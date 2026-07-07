@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryQtControlWidget.h"
 
-#include <berryShell.h>
+#include "berryShell.h"
 
 #include <QMoveEvent>
 #include <QResizeEvent>

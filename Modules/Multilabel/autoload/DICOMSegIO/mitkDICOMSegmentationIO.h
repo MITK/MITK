@@ -18,15 +18,19 @@ found in the LICENSE file.
 
 #include <mitkDICOMTagsOfInterestAddHelper.h>
 
+#include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 
+#include <dcmtk/dcmdata/dcitem.h>
+
 #include <memory>
+#include <vector>
 
 namespace mitk
 {
   /**
-   * Read and Writes a MultiLabelSegmentation to a dcm file
-   * @ingroup Process
+   * \brief Read and write MultiLabelSegmentation objects as DICOM Segmentation files.
+   * \ingroup Process
    */
   class DICOMSegmentationIO : public mitk::AbstractFileIO
   {
@@ -35,24 +39,29 @@ namespace mitk
     typedef itk::Image<unsigned short, 3> itkInputImageType;
     typedef itk::Image<short, 3> itkInternalImageType;
 
+    /** \brief Default constructor. Registers reader/writer for the DICOM Segmentation MIME type. */
     DICOMSegmentationIO();
 
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
+    /** \brief Return the confidence level for reading the given file as a DICOM segmentation. */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
+    /** \brief Write the MultiLabelSegmentation as a DICOM Segmentation file. */
     void Write() override;
+
+    /** \brief Return the confidence level for writing the given data as a DICOM segmentation. */
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
     /**
-     * @brief Reads a number of DICOM segmentation from the file system
-     * @return a vector of mitk::LabelSetImages
-     * @throws throws an mitk::Exception if an error occurs
+     * \brief Read DICOM segmentation objects from the file system.
+     * \return A vector of mitk::LabelSetImages.
+     * \throw mitk::Exception if an error occurs during reading.
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
@@ -60,8 +69,61 @@ namespace mitk
     DICOMSegmentationIO *IOClone() const override;
 
     // -------------- DICOMSegmentationIO specific functions -------------
-    const std::string CreateMetaDataJsonFile(int layer);
+
+    /**
+     * \brief Populate a DCMQI metadata handler in memory for one group.
+     *
+     * Out-parameter (rather than return-by-value) because
+     * dcmqi::JSONSegmentationMetaInformationHandler owns raw
+     * SegmentAttributes pointers and its destructor deletes them. A copy
+     * or move (which the compiler is free to materialise on return) would
+     * double-free those pointers; constructing the handler at the call
+     * site and populating it in place removes the question.
+     *
+     * \pre input must be a valid (non-null) MultiLabelSegmentation pointer.
+     * \pre layer must be a valid group index of input.
+     */
+    void BuildMetaInfoHandler(const MultiLabelSegmentation *input,
+                              int layer,
+                              dcmqi::JSONSegmentationMetaInformationHandler &handler) const;
     void SetLabelProperties(Label *label, dcmqi::SegmentAttributes *segmentAttribute);
+
+    /**
+     * \brief Build a MultiLabelSegmentation from a Sup 243 labelmap SEG.
+     *
+     * A labelmap SEG carries every segment in a single image whose pixel
+     * values are the segment numbers, so the result is exactly one MITK
+     * group. Labels are driven from the SEG's Segment Sequence (metaInfo) so
+     * the metadata is authoritative for what labels exist; mismatch between
+     * pixel grid and metadata in either direction throws rather than
+     * silently dropping content.
+     *
+     * \pre converter.dcmSegmentation2itkimage() must have been called
+     *      successfully.
+     * \pre converter.isLabelmap() must be true.
+     * \pre metaInfo.read() must have been called.
+     */
+    MultiLabelSegmentation::Pointer ReadLabelmapSegmentation(
+      dcmqi::Dicom2ItkConverterBase &converter,
+      dcmqi::JSONSegmentationMetaInformationHandler &metaInfo);
+
+    /**
+     * \brief Build a MultiLabelSegmentation from a binary DICOM SEG.
+     *
+     * A binary SEG arrives as one image per segment. When
+     * assumeOverlappingSegments is true each segment is placed in its own
+     * MITK group because segment images may overlap; otherwise all segments
+     * share a single group.
+     *
+     * \pre converter.dcmSegmentation2itkimage() must have been called
+     *      successfully.
+     * \pre converter.isLabelmap() must be false.
+     * \pre metaInfo.read() must have been called.
+     */
+    MultiLabelSegmentation::Pointer ReadBinarySegmentation(
+      dcmqi::Dicom2ItkConverterBase &converter,
+      dcmqi::JSONSegmentationMetaInformationHandler &metaInfo,
+      bool assumeOverlappingSegments);
   };
 } // end of namespace mitk
 

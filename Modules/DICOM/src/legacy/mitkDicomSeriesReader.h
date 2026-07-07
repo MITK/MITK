@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDicomSeriesReader_h
 #define mitkDicomSeriesReader_h
 
-#include "mitkConfig.h"
-#include "mitkDataNode.h"
+#include <mitkConfig.h>
+#include <mitkDataNode.h>
 
 #include <itkGDCMImageIO.h>
 
@@ -239,7 +239,7 @@ namespace mitk
   slice distance in this special case)
 
    Both errors are introduced in
-   itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of
+   itkImageSeriesReader.tpp (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of
   ITK 3.20)
 
    For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
@@ -347,92 +347,93 @@ namespace mitk
   {
   public:
     /**
-      \brief Lists of filenames.
-    */
+     * \brief Container type for lists of DICOM filenames.
+     */
     typedef std::vector<std::string> StringContainer;
 
     /**
-      \brief Interface for the progress callback.
-    */
+     * \brief Function pointer type for progress callbacks.
+     *
+     * The callback receives a float value in [0,1] representing the loading progress.
+     */
     typedef void (*UpdateCallBackMethod)(float);
 
     /**
-      \brief Describes how well the reader is tested for a certain file type.
-
-      Applications should not rely on the outcome for images which are reported
-      ReaderImplementationLevel_Implemented or ReaderImplementationLevel_Unsupported.
-
-      Errors to load images which are reported as ReaderImplementationLevel_Supported
-      are considered bugs. For ReaderImplementationLevel_PartlySupported please check the appropriate paragraph in \ref
-      DicomSeriesReader_supportedmodalities
-    */
+     * \brief Describes how well the reader is tested for a certain file type (SOP Class).
+     *
+     * Applications should not rely on the outcome for images which are reported as
+     * ReaderImplementationLevel_Implemented or ReaderImplementationLevel_Unsupported.
+     *
+     * Errors loading images reported as ReaderImplementationLevel_Supported are considered
+     * bugs. For ReaderImplementationLevel_PartlySupported, check the appropriate paragraph
+     * in \ref DicomSeriesReader_supportedmodalities.
+     */
     typedef enum {
-      ReaderImplementationLevel_Supported,       /// loader code and tests are established
-      ReaderImplementationLevel_PartlySupported, /// loader code and tests are established for specific parts of a SOP
-                                                 /// Class
-      ReaderImplementationLevel_Implemented,     /// loader code is implemented but not accompanied by tests
-      ReaderImplementationLevel_Unsupported,     /// loader code is not working with this SOP Class
+      ReaderImplementationLevel_Supported,       ///< Loader code and tests are established.
+      ReaderImplementationLevel_PartlySupported, ///< Loader code and tests are established for specific parts of a SOP Class.
+      ReaderImplementationLevel_Implemented,     ///< Loader code is implemented but not accompanied by tests.
+      ReaderImplementationLevel_Unsupported,     ///< Loader code is not working with this SOP Class.
     } ReaderImplementationLevel;
 
     /**
-      \brief How the mitk::Image spacing should be interpreted.
-
-      Compare DICOM PS 3.3 10.7 (Basic Pixel Spacing Calibration Macro).
-    */
+     * \brief How the mitk::Image pixel spacing should be interpreted.
+     *
+     * Compare DICOM PS 3.3 10.7 (Basic Pixel Spacing Calibration Macro).
+     */
     typedef enum {
-      PixelSpacingInterpretation_SpacingInPatient,  /// distances are mm within a patient
-      PixelSpacingInterpretation_SpacingAtDetector, /// distances are mm at detector surface
-      PixelSpacingInterpretation_SpacingUnknown     /// NO spacing information is present, we use (1,1) as default
+      PixelSpacingInterpretation_SpacingInPatient,  ///< Distances are mm within a patient.
+      PixelSpacingInterpretation_SpacingAtDetector, ///< Distances are mm at detector surface.
+      PixelSpacingInterpretation_SpacingUnknown     ///< No spacing information is present; (1,1) is used as default.
     } PixelSpacingInterpretation;
 
     /**
-      \brief Return type of GetSeries, describes a logical group of files.
-
-      Files grouped into a single 3D or 3D+t block are described by an instance
-      of this class. Relevant descriptive properties can be used to provide
-      the application user with meaningful choices.
-    */
+     * \brief Return type of GetSeries, describes a logical group of DICOM files.
+     *
+     * Files grouped into a single 3D or 3D+t block are described by an instance
+     * of this class. Relevant descriptive properties can be used to provide
+     * the application user with meaningful choices about which data to load.
+     */
     class ImageBlockDescriptor
     {
     public:
-      /// List of files in this group
+      /** \brief Get the list of filenames in this group. */
       StringContainer GetFilenames() const;
 
-      /// A unique ID describing this bloc (enhanced Series Instance UID).
+      /** \brief Get a unique ID describing this block (enhanced Series Instance UID). */
       std::string GetImageBlockUID() const;
 
-      /// The Series Instance UID.
+      /** \brief Get the Series Instance UID. */
       std::string GetSeriesInstanceUID() const;
 
-      /// Series Modality (CT, MR, etc.)
+      /** \brief Get the series modality (CT, MR, etc.). */
       std::string GetModality() const;
 
-      /// SOP Class UID as readable string (Computed Tomography Image Storage, Secondary Capture Image Storage, etc.)
+      /** \brief Get the SOP Class UID as a readable string (e.g., "Computed Tomography Image Storage"). */
       std::string GetSOPClassUIDAsString() const;
 
-      /// SOP Class UID as DICOM UID
+      /** \brief Get the SOP Class UID as a DICOM UID string. */
       std::string GetSOPClassUID() const;
 
-      /// Confidence of the reader that this block can be read successfully.
+      /** \brief Get the confidence level of the reader for this block. */
       ReaderImplementationLevel GetReaderImplementationLevel() const;
 
-      /// Whether or not the block contains a gantry tilt which will be "corrected" during loading
+      /** \brief Whether the block contains a gantry tilt which will be corrected during loading. */
       bool HasGantryTiltCorrected() const;
 
-      /// Whether or not mitk::Image spacing relates to the patient
+      /** \brief Whether mitk::Image spacing relates to the patient. */
       bool PixelSpacingRelatesToPatient() const;
-      /// Whether or not mitk::Image spacing relates to the detector surface
+      /** \brief Whether mitk::Image spacing relates to the detector surface. */
       bool PixelSpacingRelatesToDetector() const;
-      /// Whether or not mitk::Image spacing is of unknown origin
+      /** \brief Whether mitk::Image spacing origin is unknown. */
       bool PixelSpacingIsUnknown() const;
 
-      /// How the mitk::Image spacing can meaningfully be interpreted.
+      /** \brief Get the interpretation of the mitk::Image pixel spacing. */
       PixelSpacingInterpretation GetPixelSpacingType() const;
 
-      /// 3D+t or not
+      /** \brief Whether this block contains multiple time points (3D+t). */
       bool HasMultipleTimePoints() const;
 
-      /// Multi-frame image(s) or not
+      /** \brief Whether this block contains multi-frame image(s). */
       bool IsMultiFrameImage() const;
 
       ImageBlockDescriptor();
@@ -476,66 +477,86 @@ namespace mitk
       bool m_IsMultiFrameImage;
     };
 
+    /** \brief Map type from enhanced UID strings to ImageBlockDescriptor instances. */
     typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;
 
     /**
-      \brief Provide combination of preprocessor defines that was active during compilation.
-
-      Since this class is a combination of several possible implementations, separated only
-      by ifdef's, calling instances might want to know which flags were active at compile time.
-    */
+     * \brief Provide the combination of preprocessor defines that was active during compilation.
+     *
+     * Since this class is a combination of several possible implementations separated only
+     * by ifdefs, calling instances might want to know which flags were active at compile time.
+     *
+     * \return A human-readable configuration string.
+     */
     static std::string GetConfigurationString();
 
     /**
-     \brief Checks if a specific file contains DICOM data.
-    */
+     * \brief Check if a specific file contains DICOM data.
+     *
+     * \param filename Path to the file to check.
+     * \return True if the file contains DICOM data, false otherwise.
+     */
     static bool IsDicom(const std::string &filename);
 
     /**
-     \brief see other GetSeries().
-
-     Find all series (and sub-series -- see details) in a particular directory.
-    */
+     * \brief Find all series (and sub-series) in a particular directory.
+     *
+     * Scans the given directory for DICOM files, groups them, and returns
+     * the result. See the preferred overload taking a StringContainer for details.
+     *
+     * \param dir The directory to scan for DICOM files.
+     * \param groupImagesWithGantryTilt Whether to apply gantry tilt correction grouping.
+     * \param restrictions Additional DICOM tag restrictions for grouping.
+     * \return A map from enhanced UID strings to ImageBlockDescriptor instances.
+     *
+     * \sa GetSeries(const StringContainer&, bool, bool, const StringContainer&)
+     */
     static FileNamesGrouping GetSeries(const std::string &dir,
                                        bool groupImagesWithGantryTilt,
                                        const StringContainer &restrictions = StringContainer());
 
     /**
-     \brief see other GetSeries().
-
-     \warning Untested, could or could not work.
-
-     This differs only by having an additional restriction to a single known DICOM series.
-     Internally, it uses the other GetSeries() method.
-    */
+     * \brief Find files belonging to a specific DICOM series in a directory.
+     *
+     * This differs from the other GetSeries() overloads by restricting results to a
+     * single known DICOM series, identified by its Series Instance UID.
+     * Internally delegates to the directory-based GetSeries() method.
+     *
+     * \warning Untested; may or may not work correctly.
+     *
+     * \param dir The directory to scan for DICOM files.
+     * \param series_uid The Series Instance UID to filter for.
+     * \param groupImagesWithGantryTilt Whether to apply gantry tilt correction grouping.
+     * \param restrictions Additional DICOM tag restrictions for grouping.
+     * \return A sorted list of filenames belonging to the specified series.
+     */
     static StringContainer GetSeries(const std::string &dir,
                                      const std::string &series_uid,
                                      bool groupImagesWithGantryTilt,
                                      const StringContainer &restrictions = StringContainer());
 
     /**
-     \brief PREFERRED version of this method - scan and sort DICOM files.
-
-     Parse a list of files for images of DICOM series.
-     For each series, an enumeration of the files contained in it is created.
-
-     \return The resulting maps UID-like keys (based on Series Instance UID and slice properties) to sorted lists of
-     file
-     names.
-
-     SeriesInstanceUID will be enhanced to be unique for each set of file names
-     that is later loadable as a single mitk::Image. This implies that
-     Image orientation, slice thickness, pixel spacing, rows, and columns
-     must be the same for each file (i.e. the image slice contained in the file).
-
-     If this separation logic requires that a SeriesInstanceUID must be made more specialized,
-     it will follow the same logic as itk::GDCMSeriesFileNames to enhance the UID with
-     more digits and dots.
-
-     Optionally, more tags can be used to separate files into different logical series by setting
-     the restrictions parameter.
-
-     \warning Adding restrictions is not yet implemented!
+     * \brief PREFERRED version -- scan and sort a list of DICOM files into loadable blocks.
+     *
+     * Parse a list of files for images of DICOM series.
+     * For each series, an enumeration of the files contained in it is created.
+     *
+     * SeriesInstanceUID will be enhanced to be unique for each set of file names
+     * that is later loadable as a single mitk::Image. This implies that
+     * image orientation, slice thickness, pixel spacing, rows, and columns
+     * must be the same for each file (i.e. the image slice contained in the file).
+     *
+     * If this separation logic requires that a SeriesInstanceUID must be made more specialized,
+     * it will follow the same logic as itk::GDCMSeriesFileNames to enhance the UID with
+     * more digits and dots.
+     *
+     * \param files List of DICOM file paths to analyze.
+     * \param sortTo3DPlust Whether to attempt grouping into 3D+t blocks.
+     * \param groupImagesWithGantryTilt Whether to apply gantry tilt correction grouping.
+     * \param restrictions Additional DICOM tag restrictions for grouping.
+     * \return A map from UID-like keys to ImageBlockDescriptor instances with sorted file lists.
+     *
+     * \warning Adding restrictions is not yet implemented.
      */
     static FileNamesGrouping GetSeries(const StringContainer &files,
                                        bool sortTo3DPlust,
@@ -543,25 +564,37 @@ namespace mitk
                                        const StringContainer &restrictions = StringContainer());
 
     /**
-      \brief See other GetSeries().
-
-      Use GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions) instead.
-    */
+     * \brief Scan and sort DICOM files (without explicit 3D+t control).
+     *
+     * Convenience overload that defaults 3D+t sorting to true.
+     * Prefer the overload with explicit \p sortTo3DPlust parameter.
+     *
+     * \param files List of DICOM file paths to analyze.
+     * \param groupImagesWithGantryTilt Whether to apply gantry tilt correction grouping.
+     * \param restrictions Additional DICOM tag restrictions for grouping.
+     * \return A map from UID-like keys to ImageBlockDescriptor instances.
+     *
+     * \sa GetSeries(const StringContainer&, bool, bool, const StringContainer&)
+     */
     static FileNamesGrouping GetSeries(const StringContainer &files,
                                        bool groupImagesWithGantryTilt,
                                        const StringContainer &restrictions = StringContainer());
 
     /**
-     Loads a DICOM series composed by the file names enumerated in the file names container.
-     If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
-
-     \param filenames The filenames to load.
-     \param sort Whether files should be sorted spatially (true) or not (false - maybe useful if presorted)
-     \param load4D Whether to load the files as 3D+t (if possible)
-     \param correctGantryTilt
-     \param callback
-     \param preLoadedImageBlock
-    */
+     * \brief Load a DICOM series into a new DataNode.
+     *
+     * Loads the DICOM series composed of the given filenames and wraps the result
+     * in a DataNode. If a callback method is supplied, it will be called after
+     * every progress update with a progress value in [0,1].
+     *
+     * \param filenames The DICOM file paths to load.
+     * \param sort Whether files should be sorted spatially (true) or not (false, useful if presorted).
+     * \param load4D Whether to attempt loading the files as 3D+t (if possible).
+     * \param correctGantryTilt Whether to correct for gantry tilt during loading.
+     * \param callback Optional progress callback function.
+     * \param preLoadedImageBlock Optional pre-loaded image to use instead of reading from disk.
+     * \return A DataNode containing the loaded mitk::Image, or nullptr on failure.
+     */
     static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames,
                                              bool sort = true,
                                              bool load4D = true,
@@ -570,18 +603,21 @@ namespace mitk
                                              itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
     /**
-      \brief See LoadDicomSeries! Just a slightly different interface.
-
-      If \p preLoadedImageBlock is provided, the reader will only "fake" loading and create appropriate mitk::Properties.
-
-      \param filenames
-      \param node
-      \param sort
-      \param load4D
-      \param correctGantryTilt
-      \param callback
-      \param preLoadedImageBlock
-    */
+     * \brief Load a DICOM series into an existing DataNode.
+     *
+     * Same as the other LoadDicomSeries() overload but stores the result into the
+     * provided DataNode reference. If \p preLoadedImageBlock is provided, the reader
+     * will only create appropriate mitk::Properties without actually reading pixel data.
+     *
+     * \param filenames The DICOM file paths to load.
+     * \param node The DataNode to populate with the loaded image and properties.
+     * \param sort Whether files should be sorted spatially.
+     * \param load4D Whether to attempt loading the files as 3D+t.
+     * \param correctGantryTilt Whether to correct for gantry tilt during loading.
+     * \param callback Optional progress callback function.
+     * \param preLoadedImageBlock Optional pre-loaded image to use instead of reading from disk.
+     * \return True if loading succeeded, false otherwise.
+     */
     static bool LoadDicomSeries(const StringContainer &filenames,
                                 DataNode &node,
                                 bool sort = true,
@@ -592,63 +628,80 @@ namespace mitk
 
   protected:
     /**
-      \brief Return type of DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
-
-      Class contains the grouping result of method
-      DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption,
-      which takes as input a number of images, which are all equally oriented and spatially sorted along their normal
-      direction.
-
-      The result contains of two blocks: a first one is the grouping result, all of those images can be loaded
-      into one image block because they have an equal origin-to-origin distance without any gaps in-between.
-    */
+     * \brief Return type of DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+     *
+     * Contains the grouping result of AnalyzeFileForITKImageSeriesReaderSpacingAssumption(),
+     * which takes as input a number of images that are all equally oriented and spatially
+     * sorted along their normal direction.
+     *
+     * The result consists of two blocks: the first contains files that can be loaded
+     * into one image block because they have equal origin-to-origin distance without gaps.
+     * The second contains remaining files that need further analysis.
+     */
     class SliceGroupingAnalysisResult
     {
     public:
       SliceGroupingAnalysisResult();
 
       /**
-        \brief Grouping result, all same origin-to-origin distance w/o gaps.
-      */
+       * \brief Get the grouped filenames (all with same origin-to-origin distance, no gaps).
+       * \return The list of filenames that form a valid image block.
+       */
       StringContainer GetBlockFilenames();
 
       /**
-        \brief Remaining files, which could not be grouped.
-      */
+       * \brief Get the remaining files which could not be grouped.
+       * \return The list of filenames not fitting into the primary block.
+       */
       StringContainer GetUnsortedFilenames();
 
       /**
-        \brief Whether or not the grouped result contain a gantry tilt.
-      */
+       * \brief Whether the grouped result contains a gantry tilt.
+       * \return True if gantry tilt was detected in the grouped block.
+       */
       bool ContainsGantryTilt();
 
       /**
-        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
-      */
+       * \brief Add a file to the sorted (grouped) block.
+       * \note Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+       * \param filename Path to the file to add.
+       */
       void AddFileToSortedBlock(const std::string &filename);
 
       /**
-        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
-      */
+       * \brief Add a file to the unsorted (remaining) block.
+       * \note Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+       * \param filename Path to the file to add.
+       */
       void AddFileToUnsortedBlock(const std::string &filename);
+
+      /**
+       * \brief Add multiple files to the unsorted (remaining) block.
+       * \note Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+       * \param filenames Paths to the files to add.
+       */
       void AddFilesToUnsortedBlock(const StringContainer &filenames);
 
       /**
-        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
-        \todo Could make sense to enhance this with an instance of GantryTiltInformation to store the whole result!
-      */
+       * \brief Flag this result as containing a gantry tilt.
+       * \note Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+       * \todo Could make sense to enhance this with an instance of GantryTiltInformation to store the whole result.
+       */
       void FlagGantryTilt();
 
       /**
-        \brief Only meaningful for use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
-      */
+       * \brief Undo a premature grouping decision.
+       *
+       * Moves all files from the sorted block back into the unsorted block.
+       * Only meaningful for use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+       */
       void UndoPrematureGrouping();
 
     protected:
-      StringContainer m_GroupedFiles;
-      StringContainer m_UnsortedFiles;
+      StringContainer m_GroupedFiles;   ///< \brief Files that form a valid image block.
+      StringContainer m_UnsortedFiles;  ///< \brief Files that could not be grouped.
 
-      bool m_GantryTilt;
+      bool m_GantryTilt; ///< \brief Whether gantry tilt was detected.
     };
 
     /**
@@ -749,67 +802,87 @@ namespace mitk
       unsigned int m_NumberOfSlicesApart;
     };
 
-    /**
-      \brief for internal sorting.
-    */
+    /** \brief Pair of string containers used for internal sorting operations. */
     typedef std::pair<StringContainer, StringContainer> TwoStringContainers;
 
-    /**
-      \brief Maps DICOM tags to MITK properties.
-    */
+    /** \brief Map type from DICOM tag strings to MITK property name strings. */
     typedef std::map<std::string, std::string> TagToPropertyMapType;
 
     /**
-      \brief Ensure an equal z-spacing for a group of files.
-
-      Takes as input a number of images, which are all equally oriented and spatially sorted along their normal
-      direction.
-
-      Internally used by GetSeries. Returns two lists: the first one contains slices of equal inter-slice spacing.
-      The second list contains remaining files, which need to be run through
-      AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
-
-      Relevant code that is matched here is in
-      itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as
-      of
-      ITK 3.20)
-    */
+     * \brief Ensure equal z-spacing for a group of files.
+     *
+     * Takes as input a number of images which are all equally oriented and spatially
+     * sorted along their normal direction. Internally used by GetSeries().
+     *
+     * Returns a SliceGroupingAnalysisResult where the first list contains slices with
+     * equal inter-slice spacing and the second list contains remaining files that need
+     * to be run through this method again.
+     *
+     * \param files Spatially sorted list of DICOM filenames to analyze.
+     * \param groupsOfSimilarImages Whether to group images with similar but not identical spacing.
+     * \param tagValueMappings_ GDCM scanner tag-value mappings for the files.
+     * \return The grouping analysis result.
+     */
     static SliceGroupingAnalysisResult AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
       const StringContainer &files, bool groupsOfSimilarImages, const gdcm::Scanner::MappingType &tagValueMappings_);
 
     /**
-      \brief Safely convert const char* to std::string.
-    */
+     * \brief Safely convert a const char pointer to std::string.
+     *
+     * \param s The C-string to convert (may be nullptr).
+     * \return The string value, or an empty string if s is nullptr.
+     */
     static std::string ConstCharStarToString(const char *s);
 
     /**
-      \brief Safely convert a string into pixel spacing x and y.
-    */
+     * \brief Parse a DICOM spacing string into pixel spacing X and Y values.
+     *
+     * \param s The DICOM spacing string (backslash-separated).
+     * \param spacingX Output parameter for the X spacing.
+     * \param spacingY Output parameter for the Y spacing.
+     * \return True if parsing succeeded, false otherwise.
+     */
     static bool DICOMStringToSpacing(const std::string &s, ScalarType &spacingX, ScalarType &spacingY);
 
     /**
-      \brief Convert DICOM string describing a point to Point3D.
-
-      DICOM tags like ImagePositionPatient contain a position as float numbers separated by backslashes:
-      \verbatim
-      42.7131\13.77\0.7
-      \endverbatim
-    */
+     * \brief Convert a DICOM string describing a 3D point to Point3D.
+     *
+     * DICOM tags like ImagePositionPatient contain a position as float numbers
+     * separated by backslashes (e.g., "42.7131\\13.77\\0.7").
+     *
+     * \param s The DICOM position string.
+     * \param successful Output flag indicating whether parsing succeeded.
+     * \return The parsed 3D point.
+     */
     static Point3D DICOMStringToPoint3D(const std::string &s, bool &successful);
 
     /**
-      \brief Convert DICOM string describing a point two Vector3D.
-
-      DICOM tags like ImageOrientationPatient contain two vectors as float numbers separated by backslashes:
-      \verbatim
-      42.7131\13.77\0.7\137.76\0.3
-      \endverbatim
-    */
+     * \brief Convert a DICOM orientation string to two direction vectors.
+     *
+     * DICOM tags like ImageOrientationPatient contain two vectors as float numbers
+     * separated by backslashes (e.g., "1\\0\\0\\0\\1\\0").
+     *
+     * \param s The DICOM orientation string.
+     * \param right Output parameter for the row direction vector.
+     * \param up Output parameter for the column direction vector.
+     * \param successful Output flag indicating whether parsing succeeded.
+     */
     static void DICOMStringToOrientationVectors(const std::string &s, Vector3D &right, Vector3D &up, bool &successful);
 
+    /**
+     * \brief Correct a tilted image geometry by resampling with a shear transformation.
+     *
+     * Applies a correction for gantry tilt by resampling the image using itk::ResampleFilter.
+     *
+     * \tparam ImageType The ITK image type.
+     * \param input The input image with tilted geometry.
+     * \param tiltInfo The gantry tilt information describing the correction needed.
+     * \return The corrected image.
+     *
+     * \note Despite the name, this is NOT an in-place operation.
+     */
     template <typename ImageType>
     static typename ImageType::Pointer
-      // TODO this is NOT inplace!
       InPlaceFixUpTiltedGeometry(ImageType *input, const GantryTiltInformation &tiltInfo);
 
     /**
@@ -835,67 +908,135 @@ namespace mitk
 
   public:
     /**
-     \brief Checks if a specific file is a Philips3D ultrasound DICOM file.
-    */
+     * \brief Check if a specific file is a Philips 3D ultrasound DICOM file.
+     *
+     * Checks for the presence of tag (3001,0010) set to "Philips3D".
+     *
+     * \param filename Path to the DICOM file to check.
+     * \return True if the file is a Philips 3D ultrasound DICOM, false otherwise.
+     */
     static bool IsPhilips3DDicom(const std::string &filename);
 
+    /**
+     * \brief Convert a ReaderImplementationLevel enum value to a human-readable string.
+     *
+     * \param enumValue The enum value to convert.
+     * \return A readable string representation.
+     */
     static std::string ReaderImplementationLevelToString(const ReaderImplementationLevel &enumValue);
+
+    /**
+     * \brief Convert a PixelSpacingInterpretation enum value to a human-readable string.
+     *
+     * \param enumValue The enum value to convert.
+     * \return A readable string representation.
+     */
     static std::string PixelSpacingInterpretationToString(const PixelSpacingInterpretation &enumValue);
 
   protected:
     /**
-     \brief Read a Philips3D ultrasound DICOM file and put into an mitk::Image.
-    */
+     * \brief Read a Philips 3D ultrasound DICOM file and load it into an mitk::Image.
+     *
+     * \param filename Path to the Philips 3D DICOM file.
+     * \param output_image The image to populate with the loaded data.
+     * \return True if reading succeeded, false otherwise.
+     */
     static bool ReadPhilips3DDicom(const std::string &filename, itk::SmartPointer<Image> output_image);
 
     /**
-      \brief Construct a UID that takes into account sorting criteria from GetSeries().
-    */
+     * \brief Construct a UID that incorporates sorting criteria from GetSeries().
+     *
+     * Enhances the Series Instance UID with additional tag values to create a
+     * unique identifier for each loadable image block.
+     *
+     * \param tagValueMap The GDCM tag-to-value mapping for the series.
+     * \return An enhanced unique identifier string.
+     */
     static std::string CreateMoreUniqueSeriesIdentifier(gdcm::Scanner::TagToValue &tagValueMap);
 
     /**
-      \brief Helper for CreateMoreUniqueSeriesIdentifier
-    */
+     * \brief Extract a single tag value as a string for use in CreateMoreUniqueSeriesIdentifier().
+     *
+     * \param tagValueMap The GDCM tag-to-value mapping.
+     * \param tag The DICOM tag to extract.
+     * \return The tag value as a string, or an empty string if not found.
+     */
     static std::string CreateSeriesIdentifierPart(gdcm::Scanner::TagToValue &tagValueMap, const gdcm::Tag &tag);
 
     /**
-      \brief Helper for CreateMoreUniqueSeriesIdentifier
-    */
+     * \brief Sanitize a tag value string for use as part of a UID.
+     *
+     * Removes or replaces characters that would not be suitable in an identifier string.
+     *
+     * \param value The raw tag value string.
+     * \return A sanitized string suitable for use in a UID.
+     */
     static std::string IDifyTagValue(const std::string &value);
 
+    /** \brief Typedef for the GDCM image IO class used internally. */
     typedef itk::GDCMImageIO DcmIoType;
 
     /**
-      \brief Progress callback for DicomSeriesReader.
-    */
+     * \brief ITK command adapter for progress callbacks.
+     *
+     * Wraps an UpdateCallBackMethod function pointer into an itk::Command
+     * so it can be used with ITK process objects for progress reporting.
+     */
     class CallbackCommand : public itk::Command
     {
     public:
+      /** \brief Construct with the given callback function pointer. */
       CallbackCommand(UpdateCallBackMethod callback) : m_Callback(callback) {}
+
+      /** \brief Execute the callback with the progress value from a const ITK process object. */
       void Execute(const itk::Object *caller, const itk::EventObject &) override
       {
         (*this->m_Callback)(static_cast<const itk::ProcessObject *>(caller)->GetProgress());
       }
 
+      /** \brief Execute the callback with the progress value from an ITK process object. */
       void Execute(itk::Object *caller, const itk::EventObject &) override
       {
         (*this->m_Callback)(static_cast<itk::ProcessObject *>(caller)->GetProgress());
       }
 
     protected:
-      UpdateCallBackMethod m_Callback;
+      UpdateCallBackMethod m_Callback; ///< \brief The wrapped progress callback.
     };
 
+    /**
+     * \brief Correct the pixel spacing of a loaded image based on the image block descriptor.
+     *
+     * \param image The loaded image whose spacing may need correction.
+     * \param imageBlockDescriptor The descriptor containing pixel spacing information.
+     */
     static void FixSpacingInformation(Image *image, const ImageBlockDescriptor &imageBlockDescriptor);
 
     /**
-     \brief Scan for slice image information
-    */
+     * \brief Scan DICOM files for slice-relevant tag information.
+     *
+     * Configures and runs the GDCM scanner to extract tags needed for
+     * spatial sorting and grouping (position, orientation, spacing, etc.).
+     *
+     * \param filenames The DICOM files to scan.
+     * \param scanner The GDCM scanner to configure and execute.
+     */
     static void ScanForSliceInformation(const StringContainer &filenames, gdcm::Scanner &scanner);
 
     /**
-     \brief Performs actual loading of a series and creates an image having the specified pixel type.
-    */
+     * \brief Perform the actual loading of a DICOM series.
+     *
+     * Determines the pixel type, invokes the appropriate templated loader,
+     * and populates the DataNode with the resulting image and properties.
+     *
+     * \param filenames The DICOM file paths to load.
+     * \param node The DataNode to populate.
+     * \param sort Whether to sort files spatially before loading.
+     * \param check_4d Whether to attempt 3D+t loading.
+     * \param correctTilt Whether to correct for gantry tilt.
+     * \param callback Optional progress callback.
+     * \param preLoadedImageBlock Optional pre-loaded image block.
+     */
     static void LoadDicom(const StringContainer &filenames,
                           DataNode &node,
                           bool sort,
@@ -905,14 +1046,16 @@ namespace mitk
                           itk::SmartPointer<Image> preLoadedImageBlock);
 
     /**
-      \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
-
-      \param correctTilt
-      \param tiltInfo
-      \param io
-      \param command can be used for progress reporting
-      \param preLoadedImageBlock
-    */
+     * \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
+     *
+     * \tparam PixelType The pixel type for the ITK image reader.
+     * \param correctTilt Whether to apply gantry tilt correction after loading.
+     * \param tiltInfo The gantry tilt information for correction.
+     * \param io The GDCM image IO instance to use.
+     * \param command Optional ITK command for progress reporting.
+     * \param preLoadedImageBlock Optional pre-loaded image to use instead of reading.
+     * \return The loaded MITK image, or nullptr on failure.
+     */
     template <typename PixelType>
     static itk::SmartPointer<Image> LoadDICOMByITK(const StringContainer &,
                                                    bool correctTilt,
@@ -921,6 +1064,7 @@ namespace mitk
                                                    CallbackCommand *command,
                                                    itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /** \brief Pixel-type multiplexer for LoadDICOMByITK -- dispatches to scalar or RGB variants. */
     static itk::SmartPointer<Image> MultiplexLoadDICOMByITK(const StringContainer &,
                                                             bool correctTilt,
                                                             const GantryTiltInformation &tiltInfo,
@@ -928,6 +1072,7 @@ namespace mitk
                                                             CallbackCommand *command,
                                                             itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /** \brief Scalar pixel type multiplexer for LoadDICOMByITK. */
     static itk::SmartPointer<Image> MultiplexLoadDICOMByITKScalar(const StringContainer &,
                                                                   bool correctTilt,
                                                                   const GantryTiltInformation &tiltInfo,
@@ -935,6 +1080,7 @@ namespace mitk
                                                                   CallbackCommand *command,
                                                                   itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /** \brief RGB pixel type multiplexer for LoadDICOMByITK. */
     static itk::SmartPointer<Image> MultiplexLoadDICOMByITKRGBPixel(const StringContainer &,
                                                                     bool correctTilt,
                                                                     const GantryTiltInformation &tiltInfo,
@@ -942,6 +1088,21 @@ namespace mitk
                                                                     CallbackCommand *command,
                                                                     itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /**
+     * \brief Feed files into itk::ImageSeriesReader for 3D+t loading.
+     *
+     * Loads multiple time-step blocks into a single 4D MITK image.
+     *
+     * \tparam PixelType The pixel type for the ITK image reader.
+     * \param imageBlocks List of filename containers, one per time step.
+     * \param imageBlockDescriptor Descriptor for the image block.
+     * \param correctTilt Whether to apply gantry tilt correction.
+     * \param tiltInfo The gantry tilt information for correction.
+     * \param io The GDCM image IO instance to use.
+     * \param command Optional ITK command for progress reporting.
+     * \param preLoadedImageBlock Optional pre-loaded image block.
+     * \return The loaded 3D+t MITK image, or nullptr on failure.
+     */
     template <typename PixelType>
     static itk::SmartPointer<Image> LoadDICOMByITK4D(std::list<StringContainer> &imageBlocks,
                                                      ImageBlockDescriptor imageBlockDescriptor,
@@ -951,6 +1112,7 @@ namespace mitk
                                                      CallbackCommand *command,
                                                      itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /** \brief Pixel-type multiplexer for LoadDICOMByITK4D -- dispatches to scalar or RGB variants. */
     static itk::SmartPointer<Image> MultiplexLoadDICOMByITK4D(std::list<StringContainer> &imageBlocks,
                                                               ImageBlockDescriptor imageBlockDescriptor,
                                                               bool correctTilt,
@@ -959,6 +1121,7 @@ namespace mitk
                                                               CallbackCommand *command,
                                                               itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /** \brief Scalar pixel type multiplexer for LoadDICOMByITK4D. */
     static itk::SmartPointer<Image> MultiplexLoadDICOMByITK4DScalar(std::list<StringContainer> &imageBlocks,
                                                                     ImageBlockDescriptor imageBlockDescriptor,
                                                                     bool correctTilt,
@@ -967,6 +1130,7 @@ namespace mitk
                                                                     CallbackCommand *command,
                                                                     itk::SmartPointer<Image> preLoadedImageBlock);
 
+    /** \brief RGB pixel type multiplexer for LoadDICOMByITK4D. */
     static itk::SmartPointer<Image> MultiplexLoadDICOMByITK4DRGBPixel(std::list<StringContainer> &imageBlocks,
                                                                       ImageBlockDescriptor imageBlockDescriptor,
                                                                       bool correctTilt,
@@ -976,42 +1140,73 @@ namespace mitk
                                                                       itk::SmartPointer<Image> preLoadedImageBlock);
 
     /**
-      \brief Sort files into time step blocks of a 3D+t image.
-
-      Called by LoadDicom. Expects to be fed a single list of filenames that have been sorted by
-      GetSeries previously (one map entry). This method will check how many timestep can be filled
-      with given files.
-
-      Assumption is that the number of time steps is determined by how often the first position in
-      space repeats. I.e. if the first three files in the input parameter all describe the same
-      location in space, we'll construct three lists of files. and sort the remaining files into them.
-
-      \todo We can probably remove this method if we somehow transfer 3D+t information from GetSeries to
-      LoadDicomSeries.
-    */
+     * \brief Sort files into time step blocks for 3D+t image loading.
+     *
+     * Called by LoadDicom(). Expects a single list of filenames previously sorted by
+     * GetSeries(). Determines how many time steps can be filled with the given files.
+     *
+     * The number of time steps is determined by how often the first spatial position
+     * repeats in the sorted input. For example, if the first three files describe the
+     * same location in space, three time-step blocks are constructed and the remaining
+     * files are distributed among them.
+     *
+     * \param presortedFilenames The spatially sorted list of DICOM filenames.
+     * \param tagValueMappings_ GDCM scanner tag-value mappings for the files.
+     * \param sort Whether to sort within each time step block.
+     * \param canLoadAs4D Output flag indicating whether 4D loading is possible.
+     * \return A list of StringContainers, one per time step.
+     *
+     * \todo We can probably remove this method if we somehow transfer 3D+t information
+     *       from GetSeries to LoadDicomSeries.
+     */
     static std::list<StringContainer> SortIntoBlocksFor3DplusT(const StringContainer &presortedFilenames,
                                                                const gdcm::Scanner::MappingType &tagValueMappings_,
                                                                bool sort,
                                                                bool &canLoadAs4D);
 
     /**
-     \brief Defines spatial sorting for sorting by GDCM 2.
-
-     Sorts by image position along image normal (distance from world origin).
-     In cases of conflict, acquisition time is used as a secondary sort criterium.
-    */
+     * \brief Spatial sorting comparator for GDCM 2 datasets.
+     *
+     * Sorts by image position along image normal (distance from world origin).
+     * In cases of conflict, acquisition time is used as a secondary criterion.
+     *
+     * \param ds1 First GDCM dataset to compare.
+     * \param ds2 Second GDCM dataset to compare.
+     * \return True if ds1 should precede ds2 in the sort order.
+     */
     static bool GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
 
     /**
-      \brief Copy information about files and DICOM tags from ITK's MetaDataDictionary
-             and from the list of input files to the PropertyList of mitk::Image.
-      \todo Tag copy must follow; image level will cause some additional files parsing, probably.
-    */
+     * \brief Copy DICOM tag information to the PropertyList of an mitk::Image (single block).
+     *
+     * Extracts metadata from ITK's MetaDataDictionary and from the GDCM scanner tag
+     * mappings, then stores them as MITK properties on the image.
+     *
+     * \param filenames The DICOM file paths for metadata extraction.
+     * \param tagValueMappings_ GDCM scanner tag-value mappings.
+     * \param io The GDCM image IO instance with loaded metadata.
+     * \param blockInfo The image block descriptor with additional metadata.
+     * \param image The MITK image to receive the properties.
+     *
+     * \todo Tag copy must follow; image level will cause some additional files parsing.
+     */
     static void CopyMetaDataToImageProperties(StringContainer filenames,
                                               const gdcm::Scanner::MappingType &tagValueMappings_,
                                               DcmIoType *io,
                                               const ImageBlockDescriptor &blockInfo,
                                               Image *image);
+
+    /**
+     * \brief Copy DICOM tag information to the PropertyList of an mitk::Image (4D blocks).
+     *
+     * Overload for 3D+t images with multiple time-step blocks.
+     *
+     * \param imageBlock List of filename containers, one per time step.
+     * \param tagValueMappings_ GDCM scanner tag-value mappings.
+     * \param io The GDCM image IO instance with loaded metadata.
+     * \param blockInfo The image block descriptor with additional metadata.
+     * \param image The MITK image to receive the properties.
+     */
     static void CopyMetaDataToImageProperties(std::list<StringContainer> imageBlock,
                                               const gdcm::Scanner::MappingType &tagValueMappings_,
                                               DcmIoType *io,
@@ -1019,13 +1214,15 @@ namespace mitk
                                               Image *image);
 
     /**
-      \brief Map between DICOM tags and MITK properties.
-
-      Uses as a positive list for copying specified DICOM tags (from ITK's ImageIO)
-      to MITK properties. ITK provides MetaDataDictionary entries of form
-      "gggg|eeee" (g = group, e = element), e.g. "0028,0109" (Largest Pixel in Series),
-      which we want to sort as dicom.series.largest_pixel_in_series".
-    */
+     * \brief Get the mapping from DICOM tags to MITK property names.
+     *
+     * Returns a positive list for copying specified DICOM tags (from ITK's ImageIO)
+     * to MITK properties. ITK provides MetaDataDictionary entries of form
+     * "gggg|eeee" (g = group, e = element), e.g. "0028,0109" (Largest Pixel in Series),
+     * which are mapped to names like "dicom.series.largest_pixel_in_series".
+     *
+     * \return A const reference to the tag-to-property map.
+     */
     static const TagToPropertyMapType &GetDICOMTagsToMITKPropertyMap();
   };
 }

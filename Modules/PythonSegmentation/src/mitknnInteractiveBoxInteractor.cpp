@@ -18,6 +18,8 @@ found in the LICENSE file.
 
 #include <usModuleRegistry.h>
 
+#include "mitknnInteractiveRenderingHelpers.h"
+
 namespace mitk::nnInteractive
 {
   class BoxInteractor::Impl
@@ -33,7 +35,9 @@ namespace mitk::nnInteractive
       m_Interactor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
       m_Interactor->EnableInteraction(false);
 
-      // nnInteractive currently does not support undo.
+      // Keep box placement off MITK's global operation-based undo stack;
+      // nnInteractive undo is handled at the session level (single-level
+      // undo of the last interaction), not via the workbench undo controller.
       m_Interactor->EnableUndo(false);
     }
 
@@ -71,6 +75,7 @@ namespace mitk::nnInteractive
       node->SetBoolProperty("planarfigure.hidecontrolpointsduringinteraction", true);
       node->SetBoolProperty("planarfigure.fill", true);
       node->SetBoolProperty("helper object", true);
+      HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
       // storing the next box data node as a persistent class member and
@@ -108,6 +113,19 @@ namespace mitk::nnInteractive
 
       // Release the reference to the next box.
       m_NextBoxNode = nullptr;
+    }
+
+    void RemoveLastBox(PromptType promptType)
+    {
+      auto iter = this->BoxNodes.find(promptType);
+
+      if (iter == this->BoxNodes.end() || iter->second.empty())
+        return;
+
+      if (auto dataStorage = m_Owner->GetDataStorage(); dataStorage != nullptr)
+        dataStorage->Remove(iter->second.back());
+
+      iter->second.pop_back();
     }
 
     void DestroyBoxNodes()
@@ -169,7 +187,7 @@ namespace mitk::nnInteractive
 }
 
 mitk::nnInteractive::BoxInteractor::BoxInteractor()
-  : Interactor(InteractionType::Box, InteractionMode::BlockLMBDisplayInteraction),
+  : Interactor(InteractionType::Box),
     m_Impl(std::make_unique<Impl>(this))
 {
 }
@@ -202,6 +220,11 @@ const mitk::PlanarFigure* mitk::nnInteractive::BoxInteractor::GetLastBox() const
     return nullptr;
 
   return m_Impl->BoxNodes[promptType].back()->GetDataAs<PlanarFigure>();
+}
+
+void mitk::nnInteractive::BoxInteractor::RemoveLastInteraction(PromptType promptType)
+{
+  m_Impl->RemoveLastBox(promptType);
 }
 
 void mitk::nnInteractive::BoxInteractor::OnEnable()

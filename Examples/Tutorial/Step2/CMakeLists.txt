@@ -1,2 +1,2 @@
-mitk_create_executable(DEPENDS MitkQtWidgetsExt)
+mitk_create_executable(DEPENDS MitkQtWidgetsExt NO_INSTALL)
 

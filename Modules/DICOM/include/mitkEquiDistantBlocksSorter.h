@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkEquiDistantBlocksSorter_h
 #define mitkEquiDistantBlocksSorter_h
 
-#include "mitkDICOMDatasetSorter.h"
-#include "mitkDICOMSortCriterion.h"
-#include "mitkGantryTiltInformation.h"
+#include <mitkDICOMDatasetSorter.h>
+#include <mitkDICOMSortCriterion.h>
+#include <mitkGantryTiltInformation.h>
 
-#include "mitkVector.h"
+#include <mitkVector.h>
 
 namespace mitk
 {
@@ -102,6 +102,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     bool operator==(const DICOMDatasetSorter& other) const override;
 
   protected:
+    mitkCloneMacro(EquiDistantBlocksSorter);
 
     /**
       \brief Return type of AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
@@ -189,7 +190,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
       The second list contains remaining files, which need to be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
 
       Relevant code that is matched here is in
-      itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+      itkImageSeriesReader.tpp (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
      */
     std::shared_ptr<SliceGroupingAnalysisResult>
     AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const DICOMDatasetList& files, bool groupsOfSimilarImages);

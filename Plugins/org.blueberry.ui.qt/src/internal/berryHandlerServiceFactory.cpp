@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include "berryICommandService.h"
 #include "berryIEvaluationService.h"
 
-#include "berryExpression.h"
+#include <berryExpression.h>
 #include "berryHandlerService.h"
 #include "berryActivePartExpression.h"
 #include "berryWorkbenchWindowExpression.h"

@@ -30,7 +30,7 @@ found in the LICENSE file.
 #include <mitkUIDGenerator.h>
 
 // VTK Testing to compare the rendered image pixel-wise against a reference screen shot
-#include "vtkTesting.h"
+#include <vtkTesting.h>
 
 mitk::RenderingTestHelper::RenderingTestHelper(int width,
                                                int height,

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkMapper.h"
+#include <mitkVtkMapper.h>
 
 mitk::VtkMapper::VtkMapper()
 {
@@ -37,11 +37,6 @@ void mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRend
       this->MitkRenderVolumetricGeometry(renderer);
       break;
   }
-}
-
-bool mitk::VtkMapper::IsVtkBased() const
-{
-  return true;
 }
 
 void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer *renderer)

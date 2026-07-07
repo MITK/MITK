@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitkMultiWidgetLayoutSelectionWidget.h>
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -22,9 +23,13 @@ found in the LICENSE file.
 
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
-  , ui(new Ui::QmitkMultiWidgetLayoutSelectionWidget)
+  , ui(std::make_unique<Ui::QmitkMultiWidgetLayoutSelectionWidget>())
 {
-  Init();
+  this->Init();
+}
+
+QmitkMultiWidgetLayoutSelectionWidget::~QmitkMultiWidgetLayoutSelectionWidget()
+{
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::Init()
@@ -129,8 +134,20 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
   if (!filename.endsWith(fileExt))
     filename += fileExt;
 
-  auto outStream = std::ofstream(filename.toStdString());
-  emit SaveLayout(&outStream);
+  // Wrap the save emit so any failure (engine layout invariant violation,
+  // serializer pre-walk inconsistency, ...) surfaces as a user-facing
+  // message rather than escaping into the Qt event dispatcher. Symmetric
+  // with the load path below.
+  try
+  {
+    auto outStream = std::ofstream(filename.toStdString());
+    emit SaveLayout(&outStream);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, tr("Layout save failed"),
+                         QString::fromUtf8(e.what()));
+  }
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
@@ -141,9 +158,21 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
 
   ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
 
-  std::ifstream f(filename.toStdString());
-  auto jsonData = nlohmann::json::parse(f);
-  emit LoadLayout(&jsonData);
+  // Wrap parse + apply in a single catch frame so any failure (file I/O,
+  // JSON parse error, schema-shape violation, missing group reference,
+  // unknown view_direction, ...) surfaces as a user-facing message rather
+  // than letting the exception escape into the Qt event dispatcher.
+  try
+  {
+    std::ifstream f(filename.toStdString());
+    auto jsonData = nlohmann::json::parse(f);
+    emit LoadLayout(&jsonData);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, tr("Layout load failed"),
+                         QString::fromUtf8(e.what()));
+  }
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
@@ -154,7 +183,18 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
     return;
   }
 
-  auto jsonData = m_PresetMap[index];
+  auto jsonData = m_PresetMap.at(index);
+  // Keep 'this' alive across the emit + potential error dialog; closing
+  // before emit could leave the catch block using a dangling parent if the
+  // widget ever gains 'Qt::WA_DeleteOnClose'. Close after the dialog path.
+  try
+  {
+    emit LoadLayout(&jsonData);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, tr("Layout load failed"),
+                         QString::fromUtf8(e.what()));
+  }
   close();
-  emit LoadLayout(&jsonData);
 }

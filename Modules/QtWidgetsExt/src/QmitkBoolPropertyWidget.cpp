@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkBoolPropertyWidget.h"
+#include <QmitkBoolPropertyWidget.h>
 
 #include <mitkPropertyObserver.h>
 

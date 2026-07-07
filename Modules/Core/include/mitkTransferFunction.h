@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkTransferFunction_h
 #define mitkTransferFunction_h
 
-#include "mitkHistogramGenerator.h"
-#include "mitkImage.h"
+#include <mitkHistogramGenerator.h>
+#include <mitkImage.h>
 #include <MitkCoreExports.h>
 
 #include <itkHistogram.h>
@@ -32,30 +32,27 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief The TransferFunction class A wrapper class for VTK scalar opacity,
-   * gradient opacity, and color transfer functions.
-   * @ingroup DataManagement
+   * \brief Wrapper for VTK scalar opacity, gradient opacity, and color transfer functions.
    *
-   * Holds a copy of each of the three standard VTK transfer functions (scalar
-   * opacity, gradient opacity, color) and provides an interface for manipulating
-   * their control points. Each original function can be retrieved by a Get()
-   * method.
+   * Holds and manages three standard VTK transfer functions: scalar opacity
+   * (vtkPiecewiseFunction), gradient opacity (vtkPiecewiseFunction), and color
+   * (vtkColorTransferFunction). Provides an interface for adding, removing,
+   * and querying control points, as well as initialization from image histograms.
    *
-   * @note Currently, transfer function initialization based on histograms or
-   * computed-tomography-presets is also provided by this class, but will likely
-   * be separated into a specific initializer class.
+   * \note If you want to use this as a property for an mitk::Image, wrap it in
+   *       a mitk::TransferFunctionProperty and set mitk::RenderingModeProperty
+   *       to a mode that supports transfer functions (e.g. COLORTRANSFERFUNCTION_COLOR).
+   *       See the test mitkImageVtkMapper2DTransferFunctionTest.cpp for an example.
    *
-   * @note If you want to use this as a property for an mitk::Image, make sure
-   * to use the mitk::TransferFunctionProperty and set the mitk::RenderingModeProperty
-   * to a mode which supports transfer functions (e.g. COLORTRANSFERFUNCTION_COLOR).
-   * Make sure to check the documentation of the mitk::RenderingModeProperty. For a
-   * code example how to use the mitk::TransferFunction check the
-   * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core/Code/Testing.
+   * \sa TransferFunctionProperty, RenderingModeProperty, LookupTable
    */
   class MITKCORE_EXPORT TransferFunction : public itk::Object
   {
   public:
+    /** \brief Type for scalar opacity or gradient opacity control points (x, value). */
     typedef std::vector<std::pair<double, double>> ControlPoints;
+
+    /** \brief Type for color transfer function control points (x, RGB). */
     typedef std::vector<std::pair<double, itk::RGBPixel<double>>> RGBControlPoints;
 
     mitkClassMacroItkParent(TransferFunction, itk::DataObject);
@@ -89,76 +86,127 @@ namespace mitk
     /** \brief Get histogram used for transfer function initialization. */
     itkGetConstObjectMacro(Histogram, HistogramGenerator::HistogramType);
 
-    /** \brief Initialize transfer function based on the histogram of an mitk::Image. */
+    /**
+     * \brief Initialize all three transfer functions from an mitk::Image histogram.
+     * \param[in] image The image whose histogram drives the initialization.
+     */
     void InitializeByMitkImage(const mitk::Image *image);
 
-    /** \brief Initialize transfer function based on the specified histogram. */
+    /**
+     * \brief Initialize all three transfer functions from an ITK histogram.
+     * \param[in] histogram The histogram to use for initialization.
+     */
     void InitializeByItkHistogram(const itk::Statistics::Histogram<double> *histogram);
 
-    /** \brief Initialize the internal histogram and min/max range based on the
-     * specified mitk::Image. */
+    /**
+     * \brief Compute and store the histogram and min/max range from an image.
+     * \param[in] image The image from which the histogram is computed.
+     */
     void InitializeHistogram(const mitk::Image *image);
 
-    /** \brief Insert control points and values into the scalar opacity transfer
-     * function. */
+    /**
+     * \brief Replace all scalar opacity control points.
+     * \param[in] points The new set of (x, opacity) control points.
+     */
     void SetScalarOpacityPoints(TransferFunction::ControlPoints points);
 
-    /** \brief Insert control points and values into the gradient opacity transfer
-     * function. */
+    /**
+     * \brief Replace all gradient opacity control points.
+     * \param[in] points The new set of (x, opacity) control points.
+     */
     void SetGradientOpacityPoints(TransferFunction::ControlPoints points);
 
-    /** \brief Insert control points and RGB values into the color transfer
-     * function. */
+    /**
+     * \brief Replace all color transfer function control points.
+     * \param[in] rgbpoints The new set of (x, RGB) control points.
+     */
     void SetRGBPoints(TransferFunction::RGBControlPoints rgbpoints);
 
-    /** \brief Add a single control point to the scalar opacity transfer function. */
+    /**
+     * \brief Add a single control point to the scalar opacity function.
+     * \param[in] x     The scalar value position.
+     * \param[in] value The opacity at this position (0.0 to 1.0).
+     */
     void AddScalarOpacityPoint(double x, double value);
 
-    /** \brief Add a single control point to the gradient opacity transfer function. */
+    /**
+     * \brief Add a single control point to the gradient opacity function.
+     * \param[in] x     The gradient magnitude position.
+     * \param[in] value The opacity at this position (0.0 to 1.0).
+     */
     void AddGradientOpacityPoint(double x, double value);
 
-    /** \brief Add a single control point to the color opacity transfer function. */
+    /**
+     * \brief Add a single control point to the color transfer function.
+     * \param[in] x The scalar value position.
+     * \param[in] r Red component (0.0 to 1.0).
+     * \param[in] g Green component (0.0 to 1.0).
+     * \param[in] b Blue component (0.0 to 1.0).
+     */
     void AddRGBPoint(double x, double r, double g, double b);
 
-    /** \brief Get a copy of the scalar opacity transfer function control-points. */
+    /**
+     * \brief Get the scalar opacity control points.
+     * \return Reference to the internal control point vector.
+     */
     TransferFunction::ControlPoints &GetScalarOpacityPoints();
 
-    /** \brief Get a copy of the gradient opacity transfer function control-points. */
+    /**
+     * \brief Get the gradient opacity control points.
+     * \return Reference to the internal control point vector.
+     */
     TransferFunction::ControlPoints &GetGradientOpacityPoints();
 
-    /** \brief Get a copy of the color transfer function control-points. */
+    /**
+     * \brief Get the color transfer function control points.
+     * \return Reference to the internal RGB control point vector.
+     */
     TransferFunction::RGBControlPoints &GetRGBPoints();
 
-    /** \brief Remove the specified control point from the scalar opacity transfer
-     * function. */
+    /**
+     * \brief Remove a control point from the scalar opacity function.
+     * \param[in] x The scalar position of the control point to remove.
+     * \return The index of the removed point, or -1 if not found.
+     */
     int RemoveScalarOpacityPoint(double x);
 
-    /** \brief Remove the specified control point from the gradient opacity transfer
-     * function. */
+    /**
+     * \brief Remove a control point from the gradient opacity function.
+     * \param[in] x The gradient position of the control point to remove.
+     * \return The index of the removed point, or -1 if not found.
+     */
     int RemoveGradientOpacityPoint(double x);
 
-    /** \brief Remove the specified control point from the color transfer function. */
+    /**
+     * \brief Remove a control point from the color transfer function.
+     * \param[in] x The scalar position of the control point to remove.
+     * \return The index of the removed point, or -1 if not found.
+     */
     int RemoveRGBPoint(double x);
 
-    /** \brief Removes all control points from the scalar opacity transfer function. */
+    /** \brief Remove all control points from the scalar opacity function. */
     void ClearScalarOpacityPoints();
 
-    /** \brief Removes all control points from the gradient opacity transfer
-     * function. */
+    /** \brief Remove all control points from the gradient opacity function. */
     void ClearGradientOpacityPoints();
 
-    /** \brief Removes all control points from the color transfer function. */
+    /** \brief Remove all control points from the color transfer function. */
     void ClearRGBPoints();
 
+    /**
+     * \brief Compare two TransferFunction objects for equality.
+     * \param[in] other The TransferFunction to compare against.
+     * \return True if all three transfer functions have identical control points.
+     */
     bool operator==(Self &other);
 
   protected:
     TransferFunction();
     ~TransferFunction() override;
 
-    TransferFunction(const TransferFunction &other);
+    TransferFunction(const Self &other);
 
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(Self);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

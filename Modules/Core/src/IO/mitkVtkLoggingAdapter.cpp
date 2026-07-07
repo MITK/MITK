@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkLoggingAdapter.h"
-#include "mitkLog.h"
+#include <mitkVtkLoggingAdapter.h>
+#include <mitkLog.h>
 #include <vtkObjectFactory.h>
 
 namespace mitk

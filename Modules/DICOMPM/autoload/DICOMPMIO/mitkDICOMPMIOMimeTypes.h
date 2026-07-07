@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMPMIOMimeTypes_h
 #define mitkDICOMPMIOMimeTypes_h
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 #include <MitkDICOMPMIOExports.h>
 
 
@@ -37,12 +37,13 @@ namespace mitk
       MitkDICOMPMMimeType *Clone() const override;
     };
 
+    /** \brief Return an instance of the DICOM Parametric Map MIME type. */
     static MitkDICOMPMMimeType DICOMPM_MIMETYPE();
+
+    /** \brief Return the name string for the DICOM Parametric Map MIME type. */
     static std::string DICOMPM_MIMETYPE_NAME();
 
-
-
-    // Get all Mime Types
+    /** \brief Return all registered DICOM PM MIME types. Caller takes ownership. */
     static std::vector<CustomMimeType *> Get();
 
   private:

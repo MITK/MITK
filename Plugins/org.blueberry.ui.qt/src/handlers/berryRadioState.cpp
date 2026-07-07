@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryRadioState.h"
 
-#include "berryObjectString.h"
-#include "berryObjectStringMap.h"
+#include <berryObjectString.h>
+#include <berryObjectStringMap.h>
 
 #include <mitkIPreferences.h>
 

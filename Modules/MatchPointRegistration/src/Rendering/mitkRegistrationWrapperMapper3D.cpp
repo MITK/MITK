@@ -20,12 +20,12 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkException.h>
 
-#include "mitkMAPRegistrationWrapper.h"
-#include "mitkRegistrationWrapperMapper3D.h"
-#include "mitkRegVisColorStyleProperty.h"
-#include "mitkRegVisHelper.h"
-#include "mitkRegVisPropertyTags.h"
-#include "mitkRegVisHelper.h"
+#include <mitkMAPRegistrationWrapper.h>
+#include <mitkRegistrationWrapperMapper3D.h>
+#include <mitkRegVisColorStyleProperty.h>
+#include <mitkRegVisHelper.h>
+#include <mitkRegVisPropertyTags.h>
+#include <mitkRegVisHelper.h>
 
 mitk::MITKRegistrationWrapperMapper3D::MITKRegistrationWrapperMapper3D()
 {

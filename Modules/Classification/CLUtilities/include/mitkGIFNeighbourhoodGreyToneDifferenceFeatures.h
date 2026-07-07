@@ -70,12 +70,26 @@ namespace mitk
 
     GIFNeighbourhoodGreyToneDifferenceFeatures();
 
+    /** \brief Set the neighbourhood range in voxels (default: 1). */
     itkSetMacro(Range, int);
+    /** \brief Get the neighbourhood range in voxels. */
     itkGetConstMacro(Range, int);
 
+    /**
+     * \brief Calculate NGTD features for the given image and mask.
+     *
+     * \param[in] image The input intensity image.
+     * \param[in] mask The binary mask defining the region of interest.
+     * \param[in] maskNoNAN The mask with NaN voxels excluded.
+     * \return A list of computed feature name-value pairs.
+     */
     FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
     using Superclass::CalculateFeatures;
 
+    /**
+     * \brief Add command line arguments for configuring this feature class.
+     * \param[in,out] parser The command line parser to add arguments to.
+     */
     void AddArguments(mitkCommandLineParser& parser) const override;
 
   protected:

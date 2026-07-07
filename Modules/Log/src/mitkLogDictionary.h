@@ -15,13 +15,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief This is a dictionary to replace long names of classes,
-    *        modules, etc. to shorter versions in the console output. */
+  /**
+   * \brief Dictionary for abbreviating class, module, and namespace names in log output.
+   *
+   * This array of string pairs maps long names (file extensions, namespace
+   * prefixes, common words) to shorter abbreviations for more compact
+   * console output. Entries are organized as consecutive pairs of
+   * {pattern, replacement}.
+   */
   static const char *replace[] = {".cpp",
                                   "",
                                   ".cxx",
                                   "",
-                                  ".txx",
+                                  ".tpp",
                                   "",
                                   ".h",
                                   "",
@@ -51,6 +57,10 @@ namespace mitk
                                   "",
                                   "qt",
                                   "",
+                                  "python",
+                                  "py",
+                                  "installer",
+                                  "inst",
 
                                   "object",
                                   "obj",

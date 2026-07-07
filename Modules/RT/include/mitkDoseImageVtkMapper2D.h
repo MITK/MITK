@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <MitkRTExports.h>
 
 //MITK Rendering
-#include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
-#include "mitkExtractSliceFilter.h"
+#include <mitkBaseRenderer.h>
+#include <mitkVtkMapper.h>
+#include <mitkExtractSliceFilter.h>
 
 //VTK
 #include <vtkSmartPointer.h>
@@ -119,16 +119,24 @@ namespace mitk {
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** \brief Get the Image to map */
+      /**
+       * \brief Get the input Image to be mapped.
+       * \return Const pointer to the mitk::Image associated with this mapper's DataNode.
+       */
       const mitk::Image *GetInput(void);
 
-    /** \brief Checks whether this mapper needs to update itself and generate
-    * data. */
+    /**
+     * \brief Checks whether this mapper needs to update itself and generate data.
+     * \param[in] renderer The renderer to check and update for.
+     */
     void Update(mitk::BaseRenderer * renderer) override;
 
-    //### methods of MITK-VTK rendering pipeline
+    /**
+     * \brief Returns the VTK prop assembly used for rendering in the given renderer.
+     * \param[in] renderer The renderer for which to retrieve the VTK prop.
+     * \return The vtkProp used by the VTK rendering pipeline.
+     */
     vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
-    //### end of methods of MITK-VTK rendering pipeline
 
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -193,15 +201,28 @@ namespace mitk {
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-    /** \brief Get the LocalStorage corresponding to the current renderer. */
+    /**
+     * \brief Get the LocalStorage corresponding to the current renderer.
+     * \param[in] renderer The renderer whose LocalStorage is requested.
+     * \return Pointer to the LocalStorage for the given renderer.
+     */
     LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
-    /** \brief Set the default properties for general image rendering. */
+    /**
+     * \brief Set the default properties for dose image rendering on a DataNode.
+     * \param[in,out] node The DataNode on which to set the default properties.
+     * \param[in] renderer Optional renderer for renderer-specific properties. If nullptr, global defaults are set.
+     * \param[in] overwrite If true, existing properties are overwritten with defaults.
+     */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
-    /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
-    * Detailed documentation about the modes can be found here: \link mitk::RenderingModeProperty \endlink
-    */
+    /**
+     * \brief Switches between different rendering modes (e.g. lookup table or transfer function).
+     *
+     * Detailed documentation about the modes can be found here: \link mitk::RenderingModeProperty \endlink
+     *
+     * \param[in] renderer The renderer for which to apply the rendering mode.
+     */
     void ApplyRenderingMode(mitk::BaseRenderer *renderer);
 
   protected:

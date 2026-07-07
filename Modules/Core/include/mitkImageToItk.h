@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkImageToItk_h
 #define mitkImageToItk_h
 
-#include "mitkImage.h"
-#include "mitkImageDataItem.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkImage.h>
+#include <mitkImageDataItem.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <itkImage.h>
 #include <itkImageSource.h>
@@ -42,14 +42,14 @@ namespace mitk
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self> ConstPointer;
 
-    /** Method for creation through the object factory. */
+    /** \brief Method for creation through the object factory. */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** Superclass typedefs. */
+      /** \brief Superclass typedefs. */
       typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-    /** Some convenient typedefs. */
+    /** \brief Some convenient typedefs. */
     typedef mitk::Image InputImageType;
     typedef InputImageType::Pointer InputImagePointer;
     typedef InputImageType::ConstPointer InputImageConstPointer;
@@ -61,34 +61,63 @@ namespace mitk
     typedef typename TOutputImage::InternalPixelType InternalPixelType;
     typedef typename TOutputImage::PixelContainer PixelContainer;
 
+    /**
+     * \brief Set the MITK image as input (non-const version).
+     *
+     * Locks the image for read/write access.
+     *
+     * \param input The MITK image to convert.
+     */
     virtual void SetInput(mitk::Image *input);
-    virtual void SetInput(const mitk::Image *input);
-    // virtual void SetInput(unsigned int index, mitk::Image * image);
-    // virtual void SetInput(unsigned int index, const mitk::Image * image);
 
+    /**
+     * \brief Set the MITK image as input (const version).
+     *
+     * Locks the image for read-only access.
+     *
+     * \param input The MITK image to convert.
+     */
+    virtual void SetInput(const mitk::Image *input);
+
+    /** \brief Update the output information from the MITK image. */
     void UpdateOutputInformation() override;
 
+    /** \brief Get the channel number to extract. */
     itkGetMacro(Channel, int);
+    /** \brief Set the channel number to extract. */
     itkSetMacro(Channel, int);
 
+    /** \brief Set whether to copy memory instead of referencing it. */
     itkSetMacro(CopyMemFlag, bool);
+    /** \brief Get whether memory is copied instead of referenced. */
     itkGetMacro(CopyMemFlag, bool);
+    /** \brief Toggle memory copy on/off. */
     itkBooleanMacro(CopyMemFlag);
 
+    /** \brief Set the image accessor options (see ImageAccessorBase). */
     itkSetMacro(Options, int);
+    /** \brief Get the image accessor options. */
     itkGetMacro(Options, int);
 
   protected:
     using itk::ProcessObject::SetInput;
+
+    /** \brief Get the MITK image input (non-const). */
     mitk::Image *GetInput(void);
+
+    /** \brief Get the MITK image input (const). */
     const mitk::Image *GetInput() const;
 
     ImageToItk() : m_CopyMemFlag(false), m_Channel(0), m_Options(mitk::ImageAccessorBase::DefaultBehavior) {}
     ~ImageToItk() override {}
+
+    /** \brief Print self information to the given stream. */
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
+    /** \brief Generate the ITK image data from the MITK image input. */
     void GenerateData() override;
 
+    /** \brief Set up the output information (size, spacing, origin, direction) from the MITK image. */
     void GenerateOutputInformation() override;
 
   private:
@@ -105,9 +134,9 @@ namespace mitk
   };
 
   /**
-   * @brief Convert a MITK image to an ITK image.
+   * \brief Convert a MITK image to an ITK image.
    *
-   * This method creates a itk::Image representation for the given MITK
+   * This method creates an itk::Image representation for the given MITK
    * image, referencing the MITK image memory. If the provided template
    * arguments do not match the type of the MITK image, an exception is thrown.
    *
@@ -115,18 +144,18 @@ namespace mitk
    * itk::Image object exists. See ImageToItkImage(const mitk::Image*) for
    * read-only access.
    *
-   * @tparam TPixel The pixel type of the ITK image
-   * @tparam VDimension The image dimension of the ITK image
-   * @param mitkImage The MITK image which is to be converted to an ITK image
-   * @return An ITK image representation for the given MITK image
-   * @throws mitk::Exception if the pixel type or dimension does not match
-   *         the MITK image type or if the MITK image is already locked for
-   *         read or write access.
+   * \tparam TPixel The pixel type of the ITK image.
+   * \tparam VDimension The image dimension of the ITK image.
+   * \param mitkImage The MITK image which is to be converted to an ITK image.
+   * \return An ITK image representation for the given MITK image.
+   * \throw mitk::Exception if the pixel type or dimension does not match
+   *        the MITK image type or if the MITK image is already locked for
+   *        read or write access.
    *
-   * @sa ImageToItkImage(const mitk::Image*)
-   * @sa CastToItkImage
+   * \sa ImageToItkImage(const mitk::Image*)
+   * \sa CastToItkImage
    *
-   * @ingroup Adaptor
+   * \ingroup Adaptor
    */
   template <typename TPixel, unsigned int VDimension>
   typename ImageTypeTrait<TPixel, VDimension>::ImageType::Pointer ImageToItkImage(mitk::Image *mitkImage)
@@ -140,9 +169,9 @@ namespace mitk
   }
 
   /**
-   * @brief Convert a MITK image to an ITK image.
+   * \brief Convert a MITK image to an ITK image (const/read-only version).
    *
-   * This method creates a itk::Image representation for the given MITK
+   * This method creates an itk::Image representation for the given MITK
    * image, referencing the MITK image memory. If the provided template
    * arguments do not match the type of the MITK image, an exception is thrown.
    *
@@ -150,18 +179,18 @@ namespace mitk
    * itk::Image object exists. See ImageToItkImage(mitk::Image*) for
    * read and write access.
    *
-   * @tparam TPixel The pixel type of the ITK image
-   * @tparam VDimension The image dimension of the ITK image
-   * @param mitkImage The MITK image which is to be converted to an ITK image
-   * @return An ITK image representation for the given MITK image
-   * @throws mitk::Exception if the pixel type or dimension does not match
-   *         the MITK image type or if the MITK image is already locked for
-   *         write access.
+   * \tparam TPixel The pixel type of the ITK image.
+   * \tparam VDimension The image dimension of the ITK image.
+   * \param mitkImage The MITK image which is to be converted to an ITK image.
+   * \return A const ITK image representation for the given MITK image.
+   * \throw mitk::Exception if the pixel type or dimension does not match
+   *        the MITK image type or if the MITK image is already locked for
+   *        write access.
    *
-   * @sa ImageToItkImage(mitk::Image*)
-   * @sa CastToItkImage
+   * \sa ImageToItkImage(mitk::Image*)
+   * \sa CastToItkImage
    *
-   * @ingroup Adaptor
+   * \ingroup Adaptor
    */
   template <typename TPixel, unsigned int VDimension>
   typename ImageTypeTrait<TPixel, VDimension>::ImageType::ConstPointer ImageToItkImage(const mitk::Image *mitkImage)
@@ -177,7 +206,7 @@ namespace mitk
 } // end namespace mitk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "mitkImageToItk.txx"
+#include <mitkImageToItk.tpp>
 #endif
 
 #endif

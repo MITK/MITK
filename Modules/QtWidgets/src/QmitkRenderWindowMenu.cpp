@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindowMenu.h"
+#include <QmitkRenderWindowMenu.h>
 
 // mitk core
-#include "mitkProperties.h"
-#include "mitkResliceMethodProperty.h"
-#include "mitkIPreferencesService.h"
-#include "mitkIPreferences.h"
-#include "mitkCoreServices.h"
+#include <mitkProperties.h>
+#include <mitkResliceMethodProperty.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+#include <mitkCoreServices.h>
 
 // qt
 #include <QActionGroup>
@@ -32,12 +32,12 @@ found in the LICENSE file.
 #include <QWidgetAction>
 
 //#include"iconClose.xpm"
-#include "iconCrosshairMode.xpm"
-#include "iconFullScreen.xpm"
+#include <iconCrosshairMode.xpm>
+#include <iconFullScreen.xpm>
 //#include"iconHoriSplit.xpm"
-#include "iconSettings.xpm"
+#include <iconSettings.xpm>
 //#include"iconVertiSplit.xpm"
-#include "iconLeaveFullScreen.xpm"
+#include <iconLeaveFullScreen.xpm>
 
 // c++
 #include <cmath>
@@ -66,6 +66,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   , m_Parent(parent)
   , m_CrosshairRotationMode(0)
   , m_CrosshairVisibility(true)
+  , m_Crosshair3DVisibility(true)
   , m_Layout(LayoutIndex::Axial)
   , m_LayoutDesign(LayoutDesign::DEFAULT)
   , m_OldLayoutDesign(LayoutDesign::DEFAULT)
@@ -185,6 +186,11 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(LayoutDesign layoutDesign)
 void QmitkRenderWindowMenu::UpdateCrosshairVisibility(bool visible)
 {
   m_CrosshairVisibility = visible;
+}
+
+void QmitkRenderWindowMenu::UpdateCrosshair3DVisibility(bool visible)
+{
+  m_Crosshair3DVisibility = visible;
 }
 
 void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(int mode)
@@ -423,6 +429,17 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
     connect(showHideCrosshairVisibilityAction, &QAction::toggled, this, &QmitkRenderWindowMenu::OnCrosshairVisibilityChanged);
   }
 
+  // Show hide crosshair in the 3D render window only
+  if (m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D)
+  {
+    QAction *show3DCrosshairVisibilityAction = new QAction(crosshairModesMenu);
+    show3DCrosshairVisibilityAction->setText("Show crosshair in 3D window");
+    show3DCrosshairVisibilityAction->setCheckable(true);
+    show3DCrosshairVisibilityAction->setChecked(m_Crosshair3DVisibility);
+    crosshairModesMenu->addAction(show3DCrosshairVisibilityAction);
+    connect(show3DCrosshairVisibilityAction, &QAction::toggled, this, &QmitkRenderWindowMenu::OnCrosshair3DVisibilityChanged);
+  }
+
   // Rotation mode
   {
     QAction *rotationGroupSeparator = new QAction(crosshairModesMenu);
@@ -547,6 +564,12 @@ void QmitkRenderWindowMenu::OnCrosshairVisibilityChanged(bool visible)
 {
   UpdateCrosshairVisibility(visible);
   emit CrosshairVisibilityChanged(m_CrosshairVisibility);
+}
+
+void QmitkRenderWindowMenu::OnCrosshair3DVisibilityChanged(bool visible)
+{
+  UpdateCrosshair3DVisibility(visible);
+  emit Crosshair3DVisibilityChanged(m_Crosshair3DVisibility);
 }
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction *action)

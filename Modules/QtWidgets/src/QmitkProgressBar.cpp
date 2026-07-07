@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkProgressBar.h"
+#include <QmitkProgressBar.h>
 
-#include "mitkProgressBar.h"
-#include "mitkRenderingManager.h"
+#include <mitkProgressBar.h>
+#include <mitkRenderingManager.h>
 
 #include <QApplication>
 #include <QProgressBar>

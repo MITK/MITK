@@ -13,20 +13,20 @@ found in the LICENSE file.
 #ifndef mitkNonBlockingAlgorithm_h
 #define mitkNonBlockingAlgorithm_h
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 #include <itkImage.h>
 #include <itkMacro.h>
 #include <itkObjectFactory.h>
 
-#include "mitkCommon.h"
-#include "mitkDataStorage.h"
-#include "mitkProperties.h"
-#include "mitkPropertyList.h"
-#include "mitkSmartPointerProperty.h"
-#include "mitkWeakPointer.h"
+#include <mitkCommon.h>
+#include <mitkDataStorage.h>
+#include <mitkProperties.h>
+#include <mitkPropertyList.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkWeakPointer.h>
 
-#include "mitkImage.h"
-#include "mitkSurface.h"
+#include <mitkImage.h>
+#include <mitkSurface.h>
 
 #include <mutex>
 #include <stdexcept>
@@ -61,31 +61,53 @@ virtual::itk::LightObject::Pointer                                              
 
 namespace mitk
 {
-  /*!
-      Invokes ResultsAvailable with each new result
-
-      <b>done</b> centralize use of itk::MultiThreader in this class
-      @todo do the property-handling in this class
-      @todo process "incoming" events in this class
-      @todo sollen segmentierungs-dinger von mitk::ImageSource erben? Ivo fragen, wie das mit AllocateOutputs, etc.
-     gehen soll
-            eine ImageSourceAlgorithm koennte dann die noetigen Methoden wie GenerateData(), GetOutput() ueberschreiben,
-     so
-            dass von dort aus die Methoden von NonBlockingAlgorithm aufgerufen werden.
-            Erben v.a. um die Output-Sachen zu uebernehmen, die Anpassungen das einfuehren einer Zwischenklasse, um die
-     Interaces zu verheiraten.
-  */
+  /**
+   * \brief Base class for algorithms that can run in a background thread.
+   *
+   * NonBlockingAlgorithm provides a framework for running computations
+   * asynchronously. Subclasses implement ThreadedUpdateFunction() with their
+   * algorithm logic. The algorithm can be started via StartAlgorithm() (non-blocking)
+   * or StartBlockingAlgorithm() (blocking). Upon completion, a ResultAvailable or
+   * ProcessingError event is emitted via the GUI thread.
+   *
+   * Parameters are stored in a PropertyList and can be set via SetParameter(),
+   * SetPointerParameter(), or SetItkImageAsMITKImagePointerParameter(). Trigger
+   * parameters can be defined so that modifying them automatically restarts the
+   * algorithm.
+   *
+   * \note Use the mitkAlgorithmNewMacro() macro for subclass instantiation, as
+   * Initialize() cannot be called from the base constructor (virtual dispatch).
+   *
+   * \sa NonBlockingAlgorithmEvent
+   * \sa ResultAvailable
+   * \sa ProcessingError
+   * \sa SegmentationSink
+   */
   class MITKALGORITHMSEXT_EXPORT NonBlockingAlgorithm : public itk::Object
   {
   public:
     mitkClassMacroItkParent(NonBlockingAlgorithm, itk::Object);
 
+    /**
+     * \brief Set the DataStorage for this algorithm.
+     * \param[in] storage Reference to the DataStorage to use.
+     */
     void SetDataStorage(DataStorage &storage);
+
+    /**
+     * \brief Get the DataStorage associated with this algorithm.
+     * \return Pointer to the DataStorage, or nullptr if expired.
+     */
     DataStorage *GetDataStorage();
 
     // parameter setting
 
-    /// For any kind of normal types
+    /**
+     * \brief Set a parameter of any normal (value) type.
+     * \tparam T The parameter value type.
+     * \param[in] parameter The parameter name.
+     * \param[in] value The parameter value.
+     */
     template <typename T>
     void SetParameter(const char *parameter, const T &value)
     {
@@ -95,7 +117,12 @@ namespace mitk
       // m_ParameterListMutex->Unlock();
     }
 
-    /// For any kind of smart pointers
+    /**
+     * \brief Set a parameter that holds a smart pointer.
+     * \tparam T The type pointed to by the smart pointer.
+     * \param[in] parameter The parameter name.
+     * \param[in] value The smart pointer value.
+     */
     template <typename T>
     void SetPointerParameter(const char *parameter, const itk::SmartPointer<T> &value)
     {
@@ -110,10 +137,26 @@ namespace mitk
     // perhaps some TriggerParameter(string) macro that creates an observer for changes in a specific property like
     // "2ndPoint" for LineAlgorithms
 
-    /// For any kind of BaseData, like Image, Surface, etc. Will be stored inside some SmartPointerProperty
+    /**
+     * \brief Set a parameter that holds a BaseData pointer (Image, Surface, etc.).
+     *
+     * The value is stored internally as a SmartPointerProperty.
+     *
+     * \param[in] parameter The parameter name.
+     * \param[in] value The BaseData pointer.
+     */
     void SetPointerParameter(const char *parameter, BaseData *value);
 
-    /// For any kind of ITK images (C pointers)
+    /**
+     * \brief Set an ITK image as a MITK Image parameter (raw pointer version).
+     *
+     * The ITK image is imported into a mitk::Image and stored as a pointer parameter.
+     *
+     * \tparam TPixel The pixel type of the ITK image.
+     * \tparam VImageDimension The dimensionality of the ITK image.
+     * \param[in] parameter The parameter name.
+     * \param[in] itkImage The ITK image to store.
+     */
     template <typename TPixel, unsigned int VImageDimension>
     void SetItkImageAsMITKImagePointerParameter(const char *parameter, itk::Image<TPixel, VImageDimension> *itkImage)
     {
@@ -125,7 +168,16 @@ namespace mitk
       SetPointerParameter(parameter, mitkImage);
     }
 
-    /// For any kind of ITK images (smartpointers)
+    /**
+     * \brief Set an ITK image as a MITK Image parameter (smart pointer version).
+     *
+     * The ITK image is imported into a mitk::Image and stored as a pointer parameter.
+     *
+     * \tparam TPixel The pixel type of the ITK image.
+     * \tparam VImageDimension The dimensionality of the ITK image.
+     * \param[in] parameter The parameter name.
+     * \param[in] itkImage Smart pointer to the ITK image to store.
+     */
     template <typename TPixel, unsigned int VImageDimension>
     void SetItkImageAsMITKImagePointerParameter(const char *parameter,
                                                 const itk::SmartPointer<itk::Image<TPixel, VImageDimension>> &itkImage)
@@ -138,8 +190,13 @@ namespace mitk
       SetPointerParameter(parameter, mitkImage);
     }
 
-    // parameter getting
-
+    /**
+     * \brief Get a parameter of any normal (value) type.
+     * \tparam T The parameter value type.
+     * \param[in] parameter The parameter name.
+     * \param[out] value The retrieved parameter value.
+     * \throw std::invalid_argument if the parameter does not exist.
+     */
     template <typename T>
     void GetParameter(const char *parameter, T &value) const
     {
@@ -161,6 +218,13 @@ namespace mitk
       throw std::invalid_argument(error);
     }
 
+    /**
+     * \brief Get a parameter that holds a smart pointer.
+     * \tparam T The type pointed to by the smart pointer.
+     * \param[in] parameter The parameter name.
+     * \param[out] value The retrieved smart pointer value.
+     * \throw std::invalid_argument if the parameter does not exist.
+     */
     template <typename T>
     void GetPointerParameter(const char *parameter, itk::SmartPointer<T> &value) const
     {
@@ -187,19 +251,54 @@ namespace mitk
       throw std::invalid_argument(error);
     }
 
-    // start/stop functions
-
+    /**
+     * \brief Reset the algorithm to its initial state.
+     *
+     * Calls Initialize() to re-create default parameters.
+     */
     virtual void Reset();
 
-    void StartAlgorithm();         // for those who want to trigger calculations on their own
-                                   // --> need for an OPTION: manual/automatic starting
-    void StartBlockingAlgorithm(); // for those who want to trigger calculations on their own
+    /**
+     * \brief Start the algorithm asynchronously in a background thread.
+     *
+     * The algorithm will only start if ReadyToRun() returns true and no kill
+     * request is pending. If the thread is already running, additional update
+     * requests are queued.
+     */
+    void StartAlgorithm();
+
+    /**
+     * \brief Start the algorithm and block until it completes.
+     *
+     * Equivalent to calling StartAlgorithm() followed by StopAlgorithm().
+     */
+    void StartBlockingAlgorithm();
+
+    /**
+     * \brief Wait for the running algorithm thread to finish.
+     */
     void StopAlgorithm();
 
-    void TriggerParameterModified(const itk::EventObject &);
+    /**
+     * \brief Callback invoked when a trigger parameter is modified.
+     *
+     * Automatically restarts the algorithm.
+     *
+     * \param[in] event The modification event (unused).
+     */
+    void TriggerParameterModified(const itk::EventObject & event);
 
-    void ThreadedUpdateSuccessful(const itk::EventObject &);
-    void ThreadedUpdateFailed(const itk::EventObject &);
+    /**
+     * \brief GUI-thread callback when the threaded update succeeds.
+     * \param[in] event The event object (unused).
+     */
+    void ThreadedUpdateSuccessful(const itk::EventObject & event);
+
+    /**
+     * \brief GUI-thread callback when the threaded update fails.
+     * \param[in] event The event object (unused).
+     */
+    void ThreadedUpdateFailed(const itk::EventObject & event);
 
   protected:
     NonBlockingAlgorithm(); // use smart pointers
@@ -236,6 +335,6 @@ namespace mitk
 
 } // namespace
 
-#include "mitkNonBlockingAlgorithmEvents.h"
+#include <mitkNonBlockingAlgorithmEvents.h>
 
 #endif

@@ -13,21 +13,26 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateProperty_h
 #define mitkNodePredicateProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkBaseRenderer.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkBaseProperty.h>
+#include <mitkBaseRenderer.h>
+#include <mitkNodePredicateBase.h>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Predicate that evaluates if the given DataNode has a specific property.
-  //## If the second parameter is nullptr, it will only be checked whether there is a property with the specified name.
-  //## If a renderer is specified in the third parameter the renderer-specific property will be checked. If this
-  //## parameter is nullptr or not specified, then the non-renderer-specific property will be checked.
-  //##
-  //##
-  //##
-  //## @ingroup DataStorage
+  /**
+   * \brief Predicate that evaluates whether a DataNode has a specific property.
+   *
+   * If only a property name is specified (second constructor parameter is nullptr),
+   * the predicate checks for the existence of any property with that name.
+   * If a property value is also provided, the predicate checks that the node's
+   * property matches the given value (using operator==).
+   *
+   * If a renderer is specified, the renderer-specific property is checked.
+   * Otherwise, the renderer-independent property is checked.
+   *
+   * \ingroup DataStorage
+   * \sa NodePredicateDataProperty, NodePredicateBase, DataNode::GetProperty
+   */
   class MITKCORE_EXPORT NodePredicateProperty : public NodePredicateBase
   {
   public:
@@ -36,12 +41,21 @@ namespace mitk
     mitkNewMacro2Param(NodePredicateProperty, const char *, mitk::BaseProperty *);
     mitkNewMacro3Param(NodePredicateProperty, const char *, mitk::BaseProperty *, const mitk::BaseRenderer *);
 
-    //##Documentation
-    //## @brief Standard Destructor
+    /**
+     * \brief Destructor.
+     */
     ~NodePredicateProperty() override;
 
-    //##Documentation
-    //## @brief Checks, if the nodes contains a property that is equal to m_ValidProperty
+    /**
+     * \brief Check whether the node has the expected property.
+     *
+     * If m_ValidProperty is nullptr, only the existence of a property with the
+     * configured name is checked. Otherwise, both name and value equality are verified.
+     *
+     * \param[in] node  The DataNode to evaluate. Must not be nullptr.
+     * \return \a true if the property exists (and matches the expected value, if set).
+     * \throw std::invalid_argument if \a node is nullptr or the property name is empty.
+     */
     bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:

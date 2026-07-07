@@ -19,13 +19,22 @@ found in the LICENSE file.
 
 namespace mitk::Forms::UI
 {
+  /**
+   * \brief Module activator for the FormsUI module.
+   *
+   * Registers all built-in question widget types with the IQuestionWidgetFactory
+   * service when the module is loaded.
+   */
   class ModuleActivator : public us::ModuleActivator
   {
   public:
     ModuleActivator();
     ~ModuleActivator() override;
 
+    /** \brief Register all built-in question widget types with the widget factory. */
     void Load(us::ModuleContext* context) override;
+
+    /** \brief Unregister the question widget factory service. */
     void Unload(us::ModuleContext* context) override;
 
   private:

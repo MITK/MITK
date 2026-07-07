@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkScalableAffineTransform.h"
-#include "mitkMatrixConvert.h"
-#include "mitkNumericTypes.h"
+#include <itkScalableAffineTransform.h>
+#include <mitkMatrixConvert.h>
+#include <mitkNumericTypes.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 using namespace mitk;
 

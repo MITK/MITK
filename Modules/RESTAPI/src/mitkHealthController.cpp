@@ -1,0 +1,120 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include "mitkHealthController.h"
+#include <mitkExceptionMacro.h>
+#include <mitkRestServerConfig.h>
+#include <mitkVersion.h>
+
+namespace mitk
+{
+
+HealthController::HealthController(DataStorageBridge& bridge)
+  : m_Bridge(bridge)
+{
+}
+
+void HealthController::SetUptimeCallback(UptimeCallback callback)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_UptimeCallback = std::move(callback);
+}
+
+void HealthController::HandleGET_health(const httplib::Request& /*req*/, httplib::Response& res)
+{
+  nlohmann::json response;
+  response["data"]["status"] = "healthy";
+
+  nlohmann::json checks;
+  checks["datastorage"] = m_Bridge.HasDataStorage() ? "ok" : "unavailable";
+  // Note: rendering check is planned for a future version
+  response["data"]["checks"] = checks;
+
+  // Add uptime if available
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    if (m_UptimeCallback)
+    {
+      auto uptime = m_UptimeCallback();
+      if (uptime.has_value())
+      {
+        response["data"]["uptime_seconds"] = uptime.value();
+      }
+    }
+  }
+
+  res.status = 200;
+  res.set_content(response.dump(), "application/json");
+}
+
+void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::Response& res)
+{
+  nlohmann::json response;
+
+  response["data"]["name"] = "MITK Workbench REST API";
+  response["data"]["api_version"] = "v1";
+  response["data"]["mitk_version"] = MITK_VERSION_STRING;
+  response["data"]["documentation_url"] =
+    GetRestApiDocumentationUrl(MITK_VERSION_MAJOR, MITK_VERSION_MINOR, MITK_VERSION_PATCH);
+  nlohmann::json capabilities;
+  capabilities["transfer_modes"] = nlohmann::json::array({"direct", "file-reference"});
+  capabilities["authentication"] = nlohmann::json::array({"api-token"});
+
+  response["data"]["capabilities"] = capabilities;
+
+  res.status = 200;
+  res.set_content(response.dump(), "application/json");
+}
+
+void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs)
+{
+  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
+  {
+    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
+  }
+
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_FileAccessMode = mode;
+  m_AllowedFileDirectories = allowedDirs;
+}
+
+void HealthController::SetMaxActiveTempDirsPerIp(size_t max)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_MaxActiveTempDirsPerIp = max;
+}
+
+void HealthController::HandleGET_config_file_access(const httplib::Request& /*req*/, httplib::Response& res)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+
+  const bool restrictionsActive = (m_FileAccessMode == FileAccessMode::AllowedDirectories);
+
+  nlohmann::json data;
+  data["mode"] = restrictionsActive ? "allowed-directories" : "unrestricted";
+  data["restrictions_active"] = restrictionsActive;
+
+  if (restrictionsActive)
+  {
+    data["allowed_paths"] = m_AllowedFileDirectories;
+  }
+
+  data["max_active_temp_dirs_per_ip"] = m_MaxActiveTempDirsPerIp;
+
+  nlohmann::json response;
+  response["data"] = data;
+
+  res.status = 200;
+  res.set_content(response.dump(), "application/json");
+}
+
+}

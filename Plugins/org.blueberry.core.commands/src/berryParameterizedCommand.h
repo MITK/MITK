@@ -45,36 +45,6 @@ public:
   berryObjectMacro(ParameterizedCommand);
 
   /**
-   * The index of the parameter id in the parameter values.
-   *
-   * @deprecated no longer used
-   */
-  static  const int INDEX_PARAMETER_ID; // = 0;
-
-  /**
-   * The index of the human-readable name of the parameter itself, in the
-   * parameter values.
-   *
-   * @deprecated no longer used
-   */
-  static const int INDEX_PARAMETER_NAME; // = 1;
-
-  /**
-   * The index of the human-readable name of the value of the parameter for
-   * this command.
-   *
-   * @deprecated no longer used
-   */
-  static const int INDEX_PARAMETER_VALUE_NAME; // = 2;
-
-  /**
-   * The index of the value of the parameter that the command can understand.
-   *
-   * @deprecated no longer used
-   */
-  static const int INDEX_PARAMETER_VALUE_VALUE; // = 3;
-
-  /**
    * Constructs a new instance of <code>ParameterizedCommand</code> with
    * specific values for zero or more of its parameters.
    *

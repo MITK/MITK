@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   INCLUDE_DIRS PRIVATE src/Algorithms src/DataManagement src/Interactions src/Rendering
-  DEPENDS MitkLegacyGL MitkAnnotation
+  DEPENDS MitkAnnotation
   PACKAGE_DEPENDS PRIVATE VTK|RenderingContextOpenGL2
 )
 

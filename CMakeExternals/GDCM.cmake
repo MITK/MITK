@@ -24,12 +24,12 @@ set(GDCM_DEPENDS ${proj})
 
 if(NOT DEFINED GDCM_DIR)
 
-  set(additional_args )
-  if(CTEST_USE_LAUNCHERS)
-    list(APPEND additional_args
-      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-    )
-  endif()
+  #[[ See CMakeExternals/lz4.cmake for the reasoning behind CMP0091.
+      GDCM caps its policy version at GDCM_MAX_VALIDATED_CMAKE_VERSION (3.13.4),
+      i.e. CMP0091 is unset despite the seemingly open version range. ]]
+  set(additional_args
+    -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=NEW
+  )
 
   # On Mac some assertions fail that prevent reading certain DICOM files. Bug #19995
   if(APPLE)
@@ -41,7 +41,7 @@ if(NOT DEFINED GDCM_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      GIT_REPOSITORY https://github.com/malaterre/GDCM.git
-     GIT_TAG v3.0.14
+     GIT_TAG 2d66f14563fb5e32fd538744f6c9fe532ddd3526 # v3.2.2
      GIT_SUBMODULES ""
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}

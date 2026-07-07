@@ -14,8 +14,8 @@ found in the LICENSE file.
 #ifndef BERRYQTTRACKER_H_
 #define BERRYQTTRACKER_H_
 
-#include <berryConstants.h>
-#include <berryGuiTkIControlListener.h>
+#include "berryConstants.h"
+#include "berryGuiTkIControlListener.h"
 
 #include <QRect>
 #include <QPoint>

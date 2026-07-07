@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometryDataWriterService.h"
-#include "mitkIOMimeTypes.h"
+#include <mitkGeometryDataWriterService.h>
+#include <mitkIOMimeTypes.h>
 
 #include "mitkProportionalTimeGeometryToXML.h"
 

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkDICOMDatasetSorter_h
 #define mitkDICOMDatasetSorter_h
 
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
-#include "mitkDICOMDatasetAccess.h"
-#include "mitkIOVolumeSplitReason.h"
+#include <mitkDICOMDatasetAccess.h>
+#include <mitkIOVolumeSplitReason.h>
 
 namespace mitk
 {
@@ -49,26 +49,67 @@ class MITKDICOM_EXPORT DICOMDatasetSorter : public itk::LightObject
     */
     virtual DICOMTagList GetTagsOfInterest() = 0;
 
-    /// \brief Input for sorting
+    /**
+     * \brief Set the input datasets for sorting.
+     * \param[in] filenames The list of DICOMDatasetAccess instances to sort.
+     */
     void SetInput(DICOMDatasetList filenames);
-    /// \brief Input for sorting
+
+    /**
+     * \brief Get the input datasets.
+     * \return Const reference to the input dataset list.
+     */
     const DICOMDatasetList& GetInput() const;
 
-    /// \brief Sort input datasets into one or multiple outputs.
+    /**
+     * \brief Sort input datasets into one or multiple outputs.
+     *
+     * Subclasses must implement this method to perform the actual sorting/splitting logic.
+     */
     virtual void Sort() = 0;
 
-    /// \brief Output of the sorting process.
+    /**
+     * \brief Get the number of output groups after sorting.
+     * \return The number of output dataset lists.
+     */
     unsigned int GetNumberOfOutputs() const;
-    /// \brief Output of the sorting process.
+
+    /**
+     * \brief Get a specific output group (const).
+     * \param[in] index The index of the output group to retrieve.
+     * \return Const reference to the output dataset list.
+     * \pre index must be less than GetNumberOfOutputs().
+     */
     const DICOMDatasetList& GetOutput(unsigned int index) const;
-    /// \brief Output of the sorting process.
+
+    /**
+     * \brief Get a specific output group (non-const).
+     * \param[in] index The index of the output group to retrieve.
+     * \return Reference to the output dataset list.
+     * \pre index must be less than GetNumberOfOutputs().
+     */
     DICOMDatasetList& GetOutput(unsigned int index);
 
+    /**
+     * \brief Get the split reason for a specific output group.
+     * \param[in] index The index of the output group.
+     * \return A const smart pointer to the split reason, or nullptr if not set.
+     * \pre index must be less than GetNumberOfOutputs().
+     */
     IOVolumeSplitReason::ConstPointer GetSplitReason(unsigned int index) const;
 
-    /// \brief Print configuration details into stream.
+    /**
+     * \brief Print configuration details into stream.
+     * \param[in,out] os The output stream to print to.
+     * \param[in] indent Indentation prefix for each line.
+     */
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const = 0;
 
+    /**
+     * \brief Equality comparison operator.
+     * \param[in] other The sorter to compare with.
+     * \return true if the sorters have identical configurations.
+     */
     virtual bool operator==(const DICOMDatasetSorter& other) const = 0;
 
   protected:

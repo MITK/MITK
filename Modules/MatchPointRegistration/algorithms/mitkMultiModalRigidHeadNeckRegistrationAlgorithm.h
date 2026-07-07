@@ -21,6 +21,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Rigid head-neck registration algorithm for multi-modal images.
+   *
+   * Type alias for the MatchPoint rigid 3D head-neck registration algorithm
+   * using Mattes mutual information with a MITK-specific UID policy.
+   *
+   * \tparam TImageType The ITK image type to register.
+   */
   template <class TImageType>
   using MultiModalRigidHeadNeckRegistrationAlgorithm = typename map::algorithm::boxed::MultiModalRigidHeadNeckRegistrationAlgorithm<TImageType, ::map::algorithm::mitkMultiModalRigidHeadNeckRegistrationAlgorithmUIDPolicy>;
 }

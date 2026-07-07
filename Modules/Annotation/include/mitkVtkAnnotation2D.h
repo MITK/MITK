@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkAnnotation2D_h
 #define mitkVtkAnnotation2D_h
 
-#include "mitkVtkAnnotation.h"
+#include <mitkVtkAnnotation.h>
 #include <MitkAnnotationExports.h>
 #include <vtkSmartPointer.h>
 
@@ -23,22 +23,54 @@ class vtkProperty2D;
 namespace mitk
 {
   /**
-   * @brief The VtkAnnotation2D class is the basis for all VTK based Annotation which create
-   * a vtkActor2D element that will be drawn on the renderer.
+   * \brief Base class for VTK-based 2D annotations rendered as vtkActor2D elements.
+   *
+   * Provides position and offset management in 2D display coordinates.
+   * Subclasses must implement UpdateVtkAnnotation2D() and GetVtkActor2D().
+   *
+   * \sa VtkAnnotation, VtkAnnotation3D, TextAnnotation2D
    */
   class MITKANNOTATION_EXPORT VtkAnnotation2D : public VtkAnnotation
   {
   public:
     mitkClassMacro(VtkAnnotation2D, VtkAnnotation);
+
+    /**
+     * \brief Get the bounding rectangle of this annotation on the display.
+     * \param[in] renderer The renderer to query.
+     * \return The bounds in display coordinates.
+     */
     Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
+
+    /**
+     * \brief Set the bounding rectangle of this annotation on the display.
+     * \param[in] renderer The renderer context.
+     * \param[in] bounds The new bounds in display coordinates.
+     */
     void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
 
+    /**
+     * \brief Set the 2D position in display coordinates.
+     * \param[in] position2D The position.
+     */
     void SetPosition2D(const Point2D &position2D);
 
+    /**
+     * \brief Get the 2D position in display coordinates.
+     * \return The current position.
+     */
     Point2D GetPosition2D() const;
 
+    /**
+     * \brief Set an offset vector added to the position.
+     * \param[in] OffsetVector The offset.
+     */
     void SetOffsetVector(const Point2D &OffsetVector);
 
+    /**
+     * \brief Get the offset vector.
+     * \return The current offset.
+     */
     Point2D GetOffsetVector() const;
 
   protected:

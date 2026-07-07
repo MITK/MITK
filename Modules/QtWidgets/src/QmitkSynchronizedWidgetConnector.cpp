@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk gui qt common plugin
-#include "QmitkSynchronizedWidgetConnector.h"
+#include <QmitkSynchronizedWidgetConnector.h>
+
+#include <mitkException.h>
 
 bool NodeListsEqual(const QmitkSynchronizedWidgetConnector::NodeList& selection1, const QmitkSynchronizedWidgetConnector::NodeList& selection2)
 {
@@ -134,6 +136,33 @@ void QmitkSynchronizedWidgetConnector::SynchronizeWidget(QmitkSynchronizedNodeSe
 QmitkSynchronizedWidgetConnector::NodeList QmitkSynchronizedWidgetConnector::GetNodeSelection() const
 {
   return m_InternalSelection;
+}
+
+void QmitkSynchronizedWidgetConnector::SeedFromMember(const NodeList& seedSelection, const mitk::BaseRenderer* seedRenderer)
+{
+  if (nullptr == seedRenderer)
+  {
+    mitkThrow() << "QmitkSynchronizedWidgetConnector::SeedFromMember: seedRenderer must not be null.";
+  }
+
+  m_InternalSelection = seedSelection;
+
+  m_InternalInvisibles.clear();
+  for (const auto& node : seedSelection)
+  {
+    if (node.IsNull())
+    {
+      continue;
+    }
+    if (!node->IsVisible(seedRenderer))
+    {
+      m_InternalInvisibles.insert(node.GetPointer());
+    }
+  }
+
+  // Note: m_SelectAll is intentionally left untouched - it is group-scoped,
+  // set from the layout document's `groups` dict in ApplyLayout, and not
+  // derived from any single cell.
 }
 
 bool QmitkSynchronizedWidgetConnector::GetSelectionMode() const

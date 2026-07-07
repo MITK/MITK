@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkScalarListLookupTable.h"
+#include <mitkScalarListLookupTable.h>
 #include <stdexcept>
 #include <iostream>
 #include <nlohmann/json.hpp>

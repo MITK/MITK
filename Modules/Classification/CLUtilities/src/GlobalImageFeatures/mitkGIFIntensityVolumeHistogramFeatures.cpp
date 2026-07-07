@@ -106,8 +106,8 @@ namespace
     featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Volume fraction at 0.90 intensity"), hist[index090]));
     featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Intensity at 0.10 volume"), intensity010));
     featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Intensity at 0.90 volume"), intensity090));
-    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Difference volume fraction at 0.10 and 0.90 intensity"), std::abs<double>(hist[index010] - hist[index090])));
-    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Difference intensity at 0.10 and 0.90 volume"), std::abs<double>(intensity090 - intensity010)));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Difference volume fraction at 0.10 and 0.90 intensity"), std::abs(hist[index010] - hist[index090])));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Difference intensity at 0.10 and 0.90 volume"), std::abs(intensity090 - intensity010)));
     featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Area under IVH curve"), auc));
     //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));
   }

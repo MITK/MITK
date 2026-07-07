@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelPredicateHelper.h"
+#include <mitkMultiLabelPredicateHelper.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateSubGeometry.h>
 #include <mitkLabelSetImage.h>
+#include <mitkDataStorage.h>
 
 mitk::NodePredicateBase::Pointer mitk::GetMultiLabelSegmentationPredicate(const mitk::BaseGeometry* referenceGeometry)
 {
@@ -55,6 +56,18 @@ mitk::NodePredicateBase::Pointer mitk::GetSegmentationReferenceImagePredicate()
   referencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
   return referencePredicate.GetPointer();
+}
+
+unsigned int mitk::GetGeometryMismatchedSegmentationCount(const mitk::DataStorage* dataStorage, const mitk::BaseGeometry* referenceGeometry)
+{
+  if (nullptr == dataStorage || nullptr == referenceGeometry)
+    return 0; // NodePredicateSubGeometry::New throws on a null reference geometry.
+
+  auto mismatchPredicate = mitk::NodePredicateAnd::New(
+    GetMultiLabelSegmentationPredicate().GetPointer(),
+    mitk::NodePredicateNot::New(mitk::NodePredicateSubGeometry::New(referenceGeometry)).GetPointer());
+
+  return dataStorage->GetSubset(mismatchPredicate)->Size();
 }
 
 

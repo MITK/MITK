@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 // mitk headers
 #include "mitkSurfaceModifier.h"
-#include "mitkSurfaceToPointSetFilter.h"
+#include <mitkSurfaceToPointSetFilter.h>
 
 // vtk headers
 #include <vtkMath.h>

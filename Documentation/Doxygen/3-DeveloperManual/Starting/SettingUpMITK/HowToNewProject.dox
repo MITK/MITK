@@ -90,7 +90,7 @@ paths accordingly.
       Project") and press "F5" to start your MITK AwesomeApp.
 </ol>
 
-\note Just opening AwesomeProject.sln from your explorer by double-cliking won`t
+\note Just opening AwesomeProject.sln from your explorer by double-cliking won't
 allow you to start or debug your application because the required environment
 variables would be missing. Use the supplied batch files or set your PATH variable
 accordingly.

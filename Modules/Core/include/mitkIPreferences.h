@@ -76,11 +76,15 @@ namespace mitk
      * \brief Get a property value as string.
      *
      * If the property cannot be found, return the provided default value instead.
+     * If a session-only override exists for the key, the override value is returned
+     * instead of the persistent property value.
      *
      * \param key Name of the property
      * \param def Default value
      *
      * \return Property value or default value
+     *
+     * \sa Override()
      */
     virtual std::string Get(const std::string& key, const std::string& def) const = 0;
 
@@ -88,6 +92,8 @@ namespace mitk
      * \brief Set a property value.
      *
      * Create the property if not yet existent. Otherwise change its value.
+     * This only affects the persistent property, not any session-only override
+     * that may exist for the same key.
      *
      * Trigger an IPreferences::OnPropertyChanged event if the new value is different
      * or if a new property has been created, except the string value is empty in
@@ -199,9 +205,73 @@ namespace mitk
     virtual void PutByteArray(const std::string& key, const std::byte* array, size_t size) = 0;
 
     /**
+     * \brief Set a session-only override for a string property.
+     *
+     * Overrides are not persisted to disk. If the key does not yet exist in the persistent
+     * properties, the override still takes effect for Get operations.
+     *
+     * \param key Name of the property
+     * \param value Override value
+     */
+    virtual void Override(const std::string& key, const std::string& value) = 0;
+
+    /**
+     * \brief Set a session-only override for an \c int property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideInt(const std::string& key, int value) = 0;
+
+    /**
+     * \brief Set a session-only override for a \c bool property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideBool(const std::string& key, bool value) = 0;
+
+    /**
+     * \brief Set a session-only override for a \c float property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideFloat(const std::string& key, float value) = 0;
+
+    /**
+     * \brief Set a session-only override for a \c double property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideDouble(const std::string& key, double value) = 0;
+
+    /**
+     * \brief Set a session-only override for a byte array property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideByteArray(const std::string& key, const std::byte* array, size_t size) = 0;
+
+    /**
+     * \brief Check whether a property has a session-only override.
+     */
+    virtual bool IsOverridden(const std::string& key) const = 0;
+
+    /**
+     * \brief Remove a session-only override for a property.
+     *
+     * The underlying persistent value is revealed again.
+     */
+    virtual void RemoveOverride(const std::string& key) = 0;
+
+    /**
+     * \brief Remove all session-only overrides from this preferences node.
+     */
+    virtual void ClearOverrides() = 0;
+
+    /**
      * \brief Write all (!) preferences to disk.
      *
-     * Enforce the persistence of the whole preferences tree.
+     * Enforce the persistence of the whole preferences tree. Session-only overrides
+     * are not written to disk.
      *
      * \note Preferences are flushed automatically at least on a regular application shutdown.
      *
@@ -212,19 +282,37 @@ namespace mitk
     /**
      * \brief Remove a property from this preferences node.
      *
+     * If the key has a session-only override and \p forceRemoval is false, the removal
+     * is denied and the method returns false. If \p forceRemoval is true, both the
+     * persistent property and the override are removed.
+     *
      * \param key Name of the property
+     * \param forceRemoval If true, also remove any override for the key
+     *
+     * \return True if the key is not present in preferences anymore (either it was
+     *         removed or it did not exist in the first place), false if removal was
+     *         denied due to an override
      */
-    virtual void Remove(const std::string& key) = 0;
+    virtual bool Remove(const std::string& key, bool forceRemoval = false) = 0;
 
     /**
      * \brief Remove all properties from this preferences node.
+     *
+     * Session-only overrides are not affected by default. Set \p includeOverrides to \c true
+     * to also remove all overrides (equivalent to calling ClearOverrides() in addition).
+     *
+     * \param includeOverrides If true, also clear all session-only overrides.
+     *
+     * \sa ClearOverrides()
      */
-    virtual void Clear() = 0;
+    virtual void Clear(bool includeOverrides = false) = 0;
 
     /**
      * \brief Get the names of all properties of this preferences node.
+     *
+     * \param includeOverrides If true, also include keys that only exist in the override layer.
      */
-    virtual std::vector<std::string> Keys() const = 0;
+    virtual std::vector<std::string> Keys(bool includeOverrides = false) const = 0;
 
     /**
      * \brief Get the name of this preferences node.
@@ -292,6 +380,36 @@ namespace mitk
     Message1<const IPreferences*> OnChanged; /**< \brief Notify on node changes. */
     Message1<const ChangeEvent&> OnPropertyChanged; /**< \brief Notify on property changes. */
   };
+
+  /**
+  * \brief Apply preference overrides from XML content.
+  *
+  * Parses the given XML string (same format as prefs.xml) and applies all
+  * properties as session-only overrides to the corresponding preference nodes.
+  *
+  * \pre \p prefs must not be nullptr.
+  * \pre \p xmlContent must be valid XML in the prefs.xml format.
+  * \throws mitk::Exception if \p prefs is nullptr or the XML is malformed.
+  *
+  * \sa IPreferences::Override()
+  */
+  MITKCORE_EXPORT void ApplyPreferencesOverrides(const std::string& xmlContent, IPreferences* prefs);
+
+  /**
+  * \brief Permanently patch preferences from an XML string.
+  *
+  * Parses the given XML string (same format as prefs.xml) and writes each
+  * property via IPreferences::Put(). Missing preference nodes are created on demand.
+  * The caller is responsible for calling Flush() after all patches have been applied.
+  *
+  * \pre \p prefs must not be nullptr.
+  * \pre \p xmlContent must be valid XML in the prefs.xml format.
+  * \throws mitk::Exception if \p prefs is nullptr or the XML is malformed.
+  *
+  * \sa IPreferences::Put()
+  */
+  MITKCORE_EXPORT void ApplyPreferencesPatches(const std::string& xmlContent, IPreferences* prefs);
+
 }
 
 #endif

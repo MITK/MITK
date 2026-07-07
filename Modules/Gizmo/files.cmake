@@ -1,10 +1,3 @@
-set(H_FILES
-  src/mitkGizmoMapper2D.h
-  src/mitkGizmoObjectFactory.h
-  include/mitkGizmo.h
-  include/mitkGizmoInteractor.h
-)
-
 set(CPP_FILES
   mitkGizmo.cpp
   mitkGizmoInteractor.cpp

@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "berryActionBarAdvisor.h"
 
-#include <berryIActionBarConfigurer.h>
-#include <berryIWorkbenchWindowConfigurer.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIMemento.h>
+#include "berryIActionBarConfigurer.h"
+#include "berryIWorkbenchWindowConfigurer.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIMemento.h"
 
 #include <QAction>
 

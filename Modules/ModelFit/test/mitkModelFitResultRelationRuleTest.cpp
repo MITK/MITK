@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitResultRelationRule.h"
+#include <mitkModelFitResultRelationRule.h>
 
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
-#include "mitkStringProperty.h"
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkStringProperty.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkModelFitConstants.h"
-#include "mitkUIDGenerator.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkModelFitConstants.h>
+#include <mitkUIDGenerator.h>
 
 #include <regex>
 
@@ -146,7 +146,7 @@ private:
     owner->SetProperty(PropertyKeyPathToPropertyName(refClassUIDPath), mitk::TemporoSpatialStringProperty::New(classUID));
 
     mitk::PropertyKeyPath purposePath;
-    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
     owner->SetProperty(PropertyKeyPathToPropertyName(purposePath), mitk::TemporoSpatialStringProperty::New(purpose));
   }
 
@@ -169,7 +169,7 @@ private:
     }
 
     mitk::PropertyKeyPath purposePath;
-    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
     prop = owner->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
     if (prop->GetValueAsString() != purpose)
     {

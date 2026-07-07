@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkDICOMUIExports.h>
 #include <QWidget>
+#include <memory>
 
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
@@ -25,51 +26,68 @@ namespace Ui
 }
 
 /**
- * \brief Wrapper widget for a ctkDICOMTableManager and a few extra buttons for
- *        managing the local storage DICOM database.
+ * \class QmitkDicomLocalStorageWidget
+ * \brief Widget for managing a persistent local DICOM storage database.
+ *
+ * This widget wraps a ctkDICOMTableManager for browsing patients, studies, and series
+ * stored in a local SQLite-based DICOM database. It provides buttons to view selected
+ * series and to delete selected patients, studies, or series from the database.
+ * Files can be imported into the local database via the OnImport() slot.
+ *
+ * \sa QmitkDicomImportWidget
  */
 class MITKDICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructor.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkDicomLocalStorageWidget(QWidget* parent = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkDicomLocalStorageWidget() override;
 
   /**
-   * \brief Set the directory for the local storage DICOM database.
+   * \brief Sets the directory for the local storage DICOM database.
    *
-   * It is necessary to set the directory for the local storage
-   * DICOM database to fully initialize this widget.
+   * This method must be called to fully initialize the widget. It creates or opens
+   * the SQLite database in the specified directory and connects it to the internal
+   * ctkDICOMTableManager and ctkDICOMIndexer.
    *
-   * The returned database pointer should be passed to the
-   * ctkDICOMQueryRetrieveWidget as retrieve database.
+   * The returned database pointer can be passed to a ctkDICOMQueryRetrieveWidget
+   * as the retrieve database.
    *
-   * \param databaseDirectory Path to a directory used for storing
-   *        the local storage DICOM database.
-   *
-   * \return A shared pointer to the DICOM database of the wrapped
-   *         ctkDICOMTableManager.
+   * \param[in] databaseDirectory Path to a directory used for storing
+   *            the local DICOM database. Created if it does not exist.
+   * \return A shared pointer to the ctkDICOMDatabase.
    */
   QSharedPointer<ctkDICOMDatabase> SetDatabaseDirectory(const QString& databaseDirectory);
 
 signals:
   /**
-   * \brief Emitted when the indexing of newly added DICOM data is complete.
+   * \brief Emitted when the indexing of newly imported DICOM data is complete.
    */
   void IndexingComplete();
 
   /**
-   * \brief Emitted when the View button is clicked.
-   *
-   * \param series A vector of pairs containing the first file of each series
-                   and optionally its modality (DICOM tag (0008,0060)).
+   * \brief Emitted when the View button is clicked to load selected series.
+   * \param[in] series A vector of pairs, each containing the first file path of a series
+   *             and optionally its DICOM Modality string (tag 0008,0060).
    */
   void ViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);
 
 public slots:
   /**
-   * \brief Starts a thread adding the given DICOM files.
+   * \brief Imports the given DICOM files into the local database.
+   *
+   * The files are indexed asynchronously. The IndexingComplete() signal is
+   * emitted when the indexing finishes.
+   *
+   * \param[in] files List of DICOM file paths to import.
+   * \pre The local database must be open (SetDatabaseDirectory() must have been called).
    */
   void OnImport(const QStringList &files);
 
@@ -87,7 +105,7 @@ private:
 
   QSharedPointer<ctkDICOMDatabase> m_LocalDatabase;
   std::unique_ptr<ctkDICOMIndexer> m_LocalIndexer;
-  Ui::QmitkDicomLocalStorageWidget *m_Ui;
+  std::unique_ptr<Ui::QmitkDicomLocalStorageWidget> m_Ui;
 };
 
 #endif

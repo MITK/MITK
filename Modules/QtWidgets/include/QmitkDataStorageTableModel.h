@@ -10,16 +10,25 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file QmitkDataStorageTableModel.h
+ * \brief Declares QmitkDataStorageTableModel, a QAbstractTableModel that presents
+ *        DataStorage nodes (filtered by a predicate) in a sortable table with
+ *        columns for name, data type, and visibility.
+ *
+ * \ingroup QmitkModule
+ */
+
 #ifndef QmitkDataStorageTableModel_h
 #define QmitkDataStorageTableModel_h
 
 #include <MitkQtWidgetsExports.h>
 
 /// Own includes.
-#include "mitkBaseProperty.h"
-#include "mitkDataStorage.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkWeakPointer.h"
+#include <mitkBaseProperty.h>
+#include <mitkDataStorage.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkWeakPointer.h>
 
 /// Toolkit includes.
 #include <QAbstractTableModel>

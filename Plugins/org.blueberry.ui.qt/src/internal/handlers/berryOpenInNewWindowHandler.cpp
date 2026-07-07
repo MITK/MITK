@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include "berryOpenInNewWindowHandler.h"
 
-#include <berryHandlerUtil.h>
+#include "berryHandlerUtil.h"
 
 #include <berryIAdaptable.h>
-#include <berryIPerspectiveRegistry.h>
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIWorkbenchPage.h>
+#include "berryIPerspectiveRegistry.h"
+#include "berryIWorkbench.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPage.h"
 
-#include <berryUIException.h>
+#include "berryUIException.h"
 
 #include "internal/berryWorkbench.h"
 

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunction.h"
-#include "mitkHistogramGenerator.h"
-#include "mitkImageToItk.h"
+#include <mitkTransferFunction.h>
+#include <mitkHistogramGenerator.h>
+#include <mitkImageToItk.h>
 
 #include <itkRGBPixel.h>
 
@@ -263,13 +263,6 @@ namespace mitk
     os << indent << "ColorTransfer: ";
     m_ColorTransferFunction->PrintHeader(os, vtkIndent());
     os << indent << "Min: " << m_Min << ", Max: " << m_Max << std::endl;
-  }
-
-  itk::LightObject::Pointer mitk::TransferFunction::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    result->UnRegister();
-    return result;
   }
 
 } // namespace

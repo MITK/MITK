@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLocaleSwitch_h
 #define mitkLocaleSwitch_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -56,8 +56,19 @@ namespace mitk
 
   struct MITKCORE_EXPORT LocaleSwitch
   {
+    /**
+     * \brief Construct a LocaleSwitch and install the given locale.
+     *
+     * Saves the current locale and switches to \p newLocale. The
+     * previous locale will be restored when this object is destroyed.
+     *
+     * \param newLocale The locale string to install (e.g. "C").
+     */
     explicit LocaleSwitch(const char *newLocale);
 
+    /**
+     * \brief Destroy the LocaleSwitch and restore the previous locale.
+     */
     ~LocaleSwitch();
 
     LocaleSwitch(LocaleSwitch &) = delete;

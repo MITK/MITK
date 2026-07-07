@@ -212,7 +212,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="labelExternalSuggestions">
        <property name="text">
         <string>External suggestions:</string>
        </property>
@@ -249,57 +249,6 @@
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item row="15" column="1">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="0">
-    <widget class="QLabel" name="monaiLabel">
-     <property name="text">
-      <string>MONAILabel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="1">
-    <layout class="QGridLayout" name="gridLayout_3">
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="allowAllModelsCheckBox">
-       <property name="toolTip">
-        <string>If checked, all models are visible.</string>
-       </property>
-       <property name="text">
-        <string>Allow all models</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="timeoutLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Time out (s):</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="monaiTimeoutEdit">
-       <property name="text">
-        <string>180</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item row="17" column="1">
     <spacer name="verticalSpacer">
@@ -343,18 +292,32 @@
     </widget>
    </item>
    <item row="4" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label3DDisplay">
      <property name="text">
       <string>3D display</string>
      </property>
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QCheckBox" name="check3DRendering">
-     <property name="text">
-      <string>Activate 3D rendering of segmentation (GPU needed)</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="rendering3DOptionsLayout">
+     <item>
+      <widget class="QCheckBox" name="check3DRendering">
+       <property name="text">
+        <string>Activate 3D rendering of segmentation</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="check3DSmoothed">
+       <property name="toolTip">
+        <string>Apply constrained smoothing to the extracted surface. Disable to render raw voxel boundaries.</string>
+       </property>
+       <property name="text">
+        <string>Smoothed</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="13" column="1">
     <widget class="QCheckBox" name="enforceSuggestionsCheckBox">
@@ -363,6 +326,33 @@
      </property>
      <property name="text">
       <string>Enforce suggestions</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1">
+    <widget class="Line" name="line_6">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="0">
+    <widget class="QLabel" name="convertToSegmentationLabel">
+     <property name="text">
+      <string>Convert to segmentation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="1">
+    <widget class="QCheckBox" name="convertWarningCheckBox">
+     <property name="toolTip">
+      <string>If checked, converting an image with many distinct values to a segmentation asks for confirmation first.</string>
+     </property>
+     <property name="text">
+      <string>Warn before converting images with many distinct values</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

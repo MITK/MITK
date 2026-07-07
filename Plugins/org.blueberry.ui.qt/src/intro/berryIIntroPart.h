@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include <berryIMemento.h>
-#include <berryIPropertyChangeListener.h>
-#include <berryUIException.h>
+#include "berryIMemento.h"
+#include "berryIPropertyChangeListener.h"
+#include "berryUIException.h"
 
 #include "berryIIntroSite.h"
 

@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 #include "QmitkAutocropAction.h"
 
-#include "mitkAutoCropImageFilter.h"
-#include "mitkImageCast.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkRenderingManager.h"
-#include "mitkProgressBar.h"
+#include <mitkAutoCropImageFilter.h>
+#include <mitkImageCast.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkRenderingManager.h>
+#include <mitkProgressBar.h>
 
 #include <itkConstantPadImageFilter.h>
 
@@ -168,16 +168,6 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
   paddedImage->GetGeometry()->SetOrigin( paddedOrigin );
 
   return paddedImage;
-}
-
-void QmitkAutocropAction::SetSmoothed(bool /*smoothed*/)
-{
- //not needed
-}
-
-void QmitkAutocropAction::SetDecimated(bool /*decimated*/)
-{
-  //not needed
 }
 
 void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)

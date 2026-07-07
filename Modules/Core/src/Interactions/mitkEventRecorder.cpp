@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEventRecorder.h"
-#include "mitkEventFactory.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
+#include <mitkEventRecorder.h>
+#include <mitkEventFactory.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
 
-#include "vtkCamera.h"
+#include <vtkCamera.h>
 
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 
 static void WriteEventXMLHeader(std::ofstream &stream)
 {

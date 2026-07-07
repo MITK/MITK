@@ -13,27 +13,25 @@ found in the LICENSE file.
 #ifndef mitkPlaneOrientationProperty_h
 #define mitkPlaneOrientationProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
-   * Property which controls whether 2D line representation of a PlaneGeometry
+   * \brief Enumeration property controlling orientation arrows on 2D plane representations.
+   *
+   * Controls whether the 2D line representation of a PlaneGeometry
    * should have small arrows at both ends to indicate the orientation of
    * the plane, and whether the arrows should be oriented in the direction of
    * the plane's normal or against it.
    *
-   * Valid values of the enumeration property are
+   * Valid values of the enumeration property are:
    * - PLANE_DECORATION_NONE (no arrows)
-   * - PLANE_DECORATION_POSITIVE_ORIENTATION (arrows pointing upwards)
-   * - PLANE_DECORATION_NEGATIVE_ORIENTATION (arrows pointing downwards)
+   * - PLANE_DECORATION_POSITIVE_ORIENTATION (arrows pointing in positive normal direction)
+   * - PLANE_DECORATION_NEGATIVE_ORIENTATION (arrows pointing in negative normal direction)
    *
-   * See also mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow()
+   * \sa PlaneGeometryDataMapper2D::DrawOrientationArrow()
+   * \sa EnumerationProperty
    */
   class MITKCORE_EXPORT PlaneOrientationProperty : public EnumerationProperty
   {
@@ -95,6 +93,8 @@ namespace mitk
      */
     PlaneOrientationProperty(const std::string &value);
 
+    PlaneOrientationProperty(const PlaneOrientationProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid types.
@@ -106,16 +106,13 @@ namespace mitk
      */
     virtual void AddDecorationTypes();
 
+    mitkCloneMacro(PlaneOrientationProperty);
+
   private:
     // purposely not implemented
     PlaneOrientationProperty &operator=(const PlaneOrientationProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

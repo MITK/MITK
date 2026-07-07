@@ -13,14 +13,17 @@ found in the LICENSE file.
 #ifndef mitkStandardToftsModelParameterizer_h
 #define mitkStandardToftsModelParameterizer_h
 
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkStandardToftsModel.h"
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkStandardToftsModel.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
 
+  /** \brief Parameterizer for the StandardToftsModel.
+   * \sa StandardToftsModel, StandardToftsModelFactory, AIFBasedModelParameterizerBase
+   */
   class MITKPHARMACOKINETICS_EXPORT StandardToftsModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::StandardToftsModel>
   {

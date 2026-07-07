@@ -10,8 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCoreServices.h"
+#include <mitkCoreServices.h>
 
+#include <mitkIDataStorageService.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkINodeSelectionService.h>
 #include <mitkIPropertyAliases.h>
@@ -21,6 +22,7 @@ found in the LICENSE file.
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkIPropertyRelations.h>
+#include <mitkIPropertyTransience.h>
 #include <mitkIPreferencesService.h>
 
 #include <usGetModuleContext.h>
@@ -45,7 +47,7 @@ namespace mitk
   }
 
   template <class S>
-  static S *GetCoreService(us::ModuleContext *context)
+  static S *GetCoreService(us::ModuleContext *context, [[maybe_unused]] bool isOptional = false)
   {
     if (context == nullptr)
       context = us::GetModuleContext();
@@ -57,13 +59,19 @@ namespace mitk
       coreService = context->GetService(serviceRef);
     }
 
-    assert(coreService && "Asserting non-nullptr MITK core service");
+    assert((coreService || isOptional) && "Asserting non-nullptr MITK core service");
+    if (coreService != nullptr)
     {
       std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
       s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
     }
 
     return coreService;
+  }
+
+  IDataStorageService* CoreServices::GetDataStorageService(us::ModuleContext* context)
+  {
+    return GetCoreService<IDataStorageService>(context,true);
   }
 
   INodeSelectionService* CoreServices::GetNodeSelectionService(us::ModuleContext* context)
@@ -104,6 +112,11 @@ namespace mitk
   IPropertyRelations *CoreServices::GetPropertyRelations(us::ModuleContext *context)
   {
     return GetCoreService<IPropertyRelations>(context);
+  }
+
+  IPropertyTransience *CoreServices::GetPropertyTransience(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyTransience>(context);
   }
 
   IMimeTypeProvider *CoreServices::GetMimeTypeProvider(us::ModuleContext *context)

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarCross_h
 #define mitkPlanarCross_h
 
-#include "mitkPlanarFigure.h"
+#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk
@@ -56,34 +56,62 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
-       * orthogonal cross. */
+      /**
+       * \brief Sets whether the PlanarFigure represents a single line or an orthogonal cross.
+       * \param[in] singleLineMode If true, only a single line (2 control points) is used.
+       */
       void SetSingleLineMode(bool singleLineMode);
 
-    /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
-    * orthogonal cross. */
+    /**
+     * \brief Returns whether the PlanarFigure represents a single line or an orthogonal cross.
+     * \return True if in single-line mode.
+     */
     bool GetSingleLineMode() const;
 
-    /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
-    * orthogonal cross. */
-    itkBooleanMacro(SingleLineMode); // No need to reimplement; calls SetSingleLineMode()
+    /**
+     * \brief Boolean macro for single-line mode toggling.
+     *
+     * Calls SetSingleLineMode().
+     */
+    itkBooleanMacro(SingleLineMode);
 
-    /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
+    /** \brief Returns 2 in single-line mode, 4 in cross mode. */
     unsigned int GetMinimumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
-    /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
+    /** \brief Returns 2 in single-line mode, 4 in cross mode. */
     unsigned int GetMaximumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
-    /** \brief The cross shall be reset to a single line when a control point is selected. */
+
+    /**
+     * \brief Resets the cross to a single line when a control point is selected.
+     *
+     * When in cross mode, selecting a control point on the second line
+     * removes the second line and prompts the user to redraw it.
+     *
+     * \return True if a reset was performed.
+     */
     bool ResetOnPointSelect() override;
 
+    /**
+     * \brief Returns whether a reset is needed when a control point is selected.
+     * \return True if the figure needs to be reset on point selection.
+     */
     bool ResetOnPointSelectNeeded() const override;
 
-    /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
+    /**
+     * \brief Returns 1 in single-line mode, 2 in cross mode (longest + shortest diameter).
+     * \return The number of available features.
+     */
     unsigned int GetNumberOfFeatures() const override;
 
+    /**
+     * \brief Compares this PlanarCross with another PlanarFigure for equality.
+     * \param[in] other The PlanarFigure to compare with.
+     * \return True if both figures are considered equal.
+     */
     bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarCross();
+    PlanarCross(const Self& other);
     mitkCloneMacro(Self);
 
     /** \brief Spatially constrain control points of second (orthogonal) line */

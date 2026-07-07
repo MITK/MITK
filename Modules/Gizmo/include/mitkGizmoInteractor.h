@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkGizmoInteractor_h
 #define mitkGizmoInteractor_h
 
-#include "mitkGizmo.h"
+#include <mitkGizmo.h>
 
 // MITK includes
 #include <mitkDataInteractor.h>
@@ -27,28 +27,37 @@ found in the LICENSE file.
 // System includes
 #include <memory>
 
-#include "MitkGizmoExports.h"
+#include <MitkGizmoExports.h>
 
 namespace mitk
 {
   class InteractionPositionEvent;
 
-  //! Data interactor to manipulate the geometry of an object via interaction
-  //! with a mitk::Gizmo visualization.
-  //!
-  //! Unlike other interactors, this class needs two DataNodes to work on:
-  //! - the "manipulated object" is the one whose geometry is modified by user input
-  //! - the "gizmo node" represents the manipulated object's primary axes _and_ is
-  //!   used to take user input (most importantly: to have a picking target)
-  //!
-  //! To determine what parts of the object are clicked during interaction,
-  //! the mappers (2D: custom mapper, 3D: regular surface mapper) are asked
-  //! for their VTK objects, picking is performed, and the picked point is
-  //! forwarded to the gizmo object for interpretation.
-  //!
-  //! The interactor fills the undo/redo stack with operations on the modified geometry.
-  //!
-  //! \sa Gizmo
+  /**
+   * \brief Data interactor for manipulating object geometry via a Gizmo widget.
+   *
+   * Unlike other interactors, this class operates on two DataNodes:
+   * - The "gizmo node" provides the visual feedback and serves as the
+   *   picking target for user input.
+   * - The "manipulated object node" owns the geometry that is actually
+   *   modified by the user interaction.
+   *
+   * During interaction, the interactor queries the appropriate mapper
+   * (2D: GizmoMapper2D, 3D: standard surface mapper) for VTK props,
+   * performs picking, and delegates handle identification to the Gizmo.
+   * Based on the picked handle, the interactor applies translation,
+   * rotation, or uniform scaling operations to the manipulated object's
+   * geometry.
+   *
+   * All geometry modifications are recorded on the undo/redo stack,
+   * enabling full undo support.
+   *
+   * The interactor's state machine is defined in Gizmo3DStates.xml
+   * and configured via Gizmo3DConfig.xml.
+   *
+   * \sa Gizmo
+   * \sa DataInteractor
+   */
   class MITKGIZMO_EXPORT GizmoInteractor : public DataInteractor
   {
   public:
@@ -56,13 +65,31 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      //! The node holding the gizmo for visual feedback.
-      //! This is the node that the interactor is primarily working on
-      //! (calls DataInteractor::SetDataNode).
+      /**
+       * \brief Set the DataNode that holds the Gizmo for visual feedback.
+       *
+       * This node is used as the interactor's primary data node
+       * (calls DataInteractor::SetDataNode internally) and provides the
+       * picking target for user interaction.
+       *
+       * \param[in] node The DataNode containing a Gizmo as its data object.
+       *
+       * \sa SetManipulatedObjectNode
+       */
       void SetGizmoNode(DataNode *node);
 
-    //! The node that shall be manipulated in function of the user
-    //! interaction on the gizmo.
+    /**
+     * \brief Set the DataNode whose geometry shall be manipulated.
+     *
+     * The geometry of this node's data object will be transformed
+     * (translated, rotated, or scaled) in response to user interaction
+     * with the gizmo.
+     *
+     * \param[in] node The DataNode whose geometry is to be manipulated.
+     *                  Must hold a data object with a valid geometry.
+     *
+     * \sa SetGizmoNode
+     */
     void SetManipulatedObjectNode(DataNode *node);
 
   private:

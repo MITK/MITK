@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDummyModelFitFunctor.h"
+#include <mitkDummyModelFitFunctor.h>
 
-#include "mitkSquaredDifferencesFitCostFunction.h"
-#include "mitkSumOfSquaredDifferencesFitCostFunction.h"
+#include <mitkSquaredDifferencesFitCostFunction.h>
+#include <mitkSumOfSquaredDifferencesFitCostFunction.h>
 #include <chrono>
 #include <mitkExceptionMacro.h>
 

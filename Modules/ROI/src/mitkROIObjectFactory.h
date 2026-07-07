@@ -17,18 +17,20 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Object factory that registers mappers and default properties for mitk::ROI.
+   */
   class ROIObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(ROIObjectFactory, CoreObjectFactoryBase)
     itkFactorylessNewMacro(Self)
 
+    /** \brief Create a mapper for the given node and slot. */
     Mapper::Pointer CreateMapper(DataNode* node, MapperSlotId slotId) override;
+
+    /** \brief Set default rendering properties on the given node. */
     void SetDefaultProperties(DataNode *node) override;
-    std::string GetFileExtensions() override;
-    MultimapType GetFileExtensionsMap() override;
-    std::string GetSaveFileExtensions() override;
-    MultimapType GetSaveFileExtensionsMap() override;
 
   protected:
     ROIObjectFactory();

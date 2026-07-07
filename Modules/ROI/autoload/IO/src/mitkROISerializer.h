@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Serializes mitk::ROI for mitk::SceneIO. */
   class ROISerializer : public BaseDataSerializer
   {
   public:

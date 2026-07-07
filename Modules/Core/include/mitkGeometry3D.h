@@ -13,28 +13,42 @@ found in the LICENSE file.
 #ifndef mitkGeometry3D_h
 #define mitkGeometry3D_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 
-#include "itkScalableAffineTransform.h"
+#include <itkScalableAffineTransform.h>
 #include <itkIndex.h>
 
-#include "mitkBaseGeometry.h"
+#include <mitkBaseGeometry.h>
 
 class vtkLinearTransform;
 
 namespace mitk
 {
-  /** @brief Standard implementation of BaseGeometry.
-    * @ingroup Geometry
-    */
+  /**
+   * \brief Standard three-dimensional geometry.
+   *
+   * Geometry3D is the default concrete implementation of BaseGeometry.
+   * It provides a standard 3D spatial reference (origin, spacing, and
+   * affine IndexToWorldTransform) without any additional constraints
+   * beyond those defined by BaseGeometry.
+   *
+   * Most MITK data objects (Image, Surface, PointSet) use Geometry3D
+   * as their spatial geometry unless a more specialized geometry
+   * (PlaneGeometry, SlicedGeometry3D, etc.) is required.
+   *
+   * \sa BaseGeometry, PlaneGeometry, SlicedGeometry3D
+   * \ingroup Geometry
+   */
   class MITKCORE_EXPORT Geometry3D : public BaseGeometry
   {
   public:
     mitkClassMacro(Geometry3D, mitk::BaseGeometry);
 
+    /** \brief Quaternion rigid transform type (for rotation representations). */
     typedef itk::QuaternionRigidTransform<ScalarType> QuaternionTransformType;
+    /** \brief VNL quaternion type derived from QuaternionTransformType. */
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
     /** Method for creation through the object factory. */
@@ -46,20 +60,9 @@ namespace mitk
   protected : Geometry3D();
     Geometry3D(const Geometry3D &);
 
-    /**
-      * @brief clones the geometry
-      *
-      * Overwrite in all sub-classes.
-      * Normally looks like:
-      * \code
-      *  Self::Pointer newGeometry = new Self(*this);
-      *  newGeometry->UnRegister();
-      *  return newGeometry.GetPointer();
-      * \endcode
-      */
-    itk::LightObject::Pointer InternalClone() const override;
-
     ~Geometry3D() override;
+
+    mitkCloneMacro(Self);
 
     /**
       * @brief PreSetSpacing

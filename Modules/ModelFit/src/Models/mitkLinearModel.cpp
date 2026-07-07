@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLinearModel.h"
+#include <mitkLinearModel.h>
 
 const std::string mitk::LinearModel::NAME_PARAMETER_b = "slope";
 const std::string mitk::LinearModel::NAME_PARAMETER_y0 = "y-intercept";
@@ -199,11 +199,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::LinearModel::ComputeDerivedParame
   return result;
 };
 
-itk::LightObject::Pointer mitk::LinearModel::InternalClone() const
+mitk::LinearModel::LinearModel(const LinearModel& source)
+: Superclass(source)
 {
-  LinearModel::Pointer newClone = LinearModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

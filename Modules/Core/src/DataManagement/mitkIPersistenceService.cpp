@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIPersistenceService.h"
+#include <mitkIPersistenceService.h>
 
 mitk::IPersistenceService::~IPersistenceService()
 {

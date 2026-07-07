@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.hxx>
 
-#include "mitkInteractionConst.h"
-#include "mitkRotationOperation.h"
+#include <mitkInteractionConst.h>
+#include <mitkRotationOperation.h>
 #include <mitkImageCast.h>
 #include <mitkMatrixConvert.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <fstream>
 #include <mitkNumericTypes.h>
 
@@ -92,7 +92,8 @@ int testIndexAndWorldConsistency(mitk::Geometry3D *geometry3d)
   itk::Index<3> itkindex;
   geometry3d->WorldToIndex(origin, itkindex);
   itk::Index<3> globalOriginIndex;
-  mitk::vtk2itk(globalOrigin, globalOriginIndex);
+  for (unsigned int i = 0; i < 3; ++i)
+    globalOriginIndex[i] = static_cast<itk::IndexValueType>(globalOrigin[i]);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
   MITK_TEST_OUTPUT(<< " Testing WorldToIndex(origin-0.5*spacing, itk::Index)==(0,0,0)");
@@ -259,7 +260,8 @@ int testItkImageIsCenterBased()
   MITK_TEST_OUTPUT(<< " Testing itk::Image::TransformPhysicalPointToIndex(origin)==(0,0,0)");
   itk::Index<3> itkindex = itkintimage->TransformPhysicalPointToIndex(origin);
   itk::Index<3> globalOriginIndex;
-  mitk::vtk2itk(globalOrigin, globalOriginIndex);
+  for (unsigned int i = 0; i < 3; ++i)
+    globalOriginIndex[i] = static_cast<itk::IndexValueType>(globalOrigin[i]);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
   MITK_TEST_OUTPUT(<< " Testing itk::Image::TransformPhysicalPointToIndex(origin-0.5*spacing)==(0,0,0)");

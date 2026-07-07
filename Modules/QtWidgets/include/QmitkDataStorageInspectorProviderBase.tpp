@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef QmitkDataStorageInspectorProviderBase_tpp
+#define QmitkDataStorageInspectorProviderBase_tpp
+
 #include <QmitkDataStorageInspectorProviderBase.h>
 #include <mitkExceptionMacro.h>
 
@@ -165,3 +168,5 @@ QmitkDataStorageInspectorProviderBase<TInspector>::SetRanking(int ranking) { d->
 template<class TInspector>
 int
 QmitkDataStorageInspectorProviderBase<TInspector>::GetRanking() const { return d->GetRanking(); }
+
+#endif

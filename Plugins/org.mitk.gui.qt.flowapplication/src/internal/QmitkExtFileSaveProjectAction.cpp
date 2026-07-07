@@ -13,21 +13,19 @@ found in the LICENSE file.
 
 #include "QmitkExtFileSaveProjectAction.h"
 
-#include "QmitkFlowApplicationPlugin.h"
-
+#include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QApplication>
-
-#include <mitkSceneIO.h>
-#include <mitkProgressBar.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateProperty.h>
-#include <mitkProperties.h>
 
 #include <mitkCoreObjectFactory.h>
-#include <mitkDataStorageEditorInput.h>
+#include <mitkCoreServices.h>
 #include <mitkIDataStorageService.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProgressBar.h>
+#include <mitkProperties.h>
+#include <mitkSceneIO.h>
+
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
@@ -65,35 +63,30 @@ void QmitkExtFileSaveProjectAction::Run()
      */
     static QString m_LastPath;
 
-    mitk::IDataStorageReference::Pointer dsRef;
-
+    mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+    if (!dsService)
     {
-      ctkPluginContext* context = QmitkFlowApplicationPlugin::GetDefault()->GetPluginContext();
-      mitk::IDataStorageService* dss = nullptr;
-      ctkServiceReference dsServiceRef = context->getServiceReference<mitk::IDataStorageService>();
-      if (dsServiceRef)
-      {
-        dss = context->getService<mitk::IDataStorageService>(dsServiceRef);
-      }
-
-      if (!dss)
-      {
-        QString msg = "IDataStorageService service not available. Unable to open files.";
-        MITK_WARN << msg.toStdString();
-        QMessageBox::warning(QApplication::activeWindow(), "Unable to open files", msg);
-        return;
-      }
-
-      // Get the active data storage (or the default one, if none is active)
-      dsRef = dss->GetDataStorage();
-      context->ungetService(dsServiceRef);
+      QString msg = "IDataStorageService service not available. Unable to save files.";
+      MITK_WARN << msg.toStdString();
+      QMessageBox::warning(QApplication::activeWindow(), "Unable to save files", msg);
+      return;
     }
 
-    mitk::DataStorage::Pointer storage = dsRef->GetDataStorage();
+    // Get the active data storage (or the default one, if none is active)
+    mitk::DataStorageReference dsRef = dsService->GetActiveDataStorageReference();
+    mitk::DataStorage::Pointer storage = dsRef.GetStorage();
+
+    if (!storage)
+    {
+      QString msg = "No active DataStorage available. Unable to save files.";
+      MITK_WARN << msg.toStdString();
+      QMessageBox::warning(QApplication::activeWindow(), "Unable to save files", msg);
+      return;
+    }
 
     QString dialogTitle = "Save MITK Scene (%1)";
     QString fileName = QFileDialog::getSaveFileName(nullptr,
-                                                    dialogTitle.arg(dsRef->GetLabel()),
+                                                    dialogTitle.arg(QString::fromStdString(dsRef.GetLabel())),
                                                     m_LastPath,
                                                     "MITK scene files (*.mitk)",
                                                     nullptr );

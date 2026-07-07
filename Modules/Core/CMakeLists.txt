@@ -23,7 +23,7 @@ mitk_create_module(
   DEPENDS
     PUBLIC
       MitkLog
-      CppMicroServices
+      MitkCppMicroServices
   PACKAGE_DEPENDS
     PUBLIC
       Boost

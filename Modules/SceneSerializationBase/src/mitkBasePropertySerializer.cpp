@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
 mitk::BasePropertySerializer::BasePropertySerializer()
 {

@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 
 QmitkIsoSurface::QmitkIsoSurface(QObject * /*parent*/, const char * /*name*/)
-  : m_Controls(nullptr), m_MitkImage(nullptr), m_SurfaceCounter(0)
+  : m_MitkImage(nullptr), m_SurfaceCounter(0)
 {
 }
 
@@ -33,7 +33,7 @@ void QmitkIsoSurface::CreateQtPartControl(QWidget *parent)
 {
   if (!m_Controls)
   {
-    m_Controls = new Ui::QmitkIsoSurfaceControls;
+    m_Controls = std::make_unique<Ui::QmitkIsoSurfaceControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
@@ -108,11 +108,8 @@ void QmitkIsoSurface::CreateSurface()
                                 "CAUTION!!!",
                                 "The number of polygons is greater than 2 000 000. If you continue, the program might "
                                 "crash. How do you want to go on?",
-                                "Proceed anyway!",
-                                "Cancel immediately! (maybe you want to insert an other threshold)!",
-                                QString(),
-                                0,
-                                1) == 1)
+                                QMessageBox::Ok | QMessageBox::Cancel,
+                                QMessageBox::Cancel) == QMessageBox::Cancel)
       {
         return;
       }
@@ -159,4 +156,5 @@ QmitkIsoSurface::~QmitkIsoSurface()
   auto* prefs = this->GetPreferences();
   if (prefs != nullptr)
     prefs->Put("defaultThreshold", m_Controls->thresholdLineEdit->text().toStdString());
+
 }

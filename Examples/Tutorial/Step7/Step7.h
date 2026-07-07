@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef STEP7_H
 #define STEP7_H
 
-#include "Step6.h"
+#include <Step6.h>
 
 #ifndef DOXYGEN_IGNORE
 class Step7 : public Step6

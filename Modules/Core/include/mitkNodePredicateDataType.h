@@ -13,36 +13,45 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateDataType_h
 #define mitkNodePredicateDataType_h
 
-#include "mitkDataNode.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkDataNode.h>
+#include <mitkNodePredicateBase.h>
 #include <string>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Predicate that evaluates if the given DataNodes data object is of a specific data type
-  //##
-  //## The data type must be specified in the constructor as a string. The string must equal the result
-  //## value of the requested data types GetNameOfClass() method.
-  //##
-  //## @ingroup DataStorage
+  /** \brief Predicate that evaluates if the given DataNode's data object is of a specific data type.
+   *
+   * The data type must be specified in the constructor as a string. The string must equal the
+   * result value of the requested data type's GetNameOfClass() method.
+   * This predicate performs exact type matching. For type-compatible matching
+   * (including derived types), use TNodePredicateDataType.
+   *
+   * \ingroup DataStorage
+   */
   class MITKCORE_EXPORT NodePredicateDataType : public NodePredicateBase
   {
   public:
     mitkClassMacro(NodePredicateDataType, NodePredicateBase);
     mitkNewMacro1Param(NodePredicateDataType, const char *);
 
-    //##Documentation
-    //## @brief Standard Destructor
+    /** \brief Standard Destructor. */
     ~NodePredicateDataType() override;
 
-    //##Documentation
-    //## @brief Checks, if the nodes data object is of a specific data type
+    /** \brief Checks if the node's data object is of the specified data type.
+     *
+     * Compares GetNameOfClass() of the data object against the stored type string.
+     * Returns false if the node has no data object.
+     *
+     * \param node The DataNode to check.
+     * \return True if the data object type matches the stored type string.
+     */
     bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
-    //##Documentation
-    //## @brief Protected constructor, use static instantiation functions instead
+    /** \brief Protected constructor, use static instantiation functions instead.
+     *
+     * \param datatype The class name string to match (must not be nullptr).
+     */
     NodePredicateDataType(const char *datatype);
 
     std::string m_ValidDataType;
@@ -64,16 +73,21 @@ namespace mitk
     itkFactorylessNewMacro(TNodePredicateDataType);
 
     ~TNodePredicateDataType() override {}
-    //##Documentation
-    //## @brief Checks, if the nodes data object is of a specific data type (casts)
+
+    /** \brief Checks if the node's data object is of the specified type (using dynamic_cast).
+     *
+     * Also accepts derived types.
+     *
+     * \param node The DataNode to check.
+     * \return True if the data object can be cast to type T.
+     */
     bool CheckNode(const mitk::DataNode *node) const override
     {
       return node && node->GetData() && dynamic_cast<T *>(node->GetData());
     }
 
   protected:
-    //##Documentation
-    //## @brief Protected constructor, use static instantiation functions instead
+    /** \brief Protected constructor, use static instantiation functions instead. */
     TNodePredicateDataType() {}
   };
 

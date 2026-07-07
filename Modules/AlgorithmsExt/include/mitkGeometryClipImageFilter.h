@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkGeometryClipImageFilter_h
 #define mitkGeometryClipImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkGeometryData.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkGeometryData.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 
 namespace itk
 {
@@ -27,19 +27,24 @@ namespace itk
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Filter for clipping an image with a PlaneGeometry
-  //##
-  //## The given geometry for clipping can be either a PlaneGeometry
-  //## or a TimeGeometry containing multiple instances
-  //## of PlaneGeometry
-  //##
-  //## \todo add AutoOrientLabels, which makes the "left" side (minimum X value) side of the image get one defined
-  //label.
-  //##       left-most because vtkPolyDataNormals uses the same definition and this filter is used for visualization of
-  //##       front/back side of curved planes
-  //##
-  //## @ingroup Process
+  /**
+   * \brief Filter for clipping an image with a PlaneGeometry.
+   *
+   * This filter clips an image along a plane defined by a PlaneGeometry.
+   * The clipping geometry can be either a single PlaneGeometry or a
+   * TimeGeometry containing PlaneGeometry instances for multiple time steps.
+   * Pixels on one side of the plane are set to an outside value (or labeled),
+   * while pixels on the other side retain their original values.
+   *
+   * The filter supports several modes:
+   * - Simple clipping with a constant outside value
+   * - Automatic outside value (minimum of the pixel type)
+   * - Labeling both sides of the plane with distinct labels
+   *
+   * \sa PlaneGeometry
+   * \sa HeightFieldSurfaceClipImageFilter
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT GeometryClipImageFilter : public ImageToImageFilter
   {
   public:
@@ -50,69 +55,136 @@ namespace mitk
     itkCloneMacro(Self);
 
       /**
-      * Set the geometry to be used for clipping
-      *
-      * The given geometry for clipping must be a PlaneGeometry.
-      */
+       * \brief Set the clipping geometry (must be a PlaneGeometry).
+       * \param[in] aClippingGeometry The PlaneGeometry used for clipping.
+       */
       void SetClippingGeometry(const mitk::BaseGeometry *aClippingGeometry);
 
     /**
-    * Set the geometry to be used for clipping
-    *
-    * The given geometry for clipping must a
-    * TimeGeometry containing multiple instances
-    * of PlaneGeometry
-    */
+     * \brief Set the clipping geometry as a TimeGeometry.
+     *
+     * The TimeGeometry must contain PlaneGeometry instances, one per time step.
+     *
+     * \param[in] aClippingGeometry The TimeGeometry containing PlaneGeometry instances.
+     */
     void SetClippingGeometry(const mitk::TimeGeometry *aClippingGeometry);
 
+    /**
+     * \brief Get the clipping geometry for a single time step.
+     * \return Const pointer to the clipping BaseGeometry.
+     */
     const mitk::BaseGeometry *GetClippingGeometry() const;
+
+    /**
+     * \brief Get the clipping time geometry (if set).
+     * \return Const pointer to the clipping TimeGeometry, or nullptr.
+     */
     const mitk::TimeGeometry *GetClippingTimeGeometry() const;
 
-    //##Description
-    //## @brief Get whether the part above or below the geometry
-    //## shall be clipped (default: @a true)
+    /**
+     * \brief Get whether the part above the geometry is clipped (default: true).
+     * \return True if the part above the geometry is clipped.
+     */
     itkGetConstMacro(ClipPartAboveGeometry, bool);
-    //## @brief Set whether the part above or below the geometry
-    //## shall be clipped (default: @a true)
+
+    /**
+     * \brief Set whether the part above or below the geometry shall be clipped (default: true).
+     * \param[in] _arg True to clip above, false to clip below.
+     */
     itkSetMacro(ClipPartAboveGeometry, bool);
-    //## @brief Set whether the part above or below the geometry
-    //## shall be clipped (default: @a true)
+
+    /** \brief Toggle ClipPartAboveGeometry on/off. */
     itkBooleanMacro(ClipPartAboveGeometry);
 
-    //##Description
-    //## @brief Set value for outside pixels (default: 0),
-    //## used when m_AutoOutsideValue is \a false
+    /**
+     * \brief Set the value for outside (clipped) pixels (default: 0).
+     *
+     * Only used when AutoOutsideValue is false.
+     *
+     * \param[in] _arg The outside pixel value.
+     */
     itkSetMacro(OutsideValue, ScalarType);
+
+    /**
+     * \brief Get the value for outside (clipped) pixels.
+     * \return The outside pixel value.
+     */
     itkGetConstMacro(OutsideValue, ScalarType);
 
-    //##Description
-    //## @brief If set to \a true the minimum of the output pixel type is
-    //## used as outside value (default: \a false)
+    /**
+     * \brief Set whether to automatically use the pixel type minimum as outside value (default: false).
+     * \param[in] _arg True to use automatic outside value.
+     */
     itkSetMacro(AutoOutsideValue, bool);
+
+    /**
+     * \brief Get whether the outside value is automatically determined.
+     * \return True if automatic outside value is enabled.
+     */
     itkGetConstMacro(AutoOutsideValue, bool);
+
+    /** \brief Toggle AutoOutsideValue on/off. */
     itkBooleanMacro(AutoOutsideValue);
 
+    /**
+     * \brief Set whether to auto-orient labels like vtkPolyDataNormals.
+     * \param[in] _arg True to enable automatic label orientation.
+     */
     itkSetMacro(AutoOrientLabels, bool);
+
+    /**
+     * \brief Get whether automatic label orientation is enabled.
+     * \return True if automatic label orientation is enabled.
+     */
     itkGetConstMacro(AutoOrientLabels, bool);
 
-    //##Description
-    //## @brief If set to \a true both sides of the clipping
-    //## geometry will be labeled using m_AboveGeometryLabel and
-    //## m_BelowGeometryLabel
+    /**
+     * \brief Set whether both sides of the clipping geometry are labeled (default: false).
+     *
+     * When enabled, pixels above the geometry receive AboveGeometryLabel and
+     * pixels below receive BelowGeometryLabel.
+     *
+     * \param[in] _arg True to label both sides.
+     */
     itkSetMacro(LabelBothSides, bool);
+
+    /**
+     * \brief Get whether both sides labeling is enabled.
+     * \return True if both sides are labeled.
+     */
     itkGetConstMacro(LabelBothSides, bool);
+
+    /** \brief Toggle LabelBothSides on/off. */
     itkBooleanMacro(LabelBothSides);
 
-    //##Description
-    //## @brief Set for voxels above the clipping geometry.
-    //## This value is only used, if m_LabelBothSides is set to true.
+    /**
+     * \brief Set the label value for voxels above the clipping geometry.
+     *
+     * Only used when LabelBothSides is true.
+     *
+     * \param[in] _arg The above-geometry label value.
+     */
     itkSetMacro(AboveGeometryLabel, ScalarType);
+
+    /**
+     * \brief Get the label value for voxels above the clipping geometry.
+     * \return The above-geometry label value.
+     */
     itkGetConstMacro(AboveGeometryLabel, ScalarType);
 
-    //##Description
-    //## @brief Set for voxels below the clipping geometry.
-    //## This value is only used, if m_LabelBothSides is set to true.
+    /**
+     * \brief Set the label value for voxels below the clipping geometry.
+     *
+     * Only used when LabelBothSides is true.
+     *
+     * \param[in] _arg The below-geometry label value.
+     */
     itkSetMacro(BelowGeometryLabel, ScalarType);
+
+    /**
+     * \brief Get the label value for voxels below the clipping geometry.
+     * \return The below-geometry label value.
+     */
     itkGetConstMacro(BelowGeometryLabel, ScalarType);
 
   protected:
@@ -137,43 +209,34 @@ namespace mitk
     mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
     mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 
-    //##Description
-    //## @brief Defines whether the part above or below the geometry
-    //## shall be clipped (default: @a true)
+    /** \brief Defines whether the part above or below the geometry shall be clipped (default: true). */
     bool m_ClipPartAboveGeometry;
 
-    //##Description
-    //## @brief Value for outside pixels (default: 0)
-    //##
-    //## Used only if m_AutoOutsideValue is \a false.
+    /** \brief Value for outside pixels (default: 0).
+     * Used only if m_AutoOutsideValue is false.
+     */
     ScalarType m_OutsideValue;
-    //##Description
-    //## @brief If \a true the minimum of the output pixel type is
-    //## used as outside value (default: \a false)
+
+    /** \brief If true, the minimum of the output pixel type is used as outside value (default: false). */
     bool m_AutoOutsideValue;
 
-    //##Description
-    //## @brief If \a true all pixels above and below the geometry
-    //## are labeled with m_AboveGeometryLabel and m_BelowGeometryLabel
+    /** \brief If true, all pixels above and below the geometry are labeled
+     * with m_AboveGeometryLabel and m_BelowGeometryLabel.
+     */
     bool m_LabelBothSides;
 
     /**
-     * \brief Orient above like vtkPolyDataNormals does with AutoOrientNormals
+     * \brief Orient above like vtkPolyDataNormals does with AutoOrientNormals.
      */
     bool m_AutoOrientLabels;
 
-    //##Description
-    //## @brief Is used for labeling all pixels above the geometry
-    //## when m_LabelBothSides is on
+    /** \brief Label value for pixels above the geometry when m_LabelBothSides is on. */
     ScalarType m_AboveGeometryLabel;
 
-    //##Description
-    //## @brief Is used for labeling all pixels below the geometry
-    //## when m_LabelBothSides is on
+    /** \brief Label value for pixels below the geometry when m_LabelBothSides is on. */
     ScalarType m_BelowGeometryLabel;
 
-    //##Description
-    //## @brief Time when Header was last initialized
+    /** \brief Time when header was last initialized. */
     itk::TimeStamp m_TimeOfHeaderInitialization;
   };
 

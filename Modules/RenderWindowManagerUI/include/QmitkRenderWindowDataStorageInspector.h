@@ -14,8 +14,7 @@ found in the LICENSE file.
 #define QmitkRenderWindowDataStorageInspector_h
 
 // render window manager UI module
-#include "MitkRenderWindowManagerUIExports.h"
-#include "ui_QmitkRenderWindowDataStorageInspector.h"
+#include <MitkRenderWindowManagerUIExports.h>
 
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
@@ -24,47 +23,95 @@ found in the LICENSE file.
 
 // qt widgets module
 #include <QmitkAbstractDataStorageInspector.h>
+#include <memory>
+
+namespace Ui { class QmitkRenderWindowDataStorageInspector; }
 
 /**
-* The 'QmitkRenderWindowDataStorageInspector' offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
-*
-* In order to use this widget, a (e.g.) plugin has to set the controlled renderer, which will be forwarded to
-* a render window view direction controller.
-*/
+ * \brief Inspector widget for managing data node layers and view directions in MITK render windows.
+ *
+ * QmitkRenderWindowDataStorageInspector provides a GUI for manipulating the data node layer
+ * ordering within a specific render window, as well as switching the view direction (axial,
+ * coronal, sagittal, 3D) via radio buttons. It combines a tree view backed by a
+ * QmitkRenderWindowDataStorageTreeModel with radio buttons for view direction control.
+ *
+ * Plugins or views that use this inspector must call SetControlledRenderer() to specify
+ * which render windows are managed, and SetActiveRenderWindow() to select the currently
+ * displayed render window.
+ *
+ * The tree view supports drag-and-drop for reordering layers, extended row selection,
+ * and alternating row colors.
+ *
+ * \sa QmitkAbstractDataStorageInspector, QmitkRenderWindowDataStorageTreeModel,
+ *     QmitkRenderWindowDataStorageListModel, QmitkDataStorageLayerStackModel,
+ *     mitk::RenderWindowLayerController, mitk::RenderWindowViewDirectionController
+ */
 class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowDataStorageInspector : public QmitkAbstractDataStorageInspector
 {
   Q_OBJECT
 
 public:
 
+  /**
+   * \brief Construct the inspector widget.
+   *
+   * Initializes the tree view, layer controller, and view direction controller.
+   * Sets up drag-and-drop, selection behavior, and radio button connections.
+   *
+   * \param[in] parent Optional parent widget.
+   */
   QmitkRenderWindowDataStorageInspector(QWidget* parent = nullptr);
 
-  // override from 'QmitkAbstractDataStorageInspector'
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
-  */
+   * \brief Destructor.
+   */
+  ~QmitkRenderWindowDataStorageInspector() override;
+
+  /**
+   * \brief Get the underlying tree view widget.
+   *
+   * \return Pointer to the QAbstractItemView (QTreeView) used by this inspector.
+   */
   QAbstractItemView* GetView() override;
+
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
-  */
+   * \brief Get the underlying tree view widget (const version).
+   *
+   * \return Const pointer to the QAbstractItemView (QTreeView) used by this inspector.
+   */
   const QAbstractItemView* GetView() const override;
+
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
-  */
+   * \brief Set the selection mode of the tree view.
+   *
+   * \param[in] mode The QAbstractItemView::SelectionMode to apply to the tree view.
+   */
   void SetSelectionMode(SelectionMode mode) override;
+
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
-  */
+   * \brief Get the current selection mode of the tree view.
+   *
+   * \return The current QAbstractItemView::SelectionMode of the tree view.
+   */
   SelectionMode GetSelectionMode() const override;
+
   /**
-  * @brief Set the controlled base renderer.
-  */
+   * \brief Set the list of render windows controlled by this inspector.
+   *
+   * Forwards the renderer vector to the tree model and the view direction controller.
+   *
+   * \param[in] controlledRenderer Vector of base renderers to manage.
+   */
   void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
+
   /**
-  * @brief Set the currently selected render window.
-  *
-  * @param renderWindowId   the text inside the combo box
-  */
+   * \brief Set the currently active render window by its identifier string.
+   *
+   * Looks up the base renderer by name, updates the tree model to display its layer
+   * stack, and checks the radio button matching the renderer's default view direction.
+   *
+   * \param[in] renderWindowId The name / identifier of the render window to activate.
+   */
   void SetActiveRenderWindow(const QString& renderWindowId);
 
 private Q_SLOTS:
@@ -78,7 +125,7 @@ private:
   void Initialize() override;
   void SetUpConnections();
 
-  Ui::QmitkRenderWindowDataStorageInspector m_Controls;
+  std::unique_ptr<Ui::QmitkRenderWindowDataStorageInspector> m_Controls;
 
   std::unique_ptr<QmitkRenderWindowDataStorageTreeModel> m_StorageModel;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

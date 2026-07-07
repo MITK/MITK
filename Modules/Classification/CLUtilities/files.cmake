@@ -1,4 +1,21 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  itkCoocurenceMatrixFeatureFunctor.h
+  itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h
+  itkEnhancedHistogramToRunLengthFeaturesFilter.h
+  itkEnhancedHistogramToSizeZoneFeaturesFilter.h
+  itkEnhancedHistogramToTextureFeaturesFilter.h
+  itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h
+  itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.h
+  itkEnhancedScalarImageToRunLengthFeaturesFilter.h
+  itkEnhancedScalarImageToRunLengthMatrixFilter.h
+  itkEnhancedScalarImageToSizeZoneFeaturesFilter.h
+  itkEnhancedScalarImageToSizeZoneMatrixFilter.h
+  itkEnhancedScalarImageToTextureFeaturesFilter.h
+  itkFirstOrderStatisticsFeatureFunctor.h
+  itkLocalIntensityFilter.h
+  itkLocalStatisticFilter.h
+  itkMultiHistogramFilter.h
+)
 
 set(CPP_FILES
   mitkCLResultWriter.cpp
@@ -33,8 +50,4 @@ set(CPP_FILES
   MiniAppUtils/mitkSplitParameterToVector.cpp
 
   mitkCLUtil.cpp
-
-)
-
-set( TOOL_FILES
 )

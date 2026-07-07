@@ -13,14 +13,17 @@ found in the LICENSE file.
 #ifndef mitkTwoCompartmentExchangeModelParameterizer_h
 #define mitkTwoCompartmentExchangeModelParameterizer_h
 
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkTwoCompartmentExchangeModel.h"
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkTwoCompartmentExchangeModel.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
 
+  /** \brief Parameterizer for the TwoCompartmentExchangeModel.
+   * \sa TwoCompartmentExchangeModel, TwoCompartmentExchangeModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoCompartmentExchangeModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::TwoCompartmentExchangeModel>
   {

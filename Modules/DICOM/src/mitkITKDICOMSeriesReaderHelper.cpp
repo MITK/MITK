@@ -15,22 +15,14 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcvrdt.h>
 #include <dcmtk/ofstd/ofstd.h>
 
-#define BOOST_DATE_TIME_NO_LIB
-//Prevent unnecessary/unwanted auto link in this compilation when activating boost libraries in the MITK superbuild
-//It is necessary because BOOST_ALL_DYN_LINK overwrites BOOST_DATE_TIME_NO_LIB
-#if defined(BOOST_ALL_DYN_LINK)
-  #undef BOOST_ALL_DYN_LINK
-#endif
+#include <mitkITKDICOMSeriesReaderHelper.h>
+#include <mitkITKDICOMSeriesReaderHelper.tpp>
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <mitkDICOMGDCMTagScanner.h>
+#include <mitkDICOMTimeUtil.h>
+#include <mitkArbitraryTimeGeometry.h>
 
-#include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkITKDICOMSeriesReaderHelper.txx"
-
-#include "mitkDICOMGDCMTagScanner.h"
-#include "mitkArbitraryTimeGeometry.h"
-
-#include "dcmtk/dcmdata/dcvrda.h"
+#include <dcmtk/dcmdata/dcvrda.h>
 
 
 const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionDateTag = mitk::DICOMTag( 0x0008, 0x0022 );
@@ -255,33 +247,6 @@ bool ConvertDICOMDateTimeString( const std::string& dateString,
   return result.good();
 }
 
-boost::posix_time::ptime ConvertOFDateTimeToPTime( const OFDateTime& time )
-{
-  const boost::posix_time::ptime min_date_time(boost::posix_time::min_date_time);
-  const boost::gregorian::date::year_type min_year = min_date_time.date().year();
-  unsigned int year = time.getDate().getYear();
-
-  if (year < min_year)
-  {
-    MITK_WARN << "Year " << year << " is before the supported minimum " << min_year
-              << " in Boost.Date_Time. Adding " << min_year << " years to proceed.";
-    year += min_year;
-  }
-
-  const boost::gregorian::date boostDate(
-    year, time.getDate().getMonth(), time.getDate().getDay() );
-
-  const boost::posix_time::time_duration boostTime =
-    boost::posix_time::hours( time.getTime().getHour() )
-    + boost::posix_time::minutes( time.getTime().getMinute() )
-    + boost::posix_time::seconds( static_cast<int>(time.getTime().getSecond()) )
-    + boost::posix_time::milliseconds( time.getTime().getMilliSecond() );
-
-  boost::posix_time::ptime result( boostDate, boostTime );
-
-  return result;
-}
-
 OFDateTime GetLowerDateTime( const OFDateTime& time1, const OFDateTime& time2 )
 {
   OFDateTime result = time1;
@@ -306,16 +271,6 @@ OFDateTime GetUpperDateTime( const OFDateTime& time1, const OFDateTime& time2 )
   }
 
   return result;
-}
-
-double ComputeMiliSecDuration( const OFDateTime& start, const OFDateTime& stop )
-{
-  const boost::posix_time::ptime startTime = ConvertOFDateTimeToPTime( start );
-  const boost::posix_time::ptime stopTime  = ConvertOFDateTimeToPTime( stop );
-
-  ::boost::posix_time::time_duration duration = stopTime - startTime;
-
-  return duration.total_milliseconds();
 }
 
 bool mitk::ITKDICOMSeriesReaderHelper::ExtractDateTimeBoundsAndTriggerOfTimeStep(
@@ -392,8 +347,8 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
 
   bool result = ExtractDateTimeBoundsAndTriggerOfTimeStep(filenamesOfTimeStep, aqDTBounds, triggerBounds);
 
-  mitk::ScalarType lowerBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[0] );
-  mitk::ScalarType upperBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[1] );
+  mitk::ScalarType lowerBound = mitk::ComputeMiliSecDuration( baselineDateTime, aqDTBounds[0] );
+  mitk::ScalarType upperBound = mitk::ComputeMiliSecDuration( baselineDateTime, aqDTBounds[1] );
   if ( lowerBound < mitk::eps || upperBound < mitk::eps || usedTriggerBounds)
   {
     lowerBound = triggerBounds[0];

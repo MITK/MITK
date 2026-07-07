@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYQTMAINWINDOWSHELL_H_
 #define BERRYQTMAINWINDOWSHELL_H_
 
-#include <berryShell.h>
+#include "berryShell.h"
 
 #include <QWidget>
 

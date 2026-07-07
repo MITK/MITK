@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMSegIOMimeTypes.h"
-#include "mitkIOMimeTypes.h"
+#include <mitkDICOMSegIOMimeTypes.h>
+#include <mitkIOMimeTypes.h>
 
 #include <array>
 
@@ -22,6 +22,7 @@ found in the LICENSE file.
 
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcuid.h>
 
 namespace mitk
 {
@@ -97,8 +98,14 @@ namespace mitk
     if (dcmFileFormat.getDataset()->findAndGetOFString(DCM_Modality, modality).good() && dcmFileFormat.getDataset()->findAndGetOFString(DCM_SOPClassUID, sopClassUID).good())
     {
       if (modality.compare("SEG") == 0)
-      {//atm we could read SegmentationStorage files. Other storage classes with "SEG" modality, e.g. SurfaceSegmentationStorage (1.2.840.10008.5.1.4.1.1.66.5), are not supported yet.
-        if (sopClassUID.compare("1.2.840.10008.5.1.4.1.1.66.4") == 0)
+      {
+        // Accept the binary SEG SOP Class (1.2.840.10008.5.1.4.1.1.66.4) and
+        // the Sup 243 labelmap SOP Class (UID_LabelMapSegmentationStorage,
+        // 1.2.840.10008.5.1.4.1.1.66.7). Other SEG-modality storage classes
+        // such as SurfaceSegmentationStorage (1.2.840.10008.5.1.4.1.1.66.5)
+        // are not supported.
+        if (sopClassUID.compare(UID_SegmentationStorage) == 0
+            || sopClassUID.compare(UID_LabelMapSegmentationStorage) == 0)
         {
           canRead = true;
         }

@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include "berryClosePerspectiveHandler.h"
 
-#include <berryHandlerUtil.h>
+#include "berryHandlerUtil.h"
 
 #include "internal/berryPerspective.h"
 #include "internal/berryWorkbenchPage.h"
 
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchCommandConstants.h>
+#include "berryIWorkbench.h"
+#include "berryIWorkbenchCommandConstants.h"
 
 namespace berry {
 

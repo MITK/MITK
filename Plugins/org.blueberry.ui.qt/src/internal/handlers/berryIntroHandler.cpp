@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryIntroHandler.h"
 
-#include <berryPlatformUI.h>
-#include <berryHandlerUtil.h>
+#include "berryPlatformUI.h"
+#include "berryHandlerUtil.h"
 
 #include "internal/berryWorkbench.h"
 #include "internal/intro/berryIntroDescriptor.h"

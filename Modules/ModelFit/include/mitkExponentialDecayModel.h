@@ -13,17 +13,23 @@ found in the LICENSE file.
 #ifndef mitkExponentialDecayModel_h
 #define mitkExponentialDecayModel_h
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
-  /** @class ExponentialDecayModel
-  * @brief Simple model of exponential decay in the form of:
-  * y(x) = y-intercept * exp(-x/lambda) with lambda being the decay constant.
-  */
+  /**
+   * \class ExponentialDecayModel
+   * \brief Simple model of exponential decay: y(x) = y-intercept * exp(-x/lambda).
+   *
+   * This model implements an exponential decay function where lambda is the decay
+   * constant. It has two parameters (y-intercept and lambda) and one derived
+   * parameter (rate constant k = 1/lambda).
+   *
+   * \sa ExponentialDecayModelFactory, ExponentialDecayModelParameterizer, ModelBase
+   */
   class MITKMODELFIT_EXPORT ExponentialDecayModel : public mitk::ModelBase
   {
 
@@ -44,85 +50,87 @@ namespace mitk
     itkTypeMacro(ExponentialDecayModel, ModelBase);
 
 
+    /** \brief Name string for the y-intercept parameter. */
     static const std::string NAME_PARAMETER_y0;
+    /** \brief Name string for the decay constant parameter (lambda). */
     static const std::string NAME_PARAMETER_lambda;
 
+    /** \brief Total number of model parameters (2). */
     static const unsigned int NUMBER_OF_PARAMETERS;
 
+    /** \brief Unit of the y-intercept parameter. */
     static const std::string UNIT_PARAMETER_y0;
+    /** \brief Unit of the decay constant parameter. */
     static const std::string UNIT_PARAMETER_lambda;
 
+    /** \brief Index position of y-intercept in the parameter vector. */
     static const unsigned int POSITION_PARAMETER_y0;
+    /** \brief Index position of lambda in the parameter vector. */
     static const unsigned int POSITION_PARAMETER_lambda;
 
+    /** \brief Name string for the derived rate constant parameter (k = 1/lambda). */
     static const std::string NAME_DERIVED_PARAMETER_k;
 
+    /** \brief Total number of derived parameters (1). */
     static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
 
+    /** \brief Unit of the derived rate constant parameter. */
     static const std::string UNIT_DERIVED_PARAMETER_k;
 
+    /** \brief Total number of static parameters (0). */
     static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
 
+    /** \brief Display name of this model. */
     static const std::string MODEL_DISPLAY_NAME;
 
+    /** \brief Type category of this model. */
     static const std::string MODEL_TYPE;
 
+    /** \brief Function string representation of the model equation. */
     static const std::string FUNCTION_STRING;
 
+    /** \brief Name of the independent variable. */
     static const std::string X_NAME;
 
+    /** \brief Display name for the x-axis. */
     static const std::string X_AXIS_NAME;
 
+    /** \brief Unit for the x-axis. */
     static const std::string X_AXIS_UNIT;
 
+    /** \brief Display name for the y-axis. */
     static const std::string Y_AXIS_NAME;
 
+    /** \brief Unit for the y-axis. */
     static const std::string Y_AXIS_UNIT;
 
     ParameterNamesType GetParameterNames() const override;
-
     ParametersSizeType  GetNumberOfParameters() const override;
-
     ParamterUnitMapType GetParameterUnits() const override;
-
     ParameterNamesType GetDerivedParameterNames() const override;
-
     ParametersSizeType  GetNumberOfDerivedParameters() const override;
-
     ParamterUnitMapType GetDerivedParameterUnits() const override;
-
     ParameterNamesType GetStaticParameterNames() const override;
-
     ParametersSizeType GetNumberOfStaticParameters() const override;
-
     std::string GetModelDisplayName() const override;
-
     std::string GetModelType() const override;
-
     FunctionStringType GetFunctionString() const override;
-
     std::string GetXName() const override;
-
     std::string GetXAxisName() const override;
-
     std::string GetXAxisUnit() const override;
-
     std::string GetYAxisName() const override;
-
     std::string GetYAxisUnit() const override;
 
     mitk::ModelBase::DerivedParameterMapType ComputeDerivedParameters(
-      const mitk::ModelBase::ParametersType &parameters) const;
+      const mitk::ModelBase::ParametersType &parameters) const override;
 
   protected:
     ExponentialDecayModel() {};
     ~ExponentialDecayModel() override {};
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    ExponentialDecayModel(const ExponentialDecayModel& source);
+
+    mitkCloneMacro(ExponentialDecayModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -132,8 +140,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    ExponentialDecayModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

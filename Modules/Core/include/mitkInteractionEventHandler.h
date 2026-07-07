@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkInteractionEventHandler_h
 #define mitkInteractionEventHandler_h
 
-#include "itkLightObject.h"
-#include "itkObjectFactory.h"
+#include <itkLightObject.h>
+#include <itkObjectFactory.h>
 
-#include "mitkCommon.h"
-#include "mitkEventConfig.h"
-#include "mitkPropertyList.h"
+#include <mitkCommon.h>
+#include <mitkEventConfig.h>
+#include <mitkPropertyList.h>
 #include <MitkCoreExports.h>
 
 #include <string>
@@ -31,10 +31,20 @@ namespace us
 namespace mitk
 {
   /**
-   * \class EventHandler
-   *  Serves as a base class for all objects and classes that handle mitk::InteractionEvents.
+   * \class InteractionEventHandler
+   * \brief Base class for all objects that handle mitk::InteractionEvents.
    *
-   *  It provides an interface to load configuration objects map of events to variant names.
+   * Provides an interface to load event configuration objects (EventConfig)
+   * that map raw interaction events to named event variants. These variant
+   * names are then matched against state machine transitions.
+   *
+   * Configuration can be loaded from XML resource files or from
+   * pre-built EventConfig objects. Multiple configurations can be combined
+   * via AddEventConfig().
+   *
+   * \sa EventStateMachine
+   * \sa EventConfig
+   * \ingroup Interaction
    */
   class InteractionEvent;
   class MITKCORE_EXPORT InteractionEventHandler : public itk::Object

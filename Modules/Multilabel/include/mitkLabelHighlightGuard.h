@@ -20,30 +20,91 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Helper class that allows to manage the node properties for label highlighting.
-   * Using the class ensures that the highlighting will always be removed if needed:
-   * (a) the destructor of the guard is called, or (b) the node changes (highlight
-   * of former node will be removed). The guard also manages the triggering the
-   * RenderWindowManager, if need, to refresh the render windows.
+  /** \brief Opacity applied to a hovered/highlighted label by the multi-label mappers.
+   *
+   * Absolute, i.e. decoupled from the base segmentation opacity (node "opacity" times the
+   * "opacity factor" preference), so highlighting stays legible no matter how transparent
+   * the base is. Consumed by LabelSetImageVtkMapper2D and MultiLabelSegmentationVtkMapper3D. */
+  inline constexpr double HIGHLIGHTED_LABEL_OPACITY = 1.0;
+
+  /** \brief Opacity floor applied to the other labels while one is hovered/highlighted.
+   *
+   * A faded label is never rendered more opaque than its normal appearance, so the mappers
+   * clamp this against the label's base opacity. */
+  inline constexpr double FADED_LABEL_OPACITY = 0.1;
+
+  /**
+   * \brief RAII guard for managing label highlighting on data nodes.
+   *
+   * This helper class manages the node properties used for label highlighting
+   * in multi-label segmentations. It ensures that highlighting is always
+   * properly removed when:
+   * - The destructor of the guard is called, or
+   * - The segmentation node changes (highlighting on the former node is removed).
+   *
+   * The guard also triggers the RenderingManager to refresh render windows
+   * when highlighting state changes.
+   *
+   * \sa MultiLabelSegmentation, LabelSetImageVtkMapper2D
    */
   class MITKMULTILABEL_EXPORT LabelHighlightGuard
   {
   public:
+    /**
+     * \brief Sets the segmentation node on which labels should be highlighted.
+     *
+     * If a different node was previously set, the highlighting on the old node is
+     * removed first. Setting nullptr removes all highlighting.
+     *
+     * \param[in] node Pointer to the data node, or nullptr to clear highlighting.
+     */
     void SetSegmentationNode(DataNode* node);
+
+    /**
+     * \brief Returns the currently associated segmentation data node.
+     * \return Smart pointer to the segmentation node, or nullptr if none is set.
+     */
     DataNode::Pointer GetSegmentationNode() const;
 
+    /**
+     * \brief Sets the label values that should be highlighted.
+     *
+     * Only takes effect if a segmentation node is set. Triggers a render update.
+     *
+     * \param[in] labels Vector of label values to highlight.
+     */
     void SetHighlightedLabels(MultiLabelSegmentation::LabelValueVectorType labels);
+
+    /**
+     * \brief Returns the currently highlighted label values.
+     * \return Vector of highlighted label values.
+     */
     MultiLabelSegmentation::LabelValueVectorType GetHighlightedLabels() const;
 
+    /**
+     * \brief Sets whether invisible labels should also be highlighted.
+     * \param[in] highlightInvisible If true, labels that are invisible will also be highlighted.
+     */
     void SetHighlightInvisibleLabels(bool highlightInvisible);
 
+    /**
+     * \brief Destructor. Removes all highlighting from the associated node.
+     */
     ~LabelHighlightGuard();
 
+    /**
+     * \brief Returns the property name used to store highlighted label values on a data node.
+     * \return The property name string "org.mitk.multilabel.labels.highlighted".
+     */
     constexpr static const char* PROPERTY_NAME_LABELS_HIGHLIGHTED()
     {
       return "org.mitk.multilabel.labels.highlighted";
     };
 
+    /**
+     * \brief Returns the property name used to control highlighting of invisible labels.
+     * \return The property name string "org.mitk.multilabel.highlight_invisible".
+     */
     constexpr static const char* PROPERTY_NAME_HIGHLIGHT_INVISIBLE()
     {
       return "org.mitk.multilabel.highlight_invisible";

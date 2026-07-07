@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define BERRYCATEGORY_H_
 
 #include <berryIAdaptable.h>
-#include <berryIPluginContribution.h>
+#include "berryIPluginContribution.h"
 
 namespace berry
 {
@@ -188,6 +188,6 @@ protected:
 } // namespace berry
 
 
-#include "berryCategory.txx"
+#include "berryCategory.tpp"
 
 #endif /*BERRYCATEGORY_H_*/

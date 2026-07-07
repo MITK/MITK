@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
-#define __itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
+#ifndef itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
+#define itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
 
-#include "itkHistogram.h"
-#include "itkMacro.h"
-#include "itkProcessObject.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkHistogram.h>
+#include <itkMacro.h>
+#include <itkProcessObject.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 namespace itk {
   namespace Statistics {
@@ -71,7 +71,6 @@ namespace itk {
     * \sa EnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >
@@ -178,7 +177,7 @@ namespace itk {
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.hxx"
+#include <itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.tpp>
 #endif
 
 #endif

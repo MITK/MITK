@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneGeometryDataVtkMapper3D.h"
+#include <mitkPlaneGeometryDataVtkMapper3D.h>
 
-#include "mitkImageVtkMapper2D.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkSmartPointerProperty.h"
-#include "mitkSurface.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "mitkWeakPointerProperty.h"
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkNeverTranslucentTexture.h"
+#include <mitkImageVtkMapper2D.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkSurface.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkWeakPointerProperty.h>
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkNeverTranslucentTexture.h>
 
 #include <vtkAssembly.h>
 #include <vtkDataSetMapper.h>
@@ -385,7 +385,9 @@ namespace mitk
       // use a predicate to get all data nodes which are "images" or inherit from mitk::Image
       mitk::TNodePredicateDataType<mitk::Image>::Pointer predicateAllImages =
         mitk::TNodePredicateDataType<mitk::Image>::New();
-      mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage.Lock()->GetSubset(predicateAllImages);
+      if (dataStorage.IsNull())
+        return;
+      mitk::DataStorage::SetOfObjects::ConstPointer all = dataStorage->GetSubset(predicateAllImages);
       // process all found images
       for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
       {

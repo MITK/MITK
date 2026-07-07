@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <berryIWorkbenchListener.h>
 #include <QmitkAbstractView.h>
+#include <memory>
 
 namespace Ui
 {
@@ -39,7 +40,7 @@ private:
 
   bool PreShutdown(berry::IWorkbench*, bool) override;
 
-  Ui::QmitkSegmentationTaskListView* m_Ui;
+  std::unique_ptr<Ui::QmitkSegmentationTaskListView> m_Ui;
 };
 
 #endif

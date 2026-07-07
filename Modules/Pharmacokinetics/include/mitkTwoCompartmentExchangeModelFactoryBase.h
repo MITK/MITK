@@ -12,12 +12,21 @@ found in the LICENSE file.
 #ifndef mitkTwoCompartmentExchangeModelFactoryBase_h
 #define mitkTwoCompartmentExchangeModelFactoryBase_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 namespace mitk
 {
+  /**
+   * \brief Template base factory for TwoCompartmentExchangeModel variants.
+   *
+   * Provides default constraint settings and initial parameterization for the
+   * two-compartment exchange model family.
+   *
+   * \tparam TModelParameterizer The concrete parameterizer type.
+   * \sa TwoCompartmentExchangeModel, TwoCompartmentExchangeModelFactory
+   */
   template <class TModelParameterizer>
   class TwoCompartmentExchangeModelFactoryBase : public
     mitk::ConcreteAIFBasedModelFactory< TModelParameterizer >

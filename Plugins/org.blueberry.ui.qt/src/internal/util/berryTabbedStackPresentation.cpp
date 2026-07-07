@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryIMemento.h"
 
@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include "berryReplaceDragHandler.h"
 #include "berryShell.h"
 
-#include <berryConstants.h>
+#include "berryConstants.h"
 
 namespace berry
 {

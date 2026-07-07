@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkColorBarAnnotation.h"
-#include "mitkLookupTable.h"
-#include "mitkLookupTableProperty.h"
+#include <mitkColorBarAnnotation.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 #include <vtkScalarBarActor.h>
 
 mitk::ColorBarAnnotation::ColorBarAnnotation()
@@ -33,13 +33,7 @@ mitk::ColorBarAnnotation::ColorBarAnnotation()
 
 mitk::ColorBarAnnotation::~ColorBarAnnotation()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::ColorBarAnnotation::LocalStorage::~LocalStorage()

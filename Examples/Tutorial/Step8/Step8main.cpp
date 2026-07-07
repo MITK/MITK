@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegisterClasses.h"
-#include "Step8.h"
+#include <QmitkRegisterClasses.h>
+#include <Step8.h>
 
 #include <QApplication>
 #include <itksys/SystemTools.hxx>

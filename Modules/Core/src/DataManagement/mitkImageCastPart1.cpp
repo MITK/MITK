@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkConfig.h>
-#include <mitkImageCast.txx>
+#include <mitkImageCast.tpp>
 #include <mitkInstantiateAccessFunctions.h>
 
 namespace mitk

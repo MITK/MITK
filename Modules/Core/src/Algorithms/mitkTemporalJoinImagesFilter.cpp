@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTemporalJoinImagesFilter.h"
+#include <mitkTemporalJoinImagesFilter.h>
 
 #include <numeric>
 
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 void mitk::TemporalJoinImagesFilter::SetMaxTimeBounds(const TimeBoundsVectorType& timeBounds)
 {

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkInteractionPositionEvent_h
 #define mitkInteractionPositionEvent_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
 #include <MitkCoreExports.h>
 #include <string>
 
@@ -26,11 +26,15 @@ namespace mitk
   /**
    * \class InteractionPositionEvent
    *
-   * \brief Super class for all position events.
+   * \brief Super class for all position-aware interaction events.
    *
-   * This class is instantiated with a BaseRenderer and the 2D pointer position relative to the renderer,
-   * the object then queries the Renderer for 3D world coordinates and supplies them to deriving classes.
+   * This class stores the 2D pointer position (in display coordinates) relative to
+   * the BaseRenderer. On demand, it converts this to a 3D world coordinate via the
+   * renderer's DisplayToWorld() method.
    *
+   * \sa InteractionEvent
+   * \sa InteractionKeyEvent
+   * \ingroup Interaction
    */
 
   class MITKCORE_EXPORT InteractionPositionEvent : public InteractionEvent
@@ -39,9 +43,26 @@ namespace mitk
     mitkClassMacro(InteractionPositionEvent, InteractionEvent);
     mitkNewMacro2Param(Self, BaseRenderer *, const Point2D &);
 
+    /**
+     * \brief Get the pointer position in display (screen) coordinates.
+     * \return The 2D pointer position in pixels.
+     */
     Point2D GetPointerPositionOnScreen() const;
+
+    /**
+     * \brief Get the pointer position converted to 3D world coordinates.
+     *
+     * The conversion is performed via the sender renderer's DisplayToWorld() method.
+     *
+     * \return The 3D world position corresponding to the pointer position.
+     */
     Point3D GetPositionInWorld() const;
 
+    /**
+     * \brief Check if the provided event is an InteractionPositionEvent or derived.
+     * \param[in] baseClass The event to check.
+     * \return true if baseClass is an InteractionPositionEvent or derived from it.
+     */
     bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
   protected:

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkApplyTransformMatrixOperation.h"
+#include <mitkApplyTransformMatrixOperation.h>
 
 namespace mitk
 {

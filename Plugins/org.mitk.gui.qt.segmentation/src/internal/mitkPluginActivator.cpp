@@ -13,15 +13,16 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationPreferencePage.h"
-#include "QmitkSegmentAnythingPreferencePage.h"
 #include "QmitkTotalSegmentatorPreferencePage.h"
 #include "QmitknnInteractivePreferencePage.h"
 #include "QmitkSegmentationUtilitiesView.h"
 #include "QmitkSegmentationTaskListView.h"
 
+#include "QmitkAssignDistinctColorsAction.h"
 #include "QmitkAutocropAction.h"
 #include "QmitkAutocropLabelSetImageAction.h"
 #include "QmitkCreatePolygonModelAction.h"
+#include "QmitkCreateSmoothedPolygonModelAction.h"
 #include "QmitkLoadMultiLabelPresetAction.h"
 #include "QmitkSaveMultiLabelPresetAction.h"
 #include "QmitkConvertSurfaceToLabelAction.h"
@@ -52,14 +53,15 @@ void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentAnythingPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTotalSegmentatorPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitknnInteractivePreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationTaskListView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAssignDistinctColorsAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropLabelSetImageAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateSmoothedPolygonModelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkLoadMultiLabelPresetAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSaveMultiLabelPresetAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)

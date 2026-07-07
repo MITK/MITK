@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAnnotationProperty.h"
+#include <mitkAnnotationProperty.h>
 
 mitk::AnnotationProperty::AnnotationProperty() : m_Position(0.0)
 {
@@ -88,13 +88,6 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
 
   myStr << this->GetLabel() << this->GetPosition();
   return myStr.str();
-}
-
-itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
 }
 
 bool mitk::AnnotationProperty::ToJSON(nlohmann::json& j) const

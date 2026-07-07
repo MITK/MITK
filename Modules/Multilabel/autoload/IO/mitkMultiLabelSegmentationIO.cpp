@@ -10,12 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationIO.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkMultilabelIOMimeTypes.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkMultiLabelIOHelper.h"
-#include "mitkLabelSetImageConverter.h"
+#include <mitkMultiLabelSegmentationIO.h>
+#include <mitkBasePropertySerializer.h>
+#include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkMultilabelIOMimeTypes.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkMultiLabelIOHelper.h>
+#include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -24,11 +25,11 @@ found in the LICENSE file.
 #include <mitkUIDManipulator.h>
 
 // itk
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkMetaDataDictionary.h>
+#include <itkMetaDataObject.h>
+#include <itkNrrdImageIO.h>
 
 #include <tinyxml2.h>
 
@@ -224,6 +225,14 @@ namespace mitk
         uidManipulator.SetUID(uidData->GetMetaDataObjectValue());
       }
     }
+
+    // Translate a legacy "referenceFiles" property (segs saved before the
+    // property-driven DICOM SEG rework) into SegSourceImageRelationRule
+    // connections so the DICOM SEG writer has a single property-driven
+    // path regardless of the seg's origin. No-op when the seg is already
+    // post-rework.
+    DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesToRelation(output);
+
     result.push_back(output.GetPointer());
 
     MITK_INFO << "...finished!";

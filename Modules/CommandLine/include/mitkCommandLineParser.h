@@ -19,9 +19,7 @@ found in the LICENSE file.
 #include <MitkCommandLineExports.h>
 #include <mitkVersion.h>
 
-/**
- *
- * The MITK command line parser, based on the CTK command line parser.
+/** \brief Command line argument parser for MITK applications, based on the CTK command line parser.
  *
  * Use this class to add information about the command line arguments
  * your program understands and to easily parse them from a given list
@@ -29,169 +27,179 @@ found in the LICENSE file.
  *
  * This parser provides the following features:
  *
- * <ul>
- * <li>Add arguments by supplying a long name and/or a short name.
- *     Arguments are validated using a regular expression. They can have
- *     a default value and a help string.</li>
- * <li>Deprecated arguments.</li>
- * <li>Custom regular expressions for argument validation.</li>
- * <li>Set different argument name prefixes for native platform look and feel.</li>
- * <li>Create a help text for the command line arguments with support for
- *     grouping arguments.</li>
- * </ul>
+ * - Add arguments by supplying a long name and/or a short name.
+ *   Arguments are validated using a regular expression. They can have
+ *   a default value and a help string.
+ * - Deprecated arguments.
+ * - Custom regular expressions for argument validation.
+ * - Set different argument name prefixes for native platform look and feel.
+ * - Create a help text for the command line arguments with support for
+ *   grouping arguments.
  *
  * The main difference between the MITK command line parser and the CTK command line
  * parser is that the former does not depend on Qt. Apart from that an image type was
  * added and XML output improved for automatic GUI generation.
  *
- * std::out is used for output to keep dependencies to a minimum.
+ * \c std::cout is used for output to keep dependencies to a minimum.
  */
-
 class MITKCOMMANDLINE_EXPORT mitkCommandLineParser
 {
 public:
+  /** \brief Supported argument value types.
+   */
   enum Type
   {
-    String = 0,
-    Bool = 1,
-    StringList = 2,
-    Int = 3,
-    Float = 4,
-    Directory = 5,
-    File = 6,
-    Image = 7
+    String = 0,    ///< A single string value.
+    Bool = 1,      ///< A boolean flag (no parameters, presence means \c true).
+    StringList = 2,///< A list of string values.
+    Int = 3,       ///< An integer value.
+    Float = 4,     ///< A floating-point value.
+    Directory = 5, ///< A directory path.
+    File = 6,      ///< A file path.
+    Image = 7      ///< An image file path.
   };
 
+  /** \brief I/O channel classification for arguments.
+   *
+   * Used in XML output generation for automatic GUI creation.
+   */
   enum Channel
   {
-    None = 0,
-    Input = 1,
-    Output = 2
+    None = 0,   ///< Not an I/O channel.
+    Input = 1,  ///< Argument represents an input resource.
+    Output = 2  ///< Argument represents an output resource.
   };
 
+  /** \brief Container type for string lists, used for argument values and unparsed arguments.
+   */
   typedef std::vector<std::string> StringContainerType;
 
+  /** \brief Construct a parser with default settings.
+   *
+   * By default, no argument prefixes are set and strict mode is disabled.
+   */
   mitkCommandLineParser();
 
+  /** \brief Destructor.
+   *
+   * Cleans up internal argument description storage.
+   */
   ~mitkCommandLineParser();
 
-  /**
- * Parse a given list of command line arguments.
- *
- * This method parses a list of string elements considering the known arguments
- * added by calls to <code>addArgument()</code>. If any one of the argument
- * values does not match the corresponding regular expression,
- * <code>ok</code> is set to false and an empty map object is returned.
- *
- * The keys in the returned map object correspond to the long argument string,
- * if it is not empty. Otherwise, the short argument string is used as key. The
- * us::Any values can safely be converted to the type specified in the
- * <code>addArgument()</code> method call.
- *
- * @param arguments A StringContainerType containing command line arguments.
- * @param ok A pointer to a boolean variable. Will be set to <code>true</code>
- *        if all regular expressions matched, <code>false</code> otherwise.
- * @return A map object mapping the long argument (if empty, the short one)
- *         to a us::Any containing the value.
- */
-
+  /** \brief Parse a given list of command line arguments.
+   *
+   * This method parses a list of string elements considering the known arguments
+   * added by calls to addArgument(). If any one of the argument
+   * values does not match the corresponding regular expression,
+   * \p ok is set to \c false and an empty map object is returned.
+   *
+   * The keys in the returned map object correspond to the long argument string,
+   * if it is not empty. Otherwise, the short argument string is used as key. The
+   * us::Any values can safely be converted to the type specified in the
+   * addArgument() method call.
+   *
+   * If the special argument \c --xml is encountered, XML output is generated
+   * and an empty map is returned. If \c --version is encountered, the MITK
+   * revision information is printed.
+   *
+   * \param[in] arguments A StringContainerType containing command line arguments.
+   * \param[out] ok If not \c nullptr, set to \c true if parsing succeeded, \c false otherwise.
+   * \return A map object mapping argument names to us::Any values.
+   */
   std::map<std::string, us::Any> parseArguments(const StringContainerType &arguments, bool *ok = nullptr);
 
-  /**
-  * Convenient method allowing to parse a given list of command line arguments.
-  * @see parseArguments(const StringContainerType &, bool*)
-  */
+  /** \brief Convenient overload to parse arguments from argc/argv.
+   *
+   * Converts \p argc and \p argv to a StringContainerType and delegates to
+   * parseArguments(const StringContainerType&, bool*).
+   *
+   * \param[in] argc The argument count from main().
+   * \param[in] argv The argument array from main().
+   * \param[out] ok If not \c nullptr, set to \c true if parsing succeeded, \c false otherwise.
+   * \return A map object mapping argument names to us::Any values.
+   *
+   * \sa parseArguments(const StringContainerType&, bool*)
+   */
   std::map<std::string, us::Any> parseArguments(int argc, char **argv, bool *ok = nullptr);
 
-  /**
- * Returns a detailed error description if a call to <code>parseArguments()</code>
- * failed.
- *
- * @return The error description, empty if no error occurred.
- * @see parseArguments(const StringContainerType&, bool*)
- */
+  /** \brief Get a detailed error description if a call to parseArguments() failed.
+   *
+   * \return The error description, or an empty string if no error occurred.
+   *
+   * \sa parseArguments()
+   */
   std::string errorString() const;
 
-  /**
- * This method returns all unparsed arguments, i.e. all arguments
- * for which no long or short name has been registered via a call
- * to <code>addArgument()</code>.
- *
- * @see addArgument()
- *
- * @return A list containing unparsed arguments.
- */
+  /** \brief Get all unparsed arguments.
+   *
+   * Returns all arguments for which no long or short name has been registered
+   * via a call to addArgument().
+   *
+   * \return A reference to the list of unparsed argument strings.
+   *
+   * \sa addArgument()
+   */
   const StringContainerType &unparsedArguments() const;
 
-  /**
- * Checks if the given argument has been added via a call
- * to <code>addArgument()</code>.
- *
- * @see addArgument()
- *
- * @param argument The argument to be checked.
- * @return <code>true</code> if the argument was added, <code>false</code>
- *         otherwise.
- */
+  /** \brief Check if a given argument has been registered.
+   *
+   * \param[in] argument The long or short argument name to check.
+   * \return \c true if the argument was added via addArgument(), \c false otherwise.
+   *
+   * \sa addArgument()
+   */
   bool argumentAdded(const std::string &argument) const;
 
-  /**
- * Checks if the given argument has been parsed successfully by a previous
- * call to <code>parseArguments()</code>.
- *
- * @param argument The argument to be checked.
- * @return <code>true</code> if the argument was parsed, <code>false</code>
- *         otherwise.
- */
+  /** \brief Check if a given argument has been parsed successfully.
+   *
+   * \param[in] argument The long or short argument name to check.
+   * \return \c true if the argument was parsed in the last call to parseArguments(),
+   *         \c false otherwise.
+   *
+   * \sa parseArguments()
+   */
   bool argumentParsed(const std::string &argument) const;
 
-  /**
- * Adds a command line argument. An argument can have a long name
- * (like --long-argument-name), a short name (like -l), or both. The type
- * of the argument can be specified by using the <code>type</code> parameter.
- * The following types are supported:
- *
- * <table>
- * <tr><td><b>Type</b></td><td><b># of parameters</b></td><td><b>Default regular expr</b></td>
- *        <td><b>Example</b></td></tr>
- * <tr><td>us::Any::String</td><td>1</td><td>.*</td><td>--test-string StringParameter</td></tr>
- * <tr><td>us::Any::Bool</td><td>0</td><td>does not apply</td><td>--enable-something</td></tr>
- * <tr><td>us::Any::StringList</td><td>-1</td><td>.*</td><td>--test-list string1 string2</td></tr>
- * <tr><td>us::Any::Int</td><td>1</td><td>-?[0-9]+</td><td>--test-int -5</td></tr>
- * </table>
- *
- * The regular expressions are used to validate the parameters of command line
- * arguments. You can restrict the valid set of parameters by calling
- * <code>setExactMatchRegularExpression()</code> for your argument.
- *
- * Optionally, a help string and a default value can be provided for the argument. If
- * the us::Any type of the default value does not match <code>type</code>, an
- * exception is thrown. Arguments with default values are always returned by
- * <code>parseArguments()</code>.
- *
- * You can also declare an argument deprecated, by setting <code>deprecated</code>
- * to <code>true</code>. Alternatively you can add a deprecated argument by calling
- * <code>addDeprecatedArgument()</code>.
- *
- * If the long or short argument has already been added, or if both are empty strings,
- * the method call has no effect.
- *
- * @param longarg The long argument name.
- * @param shortarg The short argument name.
- * @param type The argument type (see the list above for supported types).
- * @param argLabel The label of this argument, when auto generated interface is used.
- * @param argHelp A help string describing the argument.
- * @param defaultValue A default value for the argument.
- * @param optional
- * @param ignoreRest All arguments after the current one will be ignored.
- * @param deprecated Declares the argument deprecated.
- * @param channel
- *
- * @see setExactMatchRegularExpression()
- * @see addDeprecatedArgument()
- * @throws std::logic_error If the us::Any type of <code>defaultValue</code>
- *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
- */
+  /** \brief Add a command line argument.
+   *
+   * An argument can have a long name (like \c --long-argument-name), a short name
+   * (like \c -l), or both. The type of the argument can be specified by using the
+   * \p type parameter. The following types are supported:
+   *
+   * | Type       | # of parameters | Default regex | Example                        |
+   * |------------|-----------------|---------------|--------------------------------|
+   * | String     | 1               | .*            | --test-string StringParameter   |
+   * | Bool       | 0               | n/a           | --enable-something              |
+   * | StringList | -1              | .*            | --test-list string1 string2     |
+   * | Int        | 1               | -?[0-9]+      | --test-int -5                   |
+   *
+   * The regular expressions are used to validate the parameters of command line
+   * arguments. You can restrict the valid set of parameters by calling
+   * setExactMatchRegularExpression() for your argument.
+   *
+   * Optionally, a help string and a default value can be provided for the argument. If
+   * the us::Any type of the default value does not match \p type, an
+   * exception is thrown. Arguments with default values are always returned by
+   * parseArguments().
+   *
+   * If the long or short argument has already been added, or if both are empty strings,
+   * the method call has no effect.
+   *
+   * \param[in] longarg The long argument name (without prefix).
+   * \param[in] shortarg The short argument name (without prefix).
+   * \param[in] type The argument value type.
+   * \param[in] argLabel The label of this argument for auto-generated interfaces.
+   * \param[in] argHelp A help string describing the argument.
+   * \param[in] defaultValue A default value for the argument.
+   * \param[in] optional Whether the argument is optional (\c true by default).
+   * \param[in] ignoreRest If \c true, all arguments after this one will be ignored.
+   * \param[in] deprecated If \c true, marks the argument as deprecated.
+   * \param[in] channel The I/O channel classification for XML output.
+   *
+   * \throw std::logic_error If the type of \p defaultValue does not match \p type.
+   *
+   * \sa setExactMatchRegularExpression(), addDeprecatedArgument()
+   */
   void addArgument(const std::string &longarg,
                    const std::string &shortarg,
                    Type type,

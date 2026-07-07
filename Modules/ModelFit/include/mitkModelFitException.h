@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef mitkModelFitException_h
 #define mitkModelFitException_h
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 
 namespace mitk
 {
     namespace modelFit
     {
         /**
-         *  @brief  Class-specific exception for modelfits.
+         * \brief Class-specific exception for model fits.
          */
         class MITKMODELFIT_EXPORT ModelFitException : public Exception
         {

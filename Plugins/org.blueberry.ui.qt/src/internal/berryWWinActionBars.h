@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYWWINACTIONBARS_H
 #define BERRYWWINACTIONBARS_H
 
-#include <berryIActionBars.h>
+#include "berryIActionBars.h"
 
 namespace berry {
 

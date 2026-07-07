@@ -13,15 +13,18 @@ found in the LICENSE file.
 #ifndef mitkPointSetToPointSetFilter_h
 #define mitkPointSetToPointSetFilter_h
 
-#include "mitkPointSetSource.h"
+#include <mitkPointSetSource.h>
 #include <MitkCoreExports.h>
 
 namespace mitk
 {
   /**
-  * @brief Superclass of all classes/algorithms having one or more PointSets
-  * as input and output
-  * @ingroup Process
+  * \brief Superclass of all classes/algorithms having one or more PointSets
+  * as input and output.
+  *
+  * \sa PointSetSource
+  * \sa PointSet
+  * \ingroup Process
   */
   class MITKCORE_EXPORT PointSetToPointSetFilter : public PointSetSource
   {
@@ -42,38 +45,40 @@ namespace mitk
 
     using itk::ProcessObject::SetInput;
     /**
-    * Sets the input of this process object
-    * @param input the input
+    * \brief Sets the input of this process object.
+    *
+    * \param input the PointSet to use as the primary input.
     */
     virtual void SetInput(const InputType *input);
 
     /**
-    * Sets the input n'th of this process object
-    * @param idx the number associated with the given input
-    * @param input
+    * \brief Sets the n-th input of this process object.
+    *
+    * \param idx the index associated with the given input.
+    * \param input the PointSet to use as the input at position \p idx.
     */
     virtual void SetInput(const unsigned int &idx, const InputType *input);
 
     /**
-    * @returns the input tree of the process object
+    * \brief Returns the primary input of the process object.
+    *
+    * \return The input PointSet, or nullptr if no input is set.
     */
     const InputType *GetInput(void);
 
     /**
-    * @param idx the index of the input to return
-    * @returns the input object with the given index
+    * \brief Returns the input at the given index.
+    *
+    * \param idx the index of the input to return.
+    * \return The input PointSet at position \p idx, or nullptr if the index is out of range.
     */
     const InputType *GetInput(const unsigned int &idx);
 
   protected:
-    /**
-    * A default constructor
-    */
+    /** \brief Default constructor. Sets the number of required inputs to 1. */
     PointSetToPointSetFilter();
 
-    /**
-    * The destructor
-    */
+    /** \brief Destructor. */
     ~PointSetToPointSetFilter() override;
 
   private:

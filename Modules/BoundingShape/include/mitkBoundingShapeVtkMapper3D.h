@@ -18,9 +18,22 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief VTK-based 3D mapper for rendering bounding shapes as wireframe cubes with handles.
+   *
+   * Renders a bounding box (GeometryData) as a 3D wireframe cube with interactive handles
+   * at the face centers for resizing. Selected handles are highlighted with a different color.
+   *
+   * \sa BoundingShapeVtkMapper2D, BoundingShapeInteractor, VtkMapper
+   */
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeVtkMapper3D : public VtkMapper
   {
   public:
+    /** \brief Set default rendering properties for bounding shape 3D visualization.
+     *
+     * \param[in] node      The data node to set properties on.
+     * \param[in] renderer  The renderer context, or \c nullptr for all renderers.
+     * \param[in] overwrite If \c true, overwrite existing properties.
+     */
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper);
@@ -29,8 +42,21 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      void ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *) override;
-    void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *);
+    /** \copydoc VtkMapper::ApplyColorAndOpacityProperties */
+    void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
+
+    /** \brief Apply bounding-shape-specific visual properties to the actor.
+     *
+     * \param[in] renderer The renderer context.
+     * \param[in] actor    The VTK actor to apply properties to (currently unused).
+     */
+    void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor);
+
+    /** \brief Get the VTK prop assembly for 3D rendering.
+     *
+     * \param[in] renderer The renderer to get the prop for.
+     * \return The VTK prop containing the bounding shape wireframe and handle actors.
+     */
     vtkProp *GetVtkProp(BaseRenderer *renderer) override;
     //   virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer) override;
   protected:

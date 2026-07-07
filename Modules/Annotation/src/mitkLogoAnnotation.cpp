@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLogoAnnotation.h"
+#include <mitkLogoAnnotation.h>
 #include <mitkIOUtil.h>
 #include <vtkImageData.h>
 #include <vtkImageData.h>
@@ -44,13 +44,7 @@ mitk::LogoAnnotation::LogoAnnotation()
 
 mitk::LogoAnnotation::~LogoAnnotation()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::LogoAnnotation::LocalStorage::~LocalStorage()

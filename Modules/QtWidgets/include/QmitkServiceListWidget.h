@@ -13,19 +13,22 @@ found in the LICENSE file.
 #ifndef QmitkServiceListWidget_h
 #define QmitkServiceListWidget_h
 
-#include "MitkQtWidgetsExports.h"
-#include "ui_QmitkServiceListWidgetControls.h"
+#include <MitkQtWidgetsExports.h>
 #include <vector>
 
 // QT headers
+#include <QListWidget>
 #include <QListWidgetItem>
 #include <QWidget>
 
 // Microservices
-#include "mitkServiceInterface.h"
-#include "usModuleContext.h"
-#include "usServiceEvent.h"
-#include "usServiceReference.h"
+#include <mitkServiceInterface.h>
+#include <usModuleContext.h>
+#include <usServiceEvent.h>
+#include <usServiceReference.h>
+#include <memory>
+
+namespace Ui { class QmitkServiceListWidgetControls; }
 
 /**
  * \ingroup QmitkModule
@@ -90,7 +93,7 @@ public:
   us::ServiceReferenceU GetSelectedServiceReference();
 
   /**
-   * @return Returns all service references that are displayed in this widget.
+   * \return Returns all service references that are displayed in this widget.
    */
   std::vector<us::ServiceReferenceU> GetAllServiceReferences();
 
@@ -119,14 +122,16 @@ public:
   *  Make sure you pass the appropriate type, or else this call will fail.
   *  Usually, you will pass the class itself, not the SmartPointer, but the function returns a pointer. Example:
   *  \verbatim mitk::USDevice::Pointer device = GetSelectedService<mitk::USDevice>(); \endverbatim
-  *  @return Returns the current selected device. Returns nullptr if no device is selected.
+  *  \return Returns the current selected device. Returns nullptr if no device is selected.
   */
   template <class T>
   T *GetSelectedService()
   {
-    if (this->m_Controls->m_ServiceList->currentRow() == -1)
+    if (m_ServiceList->currentRow() == -1)
       return nullptr;
-    us::ServiceReferenceU ref = GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
+
+    us::ServiceReferenceU ref = GetServiceForListItem(m_ServiceList->currentItem());
+
     return (m_Context->GetService(us::ServiceReference<T>(ref)));
   }
 
@@ -226,7 +231,8 @@ protected slots:
   void OnServiceSelectionChanged();
 
 protected:
-  Ui::QmitkServiceListWidgetControls *m_Controls; ///< member holding the UI elements of this widget
+  std::unique_ptr<Ui::QmitkServiceListWidgetControls> m_Controls; ///< member holding the UI elements of this widget
+  QListWidget* m_ServiceList;
 
   /**
   * \brief  Internal structure used to link ServiceReferences to their QListWidgetItems

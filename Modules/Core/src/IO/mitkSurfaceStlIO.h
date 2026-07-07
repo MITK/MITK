@@ -17,9 +17,22 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Reader and writer for STL (Stereolithography) surface files.
+   *
+   * Reads and writes mitk::Surface data in STL format. On reading, supports
+   * optional tagging of solids and cleaning of the poly data (removing
+   * degenerate cells). Normals are always generated. On writing, the surface
+   * is triangulated before being saved.
+   *
+   * \sa SurfaceVtkIO
+   * \sa SurfaceVtkLegacyIO
+   * \sa SurfaceVtkXmlIO
+   */
   class SurfaceStlIO : public mitk::SurfaceVtkIO
   {
   public:
+    /** \brief Construct and register the STL I/O service with default options. */
     SurfaceStlIO();
 
     // -------------- AbstractFileReader -------------
@@ -28,19 +41,32 @@ namespace mitk
 
     // -------------- AbstractFileWriter -------------
 
+    /**
+     * \brief Write a mitk::Surface to STL format.
+     *
+     * Triangulates the surface before writing. For multi-timestep data writing
+     * to streams, only the first timestep is written.
+     *
+     * \throw mitk::Exception on write failure.
+     */
     void Write() override;
 
   protected:
+    /**
+     * \brief Read an STL file into a mitk::Surface.
+     *
+     * Generates normals and optionally cleans the poly data based on
+     * reader options.
+     *
+     * \return A vector containing the read Surface.
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     SurfaceStlIO *IOClone() const override;
 
-    // vtkSTLReader crashes with this option
-    // static std::string OPTION_MERGE_POINTS();
-
-    static std::string OPTION_TAG_SOLIDS();
-    static std::string OPTION_CLEAN();
+    static std::string OPTION_TAG_SOLIDS();  ///< Reader option key for tagging solids.
+    static std::string OPTION_CLEAN();       ///< Reader option key for cleaning poly data.
   };
 }
 

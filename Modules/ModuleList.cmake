@@ -3,16 +3,15 @@
 
 set(MITK_MODULES
   Log
+  CppMicroServices
   Core
   Forms
   FormsUI
   CommandLine
   CoreCmdApps
   AppUtil
-  LegacyIO
   DataTypesExt
   Annotation
-  LegacyGL
   AlgorithmsExt
   MapperExt
   DICOM
@@ -58,7 +57,10 @@ set(MITK_MODULES
   ROI
   PET
   PythonHelper
+  PythonInstaller
+  PythonInstallerUI
   Python
   PythonSegmentation
   PythonSegmentationUI
+  RESTAPI
 )

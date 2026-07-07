@@ -17,16 +17,27 @@ found in the LICENSE file.
 
 #include <mitkVector.h>
 
-#include "mitkModelBase.h"
-#include "mitkSVModelFitCostFunction.h"
+#include <mitkModelBase.h>
+#include <mitkSVModelFitCostFunction.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 #include <mutex>
 
 namespace mitk
 {
 
+  /**
+   * \class ModelFitFunctorBase
+   * \brief Abstract base class for functors that perform model fitting.
+   *
+   * A model fit functor takes an observed signal, a model instance, and initial parameters,
+   * then performs the fitting optimization. Subclasses implement specific fitting algorithms
+   * (e.g. Levenberg-Marquardt). The functor also supports user-defined evaluation cost
+   * functions and optional debug parameter maps.
+   *
+   * \sa LevenbergMarquardtModelFitFunctor, DummyModelFitFunctor
+   */
   class MITKMODELFIT_EXPORT ModelFitFunctorBase: public ::itk::Object
   {
   public:
@@ -41,41 +52,67 @@ namespace mitk
     typedef std::vector<ParameterImagePixelType> InputPixelArrayType;
     typedef std::vector<ParameterImagePixelType> OutputPixelArrayType;
 
-    /** Returns the values determined by fitting the passed model. The values in the returned vector are ordered in the
-     * following sequence:
-       * - model parameters (see also GetParameterNames())
-       * - derived model parameters (see also GetDerivedParameterNames())
-       * - criterion(s) (see also GetCriterionNames())
-       * - evaluation parameters (see also GetEvaluationParameterNames())
-       * @param value Signal the model should be fitted onto
-       * @param model Pointer to the preconfigured/ready to use model instance for the fitting against the signal curve
-       * @param initialParameters parameters of the model that should be used as starting point of the fitting process.
-       * @pre model must point to a valid instance.
-       * @pre Size of initialParameters must be equal to model->GetNumberOfParameters().
-       */
+    /**
+     * \brief Performs model fitting and returns the results.
+     *
+     * The values in the returned vector are ordered in the following sequence:
+     * - model parameters (see also GetParameterNames())
+     * - derived model parameters (see also GetDerivedParameterNames())
+     * - criterion(s) (see also GetCriterionNames())
+     * - evaluation parameters (see also GetEvaluationParameterNames())
+     *
+     * \param value Signal the model should be fitted onto.
+     * \param model Pointer to the preconfigured model instance.
+     * \param initialParameters Starting point parameters for the fitting process.
+     * \return Vector of fitted parameter values, derived parameters, criteria, and evaluation parameters.
+     * \pre model must point to a valid instance.
+     * \pre Size of initialParameters must be equal to model->GetNumberOfParameters().
+     */
     OutputPixelArrayType Compute(const InputPixelArrayType& value, const ModelBase* model,
                                  const ModelBase::ParametersType& initialParameters) const;
 
-    /** Returns the number of outputs the fit functor will return if compute is called.
-     * The number depends in parts on the passed model.
-     * @exception Exception will be thrown if no valid model is passed.*/
+    /**
+     * \brief Returns the number of outputs the fit functor will produce.
+     *
+     * The number depends in part on the passed model.
+     * \param model The model for which the output count is determined.
+     * \return The total number of output values.
+     * \throw Exception if no valid model is passed.
+     */
     unsigned int GetNumberOfOutputs(const ModelBase* model) const;
 
     typedef ModelBase::ParameterNamesType ParameterNamesType;
 
-    /** Returns names of all evaluation parameters defined by the user*/
+    /** \brief Returns names of all evaluation parameters defined by the user. */
     ParameterNamesType GetEvaluationParameterNames() const;
+
+    /** \brief Removes all registered evaluation parameters. */
     void ResetEvaluationParameters();
+
+    /**
+     * \brief Registers an evaluation parameter with its cost function.
+     * \param parameterName The name of the evaluation parameter.
+     * \param evaluationCostFunction The cost function used to compute this evaluation parameter.
+     */
     void RegisterEvaluationParameter(const std::string& parameterName,
                                      SVModelFitCostFunction* evaluationCostFunction);
+
+    /**
+     * \brief Returns the cost function associated with the given evaluation parameter.
+     * \param parameterName The name of the evaluation parameter.
+     * \return Pointer to the associated cost function.
+     */
     const SVModelFitCostFunction* GetEvaluationParameterCostFunction(const std::string& parameterName)
     const;
 
-    /** Returns names of the criterion used to fit the model. */
+    /** \brief Returns names of the criteria used to fit the model. */
     virtual ParameterNamesType GetCriterionNames() const = 0 ;
 
-    /** Returns names of the depug parameters generated by the functor.
-     Is empty, if debug is deactivated. */
+    /**
+     * \brief Returns names of the debug parameters generated by the functor.
+     *
+     * Returns an empty list if debug is deactivated.
+     */
     ParameterNamesType GetDebugParameterNames() const;
 
     itkBooleanMacro(DebugParameterMaps);
@@ -91,38 +128,47 @@ namespace mitk
 
     ~ModelFitFunctorBase() override;
 
-    /**Internal Method called by Compute to get the final criterion values that dove the fit.
-     must be implemented be concrete functor classes.*/
+    /**
+     * \brief Internal method called by Compute() to get the final criterion values that drove the fit.
+     *
+     * Must be implemented by concrete functor classes.
+     */
     virtual OutputPixelArrayType GetCriteria(const ModelBase* model, const ParametersType& parameters,
         const SignalType& sample) const = 0;
 
-    /** Internal Method called by Compute().
-      Gets all derived parameters of the models with the final found parameters of the fit.*/
+    /** \brief Internal method called by Compute() to get derived parameters with the final fit parameters. */
     OutputPixelArrayType GetDerivedParameters(const ModelBase* model,
         const ParametersType& parameters) const;
 
-    /** Internal Method called by Compute().
-      Gets the evaluation parameters for all cost functions enlisted by the user, based on
-      the model with the final found parameters of the fit and the input signal.*/
+    /** \brief Internal method called by Compute() to get evaluation parameters from user-defined cost functions. */
     OutputPixelArrayType GetEvaluationParameters(const ModelBase* model,
         const ParametersType& parameters, const SignalType& sample) const;
 
     typedef std::map<std::string, ParameterImagePixelType> DebugParameterMapType;
 
-    /** Internal Method called by Compute(). It does the real fit and returns the found parameters.
-    Additionally it must return its debug parameter via debugParameters.
-    @post If m_DebugParameterMaps is true, it must return all debug parameters defined by
-    GetDebugParameterNames() via debugParameters.
-    @param value Signal the Model should be fitted against
-    @param model Pointer to the model that should be fitted
-    @param initialParameters Initial modal parameters for the fit
-    @param [out] debugParameters Map containing all debug parameters for the done fit (must only valid if m_DebugParameterMap is true)*/
+    /**
+     * \brief Internal method that performs the actual model fitting.
+     *
+     * Must be implemented by derived classes. Returns the found parameters and
+     * optionally populates the debug parameter map.
+     *
+     * \param value Signal the model should be fitted against.
+     * \param model Pointer to the model that should be fitted.
+     * \param initialParameters Initial model parameters for the fit.
+     * \param[out] debugParameters Map containing all debug parameters (only valid if m_DebugParameterMaps is true).
+     * \return The optimized parameter values.
+     * \post If m_DebugParameterMaps is true, all debug parameters defined by
+     * DefineDebugParameterNames() must be returned via debugParameters.
+     */
     virtual ParametersType DoModelFit(const SignalType& value, const ModelBase* model,
                                       const ModelBase::ParametersType& initialParameters,
                                       DebugParameterMapType& debugParameters) const = 0;
 
-    /** Returns names of the depug parameters generated by the functor. Will be called by GetDebugParameterNames,
-    if debug is activated. */
+    /**
+     * \brief Returns names of the debug parameters generated by the functor.
+     *
+     * Will be called by GetDebugParameterNames() if debug is activated.
+     */
     virtual ParameterNamesType DefineDebugParameterNames()const = 0;
 
   private:

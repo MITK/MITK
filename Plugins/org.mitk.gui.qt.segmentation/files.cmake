@@ -1,11 +1,6 @@
 set(SRC_CPP_FILES
   QmitkSegmentationPreferencePage.cpp
   QmitkNewSegmentationDialog.cpp
-  QmitkSegmentAnythingPreferencePage.cpp
-  QmitkTotalSegmentatorPreferencePage.cpp
-  QmitkToolInstallDialog.cpp
-  QmitkTotalSegmentatorToolInstaller.cpp
-  QmitkSegmentAnythingToolInstaller.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -13,48 +8,49 @@ set(INTERNAL_CPP_FILES
   QmitkSegmentationView.cpp
   QmitkSegmentationUtilitiesView.cpp
   QmitkSegmentationTaskListView.cpp
+  QmitkAssignDistinctColorsAction.cpp
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
   QmitkCreatePolygonModelAction.cpp
+  QmitkCreateSmoothedPolygonModelAction.cpp
   QmitkLoadMultiLabelPresetAction.cpp
   QmitkSaveMultiLabelPresetAction.cpp
   QmitkConvertSurfaceToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
   QmitknnInteractivePreferencePage.cpp
+  QmitkTotalSegmentatorPreferencePage.cpp
 )
 
 set(UI_FILES
   src/QmitkSegmentationPreferencePageControls.ui
-  src/QmitkSegmentAnythingPreferencePage.ui
-  src/QmitkTotalSegmentatorPreferencePage.ui
-  src/QmitkToolInstallDialog.ui
   src/QmitkNewSegmentationDialog.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/QmitkSegmentationTaskListView.ui
   src/internal/QmitknnInteractivePreferencePage.ui
+  src/internal/QmitkTotalSegmentatorPreferencePage.ui
 )
 
 set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
-  src/QmitkSegmentAnythingPreferencePage.h
-  src/QmitkToolInstallDialog.h
-  src/QmitkTotalSegmentatorPreferencePage.h
   src/QmitkNewSegmentationDialog.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
   src/internal/QmitkSegmentationUtilitiesView.h
   src/internal/QmitkSegmentationTaskListView.h
+  src/internal/QmitkAssignDistinctColorsAction.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/QmitkCreatePolygonModelAction.h
+  src/internal/QmitkCreateSmoothedPolygonModelAction.h
   src/internal/QmitkLoadMultiLabelPresetAction.h
   src/internal/QmitkSaveMultiLabelPresetAction.h
   src/internal/QmitkConvertSurfaceToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
   src/internal/QmitknnInteractivePreferencePage.h
+  src/internal/QmitkTotalSegmentatorPreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -69,8 +65,6 @@ set(QRC_FILES
   resources/SegmentationUtilities.qrc
   resources/SegmentationTaskList.qrc
 )
-
-set(CPP_FILES)
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

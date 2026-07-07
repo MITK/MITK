@@ -6,225 +6,129 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
-    <height>671</height>
+    <width>447</width>
+    <height>820</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>0</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string>QmitkTemplate</string>
+   <string>QmitkPETSUV</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Radio nuclide half life</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="5">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>[min]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QDoubleSpinBox" name="halflifeSpinBox">
-       <property name="specialValueText">
-        <string>unkown</string>
-       </property>
-       <property name="decimals">
-        <number>3</number>
-       </property>
-       <property name="maximum">
-        <double>100000.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="5">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>[kBq]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Injected Activity            </string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QSpinBox" name="weightSpinBox">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="readOnly">
-        <bool>false</bool>
-       </property>
-       <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::UpDownArrows</enum>
-       </property>
-       <property name="specialValueText">
-        <string>unkown</string>
-       </property>
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>150</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QDoubleSpinBox" name="activitySpinBox">
-       <property name="specialValueText">
-        <string>unkown</string>
-       </property>
-       <property name="maximum">
-        <double>1000000.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="5">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>[kg]</string>
-       </property>
-      </widget>
-     </item>
+    <widget class="QmitkSingleNodeSelectionWidget" name="petNodeSelector" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkPETonly">
+     <property name="toolTip">
+      <string>If checked, only images that have a DICOM modality property entry &quot;PT&quot; are selectable.</string>
+     </property>
+     <property name="text">
+      <string>Select only PET images</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridVariant">
      <item row="0" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="labelVariant">
        <property name="text">
-        <string>Patient body weight    </string>
+        <string>SUV variant</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="6">
-      <widget class="QPushButton" name="btnNuclideLookup">
-       <property name="maximumSize">
-        <size>
-         <width>30</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="7">
-      <widget class="QLabel" name="labelAutoNuclide">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="variantCombo">
+       <property name="toolTip">
+        <string>SUV normalization variant. BW = body weight, LBM = lean body mass (Janmahasatian / James 1976), IBW = ideal body weight (Sugawara 1999), BSA = body surface area (DuBois).</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupTime">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+    <widget class="QGroupBox" name="groupPatient">
      <property name="title">
-      <string>Time to measurment</string>
+      <string>Patient</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="1">
-       <widget class="QRadioButton" name="radioTimeAuto">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
+     <layout class="QGridLayout" name="gridPatient">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelWeight">
         <property name="text">
-         <string>Auto detect</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QSpinBox" name="timeSpinBox">
-          <property name="specialValueText">
-           <string>unkown</string>
-          </property>
-          <property name="maximum">
-           <number>180</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>[min]</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="2">
-       <widget class="QTextEdit" name="timeInfo">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-        <property name="html">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;auto detect strategy info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>Patient body weight</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QRadioButton" name="radioTimeUser">
+       <widget class="QDoubleSpinBox" name="weightSpinBox">
+        <property name="specialValueText">
+         <string>unknown</string>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <double>150.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="labelWeightUnit">
         <property name="text">
-         <string>User defined</string>
+         <string>[kg]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelHeight">
+        <property name="text">
+         <string>Patient height</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="heightSpinBox">
+        <property name="specialValueText">
+         <string>unknown</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>300.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="labelHeightUnit">
+        <property name="text">
+         <string>[cm]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelSex">
+        <property name="text">
+         <string>Patient sex</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QComboBox" name="sexCombo">
+        <property name="toolTip">
+         <string>Patient sex. 'O' (Other) triggers the IBSI-SUV recommended mean-of-M-and-F adaptation under DICOMReadPolicy::Lenient; refused under Strict.</string>
         </property>
        </widget>
       </item>
@@ -232,11 +136,245 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="checkAuto">
-     <property name="text">
-      <string>Automatic value settings</string>
+    <widget class="QGroupBox" name="groupActivity">
+     <property name="visible">
+      <bool>false</bool>
      </property>
-     <property name="checked">
+     <property name="title">
+      <string>Radiopharmaceutical / activity</string>
+     </property>
+     <layout class="QGridLayout" name="gridActivity">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelActivity">
+        <property name="text">
+         <string>Injected activity</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="activitySpinBox">
+        <property name="specialValueText">
+         <string>unknown</string>
+        </property>
+        <property name="maximum">
+         <double>1000000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="labelActivityUnit">
+        <property name="text">
+         <string>[kBq]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelNuclide">
+        <property name="text">
+         <string>Radio nuclide</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QComboBox" name="nuclideCombo">
+        <property name="toolTip">
+         <string>Pick a radio nuclide to fill in the half-life automatically, or pick &quot;(custom)&quot; and edit the half-life manually.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelHalflife">
+        <property name="text">
+         <string>Radio nuclide half life</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="halflifeSpinBox">
+        <property name="specialValueText">
+         <string>unknown</string>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <double>100000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="labelHalflifeUnit">
+        <property name="text">
+         <string>[min]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="labelTracer">
+        <property name="text">
+         <string>Tracer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QComboBox" name="tracerCombo">
+        <property name="toolTip">
+         <string>The input's Radiopharmaceutical Information Sequence (0054,0016) contains more than one item. Select which one to use for the SUV computation.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupTime">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Time to measurement</string>
+     </property>
+     <layout class="QVBoxLayout" name="layoutTime">
+      <item>
+       <widget class="QRadioButton" name="radioTimeAuto">
+        <property name="text">
+         <string>Auto detect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="layoutTimeUniform">
+        <item>
+         <widget class="QRadioButton" name="radioTimeUser">
+          <property name="toolTip">
+           <string>Apply one decay duration uniformly to every (timestep, slice).</string>
+          </property>
+          <property name="text">
+           <string>User defined (uniform)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="timeSpinBox">
+          <property name="maximum">
+           <number>180</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeUnit">
+          <property name="text">
+           <string>[min]</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="spacerTimeUniform">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioTimePerSlice">
+        <property name="toolTip">
+         <string>Edit decay durations individually for every (timestep, slice) in the table below. The map is seeded from the currently active decay times when this mode is engaged.</string>
+        </property>
+        <property name="text">
+         <string>User defined (per-slice, edit in table below)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="strategyLabel">
+        <property name="toolTip">
+         <string>Decay-correction strategy behind the per-(timestep, slice) decay times shown in the table.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTreeView" name="decayTimeView"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupValidation">
+     <property name="title">
+      <string>Validation</string>
+     </property>
+     <layout class="QVBoxLayout" name="layoutValidation">
+      <item>
+       <widget class="QCheckBox" name="checkForcePET">
+        <property name="toolTip">
+         <string>Bypass the (0008,0060) Modality == &quot;PT&quot; check. Use only if the input is genuinely PET data that lacks a correct Modality tag.</string>
+        </property>
+        <property name="text">
+         <string>Force PET semantics (ignore DICOM Modality check)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkForceBqMl">
+        <property name="toolTip">
+         <string>Treat the input pixel values as activity concentration in [Bq/mL], regardless of (0054,1001) Units. Only physically meaningful if the input really is in [Bq/mL].</string>
+        </property>
+        <property name="text">
+         <string>Force activity-concentration semantics ([Bq/mL])</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkStrictDicom">
+        <property name="toolTip">
+         <string>Refuse IBSI-SUV-recommended empirical adaptations of borderline / ambiguous DICOM input (Mbq dose, vendor-specific decay-timing fallbacks, ambiguous patient sex). Supply explicit overrides instead.</string>
+        </property>
+        <property name="text">
+         <string>Strict DICOM input policy</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="diagnosticsWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>120</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Diagnostics: category-specific guidance for configuration errors and IBSI-SUV adaptation warnings.</string>
+     </property>
+     <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
@@ -264,6 +402,14 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -10,14 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFourPointAngle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {
   // Four point angle has two control points
   this->ResetNumberOfControlPoints(2);
   this->SetNumberOfPolyLines(2);
+}
+
+mitk::PlanarFourPointAngle::PlanarFourPointAngle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_ANGLE(other.FEATURE_ID_ANGLE)
+{
 }
 
 void mitk::PlanarFourPointAngle::GeneratePolyLine()
@@ -53,7 +59,7 @@ void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
 
   v0.Normalize();
   v1.Normalize();
-  double angle = acos(v0 * v1);
+  double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
 
   this->SetQuantity(FEATURE_ID_ANGLE, angle);
 }

@@ -7,117 +7,616 @@
     <x>0</x>
     <y>0</y>
     <width>702</width>
-    <height>474</height>
+    <height>1074</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="rootLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="modelGroupBox">
-     <property name="title">
-      <string>Model</string>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="checkpointLabel">
-          <property name="text">
-           <string>Checkpoint:</string>
-          </property>
-          <property name="buddy">
-           <cstring>checkpointLineEdit</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="checkpointLineEdit">
-          <property name="text">
-           <string>nnInteractive_v1.0</string>
-          </property>
-          <property name="placeholderText">
-           <string>nnInteractive_v1.0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>702</width>
+        <height>1074</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="automationGroupBox">
+         <property name="title">
+          <string>Automation</string>
+         </property>
+         <layout class="QVBoxLayout" name="automationLayout">
+          <item>
+           <widget class="QCheckBox" name="autoCreateNextLabelCheckBox">
+            <property name="text">
+             <string>Auto-create next label</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="autoCreateNextLabelDescriptionLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Once you confirm a label, a new empty label is ready so you can keep segmenting right away.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="skipNamingPromptLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="skipNamingPromptIndentSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Policy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="skipNamingPromptCheckBox">
+              <property name="text">
+               <string>Ignore label naming preferences</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="skipNamingPromptDescriptionLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Preserve a smooth workflow by bypassing other label naming preferences and constraints.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>40</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="autoConfirmCheckBox">
+            <property name="text">
+             <string>Auto-confirm after single interaction</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="autoConfirmDescriptionLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Confirm automatically after the first interaction. Use when a single interaction per label is enough.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="inferenceGroupBox">
+         <property name="title">
+          <string>Inference</string>
+         </property>
+         <layout class="QVBoxLayout" name="inferenceLayout">
+          <item>
+           <widget class="QRadioButton" name="localModeRadioButton">
+            <property name="toolTip">
+             <string>Run inference locally in this application's Python environment.</string>
+            </property>
+            <property name="text">
+             <string>Local</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="clientOnlyHintLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Local inference requires a full installation. Uninstall nnInteractive below and reinstall in Full mode to enable it.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="remoteModeRadioButton">
+            <property name="toolTip">
+             <string>Run inference on a remote nninteractive-server, which provides the model and GPU.</string>
+            </property>
+            <property name="text">
+             <string>Remote server</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="remoteServerLayout">
+            <property name="leftMargin">
+             <number>20</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="serverUrlLabel">
+              <property name="text">
+               <string>Server URL:</string>
+              </property>
+              <property name="buddy">
+               <cstring>serverUrlLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="serverUrlLineEdit">
+              <property name="placeholderText">
+               <string>http://127.0.0.1:1527</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="apiKeyLabel">
+              <property name="text">
+               <string>API key:</string>
+              </property>
+              <property name="buddy">
+               <cstring>apiKeyLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="apiKeyLineEdit">
+              <property name="echoMode">
+               <enum>QLineEdit::EchoMode::Password</enum>
+              </property>
+              <property name="placeholderText">
+               <string>optional</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="remoteHelpLabel">
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
+              </property>
+              <property name="text">
+               <string>&lt;small&gt;If left empty, the NN_INTERACTIVE_API_KEY environment variable is used instead.&lt;br&gt;The API key above is stored in plain text in the application preferences.&lt;/small&gt;</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="inferenceRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="modelGroupBox">
+         <property name="title">
+          <string>Model</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QRadioButton" name="hfSourceRadioButton">
+            <property name="toolTip">
+             <string>Download the selected checkpoint from Hugging Face on demand.</string>
+            </property>
+            <property name="text">
+             <string>Hugging Face download</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="checkpointLabel">
+              <property name="text">
+               <string>Checkpoint:</string>
+              </property>
+              <property name="buddy">
+               <cstring>checkpointComboBox</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="checkpointComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="refreshModelsButton">
+              <property name="toolTip">
+               <string>Refresh the list of available model checkpoints.</string>
+              </property>
+              <property name="text">
+               <string>Refresh</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="localSourceRadioButton">
+            <property name="toolTip">
+             <string>Use a checkpoint folder already present on disk.</string>
+            </property>
+            <property name="text">
+             <string>Local folder</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="localModelPathLayout">
+            <item>
+             <widget class="QLabel" name="localModelPathLabel">
+              <property name="text">
+               <string>Folder:</string>
+              </property>
+              <property name="buddy">
+               <cstring>localModelPathLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="localModelPathLineEdit">
+              <property name="placeholderText">
+               <string>Path to nnInteractive checkpoint folder</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="localModelPathBrowseButton">
+              <property name="text">
+               <string>Browse...</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="modelRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="backendGroupBox">
+         <property name="title">
+          <string>Computation backend</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QRadioButton" name="autoBackendRadioButton">
+            <property name="toolTip">
+             <string>Try GPU if possible, fall back to CPU otherwise.</string>
+            </property>
+            <property name="text">
+             <string>Auto</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="cpuBackendRadioButton">
+            <property name="text">
+             <string>CPU</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="gpuBackendRadioButton">
+              <property name="text">
+               <string>GPU:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="gpuBackendLineEdit">
+              <property name="text">
+               <string>cuda:0</string>
+              </property>
+              <property name="placeholderText">
+               <string>cuda:0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="torchCompileCheckBox">
+            <property name="text">
+             <string>Faster interactions for slightly longer initialization (torch.compile).</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="backendRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="storageBackendGroupBox">
+         <property name="title">
+          <string>Storage backend</string>
+         </property>
+         <layout class="QVBoxLayout" name="storageBackendLayout">
+          <item>
+           <widget class="QRadioButton" name="autoStorageRadioButton">
+            <property name="toolTip">
+             <string>Use a dense tensor for smaller images and blosc2 for larger ones.</string>
+            </property>
+            <property name="text">
+             <string>Auto (recommended)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="blosc2StorageRadioButton">
+            <property name="text">
+             <string>blosc2 (less memory, slower)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="tensorStorageRadioButton">
+            <property name="text">
+             <string>Tensor (more memory, faster)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="storageBackendRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="otherGroupBox">
+         <property name="title">
+          <string>Other</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="showShortcutsInLabelsCheckBox">
+            <property name="text">
+             <string>Show keyboard shortcuts</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="checkForUpdatesButton">
+              <property name="text">
+               <string>Check for updates...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="uninstallButton">
+              <property name="text">
+               <string>Uninstall nnInteractive...</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="backendGroupBox">
-     <property name="title">
-      <string>Backend</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QRadioButton" name="autoBackendRadioButton">
-        <property name="toolTip">
-         <string>Try GPU if possible, fall back to CPU otherwise.</string>
-        </property>
-        <property name="text">
-         <string>Auto</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="cpuBackendRadioButton">
-        <property name="text">
-         <string>CPU</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QRadioButton" name="gpuBackendRadioButton">
-          <property name="text">
-           <string>GPU:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="gpuBackendLineEdit">
-          <property name="text">
-           <string>cuda:0</string>
-          </property>
-          <property name="placeholderText">
-           <string>cuda:0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>335</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>autoCreateNextLabelCheckBox</tabstop>
+  <tabstop>skipNamingPromptCheckBox</tabstop>
+  <tabstop>autoConfirmCheckBox</tabstop>
+  <tabstop>localModeRadioButton</tabstop>
+  <tabstop>remoteModeRadioButton</tabstop>
+  <tabstop>serverUrlLineEdit</tabstop>
+  <tabstop>apiKeyLineEdit</tabstop>
+  <tabstop>hfSourceRadioButton</tabstop>
+  <tabstop>checkpointComboBox</tabstop>
+  <tabstop>refreshModelsButton</tabstop>
+  <tabstop>localSourceRadioButton</tabstop>
+  <tabstop>localModelPathLineEdit</tabstop>
+  <tabstop>localModelPathBrowseButton</tabstop>
   <tabstop>autoBackendRadioButton</tabstop>
   <tabstop>cpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendLineEdit</tabstop>
-  <tabstop>checkpointLineEdit</tabstop>
+  <tabstop>torchCompileCheckBox</tabstop>
+  <tabstop>autoStorageRadioButton</tabstop>
+  <tabstop>blosc2StorageRadioButton</tabstop>
+  <tabstop>tensorStorageRadioButton</tabstop>
+  <tabstop>showShortcutsInLabelsCheckBox</tabstop>
+  <tabstop>uninstallButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

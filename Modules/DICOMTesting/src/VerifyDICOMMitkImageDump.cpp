@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestDICOMLoading.h"
-#include "mitkImage.h"
+#include <mitkTestDICOMLoading.h>
+#include <mitkImage.h>
 
 std::vector<std::string> LoadDumps(const std::string& fileName)
 {

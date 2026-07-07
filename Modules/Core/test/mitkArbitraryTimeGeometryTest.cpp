@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkGeometry3D.h"
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkGeometry3D.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 #include <limits>
 
 class mitkArbitraryTimeGeometryTestSuite : public mitk::TestFixture

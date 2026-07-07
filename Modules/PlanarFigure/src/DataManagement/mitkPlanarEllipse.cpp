@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarEllipse.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarEllipse.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 #include <algorithm>
 
@@ -29,6 +29,18 @@ mitk::PlanarEllipse::PlanarEllipse()
   this->ResetNumberOfControlPoints(4);
   this->SetNumberOfPolyLines(2);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
+}
+
+mitk::PlanarEllipse::PlanarEllipse(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
+    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA),
+    m_MinRadius(other.m_MinRadius),
+    m_MaxRadius(other.m_MaxRadius),
+    m_MinMaxRadiusContraintsActive(other.m_MinMaxRadiusContraintsActive),
+    m_TreatAsCircle(other.m_TreatAsCircle)
+{
 }
 
 bool mitk::PlanarEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
@@ -156,7 +168,10 @@ void mitk::PlanarEllipse::PlaceFigure(const mitk::Point2D &point)
 
 mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-  return point;
+  if (this->GetPlaneGeometry() == nullptr)
+  {
+    return point;
+  }
 
   Point2D indexPoint;
   this->GetPlaneGeometry()->WorldToIndex(point, indexPoint);

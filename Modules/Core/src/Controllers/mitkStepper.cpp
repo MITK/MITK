@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStepper.h"
+#include <mitkStepper.h>
 
 mitk::Stepper::Stepper()
   : m_Pos(0),
@@ -192,9 +192,13 @@ void mitk::Stepper::MoveSlice(int sliceDelta)
   {
     // if the new slice is below 0 we still show slice 0
     // due to the stepper using unsigned int we have to do this ourselves
-    if (newPosition < 1)
+    if (newPosition < 0)
     {
       newPosition = 0;
+    }
+    else if (newPosition >= maxSlices)
+    {
+      newPosition = maxSlices - 1;
     }
   }
 

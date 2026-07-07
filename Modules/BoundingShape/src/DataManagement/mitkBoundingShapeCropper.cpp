@@ -10,21 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBoundingShapeCropper.h"
-#include "mitkGeometry3D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageToItk.h"
-#include "mitkStatusBar.h"
-#include "mitkTimeHelper.h"
+#include <mitkBoundingShapeCropper.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageToItk.h>
+#include <mitkStatusBar.h>
+#include <mitkTimeHelper.h>
 
 #include <cmath>
 
-#include "vtkMatrix4x4.h"
-#include "vtkSmartPointer.h"
-#include "vtkTransform.h"
+#include <vtkMatrix4x4.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
-#include "itkImageRegionIteratorWithIndex.h"
+#include <itkImageRegionIteratorWithIndex.h>
 #include <itkImageIOBase.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkRGBAPixel.h>
@@ -76,13 +76,15 @@ namespace mitk
 
     // first convert the index
     typename ItkRegionType::IndexType::IndexValueType tmpIndex[3];
-    itk2vtk(this->m_InputRequestedRegion.GetIndex(), tmpIndex);
+    for (unsigned int i = 0; i < 3; ++i)
+      tmpIndex[i] = this->m_InputRequestedRegion.GetIndex()[i];
     typename ItkRegionType::IndexType index;
     index.SetIndex(tmpIndex);
 
     // then convert the size
     typename ItkRegionType::SizeType::SizeValueType tmpSize[3];
-    itk2vtk(this->m_InputRequestedRegion.GetSize(), tmpSize);
+    for (unsigned int i = 0; i < 3; ++i)
+      tmpSize[i] = this->m_InputRequestedRegion.GetSize()[i];
     typename ItkRegionType::SizeType size;
     size.SetSize(tmpSize);
 
@@ -123,9 +125,11 @@ namespace mitk
     for (unsigned int i = 0; i < 3; ++i)
       extent[i] = (this->m_Geometry->GetGeometry()->GetExtent(i));
 
+    constexpr unsigned int kIndexLoopLimit = VImageDimension < 3 ? VImageDimension : 3;
     for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
     {
-      vtk2itk(inputIt.GetIndex(), p);
+      for (unsigned int i = 0; i < kIndexLoopLimit; ++i)
+        p[i] = inputIt.GetIndex()[i];
       inputGeometry->IndexToWorld(p, p);
       ScalarType p2[4];
       p2[0] = p[0];
@@ -253,7 +257,8 @@ namespace mitk
     else
       dimension = 3; // set timeStep to zero if GetUseCropTimeStepOnly is true
 
-    itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
+    for (unsigned int i = 0; i < 3; ++i)
+      dimensions[i] = static_cast<unsigned int>(m_InputRequestedRegion.GetSize(i));
 
     output->Initialize(mitk::PixelType(GetOutputPixelType()), dimension, dimensions);
     delete[] dimensions;
@@ -324,7 +329,8 @@ namespace mitk
       slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
       const mitk::SlicedData::IndexType &start = m_InputRequestedRegion.GetIndex();
       mitk::Point3D origin;
-      vtk2itk(start, origin);
+      for (unsigned int i = 0; i < 3; ++i)
+        origin[i] = start[i];
       inputImageGeometry->IndexToWorld(origin, origin);
       slicedGeometry->SetOrigin(origin);
       m_InputTimeSelector->SetTimeNr(m_CurrentTimeStep);
@@ -344,7 +350,8 @@ namespace mitk
         slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
         const mitk::SlicedData::IndexType &start = m_InputRequestedRegion.GetIndex();
         mitk::Point3D origin;
-        vtk2itk(start, origin);
+        for (unsigned int i = 0; i < 3; ++i)
+          origin[i] = start[i];
         inputImageGeometry->IndexToWorld(origin, origin);
         slicedGeometry->SetOrigin(origin);
         m_InputTimeSelector->SetTimeNr(t);

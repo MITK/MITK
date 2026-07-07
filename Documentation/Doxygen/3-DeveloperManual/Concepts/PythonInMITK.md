@@ -8,7 +8,7 @@ There are at least three closely intertwined aspects to consider when working wi
 
 1. **Embedding Python** using the Python C API by including Python.h and linking against the Python library in C++.
 2. **Running the Python interpreter** as a separate process, passing command-line arguments.
-3. **Exposing MITK functionality to Python** via pyMITK, using SWIG to generate the necessary bindings.
+3. **Exposing MITK functionality to Python** via the mitk Python module, using pybind11 to generate the necessary bindings.
 
 Each of these aspects comes with its own challenges, and their integration imposes certain restrictions and pitfalls that can affect one another.
 As such, even minor changes to one of these components require careful consideration of the others.
@@ -55,7 +55,7 @@ When `MITK_USE_Python3` is enabled (which is the default in our standard `Workbe
 
 The project is then installed by copying `ep/src/Python3/` into `MITK-build/python`.
 
-Since our build system relies on CMake’s `find_package()` to locate external dependencies, we enforce consistency for calls to `find_package(Python3)` by explicitly setting `Python3_ROOT_DIR` to `MITK-build/python` and passing it from the superbuild down to the MITK build itself.
+Since our build system relies on CMake’s `find_package()` to locate external dependencies, we enforce consistency for calls to `find_package(Python3)` by passing both `Python3_ROOT_DIR` (set to `MITK-build/python`) and `Python3_EXECUTABLE` (the interpreter inside that directory) from the superbuild down to the MITK build itself. `Python3_ROOT_DIR` alone is only a search hint; `find_package(Python3)` still consults `PATH` and the Windows registry and prefers the newest version it finds there, so on a machine with a newer system Python the hint would be overruled. Pinning `Python3_EXECUTABLE` makes the MITK build skip that search and use the staged interpreter unconditionally.
 
 MITK modules can then depend on Python either via the classic MITK syntax `PACKAGE_DEPENDS Python3|Python` or by using the native CMake target like `TARGET_DEPENDS Python3::Python`.
 
@@ -84,12 +84,75 @@ In most cases, you won't need to interact with the `MitkPreloadPython` module di
 To run the Python interpreter as a separate process, use `MitkPythonHelper`.
 To exchange data (e.g., images) between MITK and Python, use `MitkPython`.
 
-## SWIG Wrapping: pyMITK
+### Testing
 
-The Python wrapping of MITK is handled by SWIG in the `pyMITK` build target.
-The SWIG runtime header is generated at `MITK-build/swigpyrun.h`, and the pyMITK module is built as a Python package inside the site-packages folder of `MITK-build/python`.
+The `MitkPython` module ships two complementary test binaries, both compiled into `MitkPythonTestDriver`:
 
-**Note**: Currently, only a small subset of MITK is wrapped — primarily to support data exchange, such as transferring images, between MITK and Python.
+1. **`mitkPythonContextTest`**: a CppUnit suite exercising the `mitk::PythonContext` class directly from C++ — interpreter initialization, variable exchange, `Execute()`, `ExecuteFile()`, image binding, and context isolation.
+2. **`mitkPythonBindingsTest`**: a thin C++ host that spins up a dedicated `mitk_pytest` virtual environment, installs `pytest` on first run, then hands control to a pytest suite under `Modules/Python/test/pytest/`. The suite covers the `mitk` Python module's binding surface (image construction, NumPy interop, I/O, geometry, pixel types, points/vectors, auto-loaded modules) as seen from idiomatic Python.
+
+Splitting the two lets each side use its native testing idiom: CppUnit for C++ API coverage, pytest for Python-side behavior. The `mitk_pytest` venv is reused across test runs, so the pytest install cost is paid only once per machine.
+
+## Python Wrapping: The mitk Python module
+
+The Python wrapping of MITK is handled by pybind11.
+The bindings are defined in `Wrapping/Python/mitk/` and compiled into a native extension module (`mitk.cpXYZ-<platform>.pyd` / `.so`).
+
+Currently, the following types and functions are exposed:
+
+| Category | Types / Functions |
+|---|---|
+| **Image** | `Image` with constructor overloads (empty / numpy / file path), `initialize()`, classmethods `from_numpy()` and `load()`, `save()`, `as_numpy()`, `__array__`, geometry properties (`spacing`, `origin`, `direction`, `direction_cosines`, `ndim`, `shape`, `dtype`, `array`, `time_steps`, `time_geometry`), per-time-step accessors (`get_spacing()`, `set_spacing()`, `get_origin()`, `set_origin()`, `get_direction()`, `set_direction()`, `get_geometry()`) |
+| **IO** | `IOUtil.load()`, `IOUtil.save()` |
+| **Geometry** | `BaseGeometry`, `Geometry3D`, `PlaneGeometry`, `SlicedGeometry3D`, `TimeGeometry` (with `count_time_steps()`, `get_min_time_point()`, `get_max_time_point()`, `get_time_bounds()`, `time_step_to_time_point()`, `time_point_to_time_step()`, `is_valid_time_step()`, `is_valid_time_point()`, `get_geometry_for_time_step()`, `get_geometry_for_time_point()`), `ArbitraryTimeGeometry`, `ProportionalTimeGeometry` |
+| **Pixel types** | `PixelType`, `make_pixel_type()` |
+| **Points / Vectors** | `Point2D`, `Point3D`, `Vector2D`, `Vector3D` |
+| **Exceptions** | `Exception` |
+| **CppMicroServices** | `get_loaded_modules()` |
+
+`mitk.Image` is the bound C++ class. Its constructor is overloaded by argument type so the same name handles empty construction, loading from a file, and wrapping a numpy array. `isinstance(img, mitk.Image)`, type hints, IDE autocomplete, and subclassing all work normally. Named factories `mitk.Image.from_numpy()` and `mitk.Image.load()` remain available for callers who prefer to be explicit.
+
+Basic usage:
+
+```python
+import mitk
+import numpy as np
+from pathlib import Path
+
+# Empty image (call initialize() before use)
+empty = mitk.Image()
+empty.initialize("float32", [64, 64, 64])
+
+# Construct from numpy
+arr = np.zeros((64, 64, 64), dtype=np.float32)
+img = mitk.Image(arr, spacing=(1.0, 1.0, 2.5))
+
+# Construct from a file path (str or pathlib.Path)
+loaded = mitk.Image("output.nrrd")
+loaded = mitk.Image(Path("output.nrrd"))
+
+# In-place modification (default direct, unlocked path)
+img.as_numpy(writeable=True)[32, 32, 32] = 1.0
+
+# Read access via the array protocol
+print(np.asarray(img)[32, 32, 32])  # 1.0
+
+# Geometry access
+print(img.shape, img.spacing, img.origin, img.direction)
+
+# Persistence
+img.save("output.nrrd")
+```
+
+By default, `as_numpy()` returns a *direct* numpy view that pins the underlying `mitk.Image` via a smart-pointer capsule but does **not** acquire any read/write lock. This is the preferred mode for in-process work and matches the behavior expected by `numpy.asarray()` and the `__array__` protocol. For workflows that need lock-based concurrency control (e.g. multi-threaded access from C++ and Python at the same time), pass `use_accessor=True` to safeguard image access through a `ImageReadAccessor`/`ImageWriteAccessor`-backed view, which holds the MITK accessor lock until the numpy array is garbage-collected:
+
+```python
+arr = img.as_numpy(use_accessor=True, writeable=True)
+arr[5, 5, 5] = 7
+del arr  # release the write accessor before re-acquiring
+```
+
+The bindings are available both within MITK applications (via the embedded Python in `MITK-build/python`) and as a standalone installable wheel (see below).
 
 ## Virtual environments
 
@@ -99,13 +162,122 @@ This allows different MITK components — such as segmentation tools — to use 
 
 These virtual environments are stored in the `mitk_venvs` folder within a dedicated user-writable location:
 
-- `%LocalAppData%` on Windows
+- `%%LocalAppData%` on Windows
 - `$XDG_DATA_HOME` or `$HOME/.local/share` on Linux
 - `$HOME/Library/Application Support` on macOS
 
 To avoid interference between multiple MITK versions built or installed on the same machine, we use a hash of the application path of the currently running MITK application as the top-level folder name inside `mitk_venvs`.
 
-Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Settings** plugin in MITK.
+Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Environments** plugin in MITK.
+
+The `mitkPythonBindingsTest` described above relies on this mechanism and creates a dedicated `mitk_pytest` virtual environment the first time it runs.
+
+## Python Wheel
+
+The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk_python-*.whl`).
+This allows users to `pip install` the MITK bindings into any compatible Python environment without building MITK from source.
+
+### What is in the wheel?
+
+The wheel bundles:
+
+- The compiled pybind11 extension module (`mitk.cpXYZ-<platform>.pyd` / `.so`)
+- All CppMicroServices auto-load modules (IO readers/writers, model fit services, etc.)
+- All native library dependencies (ITK, VTK, CppMicroServices, MITK modules, etc.), vendored via a platform-specific delocator
+
+On import, `mitk/__init__.py` sets up the environment so that CppMicroServices auto-loading works transparently — the same IO file formats are available as in a full MITK application.
+
+### Building the wheel
+
+Use the `PythonWheel` build configuration, which is a headless configuration (no Qt, BlueBerry, or plugins) locked to Release builds:
+
+```bash
+cmake -S . -B ../MITK-superbuild -DMITK_BUILD_CONFIGURATION=PythonWheel
+cmake --build ../MITK-superbuild
+```
+
+The SuperBuild build chains into the inner MITK build, which builds all MITK modules and then produces the wheel in `../MITK-superbuild/MITK-build/` via the `mitk_python_wheel` target (included in the default build for this configuration).
+
+The target:
+1. Installs pip packaging dependencies (`wheel` + platform delocator) into the build Python
+2. Stages the bindings and auto-load modules via `cmake --install --component wheel`
+3. Packs a raw wheel and repairs it with the platform delocator to bundle all native dependencies
+
+The platform delocators are:
+- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk_python.libs/`
+- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk_python.libs/` and patches RPATH
+- **macOS**: [delocate](https://github.com/matthew-brett/delocate) — copies dylibs into `mitk/.dylibs/` and rewrites load commands
+
+### Testing the wheel
+
+A self-contained smoke test script is provided:
+
+```bash
+python Wrapping/Python/wheel/test_wheel.py --build-dir ../MITK-superbuild/MITK-build
+```
+
+This automatically creates a temporary virtual environment, installs the wheel, runs the tests, and cleans up.
+The test scope is deliberately narrow: it covers wheel-specific concerns (import, `__version__`, CppMicroServices auto-load bundling) plus a single functional sanity check.
+Comprehensive binding coverage lives in the `mitkPythonBindingsTest` pytest suite described above — running those against the wheel would be redundant.
+
+### Standalone usage
+
+The `build_wheel.py` script can also be invoked manually outside of the CMake build:
+
+```bash
+python Wrapping/Python/wheel/build_wheel.py --build-dir <MITK-build>
+```
+
+The wheel is written to the build directory by default.
+Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocator step for debugging.
+
+## API documentation (Sphinx)
+
+Doxygen does not handle Python well: it does not understand Google-style docstrings, dataclasses, or `typing.Literal`/union hints, and its native Python rendering undersells a typed binding surface.
+For that reason, the `mitk` Python package has its own Sphinx-based documentation site, built and published independently of this C++ Doxygen site.
+
+The Python documentation lives at <https://mitk-python.readthedocs.io/en/2026.06/>.
+It is also reachable from the "Python API" tab in the top navigation bar of this Doxygen site.
+
+### Sources
+
+The Sphinx project sits next to the bindings, in `Wrapping/Python/docs/`:
+
+- `conf.py`: Sphinx configuration (autodoc + napoleon + autosummary + autodoc-typehints + myst-parser + sphinx-copybutton + `sphinx_book_theme`).
+- `requirements.txt`: pinned toolchain.
+- `index.md`, `installation.md`, `getting_started.md`, `user_guide/*.md`, `api/index.md`: narrative pages and the autosummary-driven API reference.
+
+The auto-generated API reference is populated by importing the freshly-built `mitk` package and reading docstrings off the compiled pybind11 extension.
+Google-style docstrings (with `Args:` / `Returns:` / `Raises:` / `Examples:` sections) on each binding are the source of truth; keep them in sync when the bindings change.
+
+### Building the docs locally
+
+There is a dedicated CMake target:
+
+```bash
+cmake --build <build-dir> --target mitk_python_docs
+```
+
+The target depends on `mitk_python_bindings`.
+On first invocation it creates a dedicated venv at `<build-dir>/mitk_python_docs_venv` (with `--system-site-packages` so the just-built `mitk` package is importable) and pip-installs the Sphinx toolchain from `requirements.txt` into that venv.
+The venv is reused on subsequent runs.
+This deliberately keeps the toolchain out of the embedded build Python, because on Windows the standalone Python's user-site directory is shared with the system Python and pollutes both.
+
+The HTML lands in `<build-dir>/Documentation/Python/html/`.
+
+The `-W` flag (warnings-as-errors) is passed to `sphinx-build`, so docstring syntax errors or duplicated definitions fail the build.
+Missing-target cross-references (e.g. a stale `:py:class:` pointing at a name that no longer exists) only fail the build when `nitpicky = True` is set in `conf.py`; the default is off, so silently-broken cross-refs need to be caught at review time.
+
+### Publishing
+
+The published site is hosted on Read the Docs at <https://mitk-python.readthedocs.io/en/2026.06/>. A separate repository, `MITK/mitk-python-docs`, drives the build: it fetches `Wrapping/Python/docs` from here and runs `sphinx-build` against the `mitk-python` wheel installed from PyPI, so the site tracks the bindings without keeping a second copy of the sources.
+
+### What goes where
+
+- Consumer-facing (`pip install mitk-python`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
+- This Doxygen page (`PythonInMITK`) is the developer-facing reference: how the wheel is built, how the C++ side embeds Python, why Standalone Python Builds, platform quirks, and so on.
+
+The two are intentionally complementary, not duplicates.
 
 ## Quirks
 
@@ -135,12 +307,12 @@ To sign an application bundle on macOS with `codesign`, the bundle must follow c
 Therefore, we convert the `python` directory from `MITK-build` into `Python.framework` for packaging.
 This conversion is handled in the `MITK-build/FixMacOSInstaller.cmake` script, which CPack executes as a post-build step.
 
-### Importing pyMITK in the Python interpreter of an installed MITK on macOS
+### Importing mitk in the Python interpreter of an installed MITK on macOS
 
 We are using CMake's `BundleUtilities` to create application bundles on macOS.
 Unfortunately, it rewrites all library dependency paths to start with `@executable_path/../MacOS`, which works fine for executables in the usual `Contents/MacOS` folder of an app bundle.
-However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `pyMITK` package.
+However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `mitk` package.
 
-To fix this, we adjust the runtime dependency paths of the `pyMITK` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after `fixup_bundle()` has finished modifying all paths.
+To fix this, we adjust the runtime dependency paths of the `mitk` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after `fixup_bundle()` has finished modifying all paths.
 This fix currently does not cover autoload-modules, which is why they cannot be loaded in this scenario.
 Running the Python interpreter as subprocess of an MITK application, however, will load autoload-modules correctly.

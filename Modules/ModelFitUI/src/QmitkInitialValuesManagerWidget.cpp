@@ -1,0 +1,124 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include <QMenu>
+
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateGeometry.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+
+#include <mitkImage.h>
+
+#include <QmitkInitialValuesManagerWidget.h>
+#include <QmitkInitialValuesModel.h>
+#include <QmitkInitialValuesTypeDelegate.h>
+#include <QmitkInitialValuesDelegate.h>
+
+#include <ui_QmitkInitialValuesManagerWidget.h>
+
+QmitkInitialValuesManagerWidget::QmitkInitialValuesManagerWidget(QWidget*)
+  : m_Controls(std::make_unique<Ui::QmitkInitialValuesManagerWidget>())
+{
+  m_Controls->setupUi(this);
+
+  m_InternalModel = new QmitkInitialValuesModel(this);
+  m_TypeDelegate = new QmitkInitialValuesTypeDelegate(this);
+  m_ValuesDelegate = new QmitkInitialValuesDelegate(this);
+
+  m_NoHiddenOrHelperPredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_ValuesDelegate->setNodePredicate(m_NoHiddenOrHelperPredicate);
+
+  m_Controls->initialsView->setModel(m_InternalModel);
+
+  m_Controls->initialsView->setItemDelegateForColumn(1, m_TypeDelegate);
+  m_Controls->initialsView->setItemDelegateForColumn(2, m_ValuesDelegate);
+
+  connect(m_InternalModel, SIGNAL(modelReset()), this, SLOT(OnModelReset()));
+
+  this->update();
+}
+
+void QmitkInitialValuesManagerWidget::OnModelReset()
+{
+  emit initialValuesChanged();
+};
+
+QmitkInitialValuesManagerWidget::~QmitkInitialValuesManagerWidget()
+{
+  delete m_InternalModel;
+}
+
+void QmitkInitialValuesManagerWidget::setInitialValues(const
+    mitk::ModelTraitsInterface::ParameterNamesType& names,
+    const mitk::ModelTraitsInterface::ParametersType values,
+    const mitk::ModelTraitsInterface::ParamterUnitMapType units
+  )
+{
+  this->m_InternalModel->setInitialValues(names, values, units);
+}
+
+void QmitkInitialValuesManagerWidget::setInitialValues(const
+    mitk::ModelTraitsInterface::ParameterNamesType& names)
+{
+  this->m_InternalModel->setInitialValues(names);
+}
+
+void QmitkInitialValuesManagerWidget::setDataStorage(mitk::DataStorage* storage)
+{
+  m_ValuesDelegate->setDataStorage(storage);
+  this->m_InternalModel->resetInitialParameterImage();
+}
+
+void QmitkInitialValuesManagerWidget::setReferenceImageGeometry(mitk::BaseGeometry* refgeo)
+{
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::NodePredicateDimension::Pointer is3D = mitk::NodePredicateDimension::New(3);
+
+  if (refgeo)
+  {
+    mitk::NodePredicateGeometry::Pointer hasGeo = mitk::NodePredicateGeometry::New(refgeo);
+    mitk::NodePredicateAnd::Pointer isValidInitialImage = mitk::NodePredicateAnd::New(isImage, hasGeo, is3D);
+    isValidInitialImage->AddPredicate(m_NoHiddenOrHelperPredicate);
+    m_ValuesDelegate->setNodePredicate(isValidInitialImage);
+  }
+  else
+  {
+    mitk::NodePredicateAnd::Pointer isValidInitialImage = mitk::NodePredicateAnd::New(isImage, is3D);
+    isValidInitialImage->AddPredicate(m_NoHiddenOrHelperPredicate);
+    m_ValuesDelegate->setNodePredicate(isImage);
+  }
+
+  this->m_InternalModel->resetInitialParameterImage();
+}
+
+mitk::ModelTraitsInterface::ParametersType
+QmitkInitialValuesManagerWidget::getInitialValues() const
+{
+  return this->m_InternalModel->getInitialValues();
+};
+
+
+mitk::InitialParameterizationDelegateBase::Pointer
+QmitkInitialValuesManagerWidget::getInitialParametrizationDelegate() const
+{
+  return this->m_InternalModel->getInitialParametrizationDelegate();
+};
+
+bool QmitkInitialValuesManagerWidget::hasValidInitialValues() const
+{
+  return this->m_InternalModel->hasValidInitialValues();
+};
+

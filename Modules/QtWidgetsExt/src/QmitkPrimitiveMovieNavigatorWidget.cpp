@@ -10,18 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPrimitiveMovieNavigatorWidget.h"
+#include <QmitkPrimitiveMovieNavigatorWidget.h>
+#include <ui_QmitkPrimitiveMovieNavigatorWidget.h>
 
 QmitkPrimitiveMovieNavigatorWidget::QmitkPrimitiveMovieNavigatorWidget(QWidget *parent, Qt::WindowFlags fl)
   : QWidget(parent, fl)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkPrimitiveMovieNavigator>();
+  m_Controls->setupUi(this);
 
   // signals and slots connections
-  connect(m_Controls.m_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(spinBoxValueChanged(int)));
-  connect(m_Controls.m_StopButton, SIGNAL(clicked()), this, SLOT(stopButton_clicked()));
-  connect(m_Controls.m_GoButton, SIGNAL(clicked()), this, SLOT(goButton_clicked()));
-  connect(m_Controls.m_TimerInterval, SIGNAL(valueChanged(int)), this, SLOT(setTimerInterval(int)));
+  connect(m_Controls->m_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(spinBoxValueChanged(int)));
+  connect(m_Controls->m_StopButton, SIGNAL(clicked()), this, SLOT(stopButton_clicked()));
+  connect(m_Controls->m_GoButton, SIGNAL(clicked()), this, SLOT(goButton_clicked()));
+  connect(m_Controls->m_TimerInterval, SIGNAL(valueChanged(int)), this, SLOT(setTimerInterval(int)));
 
   m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != nullptr (additionally to the
                       // avoiding recursions during refetching)
@@ -35,7 +37,6 @@ QmitkPrimitiveMovieNavigatorWidget::QmitkPrimitiveMovieNavigatorWidget(QWidget *
  */
 QmitkPrimitiveMovieNavigatorWidget::~QmitkPrimitiveMovieNavigatorWidget()
 {
-  // no need to delete child widgets, Qt does it all for us
 }
 
 void QmitkPrimitiveMovieNavigatorWidget::Refetch()
@@ -43,9 +44,9 @@ void QmitkPrimitiveMovieNavigatorWidget::Refetch()
   if (!m_InRefetch)
   {
     m_InRefetch = true;
-    m_Controls.m_SpinBox->setMinimum(0);
-    m_Controls.m_SpinBox->setMaximum(m_Stepper->GetSteps() - 1);
-    m_Controls.m_SpinBox->setValue(m_Stepper->GetPos());
+    m_Controls->m_SpinBox->setMinimum(0);
+    m_Controls->m_SpinBox->setMaximum(m_Stepper->GetSteps() - 1);
+    m_Controls->m_SpinBox->setValue(m_Stepper->GetPos());
     m_InRefetch = false;
   }
 }
@@ -90,7 +91,7 @@ void QmitkPrimitiveMovieNavigatorWidget::spinBoxValueChanged(int)
 {
   if (!m_InRefetch)
   {
-    m_Stepper->SetPos(m_Controls.m_SpinBox->value());
+    m_Stepper->SetPos(m_Controls->m_SpinBox->value());
   }
 }
 

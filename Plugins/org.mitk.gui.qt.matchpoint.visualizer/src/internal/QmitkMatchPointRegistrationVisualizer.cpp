@@ -24,13 +24,13 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateFunction.h>
-#include "mitkRegVisDirectionProperty.h"
-#include "mitkRegVisStyleProperty.h"
-#include "mitkRegVisColorStyleProperty.h"
-#include "mitkRegVisPropertyTags.h"
-#include "mitkRegVisHelper.h"
-#include "mitkMatchPointPropertyTags.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkRegVisDirectionProperty.h>
+#include <mitkRegVisStyleProperty.h>
+#include <mitkRegVisColorStyleProperty.h>
+#include <mitkRegVisPropertyTags.h>
+#include <mitkRegVisHelper.h>
+#include <mitkMatchPointPropertyTags.h>
+#include <mitkRegistrationHelper.h>
 
 // Qmitk
 #include "QmitkMatchPointRegistrationVisualizer.h"
@@ -39,12 +39,21 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QErrorMessage>
 
+#include <ui_QmitkMatchPointRegistrationVisualizer.h>
+
 const std::string QmitkMatchPointRegistrationVisualizer::VIEW_ID =
 "org.mitk.views.matchpoint.visualizer";
 
 QmitkMatchPointRegistrationVisualizer::QmitkMatchPointRegistrationVisualizer()
-    : m_Parent(nullptr), m_internalUpdateGuard(false), m_spSelectedFOVRefNode(nullptr),
+  :
+    m_Parent(nullptr),
+    m_internalUpdateGuard(false),
+    m_spSelectedFOVRefNode(nullptr),
     m_spSelectedRegNode(nullptr)
+{
+}
+
+QmitkMatchPointRegistrationVisualizer::~QmitkMatchPointRegistrationVisualizer()
 {
 }
 
@@ -90,7 +99,7 @@ void QmitkMatchPointRegistrationVisualizer::Error(QString msg)
 
 void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
 {
-    m_Controls = new Ui::MatchPointRegVisControls;
+    m_Controls = std::make_unique<Ui::MatchPointRegVisControls>();
 
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls->setupUi(parent);

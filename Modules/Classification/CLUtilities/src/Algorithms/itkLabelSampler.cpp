@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef itkLabelSampler_cpp
 #define itkLabelSampler_cpp
 
-#include "itkLabelSampler.h"
-#include "itkObjectFactory.h"
-#include "itkImageRegionIterator.h"
-#include "itkImageRegionConstIterator.h"
-#include "itkImageIterator.h"
-#include "itkImageConstIterator.h"
+#include <itkLabelSampler.h>
+#include <itkObjectFactory.h>
+#include <itkImageRegionIterator.h>
+#include <itkImageRegionConstIterator.h>
+#include <itkImageIterator.h>
+#include <itkImageConstIterator.h>
 
 #include <cstdlib>     /* srand, rand */
 #include <ctime>       /* time */

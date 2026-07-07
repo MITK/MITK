@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMouseMoveEvent.h"
-#include "mitkException.h"
+#include <mitkMouseMoveEvent.h>
+#include <mitkException.h>
 
 mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer *baseRenderer,
                                      const mitk::Point2D &mousePosition,

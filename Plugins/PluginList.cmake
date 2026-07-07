@@ -24,6 +24,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.datastorageviewertest:OFF
   org.mitk.gui.qt.properties:ON
+  org.mitk.gui.qt.restapi:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicombrowser:OFF
   org.mitk.gui.qt.dicominspector:OFF
@@ -64,5 +65,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.pixelvalue:ON
   org.mitk.gui.qt.pet.suvcalculation:OFF
   org.mitk.gui.qt.undoredo:OFF
-  org.mitk.gui.qt.pythonsettings:OFF
+  org.mitk.gui.qt.pythonenvironments:OFF
 )

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVectorProperty.h"
+#include <mitkVectorProperty.h>
 #include <nlohmann/json.hpp>
 
 namespace mitk
@@ -26,13 +26,6 @@ namespace mitk
   {
     this->m_PropertyContent = static_cast<const Self &>(property).m_PropertyContent;
     return true;
-  }
-
-  template <typename DATATYPE>
-  itk::LightObject::Pointer VectorProperty<DATATYPE>::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    return result;
   }
 
   template <typename DATATYPE>

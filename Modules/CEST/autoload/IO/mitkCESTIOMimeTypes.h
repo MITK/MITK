@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCESTIOMimeTypes_h
 #define mitkCESTIOMimeTypes_h
 
-#include "mitkIOMimeTypes.h"
+#include <mitkIOMimeTypes.h>
 
 #include <string>
 
@@ -36,7 +36,10 @@ namespace mitk
       MitkCESTDicomMimeType *Clone() const override;
     };
 
+    /** \brief Return an instance of the CEST DICOM MIME type. */
     static MitkCESTDicomMimeType CEST_DICOM_MIMETYPE();
+
+    /** \brief Return the name string for the CEST DICOM MIME type. */
     static std::string CEST_DICOM_MIMETYPE_NAME();
 
     /** Mime type that indicated generic CEST dicom files.
@@ -52,7 +55,10 @@ namespace mitk
       MitkCESTDicomWithMetaFileMimeType* Clone() const override;
     };
 
+    /** \brief Return an instance of the CEST DICOM with meta file MIME type. */
     static MitkCESTDicomWithMetaFileMimeType CEST_DICOM_WITH_META_FILE_MIMETYPE();
+
+    /** \brief Return the name string for the CEST DICOM with meta file MIME type. */
     static std::string CEST_DICOM_WITH_META_FILE_NAME();
 
     /** Mime type that indicated dicom files that can be potantially read as Generic
@@ -69,10 +75,13 @@ namespace mitk
       MitkCESTDicomWOMetaFileMimeType* Clone() const override;
     };
 
+    /** \brief Return an instance of the CEST DICOM without meta file MIME type. */
     static MitkCESTDicomWOMetaFileMimeType CEST_DICOM_WITHOUT_META_FILE_MIMETYPE();
+
+    /** \brief Return the name string for the CEST DICOM without meta file MIME type. */
     static std::string CEST_DICOM_WITHOUT_META_FILE_NAME();
 
-    // Get all Mime Types
+    /** \brief Return all registered CEST MIME types. Caller takes ownership of the returned pointers. */
     static std::vector<CustomMimeType *> Get();
 
   private:

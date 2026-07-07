@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStandardToftsModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkStandardToftsModel.h>
+#include <mitkConvolutionHelper.h>
 #include <vnl/algo/vnl_fft_1d.h>
 #include <fstream>
 
@@ -160,14 +160,10 @@ mitk::ModelBase::DerivedParameterMapType mitk::StandardToftsModel::ComputeDerive
   return result;
 };
 
-itk::LightObject::Pointer mitk::StandardToftsModel::InternalClone() const
+mitk::StandardToftsModel::StandardToftsModel(const StandardToftsModel& source)
+: Superclass(source)
 {
-  StandardToftsModel::Pointer newClone = StandardToftsModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}
 
 void mitk::StandardToftsModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const
 {

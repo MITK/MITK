@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeReinitAction.h>
+#include "QmitkDataNodeReinitAction.h"
 
 // mitk core
 #include <mitkImage.h>

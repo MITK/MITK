@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionEvent.h"
-#include "mitkException.h"
+#include <mitkInteractionEvent.h>
+#include <mitkException.h>
 
 const std::string mitk::InteractionEvent::KeyEsc = "Escape";
 const std::string mitk::InteractionEvent::KeyEnter = "Enter";

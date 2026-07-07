@@ -12,18 +12,33 @@ found in the LICENSE file.
 #ifndef QmitkStringPropertyEditor_h
 #define QmitkStringPropertyEditor_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QLineEdit>
 #include <mitkPropertyObserver.h>
 #include <mitkStringProperty.h>
 
-/// @ingroup Widgets
+/**
+ * \brief A QLineEdit that edits a mitk::StringProperty.
+ *
+ * Bidirectionally synchronizes the line edit text with a mitk::StringProperty.
+ * When the user types, the property is updated. When the property changes
+ * externally, the text is updated. If the property is removed, "n/a" is displayed.
+ *
+ * \sa QmitkStringPropertyView, QmitkStringPropertyOnDemandEdit, QmitkPropertyViewFactory
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
 {
   Q_OBJECT
 
 public:
-  QmitkStringPropertyEditor(mitk::StringProperty *, QWidget *parent);
+  /**
+   * \brief Construct an editor for the given string property.
+   * \param[in] property The mitk::StringProperty to edit.
+   * \param[in] parent The parent widget.
+   */
+  QmitkStringPropertyEditor(mitk::StringProperty *property, QWidget *parent);
+
+  /** \brief Destructor. */
   ~QmitkStringPropertyEditor() override;
 
 protected:

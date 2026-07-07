@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelAnnotation3D.h"
+#include <mitkLabelAnnotation3D.h>
 #include <mitkPointSet.h>
 #include <vtkActor2D.h>
 #include <vtkIntArray.h>
@@ -31,13 +31,7 @@ mitk::LabelAnnotation3D::~LabelAnnotation3D()
 {
   if (m_LabelCoordinates.IsNotNull())
     m_LabelCoordinates->RemoveObserver(m_PointSetModifiedObserverTag);
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::LabelAnnotation3D::LocalStorage::~LocalStorage()

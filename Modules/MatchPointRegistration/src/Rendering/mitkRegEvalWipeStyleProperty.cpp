@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegEvalWipeStyleProperty.h"
+#include <mitkRegEvalWipeStyleProperty.h>
 
 
 mitk::RegEvalWipeStyleProperty::RegEvalWipeStyleProperty( )

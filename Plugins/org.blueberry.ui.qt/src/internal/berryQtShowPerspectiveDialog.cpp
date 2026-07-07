@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "berryQtShowPerspectiveDialog.h"
-#include "ui_berryQtShowPerspectiveDialog.h"
+#include <ui_berryQtShowPerspectiveDialog.h>
 
-#include <berryPerspectiveListModel.h>
+#include "berryPerspectiveListModel.h"
 
 #include <QSortFilterProxyModel>
 
@@ -21,7 +21,7 @@ namespace berry {
 
 QtShowPerspectiveDialog::QtShowPerspectiveDialog(IPerspectiveRegistry* perspReg, QWidget *parent)
   : QDialog(parent)
-  , ui(new Ui::QtShowPerspectiveDialog)
+  , ui(std::make_unique<Ui::QtShowPerspectiveDialog>())
 {
   ui->setupUi(this);
 
@@ -44,7 +44,6 @@ QtShowPerspectiveDialog::QtShowPerspectiveDialog(IPerspectiveRegistry* perspReg,
 
 QtShowPerspectiveDialog::~QtShowPerspectiveDialog()
 {
-  delete ui;
 }
 
 QString QtShowPerspectiveDialog::GetSelection() const

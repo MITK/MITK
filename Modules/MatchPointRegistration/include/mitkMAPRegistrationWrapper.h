@@ -25,14 +25,22 @@ found in the LICENSE file.
 #include <mapContinuousElements.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {
-/*!
-  \brief MAPRegistrationWrapper
-  Wrapper class to allow the handling of MatchPoint registration objects as mitk data (e.g. in the data explorer).
-*/
+/**
+ * \brief Wrapper class that adapts MatchPoint registration objects to the MITK data model.
+ *
+ * MAPRegistrationWrapper wraps a %map::core::RegistrationBase instance so that it can be
+ * handled as a mitk::BaseData object. This allows registrations to be stored in the MITK
+ * DataStorage, displayed in the Data Manager, and visualized via registration mappers.
+ *
+ * The wrapper provides convenience methods for point mapping (direct and inverse),
+ * field representation queries, and kernel precomputation.
+ *
+ * \sa mitk::MITKRegistrationHelper, mitk::ImageMappingHelper, mitk::MITKRegistrationWrapperMapperBase
+ */
 class MITKMATCHPOINTREGISTRATION_EXPORT MAPRegistrationWrapper: public mitk::BaseData
 {
 public:
@@ -41,10 +49,23 @@ public:
 
   mitkNewMacro1Param( Self, ::map::core::RegistrationBase*);
 
+  /**
+   * \brief Returns the unique identifier of the wrapped registration.
+   * \return The UID string of the registration instance.
+   */
   Identifiable::UIDType GetUID() const override;
 
+  /**
+   * \brief Checks whether the registration is empty at the given time step.
+   * \param[in] t The time step to check.
+   * \return True if no registration is set (m_spRegistration is null).
+   */
   bool IsEmptyTimeStep(unsigned int t) const override;
 
+  /**
+   * \brief Checks whether the registration wrapper contains no valid registration.
+   * \return True if no registration is set.
+   */
   bool IsEmpty() const override;
 
   /**
@@ -71,63 +92,76 @@ public:
    */
   void SetRequestedRegion(const itk::DataObject*) override;
 
-  /*! @brief Gets the number of moving dimensions
-  @pre valid registration instance must be set.
-  */
+  /**
+   * \brief Gets the number of dimensions of the moving space.
+   * \return The moving dimensionality of the wrapped registration.
+   * \pre A valid registration instance must be set.
+   */
   virtual unsigned int GetMovingDimensions() const;
 
-  /*! @brief Gets the number of target dimensions
-  @pre valid registration instance must be set.
-  */
+  /**
+   * \brief Gets the number of dimensions of the target space.
+   * \return The target dimensionality of the wrapped registration.
+   * \pre A valid registration instance must be set.
+   */
   virtual unsigned int GetTargetDimensions() const;
 
-  /*! typedefs used for the TagMap
-  */
+  /** \brief Tag key type from the MatchPoint registration metadata. */
   typedef ::map::core::RegistrationBase::TagType TagType;
+  /** \brief Tag value type from the MatchPoint registration metadata. */
   typedef ::map::core::RegistrationBase::ValueType ValueType;
+  /** \brief Map type associating tag keys with their values. */
   typedef ::map::core::RegistrationBase::TagMapType TagMapType;
 
-  /*! @brief returns the tags associated with this registration
-  @pre valid registration instance must be set.
-  @return a TagMapType containing tags
-  */
+  /**
+   * \brief Returns all metadata tags associated with this registration.
+   * \return A const reference to the TagMapType containing all tags.
+   * \pre A valid registration instance must be set.
+   */
   const TagMapType& GetTags() const;
 
-  /*! @brief returns the tag value for a specific tag
-  @pre valid registration instance must be set.
-  @return the success of the operation
-  */
+  /**
+   * \brief Retrieves the value for a specific metadata tag.
+   * \param[in] tag The tag key to look up.
+   * \param[out] value The value associated with the tag, if found.
+   * \return True if the tag was found and the value was set, false otherwise.
+   * \pre A valid registration instance must be set.
+   */
   bool GetTagValue(const TagType & tag, ValueType & value) const;
 
-  /*! Indicates
-  @pre valid registration instance must be set.
-  @return is the target representation limited
-  @retval true if target representation is limited. Thus it is not guaranteed that all inverse mapping operations
-  will succeed. Transformation(inverse kernel) covers only a part of the target space).
-  @retval false if target representation is not limited. Thus it is guaranteed that all inverse mapping operations
-  will succeed.
-  */
+  /**
+   * \brief Checks whether the inverse mapping kernel has a limited representation in target space.
+   *
+   * \return True if the target representation is limited (the inverse kernel covers only
+   *         a part of the target space, so not all inverse mapping operations are guaranteed to succeed).
+   *         False if the representation is unlimited (all inverse mappings are guaranteed to succeed).
+   * \pre A valid registration instance must be set.
+   */
   bool HasLimitedTargetRepresentation() const;
 
-  /*!
-  @pre valid registration instance must be set.
-  @return is the moving representation limited
-  @retval true if moving representation is limited. Thus it is not guaranteed that all direct mapping operations
-  will succeed. Transformation(direct kernel) covers only a part of the moving space).
-  @retval false if moving representation is not limited. Thus it is guaranteed that all direct mapping operations
-  will succeed.
-  */
+  /**
+   * \brief Checks whether the direct mapping kernel has a limited representation in moving space.
+   *
+   * \return True if the moving representation is limited (the direct kernel covers only
+   *         a part of the moving space, so not all direct mapping operations are guaranteed to succeed).
+   *         False if the representation is unlimited (all direct mappings are guaranteed to succeed).
+   * \pre A valid registration instance must be set.
+   */
   bool HasLimitedMovingRepresentation() const;
 
-  /*! Helper function that maps a mitk point (of arbitrary dimension) from moving space to target space.
-  @remarks The operation might fail, if the moving and target dimension of the registration
-  is not equal to the dimensionality of the passed points.
-  @pre valid registration instance must be set.
-  @param inPoint Reference pointer to a MovingPointType
-  @param outPoint pointer to a TargetPointType
-  @return success of operation.
-  @pre direct mapping kernel must be defined
-  */
+  /**
+   * \brief Maps a point from moving space to target space using the direct mapping kernel.
+   *
+   * \tparam VMovingDim Dimensionality of the moving space point.
+   * \tparam VTargetDim Dimensionality of the target space point.
+   * \param[in] inPoint The point in moving space to map.
+   * \param[out] outPoint The mapped point in target space (only valid if return is true).
+   * \return True if the mapping was successful, false otherwise (e.g. dimension mismatch).
+   * \pre A valid registration instance must be set.
+   * \pre The direct mapping kernel must be defined.
+   * \note The operation may fail if the registration dimensions do not match the point dimensions.
+   * \throw mapDefaultException if the registration pointer is null or has invalid dimensions.
+   */
   template <unsigned int VMovingDim, unsigned int VTargetDim>
   bool MapPoint(const ::itk::Point<mitk::ScalarType,VMovingDim>& inPoint, ::itk::Point<mitk::ScalarType,VTargetDim>& outPoint) const
   {
@@ -166,14 +200,18 @@ public:
     return result;
   };
 
-  /*! Helper function that maps a mitk point (of arbitrary dimension) from target space to moving space
-  @remarks The operation might fail, if the moving and target dimension of the registration
-  is not equal to the dimensionalities of the passed points.
-  @pre valid registration instance must be set.
-  @param inPoint pointer to a TargetPointType
-  @param outPoint pointer to a MovingPointType
-  @return success of operation
-  */
+  /**
+   * \brief Maps a point from target space to moving space using the inverse mapping kernel.
+   *
+   * \tparam VMovingDim Dimensionality of the moving space point.
+   * \tparam VTargetDim Dimensionality of the target space point.
+   * \param[in] inPoint The point in target space to map.
+   * \param[out] outPoint The mapped point in moving space (only valid if return is true).
+   * \return True if the mapping was successful, false otherwise (e.g. dimension mismatch).
+   * \pre A valid registration instance must be set.
+   * \note The operation may fail if the registration dimensions do not match the point dimensions.
+   * \throw mapDefaultException if the registration pointer is null or has invalid dimensions.
+   */
   template <unsigned int VMovingDim, unsigned int VTargetDim>
   bool MapPointInverse(const ::itk::Point<mitk::ScalarType,VTargetDim> & inPoint, ::itk::Point<mitk::ScalarType,VMovingDim> & outPoint) const
 {
@@ -212,43 +250,62 @@ public:
   return result;
 };
 
-  /*! returns the direct FieldRepresentationDescriptor which defines the part
-  of the moving space that is guaranteed to be mapped by the direct mapping kernel.
-  This member converts the internal MatchPoint type into a mitk::Geometry3D.
-  @pre valid registration instance must be set.
-  @return smart pointer to a FieldRepresentationDescriptor for the supported registration space in the moving domain.
-  May be null if the direct registration kernel is global and thus not limited.
-  If there is a limitation, the return value is not nullptr.
-  @retval nullptr no field representation set/requested by the creating registration algorithm.
-  */
+  /**
+   * \brief Returns the field representation of the direct mapping kernel as a Geometry3D.
+   *
+   * The field representation defines the part of the moving space that is guaranteed to
+   * be mapped by the direct mapping kernel. This method converts the internal MatchPoint
+   * field representation descriptor into a mitk::Geometry3D.
+   *
+   * \return A Geometry3D describing the supported registration space in the moving domain.
+   *         Returns a default-constructed Geometry3D if the direct kernel is global (unlimited).
+   * \pre A valid registration instance must be set.
+   */
   mitk::Geometry3D GetDirectFieldRepresentation() const;
 
-  /*! returns the inverse FieldRepresentationDescriptor which defines the part
-  of the target space that is guaranteed to be mapped by the inverse mapping kernel.
-  This member converts the internal MatchPoint type into a mitk::Geometry3D.
-  @pre valid registration instance must be set.
-  @return a const FieldRepresentationDescriptor for the supported registration space in the target domain.
-  May be null if the inverse registration kernel is global and thus not limited.
-  If there is a limitation, the return value is not nullptr.
-  @retval nullptr no field representation set/requested by the creating registration algorithm.
-  */
+  /**
+   * \brief Returns the field representation of the inverse mapping kernel as a Geometry3D.
+   *
+   * The field representation defines the part of the target space that is guaranteed to
+   * be mapped by the inverse mapping kernel. This method converts the internal MatchPoint
+   * field representation descriptor into a mitk::Geometry3D.
+   *
+   * \return A Geometry3D describing the supported registration space in the target domain.
+   *         Returns a default-constructed Geometry3D if the inverse kernel is global (unlimited).
+   * \pre A valid registration instance must be set.
+   */
   mitk::Geometry3D GetInverseFieldRepresentation() const;
 
-  /*! forces kernel to precompute, even if it is a LazyFieldKernel
-  @pre valid registration instance must be set.
-  @todo der LazyFieldBasedRegistrationKernel muss dann die stong guarantee erfllen beim erzeugen des feldes ansonsten
-  ist die garantie dieser methode nicht erfllbar. noch berprfen
-  */
+  /**
+   * \brief Forces the direct mapping kernel to precompute its deformation field.
+   *
+   * This is useful for lazy field-based kernels that defer computation until first use.
+   * Calling this method ensures the field is computed immediately.
+   *
+   * \pre A valid registration instance must be set.
+   */
   void PrecomputeDirectMapping();
 
-  /*! forces kernel to precompute, even if it is a LazyFieldKernel
-  @pre valid registration instance must be set.
-  @todo der LazyFieldBasedRegistrationKernel muss dann die stong guarantee erfllen beim erzeugen des feldes ansonsten
-  ist die garantie dieser methode nicht erfllbar. noch berprfen
-  */
+  /**
+   * \brief Forces the inverse mapping kernel to precompute its deformation field.
+   *
+   * This is useful for lazy field-based kernels that defer computation until first use.
+   * Calling this method ensures the field is computed immediately.
+   *
+   * \pre A valid registration instance must be set.
+   */
   void PrecomputeInverseMapping();
 
+  /**
+   * \brief Returns a mutable pointer to the wrapped MatchPoint registration.
+   * \return Pointer to the internal RegistrationBase instance.
+   */
   ::map::core::RegistrationBase* GetRegistration();
+
+  /**
+   * \brief Returns a const pointer to the wrapped MatchPoint registration.
+   * \return Const pointer to the internal RegistrationBase instance.
+   */
   const ::map::core::RegistrationBase* GetRegistration() const;
 
 protected:

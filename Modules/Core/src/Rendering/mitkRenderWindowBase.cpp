@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRenderWindowBase.h"
-#include "mitkRenderingManager.h"
-#include "mitkVtkLayerController.h"
-#include "vtkRenderer.h"
+#include <mitkRenderWindowBase.h>
+#include <mitkRenderingManager.h>
+#include <mitkVtkLayerController.h>
+#include <vtkRenderer.h>
 
-#include "mitkAnnotationUtils.h"
+#include <mitkAnnotationUtils.h>
 
 mitk::RenderWindowBase::RenderWindowBase() : m_RenderProp(nullptr), m_InResize(false)
 {

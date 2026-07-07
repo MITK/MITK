@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "mitkRenderingManagerFactory.h"
+#include <mitkRenderingManagerFactory.h>
 
 /**
  * \ingroup QmitkModule

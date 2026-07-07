@@ -18,8 +18,6 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkMatchPointFrameCorrectionControls.h"
-
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
 
@@ -33,6 +31,12 @@ found in the LICENSE file.
 
 #include <mitkMAPRegistrationWrapper.h>
 #include <QmitkFramesRegistrationJob.h>
+#include <memory>
+
+namespace Ui
+{
+  class MatchPointFrameCorrectionControls;
+}
 
 /*!
 \brief View for motion artefact correction of images.
@@ -160,6 +164,8 @@ private:
 
   friend struct berry::SelectionChangedAdapter<QmitkMatchPointFrameCorrection>;
 
+  std::unique_ptr<Ui::MatchPointFrameCorrectionControls> m_Controls;
+
   QWidget* m_Parent;
 
   /** @brief this pointer holds the algorithm selection listener */
@@ -184,8 +190,6 @@ private:
   // boolean variables to control visibility of GUI elements
   bool m_CanLoadAlgorithm;
   bool m_Working;
-
-  Ui::MatchPointFrameCorrectionControls m_Controls;
 };
 
 #endif

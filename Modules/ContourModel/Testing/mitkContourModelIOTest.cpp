@@ -15,9 +15,8 @@ found in the LICENSE file.
 #include <fstream>
 #include <iostream>
 #include <locale>
-#include <mitkContourModelWriter.h>
-
 #include <mitkIOUtil.h>
+#include <mitkContourModel.h>
 
 static void TestContourModel(mitk::ContourModel *contour, std::string fileName)
 {

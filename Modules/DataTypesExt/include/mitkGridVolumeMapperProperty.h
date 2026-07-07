@@ -13,25 +13,33 @@ found in the LICENSE file.
 #ifndef mitkGridVolumeMapperProperty_h
 #define mitkGridVolumeMapperProperty_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkEnumerationProperty.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {
   /**
-   * Extends the enumeration prop mitkEnumerationPropery. Adds the value
-   * (constant/Id/string representation):
-   * PT/0/Projected Tetrahedra, ZSWEEP/1/ZSweep, RAYCAST/2/Ray Cast
-   * Default is the Wireframe representation
+   * \brief Enumeration property for volume mapper types used with unstructured grids.
+   *
+   * Extends EnumerationProperty with the following values:
+   * - RAYCAST (0) -- ray casting volume mapper (default)
+   * - PT (1) -- projected tetrahedra volume mapper
+   * - ZSWEEP (2) -- ZSweep volume mapper
+   *
+   * \sa EnumerationProperty, GridRepresentationProperty
+   * \ingroup Data
    */
   class MITKDATATYPESEXT_EXPORT GridVolumeMapperProperty : public EnumerationProperty
   {
   public:
+    /**
+     * \brief Available volume mapper types.
+     */
     enum MapperType
     {
-      RAYCAST = 0,
-      PT = 1,
-      ZSWEEP = 2
+      RAYCAST = 0, ///< Ray casting mapper.
+      PT = 1,      ///< Projected tetrahedra mapper.
+      ZSWEEP = 2   ///< ZSweep mapper.
     };
 
     mitkClassMacro(GridVolumeMapperProperty, EnumerationProperty);
@@ -44,19 +52,13 @@ namespace mitk
 
     mitkNewMacro1Param(GridVolumeMapperProperty, const std::string &);
 
-    /**
-     * Sets the mapper to projected tetrahedra.
-     */
+    /** \brief Set the volume mapper to projected tetrahedra. */
     virtual void SetVolumeMapperToPT();
 
-    /**
-     * Sets the mapper to zsweep.
-     */
+    /** \brief Set the volume mapper to ZSweep. */
     virtual void SetVolumeMapperToZSweep();
 
-    /**
-     * Sets the mapper to ray casting.
-     */
+    /** \brief Set the volume mapper to ray casting. */
     virtual void SetVolumeMapperToRayCast();
 
   protected:
@@ -64,6 +66,8 @@ namespace mitk
      * Constructor. Sets the representation to a default value of Wireframe(1)
      */
     GridVolumeMapperProperty();
+
+    GridVolumeMapperProperty(const GridVolumeMapperProperty &other);
 
     /**
      * Constructor. Sets the representation to the given value. If it is not
@@ -91,8 +95,7 @@ namespace mitk
      */
     virtual void AddRepresentationTypes();
 
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(GridVolumeMapperProperty);
   };
 } // end of namespace mitk
 #endif

@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <itkComposeImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkImageDuplicator.h>
+#include <itkImageRegionConstIterator.h>
 #include <itkVectorIndexSelectionCastImageFilter.h>
 
 template <typename TPixel, unsigned int VDimension>
@@ -272,6 +273,54 @@ mitk::Image::Pointer mitk::ConvertImageToGroupImage(const Image* inputImage, mit
   return result;
 }
 
+namespace
+{
+  template <typename SourceImageType>
+  void CountDistinctForegroundValuesInternal(const SourceImageType* sourceImage, unsigned int limit, unsigned int& result)
+  {
+    itk::ImageRegionConstIterator<SourceImageType> sourceIter(sourceImage, sourceImage->GetRequestedRegion());
+
+    // Count on the native pixel type: narrowing to LabelValueType (unsigned short)
+    // would alias values above the label range (e.g. 65536 to 0/background) and
+    // undercount the very wide-pixel images this check exists to flag.
+    std::set<typename SourceImageType::PixelType> detectedValues;
+
+    for (sourceIter.GoToBegin(); !sourceIter.IsAtEnd(); ++sourceIter)
+    {
+      const auto sourceValue = sourceIter.Get();
+
+      if (sourceValue != mitk::Label::UNLABELED_VALUE)
+      {
+        detectedValues.insert(sourceValue);
+
+        if (detectedValues.size() >= limit)
+          break;
+      }
+    }
+
+    result = static_cast<unsigned int>(detectedValues.size());
+  }
+}
+
+unsigned int mitk::CountDistinctForegroundValues(const Image* image, unsigned int limit)
+{
+  if (nullptr == image || image->IsEmpty() || !image->IsInitialized() || 0 == limit)
+    return 0;
+
+  unsigned int result = 0;
+
+  if (image->GetDimension() == 3)
+  {
+    AccessFixedDimensionByItk_2(image, CountDistinctForegroundValuesInternal, 3, limit, result);
+  }
+  else if (image->GetDimension() == 4)
+  {
+    AccessFixedDimensionByItk_2(image, CountDistinctForegroundValuesInternal, 4, limit, result);
+  }
+
+  return result;
+}
+
 bool mitk::CheckForLabelValueConflictsAndResolve(const mitk::MultiLabelSegmentation::LabelValueVectorType& newValues, mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues, mitk::MultiLabelSegmentation::LabelValueVectorType& correctedLabelValues)
 {
   bool corrected = false;
@@ -377,7 +426,7 @@ mitk::Image::Pointer mitk::CreateFilteredGroupImage(const MultiLabelSegmentation
 
   // get relevant labels (as intersect of groupLabels and selectedLabels
   auto groupValues = segmentation->GetLabelValuesByGroup(groupID);
-  auto relevantDetectLambda = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType& result, MultiLabelSegmentation::LabelValueType element)
+  auto relevantDetectLambda = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType result, MultiLabelSegmentation::LabelValueType element)
     {
       if (std::find(selectedLabels.begin(), selectedLabels.end(), element) != selectedLabels.end())
       {
@@ -423,7 +472,7 @@ std::pair<mitk::Image::Pointer, mitk::IDToLabelClassNameMapType> mitk::CreateLab
 
   // get relevant labels (as intersect of groupLabels and selectedLabels
   auto groupValues = segmentation->GetLabelValuesByGroup(groupID);
-  auto relevantDetectLamba = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType& result, MultiLabelSegmentation::LabelValueType element)
+  auto relevantDetectLamba = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType result, MultiLabelSegmentation::LabelValueType element)
     {
       if (std::find(selectedLabels.begin(), selectedLabels.end(), element) != selectedLabels.end())
       {

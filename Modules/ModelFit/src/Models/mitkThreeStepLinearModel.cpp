@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThreeStepLinearModel.h"
+#include <mitkThreeStepLinearModel.h>
 #include <mitkIOUtil.h>
 
 const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_y_bl = "baseline";
@@ -311,11 +311,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::ThreeStepLinearModel::ComputeDeri
     return result;
 };
 
-itk::LightObject::Pointer mitk::ThreeStepLinearModel::InternalClone() const
+mitk::ThreeStepLinearModel::ThreeStepLinearModel(const ThreeStepLinearModel& source)
+: Superclass(source)
 {
-  ThreeStepLinearModel::Pointer newClone = ThreeStepLinearModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

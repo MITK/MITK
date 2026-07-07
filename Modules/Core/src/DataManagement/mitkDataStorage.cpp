@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
-#include "itkCommand.h"
-#include "mitkDataNode.h"
-#include "mitkGroupTagProperty.h"
-#include "mitkImage.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkNodePredicateFunction.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
-#include "mitkArbitraryTimeGeometry.h"
+#include <itkCommand.h>
+#include <mitkDataNode.h>
+#include <mitkGroupTagProperty.h>
+#include <mitkImage.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
+#include <mitkArbitraryTimeGeometry.h>
 
 #include <regex>
 #include <set>
@@ -47,11 +47,36 @@ void mitk::DataStorage::Add(DataNode *node, DataNode *parent)
   this->Add(node, parents);
 }
 
+void mitk::DataStorage::Add(DataNode *node, const ConstSetOfObjects *parents)
+{
+  if (parents == nullptr)
+  {
+    this->Add(node, static_cast<const SetOfObjects *>(nullptr));
+    return;
+  }
+  // Convert ConstSetOfObjects to SetOfObjects. The const_cast below is a deliberate, justified
+  // exception to the "avoid const_cast" rule: the DataStorage owns all nodes as mutable objects,
+  // and the ConstPointer only reflects the caller's limited access, not the storage's ownership.
+  // This centralizes the cast here instead of requiring it at every call site.
+  SetOfObjects::Pointer mutableParents = SetOfObjects::New();
+  for (ConstSetOfObjects::ConstIterator it = parents->Begin(); it != parents->End(); it++)
+    mutableParents->InsertElement(mutableParents->Size(), const_cast<DataNode *>(it.Value().GetPointer()));
+  this->Add(node, mutableParents);
+}
+
 void mitk::DataStorage::Remove(const DataStorage::SetOfObjects *nodes)
 {
   if (nodes == nullptr)
     return;
   for (DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
+    this->Remove(it.Value());
+}
+
+void mitk::DataStorage::Remove(const ConstSetOfObjects *nodes)
+{
+  if (nodes == nullptr)
+    return;
+  for (ConstSetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
     this->Remove(it.Value());
 }
 
@@ -313,147 +338,171 @@ void mitk::DataStorage::RemoveListeners(const DataNode *_Node)
   }
 }
 
+namespace
+{
+  // Template helper to compute bounding geometry from any node container whose elements
+  // are implicitly convertible to const mitk::DataNode* (i.e. DataNode::Pointer or DataNode::ConstPointer).
+  template <typename Container>
+  mitk::TimeGeometry::ConstPointer ComputeBoundingGeometry3DImpl(const Container *input,
+                                                                  const char *boolPropertyKey,
+                                                                  const mitk::BaseRenderer *renderer,
+                                                                  const char *boolPropertyKey2)
+  {
+    mitk::BoundingBox::PointsContainer::Pointer pointscontainer = mitk::BoundingBox::PointsContainer::New();
+
+    mitk::BoundingBox::PointIdentifier pointid = 0;
+    mitk::Point3D point;
+
+    mitk::Vector3D minSpacing;
+    minSpacing.Fill(itk::NumericTraits<mitk::ScalarType>::max());
+
+    const mitk::ScalarType stmax = itk::NumericTraits<mitk::ScalarType>::max();
+    const mitk::ScalarType stmin = itk::NumericTraits<mitk::ScalarType>::NonpositiveMin();
+
+    std::set<mitk::ScalarType> existingTimePoints;
+    mitk::ScalarType maximalTime = 0;
+
+    // Needed for check of zero bounding boxes
+    mitk::ScalarType nullpoint[] = {0, 0, 0, 0, 0, 0};
+    mitk::BoundingBox::BoundsArrayType itkBoundsZero(nullpoint);
+
+    for (const auto &node : *input)
+    {
+      if (node.IsNotNull() && node->GetData() != nullptr && !node->GetData()->IsEmpty() &&
+          node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
+      {
+        const mitk::TimeGeometry *timeGeometry = node->GetData()->GetUpdatedTimeGeometry();
+
+        if (timeGeometry != nullptr)
+        {
+          // bounding box (only if non-zero)
+          mitk::BoundingBox::BoundsArrayType itkBounds = timeGeometry->GetBoundingBoxInWorld()->GetBounds();
+          if (itkBounds == itkBoundsZero)
+          {
+            continue;
+          }
+
+          unsigned char i;
+          for (i = 0; i < 8; ++i)
+          {
+            point = timeGeometry->GetCornerPointInWorld(i);
+            if (point[0] * point[0] + point[1] * point[1] + point[2] * point[2] < mitk::large)
+              pointscontainer->InsertElement(pointid++, point);
+            else
+            {
+              itkGenericOutputMacro(<< "Unrealistically distant corner point encountered. Ignored. Node: " << node);
+            }
+          }
+          try
+          {
+            // time bounds
+            // iterate over all time steps
+            // Attention: Objects with zero bounding box are not respected in time bound calculation
+            for (mitk::TimeStepType j = 0; j < timeGeometry->CountTimeSteps(); j++)
+            {
+              // We must not use 'node->GetData()->GetGeometry(j)->GetSpacing()' here, as it returns the spacing
+              // in its original space, which, in case of an image geometry, can have the values in different
+              // order than in world space. For the further calculations, we need to have the spacing values
+              // in world coordinate order (sag-cor-ax).
+              mitk::Vector3D spacing;
+              spacing.Fill(1.0);
+              node->GetData()->GetGeometry(j)->IndexToWorld(spacing, spacing);
+              for (int axis = 0; axis < 3; ++axis)
+              {
+                const mitk::ScalarType space = std::abs(spacing[axis]);
+                if (space < minSpacing[axis])
+                {
+                  minSpacing[axis] = space;
+                }
+              }
+
+              const auto curTimeBounds = timeGeometry->GetTimeBounds(j);
+              if ((curTimeBounds[0] > stmin) && (curTimeBounds[0] < stmax))
+              {
+                existingTimePoints.insert(curTimeBounds[0]);
+              }
+              if ((curTimeBounds[1] > maximalTime) && (curTimeBounds[1] < stmax))
+              {
+                maximalTime = curTimeBounds[1];
+              }
+            }
+          }
+          catch (const itk::ExceptionObject &e)
+          {
+            MITK_ERROR << e.GetDescription() << std::endl;
+          }
+        }
+      }
+    }
+
+    mitk::BoundingBox::Pointer result = mitk::BoundingBox::New();
+    result->SetPoints(pointscontainer);
+    result->ComputeBoundingBox();
+
+    // compute the number of time steps
+    if (existingTimePoints.empty()) // make sure that there is at least one time sliced geometry in the data storage
+    {
+      existingTimePoints.insert(0.0);
+      maximalTime = 1.0;
+    }
+
+    mitk::ArbitraryTimeGeometry::Pointer timeGeometry = nullptr;
+    if (result->GetPoints()->Size() > 0)
+    {
+      // Initialize a geometry of a single time step
+      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+      geometry->Initialize();
+      // correct bounding-box (is now in mm, should be in index-coordinates)
+      // according to spacing
+      mitk::BoundingBox::BoundsArrayType bounds = result->GetBounds();
+      mitk::AffineTransform3D::OutputVectorType offset;
+      for (int i = 0; i < 3; ++i)
+      {
+        offset[i] = bounds[i * 2];
+        bounds[i * 2] = 0.0;
+        bounds[i * 2 + 1] = (bounds[i * 2 + 1] - offset[i]) / minSpacing[i];
+      }
+      geometry->GetIndexToWorldTransform()->SetOffset(offset);
+      geometry->SetBounds(bounds);
+      geometry->SetSpacing(minSpacing);
+
+      // Initialize the time sliced geometry
+      auto tsIterator = existingTimePoints.cbegin();
+      auto tsPredecessor = tsIterator++;
+      const auto tsEnd = existingTimePoints.cend();
+      timeGeometry = mitk::ArbitraryTimeGeometry::New();
+      for (; tsIterator != tsEnd; ++tsIterator, ++tsPredecessor)
+      {
+        timeGeometry->AppendNewTimeStep(geometry, *tsPredecessor, *tsIterator);
+      }
+      timeGeometry->AppendNewTimeStep(geometry, *tsPredecessor, maximalTime);
+
+      timeGeometry->Update();
+    }
+    return timeGeometry.GetPointer();
+  }
+} // namespace
+
 mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(const SetOfObjects *input,
-                                                                              const char *boolPropertyKey,
-                                                                              const BaseRenderer *renderer,
-                                                                              const char *boolPropertyKey2) const
+                                                                               const char *boolPropertyKey,
+                                                                               const BaseRenderer *renderer,
+                                                                               const char *boolPropertyKey2) const
 {
   if (input == nullptr)
     throw std::invalid_argument("DataStorage: input is invalid");
 
-  BoundingBox::PointsContainer::Pointer pointscontainer = BoundingBox::PointsContainer::New();
+  return ComputeBoundingGeometry3DImpl(input, boolPropertyKey, renderer, boolPropertyKey2);
+}
 
-  BoundingBox::PointIdentifier pointid = 0;
-  Point3D point;
+mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(const ConstSetOfObjects *input,
+                                                                               const char *boolPropertyKey,
+                                                                               const BaseRenderer *renderer,
+                                                                               const char *boolPropertyKey2) const
+{
+  if (input == nullptr)
+    throw std::invalid_argument("DataStorage: input is invalid");
 
-  Vector3D minSpacing;
-  minSpacing.Fill(itk::NumericTraits<ScalarType>::max());
-
-  ScalarType stmax = itk::NumericTraits<ScalarType>::max();
-  ScalarType stmin = itk::NumericTraits<ScalarType>::NonpositiveMin();
-
-  std::set<ScalarType> existingTimePoints;
-  ScalarType maximalTime = 0;
-
-  // Needed for check of zero bounding boxes
-  ScalarType nullpoint[] = {0, 0, 0, 0, 0, 0};
-  BoundingBox::BoundsArrayType itkBoundsZero(nullpoint);
-
-  for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
-  {
-    DataNode::Pointer node = it->Value();
-    if ((node.IsNotNull()) && (node->GetData() != nullptr) && (node->GetData()->IsEmpty() == false) &&
-        node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
-    {
-      const TimeGeometry *timeGeometry = node->GetData()->GetUpdatedTimeGeometry();
-
-      if (timeGeometry != nullptr)
-      {
-        // bounding box (only if non-zero)
-        BoundingBox::BoundsArrayType itkBounds = timeGeometry->GetBoundingBoxInWorld()->GetBounds();
-        if (itkBounds == itkBoundsZero)
-        {
-          continue;
-        }
-
-        unsigned char i;
-        for (i = 0; i < 8; ++i)
-        {
-          point = timeGeometry->GetCornerPointInWorld(i);
-          if (point[0] * point[0] + point[1] * point[1] + point[2] * point[2] < large)
-            pointscontainer->InsertElement(pointid++, point);
-          else
-          {
-            itkGenericOutputMacro(<< "Unrealistically distant corner point encountered. Ignored. Node: " << node);
-          }
-        }
-        try
-        {
-          // time bounds
-          // iterate over all time steps
-          // Attention: Objects with zero bounding box are not respected in time bound calculation
-          for (TimeStepType i = 0; i < timeGeometry->CountTimeSteps(); i++)
-          {
-            // We must not use 'node->GetData()->GetGeometry(i)->GetSpacing()' here, as it returns the spacing
-            // in its original space, which, in case of an image geometry, can have the values in different
-            // order than in world space. For the further calculations, we need to have the spacing values
-            // in world coordinate order (sag-cor-ax).
-            Vector3D spacing;
-            spacing.Fill(1.0);
-            node->GetData()->GetGeometry(i)->IndexToWorld(spacing, spacing);
-            for (int axis = 0; axis < 3; ++ axis)
-            {
-              ScalarType space = std::abs(spacing[axis]);
-              if (space < minSpacing[axis])
-              {
-                minSpacing[axis] = space;
-              }
-            }
-
-            const auto curTimeBounds = timeGeometry->GetTimeBounds(i);
-            if ((curTimeBounds[0] > stmin) && (curTimeBounds[0] < stmax))
-            {
-              existingTimePoints.insert(curTimeBounds[0]);
-            }
-            if ((curTimeBounds[1] > maximalTime) && (curTimeBounds[1] < stmax))
-            {
-               maximalTime = curTimeBounds[1];
-            }
-          }
-        }
-        catch ( const itk::ExceptionObject &e )
-        {
-          MITK_ERROR << e.GetDescription() << std::endl;
-        }
-      }
-    }
-  }
-
-  BoundingBox::Pointer result = BoundingBox::New();
-  result->SetPoints(pointscontainer);
-  result->ComputeBoundingBox();
-
-  // compute the number of time steps
-  if (existingTimePoints.empty()) // make sure that there is at least one time sliced geometry in the data storage
-  {
-    existingTimePoints.insert(0.0);
-    maximalTime = 1.0;
-  }
-
-  ArbitraryTimeGeometry::Pointer timeGeometry = nullptr;
-  if (result->GetPoints()->Size() > 0)
-  {
-    // Initialize a geometry of a single time step
-    Geometry3D::Pointer geometry = Geometry3D::New();
-    geometry->Initialize();
-    // correct bounding-box (is now in mm, should be in index-coordinates)
-    // according to spacing
-    BoundingBox::BoundsArrayType bounds = result->GetBounds();
-    AffineTransform3D::OutputVectorType offset;
-    for (int i = 0; i < 3; ++i)
-    {
-      offset[i] = bounds[i * 2];
-      bounds[i * 2] = 0.0;
-      bounds[i * 2 + 1] = (bounds[i * 2 + 1] - offset[i]) / minSpacing[i];
-    }
-    geometry->GetIndexToWorldTransform()->SetOffset(offset);
-    geometry->SetBounds(bounds);
-    geometry->SetSpacing(minSpacing);
-
-    // Initialize the time sliced geometry
-    auto tsIterator = existingTimePoints.cbegin();
-    auto tsPredecessor = tsIterator++;
-    auto tsEnd = existingTimePoints.cend();
-    timeGeometry = ArbitraryTimeGeometry::New();
-    for (; tsIterator != tsEnd; ++tsIterator, ++tsPredecessor)
-    {
-      timeGeometry->AppendNewTimeStep(geometry, *tsPredecessor, *tsIterator);
-    }
-    timeGeometry->AppendNewTimeStep(geometry, *tsPredecessor, maximalTime);
-
-    timeGeometry->Update();
-  }
-  return timeGeometry.GetPointer();
+  return ComputeBoundingGeometry3DImpl(input, boolPropertyKey, renderer, boolPropertyKey2);
 }
 
 mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(const char *boolPropertyKey,

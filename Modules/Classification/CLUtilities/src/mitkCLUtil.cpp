@@ -25,9 +25,9 @@ found in the LICENSE file.
 // itk includes
 #include <itkCheckerBoardImageFilter.h>
 #include <itkShapedNeighborhoodIterator.h>
-#include "itkHessianRecursiveGaussianImageFilter.h"
-#include "itkUnaryFunctorImageFilter.h"
-#include "vnl/algo/vnl_symmetric_eigensystem.h"
+#include <itkHessianRecursiveGaussianImageFilter.h>
+#include <itkUnaryFunctorImageFilter.h>
+#include <vnl/algo/vnl_symmetric_eigensystem.h>
 #include <itkLaplacianRecursiveGaussianImageFilter.h>
 #include <itkMultiHistogramFilter.h>
 
@@ -133,7 +133,7 @@ void mitk::CLUtil::LaplacianOfGaussianFilter(mitk::Image::Pointer image, mitk::I
 
 void mitk::CLUtil::HessianOfGaussianFilter(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, double sigma)
 {
-  AccessByItk_2(image, mitk::CLUtil::itkHessianOfGaussianFilter, sigma, out);
+  AccessFixedDimensionByItk_2(image, mitk::CLUtil::itkHessianOfGaussianFilter, 3, sigma, out);
 }
 
 void mitk::CLUtil::LocalHistogram(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, int Bins, int NeighbourhoodSize)

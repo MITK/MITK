@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPreferenceListReaderOptionsFunctor.h"
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 mitk::PreferenceListReaderOptionsFunctor::PreferenceListReaderOptionsFunctor()
 {

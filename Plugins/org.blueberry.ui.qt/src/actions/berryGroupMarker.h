@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYGROUPMARKER_H
 #define BERRYGROUPMARKER_H
 
-#include <internal/berryAbstractGroupMarker.h>
+#include "internal/berryAbstractGroupMarker.h"
 
 namespace berry {
 

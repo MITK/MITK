@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLookupTablePropertySerializer.h"
-#include "mitkStringsToNumbers.h"
+#include <mitkLookupTablePropertySerializer.h>
+#include <mitkStringsToNumbers.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkLookupTableProperty.h>
 

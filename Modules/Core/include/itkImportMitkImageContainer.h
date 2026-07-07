@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkImportMitkImageContainer_h
-#define __itkImportMitkImageContainer_h
+#ifndef itkImportMitkImageContainer_h
+#define itkImportMitkImageContainer_h
 
 #include <itkImportImageContainer.h>
 #include <mitkImageAccessorBase.h>
@@ -20,8 +20,9 @@ found in the LICENSE file.
 namespace itk
 {
   /** \class ImportMitkImageContainer
-   * Defines an itk::Image front-end to an mitk::Image. This container
-   * conforms to the ImageContainerInterface. This is a full-fleged Object,
+   * \brief Defines an itk::Image front-end to an mitk::Image.
+   *
+   * This container conforms to the ImageContainerInterface. This is a full-fledged Object,
    * so there is modification time, debug, and reference count information.
    *
    * Template parameters for ImportMitkImageContainer:
@@ -57,12 +58,23 @@ namespace itk
     ///** Get the pointer from which the image data is imported. */
     // TElement *GetImportPointer() {return m_ImportPointer;};
 
-    /** \brief Set the mitk::ImageDataItem to be imported  */
     // void SetImageDataItem(mitk::ImageDataItem* imageDataItem);
+
+    /** \brief Set the image accessor from which data is imported.
+     *
+     * Stores the given image accessor and configures the import pointer
+     * to reference its underlying data buffer.
+     *
+     * \param imageAccess Pointer to the mitk::ImageAccessorBase providing access to the image data.
+     * \param noBytes Size of the image data buffer in bytes.
+     */
     void SetImageAccessor(mitk::ImageAccessorBase *imageAccess, size_t noBytes);
 
   protected:
+    /** \brief Default constructor. Initializes the image accessor to nullptr. */
     ImportMitkImageContainer();
+
+    /** \brief Destructor. Deletes the owned image accessor. */
     ~ImportMitkImageContainer() override;
 
     /** PrintSelf routine. Normally this is a protected internal method. It is
@@ -92,7 +104,7 @@ namespace itk
   }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkImportMitkImageContainer.txx"
+#include <itkImportMitkImageContainer.tpp>
 #endif
 
 #endif

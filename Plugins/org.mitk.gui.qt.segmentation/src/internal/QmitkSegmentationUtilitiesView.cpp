@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSegmentationUtilitiesView.h"
+#include <ui_QmitkSegmentationUtilitiesViewControls.h>
 
 #include <QmitkBooleanOperationsWidget.h>
 #include <QmitkImageMaskingWidget.h>
@@ -33,7 +34,8 @@ QmitkSegmentationUtilitiesView::~QmitkSegmentationUtilitiesView()
 
 void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls = std::make_unique<Ui::QmitkSegmentationUtilitiesViewControls>();
+  m_Controls->setupUi(parent);
 
   auto dataStorage = this->GetDataStorage();
   m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(dataStorage, parent);
@@ -41,6 +43,13 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
   m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(dataStorage, parent);
   m_ConvertToSegWidget = new QmitkConvertToMultiLabelSegmentationWidget(dataStorage, parent);
   m_ExtractFromSegWidget = new QmitkExtractFromMultiLabelSegmentationWidget(dataStorage, parent);
+
+  connect(m_ImageMaskingWidget, &QmitkImageMaskingWidget::NewResultsReady,
+    this, &QmitkSegmentationUtilitiesView::OnNewResultsReady);
+  connect(m_ConvertToSegWidget, &QmitkConvertToMultiLabelSegmentationWidget::NewResultsReady,
+    this, &QmitkSegmentationUtilitiesView::OnNewResultsReady);
+  connect(m_ExtractFromSegWidget, &QmitkExtractFromMultiLabelSegmentationWidget::NewResultsReady,
+    this, &QmitkSegmentationUtilitiesView::OnNewResultsReady);
 
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
@@ -51,12 +60,12 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
 {
-  m_Controls.toolBox->addItem(widget, icon, text);
+  m_Controls->toolBox->addItem(widget, icon, text);
 }
 
 void QmitkSegmentationUtilitiesView::SetFocus()
 {
-  m_Controls.toolBox->setFocus();
+  m_Controls->toolBox->setFocus();
 }
 
 void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWindowPart*)
@@ -65,4 +74,21 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWind
 
 void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
+}
+
+void QmitkSegmentationUtilitiesView::OnNewResultsReady(const QList<mitk::DataNode::Pointer>& nodes)
+{
+  if (nodes.empty())
+    return;
+
+  // Order matters: SynchronizeDataManagerSelection() triggers the Data Manager's selection
+  // handler, which re-derives every node's "selected" property, so set it afterwards.
+  this->FireNodesSelected(nodes);
+  this->SynchronizeDataManagerSelection();
+
+  for (const auto& node : nodes)
+  {
+    if (node.IsNotNull())
+      node->SetSelected(true);
+  }
 }

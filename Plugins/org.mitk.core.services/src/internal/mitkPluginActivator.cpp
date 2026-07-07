@@ -12,12 +12,18 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 
+#include <cassert>
+
 #include <mitkLogBackend.h>
 
 #include <QString>
 #include <QFileInfo>
+#include <QThread>
+#include <QCoreApplication>
+#include <QMetaObject>
 
-#include "internal/mitkDataStorageService.h"
+#include <mitkDataStorageService.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <usModuleRegistry.h>
 #include <usModule.h>
@@ -26,6 +32,57 @@ found in the LICENSE file.
 #include <mitkVtkLoggingAdapter.h>
 #include <mitkItkLoggingAdapter.h>
 
+
+namespace
+{
+  /**
+   * @brief Qt-specific dispatcher that marshals tasks to the GUI main thread.
+   *
+   * Provides both dispatch modes via QMetaObject::invokeMethod:
+   * ExecuteDispatched() uses Qt::BlockingQueuedConnection and blocks until the
+   * task has run on the main thread; Post() uses Qt::QueuedConnection and returns
+   * immediately, deferring the task to a later main-loop turn.
+   */
+  class QtStorageThreadDispatcher : public mitk::StorageThreadDispatcherBase
+  {
+  public:
+    mitkClassMacro(QtStorageThreadDispatcher, mitk::StorageThreadDispatcherBase);
+    itkFactorylessNewMacro(Self);
+
+    bool IsDispatchThread() const override
+    {
+      auto* app = QCoreApplication::instance();
+      return app != nullptr && QThread::currentThread() == app->thread();
+    }
+
+    void Post(std::function<void()> task) override
+    {
+      // Catch an empty task at the call site. A null std::function would queue fine
+      // and only throw std::bad_function_call on a later main-loop turn, far from
+      // here and hard to trace back.
+      assert(task && "Post() requires a non-empty task");
+
+      // Queue onto the main-thread event loop without blocking. A QueuedConnection
+      // only appends to the event queue (no thread creation, no synchronous run),
+      // so it is safe to call while the loader lock is held during plugin bring-up;
+      // the task runs on a later main-loop turn once the lock is released. This is
+      // deliberately a plain QueuedConnection, never BlockingQueuedConnection.
+      QMetaObject::invokeMethod(
+        QCoreApplication::instance(), std::move(task), Qt::QueuedConnection);
+    }
+
+  protected:
+    QtStorageThreadDispatcher() = default;
+    ~QtStorageThreadDispatcher() override = default;
+
+    void ExecuteDispatched(std::function<void()> task) override
+    {
+      QMetaObject::invokeMethod(
+        QCoreApplication::instance(), std::move(task), Qt::BlockingQueuedConnection);
+    }
+
+  };
+}
 
 namespace mitk
 {
@@ -86,12 +143,13 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   mitk::VtkLoggingAdapter::Initialize();
   mitk::ItkLoggingAdapter::Initialize();
 
-  //initialize data storage service
-  dataStorageService.reset(new DataStorageService());
-  context->registerService<mitk::IDataStorageService>(dataStorageService.data());
-
-  // Get the MitkCore Module Context
+  // Get the MitkCore Module Context (needed for service registration)
   mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+
+  // Initialize and register data storage service via CppMicroServices
+  dataStorageService.reset(new DataStorageService());
+  dataStorageService->SetDispatcher(QtStorageThreadDispatcher::New());
+  m_DataStorageServiceReg = mitkContext->RegisterService<IDataStorageService>(dataStorageService.data());
 
   // Process all already registered services
   std::vector<us::ServiceReferenceU> refs = mitkContext->GetServiceReferences("");
@@ -120,6 +178,8 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
   //clean up logging
   mitk::LogBackend::Unregister();
 
+  // Unregister and cleanup data storage service
+  m_DataStorageServiceReg.Unregister();
   dataStorageService.reset();
   mitkContext = nullptr;
   pluginContext = nullptr;

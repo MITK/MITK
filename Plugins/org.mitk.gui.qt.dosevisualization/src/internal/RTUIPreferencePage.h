@@ -14,11 +14,15 @@ found in the LICENSE file.
 #ifndef __RT_UI_PREFERENCE_PAGE_H
 #define __RT_UI_PREFERENCE_PAGE_H
 
-#include "berryIQtPreferencePage.h"
-
-#include "ui_RTUIPreferencePageControls.h"
+#include <berryIQtPreferencePage.h>
+#include <memory>
 
 class QWidget;
+
+namespace Ui
+{
+  class RTUIPreferencePageControls;
+}
 
 /**
 * \class RTUIPreferencePage
@@ -70,8 +74,8 @@ public:
 
 protected:
 
-  QWidget                 *m_MainControl;
-  Ui::RTUIPreferencePageControls* m_Controls;
+  QWidget* m_MainControl;
+  std::unique_ptr<Ui::RTUIPreferencePageControls> m_Controls;
 };
 
 #endif

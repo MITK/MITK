@@ -29,12 +29,6 @@ set(CACHED_RESOURCE_FILES
 
 # list of Qt .qrc files which contain additional resources
 # specific to this plugin
-set(QRC_FILES
-
-)
-
-set(CPP_FILES )
-
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})

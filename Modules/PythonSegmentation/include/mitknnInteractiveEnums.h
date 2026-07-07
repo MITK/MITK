@@ -40,23 +40,22 @@ namespace mitk::nnInteractive
   };
 
   /** \brief Converts an InteractionType to a corresponding string representation.
+   *
+   * \param[in] interactionType The interaction type to convert.
+   *
+   * \return A reference to a static string representing the interaction type
+   *         (e.g., "Point", "Box", "Scribble", "Lasso").
+   *
+   * \throw std::out_of_range if the interaction type is out of the valid range.
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::string& GetInteractionTypeAsString(InteractionType interactionType);
 
   /** \brief Returns all possible interaction types.
+   *
+   * \return A reference to a static array containing all InteractionType
+   *         enumerators.
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::array<InteractionType, 4>& GetAllInteractionTypes();
-
-  /** \brief Specifies the interaction modes for interactors.
-   *
-   * Interaction modes define specific behaviors during interactions, such as
-   * blocking left mouse button display interactions resp. crosshair navigation.
-   */
-  enum class InteractionMode
-  {
-    Default,                   /**< Default interaction mode */
-    BlockLMBDisplayInteraction /**< Block left mouse button display interaction */
-  };
 
   /** \brief Specifies the types of prompts used in %nnInteractive.
    *
@@ -76,10 +75,20 @@ namespace mitk::nnInteractive
   };
 
   /** \brief Converts a PromptType to a corresponding string representation.
+   *
+   * \param[in] promptType The prompt type to convert.
+   *
+   * \return A reference to a static string representing the prompt type
+   *         (e.g., "Positive", "Negative").
+   *
+   * \throw std::out_of_range if the prompt type is out of the valid range.
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::string& GetPromptTypeAsString(PromptType promptType);
 
   /** \brief Returns all possible prompt types.
+   *
+   * \return A reference to a static array containing all PromptType
+   *         enumerators.
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::array<PromptType, 2>& GetAllPromptTypes();
 
@@ -100,10 +109,19 @@ namespace mitk::nnInteractive
   };
 
   /** \brief Converts a Backend type to a corresponding string representation.
+   *
+   * \param[in] backend The backend type to convert.
+   *
+   * \return A reference to a static string representing the backend
+   *         (e.g., "CUDA", "CPU").
+   *
+   * \throw std::out_of_range if the backend type is out of the valid range.
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::string& GetBackendAsString(Backend backend);
 
   /** \brief Returns all possible backend types.
+   *
+   * \return A reference to a static array containing all Backend enumerators.
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::array<Backend, 2>& GetAllBackends();
 
@@ -120,7 +138,13 @@ namespace mitk::nnInteractive
   /** \brief Returns the color associated with a specific prompt type and color intensity.
    *
    * Use this function for color lookup to ensure a coherent color scheme across
-   * different interactors.
+   * different interactors. Positive prompts use green tones, negative prompts
+   * use red tones.
+   *
+   * \param[in] promptType The prompt type determining the base color hue.
+   * \param[in] colorIntensity The color intensity variant (muted or vibrant).
+   *
+   * \return A reference to a static Color object.
    */
   MITKPYTHONSEGMENTATION_EXPORT const Color& GetColor(PromptType promptType, ColorIntensity colorIntensity);
 }

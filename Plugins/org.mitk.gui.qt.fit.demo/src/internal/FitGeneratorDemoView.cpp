@@ -11,13 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "FitGeneratorDemoView.h"
+#include <ui_FitGeneratorDemoView.h>
 #include <QMessageBox>
 #include <QThreadPool>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkImage.h>
 #include <mitkImageTimeSelector.h>
@@ -44,19 +45,19 @@ typedef itk::Image<double, 4> DynamicITKImageType;
 
 void FitGeneratorDemoView::SetFocus()
 {
-  m_Controls.btnModelling->setFocus();
+  m_Controls->btnModelling->setFocus();
 }
 
 void FitGeneratorDemoView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
-  m_Controls.btnModelling->setEnabled(false);
+  m_Controls->setupUi(parent);
+  m_Controls->btnModelling->setEnabled(false);
 
-  connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
-  connect(m_Controls.btnGenerateTestData, SIGNAL(clicked()), this,
+  connect(m_Controls->btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
+  connect(m_Controls->btnGenerateTestData, SIGNAL(clicked()), this,
           SLOT(OnGenerateTestDataButtonClicked()));
 
-  m_Controls.leFitName->setText(tr("demo"));
+  m_Controls->leFitName->setText(tr("demo"));
 }
 
 void FitGeneratorDemoView::OnModellingButtonClicked()
@@ -132,37 +133,37 @@ void FitGeneratorDemoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*s
 
   if (m_selectedImage)
   {
-    m_Controls.lTimeseries->setText((m_selectedNode->GetName()).c_str());
+    m_Controls->lTimeseries->setText((m_selectedNode->GetName()).c_str());
   }
   else
   {
     if (m_selectedNode.IsNull())
     {
-      m_Controls.lTimeseries->setText("None");
+      m_Controls->lTimeseries->setText("None");
     }
     else
     {
-      m_Controls.lTimeseries->setText("Error. Selected node #1 is no 4D image!");
+      m_Controls->lTimeseries->setText("Error. Selected node #1 is no 4D image!");
     }
   }
 
   if (m_selectedMask)
   {
-    m_Controls.lMask->setText((m_selectedMaskNode->GetName()).c_str());
+    m_Controls->lMask->setText((m_selectedMaskNode->GetName()).c_str());
   }
   else
   {
     if (m_selectedMaskNode.IsNull())
     {
-      m_Controls.lMask->setText("None");
+      m_Controls->lMask->setText("None");
     }
     else
     {
-      m_Controls.lMask->setText("Error. Selected node #2 is no mask!");
+      m_Controls->lMask->setText("Error. Selected node #2 is no mask!");
     }
   }
 
-  m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull());
+  m_Controls->btnModelling->setEnabled(m_selectedImage.IsNotNull());
 }
 
 void FitGeneratorDemoView::Generate()
@@ -193,7 +194,7 @@ void FitGeneratorDemoView::Generate()
 
   mitk::modelFit::ModelFitInfo::Pointer fitSession =
     mitk::modelFit::CreateFitInfoFromModelParameterizer(parameterizer, m_selectedNode->GetData(),
-        mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), m_Controls.leFitName->text().toStdString());
+        mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), m_Controls->leFitName->text().toStdString());
 
   /////////////////////////
   //create job and put it into the thread pool
@@ -215,22 +216,27 @@ void FitGeneratorDemoView::Generate()
 }
 
 FitGeneratorDemoView::FitGeneratorDemoView()
+  : m_Controls(std::make_unique<Ui::FitGeneratorDemoViewControls>())
 {
   m_selectedImage = nullptr;
   m_selectedNode = nullptr;
 
 }
 
+FitGeneratorDemoView::~FitGeneratorDemoView()
+{
+}
+
 void FitGeneratorDemoView::OnJobFinished()
 {
-  this->m_Controls.textEdit->append(QString("Fitting finished"));
+  this->m_Controls->textEdit->append(QString("Fitting finished"));
 };
 
 void FitGeneratorDemoView::OnJobError(QString err)
 {
   MITK_ERROR << err.toStdString().c_str();
 
-  m_Controls.textEdit->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
+  m_Controls->textEdit->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
 
 };
 
@@ -245,10 +251,10 @@ void FitGeneratorDemoView::OnJobResultsAreAvailable(
 void FitGeneratorDemoView::OnJobProgress(double progress)
 {
   QString report = QString("Progress. ") + QString::number(progress);
-  this->m_Controls.textEdit->append(report);
+  this->m_Controls->textEdit->append(report);
 };
 
 void FitGeneratorDemoView::OnJobStatusChanged(QString info)
 {
-  this->m_Controls.textEdit->append(info);
+  this->m_Controls->textEdit->append(info);
 }

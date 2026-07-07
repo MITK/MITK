@@ -13,20 +13,23 @@ found in the LICENSE file.
 #ifndef mitkImagePixelReadAccessor_h
 #define mitkImagePixelReadAccessor_h
 
-#include "mitkImagePixelAccessor.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkImagePixelAccessor.h>
+#include <mitkImageReadAccessor.h>
 
 namespace mitk
 {
   class Image;
 
   /**
-   * @brief Gives locked and index-based read access for a particular image part.
-   * The class provides several set- and get-methods, which allow an easy pixel access.
+   * \brief Gives locked and index-based read access for a particular image part.
+   *
+   * The class provides several get-methods, which allow easy pixel access.
    * It needs to know about pixel type and dimension of its image at compile time.
-   * @tparam TPixel defines the PixelType
-   * @tparam VDimension defines the dimension for accessing data
-   * @ingroup Data
+   *
+   * \tparam TPixel Defines the pixel type.
+   * \tparam VDimension Defines the dimension for accessing data.
+   *
+   * \ingroup Data
    */
   template <class TPixel, unsigned int VDimension = 3>
   class ImagePixelReadAccessor : public ImagePixelAccessor<TPixel, VDimension>
@@ -57,6 +60,7 @@ namespace mitk
     {
     }
 
+    /** \brief Instantiates a mitk::ImageReadAccessor from an Image smart pointer. */
     ImagePixelReadAccessor(ImagePointer iP,
                            const ImageDataItem *iDI = nullptr,
                            int OptionFlags = ImageAccessorBase::DefaultBehavior)
@@ -64,6 +68,7 @@ namespace mitk
     {
     }
 
+    /** \brief Instantiates a mitk::ImageReadAccessor from a non-const Image raw pointer. */
     ImagePixelReadAccessor(Image *iP,
                            const ImageDataItem *iDI = nullptr,
                            int OptionFlags = ImageAccessorBase::DefaultBehavior)
@@ -71,6 +76,7 @@ namespace mitk
     {
     }
 
+    /** \brief Instantiates a mitk::ImageReadAccessor from a const Image raw pointer. */
     ImagePixelReadAccessor(const Image *iP,
                            const ImageDataItem *iDI = nullptr,
                            int OptionFlags = ImageAccessorBase::DefaultBehavior)
@@ -88,6 +94,11 @@ namespace mitk
       return *(((TPixel *)m_ReadAccessor.m_AddressBegin) + offset);
     }
 
+    /** \brief Returns consecutive pixel values starting at a given index as a variable length vector.
+     *  \param idx The starting index in the image.
+     *  \param nrComponents The number of consecutive components to read.
+     *  \return A variable length vector containing the requested pixel components.
+     */
     itk::VariableLengthVector<TPixel> GetConsecutivePixelsAsVector(const itk::Index<VDimension> &idx,
                                                                    int nrComponents) const
     {

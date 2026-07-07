@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkConcreteModelParameterizerBase.h"
+#include <mitkTwoStepLinearModelFactory.h>
+#include <mitkConcreteModelParameterizerBase.h>
 
 mitk::TwoStepLinearModelFactory::TwoStepLinearModelFactory()
 {

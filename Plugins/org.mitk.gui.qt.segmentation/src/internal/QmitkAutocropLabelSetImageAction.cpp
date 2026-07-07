@@ -242,14 +242,6 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
   }
 }
 
-void QmitkAutocropLabelSetImageAction::SetSmoothed(bool)
-{
-}
-
-void QmitkAutocropLabelSetImageAction::SetDecimated(bool)
-{
-}
-
 void QmitkAutocropLabelSetImageAction::SetDataStorage(mitk::DataStorage*)
 {
 }

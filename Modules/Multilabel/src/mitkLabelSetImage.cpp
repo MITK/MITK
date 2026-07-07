@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSetImage.h"
+#include <mitkLabelSetImage.h>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImagePixelReadAccessor.h>
 
-#include <itkLabelGeometryImageFilter.h>
+#include <itkLabelImageToShapeLabelMapFilter.h>
 #include <itkCommand.h>
 #include <itkBinaryFunctorImageFilter.h>
 
@@ -106,8 +106,8 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation()
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
 
-  // Add some DICOM Tags as properties to segmentation image
-  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
+  DICOMSegmentationPropertyHelper::Complete(this,
+    DICOMSegmentationPropertyHelper::CompletionOptions{});
 }
 
 mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegmentation &other)
@@ -125,8 +125,8 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegme
   }
   m_Groups = other.m_Groups;
 
-  // Add some DICOM Tags as properties to segmentation image
-  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
+  DICOMSegmentationPropertyHelper::Complete(this,
+    DICOMSegmentationPropertyHelper::CompletionOptions{});
 }
 
 mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
@@ -253,7 +253,9 @@ mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 {
   if (m_GroupContainer.empty()) mitkThrow() << "Cannot return active group index. No group is available.";
-  if (m_ActiveLabelValue == UNLABELED_VALUE) return 0;
+  // A stale active value must never abort a caller on the render hot path
+  // (the 2D mapper queries this every frame); treat it like "no active label".
+  if (m_ActiveLabelValue == UNLABELED_VALUE || !this->ExistLabel(m_ActiveLabelValue)) return 0;
 
   return this->GetGroupIndexOfLabel(m_ActiveLabelValue);
 }
@@ -612,7 +614,7 @@ const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType gr
   return m_GroupContainer.at(groupID).GetPointer();
 }
 
-void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep)
+void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep, int sourceAccessOptions)
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot update group image. Group ID is invalid. Invalid ID: " << groupID;
   if (nullptr == sourceImage) mitkThrow() << "Error, cannot update group image. Passed sourceImage is invalid.";
@@ -623,7 +625,7 @@ void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, cons
     mitkThrow() << "Error, cannot update group image. Passed sourceImage has not the same geometry then the MultiLabelSegmentationInstance.";
 
   auto imageTimeStep = SelectImageByTimeStep(sourceImage, sourceTimestep);
-  mitk::ImageReadAccessor sourceImageAcc(imageTimeStep);
+  mitk::ImageReadAccessor sourceImageAcc(imageTimeStep, nullptr, sourceAccessOptions);
   m_GroupContainer[groupID]->SetVolume(sourceImageAcc.GetData(), timestep);
 }
 
@@ -648,6 +650,17 @@ void mitk::MultiLabelSegmentation::SetGroupName(GroupIndexType groupID, const st
 
 void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
 {
+  // The active label is soft selection state that UI/async model churn can
+  // request for a value that was just removed. Accepting such a value would
+  // either leave m_ActiveLabelValue referring to a label that no longer
+  // exists or throw in GetGroupIndexOfLabel below, so it is ignored, keeping
+  // the previous selection, and reported instead of being fatal.
+  if (UNLABELED_VALUE != label && !this->ExistLabel(label))
+  {
+    MITK_WARN << "Ignored request to activate a label that does not exist. Invalid label value: " << label;
+    return;
+  }
+
   if (m_ActiveLabelValue != label)
   {
     bool eventNeeded = false;
@@ -1255,16 +1268,27 @@ void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *it
   auto label = this->GetLabel(pixelValue);
   if (label.IsNotNull())
   {
-    auto labelGeometryFilter = itk::LabelGeometryImageFilter<ImageType>::New();
-    labelGeometryFilter->SetInput(itkImage);
-    labelGeometryFilter->Update();
-    auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
+    using ShapeLabelMapFilterType = itk::LabelImageToShapeLabelMapFilter<ImageType>;
+    auto shapeLabelMapFilter = ShapeLabelMapFilterType::New();
+    shapeLabelMapFilter->SetInput(itkImage);
+    shapeLabelMapFilter->Update();
+    const auto *labelMap = shapeLabelMapFilter->GetOutput();
 
-    Point3D pos(centroid[0], centroid[1], centroid[2]);
-    mitk::Point3D coordinates;
+    if (labelMap->HasLabel(pixelValue))
+    {
+      const auto *labelObject = labelMap->GetLabelObject(pixelValue);
+      const auto &physicalCentroid = labelObject->GetCentroid();
 
-    this->GetSlicedGeometry()->IndexToWorld(pos, coordinates);
-    label->UpdateCenterOfMass(pos,coordinates);
+      mitk::Point3D coordinates;
+      coordinates[0] = physicalCentroid[0];
+      coordinates[1] = physicalCentroid[1];
+      coordinates[2] = physicalCentroid[2];
+
+      mitk::Point3D pos;
+      this->GetSlicedGeometry()->WorldToIndex(coordinates, pos);
+
+      label->UpdateCenterOfMass(pos, coordinates);
+    }
   }
 }
 

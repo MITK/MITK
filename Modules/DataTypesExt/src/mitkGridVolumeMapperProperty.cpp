@@ -10,13 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGridVolumeMapperProperty.h"
+#include <mitkGridVolumeMapperProperty.h>
 #include <vtkProperty.h>
 
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty()
 {
   AddRepresentationTypes();
   SetValue(PT);
+}
+
+mitk::GridVolumeMapperProperty::GridVolumeMapperProperty(const mitk::GridVolumeMapperProperty &other)
+  : mitk::EnumerationProperty(other)
+{
 }
 
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty(const IdType &value)
@@ -70,11 +75,4 @@ void mitk::GridVolumeMapperProperty::AddRepresentationTypes()
 bool mitk::GridVolumeMapperProperty::AddEnum(const std::string &name, const IdType &id)
 {
   return Superclass::AddEnum(name, id);
-}
-
-itk::LightObject::Pointer mitk::GridVolumeMapperProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
 }

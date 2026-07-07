@@ -3,7 +3,7 @@
 The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Division of Medical Image Computing.
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -24,12 +24,11 @@ namespace mitk
   /*!
    * @brief Activator class for the @ref PET SUV calculation plugin.
    * @details This small helper class is necessary for the integration as a CTK plug-in.
-   * @author Charlie Debus
    */
   class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_segmentation")
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_pet_suvcalculation")
     Q_INTERFACES(ctkPluginActivator)
 
   public:

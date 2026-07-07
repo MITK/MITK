@@ -19,23 +19,29 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Reads a MultiLabelSegmentation from a mitklabel.json file 
-  * (including the associated image files).
-  * mitk::Identifiable UID is supported and will be serialized.
-  * @ingroup Process
-  */
+   * \brief Read a MultiLabelSegmentation from a mitklabel.json file and its associated image files.
+   *
+   * mitk::Identifiable UID is supported and will be deserialized.
+   *
+   * \ingroup Process
+   */
   class MultiLabelSegmentationStackReader : public mitk::AbstractFileReader
   {
   public:
     typedef mitk::MultiLabelSegmentation InputType;
 
+    /** \brief Default constructor. Registers reader for the multi-label meta MIME type. */
     MultiLabelSegmentationStackReader();
     ~MultiLabelSegmentationStackReader() = default;
 
+    /** \brief Return the confidence level for reading the given file as a multi-label stack. */
     ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
-
+    /**
+     * \brief Perform the actual reading of the multi-label stack.
+     * \return A vector of loaded BaseData objects (MultiLabelSegmentations).
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
 

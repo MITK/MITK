@@ -1,10 +1,10 @@
-set(CPP_FILES
-  itkShortestPathNode.cpp
-)
 set(H_FILES
   itkShortestPathCostFunction.h
-  itkShortestPathCostFunctionTbss.h
-  itkShortestPathNode.h
-  itkShortestPathImageFilter.h
   itkShortestPathCostFunctionLiveWire.h
+  itkShortestPathCostFunctionTbss.h
+  itkShortestPathImageFilter.h
+)
+
+set(CPP_FILES
+  itkShortestPathNode.cpp
 )

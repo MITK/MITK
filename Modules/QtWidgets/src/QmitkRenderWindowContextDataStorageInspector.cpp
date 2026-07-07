@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // render window manager UI module
-#include "QmitkRenderWindowContextDataStorageInspector.h"
+#include <QmitkRenderWindowContextDataStorageInspector.h>
+
+#include <ui_QmitkRenderWindowContextDataStorageInspector.h>
 
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
@@ -29,7 +31,8 @@ QmitkRenderWindowContextDataStorageInspector::QmitkRenderWindowContextDataStorag
   mitk::BaseRenderer* renderer /* = nullptr */)
   : QmitkAbstractDataStorageInspector(parent)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkRenderWindowContextDataStorageInspector>();
+  m_Controls->setupUi(this);
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ renderer };
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
@@ -37,18 +40,18 @@ QmitkRenderWindowContextDataStorageInspector::QmitkRenderWindowContextDataStorag
   m_StorageModel = std::make_unique<QmitkRenderWindowDataStorageTreeModel>(this);
   m_StorageModel->SetControlledRenderer(controlledRenderer);
 
-  m_Controls.renderWindowTreeView->setModel(m_StorageModel.get());
-  m_Controls.renderWindowTreeView->setHeaderHidden(true);
-  m_Controls.renderWindowTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  m_Controls.renderWindowTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.renderWindowTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  m_Controls.renderWindowTreeView->setAlternatingRowColors(true);
-  m_Controls.renderWindowTreeView->setDragEnabled(true);
-  m_Controls.renderWindowTreeView->setDropIndicatorShown(true);
-  m_Controls.renderWindowTreeView->setAcceptDrops(true);
-  m_Controls.renderWindowTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls->renderWindowTreeView->setModel(m_StorageModel.get());
+  m_Controls->renderWindowTreeView->setHeaderHidden(true);
+  m_Controls->renderWindowTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_Controls->renderWindowTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls->renderWindowTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_Controls->renderWindowTreeView->setAlternatingRowColors(true);
+  m_Controls->renderWindowTreeView->setDragEnabled(true);
+  m_Controls->renderWindowTreeView->setDropIndicatorShown(true);
+  m_Controls->renderWindowTreeView->setAcceptDrops(true);
+  m_Controls->renderWindowTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  connect(m_Controls.renderWindowTreeView, &QTreeView::customContextMenuRequested,
+  connect(m_Controls->renderWindowTreeView, &QTreeView::customContextMenuRequested,
           this, &QmitkRenderWindowContextDataStorageInspector::OnContextMenuRequested);
 
   SetUpConnections();
@@ -61,29 +64,33 @@ QmitkRenderWindowContextDataStorageInspector::QmitkRenderWindowContextDataStorag
   m_StorageModel->SetCurrentRenderer(renderer);
 }
 
+QmitkRenderWindowContextDataStorageInspector::~QmitkRenderWindowContextDataStorageInspector()
+{
+}
+
 QAbstractItemView* QmitkRenderWindowContextDataStorageInspector::GetView()
 {
-  return m_Controls.renderWindowTreeView;
+  return m_Controls->renderWindowTreeView;
 }
 
 const QAbstractItemView* QmitkRenderWindowContextDataStorageInspector::GetView() const
 {
-  return m_Controls.renderWindowTreeView;
+  return m_Controls->renderWindowTreeView;
 }
 
 void QmitkRenderWindowContextDataStorageInspector::SetSelectionMode(SelectionMode mode)
 {
-  m_Controls.renderWindowTreeView->setSelectionMode(mode);
+  m_Controls->renderWindowTreeView->setSelectionMode(mode);
 }
 
 QmitkRenderWindowContextDataStorageInspector::SelectionMode QmitkRenderWindowContextDataStorageInspector::GetSelectionMode() const
 {
-  return m_Controls.renderWindowTreeView->selectionMode();
+  return m_Controls->renderWindowTreeView->selectionMode();
 }
 
 QItemSelectionModel* QmitkRenderWindowContextDataStorageInspector::GetDataNodeSelectionModel() const
 {
-  return m_Controls.renderWindowTreeView->selectionModel();
+  return m_Controls->renderWindowTreeView->selectionModel();
 }
 
 void QmitkRenderWindowContextDataStorageInspector::Initialize()
@@ -102,7 +109,7 @@ void QmitkRenderWindowContextDataStorageInspector::Initialize()
 
   m_RenderWindowLayerController->SetDataStorage(dataStorage);
 
-  m_Connector->SetView(m_Controls.renderWindowTreeView);
+  m_Connector->SetView(m_Controls->renderWindowTreeView);
 }
 
 void QmitkRenderWindowContextDataStorageInspector::SetUpConnections()
@@ -112,7 +119,7 @@ void QmitkRenderWindowContextDataStorageInspector::SetUpConnections()
 
 void QmitkRenderWindowContextDataStorageInspector::ModelRowsInserted(const QModelIndex& parent, int /*start*/, int /*end*/)
 {
-  m_Controls.renderWindowTreeView->setExpanded(parent, true);
+  m_Controls->renderWindowTreeView->setExpanded(parent, true);
 }
 
 void QmitkRenderWindowContextDataStorageInspector::OnContextMenuRequested(const QPoint& pos)

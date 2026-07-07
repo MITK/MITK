@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationPreferencePage.h"
 
-#include <mitkBaseApplication.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -34,7 +33,7 @@ namespace
 }
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
-  : m_Ui(new Ui::QmitkSegmentationPreferencePageControls),
+  : m_Ui(std::make_unique<Ui::QmitkSegmentationPreferencePageControls>()),
     m_Control(nullptr),
     m_Initializing(false)
 {
@@ -58,6 +57,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Ui->labelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
   connect(m_Ui->suggestionsToolButton, SIGNAL(clicked()), this, SLOT(OnSuggestionsButtonClicked()));
   connect(m_Ui->comboBuiltInSuggestions, &QComboBox::currentIndexChanged, this, &QmitkSegmentationPreferencePage::OnBuilInSuggestionsChanged);
+  connect(m_Ui->check3DRendering, &QCheckBox::toggled, m_Ui->check3DSmoothed, &QCheckBox::setEnabled);
 
   this->Update();
   m_Initializing = false;
@@ -79,19 +79,30 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutFloat("opacity factor", opacityFactor);
 
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
-  prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
-  prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
+
+  prefs->PutBool("warn before converting to segmentation", m_Ui->convertWarningCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("label set preset"))
+    prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
+
+  if (!prefs->IsOverridden("default label naming"))
+    prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
 
   prefs->Put("standard label suggestions", m_Ui->comboBuiltInSuggestions->currentText().toStdString());
-  prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
-  prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
-  prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("external label suggestions"))
+    prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
+
+  if (!prefs->IsOverridden("replace standard suggestions"))
+    prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("suggest once"))
+    prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+
   prefs->PutBool("enforce suggestions", m_Ui->enforceSuggestionsCheckBox->isChecked());
 
-  prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
-  prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
-
   prefs->PutBool("activate 3D rendering", m_Ui->check3DRendering->isChecked());
+  prefs->PutBool("3D rendering smoothed", m_Ui->check3DSmoothed->isChecked());
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 
   return true;
@@ -121,16 +132,15 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 
+  m_Ui->convertWarningCheckBox->setChecked(prefs->GetBool("warn before converting to segmentation", true));
+
   //label presets
-  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
-  bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
+  bool isOverridden = prefs->IsOverridden("label set preset");
+  auto labelSetPreset = prefs->Get("label set preset", "");
 
-  if (!isOverriddenByCmdLineArg)
-    labelSetPreset = prefs->Get("label set preset", "");
-
-  m_Ui->labelSetPresetLineEdit->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->labelSetPresetToolButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);
+  m_Ui->labelSetPresetLineEdit->setDisabled(isOverridden);
+  m_Ui->labelSetPresetToolButton->setDisabled(isOverridden);
+  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverridden);
 
   m_Ui->labelSetPresetLineEdit->setText(QString::fromStdString(labelSetPreset));
 
@@ -143,8 +153,9 @@ void QmitkSegmentationPreferencePage::Update()
     m_Ui->askForNameRadioButton->setChecked(true);
   }
 
-  m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
+  bool isLabelNamingOverridden = prefs->IsOverridden("default label naming");
+  m_Ui->defaultNameRadioButton->setDisabled(isLabelNamingOverridden);
+  m_Ui->askForNameRadioButton->setDisabled(isLabelNamingOverridden);
 
   //label suggestions
   mitk::LabelSuggestionHelper::Preferences defaultPrefs;
@@ -161,12 +172,10 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", defaultPrefs.suggestionOnce));
   m_Ui->enforceSuggestionsCheckBox->setChecked(prefs->GetBool("enforce suggestions", defaultPrefs.enforceSuggestions));
 
-  //MONAI
-
-  m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
-  m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));
-
-  m_Ui->check3DRendering->setChecked(prefs->GetBool("activate 3D rendering", true));
+  const bool activate3D = prefs->GetBool("activate 3D rendering", true);
+  m_Ui->check3DRendering->setChecked(activate3D);
+  m_Ui->check3DSmoothed->setChecked(prefs->GetBool("3D rendering smoothed", true));
+  m_Ui->check3DSmoothed->setEnabled(activate3D);
 }
 
 void QmitkSegmentationPreferencePage::FillBuiltInSuggestionComboBox(std::string& standardLabelSuggestions)

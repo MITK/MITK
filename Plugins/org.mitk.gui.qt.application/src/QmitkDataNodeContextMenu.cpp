@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeContextMenu.h>
+#include "QmitkDataNodeContextMenu.h"
 
 #include <QmitkCustomVariants.h>
-#include <QmitkFileSaveAction.h>
+#include "QmitkFileSaveAction.h"
 #include <QmitkNodeDescriptorManager.h>
 
 #include <mitkDataNodeSelection.h>
-#include <mitkIContextMenuAction.h>
+#include "mitkIContextMenuAction.h"
 
 #include <berryAbstractUICTKPlugin.h>
 #include <berryIContributor.h>
@@ -65,11 +65,6 @@ void QmitkDataNodeContextMenu::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
     if (nullptr != dataNodeAction)
       dataNodeAction->SetBaseRenderer(baseRenderer);
   }
-}
-
-void QmitkDataNodeContextMenu::SetSurfaceDecimation(bool surfaceDecimation)
-{
-  m_SurfaceDecimation = surfaceDecimation;
 }
 
 void QmitkDataNodeContextMenu::SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes)
@@ -322,12 +317,6 @@ void QmitkDataNodeContextMenu::OnExtensionPointActionTriggered(QAction* action)
 
   if (dataStorage.IsNotNull())
     contextMenuAction->SetDataStorage(dataStorage);
-
-  if ("QmitkCreatePolygonModelAction" == configElement->GetAttribute("class"))
-  {
-    contextMenuAction->SetSmoothed("true" == configElement->GetAttribute("smoothed"));
-    contextMenuAction->SetDecimated(m_SurfaceDecimation);
-  }
 
   contextMenuAction->Run(m_SelectedNodes);
 }

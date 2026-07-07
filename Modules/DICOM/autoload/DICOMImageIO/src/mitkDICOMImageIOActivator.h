@@ -24,11 +24,20 @@ namespace mitk {
 struct IFileReader;
 class IDICOMTagsOfInterest;
 
+/**
+ * \brief Module activator for the DICOM Image IO module.
+ *
+ * Registers DICOM reader services (auto-selecting, manual-selecting, and
+ * simple volume readers) and DICOM tags-of-interest service when the module
+ * is loaded.
+ */
 class DICOMImageIOActivator : public us::ModuleActivator
 {
 public:
-
+  /** \brief Register DICOM reader services and tags-of-interest service. */
   void Load(us::ModuleContext* context) override;
+
+  /** \brief Unregister all DICOM IO services. */
   void Unload(us::ModuleContext* context) override;
 
 private:

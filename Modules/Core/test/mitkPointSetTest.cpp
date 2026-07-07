@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkInteractionConst.h>
 #include <mitkNumericTypes.h>
@@ -38,6 +38,7 @@ class mitkPointSetTestSuite : public mitk::TestFixture
   MITK_TEST(TestSwapPointPositionDownwardsNotPossible);
   MITK_TEST(TestCreateHoleInThePointIDs);
   MITK_TEST(TestInsertPointWithPointSpecification);
+  MITK_TEST(TestInsertPointSpecExpandsTimeSteps);
   MITK_TEST(TestRemovePointInterface);
   MITK_TEST(TestMaxIdAccess);
   MITK_TEST(TestInsertPointAtEnd);
@@ -313,14 +314,22 @@ std::cout<<"[PASSED]"<<std::endl;
     tempPoint = pointSet->GetPoint(5);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("check InsertPoint with PointSpecification", true, tempPoint == point5);
-    /*
-      if (tempPoint != point5)
-      {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-      }
-      std::cout<<"[PASSED]"<<std::endl;
-     */
+  }
+
+  void TestInsertPointSpecExpandsTimeSteps()
+  {
+    // InsertPoint(id, point, spec, t) must expand the PointSet to cover time
+    // step t, matching SetPoint and the other InsertPoint overloads.
+    mitk::PointSet::Pointer ps = mitk::PointSet::New();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("initial time step count", 1u, ps->GetPointSetSeriesSize());
+
+    mitk::Point3D point;
+    point.Fill(42);
+    ps->InsertPoint(0, point, mitk::PTEDGE, 3);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("time steps expanded to t+1", 4u, ps->GetPointSetSeriesSize());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("point exists at target time step", true, ps->IndexExists(0, 3));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("point value round-trips", true, ps->GetPoint(0, 3) == point);
   }
 
   void TestRemovePointInterface()

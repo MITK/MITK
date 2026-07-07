@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToRunLengthMatrixFilter_h
-#define __itkEnhancedScalarImageToRunLengthMatrixFilter_h
+#ifndef itkEnhancedScalarImageToRunLengthMatrixFilter_h
+#define itkEnhancedScalarImageToRunLengthMatrixFilter_h
 
-#include "itkImage.h"
-#include "itkHistogram.h"
-#include "itkNumericTraits.h"
-#include "itkVectorContainer.h"
+#include <itkImage.h>
+#include <itkHistogram.h>
+#include <itkNumericTraits.h>
+#include <itkVectorContainer.h>
 
 namespace itk
 {
@@ -109,7 +109,6 @@ namespace itk
     * \sa HistogramToRunLengthFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template<typename TImageType, typename THistogramFrequencyContainer =
@@ -282,7 +281,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToRunLengthMatrixFilter.hxx"
+#include <itkEnhancedScalarImageToRunLengthMatrixFilter.tpp>
 #endif
 
 #endif

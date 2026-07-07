@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitResultRelationRule.h"
-#include "mitkModelFitConstants.h"
+#include <mitkModelFitResultRelationRule.h>
+#include <mitkModelFitConstants.h>
 
 #include <mitkDataNode.h>
 
@@ -29,6 +29,10 @@ bool mitk::ModelFitResultRelationRule::IsDestinationCandidate(const IPropertyPro
 
 mitk::ModelFitResultRelationRule::ModelFitResultRelationRule()
   : SourceImageRelationRule("Model fit input", "Model fit result relation", "fit result", "source image")
+{}
+
+mitk::ModelFitResultRelationRule::ModelFitResultRelationRule(const ModelFitResultRelationRule &other)
+  : SourceImageRelationRule(other)
 {}
 
 
@@ -72,9 +76,3 @@ void mitk::ModelFitResultRelationRule::Disconnect_datalayer(IPropertyOwner * sou
   //disconnected on purpose.
 }
 
-itk::LightObject::Pointer mitk::ModelFitResultRelationRule::InternalClone() const
-{
-  itk::LightObject::Pointer result = Self::New().GetPointer();
-
-  return result;
-}

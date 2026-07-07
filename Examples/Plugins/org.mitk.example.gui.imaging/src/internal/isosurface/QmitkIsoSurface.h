@@ -13,9 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkIsoSurface_h
 #define QmitkIsoSurface_h
 
-#include "QmitkAbstractView.h"
-#include "mitkColorSequenceRainbow.h"
-#include "mitkDataStorage.h"
+#include <QmitkAbstractView.h>
+#include <mitkColorSequenceRainbow.h>
+#include <mitkDataStorage.h>
+#include <memory>
 
 namespace Ui
 {
@@ -65,7 +66,7 @@ private:
   /**
    * controls containing sliders for scrolling through the slices
    */
-  Ui::QmitkIsoSurfaceControls *m_Controls;
+  std::unique_ptr<Ui::QmitkIsoSurfaceControls> m_Controls;
 
   /**
    * image which is used to create the surface

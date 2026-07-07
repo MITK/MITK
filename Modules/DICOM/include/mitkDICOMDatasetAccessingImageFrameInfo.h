@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkDICOMDatasetAccessingImageFrameInfo_h
 #define mitkDICOMDatasetAccessingImageFrameInfo_h
 
-#include "mitkDICOMImageFrameInfo.h"
-#include "mitkDICOMDatasetAccess.h"
+#include <mitkDICOMImageFrameInfo.h>
+#include <mitkDICOMDatasetAccess.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {
@@ -43,14 +43,30 @@ namespace mitk
   };
 
 
+  /** \brief A list of smart pointers to DICOMDatasetAccessingImageFrameInfo instances. */
   typedef std::vector<DICOMDatasetAccessingImageFrameInfo::Pointer> DICOMDatasetAccessingImageFrameList;
 
+  /**
+   * \brief Convert a list of DICOMDatasetAccessingImageFrameInfo to a list of DICOMImageFrameInfo.
+   * \param[in] input The list to convert.
+   * \return A vector of DICOMImageFrameInfo smart pointers.
+   */
   MITKDICOM_EXPORT mitk::DICOMImageFrameList
     ConvertToDICOMImageFrameList(const DICOMDatasetAccessingImageFrameList& input);
 
+  /**
+   * \brief Convert a list of DICOMDatasetAccessingImageFrameInfo to a raw pointer list of DICOMDatasetAccess.
+   * \param[in] input The list to convert.
+   * \return A vector of raw DICOMDatasetAccess pointers.
+   */
   MITKDICOM_EXPORT mitk::DICOMDatasetList
     ConvertToDICOMDatasetList(const DICOMDatasetAccessingImageFrameList& input);
 
+  /**
+   * \brief Convert a raw DICOMDatasetList to a list of DICOMDatasetAccessingImageFrameInfo smart pointers.
+   * \param[in] input The raw pointer list to convert (elements must be DICOMDatasetAccessingImageFrameInfo instances).
+   * \return A vector of DICOMDatasetAccessingImageFrameInfo smart pointers.
+   */
   MITKDICOM_EXPORT mitk::DICOMDatasetAccessingImageFrameList
     ConvertToDICOMDatasetAccessingImageFrameList(const DICOMDatasetList& input);
 

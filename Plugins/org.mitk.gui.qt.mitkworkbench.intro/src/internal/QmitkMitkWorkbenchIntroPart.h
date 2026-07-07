@@ -17,8 +17,12 @@ found in the LICENSE file.
 #include <QtCore/qconfig.h>
 
 #include <berryQtIntroPart.h>
-#include <ui_QmitkWelcomeScreenViewControls.h>
+#include <memory>
 
+namespace Ui
+{
+  class QmitkWelcomeScreenViewControls;
+}
 
 /**
  * \ingroup org_mitk_gui_qt_welcomescreen_internal
@@ -66,7 +70,7 @@ private:
   void CreateConnections();
   void OnLoadFinished(bool ok);
 
-  Ui::QmitkWelcomeScreenViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkWelcomeScreenViewControls> m_Controls;
 
   class Impl;
   Impl* m_Impl;

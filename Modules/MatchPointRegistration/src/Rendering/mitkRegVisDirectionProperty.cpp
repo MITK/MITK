@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegVisDirectionProperty.h"
+#include <mitkRegVisDirectionProperty.h>
 
 
 mitk::RegVisDirectionProperty::RegVisDirectionProperty( )

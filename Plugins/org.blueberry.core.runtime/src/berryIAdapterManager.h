@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIADAPTERMANAGER_H_
 #define BERRYIADAPTERMANAGER_H_
 
-#include <berryMacros.h>
+#include "berryMacros.h"
 
 #include <org_blueberry_core_runtime_Export.h>
 

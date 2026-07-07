@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTextAnnotation3D.h"
+#include <mitkTextAnnotation3D.h>
 #include <vtkCamera.h>
 #include <vtkFollower.h>
 #include <vtkMath.h>
@@ -33,13 +33,7 @@ mitk::TextAnnotation3D::TextAnnotation3D()
 
 mitk::TextAnnotation3D::~TextAnnotation3D()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::TextAnnotation3D::LocalStorage::~LocalStorage()

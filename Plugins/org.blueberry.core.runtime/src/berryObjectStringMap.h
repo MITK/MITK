@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYOBJECTSTRINGMAP_H
 #define BERRYOBJECTSTRINGMAP_H
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 #include <QHash>
 

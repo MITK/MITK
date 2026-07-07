@@ -21,8 +21,6 @@ const std::string WorkbenchPreferenceConstants::OPEN_NEW_PERSPECTIVE =
     "OPEN_NEW_PERSPECTIVE";
 const std::string WorkbenchPreferenceConstants::OPEN_PERSPECTIVE_WINDOW =
     "OPEN_PERSPECTIVE_WINDOW";
-const std::string WorkbenchPreferenceConstants::OPEN_PERSPECTIVE_PAGE =
-    "OPEN_PERSPECTIVE_PAGE";
 const std::string WorkbenchPreferenceConstants::OPEN_PERSPECTIVE_REPLACE =
     "OPEN_PERSPECTIVE_REPLACE";
 const std::string WorkbenchPreferenceConstants::NO_NEW_PERSPECTIVE =

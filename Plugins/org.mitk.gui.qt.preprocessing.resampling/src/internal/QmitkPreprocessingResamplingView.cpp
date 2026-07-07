@@ -21,22 +21,21 @@ found in the LICENSE file.
 #include <berryIWorkbenchWindow.h>
 
 // MITK includes (GUI)
-#include "QmitkDataNodeSelectionProvider.h"
-#include "mitkDataNodeObject.h"
+#include <QmitkDataNodeSelectionProvider.h>
+#include <mitkDataNodeObject.h>
 
 // MITK includes (general)
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkVectorImageMapper2D.h"
-#include "mitkProperties.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkProperties.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkTimeNavigationController.h>
 
 // Includes for image casting between ITK and MITK
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 
 // ITK includes (general)
 #include <itkVectorImage.h>
@@ -73,7 +72,6 @@ typedef itk::BSplineInterpolateImageFunction<ImageType, double>                 
 
 QmitkPreprocessingResampling::QmitkPreprocessingResampling()
 : QmitkAbstractView(),
-  m_Controls(nullptr),
   m_SelectedImageNode(nullptr),
   m_TimeStepperAdapter(nullptr)
 {
@@ -87,7 +85,7 @@ void QmitkPreprocessingResampling::CreateQtPartControl(QWidget *parent)
 {
   if (m_Controls == nullptr)
   {
-    m_Controls = new Ui::QmitkPreprocessingResamplingViewControls;
+    m_Controls = std::make_unique<Ui::QmitkPreprocessingResamplingViewControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
@@ -407,14 +405,6 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( name.c_str() ) );
   result->SetData( newImage );
-
-  // for vector images, a different mapper is needed
-  if(isVectorImage > 1)
-  {
-    mitk::VectorImageMapper2D::Pointer mapper =
-      mitk::VectorImageMapper2D::New();
-    result->SetMapper(1,mapper);
-  }
 
   // add new image to data storage and set as active to ease further processing
   GetDataStorage()->Add( result, m_SelectedImageNode->GetNode() );

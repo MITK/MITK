@@ -16,16 +16,25 @@ found in the LICENSE file.
 // ITK
 #include <itkObject.h>
 // MITK
-#include "mitkOperationActor.h"
+#include <mitkOperationActor.h>
 #include <MitkCoreExports.h>
 #include <mitkBaseGeometry.h>
 #include <mitkCommon.h>
 
 namespace mitk
 {
+  /** \brief Type for time point values in milliseconds (ms). */
   typedef mitk::ScalarType TimePointType;
+
+  /** \brief Type for time step indices (non-negative integers starting from 0). */
   typedef std::size_t TimeStepType;
 
+  /**
+   * \brief Sentinel value representing an invalid time step.
+   *
+   * Since TimeStepType is unsigned, assigning -1 yields the maximum
+   * representable value, which is used as the "invalid" marker.
+   */
   static const TimeStepType TIMESTEP_INVALID = -1;
 
   /**
@@ -46,17 +55,13 @@ namespace mitk
   {
   protected:
     TimeGeometry();
+    TimeGeometry(const TimeGeometry &other);
     ~TimeGeometry() override;
 
     /**
     * \brief Contains a bounding box which includes all time steps
     */
     BoundingBox::Pointer m_BoundingBox;
-
-    /**
-    * \brief Makes a deep copy of the current object
-    */
-    LightObject::Pointer InternalClone() const override;
 
   public:
     mitkClassMacroItkParent(TimeGeometry, itk::Object);
@@ -251,48 +256,68 @@ namespace mitk
     bool IsWorldPointInside(const mitk::Point3D &p) const;
 
     /**
-    * \brief Updates the bounding box to cover the area used in all time steps
-    *
-    * The bounding box is updated by this method. The new bounding box
-    * covers an area which includes all bounding boxes during
-    * all times steps.
-    */
+     * \brief Recompute the bounding box to cover all time steps.
+     *
+     * Iterates over all time steps, collects the eight corner points
+     * of each step's geometry, and computes an axis-aligned bounding
+     * box that encloses all of them.
+     */
     void UpdateBoundingBox();
 
     /**
-    * \brief Returns a bounding box that covers all time steps
-    */
+     * \brief Get the bounding box that covers all time steps.
+     *
+     * \return Pointer to the aggregate bounding box (world coordinates, mm).
+     */
     BoundingBox *GetBoundingBoxInWorld() const { return m_BoundingBox; }
+
     /**
-    * \brief Returns the world bounds of the object that cover all time steps
-    */
+     * \brief Get the bounds array of the aggregate bounding box.
+     *
+     * \return BoundsArrayType [xmin,xmax,ymin,ymax,zmin,zmax] in world coordinates.
+     */
     BoundingBox::BoundsArrayType GetBoundsInWorld() const { return m_BoundingBox->GetBounds(); }
+
     /**
-    * \brief Returns the Extend of the bounding in the given direction
-    */
+     * \brief Get the extent of the aggregate bounding box in the given direction.
+     *
+     * \param[in] direction The axis (0=x, 1=y, 2=z).
+     * \return Extent in mm.
+     * \pre \a direction must be < 3.
+     */
     ScalarType GetExtentInWorld(unsigned int direction) const;
 
     /**
-    * \brief Initializes the TimeGeometry
-    */
+     * \brief Initialize the TimeGeometry to its default state.
+     *
+     * The default implementation is empty; subclasses should override
+     * to set up initial time steps and geometries.
+     */
     virtual void Initialize();
 
     /**
-    * \brief Updates the geometry
-    */
+     * \brief Update the geometry (bounding box and subclass-specific data).
+     *
+     * Calls UpdateBoundingBox() followed by UpdateWithoutBoundingBox().
+     */
     void Update();
 
     /**
-    * \brief Updates everything except the Bounding box
-    *
-    * This class should be overwritten by child classes.
-    * The method is called when Update() is required.
-    */
+     * \brief Hook for subclass-specific updates that do not involve the bounding box.
+     *
+     * Called by Update() after UpdateBoundingBox(). Subclasses should
+     * override this to perform any additional update logic.
+     */
     virtual void UpdateWithoutBoundingBox(){};
 
     /**
-    * \brief Executes the given operation on all time steps
-    */
+     * \brief Execute the given operation on all time steps.
+     *
+     * Iterates over every time step and calls ExecuteOperation()
+     * on each step's geometry.
+     *
+     * \param[in] op The operation to execute.
+     */
     void ExecuteOperation(Operation *op) override;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;

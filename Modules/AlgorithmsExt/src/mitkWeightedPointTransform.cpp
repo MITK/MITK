@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkWeightedPointTransform.h"
-#include "mitkAnisotropicRegistrationCommon.h"
+#include <mitkWeightedPointTransform.h>
+#include <mitkAnisotropicRegistrationCommon.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPoints.h>

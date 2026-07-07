@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImageToSurfaceFilter_h
 #define mitkLabelSetImageToSurfaceFilter_h
 
-#include "MitkMultilabelExports.h"
-#include "mitkLabelSetImage.h"
-#include "mitkSurface.h"
+#include <MitkMultilabelExports.h>
+#include <mitkLabelSetImage.h>
+#include <mitkSurface.h>
 #include <mitkSurfaceSource.h>
 
 #include <vtkMatrix4x4.h>
@@ -27,9 +27,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Generates surface meshes from a labelset image.
-   * If you want to calculate a surface representation for all available labels,
-   * you may call GenerateAllLabelsOn().
+   * \brief Filter that generates surface meshes from a MultiLabelSegmentation image.
+   *
+   * This filter extracts label regions from a multi-label segmentation image and
+   * converts them into VTK surface meshes using marching cubes. It supports extracting
+   * a single label or all labels at once.
+   *
+   * To extract surfaces for all available labels, call GenerateAllLabelsOn().
+   *
+   * \sa MultiLabelSegmentation, SurfaceSource, LabelSetImageToSurfaceThreadedFilter
    */
   class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
   {
@@ -38,20 +44,25 @@ namespace mitk
 
     itkNewMacro(Self);
 
+    /** \brief Type for label pixel values. */
     typedef MultiLabelSegmentation::LabelValueType LabelType;
 
+    /** \brief Map from label value to count/size. */
     typedef std::map<LabelType, unsigned long> LabelMapType;
 
+    /** \brief Map from output index to label value. */
     typedef std::map<unsigned int, LabelType> IndexToLabelMapType;
 
     /**
-    * Returns a const pointer to the labelset image set as input
-    */
+     * \brief Returns a const pointer to the input image.
+     * \return Const pointer to the input Image, or nullptr if not set.
+     */
     const mitk::Image *GetInput(void);
 
     /**
-    * Set the labelset image to create a surface from.
-    */
+     * \brief Sets the input image from which to create surface(s).
+     * \param[in] image Pointer to the input image.
+     */
     using ProcessObject::SetInput;
     virtual void SetInput(const mitk::Image *image);
 
@@ -63,7 +74,7 @@ namespace mitk
     itkSetMacro(GenerateAllLabels, bool);
 
     /**
-     * @returns if all labels or only a specific label should be
+     * \return if all labels or only a specific label should be
      * extracted.
      */
     itkGetMacro(GenerateAllLabels, bool);
@@ -72,26 +83,26 @@ namespace mitk
     /**
      * Set the label you want to extract. This method only has an effect,
      * if GenerateAllLabels() is set to false
-     * @param _arg the label to extract, by default 1
+     * \param _arg the label to extract, by default 1
      */
     itkSetMacro(RequestedLabel, int);
 
     /**
      * Returns the label you want to extract. This method only has an effect,
      * if GenerateAllLabels() is set to false
-     * @return the label to extract, by default 1
+     * \return the label to extract, by default 1
      */
     itkGetMacro(RequestedLabel, int);
 
     /**
      * Sets the label value of the background. No surface will be generated for this label.
-     * @param _arg the label of the background, by default 0
+     * \param _arg the label of the background, by default 0
      */
     itkSetMacro(BackgroundLabel, int);
 
     /**
      * Gets the label value of the background. No surface will be generated for this label.
-     * @return the label of the background, by default 0
+     * \return the label of the background, by default 0
      */
     itkGetMacro(BackgroundLabel, int);
 

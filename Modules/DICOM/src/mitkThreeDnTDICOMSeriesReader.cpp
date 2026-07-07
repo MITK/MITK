@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThreeDnTDICOMSeriesReader.h"
-#include "mitkITKDICOMSeriesReaderHelper.h"
+#include <mitkThreeDnTDICOMSeriesReader.h>
+#include <mitkITKDICOMSeriesReaderHelper.h>
 
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)
@@ -23,7 +23,7 @@ mitk::ThreeDnTDICOMSeriesReader
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other )
 :DICOMITKSeriesGDCMReader(other)
-,m_Group3DandT(m_DefaultGroup3DandT), m_OnlyCondenseSameSeries(m_DefaultOnlyCondenseSameSeries)
+,m_Group3DandT(other.m_Group3DandT), m_OnlyCondenseSameSeries(other.m_OnlyCondenseSameSeries)
 {
 }
 

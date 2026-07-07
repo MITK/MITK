@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkXnatCreateObjectDialog.h"
+#include <QmitkXnatCreateObjectDialog.h>
 
 // XNAT
 #include <QmitkXnatExperimentWidget.h>
@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <ctkXnatSubject.h>
 
 // Qt
+#include <QBoxLayout>
+#include <QGridLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>

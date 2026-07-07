@@ -11,12 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSceneReaderV1.h"
-#include "Poco/Path.h"
-#include "mitkBaseRenderer.h"
-#include "mitkIOUtil.h"
-#include "mitkProgressBar.h"
+#include <Poco/Path.h>
+#include <mitkBaseRenderer.h>
+#include <mitkIOUtil.h>
+#include <mitkProgressBar.h>
 #include "mitkPropertyListDeserializer.h"
-#include "mitkSerializerMacros.h"
+#include "mitkSceneReaderHelpers.h"
+#include <mitkSerializerMacros.h>
 #include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
 #include <tinyxml2.h>
@@ -51,30 +52,6 @@ namespace
     // this is not reasonable but at least answers the sorting
     // question clearly
     return left.first.GetPointer() < right.first.GetPointer();
-  }
-
-  // This is a workaround until we are able to save time-related information in an
-  // actual file format of surfaces.
-  void ApplyProportionalTimeGeometryProperties(mitk::BaseData* data)
-  {
-    auto* geometry = dynamic_cast<mitk::ProportionalTimeGeometry*>(data->GetTimeGeometry());
-
-    if (nullptr == geometry)
-      return;
-
-    auto properties = data->GetPropertyList();
-    float value = 0.0f;
-
-    if (properties->GetFloatProperty("ProportionalTimeGeometry.FirstTimePoint", value))
-    {
-      if (value == -std::numeric_limits<float>::infinity())
-        value = std::numeric_limits<float>::lowest();
-
-      geometry->SetFirstTimePoint(value);
-    }
-
-    if (properties->GetFloatProperty("ProportionalTimeGeometry.StepDuration", value))
-      geometry->SetStepDuration(value);
   }
 
   mitk::PropertyList::Pointer DeserializeProperties(const tinyxml2::XMLElement *propertiesElement, const fs::path& basePath)
@@ -172,7 +149,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     if (baseData != nullptr && properties != nullptr)
     {
       baseData->SetPropertyList(properties);
-      ApplyProportionalTimeGeometryProperties(baseData);
+      mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(baseData);
     }
 
     DataNodes.push_back(dataNode);
@@ -454,6 +431,11 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
 
     if (readProperties.IsNotNull())
     {
+      // Drop transient properties (e.g. the "selected" UI flag) that may be
+      // present in older scene files, so reloading does not resurrect runtime
+      // or UI state. Transience is decided per the node's BaseData type.
+      mitk::SceneReaderHelpers::StripTransientProperties(*readProperties, node->GetData());
+
       propertyList->ConcatenatePropertyList(readProperties, true); // true = replace
     }
     else

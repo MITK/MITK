@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <QObject>
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 
 namespace berry {

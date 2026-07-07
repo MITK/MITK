@@ -20,9 +20,13 @@ found in the LICENSE file.
 
 #include <QSortFilterProxyModel>
 
-#include "ui_QmitkMatchPointMapper.h"
+#include <QmitkMappingJob.h>
+#include <memory>
 
-#include "QmitkMappingJob.h"
+namespace Ui
+{
+  class MatchPointMapperControls;
+}
 
 /*!
   \brief QmitkMatchPointMapper
@@ -45,6 +49,7 @@ public:
     berryObjectMacro(QmitkMatchPointMapper);
 
     QmitkMatchPointMapper();
+    ~QmitkMatchPointMapper() override;
 
     void CreateQtPartControl(QWidget *parent) override;
 
@@ -74,7 +79,7 @@ protected slots:
 protected:
     void SetFocus() override;
 
-    Ui::MatchPointMapperControls m_Controls;
+    std::unique_ptr<Ui::MatchPointMapperControls> m_Controls;
 
 private:
     QWidget *m_Parent;

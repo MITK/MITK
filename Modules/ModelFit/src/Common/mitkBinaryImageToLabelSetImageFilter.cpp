@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBinaryImageToLabelSetImageFilter.h"
+#include <mitkBinaryImageToLabelSetImageFilter.h>
 
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>

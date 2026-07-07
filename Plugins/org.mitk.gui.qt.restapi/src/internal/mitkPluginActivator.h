@@ -1,0 +1,59 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef mitkPluginActivator_h
+#define mitkPluginActivator_h
+
+#include <berryAbstractUICTKPlugin.h>
+
+#include <usModuleContext.h>
+#include <usServiceEvent.h>
+#include <usServiceReference.h>
+
+namespace mitk
+{
+  struct IRestServerService;
+  class RenderWindowBridge;
+
+  class RestApiPluginActivator : public berry::AbstractUICTKPlugin
+  {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_restapi")
+    Q_INTERFACES(ctkPluginActivator)
+
+  public:
+
+    RestApiPluginActivator();
+    ~RestApiPluginActivator() override;
+
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext* context) override;
+
+    static RestApiPluginActivator* getDefault();
+
+    static ctkPluginContext* getContext();
+
+  private:
+
+    void OnRestServerServiceChanged(const us::ServiceEvent event);
+    void ConnectRestServer(const us::ServiceReferenceU& ref);
+    void DisconnectRestServer(const us::ServiceReferenceU& ref);
+
+    static ctkPluginContext* m_context;
+    static RestApiPluginActivator* m_Instance;
+
+    us::ModuleContext* m_MitkContext = nullptr;
+    RenderWindowBridge* m_RenderWindowBridge = nullptr;
+  };
+}
+
+#endif

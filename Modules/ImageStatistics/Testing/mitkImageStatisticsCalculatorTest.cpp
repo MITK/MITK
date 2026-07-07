@@ -1110,8 +1110,11 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   {
     CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(mppObject - MPP) < mitk::eps);
   }
-  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(skewnessObject - skewness) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(kurtosisObject - kurtosis) < mitk::eps);
+  // Skewness and kurtosis use the high-order moment formula (Σx³/n - 3μs² - μ³)/s³
+  // which is sensitive to FP evaluation order (FMA contractions differ between
+  // x86_64 and ARM64). Use a relative tolerance with mitk::eps as the absolute floor.
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(skewnessObject - skewness) <= std::max(mitk::eps, std::abs(skewness) * 1e-9));
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(kurtosisObject - kurtosis) <= std::max(mitk::eps, std::abs(kurtosis) * 1e-9));
   CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(varianceObject - variance) < mitk::eps);
   CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(standardDeviationObject - stdev) < mitk::eps);
   CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(minObject - min) < mitk::eps);

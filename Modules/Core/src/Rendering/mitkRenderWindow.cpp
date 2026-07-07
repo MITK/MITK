@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRenderWindow.h"
+#include <mitkRenderWindow.h>
 
-#include "mitkVtkEventProvider.h"
-#include "mitkVtkLayerController.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
+#include <mitkVtkEventProvider.h>
+#include <mitkVtkLayerController.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
 
 mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin, const char *name)
   : m_vtkRenderWindow(renWin),

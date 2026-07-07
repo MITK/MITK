@@ -28,7 +28,7 @@ found in the LICENSE file.
 #include <ui_QmitkViewNavigatorView.h>
 
 QmitkViewNavigatorView::QmitkViewNavigatorView()
-  : m_Ui(new Ui::QmitkViewNavigatorView),
+  : m_Ui(std::make_unique<Ui::QmitkViewNavigatorView>()),
     m_Model(nullptr),
     m_ProxyModel(nullptr)
 {
@@ -146,9 +146,9 @@ void QmitkViewNavigatorView::PartOpened(const berry::IWorkbenchPartReference::Po
     // into PartOpened() for the View Navigator itself, which is called shortly after,
     // to initialize the state of all views.
 
-    for (const auto& view : activePage->GetViews())
+    for (const auto& viewRef : activePage->GetViewReferences())
     {
-      auto viewItem = m_Model->GetViewItemFromId(view->GetSite()->GetId());
+      auto viewItem = m_Model->GetViewItemFromId(viewRef->GetId());
 
       if (viewItem != nullptr)
         viewItem->SetBoldFont(true);

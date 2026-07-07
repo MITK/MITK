@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include <itkDataObject.h>
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 
 #include <nlohmann/json.hpp>
@@ -31,11 +31,11 @@ namespace mitk
   template <typename T> void from_json(const nlohmann::json&, GenericLookupTable<T>&);
 
   /**
-   * @brief Template class for generating lookup-tables
+   * \brief Template class for generating lookup-tables.
    *
-   * This class template can be instantiated for all classes/internal types that fulfills
-   *  these requirements:
-   * - an operator<< so that the properties value can be put into a std::stringstream
+   * This class template can be instantiated for all classes/internal types that fulfill
+   * these requirements:
+   * - an operator<< so that the property value can be put into a std::stringstream
    * - an operator== so that two properties can be checked for equality
    *
    * The main purpose of this class is to be used in conjunction with
@@ -52,16 +52,39 @@ namespace mitk
 
     typedef GenericLookupTable Self;
 
+    /** \brief Default constructor. */
     GenericLookupTable() {}
+
+    /** \brief Copy constructor. */
+    GenericLookupTable(const GenericLookupTable &) = default;
+
+    /** \brief Virtual destructor. */
     virtual ~GenericLookupTable() {}
+
+    /** \brief Return the class name as a string. */
     virtual const char *GetNameOfClass() const { return "GenericLookupTable"; }
+
+    /** \brief Set the value for the given identifier.
+     * \param id The identifier (key) in the lookup table.
+     * \param value The value to associate with the identifier.
+     */
     void SetTableValue(IdentifierType id, ValueType value) { m_LookupTable[id] = value; }
+
+    /** \brief Check if a value exists for the given identifier.
+     * \param id The identifier to look up.
+     * \return True if the identifier exists in the table.
+     */
     bool ValueExists(IdentifierType id) const
     {
       auto it = m_LookupTable.find(id);
       return (it != m_LookupTable.end());
     }
 
+    /** \brief Get the value for the given identifier.
+     * \param id The identifier to look up.
+     * \return The value associated with the identifier.
+     * \throws std::range_error if the identifier does not exist.
+     */
     ValueType GetTableValue(IdentifierType id) const
     {
       auto it = m_LookupTable.find(id);
@@ -71,9 +94,18 @@ namespace mitk
         throw std::range_error("id does not exist in the lookup table");
     }
 
+    /** \brief Get the underlying lookup table map.
+     * \return Const reference to the map.
+     */
     const LookupTableType &GetLookupTable() const { return m_LookupTable; }
+
+    /** \brief Equality comparison operator. */
     bool operator==(const Self &lookupTable) const { return (m_LookupTable == lookupTable.m_LookupTable); }
+
+    /** \brief Inequality comparison operator. */
     bool operator!=(const Self &lookupTable) const { return !(m_LookupTable == lookupTable.m_LookupTable); }
+
+    /** \brief Assignment operator. */
     virtual Self &operator=(const Self &other) // \TODO: this needs to be unit tested!
     {
       if (this == &other)
@@ -94,12 +126,14 @@ namespace mitk
     LookupTableType m_LookupTable;
   };
 
+  /** \brief Serialize a GenericLookupTable to JSON. */
   template <typename T>
   void to_json(nlohmann::json& j, const GenericLookupTable<T>& t)
   {
     j = t.GetLookupTable();
   }
 
+  /** \brief Deserialize a GenericLookupTable from JSON. */
   template <typename T>
   void from_json(const nlohmann::json& j, GenericLookupTable<T>& t)
   {
@@ -109,12 +143,14 @@ namespace mitk
 } // namespace mitk
 
 /**
-* Generates a specialized subclass of mitk::GenericLookupTable.
-* This way, GetNameOfClass() returns the value provided by LookupTableName.
-* Please see mitkProperties.h for examples.
-* @param LookupTableName the name of the instantiation of GenericLookupTable
-* @param Type the value type of the GenericLookupTable
-*/
+ * \brief Generates a specialized subclass of mitk::GenericLookupTable.
+ *
+ * This way, GetNameOfClass() returns the value provided by LookupTableName.
+ * Please see mitkProperties.h for examples.
+ *
+ * \param LookupTableName The name of the instantiation of GenericLookupTable.
+ * \param Type The value type of the GenericLookupTable.
+ */
 #define mitkSpecializeGenericLookupTable(LookupTableName, Type)                                                        \
                                                                                                                        \
   class MITKCORE_EXPORT LookupTableName : public GenericLookupTable<Type>                                              \
@@ -125,6 +161,7 @@ namespace mitk
     typedef GenericLookupTable<Type> Superclass;                                                                       \
     virtual const char *GetNameOfClass() const { return #LookupTableName; }                                            \
     LookupTableName() {}                                                                                               \
+    LookupTableName(const LookupTableName &) = default;                                                                \
     virtual Superclass &operator=(const Superclass &other) { return Superclass::operator=(other); }                    \
     virtual ~LookupTableName() {}                                                                                      \
   };                                                                                                                   \
@@ -132,10 +169,11 @@ namespace mitk
   MITKCORE_EXPORT std::ostream &operator<<(std::ostream &stream, const LookupTableName & /*l*/);
 
 /**
-* Generates the ostream << operator for the lookuptable. This definition
-* of a global function must be in a cpp file, therefore it is split from the
-* class declaration macro mitkSpecializeGenericLookupTable.
-*/
+ * \brief Generates the ostream << operator for the lookup table.
+ *
+ * This definition of a global function must be in a cpp file, therefore it is
+ * split from the class declaration macro mitkSpecializeGenericLookupTable.
+ */
 #define mitkSpecializeGenericLookupTableOperator(LookupTableName)                                                      \
                                                                                                                        \
   std::ostream &mitk::operator<<(std::ostream &stream, const LookupTableName &l)                                       \

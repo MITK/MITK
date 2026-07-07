@@ -1,4 +1,22 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  itkMaskedNaryStatisticsImageFilter.h
+  itkMaskedStatisticsImageFilter.h
+  itkMultiOutputNaryFunctorImageFilter.h
+  mitkConcreteModelFactoryBase.h
+  mitkConcreteModelParameterizerBase.h
+  mitkConstraintCheckerInterface.h
+  mitkGaussianNoiseFunctor.h
+  mitkIModelProvider.h
+  mitkIndexedValueFunctorBase.h
+  mitkLinearModelParameterizer.h
+  mitkModelBasedValueFunctorBase.h
+  mitkModelFitCostFunctionInterface.h
+  mitkModelFitException.h
+  mitkModelFitFunctorPolicy.h
+  mitkModelFitProviderBase.h
+  mitkModelTestFixture.h
+  mitkModelTraitsInterface.h
+)
 
 set(CPP_FILES
   Common/mitkExtractTimeGrid.cpp
@@ -71,18 +89,4 @@ set(CPP_FILES
   Models/mitkThreeStepLinearModelParameterizer.cpp
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
-)
-
-set(TPP_FILES
-    include/itkMultiOutputNaryFunctorImageFilter.tpp
-    include/itkMaskedStatisticsImageFilter.hxx
-    include/itkMaskedNaryStatisticsImageFilter.hxx
-	include/mitkModelFitProviderBase.tpp
-)
-
-set(HXX_FILES
-)
-
-
-set(MOC_H_FILES
 )

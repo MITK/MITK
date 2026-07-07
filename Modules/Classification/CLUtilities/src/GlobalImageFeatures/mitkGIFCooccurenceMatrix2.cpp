@@ -338,9 +338,9 @@ void CalculateFeatures(
       }
       results.AngularSecondMoment += pij*pij;
       results.Contrast += (iInt - jInt)* (iInt - jInt) * pij;
-      results.Dissimilarity += std::abs<double>(iInt - jInt) * pij;
-      results.InverseDifference += pij / (1 + (std::abs<double>(iInt - jInt)));
-      results.InverseDifferenceNormalised += pij / (1 + (std::abs<double>(iInt - jInt) / Ng));
+      results.Dissimilarity += std::abs(iInt - jInt) * pij;
+      results.InverseDifference += pij / (1 + (std::abs(iInt - jInt)));
+      results.InverseDifferenceNormalised += pij / (1 + (std::abs(iInt - jInt) / Ng));
       results.InverseDifferenceMoment += pij / (1 + (iInt - jInt)*(iInt - jInt));
       results.InverseDifferenceMomentNormalised += pij / (1 + (iInt - jInt)*(iInt - jInt)/Ng/Ng);
       results.Autocorrelation += iInt*jInt * pij;
@@ -463,7 +463,10 @@ CalculateCoocurenceFeatures(const itk::Image<TPixel, VImageDimension>* itkImage,
     offsetVector.clear();
     offset[0] = 0;
     offset[1] = 0;
-    offset[2] = 1;
+    if constexpr (VImageDimension >= 3)
+    {
+      offset[2] = 1;
+    }
   }
 
   std::vector<mitk::CoocurenceMatrixFeatures> resultVector;

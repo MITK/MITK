@@ -57,9 +57,9 @@ the actual image type of the mitk::Image and does any necessary conversions. Loo
 AccessByItk(mitkImage, MyAccessMethod)
 \endcode
 
-\dontinclude Step6RegionGrowing.txx
+\dontinclude Step6RegionGrowing.tpp
 
-In this step our access method is called RegionGrowing() (defined in %Step6RegionGrowing.txx ):
+In this step our access method is called RegionGrowing() (defined in %Step6RegionGrowing.tpp ):
 \skipline template
 \until } //RegionGrowing()
 

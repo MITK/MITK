@@ -47,35 +47,8 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
-  if(MITK_USE_HDF5)
-    FIND_PACKAGE(HDF5 COMPONENTS C HL NO_MODULE REQUIRED shared)
-    get_target_property(_location hdf5-shared LOCATION)
-    get_filename_component(_location ${_location} PATH)
-    list(APPEND _additional_paths ${_location})
-
-    # This is a work-around. The hdf5-config.cmake file is not robust enough
-    # to be included several times via find_pakcage calls.
-    set(HDF5_LIBRARIES ${HDF5_LIBRARIES} PARENT_SCOPE)
-  endif()
-
   if(_additional_paths)
     list(APPEND _dir_candidates ${_additional_paths})
-  endif()
-
-  # The code below is sub-optimal. It makes assumptions about
-  # the structure of the build directories, pointed to by
-  # the *_DIR variables. Instead, we should rely on package
-  # specific "LIBRARY_DIRS" variables, if they exist.
-  if(WIN32)
-    list(APPEND _dir_candidates "${ITK_DIR}/bin")
-  endif()
-
-  if(MITK_USE_MatchPoint)
-    if(WIN32)
-      list(APPEND _dir_candidates "${MatchPoint_DIR}/bin")
-    else()
-      list(APPEND _dir_candidates "${MatchPoint_DIR}/lib")
-    endif()
   endif()
 
   if(MITK_USE_Python3)

@@ -13,7 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYPERSPECTIVESPREFERENCEPAGE_H
 #define BERRYPERSPECTIVESPREFERENCEPAGE_H
 
-#include <berryIQtPreferencePage.h>
+#include "berryIQtPreferencePage.h"
+#include <memory>
 
 namespace Ui {
 class PerspectivesPreferencePage;
@@ -61,7 +62,7 @@ private:
 
   SmartPointer<PerspectiveDescriptor> GetSelectedPerspective() const;
 
-  Ui::PerspectivesPreferencePage* ui;
+  std::unique_ptr<Ui::PerspectivesPreferencePage> ui;
   QWidget* pageWidget;
 
   int openPerspMode;

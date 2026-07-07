@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDICOMReaderConfigurator_h
 #define mitkDICOMReaderConfigurator_h
 
-#include "mitkClassicDICOMSeriesReader.h"
-#include "mitkDICOMTagBasedSorter.h"
+#include <mitkClassicDICOMSeriesReader.h>
+#include <mitkDICOMTagBasedSorter.h>
 
 namespace tinyxml2
 {
@@ -97,16 +97,32 @@ class MITKDICOM_EXPORT DICOMReaderConfigurator : public itk::LightObject
     mitkClassMacroItkParent( DICOMReaderConfigurator, itk::LightObject );
     itkNewMacro( DICOMReaderConfigurator );
 
+    /**
+     * \brief Create a DICOMFileReader from an XML configuration file.
+     * \param[in] filename Absolute path to the XML configuration file.
+     * \return A smart pointer to the configured DICOMFileReader, or nullptr on failure.
+     */
     DICOMFileReader::Pointer CreateFromConfigFile(const std::string& filename) const;
+
+    /**
+     * \brief Create a DICOMFileReader from an XML configuration string (UTF-8 encoded).
+     * \param[in] xmlContents The XML configuration as a string.
+     * \return A smart pointer to the configured DICOMFileReader, or nullptr on failure.
+     */
     DICOMFileReader::Pointer CreateFromUTF8ConfigString(const std::string& xmlContents) const;
 
-    /** Helper function that returns a config string for a DICOMReader that is compiled into
-    a module resource of the MitkDICOM module.
-    @param resourcePath Path of the resource in the module MitkDICOM.
-    @result Returns the config as string. If the passed resourcePath cannot be resolved, an
-    empty string will be returned.*/
+    /**
+     * \brief Retrieve a configuration string from a compiled-in module resource.
+     * \param[in] resourcePath Path of the resource within the MitkDICOM module.
+     * \return The configuration XML as a string, or an empty string if the resource cannot be resolved.
+     */
     static std::string GetConfigStringFromModuleResource(const std::string& resourcePath);
 
+    /**
+     * \brief Serialize a DICOMFileReader's configuration to an XML string.
+     * \param[in] reader The reader whose configuration should be serialized.
+     * \return An XML configuration string representing the reader's setup.
+     */
     std::string CreateConfigStringFromReader(DICOMFileReader::ConstPointer reader) const;
 
   protected:

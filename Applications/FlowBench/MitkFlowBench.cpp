@@ -11,14 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkBaseApplication.h>
-#include <QVariant>
-
-#if defined __GNUC__ && !defined __clang__
-#  include <QDir>
-#  include <QFileInfo>
-#  include <QString>
-#  include <QStringList>
-#endif
 
 class FlowApplication : public mitk::BaseApplication
 {
@@ -54,28 +46,14 @@ protected:
 const QString FlowApplication::ARG_OUTPUTDIR = "flow.outputdir";
 const QString FlowApplication::ARG_OUTPUTFORMAT = "flow.outputextension";
 
-int main(int argc, char **argv)
+int main(int argc, char* argv[])
 {
   FlowApplication app(argc, argv);
 
   app.setSingleMode(true);
   app.setApplicationName("MITK FlowBench");
   app.setOrganizationName("DKFZ");
-
-  // Preload the org.blueberry.core.expressions plugin to work around a bug in
-  // GCC that leads to undefined symbols while loading certain libraries even though
-  // the symbols are actually defined.
-#if defined __GNUC__ && !defined __clang__
-  auto library = QFileInfo(argv[0]).dir().path() + "/../lib/plugins/liborg_blueberry_core_expressions.so";
-
-  if (!QFileInfo(library).exists())
-    library = "liborg_blueberry_core_expressions";
-
-  app.setPreloadLibraries(QStringList() << library);
-#endif
-
   app.setProperty(mitk::BaseApplication::PROP_PRODUCT, "org.mitk.gui.qt.flowapplication.workbench");
 
-  // Run the workbench.
   return app.run();
 }

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitConstants.h"
+#include <mitkModelFitConstants.h>
 
 
 const std::string mitk::ModelFitConstants::MODEL_FIT_PROPERTY_NAME() { return "modelfit";}

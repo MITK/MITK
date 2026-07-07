@@ -13,13 +13,24 @@ found in the LICENSE file.
 #ifndef mitkThreeStepLinearModel_h
 #define mitkThreeStepLinearModel_h
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class ThreeStepLinearModel
+   * \brief Piecewise linear model with three segments and two transition points.
+   *
+   * The model defines three linear segments: a baseline region before x0,
+   * an ascending/descending region between x0 and x1, and a final region after x1.
+   * Parameters are the baseline value (y_bl), transition points (x0, x1), and
+   * slopes (b0, b1). Derived parameters include AUC, x_fin, y_fin, y_max, y1, and y2.
+   *
+   * \sa ThreeStepLinearModelFactory, ThreeStepLinearModelParameterizer, ModelBase
+   */
   class MITKMODELFIT_EXPORT ThreeStepLinearModel : public mitk::ModelBase
   {
 
@@ -130,12 +141,9 @@ namespace mitk
     ThreeStepLinearModel() {};
     ~ThreeStepLinearModel() override{};
 
+    ThreeStepLinearModel(const ThreeStepLinearModel& source);
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(ThreeStepLinearModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
     DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
@@ -149,8 +157,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    ThreeStepLinearModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

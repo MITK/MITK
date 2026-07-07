@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMouseDoubleClickEvent.h"
-#include "mitkException.h"
+#include <mitkMouseDoubleClickEvent.h>
+#include <mitkException.h>
 
 mitk::MouseDoubleClickEvent::MouseDoubleClickEvent(mitk::BaseRenderer *baseRenderer,
                                                    const mitk::Point2D &mousePosition,

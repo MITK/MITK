@@ -12,22 +12,23 @@ found in the LICENSE file.
 
 // Blueberry
 #include <berryISelectionService.h>
+#include <ui_QmitkMatchPointRegistrationEvaluator.h>
 #include <berryIWorkbenchWindow.h>
 
 // Mitk
 #include <mitkStatusBar.h>
 #include <mitkNodePredicateDataProperty.h>
 #include <mitkMAPRegistrationWrapper.h>
-#include "mitkRegVisPropertyTags.h"
-#include "mitkMatchPointPropertyTags.h"
-#include "mitkRegEvaluationObject.h"
-#include "mitkRegistrationHelper.h"
-#include "mitkRegEvaluationMapper2D.h"
+#include <mitkRegVisPropertyTags.h>
+#include <mitkMatchPointPropertyTags.h>
+#include <mitkRegEvaluationObject.h>
+#include <mitkRegistrationHelper.h>
+#include <mitkRegEvaluationMapper2D.h>
 #include <mitkMAPAlgorithmHelper.h>
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 // Qmitk
-#include "QmitkRenderWindow.h"
+#include <QmitkRenderWindow.h>
 #include "QmitkMatchPointRegistrationEvaluator.h"
 
 // Qt
@@ -43,7 +44,10 @@ const std::string QmitkMatchPointRegistrationEvaluator::HelperNodeName =
     "RegistrationEvaluationHelper";
 
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-  : m_Parent(nullptr), m_activeEvaluation(false), m_currentSelectedTimePoint(0.)
+  : m_Controls(std::make_unique<Ui::MatchPointRegistrationEvaluatorControls>()),
+    m_Parent(nullptr),
+    m_activeEvaluation(false),
+    m_currentSelectedTimePoint(0.0)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -70,39 +74,39 @@ void QmitkMatchPointRegistrationEvaluator::Error(QString msg)
 void QmitkMatchPointRegistrationEvaluator::CreateQtPartControl(QWidget* parent)
 {
 	// create GUI widgets from the Qt Designer's .ui file
-	m_Controls.setupUi(parent);
+	m_Controls->setupUi(parent);
 
 	m_Parent = parent;
 
-  this->m_Controls.registrationNodeSelector->SetDataStorage(this->GetDataStorage());
-  this->m_Controls.registrationNodeSelector->SetSelectionIsOptional(true);
-  this->m_Controls.movingNodeSelector->SetDataStorage(this->GetDataStorage());
-  this->m_Controls.movingNodeSelector->SetSelectionIsOptional(false);
-  this->m_Controls.targetNodeSelector->SetDataStorage(this->GetDataStorage());
-  this->m_Controls.targetNodeSelector->SetSelectionIsOptional(false);
+  this->m_Controls->registrationNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls->registrationNodeSelector->SetSelectionIsOptional(true);
+  this->m_Controls->movingNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls->movingNodeSelector->SetSelectionIsOptional(false);
+  this->m_Controls->targetNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls->targetNodeSelector->SetSelectionIsOptional(false);
 
-  this->m_Controls.registrationNodeSelector->SetInvalidInfo("Select valid registration.");
-  this->m_Controls.registrationNodeSelector->SetEmptyInfo("Assuming identity. Select registration to change.");
-  this->m_Controls.registrationNodeSelector->SetPopUpTitel("Select registration.");
-  this->m_Controls.registrationNodeSelector->SetPopUpHint("Select a registration object that should be evaluated. If no registration is selected, identity will be assumed for evaluation.");
+  this->m_Controls->registrationNodeSelector->SetInvalidInfo("Select valid registration.");
+  this->m_Controls->registrationNodeSelector->SetEmptyInfo("Assuming identity. Select registration to change.");
+  this->m_Controls->registrationNodeSelector->SetPopUpTitel("Select registration.");
+  this->m_Controls->registrationNodeSelector->SetPopUpHint("Select a registration object that should be evaluated. If no registration is selected, identity will be assumed for evaluation.");
 
-  this->m_Controls.movingNodeSelector->SetInvalidInfo("Select moving image.");
-  this->m_Controls.movingNodeSelector->SetPopUpTitel("Select moving image.");
-  this->m_Controls.movingNodeSelector->SetPopUpHint("Select the moving image for the evaluation. This is the image that will be mapped by the registration.");
-  this->m_Controls.targetNodeSelector->SetInvalidInfo("Select target image.");
-  this->m_Controls.targetNodeSelector->SetPopUpTitel("Select target image.");
-  this->m_Controls.targetNodeSelector->SetPopUpHint("Select the target image for the evaluation.");
-  this->m_Controls.checkAutoSelect->setChecked(true);
+  this->m_Controls->movingNodeSelector->SetInvalidInfo("Select moving image.");
+  this->m_Controls->movingNodeSelector->SetPopUpTitel("Select moving image.");
+  this->m_Controls->movingNodeSelector->SetPopUpHint("Select the moving image for the evaluation. This is the image that will be mapped by the registration.");
+  this->m_Controls->targetNodeSelector->SetInvalidInfo("Select target image.");
+  this->m_Controls->targetNodeSelector->SetPopUpTitel("Select target image.");
+  this->m_Controls->targetNodeSelector->SetPopUpHint("Select the target image for the evaluation.");
+  this->m_Controls->checkAutoSelect->setChecked(true);
 
   this->ConfigureNodePredicates();
 
-  connect(m_Controls.pbEval, SIGNAL(clicked()), this, SLOT(OnEvalBtnPushed()));
-  connect(m_Controls.pbStop, SIGNAL(clicked()), this, SLOT(OnStopBtnPushed()));
-  connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
+  connect(m_Controls->pbEval, SIGNAL(clicked()), this, SLOT(OnEvalBtnPushed()));
+  connect(m_Controls->pbStop, SIGNAL(clicked()), this, SLOT(OnStopBtnPushed()));
+  connect(m_Controls->evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
 
-  connect(m_Controls.registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
-  connect(m_Controls.movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
-  connect(m_Controls.targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
+  connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
+  connect(m_Controls->movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
+  connect(m_Controls->targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN));
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
@@ -126,20 +130,20 @@ void QmitkMatchPointRegistrationEvaluator::RenderWindowPartDeactivated(
 
 void QmitkMatchPointRegistrationEvaluator::ConfigureNodePredicates()
 {
-  this->m_Controls.registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
+  this->m_Controls->registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
 
-  this->m_Controls.movingNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
-  this->m_Controls.targetNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
+  this->m_Controls->movingNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
+  this->m_Controls->targetNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
 }
 
 void QmitkMatchPointRegistrationEvaluator::CheckInputs()
 {
   if (!m_activeEvaluation)
   {
-    bool autoSelectInput = m_Controls.checkAutoSelect->isChecked() && this->m_spSelectedRegNode != this->m_Controls.registrationNodeSelector->GetSelectedNode();
-    this->m_spSelectedRegNode = this->m_Controls.registrationNodeSelector->GetSelectedNode();
-    this->m_spSelectedMovingNode = this->m_Controls.movingNodeSelector->GetSelectedNode();
-    this->m_spSelectedTargetNode = this->m_Controls.targetNodeSelector->GetSelectedNode();
+    bool autoSelectInput = m_Controls->checkAutoSelect->isChecked() && this->m_spSelectedRegNode != this->m_Controls->registrationNodeSelector->GetSelectedNode();
+    this->m_spSelectedRegNode = this->m_Controls->registrationNodeSelector->GetSelectedNode();
+    this->m_spSelectedMovingNode = this->m_Controls->movingNodeSelector->GetSelectedNode();
+    this->m_spSelectedTargetNode = this->m_Controls->targetNodeSelector->GetSelectedNode();
 
     if (this->m_spSelectedRegNode.IsNotNull() && (this->m_spSelectedMovingNode.IsNull() || autoSelectInput))
     {
@@ -155,7 +159,7 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
         {
           this->m_spSelectedMovingNode = movingNode;
           QmitkSingleNodeSelectionWidget::NodeList selection({ movingNode });
-          this->m_Controls.movingNodeSelector->SetCurrentSelection(selection);
+          this->m_Controls->movingNodeSelector->SetCurrentSelection(selection);
         }
       }
     }
@@ -174,7 +178,7 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
         {
           this->m_spSelectedTargetNode = targetNode;
           QmitkSingleNodeSelectionWidget::NodeList selection({ targetNode });
-          this->m_Controls.targetNodeSelector->SetCurrentSelection(selection);
+          this->m_Controls->targetNodeSelector->SetCurrentSelection(selection);
         }
       }
     }
@@ -206,14 +210,14 @@ void QmitkMatchPointRegistrationEvaluator::NodeRemoved(const mitk::DataNode* nod
 void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 {
   //config settings widget
-  this->m_Controls.evalSettings->setVisible(m_activeEvaluation);
-  this->m_Controls.pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
+  this->m_Controls->evalSettings->setVisible(m_activeEvaluation);
+  this->m_Controls->pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
     && this->m_spSelectedTargetNode.IsNotNull());
-  this->m_Controls.pbEval->setVisible(!m_activeEvaluation);
-  this->m_Controls.pbStop->setVisible(m_activeEvaluation);
-  this->m_Controls.registrationNodeSelector->setEnabled(!m_activeEvaluation);
-  this->m_Controls.movingNodeSelector->setEnabled(!m_activeEvaluation);
-  this->m_Controls.targetNodeSelector->setEnabled(!m_activeEvaluation);
+  this->m_Controls->pbEval->setVisible(!m_activeEvaluation);
+  this->m_Controls->pbStop->setVisible(m_activeEvaluation);
+  this->m_Controls->registrationNodeSelector->setEnabled(!m_activeEvaluation);
+  this->m_Controls->movingNodeSelector->setEnabled(!m_activeEvaluation);
+  this->m_Controls->targetNodeSelector->setEnabled(!m_activeEvaluation);
 }
 
 
@@ -283,7 +287,7 @@ void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
   this->m_selectedEvalNode->SetBoolProperty("helper object", true);
   this->GetDataStorage()->Add(this->m_selectedEvalNode);
 
-  this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
+  this->m_Controls->evalSettings->SetNode(this->m_selectedEvalNode);
   this->OnSliceChanged();
 
   auto* renderWindowPart = this->GetRenderWindowPart();
@@ -306,7 +310,7 @@ void QmitkMatchPointRegistrationEvaluator::OnStopBtnPushed()
   }
   this->m_selectedEvalNode = nullptr;
 
-  this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
+  this->m_Controls->evalSettings->SetNode(this->m_selectedEvalNode);
 
   this->CheckInputs();
   this->ConfigureControls();

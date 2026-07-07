@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeTextureInterpolationAction.h>
+#include "QmitkDataNodeTextureInterpolationAction.h"
 
 // mitk core
 #include <mitkRenderingManager.h>

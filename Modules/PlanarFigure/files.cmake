@@ -1,6 +1,5 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
-
 set(CPP_FILES
+  mitkPlanarFigureActivator.cpp
   Algorithms/mitkExtrudePlanarFigureFilter.cpp
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureObjectFactory.cpp

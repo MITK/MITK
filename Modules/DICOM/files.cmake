@@ -1,4 +1,6 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  mitkDICOMDatasetAccess.h
+)
 
 set(CPP_FILES
   mitkBaseDICOMReaderService.cpp
@@ -37,6 +39,7 @@ set(CPP_FILES
   mitkIDICOMTagsOfInterest.cpp
   mitkDICOMTagsOfInterestAddHelper.cpp
   mitkDICOMTagPath.cpp
+  mitkDICOMTimeUtil.cpp
   mitkDICOMProperty.cpp
   mitkDICOMFilesHelper.cpp
   mitkDICOMIOMetaInformationPropertyConstants.cpp

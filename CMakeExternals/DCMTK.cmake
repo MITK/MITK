@@ -22,16 +22,11 @@ if(MITK_USE_DCMTK)
     endif()
 
     set(additional_args )
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/DCMTK/dcmtk.git
-      GIT_TAG DCMTK-3.6.7
+      GIT_TAG 2dd54ca1c28100b820ccf1383a0948e889246f96 # DCMTK 3.7.0++ (2026-05-08, matches dcmqi HEAD's pin)
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

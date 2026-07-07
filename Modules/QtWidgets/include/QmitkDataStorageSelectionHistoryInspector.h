@@ -15,14 +15,18 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "QmitkAbstractDataStorageInspector.h"
+#include <QmitkAbstractDataStorageInspector.h>
 #include <QSortFilterProxyModel>
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <QmitkSimpleTextOverlayWidget.h>
+#include <memory>
 
-#include "ui_QmitkDataStorageSelectionHistoryInspector.h"
+namespace Ui
+{
+  class QmitkDataStorageSelectionHistoryInspector;
+}
 
-/*
-* @brief This is an inspector that offers a simple list view on the last selected nodes (in chronologic order) in a data storage.
+/**
+* \brief Inspector that offers a simple list view on the last selected nodes (in chronologic order) in a data storage.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageSelectionHistoryInspector : public QmitkAbstractDataStorageInspector
 {
@@ -30,6 +34,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageSelectionHistoryInspector : public Qm
 
 public:
   QmitkDataStorageSelectionHistoryInspector(QWidget* parent = nullptr);
+  ~QmitkDataStorageSelectionHistoryInspector() override;
 
   QAbstractItemView* GetView() override;
   const QAbstractItemView* GetView() const override;
@@ -49,7 +54,7 @@ protected:
   void Initialize() override;
 
   QmitkAbstractDataStorageModel* m_StorageModel;
-  Ui_QmitkDataStorageSelectionHistoryInspector m_Controls;
+  std::unique_ptr<Ui::QmitkDataStorageSelectionHistoryInspector> m_Controls;
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 

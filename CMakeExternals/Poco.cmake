@@ -18,11 +18,6 @@ if(MITK_USE_Poco)
   if(NOT DEFINED ${proj}_DIR)
 
     set(additional_cmake_args )
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_cmake_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
 
     set(ssl_args
       -DENABLE_CRYPTO:BOOL=OFF
@@ -47,7 +42,7 @@ if(MITK_USE_Poco)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/pocoproject/poco.git
-      GIT_TAG fee4dccb44396911e9559c6875e88146f64b7f55 # poco-1.14.1-release
+      GIT_TAG 96d182a99303fb068575294b36f0cc20da2e7b25 # poco-1.14.2-release
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

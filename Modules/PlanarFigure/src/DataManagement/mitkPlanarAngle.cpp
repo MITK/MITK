@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarAngle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarAngle.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarAngle::PlanarAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {
@@ -22,6 +22,12 @@ mitk::PlanarAngle::PlanarAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "d
   this->SetNumberOfHelperPolyLines(1);
 
   m_HelperPolyLinesToBePainted->InsertElement(0, false);
+}
+
+mitk::PlanarAngle::PlanarAngle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_ANGLE(other.FEATURE_ID_ANGLE)
+{
 }
 
 void mitk::PlanarAngle::GeneratePolyLine()
@@ -65,7 +71,7 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   m_HelperPolyLinesToBePainted->SetElement(0, true);
   radius = nonScalingRadius;
 
-  double angle = this->GetQuantity(FEATURE_ID_ANGLE);
+  double angle = this->GetQuantity(FEATURE_ID_ANGLE) * vnl_math::pi / 180.0;
 
   // Determine from which arm the angle should be drawn
 
@@ -75,8 +81,9 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   v2[0] = 1.0;
   v2[1] = 0.0;
 
-  v0[0] = v0[0] * cos(0.001) - v0[1] * sin(0.001); // rotate one arm a bit
-  v0[1] = v0[0] * sin(0.001) + v0[1] * cos(0.001);
+  const double v0x = v0[0]; // save before overwriting for correct 2D rotation
+  v0[0] = v0x * cos(0.001) - v0[1] * sin(0.001);
+  v0[1] = v0x * sin(0.001) + v0[1] * cos(0.001);
   v0.Normalize();
   v1.Normalize();
   double testAngle = acos(v0 * v1);
@@ -144,7 +151,7 @@ void mitk::PlanarAngle::EvaluateFeaturesInternal()
 
   v0.Normalize();
   v1.Normalize();
-  double angle = acos(v0 * v1);
+  double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
 
   this->SetQuantity(FEATURE_ID_ANGLE, angle);
 }

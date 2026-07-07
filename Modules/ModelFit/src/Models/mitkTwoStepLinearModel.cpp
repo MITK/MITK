@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoStepLinearModel.h"
+#include <mitkTwoStepLinearModel.h>
 #include <mitkIOUtil.h>
 
 
@@ -275,11 +275,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerive
     return result;
 };
 
-itk::LightObject::Pointer mitk::TwoStepLinearModel::InternalClone() const
+mitk::TwoStepLinearModel::TwoStepLinearModel(const TwoStepLinearModel& source)
+: Superclass(source)
 {
-  TwoStepLinearModel::Pointer newClone = TwoStepLinearModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

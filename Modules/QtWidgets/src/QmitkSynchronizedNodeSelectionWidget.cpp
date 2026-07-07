@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // mitk qt widgets module
 #include <QmitkSynchronizedNodeSelectionWidget.h>
+#include <ui_QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 #include <QmitkNodeSelectionDialog.h>
@@ -26,19 +27,20 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
   : QmitkAbstractNodeSelectionWidget(parent)
   , m_SyncGroupIndex(-1)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkSynchronizedNodeSelectionWidget>();
+  m_Controls->setupUi(this);
 
   m_StorageModel = std::make_unique<QmitkRenderWindowDataNodeTableModel>(this);
 
-  m_Controls.tableView->setModel(m_StorageModel.get());
-  m_Controls.tableView->horizontalHeader()->setVisible(false);
-  m_Controls.tableView->verticalHeader()->setVisible(false);
-  m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_Controls.tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  m_Controls->tableView->setModel(m_StorageModel.get());
+  m_Controls->tableView->horizontalHeader()->setVisible(false);
+  m_Controls->tableView->verticalHeader()->setVisible(false);
+  m_Controls->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  auto header = m_Controls.tableView->horizontalHeader();
+  auto header = m_Controls->tableView->horizontalHeader();
   header->setSectionResizeMode(0, QHeaderView::Stretch);
 
   const int columnCount = m_StorageModel->columnCount();
@@ -54,7 +56,6 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
 
 QmitkSynchronizedNodeSelectionWidget::~QmitkSynchronizedNodeSelectionWidget()
 {
-
   emit DeregisterSynchronization();
 
   auto baseRenderer = m_BaseRenderer.Lock();
@@ -126,18 +127,18 @@ QmitkRenderWindowDataNodeTableModel* QmitkSynchronizedNodeSelectionWidget::GetSt
 
 void QmitkSynchronizedNodeSelectionWidget::SetSelectAll(bool selectAll)
 {
-  if (selectAll == m_Controls.selectionModeCheckBox->isChecked())
+  if (selectAll == m_Controls->selectionModeCheckBox->isChecked())
   {
     // no need to do something
     return;
   }
 
-  m_Controls.selectionModeCheckBox->setChecked(selectAll);
+  m_Controls->selectionModeCheckBox->setChecked(selectAll);
 }
 
 bool QmitkSynchronizedNodeSelectionWidget::GetSelectAll() const
 {
-  return m_Controls.selectionModeCheckBox->isChecked();
+  return m_Controls->selectionModeCheckBox->isChecked();
 }
 
 void QmitkSynchronizedNodeSelectionWidget::OnSelectionModeChanged(bool selectAll)
@@ -159,12 +160,12 @@ void QmitkSynchronizedNodeSelectionWidget::OnEditSelection()
   dialog->SetCurrentSelection(m_StorageModel->GetCurrentSelection());
   dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
 
-  m_Controls.changeSelectionButton->setChecked(true);
+  m_Controls->changeSelectionButton->setChecked(true);
   if (dialog->exec())
   {
-    if (m_Controls.selectionModeCheckBox->isChecked())
+    if (m_Controls->selectionModeCheckBox->isChecked())
     {
-      m_Controls.selectionModeCheckBox->setChecked(false);
+      m_Controls->selectionModeCheckBox->setChecked(false);
       emit SelectionModeChanged(false);
     }
 
@@ -172,7 +173,7 @@ void QmitkSynchronizedNodeSelectionWidget::OnEditSelection()
     this->HandleChangeOfInternalSelection(selectedNodes);
   }
 
-  m_Controls.changeSelectionButton->setChecked(false);
+  m_Controls->changeSelectionButton->setChecked(false);
 
   delete dialog;
 }
@@ -216,19 +217,19 @@ void QmitkSynchronizedNodeSelectionWidget::OnTableClicked(const QModelIndex& ind
 
 void QmitkSynchronizedNodeSelectionWidget::SetUpConnections()
 {
-  connect(m_Controls.selectionModeCheckBox, &QCheckBox::clicked,
+  connect(m_Controls->selectionModeCheckBox, &QCheckBox::clicked,
     this, &QmitkSynchronizedNodeSelectionWidget::OnSelectionModeChanged);
-  connect(m_Controls.changeSelectionButton, &QPushButton::clicked,
+  connect(m_Controls->changeSelectionButton, &QPushButton::clicked,
     this, &QmitkSynchronizedNodeSelectionWidget::OnEditSelection);
 
-  connect(m_Controls.tableView, &QTableView::clicked,
+  connect(m_Controls->tableView, &QTableView::clicked,
     this, &QmitkSynchronizedNodeSelectionWidget::OnTableClicked);
 }
 
 void QmitkSynchronizedNodeSelectionWidget::SetSelection(const NodeList& newSelection)
 {
   this->HandleChangeOfInternalSelection(newSelection);
-  m_Controls.selectionModeCheckBox->setChecked(false);
+  m_Controls->selectionModeCheckBox->setChecked(false);
 }
 
 void QmitkSynchronizedNodeSelectionWidget::Initialize()
@@ -240,8 +241,8 @@ void QmitkSynchronizedNodeSelectionWidget::Initialize()
 
   if (baseRenderer.IsNull() || dataStorage.IsNull())
   {
-    m_Controls.selectionModeCheckBox->setEnabled(false);
-    m_Controls.changeSelectionButton->setEnabled(false);
+    m_Controls->selectionModeCheckBox->setEnabled(false);
+    m_Controls->changeSelectionButton->setEnabled(false);
     // reset the model if no data storage is defined
     m_StorageModel->removeRows(0, m_StorageModel->rowCount());
     return;
@@ -252,10 +253,10 @@ void QmitkSynchronizedNodeSelectionWidget::Initialize()
   // If a new data storage or node predicate has been defined,
   // we switch to the "selectAll" mode and synchronize the selection for simplicity.
   // enable UI
-  m_Controls.selectionModeCheckBox->setEnabled(true);
-  m_Controls.changeSelectionButton->setEnabled(true);
+  m_Controls->selectionModeCheckBox->setEnabled(true);
+  m_Controls->changeSelectionButton->setEnabled(true);
 
-  m_Controls.selectionModeCheckBox->setChecked(true);
+  m_Controls->selectionModeCheckBox->setChecked(true);
 }
 
 void QmitkSynchronizedNodeSelectionWidget::UpdateInfo()
@@ -368,7 +369,7 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
   // of an already selected node or it is already explicitly visible for this renderer
   // via properties.
   // Nodes added to the selection will be made visible.
-  if (m_Controls.selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node) || visibleInRenderer)
+  if (m_Controls->selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node) || visibleInRenderer)
   {
     auto currentSelection = this->GetCurrentInternalSelection();
     // Check if the nodes is already part of the internal selection.
@@ -459,9 +460,9 @@ void QmitkSynchronizedNodeSelectionWidget::RemoveFromInternalSelection(mitk::Dat
     return;
   }
 
-  if (m_Controls.selectionModeCheckBox->isChecked())
+  if (m_Controls->selectionModeCheckBox->isChecked())
   {
-    m_Controls.selectionModeCheckBox->setChecked(false);
+    m_Controls->selectionModeCheckBox->setChecked(false);
     emit SelectionModeChanged(false);
   }
 
@@ -536,25 +537,36 @@ void QmitkSynchronizedNodeSelectionWidget::SelectAll()
 
 void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  auto baseRenderer = m_BaseRenderer.Lock();
-  if (baseRenderer.IsNull())
+  if (index < 1)
+  {
+    mitkThrow() << "Invalid synchronization group index '" << index
+                << "'. Group index must be >= 1.";
+  }
+
+  // No-op when the value is unchanged. Suppressing the signal emission here is
+  // load-bearing: it terminates the model->view feedback loop in which the
+  // owning utility widget mirrors this index back into its combobox via
+  // 'SetSyncGroup'.
+  if (m_SyncGroupIndex == index)
   {
     return;
   }
 
-  if (index == 0)
-  {
-    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
-    return;
-  }
-
+  // The logical group index is widget bookkeeping and must always be stored;
+  // it does not depend on a renderer being attached. The renderer is only
+  // required for the optional render-update side effect below.
   m_SyncGroupIndex = index;
+
+  emit SyncGroupIndexChanged(index);
 
   // Since the synchronization might lead to a different node order depending on the layer properties, the render window
   // needs to be updated.
   // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
   // see https://phabricator.mitk.org/T22322
-  mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  if (auto baseRenderer = m_BaseRenderer.Lock())
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }
 
 QmitkSynchronizedNodeSelectionWidget::GroupSyncIndexType QmitkSynchronizedNodeSelectionWidget::GetSyncGroup() const

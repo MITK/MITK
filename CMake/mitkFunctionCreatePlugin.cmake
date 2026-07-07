@@ -53,7 +53,6 @@ function(mitk_create_plugin)
     TARGET_DEPENDS
     DOXYGEN_TAGFILES
     MOC_OPTIONS
-    SUBPROJECTS # deprecated
   )
 
   cmake_parse_arguments(_PLUGIN "${arg_options}" "${arg_single}" "${arg_multiple}" ${ARGN})
@@ -106,8 +105,6 @@ function(mitk_create_plugin)
   set(_PLUGIN_TRANSLATION_FILES ${TRANSLATION_FILES})
   set(_PLUGIN_QRC_FILES ${QRC_FILES})
   set(_PLUGIN_H_FILES ${H_FILES})
-  set(_PLUGIN_TXX_FILES ${TXX_FILES})
-  set(_PLUGIN_DOX_FILES ${DOX_FILES})
   set(_PLUGIN_CMAKE_FILES ${CMAKE_FILES} files.cmake)
   set(_PLUGIN_FILE_DEPENDENCIES ${FILE_DEPENDENCIES})
 
@@ -129,35 +126,42 @@ function(mitk_create_plugin)
     set(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
 
-    # Create a list of Doxygen tag files from the plug-in dependencies
+    # Create a list of Doxygen tag files from the plug-in dependencies.
+    #
+    # Doxygen 1.11.0 ignores TAGFILES while generating Qt Help and emits an
+    # "error:"-prefixed advisory that MSBuild misclassifies as a build failure
+    # whenever the help step runs. Cross-plugin help links via TAGFILES only
+    # worked up to Doxygen 1.10, so collect them only for those versions.
     set(PLUGIN_DOXYGEN_TAGFILES)
-    foreach(_dep_target ${_PLUGIN_target_libraries})
-      string(REPLACE _ . _dep ${_dep_target})
+    if(DOXYGEN_VERSION VERSION_LESS 1.11.0)
+      foreach(_dep_target ${_PLUGIN_target_libraries})
+        string(REPLACE _ . _dep ${_dep_target})
 
-      get_target_property(_is_imported ${_dep_target} IMPORTED)
-      if(_is_imported)
-        get_target_property(_import_loc_debug ${_dep_target} IMPORTED_LOCATION_DEBUG)
-        get_target_property(_import_loc_release ${_dep_target} IMPORTED_LOCATION_RELEASE)
-        # There is not necessarily a debug and release build
-        if(_import_loc_release)
-          set(_import_loc ${_import_loc_release})
+        get_target_property(_is_imported ${_dep_target} IMPORTED)
+        if(_is_imported)
+          get_target_property(_import_loc_debug ${_dep_target} IMPORTED_LOCATION_DEBUG)
+          get_target_property(_import_loc_release ${_dep_target} IMPORTED_LOCATION_RELEASE)
+          # There is not necessarily a debug and release build
+          if(_import_loc_release)
+            set(_import_loc ${_import_loc_release})
+          else()
+            set(_import_loc ${_import_loc_debug})
+          endif()
+          get_filename_component(_target_filename "${_import_loc}" NAME)
+          # on windows there might be a Debug or Release subdirectory
+          string(REGEX REPLACE "/bin/plugins/(Debug/|Release/)?${_target_filename}" "/Plugins/${_dep}/documentation/UserManual" plugin_tag_dir "${_import_loc}" )
         else()
-          set(_import_loc ${_import_loc_debug})
+          set(plugin_tag_dir "${CMAKE_BINARY_DIR}/Plugins/${_dep}/documentation/UserManual")
         endif()
-        get_filename_component(_target_filename "${_import_loc}" NAME)
-        # on windows there might be a Debug or Release subdirectory
-        string(REGEX REPLACE "/bin/plugins/(Debug/|Release/)?${_target_filename}" "/Plugins/${_dep}/documentation/UserManual" plugin_tag_dir "${_import_loc}" )
-      else()
-        set(plugin_tag_dir "${CMAKE_BINARY_DIR}/Plugins/${_dep}/documentation/UserManual")
-      endif()
 
-      set(_tag_file "${plugin_tag_dir}/${_dep_target}.tag")
-      if(EXISTS ${_tag_file})
-        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} \"${_tag_file}=qthelp://${_dep}/bundle/\"")
+        set(_tag_file "${plugin_tag_dir}/${_dep_target}.tag")
+        if(EXISTS ${_tag_file})
+          set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} \"${_tag_file}=qthelp://${_dep}/bundle/\"")
+        endif()
+      endforeach()
+      if(_PLUGIN_DOXYGEN_TAGFILES)
+        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_PLUGIN_DOXYGEN_TAGFILES}")
       endif()
-    endforeach()
-    if(_PLUGIN_DOXYGEN_TAGFILES)
-      set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_PLUGIN_DOXYGEN_TAGFILES}")
     endif()
     #message("PLUGIN_DOXYGEN_TAGFILES: ${PLUGIN_DOXYGEN_TAGFILES}")
 
@@ -168,17 +172,17 @@ function(mitk_create_plugin)
   #------------------------------------------------------------#
   #------------------ Create Plug-in --------------------------#
 
+  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+  endif()
+
   mitkFunctionOrganizeSources(
     SOURCE ${_PLUGIN_CPP_FILES}
     HEADER ${_PLUGIN_H_FILES}
-    TXX ${_PLUGIN_TXX_FILES}
-    DOC ${_PLUGIN_DOX_FILES}
     UI ${_PLUGIN_UI_FILES}
     QRC ${_PLUGIN_QRC_FILES} ${_PLUGIN_CACHED_RESOURCE_FILES}
     META ${_PLUGIN_META_FILES}
-    MOC ${MY_MOC_CPP}
-    GEN_UI ${MY_UI_CPP}
-    GEN_QRC ${MY_QRC_SRCS}
   )
 
   ctkMacroBuildPlugin(
@@ -195,6 +199,7 @@ function(mitk_create_plugin)
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
     NO_INSTALL # we install the plug-in ourselves
+    NO_SOURCE_GROUPS # we organize sources ourselves
     ${is_test_plugin}
   )
 
@@ -216,6 +221,19 @@ function(mitk_create_plugin)
   set_property(TARGET ${PLUGIN_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${PLUGIN_TARGET})
   set_property(TARGET ${PLUGIN_TARGET} PROPERTY US_MODULE_NAME ${PLUGIN_TARGET})
 
+  if(TARGET MitkCompilerFlags)
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkCompilerFlags)
+  endif()
+
+  # CTK's UseCTK.cmake injects CTK_INCLUDE_DIRS into the directory scope via
+  # a plain include_directories() call, which arrives as non-SYSTEM -I. Re-
+  # add the same dirs to the plugin target as SYSTEM so warnings from CTK
+  # headers (e.g. ctkServiceTracker.tpp's volatile compound assignments
+  # under C++20) are suppressed without per-plugin target_compile_options.
+  if(CTK_INCLUDE_DIRS)
+    target_include_directories(${PLUGIN_TARGET} SYSTEM PRIVATE ${CTK_INCLUDE_DIRS})
+  endif()
+
   if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
     foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
       if("${CMAKE_CURRENT_SOURCE_DIR}/" MATCHES "^${MITK_EXTENSION_DIR}/.*")
@@ -236,13 +254,7 @@ function(mitk_create_plugin)
       mitkFunctionCheckCAndCXXCompilerFlags("/WX" plugin_c_flags plugin_cxx_flags)
     else()
       mitkFunctionCheckCAndCXXCompilerFlags(-Werror plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" plugin_c_flags plugin_cxx_flags)
       mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-function-type" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" plugin_c_flags plugin_cxx_flags)
     endif()
   endif()
 
@@ -266,30 +278,39 @@ function(mitk_create_plugin)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkLog)
   endif()
 
-  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-  endif()
+  target_sources(${PLUGIN_TARGET} PRIVATE ${_PLUGIN_META_FILES})
 
   set(PLUGIN_TARGET ${PLUGIN_TARGET} PARENT_SCOPE)
+
+  if(_PLUGIN_NO_INSTALL)
+    set_target_properties(${PLUGIN_TARGET} PROPERTIES NO_INSTALL TRUE)
+  endif()
 
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
   if(NOT _PLUGIN_NO_INSTALL)
     set(install_directories "")
+    set(install_depsets "")
     if(NOT MACOSX_BUNDLE_NAMES)
       set(install_directories bin/plugins)
-    else(NOT MACOSX_BUNDLE_NAMES)
+      set(install_depsets ${MITK_RUNTIME_DEPENDENCY_SETS})
+    else()
       foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
         list(APPEND install_directories ${bundle_name}.app/Contents/MacOS/plugins)
-      endforeach(bundle_name)
-    endif(NOT MACOSX_BUNDLE_NAMES)
+      endforeach()
+      set(install_depsets ${MITK_RUNTIME_DEPENDENCY_SETS})
+    endif()
 
-    foreach(install_subdir ${install_directories})
+    if(LINUX)
+      set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
+    elseif(APPLE)
+      set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
+    endif()
 
+    foreach(install_subdir _depset IN ZIP_LISTS install_directories install_depsets)
       mitkFunctionInstallCTKPlugin(TARGETS ${PLUGIN_TARGET}
-                                   DESTINATION ${install_subdir})
-
+                                   DESTINATION ${install_subdir}
+                                   RUNTIME_DEPENDENCY_SET ${_depset})
     endforeach()
 
     set(_autoload_targets )
@@ -300,8 +321,8 @@ function(mitk_create_plugin)
       endif()
     endforeach()
 
-    # The MITK_AUTOLOAD_TARGETS property is used in the mitkFunctionInstallAutoLoadModules
-    # macro which expects a list of plug-in targets.
+    # The MITK_AUTOLOAD_TARGETS property tracks auto-load modules associated
+    # with this plug-in target.
     if (_autoload_targets)
       list(REMOVE_DUPLICATES _autoload_targets)
       set_target_properties(${PLUGIN_TARGET} PROPERTIES MITK_AUTOLOAD_TARGETS "${_autoload_targets}")

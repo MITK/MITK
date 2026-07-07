@@ -10,13 +10,30 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkPPArgCount.h
+ * \brief Preprocessor utility macros for counting the number of variadic macro arguments at compile time.
+ *
+ * Provides the \c MITK_PP_ARG_COUNT macro, which expands to the number of arguments passed
+ * to it (supports 1 to 25 arguments). This is used internally by the AccessByItk macro family.
+ *
+ * \ingroup Core
+ */
+
 #ifndef mitkPPArgCount_h
 #define mitkPPArgCount_h
 
+/**
+ * \brief Count the number of arguments in a variadic macro invocation (1--25 arguments).
+ *
+ * Example: \c MITK_PP_ARG_COUNT(a, b, c) expands to \c 3.
+ */
 #define MITK_PP_ARG_COUNT(...) MITK_PP_ARG_COUNT_((__VA_ARGS__, MITK_PP_RSEQ_N()))
 
+/** \brief Internal helper that unpacks the tuple for MITK_PP_ARG_N. */
 #define MITK_PP_ARG_COUNT_(tuple) MITK_PP_ARG_N tuple
 
+/** \brief Internal helper that selects the Nth argument to determine the count. */
 #define MITK_PP_ARG_N(_1,                                                                                              \
                       _2,                                                                                              \
                       _3,                                                                                              \
@@ -46,6 +63,7 @@ found in the LICENSE file.
                       ...)                                                                                             \
   N
 
+/** \brief Internal reverse integer sequence used by MITK_PP_ARG_COUNT to resolve the argument count. */
 #define MITK_PP_RSEQ_N() 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
 #endif

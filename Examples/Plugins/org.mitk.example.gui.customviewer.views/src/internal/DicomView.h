@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
+#include <memory>
 
 namespace Ui
 {
@@ -67,7 +68,7 @@ protected Q_SLOTS:
 protected:
   void SetFocus() override;
 
-  Ui::QmitkDicomViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkDicomViewControls> m_Controls;
 
   QWidget *m_Parent;
 };

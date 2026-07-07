@@ -32,11 +32,11 @@ found in the LICENSE file.
 #include <mitkSliceNavigationController.h>
 #include <mitkStatusBar.h>
 #include <mitkPlanarFigure.h>
-#include "mitkPlanarFigureMaskGenerator.h"
+#include <mitkPlanarFigureMaskGenerator.h>
 
-#include "QmitkImageStatisticsDataGenerator.h"
+#include <QmitkImageStatisticsDataGenerator.h>
 
-#include "mitkImageStatisticsContainerManager.h"
+#include <mitkImageStatisticsContainerManager.h>
 #include <mitkPlanarFigureInteractor.h>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
@@ -66,7 +66,7 @@ namespace {
 } // unnamed namespace
 
 QmitkImageStatisticsView::QmitkImageStatisticsView()
-  : m_Controls(new Ui::QmitkImageStatisticsViewControls)
+  : m_Controls(std::make_unique<Ui::QmitkImageStatisticsViewControls>())
 {
 }
 
@@ -325,9 +325,9 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nbins)
   this->UpdateHistogramWidget();
 }
 
-void QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged(int state)
+void QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged(Qt::CheckState state)
 {
-  auto ignoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
+  auto ignoreZeroValueVoxel = state != Qt::Unchecked;
   m_Controls->widget_statistics->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);
   m_DataGenerator->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);
   this->UpdateIntensityProfile();

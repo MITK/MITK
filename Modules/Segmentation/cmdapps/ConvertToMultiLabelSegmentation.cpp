@@ -20,10 +20,10 @@ found in the LICENSE file.
 #include <sstream>
 
 // ITK includes
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 // MITK includes
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 #include <mitkIOUtil.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkDataStorage.h>

@@ -13,78 +13,122 @@ found in the LICENSE file.
 #ifndef mitkApplicationCursor_h
 #define mitkApplicationCursor_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 
 namespace mitk
 {
-  /*!
-    \brief Toolkit specific implementation of mitk::ApplicationCursor
-
-    For any toolkit, this class has to be sub-classed. One instance of that sub-class has to
-    be registered with mitk::ApplicationCursor. See the (very simple) implementation of
-    QmitkApplicationCursor for an example.
-  */
+  /**
+   * \brief Abstract interface for toolkit-specific cursor implementations.
+   *
+   * For any GUI toolkit, this class must be sub-classed to provide cursor
+   * management functionality. One instance of the sub-class must be registered
+   * with mitk::ApplicationCursor. See QmitkApplicationCursor for an example.
+   *
+   * \sa ApplicationCursor
+   */
   class MITKCORE_EXPORT ApplicationCursorImplementation
   {
   public:
-    /// Change the current application cursor
+    /**
+     * \brief Push a new cursor onto the cursor stack (XPM format).
+     *
+     * \param[in] XPM The cursor image in XPM format.
+     * \param[in] hotspotX The x-coordinate of the cursor hotspot.
+     * \param[in] hotspotY The y-coordinate of the cursor hotspot.
+     */
     virtual void PushCursor(const char *XPM[], int hotspotX, int hotspotY) = 0;
 
-    /// Change the current application cursor
-    virtual void PushCursor(std::istream &, int hotspotX, int hotspotY) = 0;
+    /**
+     * \brief Push a new cursor onto the cursor stack (stream format).
+     *
+     * \param[in,out] cursorStream Input stream containing cursor data.
+     * \param[in] hotspotX The x-coordinate of the cursor hotspot.
+     * \param[in] hotspotY The y-coordinate of the cursor hotspot.
+     */
+    virtual void PushCursor(std::istream &cursorStream, int hotspotX, int hotspotY) = 0;
 
-    /// Restore the previous cursor
+    /** \brief Restore the previous cursor from the stack. */
     virtual void PopCursor() = 0;
 
-    /// Get absolute mouse position on screen
+    /**
+     * \brief Get the absolute mouse position on screen.
+     * \return The current cursor position in screen coordinates.
+     */
     virtual const Point2I GetCursorPosition() = 0;
 
-    /// Set absolute mouse position on screen
-    virtual void SetCursorPosition(const Point2I &) = 0;
+    /**
+     * \brief Set the absolute mouse position on screen.
+     * \param[in] position The desired cursor position in screen coordinates.
+     */
+    virtual void SetCursorPosition(const Point2I &position) = 0;
 
     virtual ~ApplicationCursorImplementation() {}
-  protected:
-  private:
   };
 
-  /*!
-    \brief Allows to override the application's cursor.
-
-    Base class for classes that allow to override the applications cursor with context dependent
-    cursors. Accepts cursors in the XPM format.
-
-    The behaviour is stack-like. You can push your cursor on top of the stack and later pop it to
-    reset the cursor to its former state. This is mimicking Qt's Application::setOverrideCuror()
-    behaviour, but should be ok for most cases where you want to switch a cursor.
-  */
+  /**
+   * \brief Singleton for overriding the application's cursor.
+   *
+   * Provides a stack-based mechanism to override the application cursor with
+   * context-dependent cursors. Accepts cursors in XPM format. Push a cursor
+   * on top of the stack and later pop it to restore the previous state. This
+   * mimics Qt's QApplication::setOverrideCursor() behavior.
+   *
+   * A toolkit-specific ApplicationCursorImplementation must be registered
+   * before any cursor operations are used.
+   *
+   * \sa ApplicationCursorImplementation
+   */
   class MITKCORE_EXPORT ApplicationCursor
   {
   public:
-    /// This class is a singleton.
+    /**
+     * \brief Get the singleton instance.
+     * \return Pointer to the singleton ApplicationCursor.
+     */
     static ApplicationCursor *GetInstance();
 
-    /// To be called by a toolkit specific ApplicationCursorImplementation.
+    /**
+     * \brief Register a toolkit-specific cursor implementation.
+     * \param[in] implementation The implementation to use for cursor operations.
+     */
     static void RegisterImplementation(ApplicationCursorImplementation *implementation);
 
-    /// Change the current application cursor
+    /**
+     * \brief Push a new cursor onto the stack (XPM format).
+     *
+     * \param[in] XPM The cursor image in XPM format.
+     * \param[in] hotspotX The x-coordinate of the cursor hotspot (-1 for default).
+     * \param[in] hotspotY The y-coordinate of the cursor hotspot (-1 for default).
+     */
     void PushCursor(const char *XPM[], int hotspotX = -1, int hotspotY = -1);
 
-    /// Change the current application cursor
-    void PushCursor(std::istream &, int hotspotX = -1, int hotspotY = -1);
+    /**
+     * \brief Push a new cursor onto the stack (stream format).
+     *
+     * \param[in,out] cursorStream Input stream containing cursor data.
+     * \param[in] hotspotX The x-coordinate of the cursor hotspot (-1 for default).
+     * \param[in] hotspotY The y-coordinate of the cursor hotspot (-1 for default).
+     */
+    void PushCursor(std::istream &cursorStream, int hotspotX = -1, int hotspotY = -1);
 
-    /// Restore the previous cursor
+    /** \brief Pop the most recent cursor from the stack, restoring the previous one. */
     void PopCursor();
 
-    /// Get absolute mouse position on screen
-    /// \return (-1, -1) if querying mouse position is not possible
+    /**
+     * \brief Get the absolute mouse position on screen.
+     * \return The cursor position, or (-1, -1) if querying is not possible.
+     */
     const Point2I GetCursorPosition();
 
-    /// Set absolute mouse position on screen
-    void SetCursorPosition(const Point2I &);
+    /**
+     * \brief Set the absolute mouse position on screen.
+     * \param[in] position The desired cursor position in screen coordinates.
+     */
+    void SetCursorPosition(const Point2I &position);
 
   protected:
-    /// Purposely hidden - singleton
+    /** \brief Hidden constructor (singleton pattern). */
     ApplicationCursor();
 
   private:

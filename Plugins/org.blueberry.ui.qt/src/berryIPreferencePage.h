@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIPREFERENCEPAGE_H_
 #define BERRYIPREFERENCEPAGE_H_
 
-#include "berryObject.h"
+#include <berryObject.h>
 #include "berryIWorkbench.h"
 
 #include <QObject>

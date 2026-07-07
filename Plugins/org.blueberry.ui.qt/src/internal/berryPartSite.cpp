@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryIWorkbenchPage.h"
 #include "berryIWorkbenchWindow.h"
 #include "berryPartPane.h"
-#include "berryIContributor.h"
+#include <berryIContributor.h>
 #include "berryIServiceScopes.h"
 
 #include "services/berryIServiceFactory.h"
@@ -279,48 +279,6 @@ void PartSite::SetSelectionProvider(ISelectionProvider::Pointer provider)
 {
   selectionProvider = provider;
 }
-
-/*
- * @see IWorkbenchPartSite#getKeyBindingService()
- *
- * TODO deprecated: use IHandlerService instead
- */
-//IKeyBindingService
-//PartSite::GetKeyBindingService() {
-//    if (keyBindingService == null) {
-//      keyBindingService = new KeyBindingService(this);
-//
-//      // TODO why is this here? and it should be using HandlerSubmissions
-//      // directly..
-//      if (this instanceof EditorSite) {
-//        EditorActionBuilder.ExternalContributor contributor = (EditorActionBuilder.ExternalContributor) ((EditorSite) this)
-//            .getExtensionActionBarContributor();
-//
-//        if (contributor != null) {
-//          ActionDescriptor[] actionDescriptors = contributor
-//              .getExtendedActions();
-//
-//          if (actionDescriptors != null) {
-//            for (int i = 0; i < actionDescriptors.length; i++) {
-//              ActionDescriptor actionDescriptor = actionDescriptors[i];
-//
-//              if (actionDescriptor != null) {
-//                IAction action = actionDescriptors[i]
-//                    .getAction();
-//
-//                if (action != null
-//                    && action.getActionDefinitionId() != null) {
-//                  keyBindingService.registerAction(action);
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
-//    }
-//
-//    return keyBindingService;
-//  }
 
 QString PartSite::GetInitialScopeId()
 {

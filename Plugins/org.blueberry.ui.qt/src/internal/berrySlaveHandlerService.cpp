@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include "berrySlaveHandlerService.h"
 
-#include "berryIHandler.h"
+#include <berryIHandler.h>
 #include "berryIHandlerActivation.h"
 #include "berryISourceProvider.h"
 
 #include "berryAndExpression.h"
 #include "berryHandlerActivation.h"
-#include "berryExecutionEvent.h"
+#include <berryExecutionEvent.h>
 
 namespace berry {
 

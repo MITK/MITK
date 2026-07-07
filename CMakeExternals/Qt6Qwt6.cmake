@@ -15,16 +15,10 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED ${proj}_DIR)
 
-  if(CTEST_USE_LAUNCHERS)
-    list(APPEND additional_cmake_args
-      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-    )
-  endif()
-
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      GIT_REPOSITORY https://github.com/MITK/Qwt.git
-     GIT_TAG 149ab80d5434bf1702c14886b0e353292a9a1d7e # branch: cmake (synced from https://github.com/MehdiChinoune/qwt)
+     GIT_TAG 611fda6875e7bbbb61d86ce8774c24f16fe8b00b # branch: 2026-07-02-patched
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

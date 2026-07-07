@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEventStateMachine.h"
-#include "mitkApplicationCursor.h"
-#include "mitkInteractionEvent.h"
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineCondition.h"
-#include "mitkStateMachineContainer.h"
-#include "mitkStateMachineState.h"
-#include "mitkStateMachineTransition.h"
-#include "mitkUndoController.h"
+#include <mitkEventStateMachine.h>
+#include <mitkApplicationCursor.h>
+#include <mitkInteractionEvent.h>
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineCondition.h>
+#include <mitkStateMachineContainer.h>
+#include <mitkStateMachineState.h>
+#include <mitkStateMachineTransition.h>
+#include <mitkUndoController.h>
 
 mitk::EventStateMachine::EventStateMachine()
   : m_IsActive(true),
@@ -58,13 +58,6 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
     m_ConditionDelegatesMap.clear();
 
     // clear actions map ,and connect all actions as declared in sub-class
-    for (auto i = m_ActionFunctionsMap.begin();
-         i != m_ActionFunctionsMap.end();
-         ++i)
-    {
-      delete i->second;
-    }
-    m_ActionFunctionsMap.clear();
     for (auto i = m_ActionDelegatesMap.begin(); i != m_ActionDelegatesMap.end(); ++i)
     {
       delete i->second;
@@ -89,30 +82,8 @@ mitk::EventStateMachine::~EventStateMachine()
   }
 }
 
-void mitk::EventStateMachine::AddActionFunction(const std::string &action, mitk::TActionFunctor *functor)
-{
-  if (!functor)
-    return;
-  // make sure double calls for same action won't cause memory leaks
-  delete m_ActionFunctionsMap[action];
-  auto i = m_ActionDelegatesMap.find(action);
-  if (i != m_ActionDelegatesMap.end())
-  {
-    delete i->second;
-    m_ActionDelegatesMap.erase(i);
-  }
-  m_ActionFunctionsMap[action] = functor;
-}
-
 void mitk::EventStateMachine::AddActionFunction(const std::string &action, const ActionFunctionDelegate &delegate)
 {
-  auto i = m_ActionFunctionsMap.find(action);
-  if (i != m_ActionFunctionsMap.end())
-  {
-    delete i->second;
-    m_ActionFunctionsMap.erase(i);
-  }
-
   delete m_ActionDelegatesMap[action];
   m_ActionDelegatesMap[action] = delegate.Clone();
 }
@@ -204,17 +175,7 @@ void mitk::EventStateMachine::ExecuteAction(StateMachineAction *action, Interact
   }
   else
   {
-    // try the legacy system
-    std::map<std::string, TActionFunctor *>::const_iterator functionIter =
-      m_ActionFunctionsMap.find(action->GetActionName());
-    if (functionIter != m_ActionFunctionsMap.cend())
-    {
-      functionIter->second->DoAction(action, event);
-    }
-    else
-    {
-      MITK_WARN << "No implementation of action '" << action->GetActionName() << "' has been found.";
-    }
+    MITK_WARN << "No implementation of action '" << action->GetActionName() << "' has been found.";
   }
 }
 

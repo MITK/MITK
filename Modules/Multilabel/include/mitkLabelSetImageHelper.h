@@ -25,48 +25,87 @@ namespace mitk
   namespace LabelSetImageHelper
   {
     /**
-     * @brief This function creates and returns a new empty segmentation data node.
-     * @remark The data is not set. Set it manually to have a properly setup node.
-     * @param segmentationName A name for the new segmentation node.
-     * @return The new segmentation node as a data node pointer.
+     * \brief This function creates and returns a new empty segmentation data node.
+     * \remark The data is not set. Set it manually to have a properly setup node.
+     * \param segmentationName A name for the new segmentation node.
+     * \return The new segmentation node as a data node pointer.
      */
     MITKMULTILABEL_EXPORT mitk::DataNode::Pointer CreateEmptySegmentationNode(const std::string& segmentationName = std::string());
 
     /**
-     * @brief This function creates and returns a new data node with a new empty segmentation
+     * \brief This function creates and returns a new data node with a new empty segmentation
      * data structure.
      * The segmentation node is named according to the given reference data node, otherwise a name
      * is passed explicitly.
      * Some properties are set to ensure a proper setup segmentation and node
      * (e.g. link the segmentation node with its parent node).
      *
-     * @param referenceNode             The reference node from which the name of the new segmentation node
+     * \param referenceNode             The reference node from which the name of the new segmentation node
      *                                  is derived. If passed pointer is null, the name "unknown" will be used.
-     * @param initialSegmentationImage  The segmentation image that is used to initialize the label set image.
-     * @param segmentationName          An optional name for the new segmentation node.
-     * @param dataStorage               The data storage of the reference node (if given, used to generate a unique node name).
+     * \param initialSegmentationImage  The segmentation image that is used to initialize the label set image.
+     * \param segmentationName          An optional name for the new segmentation node.
+     * \param dataStorage               The data storage of the reference node (if given, used to generate a unique node name).
      *
-     * @return                          The new segmentation node as a data node pointer.
+     * \return                          The new segmentation node as a data node pointer.
      */
     MITKMULTILABEL_EXPORT mitk::DataNode::Pointer CreateNewSegmentationNode(const DataNode* referenceNode,
       const Image* initialSegmentationImage = nullptr, const std::string& segmentationName = std::string(),
       const DataStorage* dataStorage = nullptr);
 
     /**
-     * @brief This function creates and returns a new label. The label is automatically assigned an
+     * \brief Apply the typical defaults for a segmentation derived from a
+     *        source image: establish the source-image relation and inherit
+     *        the source's patient, study, and frame-of-reference identity.
+     *
+     * Single source of truth for "what makes a freshly-created seg behave
+     * as a typical derived seg" so the C++ factory (CreateNewSegmentationNode)
+     * and the Python `MultiLabelSegmentation(image)` constructor stay in
+     * lockstep. A future change to the default setup edits one location.
+     *
+     * Each step is best-effort: a mitk::Exception from any step is logged via
+     * MITK_WARN and swallowed (a non-mitk std::exception still propagates).
+     * Callers that want explicit control over the individual
+     * steps should call SegSourceImageRelationRule::Connect and the
+     * DICOMSegmentationPropertyHelper::InheritXxxFromSource functions
+     * directly instead.
+     *
+     * \pre seg and source must be valid pointers.
+     */
+    MITKMULTILABEL_EXPORT void SetupDerivedSegmentation(MultiLabelSegmentation* seg,
+                                                        const Image* source);
+
+    /**
+     * \brief This function creates and returns a new label. The label is automatically assigned an
      *        unused generic label name, depending on existing label names in all label sets of the
      *        given label set image.
      *        The color of the label is selected from the MULTILABEL lookup table, following the same
      *        rules of the naming to likely chose a unique color.
      *
-     * @param labelSetImage   The label set image that the new label is added to
-     * @param namePrefix      The prefix of the label name that is prepended by a sequential number
-     * @param hideIDIfUnique Indicates if the ID suffix should be added if the label name prefix would be already unique.
+     * \param labelSetImage   The label set image that the new label is added to
+     * \param namePrefix      The prefix of the label name that is prepended by a sequential number
+     * \param hideIDIfUnique Indicates if the ID suffix should be added if the label name prefix would be already unique.
      * true: only add if not unique; false: add always.
      *
-     * @return                The new label.
+     * \return                The new label.
      */
     MITKMULTILABEL_EXPORT Label::Pointer CreateNewLabel(const MultiLabelSegmentation* labelSetImage, const std::string& namePrefix = "Label", bool hideIDIfUnique = false);
+
+    /**
+     * \brief Suggests the next color from the MULTILABEL color scheme, given the colors already in use.
+     *
+     *        This is the color-selection used by CreateNewLabel, exposed so the same scheme can be
+     *        applied outside of a MultiLabelSegmentation (e.g. to assign distinct colors to several
+     *        binary mask nodes). The first color of an otherwise empty set is palette index 0; every
+     *        subsequent color is the candidate (curated palette first, then generated colors) whose
+     *        nearest distance in CIE Lab space to the in-use colors and the reserved black background
+     *        is the largest.
+     *
+     * \param usedColors The colors already in use. The black background is always reserved implicitly
+     *                    and must not be included.
+     *
+     * \return           The suggested color.
+     */
+    MITKMULTILABEL_EXPORT mitk::Color SuggestNewLabelColor(const std::vector<mitk::Color>& usedColors);
 
     using GroupIDToLabelValueMapType = std::map<mitk::MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::LabelValueVectorType>;
     MITKMULTILABEL_EXPORT GroupIDToLabelValueMapType SplitLabelValuesByGroup(const MultiLabelSegmentation* labelSetImage, const MultiLabelSegmentation::LabelValueVectorType& labelValues);

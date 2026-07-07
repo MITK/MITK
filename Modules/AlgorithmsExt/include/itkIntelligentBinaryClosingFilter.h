@@ -9,12 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkIntelligentBinaryClosingFilter_h
-#define __itkIntelligentBinaryClosingFilter_h
-
-#if defined(_MSC_VER)
-#pragma warning(disable : 4786)
-#endif
+#ifndef itkIntelligentBinaryClosingFilter_h
+#define itkIntelligentBinaryClosingFilter_h
 
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
@@ -29,11 +25,26 @@ found in the LICENSE file.
 
 namespace itk
 {
-  /** \class itkIntelligentBinaryClosingFilter
-   * WARNING: This filtezr needs at least ITK version 3.2
-   * or above to run and compile!!!
-   *  */
-
+  /**
+   * \class IntelligentBinaryClosingFilter
+   * \brief Performs a morphological closing on a binary image, selectively filling
+   * only those holes whose surface-to-volume ratio exceeds a given threshold.
+   *
+   * Unlike a standard binary closing, this filter analyzes connected components
+   * in the closed region (the difference between dilated and eroded images) and
+   * only fills components that meet the surface ratio criterion. This prevents
+   * the closing operation from filling large cavities that should be preserved.
+   *
+   * The filter internally uses a mini-pipeline consisting of dilation, erosion,
+   * subtraction, connected component analysis, and relabeling filters.
+   *
+   * \tparam TInputImage  The input image type (binary image).
+   * \tparam TOutputImage The output image type (typically a labeled or binary image).
+   *
+   * \sa itk::BinaryDilateImageFilter
+   * \sa itk::BinaryErodeImageFilter
+   * \sa itk::ConnectedComponentImageFilter
+   */
   template <class TInputImage, class TOutputImage>
   class ITK_EXPORT IntelligentBinaryClosingFilter : public ImageToImageFilter<TInputImage, TOutputImage>
   {
@@ -63,11 +74,22 @@ namespace itk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** Standard process object method.  This filter is not multithreaded. */
+      /**
+       * \brief Execute the intelligent binary closing algorithm.
+       *
+       * This method is not multithreaded. It runs the internal mini-pipeline
+       * (dilate, erode, subtract, connected component analysis) and selectively
+       * fills holes based on the surface ratio.
+       */
       void GenerateData() override;
 
-    /** Overloaded to link the input to this filter with the input of the
-        mini-pipeline */
+    /**
+     * \brief Set the input binary image.
+     *
+     * Overloaded to also connect the input to the internal dilation filter.
+     *
+     * \param[in] input The input binary image.
+     */
     void SetInput(const InputImageType *input) override
     {
       // processObject is not const-correct so a const_cast is needed here
@@ -76,6 +98,12 @@ namespace itk
     }
 
     using Superclass::SetInput;
+    /**
+     * \brief Set the input at a given index. Only index 0 is supported.
+     * \param[in] i Input index (must be 0).
+     * \param[in] image The input binary image.
+     * \throw itk::ExceptionObject if \p i is not 0.
+     */
     void SetInput(unsigned int i, const TInputImage *image) override
     {
       if (i != 0)
@@ -88,10 +116,32 @@ namespace itk
       }
     }
 
+    /**
+     * \brief Get the radius used for the morphological closing structuring element.
+     * \return The closing radius in pixels.
+     */
     itkGetMacro(ClosingRadius, float);
+
+    /**
+     * \brief Set the radius of the structuring element for morphological closing.
+     * \param[in] _arg The closing radius in pixels.
+     */
     itkSetMacro(ClosingRadius, float);
 
+    /**
+     * \brief Get the surface-to-volume ratio threshold.
+     * \return The surface ratio threshold.
+     */
     itkGetMacro(SurfaceRatio, float);
+
+    /**
+     * \brief Set the surface-to-volume ratio threshold.
+     *
+     * Connected components in the difference image whose surface ratio
+     * exceeds this value will be filled in the output.
+     *
+     * \param[in] _arg The surface ratio threshold.
+     */
     itkSetMacro(SurfaceRatio, float);
 
   protected:
@@ -127,7 +177,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkIntelligentBinaryClosingFilter.txx"
+#include <itkIntelligentBinaryClosingFilter.tpp>
 
 #endif
 

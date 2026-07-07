@@ -22,39 +22,66 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** @brief Class is used to identify (nested) attributes in a DICOM dataset.
-  * In  contrast to the class DICOMTag, which only specifies one specific tag,
-  * the tag path can identify nested attributes (like items in a DICOM sequence).
-  * In addition you may also specify wildcards for the selection index or
-  * complete elements of the path.
-  * @remark If you want to keep the DICOMTagPath compatible to the dcmtk search path
-  * format, you may *not* use element wild cards (this IsExplicit() or HasItemSelectionWildcardsOnly()
-  * must return true).
-  */
+  /**
+   * \ingroup DICOMModule
+   * \brief Class used to identify (nested) attributes in a DICOM dataset.
+   *
+   * In contrast to the class DICOMTag, which only specifies one specific tag,
+   * the tag path can identify nested attributes (like items in a DICOM sequence).
+   * In addition you may also specify wildcards for the selection index or
+   * complete elements of the path.
+   *
+   * \note If you want to keep the DICOMTagPath compatible to the DCMTK search path
+   * format, you may *not* use element wild cards (i.e. IsExplicit() or HasItemSelectionWildcardsOnly()
+   * must return true).
+   *
+   * \sa DICOMTag, DICOMTagPathToPropertyName, PropertyNameToDICOMTagPath
+   */
   class MITKDICOM_EXPORT DICOMTagPath
   {
   public:
     typedef int ItemSelectionIndex;
 
+    /** \brief Describes a single node within a DICOMTagPath. */
     struct MITKDICOM_EXPORT NodeInfo
     {
+      /** \brief Defines the type of a path node. */
       enum class NodeType
       {
-        Invalid = 0,  //*< Node is non existent or invalid.
-        Element,  //*< Selects an specific element given the node name.
-        SequenceSelection, //*< Selects an specific item in a sequence of items and has a item selector ("[n]").
-        AnySelection, //*< Selects all items of a specific element ("[*]").
-        AnyElement,  //*< Selects any element/item. Node name is wildcarded ("*"); item selection as well implictily.
+        Invalid = 0,       ///< Node is non-existent or invalid.
+        Element,           ///< Selects a specific element given the node name.
+        SequenceSelection, ///< Selects a specific item in a sequence of items and has an item selector ("[n]").
+        AnySelection,      ///< Selects all items of a specific element ("[*]").
+        AnyElement,        ///< Selects any element/item. Node name is wildcarded ("*"); item selection as well implicitly.
       };
 
-      NodeType type;
-      DICOMTag tag;
-      ItemSelectionIndex selection;
+      NodeType type;               ///< The type of this node.
+      DICOMTag tag;                ///< The DICOM tag this node refers to.
+      ItemSelectionIndex selection; ///< The item selection index (for SequenceSelection nodes).
 
+      /** \brief Default constructor, creates an Invalid node. */
       NodeInfo();
+
+      /**
+       * \brief Construct a node info with specified tag, type, and optional selection index.
+       * \param[in] tag The DICOM tag for this node.
+       * \param[in] type The node type (default: Element).
+       * \param[in] index The item selection index (default: 0).
+       */
       NodeInfo(const DICOMTag& tag, NodeType type = NodeType::Element, ItemSelectionIndex index = 0);
+
+      /**
+       * \brief Check whether this node matches another node (respecting wildcards).
+       * \param[in] right The node to match against.
+       * \return true if this node matches the given node.
+       */
       bool Matches(const NodeInfo& right) const;
 
+      /**
+       * \brief Equality operator; checks strict equality (no wildcard matching).
+       * \param[in] right The node to compare with.
+       * \return true if type, tag, and selection are identical.
+       */
       bool operator == (const NodeInfo& right) const;
     };
 
@@ -112,10 +139,25 @@ namespace mitk
     * \return Info of the first path node. If the path is empty, an InvalidPathNode exception will be thrown.*/
     const NodeInfo& GetLastNode() const;
 
+    /**
+     * \brief Get the complete vector of node infos in this path.
+     * \return Const reference to the internal node info vector.
+     */
     const NodeInfoVectorType& GetNodes() const;
 
+    /**
+     * \brief Serialize this path to a string representation.
+     * \return A string representation of this DICOMTagPath.
+     * \sa FromStr
+     */
     std::string ToStr() const;
 
+    /**
+     * \brief Parse a string representation and set this path accordingly.
+     * \param[in] pathStr The string to parse.
+     * \return Reference to this path after parsing.
+     * \sa ToStr
+     */
     DICOMTagPath& FromStr(const std::string& pathStr);
 
     /**Compares two DICOMTagPaths for real equality. So its a string compare of their string conversion*/
@@ -152,18 +194,59 @@ namespace mitk
     * \return Reference to this path.*/
     DICOMTagPath& operator += (const std::string& pathStr);
 
+    /**
+     * \brief Append a wildcard element node (AnyElement) to this path.
+     * \return Reference to this path.
+     */
     DICOMTagPath& AddAnyElement();
+
+    /**
+     * \brief Append a specific element node to this path.
+     * \param[in] group The DICOM tag group number.
+     * \param[in] element The DICOM tag element number.
+     * \return Reference to this path.
+     */
     DICOMTagPath& AddElement(unsigned int group, unsigned int element);
+
+    /**
+     * \brief Append a wildcard selection node (AnySelection) to this path.
+     * \param[in] group The DICOM tag group number.
+     * \param[in] element The DICOM tag element number.
+     * \return Reference to this path.
+     */
     DICOMTagPath& AddAnySelection(unsigned int group, unsigned int element);
+
+    /**
+     * \brief Append a specific sequence selection node to this path.
+     * \param[in] group The DICOM tag group number.
+     * \param[in] element The DICOM tag element number.
+     * \param[in] index The item selection index within the sequence.
+     * \return Reference to this path.
+     */
     DICOMTagPath& AddSelection(unsigned int group, unsigned int element, ItemSelectionIndex index);
 
+    /** \brief Default constructor, creates an empty path. */
     DICOMTagPath();
+
+    /** \brief Copy constructor. */
     DICOMTagPath(const DICOMTagPath& path);
+
+    /**
+     * \brief Construct a single-element path from a DICOMTag.
+     * \param[in] tag The DICOM tag to use as the single path node.
+     */
     DICOMTagPath(const DICOMTag& tag);
+
+    /**
+     * \brief Construct a single-element path from group and element numbers.
+     * \param[in] group The DICOM tag group number.
+     * \param[in] element The DICOM tag element number.
+     */
     explicit DICOMTagPath(unsigned int group, unsigned int element);
 
     virtual ~DICOMTagPath();
 
+    /** \brief Clear all nodes from this path, making it empty. */
     virtual void Reset();
 
   protected:
@@ -172,23 +255,48 @@ namespace mitk
     static bool DICOMTagPathesMatch(const DICOMTagPath& left, const DICOMTagPath& right);
   };
 
+  /** \brief A list of DICOMTagPath instances. */
   typedef std::vector<DICOMTagPath> DICOMTagPathList;
 
+  /** \brief Stream output operator for DICOMTagPath. */
   MITKDICOM_EXPORT std::ostream& operator<<(std::ostream& os, const DICOMTagPath& path);
 
-  /** Concatenates a string with a DICOM tag path (reverse order).
-  * \param [in] pathStr String representation of a path.
-  * \param [in] right The DICOMTagPath to append.
+  /** \brief Concatenates a string with a DICOM tag path (reverse order).
+  * \param[in] pathStr String representation of a path.
+  * \param[in] right The DICOMTagPath to append.
   * \return A new DICOMTagPath with the concatenated result.*/
   MITKDICOM_EXPORT DICOMTagPath operator + (const std::string& pathStr, const DICOMTagPath& right);
 
+  /**
+   * \brief Convert a DICOMTagPath to a regular expression that matches the corresponding property name.
+   * \param[in] tagPath The path to convert.
+   * \return A regular expression string.
+   */
   MITKDICOM_EXPORT std::string DICOMTagPathToPropertyRegEx(const DICOMTagPath& tagPath);
+
+  /**
+   * \brief Convert a DICOMTagPath to a regular expression for persistence key matching.
+   * \param[in] tagPath The path to convert.
+   * \return A regular expression string for persistence keys.
+   */
   MITKDICOM_EXPORT std::string DICOMTagPathToPersistenceKeyRegEx(const DICOMTagPath& tagPath);
+
+  /**
+   * \brief Convert a DICOMTagPath to a persistence key template string.
+   * \param[in] tagPath The path to convert.
+   * \return A persistence key template string.
+   */
   MITKDICOM_EXPORT std::string DICOMTagPathToPersistenceKeyTemplate(const DICOMTagPath& tagPath);
+
+  /**
+   * \brief Convert a DICOMTagPath to a persistence name template string.
+   * \param[in] tagPath The path to convert.
+   * \return A persistence name template string.
+   */
   MITKDICOM_EXPORT std::string DICOMTagPathToPersistenceNameTemplate(const DICOMTagPath& tagPath);
 
   /** Converts a passed path into a search string for the DCMTK DcmPathProcessor.
-   @pre tagPath must be an explicit (DICOMTagPath::IsExplicit()) path or
+   \pre tagPath must be an explicit (DICOMTagPath::IsExplicit()) path or
    must only contain selection wild cards (DICOMTagPath::HasItemSelectionWildcardsOnly()).*/
   MITKDICOM_EXPORT std::string DICOMTagPathToDCMTKSearchPath(const DICOMTagPath& tagPath);
 

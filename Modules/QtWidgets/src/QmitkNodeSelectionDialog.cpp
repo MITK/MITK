@@ -10,7 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkNodeSelectionDialog.h"
+#include <QmitkNodeSelectionDialog.h>
+
+#include <ui_QmitkNodeSelectionDialog.h>
 
 #include <QmitkStyleManager.h>
 
@@ -29,7 +31,8 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   , m_SelectedNodes(NodeList())
   , m_SelectionMode(QAbstractItemView::SingleSelection)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkNodeSelectionDialog>();
+  m_Controls->setupUi(this);
 
   m_CheckFunction = [](const NodeList &) { return ""; };
 
@@ -85,28 +88,32 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     }
   }
 
-  m_Controls.tabWidget->setCurrentIndex(preferredIndex);
+  m_Controls->tabWidget->setCurrentIndex(preferredIndex);
   this->setWindowTitle(title);
   this->setToolTip(hint);
 
-  m_Controls.hint->setText(hint);
-  m_Controls.hint->setVisible(!hint.isEmpty());
+  m_Controls->hint->setText(hint);
+  m_Controls->hint->setVisible(!hint.isEmpty());
   if(hint.isEmpty())
   {
-    m_Controls.layoutHint->setContentsMargins(0, 0, 0, 0);
+    m_Controls->layoutHint->setContentsMargins(0, 0, 0, 0);
   }
   else
   {
-    m_Controls.layoutHint->setContentsMargins(6, 6, 6, 6);
+    m_Controls->layoutHint->setContentsMargins(6, 6, 6, 6);
   }
 
   this->SetErrorText("");
 
-  m_Controls.btnAddToFav->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
+  m_Controls->btnAddToFav->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
-  connect(m_Controls.btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
-  connect(m_Controls.buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);
-  connect(m_Controls.buttonBox, &QDialogButtonBox::rejected, this, &QmitkNodeSelectionDialog::OnCancel);
+  connect(m_Controls->btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
+  connect(m_Controls->buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);
+  connect(m_Controls->buttonBox, &QDialogButtonBox::rejected, this, &QmitkNodeSelectionDialog::OnCancel);
+}
+
+QmitkNodeSelectionDialog::~QmitkNodeSelectionDialog()
+{
 }
 
 void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -156,20 +163,20 @@ void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFun
 
   SetErrorText(checkResponse);
 
-  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+  m_Controls->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 }
 
 void QmitkNodeSelectionDialog::SetErrorText(const std::string& checkResponse)
 {
-  m_Controls.error->setText(QString::fromStdString(checkResponse));
-  m_Controls.error->setVisible(!checkResponse.empty());
+  m_Controls->error->setText(QString::fromStdString(checkResponse));
+  m_Controls->error->setVisible(!checkResponse.empty());
   if (checkResponse.empty())
   {
-    m_Controls.layoutError->setContentsMargins(0, 0, 0, 0);
+    m_Controls->layoutError->setContentsMargins(0, 0, 0, 0);
   }
   else
   {
-    m_Controls.layoutError->setContentsMargins(6, 6, 6, 6);
+    m_Controls->layoutError->setContentsMargins(6, 6, 6, 6);
   }
 }
 
@@ -212,7 +219,7 @@ void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 
   SetErrorText(checkResponse);
 
-  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+  m_Controls->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 
   for (auto panel : m_Panels)
   {
@@ -267,12 +274,12 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
   verticalLayout->setContentsMargins(0, 0, 0, 0);
   verticalLayout->addWidget(inspector);
 
-  auto panelPos = m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
+  auto panelPos = m_Controls->tabWidget->insertTab(m_Controls->tabWidget->count(), tabPanel, name);
 
   auto icon = provider->GetInspectorIcon();
   if (!icon.isNull())
   {
-    m_Controls.tabWidget->setTabIcon(panelPos, icon);
+    m_Controls->tabWidget->setTabIcon(panelPos, icon);
   }
 
   m_Panels.push_back(inspector);
@@ -288,7 +295,7 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
 
 void QmitkNodeSelectionDialog::OnDoubleClicked(const QModelIndex& /*index*/)
 {
-  const auto isOK = m_Controls.buttonBox->button(QDialogButtonBox::Ok)->isEnabled();
+  const auto isOK = m_Controls->buttonBox->button(QDialogButtonBox::Ok)->isEnabled();
   if (!m_SelectedNodes.empty() && isOK)
   {
     this->OnOK();

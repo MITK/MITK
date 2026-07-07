@@ -1,5 +1,3 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
-
 set(CPP_FILES
   qclickablelabel.cpp
   QmitkAboutDialog.cpp
@@ -16,7 +14,6 @@ set(CPP_FILES
   QmitkFileChooser.cpp
   QmitkHistogram.cpp
   QmitkHotkeyLineEdit.cpp
-  QmitkModulesDialog.cpp
   QmitkModuleTableModel.cpp
   QmitkNumberPropertyEditor.cpp
   QmitkNumberPropertySlider.cpp
@@ -42,50 +39,14 @@ set(CPP_FILES
   QtWidgetsExtRegisterClasses.cpp
 )
 
-set(MOC_H_FILES
-  include/qclickablelabel.h
-  include/QmitkAboutDialog.h
-  include/QmitkBasePropertyView.h
-  include/QmitkBoolPropertyWidget.h
-  include/QmitkBoundingObjectWidget.h
-  include/QmitkCallbackFromGUIThread.h
-  include/QmitkColorPropertyEditor.h
-  include/QmitkColorPropertyView.h
-  include/QmitkColorTransferFunctionCanvas.h
-  include/QmitkCrossWidget.h
-  include/QmitkEditPointDialog.h
-  include/QmitkEnumerationPropertyWidget.h
-  include/QmitkFileChooser.h
-  include/QmitkHotkeyLineEdit.h
-  include/QmitkNumberPropertyEditor.h
-  include/QmitkNumberPropertySlider.h
-  include/QmitkNumberPropertyView.h
-  include/QmitkPiecewiseFunctionCanvas.h
-  include/QmitkPlotWidget.h
-  include/QmitkPointListModel.h
-  include/QmitkPointListView.h
-  include/QmitkPointListWidget.h
-  include/QmitkPrimitiveMovieNavigatorWidget.h
-  include/QmitkSliceWidget.h
-  include/QmitkStandardViews.h
-  include/QmitkStringPropertyEditor.h
-  include/QmitkStringPropertyOnDemandEdit.h
-  include/QmitkStringPropertyView.h
-  include/QmitkTransferFunctionCanvas.h
-  include/QmitkTransferFunctionGeneratorWidget.h
-  include/QmitkTransferFunctionWidget.h
-  include/QmitkUGCombinedRepresentationPropertyWidget.h
-  include/QmitkVideoBackground.h
-)
-
 set(UI_FILES
-  src/QmitkAboutDialogGUI.ui
-  src/QmitkPrimitiveMovieNavigatorWidget.ui
-  src/QmitkSliceWidget.ui
-  src/QmitkTransferFunctionGeneratorWidget.ui
-  src/QmitkTransferFunctionWidget.ui
+  QmitkAboutDialogGUI.ui
+  QmitkPrimitiveMovieNavigatorWidget.ui
+  QmitkSliceWidget.ui
+  QmitkTransferFunctionGeneratorWidget.ui
+  QmitkTransferFunctionWidget.ui
 )
 
 set(QRC_FILES
-  resource/QtWidgetsExt.qrc
+  QtWidgetsExt.qrc
 )

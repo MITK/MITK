@@ -10,6 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkLogBackend.h
+ * \brief Declares the MITK-specific log backend with file logging, rolling log files,
+ *        and integration with the ITK output window.
+ *
+ * \ingroup Core
+ */
+
 #ifndef mitkLogBackend_h
 #define mitkLogBackend_h
 
@@ -23,6 +31,11 @@ namespace mitk
   class MITKCORE_EXPORT LogBackend : public LogBackendText
   {
   public:
+    /** \brief Process and output a single log message.
+     *
+     * Writes the message to the console and, if configured, to the active log file.
+     * When an additional ITK output window is enabled, the message is forwarded there as well.
+     */
     void ProcessMessage(const LogMessage&) override;
 
     /** \brief Registers MITK log backend.
@@ -97,6 +110,10 @@ namespace mitk
      */
     static void CatchLogFileCommandLineParameter(int& argc, char** argv);
 
+    /** \brief Return the output type of this backend.
+     *
+     * \return The output type, which is \c OutputType::Console for the MITK log backend.
+     */
     LogBackendBase::OutputType GetOutputType() const override;
 
   protected:

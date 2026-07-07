@@ -12,17 +12,17 @@ found in the LICENSE file.
 
 #include <iostream>
 
-#include "itkVector.h"
+#include <itkVector.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "vnl/vnl_math.h"
+#include <vnl/vnl_math.h>
 #include <vnl/vnl_vector_fixed_ref.h>
 
-#include "mitkNumericConstants.h"
-#include "mitkPoint.h"
-#include "mitkVector.h"
+#include <mitkNumericConstants.h>
+#include <mitkPoint.h>
+#include <mitkVector.h>
 
 using namespace mitk;
 

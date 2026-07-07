@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImage.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkTestingMacros.h"
+#include <mitkImage.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkTestingMacros.h>
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.hxx>

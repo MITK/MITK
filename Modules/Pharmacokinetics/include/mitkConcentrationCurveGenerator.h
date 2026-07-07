@@ -14,20 +14,31 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 #include <itkBinaryFunctorImageFilter.h>
-#include "mitkConvertToConcentrationAbsoluteFunctor.h"
-#include "mitkConvertToConcentrationRelativeFunctor.h"
+#include <mitkConvertToConcentrationAbsoluteFunctor.h>
+#include <mitkConvertToConcentrationRelativeFunctor.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk {
 
 /** \class ConcentrationCurveGenerator
-* \brief Converts a given 4D mitk::Image with MR signal values into a 4D mitk::Image with corresponding contrast agent concentration values
-*
-* From a given 4D image, the Generator takes the 3D image of the first time point as baseline image. It then loops over all time steps, casts
-* the current 3D image to itk and passes it to the ConvertToconcentrationFunctor. The returned 3D image has now values of concentration type and is stored at its timepoint
-* in the return image.
-*/
+ * \brief Converts a 4D MR signal image into a 4D contrast agent concentration image.
+ *
+ * Given a 4D dynamic image with MR signal intensities, this generator computes the
+ * baseline image from the specified time step range and then converts each 3D time frame
+ * to concentration values using the appropriate conversion functor, selected based on the
+ * MR sequence type (TurboFLASH, absolute/relative signal enhancement, T1 mapping via
+ * variable flip angle, or T2-weighted).
+ *
+ * The result is a 4D image where each voxel contains the computed contrast agent
+ * concentration at each time point.
+ *
+ * \pre The 4D dynamic image must be set before calling GetConvertedImage().
+ * \pre The appropriate sequence flags and MR parameters must be configured.
+ * \sa AterialInputFunctionGenerator, ConvertToConcentrationAbsoluteFunctor,
+ *     ConvertToConcentrationRelativeFunctor, ConvertToConcentrationTurboFlashFunctor,
+ *     ConvertToConcentrationViaT1CalcFunctor, ConvertT2ConcentrationFunctor
+ */
 class MITKPHARMACOKINETICS_EXPORT ConcentrationCurveGenerator : public itk::Object
 {
 public:
@@ -35,71 +46,123 @@ public:
     mitkClassMacroItkParent(ConcentrationCurveGenerator, itk::Object);
     itkNewMacro(Self);
 
-    //typedef itk::Image<double,3> ImageType;
+    /** \brief ITK image type for converted 3D concentration frames. */
     typedef itk::Image<double,3> ConvertedImageType;
 
 
-    /** Getter and Setter for 4D mitk::Image*/
+    /** \brief Sets the input 4D dynamic MR signal image.
+     *  \param[in] _arg The 4D dynamic image to convert. */
     itkSetConstObjectMacro(DynamicImage,Image);
+    /** \brief Returns the currently set 4D dynamic input image. */
     itkGetConstObjectMacro(DynamicImage,Image);
 
-    /** Parameters Relevant for conversion Calculation; Have to be Set externally (Sequence Dependent)*/
+    /** \brief Sets the pre-contrast T1 relaxation time (T10) in ms.
+     *  \param[in] _arg The relaxation time value. */
     itkSetMacro(RelaxationTime, double);
+    /** \brief Returns the pre-contrast T1 relaxation time. */
     itkGetConstReferenceMacro(RelaxationTime, double);
 
+    /** \brief Sets the contrast agent relaxivity in 1/(mM*s).
+     *  \param[in] _arg The relaxivity value. */
     itkSetMacro(Relaxivity, double);
+    /** \brief Returns the contrast agent relaxivity. */
     itkGetConstReferenceMacro(Relaxivity, double);
 
+    /** \brief Sets the recovery time for TurboFLASH sequences.
+     *  \param[in] _arg The recovery time value. */
     itkSetMacro(RecoveryTime, double);
+    /** \brief Returns the recovery time. */
     itkGetConstReferenceMacro(RecoveryTime, double);
 
+    /** \brief Sets the repetition time (TR) in ms.
+     *  \param[in] _arg The repetition time value. */
     itkSetMacro(RepetitionTime, double);
+    /** \brief Returns the repetition time (TR). */
     itkGetConstReferenceMacro(RepetitionTime, double);
 
+    /** \brief Sets the flip angle in radians.
+     *  \param[in] _arg The flip angle value. */
     itkSetMacro(FlipAngle, double);
+    /** \brief Returns the flip angle. */
     itkGetConstReferenceMacro(FlipAngle, double);
 
+    /** \brief Sets the flip angle of the proton density weighted (PDW) image in radians.
+     *  \param[in] _arg The PDW flip angle value. */
     itkSetMacro(FlipAnglePDW, double);
+    /** \brief Returns the PDW flip angle. */
     itkGetConstReferenceMacro(FlipAnglePDW, double);
 
+    /** \brief Sets the conversion scaling factor (k).
+     *  \param[in] _arg The scaling factor value. */
     itkSetMacro(Factor, double);
+    /** \brief Returns the conversion scaling factor. */
     itkGetConstReferenceMacro(Factor, double);
 
-    /** Getter and Setter for PDW Map image*/
+    /** \brief Sets the proton density weighted (PDW) map image for T1 mapping via variable flip angle.
+     *  \param[in] _arg The 3D PDW image. */
     itkSetConstObjectMacro(PDWImage,Image);
+    /** \brief Returns the currently set PDW image. */
     itkGetConstObjectMacro(PDWImage,Image);
 
+    /** \brief Sets the T2* relaxivity factor for T2-weighted conversion.
+     *  \param[in] _arg The T2 factor value. */
     itkSetMacro(T2Factor, double);
+    /** \brief Returns the T2 factor. */
     itkGetConstReferenceMacro(T2Factor, double);
 
+    /** \brief Sets the echo time (TE) for T2-weighted conversion in ms.
+     *  \param[in] _arg The echo time value. */
     itkSetMacro(T2EchoTime, double);
+    /** \brief Returns the T2 echo time. */
     itkGetConstReferenceMacro(T2EchoTime, double);
 
-
-    /** @brief Calls Convert and returns the 4D mitk::image in Concentration units*/
-
+    /** \brief Sets the first time step index included in baseline averaging (0-based).
+     *  \param[in] _arg The start time step index. */
     itkSetMacro(BaselineStartTimeStep, unsigned int);
+    /** \brief Returns the baseline start time step index. */
     itkGetConstReferenceMacro(BaselineStartTimeStep, unsigned int);
 
+    /** \brief Sets the last time step index included in baseline averaging.
+     *  \param[in] _arg The end time step index. */
     itkSetMacro(BaselineEndTimeStep, unsigned int);
+    /** \brief Returns the baseline end time step index. */
     itkGetConstReferenceMacro(BaselineEndTimeStep, unsigned int);
 
+    /** \brief Sets whether the input is a TurboFLASH sequence.
+     *  \param[in] _arg True if TurboFLASH conversion should be used. */
     itkSetMacro(isTurboFlashSequence,bool);
+    /** \brief Returns whether TurboFLASH conversion mode is active. */
     itkGetConstReferenceMacro(isTurboFlashSequence,bool);
 
+    /** \brief Sets whether to use absolute signal enhancement for conversion.
+     *  \param[in] _arg True to use absolute signal enhancement. */
     itkSetMacro(AbsoluteSignalEnhancement,bool);
+    /** \brief Returns whether absolute signal enhancement mode is active. */
     itkGetConstReferenceMacro(AbsoluteSignalEnhancement,bool);
 
+    /** \brief Sets whether to use relative signal enhancement for conversion.
+     *  \param[in] _arg True to use relative signal enhancement. */
     itkSetMacro(RelativeSignalEnhancement,bool);
+    /** \brief Returns whether relative signal enhancement mode is active. */
     itkGetConstReferenceMacro(RelativeSignalEnhancement,bool);
 
+    /** \brief Sets whether to compute concentration via T1 mapping (variable flip angle method).
+     *  \param[in] _arg True to use T1 mapping conversion. */
     itkSetMacro(UsingT1Map,bool);
+    /** \brief Returns whether T1 mapping conversion mode is active. */
     itkGetConstReferenceMacro(UsingT1Map,bool);
 
-
+    /** \brief Sets whether the input is a T2-weighted image.
+     *  \param[in] _arg True if the image is T2-weighted. */
     itkSetMacro(isT2weightedImage,bool);
+    /** \brief Returns whether T2-weighted conversion mode is active. */
     itkGetConstReferenceMacro(isT2weightedImage,bool);
 
+    /** \brief Performs the conversion and returns the 4D concentration image.
+     *
+     * Triggers the full conversion pipeline: baseline computation, per-frame conversion
+     * using the configured functor, and assembly of the 4D result image.
+     * \return Smart pointer to the 4D concentration image. */
     Image::Pointer GetConvertedImage();
 
 protected:
@@ -116,13 +179,13 @@ protected:
 
 
 
-    /** @brief Takes the 3D image of the first timepoint to set as baseline image*/
+    /** \brief Takes the 3D image of the first timepoint to set as baseline image.*/
     void PrepareBaselineImage();
 
     template<class TPixel>
     void CalculateAverageBaselineImage(const itk::Image<TPixel,4> *itkBaselineImage);
 
-    /** @brief loops over all timepoints, casts the current timepoint 3D mitk::image to itk and passes it to ConvertSignalToConcentrationCurve */
+    /** \brief Loops over all timepoints, casts the current timepoint 3D mitk::image to itk and passes it to ConvertSignalToConcentrationCurve. */
     virtual void Convert();
 
 

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 
-#include "mitkVtkPropRenderer.h"
+#include <mitkVtkPropRenderer.h>
 #include <vtkWindow.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 
@@ -113,7 +113,7 @@ public:
 
     mapper = mitk::SurfaceVtkMapper2D::New();
     dataNode->SetMapper(1, mapper);
-    MITK_TEST_CONDITION(mapper == dataNode->GetMapper(1), "Testing if a SurfaceGLMapper2D was set correctly")
+    MITK_TEST_CONDITION(mapper == dataNode->GetMapper(1), "Testing if a SurfaceVtkMapper2D was set correctly")
     MITK_TEST_CONDITION(dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode")
 
     mapper = mitk::PlaneGeometryDataVtkMapper3D::New();

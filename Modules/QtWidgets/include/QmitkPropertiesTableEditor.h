@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 /// Own includes.
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 
 /// Toolkit includes.
 #include <QWidget>

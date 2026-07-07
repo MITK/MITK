@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkMaskedGlyph2D.h"
+#include <vtkMaskedGlyph2D.h>
 
-#include "vtkMaskPoints.h"
-#include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
+#include <vtkMaskPoints.h>
+#include <vtkObjectFactory.h>
+#include <vtkPolyData.h>
 
 vtkStandardNewMacro(vtkMaskedGlyph2D);
 

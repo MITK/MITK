@@ -14,12 +14,18 @@ found in the LICENSE file.
 #define mitkRegEvaluationObjectFactory_h
 
 #include <mitkCoreObjectFactory.h>
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk {
 
-  /** Factory that registers everything (the mapper) needed for handling
-   RegEvaluationObject instances in MITK.*/
+  /**
+   * \brief Factory that registers the mapper needed for rendering RegEvaluationObject instances in MITK.
+   *
+   * This CoreObjectFactory creates the RegEvaluationMapper2D for 2D slice rendering and
+   * sets default properties on data nodes containing RegEvaluationObject data.
+   *
+   * \sa mitk::RegEvaluationObject, mitk::RegEvaluationMapper2D
+   */
   class RegEvaluationObjectFactory : public mitk::CoreObjectFactoryBase
   {
   public:
@@ -28,15 +34,22 @@ namespace mitk {
 
     ~RegEvaluationObjectFactory() override;
 
+    /**
+     * \brief Sets the default rendering properties for a RegEvaluationObject node.
+     * \param[in] node Pointer to the DataNode to configure.
+     */
     void SetDefaultProperties(mitk::DataNode* node) override;
-    std::string GetFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    std::string GetSaveFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+
+    /**
+     * \brief Creates the appropriate mapper for a RegEvaluationObject node.
+     *
+     * \param[in] node Pointer to the DataNode.
+     * \param[in] slotId The mapper slot (2D or 3D).
+     * \return Smart pointer to the created mapper, or nullptr if the slot is not supported.
+     */
     mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
-    void RegisterIOFactories();
+
   protected:
-    std::string m_FileExtensions;
     RegEvaluationObjectFactory();
   };
 

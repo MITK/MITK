@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYTABFOLDEREVENT_H_
 #define BERRYTABFOLDEREVENT_H_
 
-#include <berryIStackPresentationSite.h>
+#include "berryIStackPresentationSite.h"
 
 #include <QPoint>
 

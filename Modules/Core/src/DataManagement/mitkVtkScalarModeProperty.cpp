@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkScalarModeProperty.h"
+#include <mitkVtkScalarModeProperty.h>
 #include <vtkAbstractMapper.h>
 
 mitk::VtkScalarModeProperty::VtkScalarModeProperty()
@@ -43,6 +43,11 @@ mitk::VtkScalarModeProperty::VtkScalarModeProperty(const std::string &value)
   {
     SetScalarModeToDefault();
   }
+}
+
+mitk::VtkScalarModeProperty::VtkScalarModeProperty(const VtkScalarModeProperty &other)
+  : EnumerationProperty(other)
+{
 }
 
 int mitk::VtkScalarModeProperty::GetVtkScalarMode()
@@ -89,9 +94,3 @@ bool mitk::VtkScalarModeProperty::AddEnum(const std::string &name, const IdType 
   return Superclass::AddEnum(name, id);
 }
 
-itk::LightObject::Pointer mitk::VtkScalarModeProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

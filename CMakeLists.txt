@@ -2,8 +2,20 @@
     in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
     long comment in CMakeExternals/Boost.cmake for details. ]]
 
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.22)
-cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
+# These variables are used by Doxygen for the build instructions.
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS 3.31)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER 3.28)
+
+if(WIN32)
+  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS})
+else()
+  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER})
+endif()
+
+# Newer CMake versions are expected to work but are not regularly tested.
+set(MITK_CMAKE_MAXIMUM_TESTED_VERSION 4.3)
+
+cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION}...${MITK_CMAKE_MAXIMUM_TESTED_VERSION})
 
 #-----------------------------------------------------------------------------
 # Policies
@@ -11,30 +23,21 @@ cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #[[ T28060
 
-    https://cmake.org/cmake/help/v3.18/policy/CMP0091.html
-    https://cmake.org/cmake/help/v3.18/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
+    https://cmake.org/cmake/help/latest/policy/CMP0091.html
+    https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
 
-    We pass CMP0091 to all external projects as command-line argument:
-      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=OLD
+    CMP0091 is set to NEW by our minimum required CMake version. The value
+    below equals the NEW default and is set explicitly only to document and
+    pin our choice of the dynamic MSVC runtime library. External projects
+    decide on their own, except for projects whose minimum required CMake
+    version predates CMP0091 (see CMakeExternals/lz4.cmake and ACVD.cmake).
  ]]
-cmake_policy(SET CMP0091 OLD)
-
-if(POLICY CMP0135)
-  # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
-  # Set timestamps of extracted ExternalProject_Add() downloads to time of extraction.
-  cmake_policy(SET CMP0135 NEW)
-endif()
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 if(POLICY CMP0167)
   # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
   # The FindBoost module is removed.
   cmake_policy(SET CMP0167 OLD)
-endif()
-
-if(POLICY CMP0177)
-  # https://cmake.org/cmake/help/v3.31/policy/CMP0177.html
-  # install() DESTINATION paths are normalized.
-  cmake_policy(SET CMP0177 NEW)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -48,7 +51,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2025.12.00)
+  project(MITK VERSION 2026.06.00)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -88,21 +91,17 @@ endforeach()
 
 # Standard CMake macros
 include(FeatureSummary)
-include(CTest)
-include(CMakeParseArguments)
 include(FindPackageHandleStandardArgs)
 
 # MITK macros
-include(mitkFunctionGetGccVersion)
 include(mitkFunctionCheckCompilerFlags)
-include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
 include(mitkFunctionAddLibrarySearchPaths)
 
-SUPPRESS_VC_DEPRECATED_WARNINGS()
+# CRT deprecation warnings are suppressed via the MitkCompilerFlags target below.
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -117,17 +116,19 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-else()
-  set(GCC_VERSION 0)
-endif()
-
-set(MITK_CXX_STANDARD 17)
+set(MITK_CXX_STANDARD 20)
 
 set(CMAKE_CXX_EXTENSIONS 0)
 set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
+
+# Without /Zc:__cplusplus, MSVC reports __cplusplus as 199711L regardless of
+# the actual standard. This breaks third-party libraries (e.g. DCMTK) that
+# check __cplusplus to detect C++11/14/17 support. Must be global because
+# external projects built by the SuperBuild also need it.
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+endif()
 
 # This is necessary to avoid problems with compile feature checks.
 # CMAKE_CXX_STANDARD seems to only set the -std=c++<std> flag for targets.
@@ -313,7 +314,7 @@ mitkFunctionFindWhitelists(MITK)
 option(MITK_USE_Qt6 "Use Qt 6 library" ON)
 
 if(MITK_USE_Qt6)
-  set(MITK_QT6_MINIMUM_VERSION 6.6)
+  set(MITK_QT6_MINIMUM_VERSION 6.10)
   set(MITK_QT6_COMPONENTS
     Concurrent
     Core
@@ -358,7 +359,9 @@ if(MITK_USE_Qt6)
       endif()
 
       if(_compilers MATCHES "[0-9]+")
-        if (CMAKE_MATCH_0 EQUAL 2022)
+        if(CMAKE_MATCH_0 EQUAL 2026)
+          list(APPEND _compilers "msvc2022" "msvc2019") # Binary compatible
+        elseif(CMAKE_MATCH_0 EQUAL 2022)
           list(APPEND _compilers "msvc2019") # Binary compatible
         endif()
       endif()
@@ -399,6 +402,15 @@ if(MITK_USE_Qt6)
 
   get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake LOCATION)
   get_target_property(QT_HELPGENERATOR_EXECUTABLE Qt6::qhelpgenerator LOCATION)
+
+  if(LINUX)
+    execute_process(COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_LIBEXECS
+      OUTPUT_VARIABLE QT_INSTALL_LIBEXECS OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_DATA
+      OUTPUT_VARIABLE QT_INSTALL_DATA OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_TRANSLATIONS
+      OUTPUT_VARIABLE QT_INSTALL_TRANSLATIONS OUTPUT_STRIP_TRAILING_WHITESPACE)
+  endif()
 endif()
 
 if(Qt6_DIR)
@@ -411,7 +423,7 @@ endif()
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
-set(MITK_REQUIRED_OPENSSL_VERSION 3.0) # Match with Python's OpenSSL version on Windows
+set(MITK_REQUIRED_OPENSSL_VERSION 3.5) # Match Python's OpenSSL version on Windows
 
 if(WIN32)
   find_package(OpenSSL ${MITK_REQUIRED_OPENSSL_VERSION} EXACT)
@@ -422,23 +434,35 @@ endif()
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
-  set(openssl_message "Could not find OpenSSL (dependency of cpp-httplib).\n")
+  set(openssl_message "Could not find OpenSSL.\n")
   if(UNIX)
     if(APPLE)
-      set(openssl_message "${openssl_message}Please install it using your favorite package management "
-                          "system (i.e. Homebrew or MacPorts).\n")
+      set(openssl_message "\
+${openssl_message}Please install it with MacPorts or Homebrew, for example.
+")
     else()
-      set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
+      set(openssl_message "\
+${openssl_message}Please install its development package (for example libssl-dev \
+on Ubuntu).
+")
     endif()
   else()
-    set(openssl_message "${openssl_message}Please install OpenSSL version ${MITK_REQUIRED_OPENSSL_VERSION}.\n"
-                        "We recommend builds from Shining Light Productions:\n"
-                        "  https://slproweb.com/products/Win32OpenSSL.html\n")
+    set(openssl_message "\
+${openssl_message}Please install OpenSSL v${MITK_REQUIRED_OPENSSL_VERSION} (exact \
+version required). We recommend builds from Shining Light Productions:
+  https://slproweb.com/products/Win32OpenSSL.html
+You will likely want to download the installer named something like:
+  Win64 OpenSSL v${MITK_REQUIRED_OPENSSL_VERSION}.x (not the \"Light\" variant)
+If you previously installed another version to the same location, make sure \
+to uninstall it first.
+")
   endif()
-  set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
-                      "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
-                      "OpenSSL installation. Make sure to clear variables of partly found "
-                      "versions of OpenSSL before, or they will be mixed up.")
+  set(openssl_message "\
+${openssl_message}If OpenSSL still cannot be found, you can help CMake locate \
+it by setting the OPENSSL_ROOT_DIR variable to the root directory of an OpenSSL \
+installation. Make sure to clear any cached variables of partially detected \
+OpenSSL versions beforehand, or they may be mixed up.
+")
   message(FATAL_ERROR ${openssl_message})
 endif()
 
@@ -613,9 +637,7 @@ include(mitkFunctionCreateProvisioningFile)
 include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
-include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionInstallCTKPlugin)
-include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallThirdPartyCTKPlugins)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionUseModules)
@@ -628,9 +650,7 @@ include(mitkMacroCreateModuleTests)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-include(mitkMacroInstall)
-include(mitkMacroInstallHelperApp)
-include(mitkMacroInstallTargets)
+include(mitkFunctionDeployQt)
 include(mitkMacroMultiplexPicType)
 
 #-----------------------------------------------------------------------------
@@ -686,7 +706,7 @@ if(OpenSSL_FOUND AND WIN32)
           try to find the closest bin directory.
         - Use the base file names of the link libraries to find corresponding
           DLLs like "<base name>*.dll", that usually are named like
-          "<base name>-1_1-x64.dll" or similar.
+          "<base name>-3-x64.dll" or similar.
    ]]
   include(mitkFunctionFindClosestBinDirectory)
 
@@ -764,9 +784,10 @@ if(OpenSSL_FOUND AND WIN32)
       configure_file("${MITK_OPENSSL_CRYPTO_DLL}" "${MITK_BINARY_DIR}/bin/${config_type}/" COPYONLY)
     endforeach()
 
-    MITK_INSTALL(FILES
+    install(FILES
       "${MITK_OPENSSL_SSL_DLL}"
       "${MITK_OPENSSL_CRYPTO_DLL}"
+      DESTINATION bin
     )
   endif()
 endif()
@@ -780,12 +801,6 @@ mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 # Ask the user to show the console window for applications
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
-
-if(NOT MITK_FAST_TESTING)
-  if(MITK_CTEST_SCRIPT_MODE STREQUAL "Continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "Experimental")
-    set(MITK_FAST_TESTING ON)
-  endif()
-endif()
 
 if(NOT UNIX)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
@@ -849,6 +864,36 @@ if(MITK_USE_BLUEBERRY AND APPLE)
 
 endif()
 
+# Compute install destinations and runtime dependency set names.
+#
+# On macOS with bundles, each app gets its own install directories and its own
+# RUNTIME_DEPENDENCY_SET so that dependency resolution is fully independent per
+# bundle. On Windows/Linux, there is a single flat "bin/" layout shared by all
+# executables, with a single dependency set.
+#
+# The lists MITK_INSTALL_BINDIR, MITK_INSTALL_FRAMEWORKSDIR, and
+# MITK_RUNTIME_DEPENDENCY_SETS are parallel lists (same length, matching
+# indices). Install sites loop over them with foreach(... IN ZIP_LISTS ...) or
+# paired index access.
+
+if(APPLE AND MACOSX_BUNDLE_NAMES)
+  set(_bindirs "")
+  set(_fwdirs "")
+  set(_depsets "")
+  foreach(_bundle ${MACOSX_BUNDLE_NAMES})
+    list(APPEND _bindirs "${_bundle}.app/Contents/MacOS")
+    list(APPEND _fwdirs "${_bundle}.app/Contents/Frameworks")
+    list(APPEND _depsets "mitk_deps_${_bundle}")
+  endforeach()
+  set(MITK_INSTALL_BINDIR "${_bindirs}" CACHE INTERNAL "")
+  set(MITK_INSTALL_FRAMEWORKSDIR "${_fwdirs}" CACHE INTERNAL "")
+  set(MITK_RUNTIME_DEPENDENCY_SETS "${_depsets}" CACHE INTERNAL "")
+else()
+  set(MITK_INSTALL_BINDIR "bin" CACHE INTERNAL "")
+  set(MITK_INSTALL_FRAMEWORKSDIR "bin" CACHE INTERNAL "")
+  set(MITK_RUNTIME_DEPENDENCY_SETS "mitk_deps" CACHE INTERNAL "")
+endif()
+
 #-----------------------------------------------------------------------------
 # Set coverage Flags
 #-----------------------------------------------------------------------------
@@ -868,7 +913,7 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX${MITK_CXX_STANDARD}_FLAG}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
@@ -876,17 +921,11 @@ set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
 if(WIN32)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
-  mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
-  mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
-  # the following line should be removed after fixing bug 17637
-  mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
-  mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
-  mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS) # warning C4251: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
-endif()
-
-if(APPLE)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DGL_SILENCE_DEPRECATION") # Apple deprecated OpenGL in macOS 10.14
+  # C4251: 'identifier' : class 'type' needs to have dll-interface to be used by
+  # clients of class 'type2'. Structural on Windows: MITK_EXPORT classes contain
+  # STL members by design, and the STL has no stable ABI across MSVC builds.
+  # This is not a defect to fix per-class; keep the suppression.
+  mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS)
 endif()
 
 if(NOT MSVC_VERSION)
@@ -897,31 +936,22 @@ if(NOT MSVC_VERSION)
     -Winvalid-pch
     -Wcast-align
     -Wwrite-strings
-    -Wno-error=gnu
-    -Wno-error=unknown-pragmas
-    # The strict-overflow warning is generated by ITK template code
-    -Wno-error=strict-overflow
     -Woverloaded-virtual
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
-    -Wno-deprecated-copy
-    -Wno-array-bounds
-    -Wno-cast-function-type
-    -Wno-maybe-uninitialized
-    -Wno-error=stringop-overread
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)
   endforeach()
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT APPLE)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
   mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
   set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCES -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 endif()
@@ -950,7 +980,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
-set(Boost_ADDITIONAL_VERSIONS 1.74 1.74.0)
+set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
@@ -1065,6 +1095,8 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
+  enable_testing()
+
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
@@ -1105,35 +1137,75 @@ if(NOT DEFINED MITK_SUPERBUILD_BINARY_DIR)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set C/CXX and linker flags for MITK code
+# INTERFACE target carrying all MITK-specific compile flags
 #-----------------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${MITK_CXX_FLAGS_DEBUG}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${MITK_C_FLAGS_DEBUG}")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${MITK_C_FLAGS_RELEASE}")
+add_library(MitkCompilerFlags INTERFACE)
 
+# C++ and C flags (populated by mitkFunctionCheckCompilerFlags probes above)
+foreach(_var MITK_CXX_FLAGS MITK_C_FLAGS MITK_CXX_FLAGS_RELEASE)
+  string(STRIP "${${_var}}" ${_var})
+endforeach()
+
+if(MITK_CXX_FLAGS)
+  string(REPLACE " " ";" _mitk_cxx_flags "${MITK_CXX_FLAGS}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<COMPILE_LANGUAGE:CXX>:${_mitk_cxx_flags}>)
+endif()
+
+if(MITK_C_FLAGS)
+  string(REPLACE " " ";" _mitk_c_flags "${MITK_C_FLAGS}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<COMPILE_LANGUAGE:C>:${_mitk_c_flags}>)
+endif()
+
+if(MITK_CXX_FLAGS_RELEASE)
+  string(REPLACE " " ";" _mitk_cxx_flags_release "${MITK_CXX_FLAGS_RELEASE}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Release>>:${_mitk_cxx_flags_release}>)
+endif()
+
+# Platform compile definitions
+if(WIN32)
+  target_compile_definitions(MitkCompilerFlags INTERFACE
+    WIN32_LEAN_AND_MEAN NOMINMAX)
+endif()
+
+if(APPLE)
+  target_compile_definitions(MitkCompilerFlags INTERFACE
+    GL_SILENCE_DEPRECATION)
+endif()
+
+if(MSVC)
+  # TODO: removing these would force a tree-wide migration to the
+  # _s variants (fopen_s, strcpy_s, ...) and iterator-debug-aware
+  # STL algorithms. Out of scope for warning cleanup; revisit as a
+  # dedicated hardening pass.
+  target_compile_definitions(MitkCompilerFlags INTERFACE
+    _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS _SCL_SECURE_NO_WARNINGS)
+endif()
+
+# Linker flags remain global
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
+
+#-----------------------------------------------------------------------------
+# RPATH settings for installed targets
+#-----------------------------------------------------------------------------
+
+if(LINUX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/plugins")
+elseif(APPLE)
+  set(CMAKE_INSTALL_RPATH "@loader_path;@loader_path/plugins;@loader_path/../Frameworks")
+  set(CMAKE_MACOSX_RPATH TRUE)
+endif()
 
 #-----------------------------------------------------------------------------
 # Add subdirectories
 #-----------------------------------------------------------------------------
 
 add_subdirectory(Utilities)
-
-if(MITK_USE_SWIG)
-  set(SWIG_VERSION 4.3.0 CACHE STRING "" FORCE)
-  find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
-
-  if(NOT SWIG_FOUND)
-   message(SEND_ERROR "SWIG not found!")
-  endif()
-endif()
-
 
 add_subdirectory(Modules)
 
@@ -1304,7 +1376,7 @@ foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
       list(GET target_info_list 2 executable_name)
       list(APPEND ALL_MITK_APPS "${MITK_EXTENSION_DIR}/Applications/${directory_name}^^${option_name}^^${executable_name}")
       if(${option_name} OR MITK_BUILD_ALL_APPS)
-        MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
+        math(EXPR activated_apps_no "${activated_apps_no} + 1")
       endif()
     endforeach()
   endif()
@@ -1367,9 +1439,6 @@ endif()
 # include CPack model once all variables are set
 include(CPack)
 
-# Additional installation rules
-include(mitkInstallRules)
-
 #-----------------------------------------------------------------------------
 # Last configuration steps
 #-----------------------------------------------------------------------------
@@ -1407,11 +1476,6 @@ set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_TARGETS \"${a
 set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"${autoload_dir}\")")
   endif()
 
-  get_target_property(deprecated_module ${target_to_export} MITK_MODULE_DEPRECATED_SINCE)
-  if(deprecated_module)
-    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
-set_target_properties(${target_to_export} PROPERTIES MITK_MODULE_DEPRECATED_SINCE \"${deprecated_module}\")")
-  endif()
 endforeach()
 
 # ---------------- External projects -----------------
@@ -1511,6 +1575,10 @@ if(MITK_BUILD_EXAMPLES)
   # might do a find_package(MITK REQUIRED).
   add_subdirectory(Examples)
 endif()
+
+# Final installation rules: resolve runtime dependencies and deploy Qt.
+# Must come after all targets have been created (Modules, Plugins, Applications, Examples).
+include(mitkInstallRules)
 
 #-----------------------------------------------------------------------------
 # Print configuration summary

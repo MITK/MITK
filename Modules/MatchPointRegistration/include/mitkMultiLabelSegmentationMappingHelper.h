@@ -14,55 +14,64 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelSegmentationMappingHelper_h
 #define mitkMultiLabelSegmentationMappingHelper_h
 
-#include "mapRegistrationBase.h"
-#include "mitkLabelSetImage.h"
-#include "mitkGeometry3D.h"
+#include <mapRegistrationBase.h>
+#include <mitkLabelSetImage.h>
+#include <mitkGeometry3D.h>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \brief Namespace providing helper functions for mapping multi-label segmentations using MatchPoint registrations.
+   *
+   * Each label is mapped individually using nearest-neighbor interpolation to preserve label integrity.
+   *
+   * \sa mitk::ImageMappingHelper, mitk::MAPRegistrationWrapper, mitk::LabelSetImage
+   */
   namespace MultiLabelSegmentationMappingHelper
   {
+    /** \brief MatchPoint registration base type. */
     typedef ::map::core::RegistrationBase RegistrationType;
+    /** \brief MITK wrapper type for MatchPoint registrations. */
     typedef ::mitk::MAPRegistrationWrapper MITKRegistrationType;
 
+    /** \brief Geometry type used for the result image grid specification. */
     typedef ::mitk::BaseGeometry ResultGeometryType;
 
-    /**Helper that maps a given input image
-     * @param input Image that should be mapped.
-     * @param registration Pointer to the registration instance that should be used for mapping
-     * @param throwOnOutOfInputAreaError Indicates if mapping should fail with an exception (true), if the input image does not cover the whole requested region to be mapped into the result image.
-     * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image. If not defined the geometry of the input image will be used.
-     * @param throwOnMappingError Indicates if mapping should fail with an exception (true), if the registration does not cover/support the whole requested region for mapping into the result image.
-     * @param errorValue Indicates the value that should be used if an mapping error occurs (and throwOnMappingError is false).
-     * @pre input must be valid
-     * @pre registration must be valid
-     * @pre Dimensionality of the registration must match with the input image must be valid
-     * @remark Depending in the settings of throwOnOutOfInputAreaError and throwOnMappingError it may also throw
-     * due to inconsistencies in the mapping process. See parameter description.
-     * @result Pointer to the resulting mapped image.h */
+    /**
+     * \brief Maps a multi-label segmentation image using a MatchPoint registration.
+     *
+     * \param[in] input Multi-label segmentation to be mapped.
+     * \param[in] registration Pointer to the MatchPoint registration to use.
+     * \param[in] throwOnOutOfInputAreaError If true, throws when the input does not cover the full result region.
+     * \param[in] resultGeometry Geometry defining the output grid. If nullptr, the input geometry is used.
+     * \param[in] throwOnMappingError If true, throws when the registration does not cover the result region.
+     * \param[in] errorValue Label value used for voxels where mapping fails (when not throwing).
+     * \return Smart pointer to the resulting mapped multi-label segmentation.
+     * \pre \p input must be valid.
+     * \pre \p registration must be valid.
+     * \pre Dimensionality of the registration must match the input image.
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT MultiLabelSegmentation::Pointer map(const MultiLabelSegmentation* input, const RegistrationType* registration,
       bool throwOnOutOfInputAreaError = false, const ResultGeometryType* resultGeometry = nullptr,
       bool throwOnMappingError = true, const MultiLabelSegmentation::LabelValueType& errorValue = 0);
 
-    /**Helper that maps a given input image.
-     * @overload
-     * @param input Image that should be mapped.
-     * @param registration Pointer to the registration instance that should be used for mapping
-     * @param throwOnOutOfInputAreaError Indicates if mapping should fail with an exception (true), if the input image does not cover the whole requested region to be mapped into the result image.
-     * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image. If not defined the geometry of the input image will be used.
-     * @param throwOnMappingError Indicates if mapping should fail with an exception (true), if the registration does not cover/support the whole requested region for mapping into the result image.
-     * @param errorValue Indicates the value that should be used if an mapping error occurs (and throwOnMappingError is false).
-     * @pre input must be valid
-     * @pre registration must be valid
-     * @pre Dimensionality of the registration must match with the input image must be valid
-     * @remark Depending in the settings of throwOnOutOfInputAreaError and throwOnMappingError it may also throw
-     * due to inconsistencies in the mapping process. See parameter description.
-     * @result Pointer to the resulting mapped image.h*/
+    /**
+     * \brief Maps a multi-label segmentation using a MITK registration wrapper.
+     * \overload
+     *
+     * \param[in] input Multi-label segmentation to be mapped.
+     * \param[in] registration Pointer to the MITK registration wrapper to use.
+     * \param[in] throwOnOutOfInputAreaError If true, throws when the input does not cover the full result region.
+     * \param[in] resultGeometry Geometry defining the output grid, or nullptr to use the input geometry.
+     * \param[in] throwOnMappingError If true, throws when the registration does not cover the result region.
+     * \param[in] errorValue Label value used for voxels where mapping fails.
+     * \return Smart pointer to the resulting mapped multi-label segmentation.
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT MultiLabelSegmentation::Pointer map(const MultiLabelSegmentation* input, const MITKRegistrationType* registration,
       bool throwOnOutOfInputAreaError = false, const ResultGeometryType* resultGeometry = nullptr,
       bool throwOnMappingError = true, const MultiLabelSegmentation::LabelValueType& errorValue = 0);

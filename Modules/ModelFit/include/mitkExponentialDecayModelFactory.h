@@ -15,18 +15,27 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkExponentialDecayModel.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkExponentialDecayModel.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class ExponentialDecayModelFactory
+   * \brief Factory class for creating ExponentialDecayModel instances and their parameterizers.
+   *
+   * Provides default initial parameterization and default constraints for the
+   * ExponentialDecayModel (e.g. lambda > 0).
+   *
+   * \sa ExponentialDecayModel, ExponentialDecayModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT ExponentialDecayModelFactory : public ConcreteModelFactoryBase<ExponentialDecayModel>
   {
   public:
-    mitkClassMacroItkParent(ExponentialDecayModelFactory, ConcreteModelFactoryBase<ExponentialDecayModel>);
+    mitkClassMacro(ExponentialDecayModelFactory, ConcreteModelFactoryBase<ExponentialDecayModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;

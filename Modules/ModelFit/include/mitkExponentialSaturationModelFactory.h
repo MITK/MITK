@@ -10,23 +10,31 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __EXPONENTIAL_SATURATION_TEST_MODEL_FACTORY_H
-#define __EXPONENTIAL_SATURATION_TEST_MODEL_FACTORY_H
+#ifndef mitkExponentialSaturationModelFactory_h
+#define mitkExponentialSaturationModelFactory_h
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkExponentialSaturationModel.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkExponentialSaturationModel.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class ExponentialSaturationModelFactory
+   * \brief Factory for creating ExponentialSaturationModel instances and their parameterizers.
+   *
+   * Provides default initial parameterization and default constraints (e.g. rate > 0).
+   *
+   * \sa ExponentialSaturationModel, ExponentialSaturationModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT ExponentialSaturationModelFactory : public ConcreteModelFactoryBase<ExponentialSaturationModel>
   {
   public:
-    mitkClassMacroItkParent(ExponentialSaturationModelFactory, ConcreteModelFactoryBase<ExponentialSaturationModel>);
+    mitkClassMacro(ExponentialSaturationModelFactory, ConcreteModelFactoryBase<ExponentialSaturationModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;
@@ -50,4 +58,4 @@ namespace mitk
 }
 
 
-#endif //__EXPONENTIAL_SATURATION_TEST_MODEL_FACTORY_H
+#endif //mitkExponentialSaturationModelFactory_h

@@ -1,0 +1,104 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include <mitkContourObjectFactory.h>
+
+#include <mitkBaseRenderer.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+
+#include <mitkContourModel.h>
+#include <mitkContourModelMapper2D.h>
+#include <mitkContourModelMapper2D.h>
+#include <mitkContourModelMapper3D.h>
+#include <mitkContourModelSet.h>
+#include <mitkContourModelSetMapper2D.h>
+#include <mitkContourModelSetMapper3D.h>
+
+mitk::ContourObjectFactory::ContourObjectFactory() : CoreObjectFactoryBase()
+{
+  MITK_DEBUG << "ContourObjectFactory c'tor" << std::endl;
+}
+
+mitk::ContourObjectFactory::~ContourObjectFactory()
+{
+}
+
+mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
+{
+  mitk::Mapper::Pointer newMapper = nullptr;
+
+  if (id == mitk::BaseRenderer::Standard2D)
+  {
+    std::string classname("ContourModel");
+    if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
+    {
+      newMapper = mitk::ContourModelMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
+    else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
+    {
+      newMapper = mitk::ContourModelSetMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
+  }
+  else if (id == mitk::BaseRenderer::Standard3D)
+  {
+    if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
+    {
+      newMapper = mitk::ContourModelMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
+    {
+      newMapper = mitk::ContourModelSetMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+  }
+  return newMapper;
+}
+
+void mitk::ContourObjectFactory::SetDefaultProperties(mitk::DataNode *node)
+{
+  if (node == nullptr)
+    return;
+
+  mitk::DataNode::Pointer nodePointer = node;
+
+  if (node->GetData() == nullptr)
+    return;
+
+  if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
+  {
+    mitk::ContourModelMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelMapper3D::SetDefaultProperties(node);
+  }
+  else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
+  {
+    mitk::ContourModelSetMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelSetMapper3D::SetDefaultProperties(node);
+  }
+}
+
+struct RegisterContourObjectFactory
+{
+  RegisterContourObjectFactory() : m_Factory(mitk::ContourObjectFactory::New())
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(m_Factory);
+  }
+
+  ~RegisterContourObjectFactory() { mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory(m_Factory); }
+  mitk::ContourObjectFactory::Pointer m_Factory;
+};
+
+static RegisterContourObjectFactory registerContourObjectFactory;

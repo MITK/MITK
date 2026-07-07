@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVolumeCalculator.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkVolumeCalculator.h>
+#include <mitkImageAccessByItk.h>
 #include <itkImageRegionConstIterator.h>
 
-#include "mitkImageStatisticsHolder.h"
+#include <mitkImageStatisticsHolder.h>
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::VolumeCalculator::InternalCompute(const itk::Image<TPixel, VImageDimension> *itkImage)

@@ -1,0 +1,162 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+/*============================================================================
+
+Extracted from qglobal.h from Qt 4.7.3 and adapted for CppMicroServices.
+Original copyright (c) Nokia Corporation. Usage covered by the
+GNU Lesser General Public License version 2.1
+(https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html) and the Nokia Qt
+LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
+
+============================================================================*/
+
+#ifndef US_STATIC_INIT_H
+#define US_STATIC_INIT_H
+
+#include <usThreads_p.h>
+
+namespace us {
+
+// POD for US_GLOBAL_STATIC
+template <typename T>
+class GlobalStatic : public MultiThreaded<>
+{
+public:
+
+  GlobalStatic(T* p = nullptr, bool destroyed = false) : pointer(p), destroyed(destroyed) {}
+
+  T* pointer;
+  bool destroyed;
+
+private:
+
+  // purposely not implemented
+  GlobalStatic(const GlobalStatic&);
+  GlobalStatic& operator=(const GlobalStatic&);
+};
+
+template<typename T>
+struct DefaultGlobalStaticDeleter
+{
+  void operator()(GlobalStatic<T>& globalStatic) const
+  {
+    delete globalStatic.pointer;
+    globalStatic.pointer = nullptr;
+    globalStatic.destroyed = true;
+  }
+};
+
+// Created as a function-local static to delete a GlobalStatic<T>
+template <typename T, template<typename T_> class Deleter = DefaultGlobalStaticDeleter>
+class GlobalStaticDeleter
+{
+public:
+  GlobalStatic<T> &globalStatic;
+
+  GlobalStaticDeleter(GlobalStatic<T> &_globalStatic)
+    : globalStatic(_globalStatic)
+  { }
+
+  inline ~GlobalStaticDeleter()
+  {
+    Deleter<T> deleter;
+    deleter(globalStatic);
+  }
+};
+
+}
+
+
+#define US_GLOBAL_STATIC_INIT(TYPE, NAME)                                \
+  static us::GlobalStatic<TYPE>& this_##NAME()         \
+  {                                                                      \
+    static us::GlobalStatic<TYPE> l;                   \
+    return l;                                                            \
+  }
+
+#define US_GLOBAL_STATIC(TYPE, NAME)                                     \
+  US_GLOBAL_STATIC_INIT(TYPE, NAME)                                      \
+  static TYPE *NAME()                                                    \
+  {                                                                      \
+    if (!this_##NAME().pointer && !this_##NAME().destroyed)              \
+    {                                                                    \
+      TYPE *x = new TYPE;                                                \
+      bool ok = false;                                                   \
+      {                                                                  \
+        us::GlobalStatic<TYPE>::Lock lock(this_##NAME()); \
+        (void)(lock);                                                 \
+        if (!this_##NAME().pointer)                                      \
+        {                                                                \
+          this_##NAME().pointer = x;                                     \
+          ok = true;                                                     \
+        }                                                                \
+      }                                                                  \
+      if (!ok)                                                           \
+        delete x;                                                        \
+      else                                                               \
+        static us::GlobalStaticDeleter<TYPE> cleanup(this_##NAME()); \
+    }                                                                    \
+    return this_##NAME().pointer;                                        \
+  }
+
+#define US_GLOBAL_STATIC_WITH_DELETER(TYPE, NAME, DELETER)               \
+  US_GLOBAL_STATIC_INIT(TYPE, NAME)                                      \
+  static TYPE *NAME()                                                    \
+  {                                                                      \
+    if (!this_##NAME().pointer && !this_##NAME().destroyed)              \
+    {                                                                    \
+      TYPE *x = new TYPE;                                                \
+      bool ok = false;                                                   \
+      {                                                                  \
+        us::GlobalStatic<TYPE>::Lock lock(this_##NAME()); \
+        (void)(lock);                                                 \
+        if (!this_##NAME().pointer)                                      \
+        {                                                                \
+          this_##NAME().pointer = x;                                     \
+          ok = true;                                                     \
+        }                                                                \
+      }                                                                  \
+      if (!ok)                                                           \
+        delete x;                                                        \
+      else                                                               \
+        static us::GlobalStaticDeleter<TYPE, DELETER > cleanup(this_##NAME()); \
+    }                                                                    \
+    return this_##NAME().pointer;                                        \
+  }
+
+#define US_GLOBAL_STATIC_WITH_ARGS(TYPE, NAME, ARGS)                     \
+  US_GLOBAL_STATIC_INIT(TYPE, NAME)                                      \
+  static TYPE *NAME()                                                    \
+  {                                                                      \
+    if (!this_##NAME().pointer && !this_##NAME().destroyed)              \
+    {                                                                    \
+      TYPE *x = new TYPE ARGS;                                           \
+      bool ok = false;                                                   \
+      {                                                                  \
+        us::GlobalStatic<TYPE>::Lock lock(this_##NAME()); \
+        (void)(lock);                                                 \
+        if (!this_##NAME().pointer)                                      \
+        {                                                                \
+          this_##NAME().pointer = x;                                     \
+          ok = true;                                                     \
+        }                                                                \
+      }                                                                  \
+      if (!ok)                                                           \
+        delete x;                                                        \
+      else                                                               \
+        static us::GlobalStaticDeleter<TYPE> cleanup(this_##NAME()); \
+    }                                                                    \
+    return this_##NAME().pointer;                                        \
+  }
+
+#endif // US_STATIC_INIT_H

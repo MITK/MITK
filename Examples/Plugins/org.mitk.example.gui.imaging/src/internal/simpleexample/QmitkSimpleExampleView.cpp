@@ -21,9 +21,9 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkStepperAdapter.h>
 
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
 
 #include <QDir>
 #include <QFileDialog>
@@ -32,7 +32,7 @@ found in the LICENSE file.
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
 QmitkSimpleExampleView::QmitkSimpleExampleView()
-  : m_Controls(nullptr), m_NavigatorsInitialized(false), m_Parent(nullptr)
+  : m_NavigatorsInitialized(false), m_Parent(nullptr)
 {
 }
 
@@ -46,7 +46,7 @@ void QmitkSimpleExampleView::CreateQtPartControl(QWidget *parent)
   {
     m_Parent = parent;
     // create GUI widgets
-    m_Controls = new Ui::QmitkSimpleExampleViewControls;
+    m_Controls = std::make_unique<Ui::QmitkSimpleExampleViewControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
 

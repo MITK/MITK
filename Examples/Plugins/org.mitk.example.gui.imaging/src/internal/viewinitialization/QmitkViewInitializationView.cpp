@@ -13,20 +13,20 @@ found in the LICENSE file.
 #include "QmitkViewInitializationView.h"
 #include <ui_QmitkViewInitializationViewControls.h>
 
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateDataType.h>
 
-#include "QmitkDataStorageComboBox.h"
-#include "mitkCameraController.h"
+#include <QmitkDataStorageComboBox.h>
+#include <mitkCameraController.h>
 #include <mitkBaseRenderer.h>
 #include <mitkSliceNavigationController.h>
 
-#include "itkCommand.h"
+#include <itkCommand.h>
 
 #include <QMessageBox>
 
 const std::string QmitkViewInitializationView::VIEW_ID = "org.mitk.views.viewinitialization";
 
-QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(nullptr)
+QmitkViewInitializationView::QmitkViewInitializationView()
 {
   m_CommandTag = 0;
 }
@@ -40,7 +40,7 @@ void QmitkViewInitializationView::CreateQtPartControl(QWidget *parent)
   if (!m_Controls)
   {
     // create GUI widgets
-    m_Controls = new Ui::QmitkViewInitializationViewControls;
+    m_Controls = std::make_unique<Ui::QmitkViewInitializationViewControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }

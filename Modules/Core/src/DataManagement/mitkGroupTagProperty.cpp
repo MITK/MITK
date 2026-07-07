@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGroupTagProperty.h"
+#include <mitkGroupTagProperty.h>
 #include <nlohmann/json.hpp>
 
 mitk::GroupTagProperty::GroupTagProperty() : mitk::BaseProperty()
@@ -43,9 +43,3 @@ bool mitk::GroupTagProperty::FromJSON(const nlohmann::json&)
   return true;
 }
 
-itk::LightObject::Pointer mitk::GroupTagProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

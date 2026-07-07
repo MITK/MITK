@@ -106,6 +106,11 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
     endif()
   endif()
 
-  MITK_INSTALL(TARGETS ${ALG_TARGET})
+  foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+    install(TARGETS ${ALG_TARGET}
+      RUNTIME_DEPENDENCY_SET ${_depset}
+      RUNTIME DESTINATION ${_bindir}
+      LIBRARY DESTINATION ${_bindir})
+  endforeach()
 
 endfunction()

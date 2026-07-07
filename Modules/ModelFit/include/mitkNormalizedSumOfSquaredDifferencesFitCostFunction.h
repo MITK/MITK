@@ -15,14 +15,21 @@ found in the LICENSE file.
 
 #include <mitkSVModelFitCostFunction.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
-/** Multi valued model fit cost function that computes the squared differences between the model output and the
- * signal.
-*/
+/**
+ * \class NormalizedSumOfSquaredDifferencesFitCostFunction
+ * \brief Single-valued cost function computing the normalized sum of squared differences.
+ *
+ * Computes the sum of squared differences between model output and the observed signal,
+ * normalized by the number of sample points. This provides a cost value that is
+ * independent of the number of time points.
+ *
+ * \sa SVModelFitCostFunction, SumOfSquaredDifferencesFitCostFunction
+ */
 class MITKMODELFIT_EXPORT NormalizedSumOfSquaredDifferencesFitCostFunction : public mitk::SVModelFitCostFunction
 {
 public:

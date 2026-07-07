@@ -29,9 +29,11 @@ if(MITK_USE_MatchPoint)
     else()
       set(download_step
           GIT_REPOSITORY https://github.com/MIC-DKFZ/MatchPoint.git
-          GIT_TAG c6188c953fe73d39882e2347a43c25605781e5d0 # 2025-04-10
+          GIT_TAG d02f5fbe4a06ac70722055c869d257437ecfaa4f # 2026-06-11
          )
     endif()
+
+    set(MatchPoint_VERSION "0.14")
 
     string(REPLACE "-DBOOST_ALL_DYN_LINK" "" modified_ep_common_args "${ep_common_args}")
 
@@ -47,13 +49,11 @@ if(MITK_USE_MatchPoint)
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build
          "-DBoost_DIR:PATH=${Boost_DIR}"
          -DMAP_USE_SYSTEM_GDCM:BOOL=ON
-         -DMAP_USE_SYSTEM_HDF5:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
          -DMAP_BUILD_Ontology:BOOL=ON
          -DMAP_BUILD_Ontology_simple:BOOL=ON
          -DGDCM_DIR:PATH=${GDCM_DIR}
-         -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS
@@ -61,8 +61,7 @@ if(MITK_USE_MatchPoint)
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    ExternalProject_Get_Property(${proj} binary_dir)
-    set(${proj}_DIR ${binary_dir})
+    set(${proj}_DIR "${ep_prefix}/lib/cmake/MatchPoint-${MatchPoint_VERSION}")
     mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()

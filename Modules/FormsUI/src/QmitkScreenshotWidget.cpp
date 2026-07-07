@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkScreenshotWidget.h"
 #include <ui_QmitkScreenshotWidget.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <QFileInfo>
 
@@ -21,7 +21,7 @@ using Self = QmitkScreenshotWidget;
 
 QmitkScreenshotWidget::QmitkScreenshotWidget(QWidget* parent)
   : QWidget(parent),
-    m_Ui(new Ui::QmitkScreenshotWidget)
+    m_Ui(std::make_unique<Ui::QmitkScreenshotWidget>())
 {
   m_Ui->setupUi(this);
 

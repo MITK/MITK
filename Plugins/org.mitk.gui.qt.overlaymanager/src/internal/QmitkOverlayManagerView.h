@@ -15,21 +15,28 @@ found in the LICENSE file.
 
 #include <berryISelectionListener.h>
 
-#include "mitkAnnotation.h"
-#include "mitkILifecycleAwarePart.h"
-#include "ui_QmitkOverlayManagerViewControls.h"
+#include <mitkAnnotation.h>
+#include <mitkILifecycleAwarePart.h>
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <memory>
 
 class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
+
 class QSortFilterProxyModel;
+class QListWidgetItem;
 
 namespace mitk
 {
   class IPropertyAliases;
   class IPropertyDescriptions;
   class IPropertyPersistence;
+}
+
+namespace Ui
+{
+  class QmitkOverlayManagerViewControls;
 }
 
 /**
@@ -62,7 +69,6 @@ protected:
   void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *) override;
 
-  Ui::QmitkOverlayManagerViewControls m_Controls;
   void OnFocusChanged(itk::Object *, const itk::EventObject &event);
 
 private slots:
@@ -101,6 +107,7 @@ private:
   /** \see berry::IPartListener::PartHidden */
   void Hidden() override;
 
+  std::unique_ptr<Ui::QmitkOverlayManagerViewControls> m_Controls;
   QWidget *m_Parent;
   unsigned long m_PropertyNameChangedTag;
   unsigned long m_OverlayManagerObserverTag;

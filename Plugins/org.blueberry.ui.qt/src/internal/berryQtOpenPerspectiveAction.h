@@ -16,8 +16,8 @@ found in the LICENSE file.
 #include <QAction>
 #include <QActionGroup>
 
-#include <berryIWorkbenchWindow.h>
-#include <berryIPerspectiveDescriptor.h>
+#include "berryIWorkbenchWindow.h"
+#include "berryIPerspectiveDescriptor.h"
 
 //TODO should be removed later
 #include <org_blueberry_ui_qt_Export.h>

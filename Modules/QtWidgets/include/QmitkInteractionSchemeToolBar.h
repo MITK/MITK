@@ -13,18 +13,19 @@ found in the LICENSE file.
 #ifndef QmitkInteractionSchemeToolBar_h
 #define QmitkInteractionSchemeToolBar_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // mitk core
-#include "mitkInteractionSchemeSwitcher.h"
+#include <mitkInteractionSchemeSwitcher.h>
 
 #include <QActionGroup>
 #include <QToolBar>
 
 /**
-* @brief
+* \brief Toolbar widget that allows switching between different interaction schemes.
 *
-*
+* Provides buttons to switch the interaction scheme (e.g., MITK default or PACS mode)
+* using the mitk::InteractionSchemeSwitcher.
 */
 class MITKQTWIDGETS_EXPORT QmitkInteractionSchemeToolBar : public QToolBar
 {

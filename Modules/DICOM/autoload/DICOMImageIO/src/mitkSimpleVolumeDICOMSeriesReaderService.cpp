@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSimpleVolumeDICOMSeriesReaderService.h"
-#include "mitkDICOMReaderConfigurator.h"
+#include <mitkSimpleVolumeDICOMSeriesReaderService.h>
+#include <mitkDICOMReaderConfigurator.h>
 #include <mitkDICOMITKSeriesGDCMReader.h>
 
 #include <usModuleContext.h>

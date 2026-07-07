@@ -1,5 +1,3 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
-
 set(CPP_FILES
   mitkManualPlacementAnnotationRenderer.cpp
   mitkColorBarAnnotation.cpp
@@ -9,7 +7,7 @@ set(CPP_FILES
   mitkScaleLegendAnnotation.cpp
   mitkTextAnnotation2D.cpp
   mitkTextAnnotation3D.cpp
-  mitkVtkLogoRepresentation.cxx
+  mitkVtkLogoRepresentation.cpp
   mitkVtkAnnotation.cpp
   mitkVtkAnnotation2D.cpp
   mitkVtkAnnotation3D.cpp

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkColorBarAnnotation_h
 #define mitkColorBarAnnotation_h
 
-#include "MitkAnnotationExports.h"
+#include <MitkAnnotationExports.h>
 #include <mitkLocalStorageHandler.h>
 #include <mitkVtkAnnotation.h>
 #include <vtkLookupTable.h>
@@ -23,14 +23,23 @@ class vtkScalarBarActor;
 
 namespace mitk
 {
-  /** \brief Displays configurable scales on the renderwindow. The scale is determined by the image spacing. */
+  /**
+   * \brief Displays a configurable color bar (scalar bar) on the render window.
+   *
+   * Wraps a vtkScalarBarActor to show a color legend corresponding to a
+   * vtkLookupTable. Orientation, number of colors, labels, and tick marks
+   * are configurable.
+   *
+   * \sa VtkAnnotation, ScaleLegendAnnotation
+   */
   class MITKANNOTATION_EXPORT ColorBarAnnotation : public mitk::VtkAnnotation
   {
   public:
+    /** \brief Per-renderer local storage for the scalar bar actor. */
     class LocalStorage : public mitk::Annotation::BaseLocalStorage
     {
     public:
-      /** \brief Actor of a 2D render window. */
+      /** \brief The vtkScalarBarActor used for rendering. */
       vtkSmartPointer<vtkScalarBarActor> m_ScalarBarActor;
 
       /** \brief Timestamp of last update of stored data. */
@@ -38,7 +47,7 @@ namespace mitk
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
-      /** \brief Default deconstructor of the local storage. */
+      /** \brief Default destructor of the local storage. */
       ~LocalStorage();
     };
 
@@ -46,27 +55,94 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      void SetDrawAnnotations(bool annotations);
+    /**
+     * \brief Enable or disable drawing of text annotations on the color bar.
+     * \param[in] annotations true to enable.
+     */
+    void SetDrawAnnotations(bool annotations);
+
+    /**
+     * \brief Query whether text annotations are drawn.
+     * \return true if enabled.
+     */
     bool GetDrawAnnotations() const;
 
+    /** \brief Set the color bar orientation to horizontal. */
     void SetOrientationToHorizontal();
+
+    /** \brief Set the color bar orientation to vertical. */
     void SetOrientationToVertical();
+
+    /**
+     * \brief Set the color bar orientation.
+     * \param[in] orientation 0 for horizontal, 1 for vertical.
+     */
     void SetOrientation(int orientation);
+
+    /**
+     * \brief Get the current orientation.
+     * \return 0 for horizontal, 1 for vertical.
+     */
     int GetOrientation() const;
 
+    /**
+     * \brief Set the maximum number of colors in the bar.
+     * \param[in] numberOfColors The maximum color count.
+     */
     void SetMaxNumberOfColors(int numberOfColors);
+
+    /**
+     * \brief Get the maximum number of colors.
+     * \return The color count.
+     */
     int GetMaxNumberOfColors() const;
 
+    /**
+     * \brief Set the number of labels displayed on the bar.
+     * \param[in] numberOfLabels The label count.
+     */
     void SetNumberOfLabels(int numberOfLabels);
+
+    /**
+     * \brief Get the number of labels.
+     * \return The label count.
+     */
     int GetNumberOfLabels() const;
 
+    /**
+     * \brief Set the lookup table used for the color mapping.
+     * \param[in] table The vtkLookupTable to display.
+     */
     void SetLookupTable(vtkSmartPointer<vtkLookupTable> table);
+
+    /**
+     * \brief Get the current lookup table.
+     * \return The vtkLookupTable.
+     */
     vtkSmartPointer<vtkLookupTable> GetLookupTable() const;
 
+    /**
+     * \brief Enable or disable drawing of tick labels.
+     * \param[in] ticks true to enable.
+     */
     void SetDrawTickLabels(bool ticks);
+
+    /**
+     * \brief Query whether tick labels are drawn.
+     * \return true if enabled.
+     */
     bool GetDrawTickLabels() const;
 
+    /**
+     * \brief Enable or disable text scaling on the annotation.
+     * \param[in] scale true to enable scaling.
+     */
     void SetAnnotationTextScaling(bool scale);
+
+    /**
+     * \brief Query whether annotation text scaling is enabled.
+     * \return true if enabled.
+     */
     bool GetAnnotationTextScaling() const;
 
   protected:

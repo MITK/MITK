@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "berryQtPerspectiveSwitcher.h"
 
 #include "berryQtOpenPerspectiveAction.h"
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIPerspectiveRegistry.h>
+#include "berryIWorkbench.h"
+#include "berryIWorkbenchPage.h"
+#include "berryIPerspectiveRegistry.h"
 
 #include <QActionGroup>
 

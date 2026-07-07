@@ -10,12 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#define NOMINMAX
 #include "berryJobManager.h"
 
 #include "berryIProgressMonitor.h"
 #include "berryNullProgressMonitor.h"
-#include "berryIStatus.h"
+#include <berryIStatus.h>
 #include "berryJobStatus.h"
 
 #include <iostream>

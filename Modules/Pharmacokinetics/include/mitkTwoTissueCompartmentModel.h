@@ -13,12 +13,20 @@ found in the LICENSE file.
 #ifndef mitkTwoTissueCompartmentModel_h
 #define mitkTwoTissueCompartmentModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 
 namespace mitk
 {
+  /**
+   * \brief Implementation of the reversible two-tissue compartment model for PET pharmacokinetics.
+   *
+   * Models two tissue compartments with parameters K1 (plasma-to-tissue influx), k2 (tissue-to-plasma
+   * efflux), k3 (free-to-bound transfer), k4 (bound-to-free transfer), and vb (blood volume fraction).
+   *
+   * \sa OneTissueCompartmentModel, TwoTissueCompartmentFDGModel, TwoCompartmentExchangeModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentModel : public AIFBasedModelBase
   {
 
@@ -74,11 +82,9 @@ namespace mitk
     TwoTissueCompartmentModel();
     ~TwoTissueCompartmentModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    TwoTissueCompartmentModel(const TwoTissueCompartmentModel& source);
+
+    mitkCloneMacro(TwoTissueCompartmentModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -86,9 +92,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    TwoTissueCompartmentModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

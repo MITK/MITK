@@ -14,12 +14,16 @@ found in the LICENSE file.
 #ifndef BERRYQTSTYLEPREFERENCEPAGE_H_
 #define BERRYQTSTYLEPREFERENCEPAGE_H_
 
-#include <berryIQtPreferencePage.h>
-#include <berryIQtStyleManager.h>
-
-#include <ui_berryQtStylePreferencePage.h>
+#include "berryIQtPreferencePage.h"
+#include "berryIQtStyleManager.h"
 
 #include <QStringList>
+#include <memory>
+
+namespace Ui
+{
+  class QtStylePreferencePageUI;
+}
 
 namespace berry {
 
@@ -32,6 +36,7 @@ class QtStylePreferencePage : public QObject, public IQtPreferencePage
 public:
 
   QtStylePreferencePage();
+  ~QtStylePreferencePage() override;
 
   void Init(IWorkbench::Pointer workbench) override;
 
@@ -62,7 +67,7 @@ private:
 
   berry::IQtStyleManager* styleManager;
 
-  Ui::QtStylePreferencePageUI controls;
+  std::unique_ptr<Ui::QtStylePreferencePageUI> controls;
   berry::IQtStyleManager::Style oldStyle;
 
   berry::IQtStyleManager::StyleList styles;

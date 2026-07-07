@@ -121,6 +121,5 @@ Maybe your image is too large. Some filter operations, like derivatives, take a 
 Try downsampling your image first.
 
 <B>All other problems.</B><BR>
-Please report to the MITK mailing list.
-See https://www.mitk.org/wiki/MITK_Mailinglist on how to do this.
+Please <a href="https://github.com/MITK/MITK/issues">open an issue on GitHub</a> to report the problem.
 */

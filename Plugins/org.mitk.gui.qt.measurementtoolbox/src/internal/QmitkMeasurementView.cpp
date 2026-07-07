@@ -49,12 +49,12 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkSingleNodeSelectionWidget.h>
 
-#include "ctkDoubleSpinBox.h"
+#include <ctkDoubleSpinBox.h>
 
 #include "mitkPluginActivator.h"
-#include "usModuleRegistry.h"
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <usModuleRegistry.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <usModuleInitialization.h>
 
 US_INITIALIZE_MODULE
@@ -467,21 +467,36 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 
 void QmitkMeasurementView::PlanarFigureSelected(itk::Object* object, const itk::EventObject&)
 {
-  d->m_CurrentSelection.clear();
-
   auto lambda = [&object](const std::pair<mitk::DataNode::Pointer, QmitkPlanarFigureData>& element)
   {
     return element.second.m_Figure == object;
   };
 
   auto it = std::find_if(d->m_DataNodeToPlanarFigureData.begin(), d->m_DataNodeToPlanarFigureData.end(), lambda);
+
   if (it != d->m_DataNodeToPlanarFigureData.end())
-  {
-    d->m_CurrentSelection.push_back(it->first);
-  }
+    this->SelectNode(it->first);
 
   this->UpdateMeasurementText();
   this->RequestRenderWindowUpdate();
+}
+
+void QmitkMeasurementView::SelectNode(const mitk::DataNode::Pointer& node)
+{
+  for (auto& selectedNode : d->m_CurrentSelection)
+    selectedNode->SetSelected(false);
+
+  d->m_CurrentSelection.clear();
+  d->m_CurrentSelection.push_back(node);
+
+  this->FireNodeSelected(node);
+  this->SynchronizeDataManagerSelection();
+
+  // Set "selected" last: SynchronizeDataManagerSelection updates the Data Manager
+  // tree selection, whose NodeSelectionChanged handler re-derives every node's
+  // "selected" property and transiently clears it for the picked node. Setting it
+  // afterwards leaves the figure in the selected (red) appearance.
+  node->SetSelected(true);
 }
 
 void QmitkMeasurementView::PlanarFigureInitialized()
@@ -750,13 +765,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
     this->GetDataStorage()->Add(newNode);
   }
 
-  for (auto &node : d->m_CurrentSelection)
-    node->SetSelected(false);
-
-  newNode->SetSelected(true);
-
-  d->m_CurrentSelection.clear();
-  d->m_CurrentSelection.push_back(newNode);
+  this->SelectNode(newNode);
 
   this->UpdateMeasurementText();
 
@@ -776,8 +785,6 @@ void QmitkMeasurementView::UpdateMeasurementText()
   int j = 1;
 
   mitk::PlanarFigure::Pointer planarFigure;
-  mitk::PlanarAngle::Pointer planarAngle;
-  mitk::PlanarFourPointAngle::Pointer planarFourPointAngle;
   mitk::DataNode::Pointer node;
 
   for (int i = 0; i < d->m_CurrentSelection.size(); ++i, ++j)
@@ -795,11 +802,6 @@ void QmitkMeasurementView::UpdateMeasurementText()
     infoText.append(QString("<b>%1</b><hr />").arg(QString::fromStdString(node->GetName())));
     plainInfoText.append(QString("%1").arg(QString::fromStdString(node->GetName())));
 
-    planarAngle = dynamic_cast<mitk::PlanarAngle*> (planarFigure.GetPointer());
-
-    if (planarAngle.IsNull())
-      planarFourPointAngle = dynamic_cast<mitk::PlanarFourPointAngle*> (planarFigure.GetPointer());
-
     double featureQuantity = 0.0;
 
     for (unsigned int k = 0; k < planarFigure->GetNumberOfFeatures(); ++k)
@@ -808,9 +810,6 @@ void QmitkMeasurementView::UpdateMeasurementText()
         continue;
 
       featureQuantity = planarFigure->GetQuantity(k);
-
-      if ((planarAngle.IsNotNull() && k == planarAngle->FEATURE_ID_ANGLE) || (planarFourPointAngle.IsNotNull() && k == planarFourPointAngle->FEATURE_ID_ANGLE))
-        featureQuantity = featureQuantity * 180 / vnl_math::pi;
 
       infoText.append(QString("<i>%1</i>: %2 %3")
         .arg(QString(planarFigure->GetFeatureName(k)))

@@ -10,7 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkTransferFunctionGeneratorWidget.h"
+#include <QmitkTransferFunctionGeneratorWidget.h>
+#include <ui_QmitkTransferFunctionGeneratorWidget.h>
 
 #include <QFileDialog>
 #include <QFontMetrics>
@@ -18,40 +19,38 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkTransferFunctionProperty.h>
-#include <mitkUnstructuredGrid.h>
 
 #include <mitkTransferFunctionPropertySerializer.h>
-
-#include <vtkUnstructuredGrid.h>
 
 QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f), deltaScale(1.0), deltaMax(1024), deltaMin(1)
 {
   histoGramm = nullptr;
 
-  this->setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkTransferFunctionGeneratorWidget>();
+  m_Controls->setupUi(this);
 
   // LevelWindow Tab
   {
-    connect(m_CrossLevelWindow, SIGNAL(SignalDeltaMove(int, int)), this, SLOT(OnDeltaLevelWindow(int, int)));
+    connect(m_Controls->m_CrossLevelWindow, SIGNAL(SignalDeltaMove(int, int)), this, SLOT(OnDeltaLevelWindow(int, int)));
   }
 
   // Threshold Tab
   {
-    connect(m_CrossThreshold, SIGNAL(SignalDeltaMove(int, int)), this, SLOT(OnDeltaThreshold(int, int)));
+    connect(m_Controls->m_CrossThreshold, SIGNAL(SignalDeltaMove(int, int)), this, SLOT(OnDeltaThreshold(int, int)));
     thDelta = 100;
   }
 
   // Presets Tab
   {
-    m_TransferFunctionComboBox->setVisible(false);
+    m_Controls->m_TransferFunctionComboBox->setVisible(false);
 
-    connect(m_TransferFunctionComboBox, SIGNAL(activated(int)), this, SIGNAL(SignalTransferFunctionModeChanged(int)));
-    connect(m_TransferFunctionComboBox, SIGNAL(activated(int)), this, SLOT(OnPreset(int)));
+    connect(m_Controls->m_TransferFunctionComboBox, SIGNAL(activated(int)), this, SIGNAL(SignalTransferFunctionModeChanged(int)));
+    connect(m_Controls->m_TransferFunctionComboBox, SIGNAL(activated(int)), this, SLOT(OnPreset(int)));
 
-    connect(m_SavePreset, SIGNAL(clicked()), this, SLOT(OnSavePreset()));
+    connect(m_Controls->m_SavePreset, SIGNAL(clicked()), this, SLOT(OnSavePreset()));
 
-    connect(m_LoadPreset, SIGNAL(clicked()), this, SLOT(OnLoadPreset()));
+    connect(m_Controls->m_LoadPreset, SIGNAL(clicked()), this, SLOT(OnLoadPreset()));
   }
 
   presetFileName = "TransferFunctionPreset";
@@ -59,25 +58,25 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
 
 int QmitkTransferFunctionGeneratorWidget::AddPreset(const QString &presetName)
 {
-  m_TransferFunctionComboBox->setVisible(true);
+  m_Controls->m_TransferFunctionComboBox->setVisible(true);
 
-  m_TransferFunctionComboBox->addItem(presetName);
-  return m_TransferFunctionComboBox->count() - 1;
+  m_Controls->m_TransferFunctionComboBox->addItem(presetName);
+  return m_Controls->m_TransferFunctionComboBox->count() - 1;
 }
 
 void QmitkTransferFunctionGeneratorWidget::SetPresetsTabEnabled(bool enable)
 {
-  m_PresetTab->setEnabled(enable);
+  m_Controls->m_PresetTab->setEnabled(enable);
 }
 
 void QmitkTransferFunctionGeneratorWidget::SetThresholdTabEnabled(bool enable)
 {
-  m_ThresholdTab->setEnabled(enable);
+  m_Controls->m_ThresholdTab->setEnabled(enable);
 }
 
 void QmitkTransferFunctionGeneratorWidget::SetBellTabEnabled(bool enable)
 {
-  m_BellTab->setEnabled(enable);
+  m_Controls->m_BellTab->setEnabled(enable);
 }
 
 void QmitkTransferFunctionGeneratorWidget::OnSavePreset()
@@ -100,13 +99,13 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset()
 
   if (mitk::TransferFunctionPropertySerializer::SerializeTransferFunction(presetFileName.toLatin1(), tf))
   {
-    QFontMetrics metrics(m_InfoPreset->font());
-    QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_InfoPreset->width());
-    m_InfoPreset->setText(QString("saved ") + text);
+    QFontMetrics metrics(m_Controls->m_InfoPreset->font());
+    QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_Controls->m_InfoPreset->width());
+    m_Controls->m_InfoPreset->setText(QString("saved ") + text);
   }
   else
   {
-    m_InfoPreset->setText(QString("saving failed"));
+    m_Controls->m_InfoPreset->setText(QString("saving failed"));
   }
 }
 
@@ -127,11 +126,11 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset()
   {
     tfpToChange->SetValue(tf);
 
-    QFontMetrics metrics(m_InfoPreset->font());
-    QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_InfoPreset->width());
-    m_InfoPreset->setText(QString("loaded ") + text);
+    QFontMetrics metrics(m_Controls->m_InfoPreset->font());
+    QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_Controls->m_InfoPreset->width());
+    m_Controls->m_InfoPreset->setText(QString("loaded ") + text);
 
-    m_TransferFunctionComboBox->setCurrentIndex(-1);
+    m_Controls->m_TransferFunctionComboBox->setCurrentIndex(-1);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit SignalUpdateCanvas();
@@ -140,7 +139,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset()
 
 void QmitkTransferFunctionGeneratorWidget::OnPreset(int /*mode*/)
 {
-  m_InfoPreset->clear();
+  m_Controls->m_InfoPreset->clear();
 }
 
 static double transformationGlocke(double x)
@@ -199,7 +198,7 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy) //
      << "center at " << thPos << "\n"
      << "width " << thDelta * 2;
 
-  m_InfoLevelWindow->setText(QString(ss.str().c_str()));
+  m_Controls->m_InfoLevelWindow->setText(QString(ss.str().c_str()));
 
   mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
@@ -271,7 +270,7 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy) // L
      << "threshold at " << thPos << "\n"
      << "width " << thDelta * 2;
 
-  m_InfoThreshold->setText(QString(ss.str().c_str()));
+  m_Controls->m_InfoThreshold->setText(QString(ss.str().c_str()));
 
   mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
@@ -339,16 +338,6 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode *node, mit
       histoMinimum = statistics->GetScalarValueMin();
       histoMaximum = statistics->GetScalarValueMax();
     }
-    else if (mitk::UnstructuredGrid *grid = dynamic_cast<mitk::UnstructuredGrid *>(node->GetData()))
-    {
-      double *range = grid->GetVtkUnstructuredGrid()->GetScalarRange();
-      histoMinimum = range[0];
-      histoMaximum = range[1];
-      double histoRange = histoMaximum - histoMinimum;
-      deltaMax = histoRange / 4.0;
-      deltaMin = histoRange / 400.0;
-      deltaScale = histoRange / 1024.0;
-    }
     else
     {
       MITK_WARN << "QmitkTransferFunctonGeneratorWidget does not support " << node->GetData()->GetNameOfClass()
@@ -360,6 +349,6 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode *node, mit
   else
   {
     tfpToChange = nullptr;
-    m_InfoPreset->setText(QString(""));
+    m_Controls->m_InfoPreset->setText(QString(""));
   }
 }

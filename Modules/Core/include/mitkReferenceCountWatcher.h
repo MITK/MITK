@@ -13,16 +13,19 @@ found in the LICENSE file.
 #ifndef mitkReferenceCountWatcher_h
 #define mitkReferenceCountWatcher_h
 
-#include "itkCommand.h"
+#include <itkCommand.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Keeps track of the reference count of an object even if
-  //## it is destroyed.
-  //## @ingroup Testing
+  /**
+   * \brief Keeps track of the reference count of an object even if it is destroyed.
+   *
+   * This utility class registers itself as an ITK observer for the DeleteEvent
+   * of the watched object. After the object is destroyed, GetReferenceCount()
+   * returns 0 instead of accessing invalid memory.
+   */
   class ReferenceCountWatcher : public itk::Object
   {
   public:
@@ -31,28 +34,24 @@ namespace mitk
     mitkClassMacroItkParent(ReferenceCountWatcher, itk::Object);
 
   protected:
-    //##Documentation
-    //## @brief Object to be watched
+    /** \brief The object to be watched. */
     itk::Object *m_Object;
 
-    //##Documentation
-    //## @brief Optional comment, e.g. for debugging output
+    /** \brief Optional comment, e.g. for debugging output. */
     std::string m_Comment;
 
-    //##Documentation
-    //## @brief If \a true, \a m_Object is no longer valid
-    //## and the returned reference count will be 0.
+    /** \brief If true, m_Object is no longer valid and the returned reference count will be 0. */
     bool m_Deleted;
 
-    //##Documentation
-    //## @brief itk::Command to get a notification when the object
-    //## is deleted.
+    /** \brief itk::Command to get a notification when the object is deleted. */
     CommandType::Pointer m_DeleteCommand;
 
   public:
-    //##Documentation
-    //## @brief Constructor requiring object to be watched and allowing
-    //## an optional comment.
+    /** \brief Constructor requiring the object to be watched and allowing an optional comment.
+     *
+     * \param o the ITK object whose reference count should be tracked.
+     * \param comment an optional descriptive string for debugging.
+     */
     ReferenceCountWatcher(itk::Object *o, const char *comment = "")
       : m_Object(o), m_Comment(comment), m_Deleted(false), m_ObserverTag(0)
     {
@@ -62,8 +61,8 @@ namespace mitk
         m_ObserverTag = m_Object->AddObserver(itk::DeleteEvent(), m_DeleteCommand);
       m_ReferenceCount = 0;
     }
-    //##Documentation
-    //## @brief Destructor: remove observer
+
+    /** \brief Destructor. Removes the observer from the watched object if it still exists. */
     ~ReferenceCountWatcher() override
     {
       if ((m_Deleted == false) && (m_Object != nullptr))
@@ -71,9 +70,12 @@ namespace mitk
         m_Object->RemoveObserver(m_ObserverTag);
       }
     }
-    //##Documentation
-    //## @brief Return the reference count of the watched object or
-    //## 0 if it has been destroyed
+
+    /** \brief Returns the reference count of the watched object.
+     *
+     * \return The reference count, 0 if the object has been destroyed,
+     *         or -1 if no object was provided.
+     */
     int GetReferenceCount() const override
     {
       if (m_Object == nullptr)
@@ -83,15 +85,13 @@ namespace mitk
       return m_Object->GetReferenceCount();
     }
 
-    //##Documentation
-    //## @brief Return the optional string comment
+    /** \brief Returns the optional string comment. */
     itkGetStringMacro(Comment);
 
   protected:
-    //##Documentation
-    //## @brief Callback called on itk::DeleteEvent() of wathched object.
+    /** \brief Callback invoked on itk::DeleteEvent() of the watched object. */
     void DeleteObserver() { m_Deleted = true; }
-    unsigned long m_ObserverTag;
+    unsigned long m_ObserverTag;  ///< ITK observer tag for the delete event.
   };
 }
 

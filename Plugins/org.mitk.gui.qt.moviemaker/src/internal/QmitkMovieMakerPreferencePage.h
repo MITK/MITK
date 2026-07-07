@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QString>
+#include <memory>
 
 class QWidget;
 
@@ -46,7 +47,7 @@ private slots:
   void OnFFmpegProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-  Ui::QmitkMovieMakerPreferencePage* m_Ui;
+  std::unique_ptr<Ui::QmitkMovieMakerPreferencePage> m_Ui;
   QWidget* m_Control;
 
   QProcess* m_FFmpegProcess;

@@ -16,17 +16,23 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkMacro.h>
 
-#include "mitkConstraintCheckerInterface.h"
+#include <mitkConstraintCheckerInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
-/** \class ConstraintCheckerBase
- * \brief This class is the base class for constraint checker.
- * @remark All functions of the ConstraintCheckerInterface must be implemented thread save because it will be used in a multi threaded
- * environment.
+/**
+ * \class ConstraintCheckerBase
+ * \brief Base class for constraint checkers used in model fitting.
+ *
+ * Provides a default implementation of GetPenaltySum() that sums all penalty values.
+ *
+ * \remark All functions of the ConstraintCheckerInterface must be implemented thread-safe
+ * because they are used in a multi-threaded environment.
+ *
+ * \sa ConstraintCheckerInterface, SimpleBarrierConstraintChecker
  */
 class MITKMODELFIT_EXPORT ConstraintCheckerBase : public itk::Object, public ConstraintCheckerInterface
 {

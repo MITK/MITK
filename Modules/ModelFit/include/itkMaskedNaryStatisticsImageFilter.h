@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkMaskedNaryStatisticsImageFilter_h
-#define __itkMaskedNaryStatisticsImageFilter_h
+#ifndef itkMaskedNaryStatisticsImageFilter_h
+#define itkMaskedNaryStatisticsImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkImageIterator.h"
-#include "itkArray.h"
+#include <itkImageToImageFilter.h>
+#include <itkImageIterator.h>
+#include <itkArray.h>
 
 namespace itk
 {
@@ -23,9 +23,6 @@ namespace itk
  * \brief Computes a masked statistic on N images and produces vectors of those statistic results.
  *
  * All the input images must be of the same type.
- *
- * \ingroup IntensityImageFilters
- * \ingroup ITKImageIntensity
  */
 
 template< class TInputImage, class TMaskImage = ::itk::Image<unsigned char, TInputImage::ImageDimension> >
@@ -104,7 +101,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMaskedNaryStatisticsImageFilter.hxx"
+#include <itkMaskedNaryStatisticsImageFilter.tpp>
 #endif
 
 #endif

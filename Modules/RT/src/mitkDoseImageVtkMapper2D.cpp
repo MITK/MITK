@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkImageStatisticsHolder.h"
-#include "mitkPlaneClipping.h"
-#include "mitkPropertyNameHelper.h"
+#include <mitkImageStatisticsHolder.h>
+#include <mitkPlaneClipping.h>
+#include <mitkPropertyNameHelper.h>
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
 #include <mitkImageSliceSelector.h>
@@ -31,11 +31,11 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 
 // MITK Rendering
-#include "mitkDoseImageVtkMapper2D.h"
+#include <mitkDoseImageVtkMapper2D.h>
 
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkMitkThickSlicesFilter.h"
-#include "vtkNeverTranslucentTexture.h"
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkMitkThickSlicesFilter.h>
+#include <vtkNeverTranslucentTexture.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -785,9 +785,9 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
       std::string sLevel;
       std::string sWindow;
 
-      if (GetBackwardsCompatibleDICOMProperty(
+      if (GetBackwardsCompatibleDICOMPropertyValue(
             0x0028, 0x1050, "dicom.voilut.WindowCenter", image->GetPropertyList(), sLevel) &&
-          GetBackwardsCompatibleDICOMProperty(
+          GetBackwardsCompatibleDICOMPropertyValue(
             0x0028, 0x1051, "dicom.voilut.WindowWidth", image->GetPropertyList(), sWindow))
       {
         float level = atof(sLevel.c_str());
@@ -797,12 +797,12 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
         std::string sSmallestPixelValueInSeries;
         std::string sLargestPixelValueInSeries;
 
-        if (GetBackwardsCompatibleDICOMProperty(0x0028,
+        if (GetBackwardsCompatibleDICOMPropertyValue(0x0028,
                                                 0x0108,
                                                 "dicom.series.SmallestPixelValueInSeries",
                                                 image->GetPropertyList(),
                                                 sSmallestPixelValueInSeries) &&
-            GetBackwardsCompatibleDICOMProperty(0x0028,
+            GetBackwardsCompatibleDICOMPropertyValue(0x0028,
                                                 0x0109,
                                                 "dicom.series.LargestPixelValueInSeries",
                                                 image->GetPropertyList(),

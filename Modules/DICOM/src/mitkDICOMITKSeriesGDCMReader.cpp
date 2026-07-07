@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <itkTimeProbesCollectorBase.h>
 #include <gdcmUIDs.h>
-#include "mitkDICOMITKSeriesGDCMReader.h"
-#include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkGantryTiltInformation.h"
-#include "mitkDICOMTagBasedSorter.h"
-#include "mitkDICOMGDCMTagScanner.h"
+#include <mitkDICOMITKSeriesGDCMReader.h>
+#include <mitkITKDICOMSeriesReaderHelper.h>
+#include <mitkGantryTiltInformation.h>
+#include <mitkDICOMTagBasedSorter.h>
+#include <mitkDICOMGDCMTagScanner.h>
 
 std::mutex mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex;
 
@@ -40,7 +40,6 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGD
 , m_FixTiltByShearing( other.m_FixTiltByShearing)
 , m_SimpleVolumeReading( other.m_SimpleVolumeReading)
 , m_SortingResultInProgress( other.m_SortingResultInProgress )
-, m_Sorter( other.m_Sorter )
 , m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
 , m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
 , m_ReplacedCLocales( other.m_ReplacedCLocales )
@@ -49,6 +48,8 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGD
 , m_TagCache( other.m_TagCache )
 , m_ExternalCache(other.m_ExternalCache)
 {
+  for (const auto &sorter : other.m_Sorter)
+    m_Sorter.push_back(dynamic_cast<DICOMDatasetSorter *>(sorter->Clone().GetPointer()));
 }
 
 mitk::DICOMITKSeriesGDCMReader::~DICOMITKSeriesGDCMReader()
@@ -64,7 +65,9 @@ mitk::DICOMITKSeriesGDCMReader& mitk::DICOMITKSeriesGDCMReader::
     this->m_FixTiltByShearing                = other.m_FixTiltByShearing;
     this->m_SimpleVolumeReading              = other.m_SimpleVolumeReading;
     this->m_SortingResultInProgress          = other.m_SortingResultInProgress;
-    this->m_Sorter                           = other.m_Sorter; // TODO should clone the list items
+    this->m_Sorter.clear();
+    for (const auto &sorter : other.m_Sorter)
+      this->m_Sorter.push_back(dynamic_cast<DICOMDatasetSorter *>(sorter->Clone().GetPointer()));
     this->m_EquiDistantBlocksSorter          = other.m_EquiDistantBlocksSorter->Clone();
     this->m_NormalDirectionConsistencySorter = other.m_NormalDirectionConsistencySorter->Clone();
     this->m_ReplacedCLocales                 = other.m_ReplacedCLocales;
@@ -80,7 +83,7 @@ bool mitk::DICOMITKSeriesGDCMReader::operator==( const DICOMFileReader& other ) 
   if ( const auto* otherSelf = dynamic_cast<const Self*>( &other ) )
   {
     if ( this->m_FixTiltByShearing == otherSelf->m_FixTiltByShearing
-         && *( this->m_EquiDistantBlocksSorter ) == *( otherSelf->m_EquiDistantBlocksSorter )
+         && static_cast<const DICOMDatasetSorter&>(*(this->m_EquiDistantBlocksSorter)) == static_cast<const DICOMDatasetSorter&>(*(otherSelf->m_EquiDistantBlocksSorter))
          && ( fabs( this->m_DecimalPlacesForOrientation - otherSelf->m_DecimalPlacesForOrientation ) < eps ) )
     {
       // test sorters for equality

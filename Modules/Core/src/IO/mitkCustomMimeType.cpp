@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 
-#include "mitkMimeType.h"
+#include <mitkMimeType.h>
 
 #include <mitkUtf8Util.h>
 
@@ -118,10 +118,11 @@ namespace mitk
          iter != iterEnd;
          ++iter)
     {
-      if (!iter->empty() && path.size() >= iter->size())
+      if (!iter->empty() && path.size() > iter->size())
       {
         FindCaseInsensitive cmp(*iter);
-        if (cmp(path.substr(path.size() - iter->size())))
+        if (path[path.size() - iter->size() - 1] == '.' &&
+            cmp(path.substr(path.size() - iter->size())))
         {
           extension = "." + *iter;
           std::string filenameWithExtension = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetFilenameName(Utf8Util::Local8BitToUtf8(path)));

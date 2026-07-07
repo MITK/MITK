@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkClassicDICOMSeriesReaderService.h"
+#include <mitkClassicDICOMSeriesReaderService.h>
 
 #include <mitkClassicDICOMSeriesReader.h>
 

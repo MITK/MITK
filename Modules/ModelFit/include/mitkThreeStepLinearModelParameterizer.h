@@ -13,12 +13,18 @@ found in the LICENSE file.
 #ifndef mitkThreeStepLinearModelParameterizer_h
 #define mitkThreeStepLinearModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkThreeStepLinearModel.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkThreeStepLinearModel.h>
 
 namespace mitk
 {
 
+/**
+ * \class ThreeStepLinearModelParameterizer
+ * \brief Parameterizer for the ThreeStepLinearModel providing default initial values.
+ *
+ * \sa ThreeStepLinearModel, ThreeStepLinearModelFactory, ConcreteModelParameterizerBase
+ */
 class MITKMODELFIT_EXPORT ThreeStepLinearModelParameterizer : public
   mitk::ConcreteModelParameterizerBase<mitk::ThreeStepLinearModel>
 {

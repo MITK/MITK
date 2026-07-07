@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 
 #include "DoseVisualizationPreferencePage.h"
-#include "mitkRTUIConstants.h"
+#include <mitkRTUIConstants.h>
 
 #include <QWidget>
 #include <QMessageBox>
@@ -28,9 +28,11 @@ found in the LICENSE file.
 #include <QmitkDoseVisualStyleDelegate.h>
 #include <QmitkIsoDoseLevelSetModel.h>
 
-#include "mitkIsoLevelsGenerator.h"
+#include <mitkIsoLevelsGenerator.h>
 
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
+
+#include <ui_DoseVisualizationPreferencePageControls.h>
 
 namespace
 {
@@ -42,7 +44,7 @@ namespace
 }
 
 DoseVisualizationPreferencePage::DoseVisualizationPreferencePage()
-  : m_MainControl(nullptr), m_Controls(nullptr), m_referenceDoseChanged(false), m_presetMapChanged(false), m_globalVisChanged(false)
+  : m_MainControl(nullptr), m_referenceDoseChanged(false), m_presetMapChanged(false), m_globalVisChanged(false)
 {
 
 }
@@ -53,7 +55,6 @@ DoseVisualizationPreferencePage::~DoseVisualizationPreferencePage()
   delete m_DoseColorDelegate;
   delete m_DoseValueDelegate;
   delete m_DoseVisualDelegate;
-  delete m_Controls;
 }
 
 void DoseVisualizationPreferencePage::Init(berry::IWorkbench::Pointer )
@@ -70,7 +71,7 @@ void DoseVisualizationPreferencePage::CreateQtControl(QWidget* parent)
 
 
   m_MainControl = new QWidget(parent);
-  m_Controls = new Ui::DoseVisualizationPreferencePageControls;
+  m_Controls = std::make_unique<Ui::DoseVisualizationPreferencePageControls>();
   m_Controls->setupUi( m_MainControl );
 
 

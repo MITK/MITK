@@ -13,13 +13,24 @@ found in the LICENSE file.
 #ifndef mitkExtendedOneTissueCompartmentModel_h
 #define mitkExtendedOneTissueCompartmentModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
 
 
+  /**
+   * \brief Implementation of the extended one-tissue compartment model for PET pharmacokinetics.
+   *
+   * Extends the standard one-tissue compartment model with an additional blood volume
+   * fraction parameter (vb). Models the tissue concentration as a combination of the
+   * blood contribution and a single-compartment residue function.
+   *
+   * Fitted parameters: K1 (influx rate constant), k2 (efflux rate constant), vb (blood volume fraction).
+   *
+   * \sa OneTissueCompartmentModel, TwoTissueCompartmentModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT ExtendedOneTissueCompartmentModel : public AIFBasedModelBase
   {
 
@@ -68,11 +79,9 @@ namespace mitk
     ExtendedOneTissueCompartmentModel();
     ~ExtendedOneTissueCompartmentModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    ExtendedOneTissueCompartmentModel(const ExtendedOneTissueCompartmentModel& source);
+
+    mitkCloneMacro(ExtendedOneTissueCompartmentModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -80,9 +89,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    ExtendedOneTissueCompartmentModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

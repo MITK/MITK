@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define BERRYQTSHOWPERSPECTIVEDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 class QModelIndex;
 
@@ -39,7 +40,7 @@ private:
 
   Q_SLOT void setDescription(const QModelIndex& index);
 
-  Ui::QtShowPerspectiveDialog *ui;
+  std::unique_ptr<Ui::QtShowPerspectiveDialog> ui;
 };
 
 }

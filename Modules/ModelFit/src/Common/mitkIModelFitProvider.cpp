@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIModelFitProvider.h"
+#include <mitkIModelFitProvider.h>
 
 namespace mitk
 {

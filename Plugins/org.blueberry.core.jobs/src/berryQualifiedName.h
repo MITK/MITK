@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define _BERRY_QUALIFIED_NAME_
 
 #include <string>
-#include "berryObject.h"
+#include <berryObject.h>
 #include <org_blueberry_core_jobs_Export.h>
 
 namespace berry

@@ -36,7 +36,7 @@ namespace
 
 QmitkSliceAnimationWidget::QmitkSliceAnimationWidget(QWidget* parent)
   : QmitkAnimationWidget(parent),
-    m_Ui(new Ui::QmitkSliceAnimationWidget),
+    m_Ui(std::make_unique<Ui::QmitkSliceAnimationWidget>()),
     m_AnimationItem(nullptr)
 {
   m_Ui->setupUi(this);

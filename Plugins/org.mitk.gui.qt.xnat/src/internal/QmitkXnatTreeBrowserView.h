@@ -15,22 +15,27 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkXnatTreeBrowserViewControls.h"
-#include "QmitkHttpStatusCodeHandler.h"
+#include <QmitkHttpStatusCodeHandler.h>
 
 // ctkXnatCore
-#include "ctkXnatSession.h"
+#include <ctkXnatSession.h>
 
 // ctkXnatWidget
-#include "QmitkXnatTreeModel.h"
+#include <QmitkXnatTreeModel.h>
 
 // MitkXNAT Module
-#include "mitkXnatSessionTracker.h"
+#include <mitkXnatSessionTracker.h>
 
-#include <mitkIDataStorageService.h>
-#include <ctkServiceTracker.h>
+#include <QFileInfo>
+#include <memory>
 
 class QMenu;
+class QDir;
+
+namespace Ui
+{
+  class QmitkXnatTreeBrowserViewControls;
+}
 
 /*!
 \brief QmitkXnatTreeBrowserView
@@ -100,7 +105,7 @@ protected:
 
   void SetFocus() override;
 
-  Ui::QmitkXnatTreeBrowserViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkXnatTreeBrowserViewControls> m_Controls;
 
 private slots:
   void OnXnatNodeSelected(const QModelIndex &index);
@@ -123,7 +128,6 @@ private:
 
   void CleanUp();
 
-  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
   QmitkXnatTreeModel* m_TreeModel;
 
   mitk::XnatSessionTracker* m_Tracker;

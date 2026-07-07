@@ -13,24 +13,30 @@ found in the LICENSE file.
 #ifndef mitkBoundingObjectCutter_h
 #define mitkBoundingObjectCutter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "itkImage.h"
-#include "mitkBoundingObject.h"
-#include "mitkCommon.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <itkImage.h>
+#include <mitkBoundingObject.h>
+#include <mitkCommon.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Cuts an Boundingobject out of an mitk Image
-  //##
-  //## Input Parameters are a mitk::BoundingObject and optionally an mitk::Image
-  //## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel,
-  //## otherwise it will have the pixelvalue of the input image.
-  //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
-  //## \todo What Image resolution/spacing should be used, if no input image is given?
-  //## @ingroup Process
+  /**
+   * \brief Cuts a BoundingObject region out of a mitk::Image.
+   *
+   * This filter extracts the region defined by a BoundingObject from an input image.
+   * If no input image is provided, inside pixels are filled with m_InsideValue.
+   * If an input image is provided, inside pixels retain the original image values
+   * (unless m_UseInsideValue is set to true, in which case they are replaced with
+   * m_InsideValue). Pixels outside the BoundingObject are set to m_OutsideValue
+   * (or the pixel type minimum if m_AutoOutsideValue is true).
+   *
+   * \sa BoundingObject
+   * \sa BoundingObjectCutAndCast
+   * \sa BoundingObjectToSegmentationFilter
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT BoundingObjectCutter : public ImageToImageFilter
   {
   public:
@@ -38,30 +44,102 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /**
+       * \brief Set the bounding object that defines the cutting region.
+       * \param[in] boundingObject The bounding object to use.
+       */
       void SetBoundingObject(const mitk::BoundingObject *boundingObject);
+
+    /**
+     * \brief Get the bounding object that defines the cutting region.
+     * \return Const pointer to the bounding object.
+     */
     const mitk::BoundingObject *GetBoundingObject() const;
-    //##Description
-    //## @brief Set for inside pixels, used when m_UseInsideValue is @a true
+
+    /**
+     * \brief Set the pixel value for inside pixels, used when m_UseInsideValue is true.
+     * \param[in] _arg The inside pixel value.
+     */
     itkSetMacro(InsideValue, ScalarType);
+
+    /**
+     * \brief Get the pixel value for inside pixels.
+     * \return The inside pixel value.
+     */
     itkGetMacro(InsideValue, ScalarType);
-    //##Description
-    //## @brief Set value for outside pixels, used when m_AutoOutsideValue is \a false
+
+    /**
+     * \brief Set the pixel value for outside pixels, used when m_AutoOutsideValue is false.
+     * \param[in] _arg The outside pixel value (default: 0).
+     */
     itkSetMacro(OutsideValue, ScalarType);
+
+    /**
+     * \brief Get the pixel value for outside pixels.
+     * \return The outside pixel value.
+     */
     itkGetMacro(OutsideValue, ScalarType);
+
+    /**
+     * \brief Set whether to use m_InsideValue for inside pixels (default: false).
+     *
+     * If true, all pixels inside the bounding object are set to m_InsideValue.
+     * If false, they retain their original image values.
+     *
+     * \param[in] _arg True to replace inside pixels with m_InsideValue.
+     */
     itkSetMacro(UseInsideValue, bool);
+
+    /**
+     * \brief Get whether m_InsideValue is used for inside pixels.
+     * \return True if inside pixels are replaced with m_InsideValue.
+     */
     itkGetMacro(UseInsideValue, bool);
+
+    /** \brief Toggle UseInsideValue on/off. */
     itkBooleanMacro(UseInsideValue);
-    //##Description
-    //## @brief If set to \a true the minimum of the output pixel type is
-    //## used as outside value.
+
+    /**
+     * \brief Set whether to automatically determine the outside value.
+     *
+     * If true, the minimum value of the output pixel type is used as the
+     * outside value (default: false).
+     *
+     * \param[in] _arg True to use automatic outside value.
+     */
     itkSetMacro(AutoOutsideValue, bool);
+
+    /**
+     * \brief Get whether the outside value is automatically determined.
+     * \return True if automatic outside value is enabled.
+     */
     itkGetMacro(AutoOutsideValue, bool);
+
+    /** \brief Toggle AutoOutsideValue on/off. */
     itkBooleanMacro(AutoOutsideValue);
 
+    /**
+     * \brief Get the number of pixels inside the bounding object after the last execution.
+     * \return The inside pixel count.
+     */
     itkGetMacro(InsidePixelCount, unsigned int);
+
+    /**
+     * \brief Get the number of pixels outside the bounding object after the last execution.
+     * \return The outside pixel count.
+     */
     itkGetMacro(OutsidePixelCount, unsigned int);
 
+    /**
+     * \brief Set whether to use the whole input region instead of a subregion.
+     * \param[in] _arg True to use the whole input region.
+     */
     itkSetMacro(UseWholeInputRegion, bool);
+
+    /**
+     * \brief Get whether the whole input region is used.
+     * \return True if using the whole input region.
+     */
     itkGetMacro(UseWholeInputRegion, bool);
 
   protected:
@@ -94,41 +172,37 @@ namespace mitk
                          int boTimeStep);
     virtual void ComputeData(mitk::Image *input3D, int boTimeStep);
 
-    //##Description
-    //## @brief BoundingObject that will be cut
+    /** \brief BoundingObject that will be cut. */
     mitk::BoundingObject::Pointer m_BoundingObject;
-    //##Description
-    //## @brief Value for inside pixels, used when m_UseInsideValue is @a true
-    //##
-    //## \sa m_UseInsideValue
+
+    /** \brief Value for inside pixels, used when m_UseInsideValue is true.
+     * \sa m_UseInsideValue
+     */
     ScalarType m_InsideValue;
-    //##Description
-    //## @brief Value for outside pixels (default: 0)
-    //##
-    //## Used only if m_AutoOutsideValue is \a false.
+
+    /** \brief Value for outside pixels (default: 0).
+     * Used only if m_AutoOutsideValue is false.
+     */
     ScalarType m_OutsideValue;
-    //##Description
-    //## @brief If \a true the minimum of the output pixel type is
-    //## used as outside value (default: \a false)
+
+    /** \brief If true, the minimum of the output pixel type is used as outside value (default: false). */
     bool m_AutoOutsideValue;
-    //##Description
-    //## @brief Use m_InsideValue for inside pixels (default: \a false)
-    //##
-    //## If @a true, pixels that are inside m_BoundingObject
-    //## will get m_InsideValue in the cutting process
-    //## If @a false, they keep their original value.
-    //## \sa m_InsideValue
+
+    /** \brief Use m_InsideValue for inside pixels (default: false).
+     *
+     * If true, pixels that are inside m_BoundingObject will get m_InsideValue
+     * in the cutting process. If false, they keep their original value.
+     * \sa m_InsideValue
+     */
     bool m_UseInsideValue;
 
     unsigned int m_OutsidePixelCount;
     unsigned int m_InsidePixelCount;
 
-    //##Description
-    //## @brief Region of input needed for cutting
+    /** \brief Region of input needed for cutting. */
     mitk::SlicedData::RegionType m_InputRequestedRegion;
 
-    //##Description
-    //## @brief Time when Header was last initialized
+    /** \brief Time when header was last initialized. */
     itk::TimeStamp m_TimeOfHeaderInitialization;
 
     mitk::ImageTimeSelector::Pointer m_InputTimeSelector;

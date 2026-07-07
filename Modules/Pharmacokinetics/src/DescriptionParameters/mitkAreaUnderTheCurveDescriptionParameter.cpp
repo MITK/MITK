@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkAreaUnderTheCurveDescriptionParameter.h"
+#include <mitkAreaUnderTheCurveDescriptionParameter.h>
 
 const std::string mitk::AreaUnderTheCurveDescriptionParameter::PARAMETER_NAME = "AreaUnderCurve";
 

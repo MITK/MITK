@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVolumeMapperVtkSmart3D.h"
-#include "mitkTransferFunctionProperty.h"
-#include "mitkTransferFunctionInitializer.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkVolumeMapperVtkSmart3D.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkTransferFunctionInitializer.h>
+#include <mitkLevelWindowProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
@@ -49,11 +49,6 @@ vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *)
   }
 
   return m_Volume;
-}
-
-void mitk::VolumeMapperVtkSmart3D::ApplyProperties(vtkActor *, mitk::BaseRenderer *)
-{
-
 }
 
 void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)

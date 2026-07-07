@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkAnnotationPropertySerializer_h_included
 #define mitkAnnotationPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
-#include "mitkAnnotationProperty.h"
-#include "mitkStringsToNumbers.h"
+#include <mitkAnnotationProperty.h>
+#include <mitkStringsToNumbers.h>
 
 #include <array>
 

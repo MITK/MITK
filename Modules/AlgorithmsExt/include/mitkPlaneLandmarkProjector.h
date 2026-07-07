@@ -13,16 +13,23 @@ found in the LICENSE file.
 #ifndef mitkPlaneLandmarkProjector_h
 #define mitkPlaneLandmarkProjector_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkLandmarkProjector.h"
-#include "mitkPointSet.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkLandmarkProjector.h>
+#include <mitkPointSet.h>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Thin-plate-spline-based landmark-based curved geometry
-  //##
-  //## @ingroup Geometry
+  /**
+   * \brief Thin-plate-spline-based landmark projector onto a plane geometry.
+   *
+   * This class projects landmarks onto a PlaneGeometry using a thin-plate
+   * spline transformation. The projected landmarks define a curved geometry
+   * that is used for deformable surface registration and visualization.
+   *
+   * \sa LandmarkProjector
+   * \sa PlaneGeometry
+   * \ingroup Geometry
+   */
   class MITKALGORITHMSEXT_EXPORT PlaneLandmarkProjector : public LandmarkProjector
   {
   public:
@@ -32,15 +39,22 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      //##Documentation
-      //## @brief Set the plane-geometry to project the target-landmarks on.
-      //##
+      /**
+       * \brief Set the plane geometry onto which target landmarks are projected.
+       * \param[in] _arg The PlaneGeometry for projection.
+       */
       itkSetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
-    //##Documentation
-    //## @brief Get the plane-geometry to project the target-landmarks on.
-    //##
+
+    /**
+     * \brief Get the plane geometry used for projection.
+     * \return Const pointer to the projection PlaneGeometry.
+     */
     itkGetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
 
+    /**
+     * \brief Project the target landmarks onto the projection plane.
+     * \param[in] targetLandmarks Container of target landmark points.
+     */
     void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer *targetLandmarks) override;
 
   protected:

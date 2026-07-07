@@ -25,10 +25,15 @@ found in the LICENSE file.
 #include <mapRegistrationAlgorithmBase.h>
 #include <mapMetaPropertyAlgorithmInterface.h>
 
-#include "ui_QmitkMatchPointBrowserControls.h"
-#include "QmitkMAPAlgorithmModel.h"
-#include "QmitkAlgorithmListModel.h"
+#include <QmitkMAPAlgorithmModel.h>
+#include <QmitkAlgorithmListModel.h>
 #include "mitkAlgorithmInfoSelectionProvider.h"
+#include <memory>
+
+namespace Ui
+{
+  class MatchPointBrowserControls;
+}
 
 /*!
 \brief MatchPoint
@@ -80,7 +85,7 @@ protected:
     void CreateQtPartControl(QWidget* parent) override;
     void SetFocus() override;
 
-    Ui::MatchPointBrowserControls m_Controls;
+    std::unique_ptr<Ui::MatchPointBrowserControls> m_Controls;
 
     //! [Qt Selection Provider]
     /** @brief this pointer holds the selection provider*/

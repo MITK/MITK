@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYSTATUSUTIL_H
 #define BERRYSTATUSUTIL_H
 
-#include "berryStatus.h"
+#include <berryStatus.h>
 
 namespace berry {
 

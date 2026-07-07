@@ -32,9 +32,9 @@ found in the LICENSE file.
   Output is also written to a log file of name "%gt;datetime-stamp%lt;_dir_&gt;directory-name&lt;.mitkdump
 */
 
-#include "mitkDICOMFileReaderSelector.h"
-#include "mitkDICOMImageFrameInfo.h"
-#include "mitkDICOMReaderConfigurator.h"
+#include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMImageFrameInfo.h>
+#include <mitkDICOMReaderConfigurator.h>
 
 using mitk::DICOMTag;
 

@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindowWidget.h"
+#include <QmitkRenderWindowWidget.h>
 
 // vtk
 #include <vtkCornerAnnotation.h>
 #include <vtkTextProperty.h>
 
-QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
-                                                 const QString& widgetName/* = ""*/,
-                                                 mitk::DataStorage* dataStorage/* = nullptr*/)
+QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent,
+                                                 const QString& widgetName,
+                                                 mitk::DataStorage* dataStorage)
   : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
@@ -83,6 +83,16 @@ QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget()
     return utilityWidget;
   }
   return nullptr;
+}
+
+const QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget() const
+{
+  if (m_Layout == nullptr)
+    return nullptr;
+  auto* const item = m_Layout->itemAt(0);
+  if (item == nullptr)
+    return nullptr;
+  return dynamic_cast<const QmitkRenderWindowUtilityWidget*>(item->widget());
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)

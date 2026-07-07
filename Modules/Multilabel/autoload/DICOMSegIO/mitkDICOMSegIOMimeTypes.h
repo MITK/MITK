@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMSegIOMimeTypes_h
 #define mitkDICOMSegIOMimeTypes_h
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 #include <MitkDICOMSegIOExports.h>
 
 
@@ -35,12 +35,13 @@ namespace mitk
       MitkDICOMSEGMimeType *Clone() const override;
     };
 
+    /** \brief Return an instance of the DICOM Segmentation MIME type. */
     static MitkDICOMSEGMimeType DICOMSEG_MIMETYPE();
+
+    /** \brief Return the name string for the DICOM Segmentation MIME type. */
     static std::string DICOMSEG_MIMETYPE_NAME();
 
-
-
-    // Get all Mime Types
+    /** \brief Return all registered DICOM Segmentation MIME types. Caller takes ownership. */
     static std::vector<CustomMimeType *> Get();
 
   private:

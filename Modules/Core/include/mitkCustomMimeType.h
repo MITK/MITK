@@ -25,94 +25,171 @@ namespace mitk
   class MimeType;
 
   /**
-   * @ingroup IO
-   * @ingroup MicroServices_Interfaces
+   * \ingroup IO
+   * \ingroup MicroServices_Interfaces
    *
-   * @brief The CustomMimeType class represents a custom mime-type which
-   *        may be registered as a service object. It should only be used for mime-type registration,
-   *        see also mitk::MimeType.
+   * \brief A custom mime-type that can be registered as a service object.
    *
-   * Instances of this class are usually created and registered as a service.
-   * They act as meta data information to allow the linking of files to reader and writer.
-   * They write files to specific IFileReader instances and provide data format
-   * meta-data for selecting compatible IFileWriter instances.
-   * mirk::CustomMimetype should only be used to register mime-types. All other interaction should happen through
-   * mitk::MimeTypeProvider, from which registered mimetypes can be pulled. mitk::MimeType provides a safe and
-   * memory-managed
-   * way of interacting with Mimetypes.
+   * Instances of this class are usually created and registered as a
+   * CppMicroServices service. They act as meta-data that links files to
+   * compatible IFileReader and IFileWriter instances by mapping file extensions
+   * to unique mime-type names.
+   *
+   * CustomMimeType should only be used to define and register mime-types. For
+   * all other interaction (querying, matching), use IMimeTypeProvider to retrieve
+   * registered mime-types as mitk::MimeType objects, which provide a safe,
+   * memory-managed, immutable view.
+   *
+   * \sa MimeType
+   * \sa IMimeTypeProvider
+   * \sa IOMimeTypes
+   * \sa IFileReader
+   * \sa IFileWriter
    */
   class MITKCORE_EXPORT CustomMimeType
   {
   public:
+    /**
+     * \brief Construct a default CustomMimeType with an empty name.
+     */
     CustomMimeType();
+
+    /**
+     * \brief Construct a CustomMimeType with the given unique name.
+     * \param[in] name The unique identifier for this mime-type
+     *            (e.g. "application/vnd.mitk.image.nrrd").
+     */
     CustomMimeType(const std::string &name);
+
+    /**
+     * \brief Copy constructor.
+     * \param[in] other The CustomMimeType to copy from.
+     */
     CustomMimeType(const CustomMimeType &other);
+
+    /**
+     * \brief Construct from an immutable MimeType wrapper.
+     * \param[in] other The MimeType to copy properties from.
+     */
     explicit CustomMimeType(const MimeType &other);
 
     virtual ~CustomMimeType();
 
+    /**
+     * \brief Copy assignment operator.
+     * \param[in] other The CustomMimeType to assign from.
+     * \return Reference to this object.
+     */
     CustomMimeType &operator=(const CustomMimeType &other);
+
+    /**
+     * \brief Assignment from an immutable MimeType wrapper.
+     * \param[in] other The MimeType to assign from.
+     * \return Reference to this object.
+     */
     CustomMimeType &operator=(const MimeType &other);
 
     /**
-    * \brief Returns the unique name for the MimeType.
-    */
+     * \brief Get the unique name for this mime-type.
+     * \return The mime-type name string (e.g. "application/vnd.mitk.image.nrrd").
+     */
     std::string GetName() const;
 
     /**
-    * \brief Returns the human-readable Category of the mime-type. Allows grouping of similar mime-types (like Surfaces)
-    */
+     * \brief Get the human-readable category of this mime-type.
+     * \return The category string (e.g. "Images", "Surfaces"). Allows
+     *         grouping of similar mime-types.
+     */
     std::string GetCategory() const;
 
     /**
-    * \brief Returns all extensions that this MimeType can handle.
-    */
+     * \brief Get all file extensions this mime-type can handle.
+     * \return A vector of file extensions (without leading dots, e.g. "nrrd", "nhdr").
+     */
     std::vector<std::string> GetExtensions() const;
 
     /**
-    * \brief Returns the Human readable comment of the MimeType, a string that describes its unique role.
-    */
+     * \brief Get a human-readable description of this mime-type.
+     * \return A comment string. If no explicit comment was set, a fallback is
+     *         generated from the first extension (e.g. "nrrd File") or "Unknown".
+     */
     std::string GetComment() const;
 
     /**
-    * \brief Checks if the MimeType can handle file at the given location.
-    *
-    * In its base implementation, this function exclusively looks a the given string.
-    * However, child classes can override this behaviour and peek into the file.
-    */
+     * \brief Check whether this mime-type can handle the file at the given path.
+     * \param[in] path The file path to check.
+     * \return \c true if this mime-type applies to the given file.
+     *
+     * The base implementation checks only the file extension. Subclasses may
+     * override this method to inspect file contents (e.g. DICOM magic bytes).
+     */
     virtual bool AppliesTo(const std::string &path) const;
 
     /**
-    * \brief Checks if the MimeType can handle the extension of the given path
-    *
-    * This function exclusively looks a the given string
-    */
+     * \brief Check whether the file extension of the given path matches this mime-type.
+     * \param[in] path The file path to check.
+     * \return \c true if the path ends with one of this mime-type's extensions.
+     *
+     * This method performs a case-insensitive extension comparison only;
+     * it does not inspect file contents.
+     */
     bool MatchesExtension(const std::string &path) const;
 
     /**
-    * \brief Provides the first matching extension
-    *
-    * Checks whether any of its extensions are present at the end of the provided path.
-    * Returns the first found one.
-    */
+     * \brief Get the first matching extension found at the end of the given path.
+     * \param[in] path The file path to inspect.
+     * \return The matching extension (with leading dot), or an empty string if none matched.
+     */
     std::string GetExtension(const std::string &path) const;
 
     /**
-    * \brief Provides the filename minus the extension
-    *
-    * Checks whether any of its extensions are present at the end of the provided path.
-    * Returns the filename without that extension and without the directory.
-    */
+     * \brief Get the filename from the given path, without the matching extension.
+     * \param[in] path The file path to inspect.
+     * \return The filename without directory and without the matched extension,
+     *         or an empty string if no extension matched.
+     */
     std::string GetFilenameWithoutExtension(const std::string &path) const;
 
+    /**
+     * \brief Set the unique name of this mime-type.
+     * \param[in] name The new mime-type name.
+     */
     void SetName(const std::string &name);
+
+    /**
+     * \brief Set the category for grouping this mime-type.
+     * \param[in] category The category string (e.g. "Images").
+     */
     void SetCategory(const std::string &category);
+
+    /**
+     * \brief Set a single file extension, replacing all existing extensions.
+     * \param[in] extension The file extension (without leading dot).
+     */
     void SetExtension(const std::string &extension);
+
+    /**
+     * \brief Add a file extension to the list if not already present (case-insensitive).
+     * \param[in] extension The file extension to add (without leading dot).
+     */
     void AddExtension(const std::string &extension);
+
+    /**
+     * \brief Set the human-readable comment for this mime-type.
+     * \param[in] comment The comment string.
+     */
     void SetComment(const std::string &comment);
 
+    /**
+     * \brief Swap the contents of this CustomMimeType with another.
+     * \param[in,out] r The CustomMimeType to swap with.
+     */
     void Swap(CustomMimeType &r);
 
+    /**
+     * \brief Create a heap-allocated copy of this CustomMimeType.
+     * \return A pointer to the cloned object. The caller takes ownership.
+     */
     virtual CustomMimeType *Clone() const;
 
   private:
@@ -123,6 +200,11 @@ namespace mitk
     Impl *d;
   };
 
+  /**
+   * \brief Swap two CustomMimeType objects.
+   * \param[in,out] l First CustomMimeType.
+   * \param[in,out] r Second CustomMimeType.
+   */
   void swap(CustomMimeType &l, CustomMimeType &r);
 }
 

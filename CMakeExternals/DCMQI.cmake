@@ -18,16 +18,10 @@ if(MITK_USE_DCMQI)
   if(NOT DEFINED DCMQI_DIR)
     set(additional_cmake_args)
 
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_cmake_args
-      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/QIICR/dcmqi.git
-      GIT_TAG v1.3.2
+      GIT_REPOSITORY https://github.com/MITK/dcmqi.git
+      GIT_TAG 145b7b4958e5ef6c21d9b03de1f0071fcb88af51 # mitk/handler-overload, carries the in-memory metadata overload of Itk2DicomConverter::itkimage2dcmSegmentation
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -40,7 +34,7 @@ if(MITK_USE_DCMQI)
         -DDCMQI_BUILD_APPS:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
         -DITK_DIR:PATH=${ITK_DIR}
-        -DITK_NO_IO_FACTORY_REGISTER_MANAGER:BOOL=ON
+        -DITK_NO_IMAGEIO_FACTORY_REGISTER_MANAGER:BOOL=ON
         -DDCMQI_SUPERBUILD:BOOL=OFF
         -DDCMQI_CMAKE_CXX_STANDARD:STRING=${MITK_CXX_STANDARD}
         ${${proj}_CUSTOM_CMAKE_ARGS}

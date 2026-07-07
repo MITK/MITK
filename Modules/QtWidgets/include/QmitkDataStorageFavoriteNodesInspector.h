@@ -17,11 +17,11 @@ found in the LICENSE file.
 
 #include <QmitkDataStorageListInspector.h>
 
-#include "mitkNodePredicateProperty.h"
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <mitkNodePredicateProperty.h>
+#include <QmitkSimpleTextOverlayWidget.h>
 
-/*
-* @brief This is an inspector that offers a simple list view on favorite nodes of a data storage.
+/**
+* \brief Inspector that offers a simple list view on favorite nodes of a data storage.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageFavoriteNodesInspector : public QmitkDataStorageListInspector
 {
@@ -32,12 +32,12 @@ public:
   QmitkDataStorageFavoriteNodesInspector(QWidget* parent = nullptr);
 
   /**
-  * @brief Overrides the corresponding function of QmitkAbstractDataStorageInspector:
+  * \brief Overrides the corresponding function of QmitkAbstractDataStorageInspector:
   *        The custom favorite nodes predicate is added to the parameter predicate
   *        which results in a combined node predicate that always filters nodes according
   *        to their favorite-property-state.
   *
-  * @param nodePredicate    A pointer to a node predicate.
+  * \param nodePredicate    A pointer to a node predicate.
   */
   void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate) override;
 

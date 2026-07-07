@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkMitkRectangleProp.h"
+#include <vtkMitkRectangleProp.h>
 
 #include <vtkLine.h>
 #include <vtkPolyData.h>

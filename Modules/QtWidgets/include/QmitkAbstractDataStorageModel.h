@@ -23,20 +23,26 @@ found in the LICENSE file.
 // qt
 #include <QAbstractItemModel>
 
-/*
-* @brief This abstract class extends the 'QAbstractItemModel' to accept an 'mitk::DataStorage' and a 'mitk::NodePredicateBase'.
-*   It registers itself as a node event listener of the data storage.
-*   The 'QmitkAbstractDataStorageModel' provides three empty functions, 'NodeAdded', 'NodeChanged' and 'NodeRemoved', that
-*   may be implemented by subclasses. These functions allow to react to the 'AddNodeEvent', 'ChangedNodeEvent' and
-*   'RemoveNodeEvent' of the data storage. This might be useful to force an update on a custom view to correctly
-*   represent the content of the data storage.
-*
-*   A concrete implementation of this class is used to store the temporarily shown data nodes of the data storage.
-*   These nodes may be a subset of all the nodes inside the data storage, if a specific node predicate is set.
-*
-*   A model that implements this class has to return mitk::DataNode::Pointer objects for model indexes when the
-*   role is QmitkDataNodeRole.
-*/
+/**
+ * \brief Abstract base class extending QAbstractItemModel for DataStorage-backed models.
+ *
+ * This class bridges the Qt model/view framework with the MITK DataStorage by
+ * accepting an mitk::DataStorage and an optional mitk::NodePredicateBase for
+ * filtering. It automatically registers itself as a listener for node events
+ * (AddNodeEvent, ChangedNodeEvent, RemoveNodeEvent) on the data storage and
+ * provides pure virtual callbacks (NodeAdded, NodeChanged, NodeRemoved) so that
+ * subclasses can react to these events and update their internal state.
+ *
+ * Subclasses must also implement DataStorageChanged() and NodePredicateChanged()
+ * to handle changes of the data storage or predicate, respectively.
+ *
+ * A model that implements this class must return mitk::DataNode::Pointer objects
+ * for model indexes when the data role is QmitkDataNodeRole.
+ *
+ * \sa QmitkAbstractDataStorageInspector
+ * \sa QmitkDataStorageDefaultListModel
+ * \sa QmitkDataStorageSimpleTreeModel
+ */
 class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -44,21 +50,39 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageModel : public QAbstractItemM
 public:
 
   ~QmitkAbstractDataStorageModel() override;
-  /*
-  * @brief Sets the data storage and adds listener for node events.
-  *
-  * @param dataStorage      A pointer to the data storage to set.
-  */
+
+  /**
+   * \brief Sets the data storage and registers node event listeners.
+   *
+   * Removes listeners from the previous data storage (if any), sets the new
+   * data storage, and registers listeners for AddNodeEvent, RemoveNodeEvent,
+   * ChangedNodeEvent, and the DeleteEvent. Finally calls DataStorageChanged()
+   * to allow the subclass to update its internal representation.
+   *
+   * \param[in] dataStorage Pointer to the new data storage. May be nullptr.
+   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
+  /**
+   * \brief Returns a locked pointer to the current data storage.
+   * \return A smart pointer to the data storage, or nullptr if none is set or it has been deleted.
+   */
   mitk::DataStorage::Pointer GetDataStorage() const;
-  /*
-  * @brief Sets the node predicate and updates the model data, according to the node predicate.
-  *
-  * @param nodePredicate    A pointer to node predicate.
-  */
+
+  /**
+   * \brief Sets the node predicate and triggers a model update.
+   *
+   * The predicate is used to filter the set of nodes shown by the model.
+   * If the predicate changes, NodePredicateChanged() is called.
+   *
+   * \param[in] nodePredicate Pointer to the node predicate. May be nullptr to show all nodes.
+   */
   void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
+  /**
+   * \brief Returns the currently set node predicate.
+   * \return Pointer to the current node predicate, or nullptr if none is set.
+   */
   const mitk::NodePredicateBase* GetNodePredicate() const { return m_NodePredicate; }
 
 protected:

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagsOfInterestHelper.h"
+#include <mitkDICOMTagsOfInterestHelper.h>
 
 #include <mitkIDICOMTagsOfInterest.h>
 
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
 mitk::DICOMTagPathMapType::value_type MakeLegacyEntry(const std::string& propName, const mitk::DICOMTag& tag)
 {
@@ -101,6 +101,13 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0012, 0x0060))); // Clinical Trial Coordinating Center Name
     result.insert(MakeEntry(DICOMTag(0x0012, 0x0071))); // Clinical Trial Series ID
 
+    // Frame of Reference module
+    // (0020,0052) is part of the IOD-mandated identity any data derived
+    // from a DICOM source must carry. Without it in the default ToI the
+    // property never lands on the loaded image, so re-saving a derived
+    // SEG would fail strict-mode Validate on a missing FoR.
+    result.insert(MakeEntry(DICOMTag(0x0020, 0x0052))); // FrameOfReferenceUID
+
     // General Series module
     /*dicom.series.Modality*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x0060)));
     /*dicom.series.SeriesInstanceUID*/ result.insert(MakeEntry(DICOMTag(0x0020, 0x000e)));
@@ -184,6 +191,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x0031))); //dicom.pet.Radiopharmaceutical
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1072))); //dicom.pet.RadiopharmaceuticalStartTime
+    result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1078))); //dicom.pet.RadiopharmaceuticalStartDateTime
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1074))); //dicom.pet.RadionuclideTotalDose
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1075))); //dicom.pet.RadionuclideHalfLife
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1076))); //dicom.pet.RadionuclidePositronFraction
@@ -193,9 +201,11 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTagPath(radioNuclideRootTag).AddElement(0x0008, 0x0104))); //dicom.pet.Radionuclide.CodeMeaning
 
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1001))); //dicom.pet.RadioactivityUnits
+    result.insert(MakeEntry(DICOMTag(0x0054, 0x1006))); //dicom.pet.SUVType
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1102))); //dicom.pet.DecayCorrection
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1321))); //dicom.pet.DecayFactor
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1300))); //dicom.pet.FrameReferenceTime
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x1242))); //dicom.pet.ActualFrameDuration
 
     result.insert(MakeEntry(DICOMTag(0x0010, 0x1030))); //dicom.patient.PatientWeight
     result.insert(MakeEntry(DICOMTag(0x0010, 0x1020))); //dicom.patient.PatientSize
@@ -224,7 +234,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefRootTag).AddElement(0x0008, 0x1155))); //dicom.SourceImage.ReferenceSOPInstanceUID
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefRootTag).AddElement(0x0008, 0x1150))); //dicom.SourceImage.ReferenceSOPClassUID
     DICOMTagPath sourceImageRefPurposeRootTag(sourceImageRefRootTag);
-    sourceImageRefPurposeRootTag.AddAnySelection(0x0040, 0xa170);
+    sourceImageRefPurposeRootTag.AddAnySelection(0x0040, 0xA170);
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0104))); //dicom.SourceImage.Purpose.CodeMeaning
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0100))); //dicom.SourceImage.Purpose.CodeValue
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0102))); //dicom.SourceImage.Purpose.CodeSchemeDesignator

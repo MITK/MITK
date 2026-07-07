@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkArray.h"
-#include "mitkNumericConstants.h"
+#include <mitkArray.h>
+#include <mitkNumericConstants.h>
 
 class mitkArrayTypeConversionTestSuite : public mitk::TestFixture
 {

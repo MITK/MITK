@@ -13,14 +13,23 @@ found in the LICENSE file.
 #ifndef mitkTestModel_h
 #define mitkTestModel_h
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
-  /**Simple (linear) test model that is used to check functionality of default implementations in factories and stuff.*/
+  /**
+   * \class TestModel
+   * \brief Simple linear test model used to verify factory and framework functionality.
+   *
+   * This model implements a basic linear function for testing purposes. It is not
+   * intended for production model fitting but serves as a reference implementation
+   * to validate the model fitting infrastructure.
+   *
+   * \sa TestModelFactory, ModelBase
+   */
   class MITKMODELFIT_EXPORT TestModel : public mitk::ModelBase
   {
 
@@ -74,13 +83,8 @@ namespace mitk
 
   protected:
     TestModel() {};
+    TestModel(const TestModel &other);
     ~TestModel() override {};
-
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
     DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
@@ -91,10 +95,9 @@ namespace mitk
     StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
 
-  private:
+    mitkCloneMacro(Self);
 
-    //No copy constructor allowed
-    TestModel(const Self& source);
+  private:
     void operator=(const Self&);  //purposely not implemented
 
   };

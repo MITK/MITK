@@ -13,13 +13,16 @@ found in the LICENSE file.
 #ifndef QmitkDataStorageViewerTestView_h
 #define QmitkDataStorageViewerTestView_h
 
-// data storage viewer test plugin
-#include "ui_QmitkDataStorageViewerTestControls.h"
-
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
-#include "QmitkModelViewSelectionConnector.h"
-#include "QmitkSelectionServiceConnector.h"
+#include <QmitkModelViewSelectionConnector.h>
+#include <QmitkSelectionServiceConnector.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkDataStorageViewerTestControls;
+}
 
 /**
 * @brief DataStorageViewerTestView
@@ -31,6 +34,9 @@ class QmitkDataStorageViewerTestView : public QmitkAbstractView
 public:
 
   static const std::string VIEW_ID;
+
+  QmitkDataStorageViewerTestView();
+  ~QmitkDataStorageViewerTestView() override;
 
 protected:
 
@@ -55,7 +61,7 @@ private Q_SLOTS:
 
 private:
 
-  Ui::QmitkDataStorageViewerTestControls m_Controls;
+  std::unique_ptr<Ui::QmitkDataStorageViewerTestControls> m_Controls;
 
   std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector1;
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector1;

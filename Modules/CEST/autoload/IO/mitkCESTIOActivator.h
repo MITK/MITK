@@ -24,10 +24,19 @@ namespace mitk
 {
   struct IFileReader;
 
+  /**
+   * \brief Module activator for the CEST IO module.
+   *
+   * Registers CEST-specific DICOM reader services and associated MIME types
+   * when the module is loaded, and unregisters them on unload.
+   */
   class CESTIOActivator : public us::ModuleActivator
   {
   public:
+    /** \brief Register CEST DICOM reader services and MIME types. */
     void Load(us::ModuleContext *context) override;
+
+    /** \brief Unregister all CEST IO services. */
     void Unload(us::ModuleContext *context) override;
 
   private:

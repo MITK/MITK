@@ -13,52 +13,78 @@ found in the LICENSE file.
 #ifndef mitkExceptionMacro_h
 #define mitkExceptionMacro_h
 
-#include "mitkException.h"
+#include <mitkException.h>
 #include <itkMacro.h>
 #include <mitkLog.h>
 #include <sstream>
 
-/** The exception macro is used to throw an exception
- *  (i.e., usually a condition that results in program failure).
+/**
+ * \brief Throw a generic mitk::Exception with source location information.
  *
- *  Example usage looks like:
- *  mitkThrow() << "this is error info";
+ * Use the stream operator to append a human-readable message:
+ * \code
+ * mitkThrow() << "this is error info";
+ * \endcode
+ *
+ * \sa mitk::Exception, mitkReThrow, mitkThrowException
  */
 #define mitkThrow() throw mitk::Exception(__FILE__, __LINE__, "", ITK_LOCATION)
 
-/** The rethrow macro is used to rethrow an existing exception. The
-  * rethrow information (file,line of code) is then additionally stored
-  * in the exception. To check if an exception was rethrown you can use
-  * the methods GetNumberOfRethrows() and GetRethrowData().
-  *
-  * Example usage:
-  * try
-  *   {
-  *   //some code that throws an exception
-  *   }
-  * catch(mitk::Exception e)
-  *   {
-  *   //here we want to rethrow the exception
-  *   mitkReThrow(e) << "Message that will be appended to the exception (optional)";
-  *   }
-  */
+/**
+ * \brief Rethrow an existing mitk::Exception while recording rethrow context.
+ *
+ * The file and line of the rethrow site are stored in the exception so that
+ * the full rethrow chain can be inspected via mitk::Exception::GetNumberOfRethrows()
+ * and mitk::Exception::GetRethrowData().
+ *
+ * Example:
+ * \code
+ * try
+ * {
+ *   // some code that throws an exception
+ * }
+ * catch (mitk::Exception &e)
+ * {
+ *   mitkReThrow(e) << "Message appended to the exception (optional)";
+ * }
+ * \endcode
+ *
+ * \param mitkexception The mitk::Exception (or derived) object to rethrow.
+ *
+ * \sa mitk::Exception::AddRethrowData
+ */
 #define mitkReThrow(mitkexception)                                                                                     \
   mitkexception.AddRethrowData(__FILE__, __LINE__, "Rethrow by mitkReThrow macro.");                                   \
   throw mitkexception
 
-/** The specialized exception macro is used to throw exceptions
-  * in cases of specialized errors. This means the second parameter must be a class which
-  * inherits from mitk::Exception. An object of this exception is thrown when using the macro.
-  * Thus, more differentiated excaptions can be thrown, when needed.
-  *
-  * Example usage:
-  * mitkSpecializedExceptionMacro(mitk::MySpecializedException) << "this is error info";
-  */
+/**
+ * \brief Throw a specialized exception derived from mitk::Exception.
+ *
+ * The \p classname must be a class that inherits from mitk::Exception and uses
+ * the mitkExceptionClassMacro in its definition. Use the stream operator to
+ * append an error message:
+ * \code
+ * mitkThrowException(MySpecializedException) << "this is error info";
+ * \endcode
+ *
+ * \param classname Fully qualified class name of the exception to throw.
+ *
+ * \sa mitk::Exception, mitkExceptionClassMacro
+ */
 #define mitkThrowException(classname) throw classname(__FILE__, __LINE__, "", ITK_LOCATION)
 
-/** Class macro for MITK exception classes.
-  * All MITK exception classes should derive from MITK::Exception.
-  */
+/**
+ * \brief Convenience macro for defining MITK exception subclasses.
+ *
+ * Generates a constructor compatible with the exception macros and provides
+ * stream operators and ITK RTTI support. All MITK exception classes should
+ * derive from mitk::Exception and use this macro in their public section.
+ *
+ * \param ClassName      Name of the new exception class.
+ * \param SuperClassName Name of the parent exception class (typically mitk::Exception).
+ *
+ * \sa mitk::Exception, mitkThrowException
+ */
 #define mitkExceptionClassMacro(ClassName, SuperClassName)                                                             \
   ClassName(const char *file, unsigned int lineNumber, const char *desc, const char *loc)                              \
     : SuperClassName(file, lineNumber, desc, loc)                                                                      \

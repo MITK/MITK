@@ -1,0 +1,62 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef QmitkSurfaceStampWidget_h
+#define QmitkSurfaceStampWidget_h
+
+#include <MitkSegmentationUIExports.h>
+
+#include <QWidget>
+
+namespace Ui
+{
+  class QmitkSurfaceStampWidgetGUIControls;
+}
+
+namespace mitk
+{
+  class ToolManager;
+}
+
+/**
+  \brief GUI for surface-based interpolation.
+
+  \ingroup ToolManagerEtAl
+*/
+
+class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceStampWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  /** \brief Constructs the surface stamp widget. */
+  QmitkSurfaceStampWidget(QWidget *parent = nullptr, const char *name = nullptr);
+  ~QmitkSurfaceStampWidget() override;
+
+  /** \brief Sets the data storage used for node selection. */
+  void SetDataStorage(mitk::DataStorage *storage);
+
+protected slots:
+
+  void OnShowInformation(bool);
+
+  void OnStamp();
+
+private:
+  mitk::ToolManager *m_ToolManager;
+
+  mitk::DataStorage *m_DataStorage;
+
+  std::unique_ptr<Ui::QmitkSurfaceStampWidgetGUIControls> m_Controls;
+};
+
+#endif

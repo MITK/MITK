@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MITK REST API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="swagger-ui.css">
+    <style>
+        html { box-sizing: border-box; overflow-y: scroll; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { margin: 0; background: #fafafa; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="swagger-ui-bundle.js"></script>
+    <script>
+        window.onload = function() {
+            SwaggerUIBundle({
+                url: "../openapi.json",
+                dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis],
+                layout: "BaseLayout",
+                deepLinking: true,
+                showExtensions: true,
+                showCommonExtensions: true
+            });
+        };
+    </script>
+</body>
+</html>

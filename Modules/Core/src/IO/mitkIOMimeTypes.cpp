@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOMimeTypes.h"
+#include <mitkIOMimeTypes.h>
 
-#include "mitkCustomMimeType.h"
-#include "mitkLog.h"
+#include <mitkCustomMimeType.h>
+#include <mitkLog.h>
 #include <mitkUtf8Util.h>
 
-#include "itkGDCMImageIO.h"
-#include "itkMetaDataObject.h"
+#include <itkGDCMImageIO.h>
+#include <itkMetaDataObject.h>
 
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>

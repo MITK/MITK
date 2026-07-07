@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "berryApplicationHandle.h"
 
-#include <berryIConfigurationElement.h>
-#include <berryIExtension.h>
-#include <berryIApplication.h>
+#include "berryIConfigurationElement.h"
+#include "berryIExtension.h"
+#include "berryIApplication.h"
 
 #include "berryApplicationDescriptor.h"
 #include "berryApplicationContainer.h"

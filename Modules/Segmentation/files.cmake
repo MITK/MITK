@@ -1,12 +1,17 @@
 set(H_FILES
-  DataManagement/mitkSegmentationTaskListMacros.h
+  itkAdaptiveThresholdIterator.h
+  itkConnectedAdaptiveThresholdImageFilter.h
+  itkContourExtractor2DImageFilter.h
+  itkImageToPathFilter.h
+  mitkSegmentationInterpolationAlgorithm.h
+  mitkSegmentationTaskListMacros.h
+  mitkToolEvents.h
+  mitkToolFactoryMacro.h
 )
 
 set(CPP_FILES
   Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkContourModelSetToImageFilter.cpp
-  Algorithms/mitkContourSetToPointSetFilter.cpp
-  Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
@@ -14,7 +19,6 @@ set(CPP_FILES
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
   Algorithms/mitkSegmentationHelper.cpp
-  Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkSegChangeOperationBase.cpp
   Algorithms/mitkSegChangeOperationApplier.cpp
   Algorithms/mitkSegGroupInsertOperation.cpp
@@ -31,9 +35,6 @@ set(CPP_FILES
   Controllers/mitkSegmentationModuleActivator.cpp
   Controllers/mitkToolManager.cpp
   Controllers/mitkToolManagerProvider.cpp
-  DataManagement/mitkContour.cpp
-  DataManagement/mitkContourSet.cpp
-  DataManagement/mitkExtrudedContour.cpp
   DataManagement/mitkSegmentationTaskList.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
@@ -55,31 +56,18 @@ set(CPP_FILES
   Interactions/mitkLabelSelectionTool.cpp
   Interactions/mitkLassoTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
-  Interactions/mitkMedSAMTool.cpp
-  Interactions/mitkMonaiLabel2DTool.cpp
-  Interactions/mitkMonaiLabel3DTool.cpp
-  Interactions/mitkMonaiLabelTool.cpp
-  Interactions/mitknnUnetTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitkSegmentAnythingProcessExecutor.cpp
-  Interactions/mitkSegmentAnythingPythonService.cpp
-  Interactions/mitkSegmentAnythingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSegWithPreviewTool.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
-  Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkLabelSelectionTool.cpp
-  Rendering/mitkContourMapper2D.cpp
-  Rendering/mitkContourSetMapper2D.cpp
-  Rendering/mitkContourSetVtkMapper3D.cpp
-  Rendering/mitkContourVtkMapper3D.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )

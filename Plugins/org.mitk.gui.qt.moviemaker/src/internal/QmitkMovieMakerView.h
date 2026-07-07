@@ -95,7 +95,7 @@ private:
   std::vector<std::pair<QmitkAnimationItem*, double>> GetActiveAnimations(double t) const;
 
   QWidget* m_Parent;
-  Ui::QmitkMovieMakerView* m_Ui;
+  std::unique_ptr<Ui::QmitkMovieMakerView> m_Ui;
   QStandardItemModel* m_AnimationModel;
   std::map<QString, QmitkAnimationWidget*> m_AnimationWidgets;
   QMenu* m_AddAnimationMenu;

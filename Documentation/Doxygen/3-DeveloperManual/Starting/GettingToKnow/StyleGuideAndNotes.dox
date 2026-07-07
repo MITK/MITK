@@ -63,7 +63,7 @@ QmitkDataStorageComboBox
 
 \li Header Files ends with an .h and
 
-\li Implementation Files with an .cpp or .txx for a template class
+\li Implementation Files with an .cpp or .tpp for a template class
 
 
 \subsection StyleGuideAndNotesPage_NamingMethodsandFunctions Naming Methods and Functions

@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <mitkExampleDataStructureWriterService.h>
 
-#include "mitkExampleIOMimeTypes.h"
+#include <mitkExampleIOMimeTypes.h>
 
 namespace mitk
 {

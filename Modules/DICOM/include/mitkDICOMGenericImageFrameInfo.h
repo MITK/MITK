@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMGenericImageFrameInfo_h
 #define mitkDICOMGenericImageFrameInfo_h
 
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
 #include <map>
 
@@ -22,6 +22,12 @@ namespace mitk
   /**
     \ingroup DICOMModule
     \brief A generic storage class for image frame info with data access.
+
+    This class stores DICOM tag values in an internal map structure and provides
+    access via the DICOMDatasetAccess interface. It is used by DICOMGenericTagCache
+    and DICOMDCMTKTagScanner as a flexible, library-independent frame info container.
+
+    \sa DICOMDatasetAccessingImageFrameInfo, DICOMGenericTagCache, DICOMGDCMImageFrameInfo
   */
   class MITKDICOM_EXPORT DICOMGenericImageFrameInfo : public DICOMDatasetAccessingImageFrameInfo
   {
@@ -35,17 +41,36 @@ namespace mitk
 
       ~DICOMGenericImageFrameInfo() override;
 
-      DICOMDatasetFinding GetTagValueAsString(const DICOMTag&) const override;
+      /**
+       * \brief Retrieve a tag value as a string for a single DICOM tag.
+       * \param[in] tag The DICOM tag to query.
+       * \return A DICOMDatasetFinding with the value if found.
+       */
+      DICOMDatasetFinding GetTagValueAsString(const DICOMTag& tag) const override;
 
+      /**
+       * \brief Retrieve tag values as strings for a DICOM tag path.
+       * \param[in] path The tag path to query.
+       * \return A list of findings matching the path.
+       */
       FindingsListType GetTagValueAsString(const DICOMTagPath& path) const override;
 
+      /**
+       * \brief Return the filename of this frame if available.
+       * \return The filename or an empty string.
+       */
       std::string GetFilenameIfAvailable() const override;
 
-      /** Sets the value for a passed tag path. If the tag path is already set, it will be overwritten
-       with the new value.
-      @pre Path must be explicit. No wildcards are allowed.
-      @post The passed value is set for the passed path.
-      */
+      /**
+       * \brief Set the value for a given tag path.
+       *
+       * If the tag path is already set, it will be overwritten with the new value.
+       *
+       * \param[in] path The tag path to set. Must be explicit (no wildcards).
+       * \param[in] value The string value to store.
+       * \pre Path must be explicit. No wildcards are allowed.
+       * \post The passed value is set for the passed path.
+       */
       void SetTagValue(const DICOMTagPath& path, const std::string& value);
 
     protected:

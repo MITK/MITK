@@ -13,21 +13,21 @@ found in the LICENSE file.
 #ifndef mitkDataNodeSource_h
 #define mitkDataNodeSource_h
 
-#include "itkProcessObject.h"
-#include "mitkDataNode.h"
+#include <itkProcessObject.h>
+#include <mitkDataNode.h>
 
 namespace mitk
 {
   /**
-   * @brief Superclass of all classes generating data tree nodes (instances of class
-   * mitk::DataNode) as output.
+   * \brief Superclass of all classes generating DataNode instances as output.
    *
-   * In itk and vtk the generated result of a ProcessObject is only guaranteed
-   * to be up-to-date, when Update() of the ProcessObject or the generated
-   * DataObject is called immediately before access of the data stored in the
-   * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
-   * for mitk::DataNodeSource.
-   * @ingroup Process
+   * In ITK and VTK the generated result of a ProcessObject is only guaranteed
+   * to be up-to-date when Update() of the ProcessObject or the generated
+   * DataObject is called immediately before accessing the stored data.
+   * This is also true for subclasses of mitk::DataNodeSource.
+   *
+   * \ingroup Process
+   * \sa DataNode
    */
   class MITKCORE_EXPORT DataNodeSource : public itk::ProcessObject
   {
@@ -38,34 +38,57 @@ namespace mitk
 
       itkCloneMacro(Self);
 
-        typedef mitk::DataNode OutputType;
+      /** \brief The output data type (mitk::DataNode). */
+      typedef mitk::DataNode OutputType;
 
+    /** \brief Pointer type for the output. */
     typedef OutputType::Pointer OutputTypePointer;
 
     /**
-     * Allocates a new output object and returns it. Currently the
-     * index idx is not evaluated.
-     * @param idx the index of the output for which an object should be created
-     * @returns the new object
+     * \brief Allocate and return a new output object.
+     *
+     * Currently the index is not evaluated; a new DataNode is always created.
+     *
+     * \param idx The index of the output for which an object should be created.
+     * \return A smart pointer to the newly created DataNode.
      */
     DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
-     * This is a default implementation to make sure we have something.
-     * Once all the subclasses of ProcessObject provide an appropriate
-     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
-     * virtual.
+     * \brief Allocate and return a new output object by name.
+     *
+     * Default implementation that creates a new DataNode. If the name
+     * corresponds to an indexed output, the indexed version is called.
+     *
+     * \param name The identifier of the output.
+     * \return A smart pointer to the newly created DataNode.
      */
     DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
 
+    /**
+     * \brief Get the primary output DataNode.
+     * \return Pointer to the primary output.
+     */
     OutputType *GetOutput();
+
+    /** \overload */
     const OutputType *GetOutput() const;
+
+    /**
+     * \brief Get the output DataNode at the given index.
+     * \param idx The output index.
+     * \return Pointer to the requested output.
+     */
     OutputType *GetOutput(DataObjectPointerArraySizeType idx);
+
+    /** \overload */
     const OutputType *GetOutput(DataObjectPointerArraySizeType idx) const;
 
   protected:
+    /** \brief Constructor. Creates the initial output. */
     DataNodeSource();
 
+    /** \brief Destructor. */
     ~DataNodeSource() override;
   };
 }

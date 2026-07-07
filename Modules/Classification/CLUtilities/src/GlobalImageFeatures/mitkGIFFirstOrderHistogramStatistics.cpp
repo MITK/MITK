@@ -184,8 +184,8 @@ CalculateFirstOrderHistogramStatistics(const itk::Image<TPixel, VImageDimension>
     meanAbsoluteDeviationIndex += probability * std::abs(deltaIndex);
     if ((i >= p10Index) && (i <= p90Index))
     {
-      robustMeanAbsoluteDeviationValue += frequence * std::abs<double>(voxelValue - robustMeanValue);
-      robustMeanAbsoluteDeivationIndex += frequence * std::abs<double>(i*1.0 - robustMeanIndex*1.0);
+      robustMeanAbsoluteDeviationValue += frequence * std::abs(voxelValue - robustMeanValue);
+      robustMeanAbsoluteDeivationIndex += frequence * std::abs(i*1.0 - robustMeanIndex*1.0);
     }
     medianAbsoluteDeviationValue += probability * std::abs(voxelValue - medianValue);
     medianAbsoluteDeviationIndex += probability * std::abs(i*1.0 - medianIndex);

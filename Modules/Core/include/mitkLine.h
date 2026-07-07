@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLine_h
 #define mitkLine_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <itkMatrix.h>
 #include <itkTransform.h>
 #include <vnl/vnl_cross.h>
@@ -21,9 +21,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Describes a line
-  //## @ingroup Geometry
+  /**
+   * \brief Describes a line in N-dimensional space.
+   *
+   * A line is defined by a start point and a direction vector. The length of
+   * the direction vector defines the length of the line segment for methods
+   * like IsPartOfStraightLine().
+   *
+   * \ingroup Geometry
+   * \tparam TCoordRep The coordinate representation type.
+   * \tparam NPointDimension The dimensionality of the space (default is 3).
+   */
   template <class TCoordRep, unsigned int NPointDimension = 3>
   class Line
   {
@@ -34,29 +42,39 @@ namespace mitk
       m_Direction.Fill(0);
     }
 
-    //##Documentation
-    //## @brief Define line by point and direction
-    //##
-    //## Length of direction defines the the length of the line
+    /** \brief Define line by point and direction.
+     *
+     * Length of direction defines the length of the line.
+     *
+     * \param point Start point of the line.
+     * \param direction Direction vector of the line.
+     */
     Line(const itk::Point<TCoordRep, NPointDimension> &point, const itk::Vector<TCoordRep, NPointDimension> &direction)
     {
       this->m_Point = point;
       this->m_Direction = direction;
     }
 
-    //##Documentation
-    //## @brief Get start point of the line
+    /** \brief Get start point of the line (const). */
     const itk::Point<TCoordRep, NPointDimension> &GetPoint() const { return m_Point; }
-    //##Documentation
-    //## @brief Get start point of the line
+
+    /** \brief Get start point of the line (non-const). */
     itk::Point<TCoordRep, NPointDimension> &GetPoint() { return m_Point; }
-    //##Documentation
-    //## @brief Get point on the line with parameter @a t
-    //##
-    //## @return m_Point+t*m_Direction
+
+    /** \brief Get point on the line at parameter \a t.
+     *
+     * \param t Parameter along the line direction.
+     * \return m_Point + t * m_Direction
+     */
     const itk::Point<TCoordRep, NPointDimension> GetPoint(TCoordRep t) const { return m_Point + m_Direction * t; }
-    //##Documentation
-    //## @brief Set/change start point of the line
+
+    /** \brief Set/change start point of the line.
+     *
+     * The end point of the line is preserved, so the direction vector is
+     * recomputed accordingly.
+     *
+     * \param point1 New start point.
+     */
     void SetPoint(const itk::Point<TCoordRep, NPointDimension> &point1)
     {
       itk::Point<TCoordRep, NPointDimension> point2;
@@ -65,19 +83,25 @@ namespace mitk
       m_Direction = point2.GetVectorFromOrigin() - point1.GetVectorFromOrigin();
     }
 
-    //##Documentation
-    //## @brief Get the direction vector of the line
+    /** \brief Get the direction vector of the line (const). */
     const itk::Vector<TCoordRep, NPointDimension> &GetDirection() const { return m_Direction; }
-    //##Documentation
-    //## @brief Get the direction vector of the line
+
+    /** \brief Get the direction vector of the line (non-const). */
     itk::Vector<TCoordRep, NPointDimension> &GetDirection() { return m_Direction; }
-    //##Documentation
-    //## @brief Set the direction vector of the line
+
+    /** \brief Set the direction vector of the line.
+     *
+     * \param direction New direction vector.
+     */
     void SetDirection(const itk::Vector<TCoordRep, NPointDimension> &direction) { m_Direction = direction; }
-    //##Documentation
-    //## @brief Define line by point and direction
-    //##
-    //## Length of direction defines the the length of the line
+
+    /** \brief Define line by point and direction.
+     *
+     * Length of direction defines the length of the line.
+     *
+     * \param point Start point of the line.
+     * \param direction Direction vector of the line.
+     */
     void Set(const itk::Point<TCoordRep, NPointDimension> &point,
              const itk::Vector<TCoordRep, NPointDimension> &direction)
     {
@@ -85,8 +109,11 @@ namespace mitk
       this->m_Direction = direction;
     }
 
-    //##Documentation
-    //## @brief Define line by two points
+    /** \brief Define line by two points.
+     *
+     * \param point1 Start point of the line.
+     * \param point2 End point of the line.
+     */
     void SetPoints(const itk::Point<TCoordRep, NPointDimension> &point1,
                    const itk::Point<TCoordRep, NPointDimension> &point2)
     {
@@ -95,8 +122,13 @@ namespace mitk
       m_Direction = point2 - point1;
     }
 
-    //##Documentation
-    //## @brief Set/change start point of the line
+    /** \brief Set/change start point of the line.
+     *
+     * The end point of the line is preserved, so the direction vector is
+     * recomputed accordingly.
+     *
+     * \param point1 New start point.
+     */
     void SetPoint1(const itk::Point<TCoordRep, NPointDimension> &point1)
     {
       itk::Vector<TCoordRep, NPointDimension> point2;
@@ -106,14 +138,21 @@ namespace mitk
       m_Direction = point2 - point1.GetVectorFromOrigin();
     }
 
-    //##Documentation
-    //## @brief Get start point of the line
+    /** \brief Get start point of the line. */
     const itk::Point<TCoordRep, NPointDimension> &GetPoint1() const { return m_Point; }
-    //##Documentation
-    //## @brief Set/change end point of the line
+
+    /** \brief Set/change end point of the line.
+     *
+     * The start point is preserved, so the direction vector is recomputed.
+     *
+     * \param point2 New end point.
+     */
     void SetPoint2(const itk::Point<TCoordRep, NPointDimension> &point2) { m_Direction = point2 - m_Point; }
-    //##Documentation
-    //## @brief Get end point of the line
+
+    /** \brief Get end point of the line.
+     *
+     * \return The point at m_Point + m_Direction.
+     */
     itk::Point<TCoordRep, NPointDimension> GetPoint2() const
     {
       itk::Point<TCoordRep, NPointDimension> point2;
@@ -121,25 +160,34 @@ namespace mitk
       return point2;
     }
 
-    //##Documentation
-    //## @brief Transform the line with a Transform
+    /** \brief Transform the line with an ITK Transform.
+     *
+     * Both the start point and the direction vector are transformed.
+     *
+     * \param transform The ITK transform to apply.
+     */
     void Transform(itk::Transform<TCoordRep, NPointDimension, NPointDimension> &transform)
     {
       m_Direction = transform.TransformVector(m_Direction);
       m_Point = transform.TransformPoint(m_Point);
     }
 
-    //##Documentation
-    //## @brief Transform the line with a matrix
-    //##
-    //## Only the direction will be changed, not the start point.
+    /** \brief Transform the line with a matrix.
+     *
+     * Only the direction will be changed, not the start point.
+     *
+     * \param matrix The transformation matrix to apply.
+     */
     void Transform(const itk::Matrix<TCoordRep, NPointDimension, NPointDimension> &matrix)
     {
       m_Direction = matrix * m_Direction;
     }
 
-    //##Documentation
-    //## @brief Distance of a point from the line
+    /** \brief Compute the distance of a point from the line.
+     *
+     * \param point The point to compute the distance for.
+     * \return The perpendicular distance from the point to the line.
+     */
     double Distance(const itk::Point<TCoordRep, NPointDimension> &point) const
     {
       itk::Vector<TCoordRep, NPointDimension> diff;
@@ -147,8 +195,13 @@ namespace mitk
       return diff.GetNorm();
     }
 
-    //##Documentation
-    //## @brief Project a point on the line
+    /** \brief Project a point onto the line.
+     *
+     * If the direction vector has zero norm, the start point is returned.
+     *
+     * \param point The point to project.
+     * \return The projected point on the line.
+     */
     itk::Point<TCoordRep, NPointDimension> Project(const itk::Point<TCoordRep, NPointDimension> &point) const
     {
       if (m_Direction.GetNorm() == 0)
@@ -165,10 +218,14 @@ namespace mitk
       return this->m_Point + normalizedDirection;
     }
 
-    //##Documentation
-    //## @brief Test if a point is part of the line
-    //##
-    //## Length of the direction vector defines the length of the line
+    /** \brief Test if a point is part of the line segment.
+     *
+     * The length of the direction vector defines the length of the line segment.
+     * The point must lie on the line and within the segment bounds.
+     *
+     * \param point The point to test.
+     * \return True if the point is on the line segment, false otherwise.
+     */
     bool IsPartOfStraightLine(const itk::Point<TCoordRep, NPointDimension> &point) const
     {
       if (Distance(point) > eps)
@@ -186,8 +243,11 @@ namespace mitk
       return false;
     }
 
-    //##Documentation
-    //## @brief Test if a point is part of the line (line having infinite length)
+    /** \brief Test if a point is part of the line (line having infinite length).
+     *
+     * \param point The point to test.
+     * \return True if the point lies on the infinite line, false otherwise.
+     */
     bool IsPartOfLine(const itk::Point<TCoordRep, NPointDimension> &point) const
     {
       if (Distance(point) < eps)
@@ -196,8 +256,13 @@ namespace mitk
       return false;
     }
 
-    //##Documentation
-    //## @brief Test if a lines is parallel to this line
+    /** \brief Test if a line is parallel to this line.
+     *
+     * Uses the cross product of direction vectors (3D only).
+     *
+     * \param line The other line to compare.
+     * \return True if the lines are parallel, false otherwise.
+     */
     bool IsParallel(const Line<TCoordRep, NPointDimension> &line) const
     {
       vnl_vector<TCoordRep> normal;
@@ -210,18 +275,26 @@ namespace mitk
       return false;
     }
 
-    //##Documentation
-    //## @brief Test if a line is part of the line (line having infinite length)
+    /** \brief Test if another line is part of this line (line having infinite length).
+     *
+     * The other line must be parallel and share a common point.
+     *
+     * \param line The other line to test.
+     * \return True if the other line lies on this infinite line, false otherwise.
+     */
     bool IsPartOfLine(const Line<TCoordRep, NPointDimension> &line) const
     {
       return (Distance(line.GetPoint()) < 0) && (IsParallel(line));
     }
 
-    //##Documentation
-    //## @brief Test if the two lines are identical
-    //##
-    //## Start point and direction and length of direction vector must be
-    //## equal for identical lines.
+    /** \brief Test if the two lines are identical.
+     *
+     * Start point and direction and length of direction vector must be
+     * equal for identical lines.
+     *
+     * \param line The other line to compare.
+     * \return True if both lines are identical, false otherwise.
+     */
     bool operator==(const Line<TCoordRep, NPointDimension> &line) const
     {
       itk::Vector<TCoordRep, NPointDimension> diff;
@@ -234,8 +307,11 @@ namespace mitk
       return true;
     }
 
-    //##Documentation
-    //## @brief Set the line by another line
+    /** \brief Set the line by another line (copy assignment).
+     *
+     * \param line The line to copy from.
+     * \return Reference to this line.
+     */
     inline const Line<TCoordRep, NPointDimension> &operator=(const Line<TCoordRep, NPointDimension> &line)
     {
       m_Point = line.GetPoint();
@@ -243,20 +319,25 @@ namespace mitk
       return *this;
     }
 
-    //##Documentation
-    //## @brief Test if two lines are not identical
-    //##
-    //## \sa operator==
+    /** \brief Test if two lines are not identical.
+     *
+     * \sa operator==
+     */
     bool operator!=(const Line<TCoordRep, NPointDimension> &line) const { return !((*this) == line); }
-    //##Documentation
-    //## @brief Calculates the intersection points of a straight line in 2D
-    //## with a rectangle
-    //##
-    //## @param x1,y1,x2,y2   rectangle
-    //## @param p,d           straight line: p point on it, d direction of line
-    //## @param s1            first intersection point (valid only if s_num>0)
-    //## @param s2            second intersection point (valid only if s_num==2)
-    //## @return              number of intersection points (0<=s_num<=2)
+
+    /** \brief Calculates the intersection points of a straight line in 2D
+     * with a rectangle.
+     *
+     * \param x1 Left boundary of the rectangle.
+     * \param y1 Bottom boundary of the rectangle.
+     * \param x2 Right boundary of the rectangle.
+     * \param y2 Top boundary of the rectangle.
+     * \param p A point on the straight line.
+     * \param d Direction vector of the straight line.
+     * \param s1 First intersection point (valid only if return value > 0).
+     * \param s2 Second intersection point (valid only if return value == 2).
+     * \return Number of intersection points (0 <= return value <= 2).
+     */
     static int RectangleLineIntersection(TCoordRep x1,
                                          TCoordRep y1,
                                          TCoordRep x2,

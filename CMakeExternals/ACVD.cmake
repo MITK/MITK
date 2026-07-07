@@ -14,17 +14,15 @@ if(MITK_USE_ACVD)
 
   if(NOT DEFINED ACVD_DIR)
 
-    set(additional_args )
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
+    # See CMakeExternals/lz4.cmake for the reasoning behind CMP0091.
+    set(additional_args
+      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=NEW
+    )
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/valette/ACVD.git
-      GIT_TAG 83a0bd0b5edd510f897c9e59e951412698ed3fb9
+      GIT_TAG 3ca0b532277152099f99d01c7219cfaa4f1ff932 # 2025-11-14
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

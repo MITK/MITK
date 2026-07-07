@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <iostream>
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkSimpleBarrierConstraintChecker.h"
-#include "mitkModelFitConstants.h"
-#include "mitkModelFitException.h"
+#include <mitkSimpleBarrierConstraintChecker.h>
+#include <mitkModelFitConstants.h>
+#include <mitkModelFitException.h>
 
 mitk::SimpleBarrierConstraintChecker::ParametersType GenerateParameters(double p1, double p2, double p3)
 {

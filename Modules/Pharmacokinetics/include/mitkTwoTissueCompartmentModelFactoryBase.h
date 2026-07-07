@@ -12,12 +12,21 @@ found in the LICENSE file.
 #ifndef mitkTwoTissueCompartmentModelFactoryBase_h
 #define mitkTwoTissueCompartmentModelFactoryBase_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 namespace mitk
 {
+  /**
+   * \brief Template base factory for TwoTissueCompartmentModel variants.
+   *
+   * Provides default constraint settings and initial parameterization for the
+   * two-tissue compartment model family (both reversible and FDG variants).
+   *
+   * \tparam TModelParameterizer The concrete parameterizer type.
+   * \sa TwoTissueCompartmentModel, TwoTissueCompartmentFDGModel
+   */
   template <class TModelParameterizer>
   class TwoTissueCompartmentModelFactoryBase : public
     mitk::ConcreteAIFBasedModelFactory< TModelParameterizer >
@@ -35,7 +44,7 @@ namespace mitk
     {
       SimpleBarrierConstraintChecker::Pointer constraints = SimpleBarrierConstraintChecker::New();
 
-      /**@todo Mit Charlie klaren ob es eine sinnvolle default Einstellung gibt.*/
+      /** \todo Clarify whether there is a sensible default constraint setting. */
       constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_K1, 0, 0);
       constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_k2, 0, 0);
       constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_k3, 0, 0);

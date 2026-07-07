@@ -13,13 +13,19 @@ found in the LICENSE file.
 #ifndef mitkExpDecayOffsetModelParameterizer_h
 #define mitkExpDecayOffsetModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkExpDecayOffsetModel.h"
-#include "MitkModelFitExports.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkExpDecayOffsetModel.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class ExpDecayOffsetModelParameterizer
+   * \brief Parameterizer for the ExpDecayOffsetModel providing default initial values.
+   *
+   * \sa ExpDecayOffsetModel, ExpDecayOffsetModelFactory, ConcreteModelParameterizerBase
+   */
   class MITKMODELFIT_EXPORT ExpDecayOffsetModelParameterizer : public
     mitk::ConcreteModelParameterizerBase<mitk::ExpDecayOffsetModel>
   {

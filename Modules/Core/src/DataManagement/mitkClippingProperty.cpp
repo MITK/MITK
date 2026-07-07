@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkClippingProperty.h"
+#include <mitkClippingProperty.h>
 
 namespace mitk
 {
@@ -98,13 +98,6 @@ namespace mitk
     this->SetNormal(j["Normal"].get<Vector3D>());
 
     return true;
-  }
-
-  itk::LightObject::Pointer ClippingProperty::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    result->UnRegister();
-    return result;
   }
 
 } // namespace

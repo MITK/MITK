@@ -10,27 +10,32 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkMultiLabelSegmentationStackNNiftiWriter_h
-#define mitkMultiLabelSegmentationStackNNiftiWriter_h
+#ifndef mitkMultiLabelSegmentationStackNiftiWriter_h
+#define mitkMultiLabelSegmentationStackNiftiWriter_h
 
 #include <mitkMultiLabelSegmentationStackWriterBase.h>
 
 namespace mitk
 {
   /**
-  * Writes a MultiLabelSegmentation as stacks of nifti files includin meta
-  * information as mitklabel.json file.
-  * mitk::Identifiable UID is supported and will be serialized.
-  * @ingroup Process
-  */
+   * \brief Write a MultiLabelSegmentation as stacks of NIfTI files with a mitklabel.json metadata file.
+   *
+   * mitk::Identifiable UID is supported and will be serialized.
+   *
+   * \ingroup Process
+   */
   class MultiLabelSegmentationStackNiftiWriter : public MultiLabelSegmentationStackWriterBase
   {
   public:
+    /** \brief Default constructor. Registers writer for the NIfTI stack MIME type. */
     MultiLabelSegmentationStackNiftiWriter();
     ~MultiLabelSegmentationStackNiftiWriter() = default;
 
   protected:
+    /** \brief Return the ITK NIfTI ImageIO instance used for writing individual stack images. */
     itk::ImageIOBase::Pointer GetITKIO() const override;
+
+    /** \brief Return the file extension for NIfTI stack images (".nii.gz"). */
     std::string GetStackImageExtension() const override;
   private:
     MultiLabelSegmentationStackNiftiWriter *Clone() const override;

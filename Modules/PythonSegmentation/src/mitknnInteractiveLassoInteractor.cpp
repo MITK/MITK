@@ -12,143 +12,350 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveLassoInteractor.h>
 
-#include <mitkAddContourTool.h>
-#include <mitkLabelSetImageHelper.h>
-#include <mitkSegmentationHelper.h>
+#include <mitkBaseRenderer.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelUtils.h>
+#include <mitkEventStateMachine.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkProperties.h>
+#include <mitkProportionalTimeGeometry.h>
+#include <mitkRenderingManager.h>
+#include <mitkSegTool2D.h>
 #include <mitkToolManager.h>
+
+#include <usModuleRegistry.h>
+
+#include "mitknnInteractiveBoundingBoxHelpers.h"
+#include "mitknnInteractiveRenderingHelpers.h"
 
 namespace
 {
-  // Internal event triggered when a contour is completed.
-  class LassoEvent : public itk::AnyEvent
+  // Aligns a single-time-step ContourModel's time bounds with the time step
+  // the renderer is currently displaying for the reference image. Without
+  // this, ContourModel::New() produces a default time geometry that only
+  // covers time point 0, so the contour stays invisible at any other time
+  // step of a 4D reference image.
+  void AlignContourToCurrentTimeStep(mitk::ContourModel* contour,
+                                     const mitk::Image* referenceImage,
+                                     const mitk::BaseRenderer* renderer)
+  {
+    if (contour == nullptr || referenceImage == nullptr || renderer == nullptr)
+      return;
+
+    const auto* refTimeGeometry = referenceImage->GetTimeGeometry();
+    if (refTimeGeometry == nullptr)
+      return;
+
+    const auto timeStep = renderer->GetTimeStep(referenceImage);
+    if (!refTimeGeometry->IsValidTimeStep(timeStep))
+      return;
+
+    const auto firstTimePoint = refTimeGeometry->GetMinimumTimePoint(timeStep);
+    const auto stepDuration = refTimeGeometry->GetMaximumTimePoint(timeStep) - firstTimePoint;
+
+    auto contourTimeGeometry = mitk::ProportionalTimeGeometry::New();
+    contourTimeGeometry->Initialize(contour->GetGeometry(), 1);
+    contourTimeGeometry->SetFirstTimePoint(firstTimePoint);
+    contourTimeGeometry->SetStepDuration(stepDuration);
+
+    contour->SetTimeGeometry(contourTimeGeometry);
+  }
+
+  // Internal event fired when a contour stroke is completed. Carries the
+  // closed contour (in 3D world coords, for persistent display), the 2D
+  // uint8 painting slice and its slicing plane (for the outer Impl to
+  // build the bbox-sized mask), and the corresponding interaction bounding
+  // box. Mirrors ScribbleStrokeEvent so both interactors keep mask
+  // construction outside the inner state machine.
+  class LassoContourEvent : public itk::AnyEvent
   {
   public:
-    using Self = LassoEvent;
+    using Self = LassoContourEvent;
     using Superclass = itk::AnyEvent;
 
-    explicit LassoEvent(mitk::ContourModel* contour = nullptr)
-      : m_Contour(contour)
+    LassoContourEvent() = default;
+
+    LassoContourEvent(mitk::ContourModel* contour,
+                       mitk::Image* slice,
+                       const mitk::PlaneGeometry* plane,
+                       const mitk::nnInteractive::InteractionBoundingBox& boundingBox)
+      : m_Contour(contour), m_Slice(slice), m_Plane(plane), m_BoundingBox(boundingBox)
     {
     }
 
-    LassoEvent(const Self& other)
+    LassoContourEvent(const Self& other)
       : Superclass(other),
-        m_Contour(other.m_Contour)
+        m_Contour(other.m_Contour),
+        m_Slice(other.m_Slice),
+        m_Plane(other.m_Plane),
+        m_BoundingBox(other.m_BoundingBox)
     {
     }
 
-    ~LassoEvent() override
-    {
-    }
+    ~LassoContourEvent() override = default;
 
-    const char* GetEventName() const override
-    {
-      return "LassoEvent";
-    }
+    const char* GetEventName() const override { return "LassoContourEvent"; }
 
     bool CheckEvent(const itk::EventObject* event) const override
     {
       return dynamic_cast<const Self*>(event) != nullptr;
     }
 
-    itk::EventObject* MakeObject() const override
-    {
-      return new Self(*this);
-    }
+    itk::EventObject* MakeObject() const override { return new Self(*this); }
 
-    mitk::ContourModel* GetContour() const
-    {
-      return m_Contour;
-    }
+    mitk::ContourModel* GetContour() const { return m_Contour; }
+    mitk::Image* GetSlice() const { return m_Slice; }
+    const mitk::PlaneGeometry* GetPlane() const { return m_Plane; }
+    const mitk::nnInteractive::InteractionBoundingBox& GetBoundingBox() const { return m_BoundingBox; }
 
   private:
     mitk::ContourModel::Pointer m_Contour;
+    mitk::Image::Pointer m_Slice;
+    mitk::PlaneGeometry::ConstPointer m_Plane;
+    mitk::nnInteractive::InteractionBoundingBox m_BoundingBox{};
   };
 
-  // A wrapper for the AddContourTool that mainly ensures compatibility with
-  // the ToolManager and 3D interpolation feature of the Segmentation view
-  // without interference.
-  class LassoTool : public mitk::AddContourTool
+  // Replaces the AddContourTool wrapper. Builds a live ContourModel in 3D
+  // world coordinates while the user drags, renders it via a feedback
+  // DataNode, and on release rasterizes into a small bounding-box-sized
+  // 3D mask via SegTool2D::WriteSliceToVolume. No 3D working segmentation
+  // is involved.
+  class LassoContourInteractor : public mitk::EventStateMachine
   {
   public:
-    mitkClassMacro(LassoTool, AddContourTool)
+    mitkClassMacro(LassoContourInteractor, EventStateMachine)
     itkFactorylessNewMacro(Self)
 
-    using Superclass::SetToolManager;
-
-    us::ModuleResource GetCursorIconResource() const override
+    void SetReferenceImage(const mitk::Image* image) { m_ReferenceImage = image; }
+    void SetDataStorage(mitk::DataStorage* storage) { m_DataStorage = storage; }
+    void SetReferenceNode(mitk::DataNode* node) { m_ReferenceNode = node; }
+    void SetContourColor(const mitk::Color& color)
     {
-      return us::ModuleResource();
+      m_ContourColor = color;
+      if (m_FeedbackNode.IsNotNull())
+        m_FeedbackNode->SetColor(color, nullptr, "contour.color");
     }
 
-    us::ModuleResource GetIconResource() const override
+    // Drops the live feedback node and any in-flight contour state.
+    // Called by the outer Interactor on OnDisable / OnReset.
+    void ReleaseFeedback()
     {
-      return us::ModuleResource();
-    }
+      if (m_FeedbackNode.IsNotNull() && m_DataStorage != nullptr && m_DataStorage->Exists(m_FeedbackNode))
+        m_DataStorage->Remove(m_FeedbackNode);
 
-    const char* GetName() const override
-    {
-      return "Lasso";
-    }
-
-    bool IsEligibleForAutoInit() const override
-    {
-      return false;
-    }
-
-    void Activate(const mitk::Color& color)
-    {
-      this->SetEnable3DInterpolation(false);
-      this->Activated();
-      this->Enable();
-
-      this->SetFeedbackContourColor(color);
-      this->SetFeedbackContourWidth(3.0f);
-    }
-
-    void Deactivate()
-    {
-      this->Disable();
-      this->Deactivated();
-      this->SetEnable3DInterpolation(true);
+      m_FeedbackNode = nullptr;
+      m_LiveContour = nullptr;
+      m_CurrentPlane = nullptr;
     }
 
   protected:
-    LassoTool()
+    LassoContourInteractor()
     {
-      this->DisableContourMarkers();
-      this->Disable();
-
-      // nnInteractive currently does not support undo.
-      this->EnableUndo(false);
+      m_ContourColor.Set(0.0f, 1.0f, 0.0f);
     }
 
-    ~LassoTool() override
+    ~LassoContourInteractor() override = default;
+
+    void ConnectActionsAndFunctions() override
     {
+      CONNECT_FUNCTION("PrimaryButtonPressed", OnMousePressed);
+      CONNECT_FUNCTION("Move", OnMouseMoved);
+      CONNECT_FUNCTION("MouseMove", OnHover);
+      CONNECT_FUNCTION("Release", OnMouseReleased);
+      CONNECT_FUNCTION("InvertLogic", OnInvertLogic);
     }
 
-    void OnMouseReleased(mitk::StateMachineAction* action, mitk::InteractionEvent* event) override
+    // Restrict to 2D render windows (drawing requires a slicing plane) and
+    // bypass the base-class DataNode visibility check, since this interactor
+    // owns its own lazily-created feedback node.
+    bool FilterEvents(mitk::InteractionEvent* event, mitk::DataNode*) override
     {
-      // Do not process accidental user clicks.
-      if (this->GetFeedbackContour()->GetNumberOfVertices() < 3)
+      return event != nullptr &&
+             event->GetSender() != nullptr &&
+             event->GetSender()->GetMapperID() == mitk::BaseRenderer::Standard2D;
+    }
+
+    void ConfigurationChanged() override {}
+
+  private:
+    void OnMousePressed(mitk::StateMachineAction*, mitk::InteractionEvent* event)
+    {
+      auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(event);
+      if (positionEvent == nullptr || m_ReferenceImage == nullptr)
         return;
 
-      // Clone the feedback contour to preserve it, as it would otherwise be overriden.
-      auto contour = this->GetFeedbackContour()->Clone();
+      const auto* planeGeometry = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
+      if (planeGeometry == nullptr)
+        return;
 
-      Superclass::OnMouseReleased(action, event);
+      // Clone the renderer-owned plane so a mid-stroke mutation by the
+      // renderer cannot desync the plane we hand to WriteSliceToVolume on
+      // release. The 2D-only restriction on the state machine already makes
+      // mid-stroke navigation unlikely; this is cheap defence in depth.
+      m_CurrentPlane = planeGeometry->Clone();
+      m_LiveContour = mitk::ContourModel::New();
+      m_LiveContour->SetClosed(true);
+      m_LiveContour->AddVertex(positionEvent->GetPositionInWorld());
 
-      // Notify LassoInteractor.
-      this->InvokeEvent(LassoEvent(contour));
+      // Align the (single-time-step) contour's time bounds with the time
+      // step the renderer is currently displaying. Without this, the
+      // contour's default time bounds cover only time point 0 and it stays
+      // invisible whenever the user views any other time step of a 4D
+      // reference image.
+      AlignContourToCurrentTimeStep(m_LiveContour, m_ReferenceImage,
+                                    positionEvent->GetSender());
 
-      // Clear the working mask to prepare for the next interaction.
-      this->GetWorkingData()->ClearGroupImage(0);
+      this->EnsureFeedbackNode();
+      m_FeedbackNode->SetData(m_LiveContour);
+      m_FeedbackNode->SetVisibility(true);
+
+      this->RequestRendererUpdate(positionEvent);
     }
 
-    void OnInvertLogic(mitk::StateMachineAction*, mitk::InteractionEvent*) override
+    void OnMouseMoved(mitk::StateMachineAction*, mitk::InteractionEvent* event)
     {
-      // Inversion is disabled; handled by LassoInteractor instead.
+      auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(event);
+      if (positionEvent == nullptr || m_LiveContour.IsNull())
+        return;
+
+      m_LiveContour->AddVertex(positionEvent->GetPositionInWorld());
+      m_LiveContour->Modified();
+
+      this->RequestRendererUpdate(positionEvent);
     }
+
+    void OnHover(mitk::StateMachineAction*, mitk::InteractionEvent*)
+    {
+      // No hover preview.
+    }
+
+    void OnMouseReleased(mitk::StateMachineAction*, mitk::InteractionEvent* event)
+    {
+      auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(event);
+      if (positionEvent == nullptr || m_LiveContour.IsNull() || m_CurrentPlane.IsNull() ||
+          m_ReferenceImage == nullptr)
+      {
+        this->DiscardCurrentContour();
+        return;
+      }
+
+      // Reject accidental clicks: a closed lasso needs at least three
+      // distinct vertices (matches the behaviour of the previous
+      // AddContourTool wrapper).
+      if (m_LiveContour->GetNumberOfVertices() < 3)
+      {
+        this->DiscardCurrentContour();
+        this->RequestRendererUpdate(positionEvent);
+        return;
+      }
+
+      this->FinalizeContour(positionEvent);
+      this->RequestRendererUpdate(positionEvent);
+    }
+
+    void OnInvertLogic(mitk::StateMachineAction*, mitk::InteractionEvent*)
+    {
+      // Prompt-type switching is handled externally via the interactor swap.
+    }
+
+    void FinalizeContour(const mitk::InteractionPositionEvent* positionEvent)
+    {
+      // Extract a uint8 2D slice of the reference image at the current
+      // renderer's time point. The event-based overload picks up the
+      // correct time step for 4D data; the previous time-point-based
+      // overload was hardcoded to 0.0.
+      auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(positionEvent, m_ReferenceImage);
+      if (refSlice.IsNull())
+      {
+        this->DiscardCurrentContour();
+        return;
+      }
+
+      const auto uint8Type = mitk::MakePixelType<unsigned char, unsigned char, 1>();
+      auto paintingSlice = mitk::Image::New();
+      paintingSlice->Initialize(uint8Type, *(refSlice->GetTimeGeometry()));
+      paintingSlice->AllocateZeroedVolume();
+
+      // Project the 3D world contour into the slice's 2D index space so
+      // VTK's stencil (used by FillContourInSlice2) operates in the same
+      // frame as the slice's vtkImageData.
+      auto projected = mitk::ContourModelUtils::ProjectContourTo2DSlice(paintingSlice, m_LiveContour);
+      if (projected.IsNull())
+      {
+        this->DiscardCurrentContour();
+        return;
+      }
+
+      mitk::ContourModelUtils::FillContourInSlice2(projected, paintingSlice, 1);
+
+      // Tight stroke bounding box in MITK index space; works for any
+      // orientation thanks to the slice-geometry-aware projection.
+      mitk::nnInteractive::InteractionBoundingBox boundingBox{};
+      const bool haveBoundingBox = mitk::nnInteractive::ComputeStrokeBoundingBox(
+        paintingSlice, m_ReferenceImage, boundingBox);
+
+      const auto contourCopy = m_LiveContour;
+      const auto handoffPlane = m_CurrentPlane;
+      m_LiveContour = nullptr;
+      m_CurrentPlane = nullptr;
+
+      if (m_FeedbackNode.IsNotNull())
+      {
+        m_FeedbackNode->SetData(nullptr);
+        m_FeedbackNode->SetVisibility(false);
+      }
+
+      // Degenerate rasterization (e.g. zero-area contour) drops silently.
+      if (!haveBoundingBox)
+        return;
+
+      // Hand off slice + plane + bbox to the outer Impl, which builds the
+      // bbox-sized 3D mask. Mirrors ScribbleStrokeEvent.
+      this->InvokeEvent(LassoContourEvent(contourCopy, paintingSlice, handoffPlane, boundingBox));
+    }
+
+    void DiscardCurrentContour()
+    {
+      m_LiveContour = nullptr;
+      m_CurrentPlane = nullptr;
+      if (m_FeedbackNode.IsNotNull())
+      {
+        m_FeedbackNode->SetData(nullptr);
+        m_FeedbackNode->SetVisibility(false);
+      }
+    }
+
+    void EnsureFeedbackNode()
+    {
+      if (m_FeedbackNode.IsNotNull())
+        return;
+
+      m_FeedbackNode = mitk::DataNode::New();
+      m_FeedbackNode->SetName("nnInteractive_Lasso_Feedback");
+      m_FeedbackNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+      m_FeedbackNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+      m_FeedbackNode->SetFloatProperty("contour.width", 3.0f);
+      m_FeedbackNode->SetColor(m_ContourColor, nullptr, "contour.color");
+      mitk::nnInteractive::HideNodeIn3DRenderWindows(m_FeedbackNode);
+
+      if (m_DataStorage != nullptr)
+        m_DataStorage->Add(m_FeedbackNode, m_ReferenceNode);
+    }
+
+    void RequestRendererUpdate(const mitk::InteractionPositionEvent* positionEvent)
+    {
+      if (positionEvent->GetSender() != nullptr && positionEvent->GetSender()->GetRenderWindow() != nullptr)
+        mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+    }
+
+    const mitk::Image* m_ReferenceImage = nullptr;
+    mitk::DataStorage* m_DataStorage = nullptr;
+    mitk::DataNode::Pointer m_ReferenceNode;
+
+    mitk::ContourModel::Pointer m_LiveContour;
+    mitk::DataNode::Pointer m_FeedbackNode;
+    mitk::PlaneGeometry::ConstPointer m_CurrentPlane;
+    mitk::Color m_ContourColor;
   };
 }
 
@@ -158,107 +365,109 @@ namespace mitk::nnInteractive
   {
   public:
     explicit Impl(LassoInteractor* owner)
-      : Tool(LassoTool::New()),
+      : Interactor(LassoContourInteractor::New()),
         m_Owner(owner)
     {
-      // Get notified each time a countour is drawn.
+      auto segModule = us::ModuleRegistry::GetModule("MitkSegmentation");
+      this->Interactor->LoadStateMachine("PressMoveReleaseWithCTRLInversionAllMouseMoves.xml", segModule);
+      this->Interactor->SetEventConfig("SegmentationToolsConfig.xml", segModule);
+
       auto command = itk::MemberCommand<Impl>::New();
-      command->SetCallbackFunction(this, &Impl::OnLassoEvent);
-      this->Tool->AddObserver(LassoEvent(), command);
+      command->SetCallbackFunction(this, &Impl::OnLassoContourEvent);
+      this->Interactor->AddObserver(LassoContourEvent(), command);
     }
 
-    ~Impl()
+    ~Impl() = default;
+
+    bool HasInteractions() const
     {
+      for (const auto& [promptType, nodes] : m_LassoNodes)
+      {
+        if (!nodes.empty())
+          return true;
+      }
+      return false;
     }
 
-    void CreateMaskNode()
+    void RemoveLastLasso(PromptType promptType)
     {
-      if (this->MaskNode.IsNotNull())
-        return; // Nothing to do.
+      auto iter = m_LassoNodes.find(promptType);
 
-      // Create a static mask node based on the reference image.
-      auto referenceNode = m_Owner->GetToolManager()->GetReferenceData(0);
-      auto referenceImage = referenceNode->GetDataAs<Image>();
-      auto templateImage = SegmentationHelper::GetStaticSegmentationTemplate(referenceImage);
+      if (iter == m_LassoNodes.end() || iter->second.empty())
+        return;
 
-      this->MaskNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, templateImage, "Lasso mask");
-      this->MaskNode->SetBoolProperty("helper object", true);
-      this->MaskNode->SetVisibility(false);
+      if (auto dataStorage = m_Owner->GetDataStorage(); dataStorage != nullptr)
+        dataStorage->Remove(iter->second.back());
 
-      // Add a single label based on the current prompt type.
-      const auto promptType = m_Owner->GetCurrentPromptType();
-      const auto& labelName = GetPromptTypeAsString(promptType);
-      const auto& color = GetColor(promptType, ColorIntensity::Vibrant);
+      iter->second.pop_back();
 
-      auto mask = this->MaskNode->GetDataAs<MultiLabelSegmentation>();
-      auto label = mask->AddLabel(labelName, color, 0);
-      mask->SetActiveLabel(label->GetValue());
-
-      m_Owner->GetDataStorage()->Add(this->MaskNode, referenceNode);
-    }
-
-    void DestroyMaskNode()
-    {
-      if (this->MaskNode.IsNull())
-        return; // Nothing to do.
-
-      // Remove the mask node from the data storage and release our reference to it.
-      m_Owner->GetDataStorage()->Remove(this->MaskNode);
-      this->MaskNode = nullptr;
+      // The cached "last lasso" referred to the contour just removed; it is
+      // only read while applying a fresh contour, so dropping it is safe.
+      m_LastLassoMask = nullptr;
+      m_LastLassoBoundingBox.reset();
     }
 
     void DestroyLassoNodes()
     {
-      // Remove all lasso nodes from the data storage and release their
-      // references for each prompt type. This should result in their
-      // destruction.
-      for (auto& [promptType, nodes] : m_LassoNodes)
+      auto dataStorage = m_Owner->GetDataStorage();
+      for (const auto& [promptType, nodes] : m_LassoNodes)
       {
-        if (auto dataStorage = m_Owner->GetDataStorage(); dataStorage != nullptr)
+        if (dataStorage != nullptr)
         {
           for (const auto& node : nodes)
             dataStorage->Remove(node);
         }
-
-        nodes.clear();
       }
-
       m_LassoNodes.clear();
+      m_LastLassoMask = nullptr;
+      m_LastLassoBoundingBox.reset();
     }
 
-    bool HasInteractions() const
-    {
-      // If any list of lassos for a prompt type is not empty, interactions have occurred.
-      for (const auto& [promptType, lassoNodes] : m_LassoNodes)
-      {
-        if (!lassoNodes.empty())
-          return true;
-      }
-
-      return false;
-    }
-
-    LassoTool::Pointer Tool;
-    DataNode::Pointer MaskNode;
+    LassoContourInteractor::Pointer Interactor;
+    std::unordered_map<PromptType, std::vector<DataNode::Pointer>> m_LassoNodes;
+    Image::Pointer m_LastLassoMask;
+    std::optional<InteractionBoundingBox> m_LastLassoBoundingBox;
 
   private:
-    void OnLassoEvent(itk::Object*, const itk::EventObject& event)
+    void OnLassoContourEvent(itk::Object*, const itk::EventObject& event)
     {
+      const auto* contourEvent = static_cast<const LassoContourEvent*>(&event);
+      auto contour = contourEvent->GetContour();
+      auto slice = contourEvent->GetSlice();
+      if (contour == nullptr || slice == nullptr)
+        return;
+
+      auto referenceNode = m_Owner->GetToolManager()->GetReferenceData(0);
+      auto referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+      if (referenceImage == nullptr)
+        return;
+
+      // Build the small 3D bounding-box-sized mask here (in the outer Impl)
+      // rather than inside the inner state machine, mirroring the Scribble
+      // path so both interactors keep mask construction symmetrical.
+      auto mask = BuildBoundingBoxMaskImage(slice, contourEvent->GetPlane(), referenceImage, contourEvent->GetBoundingBox());
+      if (mask.IsNull())
+        return;
+
       const auto promptType = m_Owner->GetCurrentPromptType();
 
-      // Create a node for the drawn contour, add it to the corresponding list
-      // of lasso nodes based on prompt type, and add it to the data storage.
+      // Persist the contour as a vector overlay (cheap, renders correctly
+      // on any view because it's vector geometry).
       auto node = DataNode::New();
-      node->SetData(static_cast<const LassoEvent*>(&event)->GetContour());
+      node->SetData(contour);
       node->SetName(this->CreateLassoNodeName());
       node->SetColor(GetColor(promptType, ColorIntensity::Muted), nullptr, "contour.color");
       node->SetFloatProperty("contour.width", 3.0f);
       node->SetBoolProperty("helper object", true);
+      node->SetBoolProperty("includeInBoundingBox", false);
+      HideNodeIn3DRenderWindows(node);
 
       m_LassoNodes[promptType].push_back(node);
-      m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
+      m_Owner->GetDataStorage()->Add(node, referenceNode);
 
-      // Notify the nnInteractiveTool that an interaction has occurred.
+      m_LastLassoMask = mask;
+      m_LastLassoBoundingBox = contourEvent->GetBoundingBox();
+
       m_Owner->UpdatePreviewEvent(false);
     }
 
@@ -269,7 +478,6 @@ namespace mitk::nnInteractive
     }
 
     LassoInteractor* m_Owner;
-    std::unordered_map<PromptType, std::vector<DataNode::Pointer>> m_LassoNodes;
   };
 }
 
@@ -289,47 +497,49 @@ bool mitk::nnInteractive::LassoInteractor::HasInteractions() const
   return m_Impl->HasInteractions();
 }
 
-const mitk::Image* mitk::nnInteractive::LassoInteractor::GetLastLassoMask() const
+mitk::Image::ConstPointer mitk::nnInteractive::LassoInteractor::GetLastLassoMask() const
 {
-  return m_Impl->MaskNode->GetDataAs<MultiLabelSegmentation>()->GetGroupImage(0);
+  return m_Impl->m_LastLassoMask.GetPointer();
 }
 
-void mitk::nnInteractive::LassoInteractor::OnSetToolManager()
+const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::LassoInteractor::GetLastLassoBoundingBox() const
 {
-  m_Impl->Tool->InitializeStateMachine();
-  m_Impl->Tool->SetToolManager(this->GetToolManager());
+  return m_Impl->m_LastLassoBoundingBox.has_value() ? &m_Impl->m_LastLassoBoundingBox.value() : nullptr;
+}
+
+void mitk::nnInteractive::LassoInteractor::RemoveLastInteraction(PromptType promptType)
+{
+  m_Impl->RemoveLastLasso(promptType);
 }
 
 void mitk::nnInteractive::LassoInteractor::OnHandleEvent(InteractionEvent* event)
 {
-  m_Impl->Tool->HandleEvent(event, nullptr);
+  m_Impl->Interactor->HandleEvent(event, nullptr);
 }
 
 void mitk::nnInteractive::LassoInteractor::OnEnable()
 {
-  // Create a mask node for the most recently drawn contour, which is used both
-  // as target by the LassoTool and as input for nnInteractive.
-  m_Impl->CreateMaskNode();
-  this->GetToolManager()->SetWorkingData(m_Impl->MaskNode);
+  auto toolManager = this->GetToolManager();
+  auto referenceNode = toolManager->GetReferenceData(0);
+  if (referenceNode == nullptr)
+    return;
 
-  // Activate the LassoTool with a color corresponding to the prompt type.
-  const auto& color = GetColor(this->GetCurrentPromptType(), ColorIntensity::Vibrant);
-  m_Impl->Tool->Activate(color);
+  const auto promptType = this->GetCurrentPromptType();
+  const auto& color = GetColor(promptType, ColorIntensity::Vibrant);
+
+  m_Impl->Interactor->SetDataStorage(this->GetDataStorage());
+  m_Impl->Interactor->SetReferenceNode(referenceNode);
+  m_Impl->Interactor->SetReferenceImage(referenceNode->GetDataAs<Image>());
+  m_Impl->Interactor->SetContourColor(color);
 }
 
 void mitk::nnInteractive::LassoInteractor::OnDisable()
 {
-  // Deactivate the LassoTool.
-  m_Impl->Tool->Deactivate();
-
-  // Reset the working data of the ToolManager and destroy the mask node for
-  // the most recently drawn contour.
-  this->GetToolManager()->SetWorkingData(nullptr);
-  m_Impl->DestroyMaskNode();
+  m_Impl->Interactor->ReleaseFeedback();
 }
 
 void mitk::nnInteractive::LassoInteractor::OnReset()
 {
-  m_Impl->DestroyMaskNode();
+  m_Impl->Interactor->ReleaseFeedback();
   m_Impl->DestroyLassoNodes();
 }

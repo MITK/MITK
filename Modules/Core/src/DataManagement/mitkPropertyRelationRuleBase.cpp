@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyRelationRuleBase.h"
+#include <mitkPropertyRelationRuleBase.h>
 
 #include <mitkDataNode.h>
 #include <mitkExceptionMacro.h>
@@ -385,7 +385,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
     if (std::regex_search(key, instance_matches, regEx))
     {
       auto idProp = source->GetConstProperty(key);
-      if (idProp->GetValueAsString() == relationUID)
+      if (idProp != nullptr && idProp->GetValueAsString() == relationUID)
       {
         if (instance_matches.size()>1)
         {
@@ -663,12 +663,6 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::C
 
   return newID;
 }
-
-itk::LightObject::Pointer mitk::PropertyRelationRuleBase::InternalClone() const
-{
-  return Superclass::InternalClone();
-}
-
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::GetInstanceIDByPropertyName(const std::string propName)
 {

@@ -12,14 +12,17 @@ found in the LICENSE file.
 #ifndef mitkOneTissueCompartmentModelFactory_h
 #define mitkOneTissueCompartmentModelFactory_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkOneTissueCompartmentModel.h"
-#include "mitkOneTissueCompartmentModelParameterizer.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkOneTissueCompartmentModel.h>
+#include <mitkOneTissueCompartmentModelParameterizer.h>
 
 namespace mitk
 {
 
 
+  /** \brief Factory for the OneTissueCompartmentModel.
+   * \sa OneTissueCompartmentModel, OneTissueCompartmentModelParameterizer, ConcreteAIFBasedModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT OneTissueCompartmentModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<OneTissueCompartmentModelParameterizer>
   {

@@ -10,23 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkConcentrationCurveGenerator.h"
-#include "mitkConvertToConcentrationTurboFlashFunctor.h"
-#include "mitkConvertT2ConcentrationFunctor.h"
-#include "mitkConvertToConcentrationViaT1Functor.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
-#include "mitkModelBase.h"
-#include "mitkExtractTimeGrid.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "itkNaryAddImageFilter.h"
-#include "mitkImageAccessByItk.h"
-#include "itkImageIOBase.h"
-#include "itkBinaryFunctorImageFilter.h"
-#include "itkTernaryFunctorImageFilter.h"
+#include <mitkConcentrationCurveGenerator.h>
+#include <mitkConvertToConcentrationTurboFlashFunctor.h>
+#include <mitkConvertT2ConcentrationFunctor.h>
+#include <mitkConvertToConcentrationViaT1Functor.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+#include <mitkModelBase.h>
+#include <mitkExtractTimeGrid.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <itkNaryAddImageFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <itkImageIOBase.h>
+#include <itkBinaryFunctorImageFilter.h>
+#include <itkTernaryFunctorImageFilter.h>
 #include <itkExtractImageFilter.h>
-#include "itkMeanProjectionImageFilter.h"
+#include <itkMeanProjectionImageFilter.h>
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false),
     m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(false), m_UsingT1Map(false), m_Factor(std::numeric_limits<double>::quiet_NaN()),

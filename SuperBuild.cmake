@@ -1,25 +1,12 @@
-#-----------------------------------------------------------------------------
-# Convenient macro allowing to download a file
-#-----------------------------------------------------------------------------
-
 if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
   set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL https://www.mitk.org/download/thirdparty)
 endif()
-
-macro(downloadFile url dest)
-  file(DOWNLOAD ${url} ${dest} STATUS status)
-  list(GET status 0 error_code)
-  list(GET status 1 error_msg)
-  if(error_code)
-    message(FATAL_ERROR "error: Failed to download ${url} - ${error_msg}")
-  endif()
-endmacro()
 
 #-----------------------------------------------------------------------------
 # MITK Prerequisites
 #-----------------------------------------------------------------------------
 
-if(UNIX AND NOT APPLE)
+if(LINUX)
 
   include(mitkFunctionCheckPackageHeader)
 
@@ -31,36 +18,11 @@ if(UNIX AND NOT APPLE)
 
 endif()
 
-# We need a proper patch program. On Linux and MacOS, we assume
-# that "patch" is available. On Windows, we download patch.exe
-# if not patch program is found.
-find_program(PATCH_COMMAND patch)
-if((NOT PATCH_COMMAND OR NOT EXISTS ${PATCH_COMMAND}) AND WIN32)
-  downloadFile(${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/patch.exe
-               ${CMAKE_CURRENT_BINARY_DIR}/patch.exe)
-  find_program(PATCH_COMMAND patch ${CMAKE_CURRENT_BINARY_DIR})
-endif()
-if(NOT PATCH_COMMAND)
-  message(FATAL_ERROR "No patch program found.")
-endif()
-
 #-----------------------------------------------------------------------------
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
-
-if(MITK_CTEST_SCRIPT_MODE)
-  # Write a file containing the list of enabled external project targets.
-  # This file can be read by a ctest script to separately build projects.
-  set(SUPERBUILD_TARGETS )
-  foreach(proj ${external_projects})
-    if(MITK_USE_${proj})
-      list(APPEND SUPERBUILD_TARGETS ${proj})
-    endif()
-  endforeach()
-  file(WRITE "${CMAKE_BINARY_DIR}/SuperBuildTargets.cmake" "set(SUPERBUILD_TARGETS ${SUPERBUILD_TARGETS})")
-endif()
 
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
@@ -104,11 +66,7 @@ set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})
 
 # Compute -G arg for configuring external projects with the same CMake generator:
-if(CMAKE_EXTRA_GENERATOR)
-  set(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
-else()
-  set(gen "${CMAKE_GENERATOR}")
-endif()
+set(gen "${CMAKE_GENERATOR}")
 
 set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
 
@@ -132,32 +90,20 @@ set(CMAKE_REQUIRED_FLAGS "-Wl,-rpath")
 mitkFunctionCheckCompilerFlags(${CMAKE_REQUIRED_FLAGS} _has_rpath_flag)
 set(CMAKE_REQUIRED_FLAGS ${_cmake_required_flags_orig})
 
-set(_install_rpath_linkflag )
-if(_has_rpath_flag)
-  if(APPLE)
-    set(_install_rpath_linkflag "-Wl,-rpath,@loader_path/../lib")
-  else()
-    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib")
-    if(Qt6_DIR)
-      set(_install_rpath_linkflag "${_install_rpath_linkflag}:${Qt6_DIR}/../..")
-    endif()
-    set(_install_rpath_linkflag "${_install_rpath_linkflag}'")
-  endif()
-endif()
-
 set(_install_rpath)
 if(APPLE)
   set(_install_rpath "@loader_path/../lib")
 elseif(UNIX)
-  # this work for libraries as well as executables
-  set(_install_rpath "\$ORIGIN/../lib")
+  set(_install_rpath "\$ORIGIN:\$ORIGIN/../lib")
   if(Qt6_DIR)
+    # External projects that link Qt (e.g. VTK) need the Qt library path in
+    # their RPATH so that transitive Qt dependencies can be resolved at runtime
+    # in the build tree.
     set(_install_rpath "${_install_rpath}:${Qt6_DIR}/../..")
   endif()
 endif()
 
 set(ep_common_args
-  -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=OLD
   -DCMAKE_CXX_EXTENSIONS:STRING=${CMAKE_CXX_EXTENSIONS}
   -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
   -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=${CMAKE_CXX_STANDARD_REQUIRED}
@@ -270,10 +216,6 @@ foreach(p ${external_projects})
   list(APPEND mitk_depends ${${p}_DEPENDS})
 endforeach()
 
-if (SWIG_EXECUTABLE)
-  list(APPEND mitk_superbuild_ep_args -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE})
-endif()
-
 #-----------------------------------------------------------------------------
 # Set superbuild boolean args
 #-----------------------------------------------------------------------------
@@ -305,10 +247,10 @@ if(MITK_BUILD_ALL_PLUGINS)
 endif()
 
 #-----------------------------------------------------------------------------
-# MITK Utilities
+# MITK Dependencies
 #-----------------------------------------------------------------------------
 
-set(proj MITK-Utilities)
+set(proj MITK-Dependencies)
 ExternalProject_Add(${proj}
   DOWNLOAD_COMMAND ""
   CONFIGURE_COMMAND ""
@@ -352,8 +294,19 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 if(Python3_ROOT_DIR)
+  # Pin the exact interpreter, not just the root hint. find_package(Python3)
+  # also consults PATH and the Windows registry and prefers the newest version
+  # it finds there, so a developer machine with a newer system Python would
+  # win over the standalone Python staged in MITK-build/python. Setting
+  # Python3_EXECUTABLE makes the inner build skip that search entirely.
+  if(WIN32)
+    set(_mitk_python3_executable "${Python3_ROOT_DIR}/python.exe")
+  else()
+    set(_mitk_python3_executable "${Python3_ROOT_DIR}/bin/python3")
+  endif()
   list(APPEND mitk_optional_cache_args
     "-DPython3_ROOT_DIR:PATH=${Python3_ROOT_DIR}"
+    "-DPython3_EXECUTABLE:FILEPATH=${_mitk_python3_executable}"
   )
 endif()
 
@@ -379,6 +332,20 @@ endif()
 if(MITK_DOXYGEN_BUILD_ALWAYS)
   list(APPEND mitk_optional_cache_args
     -DMITK_DOXYGEN_BUILD_ALWAYS:BOOL=${MITK_DOXYGEN_BUILD_ALWAYS}
+  )
+endif()
+
+# Optional override of the generated Python wheel version (PythonWheel
+# configuration). Empty (the default) derives the version from git; a value
+# is forwarded to the inner build, where build_wheel.py reads it from the
+# cache. Lets a CI job pin an explicit, PyPI-uploadable version without a tag.
+set(MITK_WHEEL_VERSION "" CACHE STRING
+  "Override the generated Python wheel version (PEP 440 public version); empty derives from git")
+mark_as_advanced(MITK_WHEEL_VERSION)
+
+if(MITK_WHEEL_VERSION)
+  list(APPEND mitk_optional_cache_args
+    "-DMITK_WHEEL_VERSION:STRING=${MITK_WHEEL_VERSION}"
   )
 endif()
 
@@ -431,11 +398,9 @@ ExternalProject_Add(${proj}
     -DMITK_PCH:BOOL=${MITK_PCH}
     -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
     -DMITK_XVFB_TESTING:BOOL=${MITK_XVFB_TESTING}
-    -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}
     -DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}
-    -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD}
     -DMITK_WHITELIST:STRING=${MITK_WHITELIST}
@@ -467,7 +432,8 @@ ExternalProject_Add(${proj}
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   DEPENDS
-    MITK-Utilities
+    MITK-Dependencies
+    MITK-Data
   )
 
 mitkFunctionInstallExternalCMakeProject(${proj})
@@ -479,7 +445,7 @@ mitkFunctionInstallExternalCMakeProject(${proj})
 if(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
   set(mitk_build_cmd "$(MAKE)")
 else()
-  set(mitk_build_cmd ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build --config ${CMAKE_CFG_INTDIR})
+  set(mitk_build_cmd ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build --config ${CMAKE_CFG_INTDIR} --parallel 4)
 endif()
 
 if(NOT DEFINED SUPERBUILD_EXCLUDE_MITKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_MITKBUILD_TARGET)
@@ -488,18 +454,8 @@ else()
   set(MITKBUILD_TARGET_ALL_OPTION "")
 endif()
 
-add_custom_target(MITK-build ${MITKBUILD_TARGET_ALL_OPTION}
+add_custom_target(MITK ${MITKBUILD_TARGET_ALL_OPTION}
   COMMAND ${mitk_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
   DEPENDS MITK-Configure
   )
-
-#-----------------------------------------------------------------------------
-# Custom target allowing to drive the build of the MITK project itself
-#-----------------------------------------------------------------------------
-
-add_custom_target(MITK
-  COMMAND ${mitk_build_cmd}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
-)
-

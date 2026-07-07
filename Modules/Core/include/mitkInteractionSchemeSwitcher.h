@@ -13,20 +13,24 @@ found in the LICENSE file.
 #ifndef mitkInteractionSchemeSwitcher_h
 #define mitkInteractionSchemeSwitcher_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
-#include "mitkInteractionEventHandler.h"
+#include <mitkInteractionEventHandler.h>
 
 #include <itkObject.h>
 
 namespace mitk
 {
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   /**
     \brief Can be observed by GUI class to update button states when type is changed programmatically.
   */
   itkEventMacroDeclaration(InteractionSchemeChangedEvent, itk::AnyEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /***********************************************************************
   *
@@ -89,20 +93,20 @@ namespace mitk
     };
 
     /**
-    * @brief Set the current interaction scheme of the given interaction event handler
-    *
-    *        The interaction event handler is able to accept xml-configuration files that will define the interaction scheme.
-    *        Based on the given interaction scheme different configuration files are loaded into the interaction event handler.
-    *        The interaction scheme can be a variant of the MITK-scheme or the PACS-scheme (see 'enum InteractionScheme').
-    *        The default is 'MITKStandard'.
-    *        If the interaction scheme has been changed, an 'InteractionSchemeChangedEvent' will be invoked.
-    *
-    * @pre    The interaction event handler has to be valid (!nullptr).
-    * @throw  mitk::Exception, if the interaction event handler is invalid (==nullptr).
-    *
-    * @param interactionEventHandler  The interaction event handler that defines the interaction scheme via configuration files
-    * @param interactionScheme        The interaction scheme that should be used for the currently active interaction event handler.
-    */
+     * \brief Set the current interaction scheme of the given interaction event handler.
+     *
+     * The interaction event handler is able to accept xml-configuration files that will define the interaction scheme.
+     * Based on the given interaction scheme different configuration files are loaded into the interaction event handler.
+     * The interaction scheme can be a variant of the MITK-scheme or the PACS-scheme (see InteractionScheme).
+     * The default is MITKStandard.
+     * If the interaction scheme has been changed, an InteractionSchemeChangedEvent will be invoked.
+     *
+     * \pre The interaction event handler has to be valid (not nullptr).
+     * \throw mitk::Exception if the interaction event handler is invalid (nullptr).
+     *
+     * \param interactionEventHandler The interaction event handler that defines the interaction scheme via configuration files.
+     * \param interactionScheme The interaction scheme that should be used for the currently active interaction event handler.
+     */
     void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
 
   protected:

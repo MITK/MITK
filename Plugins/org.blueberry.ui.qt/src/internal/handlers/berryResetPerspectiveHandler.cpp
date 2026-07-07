@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 #include "berryResetPerspectiveHandler.h"
 
-#include <berryIWorkbenchWindow.h>
-#include <berryHandlerUtil.h>
+#include "berryIWorkbenchWindow.h"
+#include "berryHandlerUtil.h"
 
-#include <internal/berryWorkbenchPage.h>
-#include <internal/berryPerspectiveDescriptor.h>
+#include "internal/berryWorkbenchPage.h"
+#include "internal/berryPerspectiveDescriptor.h"
 
 #include <QMessageBox>
 

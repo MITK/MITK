@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometryClipImageFilter.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkProperties.h"
-#include "mitkTimeHelper.h"
+#include <mitkGeometryClipImageFilter.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkProperties.h>
+#include <mitkTimeHelper.h>
 
-#include "mitkImageToItk.h"
+#include <mitkImageToItk.h>
 
-#include "itkImageRegionConstIterator.h"
-#include "itkImageRegionIteratorWithIndex.h"
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionIteratorWithIndex.h>
 
 #include <limits>
 
@@ -195,7 +195,7 @@ void mitk::GeometryClipImageFilter::_InternalComputeClippedImage(itk::Image<TPix
   }
 }
 
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 
 void mitk::GeometryClipImageFilter::GenerateData()
 {

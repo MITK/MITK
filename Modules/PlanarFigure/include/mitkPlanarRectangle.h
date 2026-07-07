@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarRectangle_h
 #define mitkPlanarRectangle_h
 
-#include "mitkPlanarPolygon.h"
+#include <mitkPlanarPolygon.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk
@@ -21,8 +21,17 @@ namespace mitk
   class PlaneGeometry;
 
   /**
-   * \brief Implementation of PlanarFigure representing a polygon
-   * with two or more control points
+   * \brief Implementation of PlanarFigure representing an axis-aligned rectangle.
+   *
+   * A rectangle defined by four control points (corners). When a control
+   * point is moved, the adjacent corners are updated to maintain the
+   * rectangular shape.
+   *
+   * Provides two features:
+   * - FEATURE_ID_CIRCUMFERENCE: the rectangle perimeter
+   * - FEATURE_ID_AREA: the rectangle area
+   *
+   * \sa PlanarFigure, PlanarPolygon, PlanarFigureMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarRectangle : public PlanarFigure
   {
@@ -33,22 +42,30 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** \brief Place figure in its minimal configuration (a point at least)
-       * onto the given 2D geometry.
-       *
-       * Must be implemented in sub-classes.
+      /**
+       * \brief Places the rectangle at the given point, initializing all four corners.
+       * \param[in] point The initial 2D placement position.
        */
-      // virtual void Initialize();
       void PlaceFigure(const Point2D &point) override;
 
-    /** \brief Polygon has 2 control points per definition. */
+    /** \brief Returns 4 -- a rectangle requires exactly four control points. */
     unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
-    /** \brief Polygon maximum number of control points is principally not limited. */
+    /** \brief Returns 4 -- a rectangle requires exactly four control points. */
     unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
+
+    /**
+     * \brief Sets a control point and updates adjacent corners to maintain the rectangle.
+     *
+     * \param[in] index               Zero-based index of the control point (corner).
+     * \param[in] point               New 2D coordinates.
+     * \param[in] createIfDoesNotExist If true, creates the point if missing.
+     * \return True if the control point was set successfully.
+     */
     bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
 
   protected:
     PlanarRectangle();
+    PlanarRectangle(const Self& other);
 
     mitkCloneMacro(Self);
 

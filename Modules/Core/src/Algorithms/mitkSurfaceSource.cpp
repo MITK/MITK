@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceSource.h"
-#include "mitkSurface.h"
+#include <mitkSurfaceSource.h>
+#include <mitkSurface.h>
 
 mitk::SurfaceSource::SurfaceSource()
 {

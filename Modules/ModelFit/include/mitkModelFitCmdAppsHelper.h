@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <string>
 
 // itk includes
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 // MITK includes
 #include <mitkParameterFitImageGeneratorBase.h>
@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include <mitkModelFitResultHelper.h>
 #include <mitkIOUtil.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

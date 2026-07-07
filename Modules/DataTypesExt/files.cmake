@@ -1,5 +1,3 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
-
 set(CPP_FILES
   mitkAffineBaseDataInteractor3D.cpp
   mitkAffineImageCropperInteractor.cpp
@@ -25,8 +23,6 @@ set(CPP_FILES
   mitkMultiStepper.cpp
   mitkPlane.cpp
   mitkSurfaceDeformationDataInteractor3D.cpp
-  mitkUnstructuredGrid.cpp
-  mitkUnstructuredGridSource.cpp
   mitkVideoSource.cpp
 
   mitkColorConversions.cpp

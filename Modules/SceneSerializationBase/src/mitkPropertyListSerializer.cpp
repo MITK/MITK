@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyListSerializer.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkStandardFileLocations.h"
+#include <mitkPropertyListSerializer.h>
+#include <mitkBasePropertySerializer.h>
+#include <mitkStandardFileLocations.h>
 #include <itksys/SystemTools.hxx>
 #include <tinyxml2.h>
 

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDICOMGDCMImageFrameInfo_h
 #define mitkDICOMGDCMImageFrameInfo_h
 
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
-#include "gdcmScanner.h"
+#include <gdcmScanner.h>
 
 namespace mitk
 {
@@ -40,10 +40,24 @@ namespace mitk
 
       ~DICOMGDCMImageFrameInfo() override;
 
-      DICOMDatasetFinding GetTagValueAsString(const DICOMTag&) const override;
+      /**
+       * \brief Retrieve a tag value as a string from the GDCM scanner results.
+       * \param[in] tag The DICOM tag to query.
+       * \return A DICOMDatasetFinding with the value if found.
+       */
+      DICOMDatasetFinding GetTagValueAsString(const DICOMTag& tag) const override;
 
+      /**
+       * \brief Retrieve tag values as strings for a DICOM tag path from the GDCM scanner.
+       * \param[in] path The tag path to query.
+       * \return A list of findings matching the path.
+       */
       FindingsListType GetTagValueAsString(const DICOMTagPath& path) const override;
 
+      /**
+       * \brief Return the filename of this frame.
+       * \return The absolute filename of this DICOM frame.
+       */
       std::string GetFilenameIfAvailable() const override;
 
     protected:

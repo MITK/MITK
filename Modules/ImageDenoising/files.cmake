@@ -1,12 +1,9 @@
-set(CPP_FILES
-  mitkBilateralFilter.cpp
-)
 set(H_FILES
   itkLocalVariationImageFilter.h
-  itkLocalVariationImageFilter.txx
   itkTotalVariationDenoisingImageFilter.h
-  itkTotalVariationDenoisingImageFilter.txx
   itkTotalVariationSingleIterationImageFilter.h
-  itkTotalVariationSingleIterationImageFilter.txx
-  mitkBilateralFilter.h
+)
+
+set(CPP_FILES
+  mitkBilateralFilter.cpp
 )

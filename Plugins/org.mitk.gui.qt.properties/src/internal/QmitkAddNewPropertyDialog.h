@@ -17,7 +17,12 @@ found in the LICENSE file.
 #include <mitkBaseProperty.h>
 #include <mitkDataNode.h>
 #include <QDialog>
-#include <ui_QmitkAddNewPropertyDialog.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkAddNewPropertyDialog;
+}
 
 class QmitkAddNewPropertyDialog : public QDialog
 {
@@ -37,7 +42,7 @@ private:
   mitk::BaseProperty::Pointer CreateProperty() const;
   void Initialize();
 
-  Ui::QmitkAddNewPropertyDialog m_Controls;
+  std::unique_ptr<Ui::QmitkAddNewPropertyDialog> m_Controls;
   mitk::DataNode::Pointer m_DataNode;
   mitk::BaseData::Pointer m_BaseData;
   mitk::BaseRenderer::Pointer m_Renderer;

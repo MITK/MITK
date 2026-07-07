@@ -1,19 +1,13 @@
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/mitkDataStorageService.h
 )
 
 set(SRC_CPP_FILES
-  mitkIDataStorageService.cpp
 )
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  mitkDataStorageReference.cpp
-  mitkDataStorageService.cpp
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

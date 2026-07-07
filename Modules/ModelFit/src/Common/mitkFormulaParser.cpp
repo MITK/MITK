@@ -10,13 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+// Suppress false positive -Wmaybe-uninitialized triggered inside Boost Spirit
+// templates when compiled with GCC 15 (Ubuntu 26.04). The variable is in fact
+// initialized along all execution paths the parser can take.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
 #include <boost/math/constants/constants.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix.hpp>
 #include <boost/version.hpp>
 
-#include "mitkFormulaParser.h"
-#include "mitkFresnel.h"
+#include <mitkFormulaParser.h>
+#include <mitkFresnel.h>
 
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;

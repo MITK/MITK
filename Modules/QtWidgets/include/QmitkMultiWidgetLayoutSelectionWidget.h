@@ -13,14 +13,15 @@ found in the LICENSE file.
 #ifndef QmitkMultiWidgetLayoutSelectionWidget_h
 #define QmitkMultiWidgetLayoutSelectionWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 #include <QmitkAutomatedLayoutWidget.h>
 
 #include <nlohmann/json.hpp>
 
 // qt
-#include "QWidget"
+#include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -28,9 +29,10 @@ namespace Ui
 }
 
 /**
-* @brief
+* \brief Widget that allows the user to select and apply a layout for a multi widget.
 *
-*
+* Provides a table to define custom row/column layouts, buttons for data-based
+* layout selection, and functionality to save and load layouts to/from JSON files.
 */
 class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidget
 {
@@ -39,6 +41,8 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidge
 public:
 
   QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = nullptr);
+  ~QmitkMultiWidgetLayoutSelectionWidget() override;
+
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
 Q_SIGNALS:
@@ -65,7 +69,7 @@ private:
   void Init();
 
 
-  Ui::QmitkMultiWidgetLayoutSelectionWidget* ui;
+  std::unique_ptr<Ui::QmitkMultiWidgetLayoutSelectionWidget> ui;
   std::map<int, nlohmann::json> m_PresetMap;
   QmitkAutomatedLayoutWidget* m_AutomatedDataLayoutWidget;
 

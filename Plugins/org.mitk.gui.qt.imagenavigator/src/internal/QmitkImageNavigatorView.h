@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <berryISizeProvider.h>
+#include <memory>
 
 class QmitkSliceNavigationWidget;
 class QmitkStepperAdapter;
@@ -81,7 +82,7 @@ private:
   int GetClosestAxisIndex(const mitk::Vector3D& normal);
   void SetVisibilityOfTimeSlider(size_t timeSteps);
 
-  Ui::QmitkImageNavigatorView* m_Ui;
+  std::unique_ptr<Ui::QmitkImageNavigatorView> m_Ui;
   std::array<AxisUi, 3> m_AxisUi;
 
   QmitkStepperAdapter* m_TimeStepperAdapter;

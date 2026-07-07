@@ -1,0 +1,558 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include <QmitkMultiLabelManager.h>
+
+// mitk
+#include <mitkAutoCropImageFilter.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkIOUtil.h>
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageToSurfaceThreadedFilter.h>
+#include <mitkLabelSetImageConverter.h>
+#include <mitkRenderingManager.h>
+#include <mitkStatusBar.h>
+#include <mitkToolManagerProvider.h>
+#include <mitkSegChangeOperationApplier.h>
+#include <mitkLabelSetImageHelper.h>
+
+// Qmitk
+#include <QmitkStyleManager.h>
+#include <QmitkMultiLabelPresetHelper.h>
+
+// Qt
+#include <QLabel>
+#include <QWidgetAction>
+#include <QColorDialog>
+#include <QDateTime>
+#include <QFileDialog>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QShortcut>
+
+// itk
+#include <itksys/SystemTools.hxx>
+
+#include <ui_QmitkMultiLabelManagerControls.h>
+
+
+QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
+  : QWidget(parent), m_Controls(std::make_unique<Ui::QmitkMultiLabelManagerControls>()), m_AddLabelInstanceShortcut(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
+{
+  m_Controls->setupUi(this);
+
+  m_Controls->labelInspector->SetAllowLabelModification(true);
+
+  m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
+  m_Controls->btnAddLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")));
+  m_Controls->btnAddInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")));
+  m_Controls->btnAddGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_add.svg")));
+  m_Controls->btnRemoveLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")));
+  m_Controls->btnRemoveInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")));
+  m_Controls->btnRemoveGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
+
+  connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector,
+    [inspector = this->m_Controls->labelInspector]() { inspector->AddNewLabel(); });
+  connect(m_Controls->btnRemoveLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabel);
+  connect(m_Controls->btnAddInstance, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
+  connect(m_Controls->btnRemoveInstance, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
+  connect(m_Controls->btnAddGroup, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewGroup);
+  connect(m_Controls->btnRemoveGroup, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::RemoveGroup);
+  connect(m_Controls->btnSavePreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnSavePreset);
+  connect(m_Controls->btnLoadPreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnLoadPreset);
+
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::LabelRenameRequested, this, &QmitkMultiLabelManager::OnLabelRenameRequested);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::OnSelectedLabelChanged);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::ModelUpdated, this, &QmitkMultiLabelManager::OnModelUpdated);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::SegmentationChanged, this, &QmitkMultiLabelManager::OnSegmentationChanged);
+
+  auto* renameLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_R), this);
+  connect(renameLabelShortcut, &QShortcut::activated, this, &QmitkMultiLabelManager::OnRenameLabelShortcutActivated);
+
+  auto* addLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_A), this);
+  connect(addLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector,
+    [inspector = this->m_Controls->labelInspector]() { inspector->AddNewLabel(); });
+
+  m_AddLabelInstanceShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), this);
+  connect(m_AddLabelInstanceShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
+
+  auto* deleteLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_D), this);
+  connect(deleteLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
+
+  this->UpdateControls();
+}
+
+QmitkMultiLabelManager::~QmitkMultiLabelManager()
+{
+  this->SetMultiLabelSegmentation(nullptr);
+}
+
+QmitkMultiLabelManager::LabelValueVectorType QmitkMultiLabelManager::GetSelectedLabels() const
+{
+  return m_Controls->labelInspector->GetSelectedLabels();
+}
+
+
+void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
+{
+  auto selectedLabels = this->GetSelectedLabels();
+
+  for (auto labelValue : selectedLabels)
+  {
+    auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
+    if (currentLabel.IsNull())
+      continue;
+
+    mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(this->GetMultiLabelSegmentation(), { labelValue });
+
+    bool canceled = false;
+    emit LabelRenameRequested(currentLabel, true, canceled);
+
+    if (!canceled)
+    {
+      undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color of \""+mitk::LabelSetImageHelper::CreateDisplayLabelName(this->GetMultiLabelSegmentation(), currentLabel)+"\"");
+    }
+  }
+
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
+}
+
+void QmitkMultiLabelManager::OnSelectedLabelChanged(const LabelValueVectorType& labels)
+{
+  this->UpdateControls();
+  if (labels.empty() || labels.size() > 1) return;
+
+  emit CurrentSelectionChanged(labels);
+}
+
+QStringList &QmitkMultiLabelManager::GetLabelStringList()
+{
+  return m_LabelStringList;
+}
+
+void QmitkMultiLabelManager::SetDefaultLabelNaming(bool defaultLabelNaming)
+{
+  this->m_Controls->labelInspector->SetDefaultLabelNaming(defaultLabelNaming);
+}
+
+void QmitkMultiLabelManager::setEnabled(bool enabled)
+{
+  QWidget::setEnabled(enabled);
+  UpdateControls();
+}
+
+void QmitkMultiLabelManager::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
+{
+  this->m_Controls->labelInspector->SetSelectedLabels(selectedLabels);
+  UpdateControls();
+}
+
+void QmitkMultiLabelManager::SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel)
+{
+  this->m_Controls->labelInspector->SetSelectedLabel(selectedLabel);
+  UpdateControls();
+}
+
+void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation)
+{
+  this->m_Controls->labelInspector->SetMultiLabelSegmentation(segmentation);
+
+  //Update of controls and observers is done in OnSegmentationChanged()
+  // which is triggered by the inspector when setting the segmentation or node 
+}
+
+mitk::MultiLabelSegmentation* QmitkMultiLabelManager::GetMultiLabelSegmentation() const
+{
+  return this->m_Controls->labelInspector->GetMultiLabelSegmentation();
+}
+
+void QmitkMultiLabelManager::SetMultiLabelNode(mitk::DataNode* node)
+{
+  this->m_Controls->labelInspector->SetMultiLabelNode(node);
+}
+
+mitk::DataNode* QmitkMultiLabelManager::GetMultiLabelNode() const
+{
+  return this->m_Controls->labelInspector->GetMultiLabelNode();
+}
+
+QmitkMultiLabelInspector* QmitkMultiLabelManager::GetMultiLabelInspector() const
+{
+  return this->m_Controls->labelInspector;
+}
+
+void QmitkMultiLabelManager::SetDataStorage(mitk::DataStorage *storage)
+{
+  m_DataStorage = storage;
+}
+
+const mitk::LabelSuggestionHelper* QmitkMultiLabelManager::GetLabelSuggestionHelper() const
+{
+  return m_SuggestionHelper;
+}
+
+void QmitkMultiLabelManager::SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper)
+{
+  if (suggestionHelper != m_SuggestionHelper)
+  {
+    m_SuggestionHelper = suggestionHelper;
+    m_Controls->labelInspector->SetLabelSuggestionHelper(suggestionHelper);
+
+    auto updateWidgets = [this](const itk::EventObject&) { this->UpdateControls(); };
+
+    m_SuggestionObserver.Reset(suggestionHelper, itk::ModifiedEvent(), updateWidgets);
+    this->UpdateControls();
+  }
+}
+
+void QmitkMultiLabelManager::UpdateControls()
+{
+  auto segmentation = this->GetMultiLabelSegmentation();
+  bool hasWorkingData = segmentation != nullptr;
+
+  auto labels = this->m_Controls->labelInspector->GetSelectedLabels();
+  bool hasMultipleInstances = this->m_Controls->labelInspector->GetLabelInstancesOfSelectedFirstLabel().size() > 1;
+  bool instanceAllowed = true;
+  if (hasWorkingData && labels.size()==1 && m_SuggestionHelper.IsNotNull())
+  {
+    auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    instanceAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(segmentation, segmentation->GetLabel(labels.front())->GetName());
+  }
+
+  m_Controls->btnAddGroup->setEnabled(hasWorkingData);
+  m_Controls->btnAddLabel->setEnabled(hasWorkingData);
+  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);
+  if (nullptr != m_AddLabelInstanceShortcut)
+    m_AddLabelInstanceShortcut->setEnabled(hasWorkingData && labels.size() == 1 && instanceAllowed);
+
+  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
+  m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
+  m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
+
+  m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
+  m_Controls->btnSavePreset->setEnabled(hasWorkingData);
+
+  if (!hasWorkingData)
+    return;
+}
+
+void QmitkMultiLabelManager::OnCreateCroppedMask(bool)
+{
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
+  mitk::Image::Pointer maskImage;
+  auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
+  try
+  {
+    this->WaitCursorOn();
+
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+
+    auto pixelValue = currentLabel->GetValue();
+
+    mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
+    cropFilter->SetInput(mitk::CreateLabelMask(this->GetMultiLabelSegmentation(),pixelValue));
+    cropFilter->SetBackgroundValue(0);
+    cropFilter->SetMarginFactor(1.15);
+    cropFilter->Update();
+
+    maskImage = cropFilter->GetOutput();
+
+    this->WaitCursorOff();
+  }
+  catch (mitk::Exception &e)
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
+  }
+
+  if (maskImage.IsNull())
+  {
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
+  }
+
+  mitk::DataNode::Pointer maskNode = mitk::DataNode::New();
+  std::string name = currentLabel->GetName();
+  name += "-mask";
+  maskNode->SetName(name);
+  maskNode->SetData(maskImage);
+  maskNode->SetBoolProperty("binary", true);
+  maskNode->SetBoolProperty("outline binary", true);
+  maskNode->SetBoolProperty("outline binary shadow", true);
+  maskNode->SetFloatProperty("outline width", 2.0);
+  maskNode->SetColor(currentLabel->GetColor());
+  maskNode->SetOpacity(1.0);
+
+  m_DataStorage->Add(maskNode, this->GetMultiLabelNode());
+}
+
+void QmitkMultiLabelManager::OnCreateMask(bool /*triggered*/)
+{
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
+  auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
+  mitk::Image::Pointer maskImage;
+  try
+  {
+    this->WaitCursorOn();
+
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+    auto pixelValue = currentLabel->GetValue();
+
+    maskImage = mitk::CreateLabelMask(GetMultiLabelSegmentation(),pixelValue);
+    this->WaitCursorOff();
+  }
+  catch (mitk::Exception &e)
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
+  }
+
+  if (maskImage.IsNull())
+  {
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
+  }
+
+  mitk::DataNode::Pointer maskNode = mitk::DataNode::New();
+  std::string name = currentLabel->GetName();
+  name += "-mask";
+  maskNode->SetName(name);
+  maskNode->SetData(maskImage);
+  maskNode->SetBoolProperty("binary", true);
+  maskNode->SetBoolProperty("outline binary", true);
+  maskNode->SetBoolProperty("outline binary shadow", true);
+  maskNode->SetFloatProperty("outline width", 2.0);
+  maskNode->SetColor(currentLabel->GetColor());
+  maskNode->SetOpacity(1.0);
+
+  m_DataStorage->Add(maskNode, this->GetMultiLabelNode());
+}
+
+void QmitkMultiLabelManager::OnCreateSmoothedSurface(bool /*triggered*/)
+{
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
+  auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
+
+  try
+  {
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+
+    auto pixelValue = currentLabel->GetValue();
+
+    mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer successCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    successCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer errorCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    errorCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
+
+    mitk::DataNode::Pointer groupNode = this->GetMultiLabelNode();
+    surfaceFilter->SetPointerParameter("Group node", groupNode);
+    surfaceFilter->SetPointerParameter("Input", this->GetMultiLabelSegmentation());
+    surfaceFilter->SetParameter("RequestedLabel", pixelValue);
+    surfaceFilter->SetParameter("Smooth", true);
+    surfaceFilter->SetDataStorage(*m_DataStorage);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
+
+    surfaceFilter->StartAlgorithm();
+  }
+  catch (mitk::Exception &e)
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this,
+                             "Create Surface",
+                             "Could not create a surface mesh out of the selected label. See error log for details.\n");
+  }
+}
+
+void QmitkMultiLabelManager::OnCreateDetailedSurface(bool /*triggered*/)
+{
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
+  auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
+
+  try
+  {
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+
+    auto pixelValue = currentLabel->GetValue();
+
+    mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer successCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    successCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer errorCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    errorCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
+
+    mitk::DataNode::Pointer groupNode = this->GetMultiLabelNode();
+    surfaceFilter->SetPointerParameter("Group node", groupNode);
+    surfaceFilter->SetPointerParameter("Input", this->GetMultiLabelSegmentation());
+    surfaceFilter->SetParameter("RequestedLabel", pixelValue);
+    surfaceFilter->SetParameter("Smooth", false);
+    surfaceFilter->SetDataStorage(*m_DataStorage);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
+
+    surfaceFilter->StartAlgorithm();
+  }
+  catch (mitk::Exception &e)
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this,
+                             "Create Surface",
+                             "Could not create a surface mesh out of the selected label. See error log for details.\n");
+  }
+}
+
+void QmitkMultiLabelManager::OnSavePreset()
+{
+  QmitkSaveMultiLabelPreset(this->GetMultiLabelSegmentation());
+}
+
+void QmitkMultiLabelManager::OnLoadPreset()
+{
+  QmitkLoadMultiLabelPreset({ this->GetMultiLabelSegmentation() });
+}
+
+void QmitkMultiLabelManager::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D& position) const
+{
+  emit GoToLabel(label, position);
+}
+
+void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
+{
+  emit LabelRenameRequested(label, rename, canceled);
+}
+
+void QmitkMultiLabelManager::WaitCursorOn()
+{
+  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+}
+
+void QmitkMultiLabelManager::WaitCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkMultiLabelManager::RestoreOverrideCursor()
+{
+  QApplication::restoreOverrideCursor();
+}
+
+void QmitkMultiLabelManager::OnThreadedCalculationDone()
+{
+  mitk::StatusBar::GetInstance()->Clear();
+}
+
+void QmitkMultiLabelManager::AddSegmentationObserver()
+{
+  m_ObservedSegmentation = this->GetMultiLabelSegmentation();
+
+  if (this->GetMultiLabelSegmentation() != nullptr)
+  {
+    auto& widget = *this;
+    m_LabelAddedObserver.Reset(this->GetMultiLabelSegmentation(), mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelEvent(labelEvent->GetLabelValue());
+      });
+    m_LabelModifiedObserver.Reset(this->GetMultiLabelSegmentation(), mitk::LabelModifiedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelEvent(labelEvent->GetLabelValue());
+      });
+    m_LabelRemovedObserver.Reset(this->GetMultiLabelSegmentation(), mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelEvent(labelEvent->GetLabelValue());
+      });
+
+    m_GroupAddedObserver.Reset(this->GetMultiLabelSegmentation(), mitk::GroupAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupEvent(groupEvent->GetGroupID());
+      });
+    m_GroupModifiedObserver.Reset(this->GetMultiLabelSegmentation(), mitk::GroupModifiedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupEvent(groupEvent->GetGroupID());
+      });
+    m_GroupRemovedObserver.Reset(this->GetMultiLabelSegmentation(), mitk::GroupRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupEvent(groupEvent->GetGroupID());
+      });
+  }
+}
+
+void QmitkMultiLabelManager::RemoveSegmentationObserver()
+{
+  m_LabelAddedObserver.Reset();
+  m_LabelModifiedObserver.Reset();
+  m_LabelRemovedObserver.Reset();
+  m_GroupAddedObserver.Reset();
+  m_GroupModifiedObserver.Reset();
+  m_GroupRemovedObserver.Reset();
+
+  m_ObservedSegmentation = nullptr;
+}
+
+void QmitkMultiLabelManager::OnLabelEvent(mitk::MultiLabelSegmentation::LabelValueType /*labelValue*/)
+{
+  if (!m_Controls->labelInspector->GetModelManipulationOngoing())
+    this->UpdateControls();
+}
+
+void QmitkMultiLabelManager::OnGroupEvent(mitk::MultiLabelSegmentation::GroupIndexType /*groupIndex*/)
+{
+  if (!m_Controls->labelInspector->GetModelManipulationOngoing())
+    this->UpdateControls();
+}
+
+void QmitkMultiLabelManager::OnModelUpdated()
+{
+  this->UpdateControls();
+}
+
+void QmitkMultiLabelManager::OnSegmentationChanged()
+{
+    this->RemoveSegmentationObserver();
+    this->AddSegmentationObserver();
+    UpdateControls();
+}

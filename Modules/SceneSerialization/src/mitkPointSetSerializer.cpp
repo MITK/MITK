@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPointSetSerializer.h"
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 MITK_REGISTER_SERIALIZER(PointSetSerializer)
 

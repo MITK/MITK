@@ -21,19 +21,16 @@ found in the LICENSE file.
 #include <mitkGeometryDataWriterService.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
-#include <mitkImageVtkLegacyIO.h>
-#include <mitkImageVtkXmlIO.h>
+#include "mitkImageVtkLegacyIO.h"
+#include "mitkImageVtkXmlIO.h"
 #include <mitkItkImageIO.h>
-#include <mitkMimeTypeProvider.h>
-#include <mitkPointSetReaderService.h>
-#include <mitkPointSetWriterService.h>
-#include <mitkRawImageFileReader.h>
-#include <mitkSurfaceStlIO.h>
-#include <mitkSurfaceVtkLegacyIO.h>
-#include <mitkSurfaceVtkXmlIO.h>
-
-#include "mitkLegacyFileWriterService.h"
-#include <mitkFileWriter.h>
+#include "mitkMimeTypeProvider.h"
+#include "mitkPointSetReaderService.h"
+#include "mitkPointSetWriterService.h"
+#include "mitkRawImageFileReader.h"
+#include "mitkSurfaceStlIO.h"
+#include "mitkSurfaceVtkLegacyIO.h"
+#include "mitkSurfaceVtkXmlIO.h"
 
 #include <itkGDCMImageIO.h>
 #include <itkNiftiImageIO.h>
@@ -87,24 +84,6 @@ found in the LICENSE file.
 
 namespace
 {
-  void HandleMicroServicesMessages(us::MsgType type, const char* msg)
-  {
-    switch (type)
-    {
-    case us::DebugMsg:
-      MITK_DEBUG << msg;
-      break;
-    case us::InfoMsg:
-      MITK_INFO << msg;
-      break;
-    case us::WarningMsg:
-      MITK_WARN << msg;
-      break;
-    case us::ErrorMsg:
-      MITK_ERROR << msg;
-      break;
-    }
-  }
 
   void AddMitkAutoLoadPaths(const std::string& programPath)
   {
@@ -246,9 +225,6 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
 {
   LimitDefaultNumberOfThreads(16);
 
-  // Handle messages from CppMicroServices
-  us::installMsgHandler(HandleMicroServicesMessages);
-
   this->m_Context = context;
 
   // Add the current application directory to the auto-load paths.
@@ -293,6 +269,10 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_PropertyRelations.reset(new mitk::PropertyRelations);
   context->RegisterService<mitk::IPropertyRelations>(m_PropertyRelations.get());
 
+  m_PropertyTransience.reset(new mitk::PropertyTransience);
+  context->RegisterService<mitk::IPropertyTransience>(m_PropertyTransience.get());
+  m_PropertyTransience->AddTransient<mitk::BaseData>("selected"); // transient UI state, never persisted
+
   m_PreferencesService.reset(new mitk::PreferencesService);
   context->RegisterService<mitk::IPreferencesService>(m_PreferencesService.get());
 
@@ -335,8 +315,6 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
     vtkObjectFactory::RegisterFactory( textureFactory );
     textureFactory->Delete();
     */
-
-  this->RegisterLegacyWriter();
 }
 
 void MitkCoreActivator::Unload(us::ModuleContext *)
@@ -352,11 +330,6 @@ void MitkCoreActivator::Unload(us::ModuleContext *)
   }
 
   for (auto &elem : m_FileIOs)
-  {
-    delete elem;
-  }
-
-  for (auto &elem : m_LegacyWriters)
   {
     delete elem;
   }
@@ -439,26 +412,6 @@ void MitkCoreActivator::RegisterVtkReaderWriter()
 
   m_FileIOs.push_back(new mitk::ImageVtkXmlIO());
   m_FileIOs.push_back(new mitk::ImageVtkLegacyIO());
-}
-
-void MitkCoreActivator::RegisterLegacyWriter()
-{
-  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
-
-  for (auto i = allobjects.begin(); i != allobjects.end(); ++i)
-  {
-    mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter *>(i->GetPointer());
-    if (io)
-    {
-      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Writer";
-      mitk::IFileWriter *writer = new mitk::LegacyFileWriterService(io, description);
-      m_LegacyWriters.push_back(writer);
-    }
-    else
-    {
-      MITK_ERROR << "Error IOWriter override is not of type mitk::FileWriter: " << (*i)->GetNameOfClass() << std::endl;
-    }
-  }
 }
 
 US_EXPORT_MODULE_ACTIVATOR(MitkCoreActivator)

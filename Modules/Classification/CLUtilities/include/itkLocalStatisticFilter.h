@@ -13,10 +13,16 @@ found in the LICENSE file.
 #ifndef itkLocalStatisticFilter_h
 #define itkLocalStatisticFilter_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
+  /**
+   * \brief Computes local statistics (mean, variance, etc.) for each voxel in a given neighbourhood.
+   *
+   * \tparam TInputImageType The input image type.
+   * \tparam TOuputImageType The output image type.
+   */
   template<typename TInputImageType, typename TOuputImageType >
   class LocalStatisticFilter : public ImageToImageFilter< TInputImageType, TOuputImageType>
   {
@@ -57,7 +63,7 @@ namespace itk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkLocalStatisticFilter.hxx"
+#include <itkLocalStatisticFilter.tpp>
 #endif
 
 #endif // itkLocalStatisticFilter_h

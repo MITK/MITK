@@ -26,18 +26,23 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief MITK vector type extending itk::Vector with additional constructors and conversions.
+   *
+   * Provides constructors from vnl_vector, vnl_vector_fixed, and variadic arguments,
+   * as well as conversion operators and utility methods for copying to/from array types.
+   *
+   * \tparam TCoordRep Coordinate representation type (e.g. double, float).
+   * \tparam NVectorDimension Number of dimensions (default: 3).
+   */
   template <class TCoordRep, unsigned int NVectorDimension = 3>
   class Vector : public itk::Vector<TCoordRep, NVectorDimension>
   {
   public:
-    /**
-     * @brief Default constructor has nothing to do.
-     */
-    explicit Vector<TCoordRep, NVectorDimension>() : itk::Vector<TCoordRep, NVectorDimension>() {}
-    /**
-     * @brief Copy constructor.
-     */
-    explicit Vector<TCoordRep, NVectorDimension>(const mitk::Vector<TCoordRep, NVectorDimension> &r)
+    /** \brief Default constructor. */
+    explicit Vector() : itk::Vector<TCoordRep, NVectorDimension>() {}
+
+    /** \brief Copy constructor. */
+    explicit Vector(const mitk::Vector<TCoordRep, NVectorDimension> &r)
       : itk::Vector<TCoordRep, NVectorDimension>(r)
     {
     }
@@ -50,19 +55,19 @@ namespace mitk
     }
 
     /**
-     * @brief Constructor to convert from itk::Vector to mitk::Vector.
+     * \brief Constructor to convert from itk::Vector to mitk::Vector.
      */
-    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TCoordRep, NVectorDimension> &r)
+    Vector(const itk::Vector<TCoordRep, NVectorDimension> &r)
       : itk::Vector<TCoordRep, NVectorDimension>(r)
     {
     }
 
     /**
-     * @brief Constructor to convert an array to mitk::Vector
-     * @param r the array.
-     * @attention must have NVectorDimension valid arguments!
+     * \brief Constructor to convert an array to mitk::Vector.
+     * \param[in] r The array.
+     * \attention Must have NVectorDimension valid arguments!
      */
-    Vector<TCoordRep, NVectorDimension>(const TCoordRep r[NVectorDimension])
+    Vector(const TCoordRep r[NVectorDimension])
       : itk::Vector<TCoordRep, NVectorDimension>(r)
     {
     }
@@ -70,12 +75,12 @@ namespace mitk
     /**
      * Constructor to initialize entire vector to one value.
      */
-    Vector<TCoordRep, NVectorDimension>(const TCoordRep &v) : itk::Vector<TCoordRep, NVectorDimension>(v) {}
+    Vector(const TCoordRep &v) : itk::Vector<TCoordRep, NVectorDimension>(v) {}
     /**
-     * @brief Constructor for vnl_vectors.
-     * @throws mitk::Exception if vnl_vector.size() != NVectorDimension.
+     * \brief Constructor for vnl_vectors.
+     * \throws mitk::Exception If vnl_vector.size() != NVectorDimension.
      */
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector<TCoordRep> &vnlVector)
+    Vector(const vnl_vector<TCoordRep> &vnlVector)
       : itk::Vector<TCoordRep, NVectorDimension>()
     {
       if (vnlVector.size() != NVectorDimension)
@@ -89,9 +94,9 @@ namespace mitk
     }
 
     /**
-     * @brief Constructor for vnl_vector_fixed.
+     * \brief Constructor for vnl_vector_fixed.
      */
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TCoordRep, NVectorDimension> &vnlVectorFixed)
+    Vector(const vnl_vector_fixed<TCoordRep, NVectorDimension> &vnlVectorFixed)
       : itk::Vector<TCoordRep, NVectorDimension>()
     {
       for (unsigned int var = 0; var < NVectorDimension; ++var)
@@ -109,10 +114,11 @@ namespace mitk
     }
 
     /**
-     * Copies the elements from array array to this.
+     * \brief Copy elements from an array into this vector.
+     *
      * Note that this method will assign doubles to floats without complaining!
      *
-     * @param array the array whose values shall be copied. Must overload [] operator.
+     * \param[in] array The array whose values shall be copied. Must overload [] operator.
      */
     template <typename ArrayType>
     void FillVector(const ArrayType &array)
@@ -123,9 +129,9 @@ namespace mitk
     }
 
     /**
-     * Copies the values stored in this vector into the array array.d
+     * \brief Copy the values stored in this vector into an array.
      *
-     * @param array the array which should store the values of this.
+     * \param[out] array The array which should store the values of this vector.
      */
     template <typename ArrayType>
     void ToArray(ArrayType array) const
@@ -134,13 +140,15 @@ namespace mitk
     }
 
     /**
-     * @brief User defined conversion of mitk::Vector to vnl_vector.
-     * Note: the conversion to mitk::Vector to vnl_vector_fixed has not been implemented since this
+     * \brief User-defined conversion of mitk::Vector to vnl_vector.
+     *
+     * Note: the conversion to vnl_vector_fixed has not been implemented since this
      * would collide with the conversion vnl_vector to vnl_vector_fixed provided by vnl.
      */
     operator vnl_vector<TCoordRep>() const { return this->GetVnlVector(); }
   }; // end mitk::Vector
 
+  /** \brief Serialize a mitk::Vector to a JSON array. */
   template <class TCoordRep, unsigned int NVectorDimension>
   void to_json(nlohmann::json &j, const Vector<TCoordRep, NVectorDimension> &v)
   {
@@ -150,6 +158,7 @@ namespace mitk
       j.push_back(v[i]);
   }
 
+  /** \brief Deserialize a mitk::Vector from a JSON array. */
   template <class TCoordRep, unsigned int NVectorDimension>
   void from_json(const nlohmann::json &j, Vector<TCoordRep, NVectorDimension> &v)
   {
@@ -169,13 +178,14 @@ namespace mitk
   // The equal methods to compare vectors for equality are below:
 
   /**
-   * @ingroup MITKTestingAPI
+   * \ingroup MITKTestingAPI
+   * \brief Compare two itk::Vector instances for equality within a tolerance.
    *
-   * @param vector1 Vector to compare.
-   * @param vector2 Vector to compare.
-   * @param eps Tolerance for floating point comparison.
-   * @param verbose Flag indicating detailed console output.
-   * @return True if vectors are equal.
+   * \param[in] vector1 Vector to compare.
+   * \param[in] vector2 Vector to compare.
+   * \param[in] eps Tolerance for floating point comparison.
+   * \param[in] verbose Flag indicating detailed console output.
+   * \return True if vectors are equal within the given tolerance.
    */
   template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const itk::Vector<TCoordRep, NPointDimension> &vector1,
@@ -200,13 +210,14 @@ namespace mitk
   }
 
   /**
-   * @ingroup MITKTestingAPI
+   * \ingroup MITKTestingAPI
+   * \brief Compare two VnlVector instances for equality within a tolerance.
    *
-   * @param vector1 Vector to compare.
-   * @param vector2 Vector to compare.
-   * @param eps Tolerance for floating point comparison.
-   * @param verbose Flag indicating detailed console output.
-   * @return True if vectors are equal.
+   * \param[in] vector1 Vector to compare.
+   * \param[in] vector2 Vector to compare.
+   * \param[in] eps Tolerance for floating point comparison.
+   * \param[in] verbose Flag indicating detailed console output.
+   * \return True if vectors are equal within the given tolerance.
    */
   inline bool Equal(const mitk::VnlVector &vector1,
                     const mitk::VnlVector &vector2,
@@ -230,13 +241,14 @@ namespace mitk
   }
 
   /**
-   * @ingroup MITKTestingAPI
+   * \ingroup MITKTestingAPI
+   * \brief Compare two vnl_vector_fixed instances for equality within a tolerance.
    *
-   * @param vector1 Vector to compare.
-   * @param vector2 Vector to compare.
-   * @param eps Tolerance for floating point comparison.
-   * @param verbose Flag indicating detailed console output.
-   * @return True if vectors are equal.
+   * \param[in] vector1 Vector to compare.
+   * \param[in] vector2 Vector to compare.
+   * \param[in] eps Tolerance for floating point comparison.
+   * \param[in] verbose Flag indicating detailed console output.
+   * \return True if vectors are equal within the given tolerance.
    */
   template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> &vector1,

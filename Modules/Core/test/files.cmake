@@ -37,6 +37,7 @@ set(MODULE_TESTS
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkImageCastTest.cpp
   mitkImageDataItemTest.cpp
+  mitkImageDescriptorTest.cpp
   mitkImageGeneratorTest.cpp
   mitkIOUtilTest.cpp
   mitkITKEventObserverGuardTest.cpp
@@ -62,6 +63,7 @@ set(MODULE_TESTS
   mitkPropertyPersistenceInfoTest.cpp
   mitkPropertyRelationRuleBaseTest.cpp
   mitkPropertyRelationsTest.cpp
+  mitkPropertyTransienceTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkSurfaceTest.cpp
@@ -78,6 +80,7 @@ set(MODULE_TESTS
   mitkRenderingManagerTest.cpp
   mitkCompositePixelValueToStringTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
+  vtkMitkLevelWindowFilterTest.cpp
   mitkNodePredicateDataPropertyTest.cpp
   mitkNodePredicateFunctionTest.cpp
   mitkVectorTest.cpp
@@ -123,6 +126,10 @@ set(MODULE_TESTS
   mitkTemporalJoinImagesFilterTest.cpp
   mitkPreferencesTest.cpp
   mitkIOVolumeSplitReasonTest.cpp
+  mitkDataStorageReferenceTest.cpp
+  mitkPropertyJsonSerializationTest.cpp
+  mitkDataStorageServiceTest.cpp
+  mitkStringUtilTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

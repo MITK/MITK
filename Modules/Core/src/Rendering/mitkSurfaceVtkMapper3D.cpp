@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceVtkMapper3D.h"
+#include <mitkSurfaceVtkMapper3D.h>
 #include <mitkClippingProperty.h>
 #include <mitkColorProperty.h>
 #include <mitkCoreServices.h>

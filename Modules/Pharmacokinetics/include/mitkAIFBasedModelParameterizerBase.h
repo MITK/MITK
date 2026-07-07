@@ -12,14 +12,21 @@ found in the LICENSE file.
 #ifndef mitkAIFBasedModelParameterizerBase_h
 #define mitkAIFBasedModelParameterizerBase_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkAIFParametrizerHelper.h"
-#include "mitkAIFBasedModelBase.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkAIFParametrizerHelper.h>
+#include <mitkAIFBasedModelBase.h>
 
 namespace mitk
 {
-  /** Base class for model parameterizers for Models using an Aterial Input Function
-  */
+  /** \class AIFBasedModelParameterizerBase
+   * \brief Base class for parameterizers of pharmacokinetic models that use an Arterial Input Function (AIF).
+   *
+   * This template class stores the AIF concentration values and corresponding time grid, and
+   * provides them as global static parameters when configuring model instances for fitting.
+   *
+   * \tparam TAIFBasedModel The concrete AIF-based model type (must derive from AIFBasedModelBase).
+   * \sa AIFBasedModelBase, ConcreteModelParameterizerBase
+   */
   template <class TAIFBasedModel>
   class MITKPHARMACOKINETICS_EXPORT AIFBasedModelParameterizerBase : public ConcreteModelParameterizerBase
     <TAIFBasedModel>
@@ -45,16 +52,26 @@ namespace mitk
 
     typedef typename Superclass::IndexType IndexType;
 
+    /** \brief Sets the Arterial Input Function concentration values.
+     *  \param[in] _arg AIF values as an itk::Array of double. */
     itkSetMacro(AIF, mitk::AIFBasedModelBase::AterialInputFunctionType);
+    /** \brief Returns the currently set AIF concentration values.
+     *  \return Const reference to the AIF array. */
     itkGetConstReferenceMacro(AIF, mitk::AIFBasedModelBase::AterialInputFunctionType);
 
+    /** \brief Sets the time grid corresponding to the AIF values.
+     *  \param[in] _arg Time grid as an itk::Array of double (in seconds). */
     itkSetMacro(AIFTimeGrid, mitk::ModelBase::TimeGridType);
+    /** \brief Returns the currently set AIF time grid.
+     *  \return Const reference to the AIF time grid array. */
     itkGetConstReferenceMacro(AIFTimeGrid, mitk::ModelBase::TimeGridType);
 
 
-    /** Returns the global static parameters for the model.
-    * @remark this default implementation assumes only AIF and its timegrid as static parameters.
-    * Reimplement in derived classes to change this behavior.*/
+    /** \brief Returns the global static parameters for the model.
+     *
+     * This default implementation provides only the AIF and its time grid as static parameters.
+     * Reimplement in derived classes to add additional static parameters.
+     * \return Map of static parameter names to their value vectors. */
     StaticParameterMapType GetGlobalStaticParameters() const override
     {
       StaticParameterMapType result;

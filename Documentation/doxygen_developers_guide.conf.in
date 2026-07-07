@@ -279,11 +279,12 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\"" \
-                         "minimumCMakeVersion=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION@" \
+                         "minimumCMakeVersionWindows=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS@" \
+                         "minimumCMakeVersionOther=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER@" \
                          "minimumQt6Version=@MITK_QT6_MINIMUM_VERSION@" \
                          "requiredOpenSSLVersion=@MITK_REQUIRED_OPENSSL_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
+                         "imageMacroEx{4}=\image html \1 \2 width=\4 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\mainpage" \
                          "usersguidemainpage{1}=\page \1" \
                          "nondependentPluginLink{3}= \ref \1 \"\3\""
@@ -737,7 +738,7 @@ GENERATE_BUGLIST       = @MITK_DOXYGEN_GENERATE_BUGLIST@
 # the documentation.
 # The default value is: YES.
 
-GENERATE_DEPRECATEDLIST= @MITK_DOXYGEN_GENERATE_DEPRECATEDLIST@
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional documentation
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
@@ -1389,14 +1390,6 @@ HTML_COLORSTYLE_SAT    = 100
 
 HTML_COLORSTYLE_GAMMA  = 80
 
-# If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML
-# page will contain the date and time when the page was generated. Setting this
-# to YES can help to show when doxygen was last run and thus if the
-# documentation is up to date.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_HTML is set to YES.
-
-HTML_TIMESTAMP         = YES
 
 # If the HTML_DYNAMIC_MENUS tag is set to YES then the generated HTML
 # documentation will contain a main index with vertical navigation menus that
@@ -2058,14 +2051,6 @@ LATEX_HIDE_INDICES     = YES
 
 LATEX_BIB_STYLE        = plain
 
-# If the LATEX_TIMESTAMP tag is set to YES then the footer of each generated
-# page will contain the date and time when the page was generated. Setting this
-# to NO can help when comparing the output of multiple runs.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_LATEX is set to YES.
-
-LATEX_TIMESTAMP        = NO
-
 # The LATEX_EMOJI_DIRECTORY tag is used to specify the (relative or absolute)
 # path from which the emoji images will be read. If a relative path is entered,
 # it will be relative to the LATEX_OUTPUT directory. If left blank the
@@ -2710,15 +2695,6 @@ DOT_GRAPH_MAX_NODES    = 50
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 MAX_DOT_GRAPH_DEPTH    = 0
-
-# Set the DOT_MULTI_TARGETS tag to YES to allow dot to generate multiple output
-# files in one run (i.e. multiple -o and -T options on the command line). This
-# makes dot run faster, but since only newer versions of dot (>1.8.10) support
-# this, this feature is disabled by default.
-# The default value is: NO.
-# This tag requires that the tag HAVE_DOT is set to YES.
-
-DOT_MULTI_TARGETS      = NO
 
 # If the GENERATE_LEGEND tag is set to YES doxygen will generate a legend page
 # explaining the meaning of the various boxes and arrows in the dot generated

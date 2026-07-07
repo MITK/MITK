@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSmartPointerProperty.h"
+#include <mitkSmartPointerProperty.h>
 
 mitk::SmartPointerProperty::ReferenceCountMapType mitk::SmartPointerProperty::m_ReferenceCount;
 mitk::SmartPointerProperty::ReferencesUIDMapType mitk::SmartPointerProperty::m_ReferencesUID;
@@ -138,9 +138,3 @@ bool mitk::SmartPointerProperty::FromJSON(const nlohmann::json&)
   return false;
 }
 
-itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

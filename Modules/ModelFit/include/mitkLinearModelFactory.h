@@ -15,18 +15,27 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkLinearModel.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkLinearModel.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class LinearModelFactory
+   * \brief Factory class for creating LinearModel instances and their parameterizers.
+   *
+   * Provides default initial parameterization and creates parameterizers
+   * from model fit info for the LinearModel.
+   *
+   * \sa LinearModel, LinearModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT LinearModelFactory : public ConcreteModelFactoryBase<LinearModel>
   {
   public:
-    mitkClassMacroItkParent(LinearModelFactory, ConcreteModelFactoryBase<LinearModel>);
+    mitkClassMacro(LinearModelFactory, ConcreteModelFactoryBase<LinearModel>);
     itkFactorylessNewMacro(Self);
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)

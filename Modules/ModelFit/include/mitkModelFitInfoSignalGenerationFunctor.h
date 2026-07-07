@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkModelFitInfoSignalGenerationFunctor_h
 #define mitkModelFitInfoSignalGenerationFunctor_h
 
-#include "mitkModelBasedValueFunctorBase.h"
-#include "mitkModelParameterizerBase.h"
-#include "mitkModelFitInfo.h"
+#include <mitkModelBasedValueFunctorBase.h>
+#include <mitkModelParameterizerBase.h>
+#include <mitkModelFitInfo.h>
 
-#include "mitkModelFitParameterValueExtraction.h"
+#include <mitkModelFitParameterValueExtraction.h>
 
 #include <MitkModelFitExports.h>
 

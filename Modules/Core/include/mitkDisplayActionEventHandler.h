@@ -16,101 +16,104 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 // mitk core
-#include "mitkDisplayActionEventBroadcast.h"
-#include "mitkDisplayActionEvents.h"
-#include "mitkStdFunctionCommand.h"
+#include <mitkDisplayActionEventBroadcast.h>
+#include <mitkDisplayActionEvents.h>
+#include <mitkStdFunctionCommand.h>
 
 namespace mitk
 {
   /**
-  * @brief This class simplifies the process of adding an itkEventObject-itkCommand pair as an observer of a
-  *        DisplayActionEventBroadcast instance.
-  *        The 'SetObservableBroadcast'-function can be used to define the broadcast instance that should be observed.
-  *        The 'ConnectDisplayActionEvent'-function can be used to add a an observer to the broadcast.
-  *        Such an observer consists of a DisplayActionEvent (an itkEventObject) and a StdFunctionCommand (an itkCommand).
-  *        The StdFunctionCommand is created inside the function by the given two std::functions.
-  */
+   * \brief Simplifies connecting display action event observers to a DisplayActionEventBroadcast.
+   *
+   * Use SetObservableBroadcast() to define which broadcast instance to observe,
+   * then ConnectDisplayActionEvent() to register event-command pairs. Each
+   * observer consists of a DisplayActionEvent (itkEventObject) and a
+   * StdFunctionCommand (itkCommand) that is created internally from the
+   * supplied std::function objects.
+   *
+   * \ingroup Interaction
+   * \sa DisplayActionEventBroadcast DisplayActionEvents StdFunctionCommand
+   */
   class MITKCORE_EXPORT DisplayActionEventHandler
   {
   public:
 
+    /** \brief Tag type used to identify registered observers. */
     using OberserverTagType = unsigned long;
 
+    /** \brief Destructor. Removes all registered observers. */
     virtual ~DisplayActionEventHandler();
 
     /**
-    * @brief Sets the display action event broadcast class that should be observed.
-    *     This class receives events from the given broadcast class and triggers the "corresponding functions" to perform the custom actions.
-    *     "Corresponding functions" are std::functions inside commands that observe the specific display action event.
-    *
-    * @post If the same broadcast class was already set, nothing changed
-    * @post If a different broadcast class was already set, the observing commands are removed as observer.
-    *       Attention: All registered commands are removed from the list of observer.
-    *
-    * @param  observableBroadcast   The 'DisplayActionEventBroadcast'-class that should be observed.
-    */
+     * \brief Set the DisplayActionEventBroadcast instance to observe.
+     *
+     * This class receives events from the given broadcast and triggers
+     * the corresponding action functions.
+     *
+     * \post If the same broadcast was already set, nothing changes.
+     * \post If a different broadcast was already set, all previously
+     *       registered observers are removed.
+     *
+     * \param observableBroadcast The broadcast instance to observe.
+     */
     void SetObservableBroadcast(DisplayActionEventBroadcast* observableBroadcast);
 
     /**
-    * @brief Uses the given std::functions to customize a command:
-    *     The display action event is used to define on which event the command should react.
-    *     The display action event broadcast class member is then observed by the newly created command.
-    *     A tag for the command is returned and stored in a member vector.
-    *
-    * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
-    * @throw  mitk::Exception, if the class' observable is null.
-    *
-    * @param displayActionEvent   The 'DisplayActionEvent' on which the command should react.
-    * @param actionFunction       A custom std::Function that will be executed if the command receives the correct event.
-    * @param filterFunction       A custom std::Function that will be checked before the execution of the action function.
-    *                           If the filter function is not specified, a default filter always returning 'true' will be used.
-    *
-    * @return   A tag to identify, receive or remove the newly created 'StdFunctionCommand'.
-    */
+     * \brief Register an observer for a specific display action event.
+     *
+     * Creates a StdFunctionCommand from the given action and filter functions,
+     * adds it as an observer to the broadcast, and stores its tag.
+     *
+     * \pre The observable broadcast must have been set via SetObservableBroadcast().
+     * \throw mitk::Exception if the observable is null.
+     *
+     * \param displayActionEvent The event type to observe.
+     * \param actionFunction     The function to execute when the event occurs.
+     * \param filterFunction     Optional filter checked before execution (defaults to always true).
+     * \return A tag identifying the newly created observer.
+     */
     OberserverTagType ConnectDisplayActionEvent(const DisplayActionEvent& displayActionEvent,
       const StdFunctionCommand::ActionFunction& actionFunction,
       const StdFunctionCommand::FilterFunction& filterFunction = [](const itk::EventObject&) { return true; });
 
     /**
-    * @brief Uses the given observer tag to remove the corresponding custom command as an observer of the observed
-    *     display action event broadcast class.
-    *     If the given tag is not contained in the member vector of observer tags, nothing happens.
-    *
-    * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
-    * @throw  mitk::Exception, if the class' observable is null.
-    *
-    * @param observerTag   The tag to identify the 'StdFunctionCommand' observer.
-    */
+     * \brief Remove an observer identified by its tag.
+     *
+     * If the tag is not found in the internal list, nothing happens.
+     *
+     * \pre The observable broadcast must have been set.
+     * \throw mitk::Exception if the observable is null.
+     *
+     * \param observerTag The tag identifying the observer to remove.
+     */
     void DisconnectObserver(OberserverTagType observerTag);
 
+    /**
+     * \brief Get all currently registered observer tags.
+     * \return A const reference to the vector of observer tags.
+     */
     const std::vector<OberserverTagType>& GetAllObserverTags() { return m_ObserverTags; }
 
     /**
-    * @brief This function can be used by sub-classes to initialize a set of pre-defined
-    *        DisplayActionEventFunctions and connect them to the observable broadcast member.
-    *        In order to customize a sub-class behavior this function calls the virtual function
-    *        InitActionsImpl.
-    *        All currently connected display action events will be removed as observer from the broadcast instance.
-    *
-    * @pre    The class' observable (the display action event broadcast) has to be set.
-    *
-    * @param prefixFilter The prefix of associated renderer names. Can be used to filter events, such that actions will only
-    *   react to events from / send changes to renderers whose name begins with this prefix.
-    *
-    * @throw  mitk::Exception, if the class' observable is null.
-    */
+     * \brief Initialize pre-defined display actions and connect them to the broadcast.
+     *
+     * Removes all currently connected observers, then calls InitActionsImpl()
+     * to let sub-classes define their specific set of actions.
+     *
+     * \pre The observable broadcast must have been set.
+     * \throw mitk::Exception if the observable is null.
+     *
+     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     */
     void InitActions(std::string prefixFilter = "");
 
   protected:
 
     /**
-    * @brief Sub-classes need to implement this function to define a customized behavior
-    *        for default action pre-definition.
-    *
-    * @param prefixFilter The prefix of associated renderer names. Can be used to filter events, such that actions will only
-    *   react to events from / send changes to renderers whose name begins with this prefix.
-    *
-    */
+     * \brief Override in sub-classes to define default display action connections.
+     *
+     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     */
     virtual void InitActionsImpl(const std::string& prefixFilter = "");
 
     WeakPointer<DisplayActionEventBroadcast> m_ObservableBroadcast;

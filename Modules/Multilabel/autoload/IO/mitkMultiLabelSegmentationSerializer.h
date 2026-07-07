@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelSegmentationSerializer_h
 #define mitkMultiLabelSegmentationSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {
@@ -26,6 +26,7 @@ namespace mitk
     mitkClassMacro(MultiLabelSegmentationSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+    /** \brief Serialize the MultiLabelSegmentation to a temporary file and return the file path. */
     std::string Serialize() override;
 
   protected:

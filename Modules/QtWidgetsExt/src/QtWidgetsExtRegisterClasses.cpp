@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QtWidgetsExtRegisterClasses.h"
-#include "QmitkCallbackFromGUIThread.h"
+#include <QtWidgetsExtRegisterClasses.h>
+#include <QmitkCallbackFromGUIThread.h>
 
 void QtWidgetsExtRegisterClasses()
 {

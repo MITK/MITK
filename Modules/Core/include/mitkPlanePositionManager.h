@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPlanePositionManager_h
 #define mitkPlanePositionManager_h
 
-#include "mitkCommon.h"
-#include "mitkDataStorage.h"
-#include "mitkRestorePlanePositionOperation.h"
+#include <mitkCommon.h>
+#include <mitkDataStorage.h>
+#include <mitkRestorePlanePositionOperation.h>
 
 #include <mitkPlaneGeometry.h>
 #include <mitkServiceInterface.h>
@@ -25,16 +25,19 @@ class MitkCoreActivator;
 namespace mitk
 {
   /**
-      The mitk::PlanePositionManagerService holds and manages a list of certain planepositions.
-      To store a new position you need to specify the first slice of your slicestack and the
-      slicenumber you want to restore in the mitk::PlanePositionManager::AddNewPlanePosition() function.
-
-      To restore a position call mitk::PlanePositionManagerService::GetPlanePosition(ID) where ID is the position
-      in the plane positionlist (returned by AddNewPlanePosition). This will give a mitk::RestorePlanePositionOperation
-      which can be executed by the SliceNavigationController of the slicestack.
-
-      \sa QmitkSegmentationView.cpp
-    */
+   * \brief Service that holds and manages a list of stored plane positions.
+   *
+   * To store a new position, specify the first slice of your slice stack and the
+   * slice number you want to restore via AddNewPlanePosition().
+   *
+   * To restore a position, call GetPlanePosition(ID) where ID is the position
+   * in the plane position list (returned by AddNewPlanePosition()). This returns a
+   * mitk::RestorePlanePositionOperation which can be executed by the
+   * SliceNavigationController of the slice stack.
+   *
+   * \sa RestorePlanePositionOperation
+   * \sa SliceNavigationController
+   */
   class MITKCORE_EXPORT PlanePositionManagerService
   {
   public:
@@ -42,39 +45,41 @@ namespace mitk
     ~PlanePositionManagerService();
 
     /**
-      \brief Adds a new plane position to the list. If this geometry is identical to one of the list nothing will be
-      added
-
-      \a plane THE FIRST! slice of the slice stack
-      \a sliceIndex the slice number of the selected slice
-      \return returns the ID i.e. the position in the positionlist. If the PlaneGeometry which is to be added already
-      exists the existing
-              ID will be returned.
-    */
+     * \brief Add a new plane position to the list.
+     *
+     * If a geometrically identical plane position already exists in the list,
+     * nothing is added and the existing ID is returned.
+     *
+     * \param plane The first slice of the slice stack (its PlaneGeometry).
+     * \param sliceIndex The slice number of the selected slice.
+     * \return The ID (position in the list) of the added or existing entry.
+     */
     unsigned int AddNewPlanePosition(const mitk::PlaneGeometry *plane, unsigned int sliceIndex = 0);
 
     /**
-      \brief Removes the plane at the position \a ID from the list.
-
-      \a ID the plane ID which should be removed, i.e. its position in the list
-      \return true if the plane was removed successfully and false if it is an invalid ID
-    */
+     * \brief Remove the plane position at the given ID from the list.
+     *
+     * \param ID The plane ID to remove (its position in the list).
+     * \return true if the plane was removed successfully, false if ID is invalid.
+     */
     bool RemovePlanePosition(unsigned int ID);
 
-    /// \brief Clears the complete positionlist
+    /** \brief Remove all plane positions from the list. */
     void RemoveAllPlanePositions();
 
     /**
-      \brief Getter for a specific plane position with a given ID
-
-      \a ID the ID of the plane position
-      \return Returns a RestorePlanePositionOperation which can be executed by th SliceNavigationController or nullptr for
-      an
-      invalid ID
-    */
+     * \brief Get a specific plane position by its ID.
+     *
+     * \param ID The ID of the plane position to retrieve.
+     * \return A RestorePlanePositionOperation that can be executed by the
+     *         SliceNavigationController, or nullptr if the ID is invalid.
+     */
     mitk::RestorePlanePositionOperation *GetPlanePosition(unsigned int ID);
 
-    /// \brief Getting the number of all stored planes
+    /**
+     * \brief Get the number of stored plane positions.
+     * \return The total count of plane positions in the list.
+     */
     unsigned int GetNumberOfPlanePositions();
 
   private:

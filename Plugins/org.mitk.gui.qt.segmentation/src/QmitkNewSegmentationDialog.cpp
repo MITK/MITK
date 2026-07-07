@@ -62,7 +62,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(
   Mode mode,
   QWidget* parent)
   : QDialog(parent),
-  m_Ui(new Ui::QmitkNewSegmentationDialog),
+  m_Ui(std::make_unique<Ui::QmitkNewSegmentationDialog>()),
   m_Mode(mode),
   m_EnforceSuggestions(false),
   m_TotalSuggestions(0),
@@ -101,6 +101,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(
       labelColor.GetGreen() * 255,
       labelColor.GetBlue() * 255);
   }
+
+  m_InitialName = m_Ui->nameLineEdit->text();
 
   InitializeDialog();
   SetupConnections();
@@ -243,7 +245,7 @@ void QmitkNewSegmentationDialog::UpdateNameList()
   // Apply current filter
   if (this->GetAutoFilter())
   {
-    ApplyFilter(m_Ui->nameLineEdit->text());
+    this->ApplyFilter(this->EffectiveNameFilter());
   }
   else
   {
@@ -366,6 +368,16 @@ const mitk::Label* QmitkNewSegmentationDialog::GetSuggestion() const
   return m_Suggestion;
 }
 
+QString QmitkNewSegmentationDialog::EffectiveNameFilter() const
+{
+  // The name field is pre-filled with a fallback name (e.g. the auto-
+  // generated "Label 01"). That default is not a user query, so it must
+  // not filter away the suggestions; only a name the user actually
+  // changed acts as a filter.
+  const auto name = m_Ui->nameLineEdit->text();
+  return name == m_InitialName ? QString() : name;
+}
+
 bool QmitkNewSegmentationDialog::GetAutoFilter() const
 {
   return m_Ui->autoFilterCheckBox->isChecked();
@@ -391,7 +403,9 @@ void QmitkNewSegmentationDialog::OnAccept()
 
 void QmitkNewSegmentationDialog::OnFinished(int)
 {
-  auto autoFilter = m_EnforceSuggestions ? std::optional<bool>() : m_Ui->autoFilterCheckBox->isChecked();
+  std::optional<bool> autoFilter;
+  if (!m_EnforceSuggestions)
+    autoFilter = m_Ui->autoFilterCheckBox->isChecked();
 
   ::SavePreferences(this->saveGeometry(), autoFilter);
 }
@@ -406,7 +420,7 @@ void QmitkNewSegmentationDialog::OnNameEdited(const QString& text)
 
   if (this->GetAutoFilter())
   {
-    this->ApplyFilter(text);
+    this->ApplyFilter(this->EffectiveNameFilter());
     this->SelectSuggestionByName(text);
   }
 
@@ -427,11 +441,15 @@ void QmitkNewSegmentationDialog::OnColorButtonClicked()
 
 void QmitkNewSegmentationDialog::OnSuggestionSelected()
 {
-  const auto* currentItem = m_Ui->suggestionList->currentItem();
+  // Read the selection, not the current item: clearSelection() leaves the
+  // current item untouched, so reading it here would misinterpret a
+  // cleared selection as a fresh pick.
+  const auto selectedItems = m_Ui->suggestionList->selectedItems();
+  const auto* selectedItem = selectedItems.isEmpty() ? nullptr : selectedItems.constFirst();
 
   m_Suggestion = nullptr;
 
-  if (nullptr == currentItem)
+  if (nullptr == selectedItem)
   {
     UpdateOKButton();
     UpdateControlStates();
@@ -440,7 +458,7 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
 
   // Retrieve the suggestion index stored in the item data
   bool ok = false;
-  int suggestionIndex = currentItem->data(Qt::UserRole).toInt(&ok);
+  int suggestionIndex = selectedItem->data(Qt::UserRole).toInt(&ok);
 
   if (!ok || suggestionIndex < 0 ||
     suggestionIndex >= static_cast<int>(m_Suggestions.size()))
@@ -488,12 +506,12 @@ void QmitkNewSegmentationDialog::OnAutoFilterToggled(bool /*checked*/)
 {
   m_Ui->filterLineEdit->clear();
 
-  QString filterName = this->GetAutoFilter() ? m_Ui->nameLineEdit->text() : m_Ui->filterLineEdit->text();
+  const bool autoFilter = this->GetAutoFilter();
+  this->ApplyFilter(autoFilter ? this->EffectiveNameFilter() : QString());
 
-  this->ApplyFilter(filterName);
-  if (this->GetAutoFilter() || !filterName.isEmpty())
+  if (autoFilter)
   {
-    this->SelectSuggestionByName(filterName);
+    this->SelectSuggestionByName(m_Ui->nameLineEdit->text());
   }
 
   this->UpdateControlStates();

@@ -13,20 +13,17 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureToPlanarFigureFilter_h
 #define mitkPlanarFigureToPlanarFigureFilter_h
 
-#include "mitkCommon.h"
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureSource.h"
+#include <mitkCommon.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureSource.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
   /**
-   * @brief Base class for all filters which have an object of type
-   * mitk::PlanarFigure as input and output
+   * \brief Base class for all filters with PlanarFigure input and PlanarFigure output.
    *
-   * Base class for all filters which have an object of type mitk::PlanarFigure
-   * as input and output.
-   * @ingroup MitkPlanarFigureModule
+   * \ingroup MitkPlanarFigureModule
    */
   class MITKPLANARFIGURE_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::PlanarFigureSource
   {

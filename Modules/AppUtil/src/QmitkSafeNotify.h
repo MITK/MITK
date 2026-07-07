@@ -18,6 +18,22 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
+#include <cstdlib>
+
+/**
+ * \brief Safely delivers a Qt event, catching and displaying any exceptions.
+ *
+ * Wraps a call to QApplication::notify() in a try/catch block. If an
+ * exception is thrown during event delivery, a critical QMessageBox is
+ * shown to the user with the option to exit the application or ignore
+ * the error.
+ *
+ * \tparam A A QApplication-derived type whose notify() method is to be called.
+ * \param app Pointer to the application instance.
+ * \param receiver The QObject that should receive the event.
+ * \param event The QEvent to deliver.
+ * \return true if the event was handled successfully, false if an exception occurred.
+ */
 template <class A>
 bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
 {
@@ -55,8 +71,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   {
     case 0:
       MITK_ERROR << "The program was closed.";
-      app->closeAllWindows();
-      break;
+      std::exit(EXIT_FAILURE);
     case 1:
       MITK_ERROR
         << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";

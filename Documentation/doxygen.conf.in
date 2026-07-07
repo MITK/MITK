@@ -279,11 +279,12 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \"\" \"Functions deprecated as of \1\" \deprecated (as of \1)" \
-                         "minimumCMakeVersion=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION@" \
+                         "minimumCMakeVersionWindows=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS@" \
+                         "minimumCMakeVersionOther=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER@" \
                          "minimumQt6Version=@MITK_QT6_MINIMUM_VERSION@" \
                          "requiredOpenSSLVersion=@MITK_REQUIRED_OPENSSL_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
+                         "imageMacroEx{4}=\image html \1 \2 width=\4 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\page \1" \
                          "usersguidemainpage{1}=\page \1" \
                          "nondependentPluginLink{3}= \ref \1 \"\3\""
@@ -737,7 +738,7 @@ GENERATE_BUGLIST       = @MITK_DOXYGEN_GENERATE_BUGLIST@
 # the documentation.
 # The default value is: YES.
 
-GENERATE_DEPRECATEDLIST= @MITK_DOXYGEN_GENERATE_DEPRECATEDLIST@
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional documentation
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
@@ -799,7 +800,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            = @MITK_SOURCE_DIR@/Documentation/MITKDoxygenLayout.xml
+LAYOUT_FILE            = @MITK_BINARY_DIR@/Documentation/MITKDoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -980,16 +981,12 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/doxygen/standalone/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/test/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/src/util/jsoncpp.cpp" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/third_party" \
                          "@MITK_SOURCE_DIR@/Licenses" \
+                         "@MITK_SOURCE_DIR@/CLAUDE.md" \
                          "@MITK_SOURCE_DIR@/CODE_OF_CONDUCT.md" \
                          "@MITK_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@MITK_SOURCE_DIR@/README.md" \
+                         "@MITK_SOURCE_DIR@/Wrapping/Python/docs" \
                          "@MITK_BINARY_DIR@/Documentation/Doxygen" \
                          "@MITK_BINARY_DIR@/bin/" \
                          "@MITK_BINARY_DIR@/PT/" \
@@ -1051,10 +1048,8 @@ EXAMPLE_PATH           = "@MITK_SOURCE_DIR@/Examples/" \
                          "@MITK_SOURCE_DIR@/Examples/Plugins/" \
                          "@MITK_SOURCE_DIR@/Examples/QtFreeRender/" \
                          "@MITK_SOURCE_DIR@/Modules/Core/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/" \
-                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/" \
                          "@MITK_SOURCE_DIR@/Plugins/org.mitk.gui.common/src/" \
+                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/doc/snippets/" \
                          @MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS@
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
@@ -1431,15 +1426,6 @@ HTML_COLORSTYLE_SAT    = 100
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_COLORSTYLE_GAMMA  = 80
-
-# If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML
-# page will contain the date and time when the page was generated. Setting this
-# to YES can help to show when doxygen was last run and thus if the
-# documentation is up to date.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_HTML is set to YES.
-
-HTML_TIMESTAMP         = YES
 
 # If the HTML_DYNAMIC_MENUS tag is set to YES then the generated HTML
 # documentation will contain a main index with vertical navigation menus that
@@ -2101,14 +2087,6 @@ LATEX_HIDE_INDICES     = NO
 
 LATEX_BIB_STYLE        = plain
 
-# If the LATEX_TIMESTAMP tag is set to YES then the footer of each generated
-# page will contain the date and time when the page was generated. Setting this
-# to NO can help when comparing the output of multiple runs.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_LATEX is set to YES.
-
-LATEX_TIMESTAMP        = NO
-
 # The LATEX_EMOJI_DIRECTORY tag is used to specify the (relative or absolute)
 # path from which the emoji images will be read. If a relative path is entered,
 # it will be relative to the LATEX_OUTPUT directory. If left blank the
@@ -2430,10 +2408,25 @@ PREDEFINED             = itkNotUsed(x)= \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
                          US_EXPORT= \
-                         "DEPRECATED(func)=func" \
                          "mitkSegmentationTaskValueMacro(type, name)=bool Has##name() const; type Get##name() const; void Set##name(const type& value);" \
                          "mitkSegmentationTaskListValueMacro(type, name)=bool Has##name(size_t index) const; type Get##name(size_t index) const; void SetDefault##name(const type& value);" \
                          @US_PLATFORM@
+
+# Doxygen 1.11+ misparses function declarations that use the MITK module export
+# macros (e.g. "void MITKCORE_EXPORT Foo();"). With MACRO_EXPANSION=YES and
+# EXPAND_ONLY_PREDEF=NO (set above), Doxygen 1.11+ expands each MITK*_EXPORT to its
+# real definition -- __declspec(...) on MSVC, __attribute__((visibility(...))) on
+# GCC/Clang -- and then mistakes the resulting decoration for the function itself,
+# dropping or garbling the docs. (Doxygen 1.10 and earlier leave the macro as a
+# literal token and render correctly.) Stripping the two underlying decoration
+# macros to empty makes every export macro (all modules, current and future)
+# vanish, so the parser sees a clean signature. This is the Doxygen manual's
+# recommended approach.
+#
+# NOTE: depends on EXPAND_ONLY_PREDEF=NO above. If set to YES, the MITK*_EXPORT
+# wrappers stop expanding, this strip no longer matches them, and docs break again.
+PREDEFINED            += __declspec(x)=
+PREDEFINED            += __attribute__(x)=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2809,15 +2802,6 @@ DOT_GRAPH_MAX_NODES    = 120
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 MAX_DOT_GRAPH_DEPTH    = 0
-
-# Set the DOT_MULTI_TARGETS tag to YES to allow dot to generate multiple output
-# files in one run (i.e. multiple -o and -T options on the command line). This
-# makes dot run faster, but since only newer versions of dot (>1.8.10) support
-# this, this feature is disabled by default.
-# The default value is: NO.
-# This tag requires that the tag HAVE_DOT is set to YES.
-
-DOT_MULTI_TARGETS      = NO
 
 # If the GENERATE_LEGEND tag is set to YES doxygen will generate a legend page
 # explaining the meaning of the various boxes and arrows in the dot generated

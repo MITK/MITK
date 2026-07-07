@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef BERRYTABORDER_H_
 #define BERRYTABORDER_H_
 
-#include <berryIPresentablePart.h>
-#include <berryIPresentationSerializer.h>
-#include <berryIMemento.h>
+#include "berryIPresentablePart.h"
+#include "berryIPresentationSerializer.h"
+#include "berryIMemento.h"
 
 #include <org_blueberry_ui_qt_Export.h>
 

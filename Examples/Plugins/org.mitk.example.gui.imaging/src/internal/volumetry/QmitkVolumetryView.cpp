@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkVolumetryView.h"
 
-#include "ui_QmitkVolumetryViewControls.h"
+#include <ui_QmitkVolumetryViewControls.h>
 
-#include "mitkImageStatisticsHolder.h"
-#include "mitkVolumeCalculator.h"
+#include <mitkImageStatisticsHolder.h>
+#include <mitkVolumeCalculator.h>
 
 #include <QDir>
 #include <QFileDialog>
@@ -24,7 +24,11 @@ found in the LICENSE file.
 
 const std::string QmitkVolumetryView::VIEW_ID = "org.mitk.views.volumetry";
 
-QmitkVolumetryView::QmitkVolumetryView() : m_Controls(nullptr), m_ParentWidget(nullptr)
+QmitkVolumetryView::QmitkVolumetryView() : m_ParentWidget(nullptr)
+{
+}
+
+QmitkVolumetryView::~QmitkVolumetryView()
 {
 }
 
@@ -34,7 +38,7 @@ void QmitkVolumetryView::CreateQtPartControl(QWidget *parent)
   {
     m_ParentWidget = parent;
     // create GUI widgets
-    m_Controls = new Ui::QmitkVolumetryViewControls;
+    m_Controls = std::make_unique<Ui::QmitkVolumetryViewControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }

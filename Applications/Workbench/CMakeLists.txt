@@ -39,3 +39,7 @@ endif()
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(MitkWorkbench ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
+
+if(TARGET mitk_python_bindings)
+  add_dependencies(MitkWorkbench mitk_python_bindings)
+endif()

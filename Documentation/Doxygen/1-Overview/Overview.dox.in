@@ -1,0 +1,54 @@
+/**
+\mainpage
+
+![MITK Logo][logo]
+
+The [Medical Imaging Interaction Toolkit][mitk] (MITK) is a free, open-source
+framework for medical image computing, developed at the [German Cancer Research
+Center (DKFZ)][dkfz]. You can use it in two ways:
+
+<ul>
+<li><b>As an application.</b> The MITK Workbench is a ready-to-run program for
+visualization, segmentation, and registration of CT, MRI, PET, and other DICOM
+data.
+<li><b>As a framework.</b> The MITK C++ libraries and plugin system let you extend
+the Workbench or build your own medical imaging software.
+</ul>
+
+MITK combines [ITK][itk] and [VTK][vtk] with data management, advanced
+visualization, and interaction in a single, modular framework.
+
+<h2>Getting started</h2>
+
+<ul>
+<li><b>Use the Workbench.</b> The \ref UserManualPortal covers common tasks such as
+loading, saving, and navigating data; see \ref PluginListPage for the individual
+tools.
+<li><b>Develop with MITK.</b> Start with the \ref BuildInstructionsPage, then read
+\ref StartingDevelopment and the \ref HowToNewProject guide. Browse the
+<a href="@MITK_DOXYGEN_GROUPS_PAGE@">API reference</a> and consult the
+\ref CMAKE_FAQ while setting up your project.
+</ul>
+
+<h2>License</h2>
+
+MITK is released under a [BSD-style license][license], free for both research and
+commercial use. It is not a certified medical product and must not be used in
+patient care.
+
+<h2>Links</h2>
+
+ - [Homepage][mitk]
+ - [Download][download]
+ - [Source code on GitHub][github]
+
+[logo]: https://raw.githubusercontent.com/MITK/MITK/master/mitk.png
+[mitk]: https://www.mitk.org/
+[itk]: https://itk.org/
+[vtk]: https://vtk.org/
+[dkfz]: https://www.dkfz.de
+[license]: https://raw.githubusercontent.com/MITK/MITK/master/LICENSE
+[download]: https://www.mitk.org/#downloads
+[github]: https://github.com/MITK/MITK
+
+*/

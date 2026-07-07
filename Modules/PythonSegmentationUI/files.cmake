@@ -1,19 +1,21 @@
 set(CPP_FILES
   mitkPythonSegmentationUI.cpp
-  QmitknnInteractiveInstallDialog.cpp
+  mitknnInteractiveInstall.cpp
+  mitknnInteractiveModel.cpp
+  mitknnInteractiveUpdatePrompt.cpp
+  mitkTotalSegmentatorInstall.cpp
+  QmitknnInteractiveInstallModeDialog.cpp
   QmitknnInteractiveToolGUI.cpp
-)
-
-set(MOC_H_FILES
-  include/QmitknnInteractiveInstallDialog.h
-  include/QmitknnInteractiveToolGUI.h
+  QmitkTotalSegmentatorToolGUI.cpp
+  QmitkVenvProcess.cpp
 )
 
 set(UI_FILES
-  src/QmitknnInteractiveInstallDialog.ui
-  src/QmitknnInteractiveToolGUI.ui
+  QmitknnInteractiveInstallModeDialog.ui
+  QmitknnInteractiveToolGUI.ui
+  QmitkTotalSegmentatorToolGUI.ui
 )
 
 set(QRC_FILES
-  Resources/nnInteractive/nnInteractive.qrc
+  nnInteractive/nnInteractive.qrc
 )

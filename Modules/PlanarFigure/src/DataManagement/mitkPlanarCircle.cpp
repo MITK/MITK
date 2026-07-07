@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarCircle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarCircle.h>
+#include <mitkPlaneGeometry.h>
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 mitk::PlanarCircle::PlanarCircle()
   : FEATURE_ID_RADIUS(this->AddFeature("Radius", "mm")),
@@ -43,6 +43,18 @@ mitk::PlanarCircle::PlanarCircle(double fixedRadius)
   this->ResetNumberOfControlPoints(1);
   this->SetNumberOfPolyLines(1);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
+}
+
+mitk::PlanarCircle::PlanarCircle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_RADIUS(other.FEATURE_ID_RADIUS),
+    FEATURE_ID_DIAMETER(other.FEATURE_ID_DIAMETER),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA),
+    m_MinRadius(other.m_MinRadius),
+    m_MaxRadius(other.m_MaxRadius),
+    m_MinMaxRadiusContraintsActive(other.m_MinMaxRadiusContraintsActive),
+    m_RadiusFixed(other.m_RadiusFixed)
+{
 }
 
 bool mitk::PlanarCircle::SetControlPoint(unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/)

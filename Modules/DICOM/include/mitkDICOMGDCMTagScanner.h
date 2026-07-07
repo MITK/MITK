@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDICOMGDCMTagScanner_h
 #define mitkDICOMGDCMTagScanner_h
 
-#include "mitkDICOMTagScanner.h"
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMGDCMTagCache.h"
+#include <mitkDICOMTagScanner.h>
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMGDCMTagCache.h>
 
 namespace mitk
 {
@@ -41,7 +41,7 @@ namespace mitk
     results, care should be taken that all the tags and files of interest
     are communicated to DICOMGDCMTagScanner before requesting the results!
 
-    @remark This scanner does only support the scanning for simple value tag.
+    \remark This scanner does only support the scanning for simple value tag.
     If you need to scann for sequence items or non-top-level elements, this scanner
     will not be sufficient. See i.a. DICOMDCMTKTagScanner for these cases.
   */
@@ -97,7 +97,7 @@ namespace mitk
 
       /**
         \brief Directly retrieve the tag value for a given frame and tag.
-        @pre Scan() must have been called before calling this function.
+        \pre Scan() must have been called before calling this function.
       */
       virtual DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const;
 

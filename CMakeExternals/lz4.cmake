@@ -14,22 +14,22 @@ if(MITK_USE_lz4)
 
   if(NOT DEFINED lz4_DIR)
 
-    set(additional_args )
+    #[[ lz4 only requires CMake 3.5, i.e. CMP0091 is unset and the MSVC
+        runtime library would resolve to the statically linked /MT default.
+        Force the NEW behavior to use the dynamic runtime library, consistent
+        with all other dependencies. ]]
+    set(additional_args
+      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=NEW
+    )
 
     if(NOT CMAKE_DEBUG_POSTFIX)
       list(APPEND additional_args "-DCMAKE_DEBUG_POSTFIX:STRING=d")
     endif()
 
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/lz4/lz4.git
-      GIT_TAG v1.9.4
+      GIT_TAG ebb370ca83af193212df4dcbadcc5d87bc0de2f0 # v1.10.0
       SOURCE_SUBDIR build/cmake
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}

@@ -10,7 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiNodeSelectionWidget.h"
+#include <QmitkMultiNodeSelectionWidget.h>
+#include <ui_QmitkMultiNodeSelectionWidget.h>
 
 #include <algorithm>
 
@@ -21,15 +22,20 @@ found in the LICENSE file.
 QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
 {
-  m_Controls.setupUi(this);
-  m_Overlay = new QmitkSimpleTextOverlayWidget(m_Controls.list);
+  m_Controls = std::make_unique<Ui::QmitkMultiNodeSelectionWidget>();
+  m_Controls->setupUi(this);
+  m_Overlay = new QmitkSimpleTextOverlayWidget(m_Controls->list);
   m_Overlay->setVisible(false);
   m_CheckFunction = [](const NodeList &) { return ""; };
 
   this->OnInternalSelectionChanged();
   this->UpdateInfo();
 
-  connect(m_Controls.btnChange, SIGNAL(clicked(bool)), this, SLOT(OnEditSelection()));
+  connect(m_Controls->btnChange, SIGNAL(clicked(bool)), this, SLOT(OnEditSelection()));
+}
+
+QmitkMultiNodeSelectionWidget::~QmitkMultiNodeSelectionWidget()
+{
 }
 
 void QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
@@ -58,12 +64,12 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
   dialog->SetSelectionCheckFunction(m_CheckFunction);
 
-  m_Controls.btnChange->setChecked(true);
+  m_Controls->btnChange->setChecked(true);
   if (dialog->exec())
   {
     this->HandleChangeOfInternalSelection(dialog->GetSelectedNodes());
   }
-  m_Controls.btnChange->setChecked(false);
+  m_Controls->btnChange->setChecked(false);
 
   emit DialogClosed();
   delete dialog;
@@ -71,7 +77,7 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
 
 void QmitkMultiNodeSelectionWidget::UpdateInfo()
 {
-  if (!m_Controls.list->count())
+  if (!m_Controls->list->count())
   {
     if (m_IsOptional)
     {
@@ -104,19 +110,19 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
     }
   }
 
-  m_Overlay->setVisible(m_Controls.list->count() == 0 || !m_CheckResponse.empty());
+  m_Overlay->setVisible(m_Controls->list->count() == 0 || !m_CheckResponse.empty());
 
-  for (auto i = 0; i < m_Controls.list->count(); ++i)
+  for (auto i = 0; i < m_Controls->list->count(); ++i)
   {
-    auto item = m_Controls.list->item(i);
-    auto widget = qobject_cast<QmitkNodeSelectionListItemWidget*>(m_Controls.list->itemWidget(item));
-    widget->SetClearAllowed(m_IsOptional || m_Controls.list->count() > 1);
+    auto item = m_Controls->list->item(i);
+    auto widget = qobject_cast<QmitkNodeSelectionListItemWidget*>(m_Controls->list->itemWidget(item));
+    widget->SetClearAllowed(m_IsOptional || m_Controls->list->count() > 1);
   }
 }
 
 void QmitkMultiNodeSelectionWidget::OnInternalSelectionChanged()
 {
-  m_Controls.list->clear();
+  m_Controls->list->clear();
   auto currentSelection = this->GetCurrentInternalSelection();
   for (auto& node : currentSelection)
   {
@@ -133,8 +139,8 @@ void QmitkMultiNodeSelectionWidget::OnInternalSelectionChanged()
       connect(widget, &QmitkNodeSelectionListItemWidget::ClearSelection, this, &QmitkMultiNodeSelectionWidget::OnClearSelection);
       newItem->setData(Qt::UserRole, QVariant::fromValue<mitk::DataNode::Pointer>(node));
 
-      m_Controls.list->addItem(newItem);
-      m_Controls.list->setItemWidget(newItem, widget);
+      m_Controls->list->addItem(newItem);
+      m_Controls->list->setItemWidget(newItem, widget);
     }
   }
 }

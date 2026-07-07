@@ -13,13 +13,19 @@ found in the LICENSE file.
 #ifndef mitkExponentialDecayModelParameterizer_h
 #define mitkExponentialDecayModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkExponentialDecayModel.h"
-#include "MitkModelFitExports.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkExponentialDecayModel.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class ExponentialDecayModelParameterizer
+   * \brief Parameterizer for the ExponentialDecayModel providing default initial values.
+   *
+   * \sa ExponentialDecayModel, ExponentialDecayModelFactory, ConcreteModelParameterizerBase
+   */
   class MITKMODELFIT_EXPORT ExponentialDecayModelParameterizer : public
     mitk::ConcreteModelParameterizerBase<mitk::ExponentialDecayModel>
   {

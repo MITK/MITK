@@ -1,4 +1,6 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  mitkXnatSession.h
+)
 
 set(CPP_FILES
   mitkXnatSessionTracker.cpp
@@ -12,26 +14,14 @@ set(CPP_FILES
   QmitkHttpStatusCodeHandler.cpp
 )
 
-set(MOC_H_FILES
- include/mitkXnatSessionTracker.h
- include/QmitkXnatTreeModel.h
- include/QmitkXnatProjectWidget.h
- include/QmitkXnatSubjectWidget.h
- include/QmitkXnatExperimentWidget.h
- include/QmitkXnatCreateObjectDialog.h
- include/QmitkSelectXnatUploadDestinationDialog.h
- include/QmitkXnatUploadFromDataStorageDialog.h
-)
-
 set(QRC_FILES
-  resources/xnat.qrc
+  xnat.qrc
 )
-
 
 set(UI_FILES
-  src/QmitkXnatExperimentWidgetControls.ui
-  src/QmitkXnatProjectWidgetControls.ui
-  src/QmitkSelectXnatUploadDestinationDialog.ui
-  src/QmitkXnatSubjectWidgetControls.ui
-  src/QmitkXnatUploadFromDataStorageDialog.ui
+  QmitkXnatExperimentWidgetControls.ui
+  QmitkXnatProjectWidgetControls.ui
+  QmitkSelectXnatUploadDestinationDialog.ui
+  QmitkXnatSubjectWidgetControls.ui
+  QmitkXnatUploadFromDataStorageDialog.ui
 )

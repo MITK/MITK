@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define _BERRYJOBSTATUS_H
 
 #include "berryIJobStatus.h"
-#include "berryStatus.h"
+#include <berryStatus.h>
 #include "berryJob.h"
 
 namespace berry {

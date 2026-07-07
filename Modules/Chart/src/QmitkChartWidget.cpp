@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QWebEngineView>
 #include <QmitkChartWidget.h>
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 #include <QmitkChartData.h>
 #include <QmitkChartxyData.h>
 
@@ -54,7 +54,7 @@ public:
                            const std::string& type,
                            const std::string& color,
                            const std::string& style,
-                           const std::string& pieLabelsData = 0);
+                           const std::string& pieLabelsData = {});
 
   void UpdateData1D(const std::vector<double> &data1D, const std::string &label);
   void UpdateData2D(const std::vector< std::pair<double, double> > &data2D, const std::string &label);
@@ -63,7 +63,7 @@ public:
                               const std::string& type,
                               const std::string& color,
                               const std::string& lineStyle,
-                              const std::string& pieLabelsData = 0);
+                              const std::string& pieLabelsData = {});
 
   void RemoveData(const std::string &label);
 

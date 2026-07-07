@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <stdexcept>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>

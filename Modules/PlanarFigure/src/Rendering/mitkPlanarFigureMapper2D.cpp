@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigureMapper2D.h"
+#include <mitkPlanarFigureMapper2D.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkColorProperty.h"
-#include "vtkContext2D.h"
-#include "vtkContextDevice2D.h"
-#include "vtkOpenGLContextDevice2D.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
-#include "vtkTextProperty.h"
-#include "vtkOpenGLRenderWindow.h"
+#include <mitkBaseRenderer.h>
+#include <mitkColorProperty.h>
+#include <vtkContext2D.h>
+#include <vtkContextDevice2D.h>
+#include <vtkOpenGLContextDevice2D.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
+#include <vtkTextProperty.h>
+#include <vtkOpenGLRenderWindow.h>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -372,35 +372,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(const mitk::Point2D &point,
 
     case PlanarFigureControlPointStyleProperty::Circle:
     {
-      // TODO: This code can not be reached using the properties provided in the GUI
-
-      /*float radius = 4.0;
-
-      if (markerOpacity > 0)
-      {
-        // Paint filled circle
-        glBegin(GL_POLYGON);
-        for (int angle = 0; angle < 8; ++angle)
-        {
-          float angleRad = angle * (float)3.14159 / 4.0;
-          float x = displayPoint[0] + radius * (float)cos(angleRad);
-          float y = displayPoint[1] + radius * (float)sin(angleRad);
-          glVertex3f(x, y, PLANAR_OFFSET);
-        }
-        glEnd();
-      }
-
-      // Paint outline
-      glColor4f(lineColor[0], lineColor[1], lineColor[2], lineOpacity);
-      glBegin(GL_LINE_LOOP);
-      for (int angle = 0; angle < 8; ++angle)
-      {
-        float angleRad = angle * (float)3.14159 / 4.0;
-        float x = displayPoint[0] + radius * (float)cos(angleRad);
-        float y = displayPoint[1] + radius * (float)sin(angleRad);
-        glVertex3f(x, y, PLANAR_OFFSET);
-      }
-      glEnd();*/
+      // Circle style is defined in the enum but not exercised by the GUI; no rendering.
       break;
     }
 

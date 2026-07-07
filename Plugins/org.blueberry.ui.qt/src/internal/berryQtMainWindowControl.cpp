@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryQtMainWindowControl.h"
 
-#include <berryShell.h>
+#include "berryShell.h"
 
 #include <QEvent>
 #include <QMoveEvent>

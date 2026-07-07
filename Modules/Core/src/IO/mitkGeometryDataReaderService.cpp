@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkGeometryDataReaderService.h"
+#include <mitkGeometryDataReaderService.h>
 #include "mitkGeometry3DToXML.h"
-#include "mitkIOMimeTypes.h"
+#include <mitkIOMimeTypes.h>
 #include "mitkProportionalTimeGeometryToXML.h"
 
 // STL

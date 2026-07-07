@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkOperationEvent_h
 #define mitkOperationEvent_h
 
-#include "mitkOperation.h"
-#include "mitkOperationActor.h"
-#include "mitkUndoModel.h"
+#include <mitkOperation.h>
+#include <mitkOperationActor.h>
+#include <mitkUndoModel.h>
 
 #include <mitkITKEventObserverGuard.h>
 
@@ -27,82 +27,103 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Represents an entry of the undo or redo stack.
-  //##
-  //## This basic entry includes a textual description of the item and a pair of IDs. Static
-  //## member functions handle creation and incrementing of these IDs.
-  //##
-  //## The GroupEventID is intended for logical grouping of several related Operations.
-  //## Currently this is used only by PointSetDataInteractor. How this is done and when to use
-  //## GroupEventIDs is still undocumented.
-  //## @ingroup Undo
+  /**
+   * \brief Represents an entry on the undo or redo stack.
+   *
+   * This base class stores a textual description and a pair of IDs
+   * (ObjectEventId and GroupEventId) for grouping related operations.
+   * Static member functions manage creation and incrementing of these IDs.
+   *
+   * The GroupEventId is intended for logical grouping of several related
+   * operations so they can be undone together with a single Undo(false) call.
+   *
+   * \sa OperationEvent, UndoController, UndoModel
+   * \ingroup Undo
+   */
   class MITKCORE_EXPORT UndoStackItem
   {
   public:
+    /**
+     * \brief Construct an UndoStackItem with an optional description.
+     * \param[in] description Human-readable description of this undo entry.
+     */
     UndoStackItem(std::string description = "");
 
+    /** \brief Virtual destructor. */
     virtual ~UndoStackItem();
 
-    //##Documentation
-    //## @brief For combining operations in groups
-    //##
-    //## This ID is used in the undo mechanism.
-    //## For separation of the separate operations
-    //## If the GroupEventId of two OperationEvents is equal,
-    //## then they share one group and will be undone in case of Undo(fine==false)
+    /**
+     * \brief Get the current global GroupEventId.
+     *
+     * Operations sharing the same GroupEventId are undone together when
+     * Undo(false) is called.
+     *
+     * \return The current GroupEventId counter value.
+     */
     static int GetCurrGroupEventId();
 
-    //##Documentation
-    //## @brief For combining operations in Objects
-    //##
-    //## This ID is used in the Undo-Mechanism.
-    //## For separation of the separate operations
-    //## If the ObjectEventId of two OperationEvents is equal,
-    //## then they share one Object and will be undone in all cases of Undo(true and false).
-    //## they shall not be separated, because they were produced to realize one object-change.
-    //## for example: OE_statechange and OE_addlastpoint
+    /**
+     * \brief Get the current global ObjectEventId.
+     *
+     * Operations sharing the same ObjectEventId belong to the same logical
+     * object change and are always undone together (both Undo(true) and
+     * Undo(false)).
+     *
+     * \return The current ObjectEventId counter value.
+     */
     static int GetCurrObjectEventId();
 
-    //##Documentation
-    //## @brief Returns the GroupEventId for this object
+    /**
+     * \brief Get this item's GroupEventId.
+     * \return The GroupEventId assigned at construction time.
+     */
     int GetGroupEventId();
 
-    //##Documentation
-    //## @brief Returns the ObjectEventId for this object
+    /**
+     * \brief Get this item's ObjectEventId.
+     * \return The ObjectEventId assigned at construction time.
+     */
     int GetObjectEventId();
 
-    //##Documentation
-    //## @brief Returns the textual description of this object
+    /**
+     * \brief Get the textual description of this undo entry.
+     * \return The description string.
+     */
     std::string GetDescription();
 
+    /** \brief Swap the do/undo operations (toggle reversed state). */
     virtual void ReverseOperations();
+
+    /** \brief Reverse the operations and execute them. */
     virtual void ReverseAndExecute();
 
-    //## @brief returns true if the destination still is present and the operations
-    //## are still valid. Returns falso if one of the conditions is not true.
+    /**
+     * \brief Check whether this entry is still valid.
+     *
+     * Returns false if the destination object has been deleted or the
+     * operations are no longer valid.
+     *
+     * \return True if the entry can still be undone/redone.
+     */
     virtual bool IsValid() const = 0;
 
-    //##Documentation
-    //## @brief Increases the current ObjectEventId
-    //## For example if a button click generates operations the ObjectEventId has to be incremented to be able to undo
-    //the
-    // operations.
-    //## Difference between ObjectEventId and GroupEventId: The ObjectEventId capsulates all operations caused by one
-    // event.
-    //## A GroupEventId capsulates several ObjectEventIds so that several operations caused by several events can be
-    // undone with one Undo call.
+    /**
+     * \brief Increment the global ObjectEventId counter.
+     *
+     * Call this when a new user interaction produces operations that should
+     * be grouped as a single object change. The ObjectEventId groups all
+     * operations from one event; the GroupEventId groups multiple
+     * ObjectEventIds for coarser undo granularity.
+     */
     static void IncCurrObjectEventId();
 
-    //##Documentation
-    //## @brief Increases the current GroupEventId
-    //## For example if a button click generates operations the GroupEventId has to be incremented to be able to undo
-    //the
-    // operations.
-    //## Difference between ObjectEventId and GroupEventId: The ObjectEventId capsulates all operations caused by one
-    // event.
-    //## A GroupEventId capsulates several ObjectEventIds so that several operations caused by several events can be
-    // undone with one Undo call.
+    /**
+     * \brief Increment the global GroupEventId counter.
+     *
+     * Call this to start a new logical group of operations. Multiple
+     * ObjectEventIds within the same GroupEventId are undone together
+     * by Undo(false).
+     */
     static void IncCurrGroupEventId();
 
   protected:
@@ -125,58 +146,86 @@ namespace mitk
     void operator=(const UndoStackItem &); // hide operator=
   };
 
-  //##Documentation
-  //## @brief Represents a pair of operations: undo and the according redo.
-  //##
-  //## Additionally to the base class UndoStackItem, which only provides a description of an
-  //## item, OperationEvent does the actual accounting of the undo/redo stack. This class
-  //## holds two Operation objects (operation and its inverse operation) and the corresponding
-  //## OperationActor. The operations may be swapped by the
-  //## undo models, when an OperationEvent is moved from their undo to their redo
-  //## stack or vice versa.
-  //##
-  //## Note, that memory management of operation and undooperation is done by this class.
-  //## Memory of both objects is freed in the destructor. For this, the method IsValid() is needed which holds
-  //## information of the state of m_Destination. In case the object referenced by m_Destination is already deleted,
-  //## isValid() returns false.
-  //## In more detail if the destination happens to be an itk::Object (often the case), OperationEvent is informed as
-  //soon
-  //## as the object is deleted - from this moment on the OperationEvent gets invalid. You should
-  //## check this flag before you call anything on destination
-  //##
-  //## @ingroup Undo
+  /**
+   * \brief Pairs a do-operation with its inverse undo-operation.
+   *
+   * Extends UndoStackItem with the actual operation accounting for the undo/redo
+   * framework. Holds two Operation objects and the OperationActor (destination)
+   * on which they are executed. The operations are swapped when the event moves
+   * between undo and redo stacks.
+   *
+   * This class owns the memory of both operations and deletes them in its
+   * destructor. If the destination (an OperationActor, often an itk::Object)
+   * is deleted, this event becomes invalid; always check IsValid() before
+   * executing operations.
+   *
+   * \sa UndoStackItem, Operation, OperationActor, UndoController
+   * \ingroup Undo
+   */
   class MITKCORE_EXPORT OperationEvent : public UndoStackItem
   {
   public:
-    //## @brief default constructor
+    /**
+     * \brief Construct an OperationEvent.
+     *
+     * If the destination is an itk::Object, a delete observer is registered
+     * to detect when it is destroyed.
+     *
+     * \param[in] destination    The OperationActor that executes the operations.
+     * \param[in] operation      The do-operation (ownership transferred).
+     * \param[in] undoOperation  The inverse undo-operation (ownership transferred).
+     * \param[in] description    Optional human-readable description.
+     */
     OperationEvent(OperationActor *destination,
                    Operation *operation,
                    Operation *undoOperation,
                    std::string description = "");
 
-    //## @brief default destructor
-    //##
-    //## removes observers if destination is valid
-    //## and frees memory referenced by m_Operation and m_UndoOperation
+    /**
+     * \brief Destructor.
+     *
+     * Removes the delete observer (if destination is still valid) and
+     * frees both Operation objects.
+     */
     ~OperationEvent() override;
 
-    //## @brief Returns the operation
+    /**
+     * \brief Get the current do-operation.
+     * \return Pointer to the Operation (may have been swapped with the undo op).
+     */
     Operation *GetOperation();
 
-    //## @brief Returns the destination of the operations
+    /**
+     * \brief Get the destination actor for the operations.
+     * \return Pointer to the OperationActor.
+     */
     OperationActor *GetDestination();
 
     friend class UndoModel;
 
-    //## @brief Swaps the two operations and sets a flag,
-    //## that it has been swapped and doOp is undoOp and undoOp is doOp
+    /**
+     * \brief Swap the do-operation and undo-operation.
+     *
+     * Called by the undo model when this event is moved between the undo
+     * and redo stacks.
+     */
     void ReverseOperations() override;
 
-    //##reverses and executes both operations (used, when moved from undo to redo stack)
+    /**
+     * \brief Reverse the operations and execute the (now current) do-operation.
+     *
+     * Used when an event is moved from the undo stack to the redo stack.
+     */
     void ReverseAndExecute() override;
 
-    //## @brief returns true if the destination still is present and the operations
-    //## are still valid. Returns false if one of the conditions is not true.
+    /**
+     * \brief Check whether this event is still valid.
+     *
+     * Returns false if the destination has been deleted or either operation
+     * reports itself as invalid.
+     *
+     * \return True if the event can be executed.
+     */
     bool IsValid() const override;
 
   protected:

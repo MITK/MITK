@@ -10,6 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkLexicalCast.h
+ * \brief Provides a robust lexical cast from strings to numeric types with a fallback for edge-case values.
+ *
+ * This header wraps \c boost::lexical_cast and adds a fallback using \c std::istringstream
+ * for certain compiler/platform combinations (e.g. Apple LLVM) that fail to convert
+ * very small floating-point numbers such as \c 0.2225e-307. It also provides template
+ * specializations that redirect \c boost::lexical_cast\<float\>, \c boost::lexical_cast\<double\>,
+ * and \c boost::lexical_cast\<long\ double\> through the MITK implementation.
+ *
+ * \ingroup Core
+ */
+
 #ifndef mitkLexicalCast_h
 #define mitkLexicalCast_h
 
@@ -17,6 +30,18 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Convert a string to a numeric target type with an \c std::istringstream fallback.
+   *
+   * First attempts conversion via \c boost::conversion::detail::try_lexical_convert.
+   * If that fails (e.g. for very small floating-point values on certain compilers),
+   * falls back to parsing via \c std::istringstream.
+   *
+   * \tparam Target The numeric type to convert to (e.g. \c float, \c double).
+   * \param arg The string to convert.
+   * \return The converted value of type \a Target.
+   * \throw boost::bad_lexical_cast If neither conversion path succeeds.
+   */
   template <typename Target>
   inline Target lexical_cast(const std::string &arg)
   {
@@ -34,7 +59,7 @@ namespace mitk
       try
       {
         stream.unsetf(std::ios::skipws);
-        stream.precision(boost::detail::lcast_get_precision<Target>());
+        stream.precision(boost::detail::lcast_precision<Target>::value);
         stream >> result;
       }
       catch (const std::ios_base::failure &)
@@ -49,18 +74,33 @@ namespace mitk
 
 namespace boost
 {
+  /**
+   * \brief Specialization of boost::lexical_cast for string-to-float conversion.
+   *
+   * Delegates to mitk::lexical_cast\<float\> to benefit from the istringstream fallback.
+   */
   template <>
   inline float lexical_cast<float, std::string>(const std::string &arg)
   {
     return mitk::lexical_cast<float>(arg);
   }
 
+  /**
+   * \brief Specialization of boost::lexical_cast for string-to-double conversion.
+   *
+   * Delegates to mitk::lexical_cast\<double\> to benefit from the istringstream fallback.
+   */
   template <>
   inline double lexical_cast<double, std::string>(const std::string &arg)
   {
     return mitk::lexical_cast<double>(arg);
   }
 
+  /**
+   * \brief Specialization of boost::lexical_cast for string-to-long-double conversion.
+   *
+   * Delegates to mitk::lexical_cast\<long double\> to benefit from the istringstream fallback.
+   */
   template <>
   inline long double lexical_cast<long double, std::string>(const std::string &arg)
   {

@@ -16,114 +16,115 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
-#include "mitkCameraRotationController.h"
-#include "mitkStepper.h"
-#include "mitkMultiStepper.h"
-#include "mitkMovieGenerator.h"
-#include "itkCommand.h"
+#include <QColor>
+#include <QList>
+#include <QPointer>
+#include <QString>
 
-#include "vtkEventQtSlotConnect.h"
-#include "vtkRenderWindow.h"
-#include "mitkVtkPropRenderer.h"
+#include <memory>
 
 namespace Ui
 {
   class QmitkScreenshotMakerControls;
 }
 
+class QmitkRenderWindow;
+class QAbstractButton;
+class QButtonGroup;
+class QEvent;
+class QObject;
+class QShortcut;
+class vtkRenderer;
+
 /**
- * \brief View for creating movies (AVIs)
+ * \brief View for taking screenshots of render windows.
+ *
+ * Works with any editor that provides render windows via mitk::IRenderWindowPart
+ * (Standard Display and MxN Display). Screenshots can be taken of a single render
+ * window picked by clicking it, or of all render windows of the active editor at
+ * once. An optional upsampling factor produces higher-resolution screenshots and
+ * the background color of the screenshot can be chosen (including transparent).
  */
-class QmitkScreenshotMaker: public QmitkAbstractView, public mitk::IRenderWindowPartListener
+class QmitkScreenshotMaker : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
-  /** \brief Constructor. */
-  QmitkScreenshotMaker(QObject *parent=nullptr, const char *name=nullptr);
-
-  /** \brief Destructor. */
+  QmitkScreenshotMaker(QObject *parent = nullptr, const char *name = nullptr);
   ~QmitkScreenshotMaker() override;
 
-  /** \brief Method for creating the widget containing the application
-   * controls, like sliders, buttons etc.
-   */
   void CreateQtPartControl(QWidget *parent) override;
-  //  virtual QWidget * CreateControlWidget(QWidget *parent);
-
-  ///
-  /// Sets the focus to an internal widget.
-  ///
   void SetFocus() override;
 
-  /** \brief Method for creating the connections of main and control widget.
-   */
-  virtual void CreateConnections();
+  void CreateConnections();
 
-  /** \brief Method for creating an QAction object, i.e. button & menu entry.
-   * @param parent the parent QWidget
-   */
-  //  virtual QAction * CreateAction(QActionGroup *parent);
-
-  ///
-  /// Called when a RenderWindowPart becomes available.
-  ///
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  ///
-  /// Called when a RenderWindowPart becomes unavailable.
-  ///
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  ///
-  /// Called when a RenderWindowPart changes.
-  ///
   void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  signals:
+protected:
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected slots:
 
-  void GenerateScreenshot();
-  void GenerateMultiplanarScreenshots();
-  void Generate3DHighresScreenshot();
-  void GenerateMultiplanar3DHighresScreenshot();
-  void SelectBackgroundColor();
-
-protected:
-
-  QObject *parentWidget;
-  QWidget* m_Parent;
-  vtkEventQtSlotConnect * connections;
-  vtkRenderWindow * renderWindow;
-  mitk::VtkPropRenderer::Pointer m_PropRenderer;
-
-  Ui::QmitkScreenshotMakerControls* m_Controls;
+  void OnScreenshotWindow();
+  void OnScreenshotAll();
 
 private:
+  /** \brief Arm pick mode: the next click on a render window triggers a screenshot of it. */
+  void ArmPickMode();
 
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-  void UpdateDirectionBox(mitk::IRenderWindowPart* renderWindowPart);
+  /** \brief Leave pick mode and restore cursor, button and status bar. */
+  void DisarmPickMode();
 
-  vtkCamera* GetCam();
-  void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");
-  void GenerateMultiplanarScreenshots(QString fileName);
+  /** \brief Ask for a file name and take a screenshot of the given render window. */
+  void CaptureSingleWindow(QmitkRenderWindow* window);
 
-  mitk::DataNode::Pointer GetTopLayerNode();
-  void MultichannelScreenshot(mitk::VtkPropRenderer* renderer, QString fileName, QString filter);
+  /** \brief Create the exclusive background color buttons and select the default. */
+  void SetupBackgroundButtons();
+
+  /** \brief Remember the chosen screenshot background (color, or transparent). */
+  void ApplyBackgroundSelection(const QColor& color, bool transparent, QAbstractButton* button);
+
+  /** \brief Open a color dialog for the custom background; restore selection on cancel. */
+  void OnSelectCustomBackground();
 
   /*!
-  \brief taking a screenshot "from" the specified renderer
-  \param magnificationFactor specifying the quality of the screenshot (the magnification of the actual RenderWindow size)
-  \param fileName file location and name where the screenshot should be saved
+  \brief Take a screenshot of the given render window on the chosen background.
+  \param window the render window to capture
+  \param scale upsampling factor (1 = on-screen resolution)
+  \param fileName file location and name where the screenshot is saved
+  \param filter selected file-type filter, used to derive the suffix when missing
   */
-  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
+  void TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter = QString());
 
-  QColor m_BackgroundColor;
+  /*!
+  \brief Write a screenshot with a transparent background.
 
-  mitk::DataNode* m_SelectedNode;
-  QString           m_LastPath;
-  QString           m_LastFile;
-  QString           m_PNGExtension = "PNG File (*.png)";
-  QString           m_JPGExtension = "JPEG File (*.jpg)";
+  vtkRenderLargeImage produces opaque RGB and MITK's render windows have no alpha
+  buffer, so alpha is recovered by rendering the scene over black and over white
+  and computing the per-pixel opacity from the difference.
+  */
+  void WriteTransparentScreenshot(vtkRenderer* renderer, unsigned int scale, const QString& fileName);
+
+  QWidget* m_Parent = nullptr;
+  std::unique_ptr<Ui::QmitkScreenshotMakerControls> m_Controls;
+
+  bool m_PickArmed = false;
+  QList<QPointer<QmitkRenderWindow>> m_FilteredWindows;
+  QList<QPointer<QWidget>> m_PickOverlays;
+  QShortcut* m_CancelPickShortcut = nullptr;
+
+  QButtonGroup* m_BackgroundButtonGroup = nullptr;
+  QAbstractButton* m_CurrentBackgroundButton = nullptr;
+  QColor m_BackgroundColor = Qt::black;
+  QColor m_CustomColor = Qt::gray;
+  bool m_TransparentBackground = false;
+
+  QString m_LastPath;
+  QString m_LastFile;
+  QString m_PNGExtension = "PNG File (*.png)";
+  QString m_JPGExtension = "JPEG File (*.jpg)";
 };
 
 #endif

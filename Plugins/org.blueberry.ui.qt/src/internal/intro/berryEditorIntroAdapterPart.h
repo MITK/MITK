@@ -14,10 +14,10 @@ found in the LICENSE file.
 #ifndef BERRYEDITORINTROADAPTERPART_H_
 #define BERRYEDITORINTROADAPTERPART_H_
 
-#include <berryEditorPart.h>
+#include "berryEditorPart.h"
 
-#include <intro/berryIIntroPart.h>
-#include <intro/berryIIntroSite.h>
+#include "intro/berryIIntroPart.h"
+#include "intro/berryIIntroSite.h"
 
 namespace berry
 {

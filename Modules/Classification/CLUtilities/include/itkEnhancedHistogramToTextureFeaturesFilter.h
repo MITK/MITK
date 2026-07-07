@@ -15,13 +15,13 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToTextureFeaturesFilter_h
-#define __itkEnhancedHistogramToTextureFeaturesFilter_h
+#ifndef itkEnhancedHistogramToTextureFeaturesFilter_h
+#define itkEnhancedHistogramToTextureFeaturesFilter_h
 
-#include "itkHistogram.h"
-#include "itkMacro.h"
-#include "itkProcessObject.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkHistogram.h>
+#include <itkMacro.h>
+#include <itkProcessObject.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 /** Get built-in type.  Creates member Get"name"() (e.g., GetVisibility()); */
 #define itkMacroGLCMFeatureGetter(name)                                       \
@@ -96,7 +96,6 @@ namespace itk
     * \sa ScalarImageToTextureFeaturesFilter
     *
     * Author: Zachary Pincus
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >
@@ -267,7 +266,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedHistogramToTextureFeaturesFilter.hxx"
+#include <itkEnhancedHistogramToTextureFeaturesFilter.tpp>
 #endif
 
 #endif

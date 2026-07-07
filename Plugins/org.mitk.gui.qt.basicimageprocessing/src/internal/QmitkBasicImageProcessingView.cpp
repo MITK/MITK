@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkVectorImageMapper2D.h>
 #include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkImageStatisticsHolder.h>
@@ -130,7 +129,7 @@ const std::string QmitkBasicImageProcessing::VIEW_ID = "org.mitk.views.basicimag
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
   : QmitkAbstractView()
-  , m_Controls(new Ui::QmitkBasicImageProcessingViewControls)
+  , m_Controls(std::make_unique<Ui::QmitkBasicImageProcessingViewControls>())
   , m_TimeStepperAdapter(nullptr)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -145,7 +144,6 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 {
-
 }
 
 void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
@@ -1038,13 +1036,6 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( name.c_str() ) );
   result->SetData( newImage );
-
-  // for vector images, a different mapper is needed
-  if(isVectorImage > 1)
-  {
-    auto mapper = mitk::VectorImageMapper2D::New();
-    result->SetMapper(1,mapper);
-  }
 
   // add new image to data storage and set as active to ease further processing
   GetDataStorage()->Add(result, selectedNode);

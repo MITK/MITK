@@ -13,11 +13,19 @@ found in the LICENSE file.
 #ifndef QmitkEnums_h
 #define QmitkEnums_h
 
-/// \ingroup QmitkModule
+/**
+ * \ingroup QmitkModule
+ * \brief Custom item model roles for MITK data node access.
+ *
+ * These roles extend Qt::ItemDataRole and are used by MITK data storage
+ * models to return mitk::DataNode objects from QAbstractItemModel::data().
+ *
+ * \sa QmitkAbstractDataStorageModel
+ */
 enum QmitkItemModelRole
 {
-  QmitkDataNodeRole = 64,
-  QmitkDataNodeRawPointerRole = 65
+  QmitkDataNodeRole = 64,         ///< Returns a mitk::DataNode::Pointer (smart pointer) wrapped in QVariant.
+  QmitkDataNodeRawPointerRole = 65 ///< Returns a raw mitk::DataNode* wrapped in QVariant.
 };
 
 #endif

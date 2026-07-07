@@ -13,14 +13,17 @@ found in the LICENSE file.
 #ifndef mitkExtendedOneTissueCompartmentModelParameterizer_h
 #define mitkExtendedOneTissueCompartmentModelParameterizer_h
 
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkExtendedOneTissueCompartmentModel.h"
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkExtendedOneTissueCompartmentModel.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
 
+  /** \brief Parameterizer for the ExtendedOneTissueCompartmentModel.
+   * \sa ExtendedOneTissueCompartmentModel, ExtendedOneTissueCompartmentModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT ExtendedOneTissueCompartmentModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::ExtendedOneTissueCompartmentModel>
   {

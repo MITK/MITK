@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelBase.h"
-#include "itkMacro.h"
+#include <mitkModelBase.h>
+#include <itkMacro.h>
 
 #include <algorithm>
 
@@ -122,6 +122,13 @@ mitk::ModelBase::ModelBase()
 }
 
 mitk::ModelBase::~ModelBase()
+{
+}
+
+mitk::ModelBase::ModelBase(const ModelBase& source)
+: Superclass()
+, ModelTraitsInterface()
+, m_TimeGrid(source.m_TimeGrid)
 {
 }
 

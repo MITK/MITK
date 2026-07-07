@@ -16,15 +16,20 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <QmitkAbstractDataStorageInspector.h>
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <QmitkSimpleTextOverlayWidget.h>
 #include <QSortFilterProxyModel>
+#include <memory>
 
-#include "ui_QmitkDataStorageTreeInspector.h"
+namespace Ui
+{
+  class QmitkDataStorageTreeInspector;
+}
 
-/*
-* @brief This is an inspector that offers a simple tree view on a data storage.
-* Something like the "data manager plugin", but in simple/light (with less functionality)
-* It uses the QmitkDataStorageSimpleTreeModel.
+/**
+* \brief Inspector that offers a simple tree view on a data storage.
+*
+* Similar to the "data manager plugin" but in a simpler/lighter variant
+* (with less functionality). It uses the QmitkDataStorageSimpleTreeModel.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeInspector : public QmitkAbstractDataStorageInspector
 {
@@ -32,6 +37,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeInspector : public QmitkAbstractD
 
 public:
   QmitkDataStorageTreeInspector(QWidget* parent = nullptr);
+  ~QmitkDataStorageTreeInspector() override;
 
   QAbstractItemView* GetView() override;
   const QAbstractItemView* GetView() const override;
@@ -44,7 +50,7 @@ protected:
   void OnModelReset();
 
   QmitkAbstractDataStorageModel* m_StorageModel;
-  Ui_QmitkDataStorageTreeInspector m_Controls;
+  std::unique_ptr<Ui::QmitkDataStorageTreeInspector> m_Controls;
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 

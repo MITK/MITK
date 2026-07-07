@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <string>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
@@ -182,7 +182,7 @@ namespace mitk
 
         /**
         * Name of the "uid" property for all data objects concerning model fitting.
-        * @remark This was also known as UID_PROPRTY_NAME(). It was renamed to indicate
+        * \remark This was also known as UID_PROPRTY_NAME(). It was renamed to indicate
         * that is only kept for backwards compatibility. Model fit now uses the Identifiable
         * interface of BaseData and the PropertyRelationRules to identify/find data.
         */
@@ -190,7 +190,7 @@ namespace mitk
 
         /**
         * modelfit.fit.input.imageUID defines the UID of the image that is used directly or indirectly (then it is source for input.data) to make the fit.
-        * @remark This was also known as FIT_INPUT_IMAGEUID_PROPERTY_NAME(). It was renamed to indicate
+        * \remark This was also known as FIT_INPUT_IMAGEUID_PROPERTY_NAME(). It was renamed to indicate
         * that is only kept for backwards compatibility. Model fit now uses the Identifiable
         * interface of BaseData and the ModelFitResultRelationRule to identify/find the input data.
         */

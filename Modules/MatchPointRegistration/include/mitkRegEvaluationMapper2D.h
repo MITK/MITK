@@ -15,22 +15,22 @@ found in the LICENSE file.
 
 //MatchPoint
 #include <mapRegistration.h>
-#include "mitkRegEvaluationObject.h"
+#include <mitkRegEvaluationObject.h>
 
 //MITK
 #include <mitkCommon.h>
 
 //MITK Rendering
-#include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
-#include "mitkExtractSliceFilter.h"
+#include <mitkBaseRenderer.h>
+#include <mitkVtkMapper.h>
+#include <mitkExtractSliceFilter.h>
 
 //VTK
 #include <vtkSmartPointer.h>
 #include <vtkPropAssembly.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 class vtkActor;
 class vtkPolyDataMapper;
@@ -38,6 +38,7 @@ class vtkPlaneSource;
 class vtkImageData;
 class vtkLookupTable;
 class vtkImageExtractComponents;
+class vtkImageLuminance;
 class vtkImageReslice;
 class vtkImageChangeInformation;
 class vtkPoints;
@@ -137,6 +138,25 @@ public:
     vtkSmartPointer<vtkImageExtractComponents> m_TargetExtractFilter;
     vtkSmartPointer<vtkImageExtractComponents> m_MappedExtractFilter;
 
+    /** \brief Luminance filters for converting multi-component images to perceptual grayscale. */
+    vtkSmartPointer<vtkImageLuminance> m_TargetLuminanceFilter;
+    vtkSmartPointer<vtkImageLuminance> m_MappedLuminanceFilter;
+
+    /** Cached output ports for scalar evaluation modes. Set in GenerateDataForRenderer
+     *  to either the extract filter output (scalar) or luminance filter output (multi-component). */
+    vtkAlgorithmOutput* m_TargetScalarOutput = nullptr;
+    vtkAlgorithmOutput* m_MappedScalarOutput = nullptr;
+
+    /** \brief Extract filters for color output path (always 3-component RGB). */
+    vtkSmartPointer<vtkImageExtractComponents> m_TargetColorExtractFilter;
+    vtkSmartPointer<vtkImageExtractComponents> m_MappedColorExtractFilter;
+
+    /** Cached output ports for color-capable evaluation modes (blend, checker, wipe).
+     *  Always 3-component RGB: for grayscale images R=G=B (neutral gray);
+     *  for RGB images the actual hue and saturation are preserved. */
+    vtkAlgorithmOutput* m_TargetColorOutput = nullptr;
+    vtkAlgorithmOutput* m_MappedColorOutput = nullptr;
+
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
@@ -216,11 +236,14 @@ protected:
   void ApplyLookuptable(mitk::BaseRenderer* renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 
   /**
-   * @brief ApplyLevelWindow Apply the level window for the given renderer.
-   * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses the level window must be set.
-   * @param renderer Level window for which renderer?
-   * @param dataNode
-   * @param levelFilter
+   * \brief Apply the level window for the given renderer.
+   *
+   * \warning To use the level window, the property 'LevelWindow' must be set and an
+   * 'Image Rendering.Mode' which uses the level window must be set.
+   *
+   * \param[in] renderer The renderer for which to apply the level window.
+   * \param[in] dataNode The data node providing the level window property.
+   * \param[in] levelFilter The VTK level window filter to configure.
    */
   void ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 

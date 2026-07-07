@@ -1,58 +1,92 @@
 {
-    "version": "1.0",
-    "name": "Two rows with each view direction",
-    "content": [
-        {
-            "content": [
-                {
-                    "isWindow": true,
-                    "size": 403,
-                    "viewDirection": "Axial",
-                    "synchGroup": 1
-                },
-                {
-                    "isWindow": true,
-                    "size": 403,
-                    "viewDirection": "Sagittal",
-                    "synchGroup": 1
-                },
-                {
-                    "isWindow": true,
-                    "size": 403,
-                    "viewDirection": "Coronal",
-                    "synchGroup": 1
-                }
-            ],
-            "isWindow": false,
-            "size": 418,
-            "vertical": false
-        },
-        {
-            "content": [
-                {
-                    "isWindow": true,
-                    "size": 403,
-                    "viewDirection": "Axial",
-                    "synchGroup": 2
-                },
-                {
-                    "isWindow": true,
-                    "size": 403,
-                    "viewDirection": "Sagittal",
-                    "synchGroup": 2
-                },
-                {
-                    "isWindow": true,
-                    "size": 403,
-                    "viewDirection": "Coronal",
-                    "synchGroup": 2
-                }
-            ],
-            "isWindow": false,
-            "size": 418,
-            "vertical": false
-        }
-    ],
-    "isWindow": false,
-    "vertical": true
+  "version": "2.0",
+  "name": "Two rows with each view direction",
+  "groups": {
+    "main": {
+      "select_all": true
+    },
+    "row2": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "vertical",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget0",
+            "name": "Row 1 - Axial",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main"
+            },
+            "size": 1
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "name": "Row 1 - Sagittal",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "main"
+            },
+            "size": 1
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "name": "Row 1 - Coronal",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "main"
+            },
+            "size": 1
+          }
+        ],
+        "size": 1
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "name": "Row 2 - Axial",
+            "view_direction": "axial",
+            "links": {
+              "selection": "row2"
+            },
+            "size": 1
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget4",
+            "name": "Row 2 - Sagittal",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "row2"
+            },
+            "size": 1
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget5",
+            "name": "Row 2 - Coronal",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "row2"
+            },
+            "size": 1
+          }
+        ],
+        "size": 1
+      }
+    ]
+  }
 }

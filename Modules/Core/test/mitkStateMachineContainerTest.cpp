@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineContainer.h"
-#include "mitkStateMachineState.h"
-#include "mitkStateMachineTransition.h"
-#include "mitkTestingMacros.h"
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineContainer.h>
+#include <mitkStateMachineState.h>
+#include <mitkStateMachineTransition.h>
+#include <mitkTestingMacros.h>
 #include <string>
 
 int mitkStateMachineContainerTest(int /*argc*/, char * /*argv*/ [])
@@ -37,13 +37,13 @@ int mitkStateMachineContainerTest(int /*argc*/, char * /*argv*/ [])
   /*
    * Follow transitions and check if all actions have been loaded.
    */
-  mitk::StateMachineTransition::Pointer s1 =
-    smc->GetStartState()->GetTransition("MouseMoveEvent", "no1"); // transition exists
-  mitk::StateMachineTransition::Pointer s2 =
-    smc->GetStartState()->GetTransition("StdMouseNotMove", "no1"); // transition does not exist
+  auto s1Transitions = smc->GetStartState()->GetTransitionList("MouseMoveEvent", "no1"); // transition exists
+  mitk::StateMachineTransition::Pointer s1 = s1Transitions.empty() ? nullptr : s1Transitions.front();
+  auto s2Transitions = smc->GetStartState()->GetTransitionList("StdMouseNotMove", "no1"); // transition does not exist
+  mitk::StateMachineTransition::Pointer s2 = s2Transitions.empty() ? nullptr : s2Transitions.front();
   mitk::StateMachineState::Pointer st2 = s1->GetNextState();
-  mitk::StateMachineTransition::Pointer s3 =
-    st2->GetTransition("MouseMoveEvent", "no1"); // transition from state2 to state3
+  auto s3Transitions = st2->GetTransitionList("MouseMoveEvent", "no1"); // transition from state2 to state3
+  mitk::StateMachineTransition::Pointer s3 = s3Transitions.empty() ? nullptr : s3Transitions.front();
   typedef std::vector<mitk::StateMachineAction::Pointer> ActionCollectionType;
   ActionCollectionType actions = s3->GetActions();
 

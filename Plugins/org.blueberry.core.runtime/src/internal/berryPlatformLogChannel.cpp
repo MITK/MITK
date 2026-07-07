@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "berryPlatformLogChannel.h"
 
 #include "berryPlatform.h"
-#include "event/berryPlatformEvent.h"
+#include <event/berryPlatformEvent.h>
 
-#include "Poco/Any.h"
+#include <Poco/Any.h>
 
 namespace berry {
 

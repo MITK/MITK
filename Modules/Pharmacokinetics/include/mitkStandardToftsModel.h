@@ -13,17 +13,24 @@ found in the LICENSE file.
 #ifndef mitkStandardToftsModel_h
 #define mitkStandardToftsModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
-  /** @class StandardToftsModel
-   * @brief Implementation of the Model function of the Tofts pharmacokinetic model, using an Aterial Input Function
-   * The Model calculates the Concentration-Time-Curve as a convolution of the plasma curve Cp (the AIF) and a tissue specific
-   * residue function (in this case an exponential: R(t) = ktrans * exp(-ktrans/ve * (t)) ).
-   *       C(t) = vp * Cp(t) + conv(Cp(t),R(t))
-   * The parameters ktrans, ve and ve are subject to the fitting routine*/
+  /** \class StandardToftsModel
+   * \brief Implementation of the Standard Tofts pharmacokinetic model using an Arterial Input Function.
+   *
+   * Calculates the concentration-time curve as a convolution of the plasma curve Cp (the AIF)
+   * and an exponential residue function R(t) = ktrans * exp(-ktrans/ve * t):
+   * \code
+   *   C(t) = conv(Cp(t), R(t))
+   * \endcode
+   * Fitted parameters: Ktrans (volume transfer constant), ve (extravascular extracellular
+   * volume fraction).
+   *
+   * \sa ExtendedToftsModel, AIFBasedModelBase
+   */
 
   class MITKPHARMACOKINETICS_EXPORT StandardToftsModel : public AIFBasedModelBase
   {
@@ -83,11 +90,9 @@ namespace mitk
     StandardToftsModel();
     ~StandardToftsModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    StandardToftsModel(const StandardToftsModel& source);
+
+    mitkCloneMacro(StandardToftsModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -99,9 +104,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    StandardToftsModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

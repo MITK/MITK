@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
+#include <QLayout>
+#include <QApplication>
 
 #include <ctkPluginException.h>
 #include <service/event/ctkEventAdmin.h>
@@ -57,20 +59,20 @@ found in the LICENSE file.
 #include <itkConfigure.h>
 #include <mitkVersion.h>
 #include <mitkBaseApplication.h>
-#include <mitkIDataStorageService.h>
-#include <mitkIDataStorageReference.h>
+#include <mitkCoreServices.h>
 #include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
+#include <mitkIDataStorageService.h>
 #include <mitkWorkbenchUtil.h>
 #include <vtkVersionMacros.h>
-#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 // UGLYYY
 #include "QmitkFlowApplicationWorkbenchWindowAdvisorHack.h"
 #include "QmitkFlowApplicationPlugin.h"
-#include "mitkUndoController.h"
-#include "mitkVerboseLimitedLinearUndo.h"
+#include <mitkUndoController.h>
+#include <mitkVerboseLimitedLinearUndo.h>
 #include <QToolBar>
 #include <QToolButton>
 #include <QMessageBox>
@@ -407,10 +409,23 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   // Enable full screen support
   if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
   {
+#ifdef __APPLE__
+    // Native full-screen (uses the full-screen button hint set in the shell
+    // factory); correctly clears the menu bar and notch.
+    mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
+#else
+    // Borderless windowed rather than true full-screen (see the same rationale
+    // in QmitkExtWorkbenchWindowAdvisor). Replace the flags so no title bar
+    // survives on X11; overflow the screen by one pixel on Windows to avoid
+    // exclusive full-screen, which would bypass composition and throttle
+    // Qt widget repaints.
     mainWindow->setWindowFlags(Qt::FramelessWindowHint);
-    // Used that way as mainWindow->showFullscreen() renders the application very
-    // unresponsive with around 5 FPS.
-    mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
+    QRect bounds = QApplication::primaryScreen()->geometry();
+#ifdef Q_OS_WIN
+    bounds.adjust(-1, -1, 1, 1);
+#endif
+    mainWindow->setGeometry(bounds);
+#endif
   }
 
   // ==== Application menu ============================
@@ -494,13 +509,13 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* editMenu = menuBar->addMenu("&Edit");
   undoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
     "&Undo",
-    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
-    QKeySequence("CTRL+Z"));
+    QKeySequence("CTRL+Z"),
+    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onUndo);
   undoAction->setToolTip("Undo the last action (not supported by all modules)");
   redoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
     "&Redo",
-    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
-    QKeySequence("CTRL+Y"));
+    QKeySequence("CTRL+Y"),
+    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onRedo);
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
   // ==== Window Menu ==========================
@@ -514,8 +529,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   windowMenu->addSeparator();
   windowMenu->addAction("&Preferences...",
-    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
-    QKeySequence("CTRL+P"));
+    QKeySequence("CTRL+P"),
+    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onEditPreferences);
 
   // fill perspective menu
   berry::IPerspectiveRegistry* perspRegistry =
@@ -556,7 +571,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* helpMenu = menuBar->addMenu("&Help");
   helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
   helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
-  helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
+  helpMenu->addAction("&Context Help", QKeySequence("F1"), this, &QmitkFlowApplicationWorkbenchWindowAdvisor::onHelp);
   helpMenu->addAction("&About",this, SLOT(onAbout()));
   // =====================================================
 
@@ -675,8 +690,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
             {
               if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
               {
-                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0, 0.0), QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0, 0.0), QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                 QApplication::sendEvent(widget, &pressEvent);
                 QApplication::sendEvent(widget, &releaseEvent);
               }
@@ -736,17 +751,12 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowOpen()
   // Force Rendering Window Creation on startup.
   berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
 
-  ctkPluginContext* context = QmitkFlowApplicationPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
-  if (serviceRef)
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+  if (dsService)
   {
-    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
-    if (dsService)
-    {
-      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
-      mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
-      mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
-    }
+    mitk::DataStorageReference dsRef = dsService->GetActiveDataStorageReference();
+    mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
+    mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(), dsInput);
   }
 }
 
@@ -1124,8 +1134,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onIntro()
 
     std::cout << title.toStdString() << std::endl;
 
-    QMessageBox::information(nullptr, title,
-      text, "Close");
+    QMessageBox::information(nullptr, title, text, QMessageBox::Close);
   }
   else
   {

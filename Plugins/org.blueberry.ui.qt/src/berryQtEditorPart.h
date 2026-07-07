@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYQTEDITORPART_H_
 #define BERRYQTEDITORPART_H_
 
-#include <berryEditorPart.h>
+#include "berryEditorPart.h"
 #include <QWidget>
 
 #include <org_blueberry_ui_qt_Export.h>

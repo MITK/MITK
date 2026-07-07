@@ -75,41 +75,60 @@ namespace mitk
   class MITKAPPUTIL_EXPORT BaseApplication : public Poco::Util::Application
   {
   public:
-    // Command line arguments
+    /** \name Command Line Argument Constants
+     *  String constants for recognized command line argument names.
+     *  These are used as keys in the framework property map when the
+     *  corresponding command line arguments are provided.
+     */
+    //\{
+    static const QString ARG_APPLICATION;          ///< \brief Argument key for specifying the application extension id ("BlueBerry.application").
+    static const QString ARG_CLEAN;                ///< \brief Argument key to clean the plugin cache on first init ("BlueBerry.clean").
+    static const QString ARG_CONSOLELOG;           ///< \brief Argument key to enable console logging ("BlueBerry.consoleLog").
+    static const QString ARG_DEBUG;                ///< \brief Argument key to enable debug mode ("BlueBerry.debug").
+    static const QString ARG_FORCE_PLUGIN_INSTALL; ///< \brief Argument key to force installing plug-ins with the same symbolic name ("BlueBerry.forcePlugins").
+    static const QString ARG_HOME;                 ///< \brief Argument key for the BlueBerry home directory ("BlueBerry.home").
+    static const QString ARG_NEWINSTANCE;          ///< \brief Argument key to force a new instance in single mode ("BlueBerry.newInstance").
+    static const QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING; ///< \brief Argument key to disable lazy registry cache loading ("BlueBerry.noLazyRegistryCacheLoading").
+    static const QString ARG_NO_REGISTRY_CACHE;    ///< \brief Argument key to disable the registry cache ("BlueBerry.noRegistryCache").
+    static const QString ARG_PLUGIN_CACHE;         ///< \brief Argument key for the plugin cache directory ("BlueBerry.plugin_cache_dir").
+    static const QString ARG_PLUGIN_DIRS;          ///< \brief Argument key for additional plugin directories ("BlueBerry.plugin_dirs").
+    static const QString ARG_PRELOAD_LIBRARY;      ///< \brief Argument key for libraries to preload at startup ("BlueBerry.preloadLibrary").
+    static const QString ARG_PRODUCT;              ///< \brief Argument key for the product id to launch ("BlueBerry.product").
+    static const QString ARG_PROVISIONING;         ///< \brief Argument key for the provisioning file path ("BlueBerry.provisioning").
+    static const QString ARG_REGISTRY_MULTI_LANGUAGE; ///< \brief Argument key to enable multi-language registry support ("BlueBerry.registryMultiLanguage").
+    static const QString ARG_SPLASH_IMAGE;         ///< \brief Argument key for the splash screen image file path ("BlueBerry.splashscreen").
+    static const QString ARG_STORAGE_DIR;          ///< \brief Argument key for the persistent storage directory ("BlueBerry.storageDir").
+    static const QString ARG_XARGS;                ///< \brief Argument key for extended arguments ("xargs").
+    static const QString ARG_LOG_QT_MESSAGES;      ///< \brief Argument key to enable logging of all Qt messages ("Qt.logMessages").
+    static const QString ARG_SEGMENTATION_LABELSET_PRESET; ///< \brief Argument key for a label set preset file for new segmentations ("Segmentation.labelSetPreset").
+    static const QString ARG_FULL_SCREEN_MODE;     ///< \brief Argument key to start the application in full screen mode ("MITK.fullscreen").
+    static const QString ARG_PREFERENCES_OVERRIDE; ///< \brief Argument key for temporarily overriding preferences for this session ("MITK.preferences-override").
+    static const QString ARG_PREFERENCES_PATCH;    ///< \brief Argument key for permanently patching preferences before session start ("MITK.preferences-patch").
+    //\}
 
-    static const QString ARG_APPLICATION;
-    static const QString ARG_CLEAN;
-    static const QString ARG_CONSOLELOG;
-    static const QString ARG_DEBUG;
-    static const QString ARG_FORCE_PLUGIN_INSTALL;
-    static const QString ARG_HOME;
-    static const QString ARG_NEWINSTANCE;
-    static const QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
-    static const QString ARG_NO_REGISTRY_CACHE;
-    static const QString ARG_PLUGIN_CACHE;
-    static const QString ARG_PLUGIN_DIRS;
-    static const QString ARG_PRELOAD_LIBRARY;
-    static const QString ARG_PRODUCT;
-    static const QString ARG_PROVISIONING;
-    static const QString ARG_REGISTRY_MULTI_LANGUAGE;
-    static const QString ARG_SPLASH_IMAGE;
-    static const QString ARG_STORAGE_DIR;
-    static const QString ARG_XARGS;
-    static const QString ARG_LOG_QT_MESSAGES;
-    static const QString ARG_SEGMENTATION_LABELSET_PRESET;
-    static const QString ARG_FULL_SCREEN_MODE;
+    /** \name BlueBerry Plugin Framework Property Constants
+     *  String constants for CTK plugin framework property keys.
+     */
+    //\{
+    static const QString PROP_APPLICATION;         ///< \brief Framework property key for the application extension id ("blueberry.application").
+    static const QString PROP_FORCE_PLUGIN_INSTALL;///< \brief Framework property key for forcing plugin installation.
+    static const QString PROP_NEWINSTANCE;         ///< \brief Framework property key for forcing a new instance.
+    static const QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING; ///< \brief Framework property key for disabling lazy registry cache loading.
+    static const QString PROP_NO_REGISTRY_CACHE;   ///< \brief Framework property key for disabling the registry cache.
+    static const QString PROP_PRODUCT;             ///< \brief Framework property key for the product id ("blueberry.product").
+    static const QString PROP_REGISTRY_MULTI_LANGUAGE; ///< \brief Framework property key for multi-language registry support.
+    //\}
 
-    // BlueBerry specific plugin framework properties
-
-    static const QString PROP_APPLICATION;
-    static const QString PROP_FORCE_PLUGIN_INSTALL;
-    static const QString PROP_NEWINSTANCE;
-    static const QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING;
-    static const QString PROP_NO_REGISTRY_CACHE;
-    static const QString PROP_PRODUCT;
-    static const QString PROP_REGISTRY_MULTI_LANGUAGE;
-
+    /**
+     * \brief Construct a BaseApplication.
+     * \param[in] argc The number of command line arguments.
+     * \param[in] argv Array of command line argument strings.
+     */
     BaseApplication(int argc, char **argv);
+
+    /**
+     * \brief Destructor. Releases internal resources.
+     */
     ~BaseApplication() override;
 
     /**
@@ -121,65 +140,133 @@ namespace mitk
     void initializeQt();
 
     /**
-     * Launches the BlueBerry framework and runs the default application
-     * or the one specified in the PROP_APPLICATION framework property.
+     * \brief Launch the BlueBerry framework and run the default application.
      *
-     * @return The return code of the application after it was shut down.
+     * Initializes Poco, parses command line arguments, sets up the CTK plugin framework,
+     * and runs the application specified by the PROP_APPLICATION framework property
+     * (or the default application registered via the org.blueberry.osgi.applications
+     * extension point).
+     *
+     * \return The return code of the application after it was shut down.
+     * \throw Poco::Util::OptionException If an invalid command line option is encountered.
+     * \throw mitk::Exception If a MITK-specific initialization error occurs.
      */
     int run() override;
 
+    /**
+     * \brief Print the command line help text and exit the application.
+     *
+     * This is used as a Poco option callback for the \c --help command line argument.
+     *
+     * \param[in] name The name of the option that triggered this callback (unused).
+     * \param[in] value The value associated with the option (unused).
+     */
     void printHelp(const std::string &name, const std::string &value);
 
     /**
-     * Set the application name. Same as QCoreApplication::setApplicationName.
-     * @param name The application name.
+     * \brief Set the application name.
+     *
+     * Equivalent to QCoreApplication::setApplicationName(). If a QCoreApplication instance
+     * already exists, the name is forwarded to it immediately. The name is also stored
+     * internally so it can be set on the QCoreApplication when it is created later.
+     *
+     * \param[in] name The application name.
      */
     void setApplicationName(const QString &name);
+
+    /**
+     * \brief Get the application name.
+     * \return The current application name. Returns the QCoreApplication name if available,
+     *         otherwise the internally stored name.
+     */
     QString getApplicationName() const;
 
     /**
-     * Set the organization name. Same as QCoreApplication::setOrganizationName.
-     * @param name The organization name.
+     * \brief Set the organization name.
+     *
+     * Equivalent to QCoreApplication::setOrganizationName(). If a QCoreApplication instance
+     * already exists, the name is forwarded to it immediately.
+     *
+     * \param[in] name The organization name.
      */
     void setOrganizationName(const QString &name);
+
+    /**
+     * \brief Get the organization name.
+     * \return The current organization name.
+     */
     QString getOrganizationName() const;
 
     /**
-     * Set the organization domain. Same as QCoreApplication::setOrganizationDomain.
-     * @param name The organization domain.
+     * \brief Set the organization domain.
+     *
+     * Equivalent to QCoreApplication::setOrganizationDomain(). If a QCoreApplication instance
+     * already exists, the domain is forwarded to it immediately.
+     *
+     * \param[in] name The organization domain.
      */
     void setOrganizationDomain(const QString &name);
+
+    /**
+     * \brief Get the organization domain.
+     * \return The current organization domain.
+     */
     QString getOrganizationDomain() const;
 
     /**
-     * Put the application in single mode, which by default only allows
-     * a single instance of the application to be created.
+     * \brief Enable or disable single-instance mode.
      *
-     * Calling this method after run() has been called has no effect.
+     * In single mode, only one instance of the application is allowed to run.
+     * If a second instance is started, the command line arguments are sent to the
+     * already running instance instead of creating a new one (unless ARG_NEWINSTANCE
+     * is specified).
      *
-     * @param singleMode
+     * \pre Must be called before run(). Calling this method after run() has no effect.
+     *
+     * \param[in] singleMode If \c true, only a single application instance is allowed.
      */
     void setSingleMode(bool singleMode);
+
+    /**
+     * \brief Query whether single-instance mode is enabled.
+     * \return \c true if single mode is enabled; \c false otherwise.
+     */
     bool getSingleMode() const;
 
     /**
-     * Put the application in safe mode, catching exceptions from the
-     * Qt event loop.
+     * \brief Enable or disable safe mode for exception-catching in the Qt event loop.
      *
-     * @param safeMode
+     * When safe mode is enabled, unhandled exceptions thrown during Qt event processing
+     * are caught and displayed to the user instead of crashing the application.
+     *
+     * \param[in] safeMode If \c true, exception-safe event dispatching is enabled.
+     * \note Has no effect if the QCoreApplication was already created externally
+     *       (i.e., not by BaseApplication itself).
      */
     void setSafeMode(bool safeMode);
+
+    /**
+     * \brief Query whether safe mode is currently enabled.
+     * \return \c true if safe mode is enabled; \c false otherwise.
+     */
     bool getSafeMode() const;
 
     /**
-     * Put the application in full screen mode, which will cover the whole screen
-     * and has no window frame.
+     * \brief Enable or disable full screen mode.
      *
-     * Calling this method after run() has been called has no effect.
+     * In full screen mode, the application window covers the entire screen without
+     * a window frame.
      *
-     * @param fullScreenMode
+     * \pre Must be called before run(). Calling this method after run() has no effect.
+     *
+     * \param[in] fullScreenMode If \c true, the application starts in full screen mode.
      */
     void setFullScreenMode(bool fullScreenMode);
+
+    /**
+     * \brief Query whether full screen mode is enabled.
+     * \return \c true if full screen mode is enabled; \c false otherwise.
+     */
     bool getFullScreenMode() const;
 
     /**
@@ -222,21 +309,90 @@ namespace mitk
      */
     QString getProvisioningFilePath() const;
 
+    /**
+     * \brief Set a CTK plugin framework property.
+     *
+     * Properties set through this method are passed to the CTK plugin framework
+     * during initialization. They can also be used to store arbitrary application-level
+     * configuration data.
+     *
+     * \param[in] property The property key.
+     * \param[in] value The property value.
+     */
     void setProperty(const QString &property, const QVariant &value);
+
+    /**
+     * \brief Get a CTK plugin framework property.
+     * \param[in] property The property key.
+     * \return The property value, or an invalid QVariant if the property is not set.
+     */
     QVariant getProperty(const QString &property) const;
 
-    void installTranslator(QTranslator*);
+    /**
+     * \brief Install a QTranslator on the underlying QCoreApplication.
+     *
+     * This is a convenience method that forwards to QCoreApplication::installTranslator().
+     *
+     * \param[in] translator The translator to install. Ownership is not transferred.
+     * \pre A QCoreApplication instance must exist (i.e., initializeQt() must have been called
+     *      or a QCoreApplication must have been created externally).
+     */
+    void installTranslator(QTranslator* translator);
 
+    /**
+     * \brief Check whether another instance of this application is already running.
+     *
+     * This method is only meaningful when the application is in single mode.
+     *
+     * \return \c true if another instance is already running.
+     * \throw mitk::Exception If the application is not in single mode.
+     * \pre Single mode must be enabled via setSingleMode().
+     */
     bool isRunning();
 
-    void sendMessage(const QByteArray);
+    /**
+     * \brief Send a message to the already running application instance.
+     *
+     * This method is only meaningful when the application is in single mode
+     * and another instance is already running.
+     *
+     * \param[in] msg The message to send (e.g., serialized command line arguments).
+     * \throw mitk::Exception If the application is not in single mode.
+     * \pre Single mode must be enabled via setSingleMode().
+     */
+    void sendMessage(const QByteArray msg);
 
   protected:
+    /**
+     * \brief Initialize the application.
+     *
+     * Called by the Poco framework. This method performs the complete initialization
+     * sequence: initializes Qt, loads configuration, sets up the CTK plugin framework
+     * storage, initializes CppMicroServices, parses the provisioning file, and installs
+     * library search paths.
+     *
+     * \param[in,out] self Reference to this application instance (required by Poco).
+     */
     void initialize(Poco::Util::Application &self) override;
 
+    /**
+     * \brief Uninitialize the application.
+     *
+     * Stops the CTK plugin framework (waiting up to 10 seconds) and calls
+     * Poco::Util::Application::uninitialize().
+     */
     void uninitialize() override;
 
+    /**
+     * \brief Get the argument count.
+     * \return The number of command line arguments.
+     */
     int getArgc() const;
+
+    /**
+     * \brief Get the argument vector.
+     * \return Pointer to the array of command line argument strings.
+     */
     char **getArgv() const;
 
     /**
@@ -282,26 +438,44 @@ namespace mitk
     virtual void initializeLibraryPaths();
 
     /**
-     * Runs the application for which the platform was started. The platform
-     * must be running.
-     * <p>
-     * The given argument is passed to the application being run.  If it is an invalid QVariant
-     * then the command line arguments used in starting the platform, and not consumed
-     * by the platform code, are passed to the application as a <code>QStringList</code>.
-     * </p>
-     * @param args the argument passed to the application. May be <code>invalid</code>
-     * @return the result of running the application
-     * @throws std::exception if anything goes wrong
+     * \brief Run the BlueBerry application via the CTK plugin framework.
+     *
+     * Called by the Poco framework after initialization is complete. This method
+     * starts the CTK plugin framework launcher, which in turn starts all installed
+     * plug-ins according to their auto-start setting and then runs the registered
+     * application.
+     *
+     * \param[in] args The unconsumed command line arguments passed from Poco.
+     * \return The exit code of the application.
+     * \throw std::exception If the application encounters an error during execution.
      */
     int main(const std::vector<std::string> &args) override;
 
     /**
-     * Define command line arguments
-     * @param options
+     * \brief Define the recognized command line options.
+     *
+     * Registers all MITK/BlueBerry-specific command line options (such as \c --help,
+     * \c --BlueBerry.clean, \c --BlueBerry.application, etc.) as well as Qt-specific
+     * options with the Poco option set.
+     *
+     * Override this method in subclasses to add custom command line options.
+     *
+     * \param[in,out] options The Poco option set to populate with recognized options.
      */
     void defineOptions(Poco::Util::OptionSet &options) override;
 
+    /**
+     * \brief Get the CTK plugin framework instance.
+     * \return A shared pointer to the CTK plugin framework, or a null pointer if
+     *         the framework has not been started.
+     */
     QSharedPointer<ctkPluginFramework> getFramework() const;
+
+    /**
+     * \brief Get the CTK plugin context of the framework.
+     * \return The plugin context of the running framework, or \c nullptr if the
+     *         framework is not available.
+     */
     ctkPluginContext *getFrameworkContext() const;
 
     /**
@@ -316,10 +490,16 @@ namespace mitk
      */
     QHash<QString, QVariant> getFrameworkProperties() const;
 
-    /*
-    * Initialize and display the splash screen if an image filename is given
-    *
-    */
+    /**
+     * \brief Initialize and display the splash screen if configured.
+     *
+     * If the ARG_SPLASH_IMAGE property contains a valid path to an image file,
+     * a QSplashScreen is created and displayed. The splash screen is automatically
+     * closed when the application's main window becomes visible.
+     *
+     * \param[in] application The QCoreApplication instance used to process events
+     *            while the splash screen is displayed.
+     */
     void initializeSplashScreen(QCoreApplication * application) const;
 
 private:

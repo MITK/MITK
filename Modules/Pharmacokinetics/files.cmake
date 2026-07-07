@@ -1,4 +1,15 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  mitkAIFBasedModelParameterizerBase.h
+  mitkConcreteAIFBasedModelFactory.h
+  mitkConvertT2ConcentrationFunctor.h
+  mitkConvertToConcentrationAbsoluteFunctor.h
+  mitkConvertToConcentrationRelativeFunctor.h
+  mitkConvertToConcentrationTurboFlashFunctor.h
+  mitkConvertToConcentrationViaT1Functor.h
+  mitkConvolutionHelper.h
+  mitkTwoCompartmentExchangeModelFactoryBase.h
+  mitkTwoTissueCompartmentModelFactoryBase.h
+)
 
 set(CPP_FILES
   Common/mitkAterialInputFunctionGenerator.cpp
@@ -41,15 +52,3 @@ set(CPP_FILES
   Models/mitkTwoTissueCompartmentFDGModelParameterizer.cpp
   SimulationFramework/mitkImageGenerationHelper.cpp
 )
-
-set(HXX_FILES
-mitkDICOMSegmentationConstants.h
-
-)
-
-
-set(MOC_H_FILES
-)
-
-
-

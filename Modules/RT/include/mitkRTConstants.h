@@ -15,11 +15,21 @@ found in the LICENSE file.
 
 #include <string>
 
-#include "MitkRTExports.h"
+#include <MitkRTExports.h>
 
 namespace mitk
 {
 
+/**
+ * \brief Collection of string constants used as property names for radiotherapy dose data nodes.
+ *
+ * This struct defines the standard property name strings used throughout the RT module to
+ * store and retrieve dose-related metadata on MITK DataNodes. These constants correspond
+ * to DICOM RT tags and visualization settings.
+ *
+ * \sa mitk::DataNode
+ * \sa mitk::RTUIConstants
+ */
 struct MITKRT_EXPORT RTConstants
 
 {

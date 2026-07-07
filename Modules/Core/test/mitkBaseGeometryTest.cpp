@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingConfig.h>
 
@@ -753,7 +753,8 @@ public:
     itk::Index<3> itkindex;
     dummyGeometry->WorldToIndex(origin, itkindex);
     itk::Index<3> globalOriginIndex;
-    mitk::vtk2itk(globalOrigin, globalOriginIndex);
+    for (unsigned int i = 0; i < 3; ++i)
+      globalOriginIndex[i] = static_cast<itk::IndexValueType>(globalOrigin[i]);
     CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     // Testing WorldToIndex(origin-0.5*spacing, itk::Index)==(0,0,0)

@@ -1,12 +1,10 @@
 #include "QmitkUndoRedoView.h"
+#include <mitkUndoRedoPreferenceHelper.h>
 
 // MITK includes
 #include <mitkRenderingManager.h>
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
-#include "mitkCoreServices.h"
-#include "mitkIPreferencesService.h"
-#include "mitkIPreferences.h"
 
 #include <QmitkRenderWindow.h>
 
@@ -17,32 +15,12 @@
 #include <QInputDialog>
 #include <QmitkStyleManager.h>
 
-
-
-namespace
-{
-  mitk::IPreferences* GetPreferences()
-  {
-    auto preferencesService = mitk::CoreServices::GetPreferencesService();
-    auto systemPref = preferencesService->GetSystemPreferences();
-    return nullptr != systemPref ? systemPref->Node("/General/UndoRedo") : nullptr;
-  }
-
-  void SetUndoLimitPreference(unsigned int limit)
-  {
-    auto* prefs = GetPreferences();
-
-    if (prefs != nullptr)
-    {
-      prefs->PutInt("UndoLimit", limit);
-    }
-  }
-}
+#include <ui_QmitkUndoRedoView.h>
 
 const std::string QmitkUndoRedoView::VIEW_ID = "org.mitk.views.undoredoview";
 
 QmitkUndoRedoView::QmitkUndoRedoView()
-  : m_Controls(new Ui::QmitkUndoRedoViewControls()), m_UndoRedoModel(nullptr)
+  : m_Controls(std::make_unique<Ui::QmitkUndoRedoViewControls>()), m_UndoRedoModel(nullptr)
 {
   m_UndoController.reset(new mitk::UndoController(mitk::UndoController::VERBOSE_LIMITEDLINEARUNDO));
 }
@@ -143,7 +121,7 @@ void QmitkUndoRedoView::OnChangeLimitClicked()
     if (ok)
     {
       undoModel->SetUndoLimit(newLimit);
-      SetUndoLimitPreference(newLimit);
+      mitk::UndoRedoPreferenceHelper::StoreLimit(newLimit);
       this->UpdateUndoRedoList();
       this->UpdateButtonStatus();
     }
@@ -157,11 +135,16 @@ void QmitkUndoRedoView::OnCheckLimitChanged(bool)
   {
     if (m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() == 0)
     {
-      undoModel->SetUndoLimit(100);
+      // Re-enabling a limit: restore the user's last chosen value (or the shared
+      // default if none), instead of clobbering it with a hardcoded number.
+      const int limit = mitk::UndoRedoPreferenceHelper::GetLastPositiveLimit();
+      undoModel->SetUndoLimit(static_cast<std::size_t>(limit));
+      mitk::UndoRedoPreferenceHelper::StoreLimit(limit);
     }
-    else if (!m_Controls->checkLimit->isChecked())
+    else if (!m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() != 0)
     {
       undoModel->SetUndoLimit(0);
+      mitk::UndoRedoPreferenceHelper::StoreLimit(0);
     }
   }
   this->UpdateButtonStatus();

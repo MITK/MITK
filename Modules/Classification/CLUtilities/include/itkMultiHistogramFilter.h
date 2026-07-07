@@ -13,10 +13,19 @@ found in the LICENSE file.
 #ifndef itkMultiHistogramFilter_h
 #define itkMultiHistogramFilter_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
+  /**
+   * \brief Computes a multi-bin local histogram for each voxel.
+   *
+   * For each voxel, a local histogram is computed within a neighbourhood of configurable
+   * size. The histogram bin counts are output as separate images, one per bin.
+   *
+   * \tparam TInputImageType The input image type.
+   * \tparam TOuputImageType The output image type.
+   */
   template<typename TInputImageType, typename TOuputImageType >
   class MultiHistogramFilter : public ImageToImageFilter< TInputImageType, TOuputImageType>
   {
@@ -72,7 +81,7 @@ namespace itk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMultiHistogramFilter.cpp"
+#include <itkMultiHistogramFilter.cpp>
 #endif
 
 #endif // itkMultiHistogramFilter_h

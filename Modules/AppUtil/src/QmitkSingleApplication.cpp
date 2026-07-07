@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSingleApplication.h"
+#include <QmitkSingleApplication.h>
 #include "QmitkSafeNotify.h"
 
 QmitkSingleApplication::QmitkSingleApplication(int &argc, char **argv, bool safeMode)

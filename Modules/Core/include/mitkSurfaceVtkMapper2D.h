@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSurfaceVtkMapper2D_h
 #define mitkSurfaceVtkMapper2D_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkLocalStorageHandler.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkLocalStorageHandler.h>
+#include <mitkVtkMapper.h>
 #include <MitkCoreExports.h>
 
 // VTK
@@ -62,12 +62,32 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      virtual const mitk::Surface *GetInput() const;
+    /**
+     * \brief Get the input Surface from the associated DataNode.
+     * \return Const pointer to the input mitk::Surface.
+     */
+    virtual const mitk::Surface *GetInput() const;
 
-    /** \brief returns the prop assembly */
+    /**
+     * \brief Get the VTK prop assembly for the given renderer.
+     *
+     * Returns the vtkAssembly containing the surface cut actor and optional
+     * normal/inverse-normal actors.
+     *
+     * \param[in] renderer The renderer for which the prop is requested.
+     * \return Pointer to the vtkProp used for rendering.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** \brief set the default properties for this mapper */
+    /**
+     * \brief Set the default properties for 2D surface rendering.
+     *
+     * Initializes properties for line width, normal drawing, colors, and scale factors.
+     *
+     * \param[in] node The DataNode on which to set the properties.
+     * \param[in] renderer The renderer context (nullptr for default property list).
+     * \param[in] overwrite If true, overwrite existing properties.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */

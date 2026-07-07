@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkVector.h>
 
 // EXPORTS
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 // STL
 #include <vector>
@@ -36,9 +36,7 @@ namespace mitk
   class WeightedPointTransform;
 
   /**
-    * \ingroup AnisotropicRegistration
-    *
-    * @brief Implementation of the anisotropic iterative closest point (A-ICP)
+    * \brief Implementation of the anisotropic iterative closest point (A-ICP)
     * algorithm.
     *
     * This class implements the anisotropic iterative closest point (A-ICP)
@@ -186,15 +184,15 @@ namespace mitk
       * weighted based on the covariance matrices and the best weighting will be
       * used as a correspondence.
       *
-      * @param X The moving point set.
-      * @param Z The returned correspondences from the fixed point set.
-      * @param Y The fixed point set saved in a kd tree.
-      * @param sigma_X Covariance matrices belonging to the moving point set.
-      * @param sigma_Y Covariance matrices belonging to the fixed point set.
-      * @param sigma_Z Covariance matrices belonging to the correspondences found.
-      * @param correspondences Saved correspondences, in a pair containing the
+      * \param X The moving point set.
+      * \param Z The returned correspondences from the fixed point set.
+      * \param Y The fixed point set saved in a kd tree.
+      * \param sigma_X Covariance matrices belonging to the moving point set.
+      * \param sigma_Y Covariance matrices belonging to the fixed point set.
+      * \param sigma_Z Covariance matrices belonging to the correspondences found.
+      * \param correspondences Saved correspondences, in a pair containing the
       *        their index in Y and distance.
-      * @param radius The search radius used in in kd tree.
+      * \param radius The search radius used in in kd tree.
       *
       */
     void ComputeCorrespondences(vtkPoints *X,
@@ -296,10 +294,10 @@ namespace mitk
     /**
       * This method executes the algorithm.
       *
-      * @warning The algorithm is only a simple calculation filter and can not be
+      * \warning The algorithm is only a simple calculation filter and can not be
       * used in a mitk filter pipeline.
       *
-      * @throws Exception if the search radius was doubled more than 20 times to
+      * \throws Exception if the search radius was doubled more than 20 times to
       * prevent endless loops. Re-run the with a different search radius that
       * will find the correspondences.
       */

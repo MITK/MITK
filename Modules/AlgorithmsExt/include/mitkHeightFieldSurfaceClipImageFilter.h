@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkHeightFieldSurfaceClipImageFilter_h
 #define mitkHeightFieldSurfaceClipImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkGeometry3D.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
-#include "mitkSurface.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
+#include <mitkSurface.h>
 
 namespace itk
 {
@@ -43,6 +43,7 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT HeightFieldSurfaceClipImageFilter : public ImageToImageFilter
   {
   public:
+    /** \brief List of Surface pointers used for multi-plane clipping. */
     typedef std::vector<mitk::Surface *> ClippingPlaneList;
 
     mitkClassMacro(HeightFieldSurfaceClipImageFilter, ImageToImageFilter);
@@ -51,15 +52,32 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** \brief Set/Get the surface defining a height field as a triangle mesh */
+      /**
+       * \brief Set the surface defining a height field as a triangle mesh.
+       * \param[in] clippingSurface The surface to use for clipping.
+       */
       void SetClippingSurface(Surface *clippingSurface);
 
-    /** \brief Set/Get the surfaces defining a height field as a triangle mesh */
+    /**
+     * \brief Set multiple surfaces for multi-plane clipping.
+     * \param[in] planeList A vector of Surface pointers to use for clipping.
+     */
     void SetClippingSurfaces(ClippingPlaneList planeList);
 
-    /** \brief Set/Get the surface defining a height field as a triangle mesh */
+    /**
+     * \brief Get the clipping surface.
+     * \return Const pointer to the clipping Surface.
+     */
     const Surface *GetClippingSurface() const;
 
+    /**
+     * \brief Clipping mode enumeration.
+     *
+     * Defines how clipped voxels are modified:
+     * - CLIPPING_MODE_CONSTANT: Replace clipped voxels with a constant value.
+     * - CLIPPING_MODE_MULTIPLYBYFACTOR: Multiply clipped voxels by a factor.
+     * - CLIPPING_MODE_MULTIPLANE: Use multi-plane labeling.
+     */
     enum
     {
       CLIPPING_MODE_CONSTANT = 0,
@@ -67,46 +85,73 @@ namespace mitk
       CLIPPING_MODE_MULTIPLANE
     };
 
-    /** \brief Specifies whether clipped part of the image shall be replaced
-     * by a constant or multiplied by a user-set factor */
+    /**
+     * \brief Set the clipping mode.
+     * \param[in] mode One of the CLIPPING_MODE_* constants.
+     */
     void SetClippingMode(int mode);
 
-    /** \brief Specifies whether clipped part of the image shall be replaced
-    * by a constant or multiplied by a user-set factor */
+    /**
+     * \brief Get the current clipping mode.
+     * \return The current clipping mode constant.
+     */
     int GetClippingMode();
 
-    /** \brief Specifies whether clipped part of the image shall be replaced
-    * by a constant or multiplied by a user-set factor */
+    /** \brief Set clipping mode to CLIPPING_MODE_CONSTANT. */
     void SetClippingModeToConstant();
 
-    /** \brief Specifies whether clipped part of the image shall be replaced
-    * by a constant or multiplied by a user-set factor */
+    /** \brief Set clipping mode to CLIPPING_MODE_MULTIPLYBYFACTOR. */
     void SetClippingModeToMultiplyByFactor();
 
+    /** \brief Set clipping mode to CLIPPING_MODE_MULTIPLANE. */
     void SetClippingModeToMultiPlaneValue();
 
-    /** \brief Set/Get constant gray-value for clipping in CONSTANT mode */
+    /**
+     * \brief Set the constant gray-value for clipping in CONSTANT mode.
+     * \param[in] _arg The constant value to fill clipped voxels with.
+     */
     itkSetMacro(ClippingConstant, ScalarType);
 
-    /** \brief Set/Get constant gray-value for clipping in CONSTANT mode */
+    /**
+     * \brief Get the constant gray-value for clipping in CONSTANT mode.
+     * \return The clipping constant value.
+     */
     itkGetConstMacro(ClippingConstant, ScalarType);
 
-    /** \brief Set/Get multiplaction factor for clipping in MULTIPLYBYFACTOR mode */
+    /**
+     * \brief Set the multiplication factor for clipping in MULTIPLYBYFACTOR mode.
+     * \param[in] _arg The factor to multiply clipped voxels by.
+     */
     itkSetMacro(MultiplicationFactor, ScalarType);
 
-    /** \brief Set/Get multiplaction factor for clipping in MULTIPLYBYFACTOR mode */
+    /**
+     * \brief Get the multiplication factor for clipping in MULTIPLYBYFACTOR mode.
+     * \return The multiplication factor.
+     */
     itkGetConstMacro(MultiplicationFactor, ScalarType);
 
-    /** \brief Set/Get x-resolution of height-field sampling (default: 256). */
+    /**
+     * \brief Set the x-resolution of the height-field sampling (default: 256).
+     * \param[in] _arg The x-resolution in samples.
+     */
     itkSetMacro(HeightFieldResolutionX, unsigned int);
 
-    /** \brief Set/Get x-resolution of height-field sampling (default: 256). */
+    /**
+     * \brief Get the x-resolution of the height-field sampling.
+     * \return The x-resolution in samples.
+     */
     itkGetConstMacro(HeightFieldResolutionX, unsigned int);
 
-    /** \brief Set/Get y-resolution of height-field sampling (default: 256). */
+    /**
+     * \brief Set the y-resolution of the height-field sampling (default: 256).
+     * \param[in] _arg The y-resolution in samples.
+     */
     itkSetMacro(HeightFieldResolutionY, unsigned int);
 
-    /** \brief Set/Get y-resolution of height-field sampling (default: 256). */
+    /**
+     * \brief Get the y-resolution of the height-field sampling.
+     * \return The y-resolution in samples.
+     */
     itkGetConstMacro(HeightFieldResolutionY, unsigned int);
 
   protected:

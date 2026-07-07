@@ -13,17 +13,23 @@ found in the LICENSE file.
 #ifndef PerfusionDataSimulationView_h
 #define PerfusionDataSimulationView_h
 
+#include <QmitkAbstractView.h>
+
+#include <mitkModelBase.h>
+#include <mitkModelFactoryBase.h>
+#include <mitkImage.h>
+#include <mitkNodePredicateBase.h>
+
+#include <itkArray.h>
+
 #include <QString>
 
-#include <QmitkAbstractView.h>
-#include "ui_PerfusionDataSimulationViewControls.h"
-#include "mitkModelBase.h"
-#include <mitkModelFactoryBase.h>
+#include <memory>
 
-#include "itkArray.h"
-#include "mitkImage.h"
-
-#include <mitkImage.h>
+namespace Ui
+{
+  class PerfusionDataSimulationViewControls;
+}
 
 /*!
  *	@brief Test Plugin for SUV calculations of PET images
@@ -38,6 +44,7 @@ public:
 	static const std::string VIEW_ID;
 
   PerfusionDataSimulationView();
+  ~PerfusionDataSimulationView() override;
 
 protected slots:
 
@@ -90,7 +97,7 @@ protected:
 	// Variables
 
 	/*! @brief The view's UI controls */
-    Ui::PerfusionDataSimulationViewControls m_Controls;
+    std::unique_ptr<Ui::PerfusionDataSimulationViewControls> m_Controls;
     mitk::DataNode::Pointer m_selectedNode;
 
     ParameterMapType m_ParameterImageMap;

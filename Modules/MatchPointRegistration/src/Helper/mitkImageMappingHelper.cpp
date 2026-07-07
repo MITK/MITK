@@ -10,11 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <type_traits>
+
 #include <itkInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
+#include <itkRGBPixel.h>
+#include <itkRGBAPixel.h>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -23,51 +27,88 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
 
-#include "mapRegistration.h"
+#include <mapRegistration.h>
 
-#include "mitkImageMappingHelper.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkImageMappingHelper.h>
+#include <mitkRegistrationHelper.h>
 
-template <typename TImage >
-typename ::itk::InterpolateImageFunction< TImage >::Pointer generateInterpolator(mitk::ImageMappingInterpolator::Type interpolatorType)
+template <typename TImage>
+typename ::itk::InterpolateImageFunction<TImage>::Pointer
+generateInterpolator(mitk::ImageMappingInterpolator::Type interpolatorType)
 {
-  typedef ::itk::InterpolateImageFunction< TImage > BaseInterpolatorType;
-  typename BaseInterpolatorType::Pointer result;
+  using PixelType = typename TImage::PixelType;
 
-  switch (interpolatorType)
+  if constexpr (!std::is_arithmetic_v<PixelType>)
   {
-  case mitk::ImageMappingInterpolator::NearestNeighbor:
-    {
-      result = ::itk::NearestNeighborInterpolateImageFunction<TImage>::New();
-      break;
-    }
-  case mitk::ImageMappingInterpolator::BSpline_3:
-    {
-      typename ::itk::BSplineInterpolateImageFunction<TImage>::Pointer spInterpolator = ::itk::BSplineInterpolateImageFunction<TImage>::New();
-      spInterpolator->SetSplineOrder(3);
-      result = spInterpolator;
-      break;
-    }
-  case mitk::ImageMappingInterpolator::WSinc_Hamming:
-    {
-      result = ::itk::WindowedSincInterpolateImageFunction<TImage,4>::New();
-      break;
-    }
-  case mitk::ImageMappingInterpolator::WSinc_Welch:
-    {
-      result = ::itk::WindowedSincInterpolateImageFunction<TImage,4,::itk::Function::WelchWindowFunction<4> >::New();
-      break;
-    }
-  default:
-    {
-      result = ::itk::LinearInterpolateImageFunction<TImage>::New();
-      break;
-    }
+    // Composite pixel types (RGB, RGBA) only support NearestNeighbor and Linear.
+    // BSpline and WindowedSinc require scalar arithmetic and won't compile for these types.
+    if (interpolatorType == mitk::ImageMappingInterpolator::NearestNeighbor)
+      return ::itk::NearestNeighborInterpolateImageFunction<TImage>::New();
 
+    return ::itk::LinearInterpolateImageFunction<TImage>::New();
   }
+  else
+  {
+    typedef ::itk::InterpolateImageFunction<TImage> BaseInterpolatorType;
+    typename BaseInterpolatorType::Pointer result;
 
-  return result;
-};
+    switch (interpolatorType)
+    {
+    case mitk::ImageMappingInterpolator::NearestNeighbor:
+      {
+        result = ::itk::NearestNeighborInterpolateImageFunction<TImage>::New();
+        break;
+      }
+    case mitk::ImageMappingInterpolator::BSpline_3:
+      {
+        typename ::itk::BSplineInterpolateImageFunction<TImage>::Pointer spInterpolator =
+          ::itk::BSplineInterpolateImageFunction<TImage>::New();
+        spInterpolator->SetSplineOrder(3);
+        result = spInterpolator;
+        break;
+      }
+    case mitk::ImageMappingInterpolator::WSinc_Hamming:
+      {
+        result = ::itk::WindowedSincInterpolateImageFunction<TImage, 4>::New();
+        break;
+      }
+    case mitk::ImageMappingInterpolator::WSinc_Welch:
+      {
+        result = ::itk::WindowedSincInterpolateImageFunction<TImage, 4,
+          ::itk::Function::WelchWindowFunction<4>>::New();
+        break;
+      }
+    default:
+      {
+        result = ::itk::LinearInterpolateImageFunction<TImage>::New();
+        break;
+      }
+    }
+
+    return result;
+  }
+}
+
+namespace
+{
+  /** Convert a scalar double value to the given pixel type.
+   *  For scalar types this performs a static_cast.
+   *  For composite types (RGBPixel, RGBAPixel) all components are filled with the value. */
+  template <typename TPixelType>
+  TPixelType ConvertToPixelValue(double value)
+  {
+    if constexpr (std::is_arithmetic_v<TPixelType>)
+    {
+      return static_cast<TPixelType>(value);
+    }
+    else
+    {
+      TPixelType result;
+      result.Fill(static_cast<typename TPixelType::ComponentType>(value));
+      return result;
+    }
+  }
+}
 
 template <typename TPixelType, unsigned int VImageDimension >
 void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::ImageMappingHelper::ResultImageType::Pointer& result, const mitk::ImageMappingHelper::RegistrationType*& registration,
@@ -145,7 +186,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
         // lead in loosing one slice. Such a case was just detected. To compensate for that double precision
         // error we add half a spacing to ensure the number of voxel in the dimension match.
         size[i] += 0.5 * fieldSpacing[i];
-        MITK_INFO << "Fixed field size for ResultImageDescriptor of image mapping operation.";
+        MITK_DEBUG << "Fixed field size for ResultImageDescriptor of image mapping operation.";
       }
     }
 
@@ -223,9 +264,9 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
   spTask->setRegistration(castedReg);
   spTask->setResultImageDescriptor(resultDescriptor);
   spTask->setThrowOnMappingError(throwOnMappingError);
-  spTask->setErrorValue(errorValue);
+  spTask->setErrorValue(ConvertToPixelValue<TPixelType>(errorValue));
   spTask->setThrowOnPaddingError(throwOnOutOfInputAreaError);
-  spTask->setPaddingValue(paddingValue);
+  spTask->setPaddingValue(ConvertToPixelValue<TPixelType>(paddingValue));
 
   spTask->execute();
   mitk::CastToMitkImage<>(spTask->getResultImage(),result);
@@ -244,7 +285,20 @@ void doMapTimesteps(const mitk::ImageMappingHelper::InputImageType* input, mitk:
 
     mitk::ImageMappingHelper::InputImageType::Pointer timeStepInput = imageTimeSelector->GetOutput();
     mitk::ImageMappingHelper::ResultImageType::Pointer timeStepResult;
-    AccessByItk_n(timeStepInput, doMITKMap, (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+
+    if (timeStepInput->GetPixelType().GetNumberOfComponents() > 1)
+    {
+      AccessFixedTypeByItk_n(timeStepInput, doMITKMap,
+        MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ, (3),
+        (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue,
+         resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+    }
+    else
+    {
+      AccessByItk_n(timeStepInput, doMITKMap,
+        (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue,
+         resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+    }
     mitk::ImageReadAccessor readAccess(timeStepResult);
     result->SetVolume(readAccess.GetData(), i);
   }
@@ -278,18 +332,30 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   ResultImageType::Pointer result;
 
-  if (input->GetTimeSteps() == 1)
-  { //map the image and done
-    AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-  }
-  else
-  { //map every time step and compose
-
+  if (input->GetTimeSteps() > 1)
+  {
+    // Multiple time steps: pre-allocate the result image and map each time step
+    // individually. doMapTimesteps internally dispatches between scalar and
+    // composite pixel types per time step.
     auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
     result = mitk::Image::New();
     result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
 
-    doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
+    doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError,
+      paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
+  }
+  else if (input->GetPixelType().GetNumberOfComponents() > 1)
+  {
+    AccessFixedTypeByItk_n(input, doMITKMap,
+      MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ, (3),
+      (result, registration, throwOnOutOfInputAreaError, paddingValue,
+       resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+  }
+  else
+  {
+    AccessByItk_n(input, doMITKMap,
+      (result, registration, throwOnOutOfInputAreaError, paddingValue,
+       resultGeometry, throwOnMappingError, errorValue, interpolatorType));
   }
 
   return result;

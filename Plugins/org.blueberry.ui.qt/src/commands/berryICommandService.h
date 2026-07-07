@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYICOMMANDSERVICE_H_
 #define BERRYICOMMANDSERVICE_H_
 
-#include "../services/berryIDisposable.h"
+#include "berryIDisposable.h"
 
 #include <QHash>
 

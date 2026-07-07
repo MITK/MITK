@@ -11,8 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "berryQtWorkbenchPageTweaklet.h"
+#include <memory>
 
-#include <internal/berryQtControlWidget.h>
+#include "internal/berryQtControlWidget.h"
 
 #include <ui_berryQtStatusPart.h>
 
@@ -54,10 +55,10 @@ QWidget* QtWorkbenchPageTweaklet::CreatePaneControl(QWidget* parent)
 
 Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(QWidget* parent, const QString& title, const QString& msg)
 {
-  Ui::QtStatusPart statusPart;
-  statusPart.setupUi(static_cast<QWidget*>(parent));
-  statusPart.m_TitleLabel->setText(title);
-  statusPart.m_DetailsLabel->setText(msg);
+  auto statusPart = std::make_unique<Ui::QtStatusPart>();
+  statusPart->setupUi(static_cast<QWidget*>(parent));
+  statusPart->m_TitleLabel->setText(title);
+  statusPart->m_DetailsLabel->setText(msg);
 
   return Object::Pointer(nullptr);
 }

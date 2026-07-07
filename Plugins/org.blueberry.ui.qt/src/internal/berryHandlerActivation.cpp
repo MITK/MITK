@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include "berryHandlerActivation.h"
 
 #include "berryISources.h"
-#include "berryIHandler.h"
-#include "berryExpression.h"
+#include <berryIHandler.h>
+#include <berryExpression.h>
 
 namespace berry {
 
@@ -37,11 +37,6 @@ HandlerActivation::HandlerActivation(const QString& commandId, const SmartPointe
   {
     throw ctkInvalidArgumentException("The handler service for an activation cannot be null");
   }
-}
-
-void HandlerActivation::ClearActive()
-{
-  ClearResult();
 }
 
 bool HandlerActivation::operator<(const Object* object) const

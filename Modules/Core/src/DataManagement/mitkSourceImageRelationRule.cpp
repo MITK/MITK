@@ -13,12 +13,12 @@ found in the LICENSE file.
 #include <regex>
 #include <mutex>
 
-#include "mitkSourceImageRelationRule.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkStringProperty.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkDataNode.h"
-#include "mitkIdentifiable.h"
+#include <mitkSourceImageRelationRule.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkStringProperty.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkDataNode.h>
+#include <mitkIdentifiable.h>
 
 std::string mitk::SourceImageRelationRule::GenerateRuleID(const std::string& purpose) const
 {
@@ -92,6 +92,13 @@ mitk::SourceImageRelationRule::SourceImageRelationRule(const RuleIDType &purpose
                                                    const std::string &sourceRole,
                                                    const std::string &destinationRole)
   : m_PurposeTag(purposeTag), m_DisplayName(displayName), m_SourceRole(sourceRole), m_DestinationRole(destinationRole){};
+
+mitk::SourceImageRelationRule::SourceImageRelationRule(const SourceImageRelationRule &other)
+  : PropertyRelationRuleBase(other),
+    m_PurposeTag(other.m_PurposeTag),
+    m_DisplayName(other.m_DisplayName),
+    m_SourceRole(other.m_SourceRole),
+    m_DestinationRole(other.m_DestinationRole){};
 
 mitk::SourceImageRelationRule::DataRelationUIDVectorType
 mitk::SourceImageRelationRule::GetRelationUIDs_DataLayer(const IPropertyProvider* source,
@@ -203,6 +210,8 @@ std::vector<std::pair<size_t,std::string> > mitk::SourceImageRelationRule::GetRe
     if (std::regex_match(key, regEx))
     {
       auto refUIDProp = source->GetConstProperty(key);
+      if (refUIDProp == nullptr)
+        continue;
       if (destination==nullptr || *refUIDProp == *destInstanceUIDProp)
       {
         auto currentKeyPath = PropertyNameToPropertyKeyPath(key);
@@ -212,7 +221,7 @@ std::vector<std::pair<size_t,std::string> > mitk::SourceImageRelationRule::GetRe
         if (finding == ignoreItemIndices.end())
         {
           PropertyKeyPath purposePath;
-          purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", currentKeyPathSelection).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+          purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", currentKeyPathSelection).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
           auto purposeProp = source->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
           std::string currentPurpose = "";
           if (purposeProp.IsNotNull())
@@ -323,8 +332,17 @@ void mitk::SourceImageRelationRule::Connect_datalayer(IPropertyOwner * source,
       source->SetProperty(PropertyKeyPathToPropertyName(refClassUIDPath), destClassUIDProp->Clone());
 
       PropertyKeyPath purposePath;
-      purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", newSelectionIndex).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
-      source->SetProperty(PropertyKeyPathToPropertyName(purposePath), StringProperty::New(m_PurposeTag));
+      // Uppercase "A170" (not "a170"): the .mitk persistence template
+      // emits hex element ids with std::uppercase, so a lowercase write
+      // here diverges from the post-load canonical form and the
+      // property's key drifts across IO paths. The stack-format JSON
+      // writer preserves the in-memory string verbatim, which would
+      // otherwise leave the two paths inconsistent. Tracked in the
+      // follow-up to #798 for the architectural cleanup (move this
+      // rule out of MitkCore so it can construct paths via DICOMTagPath).
+      purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", newSelectionIndex).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
+      source->SetProperty(PropertyKeyPathToPropertyName(purposePath),
+                          TemporoSpatialStringProperty::New(m_PurposeTag));
 
       newSelectionIndexStr = std::to_string(newSelectionIndex);
     }
@@ -411,9 +429,3 @@ void mitk::SourceImageRelationRule::Disconnect_datalayer(IPropertyOwner * source
   }
 };
 
-itk::LightObject::Pointer mitk::SourceImageRelationRule::InternalClone() const
-{
-  itk::LightObject::Pointer result = Self::New(this->m_PurposeTag, this->m_DisplayName, this->m_SourceRole, this->m_DestinationRole).GetPointer();
-
-  return result;
-};

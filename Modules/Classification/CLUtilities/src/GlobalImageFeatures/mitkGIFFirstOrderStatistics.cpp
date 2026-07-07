@@ -122,7 +122,7 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
     p95th = histogram->Quantile(0, 0.95);
   }
   double Log2=log(2);
-  double mode_bin;
+  double mode_bin = 0;
   double mode_value = 0;
   double variance = 0;
   if (histogramIsCalculated)

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-#include <QmitkApplicationConstants.h>
+#include "QmitkApplicationConstants.h"
 
 #include <berryPlatformUI.h>
 
@@ -58,7 +58,7 @@ namespace
 }
 
 QmitkToolBarsPreferencePage::QmitkToolBarsPreferencePage()
-  : m_Ui(new Ui::QmitkToolBarsPreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitkToolBarsPreferencePage>()),
     m_Control(nullptr)
 {
 }

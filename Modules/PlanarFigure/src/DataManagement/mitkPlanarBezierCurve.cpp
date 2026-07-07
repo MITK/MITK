@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarBezierCurve.h"
+#include <mitkPlanarBezierCurve.h>
 #include <mitkProperties.h>
 
 #include <limits>
@@ -21,6 +21,14 @@ mitk::PlanarBezierCurve::PlanarBezierCurve()
   this->ResetNumberOfControlPoints(2);
   this->SetNumberOfPolyLines(1);
   this->SetNumberOfHelperPolyLines(1);
+}
+
+mitk::PlanarBezierCurve::PlanarBezierCurve(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH),
+    m_DeCasteljauPoints(other.m_DeCasteljauPoints),
+    m_NumberOfSegments(other.m_NumberOfSegments)
+{
 }
 
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
@@ -98,7 +106,7 @@ int mitk::PlanarBezierCurve::GetControlPointForPolylinePoint(int indexOfPolyline
 {
   const auto& polyLine = GetPolyLine(polyLineIndex);
 
-  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
+  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint >= static_cast<int>(polyLine.size()))
     return -1;
 
   mitk::PlanarFigure::ControlPointListType::const_iterator elem;

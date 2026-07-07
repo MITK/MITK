@@ -13,18 +13,34 @@ found in the LICENSE file.
 #ifndef mitkUndoController_h
 #define mitkUndoController_h
 
-#include "mitkOperationEvent.h"
-#include "mitkUndoModel.h"
+#include <mitkOperationEvent.h>
+#include <mitkUndoModel.h>
 #include <MitkCoreExports.h>
 #include <map>
 
 namespace mitk
 {
-  //## @ingroup Undo
+  /** \brief Default maximum number of operations kept on the undo/redo stack.
+   *
+   * Used by UndoController when no \c UndoLimit preference is stored, and by the
+   * Undo/Redo UI as the value to fall back to when (re-)enabling a limited stack.
+   * A value of 0 means "unlimited"; this default is a finite cap.
+   */
+  inline constexpr unsigned int DEFAULT_UNDO_REDO_LIMIT = 50;
+
+  /**
+   * \brief Controller that manages undo/redo operations by delegating to an UndoModel.
+   *
+   * The UndoController selects and delegates to an UndoModel implementation
+   * (e.g. LimitedLinearUndo or VerboseLimitedLinearUndo). Multiple UndoModel
+   * types can be registered and switched at runtime.
+   *
+   * \ingroup Undo
+   */
   class MITKCORE_EXPORT UndoController
   {
   public:
-    // different UndoModels:
+    /** \brief Enumeration of available undo model types. */
     enum UndoType
     {
       LIMITEDLINEARUNDO = 10,
@@ -34,97 +50,140 @@ namespace mitk
 
     typedef std::map<UndoType, UndoModel::Pointer> UndoModelMap;
     typedef std::map<UndoType, UndoModel::Pointer>::iterator UndoModelMapIter;
-    //##Documentation
-    //## @brief Default UndoModel to use.
+
+    /** \brief Default UndoModel to use. */
     static const UndoType DEFAULTUNDOMODEL;
 
-    //##Documentation
-    //## Constructor; Adds the new UndoType or if undoType exists ,
-    //## switches it to undoType; for UndoTypes see definitionmitkInteractionConst.h
+    /**
+     * \brief Construct an UndoController.
+     *
+     * Adds the specified UndoType to the model list if it does not exist,
+     * or switches to it if it already exists.
+     *
+     * \param[in] undoType The type of undo model to use. Defaults to DEFAULTUNDOMODEL.
+     */
     UndoController(UndoType undoType = DEFAULTUNDOMODEL);
     virtual ~UndoController();
 
+    /**
+     * \brief Store an operation event in the current undo model.
+     *
+     * \param[in] operationEvent The undo stack item to store.
+     * \return True if the operation was stored successfully.
+     */
     bool SetOperationEvent(UndoStackItem *operationEvent);
 
-    //##Documentation
-    //## @brief calls the UndoMechanism to undo the last change
+    /**
+     * \brief Undo the last change (fine-grained, by ObjectEventId).
+     * \return True if the undo was performed successfully.
+     */
     bool Undo();
 
-    //##Documentation
-    //## @brief calls the UndoMechanism to undo the last change
-    //##
-    //## the UndoMechanism has the possibility to undo the last changes in two different ways:
-    //## first it can Undo a group of operations done at last (e.g. build up a new object; Undo leads to deleting that
-    // object);
-    //## or it can Undo a set of operations, that belong together(statechange with Action),
-    //## that way it is possible recall the last set point after you have finished to build up a new object
-    //## @param fine: if set to true, then undo all operations with the same objectEventId
-    //## if set to false, then undo all operations with the same GroupEventId
+    /**
+     * \brief Undo the last change with control over granularity.
+     *
+     * The undo mechanism can undo in two ways:
+     * - Fine undo: undo all operations with the same ObjectEventId
+     * - Coarse undo: undo all operations with the same GroupEventId
+     *
+     * \param[in] fine If true, undo by ObjectEventId; if false, undo by GroupEventId.
+     * \return True if the undo was performed successfully.
+     */
     bool Undo(bool fine);
 
-    //##Documentation
-    //## @brief calls the RedoMechanism to redo the operations undone
-    //##
-    //## read the Documentation of Undo!
+    /**
+     * \brief Redo the last undone change (fine-grained, by ObjectEventId).
+     * \return True if the redo was performed successfully.
+     */
     bool Redo();
 
-    //##Documentation
-    //## @brief calls the RedoMechanism to redo the operations undone
-    //##
-    //## read the Documentation of Undo!
-    //## only with the possibility to fine redo, like fine undo
+    /**
+     * \brief Redo the last undone change with control over granularity.
+     *
+     * \param[in] fine If true, redo by ObjectEventId; if false, redo by GroupEventId.
+     * \return True if the redo was performed successfully.
+     */
     bool Redo(bool fine);
 
-    //##Documentation
-    //## @brief Clears the Undo and the RedoList
+    /** \brief Clear both the undo and redo lists. */
     void Clear();
 
-    //##Documentation
-    //## @brief Clears the RedoList
+    /** \brief Clear the redo list only. */
     void ClearRedoList();
 
-    //##Documentation
-    //## @brief returns true, if the RedoList is empty
+    /**
+     * \brief Check whether the redo list is empty.
+     * \return True if the redo list contains no entries.
+     */
     bool RedoListEmpty();
 
+    /**
+     * \brief Switch to a different undo model type.
+     *
+     * \param[in] undoType The undo model type to switch to.
+     * \return True if the switch was successful, false if the type is not registered.
+     */
     bool SwitchUndoModel(UndoType undoType);
 
+    /**
+     * \brief Add a new undo model type and switch to it.
+     *
+     * If the type already exists, nothing is done and false is returned.
+     *
+     * \param[in] undoType The undo model type to add.
+     * \return True if the model was added successfully.
+     */
     bool AddUndoModel(UndoType undoType);
 
+    /**
+     * \brief Remove an undo model type from the list.
+     *
+     * If the removed type is the currently active one, the controller switches
+     * to the default model or the first available model. The last remaining
+     * model cannot be removed.
+     *
+     * \param[in] undoType The undo model type to remove.
+     * \return True if the model was removed successfully.
+     */
     bool RemoveUndoModel(UndoType undoType);
 
-    //##Documentation
-    //## @brief returns the ObjectEventId of the
-    //## top Element in the OperationHistory of the selected
-    //## UndoModel
+    /**
+     * \brief Return the ObjectEventId of the top element in the undo history.
+     * \return The ObjectEventId of the most recent undo stack entry.
+     */
     int GetLastObjectEventIdInList();
 
-    //##Documentation
-    //## @brief returns the GroupEventId of the
-    //## top Element in the OperationHistory of the selected
-    //## UndoModel
+    /**
+     * \brief Return the GroupEventId of the top element in the undo history.
+     * \return The GroupEventId of the most recent undo stack entry.
+     */
     int GetLastGroupEventIdInList();
 
-    //##Documentation
-    //## @brief returns the last specified OperationEvent in Undo-list
-    //## corresponding to the given value; if nothing found, then returns nullptr
+    /**
+     * \brief Return the last OperationEvent matching the given destination and operation type.
+     *
+     * \param[in] destination The target OperationActor.
+     * \param[in] opType The operation type to search for.
+     * \return The matching OperationEvent, or nullptr if not found.
+     */
     OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType);
 
-    //##Documentation
-    //## @brief gives access to the currently used UndoModel
-    //## Introduced to access special functions of more specific UndoModels,
-    //## especially to retrieve text descriptions of the undo/redo stack
+    /**
+     * \brief Return the currently active UndoModel.
+     *
+     * Can be used to access model-specific functions, such as retrieving
+     * text descriptions of the undo/redo stack from VerboseLimitedLinearUndo.
+     *
+     * \return Pointer to the current UndoModel.
+     */
     static UndoModel *GetCurrentUndoModel();
 
   private:
-    //##Documentation
-    //## current selected UndoModel
+    /** \brief Currently selected UndoModel. */
     static UndoModel::Pointer m_CurUndoModel;
-    //##Documentation
-    //## current selected Type of m_CurUndoModel
+    /** \brief Currently selected UndoType of m_CurUndoModel. */
     static UndoType m_CurUndoType;
-    //##Documentation
-    //## different UndoModels to select and activate
+    /** \brief Map of registered UndoModels available for selection. */
     static UndoModelMap m_UndoModelList;
   };
 } // namespace mitk

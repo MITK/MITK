@@ -13,13 +13,22 @@ found in the LICENSE file.
 #ifndef mitkIndexedValueFunctorPolicy_h
 #define mitkIndexedValueFunctorPolicy_h
 
-#include "itkIndex.h"
-#include "mitkIndexedValueFunctorBase.h"
-#include "MitkModelFitExports.h"
+#include <itkIndex.h>
+#include <mitkIndexedValueFunctorBase.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class IndexedValueFunctorPolicy
+   * \brief Policy class adapting an IndexedValueFunctorBase for use with itkMultiOutputNaryFunctorImageFilter.
+   *
+   * Wraps an IndexedValueFunctorBase and provides the operator() interface expected
+   * by the ITK image filter, passing both the pixel values and the current index.
+   *
+   * \sa IndexedValueFunctorBase, SimpleFunctorPolicy
+   */
   class MITKMODELFIT_EXPORT IndexedValueFunctorPolicy
   {
   public:

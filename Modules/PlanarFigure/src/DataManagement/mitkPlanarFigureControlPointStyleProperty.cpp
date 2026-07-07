@@ -9,12 +9,18 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkPlanarFigureControlPointStyleProperty.h"
+#include <mitkPlanarFigureControlPointStyleProperty.h>
 
 mitk::PlanarFigureControlPointStyleProperty::PlanarFigureControlPointStyleProperty()
 {
   this->AddEnumTypes();
   this->SetValue(static_cast<IdType>(Square));
+}
+
+mitk::PlanarFigureControlPointStyleProperty::PlanarFigureControlPointStyleProperty(
+  const mitk::PlanarFigureControlPointStyleProperty &other)
+  : mitk::EnumerationProperty(other)
+{
 }
 
 mitk::PlanarFigureControlPointStyleProperty::PlanarFigureControlPointStyleProperty(const IdType &value)
@@ -62,11 +68,4 @@ mitk::PlanarFigureControlPointStyleProperty::Shape mitk::PlanarFigureControlPoin
 void mitk::PlanarFigureControlPointStyleProperty::SetShape(mitk::PlanarFigureControlPointStyleProperty::Shape shape)
 {
   this->SetValue(static_cast<IdType>(shape));
-}
-
-itk::LightObject::Pointer mitk::PlanarFigureControlPointStyleProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
 }

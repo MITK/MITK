@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitResultHelper.h"
+#include <mitkModelFitResultHelper.h>
 
 #include <mitkDataStorage.h>
 #include <mitkUIDGenerator.h>
 
-#include "mitkModelTraitsInterface.h"
-#include "mitkModelFitConstants.h"
-#include "mitkModelFitInfo.h"
+#include <mitkModelTraitsInterface.h>
+#include <mitkModelFitConstants.h>
+#include <mitkModelFitInfo.h>
 #include <mitkModelFitResultRelationRule.h>
 
 #include <mitkDICOMPMPropertyHelper.h>
@@ -228,7 +228,7 @@ MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( co
 
   // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
   mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(modelFitInfo->inputImage, parameterImage);
-  mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(parameterImage);
+  mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(modelFitInfo->inputImage, parameterImage);
 
   // Add properties to ensure suitable visualization
   // adjust level/window to new image

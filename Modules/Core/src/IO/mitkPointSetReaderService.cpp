@@ -13,8 +13,8 @@ found in the LICENSE file.
 // MITK
 #include "mitkPointSetReaderService.h"
 #include "mitkGeometry3DToXML.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkProportionalTimeGeometry.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkLocaleSwitch.h>
 
 // STL
@@ -111,120 +111,6 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
   return result;
 }
 
-mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(tinyxml2::XMLElement *parentElement)
-{
-  auto *geometryElem = parentElement->FirstChildElement("geometry3d");
-  if (!geometryElem)
-    return nullptr;
-
-  // data to generate
-  AffineTransform3D::MatrixType matrix;
-  AffineTransform3D::OffsetType offset;
-  bool isImageGeometry(false);
-  unsigned int frameOfReferenceID(0);
-  BaseGeometry::BoundsArrayType bounds;
-
-  bool somethingMissing(false);
-
-  // find data in xml structure
-  auto *imageGeometryElem = geometryElem->FirstChildElement("image_geometry");
-  if (imageGeometryElem)
-  {
-    std::string igs = imageGeometryElem->GetText();
-    isImageGeometry = igs == "true" || igs == "TRUE" || igs == "1";
-  }
-  else
-    somethingMissing = true;
-
-  auto *frameOfReferenceElem = geometryElem->FirstChildElement("frame_of_reference_id");
-  if (frameOfReferenceElem)
-  {
-    frameOfReferenceID = atoi(frameOfReferenceElem->GetText());
-  }
-  else
-    somethingMissing = true;
-
-  auto *indexToWorldElem = geometryElem->FirstChildElement("index_to_world");
-  if (indexToWorldElem)
-  {
-    auto *matrixElem = indexToWorldElem->FirstChildElement("matrix3x3");
-    auto *offsetElem = indexToWorldElem->FirstChildElement("offset");
-    if (indexToWorldElem && offsetElem)
-    {
-      auto*col0 = matrixElem->FirstChildElement("column_0");
-      auto*col1 = matrixElem->FirstChildElement("column_1");
-      auto*col2 = matrixElem->FirstChildElement("column_2");
-
-      if (col0 && col1 && col2)
-      {
-        somethingMissing |= tinyxml2::XML_SUCCESS != col0->QueryDoubleAttribute("x", &matrix[0][0]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != col0->QueryDoubleAttribute("y", &matrix[1][0]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != col0->QueryDoubleAttribute("z", &matrix[2][0]);
-
-        somethingMissing |= tinyxml2::XML_SUCCESS != col1->QueryDoubleAttribute("x", &matrix[0][1]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != col1->QueryDoubleAttribute("y", &matrix[1][1]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != col1->QueryDoubleAttribute("z", &matrix[2][1]);
-
-        somethingMissing |= tinyxml2::XML_SUCCESS != col2->QueryDoubleAttribute("x", &matrix[0][2]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != col2->QueryDoubleAttribute("y", &matrix[1][2]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != col2->QueryDoubleAttribute("z", &matrix[2][2]);
-      }
-      else
-        somethingMissing = true;
-
-      somethingMissing |= tinyxml2::XML_SUCCESS != offsetElem->QueryDoubleAttribute("x", &offset[0]);
-      somethingMissing |= tinyxml2::XML_SUCCESS != offsetElem->QueryDoubleAttribute("y", &offset[1]);
-      somethingMissing |= tinyxml2::XML_SUCCESS != offsetElem->QueryDoubleAttribute("z", &offset[2]);
-    }
-    else
-      somethingMissing = true;
-
-    auto *boundsElem = geometryElem->FirstChildElement("bounds");
-    if (boundsElem)
-    {
-      auto *minBoundsElem = boundsElem->FirstChildElement("min");
-      auto *maxBoundsElem = boundsElem->FirstChildElement("max");
-
-      if (minBoundsElem && maxBoundsElem)
-      {
-        somethingMissing |= tinyxml2::XML_SUCCESS != minBoundsElem->QueryDoubleAttribute("x", &bounds[0]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != minBoundsElem->QueryDoubleAttribute("y", &bounds[2]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != minBoundsElem->QueryDoubleAttribute("z", &bounds[4]);
-
-        somethingMissing |= tinyxml2::XML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("x", &bounds[1]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("y", &bounds[3]);
-        somethingMissing |= tinyxml2::XML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("z", &bounds[5]);
-      }
-      else
-        somethingMissing = true;
-    }
-    else
-      somethingMissing = true;
-  }
-  else
-    somethingMissing = true;
-
-  if (somethingMissing)
-  {
-    MITK_ERROR << "XML structure of geometry inside a PointSet file broken. Refusing to build Geometry3D";
-    return nullptr;
-  }
-  else
-  {
-    Geometry3D::Pointer g = Geometry3D::New();
-    g->SetImageGeometry(isImageGeometry);
-    g->SetFrameOfReferenceID(frameOfReferenceID);
-    g->SetBounds(bounds);
-
-    AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    transform->SetMatrix(matrix);
-    transform->SetOffset(offset);
-
-    g->SetIndexToWorldTransform(transform);
-
-    return g.GetPointer();
-  }
-}
 
 mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::Pointer newPointSet,
                                                                 tinyxml2::XMLElement *currentTimeSeries,

@@ -24,11 +24,12 @@ class vtkRenderWindow;
 namespace mitk
 {
   /**
-   * This is a simple class for rendering colored rectangles
-   * at the boarders of vtkRenderWindows.
-   * The rectangle rendering itself is performed by means of a
-   * vtkProp (vtkMitkRectangleProp).
-   * This class instantiates the vtkProp and a corresponding vtkRenderer instance.
+   * \brief Renders a colored rectangle frame at the borders of a vtkRenderWindow.
+   *
+   * The rectangle rendering is performed by a vtkMitkRectangleProp. This class
+   * instantiates the vtkProp and a corresponding vtkRenderer instance.
+   *
+   * \sa vtkMitkRectangleProp
    */
   class MITKCORE_EXPORT RenderWindowFrame : public itk::Object
   {
@@ -38,52 +39,58 @@ namespace mitk
     itkCloneMacro(Self);
 
       /**
-       * Sets the renderwindow, in which colored rectangle boarders will be shown.
-       * Make sure, you have called this function
-       * before calling Enable()
+       * \brief Set the render window in which the colored rectangle border will be shown.
+       *
+       * \pre Must be called before calling Enable().
+       *
+       * \param[in] renderWindow  The vtkRenderWindow to render the frame into.
        */
       virtual void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renderWindow);
 
     /**
-     * Enables drawing of the colored rectangle.
+     * \brief Enable drawing of the colored rectangle frame.
+     *
      * If you want to disable it, call the Disable() function.
+     *
+     * \param[in] col1  Red color component (0.0 to 1.0).
+     * \param[in] col2  Green color component (0.0 to 1.0).
+     * \param[in] col3  Blue color component (0.0 to 1.0).
      */
     virtual void Enable(float col1, float col2, float col3);
 
     /**
-     * Disables drawing of the colored rectangle.
+     * \brief Disable drawing of the colored rectangle frame.
+     *
      * If you want to enable it, call the Enable() function.
      */
     virtual void Disable();
 
     /**
-     * Checks, if the text is currently
-     * enabled (visible)
+     * \brief Check whether the frame is currently enabled (visible).
+     *
+     * \return True if the frame is enabled, false otherwise.
      */
     virtual bool IsEnabled();
 
     /**
-     * Returns the vtkRenderWindow, which is used
-     * for displaying the text
+     * \brief Get the vtkRenderWindow used for displaying the frame.
+     *
+     * \return The associated vtkRenderWindow, or nullptr if not set.
      */
     virtual vtkSmartPointer<vtkRenderWindow> GetRenderWindow();
 
     /**
-     * Returns the renderer responsible for
-     * rendering the text into the
-     * vtkRenderWindow
+     * \brief Get the renderer responsible for rendering the frame.
+     *
+     * \return The internal vtkRenderer instance.
      */
     virtual vtkSmartPointer<vtkRenderer> GetVtkRenderer();
 
   protected:
-    /**
-     * Constructor
-     */
+    /** \brief Constructor. */
     RenderWindowFrame();
 
-    /**
-     * Destructor
-     */
+    /** \brief Destructor. */
     ~RenderWindowFrame() override;
 
     vtkSmartPointer<vtkRenderWindow> m_RenderWindow;

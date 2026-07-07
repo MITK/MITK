@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYQTWORKBENCHPAGETWEAKLET_H_
 #define BERRYQTWORKBENCHPAGETWEAKLET_H_
 
-#include <berryWorkbenchPageTweaklet.h>
+#include "berryWorkbenchPageTweaklet.h"
 
 #include <org_blueberry_ui_qt_Export.h>
 

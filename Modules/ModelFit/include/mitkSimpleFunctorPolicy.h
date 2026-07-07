@@ -13,13 +13,22 @@ found in the LICENSE file.
 #ifndef mitkSimpleFunctorPolicy_h
 #define mitkSimpleFunctorPolicy_h
 
-#include "itkIndex.h"
-#include "mitkSimpleFunctorBase.h"
-#include "MitkModelFitExports.h"
+#include <itkIndex.h>
+#include <mitkSimpleFunctorBase.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class SimpleFunctorPolicy
+   * \brief Policy class adapting a SimpleFunctorBase for use with itkMultiOutputNaryFunctorImageFilter.
+   *
+   * Wraps a SimpleFunctorBase instance and provides the operator() interface
+   * expected by the ITK image filter. The index parameter is ignored.
+   *
+   * \sa SimpleFunctorBase, IndexedValueFunctorPolicy
+   */
   class MITKMODELFIT_EXPORT SimpleFunctorPolicy
   {
   public:

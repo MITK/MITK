@@ -28,6 +28,10 @@ class mitkLabelTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetValue);
   MITK_TEST(TestSetProperty);
   MITK_TEST(TestAlgorithmFunctions);
+  MITK_TEST(TestAlgorithmNameEmptyHandling);
+  MITK_TEST(TestAddToolUseSanitization);
+  MITK_TEST(TestHasAlgorithmName);
+  MITK_TEST(TestMergeToolUses);
   MITK_TEST(TestDICOMFunctions);
   CPPUNIT_TEST_SUITE_END();
 
@@ -153,6 +157,11 @@ public:
   {
     mitk::Label::Pointer label = mitk::Label::New();
 
+    // A freshly constructed label has an Undefined (undeclared) algorithm type; its name falls back
+    // to the prefix-only "MITK Segmentation" until a tool is recorded.
+    CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::Undefined);
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == "MITK Segmentation");
+
     // --- Check all AlgorithmType values and their string representations ---
     struct AlgoPair { mitk::Label::AlgorithmType type; std::string str; };
     std::vector<AlgoPair> algoPairs = {
@@ -192,6 +201,131 @@ public:
     CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
     name = label->GetAlgorithmName();
     CPPUNIT_ASSERT(name == "ToolA|ToolB|nnUNet");
+
+    // --- First-use-replaces on a fresh label: the first dedicated tool defines the type and is
+    //     appended to the prefix after ": " ---
+    auto freshLabel = mitk::Label::New();
+    freshLabel->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "X");
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::AUTOMATIC);
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmName() == "MITK Segmentation: X");
+    // A second tool of a different type mixes to SEMIAUTOMATIC and is appended after "|"
+    freshLabel->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Y");
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmName() == "MITK Segmentation: X|Y");
+    // Repeating an existing tool is idempotent (type stable, name de-duplicated)
+    freshLabel->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "X");
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmName() == "MITK Segmentation: X|Y");
+
+    // --- Externally-loaded names without the MITK prefix are kept as-is (no prefix injected) ---
+    auto externalLabel = mitk::Label::New();
+    externalLabel->SetAlgorithmName("AcmeNet");
+    externalLabel->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Paint");
+    CPPUNIT_ASSERT(externalLabel->GetAlgorithmName() == "AcmeNet|Paint");
+  }
+
+  void TestAlgorithmNameEmptyHandling()
+  {
+    // SetAlgorithmName("") must remove the property (mirroring SetAlgorithmTypeStr), not store an empty
+    // string. A stored empty string shadows the "MITK Segmentation" fallback and corrupts the first
+    // AddToolUse into "|<tool>".
+    auto label = mitk::Label::New();
+    label->SetAlgorithmName("nnUNet");
+    label->SetAlgorithmName("");
+    CPPUNIT_ASSERT_MESSAGE("SetAlgorithmName(\"\") must remove the property", !label->HasAlgorithmName());
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == "MITK Segmentation");
+    // First tool after the reset starts a fresh chain, not "|Paint".
+    label->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Paint");
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == "MITK Segmentation: Paint");
+
+    // A legacy persisted empty algorithm_name property (the native-JSON reader restores such a value
+    // verbatim via SetProperty, bypassing SetAlgorithmName) must still not corrupt the first tool use.
+    auto legacyLabel = mitk::Label::New();
+    legacyLabel->SetStringProperty("algorithm_name", "");
+    CPPUNIT_ASSERT(legacyLabel->GetAlgorithmName().empty()); // the empty property shadows the fallback
+    legacyLabel->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Paint");
+    CPPUNIT_ASSERT_MESSAGE("Empty stored name must normalize to the prefix, not produce \"|Paint\"",
+                           legacyLabel->GetAlgorithmName() == "MITK Segmentation: Paint");
+  }
+
+  void TestAddToolUseSanitization()
+  {
+    // AddToolUse must keep the provenance string parseable by sanitizing the reserved separators
+    // ("|" and ":") to "#" rather than throwing at the writeback choke point.
+    auto label = mitk::Label::New();
+    CPPUNIT_ASSERT_NO_THROW(label->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "Acme|Net"));
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == "MITK Segmentation: Acme#Net");
+
+    auto colonLabel = mitk::Label::New();
+    CPPUNIT_ASSERT_NO_THROW(colonLabel->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "Region: Grow"));
+    CPPUNIT_ASSERT(colonLabel->GetAlgorithmName() == "MITK Segmentation: Region# Grow");
+
+    // An empty tool name is a no-op (no throw, provenance untouched).
+    auto emptyLabel = mitk::Label::New();
+    CPPUNIT_ASSERT_NO_THROW(emptyLabel->AddToolUse(mitk::Label::AlgorithmType::MANUAL, ""));
+    CPPUNIT_ASSERT(emptyLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::Undefined);
+    CPPUNIT_ASSERT(!emptyLabel->HasAlgorithmName());
+  }
+
+  void TestHasAlgorithmName()
+  {
+    // HasAlgorithmName reports property presence, distinguishing it from GetAlgorithmName()'s fallback.
+    auto label = mitk::Label::New();
+    CPPUNIT_ASSERT_MESSAGE("Fresh label has no algorithm_name property", !label->HasAlgorithmName());
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == "MITK Segmentation"); // fallback, despite the property being absent
+
+    label->SetAlgorithmName("nnUNet");
+    CPPUNIT_ASSERT(label->HasAlgorithmName());
+
+    label->SetAlgorithmName("");
+    CPPUNIT_ASSERT(!label->HasAlgorithmName());
+
+    // AddToolUse sets the property, so a recorded tool implies HasAlgorithmName().
+    auto label2 = mitk::Label::New();
+    label2->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "nnUNet");
+    CPPUNIT_ASSERT(label2->HasAlgorithmName());
+  }
+
+  void TestMergeToolUses()
+  {
+    // A null source is a programming error.
+    auto target = mitk::Label::New();
+    CPPUNIT_ASSERT_THROW(target->MergeToolUses(nullptr), mitk::Exception);
+
+    // Merging an AUTOMATIC source into a fresh (Undefined) target adopts the source's type and tool.
+    auto autoSource = mitk::Label::New();
+    autoSource->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "nnUNet");
+    target->MergeToolUses(autoSource);
+    CPPUNIT_ASSERT(target->GetAlgorithmType() == mitk::Label::AlgorithmType::AUTOMATIC);
+    CPPUNIT_ASSERT(target->GetAlgorithmName() == "MITK Segmentation: nnUNet");
+
+    // Merging a MANUAL source mixes the type to SEMIAUTOMATIC and appends its tool.
+    auto manualSource = mitk::Label::New();
+    manualSource->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Paint");
+    target->MergeToolUses(manualSource);
+    CPPUNIT_ASSERT(target->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    CPPUNIT_ASSERT(target->GetAlgorithmName() == "MITK Segmentation: nnUNet|Paint");
+
+    // Re-merging an already-absorbed source is idempotent (tool de-duplicated).
+    target->MergeToolUses(autoSource);
+    CPPUNIT_ASSERT(target->GetAlgorithmName() == "MITK Segmentation: nnUNet|Paint");
+
+    // A source that carries only a type (no recorded tool name) contributes its type but no tool.
+    auto typeOnlySource = mitk::Label::New();
+    typeOnlySource->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    CPPUNIT_ASSERT(!typeOnlySource->HasAlgorithmName());
+    auto freshTarget = mitk::Label::New();
+    freshTarget->MergeToolUses(typeOnlySource);
+    CPPUNIT_ASSERT(freshTarget->GetAlgorithmType() == mitk::Label::AlgorithmType::MANUAL);
+    CPPUNIT_ASSERT(!freshTarget->HasAlgorithmName());
+
+    // An Undefined source contributes nothing.
+    auto definedTarget = mitk::Label::New();
+    definedTarget->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "nnUNet");
+    auto undefinedSource = mitk::Label::New();
+    definedTarget->MergeToolUses(undefinedSource);
+    CPPUNIT_ASSERT(definedTarget->GetAlgorithmType() == mitk::Label::AlgorithmType::AUTOMATIC);
+    CPPUNIT_ASSERT(definedTarget->GetAlgorithmName() == "MITK Segmentation: nnUNet");
   }
 
   void TestDICOMFunctions()

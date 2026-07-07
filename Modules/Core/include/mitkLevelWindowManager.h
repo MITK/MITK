@@ -14,9 +14,9 @@ found in the LICENSE file.
 #define mitkLevelWindowManager_h
 
 // mitk core
-#include "mitkBaseProperty.h"
-#include "mitkDataStorage.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkBaseProperty.h>
+#include <mitkDataStorage.h>
+#include <mitkLevelWindowProperty.h>
 
 //  c++
 #include <map>
@@ -56,7 +56,20 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Set the DataStorage to observe for image nodes.
+     *
+     * Registers listeners for node add/remove events on the new DataStorage.
+     * If a previous DataStorage was set, its listeners are removed first.
+     *
+     * \param[in] dataStorage The DataStorage to observe. Ignored if nullptr.
+     */
     void SetDataStorage(DataStorage* dataStorage);
+
+    /**
+     * \brief Get the currently observed DataStorage.
+     * \return Pointer to the DataStorage.
+     */
     DataStorage *GetDataStorage();
 
     /**
@@ -76,6 +89,14 @@ namespace mitk
     */
     void SetSelectedImages(bool selectedImagesMode, const DataNode *removedNode = nullptr);
 
+    /**
+     * \brief Recalculate the level window for the currently displayed component of selected images.
+     *
+     * Called when the "Image.Displayed Component" property changes.
+     * Uses SetAuto() to recompute optimal contrast for the new component.
+     *
+     * The event parameter is unused.
+     */
     void RecalculateLevelWindowForSelectedComponent(const itk::EventObject&);
     /**
     * @brief Update the level window.

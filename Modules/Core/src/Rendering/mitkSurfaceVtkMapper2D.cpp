@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceVtkMapper2D.h"
+#include <mitkSurfaceVtkMapper2D.h>
 
 // MITK includes
-#include "mitkVtkPropRenderer.h"
+#include <mitkVtkPropRenderer.h>
 #include <mitkCoreServices.h>
 #include <mitkDataNode.h>
 #include <mitkIPropertyAliases.h>

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCylinder.h"
-#include "mitkNumericTypes.h"
-#include "vtkCylinderSource.h"
-#include "vtkLinearTransform.h"
+#include <mitkCylinder.h>
+#include <mitkNumericTypes.h>
+#include <vtkCylinderSource.h>
+#include <vtkLinearTransform.h>
 
 mitk::Cylinder::Cylinder() : BoundingObject()
 {

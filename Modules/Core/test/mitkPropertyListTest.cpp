@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLookupTables.h"
-#include "mitkProperties.h"
-#include "mitkPropertyList.h"
-#include "mitkStringProperty.h"
-#include "mitkExceptionMacro.h"
+#include <mitkLookupTables.h>
+#include <mitkProperties.h>
+#include <mitkPropertyList.h>
+#include <mitkStringProperty.h>
+#include <mitkExceptionMacro.h>
 
 #include <iostream>
 

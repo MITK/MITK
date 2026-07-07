@@ -10,13 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itLabelSampler_h
-#define itLabelSampler_h
+#ifndef itkLabelSampler_h
+#define itkLabelSampler_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
+/**
+ * \brief Randomly sub-samples voxels from a label image based on an acceptance rate.
+ *
+ * For each voxel matching the specified label (or all non-zero labels if label is -1),
+ * the voxel is kept with probability equal to AcceptRate. The filter also counts the
+ * number of voxels per label and the total number of sampled voxels.
+ *
+ * \tparam TImage The input/output image type.
+ */
 template< class TImage>
 class LabelSampler:public ImageToImageFilter< TImage, TImage >
 {
@@ -28,13 +37,19 @@ public:
   typedef std::map<int,int> outmap;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self); /** Run-time type information (and related methods). */
+  itkNewMacro(Self);
+  /** Run-time type information (and related methods). */
   itkTypeMacro(Self, ImageToImageFilter);
   itkSetMacro(AcceptRate, double);
   itkSetMacro(Label, int);
   itkGetMacro(LabelVoxelCountMap, outmap);
   itkGetMacro(NumberOfSampledVoxels,int);
 
+  /**
+   * \brief Get the voxel count for a specific label value.
+   * \param label The label value to query.
+   * \return The number of voxels with the given label, or 0 if no counts are available.
+   */
   int GetLabelVoxelCount(int label)
   {
     if(m_LabelVoxelCountMap.empty())
@@ -71,8 +86,8 @@ private:
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <../src/Algorithms/itkLabelSampler.cpp>
+#include "../src/Algorithms/itkLabelSampler.cpp"
 #endif
 
 
-#endif // itLabelSampler_h
+#endif // itkLabelSampler_h

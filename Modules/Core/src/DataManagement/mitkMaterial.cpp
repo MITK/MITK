@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMaterial.h"
-#include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
-#include "mitkVtkInterpolationProperty.h"
-#include "mitkVtkRepresentationProperty.h"
+#include <mitkMaterial.h>
+#include <mitkBaseRenderer.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
 #include <vtkProperty.h>
 
 mitk::Material::Material(Color color, double opacity)

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRenderingManagerFactory_h
 #define mitkRenderingManagerFactory_h
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 namespace mitk
 {
@@ -53,11 +53,18 @@ namespace mitk
   };
 
   /**
-   * Factory for the TestingRenderingManager
+   * \brief Factory that creates TestingRenderingManager instances.
+   *
+   * This factory is intended for use in unit tests. It registers itself as the
+   * RenderingManager factory if no other factory has been set.
+   *
+   * \sa RenderingManagerFactory
+   * \sa TestingRenderingManager
    */
   class MITKCORE_EXPORT TestingRenderingManagerFactory : public RenderingManagerFactory
   {
   public:
+    /** \brief Constructor. Registers this factory with RenderingManager if no factory is set yet. */
     TestingRenderingManagerFactory()
     {
       if (!mitk::RenderingManager::HasFactory())
@@ -66,8 +73,13 @@ namespace mitk
       }
     };
 
+    /** \brief Destructor. */
     ~TestingRenderingManagerFactory() override{};
 
+    /** \brief Creates a new TestingRenderingManager instance.
+     *
+     * \return A smart pointer to the newly created TestingRenderingManager.
+     */
     mitk::RenderingManager::Pointer CreateRenderingManager() const override
     {
       TestingRenderingManager::Pointer specificSmartPtr = TestingRenderingManager::New();

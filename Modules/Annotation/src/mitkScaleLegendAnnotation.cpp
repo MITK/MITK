@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkScaleLegendAnnotation.h"
+#include <mitkScaleLegendAnnotation.h>
 #include <vtkAxisActor2D.h>
 #include <vtkLegendScaleActor.h>
 #include <vtkTextProperty.h>
@@ -32,13 +32,7 @@ mitk::ScaleLegendAnnotation::ScaleLegendAnnotation()
 
 mitk::ScaleLegendAnnotation::~ScaleLegendAnnotation()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::ScaleLegendAnnotation::LocalStorage::~LocalStorage()

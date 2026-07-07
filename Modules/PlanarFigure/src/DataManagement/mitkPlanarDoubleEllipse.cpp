@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarDoubleEllipse.h"
+#include <mitkPlanarDoubleEllipse.h>
 #include <mitkProperties.h>
 
 #include <algorithm>
@@ -49,6 +49,20 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(double fixedRadius, double fixedT
   }
 }
 
+mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
+    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
+    FEATURE_ID_THICKNESS(other.FEATURE_ID_THICKNESS),
+    m_NumberOfSegments(other.m_NumberOfSegments),
+    m_ConstrainCircle(other.m_ConstrainCircle),
+    m_ConstrainThickness(other.m_ConstrainThickness),
+    m_FixedRadius(other.m_FixedRadius),
+    m_FixedThickness(other.m_FixedThickness),
+    m_SizeIsFixed(other.m_SizeIsFixed)
+{
+}
+
 mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
   if (index == 2 && !m_ConstrainCircle)
@@ -66,7 +80,7 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
     const ScalarType radius =
       std::max(outerMajorRadius - innerMajorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
 
-    return centerPoint + minorDirection * radius;
+    return Superclass::ApplyControlPointConstraints(index, centerPoint + minorDirection * radius);
   }
   else if (index == 3 && !m_ConstrainThickness)
   {
@@ -80,10 +94,10 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
 
     outerMajorVector.Normalize();
 
-    return centerPoint - outerMajorVector * radius;
+    return Superclass::ApplyControlPointConstraints(index, centerPoint - outerMajorVector * radius);
   }
 
-  return point;
+  return Superclass::ApplyControlPointConstraints(index, point);
 }
 
 void mitk::PlanarDoubleEllipse::EvaluateFeaturesInternal()

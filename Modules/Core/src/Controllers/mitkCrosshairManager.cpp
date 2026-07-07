@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCrosshairManager.h"
+#include <mitkCrosshairManager.h>
 
 #include <mitkException.h>
 #include <mitkResliceMethodProperty.h>
@@ -116,11 +116,7 @@ bool mitk::CrosshairManager::GetCrosshairVisibility(const BaseRenderer* baseRend
   }
 
   bool visibility = false;
-  if (m_CrosshairDataNode->GetVisibility(visibility, baseRenderer))
-  {
-    return false;
-  }
-
+  m_CrosshairDataNode->GetVisibility(visibility, baseRenderer);
   return visibility;
 }
 

@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkEnhancedPointSetVtkMapper3D_h
 #define mitkEnhancedPointSetVtkMapper3D_h
 
-#include "MitkMapperExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkPointSet.h"
-#include "mitkVector.h"
-#include "mitkVtkMapper.h"
+#include <MitkMapperExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkPointSet.h>
+#include <mitkVector.h>
+#include <mitkVtkMapper.h>
 
 class vtkActor;
 class vtkAssembly;
@@ -69,12 +69,31 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      virtual const mitk::PointSet *GetInput();
+    /** \brief Get the PointSet input data.
+     *
+     * \return The PointSet associated with this mapper's data node.
+     */
+    virtual const mitk::PointSet *GetInput();
 
+    /** \brief Get the VTK prop assembly containing all point actors.
+     *
+     * \param[in] renderer The renderer context.
+     * \return The VTK prop assembly for this renderer.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
+    /** \brief Update the VTK transform for the given renderer.
+     *
+     * \param[in] renderer The renderer to update the transform for.
+     */
     void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
+    /** \brief Set default rendering properties for enhanced point set visualization.
+     *
+     * \param[in] node      The data node to configure.
+     * \param[in] renderer  The renderer context, or \c nullptr for all renderers.
+     * \param[in] overwrite If \c true, overwrite existing properties.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;

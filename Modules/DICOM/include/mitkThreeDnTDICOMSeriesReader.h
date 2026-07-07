@@ -13,15 +13,14 @@ found in the LICENSE file.
 #ifndef mitkThreeDnTDICOMSeriesReader_h
 #define mitkThreeDnTDICOMSeriesReader_h
 
-#include "mitkDICOMITKSeriesGDCMReader.h"
+#include <mitkDICOMITKSeriesGDCMReader.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {
 
 /**
-   \ingroup DICOMReader
    \brief Extends DICOMITKSeriesGDCMReader by sorting/grouping into 3D+t image blocks.
 
    This class reuses the DICOMITKSeriesGDCMReader class and adds the option of
@@ -43,7 +42,6 @@ class MITKDICOM_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRead
   public:
 
     mitkClassMacro( ThreeDnTDICOMSeriesReader, DICOMITKSeriesGDCMReader );
-    mitkCloneMacro( ThreeDnTDICOMSeriesReader );
     itkNewMacro( ThreeDnTDICOMSeriesReader );
     mitkNewMacro1Param( ThreeDnTDICOMSeriesReader, unsigned int );
 
@@ -71,6 +69,7 @@ class MITKDICOM_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRead
     }
 
   protected:
+    mitkCloneMacro( ThreeDnTDICOMSeriesReader );
 
     ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation = Superclass::m_DefaultDecimalPlacesForOrientation);
     ~ThreeDnTDICOMSeriesReader() override;

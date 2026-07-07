@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAbstractFileIO.h"
+#include <mitkAbstractFileIO.h>
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 
 namespace mitk
 {

@@ -10,24 +10,24 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkPlanarAngle.h"
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarCross.h"
-#include "mitkPlanarFourPointAngle.h"
-#include "mitkPlanarLine.h"
-#include "mitkPlanarPolygon.h"
-#include "mitkPlanarRectangle.h"
-#include "mitkPlanarSubdivisionPolygon.h"
+#include <mitkPlanarAngle.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarCross.h>
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarSubdivisionPolygon.h>
 
-#include "mitkPlaneGeometry.h"
+#include <mitkPlaneGeometry.h>
 
-#include "mitkGeometry3D.h"
-#include "mitkAbstractFileIO.h"
-#include "mitkFileReaderRegistry.h"
-#include "mitkFileWriterRegistry.h"
-#include "mitkIOUtil.h"
+#include <mitkGeometry3D.h>
+#include <mitkAbstractFileIO.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkFileWriterRegistry.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -427,7 +427,7 @@ public:
 
     mitk::FileReaderRegistry readerRegistry;
     std::vector<mitk::IFileReader*> readers =
-      readerRegistry.GetReaders(mitk::FileReaderRegistry::GetMimeTypeForFile("pf"));
+      readerRegistry.GetReaders(mitk::FileReaderRegistry::GetMimeTypeForFile("test.pf"));
 
     for (const auto& pfStream : pfMemoryStreams)
     {

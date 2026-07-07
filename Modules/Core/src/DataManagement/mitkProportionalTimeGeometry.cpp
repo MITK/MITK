@@ -16,6 +16,16 @@ mitk::ProportionalTimeGeometry::ProportionalTimeGeometry() : m_FirstTimePoint(0.
 {
 }
 
+mitk::ProportionalTimeGeometry::ProportionalTimeGeometry(const ProportionalTimeGeometry &other)
+  : TimeGeometry(other), m_FirstTimePoint(other.m_FirstTimePoint), m_StepDuration(other.m_StepDuration)
+{
+  m_GeometryVector.reserve(other.m_GeometryVector.size());
+  for (const auto &geometry : other.m_GeometryVector)
+  {
+    m_GeometryVector.push_back(geometry->Clone());
+  }
+}
+
 mitk::ProportionalTimeGeometry::~ProportionalTimeGeometry()
 {
 }
@@ -195,23 +205,6 @@ void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(BaseGeometry *geometry,
     m_GeometryVector.push_back(geometry);
 
   m_GeometryVector[timeStep] = geometry;
-}
-
-itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
-{
-  itk::LightObject::Pointer parent = Superclass::InternalClone();
-  ProportionalTimeGeometry::Pointer newTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(parent.GetPointer());
-
-  newTimeGeometry->m_FirstTimePoint = this->m_FirstTimePoint;
-  newTimeGeometry->m_StepDuration = this->m_StepDuration;
-  newTimeGeometry->m_GeometryVector.clear();
-  newTimeGeometry->Expand(this->CountTimeSteps());
-  for (TimeStepType i = 0; i < CountTimeSteps(); ++i)
-  {
-    BaseGeometry::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
-    newTimeGeometry->SetTimeStepGeometry(tempGeometry, i);
-  }
-  return parent;
 }
 
 void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry *geometry)

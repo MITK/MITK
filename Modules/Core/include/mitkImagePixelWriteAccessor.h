@@ -13,18 +13,21 @@ found in the LICENSE file.
 #ifndef mitkImagePixelWriteAccessor_h
 #define mitkImagePixelWriteAccessor_h
 
-#include "mitkImagePixelAccessor.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkImagePixelAccessor.h>
+#include <mitkImageWriteAccessor.h>
 
 namespace mitk
 {
   /**
-   * @brief Gives locked and index-based write access for a particular image part.
-   * The class provides several set- and get-methods, which allow an easy pixel access.
+   * \brief Gives locked and index-based write access for a particular image part.
+   *
+   * The class provides several set- and get-methods, which allow easy pixel access.
    * It needs to know about pixel type and dimension of its image at compile time.
-   * @tparam TPixel defines the PixelType
-   * @tparam VDimension defines the dimension for accessing data
-   * @ingroup Data
+   *
+   * \tparam TPixel Defines the pixel type.
+   * \tparam VDimension Defines the dimension for accessing data.
+   *
+   * \ingroup Data
    */
   template <class TPixel, unsigned int VDimension = 3>
   class ImagePixelWriteAccessor : public ImagePixelAccessor<TPixel, VDimension>
@@ -60,7 +63,7 @@ namespace mitk
 
     /** \brief Gives full data access. */
     virtual inline TPixel *GetData() const { return static_cast<TPixel *>(m_WriteAccessor.m_AddressBegin); }
-    /// Sets a pixel value at given index.
+    /** \brief Sets a pixel value at the given index. */
     void SetPixelByIndex(const itk::Index<VDimension> &idx, const TPixel &value)
     {
       unsigned int offset = ImagePixelAccessor<TPixel, VDimension>::GetOffset(idx);
@@ -127,7 +130,9 @@ namespace mitk
     /** Returns a reference to the pixel at given world coordinate */
     void SetPixelByWorldCoordinates(const mitk::Point3D &, const TPixel &value, unsigned int timestep = 0);
 
+    /** \brief Destructor informs Image to unlock memory. */
     ~ImagePixelWriteAccessor() override {}
+
   private:
     ImageWriteAccessor m_WriteAccessor;
 

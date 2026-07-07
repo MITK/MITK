@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExampleDataStructureWriterService.h"
+#include <mitkExampleDataStructureWriterService.h>
 
 // itk includes
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 // mitk includes
-#include "mitkExampleIOMimeTypes.h"
+#include <mitkExampleIOMimeTypes.h>
 
 mitk::ExampleDataStructureWriterService::ExampleDataStructureWriterService()
   : AbstractFileWriter(mitk::ExampleDataStructure::GetStaticNameOfClass(),

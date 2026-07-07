@@ -15,10 +15,10 @@ found in the LICENSE file.
 
 #include "berryIPropertyTester.h"
 
-#include "berryObject.h"
+#include <berryObject.h>
 
-#include "Poco/SharedPtr.h"
-#include "Poco/Any.h"
+#include <Poco/SharedPtr.h>
+#include <Poco/Any.h>
 
 #include <vector>
 #include <typeinfo>

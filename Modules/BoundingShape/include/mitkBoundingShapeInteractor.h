@@ -19,22 +19,34 @@ found in the LICENSE file.
 
 #include <usServiceRegistration.h>
 
+#include <array>
+
 #include <MitkBoundingShapeExports.h>
 
 namespace mitk
 {
 // create events for interactions
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   itkEventMacroDeclaration(BoundingShapeInteractionEvent, itk::AnyEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
-  /**
-    * @brief Basic interaction methods for mitk::GeometryData
-    *
-    * Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-    *
-    * \ingroup Interaction
-    */
+  /** \brief Interactor for manipulating bounding shapes (GeometryData).
+   *
+   * Provides interactive translation and scaling of a bounding box through
+   * mouse-based handle manipulation. Inherits from DataInteractor, providing
+   * state machine and configurable input support.
+   *
+   * The interactor manages 6 face handles that can be dragged to resize the
+   * bounding box, and supports translating the entire box by dragging the body.
+   * Visual feedback is provided through color changes on hover and selection.
+   *
+   * \sa BoundingShapeCropper, BoundingShapeVtkMapper2D, BoundingShapeVtkMapper3D, DataInteractor
+   * \ingroup Interaction
+   */
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeInteractor : public DataInteractor
   {
   public:
@@ -42,8 +54,14 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Set the data node this interactor operates on.
+     *
+     * Initializes default bounding shape properties on the node and sets up
+     * the interaction geometry.
+     *
+     * \param[in] dataNode The data node containing GeometryData to interact with.
+     */
     void SetDataNode(DataNode *dataNode) override;
-    void SetRotationEnabled(bool rotationEnabled);
 
   protected:
     BoundingShapeInteractor();
@@ -60,7 +78,17 @@ namespace mitk
       */
     void DataNodeChanged() override;
 
-    void HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center);
+    /**
+     * @brief Updates the handle positions for the renderer of the given event and reports which
+     *        handles are visible there.
+     *
+     * In a 2D render window a handle is placed where its box face crosses the current slice and is
+     * visible only when that intersection exists; in the 3D render window handles sit at the face
+     * centers and are always visible. \p handleVisible is filled accordingly.
+     */
+    void HandlePositionChanged(const InteractionEvent *interactionEvent,
+                               Point3D &center,
+                               std::array<bool, 6> &handleVisible);
 
     /**
     * @brief Checks if the mouse pointer is over the object.

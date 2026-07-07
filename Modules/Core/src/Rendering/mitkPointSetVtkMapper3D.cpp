@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetVtkMapper3D.h"
-#include "mitkColorProperty.h"
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
-#include "mitkProperties.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkPointSetVtkMapper3D.h>
+#include <mitkColorProperty.h>
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkProperties.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -65,15 +65,6 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
 
 mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 {
-}
-
-void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
-{
-  m_PointsAssembly->ReleaseGraphicsResources(renWin);
-
-  m_SelectedActor->ReleaseGraphicsResources(renWin);
-  m_UnselectedActor->ReleaseGraphicsResources(renWin);
-  m_ContourActor->ReleaseGraphicsResources(renWin);
 }
 
 void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(mitk::BaseRenderer *renderer)
@@ -285,7 +276,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       std::string l = pointLabel;
       if (input->GetSize() > 1)
       {
-        sprintf(buffer, "%d", ptIdx + 1);
+        snprintf(buffer, sizeof(buffer), "%d", ptIdx + 1);
         l.append(buffer);
       }
       // Define the text for the label

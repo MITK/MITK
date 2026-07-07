@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegisterClasses.h"
-#include "QmitkRenderWindow.h"
+#include <QmitkRegisterClasses.h>
+#include <QmitkRenderWindow.h>
 
 #include <mitkIOUtil.h>
 #include <mitkProperties.h>

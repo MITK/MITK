@@ -20,8 +20,6 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 )
 
-set(CPP_FILES )
-
 set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/data-manager.svg

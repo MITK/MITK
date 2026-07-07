@@ -22,10 +22,10 @@ found in the LICENSE file.
 
 */
 
-#include "mitkStandardFileLocations.h"
-#include "mitkTestDICOMLoading.h"
+#include <mitkStandardFileLocations.h>
+#include <mitkTestDICOMLoading.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <list>
 #include <locale>

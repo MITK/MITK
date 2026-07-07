@@ -326,8 +326,19 @@ std::string mitk::Annotation::GetMicroserviceID()
 
 void mitk::Annotation::RegisterAsMicroservice(us::ServiceProperties props)
 {
-  if (m_ServiceRegistration != nullptr)
-    m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration)
+  {
+    try
+    {
+      if (m_ServiceRegistration.IsAvailable())
+        m_ServiceRegistration.Unregister();
+    }
+    catch (...)
+    {
+      // Best-effort cleanup of the stale handle; proceed with the fresh
+      // registration even if the previous one cannot be torn down cleanly.
+    }
+  }
   us::ModuleContext *context = us::GetModuleContext();
   // Define ServiceProps
   mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.Annotation.id_");
@@ -337,8 +348,21 @@ void mitk::Annotation::RegisterAsMicroservice(us::ServiceProperties props)
 
 void mitk::Annotation::UnRegisterMicroservice()
 {
-  if (m_ServiceRegistration != nullptr)
-    m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration)
+  {
+    try
+    {
+      if (m_ServiceRegistration.IsAvailable())
+        m_ServiceRegistration.Unregister();
+    }
+    catch (...)
+    {
+      // Best-effort cleanup. Reached e.g. when the underlying service was
+      // already torn down at process exit (Unregister throws
+      // std::logic_error("Service is unregistered")). ~Annotation is
+      // implicitly noexcept, so no exception may escape.
+    }
+  }
   m_ServiceRegistration = 0;
 }
 
@@ -346,4 +370,22 @@ void mitk::Annotation::AnnotationModified()
 {
   Modified();
   this->SetUSProperty(US_PROPKEY_MODIFIED, this->GetMTime());
+}
+
+void mitk::Annotation::RemoveFromAllRegisteredBaseRenderers(const std::vector<BaseRenderer *> &renderers) noexcept
+{
+  for (BaseRenderer *renderer : renderers)
+  {
+    if (renderer == nullptr)
+      continue;
+    try
+    {
+      this->RemoveFromBaseRenderer(renderer);
+    }
+    catch (...)
+    {
+      // Failures during destruction (e.g. process-exit teardown) must not
+      // escape; the destructor is implicitly noexcept.
+    }
+  }
 }

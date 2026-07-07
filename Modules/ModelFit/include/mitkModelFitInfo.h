@@ -15,14 +15,14 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 
-#include "mitkModelFitConstants.h"
-#include "mitkModelFitParameter.h"
-#include "mitkModelFitStaticParameterMap.h"
-#include "mitkScalarListLookupTable.h"
-#include "mitkModelParameterizerBase.h"
-#include "mitkModelTraitsInterface.h"
+#include <mitkModelFitConstants.h>
+#include <mitkModelFitParameter.h>
+#include <mitkModelFitStaticParameterMap.h>
+#include <mitkScalarListLookupTable.h>
+#include <mitkModelParameterizerBase.h>
+#include <mitkModelTraitsInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
@@ -30,8 +30,10 @@ namespace mitk
   namespace modelFit
   {
     /**
-     *	@brief	Data class that stores all information about a modelfit that is relevant to the
-     *			visualization and stored as properties in the result nodes.
+     * \class ModelFitInfo
+     * \brief Data class that stores all information about a model fit relevant to visualization.
+     *
+     * Fit information is stored as properties in the result nodes.
      */
     class MITKMODELFIT_EXPORT ModelFitInfo : public itk::LightObject
     {
@@ -51,31 +53,28 @@ namespace mitk
       }
 
       /**
-       *	@brief		Adds the given parameter to this fit's parameter list if it doesn't
-       *				exist already.
-       *	@param p	The param that should be added to this fit's parameter list.
+       * \brief Adds the given parameter to this fit's parameter list if it doesn't exist already.
+       * \param p The parameter that should be added to this fit's parameter list.
        */
       void AddParameter(Parameter::Pointer p);
 
       /**
-       *	@brief		Searches for the parameter with the given name and type in the fit's
-       *				parameter list and returns it.
-       *	@param name	The name of the desired parameter.
-       *	@param type The type of the desired parameter.
-       *	@return		The parameter with the given name on success or NULL otherwise.
+       * \brief Searches for the parameter with the given name and type and returns it.
+       * \param name The name of the desired parameter.
+       * \param type The type of the desired parameter.
+       * \return The parameter with the given name on success or NULL otherwise.
        */
       Parameter::ConstPointer GetParameter(const std::string& name, const Parameter::Type& type)
       const;
 
       /**
-       *	@brief		Searches for the parameter with the given name and type in the fit's
-       *				parameter list and deletes it if it exists.
-       *	@param name	The name of the desired parameter.
-       *	@param type The type of the desired parameter.
+       * \brief Removes the parameter with the given name and type from the list.
+       * \param name The name of the parameter to delete.
+       * \param type The type of the parameter to delete.
        */
       void DeleteParameter(const std::string& name, const Parameter::Type& type);
 
-      /**Return const reference to the parameter list.*/
+      /** \brief Returns a const reference to the parameter list. */
       const ParamListType& GetParameters() const;
 
       /** ModelFitConstants::MODEL_NAME_PROPERTY_NAME */
@@ -122,69 +121,72 @@ namespace mitk
     };
 
     /**
-     *	@brief Reads the string property with the given name from the data of the given node
-     *  and	returns its value. Throws a ModelFitException if the property doesn't exist.
-     *	@param node	The node whose property value should be returned.
-     *	@param prop	The name of the property that should be read.
-     *	@return		The value of the found property.
-     *	@throw ModelFitException	If the property doesn't exist or returns an empty string.
+     * \brief Reads a mandatory string property from a data node.
+     * \param node The node whose property value should be returned.
+     * \param prop The name of the property that should be read.
+     * \return The value of the found property.
+     * \throw ModelFitException If the property doesn't exist or returns an empty string.
      */
     MITKMODELFIT_EXPORT const std::string GetMandatoryProperty(const mitk::DataNode* node,
         const std::string& prop);
 
     /**
-    *	@brief		Reads the string property with the given name from the given base data and
-    *				returns its value. Throws a ModelFitException if the property doesn't exist.
-    *	@param data	The data whose property value should be returned.
-    *	@param prop	The name of the property that should be read.
-    *	@return		The value of the found property.
-    *	@throw ModelFitException	If the property doesn't exist or returns an empty string.
-    */
+     * \brief Reads a mandatory string property from base data.
+     * \param data The data whose property value should be returned.
+     * \param prop The name of the property that should be read.
+     * \return The value of the found property.
+     * \throw ModelFitException If the property doesn't exist or returns an empty string.
+     */
     MITKMODELFIT_EXPORT const std::string GetMandatoryProperty(const mitk::BaseData* data,
       const std::string& prop);
 
     /**
-     *	@brief	Creates a new ModelFitInfo instance from the nodes in the passed storage.
-     * The fit will be identified by the passed UID. Returns the instance on
-     *					success.
-     *	@param uid		The uid of the fit that should get its ModelFitInfo created and which identifies the nodes in the storage.
-     *	@param storage	Pointer to the data storage containing any potential relevantThe nodes.
-     *	@return			The newly created modelfit on success or NULL otherwise.
+     * \brief Creates a new ModelFitInfo instance from the nodes in the passed storage.
+     *
+     * The fit will be identified by the passed UID.
+     * \param uid The UID of the fit that identifies the nodes in the storage.
+     * \param storage Pointer to the data storage containing the relevant nodes.
+     * \return The newly created ModelFitInfo on success or NULL otherwise.
      */
     MITKMODELFIT_EXPORT ModelFitInfo::Pointer CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
         const mitk::DataStorage* storage);
 
-    /** creates a new ModelFitInfo instance from a passed modal instance and his traits instance*
-    *	@param usedParameterizer Pointer to a model which was used for a fit, which should get a fit info created.
-    * @param inputImage Pointer to the input image. If it has no UID yet, a property will be added to the node.
-    * @param fitType String identifying the type of the fit (e.g. ROI based or voxel based)
-    * @param fitName Optional human readable name of the fit.
-    * @param roiUID UID of the ROI, if one was used.
-    *	@return			The newly created modelfit on success or NULL otherwise.*/
+    /**
+     * \brief Creates a new ModelFitInfo instance from a model parameterizer.
+     * \param usedParameterizer Pointer to the parameterizer used for the fit.
+     * \param inputImage Pointer to the input image. If it has no UID yet, one will be added.
+     * \param fitType String identifying the type of fit (e.g. ROI based or pixel based).
+     * \param fitName Optional human readable name of the fit.
+     * \param roiUID UID of the ROI, if one was used.
+     * \return The newly created ModelFitInfo on success or NULL otherwise.
+     */
     MITKMODELFIT_EXPORT ModelFitInfo::Pointer CreateFitInfoFromModelParameterizer(
       const ModelParameterizerBase* usedParameterizer, mitk::BaseData* inputImage,
       const std::string& fitType, const std::string& fitName = "", const ModelFitInfo::UIDType& roiUID = "");
-    /** @overload
-     Overloaded version that allows additional definition of optional input data for the fit.*/
+
+    /** \overload */
     MITKMODELFIT_EXPORT ModelFitInfo::Pointer CreateFitInfoFromModelParameterizer(
       const ModelParameterizerBase* usedParameterizer, mitk::BaseData* inputImage,
       const std::string& fitType, const ScalarListLookupTable& inputData, const std::string& fitName = "",
       const ModelFitInfo::UIDType& roiUID = "");
 
-    /** Returns all nodes that belong to the fit indicated by the passed UID.
-     *	@param fitUID	The uid of the fit that is relevant for the query.
-     *	@param storage	Pointer to the data storage containing any potential relevant nodes.
-     *	@return			The set of found nodes or null if storage is not valid.
+    /**
+     * \brief Returns all nodes that belong to the fit indicated by the passed UID.
+     * \param fitUID The UID of the fit.
+     * \param storage Pointer to the data storage containing relevant nodes.
+     * \return The set of found nodes or null if storage is not valid.
      */
     MITKMODELFIT_EXPORT DataStorage::SetOfObjects::ConstPointer GetNodesOfFit(
       const ModelFitInfo::UIDType& fitUID,
       const mitk::DataStorage* storage);
 
     typedef std::set<ModelFitInfo::UIDType> NodeUIDSetType;
-    /** Returns the UIDs of all fits that are derived (directly or indirectly from the passed node).
-     *	@param node	The node which defines the parent node. It will be searched in his derived nodes for fits.
-     *	@param storage	Pointer to the data storage containing any potential relevant nodes.
-     *	@return	The set of found uid will be returned.
+
+    /**
+     * \brief Returns the UIDs of all fits that are derived from the passed node.
+     * \param node The parent node to search for derived fits.
+     * \param storage Pointer to the data storage containing relevant nodes.
+     * \return The set of found fit UIDs.
      */
     MITKMODELFIT_EXPORT NodeUIDSetType GetFitUIDsOfNode(const mitk::DataNode* node,
         const mitk::DataStorage* storage);

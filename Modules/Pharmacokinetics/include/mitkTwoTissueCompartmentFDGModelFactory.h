@@ -12,14 +12,17 @@ found in the LICENSE file.
 #ifndef mitkTwoTissueCompartmentFDGModelFactory_h
 #define mitkTwoTissueCompartmentFDGModelFactory_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkTwoTissueCompartmentFDGModel.h"
-#include "mitkTwoTissueCompartmentFDGModelParameterizer.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkTwoTissueCompartmentFDGModel.h>
+#include <mitkTwoTissueCompartmentFDGModelParameterizer.h>
 
 namespace mitk
 {
 
 
+  /** \brief Factory for the TwoTissueCompartmentFDGModel (irreversible FDG model).
+   * \sa TwoTissueCompartmentFDGModel, TwoTissueCompartmentFDGModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentFDGModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<TwoTissueCompartmentFDGModelParameterizer>
   {

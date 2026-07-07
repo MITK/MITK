@@ -13,10 +13,22 @@ found in the LICENSE file.
 #ifndef mitkConcreteModelParameterizerBase_h
 #define mitkConcreteModelParameterizerBase_h
 
-#include "mitkModelParameterizerBase.h"
+#include <mitkModelParameterizerBase.h>
 
 namespace mitk
 {
+  /**
+   * \class ConcreteModelParameterizerBase
+   * \brief Template base class for parameterizers operating on a specific model type.
+   *
+   * Provides default implementations for generating parameterized model instances
+   * and retrieving model traits by delegating to newly created model instances.
+   * Default implementations assume no static parameters and zero initial values.
+   *
+   * \tparam TModel The concrete model type this parameterizer configures.
+   *
+   * \sa ModelParameterizerBase, ModelBase
+   */
   template <class TModel>
   class ConcreteModelParameterizerBase : public ModelParameterizerBase
   {
@@ -42,7 +54,7 @@ namespace mitk
     typedef Superclass::IndexType IndexType;
 
     /* Returns the global static parameters for the model.
-     * @remark this default implementation assumes no global static parameters exist.
+     * \remark this default implementation assumes no global static parameters exist.
      * Thus an empty map is returned.*/
     StaticParameterMapType GetGlobalStaticParameters() const override
     {
@@ -51,7 +63,7 @@ namespace mitk
     };
 
     /* Returns the local static parameters for the model at the given index.
-     * @remark this default implementation assumes no local static parameters exist.
+     * \remark this default implementation assumes no local static parameters exist.
      * Thus an empty map is returned.*/
     StaticParameterMapType GetLocalStaticParameters(const IndexType& /*currentPosition*/) const override
     {
@@ -88,7 +100,7 @@ namespace mitk
     };
 
     /* Returns a parameterization filled with zeros.
-     * @remark this default implementation assumes no special initial parameterization is suggested.
+     * \remark this default implementation assumes no special initial parameterization is suggested.
      * Thus an zero filled vector is returned.*/
     ParametersType GetDefaultInitialParameterization() const override
     {

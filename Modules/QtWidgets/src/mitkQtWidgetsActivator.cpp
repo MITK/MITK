@@ -17,11 +17,11 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 
 // Qmitk
-#include "QmitkDataStorageInspectorProviderBase.h"
-#include "QmitkDataStorageListInspector.h"
-#include "QmitkDataStorageTreeInspector.h"
-#include "QmitkDataStorageSelectionHistoryInspector.h"
-#include "QmitkDataStorageFavoriteNodesInspector.h"
+#include <QmitkDataStorageInspectorProviderBase.h>
+#include <QmitkDataStorageListInspector.h>
+#include <QmitkDataStorageTreeInspector.h>
+#include <QmitkDataStorageSelectionHistoryInspector.h>
+#include <QmitkDataStorageFavoriteNodesInspector.h>
 
 void MitkQtWidgetsActivator::Load(us::ModuleContext * /*context*/)
 {

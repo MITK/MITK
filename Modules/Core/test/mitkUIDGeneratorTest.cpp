@@ -11,12 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 // std includes
 #include <string>
 // MITK includes
-#include "mitkUIDGenerator.h"
+#include <mitkUIDGenerator.h>
 #include <mitkLog.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

@@ -46,7 +46,9 @@ tramp
 
 # Visual Studio / VS Code
 .vs/
+.vscode/
 out/
+build/
 CMakeSettings.json
 
 ########## OS specific
@@ -84,3 +86,14 @@ Icon
 ## Python
 *.pyc
 __pycache__/
+.pytest_cache/
+
+## Sphinx autosummary output for the mitk Python docs
+## (regenerated on every mitk_python_docs build)
+/Wrapping/Python/docs/api/generated/
+/Wrapping/Python/docs/_build/
+
+## Claude Code
+.claude/*
+!.claude/rules/
+!.claude/settings.json

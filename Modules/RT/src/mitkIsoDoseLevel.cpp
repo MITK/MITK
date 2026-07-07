@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkIsoDoseLevel.h"
+#include <mitkIsoDoseLevel.h>
 
 mitk::IsoDoseLevel::IsoDoseLevel() :
 m_DoseValue (0.0),

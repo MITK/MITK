@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "berryISourceProvider.h"
 
-#include <berryISourceProviderListener.h>
+#include "berryISourceProviderListener.h"
 
 namespace berry {
 

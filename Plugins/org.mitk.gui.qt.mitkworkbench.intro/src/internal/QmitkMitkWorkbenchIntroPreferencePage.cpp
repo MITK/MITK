@@ -31,7 +31,7 @@ namespace
 }
 
 QmitkMitkWorkbenchIntroPreferencePage::QmitkMitkWorkbenchIntroPreferencePage()
-  : m_Ui(new Ui::QmitkMitkWorkbenchIntroPreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitkMitkWorkbenchIntroPreferencePage>()),
     m_Control(nullptr)
 {
 }

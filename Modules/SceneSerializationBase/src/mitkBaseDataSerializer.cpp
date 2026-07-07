@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseDataSerializer.h"
-#include "mitkStandardFileLocations.h"
+#include <mitkBaseDataSerializer.h>
+#include <mitkStandardFileLocations.h>
 #include <itksys/SystemTools.hxx>
 
 mitk::BaseDataSerializer::BaseDataSerializer() : m_FilenameHint("unnamed"), m_WorkingDirectory("")

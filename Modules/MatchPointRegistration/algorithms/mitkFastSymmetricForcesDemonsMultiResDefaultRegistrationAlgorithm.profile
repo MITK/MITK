@@ -3,7 +3,7 @@ SET(ALGORITHM_PROFILE_UID_Name "Demons.FastSymmetricForces.3D.multiRes.default")
 SET(ALGORITHM_PROFILE_UID_Version "1.0.0")
 
 SET(ALGORITHM_PROFILE_Description "This algorithm is a default option for monomodal deformable problem statements in DIPP. The registration algorithm is based on the concept of Thiron's demons using fast symmetric forces and using a 4 level multi resolution approach to get faster and more robust results.")
-SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; mitk-users@lists.sourceforge.net")
+SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; https://github.com/MITK/MITK/issues")
 SET(ALGORITHM_PROFILE_Citation "Tom Vercauteren, Xavier Pennec, Aymeric Perchant, and Nicholas Ayache. Diffeomorphic Demons Using ITK's Finite Difference Solver Hierarchy. Insight Journal , ISC/NA-MIC Workshop on Open Science at MICCAI 2007, October 2007.")
 
 SET(ALGORITHM_PROFILE_DataType "Image")

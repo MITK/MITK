@@ -11,13 +11,15 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkBoundingShapeUtil.h"
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
-#include "vtkDoubleArray.h"
-#include "vtkMath.h"
+#include <vtkDoubleArray.h>
+#include <vtkMath.h>
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
+#include <array>
+#include <vector>
 
 mitk::Handle::Handle() : m_IsActive(false), m_FaceIndices(4), m_Index(0)
 {
@@ -210,4 +212,66 @@ std::vector<int> mitk::GetHandleIndices(int index)
   }
 
   return faceIndices;
+}
+
+std::array<int, 4> mitk::GetHandleFaceCornerIndices(int handleIndex)
+{
+  // Perimeter-ordered corners of the face that each handle sits on (the face it
+  // moves when dragged). Consecutive entries (and the last-to-first pair) are edges.
+  switch (handleIndex)
+  {
+    case 0: return {4, 5, 7, 6}; // x-max face
+    case 1: return {0, 1, 3, 2}; // x-min face
+    case 2: return {0, 4, 6, 2}; // z-min face
+    case 3: return {1, 5, 7, 3}; // z-max face
+    case 4: return {2, 3, 7, 6}; // y-max face
+    case 5: return {0, 1, 5, 4}; // y-min face
+    default: return {0, 0, 0, 0};
+  }
+}
+
+bool mitk::GetFacePlaneIntersectionCenter(const std::array<mitk::Point3D, 4> &faceCorners,
+                                          const mitk::Point3D &planeOrigin,
+                                          const mitk::Vector3D &planeNormal,
+                                          mitk::Point3D &center)
+{
+  std::vector<mitk::Point3D> hits;
+  hits.reserve(2);
+
+  for (int i = 0; i < 4; ++i)
+  {
+    const mitk::Point3D &a = faceCorners[i];
+    const mitk::Point3D &b = faceCorners[(i + 1) % 4];
+
+    const double distA = planeNormal * (a - planeOrigin);
+    const double distB = planeNormal * (b - planeOrigin);
+
+    // Strict sign change: the edge crosses the plane strictly between a and b.
+    if (distA * distB < 0.0)
+    {
+      const double t = distA / (distA - distB);
+      mitk::Point3D hit;
+      hit[0] = a[0] + t * (b[0] - a[0]);
+      hit[1] = a[1] + t * (b[1] - a[1]);
+      hit[2] = a[2] + t * (b[2] - a[2]);
+      hits.push_back(hit);
+    }
+  }
+
+  if (hits.size() < 2)
+    return false;
+
+  center.Fill(0.0);
+  for (const auto &hit : hits)
+  {
+    center[0] += hit[0];
+    center[1] += hit[1];
+    center[2] += hit[2];
+  }
+  const double count = static_cast<double>(hits.size());
+  center[0] /= count;
+  center[1] /= count;
+  center[2] /= count;
+
+  return true;
 }

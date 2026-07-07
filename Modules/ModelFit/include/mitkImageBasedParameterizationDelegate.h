@@ -13,18 +13,27 @@ found in the LICENSE file.
 #ifndef mitkImageBasedParameterizationDelegate_h
 #define mitkImageBasedParameterizationDelegate_h
 
-#include "mitkValueBasedParameterizationDelegate.h"
+#include <mitkValueBasedParameterizationDelegate.h>
 #include <itkIndex.h>
 #include <itkObject.h>
 
-#include "mitkModelBase.h"
-#include "mitkImage.h"
-#include "mitkModelTraitsInterface.h"
+#include <mitkModelBase.h>
+#include <mitkImage.h>
+#include <mitkModelTraitsInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk {
 
+/** \class ImageBasedParameterizationDelegate
+ * \brief Parameterization delegate that uses images as sources for initial parameter values.
+ *
+ * Extends ValueBasedParameterizationDelegate to allow associating parameter images
+ * with specific parameter indices. When queried for initial parameterization at
+ * a given position, it reads the corresponding voxel value from the associated image.
+ *
+ * \sa ValueBasedParameterizationDelegate, InitialParameterizationDelegateBase
+ */
 class MITKMODELFIT_EXPORT ImageBasedParameterizationDelegate : public ValueBasedParameterizationDelegate
 {
 public:
@@ -53,13 +62,13 @@ public:
     ParametersType GetInitialParameterization(const IndexType& currentPosition) const override;
 
     /** Adds an image as a source for the initial value of a parameter.
-     * @param image Pointer to the image that is the value source.
-     * @param paramIndex Indicates which parameter is defined by the source image.
+     * \param image Pointer to the image that is the value source.
+     * \param paramIndex Indicates which parameter is defined by the source image.
      * It equals the position in the return vector of GetInitialParameterization().
-     * @remark setting an image for an index overwrites the value for this index set by
+     * \remark Setting an image for an index overwrites the value for this index set by
      * SetInitialParameterization.
-     * @pre paramIndex must be in bound of the initial parametrization vector.
-     * @pre image must be a valid instance*/
+     * \pre paramIndex must be in bound of the initial parametrization vector.
+     * \pre image must be a valid instance.*/
     void AddInitialParameterImage(const mitk::Image* image, ParametersType::size_type paramIndex);
 protected:
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLimitedLinearUndo.h"
+#include <mitkLimitedLinearUndo.h>
 #include <mitkRenderingManager.h>
 
 namespace mitk
@@ -198,9 +198,16 @@ void mitk::LimitedLinearUndo::SetUndoLimit(std::size_t undoLimit)
 {
   if (undoLimit != m_UndoLimit)
   {
-    if (m_UndoList.size() > undoLimit)
+    // 0 means "unlimited" in this case, so only trim when an actual (non-zero) limit is set
+    if (0 != undoLimit && m_UndoList.size() > undoLimit)
     {
-      m_UndoList.erase(m_UndoList.begin(), m_UndoList.end() - undoLimit);
+      auto last = m_UndoList.end() - undoLimit;
+
+      // delete the owned items before dropping them from the list
+      for (auto iter = m_UndoList.begin(); iter != last; ++iter)
+        delete *iter;
+
+      m_UndoList.erase(m_UndoList.begin(), last);
     }
     m_UndoLimit = undoLimit;
 

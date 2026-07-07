@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkLookupTable.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkNumericTypes.h>
 #include <mitkTestFixture.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TimeNavigationController_h
-#define TimeNavigationController_h
+#ifndef mitkTimeNavigationController_h
+#define mitkTimeNavigationController_h
 
 #include <MitkCoreExports.h>
 
@@ -49,7 +49,7 @@ namespace mitk
    * timeCtrl->Update();
    * \endcode
    *
-   * Vvisible navigation widgets can be connected to a TimeNavigationController, e.g., a
+   * Visible navigation widgets can be connected to a TimeNavigationController, e.g., a
    * QmitkSliceNavigationWidget (for Qt):
    *
    * \code
@@ -98,6 +98,13 @@ namespace mitk
      */
     virtual void SendTime();
 
+    /**
+     * \brief ITK event that carries the currently selected time step.
+     *
+     * This event is invoked by the TimeNavigationController whenever the
+     * selected time step changes. Observers (e.g. BaseRenderer) can listen
+     * for this event to update their rendering accordingly.
+     */
     class MITKCORE_EXPORT TimeEvent : public itk::AnyEvent
     {
     public:
@@ -110,6 +117,8 @@ namespace mitk
       const char *GetEventName() const override { return "TimeEvent"; }
       bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
       ::itk::EventObject *MakeObject() const override { return new Self(m_TimeStep); }
+
+      /** \brief Return the time step carried by this event. */
       TimeStepType GetTimeStep() const { return m_TimeStep; }
     private:
 
@@ -117,6 +126,15 @@ namespace mitk
       void operator=(const Self &);
     };
 
+    /**
+     * \brief Connect a receiver to TimeEvent notifications.
+     *
+     * The receiver must implement a SetGeometryTime() member function
+     * that accepts an itk::EventObject.
+     *
+     * \tparam T The receiver type.
+     * \param[in] receiver The object to connect. Must not be nullptr.
+     */
     template <typename T>
     void ConnectTimeEvent(T* receiver)
     {
@@ -127,7 +145,15 @@ namespace mitk
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
     }
 
-    // use a templated method to get the right offset when casting to void*
+    /**
+     * \brief Disconnect a receiver from TimeEvent notifications.
+     *
+     * Removes all observer tags associated with the given receiver.
+     * If the receiver was not connected, this method does nothing.
+     *
+     * \tparam T The receiver type.
+     * \param[in] receiver The object to disconnect.
+     */
     template <typename T>
     void Disconnect(T* receiver)
     {

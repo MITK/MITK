@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMaskedAlgorithmHelper.h"
+#include <mitkMaskedAlgorithmHelper.h>
 
 #include <itkImageMaskSpatialObject.h>
 
@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 
 // MatchPoint
-#include "mapMaskedRegistrationAlgorithmInterface.h"
+#include <mapMaskedRegistrationAlgorithmInterface.h>
 #include <mapRegistrationAlgorithmInterface.h>
 
 namespace mitk

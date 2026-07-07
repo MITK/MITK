@@ -10,12 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkResliceMethodProperty.h"
+#include <mitkResliceMethodProperty.h>
 
 mitk::ResliceMethodProperty::ResliceMethodProperty()
 {
   AddThickSlicesTypes();
   SetValue((IdType)0);
+}
+
+mitk::ResliceMethodProperty::ResliceMethodProperty(const ResliceMethodProperty &other)
+  : EnumerationProperty(other)
+{
 }
 
 mitk::ResliceMethodProperty::ResliceMethodProperty(const IdType &value)
@@ -42,9 +47,3 @@ void mitk::ResliceMethodProperty::AddThickSlicesTypes()
   AddEnum("mean", (IdType)5);
 }
 
-itk::LightObject::Pointer mitk::ResliceMethodProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

@@ -13,23 +13,19 @@ found in the LICENSE file.
 #ifndef mitkVtkScalarModeProperty_h
 #define mitkVtkScalarModeProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
-   * Encapsulates the enumeration vtkInterpolation. Valid values are
-   * (VTK constant/Id/string representation):
-   * \li VTK_SCALAR_MODE_DEFAULT/0/Default,
-   * \li VTK_SCALAR_MODE_USE_POINT_DATA/1/PointData,
-   * \li VTK_SCALAR_MODE_USE_CELL_DATA/2/CellData
-   * \li VTK_SCALAR_MODE_USE_POINT_FIELD_DATA/3/PointFieldData
-   * \li VTK_SCALAR_MODE_USE_CELL_FIELD_DATA/4/CellFieldData
+   * \brief Encapsulates the VTK scalar mode enumeration as an EnumerationProperty.
+   *
+   * Valid values are (VTK constant / Id / string representation):
+   * \li VTK_SCALAR_MODE_DEFAULT / 0 / Default
+   * \li VTK_SCALAR_MODE_USE_POINT_DATA / 1 / PointData
+   * \li VTK_SCALAR_MODE_USE_CELL_DATA / 2 / CellData
+   * \li VTK_SCALAR_MODE_USE_POINT_FIELD_DATA / 3 / PointFieldData
+   * \li VTK_SCALAR_MODE_USE_CELL_FIELD_DATA / 4 / CellFieldData
    */
   class MITKCORE_EXPORT VtkScalarModeProperty : public EnumerationProperty
   {
@@ -45,65 +41,82 @@ namespace mitk
     mitkNewMacro1Param(VtkScalarModeProperty, const std::string &);
 
     /**
-     * Returns the current scalar mode value as defined by VTK constants.
-     * @returns the current scalar mode as VTK constant.
+     * \brief Return the current scalar mode value as defined by VTK constants.
+     *
+     * \return The current scalar mode as a VTK constant (e.g. VTK_SCALAR_MODE_DEFAULT).
      */
     virtual int GetVtkScalarMode();
 
+    /** \brief Set the scalar mode to VTK_SCALAR_MODE_DEFAULT. */
     virtual void SetScalarModeToDefault();
 
+    /** \brief Set the scalar mode to VTK_SCALAR_MODE_USE_POINT_DATA. */
     virtual void SetScalarModeToPointData();
 
+    /** \brief Set the scalar mode to VTK_SCALAR_MODE_USE_CELL_DATA. */
     virtual void SetScalarModeToCellData();
 
+    /** \brief Set the scalar mode to VTK_SCALAR_MODE_USE_POINT_FIELD_DATA. */
     virtual void SetScalarModeToPointFieldData();
 
+    /** \brief Set the scalar mode to VTK_SCALAR_MODE_USE_CELL_FIELD_DATA. */
     virtual void SetScalarModeToCellFieldData();
 
     using BaseProperty::operator=;
 
   protected:
     /**
-     * Constructor. Sets the representation to a default value of surface(2)
+     * \brief Default constructor. Sets the scalar mode to VTK_SCALAR_MODE_DEFAULT.
      */
     VtkScalarModeProperty();
 
     /**
-     * \brief Sets the scalar mode to the given value. If it is not
-     * valid, the scalar mode is set to default (0).
-     * @param value the integer representation of the scalar mode
+     * \brief Construct with an integer scalar mode value.
+     *
+     * If the value is not a valid enumeration id, the scalar mode is set to
+     * VTK_SCALAR_MODE_DEFAULT (0).
+     *
+     * \param[in] value The integer representation of the scalar mode.
      */
     VtkScalarModeProperty(const IdType &value);
 
     /**
-     * \brief Sets the scalar mode to the given value. If it is not
-     * valid, the representation is set to default (0).
-     * @param value the string representation of the scalar mode
+     * \brief Construct with a string scalar mode value.
+     *
+     * If the value is not a valid enumeration string, the scalar mode is set to
+     * VTK_SCALAR_MODE_DEFAULT (0).
+     *
+     * \param[in] value The string representation of the scalar mode.
      */
     VtkScalarModeProperty(const std::string &value);
 
+    /** \brief Copy constructor. */
+    VtkScalarModeProperty(const VtkScalarModeProperty &other);
+
     /**
-     * this function is overridden as protected, so that the user may not add
+     * \brief Add an enumeration value.
+     *
+     * Overridden as protected so that external code cannot add
      * additional invalid scalar mode types.
+     *
+     * \param[in] name  The string name of the enumeration entry.
+     * \param[in] id    The integer id of the enumeration entry.
+     * \return True if the entry was added successfully.
      */
     bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
-     * Adds the enumeration types as defined by vtk to the list of known
-     * enumeration values.
+     * \brief Populate the enumeration with the VTK-defined scalar mode types.
      */
     virtual void AddInterpolationTypes();
+
+    mitkCloneMacro(VtkScalarModeProperty);
 
   private:
     // purposely not implemented
     VtkScalarModeProperty &operator=(const VtkScalarModeProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

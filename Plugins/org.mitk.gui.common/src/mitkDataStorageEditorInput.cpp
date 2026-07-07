@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <berryIAdapterManager.h>
 #include <berryIMemento.h>
 
+#include <mitkCoreServices.h>
 #include <mitkIDataStorageService.h>
 
 #include "internal/org_mitk_gui_common_Activator.h"
@@ -30,9 +31,9 @@ DataStorageEditorInput::DataStorageEditorInput()
 {
 }
 
-DataStorageEditorInput::DataStorageEditorInput(IDataStorageReference::Pointer ref)
+DataStorageEditorInput::DataStorageEditorInput(const DataStorageReference& reference)
+  : m_DataStorageReference(reference)
 {
-  m_DataStorageRef = ref;
 }
 
 bool DataStorageEditorInput::Exists() const
@@ -84,25 +85,23 @@ berry::Object* DataStorageEditorInput::GetAdapter(const QString& adapterType) co
 bool DataStorageEditorInput::operator==(const berry::Object* o) const
 {
   if (const DataStorageEditorInput* input = dynamic_cast<const DataStorageEditorInput*>(o))
-    return this->m_DataStorageRef == input->m_DataStorageRef;
+    return this->m_DataStorageReference == input->m_DataStorageReference;
 
   return false;
 }
 
-IDataStorageReference::Pointer
-DataStorageEditorInput::GetDataStorageReference()
+DataStorageReference DataStorageEditorInput::GetDataStorageReference()
 {
-  if (m_DataStorageRef.IsNull())
+  if (!m_DataStorageReference.IsValid())
   {
-    ctkPluginContext* context = PluginActivator::GetContext();
-    ctkServiceReference serviceRef = context->getServiceReference<IDataStorageService>();
-    if (!serviceRef) return IDataStorageReference::Pointer(nullptr);
-    IDataStorageService* dataService = context->getService<IDataStorageService>(serviceRef);
-    if (!dataService) return IDataStorageReference::Pointer(nullptr);
-    m_DataStorageRef = dataService->GetDefaultDataStorage();
+    CoreServicePointer<IDataStorageService> dsService(CoreServices::GetDataStorageService());
+    if (dsService)
+    {
+      m_DataStorageReference = dsService->GetActiveDataStorageReference();
+    }
   }
 
-  return m_DataStorageRef;
+  return m_DataStorageReference;
 }
 
 }

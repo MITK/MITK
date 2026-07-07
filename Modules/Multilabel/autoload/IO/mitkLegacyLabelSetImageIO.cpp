@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef __mitkLabelSetImageWriter__cpp
 #define __mitkLabelSetImageWriter__cpp
 
-#include "mitkLegacyLabelSetImageIO.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkMultilabelIOMimeTypes.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkMultiLabelIOHelper.h"
-#include "mitkLabelSetImageConverter.h"
+#include <mitkLegacyLabelSetImageIO.h>
+#include <mitkBasePropertySerializer.h>
+#include <mitkMultilabelIOMimeTypes.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkMultiLabelIOHelper.h>
+#include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -27,11 +27,11 @@ found in the LICENSE file.
 #include <mitkUIDManipulator.h>
 
 // itk
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkMetaDataDictionary.h>
+#include <itkMetaDataObject.h>
+#include <itkNrrdImageIO.h>
 
 #include <tinyxml2.h>
 
@@ -93,7 +93,7 @@ namespace mitk
 
     for (unsigned int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
     {
-      sprintf(keybuffer, "layer_%03u", layerIdx);
+      snprintf(keybuffer, sizeof(keybuffer), "layer_%03u", layerIdx);
       int numberOfLabels = MultiLabelIOHelper::GetIntByKey(dictionary, keybuffer);
 
       mitk::MultiLabelSegmentation::LabelVectorType labelSet;
@@ -101,7 +101,7 @@ namespace mitk
       for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
       {
         tinyxml2::XMLDocument doc;
-        sprintf(keybuffer, "label_%03u_%05d", layerIdx, labelIdx);
+        snprintf(keybuffer, sizeof(keybuffer), "label_%03u_%05d", layerIdx, labelIdx);
         _xmlStr = MultiLabelIOHelper::GetStringByKey(dictionary, keybuffer);
         doc.Parse(_xmlStr.c_str(), _xmlStr.size());
 

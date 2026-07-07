@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFloatPropertyExtension.h"
+#include <mitkFloatPropertyExtension.h>
 
 namespace mitk
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunctionProperty.h"
+#include <mitkTransferFunctionProperty.h>
 #include <nlohmann/json.hpp>
 
 namespace mitk
@@ -113,13 +113,6 @@ namespace mitk
     this->SetValue(tf);
 
     return true;
-  }
-
-  itk::LightObject::Pointer TransferFunctionProperty::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    result->UnRegister();
-    return result;
   }
 
 } // namespace mitk

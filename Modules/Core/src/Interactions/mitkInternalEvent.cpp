@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInternalEvent.h"
-#include "mitkDataInteractor.h"
+#include <mitkInternalEvent.h>
+#include <mitkDataInteractor.h>
 
 mitk::InternalEvent::InternalEvent(mitk::BaseRenderer *baseRenderer,
                                    DataInteractor *sourceInteractor,

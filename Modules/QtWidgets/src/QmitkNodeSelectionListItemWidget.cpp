@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "QmitkNodeSelectionListItemWidget.h"
+#include <QmitkNodeSelectionListItemWidget.h>
+
+#include <ui_QmitkNodeSelectionListItemWidget.h>
 
 #include <QmitkNodeDetailsDialog.h>
 #include <QmitkStyleManager.h>
@@ -21,16 +23,17 @@ found in the LICENSE file.
 QmitkNodeSelectionListItemWidget::QmitkNodeSelectionListItemWidget(QWidget *parent)
   : QWidget(parent)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkNodeSelectionListItemWidget>();
+  m_Controls->setupUi(this);
 
-  m_Controls.btnSelect->installEventFilter(this);
-  m_Controls.btnSelect->setVisible(true);
-  m_Controls.btnSelect->SetNodeInfo("No valid selection");
-  m_Controls.btnClear->setVisible(false);
+  m_Controls->btnSelect->installEventFilter(this);
+  m_Controls->btnSelect->setVisible(true);
+  m_Controls->btnSelect->SetNodeInfo("No valid selection");
+  m_Controls->btnClear->setVisible(false);
 
-  m_Controls.btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+  m_Controls->btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
 
-  connect(m_Controls.btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
+  connect(m_Controls->btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
 }
 
 QmitkNodeSelectionListItemWidget::~QmitkNodeSelectionListItemWidget()
@@ -39,18 +42,18 @@ QmitkNodeSelectionListItemWidget::~QmitkNodeSelectionListItemWidget()
 
 const mitk::DataNode* QmitkNodeSelectionListItemWidget::GetSelectedNode() const
 {
-  return m_Controls.btnSelect->GetSelectedNode();
+  return m_Controls->btnSelect->GetSelectedNode();
 };
 
 void QmitkNodeSelectionListItemWidget::SetSelectedNode(const mitk::DataNode* node)
 {
-  m_Controls.btnSelect->SetSelectedNode(node);
+  m_Controls->btnSelect->SetSelectedNode(node);
   this->update();
 };
 
 void QmitkNodeSelectionListItemWidget::SetClearAllowed(bool allowed)
 {
-  m_Controls.btnClear->setVisible(allowed);
+  m_Controls->btnClear->setVisible(allowed);
 };
 
 void QmitkNodeSelectionListItemWidget::OnClearSelection()
@@ -60,7 +63,7 @@ void QmitkNodeSelectionListItemWidget::OnClearSelection()
 
 bool QmitkNodeSelectionListItemWidget::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (obj == m_Controls.btnSelect)
+  if (obj == m_Controls->btnSelect)
   {
     if (ev->type() == QEvent::MouseButtonRelease)
     {

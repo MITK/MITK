@@ -18,20 +18,25 @@ found in the LICENSE file.
 #include <mitkEnumerationProperty.h>
 
 // MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
-#endif
-
 /**
- * Encapsulates the enumeration for visualization styles. Valid values are:
- * 0/Blend 1/Color Blend 2/Checkerboard, 3/Wipe, 4/Difference, 5/Contour
- * Default is "Blend"
+ * \brief Enumeration property defining the visualization style for registration evaluation.
+ *
+ * Valid values are:
+ * - 0: Blend
+ * - 1: Color Blend
+ * - 2: Checkerboard
+ * - 3: Wipe
+ * - 4: Difference
+ * - 5: Contour
+ *
+ * Default is "Blend".
+ *
+ * \sa mitk::RegEvaluationMapper2D, mitk::RegEvalWipeStyleProperty
  */
 class MITKMATCHPOINTREGISTRATION_EXPORT RegEvalStyleProperty : public EnumerationProperty
 {
@@ -41,8 +46,10 @@ public:
 
   itkNewMacro(RegEvalStyleProperty);
 
+  /** \brief Constructs a RegEvalStyleProperty from a numeric ID. */
   mitkNewMacro1Param(RegEvalStyleProperty, const IdType&);
 
+  /** \brief Constructs a RegEvalStyleProperty from a string name. */
   mitkNewMacro1Param(RegEvalStyleProperty, const std::string&);
 
 
@@ -85,9 +92,6 @@ private:
   RegEvalStyleProperty& operator=(const RegEvalStyleProperty&);
 };
 
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

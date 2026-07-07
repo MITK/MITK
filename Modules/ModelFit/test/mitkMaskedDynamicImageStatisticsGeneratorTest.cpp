@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include <iostream>
 
-#include "mitkTestingMacros.h"
-#include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkTestingMacros.h>
+#include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 
-#include "mitkMaskedDynamicImageStatisticsGenerator.h"
+#include <mitkMaskedDynamicImageStatisticsGenerator.h>
 
-#include "mitkTestDynamicImageGenerator.h"
+#include <mitkTestDynamicImageGenerator.h>
 
 int mitkMaskedDynamicImageStatisticsGeneratorTest(int  /*argc*/, char*[] /*argv[]*/)
 {

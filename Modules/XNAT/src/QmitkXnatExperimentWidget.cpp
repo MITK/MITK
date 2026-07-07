@@ -10,7 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkXnatExperimentWidget.h"
+#include <QmitkXnatExperimentWidget.h>
+#include <ui_QmitkXnatExperimentWidgetControls.h>
 
 #include <ctkXnatExperiment.h>
 
@@ -34,18 +35,19 @@ QmitkXnatExperimentWidget::~QmitkXnatExperimentWidget()
 void QmitkXnatExperimentWidget::Init()
 {
   // Create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkXnatExperimentWidgetControls>();
+  m_Controls->setupUi(this);
 
   if (m_Mode == Mode::INFO)
   {
     // make not needed row invisible
-    m_Controls.labelLabel->setText("ID:");
-    m_Controls.mandatoryLabel->setVisible(false);
+    m_Controls->labelLabel->setText("ID:");
+    m_Controls->mandatoryLabel->setVisible(false);
   }
   if (m_Mode == Mode::CREATE)
   {
     // change modality to xsiType
-    m_Controls.modalityLabel->setText("Type*:");
+    m_Controls->modalityLabel->setText("Type*:");
 
     // create list of all experiment session types
     QStringList xsiTypeList;
@@ -80,8 +82,8 @@ void QmitkXnatExperimentWidget::Init()
 
     // create completer for experiment sessions
     QCompleter *completer = new QCompleter(xsiTypeList, this);
-    m_Controls.modalityLineEdit->setCompleter(completer);
-    m_Controls.modalityLineEdit->setPlaceholderText("Start with \"xnat::\"");
+    m_Controls->modalityLineEdit->setCompleter(completer);
+    m_Controls->modalityLineEdit->setPlaceholderText("Start with \"xnat::\"");
   }
 }
 
@@ -92,39 +94,39 @@ void QmitkXnatExperimentWidget::SetExperiment(ctkXnatExperiment *experiment)
   // Set the UI labels
   if (m_Experiment->parent())
   {
-    m_Controls.breadcrumbLabel->setText("Project:" + m_Experiment->parent()->parent()->property("name") +
+    m_Controls->breadcrumbLabel->setText("Project:" + m_Experiment->parent()->parent()->property("name") +
                                         " > Subject:" + m_Experiment->parent()->property("label"));
   }
-  m_Controls.labelLineEdit->setText(m_Experiment->property("label"));
-  m_Controls.modalityLineEdit->setText(m_Experiment->property("modality"));
-  m_Controls.dateLineEdit->setText(m_Experiment->property("date"));
-  m_Controls.timeLineEdit->setText(m_Experiment->property("time"));
-  m_Controls.scannerLineEdit->setText(m_Experiment->property("scanner"));
+  m_Controls->labelLineEdit->setText(m_Experiment->property("label"));
+  m_Controls->modalityLineEdit->setText(m_Experiment->property("modality"));
+  m_Controls->dateLineEdit->setText(m_Experiment->property("date"));
+  m_Controls->timeLineEdit->setText(m_Experiment->property("time"));
+  m_Controls->scannerLineEdit->setText(m_Experiment->property("scanner"));
 }
 
 ctkXnatExperiment *QmitkXnatExperimentWidget::GetExperiment() const
 {
   if (m_Mode == Mode::CREATE)
   {
-    if (!m_Controls.labelLineEdit->text().isEmpty())
+    if (!m_Controls->labelLineEdit->text().isEmpty())
     {
-      m_Experiment->setProperty("label", m_Controls.labelLineEdit->text());
+      m_Experiment->setProperty("label", m_Controls->labelLineEdit->text());
     }
-    if (!m_Controls.modalityLineEdit->text().isEmpty())
+    if (!m_Controls->modalityLineEdit->text().isEmpty())
     {
-      m_Experiment->setProperty("xsiType", m_Controls.modalityLineEdit->text());
+      m_Experiment->setProperty("xsiType", m_Controls->modalityLineEdit->text());
     }
-    if (!m_Controls.dateLineEdit->text().isEmpty())
+    if (!m_Controls->dateLineEdit->text().isEmpty())
     {
-      m_Experiment->setProperty("date", m_Controls.dateLineEdit->text());
+      m_Experiment->setProperty("date", m_Controls->dateLineEdit->text());
     }
-    if (!m_Controls.timeLineEdit->text().isEmpty())
+    if (!m_Controls->timeLineEdit->text().isEmpty())
     {
-      m_Experiment->setProperty("time", m_Controls.dateLineEdit->text());
+      m_Experiment->setProperty("time", m_Controls->dateLineEdit->text());
     }
-    if (!m_Controls.scannerLineEdit->text().isEmpty())
+    if (!m_Controls->scannerLineEdit->text().isEmpty())
     {
-      m_Experiment->setProperty("scanner", m_Controls.scannerLineEdit->text());
+      m_Experiment->setProperty("scanner", m_Controls->scannerLineEdit->text());
     }
   }
 

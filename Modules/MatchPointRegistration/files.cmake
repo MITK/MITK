@@ -1,11 +1,14 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-file(GLOB_RECURSE TPP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.tpp")
+set(H_FILES
+  itkStitchImageFilter.h
+  mitkMatchPointPropertyTags.h
+)
 
 set(CPP_FILES
   mitkMAPRegistrationWrapper.cpp
   mitkMAPRegistrationWrapperObjectFactory.cpp
   mitkRegEvaluationObjectFactory.cpp
   mitkRegEvaluationObject.cpp
+  mitkRegistrationManipulationInteractor.cpp
   Helper/mitkUIDHelper.cpp
   Helper/mitkMAPAlgorithmHelper.cpp
   Helper/mitkMaskedAlgorithmHelper.cpp
@@ -29,5 +32,10 @@ set(CPP_FILES
   Rendering/mitkRegEvalWipeStyleProperty.cpp
 )
 
-set(MOC_H_FILES
+set(RESOURCE_FILES
+  Interactions/RegistrationManipulationStates.xml
+  Interactions/RegistrationManipulationConfig.xml
+  Cursors/RegManip_Base_Cursor.svg
+  Cursors/RegManip_Translate_Cursor.svg
+  Cursors/RegManip_Rotate_Cursor.svg
 )

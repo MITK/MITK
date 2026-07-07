@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToRunLengthFeaturesFilter_h
-#define __itkEnhancedScalarImageToRunLengthFeaturesFilter_h
+#ifndef itkEnhancedScalarImageToRunLengthFeaturesFilter_h
+#define itkEnhancedScalarImageToRunLengthFeaturesFilter_h
 
-#include "itkDataObjectDecorator.h"
+#include <itkDataObjectDecorator.h>
 
-#include "itkEnhancedHistogramToRunLengthFeaturesFilter.h"
-#include "itkEnhancedScalarImageToRunLengthMatrixFilter.h"
+#include <itkEnhancedHistogramToRunLengthFeaturesFilter.h>
+#include <itkEnhancedScalarImageToRunLengthMatrixFilter.h>
 
 namespace itk
 {
@@ -100,7 +100,6 @@ namespace itk
     * \sa HistogramToRunLengthFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename TImageType,
@@ -239,7 +238,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToRunLengthFeaturesFilter.hxx"
+#include <itkEnhancedScalarImageToRunLengthFeaturesFilter.tpp>
 #endif
 
 #endif

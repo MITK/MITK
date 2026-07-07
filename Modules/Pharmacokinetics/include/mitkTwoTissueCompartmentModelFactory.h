@@ -13,13 +13,16 @@ found in the LICENSE file.
 #ifndef mitkTwoTissueCompartmentModelFactory_h
 #define mitkTwoTissueCompartmentModelFactory_h
 
-#include "mitkTwoTissueCompartmentModelFactoryBase.h"
-#include "mitkTwoTissueCompartmentModelParameterizer.h"
+#include <mitkTwoTissueCompartmentModelFactoryBase.h>
+#include <mitkTwoTissueCompartmentModelParameterizer.h>
 
 namespace mitk
 {
 
 
+  /** \brief Factory for the TwoTissueCompartmentModel.
+   * \sa TwoTissueCompartmentModel, TwoTissueCompartmentModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentModelFactory : public
     mitk::TwoTissueCompartmentModelFactoryBase<TwoTissueCompartmentModelParameterizer>
   {

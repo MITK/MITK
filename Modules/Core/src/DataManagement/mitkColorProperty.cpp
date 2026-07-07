@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkColorProperty.h"
+#include <mitkColorProperty.h>
 #include <sstream>
 #include <nlohmann/json.hpp>
 
@@ -95,9 +95,3 @@ bool mitk::ColorProperty::FromJSON(const nlohmann::json& j)
   return true;
 }
 
-itk::LightObject::Pointer mitk::ColorProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkClippedSurfaceBoundsCalculator.h"
-#include "mitkLine.h"
+#include <mitkClippedSurfaceBoundsCalculator.h>
+#include <mitkLine.h>
 
 #define ROUND_P(x) ((x) >= 0 ? (int)((x) + 0.5) : (int)((x)-0.5))
 
@@ -122,10 +122,13 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     // go through all slices of the image, ...
     const auto *slicedGeometry3D =
       dynamic_cast<const mitk::SlicedGeometry3D *>(m_Geometry3D.GetPointer());
-    int allSlices = slicedGeometry3D->GetSlices();
-    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry *>(slicedGeometry3D->GetPlaneGeometry(0)));
-    this->CalculateIntersectionPoints(
-      dynamic_cast<mitk::PlaneGeometry *>(slicedGeometry3D->GetPlaneGeometry(allSlices - 1)));
+    if (slicedGeometry3D != nullptr && slicedGeometry3D->GetSlices() > 0)
+    {
+      int allSlices = slicedGeometry3D->GetSlices();
+      this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry *>(slicedGeometry3D->GetPlaneGeometry(0)));
+      this->CalculateIntersectionPoints(
+        dynamic_cast<mitk::PlaneGeometry *>(slicedGeometry3D->GetPlaneGeometry(allSlices - 1)));
+    }
   }
   else if (!m_ObjectPointsInWorldCoordinates.empty())
   {
@@ -137,6 +140,9 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
 void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mitk::PlaneGeometry *geometry)
 {
   // SEE HEADER DOCUMENTATION for explanation
+
+  if (geometry == nullptr)
+    return;
 
   const mitk::BaseGeometry::Pointer imageGeometry = m_Image->GetGeometry()->Clone();
 

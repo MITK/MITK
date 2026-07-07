@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceDeformationDataInteractor3D.h"
+#include <mitkSurfaceDeformationDataInteractor3D.h>
 
-#include "mitkMouseWheelEvent.h"
+#include <mitkMouseWheelEvent.h>
 
 #include <vtkInteractorObserver.h>
 #include <vtkPointData.h>

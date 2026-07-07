@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCone.h"
-#include "mitkNumericTypes.h"
-#include "vtkConeSource.h"
-#include "vtkLinearTransform.h"
+#include <mitkCone.h>
+#include <mitkNumericTypes.h>
+#include <vtkConeSource.h>
+#include <vtkLinearTransform.h>
 
 mitk::Cone::Cone() : BoundingObject()
 {

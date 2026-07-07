@@ -13,12 +13,16 @@ found in the LICENSE file.
 #ifndef mitkLinearModelParameterizer_h
 #define mitkLinearModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkLinearModel.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkLinearModel.h>
 
 namespace mitk
 {
-
+  /**
+   * \brief Type alias for the parameterizer of the LinearModel.
+   *
+   * \sa LinearModel, LinearModelFactory, ConcreteModelParameterizerBase
+   */
   typedef ConcreteModelParameterizerBase<mitk::LinearModel> LinearModelParameterizer;
 }
 

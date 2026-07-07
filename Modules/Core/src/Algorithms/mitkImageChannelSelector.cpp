@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageChannelSelector.h"
+#include <mitkImageChannelSelector.h>
 
 mitk::ImageChannelSelector::ImageChannelSelector() : m_ChannelNr(0)
 {

@@ -13,13 +13,26 @@ found in the LICENSE file.
 #ifndef QmitkSegmentationView_h
 #define QmitkSegmentationView_h
 
-#include "ui_QmitkSegmentationViewControls.h"
-
-#include <QmitkAbstractView.h>
-#include <QmitkButtonOverlayWidget.h>
 #include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkNodePredicateBase.h>
+
+#include <QmitkAbstractView.h>
+#include <QmitkButtonOverlayWidget.h>
+#include <QmitkMultiLabelManager.h>
+
+#include <memory>
+
+namespace mitk
+{
+  class ToolManager;
+}
+
+namespace Ui
+{
+  class QmitkSegmentationViewControls;
+}
 
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
@@ -146,13 +159,11 @@ private:
 
   void ValidateSelectionInput();
 
-  std::string GetDefaultLabelSetPreset() const;
-
   mitk::MultiLabelSegmentation* GetCurrentSegmentation() const;
 
   QWidget* m_Parent;
 
-  Ui::QmitkSegmentationViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkSegmentationViewControls> m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
 
@@ -177,6 +188,10 @@ private:
   bool m_DefaultLabelNaming;
 
   bool m_SelectionChangeIsAlreadyBeingHandled;
+
+  /** Prevents premature destruction of the segmentation the observer guards below
+   *  are registered on. Managed exclusively by Add/RemoveObserversToWorkingImage(). */
+  mitk::MultiLabelSegmentation::Pointer m_ObservedSegmentation;
 
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;

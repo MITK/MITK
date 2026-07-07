@@ -13,9 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkSegmentationPreferencePage_h
 #define QmitkSegmentationPreferencePage_h
 
-#include "org_mitk_gui_qt_segmentation_Export.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
 #include <berryIQtPreferencePage.h>
+#include <memory>
 
 class QWidget;
 
@@ -56,7 +57,7 @@ protected Q_SLOTS:
 protected:
   void FillBuiltInSuggestionComboBox(std::string& standardLabelSuggestions);
 
-  Ui::QmitkSegmentationPreferencePageControls* m_Ui;
+  std::unique_ptr<Ui::QmitkSegmentationPreferencePageControls> m_Ui;
   QWidget* m_Control;
 
   bool m_Initializing;

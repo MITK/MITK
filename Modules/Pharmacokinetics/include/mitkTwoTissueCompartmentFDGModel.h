@@ -13,12 +13,21 @@ found in the LICENSE file.
 #ifndef mitkTwoTissueCompartmentFDGModel_h
 #define mitkTwoTissueCompartmentFDGModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 
 namespace mitk
 {
+  /**
+   * \brief Implementation of the irreversible two-tissue compartment model for FDG PET pharmacokinetics.
+   *
+   * Models the irreversible uptake of FDG with parameters K1 (plasma-to-tissue influx),
+   * k2 (tissue-to-plasma efflux), k3 (phosphorylation rate), and vb (blood volume fraction).
+   * Unlike the full two-tissue compartment model, k4 is assumed to be zero (irreversible trapping).
+   *
+   * \sa TwoTissueCompartmentModel, OneTissueCompartmentModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentFDGModel : public AIFBasedModelBase
   {
 
@@ -71,11 +80,9 @@ namespace mitk
     TwoTissueCompartmentFDGModel();
     ~TwoTissueCompartmentFDGModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    TwoTissueCompartmentFDGModel(const TwoTissueCompartmentFDGModel& source);
+
+    mitkCloneMacro(TwoTissueCompartmentFDGModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -83,9 +90,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    TwoTissueCompartmentFDGModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

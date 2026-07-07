@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBoundingShapeObjectFactory.h"
-#include "mitkBoundingShapeVtkMapper2D.h"
-#include "mitkBoundingShapeVtkMapper3D.h"
+#include <mitkBoundingShapeObjectFactory.h>
+#include <mitkBoundingShapeVtkMapper2D.h>
+#include <mitkBoundingShapeVtkMapper3D.h>
 #include <mitkCoreObjectFactory.h>
 
 mitk::BoundingShapeObjectFactory::BoundingShapeObjectFactory()
@@ -48,26 +48,6 @@ mitk::Mapper::Pointer mitk::BoundingShapeObjectFactory::CreateMapper(mitk::DataN
 const char *mitk::BoundingShapeObjectFactory::GetDescription() const
 {
   return "BoundingShape Object Factory";
-}
-
-std::string mitk::BoundingShapeObjectFactory::GetFileExtensions()
-{
-  return "";
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetFileExtensionsMap()
-{
-  return MultimapType();
-}
-
-std::string mitk::BoundingShapeObjectFactory::GetSaveFileExtensions()
-{
-  return "";
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetSaveFileExtensionsMap()
-{
-  return MultimapType();
 }
 
 void mitk::BoundingShapeObjectFactory::SetDefaultProperties(mitk::DataNode *node)

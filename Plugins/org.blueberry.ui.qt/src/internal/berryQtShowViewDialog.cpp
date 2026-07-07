@@ -11,10 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "berryQtShowViewDialog.h"
+#include <ui_berryQtShowViewDialog.h>
 
-#include <berryIViewDescriptor.h>
+#include "berryIViewDescriptor.h"
 
-#include <berryViewTreeModel.h>
+#include "berryViewTreeModel.h"
 
 #include "berryWorkbenchPlugin.h"
 #include "berryXMLMemento.h"
@@ -50,8 +51,9 @@ public:
   {
     if (m_FilterOnKeywords != filterOnKeywords)
     {
+      this->beginFilterChange();
       m_FilterOnKeywords = filterOnKeywords;
-      this->invalidateFilter();
+      this->endFilterChange();
     }
   }
 
@@ -105,34 +107,39 @@ QtShowViewDialog::QtShowViewDialog(const IWorkbenchWindow* window, IViewRegistry
   , m_Window(window)
   , m_ViewReg(registry)
   , m_FilterModel(nullptr)
+  , m_UserInterface(std::make_unique<Ui::QtShowViewDialog_>())
 {
-  m_UserInterface.setupUi(this);
-  m_UserInterface.m_TreeView->header()->setVisible(false);
-  m_UserInterface.m_TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_UserInterface->setupUi(this);
+  m_UserInterface->m_TreeView->header()->setVisible(false);
+  m_UserInterface->m_TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   m_FilterModel = new ViewFilterProxyModel(this);
   auto   sourceModel = new ViewTreeModel(window, m_FilterModel);
   m_FilterModel->setSourceModel(sourceModel);
-  m_UserInterface.m_TreeView->setModel(m_FilterModel);
+  m_UserInterface->m_TreeView->setModel(m_FilterModel);
 
-  connect(m_UserInterface.m_Filter, SIGNAL(textChanged(QString)), this, SLOT(setFilter(QString)));
-  connect(m_UserInterface.m_TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(setDescription(QModelIndex)));
-  connect(m_UserInterface.m_TreeView, SIGNAL(collapsed(QModelIndex)), this, SLOT(categoryCollapsed(QModelIndex)));
-  connect(m_UserInterface.m_TreeView, SIGNAL(expanded(QModelIndex)), this, SLOT(categoryExpanded(QModelIndex)));
-  connect(m_UserInterface.m_TreeView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(accept()));
-  connect(m_UserInterface.m_TreeView, SIGNAL(activated(QModelIndex)), this, SLOT(accept()));
-  connect(m_UserInterface.m_TreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
-  connect(m_UserInterface.m_KeywordFilter, SIGNAL(clicked(bool)), this, SLOT(enableKeywordFilter(bool)));
+  connect(m_UserInterface->m_Filter, SIGNAL(textChanged(QString)), this, SLOT(setFilter(QString)));
+  connect(m_UserInterface->m_TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(setDescription(QModelIndex)));
+  connect(m_UserInterface->m_TreeView, SIGNAL(collapsed(QModelIndex)), this, SLOT(categoryCollapsed(QModelIndex)));
+  connect(m_UserInterface->m_TreeView, SIGNAL(expanded(QModelIndex)), this, SLOT(categoryExpanded(QModelIndex)));
+  connect(m_UserInterface->m_TreeView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(accept()));
+  connect(m_UserInterface->m_TreeView, SIGNAL(activated(QModelIndex)), this, SLOT(accept()));
+  connect(m_UserInterface->m_TreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+  connect(m_UserInterface->m_KeywordFilter, SIGNAL(clicked(bool)), this, SLOT(enableKeywordFilter(bool)));
 
   this->RestoreState();
-  m_UserInterface.m_Filter->selectAll();
+  m_UserInterface->m_Filter->selectAll();
   this->UpdateButtons();
+}
+
+QtShowViewDialog::~QtShowViewDialog()
+{
 }
 
 void QtShowViewDialog::setDescription(const QModelIndex& index)
 {
-  QString description = m_UserInterface.m_TreeView->model()->data(index, Qt::WhatsThisRole).toString();
-  m_UserInterface.m_Description->setText(description);
+  QString description = m_UserInterface->m_TreeView->model()->data(index, Qt::WhatsThisRole).toString();
+  m_UserInterface->m_Description->setText(description);
 }
 
 void QtShowViewDialog::enableKeywordFilter(bool enable)
@@ -170,17 +177,17 @@ void QtShowViewDialog::RestoreExpandedState()
     QModelIndex index = m_FilterModel->index(i, 0);
     if (m_ExpandedCategories.contains(m_FilterModel->mapToSource(index)))
     {
-      m_UserInterface.m_TreeView->expand(index);
+      m_UserInterface->m_TreeView->expand(index);
     }
   }
 }
 
 void QtShowViewDialog::UpdateButtons()
 {
-  QPushButton* okBtn = m_UserInterface.m_ButtonBox->button(QDialogButtonBox::Ok);
+  QPushButton* okBtn = m_UserInterface->m_ButtonBox->button(QDialogButtonBox::Ok);
   if (okBtn)
   {
-    okBtn->setEnabled(!m_UserInterface.m_TreeView->selectionModel()->selection().isEmpty());
+    okBtn->setEnabled(!m_UserInterface->m_TreeView->selectionModel()->selection().isEmpty());
   }
 }
 
@@ -197,14 +204,14 @@ void QtShowViewDialog::RestoreState()
   bool keywordFilter = false;
   if (memento->GetBoolean("keywordFilter", keywordFilter))
   {
-    m_UserInterface.m_KeywordFilter->setChecked(keywordFilter);
+    m_UserInterface->m_KeywordFilter->setChecked(keywordFilter);
     m_FilterModel->setFilterOnKeywords(keywordFilter);
   }
 
   QString filter;
   if (memento->GetString("filter", filter))
   {
-    m_UserInterface.m_Filter->setText(filter);
+    m_UserInterface->m_Filter->setText(filter);
   }
 
   IMemento::Pointer geomChild = memento->GetChild(TAG_GEOMETRY);
@@ -257,14 +264,14 @@ void QtShowViewDialog::RestoreState()
       }
     }
   }
-  m_UserInterface.m_TreeView->selectionModel()->select(itemSelection, QItemSelectionModel::ClearAndSelect);
+  m_UserInterface->m_TreeView->selectionModel()->select(itemSelection, QItemSelectionModel::ClearAndSelect);
 }
 
 void QtShowViewDialog::SaveState()
 {
   XMLMemento::Pointer memento = XMLMemento::CreateWriteRoot(TAG_SHOWVIEWDIALOG);
-  memento->PutString("filter", m_UserInterface.m_Filter->text());
-  memento->PutBoolean("keywordFilter", m_UserInterface.m_KeywordFilter->isChecked());
+  memento->PutString("filter", m_UserInterface->m_Filter->text());
+  memento->PutBoolean("keywordFilter", m_UserInterface->m_KeywordFilter->isChecked());
 
   // dialog geometry
   QByteArray geom = this->saveGeometry();
@@ -286,7 +293,7 @@ void QtShowViewDialog::SaveState()
 
   // we only record a single selected item. restoring a multi-selection might be
   // confusing for the user
-  QModelIndexList selectedIndices = m_UserInterface.m_TreeView->selectionModel()->selectedIndexes();
+  QModelIndexList selectedIndices = m_UserInterface->m_TreeView->selectionModel()->selectedIndexes();
   if (!selectedIndices.isEmpty())
   {
     QString id = selectedIndices.back().data(ViewTreeModel::Id).toString();
@@ -315,7 +322,7 @@ QtShowViewDialog::GetSelection() const
 {
   QList<QString> selected;
 
-  QModelIndexList indices = m_UserInterface.m_TreeView->selectionModel()->selectedIndexes();
+  QModelIndexList indices = m_UserInterface->m_TreeView->selectionModel()->selectedIndexes();
   for(QModelIndex index : std::as_const(indices))
   {
     QString id = m_FilterModel->data(index, ViewTreeModel::Id).toString();

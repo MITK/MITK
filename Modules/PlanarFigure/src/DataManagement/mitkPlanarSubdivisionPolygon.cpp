@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarSubdivisionPolygon.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarSubdivisionPolygon.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 // stl related includes
 #include <algorithm>
@@ -24,6 +24,13 @@ mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon() : m_TensionParameter(
   this->SetProperty("subdivision", mitk::BoolProperty::New(true));
 
   // Other properties are inherited / already initialized by parent class PlanarPolygon
+}
+
+mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon(const Self& other)
+  : PlanarPolygon(other),
+    m_TensionParameter(other.m_TensionParameter),
+    m_SubdivisionRounds(other.m_SubdivisionRounds)
+{
 }
 
 void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
@@ -135,7 +142,7 @@ int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint(int indexOfP
 {
   const auto& polyLine = GetPolyLine(polyLineIndex);
 
-  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
+  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint >= static_cast<int>(polyLine.size()))
     return -1;
 
   mitk::PlanarFigure::ControlPointListType::const_iterator elem;

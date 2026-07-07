@@ -11,8 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "GenericDataFittingView.h"
+#include <ui_GenericDataFittingViewControls.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkLinearModelFactory.h>
 #include <mitkLinearModelParameterizer.h>
@@ -23,10 +24,10 @@ found in the LICENSE file.
 #include <mitkExponentialSaturationModel.h>
 #include <mitkExponentialSaturationModelFactory.h>
 #include <mitkExponentialSaturationModelParameterizer.h>
-#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkTwoStepLinearModelParameterizer.h"
-#include "mitkThreeStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelParameterizer.h"
+#include <mitkTwoStepLinearModelFactory.h>
+#include <mitkTwoStepLinearModelParameterizer.h>
+#include <mitkThreeStepLinearModelFactory.h>
+#include <mitkThreeStepLinearModelParameterizer.h>
 #include <mitkLabelSetImageConverter.h>
 
 #include <mitkValueBasedParameterizationDelegate.h>
@@ -36,7 +37,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
-#include "mitkNodePredicateFunction.h"
+#include <mitkNodePredicateFunction.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
@@ -55,8 +56,8 @@ found in the LICENSE file.
 
 // Includes for image casting between ITK and MITK
 #include <mitkImage.h>
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 #include <iostream>
@@ -66,108 +67,108 @@ const std::string GenericDataFittingView::VIEW_ID = "org.mitk.views.fit.genericf
 
 void GenericDataFittingView::SetFocus()
 {
-  m_Controls.btnModelling->setFocus();
+  m_Controls->btnModelling->setFocus();
 }
 
 void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
-  m_Controls.btnModelling->setEnabled(false);
+  m_Controls->btnModelling->setEnabled(false);
 
   this->InitModelComboBox();
-  m_Controls.labelMaskInfo->hide();
+  m_Controls->labelMaskInfo->hide();
 
-  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
-  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls->timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls->timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
 
-  m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
-  m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
-  m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
+  m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls->maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->maskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls->maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
 
-  connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
+  connect(m_Controls->btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
 
-  connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
-  connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
+  connect(m_Controls->radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
-  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnImageNodeSelectionChanged);
-  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnMaskNodeSelectionChanged);
+  connect(m_Controls->timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnImageNodeSelectionChanged);
+  connect(m_Controls->maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnMaskNodeSelectionChanged);
 
   //Generic setting
-  m_Controls.groupGeneric->hide();
-  m_Controls.labelFormulaInfo->hide();
-  connect(m_Controls.editFormula, SIGNAL(textChanged(const QString&)), this,
+  m_Controls->groupGeneric->hide();
+  m_Controls->labelFormulaInfo->hide();
+  connect(m_Controls->editFormula, SIGNAL(textChanged(const QString&)), this,
           SLOT(UpdateGUIControls()));
-  connect(m_Controls.checkFormulaInfo, SIGNAL(toggled(bool)), m_Controls.labelFormulaInfo,
+  connect(m_Controls->checkFormulaInfo, SIGNAL(toggled(bool)), m_Controls->labelFormulaInfo,
           SLOT(setVisible(bool)));
-  connect(m_Controls.nrOfParams, SIGNAL(valueChanged(int)), this, SLOT(OnNrOfParamsChanged()));
+  connect(m_Controls->nrOfParams, SIGNAL(valueChanged(int)), this, SLOT(OnNrOfParamsChanged()));
 
-  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
+  connect(m_Controls->checkMaskInfo, SIGNAL(toggled(bool)), m_Controls->labelMaskInfo,
     SLOT(setVisible(bool)));
 
   //Model fit configuration
-  m_Controls.groupBox_FitConfiguration->hide();
+  m_Controls->groupBox_FitConfiguration->hide();
 
-  m_Controls.checkBox_Constraints->setEnabled(false);
-  m_Controls.constraintManager->setEnabled(false);
-  m_Controls.initialValuesManager->setEnabled(false);
-  m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
+  m_Controls->checkBox_Constraints->setEnabled(false);
+  m_Controls->constraintManager->setEnabled(false);
+  m_Controls->initialValuesManager->setEnabled(false);
+  m_Controls->initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this,
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
-  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)),
-          m_Controls.initialValuesManager,
+  connect(m_Controls->checkBox_StartParameters, SIGNAL(toggled(bool)),
+          m_Controls->initialValuesManager,
           SLOT(setEnabled(bool)));
 
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls->constraintManager,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls->constraintManager,
           SLOT(setVisible(bool)));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
 }
 
 void GenericDataFittingView::UpdateGUIControls()
 {
-  m_Controls.lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
-  m_Controls.lineFitName->setEnabled(!m_FittingInProgress);
+  m_Controls->lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
+  m_Controls->lineFitName->setEnabled(!m_FittingInProgress);
 
-  m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
+  m_Controls->checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
   bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
-  m_Controls.groupGeneric->setVisible(isGenericFactory);
+  m_Controls->groupGeneric->setVisible(isGenericFactory);
 
-  m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
+  m_Controls->groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
-  m_Controls.groupBox->setEnabled(!m_FittingInProgress);
-  m_Controls.comboModel->setEnabled(!m_FittingInProgress);
-  m_Controls.groupGeneric->setEnabled(!m_FittingInProgress);
-  m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
+  m_Controls->groupBox->setEnabled(!m_FittingInProgress);
+  m_Controls->comboModel->setEnabled(!m_FittingInProgress);
+  m_Controls->groupGeneric->setEnabled(!m_FittingInProgress);
+  m_Controls->groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
 
-  m_Controls.radioROIbased->setEnabled(m_selectedMask.IsNotNull());
+  m_Controls->radioROIbased->setEnabled(m_selectedMask.IsNotNull());
 
-  m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
+  m_Controls->btnModelling->setEnabled(m_selectedImage.IsNotNull()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 }
 
 std::string GenericDataFittingView::GetFitName() const
 {
-  std::string fitName = m_Controls.lineFitName->text().toStdString();
+  std::string fitName = m_Controls->lineFitName->text().toStdString();
   if (fitName.empty())
   {
-    fitName = m_Controls.lineFitName->placeholderText().toStdString();
+    fitName = m_Controls->lineFitName->placeholderText().toStdString();
   }
   return fitName;
 }
@@ -181,7 +182,7 @@ std::string GenericDataFittingView::GetDefaultFitName() const
         defaultName = this->m_selectedModelFactory->GetClassID();
     }
 
-    if (this->m_Controls.radioPixelBased->isChecked())
+    if (this->m_Controls->radioPixelBased->isChecked())
     {
         defaultName += "_pixel";
     }
@@ -226,10 +227,10 @@ void GenericDataFittingView::OnModellSet(int index)
       this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
     }
 
-    m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
+    m_Controls->initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
       m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits() );
 
-    m_Controls.constraintManager->setChecker(this->m_modelConstraints,
+    m_Controls->constraintManager->setChecker(this->m_modelConstraints,
       this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
@@ -249,7 +250,7 @@ void GenericDataFittingView::PrepareFitConfiguration()
   {
     mitk::ModelBase::ParameterNamesType paramNames = m_selectedModelFactory->GetParameterNames();
     mitk::ModelBase::ParamterUnitMapType paramUnits = m_selectedModelFactory->GetParameterUnits();
-    unsigned int nrOfPools = this->m_Controls.nrOfParams->value();
+    unsigned int nrOfPools = this->m_Controls->nrOfParams->value();
 
     //init values
     if (this->IsGenericParamFactorySelected())
@@ -261,11 +262,11 @@ void GenericDataFittingView::PrepareFitConfiguration()
       paramNames = parameterizer->GetParameterNames();
       paramUnits = parameterizer->GetParameterUnits();
 
-      m_Controls.initialValuesManager->setInitialValues(paramNames, parameterizer->GetDefaultInitialParameterization(), paramUnits);
+      m_Controls->initialValuesManager->setInitialValues(paramNames, parameterizer->GetDefaultInitialParameterization(), paramUnits);
     }
     else
     {
-      m_Controls.initialValuesManager->setInitialValues(paramNames, this->m_selectedModelFactory->GetDefaultInitialParameterization(), paramUnits);
+      m_Controls->initialValuesManager->setInitialValues(paramNames, this->m_selectedModelFactory->GetDefaultInitialParameterization(), paramUnits);
     }
 
     //constraints
@@ -277,7 +278,7 @@ void GenericDataFittingView::PrepareFitConfiguration()
       this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
     }
 
-    m_Controls.constraintManager->setChecker(this->m_modelConstraints, paramNames, paramUnits);
+    m_Controls->constraintManager->setChecker(this->m_modelConstraints, paramNames, paramUnits);
   }
 };
 
@@ -305,7 +306,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
 
     if (isLinearFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::LinearModelParameterizer>(fitSession, generator);
       }
@@ -316,7 +317,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
     }
     else if (isGenericFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::GenericParamModelParameterizer>(fitSession, generator);
       }
@@ -327,7 +328,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
     }
     else if (isExponentialDecayFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::ExponentialDecayModelParameterizer>(fitSession, generator);
       }
@@ -338,7 +339,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
     }
     else if (isTwoStepLinearFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
       }
@@ -349,7 +350,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
     }
     else if (isThreeStepLinearFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
       }
@@ -360,7 +361,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
     }
     else if (isExponentialSaturationFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
       }
@@ -405,27 +406,27 @@ void GenericDataFittingView::OnModellingButtonClicked()
 void GenericDataFittingView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
 
-  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    this->m_selectedNode = m_Controls->timeSeriesNodeSelector->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
 
     if (m_selectedImage)
     {
-      this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
-      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
+      this->m_Controls->initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
+      m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
     }
     else
     {
-      this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
-      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
+      this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
+      m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
     }
   }
   else
   {
     this->m_selectedNode = nullptr;
     this->m_selectedImage = nullptr;
-    this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+    this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
   }
 
   UpdateGUIControls();
@@ -436,9 +437,9 @@ void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Po
   m_selectedMaskNode = nullptr;
   m_selectedMask = nullptr;
 
-  if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->maskNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+    this->m_selectedMaskNode = m_Controls->maskNodeSelector->GetSelectedNode();
     auto selectedLabelSetMask = dynamic_cast<mitk::MultiLabelSegmentation*>(m_selectedMaskNode->GetData());
 
     if (selectedLabelSetMask != nullptr)
@@ -455,7 +456,7 @@ void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Po
     {
       MITK_INFO <<
         "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-      m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
+      m_Controls->maskNodeSelector->GetSelectedNode()->GetName();
       this->m_selectedMask = SelectImageByTimeStep(m_selectedMask, 0);
 
     }
@@ -463,7 +464,7 @@ void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Po
 
   if (m_selectedMask.IsNull())
   {
-    this->m_Controls.radioPixelBased->setChecked(true);
+    this->m_Controls->radioPixelBased->setChecked(true);
   }
 
   UpdateGUIControls();
@@ -482,18 +483,18 @@ bool GenericDataFittingView::CheckModelSettings() const
 
     if (isGenericFactory)
     {
-      ok = !m_Controls.editFormula->text().isEmpty();
+      ok = !m_Controls->editFormula->text().isEmpty();
     }
   }
   else
   {
     ok = false;
   }
-  if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+  if (this->m_Controls->checkBox_StartParameters->isChecked() && !this->m_Controls->initialValuesManager->hasValidInitialValues())
   {
     std::string warning = "Warning. Invalid start parameters. At least one parameter has an invalid image setting as source.";
     MITK_ERROR << warning;
-    m_Controls.infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
+    m_Controls->infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
 
     ok = false;
   };
@@ -504,12 +505,12 @@ bool GenericDataFittingView::CheckModelSettings() const
 void GenericDataFittingView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.checkBox_StartParameters->isChecked())
+  if (m_Controls->checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
     mitk::ValueBasedParameterizationDelegate::Pointer paramDelegate =
       mitk::ValueBasedParameterizationDelegate::New();
-    paramDelegate->SetInitialParameterization(m_Controls.initialValuesManager->getInitialValues());
+    paramDelegate->SetInitialParameterization(m_Controls->initialValuesManager->getInitialValues());
 
     parameterizer->SetInitialParameterizationDelegate(paramDelegate);
   }
@@ -519,7 +520,7 @@ void GenericDataFittingView::ConfigureInitialParametersOfParameterizer(mitk::Mod
 
   if (genericParameterizer)
   {
-    genericParameterizer->SetFunctionString(m_Controls.editFormula->text().toStdString());
+    genericParameterizer->SetFunctionString(m_Controls->editFormula->text().toStdString());
   }
 }
 
@@ -536,7 +537,7 @@ void GenericDataFittingView::GenerateModelFit_PixelBased(mitk::modelFit::ModelFi
   auto genericParameterizer = dynamic_cast<mitk::GenericParamModelParameterizer*>(modelParameterizer.GetPointer());
   if (genericParameterizer)
   {
-    genericParameterizer->SetNumberOfParameters(this->m_Controls.nrOfParams->value());
+    genericParameterizer->SetNumberOfParameters(this->m_Controls->nrOfParams->value());
   }
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
@@ -579,7 +580,7 @@ void GenericDataFittingView::GenerateModelFit_ROIBased(
   auto genericParameterizer = dynamic_cast<mitk::GenericParamModelParameterizer*>(modelParameterizer.GetPointer());
   if (genericParameterizer)
   {
-    genericParameterizer->SetNumberOfParameters(this->m_Controls.nrOfParams->value());
+    genericParameterizer->SetNumberOfParameters(this->m_Controls->nrOfParams->value());
   }
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
@@ -627,7 +628,7 @@ void GenericDataFittingView::DoFit(const mitk::modelFit::ModelFitInfo* fitSessio
                                    mitk::ParameterFitImageGeneratorBase* generator)
 {
   QString message = "<font color='green'>Fitting Data Set . . .</font>";
-  m_Controls.infoBox->append(message);
+  m_Controls->infoBox->append(message);
 
   /////////////////////////
   //create job and put it into the thread pool
@@ -648,7 +649,9 @@ void GenericDataFittingView::DoFit(const mitk::modelFit::ModelFitInfo* fitSessio
   threadPool->start(pJob);
 }
 
-GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
+GenericDataFittingView::GenericDataFittingView()
+  : m_Controls(std::make_unique<Ui::GeneralDataFittingViewControls>()),
+    m_FittingInProgress(false)
 {
   m_selectedImage = nullptr;
   m_selectedMask = nullptr;
@@ -680,9 +683,13 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }
 
+GenericDataFittingView::~GenericDataFittingView()
+{
+}
+
 void GenericDataFittingView::OnJobFinished()
 {
-  this->m_Controls.infoBox->append(QString("<font color='green'>Fitting finished</font>"));
+  this->m_Controls->infoBox->append(QString("<font color='green'>Fitting finished</font>"));
   this->m_FittingInProgress = false;
   this->UpdateGUIControls();
 };
@@ -691,7 +698,7 @@ void GenericDataFittingView::OnJobError(QString err)
 {
   MITK_ERROR << err.toStdString().c_str();
 
-  m_Controls.infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
+  m_Controls->infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
 
 };
 
@@ -707,27 +714,27 @@ void GenericDataFittingView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitRe
 void GenericDataFittingView::OnJobProgress(double progress)
 {
   QString report = QString("Progress. ") + QString::number(progress);
-  this->m_Controls.infoBox->append(report);
+  this->m_Controls->infoBox->append(report);
 };
 
 void GenericDataFittingView::OnJobStatusChanged(QString info)
 {
-  this->m_Controls.infoBox->append(info);
+  this->m_Controls->infoBox->append(info);
 }
 
 
 void GenericDataFittingView::InitModelComboBox() const
 {
-  this->m_Controls.comboModel->clear();
-  this->m_Controls.comboModel->addItem(tr("No model selected"));
+  this->m_Controls->comboModel->clear();
+  this->m_Controls->comboModel->addItem(tr("No model selected"));
 
   for (ModelFactoryStackType::const_iterator pos = m_FactoryStack.begin();
        pos != m_FactoryStack.end(); ++pos)
   {
-    this->m_Controls.comboModel->addItem(QString::fromStdString((*pos)->GetClassID()));
+    this->m_Controls->comboModel->addItem(QString::fromStdString((*pos)->GetClassID()));
   }
 
-  this->m_Controls.comboModel->setCurrentIndex(0);
+  this->m_Controls->comboModel->setCurrentIndex(0);
 };
 
 mitk::ModelFitFunctorBase::Pointer GenericDataFittingView::CreateDefaultFitFunctor(
@@ -740,7 +747,7 @@ mitk::ModelFitFunctorBase::Pointer GenericDataFittingView::CreateDefaultFitFunct
     mitk::NormalizedSumOfSquaredDifferencesFitCostFunction::New();
   fitFunctor->RegisterEvaluationParameter("Chi^2", chi2);
 
-  if (m_Controls.checkBox_Constraints->isChecked())
+  if (m_Controls->checkBox_Constraints->isChecked())
   {
     fitFunctor->SetConstraintChecker(m_modelConstraints);
   }
@@ -752,7 +759,7 @@ mitk::ModelFitFunctorBase::Pointer GenericDataFittingView::CreateDefaultFitFunct
   scales.Fill(1.0);
   fitFunctor->SetScales(scales);
 
-  fitFunctor->SetDebugParameterMaps(m_Controls.checkDebug->isChecked());
+  fitFunctor->SetDebugParameterMaps(m_Controls->checkDebug->isChecked());
 
   return fitFunctor.GetPointer();
 }

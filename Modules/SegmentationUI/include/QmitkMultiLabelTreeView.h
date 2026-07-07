@@ -1,0 +1,40 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef QmitkMultiLabelTreeView_h
+#define QmitkMultiLabelTreeView_h
+
+#include <MitkSegmentationUIExports.h>
+
+#include <QTreeView>
+
+/**
+* \brief Customized QTreeView for displaying multi-label segmentation data.
+*/
+class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeView : public QTreeView
+{
+  Q_OBJECT
+
+public:
+  QmitkMultiLabelTreeView(QWidget* parent = nullptr);
+
+Q_SIGNALS:
+  void MouseLeave() const;
+
+protected:
+  QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const QEvent* event = nullptr) const override;
+
+  void leaveEvent(QEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
+};
+
+#endif

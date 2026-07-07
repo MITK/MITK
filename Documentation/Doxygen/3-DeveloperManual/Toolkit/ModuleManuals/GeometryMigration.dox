@@ -114,7 +114,7 @@ Here are some guidelines, how to change your code to the new geometry scheme.
     {
     m_IndexToWorldTransform = transform;
     CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-    vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+    mitk::FillArray(m_Origin, m_IndexToWorldTransform->GetOffset());
     TransferItkToVtkTransform();
     Modified();
     }

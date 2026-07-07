@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include "mitkRenderWindowBase.h"
+#include <mitkRenderWindowBase.h>
 
 namespace mitk
 {
@@ -37,27 +37,56 @@ namespace mitk
     mitkNewMacro1Param(Self, vtkRenderWindow*);
     mitkNewMacro2Param(Self, vtkRenderWindow *, const char *);
 
+    /** \brief Destructor. Cleans up VTK render window, interactor, and event provider. */
     ~RenderWindow() override;
 
+    /** \brief Returns the underlying vtkRenderWindow.
+     *
+     * \return The VTK render window instance.
+     */
     vtkRenderWindow *GetVtkRenderWindow() override;
+
+    /** \brief Returns the underlying vtkRenderWindowInteractor.
+     *
+     * \return The VTK render window interactor instance.
+     */
     vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override;
 
-    // Set Layout Index to define the Layout Type
+    /** \brief Sets the layout index to define the layout type.
+     *
+     * \param layoutIndex the layout index to set.
+     */
     void SetLayoutIndex(unsigned int layoutIndex);
 
-    // Get Layout Index to define the Layout Type
+    /** \brief Returns the layout index that defines the layout type.
+     *
+     * \return The current layout index.
+     */
     unsigned int GetLayoutIndex();
 
-    // MenuWidget need to update the Layout Design List when Layout had changed
+    /** \brief Notifies that the layout design list has changed.
+     *
+     * Called when the MenuWidget needs to update the Layout Design List
+     * after a layout change.
+     *
+     * \param layoutDesignIndex the new layout design index.
+     */
     void LayoutDesignListChanged(int layoutDesignIndex);
 
+    /** \brief Toggles full screen mode.
+     *
+     * \param state if true, enters full screen mode; if false, leaves it.
+     */
     void FullScreenMode(bool state);
 
     /**
     * \brief Convenience method to set the size of an mitkRenderWindow.
     *
     * This method sets the size of the vtkRenderWindow and tells the
-    * rendering that the size has changed -> adapts displayGeometry, etc.
+    * rendering that the size has changed, which adapts displayGeometry, etc.
+    *
+    * \param width the new width in pixels.
+    * \param height the new height in pixels.
     */
     void SetSize(int width, int height);
 

@@ -12,17 +12,12 @@ found in the LICENSE file.
 
 #include "mitkMimeTypeProvider.h"
 
-#include "mitkLog.h"
+#include <mitkLog.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
 #include <itksys/SystemTools.hxx>
-
-#ifdef _MSC_VER
-#pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
-#pragma warning(disable : 4355)
-#endif
 
 namespace mitk
 {

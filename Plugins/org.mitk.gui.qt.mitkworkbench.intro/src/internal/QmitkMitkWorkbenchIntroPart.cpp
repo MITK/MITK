@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMitkWorkbenchIntroPart.h"
+#include <ui_QmitkWelcomeScreenViewControls.h>
 #include "QmitkMitkWorkbenchIntroPlugin.h"
 
 #include <berryIPerspectiveDescriptor.h>
@@ -20,6 +21,7 @@ found in the LICENSE file.
 #include <berryWorkbenchPreferenceConstants.h>
 
 #include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
@@ -91,16 +93,10 @@ namespace
 
         workbench->ShowPerspective(id, workbenchWindow);
 
-        auto context = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPluginContext();
-        auto serviceReference = context->getServiceReference<mitk::IDataStorageService>();
-
-        mitk::IDataStorageService* service = serviceReference
-          ? context->getService<mitk::IDataStorageService>(serviceReference)
-          : nullptr;
-
-        if (service)
+        mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+        if (dsService)
         {
-          berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(service->GetActiveDataStorage()));
+          berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsService->GetActiveDataStorageReference()));
 
           auto page = introSite->GetPage();
           auto editorPart = page->FindEditor(editorInput);
@@ -124,7 +120,7 @@ namespace
 }
 
 QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
-  : m_Controls(nullptr),
+  :
     m_Impl(new Impl)
 {
   auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
@@ -160,7 +156,7 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
   if (!m_Controls)
   {
     // create GUI widgets
-    m_Controls = new Ui::QmitkWelcomeScreenViewControls;
+    m_Controls = std::make_unique<Ui::QmitkWelcomeScreenViewControls>();
     m_Controls->setupUi(parent);
 
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview

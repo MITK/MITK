@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <vtkPiecewiseFunction.h>
 #include <vtkSmartPointer.h>
 
-#include "mitkTransferFunction.h"
+#include <mitkTransferFunction.h>
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -49,12 +49,39 @@ namespace mitk
     itkCloneMacro(Self)
       mitkNewMacro1Param(TransferFunctionInitializer, TransferFunction::Pointer);
 
+    /**
+     * \brief Populate a vector with the names of all available transfer function presets.
+     * \param[out] presetNames Vector to be filled with preset name strings.
+     */
     static void GetPresetNames(std::vector<std::string> &presetNames);
 
+    /**
+     * \brief Set the transfer function to be initialized.
+     * \param[in] transferFunction The transfer function to configure.
+     */
     void SetTransferFunction(TransferFunction::Pointer transferFunction);
+
+    /**
+     * \brief Return the currently held transfer function.
+     * \return The transfer function, or nullptr if none has been set.
+     */
     mitk::TransferFunction::Pointer GetTransferFunction();
+
+    /**
+     * \brief Set the transfer function preset mode and immediately apply it.
+     *
+     * Valid mode values correspond to the internal TransferFunctionMode enum
+     * (e.g., 0 for CT Default, 7 for MR Generic).
+     *
+     * \param[in] mode The preset index to apply.
+     */
     void SetTransferFunctionMode(int mode);
 
+    /**
+     * \brief Initialize the transfer function according to the currently set mode.
+     * \pre A transfer function must have been set via SetTransferFunction() or the constructor.
+     * \throw itk::ExceptionObject if no transfer function has been set.
+     */
     void InitTransferFunctionMode();
 
   protected:

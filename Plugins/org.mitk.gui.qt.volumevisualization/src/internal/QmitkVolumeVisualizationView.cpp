@@ -31,6 +31,8 @@ found in the LICENSE file.
 
 #include <mitkProperties.h>
 
+#include <ui_QmitkVolumeVisualizationViewControls.h>
+
 const std::string QmitkVolumeVisualizationView::VIEW_ID = "org.mitk.views.volumevisualization";
 
 enum
@@ -42,7 +44,10 @@ enum
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
   : QmitkAbstractView()
-  , m_Controls(nullptr)
+{
+}
+
+QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 {
 }
 
@@ -52,7 +57,7 @@ void QmitkVolumeVisualizationView::SetFocus()
 
 void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
+  m_Controls = std::make_unique<Ui::QmitkVolumeVisualizationViewControls>();
   m_Controls->setupUi(parent);
 
   m_Controls->volumeSelectionWidget->SetDataStorage(GetDataStorage());

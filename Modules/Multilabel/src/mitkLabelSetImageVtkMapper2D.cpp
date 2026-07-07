@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSetImageVtkMapper2D.h"
+#include <mitkLabelSetImageVtkMapper2D.h>
 
 // MITK
 #include <mitkAbstractTransformGeometry.h>
@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 
 // MITK Rendering
-#include "vtkNeverTranslucentTexture.h"
+#include <vtkNeverTranslucentTexture.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -38,8 +38,14 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkImageMapToColors.h>
 
+#include <algorithm>
+
 namespace
 {
+  // The active-label outline marks the working label and stays crisp regardless of the
+  // (possibly low) base segmentation opacity, so its opacity is decoupled from the base.
+  constexpr double ACTIVE_LABEL_OUTLINE_OPACITY = 1.0;
+
   itk::ModifiedTimeType PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
   {
     const std::string context = renderer != nullptr ? renderer->GetName() : "";
@@ -98,41 +104,62 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
   assert(image && image->IsInitialized());
 
   localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
+  auto lookUpTable = localStorage->m_LabelLookupTable->GetVtkLookupTable();
   const auto labelValues = image->GetAllLabelValues();
 
   mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_LABELS_HIGHLIGHTED()));
+  const auto highlightedLabelValues = prop.IsNotNull() ? prop->GetValue() : std::vector<int>({});
+  const auto highlightEnd = highlightedLabelValues.cend();
+  const bool highlightingActive = !highlightedLabelValues.empty();
 
-  if (nullptr != prop)
+  mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
+  const bool highlightInvisibleLabels = boolProp.IsNull() ? false : boolProp->GetValue();
+
+  float nodeOpacity = 1.0f;
+  node->GetOpacity(nodeOpacity, renderer, "opacity");
+  const float opacityFactor = this->GetOpacityFactor();
+
+  // Node "opacity" times the "opacity factor" preference define the base (normal)
+  // opacity. It is baked into the LUT alpha here rather than applied at the layer actor,
+  // so a hovered label can be spotlit above the base (see GenerateDataForRenderer, which
+  // keeps the actor opacity fixed at 1.0).
+  const double base = static_cast<double>(nodeOpacity) * opacityFactor;
+
+  double rgba[4];
+  for (const auto& value : labelValues)
   {
-    const auto highlightedLabelValues = prop->GetValue();
-    mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
-    bool higlightInvisible = boolProp.IsNull() ? false : boolProp->GetValue();
+    lookUpTable->GetTableValue(value, rgba);
 
-    if (!highlightedLabelValues.empty())
+    // The segmentation LUT stores each label's own opacity in alpha (0 = hidden).
+    const double labelOpacity = rgba[3];
+    const double normalOpacity = labelOpacity * base;
+
+    if (highlightingActive)
     {
-      auto lookUpTable  = localStorage->m_LabelLookupTable->GetVtkLookupTable();
-      auto highlightEnd = highlightedLabelValues.cend();
-
-      double rgba[4];
-      for (const auto& value : labelValues)
+      const bool isHighlightedValue = highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
+      if (isHighlightedValue)
       {
-        lookUpTable->GetTableValue(value, rgba);
-        if (highlightEnd == std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value))
-        { //make all none highlighted values more transparent
-          rgba[3] *= 0.3;
-        }
-        else
-        {
-          if (higlightInvisible || rgba[3] != 0 )
-          {
-            rgba[3] = 1.;
-          }
-        }
-        lookUpTable->SetTableValue(value, rgba);
+        // Spotlight the hovered label at full opacity, decoupled from the base so it
+        // pops regardless of how transparent the segmentation is. A hidden label is
+        // only revealed when explicitly requested (Shift-highlight of invisible labels).
+        rgba[3] = (labelOpacity != 0.0 || highlightInvisibleLabels) ? HIGHLIGHTED_LABEL_OPACITY : 0.0;
       }
-      localStorage->m_LabelLookupTable->Modified();
+      else
+      {
+        // Fade the other labels to a low floor, but never above their normal appearance.
+        rgba[3] = std::min(FADED_LABEL_OPACITY, normalOpacity);
+      }
     }
+    else
+    {
+      rgba[3] = normalOpacity;
+    }
+
+    lookUpTable->SetTableValue(value, rgba);
   }
+
+  localStorage->m_LastOpacityFactor = opacityFactor;
+  localStorage->m_LabelLookupTable->Modified();
 }
 
 namespace
@@ -168,7 +195,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.highlight_invisible", localStorage->m_LabelLookupTable->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
+    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime()) ||
+    this->GetOpacityFactor() != localStorage->m_LastOpacityFactor;
 
   if (isLookupModified)
   {
@@ -247,9 +275,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   localStorage->m_LastTimeStep = currentTimestep;
 
 
-  float opacity = 1.0f;
-  node->GetOpacity(opacity, renderer, "opacity");
-  opacity *= this->GetOpacityFactor();
+  // Base opacity is baked into the lookup table (see GenerateLookupTable); the layer
+  // actor stays fully opaque so a highlighted label can be spotlit above the base.
+  const float opacity = 1.0f;
 
   if (isLookupModified)
   {
@@ -412,9 +440,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
 
   int activeLayer = image->GetActiveLayer();
 
-  float opacity = 1.0f;
-  node->GetOpacity(opacity, renderer, "opacity");
-  opacity *= this->GetOpacityFactor();
+  // Decoupled from the base opacity so the working label's outline stays crisp even
+  // when the segmentation itself is rendered nearly transparent.
+  const float opacity = static_cast<float>(ACTIVE_LABEL_OUTLINE_OPACITY);
 
   Label* activeLabel = image->GetActiveLabel();
   MultiLabelSegmentation::LabelValueType activeLabelValue = nullptr != activeLabel ? activeLabel->GetValue() : MultiLabelSegmentation::UNLABELED_VALUE;
@@ -678,7 +706,8 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
       (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
-      (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()))
+      (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()) ||
+      (this->GetOpacityFactor() != localStorage->m_LastOpacityFactor))
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
@@ -758,7 +787,8 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                           bool overwrite)
 {
   // add/replace the following properties
-  node->SetProperty("opacity", FloatProperty::New(1.0f), renderer);
+  // Default to a translucent overlay so the underlying image stays visible.
+  node->SetProperty("opacity", FloatProperty::New(0.5f), renderer);
   node->SetProperty("binary", BoolProperty::New(false), renderer);
 
   node->SetProperty("labelset.contour.active", BoolProperty::New(true), renderer);

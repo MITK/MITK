@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkCommand.h"
+#include <itkCommand.h>
 
-#include "mitkTimeFramesRegistrationHelper.h"
+#include <mitkTimeFramesRegistrationHelper.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageReadAccessor.h>
 

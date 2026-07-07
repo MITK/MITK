@@ -13,14 +13,19 @@ found in the LICENSE file.
 #ifndef mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer_h
 #define mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
+#include <mitkConcreteModelParameterizerBase.h>
 
 namespace mitk
 {
-  /** Parameterizer for the DescriptivePharmacokineticBrixModel that don't use an image
-   for initializing the model but a single signal value. This parameterizer is amongst
-   others used for ROI based fiting strategies where no complete image is needed/used.
-   @sa DescriptivePharmacokineticBrixModelParameterizer*/
+  /**
+   * \brief Parameterizer for the DescriptivePharmacokineticBrixModel using a single baseline value.
+   *
+   * Instead of a baseline image, this parameterizer uses a single scalar base value for the
+   * pre-contrast signal S0, making it suitable for ROI-based fitting strategies where a
+   * complete image is not needed.
+   *
+   * \sa DescriptivePharmacokineticBrixModel, DescriptivePharmacokineticBrixModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT DescriptivePharmacokineticBrixModelValueBasedParameterizer : public
     ConcreteModelParameterizerBase<mitk::DescriptivePharmacokineticBrixModel>
   {
@@ -54,12 +59,12 @@ namespace mitk
     itkGetConstReferenceMacro(BaseValue, double);
 
     /* Returns the global static parameters for the model.
-     * @remark this default implementation assumes no global static parameters exist.
+     * \remark this default implementation assumes no global static parameters exist.
      * Thus an empty map is returned.*/
     StaticParameterMapType GetGlobalStaticParameters() const override;
 
     /* Returns the local static parameters for the model at the given index.
-     * @remark this default implementation assumes no local static parameters exist.
+     * \remark this default implementation assumes no local static parameters exist.
      * Thus an empty map is returned.*/
     StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const override;
 

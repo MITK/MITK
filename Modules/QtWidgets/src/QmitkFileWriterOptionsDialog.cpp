@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFileWriterOptionsDialog.h"
-#include "ui_QmitkFileWriterOptionsDialog.h"
+#include <QmitkFileWriterOptionsDialog.h>
+#include <ui_QmitkFileWriterOptionsDialog.h>
 
-#include "QmitkFileReaderWriterOptionsWidget.h"
-#include "mitkFileWriterSelector.h"
-#include "mitkIFileWriter.h"
+#include <QmitkFileReaderWriterOptionsWidget.h>
+#include <mitkFileWriterSelector.h>
+#include <mitkIFileWriter.h>
 
 QmitkFileWriterOptionsDialog::QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo &saveInfo, QWidget *parent)
-  : QDialog(parent), ui(new Ui::QmitkFileWriterOptionsDialog), m_SaveInfo(saveInfo)
+  : QDialog(parent), ui(std::make_unique<Ui::QmitkFileWriterOptionsDialog>()), m_SaveInfo(saveInfo)
 {
   ui->setupUi(this);
 
@@ -69,7 +69,6 @@ QmitkFileWriterOptionsDialog::QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInf
 
 QmitkFileWriterOptionsDialog::~QmitkFileWriterOptionsDialog()
 {
-  delete ui;
 }
 
 bool QmitkFileWriterOptionsDialog::ReuseOptions() const

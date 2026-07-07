@@ -13,14 +13,16 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionPreferencePage.h"
 
-#include "QmitkNodeSelectionPreferenceHelper.h"
+#include <QmitkNodeSelectionPreferenceHelper.h>
 
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <QmitkDataStorageFavoriteNodesInspector.h>
 
+#include <ui_QmitkNodeSelectionPreferencePage.h>
+
 //-----------------------------------------------------------------------------
 QmitkNodeSelectionPreferencePage::QmitkNodeSelectionPreferencePage()
-  : m_MainControl(nullptr), m_Controls(nullptr)
+  : m_MainControl(nullptr)
 {
 
 }
@@ -29,7 +31,6 @@ QmitkNodeSelectionPreferencePage::QmitkNodeSelectionPreferencePage()
 //-----------------------------------------------------------------------------
 QmitkNodeSelectionPreferencePage::~QmitkNodeSelectionPreferencePage()
 {
-  delete m_Controls;
 }
 
 
@@ -44,7 +45,7 @@ void QmitkNodeSelectionPreferencePage::Init(berry::IWorkbench::Pointer )
 void QmitkNodeSelectionPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_MainControl = new QWidget(parent);
-  m_Controls = new Ui::QmitkNodeSelectionPreferencePage;
+  m_Controls = std::make_unique<Ui::QmitkNodeSelectionPreferencePage>();
   m_Controls->setupUi( m_MainControl );
 
   connect(m_Controls->comboPreferred, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateWidgets()));

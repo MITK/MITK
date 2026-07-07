@@ -15,10 +15,10 @@ found in the LICENSE file.
 #include <string>
 
 // CTK includes
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 
 // MITK includes
-#include "mitkExampleDataStructure.h"
+#include <mitkExampleDataStructure.h>
 #include <mitkIOUtil.h>
 
 /** \brief Example MiniApp that converts a text file content to upper case

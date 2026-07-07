@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkStepper_h
 #define mitkStepper_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 
@@ -52,9 +52,11 @@ namespace mitk
     itkCloneMacro(Self);
     itkGetConstMacro(Pos, unsigned int);
 
+    /** \brief Set the current position, clamped to [0, GetSteps()-1].
+     * \param[in] pos The desired position.
+     */
     virtual void SetPos(unsigned int pos)
     {
-      // copied from itkMacro.h, itkSetClampMacro(...)
       unsigned int newPos;
       if (m_Steps != 0)
       {
@@ -90,35 +92,78 @@ namespace mitk
     itkGetConstMacro(InverseDirection, bool);
     itkBooleanMacro(InverseDirection);
 
+    /** \brief Set the scalar range (min/max) corresponding to the step positions.
+     * \param[in] min The minimum scalar value.
+     * \param[in] max The maximum scalar value.
+     */
     void SetRange(ScalarType min, ScalarType max);
+
+    /** \brief Mark the current range as invalid while keeping the range itself. */
     void InvalidateRange();
+
+    /** \brief Get the minimum value of the range. */
     ScalarType GetRangeMin() const;
+
+    /** \brief Get the maximum value of the range. */
     ScalarType GetRangeMax() const;
+
+    /** \brief Check whether the range has been set and is currently valid. */
     bool HasValidRange() const;
+
+    /** \brief Remove the range entirely. */
     void RemoveRange();
+
+    /** \brief Check whether a range has been set (may or may not be valid). */
     bool HasRange() const;
 
+    /** \brief Set the unit name string (e.g. "mm") for the stepping range.
+     * \param[in] unitName The unit name string.
+     */
     void SetUnitName(const char *unitName);
+
+    /** \brief Get the unit name string. */
     const char *GetUnitName() const;
+
+    /** \brief Remove the unit name. */
     void RemoveUnitName();
+
+    /** \brief Check whether a unit name has been set. */
     bool HasUnitName() const;
 
+    /** \brief Advance to the next position in the list.
+     *
+     * Respects AutoRepeat, PingPong, and InverseDirection settings.
+     */
     virtual void Next();
 
+    /** \brief Go to the previous position in the list.
+     *
+     * Respects AutoRepeat, PingPong, and InverseDirection settings.
+     */
     virtual void Previous();
 
+    /** \brief Move the position by a given delta (positive or negative).
+     *
+     * Respects AutoRepeat wrapping. If the resulting position would be
+     * negative, it is clamped to 0 (unless AutoRepeat is on).
+     * \param[in] sliceDelta Number of steps to move (can be negative).
+     */
     virtual void MoveSlice(int sliceDelta);
 
+    /** \brief Go to the first position (index 0). */
     virtual void First();
 
+    /** \brief Go to the last position (index GetSteps() - 1). */
     virtual void Last();
 
   protected:
     Stepper();
     ~Stepper() override;
 
+    /** \brief Increment position by one, respecting AutoRepeat and PingPong. */
     void Increase();
 
+    /** \brief Decrement position by one, respecting AutoRepeat and PingPong. */
     void Decrease();
 
     unsigned int m_Pos;

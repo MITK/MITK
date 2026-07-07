@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPadImageFilter.h"
-#include "mitkImageCast.h"
+#include <mitkPadImageFilter.h>
+#include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
-#include "itkBinaryThresholdImageFilter.h"
-#include "itkConstantPadImageFilter.h"
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkConstantPadImageFilter.h>
 
 mitk::PadImageFilter::PadImageFilter()
 {

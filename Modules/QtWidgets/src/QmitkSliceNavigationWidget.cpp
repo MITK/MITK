@@ -10,28 +10,31 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSliceNavigationWidget.h"
+#include <QmitkSliceNavigationWidget.h>
+
+#include <ui_QmitkSliceNavigationWidget.h>
 
 QmitkSliceNavigationWidget::QmitkSliceNavigationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  this->setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkSliceNavigationWidget>();
+  m_Controls->setupUi(this);
 
-  m_Slider->setOrientation(Qt::Horizontal);
-  m_Slider->setMinimum(0);
-  m_Slider->setMaximum(0);
-  m_Slider->setValue(0);
-  m_Slider->setSingleStep(1);
-  m_Slider->setPageStep(10);
+  m_Controls->m_Slider->setOrientation(Qt::Horizontal);
+  m_Controls->m_Slider->setMinimum(0);
+  m_Controls->m_Slider->setMaximum(0);
+  m_Controls->m_Slider->setValue(0);
+  m_Controls->m_Slider->setSingleStep(1);
+  m_Controls->m_Slider->setPageStep(10);
 
-  m_SpinBox->setMinimum( 0 );
-  m_SpinBox->setMaximum(0);
-  m_SpinBox->setValue(0);
-  m_SpinBox->setDecimals(0);
-  m_SpinBox->setSingleStep(1);
+  m_Controls->m_SpinBox->setMinimum( 0 );
+  m_Controls->m_SpinBox->setMaximum(0);
+  m_Controls->m_SpinBox->setValue(0);
+  m_Controls->m_SpinBox->setDecimals(0);
+  m_Controls->m_SpinBox->setSingleStep(1);
 
-  this->connect(m_Slider, SIGNAL(valueChanged(double)), SLOT(SliderChanged(double)));
-  this->connect(m_SpinBox, SIGNAL(valueChanged(double)), SLOT(SpinBoxChanged(double)));
+  this->connect(m_Controls->m_Slider, SIGNAL(valueChanged(double)), SLOT(SliderChanged(double)));
+  this->connect(m_Controls->m_SpinBox, SIGNAL(valueChanged(double)), SLOT(SpinBoxChanged(double)));
 
   // this avoids trying to use m_Stepper until it is set to something != nullptr
   // (additionally to the avoiding recursions during refetching)
@@ -47,6 +50,10 @@ QmitkSliceNavigationWidget::QmitkSliceNavigationWidget(QWidget* parent, Qt::Wind
   m_HasLabelUnit = true;
   m_InverseDirection = false;
   m_InvertedControls = false;
+}
+
+QmitkSliceNavigationWidget::~QmitkSliceNavigationWidget()
+{
 }
 
 QString QmitkSliceNavigationWidget::ClippedValueToString(float value)
@@ -117,10 +124,10 @@ void QmitkSliceNavigationWidget::Refetch()
 
     if (m_Stepper->GetSteps() == 0)
     {
-      m_Slider->setMaximum(0);
-      m_Slider->setValue(0);
-      m_SpinBox->setMaximum(0);
-      m_SpinBox->setValue(0);
+      m_Controls->m_Slider->setMaximum(0);
+      m_Controls->m_Slider->setValue(0);
+      m_Controls->m_SpinBox->setMaximum(0);
+      m_Controls->m_SpinBox->setValue(0);
     }
     else
     {
@@ -128,33 +135,33 @@ void QmitkSliceNavigationWidget::Refetch()
       unsigned int currentPosition = m_Stepper->GetPos();
 
       // set slider value
-      m_Slider->setMaximum(maximumSteps);
+      m_Controls->m_Slider->setMaximum(maximumSteps);
       if (m_InverseDirection)
       {
-        m_Slider->setValue(maximumSteps - currentPosition);
+        m_Controls->m_Slider->setValue(maximumSteps - currentPosition);
       }
       else
       {
-        m_Slider->setValue(currentPosition);
+        m_Controls->m_Slider->setValue(currentPosition);
       }
 
       // set spinbox values
-      m_SpinBox->setMaximum(maximumSteps);
+      m_Controls->m_SpinBox->setMaximum(maximumSteps);
       if (m_InverseDirection)
       {
-        m_SpinBox->setValue(maximumSteps - currentPosition);
+        m_Controls->m_SpinBox->setValue(maximumSteps - currentPosition);
       }
       else
       {
-        m_SpinBox->setValue(currentPosition);
+        m_Controls->m_SpinBox->setValue(currentPosition);
       }
     }
 
     if (m_Stepper->HasRange() && m_HasLabels)
     {
       // Show slider with labels according to settings below
-      m_SliderLabelLeft->setHidden(false);
-      m_SliderLabelRight->setHidden(false);
+      m_Controls->m_SliderLabelLeft->setHidden(false);
+      m_Controls->m_SliderLabelRight->setHidden(false);
 
       if (m_Stepper->HasValidRange())
       {
@@ -174,8 +181,8 @@ void QmitkSliceNavigationWidget::Refetch()
     else
     {
       // Show slider without any labels
-      m_SliderLabelLeft->setHidden(true);
-      m_SliderLabelRight->setHidden(true);
+      m_Controls->m_SliderLabelLeft->setHidden(true);
+      m_Controls->m_SliderLabelRight->setHidden(true);
     }
 
     // Update GUI according to settings above
@@ -226,9 +233,9 @@ void QmitkSliceNavigationWidget::SetInvertedControls(bool invertedControls)
   if (invertedControls != m_InvertedControls)
   {
     m_InvertedControls = invertedControls;
-    m_Slider->setInvertedAppearance(invertedControls);
-    m_Slider->setInvertedControls(invertedControls);
-    m_SpinBox->setInvertedControls(invertedControls);
+    m_Controls->m_Slider->setInvertedAppearance(invertedControls);
+    m_Controls->m_Slider->setInvertedControls(invertedControls);
+    m_Controls->m_SpinBox->setInvertedControls(invertedControls);
   }
 }
 
@@ -241,11 +248,11 @@ void QmitkSliceNavigationWidget::SliderChanged(double)
 
   if (m_InverseDirection)
   {
-    m_Stepper->SetPos(m_Stepper->GetSteps() - 1 - m_Slider->value());
+    m_Stepper->SetPos(m_Stepper->GetSteps() - 1 - m_Controls->m_Slider->value());
   }
   else
   {
-    m_Stepper->SetPos(m_Slider->value());
+    m_Stepper->SetPos(m_Controls->m_Slider->value());
   }
 
   this->Refetch();
@@ -260,11 +267,11 @@ void QmitkSliceNavigationWidget::SpinBoxChanged(double)
 
   if (m_InverseDirection)
   {
-    m_Stepper->SetPos(m_Stepper->GetSteps() - 1 - m_SpinBox->value());
+    m_Stepper->SetPos(m_Stepper->GetSteps() - 1 - m_Controls->m_SpinBox->value());
   }
   else
   {
-    m_Stepper->SetPos(m_SpinBox->value());
+    m_Stepper->SetPos(m_Controls->m_SpinBox->value());
   }
 
   this->Refetch();
@@ -312,6 +319,6 @@ void QmitkSliceNavigationWidget::SetLabels()
   minText += "</font></p>";
   maxText += "</font></p>";
 
-  m_SliderLabelLeft->setText(minText);
-  m_SliderLabelRight->setText(maxText);
+  m_Controls->m_SliderLabelLeft->setText(minText);
+  m_Controls->m_SliderLabelRight->setText(maxText);
 }

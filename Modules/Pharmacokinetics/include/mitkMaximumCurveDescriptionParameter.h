@@ -13,11 +13,15 @@ found in the LICENSE file.
 #ifndef mitkMaximumCurveDescriptionParameter_h
 #define mitkMaximumCurveDescriptionParameter_h
 
-#include "mitkCurveDescriptionParameterBase.h"
+#include <mitkCurveDescriptionParameterBase.h>
 
 namespace mitk {
 
-  /** Descriptor computes the maximum of the curve.*/
+  /**
+   * \brief Curve description parameter that computes the maximum value of a curve.
+   *
+   * \sa CurveDescriptionParameterBase
+   */
 class MITKPHARMACOKINETICS_EXPORT MaximumCurveDescriptionParameter : public mitk::CurveDescriptionParameterBase
 {
 public:
@@ -28,6 +32,9 @@ public:
 
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /** \brief Returns the name of the computed parameter ("Maximum").
+     *  \return Vector containing the single parameter name. */
     DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
 protected:

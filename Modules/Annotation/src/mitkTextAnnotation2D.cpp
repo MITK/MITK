@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTextAnnotation2D.h"
+#include <mitkTextAnnotation2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -32,13 +32,7 @@ mitk::TextAnnotation2D::TextAnnotation2D()
 
 mitk::TextAnnotation2D::~TextAnnotation2D()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::Annotation::Bounds mitk::TextAnnotation2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const

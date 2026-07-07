@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMITKSeriesGDCMReader.h"
-#include "mitkDICOMFileReaderTestHelper.h"
-#include "mitkDICOMFilenameSorter.h"
-#include "mitkDICOMTagBasedSorter.h"
-#include "mitkDICOMSortByTag.h"
+#include <mitkDICOMITKSeriesGDCMReader.h>
+#include <mitkDICOMFileReaderTestHelper.h>
+#include <mitkDICOMFilenameSorter.h>
+#include <mitkDICOMTagBasedSorter.h>
+#include <mitkDICOMSortByTag.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <unordered_map>
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 
 using mitk::DICOMTag;
 

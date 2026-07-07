@@ -13,18 +13,29 @@ found in the LICENSE file.
 #ifndef itkNeighborhoodFunctorImageFilter_h
 #define itkNeighborhoodFunctorImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkZeroFluxNeumannBoundaryCondition.h"
-#include "itkConstNeighborhoodIterator.h"
-#include "itkImage.h"
+#include <itkImageToImageFilter.h>
+#include <itkZeroFluxNeumannBoundaryCondition.h>
+#include <itkConstNeighborhoodIterator.h>
+#include <itkImage.h>
 #include <cstdio>
 
 #include <itkHistogramToTextureFeaturesFilter.h>
-#include "itkHistogram.h"
+#include <itkHistogram.h>
 
 namespace itk
 {
 
+/**
+ * \brief Applies a user-supplied functor to each neighbourhood in an image and writes the results to feature images.
+ *
+ * This filter iterates over each voxel in the input image (optionally restricted by a mask),
+ * constructs a neighbourhood around the voxel, and passes it to the given functor. The functor
+ * returns a fixed-size vector of feature values that are written to separate output images.
+ *
+ * \tparam TInputImageType The input image type.
+ * \tparam TFeatureImageType The output feature image type.
+ * \tparam FunctorType The functor type that computes features from a neighbourhood.
+ */
 template<typename TInputImageType, typename TFeatureImageType , class FunctorType>
 class NeighborhoodFunctorImageFilter : public ImageToImageFilter< TInputImageType, TFeatureImageType>
 {

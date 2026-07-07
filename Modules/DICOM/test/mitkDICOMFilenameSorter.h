@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMFilenameSorter_h
 #define mitkDICOMFilenameSorter_h
 
-#include "mitkDICOMDatasetSorter.h"
+#include <mitkDICOMDatasetSorter.h>
 
 namespace mitk
 {

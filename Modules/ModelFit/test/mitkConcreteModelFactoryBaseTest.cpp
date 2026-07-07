@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <iostream>
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkTestModel.h"
-#include "mitkTestModelFactory.h"
-#include "mitkModelFitException.h"
+#include <mitkTestModel.h>
+#include <mitkTestModelFactory.h>
+#include <mitkModelFitException.h>
 
 
 int mitkConcreteModelFactoryBaseTest(int  /*argc*/, char*[] /*argv[]*/)

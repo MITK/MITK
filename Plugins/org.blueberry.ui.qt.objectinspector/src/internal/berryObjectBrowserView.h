@@ -16,13 +16,18 @@ found in the LICENSE file.
 #include <berryQtViewPart.h>
 #include <string>
 
-#include <ui_berryQtObjectBrowserView.h>
 #include "berryQtObjectTableModel.h"
 
 #include <QAction>
 #include <QMenu>
+#include <memory>
 
 class QAbstractProxyModel;
+
+namespace Ui
+{
+  class QtObjectBrowserView;
+}
 
 namespace berry {
 
@@ -45,6 +50,7 @@ public:
   static const std::string VIEW_ID;
 
   ObjectBrowserView();
+  ~ObjectBrowserView() override;
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento) override;
 
@@ -76,7 +82,7 @@ protected:
 
 private:
 
-  Ui::QtObjectBrowserView m_Controls;
+  std::unique_ptr<Ui::QtObjectBrowserView> m_Controls;
   QtObjectTableModel* m_ObjectModel;
   QAbstractProxyModel* m_ProxyModel;
 

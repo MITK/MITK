@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToSizeZoneFeaturesFilter_h
-#define __itkEnhancedHistogramToSizeZoneFeaturesFilter_h
+#ifndef itkEnhancedHistogramToSizeZoneFeaturesFilter_h
+#define itkEnhancedHistogramToSizeZoneFeaturesFilter_h
 
-#include "itkHistogram.h"
-#include "itkMacro.h"
-#include "itkProcessObject.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkHistogram.h>
+#include <itkMacro.h>
+#include <itkProcessObject.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 namespace itk {
   namespace Statistics {
@@ -71,7 +71,6 @@ namespace itk {
     * \sa EnhancedHistogramToSizeZoneFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >
@@ -230,7 +229,7 @@ namespace itk {
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedHistogramToSizeZoneFeaturesFilter.hxx"
+#include <itkEnhancedHistogramToSizeZoneFeaturesFilter.tpp>
 #endif
 
 #endif

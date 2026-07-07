@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
 #include <itkObjectFactoryBase.h>
 #include <mitkException.h>

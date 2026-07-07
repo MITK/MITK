@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkRawImageFileReader.h"
-#include "mitkIOConstants.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageCast.h"
+#include <mitkIOConstants.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageCast.h>
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>

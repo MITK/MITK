@@ -16,15 +16,26 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkLevenbergMarquardtOptimizer.h>
 
-#include "mitkModelBase.h"
-#include "mitkModelFitFunctorBase.h"
-#include "mitkMVConstrainedCostFunctionDecorator.h"
+#include <mitkModelBase.h>
+#include <mitkModelFitFunctorBase.h>
+#include <mitkMVConstrainedCostFunctionDecorator.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class LevenbergMarquardtModelFitFunctor
+   * \brief Model fit functor that uses the Levenberg-Marquardt optimization algorithm.
+   *
+   * This functor performs nonlinear least-squares fitting using the ITK
+   * LevenbergMarquardtOptimizer. It supports optional parameter constraints via
+   * a ConstraintCheckerBase and configurable optimizer parameters (epsilon,
+   * gradient tolerance, value tolerance, iteration count).
+   *
+   * \sa ModelFitFunctorBase, DummyModelFitFunctor, MVConstrainedCostFunctionDecorator
+   */
   class MITKMODELFIT_EXPORT LevenbergMarquardtModelFitFunctor : public ModelFitFunctorBase
   {
   public:

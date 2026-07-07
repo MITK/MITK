@@ -26,48 +26,74 @@ found in the LICENSE file.
 #include <mapRegistrationKernelBase.h>
 
 // MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 
 namespace mitk
 {
 
-/** Generates the geometry info used to visualized a registration based on the properties
- * of the data node containing the registration.\n
- * @pre regNode is a correctly initialized data node of a registration
- * @param regNode Pointer to the data node of the registration.
- * @param [out] gridDesc Smartpointer to the extracted grid geometry.
- * @param [out] gridFrequ Grid frequency stored in the regNode.
+/**
+ * \brief Generate the geometry info used to visualize a registration.
+ *
+ * Extracts the grid geometry and grid frequency from the properties
+ * of the data node containing the registration.
+ *
+ * \pre regNode is a correctly initialized data node of a registration.
+ * \param[in] regNode Pointer to the data node of the registration.
+ * \param[out] gridDesc Smart pointer to the extracted grid geometry.
+ * \param[out] gridFrequ Grid frequency stored in the regNode.
  */
 void MITKMATCHPOINTREGISTRATION_EXPORT GetGridGeometryFromNode(const mitk::DataNode* regNode, mitk::Geometry3D::Pointer& gridDesc, unsigned int& gridFrequ);
 
 /**
- * Generates a 3D defomration grid according to a passed Geometry3D info. It is the basis
- * for most of the visualizations of a MatchPoint registration.
+ * \brief Generate a 3D deformation grid for visualizing a MatchPoint registration.
+ *
+ * \param[in] gridDesc The geometry defining the field of view.
+ * \param[in] gridFrequence The grid sampling frequency.
+ * \param[in] regKernel Optional registration kernel to deform the grid; nullptr for an undeformed grid.
+ * \return VTK poly data representing the deformation grid.
  */
 vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGrid(const mitk::BaseGeometry* gridDesc, unsigned int gridFrequence, const map::core::RegistrationKernelBase<3,3>* regKernel = nullptr);
 
 /**
- * Generates a 3D glyph representation of the given regKernel in the FOV defined by gridDesc.
+ * \brief Generate a 3D glyph representation of a registration kernel.
+ *
+ * \param[in] gridDesc The geometry defining the field of view.
+ * \param[in] regKernel The registration kernel to visualize.
+ * \return VTK poly data containing the glyph representation.
  */
 vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGlyph(const mitk::BaseGeometry* gridDesc, const map::core::RegistrationKernelBase<3,3>* regKernel);
 
 /**
- * Checks if the grid relevant node properties are outdated regarding the passed time stamp
- * reference*/
+ * \brief Check if grid-relevant node properties are outdated.
+ *
+ * \param[in] regNode The data node to check.
+ * \param[in] reference The time stamp to compare against.
+ * \return True if any grid-relevant property was modified after the reference time stamp.
+ */
 bool MITKMATCHPOINTREGISTRATION_EXPORT GridIsOutdated(const mitk::DataNode* regNode, const itk::TimeStamp& reference);
 
 /**
- * Checks if the property of the passed node is outdated regarding the passed time stamp
- * reference
- * If the property does not exist the return value indicates if the node is outdated.*/
+ * \brief Check if a specific property of a node is outdated.
+ *
+ * If the property does not exist, the return value indicates whether the node itself is outdated.
+ *
+ * \param[in] regNode The data node to check.
+ * \param[in] propName The name of the property to check.
+ * \param[in] reference The time stamp to compare against.
+ * \return True if the property (or node) was modified after the reference time stamp.
+ */
 bool MITKMATCHPOINTREGISTRATION_EXPORT PropertyIsOutdated(const mitk::DataNode* regNode, const std::string& propName, const itk::TimeStamp& reference);
 
 /**
- * Gets the relevant kernel for visualization of a registration node. The kernel is determined
- * by the direction property of the node.
- * @return Pointer to the relevant kernel. Method may return nullptr if data node is not valid, node
- * contains no registration or has no direction property.*/
+ * \brief Get the relevant registration kernel for visualization.
+ *
+ * The kernel is determined by the direction property of the node.
+ *
+ * \param[in] regNode The data node containing the registration.
+ * \return Pointer to the relevant kernel, or nullptr if the data node is not valid,
+ *         contains no registration, or has no direction property.
+ */
 MITKMATCHPOINTREGISTRATION_EXPORT const map::core::RegistrationKernelBase<3,3>* GetRelevantRegKernelOfNode(const mitk::DataNode* regNode);
 
 

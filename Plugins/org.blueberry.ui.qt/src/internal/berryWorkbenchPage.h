@@ -831,11 +831,6 @@ public:
    */
   PartService* GetPartService();
 
-  /**
-   * See IWorkbenchPage.
-   */
-  QList<IEditorPart::Pointer> GetEditors() override;
-
   QList<IEditorPart::Pointer> GetDirtyEditors() override;
 
   QList<ISaveablePart::Pointer> GetDirtyParts();
@@ -894,11 +889,6 @@ public:
    * See IWorkbenchPage.
    */
   QList<IViewReference::Pointer> GetViewReferences() override;
-
-  /**
-   * See IWorkbenchPage.
-   */
-  QList<IViewPart::Pointer> GetViews() override;
 
 protected:
 

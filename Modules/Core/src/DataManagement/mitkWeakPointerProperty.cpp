@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkWeakPointerProperty.h"
+#include <mitkWeakPointerProperty.h>
 
 bool mitk::WeakPointerProperty::IsEqual(const BaseProperty &property) const
 {
@@ -77,9 +77,3 @@ bool mitk::WeakPointerProperty::FromJSON(const nlohmann::json&)
   return false;
 }
 
-itk::LightObject::Pointer mitk::WeakPointerProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

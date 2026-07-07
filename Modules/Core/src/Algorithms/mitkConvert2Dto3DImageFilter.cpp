@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkConvert2Dto3DImageFilter.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkConvert2Dto3DImageFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 
 mitk::Convert2Dto3DImageFilter::Convert2Dto3DImageFilter()
 {

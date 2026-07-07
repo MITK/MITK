@@ -17,13 +17,13 @@ found in the LICENSE file.
 #include <mitkModelFitProviderBase.h>
 
 //general models
-#include "mitkGenericParamModelFactory.h"
-#include "mitkLinearModelFactory.h"
-#include "mitkExponentialDecayModelFactory.h"
-#include "mitkExpDecayOffsetModelFactory.h"
-#include "mitkExponentialSaturationModelFactory.h"
-#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelFactory.h"
+#include <mitkGenericParamModelFactory.h>
+#include <mitkLinearModelFactory.h>
+#include <mitkExponentialDecayModelFactory.h>
+#include <mitkExpDecayOffsetModelFactory.h>
+#include <mitkExponentialSaturationModelFactory.h>
+#include <mitkTwoStepLinearModelFactory.h>
+#include <mitkThreeStepLinearModelFactory.h>
 
 namespace mitk
 {

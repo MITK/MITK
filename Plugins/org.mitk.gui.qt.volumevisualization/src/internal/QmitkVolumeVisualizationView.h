@@ -13,8 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkVolumeVisualizationView_h
 #define QmitkVolumeVisualizationView_h
 
-#include "ui_QmitkVolumeVisualizationViewControls.h"
-
 // mitk core
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
@@ -22,6 +20,13 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkIRenderWindowPartListener.h>
+
+#include <memory>
+
+namespace Ui
+{
+  class QmitkVolumeVisualizationViewControls;
+}
 
 /**
  * @brief
@@ -36,7 +41,7 @@ public:
 
   QmitkVolumeVisualizationView();
 
-  ~QmitkVolumeVisualizationView() override = default;
+  ~QmitkVolumeVisualizationView() override;
 
   void SetFocus() override;
 
@@ -59,7 +64,7 @@ private:
 
   void UpdateInterface();
 
-  Ui::QmitkVolumeVisualizationViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkVolumeVisualizationViewControls> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   QmitkSliceNavigationListener m_TimePointChangeListener;
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "tweaklets/berryWorkbenchPageTweaklet.h"
@@ -2025,30 +2025,6 @@ EditorAreaHelper* WorkbenchPage::GetEditorPresentation()
   return editorPresentation;
 }
 
-QList<IEditorPart::Pointer> WorkbenchPage::GetEditors()
-{
-  QList<IEditorReference::Pointer> refs = this->GetEditorReferences();
-  QList<IEditorPart::Pointer> result;
-  //Display d = getWorkbenchWindow().getShell().getDisplay();
-  //Must be backward compatible.
-  //    d.syncExec(new Runnable()
-  //        {
-  //        public void WorkbenchPage::run()
-  //          {
-  for (QList<IEditorReference::Pointer>::iterator iter = refs.begin(); iter
-      != refs.end(); ++iter)
-  {
-    IEditorPart::Pointer part = (*iter)->GetEditor(true);
-    if (part != 0)
-    {
-      result.push_back(part);
-    }
-  }
-  //          }
-  //        });
-  return result;
-}
-
 QList<IEditorPart::Pointer> WorkbenchPage::GetDirtyEditors()
 {
   return this->GetEditorManager()->GetDirtyEditors();
@@ -2171,11 +2147,6 @@ QList<IViewReference::Pointer> WorkbenchPage::GetViewReferences()
   {
     return QList<IViewReference::Pointer>();
   }
-}
-
-QList<IViewPart::Pointer> WorkbenchPage::GetViews()
-{
-  return this->GetViews(Perspective::Pointer(nullptr), true);
 }
 
 QList<IViewPart::Pointer> WorkbenchPage::GetViews(
@@ -2819,21 +2790,6 @@ void WorkbenchPage::RemovePartListener(IPartListener* l)
 {
   partList->GetPartService()->RemovePartListener(l);
 }
-
-/**
- * Implements IWorkbenchPage
- *
- * @see org.blueberry.ui.IWorkbenchPage#removePropertyChangeListener(IPropertyChangeListener)
- * @since 2.0
- * @deprecated individual views should store a working set if needed and
- *             register a property change listener directly with the
- *             working set manager to receive notification when the view
- *             working set is removed.
- */
-//    void WorkbenchPage::RemovePropertyChangeListener(IPropertyChangeListener listener) {
-//        propertyChangeListeners.remove(listener);
-//    }
-
 
 void WorkbenchPage::RemoveSelectionListener(ISelectionListener* listener)
 {

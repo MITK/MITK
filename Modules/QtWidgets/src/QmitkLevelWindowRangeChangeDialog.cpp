@@ -10,41 +10,46 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLevelWindowRangeChangeDialog.h"
+#include <QmitkLevelWindowRangeChangeDialog.h>
+#include <ui_QmitkLevelWindowRangeChange.h>
 
 #include <QMessageBox>
 
 QmitkLevelWindowRangeChangeDialog::QmitkLevelWindowRangeChangeDialog(QWidget *parent, Qt::WindowFlags f)
-  : QDialog(parent, f)
+  : QDialog(parent, f), m_Controls(std::make_unique<Ui::QmitkLevelWindowRangeChange>())
 {
-  this->setupUi(this);
+  m_Controls->setupUi(this);
 
-  QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(inputValidator()));
+  QObject::connect(m_Controls->okButton, SIGNAL(clicked()), this, SLOT(inputValidator()));
+}
+
+QmitkLevelWindowRangeChangeDialog::~QmitkLevelWindowRangeChangeDialog()
+{
 }
 
 double QmitkLevelWindowRangeChangeDialog::getLowerLimit()
 {
-  return rangeMinDoubleSpinBox->value();
+  return m_Controls->rangeMinDoubleSpinBox->value();
 }
 
 double QmitkLevelWindowRangeChangeDialog::getUpperLimit()
 {
-  return rangeMaxDoubleSpinBox->value();
+  return m_Controls->rangeMaxDoubleSpinBox->value();
 }
 
 void QmitkLevelWindowRangeChangeDialog::setLowerLimit(double rangeMin)
 {
-  rangeMinDoubleSpinBox->setValue(rangeMin);
+  m_Controls->rangeMinDoubleSpinBox->setValue(rangeMin);
 }
 
 void QmitkLevelWindowRangeChangeDialog::setUpperLimit(double rangeMax)
 {
-  rangeMaxDoubleSpinBox->setValue(rangeMax);
+  m_Controls->rangeMaxDoubleSpinBox->setValue(rangeMax);
 }
 
 void QmitkLevelWindowRangeChangeDialog::inputValidator()
 {
-  if (!(rangeMinDoubleSpinBox->value() < rangeMaxDoubleSpinBox->value()))
+  if (!(m_Controls->rangeMinDoubleSpinBox->value() < m_Controls->rangeMaxDoubleSpinBox->value()))
   {
     QMessageBox::critical(this,
                           "Change Range",

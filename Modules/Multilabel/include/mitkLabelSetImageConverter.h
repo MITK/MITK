@@ -33,53 +33,70 @@ namespace mitk
 
   /** Function takes a vector of labels and transfers all labels as clones with adapted label values to the result vector.
   The values will be adapted according to the provided mapping (key is the old value, value the new).
-  @remark: Only labels will be transferred, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
+  \remark: Only labels will be transferred, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
   MITKMULTILABEL_EXPORT MultiLabelSegmentation::LabelVectorType GenerateLabelSetWithMappedValues(const MultiLabelSegmentation::ConstLabelVectorType&, LabelValueMappingVector labelMapping);
 
   MITKMULTILABEL_EXPORT Image::Pointer ConvertImageToGroupImage(const Image* inputImage, mitk::MultiLabelSegmentation::LabelValueVectorType& foundLabels);
 
+  /** \brief Counts distinct foreground (non-zero) pixel values, stopping early once \p limit is reached.
+   *
+   * Each distinct foreground value becomes a label when the image is converted to a
+   * MultiLabelSegmentation (see ConvertImageToGroupImage and
+   * MultiLabelSegmentation::InitializeByLabeledImage). Counting with an early exit makes this a
+   * cheap plausibility check before the potentially very expensive conversion.
+   *
+   * \param image image to inspect; only 3D and 4D images are counted (the dimensions the
+   *        conversion supports), all others return 0.
+   * \param limit count at which to stop; the result is capped at \p limit, so a return value equal
+   *        to \p limit means "at least \p limit".
+   * \return number of distinct foreground values found, capped at \p limit.
+   */
+  MITKMULTILABEL_EXPORT unsigned int CountDistinctForegroundValues(const Image* image, unsigned int limit);
+
   MITKMULTILABEL_EXPORT bool CheckForLabelValueConflictsAndResolve(const mitk::MultiLabelSegmentation::LabelValueVectorType& newValues, mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues, mitk::MultiLabelSegmentation::LabelValueVectorType& correctedLabelValues);
 
   /** Function creates a binary mask representing only the specified label of the multi label segmentation.
-  * @param segmentation Pointer to the segmentation that is the source for the mask.
-  * @param labelValue the label that should be extracted.
-  * @param createBinaryMap indicates if the label pixels should be indicated by the value 1 (createBinaryMap==true) or by the value of the label
-  * (createBinaryMap==false).
-  * @pre segmentation must point to a valid instance.
-  * @pre labelValue must exist in segmentation.*/
+  * \param[in] segmentation Pointer to the segmentation that is the source for the mask.
+  * \param[in] labelValue The label that should be extracted.
+  * \param[in] createBinaryMap If true, label pixels are set to 1; if false, they keep their label value.
+  * \pre segmentation must point to a valid instance.
+  * \pre labelValue must exist in segmentation.
+  */
   MITKMULTILABEL_EXPORT Image::Pointer CreateLabelMask(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueType labelValue, bool createBinaryMap = true);
 
   /** Function creates the group image of a segmentation that only contains the selected labels.
-  * @param segmentation Pointer to the segmentation that is the source for the map.
-  * @param groupID the group that should be used.
-  * @param selectedLabels The selected labels that should be represented in the result. This is meant as white list, therefore only
-  * label values listed in the list are used. Invalid label values (not existing in the group) will be ignored.
-  * @return Group image clone that only contains the selected values.
-  * @pre segmentation must point to a valid instance.
-  * @pre groupID must exist in segmentation.*/
+  * \param[in] segmentation Pointer to the segmentation that is the source for the map.
+  * \param[in] groupID The group that should be used.
+  * \param[in] selectedLabels White list of label values to include. Invalid values are ignored.
+  * \return Group image clone that only contains the selected values.
+  * \pre segmentation must point to a valid instance.
+  * \pre groupID must exist in segmentation.
+  */
   MITKMULTILABEL_EXPORT Image::Pointer CreateFilteredGroupImage(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& selectedLabels);
 
   using IDToLabelClassNameMapType = std::map<MultiLabelSegmentation::LabelValueType, std::string>;
-  /** Function creates a map of all label classes in a specified group.
-  * @param segmentation Pointer to the segmentation that is the source for the map.
-  * @param groupID the group that should be used.
-  * @param selectedLabels The selected labels that should be represented in the class map. This is meant as white list, therefore only
-  * label values listed in the list are used. Invalid label values (not existing in the group) will be ignored.
-  * @return Returns a pair where first is the pointer to the created map image and second is the look up table that indicated
-  * the pixel value of each found class in the map.
-  * @pre segmentation must point to a valid instance.
-  * @pre groupID must exist in segmentation.*/
+  /** \brief Create a map of all label classes in a specified group.
+  *
+  * \param[in] segmentation Pointer to the segmentation that is the source for the map.
+  * \param[in] groupID The group that should be used.
+  * \param[in] selectedLabels White list of label values to include. Invalid values are ignored.
+  * \return A pair: first is the map image, second is the lookup table mapping pixel values to class names.
+  * \pre segmentation must point to a valid instance.
+  * \pre groupID must exist in segmentation.
+  */
   MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& selectedLabels);
 
-  /** Function creates a map of all label classes in a specified group.
-  * @overload
-  * This version always uses all labels of a group.
-  * @param segmentation Pointer to the segmentation that is the source for the map.
-  * @param groupID the group that should be used.
-  * @return Returns a pair where first is the pointer to the created map image and second is the look up table that indicated
-  * the pixel value of each found class in the map.
-  * @pre segmentation must point to a valid instance.
-  * @pre groupID must exist in segmentation.*/
+  /** \brief Create a map of all label classes in a specified group.
+  *
+  * \overload
+  * This version always uses all labels of the group.
+  *
+  * \param[in] segmentation Pointer to the segmentation that is the source for the map.
+  * \param[in] groupID The group that should be used.
+  * \return A pair: first is the map image, second is the lookup table mapping pixel values to class names.
+  * \pre segmentation must point to a valid instance.
+  * \pre groupID must exist in segmentation.
+  */
   MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID);
 
 }

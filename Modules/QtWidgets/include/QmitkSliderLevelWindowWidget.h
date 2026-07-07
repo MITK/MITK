@@ -79,24 +79,37 @@ class MITKQTWIDGETS_EXPORT QmitkSliderLevelWindowWidget : public QWidget
   Q_OBJECT
 
 public:
-  /// constructor
+  /**
+   * \brief Constructs the slider level/window widget.
+   * \param[in] parent Optional parent widget.
+   * \param[in] f      Optional window flags.
+   */
   QmitkSliderLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
-  /// destructor
   ~QmitkSliderLevelWindowWidget() override;
 
-  /// sets the manager who is responsible to collect and deliver changes on Level/Window
+  /**
+   * \brief Sets the LevelWindowManager for this widget.
+   * \param[in] levelWindowManager The manager to use for level/window changes.
+   */
   void SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
-  /// sets the DataStorage which holds all image-nodes
+  /**
+   * \brief Sets the DataStorage that holds all image nodes.
+   * \param[in] ds The data storage to set.
+   */
   void SetDataStorage(mitk::DataStorage *ds);
 
-  /// returns the manager who is responsible to collect and deliver changes on Level/Window
+  /**
+   * \brief Returns the LevelWindowManager used by this widget.
+   * \return Pointer to the LevelWindowManager.
+   */
   mitk::LevelWindowManager *GetManager();
 
+  /** \brief Stores the current level/window values. */
   mitk::LevelWindow m_LevelWindow;
 
-  /// manager who is responsible to collect and deliver changes on Level/Window
+  /** \brief The LevelWindowManager responsible for collecting and delivering level/window changes. */
   mitk::LevelWindowManager::Pointer m_Manager;
 
 private:
@@ -176,11 +189,11 @@ protected:
 
 protected Q_SLOTS:
 
-  /** @brief Hide the scale if "Hide Scale" is selected in the context menu
+  /** \brief Hide the scale if "Hide Scale" is selected in the context menu
   */
   void HideScale();
 
-  /** @brief Shows the scale if "Show Scale" is selected in the context menu
+  /** \brief Shows the scale if "Show Scale" is selected in the context menu
   */
   void ShowScale();
 };

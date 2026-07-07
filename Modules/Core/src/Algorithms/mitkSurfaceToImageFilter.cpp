@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceToImageFilter.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkTimeHelper.h"
+#include <mitkSurfaceToImageFilter.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkTimeHelper.h>
 #include <mitkImageReadAccessor.h>
 
 #include <vtkImageData.h>

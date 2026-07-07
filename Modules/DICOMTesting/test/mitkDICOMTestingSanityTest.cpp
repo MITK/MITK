@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkTestDICOMLoading.h"
+#include <mitkTestDICOMLoading.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 int mitkDICOMTestingSanityTest(int argc, char** const argv)
 {

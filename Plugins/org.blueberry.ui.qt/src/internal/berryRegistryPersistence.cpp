@@ -12,18 +12,18 @@ found in the LICENSE file.
 
 #include "berryRegistryPersistence.h"
 
-#include "berryExpression.h"
-#include "berryIConfigurationElement.h"
-#include "berryIContributor.h"
-#include "berryStatus.h"
-#include "berryMultiStatus.h"
-#include "berryParameterizedCommand.h"
-#include "berryParameterization.h"
+#include <berryExpression.h>
+#include <berryIConfigurationElement.h>
+#include <berryIContributor.h>
+#include <berryStatus.h>
+#include <berryMultiStatus.h>
+#include <berryParameterizedCommand.h>
+#include <berryParameterization.h>
 #include "berryICommandService.h"
-#include "berryCommand.h"
-#include "berryElementHandler.h"
-#include "berryExpressionConverter.h"
-#include "berryIRegistryEventListener.h"
+#include <berryCommand.h>
+#include <berryElementHandler.h>
+#include <berryExpressionConverter.h>
+#include <berryIRegistryEventListener.h>
 
 #include "berryPlatformUI.h"
 

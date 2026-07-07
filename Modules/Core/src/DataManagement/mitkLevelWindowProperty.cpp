@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLevelWindowProperty.h"
+#include <mitkLevelWindowProperty.h>
 
 mitk::LevelWindowProperty::LevelWindowProperty()
 {
@@ -84,9 +84,3 @@ bool mitk::LevelWindowProperty::FromJSON(const nlohmann::json& j)
   return true;
 }
 
-itk::LightObject::Pointer mitk::LevelWindowProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

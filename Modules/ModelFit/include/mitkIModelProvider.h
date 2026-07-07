@@ -56,9 +56,9 @@ namespace mitk
     virtual void SetInput(const std::string &location) = 0;
 
     /**
-     * @brief Set an input stream to read from.
-     * @param location A custom label for the input stream.
-     * @param is The input stream.
+     * \brief Set an input stream to read from.
+     * \param location A custom label for the input stream.
+     * \param is The input stream.
      *
      * If \c is is \c NULL, this clears the current input stream and \c location
      * is interpreted as a file-system path. Otherwise, \c location is a custom
@@ -67,14 +67,14 @@ namespace mitk
     virtual void SetInput(const std::string &location, std::istream *is) = 0;
 
     /**
-     * @brief Get the current input location.
-     * @return The input location.
+     * \brief Get the current input location.
+     * \return The input location.
      */
     virtual std::string GetInputLocation() const = 0;
 
     /**
-     * @brief Get the input stream.
-     * @return The currently set input stream.
+     * \brief Get the input stream.
+     * \return The currently set input stream.
      */
     virtual std::istream *GetInputStream() const = 0;
 

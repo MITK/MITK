@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 // std includes
 #include <string>
@@ -21,9 +21,9 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include <mitkTemporoSpatialStringProperty.h>
-#include "mitkCESTImageDetectionHelper.h"
-#include "mitkCustomTagParser.h"
-#include "mitkCESTPropertyHelper.h"
+#include <mitkCESTImageDetectionHelper.h>
+#include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
 
 class mitkCESTDICOMReaderServiceTestSuite : public mitk::TestFixture
 {

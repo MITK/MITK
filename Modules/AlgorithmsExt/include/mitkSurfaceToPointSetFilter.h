@@ -14,19 +14,21 @@ found in the LICENSE file.
 #define mitkSurfaceToPointSetFilter_h
 
 // exports
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 // mitk headers
-#include "mitkSurface.h"
+#include <mitkSurface.h>
 #include <mitkPointSetSource.h>
 //#include <itkExtendedDoublyLinkedFaceList.h>
 
 namespace mitk
 {
-  /** Documentation
-   *  @brief This filter converts the input surface into a point set. The output point set contains every point exactly
-   * one time
-   *         (no duplicated points like in the stl-format).
+  /**
+   * \brief Convert a Surface into a PointSet without duplicate points.
+   *
+   * This filter extracts all unique vertices from the input surface and
+   * produces a PointSet where each point appears exactly once (unlike the
+   * STL format which may contain duplicate vertices).
    */
 
   class MITKALGORITHMSEXT_EXPORT SurfaceToPointSetFilter : public mitk::PointSetSource
@@ -43,7 +45,7 @@ namespace mitk
     SurfaceToPointSetFilter();
     ~SurfaceToPointSetFilter() override;
 
-    /** @brief method generating the output of this filter. Called in the updated process of the pipeline. */
+    /** \brief Generate the output of this filter. Called in the update process of the pipeline. */
     void GenerateData() override;
 
     //############### members ########################

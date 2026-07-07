@@ -14,15 +14,15 @@ found in the LICENSE file.
 
 #include "berryExpressionConverter.h"
 #include "berryExpressionStatus.h"
-#include "berryCoreException.h"
+#include <berryCoreException.h>
 #include "berryElementHandler.h"
 
-#include "berryPlatform.h"
-#include "berryPlatformException.h"
-#include "berryStatus.h"
-#include "berryIExtensionRegistry.h"
-#include "berryIConfigurationElement.h"
-#include "berryInvalidRegistryObjectException.h"
+#include <berryPlatform.h>
+#include <berryPlatformException.h>
+#include <berryStatus.h>
+#include <berryIExtensionRegistry.h>
+#include <berryIConfigurationElement.h>
+#include <berryInvalidRegistryObjectException.h>
 
 namespace berry {
 

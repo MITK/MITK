@@ -1,0 +1,26 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef USTESTINGCONFIG_H
+#define USTESTINGCONFIG_H
+
+#ifdef CMAKE_INTDIR
+#define US_LIBRARY_OUTPUT_DIRECTORY "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@/" CMAKE_INTDIR
+#define US_RUNTIME_OUTPUT_DIRECTORY "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/" CMAKE_INTDIR
+#else
+#define US_LIBRARY_OUTPUT_DIRECTORY "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@"
+#define US_RUNTIME_OUTPUT_DIRECTORY "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
+#endif
+
+#define US_CORE_SOURCE_DIR "@CMAKE_CURRENT_SOURCE_DIR@/.."
+
+#endif // USTESTINGCONFIG_H

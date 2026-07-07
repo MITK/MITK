@@ -24,7 +24,6 @@ set(INTERNAL_CPP_FILES
   org_mitk_gui_common_Activator.cpp
 )
 
-
 #set(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})

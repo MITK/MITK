@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_stdmultiwidgeteditor_Activator.cpp
+  QmitkRenderWindowColorWidget.cpp
   QmitkStdMultiWidgetEditorPreferencePage.cpp
 )
 
@@ -11,6 +12,7 @@ set(MOC_H_FILES
   src/QmitkStdMultiWidgetEditor.h
 
   src/internal/org_mitk_gui_qt_stdmultiwidgeteditor_Activator.h
+  src/internal/QmitkRenderWindowColorWidget.h
   src/internal/QmitkStdMultiWidgetEditorPreferencePage.h
 )
 
@@ -26,8 +28,6 @@ set(CACHED_RESOURCE_FILES
 set(QRC_FILES
   resources/QmitkStdMultiWidgetEditor.qrc
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

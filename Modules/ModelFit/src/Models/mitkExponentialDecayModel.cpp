@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialDecayModel.h"
-#include "mitkNumericConstants.h"
+#include <mitkExponentialDecayModel.h>
+#include <mitkNumericConstants.h>
 
 const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_y0 = "y-intercept";
 const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_lambda = "lambda";
@@ -198,11 +198,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::ExponentialDecayModel::ComputeDer
   return result;
 };
 
-itk::LightObject::Pointer mitk::ExponentialDecayModel::InternalClone() const
+mitk::ExponentialDecayModel::ExponentialDecayModel(const ExponentialDecayModel& source)
+: Superclass(source)
 {
-  ExponentialDecayModel::Pointer newClone = ExponentialDecayModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

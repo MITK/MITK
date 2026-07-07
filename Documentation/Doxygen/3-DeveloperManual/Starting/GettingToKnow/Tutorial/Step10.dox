@@ -132,8 +132,8 @@ a predefined event variant with the name 'Std' + value, that is key a is named '
 The names for special keys are listed here:
 
 \dontinclude mitkInteractionEvent.h
-\skipline  // Special Keys
-\until // End special keys
+\skipline KeyEsc
+\until KeySpace
 
 
 <b> Modifier Keys</b> \n
@@ -434,7 +434,7 @@ The implementation is described in the following. \see Step10.h \see Step10.cpp
 \dontinclude Step10.h
 
 Implementation of protected functions:
-\skipline protected:
+\skipline protected
 \until virtual void ConfigurationChanged();
 
 <b> ConnectActionsAndFunctions </b> - Is inherited from mitk::InteractionStateMachine, here action strings from the xml are connected with
@@ -473,7 +473,7 @@ If a condition fails the event is considered as untreated, and will be offered t
 
 \dontinclude Step10.cpp
 \skipline bool mitk::ExampleInteractor::CheckPoint(
-\until //end
+\until // end
 
 Here we see an internal event used to signal that the point set reached the maximal number of allowed points.
 The event is created and added to the Dispatchers event queue.
@@ -494,7 +494,7 @@ understanding: </b>
 Have fun with creating your own interaction and please think about contributing it to MITK!
 
 <b>
-If you meet any difficulties during this step, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
+If you meet any difficulties during this step, don't hesitate to open an issue on <a href="https://github.com/MITK/MITK/issues">GitHub</a>!
 People there are kind and will try to help you. </b>
 
 \ref Step09Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"

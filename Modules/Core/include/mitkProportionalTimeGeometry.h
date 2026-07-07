@@ -198,39 +198,77 @@ namespace mitk
     void ReplaceTimeStepGeometries(const BaseGeometry *geometry) override;
 
     /**
-    * \brief Makes a deep copy of the current object
-    */
-    itk::LightObject::Pointer InternalClone() const override;
-
+     * \brief Get the time point of the first time step (in ms).
+     * \return The minimum time point.
+     */
     itkGetConstMacro(FirstTimePoint, TimePointType);
+
+    /**
+     * \brief Set the time point of the first time step (in ms).
+     * \param[in] _arg The first time point value.
+     */
     itkSetMacro(FirstTimePoint, TimePointType);
+
+    /**
+     * \brief Get the uniform duration of each time step (in ms).
+     * \return The step duration.
+     */
     itkGetConstMacro(StepDuration, TimePointType);
+
+    /**
+     * \brief Set the uniform duration of each time step (in ms).
+     * \param[in] _arg The step duration value.
+     */
     itkSetMacro(StepDuration, TimePointType);
 
-    //    void SetGeometryForTimeStep(TimeStepType timeStep, BaseGeometry& geometry);
+    /**
+     * \brief Remove all stored geometries, leaving the container empty.
+     */
     void ClearAllGeometries();
-    //    void AddGeometry(BaseGeometry geometry);
+
+    /**
+     * \brief Pre-allocate space for a given number of geometries.
+     *
+     * This only reserves memory; it does not create geometry objects.
+     *
+     * \param[in] numberOfGeometries The number of slots to reserve.
+     */
     void ReserveSpaceForGeometries(TimeStepType numberOfGeometries);
 
     /**
-    * \brief Initializes the TimeGeometry with equally time Step geometries
-    *
-    * Saves a copy for each time step.
-    */
+     * \brief Initialize with copies of a given geometry for each time step.
+     *
+     * Clones \a geometry for each of the \a timeSteps steps. If
+     * \a timeSteps < 2, the time bounds span from -max to +max with
+     * infinite duration. Otherwise, the first time point is 0 and
+     * the step duration is 1 ms.
+     *
+     * \param[in] geometry The geometry to clone for each step.
+     * \param[in] timeSteps Number of time steps (minimum 1).
+     */
     void Initialize(const BaseGeometry *geometry, TimeStepType timeSteps);
+
     /**
-    * \brief Initialize the TimeGeometry with empty BaseGeometry
-    */
+     * \brief Initialize with empty Geometry3D instances for each time step.
+     *
+     * Creates a default Geometry3D and delegates to
+     * Initialize(const BaseGeometry*, TimeStepType).
+     *
+     * \param[in] timeSteps Number of time steps (minimum 1).
+     */
     void Initialize(TimeStepType timeSteps);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   protected:
+    ProportionalTimeGeometry(const ProportionalTimeGeometry &other);
     ~ProportionalTimeGeometry() override;
 
     std::vector<BaseGeometry::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
+
+    mitkCloneMacro(Self);
   }; // end class ProportialTimeGeometry
 
   /**

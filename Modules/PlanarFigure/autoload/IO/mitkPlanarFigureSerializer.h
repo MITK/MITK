@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureSerializer_h
 #define mitkPlanarFigureSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {
   /**
-    \brief Serializes mitk::Surface for mitk::SceneIO
+    \brief Serializes mitk::PlanarFigure for mitk::SceneIO.
   */
   class PlanarFigureSerializer : public BaseDataSerializer
   {

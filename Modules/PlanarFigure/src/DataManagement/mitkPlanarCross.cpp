@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarCross.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarCross.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 mitk::PlanarCross::PlanarCross()
   : FEATURE_ID_LONGESTDIAMETER(this->AddFeature("Longest Axis", "mm")),
@@ -27,6 +27,13 @@ mitk::PlanarCross::PlanarCross()
   // Create helper polyline object (for drawing the orthogonal orientation line)
   this->SetNumberOfHelperPolyLines(1);
   m_HelperPolyLinesToBePainted->InsertElement(0, false);
+}
+
+mitk::PlanarCross::PlanarCross(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LONGESTDIAMETER(other.FEATURE_ID_LONGESTDIAMETER),
+    FEATURE_ID_SHORTAXISDIAMETER(other.FEATURE_ID_SHORTAXISDIAMETER)
+{
 }
 
 void mitk::PlanarCross::SetSingleLineMode(bool singleLineMode)

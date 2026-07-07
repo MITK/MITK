@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/Properties">
      <file>new.png</file>
+     <file>transient.svg</file>
   </qresource>
 </RCC>

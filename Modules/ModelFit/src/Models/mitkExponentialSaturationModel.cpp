@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialSaturationModel.h"
-#include "mitkNumericConstants.h"
+#include <mitkExponentialSaturationModel.h>
+#include <mitkNumericConstants.h>
 
 const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_BAT = "onset";
 const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_y_bl = "baseline";
@@ -169,11 +169,7 @@ mitk::ExponentialSaturationModel::StaticParameterValuesType mitk::ExponentialSat
   return result;
 };
 
-itk::LightObject::Pointer mitk::ExponentialSaturationModel::InternalClone() const
+mitk::ExponentialSaturationModel::ExponentialSaturationModel(const ExponentialSaturationModel& source)
+: Superclass(source)
 {
-  ExponentialSaturationModel::Pointer newClone = ExponentialSaturationModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

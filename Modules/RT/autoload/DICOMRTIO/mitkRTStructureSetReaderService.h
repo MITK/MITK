@@ -15,18 +15,24 @@ found in the LICENSE file.
 
 #include <mitkAbstractFileReader.h>
 
-#include "MitkDICOMRTIOExports.h"
+#include <MitkDICOMRTIOExports.h>
 #include <mitkContourModelSet.h>
 
 #include <usModuleContext.h>
 
 namespace mitk
 {
+  /**
+   * \brief Reader service for DICOM files of modality RT Structure Set.
+   *
+   * Reads RT Structure Set DICOM files and converts each ROI (region of
+   * interest) into a mitk::ContourModelSet.
+   */
   class MITKDICOMRTIO_EXPORT RTStructureSetReaderService : public mitk::AbstractFileReader
   {
 
     /**
-     * Represent a region of interest (ROI)
+     * \brief Represents a single region of interest (ROI) from the structure set.
      */
     class RoiEntry
     {
@@ -46,17 +52,20 @@ namespace mitk
     };
 
   public:
+    /** \brief Default constructor. Registers reader for the RT Structure Set MIME type. */
     RTStructureSetReaderService();
+
+    /** \brief Copy constructor. */
     RTStructureSetReaderService(const RTStructureSetReaderService& other);
 
     ~RTStructureSetReaderService() override;
 
     /**
-    * @brief Reading a RT StructureSet from the DICOM file and returns the ROIs
-    * (region of interest) as a ContourModelSet. One ContourModelSet represent
-    * one ROI. A ContourModelSet contains ContourModels which represent the
-    * single structures.
-    */
+     * \brief Read an RT Structure Set from a DICOM file and return the ROIs as ContourModelSets.
+     *
+     * One ContourModelSet represents one ROI. A ContourModelSet contains
+     * ContourModels which represent the individual structures.
+     */
     using AbstractFileReader::Read;
 
   protected:

@@ -10,13 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_H
-#define ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_H
+#ifndef itkLineHistogramBasedMassImageFilter_h
+#define itkLineHistogramBasedMassImageFilter_h
 
 #include <itkImageToImageFilter.h>
 
 namespace itk
 {
+  /**
+   * \brief Computes line-histogram-based mass features for each voxel in an image.
+   *
+   * For each voxel, a line from the center of mass of the mask through the voxel
+   * is considered and histogram-based mass features are computed along this line.
+   *
+   * \tparam TInputImageType The input image type.
+   * \tparam TOutputImageType The output image type (defaults to input type).
+   * \tparam TMaskImageType The mask image type (defaults to itk::Image<short,3>).
+   */
   template< class TInputImageType, class TOutputImageType = TInputImageType, class TMaskImageType = itk::Image<short,3> >
   class LineHistogramBasedMassImageFilter
     : public itk::ImageToImageFilter<TInputImageType, TOutputImageType>
@@ -31,7 +41,16 @@ namespace itk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Set the mask image defining the region of interest.
+     * \param maskimage Pointer to the mask image.
+     */
     void SetImageMask(TMaskImageType * maskimage);
+
+    /**
+     * \brief Set the binary contour image.
+     * \param contouriamge Pointer to the binary contour image.
+     */
     void SetBinaryContour(TMaskImageType * contouriamge);
 
   private:

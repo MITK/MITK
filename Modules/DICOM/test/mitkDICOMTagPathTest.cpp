@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagPath.h"
+#include <mitkDICOMTagPath.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <regex>
 
@@ -29,6 +29,7 @@ class mitkDICOMTagPathTestSuite : public mitk::TestFixture
   MITK_TEST(PropertyNameToDICOMTagPath);
   MITK_TEST(DICOMTagPathToPropertyName);
   MITK_TEST(ExecutePropertyRegEx);
+  MITK_TEST(AnySelectionIndexSurvivesTemplateRoundTrip);
 
   MITK_TEST(TestOperatorPlusWithTwoPaths);
   MITK_TEST(TestOperatorPlusWithString);
@@ -89,15 +90,15 @@ public:
     std::string result = mitk::DICOMTagPathToPropertyRegEx(simplePath);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011)'", std::string("DICOM\\.0010\\.0011"), result);
     result = mitk::DICOMTagPathToPropertyRegEx(deepPath);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).(0020,0022).(003A,0033)'", std::string("DICOM\\.0010\\.0011\\.0020\\.0022\\.(003a|003A)\\.0033"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).(0020,0022).(003A,0033)'", std::string("DICOM\\.0010\\.0011\\.0020\\.0022\\.(?:003a|003A)\\.0033"), result);
     result = mitk::DICOMTagPathToPropertyRegEx(deepPath_withAnyElement);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).*.(003a,003f)'", std::string("DICOM\\.0010\\.0011\\.([A-Fa-f\\d]{4})\\.([A-Fa-f\\d]{4})\\.(003a|003A)\\.(003f|003F)"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).*.(003a,003f)'", std::string("DICOM\\.0010\\.0011\\.([A-Fa-f\\d]{4})\\.([A-Fa-f\\d]{4})\\.(?:003a|003A)\\.(?:003f|003F)"), result);
     result = mitk::DICOMTagPathToPropertyRegEx(deepPath_withAnySelection);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).(002B,002E)[*].(0030,0033)'", std::string("DICOM\\.0010\\.0011\\.(002b|002B)\\.(002e|002E)\\.\\[(\\d*)\\]\\.0030\\.0033"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).(002B,002E)[*].(0030,0033)'", std::string("DICOM\\.0010\\.0011\\.(?:002b|002B)\\.(?:002e|002E)\\.\\[(\\d*)\\]\\.0030\\.0033"), result);
     result = mitk::DICOMTagPathToPropertyRegEx(deepPath_withSelection);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).(0020,0022)[6].(003b,003e)'", std::string("DICOM\\.0010\\.0011\\.0020\\.0022\\.\\[6\\]\\.(003b|003B)\\.(003e|003E)"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011).(0020,0022)[6].(003b,003e)'", std::string("DICOM\\.0010\\.0011\\.0020\\.0022\\.\\[6\\]\\.(?:003b|003B)\\.(?:003e|003E)"), result);
     result = mitk::DICOMTagPathToPropertyRegEx(verydeepPath);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011)[*].*.(0030,0033).(004c,004d)[4].(0050,0055)'", std::string("DICOM\\.0010\\.0011\\.\\[(\\d*)\\]\\.([A-Fa-f\\d]{4})\\.([A-Fa-f\\d]{4})\\.0030\\.0033\\.(004c|004C)\\.(004d|004D)\\.\\[4\\]\\.0050\\.0055"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPropertyRegEx() with '(0010,0011)[*].*.(0030,0033).(004c,004d)[4].(0050,0055)'", std::string("DICOM\\.0010\\.0011\\.\\[(\\d*)\\]\\.([A-Fa-f\\d]{4})\\.([A-Fa-f\\d]{4})\\.0030\\.0033\\.(?:004c|004C)\\.(?:004d|004D)\\.\\[4\\]\\.0050\\.0055"), result);
   }
 
   void DICOMTagPathToPersistenceKeyRegEx()
@@ -105,15 +106,15 @@ public:
     std::string result = mitk::DICOMTagPathToPersistenceKeyRegEx(simplePath);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011)'", std::string("DICOM_0010_0011"), result);
     result = mitk::DICOMTagPathToPersistenceKeyRegEx(deepPath);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).(0020,0022).(003A,0033)'", std::string("DICOM_0010_0011_0020_0022_(003a|003A)_0033"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).(0020,0022).(003A,0033)'", std::string("DICOM_0010_0011_0020_0022_(?:003a|003A)_0033"), result);
     result = mitk::DICOMTagPathToPersistenceKeyRegEx(deepPath_withAnyElement);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).*.(003a,003f)'", std::string("DICOM_0010_0011_([A-Fa-f\\d]{4})_([A-Fa-f\\d]{4})_(003a|003A)_(003f|003F)"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).*.(003a,003f)'", std::string("DICOM_0010_0011_([A-Fa-f\\d]{4})_([A-Fa-f\\d]{4})_(?:003a|003A)_(?:003f|003F)"), result);
     result = mitk::DICOMTagPathToPersistenceKeyRegEx(deepPath_withAnySelection);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).(002B,002E)[*].(0030,0033)'", std::string("DICOM_0010_0011_(002b|002B)_(002e|002E)_\\[(\\d*)\\]_0030_0033"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).(002B,002E)[*].(0030,0033)'", std::string("DICOM_0010_0011_(?:002b|002B)_(?:002e|002E)_\\[(\\d*)\\]_0030_0033"), result);
     result = mitk::DICOMTagPathToPersistenceKeyRegEx(deepPath_withSelection);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).(0020,0022)[6].(003b,003e)'", std::string("DICOM_0010_0011_0020_0022_\\[6\\]_(003b|003B)_(003e|003E)"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011).(0020,0022)[6].(003b,003e)'", std::string("DICOM_0010_0011_0020_0022_\\[6\\]_(?:003b|003B)_(?:003e|003E)"), result);
     result = mitk::DICOMTagPathToPersistenceKeyRegEx(verydeepPath);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011)[*].*.(0030,0033).(004c,004d)[4].(0050,0055)'", std::string("DICOM_0010_0011_\\[(\\d*)\\]_([A-Fa-f\\d]{4})_([A-Fa-f\\d]{4})_0030_0033_(004c|004C)_(004d|004D)_\\[4\\]_0050_0055"), result);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing DICOMTagPathToPersistenceKeyRegEx() with '(0010,0011)[*].*.(0030,0033).(004c,004d)[4].(0050,0055)'", std::string("DICOM_0010_0011_\\[(\\d*)\\]_([A-Fa-f\\d]{4})_([A-Fa-f\\d]{4})_0030_0033_(?:004c|004C)_(?:004d|004D)_\\[4\\]_0050_0055"), result);
   }
 
   void DICOMTagPathToPersistenceKeyTemplate()
@@ -237,6 +238,55 @@ public:
         CPPUNIT_ASSERT(std::regex_match(result, regEx));
       }
     }
+  }
+
+  // Regression guard for a defect in the persistence template machinery
+  // where GenerateRegExForNumber emits a *capturing* alternation
+  // (e.g. "(a170|A170)") for tags whose hex element id contains letters,
+  // while DICOMTagPathToPersistenceNameTemplate (and KeyTemplate) assigns
+  // $N placeholders assuming only AnySelection / AnyElement nodes
+  // produce captures. The placeholder numbering then shifts and the
+  // template's selection slot resolves to the element id instead of the
+  // numeric index.
+  //
+  // Concrete repro: AddAnySelection(0x0040, 0xa170) builds a regex with
+  // two captures - (a170|A170) plus (\d*) - but the template carries
+  // only one placeholder [$1]. Feeding the input "DICOM.0040.a170.[7]"
+  // through the regex + template substitution lands "[a170]" in the
+  // selection slot, dropping the actual index 7.
+  //
+  // The test mirrors GenerateFromTemplate's substitution loop in
+  // PropertyPersistenceInfo so the check stays close to how the
+  // persistence layer actually reconstructs the property name.
+  void AnySelectionIndexSurvivesTemplateRoundTrip()
+  {
+    mitk::DICOMTagPath path;
+    path.AddAnySelection(0x0040, 0xa170).AddElement(0x0008, 0x0104);
+
+    const std::string regexStr = mitk::DICOMTagPathToPropertyRegEx(path);
+    const std::string templateStr = mitk::DICOMTagPathToPersistenceNameTemplate(path);
+    const std::string input = "DICOM.0040.a170.[7].0008.0104";
+
+    std::regex ex(regexStr);
+    std::smatch sm;
+    CPPUNIT_ASSERT_MESSAGE("Input must match the path's property regex",
+                           std::regex_match(input, sm, ex));
+
+    // Replicate GenerateFromTemplate's substitution: replace $1, $2, ...
+    // in the template with the corresponding capture group values from
+    // the regex match.
+    std::string substituted = templateStr;
+    for (std::size_t groupID = 1; groupID < sm.size(); ++groupID)
+    {
+      const std::string placeholder = "\\$" + std::to_string(groupID);
+      substituted = std::regex_replace(substituted, std::regex(placeholder), sm[groupID].str());
+    }
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The AnySelection's numeric index must survive the regex -> template "
+      "round trip and not be overwritten by the element-id capture.",
+      std::string("DICOM.0040.A170.[7].0008.0104"),
+      substituted);
   }
 
   void TestOperatorPlusWithTwoPaths()

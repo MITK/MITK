@@ -10,13 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyAliases.h"
+#include <mitkPropertyAliases.h>
 #include <algorithm>
 #include <utility>
-
-#ifdef _MSC_VER
-#pragma warning(disable : 4503) // "decorated name length exceeded, name was truncated"
-#endif
 
 class AliasEquals
 {

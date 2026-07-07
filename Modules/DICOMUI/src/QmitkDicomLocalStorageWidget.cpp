@@ -21,7 +21,7 @@ found in the LICENSE file.
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
   : QWidget(parent),
     m_LocalIndexer(std::make_unique<ctkDICOMIndexer>(parent)),
-    m_Ui(new Ui::QmitkDicomLocalStorageWidget)
+    m_Ui(std::make_unique<Ui::QmitkDicomLocalStorageWidget>())
 {
   using Self = QmitkDicomLocalStorageWidget;
 

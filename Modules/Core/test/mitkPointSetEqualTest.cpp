@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSet.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkPointSet.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 /**
  * @brief mitkPointSetEqualTestSuite A test class for Equal methods in mitk::PointSet.

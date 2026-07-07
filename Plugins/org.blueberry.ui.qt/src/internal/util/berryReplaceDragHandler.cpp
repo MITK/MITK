@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include "berryReplaceDragHandler.h"
 #include "berryAbstractTabItem.h"
 
-#include <berryGeometry.h>
-#include <internal/berryDragUtil.h>
+#include "berryGeometry.h"
+#include "internal/berryDragUtil.h"
 
 namespace berry
 {

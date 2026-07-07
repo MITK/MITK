@@ -13,12 +13,13 @@ found in the LICENSE file.
 #ifndef mitkTextAnnotation2D_h
 #define mitkTextAnnotation2D_h
 
-#include "MitkAnnotationExports.h"
+#include <MitkAnnotationExports.h>
 #include <mitkLocalStorageHandler.h>
 #include <mitkVtkAnnotation2D.h>
 #include <vtkSmartPointer.h>
 
 class vtkTextActor;
+class vtkTextProperty;
 class vtkPropAssembly;
 
 namespace mitk

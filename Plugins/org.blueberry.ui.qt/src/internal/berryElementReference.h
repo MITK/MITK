@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYELEMENTREFERENCE_H
 #define BERRYELEMENTREFERENCE_H
 
-#include <berryIElementReference.h>
+#include "berryIElementReference.h"
 
 namespace berry {
 

@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkIOUtil.h"
+#include <QmitkIOUtil.h>
 
-#include "mitkCoreServices.h"
-#include "mitkCustomMimeType.h"
-#include "mitkFileReaderRegistry.h"
-#include "mitkFileWriterRegistry.h"
-#include "mitkIMimeTypeProvider.h"
-#include "mitkMimeType.h"
+#include <mitkCoreServices.h>
+#include <mitkCustomMimeType.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkFileWriterRegistry.h>
+#include <mitkIMimeTypeProvider.h>
+#include <mitkMimeType.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 
-#include "QmitkFileReaderOptionsDialog.h"
-#include "QmitkFileWriterOptionsDialog.h"
+#include <QmitkFileReaderOptionsDialog.h>
+#include <QmitkFileWriterOptionsDialog.h>
 
 // QT
 #include <QDebug>
@@ -416,26 +416,6 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
   }
 
   return fileNames;
-}
-
-void QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget * /*parent*/)
-{
-  Save(data, fileName);
-}
-
-void QmitkIOUtil::SaveSurfaceWithDialog(mitk::Surface::Pointer surface, std::string fileName, QWidget * /*parent*/)
-{
-  Save(surface, fileName);
-}
-
-void QmitkIOUtil::SaveImageWithDialog(mitk::Image::Pointer image, std::string fileName, QWidget * /*parent*/)
-{
-  Save(image, fileName);
-}
-
-void QmitkIOUtil::SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::string fileName, QWidget * /*parent*/)
-{
-  Save(pointset, fileName);
 }
 
 struct QmitkIOUtil::SaveFilter::Impl

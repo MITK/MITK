@@ -1,0 +1,75 @@
+<statemachine NAME="RegistrationManipulationInteractor">
+    <state name="start" startstate="true" >
+        <!-- Shift+LeftMouse: start translation -->
+        <transition event_class="MousePressEvent" event_variant="StartTranslation" target="translating">
+            <action name="InitTranslation"/>
+        </transition>
+        <!-- Ctrl+LeftMouse: start rotation -->
+        <transition event_class="MousePressEvent" event_variant="StartRotation" target="rotating">
+            <action name="InitRotation"/>
+        </transition>
+        <!-- Plain LeftMouse: position selection (drag or click) -->
+        <transition event_class="MousePressEvent" event_variant="StartSelectPosition" target="selectingPosition">
+        </transition>
+        <!-- Cursor foreshadowing: update hint cursor while hovering with a modifier held.
+             Self-transitions (target=start) so drag state is unaffected.
+             Order matters: Shift and Ctrl variants must come before the catch-all HoverNeutral. -->
+        <transition event_class="MouseMoveEvent" event_variant="HoverTranslate" target="start">
+            <action name="HintTranslate"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="HoverRotate" target="start">
+            <action name="HintRotate"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="HoverNeutral" target="start">
+            <action name="HintNeutral"/>
+        </transition>
+    </state>
+
+    <state name="translating">
+        <transition event_class="MouseMoveEvent" event_variant="Translating" target="translating">
+            <action name="Translate"/>
+        </transition>
+        <!-- All modifier variants for release: the user may still hold Shift when
+             releasing the mouse button after a translation gesture -->
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteraction" target="start">
+            <action name="EndTranslation"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShift" target="start">
+            <action name="EndTranslation"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionCtrl" target="start">
+            <action name="EndTranslation"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShiftCtrl" target="start">
+            <action name="EndTranslation"/>
+        </transition>
+    </state>
+
+    <state name="rotating">
+        <transition event_class="MouseMoveEvent" event_variant="Rotating" target="rotating">
+            <action name="Rotate"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteraction" target="start">
+            <action name="EndRotation"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShift" target="start">
+            <action name="EndRotation"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionCtrl" target="start">
+            <action name="EndRotation"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShiftCtrl" target="start">
+            <action name="EndRotation"/>
+        </transition>
+    </state>
+
+    <!-- Plain LMB: drag updates position continuously; release also fires SelectPosition -->
+    <state name="selectingPosition">
+        <transition event_class="MouseMoveEvent" event_variant="SelectingPosition" target="selectingPosition">
+            <action name="SelectPosition"/>
+        </transition>
+        <transition event_class="MouseReleaseEvent" event_variant="EndInteraction" target="start">
+            <action name="SelectPosition"/>
+        </transition>
+    </state>
+</statemachine>

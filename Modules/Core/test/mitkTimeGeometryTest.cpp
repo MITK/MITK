@@ -10,20 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometry3D.h"
-#include "mitkTimeGeometry.h"
+#include <mitkGeometry3D.h>
+#include <mitkTimeGeometry.h>
 
-#include "mitkInteractionConst.h"
-#include "mitkRotationOperation.h"
+#include <mitkInteractionConst.h>
+#include <mitkRotationOperation.h>
 #include <mitkImageCast.h>
 #include <mitkMatrixConvert.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <fstream>
 #include <mitkVector.h>
 
-#include "mitkImageGenerator.h"
-#include "mitkPointSet.h"
+#include <mitkImageGenerator.h>
+#include <mitkPointSet.h>
 #include <limits>
 #include <mitkStandaloneDataStorage.h>
 

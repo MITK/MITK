@@ -35,10 +35,6 @@ https://dicom.offis.de/dcmtk
 
 https://gdcm.sourceforge.net/
 
-\par HDF5
-
-https://support.hdfgroup.org/HDF5/
-
 \par ITK
 
 https://itk.org/
@@ -55,6 +51,10 @@ https://github.com/lz4/lz4
 
 https://github.com/MIC-DKFZ/MatchPoint
 
+\par nnInteractive
+
+https://github.com/MIC-DKFZ/nnInteractive
+
 \par oneAPI Threading Building Blocks (oneTBB)
 
 https://github.com/uxlfoundation/oneTBB
@@ -62,6 +62,10 @@ https://github.com/uxlfoundation/oneTBB
 \par POCO
 
 https://pocoproject.org/
+
+\par pybind11
+
+https://github.com/pybind/pybind11
 
 \par Python
 
@@ -75,13 +79,13 @@ https://www.qt.io/
 
 https://qwt.sourceforge.io/
 
-\par SWIG
-
-https://www.swig.org/
-
 \par TinyXML-2
 
 https://www.grinninglizard.com/tinyxml2/
+
+\par TotalSegmentator
+
+https://github.com/wasserth/TotalSegmentator
 
 \par VTK
 

@@ -16,14 +16,23 @@ found in the LICENSE file.
 #include <itkSingleValuedCostFunction.h>
 #include <itkMacro.h>
 
-#include "mitkModelFitCostFunctionInterface.h"
+#include <mitkModelFitCostFunctionInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
-/** Base class for all model fit cost function that return a single cost value*/
+/**
+ * \class SVModelFitCostFunction
+ * \brief Base class for all model fit cost functions that return a single scalar cost value.
+ *
+ * Inherits from itk::SingleValuedCostFunction and ModelFitCostFunctionInterface.
+ * Subclasses must implement CalcMeasure() to define the specific cost metric.
+ * Provides a default numerical derivative computation via finite differences.
+ *
+ * \sa MVModelFitCostFunction, ModelFitCostFunctionInterface, SumOfSquaredDifferencesFitCostFunction
+ */
 class MITKMODELFIT_EXPORT SVModelFitCostFunction : public itk::SingleValuedCostFunction, public ModelFitCostFunctionInterface
 {
 public:
@@ -37,15 +46,34 @@ public:
     typedef Superclass::MeasureType MeasureType;
     typedef Superclass::DerivativeType DerivativeType;
 
+    /**
+     * \brief Sets the observed sample signal.
+     * \param[in] sampleSet The sample signal array.
+     */
     void SetSample(const SignalType &sampleSet) override;
 
+    /**
+     * \brief Computes the scalar cost value for the given parameters.
+     * \param[in] parameter The model parameters to evaluate.
+     * \return The scalar cost measure value.
+     */
     MeasureType GetValue(const ParametersType& parameter) const override;
+
+    /**
+     * \brief Computes the derivative of the cost function numerically via finite differences.
+     * \param[in] parameters The parameters at which the derivative is evaluated.
+     * \param[out] derivative The computed derivative vector.
+     */
     void GetDerivative (const ParametersType &parameters, DerivativeType &derivative) const override;
 
+    /**
+     * \brief Returns the number of model parameters.
+     * \return The number of parameters of the associated model.
+     */
     unsigned int GetNumberOfParameters (void) const override;
 
-    itkSetConstObjectMacro(Model, ModelBase);
-    itkGetConstObjectMacro(Model, ModelBase);
+    mitkOverrideSetConstObjectMacro(Model, ModelBase);
+    mitkOverrideGetConstObjectMacro(Model, ModelBase);
 
     itkSetMacro(DerivativeStepLength, double);
     itkGetConstMacro(DerivativeStepLength, double);

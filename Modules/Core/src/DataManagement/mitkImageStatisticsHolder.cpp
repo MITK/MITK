@@ -9,11 +9,11 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkImageStatisticsHolder.h"
+#include <mitkImageStatisticsHolder.h>
 
-#include "mitkHistogramGenerator.h"
+#include <mitkHistogramGenerator.h>
 #include <mitkProperties.h>
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 //#define BOUNDINGOBJECT_IGNORE
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)

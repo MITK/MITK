@@ -15,19 +15,25 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkGenericParamModel.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkGenericParamModel.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class GenericParamModelFactory
+   * \brief Factory for creating GenericParamModel instances and their parameterizers.
+   *
+   * \sa GenericParamModel, GenericParamModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT GenericParamModelFactory : public
     ConcreteModelFactoryBase<GenericParamModel>
   {
   public:
-    mitkClassMacroItkParent(GenericParamModelFactory, ConcreteModelFactoryBase<GenericParamModel>);
+    mitkClassMacro(GenericParamModelFactory, ConcreteModelFactoryBase<GenericParamModel>);
     itkFactorylessNewMacro(Self);
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)

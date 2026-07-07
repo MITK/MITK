@@ -13,50 +13,30 @@ found in the LICENSE file.
 #ifndef mitkPlaneFit_h
 #define mitkPlaneFit_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkGeometryDataSource.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPointSet.h"
-#include "mitkTimeGeometry.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkGeometryDataSource.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPointSet.h>
+#include <mitkTimeGeometry.h>
 
 namespace mitk
 {
-  //!
-  //  kind regards to dr. math!
-  // function [x0, a, d, normd] = lsplane(X)
-  // ---------------------------------------------------------------------
-  // LSPLANE.M   Least-squares plane (orthogonal distance
-  //             regression).
-  //
-  // Version 1.0
-  // Last amended   I M Smith 27 May 2002.
-  // Created        I M Smith 08 Mar 2002
-  // ---------------------------------------------------------------------
-  // Input
-  // X        Array [x y z] where x = vector of x-coordinates,
-  //          y = vector of y-coordinates and z = vector of
-  //          z-coordinates.
-  //          Dimension: m x 3.
-  //
-  // Output
-  // x0       Centroid of the data = point on the best-fit plane.
-  //          Dimension: 3 x 1.
-  //
-  // a        Direction cosines of the normal to the best-fit
-  //          plane.
-  //          Dimension: 3 x 1.
-  //
-  // <Optional...
-  // d        Residuals.
-  //          Dimension: m x 1.
-  //
-  // normd    Norm of residual errors.
-  //          Dimension: 1 x 1.
-  // ...>
-  //
-  // [x0, a <, d, normd >] = lsplane(X)
-  // ---------------------------------------------------------------------
-
+  /**
+   * \brief Fits a plane to a point set using least-squares orthogonal distance regression.
+   *
+   * This filter computes the best-fit plane for a given mitk::PointSet using
+   * Singular Value Decomposition (SVD). For each time step the centroid of the
+   * points and the normal of the least-squares plane are computed. The output
+   * is a GeometryData containing PlaneGeometry instances.
+   *
+   * The algorithm requires at least 3 points per time step. Based on the LSPLANE
+   * method by I. M. Smith (2002).
+   *
+   * \sa GeometryDataSource
+   * \sa PlaneGeometry
+   * \sa PointSet
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT PlaneFit : public GeometryDataSource
   {
   public:
@@ -66,33 +46,44 @@ namespace mitk
     typedef mitk::PointSet::PointDataType PointDataType;
     typedef mitk::PointSet::PointDataIterator PointDataIterator;
 
+    /** \brief Initialize the output information (time geometry, plane geometries). */
     void GenerateOutputInformation() override;
 
+    /** \brief Compute the best-fit plane for each time step. */
     void GenerateData() override;
 
-    /*!Getter for point set.
-     *
+    /**
+     * \brief Get the input point set.
+     * \return Const pointer to the input PointSet, or nullptr if not set.
      */
     const mitk::PointSet *GetInput();
 
-    /*! filter initialisation.
-     *
+    /**
+     * \brief Set the input point set.
+     * \param[in] ps The PointSet to fit a plane to.
+     * \pre The point set should contain at least 3 points per time step.
      */
     using mitk::GeometryDataSource::SetInput;
     virtual void SetInput(const mitk::PointSet *ps);
 
-    /*! returns the center of gravity of the point set.
-     *
+    /**
+     * \brief Get the centroid (center of gravity) of the point set.
+     * \param[in] t The time step (default: 0).
+     * \return Const reference to the centroid point.
      */
     virtual const mitk::Point3D &GetCentroid(int t = 0) const;
 
-    /*! returns the plane geometry which represents the point set.
-     *
+    /**
+     * \brief Get the PlaneGeometry representing the best-fit plane.
+     * \param[in] t The time step (default: 0).
+     * \return Smart pointer to the PlaneGeometry.
      */
     virtual mitk::PlaneGeometry::Pointer GetPlaneGeometry(int t = 0);
 
-    /*! returns the normal of the plane which represents the point set.
-     *
+    /**
+     * \brief Get the normal vector of the best-fit plane.
+     * \param[in] t The time step (default: 0).
+     * \return Const reference to the normal vector.
      */
     virtual const mitk::Vector3D &GetPlaneNormal(int t = 0) const;
 

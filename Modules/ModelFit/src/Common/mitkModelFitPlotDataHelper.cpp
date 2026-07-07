@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitPlotDataHelper.h"
+#include <mitkModelFitPlotDataHelper.h>
 
-#include "mitkExceptionMacro.h"
-#include "mitkImage.h"
-#include "mitkModelFitParameterValueExtraction.h"
-#include "mitkModelGenerator.h"
+#include <mitkExceptionMacro.h>
+#include <mitkImage.h>
+#include <mitkModelFitParameterValueExtraction.h>
+#include <mitkModelGenerator.h>
 
-#include "mitkFormulaParser.h"
+#include <mitkFormulaParser.h>
 
 const std::string mitk::MODEL_FIT_PLOT_SAMPLE_NAME()
 {

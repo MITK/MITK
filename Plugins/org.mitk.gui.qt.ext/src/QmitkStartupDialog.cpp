@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkStartupDialog.h>
+#include "QmitkStartupDialog.h"
 #include <ui_QmitkStartupDialog.h>
 
 #include <mitkCoreServices.h>
@@ -144,7 +144,7 @@ private:
 
 QmitkStartupDialog::QmitkStartupDialog(QWidget* parent)
   : QDialog(parent),
-    m_Ui(new Ui::QmitkStartupDialog)
+    m_Ui(std::make_unique<Ui::QmitkStartupDialog>())
 {
   m_Ui->setupUi(this);
 
@@ -155,7 +155,6 @@ QmitkStartupDialog::QmitkStartupDialog(QWidget* parent)
 
 QmitkStartupDialog::~QmitkStartupDialog()
 {
-  delete m_Ui;
 }
 
 bool QmitkStartupDialog::UsePreset() const
@@ -173,11 +172,15 @@ QStringList QmitkStartupDialog::GetPresetCategories() const
   return m_Ui->presetListWidget->currentItem()->data(Preset::CategoriesRole).toStringList();
 }
 
-// Check if "Do not show this dialog again" is ticked off.
+// Check if the dialog should be skipped, either because the user ticked
+// "Do not show this dialog again" or because a preset is enforced via
+// a session-only override (e.g. command-line argument).
 bool QmitkStartupDialog::SkipDialog() const
 {
   auto prefs = GetPreferences();
-  return prefs->GetBool("skip", false);
+  return prefs->GetBool("skip", false)
+    || prefs->IsOverridden("use preset")
+    || prefs->IsOverridden("preset");
 }
 
 // Load preset resources.

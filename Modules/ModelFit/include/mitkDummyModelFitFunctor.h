@@ -15,15 +15,25 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 
-#include "mitkModelBase.h"
-#include "mitkModelFitFunctorBase.h"
-#include "mitkMVConstrainedCostFunctionDecorator.h"
+#include <mitkModelBase.h>
+#include <mitkModelFitFunctorBase.h>
+#include <mitkMVConstrainedCostFunctionDecorator.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class DummyModelFitFunctor
+   * \brief A no-op model fit functor that returns initial parameters without optimization.
+   *
+   * This functor does not perform any actual fitting. It simply returns the initial
+   * parameters as the "fitted" result. It is useful for testing the model fitting
+   * pipeline infrastructure or for generating model signals from known parameters.
+   *
+   * \sa ModelFitFunctorBase, LevenbergMarquardtModelFitFunctor
+   */
   class MITKMODELFIT_EXPORT DummyModelFitFunctor : public ModelFitFunctorBase
   {
   public:

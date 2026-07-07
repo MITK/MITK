@@ -21,15 +21,21 @@ found in the LICENSE file.
 
 #include <memory>
 
-#include "mitkIDataStorageInspectorProvider.h"
+#include <mitkIDataStorageInspectorProvider.h>
 
-/*
- * This is the module activator for the "QtWidgets" module.
+/**
+ * \brief Module activator for the QtWidgets module.
+ *
+ * Registers data storage inspector providers (tree, list, history, favorites)
+ * as micro-services when the module is loaded.
  */
 class MitkQtWidgetsActivator : public us::ModuleActivator
 {
 public:
+  /** \brief Register data storage inspector providers. */
   void Load(us::ModuleContext *context) override;
+
+  /** \brief Unregister all data storage inspector providers. */
   void Unload(us::ModuleContext *) override;
 
 private:

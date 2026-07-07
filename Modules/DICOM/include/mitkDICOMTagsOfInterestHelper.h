@@ -17,24 +17,42 @@ found in the LICENSE file.
 
 #include <mitkDICOMTagPath.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {
 
-    /** Type specifies tags of interest. Key is the tag path of interest.
-    * The value is an optional user defined name for the property that should be used to store the tag value(s).
-    * Empty value is default and will imply to use the found DICOMTagPath as property name.*/
+    /**
+     * \ingroup DICOMModule
+     * \brief Map type for DICOM tags of interest.
+     *
+     * Key is the tag path of interest. Value is an optional user-defined name
+     * for the property that should be used to store the tag value(s). An empty
+     * value (default) implies using the DICOMTagPath converted to a property name.
+     */
     typedef std::map<DICOMTagPath, std::string> DICOMTagPathMapType;
 
-    /** Returns the list of tags that are by default of interest and should
-    * be extracted when loading DICOM data. This can for instance be used
-    * to with DICOMFileReader::SetAdditionalTagsOfInterest().*/
+    /**
+     * \brief Returns the currently registered DICOM tags of interest.
+     *
+     * Queries the IDICOMTagsOfInterest service for the tags that have been registered.
+     * This list may differ from the default list if additional tags have been added.
+     *
+     * \return A map of tag paths to optional property names.
+     * \sa GetDefaultDICOMTagsOfInterest, IDICOMTagsOfInterest, DICOMFileReader::SetAdditionalTagsOfInterest
+     */
     DICOMTagPathMapType MITKDICOM_EXPORT GetCurrentDICOMTagsOfInterest();
 
-    /** Returns the list of tags that are by default of interest and should
+    /**
+     * \brief Returns the default list of DICOM tags of interest.
+     *
+     * Returns the built-in list of tags that are by default of interest and should
      * be extracted when loading DICOM data. This can for instance be used
-     * to with DICOMFileReader::SetAdditionalTagsOfInterest().*/
+     * with DICOMFileReader::SetAdditionalTagsOfInterest().
+     *
+     * \return A map of tag paths to optional property names.
+     * \sa GetCurrentDICOMTagsOfInterest, DICOMFileReader::SetAdditionalTagsOfInterest
+     */
     DICOMTagPathMapType MITKDICOM_EXPORT GetDefaultDICOMTagsOfInterest();
 }
 

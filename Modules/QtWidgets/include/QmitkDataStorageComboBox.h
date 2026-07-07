@@ -10,16 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file QmitkDataStorageComboBox.h
+ * \brief Declares QmitkDataStorageComboBox, a QComboBox subclass that displays data nodes from a DataStorage.
+ *
+ * \ingroup QmitkModule
+ */
+
 #ifndef QmitkDataStorageComboBox_h
 #define QmitkDataStorageComboBox_h
 
 #include <MitkQtWidgetsExports.h>
 
 // Own Includes
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkWeakPointer.h"
+#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkWeakPointer.h>
 
 // Toolkit Includes
 #include <QComboBox>
@@ -31,7 +38,6 @@ found in the LICENSE file.
 /// \author Michael Mueller
 /// \version 4.0
 /// \date 2009-02-09
-/// \ingroup Widgets
 /// \brief Displays all or a subset (defined by a predicate) of nodes of the Data Storage.
 ///
 ///
@@ -180,8 +186,14 @@ protected:
   ///
   virtual void Reset();
 
+  ///
+  /// \brief Remove the node at the given index and unregister its property list observers.
+  ///
   void RemoveNodeAndPropertyLists(int index);
 
+  ///
+  /// \brief Update the combo box display text when a node's property list changes.
+  ///
   virtual void UpdateComboBoxText(const mitk::PropertyList*);
 
 protected:

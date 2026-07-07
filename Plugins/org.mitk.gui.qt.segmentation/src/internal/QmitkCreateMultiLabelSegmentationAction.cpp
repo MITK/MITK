@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 
-#include "mitkLabelSetImage.h"
-#include "mitkLabelSetImageHelper.h"
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
 
 #include <QmitkStaticDynamicSegmentationDialog.h>
 
-#include "QMessageBox"
+#include <QMessageBox>
 
 QmitkCreateMultiLabelSegmentationAction::QmitkCreateMultiLabelSegmentationAction()
 {
@@ -102,16 +102,6 @@ void QmitkCreateMultiLabelSegmentationAction::SetDataStorage(mitk::DataStorage* 
 }
 
 void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart*)
-{
-  //not needed
-}
-
-void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool)
-{
-  //not needed
-}
-
-void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool)
 {
   //not needed
 }

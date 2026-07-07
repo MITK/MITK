@@ -15,13 +15,13 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkMaskedStatisticsImageFilter_h
-#define __itkMaskedStatisticsImageFilter_h
+#ifndef itkMaskedStatisticsImageFilter_h
+#define itkMaskedStatisticsImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkNumericTraits.h"
-#include "itkArray.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkImageToImageFilter.h>
+#include <itkNumericTraits.h>
+#include <itkArray.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 namespace itk
 {
@@ -40,10 +40,6 @@ namespace itk
   * \remark This filter differs from itk::StatisticsImageFilter by the fact that you can
   * specify an mask image. If set, only pixels within the mask (mask value > 0) are taken
   * into account for the statistics.
-  *
-  * \ingroup MathematicalStatisticsImageFilters
-  * \ingroup ITKImageStatistics
-  *
   */
   template< typename TInputImage , typename TMaskImage = ::itk::Image<unsigned char, TInputImage::ImageDimension> >
   class MaskedStatisticsImageFilter:
@@ -189,7 +185,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMaskedStatisticsImageFilter.hxx"
+#include <itkMaskedStatisticsImageFilter.tpp>
 #endif
 
 #endif

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoCompartmentExchangeModelParameterizer.h"
+#include <mitkTwoCompartmentExchangeModelParameterizer.h>
 
 mitk::TwoCompartmentExchangeModelParameterizer::ParametersType
 mitk::TwoCompartmentExchangeModelParameterizer::GetDefaultInitialParameterization() const

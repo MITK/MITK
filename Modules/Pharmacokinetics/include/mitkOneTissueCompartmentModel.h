@@ -13,11 +13,20 @@ found in the LICENSE file.
 #ifndef mitkOneTissueCompartmentModel_h
 #define mitkOneTissueCompartmentModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
+  /**
+   * \brief Implementation of the reversible one-tissue compartment model for PET pharmacokinetics.
+   *
+   * Models a single tissue compartment with parameters K1 (influx rate constant)
+   * and k2 (efflux rate constant). The concentration is computed by convolution
+   * of the AIF with an exponential residue function.
+   *
+   * \sa ExtendedOneTissueCompartmentModel, TwoTissueCompartmentModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT OneTissueCompartmentModel : public AIFBasedModelBase
   {
 
@@ -62,11 +71,9 @@ namespace mitk
     OneTissueCompartmentModel();
     ~OneTissueCompartmentModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    OneTissueCompartmentModel(const OneTissueCompartmentModel& source);
+
+    mitkCloneMacro(OneTissueCompartmentModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -74,9 +81,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    OneTissueCompartmentModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>241</width>
-    <height>402</height>
+    <width>290</width>
+    <height>446</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="leftMargin">
@@ -28,45 +34,75 @@
      <property name="title">
       <string>nnInteractive</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="initializeButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Initialize</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="settingsButton">
-          <property name="text">
-           <string>Settings</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="initializeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Initialize</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
-      <item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="settingsButton">
+        <property name="styleSheet">
+         <string notr="true">text-align: left;</string>
+        </property>
+        <property name="text">
+         <string>Settings</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Gear</normaloff>:/nnInteractive/Gear</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
        <widget class="QPushButton" name="resetButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Reset Interactions</string>
+         <string>Reset all Interactions</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Reset</normaloff>:/nnInteractive/Reset</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="undoButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">text-align: left;</string>
+        </property>
+        <property name="text">
+         <string>Undo</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Undo</normaloff>:/nnInteractive/Undo</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="modelLicenseLabel">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -88,7 +124,7 @@
          <string>Positive</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Positive</normaloff>:/nnInteractive/Positive</iconset>
         </property>
         <property name="checkable">
@@ -105,7 +141,7 @@
          <string>Negative</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Negative</normaloff>:/nnInteractive/Negative</iconset>
         </property>
         <property name="checkable">
@@ -193,26 +229,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="maskButton">
-        <property name="text">
-         <string>Initialize with Mask</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
-          <normaloff>:/nnInteractive/Mask</normaloff>:/nnInteractive/Mask</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="autoRefineCheckBox">
         <property name="text">
-         <string>Auto-refine mask</string>
+         <string>Auto-refine preexisting label content</string>
+        </property>
+        <property name="toolTip">
+         <string>If off, the label's content is used as-is until your next interaction.</string>
         </property>
        </widget>
       </item>
@@ -220,6 +242,9 @@
        <widget class="QCheckBox" name="autoZoomCheckBox">
         <property name="text">
          <string>Auto-zoom</string>
+        </property>
+        <property name="toolTip">
+         <string>When on, the model widens the region it analyzes if a segment reaches the edge, so large structures are not cut off. Improves completeness at the cost of speed; not available on CPU.</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -232,7 +257,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/nnInteractive/nnInteractive.qrc"/>
+  <include location="../resource/nnInteractive/nnInteractive.qrc"/>
  </resources>
  <connections/>
 </ui>

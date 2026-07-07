@@ -158,7 +158,7 @@ found in the LICENSE file.
 
 #include <org_blueberry_core_runtime_Export.h>
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <QDir>
 #include <QSharedPointer>
@@ -299,20 +299,6 @@ public:
   static QVariant GetDebugOption(const QString& option);
 
   /**
-   * Returns the path of the configuration information
-   * used to run this instance of the BlueBerry platform.
-   * The configuration area typically
-   * contains the list of plug-ins available for use, various settings
-   * (those shared across different instances of the same configuration)
-   * and any other such data needed by plug-ins.
-   * An empty path is returned if the platform is running without a configuration location.
-   *
-   * @return the location of the platform's configuration data area
-   * @deprecatedSince{2015_05} Use GetConfigurationLocation() instead.
-   */
-  QT_DEPRECATED static QDir GetConfigurationPath();
-
-  /**
    * Returns the location of the configuration information
    * used to run this instance of BlueBerry.  The configuration area typically
    * contains the list of plug-ins available for use, various settings
@@ -329,14 +315,6 @@ public:
   static ctkLocation* GetConfigurationLocation();
 
   /**
-   * Returns the path of the base installation for the running platform
-   *
-   * @return the location of the platform's installation area or <code>null</code> if none
-   * @deprecatedSince{2015_05} Use GetInstallLocation() instead.
-   */
-  QT_DEPRECATED static QDir GetInstallPath();
-
-  /**
    * Returns the location of the base installation for the running platform
    * <code>null</code> is returned if the platform is running without a configuration location.
    * <p>
@@ -349,15 +327,6 @@ public:
   static ctkLocation* GetInstallLocation();
 
   /**
-   * Returns the path of the platform's working directory (also known as the instance data area).
-   * An empty path is returned if the platform is running without an instance location.
-   *
-   * @return the location of the platform's instance data area or <code>null</code> if none
-   * @deprecatedSince{2015_05} Use GetInstanceLocation() instead.
-   */
-  QT_DEPRECATED static QDir GetInstancePath();
-
-  /**
    * Returns the location of the platform's working directory (also known as the instance data area).
    * <code>null</code> is returned if the platform is running without an instance location.
    * <p>
@@ -368,29 +337,6 @@ public:
    * @see ctkLocation::INSTANCE_FILTER
    */
   static ctkLocation* GetInstanceLocation();
-
-  /**
-   * Returns the path in the local file system of the
-   * plug-in state area for the given plug-in.
-   * If the plug-in state area did not exist prior to this call,
-   * it is created.
-   * <p>
-   * The plug-in state area is a file directory within the
-   * platform's metadata area where a plug-in is free to create files.
-   * The content and structure of this area is defined by the plug-in,
-   * and the particular plug-in is solely responsible for any files
-   * it puts there. It is recommended for plug-in preference settings and
-   * other configuration parameters.
-   * </p>
-   *
-   * @param statePath
-   * @param plugin the plug-in whose state location is returned
-   * @param create
-   * @return a local file system path
-   * TODO Investigate the usage of a service factory
-   * @deprecatedSince{2015_05} Use GetStateLocation instead.
-   */
-  QT_DEPRECATED static bool GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& plugin, bool create = true);
 
   /**
    * Returns the location in the local file system of the
@@ -412,17 +358,6 @@ public:
    * @throws RuntimeException if the plug-in state area could not be created.
    */
   static QDir GetStateLocation(const QSharedPointer<ctkPlugin>& plugin);
-
-  /**
-   * Returns the path of the platform's user data area.  The user data area is a location on the system
-   * which is specific to the system's current user.  By default it is located relative to the
-   * location given by the System property "user.home".
-   * An empty path is returned if the platform is running without an user location.
-   *
-   * @return the location of the platform's user data area or <code>null</code> if none
-   * @deprecatedSince{2015_05} Use GetUserLocation() instead.
-   */
-  QT_DEPRECATED static QDir GetUserPath();
 
   /**
    * Returns the location of the platform's user data area.  The user data area is a location on the system

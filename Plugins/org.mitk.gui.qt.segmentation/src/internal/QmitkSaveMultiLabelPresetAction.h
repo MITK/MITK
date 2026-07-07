@@ -27,8 +27,6 @@ public:
   void Run(const QList<mitk::DataNode::Pointer>& selectedNodes) override;
   void SetDataStorage(mitk::DataStorage*) override;
   void SetFunctionality(berry::QtViewPart*) override;
-  void SetSmoothed(bool) override;
-  void SetDecimated(bool) override;
 };
 
 #endif

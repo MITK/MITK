@@ -13,18 +13,22 @@ found in the LICENSE file.
 #ifndef mitkImagePixelAccessor_h
 #define mitkImagePixelAccessor_h
 
-#include "mitkImage.h"
-#include "mitkImageDataItem.h"
+#include <mitkImage.h>
+#include <mitkImageDataItem.h>
 
 #include <typeinfo>
 
 namespace mitk
 {
   /**
-   * @brief Provides templated image access for all inheriting classes
-   * @tparam TPixel defines the PixelType
-   * @tparam VDimension defines the dimension for accessing data
-   * @ingroup Data
+   * \brief Provides templated image access for all inheriting classes.
+   *
+   * \tparam TPixel Defines the pixel type used for accessing image data.
+   * \tparam VDimension Defines the dimension for accessing data. Defaults to 3.
+   *
+   * \ingroup Data
+   * \sa ImageReadAccessor
+   * \sa ImageWriteAccessor
    */
   template <class TPixel, unsigned int VDimension = 3>
   class ImagePixelAccessor
@@ -34,16 +38,26 @@ namespace mitk
     typedef ImagePixelAccessor<TPixel, VDimension> ImagePixelAccessorType;
     typedef Image::ConstPointer ImageConstPointer;
 
-    /** Get Dimensions from ImageDataItem */
+    /**
+     * \brief Get the size of the specified dimension from the underlying ImageDataItem.
+     *
+     * \param i The dimension index to query.
+     * \return The size of the requested dimension.
+     */
     int GetDimension(int i) const { return m_ImageDataItem->GetDimension(i); }
 
   private:
   friend class Image;
 
   protected:
-    /** 
-     * \param iP
-     * \param iDI specifies the allocated image part
+    /**
+     * \brief Construct the accessor from an image and an optional ImageDataItem.
+     *
+     * If \p iDI is nullptr, the full channel data of the image is used instead.
+     *
+     * \param iP Pointer to the image to access.
+     * \param iDI The allocated image data item (e.g. a slice, volume, or channel).
+     *            If nullptr, the full channel data is retrieved from the image.
      */
     ImagePixelAccessor(ImageConstPointer iP, const mitk::ImageDataItem *iDI) : m_ImageDataItem(iDI)
     {
@@ -54,9 +68,15 @@ namespace mitk
       CheckData(iP.GetPointer());
     }
 
-    /** Destructor */
+    /** \brief Destructor. */
     virtual ~ImagePixelAccessor() {}
 
+    /**
+     * \brief Validate that the accessor dimensions and pixel type match the image.
+     *
+     * \param image The image to validate against.
+     * \throw mitk::Exception if dimensions or pixel types do not match.
+     */
     void CheckData( const Image *image )
     {
       // Check if Dimensions are correct
@@ -92,7 +112,7 @@ namespace mitk
       }
     }
 
-    /** Holds the specified ImageDataItem */
+    /** \brief Holds the specified ImageDataItem for pixel data access. */
     const ImageDataItem *m_ImageDataItem;
 
     /** \brief Pointer to the used Geometry.
@@ -113,7 +133,12 @@ namespace mitk
      */
     int m_Options;
 
-    /** Get memory offset for a given image index */
+    /**
+     * \brief Compute the linear memory offset for a given multi-dimensional image index.
+     *
+     * \param idx The multi-dimensional index into the image.
+     * \return The linear memory offset corresponding to the index.
+     */
     unsigned int GetOffset(const IndexType &idx) const
     {
       const unsigned int *imageDims = m_ImageDataItem->m_Dimensions;

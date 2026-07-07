@@ -18,20 +18,39 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief Deserializes a mitk::PropertyList
-  */
+   * \brief Deserializes a version 1 mitk::PropertyList from an XML file.
+   *
+   * Implements the deserialization logic for property list XML files with
+   * FileVersion 1. Iterates over all \c \<property\> elements in the XML,
+   * looks up the appropriate BasePropertySerializer for each property type
+   * via the ITK object factory, and reassembles the PropertyList. The result
+   * can be retrieved via GetOutput().
+   *
+   * This class is registered with the ITK object factory using
+   * MITK_REGISTER_SERIALIZER so it can be discovered automatically
+   * by PropertyListDeserializer.
+   *
+   * \sa PropertyListDeserializer, BasePropertySerializer
+   */
   class PropertyListDeserializerV1 : public PropertyListDeserializer
   {
   public:
     mitkClassMacro(PropertyListDeserializerV1, PropertyListDeserializer);
-    itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
-      itkCloneMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self);
 
-      /**
-        \brief Reads a propertylist from file. Get result via GetOutput()
-        \return success of deserialization
-        */
-      bool Deserialize() override;
+    /**
+     * \brief Read a version 1 PropertyList from the configured XML file.
+     *
+     * Parses each \c \<property\> element, instantiates the corresponding serializer
+     * based on the type attribute, and deserializes the property value. The resulting
+     * PropertyList can be retrieved via GetOutput().
+     *
+     * \return True if all properties were deserialized successfully, false if any errors occurred.
+     *
+     * \pre The Filename must be set to a valid version 1 property list XML file.
+     */
+    bool Deserialize() override;
 
   protected:
     PropertyListDeserializerV1();

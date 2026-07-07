@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderingManagerFactory.h"
-#include "QmitkRenderingManager.h"
+#include <QmitkRenderingManagerFactory.h>
+#include <QmitkRenderingManager.h>
 
 QmitkRenderingManagerFactory::QmitkRenderingManagerFactory()
 {

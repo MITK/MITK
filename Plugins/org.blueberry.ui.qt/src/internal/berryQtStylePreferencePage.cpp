@@ -11,10 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "berryQtStylePreferencePage.h"
+#include <ui_berryQtStylePreferencePage.h>
 
 #include "berryWorkbenchPlugin.h"
-#include <berryQtPreferences.h>
-#include <berryQtStyleManager.h>
+#include "berryQtPreferences.h"
+#include "berryQtStyleManager.h"
 
 #include <QFileDialog>
 #include <QDirIterator>
@@ -35,7 +36,10 @@ namespace berry
 
 QtStylePreferencePage::QtStylePreferencePage()
 {
+}
 
+QtStylePreferencePage::~QtStylePreferencePage()
+{
 }
 
 void QtStylePreferencePage::Init(IWorkbench::Pointer )
@@ -46,7 +50,8 @@ void QtStylePreferencePage::Init(IWorkbench::Pointer )
 void QtStylePreferencePage::CreateQtControl(QWidget* parent)
 {
   mainWidget = new QWidget(parent);
-  controls.setupUi(mainWidget);
+  controls = std::make_unique<Ui::QtStylePreferencePageUI>();
+  controls->setupUi(mainWidget);
 
   ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
@@ -57,55 +62,55 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
 
   Update();
 
-  connect(controls.m_StylesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged(int)));
-  connect(controls.m_FontComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(FontChanged(int)));
-  connect(controls.m_FontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(FontChanged(int)));
-  connect(controls.m_PathList, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePathListButtons()));
-  connect(controls.m_AddButton, SIGNAL(clicked(bool)), this, SLOT(AddPathClicked(bool)));
-  connect(controls.m_EditButton, SIGNAL(clicked(bool)), this, SLOT(EditPathClicked(bool)));
-  connect(controls.m_RemoveButton, SIGNAL(clicked(bool)), this, SLOT(RemovePathClicked(bool)));
+  connect(controls->m_StylesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged(int)));
+  connect(controls->m_FontComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(FontChanged(int)));
+  connect(controls->m_FontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(FontChanged(int)));
+  connect(controls->m_PathList, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePathListButtons()));
+  connect(controls->m_AddButton, SIGNAL(clicked(bool)), this, SLOT(AddPathClicked(bool)));
+  connect(controls->m_EditButton, SIGNAL(clicked(bool)), this, SLOT(EditPathClicked(bool)));
+  connect(controls->m_RemoveButton, SIGNAL(clicked(bool)), this, SLOT(RemovePathClicked(bool)));
 }
 
 void QtStylePreferencePage::FillStyleCombo(const berry::IQtStyleManager::Style& currentStyle)
 {
-  controls.m_StylesCombo->clear();
+  controls->m_StylesCombo->clear();
   styles.clear();
   styleManager->GetStyles(styles);
 
   std::sort(styles.begin(), styles.end());
   for (int i = 0; i < styles.size(); ++i)
   {
-    controls.m_StylesCombo->addItem(styles.at(i).name, QVariant(styles.at(i).fileName));
+    controls->m_StylesCombo->addItem(styles.at(i).name, QVariant(styles.at(i).fileName));
   }
-  controls.m_StylesCombo->setCurrentIndex(styles.indexOf(currentStyle));
+  controls->m_StylesCombo->setCurrentIndex(styles.indexOf(currentStyle));
 }
 
 void QtStylePreferencePage::FillFontCombo(const QString& currentFont)
 {
-  controls.m_FontComboBox->clear();
+  controls->m_FontComboBox->clear();
   QStringList fonts;
   styleManager->GetFonts(fonts);
 
   for (int i = 0; i < fonts.size(); ++i)
   {
-    controls.m_FontComboBox->addItem(fonts.at(i));
+    controls->m_FontComboBox->addItem(fonts.at(i));
   }
-  controls.m_FontComboBox->setCurrentIndex(fonts.indexOf(currentFont));
+  controls->m_FontComboBox->setCurrentIndex(fonts.indexOf(currentFont));
   if (currentFont == QString("<<system>>"))
   {
-    controls.m_FontSizeSpinBox->setEnabled(false);
+    controls->m_FontSizeSpinBox->setEnabled(false);
   }
   else
   {
-    controls.m_FontSizeSpinBox->setEnabled(true);
+    controls->m_FontSizeSpinBox->setEnabled(true);
   }
 }
 
 void QtStylePreferencePage::AddPath(const QString& path, bool updateCombo)
 {
-  if (!controls.m_PathList->findItems(path, Qt::MatchCaseSensitive).isEmpty()) return;
+  if (!controls->m_PathList->findItems(path, Qt::MatchCaseSensitive).isEmpty()) return;
 
-  new QListWidgetItem(path, controls.m_PathList);
+  new QListWidgetItem(path, controls->m_PathList);
 
   styleManager->AddStyles(path);
 
@@ -115,22 +120,22 @@ void QtStylePreferencePage::AddPath(const QString& path, bool updateCombo)
 
 void QtStylePreferencePage::StyleChanged(int /*index*/)
 {
-  QString fileName = controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString();
+  QString fileName = controls->m_StylesCombo->itemData(controls->m_StylesCombo->currentIndex()).toString();
   styleManager->SetStyle(fileName);
 }
 
 void QtStylePreferencePage::FontChanged(int /*index*/)
 {
-  QString fontName = controls.m_FontComboBox->currentText();
-  int fontSize = controls.m_FontSizeSpinBox->value();
+  QString fontName = controls->m_FontComboBox->currentText();
+  int fontSize = controls->m_FontSizeSpinBox->value();
 
   if (fontName == QString("<<system>>"))
   {
-    controls.m_FontSizeSpinBox->setEnabled(false);
+    controls->m_FontSizeSpinBox->setEnabled(false);
   }
   else
   {
-    controls.m_FontSizeSpinBox->setEnabled(true);
+    controls->m_FontSizeSpinBox->setEnabled(true);
   }
 
   styleManager->SetFont(fontName);
@@ -140,7 +145,7 @@ void QtStylePreferencePage::FontChanged(int /*index*/)
 
 void QtStylePreferencePage::AddPathClicked(bool /*checked*/)
 {
-  QListWidgetItem* item = controls.m_PathList->currentItem();
+  QListWidgetItem* item = controls->m_PathList->currentItem();
   QString initialDir;
   if (item) initialDir = item->text();
   QString dir = QFileDialog::getExistingDirectory(mainWidget, "", initialDir);
@@ -150,14 +155,14 @@ void QtStylePreferencePage::AddPathClicked(bool /*checked*/)
 
 void QtStylePreferencePage::RemovePathClicked(bool /*checked*/)
 {
-  QList<QListWidgetItem*> selection = controls.m_PathList->selectedItems();
+  QList<QListWidgetItem*> selection = controls->m_PathList->selectedItems();
   QListIterator<QListWidgetItem*> it(selection);
   while (it.hasNext())
   {
     QListWidgetItem* item = it.next();
     QString dir = item->text();
 
-    controls.m_PathList->takeItem(controls.m_PathList->row(item));
+    controls->m_PathList->takeItem(controls->m_PathList->row(item));
     delete item;
     styleManager->RemoveStyles(dir);
   }
@@ -172,7 +177,7 @@ void QtStylePreferencePage::RemovePathClicked(bool /*checked*/)
 
 void QtStylePreferencePage::EditPathClicked(bool checked)
 {
-  QListWidgetItem* item = controls.m_PathList->currentItem();
+  QListWidgetItem* item = controls->m_PathList->currentItem();
   QString initialDir = item->text();
   QString dir = QFileDialog::getExistingDirectory(mainWidget, "", initialDir);
 
@@ -185,22 +190,22 @@ void QtStylePreferencePage::EditPathClicked(bool checked)
 
 void QtStylePreferencePage::UpdatePathListButtons()
 {
-  int s = controls.m_PathList->selectedItems().size();
+  int s = controls->m_PathList->selectedItems().size();
 
   if (s == 0)
   {
-    controls.m_EditButton->setEnabled(false);
-    controls.m_RemoveButton->setEnabled(false);
+    controls->m_EditButton->setEnabled(false);
+    controls->m_RemoveButton->setEnabled(false);
   }
   else if (s == 1)
   {
-    controls.m_EditButton->setEnabled(true);
-    controls.m_RemoveButton->setEnabled(true);
+    controls->m_EditButton->setEnabled(true);
+    controls->m_RemoveButton->setEnabled(true);
   }
   else
   {
-    controls.m_EditButton->setEnabled(false);
-    controls.m_RemoveButton->setEnabled(true);
+    controls->m_EditButton->setEnabled(false);
+    controls->m_RemoveButton->setEnabled(true);
   }
 }
 
@@ -213,18 +218,18 @@ bool QtStylePreferencePage::PerformOk()
 {
   auto* prefs = GetPreferences();
 
-  prefs->Put(berry::QtPreferences::QT_STYLE_NAME, controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString().toStdString());
+  prefs->Put(berry::QtPreferences::QT_STYLE_NAME, controls->m_StylesCombo->itemData(controls->m_StylesCombo->currentIndex()).toString().toStdString());
 
   QString paths;
-  for (int i = 0; i < controls.m_PathList->count(); ++i)
+  for (int i = 0; i < controls->m_PathList->count(); ++i)
   {
-    QString path = controls.m_PathList->item(i)->text() + ";";
+    QString path = controls->m_PathList->item(i)->text() + ";";
     paths += path;
   }
 
   prefs->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths.toStdString());
-  prefs->Put(berry::QtPreferences::QT_FONT_NAME, controls.m_FontComboBox->currentText().toStdString());
-  prefs->PutInt(berry::QtPreferences::QT_FONT_SIZE, controls.m_FontSizeSpinBox->value());
+  prefs->Put(berry::QtPreferences::QT_FONT_NAME, controls->m_FontComboBox->currentText().toStdString());
+  prefs->PutInt(berry::QtPreferences::QT_FONT_SIZE, controls->m_FontSizeSpinBox->value());
 
   return true;
 }
@@ -258,7 +263,7 @@ void QtStylePreferencePage::Update()
 
   auto fontSize = prefs->GetInt(QtPreferences::QT_FONT_SIZE, QtStyleManager::DEFAULT_FONT_SIZE);
   styleManager->SetFontSize(fontSize);
-  controls.m_FontSizeSpinBox->setValue(fontSize);
+  controls->m_FontSizeSpinBox->setValue(fontSize);
   styleManager->UpdateWorkbenchFont();
 
   FillFontCombo(styleManager->GetFont());

@@ -27,6 +27,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief VTK-based 2D mapper for rendering bounding shape cross-sections and handles.
+   *
+   * Renders the intersection of a bounding box (GeometryData) with the current 2D slice
+   * plane, along with interactive handles for resizing. Handles are displayed as small
+   * cubes at the face centers of the bounding box where they intersect the slice.
+   *
+   * \sa BoundingShapeVtkMapper3D, BoundingShapeInteractor, VtkMapper
+   */
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeVtkMapper2D final : public VtkMapper
   {
     class LocalStorage : public Mapper::BaseLocalStorage
@@ -56,13 +64,26 @@ namespace mitk
     };
 
   public:
+    /** \brief Set default rendering properties for bounding shape 2D visualization.
+     *
+     * \param[in] node      The data node to set properties on.
+     * \param[in] renderer  The renderer context, or \c nullptr for all renderers.
+     * \param[in] overwrite If \c true, overwrite existing properties.
+     */
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     mitkClassMacro(BoundingShapeVtkMapper2D, VtkMapper);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      void ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *) override;
+    /** \copydoc VtkMapper::ApplyColorAndOpacityProperties */
+    void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
+
+    /** \brief Get the VTK prop assembly for rendering.
+     *
+     * \param[in] renderer The renderer to get the prop for.
+     * \return The VTK prop assembly containing the bounding shape and handle actors.
+     */
     vtkProp *GetVtkProp(BaseRenderer *renderer) override;
 
   private:

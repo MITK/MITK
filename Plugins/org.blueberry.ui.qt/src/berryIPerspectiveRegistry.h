@@ -20,8 +20,6 @@ found in the LICENSE file.
 namespace berry {
 
 /**
- * \ingroup org_blueberry_ui
- *
  * The workbench's global registry of perspectives.
  * <p>
  * This registry contains a descriptor for each perspectives in the workbench.

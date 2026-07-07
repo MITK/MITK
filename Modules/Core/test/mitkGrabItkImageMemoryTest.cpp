@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkITKImageImport.h"
-#include "mitkTestingMacros.h"
+#include <mitkITKImageImport.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkImagePixelReadAccessor.h>
 
 #include <itkThresholdImageFilter.h>
 
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 
 /**
  *  An ITK-based filter for thresholding.

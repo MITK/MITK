@@ -13,10 +13,20 @@ found in the LICENSE file.
 #ifndef mitkProperties_h
 #define mitkProperties_h
 
-#include "mitkGenericProperty.h"
-#include "mitkLookupTables.h"
-#include "mitkNumericTypes.h"
+#include <mitkGenericProperty.h>
+#include <mitkLookupTables.h>
+#include <mitkNumericTypes.h>
 
+/**
+ * \file mitkProperties.h
+ * \brief Declares commonly used GenericProperty specializations for MITK.
+ *
+ * This header provides type-safe property classes for fundamental types
+ * and geometric types used throughout the MITK framework.
+ *
+ * \sa GenericProperty
+ * \sa PropertyList
+ */
 namespace mitk
 {
   mitkDeclareGenericProperty(BoolProperty, bool, MITKCORE_EXPORT);
@@ -46,7 +56,7 @@ namespace mitk
   mitkDeclareGenericProperty(IntLookupTableProperty, IntLookupTable, MITKCORE_EXPORT);
   mitkDeclareGenericProperty(StringLookupTableProperty, StringLookupTable, MITKCORE_EXPORT);
   /**
-  * \warning If you add more specialization of GenericProperty, you must also add these to the
+  * \warning If you add more specializations of GenericProperty, you must also add these to the
   * templated GetPropertyValue() method in mitkPropertyList.cpp!
   */
 } // namespace mitk

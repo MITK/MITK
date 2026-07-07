@@ -13,25 +13,26 @@ found in the LICENSE file.
 #ifndef mitkSinglePointDataInteractor_h
 #define mitkSinglePointDataInteractor_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkSmartPointer.h"
-#include "mitkCommon.h"
-#include "mitkPointSetDataInteractor.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkSmartPointer.h>
+#include <mitkCommon.h>
+#include <mitkPointSetDataInteractor.h>
 #include <MitkCoreExports.h>
 #include <mitkPointSet.h>
 
 namespace mitk
 {
   /**
-   * Class SinglePointDataInteractor
-   * \brief Implementation of the single point interaction
+   * \brief Implementation of the single point interaction.
    *
-   * Interactor operates on a single point set, when a data node is set, its containing point set is clear for
-   * initialization.
+   * Interactor operates on a single point set. When a data node is set, its
+   * containing point set is cleared for initialization. Instead of adding new
+   * points, the first point's position is updated. All other interaction
+   * (move, delete) is handled by the base class PointSetDataInteractor.
+   *
+   * \sa PointSetDataInteractor
    */
-
-  // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
   class MITKCORE_EXPORT SinglePointDataInteractor : public PointSetDataInteractor
   {
   public:
@@ -42,19 +43,26 @@ namespace mitk
       protected : SinglePointDataInteractor();
     ~SinglePointDataInteractor() override;
 
-    /** Adds a point at the given coordinates.
-     *  This function overwrites the behavior of PointSetDataInteractor such that instead of adding new points
-     *  the first points position is updated. All other interaction (move,delete) is still handled by
-     * PointSetDataInteractor.
+    /** \brief Add or move the single point at the given coordinates.
+     *
+     * Overwrites PointSetDataInteractor::AddPoint() so that instead of adding
+     * new points, the first point's position is updated. All other interaction
+     * (move, delete) is still handled by PointSetDataInteractor.
      */
     void AddPoint(StateMachineAction *, InteractionEvent *event) override;
 
-    /**
-     * @brief SetMaxPoints Sets the maximal number of points for the pointset
-     * Overwritten, per design this class will always have a maximal number of one.
-     * @param maxNumber
+    /** \brief Overridden to enforce a maximum of one point.
+     *
+     * This method is a no-op by design, since this class always operates
+     * on exactly one point.
      */
     virtual void SetMaxPoints(unsigned int maxNumber = 0);
+
+    /** \brief Called when the data node changes.
+     *
+     * Ensures the data node contains a point set. If one exists, it is cleared;
+     * otherwise a new empty PointSet is created and assigned.
+     */
     void DataNodeChanged() override;
   };
 }

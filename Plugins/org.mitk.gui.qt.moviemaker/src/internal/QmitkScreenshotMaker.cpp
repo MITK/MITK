@@ -13,356 +13,226 @@ found in the LICENSE file.
 #include "QmitkScreenshotMaker.h"
 #include <ui_QmitkScreenshotMakerControls.h>
 
-#include "QmitkStepperAdapter.h"
-
-#include "mitkVtkPropRenderer.h"
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
 
-#include <iostream>
-
-#include <vtkRenderer.h>
-#include <vtkCamera.h>
-
-#include "vtkImageWriter.h"
-#include "vtkJPEGWriter.h"
-#include "vtkPNGWriter.h"
-#include "vtkRenderLargeImage.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
-#include "vtkTestUtilities.h"
-
-#include <vtkActor.h>
-#include "vtkMitkRenderProp.h"
-
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include "vtkRenderWindowInteractor.h"
-
-#include "mitkSliceNavigationController.h"
-#include "mitkPlanarFigure.h"
+#include <mitkIRenderWindowPart.h>
+#include <mitkRenderingManager.h>
+#include <mitkStatusBar.h>
 #include <mitkWorkbenchUtil.h>
-#include <mitkImage.h>
-#include <itksys/SystemTools.hxx>
 
+#include <vtkImageData.h>
+#include <vtkImageWriter.h>
+#include <vtkJPEGWriter.h>
+#include <vtkPNGWriter.h>
+#include <vtkRenderLargeImage.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
+
+#include <QAbstractButton>
+#include <QApplication>
+#include <QButtonGroup>
 #include <QColorDialog>
+#include <QDir>
 #include <QFileDialog>
+#include <QFileInfo>
+#include <QIcon>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QPen>
+#include <QPixmap>
+#include <QPushButton>
+#include <QRegularExpression>
+#include <QShortcut>
+#include <QTimer>
+#include <QWidget>
 
-QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
-  : QmitkAbstractView(),
-    m_Controls(nullptr),
-    m_BackgroundColor(QColor(0,0,0)),
-    m_SelectedNode(nullptr)
+#include <algorithm>
+
+namespace
 {
-  parentWidget = parent;
+  QIcon CreateColorSwatch(const QColor& color, int size = 20)
+  {
+    QPixmap pixmap(size, size);
+    pixmap.fill(color);
+    return QIcon(pixmap);
+  }
+
+  QIcon CreateTransparentSwatch(int size = 20)
+  {
+    QPixmap pixmap(size, size);
+    pixmap.fill(Qt::white);
+    QPainter painter(&pixmap);
+    const int half = size / 2;
+    const QColor gray(200, 200, 200);
+    painter.fillRect(0, 0, half, half, gray);
+    painter.fillRect(half, half, size - half, size - half, gray);
+    painter.end();
+    return QIcon(pixmap);
+  }
+
+  /** Return the first "<baseName>_NNN.png" in the directory that does not exist yet. */
+  QString NextAvailableScreenshotName(const QString& directory, const QString& baseName)
+  {
+    for (int index = 1; index <= 9999; ++index)
+    {
+      const QString candidate = directory + "/" + baseName + "_" + QString::number(index).rightJustified(3, '0') + ".png";
+      if (!QFileInfo::exists(candidate))
+        return candidate;
+    }
+
+    return directory + "/" + baseName + ".png";
+  }
+
+  /**
+   * Overlay drawn on a render window while pick mode is armed: dims the window
+   * (spotlight effect) unless it is the one currently hovered, which instead gets
+   * a bright accent border. It is transparent to mouse events, so the click still
+   * reaches the render window, and follows the render window's size.
+   */
+  class ScreenshotPickOverlay : public QWidget
+  {
+  public:
+    explicit ScreenshotPickOverlay(QWidget* parent)
+      : QWidget(parent)
+    {
+      this->setAttribute(Qt::WA_TransparentForMouseEvents);
+      this->setAttribute(Qt::WA_NoSystemBackground);
+      this->setFocusPolicy(Qt::NoFocus);
+
+      if (nullptr != parent)
+      {
+        parent->installEventFilter(this);
+        this->setGeometry(parent->rect());
+      }
+    }
+
+    void SetHighlighted(bool highlighted)
+    {
+      if (m_Highlighted != highlighted)
+      {
+        m_Highlighted = highlighted;
+        this->update();
+      }
+    }
+
+  protected:
+    void paintEvent(QPaintEvent*) override
+    {
+      QPainter painter(this);
+
+      if (m_Highlighted)
+      {
+        painter.setPen(QPen(QColor(255, 255, 255), 4));
+        painter.drawRect(this->rect().adjusted(2, 2, -2, -2));
+      }
+      else
+      {
+        painter.fillRect(this->rect(), QColor(0, 0, 0, 120));
+      }
+    }
+
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+      if (watched == this->parentWidget() && QEvent::Resize == event->type())
+        this->setGeometry(this->parentWidget()->rect());
+
+      return QWidget::eventFilter(watched, event);
+    }
+
+  private:
+    bool m_Highlighted = false;
+  };
+}
+
+QmitkScreenshotMaker::QmitkScreenshotMaker(QObject * /*parent*/, const char * /*name*/)
+{
 }
 
 QmitkScreenshotMaker::~QmitkScreenshotMaker()
 {
+  // Minimal cleanup without touching the (possibly torn-down) UI widgets.
+  if (m_PickArmed)
+  {
+    for (const auto& window : m_FilteredWindows)
+    {
+      if (window)
+        window->removeEventFilter(this);
+    }
+    for (const auto& overlay : m_PickOverlays)
+    {
+      if (overlay)
+        delete overlay;
+    }
+    QApplication::restoreOverrideCursor();
+  }
 }
 
 void QmitkScreenshotMaker::CreateConnections()
 {
   if (m_Controls)
   {
-    connect((QObject*) m_Controls->m_AllViews, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateMultiplanar3DHighresScreenshot()));
-    connect((QObject*) m_Controls->m_Shot, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateMultiplanarScreenshots()));
-    connect((QObject*) m_Controls->m_BackgroundColor, SIGNAL(clicked()), (QObject*) this, SLOT(SelectBackgroundColor()));
-    connect((QObject*) m_Controls->btnScreenshot, SIGNAL(clicked()), this, SLOT(GenerateScreenshot()));
-    connect((QObject*) m_Controls->m_HRScreenshot, SIGNAL(clicked()), this, SLOT(Generate3DHighresScreenshot()));
+    // clicked() (not toggled()) so programmatic setChecked() during auto-disarm does not recurse.
+    connect(m_Controls->btnScreenshotWindow, &QPushButton::clicked, this, &QmitkScreenshotMaker::OnScreenshotWindow);
+    connect(m_Controls->btnScreenshotAll, &QPushButton::clicked, this, &QmitkScreenshotMaker::OnScreenshotAll);
 
-    QString styleSheet = "background-color:rgb(0,0,0)";
-    m_Controls->m_BackgroundColor->setStyleSheet(styleSheet);
+    connect(m_Controls->btnBgWhite, &QAbstractButton::clicked, this,
+            [this] { this->ApplyBackgroundSelection(Qt::white, false, m_Controls->btnBgWhite); });
+    connect(m_Controls->btnBgBlack, &QAbstractButton::clicked, this,
+            [this] { this->ApplyBackgroundSelection(Qt::black, false, m_Controls->btnBgBlack); });
+    connect(m_Controls->btnBgTransparent, &QAbstractButton::clicked, this,
+            [this] { this->ApplyBackgroundSelection(QColor(), true, m_Controls->btnBgTransparent); });
+    connect(m_Controls->btnBgCustom, &QAbstractButton::clicked, this, &QmitkScreenshotMaker::OnSelectCustomBackground);
   }
 }
 
-mitk::DataNode::Pointer QmitkScreenshotMaker::GetTopLayerNode()
+void QmitkScreenshotMaker::SetupBackgroundButtons()
 {
-  mitk::DataNode::Pointer out = nullptr;
+  const QSize iconSize(20, 20);
+  for (auto* button : {m_Controls->btnBgWhite, m_Controls->btnBgBlack, m_Controls->btnBgTransparent, m_Controls->btnBgCustom})
+    button->setIconSize(iconSize);
 
-  int layer = -1;
-  auto nodes = GetDataStorage()->GetAll();
-  for (auto node = nodes->begin(); node!=nodes->end(); ++node)
-  {
-    if (!(*node)->IsVisible(nullptr))
-      continue;
-    int current_layer;
-    (*node)->GetIntProperty("layer", current_layer);
-    if (current_layer>layer)
-    {
-      out = (*node);
-      layer = current_layer;
-    }
-  }
+  m_Controls->btnBgWhite->setIcon(CreateColorSwatch(Qt::white));
+  m_Controls->btnBgBlack->setIcon(CreateColorSwatch(Qt::black));
+  m_Controls->btnBgTransparent->setIcon(CreateTransparentSwatch());
+  m_Controls->btnBgCustom->setIcon(CreateColorSwatch(m_CustomColor));
 
-  return out;
+  m_BackgroundButtonGroup = new QButtonGroup(this);
+  m_BackgroundButtonGroup->setExclusive(true);
+  m_BackgroundButtonGroup->addButton(m_Controls->btnBgWhite);
+  m_BackgroundButtonGroup->addButton(m_Controls->btnBgBlack);
+  m_BackgroundButtonGroup->addButton(m_Controls->btnBgTransparent);
+  m_BackgroundButtonGroup->addButton(m_Controls->btnBgCustom);
+
+  m_Controls->btnBgBlack->setChecked(true);
+  this->ApplyBackgroundSelection(Qt::black, false, m_Controls->btnBgBlack);
 }
 
-void QmitkScreenshotMaker::MultichannelScreenshot(mitk::VtkPropRenderer* renderer, QString fileName, QString filter)
+void QmitkScreenshotMaker::ApplyBackgroundSelection(const QColor& color, bool transparent, QAbstractButton* button)
 {
-  auto node = GetTopLayerNode();
-  if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
-  {
-    auto image = dynamic_cast<mitk::Image*>(node->GetData());
-
-    std::string fname = itksys::SystemTools::GetFilenamePath(fileName.toStdString()) + "/" + itksys::SystemTools::GetFilenameWithoutExtension(fileName.toStdString());
-    std::string ext = itksys::SystemTools::GetFilenameExtension(fileName.toStdString());
-
-    mitk::PixelType chPixelType = image->GetImageDescriptor()->GetChannelTypeById(0);
-    if (image->GetDimension() == 4)
-    {
-      MITK_INFO << "LOOPING THROUGH FOURTH DIMENSION IS NOT IMPLEMENTED";
-    }
-    else if (chPixelType.GetNumberOfComponents()>1)
-    {
-      for(int unsigned c=0; c<chPixelType.GetNumberOfComponents(); ++c)
-      {
-        node->SetProperty("Image.Displayed Component", mitk::IntProperty::New(c));
-        this->TakeScreenshot(renderer->GetVtkRenderer(), 1, QString(fname.c_str()) + "_" + QString::number(c) + QString(ext.c_str()), filter);
-      }
-    }
-    else
-      this->TakeScreenshot(renderer->GetVtkRenderer(), 1, fileName, filter);
-  }
-  else
-    this->TakeScreenshot(renderer->GetVtkRenderer(), 1, fileName, filter);
+  m_BackgroundColor = color;
+  m_TransparentBackground = transparent;
+  m_CurrentBackgroundButton = button;
 }
 
-void QmitkScreenshotMaker::GenerateScreenshot()
+void QmitkScreenshotMaker::OnSelectCustomBackground()
 {
-  if (m_LastFile.size()==0)
-    m_LastFile = QDir::currentPath()+"/screenshot.png";
+  const QColor color = QColorDialog::getColor(m_CustomColor, m_Parent, "Select screenshot background color");
 
-  QString filter;
-  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, m_PNGExtension + ";;" + m_JPGExtension, &filter);
-
-  if (fileName.size()>0)
-    m_LastFile = fileName;
-
-  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
-
-  auto* renderer = renderWindowPart->GetQmitkRenderWindow(m_Controls->m_DirectionBox->currentText())->GetRenderer();
-  if (renderer == nullptr)
-    return;
-
-  if (m_Controls->m_AllChannelsBox->isChecked())
-    MultichannelScreenshot(renderer, fileName, filter);
-  else
-    this->TakeScreenshot(renderer->GetVtkRenderer(), 1, fileName, filter);
-}
-
-void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
-{
-  if (m_LastPath.size()==0)
-    m_LastPath = QDir::currentPath();
-  QString filePath = QFileDialog::getExistingDirectory(nullptr, "Save screenshots to...", m_LastPath);
-  if (filePath.size()>0)
-    m_LastPath = filePath;
-
-  if( filePath.isEmpty() )
+  if (color.isValid())
   {
-    return;
+    m_CustomColor = color;
+    m_Controls->btnBgCustom->setIcon(CreateColorSwatch(color));
+    this->ApplyBackgroundSelection(color, false, m_Controls->btnBgCustom);
   }
-
-  //emit StartBlockControls();
-  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
-  renderWindowPart->EnableDecorations(false, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
-
-  auto windowCount = m_Controls->m_DirectionBox->count();
-  for (int i = 0; i < windowCount; ++i)
+  else if (nullptr != m_CurrentBackgroundButton)
   {
-    auto windowName = m_Controls->m_DirectionBox->itemText(i);
-    QString fileName = QDir::separator() + windowName + QString::fromStdString(".png");
-    int c = 1;
-    while (QFile::exists(filePath + fileName))
-    {
-      fileName = QDir::separator() + windowName + QString::fromStdString("_");
-      fileName += QString::number(c);
-      fileName += ".png";
-      c++;
-    }
-    vtkRenderer* renderer = renderWindowPart->GetQmitkRenderWindow(windowName)->GetRenderer()->GetVtkRenderer();
-    if (renderer != nullptr)
-    {
-      if (m_Controls->m_AllChannelsBox->isChecked())
-        MultichannelScreenshot(renderWindowPart->GetQmitkRenderWindow(windowName)->GetRenderer(), filePath + fileName, m_PNGExtension);
-      else
-        this->TakeScreenshot(renderer, 1, filePath + fileName);
-    }
+    // Dialog cancelled: restore the previously selected background button.
+    m_CurrentBackgroundButton->setChecked(true);
   }
-
-  /// TODO I do not find a simple way of doing this through the render window part API,
-  /// however, I am also not convinced that this code is needed at all. The colour
-  /// of the crosshair planes is never set to any colour other than these.
-  /// I suggest a new 'mitk::DataNode* mitk::ILinkedRendererPart::GetSlicingPlane(const std::string& name) const'
-  /// function to introduce that could return the individual ("axial", "sagittal" or
-  /// "coronal" crosshair planes.
-
-  //    mitk::DataNode* n = renderWindowPart->GetSlicingPlane("axial");
-  //    if (n)
-  //    {
-  //        n->SetProperty( "color", mitk::ColorProperty::New( 1,0,0 ) );
-  //    }
-  //
-  //    n = renderWindowPart->GetSlicingPlane("sagittal");
-  //    if (n)
-  //    {
-  //        n->SetProperty( "color", mitk::ColorProperty::New( 0,1,0 ) );
-  //    }
-  //
-  //    n = renderWindowPart->GetSlicingPlane("coronal");
-  //    if (n)
-  //    {
-  //        n->SetProperty( "color", mitk::ColorProperty::New( 0,0,1 ) );
-  //    }
-
-  renderWindowPart->EnableDecorations(true, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
-}
-
-void QmitkScreenshotMaker::Generate3DHighresScreenshot()
-{
-  if (m_LastFile.size()==0)
-    m_LastFile = QDir::currentPath()+"/3D_screenshot.png";
-
-  QString filter;
-  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, m_PNGExtension + ";;" + m_JPGExtension, &filter);
-
-  if (fileName.size()>0)
-    m_LastFile = fileName;
-  GenerateHR3DAtlasScreenshots(fileName, filter);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
-{
-  if (m_LastPath.size()==0)
-    m_LastPath = QDir::currentPath();
-  QString filePath = QFileDialog::getExistingDirectory( nullptr, "Save screenshots to...", m_LastPath);
-  if (filePath.size()>0)
-    m_LastPath = filePath;
-
-  if( filePath.isEmpty() )
-  {
-    return;
-  }
-
-  QString fileName = "/3D_View1.png";
-  int c = 1;
-  while (QFile::exists(filePath+fileName))
-  {
-    fileName = QString("/3D_View1_");
-    fileName += QString::number(c);
-    fileName += ".png";
-    c++;
-  }
-  GetCam()->Azimuth( -7.5 );
-  GetCam()->Roll(-4);
-  GenerateHR3DAtlasScreenshots(filePath+fileName);
-  GetCam()->Roll(4);
-
-  fileName = "/3D_View2.png";
-  c = 1;
-  while (QFile::exists(filePath+fileName))
-  {
-    fileName = QString("/3D_View2_");
-    fileName += QString::number(c);
-    fileName += ".png";
-    c++;
-  }
-  GetCam()->Azimuth( 90 );
-  GetCam()->Elevation( 4 );
-  GenerateHR3DAtlasScreenshots(filePath+fileName);
-
-  fileName = "/3D_View3.png";
-  c = 1;
-  while (QFile::exists(filePath+fileName))
-  {
-    fileName = QString("/3D_View3_");
-    fileName += QString::number(c);
-    fileName += ".png";
-    c++;
-  }
-  GetCam()->Elevation( 90 );
-  GetCam()->Roll( -2.5 );
-  GenerateHR3DAtlasScreenshots(filePath+fileName);
-
-  GetCam()->Roll( 2.5 );
-  // not negative because direction of elevation has flipped
-  GetCam()->Elevation( 94 );
-  GetCam()->Azimuth( -82.5 );
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QString filter)
-{
-  // only works correctly for 3D RenderWindow
-  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
-  auto* renderer = renderWindowPart->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
-
-  if (nullptr != renderer)
-    this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
-}
-
-vtkCamera* QmitkScreenshotMaker::GetCam()
-{
-  auto* renderer = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
-  vtkCamera* cam = nullptr;
-  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
-  if (propRenderer)
-  {
-    // get vtk renderer
-    vtkRenderer* vtkrenderer = propRenderer->GetVtkRenderer();
-    if (vtkrenderer)
-    {
-      // get vtk camera
-      vtkCamera* vtkcam = vtkrenderer->GetActiveCamera();
-      if (vtkcam)
-      {
-        // vtk smart pointer handling
-        cam = vtkcam;
-        cam->Register( nullptr );
-      }
-    }
-  }
-  return cam;
-}
-
-void QmitkScreenshotMaker::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
-{
-  if(nodes.size())
-    m_SelectedNode = nodes[0];
-}
-
-void QmitkScreenshotMaker::UpdateDirectionBox(mitk::IRenderWindowPart* renderWindowPart)
-{
-  m_Controls->m_DirectionBox->clear();
-
-  auto renderWindows = renderWindowPart->GetQmitkRenderWindows();
-  bool has3DWindow = false;
-  for (auto name : renderWindows.keys())
-  {
-    auto window = renderWindows[name];
-    if (window->GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D)
-    {
-      has3DWindow = true;
-    }
-    else
-    {
-      auto windowName = name;
-      auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget());
-      if (renderWindowWidget)
-      {
-        windowName = QString::fromStdString(renderWindowWidget->GetCornerAnnotationText());
-      }
-      m_Controls->m_DirectionBox->insertItem(m_Controls->m_DirectionBox->count() + 1, windowName);
-    }
-  }
-
-  renderWindows = renderWindowPart->GetQmitkRenderWindows();
-
-  m_Controls->groupBox->setEnabled(has3DWindow);
 }
 
 void QmitkScreenshotMaker::CreateQtPartControl(QWidget *parent)
@@ -370,130 +240,387 @@ void QmitkScreenshotMaker::CreateQtPartControl(QWidget *parent)
   if (!m_Controls)
   {
     m_Parent = parent;
-    m_Controls = new Ui::QmitkScreenshotMakerControls;
+    m_Controls = std::make_unique<Ui::QmitkScreenshotMakerControls>();
     m_Controls->setupUi(parent);
 
-    auto renderWindowPart = this->GetRenderWindowPart();
-    if (renderWindowPart)
-    {
-      this->UpdateDirectionBox(renderWindowPart);
-    }
+    const int buttonHeight = static_cast<int>(m_Controls->btnScreenshotWindow->sizeHint().height() * 1.5);
+    m_Controls->btnScreenshotWindow->setMinimumHeight(buttonHeight);
+    m_Controls->btnScreenshotAll->setMinimumHeight(buttonHeight);
 
-    // Initialize "Selected Window" combo box
-    const mitk::RenderingManager::RenderWindowVector rwv =
-        mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+    // Esc cancels pick mode. A render window does not have keyboard focus while
+    // arming, so an application-context shortcut is used instead of a key event.
+    m_CancelPickShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), m_Parent);
+    m_CancelPickShortcut->setContext(Qt::ApplicationShortcut);
+    m_CancelPickShortcut->setEnabled(false);
+    connect(m_CancelPickShortcut, &QShortcut::activated, this, &QmitkScreenshotMaker::DisarmPickMode);
 
+    this->SetupBackgroundButtons();
+    this->CreateConnections();
   }
 
-  this->CreateConnections();
-
+  m_Parent->setEnabled(nullptr != this->GetRenderWindowPart());
 }
 
 void QmitkScreenshotMaker::SetFocus()
 {
-  m_Controls->btnScreenshot->setFocus();
+  m_Controls->btnScreenshotWindow->setFocus();
 }
 
-void QmitkScreenshotMaker::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkScreenshotMaker::OnScreenshotWindow()
+{
+  if (m_PickArmed)
+    this->DisarmPickMode();
+  else
+    this->ArmPickMode();
+}
+
+void QmitkScreenshotMaker::ArmPickMode()
+{
+  if (auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN))
+  {
+    const auto renderWindows = renderWindowPart->GetQmitkRenderWindows();
+    for (auto* window : renderWindows)
+    {
+      if (nullptr != window)
+      {
+        window->installEventFilter(this);
+        m_FilteredWindows.append(QPointer<QmitkRenderWindow>(window));
+
+        auto* overlay = new ScreenshotPickOverlay(window);
+        overlay->show();
+        overlay->raise();
+        m_PickOverlays.append(overlay);
+      }
+    }
+  }
+
+  if (m_FilteredWindows.isEmpty())
+  {
+    m_Controls->btnScreenshotWindow->setChecked(false);
+    return;
+  }
+
+  m_PickArmed = true;
+  m_Controls->btnScreenshotWindow->setChecked(true);
+  m_Controls->labelPickHint->setVisible(true);
+  m_CancelPickShortcut->setEnabled(true);
+  QApplication::setOverrideCursor(Qt::CrossCursor);
+  mitk::StatusBar::GetInstance()->DisplayText("Click a display window to take a screenshot of it (Esc to cancel).");
+}
+
+void QmitkScreenshotMaker::DisarmPickMode()
+{
+  if (!m_PickArmed)
+    return;
+
+  for (const auto& window : m_FilteredWindows)
+  {
+    if (window)
+      window->removeEventFilter(this);
+  }
+  m_FilteredWindows.clear();
+
+  for (const auto& overlay : m_PickOverlays)
+  {
+    if (overlay)
+      overlay->deleteLater();
+  }
+  m_PickOverlays.clear();
+
+  m_PickArmed = false;
+  m_Controls->btnScreenshotWindow->setChecked(false);
+  m_Controls->labelPickHint->setVisible(false);
+  m_CancelPickShortcut->setEnabled(false);
+  QApplication::restoreOverrideCursor();
+  mitk::StatusBar::GetInstance()->Clear();
+}
+
+bool QmitkScreenshotMaker::eventFilter(QObject* watched, QEvent* event)
+{
+  if (m_PickArmed)
+  {
+    if (QEvent::Enter == event->type() || QEvent::Leave == event->type())
+    {
+      // Highlight the hovered window (Enter) and dim the rest; on Leave, dim all.
+      auto* hoveredWindow = (QEvent::Enter == event->type()) ? qobject_cast<QmitkRenderWindow*>(watched) : nullptr;
+      for (const auto& overlay : m_PickOverlays)
+      {
+        if (overlay)
+          static_cast<ScreenshotPickOverlay*>(overlay.data())->SetHighlighted(overlay->parentWidget() == hoveredWindow);
+      }
+    }
+    else if (QEvent::MouseButtonPress == event->type())
+    {
+      if (Qt::LeftButton == static_cast<QMouseEvent*>(event)->button())
+      {
+        auto* window = qobject_cast<QmitkRenderWindow*>(watched);
+        this->DisarmPickMode();
+
+        if (nullptr != window)
+        {
+          // Defer so the current event unwinds before the modal save dialog and re-render.
+          QPointer<QmitkRenderWindow> windowPointer(window);
+          QTimer::singleShot(0, this, [this, windowPointer]()
+          {
+            if (windowPointer)
+              this->CaptureSingleWindow(windowPointer);
+          });
+        }
+      }
+      else
+      {
+        this->DisarmPickMode();
+      }
+
+      return true; // consume the press so the crosshair does not move
+    }
+    else if (QEvent::KeyPress == event->type() && Qt::Key_Escape == static_cast<QKeyEvent*>(event)->key())
+    {
+      this->DisarmPickMode();
+      return true;
+    }
+  }
+
+  return QmitkAbstractView::eventFilter(watched, event);
+}
+
+void QmitkScreenshotMaker::CaptureSingleWindow(QmitkRenderWindow* window)
+{
+  if (nullptr == window)
+    return;
+
+  const QString directory = m_LastFile.isEmpty()
+    ? QDir::currentPath()
+    : QFileInfo(m_LastFile).absolutePath();
+
+  QString filter;
+  const QString fileName = QFileDialog::getSaveFileName(
+    nullptr, "Save screenshot to...", NextAvailableScreenshotName(directory, "screenshot"), m_PNGExtension + ";;" + m_JPGExtension, &filter);
+
+  if (fileName.isEmpty())
+    return;
+
+  m_LastFile = fileName;
+  this->TakeScreenshot(window, static_cast<unsigned int>(m_Controls->m_MagFactor->value()), fileName, filter);
+}
+
+void QmitkScreenshotMaker::OnScreenshotAll()
+{
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  if (nullptr == renderWindowPart)
+    return;
+
+  if (m_LastPath.isEmpty())
+    m_LastPath = QDir::currentPath();
+
+  const QString directory = QFileDialog::getExistingDirectory(nullptr, "Save screenshots to...", m_LastPath);
+  if (directory.isEmpty())
+    return;
+
+  m_LastPath = directory;
+
+  const auto renderWindows = renderWindowPart->GetQmitkRenderWindows();
+  const auto scale = static_cast<unsigned int>(m_Controls->m_MagFactor->value());
+
+  for (auto it = renderWindows.constBegin(); it != renderWindows.constEnd(); ++it)
+  {
+    auto* window = it.value();
+    if (nullptr == window)
+      continue;
+
+    QString baseName = it.key();
+    if (auto* renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget()))
+    {
+      const auto cornerAnnotation = renderWindowWidget->GetCornerAnnotationText();
+      if (!cornerAnnotation.empty())
+        baseName = QString::fromStdString(cornerAnnotation);
+    }
+    baseName.replace(QRegularExpression("[^\\w.-]"), "_");
+
+    this->TakeScreenshot(window, scale, NextAvailableScreenshotName(directory, baseName), m_PNGExtension);
+  }
+}
+
+void QmitkScreenshotMaker::TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter)
+{
+  if (nullptr == window || scale < 1 || fileName.isEmpty())
+    return;
+
+  auto* baseRenderer = window->GetRenderer();
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  if (nullptr == baseRenderer || nullptr == renderWindowPart)
+    return;
+
+  auto* renderer = baseRenderer->GetVtkRenderer();
+  auto* renderWindow = baseRenderer->GetRenderWindow();
+  if (nullptr == renderer || nullptr == renderWindow)
+    return;
+
+  // Resolve the output file name and format. Transparency requires PNG (alpha).
+  QString outputFileName = fileName;
+  QString suffix = QFileInfo(outputFileName).suffix().toLower();
+
+  bool useJpeg = false;
+  if (!m_TransparentBackground)
+  {
+    if ("jpg" == suffix || "jpeg" == suffix)
+      useJpeg = true;
+    else if ("png" != suffix && filter == m_JPGExtension)
+      useJpeg = true;
+  }
+
+  if ("png" != suffix && "jpg" != suffix && "jpeg" != suffix)
+  {
+    suffix = useJpeg ? "jpg" : "png";
+    outputFileName += "." + suffix;
+  }
+  else if (m_TransparentBackground && "png" != suffix)
+  {
+    outputFileName.chop(suffix.length());
+    outputFileName += "png";
+  }
+
+  // vtkRenderLargeImage magnifies one renderer by tiling its camera. Content that
+  // is view-independent (gradient background) or lives in a separate overlay
+  // (logo, corner annotation) would be repeated in every tile, so disable those
+  // decorations during capture and restore their prior state afterwards.
+  const QStringList decorations{
+    mitk::IRenderWindowPart::DECORATION_LOGO,
+    mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION,
+    mitk::IRenderWindowPart::DECORATION_BORDER,
+    mitk::IRenderWindowPart::DECORATION_MENU,
+    mitk::IRenderWindowPart::DECORATION_BACKGROUND};
+
+  QStringList decorationsToRestore;
+  for (const auto& decoration : decorations)
+  {
+    if (renderWindowPart->IsDecorationEnabled(decoration))
+      decorationsToRestore << decoration;
+  }
+  renderWindowPart->EnableDecorations(false, decorations);
+
+  const bool doubleBuffering = renderWindow->GetDoubleBuffer();
+  renderWindow->DoubleBufferOff();
+
+  double oldBackground[3];
+  renderer->GetBackground(oldBackground);
+
+  if (m_TransparentBackground)
+  {
+    this->WriteTransparentScreenshot(renderer, scale, outputFileName);
+  }
+  else
+  {
+    renderer->SetBackground(m_BackgroundColor.redF(), m_BackgroundColor.greenF(), m_BackgroundColor.blueF());
+
+    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
+    magnifier->SetInput(renderer);
+    magnifier->SetMagnification(static_cast<int>(scale));
+
+    vtkSmartPointer<vtkImageWriter> fileWriter;
+    if (useJpeg)
+    {
+      auto jpegWriter = vtkSmartPointer<vtkJPEGWriter>::New();
+      jpegWriter->SetQuality(100);
+      jpegWriter->ProgressiveOff();
+      fileWriter = jpegWriter;
+    }
+    else
+    {
+      fileWriter = vtkSmartPointer<vtkPNGWriter>::New();
+    }
+
+    fileWriter->SetInputConnection(magnifier->GetOutputPort());
+    fileWriter->SetFileName(outputFileName.toLocal8Bit().constData());
+    fileWriter->Write();
+  }
+
+  renderer->SetBackground(oldBackground);
+  renderWindow->SetDoubleBuffer(doubleBuffering);
+  if (!decorationsToRestore.isEmpty())
+    renderWindowPart->EnableDecorations(true, decorationsToRestore);
+
+  // Re-render so MITK restores the (2D) camera and the decorations reappear.
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkScreenshotMaker::WriteTransparentScreenshot(vtkRenderer* renderer, unsigned int scale, const QString& fileName)
+{
+  auto capture = [renderer, scale](double r, double g, double b)
+  {
+    renderer->SetBackground(r, g, b);
+    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
+    magnifier->SetInput(renderer);
+    magnifier->SetMagnification(static_cast<int>(scale));
+    magnifier->Update();
+
+    auto image = vtkSmartPointer<vtkImageData>::New();
+    image->DeepCopy(magnifier->GetOutput());
+    return image;
+  };
+
+  auto imageOverBlack = capture(0.0, 0.0, 0.0);
+  auto imageOverWhite = capture(1.0, 1.0, 1.0);
+
+  int dimensions[3];
+  imageOverBlack->GetDimensions(dimensions);
+
+  auto rgbaImage = vtkSmartPointer<vtkImageData>::New();
+  rgbaImage->SetDimensions(dimensions);
+  rgbaImage->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
+
+  auto* blackPixels = static_cast<unsigned char*>(imageOverBlack->GetScalarPointer());
+  auto* whitePixels = static_cast<unsigned char*>(imageOverWhite->GetScalarPointer());
+  auto* rgbaPixels = static_cast<unsigned char*>(rgbaImage->GetScalarPointer());
+  if (nullptr == blackPixels || nullptr == whitePixels || nullptr == rgbaPixels)
+    return;
+
+  const vtkIdType pixelCount = static_cast<vtkIdType>(dimensions[0]) * dimensions[1] * dimensions[2];
+  for (vtkIdType i = 0; i < pixelCount; ++i)
+  {
+    const unsigned char* overBlack = blackPixels + 3 * i;
+    const unsigned char* overWhite = whitePixels + 3 * i;
+
+    // A pixel with opacity a over black is a*C; over white it is a*C + (1-a)*255.
+    // The difference averaged over the channels yields (1-a)*255.
+    const int backgroundContribution =
+      ((overWhite[0] - overBlack[0]) + (overWhite[1] - overBlack[1]) + (overWhite[2] - overBlack[2])) / 3;
+    const int alpha = std::clamp(255 - backgroundContribution, 0, 255);
+
+    unsigned char* out = rgbaPixels + 4 * i;
+    if (0 == alpha)
+    {
+      out[0] = out[1] = out[2] = out[3] = 0;
+    }
+    else
+    {
+      // Un-premultiply the color captured over the black background.
+      out[0] = static_cast<unsigned char>(std::min(255, overBlack[0] * 255 / alpha));
+      out[1] = static_cast<unsigned char>(std::min(255, overBlack[1] * 255 / alpha));
+      out[2] = static_cast<unsigned char>(std::min(255, overBlack[2] * 255 / alpha));
+      out[3] = static_cast<unsigned char>(alpha);
+    }
+  }
+
+  auto writer = vtkSmartPointer<vtkPNGWriter>::New();
+  writer->SetInputData(rgbaImage);
+  writer->SetFileName(fileName.toLocal8Bit().constData());
+  writer->Write();
+}
+
+void QmitkScreenshotMaker::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   m_Parent->setEnabled(true);
-  this->UpdateDirectionBox(renderWindowPart);
 }
 
-void QmitkScreenshotMaker::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkScreenshotMaker::RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-  this->UpdateDirectionBox(renderWindowPart);
+  // The set of render windows may have changed (e.g. an MxN relayout); cancel a pending pick.
+  this->DisarmPickMode();
 }
 
 void QmitkScreenshotMaker::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
+  this->DisarmPickMode();
   m_Parent->setEnabled(false);
-  m_Controls->m_DirectionBox->clear();
-}
-
-void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter)
-{
-  if ((renderer == nullptr) ||(magnificationFactor < 1) || fileName.isEmpty())
-    return;
-
-  bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );
-  renderer->GetRenderWindow()->DoubleBufferOff();
-
-  vtkImageWriter* fileWriter = nullptr;
-
-  QFileInfo fi(fileName);
-  QString suffix = fi.suffix().toLower();
-
-  if (suffix.isEmpty() || (suffix != "png" && suffix != "jpg" && suffix != "jpeg"))
-  {
-    if (filter == m_PNGExtension)
-    {
-      suffix = "png";
-    }
-    else if (filter == m_JPGExtension)
-    {
-      suffix = "jpg";
-    }
-    fileName += "." + suffix;
-  }
-
-  if (suffix.compare("jpg", Qt::CaseInsensitive) == 0 || suffix.compare("jpeg", Qt::CaseInsensitive) == 0)
-  {
-    vtkJPEGWriter* w = vtkJPEGWriter::New();
-    w->SetQuality(100);
-    w->ProgressiveOff();
-    fileWriter = w;
-  }
-  else //default is png
-  {
-    fileWriter = vtkPNGWriter::New();
-  }
-
-  vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
-  magnifier->SetInput(renderer);
-  magnifier->SetMagnification(magnificationFactor);
-  //magnifier->Update();
-  fileWriter->SetInputConnection(magnifier->GetOutputPort());
-  fileWriter->SetFileName(fileName.toLatin1());
-
-  // vtkRenderLargeImage has problems with different layers, therefore we have to
-  // temporarily deactivate all other layers.
-  // we set the background to white, because it is nicer than black...
-  double oldBackground[3];
-  renderer->GetBackground(oldBackground);
-
-
-  //  QColor color = QColorDialog::getColor();
-  double bgcolor[] = {m_BackgroundColor.red()/255.0, m_BackgroundColor.green()/255.0, m_BackgroundColor.blue()/255.0};
-  renderer->SetBackground(bgcolor);
-
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
-
-  renderWindowPart->EnableDecorations(false);
-
-  fileWriter->Write();
-  fileWriter->Delete();
-
-  renderWindowPart->EnableDecorations(true);
-
-  renderer->SetBackground(oldBackground);
-
-  renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
-}
-
-void QmitkScreenshotMaker::SelectBackgroundColor()
-{
-  m_BackgroundColor = QColorDialog::getColor();
-
-  m_Controls->m_BackgroundColor->setAutoFillBackground(true);
-
-
-  QString styleSheet = "background-color:rgb(";
-  styleSheet.append(QString::number(m_BackgroundColor.red()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(m_BackgroundColor.green()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(m_BackgroundColor.blue()));
-  styleSheet.append(")");
-  m_Controls->m_BackgroundColor->setStyleSheet(styleSheet);
 }

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageGenerator_h
 #define mitkImageGenerator_h
 
-#include "mitkImageWriteAccessor.h"
+#include <mitkImageWriteAccessor.h>
 #include <MitkCoreExports.h>
 #include <itkImageRegionIterator.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
@@ -22,16 +22,30 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief generator for synthetic MITK images
-   * This is a helper class to  generate synthetic MITK images (random or gradient).
+   * \brief Generator for synthetic MITK images.
    *
-   * @ingroup IO
+   * This is a helper class to generate synthetic MITK images (random or gradient).
+   *
+   * \ingroup IO
+   * \sa Image
    */
   class MITKCORE_EXPORT ImageGenerator
   {
   public:
     /**
-     * \brief Generates gradient image with the defined size and spacing
+     * \brief Generates a 3D gradient image with the defined size and spacing.
+     *
+     * Pixel values are filled sequentially starting from 0 and incrementing by 1
+     * for each voxel.
+     *
+     * \tparam TPixelType The pixel type of the generated image.
+     * \param dimX Image dimension in X direction (number of columns).
+     * \param dimY Image dimension in Y direction (number of rows).
+     * \param dimZ Image dimension in Z direction (number of slices).
+     * \param spacingX Voxel spacing in X direction. Defaults to 1.
+     * \param spacingY Voxel spacing in Y direction. Defaults to 1.
+     * \param spacingZ Voxel spacing in Z direction. Defaults to 1.
+     * \return A newly created MITK image filled with gradient values.
      */
     template <typename TPixelType>
     static mitk::Image::Pointer GenerateGradientImage(unsigned int dimX,
@@ -85,9 +99,14 @@ namespace mitk
     }
 
     /**
-     * \brief Generates an image of a same geometry as the one given as reference
-
-       The image buffer is filled to the fill_value given as parameter
+     * \brief Generates an image with the same geometry as the given reference image.
+     *
+     * The image buffer is filled uniformly with the specified fill value.
+     *
+     * \tparam TPixelType The pixel type of the generated image.
+     * \param reference The reference image whose geometry is used for the new image.
+     * \param fill_value The value to fill every voxel with.
+     * \return A newly created MITK image with the same geometry as the reference.
      */
     template <typename TPixelType>
     static mitk::Image::Pointer GenerateImageFromReference(mitk::Image::Pointer reference, TPixelType fill_value)
@@ -120,9 +139,24 @@ namespace mitk
       return output;
     }
 
-    /*!
-    \brief Generates random image with the defined size and spacing
-    */
+    /**
+     * \brief Generates a random image with the defined size and spacing.
+     *
+     * Creates a 2D, 3D, or 4D image depending on the dimension parameters.
+     * Supported pixel types are int, float, double, unsigned char, and unsigned short.
+     *
+     * \tparam TPixelType The pixel type of the generated image.
+     * \param dimX Image dimension in X direction (number of columns).
+     * \param dimY Image dimension in Y direction (number of rows).
+     * \param dimZ Image dimension in Z direction. If <= 1, a 2D image is created. Defaults to 1.
+     * \param dimT Image dimension in time. If <= 1, no time dimension is added. Defaults to 1.
+     * \param spacingX Voxel spacing in X direction. Defaults to 1.
+     * \param spacingY Voxel spacing in Y direction. Defaults to 1.
+     * \param spacingZ Voxel spacing in Z direction. Defaults to 1.
+     * \param randomMax The upper bound for random values. Defaults to 1000.
+     * \param randMin The lower bound for random values (used for float/double types). Defaults to 0.
+     * \return A newly created MITK image filled with random values.
+     */
     template <typename TPixelType>
     static mitk::Image::Pointer GenerateRandomImage(unsigned int dimX,
                                                     unsigned int dimY,

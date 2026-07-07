@@ -14,9 +14,9 @@ found in the LICENSE file.
 
 #include <Poco/Bugcheck.h>
 
-#include <berryShell.h>
-#include <berryActionBarAdvisor.h>
-#include <berryWorkbenchPreferenceConstants.h>
+#include "berryShell.h"
+#include "berryActionBarAdvisor.h"
+#include "berryWorkbenchPreferenceConstants.h"
 #include <berryObjects.h>
 
 #include "internal/berryWorkbenchWindowConfigurer.h"

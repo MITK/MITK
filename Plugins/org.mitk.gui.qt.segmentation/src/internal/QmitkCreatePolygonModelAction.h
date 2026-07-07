@@ -33,19 +33,17 @@ public:
   // IContextMenuAction
   void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;
   void SetDataStorage(mitk::DataStorage *dataStorage) override;
-  void SetSmoothed(bool smoothed) override;
-  void SetDecimated(bool decimated) override;
   void SetFunctionality(berry::QtViewPart* view) override;
 
-  void OnSurfaceCalculationDone();
+protected:
+  /// Set in derived classes' constructors. The base class produces non-smoothed output.
+  bool m_IsSmoothed = false;
 
 private:
   QmitkCreatePolygonModelAction(const QmitkCreatePolygonModelAction &);
   QmitkCreatePolygonModelAction & operator=(const QmitkCreatePolygonModelAction &);
 
   mitk::DataStorage::Pointer m_DataStorage;
-  bool m_IsSmoothed = false;
-  bool m_IsDecimated = true;
 };
 
 #endif

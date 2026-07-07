@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTimeToPeakCurveDescriptionParameter.h"
+#include <mitkTimeToPeakCurveDescriptionParameter.h>
 
 const std::string mitk::TimeToPeakCurveDescriptionParameter::PARAMETER_PEAK_NAME = "Peak";
 const std::string mitk::TimeToPeakCurveDescriptionParameter::PARAMETER_TIME_NAME = "Time";

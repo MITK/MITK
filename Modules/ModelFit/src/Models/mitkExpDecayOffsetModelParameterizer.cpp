@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExpDecayOffsetModelParameterizer.h"
+#include <mitkExpDecayOffsetModelParameterizer.h>
 
 mitk::ExpDecayOffsetModelParameterizer::ParametersType
 mitk::ExpDecayOffsetModelParameterizer::GetDefaultInitialParameterization() const

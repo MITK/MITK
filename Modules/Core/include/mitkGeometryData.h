@@ -13,16 +13,26 @@ found in the LICENSE file.
 #ifndef mitkGeometryData_h
 #define mitkGeometryData_h
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Data class only having a BaseGeometry but not containing
-  //## any specific data.
-  //##
-  //## Only implements pipeline methods which are abstract in BaseData.
-  //## @ingroup Geometry
+  /**
+   * \brief Data class that holds only a BaseGeometry without any specific data payload.
+   *
+   * GeometryData is a lightweight BaseData subclass that provides concrete
+   * implementations of the pure-virtual pipeline methods defined in
+   * BaseData / itk::DataObject.  It carries spatial geometry information
+   * (via its inherited TimeGeometry / BaseGeometry) but stores no image,
+   * surface, or other domain-specific data.
+   *
+   * Use this class when you need a first-class data object in the MITK
+   * pipeline that represents only geometry (e.g., for storing a
+   * coordinate system or a region of interest).
+   *
+   * \sa BaseData, BaseGeometry
+   * \ingroup Geometry
+   */
   class MITKCORE_EXPORT GeometryData : public BaseData
   {
   public:
@@ -32,16 +42,50 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+      /**
+       * \brief Update the output information.
+       *
+       * Delegates to Superclass::UpdateOutputInformation().
+       */
       void UpdateOutputInformation() override;
 
+    /**
+     * \brief Set the requested region to the largest possible region.
+     *
+     * No-op for GeometryData because there is no data region to manage.
+     */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
+    /**
+     * \brief Check whether the requested region is outside the buffered region.
+     *
+     * \return true if a geometry is set (data is buffered), false otherwise.
+     */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
+    /**
+     * \brief Verify that the requested region is valid.
+     *
+     * \return true if a geometry is set, false otherwise.
+     */
     bool VerifyRequestedRegion() override;
 
+    /**
+     * \brief Set the requested region from another data object.
+     *
+     * No-op for GeometryData.
+     *
+     * \param[in] data The data object to copy the requested region from.
+     */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
+    /**
+     * \brief Copy information from another data object.
+     *
+     * No-op for GeometryData.
+     *
+     * \param[in] data The data object to copy information from.
+     */
     void CopyInformation(const itk::DataObject *data) override;
 
   protected:

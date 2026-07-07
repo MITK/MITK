@@ -13,31 +13,46 @@ found in the LICENSE file.
 #ifndef mitkDICOMImageBlockDescriptor_h
 #define mitkDICOMImageBlockDescriptor_h
 
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMImageFrameInfo.h"
-#include "mitkDICOMTag.h"
-#include "mitkDICOMTagCache.h"
-#include "mitkIOVolumeSplitReason.h"
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMImageFrameInfo.h>
+#include <mitkDICOMTag.h>
+#include <mitkDICOMTagCache.h>
+#include <mitkIOVolumeSplitReason.h>
 
-#include "mitkImage.h"
-#include "mitkProperties.h"
-#include "mitkWeakPointer.h"
-#include "mitkIPropertyProvider.h"
+#include <mitkImage.h>
+#include <mitkProperties.h>
+#include <mitkWeakPointer.h>
+#include <mitkIPropertyProvider.h>
 
-#include "mitkGantryTiltInformation.h"
+#include <mitkGantryTiltInformation.h>
 
 #include <unordered_map>
 
 namespace mitk
 {
 
+  /**
+   * \ingroup DICOMModule
+   * \brief Stores cached DICOM tag value information for a specific slice.
+   *
+   * Each entry associates a tag value with its time point and slice index within
+   * that time point, enabling lookup of per-slice tag values in the image block.
+   *
+   * \sa DICOMCachedValueLookupTable
+   */
   struct DICOMCachedValueInfo
   {
-    unsigned int TimePoint;
-    unsigned int SliceInTimePoint;
-    std::string Value;
+    unsigned int TimePoint;       ///< The time point index this value belongs to.
+    unsigned int SliceInTimePoint; ///< The slice index within the time point.
+    std::string Value;            ///< The cached tag value as a string.
   };
 
+  /**
+   * \ingroup DICOMModule
+   * \brief Lookup table mapping slice indices to cached DICOM tag value information.
+   *
+   * \sa DICOMCachedValueInfo, DICOMImageBlockDescriptor
+   */
   class DICOMCachedValueLookupTable : public GenericLookupTable< DICOMCachedValueInfo >
   {
   public:
@@ -85,6 +100,10 @@ namespace mitk
     DICOMImageBlockDescriptor(const DICOMImageBlockDescriptor& other);
     DICOMImageBlockDescriptor& operator=(const DICOMImageBlockDescriptor& other);
 
+    /**
+     * \brief Return the list of DICOM tags that the descriptor internally uses.
+     * \return A list of DICOMTag instances needed for image description.
+     */
     static DICOMTagList GetTagsOfInterest();
 
     /// List of frames that constitute the mitk::Image (DICOMImageFrame%s)
@@ -165,11 +184,22 @@ namespace mitk
     /// SOP Class as human readable name (e.g. "CT Image Storage")
     std::string GetSOPClassUIDAsName() const;
 
-    /**Convenience method that returns the property timesteps*/
+    /**
+     * \brief Convenience method that returns the number of time steps.
+     * \return The number of time steps, or 1 if not a 3D+t image.
+     */
     int GetNumberOfTimeSteps() const;
-    /**return the number of frames that constitute one timestep.*/
+
+    /**
+     * \brief Return the number of frames that constitute one time step.
+     * \return The number of frames per time step.
+     */
     int GetNumberOfFramesPerTimeStep() const;
 
+    /**
+     * \brief Set the tag cache used for reading tag values during image description.
+     * \param[in] privateCache Pointer to the DICOMTagCache to use.
+     */
     void SetTagCache(DICOMTagCache* privateCache);
 
     /** Type specifies additional tags of interest. Key is the tag path of interest.

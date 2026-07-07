@@ -12,18 +12,19 @@ found in the LICENSE file.
 
 #include "QmitkPreferencesDialog.h"
 
-#include "berryPlatform.h"
-#include "berryPlatformUI.h"
-#include "berryIWorkbench.h"
-#include "berryIConfigurationElement.h"
-#include "berryIExtensionRegistry.h"
-#include "berryIExtension.h"
+#include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryIWorkbench.h>
+#include <berryIConfigurationElement.h>
+#include <berryIExtensionRegistry.h>
+#include <berryIExtension.h>
 #include <berryIQtPreferencePage.h>
 
 #include "internal/org_mitk_gui_qt_application_Activator.h"
 
 #include <ui_QmitkPreferencesDialog.h>
 
+#include <QByteArray>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
@@ -36,6 +37,17 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 
 using namespace std;
+
+namespace
+{
+  const std::string GEOMETRY_KEY = "QmitkPreferencesDialog geometry";
+  const std::string LAST_PAGE_KEY = "QmitkPreferencesDialog last page";
+
+  mitk::IPreferences* GetDialogPreferences()
+  {
+    return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.application");
+  }
+}
 
 static std::vector<std::string> splitString(const std::string &s, char delim=' ')
 {
@@ -154,6 +166,8 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   QObject::connect(this, SIGNAL(rejected()), this, SLOT(OnDialogRejected()));
 
   this->UpdateTree();
+
+  this->RestoreDialogState();
 }
 
 QmitkPreferencesDialog::~QmitkPreferencesDialog()
@@ -193,8 +207,37 @@ void QmitkPreferencesDialog::SavePreferences()
   mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Flush();
 }
 
+void QmitkPreferencesDialog::RestoreDialogState()
+{
+  auto* prefs = GetDialogPreferences();
+
+  const auto geometry = prefs->GetByteArray(GEOMETRY_KEY, nullptr, 0);
+  if (!geometry.empty())
+    this->restoreGeometry(QByteArray(reinterpret_cast<const char*>(geometry.data()), geometry.size()));
+
+  // Reopen on the page from the previous session. SetSelectedPage() does nothing
+  // if that page no longer exists, so the default selection remains as fallback.
+  const auto lastPage = prefs->Get(LAST_PAGE_KEY, "");
+  if (!lastPage.empty())
+    this->SetSelectedPage(QString::fromStdString(lastPage));
+}
+
+void QmitkPreferencesDialog::SaveDialogState()
+{
+  auto* prefs = GetDialogPreferences();
+
+  const QByteArray geometry = this->saveGeometry();
+  prefs->PutByteArray(GEOMETRY_KEY, reinterpret_cast<const std::byte*>(geometry.data()), geometry.size());
+
+  if (d->m_CurrentPage >= 0 && d->m_CurrentPage < d->m_PrefPages.size())
+    prefs->Put(LAST_PAGE_KEY, d->m_PrefPages[d->m_CurrentPage].id.toStdString());
+
+  prefs->Flush();
+}
+
 void QmitkPreferencesDialog::OnDialogAccepted()
 {
+  this->SaveDialogState();
   this->SavePreferences();
 }
 
@@ -203,6 +246,8 @@ void QmitkPreferencesDialog::OnDialogRejected()
   berry::IQtPreferencePage* prefPage = d->m_PrefPages[d->m_CurrentPage].prefPage;
   if(prefPage)
     prefPage->PerformCancel();
+
+  this->SaveDialogState();
 }
 
 void QmitkPreferencesDialog::OnKeywordTextChanged(const QString &  /*s*/)

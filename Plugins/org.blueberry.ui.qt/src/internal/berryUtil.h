@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYUTIL_H_
 #define BERRYUTIL_H_
 
-#include "berryObject.h"
-#include "berryIAdaptable.h"
+#include <berryObject.h>
+#include <berryIAdaptable.h>
 
 namespace berry {
 

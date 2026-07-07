@@ -39,18 +39,31 @@ namespace mitk
     };
 
   /**
-  * \brief Base class from with interactors that handle DataNodes are to be derived.
-  *
-  * Base class from with interactors that handle DataNodes are to be derived.
-  * Provides an interface that is relevant for the interactor to work together with the dispatcher.
-  * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
-  */
+   * \brief Base class for interactors that operate on DataNodes.
+   *
+   * DataInteractor provides the interface required for an interactor to work
+   * together with the Dispatcher. Each DataInteractor is associated with exactly
+   * one DataNode and processes events according to its loaded state machine pattern.
+   *
+   * To implement a new interactor, subclass DataInteractor and override
+   * ConnectActionsAndFunctions() to bind state machine action names to member functions.
+   *
+   * The processing priority is determined by the "layer" property of the
+   * associated DataNode (higher layers are handled first).
+   *
+   * \sa EventStateMachine
+   * \sa Dispatcher
+   * \sa DataNode
+   * \ingroup Interaction
+   */
   class MITKCORE_EXPORT DataInteractor : public EventStateMachine
   {
   public:
-    // Predefined internal events/signals
+    /** \brief Internal signal name to request deactivation of this interactor. */
     static const std::string IntDeactivateMe;
+    /** \brief Internal signal name indicating the pointer left the widget area. */
     static const std::string IntLeaveWidget;
+    /** \brief Internal signal name indicating the pointer entered the widget area. */
     static const std::string IntEnterWidget;
 
     mitkClassMacro(DataInteractor, EventStateMachine);
@@ -59,11 +72,41 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      DataNode *GetDataNode() const;
-    virtual void SetDataNode(DataNode *dataNode); // TODO: Remove virtual, use DataNodeChanged instead in subclasses
+    /**
+     * \brief Get the DataNode associated with this interactor.
+     * \return Pointer to the DataNode, or nullptr if none is set.
+     */
+    DataNode *GetDataNode() const;
 
+    /**
+     * \brief Set the DataNode that this interactor operates on.
+     *
+     * Removes the interactor from any previously associated DataNode,
+     * assigns this interactor to the new DataNode, and calls DataNodeChanged().
+     *
+     * \param[in] dataNode The DataNode to associate. Can be nullptr to detach.
+     */
+    virtual void SetDataNode(DataNode *dataNode);
+
+    /**
+     * \brief Get the rendering layer of the associated DataNode.
+     *
+     * The layer determines the priority in event dispatching (higher layers first).
+     *
+     * \return The integer layer value, or -1 if no DataNode is set.
+     */
     int GetLayer() const;
 
+    /**
+     * \brief Get the current event processing mode from the state machine's current state.
+     *
+     * The mode determines how the Dispatcher handles event distribution:
+     * - REGULAR: normal dispatching
+     * - PREFERINPUT: this interactor is preferred but others can still receive events
+     * - GRABINPUT: only this interactor receives events
+     *
+     * \return The current ProcessEventMode.
+     */
     ProcessEventMode GetMode() const;
 
   protected:

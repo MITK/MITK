@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryCompositeExpression.h"
 
-#include "Poco/DOM/Element.h"
+#include <Poco/DOM/Element.h>
 
 #include <vector>
 

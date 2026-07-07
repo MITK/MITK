@@ -4,6 +4,8 @@ set(MODULE_TESTS
   mitkDICOMSimpleVolumeImportTest.cpp
   mitkDICOMTagPathTest.cpp
   mitkDICOMPropertyTest.cpp
+  mitkDICOMTagsOfInterestHelperTest.cpp
+  mitkDICOMTimeUtilTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

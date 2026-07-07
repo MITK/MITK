@@ -49,7 +49,7 @@ Next, we add some source code to our plugin folder. First, we need a class for o
 
 \dontinclude CustomViewer.h
 \skip class CustomViewer : public QObject
-\until void Stop();
+\until void Stop()
 
 In short, this class acts as an entry point for the BlueBerry application runtime. It defines what the application does when it is started (Start()-Method) and before it is ended (Stop()-Method). Our Start()-Method creates a BlueBerry display for GUI-rendering and a WorkbenchAdvisor for workbench control. Then the BlueBerry workbench is created and run given the created display and WorkbenchAdvisor:
 

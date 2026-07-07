@@ -13,7 +13,6 @@ set(INTERNAL_CPP_FILES
   volumetry/QmitkVolumetryView.cpp
   surfaceutilities/QmitkSurfaceUtilities.cpp
   surfaceutilities/mitkSurfaceModifier.cpp
-  surfaceutilities/mitkSurfaceToPointSetFilter.cpp
   surfaceutilities/mitkTargetPointsCalculator.cpp
 )
 
@@ -54,8 +53,6 @@ set(QRC_FILES
   resources/isosurface.qrc
   resources/QmitkVolumetryView.qrc
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

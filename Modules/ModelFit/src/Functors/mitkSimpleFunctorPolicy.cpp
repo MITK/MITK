@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSimpleFunctorPolicy.h"
+#include <mitkSimpleFunctorPolicy.h>
 
 mitk::SimpleFunctorPolicy::SimpleFunctorPolicy() = default;
 mitk::SimpleFunctorPolicy::~SimpleFunctorPolicy() = default;

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "../DataManagement/mitkBoundingShapeUtil.h"
+#include "mitkBoundingShapeUtil.h"
 #include <mitkBaseProperty.h>
 #include <mitkBoundingShapeVtkMapper2D.h>
 
@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <vtkStripper.h>
 #include <vtkTransformFilter.h>
 #include <vtkTransformPolyDataFilter.h>
+
+#include <array>
 
 namespace mitk
 {
@@ -195,61 +197,6 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     // calculate center based on half way of the distance between two opposing cornerpoints
     mitk::Point3D center = CalcAvgPoint(cornerPoints[7], cornerPoints[0]);
 
-    if (m_Impl->HandlePropertyList.size() == 6)
-    {
-      // set handle positions
-      Point3D pointLeft = CalcAvgPoint(cornerPoints[5], cornerPoints[6]);
-      Point3D pointRight = CalcAvgPoint(cornerPoints[1], cornerPoints[2]);
-      Point3D pointTop = CalcAvgPoint(cornerPoints[0], cornerPoints[6]);
-      Point3D pointBottom = CalcAvgPoint(cornerPoints[7], cornerPoints[1]);
-      Point3D pointFront = CalcAvgPoint(cornerPoints[2], cornerPoints[7]);
-      Point3D pointBack = CalcAvgPoint(cornerPoints[4], cornerPoints[1]);
-
-      m_Impl->HandlePropertyList[0].SetPosition(pointLeft);
-      m_Impl->HandlePropertyList[1].SetPosition(pointRight);
-      m_Impl->HandlePropertyList[2].SetPosition(pointTop);
-      m_Impl->HandlePropertyList[3].SetPosition(pointBottom);
-      m_Impl->HandlePropertyList[4].SetPosition(pointFront);
-      m_Impl->HandlePropertyList[5].SetPosition(pointBack);
-    }
-
-    // calculate face normals
-    double cubeFaceNormal0[3], cubeFaceNormal1[3], cubeFaceNormal2[3];
-    double a[3], b[3];
-    a[0] = (cornerPoints[5][0] - cornerPoints[6][0]);
-    a[1] = (cornerPoints[5][1] - cornerPoints[6][1]);
-    a[2] = (cornerPoints[5][2] - cornerPoints[6][2]);
-
-    b[0] = (cornerPoints[5][0] - cornerPoints[4][0]);
-    b[1] = (cornerPoints[5][1] - cornerPoints[4][1]);
-    b[2] = (cornerPoints[5][2] - cornerPoints[4][2]);
-
-    vtkMath::Cross(a, b, cubeFaceNormal0);
-
-    a[0] = (cornerPoints[0][0] - cornerPoints[6][0]);
-    a[1] = (cornerPoints[0][1] - cornerPoints[6][1]);
-    a[2] = (cornerPoints[0][2] - cornerPoints[6][2]);
-
-    b[0] = (cornerPoints[0][0] - cornerPoints[2][0]);
-    b[1] = (cornerPoints[0][1] - cornerPoints[2][1]);
-    b[2] = (cornerPoints[0][2] - cornerPoints[2][2]);
-
-    vtkMath::Cross(a, b, cubeFaceNormal1);
-
-    a[0] = (cornerPoints[2][0] - cornerPoints[7][0]);
-    a[1] = (cornerPoints[2][1] - cornerPoints[7][1]);
-    a[2] = (cornerPoints[2][2] - cornerPoints[7][2]);
-
-    b[0] = (cornerPoints[2][0] - cornerPoints[6][0]);
-    b[1] = (cornerPoints[2][1] - cornerPoints[6][1]);
-    b[2] = (cornerPoints[2][2] - cornerPoints[6][2]);
-
-    vtkMath::Cross(a, b, cubeFaceNormal2);
-
-    vtkMath::Normalize(cubeFaceNormal0);
-    vtkMath::Normalize(cubeFaceNormal1);
-    vtkMath::Normalize(cubeFaceNormal2);
-
     // create cube for rendering bounding box
     auto cube = vtkCubeSource::New();
     cube->SetXLength(extent[0] / spacing[0]);
@@ -334,57 +281,72 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
 
       auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
-      unsigned int handleIdx = 0;
-
       // add handles and their assigned properties to the local storage
       mitk::IntProperty::Pointer activeHandleId =
         dynamic_cast<mitk::IntProperty *>(node->GetProperty("Bounding Shape.Active Handle ID"));
 
-      double angle0 = std::abs(vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(displayPlaneNormal, cubeFaceNormal0)));
-      if (angle0 > 179.0) angle0 -= 180.0;
-      double angle1 = std::abs(vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(displayPlaneNormal, cubeFaceNormal1)));
-      if (angle1 > 179.0) angle1 -= 180.0;
-      double angle2 = std::abs(vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(displayPlaneNormal, cubeFaceNormal2)));
-      if (angle2 > 179.0) angle2 -= 180.0;
+      // direction cosines of the geometry, used to orient the handle markers with the box
+      double dirCos[3][3];
+      for (int c = 0; c < 3; ++c)
+        for (int r = 0; r < 3; ++r)
+          dirCos[r][c] = imageTransform->GetElement(r, c) / spacing[c];
+
+      const Point3D planeOrigin = planeGeometry->GetOrigin();
+      const Vector3D planeNormal = planeGeometry->GetNormal();
 
       bool visible = false;
       bool selected = false;
-      for (auto& handle : localStorage->m_Handles)
+      for (unsigned int handleIdx = 0; handleIdx < localStorage->m_Handles.size(); ++handleIdx)
       {
-        Point3D handleCenter = m_Impl->HandlePropertyList[handleIdx].GetPosition();
+        // place the handle where its box face crosses the current slice, so it stays on the
+        // rendered cross-section outline for oblique boxes; hide it when the slice misses the face
+        const std::array<int, 4> faceCornerIndices = GetHandleFaceCornerIndices(handleIdx);
+        const std::array<Point3D, 4> faceCorners = {cornerPoints[faceCornerIndices[0]],
+                                                    cornerPoints[faceCornerIndices[1]],
+                                                    cornerPoints[faceCornerIndices[2]],
+                                                    cornerPoints[faceCornerIndices[3]]};
+        Point3D handleCenter;
+        if (!GetFacePlaneIntersectionCenter(faceCorners, planeOrigin, planeNormal, handleCenter))
+          continue;
 
+        auto &handle = localStorage->m_Handles[handleIdx];
         handle->SetXLength(handleSize);
         handle->SetYLength(handleSize);
         handle->SetZLength(handleSize);
-        handle->SetCenter(handleCenter[0], handleCenter[1], handleCenter[2]);
+        handle->SetCenter(0.0, 0.0, 0.0);
 
-        // show handles only if the corresponding face is aligned to the render window
-        if ( (handleIdx != 0 && handleIdx != 1 && std::abs(angle0) < 0.1) || // handles 0 and 1
-             (handleIdx != 2 && handleIdx != 3 && std::abs(angle1) < 0.1) || // handles 2 and 3
-             (handleIdx != 4 && handleIdx != 5 && std::abs(angle2) < 0.1) )  // handles 4 and 5
+        // orient the marker with the box and move it onto the handle position
+        auto handleMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+        handleMatrix->Identity();
+        for (int c = 0; c < 3; ++c)
+          for (int r = 0; r < 3; ++r)
+            handleMatrix->SetElement(r, c, dirCos[r][c]);
+        handleMatrix->SetElement(0, 3, handleCenter[0]);
+        handleMatrix->SetElement(1, 3, handleCenter[1]);
+        handleMatrix->SetElement(2, 3, handleCenter[2]);
+
+        auto handleTransform = vtkSmartPointer<vtkTransform>::New();
+        handleTransform->SetMatrix(handleMatrix);
+
+        auto handleTransformFilter = vtkSmartPointer<vtkTransformFilter>::New();
+        handleTransformFilter->SetInputConnection(handle->GetOutputPort());
+        handleTransformFilter->SetTransform(handleTransform);
+        handleTransformFilter->Update();
+
+        auto orientedHandle = vtkSmartPointer<vtkPolyData>::New();
+        orientedHandle->DeepCopy(handleTransformFilter->GetPolyDataOutput());
+
+        if (activeHandleId != nullptr && activeHandleId->GetValue() == static_cast<int>(handleIdx))
         {
-          if (activeHandleId == nullptr)
-          {
-            appendPoly->AddInputConnection(handle->GetOutputPort());
-          }
-          else
-          {
-            if ((activeHandleId->GetValue() != m_Impl->HandlePropertyList[handleIdx].GetIndex()))
-            {
-              appendPoly->AddInputConnection(handle->GetOutputPort());
-            }
-            else
-            {
-              handle->Update();
-              localStorage->m_SelectedHandleMapper->SetInputData(handle->GetOutput());
-              localStorage->m_SelectedHandleActor->VisibilityOn();
-              selected = true;
-            }
-          }
-          visible = true;
+          localStorage->m_SelectedHandleMapper->SetInputData(orientedHandle);
+          localStorage->m_SelectedHandleActor->VisibilityOn();
+          selected = true;
         }
-
-        ++handleIdx;
+        else
+        {
+          appendPoly->AddInputData(orientedHandle);
+        }
+        visible = true;
       }
 
       if (visible)
@@ -426,6 +388,9 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       {
         localStorage->m_PropAssembly->AddPart(localStorage->m_SelectedHandleActor);
       }
+      // hide the selected (green) handle whenever none is active this frame; its input is only
+      // refreshed on selection, so otherwise the last green handle lingers at its old position
+      localStorage->m_SelectedHandleActor->SetVisibility(selected);
 
       localStorage->m_PropAssembly->VisibilityOn();
       localStorage->m_Actor->VisibilityOn();

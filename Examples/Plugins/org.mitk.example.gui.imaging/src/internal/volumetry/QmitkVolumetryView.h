@@ -15,7 +15,8 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "mitkWeakPointer.h"
+#include <mitkWeakPointer.h>
+#include <memory>
 
 namespace Ui
 {
@@ -35,6 +36,7 @@ public:
   static const std::string VIEW_ID;
 
   QmitkVolumetryView();
+  ~QmitkVolumetryView() override;
 
 private:
   void CreateQtPartControl(QWidget *parent) override;
@@ -70,7 +72,7 @@ private slots:
   void OnSaveCsvButtonClicked();
 
 private:
-  Ui::QmitkVolumetryViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkVolumetryViewControls> m_Controls;
 
   /// store weak pointer of the DataNode
   mitk::WeakPointer<mitk::DataNode> m_SelectedDataNode;

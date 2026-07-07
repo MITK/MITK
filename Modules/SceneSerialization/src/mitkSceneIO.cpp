@@ -16,18 +16,23 @@ found in the LICENSE file.
 #include <Poco/Zip/Compress.h>
 #include <Poco/Zip/Decompress.h>
 
-#include "mitkBaseDataSerializer.h"
-#include "mitkPropertyListSerializer.h"
-#include "mitkSceneIO.h"
-#include "mitkSceneReader.h"
+#include <mitkBaseDataSerializer.h>
+#include <mitkPropertyListSerializer.h>
+#include <mitkSceneIO.h>
+#include <mitkSceneJsonReader.h>
+#include <mitkSceneReader.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkProgressBar.h"
-#include "mitkRenderingManager.h"
-#include "mitkStandaloneDataStorage.h"
+#include <mitkBaseRenderer.h>
+#include <mitkProgressBar.h>
+#include <mitkRenderingManager.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
+#include <mitkStringUtil.h>
 #include <mitkUIDGenerator.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPropertyTransience.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -35,7 +40,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <sstream>
 
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 #include <tinyxml2.h>
 
@@ -102,6 +107,30 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
     return storage;
   }
 
+  // Standalone JSON scene (not a ZIP archive): route directly to the
+  // JSON reader without unpacking.
+  if (mitk::EndsWithCaseInsensitive(filename, ".mitkscene.json"))
+  {
+    // Clearing is delegated to the reader so it can be deferred until
+    // after the scene descriptor has been validated (a malformed JSON
+    // file must not wipe the caller's session).
+    try
+    {
+      SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
+      {
+        MITK_ERROR << "There were errors while loading scene file " << filename
+                   << ". Your data may be corrupted";
+      }
+    }
+    catch (const std::exception &e)
+    {
+      MITK_ERROR << "Failed to load JSON scene file '" << filename << "': " << e.what();
+    }
+
+    return storage;
+  }
+
   // test if filename can be read
   std::ifstream file(filename.c_str(), std::ios::binary);
   if (!file.good())
@@ -140,7 +169,10 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
   // transcode locale-dependent string
   m_WorkingDirectory = Poco::Path::transcode (m_WorkingDirectory);
 
-  auto indexFile = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml";
+  // Prefer index.json over index.xml when both exist.
+  auto indexJson = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.json";
+  auto indexXml = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml";
+  auto indexFile = itksys::SystemTools::FileExists(indexJson.c_str()) ? indexJson : indexXml;
   storage = LoadSceneUnzipped(indexFile, storage, clearStorageFirst);
 
   // delete temp directory
@@ -171,18 +203,6 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
     storage = StandaloneDataStorage::New().GetPointer();
   }
 
-  if (clearStorageFirst)
-  {
-    try
-    {
-      storage->Remove(storage->GetAll());
-    }
-    catch (...)
-    {
-      MITK_ERROR << "DataStorage cannot be cleared properly.";
-    }
-  }
-
   // test input filename
   if (indexfilename.empty())
   {
@@ -195,13 +215,46 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
   std::string workingDir;
   itksys::SystemTools::SplitProgramPath(indexfilename, workingDir, tempfilename);
 
-  // test if index.xml exists
-  // parse index.xml with TinyXML
+  // Route JSON index files to the JSON reader. Clearing is delegated so it
+  // can be deferred until the descriptor is validated; a malformed scene
+  // file must not wipe the caller's session.
+  if (mitk::EndsWithCaseInsensitive(indexfilename, ".json"))
+  {
+    try
+    {
+      SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      if (!jsonReader->LoadScene(indexfilename, storage, clearStorageFirst))
+      {
+        MITK_ERROR << "There were errors while loading scene file " << indexfilename
+                   << ". Your data may be corrupted";
+      }
+    }
+    catch (const std::exception &e)
+    {
+      MITK_ERROR << "Failed to load JSON scene index '" << indexfilename << "': " << e.what();
+    }
+    return storage;
+  }
+
+  // XML path: clear now (legacy SceneReader has no clearStorageFirst plumbing),
+  // then parse the scene descriptor.
+  if (clearStorageFirst)
+  {
+    try
+    {
+      storage->Remove(storage->GetAll());
+    }
+    catch (...)
+    {
+      MITK_ERROR << "DataStorage cannot be cleared properly.";
+    }
+  }
+
   tinyxml2::XMLDocument document;
   if (tinyxml2::XML_SUCCESS != document.LoadFile(indexfilename.c_str()))
   {
     MITK_ERROR << "Could not open/read/parse " << workingDir << mitk::IOUtil::GetDirectorySeparator()
-      << "index.xml\nTinyXML reports: " << document.ErrorStr() << std::endl;
+      << tempfilename << "\nTinyXML reports: " << document.ErrorStr() << std::endl;
     return storage;
   }
 
@@ -318,6 +371,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
       }
 
+      // Acquire the transience service once for the whole save. SavePropertyList
+      // uses it to drop transient (runtime/UI) properties from each list.
+      CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
+
       // write out objects, dependencies and properties
       for (auto iter = sceneNodes->begin(); iter != sceneNodes->end(); ++iter)
       {
@@ -368,8 +425,9 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             if (propertyList && !propertyList->IsEmpty())
             {
               auto *baseDataPropertiesElement =
-                SavePropertyList(document, propertyList, filenameHint + "-data"); // returns a reference to a file
-              dataElement->InsertEndChild(baseDataPropertiesElement);
+                SavePropertyList(document, transience.Get(), propertyList, data, filenameHint + "-data"); // returns a reference to a file
+              if (baseDataPropertiesElement)
+                dataElement->InsertEndChild(baseDataPropertiesElement);
             }
 
             nodeElement->InsertEndChild(dataElement);
@@ -383,9 +441,12 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             if (propertyList && !propertyList->IsEmpty())
             {
               auto *renderWindowPropertiesElement =
-                SavePropertyList(document, propertyList, filenameHint + "-" + renderWindowName); // returns a reference to a file
-              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName.c_str());
-              nodeElement->InsertEndChild(renderWindowPropertiesElement);
+                SavePropertyList(document, transience.Get(), propertyList, node->GetData(), filenameHint + "-" + renderWindowName); // returns a reference to a file
+              if (renderWindowPropertiesElement)
+              {
+                renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName.c_str());
+                nodeElement->InsertEndChild(renderWindowPropertiesElement);
+              }
             }
           }
 
@@ -394,8 +455,9 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           if (propertyList && !propertyList->IsEmpty())
           {
             auto *propertiesElement =
-              SavePropertyList(document, propertyList, filenameHint + "-node"); // returns a reference to a file
-            nodeElement->InsertEndChild(propertiesElement);
+              SavePropertyList(document, transience.Get(), propertyList, node->GetData(), filenameHint + "-node"); // returns a reference to a file
+            if (propertiesElement)
+              nodeElement->InsertEndChild(propertiesElement);
           }
           document.InsertEndChild(nodeElement);
         }
@@ -521,9 +583,44 @@ tinyxml2::XMLElement *mitk::SceneIO::SaveBaseData(tinyxml2::XMLDocument &doc, Ba
   return element;
 }
 
-tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const std::string &filenamehint)
+tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, const IPropertyTransience *transience, PropertyList *propertyList, const BaseData *nodeData, const std::string &filenamehint)
 {
   assert(propertyList);
+
+  // Drop transient DataNode properties (e.g. the "selected" UI flag) so they are
+  // not written to the scene file. Transience is decided per the node's BaseData
+  // type; data-less nodes (nodeData == nullptr) still match rules registered for
+  // mitk::BaseData. Only build a filtered copy when at least one property is
+  // actually transient, so the common case serializes the list as-is.
+  PropertyList::Pointer persistable;
+  if (transience != nullptr)
+  {
+    bool anyTransient = false;
+    for (const auto &property : *propertyList->GetMap())
+    {
+      if (transience->IsTransient(nodeData, property.first))
+      {
+        anyTransient = true;
+        break;
+      }
+    }
+
+    if (anyTransient)
+    {
+      persistable = PropertyList::New();
+
+      for (const auto &property : *propertyList->GetMap())
+      {
+        if (!transience->IsTransient(nodeData, property.first))
+          persistable->SetProperty(property.first, property.second);
+      }
+
+      if (persistable->IsEmpty())
+        return nullptr;
+
+      propertyList = persistable;
+    }
+  }
 
   //  - TODO what to do about shared properties (same object in two lists or behind several keys)?
   auto *element = doc.NewElement("properties");

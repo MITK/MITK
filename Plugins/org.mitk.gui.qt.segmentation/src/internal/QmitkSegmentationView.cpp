@@ -28,19 +28,19 @@ found in the LICENSE file.
 #include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
-#include <QmitkNewSegmentationDialog.h>
+#include "QmitkNewSegmentationDialog.h"
 #include <QmitkMultiLabelManager.h>
 #include <QmitkStyleManager.h>
 
@@ -64,6 +64,8 @@ found in the LICENSE file.
   #include <mitkPythonSegmentationUI.h>
 #endif
 
+#include <ui_QmitkSegmentationViewControls.h>
+
 namespace
 {
   QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
@@ -78,13 +80,29 @@ namespace
     }
     return all2DWindows;
   }
+
+  QString BuildWorkingNodeHint(unsigned int hiddenCount)
+  {
+    QString hint = QStringLiteral(
+      "<p>Select a segmentation that should be modified. Only segmentations with the same geometry "
+      "and within the bounds of the reference image are shown.</p>");
+
+    if (hiddenCount > 0)
+    {
+      hint += QStringLiteral("<p style=\"color:%1;\">%2 segmentation%3 hidden: geometry does not match the selected image.</p>")
+        .arg(QmitkStyleManager::GetIconAccentColor())
+        .arg(hiddenCount)
+        .arg(hiddenCount == 1 ? QString() : QStringLiteral("s"));
+    }
+
+    return hint;
+  }
 }
 
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
 QmitkSegmentationView::QmitkSegmentationView()
   : m_Parent(nullptr)
-  , m_Controls(nullptr)
   , m_RenderWindowPart(nullptr)
   , m_ToolManager(nullptr)
   , m_ReferenceNode(nullptr)
@@ -151,7 +169,6 @@ QmitkSegmentationView::~QmitkSegmentationView()
   m_ToolManager->ActiveWorkingLabelChanged -=
     mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
 
-  delete m_Controls;
 }
 
 /**********************************************************************/
@@ -223,6 +240,13 @@ void QmitkSegmentationView::OnAnySelectionChanged()
       m_ReferenceDataObserverTags[m_ReferenceNode] =
         m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
     }
+
+    const mitk::BaseGeometry* refGeometry = m_ReferenceNode.IsNull()
+      ? nullptr
+      : m_ReferenceNode->GetData()->GetGeometry();
+    const auto hiddenSegmentations =
+      mitk::GetGeometryMismatchedSegmentationCount(this->GetDataStorage(), refGeometry);
+    m_Controls->workingNodeSelector->SetPopUpHint(BuildWorkingNodeHint(hiddenSegmentations));
   }
 
   auto selectedWorkingNode = m_Controls->workingNodeSelector->GetSelectedNode();
@@ -298,6 +322,7 @@ mitk::MultiLabelSegmentation* QmitkSegmentationView::GetWorkingImage()
 void QmitkSegmentationView::AddObserversToWorkingImage()
 {
   auto* workingImage = this->GetWorkingImage();
+  m_ObservedSegmentation = workingImage;
 
   if (workingImage != nullptr)
   {
@@ -326,6 +351,8 @@ void QmitkSegmentationView::RemoveObserversFromWorkingImage()
   m_LabelAddedObserver.Reset();
   m_LabelRemovedObserver.Reset();
   m_GroupRemovedObserver.Reset();
+
+  m_ObservedSegmentation = nullptr;
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()
@@ -430,7 +457,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  const auto labelSetPreset = this->GetDefaultLabelSetPreset();
+  const auto labelSetPreset = m_LabelSetPresetPreference.toStdString();
 
   if (labelSetPreset.empty() || !mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(labelSetPreset, newLabelSetImage))
   {
@@ -460,16 +487,6 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   newSegmentationNode->SetSelected(true);
   m_Controls->workingNodeSelector->SetCurrentSelectedNode(newSegmentationNode);
-}
-
-std::string QmitkSegmentationView::GetDefaultLabelSetPreset() const
-{
-  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
-
-  if (labelSetPreset.empty())
-    labelSetPreset = m_LabelSetPresetPreference.toStdString();
-
-  return labelSetPreset;
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
@@ -555,7 +572,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
    m_Parent = parent;
 
-   m_Controls = new Ui::QmitkSegmentationViewControls;
+   m_Controls = std::make_unique<Ui::QmitkSegmentationViewControls>();
    m_Controls->setupUi(parent);
 
    // setup overlay widget to show a warning message with a button
@@ -602,7 +619,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
    m_Controls->workingNodeSelector->SetInvalidInfo("Select a segmentation");
    m_Controls->workingNodeSelector->SetPopUpTitel("Select a segmentation");
-   m_Controls->workingNodeSelector->SetPopUpHint("Select a segmentation that should be modified. Only segmentation with the same geometry and within the bounds of the reference image are selected.");
+   m_Controls->workingNodeSelector->SetPopUpHint(BuildWorkingNodeHint(0));
 
    connect(m_Controls->referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &Self::OnReferenceSelectionChanged);
@@ -620,12 +637,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MedSAM' 'MONAI Label 2D' Selection");
-   QString segTools3D = tr("nnInteractive Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator 'MONAI Label 3D'");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' Selection");
+   QString segTools3D = tr("nnInteractive TotalSegmentator Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut Selection");
 
-#ifdef __linux__
-   segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows
-#endif
    std::regex extSegTool2DRegEx("SegTool2D$");
    std::regex extSegTool3DRegEx("SegTool3D$");
 
@@ -642,11 +656,15 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      }
    }
 
+   // Forward the label inspector so tool GUIs can interact with the host's label-management widget.
+   auto* multiLabelInspector = m_Controls->multiLabelWidget->GetMultiLabelInspector();
+
    // setup 2D tools
    m_Controls->toolSelectionBox2D->SetToolManager(*m_ToolManager);
    m_Controls->toolSelectionBox2D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
+   m_Controls->toolSelectionBox2D->SetMultiLabelInspector(multiLabelInspector);
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
            this, &Self::OnManualTool2DSelected);
 
@@ -655,6 +673,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
+   m_Controls->toolSelectionBox3D->SetMultiLabelInspector(multiLabelInspector);
 
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 
@@ -699,10 +718,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_RenderingManagerObserverTag =
      mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command);
 
-   m_RenderWindowPart = this->GetRenderWindowPart();
-   if (nullptr != m_RenderWindowPart)
+   // Put m_Parent into a known-enabled state. When the view is restored from a
+   // perspective before the render window editor opens (e.g., CLI startup with
+   // a data argument), GetRenderWindowPart() returns null; the coordinator will
+   // call RenderWindowPartActivated once the editor becomes visible.
+   auto* renderWindowPart = this->GetRenderWindowPart();
+   if (nullptr != renderWindowPart)
    {
-     this->RenderWindowPartActivated(m_RenderWindowPart);
+     this->RenderWindowPartActivated(renderWindowPart);
+   }
+   else if (nullptr != m_Parent)
+   {
+     m_Parent->setEnabled(true);
    }
 
    // Make sure the GUI notices if appropriate data is already present on creation.
@@ -712,6 +739,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    m_Controls->splitter->setObjectName("QmitkSegmentationViewSplitter");
    m_Controls->splitter->setHandleWidth(2);
+
+   // Apply command-line argument as a session-only override so all preference
+   // consumers transparently see the value without manual bypass logic.
+   auto labelSetPreset = mitk::BaseApplication::instance().config().getString(
+     mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
+
+   if (!labelSetPreset.empty())
+   {
+     auto* prefs = this->GetPreferences();
+     prefs->Override("label set preset", labelSetPreset);
+   }
+
    this->UpdateGUI();
 }
 

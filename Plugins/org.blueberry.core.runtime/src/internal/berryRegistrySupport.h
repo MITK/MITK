@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYREGISTRYSUPPORT_H
 #define BERRYREGISTRYSUPPORT_H
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 class QTranslator;
 

@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtractSliceFilter.h"
-#include "mitkIOUtil.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkInteractionConst.h"
-#include "mitkRotationOperation.h"
-#include "mitkTestingMacros.h"
+#include <mitkExtractSliceFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkInteractionConst.h>
+#include <mitkRotationOperation.h>
+#include <mitkTestingMacros.h>
 #include <ctime>
 
 /*

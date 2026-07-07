@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMNullFileReader_h
 #define mitkDICOMNullFileReader_h
 
-#include "mitkDICOMFileReader.h"
+#include <mitkDICOMFileReader.h>
 
 namespace mitk
 {
@@ -23,7 +23,6 @@ class DICOMNullFileReader : public DICOMFileReader
   public:
 
     mitkClassMacro( DICOMNullFileReader, DICOMFileReader );
-    mitkCloneMacro( DICOMNullFileReader );
     itkNewMacro( DICOMNullFileReader );
 
     void AnalyzeInputFiles() override;
@@ -39,6 +38,7 @@ class DICOMNullFileReader : public DICOMFileReader
     void SetTagCache( const DICOMTagCache::Pointer& ) override {}
 
   protected:
+    mitkCloneMacro( DICOMNullFileReader );
 
     DICOMNullFileReader();
     ~DICOMNullFileReader() override;

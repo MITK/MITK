@@ -13,16 +13,22 @@ found in the LICENSE file.
 #ifndef mitkModelBasedValueFunctorBase_h
 #define mitkModelBasedValueFunctorBase_h
 
-#include "mitkIndexedValueFunctorBase.h"
+#include <mitkIndexedValueFunctorBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
-  /**Functor base class for functors that are some how based on an model.
-   This abstract class adds the possibility to query the signal grid
-   of the model.*/
+  /**
+   * \class ModelBasedValueFunctorBase
+   * \brief Abstract functor base class for model-based indexed value computation.
+   *
+   * Extends IndexedValueFunctorBase by adding the ability to query the signal
+   * grid (time grid) of the underlying model, via GetGrid().
+   *
+   * \sa IndexedValueFunctorBase, ModelFitInfoSignalGenerationFunctor
+   */
   class MITKMODELFIT_EXPORT ModelBasedValueFunctorBase: public IndexedValueFunctorBase
   {
   public:

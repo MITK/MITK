@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneGeometry.h"
-#include "mitkInteractionConst.h"
-#include "mitkLine.h"
-#include "mitkPlaneOperation.h"
+#include <mitkPlaneGeometry.h>
+#include <mitkInteractionConst.h>
+#include <mitkLine.h>
+#include <mitkPlaneOperation.h>
 
 #include <itkSpatialOrientationAdapter.h>
 
@@ -89,24 +89,10 @@ namespace mitk
     pt_units[1] = pt_mm[1] * (1.0 / (GetExtentInMM(1) / GetExtent(1)));
   }
 
-  void PlaneGeometry::IndexToWorld(const Point2D & /*atPt2d_units*/, const Vector2D &vec_units, Vector2D &vec_mm) const
-  {
-    MITK_WARN << "Warning! Call of the deprecated function PlaneGeometry::IndexToWorld(point, vec, vec). Use "
-                 "PlaneGeometry::IndexToWorld(vec, vec) instead!";
-    this->IndexToWorld(vec_units, vec_mm);
-  }
-
   void PlaneGeometry::IndexToWorld(const Vector2D &vec_units, Vector2D &vec_mm) const
   {
     vec_mm[0] = (GetExtentInMM(0) / GetExtent(0)) * vec_units[0];
     vec_mm[1] = (GetExtentInMM(1) / GetExtent(1)) * vec_units[1];
-  }
-
-  void PlaneGeometry::WorldToIndex(const Point2D & /*atPt2d_mm*/, const Vector2D &vec_mm, Vector2D &vec_units) const
-  {
-    MITK_WARN << "Warning! Call of the deprecated function PlaneGeometry::WorldToIndex(point, vec, vec). Use "
-                 "PlaneGeometry::WorldToIndex(vec, vec) instead!";
-    this->WorldToIndex(vec_mm, vec_units);
   }
 
   void PlaneGeometry::WorldToIndex(const Vector2D &vec_mm, Vector2D &vec_units) const
@@ -727,13 +713,6 @@ namespace mitk
     return pt - this->GetNormal() * this->SignedDistanceFromPlane(pt) / len;
   }
 
-  itk::LightObject::Pointer PlaneGeometry::InternalClone() const
-  {
-    Self::Pointer newGeometry = new PlaneGeometry(*this);
-    newGeometry->UnRegister();
-    return newGeometry.GetPointer();
-  }
-
   void PlaneGeometry::ExecuteOperation(Operation *operation)
   {
     vtkTransform *transform = vtkTransform::New();
@@ -883,23 +862,6 @@ namespace mitk
     vec3d_units[2] = 0;
     projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
     return true;
-  }
-
-  bool PlaneGeometry::Project(const mitk::Point3D &atPt3d_mm,
-                              const mitk::Vector3D &vec3d_mm,
-                              mitk::Vector3D &projectedVec3d_mm) const
-  {
-    MITK_WARN << "Deprecated function! Call Project(vec3D,vec3D) instead.";
-    assert(this->IsBoundingBoxNull() == false);
-
-    Vector3D vec3d_units;
-    Superclass::WorldToIndex(atPt3d_mm, vec3d_mm, vec3d_units);
-    vec3d_units[2] = 0;
-    projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
-
-    Point3D pt3d_units;
-    Superclass::WorldToIndex(atPt3d_mm, pt3d_units);
-    return this->GetBoundingBox()->IsInside(pt3d_units);
   }
 
   bool PlaneGeometry::Map(const mitk::Point3D &atPt3d_mm,

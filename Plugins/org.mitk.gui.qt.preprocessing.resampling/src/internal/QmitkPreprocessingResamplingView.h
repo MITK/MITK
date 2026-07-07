@@ -16,9 +16,10 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_preprocessing_resampling_Export.h>
 
-#include "QmitkStepperAdapter.h"
+#include <QmitkStepperAdapter.h>
 
 #include <mitkDataStorageSelection.h>
+#include <memory>
 
 namespace Ui
 {
@@ -107,7 +108,7 @@ private:
   /*!
   * controls containing sliders for scrolling through the slices
   */
-  Ui::QmitkPreprocessingResamplingViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkPreprocessingResamplingViewControls> m_Controls;
 
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;

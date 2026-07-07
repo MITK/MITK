@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarPolygon.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarPolygon.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 // stl related includes
 #include <algorithm>
@@ -27,6 +27,13 @@ mitk::PlanarPolygon::PlanarPolygon()
   // Polygon is closed by default
   this->SetProperty("closed", mitk::BoolProperty::New(true));
   this->SetProperty("subdivision", mitk::BoolProperty::New(false));
+}
+
+mitk::PlanarPolygon::PlanarPolygon(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_CIRCUMFERENCE(other.FEATURE_ID_CIRCUMFERENCE),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
+{
 }
 
 void mitk::PlanarPolygon::SetClosed(bool closed)

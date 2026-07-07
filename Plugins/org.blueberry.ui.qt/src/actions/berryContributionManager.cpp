@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "berryIContributionManagerOverrides.h"
 #include "berryIContributionItem.h"
 
-#include <berryQActionContributionItem.h>
+#include "berryQActionContributionItem.h"
 
 namespace berry {
 

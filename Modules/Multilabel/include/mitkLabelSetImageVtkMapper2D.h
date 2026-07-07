@@ -14,14 +14,14 @@ found in the LICENSE file.
 #define mitkLabelSetImageVtkMapper2D_h
 
 // MITK
-#include "MitkMultilabelExports.h"
-#include "mitkCommon.h"
+#include <MitkMultilabelExports.h>
+#include <mitkCommon.h>
 
 // MITK Rendering
-#include "mitkBaseRenderer.h"
-#include "mitkExtractSliceFilter.h"
-#include "mitkLabelSetImage.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkExtractSliceFilter.h>
+#include <mitkLabelSetImage.h>
+#include <mitkVtkMapper.h>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -72,9 +72,11 @@ namespace mitk
      * data. */
     void Update(mitk::BaseRenderer *renderer) override;
 
-    //### methods of MITK-VTK rendering pipeline
+    /** \brief Get the VTK prop for MITK-VTK rendering pipeline.
+     * \param renderer The renderer to get the prop for.
+     * \return The vtkProp for rendering.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    //### end of methods of MITK-VTK rendering pipeline
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     /**
@@ -86,25 +88,37 @@ namespace mitk
     class MITKMULTILABEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
+      /** \brief Assembly of all VTK actors used for rendering. */
       vtkSmartPointer<vtkPropAssembly> m_Actors;
 
-      /** Vector containing the pointer of the currently used group images.
+      /** \brief Vector containing the pointer of the currently used group images.
+       *
        * IMPORTANT: This member must not be used to access any data.
        * Its purpose is to allow checking if the order of the groups has changed
-       * in order to adapt the pipe line accordingly*/
+       * in order to adapt the pipeline accordingly.
+       */
       std::vector<const Image*> m_GroupImageIDs;
 
+      /** \brief Vector of actors for each label group layer. */
       std::vector<vtkSmartPointer<vtkActor>> m_LayerActorVector;
+      /** \brief Vector of mappers for each label group layer. */
       std::vector<vtkSmartPointer<vtkPolyDataMapper>> m_LayerMapperVector;
+      /** \brief Vector of resliced image data for each label group layer. */
       std::vector<vtkSmartPointer<vtkImageData>> m_ReslicedImageVector;
+      /** \brief Vector of image-to-color mappers for each label group layer. */
       std::vector<vtkSmartPointer<vtkImageMapToColors>> m_LayerImageMapToColors;
+      /** \brief Vector of textures for each label group layer. */
       std::vector<vtkSmartPointer<vtkNeverTranslucentTexture>> m_LayerTextureVector;
 
+      /** \brief Empty poly data used as a placeholder. */
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
+      /** \brief The plane source used for texture mapping. */
       vtkSmartPointer<vtkPlaneSource> m_Plane;
 
+      /** \brief Vector of reslice filters for each label group layer. */
       std::vector<mitk::ExtractSliceFilter::Pointer> m_ReslicerVector;
 
+      /** \brief Poly data for the label outline. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
       /** \brief An actor for the outline */
       vtkSmartPointer<vtkActor> m_OutlineActor;
@@ -117,23 +131,34 @@ namespace mitk
       itk::TimeStamp m_LastDataUpdateTime;
       /** \brief Timestamp of last update of a property. */
       itk::TimeStamp m_LastPropertyUpdateTime;
-      /** \brief Timestamp of last update of a property. */
+      /** \brief Timestamp of last update of the active label. */
       itk::TimeStamp m_LastActiveLabelUpdateTime;
 
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
       mitk::ScalarType *m_mmPerPixel;
 
-      /** look up table for label colors. */
+      /** \brief Look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
+      /** \brief The current world plane geometry. */
       mitk::PlaneGeometry::Pointer m_WorldPlane;
+      /** \brief Flag indicating whether the local storage contains valid content. */
       bool m_HasValidContent;
 
+      /** \brief The last time step that was rendered. */
       mitk::TimeStepType m_LastTimeStep;
 
+      /** \brief The number of label group layers. */
       unsigned int m_NumberOfLayers;
 
+      /** \brief The label value of the last active label. */
       MultiLabelSegmentation::LabelValueType m_LastActiveLabelValue = MultiLabelSegmentation::UNLABELED_VALUE;
+
+      /** \brief The "opacity factor" preference value baked into the current LUT.
+       *
+       * The factor is a global preference (no MTime), so a change is detected by
+       * comparing against this cached value to trigger a LUT rebuild. */
+      float m_LastOpacityFactor = 1.0f;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -186,9 +211,9 @@ namespace mitk
                                                        vtkImageData *image,
                                                        int pixelValue = 1);
 
-    /** Default constructor */
+    /** \brief Default constructor. */
     LabelSetImageVtkMapper2D();
-    /** Default deconstructor */
+    /** \brief Default destructor. */
     ~LabelSetImageVtkMapper2D() override;
 
     /** \brief Does the actual resampling, without rendering the image yet.
@@ -205,8 +230,15 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
+    /** \brief Generate the image slice for the given renderer and outdated group IDs.
+      * \param renderer The renderer to generate the slice for.
+      * \param outdatedGroupIDs The group indices that need to be updated.
+      */
     void GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
 
+    /** \brief Generate the outline for the currently active label.
+      * \param renderer The renderer to generate the outline for.
+      */
     void GenerateActiveLabelOutline(mitk::BaseRenderer* renderer);
 
     /** \brief Generates the look up table that should be used.
@@ -231,8 +263,11 @@ namespace mitk
     bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, const BaseGeometry* imageGeometry) const;
 
   private:
+    /** \brief Get the opacity factor from user preferences.
+      * \return The opacity factor.
+      */
     float GetOpacityFactor();
-    IPreferences* m_Preferences;
+    IPreferences* m_Preferences; ///< \brief Pointer to the user preferences.
   };
 
 } // namespace mitk

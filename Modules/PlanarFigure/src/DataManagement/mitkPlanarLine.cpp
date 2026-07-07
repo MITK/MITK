@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarLine.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarLine.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarLine::PlanarLine() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {
@@ -19,6 +19,12 @@ mitk::PlanarLine::PlanarLine() : FEATURE_ID_LENGTH(this->AddFeature("Length", "m
   this->ResetNumberOfControlPoints(2);
 
   this->SetNumberOfPolyLines(1);
+}
+
+mitk::PlanarLine::PlanarLine(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH)
+{
 }
 
 void mitk::PlanarLine::GeneratePolyLine()

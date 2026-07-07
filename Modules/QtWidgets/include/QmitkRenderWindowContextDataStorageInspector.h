@@ -14,8 +14,7 @@ found in the LICENSE file.
 #define QmitkRenderWindowContextDataStorageInspector_h
 
 // qt widgets module
-#include "MitkQtWidgetsExports.h"
-#include "ui_QmitkRenderWindowContextDataStorageInspector.h"
+#include <MitkQtWidgetsExports.h>
 
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
@@ -26,6 +25,9 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkBaseRenderer.h>
+#include <memory>
+
+namespace Ui { class QmitkRenderWindowContextDataStorageInspector; }
 
 /**
 * The 'QmitkRenderWindowContextDataStorageInspector' offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
@@ -40,22 +42,23 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowContextDataStorageInspector : public
 public:
 
   QmitkRenderWindowContextDataStorageInspector(QWidget* parent = nullptr, mitk::BaseRenderer* renderer = nullptr);
+  ~QmitkRenderWindowContextDataStorageInspector() override;
 
   // override from 'QmitkAbstractDataStorageInspector'
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   QAbstractItemView* GetView() override;
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   const QAbstractItemView* GetView() const override;
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   void SetSelectionMode(SelectionMode mode) override;
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   SelectionMode GetSelectionMode() const override;
 
@@ -79,7 +82,7 @@ private:
   void Initialize() override;
   void SetUpConnections();
 
-  Ui::QmitkRenderWindowContextDataStorageInspector m_Controls;
+  std::unique_ptr<Ui::QmitkRenderWindowContextDataStorageInspector> m_Controls;
 
   std::unique_ptr<QmitkRenderWindowDataStorageTreeModel> m_StorageModel;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureMapper2D_h
 #define mitkPlanarFigureMapper2D_h
 
-#include "mitkCommon.h"
-#include "mitkMapper.h"
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureControlPointStyleProperty.h"
+#include <mitkCommon.h>
+#include <mitkMapper.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureControlPointStyleProperty.h>
 #include <MitkPlanarFigureExports.h>
-#include "vtkNew.h"
-#include "vtkPen.h"
+#include <vtkNew.h>
+#include <vtkPen.h>
 
 class vtkContext2D;
 
@@ -102,7 +102,7 @@ namespace mitk
   *   </ul>
   * </ol>
   *
-  * @ingroup MitkPlanarFigureModule
+  * \ingroup MitkPlanarFigureModule
   */
 
   class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public Mapper
@@ -122,7 +122,7 @@ namespace mitk
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Apply color and opacity properties read from the PropertyList.
-    * The actor is not used in the GLMappers. Called by mapper subclasses.
+    * The actor parameter is unused; color and opacity are applied via vtkContext2D.
     */
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) override;
 

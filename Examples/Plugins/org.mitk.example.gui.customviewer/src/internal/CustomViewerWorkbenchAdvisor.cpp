@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "CustomViewerWorkbenchAdvisor.h"
 #include "CustomViewerWorkbenchWindowAdvisor.h"
-#include "berryIQtStyleManager.h"
+#include <berryIQtStyleManager.h>
 #include "org_mitk_example_gui_customviewer_Activator.h"
 
 const QString CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.viewerperspective";

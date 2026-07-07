@@ -1,0 +1,13 @@
+set(MODULE_TESTS
+  mitkNodeUidMapperTest.cpp
+  mitkRestServerTest.cpp
+  mitkDataStorageBridgeTest.cpp
+  mitkHealthControllerTest.cpp
+  mitkDataStorageControllerTest.cpp
+  mitkDataStorageControllerDataTest.cpp
+  mitkApiConformanceTest.cpp
+  mitkSecurityMiddlewareTest.cpp
+  mitkInputValidationTest.cpp
+  mitkRenderingControllerTest.cpp
+  mitkRenderWindowBridgeTest.cpp
+)

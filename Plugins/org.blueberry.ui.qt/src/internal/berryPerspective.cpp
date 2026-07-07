@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include "intro/berryIntroConstants.h"
 #include "berryWorkbenchWindow.h"
 #include "berryStatusUtil.h"
-#include "berryMultiStatus.h"
+#include <berryMultiStatus.h>
 #include "berryXMLMemento.h"
 
 #include "presentations/berryIStackPresentationSite.h"

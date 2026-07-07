@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYERRORAPPLICATION_H
 #define BERRYERRORAPPLICATION_H
 
-#include <berryIApplication.h>
+#include "berryIApplication.h"
 
 #include <QObject>
 

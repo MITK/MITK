@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarFiguresSubclassesSerializer_h_included
 #define mitkPlanarFiguresSubclassesSerializer_h_included
 
-#include "mitkPlanarFigureSerializer.h"
+#include <mitkPlanarFigureSerializer.h>
 
 #define MITK_REGISTER_PF_SUB_SERIALIZER(classname)                                                                     \
                                                                                                                        \

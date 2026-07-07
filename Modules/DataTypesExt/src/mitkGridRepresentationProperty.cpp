@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGridRepresentationProperty.h"
+#include <mitkGridRepresentationProperty.h>
 #include <vtkProperty.h>
 
 mitk::GridRepresentationProperty::GridRepresentationProperty()
@@ -81,11 +81,4 @@ void mitk::GridRepresentationProperty::AddRepresentationTypes()
 bool mitk::GridRepresentationProperty::AddEnum(const std::string &name, const IdType &id)
 {
   return Superclass::AddEnum(name, id);
-}
-
-itk::LightObject::Pointer mitk::GridRepresentationProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
 }

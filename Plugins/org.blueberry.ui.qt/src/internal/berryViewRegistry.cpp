@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
 
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 
 namespace berry
 {

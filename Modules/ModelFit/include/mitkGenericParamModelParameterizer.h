@@ -12,13 +12,20 @@ found in the LICENSE file.
 #ifndef mitkGenericParamModelParameterizer_h
 #define mitkGenericParamModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkGenericParamModel.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkGenericParamModel.h>
 
 namespace mitk
 {
-  /** Parameterizer for the GenricParamModel.
-  */
+  /**
+   * \class GenericParamModelParameterizer
+   * \brief Parameterizer for the GenericParamModel.
+   *
+   * Extends ConcreteModelParameterizerBase to additionally configure the function
+   * string and the number of parameters for the GenericParamModel.
+   *
+   * \sa GenericParamModel, GenericParamModelFactory, ConcreteModelParameterizerBase
+   */
   class MITKMODELFIT_EXPORT GenericParamModelParameterizer : public ConcreteModelParameterizerBase
     <GenericParamModel>
   {
@@ -46,7 +53,7 @@ namespace mitk
 
     itkSetMacro(FunctionString, mitk::ModelBase::FunctionStringType);
 
-    /**@pre The Number of parameters must be between 1 and 10.*/
+    /** \pre The Number of parameters must be between 1 and 10.*/
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
     mitk::ModelBase::FunctionStringType GetFunctionString() const override;

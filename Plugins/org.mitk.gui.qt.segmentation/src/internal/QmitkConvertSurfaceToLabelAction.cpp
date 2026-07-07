@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 #include "QmitkConvertSurfaceToLabelAction.h"
 
-#include "mitkRenderingManager.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolManagerProvider.h"
+#include <mitkRenderingManager.h>
+#include <mitkLabelSetImage.h>
+#include <mitkToolManagerProvider.h>
 #include <mitkSurface.h>
 
 #include <QApplication>
@@ -76,16 +76,6 @@ void QmitkConvertSurfaceToLabelAction::Run( const QList<mitk::DataNode::Pointer>
       MITK_INFO << "   a nullptr node was selected";
     }
   }
-}
-
-void QmitkConvertSurfaceToLabelAction::SetSmoothed(bool /*smoothed*/)
-{
- //not needed
-}
-
-void QmitkConvertSurfaceToLabelAction::SetDecimated(bool /*decimated*/)
-{
-  //not needed
 }
 
 void QmitkConvertSurfaceToLabelAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)

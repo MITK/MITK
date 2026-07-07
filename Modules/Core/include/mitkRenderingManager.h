@@ -82,57 +82,103 @@ namespace mitk
 
     typedef itk::SmartPointer<DataStorage> DataStoragePointer;
 
+    /**
+     * \brief Enumeration of update request types.
+     */
     enum RequestType
     {
-      REQUEST_UPDATE_ALL = 0,
-      REQUEST_UPDATE_2DWINDOWS,
-      REQUEST_UPDATE_3DWINDOWS
+      REQUEST_UPDATE_ALL = 0,       ///< Update all render windows.
+      REQUEST_UPDATE_2DWINDOWS,     ///< Update only 2D render windows.
+      REQUEST_UPDATE_3DWINDOWS      ///< Update only 3D render windows.
     };
 
+    /**
+     * \brief Create a new RenderingManager instance via the registered factory.
+     * \return Smart pointer to the newly created instance, or nullptr if no factory is set.
+     */
     static Pointer New();
 
-    /** Set the object factory which produces the desired platform specific
-     * RenderingManager singleton instance. */
+    /**
+     * \brief Set the factory that produces platform-specific RenderingManager instances.
+     * \param[in] factory The factory to use.
+     */
     static void SetFactory(RenderingManagerFactory *factory);
 
-    /** Get the object factory which produces the platform specific
-     * RenderingManager instances. */
+    /**
+     * \brief Get the factory that produces platform-specific RenderingManager instances.
+     * \return Pointer to the current factory.
+     */
     static const RenderingManagerFactory *GetFactory();
 
-    /** Returns true if a factory has already been set. */
+    /**
+     * \brief Check whether a factory has already been set.
+     * \return True if a factory is registered.
+     */
     static bool HasFactory();
 
-    /** Get the RenderingManager singleton instance. */
+    /**
+     * \brief Get the RenderingManager singleton instance.
+     *
+     * If no instance exists yet, one is created using the registered factory.
+     *
+     * \return Pointer to the singleton RenderingManager.
+     */
     static RenderingManager *GetInstance();
 
-    /** Returns true if the singleton instance does already exist. */
+    /**
+     * \brief Check whether the singleton instance already exists.
+     * \return True if the singleton is instantiated.
+     */
     static bool IsInstantiated();
 
-    /** Adds a RenderWindow. This is required if the methods #RequestUpdateAll
-     * or #ForceImmediateUpdate are to be used. */
+    /**
+     * \brief Register a vtkRenderWindow with this RenderingManager.
+     *
+     * Required for using RequestUpdateAll() and ForceImmediateUpdateAll().
+     * Also sets up VTK rendering callbacks for the LOD abort mechanism.
+     *
+     * \param[in] renderWindow The render window to register.
+     */
     void AddRenderWindow(vtkRenderWindow *renderWindow);
 
-    /** Removes a RenderWindow. */
+    /**
+     * \brief Unregister a vtkRenderWindow from this RenderingManager.
+     * \param[in] renderWindow The render window to remove.
+     */
     void RemoveRenderWindow(vtkRenderWindow *renderWindow);
 
-    /** Get a list of all registered RenderWindows */
+    /**
+     * \brief Get all registered vtkRenderWindows.
+     * \return Const reference to the vector of registered render windows.
+     */
     const RenderWindowVector &GetAllRegisteredRenderWindows();
 
-    /** Requests an update for the specified RenderWindow, to be executed as
-   * soon as the main loop is ready for rendering. */
+    /**
+     * \brief Request a deferred update for the specified render window.
+     *
+     * The update is executed at the next event loop iteration. Multiple
+     * requests for the same window are coalesced.
+     *
+     * \param[in] renderWindow The render window to update.
+     */
     void RequestUpdate(vtkRenderWindow *renderWindow);
 
-    /** Immediately executes an update of the specified RenderWindow. */
+    /**
+     * \brief Immediately execute a synchronous update of the specified render window.
+     * \param[in] renderWindow The render window to update.
+     */
     void ForceImmediateUpdate(vtkRenderWindow *renderWindow);
 
-    /** Requests all currently registered RenderWindows to be updated.
-     * If only 2D or 3D windows should be updated, this can be specified
-     * via the parameter requestType. */
+    /**
+     * \brief Request a deferred update for all registered render windows.
+     * \param[in] type Filter to update only specific window types (default: all).
+     */
     void RequestUpdateAll(RequestType type = REQUEST_UPDATE_ALL);
 
-    /** Immediately executes an update of all registered RenderWindows.
-     * If only 2D or 3D windows should be updated, this can be specified
-     * via the parameter requestType. */
+    /**
+     * \brief Immediately execute a synchronous update for all registered render windows.
+     * \param[in] type Filter to update only specific window types (default: all).
+     */
     void ForceImmediateUpdateAll(RequestType type = REQUEST_UPDATE_ALL);
 
     /**
@@ -269,66 +315,127 @@ namespace mitk
      * time-slicing. */
     TimeNavigationController* GetTimeNavigationController();
 
+    /** \brief Destructor. Unregisters all render windows and removes callbacks. */
     ~RenderingManager() override;
 
-    /** Executes all pending requests. This method has to be called by the
-     * system whenever a RenderingManager induced request event occurs in
-     * the system pipeline (see concrete RenderingManager implementations). */
+    /**
+     * \brief Execute all pending rendering requests.
+     *
+     * Must be called by the system whenever a RenderingManager-induced
+     * request event occurs in the system pipeline.
+     */
     virtual void ExecutePendingRequests();
 
+    /**
+     * \brief Check whether any registered render window is currently rendering.
+     * \return True if rendering is in progress.
+     */
     bool IsRendering() const;
+
+    /**
+     * \brief Abort all in-progress renderings by setting the abort flag on active render windows.
+     */
     void AbortRendering();
 
-    /** En-/Disable LOD increase globally. */
+    /** \brief Set whether LOD increase is blocked globally. */
     itkSetMacro(LODIncreaseBlocked, bool);
-
-    /** En-/Disable LOD increase globally. */
+    /** \brief Get whether LOD increase is blocked globally. */
     itkGetMacro(LODIncreaseBlocked, bool);
-
-    /** En-/Disable LOD increase globally. */
+    /** \brief Toggle LOD increase blocking. */
     itkBooleanMacro(LODIncreaseBlocked);
 
-    /** En-/Disable LOD abort mechanism. */
+    /** \brief Set whether the LOD abort mechanism is enabled. */
     itkSetMacro(LODAbortMechanismEnabled, bool);
-
-    /** En-/Disable LOD abort mechanism. */
+    /** \brief Get whether the LOD abort mechanism is enabled. */
     itkGetMacro(LODAbortMechanismEnabled, bool);
-
-    /** En-/Disable LOD abort mechanism. */
+    /** \brief Toggle the LOD abort mechanism. */
     itkBooleanMacro(LODAbortMechanismEnabled);
 
-    /** Force a sub-class to start a timer for a pending hires-rendering request */
+    /** \brief Start or reset a timer for a pending high-resolution rendering request. Subclasses should override. */
     virtual void StartOrResetTimer(){};
 
-    /** To be called by a sub-class from a timer callback */
+    /** \brief Execute any pending high-resolution rendering requests. Called from a timer callback in subclasses. */
     void ExecutePendingHighResRenderingRequest();
 
+    /** \brief Hook called when rendering starts. Override in subclasses. */
     virtual void DoStartRendering(){};
+    /** \brief Hook called to monitor rendering progress. Override in subclasses. */
     virtual void DoMonitorRendering(){};
+    /** \brief Hook called when rendering abort is finished. Override in subclasses. */
     virtual void DoFinishAbortRendering(){};
 
+    /**
+     * \brief Get the next LOD level for the given renderer.
+     * \param[in] renderer The renderer to query (nullptr returns 0).
+     * \return The next LOD level.
+     */
     int GetNextLOD(BaseRenderer *renderer);
 
-    /** Set current LOD (nullptr means all renderers)*/
+    /**
+     * \brief Set the maximum LOD level.
+     * \param[in] max The maximum LOD value.
+     */
     void SetMaximumLOD(unsigned int max);
 
+    /**
+     * \brief Enable or disable shading for a specific LOD level.
+     * \param[in] state True to enable, false to disable.
+     * \param[in] lod The LOD level.
+     */
     void SetShading(bool state, unsigned int lod);
+
+    /**
+     * \brief Get the shading state for a specific LOD level.
+     * \param[in] lod The LOD level.
+     * \return True if shading is enabled for the given LOD.
+     */
     bool GetShading(unsigned int lod);
 
+    /**
+     * \brief Enable or disable the clipping plane.
+     * \param[in] status True to enable, false to disable.
+     */
     void SetClippingPlaneStatus(bool status);
+
+    /**
+     * \brief Get the clipping plane status.
+     * \return True if the clipping plane is enabled.
+     */
     bool GetClippingPlaneStatus();
 
+    /**
+     * \brief Set the shading values for rendering.
+     * \param[in] ambient Ambient coefficient.
+     * \param[in] diffuse Diffuse coefficient.
+     * \param[in] specular Specular coefficient.
+     * \param[in] specpower Specular power.
+     */
     void SetShadingValues(float ambient, float diffuse, float specular, float specpower);
 
+    /**
+     * \brief Get the current shading values.
+     * \return Reference to the vector of shading values [ambient, diffuse, specular, specpower].
+     */
     FloatVector &GetShadingValues();
 
-    /** Returns a property list */
+    /**
+     * \brief Get the internal property list used for global rendering settings.
+     * \return Smart pointer to the PropertyList.
+     */
     PropertyList::Pointer GetPropertyList() const;
 
-    /** Returns a property from m_PropertyList */
+    /**
+     * \brief Get a property from the internal property list.
+     * \param[in] propertyKey The property key to look up.
+     * \return Pointer to the property, or nullptr if not found.
+     */
     BaseProperty *GetProperty(const char *propertyKey) const;
 
-    /** Sets or adds (if not present) a property in m_PropertyList  */
+    /**
+     * \brief Set or add a property in the internal property list.
+     * \param[in] propertyKey The property key.
+     * \param[in] propertyValue The property value to set.
+     */
     void SetProperty(const char *propertyKey, BaseProperty *propertyValue);
 
     /**
@@ -470,12 +577,16 @@ namespace mitk
     AntiAliasing m_AntiAliasing;
   };
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 
   itkEventMacroDeclaration(RenderingManagerEvent, itk::AnyEvent);
   itkEventMacroDeclaration(RenderingManagerViewsInitializedEvent, RenderingManagerEvent);
 
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent);
 

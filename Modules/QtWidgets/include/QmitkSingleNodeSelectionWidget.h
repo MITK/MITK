@@ -15,23 +15,24 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <ui_QmitkSingleNodeSelectionWidget.h>
-
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkNodeSelectionButton.h>
+#include <memory>
 
 class QmitkAbstractDataStorageModel;
 
+namespace Ui { class QmitkSingleNodeSelectionWidget; }
+
 /**
-* @class QmitkSingleNodeSelectionWidget
-* @brief Widget that represents a node selection of (max) one node. It acts like a button. Clicking on it
+* \class QmitkSingleNodeSelectionWidget
+* \brief Widget that represents a node selection of (max) one node. It acts like a button. Clicking on it
 *        allows to change the selection.
 *
-* @remark This class provides a public function 'SetAutoSelectNewNodes' that can be used to enable
+* \remark This class provides a public function 'SetAutoSelectNewNodes' that can be used to enable
 *         the auto selection mode (default is false).
 *         The user of this class calling this function has to make sure that the base-class Q_SIGNAL
 *         'CurrentSelectionChanged', which will be emitted by this function, is already
@@ -43,6 +44,7 @@ class MITKQTWIDGETS_EXPORT QmitkSingleNodeSelectionWidget : public QmitkAbstract
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
+  ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
   bool GetAutoSelectNewNodes() const;
@@ -60,7 +62,7 @@ public Q_SLOTS:
   *  - data storage contains at least one node that matches the given predicate
   *  - no selection is set
   *
-  * @remark Enabling the auto selection mode by calling 'SetAutoSelectNewNodes(true)'
+  * \remark Enabling the auto selection mode by calling 'SetAutoSelectNewNodes(true)'
   *         will directly emit a 'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged' Q_SIGNAL
   *         if a valid auto selection was made.
   *         If this initial emission should not get lost, auto selection mode needs to be enabled after this
@@ -86,13 +88,13 @@ protected:
   void AutoSelectNodes();
 
   /** Helper function that gets a suitable auto selected node from the datastorage that fits to the predicate settings.
-   @param ignoreNodes You may pass a list of nodes that must not be chosen as auto selected node. */
+   \param ignoreNodes You may pass a list of nodes that must not be chosen as auto selected node. */
   mitk::DataNode::Pointer DetermineAutoSelectNode(const NodeList& ignoreNodes = {});
 
   /** See documentation of SetAutoSelectNewNodes for details*/
   bool m_AutoSelectNodes;
 
-  Ui_QmitkSingleNodeSelectionWidget m_Controls;
+  std::unique_ptr<Ui::QmitkSingleNodeSelectionWidget> m_Controls;
 };
 
 #endif

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 // Testing
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 // std includes
@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <tinyxml2.h>
 
 // MITK includes
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 #include <mitkNumericTypes.h>
 #include <mitkUtf8Util.h>
 

@@ -19,9 +19,9 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkStringProperty.h>
 
-#include "QmitkDataStorageFilterProxyModel.h"
-#include "QmitkDataStorageTreeModel.h"
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkDataStorageFilterProxyModel.h>
+#include <QmitkDataStorageTreeModel.h>
+#include <QmitkNodeDescriptorManager.h>
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 
@@ -41,17 +41,16 @@ QmitkDataStorageFilterProxyModel::~QmitkDataStorageFilterProxyModel()
 
 void QmitkDataStorageFilterProxyModel::AddFilterPredicate(mitk::NodePredicateBase::Pointer pred)
 {
+  this->beginFilterChange();
   m_Predicates.insert(pred);
-  this->invalidateFilter();
+  this->endFilterChange();
 }
 
 bool QmitkDataStorageFilterProxyModel::RemoveFilterPredicate(mitk::NodePredicateBase::Pointer pred)
 {
+  this->beginFilterChange();
   bool removed = m_Predicates.erase(pred) != 0;
-  if (removed)
-  {
-    this->invalidateFilter();
-  }
+  this->endFilterChange();
   return removed;
 }
 

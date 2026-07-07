@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCellOperation.h"
+#include <mitkCellOperation.h>
 
 mitk::CellOperation::CellOperation(OperationType operationType, int cellId, Vector3D vector)
   : mitk::Operation(operationType), m_CellId(cellId), m_Vector(vector)

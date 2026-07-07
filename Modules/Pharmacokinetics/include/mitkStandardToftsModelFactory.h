@@ -12,14 +12,17 @@ found in the LICENSE file.
 #ifndef mitkStandardToftsModelFactory_h
 #define mitkStandardToftsModelFactory_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkStandardToftsModel.h"
-#include "mitkStandardToftsModelParameterizer.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkStandardToftsModel.h>
+#include <mitkStandardToftsModelParameterizer.h>
 
 namespace mitk
 {
 
 
+  /** \brief Factory for the StandardToftsModel.
+   * \sa StandardToftsModel, StandardToftsModelParameterizer, ConcreteAIFBasedModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT StandardToftsModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<StandardToftsModelParameterizer>
   {

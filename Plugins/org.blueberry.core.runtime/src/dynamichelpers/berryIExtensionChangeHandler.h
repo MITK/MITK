@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIEXTENSIONCHANGEHANDLER_H
 #define BERRYIEXTENSIONCHANGEHANDLER_H
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <org_blueberry_core_runtime_Export.h>
 

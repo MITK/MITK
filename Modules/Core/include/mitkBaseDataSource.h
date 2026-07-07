@@ -56,38 +56,41 @@ namespace mitk
   class BaseData;
 
   /**
-   * @brief Superclass of all classes generating some kind of mitk::BaseData.
+   * \brief Superclass of all classes generating some kind of mitk::BaseData.
    *
-   * Superclass of all classes generating some kind of mitk::BaseData.
-   * In itk and vtk the generated result of a ProcessObject is only guaranteed
-   * to be up-to-date, when Update() of the ProcessObject or the generated
+   * In ITK and VTK the generated result of a ProcessObject is only guaranteed
+   * to be up-to-date when Update() of the ProcessObject or the generated
    * DataObject is called immediately before access of the data stored in the
    * DataObject. This is also true for subclasses of mitk::BaseProcess. But
    * many of the subclasses of mitk::BaseProcess define additional access
-   * functions to the generated output that guarantee an up-to-date result, see
+   * functions to the generated output that guarantee an up-to-date result; see
    * for example mitk::ImageSource.
-   * @ingroup Process
+   *
+   * \ingroup Process
    */
   class MITKCORE_EXPORT BaseDataSource : public itk::ProcessObject
   {
   public:
     mitkClassMacroItkParent(BaseDataSource, itk::ProcessObject);
 
+      /** \brief Output data type. */
       typedef BaseData OutputType;
+
+    /** \brief Identifier type for named data objects. */
     typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
 
     mitkBaseDataSourceGetOutputDeclarations
 
-      /** @brief Graft the specified BaseData onto this BaseDataSource's output.
+      /**
+       * \brief Graft the specified BaseData onto this BaseDataSource's output.
        *
-       * This method is used when a
-       * process object is implemented using a mini-pipeline which is
-       * defined in its GenerateData() method.  The usage is:
+       * This method is used when a process object is implemented using a
+       * mini-pipeline defined in its GenerateData() method. The usage is:
        *
        * \code
        *    // setup the mini-pipeline to process the input to this filter
        *    firstFilterInMiniPipeline->SetInput( this->GetInput() );
-
+       *
        *    // setup the mini-pipeline to calculate the correct regions
        *    // and write to the appropriate bulk data block
        *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput(0) );
@@ -99,50 +102,70 @@ namespace mitk
        *    // this is needed to get the appropriate regions passed back.
        *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput(0) );
        * \endcode
+       *
+       * \param[in] output  The BaseData object to graft onto this source's primary output.
        */
       virtual void
       GraftOutput(OutputType *output);
 
     /**
-     * Graft the specified base data object onto this BaseDataSource's named
-     * output. This is similar to the GraftOutput method except it
-     * allows you to specify which output is affected.
-     * See the GraftOutput for general usage information.
+     * \brief Graft the specified base data object onto a named output.
+     *
+     * Similar to the GraftOutput method except it allows you to specify
+     * which output is affected by name.
+     *
+     * \param[in] key     The identifier of the output to graft onto.
+     * \param[in] output  The BaseData object to graft.
+     *
+     * \sa GraftOutput
      */
     virtual void GraftOutput(const DataObjectIdentifierType &key, OutputType *output);
 
-    /** @brief Graft the specified base data object onto this BaseDataSource's idx'th
-     * output.
+    /**
+     * \brief Graft the specified base data object onto this BaseDataSource's idx'th output.
      *
-     * This is the similar to GraftOutput method except is
-     * allows you specify which output is affected. The specified index
-     * must be a valid output number (less than
-     * ProcessObject::GetNumberOfOutputs()). See the GraftOutput for
-     * general usage information.
+     * Similar to GraftOutput except it allows you to specify which output is
+     * affected by index. The specified index must be a valid output number
+     * (less than ProcessObject::GetNumberOfOutputs()).
+     *
+     * \param[in] idx     The zero-based index of the output to graft onto.
+     * \param[in] output  The BaseData object to graft.
+     *
+     * \sa GraftOutput
      */
     virtual void GraftNthOutput(unsigned int idx, OutputType *output);
 
     /**
-     * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
+     * \brief Create the output data object for the given index.
+     *
+     * \sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
      */
     DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override = 0;
 
     /**
-     * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
+     * \brief Create the output data object for the given name.
+     *
+     * \sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
      */
     DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override = 0;
 
     /**
-     * @brief Access itk::ProcessObject::m_Updating
+     * \brief Check whether the pipeline is currently executing.
      *
-     * m_Updating indicates when the pipeline is executing.
-     * It prevents infinite recursion when pipelines have loops.
+     * Accesses itk::ProcessObject::m_Updating, which prevents infinite
+     * recursion when pipelines have loops.
+     *
+     * \return True if the pipeline is currently executing, false otherwise.
+     *
      * \sa itk::ProcessObject::m_Updating
-     **/
+     */
     bool Updating() const;
 
   protected:
+    /** \brief Constructor. */
     BaseDataSource();
+
+    /** \brief Destructor. */
     ~BaseDataSource() override;
 
     // purposely not implemented

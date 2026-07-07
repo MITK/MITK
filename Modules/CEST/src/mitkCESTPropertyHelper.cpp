@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTPropertyHelper.h"
+#include <mitkCESTPropertyHelper.h>
 
-#include "mitkDICOMProperty.h"
-#include "mitkStringProperty.h"
+#include <mitkDICOMProperty.h>
+#include <mitkStringProperty.h>
 
 const std::string mitk::CEST_PROPERTY_NAME_PREPERATIONTYPE()
 {

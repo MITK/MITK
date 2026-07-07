@@ -10,13 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itSmoothedClassProbabilites_h
-#define itSmoothedClassProbabilites_h
+#ifndef itkSmoothedClassProbabilites_h
+#define itkSmoothedClassProbabilites_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
+/**
+ * \brief Applies Gaussian smoothing to class probability images within a mask region.
+ *
+ * Each input class probability image is smoothed with a Gaussian kernel of configurable
+ * sigma. The mask restricts which voxels are considered for smoothing.
+ *
+ * \tparam TImage The image type for both input and output.
+ */
 template< class TImage>
 class SmoothedClassProbabilites:public ImageToImageFilter< TImage, TImage >
 {
@@ -27,10 +35,15 @@ public:
   typedef SmartPointer< Self >        Pointer;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self); /** Run-time type information (and related methods). */
+  itkNewMacro(Self);
+  /** Run-time type information (and related methods). */
   itkTypeMacro(SmoothedClassProbabilites, ImageToImageFilter);
   itkSetMacro(Sigma, double);
 
+  /**
+   * \brief Set the mask image that restricts the smoothing region.
+   * \param mask Pointer to the mask image.
+   */
   void SetMaskImage(TImage * mask){m_MaskImage = mask;}
 
 protected:
@@ -53,7 +66,7 @@ private:
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <../src/Algorithms/itkSmoothedClassProbabilites.cpp>
+#include "../src/Algorithms/itkSmoothedClassProbabilites.cpp"
 #endif
 
 

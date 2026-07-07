@@ -13,32 +13,40 @@ found in the LICENSE file.
 #ifndef mitkVectorPropertySerializer_h
 #define mitkVectorPropertySerializer_h
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkVectorProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkVectorProperty.h>
 #include <mitkLexicalCast.h>
 #include <tinyxml2.h>
 
 namespace mitk
 {
   /**
-    \brief Serializes a VectorProperty
-
-    Serializes an instance of VectorProperty into a XML structure like
-
-    \verbatim
-    <Values>
-      <Value idx="0" value="17.3"/>
-      <Value idx="1" value="7.2"/>
-      <Value idx="2" value="-17.3"/>
-    </Values>
-    \endverbatim
-
-    This class is implemented as a template and makes use of std::stringstream
-    for necessary conversions of specific data types to and from string.
-
-    For numeric types, the class adds a precision token to stringstream that
-    should usually suffice.
-  */
+   * \brief Serializes and deserializes VectorProperty instances to/from XML.
+   *
+   * Converts a VectorProperty (a vector of values of type DATATYPE) into an
+   * XML structure and back. The XML format is:
+   *
+   * \verbatim
+   * <Values>
+   *   <Value idx="0" value="17.3"/>
+   *   <Value idx="1" value="7.2"/>
+   *   <Value idx="2" value="-17.3"/>
+   * </Values>
+   * \endverbatim
+   *
+   * This class is implemented as a template and uses boost::lexical_cast
+   * for conversions between specific data types and strings.
+   *
+   * \tparam DATATYPE The element type stored in the VectorProperty (e.g., double, int).
+   *
+   * \note The class name returned by GetStaticNameOfClass() is prefixed with
+   *       a type-dependent string (e.g., "Double" or "Int"), so that the ITK
+   *       object factory can discover the correct serializer for each VectorProperty
+   *       specialization.
+   *
+   * \sa BasePropertySerializer, VectorProperty, DoubleVectorPropertySerializer,
+   *     IntVectorPropertySerializer
+   */
   template <typename DATATYPE>
   class MITKSCENESERIALIZATIONBASE_EXPORT VectorPropertySerializer : public BasePropertySerializer
   {
@@ -68,7 +76,17 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    //! Build an XML version of this property
+    /**
+     * \brief Serializes the VectorProperty into an XML "Values" element.
+     *
+     * Each element of the vector is stored as a child element with an
+     * "idx" attribute (zero-based index) and a "value" attribute (string
+     * representation of the numeric value).
+     *
+     * \param[in,out] doc The XML document used to create elements.
+     * \return Pointer to the "Values" XML element, or nullptr if the
+     *         property is not a VectorProperty of the expected type.
+     */
     tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       auto *listElement = doc.NewElement("Values");
@@ -96,7 +114,17 @@ namespace mitk
       }
     }
 
-    //! Construct a property from an XML serialization
+    /**
+     * \brief Deserializes an XML "Values" element back into a VectorProperty.
+     *
+     * Reads child "Value" elements, parses each "value" attribute using
+     * boost::lexical_cast, and constructs a new VectorProperty containing
+     * the parsed values.
+     *
+     * \param[in] listElement The XML "Values" element to deserialize. May be nullptr.
+     * \return A smart pointer to the deserialized VectorProperty, or nullptr
+     *         if the element is null, missing, or contains unparsable values.
+     */
     BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *listElement) override
     {
       typename PropertyType::VectorType datalist;
@@ -141,7 +169,9 @@ namespace mitk
     }
   };
 
+  /** \brief Convenience typedef for a VectorPropertySerializer specialized for double values. */
   typedef VectorPropertySerializer<double> DoubleVectorPropertySerializer;
+  /** \brief Convenience typedef for a VectorPropertySerializer specialized for int values. */
   typedef VectorPropertySerializer<int> IntVectorPropertySerializer;
 
 } // namespace

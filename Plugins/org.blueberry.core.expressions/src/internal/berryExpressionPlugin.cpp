@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "berryExpressions.h"
 #include "berryTypeExtensionManager.h"
 #include "berryPlatformPropertyTester.h"
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 
 namespace berry {
 

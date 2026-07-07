@@ -86,7 +86,7 @@ namespace
       {
         std::string sopUID;
 
-        if (mitk::GetBackwardsCompatibleDICOMProperty(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
+        if (mitk::GetBackwardsCompatibleDICOMPropertyValue(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
           doseImageNode->SetName(sopUID);
 
         auto prefService = mitk::CoreServices::GetPreferencesService();
@@ -159,7 +159,7 @@ namespace
 const std::string QmitkDicomBrowser::EDITOR_ID = "org.mitk.editors.dicombrowser";
 
 QmitkDicomBrowser::QmitkDicomBrowser()
-  : m_Ui(new Ui::QmitkDicomBrowser)
+  : m_Ui(std::make_unique<Ui::QmitkDicomBrowser>())
 {
 }
 
@@ -174,6 +174,7 @@ QmitkDicomBrowser::~QmitkDicomBrowser()
 
   if (queryTagCacheFile.exists())
     queryTagCacheFile.remove();
+
 }
 
 void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent)
@@ -212,9 +213,15 @@ void QmitkDicomBrowser::OnIndexingComplete()
 
 void QmitkDicomBrowser::OnViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series)
 {
-  auto serviceRef = mitk::PluginActivator::GetContext()->getServiceReference<mitk::IDataStorageService>();
-  auto storageService = mitk::PluginActivator::GetContext()->getService<mitk::IDataStorageService>(serviceRef);
-  auto dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+  if (!dsService)
+  {
+    MITK_ERROR << "IDataStorageService not available. Unable to load DICOM data.";
+    QMessageBox::critical(nullptr, "View DICOM series", "Data storage service not available.");
+    return;
+  }
+
+  auto dataStorage = dsService->GetDefaultDataStorage().GetPointer();
 
   bool reinit = false;
 

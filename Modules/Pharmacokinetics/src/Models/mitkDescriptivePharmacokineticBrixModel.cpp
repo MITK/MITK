@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDescriptivePharmacokineticBrixModel.h"
+#include <mitkDescriptivePharmacokineticBrixModel.h>
 
 const std::string mitk::DescriptivePharmacokineticBrixModel::MODEL_DISPLAY_NAME =
   "Descriptive Pharmacokinetic Brix Model";
@@ -81,6 +81,11 @@ std::string mitk::DescriptivePharmacokineticBrixModel::GetYAxisUnit() const
 mitk::DescriptivePharmacokineticBrixModel::DescriptivePharmacokineticBrixModel(): m_Tau(0), m_S0(1)
 {
 
+}
+
+mitk::DescriptivePharmacokineticBrixModel::DescriptivePharmacokineticBrixModel(const DescriptivePharmacokineticBrixModel &other)
+  : ModelBase(other), m_Tau(other.m_Tau), m_S0(other.m_S0)
+{
 }
 
 mitk::DescriptivePharmacokineticBrixModel::~DescriptivePharmacokineticBrixModel()
@@ -248,17 +253,6 @@ const
   }
 
   return result;
-};
-
-itk::LightObject::Pointer mitk::DescriptivePharmacokineticBrixModel::InternalClone() const
-{
-  DescriptivePharmacokineticBrixModel::Pointer newClone = DescriptivePharmacokineticBrixModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-  newClone->SetTau(this->m_Tau);
-  newClone->SetS0(this->m_S0);
-
-  return newClone.GetPointer();
 };
 
 void mitk::DescriptivePharmacokineticBrixModel::PrintSelf(std::ostream& os,

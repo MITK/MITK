@@ -13,16 +13,13 @@ found in the LICENSE file.
 #ifndef mitkPointSetShapeProperty_h
 #define mitkPointSetShapeProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
+   * \brief Enumeration property for point set rendering shapes.
+   *
    * Encapsulates the enumeration for point set shapes. Valid values are:
    * \li NONE
    * \li VERTEX
@@ -39,6 +36,8 @@ namespace mitk
    *
    * This class provides different shapes for the point set rendering (unselected points).
    *
+   * \sa EnumerationProperty
+   * \sa PointSetDataInteractor
    */
 
   class MITKCORE_EXPORT PointSetShapeProperty : public EnumerationProperty
@@ -93,6 +92,8 @@ namespace mitk
      */
     PointSetShapeProperty(const std::string &value);
 
+    PointSetShapeProperty(const PointSetShapeProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
@@ -104,16 +105,13 @@ namespace mitk
      */
     virtual void AddPointSetShapes();
 
+    mitkCloneMacro(PointSetShapeProperty);
+
   private:
     // purposely not implemented
     PointSetShapeProperty &operator=(const PointSetShapeProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

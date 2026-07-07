@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataNode.h"
-#include "mitkCoreObjectFactory.h"
+#include <mitkDataNode.h>
+#include <mitkCoreObjectFactory.h>
 #include <vtkTransform.h>
 
-#include "mitkGroupTagProperty.h"
-#include "mitkProperties.h"
-#include "mitkSmartPointerProperty.h"
-#include "mitkStringProperty.h"
+#include <mitkGroupTagProperty.h>
+#include <mitkProperties.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkStringProperty.h>
 //#include "mitkMaterialProperty.h"
-#include "mitkColorProperty.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkGenericProperty.h"
-#include "mitkGeometry3D.h"
-#include "mitkImageSource.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkRenderingManager.h"
+#include <mitkColorProperty.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkGenericProperty.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageSource.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkRenderingManager.h>
 
 namespace mitk
 {

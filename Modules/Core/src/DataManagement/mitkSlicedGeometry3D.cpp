@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include <itkSpatialOrientationAdapter.h>
 
-#include "mitkSlicedGeometry3D.h"
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkApplyTransformMatrixOperation.h"
-#include "mitkInteractionConst.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneOperation.h"
-#include "mitkRestorePlanePositionOperation.h"
-#include "mitkRotationOperation.h"
-#include "mitkSliceNavigationController.h"
+#include <mitkSlicedGeometry3D.h>
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkApplyTransformMatrixOperation.h>
+#include <mitkInteractionConst.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneOperation.h>
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkRotationOperation.h>
+#include <mitkSliceNavigationController.h>
 
 const mitk::ScalarType PI = 3.14159265359;
 
@@ -130,7 +130,8 @@ bool mitk::SlicedGeometry3D::SetPlaneGeometry(mitk::PlaneGeometry *geometry2D, i
   if (this->IsValidSlice(s))
   {
     m_PlaneGeometries[s] = geometry2D;
-    m_PlaneGeometries[s]->SetReferenceGeometry(m_ReferenceGeometry);
+    if (geometry2D != nullptr)
+      m_PlaneGeometries[s]->SetReferenceGeometry(m_ReferenceGeometry);
     return true;
   }
   return false;
@@ -595,13 +596,6 @@ void mitk::SlicedGeometry3D::SetDirectionVector(const mitk::Vector3D &directionV
 //  }
 //  m_TimeBounds = timebounds;
 //}
-
-itk::LightObject::Pointer mitk::SlicedGeometry3D::InternalClone() const
-{
-  Self::Pointer newGeometry = new SlicedGeometry3D(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}
 
 void mitk::SlicedGeometry3D::PrintSelf(std::ostream &os, itk::Indent indent) const
 {

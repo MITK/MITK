@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "usServiceRegistration.h"
+#include <usServiceRegistration.h>
 
 /// forward declarations
 struct QmitkMeasurementViewData;
@@ -76,6 +76,8 @@ private:
 
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+
+    void SelectNode(const mitk::DataNode::Pointer& node);
 
     void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 

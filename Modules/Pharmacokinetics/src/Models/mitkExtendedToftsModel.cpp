@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtendedToftsModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkExtendedToftsModel.h>
+#include <mitkConvolutionHelper.h>
 #include <vnl/algo/vnl_fft_1d.h>
 #include <fstream>
 
@@ -173,14 +173,10 @@ mitk::ModelBase::DerivedParameterMapType mitk::ExtendedToftsModel::ComputeDerive
   return result;
 };
 
-itk::LightObject::Pointer mitk::ExtendedToftsModel::InternalClone() const
+mitk::ExtendedToftsModel::ExtendedToftsModel(const ExtendedToftsModel& source)
+: Superclass(source)
 {
-  ExtendedToftsModel::Pointer newClone = ExtendedToftsModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}
 
 void mitk::ExtendedToftsModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const
 {

@@ -27,7 +27,11 @@ namespace
 }
 
 QmitkAppInstancesPreferencePage::QmitkAppInstancesPreferencePage()
-  : controls(new Ui::QmitkAppInstancesPreferencePage)
+  : controls(std::make_unique<Ui::QmitkAppInstancesPreferencePage>())
+{
+}
+
+QmitkAppInstancesPreferencePage::~QmitkAppInstancesPreferencePage()
 {
 }
 

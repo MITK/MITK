@@ -16,6 +16,7 @@ found in the LICENSE file.
 // berry includes
 #include <berryQtSelectionProvider.h>
 #include <berryQtViewPart.h>
+#include <memory>
 
 namespace Ui
 {
@@ -43,6 +44,7 @@ public:
   //! [Qt Selection Provider]
 
   SelectionView();
+  ~SelectionView() override;
 
 protected:
   void CreateQtPartControl(QWidget *parent) override;
@@ -50,7 +52,7 @@ protected:
   void SetFocus() override;
 
 private:
-  Ui::SelectionViewControls *m_Controls;
+  std::unique_ptr<Ui::SelectionViewControls> m_Controls;
 
   QWidget *m_Parent;
 };

@@ -13,16 +13,20 @@ found in the LICENSE file.
 #ifndef mitkNumericTypes_h
 #define mitkNumericTypes_h
 
-#include "mitkAffineTransform3D.h"
-#include "mitkEqual.h"
-#include "mitkMatrix.h"
-#include "mitkNumericConstants.h"
-#include "mitkPoint.h"
-#include "mitkQuaternion.h"
-#include "mitkVector.h"
+/**
+ * \file mitkNumericTypes.h
+ * \brief Convenience header that includes all MITK numeric types.
+ *
+ * Includes Vector, Point, Matrix, AffineTransform3D, Quaternion, Equal,
+ * and NumericConstants.
+ */
 
-// this include hold the old deprecated ways to convert from itk 2 vtk and the likes.
-// calls to these functions shall be removed in future bugsquashings so that this include can be removed.
-#include "mitkVectorDeprecated.h"
+#include <mitkAffineTransform3D.h>
+#include <mitkEqual.h>
+#include <mitkMatrix.h>
+#include <mitkNumericConstants.h>
+#include <mitkPoint.h>
+#include <mitkQuaternion.h>
+#include <mitkVector.h>
 
 #endif

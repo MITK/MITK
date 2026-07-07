@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageGenerationHelper.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkImageCast.h"
+#include <mitkImageGenerationHelper.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkImageCast.h>
 
 
   typedef itk::Image<double,3> FrameITKImageType;
@@ -108,6 +108,7 @@ found in the LICENSE file.
     dynamicITKOrigin[0]=tempImage->GetGeometry()->GetOrigin()[0];
     dynamicITKOrigin[1]=tempImage->GetGeometry()->GetOrigin()[1];
     dynamicITKOrigin[2]=tempImage->GetGeometry()->GetOrigin()[2];
+    dynamicITKOrigin[3]=0.0;
 
     dynamicITKImage->SetOrigin(dynamicITKOrigin);
     dynamicITKImage->SetSpacing(dynamicITKSpacing);

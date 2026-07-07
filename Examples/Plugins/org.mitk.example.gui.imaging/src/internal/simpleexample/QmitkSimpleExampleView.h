@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <memory>
 
 class QmitkStepperAdapter;
 
@@ -84,7 +85,7 @@ private slots:
   void OnTakeScreenshot();
 
 private:
-  Ui::QmitkSimpleExampleViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkSimpleExampleViewControls> m_Controls;
 
   bool m_NavigatorsInitialized;
 

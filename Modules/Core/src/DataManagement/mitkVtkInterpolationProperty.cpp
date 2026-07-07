@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkInterpolationProperty.h"
+#include <mitkVtkInterpolationProperty.h>
 #include <vtkProperty.h>
 
 mitk::VtkInterpolationProperty::VtkInterpolationProperty()
@@ -45,6 +45,11 @@ mitk::VtkInterpolationProperty::VtkInterpolationProperty(const std::string &valu
   }
 }
 
+mitk::VtkInterpolationProperty::VtkInterpolationProperty(const VtkInterpolationProperty &other)
+  : EnumerationProperty(other)
+{
+}
+
 int mitk::VtkInterpolationProperty::GetVtkInterpolation()
 {
   return static_cast<int>(GetValueAsId());
@@ -77,9 +82,3 @@ bool mitk::VtkInterpolationProperty::AddEnum(const std::string &name, const IdTy
   return Superclass::AddEnum(name, id);
 }
 
-itk::LightObject::Pointer mitk::VtkInterpolationProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

@@ -13,20 +13,27 @@ found in the LICENSE file.
 #ifndef MRPerfusionView_h
 #define MRPerfusionView_h
 
+#include <mitkNodePredicateBase.h>
+#include <mitkModelBase.h>
+#include <mitkModelFitResultHelper.h>
+#include <mitkModelFactoryBase.h>
+#include <mitkLevenbergMarquardtModelFitFunctor.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
+#include <mitkAIFBasedModelBase.h>
+
+#include <QmitkAbstractView.h>
+#include <QmitkParameterFitBackgroundJob.h>
+
+#include <itkCommand.h>
+
 #include <QString>
 
-#include "QmitkAbstractView.h"
+#include <memory>
 
-#include "itkCommand.h"
-
-#include "ui_MRPerfusionViewControls.h"
-#include "mitkModelBase.h"
-#include "QmitkParameterFitBackgroundJob.h"
-#include "mitkModelFitResultHelper.h"
-#include "mitkModelFactoryBase.h"
-#include "mitkLevenbergMarquardtModelFitFunctor.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
-#include "mitkAIFBasedModelBase.h"
+namespace Ui
+{
+  class MRPerfusionViewControls;
+}
 
 /*!
 *	@brief Test Plugin for SUV calculations of PET images
@@ -41,6 +48,7 @@ public:
   static const std::string VIEW_ID;
 
   MRPerfusionView();
+  ~MRPerfusionView() override;
 
 protected slots:
 
@@ -114,8 +122,16 @@ protected:
   void OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
   void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
+  /** Refreshes the mask-selector status hint (labelMaskStatus): how many
+   *  segmentations are hidden from the tissue "Selected Mask" selector because
+   *  their geometry does not match the selected time series, and whether
+   *  ROI-based fitting is unavailable because no mask is selected. Recomputed
+   *  from the current selection state; it does not track DataStorage changes
+   *  that happen without a subsequent selection change. */
+  void UpdateMaskStatusInfo();
+
   /*! @brief The view's UI controls */
-  Ui::MRPerfusionViewControls m_Controls;
+  std::unique_ptr<Ui::MRPerfusionViewControls> m_Controls;
 
   /* Nodes selected by user/ui for the fit */
   mitk::DataNode::Pointer m_selectedNode;
@@ -180,7 +196,6 @@ private:
   std::vector<double> AIFinputFunction;
 
   mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
-  mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
   mitk::NodePredicateBase::Pointer m_isValidPDWImagePredicate;
   mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 

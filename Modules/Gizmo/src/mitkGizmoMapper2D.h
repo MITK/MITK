@@ -22,16 +22,19 @@ namespace mitk
   // forward declaration
   class Gizmo;
 
-  //! 2D Mapper for mitk::Gimzo.
-  //!
-  //! Paints a similar representation as for 2D (see mitk::Gizmo itself).
-  //! The three axes of the manipulated object are visualized. They are
-  //! pickable and will report "move along axis" or "scale" when clicked
-  //! at the arrow shafts or the arrow tips.
-  //!
-  //! For usability, we removed the circles for rotation because they
-  //! would most often coincide with the arrows, thus distinction is
-  //! complicated.
+  /**
+   * \brief 2D mapper for mitk::Gizmo.
+   *
+   * Paints a similar representation as for 3D (see mitk::Gizmo itself).
+   * The three axes of the manipulated object are visualized as arrows. They are
+   * pickable and will report "move along axis" or "scale" when clicked
+   * at the arrow shafts or the arrow tips, respectively.
+   *
+   * For usability, the circles for rotation are omitted in 2D because they
+   * would most often coincide with the arrows, making distinction difficult.
+   *
+   * \sa Gizmo, GizmoInteractor
+   */
   class GizmoMapper2D : public mitk::VtkMapper
   {
   public:
@@ -39,52 +42,86 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    //! Provides given node with a set of default properties.
-    //!
-    //! \param node The DataNode to decorate with properties.
-    //! \param renderer When not nullptr, generate specific properties for given renderer
-    //! \param overwrite Whether already existing properties shall be overwritten.
+    /**
+     * \brief Provides the given node with a set of default properties.
+     *
+     * Configures color, scalar visibility, lookup table for axis coloring,
+     * and visibility properties for the gizmo rendering.
+     *
+     * \param node The DataNode to decorate with default properties.
+     * \param renderer When not nullptr, generate renderer-specific properties.
+     * \param overwrite Whether already existing properties shall be overwritten.
+     */
     static void SetDefaultProperties(mitk::DataNode *node,
                                      mitk::BaseRenderer *renderer = nullptr,
                                      bool overwrite = false);
 
-    //! Return the vtkProp that represents the "rendering result".
+    /**
+     * \brief Return the vtkProp that represents the rendering result.
+     *
+     * \param renderer The renderer for which to retrieve the vtkProp.
+     * \return The vtkActor used for rendering this gizmo in the given renderer.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override { return m_LSH.GetLocalStorage(renderer)->m_Actor; }
-    //! "Resets" the mapper, setting its result to invisible.
+
+    /**
+     * \brief Reset the mapper, setting its result to invisible.
+     *
+     * \param renderer The renderer whose local storage should be reset.
+     */
     void ResetMapper(mitk::BaseRenderer *renderer) override;
 
-    //! Return the internal vtkPolyData for given renderer.
-    //! This serves for picking by the associated interactor class.
+    /**
+     * \brief Return the internal vtkPolyData for the given renderer.
+     *
+     * This serves for picking by the associated GizmoInteractor class.
+     * The poly data contains scalar values that encode the handle type
+     * (e.g., Gizmo::MoveAlongAxisX, Gizmo::ScaleX).
+     *
+     * \param renderer The renderer for which to retrieve the poly data.
+     * \return The vtkPolyData used as mapper input for the given renderer.
+     */
     vtkPolyData *GetVtkPolyData(mitk::BaseRenderer *renderer);
 
   private:
-    //! Provide the mapping input as a specific RawMesh_C
+    /** \brief Retrieve the input Gizmo data object from the associated DataNode. */
     const Gizmo *GetInput();
 
-    //! Update the vtkProp, i.e. the contours of a slice through our RawMesh_C.
+    /**
+     * \brief Update the vtkProp by generating 2D arrow geometry for the current slice.
+     *
+     * Creates arrows along the three gizmo axes and a center disk for free movement,
+     * projected onto the current world plane geometry of the renderer.
+     *
+     * \param renderer The renderer for which to generate the 2D representation.
+     */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    //! Apply visual properties
+    /**
+     * \brief Apply visual properties (line width, lookup table, scalar visibility)
+     *        to the local storage actor.
+     *
+     * \param renderer The renderer whose local storage should be updated.
+     */
     void ApplyVisualProperties(BaseRenderer *renderer);
 
-    //! (RenderWindow) Instance specific data.
+    /** \brief Render-window-specific data storage for the 2D gizmo mapper. */
     class LocalStorage : public Mapper::BaseLocalStorage
     {
     public:
-      //! The overall rendering result.
+      /** \brief The overall rendering result actor. */
       vtkSmartPointer<vtkActor> m_Actor;
 
-      //! The mapper of the resulting vtkPolyData
-      //! (3D polygons for 3D mapper, 2D contours for 2D mapper)
+      /** \brief The mapper of the resulting vtkPolyData (2D contours for 2D mapper). */
       vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
 
-      //! Last time this storage has been updated.
+      /** \brief Last time this storage has been updated. */
       itk::TimeStamp m_LastUpdateTime;
 
       LocalStorage();
     };
 
-    //! (RenderWindow) Instance specific data.
+    /** \brief Render-window-specific local storage handler. */
     LocalStorageHandler<LocalStorage> m_LSH;
   };
 

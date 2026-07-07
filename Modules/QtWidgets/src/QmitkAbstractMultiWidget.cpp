@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk qt widgets module
-#include "QmitkAbstractMultiWidget.h"
-#include "QmitkMultiWidgetLayoutManager.h"
-#include "QmitkRenderWindowWidget.h"
+#include <QmitkAbstractMultiWidget.h>
+#include <QmitkMultiWidgetLayoutManager.h>
+#include <QmitkRenderWindowWidget.h>
 
 // mitk core
 #include <mitkDataStorage.h>
@@ -55,6 +55,16 @@ struct QmitkAbstractMultiWidget::Impl final
 
   QString m_MultiWidgetName;
 
+  // INVARIANT: cells stored here are owned by these shared_ptrs and MUST be
+  // destroyed by dropping the shared_ptr (via 'RemoveRenderWindowWidget' or
+  // 'TearDownAllCells'). They MUST NOT be cascade-deleted via Qt's parent /
+  // child mechanics: cells are created with 'std::make_shared', so the
+  // QObject lives inside the shared_ptr's combined control block and
+  // calling 'operator delete' on it - which Qt's 'deleteChildren' does -
+  // is undefined behaviour. Any path that destroys a layout/splitter that
+  // contains cells must drop the shared_ptrs first; see 'TearDownAllCells'
+  // for the canonical sequence. (Architectural debt: dual ownership model
+  // is brittle and worth replacing with a single ownership domain.)
   RenderWindowWidgetMap m_RenderWindowWidgets;
   RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
 
@@ -311,9 +321,23 @@ QString QmitkAbstractMultiWidget::GetNameFromIndex(int row, int column) const
 
 QString QmitkAbstractMultiWidget::GetNameFromIndex(size_t index) const
 {
-  if (index <= m_Impl->m_RenderWindowWidgets.size())
+  // Look-ahead: if 'index' equals the current cell count, return the legacy
+  // positional name a hypothetical next cell would have received. This keeps
+  // the slot prediction the toolbar uses working unchanged.
+  if (index == m_Impl->m_RenderWindowWidgets.size())
   {
     return m_Impl->m_MultiWidgetName + ".widget" + QString::number(index);
+  }
+
+  // Indexed lookup: walk the registered map (sorted by qualified name) and
+  // return the i-th key. This keeps the positional accessor functional under
+  // any naming scheme, including v2 layouts with custom names that no longer
+  // match 'widget<index>'.
+  if (index < m_Impl->m_RenderWindowWidgets.size())
+  {
+    auto iterator = m_Impl->m_RenderWindowWidgets.begin();
+    std::advance(iterator, index);
+    return iterator->first;
   }
 
   return QString();
@@ -403,18 +427,39 @@ void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, 
   m_Impl->m_RenderWindowWidgets.insert(std::make_pair(widgetName, renderWindowWidget));
 }
 
+void QmitkAbstractMultiWidget::ResetGridState()
+{
+  m_Impl->m_MultiWidgetRows = 0;
+  m_Impl->m_MultiWidgetColumns = 0;
+  m_Impl->m_ActiveRenderWindowWidget = nullptr;
+}
+
 void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()
 {
-  auto iterator = m_Impl->m_RenderWindowWidgets.find(this->GetNameFromIndex(this->GetNumberOfRenderWindowWidgets() - 1));
+  // Walk the map in reverse and remove the lexicographically last entry.
+  // Using the map directly (rather than 'GetNameFromIndex(count-1)') keeps
+  // this safe for layouts whose cell names are not the legacy positional
+  // 'widget<i>' form, e.g. v2 layouts with custom names.
+  if (m_Impl->m_RenderWindowWidgets.empty())
+  {
+    return;
+  }
+
+  auto last = std::prev(m_Impl->m_RenderWindowWidgets.end());
+  RenderWindowWidgetPointer renderWindowWidgetToRemove = last->second;
+  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
+  m_Impl->m_RenderWindowWidgets.erase(last);
+}
+
+void QmitkAbstractMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
+{
+  auto iterator = m_Impl->m_RenderWindowWidgets.find(widgetName);
   if (iterator == m_Impl->m_RenderWindowWidgets.end())
   {
     return;
   }
 
-  // disconnect each signal of this render window widget
   RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
   disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
-
-  // erase the render window from the map
   m_Impl->m_RenderWindowWidgets.erase(iterator);
 }

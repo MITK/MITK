@@ -1,0 +1,57 @@
+import glob as _glob
+import os as _os
+import sys as _sys
+
+_pkg_dir = _os.path.dirname(_os.path.abspath(__file__))
+
+# Detect a wheel install by locating the bundled native-library directory.
+# delvewheel (Windows) and auditwheel (Linux) create it as a sibling of the
+# package, named after the distribution (e.g. "mitk_python.libs"); delocate
+# (macOS) creates a ".dylibs" directory inside the package. The sibling name
+# tracks the PyPI distribution name, so match it by prefix instead of
+# hardcoding it. In a build-tree install none of these exist and the
+# wheel-only environment setup below is skipped.
+_libs_dir = _os.path.join(_pkg_dir, ".dylibs")
+if not _os.path.isdir(_libs_dir):
+    _siblings = _glob.glob(_os.path.join(_os.path.dirname(_pkg_dir), "mitk*.libs"))
+    if _siblings:
+        _libs_dir = _siblings[0]
+_is_wheel = _os.path.isdir(_libs_dir)
+
+if _is_wheel:
+    # Tell PreloadPython activator to skip (Python is already loaded).
+    _os.environ["PYMITK"] = "1"
+
+    # Tell CppMicroServices where to find auto-load module subdirectories.
+    _os.environ["US_AUTOLOAD_PATHS"] = _pkg_dir
+
+    # Windows: register DLL search directory for bundled native libraries.
+    # add_dll_directory covers Python extension loading (pyd files), while
+    # PATH is needed for CppMicroServices auto-load which uses LoadLibrary.
+    if _sys.platform == "win32":
+        _os.add_dll_directory(_libs_dir)
+        _os.environ["PATH"] = _libs_dir + _os.pathsep + _os.environ.get("PATH", "")
+    # Linux: auditwheel sets the extension RPATH to the sibling .libs dir.
+    # macOS: delocate rewrites @loader_path references.
+
+from .mitk import *
+
+
+def _rebind_module_names():
+    # Rewrite __module__ on exposed names so tooling renders mitk.X rather
+    # than mitk.mitk.X (the inner "mitk" is the pybind11 extension). Covers
+    # classes and free functions; pybind11 enum values inherit __module__
+    # from their enum type, which is itself rebound here.
+    from . import mitk as ext
+    for obj in vars(ext).values():
+        if getattr(obj, "__module__", None) == "mitk.mitk":
+            try:
+                obj.__module__ = "mitk"
+            except (AttributeError, TypeError):
+                pass
+
+
+_rebind_module_names()
+del _rebind_module_names
+
+__version__ = "@MITK_VERSION_STRING@"

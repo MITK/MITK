@@ -13,22 +13,29 @@ found in the LICENSE file.
 #ifndef mitkBoundingObjectCutAndCast_h
 #define mitkBoundingObjectCutAndCast_h
 
-#include "mitkBoundingObjectCutter.h"
-#include "mitkCommon.h"
+#include <mitkBoundingObjectCutter.h>
+#include <mitkCommon.h>
 
-#include "mitkBoundingObjectCutter.txx"
+#include <mitkBoundingObjectCutter.tpp>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Cuts an Boundingobject out of an mitk Image
-  //##
-  //## Input Parameters are a mitk::BoundingObject and optionally an mitk::Image
-  //## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel,
-  //## otherwise it will have the pixelvalue of the input image.
-  //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
-  //## \todo What Image resolution/spacing should be used, if no input image is given?
-  //## @ingroup Process
+  /**
+   * \brief Cuts a BoundingObject region out of an image and casts the result to a specific pixel type.
+   *
+   * This is a templated extension of BoundingObjectCutter that additionally casts
+   * the output image to the pixel type specified by the template parameter TPixel.
+   * Input parameters are a mitk::BoundingObject and optionally a mitk::Image.
+   * If no image is provided, the resulting image will have m_InsideValue as the pixel
+   * value for inside pixels. If an image is provided, inside pixels retain their
+   * original values. Pixels outside the BoundingObject are set to m_OutsideValue.
+   *
+   * \tparam TPixel The desired output pixel type (e.g., short, float, unsigned char).
+   *
+   * \sa BoundingObjectCutter
+   * \sa BoundingObject
+   * \ingroup Process
+   */
   template <typename TPixel>
   class BoundingObjectCutAndCast : public BoundingObjectCutter
   {
@@ -37,6 +44,7 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /** \brief The output pixel type for the cast operation. */
       typedef TPixel PixelType;
 
   protected:
@@ -50,7 +58,7 @@ namespace mitk
 } // namespace mitk
 
 #ifndef MITK_MANUAL_INSTANTIATION
-#include "mitkBoundingObjectCutAndCast.txx" // because it is a template
+#include <mitkBoundingObjectCutAndCast.tpp> // because it is a template
 #endif
 
 #endif

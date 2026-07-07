@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkPropertyRelationRuleBase_h
 #define mitkPropertyRelationRuleBase_h
 
-#include "mitkIPropertyOwner.h"
-#include "mitkIdentifiable.h"
+#include <mitkIPropertyOwner.h>
+#include <mitkIdentifiable.h>
 
-#include "mitkException.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkPropertyKeyPath.h"
+#include <mitkException.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkPropertyKeyPath.h>
 
 #include <MitkCoreExports.h>
 
@@ -26,51 +26,40 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**Base class to standardize/abstract/encapsulate rules and business logic to detect and define
-  (property/data based) relations in MITK.
-  Following important definitions must be regarded when using/implementing/specifying rule classes:
-  - Relations represented by rules are directed relations that point from a source IPropertyOwner (Source)
-  to a destination IPropertyOwner (Destination).
-  - Rule can be abstract (indicated by IsAbstract()) or concrete. Abstract rules cannot be used to connect relations.
-  Abstract rules can only be used to detect/indicate or disconnect relations. Therefore, in contrast to concrete rules,
-  abstract rules can be used to indicate several relations that are established be "derived" rules. See e.g. GenericIDRelationRule:
-  in its abstract state it cannot connect but be used to detect any type of generic ID relation.
-  - A concrete rule ID (rule ID of a concrete rule) always "implements" a concrete relation type. E.g. In DICOM the
-  way to express the source image relation to an input image and to a mask would be nearly the same
-  and only differs by the encoded purpose. One may implement an interim or joined class that manages the mutual
-  stuff, but the registered instances must be one concrete rule for "DICOM source input image" and one concrete rule for
-  "DICOM source mask" and both rules must have distinct rule IDs.
-  - Source may have several relations of a rule to different Destinations.
-  Destination may have several relations of a rule from different Sources. But a specific source destination
-  pair may have only one relation of a specific rule id (concrete rule). A specific source destination
-  pair may however have multiple relations for an abstract rule.
-  - The deletion of a Destination in the storage does not remove the relation implicitly. It becomes a "zombie" relation
-  but it should still be documented, even if the destination is unknown. One has to explicitly
-  disconnect a zombie relation to get rid of it.
-  - Each relation has its own UID (relationUID) that can be used to address it.
-
-  The basic concept of the rule design is that we have two layers of relation identification: Layer 1 is the ID-layer
-  which uses the IIdentifiable interface and UIDs if available to encode "hard" relations. Layer 2 is the Data-layer
-  which uses the properties of Source and Destination to deduce if there is a relation of the rule type.
-  The ID-layer is completely implemented by this base class. The base class falls back to the Data-layer
-  (implemented by the concrete rule class) if the ID-layer is not sufficient or it is explicitly stated to (only)
-  look at the data layer.
-  Reasons for the introduction of the ID-layer are: 1st, data-defined relations may be weak (several Destinations are
-  possible; e.g. DICOM source images may point to several loaded mitk images). But if explicitly a relation was
-  connected it should be deduceable. 2nd, checks on a UID are faster then unnecessary data deduction.
-
-  Rules use relation instance identifying (RII) properties in order to manage their relations that are stored in the
-  Source. The RII-properties follow the following naming schema:
-  "MITK.Relations.\<InstanceID\>.[relationUID|destinationUID|ruleID|\<data-layer-specific\>]"
-  - \<InstanceID\>: The unique index of the relation for the Source. Used to assign/group the properties to
-  their relation. In the default implementation of this class the instance id is an positive integer (i>0).
-  - relationUID: The UID of the relation. Set by the ID-layer (so by this class)
-  - destinationUID: The UID of the Destination. Set by the ID-layer (so by this class) if Destination implements
-  IIdentifiable.
-  - ruleID: The identifier of the concrete rule that sets the property. Is specified by the derived class and set
-  automatically be this base class.
-  - <data-layer-specific>: Information needed by the Data-layer (so derived classes) to find the relationUID
-  */
+  /**
+   * \brief Base class for defining and detecting property-based relations between data objects.
+   *
+   * This class standardizes, abstracts, and encapsulates rules and business logic for
+   * detecting and defining directed, property-based relations in MITK. Relations point
+   * from a source IPropertyOwner to a destination IPropertyOwner.
+   *
+   * Key concepts:
+   * - **Abstract vs. concrete rules:** Abstract rules (IsAbstract() == true) can detect
+   *   and disconnect relations but cannot create new connections. Concrete rules can
+   *   create, detect, and disconnect relations. Abstract rules match multiple concrete
+   *   rule types (e.g., GenericIDRelationRule in abstract mode detects all ID relations).
+   * - **Uniqueness:** A specific source-destination pair may have only one relation per
+   *   concrete rule ID, but may have multiple relations for an abstract rule.
+   * - **Zombie relations:** Deleting a destination does not implicitly remove the relation.
+   *   The relation becomes a "zombie" that must be explicitly disconnected.
+   * - **Relation UID:** Each relation has a unique identifier (relationUID).
+   *
+   * The relation identification uses two layers:
+   * 1. **ID-layer:** Uses IIdentifiable UIDs for explicit, strong relation encoding.
+   *    Fully implemented by this base class.
+   * 2. **Data-layer:** Uses properties of source and destination to deduce relations.
+   *    Implemented by concrete rule subclasses.
+   *
+   * Relations are stored as Relation Instance Identifying (RII) properties on the source:
+   * \code
+   * MITK.Relations.<InstanceID>.[relationUID|destinationUID|ruleID|<data-layer-specific>]
+   * \endcode
+   *
+   * \sa GenericIDRelationRule
+   * \sa SourceImageRelationRule
+   * \sa IPropertyOwner
+   * \sa Identifiable
+   */
   class MITKCORE_EXPORT PropertyRelationRuleBase : public itk::Object
   {
   public:
@@ -253,18 +242,27 @@ namespace mitk
     on the ID layer. Complete: Remove the connection on all layers. If a connection does not exist on a selected layer, it is silently ignored.*/
     void Disconnect(IPropertyOwner *source, RelationUIDType relationUID, RelationType layer = RelationType::Complete) const;
 
-    /**Returns the list of PropertyKeyPaths of all properties that are relevant for a given relation.
-    @param source Pointer to the Source instance that contains the potential properties.
-    @param relationUID UID of the relation that is relevant for the requested properties.
-    @param layer Indicates which layer is requested. ID: returns all RII properties that belong to the relation. Data: returns all properties that are relevant/belong to the data layer of the relation. Complete: returns all properties (ID+Data)
-    @pre source must be a valid instance.
-    @pre relationUID must identify a relation of the passed source and rule. (This must be in the return of
-    this->GetExistingRelations(source). */
+    /**
+     * \brief Get all property key paths relevant for a given relation.
+     *
+     * \param[in] source Pointer to the Source instance containing the relation properties.
+     * \param[in] relationUID UID of the relation to query.
+     * \param[in] layer Defines which layer to query:
+     *            - RelationType::ID: returns all RII properties belonging to the relation.
+     *            - RelationType::Data: returns all data-layer properties (default).
+     *            - RelationType::Complete: returns all properties (ID + Data).
+     * \return A vector of PropertyKeyPath entries for the matching properties.
+     *
+     * \pre \p source must be a valid instance.
+     * \pre \p relationUID must identify a relation of the passed source and this rule
+     *      (must be in the return of GetExistingRelations(source)).
+     */
     std::vector<PropertyKeyPath> GetRelationPropertyPaths(const IPropertyProvider* source,
       RelationUIDType relationUID, RelationType layer = RelationType::Data) const;
 
   protected:
     PropertyRelationRuleBase() = default;
+    PropertyRelationRuleBase(const PropertyRelationRuleBase &) {}
     ~PropertyRelationRuleBase() override = default;
 
     using InstanceIDVectorType = std::vector<InstanceIDType>;
@@ -369,8 +367,6 @@ namespace mitk
        @pre source must be valid.*/
     std::string GetDestinationUIDByInstanceID(const IPropertyProvider * source,
       const InstanceIDType & instanceID) const;
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     /** helper method that serves as a workaround until T24729 is done.
        Please remove if T24728 is done then could directly use owner->GetPropertyKeys() again.*/

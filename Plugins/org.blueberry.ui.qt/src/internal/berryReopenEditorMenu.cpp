@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "berryReopenEditorMenu.h"
 
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchPage.h>
+#include "berryIWorkbench.h"
+#include "berryIWorkbenchPage.h"
 
-#include <berryMenuManager.h>
+#include "berryMenuManager.h"
 #include <berrySafeRunner.h>
 
 #include "berryEditorHistory.h"

@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
 
-  <extension point="org.blueberry.ui.editors">
-    <editor id="org.mitk.editors.xnat.browser"
-      name="XNAT Editor"
-      class="QmitkXnatEditor"
-      icon="resources/xnat-icon.png">
-      <description>Search, browse and view the data in a XNAT-Installation</description>
-      <keywordReference id="org.mitk.views.xnat.browser.ViewKeyword"/>
-    </editor>
-  </extension>
-
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.xnat.treebrowser"
       name="XNAT Tree Browser"

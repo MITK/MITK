@@ -1,0 +1,65 @@
+set(H_FILES
+  usGetModuleContext.h
+  usGlobalConfig.h
+  usModuleAbstractTracked.tpp
+  usModuleActivator.h
+  usModuleImport.h
+  usModuleInitialization.h
+  usPrototypeServiceFactory.h
+  usServiceFactory.h
+  usServiceInterface.h
+  usServiceReference.h
+  usServiceRegistration.h
+  usServiceTracker.h
+  usServiceTrackerCustomizer.h
+  usServiceTrackerPrivate.tpp
+  usSharedData.h
+  usShrinkableMap.h
+  usShrinkableVector.h
+  usTrackedService.tpp
+)
+
+
+set(CPP_FILES
+  usAny.cpp
+  usCoreModuleActivator.cpp
+  usCoreModuleContext.cpp
+  usLDAPExpr.cpp
+  usLDAPFilter.cpp
+  usLDAPProp.cpp
+  usModule.cpp
+  usModuleContext.cpp
+  usModuleEvent.cpp
+  usModuleEventHook.cpp
+  usModuleFindHook.cpp
+  usModuleHooks.cpp
+  usModuleInfo.cpp
+  usModuleManifest.cpp
+  usModulePrivate.cpp
+  usModuleRegistry.cpp
+  usModuleResource.cpp
+  usModuleResourceBuffer.cpp
+  usModuleResourceContainer.cpp
+  usModuleResourceStream.cpp
+  usModuleSettings.cpp
+  usModuleUtils.cpp
+  usModuleVersion.cpp
+  usServiceEvent.cpp
+  usServiceEventListenerHook.cpp
+  usServiceException.cpp
+  usServiceFindHook.cpp
+  usServiceHooks.cpp
+  usServiceListenerEntry.cpp
+  usServiceListenerHook.cpp
+  usServiceListeners.cpp
+  usServiceObjects.cpp
+  usServiceProperties.cpp
+  usServicePropertiesImpl.cpp
+  usServiceReferenceBase.cpp
+  usServiceReferenceBasePrivate.cpp
+  usServiceRegistrationBase.cpp
+  usServiceRegistrationBasePrivate.cpp
+  usServiceRegistry.cpp
+  usSharedLibrary.cpp
+  usUtils.cpp
+)

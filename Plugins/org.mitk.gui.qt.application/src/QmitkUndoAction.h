@@ -20,8 +20,6 @@ found in the LICENSE file.
 
 #include <org_mitk_gui_qt_application_Export.h>
 
-#include <mitkIDataStorageReference.h>
-
 class QmitkUndoActionPrivate;
 
 /**

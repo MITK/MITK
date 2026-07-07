@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkBoolLookupTablePropertySerializer_h_included
 #define mitkBoolLookupTablePropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 #include <tinyxml2.h>
 

@@ -15,7 +15,7 @@ found in the LICENSE file.
 #define BERRYEVALUATIONREFERENCE_H
 
 #include "berryEvaluationResultCache.h"
-#include <berryIEvaluationReference.h>
+#include "berryIEvaluationReference.h"
 
 namespace berry {
 

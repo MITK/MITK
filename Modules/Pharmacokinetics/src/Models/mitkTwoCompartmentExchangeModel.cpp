@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoCompartmentExchangeModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkTwoCompartmentExchangeModel.h>
+#include <mitkConvolutionHelper.h>
 #include <fstream>
 
 const std::string mitk::TwoCompartmentExchangeModel::MODEL_DISPLAY_NAME = "Two Compartment Exchange Model";
@@ -164,13 +164,9 @@ mitk::TwoCompartmentExchangeModel::ComputeModelfunction(const ParametersType& pa
 }
 
 
-itk::LightObject::Pointer mitk::TwoCompartmentExchangeModel::InternalClone() const
+mitk::TwoCompartmentExchangeModel::TwoCompartmentExchangeModel(const TwoCompartmentExchangeModel& source)
+: Superclass(source)
 {
-  TwoCompartmentExchangeModel::Pointer newClone = TwoCompartmentExchangeModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
 }
 
 void mitk::TwoCompartmentExchangeModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkLocalStorageHandler_h
 #define mitkLocalStorageHandler_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkLevelWindow.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkLevelWindow.h>
+#include <mitkVtkPropRenderer.h>
 #include <MitkCoreExports.h>
 
 #include <itkObject.h>
@@ -28,11 +28,21 @@ class vtkProp;
 namespace mitk
 {
   /** \brief Interface for accessing (templated) LocalStorageHandler instances.
+   *
+   * Provides a type-erased base class so that different LocalStorageHandler
+   * template instantiations can be managed uniformly by BaseRenderer.
    */
   class BaseLocalStorageHandler
   {
   public:
     virtual ~BaseLocalStorageHandler() {}
+
+    /** \brief Deallocate the local storage for the given renderer.
+     *
+     * \param renderer The renderer whose local storage should be cleared.
+     * \param unregisterFromBaseRenderer If true, unregister this handler from the renderer.
+     *        Set to false when the renderer itself is being destroyed and calls this method.
+     */
     virtual void ClearLocalStorage(mitk::BaseRenderer *renderer, bool unregisterFromBaseRenderer = true) = 0;
   };
 
@@ -43,6 +53,7 @@ namespace mitk
    * assigned its own LocalStorage instance so that all contained resources
    * (actors, shaders, textures, ...) are provided individually per window.
    *
+   * \tparam L The LocalStorage type managed by this handler.
    */
   template <class L>
   class LocalStorageHandler : public mitk::BaseLocalStorageHandler
@@ -65,6 +76,10 @@ namespace mitk
       delete l;
     }
 
+    /** \brief Get a list of all BaseRenderers that have a local storage registered.
+     *
+     * \return Vector of pointers to all registered BaseRenderer instances.
+     */
     std::vector<mitk::BaseRenderer *> GetRegisteredBaseRenderer()
     {
       std::vector<mitk::BaseRenderer *> baserenderers;

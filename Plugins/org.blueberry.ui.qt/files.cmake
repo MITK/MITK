@@ -126,7 +126,6 @@ set(SRC_CPP_FILES
   actions/berrySeparator.cpp
   actions/berrySubContributionItem.cpp
 
-
   #application
   application/berryActionBarAdvisor.cpp
   application/berryIActionBarConfigurer.cpp
@@ -501,8 +500,6 @@ set(QRC_FILES
 set(CACHED_RESOURCE_FILES
   plugin.xml
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

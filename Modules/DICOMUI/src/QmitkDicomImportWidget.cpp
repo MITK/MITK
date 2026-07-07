@@ -31,7 +31,7 @@ QmitkDicomImportWidget::QmitkDicomImportWidget(QWidget *parent)
     m_Indexer(nullptr),
     m_ImportDialog(new ctkFileDialog(this)),
     m_ProgressDialog(nullptr),
-    m_Ui(new Ui::QmitkDicomImportWidget)
+    m_Ui(std::make_unique<Ui::QmitkDicomImportWidget>())
 {
   m_Ui->setupUi(this);
   m_Ui->tableManager->setTableOrientation(Qt::Vertical);

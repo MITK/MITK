@@ -15,15 +15,18 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
     namespace modelFit
     {
         /**
-         *  @brief Data class that stores all information about a modelfit parameter.
-     * Such a parameter is going to be fitted for the according model.
+         * \class Parameter
+         * \brief Data class that stores all information about a model fit parameter.
+         *
+         * Stores name, type, unit, scale, and the corresponding result image for
+         * a parameter that is fitted for the according model.
          */
         class MITKMODELFIT_EXPORT Parameter : public itk::LightObject
         {
@@ -53,10 +56,12 @@ namespace mitk
             mitk::Image::ConstPointer image;
         };
 
-        /** Extracts the parameter information stored in the data instance and returns it as parameter instance.
-     * If the data does not encode an parameter/fit result a Null pointer will be returned.
-         *  @param data The data instance that contains parameter information that should be extracted.
-         *  @return The newly created parameter instance on success or NULL otherwise.
+        /**
+         * \brief Extracts parameter information from a data instance and returns it as a Parameter.
+         *
+         * If the data does not encode a parameter/fit result, a null pointer will be returned.
+         * \param data The data instance that contains parameter information to be extracted.
+         * \return The newly created parameter instance on success or NULL otherwise.
          */
         MITKMODELFIT_EXPORT Parameter::Pointer ExtractParameterFromData(const mitk::BaseData* data);
     }

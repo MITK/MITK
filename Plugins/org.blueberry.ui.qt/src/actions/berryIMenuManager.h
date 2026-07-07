@@ -14,8 +14,8 @@ found in the LICENSE file.
 #ifndef BERRYIMENUMANAGER_H
 #define BERRYIMENUMANAGER_H
 
-#include <berryIContributionManager.h>
-#include <berryIContributionItem.h>
+#include "berryIContributionManager.h"
+#include "berryIContributionItem.h"
 
 namespace berry {
 

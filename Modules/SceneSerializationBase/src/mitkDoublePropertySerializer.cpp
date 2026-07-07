@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDoublePropertySerializer_h_included
 #define mitkDoublePropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 #include <mitkLexicalCast.h>
 
 #include <MitkSceneSerializationBaseExports.h>

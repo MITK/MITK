@@ -12,24 +12,31 @@ found in the LICENSE file.
 #ifndef mitkRandomImageSampler_h
 #define mitkRandomImageSampler_h
 
-#include "MitkCLUtilitiesExports.h"
+#include <MitkCLUtilitiesExports.h>
 
 //MITK
 #include <mitkImage.h>
-#include "mitkImageToImageFilter.h"
+#include <mitkImageToImageFilter.h>
 #include <itkImage.h>
 
 namespace mitk
 {
+  /** \brief Enumeration of sampling modes for RandomImageSampler. */
   enum RandomImageSamplerMode
   {
-    SINGLE_ACCEPTANCE_RATE,
-    CLASS_DEPENDEND_ACCEPTANCE_RATE,
-    SINGLE_NUMBER_OF_ACCEPTANCE,
-    CLASS_DEPENDEND_NUMBER_OF_ACCEPTANCE
+    SINGLE_ACCEPTANCE_RATE,                ///< Sample all labels with a single acceptance rate.
+    CLASS_DEPENDEND_ACCEPTANCE_RATE,       ///< Sample each class with an individual acceptance rate.
+    SINGLE_NUMBER_OF_ACCEPTANCE,           ///< Draw a fixed total number of samples.
+    CLASS_DEPENDEND_NUMBER_OF_ACCEPTANCE   ///< Draw a fixed number of samples per class.
   };
 
-
+  /**
+   * \brief Randomly samples voxels from a label image using configurable strategies.
+   *
+   * This filter produces a sub-sampled version of a label image. It supports
+   * four sampling modes: single acceptance rate, class-dependent acceptance rate,
+   * fixed number of samples, and class-dependent fixed number of samples.
+   */
   class MITKCLUTILITIES_EXPORT RandomImageSampler : public ImageToImageFilter
   {
   public:
@@ -43,7 +50,10 @@ namespace mitk
     itkSetMacro(AcceptanceRate, double);
     itkGetConstMacro(AcceptanceRate, double);
 
-    //itkSetMacro(AcceptanceRateVector, std::vector<double>);
+    /**
+     * \brief Set per-class acceptance rates for CLASS_DEPENDEND_ACCEPTANCE_RATE mode.
+     * \param arg Vector of acceptance rates, one per class label.
+     */
     void SetAcceptanceRateVector(std::vector<double> arg)
     {
       m_AcceptanceRateVector = arg;
@@ -54,7 +64,10 @@ namespace mitk
     itkSetMacro(NumberOfSamples, unsigned int);
     itkGetConstMacro(NumberOfSamples, unsigned int);
 
-    //itkSetMacro(NumberOfSamplesVector, std::vector<unsigned int>);
+    /**
+     * \brief Set per-class sample counts for CLASS_DEPENDEND_NUMBER_OF_ACCEPTANCE mode.
+     * \param arg Vector of sample counts, one per class label.
+     */
     void SetNumberOfSamplesVector(std::vector<unsigned int> arg)
     {
       m_NumberOfSamplesVector = arg;

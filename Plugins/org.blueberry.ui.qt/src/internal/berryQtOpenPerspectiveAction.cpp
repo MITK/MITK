@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryQtOpenPerspectiveAction.h"
 
-#include <berryIWorkbenchPage.h>
-#include <berryIWorkbench.h>
+#include "berryIWorkbenchPage.h"
+#include "berryIWorkbench.h"
 
 #include <QWidget>
 #include <QMessageBox>

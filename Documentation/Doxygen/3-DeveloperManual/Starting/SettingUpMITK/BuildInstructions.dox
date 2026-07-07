@@ -15,7 +15,7 @@ This page explains how to configure and use the MITK superbuild.
 You need the following software:
 
   -# <a href="https://git-scm.com/">Git</a>
-  -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersion or later; CMake 4 is not yet supported)
+  -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersionOther or later; version \minimumCMakeVersionWindows on Windows; CMake 4 is not yet supported)
   -# <a href="https://www.qt.io/">Qt</a> (version \minimumQt6Version or later; see below)
   -# <a href="https://www.doxygen.nl/">Doxygen</a> (version 1.9; Doxygen 1.10 and later are not yet supported)
   -# <a href="https://graphviz.org/">GraphViz</a>
@@ -31,6 +31,12 @@ sudo apt install bison build-essential doxygen git graphviz \
   libxcb-cursor-dev libxdamage-dev libxi-dev libxcb-icccm4 \
   libxcb-keysyms1 libxcb-shape0 libxkbcommon-dev libxkbcommon-x11-0 \
   libxkbfile1 libxrandr2 libxtst6 libxt-dev mesa-common-dev
+\endcode
+
+When building the MITK Python wheel via <tt>MITK_BUILD_CONFIGURATION=PythonWheel</tt>, <tt>patchelf</tt> is an additional prerequisite:
+
+\code{.unparsed}
+sudo apt install patchelf
 \endcode
 
 \subsection Windows
@@ -53,7 +59,7 @@ xcode-select --install
 Then install the following packages, for example via Homebrew:
 
 \code{.unparsed}
-brew install freetype graphviz libomp openssl@3 swig
+brew install freetype graphviz libomp openssl@3
 \endcode
 
 Note: Because of known incompatibilities, OpenMP is disabled on macOS when <tt>MITK_USE_Python3</tt> is enabled (default), though.
@@ -70,13 +76,13 @@ We highly recommend installing Qt to the <b>default location</b>, so CMake can f
 In the Qt installer, make sure to select the following <b>additional libraries</b>:
 
   - Qt 5 Compatibility Module
+  - Qt Positioning
   - Qt State Machines
-  - Qt WebEngine (see note below)
-  - Qt WebChannel (Qt 6.8 and later)
-  - Qt Positioning (Qt 6.8 and later)
+  - Qt WebChannel
 
-Note: Starting with Qt 6.8, Qt WebEngine is no longer listed under "Additional Libraries".
-It is now located under "Extensions > Qt WebEngine".
+You also need the following <b>extension</b>:
+
+  - Qt WebEngine
 
 \section BuildInstructions_Build_With_CMake Build MITK with CMake
 

@@ -190,8 +190,8 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
       double value = imageIter.Get();
       double valueMinusMean = value - mean;
 
-      sumAbsoluteDistanceToMean += std::abs<double>(valueMinusMean);
-      sumAbsoluteDistanceToMedian += std::abs<double>(value - median);
+      sumAbsoluteDistanceToMean += std::abs(valueMinusMean);
+      sumAbsoluteDistanceToMedian += std::abs(value - median);
       sumValueMinusMeanThree += valueMinusMean * valueMinusMean * valueMinusMean;
       sumValueMinusMeanFour += valueMinusMean * valueMinusMean * valueMinusMean * valueMinusMean;
 

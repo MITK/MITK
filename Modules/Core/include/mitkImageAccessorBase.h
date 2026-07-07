@@ -17,26 +17,44 @@ found in the LICENSE file.
 #include <itkIndex.h>
 #include <itkSmartPointer.h>
 
-#include "mitkImageDataItem.h"
+#include <mitkImageDataItem.h>
 
 #include <mutex>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief The ImageAccessorBase class provides a lock mechanism for all inheriting image accessors.
-  //##
-  //## @ingroup Data
+  /**
+   * \brief Base class providing a locking mechanism for all image accessor classes.
+   *
+   * ImageAccessorBase establishes the lock protocol for concurrent read/write access
+   * to mitk::Image data. All concrete accessor classes (ImageReadAccessor,
+   * ImageWriteAccessor, ImagePixelReadAccessor, ImagePixelWriteAccessor,
+   * ImageVtkReadAccessor, ImageVtkWriteAccessor) inherit from this class.
+   *
+   * The locking ensures that overlapping image memory regions are not written
+   * and read simultaneously from different threads, preventing data races.
+   *
+   * \sa mitk::ImageReadAccessor, mitk::ImageWriteAccessor
+   * \sa mitk::ImagePixelReadAccessor, mitk::ImagePixelWriteAccessor
+   * \sa mitk::ImageVtkReadAccessor, mitk::ImageVtkWriteAccessor
+   * \ingroup Data
+   */
 
   class Image;
 
-  /** \brief This struct allows to make ImageAccessors wait for this particular ImageAccessor object*/
+  /**
+   * \brief Wait-lock structure allowing ImageAccessors to wait for each other.
+   *
+   * When an ImageAccessor cannot immediately acquire access because another
+   * accessor holds an overlapping region, it increments the waiter count and
+   * waits on the mutex until the blocking accessor is released.
+   */
   struct ImageAccessorWaitLock
   {
-    /** \brief Holds the number of ImageAccessors, which are waiting until the represented ImageAccessor is released. */
+    /** \brief Number of ImageAccessors waiting for this accessor to be released. */
     unsigned int m_WaiterCount;
 
-    /** \brief A mutex that allows other ImageAccessors to wait for the represented ImageAccessor. */
+    /** \brief Mutex that other ImageAccessors lock on to wait for this accessor. */
     std::mutex m_Mutex;
   };
 
@@ -59,29 +77,36 @@ namespace mitk
     friend class ImagePixelWriteAccessor;
 
   public:
+    /** \brief Const smart pointer type for the associated Image. */
     typedef itk::SmartPointer<const mitk::Image> ImageConstPointer;
 
-    /** \brief defines different flags for the ImageAccessor constructors
-      */
+    /**
+     * \brief Option flags that control ImageAccessor behavior.
+     *
+     * These flags can be combined via bitwise OR and passed to accessor
+     * constructors.
+     */
     enum Options
     {
-      /** No specific Options ==> Default */
+      /** \brief Default behavior: wait for locked memory to be released. */
       DefaultBehavior = 0,
-      /** Defines if the Constructor waits for locked memory until it is released or not. If not, an exception is
-         thrown.*/
+      /** \brief Throw MemoryIsLockedException instead of waiting if the memory is locked. */
       ExceptionIfLocked = 1,
-      /** Defines if requested Memory has to be coherent. If the parameter is true, it is possible that new Memory has
-         to
-         be allocated to arrange this desired condition. Consequently, this parameter can heavily affect computation
-         time.*/
+      /** \brief Force the accessed memory to be coherent (contiguous). May cause
+       *  additional memory allocation and data copying, potentially affecting performance. */
       ForceCoherentMemory = 2,
-      /** Ignores the lock mechanism for immediate access. Only possible with read accessors. */
+      /** \brief Bypass the lock mechanism for immediate access. Only valid for read accessors. */
       IgnoreLock = 4
     };
 
+    /** \brief Virtual destructor. Releases the wait lock if no other accessors are waiting. */
     virtual ~ImageAccessorBase();
 
-    /** \brief Gives const access to the data. */
+    /**
+     * \brief Get const access to the raw image data.
+     *
+     * \return Pointer to the beginning of the accessed image memory region.
+     */
     inline const void *GetData() const { return m_AddressBegin; }
   protected:
 // Define type of thread id

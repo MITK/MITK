@@ -12,25 +12,40 @@ found in the LICENSE file.
 #ifndef mitkColorSequenceRainbow_h
 #define mitkColorSequenceRainbow_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkColorSequence.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkColorSequence.h>
 
 namespace mitk
 {
+  /**
+   * \brief Predefined rainbow color sequence with eight distinguishable colors.
+   *
+   * Cycles through: default orange, red, yellow, blue, green, magenta, cyan,
+   * and orange. After reaching the end the sequence wraps around.
+   *
+   * \sa ColorSequence, ColorSequenceCycleH
+   */
   class MITKDATATYPESEXT_EXPORT ColorSequenceRainbow : public ColorSequence
   {
   public:
+    /** \brief Construct and initialize the predefined color list. */
     ColorSequenceRainbow();
+
+    /** \brief Destructor. */
     ~ColorSequenceRainbow() override;
 
-    /*!
-    \brief method to return another color
-    */
+    /**
+     * \brief Return the next color in the rainbow sequence.
+     *
+     * Advances the internal index and wraps around at the end of the list.
+     *
+     * \return The next mitk::Color.
+     */
     Color GetNextColor() override;
 
-    /*!
-    \brief method to set the color-index to begin again
-    */
+    /**
+     * \brief Reset the color index to the beginning.
+     */
     void GoToBegin() override;
 
   private:

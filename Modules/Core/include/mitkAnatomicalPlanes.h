@@ -15,12 +15,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Enumeration of standard anatomical image planes.
+   *
+   * Used to specify the orientation of 2D image slices in medical imaging.
+   */
   enum class AnatomicalPlane
   {
-    Axial,
-    Sagittal,
-    Coronal,
-    Original
+    Axial,    ///< Transverse plane (top-down view, perpendicular to body's long axis).
+    Sagittal, ///< Plane dividing the body into left and right portions.
+    Coronal,  ///< Frontal plane dividing the body into anterior and posterior portions.
+    Original  ///< The image's native acquisition plane.
   };
 }
 

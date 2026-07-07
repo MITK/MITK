@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkExtractSliceFilter_h
 #define mitkExtractSliceFilter_h
 
-#include "MitkCoreExports.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkCoreExports.h>
+#include <mitkImageToImageFilter.h>
 
 #include <vtkAbstractTransform.h>
 #include <vtkImageData.h>
@@ -69,7 +69,11 @@ namespace mitk
 
     mitkNewMacro1Param(Self, vtkImageReslice *);
 
-    /** \brief Set the axis where to reslice at.*/
+    /**
+     * \brief Set the plane geometry defining the reslice axis.
+     *
+     * \param geometry The PlaneGeometry that defines where to reslice.
+     */
     void SetWorldGeometry(const PlaneGeometry *geometry)
     {
       if (geometry != m_WorldGeometry)
@@ -79,76 +83,149 @@ namespace mitk
       }
     }
 
-    /** \brief Set the time step in the 4D volume */
+    /**
+     * \brief Set the time step in the 4D volume.
+     *
+     * \param timestep The time step index to extract.
+     */
     void SetTimeStep(unsigned int timestep) { m_TimeStep = timestep; }
+
+    /**
+     * \brief Get the current time step.
+     *
+     * \return The time step index currently set.
+     */
     unsigned int GetTimeStep() { return m_TimeStep; }
 
-    /** \brief Set the component of an image to be extracted */
+    /**
+     * \brief Set the component of a multi-component image to be extracted.
+     *
+     * \param component The zero-based component index.
+     */
     void SetComponent(unsigned int component) { m_Component = component; }
 
-    /** \brief Set a transform for the reslice axes.
-    * This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
-    */
+    /**
+     * \brief Set a transform for the reslice axes.
+     *
+     * This transform is needed if the image volume itself is transformed (affects the reslice axis).
+     *
+     * \param transform The BaseGeometry whose transform is used.
+     */
     void SetResliceTransformByGeometry(const BaseGeometry *transform) { this->m_ResliceTransform = transform; }
-    /** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
+
+    /**
+     * \brief Set whether the resampling grid is derived from image or world geometry.
+     *
+     * \param inPlaneResampleExtentByGeometry If \c false, resampling grid corresponds to the image;
+     *        if \c true, it corresponds to the world geometry.
+     */
     void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry)
     {
       this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry;
     }
 
-    /** \brief Sets the output dimension of the slice*/
+    /**
+     * \brief Set the output dimensionality of the slice.
+     *
+     * \param dimension The output dimension (typically 2 for a slice).
+     */
     void SetOutputDimensionality(unsigned int dimension) { this->m_OutputDimension = dimension; }
-    /** \brief Set the spacing in z direction manually.
-    * Required if the outputDimension is > 2.
-    */
+
+    /**
+     * \brief Set the spacing in z direction manually.
+     *
+     * Required if the output dimension is > 2.
+     *
+     * \param zSpacing The spacing value in z direction.
+     */
     void SetOutputSpacingZDirection(double zSpacing) { this->m_ZSpacing = zSpacing; }
-    /** \brief Set the extent in pixel for direction z manually.
-    Required if the output dimension is > 2.
-    */
+
+    /**
+     * \brief Set the extent in pixels for the z direction manually.
+     *
+     * Required if the output dimension is > 2.
+     *
+     * \param zMin Minimum z extent.
+     * \param zMax Maximum z extent.
+     */
     void SetOutputExtentZDirection(int zMin, int zMax)
     {
       this->m_ZMin = zMin;
       this->m_ZMax = zMax;
     }
 
-    /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]
-    * The method uses the input of the filter to calculate the bounds.
-    * It is recommended to use
-    * GetClippedPlaneBounds(const BaseGeometry*, const PlaneGeometry*, double*)
-    * if you are not sure about the input.
-    */
+    /**
+     * \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax].
+     *
+     * The method uses the input of the filter to calculate the bounds.
+     * It is recommended to use
+     * GetClippedPlaneBounds(const BaseGeometry*, const PlaneGeometry*, double*)
+     * if you are not sure about the input.
+     *
+     * \param bounds Output array of six doubles: [xMin, xMax, yMin, yMax, zMin, zMax].
+     * \return \c true if bounds were successfully computed, \c false otherwise.
+     */
     bool GetClippedPlaneBounds(double bounds[6]);
 
-    /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
+    /**
+     * \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax].
+     *
+     * \param boundingGeometry The bounding geometry of the volume.
+     * \param planeGeometry The plane geometry defining the slice.
+     * \param bounds Output array of six doubles: [xMin, xMax, yMin, yMax, zMin, zMax].
+     * \return \c true if bounds were successfully computed, \c false otherwise.
+     */
     bool GetClippedPlaneBounds(const BaseGeometry *boundingGeometry,
                                const PlaneGeometry *planeGeometry,
                                double *bounds);
 
-    /** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
+    /**
+     * \brief Get the spacing of the slice.
+     *
+     * \return Pointer to an array of two mitk::ScalarType values representing the x and y spacing.
+     */
     mitk::ScalarType *GetOutputSpacing();
 
-    /** \brief Get Output as vtkImageData.
-    * Note:
-    * SetVtkOutputRequest(true) has to be called at least once before
-    * GetVtkOutput(). Otherwise the output is empty for the first update step.
-    */
+    /**
+     * \brief Get the output as vtkImageData.
+     *
+     * \note SetVtkOutputRequest(true) has to be called at least once before
+     * GetVtkOutput(). Otherwise the output is empty for the first update step.
+     *
+     * \return The resliced output as vtkImageData.
+     */
     vtkImageData *GetVtkOutput()
     {
       m_VtkOutputRequested = true;
       return m_Reslicer->GetOutput();
     }
 
-    /** Set VtkOutPutRequest to suppress the conversion of the image.
-    * It is suggested to use this with GetVtkOutput().
-    * Note:
-    * SetVtkOutputRequest(true) has to be called at least once before
-    * GetVtkOutput(). Otherwise the output is empty for the first update step.
-    */
+    /**
+     * \brief Set VtkOutputRequest to suppress the conversion of the image.
+     *
+     * It is suggested to use this with GetVtkOutput().
+     *
+     * \note SetVtkOutputRequest(true) has to be called at least once before
+     * GetVtkOutput(). Otherwise the output is empty for the first update step.
+     *
+     * \param isRequested If \c true, output will be provided as vtkImageData.
+     */
     void SetVtkOutputRequest(bool isRequested) { m_VtkOutputRequested = isRequested; }
-    /** \brief Get the reslices axis matrix.
-    * Note: the axis are recalculated when calling SetResliceTransformByGeometry.
-    */
+
+    /**
+     * \brief Get the reslice axes matrix.
+     *
+     * \note The axes are recalculated when calling SetResliceTransformByGeometry.
+     *
+     * \return The 4x4 reslice axes matrix.
+     */
     vtkMatrix4x4 *GetResliceAxes() { return this->m_Reslicer->GetResliceAxes(); }
+
+    /**
+     * \brief Set the background level for areas outside the volume.
+     *
+     * \param backgroundLevel The background intensity value.
+     */
     void SetBackgroundLevel(double backgroundLevel) { m_BackgroundLevel = backgroundLevel; }
     enum ResliceInterpolation
     {
@@ -157,17 +234,34 @@ namespace mitk
       RESLICE_CUBIC = 3
     };
 
+    /**
+     * \brief Set the interpolation mode for reslicing.
+     *
+     * \param interpolation The interpolation mode (RESLICE_NEAREST, RESLICE_LINEAR, or RESLICE_CUBIC).
+     */
     void SetInterpolationMode(ExtractSliceFilter::ResliceInterpolation interpolation)
     {
       this->m_InterpolationMode = interpolation;
     }
 
   protected:
+    /**
+     * \brief Constructor.
+     *
+     * \param reslicer Optional custom vtkImageReslice instance. If nullptr, a default one is created.
+     */
     ExtractSliceFilter(vtkImageReslice *reslicer = nullptr);
+
+    /** \brief Destructor. */
     ~ExtractSliceFilter() override;
 
+    /** \brief Perform the actual reslicing. */
     void GenerateData() override;
+
+    /** \brief Compute output information (spacing, origin, extent) based on input and world geometry. */
     void GenerateOutputInformation() override;
+
+    /** \brief Set the requested region on the input image. */
     void GenerateInputRequestedRegion() override;
 
     PlaneGeometry::ConstPointer m_WorldGeometry;

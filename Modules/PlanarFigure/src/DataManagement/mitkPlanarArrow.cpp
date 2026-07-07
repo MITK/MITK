@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarArrow.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarArrow.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {
@@ -25,6 +25,13 @@ mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", 
   // Create helper polyline object (for drawing the orthogonal orientation line)
   m_HelperPolyLinesToBePainted->InsertElement(0, false);
   m_HelperPolyLinesToBePainted->InsertElement(1, false);
+}
+
+mitk::PlanarArrow::PlanarArrow(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH),
+    m_ArrowTipScaleFactor(other.m_ArrowTipScaleFactor)
+{
 }
 
 void mitk::PlanarArrow::GeneratePolyLine()
@@ -67,13 +74,13 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   Vector2D n1 = p1 - p2;
   n1.Normalize();
 
-  double degrees = 100.0;
+  const double arrowHalfAngleRad = 30.0 * vnl_math::pi / 180.0;
   Vector2D temp;
-  temp[0] = n1[0] * cos(degrees) - n1[1] * sin(degrees);
-  temp[1] = n1[0] * sin(degrees) + n1[1] * cos(degrees);
+  temp[0] = n1[0] * cos(arrowHalfAngleRad) - n1[1] * sin(arrowHalfAngleRad);
+  temp[1] = n1[0] * sin(arrowHalfAngleRad) + n1[1] * cos(arrowHalfAngleRad);
   Vector2D temp2;
-  temp2[0] = n1[0] * cos(-degrees) - n1[1] * sin(-degrees);
-  temp2[1] = n1[0] * sin(-degrees) + n1[1] * cos(-degrees);
+  temp2[0] = n1[0] * cos(-arrowHalfAngleRad) - n1[1] * sin(-arrowHalfAngleRad);
+  temp2[1] = n1[0] * sin(-arrowHalfAngleRad) + n1[1] * cos(-arrowHalfAngleRad);
 
   this->AppendPointToHelperPolyLine(0, p1);
   this->AppendPointToHelperPolyLine(0, Point2D(p1 - temp * nonScalingLength));

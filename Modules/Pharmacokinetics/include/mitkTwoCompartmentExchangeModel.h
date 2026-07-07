@@ -13,29 +13,28 @@ found in the LICENSE file.
 #ifndef mitkTwoCompartmentExchangeModel_h
 #define mitkTwoCompartmentExchangeModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 
 namespace mitk
 {
-  /** @class TwoCompartmentExchangeModel
-   * @brief Implementation of the analytical model function of the Physiological Pharmacokinetic Brix model, using an Aterial Input Function
-   * The Model calculates the Concentration-Time-Curve as a convolution of the Aterial Input funciton CA(t) and a tissue specific
-   * residue function R(t). The Residue funktion consists of two parts: The Residue funktion Qp(t) of the Blood Plasma p and the residue funktion Qi(t) of the
-   * interstitial volume I.
-   *       Ctotal(t) = vp * Cp(t) + fi * Ci(t) = [vp * Qp(t) + fi * Qi(t)] conv CA(t)
-   *                 = Qtotal(t) conv CA(t)
-   * where vp=Vp/VT and fi=Vi/VT are the portion of Plasma/interstitial volume Vp/VI of the total volume VT respectively.
-   * The Residuefunctions are described by
-   * Qp(t) = F/Vp * PS/Vp * 1/(l2 - l1) *[ µ2 exp(l1*t) - µ1 exp(l2*t)]* sig(t)
-   * Qi(t) = F/Vp * PS/Vi * 1/(l1 - l2) *[ exp(l1*t) - exp(l2*t)]* sig(t)
-   *       = F/Vp * PS/Vp * vp/fi * 1/(l1 - l2) *[ exp(l1*t) - exp(l2*t)]* sig(t)
-   * with
-   * l1/2 = -1/2 (PS/Vp * vp/fi + PS/Vp + F/Vp) +/- sqrt((PS/Vp * vp/fi + PS/Vp + F/Vp)² - 4* F/Vp * PS/Vp * vp/fi)
-   * µ1/2 = F/Vp * Vp/PS + 1 + Vp/PS* l1/2
+  /** \class TwoCompartmentExchangeModel
+   * \brief Implementation of the two-compartment exchange model (2CXM) for MR perfusion pharmacokinetics.
    *
-   * The parameters PS/Vp, F/Vp,  vp and fi are subject to the fitting routine*/
+   * Calculates the concentration-time curve as a convolution of the arterial input function CA(t)
+   * and a tissue-specific residue function R(t) composed of plasma and interstitial contributions:
+   * \code
+   *   Ctotal(t) = vp * Cp(t) + fi * Ci(t) = [vp * Qp(t) + fi * Qi(t)] conv CA(t)
+   * \endcode
+   * where vp = Vp/VT and fi = Vi/VT are the plasma and interstitial volume fractions respectively.
+   *
+   * The residue functions involve eigenvalues l1, l2 computed from F/Vp, PS/Vp, vp, and fi.
+   * Fitted parameters: PS (permeability-surface area product per plasma volume), F/Vp (flow per
+   * plasma volume), vp (plasma volume fraction), fi (interstitial volume fraction).
+   *
+   * \sa TwoTissueCompartmentModel, ExtendedToftsModel, AIFBasedModelBase
+   */
 
   class MITKPHARMACOKINETICS_EXPORT TwoCompartmentExchangeModel : public AIFBasedModelBase
   {
@@ -90,11 +89,9 @@ namespace mitk
     TwoCompartmentExchangeModel();
     ~TwoCompartmentExchangeModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    TwoCompartmentExchangeModel(const TwoCompartmentExchangeModel& source);
+
+    mitkCloneMacro(TwoCompartmentExchangeModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -102,9 +99,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    TwoCompartmentExchangeModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

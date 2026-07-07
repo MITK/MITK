@@ -38,11 +38,3 @@ void QmitkSaveMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)
 void QmitkSaveMultiLabelPresetAction::SetFunctionality(berry::QtViewPart*)
 {
 }
-
-void QmitkSaveMultiLabelPresetAction::SetSmoothed(bool)
-{
-}
-
-void QmitkSaveMultiLabelPresetAction::SetDecimated(bool)
-{
-}

@@ -21,6 +21,11 @@ mitk::TimeGeometry::TimeGeometry() : m_BoundingBox(BoundingBox::New())
   m_BoundingBox->SetPoints(points.GetPointer());
 }
 
+mitk::TimeGeometry::TimeGeometry(const TimeGeometry &other) : Superclass()
+{
+  m_BoundingBox = other.m_BoundingBox->DeepCopy();
+}
+
 mitk::TimeGeometry::~TimeGeometry() = default;
 
 void mitk::TimeGeometry::Initialize()
@@ -175,18 +180,6 @@ void mitk::TimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
     os << "nullptr" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
-}
-
-itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
-{
-  itk::LightObject::Pointer parent = Superclass::InternalClone();
-  Self::Pointer rval = dynamic_cast<Self *>(parent.GetPointer());
-  if (rval.IsNull())
-  {
-    mitkThrow() << " Downcast to type " << this->GetNameOfClass() << " failed.";
-  }
-  rval->m_BoundingBox = m_BoundingBox->DeepCopy();
-  return parent;
 }
 
 bool mitk::Equal(const TimeGeometry& leftHandSide, const TimeGeometry& rightHandSide, ScalarType eps, bool verbose)

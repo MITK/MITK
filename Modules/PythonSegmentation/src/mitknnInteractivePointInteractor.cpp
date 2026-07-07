@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkToolManager.h>
 
+#include "mitknnInteractiveRenderingHelpers.h"
+
 namespace mitk::nnInteractive
 {
   class PointInteractor::Impl
@@ -33,7 +35,9 @@ namespace mitk::nnInteractive
       // crosshair navigation via left clicks.
       this->Interactor->SetEventConfig("PointSetConfigLMB.xml");
 
-      // nnInteractive currently does not support undo.
+      // Keep point placement off MITK's global operation-based undo stack;
+      // nnInteractive undo is handled at the session level (single-level
+      // undo of the last interaction), not via the workbench undo controller.
       this->Interactor->EnableUndo(false);
       this->Interactor->EnableInteraction(false);
       this->Interactor->EnableMovement(false);
@@ -74,11 +78,13 @@ namespace mitk::nnInteractive
       node->SetColor(GetColor(promptType, ColorIntensity::Vibrant), nullptr, "selectedcolor");
       node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
       node->SetIntProperty("Pointset.2D.resolution", 64);
-      node->SetFloatProperty("point 2D size", 5.0f);
+      node->SetFloatProperty("point 2D size", 10.0f);
+      node->SetBoolProperty("Pointset.2D.fixed size on screen", true);
       node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
       node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
       node->SetBoolProperty("Pointset.2D.fill shape", true);
       node->SetBoolProperty("helper object", true);
+      HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
       // storing the point set data node for the current prompt type as a
@@ -113,7 +119,7 @@ namespace mitk::nnInteractive
 }
 
 mitk::nnInteractive::PointInteractor::PointInteractor()
-  : Interactor(InteractionType::Point, InteractionMode::BlockLMBDisplayInteraction),
+  : Interactor(InteractionType::Point),
     m_Impl(std::make_unique<Impl>(this))
 {
 }
@@ -148,6 +154,19 @@ std::optional<mitk::Point3D> mitk::nnInteractive::PointInteractor::GetLastPoint(
     return std::nullopt;
 
   return pointSet->GetPoint(pointSet->GetSize() - 1);
+}
+
+void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType promptType)
+{
+  auto iter = m_Impl->PointSetNodes.find(promptType);
+
+  if (iter == m_Impl->PointSetNodes.end())
+    return;
+
+  auto pointSet = iter->second->GetDataAs<PointSet>();
+
+  if (!pointSet->IsEmpty())
+    pointSet->RemovePointAtEnd(0);
 }
 
 void mitk::nnInteractive::PointInteractor::OnEnable()

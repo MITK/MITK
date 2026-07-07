@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunction.h"
-#include "mitkTransferFunctionInitializer.h"
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionInitializer.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 

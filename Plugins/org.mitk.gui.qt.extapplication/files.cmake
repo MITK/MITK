@@ -18,9 +18,6 @@ set(MOC_H_FILES
   src/internal/perspectives/QmitkVisualizationPerspective.h
 )
 
-set(UI_FILES
-)
-
 set(CACHED_RESOURCE_FILES
 # list of resource files which can be used by the plug-in
 # system without loading the plug-ins shared library,
@@ -35,8 +32,6 @@ set(CACHED_RESOURCE_FILES
 set(QRC_FILES
 resources/QmitkExtApplication.qrc
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

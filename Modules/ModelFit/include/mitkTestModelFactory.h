@@ -15,14 +15,20 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkTestModel.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkTestModel.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
 
+  /**
+   * \class TestModelFactory
+   * \brief Factory for creating TestModel instances, used for testing the model fit framework.
+   *
+   * \sa TestModel, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT TestModelFactory : public ConcreteModelFactoryBase<TestModel>
   {
   public:

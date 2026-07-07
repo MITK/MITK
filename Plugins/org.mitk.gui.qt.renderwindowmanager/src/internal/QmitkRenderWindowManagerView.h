@@ -13,9 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkRenderWindowManagerView_h
 #define QmitkRenderWindowManagerView_h
 
-// render window manager plugin
-#include "ui_QmitkRenderWindowManagerControls.h"
-
 // render window manager UI module
 #include <QmitkRenderWindowDataStorageInspector.h>
 
@@ -28,6 +25,13 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 
+#include <memory>
+
+namespace Ui
+{
+  class QmitkRenderWindowManagerControls;
+}
+
 /**
 * @brief RenderWindowManager
 */
@@ -38,6 +42,9 @@ class QmitkRenderWindowManagerView : public QmitkAbstractView, public mitk::IRen
 public:
 
   static const std::string VIEW_ID;
+
+  QmitkRenderWindowManagerView();
+  ~QmitkRenderWindowManagerView() override;
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
@@ -65,7 +72,7 @@ private:
   void RenderWindowChanged();
 
   QWidget* m_Parent;
-  Ui::QmitkRenderWindowManagerControls m_Controls;
+  std::unique_ptr<Ui::QmitkRenderWindowManagerControls> m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart = nullptr;
 

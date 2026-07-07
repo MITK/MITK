@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestDynamicImageGenerator.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkImageCast.h"
-#include "mitkTemporalJoinImagesFilter.h"
+#include <mitkTestDynamicImageGenerator.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkImageCast.h>
+#include <mitkTemporalJoinImagesFilter.h>
 
 namespace mitk
 {

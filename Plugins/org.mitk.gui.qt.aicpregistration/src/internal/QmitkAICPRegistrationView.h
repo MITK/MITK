@@ -18,10 +18,15 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 #include <QWidget>
-#include "ui_QmitkAICPRegistrationViewControls.h"
+#include <memory>
 
 // forwarddeclaration
 class AICPRegistrationViewData;
+
+namespace Ui
+{
+  class QmitkAICPRegistrationViewControls;
+}
 
 /**
   * \brief Implementation of a worker thread class.
@@ -103,7 +108,7 @@ class QmitkAICPRegistrationView : public QmitkAbstractView
 
     void SetFocus() override;
 
-    Ui::QmitkAICPRegistrationViewControls m_Controls;
+    std::unique_ptr<Ui::QmitkAICPRegistrationViewControls> m_Controls;
 
   private:
 

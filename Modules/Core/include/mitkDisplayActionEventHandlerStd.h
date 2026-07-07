@@ -16,29 +16,33 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 // mitk core
-#include "mitkDisplayActionEventHandler.h"
+#include <mitkDisplayActionEventHandler.h>
 
 namespace mitk
 {
+  /**
+   * \brief Handler that connects a standard mix of synchronized and desynchronized display actions.
+   *
+   * Uses:
+   * - SetCrosshairSynchronizedAction (synchronized crosshair)
+   * - MoveSenderCameraAction (per-renderer move)
+   * - ZoomSenderCameraAction (per-renderer zoom)
+   * - ScrollSliceStepperAction (per-renderer scroll)
+   *
+   * \sa DisplayActionEventHandler DisplayActionEventFunctions
+   */
   class MITKCORE_EXPORT DisplayActionEventHandlerStd : public DisplayActionEventHandler
   {
   protected:
 
     /**
-    * @brief Initializes common standard display actions by using mixed synchronized and desynchronized display action event functions.
-    *        Uses:
-    *           - 'SetCrosshairSynchronizedAction'
-    *           - 'MoveSenderCameraAction'
-    *           - 'ZoomSenderCameraAction'
-    *           - 'ScrollSliceStepperAction'
-    *
-    * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
-    *
-    * @param prefixFilter The prefix of associated renderer names. Actions will only react to events from / send
-    *                     changes to renderers whose name begins with this prefix.
-    *
-    * @throw  mitk::Exception, if the class' observable is null.
-    */
+     * \brief Initialize the standard mix of display actions.
+     *
+     * \pre The observable broadcast must have been set.
+     * \throw mitk::Exception if the observable is null.
+     *
+     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     */
     void InitActionsImpl(const std::string& prefixFilter = "") override;
   };
 } // end namespace mitk

@@ -13,15 +13,10 @@ found in the LICENSE file.
 #ifndef mitkRenderingModeProperty_h
 #define mitkRenderingModeProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * Encapsulates the enumeration for rendering modes. The property human-readable name (which is
    * used in the mitkWorkbench inside the Property View) is "Image Rendering.Mode". This property
@@ -29,7 +24,6 @@ namespace mitk
    * rendering mode is applied to images.
    * Valid values are:
    *
-   * \li LEVELWINDOW_COLOR is DEPRECATED and mapped to LOOKUPTABLE_LEVELWINDOW_COLOR.
    * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
    * As lookup table, the table object supplied by the property "LookupTable" will be used. As default,
    * we apply a GRAYSCALE mitk::LookupTable. Note, if you want to use a former rainbow-like lookup table,
@@ -86,6 +80,8 @@ namespace mitk
    * that users who change the mode know that a previously set color will still be applied (on top of the respective
    * mode).
    * See VTK documentation for examples how to use vtkTransferfunction and vtkLookupTable.
+   *
+   * \sa EnumerationProperty
    */
 
   class MITKCORE_EXPORT RenderingModeProperty : public EnumerationProperty
@@ -101,22 +97,24 @@ namespace mitk
 
     mitkNewMacro1Param(RenderingModeProperty, const std::string &);
 
-    // Never (!) change this without adaptation of mitkLevelWindowManagerTest::VerifyRenderingModes and
-    // mitkLevelWindowManagerTest::TestLevelWindowSliderVisibility !
+    /**
+     * \brief Enumeration of available image rendering modes.
+     *
+     * \note Never change this without adaptation of mitkLevelWindowManagerTest::VerifyRenderingModes and
+     * mitkLevelWindowManagerTest::TestLevelWindowSliderVisibility!
+     */
     enum ImageRenderingMode
     {
-      // 0 used to be LEVELWINDOW_COLOR which is deprecated now and will be mapped to LOOKUPTABLE_LEVELWINDOW_COLOR.
-      // Our default lookup table property is the GRAYSCALE type which represents the
-      // former LEVELWINDOW_COLOR mode.
-      LOOKUPTABLE_LEVELWINDOW_COLOR = 1,
-      COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR = 2,
-      LOOKUPTABLE_COLOR = 3,
-      COLORTRANSFERFUNCTION_COLOR = 4
-      //  Default = LOOKUPTABLE_LEVELWINDOW_COLOR;
+      LOOKUPTABLE_LEVELWINDOW_COLOR = 1,          ///< Lookup table + level window + color (default).
+      COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR = 2, ///< Color transfer function + level window + color.
+      LOOKUPTABLE_COLOR = 3,                       ///< Lookup table + color (level window does not affect lookup table).
+      COLORTRANSFERFUNCTION_COLOR = 4              ///< Color transfer function + color (level window does not affect transfer function).
     };
 
     /**
-     * Returns the current rendering mode
+     * \brief Returns the current rendering mode as an integer.
+     *
+     * \return The current ImageRenderingMode value.
      */
     virtual int GetRenderingMode();
 
@@ -137,6 +135,8 @@ namespace mitk
      */
     RenderingModeProperty(const std::string &value);
 
+    RenderingModeProperty(const RenderingModeProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
@@ -148,16 +148,13 @@ namespace mitk
      */
     virtual void AddRenderingModes();
 
+    mitkCloneMacro(RenderingModeProperty);
+
   private:
     // purposely not implemented
     RenderingModeProperty &operator=(const RenderingModeProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

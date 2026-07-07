@@ -15,34 +15,39 @@ found in the LICENSE file.
 #include <ctkPathListWidget.h>
 #include <ctkPathListButtonsWidget.h>
 
-//-----------------------------------------------------------------------------
+#include <ui_QmitkPathListWidget.h>
+
 QmitkFileListWidget::QmitkFileListWidget(QWidget*)
+  : m_Controls(std::make_unique<Ui::QmitkPathListWidget>())
 {
-  this->setupUi(this);
-  this->m_PathListWidget->setMode(ctkPathListWidget::FilesOnly);
-  this->m_PathListWidget->setFileOptions(ctkPathListWidget::Exists | ctkPathListWidget::Readable | ctkPathListWidget::Executable);
-  this->m_PathListButtonsWidget->init(this->m_PathListWidget);
-  this->m_PathListButtonsWidget->setOrientation(Qt::Vertical);
-  connect(this->m_PathListWidget, SIGNAL(pathsChanged(QStringList,QStringList)), this, SLOT(OnPathsChanged(QStringList, QStringList)));
+  m_Controls->setupUi(this);
+  m_Controls->m_PathListWidget->setMode(ctkPathListWidget::FilesOnly);
+  m_Controls->m_PathListWidget->setFileOptions(ctkPathListWidget::Exists | ctkPathListWidget::Readable | ctkPathListWidget::Executable);
+  m_Controls->m_PathListButtonsWidget->init(m_Controls->m_PathListWidget);
+  m_Controls->m_PathListButtonsWidget->setOrientation(Qt::Vertical);
+  connect(m_Controls->m_PathListWidget, SIGNAL(pathsChanged(QStringList,QStringList)), this, SLOT(OnPathsChanged(QStringList, QStringList)));
 }
 
+QmitkFileListWidget::~QmitkFileListWidget()
+{
+}
 
-//-----------------------------------------------------------------------------
 void QmitkFileListWidget::OnPathsChanged(const QStringList& before, const QStringList& after)
 {
   emit pathsChanged(before, after);
 }
 
-
-//-----------------------------------------------------------------------------
 QStringList QmitkFileListWidget::files(bool absolutePath) const
 {
-  return this->m_PathListWidget->files(absolutePath);
+  return m_Controls->m_PathListWidget->files(absolutePath);
 }
 
-
-//-----------------------------------------------------------------------------
 void QmitkFileListWidget::setFiles(const QStringList& paths)
 {
-  this->m_PathListWidget->setPaths(paths);
+  m_Controls->m_PathListWidget->setPaths(paths);
+}
+
+void QmitkFileListWidget::setText(const QString& text)
+{
+  m_Controls->m_Label->setText(text);
 }

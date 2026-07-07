@@ -32,8 +32,6 @@ set(CACHED_RESOURCE_FILES
   resources/viewIcon2.png
 )
 
-set(CPP_FILES )
-
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})

@@ -20,7 +20,8 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Represents a DICOM Code Sequence with value, scheme, and meaning.
+   * \ingroup DICOMModule
+   * \brief Represents a DICOM Code Sequence with value, scheme, and meaning.
    *
    * This class provides a simplified representation of a DICOM Code Sequence,
    * storing only the essential elements: Code Value, Coding Scheme Designator,
@@ -31,6 +32,8 @@ namespace mitk
    * - or URN Code Value (0008,0120)
    * Which tag to use/correlate to depends on the content (length, or if an URN prefix exists).
    * This is e.g. handled by DCMTK.
+   *
+   * \sa DICOMCodeSequenceWithModifiers
    */
   class MITKDICOM_EXPORT DICOMCodeSequence
   {
@@ -38,10 +41,10 @@ namespace mitk
     DICOMCodeSequence() = default;
 
     /**
-     * @brief Constructs a DICOMCodeSequence with the specified attributes.
-     * @param value The Code Value (0008,0100), Long Code Value (0008,0119), or URN Code Value (0008,0120)
-     * @param scheme The Coding Scheme Designator (0008,0102)
-     * @param meaning The Code Meaning (0008,0104)
+     * \brief Constructs a DICOMCodeSequence with the specified attributes.
+     * \param value The Code Value (0008,0100), Long Code Value (0008,0119), or URN Code Value (0008,0120)
+     * \param scheme The Coding Scheme Designator (0008,0102)
+     * \param meaning The Code Meaning (0008,0104)
      */
     DICOMCodeSequence(const std::string& value, const std::string& scheme, const std::string& meaning);
 
@@ -53,52 +56,52 @@ namespace mitk
     DICOMCodeSequence& operator=(DICOMCodeSequence&&) = default;
 
     /**
-     * @brief Gets the Code Value.
+     * \brief Gets the Code Value.
      */
     const std::string& GetValue() const;
 
     /**
-     * @brief Sets the Code Value.
+     * \brief Sets the Code Value.
      */
     void SetValue(const std::string& value);
 
     /**
-     * @brief Gets the Coding Scheme Designator.
+     * \brief Gets the Coding Scheme Designator.
      */
     const std::string& GetScheme() const;
 
     /**
-     * @brief Sets the Coding Scheme Designator.
+     * \brief Sets the Coding Scheme Designator.
      */
     void SetScheme(const std::string& scheme);
 
     /**
-     * @brief Gets the Code Meaning.
+     * \brief Gets the Code Meaning.
      */
     const std::string& GetMeaning() const;
 
     /**
-     * @brief Sets the Code Meaning.
+     * \brief Sets the Code Meaning.
      */
     void SetMeaning(const std::string& meaning);
 
     /**
-     * @brief Checks if the code is empty (all fields empty).
-     * @return true if all fields are empty, false otherwise
+     * \brief Checks if the code is empty (all fields empty).
+     * \return true if all fields are empty, false otherwise
      */
     bool IsEmpty() const;
 
     /**
-     * @brief Equality comparison operator.
-     * @param other The DICOMCodeSequence to compare with
-     * @return true if value, scheme, and meaning are equal
+     * \brief Equality comparison operator.
+     * \param other The DICOMCodeSequence to compare with
+     * \return true if value, scheme, and meaning are equal
      */
     bool operator==(const DICOMCodeSequence& other) const;
 
     /**
-     * @brief Inequality comparison operator.
-     * @param other The DICOMCodeSequence to compare with
-     * @return true if any field differs
+     * \brief Inequality comparison operator.
+     * \param other The DICOMCodeSequence to compare with
+     * \return true if any field differs
      */
     bool operator!=(const DICOMCodeSequence& other) const;
 

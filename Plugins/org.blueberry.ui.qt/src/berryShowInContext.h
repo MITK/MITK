@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYSHOWINCONTEXT_H
 #define BERRYSHOWINCONTEXT_H
 
-#include "berryObject.h"
+#include <berryObject.h>
 
 #include <org_blueberry_ui_qt_Export.h>
 

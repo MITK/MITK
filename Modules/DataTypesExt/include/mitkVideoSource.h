@@ -13,73 +13,97 @@ found in the LICENSE file.
 #ifndef mitkVideoSource_h
 #define mitkVideoSource_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCommon.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkCommon.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include <mitkMessage.h>
 
 namespace mitk
 {
-  ///
-  /// Simple base class for acquiring video data.
-  ///
+  /**
+   * \brief Abstract base class for acquiring video frame data.
+   *
+   * Provides an interface for starting, stopping, and pausing video capture,
+   * as well as fetching frames and retrieving video texture data. Subclasses
+   * must implement GetVideoTexture() and typically override FetchFrame().
+   *
+   * \ingroup Data
+   */
   class MITKDATATYPESEXT_EXPORT VideoSource : virtual public itk::Object
   {
   public:
-    ///
-    /// Smart pointer defs
-    ///
     mitkClassMacroItkParent(VideoSource, itk::Object);
-    ///
-    /// assigns the grabbing devices for acquiring the next frame.
-    /// in this base implementation it does nothing except incrementing
-    /// m_FrameCount
-    ///
+
+    /**
+     * \brief Fetch the next frame from the capture device.
+     *
+     * In this base implementation, only the frame counter is incremented.
+     * Subclasses should override to perform actual frame acquisition.
+     */
     virtual void FetchFrame();
-    ///
-    /// \return a pointer to the image data array for opengl rendering.
-    ///
+
+    /**
+     * \brief Get a pointer to the current video frame pixel data.
+     *
+     * The returned buffer is suitable for OpenGL texture upload.
+     *
+     * \return Pointer to the RGBA/RGB pixel data array.
+     */
     virtual unsigned char *GetVideoTexture() = 0;
-    ///
-    /// advices this class to start the video capturing.
-    /// in this base implementation: toggles m_CapturingInProcess, resets m_FrameCount
-    /// *ATTENTION*: this should be also done in subclasses overwriting this method
-    ///
+
+    /**
+     * \brief Start video capturing.
+     *
+     * Sets m_CapturingInProcess to true and resets the frame count.
+     * Subclasses overriding this method should call the base implementation.
+     */
     virtual void StartCapturing();
-    ///
-    /// advices this class to stop the video capturing.
-    /// in this base implementation: toggles m_CapturingInProcess, resets m_FrameCount
-    /// *ATTENTION*: this should be also done in subclasses overwriting this method
-    ///
+
+    /**
+     * \brief Stop video capturing.
+     *
+     * Sets m_CapturingInProcess to false and resets the frame count.
+     * Subclasses overriding this method should call the base implementation.
+     */
     virtual void StopCapturing();
-    ///
-    /// \return true if video capturing is active.
-    /// \see m_CapturingInProcess
-    ///
+
+    /**
+     * \brief Query whether video capturing is currently active.
+     * \return true if capturing is in progress.
+     */
     virtual bool IsCapturingEnabled() const;
-    ///
-    /// \return the current frame width (might be 0 if unknown)
-    ///
+
+    /**
+     * \brief Get the width of the current video frame.
+     * \return The frame width in pixels, or 0 if unknown.
+     */
     virtual int GetImageWidth();
-    ///
-    /// \return the current frame height (might be 0 if unknown)
-    ///
+
+    /**
+     * \brief Get the height of the current video frame.
+     * \return The frame height in pixels, or 0 if unknown.
+     */
     virtual int GetImageHeight();
-    ///
-    /// \return the current frame count
-    ///
+
+    /**
+     * \brief Get the number of frames captured since the last start.
+     * \return The frame count.
+     */
     virtual unsigned long GetFrameCount() const;
-    ///
-    /// \return true, if capturing is currently paused, false otherwise
-    ///
+
+    /**
+     * \brief Query whether capturing is currently paused.
+     * \return true if paused.
+     */
     virtual bool GetCapturePaused() const;
-    ///
-    /// toggles m_CapturePaused
-    /// In Subclasses this function can be overwritten to take
-    /// measurs to provide a pause image, *BUT DO NOT FORGET TO
-    /// TOGGLE m_CapturePaused*
-    ///
+
+    /**
+     * \brief Toggle the capture pause state.
+     *
+     * While paused, FetchFrame() should provide the same frame repeatedly.
+     * Subclasses overriding this method must toggle m_CapturePaused.
+     */
     virtual void PauseCapturing();
 
   protected:

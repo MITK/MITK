@@ -12,11 +12,14 @@ found in the LICENSE file.
 #ifndef mitkTwoCompartmentExchangeModelFactory_h
 #define mitkTwoCompartmentExchangeModelFactory_h
 
-#include "mitkTwoCompartmentExchangeModelFactoryBase.h"
-#include "mitkTwoCompartmentExchangeModelParameterizer.h"
+#include <mitkTwoCompartmentExchangeModelFactoryBase.h>
+#include <mitkTwoCompartmentExchangeModelParameterizer.h>
 
 namespace mitk
 {
+  /** \brief Factory for the TwoCompartmentExchangeModel.
+   * \sa TwoCompartmentExchangeModel, TwoCompartmentExchangeModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoCompartmentExchangeModelFactory : public
     mitk::TwoCompartmentExchangeModelFactoryBase<TwoCompartmentExchangeModelParameterizer>
   {

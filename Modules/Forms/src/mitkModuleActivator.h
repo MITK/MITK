@@ -19,13 +19,22 @@ found in the LICENSE file.
 
 namespace mitk::Forms
 {
+  /**
+   * \brief Module activator for the Forms module.
+   *
+   * Registers all built-in question types with the IQuestionFactory service
+   * when the module is loaded.
+   */
   class ModuleActivator : public us::ModuleActivator
   {
   public:
     ModuleActivator();
     ~ModuleActivator() override;
 
+    /** \brief Register all built-in question types with the question factory. */
     void Load(us::ModuleContext* context) override;
+
+    /** \brief Unregister the question factory service. */
     void Unload(us::ModuleContext* context) override;
 
   private:

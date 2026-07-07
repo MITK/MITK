@@ -23,19 +23,51 @@ namespace mitk::nnInteractive
   /** \brief %nnInteractive interactor for placing individual points.
    *
    * Points are managed in up to two PointSet data nodes, separated by
-   * prompt type.
+   * prompt type. Point placement is restricted to the bounds of the
+   * reference image.
    *
-   * Interaction is handled through the PointSetDataInteractor.
+   * Interaction is handled through the PointSetDataInteractor. Left mouse
+   * button display interaction (crosshair navigation) is blocked while this
+   * interactor is enabled, allowing plain left clicks for point placement.
+   *
+   * \sa Interactor, PointSet, nnInteractiveTool
    */
   class MITKPYTHONSEGMENTATION_EXPORT PointInteractor : public Interactor
   {
   public:
+    /** \brief Constructs a PointInteractor with InteractionType::Point.
+     */
     PointInteractor();
+
+    /** \brief Destructor. Calls OnReset() to clean up data nodes.
+     */
     ~PointInteractor() override;
 
+    /** \brief Checks whether any points have been placed.
+     *
+     * \return \c true if at least one point exists in any PointSet for any
+     *         prompt type, \c false otherwise.
+     */
     bool HasInteractions() const override;
 
+    /** \brief Returns the most recently placed point for the current prompt type.
+     *
+     * \return The last point's 3D coordinates if at least one point exists
+     *         for the current prompt type, \c std::nullopt otherwise.
+     *
+     * \sa GetCurrentPromptType()
+     */
     std::optional<Point3D> GetLastPoint() const;
+
+    /** \brief Removes the most recently placed point for the given prompt type.
+     *
+     * A no-op if no point set exists for \p promptType or it is already empty.
+     * The point set node is left in place (it may be the actively bound node);
+     * empty sets are cleaned up by OnDisable() / OnReset() as before.
+     *
+     * \param[in] promptType The prompt type whose last point should be removed.
+     */
+    void RemoveLastInteraction(PromptType promptType) override;
 
   private:
     void OnEnable() override;

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkInteractorStyle_h
 #define mitkVtkInteractorStyle_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 #include <vtkInteractorStyleUser.h>
 
 namespace mitk
@@ -33,7 +33,7 @@ namespace mitk
   class MITKCORE_EXPORT VtkInteractorStyle : public vtkInteractorStyleUser
   {
   public:
-    // default VTK c'tor
+    /** \brief VTK standard factory method. */
     static VtkInteractorStyle* New();
     vtkTypeMacro(VtkInteractorStyle, vtkInteractorStyleUser);
 

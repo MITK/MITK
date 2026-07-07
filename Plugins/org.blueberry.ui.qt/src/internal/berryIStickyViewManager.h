@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include <berryIMemento.h>
+#include "berryIMemento.h"
 
 #include <set>
 

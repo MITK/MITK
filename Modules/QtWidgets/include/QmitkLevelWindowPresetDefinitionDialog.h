@@ -15,31 +15,57 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkLevelWindowPresetDefinition.h"
-
 #include <QDialog>
 #include <QSortFilterProxyModel>
 
 #include <map>
 #include <string>
+#include <memory>
 
-/// \ingroup QmitkModule
-class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog,
-                                                                    public Ui::QmitkLevelWindowPresetDefinition
+namespace Ui
+{
+  class QmitkLevelWindowPresetDefinition;
+}
+
+/** \brief Dialog for defining and managing level/window presets.
+ *
+ * Provides a table-based UI for adding, removing, and editing named
+ * level/window presets. Presets can be sorted by name, level, or window value.
+ *
+ * \ingroup QmitkModule
+ * \sa QmitkLevelWindowWidgetContextMenu, QmitkLevelWindowRangeChangeDialog
+ */
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog
 {
   Q_OBJECT
 
 public:
+  /** \brief Construct the preset definition dialog.
+   * \param[in] parent Parent widget.
+   * \param[in] f Window flags.
+   */
   QmitkLevelWindowPresetDefinitionDialog(QWidget *parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkLevelWindowPresetDefinitionDialog() override;
 
+  /** \brief Initialize the dialog with existing presets and default values.
+   * \param[in] level  Map of preset names to level values.
+   * \param[in] window Map of preset names to window values.
+   * \param[in] initLevel  Default level value shown in the input field.
+   * \param[in] initWindow Default window value shown in the input field.
+   */
   void setPresets(std::map<std::string, double> &level,
                   std::map<std::string, double> &window,
                   QString initLevel,
                   QString initWindow);
 
+  /** \brief Get the edited level presets.
+   * \return Map of preset names to level values.
+   */
   std::map<std::string, double> getLevelPresets();
 
+  /** \brief Get the edited window presets.
+   * \return Map of preset names to window values.
+   */
   std::map<std::string, double> getWindowPresets();
 
 protected slots:
@@ -94,6 +120,7 @@ protected:
 
   void resizeColumns();
 
+  std::unique_ptr<Ui::QmitkLevelWindowPresetDefinition> m_Controls;
   PresetTableModel *m_TableModel;
   QSortFilterProxyModel m_SortModel;
 };

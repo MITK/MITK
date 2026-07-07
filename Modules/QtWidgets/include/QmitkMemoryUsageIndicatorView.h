@@ -19,18 +19,28 @@ found in the LICENSE file.
 
 #include <array>
 #include <utility>
+#include <memory>
 
 namespace Ui
 {
   class QmitkMemoryUsageIndicator;
 }
 
-/// \ingroup QmitkModule
+/** \brief Widget that displays the current process memory usage.
+ *
+ * Shows memory usage as a percentage bar with an icon that changes
+ * based on usage thresholds. Updates periodically via a timer.
+ *
+ * \ingroup QmitkModule
+ */
 class MITKQTWIDGETS_EXPORT QmitkMemoryUsageIndicatorView : public QWidget
 {
   Q_OBJECT
 
 public:
+  /** \brief Construct the memory usage indicator.
+   * \param[in] parent Parent widget.
+   */
   QmitkMemoryUsageIndicatorView(QWidget* parent = nullptr);
   ~QmitkMemoryUsageIndicatorView() override;
 
@@ -40,7 +50,7 @@ private:
   std::string FormatPercentage(double val);
   std::string GetMemoryDescription(size_t processSize, float percentage);
 
-  Ui::QmitkMemoryUsageIndicator* m_Ui;
+  std::unique_ptr<Ui::QmitkMemoryUsageIndicator> m_Ui;
   size_t m_PreviousState;
   std::array<std::pair<float, QPixmap>, 4> m_States;
 };

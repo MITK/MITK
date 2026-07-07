@@ -18,20 +18,21 @@ found in the LICENSE file.
 #include <mitkEnumerationProperty.h>
 
 // MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
-#endif
-
 /**
- * Encapsulates the enumeration for direction for the registration visualization. Valid values are:
- * 0/UniColor, 1/VectorMagnitude
- * Default is "UniColor"
+ * \brief Enumeration property defining the color style for registration visualization.
+ *
+ * Valid values are:
+ * - 0: UniColor (single uniform color)
+ * - 1: VectorMagnitude (color mapped by deformation vector magnitude)
+ *
+ * Default is "UniColor".
+ *
+ * \sa mitk::MITKRegistrationWrapperMapperBase, mitk::RegVisStyleProperty
  */
 class MITKMATCHPOINTREGISTRATION_EXPORT RegVisColorStyleProperty : public EnumerationProperty
 {
@@ -41,8 +42,10 @@ public:
 
   itkNewMacro(RegVisColorStyleProperty);
 
+  /** \brief Constructs a RegVisColorStyleProperty from a numeric ID. */
   mitkNewMacro1Param(RegVisColorStyleProperty, const IdType&);
 
+  /** \brief Constructs a RegVisColorStyleProperty from a string name. */
   mitkNewMacro1Param(RegVisColorStyleProperty, const std::string&);
 
 
@@ -85,9 +88,6 @@ private:
   RegVisColorStyleProperty& operator=(const RegVisColorStyleProperty&);
 };
 
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

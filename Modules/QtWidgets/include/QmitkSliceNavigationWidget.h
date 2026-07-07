@@ -13,21 +13,24 @@ found in the LICENSE file.
 #ifndef QmitkSliceNavigationWidget_h
 #define QmitkSliceNavigationWidget_h
 
-#include "MitkQtWidgetsExports.h"
-#include "ui_QmitkSliceNavigationWidget.h"
+#include <MitkQtWidgetsExports.h>
 
 #include <mitkStepper.h>
 
 #include <QString>
 #include <QWidget>
+#include <memory>
 
-class MITKQTWIDGETS_EXPORT QmitkSliceNavigationWidget : public QWidget, public Ui::QmitkSliceNavigationWidget
+namespace Ui { class QmitkSliceNavigationWidget; }
+
+class MITKQTWIDGETS_EXPORT QmitkSliceNavigationWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
   QmitkSliceNavigationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
+  ~QmitkSliceNavigationWidget() override;
 
   /**
    * \brief Convert the passed value to a QString representation.
@@ -129,6 +132,8 @@ protected slots:
   void SetLabels();
 
 protected:
+
+  std::unique_ptr<Ui::QmitkSliceNavigationWidget> m_Controls;
 
   mitk::Stepper::Pointer m_Stepper;
   bool m_InRefetch;

@@ -13,19 +13,22 @@ found in the LICENSE file.
 #ifndef mitkLookupTables_h
 #define mitkLookupTables_h
 
-#include "mitkGenericLookupTable.h"
+#include <mitkGenericLookupTable.h>
 
 namespace mitk
 {
-  /**Documentation
-  * \brief specializations of GenericLookupTable
-  *
-  * This file contains specializations of mitk::GenericLookupTable
-  * for bool, float, int and std::string lookuptables
-  * \warning you have to call the mitkSpecializeGenericLookupTableOperator macro
-  * in mitkLookupTables.cpp with each specialization to add an ostream << operator
-  * for that lookuptable specialization.
-  */
+  /**
+   * \brief Specializations of GenericLookupTable for common value types.
+   *
+   * This file contains specializations of mitk::GenericLookupTable
+   * for bool, float, int, and std::string lookup tables.
+   *
+   * \warning You must call the mitkSpecializeGenericLookupTableOperator macro
+   * in mitkLookupTables.cpp for each specialization to add an ostream << operator
+   * for that lookup table specialization.
+   *
+   * \sa GenericLookupTable
+   */
   mitkSpecializeGenericLookupTable(BoolLookupTable, bool);
   mitkSpecializeGenericLookupTable(FloatLookupTable, float);
   mitkSpecializeGenericLookupTable(IntLookupTable, int);

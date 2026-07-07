@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkMultiOutputNaryFunctorImageFilter_h
-#define __itkMultiOutputNaryFunctorImageFilter_h
+#ifndef itkMultiOutputNaryFunctorImageFilter_h
+#define itkMultiOutputNaryFunctorImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkImageIterator.h"
-#include "itkArray.h"
+#include <itkImageToImageFilter.h>
+#include <itkImageIterator.h>
+#include <itkArray.h>
 
 namespace itk
 {
@@ -33,9 +33,6 @@ namespace itk
  * function.\n
  *
  * All the input images must be of the same type.
- *
- * \ingroup IntensityImageFilters MultiThreaded
- * \ingroup ITKImageIntensity
  */
 
 template< class TInputImage, class TOutputImage, class TFunction, class TMaskImage = ::itk::Image<unsigned char, TInputImage::ImageDimension> >
@@ -140,7 +137,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMultiOutputNaryFunctorImageFilter.tpp"
+#include <itkMultiOutputNaryFunctorImageFilter.tpp>
 #endif
 
 #endif

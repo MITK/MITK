@@ -13,7 +13,7 @@
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.StdMultiWidgetEditorPreferencePage" name="Standard Multi Widget"
+    <page id="org.mitk.StdMultiWidgetEditorPreferencePage" name="Standard Display"
       class="QmitkStdMultiWidgetEditorPreferencePage" category="org.mitk.EditorsPreferencePage">
       <keywordreference id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords"/>
     </page>

@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkClassicDICOMSeriesReader.h"
+#include <mitkClassicDICOMSeriesReader.h>
 
-#include "mitkDICOMTagBasedSorter.h"
-#include "mitkDICOMSortByTag.h"
-#include "mitkSortByImagePositionPatient.h"
+#include <mitkDICOMTagBasedSorter.h>
+#include <mitkDICOMSortByTag.h>
+#include <mitkSortByImagePositionPatient.h>
 
 
 mitk::ClassicDICOMSeriesReader

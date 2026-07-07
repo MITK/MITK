@@ -13,6 +13,8 @@ found in the LICENSE file.
 //#define _USE_MATH_DEFINES
 #include <QmitkServiceListWidget.h>
 
+#include <ui_QmitkServiceListWidgetControls.h>
+
 // STL Headers
 #include <list>
 
@@ -26,7 +28,7 @@ found in the LICENSE file.
 const std::string QmitkServiceListWidget::VIEW_ID = "org.mitk.views.QmitkServiceListWidget";
 
 QmitkServiceListWidget::QmitkServiceListWidget(QWidget *parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_AutomaticallySelectFirstEntry(false), m_Controls(nullptr)
+  : QWidget(parent, f), m_AutomaticallySelectFirstEntry(false), m_ServiceList(nullptr)
 {
   CreateQtPartControl(this);
 }
@@ -48,8 +50,9 @@ void QmitkServiceListWidget::CreateQtPartControl(QWidget *parent)
   if (!m_Controls)
   {
     // create GUI widgets
-    m_Controls = new Ui::QmitkServiceListWidgetControls;
+    m_Controls = std::make_unique<Ui::QmitkServiceListWidgetControls>();
     m_Controls->setupUi(parent);
+    m_ServiceList = m_Controls->m_ServiceList; // Expose m_ServiceList in header without exposing whole Ui class
     this->CreateConnections();
   }
   m_Context = us::GetModuleContext();

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDataStorageSelection_h
 #define mitkDataStorageSelection_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 
 #include <mitkCommon.h>
 #include <mitkDataStorage.h>
@@ -26,15 +26,32 @@ namespace mitk
   class BaseProperty;
   class PropertyList;
 
+  /**
+   * \brief Manages a selection of DataNode objects from a DataStorage.
+   *
+   * Observes a DataStorage for node additions and removals, optionally
+   * filtering by a NodePredicateBase. Fires events (NodeChanged, NodeAdded,
+   * NodeRemoved, PropertyChanged) when the selection or its properties change.
+   *
+   * Nodes can be automatically added when they appear in the DataStorage
+   * (if AutoAddNodes is enabled), or manually added/removed.
+   *
+   * \sa DataStorage, NodePredicateBase
+   * \ingroup Data
+   */
   class MITKDATATYPESEXT_EXPORT DataStorageSelection : public itk::Object
   {
   public:
     typedef std::vector<mitk::DataNode *> Nodes;
     typedef Message1<const mitk::DataNode *> DataNodeEvent;
 
+    /** \brief Event fired when a node in the selection is modified. */
     DataNodeEvent NodeChanged;
+    /** \brief Event fired when a node is added to the selection. */
     DataNodeEvent NodeAdded;
+    /** \brief Event fired when a node is removed from the selection. */
     DataNodeEvent NodeRemoved;
+    /** \brief Event fired when a property on a selected node changes. */
     Message2<const mitk::DataNode *, const mitk::BaseProperty *> PropertyChanged;
 
     mitkClassMacroItkParent(DataStorageSelection, itk::Object);
@@ -49,67 +66,104 @@ namespace mitk
   public:
     ~DataStorageSelection() override;
 
-    ///
-    /// Get the DataStorage.
-    ///
+    /**
+     * \brief Get the associated DataStorage.
+     * \return Smart pointer to the DataStorage, or nullptr.
+     */
     mitk::DataStorage::Pointer GetDataStorage() const;
-    ///
-    /// Get the predicate.
-    ///
+
+    /**
+     * \brief Get the predicate used for filtering nodes.
+     * \return Smart pointer to the predicate, or nullptr if none is set.
+     */
     mitk::NodePredicateBase::Pointer GetPredicate() const;
-    ///
-    /// Returns the size of this selection
-    ///
+
+    /**
+     * \brief Returns the number of nodes in this selection.
+     * \return The node count.
+     */
     unsigned int GetSize() const;
-    ///
-    /// Get node at a specific model index.
-    ///
+
+    /**
+     * \brief Get a node at a specific index.
+     * \param[in] index The zero-based index.
+     * \return Smart pointer to the node, or nullptr if index is out of range.
+     */
     mitk::DataNode::Pointer GetNode(unsigned int index) const;
-    ///
-    /// Returns the first node, same as calling GetNode(0)
-    ///
+
+    /**
+     * \brief Returns the first node in the selection.
+     *
+     * Equivalent to calling GetNode(0).
+     *
+     * \return Smart pointer to the first node, or nullptr if empty.
+     */
     mitk::DataNode::Pointer GetNode() const;
-    ///
-    /// Returns a copy of the node-vector
-    ///
+
+    /**
+     * \brief Returns a copy of the internal node vector.
+     * \return A vector of raw DataNode pointers.
+     */
     std::vector<mitk::DataNode *> GetNodes() const;
-    ///
-    /// \see m_AutoAddNodes
-    ///
+
+    /**
+     * \brief Query whether nodes are automatically added from the DataStorage.
+     * \return true if auto-add is enabled.
+     */
     bool DoesAutoAddNodes() const;
 
   public:
-    ///
-    /// Removes all nodes, sets node as new first element
-    ///
+    /**
+     * \brief Remove all nodes and set a raw pointer as the sole element.
+     * \param[in] node The node to set.
+     * \return Reference to this selection.
+     */
     DataStorageSelection &operator=(mitk::DataNode *node);
-    ///
-    /// Removes all nodes, sets node as new first element
-    ///
+
+    /**
+     * \brief Remove all nodes and set a smart pointer as the sole element.
+     * \param[in] node The node to set.
+     * \return Reference to this selection.
+     */
     DataStorageSelection &operator=(mitk::DataNode::Pointer node);
-    ///
-    /// Sets the DataStorage.
-    ///
+
+    /**
+     * \brief Set or change the associated DataStorage.
+     * \param[in] _DataStorage Pointer to the new DataStorage, or nullptr to detach.
+     */
     virtual void SetDataStorage(mitk::DataStorage *_DataStorage);
-    ///
-    /// Sets the predicate. <b>QmitkDataStorageTableModel is owner of the predicate!</b>
-    ///
+
+    /**
+     * \brief Set or change the filter predicate.
+     *
+     * Ownership of the predicate is taken by this class.
+     *
+     * \param[in] _Predicate The new predicate, or nullptr to accept all nodes.
+     */
     virtual void SetPredicate(mitk::NodePredicateBase *_Predicate);
-    ///
-    /// Add a node (if not already there)
-    ///
+
+    /**
+     * \brief Add a node to the selection if it is not already present.
+     * \param[in] node The node to add.
+     */
     virtual void AddNode(const mitk::DataNode *node);
-    ///
-    /// Removes a node
-    ///
+
+    /**
+     * \brief Remove a node from the selection.
+     * \param[in] node The node to remove.
+     */
     virtual void RemoveNode(const mitk::DataNode *node);
-    ///
-    /// Removes a node
-    ///
+
+    /**
+     * \brief Remove all nodes from the selection.
+     */
     virtual void RemoveAllNodes();
-    ///
-    /// Called whenever an itk Object this class holds gets deleted or modified
-    ///
+
+    /**
+     * \brief Callback invoked when an observed ITK object is deleted or modified.
+     * \param[in] caller The object that triggered the event.
+     * \param[in] event The event descriptor.
+     */
     virtual void ObjectChanged(const itk::Object *caller, const itk::EventObject &event);
 
   protected:

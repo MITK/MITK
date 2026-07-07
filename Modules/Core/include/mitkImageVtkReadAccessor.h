@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageVtkReadAccessor_h
 #define mitkImageVtkReadAccessor_h
 
-#include "mitkImageAccessorBase.h"
+#include <mitkImageAccessorBase.h>
 
 class vtkImageData;
 
@@ -23,26 +23,31 @@ namespace mitk
   class ImageDataItem;
 
   /**
-   * @brief ImageVtkReadAccessor class provides any image read access which is required by Vtk methods
-   * @ingroup Data
+   * \brief Provides read access to image data in the form required by VTK methods.
+   *
+   * This class locks the image data for reading and provides access to the
+   * underlying vtkImageData representation.
+   *
+   * \ingroup Data
    */
   class MITKCORE_EXPORT ImageVtkReadAccessor : public ImageAccessorBase
   {
   public:
-    /** \brief Creates an ImageVtkWriteAccessor for a whole Image
-     *  \param iP specifies the associated Image
-     *  \param iDI
-     *  \param imageDataVtk
+    /** \brief Creates an ImageVtkReadAccessor for a whole Image.
+     *  \param iP The associated Image (const smart pointer).
+     *  \param iDI The image data item describing the allocated image part.
+     *  \param imageDataVtk The VTK image data representation to provide access to.
      */
     ImageVtkReadAccessor(ImageConstPointer iP, const ImageDataItem *iDI, const vtkImageData *imageDataVtk);
 
+    /** \brief Destructor unregisters this accessor from the image. */
     ~ImageVtkReadAccessor() override;
 
+    /** \brief Returns the VTK image data for read access. */
     const vtkImageData *GetVtkImageData() const;
 
-    // vtkTypeMacro(ImageVtkWriteAccessor,vtkDataSet)
-
   protected:
+    /** \brief Returns a const pointer to the associated Image. */
     const Image *GetImage() const override;
 
   private:

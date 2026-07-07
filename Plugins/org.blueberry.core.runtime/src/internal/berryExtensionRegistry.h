@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef BERRYEXTENSIONREGISTRY_H
 #define BERRYEXTENSIONREGISTRY_H
 
-#include <berryIExtensionRegistry.h>
+#include "berryIExtensionRegistry.h"
 
-#include <berryIRegistryEventListener.h>
+#include "berryIRegistryEventListener.h"
 #include "berryRegistryTimestamp.h"
 #include "berryCombinedEventDelta.h"
 #include "berryListenerList.h"

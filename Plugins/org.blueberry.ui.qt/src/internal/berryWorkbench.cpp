@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "tweaklets/berryWorkbenchTweaklet.h"
 
@@ -40,21 +40,21 @@ found in the LICENSE file.
 #include "berryWorkbenchMenuService.h"
 #include "berryEvaluationService.h"
 #include "berryCommandService.h"
-#include "berryCommandManager.h"
+#include <berryCommandManager.h>
 #include "berryMenuManager.h"
-#include "berryParameterType.h"
+#include <berryParameterType.h>
 #include "berryQActionProperties.h"
 #include "berrySourceProviderService.h"
 #include "berryWorkbenchLocationService.h"
 
 #include <berryCommand.h>
 #include <berryCommandCategory.h>
-#include <berryIElementFactory.h>
+#include "berryIElementFactory.h"
 #include <berryIHandler.h>
-#include <berryIHandlerService.h>
+#include "berryIHandlerService.h"
 #include <berryIProduct.h>
-#include <berryISourceProvider.h>
-#include <berryIServiceScopes.h>
+#include "berryISourceProvider.h"
+#include "berryIServiceScopes.h"
 
 #include <QDir>
 #include <QApplication>

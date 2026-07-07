@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   viewBox="0 0 128 128"
+   width="128"
+   height="128"
+   id="svg7"
+   sodipodi:docname="map_translate_center_to_navigator.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7" />
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="3.1536515"
+     inkscape:cx="65.638197"
+     inkscape:cy="63.894187"
+     inkscape:window-width="1920"
+     inkscape:window-height="1121"
+     inkscape:window-x="-7"
+     inkscape:window-y="-7"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7" />
+  <!-- Moving image: dashed bounding box with center crosshair -->
+  <rect
+     x="6.8538346"
+     y="8.2907257"
+     width="44"
+     height="48"
+     rx="3"
+     fill="none"
+     stroke="#1D1D1B"
+     stroke-width="3"
+     stroke-dasharray="6, 3"
+     stroke-linecap="round"
+     id="rect1"
+     style="fill:none;stroke:#00ff00;stroke-opacity:1" />
+  <!-- Moving image center cross -->
+  <line
+     x1="16.853834"
+     y1="32.290726"
+     x2="40.853836"
+     y2="32.290726"
+     stroke="#1D1D1B"
+     stroke-width="2.5"
+     stroke-linecap="round"
+     id="line1"
+     style="fill:#00ff00;stroke:#00ff00" />
+  <line
+     x1="28.853834"
+     y1="20.290726"
+     x2="28.853834"
+     y2="44.290726"
+     stroke="#1D1D1B"
+     stroke-width="2.5"
+     stroke-linecap="round"
+     id="line2"
+     style="fill:#00ff00;stroke:#00ff00" />
+  <!-- Moving image center dot -->
+  <circle
+     cx="28.853834"
+     cy="32.290726"
+     r="5"
+     fill="#1D1D1B"
+     id="circle2"
+     style="fill:#00ff00;stroke:#00ff00" />
+  <!-- Arrow shaft (accent) -->
+  <!-- Arrowhead (accent) -->
+  <g
+     id="g7"
+     transform="translate(6.0247626,-1.9025588)"
+     inkscape:label="g7"
+     style="fill:#ff00ff;fill-opacity:1">
+    <line
+       x1="35.411449"
+       y1="49.616386"
+       x2="50.144638"
+       y2="61.280956"
+       stroke="#f39200"
+       stroke-width="13.1542"
+       stroke-linecap="round"
+       id="line3"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#ff00ff;stroke-opacity:1" />
+    <polygon
+       points="62,52 76,64 62,76 "
+       fill="#f39200"
+       id="polygon3"
+       transform="matrix(1.473319,1.1664571,-1.1664571,1.473319,33.45211,-105.3318)"
+       style="fill:#ff00ff;fill-opacity:1" />
+  </g>
+  <!-- Navigator crosshair -->
+  <!-- Left tick (gap after arrowhead tip at x=76) -->
+  <!-- Crosshair circle -->
+  <circle
+     cx="92.26757"
+     cy="90.635788"
+     r="16"
+     fill="none"
+     stroke="#1d1d1b"
+     stroke-width="4.5"
+     id="circle4"
+     style="stroke:#00ff00" />
+  <!-- Top tick -->
+  <!-- Bottom tick -->
+  <!-- Right tick -->
+  <!-- Navigator center dot -->
+  <circle
+     cx="92.26757"
+     cy="90.635788"
+     r="5"
+     fill="#1d1d1b"
+     id="circle7"
+     style="fill:#00ff00;stroke:#00ff00" />
+  <rect
+     style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.623622;stroke-opacity:1"
+     id="rect7"
+     width="5"
+     height="20"
+     x="89.745613"
+     y="56.442505"
+     rx="3" />
+  <rect
+     style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.623622;stroke-opacity:1"
+     id="rect7-2"
+     width="5"
+     height="20"
+     x="89.745613"
+     y="104.80592"
+     rx="3" />
+  <rect
+     style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.623622;stroke-opacity:1"
+     id="rect7-2-3"
+     width="5"
+     height="20"
+     x="88.291122"
+     y="-126.5016"
+     rx="3"
+     transform="rotate(90)" />
+  <rect
+     style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.623622;stroke-opacity:1"
+     id="rect7-2-4"
+     width="5"
+     height="20"
+     x="88.291122"
+     y="-77.986412"
+     rx="3"
+     transform="rotate(90)" />
+</svg>

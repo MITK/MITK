@@ -1,4 +1,8 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  QmitkCustomVariants.h
+  QmitkDataStorageInspectorProviderBase.h
+  QmitkEnums.h
+)
 
 set(CPP_FILES
   QmitkAbstractDataStorageModel.cpp
@@ -89,98 +93,27 @@ set(CPP_FILES
   QmitkRun.cpp
 )
 
-set(MOC_H_FILES
-  include/QmitkAbstractDataStorageModel.h
-  include/QmitkAbstractMultiWidget.h
-  include/QmitkAbstractNodeSelectionWidget.h
-  include/QmitkAutomatedLayoutWidget.h
-  include/QmitkDataStorageComboBox.h
-  include/QmitkDataStorageTableModel.h
-  include/QmitkDataStorageTreeModel.h
-  include/QmitkDataStorageSimpleTreeModel.h
-  include/QmitkDataStorageDefaultListModel.h
-  include/QmitkDnDDataNodeWidget.h
-  include/QmitkFileReaderOptionsDialog.h
-  include/QmitkFileReaderWriterOptionsWidget.h
-  include/QmitkFileWriterOptionsDialog.h
-  include/QmitkFloatingTextPopup.h
-  include/QmitkInteractionSchemeToolBar.h
-  include/QmitkLevelWindowPresetDefinitionDialog.h
-  include/QmitkLevelWindowRangeChangeDialog.h
-  include/QmitkLevelWindowWidgetContextMenu.h
-  include/QmitkLevelWindowWidget.h
-  include/QmitkLineEditLevelWindowWidget.h
-  include/QmitkMemoryUsageIndicatorView.h
-  include/QmitkMultiNodeSelectionWidget.h
-  include/QmitkMultiWidgetConfigurationToolBar.h
-  include/QmitkMultiWidgetLayoutManager.h
-  include/QmitkMultiWidgetLayoutSelectionWidget.h
-  include/QmitkNodeDescriptor.h
-  include/QmitkNodeSelectionButton.h
-  include/QmitkNodeSelectionDialog.h
-  include/QmitkNodeSelectionListItemWidget.h
-  include/QmitkColoredNodeDescriptor.h
-  include/QmitkNodeDescriptorManager.h
-  include/QmitkProgressBar.h
-  include/QmitkPropertiesTableEditor.h
-  include/QmitkPropertyDelegate.h
-  include/QmitkRenderingManager.h
-  include/QmitkRenderWindow.h
-  include/QmitkRenderWindowDataStorageTreeModel.h
-  include/QmitkRenderWindowMenu.h
-  include/QmitkRenderWindowUtilityWidget.h
-  include/QmitkRenderWindowWidget.h
-  include/QmitkRenderWindowContextDataStorageInspector.h
-  include/mitkRenderWindowLayerController.h
-  include/mitkRenderWindowLayerUtilities.h
-  include/mitkRenderWindowViewDirectionController.h
-  include/QmitkServiceListWidget.h
-  include/QmitkSingleNodeSelectionWidget.h
-  include/QmitkSliceNavigationWidget.h
-  include/QmitkSliderLevelWindowWidget.h
-  include/QmitkStdMultiWidget.h
-  include/QmitkMxNMultiWidget.h
-  include/QmitkStepperAdapter.h
-  include/QmitkDataStorageComboBoxWithSelectNone.h
-  include/QmitkPropertyItemDelegate.h
-  include/QmitkPropertyItemModel.h
-  include/QmitkAbstractDataStorageInspector.h
-  include/QmitkDataStorageFavoriteNodesInspector.h
-  include/QmitkDataStorageListInspector.h
-  include/QmitkDataStorageTreeInspector.h
-  include/QmitkDataStorageHistoryModel.h
-  include/QmitkDataStorageSelectionHistoryInspector.h
-  include/QmitkModelViewSelectionConnector.h
-  include/QmitkOverlayWidget.h
-  include/QmitkSimpleTextOverlayWidget.h
-  include/QmitkButtonOverlayWidget.h
-  include/QmitkNodeDetailsDialog.h
-  include/QmitkRenderWindowDataNodeTableModel.h
-  include/QmitkSynchronizedNodeSelectionWidget.h
-  include/QmitkSynchronizedWidgetConnector.h
-)
-
 set(UI_FILES
-  src/QmitkAutomatedLayoutWidget.ui
-  src/QmitkFileReaderOptionsDialog.ui
-  src/QmitkFileWriterOptionsDialog.ui
-  src/QmitkLevelWindowPresetDefinition.ui
-  src/QmitkLevelWindowWidget.ui
-  src/QmitkLevelWindowRangeChange.ui
-  src/QmitkMemoryUsageIndicator.ui
-  src/QmitkMultiNodeSelectionWidget.ui
-  src/QmitkMultiWidgetLayoutSelectionWidget.ui
-  src/QmitkNodeSelectionDialog.ui
-  src/QmitkNodeSelectionListItemWidget.ui
-  src/QmitkRenderWindowContextDataStorageInspector.ui
-  src/QmitkServiceListWidgetControls.ui
-  src/QmitkSingleNodeSelectionWidget.ui
-  src/QmitkSliceNavigationWidget.ui
-  src/QmitkDataStorageListInspector.ui
-  src/QmitkDataStorageTreeInspector.ui
-  src/QmitkDataStorageSelectionHistoryInspector.ui
-  src/QmitkSynchronizedNodeSelectionWidget.ui
-  src/QmitkNodeDetailsDialog.ui
+  QmitkAutomatedLayoutWidget.ui
+  QmitkFileReaderOptionsDialog.ui
+  QmitkFileWriterOptionsDialog.ui
+  QmitkLevelWindowPresetDefinition.ui
+  QmitkLevelWindowWidget.ui
+  QmitkLevelWindowRangeChange.ui
+  QmitkMemoryUsageIndicator.ui
+  QmitkMultiNodeSelectionWidget.ui
+  QmitkMultiWidgetLayoutSelectionWidget.ui
+  QmitkNodeSelectionDialog.ui
+  QmitkNodeSelectionListItemWidget.ui
+  QmitkRenderWindowContextDataStorageInspector.ui
+  QmitkServiceListWidgetControls.ui
+  QmitkSingleNodeSelectionWidget.ui
+  QmitkSliceNavigationWidget.ui
+  QmitkDataStorageListInspector.ui
+  QmitkDataStorageTreeInspector.ui
+  QmitkDataStorageSelectionHistoryInspector.ui
+  QmitkSynchronizedNodeSelectionWidget.ui
+  QmitkNodeDetailsDialog.ui
 )
 
 set(RESOURCE_FILES
@@ -188,5 +121,5 @@ set(RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resource/Qmitk.qrc
+  Qmitk.qrc
 )

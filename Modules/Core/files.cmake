@@ -1,4 +1,70 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  Colortables/HotIron.h
+  Colortables/Inferno.h
+  Colortables/Jet.h
+  Colortables/Magma.h
+  Colortables/Multilabel.h
+  Colortables/PET20.h
+  Colortables/PETColor.h
+  Colortables/Plasma.h
+  Colortables/Turbo.h
+  Colortables/Viridis.h
+  itkImportMitkImageContainer.h
+  itkMITKScalarImageToHistogramGenerator.h
+  itkVtkAbstractTransform.h
+  mitkAnatomicalPlanes.h
+  mitkAntiAliasing.h
+  mitkArray.h
+  mitkBaseDataTestImplementation.h
+  mitkCommon.h
+  mitkDisplayActionEvents.h
+  mitkEqual.h
+  mitkEventInformer.h
+  mitkExceptionMacro.h
+  mitkFileSystem.h
+  mitkGenericLookupTable.h
+  mitkGenericProperty.h
+  mitkGetClassHierarchy.h
+  mitkINodeSelectionListener.h
+  mitkITKImageImport.h
+  mitkImageAccessByItk.h
+  mitkImageCast.h
+  mitkImageGenerator.h
+  mitkImagePixelAccessor.h
+  mitkImagePixelReadAccessor.h
+  mitkImagePixelWriteAccessor.h
+  mitkImageToItk.h
+  mitkInstantiateAccessFunctions.h
+  mitkInteractionConst.h
+  mitkItkMatrixHack.h
+  mitkLexicalCast.h
+  mitkLine.h
+  mitkLocalStorageHandler.h
+  mitkMatrix.h
+  mitkMatrixConvert.h
+  mitkMessage.h
+  mitkNumericTypes.h
+  mitkOperationActor.h
+  mitkPPArgCount.h
+  mitkPixelTypeList.h
+  mitkPixelTypeMultiplex.h
+  mitkPixelTypeTraits.h
+  mitkPlaneClipping.h
+  mitkPoint.h
+  mitkProgressBarImplementation.h
+  mitkQuaternion.h
+  mitkReferenceCountWatcher.h
+  mitkRenderingManagerFactory.h
+  mitkServiceInterface.h
+  mitkStatusBarImplementation.h
+  mitkStdFunctionCommand.h
+  mitkStorageThreadDispatcherBase.h
+  mitkTimeHelper.h
+  mitkUndoModel.h
+  mitkUndoRedoPreferenceHelper.h
+  mitkVector.h
+  mitkWeakPointer.h
+)
 
 set(CPP_FILES
   mitkCoreActivator.cpp
@@ -53,6 +119,7 @@ set(CPP_FILES
   Controllers/mitkTestManager.cpp
   Controllers/mitkTimeNavigationController.cpp
   Controllers/mitkUndoController.cpp
+  Controllers/mitkUndoRedoPreferenceHelper.cpp
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
 
@@ -94,6 +161,9 @@ set(CPP_FILES
   DataManagement/mitkImageVtkReadAccessor.cpp
   DataManagement/mitkImageVtkWriteAccessor.cpp
   DataManagement/mitkImageWriteAccessor.cpp
+  DataManagement/mitkDataStorageReference.cpp
+  DataManagement/mitkDataStorageService.cpp
+  DataManagement/mitkIDataStorageService.cpp
   DataManagement/mitkINodeSelectionService.cpp
   DataManagement/mitkIntPropertyExtension.cpp
   DataManagement/mitkIPersistenceService.cpp
@@ -106,6 +176,7 @@ set(CPP_FILES
   DataManagement/mitkIPropertyPersistence.cpp
   DataManagement/mitkIPropertyProvider.cpp
   DataManagement/mitkIPropertyRelations.cpp
+  DataManagement/mitkIPropertyTransience.cpp
   DataManagement/mitkITKEventObserverGuard.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
@@ -160,6 +231,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyPersistenceInfo.cpp
   DataManagement/mitkPropertyRelationRuleBase.cpp
   DataManagement/mitkPropertyRelations.cpp
+  DataManagement/mitkPropertyTransience.cpp
   DataManagement/mitkProportionalTimeGeometry.cpp
   DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
@@ -198,7 +270,6 @@ set(CPP_FILES
   Interactions/mitkDisplayActionEventHandlerDesynchronized.cpp
   Interactions/mitkDisplayActionEventHandlerStd.cpp
   Interactions/mitkDisplayActionEventHandlerSynchronized.cpp
-  Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
@@ -224,18 +295,16 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkVtkEventAdapter.cpp
-  Interactions/mitkVtkInteractorStyle.cxx
+  Interactions/mitkVtkInteractorStyle.cpp
   Interactions/mitkXML2EventParser.cpp
 
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
   IO/mitkCustomMimeType.cpp
-  IO/mitkFileReader.cpp
   IO/mitkFileReaderRegistry.cpp
   IO/mitkFileReaderSelector.cpp
   IO/mitkFileReaderWriterBase.cpp
-  IO/mitkFileWriter.cpp
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
   IO/mitkGeometry3DToXML.cpp
@@ -257,8 +326,6 @@ set(CPP_FILES
   IO/mitkIPreferencesStorage.cpp
   IO/mitkItkImageIO.cpp
   IO/mitkItkLoggingAdapter.cpp
-  IO/mitkLegacyFileReaderService.cpp
-  IO/mitkLegacyFileWriterService.cpp
   IO/mitkLocaleSwitch.cpp
   IO/mitkLogBackend.cpp
   IO/mitkMimeType.cpp
@@ -273,6 +340,7 @@ set(CPP_FILES
   IO/mitkProportionalTimeGeometryToXML.cpp
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
+  IO/mitkStringUtil.cpp
   IO/mitkSurfaceStlIO.cpp
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp
@@ -287,7 +355,6 @@ set(CPP_FILES
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkBaseRendererHelper.cpp
   Rendering/mitkCrosshairVtkMapper2D.cpp
-  Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp
@@ -312,25 +379,26 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-Interactions/globalConfig.xml
-Interactions/DisplayInteraction.xml
-Interactions/DisplayConfigMITKBase.xml
-Interactions/DisplayConfigPACSBase.xml
-Interactions/DisplayConfigCrosshair.xml
-Interactions/DisplayConfigRotation.xml
-Interactions/DisplayConfigActivateCoupling.xml
-Interactions/DisplayConfigSwivel.xml
-Interactions/DisplayConfigPACSPan.xml
-Interactions/DisplayConfigPACSScroll.xml
-Interactions/DisplayConfigPACSZoom.xml
-Interactions/DisplayConfigPACSLevelWindow.xml
-Interactions/DisplayConfigBlockLMB.xml
-Interactions/PointSet.xml
-Interactions/PointSetConfig.xml
-Interactions/PointSetConfigLMB.xml
+  Interactions/globalConfig.xml
+  Interactions/DisplayInteraction.xml
+  Interactions/DisplayConfigMITKBase.xml
+  Interactions/DisplayConfigPACSBase.xml
+  Interactions/DisplayConfigCrosshair.xml
+  Interactions/DisplayConfigRotation.xml
+  Interactions/DisplayConfigActivateCoupling.xml
+  Interactions/DisplayConfigSwivel.xml
+  Interactions/DisplayConfigPACSPan.xml
+  Interactions/DisplayConfigPACSScroll.xml
+  Interactions/DisplayConfigPACSZoom.xml
+  Interactions/DisplayConfigPACSLevelWindow.xml
+  Interactions/DisplayConfigBlockLMB.xml
+  Interactions/PointSet.xml
+  Interactions/PointSetConfig.xml
+  Interactions/PointSetConfigLMB.xml
 
-mitkLevelWindowPresets.xml
-mitkAnatomicalStructureColorPresets.xml
-LabelSuggestions/mitk_classic.json
-LabelSuggestions/EUCAIM.json
+  LabelSuggestions/mitk_classic.json
+  LabelSuggestions/EUCAIM.json
+
+  mitkLevelWindowPresets.xml
+  mitkAnatomicalStructureColorPresets.xml
 )

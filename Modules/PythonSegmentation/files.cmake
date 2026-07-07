@@ -2,6 +2,10 @@ set(CPP_FILES
   mitknnInteractiveEnums.cpp
   mitknnInteractiveInteractor.cpp
   mitknnInteractiveTool.cpp
+  mitknnInteractiveVersion.cpp
+  mitknnInteractiveBoundingBoxHelpers.cpp
+  mitknnInteractiveRenderingHelpers.cpp
+  mitkTotalSegmentatorTool.cpp
 )
 
 set(NNINTERACTIVE_INTERACTION_TYPES

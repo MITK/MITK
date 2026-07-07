@@ -20,15 +20,15 @@ found in the LICENSE file.
 
 //! [cpp-includes]
 // Qmitk
-#include "QmitkPointListWidget.h"
-#include "QmitkRenderWindow.h"
+#include <QmitkPointListWidget.h>
+#include <QmitkRenderWindow.h>
 
 // MITK
-#include "mitkColorProperty.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkProperties.h"
+#include <mitkColorProperty.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkProperties.h>
 
 // ITK
 #include <itkConnectedThresholdImageFilter.h>
@@ -40,8 +40,12 @@ found in the LICENSE file.
 const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.views.example.regiongrowing";
 
 QmitkRegionGrowingView::QmitkRegionGrowingView()
-  : m_Controls(new Ui::QmitkRegionGrowingViewControls),
+  : m_Controls(std::make_unique<Ui::QmitkRegionGrowingViewControls>()),
     m_PointListWidget(nullptr)
+{
+}
+
+QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {
 }
 

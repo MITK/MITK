@@ -14,8 +14,14 @@ found in the LICENSE file.
 #define QmitkChartExampleView_h
 
 #include <QmitkAbstractView.h>
+#include <QmitkChartWidget.h>
 
-#include "ui_QmitkChartExampleViewControls.h"
+#include <memory>
+
+namespace Ui
+{
+  class QmitkChartExampleViewControls;
+}
 
 /**
   \brief Basic example for use of module mitkChart
@@ -31,6 +37,9 @@ class QmitkChartExampleView : public QmitkAbstractView
 
 public:
   static const std::string VIEW_ID;
+
+  QmitkChartExampleView();
+  ~QmitkChartExampleView() override;
 
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
@@ -65,10 +74,10 @@ private:
   void OnXAxisLabelChanged();
   void OnYAxisLabelChanged();
   void OnYAxisScaleChanged(const QString &newYAxisScale);
-  void OnShowLegendChanged(int newState);
-  void OnStackedDataChanged(int newState);
-  void OnShowDataPointsChanged(int newState);
-  void OnShowSubchartChanged(int newState);
+  void OnShowLegendChanged(Qt::CheckState newState);
+  void OnStackedDataChanged(Qt::CheckState newState);
+  void OnShowDataPointsChanged(Qt::CheckState newState);
+  void OnShowSubchartChanged(Qt::CheckState newState);
 
   std::vector< std::pair<double, double> > CreatePairList(std::vector<double> keys, std::vector<double> values) const;
   std::string ConvertToText(std::vector<QVariant> numbers, std::string delimiter = ";") const;
@@ -78,7 +87,7 @@ private:
   std::vector<std::string> ConvertToStringVector(const QString& data, QChar delimiter = ';') const;
 
   unsigned int countForUID = 0;
-  Ui::QmitkChartExampleViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkChartExampleViewControls> m_Controls;
 };
 
 #endif

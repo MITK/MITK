@@ -13,12 +13,14 @@ found in the LICENSE file.
 #ifndef mitkInteractionConst_h
 #define mitkInteractionConst_h
 
-//##Documentation
-//## @file mitkInteractionConst.h
-//## @brief Constants for most interaction classes, due to the generic StateMachines.
-//##
-//## Changes in Type, ButtonState or Key has to be don in mitkEventMapper.cpp, too.
-//## @ingroup Interaction
+/**
+ * \file mitkInteractionConst.h
+ * \brief Constants for most interaction classes, due to the generic StateMachines.
+ *
+ * Changes in Type, ButtonState or Key have to be done in mitkEventMapper.cpp, too.
+ *
+ * \ingroup Interaction
+ */
 
 /*Prefixes for Constants:
 E = Enumeration
@@ -31,7 +33,7 @@ Key_ = Keys like in QT
 */
 namespace mitk
 {
-  // Constants for EventIds; use the according constant to through an event in the code
+  /** \brief Constants for EventIds; use the corresponding constant to throw an event in the code. */
   enum EEventIds
   {
     EIDNULLEVENT = 0,
@@ -176,8 +178,7 @@ namespace mitk
     EIDNOFIGUREHOVER = 12341
   };
 
-  //##Constants for Operations
-  //## comments are always examples of the usage
+  /** \brief Constants for Operations. Comments are always examples of the usage. */
   enum EOperations
   {
     OpNOTHING = 0,
@@ -239,11 +240,11 @@ namespace mitk
     OpSURFACECHANGED = 3000,      // used for changing polydata in surfaces
   };
 
-  //##Constants for EventMapping...
-  //##connects the statemachine.xml-File with the implemented conditions.
-  //##within one statemachine the choice of the actionconstants is freely
-  //##
-  //## ActionId
+  /** \brief Constants for EventMapping (ActionIds).
+   *
+   * Connects the statemachine.xml file with the implemented conditions.
+   * Within one statemachine the choice of the action constants is free.
+   */
   enum EActions
   {
     AcDONOTHING = 0,
@@ -416,7 +417,7 @@ namespace mitk
   //!!!!!!!!!!!!!!!!!!!!!!!!
   */
 
-  // Type of an Event;
+  /** \brief Type of an Event. */
   enum EEventType
   {
     Type_None = 0,                      // invalid event
@@ -491,9 +492,10 @@ namespace mitk
     Type_MaxUser = 65535
   };
 
-  //##ButtonState
-  // mouse/keyboard state values
-  // QT combinations if MOUSEBUTTONRelease: left MouseButton + ControlButton: 0x201
+  /** \brief Mouse/keyboard button state values.
+   *
+   * QT combinations if MOUSEBUTTONRelease: left MouseButton + ControlButton: 0x201
+   */
   enum EButtonStates
   {
     BS_NoButton = 0x0000,
@@ -508,7 +510,7 @@ namespace mitk
     BS_KeyButtonMask = 0x0f00,
     BS_Keypad = 0x4000
   };
-  //##Key
+  /** \brief Key constants mirroring Qt key codes. */
   enum EKeys
   {
     Key_Escape = 0x1000, // misc keys

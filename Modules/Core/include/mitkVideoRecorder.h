@@ -58,23 +58,104 @@ namespace mitk
     VideoRecorder(const VideoRecorder&) = delete;
     VideoRecorder& operator=(const VideoRecorder&) = delete;
 
+    /**
+     * \brief Get the path to the FFmpeg executable.
+     *
+     * If not set explicitly, the path is read from the user preferences.
+     *
+     * \return The path to FFmpeg, or an empty path if not configured.
+     */
     fs::path GetFFmpegPath() const;
+
+    /**
+     * \brief Set the path to the FFmpeg executable.
+     * \param[in] path The filesystem path to the FFmpeg binary.
+     */
     void SetFFmpegPath(const fs::path& path);
 
+    /**
+     * \brief Get the path to the output video file.
+     * \return The output file path.
+     */
     fs::path GetOutputPath() const;
+
+    /**
+     * \brief Set the path for the output video file.
+     * \param[in] path The filesystem path for the output video.
+     */
     void SetOutputPath(const fs::path& path);
 
+    /**
+     * \brief Get the output format (codec/container).
+     *
+     * If not set explicitly, the format is read from the user preferences.
+     * Defaults to WebM_VP9.
+     *
+     * \return The current output format.
+     */
     OutputFormat GetOutputFormat() const;
+
+    /**
+     * \brief Set the output format (codec/container).
+     * \param[in] format The desired output format.
+     */
     void SetOutputFormat(OutputFormat format);
 
+    /**
+     * \brief Get the name of the render window being recorded.
+     * \return The render window name.
+     */
     std::string GetRenderWindowName() const;
+
+    /**
+     * \brief Set the name of the render window to record.
+     * \param[in] renderWindowName The name of the MITK render window.
+     */
     void SetRenderWindowName(const std::string& renderWindowName);
 
+    /**
+     * \brief Get the recording frame rate.
+     * \return The frame rate in frames per second.
+     */
     int GetFrameRate() const;
+
+    /**
+     * \brief Set the recording frame rate.
+     * \param[in] fps The desired frame rate in frames per second.
+     */
     void SetFrameRate(unsigned int fps);
 
+    /**
+     * \brief Begin a recording session.
+     *
+     * \pre A render window name must have been set.
+     * \throw mitk::Exception if already recording, or if no valid render window is found.
+     */
     void StartRecording();
+
+    /**
+     * \brief Record the current frame of the render window.
+     *
+     * Captures the current contents of the render window and stores
+     * them as a PNG file in a temporary directory.
+     *
+     * \pre A recording session must be active (StartRecording() must have been called).
+     * \throw mitk::Exception if no recording session is running.
+     */
     void RecordFrame() const;
+
+    /**
+     * \brief Stop the recording session and encode the video.
+     *
+     * This is a blocking call that invokes FFmpeg to encode all captured
+     * frames into the output video file. It may take a long time to return.
+     * Consider calling from a separate thread.
+     *
+     * \pre A recording session must be active.
+     * \pre FFmpeg path and output path must be set.
+     * \return The FFmpeg process exit code (0 on success).
+     * \throw mitk::Exception if no session is running, or paths are not set.
+     */
     int StopRecording();
 
   private:

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiWidgetLayoutManager.h"
+#include <QmitkMultiWidgetLayoutManager.h>
 
 #include <mitkLog.h>
 #include <QmitkAbstractMultiWidget.h>

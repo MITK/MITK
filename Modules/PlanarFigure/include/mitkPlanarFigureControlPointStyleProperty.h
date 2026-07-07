@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureControlPointStyleProperty_h
 #define mitkPlanarFigureControlPointStyleProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 #include <MitkPlanarFigureExports.h>
 
@@ -22,7 +22,7 @@ namespace mitk
   /**
    * \brief Defines the rendering style of control points for PlanarFigure objects.
    * \sa mitk::PlanarFigureMapper2D
-   * @ingroup MitkPlanarFigureModule
+   * \ingroup MitkPlanarFigureModule
    *
    * Used by PlanarFigureMapper2D to determine which of several control point shapes to use.
    * Currently this is basically the choice between squares and circles. If more options
@@ -53,6 +53,8 @@ namespace mitk
   protected:
     PlanarFigureControlPointStyleProperty();
 
+    PlanarFigureControlPointStyleProperty(const PlanarFigureControlPointStyleProperty &other);
+
     PlanarFigureControlPointStyleProperty(const IdType &value);
 
     /**
@@ -72,11 +74,11 @@ namespace mitk
      */
     virtual void AddEnumTypes();
 
+    mitkCloneMacro(PlanarFigureControlPointStyleProperty);
+
   private:
     // purposely not implemented
     PlanarFigureControlPointStyleProperty &operator=(const PlanarFigureControlPointStyleProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // end of namespace mitk

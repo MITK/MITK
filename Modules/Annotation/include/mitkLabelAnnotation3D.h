@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLabelAnnotation3D_h
 #define mitkLabelAnnotation3D_h
 
-#include "MitkAnnotationExports.h"
+#include <MitkAnnotationExports.h>
 #include <mitkLocalStorageHandler.h>
 #include <mitkVtkAnnotation3D.h>
 #include <vtkSmartPointer.h>

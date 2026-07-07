@@ -38,9 +38,6 @@
     <page id="org.mitk.gui.qt.application.nnInteractionPreferencePage" name="nnInteractive" class="QmitknnInteractivePreferencePage" category="org.mitk.gui.qt.application.SegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
     </page>
-    <page id="org.mitk.gui.qt.application.SegmentAnythingPreferencePage" name="Segment Anything" class="QmitkSegmentAnythingPreferencePage" category="org.mitk.gui.qt.application.SegmentationPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
-    </page>
     <page id="org.mitk.gui.qt.application.TotalSegmentatorPreferencePage" name="TotalSegmentator" class="QmitkTotalSegmentatorPreferencePage" category="org.mitk.gui.qt.application.SegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
     </page>
@@ -53,11 +50,12 @@
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
     <contextMenuAction nodeDescriptorName="Image" label="Create Segmentation" icon="" class="QmitkCreateMultiLabelSegmentationAction" />
     <contextMenuAction nodeDescriptorName="Image" label="Convert to Segmentation" icon="" class="QmitkConvertToMultiLabelSegmentationAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" class="QmitkCreateSmoothedPolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
-    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
-    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Assign distinct mask colors" icon="" class="QmitkAssignDistinctColorsAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create polygon model" icon="" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create smoothed polygon model" icon="" class="QmitkCreateSmoothedPolygonModelAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Autocrop" icon="" class="QmitkAutocropLabelSetImageAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Save LabelSet Preset" icon="" class="QmitkSaveMultiLabelPresetAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Load LabelSet Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
@@ -79,7 +77,6 @@
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Annotation annote" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Labeling" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Tools" />
-    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="nnUNet" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="nnInteractive" />
 
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Segmentation" />

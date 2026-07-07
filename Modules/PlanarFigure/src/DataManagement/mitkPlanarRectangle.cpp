@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
-#include "mitkPlanarRectangle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarRectangle.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarRectangle::PlanarRectangle()
   : FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")), FEATURE_ID_AREA(this->AddFeature("Area", "mm2"))
@@ -22,6 +22,13 @@ mitk::PlanarRectangle::PlanarRectangle()
   this->ResetNumberOfControlPoints(4);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
   this->SetNumberOfPolyLines(1);
+}
+
+mitk::PlanarRectangle::PlanarRectangle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_CIRCUMFERENCE(other.FEATURE_ID_CIRCUMFERENCE),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
+{
 }
 
 bool mitk::PlanarRectangle::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)

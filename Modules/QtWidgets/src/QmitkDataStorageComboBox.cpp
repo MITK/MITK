@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDataStorageComboBox.h"
+#include <QmitkDataStorageComboBox.h>
 
 #include <itkCommand.h>
 

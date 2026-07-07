@@ -75,8 +75,8 @@ Following a PR submission, the MITK developer team will discuss the correspondin
 
 [github_fork_and_pull_page]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models#fork-and-pull-model
 
-[sign_off_page]: https://www.mitk.org/wiki/Sign_off_contribution
+[sign_off_page]: https://developercertificate.org/
 
 [seven_commit_rules_page]: https://cbea.ms/git-commit/
 
-[MITK_styleguide_page]: https://docs.mitk.org/nightly/StyleGuideAndNotesPage.html
+[MITK_styleguide_page]: https://docs.mitk.org/2026.06/StyleGuideAndNotesPage.html

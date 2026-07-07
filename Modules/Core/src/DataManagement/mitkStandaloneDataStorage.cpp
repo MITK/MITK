@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStandaloneDataStorage.h"
+#include <mitkStandaloneDataStorage.h>
 
-#include "mitkDataNode.h"
-#include "mitkGroupTagProperty.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
+#include <mitkDataNode.h>
+#include <mitkGroupTagProperty.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
 
 #include <mitkUndoController.h>
 

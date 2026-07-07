@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include <mutex>
 #include <stack>
-#include "mitkDICOMFileReader.h"
-#include "mitkDICOMDatasetSorter.h"
-#include "mitkDICOMGDCMImageFrameInfo.h"
-#include "mitkEquiDistantBlocksSorter.h"
-#include "mitkNormalDirectionConsistencySorter.h"
-#include "MitkDICOMExports.h"
+#include <mitkDICOMFileReader.h>
+#include <mitkDICOMDatasetSorter.h>
+#include <mitkDICOMGDCMImageFrameInfo.h>
+#include <mitkEquiDistantBlocksSorter.h>
+#include <mitkNormalDirectionConsistencySorter.h>
+#include <MitkDICOMExports.h>
 
 
 namespace itk
@@ -159,7 +159,7 @@ namespace mitk
     - the spacing is corrected (it is calculated by ITK's reader from the distance between two origins, which is NOT the slice distance in this special case)
 
   Both errors are introduced in
-  itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+  itkImageSeriesReader.tpp (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
 
   For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
     - we calculate if the first origin is on a line along the normal of the second slice
@@ -192,7 +192,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
   public:
 
     mitkClassMacro( DICOMITKSeriesGDCMReader, DICOMFileReader );
-    mitkCloneMacro( DICOMITKSeriesGDCMReader );
+    itkCloneMacro( DICOMITKSeriesGDCMReader );
     itkFactorylessNewMacro( DICOMITKSeriesGDCMReader );
     mitkNewMacro1Param( DICOMITKSeriesGDCMReader, unsigned int );
     mitkNewMacro2Param( DICOMITKSeriesGDCMReader, unsigned int, bool );
@@ -284,6 +284,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     }
 
   protected:
+    mitkCloneMacro( DICOMITKSeriesGDCMReader );
 
     void InternalPrintConfiguration(std::ostream& os) const override;
 

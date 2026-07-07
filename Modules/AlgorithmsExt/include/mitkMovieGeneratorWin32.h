@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkMovieGeneratorWin32_h
 #define mitkMovieGeneratorWin32_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkMovieGenerator.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkMovieGenerator.h>
 #include <comdef.h>
 #include <memory.h>
 #include <string.h>
@@ -26,6 +26,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Win32-specific implementation of MovieGenerator using Video for Windows (VFW).
+   *
+   * This class implements the MovieGenerator interface on Windows platforms using
+   * the Video for Windows (VFW) API. It captures frames from an OpenGL context
+   * and writes them to an AVI file. A compression codec dialog is presented
+   * to the user during initialization.
+   *
+   * \sa MovieGenerator
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT MovieGeneratorWin32 : public MovieGenerator
   {
   public:
@@ -33,6 +44,10 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /**
+       * \brief Set the output filename for the AVI movie.
+       * \param[in] fileName Path to the output AVI file.
+       */
       virtual void SetFileName(const char *fileName);
 
   protected:

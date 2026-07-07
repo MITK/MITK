@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFileReaderOptionsDialog.h"
-#include "ui_QmitkFileReaderOptionsDialog.h"
+#include <QmitkFileReaderOptionsDialog.h>
+#include <ui_QmitkFileReaderOptionsDialog.h>
 
-#include "QmitkFileReaderWriterOptionsWidget.h"
-#include "mitkIFileReader.h"
+#include <QmitkFileReaderWriterOptionsWidget.h>
+#include <mitkIFileReader.h>
 
 QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo &loadInfo, QWidget *parent)
-  : QDialog(parent, Qt::WindowStaysOnTopHint), ui(new Ui::QmitkFileReaderOptionsDialog), m_LoadInfo(loadInfo)
+  : QDialog(parent, Qt::WindowStaysOnTopHint), ui(std::make_unique<Ui::QmitkFileReaderOptionsDialog>()), m_LoadInfo(loadInfo)
 
 {
   ui->setupUi(this);
@@ -65,7 +65,6 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
 
 QmitkFileReaderOptionsDialog::~QmitkFileReaderOptionsDialog()
 {
-  delete ui;
 }
 
 void QmitkFileReaderOptionsDialog::SetCurrentReader(int index)

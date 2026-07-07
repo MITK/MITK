@@ -10,27 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMAPRegistrationWrapperObjectFactory.h"
+#include <mitkMAPRegistrationWrapperObjectFactory.h>
 
 #include <mitkProperties.h>
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 
-#include "mitkRegistrationWrapperMapper2D.h"
-#include "mitkRegistrationWrapperMapper3D.h"
-#include "mitkMAPRegistrationWrapper.h"
-
-typedef std::multimap<std::string, std::string> MultimapType;
+#include <mitkRegistrationWrapperMapper2D.h>
+#include <mitkRegistrationWrapperMapper3D.h>
+#include <mitkMAPRegistrationWrapper.h>
 
 mitk::MAPRegistrationWrapperObjectFactory::MAPRegistrationWrapperObjectFactory()
 : CoreObjectFactoryBase()
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    alreadyDone = true;
-  }
-
 }
 
 mitk::MAPRegistrationWrapperObjectFactory::~MAPRegistrationWrapperObjectFactory()
@@ -79,30 +71,6 @@ void mitk::MAPRegistrationWrapperObjectFactory::SetDefaultProperties(mitk::DataN
   {
     mitk::MITKRegistrationWrapperMapperBase::SetDefaultProperties(node);
   }
-}
-
-std::string mitk::MAPRegistrationWrapperObjectFactory::GetFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions({}, fileExtension);
-  return fileExtension.c_str();
-};
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::MAPRegistrationWrapperObjectFactory::GetFileExtensionsMap()
-{
-  return {};
-}
-
-std::string mitk::MAPRegistrationWrapperObjectFactory::GetSaveFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions({}, fileExtension);
-  return fileExtension.c_str();
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::MAPRegistrationWrapperObjectFactory::GetSaveFileExtensionsMap()
-{
-  return {};
 }
 
 struct RegisterMAPRegistrationWrapperObjectFactoryHelper{

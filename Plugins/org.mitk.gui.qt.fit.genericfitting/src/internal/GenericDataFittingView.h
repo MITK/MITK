@@ -15,18 +15,23 @@ found in the LICENSE file.
 
 #include <QString>
 
-#include "QmitkAbstractView.h"
-#include "itkCommand.h"
+#include <QmitkAbstractView.h>
+#include <itkCommand.h>
 
-#include "ui_GenericDataFittingViewControls.h"
-#include "mitkModelBase.h"
-#include "QmitkParameterFitBackgroundJob.h"
-#include "mitkModelFitResultHelper.h"
-#include "mitkModelFactoryBase.h"
-#include "mitkLevenbergMarquardtModelFitFunctor.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkModelBase.h>
+#include <QmitkParameterFitBackgroundJob.h>
+#include <mitkModelFitResultHelper.h>
+#include <mitkModelFactoryBase.h>
+#include <mitkLevenbergMarquardtModelFitFunctor.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 #include <mitkNodePredicateBase.h>
+#include <memory>
+
+namespace Ui
+{
+  class GeneralDataFittingViewControls;
+}
 
 /*!
 *	@brief Plugin for generic dynamic image data fitting
@@ -41,6 +46,7 @@ public:
   static const std::string VIEW_ID;
 
   GenericDataFittingView();
+  ~GenericDataFittingView() override;
 
 protected slots:
 
@@ -112,7 +118,7 @@ protected:
   // Variables
 
   /*! @brief The view's UI controls */
-  Ui::GeneralDataFittingViewControls m_Controls;
+  std::unique_ptr<Ui::GeneralDataFittingViewControls> m_Controls;
 
   /* Nodes selected by user/ui for the fit */
   mitk::DataNode::Pointer m_selectedNode;

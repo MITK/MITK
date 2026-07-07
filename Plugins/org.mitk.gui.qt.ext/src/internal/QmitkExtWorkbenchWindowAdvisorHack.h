@@ -34,6 +34,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onResetPerspective();
     void onClosePerspective();
     void onNewWindow();
+    void onFullScreen();
     void onIntro();
 
     /**

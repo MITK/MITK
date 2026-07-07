@@ -12,12 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkFileOpenAction.h"
 
-#include "internal/org_mitk_gui_qt_application_Activator.h"
-
+#include <mitkCoreServices.h>
 #include <mitkIDataStorageService.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkWorkbenchUtil.h>
-#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -29,27 +27,12 @@ namespace
 {
   mitk::DataStorage::Pointer GetDataStorage()
   {
-    auto context = mitk::org_mitk_gui_qt_application_Activator::GetContext();
+    mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
 
-    if (nullptr == context)
+    if (!dsService)
       return nullptr;
 
-    auto dataStorageServiceReference = context->getServiceReference<mitk::IDataStorageService>();
-
-    if (!dataStorageServiceReference)
-      return nullptr;
-
-    auto dataStorageService = context->getService<mitk::IDataStorageService>(dataStorageServiceReference);
-
-    if (nullptr == dataStorageService)
-      return nullptr;
-
-    auto dataStorageReference = dataStorageService->GetDataStorage();
-
-    if (dataStorageReference.IsNull())
-      return nullptr;
-
-    return dataStorageReference->GetDataStorage();
+    return dsService->GetActiveDataStorage();
   }
 
   mitk::DataNode::Pointer GetFirstSelectedNode()

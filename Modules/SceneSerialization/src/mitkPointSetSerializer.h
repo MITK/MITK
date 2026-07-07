@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkPointSetSerializer_h
 #define mitkPointSetSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {
   /**
-    \brief Serializes mitk::Surface for mitk::SceneIO
+    \brief Serializes mitk::PointSet for mitk::SceneIO.
   */
   class PointSetSerializer : public BaseDataSerializer
   {

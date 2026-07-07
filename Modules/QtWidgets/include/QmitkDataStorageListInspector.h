@@ -15,13 +15,17 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "QmitkAbstractDataStorageInspector.h"
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <QmitkAbstractDataStorageInspector.h>
+#include <QmitkSimpleTextOverlayWidget.h>
+#include <memory>
 
-#include "ui_QmitkDataStorageListInspector.h"
+namespace Ui
+{
+  class QmitkDataStorageListInspector;
+}
 
-/*
-* @brief This is an inspector that offers a simple list view on a data storage.
+/**
+* \brief Inspector that offers a simple list view on a data storage.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageListInspector : public QmitkAbstractDataStorageInspector
 {
@@ -29,6 +33,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageListInspector : public QmitkAbstractD
 
 public:
   QmitkDataStorageListInspector(QWidget* parent = nullptr);
+  ~QmitkDataStorageListInspector() override;
 
   QAbstractItemView* GetView() override;
   const QAbstractItemView* GetView() const override;
@@ -41,7 +46,7 @@ protected:
   void OnModelReset();
 
   QmitkAbstractDataStorageModel* m_StorageModel;
-  Ui_QmitkDataStorageListInspector m_Controls;
+  std::unique_ptr<Ui::QmitkDataStorageListInspector> m_Controls;
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 

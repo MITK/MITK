@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYOBJECTTYPEINFO_H
 #define BERRYOBJECTTYPEINFO_H
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 #include <org_blueberry_core_runtime_Export.h>
 

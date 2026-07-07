@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // Qt
 #include <QMessageBox>
+#include <ui_RTDoseVisualizerControls.h>
 #include <QMenu>
 
 // Blueberry
@@ -45,12 +46,12 @@ found in the LICENSE file.
 #include <QmitkDoseVisualStyleDelegate.h>
 #include <QmitkIsoDoseLevelSetModel.h>
 #include <QmitkFreeIsoDoseLevelWidget.h>
-#include "QmitkRenderWindow.h"
+#include <QmitkRenderWindow.h>
 
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
 
 #include <vtkMath.h>
-#include "vtkDecimatePro.h"
+#include <vtkDecimatePro.h>
 
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
@@ -96,6 +97,7 @@ namespace mitk
 
 
 RTDoseVisualizer::RTDoseVisualizer()
+  : m_Controls(std::make_unique<Ui::RTDoseVisualizerControls>())
 {
   m_selectedNode = nullptr;
   m_selectedPresetName = "";
@@ -125,7 +127,7 @@ void RTDoseVisualizer::SetFocus(){}
 void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
+  m_Controls->setupUi( parent );
 
   m_LevelSetModel = new QmitkIsoDoseLevelSetModel(this);
   m_LevelSetModel->setVisibilityEditOnly(true);
@@ -149,29 +151,29 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   this->ActualizeReferenceDoseForAllDoseDataNodes();
   this->ActualizeDisplayStyleForAllDoseDataNodes();
 
-  this->m_Controls.isoLevelSetView->setModel(m_LevelSetModel);
-  this->m_Controls.isoLevelSetView->setItemDelegateForColumn(0,m_DoseColorDelegate);
-  this->m_Controls.isoLevelSetView->setItemDelegateForColumn(1,m_DoseValueDelegate);
-  this->m_Controls.isoLevelSetView->setItemDelegateForColumn(2,m_DoseVisualDelegate);
-  this->m_Controls.isoLevelSetView->setItemDelegateForColumn(3,m_DoseVisualDelegate);
-  this->m_Controls.isoLevelSetView->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->m_Controls->isoLevelSetView->setModel(m_LevelSetModel);
+  this->m_Controls->isoLevelSetView->setItemDelegateForColumn(0,m_DoseColorDelegate);
+  this->m_Controls->isoLevelSetView->setItemDelegateForColumn(1,m_DoseValueDelegate);
+  this->m_Controls->isoLevelSetView->setItemDelegateForColumn(2,m_DoseVisualDelegate);
+  this->m_Controls->isoLevelSetView->setItemDelegateForColumn(3,m_DoseVisualDelegate);
+  this->m_Controls->isoLevelSetView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  this->m_Controls.btnRemoveFreeValue->setDisabled(true);
+  this->m_Controls->btnRemoveFreeValue->setDisabled(true);
 
-  this->m_Controls.doseBtn->setVisible(false);
+  this->m_Controls->doseBtn->setVisible(false);
 
-  connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), this, SLOT(OnReferenceDoseChanged(double)));
-  connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), m_LevelSetModel, SLOT(setReferenceDose(double)));
-  connect(m_Controls.radioAbsDose, SIGNAL(toggled(bool)), m_LevelSetModel, SLOT(setShowAbsoluteDose(bool)));
-  connect(m_Controls.radioAbsDose, SIGNAL(toggled(bool)), this, SLOT(OnAbsDoseToggled(bool)));
-  connect(m_Controls.btnAddFreeValue, SIGNAL(clicked()), this, SLOT(OnAddFreeValueClicked()));
-  connect(m_Controls.btnRemoveFreeValue, SIGNAL(clicked()), this, SLOT(OnRemoveFreeValueClicked()));
-  connect(m_Controls.checkGlobalVisColorWash, SIGNAL(toggled(bool)), this, SLOT(OnGlobalVisColorWashToggled(bool)));
-  connect(m_Controls.checkGlobalVisIsoLine, SIGNAL(toggled(bool)), this, SLOT(OnGlobalVisIsoLineToggled(bool)));
-  connect(m_Controls.isoLevelSetView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnShowContextMenuIsoSet(const QPoint&)));
-  connect(m_Controls.comboPresets, SIGNAL(currentIndexChanged ( const QString&)), this, SLOT(OnCurrentPresetChanged(const QString&)));
-  connect(m_Controls.btnUsePrescribedDose, SIGNAL(clicked()), this, SLOT(OnUsePrescribedDoseClicked()));
-  connect(m_Controls.isoLevelSetView->model(), SIGNAL( modelReset()), this, SLOT(OnDataChangedInIsoLevelSetView()));
+  connect(m_Controls->spinReferenceDose, SIGNAL(valueChanged(double)), this, SLOT(OnReferenceDoseChanged(double)));
+  connect(m_Controls->spinReferenceDose, SIGNAL(valueChanged(double)), m_LevelSetModel, SLOT(setReferenceDose(double)));
+  connect(m_Controls->radioAbsDose, SIGNAL(toggled(bool)), m_LevelSetModel, SLOT(setShowAbsoluteDose(bool)));
+  connect(m_Controls->radioAbsDose, SIGNAL(toggled(bool)), this, SLOT(OnAbsDoseToggled(bool)));
+  connect(m_Controls->btnAddFreeValue, SIGNAL(clicked()), this, SLOT(OnAddFreeValueClicked()));
+  connect(m_Controls->btnRemoveFreeValue, SIGNAL(clicked()), this, SLOT(OnRemoveFreeValueClicked()));
+  connect(m_Controls->checkGlobalVisColorWash, SIGNAL(toggled(bool)), this, SLOT(OnGlobalVisColorWashToggled(bool)));
+  connect(m_Controls->checkGlobalVisIsoLine, SIGNAL(toggled(bool)), this, SLOT(OnGlobalVisIsoLineToggled(bool)));
+  connect(m_Controls->isoLevelSetView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnShowContextMenuIsoSet(const QPoint&)));
+  connect(m_Controls->comboPresets, SIGNAL(currentIndexChanged ( const QString&)), this, SLOT(OnCurrentPresetChanged(const QString&)));
+  connect(m_Controls->btnUsePrescribedDose, SIGNAL(clicked()), this, SLOT(OnUsePrescribedDoseClicked()));
+  connect(m_Controls->isoLevelSetView->model(), SIGNAL( modelReset()), this, SLOT(OnDataChangedInIsoLevelSetView()));
 
   ctkServiceReference ref = mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext()->getServiceReference<ctkEventAdmin>();
 
@@ -253,7 +255,7 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
     isoDoseNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), propIsoVector);
 
     m_freeIsoValuesCount++;
-    this->m_Controls.btnRemoveFreeValue->setEnabled(true);
+    this->m_Controls->btnRemoveFreeValue->setEnabled(true);
     //Update Widget
     this->UpdateFreeIsoValues();
     //Update Rendering
@@ -263,7 +265,7 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
 
 void RTDoseVisualizer::OnRemoveFreeValueClicked()
 {
-  int index = this->m_Controls.listFreeValues->currentRow();
+  int index = this->m_Controls->listFreeValues->currentRow();
   if (index > static_cast<int>(m_freeIsoValuesCount) || index < 0)
     return;
 
@@ -279,7 +281,7 @@ void RTDoseVisualizer::OnRemoveFreeValueClicked()
     freeIsoDoseLevelVec->erase(freeIsoDoseLevelVec->begin()+index);
     --m_freeIsoValuesCount;
     if(m_freeIsoValuesCount == 0)
-      this->m_Controls.btnRemoveFreeValue->setEnabled(true);
+      this->m_Controls->btnRemoveFreeValue->setEnabled(true);
     this->UpdateFreeIsoValues();
     this->ActualizeFreeIsoLine();
   }
@@ -288,7 +290,7 @@ void RTDoseVisualizer::OnRemoveFreeValueClicked()
 
 void RTDoseVisualizer::OnUsePrescribedDoseClicked()
 {
-  m_Controls.spinReferenceDose->setValue(this->m_PrescribedDose_Data);
+  m_Controls->spinReferenceDose->setValue(this->m_PrescribedDose_Data);
 }
 
 void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
@@ -310,7 +312,7 @@ void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
 
 void RTDoseVisualizer::OnShowContextMenuIsoSet(const QPoint& pos)
 {
-  QPoint globalPos = m_Controls.isoLevelSetView->viewport()->mapToGlobal(pos);
+  QPoint globalPos = m_Controls->isoLevelSetView->viewport()->mapToGlobal(pos);
 
   QMenu viewMenu;
   QAction* invertIsoLineAct = viewMenu.addAction("Invert iso line visibility");
@@ -357,7 +359,7 @@ void RTDoseVisualizer::OnShowContextMenuIsoSet(const QPoint& pos)
 
 void RTDoseVisualizer::UpdateFreeIsoValues()
 {
-  this->m_Controls.listFreeValues->clear();
+  this->m_Controls->listFreeValues->clear();
 
   mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
   if (isoDoseNode.IsNotNull())
@@ -381,13 +383,13 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
 
       widget->setIsoDoseLevel(pos.Value());
       widget->setReferenceDose(pref);
-      connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
+      connect(m_Controls->spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
       connect(widget, SIGNAL(ColorChanged(mitk::IsoDoseLevel*)), this, SLOT(ActualizeFreeIsoLine()));
       connect(widget, SIGNAL(ValueChanged(mitk::IsoDoseLevel*, mitk::DoseValueRel)), this, SLOT(ActualizeFreeIsoLine()));
       connect(widget, SIGNAL(VisualizationStyleChanged(mitk::IsoDoseLevel*)), this, SLOT(ActualizeFreeIsoLine()));
 
-      this->m_Controls.listFreeValues->addItem(item);
-      this->m_Controls.listFreeValues->setItemWidget(item, widget);
+      this->m_Controls->listFreeValues->addItem(item);
+      this->m_Controls->listFreeValues->setItemWidget(item, widget);
     }
   }
 }
@@ -441,7 +443,7 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
       isoDoseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLines);
 
       //toggle the visibility of the free isolevel sliders
-      this->m_Controls.listFreeValues->setEnabled(showIsoLines);
+      this->m_Controls->listFreeValues->setEnabled(showIsoLines);
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -557,24 +559,24 @@ void RTDoseVisualizer::PrepareDoseNode( mitk::DataNode* doseNode ) const
 
 void RTDoseVisualizer::UpdateBySelectedNode()
 {
-  m_Controls.groupNodeSpecific->setEnabled(m_selectedNode.IsNotNull());
-  m_Controls.groupFreeValues->setEnabled(m_selectedNode.IsNotNull());
-  m_Controls.checkGlobalVisColorWash->setEnabled(m_selectedNode.IsNotNull());
-  m_Controls.checkGlobalVisIsoLine->setEnabled(m_selectedNode.IsNotNull());
-  m_Controls.isoLevelSetView->setEnabled(m_selectedNode.IsNotNull());
+  m_Controls->groupNodeSpecific->setEnabled(m_selectedNode.IsNotNull());
+  m_Controls->groupFreeValues->setEnabled(m_selectedNode.IsNotNull());
+  m_Controls->checkGlobalVisColorWash->setEnabled(m_selectedNode.IsNotNull());
+  m_Controls->checkGlobalVisIsoLine->setEnabled(m_selectedNode.IsNotNull());
+  m_Controls->isoLevelSetView->setEnabled(m_selectedNode.IsNotNull());
 
 
   if(m_selectedNode.IsNull())
   {
-    m_Controls.NrOfFractions->setText(QString("N/A. No dose selected"));
-    m_Controls.prescribedDoseSpecific->setText(QString("N/A. No dose selected"));
+    m_Controls->NrOfFractions->setText(QString("N/A. No dose selected"));
+    m_Controls->prescribedDoseSpecific->setText(QString("N/A. No dose selected"));
   }
   else
   {
     //dose specific information
       int fracCount = 1;
       m_selectedNode->GetIntProperty(mitk::RTConstants::DOSE_FRACTION_COUNT_PROPERTY_NAME.c_str(), fracCount);
-      m_Controls.NrOfFractions->setText(QString::number(fracCount));
+      m_Controls->NrOfFractions->setText(QString::number(fracCount));
 
       m_PrescribedDose_Data = 0.0;
 
@@ -582,7 +584,7 @@ void RTDoseVisualizer::UpdateBySelectedNode()
       auto prescribedDoseGenericProperty = dynamic_cast<mitk::DoubleProperty*>(prescibedDoseProperty.GetPointer());
       m_PrescribedDose_Data = prescribedDoseGenericProperty->GetValue();
 
-      m_Controls.prescribedDoseSpecific->setText(QString::number(m_PrescribedDose_Data));
+      m_Controls->prescribedDoseSpecific->setText(QString::number(m_PrescribedDose_Data));
 
     //free iso lines
     mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
@@ -605,16 +607,16 @@ void RTDoseVisualizer::UpdateBySelectedNode()
       //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
       bool showIsoLine = mitk::GetGlobalIsolineVis();
       isoDoseNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLine);
-      m_Controls.checkGlobalVisIsoLine->setChecked(showIsoLine);
+      m_Controls->checkGlobalVisIsoLine->setChecked(showIsoLine);
     }
 
     bool showColorWash = mitk::GetGlobalColorwashVis();
     m_selectedNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showColorWash);
-    m_Controls.checkGlobalVisColorWash->setChecked(showColorWash);
+    m_Controls->checkGlobalVisColorWash->setChecked(showColorWash);
 
     float referenceDose = 0.0;
     m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
-    m_Controls.spinReferenceDose->setValue(referenceDose);
+    m_Controls->spinReferenceDose->setValue(referenceDose);
 
     mitk::IsoDoseLevelSetProperty::Pointer propIsoSet =
       dynamic_cast<mitk::IsoDoseLevelSetProperty* >(m_selectedNode->GetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
@@ -670,11 +672,11 @@ void RTDoseVisualizer::UpdateByPreferences()
 {
   m_Presets = mitk::LoadPresetsMap();
   m_internalUpdate = true;
-  m_Controls.comboPresets->clear();
+  m_Controls->comboPresets->clear();
   this->m_selectedPresetName = mitk::GetSelectedPresetName();
 
-  m_Controls.checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
-  m_Controls.checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
+  m_Controls->checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
+  m_Controls->checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
 
   if(m_Presets.empty())
     return;
@@ -683,7 +685,7 @@ void RTDoseVisualizer::UpdateByPreferences()
   int selectedIndex = -1;
   for (mitk::PresetMapType::const_iterator pos = m_Presets.begin(); pos != m_Presets.end(); ++pos, ++index)
   {
-    m_Controls.comboPresets->addItem(QString(pos->first.c_str()));
+    m_Controls->comboPresets->addItem(QString(pos->first.c_str()));
     if (this->m_selectedPresetName == pos->first)
     {
       selectedIndex = index;
@@ -699,7 +701,7 @@ void RTDoseVisualizer::UpdateByPreferences()
     MITK_INFO << "Changed selected iso dose level preset to first existing preset. New preset name: "<<this->m_selectedPresetName;
   }
 
-  m_Controls.comboPresets->setCurrentIndex(selectedIndex);
+  m_Controls->comboPresets->setCurrentIndex(selectedIndex);
 
   this->m_LevelSetModel->setIsoDoseLevelSet(this->m_Presets[this->m_selectedPresetName]);
 
@@ -707,12 +709,12 @@ void RTDoseVisualizer::UpdateByPreferences()
   bool globalSync = mitk::GetReferenceDoseValue(referenceDose);
   if (globalSync || this->m_selectedNode.IsNull())
   {
-    m_Controls.spinReferenceDose->setValue(referenceDose);
+    m_Controls->spinReferenceDose->setValue(referenceDose);
   }
 
   bool displayAbsoluteDose = mitk::GetDoseDisplayAbsolute();
-  m_Controls.radioAbsDose->setChecked(displayAbsoluteDose);
-  m_Controls.radioRelDose->setChecked(!displayAbsoluteDose);
+  m_Controls->radioAbsDose->setChecked(displayAbsoluteDose);
+  m_Controls->radioRelDose->setChecked(!displayAbsoluteDose);
   this->m_LevelSetModel->setShowAbsoluteDose(displayAbsoluteDose);
   m_internalUpdate = false;
 }
@@ -790,13 +792,13 @@ void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent&)
   mitk::DoseValueAbs referenceDose = 0.0;
   mitk::GetReferenceDoseValue(referenceDose);
 
-  this->m_Controls.spinReferenceDose->setValue(referenceDose);
+  this->m_Controls->spinReferenceDose->setValue(referenceDose);
 }
 
 void RTDoseVisualizer::OnHandleCTKEventGlobalVisChanged(const ctkEvent&)
 {
-  this->m_Controls.checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
-  this->m_Controls.checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
+  this->m_Controls->checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
+  this->m_Controls->checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
 }
 
 void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent&)

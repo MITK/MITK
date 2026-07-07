@@ -11,36 +11,37 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QMessageBox>
+#include <ui_PerfusionDataSimulationViewControls.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include "PerfusionDataSimulationView.h"
 
-#include "itkUnaryFunctorImageFilter.h"
+#include <itkUnaryFunctorImageFilter.h>
 #include <boost/tokenizer.hpp>
-#include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkITKImageImport.h"
-#include "mitkGaussianNoiseFunctor.h"
-#include "mitkTwoCompartmentExchangeModel.h"
-#include "mitkTwoCompartmentExchangeModelParameterizer.h"
-#include "mitkTwoCompartmentExchangeModelFactory.h"
-#include "mitkExtendedToftsModel.h"
-#include "mitkExtendedToftsModelFactory.h"
-#include "mitkExtendedToftsModelParameterizer.h"
-#include "mitkTwoTissueCompartmentModel.h"
-#include "mitkTwoTissueCompartmentModelParameterizer.h"
-#include "mitkTwoTissueCompartmentModelFactory.h"
-#include "mitkOneTissueCompartmentModel.h"
-#include "mitkOneTissueCompartmentModelParameterizer.h"
-#include "mitkOneTissueCompartmentModelFactory.h"
-#include "mitkModelSignalImageGenerator.h"
+#include <mitkImageCast.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkITKImageImport.h>
+#include <mitkGaussianNoiseFunctor.h>
+#include <mitkTwoCompartmentExchangeModel.h>
+#include <mitkTwoCompartmentExchangeModelParameterizer.h>
+#include <mitkTwoCompartmentExchangeModelFactory.h>
+#include <mitkExtendedToftsModel.h>
+#include <mitkExtendedToftsModelFactory.h>
+#include <mitkExtendedToftsModelParameterizer.h>
+#include <mitkTwoTissueCompartmentModel.h>
+#include <mitkTwoTissueCompartmentModelParameterizer.h>
+#include <mitkTwoTissueCompartmentModelFactory.h>
+#include <mitkOneTissueCompartmentModel.h>
+#include <mitkOneTissueCompartmentModelParameterizer.h>
+#include <mitkOneTissueCompartmentModelFactory.h>
+#include <mitkModelSignalImageGenerator.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
-#include "mitkSimpleFunctorBase.h"
-#include "mitkArbitraryTimeGeometry.h"
+#include <mitkSimpleFunctorBase.h>
+#include <mitkArbitraryTimeGeometry.h>
 #include <iostream>
  #include <QFileDialog>
 
@@ -71,85 +72,85 @@ return maximum;
 
 void PerfusionDataSimulationView::SetFocus()
 {
-    m_Controls.GenerateBtn->setFocus();
+    m_Controls->GenerateBtn->setFocus();
 }
 
 void PerfusionDataSimulationView::CreateQtPartControl(QWidget* parent)
 {
-	m_Controls.setupUi(parent);
-    m_Controls.GenerateBtn->setEnabled(false);
+	m_Controls->setupUi(parent);
+    m_Controls->GenerateBtn->setEnabled(false);
 
-    m_Controls.groupBox_TM->hide();
-    m_Controls.groupBox_2CXM->hide();
-    m_Controls.groupBox_2TCM->hide();
-    m_Controls.groupBox_1TCM->hide();
-    m_Controls.groupBox_CNR->hide();
+    m_Controls->groupBox_TM->hide();
+    m_Controls->groupBox_2CXM->hide();
+    m_Controls->groupBox_2TCM->hide();
+    m_Controls->groupBox_1TCM->hide();
+    m_Controls->groupBox_CNR->hide();
 
     this->InitModelComboBox();
     /** #2 @todo Reduce code ?
      */
 
-    m_Controls.comboBox_F->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_F->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_F->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_F->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_PS->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_PS->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_PS->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_PS->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_fp->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_fp->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_fp->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_fp->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_fi->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_fi->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_fi->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_fi->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_Ktrans->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_Ktrans->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_Ktrans->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_Ktrans->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_vp->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_vp->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_vp->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_vp->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_ve->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_ve->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_ve->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_ve->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_K1->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_K1->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_K1->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_K1->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_K2->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_K2->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_K2->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_K2->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_K3->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_K3->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_K3->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_K3->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_K4->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_K4->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_K4->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_K4->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_VB->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_VB->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_VB->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_VB->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_k1->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_k1->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_k1->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_k1->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    m_Controls.comboBox_k2->SetDataStorage(this->GetDataStorage());
-    m_Controls.comboBox_k2->SetPredicate(m_IsNotABinaryImagePredicate);
+    m_Controls->comboBox_k2->SetDataStorage(this->GetDataStorage());
+    m_Controls->comboBox_k2->SetPredicate(m_IsNotABinaryImagePredicate);
 
-    connect(m_Controls.AifFileBtn, SIGNAL(clicked()), this, SLOT(LoadAIFFile()));
-    connect(m_Controls.ModelSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
-    connect(m_Controls.GenerateBtn, SIGNAL(clicked()), this, SLOT(OnGenerateDataButtonClicked()));
-    connect(m_Controls.comboBox_F, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_PS, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_fp, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_fi, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_VB, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_K1, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_K2, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_K3, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_K4, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_k1, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_k2, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_Ktrans, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_vp, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.comboBox_ve, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.CNRSpinBox, SIGNAL(valueChanged(double)),this, SLOT(OnSimulationConfigurationChanged()));
-    connect(m_Controls.NoiseCheckBox, SIGNAL(stateChanged(int)),this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->AifFileBtn, SIGNAL(clicked()), this, SLOT(LoadAIFFile()));
+    connect(m_Controls->ModelSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
+    connect(m_Controls->GenerateBtn, SIGNAL(clicked()), this, SLOT(OnGenerateDataButtonClicked()));
+    connect(m_Controls->comboBox_F, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_PS, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_fp, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_fi, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_VB, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_K1, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_K2, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_K3, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_K4, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_k1, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_k2, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_Ktrans, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_vp, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->comboBox_ve, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->CNRSpinBox, SIGNAL(valueChanged(double)),this, SLOT(OnSimulationConfigurationChanged()));
+    connect(m_Controls->NoiseCheckBox, SIGNAL(stateChanged(int)),this, SLOT(OnSimulationConfigurationChanged()));
 
 //    UpdateDataSelection();
 
@@ -165,7 +166,7 @@ void PerfusionDataSimulationView::UpdateDataSelection()
 //    const QList<mitk::DataNode::Pointer>& selectedNodes)
 //{
 //    UpdateDataSelection();
-//    m_Controls.GenerateBtn->setEnabled(CheckModelSettings());
+//    m_Controls->GenerateBtn->setEnabled(CheckModelSettings());
 
 //}
 
@@ -173,11 +174,11 @@ void PerfusionDataSimulationView::OnSimulationConfigurationChanged()
 {
 //    UpdateDataSelection();
 
-    m_Controls.groupBox_CNR->setVisible(m_Controls.NoiseCheckBox->isChecked());
+    m_Controls->groupBox_CNR->setVisible(m_Controls->NoiseCheckBox->isChecked());
 
-    this->m_CNR = m_Controls.CNRSpinBox->value();
+    this->m_CNR = m_Controls->CNRSpinBox->value();
 
-    m_Controls.GenerateBtn->setEnabled( CheckModelSettings() );
+    m_Controls->GenerateBtn->setEnabled( CheckModelSettings() );
 
 
 }
@@ -204,13 +205,13 @@ void PerfusionDataSimulationView::OnModellSet(int index)
   bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
   bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
-  m_Controls.groupBox_TM->setVisible(isToftsFactory);
-  m_Controls.groupBox_2CXM->setVisible(is2CXMFactory );
-  m_Controls.groupBox_2TCM->setVisible(is2TCMFactory );
-  m_Controls.groupBox_1TCM->setVisible(is1TCMFactory );
+  m_Controls->groupBox_TM->setVisible(isToftsFactory);
+  m_Controls->groupBox_2CXM->setVisible(is2CXMFactory );
+  m_Controls->groupBox_2TCM->setVisible(is2TCMFactory );
+  m_Controls->groupBox_1TCM->setVisible(is1TCMFactory );
 
 
-  m_Controls.GenerateBtn->setEnabled( CheckModelSettings() );
+  m_Controls->GenerateBtn->setEnabled( CheckModelSettings() );
 //  UpdateDataSelection();
 
 
@@ -238,30 +239,30 @@ bool PerfusionDataSimulationView::CheckModelSettings()
 
     if(isToftsFactory)
     {
-        ok = ok && m_Controls.comboBox_Ktrans->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_vp->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_ve->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_Ktrans->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_vp->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_ve->GetSelectedNode().IsNotNull();
     }
     else if(is2CXMFactory)
     {
-        ok = ok && m_Controls.comboBox_F->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_PS->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_fp->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_fi->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_F->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_PS->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_fp->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_fi->GetSelectedNode().IsNotNull();
     }
 
     else if(is2TCMFactory)
     {
-        ok = ok && m_Controls.comboBox_K1->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_K2->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_K3->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_K4->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_VB->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_K1->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_K2->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_K3->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_K4->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_VB->GetSelectedNode().IsNotNull();
     }
     else if(is1TCMFactory)
     {
-        ok = ok && m_Controls.comboBox_k1->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.comboBox_k2->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_k1->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->comboBox_k2->GetSelectedNode().IsNotNull();
      }
 
     else
@@ -269,7 +270,7 @@ bool PerfusionDataSimulationView::CheckModelSettings()
         return false;
 
     }
-    if(m_Controls.NoiseCheckBox->isChecked())
+    if(m_Controls->NoiseCheckBox->isChecked())
     {
         if(m_CNR !=0 && m_MaxConcentration !=0)
         {
@@ -290,14 +291,14 @@ bool PerfusionDataSimulationView::CheckModelSettings()
 
 void PerfusionDataSimulationView::InitModelComboBox() const
 {
-  this->m_Controls.ModelSelection->clear();
-  this->m_Controls.ModelSelection->addItem(tr("No model selected"));
+  this->m_Controls->ModelSelection->clear();
+  this->m_Controls->ModelSelection->addItem(tr("No model selected"));
 
   for (ModelFactoryStackType::const_iterator pos = m_FactoryStack.begin(); pos != m_FactoryStack.end(); ++pos)
   {
-    this->m_Controls.ModelSelection->addItem(QString::fromStdString((*pos)->GetClassID()));
+    this->m_Controls->ModelSelection->addItem(QString::fromStdString((*pos)->GetClassID()));
   }
-  this->m_Controls.ModelSelection->setCurrentIndex(0);
+  this->m_Controls->ModelSelection->setCurrentIndex(0);
 };
 
 
@@ -308,7 +309,7 @@ void PerfusionDataSimulationView::LoadAIFFile()
 
   QString fileName = dialog.getOpenFileName();
 
-  m_Controls.AifFilePath->setText( fileName );
+  m_Controls->AifFilePath->setText( fileName );
 
   std::string aifFilePath = fileName.toStdString();
 
@@ -324,7 +325,7 @@ void PerfusionDataSimulationView::LoadAIFFile()
 
   if(!in1.is_open())
   {
-      m_Controls.errorMessageLabel->setText("Could not open AIF File!");
+      m_Controls->errorMessageLabel->setText("Could not open AIF File!");
   }
 
 
@@ -369,7 +370,7 @@ void PerfusionDataSimulationView::LoadAIFFile()
   this->m_TimeGrid = grid;
 
 
-  m_Controls.GenerateBtn->setEnabled( CheckModelSettings() );
+  m_Controls->GenerateBtn->setEnabled( CheckModelSettings() );
 //  UpdateDataSelection();
 
 
@@ -381,19 +382,19 @@ void PerfusionDataSimulationView::FillParameterMap2CXM()
 {
     ParameterMapType stack;
 
-    mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_F->GetSelectedNode();
+    mitk::DataNode::Pointer m_selectedNode = m_Controls->comboBox_F->GetSelectedNode();
     mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_F,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_PS->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_PS->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_PS,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_fp->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_fp->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_vp,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_fi->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_fi->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_ve,m_selectedImage));
 
@@ -408,15 +409,15 @@ void PerfusionDataSimulationView::FillParameterMapETM()
 {
     ParameterMapType stack;
 
-    mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_Ktrans->GetSelectedNode();
+    mitk::DataNode::Pointer m_selectedNode = m_Controls->comboBox_Ktrans->GetSelectedNode();
     mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::ExtendedToftsModel::NAME_PARAMETER_Ktrans,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_vp->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_vp->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::ExtendedToftsModel::NAME_PARAMETER_vp,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_ve->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_ve->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::ExtendedToftsModel::NAME_PARAMETER_ve,m_selectedImage));
 
@@ -429,23 +430,23 @@ void PerfusionDataSimulationView::FillParameterMap2TCM()
 {
     ParameterMapType stack;
 
-    mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_K1->GetSelectedNode();
+    mitk::DataNode::Pointer m_selectedNode = m_Controls->comboBox_K1->GetSelectedNode();
     mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_K1,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_K2->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_K2->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_k2,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_K3->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_K3->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_k3,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_K4->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_K4->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_k4,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_VB->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_VB->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_vb,m_selectedImage));
 
@@ -457,11 +458,11 @@ void PerfusionDataSimulationView::FillParameterMap1TCM()
 {
     ParameterMapType stack;
 
-    mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_k1->GetSelectedNode();
+    mitk::DataNode::Pointer m_selectedNode = m_Controls->comboBox_k1->GetSelectedNode();
     mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::OneTissueCompartmentModel::NAME_PARAMETER_K1,m_selectedImage));
 
-    m_selectedNode = m_Controls.comboBox_k2->GetSelectedNode();
+    m_selectedNode = m_Controls->comboBox_k2->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     stack.insert(std::make_pair(mitk::OneTissueCompartmentModel::NAME_PARAMETER_k2,m_selectedImage));
 
@@ -552,7 +553,7 @@ generator->SetParameterizer(modelParameterizer);
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
  mitk::Image::Pointer resultImage = mitk::Image::New();
-if(m_Controls.NoiseCheckBox->isChecked())
+if(m_Controls->NoiseCheckBox->isChecked())
 {
     typedef itk::Image<double,3> ImageType;
 
@@ -635,7 +636,7 @@ mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
 
 mitk::Image::Pointer resultImage = mitk::Image::New();
-if(m_Controls.NoiseCheckBox->isChecked())
+if(m_Controls->NoiseCheckBox->isChecked())
 {
    typedef itk::Image<double,3> ImageType;
 
@@ -725,7 +726,7 @@ generator->SetParameterizer(modelParameterizer);
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
  mitk::Image::Pointer resultImage = mitk::Image::New();
-if(m_Controls.NoiseCheckBox->isChecked())
+if(m_Controls->NoiseCheckBox->isChecked())
 {
     typedef itk::Image<double,3> ImageType;
 
@@ -803,7 +804,7 @@ generator->SetParameterizer(modelParameterizer);
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
  mitk::Image::Pointer resultImage = mitk::Image::New();
-if(m_Controls.NoiseCheckBox->isChecked())
+if(m_Controls->NoiseCheckBox->isChecked())
 {
     typedef itk::Image<double,3> ImageType;
 
@@ -854,6 +855,7 @@ return resultImage;
 
 
 PerfusionDataSimulationView::PerfusionDataSimulationView()
+  : m_Controls(std::make_unique<Ui::PerfusionDataSimulationViewControls>())
 {
      m_Sigma = 0;
      m_CNR=0;
@@ -877,4 +879,8 @@ PerfusionDataSimulationView::PerfusionDataSimulationView()
                  mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))),
                  mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
+}
+
+PerfusionDataSimulationView::~PerfusionDataSimulationView()
+{
 }

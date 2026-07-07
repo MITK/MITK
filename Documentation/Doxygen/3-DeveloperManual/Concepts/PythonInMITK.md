@@ -236,7 +236,7 @@ Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocat
 Doxygen does not handle Python well: it does not understand Google-style docstrings, dataclasses, or `typing.Literal`/union hints, and its native Python rendering undersells a typed binding surface.
 For that reason, the `mitk` Python package has its own Sphinx-based documentation site, built and published independently of this C++ Doxygen site.
 
-The Python documentation lives at <https://mitk-python.readthedocs.io/en/latest/>.
+The Python documentation lives at <https://mitk-python.readthedocs.io/en/2026.06/>.
 It is also reachable from the "Python API" tab in the top navigation bar of this Doxygen site.
 
 ### Sources
@@ -270,7 +270,7 @@ Missing-target cross-references (e.g. a stale `:py:class:` pointing at a name th
 
 ### Publishing
 
-The published site is hosted on Read the Docs at <https://mitk-python.readthedocs.io/en/latest/>. A separate repository, `MITK/mitk-python-docs`, drives the build: it fetches `Wrapping/Python/docs` from here and runs `sphinx-build` against the `mitk-python` wheel installed from PyPI, so the site tracks the bindings without keeping a second copy of the sources.
+The published site is hosted on Read the Docs at <https://mitk-python.readthedocs.io/en/2026.06/>. A separate repository, `MITK/mitk-python-docs`, drives the build: it fetches `Wrapping/Python/docs` from here and runs `sphinx-build` against the `mitk-python` wheel installed from PyPI, so the site tracks the bindings without keeping a second copy of the sources.
 
 ### What goes where
 

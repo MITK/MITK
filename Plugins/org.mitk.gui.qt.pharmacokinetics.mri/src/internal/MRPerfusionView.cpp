@@ -103,7 +103,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls->timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls->timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
 
-  m_Controls->maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->maskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls->maskNodeSelector->SetSelectionIsOptional(true);
   m_Controls->maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
@@ -138,7 +138,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls->aifFilePath->setText("Please select AIF file.");
   m_Controls->radioAIFImage->setChecked(true);
   m_Controls->AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls->AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
+  m_Controls->AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->AIFMaskNodeSelector->setVisible(true);
   m_Controls->AIFMaskNodeSelector->setEnabled(true);
   m_Controls->AIFMaskLabelSelector->hide();
@@ -953,8 +953,6 @@ MRPerfusionView::MRPerfusionView()
   mitk::NodePredicateOr::Pointer isMask = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
   mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
   mitk::NodePredicateAnd::Pointer is3DImage = mitk::NodePredicateAnd::New(isImage, is3D, isNoMask);
-
-  this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
   this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 

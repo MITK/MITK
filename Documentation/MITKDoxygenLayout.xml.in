@@ -27,7 +27,7 @@
       </tab>
       <tab type="examples" visible="yes" title="" intro=""/>
     </tab>
-    <tab type="user" url="https://mitk-python.readthedocs.io/en/latest/" title="Python API"/>
+    <tab type="user" url="https://mitk-python.readthedocs.io/en/2026.06/" title="Python API"/>
     <tab type="user" url="https://www.mitk.org/#downloads" title="Download"/>
   </navindex>
 

@@ -43,9 +43,9 @@ file I/O via :py:class:`IOUtil`, geometry classes (:py:class:`BaseGeometry`,
 :py:class:`MultiLabelSegmentation` for label-set data.
 
 Full user documentation, including a Getting Started guide and an
-auto-generated API reference, lives at https://mitk-python.readthedocs.io/en/latest/.
+auto-generated API reference, lives at https://mitk-python.readthedocs.io/en/2026.06/.
 
-The wider MITK C++ stack is documented at https://docs.mitk.org/latest/.
+The wider MITK C++ stack is documented at https://docs.mitk.org/2026.06/.
 )";
 
   py::module_ os = py::module_::import("os");

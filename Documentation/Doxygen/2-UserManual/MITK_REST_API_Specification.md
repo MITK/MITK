@@ -558,7 +558,7 @@ API information and capabilities.
       "transfer_modes": ["direct", "file-reference"],
       "authentication": ["api-token"]
     },
-    "documentation_url": "https://docs.mitk.org/2026.06/MITKRESTAPISpec.html"
+    "documentation_url": "https://docs.mitk.org/latest/MITKRESTAPISpec.html"
   }
 }
 ```

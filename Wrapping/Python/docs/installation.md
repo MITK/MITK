@@ -48,7 +48,7 @@ setup is required.
 
 Building the wheel from source is a developer-side concern; it requires the
 full MITK SuperBuild and is documented in the MITK developer manual under
-[Python in MITK](https://docs.mitk.org/2026.06/PythonInMITKPage.html). The
+[Python in MITK](https://docs.mitk.org/latest/PythonInMITKPage.html). The
 short version:
 
 ```bash

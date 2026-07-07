@@ -32,11 +32,11 @@ print(loaded.shape, loaded.spacing, loaded.origin)
 
 The Python API (classes, functions, NumPy interop, file I/O, geometry,
 properties) is documented at
-[mitk-python.readthedocs.io/en/2026.06/](https://mitk-python.readthedocs.io/en/2026.06/).
+[mitk-python.readthedocs.io/en/latest/](https://mitk-python.readthedocs.io/en/latest/).
 
 The wider MITK stack (C++ modules, plugins, the application framework) is
 documented at
-[docs.mitk.org/2026.06/](https://docs.mitk.org/2026.06/).
+[docs.mitk.org/latest/](https://docs.mitk.org/latest/).
 
 ## License
 

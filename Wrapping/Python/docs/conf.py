@@ -119,10 +119,10 @@ html_theme_options = {
     "home_page_in_toc": True,
     "extra_footer": (
         '<p>This is the Python documentation for the '
-        '<a href="https://docs.mitk.org/2026.06/">Medical Imaging Interaction '
+        '<a href="https://docs.mitk.org/latest/">Medical Imaging Interaction '
         'Toolkit (MITK)</a>. For the full C++ reference, the developer manual, '
         'and the user manual, see '
-        '<a href="https://docs.mitk.org/2026.06/">docs.mitk.org/2026.06/</a>.</p>'
+        '<a href="https://docs.mitk.org/latest/">docs.mitk.org/latest/</a>.</p>'
     ),
 }
 

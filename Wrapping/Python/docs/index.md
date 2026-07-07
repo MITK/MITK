@@ -24,7 +24,7 @@ This site documents the **Python surface** of MITK: classes, functions,
 NumPy interop, file I/O, geometry, properties. The wider MITK stack (C++
 modules, plugins, the application framework, the BlueBerry plugin system)
 is documented separately at
-[docs.mitk.org/2026.06/](https://docs.mitk.org/2026.06/). Think of this
+[docs.mitk.org/latest/](https://docs.mitk.org/latest/). Think of this
 site as the Python facade on that stack.
 
 ```{toctree}
@@ -55,6 +55,6 @@ api/index
 
 ## See also
 
-- [docs.mitk.org/2026.06/](https://docs.mitk.org/2026.06/): the full MITK
+- [docs.mitk.org/latest/](https://docs.mitk.org/latest/): the full MITK
   C++ reference and user manual.
 - [www.mitk.org](https://www.mitk.org): the project homepage.

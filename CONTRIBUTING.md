@@ -79,4 +79,4 @@ Following a PR submission, the MITK developer team will discuss the correspondin
 
 [seven_commit_rules_page]: https://cbea.ms/git-commit/
 
-[MITK_styleguide_page]: https://docs.mitk.org/2026.06/StyleGuideAndNotesPage.html
+[MITK_styleguide_page]: https://docs.mitk.org/latest/StyleGuideAndNotesPage.html

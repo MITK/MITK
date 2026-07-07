@@ -30,6 +30,13 @@ if(MITK_USE_${proj})
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/getsentry/sentry-native.git
       GIT_TAG fea16b84ef4e723dd3a0e7f5e76f1737973dd349 # 0.15.2
+      # Crashpad's Linux HTTP transport hard-requires libcurl; Windows uses
+      # WinHTTP and needs nothing. Local-only dumps never upload, so switch
+      # Linux to crashpad's curl-free socket transport instead of dragging in
+      # libcurl. Harmless on other platforms (the edit is Linux-gated).
+      PATCH_COMMAND ${CMAKE_COMMAND}
+        -DCRASHPAD_UTIL_CMAKE=<SOURCE_DIR>/external/crashpad/util/CMakeLists.txt
+        -P ${CMAKE_CURRENT_LIST_DIR}/PatchSentryCrashpad.cmake
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}

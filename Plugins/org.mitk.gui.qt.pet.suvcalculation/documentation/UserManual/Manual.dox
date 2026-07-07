@@ -1,13 +1,9 @@
 /**
-\page org_mitk_petSUVCalculation The PET SUV Calculation View
+\page org_mitk_gui_qt_pet_suvcalculation The PET SUV Calculation View
 
-\li \ref PETSUV_Introduction
-\li \ref PETSUV_Usage
-\li \ref PETSUV_Variants
-\li \ref PETSUV_DecayTime
-\li \ref PETSUV_Validation
-\li \ref PETSUV_Diagnostics
-\li \ref PETSUV_Contact
+\imageMacro{petsuv.png,"Icon of the PET SUV View",2.00}
+
+\tableofcontents
 
 \section PETSUV_Introduction Introduction
 
@@ -22,7 +18,7 @@ The view requires DICOM-tagged PET input. Acquisition information
 correction strategy, units) is read from the input's DICOM properties
 and may be overridden via the controls below.
 
-\image html usage_suv.png "The PET SUV Calculation view."
+\imageMacroEx{usage_suv.png,"The PET SUV Calculation view",10, 360px}
 
 \section PETSUV_Usage Usage
 

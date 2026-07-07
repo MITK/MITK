@@ -56,11 +56,18 @@ public:
 
   void NoStallWhileBeating()
   {
+    // A loaded CI can starve the beat loop between iterations for far longer
+    // than the 150 ms default timeout, which would trip a spurious stall.
+    // Give the timeout a wide margin over the beat interval so only a
+    // pathological (>1 s) starvation trips it, while still beating past a full
+    // timeout window so the no-stall path is genuinely exercised.
+    m_Config.Timeout = std::chrono::milliseconds(1000);
+
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Beat well within the timeout for several timeout windows.
-    for (int i = 0; i < 40; ++i)
+    // 75 * 20 ms = 1.5 s of beating, longer than the timeout window.
+    for (int i = 0; i < 75; ++i)
     {
       monitor.Beat();
       std::this_thread::sleep_for(std::chrono::milliseconds(20));

@@ -67,7 +67,7 @@ And add the new method:
 
 Have fun using MITK!
 
-If you meet any difficulties during your first steps, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
+If you meet any difficulties during your first steps, don't hesitate to open an issue on <a href="https://github.com/MITK/MITK/issues">GitHub</a>!
 People there are kind and will try to help you.
 
  \ref Step08Page "[Previous step]" \ref Step10Page "[Next Step]" \ref TutorialPage "[Main tutorial page]"

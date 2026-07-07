@@ -28,6 +28,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_moviemaker </li>
   <li> \subpage org_mitk_views_pointsetinteraction </li>
   <li> \subpage org_mitk_views_remeshing </li>
+  <li> \subpage org_mitk_views_restapi </li>
   <li> \subpage org_mitk_views_screenshotmaker </li>
   <li> Segmentation
     <ul>

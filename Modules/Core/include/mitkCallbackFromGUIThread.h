@@ -148,7 +148,7 @@ namespace mitk
     This obviously won't allow you to pass parameters to ChangeGUIElementsToIndicateProgress. If you need to do that,
     you have to create a kind of itk::EventObject that can be asked for a parameter (this solution is not nice, if you
   see
-    a better solution, please mail to mitk-users@lists.sourceforge.net).
+    a better solution, please open an issue on GitHub).
 
     The itk::EventObject has to be created with "new" (which can also be done by calling MakeObject on an existing
   EventObject).

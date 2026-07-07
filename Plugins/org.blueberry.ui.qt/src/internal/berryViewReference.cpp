@@ -188,8 +188,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     errorMsg
         += "<ul><li>Check your shared library for unresolved symbols</li>"
             "<li>Check your class attribute in your plugin.xml file</li>"
-            "<li>Check your manifest.cpp file</li></ul>"
-            "</br>For a comprehensive check-list, see <a href=\"https://www.mitk.org/wiki/How_to_fix_your_plug-in_DLL\">https://www.mitk.org/wiki/How_to_fix_your_plug-in_DLL</a>";
+            "<li>Check your manifest.cpp file</li></ul>";
     ErrorViewPart::Pointer part(new ErrorViewPart(errorTitle, errorMsg));
 
     //PartPane pane = getPane();

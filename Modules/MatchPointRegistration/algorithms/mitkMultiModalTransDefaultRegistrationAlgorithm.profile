@@ -3,7 +3,7 @@ SET(ALGORITHM_PROFILE_UID_Name "MultiModal.translation.default")
 SET(ALGORITHM_PROFILE_UID_Version "1.0.1")
 
 SET(ALGORITHM_PROFILE_Description "Algorithm is used as default solution for multimodal problem statements in DIPP where only translation is needed. Uses 3 Resolution levels. By default initializes via image centers.")
-SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; mitk-users@lists.sourceforge.net")
+SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; https://github.com/MITK/MITK/issues")
 
 SET(ALGORITHM_PROFILE_DataType "Image")
 SET(ALGORITHM_PROFILE_ResolutionStyle "3 (multi res)")

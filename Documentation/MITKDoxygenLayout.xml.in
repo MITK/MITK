@@ -28,7 +28,7 @@
       <tab type="examples" visible="yes" title="" intro=""/>
     </tab>
     <tab type="user" url="https://mitk-python.readthedocs.io/en/latest/" title="Python API"/>
-    <tab type="user" url="https://www.mitk.org/Downloads" title="Download"/>
+    <tab type="user" url="https://www.mitk.org/#downloads" title="Download"/>
   </navindex>
 
   <!-- Layout definition for a class page -->

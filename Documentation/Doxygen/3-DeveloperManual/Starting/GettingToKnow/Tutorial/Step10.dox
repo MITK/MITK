@@ -494,7 +494,7 @@ understanding: </b>
 Have fun with creating your own interaction and please think about contributing it to MITK!
 
 <b>
-If you meet any difficulties during this step, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
+If you meet any difficulties during this step, don't hesitate to open an issue on <a href="https://github.com/MITK/MITK/issues">GitHub</a>!
 People there are kind and will try to help you. </b>
 
 \ref Step09Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"

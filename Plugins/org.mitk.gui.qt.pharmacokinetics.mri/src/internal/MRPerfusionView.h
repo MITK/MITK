@@ -122,6 +122,14 @@ protected:
   void OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
   void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
+  /** Refreshes the mask-selector status hint (labelMaskStatus): how many
+   *  segmentations are hidden from the tissue "Selected Mask" selector because
+   *  their geometry does not match the selected time series, and whether
+   *  ROI-based fitting is unavailable because no mask is selected. Recomputed
+   *  from the current selection state; it does not track DataStorage changes
+   *  that happen without a subsequent selection change. */
+  void UpdateMaskStatusInfo();
+
   /*! @brief The view's UI controls */
   std::unique_ptr<Ui::MRPerfusionViewControls> m_Controls;
 

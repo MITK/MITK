@@ -57,6 +57,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QFileDialog>
+#include <QStringList>
 
 
 // Includes for image casting between ITK and MITK
@@ -234,6 +235,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls->AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
+  this->UpdateMaskStatusInfo();
 }
 
 
@@ -495,6 +497,7 @@ void MRPerfusionView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>
   }
 
   UpdateGUIControls();
+  this->UpdateMaskStatusInfo();
 }
 
 
@@ -522,6 +525,7 @@ void MRPerfusionView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/
   }
 
   UpdateGUIControls();
+  this->UpdateMaskStatusInfo();
 }
 
 void MRPerfusionView::OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
@@ -543,6 +547,29 @@ void MRPerfusionView::OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointe
   }
 
   UpdateGUIControls();
+}
+
+void MRPerfusionView::UpdateMaskStatusInfo()
+{
+  QStringList lines;
+
+  if (m_selectedImage.IsNotNull())
+  {
+    const auto hiddenCount = mitk::GetGeometryMismatchedSegmentationCount(
+      this->GetDataStorage(), m_selectedImage->GetGeometry());
+    if (hiddenCount > 0)
+    {
+      lines << tr("%1 segmentation(s) hidden from the Selected Mask list: geometry does not match the selected time series.").arg(hiddenCount);
+    }
+
+    if (m_selectedMaskNode.IsNull())
+    {
+      lines << tr("ROI-based fitting requires a selected mask.");
+    }
+  }
+
+  m_Controls->labelMaskStatus->setText(lines.join(QStringLiteral("<br/>")));
+  m_Controls->labelMaskStatus->setVisible(!lines.isEmpty());
 }
 
 bool MRPerfusionView::CheckModelSettings() const

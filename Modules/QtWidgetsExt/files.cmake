@@ -14,7 +14,6 @@ set(CPP_FILES
   QmitkFileChooser.cpp
   QmitkHistogram.cpp
   QmitkHotkeyLineEdit.cpp
-  QmitkModulesDialog.cpp
   QmitkModuleTableModel.cpp
   QmitkNumberPropertyEditor.cpp
   QmitkNumberPropertySlider.cpp

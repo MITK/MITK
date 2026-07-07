@@ -3,7 +3,7 @@ SET(ALGORITHM_PROFILE_UID_Name "RigidClosedForm.3D.default")
 SET(ALGORITHM_PROFILE_UID_Version "1.0.0")
 
 SET(ALGORITHM_PROFILE_Description "Simple 3D rigid (translation and euler angles) registration algorithm using point sets pairs and a closed form solution. It assumes that both given point sets are sorted by pair index.")
-SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; mitk-users@lists.sourceforge.net")
+SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; https://github.com/MITK/MITK/issues")
 
 SET(ALGORITHM_PROFILE_DataType "Points")
 SET(ALGORITHM_PROFILE_ResolutionStyle "Single")

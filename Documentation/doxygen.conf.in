@@ -986,6 +986,7 @@ EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
                          "@MITK_SOURCE_DIR@/CODE_OF_CONDUCT.md" \
                          "@MITK_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@MITK_SOURCE_DIR@/README.md" \
+                         "@MITK_SOURCE_DIR@/Wrapping/Python/docs" \
                          "@MITK_BINARY_DIR@/Documentation/Doxygen" \
                          "@MITK_BINARY_DIR@/bin/" \
                          "@MITK_BINARY_DIR@/PT/" \

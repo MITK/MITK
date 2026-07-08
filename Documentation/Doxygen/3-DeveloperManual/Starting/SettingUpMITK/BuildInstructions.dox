@@ -76,7 +76,6 @@ We highly recommend installing Qt to the <b>default location</b>, so CMake can f
 In the Qt installer, make sure to select the following <b>additional libraries</b>:
 
   - Qt 5 Compatibility Module
-  - Qt Positioning
   - Qt State Machines
 
 \section BuildInstructions_Build_With_CMake Build MITK with CMake

@@ -1,0 +1,135 @@
+/**
+\page AnalyzingCrashDumpsHowTo Analyzing a Crash Dump
+
+\tableofcontents
+
+A MITK minidump (a <tt>.dmp</tt> file) records the stacks of all threads, the
+CPU context, and the list of loaded modules - not source code and not symbols.
+Turning it into function names, files, and line numbers needs two things:
+
+-# the debug symbols built from the <em>exact same sources</em> as the binary
+   that crashed, and
+-# a tool that walks the dump against those symbols.
+
+This page is the operational walkthrough. For the facility itself - what a dump
+contains, where dumps live, retention, and the privacy implications - see
+\ref CrashDumpFacilityPage.
+
+\section AnalyzingCrashDumpsHowTo_Pieces Getting the pieces
+
+- <b>The dump.</b> From the crash-dump database
+  (\ref CrashDumpFacilityPage_Storage), or reproduce one deliberately
+  (\ref AnalyzingCrashDumpsHowTo_Reproduce).
+- <b>Matching symbols.</b> The <tt>-symbols.zip</tt> produced by the
+  \c package-symbols target for that release
+  (\ref CrashDumpFacilityPage_Symbols_Archive). A dump only decodes against
+  symbols from the identical build; a different build, even of the same
+  sources, will not match.
+- <b>A tool.</b> Platform specific; see the per-OS sections below and
+  \ref AnalyzingCrashDumpsHowTo_Tools.
+
+\section AnalyzingCrashDumpsHowTo_Windows Windows
+
+Windows debug info lives in PDBs (shipped inside the symbols archive, not with
+the application). Use \c cdb or WinDbg from the Windows SDK "Debugging Tools for
+Windows". A PDB is matched to its DLL by an embedded signature, so no manual
+pairing is needed - just make the extracted symbols directory a symbol path.
+
+\code
+cdb -z crash.dmp -y <extracted-symbols-dir> -c "!analyze -v; k; q"
+\endcode
+
+Interactively in WinDbg: <em>File > Open Crash Dump</em>, then
+
+\code
+.sympath+ <extracted-symbols-dir>
+!analyze -v      REM triage: faulting frame and probable cause
+.ecxr            REM switch to the context of the crash
+k                REM call stack of the crashing thread
+\endcode
+
+\section AnalyzingCrashDumpsHowTo_Linux Linux
+
+Linux binaries are shipped unstripped, and the bulk of the debug info sits
+beside them as split DWARF (see \ref CrashDumpFacilityPage_Symbols); both are in
+the symbols archive. Minidumps are not a native ELF format, so a debugger does
+not open them directly - convert the debug info to a Breakpad symbol file and
+walk the dump against it.
+
+The general flow (exact invocation depends on the tool you pick):
+
+\code
+# 1. Produce a Breakpad .sym from the binary (resolving its split DWARF).
+dump_syms libMitkCore.so > MitkCore.sym
+
+# 2. Its first line is: MODULE Linux x86_64 <BUILD-ID> MitkCore
+#    Place the file where the walker expects it:
+mkdir -p symbols/MitkCore/<BUILD-ID>
+mv MitkCore.sym symbols/MitkCore/<BUILD-ID>/MitkCore.sym
+
+# 3. Walk the dump against the symbol tree.
+minidump-stackwalk crash.dmp symbols/
+\endcode
+
+Repeat step 1 for each module whose frames you need resolved.
+
+\section AnalyzingCrashDumpsHowTo_macOS macOS
+
+macOS debug info lives in <tt>.dSYM</tt> bundles (see
+\ref CrashDumpFacilityPage_Symbols), carried in the symbols archive. The flow is
+the same as on Linux, reading from the <tt>.dSYM</tt> instead of split DWARF:
+
+\code
+dump_syms MitkCore.framework.dSYM > MitkCore.sym
+# then the same symbol-tree layout and walker as on Linux
+\endcode
+
+Two macOS specifics:
+
+- Dumps are written to
+  <tt>&lt;user data location&gt;/&lt;organization&gt;/&lt;application&gt;/CrashDumps</tt>,
+  as on the other platforms.
+- Only hard-crash dumps are produced on macOS. On-demand snapshots and the
+  UI-freeze watchdog are unavailable there, because Crashpad's macOS client has
+  no <tt>DumpWithoutCrash</tt> equivalent (macOS drives dumps through a Mach
+  exception server, on an actual crash). Hard-crash capture is unaffected.
+
+\section AnalyzingCrashDumpsHowTo_Tools Tools
+
+MITK does not ship the cross-platform symbol tools; obtain them separately. If
+you have no existing preference, the following are options, listed without
+endorsement:
+
+- \c dump_syms to produce Breakpad <tt>.sym</tt> files - implementations exist
+  from Mozilla (Rust) and from Google Breakpad.
+- A minidump walker such as <tt>minidump-stackwalk</tt> from the rust-minidump
+  project, or Breakpad's <tt>minidump_stackwalk</tt>.
+- On Windows, \c cdb / WinDbg (Windows SDK) read the PDBs directly and need no
+  symbol conversion.
+
+Follow the chosen tool's own documentation for details such as how it resolves
+split DWARF or dSYM input.
+
+\section AnalyzingCrashDumpsHowTo_Reading Reading the result
+
+- <b>Crashing thread.</b> On Windows \c !analyze -v names it and the faulting
+  frame; with a walker, it is the thread carrying the faulting instruction.
+- <b>Resolution differs by origin.</b> MITK's own frames resolve to file and
+  line; frames in prebuilt third-party dependencies (ITK, VTK, Qt, ...) resolve
+  to function name plus offset only. Those dependencies are built separately and
+  never carry MITK's symbol flags (see \ref CrashDumpFacilityPage_Symbols), so
+  this is expected, not a setup error.
+- <b>All frames blank, or a signature/build-id warning.</b> The symbols do not
+  match the binary: usually the wrong <tt>-symbols.zip</tt> for this exact
+  build, or a stripped binary with no symbols archived.
+
+\section AnalyzingCrashDumpsHowTo_Reproduce Reproducing a dump
+
+To practise the workflow, or to verify symbols resolve before a real incident,
+produce a dump on demand with the \c org.mitk.gui.qt.crashtest plugin (a QA aid,
+off by default; build with \c MITK_BUILD_org.mitk.gui.qt.crashtest, see
+\ref CrashDumpFacilityPage_Testing). Its Crash Test view offers one button per
+failure path: a hard crash, an unhandled mitk::Exception, and a UI freeze of
+configurable duration. Start the application with <tt>--ui-watchdog 5</tt> to
+let the freeze watchdog react within seconds instead of the default timeout.
+*/

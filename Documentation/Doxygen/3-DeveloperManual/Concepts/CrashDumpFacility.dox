@@ -275,21 +275,11 @@ released build is a release-pipeline responsibility - see \ref PackagingPage.
 
 \subsection CrashDumpFacilityPage_Symbols_HowTo Symbolicating a dump
 
-On Windows, point a debugger at the archive's PDBs and open the dump:
-
-\code
-cdb -z crash.dmp -y <extracted-symbols-dir> -c "!analyze -v; k; q"
-\endcode
-
-WinDbg loads a PDB whose signature matches the shipped DLL without any
-override. Cross-platform, convert the archived debug info with \c dump_syms
-and walk the dump with \c minidump_stackwalk (both from the Breakpad /
-Crashpad tooling):
-
-\code
-dump_syms MitkCore.pdb > MitkCore.sym          # or the ELF/dSYM equivalent
-minidump_stackwalk crash.dmp <symbol-dir>
-\endcode
+Walking a dump back to function, file, and line is a per-OS operation and needs
+the symbols archive that matches the exact build. The step-by-step workflow for
+Windows, Linux, and macOS - including how to read the result and how to
+reproduce a dump for practice - is a separate developer how-to:
+\subpage AnalyzingCrashDumpsHowTo.
 
 \section CrashDumpFacilityPage_MixedConfigs Debug and Release in one superbuild tree
 

@@ -55,10 +55,6 @@ public:
   bool isBackwardAvailable() const
   { return m_HistoryIndex > 0; }
 
-  static QString mimeFromUrl(const QUrl &url);
-  static bool canOpenPage(const QString &url);
-  static bool isLocalUrl(const QUrl &url);
-  static bool launchWithExternalApp(const QUrl &url);
   static const QString m_MissingContextMessage;
   static const QString m_PageNotFoundMessage;
 
@@ -77,6 +73,7 @@ Q_SIGNALS:
   void sourceChanged(const QUrl &);
 
 protected:
+  void mousePressEvent(QMouseEvent *) override;
   void wheelEvent(QWheelEvent *) override;
 
 private Q_SLOTS:

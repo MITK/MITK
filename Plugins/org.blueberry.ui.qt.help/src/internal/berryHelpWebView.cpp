@@ -18,51 +18,11 @@ found in the LICENSE file.
 
 #include <QCoreApplication>
 #include <QDesktopServices>
-#include <QFileInfo>
 #include <QMouseEvent>
 #include <QScrollBar>
-#include <QStringBuilder>
-#include <QTemporaryFile>
 #include <QWheelEvent>
 
 namespace berry {
-
-struct ExtensionMap {
-  const char *extension;
-  const char *mimeType;
-} extensionMap[] = {
-    { ".bmp", "image/bmp" },
-    { ".css", "text/css" },
-    { ".gif", "image/gif" },
-    { ".html", "text/html" },
-    { ".htm", "text/html" },
-    { ".ico", "image/x-icon" },
-    { ".jpeg", "image/jpeg" },
-    { ".jpg", "image/jpeg" },
-    { ".js", "application/x-javascript" },
-    { ".mng", "video/x-mng" },
-    { ".pbm", "image/x-portable-bitmap" },
-    { ".pgm", "image/x-portable-graymap" },
-    { ".pdf", "application/pdf" },
-    { ".png", "image/png" },
-    { ".ppm", "image/x-portable-pixmap" },
-    { ".rss", "application/rss+xml" },
-    { ".svg", "image/svg+xml" },
-    { ".svgz", "image/svg+xml" },
-    { ".text", "text/plain" },
-    { ".tif", "image/tiff" },
-    { ".tiff", "image/tiff" },
-    { ".txt", "text/plain" },
-    { ".xbm", "image/x-xbitmap" },
-    { ".xml", "text/xml" },
-    { ".xpm", "image/x-xpm" },
-    { ".xsl", "text/xsl" },
-    { ".xhtml", "application/xhtml+xml" },
-    { ".wml", "text/vnd.wap.wml" },
-    { ".wmlc", "application/vnd.wap.wmlc" },
-    { "about:blank", nullptr },
-    { nullptr, nullptr }
-};
 
 const QString HelpWebView::m_PageNotFoundMessage =
     QCoreApplication::translate("org.blueberry.ui.qt.help", "<title>Context Help</title><div "
@@ -214,6 +174,16 @@ bool HelpWebView::handleForwardBackwardMouseButtons(QMouseEvent *e)
   return false;
 }
 
+void HelpWebView::mousePressEvent(QMouseEvent *e)
+{
+  // The dedicated back/forward mouse buttons navigate the help history; the
+  // base class only handles the left button and ignores the rest.
+  if (this->handleForwardBackwardMouseButtons(e))
+    return;
+
+  QmitkHtmlWidget::mousePressEvent(e);
+}
+
 void HelpWebView::wheelEvent(QWheelEvent *e)
 {
   if (e->modifiers()& Qt::ControlModifier)
@@ -225,72 +195,6 @@ void HelpWebView::wheelEvent(QWheelEvent *e)
   {
     QmitkHtmlWidget::wheelEvent(e);
   }
-}
-
-QString HelpWebView::mimeFromUrl(const QUrl &url)
-{
-  const QString &path = url.path();
-  const int index = path.lastIndexOf(QLatin1Char('.'));
-  const QByteArray &ext = path.mid(index).toUtf8().toLower();
-
-  const ExtensionMap *e = extensionMap;
-  while (e->extension)
-  {
-    if (ext == e->extension)
-      return QLatin1String(e->mimeType);
-    ++e;
-  }
-  return QLatin1String("");
-}
-
-bool HelpWebView::canOpenPage(const QString &url)
-{
-  return !mimeFromUrl(url).isEmpty();
-}
-
-bool HelpWebView::isLocalUrl(const QUrl &url)
-{
-  const QString &scheme = url.scheme();
-  return scheme.isEmpty()
-      || scheme == QLatin1String("file")
-      || scheme == QLatin1String("qrc")
-      || scheme == QLatin1String("data")
-      || scheme == QLatin1String("qthelp")
-      || scheme == QLatin1String("about");
-}
-
-bool HelpWebView::launchWithExternalApp(const QUrl &url)
-{
-  if (isLocalUrl(url))
-  {
-    const QHelpEngine& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
-    const QUrl &resolvedUrl = helpEngine.findFile(url);
-    if (!resolvedUrl.isValid())
-      return false;
-
-    const QString& path = resolvedUrl.path();
-    if (!canOpenPage(path))
-    {
-      QTemporaryFile tmpTmpFile;
-      if (!tmpTmpFile.open())
-        return false;
-
-      const QString &extension = QFileInfo(path).completeSuffix();
-      QFile actualTmpFile(tmpTmpFile.fileName() % QLatin1String(".")
-                          % extension);
-      if (!actualTmpFile.open(QIODevice::ReadWrite | QIODevice::Truncate))
-        return false;
-
-      actualTmpFile.write(helpEngine.fileData(resolvedUrl));
-      actualTmpFile.close();
-      return QDesktopServices::openUrl(QUrl(actualTmpFile.fileName()));
-    }
-  }
-  else if (url.scheme() == QLatin1String("http"))
-  {
-    return QDesktopServices::openUrl(url);
-  }
-  return false;
 }
 
 }

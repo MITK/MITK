@@ -17,19 +17,13 @@ found in the LICENSE file.
 #include <MitkQtHtmlExports.h>
 
 #include <QAbstractScrollArea>
+#include <QByteArray>
 #include <QColor>
-#include <QHash>
-#include <QImage>
+#include <QString>
 #include <QUrl>
 
 #include <functional>
-#include <string>
-
-#include <litehtml.h>
-
-class QMovie;
-class QPainter;
-class QSvgRenderer;
+#include <memory>
 
 /**
  * \brief A litehtml-based HTML view rendered with QPainter.
@@ -40,7 +34,7 @@ class QSvgRenderer;
  * a resource handler set by the owner, so any URL scheme (e.g. qthelp://) can
  * be served without a global URL scheme handler.
  */
-class MITKQTHTML_EXPORT QmitkHtmlWidget : public QAbstractScrollArea, public litehtml::document_container
+class MITKQTHTML_EXPORT QmitkHtmlWidget : public QAbstractScrollArea
 {
   Q_OBJECT
 
@@ -91,69 +85,12 @@ protected:
   void leaveEvent(QEvent *event) override;
   void scrollContentsBy(int dx, int dy) override;
 
-  // litehtml::document_container
-  litehtml::uint_ptr create_font(const litehtml::font_description &descr, const litehtml::document *doc, litehtml::font_metrics *fm) override;
-  void delete_font(litehtml::uint_ptr hFont) override;
-  litehtml::pixel_t text_width(const char *text, litehtml::uint_ptr hFont) override;
-  void draw_text(litehtml::uint_ptr hdc, const char *text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position &pos) override;
-  litehtml::pixel_t pt_to_px(float pt) const override;
-  litehtml::pixel_t get_default_font_size() const override;
-  const char *get_default_font_name() const override;
-  void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker &marker) override;
-  void load_image(const char *src, const char *baseurl, bool redraw_on_ready) override;
-  void get_image_size(const char *src, const char *baseurl, litehtml::size &sz) override;
-  void draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const std::string &url, const std::string &base_url) override;
-  void draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::web_color &color) override;
-  void draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::background_layer::linear_gradient &gradient) override;
-  void draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::background_layer::radial_gradient &gradient) override;
-  void draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::background_layer::conic_gradient &gradient) override;
-  void draw_borders(litehtml::uint_ptr hdc, const litehtml::borders &borders, const litehtml::position &draw_pos, bool root) override;
-  void set_caption(const char *caption) override;
-  void set_base_url(const char *base_url) override;
-  void link(const std::shared_ptr<litehtml::document> &doc, const litehtml::element::ptr &el) override;
-  void on_anchor_click(const char *url, const litehtml::element::ptr &el) override;
-  void on_mouse_event(const litehtml::element::ptr &el, litehtml::mouse_event event) override;
-  void set_cursor(const char *cursor) override;
-  void transform_text(std::string &text, litehtml::text_transform tt) override;
-  void import_css(std::string &text, const std::string &url, std::string &baseurl) override;
-  void set_clip(const litehtml::position &pos, const litehtml::border_radiuses &bdr_radius) override;
-  void del_clip() override;
-  void get_viewport(litehtml::position &viewport) const override;
-  litehtml::element::ptr create_element(const char *tag_name, const litehtml::string_map &attributes, const std::shared_ptr<litehtml::document> &doc) override;
-  void get_media_features(litehtml::media_features &media) const override;
-  void get_language(std::string &language, std::string &culture) const override;
-
 private:
-  struct AnimatedImage
-  {
-    QMovie *movie;
-    QSize size;
-  };
-
-  QByteArray Fetch(const QUrl &url) const;
-  QUrl Resolve(const QString &src, const QString &baseUrl) const;
-  /** \brief Fetch and cache an image, as a QMovie if it is an animated GIF. */
-  void EnsureImage(const QString &key, const QUrl &url);
-  /** \brief The current frame of an animated image, or the static image. */
-  QImage CurrentFrame(const QString &key) const;
-  void ClearAnimations();
-  void ClearSvgImages();
-  void Render();
-  void UpdateScrollBars();
-
-  ResourceHandler m_ResourceHandler;
-  litehtml::document::ptr m_Document;
-  QUrl m_BaseUrl;
-  QString m_Caption;
-  std::string m_DefaultFontName;
-  qreal m_Zoom;
-  bool m_FitToContent;
-  QColor m_PageColor;
-
-  QHash<QString, QImage> m_Images;
-  QHash<QString, AnimatedImage> m_Animations;
-  QHash<QString, QSvgRenderer *> m_SvgImages;
-  QPainter *m_Painter;
+  // The litehtml document_container implementation lives in Impl so that
+  // litehtml stays out of this public header (and out of the module's public
+  // dependencies). See QmitkHtmlWidget.cpp.
+  class Impl;
+  std::unique_ptr<Impl> m_Impl;
 };
 
 #endif // QMITKHTMLWIDGET_H

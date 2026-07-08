@@ -16,6 +16,8 @@ found in the LICENSE file.
 
 #include <berryQtIntroPart.h>
 
+#include <QStringList>
+
 class QmitkHtmlWidget;
 class QWidget;
 
@@ -51,6 +53,7 @@ private:
 
   QWidget* m_TipsBox;
   QmitkHtmlWidget* m_TipView;
+  QStringList m_TipFiles;
   int m_CurrentTip;
 };
 

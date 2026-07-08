@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QmitkHtmlWidget.h>
 
 #include <QColor>
+#include <QDir>
 #include <QFile>
 #include <QFrame>
 #include <QHBoxLayout>
@@ -33,6 +34,7 @@ found in the LICENSE file.
 #include <QRandomGenerator>
 #include <QScrollArea>
 #include <QSizePolicy>
+#include <QStringList>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -53,71 +55,35 @@ namespace
     " color: #f1f1f1; font-size: 18px; padding: 6px 14px; }"
     "#welcomeContent #nextTipButton:hover { background-color: #f1f1f1; color: #252526; }";
 
-  // Colour of the tip card; the HTML tip view paints the same colour behind its
-  // content so it blends seamlessly into the rounded card.
+  // Colour of the tip card. The tip HTML view paints the same colour behind its
+  // content (SetPageColor) and tips.css uses it as the body background, so the
+  // card and the rendered tip blend seamlessly. Keep all three in sync.
   const QColor TIP_CARD_COLOR("#3f3f46");
 
-  // Style sheet for the HTML tip documents. Mirrors the look of the previous
-  // web-based welcome page, which flowed the images and the mouse-button grid
-  // more naturally than a widget layout could.
-  const char* TIP_STYLE =
-    "body { background-color: #3f3f46; color: #f1f1f1;"
-    " font-family: \"Roboto\", \"Open Sans\", sans-serif; font-size: 16px;"
-    " line-height: 1.25; margin: 0; }"
-    "h2 { font-size: 24px; margin: 0 0 8px 0; }"
-    "h3 { font-size: 18px; text-align: center; margin: 4px 0; }"
-    "p { margin: 8px 0; }"
-    ".tip-content { overflow: hidden; }"
-    ".center { display: block; margin: 0 auto; }"
-    ".cell { background-color: #2d2d30; padding: 8px 16px; vertical-align: top; }"
-    ".float-left { float: left; margin-right: 32px; }";
+  // The welcome tips are standalone HTML documents in the plug-in resources.
+  // Whatever *.html files exist here become the tips, so one can be added or
+  // removed without touching this code (it only needs a matching .qrc entry).
+  const QString TIP_DIR = QStringLiteral(":/org.mitk.gui.qt.welcomescreen/tips");
 
-  const char* TIP_BODIES[] =
+  QStringList FindTipDocuments()
   {
-    "<h2>Mouse navigation</h2>"
-    "<div class=\"tip-content\">"
-    "<img class=\"center\" style=\"width: 50%\" alt=\"Crosshair\" src=\"img/mousenavigation/crosshair.svg\">"
-    "<p>Your images are typically shown from three different view directions at once: "
-    "axial, sagittal, and coronal. Together, the view planes resemble the shape of a "
-    "three-dimensional crosshair slicing through your image data. Use the mouse to "
-    "navigate in these views.</p>"
-    "<table cellspacing=\"16\" cellpadding=\"0\" width=\"100%\" style=\"table-layout: fixed;\"><tr>"
-    "<td class=\"cell\"><h3>Focus</h3>"
-    "<img style=\"width: 100%\" alt=\"Left mouse button\" src=\"img/mousenavigation/click.svg\">"
-    "<p>Use the left mouse button to focus all views on the clicked position.</p></td>"
-    "<td class=\"cell\"><h3>Zoom</h3>"
-    "<img style=\"width: 100%\" alt=\"Right mouse button\" src=\"img/mousenavigation/zoom.svg\">"
-    "<p>Press and hold the right mouse button and move the mouse up and down to zoom in and out.</p></td>"
-    "<td class=\"cell\"><h3>Pan</h3>"
-    "<img style=\"width: 100%\" alt=\"Middle mouse button\" src=\"img/mousenavigation/pan.svg\">"
-    "<p>Press and hold the middle mouse button and move the mouse to pan around.</p></td>"
-    "<td class=\"cell\"><h3>Scroll</h3>"
-    "<img style=\"width: 100%\" alt=\"Scroll wheel\" src=\"img/mousenavigation/scroll.svg\">"
-    "<p>Use the scroll wheel to scroll through slices along the view's direction.</p></td>"
-    "</tr></table>"
-    "</div>",
+    QStringList tips;
+    const QDir dir(TIP_DIR);
 
-    "<h2>Image contrast</h2>"
-    "<div class=\"tip-content\">"
-    "<img class=\"float-left\" style=\"width: 40%\" alt=\"Standard display with level window\" src=\"img/levelwindow/standarddisplay.svg\">"
-    "<p>For images, a vertical scale is shown right next to the views. "
-    "It is called the <b>level window</b>.</p>"
-    "<p>The values shown in the level window represent the pixel intensities of an image. "
-    "The blue bar defines the range of pixel intensities that is mapped onto the whole "
-    "range of displayable pixel brightness. Hence, a shorter range of pixel intensities "
-    "results in higher displayed image contrast.</p>"
-    "<p>Grab the blue bar to move it up and down.<br>"
-    "Grab the tips of the blue bar to change its size.</p>"
-    "<p>Right-click on the level window for many more options.</p>"
-    "</div>"
-  };
+    for (const QString& name : dir.entryList({QStringLiteral("*.html")}, QDir::Files, QDir::Name))
+      tips.append(dir.filePath(name));
 
-  const int TIP_COUNT = static_cast<int>(sizeof(TIP_BODIES) / sizeof(TIP_BODIES[0]));
+    return tips;
+  }
 
-  QString BuildTipDocument(const char* body)
+  QString ReadResource(const QString& path)
   {
-    return QStringLiteral("<html><head><style>%1</style></head><body>%2</body></html>")
-      .arg(QLatin1String(TIP_STYLE), QLatin1String(body));
+    QFile file(path);
+
+    if (file.open(QIODevice::ReadOnly))
+      return QString::fromUtf8(file.readAll());
+
+    return QString();
   }
 
   QLabel* CreateLabel(const QString& text, const QString& objectName = QString())
@@ -135,6 +101,7 @@ namespace
 QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
   : m_TipsBox(nullptr),
     m_TipView(nullptr),
+    m_TipFiles(FindTipDocuments()),
     m_CurrentTip(0)
 {
   auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
@@ -274,18 +241,20 @@ void QmitkMitkWorkbenchIntroPart::ApplyTipsPreference()
   auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.qt.extapplicationintro");
   const bool showTips = prefs->GetBool("show tips", true);
 
-  if (showTips)
-    this->ShowTip(QRandomGenerator::global()->bounded(TIP_COUNT));
+  if (showTips && !m_TipFiles.isEmpty())
+    this->ShowTip(QRandomGenerator::global()->bounded(m_TipFiles.size()));
 
   m_TipsBox->setVisible(showTips);
 }
 
 void QmitkMitkWorkbenchIntroPart::ShowTip(int index)
 {
-  if (TIP_COUNT == 0)
+  const int count = m_TipFiles.size();
+
+  if (count == 0)
     return;
 
-  m_CurrentTip = ((index % TIP_COUNT) + TIP_COUNT) % TIP_COUNT;
-  m_TipView->SetHtml(BuildTipDocument(TIP_BODIES[m_CurrentTip]),
+  m_CurrentTip = ((index % count) + count) % count;
+  m_TipView->SetHtml(ReadResource(m_TipFiles[m_CurrentTip]),
     QUrl(QStringLiteral("qrc:/org.mitk.gui.qt.welcomescreen/")));
 }

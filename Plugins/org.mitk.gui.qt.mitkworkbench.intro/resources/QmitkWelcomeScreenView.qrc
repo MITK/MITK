@@ -6,5 +6,8 @@
         <file>img/mousenavigation/pan.svg</file>
         <file>img/mousenavigation/scroll.svg</file>
         <file>img/mousenavigation/zoom.svg</file>
+        <file>tips/tips.css</file>
+        <file>tips/image-contrast.html</file>
+        <file>tips/mouse-navigation.html</file>
     </qresource>
 </RCC>

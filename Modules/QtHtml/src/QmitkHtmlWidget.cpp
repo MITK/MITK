@@ -13,6 +13,8 @@ found in the LICENSE file.
 
 #include "QmitkHtmlWidget.h"
 
+#include <litehtml/el_image.h>
+
 #include <QApplication>
 #include <QBuffer>
 #include <QConicalGradient>
@@ -25,6 +27,9 @@ found in the LICENSE file.
 #include <QRadialGradient>
 #include <QScrollBar>
 #include <QSvgRenderer>
+
+#include <cmath>
+#include <cstring>
 
 namespace
 {
@@ -579,18 +584,50 @@ void QmitkHtmlWidget::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
 
   auto *painter = reinterpret_cast<QPainter *>(hdc);
 
-  const auto svg = m_SvgImages.constFind(key);
-  if (svg != m_SvgImages.constEnd())
-  {
-    svg.value()->render(painter, toRectF(layer.border_box));
+  // litehtml reports a single tile's placement in origin_box (position and size
+  // after background-size/position) and the paintable area in clip_box;
+  // border_box carries only the border radius. Draw the tile at its own size and
+  // repeat it across clip_box, instead of stretching one copy over the box.
+  const QRectF tile = toRectF(layer.origin_box);
+  const QRectF clip = toRectF(layer.clip_box);
+  if (tile.width() <= 0.0 || tile.height() <= 0.0)
     return;
+
+  QSvgRenderer *svg = m_SvgImages.value(key, nullptr);
+  QImage image;
+  if (svg == nullptr)
+  {
+    image = this->CurrentFrame(key);
+    if (image.isNull())
+      return;
   }
 
-  const QImage image = this->CurrentFrame(key);
-  if (image.isNull())
-    return;
+  const bool repeatX = layer.repeat == litehtml::background_repeat_repeat || layer.repeat == litehtml::background_repeat_repeat_x;
+  const bool repeatY = layer.repeat == litehtml::background_repeat_repeat || layer.repeat == litehtml::background_repeat_repeat_y;
 
-  painter->drawImage(toRectF(layer.border_box), image);
+  // When repeating, back the first tile up to just before the clip box so the
+  // pattern stays anchored on origin_box; otherwise draw the single tile only.
+  const qreal firstX = repeatX ? tile.x() - std::ceil((tile.x() - clip.left()) / tile.width()) * tile.width() : tile.x();
+  const qreal firstY = repeatY ? tile.y() - std::ceil((tile.y() - clip.top()) / tile.height()) * tile.height() : tile.y();
+  const qreal lastX = repeatX ? clip.right() : tile.x();
+  const qreal lastY = repeatY ? clip.bottom() : tile.y();
+
+  painter->save();
+  painter->setClipRect(clip, Qt::IntersectClip);
+
+  for (qreal y = firstY; y <= lastY; y += tile.height())
+  {
+    for (qreal x = firstX; x <= lastX; x += tile.width())
+    {
+      const QRectF target(x, y, tile.width(), tile.height());
+      if (svg != nullptr)
+        svg->render(painter, target);
+      else
+        painter->drawImage(target, image);
+    }
+  }
+
+  painter->restore();
 }
 
 void QmitkHtmlWidget::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::web_color &color)
@@ -737,8 +774,25 @@ void QmitkHtmlWidget::get_viewport(litehtml::position &viewport) const
   viewport.height = static_cast<litehtml::pixel_t>(this->viewport()->height() / m_Zoom);
 }
 
-litehtml::element::ptr QmitkHtmlWidget::create_element(const char *, const litehtml::string_map &, const std::shared_ptr<litehtml::document> &)
+litehtml::element::ptr QmitkHtmlWidget::create_element(const char *tag_name, const litehtml::string_map &attributes, const std::shared_ptr<litehtml::document> &doc)
 {
+  // Doxygen embeds SVG figures as <object type="image/svg+xml" data="...">, and
+  // litehtml has no <object> element (it would fall back to a plain container
+  // that reserves no space and draws nothing). Map an image object onto the
+  // built-in image element, copying the data attribute to src.
+  if (std::strcmp(tag_name, "object") == 0)
+  {
+    const auto type = attributes.find("type");
+    const auto data = attributes.find("data");
+
+    if (type != attributes.end() && data != attributes.end() && type->second.starts_with("image/"))
+    {
+      auto image = std::make_shared<litehtml::el_image>(doc);
+      image->set_attr("src", data->second.c_str());
+      return image;
+    }
+  }
+
   // Returning nullptr makes litehtml use its built-in element implementations.
   return nullptr;
 }

@@ -15,39 +15,26 @@ found in the LICENSE file.
 
 #include <QmitkPlotWidget.h>
 
+#include "QmitkImageStatisticsPlotHelper.h"
+
 #include <qwt_picker_machine.h>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_item.h>
-#include <qwt_plot_magnifier.h>
-#include <qwt_plot_panner.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
-#include <qwt_scale_widget.h>
 #include <qwt_series_data.h>
 #include <qwt_text.h>
 
 #include <QApplication>
-#include <QBrush>
 #include <QClipboard>
 #include <QColor>
-#include <QPalette>
 #include <QPen>
 #include <QVBoxLayout>
 
 namespace
 {
   const QColor LINE_COLOR(0x4a, 0x90, 0xd9);
-  const QColor HIGHLIGHT_COLOR(0x9e, 0xce, 0xf5);
-
-  QwtText MakeTooltip(const QString& text)
-  {
-    QwtText tooltip(text);
-    tooltip.setColor(Qt::white);
-    tooltip.setBackgroundBrush(QBrush(QColor(0, 0, 0, 180)));
-    tooltip.setRenderFlags(Qt::AlignLeft | Qt::AlignVCenter);
-    return tooltip;
-  }
 
   /** Shows the intensity at the hovered sample as a tracker tooltip. */
   class ProfilePicker : public QwtPlotPicker
@@ -74,34 +61,12 @@ namespace
 
       const int index = qBound(0, qRound(pos.x()), static_cast<int>(data->size()) - 1);
       const QPointF point = data->sample(index);
-      return MakeTooltip(QString("Distance: %1\nIntensity: %2").arg(point.x()).arg(point.y()));
+      return QmitkImageStatisticsPlot::MakeTooltip(QString("Distance: %1\nIntensity: %2").arg(point.x()).arg(point.y()));
     }
 
   private:
     QwtPlot* m_Plot;
   };
-
-  /** Adds interactive navigation: left-drag box zoom (right-click to zoom out),
-      middle-drag pan, and mouse-wheel zoom. Returns the zoomer so its base can
-      be re-synced to the data range. */
-  QwtPlotZoomer* SetupNavigation(QwtPlot* plot)
-  {
-    auto* zoomer = new QwtPlotZoomer(plot->canvas());
-    zoomer->setTrackerMode(QwtPicker::AlwaysOff);
-    zoomer->setRubberBandPen(QPen(HIGHLIGHT_COLOR));
-    // Free the middle button (default zoom-stack navigation) for panning: move
-    // stepwise zoom-out to the right button and zoom-to-base to Ctrl+right.
-    zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
-    zoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
-
-    auto* panner = new QwtPlotPanner(plot->canvas());
-    panner->setMouseButton(Qt::MiddleButton);
-
-    auto* magnifier = new QwtPlotMagnifier(plot->canvas());
-    magnifier->setMouseButton(Qt::NoButton);
-
-    return zoomer;
-  }
 }
 
 QmitkIntensityProfileVisualizationWidget::QmitkIntensityProfileVisualizationWidget(QWidget* parent)
@@ -118,7 +83,7 @@ QmitkIntensityProfileVisualizationWidget::QmitkIntensityProfileVisualizationWidg
 
   new ProfilePicker(m_PlotWidget->GetPlot());
 
-  m_Zoomer = SetupNavigation(m_PlotWidget->GetPlot());
+  m_Zoomer = QmitkImageStatisticsPlot::SetupNavigation(m_PlotWidget->GetPlot());
 
   auto* layout = new QVBoxLayout(m_Controls->plotContainer);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -183,21 +148,7 @@ void QmitkIntensityProfileVisualizationWidget::SetTheme(QmitkPlotStyle style)
 
 void QmitkIntensityProfileVisualizationWidget::ApplyTheme()
 {
-  const bool dark = m_Style == QmitkPlotStyle::Dark;
-  const QColor background = dark ? QColor(0x2d, 0x2d, 0x30) : QColor(Qt::white);
-  const QColor foreground = dark ? QColor(0xf1, 0xf1, 0xf1) : QColor(Qt::black);
-
-  QwtPlot* plot = m_PlotWidget->GetPlot();
-  plot->setCanvasBackground(background);
-
-  QPalette palette = plot->palette();
-  palette.setColor(QPalette::WindowText, foreground);
-  palette.setColor(QPalette::Text, foreground);
-  plot->setPalette(palette);
-  plot->axisWidget(QwtPlot::xBottom)->setPalette(palette);
-  plot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
-
-  plot->replot();
+  QmitkImageStatisticsPlot::ApplyTheme(m_PlotWidget->GetPlot(), m_Style);
 }
 
 void QmitkIntensityProfileVisualizationWidget::CreateConnections()

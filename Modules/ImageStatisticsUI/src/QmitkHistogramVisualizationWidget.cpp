@@ -13,18 +13,17 @@ found in the LICENSE file.
 #include <QmitkHistogramVisualizationWidget.h>
 #include <ui_QmitkHistogramVisualizationWidget.h>
 
+#include "QmitkImageStatisticsPlotHelper.h"
+
 #include <qwt_interval.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_histogram.h>
 #include <qwt_plot_item.h>
-#include <qwt_plot_magnifier.h>
-#include <qwt_plot_panner.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_samples.h>
-#include <qwt_scale_widget.h>
 #include <qwt_series_data.h>
 #include <qwt_text.h>
 
@@ -34,7 +33,6 @@ found in the LICENSE file.
 #include <QColor>
 #include <QEvent>
 #include <QMouseEvent>
-#include <QPalette>
 #include <QPen>
 #include <QVBoxLayout>
 #include <QVector>
@@ -44,7 +42,6 @@ found in the LICENSE file.
 namespace
 {
   const QColor BAR_COLOR(0x4a, 0x90, 0xd9);
-  const QColor HIGHLIGHT_COLOR(0x9e, 0xce, 0xf5);
 
   QVector<QwtIntervalSample> ToIntervalSamples(itk::Statistics::Histogram<double>::ConstPointer histogram)
   {
@@ -61,13 +58,27 @@ namespace
     return samples;
   }
 
-  QwtText MakeTooltip(const QString& text)
+  // Bins are contiguous and ascending, so a binary search finds the hovered
+  // bin without scanning every sample (a histogram can hold thousands of bins).
+  int FindBin(const QwtSeriesData<QwtIntervalSample>* data, double x)
   {
-    QwtText tooltip(text);
-    tooltip.setColor(Qt::white);
-    tooltip.setBackgroundBrush(QBrush(QColor(0, 0, 0, 180)));
-    tooltip.setRenderFlags(Qt::AlignLeft | Qt::AlignVCenter);
-    return tooltip;
+    int lo = 0;
+    int hi = static_cast<int>(data->size()) - 1;
+
+    while (lo <= hi)
+    {
+      const int mid = (lo + hi) / 2;
+      const QwtInterval interval = data->sample(mid).interval;
+
+      if (x < interval.minValue())
+        hi = mid - 1;
+      else if (x > interval.maxValue())
+        lo = mid + 1;
+      else
+        return mid;
+    }
+
+    return -1;
   }
 
   /** Shows the hovered bin's gray-value range and frequency as a tracker tooltip. */
@@ -89,12 +100,12 @@ namespace
       {
         const auto* histogram = static_cast<const QwtPlotHistogram*>(plotItem);
         const QwtSeriesData<QwtIntervalSample>* data = histogram->data();
-        for (size_t i = 0; i < data->size(); ++i)
+        const int bin = FindBin(data, pos.x());
+        if (bin >= 0)
         {
-          const QwtIntervalSample sample = data->sample(i);
-          if (sample.interval.contains(pos.x()))
-            return MakeTooltip(QString("Gray value: [%1, %2]\nFrequency: %3")
-              .arg(sample.interval.minValue()).arg(sample.interval.maxValue()).arg(sample.value));
+          const QwtIntervalSample sample = data->sample(bin);
+          return QmitkImageStatisticsPlot::MakeTooltip(QString("Gray value: [%1, %2]\nFrequency: %3")
+            .arg(sample.interval.minValue()).arg(sample.interval.maxValue()).arg(sample.value));
         }
       }
       return QwtText();
@@ -103,28 +114,6 @@ namespace
   private:
     QwtPlot* m_Plot;
   };
-
-  /** Adds interactive navigation: left-drag box zoom (right-click to zoom out),
-      middle-drag pan, and mouse-wheel zoom. Returns the zoomer so its base can
-      be re-synced to the data range. */
-  QwtPlotZoomer* SetupNavigation(QwtPlot* plot)
-  {
-    auto* zoomer = new QwtPlotZoomer(plot->canvas());
-    zoomer->setTrackerMode(QwtPicker::AlwaysOff);
-    zoomer->setRubberBandPen(QPen(HIGHLIGHT_COLOR));
-    // Free the middle button (default zoom-stack navigation) for panning: move
-    // stepwise zoom-out to the right button and zoom-to-base to Ctrl+right.
-    zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
-    zoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
-
-    auto* panner = new QwtPlotPanner(plot->canvas());
-    panner->setMouseButton(Qt::MiddleButton);
-
-    auto* magnifier = new QwtPlotMagnifier(plot->canvas());
-    magnifier->setMouseButton(Qt::NoButton);
-
-    return zoomer;
-  }
 }
 
 QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* parent)
@@ -149,8 +138,8 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
 
   m_HighlightItem = new QwtPlotHistogram;
   m_HighlightItem->setStyle(QwtPlotHistogram::Columns);
-  m_HighlightItem->setBrush(HIGHLIGHT_COLOR);
-  m_HighlightItem->setPen(QPen(HIGHLIGHT_COLOR));
+  m_HighlightItem->setBrush(QmitkImageStatisticsPlot::HIGHLIGHT_COLOR);
+  m_HighlightItem->setPen(QPen(QmitkImageStatisticsPlot::HIGHLIGHT_COLOR));
   m_HighlightItem->setZ(1000);
   m_HighlightItem->attach(m_Plot);
 
@@ -158,7 +147,7 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
   m_Plot->canvas()->installEventFilter(this);
   m_Plot->canvas()->setMouseTracking(true);
 
-  m_Zoomer = SetupNavigation(m_Plot);
+  m_Zoomer = QmitkImageStatisticsPlot::SetupNavigation(m_Plot);
 
   auto* layout = new QVBoxLayout(m_Controls->plotContainer);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -248,20 +237,7 @@ void QmitkHistogramVisualizationWidget::SetTheme(QmitkPlotStyle style)
 
 void QmitkHistogramVisualizationWidget::ApplyTheme()
 {
-  const bool dark = m_Style == QmitkPlotStyle::Dark;
-  const QColor background = dark ? QColor(0x2d, 0x2d, 0x30) : QColor(Qt::white);
-  const QColor foreground = dark ? QColor(0xf1, 0xf1, 0xf1) : QColor(Qt::black);
-
-  m_Plot->setCanvasBackground(background);
-
-  QPalette palette = m_Plot->palette();
-  palette.setColor(QPalette::WindowText, foreground);
-  palette.setColor(QPalette::Text, foreground);
-  m_Plot->setPalette(palette);
-  m_Plot->axisWidget(QwtPlot::xBottom)->setPalette(palette);
-  m_Plot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
-
-  m_Plot->replot();
+  QmitkImageStatisticsPlot::ApplyTheme(m_Plot, m_Style);
 }
 
 void QmitkHistogramVisualizationWidget::OnHover(const QPointF& pos)
@@ -272,18 +248,13 @@ void QmitkHistogramVisualizationWidget::OnHover(const QPointF& pos)
   for (const auto& entry : m_HistogramItems)
   {
     const QwtSeriesData<QwtIntervalSample>* data = entry.second->data();
-    for (size_t i = 0; i < data->size(); ++i)
+    const int bin = FindBin(data, pos.x());
+    if (bin >= 0)
     {
-      const QwtIntervalSample sample = data->sample(i);
-      if (sample.interval.contains(pos.x()))
-      {
-        hovered = sample;
-        found = true;
-        break;
-      }
-    }
-    if (found)
+      hovered = data->sample(bin);
+      found = true;
       break;
+    }
   }
 
   const bool hasHighlight = m_HighlightItem->data()->size() > 0;

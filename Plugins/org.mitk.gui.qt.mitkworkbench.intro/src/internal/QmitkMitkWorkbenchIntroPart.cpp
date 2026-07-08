@@ -76,14 +76,14 @@ namespace
     return tips;
   }
 
-  QString ReadResource(const QString& path)
+  QByteArray ReadResource(const QString& path)
   {
     QFile file(path);
 
     if (file.open(QIODevice::ReadOnly))
-      return QString::fromUtf8(file.readAll());
+      return file.readAll();
 
-    return QString();
+    return QByteArray();
   }
 
   QLabel* CreateLabel(const QString& text, const QString& objectName = QString())
@@ -178,12 +178,7 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
   m_TipView->SetPageColor(TIP_CARD_COLOR);
   m_TipView->SetResourceHandler([](const QUrl& url) -> QByteArray
   {
-    QFile file(QLatin1Char(':') + url.path());
-
-    if (file.open(QIODevice::ReadOnly))
-      return file.readAll();
-
-    return QByteArray();
+    return ReadResource(QLatin1Char(':') + url.path());
   });
 
   auto* nextTip = new QPushButton(QString("Next tip ") + QChar(0x00BB));
@@ -255,6 +250,6 @@ void QmitkMitkWorkbenchIntroPart::ShowTip(int index)
     return;
 
   m_CurrentTip = ((index % count) + count) % count;
-  m_TipView->SetHtml(ReadResource(m_TipFiles[m_CurrentTip]),
+  m_TipView->SetHtml(QString::fromUtf8(ReadResource(m_TipFiles[m_CurrentTip])),
     QUrl(QStringLiteral("qrc:/org.mitk.gui.qt.welcomescreen/")));
 }

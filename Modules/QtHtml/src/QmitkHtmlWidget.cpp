@@ -84,6 +84,9 @@ void QmitkHtmlWidget::SetResourceHandler(const ResourceHandler &handler)
 void QmitkHtmlWidget::SetHtml(const QString &html, const QUrl &baseUrl)
 {
   m_BaseUrl = baseUrl;
+  // litehtml only calls set_caption when the document has a <title>, so clear
+  // the previous title up front or a title-less page keeps reporting the old one.
+  m_Caption.clear();
   m_Images.clear();
   this->ClearAnimations();
   this->ClearSvgImages();
@@ -187,13 +190,21 @@ QByteArray QmitkHtmlWidget::Fetch(const QUrl &url) const
   // so decode them here instead of routing them to the resource handler.
   if (url.scheme() == QLatin1String("data"))
   {
-    const QString path = url.path(QUrl::FullyDecoded);
-    const int comma = path.indexOf(QLatin1Char(','));
+    // QUrl parses a data: payload like a normal URL, so an unencoded '?' or '#'
+    // inside it (e.g. an inline SVG referencing url(#gradient)) is split off as
+    // query/fragment. Reassemble the parts to recover the original payload.
+    QString content = url.path(QUrl::FullyDecoded);
+    if (url.hasQuery())
+      content += QLatin1Char('?') + url.query(QUrl::FullyDecoded);
+    if (url.hasFragment())
+      content += QLatin1Char('#') + url.fragment(QUrl::FullyDecoded);
+
+    const int comma = content.indexOf(QLatin1Char(','));
     if (comma < 0)
       return QByteArray();
 
-    const QString meta = path.left(comma);
-    const QString payload = path.mid(comma + 1);
+    const QString meta = content.left(comma);
+    const QString payload = content.mid(comma + 1);
 
     return meta.contains(QLatin1String(";base64"))
       ? QByteArray::fromBase64(payload.toUtf8())
@@ -593,6 +604,12 @@ void QmitkHtmlWidget::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
   if (tile.width() <= 0.0 || tile.height() <= 0.0)
     return;
 
+  // Clamp the tile step to a full pixel. A degenerate sub-pixel tile (e.g. a
+  // zero-intrinsic-size SVG used as a repeating background) would otherwise
+  // make the repeat loop below run for millions of iterations and freeze the UI.
+  const qreal stepX = qMax(tile.width(), 1.0);
+  const qreal stepY = qMax(tile.height(), 1.0);
+
   QSvgRenderer *svg = m_SvgImages.value(key, nullptr);
   QImage image;
   if (svg == nullptr)
@@ -607,19 +624,19 @@ void QmitkHtmlWidget::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
 
   // When repeating, back the first tile up to just before the clip box so the
   // pattern stays anchored on origin_box; otherwise draw the single tile only.
-  const qreal firstX = repeatX ? tile.x() - std::ceil((tile.x() - clip.left()) / tile.width()) * tile.width() : tile.x();
-  const qreal firstY = repeatY ? tile.y() - std::ceil((tile.y() - clip.top()) / tile.height()) * tile.height() : tile.y();
+  const qreal firstX = repeatX ? tile.x() - std::ceil((tile.x() - clip.left()) / stepX) * stepX : tile.x();
+  const qreal firstY = repeatY ? tile.y() - std::ceil((tile.y() - clip.top()) / stepY) * stepY : tile.y();
   const qreal lastX = repeatX ? clip.right() : tile.x();
   const qreal lastY = repeatY ? clip.bottom() : tile.y();
 
   painter->save();
   painter->setClipRect(clip, Qt::IntersectClip);
 
-  for (qreal y = firstY; y <= lastY; y += tile.height())
+  for (qreal y = firstY; y <= lastY; y += stepY)
   {
-    for (qreal x = firstX; x <= lastX; x += tile.width())
+    for (qreal x = firstX; x <= lastX; x += stepX)
     {
-      const QRectF target(x, y, tile.width(), tile.height());
+      const QRectF target(x, y, stepX, stepY);
       if (svg != nullptr)
         svg->render(painter, target);
       else
@@ -749,6 +766,11 @@ void QmitkHtmlWidget::import_css(std::string &text, const std::string &url, std:
   const QUrl resolved = this->Resolve(QString::fromStdString(url), QString::fromStdString(baseurl));
   const QByteArray data = this->Fetch(resolved);
   text.assign(data.constData(), static_cast<std::size_t>(data.size()));
+
+  // baseurl is an in/out parameter: litehtml resolves url()/@import inside this
+  // sheet against it, so hand back the sheet's own location (empty on input for
+  // a <link>) instead of leaving relative resources to resolve against the page.
+  baseurl = resolved.toString().toStdString();
 }
 
 void QmitkHtmlWidget::set_clip(const litehtml::position &pos, const litehtml::border_radiuses &)

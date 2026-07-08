@@ -142,12 +142,6 @@
         categoryId="org.blueberry.ui.category.edit"
         id="org.blueberry.ui.edit.delete" />
 
-     <command
-       name="Help Contents"
-       description="Open the help contents"
-       categoryId="org.blueberry.ui.category.help"
-       defaultHandler="berry::HelpContentsHandler"
-       id="org.blueberry.ui.help.helpContents" />
      <!--
      <command
        name="Help Search"
@@ -350,20 +344,6 @@
            <!-- this is a workaround to evaluate the expression -->
            <with variable="activePart">
              <instanceof value="berry::IWorkbenchPart"/>
-           </with>
-         </or>
-       </enabledWhen>
-     </handler>
-     <handler
-       class="berry::HelpContentsHandler"
-       commandId="org.blueberry.ui.help.helpContents">
-       <enabledWhen>
-         <or>
-           <with variable="org.blueberry.core.runtime.Platform">
-             <test property="org.blueberry.core.runtime.pluginState" args="org.blueberry.ui.qt.help" value="STARTING"/>
-           </with>
-           <with variable="org.blueberry.core.runtime.Platform">
-             <test property="org.blueberry.core.runtime.pluginState" args="org.blueberry.ui.qt.help" value="ACTIVE"/>
            </with>
          </or>
        </enabledWhen>

@@ -199,7 +199,6 @@ berry::SmartPointer<berry::MenuManager> QmitkExtActionBarAdvisor::CreateHelpMenu
   }
   menu->Add(berry::IContributionItem::Pointer(new berry::GroupMarker("group.intro.ext")));
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator("group.main")));
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_HELP_CONTENTS, "Help &Contents"));
   //menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_HELP_SEARCH, "Help Search"));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_DYNAMIC_HELP, "Conte&xt Help", "", QIcon(), QKeySequence::HelpContents));
   menu->Add(berry::IContributionItem::Pointer(new berry::GroupMarker(berry::WorkbenchActionConstants::HELP_END)));

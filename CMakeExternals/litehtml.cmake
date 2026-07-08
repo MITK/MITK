@@ -38,8 +38,11 @@ if(MITK_USE_litehtml)
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
         # Build the bundled gumbo parser (no system dependency) and link
-        # everything statically into the help plugin.
+        # everything statically into the MitkQtHtml module. That module is a
+        # shared library, so the static archive must be position independent;
+        # a static build, unlike a shared one, does not get -fPIC by default.
         -DBUILD_SHARED_LIBS:BOOL=OFF
+        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
         -DEXTERNAL_GUMBO:BOOL=OFF
         -DLITEHTML_BUILD_TESTING:BOOL=OFF
         # LITEHTML_ENABLE_LINT turns clang-tidy findings into build errors when

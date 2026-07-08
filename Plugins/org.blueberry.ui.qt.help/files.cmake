@@ -3,15 +3,11 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  berryHelpContentView.cpp
   berryHelpEditor.cpp
-  berryHelpEditorFindWidget.cpp
   berryHelpEditorInput.cpp
   berryHelpEditorInputFactory.cpp
   berryHelpIndexView.cpp
-  berryHelpPerspective.cpp
   berryHelpPluginActivator.cpp
-  berryHelpSearchView.cpp
   berryHelpTopicChooser.cpp
   berryHelpWebView.cpp
 
@@ -20,14 +16,10 @@ set(INTERNAL_CPP_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/berryHelpContentView.h
   src/internal/berryHelpEditor.h
-  src/internal/berryHelpEditorFindWidget.h
   src/internal/berryHelpEditorInputFactory.h
   src/internal/berryHelpIndexView.h
-  src/internal/berryHelpPerspective.h
   src/internal/berryHelpPluginActivator.h
-  src/internal/berryHelpSearchView.h
   src/internal/berryHelpTopicChooser.h
   src/internal/berryHelpWebView.h
 
@@ -39,7 +31,6 @@ set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/help.svg
   resources/helpIndex.svg
-  resources/helpSearch.svg
 )
 
 set(QRC_FILES

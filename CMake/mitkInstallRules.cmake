@@ -70,7 +70,7 @@ foreach(_bindir _fwdir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_INSTALL_FRA
 endforeach()
 
 #-----------------------------------------------------------------------------
-# Deploy Qt runtime dependencies (plugins, qt.conf, WebEngine resources).
+# Deploy Qt runtime dependencies (plugins, qt.conf).
 #
 # This runs AFTER install(RUNTIME_DEPENDENCY_SET) so that windeployqt can see
 # all MITK DLLs in bin/ and correctly trace their transitive Qt dependencies.

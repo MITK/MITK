@@ -20,12 +20,11 @@ found in the LICENSE file.
 
 #include <berryIWorkbenchPage.h>
 
-#include <ctkSearchBox.h>
-
 #include <QHelpIndexWidget>
 #include <QHelpLink>
 #include <QLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QKeyEvent>
 
@@ -102,8 +101,8 @@ void HelpIndexView::CreateQtPartControl(QWidget* parent)
     //QLabel *l = new QLabel(tr("&Look for:"));
     //layout->addWidget(l);
 
-    m_SearchLineEdit = new ctkSearchBox(parent);
-    m_SearchLineEdit->setClearIcon(QIcon(":/org.blueberry.ui.qt.help/clear.png"));
+    m_SearchLineEdit = new QLineEdit(parent);
+    m_SearchLineEdit->setClearButtonEnabled(true);
     m_SearchLineEdit->setPlaceholderText("Filter...");
     m_SearchLineEdit->setContentsMargins(2,2,2,0);
     //l->setBuddy(m_SearchLineEdit);
@@ -127,6 +126,10 @@ void HelpIndexView::CreateQtPartControl(QWidget* parent)
             SLOT(disableSearchLineEdit()));
     connect(helpEngine.indexModel(), SIGNAL(indexCreated()), this,
             SLOT(enableSearchLineEdit()));
+    connect(helpEngine.indexModel(), SIGNAL(indexCreated()), this,
+            SLOT(buildKeywordMap()));
+    connect(&helpEngine, SIGNAL(currentPageChanged(QUrl)), this,
+            SLOT(syncSelectionToUrl(QUrl)));
     connect(m_IndexWidget, SIGNAL(linkActivated(QUrl,QString)), this,
             SLOT(linkActivated(QUrl)));
     connect(m_IndexWidget, SIGNAL(linksActivated(QMap<QString,QUrl>,QString)),
@@ -217,6 +220,12 @@ bool HelpIndexView::eventFilter(QObject *obj, QEvent *e)
       {
         open(m_IndexWidget, idx);
       }
+      else if (button == Qt::LeftButton)
+      {
+        // A plain single click opens the manual in the current editor.
+        m_IndexWidget->setCurrentIndex(idx);
+        m_IndexWidget->activateCurrentItem();
+      }
     }
   }
 #ifdef Q_OS_MAC
@@ -249,6 +258,61 @@ void HelpIndexView::setIndexWidgetBusy()
 void HelpIndexView::unsetIndexWidgetBusy()
 {
   m_IndexWidget->unsetCursor();
+}
+
+void HelpIndexView::buildKeywordMap()
+{
+  m_UrlToKeyword.clear();
+
+  QAbstractItemModel *model = m_IndexWidget->model();
+  if (model == nullptr)
+    return;
+
+  QHelpEngineWrapper &helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
+
+  const int rows = model->rowCount();
+  for (int row = 0; row < rows; ++row)
+  {
+    const QString keyword = model->index(row, 0).data(Qt::DisplayRole).toString();
+    for (const auto &link : helpEngine.documentsForKeyword(keyword))
+    {
+      QUrl url = link.url;
+      url.setFragment(QString());
+      m_UrlToKeyword.insert(url.toString(), keyword);
+    }
+  }
+}
+
+void HelpIndexView::syncSelectionToUrl(const QUrl &url)
+{
+  // The index may already have been built before this view connected.
+  if (m_UrlToKeyword.isEmpty())
+    this->buildKeywordMap();
+
+  QUrl pageUrl = url;
+  pageUrl.setFragment(QString());
+
+  const auto it = m_UrlToKeyword.constFind(pageUrl.toString());
+  if (it == m_UrlToKeyword.constEnd())
+    return;
+
+  QAbstractItemModel *model = m_IndexWidget->model();
+  if (model == nullptr)
+    return;
+
+  const int rows = model->rowCount();
+  for (int row = 0; row < rows; ++row)
+  {
+    const QModelIndex index = model->index(row, 0);
+    if (index.data(Qt::DisplayRole).toString() == it.value())
+    {
+      // setCurrentIndex is silent, so this only highlights the keyword
+      // and does not trigger another navigation.
+      m_IndexWidget->setCurrentIndex(index);
+      m_IndexWidget->scrollTo(index);
+      return;
+    }
+  }
 }
 
 void HelpIndexView::setSearchLineEditText(const QString &text)

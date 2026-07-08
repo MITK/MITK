@@ -21,7 +21,9 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
 {
   QString editorArea = layout->GetEditorArea();
 
-  layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.21f, editorArea);
+  auto leftFolder = layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.21f, editorArea);
+  leftFolder->AddView("org.mitk.views.datamanager");
+  leftFolder->AddPlaceholder("org.blueberry.views.helpindex");
 
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.datamanager");
   lo->SetCloseable(false);

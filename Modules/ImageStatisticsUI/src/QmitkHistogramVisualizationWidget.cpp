@@ -13,23 +13,160 @@ found in the LICENSE file.
 #include <QmitkHistogramVisualizationWidget.h>
 #include <ui_QmitkHistogramVisualizationWidget.h>
 
+#include <qwt_interval.h>
+#include <qwt_picker_machine.h>
+#include <qwt_plot.h>
+#include <qwt_plot_grid.h>
+#include <qwt_plot_histogram.h>
+#include <qwt_plot_item.h>
+#include <qwt_plot_magnifier.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_picker.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_samples.h>
+#include <qwt_scale_widget.h>
+#include <qwt_series_data.h>
+#include <qwt_text.h>
+
+#include <QApplication>
+#include <QBrush>
 #include <QClipboard>
+#include <QColor>
+#include <QEvent>
+#include <QMouseEvent>
+#include <QPalette>
+#include <QPen>
+#include <QVBoxLayout>
+#include <QVector>
+
+#include <limits>
+
+namespace
+{
+  const QColor BAR_COLOR(0x4a, 0x90, 0xd9);
+  const QColor HIGHLIGHT_COLOR(0x9e, 0xce, 0xf5);
+
+  QVector<QwtIntervalSample> ToIntervalSamples(itk::Statistics::Histogram<double>::ConstPointer histogram)
+  {
+    QVector<QwtIntervalSample> samples;
+    samples.reserve(static_cast<int>(histogram->Size()));
+
+    for (auto it = histogram->Begin(); it != histogram->End(); ++it)
+    {
+      const auto bin = it.GetInstanceIdentifier();
+      samples.append(QwtIntervalSample(
+        it.GetFrequency(), QwtInterval(histogram->GetBinMin(0, bin), histogram->GetBinMax(0, bin))));
+    }
+
+    return samples;
+  }
+
+  QwtText MakeTooltip(const QString& text)
+  {
+    QwtText tooltip(text);
+    tooltip.setColor(Qt::white);
+    tooltip.setBackgroundBrush(QBrush(QColor(0, 0, 0, 180)));
+    tooltip.setRenderFlags(Qt::AlignLeft | Qt::AlignVCenter);
+    return tooltip;
+  }
+
+  /** Shows the hovered bin's gray-value range and frequency as a tracker tooltip. */
+  class HistogramPicker : public QwtPlotPicker
+  {
+  public:
+    explicit HistogramPicker(QwtPlot* plot)
+      : QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn, plot->canvas()),
+        m_Plot(plot)
+    {
+      this->setStateMachine(new QwtPickerTrackerMachine);
+    }
+
+  protected:
+    QwtText trackerTextF(const QPointF& pos) const override
+    {
+      const QwtPlotItemList items = m_Plot->itemList(QwtPlotItem::Rtti_PlotHistogram);
+      for (auto* plotItem : items)
+      {
+        const auto* histogram = static_cast<const QwtPlotHistogram*>(plotItem);
+        const QwtSeriesData<QwtIntervalSample>* data = histogram->data();
+        for (size_t i = 0; i < data->size(); ++i)
+        {
+          const QwtIntervalSample sample = data->sample(i);
+          if (sample.interval.contains(pos.x()))
+            return MakeTooltip(QString("Gray value: [%1, %2]\nFrequency: %3")
+              .arg(sample.interval.minValue()).arg(sample.interval.maxValue()).arg(sample.value));
+        }
+      }
+      return QwtText();
+    }
+
+  private:
+    QwtPlot* m_Plot;
+  };
+
+  /** Adds interactive navigation: left-drag box zoom (right-click to zoom out),
+      middle-drag pan, and mouse-wheel zoom. Returns the zoomer so its base can
+      be re-synced to the data range. */
+  QwtPlotZoomer* SetupNavigation(QwtPlot* plot)
+  {
+    auto* zoomer = new QwtPlotZoomer(plot->canvas());
+    zoomer->setTrackerMode(QwtPicker::AlwaysOff);
+    zoomer->setRubberBandPen(QPen(HIGHLIGHT_COLOR));
+    // Free the middle button (default zoom-stack navigation) for panning: move
+    // stepwise zoom-out to the right button and zoom-to-base to Ctrl+right.
+    zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
+    zoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
+
+    auto* panner = new QwtPlotPanner(plot->canvas());
+    panner->setMouseButton(Qt::MiddleButton);
+
+    auto* magnifier = new QwtPlotMagnifier(plot->canvas());
+    magnifier->setMouseButton(Qt::NoButton);
+
+    return zoomer;
+  }
+}
 
 QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* parent)
   : QWidget(parent),
-    m_Controls(std::make_unique<Ui::QmitkHistogramVisualizationControls>())
+    m_Controls(std::make_unique<Ui::QmitkHistogramVisualizationControls>()),
+    m_Plot(nullptr),
+    m_HighlightItem(nullptr),
+    m_Zoomer(nullptr)
 {
   m_Controls->setupUi(this);
-  m_Controls->checkBoxShowSubchart->setChecked(false);
   m_Controls->spinBoxNBins->setValue(m_DefaultNBins);
   m_Controls->spinBoxNBins->setMinimum(m_MinNBins);
   m_Controls->spinBoxNBins->setMaximum(m_MaxNBins);
-  m_Controls->chartWidget->SetXAxisLabel("Gray value");
-  m_Controls->chartWidget->SetYAxisLabel("Frequency");
-  m_Controls->chartWidget->SetShowLegend(false);
 
-  SetGUIElementsEnabled(false);
-  CreateConnections();
+  m_Plot = new QwtPlot(this);
+  m_Plot->setAxisTitle(QwtPlot::xBottom, "Gray value");
+  m_Plot->setAxisTitle(QwtPlot::yLeft, "Frequency");
+
+  auto* grid = new QwtPlotGrid;
+  grid->setPen(QColor(0x88, 0x88, 0x88), 0.0, Qt::DotLine);
+  grid->attach(m_Plot);
+
+  m_HighlightItem = new QwtPlotHistogram;
+  m_HighlightItem->setStyle(QwtPlotHistogram::Columns);
+  m_HighlightItem->setBrush(HIGHLIGHT_COLOR);
+  m_HighlightItem->setPen(QPen(HIGHLIGHT_COLOR));
+  m_HighlightItem->setZ(1000);
+  m_HighlightItem->attach(m_Plot);
+
+  new HistogramPicker(m_Plot);
+  m_Plot->canvas()->installEventFilter(this);
+  m_Plot->canvas()->setMouseTracking(true);
+
+  m_Zoomer = SetupNavigation(m_Plot);
+
+  auto* layout = new QVBoxLayout(m_Controls->plotContainer);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(m_Plot);
+
+  this->ApplyTheme();
+  this->SetGUIElementsEnabled(false);
+  this->CreateConnections();
 }
 
 QmitkHistogramVisualizationWidget::~QmitkHistogramVisualizationWidget()
@@ -38,33 +175,57 @@ QmitkHistogramVisualizationWidget::~QmitkHistogramVisualizationWidget()
 
 void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<double>::ConstPointer histogram, const std::string& dataLabel)
 {
-  if (histogram == nullptr)
+  if (histogram.IsNull())
     return;
 
-  bool histogramWasEmpty = m_Histograms.empty();
+  this->ClearHighlight();
 
-  if (m_Histograms.find(dataLabel) == m_Histograms.end())
+  const bool histogramWasEmpty = m_Histograms.empty();
+  m_Histograms[dataLabel] = histogram;
+
+  auto it = m_HistogramItems.find(dataLabel);
+  if (it == m_HistogramItems.end())
   {
-    m_Histograms.insert(std::make_pair(dataLabel, histogram));
-    m_Controls->chartWidget->AddData2D(ConvertHistogramToPairList(histogram), dataLabel);
-    m_Controls->chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::bar);
+    auto* item = new QwtPlotHistogram(QString::fromStdString(dataLabel));
+    item->setStyle(QwtPlotHistogram::Columns);
+    item->setBrush(BAR_COLOR);
+    item->setPen(QPen(BAR_COLOR));
+    item->attach(m_Plot);
+    it = m_HistogramItems.emplace(dataLabel, item).first;
   }
-  else
+
+  it->second->setSamples(ToIntervalSamples(histogram));
+  m_Plot->replot();
+
+  QRectF bounds;
+  bool first = true;
+  for (const auto& entry : m_HistogramItems)
   {
-    m_Histograms[dataLabel] = histogram;
-    m_Controls->chartWidget->UpdateData2D(ConvertHistogramToPairList(histogram), dataLabel);
+    const QRectF itemBounds = entry.second->boundingRect();
+    bounds = first ? itemBounds : bounds.united(itemBounds);
+    first = false;
   }
+  if (!m_HistogramItems.empty() && bounds.isValid())
+    m_Zoomer->setZoomBase(bounds);
 
   if (m_Histograms.empty() != histogramWasEmpty)
-  {
-    m_Controls->chartWidget->Show(m_Controls->checkBoxShowSubchart->isChecked());
-    SetGUIElementsEnabled(!m_Histograms.empty());
-  }
+    this->SetGUIElementsEnabled(!m_Histograms.empty());
 }
 
 void QmitkHistogramVisualizationWidget::Reset()
 {
-  m_Controls->chartWidget->Clear();
+  for (const auto& item : m_HistogramItems)
+  {
+    item.second->detach();
+    delete item.second;
+  }
+  m_HistogramItems.clear();
+  m_Histograms.clear();
+  this->ClearHighlight();
+
+  m_Plot->setAxisAutoScale(QwtPlot::xBottom);
+  m_Plot->replot();
+
   SetGUIElementsEnabled(false);
 }
 
@@ -77,12 +238,96 @@ void QmitkHistogramVisualizationWidget::ResetDefault()
   m_Controls->checkBoxUseDefaultNBins->setChecked(true);
   m_Controls->spinBoxNBins->setEnabled(false);
   m_Controls->spinBoxNBins->setValue(100);
-  m_Controls->checkBoxShowSubchart->setChecked(false);
 }
 
-void QmitkHistogramVisualizationWidget::SetTheme(QmitkChartWidget::ColorTheme style)
+void QmitkHistogramVisualizationWidget::SetTheme(QmitkPlotStyle style)
 {
-  m_Controls->chartWidget->SetTheme(style);
+  m_Style = style;
+  this->ApplyTheme();
+}
+
+void QmitkHistogramVisualizationWidget::ApplyTheme()
+{
+  const bool dark = m_Style == QmitkPlotStyle::Dark;
+  const QColor background = dark ? QColor(0x2d, 0x2d, 0x30) : QColor(Qt::white);
+  const QColor foreground = dark ? QColor(0xf1, 0xf1, 0xf1) : QColor(Qt::black);
+
+  m_Plot->setCanvasBackground(background);
+
+  QPalette palette = m_Plot->palette();
+  palette.setColor(QPalette::WindowText, foreground);
+  palette.setColor(QPalette::Text, foreground);
+  m_Plot->setPalette(palette);
+  m_Plot->axisWidget(QwtPlot::xBottom)->setPalette(palette);
+  m_Plot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
+
+  m_Plot->replot();
+}
+
+void QmitkHistogramVisualizationWidget::OnHover(const QPointF& pos)
+{
+  bool found = false;
+  QwtIntervalSample hovered;
+
+  for (const auto& entry : m_HistogramItems)
+  {
+    const QwtSeriesData<QwtIntervalSample>* data = entry.second->data();
+    for (size_t i = 0; i < data->size(); ++i)
+    {
+      const QwtIntervalSample sample = data->sample(i);
+      if (sample.interval.contains(pos.x()))
+      {
+        hovered = sample;
+        found = true;
+        break;
+      }
+    }
+    if (found)
+      break;
+  }
+
+  const bool hasHighlight = m_HighlightItem->data()->size() > 0;
+
+  if (found)
+  {
+    if (hasHighlight && m_HighlightItem->data()->sample(0).interval.minValue() == hovered.interval.minValue())
+      return;
+
+    QVector<QwtIntervalSample> single;
+    single.append(hovered);
+    m_HighlightItem->setSamples(single);
+    m_Plot->replot();
+  }
+  else if (hasHighlight)
+  {
+    m_HighlightItem->setSamples(QVector<QwtIntervalSample>());
+    m_Plot->replot();
+  }
+}
+
+void QmitkHistogramVisualizationWidget::ClearHighlight()
+{
+  if (m_HighlightItem->data()->size() > 0)
+    m_HighlightItem->setSamples(QVector<QwtIntervalSample>());
+}
+
+bool QmitkHistogramVisualizationWidget::eventFilter(QObject* watched, QEvent* event)
+{
+  if (watched == m_Plot->canvas())
+  {
+    if (event->type() == QEvent::MouseMove)
+    {
+      const auto* mouseEvent = static_cast<QMouseEvent*>(event);
+      this->OnHover(QPointF(m_Plot->invTransform(QwtPlot::xBottom, mouseEvent->position().x()), 0.0));
+    }
+    else if (event->type() == QEvent::Leave && m_HighlightItem->data()->size() > 0)
+    {
+      m_HighlightItem->setSamples(QVector<QwtIntervalSample>());
+      m_Plot->replot();
+    }
+  }
+
+  return QWidget::eventFilter(watched, event);
 }
 
 void QmitkHistogramVisualizationWidget::CreateConnections()
@@ -90,7 +335,6 @@ void QmitkHistogramVisualizationWidget::CreateConnections()
   connect(m_Controls->buttonCopyHistogramToClipboard, &QPushButton::clicked, this, &QmitkHistogramVisualizationWidget::OnClipboardButtonClicked);
   connect(m_Controls->checkBoxUseDefaultNBins, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnDefaultNBinsCheckBoxChanged);
   connect(m_Controls->spinBoxNBins, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged);
-  connect(m_Controls->checkBoxShowSubchart, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged);
   connect(m_Controls->checkBoxViewMinMax, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged);
   connect(m_Controls->doubleSpinBoxMaxValue, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged);
   connect(m_Controls->doubleSpinBoxMinValue, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged);
@@ -100,37 +344,12 @@ void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
 {
   this->setEnabled(enabled);
   m_Controls->tabWidgetPlot->setEnabled(enabled);
-  m_Controls->checkBoxShowSubchart->setEnabled(enabled);
   m_Controls->checkBoxUseDefaultNBins->setEnabled(enabled);
   m_Controls->spinBoxNBins->setEnabled(!m_Controls->checkBoxUseDefaultNBins->isChecked());
   m_Controls->buttonCopyHistogramToClipboard->setEnabled(enabled);
   m_Controls->checkBoxViewMinMax->setEnabled(enabled);
   m_Controls->doubleSpinBoxMaxValue->setEnabled(m_Controls->checkBoxViewMinMax->isChecked());
   m_Controls->doubleSpinBoxMinValue->setEnabled(m_Controls->checkBoxViewMinMax->isChecked());
-}
-
-std::vector< std::pair<double, double> > QmitkHistogramVisualizationWidget::ConvertHistogramToPairList(itk::Statistics::Histogram<double>::ConstPointer histogram) const
-{
-  std::map<double, double> histogramMap;
-  if (histogram)
-  {
-    auto endIt = histogram->End();
-    auto it = histogram->Begin();
-
-    // generating Lists of measurement and frequencies
-    for (; it != endIt; ++it)
-    {
-      double frequency = it.GetFrequency();
-      double measurement = it.GetMeasurementVector()[0];
-      histogramMap.emplace(measurement, frequency);
-    }
-
-  }
-  std::vector< std::pair<double, double> > histogram_list;
-  for(auto iter = histogramMap.begin(); iter != histogramMap.end(); ++iter)
-    histogram_list.emplace_back( iter->first, iter->second );
-
-  return histogram_list;
 }
 
 void QmitkHistogramVisualizationWidget::OnClipboardButtonClicked()
@@ -179,11 +398,6 @@ void QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged()
   emit RequestHistogramUpdate(m_Controls->spinBoxNBins->value());
 }
 
-void QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged()
-{
-  m_Controls->chartWidget->Show(m_Controls->checkBoxShowSubchart->isChecked());
-}
-
 void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
 {
   double min = std::numeric_limits<double>::max();
@@ -208,7 +422,8 @@ void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
   {
     m_Controls->doubleSpinBoxMaxValue->setEnabled(false);
     m_Controls->doubleSpinBoxMinValue->setEnabled(false);
-    m_Controls->chartWidget->Reload();
+    m_Plot->setAxisAutoScale(QwtPlot::xBottom);
+    m_Plot->replot();
   }
   else
   {
@@ -224,13 +439,13 @@ void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
 void QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged()
 {
   m_Controls->doubleSpinBoxMaxValue->setMinimum(m_Controls->doubleSpinBoxMinValue->value()+1);
-  m_Controls->chartWidget->SetMinMaxValueXView(m_Controls->doubleSpinBoxMinValue->value(),m_Controls->doubleSpinBoxMaxValue->value());
-  m_Controls->chartWidget->Show();
+  m_Plot->setAxisScale(QwtPlot::xBottom, m_Controls->doubleSpinBoxMinValue->value(), m_Controls->doubleSpinBoxMaxValue->value());
+  m_Plot->replot();
 }
 
 void QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged()
 {
   m_Controls->doubleSpinBoxMinValue->setMaximum(m_Controls->doubleSpinBoxMaxValue->value()-1);
-  m_Controls->chartWidget->SetMinMaxValueXView(m_Controls->doubleSpinBoxMinValue->value(),m_Controls->doubleSpinBoxMaxValue->value());
-  m_Controls->chartWidget->Show();
+  m_Plot->setAxisScale(QwtPlot::xBottom, m_Controls->doubleSpinBoxMinValue->value(), m_Controls->doubleSpinBoxMaxValue->value());
+  m_Plot->replot();
 }

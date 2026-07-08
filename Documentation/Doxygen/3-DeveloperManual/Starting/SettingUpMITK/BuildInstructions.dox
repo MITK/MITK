@@ -78,11 +78,6 @@ In the Qt installer, make sure to select the following <b>additional libraries</
   - Qt 5 Compatibility Module
   - Qt Positioning
   - Qt State Machines
-  - Qt WebChannel
-
-You also need the following <b>extension</b>:
-
-  - Qt WebEngine
 
 \section BuildInstructions_Build_With_CMake Build MITK with CMake
 

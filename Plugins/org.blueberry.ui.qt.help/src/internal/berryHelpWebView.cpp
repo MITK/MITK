@@ -14,19 +14,16 @@ found in the LICENSE file.
 #include "berryHelpWebView.h"
 
 #include "berryHelpPluginActivator.h"
-#include "berryHelpEditor.h"
-#include "berryHelpEditorInput.h"
 #include "berryQHelpEngineWrapper.h"
 
-#include <berryIWorkbenchPage.h>
-
 #include <QCoreApplication>
+#include <QDesktopServices>
+#include <QFileInfo>
+#include <QMouseEvent>
+#include <QScrollBar>
 #include <QStringBuilder>
 #include <QTemporaryFile>
-#include <QDesktopServices>
 #include <QWheelEvent>
-
-#include <QWebEngineSettings>
 
 namespace berry {
 
@@ -76,130 +73,145 @@ const QString HelpWebView::m_MissingContextMessage =
     QCoreApplication::translate("org.blueberry.ui.qt.help", "<title>Context Help</title><div "
                                 "align=\"center\"><br><br><h1>Unknown context..</h1><h1>&nbsp;</h1><h1>Please click inside a view and hit F1 again!</h1></div>");
 
-class HelpPage final : public QWebEnginePage
+HelpWebView::HelpWebView(IEditorSite::Pointer, QWidget *parent)
+  : QmitkHtmlWidget(parent),
+    m_HelpEngine(HelpPluginActivator::getInstance()->getQHelpEngine()),
+    m_HistoryIndex(-1)
 {
-public:
-  explicit HelpPage(QObject* parent = nullptr);
-  ~HelpPage() override;
+  // Serve the page's resources (images, style sheets) out of the .qch files.
+  this->SetResourceHandler([this](const QUrl &url) -> QByteArray {
+    const QUrl resolved = m_HelpEngine.findFile(url);
+    return resolved.isValid() ? m_HelpEngine.fileData(resolved) : QByteArray();
+  });
 
-private:
-  bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;
-};
-
-HelpPage::HelpPage(QObject* parent)
-  : QWebEnginePage(parent)
-{
-}
-
-HelpPage::~HelpPage()
-{
-}
-
-bool HelpPage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
-{
-  if (url.scheme().contains("http"))
-  {
-    QDesktopServices::openUrl(url);
-    return false;
-  }
-
-  return true;
-}
-
-HelpWebView::HelpWebView(IEditorSite::Pointer, QWidget *parent, qreal zoom)
-  : QWebEngineView(parent),
-    m_LoadFinished(false),
-    m_HelpEngine(HelpPluginActivator::getInstance()->getQHelpEngine())
-{
-  auto helpPage = new HelpPage(this);
-  this->setPage(helpPage);
-
-  this->setAcceptDrops(false);
-
-  auto action = pageAction(QWebEnginePage::OpenLinkInNewWindow);
-  action->setText("Open Link in New Tab");
-
-  if (parent == nullptr)
-    action->setVisible(false);
-
-  this->pageAction(QWebEnginePage::DownloadLinkToDisk)->setVisible(false);
-  this->pageAction(QWebEnginePage::DownloadImageToDisk)->setVisible(false);
-
-  connect(pageAction(QWebEnginePage::Copy), SIGNAL(changed()), this, SLOT(actionChanged()));
-  connect(pageAction(QWebEnginePage::Back), SIGNAL(changed()), this, SLOT(actionChanged()));
-  connect(pageAction(QWebEnginePage::Forward), SIGNAL(changed()), this, SLOT(actionChanged()));
-  connect(page(), SIGNAL(linkHovered(QString)), this, SIGNAL(highlighted(QString)));
-  connect(this, SIGNAL(urlChanged(QUrl)), this, SIGNAL(sourceChanged(QUrl)));
-  connect(this, SIGNAL(loadStarted()), this, SLOT(setLoadStarted()));
-  connect(this, SIGNAL(loadFinished(bool)), this, SLOT(setLoadFinished(bool)));
-
-  this->setFont(this->viewerFont());
-  this->setZoomFactor(zoom == 0.0 ? 1.0 : zoom);
+  connect(this, &QmitkHtmlWidget::linkClicked, this, &HelpWebView::onLinkClicked);
 }
 
 HelpWebView::~HelpWebView()
 {
 }
 
-QFont HelpWebView::viewerFont() const
+void HelpWebView::onLinkClicked(const QUrl &url)
 {
-  QWebEngineSettings* webSettings = settings();
-  return QFont(webSettings->fontFamily(QWebEngineSettings::StandardFont),
-               webSettings->fontSize(QWebEngineSettings::DefaultFontSize));
-}
-
-void HelpWebView::setViewerFont(const QFont &font)
-{
-  QWebEngineSettings *webSettings = settings();
-  webSettings->setFontFamily(QWebEngineSettings::StandardFont, font.family());
-  webSettings->setFontSize(QWebEngineSettings::DefaultFontSize, font.pointSize());
-}
-
-void HelpWebView::scaleUp()
-{
-  setZoomFactor(zoomFactor() + 0.1);
-}
-
-void HelpWebView::scaleDown()
-{
-  setZoomFactor(qMax(0.0, zoomFactor() - 0.1));
-}
-
-void HelpWebView::resetScale()
-{
-  setZoomFactor(1.0);
-}
-
-bool HelpWebView::handleForwardBackwardMouseButtons(QMouseEvent *e)
-{
-  if (e->button() == Qt::XButton1)
+  if (url.scheme().contains("http"))
   {
-    triggerPageAction(QWebEnginePage::Back);
-    return true;
+    QDesktopServices::openUrl(url);
+  }
+  else
+  {
+    this->setSource(url);
+  }
+}
+
+void HelpWebView::load(const QUrl &url)
+{
+  if (url.toString().trimmed().isEmpty())
+  {
+    this->SetHtml(m_MissingContextMessage, QUrl());
+    m_CurrentUrl = QUrl();
+    return;
   }
 
-  if (e->button() == Qt::XButton2)
+  QUrl fileUrl = url;
+  fileUrl.setFragment(QString());
+
+  // Only reload when the page (ignoring the fragment) actually changes, so a
+  // same-page anchor jump neither re-fetches nor re-renders.
+  if (fileUrl != m_CurrentUrl)
   {
-    triggerPageAction(QWebEnginePage::Forward);
-    return true;
+    const QUrl resolved = m_HelpEngine.findFile(fileUrl);
+    if (resolved.isValid())
+    {
+      this->SetHtml(QString::fromUtf8(m_HelpEngine.fileData(resolved)), fileUrl);
+      m_CurrentUrl = fileUrl;
+    }
+    else
+    {
+      this->SetHtml(m_PageNotFoundMessage.arg(url.toString()), QUrl());
+      m_CurrentUrl = QUrl();
+      return;
+    }
   }
 
-  return false;
+  if (url.hasFragment())
+    this->ScrollToAnchor(url.fragment());
+  else
+    this->verticalScrollBar()->setValue(0);
 }
 
 void HelpWebView::setSource(const QUrl &url)
 {
-  if (url.toString().trimmed().isEmpty()) {
-    setHtml(m_MissingContextMessage);
-  }
-  else if (m_HelpEngine.findFile(url).isValid())
+  this->load(url);
+
+  // Drop any forward history and append the new location.
+  while (m_History.size() > m_HistoryIndex + 1)
+    m_History.removeLast();
+
+  m_History.append(url);
+  m_HistoryIndex = m_History.size() - 1;
+
+  emit sourceChanged(url);
+  this->updateHistoryButtons();
+}
+
+void HelpWebView::backward()
+{
+  if (!this->isBackwardAvailable())
+    return;
+
+  --m_HistoryIndex;
+  this->load(m_History.at(m_HistoryIndex));
+  emit sourceChanged(m_History.at(m_HistoryIndex));
+  this->updateHistoryButtons();
+}
+
+void HelpWebView::forward()
+{
+  if (!this->isForwardAvailable())
+    return;
+
+  ++m_HistoryIndex;
+  this->load(m_History.at(m_HistoryIndex));
+  emit sourceChanged(m_History.at(m_HistoryIndex));
+  this->updateHistoryButtons();
+}
+
+void HelpWebView::home()
+{
+  this->setSource(m_HelpEngine.homePage());
+}
+
+void HelpWebView::updateHistoryButtons()
+{
+  emit backwardAvailable(this->isBackwardAvailable());
+  emit forwardAvailable(this->isForwardAvailable());
+}
+
+void HelpWebView::scaleUp()
+{
+  this->SetZoomFactor(this->ZoomFactor() + 0.1);
+}
+
+void HelpWebView::scaleDown()
+{
+  this->SetZoomFactor(qMax(0.1, this->ZoomFactor() - 0.1));
+}
+
+bool HelpWebView::handleForwardBackwardMouseButtons(QMouseEvent *e)
+{
+  if (e->button() == Qt::BackButton)
   {
-    load(url);
+    this->backward();
+    return true;
   }
-  else
+
+  if (e->button() == Qt::ForwardButton)
   {
-    setHtml(m_PageNotFoundMessage.arg(url.toString()));
+    this->forward();
+    return true;
   }
+
+  return false;
 }
 
 void HelpWebView::wheelEvent(QWheelEvent *e)
@@ -211,30 +223,8 @@ void HelpWebView::wheelEvent(QWheelEvent *e)
   }
   else
   {
-    QWebEngineView::wheelEvent(e);
+    QmitkHtmlWidget::wheelEvent(e);
   }
-}
-
-void HelpWebView::actionChanged()
-{
-  QAction *a = qobject_cast<QAction *>(sender());
-  if (a == pageAction(QWebEnginePage::Copy))
-    emit copyAvailable(a->isEnabled());
-  else if (a == pageAction(QWebEnginePage::Back))
-    emit backwardAvailable(a->isEnabled());
-  else if (a == pageAction(QWebEnginePage::Forward))
-    emit forwardAvailable(a->isEnabled());
-}
-
-void HelpWebView::setLoadStarted()
-{
-  m_LoadFinished = false;
-}
-
-void HelpWebView::setLoadFinished(bool ok)
-{
-  m_LoadFinished = ok;
-  emit sourceChanged(url());
 }
 
 QString HelpWebView::mimeFromUrl(const QUrl &url)
@@ -301,11 +291,6 @@ bool HelpWebView::launchWithExternalApp(const QUrl &url)
     return QDesktopServices::openUrl(url);
   }
   return false;
-}
-
-void HelpWebView::home()
-{
-  setSource(m_HelpEngine.homePage());
 }
 
 }

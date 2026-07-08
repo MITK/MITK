@@ -263,7 +263,7 @@ MITK uses `qt_generate_deploy_app_script()` only on macOS (for `.app` bundles). 
 
 **Windows**: Uses `qt_generate_deploy_script()` with `qt_deploy_runtime_dependencies()`. The `--no-opengl-sw` option is passed to `windeployqt` to skip the software OpenGL fallback. If OpenSSL is available, its root directory is passed via `--openssl-root`.
 
-After deployment, a post-install step moves `resources/` and `translations/` directories from the install prefix root into `bin/`, because `windeployqt` places them at the prefix root level and provides no option to change this.
+After deployment, a post-install step moves the `translations/` directory from the install prefix root into `bin/`, because `windeployqt` places it at the prefix root level and provides no option to change this.
 
 **Linux**: Uses `qt_generate_deploy_script()` with overridden `QT_DEPLOY_*` variables so that everything goes under `bin/` instead of the default FHS-style directories:
 
@@ -279,22 +279,16 @@ set(QT_DEPLOY_DATA_DIR "bin")
 
 Without these overrides, Qt would deploy libraries to `lib/`, executables to `libexec/`, plugins to `plugins/` at the prefix root, etc. — scattering files across the install tree and breaking MITK's RPATH-based portable layout.
 
-These overrides also affect internal deployment hooks (e.g. the WebEngine deployment hook), which is critical: it ensures that `QtWebEngineProcess`, resource `.pak` files, and locale data all land under `bin/` rather than at the prefix root.
+### qt.conf on Linux
 
-### The qt.conf Problem on Linux
-
-After the Qt deploy script runs on Linux, `qt.conf` is overwritten. The reason: Qt's WebEngine deployment hook generates `qt.conf` with an **absolute staging path** as the prefix (e.g. `/tmp/cpack-staging/install/bin`). This makes the deployment non-relocatable.
-
-The fixup overwrites it with a correct relative prefix:
+A post-install step writes `qt.conf` into `bin/` with a relative prefix:
 
 ```ini
 [Paths]
 Prefix = .
 ```
 
-Since `qt.conf` lives in `bin/` and the prefix is `.`, Qt looks for plugins at `bin/plugins/`, QML modules at `bin/qml/`, etc. — all relative to `bin/`.
-
-This fixup is fragile. If Qt's internal deployment hooks change their `qt.conf` generation behavior in a future version, the overwrite may need to be adjusted.
+Since `qt.conf` lives in `bin/` and the prefix is `.`, Qt looks for plugins at `bin/plugins/`, QML modules at `bin/qml/`, etc. — all relative to `bin/`. Writing it explicitly guarantees a relative prefix, since the Qt deploy script can otherwise leave an absolute staging path (e.g. `/tmp/cpack-staging/install/bin`), which would make the package non-relocatable.
 
 ## RPATH Configuration
 
@@ -453,8 +447,6 @@ External projects register their library paths via `mitkFunctionAddLibrarySearch
 │   │   ├── org_blueberry_*.dll/.so
 │   │   ├── imageformats/          # Qt plugin subdirectories
 │   │   └── platforms/
-│   ├── resources/                  # Qt WebEngine resources
-│   │   └── *.pak
 │   └── translations/              # Qt translations
 └── python/                         # Python distribution (if enabled)
     ├── bin/ or python.exe
@@ -691,14 +683,12 @@ The current install system replaced several legacy approaches:
 
 - **macOS autoload modules in Python**: The `FixMacOSInstaller.cmake` `@loader_path` fix does not cover autoload modules. Importing `mitk` in a standalone Python interpreter on macOS will not load autoload modules. Running Python as a subprocess of an MITK application works correctly.
 
-- **Qt WebEngine `qt.conf` on Linux**: The Qt WebEngine deployment hook writes `qt.conf` with an absolute staging path. A post-install step overwrites it, but this is fragile and depends on the hook's behavior not changing across Qt versions.
-
 ## File Reference
 
 | File | Purpose |
 |---|---|
 | `CMake/mitkInstallRules.cmake` | Central install orchestration: CppMicroServices, Python, dependency resolution, Qt deployment loop |
-| `CMake/mitkFunctionDeployQt.cmake` | `mitkFunctionDeployQt()` — Qt plugin, qt.conf, and WebEngine deployment |
+| `CMake/mitkFunctionDeployQt.cmake` | `mitkFunctionDeployQt()` — Qt plugin and qt.conf deployment |
 | `CMake/mitkFunctionCreateModule.cmake` | `mitk_create_module()` — module install rules and RPATH overrides |
 | `CMake/mitkMacroCreateExecutable.cmake` | `mitk_create_executable()` — executable install rules and wrapper scripts |
 | `CMake/mitkFunctionCreateCommandLineApp.cmake` | `mitkFunctionCreateCommandLineApp()` — wraps `mitk_create_executable()` with MitkCommandLine dependency |

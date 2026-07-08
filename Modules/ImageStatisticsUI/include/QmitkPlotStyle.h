@@ -10,17 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkChartData.h>
+#ifndef QmitkPlotStyle_h
+#define QmitkPlotStyle_h
 
-QmitkChartData::QmitkChartData()
-  : m_ShowSubchart(true)
-  , m_YAxisScale("")
-  , m_StackedData(false)
+/**
+ * \brief Light/dark styling for the image-statistics Qwt plots.
+ *
+ * Chosen by the hosting view from the active Workbench theme and pushed into
+ * the histogram and intensity-profile widgets, which have no access to the
+ * plugin-level style service themselves.
+ */
+enum class QmitkPlotStyle
 {
-}
+  Light,
+  Dark
+};
 
-void QmitkChartData::SetAppearance(bool showSubChart, bool usePercentageInPieChart)
-{
-  m_ShowSubchart = showSubChart;
-  m_UsePercentageInPieChart = usePercentageInPieChart;
-}
+#endif

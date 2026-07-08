@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <berryIQtStyleManager.h>
 #include <berryWorkbenchPlugin.h>
 
-#include <QmitkChartWidget.h>
 #include <mitkImageStatisticsContainerNodeHelper.h>
 #include <mitkImageStatisticsPredicateHelper.h>
 #include <mitkImageTimeSelector.h>
@@ -263,7 +262,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
   }
 }
 
-QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const
+QmitkPlotStyle QmitkImageStatisticsView::GetColorTheme() const
 {
   ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
@@ -272,14 +271,14 @@ QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const
     auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
     if (styleManager->GetStyle().name == "Dark")
     {
-      return QmitkChartWidget::ColorTheme::darkstyle;
+      return QmitkPlotStyle::Dark;
     }
     else
     {
-      return QmitkChartWidget::ColorTheme::lightstyle;
+      return QmitkPlotStyle::Light;
     }
   }
-  return QmitkChartWidget::ColorTheme::darkstyle;
+  return QmitkPlotStyle::Dark;
 }
 
 void QmitkImageStatisticsView::ResetGUI()

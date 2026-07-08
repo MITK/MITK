@@ -14,7 +14,6 @@ set(MOC_H_FILES
 )
 
 set(UI_FILES
-  src/internal/QmitkWelcomeScreenViewControls.ui
   src/internal/QmitkMitkWorkbenchIntroPreferencePage.ui
 )
 

@@ -25,12 +25,12 @@ set(MITK_MODULES
   Gizmo
   GraphAlgorithms
   Multilabel
-  Chart
   ImageStatistics
   ContourModel
   SurfaceInterpolation
   BoundingShape
   Segmentation
+  QtHtml
   QtWidgets
   QtWidgetsExt
   ImageStatisticsUI

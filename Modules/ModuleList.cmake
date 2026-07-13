@@ -34,6 +34,7 @@ set(MITK_MODULES
   QtIconTheme
   QtWidgets
   QtWidgetsExt
+  VolumeVisualizationUI
   ImageStatisticsUI
   SegmentationUI
   MatchPointRegistration

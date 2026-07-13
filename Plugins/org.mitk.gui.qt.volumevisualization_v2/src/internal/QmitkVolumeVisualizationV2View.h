@@ -13,13 +13,19 @@ found in the LICENSE file.
 #ifndef QmitkVolumeVisualizationV2View_h
 #define QmitkVolumeVisualizationV2View_h
 
+// mitk core
+#include <mitkDataStorage.h>
+#include <mitkWeakPointer.h>
+
+#include <mitkTransferFunctionPresets.h>
+
 #include <QmitkAbstractView.h>
 
 #include <memory>
 
 namespace Ui
 {
-  class QmitkVolumeVisualizationV2ViewControls;
+  class QmitkVolumeVisualizationV2View;
 }
 
 class QmitkVolumeVisualizationV2View : public QmitkAbstractView
@@ -34,10 +40,19 @@ public:
 
   void SetFocus() override;
 
+private Q_SLOTS:
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnEnabledRendering(bool state);
+  void OnTransferFunctionPresetSelected(const QString &presetName);
+
 private:
   void CreateQtPartControl(QWidget *parent) override;
 
-  std::unique_ptr<Ui::QmitkVolumeVisualizationV2ViewControls> m_Controls;
+  void UpdateInterface();
+
+  std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+  mitk::TransferFunctionPresets m_Presets;
 };
 
 #endif

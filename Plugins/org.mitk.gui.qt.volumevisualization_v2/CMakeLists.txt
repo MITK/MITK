@@ -3,5 +3,5 @@ project(org_mitk_gui_qt_volumevisualization_v2)
 mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_QT_VOLUMEVISUALIZATION_V2
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgetsExt
+  MODULE_DEPENDS MitkQtWidgetsExt MitkVolumeVisualizationUI
 )

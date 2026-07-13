@@ -4,7 +4,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  src/internal/QmitkVolumeVisualizationV2ViewControls.ui
+  src/internal/QmitkVolumeVisualizationV2View.ui
 )
 
 set(MOC_H_FILES

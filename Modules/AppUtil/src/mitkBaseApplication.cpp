@@ -695,6 +695,16 @@ namespace mitk
       qputenv("QT_STYLE_OVERRIDE", "Fusion");
 #endif
 
+#ifdef Q_OS_WIN
+    // Force the Windows Vista style. Qt's default windows11 style does not play
+    // well with our UI (for example, it miscalculates spin box size hints,
+    // QTBUG-124150, so the spin buttons occlude the value). windowsvista is
+    // built into Qt Widgets, so no style plugin has to be deployed. A -style
+    // command-line argument still takes precedence.
+    if (qEnvironmentVariableIsEmpty("QT_STYLE_OVERRIDE"))
+      qputenv("QT_STYLE_OVERRIDE", "windowsvista");
+#endif
+
     // Prevent conflicts between native OpenGL applications and QWebEngine
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))

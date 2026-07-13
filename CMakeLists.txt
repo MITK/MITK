@@ -616,6 +616,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(MITK_ROOT_FOLDER "MITK" CACHE STRING "")
 mark_as_advanced(MITK_ROOT_FOLDER)
 
+# Collect the helper targets that CMake generates for AUTOMOC/AUTOUIC/AUTORCC
+# (<target>_autogen, <target>_autogen_timestamp_deps, RCC) into one folder
+# instead of scattering them next to the real targets. Global property, so it
+# is a single folder for the whole solution.
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "${MITK_ROOT_FOLDER}/Autogen")
+
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------

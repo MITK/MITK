@@ -58,6 +58,11 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   {
     m_Controls->presetComboBox->addItem(QString::fromStdString(name));
   }
+
+  //select the applied preset, or -1 for "none":
+  m_Controls->presetComboBox->setCurrentIndex(-1);
+  m_Controls->presetComboBox->setEnabled(false);
+  m_Controls->enableRenderingCB->setEnabled(false);
   
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
@@ -139,7 +144,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   selectedNode->GetBoolProperty("volumerendering", volumeRenderingOn);
 
   m_Controls->enableRenderingCB->setEnabled(true);
-  m_Controls->presetComboBox->setEnabled(true);
+  m_Controls->presetComboBox->setEnabled(volumeRenderingOn);
 
   const QSignalBlocker blocker(m_Controls->enableRenderingCB);
   m_Controls->enableRenderingCB->setChecked(volumeRenderingOn);

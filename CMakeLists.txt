@@ -59,7 +59,17 @@ endif()
 # MITK Extension Feature
 #-----------------------------------------------------------------------------
 
-set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+set(MITK_EXTENSION_DIRS "" CACHE PATH "")
+
+# MITK_EXTENSION_DIRS may be provided with native backslashes (for example
+# "D:\MyExtension" on Windows). Normalize them to forward slashes; otherwise the
+# raw value is written verbatim into the generated MITK-Configure initial cache
+# file, where CMake rejects a backslash as an invalid escape sequence.
+# The PATH type only improves the CMake GUI (directory picker); the value is
+# still a string, so a semicolon-separated list of directories keeps working.
+string(REPLACE "\\" "/" _mitk_extension_dirs "${MITK_EXTENSION_DIRS}")
+set(MITK_EXTENSION_DIRS "${_mitk_extension_dirs}" CACHE PATH "" FORCE)
+unset(_mitk_extension_dirs)
 
 unset(MITK_ABSOLUTE_EXTENSION_DIRS)
 

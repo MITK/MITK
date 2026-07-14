@@ -109,7 +109,7 @@ namespace mitk
   void TransferFunction::SetScalarOpacityPoints(TransferFunction::ControlPoints points)
   {
     m_ScalarOpacityFunction->RemoveAllPoints();
-    for (unsigned int i = 0; i <= points.size() - 1; i++)
+    for (std::size_t i = 0; i < points.size(); ++i)
     {
       this->AddScalarOpacityPoint(points[i].first, points[i].second);
     }
@@ -118,7 +118,7 @@ namespace mitk
   void TransferFunction::SetGradientOpacityPoints(TransferFunction::ControlPoints points)
   {
     m_GradientOpacityFunction->RemoveAllPoints();
-    for (unsigned int i = 0; i <= points.size() - 1; i++)
+    for (std::size_t i = 0; i < points.size(); ++i)
     {
       this->AddGradientOpacityPoint(points[i].first, points[i].second);
     }
@@ -127,7 +127,7 @@ namespace mitk
   void TransferFunction::SetRGBPoints(TransferFunction::RGBControlPoints rgbpoints)
   {
     m_ColorTransferFunction->RemoveAllPoints();
-    for (unsigned int i = 0; i <= rgbpoints.size() - 1; i++)
+    for (std::size_t i = 0; i < rgbpoints.size(); ++i)
     {
       this->AddRGBPoint(rgbpoints[i].first, rgbpoints[i].second[0], rgbpoints[i].second[1], rgbpoints[i].second[2]);
     }

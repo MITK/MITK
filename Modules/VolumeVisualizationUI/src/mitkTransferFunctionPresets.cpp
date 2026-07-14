@@ -87,18 +87,18 @@ mitk::TransferFunctionPresets::TransferFunctionPresets()
 
   for (const auto &entry : presets)
   {
-    // A preset without a name or without colors is unusable; skip it.
-    if (!entry.contains("Name") || !entry.contains("RGBPoints"))
+    // A volume-rendering preset needs a name, a color function, and an opacity
+    // function. The file also bundles plain colormaps (e.g. "2hot", "Blue to Red
+    // Rainbow") that carry only RGBPoints; those are not volume presets, so skip
+    // them.
+    if (!entry.contains("Name") || !entry.contains("RGBPoints") || !entry.contains("OpacityPoints"))
       continue;
 
     Preset preset;
     preset.name = entry["Name"].get<std::string>();
     preset.colorSpace = entry.value("ColorSpace", std::string("RGB"));
     preset.color = DecodeColor(entry["RGBPoints"]);
-
-    // Opacity is optional (pure colormaps omit it).
-    if (entry.contains("OpacityPoints"))
-      preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
+    preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
 
     m_Presets.push_back(std::move(preset));
   }
@@ -129,7 +129,8 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
 
   auto transferFunction = mitk::TransferFunction::New();
 
-  transferFunction->SetScalarOpacityPoints(it->scalarOpacity);
+  if (!it->scalarOpacity.empty())
+    transferFunction->SetScalarOpacityPoints(it->scalarOpacity);
   transferFunction->SetRGBPoints(it->color);
 
   // The gradient opacity function is intentionally left at its default

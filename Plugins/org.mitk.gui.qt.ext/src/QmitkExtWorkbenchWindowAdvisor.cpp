@@ -616,13 +616,31 @@ namespace
   // bar survives on X11, and overflow the screen by one pixel on Windows to
   // avoid the exclusive path; the overflow is clamped by X11 window managers,
   // so it is applied on Windows only.
-  void SetBorderlessFullScreen(QMainWindow* window)
+  QRect BorderlessFullScreenBounds(const QMainWindow* window)
   {
-    window->setWindowFlags(Qt::FramelessWindowHint);
     QRect bounds = window->screen()->geometry();
 #ifdef Q_OS_WIN
     bounds.adjust(-1, -1, 1, 1);
 #endif
+    return bounds;
+  }
+
+  void SetBorderlessFullScreen(QMainWindow* window)
+  {
+    window->setWindowFlags(Qt::FramelessWindowHint);
+    window->setGeometry(BorderlessFullScreenBounds(window));
+  }
+
+  // Toggle window flags and geometry on an already-visible window. setWindowFlags()
+  // hides the window; show() must run before setGeometry() so the geometry lands
+  // on a realized window and cascades a resize event into the central widget's
+  // layout. Setting the geometry while hidden updates the stored size first, so
+  // the size reported after show() matches it, Qt suppresses the resize event,
+  // and the editor area stays one toggle behind the window.
+  void ReshowWithFlagsAndGeometry(QMainWindow* window, Qt::WindowFlags flags, const QRect& bounds)
+  {
+    window->setWindowFlags(flags);
+    window->show();
     window->setGeometry(bounds);
   }
 #endif
@@ -1284,23 +1302,22 @@ void QmitkExtWorkbenchWindowAdvisorHack::onFullScreen()
   mainWindow->isFullScreen() ? mainWindow->showNormal() : mainWindow->showFullScreen();
 #else
   // Toggle borderless full-screen. See SetBorderlessFullScreen for why true
-  // full-screen is avoided off macOS. The original flags are saved so the
-  // decorations can be restored on exit.
+  // full-screen is avoided off macOS. The original flags and geometry are saved
+  // so the decorated window can be restored on exit.
   if (mainWindow->property("mitkBorderlessFullScreen").toBool())
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", false);
-    mainWindow->setWindowFlags(Qt::WindowFlags(mainWindow->property("mitkWindowedFlags").toInt()));
-    mainWindow->setGeometry(mainWindow->property("mitkWindowedGeometry").toRect());
+    ReshowWithFlagsAndGeometry(mainWindow,
+      Qt::WindowFlags(mainWindow->property("mitkWindowedFlags").toInt()),
+      mainWindow->property("mitkWindowedGeometry").toRect());
   }
   else
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", true);
     mainWindow->setProperty("mitkWindowedFlags", static_cast<int>(mainWindow->windowFlags()));
     mainWindow->setProperty("mitkWindowedGeometry", mainWindow->geometry());
-    SetBorderlessFullScreen(mainWindow);
+    ReshowWithFlagsAndGeometry(mainWindow, Qt::FramelessWindowHint, BorderlessFullScreenBounds(mainWindow));
   }
-
-  mainWindow->show(); // setWindowFlags() hides the window
 #endif
 }
 

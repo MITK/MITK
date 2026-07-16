@@ -346,7 +346,7 @@ Wrapper scripts launch MITK executables from the install root. They exist becaus
 
 | Script | Used by | Behavior |
 |---|---|---|
-| `RunInstalledWin32App.bat` | BlueBerry apps | `start "" /B "%~dp0bin\%~n0.exe" -style windowsvista %*` — launches detached with Qt style |
+| `RunInstalledWin32App.bat` | BlueBerry apps | `start "" /B "%~dp0bin\%~n0.exe" %*`: launches detached (the app sets its own Qt style) |
 | `RunInstalledApp.bat` | Regular executables | `"%~dp0bin\%~n0.exe" %*` — direct launch from root |
 | `RunInstalledCmdLineApp.bat` | Command-line apps | `"%~dp0..\bin\%~n0.exe" %*` — launch from `apps/` subdirectory |
 

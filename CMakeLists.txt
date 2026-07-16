@@ -59,7 +59,17 @@ endif()
 # MITK Extension Feature
 #-----------------------------------------------------------------------------
 
-set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+set(MITK_EXTENSION_DIRS "" CACHE PATH "")
+
+# MITK_EXTENSION_DIRS may be provided with native backslashes (for example
+# "D:\MyExtension" on Windows). Normalize them to forward slashes; otherwise the
+# raw value is written verbatim into the generated MITK-Configure initial cache
+# file, where CMake rejects a backslash as an invalid escape sequence.
+# The PATH type only improves the CMake GUI (directory picker); the value is
+# still a string, so a semicolon-separated list of directories keeps working.
+string(REPLACE "\\" "/" _mitk_extension_dirs "${MITK_EXTENSION_DIRS}")
+set(MITK_EXTENSION_DIRS "${_mitk_extension_dirs}" CACHE PATH "" FORCE)
+unset(_mitk_extension_dirs)
 
 unset(MITK_ABSOLUTE_EXTENSION_DIRS)
 
@@ -613,6 +623,12 @@ endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(MITK_ROOT_FOLDER "MITK" CACHE STRING "")
 mark_as_advanced(MITK_ROOT_FOLDER)
+
+# Collect the helper targets that CMake generates for AUTOMOC/AUTOUIC/AUTORCC
+# (<target>_autogen, <target>_autogen_timestamp_deps, RCC) into one folder
+# instead of scattering them next to the real targets. Global property, so it
+# is a single folder for the whole solution.
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "${MITK_ROOT_FOLDER}/Autogen")
 
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)

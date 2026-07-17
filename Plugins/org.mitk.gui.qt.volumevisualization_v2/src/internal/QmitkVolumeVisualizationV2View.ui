@@ -6,47 +6,62 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
+    <width>494</width>
     <height>565</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="5" column="0">
-      <spacer name="verticalSpacer">
+     <item row="8" column="0">
+      <widget class="QLabel" name="shiftLabel">
+       <property name="text">
+        <string>shift</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="ctkDoubleSlider" name="shiftSlider" native="true"/>
+     </item>
+     <item row="9" column="2">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
-         <height>40</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
       </spacer>
      </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="widthLabel">
+       <property name="text">
+        <string>width</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="headline">
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>Volume Visualization V2 Prototype</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="volumeSelectionLabel">
-       <property name="text">
-        <string>Selected image</string>
-       </property>
-      </widget>
+     <item row="9" column="1">
+      <widget class="ctkDoubleSlider" name="widthSlider" native="true"/>
      </item>
-     <item row="2" column="1">
-      <widget class="QmitkSingleNodeSelectionWidget" name="volumeSelectionWidget" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <item row="6" column="0">
+      <widget class="QLabel" name="presetLabel">
+       <property name="text">
+        <string>Select a transfer function preset</string>
        </property>
       </widget>
      </item>
@@ -63,21 +78,88 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-	  <widget class="QComboBox" name="presetComboBox">
+     <item row="4" column="0" colspan="2">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QmitkSingleNodeSelectionWidget" name="volumeSelectionWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="headline_presetsection">
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Transfer Function Presets</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="volumeSelectionLabel">
+       <property name="text">
+        <string>Selected image</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="presetComboBox">
        <property name="placeholderText">
         <string>Choose a preset...</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="presetLabel">
+     <item row="10" column="1">
+      <widget class="QPushButton" name="resetTfButton">
        <property name="text">
-        <string>Select a transfer function preset</string>
+        <string>Reset Override</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="collapsibleGroupBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Advanced</string>
+     </property>
+     <property name="collapsed" stdset="0">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="advancedLayout">
+      <item>
+       <widget class="QmitkTransferFunctionWidget" name="tfControlPanelsWidget" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -86,6 +168,24 @@
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkTransferFunctionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkTransferFunctionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkDoubleSlider</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkDoubleSlider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header location="global">ctkCollapsibleGroupBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

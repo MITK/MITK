@@ -34,7 +34,9 @@ namespace
     mitk::TransferFunction::ControlPoints points;
 
     for (std::size_t i = 0; i + 1 < flat.size(); i += 2)
+    {
       points.emplace_back(flat[i].get<double>(), flat[i + 1].get<double>());
+    }
 
     return points;
   }
@@ -100,6 +102,19 @@ mitk::TransferFunctionPresets::TransferFunctionPresets()
     preset.color = DecodeColor(entry["RGBPoints"]);
     preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
 
+    // The effective Range is the itensity window a preset is designed for, i.e.
+    // the range of voxel values over wehich the transfer functin actually varies.
+    // If no effective Range is included, the fallback takes the values of the first 
+    // and last Opacity Value, so the entire range instead of a subset
+    if (entry.contains("EffectiveRange") && entry["EffectiveRange"].is_array() && entry["EffectiveRange"].size()>=2)
+    {
+      preset.effectiveRange = entry["EffectiveRange"].get<std::array<double, 2>>();
+    }
+    else if (!preset.scalarOpacity.empty())
+    {
+      preset.effectiveRange = std::array<double, 2>{ preset.scalarOpacity.front().first, preset.scalarOpacity.back().first };
+    }
+
     m_Presets.push_back(std::move(preset));
   }
 }
@@ -110,9 +125,19 @@ std::vector<std::string> mitk::TransferFunctionPresets::GetPresetNames() const
   names.reserve(m_Presets.size());
 
   for (const auto &preset : m_Presets)
+  {
     names.push_back(preset.name);
+  }
 
   return names;
+}
+
+std::array<double, 2> mitk::TransferFunctionPresets::GetEffectiveRange(const std::string &presetName) const
+{
+  const auto it = std::find_if(m_Presets.begin(), m_Presets.end(), 
+    [&presetName](const Preset &preset) {return preset.name == presetName; });
+
+  return it != m_Presets.end() ? it->effectiveRange : std::array<double, 2> { 0.0, 0.0};
 }
 
 mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFunction(
@@ -131,6 +156,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
 
   if (!it->scalarOpacity.empty())
     transferFunction->SetScalarOpacityPoints(it->scalarOpacity);
+
   transferFunction->SetRGBPoints(it->color);
 
   // The gradient opacity function is intentionally left at its default
@@ -139,13 +165,21 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
   auto *colorFunction = transferFunction->GetColorTransferFunction();
 
   if (it->colorSpace == "RGB")
+  {
     colorFunction->SetColorSpaceToRGB();
+  }
   else if (it->colorSpace == "HSV")
+  {
     colorFunction->SetColorSpaceToHSV();
+  }
   else if (it->colorSpace == "Lab")
+  {
     colorFunction->SetColorSpaceToLab();
+  }
   else if (it->colorSpace == "Diverging")
+  {
     colorFunction->SetColorSpaceToDiverging();
+  }
   else
   {
     MITK_WARN << "Unknown color space \"" << it->colorSpace << "\" in preset \""

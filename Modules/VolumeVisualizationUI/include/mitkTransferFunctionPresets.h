@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <string>
 #include <vector>
+#include <array>
 
 namespace mitk
 {
@@ -39,6 +40,15 @@ namespace mitk
     std::vector<std::string> GetPresetNames() const;
 
     /**
+     * \brief Intensity window the preset is authored for.
+     * \return {min, max} scalar values in the image's own intensity units
+     * (e.g. Hounsfield units for CT) over which the preset's transfer
+     * function is meaningful. Callers use it to window/scale the volume
+     * so the preset lands on the right value range.
+     */
+    std::array<double, 2> GetEffectiveRange(const std::string &presetName) const;
+
+    /**
      * \brief Build a transfer function for the named preset.
      * \param[in] presetName One of the names returned by GetPresetNames().
      * \return A newly created transfer function, or nullptr if the name is unknown.
@@ -52,6 +62,7 @@ namespace mitk
       std::string colorSpace;
       TransferFunction::ControlPoints scalarOpacity;
       TransferFunction::RGBControlPoints color;
+      std::array<double, 2> effectiveRange {0.0, 0.0};
     };
 
     std::vector<Preset> m_Presets;

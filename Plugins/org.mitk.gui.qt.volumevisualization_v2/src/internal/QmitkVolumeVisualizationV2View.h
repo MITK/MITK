@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 
+#include <mitkTransferFunction.h>
 #include <mitkTransferFunctionPresets.h>
 
 #include <QmitkAbstractView.h>
@@ -44,15 +45,26 @@ private Q_SLOTS:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnEnabledRendering(bool state);
   void OnTransferFunctionPresetSelected(const QString &presetName);
+  void OnShiftOrWidthChanged();
+  void OnResetTransferFunction();
 
 private:
   void CreateQtPartControl(QWidget *parent) override;
 
   void UpdateInterface();
 
+  void SnapshotAppliedTransferFunction();
+  void ResetShiftWidthControls();
+
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   mitk::TransferFunctionPresets m_Presets;
+
+  mitk::TransferFunction::Pointer m_AppliedTransferFunction;
+  mitk::TransferFunction::ControlPoints m_BaseScalarOpacity;
+  mitk::TransferFunction::RGBControlPoints m_BaseColor;
+  double m_WidthCenter = 0.0;
+  std::array<double, 2> m_EffectiveRange { 0.0, 0.0 }; 
 };
 
 #endif

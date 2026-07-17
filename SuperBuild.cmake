@@ -349,6 +349,10 @@ if(MITK_WHEEL_VERSION)
   )
 endif()
 
+# Encode list values for transport to the inner build (LIST_SEPARATOR below).
+string(REPLACE ";" "^^" _boost_header_libraries_arg "${MITK_USE_Boost_HEADER_LIBRARIES}")
+string(REPLACE ";" "^^" _boost_compiled_libraries_arg "${MITK_USE_Boost_COMPILED_LIBRARIES}")
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
@@ -421,7 +425,8 @@ ExternalProject_Add(${proj}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=${DCMTK_CMAKE_DEBUG_POSTFIX}
     -DBoost_ROOT:PATH=${Boost_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
-    -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
+    -DMITK_USE_Boost_HEADER_LIBRARIES:STRING=${_boost_header_libraries_arg}
+    -DMITK_USE_Boost_COMPILED_LIBRARIES:STRING=${_boost_compiled_libraries_arg}
     -DQt6_DIR:PATH=${Qt6_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}

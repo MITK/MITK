@@ -439,21 +439,24 @@ else()
   find_package(OpenSSL 3)
 endif()
 
-# MITK's own minimum Boost usage. Its dependency closure (plus anything added
-# below or via the cache variable) is resolved and provisioned automatically.
+# MITK's own header-only Boost usage. The dependency closure of these libraries
+# (and of the compiled ones below) is resolved and provisioned automatically.
 set(_mitk_minimum_boost_libraries "algorithm;tokenizer;math;lexical_cast;preprocessor;uuid;variant;spirit;phoenix")
-set(MITK_USE_Boost_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries to provision (their dependency closure is resolved automatically)")
+set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)")
 
-# MITK cannot build without its minimum set, so restore it if the cache is empty.
-if(NOT MITK_USE_Boost_LIBRARIES)
-  set(MITK_USE_Boost_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries to provision (their dependency closure is resolved automatically)" FORCE)
+# MITK cannot build without its minimum header set, so restore it if cleared.
+if(NOT MITK_USE_Boost_HEADER_LIBRARIES)
+  set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)" FORCE)
 endif()
 
-# Boost libraries required by optional dependencies are added when enabled so
-# their dependency closure is provisioned too.
+# Boost libraries that are compiled and linked (none by default; e.g. process).
+set(MITK_USE_Boost_COMPILED_LIBRARIES "" CACHE STRING "Semicolon-separated Boost libraries to compile and link (dependency closure resolved automatically)")
+
+# Header-only Boost libraries required by optional dependencies, added when the
+# dependency is enabled so their closure is provisioned too.
 if(MITK_USE_MatchPoint)
-  list(APPEND MITK_USE_Boost_LIBRARIES graph interprocess uuid)
-  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
+  list(APPEND MITK_USE_Boost_HEADER_LIBRARIES graph interprocess uuid)
+  list(REMOVE_DUPLICATES MITK_USE_Boost_HEADER_LIBRARIES)
 endif()
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)

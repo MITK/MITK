@@ -2,8 +2,6 @@
 # Boost
 #-----------------------------------------------------------------------------
 
-include(mitkFunctionGetMSVCVersion)
-
 #[[ Sanity checks ]]
 if(DEFINED Boost_ROOT AND NOT EXISTS ${Boost_ROOT})
   message(FATAL_ERROR "Boost_ROOT variable is defined but corresponds to non-existing directory")
@@ -15,12 +13,24 @@ set(proj Boost)
 set(proj_DEPENDENCIES )
 set(Boost_DEPENDS ${proj})
 
-if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
+#[[ Provisioning fetches the internal-dependency closure of
+    MITK_USE_Boost_LIBRARIES from a committed map (CMakeExternals/Boost/) and
+    builds exactly that set. When MITK builds its standalone Python, the closure
+    is fetched in parallel; otherwise a sequential pure-CMake fetch is used.
+    Using Python only adds a build-order dependency on Python3, which is
+    registered before Boost in ExternalProjectList.cmake for that reason. ]]
+if(MITK_USE_Python3)
+  if(WIN32)
+    set(boost_python "${Python3_ROOT_DIR}/python.exe")
+  else()
+    set(boost_python "${Python3_ROOT_DIR}/bin/python3")
+  endif()
+  list(APPEND proj_DEPENDENCIES Python3)
+else()
+  set(boost_python "")
+endif()
 
-  #[[ Reset variables. ]]
-  set(patch_cmd "")
-  set(configure_cmd "")
-  set(install_cmd "")
+if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
   set(Boost_ROOT ${ep_prefix})
   set(Boost_DIR "${Boost_ROOT}/lib/cmake/Boost-1.91.0")
@@ -29,317 +39,55 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(BOOST_LIBRARYDIR "${Boost_ROOT}/lib")
   endif()
 
-  #[[ If you update Boost, make sure that the FindBoost module of the minimum
-      required version of CMake supports the new version of Boost.
+  find_package(Git REQUIRED)
 
-      In case you are using a higher version of CMake, download at least the
-      source code of the minimum required version of CMake to look into the
-      right version of the FindBoost module:
+  set(provision_dir "${CMAKE_CURRENT_LIST_DIR}/Boost")
 
-        <CMAKE_INSTALL_DIR>/share/cmake-<VERSION>/Modules/FindBoost.cmake
-
-      Search for a list called _Boost_KNOWN_VERSIONS. If the new version is
-      not included in this list, you have three options:
-
-        * Update the minimum required version of CMake. This may require
-          adaptions of other parts of our CMake scripts and has the most
-          impact on other MITK developers. Yet this is the safest and
-          cleanest option.
-
-        * Set Boost_ADDITIONAL_VERSIONS (see the documentation of the
-          FindBoost module). As Boost libraries and dependencies between
-          them are hard-coded in the FindBoost module only for known versions,
-          this may cause trouble for other MITK developers relying on new
-          components of Boost or components with changed dependencies.
-
-        * Copy a newer version of the FindBoost module into our CMake
-          directory. Our CMake directory has a higher precedence than the
-          default CMake module directory. Doublecheck if the minimum required
-          version of CMake is able to process the newer version of the
-          FindBoost module. Also, DO NOT FORGET to mention this option right
-          above the call of cmake_minimum_required() in the top-level
-          CMakeLists.txt file AND in this file right above the set(url)
-          command below so if we update the minimum required version of CMake
-          or use another option in the future, we do not forget to remove our
-          copy of the FindBoost module again. ]]
-
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_91_0.tar.gz")
-  set(md5 e799ed3e5af9708739fb2e088c670ae1)
-
-  if(MITK_USE_Boost_LIBRARIES)
-
-     #[[ Boost has a two-step build process. In the first step, a bootstrap
-         script is called to build b2, an executable that is used to actually
-         build Boost in the second step.
-
-         The bootstrap script expects a toolset (compiler) argument that is
-         used to build the b2 executable. The scripts and their expected
-         argument format differ between Windows and Unix. ]]
-
-    if(WIN32)
-
-      mitkFunctionGetMSVCVersion()
-
-      if(VISUAL_STUDIO_VERSION_MINOR EQUAL 0)
-
-        #[[ Use just the major version in the toolset name. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR})
-
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 20)
-
-        #[[ Assume Visual Studio 2017. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}1)
-
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 30)
-
-        #[[ Assume Visual Studio 2019. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}2)
-
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 45)
-
-        #[[ Assume Visual Studio 2022. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}3)
-
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 60)
-
-        #[[ Assume Visual Studio 2026. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}5)
-
-      else()
-
-        #[[ Fallback to the generic case. Be prepared to add another elseif
-            branch above for future versions of Visual Studio. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR})
-
-      endif()
-
-    else()
-
-      #[[ We support GCC and Clang on Unix. On macOS, the toolset must be set
-          to clang. The actual compiler for all of these toolkits is set
-          further below, after the bootstrap script but before b2. ]]
-
-      if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
-        set(toolset gcc)
-      elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR APPLE)
-        set(toolset clang)
-      endif()
-
-      if(toolset)
-        set(bootstrap_args --with-toolset=${toolset})
-      endif()
-
-      #[[ At least give it a shot if the toolset is something else and let
-          the bootstrap script decide on the toolset by not passing any
-          argument. ]]
-
-    endif()
-
-    #[[ The call of b2 is more complex. b2 arguments are grouped into options
-        and properties. Options follow the standard format for arguments while
-        properties are plain key-value pairs. ]]
-
-    set(b2_options
-      --build-dir=<BINARY_DIR>
-      --stagedir=<INSTALL_DIR>
-      --ignore-site-config #[[ Build independent of any site.config file ]]
-      -q #[[ Stop at first error ]]
-    )
-
-    if(APPLE AND CMAKE_OSX_SYSROOT)
-
-      #[[ Specify the macOS platform SDK to be used. ]]
-      list(APPEND b2_options --sysroot=${CMAKE_OSX_SYSROOT})
-
-    endif()
-
-    foreach(lib ${MITK_USE_Boost_LIBRARIES})
-      list(APPEND b2_options --with-${lib})
-    endforeach()
-
-    set(b2_properties
-      threading=multi
-      runtime-link=shared
-      "cxxflags=${MITK_CXX${MITK_CXX_STANDARD}_FLAG} ${CMAKE_CXX_FLAGS}"
-    )
-
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-      list(APPEND b2_properties address-model=64)
-    else()
-      list(APPEND b2_properties address-model=32)
-    endif()
-
-    if(BUILD_SHARED_LIBS)
-      list(APPEND b2_properties link=shared)
-    else()
-      list(APPEND b2_properties link=static)
-    endif()
-
-    list(APPEND b2_properties "\
-$<$<CONFIG:Debug>:variant=debug>\
-$<$<CONFIG:Release>:variant=release>\
-$<$<CONFIG:MinSizeRel>:variant=release>\
-$<$<CONFIG:RelWithDebInfo>:variant=release>")
-
-    if(WIN32)
-
-      set(bootstrap_cmd if not exist b2.exe \( call bootstrap.bat ${bootstrap_args} \))
-      set(b2_cmd b2 ${b2_options} ${b2_properties} stage)
-
-    else()
-
-      set(bootstrap_cmd #[[ test -e ./b2 || ]] ./bootstrap.sh ${bootstrap_args})
-      set(b2_cmd ./b2 ${b2_options} ${b2_properties} stage)
-
-      #[[ We already told Boost if we want to use GCC or Clang but so far we
-          were not able to specify the exact same compiler we set in CMake
-          when configuring the MITK superbuild for the first time.
-          For example, this can be different from the system default
-          when multiple versions of the same compiler are installed
-          at the same time.
-
-          The bootstrap script creates a configuration file for b2 that should
-          be modified if necessary before b2 is called.
-          We look for a line like
-
-            using gcc ;
-
-          and replace it with something more specific like
-
-            using gcc : : /usr/bin/gcc-7.3 ;
-
-          We use the stream editor sed for the replacement but since macOS is
-          based on BSD Unix, we use the limited but portable BSD syntax
-          instead of the more powerful GNU syntax. We also use | instead of
-          the more commonly used / separator for sed because the replacement
-          contains slashes.
-
-          2021/06/15: The custom project-config.jam does not work well with
-          SDK paths on macOS anymore, so we use a custom project-config.jam
-          only on Linux for now. ]]
-
-      if(toolset AND NOT APPLE)
-        set(configure_cmd sed -i.backup "\
-s|\
-using[[:space:]][[:space:]]*${toolset}[[:space:]]*$<SEMICOLON>|\
-using ${toolset} : : ${CMAKE_CXX_COMPILER} $<SEMICOLON>|\
-g"
-          <SOURCE_DIR>/project-config.jam
-        )
-      endif()
-
-    endif()
-
-  endif()
-
-  if(WIN32)
-    set(dummy_cmd cd .)
-  else()
-    set(dummy_cmd true) #[[ "cd ." does not work reliably ]]
-  endif()
-
-  if(NOT patch_cmd)
-    set(patch_cmd ${dummy_cmd}) #[[ Do nothing ]]
-  endif()
-
-  if(NOT configure_cmd)
-    set(configure_cmd ${dummy_cmd}) #[[ Do nothing ]]
-  endif()
-
-  if(WIN32)
-    set(install_cmd
-      if not exist $<SHELL_PATH:${ep_prefix}/include/boost/config.hpp>
-      \( ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/boost <INSTALL_DIR>/include/boost \)
-    )
-  else()
-    set(install_cmd
-      # test -e <INSTALL_DIR>/include/boost/config.hpp ||
-      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/boost <INSTALL_DIR>/include/boost
-    )
-  endif()
+  #[[ Transport the library set through single -D arguments using the
+      ExternalProject list separator; the nested build and BoostProvision.cmake
+      decode it back into a list. ]]
+  string(REPLACE ";" "^^" boost_libraries "${MITK_USE_Boost_LIBRARIES}")
 
   ExternalProject_Add(${proj}
-    URL ${url}
-    URL_MD5 ${md5}
-    PATCH_COMMAND ${patch_cmd}
-    CONFIGURE_COMMAND ${configure_cmd}
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ${install_cmd}
+    LIST_SEPARATOR ${sep}
+    GIT_REPOSITORY https://github.com/boostorg/boost.git
+    #[[ When upgrading Boost, bump this tag AND regenerate the dependency map:
+        clone the new tag with --recurse-submodules, then run
+        Boost/generate_boost_map.py <checkout> Boost/boost-deps.cmake ]]
+    GIT_TAG boost-1.91.0
+    GIT_SHALLOW 1
+    GIT_SUBMODULES "" #[[ Superproject only; the closure is fetched selectively below. ]]
+    CMAKE_GENERATOR ${gen}
+    CMAKE_GENERATOR_PLATFORM ${gen_platform}
+    CMAKE_ARGS
+      ${ep_common_args}
+      -DBOOST_INSTALL_LAYOUT:STRING=system
+      -DBOOST_INCLUDE_LIBRARIES:STRING=${boost_libraries}
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+      -DBUILD_TESTING:BOOL=OFF
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
+    DEPENDS ${proj_DEPENDENCIES}
   )
 
-  ExternalProject_Add_Step(${proj} bootstrap
-    COMMAND ${bootstrap_cmd}
-    DEPENDEES patch
+  #[[ After clone, before configure: fetch the CMake build infrastructure
+      (superproject submodules) and the sparse dependency closure of the
+      requested libraries. ]]
+  ExternalProject_Add_Step(${proj} provision
+    COMMAND ${GIT_EXECUTABLE} submodule update --init --depth 1
+            tools/cmake tools/build tools/boost_install
+    COMMAND ${CMAKE_COMMAND}
+            -DBOOST_SRC=<SOURCE_DIR>
+            -DBOOST_LIBRARIES=${boost_libraries}
+            -DBOOST_MAP=${provision_dir}/boost-deps.cmake
+            -DFETCH_ONE=${provision_dir}/fetch_one.cmake
+            -DFETCH_PY=${provision_dir}/fetch_boost.py
+            -DBOOST_PYTHON=${boost_python}
+            -P ${provision_dir}/BoostProvision.cmake
+    DEPENDEES download
     DEPENDERS configure
     WORKING_DIRECTORY <SOURCE_DIR>
-  )
-
-  ExternalProject_Add_Step(${proj} b2
-    COMMAND ${b2_cmd}
-    DEPENDEES bootstrap
-    DEPENDERS build
-    WORKING_DIRECTORY <SOURCE_DIR>
-  )
-
-  if(WIN32)
-
-    #[[ Reuse already extracted files. ]]
-
-    set(stamp_dir ${ep_prefix}/src/Boost-stamp)
-
-    configure_file(
-      ${CMAKE_CURRENT_LIST_DIR}/extract-Boost.replacement.cmake
-      ${stamp_dir}/extract-Boost.replacement.cmake
-      COPYONLY)
-
-    ExternalProject_Add_Step(${proj} pre_download
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/Boost-pre_download.cmake
-      DEPENDEES mkdir
-      DEPENDERS download
-      INDEPENDENT TRUE
-      WORKING_DIRECTORY ${stamp_dir}
-    )
-
-  endif()
-
-  set(install_manifest_dependees install)
-
-  if(MITK_USE_Boost_LIBRARIES)
-
-    if(WIN32)
-
-      #[[ Move DLLs from lib to bin directory. ]]
-
-      ExternalProject_Add_Step(${proj} post_install
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/Boost-post_install-WIN32.cmake
-        DEPENDEES install
-        WORKING_DIRECTORY <INSTALL_DIR>/lib
-      )
-
-      set(install_manifest_dependees post_install)
-
-    elseif(APPLE)
-
-      #[[ Boost does not follow the common practice of either using rpath or
-          absolute paths for referencing dependencies. We have to use the
-          install_name_tool to fix this. ]]
-
-      ExternalProject_Add_Step(${proj} post_install
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/Boost-post_install-APPLE.cmake
-        DEPENDEES install
-        WORKING_DIRECTORY <INSTALL_DIR>/lib
-      )
-
-      set(install_manifest_dependees post_install)
-
-    endif()
-
-  endif()
-
-  ExternalProject_Add_Step(${proj} install_manifest
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/Boost-install_manifest.cmake
-    DEPENDEES ${install_manifest_dependees}
-    WORKING_DIRECTORY ${ep_prefix}
   )
 
 else()

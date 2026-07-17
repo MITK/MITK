@@ -439,7 +439,22 @@ else()
   find_package(OpenSSL 3)
 endif()
 
-set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
+# MITK's own minimum Boost usage. Its dependency closure (plus anything added
+# below or via the cache variable) is resolved and provisioned automatically.
+set(_mitk_minimum_boost_libraries "algorithm;tokenizer;math;lexical_cast;preprocessor;uuid;variant;spirit;phoenix")
+set(MITK_USE_Boost_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries to provision (their dependency closure is resolved automatically)")
+
+# MITK cannot build without its minimum set, so restore it if the cache is empty.
+if(NOT MITK_USE_Boost_LIBRARIES)
+  set(MITK_USE_Boost_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries to provision (their dependency closure is resolved automatically)" FORCE)
+endif()
+
+# Boost libraries required by optional dependencies are added when enabled so
+# their dependency closure is provisioned too.
+if(MITK_USE_MatchPoint)
+  list(APPEND MITK_USE_Boost_LIBRARIES graph interprocess uuid)
+  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
+endif()
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
   set(openssl_message "Could not find OpenSSL.\n")

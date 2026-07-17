@@ -500,32 +500,9 @@ MITK's own code (modules, executables, CppMicroServices, CTK/BlueBerry plugins) 
 
 ## External Project Special Cases
 
-### Boost DLL Relocation (Windows)
+### Boost
 
-Boost builds its DLLs into `lib/`. A post-install step (`Boost-post_install-WIN32.cmake`) moves them to `bin/` so they are found alongside other DLLs:
-
-```cmake
-file(GLOB boost_dlls boost_*.dll)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ../bin)
-foreach(boost_dll ${boost_dlls})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${boost_dll} ../bin)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${boost_dll})
-endforeach()
-```
-
-### Boost macOS RPATH
-
-Boost does not follow the common practice of using `@rpath` for inter-library references on macOS. A post-install step (`Boost-post_install-APPLE.cmake`) fixes this with `install_name_tool`:
-
-```cmake
-foreach(boost_dylib ${boost_dylibs})
-  execute_process(COMMAND install_name_tool -id @rpath/${boost_dylib} ${boost_dylib})
-  foreach(other_boost_dylib ${boost_dylibs})
-    execute_process(COMMAND install_name_tool -change ${other_boost_dylib}
-      @rpath/${other_boost_dylib} ${boost_dylib})
-  endforeach()
-endforeach()
-```
+Boost is provisioned and built through its own CMake support (`BoostRoot`) rather than b2 (see `CMakeExternals/Boost.cmake`). Only the libraries listed in `MITK_USE_Boost_LIBRARIES` and their dependency closure are fetched (sparse and shallow) and built. Because the build installs through CMake's `install(TARGETS ...)`, shared libraries land in the conventional locations, DLLs in `bin/` and import libraries in `lib/` on Windows, `.so`/`.dylib` in `lib/` on Unix, and inter-library references use the superbuild's shared `CMAKE_INSTALL_RPATH`. The former post-install steps that moved Boost DLLs from `lib/` to `bin/` on Windows and rewrote install names with `install_name_tool` on macOS are therefore no longer needed and have been removed.
 
 ### External CMake Project Installation
 

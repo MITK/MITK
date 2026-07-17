@@ -22,10 +22,8 @@ found in the LICENSE file.
 #include <QMutex>
 
 #include <berryIWorkbenchPage.h>
-#include <berryIWindowListener.h>
 
 class QHelpEngine;
-class QWebEngineUrlSchemeHandler;
 
 namespace berry {
 
@@ -72,10 +70,8 @@ private:
   QScopedPointer<QHelpEngineWrapper, QScopedPointerDeleteLater > helpEngine;
   QScopedPointer<QHelpEngineConfiguration> helpEngineConfiguration;
   QScopedPointer<HelpContextHandler> helpContextHandler;
-  QWebEngineUrlSchemeHandler* helpSchemeHandler;
 
   QCHPluginListener* pluginListener;
-  QScopedPointer<IWindowListener> wndListener;
 };
 
 /**

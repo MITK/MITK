@@ -12,29 +12,34 @@ found in the LICENSE file.
 #ifndef QmitkIntensityProfileVisualizationWidget_h
 #define QmitkIntensityProfileVisualizationWidget_h
 
-//Qt
-#include <QmitkChartWidget.h>
-
 #include <MitkImageStatisticsUIExports.h>
+
+#include <QmitkPlotStyle.h>
 
 //mitk
 #include <mitkIntensityProfile.h>
+
+#include <QWidget>
+
 #include <memory>
+#include <string>
+#include <vector>
+
+class QmitkPlotWidget;
+class QwtPlotZoomer;
 
 namespace Ui
 {
   class QmitkIntensityProfileControls;
-};
+}
 
 /**
  * \brief Widget for displaying intensity profile line charts along a path.
  *
- * Provides a chart-based visualization of intensity values along a line or path,
- * with controls for toggling a subchart overview and copying the intensity data
- * to the clipboard. The chart displays distance on the X-axis and intensity values
- * on the Y-axis.
+ * Provides a Qwt-based visualization of intensity values along a line or path,
+ * with a control for copying the intensity data to the clipboard. The plot
+ * displays distance on the X-axis and intensity values on the Y-axis.
  *
- * \sa QmitkChartWidget
  * \sa QmitkHistogramVisualizationWidget
  * \sa mitk::IntensityProfile
  */
@@ -56,27 +61,24 @@ public:
   /**
    * \brief Displays an intensity profile as a line chart.
    *
-   * Converts the intensity profile to a vector of values and adds it to the chart widget.
+   * Converts the intensity profile to a vector of values and adds it to the plot.
    * If the profile is nullptr or empty, the call is ignored.
    *
    * \param[in] intensityProfile The intensity profile to visualize. May be nullptr.
-   * \param[in] dataLabel A label identifying this data series in the chart.
+   * \param[in] dataLabel A label identifying this data series in the plot.
    */
   void SetIntensityProfile(mitk::IntensityProfile::ConstPointer intensityProfile, const std::string& dataLabel);
 
   /**
-   * \brief Clears the chart and disables all GUI elements.
+   * \brief Clears the plot and disables all GUI elements.
    */
   void Reset();
 
   /**
-   * \brief Sets the color theme for the chart widget.
-   *
-   * The theme is applied when the chart page finishes loading.
-   *
-   * \param[in] style The color theme to apply (dark or light).
+   * \brief Sets the color theme for the plot.
+   * \param[in] style The plot style to apply (dark or light).
    */
-  void SetTheme(QmitkChartWidget::ColorTheme style);
+  void SetTheme(QmitkPlotStyle style);
 
 private:
 
@@ -84,19 +86,16 @@ private:
 
   void SetGUIElementsEnabled(bool enabled);
 
-  std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
+  /** \brief Applies m_Style (canvas background and axis colors) to the plot. */
+  void ApplyTheme();
 
   /** \brief  Saves the intensity profile to the clipboard. */
   void OnClipboardButtonClicked();
-  /** \brief Shows / Hides the subchart. */
-  void OnShowSubchartCheckBoxChanged();
-
-  void OnPageSuccessfullyLoaded();
-
-private:
 
   std::unique_ptr<Ui::QmitkIntensityProfileControls> m_Controls;
-  QmitkChartWidget::ColorTheme m_ChartStyle = QmitkChartWidget::ColorTheme::darkstyle;
+  QmitkPlotWidget* m_PlotWidget;
+  QwtPlotZoomer* m_Zoomer;
+  QmitkPlotStyle m_Style = QmitkPlotStyle::Dark;
 
   std::vector<double> m_IntensityProfileList;
 };

@@ -42,8 +42,6 @@ found in the LICENSE file.
 #include <QSplashScreen>
 #include <QStandardPaths>
 #include <QTime>
-#include <QWebEngineUrlScheme>
-#include <QQuickWindow>
 
 #include <fstream>
 #include <sstream>
@@ -705,14 +703,6 @@ namespace mitk
       qputenv("QT_STYLE_OVERRIDE", "windowsvista");
 #endif
 
-    // Prevent conflicts between native OpenGL applications and QWebEngine
-    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-      QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
-#else
-      QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
-#endif
-
     // If parameters have been set before, we have to store them to hand them
     // through to the application
     auto appName = this->getApplicationName();
@@ -730,10 +720,6 @@ namespace mitk
     qInstallMessageHandler(!d->m_LogQtMessages
       ? outputImportantQtMessage
       : outputQtMessage);
-
-    QWebEngineUrlScheme qtHelpScheme("qthelp");
-    qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
-    QWebEngineUrlScheme::registerScheme(qtHelpScheme);
   }
 
   void BaseApplication::initialize(Poco::Util::Application &self)

@@ -1,6 +1,7 @@
 set(CPP_FILES
   QmitkHistogramVisualizationWidget.cpp
   QmitkImageStatisticsCalculationRunnable.cpp
+  QmitkImageStatisticsPlotHelper.cpp
   QmitkIntensityProfileVisualizationWidget.cpp
   QmitkImageStatisticsTreeModel.cpp
   QmitkStatisticsModelToStringConverter.cpp

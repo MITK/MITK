@@ -125,6 +125,7 @@ function(mitk_create_plugin)
       EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
+    set(PLUGIN_DOXYGEN_STYLESHEET "${MITK_SOURCE_DIR}/Documentation/mitk_doxygen_plugin_manual_extra.css")
 
     # Create a list of Doxygen tag files from the plug-in dependencies.
     #
@@ -356,7 +357,7 @@ function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file)
                      COMMAND ${DOXYGEN_EXECUTABLE} ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
                      # Generate the final Qt compressed help file (.qch)
                      COMMAND ${QT_HELPGENERATOR_EXECUTABLE} ${_generated_qhp_file} -o ${${qch_file}}
-                     DEPENDS ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf ${_file_dependencies}
+                     DEPENDS ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf ${_file_dependencies} ${PLUGIN_DOXYGEN_STYLESHEET}
                      )
 
   #set_source_files_properties(${qch_file} PROPERTIES GENERATED 1)

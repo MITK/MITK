@@ -21,4 +21,5 @@ mitkFunctionAddExternalProject(NAME pybind11 OFF ADVANCED)
 
 if(MITK_USE_Qt6)
  mitkFunctionAddExternalProject(NAME Qt6Qwt6 ON ADVANCED DEPENDS Qt6)
+ mitkFunctionAddExternalProject(NAME litehtml ON ADVANCED)
 endif()

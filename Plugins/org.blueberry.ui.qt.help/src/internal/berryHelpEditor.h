@@ -15,18 +15,15 @@ found in the LICENSE file.
 
 #include <berryIReusableEditor.h>
 #include <berryIPartListener.h>
-#include <berryIPerspectiveListener.h>
 #include <berryQtEditorPart.h>
 
 class QToolBar;
-class QWebEnginePage;
 
 namespace berry {
 
 class HelpWebView;
-class HelpEditorFindWidget;
 
-class HelpEditor : public QtEditorPart, public IReusableEditor, public IPartListener, public IPerspectiveListener
+class HelpEditor : public QtEditorPart, public IReusableEditor, public IPartListener
 {
   Q_OBJECT
 
@@ -47,16 +44,8 @@ public:
   bool IsDirty() const override { return false; }
   bool IsSaveAsAllowed() const override { return false; }
 
-  QWebEnginePage* GetQWebPage() const;
-
   IPartListener::Events::Types GetPartEventTypes() const override;
   void PartDeactivated(const IWorkbenchPartReference::Pointer& /*partRef*/) override;
-
-  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const override;
-  void PerspectiveActivated(const SmartPointer<IWorkbenchPage>& page,
-                            const IPerspectiveDescriptor::Pointer& perspective) override;
-  void PerspectiveDeactivated(const SmartPointer<IWorkbenchPage>& page,
-                              const IPerspectiveDescriptor::Pointer& perspective) override;
 
 protected:
 
@@ -69,19 +58,10 @@ protected:
 private Q_SLOTS:
 
   void HomePageChanged(const QString& page);
-  void OpenHelpPerspective();
-  void CloseHelpPerspective();
 
   void InitializeTitle();
-  void ShowTextSearch();
-
-  void findNext();
-  void findPrevious();
-  void find(const QString& ttf, bool forward);
 
 private:
-
-  void findInWebPage(const QString& ttf, bool forward);
 
   void enableShortcuts();
   void disableShortcuts();
@@ -91,17 +71,12 @@ private:
   Q_DISABLE_COPY(HelpEditor)
 
   QToolBar* m_ToolBar;
-  HelpWebView* m_WebEngineView;
-  HelpEditorFindWidget* m_FindWidget;
+  HelpWebView* m_WebView;
 
   QAction* m_BackAction;
   QAction* m_ForwardAction;
-  QAction* m_FindAction;
   QAction* m_ZoomIn;
   QAction* m_ZoomOut;
-  QAction* m_OpenHelpMode;
-  QAction* m_CloseHelpMode;
-  QAction* m_HomeAction;
 };
 
 } // end namespace berry

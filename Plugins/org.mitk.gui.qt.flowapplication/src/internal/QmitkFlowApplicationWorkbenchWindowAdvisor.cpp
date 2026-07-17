@@ -570,7 +570,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   // ===== Help menu ====================================
   QMenu* helpMenu = menuBar->addMenu("&Help");
   helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-  helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
+  helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
   helpMenu->addAction("&Context Help", QKeySequence("F1"), this, &QmitkFlowApplicationWorkbenchWindowAdvisor::onHelp);
   helpMenu->addAction("&About",this, SLOT(onAbout()));
   // =====================================================
@@ -770,9 +770,9 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::onHelp()
   QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack->onHelp();
 }
 
-void QmitkFlowApplicationWorkbenchWindowAdvisor::onHelpOpenHelpPerspective()
+void QmitkFlowApplicationWorkbenchWindowAdvisor::onHelpOpenHelpView()
 {
-  QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpPerspective();
+  QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpView();
 }
 
 void QmitkFlowApplicationWorkbenchWindowAdvisor::onAbout()
@@ -1191,10 +1191,17 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelp()
   }
 }
 
-void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
+void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelpOpenHelpView()
 {
-  berry::PlatformUI::GetWorkbench()->ShowPerspective("org.blueberry.perspectives.help",
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
+  auto window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  if (window.IsNull())
+    return;
+
+  auto page = window->GetActivePage();
+  if (page.IsNull())
+    return;
+
+  page->ShowView("org.blueberry.views.helpindex");
 }
 
 void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onAbout()

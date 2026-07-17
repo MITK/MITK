@@ -5,7 +5,7 @@
 
 \section org_mitk_editors_stdmultiwidget_F1Help General remark on F1 help
 This is the help window of the standard display. To display the help windows of other plugins, press F1 when the plugin of interest is active (please make sure the tab of the plugin of interest is highlighted). 
-Alternatively, go to the <i>Help</i> menu and select <i>Open Help Perspective</i>. A help window opens from which you can select the documentation of the plugin of interest.
+Alternatively, go to the <i>Help</i> menu and select <i>User Manuals</i>. A view opens from which you can select the documentation of the plugin of interest.
 
 \section org_mitk_editors_stdmultiwidget_FourWindowView Four Window View
 

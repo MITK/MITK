@@ -344,8 +344,6 @@ if(MITK_USE_Qt6)
     Svg
     ToolsTools
     UiTools
-    WebEngineCore
-    WebEngineWidgets
     Widgets
     Xml
   )

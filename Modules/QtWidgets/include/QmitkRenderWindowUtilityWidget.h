@@ -17,10 +17,12 @@ found in the LICENSE file.
 
 // qt widgets module
 #include <QmitkSynchronizedNodeSelectionWidget.h>
-#include <QmitkSliceNavigationWidget.h>
-#include <QmitkStepperAdapter.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
 #include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
+
+#include <QColor>
+#include <QList>
 
 // qt
 #include <QWidget>
@@ -38,11 +40,11 @@ class QToolButton;
 /**
 * \brief Utility widget that extends a QmitkRenderWindowWidget with window-specific controls.
 *
-* It offers to select the viewing direction of the window, as well as a QmitkSliceNavigationWidget
-* to scroll through the current view direction.
-* In addition, it contains a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
-* properties and shown nodes, as well as a synchronization-group selector to share this state with
-* other render windows.
+* It offers to select the viewing direction of the window (slice scrolling
+* lives in the cell's viewport navigator, not here). In addition, it contains
+* a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
+* properties and shown nodes, as well as a synchronization-group selector to
+* share this state with other render windows.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {
@@ -86,23 +88,18 @@ public:
   */
   GroupSyncIndexType GetSyncGroup() const;
 
-  void SetGeometry(const itk::EventObject& event);
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
   /**
-  * \brief Programmatically set the cell's view direction: applies the plane
-  *        to the renderer and mirrors it in the selector WITHOUT emitting
-  *        'ViewDirectionChanged'.
-  *
-  *   This is the propagation path: the owning multi widget uses it to relay
-  *   an orientation-group change to member cells, so a relayed change can
-  *   never re-trigger propagation. Only 'AnatomicalPlane::Axial' /
-  *   'Coronal' / 'Sagittal' are supported; other planes are ignored.
+  * \brief Apply the cell's view direction to its renderer. Both the source
+  *        cell's plane-label picker (via MxN::SetViewDirection) and an
+  *        orientation-group relay (via MxN::PropagateOrientation) funnel
+  *        through here. Only 'AnatomicalPlane::Axial' / 'Coronal' /
+  *        'Sagittal' are supported; other planes are ignored.
   */
   void SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection);
 
 public Q_SLOTS:
-  void UpdateViewPlaneSelection();
 
   /**
   * \brief Register a group row in the selector, labeled with the group's
@@ -120,6 +117,19 @@ public Q_SLOTS:
   */
   void SetCleanViewChecked(bool checked);
 
+  /**
+  * \brief Mirror the editor-wide navigator mode into this cell's toggle
+  *        button without re-emitting 'NavigatorToggled'.
+  */
+  void SetNavigatorChecked(bool expanded);
+
+  /**
+  * \brief Set the per-dimension sync barcode for this cell: one color per
+  *        dimension (an invalid color is an unsynced gap). Pushed by the
+  *        owning multi widget from the group registry.
+  */
+  void SetSyncBarcodeSlots(const QList<QColor>& slotColors);
+
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
@@ -132,19 +142,18 @@ Q_SIGNALS:
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
   /**
-  * \brief Emitted after the cell's view direction changed through this
-  *        widget's selector. The programmatic 'SetViewDirectionSelection'
-  *        path stays silent, so listeners (the multi widget's orientation
-  *        propagation) only see user-driven changes.
-  */
-  void ViewDirectionChanged(mitk::AnatomicalPlane viewDirection);
-
-  /**
   * \brief Emitted when the user toggles clean-view mode in this cell. The
   *        mode is editor-wide; the owning multi widget applies it to every
   *        cell and mirrors it back via 'SetCleanViewChecked'.
   */
   void CleanViewToggled(bool cleanView);
+
+  /**
+  * \brief Emitted when the user toggles the navigator mode in this cell. The
+  *        mode is editor-wide; the owning multi widget applies it to every
+  *        cell and mirrors it back via 'SetNavigatorChecked'.
+  */
+  void NavigatorToggled(bool expanded);
 
   /**
   * \brief Emitted when the user asks for the editor-wide layout editor from
@@ -165,13 +174,10 @@ private:
   QComboBox* m_SyncGroupSelector;
   QToolButton* m_NewSyncGroupButton;
   QToolButton* m_CleanViewButton;
-  QmitkSliceNavigationWidget* m_SliceNavigationWidget;
-  QmitkStepperAdapter* m_StepperAdapter;
+  QToolButton* m_NavigatorToggleButton;
+  QmitkMxNSyncBarcodeWidget* m_SyncBarcode;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
-  QComboBox* m_ViewDirectionSelector;
-
-  void ChangeViewDirection(const QString& viewDirection);
 
 };
 

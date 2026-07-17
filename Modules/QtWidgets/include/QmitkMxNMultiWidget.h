@@ -419,6 +419,19 @@ public:
   void SetLevelWindowReadoutVisible(bool visible);
 
   /**
+  * \brief Per-cell navigator mode, mirrored editor-wide: compact (the slice
+  *        slider only, the frequent action) or expanded (the full 3D
+  *        crosshair as three axis sliders plus coordinate entry). "Show
+  *        everything" is an acute working mode, not per-window state, so the
+  *        live toggle is editor-wide like clean-view; the persisted default
+  *        comes from the MxN preference. Applies to cells created later as
+  *        well and emits 'NavigatorExpandedChanged' so per-cell affordances
+  *        can mirror the state.
+  */
+  void SetNavigatorExpanded(bool expanded);
+  bool IsNavigatorExpanded() const;
+
+  /**
   * \brief Ask the hosting layer for the layout editor (emits
   *        'LayoutEditorRequested'). Entry point for furniture that cannot
   *        emit the editor's signal itself (e.g. the seams' editor hook).
@@ -650,10 +663,10 @@ Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
   void Moved();
-  void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
   void SyncGroupAdded(const GroupSyncIndexType index, const QString& label);
   void CleanViewChanged(bool cleanView);
+  void NavigatorExpandedChanged(bool expanded);
 
   /**
   * \brief A selection group's display label changed (cosmetic rename);
@@ -830,6 +843,13 @@ private:
   *        'LayoutChanged' so every layout mutation path refreshes them.
   */
   void RebuildSeams();
+
+  /**
+  * \brief Push each cell's per-dimension group membership to its utility-strip
+  *        sync barcode (one hue per linked dimension, a gap otherwise).
+  *        Connected to 'LayoutChanged' and 'SyncLinksChanged'.
+  */
+  void RefreshSyncBarcodes();
 
   /**
   * \brief Recovery path when 'ApplyLayout' construction fails part-way.
@@ -1016,6 +1036,11 @@ private:
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;
+
+  /** \brief Editor-wide navigator mode (compact vs. expanded); the preference
+   *         sets the default, the top-chrome toggle flips it live. Applied to
+   *         cells created later, too. */
+  bool m_NavigatorExpanded = false;
 
   /**
   * \brief Stashed layout-document `name` so it survives a load -> save

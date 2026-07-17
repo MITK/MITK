@@ -74,6 +74,7 @@ set(CPP_FILES
   QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNLinkSeamWidget.cpp
   QmitkMxNMultiWidget.cpp
+  QmitkMxNSyncBarcodeWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp
   QmitkPropertyItem.cpp

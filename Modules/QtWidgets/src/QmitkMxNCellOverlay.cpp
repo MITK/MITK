@@ -15,20 +15,22 @@ found in the LICENSE file.
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
-#include <QmitkSliceNavigationWidget.h>
-#include <QmitkStepperAdapter.h>
 
 #include <mitkAnatomicalPlanes.h>
 #include <mitkBaseRenderer.h>
+#include <mitkDisplayActionEvents.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImage.h>
+#include <mitkInteractionEvent.h>
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkRenderingManager.h>
+#include <mitkSliceNavigationController.h>
 #include <mitkTimeNavigationController.h>
 
 #include <vtkCallbackCommand.h>
@@ -42,11 +44,17 @@ found in the LICENSE file.
 #include <QFontMetrics>
 #include <QFormLayout>
 #include <QFrame>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPolygon>
+#include <QPropertyAnimation>
+#include <QSpinBox>
+#include <QStyle>
 #include <QTimer>
 
+#include <array>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -57,30 +65,39 @@ namespace
   constexpr int PassiveRibbonWidth = 2;
   constexpr int ActiveRibbonWidth = 14;
   constexpr int RibbonEndHandleHeight = 16;
-  constexpr int ReadoutMargin = 8;
+  constexpr int ReadoutMargin = 5;        // tight edge padding to spare canvas
   constexpr int HueDotDiameter = 8;
   constexpr int ChipSize = 14;
   constexpr int EdgeStripThickness = 20;
   constexpr int EdgeActivationDistance = 16;
   constexpr int TopStripHeight = 4;
   constexpr int SliceTickHeight = 8;
+  constexpr int LineGap = 1;              // between the two bottom-left lines
+  constexpr int TickScaleWidth = 34;      // labels left of the active colorbar
+  constexpr int RevealSlideOffset = 6;    // px the reveal furniture slides in
+  constexpr int TimeTriangleHalfWidth = 3;
+  constexpr int NavRowHeight = 16;        // one navigator slider row
+  constexpr int NavRowGap = 4;
+  constexpr int NavLabelWidth = 78;       // left label column of a navigator row
+  constexpr int NavKnobRadius = 5;
+  constexpr int NavTrackThickness = 2;
+  // The active colorbar does not span the whole edge: it is inset top and
+  // bottom so the range labels never crowd the top chrome or the W/L readout,
+  // and so the colormap chip has room below it.
+  constexpr int ColorbarInsetTop = 30;
+  constexpr int ColorbarInsetBottom = 46;
 
   const QColor IdleText(255, 255, 255, 140);    // 55 % white
   const QColor ActiveText(255, 255, 255, 216);  // 85 % white
 
+  /** \brief The one peripheral-readout font: a single size + tabular numerals
+   *         for every readout (plane, slice, W/L, colorbar ticks, navigator),
+   *         so the instrument panel reads as one type scale. */
   QFont ReadoutFont(const QFont& base)
   {
     QFont font(base);
-    font.setPointSize(10);
-    // Tabular numerals keep the readout from jittering while values change.
-    font.setFeature(QFont::Tag("tnum"), 1);
-    return font;
-  }
-
-  QFont LabelFont(const QFont& base)
-  {
-    QFont font(base);
-    font.setPointSize(8);
+    font.setPointSize(9);
+    // Tabular numerals keep the readouts from jittering while values change.
     font.setFeature(QFont::Tag("tnum"), 1);
     return font;
   }
@@ -88,6 +105,28 @@ namespace
   QString FormatValue(double value)
   {
     return QString::number(std::llround(value));
+  }
+
+  /** \brief A copy of 'base' with its alpha scaled by 'factor' (0..1). */
+  QColor Faded(const QColor& base, qreal factor)
+  {
+    QColor color(base);
+    color.setAlpha(static_cast<int>(std::round(base.alpha() * std::clamp(factor, 0.0, 1.0))));
+    return color;
+  }
+
+  /** \brief The clock glyph preceding the 4D time readout: a ring with two
+   *         hands, drawn to fit 'box'. Antialiasing is expected to be on. */
+  void DrawClockGlyph(QPainter& painter, const QRect& box, const QColor& color)
+  {
+    QPen pen(color, 1.2);
+    painter.setPen(pen);
+    painter.setBrush(Qt::NoBrush);
+    const QRect ring = box.adjusted(1, 1, -1, -1);
+    painter.drawEllipse(ring);
+    const QPointF center = QRectF(ring).center();
+    painter.drawLine(center, center + QPointF(0, -ring.height() * 0.30));
+    painter.drawLine(center, center + QPointF(ring.width() * 0.24, 0));
   }
 }
 
@@ -123,14 +162,34 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
   // state alive while the pointer rests on the furniture itself.
   proximity->AddEventSource(this);
 
-  m_RibbonRegion = proximity->RegisterRegion([this]() { return this->RibbonRect(true); });
-  m_ReadoutRegion = proximity->RegisterRegion([this]() { return this->ReadoutRect(); });
-  m_BottomRegion = proximity->RegisterRegion([this]() { return this->BottomStripRect(); },
-                                             EdgeActivationDistance);
+  m_RibbonRegion = proximity->RegisterRegion([this]() { return this->RibbonRect(); });
+  m_WindowLevelRegion = proximity->RegisterRegion([this]() { return this->WindowLevelRect(); });
+  // The plane label is a control (click to reorient); it highlights and takes
+  // input when the pointer is near it, like the W/L readout.
+  m_PlaneLabelRegion = proximity->RegisterRegion([this]() { return this->PlaneLabelRect(); });
+  // The bottom region is the navigator band (the painted sliders); it goes
+  // Active as the pointer approaches, enabling the drag and sharpening it.
+  m_BottomRegion = proximity->RegisterRegion([this]() { return this->NavigatorBandRect(); });
   m_TopRegion = proximity->RegisterRegion([this]() { return this->TopStripRect(); },
                                           EdgeActivationDistance);
   connect(proximity, &QmitkRenderWindowProximity::StateChanged,
           this, &QmitkMxNCellOverlay::OnProximityStateChanged);
+
+  // The group-identity dot (and the colorbar's level-marker hue) are resolved
+  // live from the group state at paint time, but a grouping change in the
+  // layout editor need not trigger a render - so repaint on the editor's
+  // link-change signal to keep them current.
+  connect(m_Editor, &QmitkMxNMultiWidget::SyncLinksChanged, this, [this]()
+  {
+    this->UpdateInteractivity();
+    this->update();
+  });
+
+  // The interactive furniture reveals as one coordinated frame (opacity +
+  // offset), not region by region; the proximity controller supplies the
+  // collapse delay and hysteresis, this only the easing.
+  m_RevealAnimation = new QPropertyAnimation(this, "revealProgress", this);
+  m_RevealAnimation->setDuration(QmitkRenderWindowProximity::RevealDurationMs);
 
   // Context-menu handling needs the render window's own mouse stream (the
   // overlay is transparent there); the base class already filters the cell.
@@ -186,7 +245,7 @@ QRect QmitkMxNCellOverlay::RenderWindowRect() const
   return nullptr != renderWindow ? renderWindow->geometry() : QRect();
 }
 
-QRect QmitkMxNCellOverlay::RibbonRect(bool active) const
+QRect QmitkMxNCellOverlay::RibbonRect() const
 {
   const QRect area = this->RenderWindowRect();
   if (!area.isValid())
@@ -194,11 +253,67 @@ QRect QmitkMxNCellOverlay::RibbonRect(bool active) const
     return QRect();
   }
 
-  const int width = active ? ActiveRibbonWidth : PassiveRibbonWidth;
-  return QRect(area.right() - width + 1, area.top(), width, area.height());
+  // The interactive colorbar (drag / tick scale / chip anchor) is the revealed
+  // wide bar, inset top and bottom so its range labels clear the top chrome
+  // and the W/L readout and the colormap chip has room below it. The passive
+  // idle strip is painted separately by paintEvent as the reveal animates.
+  return QRect(area.right() - ActiveRibbonWidth + 1, area.top() + ColorbarInsetTop,
+               ActiveRibbonWidth, area.height() - ColorbarInsetTop - ColorbarInsetBottom);
 }
 
-QRect QmitkMxNCellOverlay::ReadoutRect() const
+QRect QmitkMxNCellOverlay::SliceReadoutRect() const
+{
+  const QRect area = this->RenderWindowRect();
+  if (!area.isValid())
+  {
+    return QRect();
+  }
+
+  const bool hasSlice = m_SliceSteps > 0;
+  const bool hasDot = this->ResolveGroupDot().kind != GroupDotKind::None;
+  if (!hasSlice && !hasDot)
+  {
+    return QRect();
+  }
+
+  const QFontMetrics metrics(ReadoutFont(this->font()));
+  const int lineHeight = metrics.height() + 4;
+
+  int width = HueDotDiameter + ReadoutMargin / 2;
+  if (hasSlice)
+  {
+    width += metrics.horizontalAdvance(QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
+    if (m_TimeSteps > 1)
+    {
+      width += ReadoutMargin + lineHeight
+        + metrics.horizontalAdvance(QStringLiteral(" %1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps));
+    }
+  }
+
+  return QRect(area.left() + ReadoutMargin, area.bottom() - ReadoutMargin - lineHeight, width, lineHeight);
+}
+
+QRect QmitkMxNCellOverlay::PlaneLabelRect() const
+{
+  const QRect area = this->RenderWindowRect();
+  const QString planeLabel = this->ResolvePlaneLabel();
+  if (!area.isValid() || planeLabel.isEmpty())
+  {
+    return QRect();
+  }
+
+  const QFontMetrics metrics(ReadoutFont(this->font()));
+  const int lineHeight = metrics.height() + 4;
+  const int width = metrics.horizontalAdvance(planeLabel) + ReadoutMargin;
+
+  // Line 1 sits directly above the slice line (line 2), whether or not the
+  // slice line is currently populated, so the two always share the corner.
+  const QRect below = this->SliceReadoutRect();
+  const int bottom = (below.isValid() ? below.top() : area.bottom() - ReadoutMargin) - LineGap;
+  return QRect(area.left() + ReadoutMargin, bottom - lineHeight, width, lineHeight);
+}
+
+QRect QmitkMxNCellOverlay::WindowLevelRect() const
 {
   const QRect area = this->RenderWindowRect();
   if (!area.isValid() || !m_HasLevelWindow)
@@ -209,54 +324,26 @@ QRect QmitkMxNCellOverlay::ReadoutRect() const
   const QFontMetrics metrics(ReadoutFont(this->font()));
   const QString text = QStringLiteral("W %1 L %2")
     .arg(FormatValue(m_LevelWindow.GetWindow()), FormatValue(m_LevelWindow.GetLevel()));
-  const int width = metrics.horizontalAdvance(text) + HueDotDiameter + 3 * ReadoutMargin / 2;
-  const int height = metrics.height() + 4;
+  const int width = metrics.horizontalAdvance(text) + ReadoutMargin;
+  const int lineHeight = metrics.height() + 4;
 
-  return QRect(area.left() + ReadoutMargin, area.bottom() - ReadoutMargin - height, width, height);
+  // Bottom-right, immediately left of the colorbar, so value and legend read
+  // as one intensity cluster.
+  const int right = area.right() - ActiveRibbonWidth - ReadoutMargin;
+  return QRect(right - width, area.bottom() - ReadoutMargin - lineHeight, width, lineHeight);
 }
 
 QRect QmitkMxNCellOverlay::ColormapChipRect() const
 {
-  const QRect readout = this->ReadoutRect();
-  if (!readout.isValid())
+  const QRect ribbon = this->RibbonRect();
+  if (!ribbon.isValid())
   {
     return QRect();
   }
 
-  return QRect(readout.right() + ReadoutMargin,
-               readout.center().y() - ChipSize / 2, ChipSize, ChipSize);
-}
-
-QRect QmitkMxNCellOverlay::SliceReadoutRect() const
-{
-  const QRect area = this->RenderWindowRect();
-  if (!area.isValid() || m_SliceSteps == 0)
-  {
-    return QRect();
-  }
-
-  const QFontMetrics metrics(ReadoutFont(this->font()));
-  const QString text = QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps);
-  const int width = metrics.horizontalAdvance(text) + ReadoutMargin;
-  const int height = metrics.height() + 4;
-
-  return QRect(area.right() - ActiveRibbonWidth - ReadoutMargin - width,
-               area.bottom() - ReadoutMargin - height, width, height);
-}
-
-QRect QmitkMxNCellOverlay::BottomStripRect() const
-{
-  const QRect area = this->RenderWindowRect();
-  if (!area.isValid())
-  {
-    return QRect();
-  }
-
-  // Leaves the W/L readout corner to its own region and the ribbon its edge.
-  const QRect readout = this->ReadoutRect();
-  const int left = (readout.isValid() ? readout.right() : area.left()) + 2 * ReadoutMargin;
-  return QRect(left, area.bottom() - EdgeStripThickness,
-               area.right() - ActiveRibbonWidth - left, EdgeStripThickness);
+  // In the room the bottom inset leaves beneath the shortened bar, so it never
+  // overlaps the range labels above or the W/L readout to its left.
+  return QRect(ribbon.left(), ribbon.bottom() + ReadoutMargin, ChipSize, ChipSize);
 }
 
 QRect QmitkMxNCellOverlay::TopStripRect() const
@@ -264,13 +351,68 @@ QRect QmitkMxNCellOverlay::TopStripRect() const
   return QRect(0, 0, this->width(), EdgeStripThickness);
 }
 
-bool QmitkMxNCellOverlay::IsRevealed(QmitkRenderWindowProximity::State state, bool alwaysOn) const
+QmitkMxNCellOverlay::GroupDotInfo QmitkMxNCellOverlay::ResolveGroupDot() const
+{
+  GroupDotInfo info;
+
+  const auto windowId = m_Cell->GetWidgetName();
+  std::vector<std::string> distinctGroups;  // in dimension order, de-duplicated
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    const auto link = m_Editor->GetSyncLink(windowId, dimension);
+    if (!link.has_value())
+    {
+      continue;
+    }
+    if (std::find(distinctGroups.begin(), distinctGroups.end(), link->group) == distinctGroups.end())
+    {
+      distinctGroups.push_back(link->group);
+    }
+  }
+
+  if (distinctGroups.empty())
+  {
+    return info;
+  }
+
+  // One hue only when every synchronized dimension names the same group; a
+  // heterogeneous cell gets a distinct complex marker instead of a single hue
+  // that would misrepresent it. Group colors can throw for a group not yet
+  // registered during a mid-layout-change; such a dot is simply dropped.
+  try
+  {
+    if (distinctGroups.size() == 1)
+    {
+      info.hue = m_Editor->GetSyncGroupColor(distinctGroups.front());
+      info.kind = GroupDotKind::Mono;
+    }
+    else
+    {
+      for (const auto& group : distinctGroups)
+      {
+        info.hues.push_back(m_Editor->GetSyncGroupColor(group));
+      }
+      info.kind = GroupDotKind::Complex;
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    return GroupDotInfo();
+  }
+
+  return info;
+}
+
+bool QmitkMxNCellOverlay::IsPassiveVisible(bool honorReadoutPreference) const
 {
   if (m_CleanView)
   {
     return false;
   }
-  return alwaysOn || state != QmitkRenderWindowProximity::State::Idle;
+  // The always-on readouts show whenever the frame is not clean; the
+  // level/window readout additionally obeys its preference, following the
+  // reveal (frame progress) when the preference has it off.
+  return !honorReadoutPreference || m_ReadoutVisible || m_RevealProgress > 0.0;
 }
 
 void QmitkMxNCellOverlay::OnProximityStateChanged(QmitkRenderWindowProximity::RegionId id,
@@ -280,70 +422,414 @@ void QmitkMxNCellOverlay::OnProximityStateChanged(QmitkRenderWindowProximity::Re
   {
     m_RibbonState = state;
   }
-  else if (id == m_ReadoutRegion)
+  else if (id == m_WindowLevelRegion)
   {
-    m_ReadoutState = state;
+    m_WindowLevelState = state;
+  }
+  else if (id == m_PlaneLabelRegion)
+  {
+    m_PlaneLabelState = state;
   }
   else if (id == m_BottomRegion)
   {
     m_BottomState = state;
-    this->UpdateSliceSlider();
   }
   else if (id == m_TopRegion)
   {
     m_TopState = state;
-    m_Cell->ShowUtilityWidget(state == QmitkRenderWindowProximity::State::Active);
   }
   else
   {
     return;
   }
 
+  this->UpdateReveal();
   this->UpdateInteractivity();
   this->update();
 }
 
-void QmitkMxNCellOverlay::UpdateSliceSlider()
+bool QmitkMxNCellOverlay::IsFrameRevealed() const
 {
-  const bool show = !m_CleanView
-    && m_BottomState == QmitkRenderWindowProximity::State::Active && m_SliceSteps > 1;
+  using State = QmitkRenderWindowProximity::State;
+  // Reveal only in the proximity hotzone of the furniture / frame edges (a
+  // region gone Active), not merely while the pointer is somewhere in the
+  // cell - the central image stays uncovered.
+  return !m_CleanView
+    && (m_RibbonState == State::Active || m_WindowLevelState == State::Active
+        || m_PlaneLabelState == State::Active || m_BottomState == State::Active
+        || m_TopState == State::Active);
+}
 
-  if (show && nullptr == m_SliceSlider)
-  {
-    auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
-    if (nullptr == renderer || nullptr == renderer->GetSliceNavigationController())
-    {
-      return;
-    }
-    // The standard slider, floating over the image (a child of the cell,
-    // not of this overlay, so the overlay's input mask does not apply).
-    auto* slider = new QmitkSliceNavigationWidget(m_Cell);
-    new QmitkStepperAdapter(slider, renderer->GetSliceNavigationController()->GetStepper());
-    m_SliceSlider = slider;
-    if (!m_Proximity.isNull())
-    {
-      m_Proximity->AddEventSource(m_SliceSlider);
-    }
-  }
+bool QmitkMxNCellOverlay::AnimationsEnabled() const
+{
+  // The one portable "reduced motion" signal Qt exposes: a style that wants
+  // no animation reports a zero widget-animation duration.
+  return this->style()->styleHint(QStyle::SH_Widget_Animation_Duration, nullptr, this) > 0;
+}
 
-  if (nullptr == m_SliceSlider)
+void QmitkMxNCellOverlay::UpdateReveal()
+{
+  const bool revealed = this->IsFrameRevealed();
+  if (revealed == m_FrameRevealed)
   {
     return;
   }
+  m_FrameRevealed = revealed;
 
-  if (show)
+  // The auto-hidden utility strip is part of the one frame: it reveals and
+  // collapses together with the painted furniture, not on its own top-edge
+  // proximity.
+  m_Cell->ShowUtilityWidget(revealed);
+
+  const qreal target = revealed ? 1.0 : 0.0;
+  if (m_RevealAnimation.isNull() || !this->AnimationsEnabled())
   {
-    const QRect area = this->RenderWindowRect();
-    const int height = m_SliceSlider->sizeHint().height();
-    m_SliceSlider->setGeometry(area.left() + ReadoutMargin,
-                               area.bottom() - EdgeStripThickness - height,
-                               area.width() - 2 * ReadoutMargin - ActiveRibbonWidth, height);
-    m_SliceSlider->show();
-    m_SliceSlider->raise();
+    this->SetRevealProgress(target);
+    return;
   }
-  else
+
+  m_RevealAnimation->stop();
+  m_RevealAnimation->setStartValue(m_RevealProgress);
+  m_RevealAnimation->setEndValue(target);
+  m_RevealAnimation->start();
+}
+
+qreal QmitkMxNCellOverlay::RevealProgress() const
+{
+  return m_RevealProgress;
+}
+
+void QmitkMxNCellOverlay::SetRevealProgress(qreal progress)
+{
+  progress = std::clamp<qreal>(progress, 0.0, 1.0);
+  if (qFuzzyCompare(progress, m_RevealProgress))
   {
-    m_SliceSlider->hide();
+    return;
+  }
+  m_RevealProgress = progress;
+  this->UpdateInteractivity();
+  this->update();
+}
+
+QString QmitkMxNCellOverlay::PlaneLabel() const
+{
+  return this->ResolvePlaneLabel();
+}
+
+QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
+{
+  auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+  if (nullptr == renderer)
+  {
+    return QString();
+  }
+
+  // The same view direction the utility-row combobox drives, so a
+  // reorientation is reflected without a separate signal.
+  if (auto* sliceNavigation = renderer->GetSliceNavigationController())
+  {
+    switch (sliceNavigation->GetDefaultViewDirection())
+    {
+      case mitk::AnatomicalPlane::Axial:    return QStringLiteral("Axial");
+      case mitk::AnatomicalPlane::Coronal:  return QStringLiteral("Coronal");
+      case mitk::AnatomicalPlane::Sagittal: return QStringLiteral("Sagittal");
+      default: break;  // 'Original' has no fixed anatomical name
+    }
+  }
+  return QString();
+}
+
+QmitkMxNCellOverlay::GroupDotKind QmitkMxNCellOverlay::GroupDot() const
+{
+  return this->ResolveGroupDot().kind;
+}
+
+void QmitkMxNCellOverlay::SetNavigatorExpanded(bool expanded)
+{
+  if (expanded == m_NavigatorExpanded)
+  {
+    return;
+  }
+  m_NavigatorExpanded = expanded;
+  this->UpdateInteractivity();
+  this->update();
+}
+
+bool QmitkMxNCellOverlay::IsNavigatorExpanded() const
+{
+  return m_NavigatorExpanded;
+}
+
+mitk::Point3D QmitkMxNCellOverlay::CrosshairWorld() const
+{
+  // GetSelectedPosition logs and returns the origin for an unknown window
+  // rather than throwing, which is a harmless fallback here.
+  return m_Editor->GetSelectedPosition(m_Cell->GetWidgetName());
+}
+
+QString QmitkMxNCellOverlay::NavigatorDepthLabel() const
+{
+  const QString plane = this->ResolvePlaneLabel();
+  // Name the plane on the depth row for an orthogonal view; a tilted view has
+  // no fixed anatomical name, so the generic label is used.
+  if (!plane.isEmpty())
+  {
+    return QStringLiteral("Slice - %1").arg(plane);
+  }
+  return QStringLiteral("Slice");
+}
+
+bool QmitkMxNCellOverlay::NavigatorInPlaneState(mitk::Point3D& origin, mitk::Vector3D& rightUnit,
+                                                mitk::Vector3D& upUnit, double& extentRight,
+                                                double& extentUp, double& rightCoord,
+                                                double& upCoord) const
+{
+  auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+  if (nullptr == renderer)
+  {
+    return false;
+  }
+  const auto* plane = renderer->GetCurrentWorldPlaneGeometry();
+  if (nullptr == plane)
+  {
+    return false;
+  }
+
+  origin = plane->GetOrigin();
+  const mitk::Vector3D right = plane->GetAxisVector(0);
+  const mitk::Vector3D up = plane->GetAxisVector(1);
+  extentRight = right.GetNorm();
+  extentUp = up.GetNorm();
+  if (extentRight < 1e-6 || extentUp < 1e-6)
+  {
+    return false;
+  }
+  rightUnit = right / extentRight;
+  upUnit = up / extentUp;
+
+  // The crosshair projected onto the plane's own axes - oblique-safe, no
+  // dependence on the world coordinate axes.
+  const mitk::Vector3D fromOrigin = this->CrosshairWorld() - origin;
+  rightCoord = fromOrigin * rightUnit;
+  upCoord = fromOrigin * upUnit;
+  return true;
+}
+
+std::vector<QmitkMxNCellOverlay::NavRow> QmitkMxNCellOverlay::NavigatorRows() const
+{
+  std::vector<NavRow> rows;
+  const QRect band = this->NavigatorBandRect();
+  if (!band.isValid())
+  {
+    return rows;
+  }
+
+  rows.push_back({ NavRow::Kind::Slice, this->NavigatorDepthLabel(), 0.0, {} });
+  if (m_NavigatorExpanded)
+  {
+    rows.push_back({ NavRow::Kind::InPlaneRight, tr("Horiz."), 0.0, {} });
+    rows.push_back({ NavRow::Kind::InPlaneUp, tr("Vert."), 0.0, {} });
+  }
+  if (m_TimeSteps > 1)
+  {
+    rows.push_back({ NavRow::Kind::Time, tr("Time"), 0.0, {} });
+  }
+
+  // In-plane state is only needed when there is an in-plane row.
+  mitk::Point3D origin;
+  mitk::Vector3D rightUnit, upUnit;
+  double extentRight = 0.0, extentUp = 0.0, rightCoord = 0.0, upCoord = 0.0;
+  const bool hasPlane = m_NavigatorExpanded
+    && this->NavigatorInPlaneState(origin, rightUnit, upUnit, extentRight, extentUp, rightCoord, upCoord);
+
+  const int trackLeft = band.left() + NavLabelWidth + NavRowGap;
+  const int trackWidth = std::max(1, band.right() - trackLeft);
+  for (std::size_t i = 0; i < rows.size(); ++i)
+  {
+    const int rowTop = band.top() + static_cast<int>(i) * (NavRowHeight + NavRowGap);
+    rows[i].track = QRect(trackLeft, rowTop, trackWidth, NavRowHeight);
+
+    double normalized = 0.0;
+    switch (rows[i].kind)
+    {
+      case NavRow::Kind::Slice:
+        normalized = m_SliceSteps > 1
+          ? static_cast<double>(m_SlicePosition) / (m_SliceSteps - 1) : 0.0;
+        break;
+      case NavRow::Kind::Time:
+        normalized = m_TimeSteps > 1
+          ? static_cast<double>(m_TimePosition) / (m_TimeSteps - 1) : 0.0;
+        break;
+      case NavRow::Kind::InPlaneRight:
+        normalized = hasPlane ? rightCoord / extentRight : 0.0;
+        break;
+      case NavRow::Kind::InPlaneUp:
+        normalized = hasPlane ? upCoord / extentUp : 0.0;
+        break;
+    }
+    rows[i].normalized = std::clamp(normalized, 0.0, 1.0);
+  }
+  return rows;
+}
+
+QRect QmitkMxNCellOverlay::NavigatorBandRect() const
+{
+  const QRect area = this->RenderWindowRect();
+  if (!area.isValid())
+  {
+    return QRect();
+  }
+
+  int rowCount = m_NavigatorExpanded ? 3 : 1;  // depth [+ H + V]
+  if (m_TimeSteps > 1)
+  {
+    ++rowCount;  // time row
+  }
+
+  const QFontMetrics metrics(ReadoutFont(this->font()));
+  const int readoutLineHeight = metrics.height() + 4;
+  // Clear the two always-on bottom-left readout lines and the hairline.
+  const int passiveBottom = ReadoutMargin + 2 * readoutLineHeight + LineGap;
+  const int coordExtra = m_NavigatorExpanded ? (NavRowGap + NavRowHeight) : 0;
+  const int bandHeight = rowCount * NavRowHeight + (rowCount - 1) * NavRowGap + coordExtra;
+
+  const int bandBottom = area.bottom() - passiveBottom - NavRowGap;
+  const int left = area.left() + ReadoutMargin;
+  const int right = area.right() - ActiveRibbonWidth - ReadoutMargin;
+  if (right <= left)
+  {
+    return QRect();
+  }
+  return QRect(left, bandBottom - bandHeight, right - left, bandHeight);
+}
+
+QRect QmitkMxNCellOverlay::CoordinateLineRect() const
+{
+  if (!m_NavigatorExpanded)
+  {
+    return QRect();
+  }
+  const QRect band = this->NavigatorBandRect();
+  if (!band.isValid())
+  {
+    return QRect();
+  }
+  return QRect(band.left(), band.bottom() - NavRowHeight, band.width(), NavRowHeight);
+}
+
+void QmitkMxNCellOverlay::NavigatorSetSlice(int position)
+{
+  auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+  if (nullptr == renderer)
+  {
+    return;
+  }
+  auto* stepper = renderer->GetSliceNavigationController()->GetStepper();
+  if (nullptr == stepper)
+  {
+    return;
+  }
+  const int delta = position - static_cast<int>(stepper->GetPos());
+  if (0 == delta)
+  {
+    return;
+  }
+  // Go through the display-action broadcast so a slice-linked cell's group
+  // follows; an unlinked cell is a singleton group and moves alone.
+  auto interactionEvent = mitk::InteractionEvent::New(renderer);
+  m_Editor->GetInteractionEventHandler()->InvokeEvent(
+    mitk::DisplayScrollEvent(interactionEvent, delta, false));
+}
+
+void QmitkMxNCellOverlay::NavigatorSetCrosshair(const mitk::Point3D& worldPosition)
+{
+  auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+  if (nullptr == renderer)
+  {
+    return;
+  }
+  // Same broadcast path: a crosshair-linked cell follows, an unlinked cell
+  // moves alone.
+  auto interactionEvent = mitk::InteractionEvent::New(renderer);
+  m_Editor->GetInteractionEventHandler()->InvokeEvent(
+    mitk::DisplaySetCrosshairEvent(interactionEvent, worldPosition));
+}
+
+void QmitkMxNCellOverlay::NavigatorSetVoxelIndex(const mitk::Point3D& voxelIndex)
+{
+  // Resolve the reference image live rather than from the render-end cache so
+  // the index fields work independently of a pending refresh; the voxel index
+  // is that of the cell's top image geometry.
+  const auto node = this->ResolveTopImageNode();
+  if (node.IsNull() || nullptr == node->GetData() || nullptr == node->GetData()->GetGeometry())
+  {
+    return;
+  }
+  mitk::Point3D world;
+  node->GetData()->GetGeometry()->IndexToWorld(voxelIndex, world);
+  this->NavigatorSetCrosshair(world);
+}
+
+void QmitkMxNCellOverlay::NavigatorMoveInPlane(double rightMm, double upMm)
+{
+  mitk::Point3D origin;
+  mitk::Vector3D rightUnit, upUnit;
+  double extentRight = 0.0, extentUp = 0.0, rightCoord = 0.0, upCoord = 0.0;
+  if (!this->NavigatorInPlaneState(origin, rightUnit, upUnit, extentRight, extentUp, rightCoord, upCoord))
+  {
+    return;
+  }
+  mitk::Point3D world = this->CrosshairWorld();
+  for (int axis = 0; axis < 3; ++axis)
+  {
+    world[axis] += rightMm * rightUnit[axis] + upMm * upUnit[axis];
+  }
+  this->NavigatorSetCrosshair(world);
+}
+
+void QmitkMxNCellOverlay::ApplyNavigatorRow(const NavRow& row, double normalized)
+{
+  normalized = std::clamp(normalized, 0.0, 1.0);
+  switch (row.kind)
+  {
+    case NavRow::Kind::Slice:
+      if (m_SliceSteps > 1)
+      {
+        this->NavigatorSetSlice(static_cast<int>(std::lround(normalized * (m_SliceSteps - 1))));
+      }
+      break;
+    case NavRow::Kind::Time:
+      if (m_TimeSteps > 1)
+      {
+        if (auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
+        {
+          if (auto* stepper = timeNavigation->GetStepper())
+          {
+            stepper->SetPos(static_cast<unsigned int>(std::lround(normalized * (m_TimeSteps - 1))));
+          }
+        }
+      }
+      break;
+    case NavRow::Kind::InPlaneRight:
+    case NavRow::Kind::InPlaneUp:
+    {
+      mitk::Point3D origin;
+      mitk::Vector3D rightUnit, upUnit;
+      double extentRight = 0.0, extentUp = 0.0, rightCoord = 0.0, upCoord = 0.0;
+      if (!this->NavigatorInPlaneState(origin, rightUnit, upUnit, extentRight, extentUp, rightCoord, upCoord))
+      {
+        break;
+      }
+      if (row.kind == NavRow::Kind::InPlaneRight)
+      {
+        this->NavigatorMoveInPlane(normalized * extentRight - rightCoord, 0.0);
+      }
+      else
+      {
+        this->NavigatorMoveInPlane(0.0, normalized * extentUp - upCoord);
+      }
+      break;
+    }
   }
 }
 
@@ -351,9 +837,14 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
 {
   using State = QmitkRenderWindowProximity::State;
 
+  // Input is only taken when a piece of interactive furniture is under the
+  // pointer (colorbar drag, colormap chip, W/L click, plane-label click, or
+  // the navigator sliders); everywhere else the overlay stays transparent so
+  // VTK is never shadowed.
   const bool interactive = !m_CleanView
-    && (m_RibbonState == State::Active || m_ReadoutState == State::Active
-        || m_DragMode != DragMode::None);
+    && (m_RibbonState == State::Active || m_WindowLevelState == State::Active
+        || m_PlaneLabelState == State::Active || m_BottomState == State::Active
+        || m_DragMode != DragMode::None || m_NavDragRow >= 0);
 
   if (!interactive)
   {
@@ -363,21 +854,47 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
   }
 
   // The mask clips painting as well as input, so it must cover every piece
-  // of currently visible furniture, not only the active one.
-  QRegion mask;
-  mask += this->RibbonRect(m_RibbonState == State::Active || m_DragMode != DragMode::None);
-  if (this->IsRevealed(m_ReadoutState, m_ReadoutVisible))
-  {
-    mask += this->ReadoutRect();
-    mask += this->ColormapChipRect();
-  }
-  // Paint-only furniture (breadcrumbs, edge strips) still needs mask
-  // coverage or it would vanish while another region is interactive.
-  mask += this->SliceReadoutRect();
+  // of currently visible furniture, not only the interactive one.
   const QRect area = this->RenderWindowRect();
+  const QRect ribbon = this->RibbonRect();
+  QRegion mask;
+  mask += ribbon;
+  mask += this->ColormapChipRect();
+  if (m_HasLevelWindow && this->IsPassiveVisible(true))
+  {
+    mask += this->WindowLevelRect();
+  }
+  if (ribbon.isValid() && m_RevealProgress > 0.0)
+  {
+    // The value tick scale is painted left of the widened colorbar.
+    mask += QRect(ribbon.left() - TickScaleWidth, ribbon.top(), TickScaleWidth, ribbon.height());
+  }
+
+  // Paint-only passive furniture still needs mask coverage or it would vanish
+  // while the intensity region is interactive.
+  const QRect plane = this->PlaneLabelRect();
+  if (plane.isValid())
+  {
+    mask += plane;
+  }
+  const QRect slice = this->SliceReadoutRect();
+  if (slice.isValid())
+  {
+    mask += slice;
+  }
   if (area.isValid())
   {
     mask += QRect(area.left(), area.bottom() - SliceTickHeight, area.width(), SliceTickHeight);
+  }
+  // The navigator band paints while the frame is revealed, so it must be in
+  // the mask (which clips painting) whenever anything is revealed.
+  if (m_RevealProgress > 0.0)
+  {
+    const QRect band = this->NavigatorBandRect();
+    if (band.isValid())
+    {
+      mask += band;
+    }
   }
   mask += QRect(0, 0, this->width(), TopStripHeight);
 
@@ -402,10 +919,20 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
   using State = QmitkRenderWindowProximity::State;
 
   QPainter painter(this);
+  const QFont readoutFont = ReadoutFont(this->font());
+  const bool intensityActive =
+    m_RibbonState == State::Active || m_WindowLevelState == State::Active || m_DragMode != DragMode::None;
 
-  // LUT ribbon (right edge, actual colormap)
-  const bool ribbonActive = m_RibbonState == State::Active || m_DragMode != DragMode::None;
-  const QRect ribbon = this->RibbonRect(ribbonActive);
+  // ---- Right edge: the colorbar, widening and insetting with the reveal ----
+  // At rest a thin full-height strip; on reveal it widens and pulls in top and
+  // bottom so its range labels clear the top chrome and the W/L readout, and
+  // the colormap chip has room below.
+  const int ribbonWidth =
+    PassiveRibbonWidth + qRound((ActiveRibbonWidth - PassiveRibbonWidth) * m_RevealProgress);
+  const int insetTop = qRound(ColorbarInsetTop * m_RevealProgress);
+  const int insetBottom = qRound(ColorbarInsetBottom * m_RevealProgress);
+  const QRect ribbon(area.right() - ribbonWidth + 1, area.top() + insetTop,
+                     ribbonWidth, area.height() - insetTop - insetBottom);
   if (!m_LutStrip.isNull())
   {
     painter.drawImage(ribbon, m_LutStrip);
@@ -415,128 +942,266 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     painter.fillRect(ribbon, QColor(255, 255, 255, 40));
   }
 
-  if (ribbonActive && m_HasLevelWindow)
+  // Value tick scale left of the widened bar: labels on a few evenly-spaced
+  // ticks (count scaled to the bar height), dimmed at rest and opaque under
+  // the pointer like the W/L readout; the level marked in the windowing hue.
+  if (m_RevealProgress > 0.0 && m_HasLevelWindow && ribbon.height() > 1)
   {
-    painter.setFont(LabelFont(this->font()));
-    painter.setPen(ActiveText);
-    const QFontMetrics metrics(painter.font());
-    const QString upper = FormatValue(m_LevelWindow.GetUpperWindowBound());
-    const QString lower = FormatValue(m_LevelWindow.GetLowerWindowBound());
-    painter.drawText(
-      QPoint(ribbon.left() - 4 - metrics.horizontalAdvance(upper), ribbon.top() + metrics.ascent() + 2),
-      upper);
-    painter.drawText(
-      QPoint(ribbon.left() - 4 - metrics.horizontalAdvance(lower), ribbon.bottom() - 4), lower);
+    const double upper = m_LevelWindow.GetUpperWindowBound();
+    const double lower = m_LevelWindow.GetLowerWindowBound();
+    const double span = upper - lower;
+    if (span > 0.0)
+    {
+      const int slideX = qRound((1.0 - m_RevealProgress) * RevealSlideOffset);
+      painter.setFont(readoutFont);
+      const QFontMetrics metrics(readoutFont);
+      const QColor tickColor = Faded(ActiveText, m_RevealProgress);
+      const QColor labelColor =
+        Faded(m_RibbonState == State::Active ? ActiveText : IdleText, m_RevealProgress);
 
-    // End handles: short contrasting notches marking the draggable bounds.
+      const int divisions = std::clamp(ribbon.height() / 44, 2, 6);
+      for (int i = 0; i <= divisions; ++i)
+      {
+        const double t = static_cast<double>(i) / divisions;  // 0 = top = upper
+        const int y = ribbon.top() + qRound(t * (ribbon.height() - 1));
+        painter.setPen(QPen(tickColor, 1));
+        painter.drawLine(ribbon.left() - 5 - slideX, y, ribbon.left() - 1 - slideX, y);
+
+        // The end labels align to (not straddle) their tick - top label below
+        // the top tick, bottom label above the bottom tick - so they stay
+        // inside the bar span and are never clipped; middle labels are centred.
+        const int labelRight = ribbon.left() - 7 - slideX;
+        const int labelTop = (i == 0) ? y
+                           : (i == divisions) ? y - metrics.height()
+                           : y - metrics.height() / 2;
+        painter.setPen(labelColor);
+        painter.drawText(QRect(labelRight - TickScaleWidth, labelTop, TickScaleWidth, metrics.height()),
+                         Qt::AlignRight | Qt::AlignVCenter, FormatValue(upper - t * span));
+      }
+
+      QColor levelColor = Faded(ActiveText, m_RevealProgress);
+      const auto windowingLink =
+        m_Editor->GetSyncLink(m_Cell->GetWidgetName(), QmitkMxNSyncDimension::Windowing);
+      if (windowingLink.has_value())
+      {
+        try
+        {
+          levelColor = Faded(m_Editor->GetSyncGroupColor(windowingLink->group), m_RevealProgress);
+        }
+        catch (const mitk::Exception&)
+        {
+        }
+      }
+      const int levelY =
+        ribbon.top() + qRound((upper - m_LevelWindow.GetLevel()) / span * (ribbon.height() - 1));
+      painter.setPen(QPen(levelColor, 2));
+      painter.drawLine(ribbon.left() - 7 - slideX, levelY, ribbon.right(), levelY);
+    }
+  }
+
+  // Colormap picker chip beneath the shortened bar (reveal only).
+  if (m_RevealProgress > 0.0 && m_TopNode.IsNotNull())
+  {
+    const QRect chip = this->ColormapChipRect();
+    painter.setOpacity(m_RevealProgress);
+    if (!m_LutStrip.isNull())
+    {
+      painter.drawImage(chip, m_LutStrip);
+    }
+    else
+    {
+      painter.fillRect(chip, QColor(255, 255, 255, 40));
+    }
+    painter.setPen(QPen(intensityActive ? ActiveText : IdleText, 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRect(chip.adjusted(0, 0, -1, -1));
+    painter.setOpacity(1.0);
+  }
+
+  // Drag end-handles: contrasting notches at the window bounds while active.
+  if (intensityActive && m_HasLevelWindow)
+  {
     painter.fillRect(QRect(ribbon.left(), ribbon.top(), ribbon.width(), 2), ActiveText);
     painter.fillRect(QRect(ribbon.left(), ribbon.bottom() - 1, ribbon.width(), 2), ActiveText);
   }
 
-  // Corner readout bottom-left
-  if (m_HasLevelWindow && this->IsRevealed(m_ReadoutState, m_ReadoutVisible))
+  // ---- Bottom-right: W/L readout beside the colorbar ----
+  if (m_HasLevelWindow && this->IsPassiveVisible(true))
   {
-    const QRect readout = this->ReadoutRect();
-    painter.setFont(ReadoutFont(this->font()));
-    painter.setPen(m_ReadoutState == State::Active ? ActiveText : IdleText);
-    const QString text = QStringLiteral("W %1 L %2")
-      .arg(FormatValue(m_LevelWindow.GetWindow()), FormatValue(m_LevelWindow.GetLevel()));
-    painter.drawText(readout, Qt::AlignLeft | Qt::AlignVCenter, text);
+    painter.setFont(readoutFont);
+    painter.setPen(m_WindowLevelState == State::Active ? ActiveText : IdleText);
+    painter.drawText(this->WindowLevelRect(), Qt::AlignRight | Qt::AlignVCenter,
+                     QStringLiteral("W %1 L %2").arg(FormatValue(m_LevelWindow.GetWindow()),
+                                                     FormatValue(m_LevelWindow.GetLevel())));
+  }
 
-    // Hue dot: the cell's windowing/LUT group identity wins the single dot
-    // slot (it lives beside the W/L readout); otherwise a navigation link
-    // no seam can show claims it, as the pointer to the layout editor.
-    const auto windowId = m_Cell->GetWidgetName();
-    std::optional<std::string> dotGroup;
-    auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Windowing);
-    if (!link.has_value())
+  // ---- Bottom-left: navigation (plane label, slice + dot + time) ----
+  if (this->IsPassiveVisible(false))
+  {
+    const QString planeLabel = this->ResolvePlaneLabel();
+    if (!planeLabel.isEmpty())
     {
-      link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Lut);
-    }
-    if (link.has_value())
-    {
-      dotGroup = link->group;
-    }
-    else
-    {
-      try
-      {
-        dotGroup = m_Editor->GetNonAdjacentNavGroup(windowId);
-      }
-      catch (const mitk::Exception&)
-      {
-        // Transient mid-layout-change state; the next refresh repaints.
-      }
-    }
-    if (dotGroup.has_value())
-    {
-      painter.setRenderHint(QPainter::Antialiasing, true);
-      painter.setPen(Qt::NoPen);
-      painter.setBrush(m_Editor->GetSyncGroupColor(*dotGroup));
-      const int dotX = readout.right() - HueDotDiameter;
-      const int dotY = readout.center().y() - HueDotDiameter / 2;
-      painter.drawEllipse(dotX, dotY, HueDotDiameter, HueDotDiameter);
-      painter.setRenderHint(QPainter::Antialiasing, false);
+      // Highlights opaque on hover to advertise it is clickable (reorient).
+      painter.setFont(readoutFont);
+      painter.setPen(m_PlaneLabelState == State::Active ? ActiveText : IdleText);
+      painter.drawText(this->PlaneLabelRect(), Qt::AlignLeft | Qt::AlignVCenter, planeLabel);
     }
 
-    // Colormap chip (active layer): a miniature of the current LUT.
-    if (m_ReadoutState == State::Active || ribbonActive)
+    const QRect line2 = this->SliceReadoutRect();
+    if (line2.isValid())
     {
-      const QRect chip = this->ColormapChipRect();
-      if (!m_LutStrip.isNull())
+      const QFontMetrics metrics(readoutFont);
+      int x = line2.left();
+
+      // Leading group-identity dot: solid hue (mono) or a segmented marker
+      // (complex) - the barcode, seams, and editor carry the per-dimension
+      // detail a single hue could not.
+      const GroupDotInfo dot = this->ResolveGroupDot();
+      if (dot.kind != GroupDotKind::None)
       {
-        painter.drawImage(chip, m_LutStrip);
+        const QRect dotRect(x, line2.center().y() - HueDotDiameter / 2, HueDotDiameter, HueDotDiameter);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setPen(Qt::NoPen);
+        if (dot.kind == GroupDotKind::Mono)
+        {
+          painter.setBrush(dot.hue);
+          painter.drawEllipse(dotRect);
+        }
+        else
+        {
+          // Vertical hue bands in a rounded square: distinct in shape from the
+          // round mono dot, and showing that more than one group is in play.
+          const int bands = static_cast<int>(dot.hues.size());
+          for (int i = 0; i < bands; ++i)
+          {
+            painter.setBrush(dot.hues[static_cast<std::size_t>(i)]);
+            const int left = dotRect.left() + i * dotRect.width() / bands;
+            const int right = dotRect.left() + (i + 1) * dotRect.width() / bands;
+            painter.drawRect(QRect(left, dotRect.top(), right - left, dotRect.height()));
+          }
+          painter.setBrush(Qt::NoBrush);
+          painter.setPen(QPen(IdleText, 1));
+          painter.drawRect(dotRect.adjusted(0, 0, -1, -1));
+        }
+        painter.setRenderHint(QPainter::Antialiasing, false);
+        x = dotRect.right() + ReadoutMargin / 2;
       }
-      else
+
+      painter.setFont(readoutFont);
+      painter.setPen(IdleText);
+      if (m_SliceSteps > 0)
       {
-        painter.fillRect(chip, QColor(255, 255, 255, 40));
+        const QString sliceText = QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps);
+        painter.drawText(QRect(x, line2.top(), metrics.horizontalAdvance(sliceText), line2.height()),
+                         Qt::AlignLeft | Qt::AlignVCenter, sliceText);
+        x += metrics.horizontalAdvance(sliceText);
+
+        // Time rides the same line, prefixed by a small clock glyph.
+        if (m_TimeSteps > 1)
+        {
+          x += ReadoutMargin;
+          const int glyph = metrics.height();
+          painter.setRenderHint(QPainter::Antialiasing, true);
+          DrawClockGlyph(painter, QRect(x, line2.top() + (line2.height() - glyph) / 2, glyph, glyph), IdleText);
+          painter.setRenderHint(QPainter::Antialiasing, false);
+          x += glyph + 2;
+          const QString timeText = QStringLiteral("%1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps);
+          painter.setPen(IdleText);
+          painter.drawText(QRect(x, line2.top(), metrics.horizontalAdvance(timeText), line2.height()),
+                           Qt::AlignLeft | Qt::AlignVCenter, timeText);
+        }
       }
-      painter.setPen(QPen(m_ReadoutState == State::Active ? ActiveText : IdleText, 1));
-      painter.drawRect(chip.adjusted(0, 0, -1, -1));
     }
   }
 
-  // Slice/time breadcrumbs: whisper-quiet, revealed with the pointer in the
-  // cell (all regions leave Idle together while the pointer is inside).
-  const bool pointerInCell = m_BottomState != State::Idle;
-  if (pointerInCell && m_SliceSteps > 0)
+  // ---- Bottom hairline: slice tick (bar) + time position (triangle) ----
+  if (m_SliceSteps > 0 && this->IsPassiveVisible(false))
   {
-    painter.setFont(ReadoutFont(this->font()));
-    painter.setPen(m_BottomState == State::Active ? ActiveText : IdleText);
-    painter.drawText(this->SliceReadoutRect(), Qt::AlignRight | Qt::AlignVCenter,
-                     QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
-
-    // Bottom hairline with the slice position tick.
-    const int hairlineY = area.bottom() - 1;
-    painter.fillRect(QRect(area.left(), hairlineY, area.width(), 1), QColor(255, 255, 255, 40));
+    painter.fillRect(QRect(area.left(), area.bottom() - 1, area.width(), 1), QColor(255, 255, 255, 40));
     if (m_SliceSteps > 1)
     {
       const int tickX = area.left()
-        + static_cast<int>((static_cast<double>(m_SlicePosition) / (m_SliceSteps - 1))
-                           * (area.width() - 2));
-      painter.fillRect(QRect(tickX, area.bottom() - SliceTickHeight, 2, SliceTickHeight),
-                       IdleText);
+        + static_cast<int>((static_cast<double>(m_SlicePosition) / (m_SliceSteps - 1)) * (area.width() - 2));
+      painter.fillRect(QRect(tickX, area.bottom() - SliceTickHeight, 2, SliceTickHeight), IdleText);
     }
 
-    // The dashed time hairline exists only for time-resolved data.
+    // The time-step position rides the same hairline as a distinct triangle,
+    // so it costs no extra line or vertical space.
     if (m_TimeSteps > 1)
     {
-      QPen dashed(QColor(255, 255, 255, 40), 1, Qt::DashLine);
-      painter.setPen(dashed);
-      const int timeY = area.bottom() - SliceTickHeight - 3;
-      painter.drawLine(area.left(), timeY, area.right(), timeY);
-      const int tickX = area.left()
-        + static_cast<int>((static_cast<double>(m_TimePosition) / (m_TimeSteps - 1))
-                           * (area.width() - 2));
-      painter.fillRect(QRect(tickX, timeY - 2, 2, 5), IdleText);
+      const int timeX = area.left()
+        + static_cast<int>((static_cast<double>(m_TimePosition) / (m_TimeSteps - 1)) * (area.width() - 2));
+      QPolygon triangle;
+      triangle << QPoint(timeX - TimeTriangleHalfWidth, area.bottom() - SliceTickHeight)
+               << QPoint(timeX + TimeTriangleHalfWidth, area.bottom() - SliceTickHeight)
+               << QPoint(timeX, area.bottom() - SliceTickHeight + TimeTriangleHalfWidth * 2);
+      painter.setRenderHint(QPainter::Antialiasing, true);
+      painter.setPen(Qt::NoPen);
+      painter.setBrush(ActiveText);
+      painter.drawPolygon(triangle);
+      painter.setRenderHint(QPainter::Antialiasing, false);
     }
   }
 
-  // Collapsed utility toolbar strip along the cell's top edge.
-  if (m_TopState != State::Active)
+  // ---- Navigator: painted slider rows, revealed with the frame ----
+  if (m_RevealProgress > 0.0)
   {
-    painter.fillRect(QRect(0, 0, this->width(), TopStripHeight),
-                     QColor(255, 255, 255, pointerInCell ? 76 : 40));
+    const auto rows = this->NavigatorRows();
+    if (!rows.empty())
+    {
+      const bool navActive = m_BottomState == State::Active || m_NavDragRow >= 0;
+      const double navAlpha = m_RevealProgress * (navActive ? 1.0 : 0.55);
+
+      painter.save();
+      painter.translate(0, qRound((1.0 - m_RevealProgress) * RevealSlideOffset));
+      const QFont labelFont = ReadoutFont(this->font());
+      const QFontMetrics labelMetrics(labelFont);
+
+      for (const auto& row : rows)
+      {
+        const int centerY = row.track.center().y();
+
+        painter.setFont(labelFont);
+        painter.setPen(Faded(IdleText, navAlpha));
+        painter.drawText(QRect(row.track.left() - NavLabelWidth - NavRowGap, row.track.top(),
+                               NavLabelWidth, row.track.height()),
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         labelMetrics.elidedText(row.label, Qt::ElideRight, NavLabelWidth));
+
+        const int thickness = navActive ? NavTrackThickness + 1 : NavTrackThickness;
+        painter.fillRect(
+          QRect(row.track.left(), centerY - thickness / 2, row.track.width(), thickness),
+          Faded(IdleText, navAlpha));
+
+        const int knobX = row.track.left() + qRound(row.normalized * row.track.width());
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(Faded(ActiveText, navAlpha));
+        painter.drawEllipse(QPoint(knobX, centerY), NavKnobRadius, NavKnobRadius);
+        painter.setRenderHint(QPainter::Antialiasing, false);
+      }
+
+      // Coordinate line (expanded): the crosshair world position, click to edit.
+      const QRect coord = this->CoordinateLineRect();
+      if (coord.isValid())
+      {
+        const mitk::Point3D world = this->CrosshairWorld();
+        painter.setFont(labelFont);
+        painter.setPen(Faded(navActive ? ActiveText : IdleText, navAlpha));
+        painter.drawText(coord, Qt::AlignLeft | Qt::AlignVCenter,
+                         QStringLiteral("x %1  y %2  z %3 mm").arg(FormatValue(world[0]),
+                                                                   FormatValue(world[1]),
+                                                                   FormatValue(world[2])));
+      }
+      painter.restore();
+    }
+  }
+
+  // ---- Top edge: collapsed utility-toolbar strip (only while the toolbar,
+  //      which reveals with the whole frame, is hidden) ----
+  if (!m_FrameRevealed)
+  {
+    painter.fillRect(QRect(0, 0, this->width(), TopStripHeight), QColor(255, 255, 255, 40));
   }
 }
 
@@ -551,7 +1216,24 @@ void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
     return;
   }
 
-  const QRect ribbon = this->RibbonRect(true);
+  // Click-to-edit readouts (the hover highlight advertises them): the W/L
+  // readout opens the numeric entry, the plane label the direction picker.
+  if (event->button() == Qt::LeftButton && m_HasLevelWindow && m_TopNode.IsNotNull()
+      && this->WindowLevelRect().contains(position))
+  {
+    event->accept();
+    this->OpenNumericEntry();
+    return;
+  }
+  if (event->button() == Qt::LeftButton && !this->ResolvePlaneLabel().isEmpty()
+      && this->PlaneLabelRect().contains(position))
+  {
+    event->accept();
+    this->OpenDirectionPicker(event->globalPosition().toPoint());
+    return;
+  }
+
+  const QRect ribbon = this->RibbonRect();
   if (event->button() == Qt::LeftButton && ribbon.contains(position)
       && m_HasLevelWindow && m_TopNode.IsNotNull())
   {
@@ -573,15 +1255,73 @@ void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
     return;
   }
 
+  // Navigator: the coordinate line opens the click-to-edit entry; a slider row
+  // starts a drag and jumps to the clicked position.
+  if (event->button() == Qt::LeftButton)
+  {
+    if (this->CoordinateLineRect().contains(position))
+    {
+      event->accept();
+      this->OpenCoordinateEntry();
+      return;
+    }
+    const auto rows = this->NavigatorRows();
+    for (std::size_t i = 0; i < rows.size(); ++i)
+    {
+      if (rows[i].track.contains(position))
+      {
+        m_NavDragRow = static_cast<int>(i);
+        this->ApplyNavigatorRow(rows[i],
+          static_cast<double>(position.x() - rows[i].track.left()) / std::max(1, rows[i].track.width()));
+        event->accept();
+        return;
+      }
+    }
+  }
+
   event->ignore();
 }
 
 void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
 {
+  if (m_NavDragRow >= 0)
+  {
+    const auto rows = this->NavigatorRows();
+    if (m_NavDragRow < static_cast<int>(rows.size()))
+    {
+      const auto& row = rows[static_cast<std::size_t>(m_NavDragRow)];
+      this->ApplyNavigatorRow(row,
+        static_cast<double>(event->pos().x() - row.track.left()) / std::max(1, row.track.width()));
+      this->RenderCellNow();  // present the change live during the drag
+    }
+    event->accept();
+    return;
+  }
+
   if (m_DragMode == DragMode::None)
   {
-    const QRect ribbon = this->RibbonRect(true);
-    this->setCursor(ribbon.contains(event->pos()) ? Qt::SizeVerCursor : Qt::ArrowCursor);
+    const QRect ribbon = this->RibbonRect();
+    if (ribbon.contains(event->pos()))
+    {
+      this->setCursor(Qt::SizeVerCursor);
+    }
+    else if (this->CoordinateLineRect().contains(event->pos()))
+    {
+      this->setCursor(Qt::PointingHandCursor);
+    }
+    else
+    {
+      bool onRow = false;
+      for (const auto& row : this->NavigatorRows())
+      {
+        if (row.track.contains(event->pos()))
+        {
+          onRow = true;
+          break;
+        }
+      }
+      this->setCursor(onRow ? Qt::PointingHandCursor : Qt::ArrowCursor);
+    }
     event->ignore();
     return;
   }
@@ -642,30 +1382,26 @@ void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
                                  m_LevelWindow.GetWindow() + windowDelta);
     this->update();
   }
+  this->RenderCellNow();  // present the windowing change live during the drag
 
   event->accept();
 }
 
 void QmitkMxNCellOverlay::mouseReleaseEvent(QMouseEvent* event)
 {
-  if (m_DragMode != DragMode::None)
+  if (m_NavDragRow >= 0)
   {
-    m_DragMode = DragMode::None;
+    m_NavDragRow = -1;
     this->UpdateInteractivity();
     event->accept();
     return;
   }
 
-  event->ignore();
-}
-
-void QmitkMxNCellOverlay::mouseDoubleClickEvent(QMouseEvent* event)
-{
-  if (event->button() == Qt::LeftButton && this->ReadoutRect().contains(event->pos())
-      && m_HasLevelWindow && m_TopNode.IsNotNull())
+  if (m_DragMode != DragMode::None)
   {
+    m_DragMode = DragMode::None;
+    this->UpdateInteractivity();
     event->accept();
-    this->OpenNumericEntry();
     return;
   }
 
@@ -713,12 +1449,98 @@ void QmitkMxNCellOverlay::OpenNumericEntry()
   connect(levelBox, &QDoubleSpinBox::editingFinished, this, commit);
   connect(windowBox, &QDoubleSpinBox::editingFinished, this, commit);
 
-  const QRect readout = this->ReadoutRect();
+  const QRect readout = this->WindowLevelRect();
   popup->adjustSize();
   popup->move(this->mapToGlobal(QPoint(readout.left(), readout.top() - popup->sizeHint().height() - 4)));
   popup->show();
   levelBox->setFocus();
   levelBox->selectAll();
+}
+
+void QmitkMxNCellOverlay::OpenCoordinateEntry()
+{
+  const mitk::Point3D world = this->CrosshairWorld();
+  const bool hasIndex = m_TopNode.IsNotNull() && nullptr != m_TopNode->GetData()
+    && nullptr != m_TopNode->GetData()->GetGeometry();
+  mitk::Point3D index;
+  if (hasIndex)
+  {
+    m_TopNode->GetData()->GetGeometry()->WorldToIndex(world, index);
+  }
+
+  auto* popup = new QFrame(this, Qt::Popup);
+  popup->setAttribute(Qt::WA_DeleteOnClose);
+  popup->setFrameShape(QFrame::StyledPanel);
+
+  auto* layout = new QFormLayout(popup);
+  layout->setContentsMargins(6, 6, 6, 6);
+
+  auto* worldRow = new QWidget(popup);
+  auto* worldLayout = new QHBoxLayout(worldRow);
+  worldLayout->setContentsMargins({});
+  std::array<QDoubleSpinBox*, 3> worldBoxes{};
+  for (int axis = 0; axis < 3; ++axis)
+  {
+    auto* box = new QDoubleSpinBox(worldRow);
+    box->setRange(-1.0e6, 1.0e6);
+    box->setDecimals(2);
+    box->setValue(world[axis]);
+    worldLayout->addWidget(box);
+    worldBoxes[static_cast<std::size_t>(axis)] = box;
+  }
+  layout->addRow(tr("World (mm)"), worldRow);
+
+  const auto commitWorld = [this, worldBoxes]()
+  {
+    mitk::Point3D position;
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      position[axis] = worldBoxes[static_cast<std::size_t>(axis)]->value();
+    }
+    this->NavigatorSetCrosshair(position);
+  };
+  for (auto* box : worldBoxes)
+  {
+    connect(box, &QDoubleSpinBox::editingFinished, this, commitWorld);
+  }
+
+  if (hasIndex)
+  {
+    auto* indexRow = new QWidget(popup);
+    auto* indexLayout = new QHBoxLayout(indexRow);
+    indexLayout->setContentsMargins({});
+    std::array<QSpinBox*, 3> indexBoxes{};
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      auto* box = new QSpinBox(indexRow);
+      box->setRange(-100000, 100000);
+      box->setValue(static_cast<int>(std::lround(index[axis])));
+      indexLayout->addWidget(box);
+      indexBoxes[static_cast<std::size_t>(axis)] = box;
+    }
+    layout->addRow(tr("Voxel index"), indexRow);
+
+    const auto commitIndex = [this, indexBoxes]()
+    {
+      mitk::Point3D voxel;
+      for (int axis = 0; axis < 3; ++axis)
+      {
+        voxel[axis] = indexBoxes[static_cast<std::size_t>(axis)]->value();
+      }
+      this->NavigatorSetVoxelIndex(voxel);
+    };
+    for (auto* box : indexBoxes)
+    {
+      connect(box, &QSpinBox::editingFinished, this, commitIndex);
+    }
+  }
+
+  const QRect coord = this->CoordinateLineRect();
+  popup->adjustSize();
+  popup->move(this->mapToGlobal(QPoint(coord.left(), coord.top() - popup->sizeHint().height() - 4)));
+  popup->show();
+  worldBoxes[0]->setFocus();
+  worldBoxes[0]->selectAll();
 }
 
 void QmitkMxNCellOverlay::OpenColormapMenu()
@@ -755,11 +1577,53 @@ void QmitkMxNCellOverlay::OpenColormapMenu()
   }
 }
 
+void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
+{
+  const auto windowId = m_Cell->GetWidgetName();
+
+  QMenu menu(this);
+  const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {
+    { "Axial", mitk::AnatomicalPlane::Axial },
+    { "Coronal", mitk::AnatomicalPlane::Coronal },
+    { "Sagittal", mitk::AnatomicalPlane::Sagittal },
+  };
+  for (const auto& [label, plane] : planes)
+  {
+    auto* action = menu.addAction(tr(label));
+    const auto planeValue = plane;
+    connect(action, &QAction::triggered, this, [this, windowId, planeValue]()
+    {
+      try
+      {
+        m_Editor->SetViewDirection(windowId, planeValue);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "View direction ignored: " << e.GetDescription();
+      }
+    });
+  }
+  menu.exec(globalPosition);
+}
+
 double QmitkMxNCellOverlay::DragScale() const
 {
   const int height = std::max(1, this->RenderWindowRect().height());
   const double window = m_HasLevelWindow ? std::max(1.0, m_LevelWindow.GetWindow()) : 256.0;
   return window / height;
+}
+
+void QmitkMxNCellOverlay::RenderCellNow()
+{
+  // Regenerate (camera prep + VTK render) through the rendering manager, then
+  // synchronously repaint the widget. The VTK render alone only queues a
+  // paintGL on the QVTKOpenGLNativeWidget, and that queued paint is starved by
+  // the continuous mouse-move stream of a drag; repaint() presents it now.
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_VtkRenderWindow);
+  if (auto* renderWindow = m_Cell->GetRenderWindow())
+  {
+    renderWindow->repaint();
+  }
 }
 
 void QmitkMxNCellOverlay::OnVtkRenderEnd(vtkObject* /*caller*/, unsigned long /*eventId*/,
@@ -945,11 +1809,13 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
     {
       // The right button doubles as the zoom / windowing gesture; only a
       // click without drag is a context-menu request. Consuming the event in
-      // both cases keeps a gesture's release from popping the menu.
+      // both cases keeps a gesture's release from popping the menu. The menu
+      // stays available in clean-view: it is transient (right-click only, not
+      // passive furniture) and it is the way back - it carries the clean-view
+      // toggle, which is otherwise unreachable once the utility strip hides.
       auto* contextEvent = static_cast<QContextMenuEvent*>(event);
-      if (!m_CleanView
-          && (contextEvent->pos() - m_RightPressPosition).manhattanLength()
-               < QApplication::startDragDistance())
+      if ((contextEvent->pos() - m_RightPressPosition).manhattanLength()
+            < QApplication::startDragDistance())
       {
         this->OpenContextMenu(contextEvent->globalPos());
       }
@@ -1077,6 +1943,14 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   connect(editorAction, &QAction::triggered, this, [this]()
   {
     m_Editor->RequestLayoutEditor();
+  });
+
+  auto* expandedNavigatorAction = menu.addAction(tr("Expanded navigator"));
+  expandedNavigatorAction->setCheckable(true);
+  expandedNavigatorAction->setChecked(m_Editor->IsNavigatorExpanded());
+  connect(expandedNavigatorAction, &QAction::toggled, this, [this](bool expanded)
+  {
+    m_Editor->SetNavigatorExpanded(expanded);
   });
 
   auto* cleanViewAction = menu.addAction(tr("Clean view"));

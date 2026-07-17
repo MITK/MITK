@@ -32,6 +32,14 @@ mitkAddCustomModuleTest(QmitkMxNLayoutEditorWidgetTest QmitkMxNLayoutEditorWidge
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNCellOverlayTest QmitkMxNCellOverlayTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNNavigatorTest QmitkMxNNavigatorTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNLinkSeamTest QmitkMxNLinkSeamTest
   -platform minimal
 )

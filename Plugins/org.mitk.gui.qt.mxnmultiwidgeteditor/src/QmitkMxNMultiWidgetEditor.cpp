@@ -231,6 +231,7 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   {
     mxnMultiWidget->SetLevelWindowReadoutVisible(
       preferences->GetBool("Show level/window readout", true));
+    mxnMultiWidget->SetNavigatorExpanded(preferences->GetBool("Expanded navigator", false));
   }
 
   bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);

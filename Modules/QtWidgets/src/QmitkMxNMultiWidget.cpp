@@ -417,6 +417,12 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   // Every layout mutation path (grid resize, document load) announces itself
   // through LayoutChanged; the seams mirror whatever cell adjacency results.
   connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RebuildSeams);
+
+  // The per-cell utility-strip sync barcodes track the same per-dimension
+  // membership the seams and layout editor show; refresh them whenever the
+  // links change or the layout (and thus the set of cells) does.
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
+  connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -911,7 +917,11 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   // create the render window widget and connect signal / slot
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
-  renderWindowWidget->SetCornerAnnotationText(id.toStdString());
+  // The cell's plane label is drawn by the Qt overlay in the same layer as the
+  // slice readout (so the two align); the VTK corner annotation, which would
+  // otherwise show the internal cell id, is blanked to avoid a second, stale
+  // label in the OpenGL scene.
+  renderWindowWidget->SetCornerAnnotationText(std::string());
   this->AddRenderWindowWidget(id, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
@@ -938,6 +948,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
   cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
   cellOverlay->SetCleanView(m_CleanView);
+  cellOverlay->SetNavigatorExpanded(m_NavigatorExpanded);
 
   // The utility row auto-hides into a top-edge strip; approaching the top
   // reveals it as a floating panel, so the render window never resizes.
@@ -950,8 +961,12 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
           utilityWidget, &QmitkRenderWindowUtilityWidget::SetCleanViewChecked);
   utilityWidget->SetCleanViewChecked(m_CleanView);
 
-  connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
-    utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::NavigatorToggled,
+          this, &QmitkMxNMultiWidget::SetNavigatorExpanded);
+  connect(this, &QmitkMxNMultiWidget::NavigatorExpandedChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetNavigatorChecked);
+  utilityWidget->SetNavigatorChecked(m_NavigatorExpanded);
+
   // 'SyncGroupChanged' is wired through a lambda that catches 'mitk::Exception',
   // because Qt slots must not let exceptions escape into the event dispatcher.
   // The direct method 'SetSynchronizationGroup' keeps its throwing contract for
@@ -1001,11 +1016,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // hosting it lives above this module, so the request is only relayed.
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::LayoutEditorRequested,
           this, &QmitkMxNMultiWidget::LayoutEditorRequested);
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::ViewDirectionChanged, this,
-    [this, id](mitk::AnatomicalPlane viewDirection)
-    {
-      this->PropagateOrientation(id, viewDirection);
-    });
 
   // The Synchronize macro covers every cell of the editor, including cells
   // created while it is active - not only those present at toggle time.
@@ -1978,7 +1988,6 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       this->SetActiveRenderWindowWidget(firstCell);
     }
 
-    emit UpdateUtilityWidgetViewPlanes();
     this->EnableCrosshair();
     emit LayoutChanged();
   }
@@ -2075,8 +2084,6 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   {
     this->SetActiveRenderWindowWidget(firstCell);
   }
-
-  emit UpdateUtilityWidgetViewPlanes();
 
   this->EnableCrosshair();
   emit LayoutChanged();
@@ -2956,6 +2963,31 @@ void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)
   }
 }
 
+void QmitkMxNMultiWidget::SetNavigatorExpanded(bool expanded)
+{
+  if (expanded == m_NavigatorExpanded)
+  {
+    return;
+  }
+
+  m_NavigatorExpanded = expanded;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetNavigatorExpanded(expanded);
+    }
+  }
+
+  emit NavigatorExpandedChanged(expanded);
+}
+
+bool QmitkMxNMultiWidget::IsNavigatorExpanded() const
+{
+  return m_NavigatorExpanded;
+}
+
 void QmitkMxNMultiWidget::RequestLayoutEditor()
 {
   emit LayoutEditorRequested();
@@ -3054,6 +3086,38 @@ void QmitkMxNMultiWidget::RebuildSeams()
     }
   };
   walk(rootSplitter);
+}
+
+void QmitkMxNMultiWidget::RefreshSyncBarcodes()
+{
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    auto* utilityWidget = renderWindowWidget->GetUtilityWidget();
+    if (nullptr == utilityWidget)
+    {
+      continue;
+    }
+
+    QList<QColor> slotColors;
+    slotColors.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()));
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      QColor color;  // invalid: this dimension is an unsynced gap
+      if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
+      {
+        try
+        {
+          color = this->GetSyncGroupColor(link->group);
+        }
+        catch (const mitk::Exception&)
+        {
+          // Group not registered mid-change; leave the slot a gap this round.
+        }
+      }
+      slotColors.append(color);
+    }
+    utilityWidget->SetSyncBarcodeSlots(slotColors);
+  }
 }
 
 QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const

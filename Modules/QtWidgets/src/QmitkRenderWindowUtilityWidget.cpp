@@ -26,9 +26,6 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkStyleManager.h>
 
-// itk
-#include <itkSpatialOrientationAdapter.h>
-
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent/* = nullptr */,
   QmitkRenderWindow* renderWindow/* = nullptr */,
@@ -37,13 +34,21 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   , m_SyncGroupSelector(nullptr)
   , m_NewSyncGroupButton(nullptr)
   , m_CleanViewButton(nullptr)
-  , m_SliceNavigationWidget(nullptr)
-  , m_StepperAdapter(nullptr)
-  , m_ViewDirectionSelector(nullptr)
+  , m_NavigatorToggleButton(nullptr)
+  , m_SyncBarcode(nullptr)
 {
   this->setParent(parent);
+
+  // A quiet translucent backing so the strip reads as one panel floating over
+  // the image rather than buttons pasted onto the canvas (matching the
+  // built-in render-window menu's dark backing).
+  this->setAutoFillBackground(false);
+  this->setStyleSheet(
+    QStringLiteral("QmitkRenderWindowUtilityWidget { background-color: rgba(0, 0, 0, 150); "
+                   "border-radius: 3px; }"));
+
   auto layout = new QHBoxLayout(this);
-  layout->setContentsMargins({});
+  layout->setContentsMargins(4, 2, 4, 2);
 
   mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
   noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
@@ -103,25 +108,16 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   });
   layout->addWidget(m_NewSyncGroupButton);
 
-  auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
-  m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
-  m_StepperAdapter =
-    new QmitkStepperAdapter(m_SliceNavigationWidget, sliceNavigationController->GetStepper());
-  layout->addWidget(m_SliceNavigationWidget);
-
+  // The per-cell slice scrub control lives in the viewport navigator, and
+  // reorientation is driven by clicking the cell's plane label; the utility
+  // row no longer hosts a slice slider or a view-direction combobox. The
+  // direction controller stays: it is how a reorientation (or a relayed
+  // orientation-group change) is applied to this cell's renderer, via
+  // 'SetViewDirectionSelection'.
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ m_BaseRenderer };
   m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
   m_RenderWindowViewDirectionController->SetControlledRenderer(controlledRenderer);
   m_RenderWindowViewDirectionController->SetDataStorage(dataStorage);
-
-  m_ViewDirectionSelector = new QComboBox(this);
-  QStringList viewDirections{ "axial", "coronal", "sagittal"};
-  m_ViewDirectionSelector->insertItems(0, viewDirections);
-  m_ViewDirectionSelector->setMinimumContentsLength(7);
-  connect(m_ViewDirectionSelector, &QComboBox::currentTextChanged, this, &QmitkRenderWindowUtilityWidget::ChangeViewDirection);
-  UpdateViewPlaneSelection();
-
-  layout->addWidget(m_ViewDirectionSelector);
 
   m_CleanViewButton = new QToolButton(this);
   m_CleanViewButton->setText("Clean");
@@ -133,8 +129,22 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   });
   layout->addWidget(m_CleanViewButton);
 
-  // finally add observer, after all relevant objects have been created / initialized
-  sliceNavigationController->ConnectGeometrySendEvent(this);
+  // Navigator mode is editor-wide (like clean-view): this per-cell toggle is
+  // the affordance, the owning multi widget applies and mirrors it back.
+  m_NavigatorToggleButton = new QToolButton(this);
+  m_NavigatorToggleButton->setText("Nav");
+  m_NavigatorToggleButton->setCheckable(true);
+  m_NavigatorToggleButton->setToolTip(tr("Expanded navigator: show the full 3D crosshair and "
+                                         "coordinate entry in every cell instead of the compact "
+                                         "slice slider"));
+  connect(m_NavigatorToggleButton, &QToolButton::toggled, this, [this](bool checked) {
+    emit NavigatorToggled(checked);
+  });
+  layout->addWidget(m_NavigatorToggleButton);
+
+  // Per-dimension sync barcode for this cell; filled by the multi widget.
+  m_SyncBarcode = new QmitkMxNSyncBarcodeWidget(this);
+  layout->addWidget(m_SyncBarcode);
 }
 
 QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
@@ -208,113 +218,19 @@ void QmitkRenderWindowUtilityWidget::OnNodeSelectionWidgetSyncGroupChanged(int i
   m_SyncGroupSelector->setCurrentIndex(row);
 }
 
-void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
-{
-  if (!mitk::SliceNavigationController::GeometrySendEvent(nullptr, 0).CheckEvent(&event))
-  {
-    return;
-  }
-
-  const auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
-  auto viewDirection = sliceNavigationController->GetViewDirection();
-  unsigned int axis = 0;
-  switch (viewDirection)
-  {
-  case mitk::AnatomicalPlane::Original:
-    return;
-  case mitk::AnatomicalPlane::Axial:
-  {
-    axis = 2;
-    break;
-  }
-  case mitk::AnatomicalPlane::Coronal:
-  {
-    axis = 1;
-    break;
-  }
-  case mitk::AnatomicalPlane::Sagittal:
-  {
-    axis = 0;
-    break;
-  }
-  }
-
-  const auto* inputTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
-  const mitk::BaseGeometry* rendererGeometry = m_BaseRenderer->GetCurrentWorldGeometry();
-
-  mitk::TimeStepType timeStep = sliceNavigationController->GetStepper()->GetPos();
-  mitk::BaseGeometry::ConstPointer geometry = inputTimeGeometry->GetGeometryForTimeStep(timeStep);
-  if (geometry == nullptr)
-    return;
-
-  mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
-  matrix.GetVnlMatrix().normalize_columns();
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
-
-  int dominantAxis = itk::Function::Max3(inverseMatrix[0][axis], inverseMatrix[1][axis], inverseMatrix[2][axis]);
-
-  bool referenceGeometryAxisInverted = inverseMatrix[dominantAxis][axis] < 0;
-  bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[axis] < 0;
-
-  m_SliceNavigationWidget->SetInverseDirection(referenceGeometryAxisInverted != rendererZAxisInverted);
-}
-
-void QmitkRenderWindowUtilityWidget::ChangeViewDirection(const QString& viewDirection)
-{
-  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString());
-
-  if ("axial" == viewDirection)
-  {
-    emit ViewDirectionChanged(mitk::AnatomicalPlane::Axial);
-  }
-  else if ("coronal" == viewDirection)
-  {
-    emit ViewDirectionChanged(mitk::AnatomicalPlane::Coronal);
-  }
-  else if ("sagittal" == viewDirection)
-  {
-    emit ViewDirectionChanged(mitk::AnatomicalPlane::Sagittal);
-  }
-}
-
 void QmitkRenderWindowUtilityWidget::SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection)
 {
-  QString text;
-  switch (viewDirection)
+  // Apply the plane to this cell's renderer. Both entry points - the source
+  // cell's plane-label picker (via MxN::SetViewDirection) and an
+  // orientation-group relay (via MxN::PropagateOrientation) - funnel through
+  // here, so it stays the single application path.
+  if (mitk::AnatomicalPlane::Axial != viewDirection
+      && mitk::AnatomicalPlane::Coronal != viewDirection
+      && mitk::AnatomicalPlane::Sagittal != viewDirection)
   {
-    case mitk::AnatomicalPlane::Axial:    text = QStringLiteral("axial"); break;
-    case mitk::AnatomicalPlane::Coronal:  text = QStringLiteral("coronal"); break;
-    case mitk::AnatomicalPlane::Sagittal: text = QStringLiteral("sagittal"); break;
-    default:
-      return;  // 'Original' has no selector entry and no propagation semantics
+    return;  // 'Original' has no propagation semantics
   }
-
-  // Mirror silently; the renderer change below is the single application.
-  // Going through the selector's change signal instead would re-emit
-  // 'ViewDirectionChanged' and turn a relayed change back into a source.
-  const QSignalBlocker blocker(m_ViewDirectionSelector);
-  m_ViewDirectionSelector->setCurrentText(text);
   m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection, m_BaseRenderer);
-}
-
-void QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection()
-{
-  const auto sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
-  const auto viewDirection = sliceNavigationController->GetDefaultViewDirection();
-  switch (viewDirection)
-  {
-  case mitk::AnatomicalPlane::Axial:
-    m_ViewDirectionSelector->setCurrentIndex(0);
-    break;
-  case mitk::AnatomicalPlane::Coronal:
-    m_ViewDirectionSelector->setCurrentIndex(1);
-    break;
-  case mitk::AnatomicalPlane::Sagittal:
-    m_ViewDirectionSelector->setCurrentIndex(2);
-    break;
-  default:
-    break;
-  }
 }
 
 QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSelectionWidget() const
@@ -328,6 +244,17 @@ void QmitkRenderWindowUtilityWidget::SetCleanViewChecked(bool checked)
   // signal terminates the toggle -> editor -> mirror round-trip.
   const QSignalBlocker blocker(m_CleanViewButton);
   m_CleanViewButton->setChecked(checked);
+}
+
+void QmitkRenderWindowUtilityWidget::SetNavigatorChecked(bool expanded)
+{
+  const QSignalBlocker blocker(m_NavigatorToggleButton);
+  m_NavigatorToggleButton->setChecked(expanded);
+}
+
+void QmitkRenderWindowUtilityWidget::SetSyncBarcodeSlots(const QList<QColor>& slotColors)
+{
+  m_SyncBarcode->SetSlots(slotColors);
 }
 
 void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index, const QString& label)

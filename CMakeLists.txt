@@ -444,9 +444,19 @@ endif()
 set(_mitk_minimum_boost_libraries "algorithm;tokenizer;math;lexical_cast;preprocessor;uuid;variant;spirit;phoenix")
 set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)")
 
-# MITK cannot build without its minimum header set, so restore it if cleared.
-if(NOT MITK_USE_Boost_HEADER_LIBRARIES)
-  set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)" FORCE)
+# MITK cannot build without its minimum header set. Restore any of these
+# libraries that were individually removed from the cache value, while keeping
+# any extra libraries the user added.
+set(_boost_header_libraries ${MITK_USE_Boost_HEADER_LIBRARIES})
+set(_restored_boost_libraries FALSE)
+foreach(_lib IN LISTS _mitk_minimum_boost_libraries)
+  if(NOT _lib IN_LIST _boost_header_libraries)
+    list(APPEND _boost_header_libraries ${_lib})
+    set(_restored_boost_libraries TRUE)
+  endif()
+endforeach()
+if(_restored_boost_libraries)
+  set(MITK_USE_Boost_HEADER_LIBRARIES "${_boost_header_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)" FORCE)
 endif()
 
 # Boost libraries that are compiled and linked (none by default; e.g. process).

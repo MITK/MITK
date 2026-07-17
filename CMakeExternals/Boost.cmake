@@ -15,11 +15,14 @@ set(proj_DEPENDENCIES )
 set(Boost_DEPENDS ${proj})
 
 #[[ Provisioning fetches the dependency closure of the requested libraries from a
-    committed map (CMakeExternals/Boost/). When MITK builds its standalone
+    committed map (CMakeExternals/Boost/). When MITK builds its own standalone
     Python, the closure is fetched in parallel; otherwise a sequential pure-CMake
     fetch is used. Using Python only adds a build-order dependency on Python3,
-    which is registered before Boost in ExternalProjectList.cmake for that reason. ]]
-if(MITK_USE_Python3)
+    which is registered before Boost in ExternalProjectList.cmake for that reason.
+    Gate on Python3_ROOT_DIR, not MITK_USE_Python3: an externally provided
+    Python3_DIR leaves the former unset, and deriving an interpreter path from it
+    would point at a non-existent binary (see the guard in SuperBuild.cmake). ]]
+if(Python3_ROOT_DIR)
   if(WIN32)
     set(boost_python "${Python3_ROOT_DIR}/python.exe")
   else()

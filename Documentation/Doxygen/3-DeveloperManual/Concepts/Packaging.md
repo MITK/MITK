@@ -685,8 +685,6 @@ The current install system replaced several legacy approaches:
 | `CMake/RunInstalledCmdLineApp.bat` | Windows wrapper for command-line apps |
 | `CMake/RunInstalledApp.sh` | Linux wrapper for regular executables and BlueBerry apps |
 | `CMake/RunInstalledCmdLineApp.sh` | Linux wrapper for command-line apps |
-| `CMakeExternals/Boost-post_install-WIN32.cmake` | Moves Boost DLLs from `lib/` to `bin/` |
-| `CMakeExternals/Boost-post_install-APPLE.cmake` | Fixes Boost inter-library references to use `@rpath` |
 | `Modules/CppMicroServices/cmake/usFunctionEmbedResources.cmake` | APPEND and LINK mode resource embedding into shared libraries |
 | `Modules/CppMicroServices/cmake/usFunctionAddResources.cmake` | Creates ZIP archives from resource files for embedding |
 | `Modules/CppMicroServices/cmake/usFunctionCheckResourceLinking.cmake` | Platform capability detection for LINK mode; sets `US_DEFAULT_RESOURCE_MODE` |

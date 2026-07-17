@@ -29,6 +29,16 @@ string(REPLACE "^^" ";" BOOST_LIBRARIES "${BOOST_LIBRARIES}")
 
 include("${BOOST_MAP}")
 
+# Reject unknown names up front. Without this a typo would only surface deep in
+# the fetch as an opaque "git remote add origin" failure (empty url and sha).
+foreach(_m IN LISTS BOOST_LIBRARIES)
+  if(NOT _m IN_LIST BOOST_ALL_MODULES)
+    message(FATAL_ERROR "Boost: unknown library '${_m}'. Check "
+      "MITK_USE_Boost_HEADER_LIBRARIES and MITK_USE_Boost_COMPILED_LIBRARIES "
+      "against the module names in ${BOOST_MAP}.")
+  endif()
+endforeach()
+
 # config and headers are always needed (depinst treats them as essentials).
 set(_worklist ${BOOST_LIBRARIES} config headers)
 set(_closure "")

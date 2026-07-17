@@ -12,11 +12,12 @@ found in the LICENSE file.
 
 #include "mitkPreferences.h"
 
+#include <mitkBase64.h>
 #include <mitkIPreferencesStorage.h>
 #include <mitkExceptionMacro.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/beast/core/detail/base64.hpp>
+#include <algorithm>
+#include <cctype>
 
 mitk::Preferences::Preferences(const Properties& properties, const std::string& name, Preferences* parent, IPreferencesStorage* storage)
   : m_Properties(properties),
@@ -87,9 +88,14 @@ bool mitk::Preferences::GetBool(const std::string& key, bool def) const
 {
   auto value = this->FindValue(key);
 
-  return value.has_value()
-    ? boost::algorithm::to_lower_copy(value.value()) == "true"
-    : def;
+  if (!value.has_value())
+    return def;
+
+  auto lower = value.value();
+  std::transform(lower.begin(), lower.end(), lower.begin(),
+    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+  return lower == "true";
 }
 
 void mitk::Preferences::PutBool(const std::string& key, bool value)
@@ -143,8 +149,6 @@ void mitk::Preferences::PutDouble(const std::string& key, double value)
 
 std::vector<std::byte> mitk::Preferences::GetByteArray(const std::string& key, const std::byte* def, size_t size) const
 {
-  using namespace boost::beast::detail;
-
   auto value = this->FindValue(key);
 
   if (!value.has_value())
@@ -155,24 +159,13 @@ std::vector<std::byte> mitk::Preferences::GetByteArray(const std::string& key, c
     return array;
   }
 
-  const auto& encodedArray = value.value();
-  std::vector<std::byte> array(base64::decoded_size(encodedArray.size()));
-  auto sizes = base64::decode(array.data(), encodedArray.data(), encodedArray.size());
-
-  array.resize(sizes.first);
-
-  return array;
+  return Base64::Decode(value.value());
 }
 
 void mitk::Preferences::PutByteArray(const std::string& key, const std::byte* array, size_t size)
 {
   this->SetProperty<std::pair<decltype(array), decltype(size)>>(m_Properties, key, std::make_pair(array, size), [](const auto& value) {
-    using namespace boost::beast::detail;
-
-    std::vector<char> encodedArray(base64::encoded_size(value.second) + 1, '\0');
-    base64::encode(encodedArray.data(), value.first, value.second);
-
-    return std::string(encodedArray.data());
+    return Base64::Encode(std::span(value.first, value.second));
   });
 }
 
@@ -204,12 +197,7 @@ void mitk::Preferences::OverrideDouble(const std::string& key, double value)
 void mitk::Preferences::OverrideByteArray(const std::string& key, const std::byte* array, size_t size)
 {
   this->SetProperty<std::pair<decltype(array), decltype(size)>>(m_Overrides, key, std::make_pair(array, size), [](const auto& value) {
-    using namespace boost::beast::detail;
-
-    std::vector<char> encodedArray(base64::encoded_size(value.second) + 1, '\0');
-    base64::encode(encodedArray.data(), value.first, value.second);
-
-    return std::string(encodedArray.data());
+    return Base64::Encode(std::span(value.first, value.second));
   });
 }
 

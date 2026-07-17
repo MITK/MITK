@@ -15,6 +15,7 @@ set(H_FILES
   mitkAnatomicalPlanes.h
   mitkAntiAliasing.h
   mitkArray.h
+  mitkBase64.h
   mitkBaseDataTestImplementation.h
   mitkCommon.h
   mitkDisplayActionEvents.h
@@ -301,6 +302,7 @@ set(CPP_FILES
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
+  IO/mitkBase64.cpp
   IO/mitkCustomMimeType.cpp
   IO/mitkFileReaderRegistry.cpp
   IO/mitkFileReaderSelector.cpp

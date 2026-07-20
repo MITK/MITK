@@ -8,6 +8,7 @@ set(CPP_FILES
   QmitkColorPropertyEditor.cpp
   QmitkColorPropertyView.cpp
   QmitkColorTransferFunctionCanvas.cpp
+  QmitkCombinedTransferFunctionCanvas.cpp
   QmitkCrossWidget.cpp
   QmitkEditPointDialog.cpp
   QmitkEnumerationPropertyWidget.cpp

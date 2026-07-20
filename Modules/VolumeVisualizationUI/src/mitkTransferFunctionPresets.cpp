@@ -157,6 +157,10 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
   if (!it->scalarOpacity.empty())
     transferFunction->SetScalarOpacityPoints(it->scalarOpacity);
 
+  // A preset defines opacity only between its control points; treat values
+  // outside that range as fully transparent rather than clamping to the end value.
+  transferFunction->GetScalarOpacityFunction()->ClampingOff();
+
   transferFunction->SetRGBPoints(it->color);
 
   // The gradient opacity function is intentionally left at its default

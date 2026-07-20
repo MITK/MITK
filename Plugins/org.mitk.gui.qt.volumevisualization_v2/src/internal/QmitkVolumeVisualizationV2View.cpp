@@ -13,10 +13,10 @@ found in the LICENSE file.
 #include "QmitkVolumeVisualizationV2View.h"
 
 #include <mitkImage.h>
-#include <mitkImageStatisticsHolder.h>
 
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
+#include <QmitkCombinedTransferFunctionCanvas.h>
 
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
@@ -32,12 +32,6 @@ found in the LICENSE file.
 #include <ctkDoubleSlider.h>
 
 #include <algorithm>
-
-namespace
-{
-  constexpr double WIDTH_MIN = 0.1;
-  constexpr double WIDTH_MAX = 3.0;
-}
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
 
@@ -57,7 +51,7 @@ void QmitkVolumeVisualizationV2View::SetFocus()
 void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
 {
   m_Controls->setupUi(parent);
-  m_Controls->verticalLayout->setStretch(1, 3);
+  //m_Controls->verticalLayout->setStretch(1, 3);
   m_Controls->verticalLayout->setStretch(2, 1);
   m_Controls->volumeSelectionWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->volumeSelectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
@@ -80,10 +74,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
 
   m_Controls->shiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->widthSlider->setOrientation(Qt::Horizontal);
-  m_Controls->widthSlider->setMinimum(WIDTH_MIN);
-  m_Controls->widthSlider->setMaximum(WIDTH_MAX);
-  m_Controls->widthSlider->setSingleStep(0.05);
-  
+
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
     
@@ -99,6 +90,8 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged);
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
+  connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
+    this, &QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged);
 
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
@@ -161,90 +154,120 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QStr
     selectedNode->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(preset));
   }
 
+  m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
+
+  auto *image = selectedNode->GetDataAs<mitk::Image>();
+  mitk::SimpleHistogram *histogram = (image != nullptr) ? m_HistogramCache[image] : nullptr;
+
+  m_Controls->combinedTfCanvas->SetHistogram(histogram);
+  m_Controls->combinedTfCanvas->SetColorTransferFunction(preset->GetColorTransferFunction());
+  m_Controls->combinedTfCanvas->SetPiecewiseFunction(preset->GetScalarOpacityFunction());
+
+  if (histogram != nullptr)
+  {
+    // Use the image scalar range as the visible x-axis so histogram, gradient
+    // and curve line up. (SetPiecewiseFunction defaulted these to the function's
+    // own range, so this must come after it.)
+    m_DataRange = { histogram->GetMin(), histogram->GetMax() };
+    m_Controls->combinedTfCanvas->SetMin(histogram->GetMin());
+    m_Controls->combinedTfCanvas->SetMax(histogram->GetMax());
+  }
+
+  double *r = preset->GetColorTransferFunction()->GetRange();
+  MITK_INFO << "color range [" << r[0] << "," << r[1] << "]"
+          << " data [" << histogram->GetMin() << "," << histogram->GetMax() << "]"
+          << " colorNodes " << preset->GetColorTransferFunction()->GetSize();
+
   this->SnapshotAppliedTransferFunction();
   this->ResetShiftWidthControls();
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
-
-  m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
 }
 
 void QmitkVolumeVisualizationV2View::SnapshotAppliedTransferFunction()
 {
   if (m_AppliedTransferFunction.IsNull())
   {
-    m_BaseScalarOpacity.clear();
     m_BaseColor.clear();
-    m_WidthCenter = 0.0;
     return;
   }
 
-  m_BaseScalarOpacity = m_AppliedTransferFunction->GetScalarOpacityPoints();
   m_BaseColor = m_AppliedTransferFunction->GetRGBPoints();
-
-  // Points come back from VTK sorted by position, so front/back are the extremes.
-  m_WidthCenter = m_BaseScalarOpacity.empty()
-    ? 0.0
-    : 0.5 * (m_BaseScalarOpacity.front().first + m_BaseScalarOpacity.back().first);
 }
 
 void QmitkVolumeVisualizationV2View::ResetShiftWidthControls()
 {
-  auto selectedNode = m_SelectedNode.Lock();
-
-  //double rangeMin = 0.0;
-  //double rangeMax = 0.0;
-
-  //if (selectedNode.IsNotNull())
-  //{
-  //  if (auto *image = selectedNode->GetDataAs<mitk::Image>())
-  //  {
-  //    rangeMin = image->GetStatistics()->GetScalarValueMin();
-  //    rangeMax = image->GetStatistics()->GetScalarValueMax();
-  //  }
-  //}
-
-  //const double span = std::max(1.0, rangeMax - rangeMin);
-
-  const double effWidth = std::max(1.0, m_EffectiveRange[1] - m_EffectiveRange[0]);
-
   const QSignalBlocker blockShift(m_Controls->shiftSlider);
   const QSignalBlocker blockWidth(m_Controls->widthSlider);
 
-  //m_Controls->shiftSlider->setMinimum(-span);
-  //m_Controls->shiftSlider->setMaximum(span);
-  m_Controls->shiftSlider->setMinimum(-effWidth);
-  m_Controls->shiftSlider->setMaximum(effWidth);
+  // Scale the sliders to the image's own value range -- the same axis the canvas
+  // draws -- so the window can be moved and sized across everything you see.
+  const double dataWidth = std::max(1.0, m_DataRange[1] - m_DataRange[0]);
+
+  const double colorSpan = m_BaseColor.empty()
+    ? dataWidth
+    : std::max(1.0, m_BaseColor.back().first - m_BaseColor.front().first);
+
+  // Shift moves the window center (level); 0 keeps the preset's own center.
+  m_Controls->shiftSlider->setMinimum(-dataWidth);
+  m_Controls->shiftSlider->setMaximum(dataWidth);
   m_Controls->shiftSlider->setValue(0.0);
-  m_Controls->widthSlider->setValue(1.0);
+
+  // Width is the window size in intensity units; default to the preset's color
+  // span so a fresh preset maps 1:1, and allow narrowing/widening around it.
+  m_Controls->widthSlider->setMinimum(1.0);
+  m_Controls->widthSlider->setMaximum(std::max(2.0 * dataWidth, colorSpan));
+  m_Controls->widthSlider->setValue(colorSpan);
 }
 
 void QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
-  if (m_AppliedTransferFunction.IsNull() || selectedNode.IsNull() || m_BaseScalarOpacity.empty())
+  if (m_AppliedTransferFunction.IsNull() || selectedNode.IsNull() || m_BaseColor.empty())
     return;
 
   const double shift = m_Controls->shiftSlider->value();
   const double width = m_Controls->widthSlider->value();
 
-  const double scale = width;
-  const double offset = m_WidthCenter * (1.0 - width) + shift;
+  // Original intensity span of the preset's color points
+  const double origMin = m_BaseColor.front().first;
+  const double origMax = m_BaseColor.back().first;
+  const double origSpan = std::max(1.0, origMax - origMin);
+  const double colorCenter = 0.5 * (origMin + origMax);
 
-  m_AppliedTransferFunction->SetScalarOpacityPoints(mitk::RemapIntensity(m_BaseScalarOpacity, scale, offset));
+  // Window/level: center on colorCenter + shift, make it 'width' wide.
+  const double level = colorCenter + shift;
+  const double windowMin = level - 0.5 * width;
+  const double windowMax = level + 0.5 * width;
+
+  // Linear remap sending the color span [origMin, origMax] onto [windowMin, windowMax].
+  const double scale = (windowMax - windowMin) / origSpan;
+  const double offset = windowMin - origMin * scale;
+
   m_AppliedTransferFunction->SetRGBPoints(mitk::RemapIntensity(m_BaseColor, scale, offset));
 
   m_AppliedTransferFunction->Modified();
   this->RequestRenderWindowUpdate();
 
   m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
+  m_Controls->combinedTfCanvas->update();
 }
 
 void QmitkVolumeVisualizationV2View::OnResetTransferFunction()
 {
-  this->ResetShiftWidthControls();
-  this->OnShiftOrWidthChanged();
+  // Reload the current preset: restores both the color map and the opacity curve
+  // to the authored defaults and re-seeds the canvas + sliders.
+  this->OnTransferFunctionPresetSelected(m_Controls->presetComboBox->currentText());
+}
+
+void QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged()
+{
+  if (m_AppliedTransferFunction.IsNotNull())
+    m_AppliedTransferFunction->Modified();
+
+  // Keep the Advanced per-point editor in sync with the canvas edit.
+  m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
 }
 
 void QmitkVolumeVisualizationV2View::UpdateInterface()

@@ -131,6 +131,22 @@
     </layout>
    </item>
    <item>
+    <widget class="QmitkCombinedTransferFunctionCanvas" name="combinedTfCanvas" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>200</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="ctkCollapsibleGroupBox" name="collapsibleGroupBox">
      <property name="enabled">
       <bool>true</bool>
@@ -186,6 +202,12 @@
    <class>ctkCollapsibleGroupBox</class>
    <extends>QGroupBox</extends>
    <header location="global">ctkCollapsibleGroupBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkCombinedTransferFunctionCanvas</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkCombinedTransferFunctionCanvas.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

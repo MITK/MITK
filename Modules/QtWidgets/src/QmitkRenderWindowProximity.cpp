@@ -146,10 +146,11 @@ bool QmitkRenderWindowProximity::IsSuppressed() const
   return m_Suppressed;
 }
 
-void QmitkRenderWindowProximity::HandlePointerMoved(const QPoint& positionInCell)
+void QmitkRenderWindowProximity::HandlePointerMoved(const QPoint& positionInCell, bool buttonsPressed)
 {
   m_PointerPosition = positionInCell;
   m_PointerInside = true;
+  m_ButtonsPressed = buttonsPressed;
 
   this->EvaluateAllRegions();
 }
@@ -194,12 +195,13 @@ bool QmitkRenderWindowProximity::eventFilter(QObject* watched, QEvent* event)
     case QEvent::MouseMove:
     case QEvent::Enter:
     {
-      const auto globalPosition = static_cast<QSinglePointEvent*>(event)->globalPosition().toPoint();
+      const auto* pointerEvent = static_cast<QSinglePointEvent*>(event);
+      const auto globalPosition = pointerEvent->globalPosition().toPoint();
       const auto positionInCell = m_Cell->mapFromGlobal(globalPosition);
 
       if (m_Cell->rect().contains(positionInCell))
       {
-        this->HandlePointerMoved(positionInCell);
+        this->HandlePointerMoved(positionInCell, pointerEvent->buttons() != Qt::NoButton);
       }
       else if (m_PointerInside)
       {
@@ -234,6 +236,15 @@ QmitkRenderWindowProximity::State QmitkRenderWindowProximity::ComputeState(const
 
     if (SquaredDistanceToRect(m_PointerPosition, rect) <= threshold * threshold)
     {
+      // Reveal on a bare hover only: while a mouse button is held, a region
+      // that is not already revealed stays at Hint, so the frame never pops in
+      // mid-gesture (drawing, crosshairing or windowing over the image). An
+      // already-active region is left alone - a drag begun on the furniture
+      // itself must keep it up.
+      if (m_ButtonsPressed && region.state != State::Active)
+      {
+        return State::Hint;
+      }
       return State::Active;
     }
   }

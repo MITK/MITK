@@ -42,7 +42,11 @@ class QWidget;
  *
  * Transitions to a higher state are immediate; transitions to a lower state
  * are delayed by CollapseDelayMs and cancelled if the pointer returns, so
- * furniture never flaps at a threshold. One instance per cell keeps timing
+ * furniture never flaps at a threshold. A region only rises to Active on a
+ * button-free hover: while a mouse button is held the escalation is withheld,
+ * so the frame never reveals mid-gesture (drawing, crosshairing or windowing
+ * over the image); a region that is already Active is left untouched, so a
+ * drag begun on the furniture itself keeps it up. One instance per cell keeps timing
  * and hysteresis defined in exactly one place; the constants are public so
  * surfaces animate consistently (RevealDurationMs is the reveal easing
  * budget for the painting layer, the controller itself switches states
@@ -76,7 +80,7 @@ public:
 
   static constexpr int RevealDurationMs = 140;
   static constexpr int CollapseDelayMs = 300;
-  static constexpr int ActivationDistance = 48;
+  static constexpr int ActivationDistance = 58;
   static constexpr int HysteresisBand = 16;
 
   /**
@@ -161,10 +165,17 @@ public:
   /**
    * \brief Feed a pointer position in the cell's coordinate space.
    *
+   * \param positionInCell  Pointer position in the cell's coordinates.
+   * \param buttonsPressed  Whether any mouse button is currently held. A
+   *                        region escalates to Active only on a button-free
+   *                        hover; while a button is down the escalation is
+   *                        withheld (the frame must not reveal mid-gesture),
+   *                        though an already-Active region is left as is.
+   *
    * Normally driven by the installed event filter; public so tests and
    * custom event sources can feed synthetic positions headlessly.
    */
-  void HandlePointerMoved(const QPoint& positionInCell);
+  void HandlePointerMoved(const QPoint& positionInCell, bool buttonsPressed = false);
 
   /** \brief Feed "the pointer left the cell". See HandlePointerMoved. */
   void HandlePointerLeft();
@@ -208,6 +219,7 @@ private:
 
   QPoint m_PointerPosition;
   bool m_PointerInside = false;
+  bool m_ButtonsPressed = false;
   bool m_Suppressed = false;
 
 };

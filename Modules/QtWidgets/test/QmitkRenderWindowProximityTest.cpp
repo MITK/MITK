@@ -54,6 +54,9 @@ class QmitkRenderWindowProximityTestSuite : public mitk::TestFixture
   MITK_TEST(Unregister_UnknownIdThrows);
   MITK_TEST(Move_FarFromRegion_HintImmediately);
   MITK_TEST(Move_NearRegion_ActiveImmediately);
+  MITK_TEST(Move_IntoRegionWithButtonHeld_StaysHint);
+  MITK_TEST(Button_ReleasedNearRegion_Reveals);
+  MITK_TEST(Active_ButtonHeldDoesNotCollapse);
   MITK_TEST(Hysteresis_NoFlappingInBand);
   MITK_TEST(Collapse_DowngradeWaitsForDelay);
   MITK_TEST(Collapse_CancelledWhenPointerReturns);
@@ -71,11 +74,11 @@ class QmitkRenderWindowProximityTestSuite : public mitk::TestFixture
   std::unique_ptr<Proximity> m_Proximity;
 
   // Cell is 400x300 with a right-edge region; distances below relate to the
-  // controller's ActivationDistance (48) and HysteresisBand (16).
+  // controller's ActivationDistance (58) and HysteresisBand (16).
   const QRect m_RightEdgeRegion = QRect(380, 0, 20, 300);
   const QPoint m_FarPoint = QPoint(200, 150);   // 180 px from the region
   const QPoint m_NearPoint = QPoint(340, 150);  // 40 px, inside activation
-  const QPoint m_BandPoint = QPoint(325, 150);  // 55 px, inside hysteresis band only
+  const QPoint m_BandPoint = QPoint(315, 150);  // 65 px, inside hysteresis band only
 
 public:
 
@@ -174,6 +177,48 @@ public:
     const auto id = this->RegisterRightEdgeRegion();
 
     m_Proximity->HandlePointerMoved(m_NearPoint);
+
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+  }
+
+  void Move_IntoRegionWithButtonHeld_StaysHint()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+
+    // A gesture in progress (a mouse button held) must not trigger a reveal,
+    // even with the pointer right on top of the region.
+    m_Proximity->HandlePointerMoved(m_NearPoint, true);
+
+    CPPUNIT_ASSERT(State::Hint == m_Proximity->GetRegionState(id));
+  }
+
+  void Button_ReleasedNearRegion_Reveals()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    m_Proximity->HandlePointerMoved(m_NearPoint, true);
+    CPPUNIT_ASSERT(State::Hint == m_Proximity->GetRegionState(id));
+
+    // Releasing the button turns the same position into a bare hover, which
+    // reveals immediately.
+    m_Proximity->HandlePointerMoved(m_NearPoint, false);
+
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+  }
+
+  void Active_ButtonHeldDoesNotCollapse()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    m_Proximity->HandlePointerMoved(m_NearPoint);
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+
+    // A drag begun on already-revealed furniture (button now held, pointer
+    // still over the region) must keep it up. Run past the collapse delay: a
+    // naive "button forces Hint" rule would arm the timer and tear the frame
+    // down mid-drag, so only the delay loop actually proves the property.
+    m_Proximity->HandlePointerMoved(m_NearPoint, true);
+    m_Proximity->HandlePointerMoved(m_BandPoint, true);
+    m_Proximity->HandlePointerMoved(m_NearPoint, true);
+    ProcessEventsFor(WaitPastCollapse);
 
     CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
   }

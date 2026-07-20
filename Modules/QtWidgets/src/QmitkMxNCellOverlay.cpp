@@ -69,7 +69,7 @@ namespace
   constexpr int HueDotDiameter = 8;
   constexpr int ChipSize = 14;
   constexpr int EdgeStripThickness = 20;
-  constexpr int EdgeActivationDistance = 16;
+  constexpr int EdgeActivationDistance = 19;
   constexpr int TopStripHeight = 4;
   constexpr int SliceTickHeight = 8;
   constexpr int LineGap = 1;              // between the two bottom-left lines

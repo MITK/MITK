@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <QVBoxLayout>
 
 class vtkCornerAnnotation;
+class QGraphicsOpacityEffect;
+class QPropertyAnimation;
 
 /**
 * \brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
@@ -156,6 +158,8 @@ private:
   QVBoxLayout* m_Layout;
   QWidget* m_UtilityWidget = nullptr;
   bool m_UtilityWidgetAutoHide = false;
+  QGraphicsOpacityEffect* m_UtilityWidgetOpacity = nullptr;
+  QPropertyAnimation* m_UtilityWidgetReveal = nullptr;
 
   mitk::DataStorage* m_DataStorage;
 

@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <QmitkRenderWindowUtilityWidget.h>
 
 #include <QMenu>
+#include <QPaintEvent>
+#include <QPainter>
 #include <QToolButton>
 #include <QWidgetAction>
 
@@ -40,12 +42,12 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   this->setParent(parent);
 
   // A quiet translucent backing so the strip reads as one panel floating over
-  // the image rather than buttons pasted onto the canvas (matching the
-  // built-in render-window menu's dark backing).
-  this->setAutoFillBackground(false);
-  this->setStyleSheet(
-    QStringLiteral("QmitkRenderWindowUtilityWidget { background-color: rgba(0, 0, 0, 150); "
-                   "border-radius: 3px; }"));
+  // the image rather than buttons pasted onto the canvas. The backing is drawn
+  // in paintEvent: a stylesheet background-color is silently dropped on a plain
+  // QWidget subclass (it would need Qt::WA_StyledBackground), and painting it
+  // against a translucent widget is the recipe the sibling viewport furniture
+  // already uses to composite correctly over the render window.
+  this->setAttribute(Qt::WA_TranslucentBackground);
 
   auto layout = new QHBoxLayout(this);
   layout->setContentsMargins(4, 2, 4, 2);
@@ -149,6 +151,18 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 
 QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 {
+}
+
+void QmitkRenderWindowUtilityWidget::paintEvent(QPaintEvent*)
+{
+  // The translucent rounded backing (see the constructor): a plain QWidget
+  // subclass paints no background of its own, so drawing it here is what makes
+  // the strip read as one panel over the image instead of loose controls.
+  QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(QColor(0, 0, 0, 150));
+  painter.drawRoundedRect(QRectF(this->rect()), 3.0, 3.0);
 }
 
 void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index)

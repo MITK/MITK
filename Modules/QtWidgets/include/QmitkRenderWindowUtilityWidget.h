@@ -35,6 +35,7 @@ namespace mitk
 }
 
 class QmitkRenderWindow;
+class QPaintEvent;
 class QToolButton;
 
 /**
@@ -161,6 +162,11 @@ Q_SIGNALS:
   *        whoever hosts the view.
   */
   void LayoutEditorRequested();
+
+protected:
+
+  /** \brief Paints the translucent rounded backing behind the controls. */
+  void paintEvent(QPaintEvent* event) override;
 
 private Q_SLOTS:
 

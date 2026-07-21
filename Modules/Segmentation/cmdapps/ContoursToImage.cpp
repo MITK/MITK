@@ -20,10 +20,8 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/replace.hpp>
-
 #include <mitkFileSystem.h>
+#include <mitkStringUtil.h>
 
 enum class OutputFormat
 {
@@ -56,9 +54,9 @@ std::string GetSafeName(const mitk::IPropertyProvider* propertyProvider)
 
     if (!name.empty())
     {
-      boost::trim(name);
-      boost::replace_all(name, "/", "_");
-      boost::replace_all(name, "\\", "_");
+      mitk::Trim(name);
+      mitk::ReplaceAll(name, "/", "_");
+      mitk::ReplaceAll(name, "\\", "_");
 
       // If you read this, feel free to handle invalid filename characters here. :)
     }

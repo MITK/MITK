@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "mitkImageStatisticsContainerManager.h"
 #include "mitkImageStatisticsContainer.h"
 
+#include <variant>
+
 class mitkImageStatisticsContainerTestSuite : public mitk::TestFixture
 {
     CPPUNIT_TEST_SUITE(mitkImageStatisticsContainerTestSuite);
@@ -299,12 +301,12 @@ public:
         m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
         m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not correctly added to StatisticsObject.", boost::get<double> (m_StatisticsContainer->GetStatistics(1,0).GetValueNonConverted("Test")), 4.2);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not correctly added to StatisticsObject.", std::get<double> (m_StatisticsContainer->GetStatistics(1,0).GetValueNonConverted("Test")), 4.2);
 
         // An existing statistic won't be updated by adding another statistic with same name to that object.
         m_StatisticsObject.AddStatistic("Test", 42.0);
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was overwritten.", boost::get<double>(m_StatisticsContainer->GetStatistics(1,0).GetValueNonConverted("Test")), 4.2);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was overwritten.", std::get<double>(m_StatisticsContainer->GetStatistics(1,0).GetValueNonConverted("Test")), 4.2);
     }
 
     void AllStatisticNamesForContainer()

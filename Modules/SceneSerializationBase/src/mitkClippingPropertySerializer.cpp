@@ -43,15 +43,15 @@ namespace mitk
         element->SetAttribute("enabled", prop->GetClippingEnabled());
         auto *originElement = doc.NewElement("origin");
         const Point3D origin = prop->GetOrigin();
-        originElement->SetAttribute("x", boost::lexical_cast<std::string>(origin[0]).c_str());
-        originElement->SetAttribute("y", boost::lexical_cast<std::string>(origin[1]).c_str());
-        originElement->SetAttribute("z", boost::lexical_cast<std::string>(origin[2]).c_str());
+        originElement->SetAttribute("x", mitk::ToString(origin[0]).c_str());
+        originElement->SetAttribute("y", mitk::ToString(origin[1]).c_str());
+        originElement->SetAttribute("z", mitk::ToString(origin[2]).c_str());
         element->InsertEndChild(originElement);
         auto *normalElement = doc.NewElement("normal");
         const Vector3D normal = prop->GetNormal();
-        normalElement->SetAttribute("x", boost::lexical_cast<std::string>(normal[0]).c_str());
-        normalElement->SetAttribute("y", boost::lexical_cast<std::string>(normal[1]).c_str());
-        normalElement->SetAttribute("z", boost::lexical_cast<std::string>(normal[2]).c_str());
+        normalElement->SetAttribute("x", mitk::ToString(normal[0]).c_str());
+        normalElement->SetAttribute("y", mitk::ToString(normal[1]).c_str());
+        normalElement->SetAttribute("z", mitk::ToString(normal[2]).c_str());
         element->InsertEndChild(normalElement);
         return element;
       }
@@ -83,7 +83,7 @@ namespace mitk
       {
         StringsToNumbers<ScalarType>(3, origin_string, origin);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch (mitk::BadLexicalCast &e)
       {
         MITK_ERROR << "Could not parse string as number: " << e.what();
         return nullptr;
@@ -104,7 +104,7 @@ namespace mitk
       {
         StringsToNumbers<ScalarType>(3, normal_string, normal);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch (mitk::BadLexicalCast &e)
       {
         MITK_ERROR << "Could not parse string as number: " << e.what();
         return nullptr;

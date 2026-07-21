@@ -12,23 +12,60 @@ found in the LICENSE file.
 
 #include <mitkStringUtil.h>
 
+#include <algorithm>
 #include <cctype>
 
 bool mitk::EndsWithCaseInsensitive(const std::string& str, const std::string& suffix)
 {
-  if (str.size() < suffix.size())
+  // Ends-with is a case-insensitive comparison of the trailing suffix.size()
+  // characters, so defer to EqualsCaseInsensitive on that tail.
+  return str.size() >= suffix.size() &&
+         EqualsCaseInsensitive(str.substr(str.size() - suffix.size()), suffix);
+}
+
+bool mitk::EqualsCaseInsensitive(const std::string& lhs, const std::string& rhs)
+{
+  if (lhs.size() != rhs.size())
     return false;
 
-  // Compare only the trailing suffix.size() characters. std::tolower must be given
-  // an unsigned char to avoid undefined behavior on negative char values.
-  const auto offset = str.size() - suffix.size();
+  // std::tolower must be given an unsigned char to avoid undefined behavior on
+  // negative char values.
+  return std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](char a, char b) {
+    return std::tolower(static_cast<unsigned char>(a)) == std::tolower(static_cast<unsigned char>(b));
+  });
+}
 
-  for (std::string::size_type i = 0; i < suffix.size(); ++i)
+std::vector<std::string> mitk::Split(const std::string& str, char delimiter)
+{
+  std::vector<std::string> tokens;
+  std::string::size_type start = 0;
+
+  while (true)
   {
-    if (std::tolower(static_cast<unsigned char>(str[offset + i])) !=
-        std::tolower(static_cast<unsigned char>(suffix[i])))
-      return false;
+    const auto end = str.find(delimiter, start);
+    tokens.push_back(str.substr(start, end - start));
+
+    if (std::string::npos == end)
+      break;
+
+    start = end + 1;
   }
 
-  return true;
+  return tokens;
+}
+
+void mitk::Trim(std::string& str)
+{
+  const auto notSpace = [](unsigned char c) { return !std::isspace(c); };
+  str.erase(str.begin(), std::find_if(str.begin(), str.end(), notSpace));
+  str.erase(std::find_if(str.rbegin(), str.rend(), notSpace).base(), str.end());
+}
+
+void mitk::ReplaceAll(std::string& str, const std::string& from, const std::string& to)
+{
+  if (from.empty())
+    return;
+
+  for (auto pos = str.find(from); pos != std::string::npos; pos = str.find(from, pos + to.size()))
+    str.replace(pos, from.size(), to);
 }

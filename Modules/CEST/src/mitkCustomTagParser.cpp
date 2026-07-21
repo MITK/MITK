@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <mitkCESTPropertyHelper.h>
 #include <mitkIPropertyPersistence.h>
+#include <mitkStringUtil.h>
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -28,10 +29,8 @@ found in the LICENSE file.
 
 #include <Poco/Glob.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/tokenizer.hpp>
-
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -255,7 +254,8 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
 
   auto comp = [](const std::string& s1, const std::string& s2)
   {
-    return boost::algorithm::lexicographical_compare(s1, s2, boost::algorithm::is_iless());
+    return std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(),
+      [](unsigned char c1, unsigned char c2) { return std::tolower(c1) < std::tolower(c2); });
   };
 
   std::map<std::string, std::string, decltype(comp)> privateParameters(comp);
@@ -316,14 +316,14 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     parameterListString = bytes.substr(ascconvBeginPos, count);
   }
 
-  boost::replace_all(parameterListString, "\r\n", "\n");
-  boost::replace_all(parameterListString, "\t", "");
-  boost::char_separator<char> newlineSeparator("\n");
-  boost::tokenizer<boost::char_separator<char>> parameters(parameterListString, newlineSeparator);
-  for (const auto &parameter : parameters)
+  mitk::ReplaceAll(parameterListString, "\r\n", "\n");
+  mitk::ReplaceAll(parameterListString, "\t", "");
+  for (const auto &parameter : mitk::Split(parameterListString, '\n'))
   {
-    std::vector<std::string> parts;
-    boost::split(parts, parameter, boost::is_any_of("="));
+    if (parameter.empty())
+      continue;
+
+    auto parts = mitk::Split(parameter, '=');
 
     if (parts.size() == 2)
     {

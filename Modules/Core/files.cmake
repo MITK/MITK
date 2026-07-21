@@ -60,6 +60,7 @@ set(H_FILES
   mitkStatusBarImplementation.h
   mitkStdFunctionCommand.h
   mitkStorageThreadDispatcherBase.h
+  mitkStringUtil.h
   mitkTimeHelper.h
   mitkUndoModel.h
   mitkUndoRedoPreferenceHelper.h

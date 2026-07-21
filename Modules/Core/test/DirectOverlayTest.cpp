@@ -233,8 +233,8 @@ int DirectOverlayTest(int argc, char *argv[])
   {
     sscanf(argv[3], "%u", &lower);
     sscanf(argv[4], "%u", &upper);
-    // lower = boost::lexical_cast<double>(argv[3]);
-    // upper = boost::lexical_cast<double>(argv[4]);
+    // lower = mitk::LexicalCast<double>(argv[3]);
+    // upper = mitk::LexicalCast<double>(argv[4]);
 
     MITK_INFO << "Got values: " << lower << " : " << upper;
   }

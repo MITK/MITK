@@ -17,7 +17,8 @@ found in the LICENSE file.
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-#include <boost/math/constants/constants.hpp>
+#include <cmath>
+#include <numbers>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix.hpp>
 #include <boost/version.hpp>
@@ -45,7 +46,7 @@ namespace mitk
   template<typename T>
   inline T deg2rad(const T deg)
   {
-    return deg * boost::math::constants::pi<T>() / static_cast<T>(180);
+    return deg * std::numbers::pi_v<T> / static_cast<T>(180);
   }
 
   /*!
@@ -95,8 +96,8 @@ namespace mitk
   template<typename T>
   T fresnelS(const T t)
   {
-    T x = t / boost::math::constants::root_half_pi<T>();
-    return static_cast<T>(fresnel_s(x) / boost::math::constants::root_two_div_pi<T>());
+    T x = t / std::sqrt(std::numbers::pi_v<T> / T(2));
+    return static_cast<T>(fresnel_s(x) / std::sqrt(T(2) / std::numbers::pi_v<T>));
   }
 
   /*!
@@ -110,8 +111,8 @@ namespace mitk
   template<typename T>
   T fresnelC(const T t)
   {
-    T x = t / boost::math::constants::root_half_pi<T>();
-    return static_cast<T>(fresnel_c(x) / boost::math::constants::root_two_div_pi<T>());
+    T x = t / std::sqrt(std::numbers::pi_v<T> / T(2));
+    return static_cast<T>(fresnel_c(x) / std::sqrt(T(2) / std::numbers::pi_v<T>));
   }
 
   /*!

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include "MRPerfusionView.h"
 #include <ui_MRPerfusionViewControls.h>
 
-#include <boost/tokenizer.hpp>
-#include <boost/math/constants/constants.hpp>
+#include <numbers>
 #include <iostream>
 
 #include <mitkWorkbenchUtil.h>
+#include <mitkStringUtil.h>
 
 #include <mitkAterialInputFunctionGenerator.h>
 #include <mitkConcentrationCurveGenerator.h>
@@ -1100,9 +1100,9 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
       concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
       concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
       //Convert Flipangle from degree to radiant
-      double alpha = m_Controls->FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+      double alpha = m_Controls->FlipangleSpinBox->value()/360*2* std::numbers::pi;
       concentrationGen->SetFlipAngle(alpha);
-      double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+      double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * std::numbers::pi;
       concentrationGen->SetFlipAnglePDW(alphaPDW);
 
   }
@@ -1220,7 +1220,6 @@ void MRPerfusionView::LoadAIFfromFile()
 
   std::string m_aifFilePath = fileName.toStdString();
   //Read Input
-  typedef boost::tokenizer< boost::escaped_list_separator<char> > Tokenizer;
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //AIF Data
 
@@ -1237,8 +1236,7 @@ void MRPerfusionView::LoadAIFfromFile()
 
   while (getline(in1, line1))
   {
-    Tokenizer tok(line1);
-    vec1.assign(tok.begin(), tok.end());
+    vec1 = mitk::Split(line1, ',');
 
     if (vec1.size() < 2)
     {

@@ -42,18 +42,18 @@ namespace mitk
 
         auto *child = doc.NewElement("CurrentSettings");
         element->InsertEndChild(child);
-        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetLevel()).c_str());
-        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetWindow()).c_str());
+        child->SetAttribute("level", mitk::ToString(lw.GetLevel()).c_str());
+        child->SetAttribute("window", mitk::ToString(lw.GetWindow()).c_str());
 
         child = doc.NewElement("DefaultSettings");
         element->InsertEndChild(child);
-        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetDefaultLevel()).c_str());
-        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetDefaultWindow()).c_str());
+        child->SetAttribute("level", mitk::ToString(lw.GetDefaultLevel()).c_str());
+        child->SetAttribute("window", mitk::ToString(lw.GetDefaultWindow()).c_str());
 
         child = doc.NewElement("CurrentRange");
         element->InsertEndChild(child);
-        child->SetAttribute("min", boost::lexical_cast<std::string>(lw.GetRangeMin()).c_str());
-        child->SetAttribute("max", boost::lexical_cast<std::string>(lw.GetRangeMax()).c_str());
+        child->SetAttribute("min", mitk::ToString(lw.GetRangeMin()).c_str());
+        child->SetAttribute("max", mitk::ToString(lw.GetRangeMax()).c_str());
 
         return element;
       }
@@ -96,14 +96,14 @@ namespace mitk
       LevelWindow lw;
       try
       {
-        lw.SetRangeMinMax(boost::lexical_cast<double>(minRange_string), boost::lexical_cast<double>(maxRange_string));
-        lw.SetDefaultLevelWindow(boost::lexical_cast<double>(defaultLevel_string),
-                                 boost::lexical_cast<double>(defaultWindow_string));
-        lw.SetLevelWindow(boost::lexical_cast<double>(level_string), boost::lexical_cast<double>(window_string));
+        lw.SetRangeMinMax(mitk::LexicalCast<double>(minRange_string), mitk::LexicalCast<double>(maxRange_string));
+        lw.SetDefaultLevelWindow(mitk::LexicalCast<double>(defaultLevel_string),
+                                 mitk::LexicalCast<double>(defaultWindow_string));
+        lw.SetLevelWindow(mitk::LexicalCast<double>(level_string), mitk::LexicalCast<double>(window_string));
         lw.SetFixed(isFixed);
         lw.SetFloatingValues(isFloatingImage);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch (mitk::BadLexicalCast &e)
       {
         MITK_ERROR << "Could not parse string as number: " << e.what();
         return nullptr;

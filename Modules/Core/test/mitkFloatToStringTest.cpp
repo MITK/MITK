@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <limits>
 
 //!
-//! Verifies boost::lexical<cast> for MITK's serialization purposes
+//! Verifies mitk::LexicalCast / mitk::ToString for MITK's serialization purposes
 //!
 //! Verifies:
 //! - special numbers behavior:
@@ -47,14 +47,14 @@ public:
   void ConfirmNumberToString(DATATYPE number, const std::string &s)
 
   {
-    CPPUNIT_ASSERT_EQUAL(boost::lexical_cast<std::string>(number), s);
+    CPPUNIT_ASSERT_EQUAL(mitk::ToString(number), s);
   }
 
   template <typename DATATYPE>
   void ConfirmStringToNumber(const std::string &s, DATATYPE number)
 
   {
-    CPPUNIT_ASSERT_EQUAL(number, boost::lexical_cast<DATATYPE>(s));
+    CPPUNIT_ASSERT_EQUAL(number, mitk::LexicalCast<DATATYPE>(s));
   }
 
   template <typename DATATYPE>
@@ -62,12 +62,12 @@ public:
   {
     // we want to make sure that the following strings will be accepted and returned
     // by our conversion functions. This must not change in the future to ensure compatibility
-    auto nan = boost::lexical_cast<DATATYPE>("nan");
+    auto nan = mitk::LexicalCast<DATATYPE>("nan");
     CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
-    nan = boost::lexical_cast<DATATYPE>("NAN");
+    nan = mitk::LexicalCast<DATATYPE>("NAN");
     CPPUNIT_ASSERT_MESSAGE("NAN==NAN must be false", !(nan == nan));
 
-    std::string s_nan = boost::lexical_cast<std::string>(nan);
+    std::string s_nan = mitk::ToString(nan);
     CPPUNIT_ASSERT_EQUAL(std::string("nan"), s_nan);
 
     ConfirmStringToNumber("inf", std::numeric_limits<DATATYPE>::infinity());
@@ -87,8 +87,8 @@ public:
   template <typename DATATYPE>
   void CheckRoundTrip(DATATYPE number, DATATYPE tolerance)
   {
-    std::string s = boost::lexical_cast<std::string>(number);
-    auto number2 = boost::lexical_cast<DATATYPE>(s);
+    std::string s = mitk::ToString(number);
+    auto number2 = mitk::LexicalCast<DATATYPE>(s);
 
     CPPUNIT_ASSERT_MESSAGE(std::string("Must not parse string ") + s + " as NaN", number2 == number2);
     if (tolerance == 0)
@@ -104,12 +104,12 @@ public:
   template <typename DATATYPE>
   void CheckRoundTrip(const std::string &input)
   {
-    auto number = boost::lexical_cast<DATATYPE>(input);
-    std::string result = boost::lexical_cast<std::string>(number);
+    auto number = mitk::LexicalCast<DATATYPE>(input);
+    std::string result = mitk::ToString(number);
 
     // There are normal imprecisions when converting to string
     // We do only compare if the numeric values match "close enough"
-    auto number2 = boost::lexical_cast<DATATYPE>(result);
+    auto number2 = mitk::LexicalCast<DATATYPE>(result);
     CPPUNIT_ASSERT(mitk::Equal(number, number2));
   }
 

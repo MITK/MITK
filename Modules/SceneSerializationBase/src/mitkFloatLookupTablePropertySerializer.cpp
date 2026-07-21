@@ -46,7 +46,7 @@ namespace mitk
       {
         auto *tableEntry = doc.NewElement("LUTValue");
         tableEntry->SetAttribute("id", it->first);
-        tableEntry->SetAttribute("value", boost::lexical_cast<std::string>(it->second).c_str());
+        tableEntry->SetAttribute("value", mitk::ToString(it->second).c_str());
         element->InsertEndChild(tableEntry);
       }
       return element;
@@ -72,9 +72,9 @@ namespace mitk
           return nullptr;
         try
         {
-          lut.SetTableValue(id, boost::lexical_cast<float>(value_string));
+          lut.SetTableValue(id, mitk::LexicalCast<float>(value_string));
         }
-        catch (boost::bad_lexical_cast &e)
+        catch (mitk::BadLexicalCast &e)
         {
           MITK_ERROR << "Could not parse string as number: " << e.what();
           return nullptr;

@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "mitkROIMapperHelper.h"
 
+#include <mitkStringUtil.h>
+
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
-
-#include <boost/algorithm/string.hpp>
 
 #include <regex>
 
@@ -113,7 +113,7 @@ std::string mitk::ROIMapperHelper::ParseCaption(const std::string& captionTempla
 
   if (hasPlaceholders)
   {
-    boost::trim(caption);
+    mitk::Trim(caption);
     return caption;
   }
 

@@ -187,7 +187,8 @@ namespace mitk
         os << std::endl << indent << "Number of entries: " << statisticKeys.size();
         for (const auto& aKey : statisticKeys)
         {
-          os << std::endl << indent.GetNextIndent() << aKey << ": " << statisticsValues.GetValueNonConverted(aKey);
+          os << std::endl << indent.GetNextIndent() << aKey << ": ";
+          std::visit([&os](const auto& value) { os << value; }, statisticsValues.GetValueNonConverted(aKey));
         }
       }
     }

@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <itkCompositeTransform.h>
 #include <itkVersor.h>
 
-#include <boost/math/constants/constants.hpp>
+#include <numbers>
 
 #include <ui_QmitkRegistrationManipulationWidget.h>
 
@@ -138,7 +138,7 @@ void QmitkRegistrationManipulationWidget::ApplyTranslationDelta(const mitk::Vect
 
 void QmitkRegistrationManipulationWidget::ApplyRotationDelta(const mitk::Vector3D& axis, double angleDeg)
 {
-  const double angleRad = angleDeg * boost::math::double_constants::pi / 180.0;
+  const double angleRad = angleDeg * std::numbers::pi / 180.0;
 
   // Build incremental rotation using itk::Versor (axis-angle representation)
   using VersorType = itk::Versor<::map::core::continuous::ScalarType>;
@@ -217,12 +217,12 @@ void QmitkRegistrationManipulationWidget::UpdateTransformWidgets()
   m_Controls->slideTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
   m_Controls->slideTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
 
-  m_Controls->sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-  m_Controls->sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-  m_Controls->sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
-  m_Controls->slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-  m_Controls->slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-  m_Controls->slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+  m_Controls->sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / std::numbers::pi));
+  m_Controls->sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / std::numbers::pi));
+  m_Controls->sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / std::numbers::pi));
+  m_Controls->slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / std::numbers::pi));
+  m_Controls->slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / std::numbers::pi));
+  m_Controls->slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / std::numbers::pi));
   this->m_internalUpdate = false;
 };
 
@@ -235,9 +235,9 @@ void QmitkRegistrationManipulationWidget::UpdateTransform(bool updateRotation)
      ConfigureTransformCenter();
     }
 
-    this->m_DirectCurrentTransform->SetRotation(m_Controls->sbRotX->value()*(boost::math::double_constants::pi / 180),
-      m_Controls->sbRotY->value()*(boost::math::double_constants::pi / 180),
-      m_Controls->sbRotZ->value()*(boost::math::double_constants::pi / 180));
+    this->m_DirectCurrentTransform->SetRotation(m_Controls->sbRotX->value()*(std::numbers::pi / 180),
+      m_Controls->sbRotY->value()*(std::numbers::pi / 180),
+      m_Controls->sbRotZ->value()*(std::numbers::pi / 180));
   }
   else
   {

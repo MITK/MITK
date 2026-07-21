@@ -21,8 +21,6 @@ found in the LICENSE file.
 #include <vtkPropAssembly.h>
 #include <vtkTransformPolyDataFilter.h>
 
-#include <boost/algorithm/string.hpp>
-
 #include <regex>
 
 namespace

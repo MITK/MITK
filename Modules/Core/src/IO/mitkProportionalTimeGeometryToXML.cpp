@@ -29,9 +29,9 @@ tinyxml2::XMLElement *mitk::ProportionalTimeGeometryToXML::ToXML(tinyxml2::XMLDo
   // by not writing them. The reader can then tell that absence of those values
   // means "keep the default values"
   if (timeGeom->GetFirstTimePoint() != -std::numeric_limits<TimePointType>::max())
-    timeGeomElem->SetAttribute("FirstTimePoint", boost::lexical_cast<std::string>(timeGeom->GetFirstTimePoint()).c_str());
+    timeGeomElem->SetAttribute("FirstTimePoint", mitk::ToString(timeGeom->GetFirstTimePoint()).c_str());
   if (timeGeom->GetStepDuration() != std::numeric_limits<TimePointType>::infinity())
-    timeGeomElem->SetAttribute("StepDuration", boost::lexical_cast<std::string>(timeGeom->GetStepDuration()).c_str());
+    timeGeomElem->SetAttribute("StepDuration", mitk::ToString(timeGeom->GetStepDuration()).c_str());
 
   for (TimeStepType t = 0; t < timeGeom->CountTimeSteps(); ++t)
   {
@@ -79,7 +79,7 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
     firstTimePoint_s = timeGeometryElement->Attribute("FirstTimePoint");
     if (nullptr != firstTimePoint_s)
     {
-      firstTimePoint = boost::lexical_cast<double>(firstTimePoint_s);
+      firstTimePoint = mitk::LexicalCast<double>(firstTimePoint_s);
     }
     else
     {
@@ -89,14 +89,14 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
     stepDuration_s = timeGeometryElement->Attribute("StepDuration");
     if (nullptr != stepDuration_s)
     {
-      stepDuration = boost::lexical_cast<double>(stepDuration_s);
+      stepDuration = mitk::LexicalCast<double>(stepDuration_s);
     }
     else
     {
       stepDuration = std::numeric_limits<TimePointType>::infinity();
     }
   }
-  catch ( const boost::bad_lexical_cast &e )
+  catch ( const mitk::BadLexicalCast &e )
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
     return nullptr;

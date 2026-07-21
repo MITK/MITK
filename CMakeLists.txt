@@ -439,7 +439,35 @@ else()
   find_package(OpenSSL 3)
 endif()
 
-set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
+# MITK's own header-only Boost usage. The dependency closure of these libraries
+# (and of the compiled ones below) is resolved and provisioned automatically.
+set(_mitk_minimum_boost_libraries "lexical_cast;preprocessor;uuid;spirit;phoenix")
+set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)")
+
+# MITK cannot build without its minimum header set. Restore any of these
+# libraries that were individually removed from the cache value, while keeping
+# any extra libraries the user added.
+set(_boost_header_libraries ${MITK_USE_Boost_HEADER_LIBRARIES})
+set(_restored_boost_libraries FALSE)
+foreach(_lib IN LISTS _mitk_minimum_boost_libraries)
+  if(NOT _lib IN_LIST _boost_header_libraries)
+    list(APPEND _boost_header_libraries ${_lib})
+    set(_restored_boost_libraries TRUE)
+  endif()
+endforeach()
+if(_restored_boost_libraries)
+  set(MITK_USE_Boost_HEADER_LIBRARIES "${_boost_header_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)" FORCE)
+endif()
+
+# Boost libraries that are compiled and linked (none by default; e.g. process).
+set(MITK_USE_Boost_COMPILED_LIBRARIES "" CACHE STRING "Semicolon-separated Boost libraries to compile and link (dependency closure resolved automatically)")
+
+# Header-only Boost libraries required by optional dependencies, added when the
+# dependency is enabled so their closure is provisioned too.
+if(MITK_USE_MatchPoint)
+  list(APPEND MITK_USE_Boost_HEADER_LIBRARIES graph interprocess uuid)
+  list(REMOVE_DUPLICATES MITK_USE_Boost_HEADER_LIBRARIES)
+endif()
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
   set(openssl_message "Could not find OpenSSL.\n")

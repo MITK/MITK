@@ -14,11 +14,11 @@ found in the LICENSE file.
 #include <ui_PerfusionDataSimulationViewControls.h>
 
 #include <mitkWorkbenchUtil.h>
+#include <mitkStringUtil.h>
 
 #include "PerfusionDataSimulationView.h"
 
 #include <itkUnaryFunctorImageFilter.h>
-#include <boost/tokenizer.hpp>
 #include <mitkImageCast.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkITKImageImport.h>
@@ -314,7 +314,6 @@ void PerfusionDataSimulationView::LoadAIFFile()
   std::string aifFilePath = fileName.toStdString();
 
   //Read Input
-  typedef boost::tokenizer< boost::escaped_list_separator<char> > Tokenizer;
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //AIF Data
 
@@ -334,8 +333,7 @@ void PerfusionDataSimulationView::LoadAIFFile()
 
   while (getline(in1,line1))
   {
-      Tokenizer tok(line1);
-      vec1.assign(tok.begin(),tok.end());
+      vec1 = mitk::Split(line1, ',');
 
 //        if (vec1.size() < 3) continue;
 

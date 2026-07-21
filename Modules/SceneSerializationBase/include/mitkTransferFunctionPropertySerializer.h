@@ -61,7 +61,7 @@ namespace mitk
      * \return A smart pointer to the deserialized TransferFunctionProperty,
      *         or nullptr if the element is null or parsing fails.
      *
-     * \throw boost::bad_lexical_cast If numeric string values cannot be parsed.
+     * \throw mitk::BadLexicalCast If numeric string values cannot be parsed.
      */
     BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override;
 

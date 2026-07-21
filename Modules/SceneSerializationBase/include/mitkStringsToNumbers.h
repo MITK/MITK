@@ -20,7 +20,7 @@ namespace mitk
   /**
    * \brief Converts an array of string representations to an array of numeric values.
    *
-   * Uses boost::lexical_cast to convert \p count elements from the \p strings container
+   * Uses mitk::LexicalCast to convert \p count elements from the \p strings container
    * into the \p numbers container. Both containers must support operator[] access.
    * This is commonly used to parse serialized numeric values (e.g., from XML attributes)
    * back into Point3D, Vector3D, or similar fixed-size numeric containers.
@@ -37,7 +37,7 @@ namespace mitk
    *          are big enough. It is the caller's responsibility to make sure that
    *          both the input and the output container can be addressed via [0] through [count-1].
    *
-   * \throw boost::bad_lexical_cast Propagated when an unparsable string is encountered.
+   * \throw mitk::BadLexicalCast Propagated when an unparsable string is encountered.
    *
    * \code
    * std::vector<std::string> serialized_double_values = ... read from some file ...
@@ -46,7 +46,7 @@ namespace mitk
    * {
    *   mitk::StringsToNumbers<double>(3, serialized_double_values, point);
    * }
-   * catch (boost::bad_lexical_cast& e)
+   * catch (mitk::BadLexicalCast& e)
    * {
    *   MITK_ERROR << "Bad cast from string to double: " << e.what();
    * }
@@ -59,7 +59,7 @@ namespace mitk
   {
     for (unsigned int i = 0; i < count; ++i)
     {
-      numbers[i] = boost::lexical_cast<NUMBER_TYPE>(strings[i]);
+      numbers[i] = mitk::LexicalCast<NUMBER_TYPE>(strings[i]);
     }
   }
 }

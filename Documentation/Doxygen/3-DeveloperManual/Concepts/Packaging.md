@@ -500,32 +500,9 @@ MITK's own code (modules, executables, CppMicroServices, CTK/BlueBerry plugins) 
 
 ## External Project Special Cases
 
-### Boost DLL Relocation (Windows)
+### Boost
 
-Boost builds its DLLs into `lib/`. A post-install step (`Boost-post_install-WIN32.cmake`) moves them to `bin/` so they are found alongside other DLLs:
-
-```cmake
-file(GLOB boost_dlls boost_*.dll)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ../bin)
-foreach(boost_dll ${boost_dlls})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${boost_dll} ../bin)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${boost_dll})
-endforeach()
-```
-
-### Boost macOS RPATH
-
-Boost does not follow the common practice of using `@rpath` for inter-library references on macOS. A post-install step (`Boost-post_install-APPLE.cmake`) fixes this with `install_name_tool`:
-
-```cmake
-foreach(boost_dylib ${boost_dylibs})
-  execute_process(COMMAND install_name_tool -id @rpath/${boost_dylib} ${boost_dylib})
-  foreach(other_boost_dylib ${boost_dylibs})
-    execute_process(COMMAND install_name_tool -change ${other_boost_dylib}
-      @rpath/${other_boost_dylib} ${boost_dylib})
-  endforeach()
-endforeach()
-```
+Boost is provisioned through its own CMake support rather than b2 (see `CMakeExternals/Boost.cmake`). Two cache variables declare which libraries MITK needs: `MITK_USE_Boost_HEADER_LIBRARIES` for libraries used header-only and `MITK_USE_Boost_COMPILED_LIBRARIES` for libraries that are compiled and linked (none by default; e.g. `process`). The dependency closure of both sets is resolved from a committed map (`CMakeExternals/Boost/boost-deps.cmake`) and fetched sparse and shallow, so only the needed modules are downloaded. Header-only libraries are copied into `include/boost`; only the compiled set (and its genuine compiled dependencies) is built with `BoostRoot`, so a default MITK build compiles no Boost library at all. Compiled libraries install through CMake's `install(TARGETS ...)`, so shared libraries land in the conventional locations, DLLs in `bin/` and import libraries in `lib/` on Windows, `.so`/`.dylib` in `lib/` on Unix, with the superbuild's shared `CMAKE_INSTALL_RPATH`. The former post-install steps that moved Boost DLLs from `lib/` to `bin/` on Windows and rewrote install names with `install_name_tool` on macOS are therefore no longer needed and have been removed. To add a Boost library, append it to the appropriate cache variable; no build files need editing.
 
 ### External CMake Project Installation
 
@@ -708,8 +685,6 @@ The current install system replaced several legacy approaches:
 | `CMake/RunInstalledCmdLineApp.bat` | Windows wrapper for command-line apps |
 | `CMake/RunInstalledApp.sh` | Linux wrapper for regular executables and BlueBerry apps |
 | `CMake/RunInstalledCmdLineApp.sh` | Linux wrapper for command-line apps |
-| `CMakeExternals/Boost-post_install-WIN32.cmake` | Moves Boost DLLs from `lib/` to `bin/` |
-| `CMakeExternals/Boost-post_install-APPLE.cmake` | Fixes Boost inter-library references to use `@rpath` |
 | `Modules/CppMicroServices/cmake/usFunctionEmbedResources.cmake` | APPEND and LINK mode resource embedding into shared libraries |
 | `Modules/CppMicroServices/cmake/usFunctionAddResources.cmake` | Creates ZIP archives from resource files for embedding |
 | `Modules/CppMicroServices/cmake/usFunctionCheckResourceLinking.cmake` | Platform capability detection for LINK mode; sets `US_DEFAULT_RESOURCE_MODE` |

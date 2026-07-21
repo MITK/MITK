@@ -122,7 +122,7 @@ public:
     for (unsigned int i = 0; i < orig_vector.size(); ++i)
     {
       // compare using Equal, i.e. with tolerance of mitk::eps
-      CPPUNIT_ASSERT_MESSAGE(std::string("Verifying element ") + boost::lexical_cast<std::string>(i),
+      CPPUNIT_ASSERT_MESSAGE(std::string("Verifying element ") + mitk::ToString(i),
                              mitk::Equal(orig_vector[i], restored_vector[i]));
     }
   }

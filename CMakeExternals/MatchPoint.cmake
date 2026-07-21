@@ -51,8 +51,8 @@ if(MITK_USE_MatchPoint)
          -DMAP_USE_SYSTEM_GDCM:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
-         -DMAP_BUILD_Ontology:BOOL=ON
-         -DMAP_BUILD_Ontology_simple:BOOL=ON
+         -DMAP_DEPLOY_INCLUDED_ALGORITHMS:BOOL=OFF
+         -DMAP_BUILD_APPS:BOOL=OFF
          -DGDCM_DIR:PATH=${GDCM_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}

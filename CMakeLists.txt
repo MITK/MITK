@@ -462,13 +462,6 @@ endif()
 # Boost libraries that are compiled and linked (none by default; e.g. process).
 set(MITK_USE_Boost_COMPILED_LIBRARIES "" CACHE STRING "Semicolon-separated Boost libraries to compile and link (dependency closure resolved automatically)")
 
-# Header-only Boost libraries required by optional dependencies, added when the
-# dependency is enabled so their closure is provisioned too.
-if(MITK_USE_MatchPoint)
-  list(APPEND MITK_USE_Boost_HEADER_LIBRARIES graph interprocess uuid)
-  list(REMOVE_DUPLICATES MITK_USE_Boost_HEADER_LIBRARIES)
-endif()
-
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
   set(openssl_message "Could not find OpenSSL.\n")
   if(UNIX)

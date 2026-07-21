@@ -20,23 +20,23 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Remap the intensity axis of scalar-opacity control points.
+   * \brief Window a color transfer function onto evenly spaced nodes.
    *
-   * Applies x' = scale * x + offset to each point's position and leaves the
-   * opacity values untouched. Shift is (scale 1, offset delta); width is a
-   * scale about a center.
+   * Rebuilds the color as \p samples evenly spaced nodes spanning
+   * [dataMin, dataMax]. The node at intensity x is colored by sampling \p source
+   * at the intensity the window [windowMin, windowMax] maps x back to, so the
+   * window edges land on \p source's own range endpoints. Even node spacing keeps
+   * VTK's volume color LUT a fixed, small size for any window width. \p source is
+   * sampled with its own clamping and color space, so a neutral window
+   * (windowMin/windowMax == \p source's range) reproduces \p source.
    */
-  MITKVOLUMEVISUALIZATIONUI_EXPORT TransferFunction::ControlPoints RemapIntensity(
-    const TransferFunction::ControlPoints &points, double scale, double offset);
-
-  /**
-   * \brief Remap the intensity axis of color control points.
-   *
-   * Applies x' = scale * x + offset to each point's position and leaves the
-   * RGB values untouched.
-   */
-  MITKVOLUMEVISUALIZATIONUI_EXPORT TransferFunction::RGBControlPoints RemapIntensity(
-    const TransferFunction::RGBControlPoints &points, double scale, double offset);
+  MITKVOLUMEVISUALIZATIONUI_EXPORT TransferFunction::RGBControlPoints ResampleColorWindow(
+    vtkColorTransferFunction *source,
+    double dataMin,
+    double dataMax,
+    double windowMin,
+    double windowMax,
+    int samples = 256);
 }
 
 #endif

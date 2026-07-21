@@ -23,7 +23,11 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
+#include <vtkSmartPointer.h>
+
 #include <memory>
+
+class vtkColorTransferFunction;
 
 namespace Ui
 {
@@ -64,7 +68,7 @@ private:
   mitk::SimpleHistogramCache m_HistogramCache;
 
   mitk::TransferFunction::Pointer m_AppliedTransferFunction;
-  mitk::TransferFunction::RGBControlPoints m_BaseColor;
+  vtkSmartPointer<vtkColorTransferFunction> m_BaseColorFn;
   std::array<double, 2> m_EffectiveRange { 0.0, 0.0 };
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };

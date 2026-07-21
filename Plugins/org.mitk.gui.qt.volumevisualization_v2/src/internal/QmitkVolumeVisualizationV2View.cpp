@@ -18,6 +18,9 @@ found in the LICENSE file.
 #include <mitkTransferFunctionTransform.h>
 #include <QmitkCombinedTransferFunctionCanvas.h>
 
+#include <vtkColorTransferFunction.h>
+#include <vtkSmartPointer.h>
+
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
 #include <mitkNodePredicateAnd.h>
@@ -173,11 +176,6 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QStr
     m_Controls->combinedTfCanvas->SetMax(histogram->GetMax());
   }
 
-  double *r = preset->GetColorTransferFunction()->GetRange();
-  MITK_INFO << "color range [" << r[0] << "," << r[1] << "]"
-          << " data [" << histogram->GetMin() << "," << histogram->GetMax() << "]"
-          << " colorNodes " << preset->GetColorTransferFunction()->GetSize();
-
   this->SnapshotAppliedTransferFunction();
   this->ResetShiftWidthControls();
   this->UpdateInterface();
@@ -188,11 +186,17 @@ void QmitkVolumeVisualizationV2View::SnapshotAppliedTransferFunction()
 {
   if (m_AppliedTransferFunction.IsNull())
   {
-    m_BaseColor.clear();
+    m_BaseColorFn = nullptr;
     return;
   }
 
-  m_BaseColor = m_AppliedTransferFunction->GetRGBPoints();
+  // Keep the untouched copy of the color function to resample from:
+  // DeepCopy preserves the color space (HSV) and clamping, so windowing
+  // stays faithful to the preset. Sampling bare RGB points instead would
+  // interpolate in the wrong color space and shift the colors on the
+  // first slider move.
+  m_BaseColorFn = vtkSmartPointer<vtkColorTransferFunction>::New();
+  m_BaseColorFn->DeepCopy(m_AppliedTransferFunction->GetColorTransferFunction());
 }
 
 void QmitkVolumeVisualizationV2View::ResetShiftWidthControls()
@@ -204,9 +208,12 @@ void QmitkVolumeVisualizationV2View::ResetShiftWidthControls()
   // draws -- so the window can be moved and sized across everything you see.
   const double dataWidth = std::max(1.0, m_DataRange[1] - m_DataRange[0]);
 
-  const double colorSpan = m_BaseColor.empty()
-    ? dataWidth
-    : std::max(1.0, m_BaseColor.back().first - m_BaseColor.front().first);
+  double colorSpan = dataWidth;
+  if (m_BaseColorFn != nullptr && m_BaseColorFn->GetSize() > 0)
+  {
+    const double *colorRange = m_BaseColorFn->GetRange();
+    colorSpan = std::max(1.0, colorRange[1] - colorRange[0]);
+  }
 
   // Shift moves the window center (level); 0 keeps the preset's own center.
   m_Controls->shiftSlider->setMinimum(-dataWidth);
@@ -216,7 +223,7 @@ void QmitkVolumeVisualizationV2View::ResetShiftWidthControls()
   // Width is the window size in intensity units; default to the preset's color
   // span so a fresh preset maps 1:1, and allow narrowing/widening around it.
   m_Controls->widthSlider->setMinimum(1.0);
-  m_Controls->widthSlider->setMaximum(std::max(2.0 * dataWidth, colorSpan));
+  m_Controls->widthSlider->setMaximum(std::max(2.0 * colorSpan, dataWidth));
   m_Controls->widthSlider->setValue(colorSpan);
 }
 
@@ -224,28 +231,24 @@ void QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
-  if (m_AppliedTransferFunction.IsNull() || selectedNode.IsNull() || m_BaseColor.empty())
+  if (m_AppliedTransferFunction.IsNull() || selectedNode.IsNull() || m_BaseColorFn == nullptr)
+    return;
+
+  if (m_DataRange[1] <= m_DataRange[0]) // no valid histogram range to span
     return;
 
   const double shift = m_Controls->shiftSlider->value();
   const double width = m_Controls->widthSlider->value();
 
-  // Original intensity span of the preset's color points
-  const double origMin = m_BaseColor.front().first;
-  const double origMax = m_BaseColor.back().first;
-  const double origSpan = std::max(1.0, origMax - origMin);
-  const double colorCenter = 0.5 * (origMin + origMax);
-
-  // Window/level: center on colorCenter + shift, make it 'width' wide.
+  // Window/level around the preset's own color center; shift moves it, width sizes it.
+  const double *colorRange = m_BaseColorFn->GetRange();
+  const double colorCenter = 0.5 * (colorRange[0] + colorRange[1]);
   const double level = colorCenter + shift;
   const double windowMin = level - 0.5 * width;
   const double windowMax = level + 0.5 * width;
 
-  // Linear remap sending the color span [origMin, origMax] onto [windowMin, windowMax].
-  const double scale = (windowMax - windowMin) / origSpan;
-  const double offset = windowMin - origMin * scale;
-
-  m_AppliedTransferFunction->SetRGBPoints(mitk::RemapIntensity(m_BaseColor, scale, offset));
+  m_AppliedTransferFunction->SetRGBPoints(
+    mitk::ResampleColorWindow(m_BaseColorFn, m_DataRange[0], m_DataRange[1], windowMin, windowMax));
 
   m_AppliedTransferFunction->Modified();
   this->RequestRenderWindowUpdate();

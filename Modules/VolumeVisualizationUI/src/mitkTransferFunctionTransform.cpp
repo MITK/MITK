@@ -12,31 +12,42 @@ found in the LICENSE file.
 
 #include "mitkTransferFunctionTransform.h"
 
+#include <vtkColorTransferFunction.h>
+
+#include <algorithm>
+
 namespace mitk
 {
-  TransferFunction::ControlPoints RemapIntensity(
-    const TransferFunction::ControlPoints &points, double scale, double offset)
-  {
-    TransferFunction::ControlPoints result;
-    result.reserve(points.size());
-
-    for (const auto &[x, value] : points)
-    {
-      result.emplace_back(scale * x + offset, value);
-    }
-
-    return result;
-  }
-
-  TransferFunction::RGBControlPoints RemapIntensity(
-    const TransferFunction::RGBControlPoints &points, double scale, double offset)
+  TransferFunction::RGBControlPoints ResampleColorWindow(vtkColorTransferFunction* source, double dataMin, double dataMax, double windowMin, double windowMax, int samples)
   {
     TransferFunction::RGBControlPoints result;
-    result.reserve(points.size());
 
-    for (const auto &[x, color] : points)
+    if (source == nullptr || samples < 2 || dataMax <= dataMin)
+      return result;
+
+    const double *sourceRange = source->GetRange();
+    const double origMin = sourceRange[0];
+    const double origSpan = std::max(1e-6, sourceRange[1] - sourceRange[0]);
+    const double windowSpan = std::max(1e-6, windowMax - windowMin); // guards width -> 0
+
+    result.reserve(samples);
+
+    for (int i = 0; i < samples; ++i)
     {
-      result.emplace_back(scale * x + offset, color);
+      const double x = dataMin + (dataMax - dataMin) * i / (samples - 1);
+
+      // Invert the window: which source intensity does this node read from?
+      const double srcX = origMin + (x - windowMin) / windowSpan * origSpan;
+
+      double rgb[3];
+      source->GetColor(srcX, rgb); // clamps to the endpoint color outside source's range
+
+      itk::RGBPixel<double> color;
+      color[0] = rgb[0];
+      color[1] = rgb[1];
+      color[2] = rgb[2];
+
+      result.emplace_back(x, color);
     }
 
     return result;

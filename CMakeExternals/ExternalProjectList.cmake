@@ -2,6 +2,7 @@ mitkFunctionAddExternalProject(NAME Poco ON COMPONENTS Foundation Net Util XML Z
 mitkFunctionAddExternalProject(NAME DCMTK ON DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
 mitkFunctionAddExternalProject(NAME tinyxml2 ON ADVANCED)
 mitkFunctionAddExternalProject(NAME GDCM ON ADVANCED)
+mitkFunctionAddExternalProject(NAME Python3 OFF ADVANCED COMPONENTS Interpreter Development NumPy)
 mitkFunctionAddExternalProject(NAME Boost ON NO_CACHE)
 mitkFunctionAddExternalProject(NAME ANN ON ADVANCED DOC "Use Approximate Nearest Neighbor Library")
 mitkFunctionAddExternalProject(NAME CppUnit ON ADVANCED DOC "Use CppUnit for unit tests")
@@ -16,7 +17,6 @@ mitkFunctionAddExternalProject(NAME CTK ON DEPENDS Qt6 DCMTK DOC "Use CTK in MIT
 mitkFunctionAddExternalProject(NAME DCMQI ON DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint OFF ADVANCED DEPENDS Boost ITK DOC "Use the MatchPoint translation image registration library")
 mitkFunctionAddExternalProject(NAME httplib ON DEPENDS ZLIB)
-mitkFunctionAddExternalProject(NAME Python3 OFF ADVANCED COMPONENTS Interpreter Development NumPy)
 mitkFunctionAddExternalProject(NAME pybind11 OFF ADVANCED)
 
 if(MITK_USE_Qt6)

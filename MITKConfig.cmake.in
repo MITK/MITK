@@ -139,7 +139,8 @@ endif()
 # -----------------------------------------
 # Special Boost variables
 
-set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
+set(MITK_USE_Boost_HEADER_LIBRARIES @MITK_USE_Boost_HEADER_LIBRARIES@)
+set(MITK_USE_Boost_COMPILED_LIBRARIES @MITK_USE_Boost_COMPILED_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 set(Boost_ROOT "@Boost_ROOT@" CACHE PATH "")
 set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")

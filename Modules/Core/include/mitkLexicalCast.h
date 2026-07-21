@@ -74,24 +74,20 @@ namespace mitk
     }
     catch (const boost::bad_lexical_cast &)
     {
-      // boost::lexical_cast fails for the smallest subnormals on Apple/libc++
-      // (it reports the underflow as an error). A classic-locale istringstream
-      // still yields the value; the underflow raises failbit, which we tolerate,
-      // treating only badbit as a genuine stream error.
+      // boost::lexical_cast rejects the smallest subnormals on Apple/libc++,
+      // reporting the underflow as an error. A classic-locale istringstream still
+      // yields the value: the underflow sets failbit, but the whole string is
+      // consumed, so the stream reaches eof. An ordinary parse failure (garbage,
+      // trailing characters, empty input) also sets failbit but stops short of
+      // eof, so require full consumption instead of trusting failbit.
       Target result{};
       std::istringstream stream{arg};
       stream.imbue(std::locale::classic());
-      stream.exceptions(std::ios::badbit);
       stream.unsetf(std::ios::skipws);
+      stream >> result;
 
-      try
-      {
-        stream >> result;
-      }
-      catch (const std::ios_base::failure &)
-      {
+      if (arg.empty() || !stream.eof())
         mitkThrowException(BadLexicalCast) << "Cannot interpret \"" << arg << "\" as a number";
-      }
 
       return result;
     }

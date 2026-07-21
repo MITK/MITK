@@ -40,6 +40,8 @@ class mitkFloatToStringTestSuite : public mitk::TestFixture
   MITK_TEST(ConfirmStringValues<double>);
   MITK_TEST(TestConversions<float>);
   MITK_TEST(TestConversions<double>);
+  MITK_TEST(RejectsInvalidInput<float>);
+  MITK_TEST(RejectsInvalidInput<double>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -111,6 +113,17 @@ public:
     // We do only compare if the numeric values match "close enough"
     auto number2 = mitk::LexicalCast<DATATYPE>(result);
     CPPUNIT_ASSERT(mitk::Equal(number, number2));
+  }
+
+  template <typename DATATYPE>
+  void RejectsInvalidInput()
+  {
+    // The conversion contract is to throw on anything that is not a complete,
+    // valid number: pure garbage, a valid prefix with trailing characters, and
+    // the empty string.
+    CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>("abc"), mitk::BadLexicalCast);
+    CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>("1.5 and more"), mitk::BadLexicalCast);
+    CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>(""), mitk::BadLexicalCast);
   }
 
   template <typename DATATYPE>

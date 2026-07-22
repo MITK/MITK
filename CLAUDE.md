@@ -57,9 +57,11 @@ cmake -S . -B ../MITK-superbuild -G "Ninja" -D CMAKE_BUILD_TYPE=Release
 cmake --build ../MITK-superbuild
 ```
 
-Subsequent rebuilds of just MITK happen in the inner build tree:
+Subsequent rebuilds of just MITK happen in the inner build tree (the
+`-- -m` is an MSBuild flag that parallelises across targets; omit it when
+building with Ninja):
 ```bash
-cmake --build ../MITK-superbuild/MITK-build --config Release
+cmake --build ../MITK-superbuild/MITK-build --config Release -- -m
 ```
 
 ### Build configurations

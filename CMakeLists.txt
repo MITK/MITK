@@ -698,6 +698,13 @@ if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   #set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
+# MITK does not use C++20 named modules or "import std;". At C++20 the compiler
+# toolchain scans every source for module dependencies by default, a per-target
+# cost that buys nothing here. Disabling it cut a full clean build by about 14%
+# in our measurements (Visual Studio 2026 / MSVC). Applies to the MITK build,
+# not the SuperBuild. Re-enable if MITK ever adopts C++20 modules.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 #-----------------------------------------------------------------------------
 # Output directories.
 #-----------------------------------------------------------------------------

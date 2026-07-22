@@ -15,7 +15,7 @@ mitkFunctionAddExternalProject(NAME lz4 ON ADVANCED)
 mitkFunctionAddExternalProject(NAME ACVD OFF DOC "Use Approximated Centroidal Voronoi Diagrams")
 mitkFunctionAddExternalProject(NAME CTK ON DEPENDS Qt6 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME DCMQI ON DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
-mitkFunctionAddExternalProject(NAME MatchPoint OFF ADVANCED DEPENDS Boost ITK DOC "Use the MatchPoint translation image registration library")
+mitkFunctionAddExternalProject(NAME MatchPoint OFF ADVANCED DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 mitkFunctionAddExternalProject(NAME httplib ON DEPENDS ZLIB)
 mitkFunctionAddExternalProject(NAME pybind11 OFF ADVANCED)
 

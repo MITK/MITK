@@ -50,7 +50,7 @@ private Q_SLOTS:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnEnabledRendering(bool state);
   void OnTransferFunctionPresetSelected(const QString &presetName);
-  void OnShiftOrWidthChanged();
+  void OnColorWindowChanged();
   void OnResetTransferFunction();
   void OnCanvasOpacityChanged();
 
@@ -60,7 +60,7 @@ private:
   void UpdateInterface();
 
   void SnapshotAppliedTransferFunction();
-  void ResetShiftWidthControls();
+  void ResetAdjustSliders();
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;

@@ -28,9 +28,9 @@ found in the LICENSE file.
  * Extends QmitkPiecewiseFunctionCanvas (opacity curve + histogram background +
  * coordinate transforms) by drawing the color transfer function as a gradient
  * beneath the curve, and by replacing per-point editing with two whole-curve
- * gestures: a horizontal drag shifts the opacity curve along the intensity
- * axis, and Control+drag raises or lowers its overall height. The color
- * function is shown for context only and is not edited here.
+ * gestures: display-only canvas whose opacity curve is shifted/raised through
+ * SetOpacityShift / SetOpacityHeight. The color function is shown for context 
+ * only and is not edited here.
  *
  * \sa QmitkPiecewiseFunctionCanvas, QmitkColorTransferFunctionCanvas
  */
@@ -41,6 +41,18 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
   public:
     QmitkCombinedTransferFunctionCanvas(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
+    /** \brief Capture the current opacity curve as the baseline the shift/height
+     *        offsets apply to, and reset both offsets to 0.
+     */
+    void SnapshotOpacityBaseline();
+    /** \brief Shift the whole opacity curve along the intensity axis
+     *         (offset from the baseline captured by SnapshotOpacityBaseline).
+     */
+    void SetOpacityShift(double shift);
+    /** \brief Raise/lower the opacity curve: a signed offset added to every
+     *         non-transparent baseline point, clamped to [0, 1].
+     */
+    void SetOpacityHeight(double height);
     /**
      * \brief Set the color transfer function shown as the background gradient.
      * \param[in] colorTransferFunction The color function to display; may be nullptr.
@@ -57,22 +69,14 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     void OpacityChanged();
 
   private:
-    /** \brief Effect of a mouse drag on the scalar-opacity curve */
-    enum class DragMode
-    {
-      None,
-      Shift,
-      AdjustHeight
-    };
-
     void PaintColorGradient(QPainter &painter);
-    void ApplyDrag(const std::pair<double, double> &functionPos);
+    void RebuildOpacityFromBaseline();
 
     vtkColorTransferFunction *m_ColorTransferFunction;
 
-    DragMode m_DragMode;
-    std::pair<double, double> m_DragStart;
-    std::vector<std::pair<double, double>> m_DragBasePoints;
+    std::vector<std::pair<double,double>> m_OpacityBasePoints;
+    double m_OpacityShift;
+    double m_OpacityHeight;
 };
 
 #endif 

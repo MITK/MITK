@@ -20,22 +20,20 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Window a color transfer function onto evenly spaced nodes.
+   * \brief Window a color transfer function by a level shift and a width.
    *
-   * Rebuilds the color as \p samples evenly spaced nodes spanning
-   * [dataMin, dataMax]. The node at intensity x is colored by sampling \p source
-   * at the intensity the window [windowMin, windowMax] maps x back to, so the
-   * window edges land on \p source's own range endpoints. Even node spacing keeps
-   * VTK's volume color LUT a fixed, small size for any window width. \p source is
-   * sampled with its own clamping and color space, so a neutral window
-   * (windowMin/windowMax == \p source's range) reproduces \p source.
+   * Rebuilds the color as \p samples evenly spaced nodes over [dataMin, dataMax].
+   * The window is centered on \p source's own range; \p shift offsets the center
+   * (level) and \p width sizes it. Each node samples \p source at the intensity
+   * the window maps it back to, so shift 0 with width == the source range
+   * reproduces \p source.
    */
   MITKVOLUMEVISUALIZATIONUI_EXPORT TransferFunction::RGBControlPoints ResampleColorWindow(
     vtkColorTransferFunction *source,
     double dataMin,
     double dataMax,
-    double windowMin,
-    double windowMax,
+    double shift,
+    double width,
     int samples = 256);
 }
 

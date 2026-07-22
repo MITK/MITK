@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  TransferFunction::RGBControlPoints ResampleColorWindow(vtkColorTransferFunction* source, double dataMin, double dataMax, double windowMin, double windowMax, int samples)
+  TransferFunction::RGBControlPoints ResampleColorWindow(vtkColorTransferFunction* source, double dataMin, double dataMax, double shift, double width, int samples)
   {
     TransferFunction::RGBControlPoints result;
 
@@ -28,7 +28,12 @@ namespace mitk
     const double *sourceRange = source->GetRange();
     const double origMin = sourceRange[0];
     const double origSpan = std::max(1e-6, sourceRange[1] - sourceRange[0]);
-    const double windowSpan = std::max(1e-6, windowMax - windowMin); // guards width -> 0
+
+    // Center the window on the source's own range; shift moves the center
+    // (level), width sizes it 
+    const double level = 0.5 * (sourceRange[0] + sourceRange[1]) + shift;
+    const double windowMin = level - 0.5 * width;
+    const double windowSpan = std::max(1e-6, width); // guards width -> 0
 
     result.reserve(samples);
 

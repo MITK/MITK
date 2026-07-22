@@ -54,8 +54,6 @@ void QmitkVolumeVisualizationV2View::SetFocus()
 void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
 {
   m_Controls->setupUi(parent);
-  //m_Controls->verticalLayout->setStretch(1, 3);
-  m_Controls->verticalLayout->setStretch(2, 1);
   m_Controls->volumeSelectionWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->volumeSelectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::Image>::New(),
@@ -75,8 +73,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->presetComboBox->setEnabled(false);
   m_Controls->enableRenderingCB->setEnabled(false);
 
-  m_Controls->shiftSlider->setOrientation(Qt::Horizontal);
-  m_Controls->widthSlider->setOrientation(Qt::Horizontal);
+  m_Controls->opacityShiftSlider->setOrientation(Qt::Horizontal);
+  m_Controls->opacityHeightSlider->setOrientation(Qt::Horizontal);
+  m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
+  m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
@@ -87,14 +87,18 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->presetComboBox, &QComboBox::textActivated,
     this, &QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected);
 
-  connect(m_Controls->shiftSlider, &ctkDoubleSlider::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged);
-  connect(m_Controls->widthSlider, &ctkDoubleSlider::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged);
-  connect(m_Controls->resetTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
     this, &QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged);
+  connect(m_Controls->opacityShiftSlider, &ctkDoubleSlider::valueChanged,
+    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetOpacityShift);
+  connect(m_Controls->opacityHeightSlider, &ctkDoubleSlider::valueChanged,
+    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetOpacityHeight);
+  connect(m_Controls->colorShiftSlider, &ctkDoubleSlider::valueChanged,
+    this, &QmitkVolumeVisualizationV2View::OnColorWindowChanged);
+  connect(m_Controls->colorWidthSlider, &ctkDoubleSlider::valueChanged,
+    this, &QmitkVolumeVisualizationV2View::OnColorWindowChanged);
+  connect(m_Controls->resetTfButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
 
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
@@ -176,8 +180,10 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QStr
     m_Controls->combinedTfCanvas->SetMax(histogram->GetMax());
   }
 
+  m_Controls->combinedTfCanvas->SnapshotOpacityBaseline();
+
   this->SnapshotAppliedTransferFunction();
-  this->ResetShiftWidthControls();
+  this->ResetAdjustSliders();
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
 }
@@ -199,10 +205,12 @@ void QmitkVolumeVisualizationV2View::SnapshotAppliedTransferFunction()
   m_BaseColorFn->DeepCopy(m_AppliedTransferFunction->GetColorTransferFunction());
 }
 
-void QmitkVolumeVisualizationV2View::ResetShiftWidthControls()
+void QmitkVolumeVisualizationV2View::ResetAdjustSliders()
 {
-  const QSignalBlocker blockShift(m_Controls->shiftSlider);
-  const QSignalBlocker blockWidth(m_Controls->widthSlider);
+  const QSignalBlocker blockOpacityShift(m_Controls->opacityShiftSlider);
+  const QSignalBlocker blockOpacityWidth(m_Controls->opacityHeightSlider);
+  const QSignalBlocker blockShift(m_Controls->colorShiftSlider);
+  const QSignalBlocker blockWidth(m_Controls->colorWidthSlider);
 
   // Scale the sliders to the image's own value range -- the same axis the canvas
   // draws -- so the window can be moved and sized across everything you see.
@@ -215,19 +223,32 @@ void QmitkVolumeVisualizationV2View::ResetShiftWidthControls()
     colorSpan = std::max(1.0, colorRange[1] - colorRange[0]);
   }
 
+  // Slide the curve along the intensity range, reaches half the data span either side
+  m_Controls->opacityShiftSlider->setMinimum(-0.5 * dataWidth);
+  m_Controls->opacityShiftSlider->setMaximum(0.5 * dataWidth);
+  m_Controls->opacityShiftSlider->setSingleStep(dataWidth / 1000.0);
+  m_Controls->opacityShiftSlider->setValue(0.0);
+
+  // Signed offset in [-1, 1]; small range needs a fine step (default is 1.0).
+  m_Controls->opacityHeightSlider->setMinimum(-1.0);
+  m_Controls->opacityHeightSlider->setMaximum(1.0);
+  m_Controls->opacityHeightSlider->setSingleStep(0.01);
+  m_Controls->opacityHeightSlider->setValue(0.0);
+
   // Shift moves the window center (level); 0 keeps the preset's own center.
-  m_Controls->shiftSlider->setMinimum(-dataWidth);
-  m_Controls->shiftSlider->setMaximum(dataWidth);
-  m_Controls->shiftSlider->setValue(0.0);
+  // Sized to the preset's color span, so shift reaches half the preset span either side.
+  m_Controls->colorShiftSlider->setMinimum(-0.5 * colorSpan);
+  m_Controls->colorShiftSlider->setMaximum(0.5 * colorSpan);
+  m_Controls->colorShiftSlider->setValue(0.0);
 
   // Width is the window size in intensity units; default to the preset's color
   // span so a fresh preset maps 1:1, and allow narrowing/widening around it.
-  m_Controls->widthSlider->setMinimum(1.0);
-  m_Controls->widthSlider->setMaximum(std::max(2.0 * colorSpan, dataWidth));
-  m_Controls->widthSlider->setValue(colorSpan);
+  m_Controls->colorWidthSlider->setMinimum(1.0);
+  m_Controls->colorWidthSlider->setMaximum(2.0 * colorSpan);
+  m_Controls->colorWidthSlider->setValue(colorSpan);
 }
 
-void QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged()
+void QmitkVolumeVisualizationV2View::OnColorWindowChanged()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
@@ -237,22 +258,11 @@ void QmitkVolumeVisualizationV2View::OnShiftOrWidthChanged()
   if (m_DataRange[1] <= m_DataRange[0]) // no valid histogram range to span
     return;
 
-  const double shift = m_Controls->shiftSlider->value();
-  const double width = m_Controls->widthSlider->value();
-
-  // Window/level around the preset's own color center; shift moves it, width sizes it.
-  const double *colorRange = m_BaseColorFn->GetRange();
-  const double colorCenter = 0.5 * (colorRange[0] + colorRange[1]);
-  const double level = colorCenter + shift;
-  const double windowMin = level - 0.5 * width;
-  const double windowMax = level + 0.5 * width;
-
   m_AppliedTransferFunction->SetRGBPoints(
-    mitk::ResampleColorWindow(m_BaseColorFn, m_DataRange[0], m_DataRange[1], windowMin, windowMax));
+    mitk::ResampleColorWindow(m_BaseColorFn, m_DataRange[0], m_DataRange[1], m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value()));
 
   m_AppliedTransferFunction->Modified();
   this->RequestRenderWindowUpdate();
-
   m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
   m_Controls->combinedTfCanvas->update();
 }
@@ -282,8 +292,10 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
     m_Controls->enableRenderingCB->setChecked(false);
     m_Controls->enableRenderingCB->setEnabled(false);
     m_Controls->presetComboBox->setEnabled(false);
-    m_Controls->shiftSlider->setEnabled(false);
-    m_Controls->widthSlider->setEnabled(false);
+    m_Controls->opacityShiftSlider->setEnabled(false);
+    m_Controls->opacityHeightSlider->setEnabled(false);
+    m_Controls->colorShiftSlider->setEnabled(false);
+    m_Controls->colorWidthSlider->setEnabled(false);
     m_Controls->resetTfButton->setEnabled(false);
     return;
   }
@@ -295,8 +307,10 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   m_Controls->presetComboBox->setEnabled(volumeRenderingOn);
 
   const bool tfAdjustable = volumeRenderingOn && m_AppliedTransferFunction.IsNotNull();
-  m_Controls->shiftSlider->setEnabled(tfAdjustable);
-  m_Controls->widthSlider->setEnabled(tfAdjustable);
+  m_Controls->opacityShiftSlider->setEnabled(tfAdjustable);
+  m_Controls->opacityHeightSlider->setEnabled(tfAdjustable);
+  m_Controls->colorShiftSlider->setEnabled(tfAdjustable);
+  m_Controls->colorWidthSlider->setEnabled(tfAdjustable);
   m_Controls->resetTfButton->setEnabled(tfAdjustable);
 
   const QSignalBlocker blocker(m_Controls->enableRenderingCB);

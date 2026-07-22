@@ -21,8 +21,8 @@ found in the LICENSE file.
 QmitkCombinedTransferFunctionCanvas::QmitkCombinedTransferFunctionCanvas(QWidget *parent, Qt::WindowFlags f)
 : QmitkPiecewiseFunctionCanvas(parent, f),
   m_ColorTransferFunction(nullptr),
-  m_DragMode(DragMode::None),
-  m_DragStart(0.0, 0.0)
+  m_OpacityShift(0.0),
+  m_OpacityHeight(0.0)
 {
 }
 
@@ -154,64 +154,56 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
   }
 }
 
-void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEvent)
+void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent * /*mouseEvent*/)
 {
-  if (m_PiecewiseFunction == nullptr || !this->isEnabled() || !(mouseEvent->button()& Qt::LeftButton))
+  // Display-only: opacity is edited through the view's sliders.
+  // Overriding the three mouse handlers as no-ops suppresses the base-class
+  // per-point editing that would otherwise take over.
+}
+
+void QmitkCombinedTransferFunctionCanvas::mouseMoveEvent(QMouseEvent * /*mouseEvent*/) {}
+
+void QmitkCombinedTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent * /*event*/) {}
+
+void QmitkCombinedTransferFunctionCanvas::SnapshotOpacityBaseline()
+{
+  m_OpacityShift = 0.0;
+  m_OpacityHeight = 0.0;
+  m_OpacityBasePoints.clear();
+
+  if (m_PiecewiseFunction == nullptr)
     return;
 
-  const auto pos = mouseEvent->position().toPoint();
-  m_DragStart = this->CanvasToFunction(std::make_pair(pos.x(), pos.y()));
-  m_DragMode = (mouseEvent->modifiers() & Qt::ControlModifier) ? DragMode::AdjustHeight : DragMode::Shift;
-
-  // Snapshot the current curve; the drag is applied relative to this baseline so
-  // repeated move events do not accumulate rounding drift.
-  m_DragBasePoints.clear();
   double *dp = m_PiecewiseFunction->GetDataPointer();
   for (int i = 0; i < m_PiecewiseFunction->GetSize(); ++i)
   {
-    m_DragBasePoints.emplace_back(dp[i * 2], dp[i * 2 + 1]);
+    m_OpacityBasePoints.emplace_back(dp[i * 2], dp[i * 2 + 1]);
   }
 }
 
-void QmitkCombinedTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
+void QmitkCombinedTransferFunctionCanvas::SetOpacityShift(double shift)
 {
-  if (m_DragMode == DragMode::None)
-    return;
-    
-  const auto pos = mouseEvent->position().toPoint();
-  this->ApplyDrag(this->CanvasToFunction(std::make_pair(pos.x(), pos.y())));
+  m_OpacityShift = shift;
+  this->RebuildOpacityFromBaseline();
 }
 
-void QmitkCombinedTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent * /*event*/)
+void QmitkCombinedTransferFunctionCanvas::SetOpacityHeight(double height)
 {
-  m_DragMode = DragMode::None;
-  this->update();
+  m_OpacityHeight = height;
+  this->RebuildOpacityFromBaseline();
 }
 
-void QmitkCombinedTransferFunctionCanvas::ApplyDrag(const std::pair<double, double> &functionPos)
+void QmitkCombinedTransferFunctionCanvas::RebuildOpacityFromBaseline()
 {
-  if (m_DragBasePoints.empty())
+  if (m_PiecewiseFunction == nullptr || m_OpacityBasePoints.empty())
     return;
 
   m_PiecewiseFunction->RemoveAllPoints();
-
-  if (m_DragMode == DragMode::Shift)
+  for (const auto &[x,y] : m_OpacityBasePoints)
   {
-    const double dx = functionPos.first - m_DragStart.first;
-    for (const auto &[x, y] : m_DragBasePoints)
-    {
-      m_PiecewiseFunction->AddPoint(x + dx, y);
-    }
-  }
-  else 
-  {
-    const double dy = functionPos.second - m_DragStart.second;
-    for (const auto &[x, y] : m_DragBasePoints)
-    {
-      // Keep fully transparent points transparent
-      const double newValue = (y > 0.0) ? std::clamp(y + dy, 0.0, 1.0) : 0.0;
-      m_PiecewiseFunction->AddPoint(x, newValue);
-    }
+    // Keep fully transparent points transparent; raise/lower the rest, clamped.
+    const double newHeight = (y > 0.0) ? std::clamp(y + m_OpacityHeight, 0.0, 1.0) : 0.0;
+    m_PiecewiseFunction->AddPoint(x + m_OpacityShift, newHeight);
   }
 
   this->update();

@@ -53,6 +53,8 @@ private Q_SLOTS:
   void OnColorWindowChanged();
   void OnResetTransferFunction();
   void OnCanvasOpacityChanged();
+  void OnCreateUserTransferFunction();
+  void OnImportUserTransferFunction();
 
 private:
   void CreateQtPartControl(QWidget *parent) override;

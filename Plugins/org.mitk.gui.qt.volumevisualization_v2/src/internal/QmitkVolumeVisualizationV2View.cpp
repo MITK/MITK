@@ -78,6 +78,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
+  m_Controls->tfControlPanelsWidget->setVisible(false);
+  m_Controls->cancelTfCreationButton->setVisible(false);
+  m_Controls->saveUserTfButton->setVisible(false);
+
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
     
@@ -99,6 +103,11 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnColorWindowChanged);
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
+
+  connect(m_Controls->createTfButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction);
+  connect(m_Controls->loadTfButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnImportUserTransferFunction);
 
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
@@ -130,6 +139,13 @@ void QmitkVolumeVisualizationV2View::OnEnabledRendering(bool state)
     return;
 
   selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
+
+  if (state && m_AppliedTransferFunction.IsNull() && m_Controls->presetComboBox->count() > 0)
+  {
+    m_Controls->presetComboBox->setCurrentIndex(0);
+    this->OnTransferFunctionPresetSelected(m_Controls->presetComboBox->itemText(0));
+  }
+
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
 }
@@ -161,7 +177,7 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QStr
     selectedNode->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(preset));
   }
 
-  m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
+  //m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
 
   auto *image = selectedNode->GetDataAs<mitk::Image>();
   mitk::SimpleHistogram *histogram = (image != nullptr) ? m_HistogramCache[image] : nullptr;
@@ -263,8 +279,24 @@ void QmitkVolumeVisualizationV2View::OnColorWindowChanged()
 
   m_AppliedTransferFunction->Modified();
   this->RequestRenderWindowUpdate();
-  m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
+  //m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
   m_Controls->combinedTfCanvas->update();
+}
+
+void QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction()
+{
+  m_Controls->tfControlPanelsWidget->setVisible(true);
+  m_Controls->combinedTfCanvas->setVisible(false);
+  m_Controls->adjustPresetPanel->setVisible(false);
+  m_Controls->createTfButton->setVisible(false);
+  m_Controls->loadTfButton->setVisible(false);
+  m_Controls->label_3->setVisible(false);
+  m_Controls->cancelTfCreationButton->setVisible(true);
+  m_Controls->saveUserTfButton->setVisible(true);
+}
+
+void QmitkVolumeVisualizationV2View::OnImportUserTransferFunction()
+{
 }
 
 void QmitkVolumeVisualizationV2View::OnResetTransferFunction()
@@ -280,7 +312,7 @@ void QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged()
     m_AppliedTransferFunction->Modified();
 
   // Keep the Advanced per-point editor in sync with the canvas edit.
-  m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
+  //m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
 }
 
 void QmitkVolumeVisualizationV2View::UpdateInterface()
@@ -297,6 +329,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
     m_Controls->colorShiftSlider->setEnabled(false);
     m_Controls->colorWidthSlider->setEnabled(false);
     m_Controls->resetTfButton->setEnabled(false);
+    m_Controls->combinedTfCanvas->setEnabled(false);
     return;
   }
 
@@ -312,6 +345,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   m_Controls->colorShiftSlider->setEnabled(tfAdjustable);
   m_Controls->colorWidthSlider->setEnabled(tfAdjustable);
   m_Controls->resetTfButton->setEnabled(tfAdjustable);
+  m_Controls->combinedTfCanvas->setEnabled(tfAdjustable);
 
   const QSignalBlocker blocker(m_Controls->enableRenderingCB);
   m_Controls->enableRenderingCB->setChecked(volumeRenderingOn);

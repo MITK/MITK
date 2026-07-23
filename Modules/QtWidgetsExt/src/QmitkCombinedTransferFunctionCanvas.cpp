@@ -76,13 +76,24 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
 {
   QPainter painter(this);
 
-  // Back to front: histogram, color gradient, then the opacity curve.
-  this->PaintHistogram(painter);
-  this->PaintColorGradient(painter);
+  // No image/preset selected, or volume rendering is off -> nothing to show.
+  // Draw just the empty frame so the histogram and labels clear instead of
+  // lingering from the previous node
+  const bool hasContent = this->isEnabled() && m_PiecewiseFunction != nullptr;
+  
+  if (hasContent)
+  {
+    // Back to front: histogram, color gradient, then the opacity curve.
+    this->PaintHistogram(painter);
+    this->PaintColorGradient(painter);
+  }
 
   const QRect contents = this->contentsRect();
   painter.setPen(Qt::gray);
   painter.drawRect(0, 0, contents.width() + 1, contents.height() + 1);
+
+  if (!hasContent)
+    return;
 
    {
     const QString minText = QString::number(m_Min, 'g', 4);

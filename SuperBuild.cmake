@@ -421,7 +421,6 @@ ExternalProject_Add(${proj}
     # --------------- External project options ---------------
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}
-    -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=${DCMTK_CMAKE_DEBUG_POSTFIX}
     -DBoost_ROOT:PATH=${Boost_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}

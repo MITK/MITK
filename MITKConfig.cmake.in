@@ -132,7 +132,12 @@ endif()
 
 set(MITK_USE_Python3 @MITK_USE_Python3@)
 if(MITK_USE_Python3)
-  set(Python3_ROOT_DIR @Python3_ROOT_DIR@)
+  # Pin the exact interpreter, not just the root hint. Otherwise a
+  # consumer's find_package(Python3) may pick a different Python from
+  # PATH and then fail to resolve the Development and NumPy components
+  # against MITK's standalone Python build.
+  set(Python3_ROOT_DIR "@Python3_ROOT_DIR@")
+  set(Python3_EXECUTABLE "@Python3_EXECUTABLE@")
   mitkMacroFindDependency(Python3 COMPONENTS Interpreter Development NumPy)
 endif()
 
@@ -193,12 +198,6 @@ endif()
 if(MITK_USE_Boost)
   link_directories(${Boost_LIBRARY_DIRS})
 endif()
-
-# -----------------------------------------
-# Internal project dependencies
-
-set(CppMicroServices_DIR "@CppMicroServices_DIR@")
-mitkMacroFindDependency(CppMicroServices)
 
 set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
 if(MITK_USE_BLUEBERRY)

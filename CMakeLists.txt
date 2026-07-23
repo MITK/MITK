@@ -332,6 +332,7 @@ if(MITK_USE_Qt6)
     Network
     OpenGL
     OpenGLWidgets
+    PrintSupport
     Qml
     Sql
     StateMachine

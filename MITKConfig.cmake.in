@@ -139,6 +139,13 @@ if(MITK_USE_Python3)
   set(Python3_ROOT_DIR "@Python3_ROOT_DIR@")
   set(Python3_EXECUTABLE "@Python3_EXECUTABLE@")
   mitkMacroFindDependency(Python3 COMPONENTS Interpreter Development NumPy)
+  # Route pybind11 through the modern FindPython instead of its legacy
+  # FindPythonLibsNew, and pin the Python (not just Python3) namespace to
+  # the same standalone interpreter, so pybind11 cannot pick up a non-MITK
+  # Python from PATH or the registry.
+  set(Python_ROOT_DIR "${Python3_ROOT_DIR}")
+  set(Python_EXECUTABLE "${Python3_EXECUTABLE}")
+  set(PYBIND11_FINDPYTHON ON)
 endif()
 
 # -----------------------------------------

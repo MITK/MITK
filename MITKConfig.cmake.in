@@ -147,7 +147,8 @@ endif()
 set(MITK_USE_Boost_HEADER_LIBRARIES @MITK_USE_Boost_HEADER_LIBRARIES@)
 set(MITK_USE_Boost_COMPILED_LIBRARIES @MITK_USE_Boost_COMPILED_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
-set(Boost_ROOT "@Boost_ROOT@" CACHE PATH "")
+# Boost is found in config mode via the baked Boost_DIR (external projects
+# block below); no root hint is needed.
 set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
 set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 

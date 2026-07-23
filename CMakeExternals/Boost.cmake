@@ -47,15 +47,24 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   set(provision_dir "${CMAKE_CURRENT_LIST_DIR}/Boost")
 
   #[[ The dependency closure of every requested library (header-only and
-      compiled) is fetched so all headers are available; only the compiled
-      libraries are built. ]]
+      compiled) is fetched so all headers are available. ]]
   set(boost_all_libraries ${MITK_USE_Boost_HEADER_LIBRARIES} ${MITK_USE_Boost_COMPILED_LIBRARIES})
   list(REMOVE_DUPLICATES boost_all_libraries)
+
+  #[[ Boost's own CMake builds these and installs a BoostConfig.cmake, so
+      downstream find_package(Boost) resolves in config mode. Only compiled
+      libraries produce binaries. With no compiled libraries, build just the
+      header-only "headers" library so a config is still generated; the full
+      header-only closure is installed on top afterwards. ]]
+  set(boost_build_libraries ${MITK_USE_Boost_COMPILED_LIBRARIES})
+  if(NOT boost_build_libraries)
+    set(boost_build_libraries headers)
+  endif()
 
   #[[ Transport lists through single -D arguments using the ExternalProject list
       separator; BoostProvision.cmake and the nested build decode them. ]]
   string(REPLACE ";" "^^" boost_all_arg "${boost_all_libraries}")
-  string(REPLACE ";" "^^" boost_compiled_arg "${MITK_USE_Boost_COMPILED_LIBRARIES}")
+  string(REPLACE ";" "^^" boost_build_arg "${boost_build_libraries}")
 
   #[[ When upgrading Boost, bump this tag AND regenerate the dependency map:
       clone the new tag with --recurse-submodules, then run
@@ -67,64 +76,47 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     ${CMAKE_COMMAND} -DBOOST_SRC=<SOURCE_DIR> -DBOOST_INSTALL=<INSTALL_DIR>
                      -P ${provision_dir}/install_headers.cmake)
 
-  if(MITK_USE_Boost_COMPILED_LIBRARIES)
+  #[[ Build the requested Boost libraries with Boost's own CMake support and
+      let it install a BoostConfig.cmake. Header-only libraries (including the
+      "headers" fallback) become INTERFACE targets; only compiled libraries
+      produce binaries. The full header-only closure is installed on top. ]]
+  ExternalProject_Add(${proj}
+    LIST_SEPARATOR ${sep}
+    GIT_REPOSITORY https://github.com/boostorg/boost.git
+    GIT_TAG ${boost_tag}
+    GIT_SHALLOW 1
+    GIT_SUBMODULES "" #[[ Superproject only; the closure is fetched selectively. ]]
+    CMAKE_GENERATOR ${gen}
+    CMAKE_GENERATOR_PLATFORM ${gen_platform}
+    CMAKE_ARGS
+      ${ep_common_args}
+      -DBOOST_INSTALL_LAYOUT:STRING=system
+      -DBOOST_INCLUDE_LIBRARIES:STRING=${boost_build_arg}
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+      -DBUILD_TESTING:BOOL=OFF
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
+    DEPENDS ${proj_DEPENDENCIES}
+  )
 
-    #[[ Build the requested compiled libraries with Boost's own CMake support.
-        Only these and their genuine compiled dependencies are built; the full
-        header-only closure is installed on top afterwards. ]]
-    ExternalProject_Add(${proj}
-      LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/boostorg/boost.git
-      GIT_TAG ${boost_tag}
-      GIT_SHALLOW 1
-      GIT_SUBMODULES "" #[[ Superproject only; the closure is fetched selectively. ]]
-      CMAKE_GENERATOR ${gen}
-      CMAKE_GENERATOR_PLATFORM ${gen_platform}
-      CMAKE_ARGS
-        ${ep_common_args}
-        -DBOOST_INSTALL_LAYOUT:STRING=system
-        -DBOOST_INCLUDE_LIBRARIES:STRING=${boost_compiled_arg}
-      CMAKE_CACHE_ARGS
-        ${ep_common_cache_args}
-        -DBUILD_TESTING:BOOL=OFF
-      CMAKE_CACHE_DEFAULT_ARGS
-        ${ep_common_cache_default_args}
-      DEPENDS ${proj_DEPENDENCIES}
-    )
+  #[[ BoostRoot needs its CMake infrastructure submodules. ]]
+  ExternalProject_Add_Step(${proj} fetch_tools
+    COMMAND ${GIT_EXECUTABLE} submodule update --init --depth 1
+            tools/cmake tools/build tools/boost_install
+    DEPENDEES download
+    DEPENDERS configure
+    WORKING_DIRECTORY <SOURCE_DIR>
+  )
 
-    #[[ BoostRoot needs its CMake infrastructure submodules. ]]
-    ExternalProject_Add_Step(${proj} fetch_tools
-      COMMAND ${GIT_EXECUTABLE} submodule update --init --depth 1
-              tools/cmake tools/build tools/boost_install
-      DEPENDEES download
-      DEPENDERS configure
-      WORKING_DIRECTORY <SOURCE_DIR>
-    )
+  #[[ Install the full header-only closure on top of the built libraries. ]]
+  ExternalProject_Add_Step(${proj} install_headers
+    COMMAND ${boost_install_headers}
+    DEPENDEES install
+  )
 
-    #[[ Install the full header-only closure on top of the built libraries. ]]
-    ExternalProject_Add_Step(${proj} install_headers
-      COMMAND ${boost_install_headers}
-      DEPENDEES install
-    )
-
-  else()
-
-    #[[ Header-only: fetch the closure and install its headers; build nothing. ]]
-    ExternalProject_Add(${proj}
-      GIT_REPOSITORY https://github.com/boostorg/boost.git
-      GIT_TAG ${boost_tag}
-      GIT_SHALLOW 1
-      GIT_SUBMODULES ""
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ""
-      INSTALL_COMMAND ${boost_install_headers}
-      DEPENDS ${proj_DEPENDENCIES}
-    )
-
-  endif()
-
-  #[[ After the clone, fetch the dependency closure of all requested libraries.
-      Runs before configure in both cases (configure is a no-op when header-only). ]]
+  #[[ After the clone, fetch the dependency closure of all requested
+      libraries so it is present when Boost's CMake configures. ]]
   ExternalProject_Add_Step(${proj} provision
     COMMAND ${CMAKE_COMMAND}
             -DBOOST_SRC=<SOURCE_DIR>

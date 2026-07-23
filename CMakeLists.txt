@@ -34,12 +34,6 @@ cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION}...${MITK_C
  ]]
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
-if(POLICY CMP0167)
-  # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
-  # The FindBoost module is removed.
-  cmake_policy(SET CMP0167 OLD)
-endif()
-
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------

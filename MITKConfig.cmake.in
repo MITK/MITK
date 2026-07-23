@@ -138,6 +138,10 @@ if(MITK_USE_Python3)
   # against MITK's standalone Python build.
   set(Python3_ROOT_DIR "@Python3_ROOT_DIR@")
   set(Python3_EXECUTABLE "@Python3_EXECUTABLE@")
+  # Probe in isolation from user site-packages so the NumPy component
+  # resolves the standalone's numpy, not a shadowing user-site install
+  # (%APPDATA%/Roaming/Python on Windows, ~/.local on Unix).
+  set(ENV{PYTHONNOUSERSITE} 1)
   mitkMacroFindDependency(Python3 COMPONENTS Interpreter Development NumPy)
   # Route pybind11 through the modern FindPython instead of its legacy
   # FindPythonLibsNew, and pin the Python (not just Python3) namespace to

@@ -1022,6 +1022,11 @@ set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
 
+# Isolate configure-time Python probes (e.g. FindPython3's NumPy
+# component) from user site-packages, so numpy resolves against MITK's
+# standalone Python instead of a shadowing user-site install.
+set(ENV{PYTHONNOUSERSITE} 1)
+
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 foreach(ep ${MITK_EXTERNAL_PROJECTS})

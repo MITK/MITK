@@ -34,12 +34,6 @@ cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION}...${MITK_C
  ]]
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
-if(POLICY CMP0167)
-  # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
-  # The FindBoost module is removed.
-  cmake_policy(SET CMP0167 OLD)
-endif()
-
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
@@ -338,6 +332,7 @@ if(MITK_USE_Qt6)
     Network
     OpenGL
     OpenGLWidgets
+    PrintSupport
     Qml
     Sql
     StateMachine
@@ -1026,6 +1021,11 @@ set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
+
+# Isolate configure-time Python probes (e.g. FindPython3's NumPy
+# component) from user site-packages, so numpy resolves against MITK's
+# standalone Python instead of a shadowing user-site install.
+set(ENV{PYTHONNOUSERSITE} 1)
 
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)

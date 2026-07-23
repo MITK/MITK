@@ -132,8 +132,24 @@ endif()
 
 set(MITK_USE_Python3 @MITK_USE_Python3@)
 if(MITK_USE_Python3)
-  set(Python3_ROOT_DIR @Python3_ROOT_DIR@)
+  # Pin the exact interpreter, not just the root hint. Otherwise a
+  # consumer's find_package(Python3) may pick a different Python from
+  # PATH and then fail to resolve the Development and NumPy components
+  # against MITK's standalone Python build.
+  set(Python3_ROOT_DIR "@Python3_ROOT_DIR@")
+  set(Python3_EXECUTABLE "@Python3_EXECUTABLE@")
+  # Probe in isolation from user site-packages so the NumPy component
+  # resolves the standalone's numpy, not a shadowing user-site install
+  # (%APPDATA%/Roaming/Python on Windows, ~/.local on Unix).
+  set(ENV{PYTHONNOUSERSITE} 1)
   mitkMacroFindDependency(Python3 COMPONENTS Interpreter Development NumPy)
+  # Route pybind11 through the modern FindPython instead of its legacy
+  # FindPythonLibsNew, and pin the Python (not just Python3) namespace to
+  # the same standalone interpreter, so pybind11 cannot pick up a non-MITK
+  # Python from PATH or the registry.
+  set(Python_ROOT_DIR "${Python3_ROOT_DIR}")
+  set(Python_EXECUTABLE "${Python3_EXECUTABLE}")
+  set(PYBIND11_FINDPYTHON ON)
 endif()
 
 # -----------------------------------------
@@ -142,7 +158,8 @@ endif()
 set(MITK_USE_Boost_HEADER_LIBRARIES @MITK_USE_Boost_HEADER_LIBRARIES@)
 set(MITK_USE_Boost_COMPILED_LIBRARIES @MITK_USE_Boost_COMPILED_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
-set(Boost_ROOT "@Boost_ROOT@" CACHE PATH "")
+# Boost is found in config mode via the baked Boost_DIR (external projects
+# block below); no root hint is needed.
 set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
 set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 
@@ -193,12 +210,6 @@ endif()
 if(MITK_USE_Boost)
   link_directories(${Boost_LIBRARY_DIRS})
 endif()
-
-# -----------------------------------------
-# Internal project dependencies
-
-set(CppMicroServices_DIR "@CppMicroServices_DIR@")
-mitkMacroFindDependency(CppMicroServices)
 
 set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
 if(MITK_USE_BLUEBERRY)

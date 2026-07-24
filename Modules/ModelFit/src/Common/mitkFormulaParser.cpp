@@ -13,16 +13,15 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <locale>
 #include <map>
 #include <memory>
 #include <numbers>
-#include <sstream>
 #include <string_view>
 #include <vector>
 
 #include <mitkFormulaParser.h>
 #include <mitkFresnel.h>
+#include <mitkLexicalCast.h>
 
 namespace
 {
@@ -292,22 +291,17 @@ namespace
       }
     }
 
-    /* The token is converted with an explicitly classic-imbued stream:
-       formulas must evaluate identically regardless of the host
-       application's global locale, whose numpunct facet could otherwise
-       turn "1.234" into 1234 ('.' as thousands separator). Out-of-range
-       literals consume the whole token and store a huge/zero value, which
-       is fine; anything short of full consumption is a real error. */
-    double value = 0.0;
-    std::istringstream stream(input.substr(start, pos - start));
-    stream.imbue(std::locale::classic());
-    stream.unsetf(std::ios::skipws);
-    stream >> value;
-
-    if (!stream.eof())
+    /* The lexer defines the token extent, so conversion failures are limited
+       to exotic cases; out-of-range literals yield a huge/zero value inside
+       LexicalCast, which is fine. */
+    try
+    {
+      return mitk::LexicalCast<double>(input.substr(start, pos - start));
+    }
+    catch (const mitk::BadLexicalCast&)
+    {
       ThrowSyntaxError(input, start);
-
-    return value;
+    }
   }
 
   std::vector<Token> Tokenize(const std::string& input)

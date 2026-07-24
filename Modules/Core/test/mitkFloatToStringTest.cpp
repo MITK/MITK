@@ -22,6 +22,26 @@ found in the LICENSE file.
 
 #include <functional>
 #include <limits>
+#include <locale>
+
+namespace
+{
+  // mimics locales like de_DE where '.' groups thousands and ',' is the
+  // decimal separator
+  struct GroupingNumpunct : std::numpunct<char>
+  {
+    char do_decimal_point() const override { return ','; }
+    char do_thousands_sep() const override { return '.'; }
+    std::string do_grouping() const override { return "\3"; }
+  };
+
+  struct GlobalLocaleGuard
+  {
+    explicit GlobalLocaleGuard(const std::locale& newLocale) : m_Previous(std::locale::global(newLocale)) {}
+    ~GlobalLocaleGuard() { std::locale::global(m_Previous); }
+    std::locale m_Previous;
+  };
+}
 
 //!
 //! Verifies mitk::LexicalCast / mitk::ToString for MITK's serialization purposes
@@ -42,6 +62,8 @@ class mitkFloatToStringTestSuite : public mitk::TestFixture
   MITK_TEST(TestConversions<double>);
   MITK_TEST(RejectsInvalidInput<float>);
   MITK_TEST(RejectsInvalidInput<double>);
+  MITK_TEST(LocaleIndependence<float>);
+  MITK_TEST(LocaleIndependence<double>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -124,6 +146,35 @@ public:
     CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>("abc"), mitk::BadLexicalCast);
     CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>("1.5 and more"), mitk::BadLexicalCast);
     CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>(""), mitk::BadLexicalCast);
+  }
+
+  template <typename DATATYPE>
+  void LocaleIndependence()
+  {
+    // The documented contract is locale-INDEPENDENT conversion: results must
+    // not change when a host application installs a global locale whose
+    // numpunct groups thousands with '.' (de_DE style). Expected values are
+    // computed under the classic locale first.
+    const auto expectedGrouped = mitk::LexicalCast<DATATYPE>("1.234");
+    const auto expectedSmall = mitk::LexicalCast<DATATYPE>("0.001");
+    const auto expectedExponent = mitk::LexicalCast<DATATYPE>("1.234e2");
+    const auto number = static_cast<DATATYPE>(1234.5);
+    const std::string expectedString = mitk::ToString(number);
+
+    GlobalLocaleGuard guard(std::locale(std::locale::classic(), new GroupingNumpunct));
+
+    CPPUNIT_ASSERT_EQUAL(expectedGrouped, mitk::LexicalCast<DATATYPE>("1.234"));
+    CPPUNIT_ASSERT_EQUAL(expectedSmall, mitk::LexicalCast<DATATYPE>("0.001"));
+    CPPUNIT_ASSERT_EQUAL(expectedExponent, mitk::LexicalCast<DATATYPE>("1.234e2"));
+    CPPUNIT_ASSERT_EQUAL(expectedString, mitk::ToString(number));
+    CPPUNIT_ASSERT_EQUAL(number, mitk::LexicalCast<DATATYPE>(mitk::ToString(number)));
+
+    // the special values from ConfirmStringValues must work under any locale
+    ConfirmStringToNumber("inf", std::numeric_limits<DATATYPE>::infinity());
+    ConfirmStringToNumber("-INFINITY", -std::numeric_limits<DATATYPE>::infinity());
+    const auto nan = mitk::LexicalCast<DATATYPE>("nan");
+    CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
+    ConfirmNumberToString(std::numeric_limits<DATATYPE>::infinity(), "inf");
   }
 
   template <typename DATATYPE>

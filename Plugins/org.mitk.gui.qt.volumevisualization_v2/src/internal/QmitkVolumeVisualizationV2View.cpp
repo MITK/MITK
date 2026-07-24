@@ -34,7 +34,12 @@ found in the LICENSE file.
 
 #include <ctkDoubleSlider.h>
 
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QMessageBox>
+
 #include <algorithm>
+#include <fstream>
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
 
@@ -62,6 +67,8 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetSelectionIsOptional(true);
   m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
+
+  m_Controls->tfControlPanelsWidget->ShowGradientOpacityFunction(false);
 
   for (const auto &name : m_Presets.GetPresetNames())
   {
@@ -108,6 +115,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction);
   connect(m_Controls->loadTfButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnImportUserTransferFunction);
+  connect(m_Controls->cancelTfCreationButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnCancelTfAdvancedMode);
+  connect(m_Controls->saveUserTfButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnSaveUserTransferFunction);
 
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
@@ -165,16 +176,26 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QStr
   m_AppliedTransferFunction = preset;
   m_EffectiveRange = m_Presets.GetEffectiveRange(presetName.toStdString());
 
+  this->ApplyCurrentTransferFunction();
+}
+
+void QmitkVolumeVisualizationV2View::ApplyCurrentTransferFunction()
+{
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull() || m_AppliedTransferFunction.IsNull())
+    return;
+
   // Preserve property identity: reuse the existing property, create it only once.
   auto *tfProperty = dynamic_cast<mitk::TransferFunctionProperty *>(selectedNode->GetProperty("TransferFunction"));
 
   if(tfProperty != nullptr)
   {
-    tfProperty->SetValue(preset);
+    tfProperty->SetValue(m_AppliedTransferFunction);
   } 
   else
   {
-    selectedNode->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(preset));
+    selectedNode->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(m_AppliedTransferFunction));
   }
 
   //m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
@@ -183,8 +204,8 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QStr
   mitk::SimpleHistogram *histogram = (image != nullptr) ? m_HistogramCache[image] : nullptr;
 
   m_Controls->combinedTfCanvas->SetHistogram(histogram);
-  m_Controls->combinedTfCanvas->SetColorTransferFunction(preset->GetColorTransferFunction());
-  m_Controls->combinedTfCanvas->SetPiecewiseFunction(preset->GetScalarOpacityFunction());
+  m_Controls->combinedTfCanvas->SetColorTransferFunction(m_AppliedTransferFunction->GetColorTransferFunction());
+  m_Controls->combinedTfCanvas->SetPiecewiseFunction(m_AppliedTransferFunction->GetScalarOpacityFunction());
 
   if (histogram != nullptr)
   {
@@ -283,20 +304,129 @@ void QmitkVolumeVisualizationV2View::OnColorWindowChanged()
   m_Controls->combinedTfCanvas->update();
 }
 
+void QmitkVolumeVisualizationV2View::SetTfAdvancedMode(bool active)
+{
+  // Controls for the Transfer Function Creation Mode
+  m_Controls->tfControlPanelsWidget->setVisible(active);
+  m_Controls->cancelTfCreationButton->setVisible(active);
+  m_Controls->saveUserTfButton->setVisible(active);
+
+  // Controls for the Preset Transfer Function Selection
+  m_Controls->combinedTfCanvas->setVisible(!active);
+  m_Controls->adjustPresetPanel->setVisible(!active);
+  m_Controls->createTfButton->setVisible(!active);
+  m_Controls->loadTfButton->setVisible(!active);
+  m_Controls->tfAdvancedLabel->setVisible(!active);
+}
+
 void QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction()
 {
-  m_Controls->tfControlPanelsWidget->setVisible(true);
-  m_Controls->combinedTfCanvas->setVisible(false);
-  m_Controls->adjustPresetPanel->setVisible(false);
-  m_Controls->createTfButton->setVisible(false);
-  m_Controls->loadTfButton->setVisible(false);
-  m_Controls->label_3->setVisible(false);
-  m_Controls->cancelTfCreationButton->setVisible(true);
-  m_Controls->saveUserTfButton->setVisible(true);
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNotNull() && m_AppliedTransferFunction.IsNotNull() && m_BaseColorFn != nullptr)
+  {
+    // Snapshot of the "normal-mode" preset function so Cancel can restore it verbatim
+    // Relevant if preset was adjusted using the sliders
+    m_PreEditTransferFunction = m_AppliedTransferFunction->Clone();
+
+    // Preset selection bakes the color window into 256 evenly spaced RGB point
+    // which would swamp the per-point color editor in the advanced mode.
+    // Currently does not reflect slider adjusted colors when entering advanced mode
+    m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
+    m_AppliedTransferFunction->Modified();
+
+    m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
+    this->RequestRenderWindowUpdate();
+  }
+
+  this->SetTfAdvancedMode(true);
 }
 
 void QmitkVolumeVisualizationV2View::OnImportUserTransferFunction()
 {
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
+    return;
+
+  auto fileName = QFileDialog::getOpenFileName(nullptr, "Load transfer function", QString(), "Transfer function (*.json)");
+
+  if (fileName.isEmpty())
+    return;
+
+  std::ifstream stream(fileName.toStdString());
+
+  if (!stream.is_open())
+  {
+    QMessageBox::warning(nullptr, "Load transfer function", "Could not open the file.");
+    return;
+  }
+
+  auto transferFunction = mitk::TransferFunctionPresets::LoadTransferFunction(stream);
+
+  if (transferFunction.IsNull())
+  {
+    QMessageBox::warning(nullptr, "Load transfer function", "The file does not contain a valid transfer function.");
+    return;
+  }
+
+  // Enable rendering so the loaded function is visible immediately.
+  selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+
+  m_AppliedTransferFunction = transferFunction;
+
+  auto &scalarPoints = transferFunction->GetScalarOpacityPoints();
+  m_EffectiveRange = scalarPoints.empty()
+    ? std::array<double, 2>{ 0.0, 0.0 }
+    : std::array<double, 2>{ scalarPoints.front().first, scalarPoints.back().first };
+
+  // A loaded custom function is not one of the named presets.
+  m_Controls->presetComboBox->setCurrentIndex(-1);
+
+  this->ApplyCurrentTransferFunction();
+}
+
+void QmitkVolumeVisualizationV2View::OnCancelTfAdvancedMode()
+{
+  if (m_AppliedTransferFunction.IsNotNull() && m_PreEditTransferFunction.IsNotNull())
+  {
+    // Discard the advanced edits: copy the pre-create functions back into the
+    // live ones in place, so the canvas / node pointers stay valid and
+    // the opacity baseline (unchanged) still matches the restored curve
+    m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_PreEditTransferFunction->GetColorTransferFunction());
+    m_AppliedTransferFunction->GetScalarOpacityFunction()->DeepCopy(m_PreEditTransferFunction->GetScalarOpacityFunction());
+    m_AppliedTransferFunction->GetGradientOpacityFunction()->DeepCopy(m_PreEditTransferFunction->GetGradientOpacityFunction());
+    m_AppliedTransferFunction->Modified();
+    m_PreEditTransferFunction = nullptr;
+
+    m_Controls->combinedTfCanvas->update();
+    this->RequestRenderWindowUpdate();
+  }
+
+  this->SetTfAdvancedMode(false);
+}
+
+void QmitkVolumeVisualizationV2View::OnSaveUserTransferFunction()
+{
+  if (m_AppliedTransferFunction.IsNull())
+    return;
+
+  auto fileName = QFileDialog::getSaveFileName(nullptr, "Save transfer function", QString(), "Transfer function (*.json)");
+
+  if (fileName.isEmpty())
+    return;
+
+  if (!fileName.endsWith(".json", Qt::CaseInsensitive))
+    fileName += ".json";
+
+  std::ofstream stream(fileName.toStdString());
+  const auto name = QFileInfo(fileName).completeBaseName().toStdString();
+
+  if (!stream.is_open() ||
+      !mitk::TransferFunctionPresets::SaveTransferFunction(stream, name, m_AppliedTransferFunction.GetPointer()))
+  {
+    QMessageBox::warning(nullptr, "Save transfer function", "Could not save the transfer function.");
+  }
 }
 
 void QmitkVolumeVisualizationV2View::OnResetTransferFunction()

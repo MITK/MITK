@@ -55,14 +55,19 @@ private Q_SLOTS:
   void OnCanvasOpacityChanged();
   void OnCreateUserTransferFunction();
   void OnImportUserTransferFunction();
+  void OnCancelTfAdvancedMode();
+  void OnSaveUserTransferFunction();
 
 private:
   void CreateQtPartControl(QWidget *parent) override;
 
   void UpdateInterface();
 
+  void ApplyCurrentTransferFunction();
+
   void SnapshotAppliedTransferFunction();
   void ResetAdjustSliders();
+  void SetTfAdvancedMode(bool active);
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
@@ -71,6 +76,7 @@ private:
 
   mitk::TransferFunction::Pointer m_AppliedTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BaseColorFn;
+  mitk::TransferFunction::Pointer m_PreEditTransferFunction;
   std::array<double, 2> m_EffectiveRange { 0.0, 0.0 };
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };

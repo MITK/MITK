@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -25,6 +26,9 @@ found in the LICENSE file.
 #include <nlohmann/json.hpp>
 
 #include <algorithm>
+#include <iomanip>
+#include <istream>
+#include <ostream>
 
 namespace
 {
@@ -58,6 +62,24 @@ namespace
 
     return points;
   }
+
+  // Inverse of the SetColorSpaceTo* switch in BuildTransferFunction.
+  std::string ColorSpaceToString(int vtkColorSpace)
+  {
+    switch (vtkColorSpace)
+    {
+      case VTK_CTF_HSV:
+        return "HSV";
+      case VTK_CTF_LAB:
+        return "Lab";
+      case VTK_CTF_DIVERGING:
+        return "Diverging";
+      case VTK_CTF_RGB:
+        return "RGB";
+      default: 
+        return "RGB";
+    }
+  }
 }
 
 mitk::TransferFunctionPresets::TransferFunctionPresets()
@@ -74,20 +96,28 @@ mitk::TransferFunctionPresets::TransferFunctionPresets()
   }
 
   us::ModuleResourceStream stream(resource);
+  m_Presets = ReadPresets(stream);
+}
 
-  nlohmann::json presets;
+std::vector<mitk::TransferFunctionPresets::Preset> mitk::TransferFunctionPresets::ReadPresets(std::istream &stream)
+{
+  std::vector<Preset> presets;
+
+  nlohmann::json json;
 
   try
   {
-    stream >> presets;
+    stream >> json;
   }
   catch (const nlohmann::json::parse_error &e)
   {
-    MITK_WARN << "Failed to parse \"MedicalColorPresets.json\": " << e.what();
-    return;
+    MITK_WARN << "Failed to parse transfer function JSON: " << e.what();
+    return presets;
   }
 
-  for (const auto &entry : presets)
+  const nlohmann::json entries = json.is_array() ? json : nlohmann::json::array({ json });
+
+  for (const auto &entry : entries)
   {
     // A volume-rendering preset needs a name, a color function, and an opacity
     // function. The file also bundles plain colormaps (e.g. "2hot", "Blue to Red
@@ -115,8 +145,54 @@ mitk::TransferFunctionPresets::TransferFunctionPresets()
       preset.effectiveRange = std::array<double, 2>{ preset.scalarOpacity.front().first, preset.scalarOpacity.back().first };
     }
 
-    m_Presets.push_back(std::move(preset));
+    presets.push_back(std::move(preset));
   }
+
+  return presets;
+}
+
+mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::BuildTransferFunction(const Preset &preset)
+{
+  auto transferFunction = mitk::TransferFunction::New();
+
+  if (!preset.scalarOpacity.empty())
+    transferFunction->SetScalarOpacityPoints(preset.scalarOpacity);
+  
+  // A preset defines opacity only between its control points; treat values
+  // outside that range as fully transparent rather than clamping to the end value.
+  transferFunction->GetScalarOpacityFunction()->ClampingOff();
+
+  transferFunction->SetRGBPoints(preset.color);
+
+  // The gradient opacity function is intentionally left at its default
+  // (constant 1): the preset format defines no gradient component.
+
+  auto *colorFunction = transferFunction->GetColorTransferFunction();
+
+  if (preset.colorSpace == "RGB")
+  {
+    colorFunction->SetColorSpaceToRGB();
+  }
+  else if (preset.colorSpace == "HSV")
+  {
+    colorFunction->SetColorSpaceToHSV();
+  }
+  else if (preset.colorSpace == "Lab")
+  {
+    colorFunction->SetColorSpaceToLab();
+  }
+  else if (preset.colorSpace == "Diverging")
+  {
+    colorFunction->SetColorSpaceToDiverging();
+  }
+  else
+  {
+    MITK_WARN << "Unknown color space \"" << preset.colorSpace << "\" in preset \""
+              << preset.name << "\"; falling back to RGB.";
+    colorFunction->SetColorSpaceToRGB();
+  }
+
+  return transferFunction;
 }
 
 std::vector<std::string> mitk::TransferFunctionPresets::GetPresetNames() const
@@ -152,44 +228,69 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
     return nullptr;
   }
 
-  auto transferFunction = mitk::TransferFunction::New();
+  return BuildTransferFunction(*it);
+}
 
-  if (!it->scalarOpacity.empty())
-    transferFunction->SetScalarOpacityPoints(it->scalarOpacity);
+mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::LoadTransferFunction(std::istream &stream)
+{
+  const auto presets = ReadPresets(stream);
 
-  // A preset defines opacity only between its control points; treat values
-  // outside that range as fully transparent rather than clamping to the end value.
-  transferFunction->GetScalarOpacityFunction()->ClampingOff();
+  if (presets.empty())
+  {
+    MITK_WARN << "No valid transfer function found in stream.";
+    return nullptr;
+  }
 
-  transferFunction->SetRGBPoints(it->color);
+  return BuildTransferFunction(presets.front());
+}
 
-  // The gradient opacity function is intentionally left at its default
-  // (constant 1): the preset file defines no gradient component.
+bool mitk::TransferFunctionPresets::SaveTransferFunction(
+  std::ostream &stream, const std::string &name, mitk::TransferFunction *transferFunction)
+{
+  if (transferFunction == nullptr || !stream.good())
+    return false;
 
+  auto *scalarOpacityFunction = transferFunction->GetScalarOpacityFunction();
   auto *colorFunction = transferFunction->GetColorTransferFunction();
 
-  if (it->colorSpace == "RGB")
+  // Read points straight from the VTK functions: they are the source of truth
+  // the editor canvases mutate (the STL-copy getters can lag behind).
+  auto opacityPoints = nlohmann::ordered_json::array();
+  double opacityNode[4];
+  for (int i = 0; i < scalarOpacityFunction->GetSize(); ++i)
   {
-    colorFunction->SetColorSpaceToRGB();
-  }
-  else if (it->colorSpace == "HSV")
-  {
-    colorFunction->SetColorSpaceToHSV();
-  }
-  else if (it->colorSpace == "Lab")
-  {
-    colorFunction->SetColorSpaceToLab();
-  }
-  else if (it->colorSpace == "Diverging")
-  {
-    colorFunction->SetColorSpaceToDiverging();
-  }
-  else
-  {
-    MITK_WARN << "Unknown color space \"" << it->colorSpace << "\" in preset \""
-              << it->name << "\"; falling back to RGB.";
-    colorFunction->SetColorSpaceToRGB();
+    scalarOpacityFunction->GetNodeValue(i, opacityNode);
+    opacityPoints.push_back(opacityNode[0]);
+    opacityPoints.push_back(opacityNode[1]);
   }
 
-  return transferFunction;
+  auto rgbPoints = nlohmann::ordered_json::array();
+  double colorNode[6];
+  for (int i = 0; i < colorFunction->GetSize(); ++i)
+  {
+    colorFunction->GetNodeValue(i, colorNode);
+    rgbPoints.push_back(colorNode[0]); // x
+    rgbPoints.push_back(colorNode[1]); // r
+    rgbPoints.push_back(colorNode[2]); // g
+    rgbPoints.push_back(colorNode[3]); // b
+  }
+
+  std::array<double, 2> effectiveRange{ 0.0, 0.0 };
+  if (scalarOpacityFunction->GetSize() > 0)
+    scalarOpacityFunction->GetRange(effectiveRange.data());
+
+  nlohmann::ordered_json entry;
+  entry["Name"] = name;
+  entry["ColorSpace"] = ColorSpaceToString(colorFunction->GetColorSpace());
+  entry["OpacityPoints"] = opacityPoints;
+  entry["RGBPoints"] = rgbPoints;
+  entry["EffectiveRange"] = effectiveRange;
+
+  auto presets = nlohmann::ordered_json::array();
+  presets.push_back(entry);
+
+  stream << std::setw(2) << presets << std::endl;
+
+  return stream.good();
 }
+

@@ -443,6 +443,37 @@ namespace
       }
     }
 
+    void Emit(OpCode op)
+    {
+      mitk::CompiledFormula::Instruction instruction;
+      instruction.op = op;
+      this->Emit(std::move(instruction));
+    }
+
+    void EmitNumber(double value)
+    {
+      mitk::CompiledFormula::Instruction instruction;
+      instruction.op = OpCode::PushNumber;
+      instruction.value = value;
+      this->Emit(std::move(instruction));
+    }
+
+    void EmitVariable(std::string name)
+    {
+      mitk::CompiledFormula::Instruction instruction;
+      instruction.op = OpCode::PushVariable;
+      instruction.name = std::move(name);
+      this->Emit(std::move(instruction));
+    }
+
+    void EmitCall(UnaryFunction function)
+    {
+      mitk::CompiledFormula::Instruction instruction;
+      instruction.op = OpCode::Call;
+      instruction.function = function;
+      this->Emit(std::move(instruction));
+    }
+
     void ParseExpression()
     {
       this->ParseTerm();
@@ -452,7 +483,7 @@ namespace
         const auto op = this->Current().kind == TokenKind::Plus ? OpCode::Add : OpCode::Subtract;
         this->Advance();
         this->ParseTerm();
-        this->Emit({.op = op});
+        this->Emit(op);
       }
     }
 
@@ -465,7 +496,7 @@ namespace
         const auto op = this->Current().kind == TokenKind::Star ? OpCode::Multiply : OpCode::Divide;
         this->Advance();
         this->ParseFactor();
-        this->Emit({.op = op});
+        this->Emit(op);
       }
     }
 
@@ -479,7 +510,7 @@ namespace
       {
         this->Advance();
         this->ParsePrimary();
-        this->Emit({.op = OpCode::Power});
+        this->Emit(OpCode::Power);
       }
     }
 
@@ -498,7 +529,7 @@ namespace
       switch (token.kind)
       {
         case TokenKind::Number:
-          this->Emit({.op = OpCode::PushNumber, .value = token.value});
+          this->EmitNumber(token.value);
           this->Advance();
           break;
 
@@ -511,7 +542,7 @@ namespace
         case TokenKind::Minus:
           this->Advance();
           this->ParsePrimary();
-          this->Emit({.op = OpCode::Negate});
+          this->Emit(OpCode::Negate);
           break;
 
         case TokenKind::Plus:
@@ -543,11 +574,11 @@ namespace
         this->Advance(); // '('
         this->ParseExpression();
         this->Expect(TokenKind::RParen);
-        this->Emit({.op = OpCode::Call, .function = function});
+        this->EmitCall(function);
       }
       else
       {
-        this->Emit({.op = OpCode::PushVariable, .name = std::string(token.text)});
+        this->EmitVariable(std::string(token.text));
         this->Advance();
       }
     }

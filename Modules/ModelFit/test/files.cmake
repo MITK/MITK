@@ -12,6 +12,7 @@ SET(MODULE_TESTS
   mitkMVConstrainedCostFunctionDecoratorTest.cpp
   mitkConcreteModelFactoryBaseTest.cpp
   mitkFormulaParserTest.cpp
+  mitkGenericParamModelTest.cpp
   mitkModelFitResultRelationRuleTest.cpp
   mitkExponentialDecayModelTest.cpp
   mitkLinearModelTest.cpp

@@ -13,9 +13,11 @@ found in the LICENSE file.
 #ifndef itkMultiOutputNaryFunctorImageFilter_tpp
 #define itkMultiOutputNaryFunctorImageFilter_tpp
 
+#include <algorithm>
+#include <vector>
+
 #include <itkMultiOutputNaryFunctorImageFilter.h>
 #include <itkImageRegionIterator.h>
-#include <itkProgressReporter.h>
 
 namespace itk
 {
@@ -26,8 +28,6 @@ namespace itk
   MultiOutputNaryFunctorImageFilter< TInputImage, TOutputImage, TFunction, TMaskImage >
     ::MultiOutputNaryFunctorImageFilter()
   {
-    this->DynamicMultiThreadingOff();
-
     // This number will be incremented each time an image
     // is added over the two minimum required
     this->SetNumberOfRequiredInputs(1);
@@ -54,17 +54,13 @@ namespace itk
   };
 
   /**
-  * ThreadedGenerateData Performs the pixel-wise addition
+  * DynamicThreadedGenerateData Performs the pixel-wise operation
   */
   template< class TInputImage, class TOutputImage, class TFunction, class TMaskImage >
   void
     MultiOutputNaryFunctorImageFilter< TInputImage, TOutputImage, TFunction, TMaskImage >
-    ::ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-    ThreadIdType threadId)
+    ::DynamicThreadedGenerateData(const OutputImageRegionType & outputRegionForThread)
   {
-    ProgressReporter progress( this, threadId,
-      outputRegionForThread.GetNumberOfPixels() );
-
     const unsigned int numberOfInputImages =
       static_cast< unsigned int >( this->GetNumberOfIndexedInputs() );
 
@@ -72,24 +68,25 @@ namespace itk
       static_cast< unsigned int >( this->GetNumberOfIndexedOutputs() );
 
     typedef ImageRegionConstIterator< TInputImage > ImageRegionConstIteratorType;
-    std::vector< ImageRegionConstIteratorType * > inputItrVector;
+    std::vector< ImageRegionConstIteratorType > inputItrVector;
     inputItrVector.reserve(numberOfInputImages);
 
     typedef ImageRegionIterator< TOutputImage > OutputImageRegionIteratorType;
-    std::vector< OutputImageRegionIteratorType * > outputItrVector;
+    std::vector< OutputImageRegionIteratorType > outputItrVector;
     outputItrVector.reserve(numberOfOutputImages);
 
     //check if mask image is set and generate iterator if mask is valid
     typedef ImageRegionConstIterator< TMaskImage > MaskImageRegionIteratorType;
-    MaskImageRegionIteratorType* pMaskIterator = nullptr;
+    MaskImageRegionIteratorType maskIterator;
+    const bool hasMask = m_Mask.IsNotNull();
 
-    if (m_Mask.IsNotNull())
+    if (hasMask)
     {
       if (!m_Mask->GetLargestPossibleRegion().IsInside(outputRegionForThread))
       {
-        itkExceptionMacro("Mask of filter is set but does not cover region of thread. Mask region: "<< m_Mask->GetLargestPossibleRegion() <<"Thread region: "<<outputRegionForThread)
+        itkExceptionMacro("Mask of filter is set but does not cover region of work unit. Mask region: "<< m_Mask->GetLargestPossibleRegion() <<"Work unit region: "<<outputRegionForThread)
       }
-      pMaskIterator = new MaskImageRegionIteratorType(m_Mask,outputRegionForThread);
+      maskIterator = MaskImageRegionIteratorType(m_Mask, outputRegionForThread);
     }
 
     // go through the inputs and add iterators for non-null inputs
@@ -100,9 +97,8 @@ namespace itk
 
       if ( inputPtr )
       {
-        inputItrVector.push_back( new ImageRegionConstIteratorType(inputPtr, outputRegionForThread) );
+        inputItrVector.push_back( ImageRegionConstIteratorType(inputPtr, outputRegionForThread) );
       }
-
     }
 
     // go through the outputs and add iterators for non-null outputs
@@ -113,120 +109,64 @@ namespace itk
 
       if ( outputPtr )
       {
-        outputItrVector.push_back( new OutputImageRegionIteratorType(outputPtr, outputRegionForThread) );
+        outputItrVector.push_back( OutputImageRegionIteratorType(outputPtr, outputRegionForThread) );
       }
     }
 
-    typename std::vector< ImageRegionConstIteratorType * >::iterator regionInputIterators;
-    const typename std::vector< ImageRegionConstIteratorType * >::const_iterator regionInputItEnd =
-      inputItrVector.end();
+    const auto numberOfValidInputImages = inputItrVector.size();
+    const auto numberOfValidOutputImages = outputItrVector.size();
 
-    typename std::vector< OutputImageRegionIteratorType * >::iterator regionOutputIterators;
-    const typename std::vector< OutputImageRegionIteratorType * >::const_iterator regionOutputItEnd =
-      outputItrVector.end();
-
-    const unsigned int numberOfValidInputImages = inputItrVector.size();
-    const unsigned int numberOfValidOutputImages = outputItrVector.size();
-
-    if ( (numberOfValidInputImages != 0) && ( numberOfValidOutputImages != 0))
+    if ( numberOfValidInputImages == 0 || numberOfValidOutputImages == 0 )
     {
-      try
+      return;
+    }
+
+    while ( !(outputItrVector.front().IsAtEnd()) )
+    {
+      NaryInputArrayType naryInputArray(numberOfValidInputImages);
+      NaryOutputArrayType naryOutputArray(numberOfValidOutputImages);
+
+      bool isValid = true;
+
+      if (hasMask)
       {
-
-        while ( !(outputItrVector.front()->IsAtEnd()) )
-        {
-          typename NaryInputArrayType::iterator arrayInIt;
-          typename NaryOutputArrayType::iterator arrayOutIt;
-          NaryInputArrayType naryInputArray(numberOfValidInputImages);
-          NaryOutputArrayType naryOutputArray(numberOfValidOutputImages);
-
-          bool isValid = true;
-
-          if (pMaskIterator)
-          {
-            isValid = pMaskIterator->Get() > 0;
-            ++(*pMaskIterator);
-          }
-
-          arrayInIt = naryInputArray.begin();
-          regionInputIterators = inputItrVector.begin();
-
-          typename ImageRegionConstIteratorType::IndexType currentIndex;
-          if(regionInputIterators != regionInputItEnd)
-          {
-            currentIndex = ( *regionInputIterators )->GetIndex();
-          }
-
-          while ( regionInputIterators != regionInputItEnd )
-          {
-            *arrayInIt++ = ( *regionInputIterators )->Get();
-            ++( *( *regionInputIterators ) );
-            ++regionInputIterators;
-          }
-
-          if (isValid)
-          {
-            naryOutputArray = m_Functor(naryInputArray, currentIndex);
-
-            if (numberOfValidOutputImages != naryOutputArray.size())
-            {
-              itkExceptionMacro("Error. Number of valid output images do not equal number of outputs required by functor. Number of valid outputs: "<< numberOfValidOutputImages << "; needed output number:" << this->m_Functor.GetNumberOfOutputs());
-            }
-          }
-          else
-          {
-            for (typename NaryOutputArrayType::iterator pos = naryOutputArray.begin(); pos!= naryOutputArray.end(); ++pos)
-            {
-                *pos = 0.0;
-            }
-          }
-
-          arrayOutIt = naryOutputArray.begin();
-          regionOutputIterators = outputItrVector.begin();
-          while ( regionOutputIterators != regionOutputItEnd )
-          {
-            ( *regionOutputIterators )->Set(*arrayOutIt++);
-            ++( *( *regionOutputIterators ) );
-            ++regionOutputIterators;
-          }
-
-          progress.CompletedPixel();
-        }
+        isValid = maskIterator.Get() > 0;
+        ++maskIterator;
       }
-      catch(...)
+
+      const typename ImageRegionConstIteratorType::IndexType currentIndex =
+        inputItrVector.front().GetIndex();
+
+      typename NaryInputArrayType::iterator arrayInIt = naryInputArray.begin();
+
+      for (auto& inputItr : inputItrVector)
       {
-        // Free memory in case of exceptions
-        regionInputIterators = inputItrVector.begin();
-        while ( regionInputIterators != regionInputItEnd )
-        {
-          delete ( *regionInputIterators++ );
-        }
+        *arrayInIt++ = inputItr.Get();
+        ++inputItr;
+      }
 
-        regionOutputIterators = outputItrVector.begin();
-        while ( regionOutputIterators != regionOutputItEnd )
-        {
-          delete ( *regionOutputIterators++ );
-        }
+      if (isValid)
+      {
+        naryOutputArray = m_Functor(naryInputArray, currentIndex);
 
-        delete pMaskIterator;
-        throw;
+        if (numberOfValidOutputImages != naryOutputArray.size())
+        {
+          itkExceptionMacro("Error. Number of valid output images do not equal number of outputs required by functor. Number of valid outputs: "<< numberOfValidOutputImages << "; needed output number:" << this->m_Functor.GetNumberOfOutputs());
+        }
+      }
+      else
+      {
+        std::fill(naryOutputArray.begin(), naryOutputArray.end(), 0.0);
+      }
+
+      typename NaryOutputArrayType::iterator arrayOutIt = naryOutputArray.begin();
+
+      for (auto& outputItr : outputItrVector)
+      {
+        outputItr.Set(*arrayOutIt++);
+        ++outputItr;
       }
     }
-
-    // Free memory regularly
-    regionInputIterators = inputItrVector.begin();
-    while ( regionInputIterators != regionInputItEnd )
-    {
-      delete ( *regionInputIterators++ );
-    }
-
-    regionOutputIterators = outputItrVector.begin();
-    while ( regionOutputIterators != regionOutputItEnd )
-    {
-      delete ( *regionOutputIterators++ );
-    }
-
-    delete pMaskIterator;
   }
 } // end namespace itk
 

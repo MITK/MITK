@@ -111,18 +111,17 @@ protected:
   MultiOutputNaryFunctorImageFilter();
   ~MultiOutputNaryFunctorImageFilter() override {}
 
-  /** MultiOutputNaryFunctorImageFilter can be implemented as a multi threaded filter.
-   * Therefore, this implementation provides a ThreadedGenerateData() routine
-   * which is called for each processing thread. The output image data is
-   * allocated automatically by the superclass prior to calling
-   * ThreadedGenerateData().  ThreadedGenerateData can only write to the
-   * portion of the output image specified by the parameter
-   * "outputRegionForThread"
+  /** MultiOutputNaryFunctorImageFilter is implemented as a dynamically
+   * multi-threaded filter. Therefore, this implementation provides a
+   * DynamicThreadedGenerateData() routine which is called once per work
+   * unit. It can only write to the portion of the output images specified
+   * by the parameter "outputRegionForThread"; the output image data is
+   * allocated automatically by the superclass beforehand. Progress is
+   * accumulated by the threading framework across all work units.
    *
-   * \sa ImageToImageFilter::ThreadedGenerateData(),
+   * \sa ImageToImageFilter::DynamicThreadedGenerateData(),
    *     ImageToImageFilter::GenerateData()  */
-  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-                            ThreadIdType threadId) override;
+  void DynamicThreadedGenerateData(const OutputImageRegionType & outputRegionForThread) override;
 
   /** Methods actualize the output settings of the filter according to the current functor*/
   void ActualizeOutputs();

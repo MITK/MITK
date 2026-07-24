@@ -10,272 +10,585 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// Suppress false positive -Wmaybe-uninitialized triggered inside Boost Spirit
-// templates when compiled with GCC 15 (Ubuntu 26.04). The variable is in fact
-// initialized along all execution paths the parser can take.
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-
+#include <algorithm>
 #include <cmath>
+#include <cstddef>
+#include <locale>
+#include <map>
+#include <memory>
 #include <numbers>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/phoenix.hpp>
-#include <boost/version.hpp>
+#include <sstream>
+#include <string_view>
+#include <vector>
 
 #include <mitkFormulaParser.h>
 #include <mitkFresnel.h>
 
-namespace qi = boost::spirit::qi;
-namespace ascii = boost::spirit::ascii;
-namespace phx = boost::phoenix;
+namespace
+{
+  /* Classification is done by hand to keep tokenization locale-independent:
+     formulas round-trip through scene files and must parse identically under
+     any global locale a host application installs, while std::isalpha and
+     friends classify per the global C locale (and are undefined for negative
+     char values on top). */
+  bool IsSpace(char c)
+  {
+    return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+  }
 
-typedef std::string::const_iterator Iter;
-typedef ascii::space_type Skipper;
+  bool IsDigit(char c)
+  {
+    return c >= '0' && c <= '9';
+  }
 
-namespace qi = boost::spirit::qi;
+  bool IsAlpha(char c)
+  {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+  }
+
+  bool IsIdentifierChar(char c)
+  {
+    return IsAlpha(c) || IsDigit(c) || c == '_';
+  }
+
+  double Deg2Rad(double deg)
+  {
+    return deg * std::numbers::pi / 180.0;
+  }
+
+  double SinDeg(double t)
+  {
+    return std::sin(Deg2Rad(t));
+  }
+
+  double CosDeg(double t)
+  {
+    return std::cos(Deg2Rad(t));
+  }
+
+  double TanDeg(double t)
+  {
+    return std::tan(Deg2Rad(t));
+  }
+
+  /* mitk::fresnel_s/fresnel_c compute the pi/2-normalized Fresnel integrals;
+     rescaling argument and result yields the unnormalized integrals
+     int_0^t sin(u^2) du and int_0^t cos(u^2) du. */
+  double FresnelS(double t)
+  {
+    const double x = t / std::sqrt(std::numbers::pi / 2.0);
+    return mitk::fresnel_s(x) / std::sqrt(2.0 / std::numbers::pi);
+  }
+
+  double FresnelC(double t)
+  {
+    const double x = t / std::sqrt(std::numbers::pi / 2.0);
+    return mitk::fresnel_c(x) / std::sqrt(2.0 / std::numbers::pi);
+  }
+
+  using UnaryFunction = double (*)(double);
+
+  UnaryFunction ResolveFunction(std::string_view name)
+  {
+    static const std::map<std::string_view, UnaryFunction> functions = {
+      {"abs", +[](double v) { return std::abs(v); }},
+      {"exp", +[](double v) { return std::exp(v); }},
+      {"sin", +[](double v) { return std::sin(v); }},
+      {"cos", +[](double v) { return std::cos(v); }},
+      {"tan", +[](double v) { return std::tan(v); }},
+      {"sind", &SinDeg},
+      {"cosd", &CosDeg},
+      {"tand", &TanDeg},
+      {"fresnelS", &FresnelS},
+      {"fresnelC", &FresnelC}};
+
+    const auto it = functions.find(name);
+    return it != functions.end() ? it->second : nullptr;
+  }
+}
 
 namespace mitk
 {
-  /*!
-   *	@brief			Transforms the given number from degrees to radians and returns it.
-   *	@tparam T		The scalar type that represents a value (e.g. double).
-   *	@param[in] deg	A scalar value in degrees.
-   *	@return			The given value in radians.
-   */
-  template<typename T>
-  inline T deg2rad(const T deg)
+  /* Compiled postfix form of a formula string. Immutable after construction
+     and therefore safely shareable between FormulaParser copies. Variables
+     are resolved by name on every evaluation so that changes to the variable
+     map between evaluations are picked up. */
+  class CompiledFormula
   {
-    return deg * std::numbers::pi_v<T> / static_cast<T>(180);
-  }
-
-  /*!
-   *	@brief			Returns the cosine of the given degree scalar.
-   *	@tparam T		The scalar type that represents a value (e.g. double).
-   *	@param[in] t	A scalar value in degrees whose cosine should be returned.
-   *	@return			The cosine of the given degree scalar.
-   */
-  template<typename T>
-  inline T cosd(const T t)
-  {
-    return std::cos(deg2rad(t));
-  }
-
-  /*!
-   *	@brief			Returns the sine of the given degree scalar.
-   *	@tparam T		The scalar type that represents a value (e.g. double).
-   *	@param[in] t	A scalar value in degrees whose sine should be returned.
-   *	@return			The sine of the given degree scalar.
-   */
-  template<typename T>
-  inline T sind(const T t)
-  {
-    return std::sin(deg2rad(t));
-  }
-
-  /*!
-   *	@brief			Returns the tangent of the given degree scalar.
-   *	@tparam T		The scalar type that represents a value (e.g. double).
-   *	@param[in] t	A scalar value in degrees whose tangent should be returned.
-   *	@return			The tangent of the given degree scalar.
-   */
-  template<typename T>
-  inline T tand(const T t)
-  {
-    return std::tan(deg2rad(t));
-  }
-
-  /*!
-   *	@brief			Returns the fresnel integral sine at the given x-coordinate.
-   *	@details		Code for "fresnel_s()" (fresnel.cpp and fresnel.h) taken as-is from the GNU
-   *					Scientific Library (https://www.gnu.org/software/gsl/).
-   *	@tparam T		The scalar type that represents a value (e.g. double).
-   *	@param[in] t	The x-coordinate at which the fresnel integral sine should be returned.
-   *	@return			The fresnel integral sine at the given x-coordinate.
-   */
-  template<typename T>
-  T fresnelS(const T t)
-  {
-    T x = t / std::sqrt(std::numbers::pi_v<T> / T(2));
-    return static_cast<T>(fresnel_s(x) / std::sqrt(T(2) / std::numbers::pi_v<T>));
-  }
-
-  /*!
-   *	@brief			Returns the fresnel integral cosine at the given x-coordinate.
-   *	@details		Code for "fresnel_c()" (fresnel.cpp and fresnel.h) taken as-is from the GNU
-   *					Scientific Library (https://www.gnu.org/software/gsl/).
-   *	@tparam T		The scalar type that represents a value (e.g. double).
-   *	@param[in] t	The x-coordinate at which the fresnel integral cosine should be returned.
-   *	@return			The fresnel integral cosine at the given x-coordinate.
-   */
-  template<typename T>
-  T fresnelC(const T t)
-  {
-    T x = t / std::sqrt(std::numbers::pi_v<T> / T(2));
-    return static_cast<T>(fresnel_c(x) / std::sqrt(T(2) / std::numbers::pi_v<T>));
-  }
-
-  /*!
-   *	@brief		The grammar that defines the language (i.e. what is allowed) for the parser.
-   */
-  class Grammar : public qi::grammar<Iter, FormulaParser::ValueType(), Skipper>
-  {
-    /*!
-     *	@brief	Helper structure that makes it easier to dynamically call any
-     *			one-parameter-function by overloading the @c () operator.
-     */
-    struct func1_
+  public:
+    enum class OpCode
     {
-      // Required for Phoenix 3+
-      template<typename Sig>
-      struct result;
-
-      /*!
-       *	@brief				Helper structure that is needed for compatibility with
-       *						@c boost::phoenix.
-       *	@tparam Functor		Type of the functor (this struct).
-       *	@tparam Function	Type of the function that should be called.
-       *	@tparam Arg1		Type of the argument the function should be called with.
-       *
-       */
-      template<typename Functor, typename Function, typename Arg1>
-      struct result<Functor(Function, Arg1&)>
-      {
-        /*! @brief The result structure always needs this typedef */
-        typedef Arg1 type;
-      };
-
-      /*!
-       *	@brief				Calls the function @b f with the argument @b a1 and returns the
-       *						result.
-       *						The result always has the same type as the argument.
-       *	@tparam Function	Type of the function that should be called.
-       *	@tparam Arg1			Type of the argument the function should be called with.
-       *	@param[in] f		The function that should be called.
-       *	@param[in] a1		The argument the function should be called with.
-       *	@return				The result of the called function.
-       */
-      template<typename Function, typename Arg1>
-      Arg1 operator()(const Function f, const Arg1 a1) const
-      {
-        return f(a1);
-      }
+      PushNumber,
+      PushVariable,
+      Add,
+      Subtract,
+      Multiply,
+      Divide,
+      Power,
+      Negate,
+      Call
     };
 
-    /*!
-     *	@brief	Helper structure that maps strings to function calls so that parsing e.g.
-     *			@c "cos(0)" actually calls the @c std::cos function with parameter @c 1 so it
-     *			returns @c 0.
-     */
-    class unaryFunction_ :
-      public qi::symbols<typename std::iterator_traits<Iter>::value_type, FormulaParser::ValueType(*)(FormulaParser::ValueType)>
+    struct Instruction
     {
-    public:
-      /*!
-       *	@brief Constructs the structure, this is where the mapping takes place.
-       */
-      unaryFunction_()
-      {
-        this->add
-        ("abs", static_cast<FormulaParser::ValueType(*)(FormulaParser::ValueType)>(&std::abs))
-          ("exp", static_cast<FormulaParser::ValueType(*)(FormulaParser::ValueType)>(&std::exp)) // @TODO: exp ignores division by zero
-          ("sin", static_cast<FormulaParser::ValueType(*)(FormulaParser::ValueType)>(&std::sin))
-          ("cos", static_cast<FormulaParser::ValueType(*)(FormulaParser::ValueType)>(&std::cos))
-          ("tan", static_cast<FormulaParser::ValueType(*)(FormulaParser::ValueType)>(&std::tan))
-          ("sind", &sind)
-          ("cosd", &cosd)
-          ("tand", &tand)
-          ("fresnelS", &fresnelS)
-          ("fresnelC", &fresnelC);
-      }
-    } unaryFunction;
+      OpCode op = OpCode::PushNumber;
+      double value = 0.0;
+      std::string name;
+      double (*function)(double) = nullptr;
+    };
 
-  public:
-    /*!
-     *	@brief							Constructs the grammar with the given formula parser.
-     *	@param[in, out] formulaParser	The formula parser this grammar is for - so it can
-     *									access its variable map.
-     */
-    Grammar(FormulaParser& formulaParser) : Grammar::base_type(start)
+    CompiledFormula(std::vector<Instruction>&& instructions, std::size_t maxStackDepth)
+      : m_Instructions(std::move(instructions)),
+        m_MaxStackDepth(maxStackDepth)
     {
-      using qi::_val;
-      using qi::_1;
-      using qi::_2;
-      using qi::char_;
-      using qi::alpha;
-      using qi::alnum;
-      using qi::double_;
-      using qi::as_string;
-
-      phx::function<func1_> func1;
-
-      start = expression > qi::eoi;
-
-      expression = term[_val = _1]
-        >> *(('+' >> term[_val += _1])
-          | ('-' >> term[_val -= _1]));
-
-      term = factor[_val = _1]
-        >> *(('*' >> factor[_val *= _1])
-          | ('/' >> factor[_val /= _1]));
-
-      factor = primary[_val = _1]
-        >> *('^' >> primary[_val = phx::bind<FormulaParser::ValueType, FormulaParser::ValueType, FormulaParser::ValueType>(std::pow, _val, _1)]);
-
-      variable = as_string[alpha >> *(alnum | char_('_'))]
-        [_val = phx::bind(&FormulaParser::lookupVariable, &formulaParser, _1)];
-
-      primary = double_[_val = _1]
-        | '(' >> expression[_val = _1] >> ')'
-        | ('-' >> primary[_val = -_1])
-        | ('+' >> primary[_val = _1])
-        | (unaryFunction >> '(' >> expression >> ')')[_val = func1(_1, _2)]
-        | variable[_val = _1];
     }
 
-    /*! the rules of the grammar. */
-    qi::rule<Iter, FormulaParser::ValueType(), Skipper> start;
-    qi::rule<Iter, FormulaParser::ValueType(), Skipper> expression;
-    qi::rule<Iter, FormulaParser::ValueType(), Skipper> term;
-    qi::rule<Iter, FormulaParser::ValueType(), Skipper> factor;
-    qi::rule<Iter, FormulaParser::ValueType(), Skipper> variable;
-    qi::rule<Iter, FormulaParser::ValueType(), Skipper> primary;
+    FormulaParser::ValueType Evaluate(FormulaParser& parser) const
+    {
+      std::vector<FormulaParser::ValueType> stack;
+      stack.reserve(m_MaxStackDepth);
+
+      const auto pop = [&stack]() {
+        const auto value = stack.back();
+        stack.pop_back();
+        return value;
+      };
+
+      for (const auto& instruction : m_Instructions)
+      {
+        switch (instruction.op)
+        {
+          case OpCode::PushNumber:
+            stack.push_back(instruction.value);
+            break;
+
+          case OpCode::PushVariable:
+            stack.push_back(parser.LookupVariable(instruction.name));
+            break;
+
+          case OpCode::Add:
+          {
+            const auto rhs = pop();
+            stack.back() += rhs;
+            break;
+          }
+
+          case OpCode::Subtract:
+          {
+            const auto rhs = pop();
+            stack.back() -= rhs;
+            break;
+          }
+
+          case OpCode::Multiply:
+          {
+            const auto rhs = pop();
+            stack.back() *= rhs;
+            break;
+          }
+
+          case OpCode::Divide:
+          {
+            const auto rhs = pop();
+            stack.back() /= rhs;
+            break;
+          }
+
+          case OpCode::Power:
+          {
+            const auto rhs = pop();
+            stack.back() = std::pow(stack.back(), rhs);
+            break;
+          }
+
+          case OpCode::Negate:
+            stack.back() = -stack.back();
+            break;
+
+          case OpCode::Call:
+            stack.back() = instruction.function(stack.back());
+            break;
+        }
+      }
+
+      return stack.back();
+    }
+
+  private:
+    std::vector<Instruction> m_Instructions;
+    std::size_t m_MaxStackDepth;
   };
+}
 
-
-  FormulaParser::FormulaParser(const VariableMapType* variables) : m_Variables(variables)
-  {}
-
-  FormulaParser::ValueType FormulaParser::parse(const std::string& input)
+namespace
+{
+  enum class TokenKind
   {
-    std::string::const_iterator iter = input.begin();
-    std::string::const_iterator end = input.end();
-    FormulaParser::ValueType result = static_cast<FormulaParser::ValueType>(0);
-
-    try
-    {
-      if (!qi::phrase_parse(iter, end, Grammar(*this), ascii::space, result))
-      {
-        mitkThrowException(FormulaParserException) << "Could not parse '" << input <<
-          "': Grammar could not be applied to the input " << "at all.";
-      }
-    }
-    catch (qi::expectation_failure<Iter>& e)
-    {
-      std::string parsed = "";
-
-      for (Iter i = input.begin(); i != e.first; i++)
-      {
-        parsed += *i;
-      }
-      mitkThrowException(FormulaParserException) << "Error while parsing '" << input <<
-        "': Unexpected character '" << *e.first << "' after '" << parsed << "'";
-    }
-
-    return result;
+    Number,
+    Identifier,
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Caret,
+    LParen,
+    RParen,
+    End
   };
 
-  FormulaParser::ValueType FormulaParser::lookupVariable(const std::string var)
+  struct Token
+  {
+    TokenKind kind = TokenKind::End;
+    std::size_t position = 0;
+    std::string_view text;
+    double value = 0.0;
+  };
+
+  [[noreturn]] void ThrowSyntaxError(const std::string& input, std::size_t position)
+  {
+    if (position < input.size())
+    {
+      mitkThrowException(mitk::FormulaParserException)
+        << "Error while parsing '" << input << "': Unexpected character '" << input[position]
+        << "' after '" << input.substr(0, position) << "'";
+    }
+
+    mitkThrowException(mitk::FormulaParserException)
+      << "Error while parsing '" << input << "': Unexpected end of input";
+  }
+
+  /* Lexes one numeric literal starting at pos (a digit, or a dot directly
+     followed by a digit). The exponent is only consumed when at least one
+     digit follows it, so "1e" lexes as the number 1 followed by the
+     identifier "e", matching the original Boost.Spirit tokenization. */
+  double LexNumber(const std::string& input, std::size_t& pos)
+  {
+    const std::size_t start = pos;
+
+    while (pos < input.size() && IsDigit(input[pos]))
+      ++pos;
+
+    if (pos < input.size() && input[pos] == '.')
+    {
+      ++pos;
+
+      while (pos < input.size() && IsDigit(input[pos]))
+        ++pos;
+    }
+
+    if (pos < input.size() && (input[pos] == 'e' || input[pos] == 'E'))
+    {
+      auto exponentPos = pos + 1;
+
+      if (exponentPos < input.size() && (input[exponentPos] == '+' || input[exponentPos] == '-'))
+        ++exponentPos;
+
+      if (exponentPos < input.size() && IsDigit(input[exponentPos]))
+      {
+        pos = exponentPos + 1;
+
+        while (pos < input.size() && IsDigit(input[pos]))
+          ++pos;
+      }
+    }
+
+    /* The token is converted with an explicitly classic-imbued stream:
+       formulas must evaluate identically regardless of the host
+       application's global locale, whose numpunct facet could otherwise
+       turn "1.234" into 1234 ('.' as thousands separator). Out-of-range
+       literals consume the whole token and store a huge/zero value, which
+       is fine; anything short of full consumption is a real error. */
+    double value = 0.0;
+    std::istringstream stream(input.substr(start, pos - start));
+    stream.imbue(std::locale::classic());
+    stream.unsetf(std::ios::skipws);
+    stream >> value;
+
+    if (!stream.eof())
+      ThrowSyntaxError(input, start);
+
+    return value;
+  }
+
+  std::vector<Token> Tokenize(const std::string& input)
+  {
+    std::vector<Token> tokens;
+    std::size_t pos = 0;
+
+    while (pos < input.size())
+    {
+      const char c = input[pos];
+
+      if (IsSpace(c))
+      {
+        ++pos;
+      }
+      else if (IsDigit(c) || (c == '.' && pos + 1 < input.size() && IsDigit(input[pos + 1])))
+      {
+        Token token;
+        token.kind = TokenKind::Number;
+        token.position = pos;
+        token.value = LexNumber(input, pos);
+        tokens.push_back(token);
+      }
+      else if (IsAlpha(c))
+      {
+        const std::size_t start = pos;
+
+        do
+        {
+          ++pos;
+        } while (pos < input.size() && IsIdentifierChar(input[pos]));
+
+        Token token;
+        token.kind = TokenKind::Identifier;
+        token.position = start;
+        token.text = std::string_view(input).substr(start, pos - start);
+        tokens.push_back(token);
+      }
+      else
+      {
+        auto kind = TokenKind::End;
+
+        switch (c)
+        {
+          case '+': kind = TokenKind::Plus; break;
+          case '-': kind = TokenKind::Minus; break;
+          case '*': kind = TokenKind::Star; break;
+          case '/': kind = TokenKind::Slash; break;
+          case '^': kind = TokenKind::Caret; break;
+          case '(': kind = TokenKind::LParen; break;
+          case ')': kind = TokenKind::RParen; break;
+          default: ThrowSyntaxError(input, pos);
+        }
+
+        Token token;
+        token.kind = kind;
+        token.position = pos;
+        tokens.push_back(token);
+        ++pos;
+      }
+    }
+
+    Token endToken;
+    endToken.kind = TokenKind::End;
+    endToken.position = input.size();
+    tokens.push_back(endToken);
+
+    return tokens;
+  }
+
+  /* Formulas come from user input, CLI arguments, and scene files; the
+     nesting depth is capped instead of risking a stack overflow. */
+  constexpr std::size_t maxNestingDepth = 500;
+
+  /* Recursive-descent parser that emits the postfix instructions directly.
+     Grammar (like the original Boost.Spirit grammar):
+
+       expression = term (('+' | '-') term)*
+       term       = factor (('*' | '/') factor)*
+       factor     = primary ('^' primary)*
+       primary    = number | '(' expression ')' | '-' primary | '+' primary
+                  | function '(' expression ')' | variable */
+  class Parser
+  {
+  public:
+    explicit Parser(const std::string& input)
+      : m_Input(input),
+        m_Tokens(Tokenize(input))
+    {
+    }
+
+    mitk::CompiledFormula Run()
+    {
+      this->ParseExpression();
+      this->Expect(TokenKind::End);
+
+      return mitk::CompiledFormula(std::move(m_Instructions), m_MaxStackDepth);
+    }
+
+  private:
+    using OpCode = mitk::CompiledFormula::OpCode;
+
+    const Token& Current() const
+    {
+      return m_Tokens[m_Position];
+    }
+
+    const Token& Next() const
+    {
+      return m_Tokens[m_Position + 1];
+    }
+
+    void Advance()
+    {
+      ++m_Position;
+    }
+
+    void Expect(TokenKind kind)
+    {
+      if (this->Current().kind != kind)
+        ThrowSyntaxError(m_Input, this->Current().position);
+
+      this->Advance();
+    }
+
+    void Emit(mitk::CompiledFormula::Instruction&& instruction)
+    {
+      const auto op = instruction.op;
+      m_Instructions.push_back(std::move(instruction));
+
+      if (op == OpCode::PushNumber || op == OpCode::PushVariable)
+      {
+        ++m_StackDepth;
+        m_MaxStackDepth = std::max(m_MaxStackDepth, m_StackDepth);
+      }
+      else if (op != OpCode::Negate && op != OpCode::Call)
+      {
+        --m_StackDepth; // binary operators pop two operands and push one
+      }
+    }
+
+    void ParseExpression()
+    {
+      this->ParseTerm();
+
+      while (this->Current().kind == TokenKind::Plus || this->Current().kind == TokenKind::Minus)
+      {
+        const auto op = this->Current().kind == TokenKind::Plus ? OpCode::Add : OpCode::Subtract;
+        this->Advance();
+        this->ParseTerm();
+        this->Emit({.op = op});
+      }
+    }
+
+    void ParseTerm()
+    {
+      this->ParseFactor();
+
+      while (this->Current().kind == TokenKind::Star || this->Current().kind == TokenKind::Slash)
+      {
+        const auto op = this->Current().kind == TokenKind::Star ? OpCode::Multiply : OpCode::Divide;
+        this->Advance();
+        this->ParseFactor();
+        this->Emit({.op = op});
+      }
+    }
+
+    void ParseFactor()
+    {
+      this->ParsePrimary();
+
+      // Deliberately folds left-associatively (2^3^2 == 64) like the original
+      // grammar; formulas stored in scene files rely on this.
+      while (this->Current().kind == TokenKind::Caret)
+      {
+        this->Advance();
+        this->ParsePrimary();
+        this->Emit({.op = OpCode::Power});
+      }
+    }
+
+    void ParsePrimary()
+    {
+      if (m_Depth >= maxNestingDepth)
+      {
+        mitkThrowException(mitk::FormulaParserException)
+          << "Error while parsing formula: Expression is nested too deeply";
+      }
+
+      ++m_Depth;
+
+      const Token& token = this->Current();
+
+      switch (token.kind)
+      {
+        case TokenKind::Number:
+          this->Emit({.op = OpCode::PushNumber, .value = token.value});
+          this->Advance();
+          break;
+
+        case TokenKind::LParen:
+          this->Advance();
+          this->ParseExpression();
+          this->Expect(TokenKind::RParen);
+          break;
+
+        case TokenKind::Minus:
+          this->Advance();
+          this->ParsePrimary();
+          this->Emit({.op = OpCode::Negate});
+          break;
+
+        case TokenKind::Plus:
+          this->Advance();
+          this->ParsePrimary();
+          break;
+
+        case TokenKind::Identifier:
+          this->ParseFunctionOrVariable(token);
+          break;
+
+        default:
+          ThrowSyntaxError(m_Input, token.position);
+      }
+
+      --m_Depth;
+    }
+
+    void ParseFunctionOrVariable(const Token& token)
+    {
+      // A known function name is only a function call when followed by '(';
+      // otherwise it is an ordinary variable, as in the original grammar.
+      const auto function =
+        this->Next().kind == TokenKind::LParen ? ResolveFunction(token.text) : nullptr;
+
+      if (function != nullptr)
+      {
+        this->Advance(); // function name
+        this->Advance(); // '('
+        this->ParseExpression();
+        this->Expect(TokenKind::RParen);
+        this->Emit({.op = OpCode::Call, .function = function});
+      }
+      else
+      {
+        this->Emit({.op = OpCode::PushVariable, .name = std::string(token.text)});
+        this->Advance();
+      }
+    }
+
+    const std::string& m_Input;
+    std::vector<Token> m_Tokens;
+    std::vector<mitk::CompiledFormula::Instruction> m_Instructions;
+    std::size_t m_Position = 0;
+    std::size_t m_Depth = 0;
+    std::size_t m_StackDepth = 0;
+    std::size_t m_MaxStackDepth = 0;
+  };
+}
+
+namespace mitk
+{
+  FormulaParser::FormulaParser(const VariableMapType* variables) : m_Variables(variables)
+  {
+  }
+
+  FormulaParser::ValueType FormulaParser::Parse(const std::string& input)
+  {
+    if (!m_CachedFormula || input != m_CachedInput)
+    {
+      // Compile before touching the cache so that it stays consistent when
+      // compilation throws.
+      auto compiledFormula = std::make_shared<const CompiledFormula>(Parser(input).Run());
+      m_CachedInput = input;
+      m_CachedFormula = std::move(compiledFormula);
+    }
+
+    return m_CachedFormula->Evaluate(*this);
+  }
+
+  FormulaParser::ValueType FormulaParser::LookupVariable(const std::string var)
   {
     if (m_Variables == nullptr)
     {
@@ -290,6 +603,5 @@ namespace mitk
     {
       mitkThrowException(FormulaParserException) << "No variable '" << var << "' defined in lookup";
     }
-  };
-
+  }
 }

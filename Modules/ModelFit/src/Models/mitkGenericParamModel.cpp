@@ -96,7 +96,7 @@ mitk::GenericParamModel::ComputeModelfunction(const ParametersType& parameters) 
        ++gridPos, ++signalPos)
   {
     parameterMap[GetXName()] = *gridPos;
-    *signalPos = formulaParser.parse(m_FunctionString);
+    *signalPos = formulaParser.Parse(m_FunctionString);
   }
 
   return signal;

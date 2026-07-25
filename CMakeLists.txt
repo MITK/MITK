@@ -1027,6 +1027,43 @@ set(_dcmtk_dir_orig ${DCMTK_DIR})
 # standalone Python instead of a shadowing user-site install.
 set(ENV{PYTHONNOUSERSITE} 1)
 
+# FindPython3 caches the artifacts it discovered. The superbuild stages every
+# CPython version to the same location, so those entries survive a switch of
+# MITK_Python3_VERSION and end up inconsistent: the interpreter is re-probed,
+# but a cached path to the previous version's runtime library is not, which
+# makes the Development component fail to be found. Discard what FindPython3
+# owns whenever the version changes and let it search again.
+#
+# Matched by prefix rather than by name: which entries the module caches is an
+# implementation detail that differs between CMake versions and platforms,
+# while namespacing them after the package is not. Entries naming an
+# interpreter or a root directory are kept, because they are the input to the
+# new search rather than a result of the old one.
+if(MITK_USE_Python3 AND DEFINED MITK_Python3_VERSION AND
+   NOT MITK_Python3_VERSION STREQUAL MITK_Python3_CACHED_VERSION)
+  get_cmake_property(_cache_variables CACHE_VARIABLES)
+
+  foreach(_cache_variable IN LISTS _cache_variables)
+    if(_cache_variable MATCHES "^_?Python3?_" AND
+       NOT _cache_variable MATCHES "_(EXECUTABLE|ROOT_DIR)$")
+      unset(${_cache_variable} CACHE)
+    endif()
+  endforeach()
+
+  # pybind11's FindPythonLibsNew caches the module suffix under its own prefix.
+  foreach(_cache_variable PYTHON_IS_DEBUG PYTHON_MODULE_DEBUG_POSTFIX PYTHON_MODULE_EXTENSION)
+    unset(${_cache_variable} CACHE)
+  endforeach()
+
+  if(MITK_Python3_CACHED_VERSION)
+    message(STATUS "Embedded CPython changed from ${MITK_Python3_CACHED_VERSION} to "
+      "${MITK_Python3_VERSION}, discarded cached Python3 artifacts")
+  endif()
+
+  set(MITK_Python3_CACHED_VERSION "${MITK_Python3_VERSION}" CACHE INTERNAL
+    "CPython version the cached Python3 artifacts in this build tree belong to")
+endif()
+
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 foreach(ep ${MITK_EXTERNAL_PROJECTS})

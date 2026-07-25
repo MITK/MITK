@@ -31,7 +31,7 @@ These libraries are loaded dynamically at runtime and may export the same symbol
 
 ## Standalone Python Builds to the rescue?
 
-The [Standalone Python Builds](https://github.com/indygreg/python-build-standalone) project provides fully statically linked Python binaries and patches the CPython build system to use relative paths instead of absolute ones.
+The [Standalone Python Builds](https://github.com/astral-sh/python-build-standalone) project provides fully statically linked Python binaries and patches the CPython build system to use relative paths instead of absolute ones.
 
 With these changes, Python is built from source across a wide matrix of versions, platforms, and build configurations, and distributed via GitHub releases.
 
@@ -58,6 +58,17 @@ The project is then installed by copying `ep/src/Python3/` into `MITK-build/pyth
 Since our build system relies on CMake’s `find_package()` to locate external dependencies, we enforce consistency for calls to `find_package(Python3)` by passing both `Python3_ROOT_DIR` (set to `MITK-build/python`) and `Python3_EXECUTABLE` (the interpreter inside that directory) from the superbuild down to the MITK build itself. `Python3_ROOT_DIR` alone is only a search hint; `find_package(Python3)` still consults `PATH` and the Windows registry and prefers the newest version it finds there, so on a machine with a newer system Python the hint would be overruled. Pinning `Python3_EXECUTABLE` makes the MITK build skip that search and use the staged interpreter unconditionally.
 
 MITK modules can then depend on Python either via the classic MITK syntax `PACKAGE_DEPENDS Python3|Python` or by using the native CMake target like `TARGET_DEPENDS Python3::Python`.
+
+### CPython versions
+
+Two independent cache variables select CPython versions. Both are fed by a committed table of the release tag, the patch version per series, and the archive hashes: `CMakeExternals/Python3/Versions.cmake`. Regenerate it on a release bump with `CMakeExternals/Python3/generate_versions.py <release> Versions.cmake`, which derives everything from the release's `SHA256SUMS` asset. The bundled OpenSSL is a property of the release rather than of one CPython series, so `MITK_REQUIRED_OPENSSL_VERSION` in the top-level `CMakeLists.txt` tracks the release tag, not the version.
+
+`MITK_Python3_VERSION` is the interpreter embedded in MITK and staged into `MITK-build/python`. It deliberately lags the newest CPython, because the AI segmentation tools install PyTorch into their virtual environments and a new series only becomes usable there once PyTorch publishes matching wheels.
+`MITK_Python3_WHEEL_VERSIONS` lists the series the `mitk` wheel is built for and defaults to every series in the table. pybind11 has no stable-ABI support, so a wheel only installs on the series its extension module was compiled against, and one wheel per series is unavoidable. A single superbuild can still produce all of them, because the extension module is the only Python-version-dependent target in the build: it links `Python3::Module`, meaning headers plus an import library on Windows, and resolves the Python C API from the hosting interpreter at runtime. Everything else a wheel contains, from MitkCore through the auto-load modules to the pure-Python subpackages, is version agnostic and built once.
+
+Each additional series consequently needs little more than headers. The superbuild stages one interpreter per series into `MITK-build/python-<version>`, without provisioning any packages into it, and `Wrapping/Python/mitk/CMakeLists.txt` compiles one extra extension module per series, reading the include directory and the module suffix from that interpreter's `sysconfig`. The two modules that do link libpython, **MitkPython** and **MitkPreloadPython**, are Workbench-only and never enter a wheel, so they keep building once against the embedded interpreter.
+
+Only the `PythonWheel` configuration acts on the list. Other configurations build no wheels, so they stage no additional interpreters and create no additional extension modules, whatever the variable says.
 
 ### No more debug builds?
 
@@ -198,10 +209,14 @@ cmake --build ../MITK-superbuild
 
 The SuperBuild build chains into the inner MITK build, which builds all MITK modules and then produces the wheel in `../MITK-superbuild/MITK-build/` via the `mitk_python_wheel` target (included in the default build for this configuration).
 
+This produces one wheel per CPython series in `MITK_Python3_WHEEL_VERSIONS`, which by default is every series MITK supports. Narrow it (for example `-DMITK_Python3_WHEEL_VERSIONS=3.12`) to build fewer. See "CPython versions" above.
+
 The target:
 1. Installs pip packaging dependencies (`wheel` + platform delocator) into the build Python
-2. Stages the bindings and auto-load modules via `cmake --install --component wheel`
+2. For each requested series, stages the shared payload and that series' extension module via `cmake --install --component wheel` and `--component wheel_cp3XY`
 3. Packs a raw wheel and repairs it with the platform delocator to bundle all native dependencies
+
+The embedded interpreter drives every run, regardless of which series is being packed: it is the only one provisioned with pip packages, and the delocators inspect binaries rather than caring which interpreter hosts them. `build_wheel.py --abi cp3XY` therefore selects the target series explicitly instead of deriving it from `sys.version_info`.
 
 The platform delocators are:
 - **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk_python.libs/`
@@ -217,6 +232,7 @@ python Wrapping/Python/wheel/test_wheel.py --build-dir ../MITK-superbuild/MITK-b
 ```
 
 This automatically creates a temporary virtual environment, installs the wheel, runs the tests, and cleans up.
+When the build produced wheels for several CPython series, pass `--python ../MITK-superbuild/MITK-build/python-3.14/python.exe` (or the POSIX equivalent) to test one of the others; the wheel is selected by the ABI tag of the interpreter under test.
 The test scope is deliberately narrow: it covers wheel-specific concerns (import, `__version__`, CppMicroServices auto-load bundling) plus a single functional sanity check.
 Comprehensive binding coverage lives in the `mitkPythonBindingsTest` pytest suite described above — running those against the wheel would be redundant.
 
@@ -309,10 +325,10 @@ This conversion is handled in the `MITK-build/FixMacOSInstaller.cmake` script, w
 
 ### Importing mitk in the Python interpreter of an installed MITK on macOS
 
-We are using CMake's `BundleUtilities` to create application bundles on macOS.
-Unfortunately, it rewrites all library dependency paths to start with `@executable_path/../MacOS`, which works fine for executables in the usual `Contents/MacOS` folder of an app bundle.
+Application bundles on macOS are deployed with `macdeployqt`, driven by `qt_generate_deploy_app_script()` (see \ref PackagingPage).
+It rewrites all library dependency paths to start with `@executable_path/../MacOS`, which works fine for executables in the usual `Contents/MacOS` folder of an app bundle.
 However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `mitk` package.
 
-To fix this, we adjust the runtime dependency paths of the `mitk` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after `fixup_bundle()` has finished modifying all paths.
+To fix this, we adjust the runtime dependency paths of the `mitk` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after deployment has finished modifying all paths.
 This fix currently does not cover autoload-modules, which is why they cannot be loaded in this scenario.
 Running the Python interpreter as subprocess of an MITK application, however, will load autoload-modules correctly.

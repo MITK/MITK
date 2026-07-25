@@ -76,6 +76,15 @@ full list lives in `CMake/BuildConfigurations/`. Commonly used:
 | `All` | Everything, used by CI |
 | `PythonWheel` | Headless build, used by `Wrapping/Python/wheel/build_wheel.py`; not for general development |
 
+### Python versions
+
+`MITK_Python3_VERSION` (default `3.12`) is the CPython embedded in
+MITK; `MITK_Python3_WHEEL_VERSIONS` (default: all supported series)
+are the ones the `mitk` wheel is built for, honoured only by the
+`PythonWheel` configuration. Both are validated against the
+committed table in `CMakeExternals/Python3/Versions.cmake`. See
+`Documentation/Doxygen/3-DeveloperManual/Concepts/PythonInMITK.md`.
+
 ### Tests
 
 Always run tests through `ctest` from the inner build tree. Do not

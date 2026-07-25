@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveScribbleInteractor.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPythonContext.h>
+#include <mitkPythonHelper.h>
 #include <mitkPythonUtil.h>
 #include <mitkRenderingManager.h>
 #include <mitkToolManager.h>
@@ -982,9 +983,19 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
 
       bool switchToCUDADevice = true;
 
-      if (deviceInfo.Major < 6)
+      // Lowest compute capability the PyTorch build we install has kernels for.
+      // torch 2.8 covers Pascal (sm_61); the 2.10 required from CPython 3.14 on
+      // starts at Turing. Keep in sync with TorchRequirements() in
+      // mitknnInteractiveInstall.cpp.
+      constexpr bool requiresTuring = mitk::PythonHelper::VERSION_MINOR >= 14;
+      constexpr int minComputeMajor = requiresTuring ? 7 : 6;
+      constexpr int minComputeMinor = requiresTuring ? 5 : 1;
+
+      if (deviceInfo.Major < minComputeMajor ||
+          (deviceInfo.Major == minComputeMajor && deviceInfo.Minor < minComputeMinor))
       {
-        MITK_WARN << "Minimum required compute capability is 6.0";
+        MITK_WARN << "Minimum required compute capability is "
+                  << minComputeMajor << '.' << minComputeMinor;
         switchToCUDADevice = false;
       }
 

@@ -780,21 +780,30 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 
     QMessageBox::warning(nullptr, "nnInteractive", macCpuBackendMessage);
   #else
+    // The architectures follow the PyTorch build we install: torch 2.8 still
+    // runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
+    // Turing. Keep in sync with TorchRequirements() in mitknnInteractiveInstall.cpp.
+    const QString gpuArchitectures = QString(
+      mitk::PythonHelper::VERSION_MINOR >= 14
+        ? "<li %1>Minimum: Turing architecture (e.g., GeForce RTX 2060)</li>"
+          "<li %1>Better: Ampere architecture (e.g., GeForce RTX 3070)</li>"
+          "<li %1>Best: Ada Lovelace or newer (e.g., GeForce RTX 4080)</li>"
+        : "<li %1>Minimum: Pascal architecture (e.g., GeForce GTX 1060)</li>"
+          "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
+          "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>")
+      .arg(LINE_HEIGHT_STYLE);
+
     const QString cpuBackendMessage = QString(
       "<h3 %1>No compatible CUDA device detected</h3>"
       "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
       "<p %1>For smooth performance and fast response times, a compatible NVIDIA GPU with at "
       "least 6 GB VRAM is required:</p>"
-      "<ul %1>"
-        "<li %1>Minimum: Pascal architecture (e.g., GeForce GTX 1060)</li>"
-        "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
-        "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>"
-      "</ul>"
+      "<ul %1>%2</ul>"
       "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>"
       "<p %1>Alternatively, you can run inference on a remote nnInteractive server with a GPU. "
       "Enable it in the nnInteractive preferences under <em>Inference</em> by selecting "
       "<em>Remote server</em>.</p>")
-      .arg(LINE_HEIGHT_STYLE);
+      .arg(LINE_HEIGHT_STYLE, gpuArchitectures);
 
     QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
   #endif

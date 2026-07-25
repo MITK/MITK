@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QLibrary>
 #include <QRunnable>
 #include <QSplashScreen>
 #include <QStandardPaths>
@@ -791,7 +792,14 @@ namespace mitk
     //     correct framework properties.
     d->parseProvisioningFile(this->getProvisioningFilePath());
 
-    // 10. Set the CTK Plugin Framework properties
+    // 10. Never unload plug-in libraries. Static data of a plug-in can outlive
+    //     its library, most notably Qt's registry of static plugins: Qt Print
+    //     Support is registered once per plug-in that indirectly depends on it
+    //     and the registry keeps referencing the freed meta data.
+    d->m_FWProps[ctkPluginConstants::FRAMEWORK_PLUGIN_LOAD_HINTS] =
+      QVariant::fromValue<QLibrary::LoadHints>(QLibrary::PreventUnloadHint);
+
+    // 11. Set the CTK Plugin Framework properties
     ctkPluginFrameworkLauncher::setFrameworkProperties(d->m_FWProps);
   }
 

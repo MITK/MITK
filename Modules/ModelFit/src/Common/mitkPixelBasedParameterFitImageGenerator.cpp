@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
+#include <mitkITKThreadingHelper.h>
 #include <mitkModelFitFunctorPolicy.h>
 
 #include <mitkExtractTimeGrid.h>
@@ -131,6 +132,8 @@ void
   {
     fitFilter->SetMask(this->m_InternalMask);
   }
+
+  UseAllLogicalProcessors(fitFilter);
 
   //generate the fits
   fitFilter->Update();

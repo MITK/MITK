@@ -78,16 +78,23 @@ mitk::GenericParamModel::ComputeModelfunction(const ParametersType& parameters) 
   unsigned int timeSteps = m_TimeGrid.GetSize();
   ModelResultType signal(timeSteps);
 
-  std::map<std::string, double> parameterMap;
-  parameterMap.insert(std::make_pair(GetXName(), 0.0));
-
   auto paramNames = this->GetParameterNames();
+
+  // The parser is a reused member so the function string is compiled only once
+  // per instance instead of once per evaluation. The fitting pipeline uses one
+  // instance per voxel, so the lock is uncontended there.
+  std::lock_guard<std::mutex> lock(m_FormulaParserMutex);
+
+  m_VariableMap.clear();
+
+  // std::map nodes are stable, so the independent variable can be updated
+  // through this reference in the loop below.
+  double& xValue = m_VariableMap[this->GetXName()];
+
   for (ParametersType::size_type i = 0; i < parameters.size(); ++i)
   {
-    parameterMap.insert(std::make_pair(paramNames[i], parameters[i]));
+    m_VariableMap[paramNames[i]] = parameters[i];
   }
-
-  FormulaParser formulaParser(&parameterMap);
 
   TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
   ModelResultType::iterator signalPos = signal.begin();
@@ -95,8 +102,8 @@ mitk::GenericParamModel::ComputeModelfunction(const ParametersType& parameters) 
   for (TimeGridType::const_iterator gridPos = m_TimeGrid.begin(); gridPos != timeGridEnd;
        ++gridPos, ++signalPos)
   {
-    parameterMap[GetXName()] = *gridPos;
-    *signalPos = formulaParser.parse(m_FunctionString);
+    xValue = *gridPos;
+    *signalPos = m_FormulaParser.Parse(m_FunctionString);
   }
 
   return signal;

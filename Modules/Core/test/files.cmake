@@ -90,6 +90,7 @@ set(MODULE_TESTS
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
+  mitkITKThreadingHelperTest.cpp
   mitkUIDGeneratorTest.cpp
   mitkPlanePositionManagerTest.cpp
   mitkAffineTransformBaseTest.cpp

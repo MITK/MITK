@@ -436,7 +436,7 @@ endif()
 
 # MITK's own header-only Boost usage. The dependency closure of these libraries
 # (and of the compiled ones below) is resolved and provisioned automatically.
-set(_mitk_minimum_boost_libraries "lexical_cast;preprocessor;uuid;spirit;phoenix")
+set(_mitk_minimum_boost_libraries "lexical_cast;preprocessor;uuid")
 set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)")
 
 # MITK cannot build without its minimum header set. Restore any of these

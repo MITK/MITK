@@ -323,9 +323,6 @@ if(MITK_USE_Qt6)
     Concurrent
     Core
     Core5Compat
-    CoreTools
-    Designer
-    DesignerComponentsPrivate
     Gui
     Help
     LinguistTools

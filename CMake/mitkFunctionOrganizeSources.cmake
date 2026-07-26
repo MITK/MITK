@@ -96,7 +96,7 @@ function(mitkFunctionOrganizeSources)
   source_group("Qt/Generated Files/QRC" REGULAR_EXPRESSION "qrc_.*\\.cpp$")
   source_group("Qt/Generated Files/UI" REGULAR_EXPRESSION "ui_.*\\.h$")
   source_group("Qt/Generated Files/AUTOUIC" REGULAR_EXPRESSION "autouic_.*\\.stamp$")
-  source_group("Qt/Generated Files/Resources" REGULAR_EXPRESSION "_(cached|manifest)\\.qrc$")
+  source_group("Qt/Generated Files/Resources" REGULAR_EXPRESSION "/(cached|manifest)\\.qrc$")
 
   if(_ORG_META)
     source_group("Plugin Files" FILES ${_ORG_META})

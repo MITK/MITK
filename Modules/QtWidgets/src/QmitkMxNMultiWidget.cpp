@@ -32,8 +32,8 @@ found in the LICENSE file.
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
 #include <QmitkMxNCellOverlay.h>
-#include <QmitkMxNLinkSeamWidget.h>
 #include <QmitkRenderWindowProximity.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
@@ -414,13 +414,12 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                 << "and use only the alphabet [A-Za-z0-9.-].";
   }
 
-  // Every layout mutation path (grid resize, document load) announces itself
-  // through LayoutChanged; the seams mirror whatever cell adjacency results.
-  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RebuildSeams);
-
-  // The per-cell utility-strip sync barcodes track the same per-dimension
-  // membership the seams and layout editor show; refresh them whenever the
-  // links change or the layout (and thus the set of cells) does.
+  // A cell's frame carries its group identity (mono group hue, else neutral),
+  // and the per-cell utility-strip sync barcodes track the same per-dimension
+  // membership the layout editor shows; refresh both whenever the links change
+  // or the layout (and thus the set of cells) does.
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RefreshFrameColors);
+  connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshFrameColors);
   connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
   connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
 }
@@ -572,22 +571,12 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
     return;
   }
 
-  // reset the decoration color of the previously active render window widget
-  if (nullptr != currentActiveRenderWindowWidget)
-  {
-    auto decorationColor = currentActiveRenderWindowWidget->GetDecorationColor();
-    QColor hexColor(decorationColor[0] * 255, decorationColor[1] * 255, decorationColor[2] * 255);
-    currentActiveRenderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
-                                                   hexColor.name(QColor::HexRgb) + "; }");
-  }
-
-  // set the new decoration color of the currently active render window widget
-  if (nullptr != activeRenderWindowWidget)
-  {
-    activeRenderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid #FF6464; }");
-  }
-
   QmitkAbstractMultiWidget::SetActiveRenderWindowWidget(activeRenderWindowWidget);
+
+  // The frame color carries group identity, not active-ness; the active cell is
+  // marked by a color-independent inner ring the overlay paints. Restyle every
+  // cell and repaint the overlays so the ring follows the active-cell change.
+  this->RefreshFrameColors();
 }
 
 void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera)
@@ -936,15 +925,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   proximity->AddEventSource(renderWindow);
   proximity->SetSuppressed(m_CleanView);
 
-  // The editor-level controller behind the seams: per-cell controllers stop
-  // at their cell border, but a seam reveal must react to the pointer in
-  // either neighbor, so every render window also feeds this one.
-  if (nullptr == m_SeamProximity)
-  {
-    m_SeamProximity = new QmitkRenderWindowProximity(this, this);
-    m_SeamProximity->SetSuppressed(m_CleanView);
-  }
-  m_SeamProximity->AddEventSource(renderWindow);
   auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
   cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
   cellOverlay->SetCleanView(m_CleanView);
@@ -967,36 +947,11 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
           utilityWidget, &QmitkRenderWindowUtilityWidget::SetNavigatorChecked);
   utilityWidget->SetNavigatorChecked(m_NavigatorExpanded);
 
-  // 'SyncGroupChanged' is wired through a lambda that catches 'mitk::Exception',
-  // because Qt slots must not let exceptions escape into the event dispatcher.
-  // The direct method 'SetSynchronizationGroup' keeps its throwing contract for
-  // direct callers; only the slot path is defensive.
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this,
-    [this](QmitkSynchronizedNodeSelectionWidget* widget, const GroupSyncIndexType index)
-    {
-      try
-      {
-        this->SetSynchronizationGroup(widget, index);
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Ignoring 'SyncGroupChanged(" << index
-                  << ")': " << e.GetDescription();
-      }
-    });
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CreateNewSyncGroupRequested,
-    this, &QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested);
-  connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
-  connect(this, &QmitkMxNMultiWidget::SyncGroupLabelChanged,
-          utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupLabelChanged);
-
-  // Replay existing groups so the freshly-created utility widget's combobox
-  // reflects the current set of registered groups (rather than relying on a
-  // contiguous 1..N seed inside the utility widget's constructor).
-  for (const auto& entry : m_SynchronizedWidgetConnectors)
-  {
-    utilityWidget->OnSyncGroupAdded(entry.first, this->GetSyncGroupDisplayName(entry.first));
-  }
+  // The cell's data-selection group is now one axis among the others: it is
+  // assigned from the layout editor and shown in the sync barcode, so the
+  // utility widget no longer carries a group combobox to wire up. The
+  // authoritative store is the node selection widget, set via
+  // 'SetSynchronizationGroup' during layout construction / editor edits.
 
   // Initialize the node selection widget with all nodes. The cell is left
   // unattached to any sync group; placement into a group is the caller's
@@ -2218,6 +2173,108 @@ void QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSel
   this->SetSynchronizationGroup(synchronizedWidget, next);
 }
 
+QmitkMxNMultiWidget::GroupSyncIndexType
+QmitkMxNMultiWidget::EnsureSelectionGroupIndex(const std::string& group)
+{
+  // Reuse the existing selection connector for this string id if there is one
+  // (a "+"/document group, or one this method allocated earlier).
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == group)
+    {
+      return index;
+    }
+  }
+  // Otherwise allocate one and remember it so it can be reclaimed when empty.
+  const auto index = this->NextFreeSyncGroupIndex();
+  this->AddSynchronizationGroup(index, group);
+  m_SelectionGroupsAllocatedForLinks.insert(index);
+  return index;
+}
+
+void QmitkMxNMultiWidget::ReclaimSelectionGroupIfEmpty(GroupSyncIndexType index)
+{
+  // Only connectors this method allocated are reclaimed; a document- or
+  // default-seed group persists even when empty (it stays assignable).
+  if (m_SelectionGroupsAllocatedForLinks.find(index) == m_SelectionGroupsAllocatedForLinks.end())
+  {
+    return;
+  }
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    auto* utility = cell->GetUtilityWidget();
+    if (nullptr != utility && utility->GetSyncGroup() == index)
+    {
+      return;  // still has a member
+    }
+  }
+  m_SynchronizedWidgetConnectors.erase(index);
+  m_GroupNameByIndex.erase(index);
+  m_SelectionGroupsAllocatedForLinks.erase(index);
+}
+
+void QmitkMxNMultiWidget::SetCellSelectionGroup(const QString& windowId, const std::string& group)
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell || nullptr == cell->GetUtilityWidget())
+  {
+    return;
+  }
+  auto* widget = cell->GetUtilityWidget()->GetNodeSelectionWidget();
+  if (nullptr == widget)
+  {
+    return;
+  }
+
+  const auto newIndex = this->EnsureSelectionGroupIndex(group);
+  const auto oldIndex = widget->GetSyncGroup();
+  if (oldIndex == newIndex)
+  {
+    return;
+  }
+
+  this->SetSynchronizationGroup(widget, newIndex);
+  this->ReclaimSelectionGroupIfEmpty(oldIndex);
+}
+
+void QmitkMxNMultiWidget::ClearCellSelectionGroup(const QString& windowId)
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell || nullptr == cell->GetUtilityWidget())
+  {
+    return;
+  }
+  auto* widget = cell->GetUtilityWidget()->GetNodeSelectionWidget();
+  if (nullptr == widget)
+  {
+    return;
+  }
+
+  // Index 1 is the default selection group every cell starts in; unlinking a
+  // cell's selection means returning it to that default (there is no "no
+  // selection group" state - every cell always belongs to one).
+  constexpr GroupSyncIndexType defaultGroup = 1;
+  const auto oldIndex = widget->GetSyncGroup();
+  if (oldIndex == defaultGroup)
+  {
+    return;
+  }
+  this->SetSynchronizationGroup(widget, defaultGroup);
+  this->ReclaimSelectionGroupIfEmpty(oldIndex);
+}
+
+std::string QmitkMxNMultiWidget::GetCellSelectionGroup(const QString& windowId) const
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell || nullptr == cell->GetUtilityWidget())
+  {
+    return {};
+  }
+  const auto index = cell->GetUtilityWidget()->GetSyncGroup();
+  const auto it = m_GroupNameByIndex.find(index);
+  return (it != m_GroupNameByIndex.end()) ? it->second : std::string();
+}
+
 void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
                                       QmitkMxNSyncDimension dimension,
                                       const std::string& group,
@@ -2933,14 +2990,6 @@ void QmitkMxNMultiWidget::SetCleanView(bool cleanView)
       cellOverlay->SetCleanView(cleanView);
     }
   }
-  if (nullptr != m_SeamProximity)
-  {
-    m_SeamProximity->SetSuppressed(cleanView);
-  }
-  for (auto* seam : this->findChildren<QmitkMxNLinkSeamWidget*>(QString(), Qt::FindDirectChildrenOnly))
-  {
-    seam->setVisible(!cleanView);
-  }
 
   emit CleanViewChanged(cleanView);
 }
@@ -2993,100 +3042,6 @@ void QmitkMxNMultiWidget::RequestLayoutEditor()
   emit LayoutEditorRequested();
 }
 
-std::optional<std::string> QmitkMxNMultiWidget::GetNonAdjacentNavGroup(const QString& windowId) const
-{
-  const auto cell = this->GetRenderWindowWidget(windowId);
-  if (nullptr == cell)
-  {
-    mitkThrow() << "GetNonAdjacentNavGroup: unknown render window '"
-                << windowId.toStdString() << "'.";
-  }
-
-  auto* splitter = qobject_cast<QSplitter*>(cell->parentWidget());
-
-  // Within-splitter siblings are the only pairs a seam can express.
-  std::vector<const QmitkRenderWindowWidget*> neighbors;
-  if (nullptr != splitter)
-  {
-    const int index = splitter->indexOf(cell.get());
-    for (const int neighborIndex : { index - 1, index + 1 })
-    {
-      if (neighborIndex < 0 || neighborIndex >= splitter->count())
-      {
-        continue;
-      }
-      if (auto* neighbor = dynamic_cast<QmitkRenderWindowWidget*>(splitter->widget(neighborIndex)))
-      {
-        neighbors.push_back(neighbor);
-      }
-    }
-  }
-
-  for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
-                                QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
-  {
-    const auto link = this->GetSyncLink(windowId, dimension);
-    if (!link.has_value())
-    {
-      continue;
-    }
-    const bool seamVisible = std::any_of(neighbors.begin(), neighbors.end(),
-      [this, dimension, &link](const QmitkRenderWindowWidget* neighbor)
-      {
-        const auto neighborLink = this->GetSyncLink(neighbor->GetWidgetName(), dimension);
-        return neighborLink.has_value() && neighborLink->group == link->group;
-      });
-    if (!seamVisible)
-    {
-      return link->group;
-    }
-  }
-
-  return std::nullopt;
-}
-
-void QmitkMxNMultiWidget::RebuildSeams()
-{
-  for (auto* seam : this->findChildren<QmitkMxNLinkSeamWidget*>(QString(), Qt::FindDirectChildrenOnly))
-  {
-    delete seam;
-  }
-
-  if (nullptr == m_SeamProximity || nullptr == this->layout() || this->layout()->count() == 0)
-  {
-    return;
-  }
-  auto* rootSplitter = dynamic_cast<QSplitter*>(this->layout()->itemAt(0)->widget());
-  if (nullptr == rootSplitter)
-  {
-    return;
-  }
-
-  std::function<void(QSplitter*)> walk = [this, &walk](QSplitter* splitter)
-  {
-    for (int i = 0; i < splitter->count(); ++i)
-    {
-      if (auto* sub = dynamic_cast<QSplitter*>(splitter->widget(i)))
-      {
-        walk(sub);
-      }
-      if (i == 0)
-      {
-        continue;
-      }
-      auto* first = dynamic_cast<QmitkRenderWindowWidget*>(splitter->widget(i - 1));
-      auto* second = dynamic_cast<QmitkRenderWindowWidget*>(splitter->widget(i));
-      if (nullptr != first && nullptr != second)
-      {
-        auto* seam = new QmitkMxNLinkSeamWidget(this, splitter->handle(i),
-                                                first->GetWidgetName(), second->GetWidgetName(),
-                                                m_SeamProximity);
-        seam->setVisible(!m_CleanView);
-      }
-    }
-  };
-  walk(rootSplitter);
-}
 
 void QmitkMxNMultiWidget::RefreshSyncBarcodes()
 {
@@ -3098,25 +3053,78 @@ void QmitkMxNMultiWidget::RefreshSyncBarcodes()
       continue;
     }
 
-    QList<QColor> slotColors;
-    slotColors.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()));
+    QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
+    axisSlots.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
+
+    // The seven per-dimension axes: a slot carries the group hue when linked and
+    // is an unsynced gap otherwise, plus the axis glyph the barcode draws when
+    // wide enough.
     for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
-      QColor color;  // invalid: this dimension is an unsynced gap
+      QString label;
+      QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;
+      switch (dimension)
+      {
+        case QmitkMxNSyncDimension::Pan:         label = tr("Pan"); glyph = QmitkMxNAxisGlyph::Pan; break;
+        case QmitkMxNSyncDimension::Zoom:        label = tr("Zoom"); glyph = QmitkMxNAxisGlyph::Zoom; break;
+        case QmitkMxNSyncDimension::Slice:       label = tr("Slice"); glyph = QmitkMxNAxisGlyph::Slice; break;
+        case QmitkMxNSyncDimension::Crosshair:   label = tr("Crosshair"); glyph = QmitkMxNAxisGlyph::Crosshair; break;
+        case QmitkMxNSyncDimension::Orientation: label = tr("Orientation"); glyph = QmitkMxNAxisGlyph::Orientation; break;
+        case QmitkMxNSyncDimension::Windowing:   label = tr("Windowing"); glyph = QmitkMxNAxisGlyph::Windowing; break;
+        case QmitkMxNSyncDimension::Lut:         label = tr("LUT"); glyph = QmitkMxNAxisGlyph::Lut; break;
+      }
+
+      QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+      slot.glyph = glyph;
       if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
       {
         try
         {
-          color = this->GetSyncGroupColor(link->group);
+          slot.color = this->GetSyncGroupColor(link->group);
+          slot.tooltip = tr("%1 - group %2").arg(label,
+            QString::fromStdString(this->GetSyncGroupDisplayName(link->group)));
         }
         catch (const mitk::Exception&)
         {
           // Group not registered mid-change; leave the slot a gap this round.
         }
       }
-      slotColors.append(color);
+      if (!slot.color.isValid())
+      {
+        slot.tooltip = tr("%1 - not linked").arg(label);
+      }
+      axisSlots.append(slot);
     }
-    utilityWidget->SetSyncBarcodeSlots(slotColors);
+
+    // The selection axis is single-valued per cell. Every cell always carries a
+    // selection group, but the default group 1 is the one every cell starts in;
+    // painting it as synced would light up every cell at rest, so the slot reads
+    // as a gap for the default group and shows a hue only once a cell is
+    // deliberately assigned to another selection group.
+    QmitkMxNSyncBarcodeWidget::AxisSlot selectionSlot;
+    selectionSlot.glyph = QmitkMxNAxisGlyph::Selection;
+    if (const auto index = utilityWidget->GetSyncGroup(); index > 1)
+    {
+      if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
+      {
+        try
+        {
+          selectionSlot.color = this->GetSyncGroupColor(recorded->second);
+          selectionSlot.tooltip = tr("Data selection - group %1").arg(
+            QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)));
+        }
+        catch (const mitk::Exception&)
+        {
+        }
+      }
+    }
+    if (!selectionSlot.color.isValid())
+    {
+      selectionSlot.tooltip = tr("Data selection - not linked");
+    }
+    axisSlots.append(selectionSlot);
+
+    utilityWidget->SetSyncBarcodeSlots(axisSlots);
   }
 }
 
@@ -3139,6 +3147,78 @@ QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const
 
   const auto position = static_cast<std::size_t>(std::distance(m_GroupHueOrder.begin(), it));
   return QColor(GROUP_HUE_PALETTE[position % GROUP_HUE_PALETTE.size()]);
+}
+
+QmitkMxNMultiWidget::CellGroupIdentity
+QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
+{
+  CellGroupIdentity identity;
+
+  std::vector<std::string> distinctGroups;  // in dimension order, de-duplicated
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    const auto link = this->GetSyncLink(windowId, dimension);
+    if (!link.has_value())
+    {
+      continue;
+    }
+    if (std::find(distinctGroups.begin(), distinctGroups.end(), link->group) == distinctGroups.end())
+    {
+      distinctGroups.push_back(link->group);
+    }
+  }
+
+  if (distinctGroups.empty())
+  {
+    return identity;
+  }
+
+  // A single hue only when every linked dimension names the same group; a
+  // heterogeneous cell stays neutral rather than picking one hue that would
+  // misrepresent it (the barcode and editor carry the per-dimension detail).
+  try
+  {
+    if (distinctGroups.size() == 1)
+    {
+      identity.hue = this->GetSyncGroupColor(distinctGroups.front());
+      identity.kind = CellGroupIdentityKind::Mono;
+    }
+    else
+    {
+      identity.kind = CellGroupIdentityKind::Complex;
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    // Group not registered mid-layout-change; treat as no identity this pass.
+    return CellGroupIdentity();
+  }
+
+  return identity;
+}
+
+void QmitkMxNMultiWidget::RefreshFrameColors()
+{
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    // The border always carries group identity - the mono group hue, else a
+    // neutral gray (ungrouped or heterogeneous) - so an active grouped cell
+    // keeps its hue rather than losing it to a highlight color. Active-ness is
+    // marked by white corner brackets the cell overlay paints on top. This is
+    // the single MxN writer of the border stylesheet; it never touches the
+    // shared 'SetDecorationColor' (which would leak into StdMultiWidget).
+    // Dark-theme colors; a light theme would derive its own (deferred).
+    const auto identity = this->ResolveCellGroupIdentity(windowId);
+    const QColor border = (CellGroupIdentityKind::Mono == identity.kind) ? identity.hue : QColor(0x60, 0x60, 0x60);
+    renderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
+                                      border.name(QColor::HexRgb) + "; }");
+
+    // Repaint the overlay so its active-corner brackets track the active change.
+    if (auto* overlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(QString(), Qt::FindDirectChildrenOnly))
+    {
+      overlay->update();
+    }
+  }
 }
 
 std::vector<QmitkMxNMultiWidget::SyncGroupInfo> QmitkMxNMultiWidget::GetSyncGroupInfos() const

@@ -14,6 +14,9 @@ found in the LICENSE file.
 
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkRenderWindowUtilityWidget.h>
+#include <QmitkRenderWindowWidget.h>
 
 #include <mitkException.h>
 #include <mitkStandaloneDataStorage.h>
@@ -41,6 +44,9 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(AssignCells_JoinsEveryGivenCell);
   MITK_TEST(Leave_ClearsEveryDimension);
   MITK_TEST(ApplyDimension_TogglesForAllMembers);
+  MITK_TEST(EditorChange_RefreshesCellBarcode);
+  MITK_TEST(Selection_TogglesViaEditorAndRoundTrips);
+  MITK_TEST(Selection_MoveIsSingleValued);
   MITK_TEST(Rebuild_PopulatesWithoutTouchingLinks);
   MITK_TEST(LayoutShrink_EmitsLayoutChanged);
 
@@ -172,6 +178,80 @@ public:
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing).has_value());
     CPPUNIT_ASSERT_MESSAGE("Disabling a dimension keeps the membership dimension",
                            IsLinked(0, QmitkMxNSyncDimension::Slice, "nav"));
+  }
+
+  void EditorChange_RefreshesCellBarcode()
+  {
+    // Regression: an edit made in the layout editor must refresh the per-cell
+    // utility-strip barcode, not just the editor's own view. The editor's
+    // mutators route through RefreshSyncControls (SyncLinksChanged) for that;
+    // before the fix they called only the editor-local rebuild, leaving the
+    // barcode stale.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Widget->ApplyDimensionToGroup("nav", QmitkMxNSyncDimension::Windowing, true);
+
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(0));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* utility = cell->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
+    CPPUNIT_ASSERT(nullptr != barcode);
+
+    int windowingSlot = -1;
+    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+    {
+      if (QmitkMxNAllSyncDimensions[i] == QmitkMxNSyncDimension::Windowing)
+      {
+        windowingSlot = static_cast<int>(i);
+        break;
+      }
+    }
+    CPPUNIT_ASSERT(windowingSlot >= 0);
+
+    const auto axisSlots = barcode->Slots();
+    CPPUNIT_ASSERT_MESSAGE(
+      "An editor dimension toggle must refresh the cell's barcode without a manual refresh",
+      axisSlots[windowingSlot].color.isValid());
+  }
+
+  void Selection_TogglesViaEditorAndRoundTrips()
+  {
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);  // nav-links them
+
+    m_Widget->ApplySelectionToGroup(id, true);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Enabling selection joins the members' selection group",
+                                 id, m_Editor->GetCellSelectionGroup(CellId(0)));
+    CPPUNIT_ASSERT_EQUAL(id, m_Editor->GetCellSelectionGroup(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("A non-member keeps the default selection group",
+                           m_Editor->GetCellSelectionGroup(CellId(2)) != id);
+
+    // The selection group survives a layout-document round-trip like any axis.
+    const auto doc = m_Editor->SerializeLayout();
+    m_Editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Selection group survives serialize/apply",
+                                 id, m_Editor->GetCellSelectionGroup(CellId(0)));
+    CPPUNIT_ASSERT_EQUAL(id, m_Editor->GetCellSelectionGroup(CellId(1)));
+
+    m_Widget->ApplySelectionToGroup(id, false);
+    CPPUNIT_ASSERT_MESSAGE("Disabling selection returns the cell to the default group",
+                           m_Editor->GetCellSelectionGroup(CellId(0)) != id);
+  }
+
+  void Selection_MoveIsSingleValued()
+  {
+    // Cell 0 belongs to two groups on different dimensions, so it is a member of
+    // both for the selection toggle.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "A");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "B");
+
+    m_Widget->ApplySelectionToGroup("A", true);
+    CPPUNIT_ASSERT_EQUAL(std::string("A"), m_Editor->GetCellSelectionGroup(CellId(0)));
+
+    // Selection is single-valued per cell: enabling it on B moves the cell.
+    m_Widget->ApplySelectionToGroup("B", true);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The cell's single selection group moves A -> B",
+                                 std::string("B"), m_Editor->GetCellSelectionGroup(CellId(0)));
   }
 
   void Rebuild_PopulatesWithoutTouchingLinks()

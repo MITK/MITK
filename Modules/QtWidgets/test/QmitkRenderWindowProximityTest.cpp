@@ -49,6 +49,8 @@ class QmitkRenderWindowProximityTestSuite : public mitk::TestFixture
   MITK_TEST(Construct_NullCellThrows);
   MITK_TEST(AddEventSource_NullThrows);
   MITK_TEST(Register_NullCallbackThrows);
+  MITK_TEST(Register_NullDistanceQueryThrows);
+  MITK_TEST(DynamicActivationDistance_QueriedLazily);
   MITK_TEST(Register_StartsIdle);
   MITK_TEST(Query_UnknownIdThrows);
   MITK_TEST(Unregister_UnknownIdThrows);
@@ -74,11 +76,11 @@ class QmitkRenderWindowProximityTestSuite : public mitk::TestFixture
   std::unique_ptr<Proximity> m_Proximity;
 
   // Cell is 400x300 with a right-edge region; distances below relate to the
-  // controller's ActivationDistance (58) and HysteresisBand (16).
+  // controller's ActivationDistance (48) and HysteresisBand (16).
   const QRect m_RightEdgeRegion = QRect(380, 0, 20, 300);
   const QPoint m_FarPoint = QPoint(200, 150);   // 180 px from the region
   const QPoint m_NearPoint = QPoint(340, 150);  // 40 px, inside activation
-  const QPoint m_BandPoint = QPoint(315, 150);  // 65 px, inside hysteresis band only
+  const QPoint m_BandPoint = QPoint(324, 150);  // 56 px, inside hysteresis band only
 
 public:
 
@@ -143,6 +145,30 @@ public:
   void Register_NullCallbackThrows()
   {
     CPPUNIT_ASSERT_THROW(m_Proximity->RegisterRegion(nullptr), mitk::Exception);
+  }
+
+  void Register_NullDistanceQueryThrows()
+  {
+    CPPUNIT_ASSERT_THROW(
+      m_Proximity->RegisterRegion([this]() { return m_RightEdgeRegion; }, std::function<int()>()),
+      mitk::Exception);
+  }
+
+  void DynamicActivationDistance_QueriedLazily()
+  {
+    int distance = 30;
+    const auto id = m_Proximity->RegisterRegion([this]() { return m_RightEdgeRegion; },
+                                                std::function<int()>([&distance]() { return distance; }));
+
+    // The near point is 40 px from the region: outside a 30 px activation.
+    m_Proximity->HandlePointerMoved(m_NearPoint);
+    CPPUNIT_ASSERT(State::Hint == m_Proximity->GetRegionState(id));
+
+    // Widening the distance reveals the same position - the query is read fresh
+    // on every evaluation, so a size-dependent distance needs no re-registration.
+    distance = 80;
+    m_Proximity->HandlePointerMoved(m_NearPoint);
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
   }
 
   void Register_StartsIdle()

@@ -12,6 +12,14 @@
     <file>SegmentationIcon_48.png</file>
     <file>list-solid.svg</file>
     <file>lock.svg</file>
+    <file>mxn-axis-pan.svg</file>
+    <file>mxn-axis-zoom.svg</file>
+    <file>mxn-axis-slice.svg</file>
+    <file>mxn-axis-crosshair.svg</file>
+    <file>mxn-axis-orientation.svg</file>
+    <file>mxn-axis-windowing.svg</file>
+    <file>mxn-axis-lut.svg</file>
+    <file>mxn-axis-selection.svg</file>
     <file>mm_contrast.png</file>
     <file>mm_pan.png</file>
     <file>mm_pointer.png</file>

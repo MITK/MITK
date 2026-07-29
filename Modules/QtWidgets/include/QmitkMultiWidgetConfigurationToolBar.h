@@ -25,11 +25,10 @@ class QmitkAbstractMultiWidget;
 /**
  * \brief Toolbar for configuring a QmitkAbstractMultiWidget layout and interaction scheme.
  *
- * Provides buttons for opening the layout editor, toggling synchronized
- * scrolling, and switching the interaction scheme (e.g., MITK default vs.
- * PACS mode). The layout-shape controls themselves (grid, presets,
- * save/load) live in the layout editor view; the layout button only
- * requests it.
+ * Provides a button for switching the interaction scheme (MITK default vs.
+ * PACS mode). Opening the layout editor and managing synchronization now live
+ * on the per-cell viewport furniture (the sync barcode) and the layout editor
+ * view, so this toolbar no longer carries those buttons.
  *
  * \sa QmitkAbstractMultiWidget
  * \sa QmitkInteractionSchemeToolBar
@@ -50,18 +49,6 @@ public:
 Q_SIGNALS:
 
   /**
-   * \brief Emitted when the user presses the layout button; the hosting
-   *        editor part shows/toggles the layout editor view.
-   */
-  void LayoutEditorRequested();
-
-  /**
-   * \brief Emitted when the synchronization state changes.
-   * \param[in] synchronized True if synchronized scrolling is enabled.
-   */
-  void Synchronized(bool synchronized);
-
-  /**
    * \brief Emitted when the interaction scheme changes.
    * \param[in] scheme The new interaction scheme.
    */
@@ -69,7 +56,6 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
 
-  void OnSynchronize();
   void OnInteractionSchemeChanged();
 
 private:
@@ -78,7 +64,6 @@ private:
 
   QmitkAbstractMultiWidget* m_MultiWidget;
 
-  QAction* m_SynchronizeAction;
   QAction* m_InteractionSchemeChangeAction;
 
 };

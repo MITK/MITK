@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <defs>
+    <linearGradient id="lut" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00ff00" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#00ff00" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect x="5.5" y="9" width="13" height="6" rx="1" fill="url(#lut)" stroke="none"/>
+</svg>

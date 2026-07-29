@@ -199,12 +199,10 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     layout->addWidget(m_Impl->m_ConfigurationToolBar);
   }
 
-  // The layout-shape controls live in the layout editor view; the toolbar
-  // button only summons it.
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LayoutEditorRequested,
-          this, &QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::Synchronized,
-          this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
+  // The layout editor is summoned from the per-cell sync barcode (relayed via
+  // QmitkMxNMultiWidget::LayoutEditorRequested, connected above), and
+  // synchronization is managed there too, so the configuration toolbar now only
+  // carries the interaction-scheme switch.
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
           this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
 

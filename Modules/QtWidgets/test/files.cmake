@@ -17,7 +17,6 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNLayoutEditorWidgetTest.cpp
   QmitkMxNCellOverlayTest.cpp
   QmitkMxNNavigatorTest.cpp
-  QmitkMxNLinkSeamTest.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp

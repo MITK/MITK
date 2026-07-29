@@ -96,6 +96,15 @@ public:
   void ApplyDimensionToGroup(const std::string& group, QmitkMxNSyncDimension dimension, bool enabled);
 
   /**
+   * \brief Link or unlink the data-selection axis for every current member
+   *        cell of 'group'. Selection is single-valued per cell, so enabling
+   *        moves each member's selection group to this group (last-writer-wins
+   *        if a member already had a different one); disabling returns each
+   *        member to the default selection group.
+   */
+  void ApplySelectionToGroup(const std::string& group, bool enabled);
+
+  /**
    * \brief Add a cell to / remove a cell from a group (see
    *        AssignCellsToGroup for the join semantics; leaving clears the
    *        cell's links to the group on every dimension).
@@ -134,6 +143,9 @@ private:
 
   /** \brief Dimensions the group currently links for at least one cell. */
   std::vector<QmitkMxNSyncDimension> GroupDimensions(const std::string& group) const;
+
+  /** \brief Whether at least one member cell's selection group is this group. */
+  bool GroupSelectionEnabled(const std::string& group) const;
 
   static QString CellLabel(const QmitkMxNMultiWidget::WindowDescriptor& descriptor);
 

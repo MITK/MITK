@@ -189,6 +189,30 @@ public:
   void SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index);
 
   /**
+  * \brief Move a cell's data-selection group to the group named 'group',
+  *        addressing selection by the same string id the other axes use.
+  *
+  *   Selection is single-valued per cell, so this is a move: the cell leaves
+  *   its previous selection group. A selection connector for 'group' is
+  *   allocated on first use (mapping the string id to a free engine index) and
+  *   reclaimed once its last member leaves - unless it came from a layout
+  *   document or the default seed, which persist. No-op for an unknown cell.
+  */
+  void SetCellSelectionGroup(const QString& windowId, const std::string& group);
+
+  /**
+  * \brief Move a cell back to the default data-selection group (clearing a
+  *        deliberate assignment). No-op for an unknown cell.
+  */
+  void ClearCellSelectionGroup(const QString& windowId);
+
+  /**
+  * \brief The string id of a cell's current data-selection group (empty for an
+  *        unknown cell or an unregistered index).
+  */
+  std::string GetCellSelectionGroup(const QString& windowId) const;
+
+  /**
   * \brief Returns the smallest positive index not already used by an existing
   *        synchronization group.
   *
@@ -255,6 +279,15 @@ public:
   *        dimension's typed value (identity when never set).
   */
   std::optional<SyncLinkState> GetSyncLink(const QString& windowId, QmitkMxNSyncDimension dimension) const;
+
+  /**
+  * \brief Notify the sync furniture (per-cell barcodes, frame colors, the
+  *        layout editor) of a link-state change by emitting 'SyncLinksChanged'.
+  *        The mutators ('SetSyncLink' / 'ClearSyncLink' / 'SetCellSelectionGroup'
+  *        ...) stay silent so a batch can settle first; the caller invokes this
+  *        once when the batch is done (as 'ApplyLayout' and the layout editor do).
+  */
+  void RefreshSyncControls();
 
   /** \brief Sorted names of all groups any live cell links for the dimension. */
   std::vector<std::string> GetSyncGroupNames(QmitkMxNSyncDimension dimension) const;
@@ -352,6 +385,35 @@ public:
   */
   QColor GetSyncGroupColor(const std::string& group) const;
 
+  /** \brief Which single group identity, if any, to paint on a cell's frame. */
+  enum class CellGroupIdentityKind
+  {
+    None,     // the cell links none of the seven navigation/intensity dimensions
+    Mono,     // every linked dimension names one group
+    Complex   // linked dimensions span more than one group
+  };
+
+  struct CellGroupIdentity
+  {
+    CellGroupIdentityKind kind = CellGroupIdentityKind::None;
+    QColor hue;  // valid only when kind == Mono
+  };
+
+  /**
+  * \brief Resolve a cell's frame identity from its navigation/intensity
+  *        membership.
+  *
+  *   'Mono' when every one of the seven 'QmitkMxNSyncDimension' axes the cell
+  *   links names one group (the hue is that group's color); 'Complex' when the
+  *   linked axes span more than one group; 'None' when the cell links none of
+  *   them. Data selection is deliberately excluded: every cell carries an
+  *   explicit default selection group, so including it would blank the frame
+  *   the moment a real navigation/intensity group is created. A group color
+  *   that throws mid-layout-change downgrades the result to 'None' for that
+  *   pass. Consumed by 'RefreshFrameColors'.
+  */
+  CellGroupIdentity ResolveCellGroupIdentity(const QString& windowId) const;
+
   /**
   * \brief Read-only description of one synchronization group, for the sync
   *        editor and other furniture surfaces to render.
@@ -437,15 +499,6 @@ public:
   *        emit the editor's signal itself (e.g. the seams' editor hook).
   */
   void RequestLayoutEditor();
-
-  /**
-  * \brief A navigation group of the cell that no seam can show: the cell
-  *        links it on a navigation dimension, but no within-splitter
-  *        neighbor shares it there. Empty when every navigation link is
-  *        seam-visible (or none exists). Feeds the corner hue dot that
-  *        points the user to the layout editor.
-  */
-  std::optional<std::string> GetNonAdjacentNavGroup(const QString& windowId) const;
 
   /**
   * \brief Re-initialize the geometry of the cell's geometry-authority
@@ -653,9 +706,9 @@ public Q_SLOTS:
   void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
   /**
-  * \brief Slot connected to 'QmitkRenderWindowUtilityWidget::CreateNewSyncGroupRequested'.
-  *        Allocates the next free group index via 'NextFreeSyncGroupIndex',
-  *        creates the group, and assigns the requesting widget to it.
+  * \brief Create a new data-selection group and assign the given node selection
+  *        widget to it: allocates the next free group index via
+  *        'NextFreeSyncGroupIndex', creates the group, and assigns the widget.
   */
   void OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
 
@@ -838,11 +891,31 @@ private:
   void TearDownAllCells();
 
   /**
-  * \brief Recreate the link-seam widgets for the current splitter tree
-  *        (one per handle whose both neighbors are cells). Connected to
-  *        'LayoutChanged' so every layout mutation path refreshes them.
+  * \brief Restyle every cell's frame from its group identity, and be the single
+  *        authoritative MxN writer of the border stylesheet. The border color is
+  *        the cell's mono group hue, or a neutral gray when it is ungrouped or
+  *        heterogeneous - carried by every cell, active or not, so an active
+  *        grouped cell keeps its hue. Active-ness is marked by white corner
+  *        brackets the cell overlay paints on top. Connected to
+  *        'SyncLinksChanged' and 'LayoutChanged', and invoked on the active-cell
+  *        change (which repaints the overlays). Never routes through the shared
+  *        'SetDecorationColor' (which would leak to StdMultiWidget).
   */
-  void RebuildSeams();
+  void RefreshFrameColors();
+
+  /**
+  * \brief The engine index of the selection connector for the string group
+  *        'group', allocating (and tracking for later reclaim) one when the
+  *        group has no connector yet.
+  */
+  GroupSyncIndexType EnsureSelectionGroupIndex(const std::string& group);
+
+  /**
+  * \brief Deregister a selection connector once its last member has left, but
+  *        only if this class allocated it (see 'EnsureSelectionGroupIndex');
+  *        document- and default-seed connectors persist even when empty.
+  */
+  void ReclaimSelectionGroupIfEmpty(GroupSyncIndexType index);
 
   /**
   * \brief Push each cell's per-dimension group membership to its utility-strip
@@ -900,9 +973,6 @@ private:
   *        linking the group. Empty string if no cell links it.
   */
   QString FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const;
-
-  /** \brief Notify structural sync furniture (sync editor, seams) of a link-state change. */
-  void RefreshSyncControls();
 
   /**
   * \brief Record 'group' in the hue-assignment order if it is new
@@ -991,6 +1061,14 @@ private:
   std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
 
   /**
+  * \brief Selection-connector indices this class lazily allocated for a link
+  *        group's selection axis (see 'SetCellSelectionGroup'). Only these are
+  *        reclaimed when they empty; document- and default-seed connectors are
+  *        not tracked here and persist.
+  */
+  std::set<GroupSyncIndexType> m_SelectionGroupsAllocatedForLinks;
+
+  /**
   * \brief Engine-internal group-name registry keyed by sync-group index.
   *
   *        Group names live nowhere else in memory: the connector map
@@ -1026,13 +1104,6 @@ private:
 
   /** \brief Sticky clean-view state; applied to cells created later, too. */
   bool m_CleanView = false;
-
-  /**
-  * \brief Editor-level proximity controller driving the seam reveals (the
-  *        per-cell controllers cannot see across cell borders). Parented to
-  *        this widget; created with the first cell.
-  */
-  QmitkRenderWindowProximity* m_SeamProximity = nullptr;
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;

@@ -62,21 +62,33 @@ void QmitkRenderWindowProximity::AddEventSource(QWidget* source)
 QmitkRenderWindowProximity::RegionId QmitkRenderWindowProximity::RegisterRegion(
   std::function<QRect()> regionInCellCoords, int activationDistance)
 {
-  if (!regionInCellCoords)
-  {
-    mitkThrow() << "Cannot register a proximity region without a rectangle callback.";
-  }
   if (activationDistance <= 0)
   {
     mitkThrow() << "Proximity activation distance must be positive (got "
                 << activationDistance << ").";
   }
 
+  return this->RegisterRegion(std::move(regionInCellCoords),
+                              std::function<int()>([activationDistance]() { return activationDistance; }));
+}
+
+QmitkRenderWindowProximity::RegionId QmitkRenderWindowProximity::RegisterRegion(
+  std::function<QRect()> regionInCellCoords, std::function<int()> activationDistanceQuery)
+{
+  if (!regionInCellCoords)
+  {
+    mitkThrow() << "Cannot register a proximity region without a rectangle callback.";
+  }
+  if (!activationDistanceQuery)
+  {
+    mitkThrow() << "Cannot register a proximity region without an activation-distance callback.";
+  }
+
   const RegionId id = m_NextRegionId++;
 
   Region region;
   region.rectQuery = std::move(regionInCellCoords);
-  region.activationDistance = activationDistance;
+  region.distanceQuery = std::move(activationDistanceQuery);
   region.collapseTimer = new QTimer(this);
   region.collapseTimer->setSingleShot(true);
   region.collapseTimer->setInterval(CollapseDelayMs);
@@ -228,11 +240,15 @@ QmitkRenderWindowProximity::State QmitkRenderWindowProximity::ComputeState(const
 
   if (rect.isValid())
   {
+    // Distance is resolved live so a size-dependent reactive margin tracks the
+    // cell; guard against a non-positive result from a caller's query.
+    const int activationDistance = std::max(1, region.distanceQuery());
+
     // Once active, the region stays active through the hysteresis band, so a
     // pointer resting near the threshold cannot flap the state.
     const int threshold = region.state == State::Active
-      ? region.activationDistance + HysteresisBand
-      : region.activationDistance;
+      ? activationDistance + HysteresisBand
+      : activationDistance;
 
     if (SquaredDistanceToRect(m_PointerPosition, rect) <= threshold * threshold)
     {

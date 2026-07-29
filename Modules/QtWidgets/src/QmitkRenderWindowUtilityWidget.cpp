@@ -33,8 +33,6 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QmitkRenderWindow* renderWindow/* = nullptr */,
   mitk::DataStorage* dataStorage/* = nullptr */)
   : m_NodeSelectionWidget(nullptr)
-  , m_SyncGroupSelector(nullptr)
-  , m_NewSyncGroupButton(nullptr)
   , m_CleanViewButton(nullptr)
   , m_NavigatorToggleButton(nullptr)
   , m_SyncBarcode(nullptr)
@@ -63,10 +61,6 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_NodeSelectionWidget->SetDataStorage(dataStorage);
   m_NodeSelectionWidget->SetNodePredicate(noHelperObjects);
   connect(this, &QmitkRenderWindowUtilityWidget::SetDataSelection, m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelection);
-  // Mirror authoritative group changes (e.g. via 'MxN::SetSynchronizationGroup'
-  // from the '+' button or layout load) back into the combobox.
-  connect(m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SyncGroupIndexChanged,
-    this, &QmitkRenderWindowUtilityWidget::OnNodeSelectionWidgetSyncGroupChanged);
 
   // A plain tool button, not a QMenuBar entry: a menu bar collapses its
   // entries behind an extension popup once the utility row gets narrow,
@@ -82,33 +76,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataButton->setMenu(dataMenu);
   layout->addWidget(dataButton);
 
-  auto* layoutEditorButton = new QToolButton(this);
-  layoutEditorButton->setText("Sync");
-  layoutEditorButton->setToolTip(tr("Open the MxN layout editor (groups, synchronization, layout)"));
-  connect(layoutEditorButton, &QToolButton::clicked, this, [this]() {
-    emit LayoutEditorRequested();
-  });
-  layout->addWidget(layoutEditorButton);
-
-  m_SyncGroupSelector = new QComboBox(this);
-  // The combobox starts empty and is populated reactively via 'OnSyncGroupAdded'.
-  // Each row carries its group index as userData (QVariant) so sparse /
-  // non-monotonic group indices map correctly. Row position is never used as
-  // a proxy for the group number.
-  m_SyncGroupSelector->setMinimumContentsLength(8);
-  connect(m_SyncGroupSelector, &QComboBox::currentIndexChanged,
-    this, &QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged);
-  layout->addWidget(m_SyncGroupSelector);
-
-  // The combobox is a passive view of existing groups. New-group creation goes
-  // through a separate button so the combobox no longer drives lifecycle.
-  m_NewSyncGroupButton = new QToolButton(this);
-  m_NewSyncGroupButton->setText("+");
-  m_NewSyncGroupButton->setToolTip(tr("Create a new synchronization group"));
-  connect(m_NewSyncGroupButton, &QToolButton::clicked, this, [this]() {
-    emit CreateNewSyncGroupRequested(m_NodeSelectionWidget);
-  });
-  layout->addWidget(m_NewSyncGroupButton);
+  // Data-selection group membership is no longer a per-cell combobox: it is one
+  // axis among the others, assigned in the layout editor and shown in the sync
+  // barcode. The cell's selection group is stored on the node selection widget
+  // (see GetSyncGroup), which stays the authoritative store.
 
   // The per-cell slice scrub control lives in the viewport navigator, and
   // reorientation is driven by clicking the cell's plane label; the utility
@@ -144,8 +115,13 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   });
   layout->addWidget(m_NavigatorToggleButton);
 
-  // Per-dimension sync barcode for this cell; filled by the multi widget.
+  // Per-axis sync barcode for this cell; filled by the multi widget. The strip
+  // doubles as the entry point to the layout editor, replacing the former
+  // "Sync" button.
   m_SyncBarcode = new QmitkMxNSyncBarcodeWidget(this);
+  connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::Clicked, this, [this]() {
+    emit LayoutEditorRequested();
+  });
   layout->addWidget(m_SyncBarcode);
 }
 
@@ -165,71 +141,13 @@ void QmitkRenderWindowUtilityWidget::paintEvent(QPaintEvent*)
   painter.drawRoundedRect(QRectF(this->rect()), 3.0, 3.0);
 }
 
-void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index)
-{
-  if (index < 1)
-  {
-    mitkThrow() << "Invalid synchronization group index '" << index
-                << "'. Group index must be >= 1.";
-  }
-  // Locate the combobox row that carries this group index in its userData.
-  // The group must already be registered with this widget (via a prior
-  // 'OnSyncGroupAdded'); silently de-selecting on a missing index would mask
-  // a contract violation by the caller.
-  const int row = m_SyncGroupSelector->findData(QVariant(index));
-  if (row < 0)
-  {
-    mitkThrow() << "Synchronization group '" << index
-                << "' is not registered with this widget. Ensure the owning "
-                   "multi widget has emitted 'SyncGroupAdded(" << index
-                << ")' before calling 'SetSyncGroup'.";
-  }
-  m_SyncGroupSelector->setCurrentIndex(row);
-}
-
 QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSyncGroup() const
 {
-  // Read the group index from the selected row's userData rather than from the
-  // row position (which would conflate combobox layout with the group's logical
-  // identifier when groups are sparse).
-  const QVariant data = m_SyncGroupSelector->currentData();
-  return data.isValid() ? data.toInt() : -1;
-}
-
-void QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged(int index)
-{
-  // Pure follower: report the selection. Group creation goes through the
-  // '+' button (CreateNewSyncGroupRequested), not through the combobox.
-  if (index < 0)
-  {
-    return;
-  }
-  const QVariant data = m_SyncGroupSelector->itemData(index);
-  if (!data.isValid())
-  {
-    return;
-  }
-  emit SyncGroupChanged(m_NodeSelectionWidget, data.toInt());
-}
-
-void QmitkRenderWindowUtilityWidget::OnNodeSelectionWidgetSyncGroupChanged(int index)
-{
-  // The node selection widget is the authoritative source of the cell's group
-  // assignment; mirror it into the combobox. The signals emitted by the
-  // combobox change are blocked to terminate the round-trip
-  // (combobox -> SyncGroupChanged -> MxN -> SetSyncGroup -> here -> combobox).
-  // We do not throw on a missing row: this slot is a notification follower and
-  // must not raise into the Qt event loop. A missing row only happens when
-  // 'SyncGroupAdded' has not been delivered yet; the corresponding
-  // 'OnSyncGroupAdded' will land shortly and the next 'SetSyncGroup' will
-  // settle the combobox.
-  const int row = m_SyncGroupSelector->findData(QVariant(index));
-  if (row < 0)
-  {
-    return;
-  }
-  const QSignalBlocker blocker(m_SyncGroupSelector);
-  m_SyncGroupSelector->setCurrentIndex(row);
+  // The node selection widget is the authoritative store of the cell's data-
+  // selection group (written by MxN::SetSynchronizationGroup); read it directly
+  // now that the mirroring combobox is gone. Serialization
+  // (MakeWindowDescriptor) and the sync barcode both read through here.
+  return m_NodeSelectionWidget->GetSyncGroup();
 }
 
 void QmitkRenderWindowUtilityWidget::SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection)
@@ -266,37 +184,7 @@ void QmitkRenderWindowUtilityWidget::SetNavigatorChecked(bool expanded)
   m_NavigatorToggleButton->setChecked(expanded);
 }
 
-void QmitkRenderWindowUtilityWidget::SetSyncBarcodeSlots(const QList<QColor>& slotColors)
+void QmitkRenderWindowUtilityWidget::SetSyncBarcodeSlots(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots)
 {
-  m_SyncBarcode->SetSlots(slotColors);
-}
-
-void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index, const QString& label)
-{
-  // Reactive growth: append a row carrying this group index as userData. We
-  // de-dupe by data (not by position) so sparse / non-monotonic group indices
-  // map correctly.
-  if (m_SyncGroupSelector->findData(QVariant(index)) >= 0)
-  {
-    return;
-  }
-  // The combobox is a passive view; populating it must never (re)assign the
-  // cell's group. The first addItem() on an empty combobox moves currentIndex
-  // from -1 to 0 and fires currentIndexChanged, which would bind this cell to
-  // the lowest-numbered group mid-construction - violating the explicit-id
-  // contract that a freshly created cell stays unattached until its caller
-  // places it. Block the combobox's signals so the authoritative assignment
-  // via SetSynchronizationGroup remains the only path that changes the group.
-  const QSignalBlocker blocker(m_SyncGroupSelector);
-  m_SyncGroupSelector->addItem(label, QVariant(index));
-}
-
-void QmitkRenderWindowUtilityWidget::OnSyncGroupLabelChanged(const GroupSyncIndexType index, const QString& label)
-{
-  const int row = m_SyncGroupSelector->findData(QVariant(index));
-  if (row < 0)
-  {
-    return;
-  }
-  m_SyncGroupSelector->setItemText(row, label);
+  m_SyncBarcode->SetSlots(axisSlots);
 }

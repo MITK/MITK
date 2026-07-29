@@ -321,7 +321,54 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
                 << "' ignored: " << e.GetDescription();
     }
   }
-  this->ScheduleRebuild();
+  // Notify the per-cell furniture (barcodes, frame colors) of the link change;
+  // this also drives the editor's own coalesced rebuild via SyncLinksChanged.
+  m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::ApplySelectionToGroup(const std::string& group, bool enabled)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+
+  for (const auto& windowId : this->GroupMembers(group))
+  {
+    try
+    {
+      if (enabled)
+      {
+        m_MultiWidget->SetCellSelectionGroup(windowId, group);
+      }
+      else
+      {
+        m_MultiWidget->ClearCellSelectionGroup(windowId);
+      }
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Layout editor: selection change for '" << windowId.toStdString()
+                << "' ignored: " << e.GetDescription();
+    }
+  }
+  m_MultiWidget->RefreshSyncControls();
+}
+
+bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group) const
+{
+  if (m_MultiWidget.isNull())
+  {
+    return false;
+  }
+  for (const auto& windowId : this->GroupMembers(group))
+  {
+    if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
@@ -346,6 +393,12 @@ void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
       {
         m_MultiWidget->SetSyncLink(windowId, dimension, group);
       }
+      // Selection is an axis too: a cell joining a group that already shares
+      // data selection joins that selection group as well.
+      if (this->GroupSelectionEnabled(group))
+      {
+        m_MultiWidget->SetCellSelectionGroup(windowId, group);
+      }
     }
     else
     {
@@ -357,6 +410,10 @@ void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
           m_MultiWidget->ClearSyncLink(windowId, dimension);
         }
       }
+      if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
+      {
+        m_MultiWidget->ClearCellSelectionGroup(windowId);
+      }
     }
   }
   catch (const mitk::Exception& e)
@@ -364,7 +421,7 @@ void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
     MITK_WARN << "Layout editor: membership change for '" << windowId.toStdString()
               << "' ignored: " << e.GetDescription();
   }
-  this->ScheduleRebuild();
+  m_MultiWidget->RefreshSyncControls();
 }
 
 void QmitkMxNLayoutEditorWidget::LinkNavigationBundle(const std::string& group)
@@ -389,7 +446,7 @@ void QmitkMxNLayoutEditorWidget::LinkNavigationBundle(const std::string& group)
       }
     }
   }
-  this->ScheduleRebuild();
+  m_MultiWidget->RefreshSyncControls();
 }
 
 void QmitkMxNLayoutEditorWidget::ReconvergeGroup(const std::string& group)
@@ -613,6 +670,16 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
     });
     dimensionRow->addWidget(box);
   }
+  // Data selection is one axis among the others (a distinct engine under the
+  // hood, single-valued per cell): managed here uniformly, not via a separate
+  // per-cell control.
+  auto* selectionBox = new QCheckBox(tr("Data"), card);
+  selectionBox->setChecked(this->GroupSelectionEnabled(groupId));
+  connect(selectionBox, &QCheckBox::toggled, this, [this, groupId](bool checked)
+  {
+    this->ApplySelectionToGroup(groupId, checked);
+  });
+  dimensionRow->addWidget(selectionBox);
   dimensionRow->addStretch();
   cardLayout->addLayout(dimensionRow);
 

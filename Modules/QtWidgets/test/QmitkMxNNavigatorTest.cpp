@@ -32,6 +32,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QFile>
+
 #include <cmath>
 #include <memory>
 
@@ -48,11 +50,12 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(CrosshairEvent_PropagatesToGroupOnly);
   MITK_TEST(SliceEvent_PropagatesToGroupOnly);
   MITK_TEST(NavigatorMode_TogglesEditorWide);
-  MITK_TEST(NavigatorDepthLabel_NamesOrthogonalPlane);
+  MITK_TEST(NavigatorDepthLabel_OmitsRedundantOrientation);
   MITK_TEST(NavigatorSlice_DrivesStepperAndGroup);
   MITK_TEST(NavigatorInPlaneMove_MapsToLocalAxes);
   MITK_TEST(NavigatorVoxelIndex_SetsCrosshair);
   MITK_TEST(SyncBarcode_ReflectsMembership);
+  MITK_TEST(AxisGlyphResources_PresentAndThemeable);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -198,14 +201,16 @@ public:
     }
   }
 
-  void NavigatorDepthLabel_NamesOrthogonalPlane()
+  void NavigatorDepthLabel_OmitsRedundantOrientation()
   {
+    // The depth row is just "Slice": the orientation is already shown by the
+    // plane label, so it is not repeated here for any view direction.
     m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
-    CPPUNIT_ASSERT_EQUAL(std::string("Slice - Axial"),
+    CPPUNIT_ASSERT_EQUAL(std::string("Slice"),
       this->Overlay(0)->NavigatorDepthLabel().toStdString());
 
     m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Coronal);
-    CPPUNIT_ASSERT_EQUAL(std::string("Slice - Coronal"),
+    CPPUNIT_ASSERT_EQUAL(std::string("Slice"),
       this->Overlay(0)->NavigatorDepthLabel().toStdString());
   }
 
@@ -273,9 +278,10 @@ public:
     auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
     CPPUNIT_ASSERT(nullptr != barcode);
 
-    const auto slotColors = barcode->Slots();
-    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()),
-                         static_cast<int>(slotColors.size()));
+    const auto axisSlots = barcode->Slots();
+    // Seven per-dimension axes plus the selection axis.
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
+                         static_cast<int>(axisSlots.size()));
     for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
     {
       const auto dimension = QmitkMxNAllSyncDimensions[i];
@@ -284,7 +290,33 @@ public:
         || dimension == QmitkMxNSyncDimension::Slice || dimension == QmitkMxNSyncDimension::Crosshair;
       CPPUNIT_ASSERT_EQUAL_MESSAGE(
         "A linked dimension is a filled barcode slot in the group hue; an unsynced one is a gap",
-        inNavigationBundle, slotColors[static_cast<int>(i)].isValid());
+        inNavigationBundle, axisSlots[static_cast<int>(i)].color.isValid());
+    }
+    // Synchronize links only the navigation bundle, not data selection, so the
+    // cell stays in the default selection group and its selection slot is a gap.
+    CPPUNIT_ASSERT_MESSAGE(
+      "The selection slot is a gap while the cell is in the default selection group",
+      !axisSlots.back().color.isValid());
+  }
+
+  void AxisGlyphResources_PresentAndThemeable()
+  {
+    // Every axis glyph the barcode draws must be an embedded resource carrying
+    // the recolor placeholder, so it can be tinted to a group hue at load. The
+    // actual rasterization is a visual-acceptance concern, not asserted here.
+    const QStringList paths = {
+      QStringLiteral(":/Qmitk/mxn-axis-pan.svg"),         QStringLiteral(":/Qmitk/mxn-axis-zoom.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-slice.svg"),       QStringLiteral(":/Qmitk/mxn-axis-crosshair.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-orientation.svg"), QStringLiteral(":/Qmitk/mxn-axis-windowing.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-lut.svg"),         QStringLiteral(":/Qmitk/mxn-axis-selection.svg") };
+    for (const auto& path : paths)
+    {
+      QFile file(path);
+      CPPUNIT_ASSERT_MESSAGE(("axis glyph resource is registered: " + path).toStdString(),
+                             file.open(QIODevice::ReadOnly));
+      const QString svg = QString::fromUtf8(file.readAll());
+      CPPUNIT_ASSERT_MESSAGE(("axis glyph carries the recolor placeholder: " + path).toStdString(),
+                             svg.contains(QStringLiteral("#00ff00"), Qt::CaseInsensitive));
     }
   }
 };

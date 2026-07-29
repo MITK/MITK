@@ -70,9 +70,9 @@ set(CPP_FILES
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
   QmitkMxNCellMapWidget.cpp
+  QmitkMxNAxisGlyph.cpp
   QmitkMxNCellOverlay.cpp
   QmitkMxNLayoutEditorWidget.cpp
-  QmitkMxNLinkSeamWidget.cpp
   QmitkMxNMultiWidget.cpp
   QmitkMxNSyncBarcodeWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp

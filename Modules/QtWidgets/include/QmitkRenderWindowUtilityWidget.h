@@ -27,7 +27,6 @@ found in the LICENSE file.
 // qt
 #include <QWidget>
 #include <QHBoxLayout>
-#include <QComboBox>
 
 namespace mitk
 {
@@ -44,8 +43,9 @@ class QToolButton;
 * It offers to select the viewing direction of the window (slice scrolling
 * lives in the cell's viewport navigator, not here). In addition, it contains
 * a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
-* properties and shown nodes, as well as a synchronization-group selector to
-* share this state with other render windows.
+* properties and shown nodes; the cell's data-selection group (shared with
+* other render windows) is stored on that widget and edited from the layout
+* editor, not here.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {
@@ -64,28 +64,9 @@ public:
   using GroupSyncIndexType = int;
 
   /**
-  * \brief Select the combobox row for the given synchronization group index.
-  *
-  * \param index  The 1-based group index. Must be >= 1 and must already be
-  *               registered with this widget (i.e. 'OnSyncGroupAdded' has run
-  *               for this index, or it was added by a prior 'SetSyncGroup').
-  *
-  * \pre  index >= 1                                          (otherwise mitk::Exception)
-  * \pre  the group is present in this widget's combobox      (otherwise mitk::Exception)
-  *
-  * \throws mitk::Exception on precondition violation.
-  */
-  void SetSyncGroup(const GroupSyncIndexType index);
-
-  /**
-  * \brief Returns the currently selected group index, or '-1' when the combobox
-  *        holds no selection.
-  *
-  *   '-1' is returned only when no group has yet been registered with this
-  *   widget (the combobox is empty -- happens during initial construction
-  *   before the first 'OnSyncGroupAdded' or 'SetSyncGroup'). After at least
-  *   one group has been registered, the return value is always a valid group
-  *   index >= 1.
+  * \brief The cell's data-selection group index, read from the authoritative
+  *        node selection widget (returns -1 while the cell is unassigned).
+  *        Read by serialization (MakeWindowDescriptor) and the sync barcode.
   */
   GroupSyncIndexType GetSyncGroup() const;
 
@@ -103,16 +84,6 @@ public:
 public Q_SLOTS:
 
   /**
-  * \brief Register a group row in the selector, labeled with the group's
-  *        display name ("one vocabulary": the same label every surface
-  *        shows, never a synthesized "Group N").
-  */
-  void OnSyncGroupAdded(const GroupSyncIndexType index, const QString& label);
-
-  /** \brief Update a registered group row's label after a cosmetic rename. */
-  void OnSyncGroupLabelChanged(const GroupSyncIndexType index, const QString& label);
-
-  /**
   * \brief Mirror the editor-wide clean-view state into this cell's toggle
   *        button without re-emitting 'CleanViewToggled'.
   */
@@ -125,21 +96,15 @@ public Q_SLOTS:
   void SetNavigatorChecked(bool expanded);
 
   /**
-  * \brief Set the per-dimension sync barcode for this cell: one color per
-  *        dimension (an invalid color is an unsynced gap). Pushed by the
-  *        owning multi widget from the group registry.
+  * \brief Set the sync barcode for this cell: one slot per axis (glyph, hue,
+  *        tooltip; an invalid color is an unsynced gap). Pushed by the owning
+  *        multi widget from the group registry.
   */
-  void SetSyncBarcodeSlots(const QList<QColor>& slotColors);
+  void SetSyncBarcodeSlots(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots);
 
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
-  void SyncGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, GroupSyncIndexType index);
-  /**
-  * \brief Emitted when the user requests a new synchronization group via the '+' button.
-  *        The owning multi widget allocates a free index and assigns this cell to it.
-  */
-  void CreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
   /**
@@ -168,17 +133,10 @@ protected:
   /** \brief Paints the translucent rounded backing behind the controls. */
   void paintEvent(QPaintEvent* event) override;
 
-private Q_SLOTS:
-
-  void OnSyncGroupSelectionChanged(int index);
-  void OnNodeSelectionWidgetSyncGroupChanged(int index);
-
 private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
-  QComboBox* m_SyncGroupSelector;
-  QToolButton* m_NewSyncGroupButton;
   QToolButton* m_CleanViewButton;
   QToolButton* m_NavigatorToggleButton;
   QmitkMxNSyncBarcodeWidget* m_SyncBarcode;

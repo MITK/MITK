@@ -41,9 +41,10 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkMxNCellOverlayTestSuite);
   MITK_TEST(CellIdAnnotation_IsBlank);
   MITK_TEST(PlaneLabel_TracksViewDirection);
-  MITK_TEST(GroupDot_NoneWhenUnlinked);
-  MITK_TEST(GroupDot_MonoWhenSingleGroup);
-  MITK_TEST(GroupDot_ComplexAcrossGroups);
+  MITK_TEST(FrameIdentity_NoneWhenUnlinked);
+  MITK_TEST(FrameIdentity_MonoWhenSingleGroup);
+  MITK_TEST(FrameIdentity_ComplexAcrossGroups);
+  MITK_TEST(FrameIdentity_IgnoresSelectionGroup);
   MITK_TEST(PaintPath_DoesNotCrash);
   CPPUNIT_TEST_SUITE_END();
 
@@ -128,29 +129,46 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("Sagittal"), overlay->PlaneLabel().toStdString());
   }
 
-  void GroupDot_NoneWhenUnlinked()
+  void FrameIdentity_NoneWhenUnlinked()
   {
-    CPPUNIT_ASSERT_MESSAGE("An unsynchronized cell shows no group dot",
-      QmitkMxNCellOverlay::GroupDotKind::None == this->Overlay(0)->GroupDot());
+    CPPUNIT_ASSERT_MESSAGE("An unsynchronized cell has no frame group identity",
+      QmitkMxNMultiWidget::CellGroupIdentityKind::None
+        == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
   }
 
-  void GroupDot_MonoWhenSingleGroup()
+  void FrameIdentity_MonoWhenSingleGroup()
   {
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
 
-    CPPUNIT_ASSERT_MESSAGE("A cell whose synchronized dimensions all name one group is mono",
-      QmitkMxNCellOverlay::GroupDotKind::Mono == this->Overlay(0)->GroupDot());
+    const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("A cell whose linked dimensions all name one group is mono",
+      QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT_MESSAGE("A mono cell carries the group hue", identity.hue.isValid());
   }
 
-  void GroupDot_ComplexAcrossGroups()
+  void FrameIdentity_ComplexAcrossGroups()
   {
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "detail");
 
     CPPUNIT_ASSERT_MESSAGE("A cell spanning more than one group is complex, not a single hue",
-      QmitkMxNCellOverlay::GroupDotKind::Complex == this->Overlay(0)->GroupDot());
+      QmitkMxNMultiWidget::CellGroupIdentityKind::Complex
+        == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
+  }
+
+  void FrameIdentity_IgnoresSelectionGroup()
+  {
+    // A deliberate, non-default data-selection group but no navigation/intensity
+    // link: the frame stays neutral. Selection is excluded from the frame
+    // (every cell carries a default selection group, so including it would blank
+    // the frame the moment a real group forms); it is legible in the barcode.
+    m_Editor->SetCellSelectionGroup(CellId(0), "sel");
+
+    CPPUNIT_ASSERT_MESSAGE("Selection membership must not drive the frame identity",
+      QmitkMxNMultiWidget::CellGroupIdentityKind::None
+        == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
   }
 
   void PaintPath_DoesNotCrash()

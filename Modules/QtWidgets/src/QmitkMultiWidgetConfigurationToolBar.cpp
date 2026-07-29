@@ -32,40 +32,14 @@ QmitkMultiWidgetConfigurationToolBar::~QmitkMultiWidgetConfigurationToolBar()
 
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
-  QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Open the layout editor"), this);
-  connect(setLayoutAction, &QAction::triggered,
-          this, &QmitkMultiWidgetConfigurationToolBar::LayoutEditorRequested);
-  QToolBar::addAction(setLayoutAction);
-
-  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwDesynchronized.png"), tr("Synchronize render windows"), this);
-  m_SynchronizeAction->setCheckable(true);
-  m_SynchronizeAction->setChecked(false);
-  connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
-  QToolBar::addAction(m_SynchronizeAction);
-
+  // Opening the layout editor and managing synchronization moved to the per-cell
+  // sync barcode and the layout editor view, so those buttons are gone; only the
+  // interaction-scheme switch remains here.
   m_InteractionSchemeChangeAction = new QAction(QIcon(":/Qmitk/mwMITK.png"), tr("Change to PACS interaction"), this);
   m_InteractionSchemeChangeAction->setCheckable(true);
   m_InteractionSchemeChangeAction->setChecked(false);
   connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(m_InteractionSchemeChangeAction);
-}
-
-void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
-{
-  bool synchronized = m_SynchronizeAction->isChecked();
-  if (synchronized)
-  {
-    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/mwSynchronized.png"));
-    m_SynchronizeAction->setText(tr("Desynchronize render windows"));
-  }
-  else
-  {
-    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/mwDesynchronized.png"));
-    m_SynchronizeAction->setText(tr("Synchronize render windows"));
-  }
-
-  m_SynchronizeAction->setChecked(synchronized);
-  emit Synchronized(synchronized);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged()

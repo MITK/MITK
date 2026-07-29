@@ -106,14 +106,6 @@ class MITKQTWIDGETS_EXPORT QmitkMxNCellOverlay : public QmitkOverlayWidget
 
 public:
 
-  /** \brief Classification of the cell's group-identity dot. */
-  enum class GroupDotKind
-  {
-    None,     // the cell is not synchronized on any dimension
-    Mono,     // every synchronized dimension names the same group
-    Complex   // synchronized dimensions span more than one group
-  };
-
   /**
    * \brief Attach the overlay to a cell.
    *
@@ -179,13 +171,6 @@ public:
    */
   QString PlaneLabel() const;
 
-  /**
-   * \brief The classification of the group-identity dot for the cell's
-   *        current per-dimension synchronization. Exposed for headless
-   *        verification of the mono/complex rule.
-   */
-  GroupDotKind GroupDot() const;
-
   qreal RevealProgress() const;
   void SetRevealProgress(qreal progress);
 
@@ -200,6 +185,9 @@ protected:
    *         parent-resize tracking. */
   bool eventFilter(QObject* watched, QEvent* event) override;
 
+  /** \brief Clears the hovered element when the pointer leaves the furniture. */
+  void leaveEvent(QEvent* event) override;
+
 private:
 
   enum class DragMode
@@ -210,12 +198,25 @@ private:
     LowerBound   // ribbon bottom end: move the lower window bound
   };
 
-  struct GroupDotInfo
+  /**
+   * \brief The interactive element under the pointer, if any. Reveal is driven
+   *        by proximity (the frame eases in when the pointer nears the
+   *        furniture), but an element only *highlights* - turns opaque and
+   *        offers interaction - while the pointer is actually over it, so the
+   *        cue never lands on an element the pointer is merely near.
+   */
+  enum class HoverTarget
   {
-    GroupDotKind kind = GroupDotKind::None;
-    QColor hue;                 // set for a mono-group cell
-    std::vector<QColor> hues;   // the distinct group hues of a complex cell
+    None,
+    Ribbon,
+    Colormap,
+    WindowLevel,
+    PlaneLabel,
+    Coordinate
   };
+
+  /** \brief The interactive element currently under the pointer. */
+  HoverTarget HoverAt(const QPoint& pos) const;
 
   /** \brief The render window's rect in cell (== overlay) coordinates. */
   QRect RenderWindowRect() const;
@@ -239,9 +240,6 @@ private:
 
   /** \brief Hot region along the cell's top edge revealing the toolbar. */
   QRect TopStripRect() const;
-
-  /** \brief The cell's per-dimension group membership reduced to the dot rule. */
-  GroupDotInfo ResolveGroupDot() const;
 
   /** \brief The plane label for the cell's current view direction, resolved
    *         live from the renderer (empty for a view with no fixed anatomical
@@ -390,6 +388,9 @@ private:
   DragMode m_DragMode = DragMode::None;
   QPoint m_LastDragPosition;
   double m_DragScale = 1.0;
+
+  HoverTarget m_Hover = HoverTarget::None;
+  int m_HoverNavRow = -1;   // navigator slider row under the pointer, or -1
 
   unsigned int m_SlicePosition = 0;
   unsigned int m_SliceSteps = 0;

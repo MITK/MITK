@@ -66,10 +66,11 @@ namespace
   constexpr int ActiveRibbonWidth = 14;
   constexpr int RibbonEndHandleHeight = 16;
   constexpr int ReadoutMargin = 5;        // tight edge padding to spare canvas
-  constexpr int HueDotDiameter = 8;
   constexpr int ChipSize = 14;
   constexpr int EdgeStripThickness = 20;
-  constexpr int EdgeActivationDistance = 19;
+  constexpr int EdgeActivationDistance = 16;    // top-strip reveal floor: a tighter approach than the furniture
+  constexpr int FurnitureActivationFloor = 48;  // fixed reveal floor for the painted furniture (small cells)
+  constexpr double CanvasReactiveFraction = 0.10;  // reveal within x% of the render extent -> inner (100-2x)% stays silent
   constexpr int TopStripHeight = 4;
   constexpr int SliceTickHeight = 8;
   constexpr int LineGap = 1;              // between the two bottom-left lines
@@ -89,6 +90,14 @@ namespace
 
   const QColor IdleText(255, 255, 255, 140);    // 55 % white
   const QColor ActiveText(255, 255, 255, 216);  // 85 % white
+
+  /** \brief Reveal margin for a furniture edge: a fraction of the render
+   *         extent perpendicular to that edge (so it scales with the canvas),
+   *         never below a fixed floor for small cells. */
+  int ReactiveDistance(int renderExtentPx, int floorPx)
+  {
+    return std::max(floorPx, qRound(CanvasReactiveFraction * renderExtentPx));
+  }
 
   /** \brief The one peripheral-readout font: a single size + tabular numerals
    *         for every readout (plane, slice, W/L, colorbar ticks, navigator),
@@ -162,16 +171,30 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
   // state alive while the pointer rests on the furniture itself.
   proximity->AddEventSource(this);
 
-  m_RibbonRegion = proximity->RegisterRegion([this]() { return this->RibbonRect(); });
-  m_WindowLevelRegion = proximity->RegisterRegion([this]() { return this->WindowLevelRect(); });
+  // Each furniture edge reveals within a margin that scales with the render
+  // window - a fraction of the extent perpendicular to that edge - so the inner
+  // region of the canvas stays silent at any cell size. The right-edge colorbar
+  // scales with the width; the bottom furniture and the top strip with the
+  // height.
+  m_RibbonRegion = proximity->RegisterRegion(
+    [this]() { return this->RibbonRect(); },
+    [this]() { return ReactiveDistance(this->RenderWindowRect().width(), FurnitureActivationFloor); });
+  m_WindowLevelRegion = proximity->RegisterRegion(
+    [this]() { return this->WindowLevelRect(); },
+    [this]() { return ReactiveDistance(this->RenderWindowRect().height(), FurnitureActivationFloor); });
   // The plane label is a control (click to reorient); it highlights and takes
   // input when the pointer is near it, like the W/L readout.
-  m_PlaneLabelRegion = proximity->RegisterRegion([this]() { return this->PlaneLabelRect(); });
+  m_PlaneLabelRegion = proximity->RegisterRegion(
+    [this]() { return this->PlaneLabelRect(); },
+    [this]() { return ReactiveDistance(this->RenderWindowRect().height(), FurnitureActivationFloor); });
   // The bottom region is the navigator band (the painted sliders); it goes
   // Active as the pointer approaches, enabling the drag and sharpening it.
-  m_BottomRegion = proximity->RegisterRegion([this]() { return this->NavigatorBandRect(); });
-  m_TopRegion = proximity->RegisterRegion([this]() { return this->TopStripRect(); },
-                                          EdgeActivationDistance);
+  m_BottomRegion = proximity->RegisterRegion(
+    [this]() { return this->NavigatorBandRect(); },
+    [this]() { return ReactiveDistance(this->RenderWindowRect().height(), FurnitureActivationFloor); });
+  m_TopRegion = proximity->RegisterRegion(
+    [this]() { return this->TopStripRect(); },
+    [this]() { return ReactiveDistance(this->RenderWindowRect().height(), EdgeActivationDistance); });
   connect(proximity, &QmitkRenderWindowProximity::StateChanged,
           this, &QmitkMxNCellOverlay::OnProximityStateChanged);
 
@@ -269,9 +292,7 @@ QRect QmitkMxNCellOverlay::SliceReadoutRect() const
     return QRect();
   }
 
-  const bool hasSlice = m_SliceSteps > 0;
-  const bool hasDot = this->ResolveGroupDot().kind != GroupDotKind::None;
-  if (!hasSlice && !hasDot)
+  if (m_SliceSteps == 0)
   {
     return QRect();
   }
@@ -279,15 +300,11 @@ QRect QmitkMxNCellOverlay::SliceReadoutRect() const
   const QFontMetrics metrics(ReadoutFont(this->font()));
   const int lineHeight = metrics.height() + 4;
 
-  int width = HueDotDiameter + ReadoutMargin / 2;
-  if (hasSlice)
+  int width = metrics.horizontalAdvance(QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
+  if (m_TimeSteps > 1)
   {
-    width += metrics.horizontalAdvance(QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
-    if (m_TimeSteps > 1)
-    {
-      width += ReadoutMargin + lineHeight
-        + metrics.horizontalAdvance(QStringLiteral(" %1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps));
-    }
+    width += ReadoutMargin + lineHeight
+      + metrics.horizontalAdvance(QStringLiteral(" %1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps));
   }
 
   return QRect(area.left() + ReadoutMargin, area.bottom() - ReadoutMargin - lineHeight, width, lineHeight);
@@ -349,58 +366,6 @@ QRect QmitkMxNCellOverlay::ColormapChipRect() const
 QRect QmitkMxNCellOverlay::TopStripRect() const
 {
   return QRect(0, 0, this->width(), EdgeStripThickness);
-}
-
-QmitkMxNCellOverlay::GroupDotInfo QmitkMxNCellOverlay::ResolveGroupDot() const
-{
-  GroupDotInfo info;
-
-  const auto windowId = m_Cell->GetWidgetName();
-  std::vector<std::string> distinctGroups;  // in dimension order, de-duplicated
-  for (const auto dimension : QmitkMxNAllSyncDimensions)
-  {
-    const auto link = m_Editor->GetSyncLink(windowId, dimension);
-    if (!link.has_value())
-    {
-      continue;
-    }
-    if (std::find(distinctGroups.begin(), distinctGroups.end(), link->group) == distinctGroups.end())
-    {
-      distinctGroups.push_back(link->group);
-    }
-  }
-
-  if (distinctGroups.empty())
-  {
-    return info;
-  }
-
-  // One hue only when every synchronized dimension names the same group; a
-  // heterogeneous cell gets a distinct complex marker instead of a single hue
-  // that would misrepresent it. Group colors can throw for a group not yet
-  // registered during a mid-layout-change; such a dot is simply dropped.
-  try
-  {
-    if (distinctGroups.size() == 1)
-    {
-      info.hue = m_Editor->GetSyncGroupColor(distinctGroups.front());
-      info.kind = GroupDotKind::Mono;
-    }
-    else
-    {
-      for (const auto& group : distinctGroups)
-      {
-        info.hues.push_back(m_Editor->GetSyncGroupColor(group));
-      }
-      info.kind = GroupDotKind::Complex;
-    }
-  }
-  catch (const mitk::Exception&)
-  {
-    return GroupDotInfo();
-  }
-
-  return info;
 }
 
 bool QmitkMxNCellOverlay::IsPassiveVisible(bool honorReadoutPreference) const
@@ -539,11 +504,6 @@ QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
   return QString();
 }
 
-QmitkMxNCellOverlay::GroupDotKind QmitkMxNCellOverlay::GroupDot() const
-{
-  return this->ResolveGroupDot().kind;
-}
-
 void QmitkMxNCellOverlay::SetNavigatorExpanded(bool expanded)
 {
   if (expanded == m_NavigatorExpanded)
@@ -569,13 +529,8 @@ mitk::Point3D QmitkMxNCellOverlay::CrosshairWorld() const
 
 QString QmitkMxNCellOverlay::NavigatorDepthLabel() const
 {
-  const QString plane = this->ResolvePlaneLabel();
-  // Name the plane on the depth row for an orthogonal view; a tilted view has
-  // no fixed anatomical name, so the generic label is used.
-  if (!plane.isEmpty())
-  {
-    return QStringLiteral("Slice - %1").arg(plane);
-  }
+  // Just "Slice": the orientation is already shown by the bottom-left plane
+  // label, so naming it again on the depth row would be redundant.
   return QStringLiteral("Slice");
 }
 
@@ -850,6 +805,8 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
   {
     this->clearMask();
     this->setTransparentForMouseEvents(true);
+    m_Hover = HoverTarget::None;
+    m_HoverNavRow = -1;
     return;
   }
 
@@ -895,8 +852,23 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
     {
       mask += band;
     }
+    // The expanded coordinate line takes input (hover highlight + click to edit)
+    // and may sit outside the band, so add it explicitly.
+    const QRect coord = this->CoordinateLineRect();
+    if (coord.isValid())
+    {
+      mask += coord;
+    }
   }
   mask += QRect(0, 0, this->width(), TopStripHeight);
+
+  // The active-cell corner brackets sit at the frame corners; keep those small
+  // squares in the mask so the brackets are not clipped while revealed.
+  const int corner = 12;
+  mask += QRect(area.left(), area.top(), corner, corner);
+  mask += QRect(area.right() - corner + 1, area.top(), corner, corner);
+  mask += QRect(area.left(), area.bottom() - corner + 1, corner, corner);
+  mask += QRect(area.right() - corner + 1, area.bottom() - corner + 1, corner, corner);
 
   this->setMask(mask);
   this->setTransparentForMouseEvents(false);
@@ -920,8 +892,27 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
 
   QPainter painter(this);
   const QFont readoutFont = ReadoutFont(this->font());
-  const bool intensityActive =
-    m_RibbonState == State::Active || m_WindowLevelState == State::Active || m_DragMode != DragMode::None;
+
+  // Active-cell mark: white corner brackets over the group-hue border (the
+  // editor keeps the border in the group's color), so an active grouped cell
+  // shows both its group and its focus. Always on for the active cell; not
+  // gated by the reveal.
+  if (nullptr != m_Editor && m_Editor->GetActiveRenderWindowWidget().get() == m_Cell)
+  {
+    painter.save();
+    painter.setPen(QPen(QColor(0xFF, 0xFF, 0xFF), 2));
+    const QRect r = area.adjusted(1, 1, -2, -2);
+    const int arm = 10;
+    painter.drawLine(r.left(), r.top(), r.left() + arm, r.top());
+    painter.drawLine(r.left(), r.top(), r.left(), r.top() + arm);
+    painter.drawLine(r.right(), r.top(), r.right() - arm, r.top());
+    painter.drawLine(r.right(), r.top(), r.right(), r.top() + arm);
+    painter.drawLine(r.left(), r.bottom(), r.left() + arm, r.bottom());
+    painter.drawLine(r.left(), r.bottom(), r.left(), r.bottom() - arm);
+    painter.drawLine(r.right(), r.bottom(), r.right() - arm, r.bottom());
+    painter.drawLine(r.right(), r.bottom(), r.right(), r.bottom() - arm);
+    painter.restore();
+  }
 
   // ---- Right edge: the colorbar, widening and insetting with the reveal ----
   // At rest a thin full-height strip; on reveal it widens and pulls in top and
@@ -957,7 +948,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
       const QFontMetrics metrics(readoutFont);
       const QColor tickColor = Faded(ActiveText, m_RevealProgress);
       const QColor labelColor =
-        Faded(m_RibbonState == State::Active ? ActiveText : IdleText, m_RevealProgress);
+        Faded(m_Hover == HoverTarget::Ribbon ? ActiveText : IdleText, m_RevealProgress);
 
       const int divisions = std::clamp(ribbon.height() / 44, 2, 6);
       for (int i = 0; i <= divisions; ++i)
@@ -1012,14 +1003,15 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     {
       painter.fillRect(chip, QColor(255, 255, 255, 40));
     }
-    painter.setPen(QPen(intensityActive ? ActiveText : IdleText, 1));
+    painter.setPen(QPen(m_Hover == HoverTarget::Colormap ? ActiveText : IdleText, 1));
     painter.setBrush(Qt::NoBrush);
     painter.drawRect(chip.adjusted(0, 0, -1, -1));
     painter.setOpacity(1.0);
   }
 
-  // Drag end-handles: contrasting notches at the window bounds while active.
-  if (intensityActive && m_HasLevelWindow)
+  // Drag end-handles: contrasting notches at the window bounds, shown while the
+  // pointer is over the colorbar or a windowing drag is in progress.
+  if ((m_Hover == HoverTarget::Ribbon || m_DragMode != DragMode::None) && m_HasLevelWindow)
   {
     painter.fillRect(QRect(ribbon.left(), ribbon.top(), ribbon.width(), 2), ActiveText);
     painter.fillRect(QRect(ribbon.left(), ribbon.bottom() - 1, ribbon.width(), 2), ActiveText);
@@ -1029,7 +1021,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
   if (m_HasLevelWindow && this->IsPassiveVisible(true))
   {
     painter.setFont(readoutFont);
-    painter.setPen(m_WindowLevelState == State::Active ? ActiveText : IdleText);
+    painter.setPen(m_Hover == HoverTarget::WindowLevel ? ActiveText : IdleText);
     painter.drawText(this->WindowLevelRect(), Qt::AlignRight | Qt::AlignVCenter,
                      QStringLiteral("W %1 L %2").arg(FormatValue(m_LevelWindow.GetWindow()),
                                                      FormatValue(m_LevelWindow.GetLevel())));
@@ -1043,7 +1035,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     {
       // Highlights opaque on hover to advertise it is clickable (reorient).
       painter.setFont(readoutFont);
-      painter.setPen(m_PlaneLabelState == State::Active ? ActiveText : IdleText);
+      painter.setPen(m_Hover == HoverTarget::PlaneLabel ? ActiveText : IdleText);
       painter.drawText(this->PlaneLabelRect(), Qt::AlignLeft | Qt::AlignVCenter, planeLabel);
     }
 
@@ -1052,40 +1044,6 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     {
       const QFontMetrics metrics(readoutFont);
       int x = line2.left();
-
-      // Leading group-identity dot: solid hue (mono) or a segmented marker
-      // (complex) - the barcode, seams, and editor carry the per-dimension
-      // detail a single hue could not.
-      const GroupDotInfo dot = this->ResolveGroupDot();
-      if (dot.kind != GroupDotKind::None)
-      {
-        const QRect dotRect(x, line2.center().y() - HueDotDiameter / 2, HueDotDiameter, HueDotDiameter);
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setPen(Qt::NoPen);
-        if (dot.kind == GroupDotKind::Mono)
-        {
-          painter.setBrush(dot.hue);
-          painter.drawEllipse(dotRect);
-        }
-        else
-        {
-          // Vertical hue bands in a rounded square: distinct in shape from the
-          // round mono dot, and showing that more than one group is in play.
-          const int bands = static_cast<int>(dot.hues.size());
-          for (int i = 0; i < bands; ++i)
-          {
-            painter.setBrush(dot.hues[static_cast<std::size_t>(i)]);
-            const int left = dotRect.left() + i * dotRect.width() / bands;
-            const int right = dotRect.left() + (i + 1) * dotRect.width() / bands;
-            painter.drawRect(QRect(left, dotRect.top(), right - left, dotRect.height()));
-          }
-          painter.setBrush(Qt::NoBrush);
-          painter.setPen(QPen(IdleText, 1));
-          painter.drawRect(dotRect.adjusted(0, 0, -1, -1));
-        }
-        painter.setRenderHint(QPainter::Antialiasing, false);
-        x = dotRect.right() + ReadoutMargin / 2;
-      }
 
       painter.setFont(readoutFont);
       painter.setPen(IdleText);
@@ -1149,45 +1107,57 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     const auto rows = this->NavigatorRows();
     if (!rows.empty())
     {
-      const bool navActive = m_BottomState == State::Active || m_NavDragRow >= 0;
-      const double navAlpha = m_RevealProgress * (navActive ? 1.0 : 0.55);
+      // The navigator reveals faint with the frame; an individual slider row
+      // brightens and thickens only while the pointer is on it (or it is being
+      // dragged), signalling it is the interactive one.
+      const double baseAlpha = m_RevealProgress * 0.55;
 
       painter.save();
       painter.translate(0, qRound((1.0 - m_RevealProgress) * RevealSlideOffset));
       const QFont labelFont = ReadoutFont(this->font());
       const QFontMetrics labelMetrics(labelFont);
 
-      for (const auto& row : rows)
+      for (int i = 0; i < static_cast<int>(rows.size()); ++i)
       {
+        const auto& row = rows[static_cast<std::size_t>(i)];
         const int centerY = row.track.center().y();
+        const bool rowHot = (i == m_HoverNavRow) || (i == m_NavDragRow);
+        const double rowAlpha = rowHot ? m_RevealProgress : baseAlpha;
 
+        // The row label matches the other readouts' idle/hover tokens (not the
+        // fainter track), fading in only with the reveal; hover lifts it to the
+        // active color like the slice / plane / W-L labels.
         painter.setFont(labelFont);
-        painter.setPen(Faded(IdleText, navAlpha));
+        painter.setPen(Faded(rowHot ? ActiveText : IdleText, m_RevealProgress));
         painter.drawText(QRect(row.track.left() - NavLabelWidth - NavRowGap, row.track.top(),
                                NavLabelWidth, row.track.height()),
                          Qt::AlignLeft | Qt::AlignVCenter,
                          labelMetrics.elidedText(row.label, Qt::ElideRight, NavLabelWidth));
 
-        const int thickness = navActive ? NavTrackThickness + 1 : NavTrackThickness;
+        const int thickness = rowHot ? NavTrackThickness + 1 : NavTrackThickness;
         painter.fillRect(
           QRect(row.track.left(), centerY - thickness / 2, row.track.width(), thickness),
-          Faded(IdleText, navAlpha));
+          Faded(IdleText, rowAlpha));
 
         const int knobX = row.track.left() + qRound(row.normalized * row.track.width());
+        const int knobRadius = rowHot ? NavKnobRadius + 1 : NavKnobRadius;
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setPen(Qt::NoPen);
-        painter.setBrush(Faded(ActiveText, navAlpha));
-        painter.drawEllipse(QPoint(knobX, centerY), NavKnobRadius, NavKnobRadius);
+        painter.setBrush(Faded(ActiveText, rowHot ? m_RevealProgress : baseAlpha));
+        painter.drawEllipse(QPoint(knobX, centerY), knobRadius, knobRadius);
         painter.setRenderHint(QPainter::Antialiasing, false);
       }
 
       // Coordinate line (expanded): the crosshair world position, click to edit.
+      // Faint by default; opaque only while the pointer is over it, so it reads
+      // as interactive rather than permanently highlighted.
       const QRect coord = this->CoordinateLineRect();
       if (coord.isValid())
       {
+        const bool coordHot = (m_Hover == HoverTarget::Coordinate);
         const mitk::Point3D world = this->CrosshairWorld();
         painter.setFont(labelFont);
-        painter.setPen(Faded(navActive ? ActiveText : IdleText, navAlpha));
+        painter.setPen(Faded(coordHot ? ActiveText : IdleText, m_RevealProgress));
         painter.drawText(coord, Qt::AlignLeft | Qt::AlignVCenter,
                          QStringLiteral("x %1  y %2  z %3 mm").arg(FormatValue(world[0]),
                                                                    FormatValue(world[1]),
@@ -1282,6 +1252,44 @@ void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
   event->ignore();
 }
 
+QmitkMxNCellOverlay::HoverTarget QmitkMxNCellOverlay::HoverAt(const QPoint& pos) const
+{
+  // Specific / small targets first; the colorbar is the largest and last, so a
+  // chip or readout sitting near it wins the hit test.
+  if (this->ColormapChipRect().contains(pos))
+  {
+    return HoverTarget::Colormap;
+  }
+  if (m_HasLevelWindow && this->WindowLevelRect().contains(pos))
+  {
+    return HoverTarget::WindowLevel;
+  }
+  if (this->PlaneLabelRect().contains(pos))
+  {
+    return HoverTarget::PlaneLabel;
+  }
+  if (this->CoordinateLineRect().contains(pos))
+  {
+    return HoverTarget::Coordinate;
+  }
+  if (this->RibbonRect().contains(pos))
+  {
+    return HoverTarget::Ribbon;
+  }
+  return HoverTarget::None;
+}
+
+void QmitkMxNCellOverlay::leaveEvent(QEvent* event)
+{
+  if (m_Hover != HoverTarget::None || m_HoverNavRow != -1)
+  {
+    m_Hover = HoverTarget::None;
+    m_HoverNavRow = -1;
+    this->update();
+  }
+  QmitkOverlayWidget::leaveEvent(event);
+}
+
 void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
 {
   if (m_NavDragRow >= 0)
@@ -1300,27 +1308,38 @@ void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
 
   if (m_DragMode == DragMode::None)
   {
-    const QRect ribbon = this->RibbonRect();
-    if (ribbon.contains(event->pos()))
+    // Highlight only what the pointer is actually over (not merely near),
+    // decoupling per-element highlight from the proximity-driven reveal - for
+    // the intensity/plane readouts (m_Hover) and the navigator slider rows.
+    const HoverTarget hover = this->HoverAt(event->pos());
+    int navRow = -1;
+    const auto rows = this->NavigatorRows();
+    for (int i = 0; i < static_cast<int>(rows.size()); ++i)
+    {
+      if (rows[static_cast<std::size_t>(i)].track.contains(event->pos()))
+      {
+        navRow = i;
+        break;
+      }
+    }
+    if (hover != m_Hover || navRow != m_HoverNavRow)
+    {
+      m_Hover = hover;
+      m_HoverNavRow = navRow;
+      this->update();
+    }
+
+    if (this->RibbonRect().contains(event->pos()))
     {
       this->setCursor(Qt::SizeVerCursor);
     }
-    else if (this->CoordinateLineRect().contains(event->pos()))
+    else if (m_Hover == HoverTarget::Coordinate || navRow >= 0)
     {
       this->setCursor(Qt::PointingHandCursor);
     }
     else
     {
-      bool onRow = false;
-      for (const auto& row : this->NavigatorRows())
-      {
-        if (row.track.contains(event->pos()))
-        {
-          onRow = true;
-          break;
-        }
-      }
-      this->setCursor(onRow ? Qt::PointingHandCursor : Qt::ArrowCursor);
+      this->setCursor(Qt::ArrowCursor);
     }
     event->ignore();
     return;

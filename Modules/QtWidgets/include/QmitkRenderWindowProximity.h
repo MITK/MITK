@@ -80,7 +80,7 @@ public:
 
   static constexpr int RevealDurationMs = 140;
   static constexpr int CollapseDelayMs = 300;
-  static constexpr int ActivationDistance = 58;
+  static constexpr int ActivationDistance = 48;
   static constexpr int HysteresisBand = 16;
 
   /**
@@ -124,10 +124,11 @@ public:
    *                            Hint while the pointer is in the cell.
    *                            Must not be null.
    * \param activationDistance  Pointer-to-rectangle distance (px) below
-   *                            which the region goes Active. Surfaces with
-   *                            a tighter reveal (e.g. seams between cells)
-   *                            pass a smaller value; timing and hysteresis
-   *                            stay uniform. Must be positive.
+   *                            which the region goes Active. An edge strip
+   *                            that should reveal on a tighter approach (e.g.
+   *                            the top utility strip) passes a smaller value;
+   *                            timing and hysteresis stay uniform. Must be
+   *                            positive.
    *
    * \return  Id used in the StateChanged signal and the query/unregister
    *          calls. The region starts in the state matching the current
@@ -138,6 +139,20 @@ public:
    */
   RegionId RegisterRegion(std::function<QRect()> regionInCellCoords,
                           int activationDistance = ActivationDistance);
+
+  /**
+   * \brief Register a region whose activation distance is resolved lazily on
+   *        every evaluation, like the rectangle.
+   *
+   * Lets the distance track the cell size (e.g. a fraction of the render
+   * window extent so the reactive margin scales with the canvas) without
+   * re-registering on resize. A non-positive result is clamped to a minimal
+   * positive distance.
+   *
+   * \throws mitk::Exception if either callback is null.
+   */
+  RegionId RegisterRegion(std::function<QRect()> regionInCellCoords,
+                          std::function<int()> activationDistanceQuery);
 
   /**
    * \brief Remove a region; no further StateChanged is emitted for its id.
@@ -193,7 +208,7 @@ private:
   struct Region
   {
     std::function<QRect()> rectQuery;
-    int activationDistance = ActivationDistance;
+    std::function<int()> distanceQuery;
     State state = State::Idle;
     QTimer* collapseTimer = nullptr;
   };

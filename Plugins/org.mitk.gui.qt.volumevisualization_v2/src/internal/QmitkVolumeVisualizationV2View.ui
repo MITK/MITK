@@ -153,6 +153,7 @@
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
          <horstretch>0</horstretch>
+         <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -309,7 +310,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkTransferFunctionWidget" name="tfControlPanelsWidget" native="true"/>
+    <widget class="QmitkTransferFunctionWidget" name="tfControlPanelsWidget" native="true">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>500</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">

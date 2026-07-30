@@ -80,6 +80,9 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->presetComboBox->setEnabled(false);
   m_Controls->enableRenderingCB->setEnabled(false);
 
+  m_Controls->createTfButton->setEnabled(false);
+  m_Controls->loadTfButton->setEnabled(false);
+
   m_Controls->opacityShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->opacityHeightSlider->setOrientation(Qt::Horizontal);
   m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
@@ -468,6 +471,8 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
   m_Controls->enableRenderingCB->setEnabled(true);
   m_Controls->presetComboBox->setEnabled(volumeRenderingOn);
+  m_Controls->createTfButton->setEnabled(volumeRenderingOn);
+  m_Controls->loadTfButton->setEnabled(volumeRenderingOn);
 
   const bool tfAdjustable = volumeRenderingOn && m_AppliedTransferFunction.IsNotNull();
   m_Controls->opacityShiftSlider->setEnabled(tfAdjustable);

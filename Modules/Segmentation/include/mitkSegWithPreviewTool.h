@@ -394,7 +394,9 @@ namespace mitk
 
     LabelTransferMode m_LabelTransferMode = LabelTransferMode::MapLabel;
 
-    bool m_IsPreviewGenerated = false;
+    /** Indicates if the preview holds content that has not been transferred into the
+     * working segmentation yet. Consulted by ConfirmBeforeDeactivation().*/
+    bool m_HasUnconfirmedPreview = false;
 
     /** Opacity (0.0 - 1.0) used when rendering the preview segmentation.
      * Kept as tool state so a user-defined value survives the opacity

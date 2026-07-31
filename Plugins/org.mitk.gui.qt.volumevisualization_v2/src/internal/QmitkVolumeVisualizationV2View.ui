@@ -153,7 +153,6 @@
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
          <horstretch>0</horstretch>
-         <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -310,6 +309,72 @@
     </widget>
    </item>
    <item>
+    <widget class="ctkCollapsibleGroupBox" name="lightingGroupBox">
+     <property name="title">
+      <string>Lighting/Shading Options</string>
+     </property>
+     <property name="collapsed" stdset="0">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="shadingLayout">
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="shadeCheckBox">
+        <property name="text">
+         <string>Shading enabled</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="ambientLabel">
+        <property name="text">
+         <string>Ambient</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="diffuseLabel">
+        <property name="text">
+         <string>Diffuse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="specularLabel">
+        <property name="text">
+         <string>Specular</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="specularPowerLabel">
+        <property name="text">
+         <string>Specular power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="resetLightingButton">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QmitkTransferFunctionWidget" name="tfControlPanelsWidget" native="true">
      <property name="maximumSize">
       <size>
@@ -375,6 +440,18 @@
    <class>QmitkCombinedTransferFunctionCanvas</class>
    <extends>QWidget</extends>
    <header location="global">QmitkCombinedTransferFunctionCanvas.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header location="global">ctkCollapsibleGroupBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkSliderWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkSliderWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

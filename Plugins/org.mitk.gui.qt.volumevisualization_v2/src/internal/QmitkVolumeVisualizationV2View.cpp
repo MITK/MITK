@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <ui_QmitkVolumeVisualizationV2View.h>
 
 #include <ctkDoubleSlider.h>
+#include <ctkSliderWidget.h>
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -42,6 +43,33 @@ found in the LICENSE file.
 #include <fstream>
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
+
+namespace
+{
+  // Mirrors mitk::VolumeMapperVtkSmart3D::SetDefaultProperties, which only runs
+  // via the IOExt object factory; the view has no guarantee that it did.
+  constexpr bool DEFAULT_SHADE = true;
+  constexpr float DEFAULT_AMBIENT = 0.25f;
+  constexpr float DEFAULT_DIFFUSE = 0.50f;
+  constexpr float DEFAULT_SPECULAR = 0.40f;
+  constexpr float DEFAULT_SPECULAR_POWER = 16.0f;
+
+  void ConfigureSlider(ctkSliderWidget *slider, int decimals, double minimum, double maximum, double step)
+  {
+    slider->setDecimals(decimals);
+    slider->setRange(minimum, maximum);
+    slider->setSingleStep(step);
+  }
+
+  void LoadSliderFromNode(const mitk::DataNode *node, const char *propertyKey, float fallback, ctkSliderWidget *slider)
+  {
+    float value = fallback;
+    node->GetFloatProperty(propertyKey, value);
+
+    const QSignalBlocker blocker(slider);
+    slider->setValue(value);
+  }
+}
 
 QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View() 
 {
@@ -88,6 +116,11 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
+  ConfigureSlider(m_Controls->ambientSlider, 2, 0.0, 1.0, 0.01);
+  ConfigureSlider(m_Controls->diffuseSlider, 2, 0.0, 1.0, 0.01);
+  ConfigureSlider(m_Controls->specularSlider, 2, 0.0, 1.0, 0.01);
+  ConfigureSlider(m_Controls->specularPowerSlider, 1, 1.0, 128.0, 1.0);
+
   m_Controls->tfControlPanelsWidget->setVisible(false);
   m_Controls->cancelTfCreationButton->setVisible(false);
   m_Controls->saveUserTfButton->setVisible(false);
@@ -101,6 +134,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->presetComboBox, &QComboBox::textActivated,
     this, &QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected);
 
+  // Transfer Function Adjustments
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
     this, &QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged);
   connect(m_Controls->opacityShiftSlider, &ctkDoubleSlider::valueChanged,
@@ -114,6 +148,21 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
 
+  // Lighting Option Controls
+  connect(m_Controls->shadeCheckBox, &QCheckBox::toggled,
+    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+  connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
+    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+  connect(m_Controls->diffuseSlider, &ctkSliderWidget::valueChanged,
+    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+  connect(m_Controls->specularSlider, &ctkSliderWidget::valueChanged,
+    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+  connect(m_Controls->specularPowerSlider, &ctkSliderWidget::valueChanged,
+    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+  connect(m_Controls->resetLightingButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnResetLighting);
+
+  // Transfer Function User Creation Mode
   connect(m_Controls->createTfButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction);
   connect(m_Controls->loadTfButton, &QPushButton::clicked,
@@ -307,6 +356,72 @@ void QmitkVolumeVisualizationV2View::OnColorWindowChanged()
   m_Controls->combinedTfCanvas->update();
 }
 
+void QmitkVolumeVisualizationV2View::OnLightingChanged()
+{
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
+    return;
+
+  selectedNode->SetBoolProperty("volumerendering.shade", m_Controls->shadeCheckBox->isChecked());
+  selectedNode->SetFloatProperty("volumerendering.ambient", static_cast<float>(m_Controls->ambientSlider->value()));
+  selectedNode->SetFloatProperty("volumerendering.diffuse", static_cast<float>(m_Controls->diffuseSlider->value()));
+  selectedNode->SetFloatProperty("volumerendering.specular", static_cast<float>(m_Controls->specularSlider->value()));
+  selectedNode->SetFloatProperty("volumerendering.specular.power", static_cast<float>(m_Controls->specularPowerSlider->value()));
+
+  this->UpdateLightingControls();
+  this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationV2View::OnResetLighting()
+{
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
+    return;
+
+  selectedNode->SetBoolProperty("volumerendering.shade", DEFAULT_SHADE);
+  selectedNode->SetFloatProperty("volumerendering.ambient", DEFAULT_AMBIENT);
+  selectedNode->SetFloatProperty("volumerendering.diffuse", DEFAULT_DIFFUSE);
+  selectedNode->SetFloatProperty("volumerendering.specular", DEFAULT_SPECULAR);
+  selectedNode->SetFloatProperty("volumerendering.specular.power", DEFAULT_SPECULAR_POWER);
+
+  this->UpdateLightingControls();
+  this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationV2View::UpdateLightingControls()
+{
+  auto selectedNode = m_SelectedNode.Lock();
+
+  bool volumeRenderingOn = false;
+
+  if (selectedNode.IsNotNull())
+    selectedNode->GetBoolProperty("volumerendering", volumeRenderingOn);
+
+  m_Controls->lightingGroupBox->setEnabled(volumeRenderingOn);
+
+  if (!volumeRenderingOn)
+    return;
+
+  bool shade = DEFAULT_SHADE;
+  selectedNode->GetBoolProperty("volumerendering.shade", shade);
+
+  // Phong parameters; with shading off they do nothing.
+  m_Controls->ambientSlider->setEnabled(shade);
+  m_Controls->diffuseSlider->setEnabled(shade);
+  m_Controls->specularSlider->setEnabled(shade);
+  m_Controls->specularPowerSlider->setEnabled(shade);
+
+  const QSignalBlocker blockShade(m_Controls->shadeCheckBox);
+  m_Controls->shadeCheckBox->setChecked(shade);
+
+  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.ambient", DEFAULT_AMBIENT, m_Controls->ambientSlider);
+  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.diffuse", DEFAULT_DIFFUSE, m_Controls->diffuseSlider);
+  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.specular", DEFAULT_SPECULAR, m_Controls->specularSlider);
+  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.specular.power", DEFAULT_SPECULAR_POWER, m_Controls->specularPowerSlider);
+}
+
 void QmitkVolumeVisualizationV2View::SetTfAdvancedMode(bool active)
 {
   // Controls for the Transfer Function Creation Mode
@@ -451,6 +566,8 @@ void QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged()
 void QmitkVolumeVisualizationV2View::UpdateInterface()
 {
   auto selectedNode = m_SelectedNode.Lock();
+
+  this->UpdateLightingControls();
 
   if(selectedNode.IsNull())
   {

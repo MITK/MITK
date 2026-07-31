@@ -66,6 +66,7 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   node->AddProperty("volumerendering.diffuse", mitk::FloatProperty::New(0.50f), renderer, overwrite);
   node->AddProperty("volumerendering.specular", mitk::FloatProperty::New(0.40f), renderer, overwrite);
   node->AddProperty("volumerendering.specular.power", mitk::FloatProperty::New(16.0f), renderer, overwrite);
+  node->AddProperty("volumerendering.shade", mitk::BoolProperty::New(true), renderer, overwrite);
 
   node->AddProperty("binary", mitk::BoolProperty::New(false), renderer, overwrite);
 
@@ -170,6 +171,7 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
 
   // shading parameter
   float value = 0;
+  bool shade = true;
   if (this->GetDataNode()->GetFloatProperty("volumerendering.ambient", value, renderer))
     m_VolumeProperty->SetAmbient(value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.diffuse", value, renderer))
@@ -178,6 +180,8 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
     m_VolumeProperty->SetSpecular(value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.specular.power", value, renderer))
     m_VolumeProperty->SetSpecularPower(value);
+  if(this->GetDataNode()->GetBoolProperty("volumerendering.shade", shade, renderer))
+    m_VolumeProperty->SetShade(shade ? 1 : 0);
 }
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()

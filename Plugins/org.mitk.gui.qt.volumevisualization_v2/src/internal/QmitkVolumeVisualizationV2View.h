@@ -53,6 +53,8 @@ private Q_SLOTS:
   void OnColorWindowChanged();
   void OnResetTransferFunction();
   void OnCanvasOpacityChanged();
+  void OnLightingChanged();
+  void OnResetLighting();
   void OnCreateUserTransferFunction();
   void OnImportUserTransferFunction();
   void OnCancelTfAdvancedMode();
@@ -62,6 +64,7 @@ private:
   void CreateQtPartControl(QWidget *parent) override;
 
   void UpdateInterface();
+  void UpdateLightingControls();
 
   void ApplyCurrentTransferFunction();
 

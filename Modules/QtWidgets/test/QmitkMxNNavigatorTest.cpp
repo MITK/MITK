@@ -55,6 +55,7 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(NavigatorInPlaneMove_MapsToLocalAxes);
   MITK_TEST(NavigatorVoxelIndex_SetsCrosshair);
   MITK_TEST(SyncBarcode_ReflectsMembership);
+  MITK_TEST(SyncBarcode_LayoutWrapsToGeometry);
   MITK_TEST(AxisGlyphResources_PresentAndThemeable);
   CPPUNIT_TEST_SUITE_END();
 
@@ -292,11 +293,36 @@ public:
         "A linked dimension is a filled barcode slot in the group hue; an unsynced one is a gap",
         inNavigationBundle, axisSlots[static_cast<int>(i)].color.isValid());
     }
-    // Synchronize links only the navigation bundle, not data selection, so the
-    // cell stays in the default selection group and its selection slot is a gap.
+    // The selection slot shows the cell's selection group consistently, including
+    // the default group every cell starts in (it is a real, shared selection
+    // group, not a "no sync" placeholder).
     CPPUNIT_ASSERT_MESSAGE(
-      "The selection slot is a gap while the cell is in the default selection group",
-      !axisSlots.back().color.isValid());
+      "The selection slot shows the cell's (default) selection group",
+      axisSlots.back().color.isValid());
+  }
+
+  void SyncBarcode_LayoutWrapsToGeometry()
+  {
+    using Layout = QmitkMxNSyncBarcodeWidget::BarcodeLayout;
+    // 'slotCount', not 'slots': the latter is the Qt macro and expands to nothing.
+    const int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
+
+    // A wide, short strip (the per-cell utility row) draws a single glyph row.
+    const auto strip = QmitkMxNSyncBarcodeWidget::ComputeLayout(200, 18, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("wide short strip shows glyphs", strip.mode == Layout::Mode::Glyphs);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("wide short strip stays a single row", 1, strip.rows);
+
+    // A squarer tile (the cell map) wraps the glyphs into a grid rather than
+    // collapsing to color slots.
+    const auto tile = QmitkMxNSyncBarcodeWidget::ComputeLayout(80, 80, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("square tile shows glyphs", tile.mode == Layout::Mode::Glyphs);
+    CPPUNIT_ASSERT_MESSAGE("square tile wraps to more than one row", tile.rows > 1);
+    CPPUNIT_ASSERT_MESSAGE("the grid holds every slot", tile.columns * tile.rows >= slotCount);
+
+    // Too small for a legible glyph even when wrapped: collapse to color slots.
+    const auto tiny = QmitkMxNSyncBarcodeWidget::ComputeLayout(40, 14, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("a cramped strip collapses to the color bar",
+                           tiny.mode == Layout::Mode::ColorBar);
   }
 
   void AxisGlyphResources_PresentAndThemeable()

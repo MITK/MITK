@@ -13,6 +13,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNGeometryAuthorityTest.cpp
   QmitkMxNLayoutV2Test.cpp
   QmitkMxNLayoutV3Test.cpp
+  QmitkMxNGridOpsTest.cpp
   QmitkMxNNavLinksTest.cpp
   QmitkMxNLayoutEditorWidgetTest.cpp
   QmitkMxNCellOverlayTest.cpp

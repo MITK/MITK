@@ -22,6 +22,10 @@ found in the LICENSE file.
 #include <QStringList>
 #include <QWidget>
 
+#include <array>
+#include <functional>
+#include <map>
+
 class QmitkMxNCellMapWidget;
 class QmitkMultiWidgetLayoutSelectionWidget;
 class QStackedWidget;
@@ -105,6 +109,19 @@ public:
   void ApplySelectionToGroup(const std::string& group, bool enabled);
 
   /**
+   * \brief Handle an axis-glyph click on a group's header barcode. Three cases:
+   *        an empty group with no windows selected in the map toggles a per-group
+   *        intent cache (applied to the first windows assigned, then cleared) and
+   *        does not touch the engine; an empty group with a map selection
+   *        bootstraps - it links the selected windows on the axis; a non-empty
+   *        group homogenizes the axis over its members (link all / unlink all).
+   *        'axisIndex' indexes the eight barcode axes (the seven
+   *        QmitkMxNAllSyncDimensions, then data selection). Public so tests can
+   *        drive the axis interaction directly.
+   */
+  void ToggleGroupAxis(const std::string& groupId, int axisIndex);
+
+  /**
    * \brief Add a cell to / remove a cell from a group (see
    *        AssignCellsToGroup for the join semantics; leaving clears the
    *        cell's links to the group on every dimension).
@@ -126,6 +143,17 @@ public:
   /** \brief Create a fresh synchronization group and return its id. */
   std::string CreateGroup();
 
+  /**
+   * \brief The group-perspective barcode slots for a group's header: one per
+   *        axis (the seven dimensions then data selection). Each axis is
+   *        tri-state over the group's member cells - a solid hue when all
+   *        members link this group on that axis, a gap when none do, and the
+   *        partial (dashed) state when only some do (reachable via per-cell
+   *        edits or the advanced matrix). Distinct from the multiwidget's
+   *        per-cell, binary BuildBarcodeSlots.
+   */
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildGroupBarcodeSlots(const std::string& group) const;
+
 public Q_SLOTS:
 
   /** \brief Coalesced full refresh from the engine state. */
@@ -133,10 +161,56 @@ public Q_SLOTS:
 
 private:
 
+  /**
+   * \brief Refresh the group cards in place, or rebuild them, depending on what
+   *        changed. A card never depends on the grid arrangement, so a link or
+   *        membership change (the common case, e.g. a glyph toggle) only updates
+   *        each existing card's contents - no widget teardown, no flicker. A full
+   *        rebuild happens only when the set of groups changes: a group added or
+   *        removed, or a whole layout replaced (load / REST push).
+   */
+  void RefreshOrRebuild();
+
+  /** \brief Update every existing card's contents from the current engine state
+   *         (glyph strip, member count, name, hue) without recreating widgets. */
+  void RefreshCards();
+
+  /** \brief Enable the add/remove row and column buttons only for a rectangular
+   *         grid layout (the shape the trailing-edge grid ops can grow or shrink
+   *         in place), gating on the tree-derived ResolveGridShape rather than
+   *         the stored counts, and explain in the tooltip why they are off
+   *         otherwise. */
+  void UpdateGridButtons();
+
+  /** \brief Select the tile of the multi widget's active render window, so the
+   *         map mirrors the editor's focus. */
+  void SelectActiveWindowTile();
+
   void Rebuild();
+
+  /**
+   * \brief Reconcile the displayed cards against the current group set instead of
+   *        tearing them all down: delete cards for groups that are gone, build and
+   *        insert cards for new groups, and re-order the survivors to match - each
+   *        surviving card keeps its widget (a move, not a recreate), so adding or
+   *        removing one group does not flicker or discard the others' state. The
+   *        secondary advanced matrix is still fully rebuilt. */
+  void ReconcileGroupCards(const std::vector<std::string>& currentIds,
+                           const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos);
   QWidget* BuildGroupCard(const QmitkMxNMultiWidget::SyncGroupInfo& info);
   void RebuildMatrix(const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
                      const std::vector<QmitkMxNMultiWidget::WindowDescriptor>& descriptors);
+
+  /** \brief Apply the group's cached "on" axes to the given windows (the first
+   *         members of a previously empty group), then clear the cache entry.
+   *         Clearing before applying keeps a re-entrant engine signal from
+   *         re-flushing. */
+  void FlushEmptyGroupCache(const std::string& group, const QStringList& windowIds);
+
+  /** \brief Whether the group has a cache entry with at least one axis toggled
+   *         on, so assigning windows should apply exactly the cache rather than
+   *         SetCellMembership's nav-bundle default. */
+  bool HasCachedGroupIntent(const std::string& group) const;
 
   /** \brief All member cells of the group over every dimension, pre-order. */
   std::vector<QString> GroupMembers(const std::string& group) const;
@@ -158,6 +232,29 @@ private:
   QTableWidget* m_Matrix;
   QToolButton* m_AddGroupButton;
   QToolButton* m_AdvancedButton;
+  QToolButton* m_AddRowButton;
+  QToolButton* m_RemoveRowButton;
+  QToolButton* m_AddColumnButton;
+  QToolButton* m_RemoveColumnButton;
+
+  // In-place refresh bookkeeping: one refresher per displayed card (keyed by
+  // group id) and the group-id order currently shown, so RefreshOrRebuild can
+  // tell a content change from a group-set change.
+  std::map<std::string, std::function<void()>> m_CardRefreshers;
+  // The card widget per group id, so the incremental reconcile can move, delete,
+  // or keep individual cards (a QPointer so a card destroyed elsewhere reads back
+  // as null rather than dangling).
+  std::map<std::string, QPointer<QWidget>> m_CardsById;
+  std::vector<std::string> m_DisplayedGroupIds;
+
+  // Per-group, empty-group-only intent buffer: which of the eight axes (the
+  // seven QmitkMxNAllSyncDimensions, then data selection) the user toggled on
+  // while the group had no members. Applied to the first windows assigned, then
+  // erased. Editor-held (not card-bound) so the const BuildGroupBarcodeSlots can
+  // render from it and it survives the card reconcile; cleared on a whole-layout
+  // reload / SetMultiWidget swap and when the group leaves the set.
+  using AxisIntent = std::array<bool, QmitkMxNAllSyncDimensions.size() + 1>;
+  std::map<std::string, AxisIntent> m_EmptyGroupAxisCache;
 
   bool m_RebuildPending = false;
 

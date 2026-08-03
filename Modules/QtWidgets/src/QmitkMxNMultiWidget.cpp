@@ -988,6 +988,313 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   return renderWindowWidget;
 }
 
+namespace
+{
+  // Even distribution for a freshly built splitter whose children are all new
+  // (the new bottom row's cells). The stretch value mirrors
+  // QmitkMultiWidgetLayoutManager::SetDefaultLayout, so a grid op and a fresh
+  // SetLayout size cells identically.
+  void DistributeSplitterEvenly(QSplitter* splitter)
+  {
+    QList<int> sizes;
+    for (int i = 0; i < splitter->count(); ++i)
+    {
+      sizes.append(1000);
+    }
+    splitter->setSizes(sizes);
+  }
+
+  // Give the just-added trailing child a fair, non-zero size (matching an
+  // existing sibling) while leaving the other children's divider positions
+  // untouched - the grid ops must not move existing cells. A widget added to an
+  // unrealized (never-shown) splitter otherwise reports size 0, which
+  // SerializeLayout would emit and ApplyLayout would reject ("size must be
+  // >= 1"); blanket even re-distribution would instead discard the user's
+  // divider positions.
+  void SizeNewTrailingChild(QSplitter* splitter)
+  {
+    auto sizes = splitter->sizes();
+    if (sizes.size() >= 2)
+    {
+      sizes.last() = sizes.first();
+      splitter->setSizes(sizes);
+    }
+  }
+}
+
+QSplitter* QmitkMxNMultiWidget::RootSplitter() const
+{
+  auto* topLayout = this->layout();
+  if (nullptr == topLayout || topLayout->count() == 0)
+  {
+    return nullptr;
+  }
+  auto* item = topLayout->itemAt(0);
+  auto* widget = (nullptr == item) ? nullptr : item->widget();
+  return dynamic_cast<QSplitter*>(widget);
+}
+
+bool QmitkMxNMultiWidget::ResolveGridShape(int& rows, int& columns) const
+{
+  rows = 0;
+  columns = 0;
+
+  auto* root = this->RootSplitter();
+  if (nullptr == root || root->orientation() != Qt::Vertical)
+  {
+    return false;
+  }
+
+  const int rowCount = root->count();
+  if (0 == rowCount)
+  {
+    return false;
+  }
+
+  int columnCount = -1;
+  for (int r = 0; r < rowCount; ++r)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
+    if (nullptr == rowSplit || rowSplit->orientation() != Qt::Horizontal)
+    {
+      return false;
+    }
+
+    const int cells = rowSplit->count();
+    if (0 == cells)
+    {
+      return false;
+    }
+    for (int c = 0; c < cells; ++c)
+    {
+      if (nullptr == dynamic_cast<QmitkRenderWindowWidget*>(rowSplit->widget(c)))
+      {
+        return false;
+      }
+    }
+
+    if (columnCount < 0)
+    {
+      columnCount = cells;
+    }
+    else if (cells != columnCount)
+    {
+      return false;
+    }
+  }
+
+  rows = rowCount;
+  columns = columnCount;
+  return true;
+}
+
+void QmitkMxNMultiWidget::DetachAndDestroyCell(QmitkRenderWindowWidget* cell)
+{
+  if (nullptr == cell)
+  {
+    return;
+  }
+  const auto id = cell->GetWidgetName();
+
+  // Read the selection group index before removal: RemoveRenderWindowWidget can
+  // drop the cell's last owning reference and destroy it (and its utility
+  // widget), after which this read would be use-after-free.
+  GroupSyncIndexType selectionIndex = -1;
+  if (auto* utility = cell->GetUtilityWidget())
+  {
+    selectionIndex = utility->GetSyncGroup();
+  }
+
+  this->RemoveRenderWindowWidget(id);
+  m_CellSyncLinks.erase(id);
+  // After the map erase, so the cell is not counted as its own last member.
+  this->ReclaimSelectionGroupIfEmpty(selectionIndex);
+}
+
+void QmitkMxNMultiWidget::ResetActiveIfRemoved(const std::vector<QmitkRenderWindowWidget*>& removalSet)
+{
+  const auto active = this->GetActiveRenderWindowWidget();
+  if (nullptr == active)
+  {
+    return;
+  }
+
+  bool activeRemoved = false;
+  for (auto* cell : removalSet)
+  {
+    if (active.get() == cell)
+    {
+      activeRemoved = true;
+      break;
+    }
+  }
+  if (!activeRemoved)
+  {
+    return;
+  }
+
+  // The top-left cell (tree row 0, column 0) survives both trailing-edge
+  // removals, so it is always a valid repoint target.
+  auto* root = this->RootSplitter();
+  auto* firstRow = (nullptr == root || 0 == root->count())
+                     ? nullptr : dynamic_cast<QSplitter*>(root->widget(0));
+  auto* survivorWidget = (nullptr == firstRow || 0 == firstRow->count())
+                           ? nullptr : dynamic_cast<QmitkRenderWindowWidget*>(firstRow->widget(0));
+  if (nullptr == survivorWidget)
+  {
+    return;
+  }
+  const auto survivor = this->GetRenderWindowWidget(survivorWidget->GetWidgetName());
+  if (nullptr != survivor)
+  {
+    this->SetActiveRenderWindowWidget(survivor);
+  }
+}
+
+void QmitkMxNMultiWidget::FinalizeGridSurgery()
+{
+  int rows = 0;
+  int columns = 0;
+  if (this->ResolveGridShape(rows, columns))
+  {
+    this->SetGridDimensions(rows, columns);
+  }
+  emit LayoutChanged();
+}
+
+void QmitkMxNMultiWidget::AddGridColumn()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "AddGridColumn: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+
+  auto* root = this->RootSplitter();
+  // The tree is transiently non-rectangular during this loop (already-grown rows
+  // have columns+1 cells, later rows still columns). Nothing reads
+  // ResolveGridShape mid-loop; the SyncLinksChanged fan-out that
+  // CreateRenderWindowWidget emits per cell only reads the cell registry.
+  for (int r = 0; r < rows; ++r)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
+    auto cell = this->CreateRenderWindowWidget();
+    rowSplit->addWidget(cell.get());
+    cell->show();
+    SizeNewTrailingChild(rowSplit);
+  }
+
+  this->FinalizeGridSurgery();
+}
+
+void QmitkMxNMultiWidget::RemoveGridColumn()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "RemoveGridColumn: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+  if (columns <= 1)
+  {
+    MITK_WARN << "RemoveGridColumn: a grid must keep at least one column; no-op.";
+    return;
+  }
+
+  auto* root = this->RootSplitter();
+
+  std::vector<QmitkRenderWindowWidget*> removalSet;
+  removalSet.reserve(rows);
+  for (int r = 0; r < rows; ++r)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
+    removalSet.push_back(dynamic_cast<QmitkRenderWindowWidget*>(rowSplit->widget(rowSplit->count() - 1)));
+  }
+
+  this->ResetActiveIfRemoved(removalSet);
+  for (auto* cell : removalSet)
+  {
+    this->DetachAndDestroyCell(cell);
+  }
+
+  this->FinalizeGridSurgery();
+}
+
+void QmitkMxNMultiWidget::AddGridRow()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "AddGridRow: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+
+  auto* root = this->RootSplitter();
+
+  // Build the row fully before attaching it, so the tree is never observably
+  // mid-construction (a childless row-split would fail ResolveGridShape and the
+  // SerializeLayout walk). QSplitter::addWidget reparents, so the end state is
+  // identical to constructing with 'root' as parent, with the trailing
+  // placement made explicit.
+  auto* rowSplit = new QSplitter(Qt::Horizontal);
+  for (int c = 0; c < columns; ++c)
+  {
+    auto cell = this->CreateRenderWindowWidget();
+    rowSplit->addWidget(cell.get());
+    cell->show();
+  }
+  DistributeSplitterEvenly(rowSplit);
+  root->addWidget(rowSplit);
+  rowSplit->show();
+  SizeNewTrailingChild(root);
+
+  this->FinalizeGridSurgery();
+}
+
+void QmitkMxNMultiWidget::RemoveGridRow()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "RemoveGridRow: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+  if (rows <= 1)
+  {
+    MITK_WARN << "RemoveGridRow: a grid must keep at least one row; no-op.";
+    return;
+  }
+
+  auto* root = this->RootSplitter();
+  auto* lastRow = dynamic_cast<QSplitter*>(root->widget(rows - 1));
+
+  std::vector<QmitkRenderWindowWidget*> removalSet;
+  removalSet.reserve(lastRow->count());
+  for (int c = 0; c < lastRow->count(); ++c)
+  {
+    removalSet.push_back(dynamic_cast<QmitkRenderWindowWidget*>(lastRow->widget(c)));
+  }
+
+  this->ResetActiveIfRemoved(removalSet);
+  for (auto* cell : removalSet)
+  {
+    this->DetachAndDestroyCell(cell);
+  }
+
+  // The removed cells' owning shared_ptrs are gone, so 'lastRow' is now
+  // childless; delete it rather than leave an empty split node. Deleting a
+  // splitter that still held cells would be undefined - cells live in shared_ptr
+  // control blocks, outside Qt's parent-delete domain.
+  delete lastRow;
+
+  this->FinalizeGridSurgery();
+}
+
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetWindowFromIndex(size_t index)
 {
   if (index >= GetRenderWindowWidgets().size())
@@ -3043,6 +3350,85 @@ void QmitkMxNMultiWidget::RequestLayoutEditor()
 }
 
 
+QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
+QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
+{
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
+  axisSlots.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
+
+  // The seven per-dimension axes: a slot carries the group hue when linked and
+  // is an unsynced gap otherwise, plus the axis glyph the barcode draws when
+  // wide enough.
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    QString label;
+    QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;
+    switch (dimension)
+    {
+      case QmitkMxNSyncDimension::Pan:         label = tr("Pan"); glyph = QmitkMxNAxisGlyph::Pan; break;
+      case QmitkMxNSyncDimension::Zoom:        label = tr("Zoom"); glyph = QmitkMxNAxisGlyph::Zoom; break;
+      case QmitkMxNSyncDimension::Slice:       label = tr("Slice"); glyph = QmitkMxNAxisGlyph::Slice; break;
+      case QmitkMxNSyncDimension::Crosshair:   label = tr("Crosshair"); glyph = QmitkMxNAxisGlyph::Crosshair; break;
+      case QmitkMxNSyncDimension::Orientation: label = tr("Orientation"); glyph = QmitkMxNAxisGlyph::Orientation; break;
+      case QmitkMxNSyncDimension::Windowing:   label = tr("Windowing"); glyph = QmitkMxNAxisGlyph::Windowing; break;
+      case QmitkMxNSyncDimension::Lut:         label = tr("LUT"); glyph = QmitkMxNAxisGlyph::Lut; break;
+    }
+
+    QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+    slot.glyph = glyph;
+    if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
+    {
+      try
+      {
+        slot.color = this->GetSyncGroupColor(link->group);
+        slot.tooltip = tr("%1 - group %2").arg(label,
+          QString::fromStdString(this->GetSyncGroupDisplayName(link->group)));
+      }
+      catch (const mitk::Exception&)
+      {
+        // Group not registered mid-change; leave the slot a gap this round.
+      }
+    }
+    if (!slot.color.isValid())
+    {
+      slot.tooltip = tr("%1 - not linked").arg(label);
+    }
+    axisSlots.append(slot);
+  }
+
+  // The selection axis is single-valued per cell: every cell carries exactly one
+  // selection group, including the default group every cell starts in. The slot
+  // shows that group's hue - consistently with the group card and the render
+  // frame - so the default group is not treated as a special "no sync" case.
+  QmitkMxNSyncBarcodeWidget::AxisSlot selectionSlot;
+  selectionSlot.glyph = QmitkMxNAxisGlyph::Selection;
+  const auto renderWindowWidget = this->GetRenderWindowWidget(windowId);
+  auto* utilityWidget = renderWindowWidget ? renderWindowWidget->GetUtilityWidget() : nullptr;
+  if (nullptr != utilityWidget)
+  {
+    const auto index = utilityWidget->GetSyncGroup();
+    if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
+    {
+      try
+      {
+        selectionSlot.color = this->GetSyncGroupColor(recorded->second);
+        selectionSlot.tooltip = tr("Data selection - group %1").arg(
+          QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)));
+      }
+      catch (const mitk::Exception&)
+      {
+      }
+    }
+  }
+  if (!selectionSlot.color.isValid())
+  {
+    selectionSlot.tooltip = tr("Data selection - not linked");
+  }
+  axisSlots.append(selectionSlot);
+
+  return axisSlots;
+}
+
 void QmitkMxNMultiWidget::RefreshSyncBarcodes()
 {
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
@@ -3052,79 +3438,7 @@ void QmitkMxNMultiWidget::RefreshSyncBarcodes()
     {
       continue;
     }
-
-    QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
-    axisSlots.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
-
-    // The seven per-dimension axes: a slot carries the group hue when linked and
-    // is an unsynced gap otherwise, plus the axis glyph the barcode draws when
-    // wide enough.
-    for (const auto dimension : QmitkMxNAllSyncDimensions)
-    {
-      QString label;
-      QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;
-      switch (dimension)
-      {
-        case QmitkMxNSyncDimension::Pan:         label = tr("Pan"); glyph = QmitkMxNAxisGlyph::Pan; break;
-        case QmitkMxNSyncDimension::Zoom:        label = tr("Zoom"); glyph = QmitkMxNAxisGlyph::Zoom; break;
-        case QmitkMxNSyncDimension::Slice:       label = tr("Slice"); glyph = QmitkMxNAxisGlyph::Slice; break;
-        case QmitkMxNSyncDimension::Crosshair:   label = tr("Crosshair"); glyph = QmitkMxNAxisGlyph::Crosshair; break;
-        case QmitkMxNSyncDimension::Orientation: label = tr("Orientation"); glyph = QmitkMxNAxisGlyph::Orientation; break;
-        case QmitkMxNSyncDimension::Windowing:   label = tr("Windowing"); glyph = QmitkMxNAxisGlyph::Windowing; break;
-        case QmitkMxNSyncDimension::Lut:         label = tr("LUT"); glyph = QmitkMxNAxisGlyph::Lut; break;
-      }
-
-      QmitkMxNSyncBarcodeWidget::AxisSlot slot;
-      slot.glyph = glyph;
-      if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
-      {
-        try
-        {
-          slot.color = this->GetSyncGroupColor(link->group);
-          slot.tooltip = tr("%1 - group %2").arg(label,
-            QString::fromStdString(this->GetSyncGroupDisplayName(link->group)));
-        }
-        catch (const mitk::Exception&)
-        {
-          // Group not registered mid-change; leave the slot a gap this round.
-        }
-      }
-      if (!slot.color.isValid())
-      {
-        slot.tooltip = tr("%1 - not linked").arg(label);
-      }
-      axisSlots.append(slot);
-    }
-
-    // The selection axis is single-valued per cell. Every cell always carries a
-    // selection group, but the default group 1 is the one every cell starts in;
-    // painting it as synced would light up every cell at rest, so the slot reads
-    // as a gap for the default group and shows a hue only once a cell is
-    // deliberately assigned to another selection group.
-    QmitkMxNSyncBarcodeWidget::AxisSlot selectionSlot;
-    selectionSlot.glyph = QmitkMxNAxisGlyph::Selection;
-    if (const auto index = utilityWidget->GetSyncGroup(); index > 1)
-    {
-      if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
-      {
-        try
-        {
-          selectionSlot.color = this->GetSyncGroupColor(recorded->second);
-          selectionSlot.tooltip = tr("Data selection - group %1").arg(
-            QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)));
-        }
-        catch (const mitk::Exception&)
-        {
-        }
-      }
-    }
-    if (!selectionSlot.color.isValid())
-    {
-      selectionSlot.tooltip = tr("Data selection - not linked");
-    }
-    axisSlots.append(selectionSlot);
-
-    utilityWidget->SetSyncBarcodeSlots(axisSlots);
+    utilityWidget->SetSyncBarcodeSlots(this->BuildBarcodeSlots(windowId));
   }
 }
 

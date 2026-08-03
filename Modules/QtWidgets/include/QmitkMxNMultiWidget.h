@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 // qt widgets module
 #include <QmitkAbstractMultiWidget.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkMxNSyncDimension.h>
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
@@ -385,6 +386,22 @@ public:
   */
   QColor GetSyncGroupColor(const std::string& group) const;
 
+  /**
+  * \brief The window-perspective sync-barcode slots for one cell: eight axes in
+  *        fixed order (the seven 'QmitkMxNSyncDimension' axes, then data
+  *        selection), each carrying the group hue when the cell is linked on
+  *        that axis and an invalid color (a gap) otherwise, plus the axis glyph
+  *        and a per-slot tooltip.
+  *
+  *   Binary per axis - a cell is linked or not; the heterogeneous group state
+  *   is a group-perspective concern, not a cell's. The default selection group
+  *   reads as a gap so a cell at rest does not paint as selection-synced. Shared
+  *   by the per-cell utility-strip barcode and the layout editor's cell map so
+  *   both surfaces tell the same story. Returns eight gap slots for an unknown
+  *   cell.
+  */
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildBarcodeSlots(const QString& windowId) const;
+
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
   {
@@ -666,6 +683,69 @@ public:
   */
   void ApplyLayout(const nlohmann::json& doc);
 
+  /**
+  * \brief True (and 'rows' / 'columns' filled) when the current layout is a
+  *        rectangular grid.
+  *
+  *   A rectangular grid is: the root splitter is vertical, every child is a
+  *   horizontal splitter, each holds only 'QmitkRenderWindowWidget' cells, and
+  *   all rows have the same non-zero cell count. Derived from the actual
+  *   splitter tree, so it is correct even when the stored 'GetRowCount()' is 0
+  *   (a loaded layout) or stale (after a render-window layout-design-menu
+  *   change, which rebuilds the tree without touching the counts). The grid-op
+  *   guards and the layout editor's grid buttons read this rather than the
+  *   stored counts.
+  */
+  bool ResolveGridShape(int& rows, int& columns) const;
+
+  /**
+  * \brief Append one fresh, empty cell to the right of every row of a
+  *        rectangular grid (r x c -> r x (c+1)).
+  *
+  *   Existing cells keep their widgets, ids, sync links, node selection, and
+  *   tree positions untouched; only the trailing column is new. New cells come
+  *   from the nullary 'CreateRenderWindowWidget()' (collision-free id, default
+  *   sync group 1, all data shown), then are added to the right of each row.
+  *   Cell ids are no longer row-major after this call (they carry uniqueness
+  *   only); the splitter tree, not the id, is the authority on cell position.
+  *   No-op (with a 'MITK_WARN') when the current layout is not a rectangular
+  *   grid.
+  */
+  void AddGridColumn();
+
+  /**
+  * \brief Remove the rightmost cell of every row of a rectangular grid
+  *        (requires >= 2 columns; otherwise a no-op).
+  *
+  *   Survivors are untouched. Each removed cell is torn down in the order the
+  *   surrounding ownership rules require: its selection-group index is captured
+  *   before removal (removal can destroy the cell and its utility widget, so
+  *   reading the index afterwards would be use-after-free), the active render
+  *   window is repointed to a surviving cell first if it is among those removed
+  *   (the active pointer is a strong reference, so an unreset active cell would
+  *   outlive the map erase and linger as a ghost), then the cell is removed, its
+  *   'm_CellSyncLinks' entry erased, and its former selection group reclaimed if
+  *   it is now empty.
+  */
+  void RemoveGridColumn();
+
+  /**
+  * \brief Append a fresh, empty bottom row (a new horizontal row-split of
+  *        'columnCount' fresh cells). Existing cells untouched. No-op (with a
+  *        'MITK_WARN') when the current layout is not a rectangular grid.
+  */
+  void AddGridRow();
+
+  /**
+  * \brief Remove the bottom row of a rectangular grid (requires >= 2 rows;
+  *        otherwise a no-op) and its cells (same per-cell teardown as
+  *        'RemoveGridColumn'), then delete the emptied bottom row-splitter -
+  *        destroying a row's cells does not delete their parent 'QSplitter', and
+  *        a leftover childless split node would break 'ResolveGridShape' and the
+  *        'SerializeLayout' tree walk.
+  */
+  void RemoveGridRow();
+
 public Q_SLOTS:
 
   // mouse events
@@ -803,6 +883,45 @@ private:
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
 
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer GetWindowFromIndex(size_t index);
+
+  /**
+  * \brief The root vertical splitter of the cell tree
+  *        ('layout()->itemAt(0)->widget()' as a 'QSplitter'), or nullptr when
+  *        the editor has no splitter-based layout. The single access point the
+  *        grid ops and 'ResolveGridShape' share with 'SerializeLayout' /
+  *        'ListWindowDescriptors'.
+  */
+  QSplitter* RootSplitter() const;
+
+  /**
+  * \brief Tear down a single cell during grid surgery: capture its selection
+  *        group index (before removal, see below), remove it from the
+  *        render-window registry, erase its 'm_CellSyncLinks' entry, and reclaim
+  *        its former selection group if that group is now empty. The index must
+  *        be read before 'RemoveRenderWindowWidget' because that call can drop
+  *        the cell's last owning reference and destroy it (and its utility
+  *        widget). Does not repoint the active render window - the caller does
+  *        that once, before removing any cell, so it can pick a survivor.
+  */
+  void DetachAndDestroyCell(QmitkRenderWindowWidget* cell);
+
+  /**
+  * \brief If the active render window is among 'removalSet', repoint it to the
+  *        surviving top-left cell (tree row 0, column 0) before any removal.
+  *        Neither trailing-edge removal touches that cell, and the active
+  *        pointer is a strong reference: leaving it on a doomed cell would keep
+  *        that cell alive and visible after its registry entry is erased.
+  */
+  void ResetActiveIfRemoved(const std::vector<QmitkRenderWindowWidget*>& removalSet);
+
+  /**
+  * \brief Common tail of the four grid ops: re-derive the grid shape from the
+  *        mutated tree, store it via 'SetGridDimensions' (keeping the
+  *        rows*columns == cell-count invariant), and emit 'LayoutChanged' so the
+  *        cell map, group cards, and other furniture refresh. Counts are set
+  *        before the signal so no listener observes a counts-vs-tree mismatch.
+  */
+  void FinalizeGridSurgery();
 
   /**
   * \brief Recursive serializer for a 'split' subtree. Emits a v2 JSON node.

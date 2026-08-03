@@ -66,6 +66,10 @@ public:
 
   QStringList GetSelectedWindowIds() const;
 
+  /** \brief Set the selected tiles (e.g. to mirror the editor's active render
+   *         window). Emits SelectionChanged only when the selection changes. */
+  void SetSelectedWindowIds(const QStringList& windowIds);
+
 Q_SIGNALS:
 
   void SelectionChanged(const QStringList& windowIds);
@@ -80,6 +84,8 @@ protected:
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
+  void dragMoveEvent(QDragMoveEvent* event) override;
+  void dragLeaveEvent(QDragLeaveEvent* event) override;
   void dropEvent(QDropEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
 
@@ -108,6 +114,7 @@ private:
   QPoint m_PressPosition;
   bool m_RubberBandActive = false;
   bool m_DragCandidate = false;
+  int m_DropTargetTile = -1;  // tile highlighted under a hovering group drag
 
 };
 

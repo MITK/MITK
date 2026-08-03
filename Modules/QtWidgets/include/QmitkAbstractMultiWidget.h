@@ -380,6 +380,19 @@ protected:
    */
   void ResetGridState();
 
+  /**
+   * \brief Set the stored grid dimensions without rebuilding the layout.
+   *
+   *        `SetLayout(r, c)` both stores the dimensions and rebuilds the cell
+   *        tree row-major. A subclass that mutates the tree in place (adding or
+   *        removing a trailing row/column) uses this to keep `GetRowCount()` /
+   *        `GetColumnCount()` in step with the new shape without a rebuild; this
+   *        setter does only that, with no side effects. The caller must preserve
+   *        the invariant `GetRowCount() * GetColumnCount()` == number of cells;
+   *        0/0 marks "not a regular grid", like the reset paths.
+   */
+  void SetGridDimensions(int rows, int columns);
+
 private:
 
   /**

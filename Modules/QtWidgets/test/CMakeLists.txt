@@ -24,6 +24,10 @@ mitkAddCustomModuleTest(QmitkMxNLayoutV3Test QmitkMxNLayoutV3Test
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNGridOpsTest QmitkMxNGridOpsTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNNavLinksTest QmitkMxNNavLinksTest
   -platform minimal
 )

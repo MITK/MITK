@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QCoreApplication>
+#include <QLayout>
 
 #include <algorithm>
 
@@ -44,11 +45,18 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(AssignCells_JoinsEveryGivenCell);
   MITK_TEST(Leave_ClearsEveryDimension);
   MITK_TEST(ApplyDimension_TogglesForAllMembers);
+  MITK_TEST(GroupBarcode_TriStateAllNoneSome);
   MITK_TEST(EditorChange_RefreshesCellBarcode);
   MITK_TEST(Selection_TogglesViaEditorAndRoundTrips);
   MITK_TEST(Selection_MoveIsSingleValued);
   MITK_TEST(Rebuild_PopulatesWithoutTouchingLinks);
   MITK_TEST(LayoutShrink_EmitsLayoutChanged);
+  MITK_TEST(IncrementalCards_AddKeepsExistingCards);
+  MITK_TEST(IncrementalCards_RemoveDropsOnlyItsCard);
+  MITK_TEST(IncrementalCards_OrderMatchesEngine);
+  MITK_TEST(EmptyGroupCache_TogglesWithoutTouchingEngine);
+  MITK_TEST(EmptyGroupCache_AppliedOnFirstAssignmentThenCleared);
+  MITK_TEST(EmptyGroupBootstrap_LinksSelectedWindows);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -88,6 +96,66 @@ public:
   {
     const auto link = m_Editor->GetSyncLink(CellId(cell), dimension);
     return link.has_value() && link->group == group;
+  }
+
+  /** Fire the coalesced, QTimer::singleShot(0)-deferred card rebuild. Twice, so a
+   *  refresh that schedules follow-up work still settles. */
+  static void Pump()
+  {
+    QCoreApplication::processEvents();
+    QCoreApplication::processEvents();
+  }
+
+  /** The barcode axis index of a sync dimension (selection is the last axis). */
+  static int AxisIndexOf(QmitkMxNSyncDimension dimension)
+  {
+    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+    {
+      if (QmitkMxNAllSyncDimensions[i] == dimension)
+      {
+        return static_cast<int>(i);
+      }
+    }
+    return -1;
+  }
+
+  /** The group's card widget by its stable object name, or nullptr. */
+  QWidget* CardFor(const std::string& groupId) const
+  {
+    return m_Widget->findChild<QWidget*>(
+      QStringLiteral("mxnGroupCard__") + QString::fromStdString(groupId));
+  }
+
+  /** The group ids of the cards in the order they sit in the card layout, read
+   *  through the public layout of the container a card is parented to. */
+  QStringList CardOrder() const
+  {
+    const QString prefix = QStringLiteral("mxnGroupCard__");
+    QWidget* container = nullptr;
+    for (auto* w : m_Widget->findChildren<QWidget*>())
+    {
+      if (w->objectName().startsWith(prefix))
+      {
+        container = w->parentWidget();
+        break;
+      }
+    }
+    QStringList order;
+    if (nullptr == container || nullptr == container->layout())
+    {
+      return order;
+    }
+    auto* layout = container->layout();
+    for (int i = 0; i < layout->count(); ++i)
+    {
+      auto* item = layout->itemAt(i);
+      auto* w = (nullptr == item) ? nullptr : item->widget();
+      if (nullptr != w && w->objectName().startsWith(prefix))
+      {
+        order << w->objectName().mid(prefix.length());
+      }
+    }
+    return order;
   }
 
   void CreateGroup_RegistersEngineGroup()
@@ -178,6 +246,49 @@ public:
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing).has_value());
     CPPUNIT_ASSERT_MESSAGE("Disabling a dimension keeps the membership dimension",
                            IsLinked(0, QmitkMxNSyncDimension::Slice, "nav"));
+  }
+
+  void GroupBarcode_TriStateAllNoneSome()
+  {
+    // The group perspective is tri-state per axis over the group's members:
+    // all linked, none linked, or some. Link Slice on all three cells, Pan on
+    // only two, and leave Windowing unlinked; the group header's slots must read
+    // solid / dashed / gap respectively.
+    const auto id = m_Widget->CreateGroup();
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      m_Editor->SetSyncLink(CellId(cell), QmitkMxNSyncDimension::Slice, id);
+    }
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, id);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, id);
+
+    const auto slotIndex = [](QmitkMxNSyncDimension dimension)
+    {
+      for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+      {
+        if (QmitkMxNAllSyncDimensions[i] == dimension)
+        {
+          return static_cast<int>(i);
+        }
+      }
+      return -1;
+    };
+
+    const auto axisSlots = m_Widget->BuildGroupBarcodeSlots(id);
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
+                         static_cast<int>(axisSlots.size()));
+
+    const auto& sliceSlot = axisSlots[slotIndex(QmitkMxNSyncDimension::Slice)];
+    CPPUNIT_ASSERT_MESSAGE("all members linked on Slice -> solid",
+                           sliceSlot.color.isValid() && !sliceSlot.partial);
+
+    const auto& panSlot = axisSlots[slotIndex(QmitkMxNSyncDimension::Pan)];
+    CPPUNIT_ASSERT_MESSAGE("some but not all members linked on Pan -> partial",
+                           panSlot.color.isValid() && panSlot.partial);
+
+    const auto& windowingSlot = axisSlots[slotIndex(QmitkMxNSyncDimension::Windowing)];
+    CPPUNIT_ASSERT_MESSAGE("no members linked on Windowing -> gap",
+                           !windowingSlot.color.isValid());
   }
 
   void EditorChange_RefreshesCellBarcode()
@@ -282,6 +393,156 @@ public:
 
     QObject::disconnect(conn);
     CPPUNIT_ASSERT_MESSAGE("Shrinking the layout must emit LayoutChanged", layoutChanges >= 1);
+  }
+
+  void IncrementalCards_AddKeepsExistingCards()
+  {
+    Pump();
+    CPPUNIT_ASSERT(nullptr != CardFor("main"));
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "alpha");
+    Pump();
+    auto* mainCard = CardFor("main");
+    auto* alphaCard = CardFor("alpha");
+    CPPUNIT_ASSERT(nullptr != mainCard);
+    CPPUNIT_ASSERT(nullptr != alphaCard);
+
+    // Adding a third group must not destroy or recreate the existing cards.
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, "beta");
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("The 'main' card must survive an add", mainCard == CardFor("main"));
+    CPPUNIT_ASSERT_MESSAGE("The 'alpha' card must survive an add", alphaCard == CardFor("alpha"));
+    CPPUNIT_ASSERT_MESSAGE("The new 'beta' card must exist", nullptr != CardFor("beta"));
+  }
+
+  void IncrementalCards_RemoveDropsOnlyItsCard()
+  {
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "alpha");
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, "beta");
+    Pump();
+    auto* mainCard = CardFor("main");
+    auto* betaCard = CardFor("beta");
+    CPPUNIT_ASSERT(nullptr != CardFor("alpha"));
+    CPPUNIT_ASSERT(nullptr != mainCard);
+    CPPUNIT_ASSERT(nullptr != betaCard);
+
+    // Unlinking alpha's only member drops it from the group set.
+    m_Widget->SetCellMembership(CellId(0), "alpha", false);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("The removed group's card must be gone", nullptr == CardFor("alpha"));
+    CPPUNIT_ASSERT_MESSAGE("Other cards survive a remove (moved, not recreated)",
+                           mainCard == CardFor("main"));
+    CPPUNIT_ASSERT_MESSAGE("Other cards survive a remove (moved, not recreated)",
+                           betaCard == CardFor("beta"));
+  }
+
+  void IncrementalCards_OrderMatchesEngine()
+  {
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "alpha");
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, "beta");
+    Pump();
+
+    QStringList expected;
+    for (const auto& info : m_Editor->GetSyncGroupInfos())
+    {
+      expected << QString::fromStdString(info.id);
+    }
+    CPPUNIT_ASSERT_EQUAL(expected.join(QStringLiteral(",")).toStdString(),
+                         CardOrder().join(QStringLiteral(",")).toStdString());
+  }
+
+  void EmptyGroupCache_TogglesWithoutTouchingEngine()
+  {
+    const auto group = m_Widget->CreateGroup();
+    CPPUNIT_ASSERT(!group.empty());
+    Pump();
+
+    // No map selection (nothing set the active window since attach), so an
+    // axis click on this empty group toggles the intent cache, not the engine.
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    const int windowingAxis = AxisIndexOf(QmitkMxNSyncDimension::Windowing);
+    m_Widget->ToggleGroupAxis(group, sliceAxis);
+    m_Widget->ToggleGroupAxis(group, windowingAxis);
+
+    // The barcode reflects exactly those two axes as linked (a valid hue).
+    const auto barcodeSlots = m_Widget->BuildGroupBarcodeSlots(group);
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
+                         static_cast<int>(barcodeSlots.size()));
+    for (int i = 0; i < barcodeSlots.size(); ++i)
+    {
+      const bool expectedOn = (i == sliceAxis || i == windowingAxis);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Cache toggle sets exactly the toggled axes",
+                                   expectedOn, barcodeSlots[i].color.isValid());
+    }
+
+    // The engine is untouched: no cell links or selects the group. (If the map
+    // had a selection, the click would have bootstrapped and this would fail.)
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      for (const auto dimension : QmitkMxNAllSyncDimensions)
+      {
+        CPPUNIT_ASSERT_MESSAGE("Cache toggle must not mutate the engine",
+                               !IsLinked(cell, dimension, group));
+      }
+      CPPUNIT_ASSERT_MESSAGE("Cache toggle must not set a selection group",
+                             m_Editor->GetCellSelectionGroup(CellId(cell)) != group);
+    }
+
+    // Toggling both axes back off returns the barcode to all-gap.
+    m_Widget->ToggleGroupAxis(group, sliceAxis);
+    m_Widget->ToggleGroupAxis(group, windowingAxis);
+    for (const auto& slot : m_Widget->BuildGroupBarcodeSlots(group))
+    {
+      CPPUNIT_ASSERT_MESSAGE("Toggling every axis back off clears the displayed intent",
+                             !slot.color.isValid());
+    }
+  }
+
+  void EmptyGroupCache_AppliedOnFirstAssignmentThenCleared()
+  {
+    const auto group = m_Widget->CreateGroup();
+    Pump();
+    m_Widget->ToggleGroupAxis(group, AxisIndexOf(QmitkMxNSyncDimension::Slice));  // cache Slice only
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
+
+    // Exactly the cached axis lands - not SetCellMembership's nav-bundle default.
+    CPPUNIT_ASSERT_MESSAGE("The cached Slice axis is applied to the assigned window",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, group));
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Crosshair })
+    {
+      CPPUNIT_ASSERT_MESSAGE("Only the cached axis is applied, not the nav-bundle default",
+                             !IsLinked(0, dimension, group));
+    }
+
+    // The cache was cleared: emptying the group again shows an all-gap barcode
+    // rather than the flushed intent re-appearing.
+    m_Widget->SetCellMembership(CellId(0), group, false);
+    for (const auto& slot : m_Widget->BuildGroupBarcodeSlots(group))
+    {
+      CPPUNIT_ASSERT_MESSAGE("A flushed cache must not re-appear when the group empties",
+                             !slot.color.isValid());
+    }
+  }
+
+  void EmptyGroupBootstrap_LinksSelectedWindows()
+  {
+    const auto group = m_Widget->CreateGroup();
+    Pump();
+
+    // Make widget1 the active window; the editor mirrors that into the map's
+    // selection, so the empty group's axis click bootstraps rather than caches.
+    m_Editor->SetActiveRenderWindowWidget(m_Editor->GetRenderWindowWidget(CellId(1)));
+
+    m_Widget->ToggleGroupAxis(group, AxisIndexOf(QmitkMxNSyncDimension::Slice));
+
+    CPPUNIT_ASSERT_MESSAGE("Bootstrap links the selected window on the clicked axis",
+                           IsLinked(1, QmitkMxNSyncDimension::Slice, group));
+    CPPUNIT_ASSERT_MESSAGE("Only the selected window is linked",
+                           !IsLinked(0, QmitkMxNSyncDimension::Slice, group));
+    CPPUNIT_ASSERT_MESSAGE("Only the clicked axis is linked",
+                           !IsLinked(1, QmitkMxNSyncDimension::Pan, group));
   }
 };
 

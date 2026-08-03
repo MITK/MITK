@@ -112,26 +112,70 @@
 	</ul>
 
 \subsection org_mitk_editors_mxnmultiwidget_Utility Utility Menu
-	Each window view has a utility menu along its top edge. It is collapsed to a thin
-	strip by default to leave the image unobstructed; moving the pointer to the top
-	edge slides it in without resizing the render window. Its elements:
+	Each window view has an MxN utility menu along its top edge. It is collapsed to a
+	thin strip by default to leave the image unobstructed and reveals - together with
+	the rest of the window's furniture - as one frame when the pointer approaches an
+	edge, without resizing the render window. It is a separate chrome from the built-in
+	render-window menu in the top-right corner (crosshair mode, full screen, window
+	arrangements), which is unchanged from the Standard Display. Its elements:
 	<ul>
 		<li> Data selection button: Select which data should be selected and visible inside the window view
 		<li> Sync button: Open the MxN Layout Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
 		<li> Sync Group drop down menu: Select the current sync group to synchronize with other windows
-		<li> Slice slider: Navigate along the view direction of this window
-		<li> View direction drop down menu: Select the current anatomical view plane / view direction
+		<li> "+" button: Create a new sync group from the current selection
 		<li> Clean button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
+		<li> Navigator button ("Nav"): Switch the per-cell navigator between its compact and
+			expanded forms for every window at once (see \ref org_mitk_editors_mxnmultiwidget_Navigator)
+		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
+			crosshair, orientation, windowing, LUT, colored with the linked group's hue and
+			left empty where the window is not synchronized - the same barcode the layout
+			editor's window tiles carry
 	</ul>
+
+	The slice control and the view-direction control are no longer in this menu: slice
+	scrolling lives in the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator),
+	and the view direction is changed by clicking the plane label
+	(\ref org_mitk_editors_mxnmultiwidget_View_Direction).
 
 	\imageMacro{utilityMenu.png, "Utility menu", 8.00}
 
-\subsubsection org_mitk_editors_mxnmultiwidget_Breadcrumbs Slice and time breadcrumbs
-	While the pointer is inside a window view, the current slice is shown as a
-	<tt>slice/total</tt> readout in the bottom right corner and as a position tick on a
-	thin line along the bottom edge; time-resolved data adds a second, dashed line for
-	the current time step. Approaching the bottom edge reveals the standard slice
-	slider floating over the image.
+\subsubsection org_mitk_editors_mxnmultiwidget_Readouts Edge readouts
+	A window view keeps navigation and intensity information on opposite sides so the
+	two never read as one. The always-on readouts are quiet and faint by default:
+	<ul>
+		<li> Bottom left (navigation): the view-plane label on the first line, and the
+			current <tt>slice/total</tt> plus the group-identity dot on the second line.
+			Time-resolved data adds a small clock and <tt>time/total</tt> after the slice.
+		<li> Bottom right (intensity): the <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout,
+			beside the colorbar (see \ref org_mitk_editors_mxnmultiwidget_WindowingOverlay).
+		<li> Along the bottom edge: a thin hairline carrying the slice position as a tick;
+			for time-resolved data the current time step rides the same hairline as a small
+			triangle.
+	</ul>
+	The group-identity dot is a solid hue only when every dimension the window is
+	synchronized on belongs to one group; a window coupled across several groups shows a
+	small segmented marker instead, and the exact per-dimension coupling is read from the
+	sync barcode and the layout editor.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_Navigator The per-cell navigator
+	Each window view has its own navigator, drawn as minimal overlay sliders that reveal
+	with the window's furniture and thicken under the pointer. It has two forms, switched
+	for the whole editor by the "Nav" button in any utility menu:
+	<ul>
+		<li> Compact (default): a single in-plane slice slider, plus - for time-resolved
+			data - the global time slider.
+		<li> Expanded: three axis sliders in the window's own local order (in-plane depth /
+			slice, then in-plane horizontal and vertical; the depth row is labelled with the
+			resolved plane when the slice is orthogonal), a click-to-edit coordinate offering
+			both world-millimetre and voxel-index fields, and the global time slider.
+	</ul>
+	Which form a newly opened editor starts in is the persisted default set by the
+	"Expand the per-cell navigator by default" preference; the "Nav" button is the live,
+	editor-wide session toggle. Both drive this window's slice stepper and world crosshair
+	through the same path a mouse interaction uses, so a window linked on slice or crosshair
+	moves its group with it while an unlinked window moves on its own. The per-cell navigator
+	is therefore the way to slice or place the crosshair in one window independently - unlike
+	the docked Image Navigator, whose sliders track the single active window.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_ContextMenu Context menu
 	A right click into a window view (without dragging - the right-button gestures
@@ -168,17 +212,19 @@
 	It is still possible to have a synchronized mouse interaction, see \ref org_mitk_editors_mxnmultiwidget_Synchronization and
 	\ref org_mitk_editors_mxnmultiwidget_Interaction_Mode.
 
-\subsubsection org_mitk_editors_mxnmultiwidget_Slice_Slider Slice selection slider
-	Displayed data is typically 3D data but each window view shows a 2D slice of the 3D volume. The direction in which the
-	3D volume is sliced is defined by the "view direction" (or "anatomical plane").
-	To define at which position in the view direction the 3D volume should be sliced, the slice selection slider can be used.
-	It can either be moved using the mouse or by using the appropriate mouse interaction (see above, e.g. mouse wheel scrolling).
+\subsubsection org_mitk_editors_mxnmultiwidget_Slice_Selection Slice selection
+	Displayed data is typically 3D but each window view shows a 2D slice of the volume,
+	sliced along the window's "view direction" (or "anatomical plane"). The slice position
+	is set with the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator) or
+	by the mouse (e.g. mouse-wheel scrolling). The current position is shown bottom-left as
+	<tt>slice/total</tt> and as a tick on the bottom hairline.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_View_Direction View direction
-	Each window view "is looking in" one of the three available view directions, namely "Axial", "Sagittal" or "Coronal".
-	You can change the view direction by switching to another anatomical plane in the view direction drop down menu.
-	Changing the view direction will reset the camera to its default for the new view direction, meaning default zoom and
-	centered camera position.
+	Each window view "is looking in" one of the three view directions, "Axial", "Sagittal"
+	or "Coronal", shown as the plane label in the window's bottom-left corner. Click that
+	label to pick another anatomical plane. Changing the view direction resets the camera to
+	its default for the new plane (default zoom, centered position). When the window is in an
+	orientation group, the change propagates to the group's other windows.
 
 \subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
 	Beyond the editor-wide synchronize toggle, window views can be coupled per dimension:
@@ -237,36 +283,19 @@
 	between windows that are not adjacent on screen; everyday assignment is expected to
 	happen in the map instead.
 
-\subsubsection org_mitk_editors_mxnmultiwidget_LinkSeams Link seams
-	The border between two adjacent render windows shows their coupling: at rest, one
-	short colored segment per group the two windows share (windows with no shared group
-	show nothing at all). Moving the pointer onto the border expands the segment into a
-	row of chips, one per dimension: a filled chip means the pair is coupled on that
-	dimension (click to uncouple), a hollow chip means it is not (click to couple - the
-	unlinked window joins its neighbor's group, or a new group is created for the pair).
-	A dashed chip marks dimensions where the two windows belong to different groups;
-	such mixed pairs are resolved in the layout editor, which the "..." chip opens
-	directly. The "Nav" chip couples or uncouples the whole navigation bundle for the
-	pair. Splitter resizing keeps working on the border outside the chip row.
-
-	Seams exist only between windows that are direct neighbors in the same splitter.
-	Couplings to windows elsewhere in the layout are indicated by the colored dot next
-	to the W/L readout (when the window is not windowing/LUT-linked) and are managed in
-	the layout editor.
-
 \subsubsection org_mitk_editors_mxnmultiwidget_WindowingOverlay Level/window and colormap overlay
-	Each window view carries quiet furniture at its edges:
+	The intensity of the topmost visible image is controlled from the right edge and the
+	bottom-right corner:
 	<ul>
-		<li> Bottom left, a <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout of the topmost
-			visible image. It is always visible by default; the preference
-			"Show level/window readout in render windows" switches it to
-			proximity-revealed instead. A colored dot beside the readout names the
-			window's windowing/LUT group when linked.
-		<li> Along the right edge, a thin ribbon showing the image's actual colormap.
-			Moving the pointer near it widens the ribbon: dragging its body shifts the
-			level, dragging its ends moves the window bounds, and the labels show the
-			current bounds. Double-clicking the readout opens numeric level/window entry;
-			the small chip beside the readout opens a colormap menu.
+		<li> The <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout sits bottom-right, beside
+			the colorbar. It is always visible by default; the preference
+			"Show level/window readout in render windows" switches it to proximity-revealed
+			instead. It highlights under the pointer; click it to open numeric level/window
+			entry.
+		<li> The colorbar along the right edge shows the image's actual colormap as a thin
+			strip. On reveal it widens into a legend with a value tick scale (the current
+			level marked in the windowing group's hue) and gains a colormap picker chip.
+			Drag the bar's body to shift the level and its ends to move the window bounds.
 	</ul>
 	For a window in a windowing or LUT group these controls drive every group member
 	(each keeping its relative difference during drags) and leave other windows and the
@@ -275,9 +304,25 @@
 	controls.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_CleanView Clean view
-	The "Clean" toggle in a window view's utility menu hides all viewport furniture in
-	every window of the editor (readouts, ribbons, and other overlays), e.g. for taking
-	clean screenshots with external tools. The mode is sticky until toggled off and
-	applies to windows added later as well.
+	The "Clean" toggle in a window view's utility menu hides all MxN viewport furniture in
+	every window of the editor (readouts, colorbars, navigator, and the utility
+	strip itself), e.g. for taking clean screenshots with external tools. The mode is
+	sticky until toggled off and applies to windows added later as well. Because the
+	utility strip is hidden while clean view is active, switch it back off from the
+	right-click context menu (see \ref org_mitk_editors_mxnmultiwidget_ContextMenu), which
+	stays available; clean view is a session state and is not saved with the layout.
+
+\subsection org_mitk_editors_mxnmultiwidget_Preferences Preferences
+	The MxN Display preference page (<i>Window &rarr; Preferences</i>) carries, besides the
+	general render-window options, two defaults for the per-window furniture:
+	<ul>
+		<li> "Show level/window readout in render windows" (default on): keep the W/L readout
+			always visible; when off it follows the proximity reveal like the rest of the
+			furniture.
+		<li> "Expand the per-cell navigator by default" (default off): start each window's
+			navigator in its expanded form (the full crosshair plus coordinate entry) instead
+			of the compact slice slider. The "Nav" button still toggles the mode live for the
+			whole editor at any time.
+	</ul>
 
 */

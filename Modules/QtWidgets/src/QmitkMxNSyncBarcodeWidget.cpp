@@ -28,6 +28,8 @@ namespace
   constexpr int SlotGap = 1;
   constexpr int IconGap = 2;          // gap between framed glyph boxes
   constexpr int IconInset = 3;        // glyph padding inside its framed box
+  constexpr int MinGlyphBox = 12;     // smallest box that still reads as a glyph
+  constexpr int MaxGlyphBox = 24;     // glyphs beyond this just waste space
 
   // Furniture neutral: a faint white, matching the hairline tokens used across
   // the MxN viewport furniture over its translucent dark backing.
@@ -59,6 +61,11 @@ QList<QmitkMxNSyncBarcodeWidget::AxisSlot> QmitkMxNSyncBarcodeWidget::Slots() co
   return m_Slots;
 }
 
+void QmitkMxNSyncBarcodeWidget::SetAxisClickable(bool clickable)
+{
+  m_AxisClickable = clickable;
+}
+
 bool QmitkMxNSyncBarcodeWidget::IsEmptyState() const
 {
   return std::none_of(m_Slots.begin(), m_Slots.end(),
@@ -78,95 +85,155 @@ QSize QmitkMxNSyncBarcodeWidget::minimumSizeHint() const
   return this->sizeHint();
 }
 
-bool QmitkMxNSyncBarcodeWidget::UseIconMode() const
+QmitkMxNSyncBarcodeWidget::BarcodeLayout
+QmitkMxNSyncBarcodeWidget::ComputeLayout(int width, int height, int slotCount)
 {
-  if (m_Slots.isEmpty())
+  BarcodeLayout layout;
+  if (slotCount <= 0)
   {
-    return false;
+    return layout;  // ColorBar, but nothing to draw
   }
-  // Draw glyphs only when the granted width fits them; otherwise collapse to
-  // the compact color slots.
-  const int box = this->IconBox();
-  const int needed = m_Slots.size() * box + (m_Slots.size() - 1) * IconGap;
-  return this->width() >= needed;
+
+  // Search every row/column wrapping and keep the one with the largest legible
+  // glyph box. A wide, short strip lands on a single row (its height caps the
+  // box); a squarer tile wraps into a grid. If nothing reaches MinGlyphBox even
+  // wrapped, collapse to the color slots.
+  int bestBox = 0;
+  int bestColumns = 0;
+  int bestRows = 0;
+  for (int columns = 1; columns <= slotCount; ++columns)
+  {
+    const int rows = (slotCount + columns - 1) / columns;
+    const int boxByWidth = (width - 1 - (columns - 1) * IconGap) / columns;  // 1 = left inset
+    const int boxByHeight = (height - (rows - 1) * IconGap) / rows;
+    const int box = std::min(boxByWidth, boxByHeight);
+    if (box < MinGlyphBox)
+    {
+      continue;
+    }
+    const int clamped = std::min(box, MaxGlyphBox);
+    // Largest box wins; on a tie prefer fewer rows (flatter reads better).
+    if (clamped > bestBox || (clamped == bestBox && (bestRows == 0 || rows < bestRows)))
+    {
+      bestBox = clamped;
+      bestColumns = columns;
+      bestRows = rows;
+    }
+  }
+
+  if (bestBox >= MinGlyphBox)
+  {
+    layout.mode = BarcodeLayout::Mode::Glyphs;
+    layout.columns = bestColumns;
+    layout.rows = bestRows;
+    layout.box = bestBox;
+  }
+  return layout;
 }
 
-int QmitkMxNSyncBarcodeWidget::IconBox() const
+QRect QmitkMxNSyncBarcodeWidget::ContentRectIn(const QRect& target, const BarcodeLayout& layout,
+                                               int slotCount)
 {
-  // Fill the strip height (minus a hair of padding) so the glyphs are legible
-  // and not lost in whitespace, clamped to a sane square range.
-  return std::clamp(this->height() - 2, 14, 24);
+  if (slotCount == 0)
+  {
+    return QRect();
+  }
+  if (layout.mode == BarcodeLayout::Mode::Glyphs)
+  {
+    const int gridWidth = layout.columns * layout.box + (layout.columns - 1) * IconGap;
+    const int gridHeight = layout.rows * layout.box + (layout.rows - 1) * IconGap;
+    // Centered vertically; left-aligned (with the 1 px inset) horizontally so
+    // the strip reads left-to-right and any trailing space stays inert.
+    const int top = target.top() + std::max(0, (target.height() - gridHeight) / 2);
+    return QRect(target.left() + 1, top, gridWidth, gridHeight);
+  }
+  const int barWidth = slotCount * ColorSlotWidth + (slotCount - 1) * SlotGap;
+  const int top = target.top() + (target.height() - BarcodeHeight) / 2;
+  return QRect(target.left(), top, barWidth, BarcodeHeight);
 }
 
-int QmitkMxNSyncBarcodeWidget::ContentWidth() const
+QRect QmitkMxNSyncBarcodeWidget::GlyphBoxRectIn(const QRect& contentRect, const BarcodeLayout& layout,
+                                                int index)
+{
+  const int column = index % layout.columns;
+  const int row = index / layout.columns;
+  return QRect(contentRect.left() + column * (layout.box + IconGap),
+               contentRect.top() + row * (layout.box + IconGap),
+               layout.box, layout.box);
+}
+
+QRect QmitkMxNSyncBarcodeWidget::ContentRect(const BarcodeLayout& layout) const
+{
+  return ContentRectIn(this->rect(), layout, m_Slots.size());
+}
+
+int QmitkMxNSyncBarcodeWidget::SlotAt(const BarcodeLayout& layout, const QPoint& pos) const
 {
   const int n = m_Slots.size();
-  if (n == 0)
-  {
-    return 0;
-  }
-  if (this->UseIconMode())
-  {
-    const int box = this->IconBox();
-    return 1 + n * box + (n - 1) * IconGap;  // 1 = the left inset used when painting
-  }
-  return n * ColorSlotWidth + (n - 1) * SlotGap;
-}
-
-int QmitkMxNSyncBarcodeWidget::SlotAtX(int x) const
-{
-  if (m_Slots.isEmpty())
+  const QRect content = this->ContentRect(layout);
+  if (n == 0 || !content.contains(pos))
   {
     return -1;
   }
-  const bool icon = this->UseIconMode();
-  const int stride = (icon ? this->IconBox() : ColorSlotWidth) + (icon ? IconGap : SlotGap);
-  const int slot = x / std::max(1, stride);
-  return (slot >= 0 && slot < m_Slots.size()) ? slot : -1;
+  if (layout.mode == BarcodeLayout::Mode::Glyphs)
+  {
+    for (int slot = 0; slot < n; ++slot)
+    {
+      if (GlyphBoxRectIn(content, layout, slot).contains(pos))
+      {
+        return slot;
+      }
+    }
+    return -1;
+  }
+  const int slot = (pos.x() - content.left()) / std::max(1, ColorSlotWidth + SlotGap);
+  return (slot >= 0 && slot < n) ? slot : -1;
 }
 
-void QmitkMxNSyncBarcodeWidget::paintEvent(QPaintEvent* /*event*/)
+void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target,
+                                          const QList<AxisSlot>& axisSlots, bool hovered,
+                                          const QColor& gapColor, int hoveredSlot)
 {
-  QPainter painter(this);
-
-  if (this->IsEmptyState())
+  const int n = axisSlots.size();
+  if (n == 0)
   {
-    painter.setPen(HintColor);
-    QFont font = painter.font();
-    font.setPointSizeF(std::max(7.0, font.pointSizeF() - 1.0));
-    painter.setFont(font);
-    painter.drawText(this->rect(), Qt::AlignVCenter | Qt::AlignLeft, tr("not synchronized"));
     return;
   }
+  const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), n);
+  const QRect content = ContentRectIn(target, layout, n);
 
-  const QColor gap = this->palette().color(QPalette::Mid);
-
-  if (this->UseIconMode())
+  if (layout.mode == BarcodeLayout::Mode::Glyphs)
   {
     // A framed glyph per axis (the seam idiom): a 1 px box in the axis color
-    // with the glyph inside. Hover brightens every frame to white so the whole
-    // strip reads as one button that opens the layout editor. A 1 px left inset
-    // keeps the leftmost frame off the widget edge (a pixel-aligned pen there
-    // would otherwise be clipped).
-    const int box = this->IconBox();
-    const int inner = std::max(1, box - 2 * IconInset);
-    const int top = (this->height() - box) / 2;
-    const qreal dpr = this->devicePixelRatioF();
+    // with the glyph inside, wrapping into a grid when the surface is squarer
+    // than a single row. A lit frame brightens to white: 'hovered' lights the
+    // whole strip (the passive per-cell strip is one button), 'hoveredSlot'
+    // lights a single axis (the editor targets axes individually).
+    const int inner = std::max(1, layout.box - 2 * IconInset);
+    const qreal dpr = nullptr != painter.device() ? painter.device()->devicePixelRatioF() : 1.0;
 
-    for (int slot = 0; slot < m_Slots.size(); ++slot)
+    for (int slot = 0; slot < n; ++slot)
     {
-      const AxisSlot& s = m_Slots[slot];
+      const AxisSlot& s = axisSlots[slot];
       const bool synced = s.color.isValid();
-      const QColor color = synced ? s.color : gap;
-      const QRect boxRect(1 + slot * (box + IconGap), top, box, box);
+      const bool lit = hovered || slot == hoveredSlot;
+      const QColor color = synced ? s.color : gapColor;
+      const QRect boxRect = GlyphBoxRectIn(content, layout, slot);
 
-      const QColor frameColor = m_Hovered ? QColor(255, 255, 255, 210) : color;
-      painter.setOpacity(synced || m_Hovered ? 1.0 : 0.5);
-      painter.setPen(QPen(frameColor, 1));
+      const QColor frameColor = lit ? QColor(255, 255, 255, 210) : color;
+      painter.setOpacity(synced || lit ? 1.0 : 0.5);
+      // A dashed frame marks the heterogeneous group state (some members linked,
+      // not all); solid means all members, gap means none.
+      QPen framePen(frameColor, 1);
+      if (s.partial)
+      {
+        framePen.setStyle(Qt::DashLine);
+      }
+      painter.setPen(framePen);
       painter.setBrush(Qt::NoBrush);
       painter.drawRect(boxRect.adjusted(0, 0, -1, -1));
 
-      painter.setOpacity(synced ? 1.0 : (m_Hovered ? 0.8 : 0.4));
+      painter.setOpacity(synced ? 1.0 : (lit ? 0.8 : 0.4));
       QPixmap glyph = QmitkMxNRenderAxisGlyph(s.glyph, color, qRound(inner * dpr));
       if (!glyph.isNull())
       {
@@ -179,43 +246,88 @@ void QmitkMxNSyncBarcodeWidget::paintEvent(QPaintEvent* /*event*/)
   }
 
   // Narrow: the compact positional color slots.
-  const int top = (this->height() - BarcodeHeight) / 2;
-  for (int slot = 0; slot < m_Slots.size(); ++slot)
+  for (int slot = 0; slot < n; ++slot)
   {
-    const QRect slotRect(slot * (ColorSlotWidth + SlotGap), top, ColorSlotWidth, BarcodeHeight);
-    const AxisSlot& s = m_Slots[slot];
-    if (s.color.isValid())
+    const QRect slotRect(content.left() + slot * (ColorSlotWidth + SlotGap), content.top(),
+                         ColorSlotWidth, BarcodeHeight);
+    const AxisSlot& s = axisSlots[slot];
+    if (s.color.isValid() && !s.partial)
     {
       painter.fillRect(slotRect, s.color);
+    }
+    else if (s.color.isValid())
+    {
+      // Heterogeneous group state: fill only the lower half so "some" reads
+      // distinctly from the solid "all" and the empty "none".
+      const int half = slotRect.height() / 2;
+      painter.fillRect(slotRect.adjusted(0, half, 0, 0), s.color);
     }
     else
     {
       // Unsynced: a faint hairline outline, no fill, so gaps read as absence.
-      painter.setPen(QPen(gap, 1));
+      painter.setPen(QPen(gapColor, 1));
       painter.drawLine(slotRect.left(), slotRect.bottom(), slotRect.right(), slotRect.bottom());
     }
   }
 }
 
+void QmitkMxNSyncBarcodeWidget::paintEvent(QPaintEvent* /*event*/)
+{
+  QPainter painter(this);
+
+  // The "not synchronized" hint is the passive strip's affordance ("click to set
+  // up sync"). In axis-clickable mode (the editor's group header) the glyphs are
+  // the controls, so they always show even when nothing is linked yet.
+  if (!m_AxisClickable && this->IsEmptyState())
+  {
+    painter.setPen(HintColor);
+    QFont font = painter.font();
+    font.setPointSizeF(std::max(7.0, font.pointSizeF() - 1.0));
+    painter.setFont(font);
+    painter.drawText(this->rect(), Qt::AlignVCenter | Qt::AlignLeft, tr("not synchronized"));
+    return;
+  }
+
+  PaintInto(painter, this->rect(), m_Slots, m_Hovered, this->palette().color(QPalette::Mid),
+            m_HoveredSlot);
+}
+
 void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
 {
-  // Only the glyph area is interactive; the strip can be laid out wider than its
-  // glyphs, and that trailing space must not highlight or read as clickable.
-  const bool over = event->pos().x() >= 0 && event->pos().x() < this->ContentWidth();
-  if (over != m_Hovered)
+  // Only the drawn slots are interactive; the strip can be laid out larger than
+  // its content, and that surrounding space must not highlight or read as
+  // clickable. Axis-clickable mode highlights the single axis under the pointer;
+  // the passive strip highlights as a whole.
+  const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
+  if (m_AxisClickable)
   {
-    m_Hovered = over;
-    this->update();
+    const int slot = this->SlotAt(layout, event->pos());
+    if (slot != m_HoveredSlot)
+    {
+      m_HoveredSlot = slot;
+      this->update();
+    }
+    this->setCursor(slot >= 0 ? Qt::PointingHandCursor : Qt::ArrowCursor);
   }
-  this->setCursor(over ? Qt::PointingHandCursor : Qt::ArrowCursor);
+  else
+  {
+    const bool over = this->ContentRect(layout).contains(event->pos());
+    if (over != m_Hovered)
+    {
+      m_Hovered = over;
+      this->update();
+    }
+    this->setCursor(over ? Qt::PointingHandCursor : Qt::ArrowCursor);
+  }
   QWidget::mouseMoveEvent(event);
 }
 
 void QmitkMxNSyncBarcodeWidget::leaveEvent(QEvent* event)
 {
-  if (m_Hovered)
+  if (m_Hovered || m_HoveredSlot != -1)
   {
     m_Hovered = false;
+    m_HoveredSlot = -1;
     this->update();
   }
   QWidget::leaveEvent(event);
@@ -232,13 +344,25 @@ void QmitkMxNSyncBarcodeWidget::mousePressEvent(QMouseEvent* event)
 
 void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-  // A click (not a drag) on the glyph area opens the editor; the trailing space
-  // is inert.
+  // A click (not a drag) on the drawn slots is a button; the surrounding space
+  // is inert. In axis-clickable mode the click targets the axis under the
+  // pointer (AxisClicked); otherwise the whole strip opens the editor (Clicked).
+  const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
   if (event->button() == Qt::LeftButton
       && (event->pos() - m_PressPos).manhattanLength() < QApplication::startDragDistance()
-      && event->pos().x() < this->ContentWidth())
+      && this->ContentRect(layout).contains(event->pos()))
   {
-    emit Clicked();
+    if (m_AxisClickable)
+    {
+      if (const int slot = this->SlotAt(layout, event->pos()); slot >= 0)
+      {
+        emit AxisClicked(slot);
+      }
+    }
+    else
+    {
+      emit Clicked();
+    }
   }
   QWidget::mouseReleaseEvent(event);
 }
@@ -248,7 +372,8 @@ bool QmitkMxNSyncBarcodeWidget::event(QEvent* event)
   if (event->type() == QEvent::ToolTip)
   {
     auto* helpEvent = static_cast<QHelpEvent*>(event);
-    const int slot = this->SlotAtX(helpEvent->pos().x());
+    const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
+    const int slot = this->SlotAt(layout, helpEvent->pos());
     if (slot >= 0 && !m_Slots[slot].tooltip.isEmpty())
     {
       QToolTip::showText(helpEvent->globalPos(), m_Slots[slot].tooltip, this);

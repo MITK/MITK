@@ -14,10 +14,12 @@ found in the LICENSE file.
 
 #include <QmitkMultiWidgetLayoutSelectionWidget.h>
 #include <QmitkMxNCellMapWidget.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
 
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 
+#include <QAction>
 #include <QApplication>
 #include <QCheckBox>
 #include <QColorDialog>
@@ -25,15 +27,19 @@ found in the LICENSE file.
 #include <QDoubleSpinBox>
 #include <QDrag>
 #include <QDragEnterEvent>
+#include <QDragLeaveEvent>
 #include <QDropEvent>
 #include <QFrame>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -65,12 +71,45 @@ namespace
     return "";
   }
 
+  QmitkMxNAxisGlyph GlyphFor(QmitkMxNSyncDimension dimension)
+  {
+    switch (dimension)
+    {
+      case QmitkMxNSyncDimension::Pan:         return QmitkMxNAxisGlyph::Pan;
+      case QmitkMxNSyncDimension::Zoom:        return QmitkMxNAxisGlyph::Zoom;
+      case QmitkMxNSyncDimension::Slice:       return QmitkMxNAxisGlyph::Slice;
+      case QmitkMxNSyncDimension::Crosshair:   return QmitkMxNAxisGlyph::Crosshair;
+      case QmitkMxNSyncDimension::Orientation: return QmitkMxNAxisGlyph::Orientation;
+      case QmitkMxNSyncDimension::Windowing:   return QmitkMxNAxisGlyph::Windowing;
+      case QmitkMxNSyncDimension::Lut:         return QmitkMxNAxisGlyph::Lut;
+    }
+    return QmitkMxNAxisGlyph::Pan;
+  }
+
   constexpr std::array<QmitkMxNSyncDimension, 4> NavigationBundle{
     QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
     QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair
   };
 
   const QString NotLinkedEntry = QStringLiteral("(not linked)");
+
+  /**
+   * Style a group card's header as a solid bar in the group hue, with the name,
+   * count, and menu button in a contrasting ink. Shared by card creation and the
+   * in-place refresh so a recolor updates both the bar and its text.
+   */
+  void StyleGroupHeader(QFrame* header, QLabel* name, QLabel* count, QToolButton* menuButton,
+                        const QColor& hue)
+  {
+    const double luminance = 0.299 * hue.red() + 0.587 * hue.green() + 0.114 * hue.blue();
+    const QString ink = luminance > 140.0 ? QStringLiteral("#1a1a1a") : QStringLiteral("#ffffff");
+    header->setStyleSheet(QStringLiteral("background-color: %1; border-top-left-radius: 3px; "
+                                         "border-top-right-radius: 3px;").arg(hue.name()));
+    name->setStyleSheet(QStringLiteral("color: %1; font-weight: bold; background: transparent;").arg(ink));
+    count->setStyleSheet(QStringLiteral("color: %1; background: transparent;").arg(ink));
+    menuButton->setStyleSheet(
+      QStringLiteral("QToolButton { color: %1; background: transparent; border: none; }").arg(ink));
+  }
 
   void ClearLayout(QLayout* layout)
   {
@@ -82,60 +121,35 @@ namespace
   }
 
   /**
-   * Group card frame that accepts cell drops from the map (no Q_OBJECT
-   * machinery needed - it only forwards to a callback).
+   * The group card as one coherent object: dragging its background assigns the
+   * group to the map's selected cells (the whole card is the drag source, not a
+   * tiny swatch), and it accepts cell drops from the map, highlighting in the
+   * group hue while a drag hovers. Interactive children (name field, glyph
+   * strip, buttons) receive their own events first, so the drag starts only from
+   * the card's own surface.
    */
   class GroupCardFrame : public QFrame
   {
   public:
-    explicit GroupCardFrame(std::function<void(const QStringList&)> onCellsDropped,
-                            QWidget* parent = nullptr)
+    GroupCardFrame(QString groupId, QColor hue,
+                   std::function<void(const QStringList&)> onCellsDropped,
+                   QWidget* parent = nullptr)
       : QFrame(parent)
+      , m_GroupId(std::move(groupId))
+      , m_Hue(std::move(hue))
       , m_OnCellsDropped(std::move(onCellsDropped))
     {
       this->setAcceptDrops(true);
     }
 
   protected:
-    void dragEnterEvent(QDragEnterEvent* event) override
-    {
-      if (event->mimeData()->hasFormat(QmitkMxNCellMapWidget::CellsMimeType))
-      {
-        event->acceptProposedAction();
-      }
-    }
-
-    void dropEvent(QDropEvent* event) override
-    {
-      const auto ids = QString::fromUtf8(
-        event->mimeData()->data(QmitkMxNCellMapWidget::CellsMimeType));
-      m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts));
-      event->acceptProposedAction();
-    }
-
-  private:
-    std::function<void(const QStringList&)> m_OnCellsDropped;
-  };
-
-  /**
-   * Color swatch that doubles as the drag source for "drop this group onto a
-   * tile"; a plain press-and-release still emits clicked() for the color
-   * dialog.
-   */
-  class GroupSwatchButton : public QPushButton
-  {
-  public:
-    GroupSwatchButton(QString groupId, QWidget* parent = nullptr)
-      : QPushButton(parent)
-      , m_GroupId(std::move(groupId))
-    {
-    }
-
-  protected:
     void mousePressEvent(QMouseEvent* event) override
     {
-      m_PressPosition = event->pos();
-      QPushButton::mousePressEvent(event);
+      if (event->button() == Qt::LeftButton)
+      {
+        m_PressPosition = event->pos();
+      }
+      QFrame::mousePressEvent(event);
     }
 
     void mouseMoveEvent(QMouseEvent* event) override
@@ -143,7 +157,6 @@ namespace
       if (event->buttons().testFlag(Qt::LeftButton)
           && (event->pos() - m_PressPosition).manhattanLength() >= QApplication::startDragDistance())
       {
-        this->setDown(false);
         auto* mimeData = new QMimeData();
         mimeData->setData(QmitkMxNCellMapWidget::GroupMimeType, m_GroupId.toUtf8());
         auto* drag = new QDrag(this);
@@ -151,12 +164,53 @@ namespace
         drag->exec(Qt::CopyAction);
         return;
       }
-      QPushButton::mouseMoveEvent(event);
+      QFrame::mouseMoveEvent(event);
+    }
+
+    void dragEnterEvent(QDragEnterEvent* event) override
+    {
+      if (event->mimeData()->hasFormat(QmitkMxNCellMapWidget::CellsMimeType))
+      {
+        m_DropHighlight = true;
+        this->update();
+        event->acceptProposedAction();
+      }
+    }
+
+    void dragLeaveEvent(QDragLeaveEvent*) override
+    {
+      m_DropHighlight = false;
+      this->update();
+    }
+
+    void dropEvent(QDropEvent* event) override
+    {
+      m_DropHighlight = false;
+      this->update();
+      const auto ids = QString::fromUtf8(
+        event->mimeData()->data(QmitkMxNCellMapWidget::CellsMimeType));
+      m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts));
+      event->acceptProposedAction();
+    }
+
+    void paintEvent(QPaintEvent* event) override
+    {
+      QFrame::paintEvent(event);
+      if (m_DropHighlight)
+      {
+        QPainter painter(this);
+        QColor tint = m_Hue.isValid() ? m_Hue : this->palette().color(QPalette::Highlight);
+        tint.setAlpha(70);
+        painter.fillRect(this->rect(), tint);
+      }
     }
 
   private:
     QString m_GroupId;
+    QColor m_Hue;
+    std::function<void(const QStringList&)> m_OnCellsDropped;
     QPoint m_PressPosition;
+    bool m_DropHighlight = false;
   };
 }
 
@@ -200,22 +254,90 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   m_CellMap->setMinimumHeight(140);
   m_CellMap->setToolTip(tr("Select render windows by click, Ctrl-click, or rubber band; "
                            "assign them by dropping them onto a group (or a group's color "
-                           "onto a window). The bottom stripe of each window is its sync "
-                           "barcode: one slot per dimension (pan, zoom, slice, crosshair, "
-                           "orientation, windowing, LUT), colored by group, gap = unsynced, "
-                           "notch = offset."));
+                           "onto a window). Each window shows its sync axes as glyphs: the "
+                           "seven dimensions plus data selection, tinted by group, a gap where "
+                           "the window is not synchronized on that axis."));
   connect(m_CellMap, &QmitkMxNCellMapWidget::AssignRequested, this,
           [this](const QString& group, const QStringList& windowIds)
           {
             this->AssignCellsToGroup(windowIds, group.toStdString());
           });
   connect(m_CellMap, &QmitkMxNCellMapWidget::SelectionChanged, this,
-          [this](const QStringList&) { this->ScheduleRebuild(); });
+          [this](const QStringList& windowIds)
+          {
+            // Selecting a tile makes its render window the active one (the first
+            // selected window for a multi-selection), so the map and the editor's
+            // focus stay in step.
+            if (!m_MultiWidget.isNull() && !windowIds.isEmpty())
+            {
+              if (const auto cell = m_MultiWidget->GetRenderWindowWidget(windowIds.first()))
+              {
+                m_MultiWidget->SetActiveRenderWindowWidget(cell);
+              }
+            }
+            this->ScheduleRebuild();
+          });
   mainFaceLayout->addWidget(m_CellMap);
+
+  // Grow or shrink the grid by a trailing row or column. The operations edit the
+  // splitter tree in place, so existing windows keep their ids, sync links,
+  // renderer-specific node properties, and positions - only the trailing edge is
+  // added (empty) or removed. They require a rectangular grid, which the
+  // tree-derived ResolveGridShape decides, so the buttons disable (with an
+  // explaining tooltip) for irregular or non-grid layouts.
+  auto* gridRow = new QHBoxLayout();
+  gridRow->setContentsMargins(0, 0, 0, 0);
+  m_RemoveRowButton = new QToolButton(mainContainer);
+  m_RemoveRowButton->setText(QStringLiteral("-"));
+  m_AddRowButton = new QToolButton(mainContainer);
+  m_AddRowButton->setText(QStringLiteral("+"));
+  m_RemoveColumnButton = new QToolButton(mainContainer);
+  m_RemoveColumnButton->setText(QStringLiteral("-"));
+  m_AddColumnButton = new QToolButton(mainContainer);
+  m_AddColumnButton->setText(QStringLiteral("+"));
+  connect(m_RemoveRowButton, &QToolButton::clicked, this, [this]()
+  {
+    if (!m_MultiWidget.isNull())
+    {
+      m_MultiWidget->RemoveGridRow();
+    }
+  });
+  connect(m_AddRowButton, &QToolButton::clicked, this, [this]()
+  {
+    if (!m_MultiWidget.isNull())
+    {
+      m_MultiWidget->AddGridRow();
+    }
+  });
+  connect(m_RemoveColumnButton, &QToolButton::clicked, this, [this]()
+  {
+    if (!m_MultiWidget.isNull())
+    {
+      m_MultiWidget->RemoveGridColumn();
+    }
+  });
+  connect(m_AddColumnButton, &QToolButton::clicked, this, [this]()
+  {
+    if (!m_MultiWidget.isNull())
+    {
+      m_MultiWidget->AddGridColumn();
+    }
+  });
+  gridRow->addStretch();
+  gridRow->addWidget(new QLabel(tr("Rows:"), mainContainer));
+  gridRow->addWidget(m_RemoveRowButton);
+  gridRow->addWidget(m_AddRowButton);
+  gridRow->addSpacing(12);
+  gridRow->addWidget(new QLabel(tr("Columns:"), mainContainer));
+  gridRow->addWidget(m_RemoveColumnButton);
+  gridRow->addWidget(m_AddColumnButton);
+  gridRow->addStretch();
+  mainFaceLayout->addLayout(gridRow);
 
   auto* groupsContainer = new QWidget(mainContainer);
   m_GroupsLayout = new QVBoxLayout(groupsContainer);
   m_GroupsLayout->setContentsMargins(0, 0, 0, 0);
+  m_GroupsLayout->setSpacing(6);
   m_GroupsLayout->addStretch();
   mainFaceLayout->addWidget(groupsContainer);
   mainFaceLayout->addStretch();
@@ -256,6 +378,9 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
 
   m_MultiWidget = multiWidget;
   m_CellMap->SetMultiWidget(multiWidget);
+  // The empty-group intent cache belongs to the attached editor's groups; a
+  // swap (or detach) invalidates it.
+  m_EmptyGroupAxisCache.clear();
 
   if (!m_MultiWidget.isNull())
   {
@@ -265,6 +390,12 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
     connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncGroupAdded,
             this, [this]() { this->ScheduleRebuild(); });
+    // Reverse of the tile-selects-active link: when the editor's active render
+    // window changes (e.g. the user clicks a window), select its tile in the
+    // map. The engine setters no-op when unchanged, so this does not loop with
+    // the forward direction.
+    connect(m_MultiWidget, &QmitkMxNMultiWidget::ActiveRenderWindowChanged,
+            this, &QmitkMxNLayoutEditorWidget::SelectActiveWindowTile);
   }
 
   this->setEnabled(!m_MultiWidget.isNull());
@@ -284,6 +415,22 @@ QmitkMultiWidgetLayoutSelectionWidget* QmitkMxNLayoutEditorWidget::GetLayoutSele
 void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds,
                                                     const std::string& group)
 {
+  // An empty group carrying a configured intent cache defines its axes exactly:
+  // apply the cache to the joining windows and clear it, instead of
+  // SetCellMembership's nav-bundle default, so the result is the cached axes
+  // rather than their union with the default. The cache's selection bit is
+  // applied uniformly here, which SetCellMembership's selection-follow cannot do
+  // for a group's first member (there is no prior member to follow).
+  if (this->HasCachedGroupIntent(group) && this->GroupMembers(group).empty())
+  {
+    this->FlushEmptyGroupCache(group, windowIds);
+    if (!m_MultiWidget.isNull())
+    {
+      m_MultiWidget->RefreshSyncControls();
+    }
+    return;
+  }
+
   for (const auto& windowId : windowIds)
   {
     this->SetCellMembership(windowId, group, true);
@@ -353,6 +500,94 @@ void QmitkMxNLayoutEditorWidget::ApplySelectionToGroup(const std::string& group,
     }
   }
   m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, int axisIndex)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  const int dimCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  if (axisIndex < 0 || axisIndex > dimCount)  // dimCount + 1 axes: [0, dimCount]
+  {
+    return;
+  }
+
+  const bool empty = this->GroupMembers(groupId).empty();
+  const auto selected = m_CellMap->GetSelectedWindowIds();
+
+  // Empty group, no map selection: toggle the per-group intent cache and repaint
+  // the card's barcode from it; the engine is not touched. The cache is applied
+  // to the first windows assigned (see FlushEmptyGroupCache).
+  if (empty && selected.isEmpty())
+  {
+    auto& intent = m_EmptyGroupAxisCache[groupId];
+    const auto axis = static_cast<std::size_t>(axisIndex);
+    intent[axis] = !intent[axis];
+    // Keep "entry present" == "intent configured": drop an entry that toggling
+    // left with no axis on, so BuildGroupBarcodeSlots and AssignCellsToGroup
+    // never treat an empty intent as a cache.
+    if (!this->HasCachedGroupIntent(groupId))
+    {
+      m_EmptyGroupAxisCache.erase(groupId);
+    }
+    // Repaint through the card's own refresher, whose first action re-pushes
+    // BuildGroupBarcodeSlots(groupId) into the barcode - which now reads the
+    // cache. Reusing the existing seam avoids reaching for the strip by hand.
+    if (auto it = m_CardRefreshers.find(groupId); it != m_CardRefreshers.end() && it->second)
+    {
+      it->second();
+    }
+    return;
+  }
+
+  // Empty group with a map selection: bootstrap - link the selected windows on
+  // this axis so the group can be built from the glyphs, then apply any other
+  // cached intent axes to those same windows.
+  if (empty && !selected.isEmpty())
+  {
+    for (const auto& windowId : selected)
+    {
+      try
+      {
+        if (axisIndex < dimCount)
+        {
+          m_MultiWidget->SetSyncLink(windowId,
+            QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)], groupId);
+        }
+        else
+        {
+          m_MultiWidget->SetCellSelectionGroup(windowId, groupId);
+        }
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Layout editor: bootstrap link for '" << windowId.toStdString()
+                  << "' ignored: " << e.GetDescription();
+      }
+    }
+    this->FlushEmptyGroupCache(groupId, selected);
+    m_MultiWidget->RefreshSyncControls();
+    return;
+  }
+
+  // Non-empty group: homogenize the axis over the members (link all / unlink all).
+  const auto axisSlots = this->BuildGroupBarcodeSlots(groupId);
+  if (axisIndex >= axisSlots.size())
+  {
+    return;
+  }
+  const bool enable = !(axisSlots[axisIndex].color.isValid() && !axisSlots[axisIndex].partial);
+  if (axisIndex < dimCount)
+  {
+    this->ApplyDimensionToGroup(groupId,
+      QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)], enable);
+  }
+  else
+  {
+    this->ApplySelectionToGroup(groupId, enable);
+  }
 }
 
 bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group) const
@@ -524,20 +759,134 @@ void QmitkMxNLayoutEditorWidget::ScheduleRebuild()
     return;
   }
 
-  // Deferred: engine signals arrive synchronously from mutations triggered
-  // by this widget's own controls; rebuilding immediately would delete the
-  // emitting control out from under its slot.
+  // Deferred: engine signals arrive synchronously from mutations triggered by
+  // this widget's own controls; acting immediately could delete a control out
+  // from under its own slot. The deferral also coalesces a burst of signals.
   m_RebuildPending = true;
   QTimer::singleShot(0, this, [this]()
   {
     m_RebuildPending = false;
-    this->Rebuild();
+    this->RefreshOrRebuild();
   });
+}
+
+void QmitkMxNLayoutEditorWidget::RefreshOrRebuild()
+{
+  if (m_MultiWidget.isNull())
+  {
+    this->Rebuild();
+    return;
+  }
+
+  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
+  try
+  {
+    infos = m_MultiWidget->GetSyncGroupInfos();
+  }
+  catch (const mitk::Exception& e)
+  {
+    // Mid-layout-change states are transient; the next engine signal retries.
+    MITK_DEBUG << "Layout editor: skipped refresh: " << e.GetDescription();
+    return;
+  }
+
+  std::vector<std::string> currentIds;
+  currentIds.reserve(infos.size());
+  for (const auto& info : infos)
+  {
+    currentIds.push_back(info.id);
+  }
+
+  // The group set is unchanged (the usual case - a link, membership, name, or
+  // color edit), so update the existing cards in place. A changed set (a group
+  // added or removed, or a whole layout loaded / pushed) is reconciled: only the
+  // affected cards change, the others keep their widgets.
+  if (currentIds == m_DisplayedGroupIds)
+  {
+    this->RefreshCards();
+  }
+  else
+  {
+    this->ReconcileGroupCards(currentIds, infos);
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::RefreshCards()
+{
+  for (const auto& [id, refresher] : m_CardRefreshers)
+  {
+    refresher();
+  }
+  // The cell map is one custom-painted widget; recomputing its tiles just
+  // repaints (no child widgets, so no flicker).
+  m_CellMap->Rebuild();
+  this->UpdateGridButtons();
+}
+
+void QmitkMxNLayoutEditorWidget::SelectActiveWindowTile()
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  const auto active = m_MultiWidget->GetActiveRenderWindowWidget();
+  if (nullptr == active)
+  {
+    return;
+  }
+  for (const auto& [windowId, widget] : m_MultiWidget->GetRenderWindowWidgets())
+  {
+    if (widget == active)
+    {
+      m_CellMap->SetSelectedWindowIds(QStringList{ windowId });
+      return;
+    }
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::UpdateGridButtons()
+{
+  // Gate on the tree-derived grid shape, not the stored row/column counts: a
+  // loaded layout reports 0/0, and a render-window layout-design-menu change
+  // leaves the stored counts stale-but-nonzero, so a count-based gate would keep
+  // the buttons wrongly enabled on a non-grid tree.
+  int rows = 0;
+  int columns = 0;
+  const bool grid = !m_MultiWidget.isNull() && m_MultiWidget->ResolveGridShape(rows, columns);
+
+  m_AddRowButton->setEnabled(grid);
+  m_AddColumnButton->setEnabled(grid);
+  m_RemoveRowButton->setEnabled(grid && rows > 1);
+  m_RemoveColumnButton->setEnabled(grid && columns > 1);
+
+  if (grid)
+  {
+    m_AddRowButton->setToolTip(tr("Add a row at the bottom"));
+    m_AddColumnButton->setToolTip(tr("Add a column at the right"));
+    m_RemoveRowButton->setToolTip(rows > 1
+      ? tr("Remove the bottom row")
+      : tr("A grid must keep at least one row"));
+    m_RemoveColumnButton->setToolTip(columns > 1
+      ? tr("Remove the rightmost column")
+      : tr("A grid must keep at least one column"));
+  }
+  else
+  {
+    const QString why = tr("Adding or removing a row or column works only on a regular grid "
+                           "layout. Use the Layout controls above to set a grid first.");
+    m_AddRowButton->setToolTip(why);
+    m_AddColumnButton->setToolTip(why);
+    m_RemoveRowButton->setToolTip(why);
+    m_RemoveColumnButton->setToolTip(why);
+  }
 }
 
 void QmitkMxNLayoutEditorWidget::Rebuild()
 {
   ClearLayout(m_GroupsLayout);
+  m_CardRefreshers.clear();
+  m_CardsById.clear();
+  m_DisplayedGroupIds.clear();
   m_Matrix->clear();
   m_Matrix->setRowCount(0);
   m_Matrix->setColumnCount(0);
@@ -545,6 +894,7 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
   if (m_MultiWidget.isNull())
   {
     m_CellMap->Rebuild();
+    this->UpdateGridButtons();
     return;
   }
 
@@ -568,10 +918,177 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
   for (const auto& info : infos)
   {
     m_GroupsLayout->addWidget(this->BuildGroupCard(info));
+    m_DisplayedGroupIds.push_back(info.id);
   }
   m_GroupsLayout->addStretch();
 
   this->RebuildMatrix(infos, descriptors);
+  this->UpdateGridButtons();
+}
+
+void QmitkMxNLayoutEditorWidget::ReconcileGroupCards(
+  const std::vector<std::string>& currentIds,
+  const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos)
+{
+  std::map<std::string, const QmitkMxNMultiWidget::SyncGroupInfo*> infoById;
+  for (const auto& info : infos)
+  {
+    infoById[info.id] = &info;
+  }
+  const auto inCurrent = [&currentIds](const std::string& id)
+  {
+    return std::find(currentIds.begin(), currentIds.end(), id) != currentIds.end();
+  };
+
+  // Delete cards for groups that are gone; their bindings go with them.
+  for (const auto& id : m_DisplayedGroupIds)
+  {
+    if (!inCurrent(id))
+    {
+      if (auto it = m_CardsById.find(id); it != m_CardsById.end())
+      {
+        delete it->second.data();  // also removes it from the layout; QPointer nulls
+        m_CardsById.erase(it);
+      }
+      m_CardRefreshers.erase(id);
+      m_EmptyGroupAxisCache.erase(id);  // a gone group's pending intent is moot
+    }
+  }
+
+  // Detach the surviving cards and the trailing stretch from the layout without
+  // destroying the cards (deleting a QLayoutItem does not delete its widget), so
+  // they can be re-added in the new order - a move, not a teardown, which is what
+  // preserves each card's widget identity and live state.
+  while (auto* item = m_GroupsLayout->takeAt(0))
+  {
+    delete item;
+  }
+
+  // Re-add in the engine's group order, building cards for ids not yet shown.
+  for (const auto& id : currentIds)
+  {
+    QWidget* card = nullptr;
+    if (auto it = m_CardsById.find(id); it != m_CardsById.end() && !it->second.isNull())
+    {
+      card = it->second;
+    }
+    else if (auto infoIt = infoById.find(id); infoIt != infoById.end())
+    {
+      card = this->BuildGroupCard(*infoIt->second);
+    }
+    if (nullptr != card)
+    {
+      m_GroupsLayout->addWidget(card);
+    }
+  }
+  m_GroupsLayout->addStretch();
+
+  m_DisplayedGroupIds = currentIds;
+
+  // Refresh the kept cards' contents and the secondary surfaces. The advanced
+  // matrix stays a full rebuild (secondary, usually hidden); the cell map is one
+  // custom-painted widget that just repaints.
+  this->RefreshCards();
+  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
+  try
+  {
+    descriptors = m_MultiWidget->ListWindowDescriptors();
+  }
+  catch (const mitk::Exception&)
+  {
+  }
+  this->RebuildMatrix(infos, descriptors);
+}
+
+QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
+QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) const
+{
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> result;
+  result.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
+  if (m_MultiWidget.isNull())
+  {
+    return result;
+  }
+
+  const auto members = this->GroupMembers(group);
+  // An empty group with a configured intent cache renders from the cache (each
+  // cached-on axis solid in the group hue), so the user sees the pending
+  // configuration before any window is assigned. total = 1 there makes a
+  // cached-on axis read as "all", not the partial "some".
+  const auto cacheIt = m_EmptyGroupAxisCache.find(group);
+  const bool useCache = members.empty() && cacheIt != m_EmptyGroupAxisCache.end();
+  const int total = useCache ? 1 : static_cast<int>(members.size());
+
+  QColor hue;
+  try
+  {
+    hue = m_MultiWidget->GetSyncGroupColor(group);
+  }
+  catch (const mitk::Exception&)
+  {
+  }
+
+  const auto stateSlot = [total](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked,
+                                 const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
+  {
+    QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+    slot.glyph = glyph;
+    if (linked > 0 && groupHue.isValid())
+    {
+      slot.color = groupHue;
+      slot.partial = linked < total;
+      slot.tooltip = slot.partial ? QObject::tr("%1 - %2 of %3 windows").arg(label).arg(linked).arg(total)
+                                   : QObject::tr("%1 - all %2 windows").arg(label).arg(total);
+    }
+    else
+    {
+      slot.tooltip = QObject::tr("%1 - no windows").arg(label);
+    }
+    return slot;
+  };
+
+  std::size_t axisIndex = 0;
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    int linked = 0;
+    if (useCache)
+    {
+      linked = cacheIt->second[axisIndex] ? 1 : 0;
+    }
+    else
+    {
+      for (const auto& windowId : members)
+      {
+        const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
+        if (link.has_value() && link->group == group)
+        {
+          ++linked;
+        }
+      }
+    }
+    result.append(stateSlot(GlyphFor(dimension), hue, linked,
+                            QString::fromUtf8(DimensionLabel(dimension))));
+    ++axisIndex;
+  }
+
+  int selectionLinked = 0;
+  if (useCache)
+  {
+    selectionLinked = cacheIt->second[axisIndex] ? 1 : 0;
+  }
+  else
+  {
+    for (const auto& windowId : members)
+    {
+      if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
+      {
+        ++selectionLinked;
+      }
+    }
+  }
+  result.append(stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, tr("Data selection")));
+
+  return result;
 }
 
 QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::SyncGroupInfo& info)
@@ -579,142 +1096,184 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   const auto groupId = info.id;
 
   auto* card = new GroupCardFrame(
+    QString::fromStdString(groupId), info.color,
     [this, groupId](const QStringList& windowIds)
     {
       this->AssignCellsToGroup(windowIds, groupId);
     },
     this);
-  card->setFrameShape(QFrame::StyledPanel);
-  card->setToolTip(tr("Drop render windows from the map here to add them to this group"));
+  // Stable, group-derived object name so the incremental reconcile and tests can
+  // find a specific card.
+  card->setObjectName(QStringLiteral("mxnGroupCard__") + QString::fromStdString(groupId));
+  // A plain (non-hue) box frame delimits each card as its own object.
+  card->setFrameShape(QFrame::Box);
+  card->setLineWidth(1);
+  card->setToolTip(tr("Drag this card onto a render window in the map to assign the group; "
+                      "drop cells from the map here to add them."));
   auto* cardLayout = new QVBoxLayout(card);
-  cardLayout->setContentsMargins(6, 6, 6, 6);
+  cardLayout->setContentsMargins(0, 0, 6, 6);
+  cardLayout->setSpacing(4);
 
-  // Identity row: hue swatch (draggable onto map tiles) + editable display
-  // name + member count + assign-selection action.
-  auto* identityRow = new QHBoxLayout();
-  auto* colorButton = new GroupSwatchButton(QString::fromStdString(groupId), card);
-  colorButton->setFixedSize(20, 20);
-  colorButton->setStyleSheet(QStringLiteral("background-color: %1;").arg(info.color.name()));
-  colorButton->setToolTip(tr("Group color (persisted with the layout). Click to change; "
-                             "drag onto a render window in the map to assign the group."));
-  connect(colorButton, &QPushButton::clicked, this, [this, groupId]()
+  // Header: a solid bar in the group hue - the card's strongest identity cue -
+  // carrying the display name, the member count, and a "..." menu for the
+  // infrequent and advanced actions.
+  auto* header = new QFrame(card);
+  header->setAttribute(Qt::WA_StyledBackground, true);
+  auto* headerRow = new QHBoxLayout(header);
+  headerRow->setContentsMargins(6, 3, 3, 3);
+
+  auto* nameLabel = new QLabel(QString::fromStdString(info.displayName), header);
+  headerRow->addWidget(nameLabel, 1);
+
+  auto* countLabel = new QLabel(tr("%n window(s)", nullptr,
+                                   static_cast<int>(this->GroupMembers(groupId).size())), header);
+  headerRow->addWidget(countLabel);
+
+  auto* menuButton = new QToolButton(header);
+  menuButton->setText(QStringLiteral("..."));
+  menuButton->setPopupMode(QToolButton::InstantPopup);
+  menuButton->setToolTip(tr("Rename, recolor, and group actions"));
+  auto* menu = new QMenu(menuButton);
+  // Rebuilt each time it opens so the selection-dependent actions reflect the
+  // map's current selection.
+  connect(menu, &QMenu::aboutToShow, this, [this, groupId, menu]()
   {
-    if (m_MultiWidget.isNull())
+    menu->clear();
+    const bool hasSelection = !m_CellMap->GetSelectedWindowIds().isEmpty();
+    const bool hasMembers = !this->GroupMembers(groupId).empty();
+
+    connect(menu->addAction(tr("Rename...")), &QAction::triggered, this, [this, groupId]()
     {
-      return;
-    }
-    const auto color = QColorDialog::getColor(m_MultiWidget->GetSyncGroupColor(groupId), this);
-    if (color.isValid())
+      if (m_MultiWidget.isNull())
+      {
+        return;
+      }
+      bool ok = false;
+      const auto text = QInputDialog::getText(
+        this, tr("Rename group"), tr("Display name:"), QLineEdit::Normal,
+        QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(groupId)), &ok);
+      if (ok)
+      {
+        try
+        {
+          m_MultiWidget->SetSyncGroupDisplayName(groupId, text.trimmed().toStdString());
+        }
+        catch (const mitk::Exception& e)
+        {
+          MITK_WARN << "Layout editor: display-name change ignored: " << e.GetDescription();
+        }
+      }
+    });
+    connect(menu->addAction(tr("Change color...")), &QAction::triggered, this, [this, groupId]()
     {
-      m_MultiWidget->SetSyncGroupColor(groupId, color);
-    }
+      if (m_MultiWidget.isNull())
+      {
+        return;
+      }
+      const auto color = QColorDialog::getColor(m_MultiWidget->GetSyncGroupColor(groupId), this);
+      if (color.isValid())
+      {
+        m_MultiWidget->SetSyncGroupColor(groupId, color);
+      }
+    });
+
+    menu->addSeparator();
+    auto* addSelected = menu->addAction(tr("Add selected windows"));
+    addSelected->setEnabled(hasSelection);
+    connect(addSelected, &QAction::triggered, this, [this, groupId]()
+    {
+      this->AssignCellsToGroup(m_CellMap->GetSelectedWindowIds(), groupId);
+    });
+    auto* removeSelected = menu->addAction(tr("Remove selected windows"));
+    removeSelected->setEnabled(hasSelection);
+    connect(removeSelected, &QAction::triggered, this, [this, groupId]()
+    {
+      for (const auto& windowId : m_CellMap->GetSelectedWindowIds())
+      {
+        this->SetCellMembership(windowId, groupId, false);
+      }
+    });
+
+    menu->addSeparator();
+    auto* linkNav = menu->addAction(tr("Link navigation"));
+    linkNav->setEnabled(hasMembers);
+    connect(linkNav, &QAction::triggered, this, [this, groupId]() { this->LinkNavigationBundle(groupId); });
+    auto* reconverge = menu->addAction(tr("Re-converge"));
+    reconverge->setEnabled(hasMembers);
+    connect(reconverge, &QAction::triggered, this, [this, groupId]() { this->ReconvergeGroup(groupId); });
+    auto* reinit = menu->addAction(tr("Reinit geometry"));
+    reinit->setEnabled(hasMembers);
+    connect(reinit, &QAction::triggered, this, [this, groupId]() { this->ReinitGroupGeometry(groupId); });
   });
-  identityRow->addWidget(colorButton);
+  menuButton->setMenu(menu);
+  headerRow->addWidget(menuButton);
 
-  auto* nameEdit = new QLineEdit(QString::fromStdString(info.displayName), card);
-  nameEdit->setToolTip(tr("Display name shown on every surface; the group id stays '%1'")
-                         .arg(QString::fromStdString(groupId)));
-  connect(nameEdit, &QLineEdit::editingFinished, this, [this, groupId, nameEdit]()
+  const QColor hue = info.color.isValid() ? info.color : card->palette().color(QPalette::Mid);
+  StyleGroupHeader(header, nameLabel, countLabel, menuButton, hue);
+  cardLayout->addWidget(header);
+
+  // Axis strip: the eight axes as glyphs in the group perspective (all / none /
+  // some). Clicking an axis homogenizes the group - "some" or "none" links every
+  // member, "all" unlinks them; the granular "some" state is reached from the
+  // cell map or the advanced matrix. A group's members are the windows it links
+  // on any axis, so an empty group has nothing to homogenize: there, linking an
+  // axis instead adds the windows currently selected in the map (select them,
+  // then click), which is how a group is built up from scratch.
+  auto* strip = new QmitkMxNSyncBarcodeWidget(card);
+  strip->SetAxisClickable(true);
+  strip->setFixedHeight(24);
+  strip->setToolTip(tr("Synchronization axes for this group. Click an axis to link or unlink it "
+                       "for every window in the group; a dashed axis is linked for only some. "
+                       "For an empty group, select windows in the map first, then click an axis "
+                       "to add them."));
+  strip->SetSlots(this->BuildGroupBarcodeSlots(groupId));
+  connect(strip, &QmitkMxNSyncBarcodeWidget::AxisClicked, this, [this, groupId](int index)
+  {
+    this->ToggleGroupAxis(groupId, index);
+  });
+  auto* stripRow = new QHBoxLayout();
+  stripRow->setContentsMargins(6, 0, 0, 0);
+  stripRow->addWidget(strip);
+  cardLayout->addLayout(stripRow);
+
+  // Update the card in place on an engine change without recreating it (avoids
+  // the flicker of a full teardown; see RefreshOrRebuild).
+  QPointer<QmitkMxNSyncBarcodeWidget> stripPtr = strip;
+  QPointer<QLabel> namePtr = nameLabel;
+  QPointer<QLabel> countPtr = countLabel;
+  QPointer<QFrame> headerPtr = header;
+  QPointer<QToolButton> menuPtr = menuButton;
+  m_CardsById[groupId] = card;
+  m_CardRefreshers[groupId] = [this, groupId, stripPtr, namePtr, countPtr, headerPtr, menuPtr]()
   {
     if (m_MultiWidget.isNull())
     {
       return;
+    }
+    if (stripPtr)
+    {
+      stripPtr->SetSlots(this->BuildGroupBarcodeSlots(groupId));
+    }
+    if (countPtr)
+    {
+      countPtr->setText(tr("%n window(s)", nullptr, static_cast<int>(this->GroupMembers(groupId).size())));
     }
     try
     {
-      m_MultiWidget->SetSyncGroupDisplayName(groupId, nameEdit->text().trimmed().toStdString());
+      if (namePtr)
+      {
+        namePtr->setText(QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(groupId)));
+      }
+      const QColor refreshedHue = m_MultiWidget->GetSyncGroupColor(groupId);
+      if (headerPtr && namePtr && countPtr && menuPtr && refreshedHue.isValid())
+      {
+        StyleGroupHeader(headerPtr, namePtr, countPtr, menuPtr, refreshedHue);
+      }
     }
-    catch (const mitk::Exception& e)
+    catch (const mitk::Exception&)
     {
-      MITK_WARN << "Layout editor: display-name change ignored: " << e.GetDescription();
     }
-  });
-  identityRow->addWidget(nameEdit, 1);
-
-  const auto members = this->GroupMembers(groupId);
-  identityRow->addWidget(new QLabel(tr("%n window(s)", nullptr, static_cast<int>(members.size())), card));
-
-  auto* assignButton = new QPushButton(tr("Assign selection"), card);
-  assignButton->setToolTip(tr("Add the render windows selected in the map to this group"));
-  assignButton->setEnabled(!m_CellMap->GetSelectedWindowIds().isEmpty());
-  connect(assignButton, &QPushButton::clicked, this, [this, groupId]()
-  {
-    this->AssignCellsToGroup(m_CellMap->GetSelectedWindowIds(), groupId);
-  });
-  identityRow->addWidget(assignButton);
-
-  auto* removeButton = new QPushButton(tr("Remove selection"), card);
-  removeButton->setToolTip(tr("Remove the render windows selected in the map from this group"));
-  removeButton->setEnabled(!m_CellMap->GetSelectedWindowIds().isEmpty());
-  connect(removeButton, &QPushButton::clicked, this, [this, groupId]()
-  {
-    for (const auto& windowId : m_CellMap->GetSelectedWindowIds())
-    {
-      this->SetCellMembership(windowId, groupId, false);
-    }
-  });
-  identityRow->addWidget(removeButton);
-  cardLayout->addLayout(identityRow);
-
-  // Dimension row
-  auto* dimensionRow = new QHBoxLayout();
-  dimensionRow->addWidget(new QLabel(tr("Synchronizes:"), card));
-  for (const auto dimension : QmitkMxNAllSyncDimensions)
-  {
-    auto* box = new QCheckBox(DimensionLabel(dimension), card);
-    const auto memberIt = info.members.find(dimension);
-    box->setChecked(memberIt != info.members.end() && !memberIt->second.empty());
-    connect(box, &QCheckBox::toggled, this, [this, groupId, dimension](bool checked)
-    {
-      this->ApplyDimensionToGroup(groupId, dimension, checked);
-    });
-    dimensionRow->addWidget(box);
-  }
-  // Data selection is one axis among the others (a distinct engine under the
-  // hood, single-valued per cell): managed here uniformly, not via a separate
-  // per-cell control.
-  auto* selectionBox = new QCheckBox(tr("Data"), card);
-  selectionBox->setChecked(this->GroupSelectionEnabled(groupId));
-  connect(selectionBox, &QCheckBox::toggled, this, [this, groupId](bool checked)
-  {
-    this->ApplySelectionToGroup(groupId, checked);
-  });
-  dimensionRow->addWidget(selectionBox);
-  dimensionRow->addStretch();
-  cardLayout->addLayout(dimensionRow);
-
-  // Action row
-  auto* actionRow = new QHBoxLayout();
-  auto* navButton = new QPushButton(tr("Link navigation"), card);
-  navButton->setToolTip(tr("Link pan, zoom, slice, and crosshair for all member windows"));
-  navButton->setEnabled(!members.empty());
-  connect(navButton, &QPushButton::clicked, this, [this, groupId]()
-  {
-    this->LinkNavigationBundle(groupId);
-  });
-  actionRow->addWidget(navButton);
-
-  auto* reconvergeButton = new QPushButton(tr("Re-converge"), card);
-  reconvergeButton->setToolTip(tr("Re-establish reference + offset for the group's "
-                                  "slice/zoom/pan members"));
-  reconvergeButton->setEnabled(!members.empty());
-  connect(reconvergeButton, &QPushButton::clicked, this, [this, groupId]()
-  {
-    this->ReconvergeGroup(groupId);
-  });
-  actionRow->addWidget(reconvergeButton);
-
-  auto* reinitButton = new QPushButton(tr("Reinit geometry"), card);
-  reinitButton->setToolTip(tr("Re-initialize the shared geometry of the group's "
-                              "slice/orientation component"));
-  reinitButton->setEnabled(!members.empty());
-  connect(reinitButton, &QPushButton::clicked, this, [this, groupId]()
-  {
-    this->ReinitGroupGeometry(groupId);
-  });
-  actionRow->addWidget(reinitButton);
-  actionRow->addStretch();
-  cardLayout->addLayout(actionRow);
+  };
 
   return card;
 }
@@ -874,6 +1433,68 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
       }
 
       m_Matrix->setCellWidget(static_cast<int>(row), static_cast<int>(column), cellWidget);
+    }
+  }
+}
+
+bool QmitkMxNLayoutEditorWidget::HasCachedGroupIntent(const std::string& group) const
+{
+  const auto it = m_EmptyGroupAxisCache.find(group);
+  if (it == m_EmptyGroupAxisCache.end())
+  {
+    return false;
+  }
+  for (const bool on : it->second)
+  {
+    if (on)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void QmitkMxNLayoutEditorWidget::FlushEmptyGroupCache(const std::string& group,
+                                                      const QStringList& windowIds)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  const auto it = m_EmptyGroupAxisCache.find(group);
+  if (it == m_EmptyGroupAxisCache.end())
+  {
+    return;
+  }
+  const auto intent = it->second;
+  m_EmptyGroupAxisCache.erase(it);  // erase before applying so a re-entrant signal cannot re-flush
+
+  const int dimCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  for (const auto& windowId : windowIds)
+  {
+    for (int axis = 0; axis <= dimCount; ++axis)
+    {
+      if (!intent[static_cast<std::size_t>(axis)])
+      {
+        continue;
+      }
+      try
+      {
+        if (axis < dimCount)
+        {
+          m_MultiWidget->SetSyncLink(windowId,
+            QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axis)], group);
+        }
+        else
+        {
+          m_MultiWidget->SetCellSelectionGroup(windowId, group);
+        }
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Layout editor: applying cached axis to '" << windowId.toStdString()
+                  << "' ignored: " << e.GetDescription();
+      }
     }
   }
 }

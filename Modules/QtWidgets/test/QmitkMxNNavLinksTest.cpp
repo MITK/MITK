@@ -409,6 +409,11 @@ public:
 
   void Windowing_UnlinkedGesture_KeepsNodeGlobalWrite()
   {
+    // A fresh cell links Windowing to "main" by default; clear it so the cell is
+    // genuinely unlinked and the classic node-global path is exercised.
+    m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing);
+    m_Editor->ClearSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing);
+
     m_ImageNode->SetProperty("levelwindow",
       mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
 
@@ -481,6 +486,10 @@ public:
 
   void SetLevelWindow_Unlinked_WritesNodeGlobal()
   {
+    // A fresh cell links Windowing to "main" by default; clear it so the by-value
+    // set falls through to the classic node-global write.
+    m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing);
+
     m_ImageNode->SetProperty("levelwindow",
       mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
 

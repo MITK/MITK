@@ -289,9 +289,13 @@ public:
       const bool inNavigationBundle =
         dimension == QmitkMxNSyncDimension::Pan || dimension == QmitkMxNSyncDimension::Zoom
         || dimension == QmitkMxNSyncDimension::Slice || dimension == QmitkMxNSyncDimension::Crosshair;
+      // Synchronize links the navigation bundle to "sync"; a fresh cell also links
+      // Windowing and LUT to "main" by default. Only Orientation stays unsynced.
+      const bool expectedFilled = inNavigationBundle
+        || dimension == QmitkMxNSyncDimension::Windowing || dimension == QmitkMxNSyncDimension::Lut;
       CPPUNIT_ASSERT_EQUAL_MESSAGE(
         "A linked dimension is a filled barcode slot in the group hue; an unsynced one is a gap",
-        inNavigationBundle, axisSlots[static_cast<int>(i)].color.isValid());
+        expectedFilled, axisSlots[static_cast<int>(i)].color.isValid());
     }
     // The selection slot shows the cell's selection group consistently, including
     // the default group every cell starts in (it is a real, shared selection

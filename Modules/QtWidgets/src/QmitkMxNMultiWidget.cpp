@@ -528,6 +528,13 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
   // Pure membership rewrite: the handler stays installed and its predicates
   // read the link map live, so no re-wiring is needed. Deliberately no
   // convergence (unlike SetSyncLink) - the toggle couples views in place.
+  //
+  // The macro couples navigation only (pan/zoom/slice/crosshair to "sync"), so
+  // members keep their appearance and selection axes on "main" and therefore read
+  // a gray 'Complex' frame while synchronized - an honest split (the cell spans
+  // "sync" and "main"), not a defect. Painting a solid hue instead would require
+  // the macro to also claim windowing/lut/selection, a broader coupling than a
+  // navigation toggle should imply.
   m_SynchronizeMacroActive = synchronized;
   if (synchronized)
   {
@@ -873,8 +880,21 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // construction. The explicit-id overload stays free of side effects so
   // v2-layout callers can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
-  auto renderWindowWidget = this->CreateRenderWindowWidget(prefix + QString::number(i));
+  const auto id = prefix + QString::number(i);
+  auto renderWindowWidget = this->CreateRenderWindowWidget(id);
   this->SetSynchronizationGroup(renderWindowWidget->GetUtilityWidget()->GetNodeSelectionWidget(), 1);
+
+  // "main" (selection group 1) synchronizes the appearance axes by default.
+  // Linking Windowing and LUT here keeps a fresh cell's level/window and LUT
+  // changes inside the editor's "main" group (grouped, per-renderer) instead of
+  // writing the node property globally, which would leak to every other renderer
+  // of the node. "main" is registered before the first cell (InitializeMultiWidget
+  // adds group 1 ahead of SetLayout), so the id always resolves. This lives in the
+  // positional overload only: the explicit-id overload stays side-effect-free so
+  // ApplyLayout honors a loaded document's links verbatim.
+  auto& links = m_CellSyncLinks[id];
+  links.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)] = "main";
+  links.groups[DimensionIndex(QmitkMxNSyncDimension::Lut)] = "main";
   return renderWindowWidget;
 }
 
@@ -3480,6 +3500,18 @@ QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
     {
       distinctGroups.push_back(link->group);
     }
+  }
+
+  // Data selection is the 8th axis and counts toward frame identity uniformly.
+  // A solid hue means the cell is wholly one group across all eight axes; a cell
+  // whose axes (selection included) name more than one group is an honest split
+  // and reads gray. Every cell always has a selection group (default "main"), so
+  // a fresh cell is at least Mono("main") and 'None' is not normally reachable.
+  const auto selectionGroup = this->GetCellSelectionGroup(windowId);
+  if (!selectionGroup.empty() &&
+      std::find(distinctGroups.begin(), distinctGroups.end(), selectionGroup) == distinctGroups.end())
+  {
+    distinctGroups.push_back(selectionGroup);
   }
 
   if (distinctGroups.empty())

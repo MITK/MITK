@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNSyncDimension.h>
 
 #include <QPointer>
@@ -86,11 +87,16 @@ public:
   QmitkMultiWidgetLayoutSelectionWidget* GetLayoutSelectionWidget() const;
 
   /**
-   * \brief Add every given cell to 'group': each cell is linked on the
-   *        group's currently synchronized dimensions, or on the navigation
-   *        bundle when the group synchronizes nothing yet.
+   * \brief Add every given cell to 'group' on the group's currently
+   *        synchronized dimensions (or the navigation bundle when the group
+   *        synchronizes nothing yet), per the join 'mode'. Replace (the default)
+   *        clears each cell's other-group ties first so it wholly joins the
+   *        target; FillEmpty sets only its currently-unlinked axes;
+   *        MergeOverwriteCollisions overwrites the group's axes but keeps the
+   *        cell's links on axes the group does not cover.
    */
-  void AssignCellsToGroup(const QStringList& windowIds, const std::string& group);
+  void AssignCellsToGroup(const QStringList& windowIds, const std::string& group,
+                          QmitkMxNGroupJoinMode mode = QmitkMxNGroupJoinMode::Replace);
 
   /**
    * \brief Link or unlink every current member cell of 'group' on one
@@ -201,12 +207,6 @@ private:
   void RebuildMatrix(const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
                      const std::vector<QmitkMxNMultiWidget::WindowDescriptor>& descriptors);
 
-  /** \brief Apply the group's cached "on" axes to the given windows (the first
-   *         members of a previously empty group), then clear the cache entry.
-   *         Clearing before applying keeps a re-entrant engine signal from
-   *         re-flushing. */
-  void FlushEmptyGroupCache(const std::string& group, const QStringList& windowIds);
-
   /** \brief Whether the group has a cache entry with at least one axis toggled
    *         on, so assigning windows should apply exactly the cache rather than
    *         SetCellMembership's nav-bundle default. */
@@ -220,6 +220,16 @@ private:
 
   /** \brief Whether at least one member cell's selection group is this group. */
   bool GroupSelectionEnabled(const std::string& group) const;
+
+  /** \brief Apply a group's axes to one cell per the join mode: Replace clears
+   *         the cell's other ties first (selection reverts to the default),
+   *         FillEmpty sets only currently-unlinked axes (and adopts the group's
+   *         selection only for a cell resting on the default), Merge overwrites
+   *         the given axes and keeps the rest. Does not refresh - the batch
+   *         caller (AssignCellsToGroup / SetCellMembership) refreshes once. */
+  void ApplyGroupAxesToCell(const QString& windowId, const std::string& group,
+                            const std::vector<QmitkMxNSyncDimension>& dimensions,
+                            bool includeSelection, QmitkMxNGroupJoinMode mode);
 
   static QString CellLabel(const QmitkMxNMultiWidget::WindowDescriptor& descriptor);
 

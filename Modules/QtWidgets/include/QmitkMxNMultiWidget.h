@@ -394,20 +394,21 @@ public:
   *        and a per-slot tooltip.
   *
   *   Binary per axis - a cell is linked or not; the heterogeneous group state
-  *   is a group-perspective concern, not a cell's. The default selection group
-  *   reads as a gap so a cell at rest does not paint as selection-synced. Shared
-  *   by the per-cell utility-strip barcode and the layout editor's cell map so
-  *   both surfaces tell the same story. Returns eight gap slots for an unknown
-  *   cell.
+  *   is a group-perspective concern, not a cell's. Every cell always carries a
+  *   selection group (default "main"), and a fresh cell also links Windowing and
+  *   LUT to "main", so a cell at rest paints three main-hued slots (Windowing,
+  *   LUT, selection), not gaps. Shared by the per-cell utility-strip barcode and
+  *   the layout editor's cell map so both surfaces tell the same story. Returns
+  *   eight gap slots for an unknown cell.
   */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildBarcodeSlots(const QString& windowId) const;
 
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
   {
-    None,     // the cell links none of the seven navigation/intensity dimensions
-    Mono,     // every linked dimension names one group
-    Complex   // linked dimensions span more than one group
+    None,     // the cell has no group on any of the eight axes (not normally reachable)
+    Mono,     // every axis the cell is tied on names one group
+    Complex   // the cell's tied axes span more than one group
   };
 
   struct CellGroupIdentity
@@ -420,14 +421,17 @@ public:
   * \brief Resolve a cell's frame identity from its navigation/intensity
   *        membership.
   *
-  *   'Mono' when every one of the seven 'QmitkMxNSyncDimension' axes the cell
-  *   links names one group (the hue is that group's color); 'Complex' when the
-  *   linked axes span more than one group; 'None' when the cell links none of
-  *   them. Data selection is deliberately excluded: every cell carries an
-  *   explicit default selection group, so including it would blank the frame
-  *   the moment a real navigation/intensity group is created. A group color
-  *   that throws mid-layout-change downgrades the result to 'None' for that
-  *   pass. Consumed by 'RefreshFrameColors'.
+  *   Resolves over all eight axes - the seven 'QmitkMxNSyncDimension' links plus
+  *   the cell's data-selection group. 'Mono' when they all name one group (the
+  *   hue is that group's color); 'Complex' (gray) when they span more than one;
+  *   'None' only when the cell has no group at all (not reachable in normal
+  *   operation, since every cell has a selection group). A fresh cell is
+  *   'Mono("main")' - it links Windowing, LUT, and selection to "main". A cell
+  *   whose navigation/intensity axes name one group while its selection stays on
+  *   another (or vice versa) is an honest split and reads 'Complex'; there is no
+  *   "navigation wins" tiebreak. A group color that throws mid-layout-change
+  *   downgrades the result to 'None' for that pass. Consumed by
+  *   'RefreshFrameColors'.
   */
   CellGroupIdentity ResolveCellGroupIdentity(const QString& windowId) const;
 

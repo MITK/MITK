@@ -2,6 +2,7 @@ set(H_FILES
   QmitkCustomVariants.h
   QmitkDataStorageInspectorProviderBase.h
   QmitkEnums.h
+  QmitkMxNGroupJoinMode.h
   QmitkMxNSyncDimension.h
 )
 

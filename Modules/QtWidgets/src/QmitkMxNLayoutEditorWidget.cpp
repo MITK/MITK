@@ -91,6 +91,32 @@ namespace
     QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair
   };
 
+  // Name of the default selection group (engine index 1; see
+  // QmitkMxNMultiWidget::AddSynchronizationGroup). A cell "resting on the default"
+  // is one whose selection has not been placed into a specific group.
+  const std::string DefaultSelectionGroup = "main";
+
+  // Mode (a) "replace" primitive: strip a cell's ties to every group other than
+  // 'keepGroup'. The seven dimension axes are unlinked; the selection reverts to
+  // the default "main" (there is no unlinked state for selection). Shared by the
+  // SetCellMembership join and the empty-group cache flush so both fully replace.
+  void ClearOtherGroupTies(QmitkMxNMultiWidget* multiWidget, const QString& windowId,
+                           const std::string& keepGroup)
+  {
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto link = multiWidget->GetSyncLink(windowId, dimension);
+      if (link.has_value() && link->group != keepGroup)
+      {
+        multiWidget->ClearSyncLink(windowId, dimension);
+      }
+    }
+    if (multiWidget->GetCellSelectionGroup(windowId) != keepGroup)
+    {
+      multiWidget->ClearCellSelectionGroup(windowId);
+    }
+  }
+
   const QString NotLinkedEntry = QStringLiteral("(not linked)");
 
   /**
@@ -132,7 +158,7 @@ namespace
   {
   public:
     GroupCardFrame(QString groupId, QColor hue,
-                   std::function<void(const QStringList&)> onCellsDropped,
+                   std::function<void(const QStringList&, QmitkMxNGroupJoinMode)> onCellsDropped,
                    QWidget* parent = nullptr)
       : QFrame(parent)
       , m_GroupId(std::move(groupId))
@@ -189,7 +215,8 @@ namespace
       this->update();
       const auto ids = QString::fromUtf8(
         event->mimeData()->data(QmitkMxNCellMapWidget::CellsMimeType));
-      m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts));
+      m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts),
+                       QmitkMxNCellMapWidget::JoinModeFromModifiers(event->modifiers()));
       event->acceptProposedAction();
     }
 
@@ -208,7 +235,7 @@ namespace
   private:
     QString m_GroupId;
     QColor m_Hue;
-    std::function<void(const QStringList&)> m_OnCellsDropped;
+    std::function<void(const QStringList&, QmitkMxNGroupJoinMode)> m_OnCellsDropped;
     QPoint m_PressPosition;
     bool m_DropHighlight = false;
   };
@@ -252,15 +279,17 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   m_CellMap = new QmitkMxNCellMapWidget(mainContainer);
   m_CellMap->setMinimumHeight(140);
-  m_CellMap->setToolTip(tr("Select render windows by click, Ctrl-click, or rubber band; "
+  m_CellMap->setToolTip(tr("Select render windows by click or Ctrl-click; "
                            "assign them by dropping them onto a group (or a group's color "
-                           "onto a window). Each window shows its sync axes as glyphs: the "
-                           "seven dimensions plus data selection, tinted by group, a gap where "
-                           "the window is not synchronized on that axis."));
+                           "onto a window). A plain drop replaces the window's groups; hold "
+                           "Alt to merge, Shift to fill only its unsynced axes. Each window "
+                           "shows its sync axes as glyphs: the seven dimensions plus data "
+                           "selection, tinted by group, a gap where the window is not "
+                           "synchronized on that axis."));
   connect(m_CellMap, &QmitkMxNCellMapWidget::AssignRequested, this,
-          [this](const QString& group, const QStringList& windowIds)
+          [this](const QString& group, const QStringList& windowIds, QmitkMxNGroupJoinMode mode)
           {
-            this->AssignCellsToGroup(windowIds, group.toStdString());
+            this->AssignCellsToGroup(windowIds, group.toStdString(), mode);
           });
   connect(m_CellMap, &QmitkMxNCellMapWidget::SelectionChanged, this,
           [this](const QStringList& windowIds)
@@ -413,27 +442,97 @@ QmitkMultiWidgetLayoutSelectionWidget* QmitkMxNLayoutEditorWidget::GetLayoutSele
 }
 
 void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds,
-                                                    const std::string& group)
+                                                    const std::string& group,
+                                                    QmitkMxNGroupJoinMode mode)
 {
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+
   // An empty group carrying a configured intent cache defines its axes exactly:
-  // apply the cache to the joining windows and clear it, instead of
-  // SetCellMembership's nav-bundle default, so the result is the cached axes
-  // rather than their union with the default. The cache's selection bit is
-  // applied uniformly here, which SetCellMembership's selection-follow cannot do
-  // for a group's first member (there is no prior member to follow).
+  // apply the cached axes (per the join mode) to the joining windows and clear
+  // the cache, instead of the derived-dimensions default. The cache's selection
+  // bit is honored here, which the derived path cannot do for a group's first
+  // member (there is no prior member to follow).
   if (this->HasCachedGroupIntent(group) && this->GroupMembers(group).empty())
   {
-    this->FlushEmptyGroupCache(group, windowIds);
-    if (!m_MultiWidget.isNull())
+    const auto it = m_EmptyGroupAxisCache.find(group);
+    const auto intent = it->second;
+    m_EmptyGroupAxisCache.erase(it);  // erase before applying so a re-entrant signal cannot re-flush
+
+    const std::size_t dimCount = QmitkMxNAllSyncDimensions.size();
+    std::vector<QmitkMxNSyncDimension> dimensions;
+    for (std::size_t axis = 0; axis < dimCount; ++axis)
     {
-      m_MultiWidget->RefreshSyncControls();
+      if (intent[axis])
+      {
+        dimensions.push_back(QmitkMxNAllSyncDimensions[axis]);
+      }
     }
+    const bool includeSelection = intent[dimCount];
+    for (const auto& windowId : windowIds)
+    {
+      this->ApplyGroupAxesToCell(windowId, group, dimensions, includeSelection, mode);
+    }
+    m_MultiWidget->RefreshSyncControls();
     return;
   }
 
   for (const auto& windowId : windowIds)
   {
-    this->SetCellMembership(windowId, group, true);
+    auto dimensions = this->GroupDimensions(group);
+    if (dimensions.empty())
+    {
+      dimensions.assign(NavigationBundle.begin(), NavigationBundle.end());
+    }
+    this->ApplyGroupAxesToCell(windowId, group, dimensions, this->GroupSelectionEnabled(group), mode);
+  }
+  m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
+    const QString& windowId, const std::string& group,
+    const std::vector<QmitkMxNSyncDimension>& dimensions, bool includeSelection,
+    QmitkMxNGroupJoinMode mode)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  try
+  {
+    if (mode == QmitkMxNGroupJoinMode::Replace)
+    {
+      // Wholly replace: drop every other tie first (selection reverts to "main").
+      ClearOtherGroupTies(m_MultiWidget, windowId, group);
+    }
+    for (const auto dimension : dimensions)
+    {
+      // FillEmpty leaves an already-linked axis alone; Replace and Merge set it.
+      if (mode == QmitkMxNGroupJoinMode::FillEmpty
+          && m_MultiWidget->GetSyncLink(windowId, dimension).has_value())
+      {
+        continue;
+      }
+      m_MultiWidget->SetSyncLink(windowId, dimension, group);
+    }
+    if (includeSelection)
+    {
+      // FillEmpty adopts the group's selection only for a cell resting on the
+      // default group; Replace and Merge move it.
+      const bool restingOnDefault =
+        (m_MultiWidget->GetCellSelectionGroup(windowId) == DefaultSelectionGroup);
+      if (mode != QmitkMxNGroupJoinMode::FillEmpty || restingOnDefault)
+      {
+        m_MultiWidget->SetCellSelectionGroup(windowId, group);
+      }
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "Layout editor: group axis apply for '" << windowId.toStdString()
+              << "' ignored: " << e.GetDescription();
   }
 }
 
@@ -515,12 +614,12 @@ void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, int
   }
 
   const bool empty = this->GroupMembers(groupId).empty();
-  const auto selected = m_CellMap->GetSelectedWindowIds();
 
-  // Empty group, no map selection: toggle the per-group intent cache and repaint
-  // the card's barcode from it; the engine is not touched. The cache is applied
-  // to the first windows assigned (see FlushEmptyGroupCache).
-  if (empty && selected.isEmpty())
+  // Empty group: toggle the per-group intent cache and repaint the card's barcode
+  // from it; the engine is not touched. Configuring an empty group must not assign
+  // any cell just because it is the active/selected one - the cache is applied only
+  // when windows are explicitly assigned to the group (a drop, or the card menu).
+  if (empty)
   {
     auto& intent = m_EmptyGroupAxisCache[groupId];
     const auto axis = static_cast<std::size_t>(axisIndex);
@@ -539,36 +638,6 @@ void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, int
     {
       it->second();
     }
-    return;
-  }
-
-  // Empty group with a map selection: bootstrap - link the selected windows on
-  // this axis so the group can be built from the glyphs, then apply any other
-  // cached intent axes to those same windows.
-  if (empty && !selected.isEmpty())
-  {
-    for (const auto& windowId : selected)
-    {
-      try
-      {
-        if (axisIndex < dimCount)
-        {
-          m_MultiWidget->SetSyncLink(windowId,
-            QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)], groupId);
-        }
-        else
-        {
-          m_MultiWidget->SetCellSelectionGroup(windowId, groupId);
-        }
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Layout editor: bootstrap link for '" << windowId.toStdString()
-                  << "' ignored: " << e.GetDescription();
-      }
-    }
-    this->FlushEmptyGroupCache(groupId, selected);
-    m_MultiWidget->RefreshSyncControls();
     return;
   }
 
@@ -596,9 +665,14 @@ bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group)
   {
     return false;
   }
-  for (const auto& windowId : this->GroupMembers(group))
+  // Computed directly over all cells, not via GroupMembers: since GroupMembers
+  // now counts the selection tie, routing through it would make this tautological
+  // (every selection member trivially matches) and let selection follow joins
+  // more eagerly than intended. "The group synchronizes selection" means at least
+  // one cell's selection names it, independent of membership.
+  for (const auto& descriptor : m_MultiWidget->ListWindowDescriptors())
   {
-    if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
+    if (m_MultiWidget->GetCellSelectionGroup(descriptor.id) == group)
     {
       return true;
     }
@@ -614,28 +688,23 @@ void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
     return;
   }
 
-  try
+  if (member)
   {
-    if (member)
+    // Adding a cell wholly replaces its membership (mode Replace): it joins the
+    // group's currently synchronized dimensions, or the navigation bundle when
+    // the group synchronizes nothing yet. The (b)/(c) merge variants are reachable
+    // only through the drop selector (AssignCellsToGroup).
+    auto dimensions = this->GroupDimensions(group);
+    if (dimensions.empty())
     {
-      auto dimensions = this->GroupDimensions(group);
-      if (dimensions.empty())
-      {
-        // Clever default: joining an empty group means "navigate together".
-        dimensions.assign(NavigationBundle.begin(), NavigationBundle.end());
-      }
-      for (const auto dimension : dimensions)
-      {
-        m_MultiWidget->SetSyncLink(windowId, dimension, group);
-      }
-      // Selection is an axis too: a cell joining a group that already shares
-      // data selection joins that selection group as well.
-      if (this->GroupSelectionEnabled(group))
-      {
-        m_MultiWidget->SetCellSelectionGroup(windowId, group);
-      }
+      dimensions.assign(NavigationBundle.begin(), NavigationBundle.end());
     }
-    else
+    this->ApplyGroupAxesToCell(windowId, group, dimensions, this->GroupSelectionEnabled(group),
+                               QmitkMxNGroupJoinMode::Replace);
+  }
+  else
+  {
+    try
     {
       for (const auto dimension : QmitkMxNAllSyncDimensions)
       {
@@ -650,11 +719,11 @@ void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
         m_MultiWidget->ClearCellSelectionGroup(windowId);
       }
     }
-  }
-  catch (const mitk::Exception& e)
-  {
-    MITK_WARN << "Layout editor: membership change for '" << windowId.toStdString()
-              << "' ignored: " << e.GetDescription();
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Layout editor: membership change for '" << windowId.toStdString()
+                << "' ignored: " << e.GetDescription();
+    }
   }
   m_MultiWidget->RefreshSyncControls();
 }
@@ -838,7 +907,15 @@ void QmitkMxNLayoutEditorWidget::SelectActiveWindowTile()
   {
     if (widget == active)
     {
-      m_CellMap->SetSelectedWindowIds(QStringList{ windowId });
+      // Do not collapse an existing multi-selection to the active cell. Selecting
+      // tiles makes the first one active, which fires ActiveRenderWindowChanged
+      // back into here; without this guard a Ctrl-click multi-selection would
+      // immediately shrink to that one cell. Only mirror an external focus change
+      // (the active cell is not already part of the map selection).
+      if (!m_CellMap->GetSelectedWindowIds().contains(windowId))
+      {
+        m_CellMap->SetSelectedWindowIds(QStringList{ windowId });
+      }
       return;
     }
   }
@@ -1097,9 +1174,9 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
 
   auto* card = new GroupCardFrame(
     QString::fromStdString(groupId), info.color,
-    [this, groupId](const QStringList& windowIds)
+    [this, groupId](const QStringList& windowIds, QmitkMxNGroupJoinMode mode)
     {
-      this->AssignCellsToGroup(windowIds, groupId);
+      this->AssignCellsToGroup(windowIds, groupId, mode);
     },
     this);
   // Stable, group-derived object name so the incremental reconcile and tests can
@@ -1109,7 +1186,8 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   card->setFrameShape(QFrame::Box);
   card->setLineWidth(1);
   card->setToolTip(tr("Drag this card onto a render window in the map to assign the group; "
-                      "drop cells from the map here to add them."));
+                      "drop cells from the map here to add them. A plain drop replaces; hold "
+                      "Alt to merge, Shift to fill only unsynced axes."));
   auto* cardLayout = new QVBoxLayout(card);
   cardLayout->setContentsMargins(0, 0, 6, 6);
   cardLayout->setSpacing(4);
@@ -1454,51 +1532,6 @@ bool QmitkMxNLayoutEditorWidget::HasCachedGroupIntent(const std::string& group) 
   return false;
 }
 
-void QmitkMxNLayoutEditorWidget::FlushEmptyGroupCache(const std::string& group,
-                                                      const QStringList& windowIds)
-{
-  if (m_MultiWidget.isNull())
-  {
-    return;
-  }
-  const auto it = m_EmptyGroupAxisCache.find(group);
-  if (it == m_EmptyGroupAxisCache.end())
-  {
-    return;
-  }
-  const auto intent = it->second;
-  m_EmptyGroupAxisCache.erase(it);  // erase before applying so a re-entrant signal cannot re-flush
-
-  const int dimCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
-  for (const auto& windowId : windowIds)
-  {
-    for (int axis = 0; axis <= dimCount; ++axis)
-    {
-      if (!intent[static_cast<std::size_t>(axis)])
-      {
-        continue;
-      }
-      try
-      {
-        if (axis < dimCount)
-        {
-          m_MultiWidget->SetSyncLink(windowId,
-            QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axis)], group);
-        }
-        else
-        {
-          m_MultiWidget->SetCellSelectionGroup(windowId, group);
-        }
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Layout editor: applying cached axis to '" << windowId.toStdString()
-                  << "' ignored: " << e.GetDescription();
-      }
-    }
-  }
-}
-
 std::vector<QString> QmitkMxNLayoutEditorWidget::GroupMembers(const std::string& group) const
 {
   std::vector<QString> members;
@@ -1509,14 +1542,24 @@ std::vector<QString> QmitkMxNLayoutEditorWidget::GroupMembers(const std::string&
 
   for (const auto& descriptor : m_MultiWidget->ListWindowDescriptors())
   {
+    // A cell belongs to a group when it is tied on ANY of the eight axes: the
+    // seven QmitkMxNSyncDimension links OR its data-selection group. Selection is
+    // a different stack part (the node-selection widget's group index) but the
+    // same axis to the user - the 8th barcode slot - so membership counts it
+    // uniformly, and the group card, count, and axis actions cover it.
+    bool member = (m_MultiWidget->GetCellSelectionGroup(descriptor.id) == group);
     for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
       const auto link = m_MultiWidget->GetSyncLink(descriptor.id, dimension);
       if (link.has_value() && link->group == group)
       {
-        members.push_back(descriptor.id);
+        member = true;
         break;
       }
+    }
+    if (member)
+    {
+      members.push_back(descriptor.id);
     }
   }
   return members;

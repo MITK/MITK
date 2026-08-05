@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxNCellMapWidget.h>
+#include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
@@ -56,7 +58,28 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(IncrementalCards_OrderMatchesEngine);
   MITK_TEST(EmptyGroupCache_TogglesWithoutTouchingEngine);
   MITK_TEST(EmptyGroupCache_AppliedOnFirstAssignmentThenCleared);
-  MITK_TEST(EmptyGroupBootstrap_LinksSelectedWindows);
+  MITK_TEST(EmptyGroup_AxisClickCaches_EvenWithSelection);
+
+  MITK_TEST(NewCell_DefaultLinksWindowingAndLutToMain);
+  MITK_TEST(NewCell_FrameIsMonoMain);
+  MITK_TEST(Frame_SelectionDivergesFromNav_IsComplex);
+  MITK_TEST(Frame_WhollyOneGroup_IsMono);
+  MITK_TEST(AssignReplace_ClearsOtherGroupLinks);
+  MITK_TEST(WidenedMembership_SelectionTieCountsAsMember);
+  MITK_TEST(MainCard_Live_AxisClickHomogenizes);
+  MITK_TEST(AssignReplace_ReclaimsEmptiedSelectionGroup);
+  MITK_TEST(AssignReplace_MultiCellReclaim_OnlyWhenLastLeaves);
+  MITK_TEST(MainCard_LinkNavigation_LinksAllCells);
+  MITK_TEST(NewCell_BarcodePaintsAppearanceDefault);
+  MITK_TEST(LoadedLayout_NoWindowingInjection);
+
+  MITK_TEST(Assign_ReplaceMode_ClearsOthers);
+  MITK_TEST(Assign_FillEmptyMode_KeepsLinkedAxes);
+  MITK_TEST(Assign_FillEmptyMode_SelectionOnlyWhenResting);
+  MITK_TEST(Assign_MergeMode_OverwritesCoveredKeepsRest);
+  MITK_TEST(JoinModeFromModifiers_MapsKeys);
+  MITK_TEST(Selection_TogglesForUserGroup);
+  MITK_TEST(MultiSelect_SurvivesActiveMirror);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -238,8 +261,8 @@ public:
     m_Widget->ApplyDimensionToGroup("nav", QmitkMxNSyncDimension::Windowing, true);
     CPPUNIT_ASSERT(IsLinked(0, QmitkMxNSyncDimension::Windowing, "nav"));
     CPPUNIT_ASSERT(IsLinked(1, QmitkMxNSyncDimension::Windowing, "nav"));
-    CPPUNIT_ASSERT_MESSAGE("Non-members stay untouched",
-                           !m_Editor->GetSyncLink(CellId(2), QmitkMxNSyncDimension::Windowing).has_value());
+    CPPUNIT_ASSERT_MESSAGE("A non-member keeps its default 'main' windowing link, untouched by the group toggle",
+                           IsLinked(2, QmitkMxNSyncDimension::Windowing, "main"));
 
     m_Widget->ApplyDimensionToGroup("nav", QmitkMxNSyncDimension::Windowing, false);
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing).has_value());
@@ -526,23 +549,372 @@ public:
     }
   }
 
-  void EmptyGroupBootstrap_LinksSelectedWindows()
+  void EmptyGroup_AxisClickCaches_EvenWithSelection()
   {
     const auto group = m_Widget->CreateGroup();
     Pump();
 
     // Make widget1 the active window; the editor mirrors that into the map's
-    // selection, so the empty group's axis click bootstraps rather than caches.
+    // selection. Configuring an empty group must still only toggle the intent
+    // cache - it must NOT assign the active/selected cell to the group.
     m_Editor->SetActiveRenderWindowWidget(m_Editor->GetRenderWindowWidget(CellId(1)));
 
     m_Widget->ToggleGroupAxis(group, AxisIndexOf(QmitkMxNSyncDimension::Slice));
 
-    CPPUNIT_ASSERT_MESSAGE("Bootstrap links the selected window on the clicked axis",
-                           IsLinked(1, QmitkMxNSyncDimension::Slice, group));
-    CPPUNIT_ASSERT_MESSAGE("Only the selected window is linked",
-                           !IsLinked(0, QmitkMxNSyncDimension::Slice, group));
-    CPPUNIT_ASSERT_MESSAGE("Only the clicked axis is linked",
-                           !IsLinked(1, QmitkMxNSyncDimension::Pan, group));
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Configuring an empty group must not assign the selected cell",
+                             !IsLinked(cell, QmitkMxNSyncDimension::Slice, group));
+      CPPUNIT_ASSERT_MESSAGE("Configuring an empty group must not set a cell's selection group",
+                             m_Editor->GetCellSelectionGroup(CellId(cell)) != group);
+    }
+    // The click cached the axis instead (visible through the group's barcode).
+    const auto axisSlots = m_Widget->BuildGroupBarcodeSlots(group);
+    CPPUNIT_ASSERT_MESSAGE("The clicked axis is cached, shown on the group barcode",
+                           axisSlots[AxisIndexOf(QmitkMxNSyncDimension::Slice)].color.isValid());
+  }
+
+  void Selection_TogglesForUserGroup()
+  {
+    // The data-selection axis toggles on/off for a non-default group like any
+    // other axis (this is the empty-group path's non-empty counterpart).
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "G");  // cell 0 is a member of G
+    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+
+    m_Widget->ToggleGroupAxis("G", selectionAxis);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Toggling the selection axis on links the member's selection to the group",
+                                 std::string("G"), m_Editor->GetCellSelectionGroup(CellId(0)));
+
+    m_Widget->ToggleGroupAxis("G", selectionAxis);
+    CPPUNIT_ASSERT_MESSAGE("Toggling it off returns the member to the default selection group",
+                           m_Editor->GetCellSelectionGroup(CellId(0)) != "G");
+  }
+
+  // --- Selection as the 8th axis, "main" default, (a)-replace join ------------
+
+  void NewCell_DefaultLinksWindowingAndLutToMain()
+  {
+    // A fresh interactive cell auto-links the appearance axes to "main" so its
+    // level/window and LUT stay inside the editor's group instead of the classic
+    // node-global write. The other axes stay unlinked; selection is "main".
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      CPPUNIT_ASSERT_MESSAGE("A fresh cell links Windowing to 'main'",
+                             IsLinked(cell, QmitkMxNSyncDimension::Windowing, "main"));
+      CPPUNIT_ASSERT_MESSAGE("A fresh cell links LUT to 'main'",
+                             IsLinked(cell, QmitkMxNSyncDimension::Lut, "main"));
+      for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                    QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair,
+                                    QmitkMxNSyncDimension::Orientation })
+      {
+        CPPUNIT_ASSERT_MESSAGE("A fresh cell leaves the navigation/orientation axes unlinked",
+                               !m_Editor->GetSyncLink(CellId(cell), dimension).has_value());
+      }
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A fresh cell's selection group is 'main'",
+                                   std::string("main"), m_Editor->GetCellSelectionGroup(CellId(cell)));
+    }
+  }
+
+  void NewCell_FrameIsMonoMain()
+  {
+    // The fresh cell reads a solid "main" frame: it links Windowing, LUT, and
+    // selection to "main", so the eight-axis resolve is Mono("main").
+    const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("A fresh cell's frame is Mono",
+                           QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT_MESSAGE("A fresh cell's frame hue is 'main's color",
+                           identity.hue == m_Editor->GetSyncGroupColor("main"));
+  }
+
+  void Frame_SelectionDivergesFromNav_IsComplex()
+  {
+    // Selection is the 8th frame axis: a cell whose navigation/intensity axes all
+    // name one group but whose selection stays on "main" is an honest split ->
+    // Complex (gray). With selection excluded it would misread as Mono.
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      m_Editor->ClearSyncLink(CellId(0), dimension);
+    }
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");  // nav on X, selection still main
+
+    const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("Nav on X but selection on 'main' spans two groups -> Complex",
+                           QmitkMxNMultiWidget::CellGroupIdentityKind::Complex == identity.kind);
+  }
+
+  void Frame_WhollyOneGroup_IsMono()
+  {
+    // A cell wholly on one group across all eight axes reads Mono.
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      m_Editor->ClearSyncLink(CellId(0), dimension);
+    }
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");
+    m_Editor->SetCellSelectionGroup(CellId(0), "X");
+
+    const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("All eight axes on X -> Mono(X)",
+                           QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT_MESSAGE("Mono hue is X's color",
+                           identity.hue == m_Editor->GetSyncGroupColor("X"));
+  }
+
+  void AssignReplace_ClearsOtherGroupLinks()
+  {
+    // Default join is mode (a) "replace": assigning a cell to a group clears its
+    // links to every other group, so it ends synchronized only on the target.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "Y");
+    // Give G a known synchronized dimension (Slice) via a second cell.
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "G");
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G");
+
+    CPPUNIT_ASSERT_MESSAGE("Replace links the target group's dimension",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "G"));
+    CPPUNIT_ASSERT_MESSAGE("Replace clears the cell's link to another group (Pan/X)",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan).has_value());
+    CPPUNIT_ASSERT_MESSAGE("Replace clears the cell's link to another group (Windowing/Y)",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing).has_value());
+  }
+
+  void WidenedMembership_SelectionTieCountsAsMember()
+  {
+    // Membership counts the selection tie (the 8th axis): a cell tied to a group
+    // only through data selection is a member, so a group axis toggle reaches it.
+    // Driven through the public ApplyDimensionToGroup, whose members come from
+    // the (now widened) GroupMembers.
+    m_Editor->SetCellSelectionGroup(CellId(0), "S");  // sole tie to S is selection
+
+    m_Widget->ApplyDimensionToGroup("S", QmitkMxNSyncDimension::Slice, true);
+
+    CPPUNIT_ASSERT_MESSAGE("A selection-only member is reached by a group dimension toggle",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "S"));
+  }
+
+  void MainCard_Live_AxisClickHomogenizes()
+  {
+    // With every cell a member of "main" (via the appearance axes), the "main"
+    // card is a live group: an axis-glyph click homogenizes that axis across all
+    // members rather than toggling an empty-group intent cache.
+    m_Widget->ToggleGroupAxis("main", AxisIndexOf(QmitkMxNSyncDimension::Slice));
+
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Clicking Slice on the live 'main' card links every cell",
+                             IsLinked(cell, QmitkMxNSyncDimension::Slice, "main"));
+    }
+  }
+
+  void AssignReplace_ReclaimsEmptiedSelectionGroup()
+  {
+    // A drop under (a) reverts the cell's selection to "main"; when that was the
+    // last tie to a method-allocated group, the group is reclaimed and drops out
+    // of the registry. Pins the intended reclaim (not a leak).
+    m_Editor->SetCellSelectionGroup(CellId(0), "H");  // allocates selection group H
+    const auto hasH = [this]()
+    {
+      const auto infos = m_Editor->GetSyncGroupInfos();
+      return std::any_of(infos.begin(), infos.end(), [](const auto& info) { return info.id == "H"; });
+    };
+    CPPUNIT_ASSERT_MESSAGE("H exists once a cell selects it", hasH());
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G");  // (a): reverts selection to main
+
+    CPPUNIT_ASSERT_MESSAGE("H is reclaimed when its last selection tie leaves", !hasH());
+  }
+
+  void AssignReplace_MultiCellReclaim_OnlyWhenLastLeaves()
+  {
+    // Two cells share a method-allocated selection group; a replace of the first
+    // must not reclaim it while the second still holds it - only the last tie
+    // leaving reclaims. Guards the per-cell reclaim ordering the single-cell test
+    // cannot exercise.
+    m_Editor->SetCellSelectionGroup(CellId(0), "H");
+    m_Editor->SetCellSelectionGroup(CellId(1), "H");
+    const auto hasH = [this]()
+    {
+      const auto infos = m_Editor->GetSyncGroupInfos();
+      return std::any_of(infos.begin(), infos.end(), [](const auto& info) { return info.id == "H"; });
+    };
+    CPPUNIT_ASSERT_MESSAGE("H exists while two cells select it", hasH());
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G");
+    CPPUNIT_ASSERT_MESSAGE("H survives while the other cell still selects it", hasH());
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, "G");
+    CPPUNIT_ASSERT_MESSAGE("H is reclaimed once its last selection tie leaves", !hasH());
+  }
+
+  void MainCard_LinkNavigation_LinksAllCells()
+  {
+    // "main" is a live members-bearing group (every cell, via the appearance
+    // axes), so its "Link navigation" action links the navigation bundle across
+    // every cell - the editor-wide reach the live main card now has.
+    m_Widget->LinkNavigationBundle("main");
+
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                    QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
+      {
+        CPPUNIT_ASSERT_MESSAGE("Link navigation on the live 'main' card links every cell",
+                               IsLinked(cell, dimension, "main"));
+      }
+    }
+  }
+
+  void NewCell_BarcodePaintsAppearanceDefault()
+  {
+    // The fresh cell's utility-strip barcode reflects the "main" appearance
+    // default with no intervening mutation: SetLayout emits LayoutChanged after
+    // creating the cells with their default links, which refreshes the barcodes.
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(0));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* utility = cell->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
+    CPPUNIT_ASSERT(nullptr != barcode);
+
+    const auto axisSlots = barcode->Slots();
+    int windowingSlot = -1;
+    int lutSlot = -1;
+    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+    {
+      if (QmitkMxNAllSyncDimensions[i] == QmitkMxNSyncDimension::Windowing) { windowingSlot = static_cast<int>(i); }
+      if (QmitkMxNAllSyncDimensions[i] == QmitkMxNSyncDimension::Lut) { lutSlot = static_cast<int>(i); }
+    }
+    CPPUNIT_ASSERT(windowingSlot >= 0 && lutSlot >= 0);
+    CPPUNIT_ASSERT_MESSAGE("A fresh cell's Windowing barcode slot is filled (main hue), no manual refresh",
+                           axisSlots[windowingSlot].color.isValid());
+    CPPUNIT_ASSERT_MESSAGE("A fresh cell's LUT barcode slot is filled (main hue), no manual refresh",
+                           axisSlots[lutSlot].color.isValid());
+  }
+
+  void LoadedLayout_NoWindowingInjection()
+  {
+    // The appearance default lives in the interactive create path only. A
+    // document that declares no Windowing/LUT link must round-trip verbatim -
+    // ApplyLayout injects nothing, and serialize/apply is identity.
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      m_Editor->ClearSyncLink(CellId(cell), QmitkMxNSyncDimension::Windowing);
+      m_Editor->ClearSyncLink(CellId(cell), QmitkMxNSyncDimension::Lut);
+    }
+    m_Editor->ApplyLayout(m_Editor->SerializeLayout());  // "load" the appearance-link-free document
+
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      CPPUNIT_ASSERT_MESSAGE("ApplyLayout injects no Windowing link a document did not declare",
+                             !m_Editor->GetSyncLink(CellId(cell), QmitkMxNSyncDimension::Windowing).has_value());
+      CPPUNIT_ASSERT_MESSAGE("ApplyLayout injects no LUT link a document did not declare",
+                             !m_Editor->GetSyncLink(CellId(cell), QmitkMxNSyncDimension::Lut).has_value());
+    }
+
+    // Round-trip identity from a loaded state onward - a fixpoint, robust to the
+    // SetLayout-vs-ApplyLayout normalization of the initial grid.
+    const auto loaded = m_Editor->SerializeLayout();
+    m_Editor->ApplyLayout(loaded);
+    CPPUNIT_ASSERT_MESSAGE("A loaded layout round-trips to itself",
+                           loaded == m_Editor->SerializeLayout());
+  }
+
+  // --- Stage 2: the (b)/(c) join-mode overrides -------------------------------
+
+  void Assign_ReplaceMode_ClearsOthers()
+  {
+    // Explicit Replace matches the default: the cell's links to other groups are
+    // cleared, so it ends synchronized only on the target.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "G");
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G", QmitkMxNGroupJoinMode::Replace);
+
+    CPPUNIT_ASSERT_MESSAGE("Replace links the target group's dimension",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "G"));
+    CPPUNIT_ASSERT_MESSAGE("Replace clears the cell's link to another group",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan).has_value());
+  }
+
+  void Assign_FillEmptyMode_KeepsLinkedAxes()
+  {
+    // FillEmpty sets only the cell's currently-unlinked axes; an axis already
+    // linked (to any group) is left untouched.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");
+    // G synchronizes Pan and Slice (established via a second cell).
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "G");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "G");
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G", QmitkMxNGroupJoinMode::FillEmpty);
+
+    CPPUNIT_ASSERT_MESSAGE("FillEmpty leaves an already-linked axis on its group",
+                           IsLinked(0, QmitkMxNSyncDimension::Pan, "X"));
+    CPPUNIT_ASSERT_MESSAGE("FillEmpty sets a previously-unlinked covered axis to the group",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "G"));
+  }
+
+  void Assign_FillEmptyMode_SelectionOnlyWhenResting()
+  {
+    // FillEmpty adopts a selection-syncing group's selection only for a cell
+    // resting on the default group; a cell explicitly placed elsewhere keeps it.
+    // The mode is load-bearing: under Replace, cell 2's move off "P" would reclaim
+    // the (empty) "P" group and the "keeps P" assertion would flip.
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "G");
+    m_Editor->SetCellSelectionGroup(CellId(1), "G");  // G synchronizes selection
+    m_Editor->SetCellSelectionGroup(CellId(2), "P");  // cell 2 is explicitly on P
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G", QmitkMxNGroupJoinMode::FillEmpty);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A cell resting on the default adopts the group's selection",
+                                 std::string("G"), m_Editor->GetCellSelectionGroup(CellId(0)));
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(2) }, "G", QmitkMxNGroupJoinMode::FillEmpty);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A cell explicitly on another selection group keeps it under FillEmpty",
+                                 std::string("P"), m_Editor->GetCellSelectionGroup(CellId(2)));
+  }
+
+  void Assign_MergeMode_OverwritesCoveredKeepsRest()
+  {
+    // Merge overwrites the group's covered axes (collisions) but keeps the cell's
+    // links on axes the group does not cover.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "Y");
+    // G synchronizes Pan only.
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "G");
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G",
+                                 QmitkMxNGroupJoinMode::MergeOverwriteCollisions);
+
+    CPPUNIT_ASSERT_MESSAGE("Merge overwrites the covered axis (Pan X -> G)",
+                           IsLinked(0, QmitkMxNSyncDimension::Pan, "G"));
+    CPPUNIT_ASSERT_MESSAGE("Merge keeps a link on an axis the group does not cover (Windowing/Y)",
+                           IsLinked(0, QmitkMxNSyncDimension::Windowing, "Y"));
+  }
+
+  void MultiSelect_SurvivesActiveMirror()
+  {
+    // Selecting several tiles makes the first the active render window, which
+    // fires ActiveRenderWindowChanged back into SelectActiveWindowTile. That
+    // mirror must not collapse the multi-selection to the single active cell.
+    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
+    CPPUNIT_ASSERT(nullptr != cellMap);
+    Pump();
+
+    cellMap->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A multi-selection must survive the active-window mirror",
+                                 2, static_cast<int>(cellMap->GetSelectedWindowIds().size()));
+  }
+
+  void JoinModeFromModifiers_MapsKeys()
+  {
+    // The drop-time modifier contract both drop targets share.
+    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::Replace
+                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::NoModifier));
+    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::MergeOverwriteCollisions
+                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::AltModifier));
+    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::FillEmpty
+                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::ShiftModifier));
   }
 };
 

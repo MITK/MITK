@@ -27,7 +27,6 @@ found in the LICENSE file.
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QRubberBand>
 
 #include <algorithm>
 
@@ -52,7 +51,6 @@ namespace
 
 QmitkMxNCellMapWidget::QmitkMxNCellMapWidget(QWidget* parent)
   : QWidget(parent)
-  , m_RubberBand(new QRubberBand(QRubberBand::Rectangle, this))
 {
   this->setAcceptDrops(true);
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -287,11 +285,9 @@ void QmitkMxNCellMapWidget::mousePressEvent(QMouseEvent* event)
 
   if (index < 0)
   {
-    // Empty area: begin a rubber-band selection.
-    m_RubberBandActive = true;
+    // Empty area: clear the selection. Multi-select is by Ctrl-click.
     m_DragCandidate = false;
-    m_RubberBand->setGeometry(QRect(m_PressPosition, QSize()));
-    m_RubberBand->show();
+    this->SetSelection(QStringList());
     event->accept();
     return;
   }
@@ -327,13 +323,6 @@ void QmitkMxNCellMapWidget::mousePressEvent(QMouseEvent* event)
 
 void QmitkMxNCellMapWidget::mouseMoveEvent(QMouseEvent* event)
 {
-  if (m_RubberBandActive)
-  {
-    m_RubberBand->setGeometry(QRect(m_PressPosition, event->pos()).normalized());
-    event->accept();
-    return;
-  }
-
   if (m_DragCandidate
       && (event->pos() - m_PressPosition).manhattanLength() >= QApplication::startDragDistance())
   {
@@ -348,26 +337,6 @@ void QmitkMxNCellMapWidget::mouseMoveEvent(QMouseEvent* event)
 
 void QmitkMxNCellMapWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-  if (m_RubberBandActive)
-  {
-    m_RubberBandActive = false;
-    m_RubberBand->hide();
-
-    const QRect band = QRect(m_PressPosition, event->pos()).normalized();
-    QStringList selection = event->modifiers().testFlag(Qt::ControlModifier) ? m_Selection
-                                                                             : QStringList();
-    for (const auto& tile : m_Tiles)
-    {
-      if (tile.mapRect.intersects(band) && !selection.contains(tile.windowId))
-      {
-        selection.append(tile.windowId);
-      }
-    }
-    this->SetSelection(selection);
-    event->accept();
-    return;
-  }
-
   m_DragCandidate = false;
   event->ignore();
 }
@@ -443,6 +412,22 @@ void QmitkMxNCellMapWidget::dropEvent(QDropEvent* event)
   // unselected tile just that cell.
   const QStringList targets = m_Selection.contains(windowId) ? m_Selection
                                                              : QStringList{ windowId };
-  emit AssignRequested(group, targets);
+  emit AssignRequested(group, targets, JoinModeFromModifiers(event->modifiers()));
   event->acceptProposedAction();
+}
+
+QmitkMxNGroupJoinMode QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::KeyboardModifiers modifiers)
+{
+  // Alt merges (overwriting collisions), Shift fills only empty axes; a plain
+  // drop replaces. Ctrl is deliberately not used - the map already binds it to
+  // multi-select, so it must keep its selection meaning during a drag.
+  if (modifiers.testFlag(Qt::AltModifier))
+  {
+    return QmitkMxNGroupJoinMode::MergeOverwriteCollisions;
+  }
+  if (modifiers.testFlag(Qt::ShiftModifier))
+  {
+    return QmitkMxNGroupJoinMode::FillEmpty;
+  }
+  return QmitkMxNGroupJoinMode::Replace;
 }

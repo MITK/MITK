@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
+#include <QmitkMxNGroupJoinMode.h>
+
 #include <QPointer>
 #include <QRect>
 #include <QStringList>
@@ -23,7 +25,6 @@ found in the LICENSE file.
 #include <vector>
 
 class QmitkMxNMultiWidget;
-class QRubberBand;
 
 /**
  * \brief Interactive miniature map of an MxN editor's cell layout, colored by
@@ -37,10 +38,10 @@ class QRubberBand;
  * filled with the linked group's hue, left as a gap when unsynced, with a
  * notch marking links that carry an offset.
  *
- * Cells are selected by click, Ctrl-click, or rubber band; selected tiles can
- * be dragged onto a group (or a group dropped onto a tile) - the widget only
- * reports these gestures via signals, the owning editor performs the engine
- * mutation.
+ * Cells are selected by click or Ctrl-click (a press on empty space clears the
+ * selection); selected tiles can be dragged onto a group (or a group dropped onto
+ * a tile) - the widget only reports these gestures via signals, the owning editor
+ * performs the engine mutation.
  *
  * Mime types: dragged cells use "application/x-mitk-mxn-cells" (newline-
  * separated window ids); accepted group drops use
@@ -70,12 +71,22 @@ public:
    *         window). Emits SelectionChanged only when the selection changes. */
   void SetSelectedWindowIds(const QStringList& windowIds);
 
+  /** \brief The join mode a drop's keyboard modifiers request: Alt =
+   *         MergeOverwriteCollisions, Shift = FillEmpty, none = Replace (the
+   *         default). Read at drop time (on release), not at drag initiation, so a
+   *         modifier held while starting a drag from a group card has no effect on
+   *         the mode. Shared by both drop targets (this map and the editor's group
+   *         cards) so the modifier meaning is identical everywhere. */
+  static QmitkMxNGroupJoinMode JoinModeFromModifiers(Qt::KeyboardModifiers modifiers);
+
 Q_SIGNALS:
 
   void SelectionChanged(const QStringList& windowIds);
 
-  /** \brief A group was dropped onto a tile (or the current selection). */
-  void AssignRequested(const QString& group, const QStringList& windowIds);
+  /** \brief A group was dropped onto a tile (or the current selection), with the
+   *         join mode the drop's modifiers requested. */
+  void AssignRequested(const QString& group, const QStringList& windowIds,
+                       QmitkMxNGroupJoinMode mode);
 
 protected:
 
@@ -110,9 +121,7 @@ private:
   std::vector<Tile> m_Tiles;
   QStringList m_Selection;
 
-  QRubberBand* m_RubberBand;
-  QPoint m_PressPosition;
-  bool m_RubberBandActive = false;
+  QPoint m_PressPosition;  // press origin for the cell-drag start threshold
   bool m_DragCandidate = false;
   int m_DropTargetTile = -1;  // tile highlighted under a hovering group drag
 

@@ -41,10 +41,10 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkMxNCellOverlayTestSuite);
   MITK_TEST(CellIdAnnotation_IsBlank);
   MITK_TEST(PlaneLabel_TracksViewDirection);
-  MITK_TEST(FrameIdentity_NoneWhenUnlinked);
+  MITK_TEST(FrameIdentity_FreshCellIsMonoMain);
   MITK_TEST(FrameIdentity_MonoWhenSingleGroup);
   MITK_TEST(FrameIdentity_ComplexAcrossGroups);
-  MITK_TEST(FrameIdentity_IgnoresSelectionGroup);
+  MITK_TEST(FrameIdentity_SelectionParticipates);
   MITK_TEST(PaintPath_DoesNotCrash);
   CPPUNIT_TEST_SUITE_END();
 
@@ -129,21 +129,32 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("Sagittal"), overlay->PlaneLabel().toStdString());
   }
 
-  void FrameIdentity_NoneWhenUnlinked()
+  void FrameIdentity_FreshCellIsMonoMain()
   {
-    CPPUNIT_ASSERT_MESSAGE("An unsynchronized cell has no frame group identity",
-      QmitkMxNMultiWidget::CellGroupIdentityKind::None
-        == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
+    // A fresh cell links Windowing, LUT, and selection to "main", so its frame is
+    // a solid "main" hue - there is no group-less "None" resting state.
+    const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("A fresh cell's frame is Mono",
+      QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT_MESSAGE("A fresh cell's frame hue is 'main's color",
+      identity.hue == m_Editor->GetSyncGroupColor("main"));
   }
 
   void FrameIdentity_MonoWhenSingleGroup()
   {
+    // Wholly one group across every tied axis (the appearance defaults cleared,
+    // navigation and selection all on "nav") reads Mono.
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      m_Editor->ClearSyncLink(CellId(0), dimension);
+    }
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetCellSelectionGroup(CellId(0), "nav");
 
     const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
-    CPPUNIT_ASSERT_MESSAGE("A cell whose linked dimensions all name one group is mono",
+    CPPUNIT_ASSERT_MESSAGE("A cell whose tied axes all name one group is mono",
       QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
     CPPUNIT_ASSERT_MESSAGE("A mono cell carries the group hue", identity.hue.isValid());
   }
@@ -158,17 +169,22 @@ public:
         == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
   }
 
-  void FrameIdentity_IgnoresSelectionGroup()
+  void FrameIdentity_SelectionParticipates()
   {
-    // A deliberate, non-default data-selection group but no navigation/intensity
-    // link: the frame stays neutral. Selection is excluded from the frame
-    // (every cell carries a default selection group, so including it would blank
-    // the frame the moment a real group forms); it is legible in the barcode.
+    // Selection is the 8th frame axis. A cell whose only group tie is a deliberate
+    // data-selection group (the appearance defaults cleared) reads Mono of that
+    // group - selection drives the frame like any other axis.
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      m_Editor->ClearSyncLink(CellId(0), dimension);
+    }
     m_Editor->SetCellSelectionGroup(CellId(0), "sel");
 
-    CPPUNIT_ASSERT_MESSAGE("Selection membership must not drive the frame identity",
-      QmitkMxNMultiWidget::CellGroupIdentityKind::None
-        == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
+    const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("A selection-only cell is Mono of its selection group",
+      QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT_MESSAGE("The frame hue is the selection group's color",
+      identity.hue == m_Editor->GetSyncGroupColor("sel"));
   }
 
   void PaintPath_DoesNotCrash()

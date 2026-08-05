@@ -888,8 +888,6 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     return;
   }
 
-  using State = QmitkRenderWindowProximity::State;
-
   QPainter painter(this);
   const QFont readoutFont = ReadoutFont(this->font());
 

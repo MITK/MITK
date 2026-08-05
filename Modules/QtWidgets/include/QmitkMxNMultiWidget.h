@@ -167,6 +167,19 @@ public:
   void AddSynchronizationGroup(const GroupSyncIndexType index, const std::string& name = std::string());
 
   /**
+  * \brief Remove a synchronization group entirely, by its string id.
+  *
+  *   Clears every cell's ties to the group - each dimension link naming it and
+  *   any cell whose data selection names it (those cells revert to the default
+  *   group) - and drops a leftover registry entry, so a group created empty via
+  *   the "+" button (which the per-member reclaim leaves in place) also
+  *   disappears. The default group (engine index 1, "main") is never removable:
+  *   the call is a no-op for it. A no-op as well for an id that names no group.
+  *   Emits SyncLinksChanged once.
+  */
+  void RemoveSynchronizationGroup(const std::string& id);
+
+  /**
   * \brief Move a synchronized node selection widget to the group with the given index.
   *
   *   The group is auto-created via 'AddSynchronizationGroup' if it does not

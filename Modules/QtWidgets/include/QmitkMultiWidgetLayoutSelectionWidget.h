@@ -45,6 +45,15 @@ public:
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
+  /**
+   * \brief Clear the transient picker state (the grid table selection and the
+   *        preset combo), so the widget opens fresh rather than showing the
+   *        previous pick. Called by a host that re-shows the widget on demand
+   *        (e.g. the layout editor's "Edit grid..." dialog) instead of keeping
+   *        it always visible.
+   */
+  void ResetSelection();
+
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);

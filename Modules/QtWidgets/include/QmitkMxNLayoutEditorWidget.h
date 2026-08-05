@@ -29,7 +29,7 @@ found in the LICENSE file.
 
 class QmitkMxNCellMapWidget;
 class QmitkMultiWidgetLayoutSelectionWidget;
-class QStackedWidget;
+class QDialog;
 class QTableWidget;
 class QToolButton;
 class QVBoxLayout;
@@ -150,6 +150,14 @@ public:
   std::string CreateGroup();
 
   /**
+   * \brief Remove a synchronization group entirely (its cells are unsynchronized
+   *        and revert to the default group). A no-op for the default group, which
+   *        every cell falls back to and which is never removable. Public so tests
+   *        and the card menu can drive it.
+   */
+  void DeleteGroup(const std::string& group);
+
+  /**
    * \brief The group-perspective barcode slots for a group's header: one per
    *        axis (the seven dimensions then data selection). Each axis is
    *        tri-state over the group's member cells - a solid hue when all
@@ -159,6 +167,17 @@ public:
    *        per-cell, binary BuildBarcodeSlots.
    */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildGroupBarcodeSlots(const std::string& group) const;
+
+  /**
+   * \brief Whether the current sync configuration is more than the trivial
+   *        default. False only when the sole group is "main" and every cell
+   *        resolves to Mono("main") - the fresh-cell state where windowing, LUT,
+   *        and selection sit on "main" and nothing else is linked. True once a
+   *        second group exists or any cell links other synchronization. The
+   *        hosting view uses this to warn before a layout replace discards a
+   *        configuration the user built; public so it is testable headlessly.
+   */
+  bool HasNonTrivialSyncConfig() const;
 
 public Q_SLOTS:
 
@@ -193,6 +212,20 @@ private:
   void SelectActiveWindowTile();
 
   void Rebuild();
+
+  /** \brief Open the grid-shape picker (grid size, presets, save/load) in an
+   *         on-demand modal dialog, re-parenting the shared picker into it and
+   *         resetting its transient state so it opens fresh. */
+  void ShowGridDialog();
+
+  /** \brief Rebuild the advanced matrix from the current engine state. */
+  void RebuildMatrixNow();
+
+  /** \brief Rebuild the advanced matrix only while it is revealed (the "Advanced"
+   *         toggle is on). Called from the structural rebuild paths and on reveal,
+   *         never from the routine card refresh, so an editable combo the user is
+   *         interacting with is not recreated mid-edit. */
+  void RefreshAdvancedMatrixIfVisible();
 
   /**
    * \brief Reconcile the displayed cards against the current group set instead of
@@ -237,11 +270,13 @@ private:
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelection;
   QmitkMxNCellMapWidget* m_CellMap;
-  QStackedWidget* m_Faces;
-  QVBoxLayout* m_GroupsLayout;    // card list inside the scrollable main face
-  QTableWidget* m_Matrix;
+  QVBoxLayout* m_GroupsLayout;    // card list inside the scrollable lower pane
+  QTableWidget* m_Matrix;         // the advanced link matrix, inside m_MatrixPane
+  QWidget* m_MatrixPane = nullptr;      // third splitter pane, hidden until "Advanced" is on
+  QDialog* m_GridDialog = nullptr;      // on-demand modal grid-shape picker host
   QToolButton* m_AddGroupButton;
   QToolButton* m_AdvancedButton;
+  QToolButton* m_EditGridButton;
   QToolButton* m_AddRowButton;
   QToolButton* m_RemoveRowButton;
   QToolButton* m_AddColumnButton;
@@ -256,6 +291,13 @@ private:
   // as null rather than dangling).
   std::map<std::string, QPointer<QWidget>> m_CardsById;
   std::vector<std::string> m_DisplayedGroupIds;
+
+  // The cell and group sets the advanced matrix currently reflects. The matrix is
+  // rebuilt when either changes (a grid resize changes the cells / rows; a group
+  // added or removed changes the columns' group dropdowns) but not on a pure
+  // link-or-selection edit, which would tear down an open combo mid-edit.
+  std::vector<QString> m_MatrixCellIds;
+  std::vector<std::string> m_MatrixGroupIds;
 
   // Per-group, empty-group-only intent buffer: which of the eight axes (the
   // seven QmitkMxNAllSyncDimensions, then data selection) the user toggled on

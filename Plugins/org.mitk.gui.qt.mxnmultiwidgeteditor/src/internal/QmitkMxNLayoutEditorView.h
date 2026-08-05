@@ -52,6 +52,11 @@ private:
 
   void DisconnectLayoutControls();
 
+  /** \brief Ask the user before a layout change discards a non-trivial
+   *         synchronization configuration; returns true to proceed. No prompt
+   *         (returns true) when the current config is the trivial default. */
+  bool ConfirmDestructiveLayoutChange();
+
   QmitkMxNLayoutEditorWidget* m_LayoutEditorWidget = nullptr;
 
   /** \brief Per-attachment connections of the layout-shape controls to the

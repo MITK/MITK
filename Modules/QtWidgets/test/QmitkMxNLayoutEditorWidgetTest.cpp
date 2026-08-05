@@ -26,7 +26,10 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QCoreApplication>
+#include <QDropEvent>
 #include <QLayout>
+#include <QMimeData>
+#include <QPointF>
 
 #include <algorithm>
 
@@ -80,6 +83,14 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(JoinModeFromModifiers_MapsKeys);
   MITK_TEST(Selection_TogglesForUserGroup);
   MITK_TEST(MultiSelect_SurvivesActiveMirror);
+
+  MITK_TEST(NonTrivialConfig_FalseForFreshDefault);
+  MITK_TEST(NonTrivialConfig_TrueOnceASecondGroupExists);
+  MITK_TEST(MultiTileDrop_AssignsEverySelectedCell);
+
+  MITK_TEST(DeleteGroup_RemovesMemberBearingGroup);
+  MITK_TEST(DeleteGroup_RemovesEmptyCreatedGroup);
+  MITK_TEST(DeleteGroup_MainIsNoOp);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -915,6 +926,119 @@ public:
                    == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::AltModifier));
     CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::FillEmpty
                    == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::ShiftModifier));
+  }
+
+  // --- Destructive-layout-change guard predicate ------------------------------
+
+  void NonTrivialConfig_FalseForFreshDefault()
+  {
+    // setUp leaves the fresh default: the sole group is "main" and every cell
+    // resolves to Mono("main"). That is exactly the "everything bound to main"
+    // state the layout-replace warning treats as trivial (no prompt).
+    CPPUNIT_ASSERT_MESSAGE("The fresh default configuration is trivial",
+                           !m_Widget->HasNonTrivialSyncConfig());
+  }
+
+  void NonTrivialConfig_TrueOnceASecondGroupExists()
+  {
+    // Assigning a cell to a new group adds a group beyond "main" and links
+    // synchronization the user built - a layout replace would discard it, so the
+    // predicate must report the configuration as non-trivial.
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "alpha");
+
+    CPPUNIT_ASSERT_MESSAGE("A user-created group makes the configuration non-trivial",
+                           m_Widget->HasNonTrivialSyncConfig());
+  }
+
+  // --- Multi-tile drag-and-drop -----------------------------------------------
+
+  void MultiTileDrop_AssignsEverySelectedCell()
+  {
+    // A multi-tile drag carries the whole selection newline-joined (StartCellDrag);
+    // a drop on a group card must assign every one. Real Qt drag loops cannot run
+    // headlessly, so reproduce the drag's mime payload from the map selection and
+    // deliver it as a synthetic drop onto the card, driving the real encode/decode
+    // seam and the card's AssignCellsToGroup handler.
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "grp");  // grp syncs Slice
+    Pump();
+    auto* card = CardFor("grp");
+    CPPUNIT_ASSERT(nullptr != card);
+
+    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
+    CPPUNIT_ASSERT(nullptr != cellMap);
+    cellMap->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
+    Pump();
+
+    const QByteArray payload =
+      cellMap->GetSelectedWindowIds().join(QStringLiteral("\n")).toUtf8();
+    QMimeData mime;
+    mime.setData(QmitkMxNCellMapWidget::CellsMimeType, payload);
+
+    // Dispatch straight to the card's virtual event() (via the public QObject
+    // overload; QWidget narrows the override to protected). QApplication::notify
+    // routes real drag-and-drop events through the platform drag manager, so a
+    // plain sendEvent would never reach dropEvent here.
+    QDropEvent drop(QPointF(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    static_cast<QObject*>(card)->event(&drop);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE("A multi-tile drop assigns the first selected cell",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "grp"));
+    CPPUNIT_ASSERT_MESSAGE("A multi-tile drop assigns the second selected cell",
+                           IsLinked(1, QmitkMxNSyncDimension::Slice, "grp"));
+    CPPUNIT_ASSERT_MESSAGE("The pre-existing member keeps its link",
+                           IsLinked(2, QmitkMxNSyncDimension::Slice, "grp"));
+  }
+
+  // --- Group removal -----------------------------------------------------------
+
+  bool RegistryHasGroup(const std::string& id) const
+  {
+    const auto infos = m_Editor->GetSyncGroupInfos();
+    return std::any_of(infos.begin(), infos.end(),
+                       [&id](const auto& info) { return info.id == id; });
+  }
+
+  void DeleteGroup_RemovesMemberBearingGroup()
+  {
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, "grp");  // nav-links them
+    CPPUNIT_ASSERT(IsLinked(0, QmitkMxNSyncDimension::Slice, "grp"));
+    CPPUNIT_ASSERT(this->RegistryHasGroup("grp"));
+
+    m_Widget->DeleteGroup("grp");
+
+    for (std::size_t cell = 0; cell < 2; ++cell)
+    {
+      for (const auto dimension : QmitkMxNAllSyncDimensions)
+      {
+        CPPUNIT_ASSERT_MESSAGE("Deleting a group clears every member link to it",
+                               !IsLinked(cell, dimension, "grp"));
+      }
+    }
+    CPPUNIT_ASSERT_MESSAGE("A deleted group leaves the registry", !this->RegistryHasGroup("grp"));
+  }
+
+  void DeleteGroup_RemovesEmptyCreatedGroup()
+  {
+    // A "+ Group" group is registered with no members; the per-member reclaim
+    // cannot drop it, so removal must erase its registry entry explicitly.
+    const auto id = m_Widget->CreateGroup();
+    CPPUNIT_ASSERT(!id.empty());
+    CPPUNIT_ASSERT_MESSAGE("A freshly created empty group is registered", this->RegistryHasGroup(id));
+
+    m_Widget->DeleteGroup(id);
+
+    CPPUNIT_ASSERT_MESSAGE("Deleting an empty '+ Group' group removes its registry entry",
+                           !this->RegistryHasGroup(id));
+  }
+
+  void DeleteGroup_MainIsNoOp()
+  {
+    m_Widget->DeleteGroup("main");
+
+    CPPUNIT_ASSERT_MESSAGE("The default 'main' group is never removed", this->RegistryHasGroup("main"));
+    CPPUNIT_ASSERT_MESSAGE("Cells keep their default 'main' windowing link",
+                           IsLinked(0, QmitkMxNSyncDimension::Windowing, "main"));
   }
 };
 

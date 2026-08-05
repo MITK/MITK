@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QDialog>
 #include <QDoubleSpinBox>
 #include <QDrag>
 #include <QDragEnterEvent>
@@ -33,17 +34,19 @@ found in the LICENSE file.
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QIcon>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
-#include <QStackedWidget>
+#include <QSplitter>
 #include <QTableWidget>
 #include <QTimer>
 #include <QToolButton>
@@ -118,6 +121,31 @@ namespace
   }
 
   const QString NotLinkedEntry = QStringLiteral("(not linked)");
+
+  /**
+   * Tint an advanced-matrix link combo's text with the linked group's hue, so the
+   * matrix speaks the same color language as the cards and tiles. A cleared or
+   * unlinked combo drops back to the default ink.
+   */
+  void ColorizeLinkCombo(QComboBox* combo, QmitkMxNMultiWidget* multiWidget, const QString& group)
+  {
+    QString sheet;
+    if (nullptr != multiWidget && !group.isEmpty() && group != NotLinkedEntry)
+    {
+      try
+      {
+        const QColor hue = multiWidget->GetSyncGroupColor(group.toStdString());
+        if (hue.isValid())
+        {
+          sheet = QStringLiteral("QComboBox { color: %1; }").arg(hue.name());
+        }
+      }
+      catch (const mitk::Exception&)
+      {
+      }
+    }
+    combo->setStyleSheet(sheet);
+  }
 
   /**
    * Style a group card's header as a solid bar in the group hue, with the name,
@@ -247,38 +275,33 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   auto* mainLayout = new QVBoxLayout(this);
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
-  auto* topRow = new QHBoxLayout();
-  m_AddGroupButton = new QToolButton(this);
-  m_AddGroupButton->setText(tr("+ Group"));
-  m_AddGroupButton->setToolTip(tr("Create a new synchronization group"));
-  connect(m_AddGroupButton, &QToolButton::clicked, this, [this]() { this->CreateGroup(); });
-  topRow->addWidget(m_AddGroupButton);
-  topRow->addStretch();
+  // The grid-shape picker (grid size, presets, save/load) is no longer an
+  // always-on box: it opens on demand in a modal "Edit grid..." dialog
+  // (ShowGridDialog). It is created here, hidden, so the hosting view can bind its
+  // data storage and apply signals before the dialog exists, and the same
+  // instance is reparented into the dialog and reused on each open.
+  m_LayoutSelection = new QmitkMultiWidgetLayoutSelectionWidget(this);
+  m_LayoutSelection->hide();
 
-  m_AdvancedButton = new QToolButton(this);
-  m_AdvancedButton->setText(tr("Advanced"));
-  m_AdvancedButton->setCheckable(true);
-  m_AdvancedButton->setToolTip(tr("Power-user view: the full per-dimension link matrix "
-                                  "with offset editors"));
-  topRow->addWidget(m_AdvancedButton);
-  mainLayout->addLayout(topRow);
+  // The cell map is the primary canvas, front and center; the "Sync groups" box
+  // reads as a legend below it. A vertical splitter lets the user trade space
+  // between them; its dotted handle mirrors the segmentation view's splitter
+  // (darkstyle.qss) so the drag affordance is visible.
+  auto* splitter = new QSplitter(Qt::Vertical, this);
+  splitter->setObjectName(QStringLiteral("QmitkMxNLayoutEditorSplitter"));
+  splitter->setChildrenCollapsible(false);
+  splitter->setHandleWidth(2);
+  splitter->setStyleSheet(QStringLiteral(
+    "QSplitter::handle { margin-top: 4px; margin-bottom: 4px; "
+    "border-top: 1px dotted #9e9e9e; border-bottom: 1px dotted #9e9e9e; "
+    "background-color: transparent; }"));
 
-  m_Faces = new QStackedWidget(this);
+  auto* mapPane = new QWidget(splitter);
+  auto* mapPaneLayout = new QVBoxLayout(mapPane);
+  mapPaneLayout->setContentsMargins(0, 0, 0, 0);
 
-  // Main face: layout shape controls, the interactive cell map, group cards.
-  auto* mainFace = new QScrollArea(m_Faces);
-  mainFace->setWidgetResizable(true);
-  auto* mainContainer = new QWidget(mainFace);
-  auto* mainFaceLayout = new QVBoxLayout(mainContainer);
-
-  auto* layoutBox = new QGroupBox(tr("Layout"), mainContainer);
-  auto* layoutBoxLayout = new QVBoxLayout(layoutBox);
-  m_LayoutSelection = new QmitkMultiWidgetLayoutSelectionWidget(layoutBox);
-  layoutBoxLayout->addWidget(m_LayoutSelection);
-  mainFaceLayout->addWidget(layoutBox);
-
-  m_CellMap = new QmitkMxNCellMapWidget(mainContainer);
-  m_CellMap->setMinimumHeight(140);
+  m_CellMap = new QmitkMxNCellMapWidget(mapPane);
+  m_CellMap->setMinimumHeight(200);
   m_CellMap->setToolTip(tr("Select render windows by click or Ctrl-click; "
                            "assign them by dropping them onto a group (or a group's color "
                            "onto a window). A plain drop replaces the window's groups; hold "
@@ -306,23 +329,24 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
             }
             this->ScheduleRebuild();
           });
-  mainFaceLayout->addWidget(m_CellMap);
+  mapPaneLayout->addWidget(m_CellMap, 1);
 
-  // Grow or shrink the grid by a trailing row or column. The operations edit the
-  // splitter tree in place, so existing windows keep their ids, sync links,
-  // renderer-specific node properties, and positions - only the trailing edge is
-  // added (empty) or removed. They require a rectangular grid, which the
-  // tree-derived ResolveGridShape decides, so the buttons disable (with an
-  // explaining tooltip) for irregular or non-grid layouts.
+  // Grid controls: quick trailing add/remove of a row or column, plus the full
+  // "Edit grid..." picker. The +/- operations edit the splitter tree in place, so
+  // existing windows keep their ids, sync links, renderer-specific node
+  // properties, and positions - only the trailing edge is added (empty) or
+  // removed. They require a rectangular grid, which the tree-derived
+  // ResolveGridShape decides, so the buttons disable (with an explaining tooltip)
+  // for irregular or non-grid layouts.
   auto* gridRow = new QHBoxLayout();
   gridRow->setContentsMargins(0, 0, 0, 0);
-  m_RemoveRowButton = new QToolButton(mainContainer);
+  m_RemoveRowButton = new QToolButton(mapPane);
   m_RemoveRowButton->setText(QStringLiteral("-"));
-  m_AddRowButton = new QToolButton(mainContainer);
+  m_AddRowButton = new QToolButton(mapPane);
   m_AddRowButton->setText(QStringLiteral("+"));
-  m_RemoveColumnButton = new QToolButton(mainContainer);
+  m_RemoveColumnButton = new QToolButton(mapPane);
   m_RemoveColumnButton->setText(QStringLiteral("-"));
-  m_AddColumnButton = new QToolButton(mainContainer);
+  m_AddColumnButton = new QToolButton(mapPane);
   m_AddColumnButton->setText(QStringLiteral("+"));
   connect(m_RemoveRowButton, &QToolButton::clicked, this, [this]()
   {
@@ -353,38 +377,103 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
     }
   });
   gridRow->addStretch();
-  gridRow->addWidget(new QLabel(tr("Rows:"), mainContainer));
+  gridRow->addWidget(new QLabel(tr("Rows:"), mapPane));
   gridRow->addWidget(m_RemoveRowButton);
   gridRow->addWidget(m_AddRowButton);
   gridRow->addSpacing(12);
-  gridRow->addWidget(new QLabel(tr("Columns:"), mainContainer));
+  gridRow->addWidget(new QLabel(tr("Columns:"), mapPane));
   gridRow->addWidget(m_RemoveColumnButton);
   gridRow->addWidget(m_AddColumnButton);
+  gridRow->addSpacing(12);
+  m_EditGridButton = new QToolButton(mapPane);
+  m_EditGridButton->setText(tr("Edit grid..."));
+  m_EditGridButton->setToolTip(tr("Choose a grid size or preset, or load or save a layout. "
+                                  "Applying a new layout replaces the current window "
+                                  "arrangement and its synchronization groups."));
+  connect(m_EditGridButton, &QToolButton::clicked, this, [this]() { this->ShowGridDialog(); });
+  gridRow->addWidget(m_EditGridButton);
   gridRow->addStretch();
-  mainFaceLayout->addLayout(gridRow);
+  mapPaneLayout->addLayout(gridRow);
 
-  auto* groupsContainer = new QWidget(mainContainer);
+  splitter->addWidget(mapPane);
+
+  // "Sync groups" gathers the group actions and the group-card list into one
+  // bounded object below the map. Its header carries the group actions: create a
+  // group, and open the advanced per-window matrix.
+  auto* groupsBox = new QGroupBox(tr("Sync groups"), splitter);
+  auto* groupsBoxLayout = new QVBoxLayout(groupsBox);
+  groupsBoxLayout->setContentsMargins(4, 4, 4, 4);
+
+  auto* groupsActionRow = new QHBoxLayout();
+  m_AddGroupButton = new QToolButton(groupsBox);
+  m_AddGroupButton->setText(tr("+ Group"));
+  m_AddGroupButton->setToolTip(tr("Create a new synchronization group"));
+  connect(m_AddGroupButton, &QToolButton::clicked, this, [this]() { this->CreateGroup(); });
+  groupsActionRow->addWidget(m_AddGroupButton);
+  groupsActionRow->addStretch();
+  m_AdvancedButton = new QToolButton(groupsBox);
+  m_AdvancedButton->setText(tr("Advanced"));
+  m_AdvancedButton->setCheckable(true);
+  m_AdvancedButton->setToolTip(tr("Show the full per-window, per-dimension link matrix with "
+                                  "offset editors below, for precise live editing of the "
+                                  "associations"));
+  connect(m_AdvancedButton, &QToolButton::toggled, this, [this](bool on)
+  {
+    m_MatrixPane->setVisible(on);
+    if (on)
+    {
+      this->RebuildMatrixNow();
+    }
+  });
+  groupsActionRow->addWidget(m_AdvancedButton);
+  groupsBoxLayout->addLayout(groupsActionRow);
+
+  // Cards scroll when they outgrow the box; no inner frame, so the box border is
+  // the only one.
+  auto* cardsScroll = new QScrollArea(groupsBox);
+  cardsScroll->setWidgetResizable(true);
+  cardsScroll->setFrameShape(QFrame::NoFrame);
+  auto* groupsContainer = new QWidget(cardsScroll);
   m_GroupsLayout = new QVBoxLayout(groupsContainer);
   m_GroupsLayout->setContentsMargins(0, 0, 0, 0);
   m_GroupsLayout->setSpacing(6);
   m_GroupsLayout->addStretch();
-  mainFaceLayout->addWidget(groupsContainer);
-  mainFaceLayout->addStretch();
+  cardsScroll->setWidget(groupsContainer);
+  groupsBoxLayout->addWidget(cardsScroll, 1);
 
-  mainFace->setWidget(mainContainer);
-  m_Faces->addWidget(mainFace);
+  splitter->addWidget(groupsBox);
 
-  // Advanced face: the full per-dimension matrix.
-  m_Matrix = new QTableWidget(m_Faces);
+  // The advanced matrix stays inside the editor - a third splitter pane, hidden
+  // until the "Advanced" toggle reveals it - so associations can be edited live
+  // beside the map and cards. It rebuilds only on structural changes (a cell or
+  // group added/removed), never on a routine link refresh, so an open combo is
+  // not torn down mid-edit.
+  m_MatrixPane = new QWidget(splitter);
+  auto* matrixPaneLayout = new QVBoxLayout(m_MatrixPane);
+  matrixPaneLayout->setContentsMargins(0, 0, 0, 0);
+  auto* matrixHint = new QLabel(
+    tr("Per-window, per-dimension links. Type a group name to create it; use the offset "
+       "editors for the exact per-window relationship. This is the deliberate way to author "
+       "a partial ('some windows') group state."),
+    m_MatrixPane);
+  matrixHint->setWordWrap(true);
+  matrixPaneLayout->addWidget(matrixHint);
+  m_Matrix = new QTableWidget(m_MatrixPane);
   m_Matrix->setSelectionMode(QAbstractItemView::NoSelection);
   m_Matrix->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   m_Matrix->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  m_Faces->addWidget(m_Matrix);
+  matrixPaneLayout->addWidget(m_Matrix, 1);
+  m_MatrixPane->setVisible(false);
+  splitter->addWidget(m_MatrixPane);
 
-  connect(m_AdvancedButton, &QToolButton::toggled, this,
-          [this](bool advanced) { m_Faces->setCurrentIndex(advanced ? 1 : 0); });
-
-  mainLayout->addWidget(m_Faces);
+  // Cell grid roughly a third, group list two thirds; the cell pane cannot shrink
+  // below its content (the map's minimum height). setSizes seeds the initial
+  // split; the stretch factors keep the ratio on resize. The hidden matrix pane
+  // takes no space until revealed.
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setSizes(QList<int>{ 200, 400 });
+  mainLayout->addWidget(splitter, 1);
 
   this->setEnabled(false);
 }
@@ -821,6 +910,26 @@ std::string QmitkMxNLayoutEditorWidget::CreateGroup()
   }
 }
 
+void QmitkMxNLayoutEditorWidget::DeleteGroup(const std::string& group)
+{
+  // The default group is the appearance/selection home every cell falls back to;
+  // it is never removable.
+  if (m_MultiWidget.isNull() || group == DefaultSelectionGroup)
+  {
+    return;
+  }
+  try
+  {
+    m_MultiWidget->RemoveSynchronizationGroup(group);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "Layout editor: group removal ignored: " << e.GetDescription();
+  }
+  // Drop any pending empty-group intent so a later same-id group starts clean.
+  m_EmptyGroupAxisCache.erase(group);
+}
+
 void QmitkMxNLayoutEditorWidget::ScheduleRebuild()
 {
   if (m_RebuildPending)
@@ -890,6 +999,10 @@ void QmitkMxNLayoutEditorWidget::RefreshCards()
   // repaints (no child widgets, so no flicker).
   m_CellMap->Rebuild();
   this->UpdateGridButtons();
+  // Rebuilds the advanced matrix only when the cell or group set changed (a grid
+  // resize, a group added/removed) - a pure link/selection edit leaves both sets
+  // untouched, so an open combo is not torn down mid-edit.
+  this->RefreshAdvancedMatrixIfVisible();
 }
 
 void QmitkMxNLayoutEditorWidget::SelectActiveWindowTile()
@@ -964,9 +1077,16 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
   m_CardRefreshers.clear();
   m_CardsById.clear();
   m_DisplayedGroupIds.clear();
-  m_Matrix->clear();
-  m_Matrix->setRowCount(0);
-  m_Matrix->setColumnCount(0);
+  if (nullptr != m_Matrix)
+  {
+    m_Matrix->clear();
+    m_Matrix->setRowCount(0);
+    m_Matrix->setColumnCount(0);
+    // Invalidate the reflected-structure signature so the trailing refresh forces
+    // a fresh matrix build when the advanced pane is open.
+    m_MatrixCellIds.clear();
+    m_MatrixGroupIds.clear();
+  }
 
   if (m_MultiWidget.isNull())
   {
@@ -976,11 +1096,9 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
   }
 
   std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
-  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
   try
   {
     infos = m_MultiWidget->GetSyncGroupInfos();
-    descriptors = m_MultiWidget->ListWindowDescriptors();
   }
   catch (const mitk::Exception& e)
   {
@@ -999,7 +1117,7 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
   }
   m_GroupsLayout->addStretch();
 
-  this->RebuildMatrix(infos, descriptors);
+  this->RefreshAdvancedMatrixIfVisible();
   this->UpdateGridButtons();
 }
 
@@ -1062,19 +1180,10 @@ void QmitkMxNLayoutEditorWidget::ReconcileGroupCards(
 
   m_DisplayedGroupIds = currentIds;
 
-  // Refresh the kept cards' contents and the secondary surfaces. The advanced
-  // matrix stays a full rebuild (secondary, usually hidden); the cell map is one
-  // custom-painted widget that just repaints.
+  // Refresh the kept cards' contents and the secondary surfaces (cell map, grid
+  // buttons, and the advanced matrix if its structure changed); RefreshCards
+  // covers them.
   this->RefreshCards();
-  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
-  try
-  {
-    descriptors = m_MultiWidget->ListWindowDescriptors();
-  }
-  catch (const mitk::Exception&)
-  {
-  }
-  this->RebuildMatrix(infos, descriptors);
 }
 
 QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
@@ -1282,6 +1391,31 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
     auto* reinit = menu->addAction(tr("Reinit geometry"));
     reinit->setEnabled(hasMembers);
     connect(reinit, &QAction::triggered, this, [this, groupId]() { this->ReinitGroupGeometry(groupId); });
+
+    // The default group is every cell's fallback and cannot be removed; all other
+    // groups can. Removing a populated group unsynchronizes its windows, so
+    // confirm that case (an empty group carries no state, so it goes quietly).
+    if (groupId != DefaultSelectionGroup)
+    {
+      menu->addSeparator();
+      auto* deleteGroup = menu->addAction(tr("Delete group"));
+      connect(deleteGroup, &QAction::triggered, this, [this, groupId]()
+      {
+        if (!this->GroupMembers(groupId).empty())
+        {
+          const auto answer = QMessageBox::warning(
+            this, tr("Delete synchronization group?"),
+            tr("Deleting this group unsynchronizes its windows and removes it. "
+               "This cannot be undone.\n\nContinue?"),
+            QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+          if (QMessageBox::Yes != answer)
+          {
+            return;
+          }
+        }
+        this->DeleteGroup(groupId);
+      });
+    }
   });
   menuButton->setMenu(menu);
   headerRow->addWidget(menuButton);
@@ -1356,6 +1490,114 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   return card;
 }
 
+void QmitkMxNLayoutEditorWidget::ShowGridDialog()
+{
+  if (nullptr == m_GridDialog)
+  {
+    m_GridDialog = new QDialog(this);
+    m_GridDialog->setWindowTitle(tr("Edit grid layout"));
+    m_GridDialog->setModal(true);
+    auto* dialogLayout = new QVBoxLayout(m_GridDialog);
+    dialogLayout->setContentsMargins(6, 6, 6, 6);
+    dialogLayout->addWidget(m_LayoutSelection);  // reparents the picker into the dialog
+
+    // The picker applies through the hosting view, which guards the destructive
+    // paths (LayoutSet / preset load / data-based) against silently discarding a
+    // non-trivial configuration. Whatever the guard decides, the picker's own
+    // controls have finished their gesture, so close the modal when one fires.
+    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet,
+            m_GridDialog, &QDialog::accept);
+    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout,
+            m_GridDialog, &QDialog::accept);
+    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout,
+            m_GridDialog, &QDialog::accept);
+  }
+
+  // Open fresh each time: the picker is a forward chooser, so a stale prior pick
+  // would misread as the current grid. It may also have hidden itself after a
+  // previous apply, so re-show it.
+  m_LayoutSelection->ResetSelection();
+  m_LayoutSelection->show();
+  m_GridDialog->exec();
+}
+
+void QmitkMxNLayoutEditorWidget::RebuildMatrixNow()
+{
+  if (m_MultiWidget.isNull() || nullptr == m_Matrix)
+  {
+    return;
+  }
+
+  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
+  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
+  try
+  {
+    infos = m_MultiWidget->GetSyncGroupInfos();
+    descriptors = m_MultiWidget->ListWindowDescriptors();
+  }
+  catch (const mitk::Exception& e)
+  {
+    // Transient mid-layout-change state; the next engine signal refreshes.
+    MITK_DEBUG << "Layout editor: skipped matrix rebuild: " << e.GetDescription();
+    return;
+  }
+  this->RebuildMatrix(infos, descriptors);
+
+  // Record the structure the matrix now reflects, so RefreshAdvancedMatrixIfVisible
+  // can rebuild on a cell- or group-set change but skip a pure link edit.
+  m_MatrixCellIds.clear();
+  for (const auto& descriptor : descriptors)
+  {
+    m_MatrixCellIds.push_back(descriptor.id);
+  }
+  m_MatrixGroupIds.clear();
+  for (const auto& info : infos)
+  {
+    m_MatrixGroupIds.push_back(info.id);
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::RefreshAdvancedMatrixIfVisible()
+{
+  // Only while the matrix is revealed. Rebuild it when the cell set (a grid
+  // resize / layout load changes the rows) or the group set (a group added or
+  // removed changes the column dropdowns) differs from what it reflects - but
+  // never on a pure link/selection edit, so an editable combo the user is
+  // interacting with is not torn down mid-edit.
+  if (nullptr == m_AdvancedButton || !m_AdvancedButton->isChecked() || m_MultiWidget.isNull())
+  {
+    return;
+  }
+
+  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
+  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
+  try
+  {
+    infos = m_MultiWidget->GetSyncGroupInfos();
+    descriptors = m_MultiWidget->ListWindowDescriptors();
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
+  }
+
+  std::vector<QString> cellIds;
+  for (const auto& descriptor : descriptors)
+  {
+    cellIds.push_back(descriptor.id);
+  }
+  std::vector<std::string> groupIds;
+  for (const auto& info : infos)
+  {
+    groupIds.push_back(info.id);
+  }
+
+  if (cellIds != m_MatrixCellIds || groupIds != m_MatrixGroupIds)
+  {
+    this->RebuildMatrixNow();
+  }
+}
+
 void QmitkMxNLayoutEditorWidget::RebuildMatrix(
   const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
   const std::vector<QmitkMxNMultiWidget::WindowDescriptor>& descriptors)
@@ -1366,16 +1608,34 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
     groupNames.append(QString::fromStdString(info.id));
   }
 
+  // Eight axes: the seven QmitkMxNSyncDimension links plus the data-selection axis
+  // in the last column, matching the tiles and group headers.
   const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
-  m_Matrix->setColumnCount(dimensionCount);
+  const int selectionColumn = dimensionCount;
+  m_Matrix->setColumnCount(dimensionCount + 1);
   m_Matrix->setRowCount(static_cast<int>(descriptors.size()));
 
-  QStringList headers;
+  // Column headers carry the same axis glyph the tiles and barcodes use, recolored
+  // to the header ink, next to the dimension name.
+  const QColor headerInk = this->palette().color(QPalette::Text);
+  int headerColumn = 0;
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
-    headers.append(DimensionLabel(dimension));
+    auto* headerItem = new QTableWidgetItem(QString::fromUtf8(DimensionLabel(dimension)));
+    const QPixmap glyph = QmitkMxNRenderAxisGlyph(GlyphFor(dimension), headerInk, 16);
+    if (!glyph.isNull())
+    {
+      headerItem->setIcon(QIcon(glyph));
+    }
+    m_Matrix->setHorizontalHeaderItem(headerColumn++, headerItem);
   }
-  m_Matrix->setHorizontalHeaderLabels(headers);
+  auto* selectionHeader = new QTableWidgetItem(tr("Data selection"));
+  const QPixmap selectionGlyph = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Selection, headerInk, 16);
+  if (!selectionGlyph.isNull())
+  {
+    selectionHeader->setIcon(QIcon(selectionGlyph));
+  }
+  m_Matrix->setHorizontalHeaderItem(selectionColumn, selectionHeader);
 
   QStringList rowLabels;
   for (const auto& descriptor : descriptors)
@@ -1402,6 +1662,7 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
       combo->addItems(groupNames);
       combo->setCurrentText(link.has_value() ? QString::fromStdString(link->group)
                                              : NotLinkedEntry);
+      ColorizeLinkCombo(combo, m_MultiWidget, combo->currentText());
       cellLayout->addWidget(combo);
 
       QSpinBox* sliceOffset = nullptr;
@@ -1496,6 +1757,10 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
           MITK_WARN << "Layout editor: link change for '" << windowId.toStdString()
                     << "' ignored: " << e.GetDescription();
         }
+        // Recolor immediately so the hue tracks the selection even when the edit
+        // is not structural enough to rebuild the matrix (e.g. switching between
+        // two existing groups).
+        ColorizeLinkCombo(combo, m_MultiWidget, text);
         this->ScheduleRebuild();
       };
 
@@ -1511,6 +1776,55 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
       }
 
       m_Matrix->setCellWidget(static_cast<int>(row), static_cast<int>(column), cellWidget);
+    }
+
+    // The data-selection axis (the 8th): single-valued per cell and offset-free,
+    // so a plain combo. Empty reverts the cell to the default group; any other
+    // name moves its selection there (creating the group on commit).
+    {
+      auto* selectionCell = new QWidget(m_Matrix);
+      auto* selectionLayout = new QHBoxLayout(selectionCell);
+      selectionLayout->setContentsMargins(2, 2, 2, 2);
+
+      auto* selectionCombo = new QComboBox(selectionCell);
+      selectionCombo->setEditable(true);
+      selectionCombo->addItems(groupNames);
+      selectionCombo->setCurrentText(
+        QString::fromStdString(m_MultiWidget->GetCellSelectionGroup(windowId)));
+      ColorizeLinkCombo(selectionCombo, m_MultiWidget, selectionCombo->currentText());
+      selectionLayout->addWidget(selectionCombo);
+
+      const auto commitSelection = [this, windowId, selectionCombo]()
+      {
+        if (m_MultiWidget.isNull())
+        {
+          return;
+        }
+        const auto text = selectionCombo->currentText().trimmed();
+        try
+        {
+          if (text.isEmpty())
+          {
+            m_MultiWidget->ClearCellSelectionGroup(windowId);
+          }
+          else
+          {
+            m_MultiWidget->SetCellSelectionGroup(windowId, text.toStdString());
+          }
+        }
+        catch (const mitk::Exception& e)
+        {
+          MITK_WARN << "Layout editor: selection change for '" << windowId.toStdString()
+                    << "' ignored: " << e.GetDescription();
+        }
+        ColorizeLinkCombo(selectionCombo, m_MultiWidget, text);
+        this->ScheduleRebuild();
+      };
+      connect(selectionCombo, QOverload<int>::of(&QComboBox::activated), this,
+              [commitSelection](int) { commitSelection(); });
+      connect(selectionCombo->lineEdit(), &QLineEdit::editingFinished, this, commitSelection);
+
+      m_Matrix->setCellWidget(static_cast<int>(row), selectionColumn, selectionCell);
     }
   }
 }
@@ -1582,6 +1896,65 @@ std::vector<QmitkMxNSyncDimension> QmitkMxNLayoutEditorWidget::GroupDimensions(c
     }
   }
   return dimensions;
+}
+
+bool QmitkMxNLayoutEditorWidget::HasNonTrivialSyncConfig() const
+{
+  if (m_MultiWidget.isNull())
+  {
+    return false;
+  }
+
+  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
+  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
+  try
+  {
+    infos = m_MultiWidget->GetSyncGroupInfos();
+    descriptors = m_MultiWidget->ListWindowDescriptors();
+  }
+  catch (const mitk::Exception&)
+  {
+    // Mid-layout-change state: treat as trivial rather than warn spuriously.
+    return false;
+  }
+
+  // Any group beyond the default "main" is a user-built structure a layout
+  // replace would discard - including an empty group the user created but has not
+  // populated yet.
+  for (const auto& info : infos)
+  {
+    if (info.id != DefaultSelectionGroup)
+    {
+      return true;
+    }
+  }
+
+  // Otherwise the only groups are "main". The configuration is trivial only when
+  // every cell rests as a clean Mono("main") - the fresh-cell default, where
+  // windowing/LUT/selection are on "main" and nothing else is linked. A cell that
+  // spans groups (Complex) or sits wholly on some non-"main" group means the user
+  // linked synchronization the warning must cover.
+  QColor mainHue;
+  try
+  {
+    mainHue = m_MultiWidget->GetSyncGroupColor(DefaultSelectionGroup);
+  }
+  catch (const mitk::Exception&)
+  {
+  }
+  for (const auto& descriptor : descriptors)
+  {
+    const auto identity = m_MultiWidget->ResolveCellGroupIdentity(descriptor.id);
+    if (identity.kind != QmitkMxNMultiWidget::CellGroupIdentityKind::Mono)
+    {
+      return true;
+    }
+    if (mainHue.isValid() && identity.hue != mainHue)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 QString QmitkMxNLayoutEditorWidget::CellLabel(const QmitkMxNMultiWidget::WindowDescriptor& descriptor)

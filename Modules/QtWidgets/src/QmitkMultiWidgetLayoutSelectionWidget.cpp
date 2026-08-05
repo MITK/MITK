@@ -69,6 +69,12 @@ void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage::Po
   m_AutomatedDataLayoutWidget->SetDataStorage(dataStorage);
 }
 
+void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
+{
+  ui->tableWidget->clearSelection();
+  ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
+}
+
 void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()
 {
   QItemSelectionModel* selectionModel = ui->tableWidget->selectionModel();

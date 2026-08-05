@@ -2416,6 +2416,56 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   emit SyncGroupAdded(index, QString::fromStdString(this->GetSyncGroupDisplayName(m_GroupNameByIndex[index])));
 }
 
+void QmitkMxNMultiWidget::RemoveSynchronizationGroup(const std::string& id)
+{
+  // Resolve the id to its engine index, if it is a registered group.
+  GroupSyncIndexType registeredIndex = 0;
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == id)
+    {
+      registeredIndex = index;
+      break;
+    }
+  }
+
+  // The default group (engine index 1, "main") is never removable.
+  if (registeredIndex == 1)
+  {
+    return;
+  }
+
+  // Clear every cell's ties to the group: each dimension link naming it, and the
+  // data selection when it names it (which reverts the cell to the default group).
+  for ([[maybe_unused]] const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto link = this->GetSyncLink(windowId, dimension);
+      if (link.has_value() && link->group == id)
+      {
+        this->ClearSyncLink(windowId, dimension);
+      }
+    }
+    if (this->GetCellSelectionGroup(windowId) == id)
+    {
+      this->ClearCellSelectionGroup(windowId);
+    }
+  }
+
+  // A group registered with no members (created empty via the "+" button) is not
+  // reclaimed by the per-member selection reclaim, so drop its registry entry
+  // here. The index-1 guard above keeps this off the default group.
+  if (registeredIndex != 0)
+  {
+    m_SynchronizedWidgetConnectors.erase(registeredIndex);
+    m_SelectionGroupsAllocatedForLinks.erase(registeredIndex);
+    m_GroupNameByIndex.erase(registeredIndex);
+  }
+
+  this->RefreshSyncControls();
+}
+
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
 {
   if (nullptr == synchronizedWidget)

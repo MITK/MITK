@@ -179,6 +179,29 @@ public:
    */
   bool HasNonTrivialSyncConfig() const;
 
+  /**
+   * \brief The window ids that share one synchronization: the members of 'group'
+   *        on barcode axis 'axisIndex' (0..6 the QmitkMxNAllSyncDimensions,
+   *        the last index the data-selection axis). Empty for an unknown group,
+   *        an out-of-range axis, an axis the group links for no cell, or a
+   *        transient mid-layout-change state. Read-only; public so the hover
+   *        highlight resolution is testable headlessly.
+   */
+  QStringList CellsSharingAxis(const QString& group, int axisIndex) const;
+
+  /**
+   * \brief Sync-highlight-on-hover. Resolve the cells sharing (group, axis) and
+   *        ring them in the cell map; a negative axis clears the highlight.
+   *        HighlightGroupAxis is driven by a group card's glyph hover;
+   *        HighlightCellAxis by a cell tile's glyph hover (it resolves the cell's
+   *        group for that axis first - the per-dimension link, or the selection
+   *        connector for the last axis - then delegates, clearing when the cell
+   *        syncs nothing there). Public so the resolution is testable headlessly.
+   */
+  void HighlightGroupAxis(const QString& group, int axisIndex);
+  void HighlightCellAxis(const QString& windowId, int axisIndex);
+  void ClearSyncHighlight();
+
 public Q_SLOTS:
 
   /** \brief Coalesced full refresh from the engine state. */

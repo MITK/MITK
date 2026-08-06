@@ -56,6 +56,7 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(NavigatorVoxelIndex_SetsCrosshair);
   MITK_TEST(SyncBarcode_ReflectsMembership);
   MITK_TEST(SyncBarcode_LayoutWrapsToGeometry);
+  MITK_TEST(SyncBarcode_SlotAtInHitTest);
   MITK_TEST(AxisGlyphResources_PresentAndThemeable);
   CPPUNIT_TEST_SUITE_END();
 
@@ -327,6 +328,49 @@ public:
     const auto tiny = QmitkMxNSyncBarcodeWidget::ComputeLayout(40, 14, slotCount);
     CPPUNIT_ASSERT_MESSAGE("a cramped strip collapses to the color bar",
                            tiny.mode == Layout::Mode::ColorBar);
+  }
+
+  void SyncBarcode_SlotAtInHitTest()
+  {
+    // The static hit-test lets a surface that custom-paints the barcode (the
+    // cell map's tiles) learn which axis glyph the pointer is over. Sweep it
+    // left to right at the vertical center and assert the glyphs map to slot
+    // indices that increase and cover the whole set, without hardcoding the
+    // private box/gap geometry.
+    const int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
+
+    const auto sweep = [slotCount](const QRect& target)
+    {
+      int maxSlot = -1;
+      int prev = -1;
+      bool sawZero = false;
+      const int y = target.center().y();
+      for (int x = target.left(); x <= target.right(); ++x)
+      {
+        const int slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(target, slotCount, QPoint(x, y));
+        if (slot < 0)
+        {
+          continue;
+        }
+        CPPUNIT_ASSERT_MESSAGE("a hit slot is always in range", slot < slotCount);
+        CPPUNIT_ASSERT_MESSAGE("glyph slots increase left to right", slot >= prev);
+        prev = slot;
+        maxSlot = std::max(maxSlot, slot);
+        sawZero = sawZero || slot == 0;
+      }
+      CPPUNIT_ASSERT_MESSAGE("the first slot is reachable", sawZero);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("every slot up to the last is reachable", slotCount - 1, maxSlot);
+    };
+
+    sweep(QRect(0, 0, 200, 18));  // wide short strip: glyphs in one row
+    sweep(QRect(0, 0, 80, 14));   // too small for glyphs: the color-slot collapse
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("a point off the strip hits no slot", -1,
+                                 QmitkMxNSyncBarcodeWidget::SlotAtIn(QRect(0, 0, 200, 18), slotCount,
+                                                                     QPoint(100, -20)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("a degenerate slot count hits no slot", -1,
+                                 QmitkMxNSyncBarcodeWidget::SlotAtIn(QRect(0, 0, 200, 18), 0,
+                                                                     QPoint(10, 9)));
   }
 
   void AxisGlyphResources_PresentAndThemeable()

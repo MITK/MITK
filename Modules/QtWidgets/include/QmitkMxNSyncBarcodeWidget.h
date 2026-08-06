@@ -102,6 +102,16 @@ public:
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,
                         int hoveredSlot = -1);
 
+  /**
+   * \brief The slot index under 'pos' when 'slotCount' slots are painted into
+   *        'target' by PaintInto, or -1. The hit-test counterpart to PaintInto,
+   *        for a surface that custom-paints the barcode into its own rect (the
+   *        cell map's tiles) and needs to know which axis glyph the pointer is
+   *        over. Uses the same ComputeLayout geometry as the render, so hit-test
+   *        and paint cannot drift.
+   */
+  static int SlotAtIn(const QRect& target, int slotCount, const QPoint& pos);
+
   explicit QmitkMxNSyncBarcodeWidget(QWidget* parent = nullptr);
   ~QmitkMxNSyncBarcodeWidget() override;
 
@@ -139,6 +149,12 @@ Q_SIGNALS:
    *         only in axis-clickable mode. */
   void AxisClicked(int index);
 
+  /** \brief The axis glyph under the pointer changed: its slot index, or -1 when
+   *         the pointer leaves the glyphs. Emitted only in axis-clickable mode
+   *         (the layout editor's group cards), so a hover can light up every cell
+   *         sharing that axis's synchronization. */
+  void AxisHovered(int index);
+
 protected:
 
   void paintEvent(QPaintEvent* event) override;
@@ -167,7 +183,7 @@ private:
   QRect ContentRect(const BarcodeLayout& layout) const;
 
   /** \brief The slot index under a point in this widget, or -1. */
-  int SlotAt(const BarcodeLayout& layout, const QPoint& pos) const;
+  int SlotAt(const QPoint& pos) const;
 
   QList<AxisSlot> m_Slots;
   bool m_Hovered = false;         // whole-strip hover (passive per-cell strip)

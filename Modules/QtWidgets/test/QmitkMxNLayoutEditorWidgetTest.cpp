@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QColor>
 #include <QCoreApplication>
 #include <QDropEvent>
 #include <QLayout>
@@ -87,6 +88,11 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(NonTrivialConfig_FalseForFreshDefault);
   MITK_TEST(NonTrivialConfig_TrueOnceASecondGroupExists);
   MITK_TEST(MultiTileDrop_AssignsEverySelectedCell);
+
+  MITK_TEST(SyncHighlight_CellsSharingDimensionAxis);
+  MITK_TEST(SyncHighlight_CellsSharingSelectionAxis);
+  MITK_TEST(SyncHighlight_CellAxisResolvesFromHoveredCell);
+  MITK_TEST(SyncHighlight_CellMapSetAndClear);
 
   MITK_TEST(DeleteGroup_RemovesMemberBearingGroup);
   MITK_TEST(DeleteGroup_RemovesEmptyCreatedGroup);
@@ -1039,6 +1045,92 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The default 'main' group is never removed", this->RegistryHasGroup("main"));
     CPPUNIT_ASSERT_MESSAGE("Cells keep their default 'main' windowing link",
                            IsLinked(0, QmitkMxNSyncDimension::Windowing, "main"));
+  }
+
+  // --- Sync-highlight-on-hover -------------------------------------------------
+
+  void SyncHighlight_CellsSharingDimensionAxis()
+  {
+    // Two cells joined to a group share the navigation bundle (incl. Slice); the
+    // resolver behind the hover highlight lists exactly them for that axis.
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
+
+    QStringList members =
+      m_Widget->CellsSharingAxis(QString::fromStdString(id), AxisIndexOf(QmitkMxNSyncDimension::Slice));
+    members.sort();
+    QStringList expected{ CellId(0), CellId(2) };
+    expected.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The Slice axis lists exactly the group's linked cells",
+                                 expected.join(QStringLiteral(",")).toStdString(),
+                                 members.join(QStringLiteral(",")).toStdString());
+
+    CPPUNIT_ASSERT_MESSAGE("An axis no member links resolves to nothing",
+                           m_Widget->CellsSharingAxis(QString::fromStdString(id),
+                             AxisIndexOf(QmitkMxNSyncDimension::Orientation)).isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("An unknown group resolves to nothing",
+                           m_Widget->CellsSharingAxis(QStringLiteral("no-such-group"),
+                             AxisIndexOf(QmitkMxNSyncDimension::Slice)).isEmpty());
+  }
+
+  void SyncHighlight_CellsSharingSelectionAxis()
+  {
+    // The data-selection axis (the last barcode slot) resolves over the selection
+    // connector, not the per-dimension links.
+    m_Editor->SetCellSelectionGroup(CellId(0), "sel");
+    m_Editor->SetCellSelectionGroup(CellId(1), "sel");
+
+    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+    QStringList members = m_Widget->CellsSharingAxis(QStringLiteral("sel"), selectionAxis);
+    members.sort();
+    QStringList expected{ CellId(0), CellId(1) };
+    expected.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The selection axis lists cells sharing that selection group",
+                                 expected.join(QStringLiteral(",")).toStdString(),
+                                 members.join(QStringLiteral(",")).toStdString());
+  }
+
+  void SyncHighlight_CellAxisResolvesFromHoveredCell()
+  {
+    // The cell-tile hover source: resolve the hovered cell's group for the axis,
+    // then highlight every cell sharing it. Drives the branch the cell map's
+    // GlyphHovered signal feeds.
+    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
+    CPPUNIT_ASSERT(nullptr != cellMap);
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "g5");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "g5");
+
+    m_Widget->HighlightCellAxis(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice));
+    QStringList highlight = cellMap->GetHighlightedWindowIds();
+    highlight.sort();
+    QStringList expected{ CellId(0), CellId(2) };
+    expected.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Hovering a cell's linked axis highlights every cell sharing it",
+                                 expected.join(QStringLiteral(",")).toStdString(),
+                                 highlight.join(QStringLiteral(",")).toStdString());
+
+    m_Widget->HighlightCellAxis(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Orientation));
+    CPPUNIT_ASSERT_MESSAGE("Hovering an axis the cell does not link clears the highlight",
+                           cellMap->GetHighlightedWindowIds().isEmpty());
+  }
+
+  void SyncHighlight_CellMapSetAndClear()
+  {
+    // The render-state plumbing the resolvers drive: the cell map stores and
+    // clears the highlighted set.
+    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
+    CPPUNIT_ASSERT(nullptr != cellMap);
+
+    const QStringList highlight{ CellId(0), CellId(2) };
+    cellMap->SetHighlightedCells(highlight, AxisIndexOf(QmitkMxNSyncDimension::Slice), QColor(Qt::red));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The cell map stores the highlighted set",
+                                 highlight.join(QStringLiteral(",")).toStdString(),
+                                 cellMap->GetHighlightedWindowIds().join(QStringLiteral(",")).toStdString());
+
+    cellMap->SetHighlightedCells(QStringList(), -1, QColor());
+    CPPUNIT_ASSERT_MESSAGE("Clearing empties the highlight",
+                           cellMap->GetHighlightedWindowIds().isEmpty());
   }
 };
 

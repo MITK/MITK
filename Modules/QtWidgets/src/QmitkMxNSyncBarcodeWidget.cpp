@@ -167,17 +167,21 @@ QRect QmitkMxNSyncBarcodeWidget::ContentRect(const BarcodeLayout& layout) const
   return ContentRectIn(this->rect(), layout, m_Slots.size());
 }
 
-int QmitkMxNSyncBarcodeWidget::SlotAt(const BarcodeLayout& layout, const QPoint& pos) const
+int QmitkMxNSyncBarcodeWidget::SlotAtIn(const QRect& target, int slotCount, const QPoint& pos)
 {
-  const int n = m_Slots.size();
-  const QRect content = this->ContentRect(layout);
-  if (n == 0 || !content.contains(pos))
+  if (slotCount <= 0)
+  {
+    return -1;
+  }
+  const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), slotCount);
+  const QRect content = ContentRectIn(target, layout, slotCount);
+  if (!content.contains(pos))
   {
     return -1;
   }
   if (layout.mode == BarcodeLayout::Mode::Glyphs)
   {
-    for (int slot = 0; slot < n; ++slot)
+    for (int slot = 0; slot < slotCount; ++slot)
     {
       if (GlyphBoxRectIn(content, layout, slot).contains(pos))
       {
@@ -187,7 +191,12 @@ int QmitkMxNSyncBarcodeWidget::SlotAt(const BarcodeLayout& layout, const QPoint&
     return -1;
   }
   const int slot = (pos.x() - content.left()) / std::max(1, ColorSlotWidth + SlotGap);
-  return (slot >= 0 && slot < n) ? slot : -1;
+  return (slot >= 0 && slot < slotCount) ? slot : -1;
+}
+
+int QmitkMxNSyncBarcodeWidget::SlotAt(const QPoint& pos) const
+{
+  return SlotAtIn(this->rect(), static_cast<int>(m_Slots.size()), pos);
 }
 
 void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target,
@@ -268,6 +277,18 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       painter.setPen(QPen(gapColor, 1));
       painter.drawLine(slotRect.left(), slotRect.bottom(), slotRect.right(), slotRect.bottom());
     }
+
+    // Lit slot: a white outline mirrors the Glyphs-mode frame brightening so the
+    // editor's single-axis highlight still reads once the tile is too small for
+    // glyphs and collapses to color slots. Keyed on the per-axis hoveredSlot
+    // only (not whole-strip 'hovered'), so the passive per-cell strip - which
+    // never sets a hovered slot - is unaffected.
+    if (slot == hoveredSlot)
+    {
+      painter.setPen(QPen(QColor(255, 255, 255, 210), 1));
+      painter.setBrush(Qt::NoBrush);
+      painter.drawRect(slotRect.adjusted(0, 0, -1, -1));
+    }
   }
 }
 
@@ -301,10 +322,11 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
   const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
   if (m_AxisClickable)
   {
-    const int slot = this->SlotAt(layout, event->pos());
+    const int slot = this->SlotAt(event->pos());
     if (slot != m_HoveredSlot)
     {
       m_HoveredSlot = slot;
+      emit AxisHovered(slot);
       this->update();
     }
     this->setCursor(slot >= 0 ? Qt::PointingHandCursor : Qt::ArrowCursor);
@@ -324,11 +346,16 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
 
 void QmitkMxNSyncBarcodeWidget::leaveEvent(QEvent* event)
 {
+  const bool hadHoveredSlot = m_HoveredSlot != -1;
   if (m_Hovered || m_HoveredSlot != -1)
   {
     m_Hovered = false;
     m_HoveredSlot = -1;
     this->update();
+  }
+  if (hadHoveredSlot)
+  {
+    emit AxisHovered(-1);
   }
   QWidget::leaveEvent(event);
 }
@@ -354,7 +381,7 @@ void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
   {
     if (m_AxisClickable)
     {
-      if (const int slot = this->SlotAt(layout, event->pos()); slot >= 0)
+      if (const int slot = this->SlotAt(event->pos()); slot >= 0)
       {
         emit AxisClicked(slot);
       }
@@ -372,8 +399,7 @@ bool QmitkMxNSyncBarcodeWidget::event(QEvent* event)
   if (event->type() == QEvent::ToolTip)
   {
     auto* helpEvent = static_cast<QHelpEvent*>(event);
-    const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
-    const int slot = this->SlotAt(layout, helpEvent->pos());
+    const int slot = this->SlotAt(helpEvent->pos());
     if (slot >= 0 && !m_Slots[slot].tooltip.isEmpty())
     {
       QToolTip::showText(helpEvent->globalPos(), m_Slots[slot].tooltip, this);

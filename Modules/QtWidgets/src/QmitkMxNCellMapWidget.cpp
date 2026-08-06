@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkMxNSyncDimension.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkException.h>
@@ -54,6 +55,9 @@ QmitkMxNCellMapWidget::QmitkMxNCellMapWidget(QWidget* parent)
 {
   this->setAcceptDrops(true);
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  // Track motion without a pressed button so hovering a tile's axis glyph can
+  // report which synchronization the pointer is over.
+  this->setMouseTracking(true);
 }
 
 QmitkMxNCellMapWidget::~QmitkMxNCellMapWidget()
@@ -144,6 +148,29 @@ void QmitkMxNCellMapWidget::Rebuild()
     this->SetSelection(survivingSelection);
   }
 
+  // The sync highlight is keyed by window id (transient hover state), so keep it
+  // only for cells that still exist; the tile-index hover state is invalidated
+  // by the rebuild and re-establishes on the next move.
+  QStringList survivingHighlight;
+  for (const auto& windowId : m_HighlightCells)
+  {
+    if (std::any_of(m_Tiles.begin(), m_Tiles.end(),
+                    [&windowId](const Tile& tile) { return tile.windowId == windowId; }))
+    {
+      survivingHighlight.append(windowId);
+    }
+  }
+  if (survivingHighlight.size() != m_HighlightCells.size())
+  {
+    m_HighlightCells = survivingHighlight;
+    if (m_HighlightCells.isEmpty())
+    {
+      m_HighlightAxis = -1;
+    }
+  }
+  m_HoverTile = -1;
+  m_HoverSlot = -1;
+
   this->UpdateTileRects();
   this->update();
 }
@@ -158,6 +185,24 @@ void QmitkMxNCellMapWidget::SetSelectedWindowIds(const QStringList& windowIds)
   this->SetSelection(windowIds);
 }
 
+void QmitkMxNCellMapWidget::SetHighlightedCells(const QStringList& windowIds, int axisIndex,
+                                                const QColor& hue)
+{
+  if (windowIds == m_HighlightCells && axisIndex == m_HighlightAxis && hue == m_HighlightHue)
+  {
+    return;
+  }
+  m_HighlightCells = windowIds;
+  m_HighlightAxis = axisIndex;
+  m_HighlightHue = hue;
+  this->update();
+}
+
+QStringList QmitkMxNCellMapWidget::GetHighlightedWindowIds() const
+{
+  return m_HighlightCells;
+}
+
 void QmitkMxNCellMapWidget::UpdateTileRects()
 {
   const QRect area = this->rect().adjusted(1, 1, -1, -1);
@@ -168,6 +213,13 @@ void QmitkMxNCellMapWidget::UpdateTileRects()
                          qRound(tile.normalizedRect.width() * area.width()) - TileSpacing,
                          qRound(tile.normalizedRect.height() * area.height()) - TileSpacing);
   }
+}
+
+QRect QmitkMxNCellMapWidget::TileBarcodeRect(const Tile& tile) const
+{
+  const int barcodeBand = std::clamp(tile.mapRect.height() / 2, 8, 56);
+  return QRect(tile.mapRect.left() + 2, tile.mapRect.bottom() - barcodeBand - 1,
+               tile.mapRect.width() - 4, barcodeBand);
 }
 
 QSize QmitkMxNCellMapWidget::minimumSizeHint() const
@@ -228,9 +280,20 @@ void QmitkMxNCellMapWidget::paintEvent(QPaintEvent* /*event*/)
                         dropTarget || selected ? 2 : 1));
     painter.drawRect(tile.mapRect.adjusted(0, 0, -1, -1));
 
+    // Sync-highlight ring: a cell sharing the hovered (group, axis) is ringed in
+    // that group's hue, inset from the border so it reads distinctly from the
+    // blue selection/drop-target border a cell may also carry.
+    const bool highlighted = m_HighlightCells.contains(tile.windowId);
+    if (highlighted && m_HighlightHue.isValid())
+    {
+      painter.setPen(QPen(m_HighlightHue, 2));
+      painter.drawRect(tile.mapRect.adjusted(1, 1, -2, -2));
+    }
+
     // A barcode band in the tile's lower portion, tall enough to wrap glyphs
     // when the tile has the room and collapsing to color slots when it does not.
-    const int barcodeBand = std::clamp(tile.mapRect.height() / 2, 8, 56);
+    const QRect barcodeRect = this->TileBarcodeRect(tile);
+    const int barcodeBand = barcodeRect.height();
 
     // The cell label, above the barcode band.
     painter.setPen(this->palette().color(QPalette::Text));
@@ -240,12 +303,14 @@ void QmitkMxNCellMapWidget::paintEvent(QPaintEvent* /*event*/)
     // Sync barcode via the shared renderer, so the tile tells the same story as
     // the per-cell strip: eight axes (the seven dimensions plus data selection)
     // as wrapping glyphs, or color slots when the band is too small. Built from
-    // this cell's window perspective (each axis linked or not).
-    const QRect barcodeRect(tile.mapRect.left() + 2, tile.mapRect.bottom() - barcodeBand - 1,
-                            tile.mapRect.width() - 4, barcodeBand);
+    // this cell's window perspective (each axis linked or not). Brighten the
+    // shared axis on a highlighted cell, else the locally hovered glyph, so the
+    // hovered synchronization pops on every cell that shares it.
+    const int litSlot = highlighted ? m_HighlightAxis
+                        : (static_cast<int>(tileIndex) == m_HoverTile ? m_HoverSlot : -1);
     QmitkMxNSyncBarcodeWidget::PaintInto(painter, barcodeRect,
                                          m_MultiWidget->BuildBarcodeSlots(tile.windowId),
-                                         false, this->palette().color(QPalette::Mid));
+                                         false, this->palette().color(QPalette::Mid), litSlot);
   }
 }
 
@@ -332,6 +397,13 @@ void QmitkMxNCellMapWidget::mouseMoveEvent(QMouseEvent* event)
     return;
   }
 
+  // Plain hover (no drag in progress): report the axis glyph under the pointer
+  // so the editor can light up every cell sharing that synchronization.
+  if (!m_DragCandidate)
+  {
+    this->UpdateGlyphHover(event->pos());
+  }
+
   event->ignore();
 }
 
@@ -341,12 +413,77 @@ void QmitkMxNCellMapWidget::mouseReleaseEvent(QMouseEvent* event)
   event->ignore();
 }
 
+void QmitkMxNCellMapWidget::leaveEvent(QEvent* event)
+{
+  if (m_HoverTile != -1 || m_HoverSlot != -1)
+  {
+    m_HoverTile = -1;
+    m_HoverSlot = -1;
+    emit GlyphHoverCleared();
+    this->update();
+  }
+  QWidget::leaveEvent(event);
+}
+
+void QmitkMxNCellMapWidget::UpdateGlyphHover(const QPoint& position)
+{
+  // The tile barcode always carries the eight sync axes (the seven dimensions
+  // plus data selection); hit-test against the same rect and slot count the
+  // paint uses.
+  static constexpr int SyncAxisCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;
+
+  int tile = this->TileAt(position);
+  int slot = -1;
+  if (tile >= 0)
+  {
+    const QRect barcodeRect = this->TileBarcodeRect(m_Tiles[static_cast<std::size_t>(tile)]);
+    slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(barcodeRect, SyncAxisCount, position);
+    if (slot < 0)
+    {
+      tile = -1;  // over a tile but not its barcode: nothing to highlight
+    }
+  }
+
+  if (tile == m_HoverTile && slot == m_HoverSlot)
+  {
+    return;
+  }
+  m_HoverTile = tile;
+  m_HoverSlot = slot;
+
+  if (tile >= 0 && slot >= 0)
+  {
+    emit GlyphHovered(m_Tiles[static_cast<std::size_t>(tile)].windowId, slot);
+  }
+  else
+  {
+    emit GlyphHoverCleared();
+  }
+  this->update();
+}
+
+void QmitkMxNCellMapWidget::DiscardHoverHighlight()
+{
+  m_HoverTile = -1;
+  m_HoverSlot = -1;
+  if (!m_HighlightCells.isEmpty() || m_HighlightAxis != -1)
+  {
+    m_HighlightCells.clear();
+    m_HighlightAxis = -1;
+    this->update();
+  }
+}
+
 void QmitkMxNCellMapWidget::StartCellDrag()
 {
   if (m_Selection.isEmpty())
   {
     return;
   }
+
+  // A drag and the hover highlight must not co-paint with the drop-target
+  // treatment; drop out of the highlight before the drag begins.
+  this->DiscardHoverHighlight();
 
   auto* mimeData = new QMimeData();
   mimeData->setData(CellsMimeType, m_Selection.join(QStringLiteral("\n")).toUtf8());
@@ -360,6 +497,9 @@ void QmitkMxNCellMapWidget::dragEnterEvent(QDragEnterEvent* event)
 {
   if (event->mimeData()->hasFormat(GroupMimeType))
   {
+    // An incoming group drag replaces the hover highlight with the drop-target
+    // treatment; drop the highlight so the two never co-paint.
+    this->DiscardHoverHighlight();
     event->acceptProposedAction();
   }
 }

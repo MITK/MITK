@@ -329,6 +329,12 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
             }
             this->ScheduleRebuild();
           });
+  // Hovering a tile's axis glyph lights up every cell that shares that
+  // synchronization, so the sync topology is legible at a glance.
+  connect(m_CellMap, &QmitkMxNCellMapWidget::GlyphHovered, this,
+          &QmitkMxNLayoutEditorWidget::HighlightCellAxis);
+  connect(m_CellMap, &QmitkMxNCellMapWidget::GlyphHoverCleared, this,
+          &QmitkMxNLayoutEditorWidget::ClearSyncHighlight);
   mapPaneLayout->addWidget(m_CellMap, 1);
 
   // Grid controls: quick trailing add/remove of a row or column, plus the full
@@ -1277,6 +1283,120 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   return result;
 }
 
+QStringList QmitkMxNLayoutEditorWidget::CellsSharingAxis(const QString& group, int axisIndex) const
+{
+  QStringList result;
+  const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  if (m_MultiWidget.isNull() || axisIndex < 0 || axisIndex > selectionAxis)
+  {
+    return result;
+  }
+
+  const auto groupId = group.toStdString();
+  try
+  {
+    for (const auto& info : m_MultiWidget->GetSyncGroupInfos())
+    {
+      if (info.id != groupId)
+      {
+        continue;
+      }
+      if (axisIndex == selectionAxis)
+      {
+        for (const auto& windowId : info.selectionMembers)
+        {
+          result.append(windowId);
+        }
+      }
+      else
+      {
+        // 'members' is keyed only for dimensions some cell links, so a missing
+        // key is the common "nobody links this axis" case, not an error.
+        const auto dimension = QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)];
+        const auto it = info.members.find(dimension);
+        if (it != info.members.end())
+        {
+          for (const auto& windowId : it->second)
+          {
+            result.append(windowId);
+          }
+        }
+      }
+      break;
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    result.clear();  // transient mid-layout-change state
+  }
+  return result;
+}
+
+void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, int axisIndex)
+{
+  if (nullptr == m_CellMap)
+  {
+    return;
+  }
+  if (axisIndex < 0)
+  {
+    this->ClearSyncHighlight();
+    return;
+  }
+
+  const QStringList members = this->CellsSharingAxis(group, axisIndex);
+  QColor hue;
+  if (!m_MultiWidget.isNull())
+  {
+    try
+    {
+      hue = m_MultiWidget->GetSyncGroupColor(group.toStdString());
+    }
+    catch (const mitk::Exception&)
+    {
+    }
+  }
+  m_CellMap->SetHighlightedCells(members, axisIndex, hue);
+}
+
+void QmitkMxNLayoutEditorWidget::HighlightCellAxis(const QString& windowId, int axisIndex)
+{
+  if (m_MultiWidget.isNull() || axisIndex < 0)
+  {
+    this->ClearSyncHighlight();
+    return;
+  }
+
+  // Resolve which group the hovered cell is on for this axis, then highlight
+  // that group's members. Selection (the last axis) is single-valued per cell
+  // and lives on the connector, not in the per-dimension links.
+  std::string group;
+  if (axisIndex == static_cast<int>(QmitkMxNAllSyncDimensions.size()))
+  {
+    group = m_MultiWidget->GetCellSelectionGroup(windowId);
+  }
+  else if (const auto link = m_MultiWidget->GetSyncLink(
+             windowId, QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)]))
+  {
+    group = link->group;
+  }
+
+  if (group.empty())
+  {
+    this->ClearSyncHighlight();  // the cell syncs nothing on this axis
+    return;
+  }
+  this->HighlightGroupAxis(QString::fromStdString(group), axisIndex);
+}
+
+void QmitkMxNLayoutEditorWidget::ClearSyncHighlight()
+{
+  if (nullptr != m_CellMap)
+  {
+    m_CellMap->SetHighlightedCells(QStringList(), -1, QColor());
+  }
+}
+
 QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::SyncGroupInfo& info)
 {
   const auto groupId = info.id;
@@ -1442,6 +1562,10 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   connect(strip, &QmitkMxNSyncBarcodeWidget::AxisClicked, this, [this, groupId](int index)
   {
     this->ToggleGroupAxis(groupId, index);
+  });
+  connect(strip, &QmitkMxNSyncBarcodeWidget::AxisHovered, this, [this, groupId](int index)
+  {
+    this->HighlightGroupAxis(QString::fromStdString(groupId), index);
   });
   auto* stripRow = new QHBoxLayout();
   stripRow->setContentsMargins(6, 0, 0, 0);

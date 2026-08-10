@@ -114,6 +114,19 @@ namespace mitk
      */
     void Deactivated() override;
 
+    /** \brief Returns whether unconfirmed results would be lost on deactivation.
+     *
+     * Honors the RequestDeactivationConfirmation flag like the base class, but
+     * takes pending interactions instead of unconfirmed preview content as the
+     * signal: DoUpdatePreview() defines the preview label on every call, which
+     * keeps the base class flag set even for an empty preview.
+     *
+     * \return \c true if any interaction or initial mask awaits confirmation.
+     *
+     * \sa HasInteractions()
+     */
+    bool ConfirmBeforeDeactivation() override;
+
     /** \brief Map type associating InteractionType keys to Interactor instances.
      */
     using InteractorMap = std::unordered_map<nnInteractive::InteractionType, std::unique_ptr<nnInteractive::Interactor>>;

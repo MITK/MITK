@@ -251,6 +251,7 @@ mitk::nnInteractiveTool::nnInteractiveTool()
 {
   this->KeepActiveAfterAcceptOn();
   this->ResetsToEmptyPreviewOn();
+  this->RequestDeactivationConfirmationOn();
   this->SetSelectedLabels({1});
 
   for (const auto& [interactionType, interactor] : m_Impl->Interactors)
@@ -291,6 +292,11 @@ void mitk::nnInteractiveTool::Deactivated()
   Superclass::Deactivated();
 
   this->DeactivatedEvent.Send();
+}
+
+bool mitk::nnInteractiveTool::ConfirmBeforeDeactivation()
+{
+  return this->GetRequestDeactivationConfirmation() && this->HasInteractions();
 }
 
 const mitk::nnInteractiveTool::InteractorMap& mitk::nnInteractiveTool::GetInteractors() const

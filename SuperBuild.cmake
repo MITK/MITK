@@ -307,6 +307,18 @@ if(Python3_ROOT_DIR)
   list(APPEND mitk_optional_cache_args
     "-DPython3_ROOT_DIR:PATH=${Python3_ROOT_DIR}"
     "-DPython3_EXECUTABLE:FILEPATH=${_mitk_python3_executable}"
+    # Not used to find anything; the inner build compares it against the version
+    # its cached Python3 artifacts belong to, so that switching the embedded
+    # CPython invalidates them instead of leaving the cache inconsistent.
+    "-DMITK_Python3_VERSION:STRING=${MITK_Python3_VERSION}"
+  )
+
+  # The inner build compiles one extension module per requested CPython version
+  # and derives the additional interpreter locations from this list by
+  # convention (MITK-build/python-<version>, staged by CMakeExternals/Python3).
+  string(REPLACE ";" "${sep}" _mitk_wheel_versions "${MITK_Python3_WHEEL_VERSIONS}")
+  list(APPEND mitk_optional_cache_args
+    "-DMITK_Python3_WHEEL_VERSIONS:STRING=${_mitk_wheel_versions}"
   )
 endif()
 

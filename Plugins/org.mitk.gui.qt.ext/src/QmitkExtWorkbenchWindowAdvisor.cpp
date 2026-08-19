@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
+#include <QTimer>
 
 #include <ctkPluginException.h>
 #include <service/event/ctkEventAdmin.h>
@@ -606,23 +607,17 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const QString& wndIcon)
 
 namespace
 {
-#ifndef __APPLE__
-  // Off macOS, use a borderless window instead of true full-screen. The render
+#ifdef Q_OS_WIN
+  // On Windows, use a borderless window instead of true full-screen. The render
   // views are OpenGL widgets, so Qt composites the whole window through OpenGL;
-  // on Windows a GL window that exactly fills the screen makes the OS bypass
-  // desktop composition (exclusive full-screen), throttling Qt widget repaints
-  // to a few FPS. A frameless window covering the screen keeps composition
-  // active. Replace the flags (do not just add the frameless hint) so no title
-  // bar survives on X11, and overflow the screen by one pixel on Windows to
-  // avoid the exclusive path; the overflow is clamped by X11 window managers,
-  // so it is applied on Windows only.
+  // a GL window that exactly fills the screen makes the OS bypass desktop
+  // composition (exclusive full-screen), throttling Qt widget repaints to a few
+  // FPS. A frameless window overflowing the screen by one pixel keeps
+  // composition active. Replace the flags (do not just add the frameless hint)
+  // so no title bar survives.
   QRect BorderlessFullScreenBounds(const QMainWindow* window)
   {
-    QRect bounds = window->screen()->geometry();
-#ifdef Q_OS_WIN
-    bounds.adjust(-1, -1, 1, 1);
-#endif
-    return bounds;
+    return window->screen()->geometry().adjusted(-1, -1, 1, 1);
   }
 
   void SetBorderlessFullScreen(QMainWindow* window)
@@ -637,11 +632,18 @@ namespace
   // layout. Setting the geometry while hidden updates the stored size first, so
   // the size reported after show() matches it, Qt suppresses the resize event,
   // and the editor area stays one toggle behind the window.
+  //
+  // The geometry is deferred by one event-loop turn: Qt's Windows backend caches
+  // the frame margins and only recalculates them once the flag change has been
+  // processed. A synchronous setGeometry() after leaving the frameless state
+  // still converts with zero margins, placing the outer frame on the requested
+  // client rect, so the restored window shrinks by the frame size on every
+  // toggle (and Qt warns "Unable to set geometry").
   void ReshowWithFlagsAndGeometry(QMainWindow* window, Qt::WindowFlags flags, const QRect& bounds)
   {
     window->setWindowFlags(flags);
     window->show();
-    window->setGeometry(bounds);
+    QTimer::singleShot(0, window, [window, bounds]() { window->setGeometry(bounds); });
   }
 #endif
 }
@@ -669,12 +671,15 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   const bool fullScreenMode = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance())->getFullScreenMode();
   if (fullScreenMode)
   {
-#ifdef __APPLE__
-    // Native full-screen (uses the full-screen button hint set in the shell
-    // factory); correctly clears the menu bar and notch.
-    mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
-#else
+#ifdef Q_OS_WIN
     SetBorderlessFullScreen(mainWindow);
+#else
+    // Native full-screen. On X11 it sets the EWMH full-screen state, so the
+    // window manager keeps the window matched to the display when its
+    // resolution changes (e.g. RANDR resizes in remote-desktop setups). On
+    // macOS it correctly clears the menu bar and notch (uses the full-screen
+    // button hint set in the shell factory).
+    mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
 #endif
   }
 
@@ -1298,12 +1303,12 @@ void QmitkExtWorkbenchWindowAdvisorHack::onFullScreen()
   if (nullptr == mainWindow)
     return;
 
-#ifdef __APPLE__
+#ifndef Q_OS_WIN
   mainWindow->isFullScreen() ? mainWindow->showNormal() : mainWindow->showFullScreen();
 #else
   // Toggle borderless full-screen. See SetBorderlessFullScreen for why true
-  // full-screen is avoided off macOS. The original flags and geometry are saved
-  // so the decorated window can be restored on exit.
+  // full-screen is avoided on Windows. The original flags and geometry are
+  // saved so the decorated window can be restored on exit.
   if (mainWindow->property("mitkBorderlessFullScreen").toBool())
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", false);

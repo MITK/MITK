@@ -62,11 +62,13 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 
   node->AddProperty("volumerendering", mitk::BoolProperty::New(false), renderer, overwrite);
 
-  node->AddProperty("volumerendering.ambient", mitk::FloatProperty::New(0.25f), renderer, overwrite);
+  node->AddProperty("volumerendering.ambient", mitk::FloatProperty::New(0.1f), renderer, overwrite);
   node->AddProperty("volumerendering.diffuse", mitk::FloatProperty::New(0.50f), renderer, overwrite);
   node->AddProperty("volumerendering.specular", mitk::FloatProperty::New(0.40f), renderer, overwrite);
   node->AddProperty("volumerendering.specular.power", mitk::FloatProperty::New(16.0f), renderer, overwrite);
   node->AddProperty("volumerendering.shade", mitk::BoolProperty::New(true), renderer, overwrite);
+  node->AddProperty("volumerendering.scattering.blend", mitk::FloatProperty::New(0.0f), renderer, overwrite);
+  node->AddProperty("volumerendering.scattering.reach", mitk::FloatProperty::New(0.5f), renderer, overwrite);
 
   node->AddProperty("binary", mitk::BoolProperty::New(false), renderer, overwrite);
 
@@ -182,6 +184,12 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
     m_VolumeProperty->SetSpecularPower(value);
   if(this->GetDataNode()->GetBoolProperty("volumerendering.shade", shade, renderer))
     m_VolumeProperty->SetShade(shade ? 1 : 0);
+
+  // VTK ignores the reach unless the blend is above zero, and both unless Shade is on.
+  if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.blend", value, renderer))
+    m_SmartVolumeMapper->SetVolumetricScatteringBlending(value);
+  if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.reach", value, renderer))
+    m_SmartVolumeMapper->SetGlobalIlluminationReach(value);
 }
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()

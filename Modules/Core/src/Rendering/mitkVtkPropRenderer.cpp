@@ -35,9 +35,11 @@ found in the LICENSE file.
 #include <vtkAssemblyPath.h>
 #include <vtkCamera.h>
 #include <vtkCellPicker.h>
+#include <vtkCollectionRange.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInformation.h>
 #include <vtkLight.h>
+#include <vtkLightCollection.h>
 #include <vtkLightKit.h>
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
@@ -71,6 +73,30 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin
 
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+
+  // vtkLight's ambient colour defaults to black and vtkLightKit never sets
+  // it, so the GPU volume ray caster - which scales vtkVolumeProperty's
+  // ambient coefficient by the summed light ambient colours - would render
+  // that coefficient inert. Normalising the sum to 1.0 keeps the
+  // coefficient on the same scale as VTK's single-headlight branch.
+  double totalIntensity = 0.0;
+  auto *lights = m_VtkRenderer->GetLights();
+
+  for (auto *light : vtk::Range(lights))
+  {
+    totalIntensity += light->GetIntensity();
+  }
+
+  if (totalIntensity > 0.0)
+  {
+    const double ambient = 1.0 / totalIntensity;
+
+    for (auto *light : vtk::Range(lights))
+    {
+      light->SetAmbientColor(ambient, ambient, ambient);
+    }
+  }
+
   m_PickingMode = WorldPointPicking;
 }
 

@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
+#include <QTimer>
 
 #include <ctkPluginException.h>
 #include <service/event/ctkEventAdmin.h>
@@ -631,11 +632,18 @@ namespace
   // layout. Setting the geometry while hidden updates the stored size first, so
   // the size reported after show() matches it, Qt suppresses the resize event,
   // and the editor area stays one toggle behind the window.
+  //
+  // The geometry is deferred by one event-loop turn: Qt's Windows backend caches
+  // the frame margins and only recalculates them once the flag change has been
+  // processed. A synchronous setGeometry() after leaving the frameless state
+  // still converts with zero margins, placing the outer frame on the requested
+  // client rect, so the restored window shrinks by the frame size on every
+  // toggle (and Qt warns "Unable to set geometry").
   void ReshowWithFlagsAndGeometry(QMainWindow* window, Qt::WindowFlags flags, const QRect& bounds)
   {
     window->setWindowFlags(flags);
     window->show();
-    window->setGeometry(bounds);
+    QTimer::singleShot(0, window, [window, bounds]() { window->setGeometry(bounds); });
   }
 #endif
 }

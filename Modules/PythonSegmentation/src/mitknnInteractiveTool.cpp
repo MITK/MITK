@@ -870,52 +870,98 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
   // shown credential-stripped (nni_server_display), and the API key is cleared in
   // a finally so it never lingers in the shared dictionary even if a statement
   // here throws.
+  //
+  // A response that looks like proxy interception (an HTML page, or a body that
+  // is not the expected JSON) triggers one automatic retry with the server host
+  // appended to no_proxy, but only if a proxy is actually configured for the
+  // server's scheme (environment variables, or the system settings urllib
+  // consults on Windows and macOS) and the host is not already bypassed;
+  // without a proxy, such a response just means the URL points at some web
+  // server. httpx snapshots the proxy environment when the session's HTTP
+  // client is constructed, so no_proxy is restored right after the retry while
+  // the direct connection still holds for the entire session. The session
+  // variable is assigned only on success because IsSessionRunning() checks its
+  // existence.
   {
     std::ostringstream pyCommands; pyCommands
       << "nni_server_url = " << PyQuote(serverUrl) << "\n"
       << "nni_server_display = " << PyQuote(SanitizeUrlForDisplay(serverUrl)) << "\n"
       << "nni_api_key = " << (apiKey.empty() ? std::string("None") : PyQuote(apiKey)) << "\n"
       << "nni_connect_error = ''\n"
-      << "try:\n"
+      << "nni_proxy_bypass = False\n"
+      << "def _nni_attempt():\n"
+      << "    import httpx\n"
       << "    from nnInteractive.inference.remote import (\n"
       << "        nnInteractiveRemoteInferenceSession, ServerAtCapacityError, SessionExpiredError)\n"
-      << "    import httpx\n"
       << "    try:\n"
-      << "        session = nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key=nni_api_key)\n"
+      << "        return nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key=nni_api_key), '', False\n"
       << "    except ServerAtCapacityError:\n"
-      << "        nni_connect_error = 'The nnInteractive server is at capacity. Please try again later.'\n"
+      << "        return None, 'The nnInteractive server is at capacity. Please try again later.', False\n"
       << "    except SessionExpiredError:\n"
-      << "        nni_connect_error = 'The nnInteractive server rejected the session request. Please try again.'\n"
+      << "        return None, 'The nnInteractive server rejected the session request. Please try again.', False\n"
       << "    except httpx.HTTPStatusError as _e:\n"
       << "        if _e.response.status_code == 401:\n"
-      << "            nni_connect_error = 'The nnInteractive server rejected the API key. Check the API key in the nnInteractive preferences.'\n"
-      << "        elif 'text/html' in _e.response.headers.get('content-type', ''):\n"
-      << "            nni_connect_error = (f'The server at {nni_server_display} returned an HTML page instead of a response. '\n"
-      << "                                 'An HTTP proxy may be intercepting the request; try adding the host to NO_PROXY.')\n"
-      << "        else:\n"
-      << "            nni_connect_error = f'The nnInteractive server returned an error (HTTP {_e.response.status_code}).'\n"
+      << "            return None, 'The nnInteractive server rejected the API key. Check the API key in the nnInteractive preferences.', False\n"
+      << "        if 'text/html' in _e.response.headers.get('content-type', ''):\n"
+      << "            return None, f'The server at {nni_server_display} returned a web page instead of a response.', True\n"
+      << "        return None, f'The nnInteractive server returned an error (HTTP {_e.response.status_code}).', False\n"
       << "    except (httpx.ConnectError, httpx.ConnectTimeout):\n"
-      << "        nni_connect_error = f'Could not reach the nnInteractive server at {nni_server_display}. Check the server URL and make sure the server is running.'\n"
+      << "        return None, f'Could not reach the nnInteractive server at {nni_server_display}. Check the server URL and make sure the server is running.', False\n"
       << "    except httpx.HTTPError as _e:\n"
-      << "        nni_connect_error = f'Could not connect to the nnInteractive server at {nni_server_display}: {_e}'\n"
+      << "        return None, f'Could not connect to the nnInteractive server at {nni_server_display}: {_e}', False\n"
       << "    except (ValueError, KeyError):\n"
-      << "        nni_connect_error = ('The nnInteractive server returned an unexpected response. '\n"
-      << "                             'An HTTP proxy or captive portal may be intercepting the request; '\n"
-      << "                             'check the server URL and NO_PROXY.')\n"
-      << "except ImportError:\n"
-      << "    nni_connect_error = ('The installed nnInteractive does not support remote mode. '\n"
-      << "                         'Reinstall or upgrade nnInteractive.')\n"
+      << "        return None, f'The server at {nni_server_display} returned an unexpected response.', True\n"
+      << "def _nni_connect():\n"
+      << "    import os\n"
+      << "    import urllib.parse\n"
+      << "    import urllib.request\n"
+      << "    session, error, proxy_suspected = _nni_attempt()\n"
+      << "    if session is not None or not proxy_suspected:\n"
+      << "        return session, error, False\n"
+      << "    parts = urllib.parse.urlsplit(nni_server_url)\n"
+      << "    host = parts.hostname or ''\n"
+      << "    proxies = urllib.request.getproxies()\n"
+      << "    scheme = parts.scheme or 'http'\n"
+      << "    if not host or (scheme not in proxies and 'all' not in proxies) or urllib.request.proxy_bypass(host):\n"
+      << "        return None, error + ' Check the server URL.', False\n"
+      << "    old = os.environ.get('no_proxy')\n"
+      << "    base = old if old is not None else os.environ.get('NO_PROXY')\n"
+      << "    os.environ['no_proxy'] = host if not base else base + ',' + host\n"
+      << "    try:\n"
+      << "        session, retry_error, _ = _nni_attempt()\n"
+      << "    finally:\n"
+      << "        if old is None:\n"
+      << "            os.environ.pop('no_proxy', None)\n"
+      << "        else:\n"
+      << "            os.environ['no_proxy'] = old\n"
+      << "    if session is not None:\n"
+      << "        return session, '', True\n"
+      << "    return None, (f'An HTTP proxy seems to intercept the connection to {nni_server_display}, '\n"
+      << "                  'and connecting directly (bypassing the proxy) failed as well: ' + retry_error), False\n"
+      << "try:\n"
+      << "    try:\n"
+      << "        nni_session, nni_connect_error, nni_proxy_bypass = _nni_connect()\n"
+      << "        if nni_session is not None:\n"
+      << "            session = nni_session\n"
+      << "        del nni_session\n"
+      << "    except ImportError:\n"
+      << "        nni_connect_error = ('The installed nnInteractive does not support remote mode. '\n"
+      << "                             'Reinstall or upgrade nnInteractive.')\n"
       << "finally:\n"
-      << "    del nni_api_key\n";
+      << "    del nni_api_key, _nni_attempt, _nni_connect\n";
     pythonContext->Execute(pyCommands.str());
   }
 
   const auto connectError = pythonContext->GetVariableAsString("nni_connect_error").value_or("");
+  const bool proxyBypassed = pythonContext->GetVariableAsBool("nni_proxy_bypass").value_or(false);
 
-  pythonContext->Execute("del nni_server_url, nni_server_display, nni_connect_error\n");
+  pythonContext->Execute("del nni_server_url, nni_server_display, nni_connect_error, nni_proxy_bypass\n");
 
   if (!connectError.empty())
     mitkThrow() << connectError;
+
+  if (proxyBypassed)
+    MITK_INFO << "Connected to the nnInteractive server directly, bypassing the configured HTTP proxy.";
 
   // The lease is claimed. If configuring the session or uploading the image
   // fails because the connection dropped mid-flight, release the half-open

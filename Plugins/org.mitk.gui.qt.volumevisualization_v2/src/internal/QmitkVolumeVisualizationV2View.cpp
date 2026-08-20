@@ -35,11 +35,14 @@ found in the LICENSE file.
 #include <ctkDoubleSlider.h>
 #include <ctkSliderWidget.h>
 
+#include <QApplication>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <fstream>
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
@@ -53,14 +56,66 @@ namespace
   constexpr float DEFAULT_DIFFUSE = 0.50f;
   constexpr float DEFAULT_SPECULAR = 0.40f;
   constexpr float DEFAULT_SPECULAR_POWER = 16.0f;
-  constexpr float DEFAULT_SCATTERING_BLEND = 0.0f;
-  constexpr float DEFAULT_SCATTERING_REACH = 0.5f;
 
-  // The cinematic slider is a tier index, not a stored value: it drives both
-  // scattering properties. Any non-zero blend is enough to make the reach live,
-  // so it stays at VTK's gradient-adaptive midpoint instead of being exposed.
-  constexpr int CINEMATIC_STEPS = 4;
-  constexpr float CINEMATIC_BLEND = 0.5f;
+  constexpr float DEFAULT_SCATTERING_BLEND = 0.0f;
+  constexpr float DEFAULT_SCATTERING_REACH = 0.0f;
+  constexpr float DEFAULT_SCATTERING_ANISOTROPY = 0.0f;
+  constexpr bool DEFAULT_NORMALS_FROM_OPACITY = false;
+
+  /** A lighting model is a fixed point in VTK's parameter space, not a slider
+   * position. Blending is a mix coefficient applied after the secondary rays
+   * have been cast, so it costs nothing; reach bounds those rays and is the
+   * entire cost. Reach 0.0 shortens each ray to a single step, which yields
+   * local occlusion only - the cheap majority of the cinematic effect.
+   */
+  struct CinematicPreset
+  {
+    const char *label;
+    float blend;
+    float reach;
+    float anisotropy;
+    bool normalsFromOpacity;
+  };
+
+  constexpr std::array<CinematicPreset, 3> CINEMATIC_PRESETS { {
+    {"Off",               0.0f, 0.0f,  0.0f, false },
+    {"Ambient occlusion", 1.0f, 0.0f,  0.0f, true  },
+    {"Soft shadows",      1.0f, 0.03f, 0.3f, true  },
+  } };
+
+  const CinematicPreset &PresetFromComboIndex(int index)
+  {
+    return index > 0 && index < static_cast<int>(CINEMATIC_PRESETS.size())
+             ? CINEMATIC_PRESETS[index]
+             : CINEMATIC_PRESETS.front();
+  }
+
+  int ComboIndexFromNode(const mitk::DataNode *node)
+  {
+    float blend = DEFAULT_SCATTERING_BLEND;
+    float reach = DEFAULT_SCATTERING_REACH;
+    node->GetFloatProperty("volumerendering.scattering.blend", blend);
+    node->GetFloatProperty("volumerendering.scattering.reach", reach);
+
+    // Blend gates the whole scattering path, so a zero blend is Off whatever
+    // the reach happens to say.
+    if (blend <= 0.0f)
+      return 0;
+
+    for (std::size_t i = 1; i < CINEMATIC_PRESETS.size(); ++i)
+    {
+      const auto &preset = CINEMATIC_PRESETS[i];
+
+      if (std::abs(preset.blend - blend) < 1e-4f && std::abs(preset.reach - reach) < 1e-4f)
+        return static_cast<int>(i);
+    }
+
+    // Scattering is on at a combination no preset describes - an older scene,
+    // or hand-edited properties. Report no selection, as presetComboBox does
+    // for an unrecognised transfer function, rather than naming a preset whose
+    // values differ from what the mapper will render.
+    return -1;
+  }
 
   void ConfigureSlider(ctkSliderWidget *slider, int decimals, double minimum, double maximum, double step)
   {
@@ -129,12 +184,18 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   ConfigureSlider(m_Controls->specularSlider, 2, 0.0, 1.0, 0.01);
   ConfigureSlider(m_Controls->specularPowerSlider, 1, 1.0, 128.0, 1.0);
 
-  ConfigureSlider(m_Controls->cinematicSlider, 0, 0.0, CINEMATIC_STEPS, 1.0);
-  m_Controls->cinematicSlider->setTickInterval(1.0);
-  m_Controls->cinematicSlider->setTickPosition(QSlider::TicksBelow);
-  // A single step can cost an order of magnitude more, and crossing zero rebuilds
-  // the shader, so do not re-render mid-drag.
-  m_Controls->cinematicSlider->setTracking(false);
+  for (const auto& preset : CINEMATIC_PRESETS)
+  {
+    m_Controls->cinematicModeComboBox->addItem(QString(preset.label));
+  }
+
+  // Children of a ctkCollapsibleGroupBox inherit its ctkProxyStyle, whose every
+  // override dereferences a QPointer base style that ctkProxyStyle::ensureBaseStyle
+  // leaves unset on its re-entrancy path. Opening a combo box popup issues exactly
+  // the nested style queries that hit it, so give this box the application style
+  // instead. Rendering is unaffected: the proxy only alters the check indicator,
+  // and only for the group box itself.
+  m_Controls->cinematicModeComboBox->setStyle(QApplication::style());
 
   m_Controls->tfControlPanelsWidget->setVisible(false);
   m_Controls->cancelTfCreationButton->setVisible(false);
@@ -174,7 +235,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
   connect(m_Controls->specularPowerSlider, &ctkSliderWidget::valueChanged,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-  connect(m_Controls->cinematicSlider, &ctkSliderWidget::valueChanged,
+  connect(m_Controls->cinematicModeComboBox, &QComboBox::currentIndexChanged,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
   connect(m_Controls->resetLightingButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnResetLighting);
@@ -386,12 +447,24 @@ void QmitkVolumeVisualizationV2View::OnLightingChanged()
   selectedNode->SetFloatProperty("volumerendering.specular", static_cast<float>(m_Controls->specularSlider->value()));
   selectedNode->SetFloatProperty("volumerendering.specular.power", static_cast<float>(m_Controls->specularPowerSlider->value()));
 
-  const auto cinematicStep = static_cast<int>(m_Controls->cinematicSlider->value());
+  // A -1 index means the node's scattering values match no preset. Leave them
+  // alone until the user picks one: this slot also fires for the Phong sliders,
+  // which must not clear a configuration they know nothing about.
+  const int cinematicIndex = m_Controls->cinematicModeComboBox->currentIndex();
 
-  selectedNode->SetFloatProperty("volumerendering.scattering.blend",
-    cinematicStep > 0 ? CINEMATIC_BLEND : 0.0f);
-  selectedNode->SetFloatProperty("volumerendering.scattering.reach",
-    static_cast<float>(cinematicStep) / CINEMATIC_STEPS);
+  if (cinematicIndex >= 0)
+  {
+    const auto &preset = PresetFromComboIndex(cinematicIndex);
+
+    // VTK ignores both scattering parameters unless shading is on.
+    if (preset.blend > 0.0f)
+      selectedNode->SetBoolProperty("volumerendering.shade", true);
+
+    selectedNode->SetFloatProperty("volumerendering.scattering.blend", preset.blend);
+    selectedNode->SetFloatProperty("volumerendering.scattering.reach", preset.reach);
+    selectedNode->SetFloatProperty("volumerendering.scattering.anisotropy", preset.anisotropy);
+    selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", preset.normalsFromOpacity);
+  }
 
   this->UpdateLightingControls();
   this->RequestRenderWindowUpdate();
@@ -411,6 +484,8 @@ void QmitkVolumeVisualizationV2View::OnResetLighting()
   selectedNode->SetFloatProperty("volumerendering.specular.power", DEFAULT_SPECULAR_POWER);
   selectedNode->SetFloatProperty("volumerendering.scattering.blend", DEFAULT_SCATTERING_BLEND);
   selectedNode->SetFloatProperty("volumerendering.scattering.reach", DEFAULT_SCATTERING_REACH);
+  selectedNode->SetFloatProperty("volumerendering.scattering.anisotropy", DEFAULT_SCATTERING_ANISOTROPY);
+  selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", DEFAULT_NORMALS_FROM_OPACITY);
 
   this->UpdateLightingControls();
   this->RequestRenderWindowUpdate();
@@ -438,7 +513,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   m_Controls->diffuseSlider->setEnabled(shade);
   m_Controls->specularSlider->setEnabled(shade);
   m_Controls->specularPowerSlider->setEnabled(shade);
-  m_Controls->cinematicSlider->setEnabled(shade);
+  m_Controls->cinematicModeComboBox->setEnabled(shade);
 
   const QSignalBlocker blockShade(m_Controls->shadeCheckBox);
   m_Controls->shadeCheckBox->setChecked(shade);
@@ -448,19 +523,10 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.specular", DEFAULT_SPECULAR, m_Controls->specularSlider);
   LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.specular.power", DEFAULT_SPECULAR_POWER, m_Controls->specularPowerSlider);
 
-  // Derive the tier from the two properties rather than storing it: a zero blend
-  // means off whatever the reach says.
-  float blend = DEFAULT_SCATTERING_BLEND;
-  float reach = DEFAULT_SCATTERING_REACH;
-  selectedNode->GetFloatProperty("volumerendering.scattering.blend", blend);
-  selectedNode->GetFloatProperty("volumerendering.scattering.reach", reach);
-  
-  double cinematicStep = 0.0;
-  if (blend > 0.0f)
-    cinematicStep = std::clamp(static_cast<int>(reach * CINEMATIC_STEPS + 0.5f), 1, CINEMATIC_STEPS);
-    
-  const QSignalBlocker blockCinematic(m_Controls->cinematicSlider);
-  m_Controls->cinematicSlider->setValue(cinematicStep);
+  // Derive the mode from the node rather than storing it, so the node stays the
+  // single source of truth.
+  const QSignalBlocker blockCinematic(m_Controls->cinematicModeComboBox);
+  m_Controls->cinematicModeComboBox->setCurrentIndex(ComboIndexFromNode(selectedNode.GetPointer()));
 }
 
 void QmitkVolumeVisualizationV2View::SetTfAdvancedMode(bool active)

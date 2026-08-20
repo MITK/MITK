@@ -367,14 +367,14 @@
       <item row="5" column="0">
        <widget class="QLabel" name="cinematicLabel">
         <property name="text">
-         <string>Cinematic</string>
+         <string>Lighting model</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="ctkSliderWidget" name="cinematicSlider" native="true">
+       <widget class="QComboBox" name="cinematicModeComboBox">
         <property name="toolTip">
-         <string>Volumetric self-shadowing: 0 off, 1 Good, 2 Better, 3 Ultra, 4 Full. Higher settings cast longer shadows and cost considerably more.</string>
+         <string>Off: surface shading only. Ambient occlusion: adds darkening in cavities and crevices, at little cost. Soft shadows: also casts short shadows between structures, considerably slower.</string>
         </property>
        </widget>
       </item>

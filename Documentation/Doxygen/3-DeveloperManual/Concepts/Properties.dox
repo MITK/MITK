@@ -182,6 +182,25 @@ surface construction
   <li> volumerendering.diffuse - same as cpu with gpu
   <li> volumerendering.specular - same as cpu with gpu
   <li> volumerendering.specular.power - same as cpu with gpu
+  <li> volumerendering.shade - Enables the shading model. The scattering
+properties below are ignored entirely while this is off.
+  <li> volumerendering.blendmode - VTK blend mode (composite, maximum
+intensity, minimum intensity, average, additive)
+  <li> volumerendering.normalsFromOpacity - Derive the shading gradient from the
+opacity rather than the raw scalars, so lighting follows the transfer function
+instead of the data's noise. The scattering blend reads the same gradient's
+magnitude, so this also shifts where scattering gives way to surface shading.
+  <li> volumerendering.scattering.blend - Mix between surface shading and
+volumetric scattering: 0 casts no secondary rays, 1 blends the two per sample
+by gradient and opacity, 2 uses the volumetric model alone. Applied after the
+secondary rays are cast, so changing it does not affect performance.
+  <li> volumerendering.scattering.reach - Length of the secondary rays, and the
+dominant cost of scattering: 0 shortens each to a single step (ambient
+occlusion), 1 lets them cross the whole volume. Inert while
+volumerendering.scattering.blend is zero.
+  <li> volumerendering.scattering.anisotropy - Henyey-Greenstein scattering
+direction, -1 (back) to 1 (forward). Only feeds the phase function, so it is
+inert while volumerendering.scattering.blend is zero.
 </ul>
 
 \subsection PointSetProperties Point Set Properties

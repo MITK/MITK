@@ -68,7 +68,12 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   node->AddProperty("volumerendering.specular.power", mitk::FloatProperty::New(16.0f), renderer, overwrite);
   node->AddProperty("volumerendering.shade", mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty("volumerendering.scattering.blend", mitk::FloatProperty::New(0.0f), renderer, overwrite);
-  node->AddProperty("volumerendering.scattering.reach", mitk::FloatProperty::New(0.5f), renderer, overwrite);
+  // Reach bounds the secondary rays and is the whole cost of scattering; 0.0
+  // collapses each to a single step. Default to the affordable end so enabling
+  // blending alone cannot land on an unusable frame rate.
+  node->AddProperty("volumerendering.scattering.reach", mitk::FloatProperty::New(0.0f), renderer, overwrite);
+  node->AddProperty("volumerendering.scattering.anisotropy", mitk::FloatProperty::New(0.0f), renderer, overwrite);
+  node->AddProperty("volumerendering.normalsFromOpacity", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("binary", mitk::BoolProperty::New(false), renderer, overwrite);
 
@@ -190,12 +195,30 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
     m_SmartVolumeMapper->SetVolumetricScatteringBlending(value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.reach", value, renderer))
     m_SmartVolumeMapper->SetGlobalIlluminationReach(value);
+
+  // Anisotropy feeds only the phase function, which VTK compiles into the
+  // shader solely when blending is above zero. Setting it on its own does
+  // nothing.
+  if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.anisotropy", value, renderer))
+    m_VolumeProperty->SetScatteringAnisotropy(value);
+
+  // Derives the shading gradient from the opacity rather than the raw scalars,
+  // so lighting follows the transfer function instead of the data's noise. The
+  // blend coefficient reads the same gradient's magnitude, so this also shifts
+  // where scattering gives way to Phong shading.
+  bool normalsFromOpacity = false;
+  if (this->GetDataNode()->GetBoolProperty("volumerendering.normalsFromOpacity", normalsFromOpacity, renderer))
+    m_SmartVolumeMapper->SetComputeNormalFromOpacity(normalsFromOpacity);
 }
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
 {
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_SmartVolumeMapper->SetBlendModeToComposite();
+  // Sampling the ray at regular offsets makes the step boundaries line up
+  // across neighbouring pixels, which reads as concentric banding. Jittering
+  // the offsets trades that for unstructured noise. VTK defaults it off.
+  m_SmartVolumeMapper->SetUseJittering(1);
   m_ImageChangeInformation = vtkSmartPointer<vtkImageChangeInformation>::New();
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_Volume = vtkSmartPointer<vtkVolume>::New();

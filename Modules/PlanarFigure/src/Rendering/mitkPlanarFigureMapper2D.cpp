@@ -592,6 +592,8 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                       bool overwrite)
 {
   node->AddProperty("visible", mitk::BoolProperty::New(true), renderer, overwrite);
+  node->AddProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0), nullptr, true);
+  node->AddProperty("opacity", mitk::FloatProperty::New(0.8), nullptr, true);
 
   // node->SetProperty("planarfigure.iseditable",mitk::BoolProperty::New(true));
   node->AddProperty("planarfigure.isextendable", mitk::BoolProperty::New(false));

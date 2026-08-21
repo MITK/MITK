@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
 
+#include <mitkIMapperProvider.h>
+
 #include "mitkMimeTypeProvider.h"
 #include "mitkNodeSelectionService.h"
 #include <mitkPlanePositionManager.h>
@@ -92,6 +94,9 @@ private:
   /** \brief Register VTK-based image and surface reader/writer services. */
   void RegisterVtkReaderWriter();
 
+  /** \brief Register the mapper providers for the core data types. */
+  void RegisterMapperProviders();
+
   // mitk::RenderingManager::Pointer m_RenderingManager;
   std::unique_ptr<mitk::NodeSelectionService> m_NodeSelectionService;
   std::unique_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
@@ -110,6 +115,8 @@ private:
   std::vector<mitk::IFileReader *> m_FileReaders;
   std::vector<mitk::IFileWriter *> m_FileWriters;
   std::vector<mitk::AbstractFileIO *> m_FileIOs;
+
+  std::vector<std::unique_ptr<mitk::IMapperProvider>> m_MapperProviders;
 
   std::vector<mitk::CustomMimeType *> m_DefaultMimeTypes;
 

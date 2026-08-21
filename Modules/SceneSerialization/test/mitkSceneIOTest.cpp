@@ -18,11 +18,11 @@ found in the LICENSE file.
 #include <Poco/File.h>
 #include <Poco/TemporaryFile.h>
 #include <mitkBaseData.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkGeometryData.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkPointSet.h>
+#include <mitkProperties.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkSurface.h>

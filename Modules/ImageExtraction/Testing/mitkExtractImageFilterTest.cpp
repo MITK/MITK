@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkCompareImageSliceTestHelper.h"
-#include "mitkCoreObjectFactory.h"
 #include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkIOUtil.h"

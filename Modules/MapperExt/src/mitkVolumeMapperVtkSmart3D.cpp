@@ -55,6 +55,11 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 {
   // GPU_INFO << "SetDefaultProperties";
 
+  mitk::Image::Pointer nodeImage = dynamic_cast<mitk::Image *>(node->GetData());
+
+  if (nodeImage.IsNull() || !nodeImage->IsInitialized())
+    return;
+
   node->AddProperty("volumerendering", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("volumerendering.ambient", mitk::FloatProperty::New(0.25f), renderer, overwrite);

@@ -12,7 +12,7 @@ set(CPP_FILES
   mitkLabelSuggestionHelper.cpp
   mitkMultiLabelEvents.cpp
   mitkMultiLabelIOHelper.cpp
-  mitkMultilabelObjectFactory.cpp
+  mitkMultilabelModuleActivator.cpp
   mitkMultiLabelPredicateHelper.cpp
   mitkMultiLabelSegmentationVtkMapper3D.cpp
   mitkMultiLabelSurfaceNetsExtractor.cpp

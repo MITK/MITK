@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <mitkFileWriterRegistry.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkMimeType.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 
 #include <QmitkFileReaderOptionsDialog.h>

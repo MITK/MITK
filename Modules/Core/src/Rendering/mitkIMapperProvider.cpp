@@ -10,4 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkCoreObjectFactoryBase.h>
+#include <mitkIMapperProvider.h>
+
+namespace mitk
+{
+  IMapperProvider::~IMapperProvider() {}
+
+  std::string IMapperProvider::PROP_BASEDATA_TYPE()
+  {
+    static std::string s = "org.mitk.IMapperProvider.basedatatype";
+    return s;
+  }
+
+  std::string IMapperProvider::PROP_SLOT_ID()
+  {
+    static std::string s = "org.mitk.IMapperProvider.slotid";
+    return s;
+  }
+}

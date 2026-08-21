@@ -117,10 +117,14 @@ there.
        become a mitk::MapperProviderBase subclass that overrides
        CreateMapper() and returns nullptr to decline a node; selection then
        falls through to the next candidate or hierarchy level.
-  <li> Default properties are applied most derived data class first. Since
-       AddProperty() does not overwrite existing values by default, the most
-       specific mapper determines conflicting property values. Previously,
-       built-in defaults ran before extra-factory defaults.
+  <li> Default properties are applied base data class first, and within one
+       data class by ascending ranking, so the most specific and highest
+       ranked mapper writes last. This keeps the order the built-in factory
+       used, where its own defaults ran before those of the extra factories,
+       but makes it well defined instead of depending on the arbitrary order
+       of the extra factory set. A mapper claims a property by writing it
+       unconditionally, via SetProperty() or AddProperty() with overwrite;
+       with AddProperty() alone it defers to the value already present.
 </ul>
 
 */

@@ -111,8 +111,10 @@ private:
     const Entry entry{provider, ranking, serviceId};
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    this->InsertSorted(m_MapperIndex[std::make_pair(dataType, static_cast<MapperSlotId>(slotId))], entry);
-    this->InsertSorted(m_DefaultsIndex[dataType], entry);
+    this->InsertSorted(m_MapperIndex[std::make_pair(dataType, static_cast<MapperSlotId>(slotId))],
+                       entry,
+                       ByElectionOrder);
+    this->InsertSorted(m_DefaultsIndex[dataType], entry, ByApplicationOrder);
 
     return provider;
   }
@@ -121,32 +123,48 @@ private:
   {
   }
 
-  void RemovedService(const ServiceReferenceType &reference, TrackedType provider) override
+  void RemovedService(const ServiceReferenceType &reference, TrackedType) override
   {
     {
+      // Identify entries by service id, not by provider pointer: one provider
+      // object may hold several registrations, e.g. one per mapper slot.
+      const auto serviceId = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
+
       std::lock_guard<std::mutex> lock(m_Mutex);
-      this->RemoveProvider(m_MapperIndex, provider);
-      this->RemoveProvider(m_DefaultsIndex, provider);
+      this->RemoveRegistration(m_MapperIndex, serviceId);
+      this->RemoveRegistration(m_DefaultsIndex, serviceId);
     }
     m_Context->UngetService(reference);
   }
 
-  static void InsertSorted(std::vector<Entry> &entries, const Entry &entry)
+  // Order in which CreateMapper() tries candidates: highest ranking first, so
+  // the preferred provider gets the first chance to accept a node.
+  static bool ByElectionOrder(const Entry &lhs, const Entry &rhs)
   {
-    auto position = std::lower_bound(entries.begin(), entries.end(), entry, [](const Entry &lhs, const Entry &rhs) {
-      return lhs.ranking != rhs.ranking ? lhs.ranking > rhs.ranking : lhs.serviceId < rhs.serviceId;
-    });
-    entries.insert(position, entry);
+    return lhs.ranking != rhs.ranking ? lhs.ranking > rhs.ranking : lhs.serviceId < rhs.serviceId;
+  }
+
+  // Order in which ApplyDefaultProperties() applies candidates: lowest ranking
+  // first, so the preferred provider writes last and wins conflicting values.
+  static bool ByApplicationOrder(const Entry &lhs, const Entry &rhs)
+  {
+    return lhs.ranking != rhs.ranking ? lhs.ranking < rhs.ranking : lhs.serviceId < rhs.serviceId;
+  }
+
+  template <typename TCompare>
+  static void InsertSorted(std::vector<Entry> &entries, const Entry &entry, TCompare compare)
+  {
+    entries.insert(std::lower_bound(entries.begin(), entries.end(), entry, compare), entry);
   }
 
   template <typename TIndex>
-  static void RemoveProvider(TIndex &index, const IMapperProvider *provider)
+  static void RemoveRegistration(TIndex &index, long serviceId)
   {
     for (auto it = index.begin(); it != index.end();)
     {
       auto &entries = it->second;
-      entries.erase(std::remove_if(entries.begin(), entries.end(), [provider](const Entry &entry) {
-        return entry.provider == provider;
+      entries.erase(std::remove_if(entries.begin(), entries.end(), [serviceId](const Entry &entry) {
+        return entry.serviceId == serviceId;
       }), entries.end());
 
       it = entries.empty() ? index.erase(it) : std::next(it);
@@ -156,8 +174,8 @@ private:
   us::ServiceTracker<IMapperProvider> *m_Tracker = nullptr;
   us::ModuleContext *m_Context = nullptr;
 
-  // Candidates per key, sorted by ranking (descending), then registration
-  // order (ascending) for deterministic tie-breaking.
+  // Mapper candidates in election order, defaults candidates in application
+  // order, both with registration order as deterministic tie-breaker.
   std::map<std::pair<std::string, MapperSlotId>, std::vector<Entry>> m_MapperIndex;
   std::map<std::string, std::vector<Entry>> m_DefaultsIndex;
   mutable std::mutex m_Mutex;
@@ -219,9 +237,13 @@ void mitk::MapperProviderRegistry::ApplyDefaultProperties(DataNode *node) const
   if (data == nullptr)
     return;
 
-  for (const auto &className : data->GetClassHierarchy())
+  const auto classHierarchy = data->GetClassHierarchy();
+
+  // Base class first, so a provider registered for a more derived class
+  // applies its defaults last and can override those of a base class.
+  for (auto className = classHierarchy.rbegin(); className != classHierarchy.rend(); ++className)
   {
-    for (const auto &entry : m_Impl->GetDefaultsCandidates(className))
+    for (const auto &entry : m_Impl->GetDefaultsCandidates(*className))
       entry.provider->SetDefaultProperties(node);
   }
 }

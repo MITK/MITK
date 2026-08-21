@@ -65,10 +65,13 @@ namespace mitk
      * \brief Apply default properties of all providers matching the node's
      *        data type, across all mapper slots.
      *
-     * Providers are applied most derived data class first, so with the usual
-     * AddProperty(..., overwrite = false) semantics of the mappers' static
-     * SetDefaultProperties() the most specific provider determines
-     * conflicting property values.
+     * Providers are applied base data class first, and within one data class
+     * by ascending service ranking, so the most specific and highest ranked
+     * provider writes last. A mapper claims a property against a base class
+     * or a lower ranked provider by writing it unconditionally, via
+     * SetProperty() or AddProperty(..., overwrite = true); with
+     * AddProperty(..., overwrite = false) it defers to the value already
+     * present, which is what that argument asks for.
      *
      * \param node The data node to configure with default rendering properties.
      */

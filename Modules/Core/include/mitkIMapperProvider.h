@@ -45,6 +45,10 @@ namespace mitk
    * ranking greater than zero to override a default provider registered by
    * MITK for the same data class.
    *
+   * Default properties are applied in the opposite order, so that the
+   * provider winning selection writes last. See
+   * MapperProviderRegistry::ApplyDefaultProperties().
+   *
    * \sa MapperProviderBase
    * \sa MapperProviderRegistry
    */

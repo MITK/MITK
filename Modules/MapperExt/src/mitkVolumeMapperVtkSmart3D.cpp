@@ -55,9 +55,9 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 {
   // GPU_INFO << "SetDefaultProperties";
 
-  mitk::Image::Pointer nodeImage = dynamic_cast<mitk::Image *>(node->GetData());
+  const auto *image = dynamic_cast<const mitk::Image *>(node->GetData());
 
-  if (nodeImage.IsNull() || !nodeImage->IsInitialized())
+  if (image == nullptr || !image->IsInitialized())
     return;
 
   node->AddProperty("volumerendering", mitk::BoolProperty::New(false), renderer, overwrite);
@@ -69,17 +69,13 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 
   node->AddProperty("binary", mitk::BoolProperty::New(false), renderer, overwrite);
 
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
-  if (image.IsNotNull() && image->IsInitialized())
+  if ((overwrite) || (node->GetProperty("TransferFunction", renderer) == nullptr))
   {
-    if ((overwrite) || (node->GetProperty("TransferFunction", renderer) == nullptr))
-    {
-      // add a default transfer function
-      mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-      mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(tf);
-      tfInit->SetTransferFunctionMode(0);
-      node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
-    }
+    // add a default transfer function
+    mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+    mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(tf);
+    tfInit->SetTransferFunctionMode(0);
+    node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
   }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

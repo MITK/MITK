@@ -46,19 +46,16 @@ namespace mitk
         std::make_unique<MapperProviderBase<MultiLabelSegmentationVtkMapper3D, MultiLabelSegmentation>>(
           BaseRenderer::Standard3D));
 
-      auto propertyFilters = CoreServices::GetPropertyFilters();
+      CoreServicePointer<IPropertyFilters> propertyFilters(CoreServices::GetPropertyFilters());
 
-      if (propertyFilters != nullptr)
-      {
-        PropertyFilter labelSetImageFilter;
-        labelSetImageFilter.AddEntry("binaryimage.hoveringannotationcolor", PropertyFilter::Blacklist);
-        labelSetImageFilter.AddEntry("binaryimage.hoveringcolor", PropertyFilter::Blacklist);
-        labelSetImageFilter.AddEntry("binaryimage.selectedannotationcolor", PropertyFilter::Blacklist);
-        labelSetImageFilter.AddEntry("binaryimage.selectedcolor", PropertyFilter::Blacklist);
-        labelSetImageFilter.AddEntry("outline binary shadow color", PropertyFilter::Blacklist);
+      PropertyFilter labelSetImageFilter;
+      labelSetImageFilter.AddEntry("binaryimage.hoveringannotationcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("binaryimage.hoveringcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("binaryimage.selectedannotationcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("binaryimage.selectedcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("outline binary shadow color", PropertyFilter::Blacklist);
 
-        propertyFilters->AddFilter(labelSetImageFilter, "MultiLabelSegmentation");
-      }
+      propertyFilters->AddFilter(labelSetImageFilter, "MultiLabelSegmentation");
     }
 
     void Unload(us::ModuleContext *) override

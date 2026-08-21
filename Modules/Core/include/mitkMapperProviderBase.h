@@ -85,7 +85,9 @@ namespace mitk
 
     ~MapperProviderBase() override
     {
-      if (m_Registration)
+      // Check availability, not just validity: stopping the module already
+      // unregisters leftover services, and unregistering twice throws.
+      if (m_Registration.IsAvailable())
         m_Registration.Unregister();
     }
 

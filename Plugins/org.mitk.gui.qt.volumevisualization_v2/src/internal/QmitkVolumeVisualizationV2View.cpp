@@ -16,7 +16,9 @@ found in the LICENSE file.
 
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
+#include <mitkVtkPropRenderer.h>
 #include <QmitkCombinedTransferFunctionCanvas.h>
+#include <QmitkRenderWindow.h>
 
 #include <vtkColorTransferFunction.h>
 #include <vtkSmartPointer.h>
@@ -62,10 +64,39 @@ namespace
   constexpr bool DEFAULT_NORMALS_FROM_OPACITY = false;
 
   /** A lighting model is a fixed point in VTK's parameter space, not a slider
-   * position. Blending is a mix coefficient applied after the secondary rays
-   * have been cast, so it costs nothing; reach bounds those rays and is the
-   * entire cost. Reach 0.0 shortens each ray to a single step, which yields
-   * local occlusion only - the cheap majority of the cinematic effect.
+   * position, and it spans the light rig as well as the mapper.
+   *
+   * Blend does not add occlusion to Phong shading, it mixes Phong out and a
+   * phase-function scattering model in:
+   * finalColor = (1 - c) * phong + c * scattering. At blend 1.0,
+   * c = exp(-gradientMagnitude * opacity), so surfaces keep their Phong
+   * shading and specular highlight while homogeneous interiors go fully
+   * volumetric. That is the only blend which keeps surface detail, so both
+   * models use it: blend 2.0 pins c to 1.0 and discards N.L and specular
+   * outright, leaving the shadow ray as the sole spatial cue.
+   *
+   * Reach bounds that shadow ray and is the entire cost, non-linearly: the
+   * traced fraction of the volume diagonal is 1 - (1 - reach)^0.33, so 0.10
+   * traces about 3% and reads as local occlusion, 0.30 about 11%. Much past
+   * that the light has to cross most of the subject, and everything not facing
+   * the key light collapses onto the ambient floor.
+   *
+   * Ambient stays at the Phong default, tempting as it is to raise it where
+   * the shadow ray has attenuated everything else. Both shading paths add
+   * ambient scaled by the light's ambient colour and never by the sample
+   * colour, so it is an additive grey over the entire image rather than a fill
+   * confined to shadow: it desaturates the whole render long before it rescues
+   * an occluded voxel. A short reach is what keeps shadows off black. Filling
+   * them with colour instead takes a second light, whose contribution does
+   * carry the sample colour and does get its own shadow ray.
+   *
+   * Diffuse rises because a single key light replaces the five-light rig,
+   * whose intensities summed to more than one.
+   *
+   * Anisotropy stays at 0. VTK's Henyey-Greenstein phase function carries no
+   * 1/4pi normalisation, so it is exactly 1.0 at 0 but swings between 0.56 and
+   * 1.88 at 0.2 depending on the light and view geometry - a brightness change
+   * rather than a shape cue.
    */
   struct CinematicPreset
   {
@@ -74,12 +105,17 @@ namespace
     float reach;
     float anisotropy;
     bool normalsFromOpacity;
+    float ambient;
+    float diffuse;
+    mitk::VtkPropRenderer::LightingMode lightingMode;
   };
 
+  using LightingMode = mitk::VtkPropRenderer::LightingMode;
+
   constexpr std::array<CinematicPreset, 3> CINEMATIC_PRESETS { {
-    {"Off",               0.0f, 0.0f,  0.0f, false },
-    {"Ambient occlusion", 1.0f, 0.0f,  0.0f, true  },
-    {"Soft shadows",      1.0f, 0.03f, 0.3f, true  },
+    {"Off",           0.0f, 0.00f, 0.0f, false, DEFAULT_AMBIENT, DEFAULT_DIFFUSE, LightingMode::Studio   },
+    {"Soft shadows",  1.0f, 0.10f, 0.0f, false, DEFAULT_AMBIENT, 0.70f,           LightingMode::KeyLight },
+    {"Cinematic",     1.0f, 0.30f, 0.0f, false, DEFAULT_AMBIENT, 0.80f,           LightingMode::KeyLight },
   } };
 
   const CinematicPreset &PresetFromComboIndex(int index)
@@ -231,7 +267,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->specularPowerSlider, &ctkSliderWidget::valueChanged,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
   connect(m_Controls->cinematicModeComboBox, &QComboBox::currentIndexChanged,
-    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+    this, &QmitkVolumeVisualizationV2View::OnCinematicModeChanged);
   connect(m_Controls->resetLightingButton, &QPushButton::clicked,
     this, &QmitkVolumeVisualizationV2View::OnResetLighting);
 
@@ -442,27 +478,52 @@ void QmitkVolumeVisualizationV2View::OnLightingChanged()
   selectedNode->SetFloatProperty("volumerendering.specular", static_cast<float>(m_Controls->specularSlider->value()));
   selectedNode->SetFloatProperty("volumerendering.specular.power", static_cast<float>(m_Controls->specularPowerSlider->value()));
 
-  // A -1 index means the node's scattering values match no preset. Leave them
-  // alone until the user picks one: this slot also fires for the Phong sliders,
-  // which must not clear a configuration they know nothing about.
-  const int cinematicIndex = m_Controls->cinematicModeComboBox->currentIndex();
-
-  if (cinematicIndex >= 0)
-  {
-    const auto &preset = PresetFromComboIndex(cinematicIndex);
-
-    // VTK ignores both scattering parameters unless shading is on.
-    if (preset.blend > 0.0f)
-      selectedNode->SetBoolProperty("volumerendering.shade", true);
-
-    selectedNode->SetFloatProperty("volumerendering.scattering.blend", preset.blend);
-    selectedNode->SetFloatProperty("volumerendering.scattering.reach", preset.reach);
-    selectedNode->SetFloatProperty("volumerendering.scattering.anisotropy", preset.anisotropy);
-    selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", preset.normalsFromOpacity);
-  }
-
   this->UpdateLightingControls();
   this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationV2View::OnCinematicModeChanged(int index)
+{
+  auto selectedNode = m_SelectedNode.Lock();
+
+  // UpdateLightingControls reports -1 for a configuration no model describes,
+  // but does so behind a QSignalBlocker, so a signal always names a real entry.
+  if (selectedNode.IsNull() || index < 0)
+    return;
+
+  const auto &preset = PresetFromComboIndex(index);
+
+  // VTK ignores both scattering parameters unless shading is on.
+  if (preset.blend > 0.0f)
+    selectedNode->SetBoolProperty("volumerendering.shade", true);
+
+  selectedNode->SetFloatProperty("volumerendering.scattering.blend", preset.blend);
+  selectedNode->SetFloatProperty("volumerendering.scattering.reach", preset.reach);
+  selectedNode->SetFloatProperty("volumerendering.scattering.anisotropy", preset.anisotropy);
+  selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", preset.normalsFromOpacity);
+  selectedNode->SetFloatProperty("volumerendering.ambient", preset.ambient);
+  selectedNode->SetFloatProperty("volumerendering.diffuse", preset.diffuse);
+
+  // The rig is not applied here: UpdateLightingControls derives it from the
+  // properties just written, so it stays the single place that installs one.
+  this->UpdateLightingControls();
+  this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationV2View::ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode)
+{
+  auto *renderWindowPart = this->GetRenderWindowPart();
+
+  if (renderWindowPart == nullptr)
+    return;
+
+  auto *renderWindow = renderWindowPart->GetQmitkRenderWindow("3d");
+
+  if (renderWindow == nullptr)
+    return;
+
+  if (auto *renderer = renderWindow->GetRenderer(); renderer != nullptr)
+    renderer->SetLightingMode(mode);
 }
 
 void QmitkVolumeVisualizationV2View::OnResetLighting()
@@ -499,7 +560,12 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   m_Controls->lightingPanel->setEnabled(volumeRenderingOn);
 
   if (!volumeRenderingOn)
+  {
+    // Nothing here is being rendered volumetrically, so nothing needs the
+    // single-source rig.
+    this->ApplyLightingMode(mitk::VtkPropRenderer::LightingMode::Studio);
     return;
+  }
 
   bool shade = DEFAULT_SHADE;
   selectedNode->GetBoolProperty("volumerendering.shade", shade);
@@ -521,8 +587,18 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
 
   // Derive the mode from the node rather than storing it, so the node stays the
   // single source of truth.
+  const int cinematicIndex = ComboIndexFromNode(selectedNode.GetPointer());
+
   const QSignalBlocker blockCinematic(m_Controls->cinematicModeComboBox);
-  m_Controls->cinematicModeComboBox->setCurrentIndex(ComboIndexFromNode(selectedNode.GetPointer()));
+  m_Controls->cinematicModeComboBox->setCurrentIndex(cinematicIndex);
+
+  // The light rig follows the node as well, so selecting a different volume or
+  // reloading a scene lands on the rig the stored properties need. A -1 index
+  // is scattering at values no model describes; leave the even rig in place
+  // rather than guess which single-source one was meant.
+  this->ApplyLightingMode(cinematicIndex >= 0
+    ? PresetFromComboIndex(cinematicIndex).lightingMode
+    : mitk::VtkPropRenderer::LightingMode::Studio);
 }
 
 void QmitkVolumeVisualizationV2View::SetTfAdvancedMode(bool active)

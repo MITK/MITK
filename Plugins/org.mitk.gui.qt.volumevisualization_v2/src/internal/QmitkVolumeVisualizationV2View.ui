@@ -387,7 +387,7 @@
       <item row="5" column="1">
        <widget class="QComboBox" name="cinematicModeComboBox">
         <property name="toolTip">
-         <string>Off: surface shading only. Ambient occlusion: adds darkening in cavities and crevices, at little cost. Soft shadows: also casts short shadows between structures, considerably slower.</string>
+         <string>Off: surface shading only, lit by the standard five-light rig. Soft shadows and Cinematic switch the 3D window to a single key light and trace shadow rays through the volume, which is what makes the shadowing directional; both keep surface shading and its highlight on top of that. Soft shadows darkens cavities and crevices; Cinematic traces about three times further, so shadows also fall between separate structures. Both cost considerably more per frame, and both relight any surface in the same window.</string>
         </property>
        </widget>
       </item>

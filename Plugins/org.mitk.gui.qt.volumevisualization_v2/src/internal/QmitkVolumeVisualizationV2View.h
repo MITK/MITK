@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkSimpleHistogram.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionPresets.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <QmitkAbstractView.h>
 
@@ -54,6 +55,7 @@ private Q_SLOTS:
   void OnResetTransferFunction();
   void OnCanvasOpacityChanged();
   void OnLightingChanged();
+  void OnCinematicModeChanged(int index);
   void OnResetLighting();
   void OnCreateUserTransferFunction();
   void OnImportUserTransferFunction();
@@ -65,6 +67,12 @@ private:
 
   void UpdateInterface();
   void UpdateLightingControls();
+
+  /** Lights belong to the renderer, so this is 3D-render-window state rather
+   * than node state, and every path that leaves cinematic mode has to restore
+   * it.
+   */
+  void ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode);
 
   void ApplyCurrentTransferFunction();
 

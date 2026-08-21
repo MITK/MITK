@@ -125,4 +125,47 @@ The VtkProp is picked up in one of the four render passes and thus integrated in
 
 \li SetDefaultProperties() should be used to define mapper-specific properties.
 
+\subsection QVTKRendering_registerMapper How to register your Mapper
+
+Writing the mapper class alone is not enough: MITK must know about it to lazily create
+mappers for data nodes. Mappers are registered as mitk::IMapperProvider micro services,
+keyed by the data class and the mapper slot they serve. The convenience template
+mitk::MapperProviderBase provides a complete provider implementation; instantiate it in
+your module activator:
+
+\code
+#include <mitkMapperProviderBase.h>
+
+void Load(us::ModuleContext*) override
+{
+  m_MapperProviders.push_back(
+    std::make_unique<mitk::MapperProviderBase<ExampleMapper2D, ExampleData>>(
+      mitk::BaseRenderer::Standard2D));
+  m_MapperProviders.push_back(
+    std::make_unique<mitk::MapperProviderBase<ExampleMapper3D, ExampleData>>(
+      mitk::BaseRenderer::Standard3D));
+}
+
+void Unload(us::ModuleContext*) override
+{
+  m_MapperProviders.clear();
+}
+
+std::vector<std::unique_ptr<mitk::IMapperProvider>> m_MapperProviders;
+\endcode
+
+Provider selection walks the class hierarchy of a node's data from the most derived class
+to the base class, so a provider registered for a subclass always wins over one registered
+for a base class, regardless of ranking. The service ranking only breaks ties between
+providers registered for the same data class and slot: register with a ranking greater
+than zero to replace a mapper that MITK registers by default for the same data class.
+
+The mapper's static SetDefaultProperties() is applied to a node whenever data of a
+matching type is assigned to it. Defaults are applied most derived data class first;
+since AddProperty() does not overwrite existing values by default, the most specific
+mapper determines conflicting property values.
+
+For adapting code that still registers mappers through the removed
+mitk::CoreObjectFactory, see \ref MapperRegistrationMigration.
+
 */

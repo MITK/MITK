@@ -22,6 +22,7 @@ The modules are shared libraries that provide functionality that can be used by 
 <ul>
   <li> \subpage GeometryMigration
   <li> \subpage InteractionMigration
+  <li> \subpage MapperRegistrationMigration
   <li> \subpage OverlayMigration
 </ul>
 */

@@ -725,6 +725,9 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
 
+  if (image.IsNull() || !image->IsInitialized())
+    return;
+
   // Properties common for both images and segmentations
   node->AddProperty("depthOffset", mitk::FloatProperty::New(0.0), renderer, overwrite);
   node->AddProperty("outline binary", mitk::BoolProperty::New(false), renderer, overwrite);

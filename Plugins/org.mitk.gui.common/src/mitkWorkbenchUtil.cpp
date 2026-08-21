@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkCoreServices.h>
 #include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>

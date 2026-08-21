@@ -1,0 +1,130 @@
+/**
+
+\page MapperRegistrationMigration Migration Guide from CoreObjectFactory to Mapper Provider Services
+
+\tableofcontents
+
+mitk::CoreObjectFactory and mitk::CoreObjectFactoryBase have been removed.
+Their last remaining responsibilities, creating mappers for data nodes and
+applying default rendering properties, moved to mitk::IMapperProvider micro
+services, mirroring how file readers and writers are registered. See
+\ref QVTKRendering_registerMapper for a description of the new mechanism.
+
+\section MapperRegistrationMigrationHowto How to adapt your code
+
+Replace your mitk::CoreObjectFactoryBase subclass and its file-scope static
+registration with one mitk::MapperProviderBase instance per mapper class and
+mapper slot, held by your module activator.
+
+\code
+// Old: object factory subclass with type dispatch and static registration
+class ExampleObjectFactory : public mitk::CoreObjectFactoryBase
+{
+public:
+  mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override
+  {
+    mitk::Mapper::Pointer mapper;
+
+    if (dynamic_cast<ExampleData*>(node->GetData()) != nullptr)
+    {
+      if (slotId == mitk::BaseRenderer::Standard2D)
+        mapper = ExampleMapper2D::New();
+      else if (slotId == mitk::BaseRenderer::Standard3D)
+        mapper = ExampleMapper3D::New();
+
+      if (mapper.IsNotNull())
+        mapper->SetDataNode(node);
+    }
+
+    return mapper;
+  }
+
+  void SetDefaultProperties(mitk::DataNode* node) override
+  {
+    if (dynamic_cast<ExampleData*>(node->GetData()) != nullptr)
+    {
+      ExampleMapper2D::SetDefaultProperties(node);
+      ExampleMapper3D::SetDefaultProperties(node);
+    }
+  }
+};
+
+struct RegisterExampleObjectFactory
+{
+  RegisterExampleObjectFactory() : m_Factory(ExampleObjectFactory::New())
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(m_Factory);
+  }
+
+  ~RegisterExampleObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory(m_Factory);
+  }
+
+  ExampleObjectFactory::Pointer m_Factory;
+};
+
+static RegisterExampleObjectFactory registerExampleObjectFactory;
+\endcode
+
+\code
+// New: mapper providers registered in the module activator
+#include <mitkMapperProviderBase.h>
+
+class ExampleModuleActivator : public us::ModuleActivator
+{
+public:
+  void Load(us::ModuleContext*) override
+  {
+    m_MapperProviders.push_back(
+      std::make_unique<mitk::MapperProviderBase<ExampleMapper2D, ExampleData>>(
+        mitk::BaseRenderer::Standard2D));
+    m_MapperProviders.push_back(
+      std::make_unique<mitk::MapperProviderBase<ExampleMapper3D, ExampleData>>(
+        mitk::BaseRenderer::Standard3D));
+  }
+
+  void Unload(us::ModuleContext*) override
+  {
+    m_MapperProviders.clear();
+  }
+
+private:
+  std::vector<std::unique_ptr<mitk::IMapperProvider>> m_MapperProviders;
+};
+
+US_EXPORT_MODULE_ACTIVATOR(ExampleModuleActivator)
+\endcode
+
+The type dispatch disappears: the targeted data class and slot are service
+properties, and the mappers' static SetDefaultProperties() is called through
+the provider. If your module already has an activator, add the registrations
+there.
+
+\section MapperRegistrationMigrationDetails Behavioral differences to be aware of
+
+<ul>
+  <li> Provider selection is deterministic. It walks the class hierarchy of a
+       node's data from the most derived class to the base class; a provider
+       registered for a subclass always wins over one registered for a base
+       class. Previously, extra factories were consulted in arbitrary order
+       and always won against the built-in factory.
+  <li> To replace a mapper that MITK registers by default, register your
+       provider for the same data class with a service ranking greater
+       than zero (third constructor argument of mitk::MapperProviderBase).
+       Relying on "extra factories always win" no longer works.
+  <li> A factory that matched nodes by criteria other than the data type must
+       become a mitk::MapperProviderBase subclass that overrides
+       CreateMapper() and returns nullptr to decline a node; selection then
+       falls through to the next candidate or hierarchy level.
+  <li> Default properties are applied base data class first, and within one
+       data class by ascending ranking, so the most specific and highest
+       ranked mapper writes last. This keeps the order the built-in factory
+       used, where its own defaults ran before those of the extra factories,
+       but makes it well defined instead of depending on the arbitrary order
+       of the extra factory set. A mapper claims a property by writing it
+       unconditionally, via SetProperty() or AddProperty() with overwrite;
+       with AddProperty() alone it defers to the value already present.
+</ul>
+
+*/

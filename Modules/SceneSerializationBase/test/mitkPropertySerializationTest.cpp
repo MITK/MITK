@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include <mitkTestingMacros.h>
 
-#include <mitkCoreObjectFactory.h>
 
 #include <mitkBaseProperty.h>
+#include <mitkDataNode.h>
 #include <mitkProperties.h>
 #include <mitkAnnotationProperty.h>
 #include <mitkClippingProperty.h>

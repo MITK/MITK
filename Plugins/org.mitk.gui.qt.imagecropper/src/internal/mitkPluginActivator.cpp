@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkBoundingShapeObjectFactory.h>
+#include <mitkBoundingShapeMapperProviders.h>
 
 #include "mitkPluginActivator.h"
 #include "QmitkImageCropperView.h"
@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 void mitk::mitkPluginActivator::start(ctkPluginContext* context)
 {
-  RegisterBoundingShapeObjectFactory();
+  RegisterBoundingShapeMapperProviders();
   BERRY_REGISTER_EXTENSION_CLASS(QmitkImageCropperView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertGeometryDataToROIAction, context)
 }

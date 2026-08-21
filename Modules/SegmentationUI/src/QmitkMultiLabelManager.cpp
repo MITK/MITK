@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkAutoCropImageFilter.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>

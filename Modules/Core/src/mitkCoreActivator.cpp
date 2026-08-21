@@ -38,6 +38,21 @@ found in the LICENSE file.
 // PropertyRelationRules
 #include <mitkPropertyRelationRuleBase.h>
 
+// Mapper providers
+#include <mitkBaseRenderer.h>
+#include <mitkCrosshairData.h>
+#include <mitkCrosshairVtkMapper2D.h>
+#include <mitkImageVtkMapper2D.h>
+#include <mitkMapperProviderBase.h>
+#include <mitkMapperProviderRegistry.h>
+#include <mitkPlaneGeometryData.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkPlaneGeometryDataVtkMapper3D.h>
+#include <mitkPointSetVtkMapper2D.h>
+#include <mitkPointSetVtkMapper3D.h>
+#include <mitkSurfaceVtkMapper2D.h>
+#include <mitkSurfaceVtkMapper3D.h>
+
 // Micro Services
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -280,6 +295,9 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_MimeTypeProvider->Start();
   m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
 
+  mitk::MapperProviderRegistry::GetInstance().Start(context);
+  this->RegisterMapperProviders();
+
   this->RegisterDefaultMimeTypes();
   this->RegisterItkReaderWriter();
   this->RegisterVtkReaderWriter();
@@ -346,6 +364,10 @@ void MitkCoreActivator::Unload(us::ModuleContext *)
   m_MimeTypeProviderReg.Unregister();
   m_MimeTypeProvider->Stop();
 
+  // Same reasoning for the service tracker of the MapperProviderRegistry.
+  m_MapperProviders.clear();
+  mitk::MapperProviderRegistry::GetInstance().Stop();
+
   for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = m_DefaultMimeTypes.begin(),
                                                            iterEnd = m_DefaultMimeTypes.end();
        mimeTypeIter != iterEnd;
@@ -353,6 +375,28 @@ void MitkCoreActivator::Unload(us::ModuleContext *)
   {
     delete *mimeTypeIter;
   }
+}
+
+void MitkCoreActivator::RegisterMapperProviders()
+{
+  using namespace mitk;
+
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<ImageVtkMapper2D, Image>>(BaseRenderer::Standard2D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<PlaneGeometryDataMapper2D, PlaneGeometryData>>(BaseRenderer::Standard2D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<PlaneGeometryDataVtkMapper3D, PlaneGeometryData>>(BaseRenderer::Standard3D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<SurfaceVtkMapper2D, Surface>>(BaseRenderer::Standard2D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<SurfaceVtkMapper3D, Surface>>(BaseRenderer::Standard3D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<PointSetVtkMapper2D, PointSet>>(BaseRenderer::Standard2D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<PointSetVtkMapper3D, PointSet>>(BaseRenderer::Standard3D));
+  m_MapperProviders.push_back(
+    std::make_unique<MapperProviderBase<CrosshairVtkMapper2D, CrosshairData>>(BaseRenderer::Standard2D));
 }
 
 void MitkCoreActivator::RegisterDefaultMimeTypes()

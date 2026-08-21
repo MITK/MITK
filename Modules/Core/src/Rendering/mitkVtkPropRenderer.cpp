@@ -74,28 +74,10 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
 
-  // vtkLight's ambient colour defaults to black and vtkLightKit never sets
-  // it, so the GPU volume ray caster - which scales vtkVolumeProperty's
-  // ambient coefficient by the summed light ambient colours - would render
-  // that coefficient inert. Normalising the sum to 1.0 keeps the
-  // coefficient on the same scale as VTK's single-headlight branch.
-  double totalIntensity = 0.0;
-  auto *lights = m_VtkRenderer->GetLights();
+  m_KeyLight = nullptr;
+  m_LightingMode = LightingMode::Studio;
 
-  for (auto *light : vtk::Range(lights))
-  {
-    totalIntensity += light->GetIntensity();
-  }
-
-  if (totalIntensity > 0.0)
-  {
-    const double ambient = 1.0 / totalIntensity;
-
-    for (auto *light : vtk::Range(lights))
-    {
-      light->SetAmbientColor(ambient, ambient, ambient);
-    }
-  }
+  this->NormalizeLightAmbientColors();
 
   m_PickingMode = WorldPointPicking;
 }
@@ -114,6 +96,9 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
   if (m_LightKit != nullptr)
     m_LightKit->Delete();
 
+  if (m_KeyLight != nullptr)
+    m_KeyLight->Delete();
+
   if (m_VtkRenderer != nullptr)
   {
     m_CameraController = nullptr;
@@ -131,6 +116,78 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_PointPicker->Delete();
   if (m_CellPicker != nullptr)
     m_CellPicker->Delete();
+}
+
+void mitk::VtkPropRenderer::NormalizeLightAmbientColors()
+{
+  // vtkLight's ambient colour defaults to black and vtkLightKit never sets
+  // it, so the GPU volume ray caster - which sums each light's ambient colour
+  // scaled by that light's intensity - would render vtkVolumeProperty's
+  // ambient coefficient inert. Normalising the sum to 1.0 keeps the
+  // coefficient on the same scale whichever rig is installed.
+  auto *lights = m_VtkRenderer->GetLights();
+  double totalIntensity = 0.0;
+
+  for (auto *light : vtk::Range(lights))
+  {
+    // Only switched-on lights reach the shader, so only they may contribute
+    // to the sum the normalisation has to cancel.
+    if (light->GetSwitch() > 0)
+      totalIntensity += light->GetIntensity();
+  }
+
+  if (totalIntensity <= 0.0)
+    return;
+
+  const double ambient = 1.0 / totalIntensity;
+
+  for (auto *light : vtk::Range(lights))
+  {
+    light->SetAmbientColor(ambient, ambient, ambient);
+  }
+}
+
+void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
+{
+  // 2D renderers have their lights removed on purpose, to keep grey values
+  // faithful to the data; installing either rig would undo that.
+  if (this->GetMapperID() != Standard3D || mode == m_LightingMode)
+    return;
+
+  if (mode == LightingMode::KeyLight)
+  {
+    m_LightKit->RemoveLightsFromRenderer(m_VtkRenderer);
+
+    if (m_KeyLight == nullptr)
+    {
+      m_KeyLight = vtkLight::New();
+      // Camera-relative, so orbiting never leaves the subject unlit. Sitting
+      // off-axis is the point: a headlight casts no visible shadow at all,
+      // because everything it lights is what the camera already sees.
+      // SetLightType clears the transform, so it has to precede the angle.
+      m_KeyLight->SetLightTypeToCameraLight();
+      m_KeyLight->SetDirectionAngle(25.0, 48.0);
+      m_KeyLight->SetIntensity(1.0);
+    }
+
+    m_VtkRenderer->AddLight(m_KeyLight);
+  }
+  else
+  {
+    if (m_KeyLight != nullptr)
+      m_VtkRenderer->RemoveLight(m_KeyLight);
+
+    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+  }
+
+  m_LightingMode = mode;
+
+  this->NormalizeLightAmbientColors();
+}
+
+mitk::VtkPropRenderer::LightingMode mitk::VtkPropRenderer::GetLightingMode() const
+{
+  return m_LightingMode;
 }
 
 void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage *storage)

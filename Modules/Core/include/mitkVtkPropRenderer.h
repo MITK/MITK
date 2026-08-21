@@ -131,6 +131,40 @@ namespace mitk
      */
     void Resize(int w, int h) override;
 
+    /**
+     * \brief Lighting rig for the 3D scene.
+     *
+     * The GPU volume ray caster casts one shadow ray per light per sample when
+     * volumetric scattering is enabled, so a multi-light rig costs
+     * proportionally more and refills the shadows its key light carves.
+     * KeyLight trades the studio rig's even coverage for the single
+     * directional source that scattering needs.
+     */
+    enum class LightingMode
+    {
+      /** vtkLightKit: key, fill, head and two back lights. The default. */
+      Studio,
+      /** A single off-axis directional key light. */
+      KeyLight
+    };
+
+    /**
+     * \brief Select the lighting rig for this renderer.
+     *
+     * Lights belong to the renderer, so this affects every lit prop in the
+     * scene rather than any single one. Has no effect on 2D renderers, which
+     * deliberately carry no lights.
+     *
+     * \param[in] mode The rig to install.
+     */
+    void SetLightingMode(LightingMode mode);
+
+    /**
+     * \brief Return the active lighting rig.
+     * \return The currently installed lighting mode.
+     */
+    LightingMode GetLightingMode() const;
+
     // Picking
     enum PickingMode
     {
@@ -257,6 +291,9 @@ namespace mitk
     /** \brief Set parallel projection, remove the interactor and the lights of VTK. */
     bool Initialize2DvtkCamera();
 
+    /** \brief Rescale the lights' ambient colours so their weighted sum stays 1.0. */
+    void NormalizeLightAmbientColors();
+
     bool m_InitNeeded;
     bool m_ResizeNeeded;
     MapperSlotId m_CameraInitializedForMapperID;
@@ -272,6 +309,8 @@ namespace mitk
     itk::SmartPointer<mitk::Mapper> m_CurrentWorldPlaneGeometryMapper;
 
     vtkLightKit *m_LightKit;
+    vtkLight *m_KeyLight;
+    LightingMode m_LightingMode;
 
     // sorted list of mappers
     MappersMapType m_MappersMap;

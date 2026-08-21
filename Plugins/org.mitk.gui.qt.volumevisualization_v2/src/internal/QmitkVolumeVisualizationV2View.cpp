@@ -35,7 +35,6 @@ found in the LICENSE file.
 #include <ctkDoubleSlider.h>
 #include <ctkSliderWidget.h>
 
-#include <QApplication>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -189,13 +188,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     m_Controls->cinematicModeComboBox->addItem(QString(preset.label));
   }
 
-  // Children of a ctkCollapsibleGroupBox inherit its ctkProxyStyle, whose every
-  // override dereferences a QPointer base style that ctkProxyStyle::ensureBaseStyle
-  // leaves unset on its re-entrancy path. Opening a combo box popup issues exactly
-  // the nested style queries that hit it, so give this box the application style
-  // instead. Rendering is unaffected: the proxy only alters the check indicator,
-  // and only for the group box itself.
-  m_Controls->cinematicModeComboBox->setStyle(QApplication::style());
+  m_Controls->lightingPanel->setVisible(false);
 
   m_Controls->tfControlPanelsWidget->setVisible(false);
   m_Controls->cancelTfCreationButton->setVisible(false);
@@ -225,6 +218,8 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
 
   // Lighting Option Controls
+  connect(m_Controls->lightingExpandButton, &ctkExpandButton::toggled,
+    m_Controls->lightingPanel, &QWidget::setVisible);
   connect(m_Controls->shadeCheckBox, &QCheckBox::toggled,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
   connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
@@ -500,7 +495,8 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   if (selectedNode.IsNotNull())
     selectedNode->GetBoolProperty("volumerendering", volumeRenderingOn);
 
-  m_Controls->lightingGroupBox->setEnabled(volumeRenderingOn);
+  m_Controls->lightingExpandButton->setEnabled(volumeRenderingOn);
+  m_Controls->lightingPanel->setEnabled(volumeRenderingOn);
 
   if (!volumeRenderingOn)
     return;

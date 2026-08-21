@@ -309,13 +309,26 @@
     </widget>
    </item>
    <item>
-    <widget class="ctkCollapsibleGroupBox" name="lightingGroupBox">
-     <property name="title">
+    <widget class="ctkExpandButton" name="lightingExpandButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
       <string>Lighting/Shading Options</string>
      </property>
-     <property name="collapsed" stdset="0">
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+     </property>
+     <property name="mirrorOnExpand" stdset="0">
       <bool>true</bool>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="lightingPanel" native="true">
      <layout class="QGridLayout" name="shadingLayout">
       <item row="0" column="0" colspan="2">
        <widget class="QCheckBox" name="shadeCheckBox">
@@ -457,10 +470,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ctkCollapsibleGroupBox</class>
-   <extends>QGroupBox</extends>
-   <header location="global">ctkCollapsibleGroupBox.h</header>
-   <container>1</container>
+   <class>ctkExpandButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">ctkExpandButton.h</header>
   </customwidget>
   <customwidget>
    <class>ctkSliderWidget</class>

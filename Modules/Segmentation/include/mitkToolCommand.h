@@ -13,20 +13,22 @@ found in the LICENSE file.
 #ifndef mitkToolCommand_h
 #define mitkToolCommand_h
 
-#include <itkCommand.h>
-#include <mitkCommon.h>
 #include <MitkSegmentationExports.h>
+
+#include <itkCommand.h>
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
-   * \brief ITK command for tracking progress of segmentation tool operations.
+   * \brief Forwards the progress of an observed ITK filter to a ProgressTask.
    *
-   * This command can be registered as an observer on ITK filters to receive
-   * ProgressEvent and IterationEvent notifications. It updates the MITK
-   * progress bar accordingly.
+   * Attach it to a filter as an observer of itk::ProgressEvent. If the task it
+   * reports into is cancelled, the command aborts the observed filter, which
+   * is the only place that can act on the request.
    *
-   * \sa SegWithPreviewTool, ProgressBar
+   * \sa SegWithPreviewTool, ProgressTask
    */
   class MITKSEGMENTATION_EXPORT ToolCommand : public itk::Command
   {
@@ -38,49 +40,35 @@ namespace mitk
     itkCloneMacro(Self);
 
     /**
-     * \brief Handles events from ITK filters (e.g. ProgressEvent, IterationEvent).
+     * \brief Report the progress of the caller and honour a cancel request.
+     *
      * \param[in] caller The ITK object that triggered the event.
      * \param[in] event The event object.
      */
     void Execute(itk::Object *caller, const itk::EventObject &event) override;
 
     /**
-     * \brief Const version of Execute (not implemented).
-     * \param[in] object The ITK object that triggered the event.
+     * \brief Report the progress of the caller.
+     *
+     * \param[in] caller The ITK object that triggered the event.
      * \param[in] event The event object.
      */
-    void Execute(const itk::Object *object, const itk::EventObject &event) override;
+    void Execute(const itk::Object *caller, const itk::EventObject &event) override;
 
     /**
-     * \brief Adds new steps to the progress bar total.
-     * \param[in] steps Number of steps to add.
+     * \brief Report into the given task, or nowhere if it is nullptr.
+     *
+     * The command does not own the task and must not outlive it.
+     *
+     * \param[in] task The task of the operation the observed filter is part of.
      */
-    void AddStepsToDo(int steps);
-
-    /**
-     * \brief Sets the progress to the given number of completed steps.
-     * \param[in] steps Number of completed steps.
-     */
-    void SetProgress(int steps);
-
-    /**
-     * \brief Returns the current progress value.
-     * \return Current progress as a double.
-     */
-    double GetCurrentProgressValue();
-
-    /**
-     * \brief Sets the stop processing flag to abort the current operation.
-     * \param[in] value If true, signals the operation to stop.
-     */
-    void SetStopProcessing(bool value);
+    void SetProgressTask(ProgressTask *task);
 
   protected:
     ToolCommand();
 
   private:
-    double m_ProgressValue;
-    bool m_StopProcessing;
+    ProgressTask *m_ProgressTask;
   };
 
 } // namespace mitk

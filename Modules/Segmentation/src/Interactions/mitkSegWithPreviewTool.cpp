@@ -12,6 +12,31 @@ found in the LICENSE file.
 
 #include <mitkSegWithPreviewTool.h>
 
+namespace
+{
+  /** Detaches the task from the command again once the update ends. */
+  class ScopedProgressTask
+  {
+  public:
+    ScopedProgressTask(mitk::ToolCommand* command, mitk::ProgressTask* task)
+      : m_Command(command)
+    {
+      m_Command->SetProgressTask(task);
+    }
+
+    ~ScopedProgressTask()
+    {
+      m_Command->SetProgressTask(nullptr);
+    }
+
+    ScopedProgressTask(const ScopedProgressTask&) = delete;
+    ScopedProgressTask& operator=(const ScopedProgressTask&) = delete;
+
+  private:
+    mitk::ToolCommand* m_Command;
+  };
+}
+
 #include <mitkToolManager.h>
 
 #include <mitkColorProperty.h>
@@ -30,6 +55,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkSegTool2D.h>
 
+#include <mitkProgressTask.h>
 #include <mitkSegChangeOperationApplier.h>
 
 #include <algorithm>
@@ -651,8 +677,10 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 {
   const auto inputImage = this->GetSegmentationInput();
   auto previewImage = this->GetPreviewSegmentation();
-  int progress_steps = 200;
   this->EnsureUpToDateUserDefinedActiveLabel();
+
+  mitk::ProgressTask task(this->GetName(), 100, true);
+  ScopedProgressTask scopedTask(m_ProgressCommand, &task);
 
   const auto workingSegmentation = this->GetTargetSegmentation();
   const auto workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
@@ -668,8 +696,6 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   {
     if (nullptr != inputImage && nullptr != previewImage)
     {
-      m_ProgressCommand->AddStepsToDo(progress_steps);
-
       if (previewImage->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
@@ -723,11 +749,14 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   }
   catch (const itk::ExceptionObject& e)
   {
-    MITK_ERROR << "Exception caught: " << e.GetDescription();
-
-    m_ProgressCommand->SetProgress(progress_steps);
-
-    ErrorMessage.Send(e.GetDescription());
+    // A cancelled preview aborts the filter, which reports the abort as an
+    // exception. Reporting that back as an error would turn the user's own
+    // decision into a failure message.
+    if (!task.IsCancelRequested())
+    {
+      MITK_ERROR << "Exception caught: " << e.GetDescription();
+      ErrorMessage.Send(e.GetDescription());
+    }
   }
   catch (const std::exception& e)
   {
@@ -735,14 +764,10 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     // unsupported pixel type ends up in the error message as well instead of
     // unwinding through the tool activation.
     MITK_ERROR << "Exception caught: " << e.what();
-
-    m_ProgressCommand->SetProgress(progress_steps);
-
     ErrorMessage.Send(e.what());
   }
   catch (...)
   {
-    m_ProgressCommand->SetProgress(progress_steps);
     m_IsUpdating = false;
     CurrentlyBusy.Send(false);
     throw;
@@ -750,7 +775,6 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   this->UpdateCleanUp();
   m_LastTimePointOfUpdate = timePoint;
-  m_ProgressCommand->SetProgress(progress_steps);
   m_IsUpdating = false;
   CurrentlyBusy.Send(false);
 }

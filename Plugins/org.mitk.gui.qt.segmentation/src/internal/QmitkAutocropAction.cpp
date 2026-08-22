@@ -14,13 +14,10 @@ found in the LICENSE file.
 #include <mitkAutoCropImageFilter.h>
 #include <mitkImageCast.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkProgressTask.h>
 #include <mitkRenderingManager.h>
-#include <mitkProgressBar.h>
 
 #include <itkConstantPadImageFilter.h>
-
-//needed for qApp
-#include <QCoreApplication>
 
 QmitkAutocropAction::QmitkAutocropAction()
 {
@@ -39,10 +36,8 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNull()) return;
 
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-      mitk::ProgressBar::GetInstance()->Progress(2);
-
-      qApp->processEvents();
+      mitk::ProgressTask task("Cropping image", 10);
+      task.Progress(2);
 
       mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
       cropFilter->SetInput( image );
@@ -108,7 +103,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
       {
         MITK_ERROR << "Cropping image failed...";
       }
-      mitk::ProgressBar::GetInstance()->Progress(8);
+      task.Progress(8);
     }
     else
     {

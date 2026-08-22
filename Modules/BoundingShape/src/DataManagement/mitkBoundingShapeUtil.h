@@ -17,10 +17,16 @@ found in the LICENSE file.
 #include <mitkBaseGeometry.h>
 #include <mitkInteractionConst.h>
 
+#include <vtkSmartPointer.h>
+
 #include <array>
+
+class vtkPolyData;
 
 namespace mitk
 {
+  class PlaneGeometry;
+
   /**
   * \brief helper function for calculating corner points of the bounding object from a given geometry
   */
@@ -31,97 +37,75 @@ namespace mitk
   */
   mitk::Point3D CalcAvgPoint(mitk::Point3D a, mitk::Point3D b);
 
-  /**
-   * \brief Return the four corner-point indices that define the face associated with the given handle index.
-   *
-   * \param index The handle index (0-5), corresponding to a face of the bounding box.
-   * \return A vector of four indices into the corner points array.
-   */
-  std::vector<int> GetHandleIndices(int index);
+  /** \brief The bound of one index axis a handle moves when dragged. */
+  enum class MovedBound
+  {
+    None,
+    Minimum,
+    Maximum
+  };
+
+  /** \brief Per index axis (x, y, z): the bound a handle moves when dragged. */
+  using AxisMovedBounds = std::array<MovedBound, 3>;
+
+  /** \brief Fallback for the "Bounding Shape.Handle Size Factor" node property when it is not set. */
+  constexpr double DefaultHandleSizeFactor = 0.02;
 
   /**
-   * \brief Return the four corner-point indices of the box face that the given handle sits on,
-   *        ordered along the face perimeter so that consecutive indices (and the last-to-first
-   *        pair) form the four face edges.
-   *
-   * This is the face that is moved when the handle is dragged. In contrast to GetHandleIndices,
-   * which returns the opposite (anchor) face used during scaling, this returns the handle's own
-   * face in a winding order suitable for edge-based geometry such as plane intersection.
-   *
-   * \param handleIndex The handle index (0-5).
-   */
-  std::array<int, 4> GetHandleFaceCornerIndices(int handleIndex);
-
-  /**
-   * \brief Intersect a planar, convex quad (given by its four perimeter-ordered corner points)
-   *        with a plane and return the center of the resulting intersection segment.
-   *
-   * Used to position a face handle where its box face crosses the current slice plane, so the
-   * handle stays on the rendered cross-section outline for arbitrarily oriented (oblique) boxes.
-   *
-   * \param faceCorners The four corner points of the face, in perimeter (winding) order.
-   * \param planeOrigin A point on the plane.
-   * \param planeNormal The plane normal (need not be normalized).
-   * \param[out] center The center of the intersection segment, valid only if the function returns true.
-   * \return true if the plane crosses the face (the handle is visible on this slice), false otherwise.
-   */
-  bool GetFacePlaneIntersectionCenter(const std::array<mitk::Point3D, 4> &faceCorners,
-                                      const mitk::Point3D &planeOrigin,
-                                      const mitk::Vector3D &planeNormal,
-                                      mitk::Point3D &center);
-
-  /**
-  * \brief Helper Class for realizing the handles of bounding object encapsulated by a geometry data
+  * \brief A single interaction handle of the bounding shape: its id, world position,
+  *        and the index-space bounds it moves when dragged.
+  *
+  * The id is unified across the interactor and both mappers (communicated via the
+  * "Bounding Shape.Active Handle ID" node property): 0-5 face handles, 6-17 edge
+  * handles (6 + edge index).
   * \ingroup Data
   */
   class Handle final
   {
   public:
-    /** \brief Default constructor. Creates an inactive handle at the origin. */
+    /** \brief Creates an invalid handle (index -1) that moves no bounds. */
     Handle();
 
-    /**
-     * \brief Construct a handle with a given position, index, and associated face indices.
-     *
-     * \param pos The 3D position of the handle.
-     * \param index The handle index (0-5).
-     * \param faceIndices Indices of the four corner points forming the associated face.
-     * \param active Whether the handle is initially active.
-     */
-    Handle(mitk::Point3D pos, int index, std::vector<int> faceIndices, bool active = false);
+    Handle(const Point3D &position, int index, const AxisMovedBounds &movedBounds);
 
-    ~Handle();
+    int GetIndex() const;
 
-    /** \brief Return true if the handle is currently active (selected). */
-    bool IsActive();
+    /** \brief Per index axis: the bound this handle moves when dragged. */
+    const AxisMovedBounds &GetMovedBounds() const;
 
-    /** \brief Return true if the handle is not active. */
-    bool IsNotActive();
-
-    /** \brief Set the active (selected) state of the handle. */
-    void SetActive(bool status);
-
-    /** \brief Set the index identifying this handle. */
-    void SetIndex(int index);
-
-    /** \brief Return the index identifying this handle. */
-    int GetIndex();
-
-    /** \brief Return the corner-point indices of the face associated with this handle. */
-    std::vector<int> GetFaceIndices();
-
-    /** \brief Set the 3D world position of the handle. */
-    void SetPosition(mitk::Point3D pos);
-
-    /** \brief Return the 3D world position of the handle. */
-    mitk::Point3D GetPosition();
+    Point3D GetPosition() const;
 
   private:
-    bool m_IsActive;
-    mitk::Point3D m_Position;
-    std::vector<int> m_FaceIndices;
+    Point3D m_Position;
     int m_Index;
+    AxisMovedBounds m_MovedBounds;
   };
+
+  /**
+   * \brief Compute the handles visible in one render window.
+   *
+   * For a 3D render window (\p planeGeometry is nullptr): the 6 face handles at the face
+   * centers. For a 2D render window (\p planeGeometry is the valid slice plane): the face
+   * handles at the centers of their face/plane intersection segments plus an edge handle
+   * wherever a box edge crosses the plane, together tracing the rendered cross-section
+   * outline with handles on its sides and corners, also for oblique boxes. Handles whose
+   * geometry does not cross the plane are omitted.
+   *
+   * \param cornerPoints The 8 box corners from GetCornerPoints() (corner index = 4x + 2y + z,
+   *        bit set = maximum bound).
+   * \param planeGeometry The slice plane of a 2D render window (must be valid), or nullptr
+   *        for a 3D render window.
+   */
+  std::vector<Handle> ComputeHandles(const std::vector<Point3D> &cornerPoints,
+                                     const PlaneGeometry *planeGeometry);
+
+  /**
+   * \brief Create the marker polydata for one handle: a cube of edge length \p size,
+   *        oriented with the direction cosines of \p geometry and centered at \p center.
+   */
+  vtkSmartPointer<vtkPolyData> CreateHandlePolyData(const BaseGeometry *geometry,
+                                                    const Point3D &center,
+                                                    double size);
 }
 
 #endif

@@ -19,8 +19,6 @@ found in the LICENSE file.
 
 #include <usServiceRegistration.h>
 
-#include <array>
-
 #include <MitkBoundingShapeExports.h>
 
 namespace mitk
@@ -40,9 +38,12 @@ namespace mitk
    * mouse-based handle manipulation. Inherits from DataInteractor, providing
    * state machine and configurable input support.
    *
-   * The interactor manages 6 face handles that can be dragged to resize the
-   * bounding box, and supports translating the entire box by dragging the body.
-   * Visual feedback is provided through color changes on hover and selection.
+   * The interactor manages handles that can be dragged to resize the bounding
+   * box: face handles resize one axis; in 2D render windows, additional handles
+   * on the corners of the rendered cross-section resize both in-plane axes at
+   * once. In 2D render windows the entire box can be translated by dragging
+   * its body. Visual feedback is provided through color changes on hover and
+   * selection.
    *
    * \sa BoundingShapeCropper, BoundingShapeVtkMapper2D, BoundingShapeVtkMapper3D, DataInteractor
    * \ingroup Interaction
@@ -79,16 +80,13 @@ namespace mitk
     void DataNodeChanged() override;
 
     /**
-     * @brief Updates the handle positions for the renderer of the given event and reports which
-     *        handles are visible there.
+     * @brief Recomputes the handles visible in the render window of the given event.
      *
-     * In a 2D render window a handle is placed where its box face crosses the current slice and is
-     * visible only when that intersection exists; in the 3D render window handles sit at the face
-     * centers and are always visible. \p handleVisible is filled accordingly.
+     * In a 2D render window handles sit on the sides and corners of the rendered cross-section
+     * (only where the box crosses the current slice); in the 3D render window face and corner
+     * handles cover the whole box. \p center is set to the box center.
      */
-    void HandlePositionChanged(const InteractionEvent *interactionEvent,
-                               Point3D &center,
-                               std::array<bool, 6> &handleVisible);
+    void HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center);
 
     /**
     * @brief Checks if the mouse pointer is over the object.

@@ -17,10 +17,12 @@ found in the LICENSE file.
 #include <vtkActor2D.h>
 #include <vtkAppendPolyData.h>
 #include <vtkCoordinate.h>
+#include <vtkCubeSource.h>
 #include <vtkMath.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
+#include <vtkProperty.h>
 #include <vtkProperty2D.h>
 #include <vtkStripper.h>
 #include <vtkTransformFilter.h>
@@ -33,16 +35,6 @@ namespace mitk
   class BoundingShapeVtkMapper2D::Impl
   {
   public:
-    Impl()
-    {
-      Point3D initialPoint;
-      initialPoint.Fill(0);
-
-      for (int i = 0; i < 6; ++i)
-        HandlePropertyList.push_back(Handle(initialPoint, i, GetHandleIndices(i)));
-    }
-
-    std::vector<Handle> HandlePropertyList;
     mitk::LocalStorageHandler<LocalStorage> LocalStorageHandler;
   };
 }
@@ -62,6 +54,9 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
 {
   m_Actor->SetMapper(m_Mapper);
   m_Actor->VisibilityOn();
+  // the cross-section is an interaction widget and keeps its nominal color regardless
+  // of scene lighting
+  m_Actor->GetProperty()->LightingOff();
 
   m_HandleActor->SetMapper(m_HandleMapper);
   m_HandleActor->VisibilityOn();
@@ -76,9 +71,6 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
   tcoord->Delete();
 
   m_Cutter->SetCutFunction(m_CuttingPlane);
-
-  for (int i = 0; i < 6; ++i)
-    m_Handles.push_back(vtkSmartPointer<vtkCubeSource>::New());
 
   m_PropAssembly->AddPart(m_Actor);
   m_PropAssembly->AddPart(m_HandleActor);
@@ -275,7 +267,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       if (handleSizeProperty != nullptr)
         initialHandleSize = handleSizeProperty->GetValue();
       else
-        initialHandleSize = 0.02;
+        initialHandleSize = DefaultHandleSizeFactor;
 
       mitk::Point2D displaySize = renderer->GetDisplaySizeInMM();
       double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
@@ -285,66 +277,21 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       mitk::IntProperty::Pointer activeHandleId =
         dynamic_cast<mitk::IntProperty *>(node->GetProperty("Bounding Shape.Active Handle ID"));
 
-      // direction cosines of the geometry, used to orient the handle markers with the box
-      double dirCos[3][3];
-      for (int c = 0; c < 3; ++c)
-        for (int r = 0; r < 3; ++r)
-          dirCos[r][c] = imageTransform->GetElement(r, c) / spacing[c];
-
-      const Point3D planeOrigin = planeGeometry->GetOrigin();
-      const Vector3D planeNormal = planeGeometry->GetNormal();
-
       bool visible = false;
       bool selected = false;
-      for (unsigned int handleIdx = 0; handleIdx < localStorage->m_Handles.size(); ++handleIdx)
+      for (const auto &handle : ComputeHandles(cornerPoints, planeGeometry))
       {
-        // place the handle where its box face crosses the current slice, so it stays on the
-        // rendered cross-section outline for oblique boxes; hide it when the slice misses the face
-        const std::array<int, 4> faceCornerIndices = GetHandleFaceCornerIndices(handleIdx);
-        const std::array<Point3D, 4> faceCorners = {cornerPoints[faceCornerIndices[0]],
-                                                    cornerPoints[faceCornerIndices[1]],
-                                                    cornerPoints[faceCornerIndices[2]],
-                                                    cornerPoints[faceCornerIndices[3]]};
-        Point3D handleCenter;
-        if (!GetFacePlaneIntersectionCenter(faceCorners, planeOrigin, planeNormal, handleCenter))
-          continue;
+        auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
 
-        auto &handle = localStorage->m_Handles[handleIdx];
-        handle->SetXLength(handleSize);
-        handle->SetYLength(handleSize);
-        handle->SetZLength(handleSize);
-        handle->SetCenter(0.0, 0.0, 0.0);
-
-        // orient the marker with the box and move it onto the handle position
-        auto handleMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
-        handleMatrix->Identity();
-        for (int c = 0; c < 3; ++c)
-          for (int r = 0; r < 3; ++r)
-            handleMatrix->SetElement(r, c, dirCos[r][c]);
-        handleMatrix->SetElement(0, 3, handleCenter[0]);
-        handleMatrix->SetElement(1, 3, handleCenter[1]);
-        handleMatrix->SetElement(2, 3, handleCenter[2]);
-
-        auto handleTransform = vtkSmartPointer<vtkTransform>::New();
-        handleTransform->SetMatrix(handleMatrix);
-
-        auto handleTransformFilter = vtkSmartPointer<vtkTransformFilter>::New();
-        handleTransformFilter->SetInputConnection(handle->GetOutputPort());
-        handleTransformFilter->SetTransform(handleTransform);
-        handleTransformFilter->Update();
-
-        auto orientedHandle = vtkSmartPointer<vtkPolyData>::New();
-        orientedHandle->DeepCopy(handleTransformFilter->GetPolyDataOutput());
-
-        if (activeHandleId != nullptr && activeHandleId->GetValue() == static_cast<int>(handleIdx))
+        if (activeHandleId != nullptr && activeHandleId->GetValue() == handle.GetIndex())
         {
-          localStorage->m_SelectedHandleMapper->SetInputData(orientedHandle);
+          localStorage->m_SelectedHandleMapper->SetInputData(handlePolyData);
           localStorage->m_SelectedHandleActor->VisibilityOn();
           selected = true;
         }
         else
         {
-          appendPoly->AddInputData(orientedHandle);
+          appendPoly->AddInputData(handlePolyData);
         }
         visible = true;
       }

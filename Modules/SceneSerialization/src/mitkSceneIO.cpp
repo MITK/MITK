@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <mitkSceneReader.h>
 
 #include <mitkBaseRenderer.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkLocaleSwitch.h>
@@ -329,7 +329,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         return false;
       }
 
-      ProgressBar::GetInstance()->AddStepsToDo(sceneNodes->size());
+      ProgressTask task("Saving scene", static_cast<unsigned int>(sceneNodes->size()));
 
       // find out about dependencies
       typedef std::map<DataNode *, std::string> UIDMapType;
@@ -466,7 +466,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           MITK_WARN << "Ignoring nullptr node during scene serialization.";
         }
 
-        ProgressBar::GetInstance()->Progress();
+        task.Progress();
       } // end for all nodes
     }   // end if sceneNodes
 

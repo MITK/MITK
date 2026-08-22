@@ -21,7 +21,6 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkProgressBar.h>
 #include <mitkProperties.h>
 #include <mitkSceneIO.h>
 
@@ -101,8 +100,6 @@ void QmitkExtFileSaveProjectAction::Run()
 
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-
     /* Build list of nodes that should be saved */
     mitk::NodePredicateNot::Pointer isNotHelperObject =
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
@@ -116,8 +113,6 @@ void QmitkExtFileSaveProjectAction::Run()
                                QMessageBox::Ok);
 
     }
-    mitk::ProgressBar::GetInstance()->Progress(2);
-
     mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
     if (!failedNodes->empty())
     {

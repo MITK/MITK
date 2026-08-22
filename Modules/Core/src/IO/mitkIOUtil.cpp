@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
 #include <mitkIMimeTypeProvider.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkStandaloneDataStorage.h>
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>
@@ -38,6 +38,7 @@ found in the LICENSE file.
 
 #include <cerrno>
 #include <cstdlib>
+#include <optional>
 
 static std::string GetLastErrorStr()
 {
@@ -578,7 +579,8 @@ namespace mitk
   std::string IOUtil::Load(std::vector<LoadInfo> &loadInfos,
                            DataStorage::SetOfObjects *nodeResult,
                            DataStorage *ds,
-                           const ReaderOptionsFunctorBase *optionsCallback)
+                           const ReaderOptionsFunctorBase *optionsCallback,
+                           ProgressTask *task)
   {
     if (loadInfos.empty())
     {
@@ -586,7 +588,19 @@ namespace mitk
     }
 
     int filesToRead = loadInfos.size();
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2 * filesToRead);
+    const auto steps = static_cast<unsigned int>(2 * filesToRead);
+
+    std::optional<ProgressTask> ownTask;
+
+    if (nullptr == task)
+    {
+      ownTask.emplace("Loading files", steps);
+      task = &ownTask.value();
+    }
+    else
+    {
+      task->AddStepsToDo(steps);
+    }
 
     std::string errMsg;
 
@@ -737,7 +751,7 @@ namespace mitk
       {
         errMsg += "Exception occurred when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
       }
-      mitk::ProgressBar::GetInstance()->Progress(2);
+      task->Progress(2);
       --filesToRead;
     }
 
@@ -745,8 +759,6 @@ namespace mitk
     {
       MITK_ERROR << errMsg;
     }
-
-    mitk::ProgressBar::GetInstance()->Progress(2 * filesToRead);
 
     return errMsg;
   }
@@ -780,7 +792,7 @@ namespace mitk
     return data;
   }
 
-  BaseData::Pointer IOUtil::Load(const std::string& path, const PropertyList* properties)
+  BaseData::Pointer IOUtil::Load(const std::string& path, const PropertyList* properties, ProgressTask* task)
   {
     LoadInfo loadInfo(path);
     loadInfo.m_Properties = properties;
@@ -788,7 +800,7 @@ namespace mitk
     std::vector<LoadInfo> loadInfos;
     loadInfos.push_back(loadInfo);
 
-    auto errMsg = Load(loadInfos, nullptr, nullptr, nullptr);
+    auto errMsg = Load(loadInfos, nullptr, nullptr, nullptr, task);
 
     if (!errMsg.empty())
       mitkThrow() << errMsg;
@@ -890,7 +902,7 @@ namespace mitk
     }
 
     int filesToWrite = saveInfos.size();
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2 * filesToWrite);
+    mitk::ProgressTask task("Saving files", static_cast<unsigned int>(2 * filesToWrite));
 
     std::string errMsg;
 
@@ -975,7 +987,7 @@ namespace mitk
       if (setPathProperty)
         saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
 
-      mitk::ProgressBar::GetInstance()->Progress(2);
+      task.Progress(2);
       --filesToWrite;
     }
 
@@ -983,8 +995,6 @@ namespace mitk
     {
       MITK_ERROR << errMsg;
     }
-
-    mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
 
     return errMsg;
   }

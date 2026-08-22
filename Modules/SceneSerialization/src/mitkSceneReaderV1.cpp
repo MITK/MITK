@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <Poco/Path.h>
 #include <mitkBaseRenderer.h>
 #include <mitkIOUtil.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include "mitkPropertyListDeserializer.h"
 #include "mitkSceneReaderHelpers.h"
 #include <mitkSerializerMacros.h>
@@ -99,7 +99,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     ++listSize;
   }
 
-  ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
+  ProgressTask task("Loading scene", listSize * 2);
 
   // Deserialize base data properties before reading the actual data to be
   // able to provide them as read-only meta data to the data reader.
@@ -139,7 +139,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     }
 
     const auto *dataElement = element->FirstChildElement("data");
-    auto dataNode = this->LoadBaseDataFromDataTag(dataElement, properties, workingDirectory, error);
+    auto dataNode = this->LoadBaseDataFromDataTag(dataElement, properties, workingDirectory, task, error);
 
     if (dataNode.IsNull())
       continue;
@@ -154,7 +154,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 
     DataNodes.push_back(dataNode);
 
-    ProgressBar::GetInstance()->Progress();
+    task.Progress();
   }
 
   // iterate all nodes
@@ -206,7 +206,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
       }
     }
 
-    ProgressBar::GetInstance()->Progress();
+    task.Progress();
   } // end for all <node>
 
   // sort our nodes by their "layer" property
@@ -300,6 +300,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyxml2::XMLElement *dataElement,
                                                                      const PropertyList *properties,
                                                                      const std::string &workingDirectory,
+                                                                     ProgressTask &task,
                                                                      bool &error)
 {
   DataNode::Pointer node;
@@ -311,7 +312,9 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyx
     {
       try
       {
-        auto baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename, properties);
+        // Report into the scene's own task, so that reading its parts does
+        // not raise a notification per part.
+        auto baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename, properties, &task);
 
         node = DataNode::New();
         node->SetData(baseData);

@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitkExtWorkbenchWindowAdvisor.h"
 #include "QmitkExtActionBarAdvisor.h"
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QLayout>
 #include <QMenu>
@@ -369,37 +371,7 @@ public:
   {
     if (perspectivesClosed)
     {
-      QListIterator<QAction*> i(windowAdvisor->viewActions);
-      while (i.hasNext())
-      {
-        i.next()->setEnabled(true);
-      }
-
-      //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
-      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
-      {
-        windowAdvisor->openDicomEditorAction->setEnabled(true);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
-      {
-        windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(true);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
-      {
-        windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(true);
-      }
-
-      windowAdvisor->fileSaveProjectAction->setEnabled(true);
-      windowAdvisor->closeProjectAction->setEnabled(true);
-      windowAdvisor->undoAction->setEnabled(true);
-      windowAdvisor->redoAction->setEnabled(true);
-      windowAdvisor->imageNavigatorAction->setEnabled(true);
-      windowAdvisor->viewNavigatorAction->setEnabled(true);
-      windowAdvisor->resetPerspAction->setEnabled(true);
-      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
-      {
-        windowAdvisor->closePerspAction->setEnabled(true);
-      }
+      this->SetActionsEnabled(true);
     }
 
     perspectivesClosed = false;
@@ -419,41 +391,37 @@ public:
     if (allClosed)
     {
       perspectivesClosed = true;
-
-      QListIterator<QAction*> i(windowAdvisor->viewActions);
-      while (i.hasNext())
-      {
-        i.next()->setEnabled(false);
-      }
-
-      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
-      {
-        windowAdvisor->openDicomEditorAction->setEnabled(false);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
-      {
-        windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(false);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
-      {
-        windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(false);
-      }
-
-      windowAdvisor->fileSaveProjectAction->setEnabled(false);
-      windowAdvisor->closeProjectAction->setEnabled(false);
-      windowAdvisor->undoAction->setEnabled(false);
-      windowAdvisor->redoAction->setEnabled(false);
-      windowAdvisor->imageNavigatorAction->setEnabled(false);
-      windowAdvisor->viewNavigatorAction->setEnabled(false);
-      windowAdvisor->resetPerspAction->setEnabled(false);
-      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
-      {
-        windowAdvisor->closePerspAction->setEnabled(false);
-      }
+      this->SetActionsEnabled(false);
     }
   }
 
 private:
+  // The optional actions are created only when their editor or view is part of the
+  // build, so the null check stands in for repeating each creation condition here.
+  static void SetEnabled(QAction* action, bool enabled)
+  {
+    if (nullptr != action)
+      action->setEnabled(enabled);
+  }
+
+  void SetActionsEnabled(bool enabled)
+  {
+    for (auto viewAction : std::as_const(windowAdvisor->viewActions))
+      viewAction->setEnabled(enabled);
+
+    SetEnabled(windowAdvisor->openDicomEditorAction, enabled);
+    SetEnabled(windowAdvisor->openStdMultiWidgetEditorAction, enabled);
+    SetEnabled(windowAdvisor->openMxNMultiWidgetEditorAction, enabled);
+    SetEnabled(windowAdvisor->fileSaveProjectAction, enabled);
+    SetEnabled(windowAdvisor->closeProjectAction, enabled);
+    SetEnabled(windowAdvisor->undoAction, enabled);
+    SetEnabled(windowAdvisor->redoAction, enabled);
+    SetEnabled(windowAdvisor->imageNavigatorAction, enabled);
+    SetEnabled(windowAdvisor->viewNavigatorAction, enabled);
+    SetEnabled(windowAdvisor->resetPerspAction, enabled);
+    SetEnabled(windowAdvisor->closePerspAction, enabled);
+  }
+
   QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
   bool perspectivesClosed;
 };
@@ -607,6 +575,22 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const QString& wndIcon)
 
 namespace
 {
+  // Both help menu entries need org.blueberry.ui.qt.help: it contributes the help
+  // index view as well as the handler for the context help event.
+  bool IsHelpPluginAvailable()
+  {
+    auto context = QmitkCommonExtPlugin::getContext();
+
+    if (nullptr == context)
+      return false;
+
+    const auto plugins = context->getPlugins();
+
+    return std::any_of(plugins.cbegin(), plugins.cend(), [](const QSharedPointer<ctkPlugin>& plugin) {
+      return "org.blueberry.ui.qt.help" == plugin->getSymbolicName();
+    });
+  }
+
 #ifdef Q_OS_WIN
   // On Windows, use a borderless window instead of true full-screen. The render
   // views are OpenGL widgets, so Qt composites the whole window through OpenGL;
@@ -867,9 +851,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // ===== Help menu ====================================
     QMenu* helpMenu = menuBar->addMenu("&Help");
-    helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-    helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
-    helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
+
+    if (window->GetWorkbench()->GetIntroManager()->HasIntro())
+      helpMenu->addAction("&Welcome", this, SLOT(onIntro()));
+
+    if (IsHelpPluginAvailable())
+    {
+      helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
+      helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
+    }
+
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================
   }
@@ -893,7 +884,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
   imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
-  bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+  bool imageNavigatorViewFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.imagenavigator");
 
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
   {
@@ -928,7 +919,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
 
   viewNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
-  viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigator");
+  viewNavigatorFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator");
   if (viewNavigatorFound)
   {
     QObject::connect(viewNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onViewNavigator()));
@@ -1224,6 +1215,10 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 // to cover for all possible cases of closed pages etc.
 static void SafeHandleNavigatorView(QString view_query_name)
 {
+  // ShowView() throws for an unknown ID, which would escape into the Qt event loop.
+  if (!mitk::WorkbenchUtil::IsViewAvailable(view_query_name))
+    return;
+
   berry::IWorkbench* wbench = berry::PlatformUI::GetWorkbench();
   if( wbench == nullptr )
     return;
@@ -1385,6 +1380,10 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpView()
 {
+  // ShowView() throws for an unknown ID, which would escape into the Qt event loop.
+  if (!mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex"))
+    return;
+
   auto window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
   if (window.IsNull())
     return;

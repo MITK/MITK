@@ -202,6 +202,28 @@ namespace mitk {
      * @return \c true if the preference was set successfully, \c false otherwise.
      */
     static bool SetDepartmentLogoPreference(const QString& logoResource, ctkPluginContext* context);
+    /**
+     * Checks whether a view is registered in the running workbench.
+     *
+     * Which view plugins are built and installed is a configuration choice, so neither
+     * perspectives nor window advisors may assume that a view exists. Positioning an
+     * unknown view merely leaves a log entry, but berry::IWorkbenchPage::ShowView()
+     * throws.
+     *
+     * @param viewId The ID of the view as declared by the contributing plugin.
+     * @return \c true if the view is registered, \c false otherwise, including when
+     *         there is no running workbench.
+     */
+    static bool IsViewAvailable(const QString& viewId);
+    /**
+     * Returns the subset of the given view IDs that is available, preserving their order.
+     *
+     * @param viewIds The IDs of the views to check.
+     * @return The available view IDs.
+     *
+     * @see IsViewAvailable()
+     */
+    static QStringList FilterAvailableViewIds(const QStringList& viewIds);
   };
 }
 

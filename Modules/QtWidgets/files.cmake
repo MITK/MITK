@@ -46,6 +46,8 @@ set(CPP_FILES
   QmitkColoredNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
   QmitkProgressBar.cpp
+  QmitkProgressNotification.cpp
+  QmitkProgressNotificationOverlay.cpp
   QmitkPropertiesTableEditor.cpp
   QmitkPropertiesTableModel.cpp
   QmitkPropertyDelegate.cpp
@@ -104,6 +106,7 @@ set(UI_FILES
   QmitkMultiWidgetLayoutSelectionWidget.ui
   QmitkNodeSelectionDialog.ui
   QmitkNodeSelectionListItemWidget.ui
+  QmitkProgressNotification.ui
   QmitkRenderWindowContextDataStorageInspector.ui
   QmitkServiceListWidgetControls.ui
   QmitkSingleNodeSelectionWidget.ui

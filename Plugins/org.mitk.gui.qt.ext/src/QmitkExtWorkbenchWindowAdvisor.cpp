@@ -867,8 +867,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // ===== Help menu ====================================
     QMenu* helpMenu = menuBar->addMenu("&Help");
-    helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-    helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
+
+    if (window->GetWorkbench()->GetIntroManager()->HasIntro())
+      helpMenu->addAction("&Welcome", this, SLOT(onIntro()));
+
+    if (mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex"))
+      helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
+
     helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================
@@ -893,7 +898,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
   imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
-  bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+  bool imageNavigatorViewFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.imagenavigator");
 
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
   {
@@ -928,7 +933,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
 
   viewNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
-  viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigator");
+  viewNavigatorFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator");
   if (viewNavigatorFound)
   {
     QObject::connect(viewNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onViewNavigator()));
@@ -1224,6 +1229,10 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 // to cover for all possible cases of closed pages etc.
 static void SafeHandleNavigatorView(QString view_query_name)
 {
+  // ShowView() throws for an unknown ID, which would escape into the Qt event loop.
+  if (!mitk::WorkbenchUtil::IsViewAvailable(view_query_name))
+    return;
+
   berry::IWorkbench* wbench = berry::PlatformUI::GetWorkbench();
   if( wbench == nullptr )
     return;
@@ -1385,6 +1394,10 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpView()
 {
+  // ShowView() throws for an unknown ID, which would escape into the Qt event loop.
+  if (!mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex"))
+    return;
+
   auto window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
   if (window.IsNull())
     return;

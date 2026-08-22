@@ -202,6 +202,25 @@ namespace mitk {
      * @return \c true if the preference was set successfully, \c false otherwise.
      */
     static bool SetDepartmentLogoPreference(const QString& logoResource, ctkPluginContext* context);
+    /**
+     * Checks whether a view is contributed by any of the plugins present in this build.
+     *
+     * Which view plugins are built is a configuration choice, so perspectives and window
+     * advisors must not position or open a view without asking for it first.
+     *
+     * @param viewId The ID of the view as declared by the contributing plugin.
+     * @return \c true if the view is registered, \c false otherwise.
+     */
+    static bool IsViewAvailable(const QString& viewId);
+    /**
+     * Returns the subset of the given view IDs that is available, preserving their order.
+     *
+     * @param viewIds The IDs of the views to check.
+     * @return The available view IDs.
+     *
+     * @see IsViewAvailable()
+     */
+    static QStringList FilterAvailableViews(const QStringList& viewIds);
   };
 }
 

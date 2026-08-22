@@ -165,17 +165,17 @@ private:
 
   // actions which will be enabled/disabled depending on the application state
   QList<QAction*> viewActions;
-  QAction* fileSaveProjectAction;
-  QAction* closeProjectAction;
-  QAction* undoAction;
-  QAction* redoAction;
-  QAction* imageNavigatorAction;
-  QAction* viewNavigatorAction;
-  QAction* resetPerspAction;
-  QAction* closePerspAction;
-  QAction* openDicomEditorAction;
-  QAction* openStdMultiWidgetEditorAction;
-  QAction* openMxNMultiWidgetEditorAction;
+  QAction* fileSaveProjectAction = nullptr;
+  QAction* closeProjectAction = nullptr;
+  QAction* undoAction = nullptr;
+  QAction* redoAction = nullptr;
+  QAction* imageNavigatorAction = nullptr;
+  QAction* viewNavigatorAction = nullptr;
+  QAction* resetPerspAction = nullptr;
+  QAction* closePerspAction = nullptr;
+  QAction* openDicomEditorAction = nullptr;
+  QAction* openStdMultiWidgetEditorAction = nullptr;
+  QAction* openMxNMultiWidgetEditorAction = nullptr;
 
   mitk::ITKEventObserverGuard m_UndoStackObserverGuard;
 };

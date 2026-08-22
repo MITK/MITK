@@ -18,6 +18,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   class ContourModelSet;
   class ContourModel;
 
@@ -86,6 +88,15 @@ namespace mitk
 
     const mitk::Image *GetImage(void);
 
+    /**
+     * \brief Report progress into the given task, or nowhere if it is nullptr.
+     *
+     * The filter contributes one step per contour of its input.
+     *
+     * \param[in] task The task of the operation this filter contributes to.
+     */
+    void SetProgressTask(ProgressTask *task);
+
   protected:
     ContourModelSetToImageFilter();
 
@@ -103,6 +114,8 @@ namespace mitk
     unsigned int m_TimeStep;
 
     const mitk::Image *m_ReferenceImage;
+
+    ProgressTask *m_ProgressTask;
   };
 
   /**

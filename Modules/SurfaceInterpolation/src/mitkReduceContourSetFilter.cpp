@@ -20,8 +20,6 @@ mitk::ReduceContourSetFilter::ReduceContourSetFilter()
   m_ReductionType = DOUGLAS_PEUCKER;
   m_MaxSpacing = -1;
   m_MinSpacing = -1;
-  this->m_UseProgressBar = false;
-  this->m_ProgressStepSize = 1;
   m_NumberOfPointsAfterReduction = 0;
 
   mitk::Surface::Pointer output = mitk::Surface::New();
@@ -128,9 +126,6 @@ void mitk::ReduceContourSetFilter::GenerateData()
     tmp_output->SetVtkPolyData(vtkPolyData::New());
     this->SetNthOutput(0, tmp_output.GetPointer());
   }
-  // Setting progressbar
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
 }
 
 void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByNthPoint(
@@ -506,14 +501,4 @@ void mitk::ReduceContourSetFilter::Reset()
   this->SetNthOutput(0, output.GetPointer());
 
   m_NumberOfPointsAfterReduction = 0;
-}
-
-void mitk::ReduceContourSetFilter::SetUseProgressBar(bool status)
-{
-  this->m_UseProgressBar = status;
-}
-
-void mitk::ReduceContourSetFilter::SetProgressStepSize(unsigned int stepSize)
-{
-  this->m_ProgressStepSize = stepSize;
 }

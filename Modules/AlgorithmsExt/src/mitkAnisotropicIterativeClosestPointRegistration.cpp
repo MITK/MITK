@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <mitkAnisotropicIterativeClosestPointRegistration.h>
 #include <mitkAnisotropicRegistrationCommon.h>
 #include <mitkWeightedPointTransform.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkSurface.h>
 // VTK
 #include <vtkIdList.h>
@@ -46,7 +46,8 @@ mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestP
     m_NumberOfIterations(0),
     m_MovingSurface(nullptr),
     m_FixedSurface(nullptr),
-    m_WeightedPointTransform(mitk::WeightedPointTransform::New())
+    m_WeightedPointTransform(mitk::WeightedPointTransform::New()),
+    m_ProgressTask(nullptr)
 {
 }
 
@@ -190,10 +191,10 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   X_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
   Z_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
 
-  // initialize the progress bar
-  unsigned int steps = m_MaxIterations;
   unsigned int stepSize = m_MaxIterations / 10;
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
+
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(m_MaxIterations);
 
   do
   {
@@ -286,16 +287,12 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     // a fixed amount of iterations
     stepSize = (k % 2 == 0) ? stepSize / 2 : stepSize;
     stepSize = (stepSize == 0) ? 1 : stepSize;
-    mitk::ProgressBar::GetInstance()->Progress(stepSize);
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress(stepSize);
 
   } while (diff > m_Threshold && k < m_MaxIterations);
 
   m_NumberOfIterations = k;
-
-  // finish the progress bar if there are more steps
-  // left than iterations used
-  if (k < steps)
-    mitk::ProgressBar::GetInstance()->Progress(steps);
 
   // free memory
   Y->Delete();

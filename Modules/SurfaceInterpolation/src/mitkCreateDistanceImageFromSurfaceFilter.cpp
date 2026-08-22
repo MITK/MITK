@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCreateDistanceImageFromSurfaceFilter.h>
+
 #include <mitkImageCast.h>
+#include <mitkProgressTask.h>
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -107,8 +109,7 @@ mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter
   : m_DistanceImageSpacing(0.0), m_DistanceImageDefaultBufferValue(0.0)
 {
   m_DistanceImageVolume = 50000;
-  this->m_UseProgressBar = false;
-  this->m_ProgressStepSize = 5;
+  this->m_ProgressTask = nullptr;
 
   mitk::Image::Pointer output = mitk::Image::New();
   this->SetNthOutput(0, output.GetPointer());
@@ -120,25 +121,28 @@ mitk::CreateDistanceImageFromSurfaceFilter::~CreateDistanceImageFromSurfaceFilte
 
 void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 {
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(5);
+
   this->PreprocessContourPoints();
   this->CreateEmptyDistanceImage();
 
   // First of all we have to build the equation-system from the existing contour-edge-points
   this->CreateSolutionMatrixAndFunctionValues();
 
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(1);
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress(1);
 
   m_Weights = m_SolutionMatrix.partialPivLu().solve(m_FunctionValues);
 
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(2);
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress(2);
 
   // The last step is to create the distance map with the interpolated distance function
   this->FillDistanceImage();
 
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(2);
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress(2);
 
   m_Centers.clear();
   m_Normals.clear();
@@ -522,14 +526,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
   this->SetNthOutput(0, output.GetPointer());
 }
 
-void mitk::CreateDistanceImageFromSurfaceFilter::SetUseProgressBar(bool status)
+void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressTask(ProgressTask* task)
 {
-  this->m_UseProgressBar = status;
-}
-
-void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressStepSize(unsigned int stepSize)
-{
-  this->m_ProgressStepSize = stepSize;
+  m_ProgressTask = task;
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage(itk::ImageBase<3>::Pointer referenceImage)

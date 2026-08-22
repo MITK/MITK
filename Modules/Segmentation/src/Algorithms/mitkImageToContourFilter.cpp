@@ -26,8 +26,6 @@ found in the LICENSE file.
 
 mitk::ImageToContourFilter::ImageToContourFilter()
   : m_SliceGeometry(nullptr),
-    m_UseProgressBar(false),
-    m_ProgressStepSize(1),
     m_ContourValue(1.0)
 {
 }
@@ -60,10 +58,6 @@ void mitk::ImageToContourFilter::GenerateData()
   m_SliceGeometry = sliceImage->GetGeometry();
 
   AccessFixedDimensionByItk(sliceImage, Itk2DContourExtraction, 2);
-
-  // Setting progressbar
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -146,14 +140,4 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction(const itk::Image<TPixel,
 void mitk::ImageToContourFilter::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
-}
-
-void mitk::ImageToContourFilter::SetUseProgressBar(bool status)
-{
-  this->m_UseProgressBar = status;
-}
-
-void mitk::ImageToContourFilter::SetProgressStepSize(unsigned int stepSize)
-{
-  this->m_ProgressStepSize = stepSize;
 }

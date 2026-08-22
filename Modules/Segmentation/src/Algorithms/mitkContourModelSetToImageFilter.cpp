@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkContourModelUtils.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageWriteAccessor.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkTimeHelper.h>
 #include <mitkLabel.h>
 #include <mitkVtkImageOverwrite.h>
@@ -26,7 +26,8 @@ mitk::ContourModelSetToImageFilter::ContourModelSetToImageFilter()
     m_MakeOutputLabelPixelType(false),
     m_PaintingPixelValue(1),
     m_TimeStep(0),
-    m_ReferenceImage(nullptr)
+    m_ReferenceImage(nullptr),
+    m_ProgressTask(nullptr)
 {
   // Create the output.
   itk::DataObject::Pointer output = this->MakeOutput(0);
@@ -136,6 +137,11 @@ void mitk::ContourModelSetToImageFilter::SetImage(const mitk::Image *refImage)
   m_ReferenceImage = refImage;
 }
 
+void mitk::ContourModelSetToImageFilter::SetProgressTask(ProgressTask *task)
+{
+  m_ProgressTask = task;
+}
+
 const mitk::Image *mitk::ContourModelSetToImageFilter::GetImage(void)
 {
   return m_ReferenceImage;
@@ -145,9 +151,8 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
 {
   auto *contourSet = const_cast<mitk::ContourModelSet *>(this->GetInput());
 
-  // Initializing progressbar
-  unsigned int num_contours = contourSet->GetContourModelList()->size();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(num_contours);
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(static_cast<unsigned int>(contourSet->GetContourModelList()->size()));
 
   // Assure that the volume data of the output is set (fill volume with zeros)
   this->InitializeOutputEmpty();
@@ -260,8 +265,8 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
 
     reslice->SetInputSlice(nullptr);
 
-    // Progress
-    mitk::ProgressBar::GetInstance()->Progress();
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
 
     ++it;
   }

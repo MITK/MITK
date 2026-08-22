@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToSurfaceFilter.h>
+#include <mitkProgressTask.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateProperty.h>
@@ -497,6 +498,11 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
 
   if (!CPICacheIsOutdated(segmentationImage, labelValue, timeStep)) return;
 
+  // Created after the early return, so that an up-to-date cache does not
+  // make a notification flash up for an interpolation that never runs. The
+  // filters below announce their own steps as they start.
+  mitk::ProgressTask task("Interpolating surface");
+
   mitk::Surface::Pointer interpolationResult = nullptr;
 
   auto reduceFilter = ReduceContourSetFilter::New();
@@ -522,11 +528,8 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   normalsFilter->SetMaxSpacing(maxSpacing);
   interpolateSurfaceFilter->SetDistanceImageVolume(m_DistanceImageVolume);
 
-  reduceFilter->SetUseProgressBar(false);
-  normalsFilter->SetUseProgressBar(true);
-  normalsFilter->SetProgressStepSize(1);
-  interpolateSurfaceFilter->SetUseProgressBar(true);
-  interpolateSurfaceFilter->SetProgressStepSize(7);
+  normalsFilter->SetProgressTask(&task);
+  interpolateSurfaceFilter->SetProgressTask(&task);
 
   //  Set reference image for interpolation surface filter
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
@@ -562,11 +565,9 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
         interpolateSurfaceFilter->SetInput(i, normalsFilter->GetOutput(i));
       }
 
-      // Setting up progress bar
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-
       // create a surface from the distance-image
       auto imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
+      imageToSurfaceFilter->SetProgressTask(&task);
       imageToSurfaceFilter->SetInput(interpolateSurfaceFilter->GetOutput());
       imageToSurfaceFilter->SetThreshold(0);
       imageToSurfaceFilter->SetSmooth(true);
@@ -582,9 +583,6 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
 
       interpolationResult->SetVtkPolyData(imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), timeStep);
       interpolationResult->DisconnectPipeline();
-
-      // Last progress step
-      mitk::ProgressBar::GetInstance()->Progress(20);
 
     }
   }

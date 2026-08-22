@@ -85,6 +85,7 @@ void QmitkDataNodeContextMenu::InitNodeDescriptors()
   m_SegmentDataNodeDescriptor = nodeDescriptorManager->GetDescriptor("Segment");
   m_SurfaceDataNodeDescriptor = nodeDescriptorManager->GetDescriptor("Surface");
   m_PointSetNodeDescriptor = nodeDescriptorManager->GetDescriptor("PointSet");
+  m_GeometryDataNodeDescriptor = nodeDescriptorManager->GetDescriptor("GeometryData");
   m_PlanarLineNodeDescriptor = nodeDescriptorManager->GetDescriptor("PlanarLine");
   m_PlanarCircleNodeDescriptor = nodeDescriptorManager->GetDescriptor("PlanarCircle");
   m_PlanarEllipseNodeDescriptor = nodeDescriptorManager->GetDescriptor("PlanarEllipse");
@@ -369,6 +370,12 @@ void QmitkDataNodeContextMenu::AddColorAction(QWidgetAction* colorAction)
   {
     m_PointSetNodeDescriptor->AddAction(colorAction, true);
     m_DescriptorActionList.push_back(std::make_pair(m_PointSetNodeDescriptor, colorAction));
+  }
+
+  if (nullptr != m_GeometryDataNodeDescriptor)
+  {
+    m_GeometryDataNodeDescriptor->AddAction(colorAction, true);
+    m_DescriptorActionList.push_back(std::make_pair(m_GeometryDataNodeDescriptor, colorAction));
   }
 
   if (nullptr != m_PlanarLineNodeDescriptor)

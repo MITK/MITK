@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkBoundingShapeUtil.h"
 
+#include <mitkDataNode.h>
 #include <mitkGeometry3D.h>
 #include <mitkNumericConstants.h>
 #include <mitkPlaneGeometry.h>
@@ -369,4 +370,19 @@ vtkSmartPointer<vtkPolyData> mitk::CreateHandlePolyData(const BaseGeometry *geom
   polyData->DeepCopy(handleTransformFilter->GetPolyDataOutput());
 
   return polyData;
+}
+
+void mitk::GetBoundingShapeColor(const DataNode *node, const BaseRenderer *renderer, float color[3])
+{
+  color[0] = 1.0f;
+  color[1] = 0.0f;
+  color[2] = 0.0f;
+
+  bool selected = false;
+  node->GetBoolProperty(BoundingShapeSelectedPropertyName, selected, renderer);
+
+  if (selected && node->GetColor(color, renderer, BoundingShapeSelectedColorPropertyName))
+    return;
+
+  node->GetColor(color, renderer, "color");
 }

@@ -60,6 +60,7 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
 
   m_HandleActor->SetMapper(m_HandleMapper);
   m_HandleActor->VisibilityOn();
+  m_HandleActor->GetProperty()->SetColor(1.0, 0, 0);
 
   m_SelectedHandleActor->VisibilityOn();
   m_SelectedHandleActor->GetProperty()->SetColor(0, 1.0, 0);
@@ -120,6 +121,7 @@ void mitk::BoundingShapeVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 void mitk::BoundingShapeVtkMapper2D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
@@ -260,51 +262,50 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
     if (localStorage->m_Cutter->GetOutput()->GetNumberOfPoints() > 0) // if plane is visible in the renderwindow
     {
-      mitk::DoubleProperty::Pointer handleSizeProperty =
-        dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
-
-      ScalarType initialHandleSize;
-      if (handleSizeProperty != nullptr)
-        initialHandleSize = handleSizeProperty->GetValue();
-      else
-        initialHandleSize = DefaultHandleSizeFactor;
-
-      mitk::Point2D displaySize = renderer->GetDisplaySizeInMM();
-      double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
-
       auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
-      // add handles and their assigned properties to the local storage
+
+      // handles are interaction affordances: the interactor adds the active-handle property
+      // when it attaches to the node and removes it when it detaches, so without the
+      // property no handles are rendered at all
       mitk::IntProperty::Pointer activeHandleId =
-        dynamic_cast<mitk::IntProperty *>(node->GetProperty("Bounding Shape.Active Handle ID"));
+        dynamic_cast<mitk::IntProperty *>(node->GetProperty(BoundingShapeActiveHandleIdPropertyName));
 
       bool visible = false;
       bool selected = false;
-      for (const auto &handle : ComputeHandles(cornerPoints, planeGeometry))
-      {
-        auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
 
-        if (activeHandleId != nullptr && activeHandleId->GetValue() == handle.GetIndex())
-        {
-          localStorage->m_SelectedHandleMapper->SetInputData(handlePolyData);
-          localStorage->m_SelectedHandleActor->VisibilityOn();
-          selected = true;
-        }
+      if (activeHandleId != nullptr)
+      {
+        mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty *>(
+          this->GetDataNode()->GetProperty(BoundingShapeHandleSizeFactorPropertyName));
+
+        ScalarType initialHandleSize;
+        if (handleSizeProperty != nullptr)
+          initialHandleSize = handleSizeProperty->GetValue();
         else
+          initialHandleSize = DefaultHandleSizeFactor;
+
+        mitk::Point2D displaySize = renderer->GetDisplaySizeInMM();
+        double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
+
+        for (const auto &handle : ComputeHandles(cornerPoints, planeGeometry))
         {
-          appendPoly->AddInputData(handlePolyData);
+          auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
+
+          if (activeHandleId->GetValue() == handle.GetIndex())
+          {
+            localStorage->m_SelectedHandleMapper->SetInputData(handlePolyData);
+            selected = true;
+          }
+          else
+          {
+            appendPoly->AddInputData(handlePolyData);
+          }
+          visible = true;
         }
-        visible = true;
       }
 
       if (visible)
-      {
         appendPoly->Update();
-      }
-      else
-      {
-        localStorage->m_HandleActor->VisibilityOff();
-        localStorage->m_SelectedHandleActor->VisibilityOff();
-      }
 
       auto stripper = vtkSmartPointer<vtkStripper>::New();
       stripper->SetInputData(localStorage->m_Cutter->GetOutput());
@@ -318,14 +319,6 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
       this->ApplyColorAndOpacityProperties(renderer, localStorage->m_Actor);
 
-      if (activeHandleId != nullptr)
-      {
-        localStorage->m_HandleActor->GetProperty()->SetColor(1, 0, 0);
-      }
-      else
-      {
-        localStorage->m_HandleActor->GetProperty()->SetColor(1, 1, 1);
-      }
       localStorage->m_HandleActor->GetMapper()->SetInputDataObject(appendPoly->GetOutput());
 
       // add parts to the overall storage
@@ -341,7 +334,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
       localStorage->m_PropAssembly->VisibilityOn();
       localStorage->m_Actor->VisibilityOn();
-      localStorage->m_HandleActor->VisibilityOn();
+      localStorage->m_HandleActor->SetVisibility(visible);
     }
     else
     {
@@ -364,8 +357,8 @@ void mitk::BoundingShapeVtkMapper2D::ApplyColorAndOpacityProperties(BaseRenderer
 {
   auto* property = actor->GetProperty();
 
-  std::array<float, 3> color = { 1.0, 0.0, 0.0 };
-  this->GetDataNode()->GetColor(color.data(), renderer);
+  float color[3];
+  GetBoundingShapeColor(this->GetDataNode(), renderer, color);
   property->SetColor(color[0], color[1], color[2]);
 
   float opacity = 0.2f;

@@ -62,6 +62,9 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::LocalStorage()
   Actor->GetProperty()->LightingOff();
   HandleActor->GetProperty()->LightingOff();
   SelectedHandleActor->GetProperty()->LightingOff();
+
+  HandleActor->GetProperty()->SetColor(1, 0, 0);
+  SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
 }
 
 mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
@@ -71,6 +74,7 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
 void mitk::BoundingShapeVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
@@ -87,8 +91,8 @@ void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer
 {
   auto* property = actor->GetProperty();
 
-  std::array<float, 3> color = { 1.0, 0.0, 0.0 };
-  this->GetDataNode()->GetColor(color.data(), renderer);
+  float color[3];
+  GetBoundingShapeColor(this->GetDataNode(), renderer, color);
   property->SetColor(color[0], color[1], color[2]);
 
   float opacity = 0.2f;
@@ -213,8 +217,8 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     vtkDataArray *pointNormals = polydata->GetPointData()->GetNormals();
     if (pointNormals != nullptr)
     {
-      float color[3] = {1.0f, 0.0f, 0.0f};
-      dataNode->GetColor(color, renderer);
+      float color[3];
+      GetBoundingShapeColor(dataNode, renderer, color);
 
       double viewDirection[3];
       camera->GetViewPlaneNormal(viewDirection); // points from the focal point towards the camera
@@ -249,19 +253,6 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
       polydata->GetCellData()->SetScalars(faceColors);
     }
 
-    mitk::DoubleProperty::Pointer handleSizeProperty =
-      dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
-
-    ScalarType initialHandleSize;
-    if (handleSizeProperty != nullptr)
-      initialHandleSize = handleSizeProperty->GetValue();
-    else
-      initialHandleSize = DefaultHandleSizeFactor;
-
-    double handlesize =
-      ((camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0) *
-      initialHandleSize;
-
     if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->HandleActor))
       localStorage->PropAssembly->RemovePart(localStorage->HandleActor);
     if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->Actor))
@@ -270,28 +261,48 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     auto selectedhandlemapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
 
+    // handles are interaction affordances: the interactor adds the active-handle property
+    // when it attaches to the node and removes it when it detaches, so without the
+    // property no handles are rendered at all
     mitk::IntProperty::Pointer activeHandleId =
-      dynamic_cast<mitk::IntProperty *>(dataNode->GetProperty("Bounding Shape.Active Handle ID"));
+      dynamic_cast<mitk::IntProperty *>(dataNode->GetProperty(BoundingShapeActiveHandleIdPropertyName));
 
+    const bool handlesVisible = activeHandleId != nullptr;
     bool selected = false;
-    for (const auto &handle : ComputeHandles(cornerPoints, nullptr))
-    {
-      auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handlesize);
 
-      if (activeHandleId != nullptr && activeHandleId->GetValue() == handle.GetIndex())
-      {
-        selectedhandlemapper->SetInputData(handlePolyData);
-        localStorage->SelectedHandleActor->SetMapper(selectedhandlemapper);
-        localStorage->SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
-        localStorage->PropAssembly->AddPart(localStorage->SelectedHandleActor);
-        selected = true;
-      }
+    if (handlesVisible)
+    {
+      mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty *>(
+        this->GetDataNode()->GetProperty(BoundingShapeHandleSizeFactorPropertyName));
+
+      ScalarType initialHandleSize;
+      if (handleSizeProperty != nullptr)
+        initialHandleSize = handleSizeProperty->GetValue();
       else
+        initialHandleSize = DefaultHandleSizeFactor;
+
+      double handlesize =
+        ((camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0) *
+        initialHandleSize;
+
+      for (const auto &handle : ComputeHandles(cornerPoints, nullptr))
       {
-        appendPoly->AddInputData(handlePolyData);
+        auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handlesize);
+
+        if (activeHandleId->GetValue() == handle.GetIndex())
+        {
+          selectedhandlemapper->SetInputData(handlePolyData);
+          localStorage->SelectedHandleActor->SetMapper(selectedhandlemapper);
+          localStorage->PropAssembly->AddPart(localStorage->SelectedHandleActor);
+          selected = true;
+        }
+        else
+        {
+          appendPoly->AddInputData(handlePolyData);
+        }
       }
+      appendPoly->Update();
     }
-    appendPoly->Update();
 
     auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputData(polydata);
@@ -303,15 +314,6 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     localStorage->Actor->GetMapper()->SetInputDataObject(polydata);
 
     localStorage->HandleActor->SetMapper(handlemapper);
-    if (activeHandleId == nullptr)
-    {
-      localStorage->HandleActor->GetProperty()->SetColor(1, 1, 1);
-    }
-    else
-    {
-      localStorage->HandleActor->GetProperty()->SetColor(1, 0, 0);
-    }
-
     localStorage->HandleActor->GetMapper()->SetInputDataObject(appendPoly->GetOutput());
 
     this->ApplyColorAndOpacityProperties(renderer, localStorage->Actor);
@@ -325,7 +327,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     // this->ApplyProperties(localStorage->m_SelectedHandleActor, renderer);
 
     localStorage->Actor->VisibilityOn();
-    localStorage->HandleActor->VisibilityOn();
+    localStorage->HandleActor->SetVisibility(handlesVisible);
     // show the selected (green) handle only when one is active this frame; its input is refreshed
     // only on selection, so otherwise a deselected handle lingers with stale geometry
     localStorage->SelectedHandleActor->SetVisibility(selected);

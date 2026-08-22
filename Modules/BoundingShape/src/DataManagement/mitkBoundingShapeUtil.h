@@ -25,7 +25,21 @@ class vtkPolyData;
 
 namespace mitk
 {
+  class BaseRenderer;
+  class DataNode;
   class PlaneGeometry;
+
+  /**
+  * Names of the DataNode properties through which the bounding shape interactor and the
+  * mappers communicate. The interactor adds the active-handle and selected properties when
+  * it attaches to a node and removes them when it detaches; the regular "color" property
+  * is owned by the user and never written by the interaction.
+  */
+  constexpr const char *BoundingShapePropertyName = "Bounding Shape";
+  constexpr const char *BoundingShapeSelectedPropertyName = "Bounding Shape.Selected";
+  constexpr const char *BoundingShapeSelectedColorPropertyName = "Bounding Shape.Selected Color";
+  constexpr const char *BoundingShapeActiveHandleIdPropertyName = "Bounding Shape.Active Handle ID";
+  constexpr const char *BoundingShapeHandleSizeFactorPropertyName = "Bounding Shape.Handle Size Factor";
 
   /**
   * \brief helper function for calculating corner points of the bounding object from a given geometry
@@ -106,6 +120,12 @@ namespace mitk
   vtkSmartPointer<vtkPolyData> CreateHandlePolyData(const BaseGeometry *geometry,
                                                     const Point3D &center,
                                                     double size);
+
+  /**
+   * \brief Effective color of the bounding shape body: the highlight color while the
+   *        interactor reports the shape as selected, the regular node color otherwise.
+   */
+  void GetBoundingShapeColor(const DataNode *node, const BaseRenderer *renderer, float color[3]);
 }
 
 #endif

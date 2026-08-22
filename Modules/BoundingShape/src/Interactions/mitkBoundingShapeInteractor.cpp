@@ -35,11 +35,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 
-// Properties to allow the user to interact with the base data
-const char *selectedColorPropertyName = "Bounding Shape.Selected Color";
-const char *deselectedColorPropertyName = "Bounding Shape.Deselected Color";
-const char *activeHandleIdPropertyName = "Bounding Shape.Active Handle ID";
-const char *boundingShapePropertyName = "Bounding Shape";
+// The property names shared with the mappers are defined in mitkBoundingShapeUtil.h.
 
 namespace mitk
 {
@@ -161,30 +157,14 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
   if (newInputNode == nullptr)
     return;
 
-  // add color properties
-  mitk::ColorProperty::Pointer selectedColor =
-    dynamic_cast<mitk::ColorProperty *>(newInputNode->GetProperty(selectedColorPropertyName));
-  mitk::ColorProperty::Pointer deselectedColor =
-    dynamic_cast<mitk::ColorProperty *>(newInputNode->GetProperty(deselectedColorPropertyName));
+  newInputNode->AddProperty(BoundingShapeSelectedColorPropertyName, mitk::ColorProperty::New(0.0, 1.0, 0.0));
 
-  if (selectedColor.IsNull())
-    newInputNode->AddProperty(selectedColorPropertyName, mitk::ColorProperty::New(0.0, 1.0, 0.0));
-
-  if (deselectedColor.IsNull())
-    newInputNode->AddProperty(deselectedColorPropertyName, mitk::ColorProperty::New(1.0, 0.0, 0.0));
-
-  newInputNode->SetProperty(boundingShapePropertyName, mitk::BoolProperty::New(true));
-  newInputNode->AddProperty(activeHandleIdPropertyName, mitk::IntProperty::New(-1));
+  newInputNode->SetProperty(BoundingShapePropertyName, mitk::BoolProperty::New(true));
+  newInputNode->SetBoolProperty(BoundingShapeSelectedPropertyName, false);
+  newInputNode->AddProperty(BoundingShapeActiveHandleIdPropertyName, mitk::IntProperty::New(-1));
   newInputNode->SetProperty("layer", mitk::IntProperty::New(101));
   newInputNode->SetBoolProperty("fixedLayer", mitk::BoolProperty::New(true));
   newInputNode->SetBoolProperty("pickable", true);
-
-  mitk::ColorProperty::Pointer initialColor =
-    dynamic_cast<mitk::ColorProperty *>(newInputNode->GetProperty(deselectedColorPropertyName));
-  if (initialColor.IsNotNull())
-  {
-    newInputNode->SetColor(initialColor->GetColor());
-  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -283,7 +263,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
 
   double scale = interactionEvent->GetSender()->GetScaleFactorMMPerDisplayUnit();
   mitk::DoubleProperty::Pointer handleSizeProperty =
-    dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
+    dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty(BoundingShapeHandleSizeFactorPropertyName));
 
   ScalarType initialHandleSize;
   if (handleSizeProperty != nullptr)
@@ -296,7 +276,8 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   const ScalarType pickRadius = handlesize / scale;
 
   // no handle hovered yet; a match below sets the active id again
-  this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName, mitk::IntProperty::New(-1));
+  this->GetDataNode()->GetPropertyList()->SetProperty(BoundingShapeActiveHandleIdPropertyName,
+                                                      mitk::IntProperty::New(-1));
 
   const Point2D currentDisplayPosition = positionEvent->GetPointerPositionOnScreen();
 
@@ -329,7 +310,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
     return false;
 
   m_Impl->ActiveHandle = *nearestHandle;
-  this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName,
+  this->GetDataNode()->GetPropertyList()->SetProperty(BoundingShapeActiveHandleIdPropertyName,
                                                       mitk::IntProperty::New(nearestHandle->GetIndex()));
   this->GetDataNode()->GetData()->Modified();
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -344,12 +325,9 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, Interacti
   if (node.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer selectedColor =
-    dynamic_cast<mitk::ColorProperty *>(node->GetProperty(deselectedColorPropertyName));
-  if (selectedColor.IsNotNull())
-  {
-    this->GetDataNode()->GetPropertyList()->SetProperty("color", selectedColor);
-  }
+  // the body highlight is dropped while a handle is hot; the handle itself is highlighted
+  // via the active handle id
+  node->SetBoolProperty(BoundingShapeSelectedPropertyName, false);
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -364,7 +342,8 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, Intera
   if (node.IsNull())
     return;
 
-  this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName, mitk::IntProperty::New(-1));
+  this->GetDataNode()->GetPropertyList()->SetProperty(BoundingShapeActiveHandleIdPropertyName,
+                                                      mitk::IntProperty::New(-1));
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -380,12 +359,7 @@ void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, Interacti
   if (node.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer selectedColor =
-    dynamic_cast<mitk::ColorProperty *>(node->GetProperty(selectedColorPropertyName));
-  if (selectedColor.IsNotNull())
-  {
-    node->GetPropertyList()->SetProperty("color", selectedColor);
-  }
+  node->SetBoolProperty(BoundingShapeSelectedPropertyName, true);
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -401,13 +375,7 @@ void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, Interac
   if (node.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer deselectedColor =
-    dynamic_cast<mitk::ColorProperty *>(node->GetProperty(deselectedColorPropertyName));
-  if (deselectedColor.IsNotNull())
-  {
-    node->GetPropertyList()->SetProperty("color", deselectedColor);
-  }
-
+  node->SetBoolProperty(BoundingShapeSelectedPropertyName, false);
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -533,14 +501,12 @@ void mitk::BoundingShapeInteractor::RestoreNodeProperties()
   if (inputNode.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer color = (mitk::ColorProperty::New(1.0, 1.0, 1.0));
-  if (color.IsNotNull())
-  {
-    inputNode->GetPropertyList()->SetProperty("color", color);
-  }
   inputNode->SetProperty("layer", mitk::IntProperty::New(99));
-  inputNode->SetProperty(boundingShapePropertyName, mitk::BoolProperty::New(false));
-  inputNode->GetPropertyList()->DeleteProperty(activeHandleIdPropertyName);
+  inputNode->SetProperty(BoundingShapePropertyName, mitk::BoolProperty::New(false));
+  // removing the interaction properties reverts the body to its regular color and hides
+  // the handles
+  inputNode->GetPropertyList()->DeleteProperty(BoundingShapeActiveHandleIdPropertyName);
+  inputNode->GetPropertyList()->DeleteProperty(BoundingShapeSelectedPropertyName);
 
   EnableOriginalInteraction();
   // update rendering

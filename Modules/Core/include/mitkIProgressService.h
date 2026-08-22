@@ -94,6 +94,7 @@ namespace mitk
      * Prefer ProgressTask over calling this directly; a task started here must
      * be finished by an explicit FinishTask(), including on error paths.
      *
+     * \param name Human-readable name of the operation, shown to the user.
      * \param steps Total number of steps, or 0 for indeterminate progress.
      * \param cancelable Whether the task polls the returned cancel flag.
      *
@@ -109,6 +110,9 @@ namespace mitk
      * Absolute rather than incremental, so that a lost or reordered update
      * cannot accumulate an error. Unknown ids are ignored.
      *
+     * \param id The task to update. Unknown ids are ignored.
+     * \param name Human-readable name of the operation, shown to the user.
+     * \param steps Total number of steps, or 0 for indeterminate progress.
      * \param progress Steps completed; clamped to \c steps.
      */
     virtual void UpdateTask(ProgressTaskId id,

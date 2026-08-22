@@ -54,6 +54,7 @@ set(H_FILES
   mitkPlaneClipping.h
   mitkPoint.h
   mitkProgressBarImplementation.h
+  mitkProgressTaskInfo.h
   mitkQuaternion.h
   mitkReferenceCountWatcher.h
   mitkRenderingManagerFactory.h
@@ -109,10 +110,14 @@ set(CPP_FILES
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
   Controllers/mitkCrosshairManager.cpp
+  Controllers/mitkIProgressListener.cpp
+  Controllers/mitkIProgressService.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
   Controllers/mitkPlanePositionManager.cpp
   Controllers/mitkProgressBar.cpp
+  Controllers/mitkProgressService.cpp
+  Controllers/mitkProgressTask.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
   Controllers/mitkSliceNavigationHelper.cpp

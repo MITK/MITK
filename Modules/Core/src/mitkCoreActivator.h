@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <mitkPropertyRelations.h>
 #include <mitkPropertyTransience.h>
 #include "mitkPreferencesService.h"
+#include "mitkProgressService.h"
 
 // Micro Services
 #include <usModuleActivator.h>
@@ -110,6 +111,7 @@ private:
   std::unique_ptr<mitk::PropertyTransience> m_PropertyTransience;
   std::unique_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
   std::unique_ptr<mitk::PreferencesService> m_PreferencesService;
+  std::unique_ptr<mitk::ProgressService> m_ProgressService;
 
   // File IO
   std::vector<mitk::IFileReader *> m_FileReaders;

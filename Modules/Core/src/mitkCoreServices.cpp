@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkIPropertyRelations.h>
 #include <mitkIPropertyTransience.h>
 #include <mitkIPreferencesService.h>
+#include <mitkIProgressService.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -127,6 +128,11 @@ namespace mitk
   IPreferencesService *CoreServices::GetPreferencesService(us::ModuleContext *context)
   {
     return GetCoreService<IPreferencesService>(context);
+  }
+
+  IProgressService *CoreServices::GetProgressService(us::ModuleContext *context)
+  {
+    return GetCoreService<IProgressService>(context, true);
   }
 
   bool CoreServices::Unget(us::ModuleContext *context, const std::string & /*interfaceId*/, void *service)

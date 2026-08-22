@@ -57,6 +57,7 @@ set(MODULE_TESTS
   mitkPointSetWriterTest.cpp
   mitkPointSetPointOperationsTest.cpp
   mitkProgressBarTest.cpp
+  mitkProgressTaskTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkPropertyPersistenceTest.cpp

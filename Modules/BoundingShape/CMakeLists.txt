@@ -1,5 +1,3 @@
-MITK_CREATE_MODULE(  
-  INCLUDE_DIRS PRIVATE src/DataManagement src/Interactions src/IO src/Rendering
+MITK_CREATE_MODULE(
   DEPENDS MitkCore MitkDataTypesExt MitkAlgorithmsExt
 )
-

@@ -18,10 +18,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief VTK-based 3D mapper for rendering bounding shapes as wireframe cubes with handles.
+  /** \brief VTK-based 3D mapper for rendering bounding shapes as translucent boxes with handles.
    *
-   * Renders a bounding box (GeometryData) as a 3D wireframe cube with interactive handles
-   * at the face centers for resizing. Selected handles are highlighted with a different color.
+   * Renders a bounding box (GeometryData) as a translucent box with interactive handles at
+   * the face centers for resizing. The box is drawn unlit, with camera-relative shading
+   * baked into its faces so that they stay distinguishable. Selected handles are
+   * highlighted with a different color.
    *
    * \sa BoundingShapeVtkMapper2D, BoundingShapeInteractor, VtkMapper
    */
@@ -45,17 +47,10 @@ namespace mitk
     /** \copydoc VtkMapper::ApplyColorAndOpacityProperties */
     void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
 
-    /** \brief Apply bounding-shape-specific visual properties to the actor.
-     *
-     * \param[in] renderer The renderer context.
-     * \param[in] actor    The VTK actor to apply properties to (currently unused).
-     */
-    void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor);
-
     /** \brief Get the VTK prop assembly for 3D rendering.
      *
      * \param[in] renderer The renderer to get the prop for.
-     * \return The VTK prop containing the bounding shape wireframe and handle actors.
+     * \return The VTK prop containing the bounding shape box and handle actors.
      */
     vtkProp *GetVtkProp(BaseRenderer *renderer) override;
     //   virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer) override;

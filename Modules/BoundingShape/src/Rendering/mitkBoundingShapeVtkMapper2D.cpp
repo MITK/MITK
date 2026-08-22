@@ -28,8 +28,6 @@ found in the LICENSE file.
 #include <vtkTransformFilter.h>
 #include <vtkTransformPolyDataFilter.h>
 
-#include <array>
-
 namespace mitk
 {
   class BoundingShapeVtkMapper2D::Impl
@@ -164,7 +162,11 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
     if (!visible)
     {
+      // the handles belong to the shape and have to go with it, not just its body
+      localStorage->m_PropAssembly->VisibilityOff();
       localStorage->m_Actor->VisibilityOff();
+      localStorage->m_HandleActor->VisibilityOff();
+      localStorage->m_SelectedHandleActor->VisibilityOff();
       return;
     }
     GeometryData::Pointer shape = static_cast<GeometryData *>(node->GetData());
@@ -270,22 +272,12 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       mitk::IntProperty::Pointer activeHandleId =
         dynamic_cast<mitk::IntProperty *>(node->GetProperty(BoundingShapeActiveHandleIdPropertyName));
 
-      bool visible = false;
+      bool hasIdleHandles = false;
       bool selected = false;
 
       if (activeHandleId != nullptr)
       {
-        mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty *>(
-          this->GetDataNode()->GetProperty(BoundingShapeHandleSizeFactorPropertyName));
-
-        ScalarType initialHandleSize;
-        if (handleSizeProperty != nullptr)
-          initialHandleSize = handleSizeProperty->GetValue();
-        else
-          initialHandleSize = DefaultHandleSizeFactor;
-
-        mitk::Point2D displaySize = renderer->GetDisplaySizeInMM();
-        double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
+        const double handleSize = GetHandleSize(renderer, node);
 
         for (const auto &handle : ComputeHandles(cornerPoints, planeGeometry))
         {
@@ -299,12 +291,14 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
           else
           {
             appendPoly->AddInputData(handlePolyData);
+            hasIdleHandles = true;
           }
-          visible = true;
         }
       }
 
-      if (visible)
+      // vtkAppendPolyData requires at least one input; with none the actor stays hidden
+      // and its stale output is never shown
+      if (hasIdleHandles)
         appendPoly->Update();
 
       auto stripper = vtkSmartPointer<vtkStripper>::New();
@@ -334,7 +328,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
       localStorage->m_PropAssembly->VisibilityOn();
       localStorage->m_Actor->VisibilityOn();
-      localStorage->m_HandleActor->SetVisibility(visible);
+      localStorage->m_HandleActor->SetVisibility(hasIdleHandles);
     }
     else
     {

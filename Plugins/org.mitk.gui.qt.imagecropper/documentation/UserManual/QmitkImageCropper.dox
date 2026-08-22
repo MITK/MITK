@@ -13,7 +13,7 @@ A new bounding box can be created by selecting an image and pressing the 'New' b
 
 \imageMacro{Basic_ImageCropperView.png,"Basic Settings.",7.09}
 
-This bounding box can be placed at an arbitrary position in the volume and can be easily adjusted by using its handles. The red handles are only shown while the bounding box is selected in the view; hovering over either the box or a single handle highlights it and allows modifying the bounding box. Moving a face handle changes the respective extent of the bounding box, and moving one of the corner handles shown in the 2D windows changes both in-plane extents at once. Moving the box itself in a 2D window changes its position. The color of the bounding box can be changed like for any other data node, e.g. via its context menu in the Data Manager.
+This bounding box can be placed at an arbitrary position in the volume and can be easily adjusted by using its handles. The red handles are only shown while the bounding box is selected in the view; hovering over either the box or a single handle highlights it and allows modifying the bounding box. Moving a face handle changes the respective extent of the bounding box, and moving one of the corner handles shown in the 2D windows changes two extents at once. Moving the box itself in a 2D window changes its position. The color of the bounding box can be changed like for any other data node, e.g. via its context menu in the Data Manager.
 
 
 As soon as the bounding box is placed at the desired position, pressing the button 'Crop' creates a new image assigned to the original image as a child node containing only the selected subvolume. The size of the subvolume equals the size of the bounding box.

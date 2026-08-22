@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <vtkCamera.h>
 #include <vtkInteractorObserver.h>
 #include <vtkInteractorStyle.h>
+#include <vtkMath.h>
 #include <vtkPointData.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
@@ -96,6 +97,40 @@ namespace
       worldPoint[i] = world[i] / world[3];
 
     return worldPoint;
+  }
+
+  /**
+   * \brief Distance from a handle within which the cursor grabs it, in display units.
+   *
+   * The mappers draw the markers at a world-space size (mitk::GetHandleSize()), so the
+   * radius is that size projected to the screen. In a 2D render window the display scale
+   * is uniform and the projection is a division; in the 3D one it depends on the depth,
+   * which is taken at \p referencePoint for all handles alike.
+   */
+  mitk::ScalarType GetPickRadiusInDisplayUnits(const mitk::BaseRenderer *renderer,
+                                               const mitk::DataNode *node,
+                                               const mitk::Point3D &referencePoint)
+  {
+    const double handleSize = mitk::GetHandleSize(renderer, node);
+
+    if (renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
+      return handleSize / renderer->GetScaleFactorMMPerDisplayUnit();
+
+    // any direction parallel to the view plane projects to the same length
+    double viewUp[3];
+    renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp(viewUp);
+    vtkMath::Normalize(viewUp);
+
+    mitk::Point3D offsetPoint;
+    for (int i = 0; i < 3; ++i)
+      offsetPoint[i] = referencePoint[i] + handleSize * viewUp[i];
+
+    mitk::Point2D displayReferencePoint;
+    mitk::Point2D displayOffsetPoint;
+    renderer->WorldToDisplay(referencePoint, displayReferencePoint);
+    renderer->WorldToDisplay(offsetPoint, displayOffsetPoint);
+
+    return displayReferencePoint.EuclideanDistanceTo(displayOffsetPoint);
   }
 }
 
@@ -261,19 +296,8 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   Point3D boundingBoxCenter;
   HandlePositionChanged(interactionEvent, boundingBoxCenter);
 
-  double scale = interactionEvent->GetSender()->GetScaleFactorMMPerDisplayUnit();
-  mitk::DoubleProperty::Pointer handleSizeProperty =
-    dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty(BoundingShapeHandleSizeFactorPropertyName));
-
-  ScalarType initialHandleSize;
-  if (handleSizeProperty != nullptr)
-    initialHandleSize = handleSizeProperty->GetValue();
-  else
-    initialHandleSize = DefaultHandleSizeFactor;
-
-  mitk::Point2D displaysize = interactionEvent->GetSender()->GetDisplaySizeInMM();
-  ScalarType handlesize = ((displaysize[0] + displaysize[1]) / 2.0) * initialHandleSize;
-  const ScalarType pickRadius = handlesize / scale;
+  BaseRenderer *renderer = interactionEvent->GetSender();
+  const ScalarType pickRadius = GetPickRadiusInDisplayUnits(renderer, this->GetDataNode(), boundingBoxCenter);
 
   // no handle hovered yet; a match below sets the active id again
   this->GetDataNode()->GetPropertyList()->SetProperty(BoundingShapeActiveHandleIdPropertyName,
@@ -284,7 +308,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   // never pick a handle close to the projected box center, so a degenerate/very small box
   // can still be grabbed by its body for translation
   Point2D displayCenterPoint;
-  interactionEvent->GetSender()->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
+  renderer->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
   if (currentDisplayPosition.EuclideanDistanceTo(displayCenterPoint) <= pickRadius)
     return false;
 
@@ -296,7 +320,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   for (const auto &handle : m_Impl->Handles)
   {
     Point2D displayHandlePosition;
-    interactionEvent->GetSender()->WorldToDisplay(handle.GetPosition(), displayHandlePosition);
+    renderer->WorldToDisplay(handle.GetPosition(), displayHandlePosition);
     const ScalarType distance = currentDisplayPosition.EuclideanDistanceTo(displayHandlePosition);
 
     if (distance < nearestDistance)
@@ -476,13 +500,14 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
     const ScalarType delta = std::round(totalIndexMove[axis]);
 
     // clamp so the extent stays positive: the moved bound stops just before the anchored
-    // one instead of pushing through it
+    // one instead of pushing through it. An already degenerate axis cannot shrink at all.
     const ScalarType extent = m_Impl->InitialBounds[2 * axis + 1] - m_Impl->InitialBounds[2 * axis];
+    const ScalarType maxShrink = std::max(0.0, std::floor(extent - 0.01));
 
     if (movedBounds[axis] == MovedBound::Maximum)
-      newBounds[2 * axis + 1] += std::max(delta, -std::floor(extent - 0.01));
+      newBounds[2 * axis + 1] += std::max(delta, -maxShrink);
     else
-      newBounds[2 * axis] += std::min(delta, std::floor(extent - 0.01));
+      newBounds[2 * axis] += std::min(delta, maxShrink);
   }
 
   if (newBounds == geometry->GetBounds()) // update only if the box changed by at least one voxel

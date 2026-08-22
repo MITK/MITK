@@ -43,6 +43,9 @@ namespace mitk
       vtkSmartPointer<vtkActor> Actor;
       vtkSmartPointer<vtkActor> HandleActor;
       vtkSmartPointer<vtkActor> SelectedHandleActor;
+      vtkSmartPointer<vtkPolyDataMapper> Mapper;
+      vtkSmartPointer<vtkPolyDataMapper> HandleMapper;
+      vtkSmartPointer<vtkPolyDataMapper> SelectedHandleMapper;
       vtkSmartPointer<vtkPropAssembly> PropAssembly;
     };
 
@@ -55,6 +58,9 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::LocalStorage()
   : Actor(vtkSmartPointer<vtkActor>::New()),
     HandleActor(vtkSmartPointer<vtkActor>::New()),
     SelectedHandleActor(vtkSmartPointer<vtkActor>::New()),
+    Mapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
+    HandleMapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
+    SelectedHandleMapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
     PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
 {
   // the box and its handles are interaction widgets and keep their nominal color
@@ -65,6 +71,22 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::LocalStorage()
 
   HandleActor->GetProperty()->SetColor(1, 0, 0);
   SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
+
+  // the actors are wired up once and are afterwards controlled through their input data
+  // and visibility alone, so that regenerating does not churn the mappers or the assembly
+  Actor->SetMapper(Mapper);
+  HandleActor->SetMapper(HandleMapper);
+  SelectedHandleActor->SetMapper(SelectedHandleMapper);
+
+  // an actor is turned on only once its mapper has data; a visible one without would
+  // contribute uninitialized bounds to the assembly
+  Actor->VisibilityOff();
+  HandleActor->VisibilityOff();
+  SelectedHandleActor->VisibilityOff();
+
+  PropAssembly->AddPart(Actor);
+  PropAssembly->AddPart(HandleActor);
+  PropAssembly->AddPart(SelectedHandleActor);
 }
 
 mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
@@ -110,11 +132,6 @@ void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer *
   if (dataNode == nullptr)
     return;
 
-  bool isVisible = false;
-  dataNode->GetBoolProperty("Bounding Shape.3D Rendering", isVisible, renderer);
-
-  actor->SetVisibility(isVisible);
-
   float lineWidth = 1.0f;
   dataNode->GetFloatProperty("Bounding Shape.Line.Width", lineWidth, renderer);
 
@@ -145,7 +162,11 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
 
     if (!isVisible)
     {
+      // the handles belong to the shape and have to go with it, not just its body
+      localStorage->PropAssembly->VisibilityOff();
       localStorage->Actor->VisibilityOff();
+      localStorage->HandleActor->VisibilityOff();
+      localStorage->SelectedHandleActor->VisibilityOff();
       return;
     }
 
@@ -204,7 +225,10 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     vtkSmartPointer<vtkPolyData> polydata = transformFilter->GetPolyDataOutput();
     if (polydata == nullptr)
     {
+      localStorage->PropAssembly->VisibilityOff();
       localStorage->Actor->VisibilityOff();
+      localStorage->HandleActor->VisibilityOff();
+      localStorage->SelectedHandleActor->VisibilityOff();
       return;
     }
 
@@ -234,14 +258,20 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
         const vtkIdType *cellPointIds = nullptr;
         polydata->GetCellPoints(cellId, numberOfCellPoints, cellPointIds);
 
-        // all points of a face share the outward face normal
-        double normal[3];
-        pointNormals->GetTuple(cellPointIds[0], normal);
-        vtkMath::Normalize(normal);
+        // one tuple per cell either way, so that the array stays aligned with the cell ids
+        double brightness = 1.0;
 
-        constexpr double minBrightness = 0.15;
-        const double facingRatio = 0.5 * (1.0 + vtkMath::Dot(normal, viewDirection));
-        const double brightness = minBrightness + (1.0 - minBrightness) * facingRatio;
+        if (numberOfCellPoints > 0)
+        {
+          // all points of a face share the outward face normal
+          double normal[3];
+          pointNormals->GetTuple(cellPointIds[0], normal);
+          vtkMath::Normalize(normal);
+
+          constexpr double minBrightness = 0.15;
+          const double facingRatio = 0.5 * (1.0 + vtkMath::Dot(normal, viewDirection));
+          brightness = minBrightness + (1.0 - minBrightness) * facingRatio;
+        }
 
         unsigned char rgb[3];
         for (int component = 0; component < 3; ++component)
@@ -253,12 +283,6 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
       polydata->GetCellData()->SetScalars(faceColors);
     }
 
-    if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->HandleActor))
-      localStorage->PropAssembly->RemovePart(localStorage->HandleActor);
-    if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->Actor))
-      localStorage->PropAssembly->RemovePart(localStorage->Actor);
-
-    auto selectedhandlemapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
 
     // handles are interaction affordances: the interactor adds the active-handle property
@@ -267,73 +291,51 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     mitk::IntProperty::Pointer activeHandleId =
       dynamic_cast<mitk::IntProperty *>(dataNode->GetProperty(BoundingShapeActiveHandleIdPropertyName));
 
-    const bool handlesVisible = activeHandleId != nullptr;
+    bool hasIdleHandles = false;
     bool selected = false;
 
-    if (handlesVisible)
+    if (activeHandleId != nullptr)
     {
-      mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty *>(
-        this->GetDataNode()->GetProperty(BoundingShapeHandleSizeFactorPropertyName));
-
-      ScalarType initialHandleSize;
-      if (handleSizeProperty != nullptr)
-        initialHandleSize = handleSizeProperty->GetValue();
-      else
-        initialHandleSize = DefaultHandleSizeFactor;
-
-      double handlesize =
-        ((camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0) *
-        initialHandleSize;
+      const double handleSize = GetHandleSize(renderer, dataNode);
 
       for (const auto &handle : ComputeHandles(cornerPoints, nullptr))
       {
-        auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handlesize);
+        auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
 
         if (activeHandleId->GetValue() == handle.GetIndex())
         {
-          selectedhandlemapper->SetInputData(handlePolyData);
-          localStorage->SelectedHandleActor->SetMapper(selectedhandlemapper);
-          localStorage->PropAssembly->AddPart(localStorage->SelectedHandleActor);
+          localStorage->SelectedHandleMapper->SetInputData(handlePolyData);
           selected = true;
         }
         else
         {
           appendPoly->AddInputData(handlePolyData);
+          hasIdleHandles = true;
         }
       }
-      appendPoly->Update();
     }
 
-    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputData(polydata);
+    // vtkAppendPolyData requires at least one input; with none the actor stays hidden
+    // and its stale output is never shown
+    if (hasIdleHandles)
+    {
+      appendPoly->Update();
+      localStorage->HandleMapper->SetInputData(appendPoly->GetOutput());
+    }
 
-    auto handlemapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    handlemapper->SetInputData(appendPoly->GetOutput());
-
-    localStorage->Actor->SetMapper(mapper);
-    localStorage->Actor->GetMapper()->SetInputDataObject(polydata);
-
-    localStorage->HandleActor->SetMapper(handlemapper);
-    localStorage->HandleActor->GetMapper()->SetInputDataObject(appendPoly->GetOutput());
+    localStorage->Mapper->SetInputData(polydata);
 
     this->ApplyColorAndOpacityProperties(renderer, localStorage->Actor);
     this->ApplyBoundingShapeProperties(renderer, localStorage->Actor);
     this->ApplyBoundingShapeProperties(renderer, localStorage->HandleActor);
     this->ApplyBoundingShapeProperties(renderer, localStorage->SelectedHandleActor);
 
-    // apply properties read from the PropertyList
-    // this->ApplyProperties(localStorage->m_Actor, renderer);
-    // this->ApplyProperties(localStorage->m_HandleActor, renderer);
-    // this->ApplyProperties(localStorage->m_SelectedHandleActor, renderer);
-
     localStorage->Actor->VisibilityOn();
-    localStorage->HandleActor->SetVisibility(handlesVisible);
+    localStorage->HandleActor->SetVisibility(hasIdleHandles);
     // show the selected (green) handle only when one is active this frame; its input is refreshed
     // only on selection, so otherwise a deselected handle lingers with stale geometry
     localStorage->SelectedHandleActor->SetVisibility(selected);
 
-    localStorage->PropAssembly->AddPart(localStorage->Actor);
-    localStorage->PropAssembly->AddPart(localStorage->HandleActor);
     localStorage->PropAssembly->VisibilityOn();
 
     localStorage->UpdateGenerateDataTime();

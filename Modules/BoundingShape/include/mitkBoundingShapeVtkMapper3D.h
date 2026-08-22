@@ -18,10 +18,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief VTK-based 3D mapper for rendering bounding shapes as wireframe cubes with handles.
+  /** \brief VTK-based 3D mapper for rendering bounding shapes as translucent boxes with handles.
    *
-   * Renders a bounding box (GeometryData) as a 3D wireframe cube with interactive handles
-   * at the face centers for resizing. Selected handles are highlighted with a different color.
+   * Renders a bounding box (GeometryData) as a translucent box with interactive handles at
+   * the face centers for resizing. The box is drawn unlit, with camera-relative shading
+   * baked into its faces so that they stay distinguishable. Selected handles are
+   * highlighted with a different color.
    *
    * \sa BoundingShapeVtkMapper2D, BoundingShapeInteractor, VtkMapper
    */
@@ -45,10 +47,13 @@ namespace mitk
     /** \copydoc VtkMapper::ApplyColorAndOpacityProperties */
     void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
 
-    /** \brief Apply bounding-shape-specific visual properties to the actor.
+    /** \brief Apply the "Bounding Shape.Line.Width" node property to the actor.
+     *
+     * Actor visibility is not part of this: it follows the node visibility and the
+     * interaction state, both of which are resolved while generating the render data.
      *
      * \param[in] renderer The renderer context.
-     * \param[in] actor    The VTK actor to apply properties to (currently unused).
+     * \param[in] actor    The VTK actor to apply properties to.
      */
     void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor);
 

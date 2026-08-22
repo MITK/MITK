@@ -40,10 +40,11 @@ namespace mitk
    *
    * The interactor manages handles that can be dragged to resize the bounding
    * box: face handles resize one axis; in 2D render windows, additional handles
-   * on the corners of the rendered cross-section resize both in-plane axes at
-   * once. In 2D render windows the entire box can be translated by dragging
-   * its body. Visual feedback is provided through color changes on hover and
-   * selection.
+   * on the corners of the rendered cross-section resize two axes at once (the
+   * two the crossed box edge does not run along, which are the in-plane axes as
+   * long as the box is aligned with the slice). In 2D render windows the entire
+   * box can be translated by dragging its body. Visual feedback is provided
+   * through color changes on hover and selection.
    *
    * \sa BoundingShapeCropper, BoundingShapeVtkMapper2D, BoundingShapeVtkMapper3D, DataInteractor
    * \ingroup Interaction
@@ -83,8 +84,8 @@ namespace mitk
      * @brief Recomputes the handles visible in the render window of the given event.
      *
      * In a 2D render window handles sit on the sides and corners of the rendered cross-section
-     * (only where the box crosses the current slice); in the 3D render window face and corner
-     * handles cover the whole box. \p center is set to the box center.
+     * (only where the box crosses the current slice); in the 3D render window they sit at the
+     * centers of the six box faces. \p center is set to the box center.
      */
     void HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center);
 

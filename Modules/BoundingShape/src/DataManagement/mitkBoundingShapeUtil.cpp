@@ -12,14 +12,18 @@ found in the LICENSE file.
 
 #include "mitkBoundingShapeUtil.h"
 
+#include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 #include <mitkGeometry3D.h>
 #include <mitkNumericConstants.h>
 #include <mitkPlaneGeometry.h>
 
+#include <vtkCamera.h>
 #include <vtkCubeSource.h>
+#include <vtkMath.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPolyData.h>
+#include <vtkRenderer.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 
@@ -48,8 +52,8 @@ namespace
     }
   }
 
-  // corner-point index pairs of the 12 box edges; edge index = 4 * (axis the edge runs
-  // along) + the fixed min/max bits of the two other axes, see the id table in the header
+  // corner-point index pairs of the 12 box edges, ordered by the edge id table documented
+  // at mitk::Handle
   constexpr std::array<std::array<int, 2>, 12> BoxEdgeCornerIndices = {{
     {0, 4}, {1, 5}, {2, 6}, {3, 7}, // running along x
     {0, 2}, {1, 3}, {4, 6}, {5, 7}, // running along y
@@ -85,21 +89,24 @@ namespace
   }
 
   /**
-   * \brief Signed distances of the 8 box corners to the slice plane, with values within
-   *        tolerance snapped to zero.
+   * \brief Signed distances of the 8 box corners to the slice plane in mm, with values
+   *        within \p tolerance snapped to zero.
    *
-   * Without the snapping, a slice lying exactly on a box face (up to floating point noise)
-   * would fail every strict crossing test and hide all handles in that render window.
+   * Without the snapping, a slice lying exactly on a box face would fail every strict
+   * crossing test and hide all handles in that render window. Slice positions and box
+   * faces are both derived from image geometries, so such a coincidence is exact only up
+   * to the round-off accumulated in the transforms, which is what the tolerance absorbs.
    */
   std::array<double, 8> GetCornerPlaneDistances(const std::vector<mitk::Point3D> &cornerPoints,
                                                 const mitk::Point3D &planeOrigin,
-                                                const mitk::Vector3D &planeNormal)
+                                                const mitk::Vector3D &unitPlaneNormal,
+                                                double tolerance)
   {
     std::array<double, 8> distances;
     for (std::size_t i = 0; i < 8; ++i)
     {
-      const double distance = planeNormal * (cornerPoints[i] - planeOrigin);
-      distances[i] = std::abs(distance) < mitk::eps ? 0.0 : distance;
+      const double distance = unitPlaneNormal * (cornerPoints[i] - planeOrigin);
+      distances[i] = std::abs(distance) < tolerance ? 0.0 : distance;
     }
     return distances;
   }
@@ -293,8 +300,20 @@ std::vector<mitk::Handle> mitk::ComputeHandles(const std::vector<Point3D> &corne
   // 2D render window: handles ride the rendered cross-section outline, also for oblique
   // boxes - face handles on its sides, edge handles on its corners. Both use the same
   // snapped corner distances, so their visibility is mutually consistent.
-  const std::array<double, 8> cornerDistances =
-    GetCornerPlaneDistances(cornerPoints, planeGeometry->GetOrigin(), planeGeometry->GetNormal());
+  Vector3D planeNormal = planeGeometry->GetNormal();
+  const double sliceThickness = planeNormal.GetNorm(); // GetNormal() is scaled by it, not unit length
+
+  if (sliceThickness < eps)
+    return handles; // degenerate slice plane, nothing to place handles on
+
+  planeNormal /= sliceThickness;
+
+  // A tolerance well below one slice and far above the round-off of the transforms that
+  // produced the corners and the plane origin.
+  constexpr double coincidenceTolerance = 1e-3;
+
+  const std::array<double, 8> cornerDistances = GetCornerPlaneDistances(
+    cornerPoints, planeGeometry->GetOrigin(), planeNormal, coincidenceTolerance * sliceThickness);
 
   for (int faceIndex = 0; faceIndex < 6; ++faceIndex)
   {
@@ -304,12 +323,18 @@ std::vector<mitk::Handle> mitk::ComputeHandles(const std::vector<Point3D> &corne
       handles.emplace_back(position, faceIndex, MovedBoundsFromCornerIndices(faceCornerIndices));
   }
 
+  // An edge that reaches the plane with one of its endpoints puts its handle on that box
+  // corner, where it would coincide with the handles of the two other edges meeting there.
+  // Only the most transverse of the three is kept.
+  constexpr int noEdge = -1;
+  std::array<int, 8> cornerEdge;
+  cornerEdge.fill(noEdge);
+  std::array<double, 8> cornerEdgeTransversality;
+  cornerEdgeTransversality.fill(0.0);
+
   for (int edgeIndex = 0; edgeIndex < 12; ++edgeIndex)
   {
     const auto &edgeCornerIndices = BoxEdgeCornerIndices[edgeIndex];
-    const Point3D &a = cornerPoints[edgeCornerIndices[0]];
-    const Point3D &b = cornerPoints[edgeCornerIndices[1]];
-
     const double distA = cornerDistances[edgeCornerIndices[0]];
     const double distB = cornerDistances[edgeCornerIndices[1]];
 
@@ -318,20 +343,57 @@ std::vector<mitk::Handle> mitk::ComputeHandles(const std::vector<Point3D> &corne
     if (distA == 0.0 && distB == 0.0)
       continue;
 
-    Point3D position;
-    if (distA == 0.0)
-      position = a; // the edge touches the plane with this endpoint
-    else if (distB == 0.0)
-      position = b;
-    else if (distA * distB < 0.0)
-      position = a + (b - a) * (distA / (distA - distB));
-    else
+    const Point3D &a = cornerPoints[edgeCornerIndices[0]];
+    const Point3D &b = cornerPoints[edgeCornerIndices[1]];
+
+    if (distA * distB < 0.0)
+    {
+      // the edge spans the plane, so its handle sits between the corners and is unique
+      handles.emplace_back(
+        a + (b - a) * (distA / (distA - distB)), 6 + edgeIndex, MovedBoundsFromCornerIndices(edgeCornerIndices));
+      continue;
+    }
+
+    if (distA != 0.0 && distB != 0.0)
       continue; // the edge does not reach the plane
 
-    handles.emplace_back(position, 6 + edgeIndex, MovedBoundsFromCornerIndices(edgeCornerIndices));
+    // The endpoints differ in distance (one is snapped to zero, the other is not), so the
+    // edge has a non-zero length and the ratio is the cosine of its angle to the normal.
+    const int touchedCorner = distA == 0.0 ? edgeCornerIndices[0] : edgeCornerIndices[1];
+    const double transversality = std::abs(distA - distB) / (b - a).GetNorm();
+
+    if (transversality > cornerEdgeTransversality[touchedCorner])
+    {
+      cornerEdge[touchedCorner] = edgeIndex;
+      cornerEdgeTransversality[touchedCorner] = transversality;
+    }
+  }
+
+  for (int cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
+  {
+    const int edgeIndex = cornerEdge[cornerIndex];
+
+    if (edgeIndex != noEdge)
+      handles.emplace_back(
+        cornerPoints[cornerIndex], 6 + edgeIndex, MovedBoundsFromCornerIndices(BoxEdgeCornerIndices[edgeIndex]));
   }
 
   return handles;
+}
+
+double mitk::GetHandleSize(const BaseRenderer *renderer, const DataNode *node)
+{
+  double sizeFactor = DefaultHandleSizeFactor;
+  node->GetDoubleProperty(BoundingShapeHandleSizeFactorPropertyName, sizeFactor, renderer);
+
+  if (renderer->GetMapperID() == BaseRenderer::Standard2D)
+  {
+    const Point2D displaySize = renderer->GetDisplaySizeInMM();
+    return (displaySize[0] + displaySize[1]) / 2.0 * sizeFactor;
+  }
+
+  vtkCamera *camera = renderer->GetVtkRenderer()->GetActiveCamera();
+  return camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle())) / 2.0 * sizeFactor;
 }
 
 vtkSmartPointer<vtkPolyData> mitk::CreateHandlePolyData(const BaseGeometry *geometry,

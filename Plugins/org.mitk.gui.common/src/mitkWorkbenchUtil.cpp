@@ -490,7 +490,7 @@ namespace mitk {
     return berry::PlatformUI::GetWorkbench()->GetViewRegistry()->Find(viewId).IsNotNull();
   }
 
-  QStringList WorkbenchUtil::FilterAvailableViews(const QStringList& viewIds)
+  QStringList WorkbenchUtil::FilterAvailableViewIds(const QStringList& viewIds)
   {
     QStringList availableViewIds;
 

@@ -24,33 +24,26 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
 {
   const QString editorArea = layout->GetEditorArea();
 
-  const bool hasDataManager = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.datamanager");
-  const bool hasHelpIndex = mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex");
-  const bool hasLeftFolder = hasDataManager || hasHelpIndex;
+  berry::IFolderLayout::Pointer leftFolder;
 
-  if (hasLeftFolder)
+  if (mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.datamanager"))
   {
-    auto leftFolder = layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.21f, editorArea);
-
-    if (hasDataManager)
-    {
-      leftFolder->AddView("org.mitk.views.datamanager");
-      layout->GetViewLayout("org.mitk.views.datamanager")->SetCloseable(false);
-    }
-
-    if (hasHelpIndex)
-      leftFolder->AddPlaceholder("org.blueberry.views.helpindex");
+    leftFolder = layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.21f, editorArea);
+    leftFolder->AddView("org.mitk.views.datamanager");
+    layout->GetViewLayout("org.mitk.views.datamanager")->SetCloseable(false);
   }
 
-  const auto bottomLeftViews = mitk::WorkbenchUtil::FilterAvailableViews(
+  const auto bottomLeftViews = mitk::WorkbenchUtil::FilterAvailableViewIds(
     { "org.mitk.views.imagenavigator", "org.mitk.views.pixelvalue" });
+
+  berry::IFolderLayout::Pointer bottomLeftFolder;
 
   if (!bottomLeftViews.isEmpty())
   {
     // Anchored on the folder ID instead of on the Data Manager, so it keeps resolving
     // when the Data Manager is not part of the build. Without a folder above it, this
     // becomes the left column itself.
-    auto bottomLeftFolder = hasLeftFolder
+    bottomLeftFolder = leftFolder.IsNotNull()
       ? layout->CreateFolder("bottomleft", berry::IPageLayout::BOTTOM, 0.72f, "left")
       : layout->CreateFolder("bottomleft", berry::IPageLayout::LEFT, 0.21f, editorArea);
 
@@ -58,10 +51,18 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
       bottomLeftFolder->AddView(viewId);
   }
 
+  // A placeholder only reserves the spot a view takes once it is opened, so it has to
+  // join a folder that holds views of its own. A folder is laid out whether or not it
+  // has content, so one created for nothing but a placeholder leaves an empty panel.
+  const auto helpIndexHost = leftFolder.IsNotNull() ? leftFolder : bottomLeftFolder;
+
+  if (helpIndexHost.IsNotNull() && mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex"))
+    helpIndexHost->AddPlaceholder("org.blueberry.views.helpindex");
+
   if (mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator"))
     layout->AddView("org.mitk.views.viewnavigator", berry::IPageLayout::RIGHT, 0.62f, editorArea);
 
-  const auto bottomViews = mitk::WorkbenchUtil::FilterAvailableViews(
+  const auto bottomViews = mitk::WorkbenchUtil::FilterAvailableViewIds(
     { "org.blueberry.views.logview", "org.mitk.views.modules", "org.mitk.views.pythonenvironments" });
 
   if (!bottomViews.isEmpty())

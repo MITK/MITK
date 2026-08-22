@@ -56,7 +56,6 @@ set(MODULE_TESTS
   mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetPointOperationsTest.cpp
-  mitkProgressBarTest.cpp
   mitkProgressTaskTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp

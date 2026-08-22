@@ -53,7 +53,6 @@ set(H_FILES
   mitkPixelTypeTraits.h
   mitkPlaneClipping.h
   mitkPoint.h
-  mitkProgressBarImplementation.h
   mitkProgressTaskInfo.h
   mitkQuaternion.h
   mitkReferenceCountWatcher.h
@@ -115,7 +114,6 @@ set(CPP_FILES
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
   Controllers/mitkPlanePositionManager.cpp
-  Controllers/mitkProgressBar.cpp
   Controllers/mitkProgressService.cpp
   Controllers/mitkProgressTask.cpp
   Controllers/mitkRenderingManager.cpp

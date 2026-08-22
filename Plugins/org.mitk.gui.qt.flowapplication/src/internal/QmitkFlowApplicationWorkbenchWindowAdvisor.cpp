@@ -50,7 +50,6 @@ found in the LICENSE file.
 #include <QmitkRedoAction.h>
 #include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
-#include <QmitkProgressBar.h>
 #include <QmitkProgressNotificationOverlay.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
@@ -687,11 +686,6 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   auto  statusBar = new QmitkStatusBar(qStatusBar);
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
-
-  auto  progBar = new QmitkProgressBar();
-
-  qStatusBar->addPermanentWidget(progBar, 0);
-  progBar->hide();
 
   mainWindow->setStatusBar(qStatusBar);
 

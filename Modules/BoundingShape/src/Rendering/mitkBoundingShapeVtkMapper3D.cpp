@@ -12,13 +12,10 @@ found in the LICENSE file.
 
 #include <mitkBoundingShapeVtkMapper3D.h>
 #include "mitkBoundingShapeUtil.h"
-#include <mitkBaseProperty.h>
-#include <vtkAppendPolyData.h>
 #include <vtkCamera.h>
 #include <vtkCellData.h>
 #include <vtkCubeSource.h>
 #include <vtkDataArray.h>
-#include <vtkDataSetMapper.h>
 #include <vtkMath.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -97,6 +94,12 @@ void mitk::BoundingShapeVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRe
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
   node->AddProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
+  node->AddProperty(
+    BoundingShapeSelectedColorPropertyName, ColorProperty::New(0.0f, 1.0f, 0.0f), renderer, overwrite);
+  node->AddProperty(BoundingShapeHandleSizeFactorPropertyName,
+                    DoubleProperty::New(DefaultHandleSizeFactor),
+                    renderer,
+                    overwrite);
   node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
@@ -120,23 +123,6 @@ void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer
   float opacity = 0.2f;
   this->GetDataNode()->GetOpacity(opacity, renderer);
   property->SetOpacity(opacity);
-}
-
-void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor)
-{
-  if (actor == nullptr)
-    return;
-
-  auto dataNode = this->GetDataNode();
-
-  if (dataNode == nullptr)
-    return;
-
-  float lineWidth = 1.0f;
-  dataNode->GetFloatProperty("Bounding Shape.Line.Width", lineWidth, renderer);
-
-  auto property = actor->GetProperty();
-  property->SetLineWidth(lineWidth);
 }
 
 void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *renderer)
@@ -167,6 +153,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
       localStorage->Actor->VisibilityOff();
       localStorage->HandleActor->VisibilityOff();
       localStorage->SelectedHandleActor->VisibilityOff();
+      localStorage->UpdateGenerateDataTime();
       return;
     }
 
@@ -179,7 +166,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     mitk::Vector3D spacing = geometry->GetSpacing();
 
     // calculate cornerpoints from geometry
-    std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
+    const std::array<Point3D, 8> cornerPoints = GetCornerPoints(geometry, true);
 
     Point3D p0 = cornerPoints[0];
     Point3D p1 = cornerPoints[1];
@@ -283,58 +270,23 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
       polydata->GetCellData()->SetScalars(faceColors);
     }
 
-    auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
+    const HandleMarkers handleMarkers = CreateHandleMarkers(dataNode, renderer, geometry, cornerPoints, nullptr);
 
-    // handles are interaction affordances: the interactor adds the active-handle property
-    // when it attaches to the node and removes it when it detaches, so without the
-    // property no handles are rendered at all
-    mitk::IntProperty::Pointer activeHandleId =
-      dynamic_cast<mitk::IntProperty *>(dataNode->GetProperty(BoundingShapeActiveHandleIdPropertyName));
+    // a handle actor with no marker is hidden below instead of being cleared: the stale
+    // input it keeps is never shown
+    if (handleMarkers.idleHandles != nullptr)
+      localStorage->HandleMapper->SetInputData(handleMarkers.idleHandles);
 
-    bool hasIdleHandles = false;
-    bool selected = false;
-
-    if (activeHandleId != nullptr)
-    {
-      const double handleSize = GetHandleSize(renderer, dataNode);
-
-      for (const auto &handle : ComputeHandles(cornerPoints, nullptr))
-      {
-        auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
-
-        if (activeHandleId->GetValue() == handle.GetIndex())
-        {
-          localStorage->SelectedHandleMapper->SetInputData(handlePolyData);
-          selected = true;
-        }
-        else
-        {
-          appendPoly->AddInputData(handlePolyData);
-          hasIdleHandles = true;
-        }
-      }
-    }
-
-    // vtkAppendPolyData requires at least one input; with none the actor stays hidden
-    // and its stale output is never shown
-    if (hasIdleHandles)
-    {
-      appendPoly->Update();
-      localStorage->HandleMapper->SetInputData(appendPoly->GetOutput());
-    }
+    if (handleMarkers.selectedHandle != nullptr)
+      localStorage->SelectedHandleMapper->SetInputData(handleMarkers.selectedHandle);
 
     localStorage->Mapper->SetInputData(polydata);
 
     this->ApplyColorAndOpacityProperties(renderer, localStorage->Actor);
-    this->ApplyBoundingShapeProperties(renderer, localStorage->Actor);
-    this->ApplyBoundingShapeProperties(renderer, localStorage->HandleActor);
-    this->ApplyBoundingShapeProperties(renderer, localStorage->SelectedHandleActor);
 
     localStorage->Actor->VisibilityOn();
-    localStorage->HandleActor->SetVisibility(hasIdleHandles);
-    // show the selected (green) handle only when one is active this frame; its input is refreshed
-    // only on selection, so otherwise a deselected handle lingers with stale geometry
-    localStorage->SelectedHandleActor->SetVisibility(selected);
+    localStorage->HandleActor->SetVisibility(handleMarkers.idleHandles != nullptr);
+    localStorage->SelectedHandleActor->SetVisibility(handleMarkers.selectedHandle != nullptr);
 
     localStorage->PropAssembly->VisibilityOn();
 

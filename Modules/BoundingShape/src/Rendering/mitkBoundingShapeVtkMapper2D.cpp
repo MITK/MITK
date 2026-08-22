@@ -11,22 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkBoundingShapeUtil.h"
-#include <mitkBaseProperty.h>
 #include <mitkBoundingShapeVtkMapper2D.h>
 
 #include <vtkActor2D.h>
-#include <vtkAppendPolyData.h>
 #include <vtkCoordinate.h>
 #include <vtkCubeSource.h>
 #include <vtkMath.h>
-#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 #include <vtkProperty.h>
 #include <vtkProperty2D.h>
 #include <vtkStripper.h>
 #include <vtkTransformFilter.h>
-#include <vtkTransformPolyDataFilter.h>
 
 namespace mitk
 {
@@ -88,7 +84,10 @@ bool mitk::BoundingShapeVtkMapper2D::LocalStorage::IsUpdateRequired(mitk::BaseRe
   unsigned int sliceNumber = renderer->GetSlice();
 
   if (m_LastSliceNumber != sliceNumber)
+  {
+    m_LastSliceNumber = sliceNumber;
     return true;
+  }
 
   if (mapper && m_LastGenerateDataTime < mapper->GetMTime())
     return true;
@@ -120,6 +119,12 @@ void mitk::BoundingShapeVtkMapper2D::SetDefaultProperties(DataNode *node, BaseRe
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
   node->AddProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
+  node->AddProperty(
+    BoundingShapeSelectedColorPropertyName, ColorProperty::New(0.0f, 1.0f, 0.0f), renderer, overwrite);
+  node->AddProperty(BoundingShapeHandleSizeFactorPropertyName,
+                    DoubleProperty::New(DefaultHandleSizeFactor),
+                    renderer,
+                    overwrite);
   node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
@@ -167,6 +172,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       localStorage->m_Actor->VisibilityOff();
       localStorage->m_HandleActor->VisibilityOff();
       localStorage->m_SelectedHandleActor->VisibilityOff();
+      localStorage->UpdateGenerateDataTime();
       return;
     }
     GeometryData::Pointer shape = static_cast<GeometryData *>(node->GetData());
@@ -177,7 +183,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     mitk::Vector3D spacing = geometry->GetSpacing();
 
     // calculate cornerpoints and extent from geometry with visualization offset
-    std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
+    const std::array<Point3D, 8> cornerPoints = GetCornerPoints(geometry, true);
     Point3D p0 = cornerPoints[0];
     Point3D p1 = cornerPoints[1];
     Point3D p2 = cornerPoints[2];
@@ -264,42 +270,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
     if (localStorage->m_Cutter->GetOutput()->GetNumberOfPoints() > 0) // if plane is visible in the renderwindow
     {
-      auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
-
-      // handles are interaction affordances: the interactor adds the active-handle property
-      // when it attaches to the node and removes it when it detaches, so without the
-      // property no handles are rendered at all
-      mitk::IntProperty::Pointer activeHandleId =
-        dynamic_cast<mitk::IntProperty *>(node->GetProperty(BoundingShapeActiveHandleIdPropertyName));
-
-      bool hasIdleHandles = false;
-      bool selected = false;
-
-      if (activeHandleId != nullptr)
-      {
-        const double handleSize = GetHandleSize(renderer, node);
-
-        for (const auto &handle : ComputeHandles(cornerPoints, planeGeometry))
-        {
-          auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
-
-          if (activeHandleId->GetValue() == handle.GetIndex())
-          {
-            localStorage->m_SelectedHandleMapper->SetInputData(handlePolyData);
-            selected = true;
-          }
-          else
-          {
-            appendPoly->AddInputData(handlePolyData);
-            hasIdleHandles = true;
-          }
-        }
-      }
-
-      // vtkAppendPolyData requires at least one input; with none the actor stays hidden
-      // and its stale output is never shown
-      if (hasIdleHandles)
-        appendPoly->Update();
+      const HandleMarkers handleMarkers = CreateHandleMarkers(node, renderer, geometry, cornerPoints, planeGeometry);
 
       auto stripper = vtkSmartPointer<vtkStripper>::New();
       stripper->SetInputData(localStorage->m_Cutter->GetOutput());
@@ -313,22 +284,25 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
       this->ApplyColorAndOpacityProperties(renderer, localStorage->m_Actor);
 
-      localStorage->m_HandleActor->GetMapper()->SetInputDataObject(appendPoly->GetOutput());
+      // a handle actor with no marker is hidden below instead of being cleared: the stale
+      // input it keeps is never shown
+      if (handleMarkers.idleHandles != nullptr)
+        localStorage->m_HandleMapper->SetInputData(handleMarkers.idleHandles);
+
+      if (handleMarkers.selectedHandle != nullptr)
+      {
+        localStorage->m_SelectedHandleMapper->SetInputData(handleMarkers.selectedHandle);
+        localStorage->m_PropAssembly->AddPart(localStorage->m_SelectedHandleActor);
+      }
 
       // add parts to the overall storage
       localStorage->m_PropAssembly->AddPart(localStorage->m_Actor);
       localStorage->m_PropAssembly->AddPart(localStorage->m_HandleActor);
-      if (selected)
-      {
-        localStorage->m_PropAssembly->AddPart(localStorage->m_SelectedHandleActor);
-      }
-      // hide the selected (green) handle whenever none is active this frame; its input is only
-      // refreshed on selection, so otherwise the last green handle lingers at its old position
-      localStorage->m_SelectedHandleActor->SetVisibility(selected);
 
       localStorage->m_PropAssembly->VisibilityOn();
       localStorage->m_Actor->VisibilityOn();
-      localStorage->m_HandleActor->SetVisibility(hasIdleHandles);
+      localStorage->m_HandleActor->SetVisibility(handleMarkers.idleHandles != nullptr);
+      localStorage->m_SelectedHandleActor->SetVisibility(handleMarkers.selectedHandle != nullptr);
     }
     else
     {
@@ -336,7 +310,6 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       localStorage->m_Actor->VisibilityOff();
       localStorage->m_HandleActor->VisibilityOff();
       localStorage->m_SelectedHandleActor->VisibilityOff();
-      localStorage->UpdateGenerateDataTime();
     }
     localStorage->UpdateGenerateDataTime();
   }

@@ -1,5 +1,5 @@
 set(CPP_FILES
-  DataManagement/mitkBoundingShapeUtil.cpp
+  mitkBoundingShapeUtil.cpp
   DataManagement/mitkBoundingShapeCropper.cpp
   Interactions/mitkBoundingShapeInteractor.cpp
   Rendering/mitkBoundingShapeMapperProviders.cpp

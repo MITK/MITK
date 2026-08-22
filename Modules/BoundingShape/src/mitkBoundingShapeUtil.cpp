@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkNumericConstants.h>
 #include <mitkPlaneGeometry.h>
 
+#include <vtkAppendPolyData.h>
 #include <vtkCamera.h>
 #include <vtkCubeSource.h>
 #include <vtkMath.h>
@@ -97,7 +98,7 @@ namespace
    * faces are both derived from image geometries, so such a coincidence is exact only up
    * to the round-off accumulated in the transforms, which is what the tolerance absorbs.
    */
-  std::array<double, 8> GetCornerPlaneDistances(const std::vector<mitk::Point3D> &cornerPoints,
+  std::array<double, 8> GetCornerPlaneDistances(const std::array<mitk::Point3D, 8> &cornerPoints,
                                                 const mitk::Point3D &planeOrigin,
                                                 const mitk::Vector3D &unitPlaneNormal,
                                                 double tolerance)
@@ -119,7 +120,7 @@ namespace
    *         the plane yields false: its cross-section is the whole face, so there is no
    *         segment to place a handle on.
    */
-  bool GetFacePlaneIntersectionCenter(const std::vector<mitk::Point3D> &cornerPoints,
+  bool GetFacePlaneIntersectionCenter(const std::array<mitk::Point3D, 8> &cornerPoints,
                                       const std::array<int, 4> &faceCornerIndices,
                                       const std::array<double, 8> &cornerDistances,
                                       mitk::Point3D &center)
@@ -176,6 +177,48 @@ namespace
 
     return true;
   }
+
+  /**
+   * \brief Create the marker polydata for one handle: a cube of edge length \p size,
+   *        oriented with the direction cosines of \p geometry and centered at \p center.
+   */
+  vtkSmartPointer<vtkPolyData> CreateHandlePolyData(const mitk::BaseGeometry *geometry,
+                                                    const mitk::Point3D &center,
+                                                    double size)
+  {
+    auto cube = vtkSmartPointer<vtkCubeSource>::New();
+    cube->SetCenter(0.0, 0.0, 0.0);
+    cube->SetXLength(size);
+    cube->SetYLength(size);
+    cube->SetZLength(size);
+
+    const mitk::Vector3D spacing = geometry->GetSpacing();
+    vtkMatrix4x4 *imageTransform = geometry->GetVtkTransform()->GetMatrix();
+
+    // orient the marker cube with the box and move it onto the handle position; the direction
+    // cosines are the transform columns with the spacing scaled out
+    auto handleMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    handleMatrix->Identity();
+    for (int c = 0; c < 3; ++c)
+      for (int r = 0; r < 3; ++r)
+        handleMatrix->SetElement(r, c, imageTransform->GetElement(r, c) / spacing[c]);
+    handleMatrix->SetElement(0, 3, center[0]);
+    handleMatrix->SetElement(1, 3, center[1]);
+    handleMatrix->SetElement(2, 3, center[2]);
+
+    auto handleTransform = vtkSmartPointer<vtkTransform>::New();
+    handleTransform->SetMatrix(handleMatrix);
+
+    auto handleTransformFilter = vtkSmartPointer<vtkTransformFilter>::New();
+    handleTransformFilter->SetInputConnection(cube->GetOutputPort());
+    handleTransformFilter->SetTransform(handleTransform);
+    handleTransformFilter->Update();
+
+    auto polyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData->DeepCopy(handleTransformFilter->GetPolyDataOutput());
+
+    return polyData;
+  }
 }
 
 mitk::Handle::Handle() : m_Index(-1), m_MovedBounds{}
@@ -212,7 +255,7 @@ mitk::Point3D mitk::CalcAvgPoint(mitk::Point3D a, mitk::Point3D b)
   return c;
 }
 
-std::vector<mitk::Point3D> mitk::GetCornerPoints(mitk::BaseGeometry::Pointer geometry, bool visualizationOffset)
+std::array<mitk::Point3D, 8> mitk::GetCornerPoints(mitk::BaseGeometry::Pointer geometry, bool visualizationOffset)
 {
   if (geometry == nullptr)
     mitkThrow() << "Geometry is not valid.";
@@ -260,21 +303,19 @@ std::vector<mitk::Point3D> mitk::GetCornerPoints(mitk::BaseGeometry::Pointer geo
   p7[1] = BBmax[1];
   p7[2] = BBmax[2]; // top - right - front corner
 
-  std::vector<mitk::Point3D> cornerPoints;
+  const mitk::AffineTransform3D *indexToWorld = geometry->GetIndexToWorldTransform();
 
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p0));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p1));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p2));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p3));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p4));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p5));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p6));
-  cornerPoints.push_back(geometry->GetIndexToWorldTransform()->TransformPoint(p7));
-
-  return cornerPoints;
+  return {indexToWorld->TransformPoint(p0),
+          indexToWorld->TransformPoint(p1),
+          indexToWorld->TransformPoint(p2),
+          indexToWorld->TransformPoint(p3),
+          indexToWorld->TransformPoint(p4),
+          indexToWorld->TransformPoint(p5),
+          indexToWorld->TransformPoint(p6),
+          indexToWorld->TransformPoint(p7)};
 }
 
-std::vector<mitk::Handle> mitk::ComputeHandles(const std::vector<Point3D> &cornerPoints,
+std::vector<mitk::Handle> mitk::ComputeHandles(const std::array<Point3D, 8> &cornerPoints,
                                                const PlaneGeometry *planeGeometry)
 {
   std::vector<Handle> handles;
@@ -392,46 +433,51 @@ double mitk::GetHandleSize(const BaseRenderer *renderer, const DataNode *node)
     return (displaySize[0] + displaySize[1]) / 2.0 * sizeFactor;
   }
 
+  // half the height of the view frustum at the focal plane
   vtkCamera *camera = renderer->GetVtkRenderer()->GetActiveCamera();
-  return camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle())) / 2.0 * sizeFactor;
+  return camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()) / 2.0) * sizeFactor;
 }
 
-vtkSmartPointer<vtkPolyData> mitk::CreateHandlePolyData(const BaseGeometry *geometry,
-                                                        const Point3D &center,
-                                                        double size)
+mitk::HandleMarkers mitk::CreateHandleMarkers(const DataNode *node,
+                                              const BaseRenderer *renderer,
+                                              const BaseGeometry *geometry,
+                                              const std::array<Point3D, 8> &cornerPoints,
+                                              const PlaneGeometry *planeGeometry)
 {
-  auto cube = vtkSmartPointer<vtkCubeSource>::New();
-  cube->SetCenter(0.0, 0.0, 0.0);
-  cube->SetXLength(size);
-  cube->SetYLength(size);
-  cube->SetZLength(size);
+  int activeHandleId = -1;
 
-  const Vector3D spacing = geometry->GetSpacing();
-  vtkMatrix4x4 *imageTransform = geometry->GetVtkTransform()->GetMatrix();
+  if (!node->GetIntProperty(BoundingShapeActiveHandleIdPropertyName, activeHandleId, renderer))
+    return {}; // no interactor attached, so no handles to offer
 
-  // orient the marker cube with the box and move it onto the handle position; the direction
-  // cosines are the transform columns with the spacing scaled out
-  auto handleMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
-  handleMatrix->Identity();
-  for (int c = 0; c < 3; ++c)
-    for (int r = 0; r < 3; ++r)
-      handleMatrix->SetElement(r, c, imageTransform->GetElement(r, c) / spacing[c]);
-  handleMatrix->SetElement(0, 3, center[0]);
-  handleMatrix->SetElement(1, 3, center[1]);
-  handleMatrix->SetElement(2, 3, center[2]);
+  const double handleSize = GetHandleSize(renderer, node);
 
-  auto handleTransform = vtkSmartPointer<vtkTransform>::New();
-  handleTransform->SetMatrix(handleMatrix);
+  HandleMarkers markers;
+  auto idleHandleAppender = vtkSmartPointer<vtkAppendPolyData>::New();
+  bool hasIdleHandles = false;
 
-  auto handleTransformFilter = vtkSmartPointer<vtkTransformFilter>::New();
-  handleTransformFilter->SetInputConnection(cube->GetOutputPort());
-  handleTransformFilter->SetTransform(handleTransform);
-  handleTransformFilter->Update();
+  for (const auto &handle : ComputeHandles(cornerPoints, planeGeometry))
+  {
+    auto handlePolyData = CreateHandlePolyData(geometry, handle.GetPosition(), handleSize);
 
-  auto polyData = vtkSmartPointer<vtkPolyData>::New();
-  polyData->DeepCopy(handleTransformFilter->GetPolyDataOutput());
+    if (activeHandleId == handle.GetIndex())
+    {
+      markers.selectedHandle = handlePolyData;
+    }
+    else
+    {
+      idleHandleAppender->AddInputData(handlePolyData);
+      hasIdleHandles = true;
+    }
+  }
 
-  return polyData;
+  // vtkAppendPolyData requires at least one input, so it is only run once there is one
+  if (hasIdleHandles)
+  {
+    idleHandleAppender->Update();
+    markers.idleHandles = idleHandleAppender->GetOutput();
+  }
+
+  return markers;
 }
 
 void mitk::GetBoundingShapeColor(const DataNode *node, const BaseRenderer *renderer, float color[3])

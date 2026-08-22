@@ -47,20 +47,10 @@ namespace mitk
     /** \copydoc VtkMapper::ApplyColorAndOpacityProperties */
     void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
 
-    /** \brief Apply the "Bounding Shape.Line.Width" node property to the actor.
-     *
-     * Actor visibility is not part of this: it follows the node visibility and the
-     * interaction state, both of which are resolved while generating the render data.
-     *
-     * \param[in] renderer The renderer context.
-     * \param[in] actor    The VTK actor to apply properties to.
-     */
-    void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor);
-
     /** \brief Get the VTK prop assembly for 3D rendering.
      *
      * \param[in] renderer The renderer to get the prop for.
-     * \return The VTK prop containing the bounding shape wireframe and handle actors.
+     * \return The VTK prop containing the bounding shape box and handle actors.
      */
     vtkProp *GetVtkProp(BaseRenderer *renderer) override;
     //   virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer) override;

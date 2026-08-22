@@ -85,9 +85,11 @@ namespace mitk
      *
      * In a 2D render window handles sit on the sides and corners of the rendered cross-section
      * (only where the box crosses the current slice); in the 3D render window they sit at the
-     * centers of the six box faces. \p center is set to the box center.
+     * centers of the six box faces.
+     *
+     * @return The center of the bounding box.
      */
-    void HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center);
+    Point3D UpdateHandles(const InteractionEvent *interactionEvent);
 
     /**
     * @brief Checks if the mouse pointer is over the object.

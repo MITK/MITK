@@ -13,13 +13,12 @@ found in the LICENSE file.
 #ifndef mitkBoundingShapeUtil_h
 #define mitkBoundingShapeUtil_h
 
-#include <mitkBaseData.h>
 #include <mitkBaseGeometry.h>
-#include <mitkInteractionConst.h>
 
 #include <vtkSmartPointer.h>
 
 #include <array>
+#include <vector>
 
 class vtkPolyData;
 
@@ -30,21 +29,37 @@ namespace mitk
   class PlaneGeometry;
 
   /**
-  * Names of the DataNode properties through which the bounding shape interactor and the
-  * mappers communicate. The interactor adds the active-handle and selected properties when
-  * it attaches to a node and removes them when it detaches; the regular "color" property
-  * is owned by the user and never written by the interaction.
+  * Names of the DataNode properties through which the bounding shape interactor reports
+  * its state to the mappers. The interactor adds them when it attaches to a node and
+  * removes them again when it detaches, except for the "Bounding Shape" flag, which it
+  * only clears.
   */
   inline constexpr const char *BoundingShapePropertyName = "Bounding Shape";
   inline constexpr const char *BoundingShapeSelectedPropertyName = "Bounding Shape.Selected";
-  inline constexpr const char *BoundingShapeSelectedColorPropertyName = "Bounding Shape.Selected Color";
   inline constexpr const char *BoundingShapeActiveHandleIdPropertyName = "Bounding Shape.Active Handle ID";
+
+  /**
+  * Names of the DataNode properties that configure the appearance of a bounding shape.
+  * Like the regular "color" property, they come with the mapper default properties, belong
+  * to the user, and are never written by the interaction.
+  */
+  inline constexpr const char *BoundingShapeSelectedColorPropertyName = "Bounding Shape.Selected Color";
   inline constexpr const char *BoundingShapeHandleSizeFactorPropertyName = "Bounding Shape.Handle Size Factor";
 
   /**
-  * \brief helper function for calculating corner points of the bounding object from a given geometry
+  * \brief The value the mappers default the "Bounding Shape.Handle Size Factor" property
+  *        to, and the fallback wherever it is missing.
   */
-  std::vector<mitk::Point3D> GetCornerPoints(mitk::BaseGeometry::Pointer geometry, bool visualizationOffset);
+  inline constexpr double DefaultHandleSizeFactor = 0.02;
+
+  /**
+  * \brief The 8 corners of the box described by \p geometry, in world coordinates.
+  *
+  * The corner index is 4x + 2y + z, a set bit meaning the maximum bound of that index axis.
+  * With \p visualizationOffset, the corners are shifted by half a voxel, matching the box
+  * the mappers render.
+  */
+  std::array<Point3D, 8> GetCornerPoints(BaseGeometry::Pointer geometry, bool visualizationOffset);
 
   /**
   * \brief helper function for calculating the average of two points
@@ -62,9 +77,6 @@ namespace mitk
   /** \brief Per index axis (x, y, z): the bound a handle moves when dragged. */
   using AxisMovedBounds = std::array<MovedBound, 3>;
 
-  /** \brief Fallback for the "Bounding Shape.Handle Size Factor" node property when it is not set. */
-  inline constexpr double DefaultHandleSizeFactor = 0.02;
-
   /**
   * \brief A single interaction handle of the bounding shape: its id, world position,
   *        and the index-space bounds it moves when dragged.
@@ -79,7 +91,7 @@ namespace mitk
   *
   * where a is the index axis the edge runs along and b combines the min/max bits of
   * the two remaining axes in ascending axis order (bit set = maximum bound), following
-  * the corner numbering documented at ComputeHandles().
+  * the corner numbering of GetCornerPoints().
   *
   * \ingroup Data
   */
@@ -118,12 +130,11 @@ namespace mitk
    * them contributes a handle there, because it is the one whose two moved bounds are
    * least parallel to the plane and therefore visibly change the cross-section.
    *
-   * \param cornerPoints The 8 box corners from GetCornerPoints() (corner index = 4x + 2y + z,
-   *        bit set = maximum bound).
+   * \param cornerPoints The box corners from GetCornerPoints().
    * \param planeGeometry The slice plane of a 2D render window (must be valid), or nullptr
    *        for a 3D render window.
    */
-  std::vector<Handle> ComputeHandles(const std::vector<Point3D> &cornerPoints,
+  std::vector<Handle> ComputeHandles(const std::array<Point3D, 8> &cornerPoints,
                                      const PlaneGeometry *planeGeometry);
 
   /**
@@ -131,18 +142,35 @@ namespace mitk
    *
    * Scales the "Bounding Shape.Handle Size Factor" node property to a constant apparent
    * size: relative to the visible extent of the slice in a 2D render window, relative to
-   * the camera distance in the 3D one. Both mappers draw and the interactor picks at this
-   * size, so a handle is grabbable exactly where it is visible.
+   * the camera distance in the 3D one. The mappers draw and the interactor picks at this
+   * size, so that the region a handle can be grabbed in follows the size it is drawn at.
    */
   double GetHandleSize(const BaseRenderer *renderer, const DataNode *node);
 
+  /** \brief The handle marker polydata of one render window, as needed by both mappers. */
+  struct HandleMarkers
+  {
+    /** \brief All handles except the hovered one, merged into a single polydata. */
+    vtkSmartPointer<vtkPolyData> idleHandles;
+
+    /** \brief The handle the interactor reports as hovered. */
+    vtkSmartPointer<vtkPolyData> selectedHandle;
+  };
+
   /**
-   * \brief Create the marker polydata for one handle: a cube of edge length \p size,
-   *        oriented with the direction cosines of \p geometry and centered at \p center.
+   * \brief Create the handle markers to render in \p renderer: cubes of the size
+   *        GetHandleSize() reports, oriented with \p geometry and centered on the handles
+   *        ComputeHandles() places.
+   *
+   * Either member of the result is null when there is no such handle, and both are while
+   * the interactor is detached: handles are interaction affordances, and the interactor
+   * adds the active-handle property when it attaches to a node.
    */
-  vtkSmartPointer<vtkPolyData> CreateHandlePolyData(const BaseGeometry *geometry,
-                                                    const Point3D &center,
-                                                    double size);
+  HandleMarkers CreateHandleMarkers(const DataNode *node,
+                                    const BaseRenderer *renderer,
+                                    const BaseGeometry *geometry,
+                                    const std::array<Point3D, 8> &cornerPoints,
+                                    const PlaneGeometry *planeGeometry);
 
   /**
    * \brief Effective color of the bounding shape body: the highlight color while the

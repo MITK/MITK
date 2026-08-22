@@ -11,32 +11,22 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkBoundingShapeUtil.h"
+#include <mitkBaseRenderer.h>
 #include <mitkBoundingShapeInteractor.h>
 #include <mitkDisplayActionEventBroadcast.h>
-#include <mitkInteractionConst.h>
 #include <mitkInteractionEventObserver.h>
-#include <mitkInteractionKeyEvent.h>
 #include <mitkInteractionPositionEvent.h>
-#include <mitkMouseWheelEvent.h>
-#include <mitkBaseRenderer.h>
 #include <mitkPlaneGeometry.h>
 
 #include <vtkCamera.h>
-#include <vtkInteractorObserver.h>
-#include <vtkInteractorStyle.h>
 #include <vtkMath.h>
-#include <vtkPointData.h>
 #include <vtkRenderer.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 
 #include <algorithm>
 #include <cmath>
-
-// The property names shared with the mappers are defined in mitkBoundingShapeUtil.h.
 
 namespace mitk
 {
@@ -102,10 +92,10 @@ namespace
   /**
    * \brief Distance from a handle within which the cursor grabs it, in display units.
    *
-   * The mappers draw the markers at a world-space size (mitk::GetHandleSize()), so the
-   * radius is that size projected to the screen. In a 2D render window the display scale
-   * is uniform and the projection is a division; in the 3D one it depends on the depth,
-   * which is taken at \p referencePoint for all handles alike.
+   * The markers are drawn at a world-space size (mitk::GetHandleSize()), so the radius is
+   * that size projected to the screen. In a 2D render window the display scale is uniform
+   * and the projection is a division; in the 3D one it depends on the depth, which is taken
+   * at \p referencePoint for all handles alike.
    */
   mitk::ScalarType GetPickRadiusInDisplayUnits(const mitk::BaseRenderer *renderer,
                                                const mitk::DataNode *node,
@@ -192,28 +182,23 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
   if (newInputNode == nullptr)
     return;
 
-  newInputNode->AddProperty(BoundingShapeSelectedColorPropertyName, mitk::ColorProperty::New(0.0, 1.0, 0.0));
-
   newInputNode->SetProperty(BoundingShapePropertyName, mitk::BoolProperty::New(true));
   newInputNode->SetBoolProperty(BoundingShapeSelectedPropertyName, false);
   newInputNode->AddProperty(BoundingShapeActiveHandleIdPropertyName, mitk::IntProperty::New(-1));
   newInputNode->SetProperty("layer", mitk::IntProperty::New(101));
-  newInputNode->SetBoolProperty("fixedLayer", mitk::BoolProperty::New(true));
+  newInputNode->SetBoolProperty("fixedLayer", true);
   newInputNode->SetBoolProperty("pickable", true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::BoundingShapeInteractor::HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center)
+mitk::Point3D mitk::BoundingShapeInteractor::UpdateHandles(const InteractionEvent *interactionEvent)
 {
   GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
 
-  std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
-
-  // center based on half way of the distance between two opposing cornerpoints
-  center = CalcAvgPoint(cornerPoints[7], cornerPoints[0]);
+  const std::array<Point3D, 8> cornerPoints = GetCornerPoints(geometry, true);
 
   const BaseRenderer *renderer = interactionEvent->GetSender();
   const PlaneGeometry *planeGeometry =
@@ -223,6 +208,9 @@ void mitk::BoundingShapeInteractor::HandlePositionChanged(const InteractionEvent
     planeGeometry = nullptr;
 
   m_Impl->Handles = ComputeHandles(cornerPoints, planeGeometry);
+
+  // center based on half way of the distance between two opposing cornerpoints
+  return CalcAvgPoint(cornerPoints[7], cornerPoints[0]);
 }
 
 void mitk::BoundingShapeInteractor::SetDataNode(DataNode *node)
@@ -293,8 +281,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   if (positionEvent == nullptr)
     return false;
 
-  Point3D boundingBoxCenter;
-  HandlePositionChanged(interactionEvent, boundingBoxCenter);
+  const Point3D boundingBoxCenter = this->UpdateHandles(interactionEvent);
 
   BaseRenderer *renderer = interactionEvent->GetSender();
   const ScalarType pickRadius = GetPickRadiusInDisplayUnits(renderer, this->GetDataNode(), boundingBoxCenter);
@@ -305,12 +292,18 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
 
   const Point2D currentDisplayPosition = positionEvent->GetPointerPositionOnScreen();
 
-  // never pick a handle close to the projected box center, so a degenerate/very small box
-  // can still be grabbed by its body for translation
-  Point2D displayCenterPoint;
-  renderer->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
-  if (currentDisplayPosition.EuclideanDistanceTo(displayCenterPoint) <= pickRadius)
-    return false;
+  // In a slice view, never pick a handle close to the projected box center, so a
+  // degenerate/very small box can still be grabbed by its body for translation. The 3D
+  // render window offers no body translation, so there the center is not kept clear:
+  // looking down a box axis projects two face handles onto it.
+  if (renderer->GetMapperID() == BaseRenderer::Standard2D)
+  {
+    Point2D displayCenterPoint;
+    renderer->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
+
+    if (currentDisplayPosition.EuclideanDistanceTo(displayCenterPoint) <= pickRadius)
+      return false;
+  }
 
   // pick the nearest handle under the cursor; face and edge handles sit close together
   // on a small box, where first-in-list would shadow the visually closer one
@@ -360,7 +353,8 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, Interacti
 
 void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *)
 {
-  this->DisableOriginalInteraction();
+  // nothing is hovered anymore, so crosshair interaction and scrolling are due back
+  this->EnableOriginalInteraction();
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())

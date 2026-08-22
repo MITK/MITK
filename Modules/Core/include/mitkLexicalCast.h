@@ -17,9 +17,9 @@ found in the LICENSE file.
  * These wrappers are intentionally backed by \c boost::lexical_cast rather than
  * \c std::from_chars / \c std::to_chars. The standard route looks like the
  * obvious replacement, but its floating-point support is not portable yet:
- * libc++ (Apple/macOS) ships the floating-point \c <charconv> overloads only in
- * very recent releases. \c boost::lexical_cast handles integers, normal floats,
- * "inf"/"-inf"/"nan" (any case) correctly on every platform, and is
+ * libc++ (Apple/macOS) ships the floating-point \c \<charconv\> overloads only
+ * in very recent releases. \c boost::lexical_cast handles integers, normal
+ * floats, "inf"/"-inf"/"nan" (any case) correctly on every platform, and is
  * header-only, so it adds no compiled Boost library or linkage cost.
  *
  * Two caveats, both handled here. First, boost::lexical_cast converts through

@@ -42,8 +42,20 @@ mitk::ProgressTask::ProgressTask(const std::string& name, unsigned int steps, bo
     m_StepsToDo(steps),
     m_Progress(0)
 {
-  if (nullptr != m_Service)
+  if (nullptr == m_Service)
+    return;
+
+  try
+  {
     m_State = m_Service->StartTask(name, steps, cancelable);
+  }
+  catch (...)
+  {
+    // The destructor never runs for an object whose constructor threw, so the
+    // service reference has to be given back here or it is held for the life
+    // of the process. Degrades to no reporting for the same reason as above.
+    this->Finish();
+  }
 }
 
 mitk::ProgressTask::ProgressTask(std::function<void(float)> report, unsigned int steps)
@@ -68,6 +80,12 @@ mitk::ProgressTask::ProgressTask(ProgressTask&& other) noexcept
     m_Progress(other.m_Progress)
 {
   other.m_Service = nullptr;
+
+  // A moved-from std::function is valid but not necessarily empty, and one
+  // that survived the move would let the moved-from handle report completion
+  // a second time when it is destroyed.
+  other.m_Report = nullptr;
+
   other.m_StepsToDo = 0;
   other.m_Progress = 0;
 }
@@ -86,6 +104,7 @@ mitk::ProgressTask& mitk::ProgressTask::operator=(ProgressTask&& other) noexcept
     m_Progress = other.m_Progress;
 
     other.m_Service = nullptr;
+    other.m_Report = nullptr;
     other.m_StepsToDo = 0;
     other.m_Progress = 0;
   }

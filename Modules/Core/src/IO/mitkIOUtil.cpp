@@ -338,6 +338,11 @@ namespace
           this, &FileProgressForwarder::OnProgress));
       }
 
+      // Ended here rather than left to the member's own destructor, which runs
+      // after this body and would call back into an object whose lifetime is
+      // already over.
+      m_FileTask.Finish();
+
       // Whatever the file reported, its share of the work is over. Formats
       // that report nothing at all advance here in one go.
       this->Advance(STEPS_PER_FILE);

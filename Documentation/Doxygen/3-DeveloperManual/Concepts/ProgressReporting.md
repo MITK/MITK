@@ -79,6 +79,13 @@ task.SetProgress(SERIALIZATION_SHARE + COMPRESSION_SHARE * (j + 1) / m);
 the shares by how long each phase takes rather than by how many steps it has,
 since what a bar is for is telling the user how much time is left.
 
+Reporting a lower value than before does nothing: the service never takes a
+task's progress backwards, so a share that reports itself done out of turn
+cannot pull the bar down through the shares before it. That is a backstop, not
+a licence to report in any order. It also does not cover `AddStepsToDo()`,
+which lowers the percentage by growing the denominator rather than by lowering
+the numerator, so the rule above still holds.
+
 ## Reporting from a filter
 
 A filter has no way of knowing which user-facing operation it is part of, so it
@@ -151,8 +158,17 @@ mitk::StandaloneDataStorage hands `Add()` and `Remove()` to the thread that owns
 the storage; adding a node notifies observers synchronously, and those observers
 are rendering and user interface code. Handing over blocks until the task has
 run, so a caller waiting on a worker **must keep its event loop turning**.
-Waiting the bare way, as `QFuture::waitForFinished()` does, deadlocks. Queries
-such as `GetAll()` are not handed over, only mutations.
+Waiting the bare way, as `QFuture::waitForFinished()` does, deadlocks;
+`QmitkProcessEventsUntil()` is the wait that does not. Queries such as
+`GetAll()` are not handed over, only mutations, and an exception thrown by one
+that was handed over is carried back to the thread that asked for it rather
+than left to unwind the event loop it ran on.
+
+What is not handed over is everything else the worker touches. A writer that
+asks a mitk::Image or mitk::Surface for its VTK representation builds that
+representation on first access, on whatever thread asks, while the mappers on
+the owning thread read the same object. Build it before handing the work over,
+which is what `QmitkIOUtil::PrebuildVtkRepresentation()` is for.
 
 ## Cancellation
 
@@ -178,10 +194,26 @@ happens. The reverse is just as misleading: a cancelable operation that blocks
 the GUI thread without ever letting it breathe leaves the user with a cancel
 button they cannot press.
 
+An operation that is not a loop of its own but a call into a filter cannot poll
+at all, and has to be stopped through whatever the filter offers.
 mitk::ToolCommand turns a cancel request into
-`itk::ProcessObject::SetAbortGenerateData()` on the filter it observes. ITK
-reports that abort as an exception, which the caller has to tell apart from a
-genuine failure, or the user gets an error message for their own decision.
+`itk::ProcessObject::SetAbortGenerateData()` on the filter it observes, which
+only a filter that reads that flag can act on. ITK reads it in
+`itk::ProgressReporter`, so a filter reporting progress the ITK way aborts by
+throwing `itk::ProcessAborted`; one that computes in a single uninterrupted
+call, as several of the segmentation filters do, never looks at it and runs to
+completion regardless.
+
+So the capability belongs to the filter, and the tool in front of it has to
+know whether it has it. mitk::SegWithPreviewTool asks `IsCancelable()`, which
+is false unless a tool overrides it, and offers a cancel only if it says yes.
+Nothing overrides it at the time of writing, which is why a segmentation
+preview shows no cancel button.
+
+Where an abort does arrive, it arrives as an exception, which the caller has to
+tell apart from a genuine failure, or the user gets an error message for their
+own decision. Whatever the operation wrote before it stopped is not a result
+either: leave it on display and the user is looking at half an answer.
 
 ## Showing tasks
 
@@ -201,6 +233,14 @@ event loop, so whatever keeps it from painting keeps it from the delivery as
 well, and a task can already be seconds old by the time its first snapshot is
 applied. Measured from the start, such a task is shown the moment it is seen
 rather than a second later still.
+
+There is a limit to that, and it is worth knowing. The delay is a timer on the
+GUI thread, and the age is checked when a snapshot arrives, so a task that
+starts, reports nothing, and holds the GUI thread until it finishes is never
+shown at all: the timer cannot fire and no second snapshot ever comes to be
+checked. An operation that blocks the GUI thread therefore has to report as it
+goes, even coarsely, or run on a worker instead. One that reports nothing and
+blocks is exactly the case this whole mechanism cannot help with.
 
 For the GUI-independent side, mitk::IProgressService is a CppMicroServices
 service reached through `mitk::CoreServices::GetProgressService()`. Anything

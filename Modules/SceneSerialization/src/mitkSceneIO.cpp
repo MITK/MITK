@@ -186,6 +186,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
     try
     {
       SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      jsonReader->SetProgressTask(m_ProgressTask);
       jsonReader->SetLoadedNodes(m_LoadedNodes);
       if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
       {
@@ -296,6 +297,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
     try
     {
       SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      jsonReader->SetProgressTask(m_ProgressTask);
       jsonReader->SetLoadedNodes(m_LoadedNodes);
       if (!jsonReader->LoadScene(indexfilename, storage, clearStorageFirst))
       {
@@ -392,7 +394,18 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
     // share. How many files there will be to compress is only known once
     // the nodes are written, and adding them to the budget then would move
     // the bar backwards.
-    ProgressTask task("Saving scene", SERIALIZATION_SHARE + COMPRESSION_SHARE);
+    //
+    // Reports through the caller when there is one, so that writing a scene
+    // file shows one notification instead of one for the file and another for
+    // the scene inside it. The shares are absolute, so what the caller is
+    // handed is the fraction they add up to rather than steps of its own.
+    ProgressTask task = nullptr != m_ProgressTask
+      ? ProgressTask([outerTask = m_ProgressTask](float progress)
+          {
+            outerTask->SetProgress(static_cast<unsigned int>(progress * outerTask->GetStepsToDo()));
+          },
+          SERIALIZATION_SHARE + COMPRESSION_SHARE)
+      : ProgressTask("Saving scene", SERIALIZATION_SHARE + COMPRESSION_SHARE);
 
     // The serializers below write one file per node through IOUtil, which
     // would otherwise raise a notification per file on top of this one.

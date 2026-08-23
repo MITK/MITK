@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkPersistenceService.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkProgressTask.h>
+#include <mitkScopedProgressTask.h>
 #include <mitkProperties.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkUIDGenerator.h>
@@ -176,6 +178,16 @@ bool mitk::PersistenceService::Save(const std::string &fileName, bool appendChan
     {
       m_SceneIO = mitk::SceneIO::New();
     }
+
+    // Reported nowhere. This is not an operation the user asked for, and it
+    // runs while the application is shutting down, where a notification has
+    // nothing left to appear on.
+    ProgressTask quiet([](float) {});
+
+    // Taken away again on the way out: the service keeps its SceneIO, which
+    // would otherwise be left pointing at a task that is gone.
+    ScopedProgressTask<SceneIO> scopedQuiet(m_SceneIO, &quiet);
+
     save = m_SceneIO->SaveScene(sceneNodes.GetPointer(), tempDs, theFile);
   }
   if (save)
@@ -235,6 +247,15 @@ bool mitk::PersistenceService::Load(const std::string &fileName, bool enforceRel
     {
       m_SceneIO = mitk::SceneIO::New();
     }
+
+    // Reported nowhere, for the same reason as in Save() above: the user did
+    // not ask for this, and it runs while the application is starting up.
+    ProgressTask quiet([](float) {});
+
+    // Taken away again on the way out: the service keeps its SceneIO, which
+    // would otherwise be left pointing at a task that is gone.
+    ScopedProgressTask<SceneIO> scopedQuiet(m_SceneIO, &quiet);
+
     DataStorage::Pointer ds = m_SceneIO->LoadScene(theFile);
     load = (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedNodes()->size() == 0) &&
            (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedProperties()->IsEmpty());

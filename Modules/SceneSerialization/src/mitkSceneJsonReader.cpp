@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
 #include <mitkPropertyList.h>
 #include <mitkUIDGenerator.h>
@@ -31,6 +32,7 @@ found in the LICENSE file.
 #include <fstream>
 #include <list>
 #include <map>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
@@ -685,6 +687,29 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
   // BaseData with the same UID), so a collision here is logged only.
   std::set<std::string> seenDataUids;
 
+  // Reports through the caller when there is one, so that opening a scene file
+  // raises a single notification rather than one for the file and another for
+  // the scene inside it. The two passes below visit every node once, which is
+  // where the budget comes from.
+  const auto steps = static_cast<unsigned int>(entries.size() * 2);
+
+  std::optional<ProgressTask> ownTask;
+
+  if (nullptr == m_ProgressTask)
+    ownTask.emplace(std::string("Loading scene"), steps);
+
+  auto &task = ownTask.has_value()
+    ? ownTask.value()
+    : *m_ProgressTask;
+
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(steps);
+
+  // Each node's data is read through IOUtil, which would otherwise both raise
+  // a notification per node and, by adding its own steps here, keep moving
+  // this bar backwards as it discovers them.
+  IOUtil::QuietProgress quietProgress;
+
   // ---- 4. Pass 1: create nodes, load data, apply data-level properties.
   //
   // Data-level properties are applied here because they live on the loaded
@@ -738,6 +763,8 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
                   << "': 'data_properties' is ignored because the node carries no 'transfer' block.";
         nonFatalError = true;
       }
+
+      task.Progress();
       continue;
     }
 
@@ -882,6 +909,8 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     }
 
     mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(entry.dataNode->GetData());
+
+    task.Progress();
   }
 
   // ---- 5. Pass 2: topological add + apply property maps ------------------
@@ -999,6 +1028,8 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
           }
         }
       }
+
+      task.Progress();
     }
   }
 

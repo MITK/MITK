@@ -23,8 +23,6 @@ namespace tinyxml2
 
 namespace mitk
 {
-  class ProgressTask;
-
   /**
    * \brief Version 1 implementation of the MITK scene reader.
    *

@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Base class for scene-graph aware readers.
    *
@@ -66,6 +68,18 @@ namespace mitk
     virtual bool LoadScene(const std::string &sceneSourcePath, DataStorage *storage, bool clearStorageFirst = false) = 0;
 
     /**
+     * \brief Report progress into the given task rather than raising a
+     *        notification of its own.
+     *
+     * Set by a caller that already reports on this operation's behalf, so
+     * that opening a scene shows one notification instead of one for the
+     * file and another for the scene inside it.
+     *
+     * \param task The task to report into, or nullptr for none.
+     */
+    void SetProgressTask(ProgressTask *task);
+
+    /**
      * \brief Collect the nodes this reader adds in the given list.
      *
      * For a caller that has to tell the scene's nodes apart from anything else
@@ -82,6 +96,9 @@ namespace mitk
   protected:
     AbstractSceneReader();
     ~AbstractSceneReader() override;
+
+    /** \brief Null unless a caller reports on this reader's behalf. */
+    ProgressTask *m_ProgressTask = nullptr;
 
     /** \brief Null unless a caller wants to know which nodes came from here. */
     DataStorage::SetOfObjects *m_LoadedNodes = nullptr;

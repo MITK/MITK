@@ -44,6 +44,23 @@ found in the LICENSE file.
 namespace
 {
   /**
+   * Puts the ordinary cursor back for as long as it exists. An operation that
+   * stops to ask something runs under a busy cursor, which over a dialog that
+   * is waiting for an answer says the opposite of what is meant. Overrides
+   * stack, so this pops back to whatever was set before rather than clearing
+   * it.
+   */
+  class ScopedArrowCursor
+  {
+  public:
+    ScopedArrowCursor() { QApplication::setOverrideCursor(Qt::ArrowCursor); }
+    ~ScopedArrowCursor() { QApplication::restoreOverrideCursor(); }
+
+    ScopedArrowCursor(const ScopedArrowCursor&) = delete;
+    ScopedArrowCursor& operator=(const ScopedArrowCursor&) = delete;
+  };
+
+  /**
    * Asks the user about reader or writer options.
    *
    * The IO itself runs on a worker thread, where a dialog must not be
@@ -61,6 +78,8 @@ namespace
 
     QMetaObject::invokeMethod(qApp, [&info, &result]()
       {
+        ScopedArrowCursor arrowCursor;
+
         Dialog dialog(info);
 
         if (dialog.exec() == QDialog::Accepted)

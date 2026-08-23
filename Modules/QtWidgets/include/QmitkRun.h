@@ -43,7 +43,8 @@ MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(const QString& title, const QStr
 
 /** \brief Runs a long task that produces a value. \sa QmitkRunAsyncBlocking()
  *
- * \return What the task returned, or a value-initialised T if it threw.
+ * \return What the task returned. A task that threw returns nothing: its
+ *         exception is rethrown here, as in the overload above.
  */
 template<typename T>
 T QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<T()> task)

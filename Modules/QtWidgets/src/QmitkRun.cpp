@@ -78,6 +78,13 @@ namespace
         case QEvent::TouchBegin:
         case QEvent::TouchUpdate:
         case QEvent::TouchEnd:
+        // A drag that started outside the application delivers these without
+        // a single mouse event of ours, so nothing above keeps it out. Left
+        // through, a file dropped on the window during a load would start a
+        // second one from inside the first.
+        case QEvent::DragEnter:
+        case QEvent::DragMove:
+        case QEvent::Drop:
           return true;
 
         default:

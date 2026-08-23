@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkProgressTask.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkFileSystem.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkStringUtil.h>
@@ -43,6 +44,42 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include <tinyxml2.h>
+
+namespace
+{
+  /** Reports one step per file that goes into the archive. */
+  class ZipProgress
+  {
+  public:
+    explicit ZipProgress(mitk::ProgressTask& task)
+      : m_Task(task)
+    {
+    }
+
+    void OnDone(const void*, const Poco::Zip::ZipLocalFileHeader&)
+    {
+      m_Task.Progress();
+    }
+
+  private:
+    mitk::ProgressTask& m_Task;
+  };
+
+  /** Counts what compressing the working directory is going to cost. */
+  unsigned int CountFiles(const std::string& directory)
+  {
+    std::error_code error;
+    unsigned int count = 0;
+
+    for (const auto& entry : fs::recursive_directory_iterator(directory, error))
+    {
+      if (entry.is_regular_file(error))
+        ++count;
+    }
+
+    return count;
+  }
+}
 
 mitk::SceneIO::SceneIO() : m_WorkingDirectory(""), m_UnzipErrors(0)
 {
@@ -309,6 +346,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
     // DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
+    // Declared out here because compressing the working directory happens
+    // after the loop over the nodes and belongs to the same operation.
+    ProgressTask task("Saving scene");
+
     if (sceneNodes.IsNull())
     {
       MITK_WARN << "Saving empty scene to " << filename;
@@ -329,7 +370,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         return false;
       }
 
-      ProgressTask task("Saving scene", static_cast<unsigned int>(sceneNodes->size()));
+      task.AddStepsToDo(static_cast<unsigned int>(sceneNodes->size()));
 
       // find out about dependencies
       typedef std::map<DataNode *, std::string> UIDMapType;
@@ -498,10 +539,23 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
         else
         {
+          // Compressing the working directory is what dominates saving a
+          // large scene, and it used to run after the task had already
+          // reported everything it knew about.
+          task.AddStepsToDo(CountFiles(m_WorkingDirectory));
+
+          ZipProgress zipProgress(task);
+
           Poco::Zip::Compress zipper(file, true);
+          zipper.EDone += Poco::Delegate<ZipProgress, const Poco::Zip::ZipLocalFileHeader>(
+            &zipProgress, &ZipProgress::OnDone);
+
           Poco::Path tmpdir(m_WorkingDirectory);
           zipper.addRecursive(tmpdir);
           zipper.close();
+
+          zipper.EDone -= Poco::Delegate<ZipProgress, const Poco::Zip::ZipLocalFileHeader>(
+            &zipProgress, &ZipProgress::OnDone);
         }
         try
         {

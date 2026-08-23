@@ -119,6 +119,11 @@ QmitkProgressNotificationOverlay renders the running tasks. The workbench
 window advisors create one per window; a plugin does not need to do anything
 to have its tasks shown.
 
+A task is only shown once it has run for about a second, so the many
+operations that finish immediately never raise a notification at all. A task
+that is shown but has yet to report its first step switches to a spinning bar
+after another second, rather than sitting at zero as if it were stuck.
+
 For the GUI-independent side, mitk::IProgressService is a CppMicroServices
 service reached through `mitk::CoreServices::GetProgressService()`. Anything
 that wants to observe tasks implements mitk::IProgressListener and registers

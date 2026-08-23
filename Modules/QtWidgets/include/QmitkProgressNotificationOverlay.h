@@ -64,6 +64,7 @@ protected:
 
 private:
   void Apply(const mitk::ProgressTaskInfo& info);
+  void ShowPendingTask(mitk::ProgressTaskId id);
   void OnCancelRequested(mitk::ProgressTaskId id);
   void OnNotificationClosed(mitk::ProgressTaskId id);
   void RefreshVisibility();
@@ -72,11 +73,21 @@ private:
   void InstallEventFilterOnParent();
   void RemoveEventFilterFromParent();
 
+  /** rief A task that started but has not been worth showing yet. */
+  struct PendingTask
+  {
+    mitk::ProgressTaskInfo Info;
+    QElapsedTimer SinceFirstSeen;
+  };
+
   mitk::IProgressService* m_Service;
   QVBoxLayout* m_Layout;
   QLabel* m_OverflowLabel;
 
   QHash<mitk::ProgressTaskId, QmitkProgressNotification*> m_Notifications;
+
+  /** rief Tasks waiting out the delay before they get a card. */
+  QHash<mitk::ProgressTaskId, PendingTask> m_Pending;
 
   /** \brief Last applied sequence number per task, to drop stale snapshots. */
   QHash<mitk::ProgressTaskId, quint64> m_Sequences;

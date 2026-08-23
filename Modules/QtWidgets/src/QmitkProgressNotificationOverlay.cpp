@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <QMainWindow>
 #include <QResizeEvent>
 #include <QStatusBar>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -38,6 +39,13 @@ namespace
    * step would cost more than the operation itself.
    */
   constexpr qint64 REPAINT_INTERVAL_IN_MS = 40;
+
+  /**
+   * How long an operation has to run before it is worth telling the user
+   * about. Most operations are over in a few milliseconds, and announcing
+   * every one of them buries the ones that actually take time.
+   */
+  constexpr qint64 SHOW_DELAY_IN_MS = 1000;
 }
 
 QmitkProgressNotificationOverlay::QmitkProgressNotificationOverlay(QWidget* parent)
@@ -112,31 +120,51 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
   m_Sequences.insert(info.Id, info.Sequence);
 
   auto* notification = m_Notifications.value(info.Id, nullptr);
-  auto appeared = false;
+
+  if (nullptr == notification)
+  {
+    if (info.Finished)
+    {
+      // Over before it was worth mentioning.
+      m_Pending.remove(info.Id);
+      m_Sequences.remove(info.Id);
+      return;
+    }
+
+    auto pending = m_Pending.find(info.Id);
+
+    if (pending == m_Pending.end())
+    {
+      PendingTask task;
+      task.Info = info;
+      task.SinceFirstSeen.start();
+      m_Pending.insert(info.Id, task);
+
+      // Covers a task that goes quiet after starting. A task that keeps
+      // reporting is picked up by the elapsed check below instead, which
+      // also works while a blocking operation starves the event loop.
+      QTimer::singleShot(SHOW_DELAY_IN_MS, this, [this, id = info.Id]()
+        {
+          this->ShowPendingTask(id);
+        });
+
+      return;
+    }
+
+    pending->Info = info;
+
+    if (pending->SinceFirstSeen.elapsed() >= SHOW_DELAY_IN_MS)
+      this->ShowPendingTask(info.Id);
+
+    return;
+  }
 
   if (info.Finished)
   {
     m_Notifications.remove(info.Id);
     m_Sequences.remove(info.Id);
 
-    if (nullptr == notification)
-      return;
-
     notification->Finish(info);
-  }
-  else if (nullptr == notification)
-  {
-    notification = new QmitkProgressNotification(info, this);
-
-    connect(notification, &QmitkProgressNotification::CancelRequested,
-      this, &QmitkProgressNotificationOverlay::OnCancelRequested);
-    connect(notification, &QmitkProgressNotification::Closed,
-      this, &QmitkProgressNotificationOverlay::OnNotificationClosed);
-
-    m_Notifications.insert(info.Id, notification);
-    m_Layout->insertWidget(0, notification);
-
-    appeared = true;
   }
   else
   {
@@ -146,9 +174,34 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
   this->RefreshVisibility();
   this->UpdatePosition();
 
-  // A card that appears or disappears must not wait for the throttle, or a
-  // short operation would never be seen at all.
-  this->Repaint(appeared || info.Finished);
+  // A card that disappears must not wait for the throttle, or the completed
+  // state would never be drawn.
+  this->Repaint(info.Finished);
+}
+
+void QmitkProgressNotificationOverlay::ShowPendingTask(mitk::ProgressTaskId id)
+{
+  auto pending = m_Pending.find(id);
+
+  if (pending == m_Pending.end())
+    return;
+
+  const auto info = pending->Info;
+  m_Pending.erase(pending);
+
+  auto* notification = new QmitkProgressNotification(info, this);
+
+  connect(notification, &QmitkProgressNotification::CancelRequested,
+    this, &QmitkProgressNotificationOverlay::OnCancelRequested);
+  connect(notification, &QmitkProgressNotification::Closed,
+    this, &QmitkProgressNotificationOverlay::OnNotificationClosed);
+
+  m_Notifications.insert(id, notification);
+  m_Layout->insertWidget(0, notification);
+
+  this->RefreshVisibility();
+  this->UpdatePosition();
+  this->Repaint(true);
 }
 
 void QmitkProgressNotificationOverlay::OnCancelRequested(mitk::ProgressTaskId id)

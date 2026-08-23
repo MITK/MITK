@@ -26,6 +26,13 @@ found in the LICENSE file.
 namespace
 {
   constexpr int LINGER_DURATION_IN_MS = 1500;
+
+  /**
+   * How long a task may show no progress at all before its bar starts
+   * spinning. A bar sitting at zero is indistinguishable from one that is
+   * stuck.
+   */
+  constexpr qint64 SPIN_DELAY_IN_MS = 1000;
   constexpr int FADE_DURATION_IN_MS = 300;
 
   QString CardStyleSheet()
@@ -61,7 +68,14 @@ QmitkProgressNotification::QmitkProgressNotification(const mitk::ProgressTaskInf
 {
   m_Controls->setupUi(this);
 
+  m_SinceCreation.start();
+
   this->setObjectName(QStringLiteral("QmitkProgressNotification"));
+
+  // Qt draws no style sheet background for a plain QWidget subclass unless
+  // it is asked to, which would leave the card without its background and
+  // border and let the render windows show through it.
+  this->setAttribute(Qt::WA_StyledBackground, true);
 
   // The card colors are baked into a style sheet, so unlike the icons they do
   // not follow a theme switch on their own.
@@ -78,6 +92,14 @@ QmitkProgressNotification::QmitkProgressNotification(const mitk::ProgressTaskInf
   connect(m_Controls->closeButton, &QToolButton::clicked, this, &QmitkProgressNotification::OnCloseButtonClicked);
 
   this->ApplyState();
+
+  // A task that goes quiet rather than reporting would otherwise never be
+  // re-evaluated, as the state is only recomputed when a snapshot arrives.
+  QTimer::singleShot(SPIN_DELAY_IN_MS, this, [this]()
+    {
+      if (!m_Info.Finished)
+        this->ApplyState();
+    });
 }
 
 QmitkProgressNotification::~QmitkProgressNotification()
@@ -124,11 +146,22 @@ void QmitkProgressNotification::OnCloseButtonClicked()
   emit Closed(m_Info.Id);
 }
 
+bool QmitkProgressNotification::ShouldSpin() const
+{
+  // A task whose extent is unknown can only ever spin.
+  if (0 == m_Info.StepsToDo)
+    return true;
+
+  return 0 == m_Info.Progress
+      && !m_Info.Finished
+      && m_SinceCreation.elapsed() >= SPIN_DELAY_IN_MS;
+}
+
 void QmitkProgressNotification::ApplyState()
 {
   this->UpdateNameLabel();
 
-  if (0 == m_Info.StepsToDo)
+  if (this->ShouldSpin())
   {
     m_Controls->progressBar->setRange(0, 0);
   }

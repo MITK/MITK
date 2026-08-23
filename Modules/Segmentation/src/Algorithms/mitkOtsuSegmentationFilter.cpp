@@ -88,7 +88,7 @@ namespace mitk
 
   OtsuSegmentationFilter::~OtsuSegmentationFilter() {}
 
-  void OtsuSegmentationFilter::ForwardProgress(const itk::Object *caller, const itk::EventObject &)
+  void OtsuSegmentationFilter::ForwardProgress(itk::Object *caller, const itk::EventObject &)
   {
     if (const auto *source = dynamic_cast<const itk::ProcessObject *>(caller); nullptr != source)
       this->UpdateProgress(source->GetProgress());

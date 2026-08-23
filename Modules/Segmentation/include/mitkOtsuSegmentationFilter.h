@@ -84,9 +84,13 @@ namespace mitk
      * Public only because that pipeline is assembled in a free template
      * function rather than by this class. Not meant to be called otherwise.
      *
+     * Takes its caller non-const because that is what itk::MemberCommand binds
+     * to the callback ITK actually invokes: a const parameter lands in the
+     * command's other slot, which nothing on the InvokeEvent() path calls.
+     *
      * \param[in] caller The internal filter reporting its progress.
      */
-    void ForwardProgress(const itk::Object *caller, const itk::EventObject &);
+    void ForwardProgress(itk::Object *caller, const itk::EventObject &);
 
     /**
      * \brief Sets the number of histogram bins for Otsu's threshold computation.

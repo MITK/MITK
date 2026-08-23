@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 
 #include <mitkCoreServices.h>
-#include <mitkIDataStorageService.h>
 #include <mitkStorageThreadDispatcherBase.h>
 #include <mitkExceptionMacro.h>
 #include <mitkFileReaderRegistry.h>
@@ -290,25 +289,15 @@ namespace
   thread_local unsigned int s_QuietDepth = 0;
 
   /**
-   * Runs the task on the thread that owns the data storage, if this is not
-   * it. Writing to data that is on display has to happen where everything
-   * else reads it, which is not the worker a save may be running on.
+   * Runs the task on the thread that owns the data storage, or here if this
+   * already is that thread. Writing to data that is on display has to happen
+   * where everything else reads it, which is not the worker a save may be
+   * running on.
    */
   void RunWhereTheDataLives(const std::function<void()>& task)
   {
-    mitk::CoreServicePointer<mitk::IDataStorageService> service(mitk::CoreServices::GetDataStorageService());
-
-    auto* dispatcher = service
-      ? service->GetDispatcher()
-      : nullptr;
-
-    if (nullptr == dispatcher || dispatcher->IsDispatchThread())
-    {
+    if (!mitk::DispatchToStorageThread(task))
       task();
-      return;
-    }
-
-    dispatcher->Execute(task);
   }
 
   /**

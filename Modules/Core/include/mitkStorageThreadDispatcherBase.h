@@ -112,6 +112,34 @@ namespace mitk
     StorageThreadDispatcherBase() = default;
     ~StorageThreadDispatcherBase() override = default;
   };
+
+  /**
+   * \brief Run a task on the thread that owns the data storage.
+   *
+   * Mutating the storage notifies observers synchronously, and those observers
+   * are rendering and user interface code that belongs to one thread. So work
+   * running elsewhere hands the whole operation over instead of doing it where
+   * it happens to be.
+   *
+   * Handing over blocks until the task has run, so the owning thread must be
+   * able to reach its event loop. Waiting for a worker without one, as a bare
+   * QFuture::waitForFinished() does, deadlocks instead.
+   *
+   * An exception the task throws is carried back and rethrown here. Left to
+   * itself it would unwind the owning thread's event loop rather than reach the
+   * caller, which is where the error belongs.
+   *
+   * The dispatcher is resolved on every call rather than cached. It belongs to
+   * the data storage service and dies with the plugin that installed it, which
+   * a caller outliving that plugin has no way of being told about.
+   *
+   * \param[in] task The operation to run on the owning thread.
+   * \return True if the task was handed over and has already run. False if
+   *         there is nothing to hand over to, as in a command line tool, or
+   *         this is already the owning thread; the task has *not* run then and
+   *         the caller carries on itself.
+   */
+  MITKCORE_EXPORT bool DispatchToStorageThread(const std::function<void()> &task);
 }
 
 #endif

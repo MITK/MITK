@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkCovarianceMatrixCalculator.h>
 #include <mitkAnisotropicRegistrationCommon.h>
 #include <mitkProgressTask.h>
+#include <mitkScopedProgressTask.h>
 
 // vtk
 #include <vtkSmartPointer.h>
@@ -416,7 +417,9 @@ void UIWorker::RegistrationThreadFunc()
   d->m_AICP->SetSearchRadius(d->m_SearchRadius);
   d->m_AICP->SetThreshold(d->m_Threshold);
   d->m_AICP->SetTrimmFactor(d->m_TrimmFactor);
-  d->m_AICP->SetProgressTask(&task);
+  // The filter belongs to the view and outlives this thread by a long way, so
+  // the task must not be left behind in it.
+  mitk::ScopedProgressTask<mitk::AnisotropicIterativeClosestPointRegistration> scopedTask(d->m_AICP, &task);
 
   // run the algorithm
   d->m_AICP->Update();

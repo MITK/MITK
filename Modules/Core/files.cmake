@@ -57,6 +57,7 @@ set(H_FILES
   mitkQuaternion.h
   mitkReferenceCountWatcher.h
   mitkRenderingManagerFactory.h
+  mitkScopedProgressTask.h
   mitkServiceInterface.h
   mitkStatusBarImplementation.h
   mitkStdFunctionCommand.h
@@ -248,6 +249,7 @@ set(CPP_FILES
   DataManagement/mitkSmartPointerProperty.cpp
   DataManagement/mitkSourceImageRelationRule.cpp
   DataManagement/mitkStandaloneDataStorage.cpp
+  DataManagement/mitkStorageThreadDispatcherBase.cpp
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp

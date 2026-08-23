@@ -25,7 +25,8 @@ namespace
 }
 
 mitk::ProgressService::ProgressService()
-  : m_NextId(0),
+  : m_Registrations(std::make_shared<Registrations>()),
+    m_NextId(0),
     m_NextSequence(0)
 {
 }
@@ -72,16 +73,19 @@ bool mitk::ProgressService::AddListener(IProgressListener* listener)
   {
     std::scoped_lock lock(m_Mutex);
 
-    auto it = std::find_if(m_Registrations.begin(), m_Registrations.end(), [listener](const auto& candidate) {
+    auto it = std::find_if(m_Registrations->begin(), m_Registrations->end(), [listener](const auto& candidate) {
       return candidate->Listener == listener;
     });
 
-    if (it != m_Registrations.end())
+    if (it != m_Registrations->end())
       return true;
 
     registration = std::make_shared<Registration>();
     registration->Listener = listener;
-    m_Registrations.push_back(registration);
+
+    auto registrations = std::make_shared<Registrations>(*m_Registrations);
+    registrations->push_back(registration);
+    m_Registrations = registrations;
 
     activeTasks.reserve(m_Tasks.size());
 
@@ -107,15 +111,18 @@ bool mitk::ProgressService::RemoveListener(const IProgressListener* listener)
   {
     std::scoped_lock lock(m_Mutex);
 
-    auto it = std::find_if(m_Registrations.begin(), m_Registrations.end(), [listener](const auto& candidate) {
+    auto registrations = std::make_shared<Registrations>(*m_Registrations);
+
+    auto it = std::find_if(registrations->begin(), registrations->end(), [listener](const auto& candidate) {
       return candidate->Listener == listener;
     });
 
-    if (it == m_Registrations.end())
+    if (it == registrations->end())
       return false;
 
     registration = *it;
-    m_Registrations.erase(it);
+    registrations->erase(it);
+    m_Registrations = registrations;
   }
 
   // m_Mutex is released above on purpose: Notify() takes the registration
@@ -143,7 +150,7 @@ std::vector<mitk::ProgressTaskInfo> mitk::ProgressService::GetActiveTasks() cons
 void mitk::ProgressService::RequestCancel(ProgressTaskId id)
 {
   ProgressTaskInfo info;
-  Registrations registrations;
+  std::shared_ptr<const Registrations> registrations;
 
   {
     std::scoped_lock lock(m_Mutex);
@@ -161,7 +168,7 @@ void mitk::ProgressService::RequestCancel(ProgressTaskId id)
     registrations = m_Registrations;
   }
 
-  Notify(registrations, info);
+  Notify(*registrations, info);
 }
 
 std::shared_ptr<mitk::ProgressTaskState> mitk::ProgressService::StartTask(const std::string& name,
@@ -169,7 +176,7 @@ std::shared_ptr<mitk::ProgressTaskState> mitk::ProgressService::StartTask(const 
                                                                          bool cancelable)
 {
   ProgressTaskInfo info;
-  Registrations registrations;
+  std::shared_ptr<const Registrations> registrations;
   std::shared_ptr<ProgressTaskState> state;
 
   {
@@ -188,7 +195,7 @@ std::shared_ptr<mitk::ProgressTaskState> mitk::ProgressService::StartTask(const 
     registrations = m_Registrations;
   }
 
-  Notify(registrations, info);
+  Notify(*registrations, info);
 
   return state;
 }
@@ -199,7 +206,7 @@ void mitk::ProgressService::UpdateTask(ProgressTaskId id,
                                        unsigned int progress)
 {
   ProgressTaskInfo info;
-  Registrations registrations;
+  std::shared_ptr<const Registrations> registrations;
 
   {
     std::scoped_lock lock(m_Mutex);
@@ -209,7 +216,11 @@ void mitk::ProgressService::UpdateTask(ProgressTaskId id,
     if (it == m_Tasks.end())
       return;
 
-    it->second.Info.Name = name;
+    // A task resends its name with every step, so this is almost always the
+    // name it already carries.
+    if (it->second.Info.Name != name)
+      it->second.Info.Name = name;
+
     it->second.Info.StepsToDo = steps;
 
     // Never backwards. A caller that maps phases of its work onto shares of one
@@ -225,13 +236,13 @@ void mitk::ProgressService::UpdateTask(ProgressTaskId id,
     registrations = m_Registrations;
   }
 
-  Notify(registrations, info);
+  Notify(*registrations, info);
 }
 
 void mitk::ProgressService::FinishTask(ProgressTaskId id)
 {
   ProgressTaskInfo info;
-  Registrations registrations;
+  std::shared_ptr<const Registrations> registrations;
 
   {
     std::scoped_lock lock(m_Mutex);
@@ -254,5 +265,5 @@ void mitk::ProgressService::FinishTask(ProgressTaskId id)
     registrations = m_Registrations;
   }
 
-  Notify(registrations, info);
+  Notify(*registrations, info);
 }

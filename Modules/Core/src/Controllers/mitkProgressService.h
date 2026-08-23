@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkIProgressService.h>
 
 #include <map>
+#include <memory>
 #include <mutex>
 
 namespace mitk
@@ -81,7 +82,16 @@ namespace mitk
 
     mutable std::mutex m_Mutex;
     std::map<ProgressTaskId, Task> m_Tasks;
-    Registrations m_Registrations;
+
+    /**
+     * \brief The registrations, replaced rather than modified in place.
+     *
+     * Every reported step has to take a snapshot of them to notify with the
+     * mutex released, and an operation reporting a hundred steps per file is
+     * no place to copy a vector for each one. Listeners come and go orders of
+     * magnitude less often, so that is where the copy belongs.
+     */
+    std::shared_ptr<const Registrations> m_Registrations;
     ProgressTaskId m_NextId;
     std::uint64_t m_NextSequence;
   };

@@ -285,10 +285,14 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
 
   auto nodes = m_Controls->inputNodesSelector->GetSelectedNodes();
 
-  // One task for the whole conversion, even when the inputs are converted
-  // one by one below. ConvertNodes() adds the steps it needs once it knows
-  // how the nodes it was handed split up.
-  mitk::ProgressTask task("Converting to segmentation");
+  // One task for the whole conversion, even when the inputs are converted one
+  // by one below. The whole budget is declared here rather than grown inside
+  // ConvertNodes(), which the loop below calls once per node: growing it there
+  // moves the bar backwards on every call after the first.
+  //
+  // Four steps per image node and three per non-image node.
+  mitk::ProgressTask task("Converting to segmentation", static_cast<unsigned int>(
+    4 * GetImageNodes(nodes).size() + 3 * GetNonimageNodes(nodes).size()));
 
   if (m_Controls->radioNewSeg->isChecked() && m_Controls->checkMultipleOutputs->isChecked())
   {
@@ -343,10 +347,6 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   auto nonimageNodes = GetNonimageNodes(nodes);
   auto imageNodes = GetImageNodes(nodes);
-
-  // Four steps per image node and three per non-image node. The previous
-  // count of three per node was short by one for every image node.
-  task.AddStepsToDo(static_cast<unsigned int>(4 * imageNodes.size() + 3 * nonimageNodes.size()));
 
   mitk::MultiLabelSegmentation::Pointer outputSeg;
   mitk::Image::Pointer refImage;

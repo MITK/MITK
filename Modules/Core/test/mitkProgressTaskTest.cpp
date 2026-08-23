@@ -71,6 +71,7 @@ class mitkProgressTaskTestSuite : public mitk::TestFixture
   MITK_TEST(Progress_ClampsAtTotal_Success);
   MITK_TEST(AddStepsToDo_ExtendsTotal_Success);
   MITK_TEST(SetProgress_IsAbsolute_Success);
+  MITK_TEST(SetProgress_NeverGoesBackwards_Success);
   MITK_TEST(IndeterminateTask_ReportsNoSteps_Success);
   MITK_TEST(TaskUnwoundByException_Finishes_Success);
   MITK_TEST(MovedTask_FinishesOnce_Success);
@@ -175,6 +176,23 @@ public:
     task.SetProgress(42);
 
     CPPUNIT_ASSERT_EQUAL(42u, m_Listener->GetSnapshots(task.GetId()).back().Progress);
+  }
+
+  void SetProgress_NeverGoesBackwards_Success()
+  {
+    // Phases that map onto shares of one budget report an absolute value
+    // each, and they do not always end in the order they began. A listener
+    // must never be shown the bar falling back.
+    mitk::ProgressTask task("Backwards", 100);
+    task.SetProgress(90);
+    task.SetProgress(20);
+
+    const auto snapshots = m_Listener->GetSnapshots(task.GetId());
+    CPPUNIT_ASSERT_EQUAL(90u, snapshots.back().Progress);
+
+    // The attempt is still published, so that a name change or a grown step
+    // count travelling with it is not lost.
+    CPPUNIT_ASSERT(snapshots.size() > 2);
   }
 
   void IndeterminateTask_ReportsNoSteps_Success()

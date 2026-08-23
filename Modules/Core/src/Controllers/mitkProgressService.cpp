@@ -45,7 +45,19 @@ void mitk::ProgressService::Notify(const Registrations& registrations, const Pro
     std::scoped_lock lock(registration->Mutex);
 
     if (nullptr != registration->Listener)
-      registration->Listener->OnTaskUpdated(info);
+    {
+      try
+      {
+        registration->Listener->OnTaskUpdated(info);
+      }
+      catch (...)
+      {
+        // Listeners are not allowed to throw, but one that does must not decide
+        // whether the others hear about a task, nor make the thread that
+        // reported the progress fail. Not logged: this runs once per snapshot
+        // from arbitrary threads, so a broken listener would drown the log.
+      }
+    }
   }
 }
 
@@ -199,7 +211,14 @@ void mitk::ProgressService::UpdateTask(ProgressTaskId id,
 
     it->second.Info.Name = name;
     it->second.Info.StepsToDo = steps;
-    it->second.Info.Progress = ClampProgress(progress, steps);
+
+    // Never backwards. A caller that maps phases of its work onto shares of one
+    // budget reports an absolute value per phase, and those phases do not always
+    // end in the order they began; whatever the cause, a bar that falls back
+    // reads as an operation coming undone. Enforced here rather than left to
+    // every call site, so that no listener can be shown a regression at all.
+    it->second.Info.Progress = ClampProgress(std::max(progress, it->second.Info.Progress), steps);
+
     it->second.Info.Sequence = ++m_NextSequence;
 
     info = it->second.Info;

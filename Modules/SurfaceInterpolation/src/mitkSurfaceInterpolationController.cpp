@@ -512,6 +512,11 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   mitk::ProgressTask task("Interpolating surface",
     NORMALS_SHARE + DISTANCE_IMAGE_SHARE + SURFACE_SHARE);
 
+  // The three handles below are destroyed in reverse order of declaration, and
+  // ending a reporting task reports its own share as done, so on the way out
+  // each of them names a lower absolute value than the one before. The service
+  // never takes a task's progress backwards, so those trailing reports are
+  // ignored rather than walking the bar down through the earlier shares.
   mitk::ProgressTask normalsProgress([&task](float progress)
     {
       task.SetProgress(static_cast<unsigned int>(NORMALS_SHARE * progress));

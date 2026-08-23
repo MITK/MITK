@@ -174,6 +174,18 @@ namespace mitk
     const FailedBaseDataListType *GetFailedNodes();
 
     /**
+     * \brief Returns the nodes added by the most recent load.
+     *
+     * Reported by the reader that added them rather than worked out by
+     * comparing the storage before and after, which cannot tell a node the
+     * scene brought from one that reached the same storage some other way
+     * while the load was running on a worker thread.
+     *
+     * \return The nodes of the last load, empty before the first one.
+     */
+    DataStorage::SetOfObjects::ConstPointer GetLoadedNodes() const;
+
+    /**
      * \brief Returns properties that failed to be written during the most
      *        recent SaveScene() call.
      *
@@ -202,6 +214,9 @@ namespace mitk
 
     FailedBaseDataListType::Pointer m_FailedNodes;
     PropertyList::Pointer m_FailedProperties;
+
+    /** \brief The nodes the last load added, as reported by its reader. */
+    DataStorage::SetOfObjects::Pointer m_LoadedNodes;
 
     std::string m_WorkingDirectory;
 

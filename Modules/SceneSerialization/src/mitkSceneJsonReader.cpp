@@ -929,6 +929,9 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       }
 
       storage->Add(entry.dataNode, parents);
+
+      if (nullptr != m_LoadedNodes)
+        m_LoadedNodes->push_back(entry.dataNode);
       added[i] = true;
       ++addedCount;
 

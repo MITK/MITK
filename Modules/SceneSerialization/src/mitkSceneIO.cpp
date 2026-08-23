@@ -107,7 +107,10 @@ namespace
   }
 }
 
-mitk::SceneIO::SceneIO() : m_WorkingDirectory(""), m_UnzipErrors(0)
+mitk::SceneIO::SceneIO()
+  : m_LoadedNodes(DataStorage::SetOfObjects::New()),
+    m_WorkingDirectory(""),
+    m_UnzipErrors(0)
 {
 }
 
@@ -156,6 +159,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
 {
   mitk::LocaleSwitch localeSwitch("C");
 
+  // A load reports the nodes it adds, so start the list over.
+  m_LoadedNodes = DataStorage::SetOfObjects::New();
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if (storage.IsNull())
@@ -180,6 +186,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
     try
     {
       SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      jsonReader->SetLoadedNodes(m_LoadedNodes);
       if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
       {
         MITK_ERROR << "There were errors while loading scene file " << filename
@@ -259,6 +266,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
 {
   mitk::LocaleSwitch localeSwitch("C");
 
+  // A load reports the nodes it adds, so start the list over.
+  m_LoadedNodes = DataStorage::SetOfObjects::New();
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if (storage.IsNull())
@@ -286,6 +296,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
     try
     {
       SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      jsonReader->SetLoadedNodes(m_LoadedNodes);
       if (!jsonReader->LoadScene(indexfilename, storage, clearStorageFirst))
       {
         MITK_ERROR << "There were errors while loading scene file " << indexfilename
@@ -323,6 +334,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
 
   SceneReader::Pointer reader = SceneReader::New();
   reader->SetProgressTask(m_ProgressTask);
+  reader->SetLoadedNodes(m_LoadedNodes);
 
   if (!reader->LoadScene(document, workingDir, storage))
   {
@@ -746,6 +758,11 @@ tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc
 const mitk::SceneIO::FailedBaseDataListType *mitk::SceneIO::GetFailedNodes()
 {
   return m_FailedNodes.GetPointer();
+}
+
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::SceneIO::GetLoadedNodes() const
+{
+  return m_LoadedNodes.GetPointer();
 }
 
 const mitk::PropertyList *mitk::SceneIO::GetFailedProperties()

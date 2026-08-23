@@ -59,6 +59,20 @@ namespace mitk
     void SetProgressTask(ProgressTask* task);
 
     /**
+     * \brief Collect the nodes this reader adds in the given list.
+     *
+     * For a caller that has to tell the scene's nodes apart from anything else
+     * that reached the same storage. Comparing the storage before and against
+     * after does not do that: a load runs on a worker thread while the thread
+     * that owns the storage keeps handling events, so a node another handler
+     * adds in the meantime is indistinguishable from one of ours.
+     *
+     * \param[in] loadedNodes The list to append to, or nullptr to collect none.
+     *        Not cleared; the caller owns it and it must outlive the load.
+     */
+    void SetLoadedNodes(DataStorage::SetOfObjects* loadedNodes);
+
+    /**
      * \brief Loads a scene from a parsed XML document into the given DataStorage.
      *
      * Reads the file version from the XML document, instantiates the appropriate
@@ -79,6 +93,9 @@ namespace mitk
   protected:
     /** \brief Null unless a caller reports on this reader's behalf. */
     ProgressTask* m_ProgressTask = nullptr;
+
+    /** \brief Null unless a caller wants to know which nodes came from here. */
+    DataStorage::SetOfObjects* m_LoadedNodes = nullptr;
   };
 }
 

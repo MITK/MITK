@@ -294,6 +294,9 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
         storage->Add(nodesIter->first, parents);
 
+        if (nullptr != m_LoadedNodes)
+          m_LoadedNodes->push_back(nodesIter->first);
+
         // remove this node from m_OrderedNodePairs
         m_OrderedNodePairs.erase(nodesIter);
 
@@ -309,6 +312,10 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
        ++nodesIter)
   {
     storage->Add(nodesIter->first);
+
+    if (nullptr != m_LoadedNodes)
+      m_LoadedNodes->push_back(nodesIter->first);
+
     MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage "
                  "without parents.";
     error = true;

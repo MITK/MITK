@@ -65,9 +65,26 @@ namespace mitk
      */
     virtual bool LoadScene(const std::string &sceneSourcePath, DataStorage *storage, bool clearStorageFirst = false) = 0;
 
+    /**
+     * \brief Collect the nodes this reader adds in the given list.
+     *
+     * For a caller that has to tell the scene's nodes apart from anything else
+     * that reached the same storage. Comparing the storage before and against
+     * after does not do that: a load runs on a worker thread while the thread
+     * that owns the storage keeps handling events, so a node another handler
+     * adds in the meantime is indistinguishable from one of ours.
+     *
+     * \param loadedNodes The list to append to, or nullptr to collect none.
+     *        Not cleared; the caller owns it and it must outlive the load.
+     */
+    void SetLoadedNodes(DataStorage::SetOfObjects *loadedNodes);
+
   protected:
     AbstractSceneReader();
     ~AbstractSceneReader() override;
+
+    /** \brief Null unless a caller wants to know which nodes came from here. */
+    DataStorage::SetOfObjects *m_LoadedNodes = nullptr;
   };
 }
 

@@ -37,6 +37,7 @@ struct AICPComperator
 
 mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestPointRegistration()
   : m_MaxIterations(1000),
+    m_ProgressTask(nullptr),
     m_Threshold(0.000001),
     m_FRENormalizationFactor(1.0),
     m_SearchRadius(30.0),
@@ -46,8 +47,7 @@ mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestP
     m_NumberOfIterations(0),
     m_MovingSurface(nullptr),
     m_FixedSurface(nullptr),
-    m_WeightedPointTransform(mitk::WeightedPointTransform::New()),
-    m_ProgressTask(nullptr)
+    m_WeightedPointTransform(mitk::WeightedPointTransform::New())
 {
 }
 

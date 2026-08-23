@@ -38,7 +38,6 @@ namespace us
 
 namespace mitk
 {
-  class ProgressTask;
   class PropertyList;
 
   /**
@@ -431,13 +430,9 @@ namespace mitk
      *
      * \param path The absolute file name including the file extension.
      * \param properties Properties to pass to the file reader.
-     * \param task Optional task to report progress into. Callers that
-     *        already report progress of their own should pass their task, so
-     *        that loading the parts of one operation does not raise a
-     *        notification per part.
      * \return The loaded BaseData object.
      */
-    static BaseData::Pointer Load(const std::string& path, const PropertyList* properties, ProgressTask* task = nullptr);
+    static BaseData::Pointer Load(const std::string& path, const PropertyList* properties);
 
     /**
      * \brief Save a mitk::BaseData instance.
@@ -524,14 +519,12 @@ namespace mitk
      * \param nodeResult Optional pointer to receive created DataNode objects.
      * \param ds Optional DataStorage to add loaded data to.
      * \param optionsCallback Optional callback for reader selection and options.
-     * \param task Optional task to report progress into instead of opening one.
      * \return Error message string (empty on success).
      */
     static std::string Load(std::vector<LoadInfo> &loadInfos,
                             DataStorage::SetOfObjects *nodeResult,
                             DataStorage *ds,
-                            const ReaderOptionsFunctorBase *optionsCallback,
-                            ProgressTask *task = nullptr);
+                            const ReaderOptionsFunctorBase *optionsCallback);
 
     /** \brief Internal save implementation with writer options callback.
      *

@@ -324,18 +324,30 @@ namespace
     FileProgressForwarder(mitk::IFileIO* fileIO, mitk::ProgressTask* task)
       : m_FileIO(nullptr != task ? fileIO : nullptr),
         m_Task(task),
-        m_Reported(0)
+        m_Reported(0),
+        m_FileTask([this](float progress) { this->OnProgress(progress); })
     {
       if (nullptr != m_FileIO)
+      {
         m_FileIO->AddProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
           this, &FileProgressForwarder::OnProgress));
+
+        // A reader that reports in steps of its own, or that drives further
+        // reads, gets a task rather than a callback. It maps into this
+        // file's share, so whatever it adds cannot grow the budget of the
+        // operation around it.
+        m_FileIO->SetProgressTask(&m_FileTask);
+      }
     }
 
     ~FileProgressForwarder()
     {
       if (nullptr != m_FileIO)
+      {
+        m_FileIO->SetProgressTask(nullptr);
         m_FileIO->RemoveProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
           this, &FileProgressForwarder::OnProgress));
+      }
 
       // Whatever the file reported, its share of the work is over. Formats
       // that report nothing at all advance here in one go.
@@ -364,6 +376,7 @@ namespace
     mitk::IFileIO* m_FileIO;
     mitk::ProgressTask* m_Task;
     unsigned int m_Reported;
+    mitk::ProgressTask m_FileTask;
   };
 }
 
@@ -681,8 +694,7 @@ namespace mitk
   std::string IOUtil::Load(std::vector<LoadInfo> &loadInfos,
                            DataStorage::SetOfObjects *nodeResult,
                            DataStorage *ds,
-                           const ReaderOptionsFunctorBase *optionsCallback,
-                           ProgressTask *task)
+                           const ReaderOptionsFunctorBase *optionsCallback)
   {
     if (loadInfos.empty())
     {
@@ -694,15 +706,12 @@ namespace mitk
 
     std::optional<ProgressTask> ownTask;
 
-    if (nullptr != task)
-    {
-      task->AddStepsToDo(steps);
-    }
-    else if (0 == s_QuietDepth)
-    {
+    if (0 == s_QuietDepth)
       ownTask.emplace("Loading files", steps);
-      task = &ownTask.value();
-    }
+
+    auto* task = ownTask.has_value()
+      ? &ownTask.value()
+      : nullptr;
 
     std::string errMsg;
 
@@ -795,7 +804,7 @@ namespace mitk
 
       reader->SetProperties(loadInfo.m_Properties);
 
-      if (ownTask.has_value())
+      if (nullptr != task)
         task->SetName("Loading " + itksys::SystemTools::GetFilenameName(loadInfo.m_Path));
 
       // Reports whatever the reader tells it while the file is being read,
@@ -900,7 +909,7 @@ namespace mitk
     return data;
   }
 
-  BaseData::Pointer IOUtil::Load(const std::string& path, const PropertyList* properties, ProgressTask* task)
+  BaseData::Pointer IOUtil::Load(const std::string& path, const PropertyList* properties)
   {
     LoadInfo loadInfo(path);
     loadInfo.m_Properties = properties;
@@ -908,7 +917,7 @@ namespace mitk
     std::vector<LoadInfo> loadInfos;
     loadInfos.push_back(loadInfo);
 
-    auto errMsg = Load(loadInfos, nullptr, nullptr, nullptr, task);
+    auto errMsg = Load(loadInfos, nullptr, nullptr, nullptr);
 
     if (!errMsg.empty())
       mitkThrow() << errMsg;

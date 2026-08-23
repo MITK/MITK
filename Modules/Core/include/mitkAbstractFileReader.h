@@ -151,6 +151,10 @@ namespace mitk
      */
     void RemoveProgressCallback(const ProgressCallback &callback) override;
 
+    void SetProgressTask(ProgressTask *task) override;
+
+    ProgressTask *GetProgressTask() const override;
+
     /**
      * \brief Register this reader as a CppMicroServices service.
      *

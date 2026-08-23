@@ -106,16 +106,20 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
   // another for the scene inside it.
   std::optional<ProgressTask> ownTask;
 
-  if (m_ProgressCallback)
-  {
-    ownTask.emplace(m_ProgressCallback, listSize * 2);
-  }
-  else
-  {
+  if (nullptr == m_ProgressTask)
     ownTask.emplace(std::string("Loading scene"), listSize * 2);
-  }
 
-  auto& task = ownTask.value();
+  auto& task = ownTask.has_value()
+    ? ownTask.value()
+    : *m_ProgressTask;
+
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(listSize * 2);
+
+  // Each node is read through IOUtil, which would otherwise both raise a
+  // notification per node and, by adding its own steps here, keep moving
+  // this bar backwards as it discovers them.
+  IOUtil::QuietProgress quietProgress;
 
   // Deserialize base data properties before reading the actual data to be
   // able to provide them as read-only meta data to the data reader.
@@ -155,7 +159,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     }
 
     const auto *dataElement = element->FirstChildElement("data");
-    auto dataNode = this->LoadBaseDataFromDataTag(dataElement, properties, workingDirectory, task, error);
+    auto dataNode = this->LoadBaseDataFromDataTag(dataElement, properties, workingDirectory, error);
 
     if (dataNode.IsNull())
       continue;
@@ -316,7 +320,6 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyxml2::XMLElement *dataElement,
                                                                      const PropertyList *properties,
                                                                      const std::string &workingDirectory,
-                                                                     ProgressTask &task,
                                                                      bool &error)
 {
   DataNode::Pointer node;
@@ -328,9 +331,7 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyx
     {
       try
       {
-        // Report into the scene's own task, so that reading its parts does
-        // not raise a notification per part.
-        auto baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename, properties, &task);
+        auto baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename, properties);
 
         node = DataNode::New();
         node->SetData(baseData);

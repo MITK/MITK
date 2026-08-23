@@ -39,9 +39,9 @@ namespace mitk
     DataStorage::SetOfObjects::ConstPointer oldNodes = ds.GetAll();
     SceneIO::Pointer sceneIO = SceneIO::New();
 
-    // The scene reports through this reader, so that reading the file and
-    // reading the scene inside it share one notification.
-    sceneIO->SetProgressCallback([this](float progress) { this->ReportProgress(progress); });
+    // The scene reports into this reader's task, so that reading the file
+    // and reading the scene inside it share one notification.
+    sceneIO->SetProgressTask(this->GetProgressTask());
 
     sceneIO->LoadScene(this->GetLocalFileName(), &ds, false);
     DataStorage::SetOfObjects::ConstPointer newNodes = ds.GetAll();

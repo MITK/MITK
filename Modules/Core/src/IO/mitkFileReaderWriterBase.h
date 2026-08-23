@@ -24,6 +24,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Common base class for file reader and writer implementations.
    *
@@ -192,6 +194,12 @@ namespace mitk
      */
     void ReportProgress(float progress);
 
+    /** \brief Set the task to report into, or nullptr for none. */
+    void SetProgressTask(ProgressTask *task);
+
+    /** \brief Get the task to report into, or nullptr. */
+    ProgressTask *GetProgressTask() const;
+
     /**
      * \brief Register the MIME type as a CppMicroServices service.
      *
@@ -227,6 +235,7 @@ namespace mitk
     // us::PrototypeServiceFactory* m_PrototypeFactory;
 
     Message1<float> m_ProgressMessage;
+    ProgressTask *m_ProgressTask = nullptr;
 
     std::unique_ptr<CustomMimeType> m_CustomMimeType;
     us::ServiceRegistration<CustomMimeType> m_MimeTypeReg;

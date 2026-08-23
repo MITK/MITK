@@ -150,6 +150,9 @@ namespace mitk
     m_ProgressMessage.Send(progress);
   }
 
+  void FileReaderWriterBase::SetProgressTask(ProgressTask *task) { m_ProgressTask = task; }
+  ProgressTask *FileReaderWriterBase::GetProgressTask() const { return m_ProgressTask; }
+
   us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(us::ModuleContext *context)
   {
     if (context == nullptr)

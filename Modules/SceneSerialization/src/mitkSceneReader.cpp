@@ -46,7 +46,7 @@ bool mitk::SceneReader::LoadScene(tinyxml2::XMLDocument &document, const std::st
   {
     if (auto *reader = dynamic_cast<SceneReader *>(iter->GetPointer()))
     {
-      reader->SetProgressCallback(m_ProgressCallback);
+      reader->SetProgressTask(m_ProgressTask);
 
       if (!reader->LoadScene(document, workingDirectory, storage))
       {
@@ -63,7 +63,7 @@ bool mitk::SceneReader::LoadScene(tinyxml2::XMLDocument &document, const std::st
   return false;
 }
 
-void mitk::SceneReader::SetProgressCallback(const std::function<void(float)>& callback)
+void mitk::SceneReader::SetProgressTask(ProgressTask* task)
 {
-  m_ProgressCallback = callback;
+  m_ProgressTask = task;
 }

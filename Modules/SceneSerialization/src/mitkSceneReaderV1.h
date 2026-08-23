@@ -57,7 +57,6 @@ namespace mitk
     DataNode::Pointer LoadBaseDataFromDataTag(const tinyxml2::XMLElement *dataElement,
                                               const PropertyList *properties,
                                               const std::string &workingDirectory,
-                                              ProgressTask &task,
                                               bool &error);
 
     /**

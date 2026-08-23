@@ -19,8 +19,6 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 
-#include <functional>
-
 namespace tinyxml2
 {
   class XMLDocument;
@@ -28,6 +26,8 @@ namespace tinyxml2
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Reads a MITK scene from an XML document and populates a DataStorage.
    *
@@ -56,7 +56,17 @@ namespace mitk
      *
      * \param[in] callback Receives how much is done, from 0 to 1.
      */
-    void SetProgressCallback(const std::function<void(float)>& callback);
+    /**
+     * \brief Report progress into the given task rather than raising a
+     *        notification of its own.
+     *
+     * Set by a caller that already reports on this operation's behalf, so
+     * that opening a scene shows one notification instead of one for the
+     * file and another for the scene inside it.
+     *
+     * \param[in] task The task to report into, or nullptr for none.
+     */
+    void SetProgressTask(ProgressTask* task);
 
     /**
      * \brief Loads a scene from a parsed XML document into the given DataStorage.
@@ -77,8 +87,8 @@ namespace mitk
     virtual bool LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage);
 
   protected:
-    /** \brief Empty unless a caller reports on this reader's behalf. */
-    std::function<void(float)> m_ProgressCallback;
+    /** \brief Null unless a caller reports on this reader's behalf. */
+    ProgressTask* m_ProgressTask = nullptr;
   };
 }
 

@@ -62,8 +62,6 @@ QmitkProgressNotification::QmitkProgressNotification(const mitk::ProgressTaskInf
 {
   m_Controls->setupUi(this);
 
-  this->setObjectName(QStringLiteral("QmitkProgressNotification"));
-
   // Qt draws no style sheet background for a plain QWidget subclass unless
   // it is asked to, which would leave the card without its background and
   // border and let the render windows show through it.

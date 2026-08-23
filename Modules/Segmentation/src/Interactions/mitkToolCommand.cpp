@@ -16,14 +16,30 @@ found in the LICENSE file.
 
 #include <itkProcessObject.h>
 
+#include <algorithm>
+
 mitk::ToolCommand::ToolCommand()
-  : m_ProgressTask(nullptr)
+  : m_ProgressTask(nullptr),
+    m_ShareIndex(0),
+    m_ShareCount(1)
 {
 }
 
 void mitk::ToolCommand::SetProgressTask(ProgressTask *task)
 {
   m_ProgressTask = task;
+
+  // A share belongs to the run it was set for, and a new task means a new
+  // operation. Reset here rather than left to the caller, which would only
+  // ever show up as a bar that stops halfway.
+  m_ShareIndex = 0;
+  m_ShareCount = 1;
+}
+
+void mitk::ToolCommand::SetShare(unsigned int index, unsigned int count)
+{
+  m_ShareCount = std::max(count, 1u);
+  m_ShareIndex = std::min(index, m_ShareCount - 1);
 }
 
 void mitk::ToolCommand::Execute(itk::Object *caller, const itk::EventObject &event)
@@ -50,10 +66,11 @@ void mitk::ToolCommand::Execute(const itk::Object *caller, const itk::EventObjec
   if (nullptr == process)
     return;
 
-  // The filter reports a fraction, which is mapped onto whatever budget the
-  // task was given. Counting one step per event, as before, made the reported
-  // progress depend on how chatty a filter happens to be.
-  const auto progress = process->GetProgress() * m_ProgressTask->GetStepsToDo();
+  // The filter reports a fraction of its own run, which is mapped onto this
+  // run's share of whatever budget the task was given. Counting one step per
+  // event, as before, made the reported progress depend on how chatty a filter
+  // happens to be.
+  const auto fraction = (m_ShareIndex + std::clamp(process->GetProgress(), 0.0f, 1.0f)) / m_ShareCount;
 
-  m_ProgressTask->SetProgress(static_cast<unsigned int>(progress));
+  m_ProgressTask->SetProgress(static_cast<unsigned int>(fraction * m_ProgressTask->GetStepsToDo()));
 }

@@ -58,17 +58,33 @@ namespace mitk
     /**
      * \brief Report into the given task, or nowhere if it is nullptr.
      *
-     * The command does not own the task and must not outlive it.
+     * The command does not own the task and must not outlive it. Resets the
+     * share to the whole task.
      *
      * \param[in] task The task of the operation the observed filter is part of.
      */
     void SetProgressTask(ProgressTask *task);
+
+    /**
+     * \brief Report into one equal share of the task instead of all of it.
+     *
+     * For an operation that runs the observed filter more than once, one run
+     * per time step for example. Every run reports its own fraction starting
+     * from zero, so without this the first of them drives the task to full and
+     * the user watches a finished bar until the last one is done.
+     *
+     * \param[in] index Which of the runs this is, counting from zero.
+     * \param[in] count How many runs there are in total.
+     */
+    void SetShare(unsigned int index, unsigned int count);
 
   protected:
     ToolCommand();
 
   private:
     ProgressTask *m_ProgressTask;
+    unsigned int m_ShareIndex;
+    unsigned int m_ShareCount;
   };
 
 } // namespace mitk

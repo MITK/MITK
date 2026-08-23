@@ -676,8 +676,14 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     {
       if (previewImage->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
       {
-        for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
+        const auto timeSteps = previewImage->GetTimeSteps();
+
+        for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
         {
+          // One run of the filter per time step, each reporting its own
+          // fraction, so each of them gets its own share of the task.
+          m_ProgressCommand->SetShare(timeStep, timeSteps);
+
           Image::ConstPointer feedBackImage;
           Image::ConstPointer currentSegImage;
 

@@ -15,69 +15,47 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QEventLoop>
-#include <QFutureWatcher>
-#include <QProgressDialog>
 #include <QString>
-#include <QWidget>
 
-#include <QtConcurrent>
-
-#include <exception>
 #include <functional>
+
+/** \brief Keeps the event loop turning until the given condition holds.
+ *
+ * For waiting out a task that this thread may itself be needed for:
+ * mitk::StandaloneDataStorage hands its mutations to the thread that owns it,
+ * so a wait that stops processing events deadlocks against its own worker.
+ *
+ * \param[in] done Polled until it returns true.
+ */
+MITKQTWIDGETS_EXPORT void QmitkProcessEventsUntil(const std::function<bool()>& done);
 
 /** \brief Runs a long task in a background thread while keeping the UI responsive.
  *
- * The function blocks until the task finishes, using a QEventLoop to process
- * events and prevent the UI from freezing.
+ * The function blocks until the task finishes, but keeps processing events, so
+ * that the UI does not freeze and the data storage can still hand the task the
+ * part of its work that has to run on this thread.
  *
  * While the task is running, a QProgressDialog is shown with a delay of 250ms.
  *
  * Exceptions are caught in the background thread and rethrown in the calling thread.
  */
+MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<void()> task);
+
+/** \brief Runs a long task that produces a value. \sa QmitkRunAsyncBlocking()
+ *
+ * \return What the task returned, or a value-initialised T if it threw.
+ */
 template<typename T>
 T QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<T()> task)
 {
-  QProgressDialog dialog(label, {}, 0, 0);
-  dialog.setWindowModality(Qt::ApplicationModal);
-  dialog.setWindowTitle(title);
-  dialog.setMinimumDuration(250);
-  dialog.show();
-
   T result{};
-  std::exception_ptr exception;
 
-  auto future = QtConcurrent::run([&]() -> T {
-    try
-    {
-      return task();
-    }
-    catch (...)
-    {
-      exception = std::current_exception();
-      return T{};
-    }
-  });
-
-  QFutureWatcher<T> watcher;
-  QEventLoop loop;
-
-  QObject::connect(&watcher, &QFutureWatcher<T>::finished, [&]() {
-    result = watcher.result();
-    dialog.close();
-    loop.quit();
-  });
-
-  watcher.setFuture(future);
-  loop.exec();
-
-  if (exception)
-    std::rethrow_exception(exception);
+  // Resolves to the overload above, which is the better match for an argument
+  // that already is a std::function<void()>, so this does not recurse.
+  QmitkRunAsyncBlocking(title, label, std::function<void()>([&result, &task]() { result = task(); }));
 
   return result;
 }
-
-MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<void()> task);
 
 /** \brief Runs a long task in a background thread and blocks user input.
  *

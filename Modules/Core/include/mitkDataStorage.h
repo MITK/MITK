@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <mitkGeometry3D.h>
 #include <mitkMessage.h>
 #include <MitkCoreExports.h>
+#include <atomic>
+#include <functional>
 #include <map>
 #include <mutex>
 
@@ -26,6 +28,7 @@ namespace mitk
 {
   class NodePredicateBase;
   class DataNode;
+  class StorageThreadDispatcherBase;
   class BaseRenderer;
 
   /**
@@ -510,6 +513,30 @@ namespace mitk
     void BlockNodeModifiedEvents(bool block);
 
   protected:
+    /**
+     * \brief Run a task on the thread that owns this data storage.
+     *
+     * Adding and removing nodes notifies observers synchronously, and those
+     * observers are rendering and user interface code that belongs to one
+     * thread. An implementation therefore hands the whole operation over
+     * instead of mutating from wherever it happened to be called.
+     *
+     * Handing over blocks until the task has run, so the owning thread must
+     * be able to reach its event loop. Waiting for a worker without one, as
+     * a bare QFuture::waitForFinished() does, deadlocks instead.
+     *
+     * Without a dispatcher, as in command line tools and tests, the task is
+     * not handed over at all and the caller carries on.
+     *
+     * \param[in] task The operation to run on the owning thread.
+     * \return True if the task was handed over and has already run, false
+     *         if this thread owns the storage and the caller should carry on.
+     */
+    bool DispatchToOwningThread(const std::function<void()>& task) const;
+
+    /** rief Resolved on first use; the data storage service owns it. */
+    mutable std::atomic<StorageThreadDispatcherBase*> m_OwningThreadDispatcher = nullptr;
+
     //##Documentation
     //## @brief  EmitAddNodeEvent emits the AddNodeEvent
     //##

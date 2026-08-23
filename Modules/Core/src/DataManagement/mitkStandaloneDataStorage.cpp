@@ -39,6 +39,10 @@ bool mitk::StandaloneDataStorage::IsInitialized() const
 
 void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents)
 {
+  // The task blocks until it has run, so both arguments stay alive.
+  if (this->DispatchToOwningThread([this, node, parents]() { this->Add(node, parents); }))
+    return;
+
   {
     std::lock_guard<std::mutex> locked(m_Mutex);
     if (!IsInitialized())
@@ -89,6 +93,9 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
 
 void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
 {
+  if (this->DispatchToOwningThread([this, node]() { this->Remove(node); }))
+    return;
+
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
   if (node == nullptr)

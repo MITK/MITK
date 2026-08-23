@@ -21,9 +21,36 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkArbitraryTimeGeometry.h>
+#include <mitkCoreServices.h>
+#include <mitkIDataStorageService.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <regex>
 #include <set>
+
+bool mitk::DataStorage::DispatchToOwningThread(const std::function<void()>& task) const
+{
+  auto* dispatcher = m_OwningThreadDispatcher.load(std::memory_order_relaxed);
+
+  if (nullptr == dispatcher)
+  {
+    CoreServicePointer<IDataStorageService> service(CoreServices::GetDataStorageService());
+
+    if (service)
+      dispatcher = service->GetDispatcher();
+
+    // Stays null in a command line tool, where there is no thread to hand
+    // anything over to. Resolving again next time is harmless.
+    m_OwningThreadDispatcher.store(dispatcher, std::memory_order_relaxed);
+  }
+
+  if (nullptr == dispatcher || dispatcher->IsDispatchThread())
+    return false;
+
+  dispatcher->Execute(task);
+
+  return true;
+}
 
 mitk::DataStorage::DataStorage() : itk::Object(), m_BlockNodeModifiedEvents(false)
 {

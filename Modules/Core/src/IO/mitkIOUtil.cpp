@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 
 #include <mitkCoreServices.h>
+#include <mitkIDataStorageService.h>
+#include <mitkStorageThreadDispatcherBase.h>
 #include <mitkExceptionMacro.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
@@ -283,6 +285,28 @@ namespace
    * a fraction, and this is what that fraction is spread over.
    */
   constexpr unsigned int STEPS_PER_FILE = 100;
+
+  /**
+   * Runs the task on the thread that owns the data storage, if this is not
+   * it. Writing to data that is on display has to happen where everything
+   * else reads it, which is not the worker a save may be running on.
+   */
+  void RunWhereTheDataLives(const std::function<void()>& task)
+  {
+    mitk::CoreServicePointer<mitk::IDataStorageService> service(mitk::CoreServices::GetDataStorageService());
+
+    auto* dispatcher = service
+      ? service->GetDispatcher()
+      : nullptr;
+
+    if (nullptr == dispatcher || dispatcher->IsDispatchThread())
+    {
+      task();
+      return;
+    }
+
+    dispatcher->Execute(task);
+  }
 
   /**
    * Maps the progress of one reader or writer onto its share of a task, and
@@ -1060,7 +1084,13 @@ namespace mitk
       }
 
       if (setPathProperty)
-        saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
+      {
+        RunWhereTheDataLives([&saveInfo]()
+          {
+            saveInfo.m_BaseData->GetPropertyList()->SetStringProperty(
+              "path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
+          });
+      }
 
       --filesToWrite;
     }

@@ -79,4 +79,20 @@ T QmitkRunAsyncBlocking(const QString& title, const QString& label, std::functio
 
 MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<void()> task);
 
+/** \brief Runs a long task in a background thread and blocks user input.
+ *
+ * The function blocks until the task finishes, but keeps processing events,
+ * so that anything the task reports through mitk::ProgressTask is shown and
+ * keeps moving. No dialog is used: the progress notifications are the
+ * feedback.
+ *
+ * User input is discarded for the duration. A second operation started into
+ * a reader that is not written to expect one would be worse than an
+ * unresponsive window.
+ *
+ * Exceptions are caught in the background thread and rethrown in the calling
+ * thread.
+ */
+MITKQTWIDGETS_EXPORT void QmitkRunWithInputBlocked(std::function<void()> task);
+
 #endif

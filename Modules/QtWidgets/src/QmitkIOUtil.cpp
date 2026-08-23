@@ -22,19 +22,59 @@ found in the LICENSE file.
 
 #include <QmitkFileReaderOptionsDialog.h>
 #include <QmitkFileWriterOptionsDialog.h>
+#include <QmitkRun.h>
 
 // QT
+#include <QApplication>
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSet>
 #include <QString>
 #include <QStringList>
+#include <QThread>
 
 // ITK
 #include <itksys/SystemTools.hxx>
 
 #include <algorithm>
+
+namespace
+{
+  /**
+   * Asks the user about reader or writer options.
+   *
+   * The IO itself runs on a worker thread, where a dialog must not be
+   * created, so the question is put to the thread that owns the widgets.
+   * That thread is inside an event loop meanwhile, so it can take the call.
+   */
+  template <class Dialog, class Info>
+  bool AskForOptions(Info& info)
+  {
+    auto result = false;
+
+    const auto connection = QThread::currentThread() == qApp->thread()
+      ? Qt::DirectConnection
+      : Qt::BlockingQueuedConnection;
+
+    QMetaObject::invokeMethod(qApp, [&info, &result]()
+      {
+        Dialog dialog(info);
+
+        if (dialog.exec() == QDialog::Accepted)
+        {
+          result = !dialog.ReuseOptions();
+        }
+        else
+        {
+          info.m_Cancel = true;
+          result = true;
+        }
+      }, connection);
+
+    return result;
+  }
+}
 
 struct QmitkIOUtil::Impl
 {
@@ -42,16 +82,7 @@ struct QmitkIOUtil::Impl
   {
     bool operator()(LoadInfo &loadInfo) const override
     {
-      QmitkFileReaderOptionsDialog dialog(loadInfo);
-      if (dialog.exec() == QDialog::Accepted)
-      {
-        return !dialog.ReuseOptions();
-      }
-      else
-      {
-        loadInfo.m_Cancel = true;
-        return true;
-      }
+      return AskForOptions<QmitkFileReaderOptionsDialog>(loadInfo);
     }
   };
 
@@ -59,16 +90,7 @@ struct QmitkIOUtil::Impl
   {
     bool operator()(SaveInfo &saveInfo) const override
     {
-      QmitkFileWriterOptionsDialog dialog(saveInfo);
-      if (dialog.exec() == QDialog::Accepted)
-      {
-        return !dialog.ReuseOptions();
-      }
-      else
-      {
-        saveInfo.m_Cancel = true;
-        return true;
-      }
+      return AskForOptions<QmitkFileWriterOptionsDialog>(saveInfo);
     }
   };
 
@@ -156,7 +178,9 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList &paths, QWidg
   }
 
   Impl::ReaderOptionsDialogFunctor optionsCallback;
-  std::string errMsg = Load(loadInfos, nullptr, nullptr, &optionsCallback);
+
+  std::string errMsg;
+  QmitkRunWithInputBlocked([&]() { errMsg = Load(loadInfos, nullptr, nullptr, &optionsCallback); });
   if (!errMsg.empty())
   {
     QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
@@ -194,7 +218,9 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(std::vector<LoadInfo>
 {
   mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
   Impl::ReaderOptionsDialogFunctor optionsCallback;
-  std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback);
+
+  std::string errMsg;
+  QmitkRunWithInputBlocked([&]() { errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback); });
   if (!errMsg.empty())
   {
     QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
@@ -413,7 +439,9 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
   if (!saveInfos.empty())
   {
     Impl::WriterOptionsDialogFunctor optionsCallback;
-    std::string errMsg = Save(saveInfos, &optionsCallback, setPathProperty);
+
+    std::string errMsg;
+    QmitkRunWithInputBlocked([&]() { errMsg = Save(saveInfos, &optionsCallback, setPathProperty); });
     if (!errMsg.empty())
     {
       QMessageBox::warning(parent, "Error writing files", QString::fromStdString(errMsg));

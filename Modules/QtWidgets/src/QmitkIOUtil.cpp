@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <mitkIMimeTypeProvider.h>
 #include <mitkMimeType.h>
 #include <mitkIOUtil.h>
+#include <mitkImage.h>
+#include <mitkSurface.h>
 
 #include <QmitkFileReaderOptionsDialog.h>
 #include <QmitkFileWriterOptionsDialog.h>
@@ -257,6 +259,25 @@ QString QmitkIOUtil::Save(const mitk::BaseData *data,
   return Save(dataVector, defaultBaseNames, defaultPath, parent, setPathProperty).back();
 }
 
+void QmitkIOUtil::PrebuildVtkRepresentation(const mitk::BaseData *data)
+{
+  if (nullptr == data)
+    return;
+
+  const auto timeSteps = data->GetTimeSteps();
+
+  if (const auto *image = dynamic_cast<const mitk::Image *>(data); nullptr != image)
+  {
+    for (unsigned int t = 0; t < timeSteps; ++t)
+      static_cast<void>(image->GetVtkImageData(static_cast<int>(t)));
+  }
+  else if (const auto *surface = dynamic_cast<const mitk::Surface *>(data); nullptr != surface)
+  {
+    for (unsigned int t = 0; t < timeSteps; ++t)
+      static_cast<void>(surface->GetVtkPolyData(t));
+  }
+}
+
 QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
                               const QStringList &defaultBaseNames,
                               const QString &defaultPath,
@@ -441,6 +462,11 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
     Impl::WriterOptionsDialogFunctor optionsCallback;
 
     std::string errMsg;
+    // Still on the thread that owns the data, which is where its VTK
+    // representation has to be built. See PrebuildVtkRepresentation().
+    for (const auto &saveInfo : saveInfos)
+      PrebuildVtkRepresentation(saveInfo.m_BaseData);
+
     QmitkRunWithInputBlocked([&]() { errMsg = Save(saveInfos, &optionsCallback, setPathProperty); });
     if (!errMsg.empty())
     {

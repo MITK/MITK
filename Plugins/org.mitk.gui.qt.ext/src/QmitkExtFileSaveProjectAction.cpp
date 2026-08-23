@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkRecentData.h>
 #include <mitkSceneIO.h>
 
+#include <QmitkIOUtil.h>
 #include <QmitkRun.h>
 
 #include <berryIEditorPart.h>
@@ -100,6 +101,12 @@ void QmitkExtFileSaveProjectAction::Run()
     mitk::NodePredicateNot::Pointer isNotHelperObject =
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
+
+    // Still on the GUI thread, which is where the VTK representation of the
+    // data has to be built rather than by a writer on the worker below. See
+    // QmitkIOUtil::PrebuildVtkRepresentation().
+    for (auto it = nodesToBeSaved->Begin(); it != nodesToBeSaved->End(); ++it)
+      QmitkIOUtil::PrebuildVtkRepresentation(it->Value()->GetData());
 
     // Off the GUI thread, so that the notification appears and keeps
     // moving while a large scene is written and compressed.

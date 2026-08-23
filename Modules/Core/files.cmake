@@ -353,6 +353,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkLegacyIO.cpp
   IO/mitkSurfaceVtkXmlIO.cpp
   IO/mitkUtf8Util.cpp
+  IO/mitkVtkFileIOProgressObserver.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkXMLPreferencesStorage.cpp
 

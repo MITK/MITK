@@ -179,6 +179,16 @@ namespace mitk
 
   protected:
     /**
+     * \brief Report how far writing has got to the registered callbacks.
+     *
+     * Subclasses of AbstractFileIO have a separate set of callbacks for
+     * reading and for writing, so they have to qualify the call.
+     *
+     * \param[in] progress How much of the work is done, from 0 to 1.
+     */
+    void ReportProgress(float progress);
+
+    /**
      * \brief A local file representation for writers that cannot use streams.
      *
      * If a writer can only work with local files, construct an instance

@@ -36,6 +36,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkTriangleFilter.h>
 
+#include <algorithm>
 #include <cerrno>
 #include <cstdlib>
 #include <optional>
@@ -274,6 +275,70 @@ static char *mkdtemps_compat(char *tmpl, int suffixlen)
 
 //**************************************************************
 // mitk::IOUtil method definitions
+
+namespace
+{
+  /**
+   * Resolution of a single file within its task. Readers and writers report
+   * a fraction, and this is what that fraction is spread over.
+   */
+  constexpr unsigned int STEPS_PER_FILE = 100;
+
+  /**
+   * Maps the progress of one reader or writer onto its share of a task, and
+   * keeps the callback registered only while that file is being handled.
+   *
+   * Steps are reported relative rather than absolute, so that a task shared
+   * with the caller keeps whatever progress the caller made itself.
+   */
+  class FileProgressForwarder final
+  {
+  public:
+    FileProgressForwarder(mitk::IFileIO* fileIO, mitk::ProgressTask& task)
+      : m_FileIO(fileIO),
+        m_Task(task),
+        m_Reported(0)
+    {
+      if (nullptr != m_FileIO)
+        m_FileIO->AddProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
+          this, &FileProgressForwarder::OnProgress));
+    }
+
+    ~FileProgressForwarder()
+    {
+      if (nullptr != m_FileIO)
+        m_FileIO->RemoveProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
+          this, &FileProgressForwarder::OnProgress));
+
+      // Whatever the file reported, its share of the work is over. Formats
+      // that report nothing at all advance here in one go.
+      this->Advance(STEPS_PER_FILE);
+    }
+
+    FileProgressForwarder(const FileProgressForwarder&) = delete;
+    FileProgressForwarder& operator=(const FileProgressForwarder&) = delete;
+
+  private:
+    void OnProgress(float progress)
+    {
+      const auto clamped = std::clamp(progress, 0.0f, 1.0f);
+      this->Advance(static_cast<unsigned int>(clamped * STEPS_PER_FILE));
+    }
+
+    void Advance(unsigned int reached)
+    {
+      if (reached > m_Reported)
+      {
+        m_Task.Progress(reached - m_Reported);
+        m_Reported = reached;
+      }
+    }
+
+    mitk::IFileIO* m_FileIO;
+    mitk::ProgressTask& m_Task;
+    unsigned int m_Reported;
+  };
+}
 
 namespace mitk
 {
@@ -588,7 +653,7 @@ namespace mitk
     }
 
     int filesToRead = loadInfos.size();
-    const auto steps = static_cast<unsigned int>(2 * filesToRead);
+    const auto steps = static_cast<unsigned int>(STEPS_PER_FILE * filesToRead);
 
     std::optional<ProgressTask> ownTask;
 
@@ -693,6 +758,13 @@ namespace mitk
 
       reader->SetProperties(loadInfo.m_Properties);
 
+      if (ownTask.has_value())
+        task->SetName("Loading " + itksys::SystemTools::GetFilenameName(loadInfo.m_Path));
+
+      // Reports whatever the reader tells it while the file is being read,
+      // and covers the rest of the file's share when it goes out of scope.
+      FileProgressForwarder fileProgress(reader, *task);
+
       // Do the actual reading
       try
       {
@@ -751,7 +823,6 @@ namespace mitk
       {
         errMsg += "Exception occurred when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
       }
-      task->Progress(2);
       --filesToRead;
     }
 
@@ -902,7 +973,7 @@ namespace mitk
     }
 
     int filesToWrite = saveInfos.size();
-    mitk::ProgressTask task("Saving files", static_cast<unsigned int>(2 * filesToWrite));
+    mitk::ProgressTask task("Saving files", static_cast<unsigned int>(STEPS_PER_FILE * filesToWrite));
 
     std::string errMsg;
 
@@ -973,6 +1044,10 @@ namespace mitk
         break;
       }
 
+      task.SetName("Saving " + itksys::SystemTools::GetFilenameName(saveInfo.m_Path));
+
+      FileProgressForwarder fileProgress(writer, task);
+
       // Do the actual writing
       try
       {
@@ -987,7 +1062,6 @@ namespace mitk
       if (setPathProperty)
         saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
 
-      task.Progress(2);
       --filesToWrite;
     }
 

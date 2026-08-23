@@ -187,6 +187,12 @@ namespace mitk
     void RemoveProgressCallback(const ProgressCallback &callback);
 
     /**
+     * \brief Report progress to the registered callbacks.
+     * \param[in] progress How much of the work is done, from 0 to 1.
+     */
+    void ReportProgress(float progress);
+
+    /**
      * \brief Register the MIME type as a CppMicroServices service.
      *
      * If the MIME type name is empty, a synthetic name is generated from the

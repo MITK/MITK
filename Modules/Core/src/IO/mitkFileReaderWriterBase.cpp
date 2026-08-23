@@ -145,6 +145,11 @@ namespace mitk
     m_ProgressMessage -= callback;
   }
 
+  void FileReaderWriterBase::ReportProgress(float progress)
+  {
+    m_ProgressMessage.Send(progress);
+  }
+
   us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(us::ModuleContext *context)
   {
     if (context == nullptr)

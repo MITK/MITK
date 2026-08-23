@@ -48,22 +48,37 @@ found in the LICENSE file.
 
 namespace
 {
-  /** Reports one step per file that goes into the archive. */
+  /**
+   * Shares of a scene save. Which of the two dominates depends on the scene,
+   * so they are given equal weight.
+   */
+  constexpr unsigned int SERIALIZATION_SHARE = 50;
+  constexpr unsigned int COMPRESSION_SHARE = 50;
+
+  /** Reports the share of the task that compressing accounts for. */
   class ZipProgress
   {
   public:
-    explicit ZipProgress(mitk::ProgressTask& task)
-      : m_Task(task)
+    ZipProgress(mitk::ProgressTask& task, unsigned int fileCount)
+      : m_Task(task),
+        m_FileCount(fileCount),
+        m_Compressed(0)
     {
     }
 
     void OnDone(const void*, const Poco::Zip::ZipLocalFileHeader&)
     {
-      m_Task.Progress();
+      ++m_Compressed;
+
+      m_Task.SetProgress(SERIALIZATION_SHARE + (0 != m_FileCount
+        ? COMPRESSION_SHARE * m_Compressed / m_FileCount
+        : COMPRESSION_SHARE));
     }
 
   private:
     mitk::ProgressTask& m_Task;
+    unsigned int m_FileCount;
+    unsigned int m_Compressed;
   };
 
   /** Counts what compressing the working directory is going to cost. */
@@ -297,7 +312,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
   }
 
   SceneReader::Pointer reader = SceneReader::New();
-  reader->SetProgressCallback(m_ProgressCallback);
+  reader->SetProgressTask(m_ProgressTask);
 
   if (!reader->LoadScene(document, workingDir, storage))
   {
@@ -351,7 +366,11 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
     // Declared out here because compressing the working directory happens
     // after the loop over the nodes and belongs to the same operation.
-    ProgressTask task("Saving scene");
+    // Serializing the nodes and compressing the result each get a fixed
+    // share. How many files there will be to compress is only known once
+    // the nodes are written, and adding them to the budget then would move
+    // the bar backwards.
+    ProgressTask task("Saving scene", SERIALIZATION_SHARE + COMPRESSION_SHARE);
 
     // The serializers below write one file per node through IOUtil, which
     // would otherwise raise a notification per file on top of this one.
@@ -377,7 +396,8 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         return false;
       }
 
-      task.AddStepsToDo(static_cast<unsigned int>(sceneNodes->size()));
+      const auto nodeCount = sceneNodes->size();
+      std::size_t serializedNodes = 0;
 
       // find out about dependencies
       typedef std::map<DataNode *, std::string> UIDMapType;
@@ -514,7 +534,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           MITK_WARN << "Ignoring nullptr node during scene serialization.";
         }
 
-        task.Progress();
+        ++serializedNodes;
+        task.SetProgress(0 != nodeCount
+          ? static_cast<unsigned int>(SERIALIZATION_SHARE * serializedNodes / nodeCount)
+          : SERIALIZATION_SHARE);
       } // end for all nodes
     }   // end if sceneNodes
 
@@ -549,9 +572,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           // Compressing the working directory is what dominates saving a
           // large scene, and it used to run after the task had already
           // reported everything it knew about.
-          task.AddStepsToDo(CountFiles(m_WorkingDirectory));
-
-          ZipProgress zipProgress(task);
+          ZipProgress zipProgress(task, CountFiles(m_WorkingDirectory));
 
           Poco::Zip::Compress zipper(file, true);
           zipper.EDone += Poco::Delegate<ZipProgress, const Poco::Zip::ZipLocalFileHeader>(
@@ -735,7 +756,7 @@ void mitk::SceneIO::OnUnzipOk(const void * /*pSender*/,
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
 }
 
-void mitk::SceneIO::SetProgressCallback(const std::function<void(float)>& callback)
+void mitk::SceneIO::SetProgressTask(ProgressTask* task)
 {
-  m_ProgressCallback = callback;
+  m_ProgressTask = task;
 }

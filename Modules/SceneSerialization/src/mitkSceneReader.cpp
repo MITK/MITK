@@ -46,6 +46,8 @@ bool mitk::SceneReader::LoadScene(tinyxml2::XMLDocument &document, const std::st
   {
     if (auto *reader = dynamic_cast<SceneReader *>(iter->GetPointer()))
     {
+      reader->SetProgressCallback(m_ProgressCallback);
+
       if (!reader->LoadScene(document, workingDirectory, storage))
       {
         MITK_ERROR << "There were errors while loading scene file "
@@ -59,4 +61,9 @@ bool mitk::SceneReader::LoadScene(tinyxml2::XMLDocument &document, const std::st
     }
   }
   return false;
+}
+
+void mitk::SceneReader::SetProgressCallback(const std::function<void(float)>& callback)
+{
+  m_ProgressCallback = callback;
 }

@@ -78,6 +78,7 @@ class mitkProgressTaskTestSuite : public mitk::TestFixture
   MITK_TEST(ListenerAddedMidFlight_LearnsRunningTasks_Success);
   MITK_TEST(RemovedListener_IsNotNotified_Success);
   MITK_TEST(ConcurrentReporting_KeepsSequencesMonotonic_Success);
+  MITK_TEST(ReportingTask_RaisesNoNotification_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -320,6 +321,25 @@ public:
       CPPUNIT_ASSERT(snapshots.back().Finished);
       CPPUNIT_ASSERT_EQUAL(stepCount, snapshots.back().Progress);
     }
+  }
+
+  void ReportingTask_RaisesNoNotification_Success()
+  {
+    std::vector<float> reported;
+
+    {
+      mitk::ProgressTask task([&reported](float progress) { reported.push_back(progress); }, 4);
+
+      CPPUNIT_ASSERT_MESSAGE("A task reporting to its caller has no id of its own", 0 == task.GetId());
+
+      task.Progress(2);
+    }
+
+    CPPUNIT_ASSERT_MESSAGE("Nothing is shown to the user", 0 == m_Listener->GetCount());
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), reported.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, reported.front(), 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, reported.back(), 0.001);
   }
 
 private:

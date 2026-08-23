@@ -19,6 +19,8 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 
+#include <functional>
+
 namespace tinyxml2
 {
   class XMLDocument;
@@ -45,6 +47,18 @@ namespace mitk
     itkCloneMacro(Self);
 
     /**
+     * \brief Report progress to the given callback rather than raising a
+     *        notification of its own.
+     *
+     * Set by a caller that already reports on this operation's behalf, so
+     * that opening a scene shows one notification instead of one for the
+     * file and another for the scene inside it.
+     *
+     * \param[in] callback Receives how much is done, from 0 to 1.
+     */
+    void SetProgressCallback(const std::function<void(float)>& callback);
+
+    /**
      * \brief Loads a scene from a parsed XML document into the given DataStorage.
      *
      * Reads the file version from the XML document, instantiates the appropriate
@@ -61,6 +75,10 @@ namespace mitk
      * \pre \p storage must not be null.
      */
     virtual bool LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage);
+
+  protected:
+    /** \brief Empty unless a caller reports on this reader's behalf. */
+    std::function<void(float)> m_ProgressCallback;
   };
 }
 

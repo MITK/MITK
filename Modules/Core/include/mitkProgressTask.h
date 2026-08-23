@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkProgressTaskInfo.h>
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -66,6 +67,19 @@ namespace mitk
     explicit ProgressTask(const std::string& name,
                           unsigned int steps = Indeterminate,
                           bool cancelable = false);
+
+    /**
+     * \brief Report to the given callback instead of raising a notification.
+     *
+     * For an operation whose progress is already covered by whoever called
+     * it. Steps still accumulate, so that anything nested inside has a task
+     * to report into, but what comes out is a fraction for the caller rather
+     * than a notification of its own.
+     *
+     * \param report Receives how much of the work is done, from 0 to 1.
+     * \param steps Total number of steps, or Indeterminate.
+     */
+    explicit ProgressTask(std::function<void(float)> report, unsigned int steps = Indeterminate);
 
     /** \brief Ends the task. */
     ~ProgressTask();
@@ -120,6 +134,7 @@ namespace mitk
 
     IProgressService* m_Service;
     std::shared_ptr<ProgressTaskState> m_State;
+    std::function<void(float)> m_Report;
     std::string m_Name;
     unsigned int m_StepsToDo;
     unsigned int m_Progress;

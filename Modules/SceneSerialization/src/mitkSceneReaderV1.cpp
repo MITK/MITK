@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkIOUtil.h>
 #include <mitkProgressTask.h>
+
+#include <optional>
 #include "mitkPropertyListDeserializer.h"
 #include "mitkSceneReaderHelpers.h"
 #include <mitkSerializerMacros.h>
@@ -99,7 +101,21 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     ++listSize;
   }
 
-  ProgressTask task("Loading scene", listSize * 2);
+  // Reports through the caller when there is one, so that opening a scene
+  // file raises a single notification rather than one for the file and
+  // another for the scene inside it.
+  std::optional<ProgressTask> ownTask;
+
+  if (m_ProgressCallback)
+  {
+    ownTask.emplace(m_ProgressCallback, listSize * 2);
+  }
+  else
+  {
+    ownTask.emplace(std::string("Loading scene"), listSize * 2);
+  }
+
+  auto& task = ownTask.value();
 
   // Deserialize base data properties before reading the actual data to be
   // able to provide them as read-only meta data to the data reader.

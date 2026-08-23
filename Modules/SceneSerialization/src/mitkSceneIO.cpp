@@ -296,6 +296,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
   }
 
   SceneReader::Pointer reader = SceneReader::New();
+  reader->SetProgressCallback(m_ProgressCallback);
+
   if (!reader->LoadScene(document, workingDir, storage))
   {
     MITK_ERROR << "There were errors while loading scene file " << indexfilename << ". Your data may be corrupted";
@@ -726,4 +728,9 @@ void mitk::SceneIO::OnUnzipOk(const void * /*pSender*/,
                               std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> & /*info*/)
 {
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
+}
+
+void mitk::SceneIO::SetProgressCallback(const std::function<void(float)>& callback)
+{
+  m_ProgressCallback = callback;
 }

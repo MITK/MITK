@@ -20,6 +20,8 @@ found in the LICENSE file.
 
 #include <Poco/Zip/ZipLocalFileHeader.h>
 
+#include <functional>
+
 namespace tinyxml2
 {
   class XMLDocument;
@@ -56,6 +58,14 @@ namespace mitk
   class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
   {
   public:
+    /**
+     * \brief Report loading progress to the given callback rather than
+     *        raising a notification of its own.
+     *
+     * \param[in] callback Receives how much is done, from 0 to 1.
+     */
+    void SetProgressCallback(const std::function<void(float)>& callback);
+
     mitkClassMacroItkParent(SceneIO, itk::Object);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
@@ -190,6 +200,9 @@ namespace mitk
     PropertyList::Pointer m_FailedProperties;
 
     std::string m_WorkingDirectory;
+
+    /** \brief Empty unless a caller reports on this scene's behalf. */
+    std::function<void(float)> m_ProgressCallback;
     unsigned int m_UnzipErrors;
   };
 }

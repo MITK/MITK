@@ -46,6 +46,14 @@ mitk::ProgressTask::ProgressTask(const std::string& name, unsigned int steps, bo
     m_State = m_Service->StartTask(name, steps, cancelable);
 }
 
+mitk::ProgressTask::ProgressTask(std::function<void(float)> report, unsigned int steps)
+  : m_Service(nullptr),
+    m_Report(std::move(report)),
+    m_StepsToDo(steps),
+    m_Progress(0)
+{
+}
+
 mitk::ProgressTask::~ProgressTask()
 {
   this->Finish();
@@ -54,6 +62,7 @@ mitk::ProgressTask::~ProgressTask()
 mitk::ProgressTask::ProgressTask(ProgressTask&& other) noexcept
   : m_Service(other.m_Service),
     m_State(std::move(other.m_State)),
+    m_Report(std::move(other.m_Report)),
     m_Name(std::move(other.m_Name)),
     m_StepsToDo(other.m_StepsToDo),
     m_Progress(other.m_Progress)
@@ -71,6 +80,7 @@ mitk::ProgressTask& mitk::ProgressTask::operator=(ProgressTask&& other) noexcept
 
     m_Service = other.m_Service;
     m_State = std::move(other.m_State);
+    m_Report = std::move(other.m_Report);
     m_Name = std::move(other.m_Name);
     m_StepsToDo = other.m_StepsToDo;
     m_Progress = other.m_Progress;
@@ -142,6 +152,20 @@ bool mitk::ProgressTask::IsCancelRequested() const
 
 void mitk::ProgressTask::Finish() noexcept
 {
+  if (m_Report)
+  {
+    try
+    {
+      m_Report(1.0f);
+    }
+    catch (...)
+    {
+    }
+
+    m_Report = nullptr;
+    return;
+  }
+
   if (nullptr == m_Service)
     return;
 
@@ -166,6 +190,15 @@ void mitk::ProgressTask::Finish() noexcept
 
 void mitk::ProgressTask::Publish()
 {
+  if (m_Report)
+  {
+    m_Report(0 != m_StepsToDo
+      ? static_cast<float>(m_Progress) / m_StepsToDo
+      : 0.0f);
+
+    return;
+  }
+
   if (nullptr != m_Service && m_State)
     m_Service->UpdateTask(m_State->Id, m_Name, m_StepsToDo, m_Progress);
 }

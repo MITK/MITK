@@ -59,9 +59,9 @@ namespace
   class ZipProgress
   {
   public:
-    ZipProgress(mitk::ProgressTask& task, unsigned int fileCount)
+    ZipProgress(mitk::ProgressTask& task, unsigned int entryCount)
       : m_Task(task),
-        m_FileCount(fileCount),
+        m_EntryCount(entryCount),
         m_Compressed(0)
     {
     }
@@ -70,30 +70,40 @@ namespace
     {
       ++m_Compressed;
 
-      m_Task.SetProgress(SERIALIZATION_SHARE + (0 != m_FileCount
-        ? COMPRESSION_SHARE * m_Compressed / m_FileCount
+      m_Task.SetProgress(SERIALIZATION_SHARE + (0 != m_EntryCount
+        ? COMPRESSION_SHARE * m_Compressed / m_EntryCount
         : COMPRESSION_SHARE));
     }
 
   private:
     mitk::ProgressTask& m_Task;
-    unsigned int m_FileCount;
+    unsigned int m_EntryCount;
     unsigned int m_Compressed;
   };
 
-  /** Counts what compressing the working directory is going to cost. */
-  unsigned int CountFiles(const std::string& directory)
+  /**
+   * Counts what compressing the working directory is going to report. Poco
+   * announces one entry per file and one per directory below the root, so
+   * directories count here too: counting only the files makes the compression
+   * share saturate well before compressing is done.
+   */
+  unsigned int CountZipEntries(const std::string& directory)
   {
+    const fs::recursive_directory_iterator end;
+
     std::error_code error;
     unsigned int count = 0;
 
-    for (const auto& entry : fs::recursive_directory_iterator(directory, error))
-    {
-      if (entry.is_regular_file(error))
-        ++count;
-    }
+    // Incremented explicitly rather than by a range-for, whose operator++
+    // throws on an unreadable entry instead of reporting it.
+    for (auto it = fs::recursive_directory_iterator(directory, error); !error && it != end; it.increment(error))
+      ++count;
 
-    return count;
+    // A count that could not be taken is reported as none, which makes the
+    // share jump to full on the first entry rather than stall below it.
+    return error
+      ? 0
+      : count;
   }
 }
 
@@ -572,7 +582,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           // Compressing the working directory is what dominates saving a
           // large scene, and it used to run after the task had already
           // reported everything it knew about.
-          ZipProgress zipProgress(task, CountFiles(m_WorkingDirectory));
+          ZipProgress zipProgress(task, CountZipEntries(m_WorkingDirectory));
 
           Poco::Zip::Compress zipper(file, true);
           zipper.EDone += Poco::Delegate<ZipProgress, const Poco::Zip::ZipLocalFileHeader>(

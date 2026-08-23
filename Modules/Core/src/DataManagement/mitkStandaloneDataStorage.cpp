@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateBase.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <mitkUndoController.h>
 
@@ -40,7 +41,7 @@ bool mitk::StandaloneDataStorage::IsInitialized() const
 void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents)
 {
   // The task blocks until it has run, so both arguments stay alive.
-  if (this->DispatchToOwningThread([this, node, parents]() { this->Add(node, parents); }))
+  if (DispatchToStorageThread([this, node, parents]() { this->Add(node, parents); }))
     return;
 
   {
@@ -93,7 +94,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
 
 void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
 {
-  if (this->DispatchToOwningThread([this, node]() { this->Remove(node); }))
+  if (DispatchToStorageThread([this, node]() { this->Remove(node); }))
     return;
 
   if (!IsInitialized())

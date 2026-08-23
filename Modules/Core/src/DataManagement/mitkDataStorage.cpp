@@ -26,11 +26,6 @@ found in the LICENSE file.
 #include <regex>
 #include <set>
 
-bool mitk::DataStorage::DispatchToOwningThread(const std::function<void()>& task) const
-{
-  return DispatchToStorageThread(task);
-}
-
 mitk::DataStorage::DataStorage() : itk::Object(), m_BlockNodeModifiedEvents(false)
 {
 }
@@ -74,6 +69,14 @@ void mitk::DataStorage::Remove(const DataStorage::SetOfObjects *nodes)
 {
   if (nodes == nullptr)
     return;
+
+  // Handed over as one batch. Removing the nodes one at a time hands each of
+  // them over separately, and clearing a scene is then a scene's worth of
+  // round trips to the owning thread. The task blocks until it has run, so
+  // the list stays alive.
+  if (DispatchToStorageThread([this, nodes]() { this->Remove(nodes); }))
+    return;
+
   for (DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
     this->Remove(it.Value());
 }
@@ -82,6 +85,10 @@ void mitk::DataStorage::Remove(const ConstSetOfObjects *nodes)
 {
   if (nodes == nullptr)
     return;
+
+  if (DispatchToStorageThread([this, nodes]() { this->Remove(nodes); }))
+    return;
+
   for (ConstSetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
     this->Remove(it.Value());
 }

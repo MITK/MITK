@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <chrono>
 
 namespace
 {
@@ -46,6 +47,13 @@ namespace
    * every one of them buries the ones that actually take time.
    */
   constexpr qint64 SHOW_DELAY_IN_MS = 1000;
+
+  /** \brief How long the task has been running, in milliseconds. */
+  qint64 TaskAgeInMs(const mitk::ProgressTaskInfo& info)
+  {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - info.StartTime).count();
+  }
 }
 
 QmitkProgressNotificationOverlay::QmitkProgressNotificationOverlay(QWidget* parent)
@@ -135,15 +143,23 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
 
     if (pending == m_Pending.end())
     {
-      PendingTask task;
-      task.Info = info;
-      task.SinceFirstSeen.start();
-      m_Pending.insert(info.Id, task);
+      m_Pending.insert(info.Id, info);
+
+      const auto remaining = SHOW_DELAY_IN_MS - TaskAgeInMs(info);
+
+      if (remaining <= 0)
+      {
+        // A snapshot can reach us long after it was taken, because whatever
+        // kept this thread from its event loop also kept it from the delivery.
+        // The task has then already outlived the delay and is shown at once.
+        this->ShowPendingTask(info.Id);
+        return;
+      }
 
       // Covers a task that goes quiet after starting. A task that keeps
-      // reporting is picked up by the elapsed check below instead, which
-      // also works while a blocking operation starves the event loop.
-      QTimer::singleShot(SHOW_DELAY_IN_MS, this, [this, id = info.Id]()
+      // reporting is picked up by the age check below instead, which also
+      // works while a blocking operation starves the event loop.
+      QTimer::singleShot(remaining, this, [this, id = info.Id]()
         {
           this->ShowPendingTask(id);
         });
@@ -151,9 +167,9 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
       return;
     }
 
-    pending->Info = info;
+    *pending = info;
 
-    if (pending->SinceFirstSeen.elapsed() >= SHOW_DELAY_IN_MS)
+    if (TaskAgeInMs(info) >= SHOW_DELAY_IN_MS)
       this->ShowPendingTask(info.Id);
 
     return;
@@ -186,7 +202,7 @@ void QmitkProgressNotificationOverlay::ShowPendingTask(mitk::ProgressTaskId id)
   if (pending == m_Pending.end())
     return;
 
-  const auto info = pending->Info;
+  const auto info = *pending;
   m_Pending.erase(pending);
 
   auto* notification = new QmitkProgressNotification(info, this);

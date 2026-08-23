@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <string>
 
@@ -49,6 +50,16 @@ namespace mitk
      * for that task.
      */
     std::uint64_t Sequence = 0;
+
+    /**
+     * \brief When the task was started, stamped by the service.
+     *
+     * Listeners measure how long a task has been running from here rather
+     * than from when the snapshot reached them. Delivery to a listener whose
+     * thread is busy lags by however long that thread stays busy, which is
+     * precisely the situation in which a progress notification is wanted.
+     */
+    std::chrono::steady_clock::time_point StartTime = std::chrono::steady_clock::now();
 
     /** \brief Human-readable name of the operation, shown to the user. */
     std::string Name;

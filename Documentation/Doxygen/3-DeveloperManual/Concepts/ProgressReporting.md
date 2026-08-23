@@ -29,8 +29,7 @@ Name the operation as the user thinks of it, not the class doing the work:
 "Loading files", not "IOUtil".
 
 If the extent of the work is not known in advance, leave the step count out.
-The task then reports indeterminate progress, and can still become determinate
-later by calling `AddStepsToDo()` once the extent is known.
+The task then reports indeterminate progress.
 
 ## There is no Reset()
 
@@ -51,6 +50,35 @@ A task ends with its handle, so early returns, exceptions and rethrows need no
 cleanup at all. `Finish()` exists for the rare case of ending a task before its
 scope does; calling it twice is harmless.
 
+## Sizing a task
+
+`AddStepsToDo()` grows the total. Doing that once progress has already been
+reported makes the bar move **backwards**, because the denominator grows while
+the numerator stays where it is. Saving a scene used to declare one step per
+node, fill that up, and only then count the files it was about to compress:
+with two nodes and seven files the bar read 50 %, then 22 %, then 44 %.
+
+So either declare the whole budget before reporting anything, or, when part of
+the work can only be measured later, give each phase a fixed share and map its
+own progress into that share:
+
+~~~{.cpp}
+constexpr unsigned int SERIALIZATION_SHARE = 50;
+constexpr unsigned int COMPRESSION_SHARE = 50;
+
+mitk::ProgressTask task("Saving scene", SERIALIZATION_SHARE + COMPRESSION_SHARE);
+
+// ... after serializing node i of n:
+task.SetProgress(SERIALIZATION_SHARE * (i + 1) / n);
+
+// ... after compressing file j of m:
+task.SetProgress(SERIALIZATION_SHARE + COMPRESSION_SHARE * (j + 1) / m);
+~~~
+
+`SetProgress()` is absolute, which is what makes shares easy to express. Size
+the shares by how long each phase takes rather than by how many steps it has,
+since what a bar is for is telling the user how much time is left.
+
 ## Reporting from a filter
 
 A filter has no way of knowing which user-facing operation it is part of, so it
@@ -63,8 +91,8 @@ filter->SetProgressTask(&task);
 Passing nothing means reporting nothing, which is what command-line tools and
 tests want.
 
-A filter announces the steps it is about to contribute when it starts, rather
-than leaving its caller to guess:
+A filter announces the steps it is about to contribute rather than leaving its
+caller to guess how much work the pipeline it assembled amounts to:
 
 ~~~{.cpp}
 if (nullptr != m_ProgressTask)
@@ -73,16 +101,58 @@ if (nullptr != m_ProgressTask)
 
 Relative step counts across the filters of a pipeline are what make a task
 advance roughly with elapsed time, so size them by cost rather than by count.
+Mind the rule above, though: filters that announce themselves one after another
+as they run will each move the bar backwards a little. Announcing at the time
+the task is set, before the pipeline starts, avoids that.
+
+## Operations inside operations
+
+An operation that calls another reported operation should end up as one
+notification, not two. There are two ways to arrange that.
+
+Where there is a seam to pass a task through, pass it. Filters take one through
+`SetProgressTask()`, and so do file readers and writers: mitk::IFileIO carries a
+task, which mitk::IOUtil sets to the share of the work that file accounts for.
+A reader can then report in steps of its own, or drive further reads, and all of
+it lands in the notification the user is already watching. That is how opening a
+scene shows one card rather than one for the file and another for the scene
+inside it.
+
+Where there is no seam, quiet the nested operation instead. Saving a scene
+writes one file per node through eight different serializers, none of which
+knows anything about the scene around it:
+
+~~~{.cpp}
+mitk::ProgressTask task("Saving scene", ...);
+mitk::IOUtil::QuietProgress quietProgress;
+~~~
+
+While that guard exists, `IOUtil::Load()` and `IOUtil::Save()` raise no
+notifications **on that thread**, leaving the reporting to whoever set it.
 
 ## Threads
 
 A handle belongs to one thread. It is move-only and must not be shared, but
 different threads may each own one and report at the same time.
 
-Operations that run on the GUI thread never reach the event loop, so the
-notification paints itself synchronously to be visible at all. Nothing else is
-done from a reporting call: notification runs without the service lock held,
-and listeners must neither block nor report progress of their own.
+Notification runs without the service lock held, and listeners must neither
+block nor report progress of their own.
+
+An operation that runs on the GUI thread never reaches the event loop, so the
+notification paints itself synchronously to be visible at all. A bar can still
+advance that way, but only while something reports; an operation that blocks in
+a single call, as reading an image through ITK does, has no moment at which
+anything could be drawn. That is why file IO runs on a worker instead, through
+`QmitkRunWithInputBlocked()`, which keeps the event loop turning and discards
+user input for the duration.
+
+Running work off the GUI thread is only safe because
+mitk::StandaloneDataStorage hands `Add()` and `Remove()` to the thread that owns
+the storage; adding a node notifies observers synchronously, and those observers
+are rendering and user interface code. Handing over blocks until the task has
+run, so a caller waiting on a worker **must keep its event loop turning**.
+Waiting the bare way, as `QFuture::waitForFinished()` does, deadlocks. Queries
+such as `GetAll()` are not handed over, only mutations.
 
 ## Cancellation
 
@@ -119,10 +189,11 @@ QmitkProgressNotificationOverlay renders the running tasks. The workbench
 window advisors create one per window; a plugin does not need to do anything
 to have its tasks shown.
 
-A task is only shown once it has run for about a second, so the many
-operations that finish immediately never raise a notification at all. A task
-that is shown but has yet to report its first step switches to a spinning bar
-after another second, rather than sitting at zero as if it were stuck.
+A task is only shown once it has run for about a second, so the many operations
+that finish immediately never raise a notification at all. A task that is shown
+but has yet to report its first step spins, rather than sitting at zero as if it
+were stuck: by the time a card appears the operation has already run for a
+second, which is long enough to conclude that no step count is coming.
 
 For the GUI-independent side, mitk::IProgressService is a CppMicroServices
 service reached through `mitk::CoreServices::GetProgressService()`. Anything

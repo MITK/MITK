@@ -58,6 +58,10 @@ namespace mitk
   class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
   {
   public:
+    mitkClassMacroItkParent(SceneIO, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+
     /**
      * \brief Report progress into the given task rather than raising a
      *        notification of its own.
@@ -69,10 +73,6 @@ namespace mitk
      * \param[in] task The task to report into, or nullptr for none.
      */
     void SetProgressTask(ProgressTask* task);
-
-    mitkClassMacroItkParent(SceneIO, itk::Object);
-    itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self);
 
       /** \brief Type for a list of DataNodes whose BaseData failed to serialize/deserialize. */
       typedef DataStorage::SetOfObjects FailedBaseDataListType;

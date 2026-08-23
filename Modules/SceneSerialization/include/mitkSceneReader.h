@@ -47,16 +47,6 @@ namespace mitk
     itkCloneMacro(Self);
 
     /**
-     * \brief Report progress to the given callback rather than raising a
-     *        notification of its own.
-     *
-     * Set by a caller that already reports on this operation's behalf, so
-     * that opening a scene shows one notification instead of one for the
-     * file and another for the scene inside it.
-     *
-     * \param[in] callback Receives how much is done, from 0 to 1.
-     */
-    /**
      * \brief Report progress into the given task rather than raising a
      *        notification of its own.
      *

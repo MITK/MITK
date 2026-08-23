@@ -12,31 +12,6 @@ found in the LICENSE file.
 
 #include <mitkSegWithPreviewTool.h>
 
-namespace
-{
-  /** Detaches the task from the command again once the update ends. */
-  class ScopedProgressTask
-  {
-  public:
-    ScopedProgressTask(mitk::ToolCommand* command, mitk::ProgressTask* task)
-      : m_Command(command)
-    {
-      m_Command->SetProgressTask(task);
-    }
-
-    ~ScopedProgressTask()
-    {
-      m_Command->SetProgressTask(nullptr);
-    }
-
-    ScopedProgressTask(const ScopedProgressTask&) = delete;
-    ScopedProgressTask& operator=(const ScopedProgressTask&) = delete;
-
-  private:
-    mitk::ToolCommand* m_Command;
-  };
-}
-
 #include <mitkToolManager.h>
 
 #include <mitkColorProperty.h>
@@ -56,6 +31,7 @@ namespace
 #include <mitkSegTool2D.h>
 
 #include <mitkProgressTask.h>
+#include <mitkScopedProgressTask.h>
 #include <mitkSegChangeOperationApplier.h>
 
 #include <algorithm>
@@ -679,8 +655,8 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   auto previewImage = this->GetPreviewSegmentation();
   this->EnsureUpToDateUserDefinedActiveLabel();
 
-  mitk::ProgressTask task(this->GetName(), 100, true);
-  ScopedProgressTask scopedTask(m_ProgressCommand, &task);
+  mitk::ProgressTask task(this->GetName(), 100, this->IsCancelable());
+  ScopedProgressTask<ToolCommand> scopedTask(m_ProgressCommand, &task);
 
   const auto workingSegmentation = this->GetTargetSegmentation();
   const auto workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
@@ -691,6 +667,8 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   this->UpdatePrepare();
 
   const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  bool cancelled = false;
 
   try
   {
@@ -752,10 +730,20 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     // A cancelled preview aborts the filter, which reports the abort as an
     // exception. Reporting that back as an error would turn the user's own
     // decision into a failure message.
-    if (!task.IsCancelRequested())
+    cancelled = task.IsCancelRequested();
+
+    if (!cancelled)
     {
       MITK_ERROR << "Exception caught: " << e.GetDescription();
       ErrorMessage.Send(e.GetDescription());
+    }
+    else
+    {
+      // Whatever the filter managed to write before it stopped is not a
+      // result. Left on display it offers the user half a segmentation that
+      // m_HasUnconfirmedPreview will not let them confirm.
+      this->ResetPreviewContent();
+      RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
   catch (const std::exception& e)
@@ -774,9 +762,22 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   }
 
   this->UpdateCleanUp();
-  m_LastTimePointOfUpdate = timePoint;
+
+  // A cancelled update leaves the time point unrecorded on purpose: recording
+  // it would tell OnTimePointChanged() that this time point is up to date, so
+  // the discarded preview would never be recomputed for it.
+  if (!cancelled)
+    m_LastTimePointOfUpdate = timePoint;
+
   m_IsUpdating = false;
   CurrentlyBusy.Send(false);
+}
+
+bool mitk::SegWithPreviewTool::IsCancelable() const
+{
+  // No filter that a tool currently hands to ToolCommand reads the abort
+  // flag, so nothing in the tree overrides this yet.
+  return false;
 }
 
 bool mitk::SegWithPreviewTool::IsUpdating() const

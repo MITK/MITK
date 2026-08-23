@@ -195,9 +195,17 @@ but has yet to report its first step spins, rather than sitting at zero as if it
 were stuck: by the time a card appears the operation has already run for a
 second, which is long enough to conclude that no step count is coming.
 
+That second counts from when the task started, not from when the overlay heard
+about it. A snapshot reaches the GUI thread only when that thread returns to its
+event loop, so whatever keeps it from painting keeps it from the delivery as
+well, and a task can already be seconds old by the time its first snapshot is
+applied. Measured from the start, such a task is shown the moment it is seen
+rather than a second later still.
+
 For the GUI-independent side, mitk::IProgressService is a CppMicroServices
 service reached through `mitk::CoreServices::GetProgressService()`. Anything
 that wants to observe tasks implements mitk::IProgressListener and registers
 there. Listeners receive a complete mitk::ProgressTaskInfo snapshot rather than
 increments, numbered so that they can discard snapshots a delivery path
-reordered.
+reordered, and stamped with the time the task started so that a listener can tell
+how long it has been running however late the snapshot arrives.

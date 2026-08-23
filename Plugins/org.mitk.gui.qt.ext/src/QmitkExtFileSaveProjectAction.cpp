@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <mitkRecentData.h>
 #include <mitkSceneIO.h>
 
+#include <QmitkRun.h>
+
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
@@ -99,7 +101,15 @@ void QmitkExtFileSaveProjectAction::Run()
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
 
-    if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
+    // Off the GUI thread, so that the notification appears and keeps
+    // moving while a large scene is written and compressed.
+    auto saved = false;
+    QmitkRunWithInputBlocked([&]()
+      {
+        saved = sceneIO->SaveScene(nodesToBeSaved, storage, fileName.toStdString());
+      });
+
+    if (!saved)
     {
       QMessageBox::information(nullptr,
                                "Scene saving",

@@ -17,7 +17,6 @@ found in the LICENSE file.
 
 #include <mitkProgressTaskInfo.h>
 
-#include <QElapsedTimer>
 #include <QString>
 #include <QWidget>
 
@@ -83,7 +82,6 @@ private:
   Ui::QmitkProgressNotification* m_Controls;
   mitk::ProgressTaskInfo m_Info;
   QString m_Name;
-  QElapsedTimer m_SinceCreation;
 };
 
 #endif

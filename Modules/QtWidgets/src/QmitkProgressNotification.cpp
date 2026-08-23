@@ -27,12 +27,6 @@ namespace
 {
   constexpr int LINGER_DURATION_IN_MS = 1500;
 
-  /**
-   * How long a task may show no progress at all before its bar starts
-   * spinning. A bar sitting at zero is indistinguishable from one that is
-   * stuck.
-   */
-  constexpr qint64 SPIN_DELAY_IN_MS = 1000;
   constexpr int FADE_DURATION_IN_MS = 300;
 
   QString CardStyleSheet()
@@ -68,8 +62,6 @@ QmitkProgressNotification::QmitkProgressNotification(const mitk::ProgressTaskInf
 {
   m_Controls->setupUi(this);
 
-  m_SinceCreation.start();
-
   this->setObjectName(QStringLiteral("QmitkProgressNotification"));
 
   // Qt draws no style sheet background for a plain QWidget subclass unless
@@ -92,14 +84,6 @@ QmitkProgressNotification::QmitkProgressNotification(const mitk::ProgressTaskInf
   connect(m_Controls->closeButton, &QToolButton::clicked, this, &QmitkProgressNotification::OnCloseButtonClicked);
 
   this->ApplyState();
-
-  // A task that goes quiet rather than reporting would otherwise never be
-  // re-evaluated, as the state is only recomputed when a snapshot arrives.
-  QTimer::singleShot(SPIN_DELAY_IN_MS, this, [this]()
-    {
-      if (!m_Info.Finished)
-        this->ApplyState();
-    });
 }
 
 QmitkProgressNotification::~QmitkProgressNotification()
@@ -148,13 +132,12 @@ void QmitkProgressNotification::OnCloseButtonClicked()
 
 bool QmitkProgressNotification::ShouldSpin() const
 {
-  // A task whose extent is unknown can only ever spin.
-  if (0 == m_Info.StepsToDo)
-    return true;
-
-  return 0 == m_Info.Progress
-      && !m_Info.Finished
-      && m_SinceCreation.elapsed() >= SPIN_DELAY_IN_MS;
+  // A task whose extent is unknown can only ever spin. So does one that has
+  // yet to report its first step: by the time a card appears the operation
+  // has already run for a second, and a bar sitting at zero is
+  // indistinguishable from one that is stuck.
+  return 0 == m_Info.StepsToDo
+      || (0 == m_Info.Progress && !m_Info.Finished);
 }
 
 void QmitkProgressNotification::ApplyState()

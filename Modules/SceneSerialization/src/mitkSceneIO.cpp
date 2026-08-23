@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkFileSystem.h>
+#include <mitkIOUtil.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkStringUtil.h>
@@ -351,6 +352,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
     // Declared out here because compressing the working directory happens
     // after the loop over the nodes and belongs to the same operation.
     ProgressTask task("Saving scene");
+
+    // The serializers below write one file per node through IOUtil, which
+    // would otherwise raise a notification per file on top of this one.
+    IOUtil::QuietProgress quietProgress;
 
     if (sceneNodes.IsNull())
     {

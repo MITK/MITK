@@ -286,6 +286,9 @@ namespace
    */
   constexpr unsigned int STEPS_PER_FILE = 100;
 
+  /** Nesting depth of IOUtil::QuietProgress on this thread. */
+  thread_local unsigned int s_QuietDepth = 0;
+
   /**
    * Runs the task on the thread that owns the data storage, if this is not
    * it. Writing to data that is on display has to happen where everything
@@ -318,8 +321,8 @@ namespace
   class FileProgressForwarder final
   {
   public:
-    FileProgressForwarder(mitk::IFileIO* fileIO, mitk::ProgressTask& task)
-      : m_FileIO(fileIO),
+    FileProgressForwarder(mitk::IFileIO* fileIO, mitk::ProgressTask* task)
+      : m_FileIO(nullptr != task ? fileIO : nullptr),
         m_Task(task),
         m_Reported(0)
     {
@@ -351,21 +354,31 @@ namespace
 
     void Advance(unsigned int reached)
     {
-      if (reached > m_Reported)
+      if (nullptr != m_Task && reached > m_Reported)
       {
-        m_Task.Progress(reached - m_Reported);
+        m_Task->Progress(reached - m_Reported);
         m_Reported = reached;
       }
     }
 
     mitk::IFileIO* m_FileIO;
-    mitk::ProgressTask& m_Task;
+    mitk::ProgressTask* m_Task;
     unsigned int m_Reported;
   };
 }
 
 namespace mitk
 {
+  IOUtil::QuietProgress::QuietProgress()
+  {
+    ++s_QuietDepth;
+  }
+
+  IOUtil::QuietProgress::~QuietProgress()
+  {
+    --s_QuietDepth;
+  }
+
   struct IOUtil::Impl
   {
     struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
@@ -681,14 +694,14 @@ namespace mitk
 
     std::optional<ProgressTask> ownTask;
 
-    if (nullptr == task)
+    if (nullptr != task)
+    {
+      task->AddStepsToDo(steps);
+    }
+    else if (0 == s_QuietDepth)
     {
       ownTask.emplace("Loading files", steps);
       task = &ownTask.value();
-    }
-    else
-    {
-      task->AddStepsToDo(steps);
     }
 
     std::string errMsg;
@@ -787,7 +800,7 @@ namespace mitk
 
       // Reports whatever the reader tells it while the file is being read,
       // and covers the rest of the file's share when it goes out of scope.
-      FileProgressForwarder fileProgress(reader, *task);
+      FileProgressForwarder fileProgress(reader, task);
 
       // Do the actual reading
       try
@@ -997,7 +1010,14 @@ namespace mitk
     }
 
     int filesToWrite = saveInfos.size();
-    mitk::ProgressTask task("Saving files", static_cast<unsigned int>(STEPS_PER_FILE * filesToWrite));
+    std::optional<ProgressTask> ownTask;
+
+    if (0 == s_QuietDepth)
+      ownTask.emplace("Saving files", static_cast<unsigned int>(STEPS_PER_FILE * filesToWrite));
+
+    auto* task = ownTask.has_value()
+      ? &ownTask.value()
+      : nullptr;
 
     std::string errMsg;
 
@@ -1068,7 +1088,8 @@ namespace mitk
         break;
       }
 
-      task.SetName("Saving " + itksys::SystemTools::GetFilenameName(saveInfo.m_Path));
+      if (nullptr != task)
+        task->SetName("Saving " + itksys::SystemTools::GetFilenameName(saveInfo.m_Path));
 
       FileProgressForwarder fileProgress(writer, task);
 

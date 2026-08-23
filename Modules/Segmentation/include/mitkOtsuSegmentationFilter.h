@@ -75,6 +75,20 @@ namespace mitk
     void SetValleyEmphasis(bool useValley) { m_ValleyEmphasis = useValley; }
 
     /**
+     * \brief Pass the progress of an internal filter on to this filter's observers.
+     *
+     * Whoever started the operation observes this filter, not the ITK pipeline
+     * inside it, so without this nothing it does is ever heard and no progress
+     * is shown at all.
+     *
+     * Public only because that pipeline is assembled in a free template
+     * function rather than by this class. Not meant to be called otherwise.
+     *
+     * \param[in] caller The internal filter reporting its progress.
+     */
+    void ForwardProgress(const itk::Object *caller, const itk::EventObject &);
+
+    /**
      * \brief Sets the number of histogram bins for Otsu's threshold computation.
      * \param[in] number Number of bins, must be >= 1.
      * \note Values less than 1 are ignored with a warning.

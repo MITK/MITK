@@ -13,14 +13,23 @@ found in the LICENSE file.
 #include <mitkOtsuSegmentationFilter.h>
 #include <itkOtsuMultipleThresholdsImageFilter.h>
 #include <itkAddImageFilter.h>
+#include <itkCommand.h>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 
 struct paramContainer
 {
-  paramContainer(unsigned int numThresholds, bool useValley, unsigned int numBins, mitk::Image::Pointer image)
-    : m_NumberOfThresholds(numThresholds), m_ValleyEmphasis(useValley), m_NumberOfBins(numBins), m_Image(image)
+  paramContainer(unsigned int numThresholds,
+                 bool useValley,
+                 unsigned int numBins,
+                 mitk::Image::Pointer image,
+                 mitk::OtsuSegmentationFilter *reportTo)
+    : m_NumberOfThresholds(numThresholds),
+      m_ValleyEmphasis(useValley),
+      m_NumberOfBins(numBins),
+      m_Image(image),
+      m_ReportTo(reportTo)
   {
   }
 
@@ -28,6 +37,7 @@ struct paramContainer
   bool m_ValleyEmphasis;
   unsigned int m_NumberOfBins;
   mitk::Image::Pointer m_Image;
+  mitk::OtsuSegmentationFilter *m_ReportTo;
 };
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -43,6 +53,14 @@ void AccessItkOtsuFilter(const itk::Image<TPixel, VImageDimension> *itkImage, pa
   otsuFilter->SetInput(itkImage);
   otsuFilter->SetValleyEmphasis(params.m_ValleyEmphasis);
   otsuFilter->SetNumberOfHistogramBins(params.m_NumberOfBins);
+
+  // The Otsu filter reports the progress of its internal labelling pass
+  // through a ProgressAccumulator. Its histogram and threshold computation
+  // report nothing, so the bar stays put until the labelling starts.
+  auto forwarder = itk::MemberCommand<mitk::OtsuSegmentationFilter>::New();
+  forwarder->SetCallbackFunction(params.m_ReportTo, &mitk::OtsuSegmentationFilter::ForwardProgress);
+  otsuFilter->AddObserver(itk::ProgressEvent(), forwarder);
+
   auto addFilter = AddFilterType::New();
   addFilter->SetInput1(otsuFilter->GetOutput());
   //add 1 to every pixel because otsu also returns 0 as a label
@@ -69,11 +87,18 @@ namespace mitk
   }
 
   OtsuSegmentationFilter::~OtsuSegmentationFilter() {}
+
+  void OtsuSegmentationFilter::ForwardProgress(const itk::Object *caller, const itk::EventObject &)
+  {
+    if (const auto *source = dynamic_cast<const itk::ProcessObject *>(caller); nullptr != source)
+      this->UpdateProgress(source->GetProgress());
+  }
+
   void OtsuSegmentationFilter::GenerateData()
   {
     mitk::Image::ConstPointer mitkImage = GetInput();
     AccessByItk_n(mitkImage,
                   AccessItkOtsuFilter,
-                  (paramContainer(m_NumberOfThresholds, m_ValleyEmphasis, m_NumberOfBins, this->GetOutput())));
+                  (paramContainer(m_NumberOfThresholds, m_ValleyEmphasis, m_NumberOfBins, this->GetOutput(), this)));
   }
 }

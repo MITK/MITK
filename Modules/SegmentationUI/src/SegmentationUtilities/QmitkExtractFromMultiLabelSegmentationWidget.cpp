@@ -113,12 +113,14 @@ mitk::DataNode::Pointer QmitkExtractFromMultiLabelSegmentationWidget::StoreToDat
 
 void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   auto selectedNodes = m_Controls->segNodeSelector->GetSelectedNodes();
   if (selectedNodes.empty())
   {
     return;
   }
+
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+
   auto node = selectedNodes.front();
 
   m_LastResultNodes.clear();

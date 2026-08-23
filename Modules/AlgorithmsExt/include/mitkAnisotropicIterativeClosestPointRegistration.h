@@ -268,7 +268,10 @@ namespace mitk
 
       /**
         * Report progress into the given task, or nowhere if it is nullptr.
-        * The algorithm contributes one step per iteration it needs.
+        *
+        * One step per iteration, and no step count: how many iterations this
+        * needs is not known until it converges, so a caller that wants a bar
+        * rather than a spinner has to size the task itself.
         */
       itkSetMacro(ProgressTask, ProgressTask*);
 

@@ -191,11 +191,6 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   X_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
   Z_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
 
-  unsigned int stepSize = m_MaxIterations / 10;
-
-  if (nullptr != m_ProgressTask)
-    m_ProgressTask->AddStepsToDo(m_MaxIterations);
-
   do
   {
     // reset innerloop
@@ -282,13 +277,14 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     // update FRE
     m_FRE = FRE_new;
 
-    // update the progressbar. Just use the half every 2nd iteration
-    // to use a simulated endless progress bar since we don't have
-    // a fixed amount of iterations
-    stepSize = (k % 2 == 0) ? stepSize / 2 : stepSize;
-    stepSize = (stepSize == 0) ? 1 : stepSize;
+    // One step per iteration, and no step count declared anywhere above. How
+    // many iterations this needs is not known until it converges, and the
+    // maximum is a bound rather than an estimate: counting against it left the
+    // bar creeping through a fraction of its range and then jumping to the end.
+    // On a task with no total this reports only that the operation is still
+    // running, which is all there is to say about an unknown extent.
     if (nullptr != m_ProgressTask)
-      m_ProgressTask->Progress(stepSize);
+      m_ProgressTask->Progress();
 
   } while (diff > m_Threshold && k < m_MaxIterations);
 

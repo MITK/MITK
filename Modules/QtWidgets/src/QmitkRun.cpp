@@ -49,16 +49,18 @@ namespace
   protected:
     bool eventFilter(QObject* watched, QEvent* event) override
     {
-      // A dialog the operation raised itself has to stay usable, or the
-      // operation waits forever for an answer the user cannot give. Reader and
-      // writer options are asked this way.
-      if (auto* modal = QApplication::activeModalWidget(); nullptr != modal)
-      {
-        auto* widget = qobject_cast<QWidget*>(watched);
-
-        if (nullptr != widget && (widget == modal || modal->isAncestorOf(widget)))
-          return QObject::eventFilter(watched, event);
-      }
+      // Nothing is filtered while a modal dialog is up. The operation may have
+      // raised one itself and be waiting for the answer: reader and writer
+      // options are asked that way, and swallowing the input leaves the user
+      // unable to give it. Qt's own modality already keeps input away from
+      // every other window meanwhile, so there is nothing left here to do.
+      //
+      // Deciding this from the receiver does not work. A press is delivered to
+      // the QWindow before the widget inside it, and there the receiver is not
+      // a QWidget at all, so a test for the dialog's own widgets never matches
+      // and the event is gone before the widget is ever asked.
+      if (nullptr != QApplication::activeModalWidget())
+        return QObject::eventFilter(watched, event);
 
       switch (event->type())
       {

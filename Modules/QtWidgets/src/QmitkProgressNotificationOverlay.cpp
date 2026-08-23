@@ -30,6 +30,14 @@ found in the LICENSE file.
 namespace
 {
   constexpr int MAX_VISIBLE_NOTIFICATIONS = 5;
+
+  /**
+   * How many tasks the overlay keeps a sequence number for. Bounds what is
+   * remembered about tasks that have already ended, which is what rejects a
+   * snapshot delivered after the one that finished them.
+   */
+  constexpr int MAX_REMEMBERED_SEQUENCES = 256;
+
   constexpr int NOTIFICATION_WIDTH = 320;
   constexpr int MARGIN = 12;
 
@@ -111,21 +119,34 @@ void QmitkProgressNotificationOverlay::OnTaskUpdated(const mitk::ProgressTaskInf
 
 void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
 {
-  if (m_Dismissed.contains(info.Id))
-  {
-    if (info.Finished)
-    {
-      m_Dismissed.remove(info.Id);
-      m_Sequences.remove(info.Id);
-    }
-
-    return;
-  }
-
+  // Before anything else, including the dismissal bookkeeping below: a
+  // snapshot that lost its race is not allowed to undo what a newer one
+  // already established.
   if (info.Sequence <= m_Sequences.value(info.Id, 0))
     return;
 
+  // Kept once the task has finished, rather than erased with the rest of its
+  // state. It is the only thing that tells a snapshot which overtook the final
+  // one that it is stale, and without it such a snapshot raises a card for a
+  // task that can never send another and so can never take it down again.
   m_Sequences.insert(info.Id, info.Sequence);
+
+  // Ids only ever increase, so the lowest ones belong to the tasks that ended
+  // longest ago. Once this many newer tasks have been seen, nothing can still
+  // be in flight for them and remembering them buys nothing. Dropping the
+  // entry of a task that is somehow still running is harmless: its next
+  // snapshot is newer than anything already applied either way, and whether
+  // its card was dismissed is recorded in m_Dismissed, not here.
+  while (m_Sequences.size() > MAX_REMEMBERED_SEQUENCES)
+    m_Sequences.erase(m_Sequences.begin());
+
+  if (m_Dismissed.contains(info.Id))
+  {
+    if (info.Finished)
+      m_Dismissed.remove(info.Id);
+
+    return;
+  }
 
   auto* notification = m_Notifications.value(info.Id, nullptr);
 
@@ -135,7 +156,6 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
     {
       // Over before it was worth mentioning.
       m_Pending.remove(info.Id);
-      m_Sequences.remove(info.Id);
       return;
     }
 
@@ -178,7 +198,6 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
   if (info.Finished)
   {
     m_Notifications.remove(info.Id);
-    m_Sequences.remove(info.Id);
 
     notification->Finish(info);
   }
@@ -241,6 +260,11 @@ void QmitkProgressNotificationOverlay::OnNotificationClosed(mitk::ProgressTaskId
     m_Dismissed.insert(id);
   }
 
+  // removeWidget() only takes it out of the layout. It stays a visible child
+  // at its last geometry until deleteLater() runs, which is a turn of the event
+  // loop away, and longer while an operation is keeping the loop busy.
+  notification->hide();
+
   m_Layout->removeWidget(notification);
   notification->deleteLater();
 
@@ -296,7 +320,9 @@ void QmitkProgressNotificationOverlay::UpdatePosition()
 
   if (auto* mainWindow = qobject_cast<QMainWindow*>(parent); nullptr != mainWindow)
   {
-    auto* statusBar = mainWindow->statusBar();
+    // Not statusBar(), which is a factory: it installs an empty status bar on
+    // a window that has none, and so can never return nullptr.
+    auto* statusBar = mainWindow->findChild<QStatusBar*>(QString(), Qt::FindDirectChildrenOnly);
 
     if (nullptr != statusBar && statusBar->isVisibleTo(mainWindow))
       anchor = statusBar->geometry().top();

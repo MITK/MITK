@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <QElapsedTimer>
 #include <QHash>
+#include <QMap>
 #include <QSet>
 #include <QWidget>
 
@@ -82,8 +83,15 @@ private:
   /** \brief Tasks waiting out the delay before they get a card. */
   QHash<mitk::ProgressTaskId, mitk::ProgressTaskInfo> m_Pending;
 
-  /** \brief Last applied sequence number per task, to drop stale snapshots. */
-  QHash<mitk::ProgressTaskId, quint64> m_Sequences;
+  /**
+   * \brief Last applied sequence number per task, to drop stale snapshots.
+   *
+   * Kept past the end of a task, since a snapshot that overtook the final one
+   * is exactly what this rejects. Ordered by task id rather than hashed so
+   * that the oldest entries, whose tasks can no longer have anything in
+   * flight, are the ones dropped when the map is trimmed.
+   */
+  QMap<mitk::ProgressTaskId, quint64> m_Sequences;
 
   /** \brief Tasks whose card the user closed while they were still running. */
   QSet<mitk::ProgressTaskId> m_Dismissed;

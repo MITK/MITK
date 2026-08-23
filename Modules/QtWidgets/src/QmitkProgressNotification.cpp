@@ -132,12 +132,17 @@ void QmitkProgressNotification::OnCloseButtonClicked()
 
 bool QmitkProgressNotification::ShouldSpin() const
 {
+  // A task that has ended never spins, whether it has a step count or not:
+  // the card lingers to show that the operation completed, and a bar still
+  // marching across it says the opposite.
+  if (m_Info.Finished)
+    return false;
+
   // A task whose extent is unknown can only ever spin. So does one that has
   // yet to report its first step: by the time a card appears the operation
   // has already run for a second, and a bar sitting at zero is
   // indistinguishable from one that is stuck.
-  return 0 == m_Info.StepsToDo
-      || (0 == m_Info.Progress && !m_Info.Finished);
+  return 0 == m_Info.StepsToDo || 0 == m_Info.Progress;
 }
 
 void QmitkProgressNotification::ApplyState()
@@ -147,6 +152,14 @@ void QmitkProgressNotification::ApplyState()
   if (this->ShouldSpin())
   {
     m_Controls->progressBar->setRange(0, 0);
+  }
+  else if (0 == m_Info.StepsToDo)
+  {
+    // Finished without ever having a step count. There is nothing to scale, but
+    // an empty bar would read as an operation that never ran, so fill it. Range
+    // 0 to 0 is not an option here: that is the busy indicator itself.
+    m_Controls->progressBar->setRange(0, 1);
+    m_Controls->progressBar->setValue(1);
   }
   else
   {

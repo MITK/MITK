@@ -499,9 +499,34 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   if (!CPICacheIsOutdated(segmentationImage, labelValue, timeStep)) return;
 
   // Created after the early return, so that an up-to-date cache does not
-  // make a notification flash up for an interpolation that never runs. The
-  // filters below announce their own steps as they start.
-  mitk::ProgressTask task("Interpolating surface");
+  // make a notification flash up for an interpolation that never runs.
+  //
+  // Each filter gets a fixed share rather than adding its own steps to the
+  // task: they announce themselves one after another as they start, which
+  // would move the bar backwards every time one of them did. The shares
+  // reflect how long each stage takes, the distance image dominating.
+  constexpr unsigned int NORMALS_SHARE = 10;
+  constexpr unsigned int DISTANCE_IMAGE_SHARE = 50;
+  constexpr unsigned int SURFACE_SHARE = 40;
+
+  mitk::ProgressTask task("Interpolating surface",
+    NORMALS_SHARE + DISTANCE_IMAGE_SHARE + SURFACE_SHARE);
+
+  mitk::ProgressTask normalsProgress([&task](float progress)
+    {
+      task.SetProgress(static_cast<unsigned int>(NORMALS_SHARE * progress));
+    });
+
+  mitk::ProgressTask distanceImageProgress([&task](float progress)
+    {
+      task.SetProgress(NORMALS_SHARE + static_cast<unsigned int>(DISTANCE_IMAGE_SHARE * progress));
+    });
+
+  mitk::ProgressTask surfaceProgress([&task](float progress)
+    {
+      task.SetProgress(NORMALS_SHARE + DISTANCE_IMAGE_SHARE
+        + static_cast<unsigned int>(SURFACE_SHARE * progress));
+    });
 
   mitk::Surface::Pointer interpolationResult = nullptr;
 
@@ -528,8 +553,8 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   normalsFilter->SetMaxSpacing(maxSpacing);
   interpolateSurfaceFilter->SetDistanceImageVolume(m_DistanceImageVolume);
 
-  normalsFilter->SetProgressTask(&task);
-  interpolateSurfaceFilter->SetProgressTask(&task);
+  normalsFilter->SetProgressTask(&normalsProgress);
+  interpolateSurfaceFilter->SetProgressTask(&distanceImageProgress);
 
   //  Set reference image for interpolation surface filter
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
@@ -567,7 +592,7 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
 
       // create a surface from the distance-image
       auto imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
-      imageToSurfaceFilter->SetProgressTask(&task);
+      imageToSurfaceFilter->SetProgressTask(&surfaceProgress);
       imageToSurfaceFilter->SetInput(interpolateSurfaceFilter->GetOutput());
       imageToSurfaceFilter->SetThreshold(0);
       imageToSurfaceFilter->SetSmooth(true);

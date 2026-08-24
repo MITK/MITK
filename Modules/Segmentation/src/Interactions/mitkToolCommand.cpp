@@ -36,6 +36,11 @@ void mitk::ToolCommand::SetProgressTask(ProgressTask *task)
   m_ShareCount = 1;
 }
 
+mitk::ProgressTask *mitk::ToolCommand::GetProgressTask() const
+{
+  return m_ProgressTask;
+}
+
 void mitk::ToolCommand::SetShare(unsigned int index, unsigned int count)
 {
   m_ShareCount = std::max(count, 1u);

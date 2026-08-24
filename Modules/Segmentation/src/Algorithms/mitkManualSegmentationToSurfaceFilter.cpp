@@ -47,8 +47,8 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   ScalarType thresholdExpanded = this->m_Threshold;
 
-  // Four steps per time step here plus the three of the inherited
-  // CreateSurface(). The old count left the last three unaccounted for.
+  // Four steps per time step here plus the three that the inherited
+  // CreateSurface() reports for each of them.
   if (nullptr != m_ProgressTask && (tmax - tstart) > 0)
   {
     m_ProgressTask->AddStepsToDo(7 * (tmax - tstart));

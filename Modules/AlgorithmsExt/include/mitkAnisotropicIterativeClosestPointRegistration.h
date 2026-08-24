@@ -276,6 +276,11 @@ namespace mitk
       itkSetMacro(ProgressTask, ProgressTask*);
 
       /**
+        * Returns the task progress is reported into, or nullptr.
+        */
+      itkGetConstMacro(ProgressTask, ProgressTask*);
+
+      /**
         * Returns the 3x1 translation vector computed by the algorithm.
         */
       itkGetConstReferenceMacro(Translation, Translation);

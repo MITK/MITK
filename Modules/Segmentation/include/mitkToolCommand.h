@@ -65,6 +65,9 @@ namespace mitk
      */
     void SetProgressTask(ProgressTask *task);
 
+    /** \brief Get the task this reports into, or nullptr. */
+    ProgressTask *GetProgressTask() const;
+
     /**
      * \brief Report into one equal share of the task instead of all of it.
      *

@@ -74,6 +74,9 @@ namespace mitk
      */
     void SetProgressTask(ProgressTask* task);
 
+    /** \brief Get the task this reports into, or nullptr. */
+    ProgressTask* GetProgressTask() const;
+
       /** \brief Type for a list of DataNodes whose BaseData failed to serialize/deserialize. */
       typedef DataStorage::SetOfObjects FailedBaseDataListType;
 

@@ -33,7 +33,8 @@ namespace mitk
    * filter->Update();
    * \endcode
    *
-   * \tparam T Anything with a \c SetProgressTask(ProgressTask*) method.
+   * \tparam T Anything with \c SetProgressTask(ProgressTask*) and
+   *         \c GetProgressTask() methods.
    *
    * \sa ProgressTask
    */
@@ -49,17 +50,25 @@ namespace mitk
      * \param[in] task The task to report into, or \c nullptr for none.
      */
     ScopedProgressTask(T *target, ProgressTask *task)
-      : m_Target(target)
+      : m_Target(target),
+        m_Previous(nullptr != target ? target->GetProgressTask() : nullptr)
     {
       if (nullptr != m_Target)
         m_Target->SetProgressTask(task);
     }
 
-    /** \brief Takes the task away from the target again. */
+    /**
+     * \brief Gives the target back whatever it reported into before.
+     *
+     * Restored rather than cleared, because the targets are long-lived members
+     * shared across calls. An operation that reaches the same target a second
+     * time while the first is still running would otherwise leave the first one
+     * reporting nowhere for the rest of its life.
+     */
     ~ScopedProgressTask()
     {
       if (nullptr != m_Target)
-        m_Target->SetProgressTask(nullptr);
+        m_Target->SetProgressTask(m_Previous);
     }
 
     ScopedProgressTask(const ScopedProgressTask &) = delete;
@@ -67,6 +76,7 @@ namespace mitk
 
   private:
     T *m_Target;
+    ProgressTask *m_Previous;
   };
 }
 

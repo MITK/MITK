@@ -277,11 +277,11 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     // update FRE
     m_FRE = FRE_new;
 
-    // One step per iteration, and no step count declared anywhere above. How
-    // many iterations this needs is not known until it converges, and the
-    // maximum is a bound rather than an estimate: counting against it left the
-    // bar creeping through a fraction of its range and then jumping to the end.
-    // On a task with no total this reports only that the operation is still
+    // One step per iteration, against no declared total. How many iterations
+    // this needs is not known until it converges, and m_MaxIterations is a
+    // bound rather than an estimate, so counting against it would show a bar
+    // creeping through a fraction of its range and then jumping to the end. On
+    // a task with no total this reports only that the operation is still
     // running, which is all there is to say about an unknown extent.
     if (nullptr != m_ProgressTask)
       m_ProgressTask->Progress();

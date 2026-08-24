@@ -62,6 +62,9 @@ public:
    */
   void Finish(const mitk::ProgressTaskInfo& info);
 
+  /** \brief Whether the task this shows has ended. */
+  bool IsFinished() const;
+
 signals:
   /** \brief The user asked for the task to stop. */
   void CancelRequested(mitk::ProgressTaskId id);

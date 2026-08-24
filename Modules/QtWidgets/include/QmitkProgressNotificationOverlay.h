@@ -20,8 +20,11 @@ found in the LICENSE file.
 #include <QElapsedTimer>
 #include <QHash>
 #include <QMap>
+#include <QPointer>
 #include <QSet>
 #include <QWidget>
+
+class QStatusBar;
 
 class QLabel;
 class QVBoxLayout;
@@ -69,6 +72,9 @@ private:
   void OnCancelRequested(mitk::ProgressTaskId id);
   void OnNotificationClosed(mitk::ProgressTaskId id);
   void RefreshVisibility();
+  void RemoveNotification(QmitkProgressNotification* notification);
+  void PruneFinishedNotifications();
+  int CountNotifications() const;
   void UpdatePosition();
   void Repaint(bool force);
   void InstallEventFilterOnParent();
@@ -97,6 +103,15 @@ private:
   QSet<mitk::ProgressTaskId> m_Dismissed;
 
   QElapsedTimer m_LastRepaint;
+
+  /**
+   * \brief The parent window's status bar, which the stack sits on top of.
+   *
+   * Cached because the position is recomputed on every reported step, and a
+   * scan of the window's children per step is not free. A QPointer so that a
+   * status bar which is replaced or destroyed is looked up again.
+   */
+  QPointer<QStatusBar> m_StatusBar;
 };
 
 #endif

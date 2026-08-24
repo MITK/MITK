@@ -111,6 +111,11 @@ void QmitkProgressNotification::Finish(const mitk::ProgressTaskInfo& info)
   QTimer::singleShot(LINGER_DURATION_IN_MS, this, &QmitkProgressNotification::FadeOut);
 }
 
+bool QmitkProgressNotification::IsFinished() const
+{
+  return m_Info.Finished;
+}
+
 void QmitkProgressNotification::resizeEvent(QResizeEvent* event)
 {
   QWidget::resizeEvent(event);
@@ -165,8 +170,13 @@ void QmitkProgressNotification::ApplyState()
     m_Controls->progressBar->setValue(ToProgressBarValue(m_Info.Progress));
   }
 
-  m_Controls->closeButton->setEnabled(!m_Info.CancelRequested);
-  m_Controls->closeButton->setToolTip(m_Info.Cancelable
+  // Stays enabled once a cancel has been requested. The operation may take a
+  // while to notice, and this button is the only way to get the card off the
+  // screen; disabling it leaves a notification that can neither be cancelled
+  // again nor dismissed. What it does changes instead, which
+  // OnCloseButtonClicked() decides from the same two flags.
+  m_Controls->closeButton->setEnabled(true);
+  m_Controls->closeButton->setToolTip(m_Info.Cancelable && !m_Info.CancelRequested
     ? QStringLiteral("Cancel this operation")
     : QStringLiteral("Hide this notification. The operation keeps running."));
 }

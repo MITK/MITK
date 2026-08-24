@@ -133,12 +133,26 @@ void QmitkProgressNotificationOverlay::Apply(const mitk::ProgressTaskInfo& info)
 
   // Ids only ever increase, so the lowest ones belong to the tasks that ended
   // longest ago. Once this many newer tasks have been seen, nothing can still
-  // be in flight for them and remembering them buys nothing. Dropping the
-  // entry of a task that is somehow still running is harmless: its next
-  // snapshot is newer than anything already applied either way, and whether
-  // its card was dismissed is recorded in m_Dismissed, not here.
+  // be in flight for them and remembering them buys nothing.
+  //
+  // Never dropped for a task the overlay is still tracking, though: those are
+  // exactly the ones a late snapshot can still arrive for, and forgetting one
+  // lets that snapshot raise a card the task can no longer take down again.
+  // Beyond that the bound wins over the guarantee, so such a card is left for
+  // the user to dismiss, which its close button always allows.
   while (m_Sequences.size() > MAX_REMEMBERED_SEQUENCES)
-    m_Sequences.erase(m_Sequences.begin());
+  {
+    const auto oldest = m_Sequences.begin();
+
+    if (m_Notifications.contains(oldest.key())
+      || m_Pending.contains(oldest.key())
+      || m_Dismissed.contains(oldest.key()))
+    {
+      break;
+    }
+
+    m_Sequences.erase(oldest);
+  }
 
   if (m_Dismissed.contains(info.Id))
   {
@@ -224,6 +238,8 @@ void QmitkProgressNotificationOverlay::ShowPendingTask(mitk::ProgressTaskId id)
   const auto info = *pending;
   m_Pending.erase(pending);
 
+  this->PruneFinishedNotifications();
+
   auto* notification = new QmitkProgressNotification(info, this);
 
   connect(notification, &QmitkProgressNotification::CancelRequested,
@@ -260,6 +276,14 @@ void QmitkProgressNotificationOverlay::OnNotificationClosed(mitk::ProgressTaskId
     m_Dismissed.insert(id);
   }
 
+  this->RemoveNotification(notification);
+
+  this->RefreshVisibility();
+  this->UpdatePosition();
+}
+
+void QmitkProgressNotificationOverlay::RemoveNotification(QmitkProgressNotification* notification)
+{
   // removeWidget() only takes it out of the layout. It stays a visible child
   // at its last geometry until deleteLater() runs, which is a turn of the event
   // loop away, and longer while an operation is keeping the loop busy.
@@ -267,9 +291,39 @@ void QmitkProgressNotificationOverlay::OnNotificationClosed(mitk::ProgressTaskId
 
   m_Layout->removeWidget(notification);
   notification->deleteLater();
+}
 
-  this->RefreshVisibility();
-  this->UpdatePosition();
+void QmitkProgressNotificationOverlay::PruneFinishedNotifications()
+{
+  // A finished card leaves the stack on a timer and then a fade, and neither of
+  // those runs while an operation on this thread keeps the event loop busy. A
+  // run of short operations therefore piles up completed cards, and they take
+  // the room the one still running needs: it ends up created hidden and counted
+  // as "1 more..." behind bars that are all full. So they are taken out as soon
+  // as something else needs the space, oldest first.
+  for (int i = m_Layout->count() - 1; 0 <= i; --i)
+  {
+    if (this->CountNotifications() < MAX_VISIBLE_NOTIFICATIONS)
+      return;
+
+    auto* notification = qobject_cast<QmitkProgressNotification*>(m_Layout->itemAt(i)->widget());
+
+    if (nullptr != notification && notification->IsFinished())
+      this->RemoveNotification(notification);
+  }
+}
+
+int QmitkProgressNotificationOverlay::CountNotifications() const
+{
+  int count = 0;
+
+  for (int i = 0; i < m_Layout->count(); ++i)
+  {
+    if (nullptr != qobject_cast<QmitkProgressNotification*>(m_Layout->itemAt(i)->widget()))
+      ++count;
+  }
+
+  return count;
 }
 
 void QmitkProgressNotificationOverlay::RefreshVisibility()
@@ -322,10 +376,11 @@ void QmitkProgressNotificationOverlay::UpdatePosition()
   {
     // Not statusBar(), which is a factory: it installs an empty status bar on
     // a window that has none, and so can never return nullptr.
-    auto* statusBar = mainWindow->findChild<QStatusBar*>(QString(), Qt::FindDirectChildrenOnly);
+    if (m_StatusBar.isNull())
+      m_StatusBar = mainWindow->findChild<QStatusBar*>(QString(), Qt::FindDirectChildrenOnly);
 
-    if (nullptr != statusBar && statusBar->isVisibleTo(mainWindow))
-      anchor = statusBar->geometry().top();
+    if (!m_StatusBar.isNull() && m_StatusBar->isVisibleTo(mainWindow))
+      anchor = m_StatusBar->geometry().top();
   }
 
   this->resize(std::max(width, 0), std::max(height, 0));

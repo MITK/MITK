@@ -12,14 +12,18 @@ found in the LICENSE file.
 
 #include <QmitkRun.h>
 
+#include <QmitkProgressNotificationOverlay.h>
+
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLog.h>
 #include <mitkSurface.h>
 
 #include <QApplication>
 #include <QCoreApplication>
 #include <QEventLoop>
 #include <QFutureWatcher>
+#include <QMouseEvent>
 #include <QProgressDialog>
 #include <QScopeGuard>
 #include <QThread>
@@ -31,6 +35,34 @@ found in the LICENSE file.
 
 namespace
 {
+  /**
+   * Whether a pointer event landed on a progress notification. The card
+   * carries the cancel and the dismiss, which are the only controls an
+   * operation leaves the user, so its clicks are the one kind worth letting
+   * through.
+   *
+   * Decided from where the pointer is rather than from the receiver, for the
+   * reason given below: a press reaches the QWindow before the widget inside
+   * it, and there the receiver is not a QWidget at all.
+   */
+  bool IsOverProgressNotification(const QEvent* event)
+  {
+    const auto* pointerEvent = dynamic_cast<const QSinglePointEvent*>(event);
+
+    if (nullptr == pointerEvent)
+      return false;
+
+    auto* widget = QApplication::widgetAt(pointerEvent->globalPosition().toPoint());
+
+    for (; nullptr != widget; widget = widget->parentWidget())
+    {
+      if (nullptr != qobject_cast<QmitkProgressNotificationOverlay*>(widget))
+        return true;
+    }
+
+    return false;
+  }
+
   /**
    * Discards user input while an operation runs. The event loop below has to
    * keep turning so that progress is drawn and timers fire, which also means
@@ -98,7 +130,9 @@ namespace
         // the window as usual.
         case QEvent::Close:
         case QEvent::Quit:
-          return true;
+          // Only asked here, where the answer decides something, rather than
+          // for every event that reaches the filter: it costs a hit test.
+          return !IsOverProgressNotification(event);
 
         default:
           return QObject::eventFilter(watched, event);
@@ -235,6 +269,24 @@ void QmitkPrebuildVtkRepresentation(const mitk::BaseData *data)
 
 void QmitkRunWithInputBlocked(std::function<void()> task, const std::vector<const mitk::BaseData *> &read)
 {
+  // The blocker below keeps user input out, but the list of event types it
+  // knows about cannot be proven complete and has grown by hand more than
+  // once. This is the backstop for the ones still missing: an event that does
+  // leak through costs an ignored click rather than a second operation started
+  // into a reader that is not written to expect one.
+  static thread_local bool running = false;
+
+  if (running)
+  {
+    MITK_WARN << "Ignored an operation started while another one was already "
+                 "running on this thread. Some user input reached the "
+                 "application that should have been kept out.";
+    return;
+  }
+
+  running = true;
+  const auto done = qScopeGuard([]() { running = false; });
+
   // Before the worker starts, and on the thread that owns the data, which is
   // where a representation the mappers read has to be built.
   for (const auto *data : read)

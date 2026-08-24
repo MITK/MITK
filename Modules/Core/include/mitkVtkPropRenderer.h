@@ -135,16 +135,17 @@ namespace mitk
      * \brief Lighting rig for the 3D scene.
      *
      * The GPU volume ray caster casts one shadow ray per light per sample when
-     * volumetric scattering is enabled, so a multi-light rig costs
-     * proportionally more and refills the shadows its key light carves.
-     * KeyLight trades the studio rig's even coverage for the single
-     * directional source that scattering needs.
+     * volumetric scattering is enabled, so the rig decides both the cost and
+     * how much of its own shadowing survives. The studio rig's five lights
+     * refill each other's shadows from five directions, which is both the most
+     * expensive option and the flattest. KeyLight keeps two deliberately
+     * unequal sources instead: enough to carve form, few enough to stay cheap.
      */
     enum class LightingMode
     {
       /** vtkLightKit: key, fill, head and two back lights. The default. */
       Studio,
-      /** A single off-axis directional key light. */
+      /** An off-axis directional key light with a dimmer, opposing fill. */
       KeyLight
     };
 
@@ -310,6 +311,7 @@ namespace mitk
 
     vtkLightKit *m_LightKit;
     vtkLight *m_KeyLight;
+    vtkLight *m_FillLight;
     LightingMode m_LightingMode;
 
     // sorted list of mappers

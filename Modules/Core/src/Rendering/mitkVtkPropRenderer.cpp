@@ -75,6 +75,7 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
 
   m_KeyLight = nullptr;
+  m_FillLight = nullptr;
   m_LightingMode = LightingMode::Studio;
 
   this->NormalizeLightAmbientColors();
@@ -98,6 +99,9 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
 
   if (m_KeyLight != nullptr)
     m_KeyLight->Delete();
+
+  if (m_FillLight != nullptr)
+    m_FillLight->Delete();
 
   if (m_VtkRenderer != nullptr)
   {
@@ -170,12 +174,32 @@ void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
       m_KeyLight->SetIntensity(1.0);
     }
 
+    if (m_FillLight == nullptr)
+    {
+      m_FillLight = vtkLight::New();
+      // The shader's shadow term is plain transmittance, so where the key is
+      // occluded it contributes nothing and the only light left is the ambient
+      // constant - which the shader does not tint by the sample's colour.
+      // Raising ambient therefore greys a shadow out rather than filling it; a
+      // second, dimmer source is the only way to put coloured, still
+      // occlusion-aware light into one. Mirrored azimuth and below camera
+      // height, so it opens the key's shadow without cancelling the modelling
+      // that carved it.
+      m_FillLight->SetLightTypeToCameraLight();
+      m_FillLight->SetDirectionAngle(-10.0, -48.0);
+      m_FillLight->SetIntensity(0.35);
+    }
+
     m_VtkRenderer->AddLight(m_KeyLight);
+    m_VtkRenderer->AddLight(m_FillLight);
   }
   else
   {
     if (m_KeyLight != nullptr)
       m_VtkRenderer->RemoveLight(m_KeyLight);
+
+    if (m_FillLight != nullptr)
+      m_VtkRenderer->RemoveLight(m_FillLight);
 
     m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }

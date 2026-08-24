@@ -17,7 +17,28 @@ found in the LICENSE file.
 #include <vtkObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkAutoInit.h>
+
+namespace
+{
+  /** Whether this frame is one of an ongoing interaction, judged the way
+   * vtkSmartVolumeMapper judges it. Absent a render window there is nothing to
+   * ask, and a still frame is the safe answer: it costs time, not fidelity.
+   */
+  bool IsInteractiveRender(mitk::BaseRenderer *renderer, double interactiveUpdateRate)
+  {
+    auto *vtkRenderer = renderer->GetVtkRenderer();
+
+    if (nullptr == vtkRenderer)
+      return false;
+
+    auto *renderWindow = vtkRenderer->GetRenderWindow();
+
+    return nullptr != renderWindow && renderWindow->GetDesiredUpdateRate() >= interactiveUpdateRate;
+  }
+}
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
@@ -190,9 +211,22 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   if(this->GetDataNode()->GetBoolProperty("volumerendering.shade", shade, renderer))
     m_VolumeProperty->SetShade(shade ? 1 : 0);
 
+  // vtkGPUVolumeRayCastMapper drops scattering for interactive frames itself,
+  // but decides that on vtkProp::AllocatedRenderTime, which this volume never
+  // receives: only vtkMitkRenderProp is a view prop, so vtkRenderer's per-prop
+  // time allocation never reaches the volume and it reports the vtkProp default
+  // of 10 forever - every frame classed as a still one. The window's update
+  // rate does track interaction, and is what vtkSmartVolumeMapper itself keys
+  // its sample-distance coarsening off, so gate on that instead.
+  //
+  // Going through the setter is the point: it calls Modified(), which is what
+  // makes VTK recompile the shader without the scattering block. Assigning the
+  // value anywhere that skips Modified() leaves the shadow rays compiled in.
+  const bool isInteractive = IsInteractiveRender(renderer, m_SmartVolumeMapper->GetInteractiveUpdateRate());
+
   // VTK ignores the reach unless the blend is above zero, and both unless Shade is on.
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.blend", value, renderer))
-    m_SmartVolumeMapper->SetVolumetricScatteringBlending(value);
+    m_SmartVolumeMapper->SetVolumetricScatteringBlending(isInteractive ? 0.0f : value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.reach", value, renderer))
     m_SmartVolumeMapper->SetGlobalIlluminationReach(value);
 

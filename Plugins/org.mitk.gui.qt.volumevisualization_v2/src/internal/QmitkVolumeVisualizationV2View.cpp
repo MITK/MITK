@@ -68,30 +68,42 @@ namespace
    *
    * Blend does not add occlusion to Phong shading, it mixes Phong out and a
    * phase-function scattering model in:
-   * finalColor = (1 - c) * phong + c * scattering. At blend 1.0,
-   * c = exp(-gradientMagnitude * opacity), so surfaces keep their Phong
-   * shading and specular highlight while homogeneous interiors go fully
-   * volumetric. That is the only blend which keeps surface detail, so both
-   * models use it: blend 2.0 pins c to 1.0 and discards N.L and specular
-   * outright, leaving the shadow ray as the sole spatial cue.
+   * finalColor = (1 - c) * phong + c * scattering.
    *
-   * Reach bounds that shadow ray and is the entire cost, non-linearly: the
-   * traced fraction of the volume diagonal is 1 - (1 - reach)^0.33, so 0.10
-   * traces about 3% and reads as local occlusion, 0.30 about 11%. Much past
-   * that the light has to cross most of the subject, and everything not facing
-   * the key light collapses onto the ambient floor.
+   * Below 1.0 the uniform is blend/2 and c = 2 * (blend/2) * exp(...), so c
+   * never exceeds blend itself: the value reads directly as the largest share
+   * of the shading the shadow ray can ever account for. That is the strength
+   * dial, and it is the one a viewer actually wants - reach only decides how
+   * far a shadow reaches, not how heavily it lands. At 1.0 there is no cap left
+   * and scattering can replace Phong outright; 2.0 pins c to 1.0 and discards
+   * N.L and specular everywhere. Hence a blend ladder at fixed reach.
+   *
+   * Reach bounds that shadow ray, and the traced fraction of the volume
+   * diagonal is 1 - (1 - reach)^0.33 - front-loaded against short values: 0.10
+   * traces 3%, 0.30 traces 11%, 0.50 traces 20%, 0.82 traces 43%.
+   *
+   * Reach is held short deliberately. Long rays do integrate more smoothly -
+   * below roughly 20% a sample's shadow is decided by one or two jittered
+   * steps, so neighbouring pixels disagree and the shadow carries visible
+   * grain - but what a long ray buys is one structure casting onto another,
+   * and that describes the light rather than the patient. A short ray darkens
+   * only contacts and recesses, which is the depth cue worth having. The grain
+   * cannot be traded away by sampling finer: the shadow ray steps with the
+   * primary ray, and vtkSmartVolumeMapper turns LockSampleDistanceToInputSpacing
+   * on without exposing it, so an explicit SampleDistance is discarded whenever
+   * it differs from the spacing-derived value.
    *
    * Ambient stays at the Phong default, tempting as it is to raise it where
    * the shadow ray has attenuated everything else. Both shading paths add
    * ambient scaled by the light's ambient colour and never by the sample
    * colour, so it is an additive grey over the entire image rather than a fill
    * confined to shadow: it desaturates the whole render long before it rescues
-   * an occluded voxel. A short reach is what keeps shadows off black. Filling
-   * them with colour instead takes a second light, whose contribution does
-   * carry the sample colour and does get its own shadow ray.
+   * an occluded voxel. Colour in shadow comes from the rig's fill light
+   * instead, whose contribution does carry the sample colour and does get its
+   * own shadow ray.
    *
-   * Diffuse rises because a single key light replaces the five-light rig,
-   * whose intensities summed to more than one.
+   * Diffuse sits below the five-light rig's total but above one light's, since
+   * the cinematic rig is a key plus a fill at a fraction of it.
    *
    * Anisotropy stays at 0. VTK's Henyey-Greenstein phase function carries no
    * 1/4pi normalisation, so it is exactly 1.0 at 0 but swings between 0.56 and
@@ -112,10 +124,11 @@ namespace
 
   using LightingMode = mitk::VtkPropRenderer::LightingMode;
 
-  constexpr std::array<CinematicPreset, 3> CINEMATIC_PRESETS { {
-    {"Off",           0.0f, 0.00f, 0.0f, false, DEFAULT_AMBIENT, DEFAULT_DIFFUSE, LightingMode::Studio   },
-    {"Soft shadows",  1.0f, 0.10f, 0.0f, false, DEFAULT_AMBIENT, 0.70f,           LightingMode::KeyLight },
-    {"Cinematic",     1.0f, 0.30f, 0.0f, false, DEFAULT_AMBIENT, 0.80f,           LightingMode::KeyLight },
+  constexpr std::array<CinematicPreset, 4> CINEMATIC_PRESETS { {
+    {"Off",              0.00f, 0.00f, 0.0f, false, DEFAULT_AMBIENT, DEFAULT_DIFFUSE, LightingMode::Studio   },
+    {"Subtle depth",     0.15f, 0.10f, 0.0f, false, DEFAULT_AMBIENT, 0.60f,           LightingMode::KeyLight },
+    {"Depth",            0.25f, 0.10f, 0.0f, false, DEFAULT_AMBIENT, 0.60f,           LightingMode::KeyLight },
+    {"Pronounced depth", 0.40f, 0.12f, 0.0f, false, DEFAULT_AMBIENT, 0.60f,           LightingMode::KeyLight },
   } };
 
   const CinematicPreset &PresetFromComboIndex(int index)
@@ -562,7 +575,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   if (!volumeRenderingOn)
   {
     // Nothing here is being rendered volumetrically, so nothing needs the
-    // single-source rig.
+    // directional rig.
     this->ApplyLightingMode(mitk::VtkPropRenderer::LightingMode::Studio);
     return;
   }
@@ -595,7 +608,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   // The light rig follows the node as well, so selecting a different volume or
   // reloading a scene lands on the rig the stored properties need. A -1 index
   // is scattering at values no model describes; leave the even rig in place
-  // rather than guess which single-source one was meant.
+  // rather than guess which directional one was meant.
   this->ApplyLightingMode(cinematicIndex >= 0
     ? PresetFromComboIndex(cinematicIndex).lightingMode
     : mitk::VtkPropRenderer::LightingMode::Studio);

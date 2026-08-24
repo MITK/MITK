@@ -150,6 +150,23 @@ namespace mitk
    * \param[in] task The operation to run.
    */
   MITKCORE_EXPORT void RunWhereTheDataLives(const std::function<void()> &task);
+
+  /**
+   * \brief Warn when data the storage thread reads is built somewhere else.
+   *
+   * A mitk::Image or mitk::Surface builds its VTK representation on first
+   * access, on whatever thread asks. Doing that on a worker while the mappers
+   * on the owning thread read the same object is a race that nothing else
+   * catches: the work is supposed to be done on the owning thread before the
+   * data is handed over, and forgetting it fails only sometimes.
+   *
+   * Silent where there is no thread that owns the data, as in a command line
+   * tool or a test, and silent on that thread itself.
+   *
+   * \param[in] what Names the action, for the message, for example
+   *        "Building the VTK representation of an image".
+   */
+  MITKCORE_EXPORT void WarnIfOffStorageThread(const char *what);
 }
 
 #endif

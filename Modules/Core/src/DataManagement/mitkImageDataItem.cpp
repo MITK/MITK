@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkImageDataItem.h>
+#include <mitkStorageThreadDispatcherBase.h>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 
@@ -282,6 +283,11 @@ void mitk::ImageDataItem::Modified() const
 
 mitk::ImageVtkReadAccessor *mitk::ImageDataItem::GetVtkImageAccessor(mitk::ImageDataItem::ImageConstPointer iP) const
 {
+  // Only where something is about to be written: this is on the path of every
+  // mapper update, and the check below costs a service lookup.
+  if (m_VtkImageData == nullptr || m_VtkImageReadAccessor == nullptr)
+    WarnIfOffStorageThread("Building the VTK representation of an image");
+
   if (m_VtkImageData == nullptr)
   {
     ConstructVtkImageData(iP);
@@ -295,6 +301,9 @@ mitk::ImageVtkReadAccessor *mitk::ImageDataItem::GetVtkImageAccessor(mitk::Image
 
 mitk::ImageVtkWriteAccessor *mitk::ImageDataItem::GetVtkImageAccessor(ImagePointer iP)
 {
+  if (m_VtkImageData == nullptr || m_VtkImageWriteAccessor == nullptr)
+    WarnIfOffStorageThread("Building the VTK representation of an image");
+
   if (m_VtkImageData == nullptr)
   {
     ConstructVtkImageData(iP.GetPointer());

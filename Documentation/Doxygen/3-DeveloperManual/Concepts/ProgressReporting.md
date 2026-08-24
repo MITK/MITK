@@ -37,12 +37,12 @@ Nothing resets progress, because there is no shared state left to reset. This
 is the point of the design, and it is worth stating explicitly because the API
 it replaced needed constant resetting.
 
-The old mitk::ProgressBar kept one pair of step counters for the whole
-process. Every caller added into the same two numbers, so two operations
+The global progress bar this replaced kept one pair of step counters for the
+whole process. Every caller added into the same two numbers, so two operations
 running at once were summed into one bar, and whichever of them reached its
 total first reset the bar for the other. An operation that returned early or
 threw left its remaining steps behind for good, which skewed every later
-operation in the session. Call sites compensated with a defensive `Reset()` on
+operation in the session. Call sites compensated with a defensive reset on
 entry and hand-written rewinds on error paths, and still got it wrong more
 often than not.
 

@@ -133,7 +133,7 @@ register a new MimeType.
 
 You can extend your reader writer with useful capabilities. All of these are optional
 + Priority: Reader use a ranking with Get- and SetRanking in order to signify how well they are suited to read a file. If several readers are able to read a file, the one with the highest Ranking level will be chosen.
-+ ProgressCallbacks : Readers are executed in a thread automatically. If the reader implements callbacks, the progress bar will be more accurate during loading of files. Note: Progress callbacks are work in progress.
++ ProgressCallbacks : A reader that reports its progress, either through the callbacks or into the mitk::ProgressTask it is given, lets the notification for the operation advance while a file is being read instead of jumping once it is done. See \ref ProgressReportingPage.
 
 ## Ranking strategies
 

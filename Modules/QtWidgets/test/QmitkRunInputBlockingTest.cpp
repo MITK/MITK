@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkProgressNotificationOverlay.h>
 #include <QmitkRun.h>
 
 #include <mitkTestFixture.h>
@@ -83,6 +84,8 @@ class QmitkRunInputBlockingTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkRunInputBlockingTestSuite);
   MITK_TEST(ModalDialogRaisedByTheOperation_StaysUsable_Success);
   MITK_TEST(WindowTheOperationRunsBehind_GetsNoInput_Success);
+  MITK_TEST(OperationStartedWhileAnotherRuns_IsIgnored_Success);
+  MITK_TEST(ProgressCardTheOperationPutsUp_StaysClickable_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -137,6 +140,77 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The window must have a handle to send the press to", result.HadWindow);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Input must not reach the window the operation runs behind",
                                  0,
+                                 result.Presses);
+  }
+
+  void OperationStartedWhileAnotherRuns_IsIgnored_Success()
+  {
+    auto attempted = false;
+    auto nestedRan = false;
+
+    // From the event loop the outer call keeps turning, which is where a user
+    // event that got past the input blocker would arrive. The list of event
+    // types the blocker knows about cannot be proven complete, so this is the
+    // backstop for whatever it still misses.
+    QTimer::singleShot(0, qApp, [&attempted, &nestedRan]()
+      {
+        attempted = true;
+        QmitkRunWithInputBlocked([&nestedRan]() { nestedRan = true; });
+      });
+
+    QmitkRunWithInputBlocked([]() { QThread::msleep(200); });
+
+    // Without this the test would pass just as well for a timer that never
+    // fired, which is the wrong reason to be happy.
+    CPPUNIT_ASSERT_MESSAGE("The second operation has to have been attempted", attempted);
+
+    CPPUNIT_ASSERT_MESSAGE("A second operation must not start while one is running",
+                           !nestedRan);
+  }
+
+  void ProgressCardTheOperationPutsUp_StaysClickable_Success()
+  {
+    QWidget window;
+    window.resize(400, 300);
+
+    // The card carries the cancel and the dismiss, which are the only controls
+    // an operation leaves the user, so a press on it has to get through while
+    // every other one is discarded.
+    QmitkProgressNotificationOverlay overlay(&window);
+
+    // Stands in for a notification card. Raising a real one would mean running
+    // an operation for longer than the delay the overlay waits out first, and
+    // then waiting on a timer for it to appear.
+    QWidget card(&overlay);
+
+    PressCounter counter;
+    card.installEventFilter(&counter);
+
+    window.show();
+    overlay.show();
+
+    // After both, because showing either puts the overlay where it belongs in
+    // its parent, and an overlay with no cards in it has no height to hit.
+    overlay.setGeometry(200, 200, 150, 60);
+    card.setGeometry(0, 0, 150, 60);
+
+    ClickResult result;
+
+    QTimer::singleShot(0, &window, [&]() {
+      auto *handle = window.windowHandle();
+      result.HadWindow = nullptr != handle;
+
+      if (result.HadWindow)
+        SendPressToWindow(handle, overlay.geometry().center());
+
+      result.Presses = counter.Count;
+    });
+
+    QmitkRunWithInputBlocked([]() { QThread::msleep(200); });
+
+    CPPUNIT_ASSERT_MESSAGE("The window must have a handle to send the press to", result.HadWindow);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A press on the progress card has to reach it",
+                                 1,
                                  result.Presses);
   }
 

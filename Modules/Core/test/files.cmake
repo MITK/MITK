@@ -66,6 +66,7 @@ set(MODULE_TESTS
   mitkPropertyTransienceTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
+  mitkStorageThreadDispatcherTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp

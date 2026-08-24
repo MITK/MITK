@@ -309,7 +309,7 @@ void mitk::ContourModelSetToImageFilter::InitializeOutputEmpty()
   }
 }
 
-mitk::Image::Pointer mitk::ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet)
+mitk::Image::Pointer mitk::ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet, ProgressTask* progressTask)
 {
   if (nullptr == refImage)
     mitkThrow() << "Cannot convert to label mask. Passed reference image is nullptr.";
@@ -321,6 +321,7 @@ mitk::Image::Pointer mitk::ConvertContourModelSetToLabelMask(const mitk::Image* 
   contourFiller->SetImage(refImage);
   contourFiller->SetInput(contourSet);
   contourFiller->MakeOutputLabelPixelTypeOn();
+  contourFiller->SetProgressTask(progressTask);
 
   try
   {
@@ -335,7 +336,7 @@ mitk::Image::Pointer mitk::ConvertContourModelSetToLabelMask(const mitk::Image* 
   return contourFiller->GetOutput();
 }
 
-mitk::Image::Pointer mitk::ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel)
+mitk::Image::Pointer mitk::ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel, ProgressTask* progressTask)
 {
   if (nullptr == refImage)
     mitkThrow() << "Cannot convert to label mask. Passed reference image is nullptr.";
@@ -344,5 +345,5 @@ mitk::Image::Pointer mitk::ConvertContourModelToLabelMask(const mitk::Image* ref
 
   auto contourModelSet = mitk::ContourModelSet::New();
   contourModelSet->AddContourModel(contourModel);
-  return ConvertContourModelSetToLabelMask(refImage, contourModelSet);
+  return ConvertContourModelSetToLabelMask(refImage, contourModelSet, progressTask);
 }

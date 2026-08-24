@@ -152,8 +152,14 @@ void mitk::ProgressTask::Progress(unsigned int steps)
 
 void mitk::ProgressTask::SetProgress(unsigned int progress)
 {
+  // Never backwards, for the same reason the service enforces it on what it
+  // publishes: phases mapped onto shares of one budget report an absolute
+  // value each and do not always end in the order they began. Enforced here as
+  // well so that the handle agrees with what the listeners were told; a handle
+  // left behind the published value would compute the increments of a later
+  // Progress() call from a number nobody ever saw.
   m_Progress = 0 != m_StepsToDo
-    ? std::min(progress, m_StepsToDo)
+    ? std::min(std::max(progress, m_Progress), m_StepsToDo)
     : 0;
 
   this->Publish();
@@ -209,15 +215,48 @@ void mitk::ProgressTask::Finish() noexcept
 
 void mitk::ProgressTask::Publish()
 {
-  if (m_Report)
+  try
   {
-    m_Report(0 != m_StepsToDo
-      ? static_cast<float>(m_Progress) / m_StepsToDo
-      : 0.0f);
+    if (m_Report)
+    {
+      m_Report(0 != m_StepsToDo
+        ? static_cast<float>(m_Progress) / m_StepsToDo
+        : 0.0f);
 
-    return;
+      return;
+    }
+
+    if (nullptr != m_Service && m_State)
+      m_Service->UpdateTask(m_State->Id, m_Name, m_StepsToDo, m_Progress);
+  }
+  catch (...)
+  {
+    // Reported from inside ITK, VTK and Poco observer dispatch, none of which
+    // expects an exception to come back out of a progress callback. Reporting
+    // progress must never be the reason an operation fails, which is what the
+    // constructor and Finish() already assume.
+  }
+}
+
+mitk::ProgressTask mitk::MakeProgressShare(ProgressTask* task, unsigned int steps)
+{
+  if (nullptr == task)
+  {
+    // An empty callback and no service: reports nowhere, so that a nested
+    // operation can take a share unconditionally without checking first.
+    return ProgressTask(std::function<void(float)>(), steps);
   }
 
-  if (nullptr != m_Service && m_State)
-    m_Service->UpdateTask(m_State->Id, m_Name, m_StepsToDo, m_Progress);
+  return ProgressTask([task, steps, reported = 0u](float progress) mutable
+    {
+      const auto reached =
+        static_cast<unsigned int>(std::clamp(progress, 0.0f, 1.0f) * steps);
+
+      if (reached > reported)
+      {
+        task->Progress(reached - reported);
+        reported = reached;
+      }
+    },
+    steps);
 }

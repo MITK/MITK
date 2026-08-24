@@ -38,6 +38,7 @@ found in the LICENSE file.
 
 #include <itkObjectFactoryBase.h>
 
+#include <algorithm>
 #include <fstream>
 #include <mitkIOUtil.h>
 #include <sstream>
@@ -399,12 +400,16 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
     // file shows one notification instead of one for the file and another for
     // the scene inside it. The shares are absolute, so what the caller is
     // handed is the fraction they add up to rather than steps of its own.
+    // The task handed down by a reader or writer arrives Indeterminate, since
+    // what a scene file contains is only known once it is open. So the share
+    // reported below has to be added to it before there is anything to report a
+    // fraction of. Added once, before any of the work starts, so the bar does
+    // not fall back partway through.
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->AddStepsToDo(SERIALIZATION_SHARE + COMPRESSION_SHARE);
+
     ProgressTask task = nullptr != m_ProgressTask
-      ? ProgressTask([outerTask = m_ProgressTask](float progress)
-          {
-            outerTask->SetProgress(static_cast<unsigned int>(progress * outerTask->GetStepsToDo()));
-          },
-          SERIALIZATION_SHARE + COMPRESSION_SHARE)
+      ? MakeProgressShare(m_ProgressTask, SERIALIZATION_SHARE + COMPRESSION_SHARE)
       : ProgressTask("Saving scene", SERIALIZATION_SHARE + COMPRESSION_SHARE);
 
     // The serializers below write one file per node through IOUtil, which
@@ -604,9 +609,9 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
         else
         {
-          // Compressing the working directory is what dominates saving a
-          // large scene, and it used to run after the task had already
-          // reported everything it knew about.
+          // Compressing the working directory is what dominates saving a large
+          // scene, so it carries half of the task rather than trailing behind
+          // the serialization the bar was showing.
           ZipProgress zipProgress(task, CountZipEntries(m_WorkingDirectory));
 
           Poco::Zip::Compress zipper(file, true);
@@ -799,4 +804,9 @@ void mitk::SceneIO::OnUnzipOk(const void * /*pSender*/,
 void mitk::SceneIO::SetProgressTask(ProgressTask* task)
 {
   m_ProgressTask = task;
+}
+
+mitk::ProgressTask* mitk::SceneIO::GetProgressTask() const
+{
+  return m_ProgressTask;
 }

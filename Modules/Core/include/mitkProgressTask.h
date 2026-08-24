@@ -108,6 +108,10 @@ namespace mitk
      * Use this to forward a fractional progress value without accumulating
      * rounding errors, for example
      * \c task.SetProgress(fraction * task.GetStepsToDo()).
+     *
+     * Never moves the task backwards: a value below what was already reported
+     * is published as a repeat of the latter. Reporting phases that map onto
+     * shares of one budget therefore does not need to end them in order.
      */
     void SetProgress(unsigned int progress);
 
@@ -139,6 +143,28 @@ namespace mitk
     unsigned int m_StepsToDo;
     unsigned int m_Progress;
   };
+
+  /**
+   * \brief Make a task that reports into a share of another one.
+   *
+   * For an operation that is one part of a larger one: it reports its own
+   * progress from 0 to 1, and the caller sees that arrive as the given number
+   * of steps of the caller's own budget.
+   *
+   * Those steps have to be part of that budget already. Declare them where the
+   * total is declared, or AddStepsToDo() them before the work starts; growing
+   * the budget once it is under way shrinks the fraction the bar shows, and a
+   * bar that falls back reads as an operation coming undone.
+   *
+   * Steps are handed over relative rather than absolute, so that the caller
+   * keeps whatever progress it made itself.
+   *
+   * \param[in] task The task to report into, or nullptr to report nowhere.
+   * \param[in] steps How much of that task this share accounts for.
+   * \return A task to hand to the nested operation. Reports the share as done
+   *         when it is destroyed.
+   */
+  MITKCORE_EXPORT ProgressTask MakeProgressShare(ProgressTask* task, unsigned int steps);
 }
 
 #endif

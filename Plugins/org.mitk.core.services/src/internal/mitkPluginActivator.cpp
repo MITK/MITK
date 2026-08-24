@@ -52,7 +52,15 @@ namespace
     bool IsDispatchThread() const override
     {
       auto* app = QCoreApplication::instance();
-      return app != nullptr && QThread::currentThread() == app->thread();
+
+      // Without an application there is no thread to hand anything over to, so
+      // whichever thread asks is the one that has to do the work. Answering no
+      // instead would send the caller into a blocking hand-over that can never
+      // be delivered.
+      if (nullptr == app)
+        return true;
+
+      return QThread::currentThread() == app->thread();
     }
 
     void Post(std::function<void()> task) override
@@ -75,9 +83,9 @@ namespace
     QtStorageThreadDispatcher() = default;
     ~QtStorageThreadDispatcher() override = default;
 
-    void ExecuteDispatched(std::function<void()> task) override
+    bool ExecuteDispatched(std::function<void()> task) override
     {
-      QMetaObject::invokeMethod(
+      return QMetaObject::invokeMethod(
         QCoreApplication::instance(), std::move(task), Qt::BlockingQueuedConnection);
     }
 

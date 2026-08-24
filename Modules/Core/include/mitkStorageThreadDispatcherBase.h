@@ -45,14 +45,10 @@ namespace mitk
      */
     void Execute(std::function<void()> task)
     {
-      if (this->IsDispatchThread())
-      {
+      // A hand-over that could not be delivered still has to run: dropping it
+      // would turn a data storage mutation into a silent no-op.
+      if (this->IsDispatchThread() || !this->ExecuteDispatched(task))
         task();
-      }
-      else
-      {
-        this->ExecuteDispatched(task);
-      }
     }
 
     /**
@@ -106,8 +102,10 @@ namespace mitk
      *
      * \param[in] task the task to execute on the dispatch thread.
      * \pre task must not be empty.
+     * \return True if the task was delivered and has run. False if it could not
+     *         be delivered, in which case Execute() runs it here instead.
      */
-    virtual void ExecuteDispatched(std::function<void()> task) = 0;
+    virtual bool ExecuteDispatched(std::function<void()> task) = 0;
 
     StorageThreadDispatcherBase() = default;
     ~StorageThreadDispatcherBase() override = default;
@@ -140,6 +138,18 @@ namespace mitk
    *         the caller carries on itself.
    */
   MITKCORE_EXPORT bool DispatchToStorageThread(const std::function<void()> &task);
+
+  /**
+   * \brief Run a task on the thread that owns the data storage, or here if this
+   *        already is that thread or there is no such thread.
+   *
+   * The unconditional form of DispatchToStorageThread(), for writing to data
+   * that is already on display: it has to happen where everything else reads
+   * it, and the caller does not care which thread that turns out to be.
+   *
+   * \param[in] task The operation to run.
+   */
+  MITKCORE_EXPORT void RunWhereTheDataLives(const std::function<void()> &task);
 }
 
 #endif

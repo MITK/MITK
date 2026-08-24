@@ -49,3 +49,9 @@ bool mitk::DispatchToStorageThread(const std::function<void()> &task)
 
   return true;
 }
+
+void mitk::RunWhereTheDataLives(const std::function<void()> &task)
+{
+  if (!DispatchToStorageThread(task))
+    task();
+}

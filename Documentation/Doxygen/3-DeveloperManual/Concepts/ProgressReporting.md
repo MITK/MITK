@@ -167,8 +167,43 @@ than left to unwind the event loop it ran on.
 What is not handed over is everything else the worker touches. A writer that
 asks a mitk::Image or mitk::Surface for its VTK representation builds that
 representation on first access, on whatever thread asks, while the mappers on
-the owning thread read the same object. Build it before handing the work over,
-which is what `QmitkIOUtil::PrebuildVtkRepresentation()` is for.
+the owning thread read the same object. So the data a worker reads is declared
+where the worker is started, and `QmitkRunWithInputBlocked()` builds it first,
+on the thread that owns it:
+
+~~~{.cpp}
+QmitkRunWithInputBlocked([&]() { Save(saveInfos); }, written);
+~~~
+
+`QmitkPrebuildVtkRepresentation()` does the same for work that does not run
+through that helper.
+
+## What a worker may touch
+
+Declaring the data is one half of a contract that has no other enforcement, so
+it is worth stating in full. On a worker, this is allowed:
+
+- Creating new mitk::BaseData. Nothing can be reading what does not exist yet,
+  which is why a reader building a node needs no preparation.
+- Reading data that was declared to `QmitkRunWithInputBlocked()`.
+- `DataStorage::Add()` and `Remove()`, which are handed over.
+- Reading data that is not on display at all.
+
+This is not:
+
+- `DataNode::SetData()` on a node that is already in the storage. It is not
+  handed over, and it publishes straight into what the mappers render. Compute
+  the new data on the worker and set it once the call has returned, which is
+  what cropping an image does.
+- Writing properties of a node that is on display. `RunWhereTheDataLives()`
+  puts such a write where the reads are.
+- Mutating mitk::BaseData that is on display, declared or not. Declaring it
+  covers a worker *reading* it, not writing to it.
+
+Getting the first of those wrong used to fail intermittently and silently.
+Building a VTK representation or replacing a node's data off the owning thread
+now says so in the log, which is how a call site that forgot is found. The log
+is where it stops, though: nothing refuses the operation.
 
 ## Cancellation
 

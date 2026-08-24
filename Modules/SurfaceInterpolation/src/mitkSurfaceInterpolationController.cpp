@@ -336,6 +336,9 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
   bool removedIt = false;
 
+  // Removed further down, once the lock below is released.
+  mitk::DataNode::Pointer planeNodeToRemove;
+
   {
     std::lock_guard<std::shared_mutex> cpiGuard(cpiMutex);
 
@@ -368,8 +371,6 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
         if (m_DataStorage.IsNotNull())
         {
-          mitk::DataNode::Pointer contourPlaneGeometryDataNode;
-
           auto contourNodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(m_DataStorage, selectedSegmentation), currentLabel, currentTimeStep);
 
           //  Go through the nodes and check if the contour position matches them.
@@ -382,7 +383,7 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
             if (samePlane)
             {
-              m_DataStorage->Remove(it->Value());
+              planeNodeToRemove = it->Value();
               break;
             }
           }
@@ -392,6 +393,13 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
       ++it;
     }
   }
+
+  // Not under the lock above. Removing a node is handed over to the thread that
+  // owns the data storage and blocks until it has run there, and the observers
+  // it fires there reach back into this controller. Holding an exclusive lock
+  // across that hands the two threads a deadlock.
+  if (planeNodeToRemove.IsNotNull())
+    m_DataStorage->Remove(planeNodeToRemove);
 
   return removedIt;
 }
@@ -499,7 +507,10 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   if (!CPICacheIsOutdated(segmentationImage, labelValue, timeStep)) return;
 
   // Created after the early return, so that an up-to-date cache does not
-  // make a notification flash up for an interpolation that never runs.
+  // make a notification flash up for an interpolation that never runs. That
+  // puts it under the lock taken above: a progress listener must therefore not
+  // reach back into this controller, and must not mutate the data storage,
+  // either of which would deadlock against a non-recursive lock held here.
   //
   // Each filter gets a fixed share rather than adding its own steps to the
   // task: they announce themselves one after another as they start, which

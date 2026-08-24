@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QEventLoop>
 #include <QFutureWatcher>
 #include <QProgressDialog>
+#include <QScopeGuard>
 #include <QThread>
 #include <QWidget>
 
@@ -85,6 +86,14 @@ namespace
         case QEvent::DragEnter:
         case QEvent::DragMove:
         case QEvent::Drop:
+        // Closing the window quits every event loop on this thread, the nested
+        // one below included, and then tears the workbench down: views are
+        // destroyed and plugins stopped while the operation is still running on
+        // its worker, holding the data storage and the dispatcher it needs.
+        // Kept out until the operation is over, after which the user can close
+        // the window as usual.
+        case QEvent::Close:
+        case QEvent::Quit:
           return true;
 
         default:
@@ -114,23 +123,50 @@ namespace
       }
     });
 
-    QFutureWatcher<void> watcher;
-    QEventLoop loop;
+    {
+      // The worker writes into this frame through the reference capture above,
+      // so leaving before it is done is a write to a frame that no longer
+      // exists. Neither ~QFuture nor ~QFutureWatcher waits, so the wait belongs
+      // on every path out of here, an exception thrown by the waiting below
+      // included.
+      //
+      // The loop is also left without the task being done in the ordinary
+      // course of events: QCoreApplication::exit() exits every loop on the
+      // thread, nested ones included.
+      const auto joinWorker = qScopeGuard([&future]()
+        {
+          // Waiting means pumping events, not QFuture::waitForFinished(): the
+          // worker hands data storage mutations to this thread and blocks on
+          // them, so a thread that stops answering deadlocks it.
+          //
+          // An event handler that throws must not carry the exception out of a
+          // destructor running during unwinding, and must not cut the wait
+          // short either, so it is swallowed and the wait resumed.
+          while (!future.isFinished())
+          {
+            try
+            {
+              QmitkProcessEventsUntil([&future]() { return future.isFinished(); });
+            }
+            catch (...)
+            {
+            }
+          }
+        });
 
-    QObject::connect(&watcher, &QFutureWatcher<void>::finished, &loop, [&]() {
-      if (onFinished)
-        onFinished();
+      QFutureWatcher<void> watcher;
+      QEventLoop loop;
 
-      loop.quit();
-    });
+      QObject::connect(&watcher, &QFutureWatcher<void>::finished, &loop, [&]() {
+        if (onFinished)
+          onFinished();
 
-    watcher.setFuture(future);
-    loop.exec();
+        loop.quit();
+      });
 
-    // The loop can be left without the task being done: QCoreApplication::exit(),
-    // which closing the window triggers, exits every loop on the thread, nested
-    // ones included. See QmitkProcessEventsUntil().
-    QmitkProcessEventsUntil([&future]() { return future.isFinished(); });
+      watcher.setFuture(future);
+      loop.exec();
+    }
 
     if (exception)
       std::rethrow_exception(exception);

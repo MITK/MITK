@@ -119,7 +119,10 @@ public:
 
     ClickResult result;
 
-    QTimer::singleShot(0, qApp, [&]() {
+    // Bound to the window, not to qApp: everything the callback touches lives
+    // in this frame, and a call still pending once the frame is gone has to be
+    // dropped rather than run against it.
+    QTimer::singleShot(0, &window, [&]() {
       auto *handle = window.windowHandle();
       result.HadWindow = nullptr != handle;
 

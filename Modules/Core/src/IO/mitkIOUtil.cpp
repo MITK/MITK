@@ -289,20 +289,15 @@ namespace
   thread_local unsigned int s_QuietDepth = 0;
 
   /**
-   * Runs the task on the thread that owns the data storage, or here if this
-   * already is that thread. Writing to data that is on display has to happen
-   * where everything else reads it, which is not the worker a save may be
-   * running on.
-   */
-  void RunWhereTheDataLives(const std::function<void()>& task)
-  {
-    if (!mitk::DispatchToStorageThread(task))
-      task();
-  }
-
-  /**
-   * Maps the progress of one reader or writer onto its share of a task, and
-   * keeps the callback registered only while that file is being handled.
+   * Owns one file's share of a task. Whatever the reader or writer reports is
+   * mapped into that share, and the remainder of it is credited once the file
+   * is done with, however that happens.
+   *
+   * Constructed before it is known whether the file has a reader at all, so
+   * that a file which is skipped still moves the bar. Without that, an
+   * operation whose budget counts every input but whose first reader consumes
+   * several of them, as a DICOM series reader does, would leave the bar
+   * standing at a fraction of a percent for its whole duration.
    *
    * Steps are reported relative rather than absolute, so that a task shared
    * with the caller keeps whatever progress the caller made itself.
@@ -310,23 +305,30 @@ namespace
   class FileProgressForwarder final
   {
   public:
-    FileProgressForwarder(mitk::IFileIO* fileIO, mitk::ProgressTask* task)
-      : m_FileIO(nullptr != task ? fileIO : nullptr),
+    explicit FileProgressForwarder(mitk::ProgressTask* task)
+      : m_FileIO(nullptr),
         m_Task(task),
         m_Reported(0),
         m_FileTask([this](float progress) { this->OnProgress(progress); })
     {
-      if (nullptr != m_FileIO)
-      {
-        m_FileIO->AddProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
-          this, &FileProgressForwarder::OnProgress));
+    }
 
-        // A reader that reports in steps of its own, or that drives further
-        // reads, gets a task rather than a callback. It maps into this
-        // file's share, so whatever it adds cannot grow the budget of the
-        // operation around it.
-        m_FileIO->SetProgressTask(&m_FileTask);
-      }
+    /** Starts forwarding what the given reader or writer reports. */
+    void Attach(mitk::IFileIO* fileIO)
+    {
+      if (nullptr == m_Task || nullptr == fileIO)
+        return;
+
+      m_FileIO = fileIO;
+
+      m_FileIO->AddProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
+        this, &FileProgressForwarder::OnProgress));
+
+      // A reader that reports in steps of its own, or that drives further
+      // reads, gets a task rather than a callback. It maps into this
+      // file's share, so whatever it adds cannot grow the budget of the
+      // operation around it.
+      m_FileIO->SetProgressTask(&m_FileTask);
     }
 
     ~FileProgressForwarder()
@@ -695,8 +697,7 @@ namespace mitk
       return "No input files given";
     }
 
-    int filesToRead = loadInfos.size();
-    const auto steps = static_cast<unsigned int>(STEPS_PER_FILE * filesToRead);
+    const auto steps = static_cast<unsigned int>(STEPS_PER_FILE * loadInfos.size());
 
     std::optional<ProgressTask> ownTask;
 
@@ -714,6 +715,10 @@ namespace mitk
     std::vector< std::string > read_files;
     for (auto &loadInfo : loadInfos)
     {
+      // Declared before the skips below so that this file's share of the task
+      // is credited on every way out of the iteration.
+      FileProgressForwarder fileProgress(task);
+
       if(std::find(read_files.begin(), read_files.end(), loadInfo.m_Path) != read_files.end())
         continue;
 
@@ -801,9 +806,7 @@ namespace mitk
       if (nullptr != task)
         task->SetName("Loading " + itksys::SystemTools::GetFilenameName(loadInfo.m_Path));
 
-      // Reports whatever the reader tells it while the file is being read,
-      // and covers the rest of the file's share when it goes out of scope.
-      FileProgressForwarder fileProgress(reader, task);
+      fileProgress.Attach(reader);
 
       // Do the actual reading
       try
@@ -845,7 +848,14 @@ namespace mitk
             continue;
           }
 
-          data->SetProperty("path", mitk::StringProperty::New(Utf8Util::Local8BitToUtf8(loadInfo.m_Path)));
+          // The reader has already handed this node to the data storage, so the
+          // thread that owns the storage may be rendering it by now. Writing to
+          // it has to happen there, exactly as the save side below does.
+          RunWhereTheDataLives([&data, &loadInfo]()
+            {
+              data->SetProperty("path",
+                mitk::StringProperty::New(Utf8Util::Local8BitToUtf8(loadInfo.m_Path)));
+            });
 
           loadInfo.m_Output.push_back(data);
           if (nodeResult)
@@ -863,7 +873,6 @@ namespace mitk
       {
         errMsg += "Exception occurred when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
       }
-      --filesToRead;
     }
 
     if (!errMsg.empty())
@@ -1012,11 +1021,10 @@ namespace mitk
       return "No data for saving available";
     }
 
-    int filesToWrite = saveInfos.size();
     std::optional<ProgressTask> ownTask;
 
     if (0 == s_QuietDepth)
-      ownTask.emplace("Saving files", static_cast<unsigned int>(STEPS_PER_FILE * filesToWrite));
+      ownTask.emplace("Saving files", static_cast<unsigned int>(STEPS_PER_FILE * saveInfos.size()));
 
     auto* task = ownTask.has_value()
       ? &ownTask.value()
@@ -1028,6 +1036,10 @@ namespace mitk
 
     for (auto &saveInfo : saveInfos)
     {
+      // Declared before the skip below so that this file's share of the task
+      // is credited on every way out of the iteration.
+      FileProgressForwarder fileProgress(task);
+
       const std::string baseDataType = saveInfo.m_BaseData->GetNameOfClass();
 
       std::vector<FileWriterSelector::Item> writers = saveInfo.m_WriterSelector.Get();
@@ -1094,7 +1106,7 @@ namespace mitk
       if (nullptr != task)
         task->SetName("Saving " + itksys::SystemTools::GetFilenameName(saveInfo.m_Path));
 
-      FileProgressForwarder fileProgress(writer, task);
+      fileProgress.Attach(writer);
 
       // Do the actual writing
       try
@@ -1115,8 +1127,6 @@ namespace mitk
               "path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
           });
       }
-
-      --filesToWrite;
     }
 
     if (!errMsg.empty())

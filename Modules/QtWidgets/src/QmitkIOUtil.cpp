@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkMimeType.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 #include <mitkSurface.h>
 
 #include <QmitkFileReaderOptionsDialog.h>
@@ -287,13 +288,26 @@ void QmitkIOUtil::PrebuildVtkRepresentation(const mitk::BaseData *data)
 
   if (const auto *image = dynamic_cast<const mitk::Image *>(data); nullptr != image)
   {
+    const auto channels = image->GetNumberOfChannels();
+
     for (unsigned int t = 0; t < timeSteps; ++t)
-      static_cast<void>(image->GetVtkImageData(static_cast<int>(t)));
+      for (unsigned int n = 0; n < channels; ++n)
+        static_cast<void>(image->GetVtkImageData(static_cast<int>(t), static_cast<int>(n)));
   }
   else if (const auto *surface = dynamic_cast<const mitk::Surface *>(data); nullptr != surface)
   {
     for (unsigned int t = 0; t < timeSteps; ++t)
       static_cast<void>(surface->GetVtkPolyData(t));
+  }
+  else if (const auto *segmentation = dynamic_cast<const mitk::MultiLabelSegmentation *>(data);
+           nullptr != segmentation)
+  {
+    // Not an Image itself, but its group images are the ones the writer reads
+    // and the mappers keep re-extracting.
+    const auto groups = segmentation->GetNumberOfGroups();
+
+    for (unsigned int group = 0; group < groups; ++group)
+      PrebuildVtkRepresentation(segmentation->GetGroupImage(group));
   }
 }
 

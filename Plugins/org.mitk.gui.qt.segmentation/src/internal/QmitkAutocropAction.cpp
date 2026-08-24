@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkProgressTask.h>
 #include <mitkRenderingManager.h>
 
+#include <QmitkIOUtil.h>
 #include <QmitkRun.h>
 
 #include <itkConstantPadImageFilter.h>
@@ -41,6 +42,11 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
 
       try
       {
+        // The worker below reads this image while the mappers on this thread may
+        // still be building its VTK representation lazily. Doing that here, where
+        // they do it too, keeps the two off the same half-built state.
+        QmitkIOUtil::PrebuildVtkRepresentation(image);
+
         // Off the GUI thread, so that the notification appears and keeps moving
         // while a large image is cropped. A crop that runs here instead reaches
         // no event loop, and the card is then only shown once the work it was

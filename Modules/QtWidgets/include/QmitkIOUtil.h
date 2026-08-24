@@ -203,7 +203,8 @@ public:
    * access, so a writer running on a worker thread would build it there while
    * the mappers on the thread that owns the data are reading the very same
    * object. Calling this first, on the owning thread, leaves the writer with
-   * nothing to build.
+   * nothing to build. mitk::MultiLabelSegmentation is covered through the
+   * group images the writer and the mappers actually read.
    *
    * Cheap for anything already on display, since the mappers have built it
    * already. Does nothing for data that has no VTK representation.

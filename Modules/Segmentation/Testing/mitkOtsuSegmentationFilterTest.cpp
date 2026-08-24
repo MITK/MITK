@@ -72,7 +72,12 @@ public:
 
     filter->Update();
 
-    CPPUNIT_ASSERT_MESSAGE("Output was produced", filter->GetOutput() != nullptr);
+    // Not a null check: ImageSource installs output 0 in its constructor, so
+    // the pointer is never null and only its content says the filter ran.
+    auto output = filter->GetOutput();
+    CPPUNIT_ASSERT_MESSAGE("Output was produced", output->IsInitialized());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Output covers the input",
+                                 input->GetDimension(), output->GetDimension());
     CPPUNIT_ASSERT_MESSAGE("The filter has to report the progress of the pipeline inside it",
                            counter->Count > 0);
   }

@@ -45,10 +45,24 @@ namespace mitk
      */
     void Execute(std::function<void()> task)
     {
-      // A hand-over that could not be delivered still has to run: dropping it
-      // would turn a data storage mutation into a silent no-op.
-      if (this->IsDispatchThread() || !this->ExecuteDispatched(task))
+      if (this->IsDispatchThread())
+      {
         task();
+        return;
+      }
+
+      if (this->ExecuteDispatched(task))
+        return;
+
+      // Dropping it would turn a data storage mutation into a silent no-op, so
+      // it runs here instead. That is not safe: whatever the owning thread is
+      // doing with the data carries on while this writes to it. Correct code
+      // never gets here, which is why it is reported rather than left to be
+      // met later as a crash with no obvious cause.
+      MITK_ERROR << "A data storage mutation could not be handed to the thread "
+                    "that owns the storage, and ran on the calling thread.";
+
+      task();
     }
 
     /**

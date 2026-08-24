@@ -94,13 +94,19 @@ public:
 
   void tearDown() override
   {
-    m_Service->RemoveListener(m_Listener);
+    // CppUnit runs tearDown() even when the assertion in setUp() threw, so
+    // there may be no service here. Dereferencing it then would take the whole
+    // test driver down instead of failing the one case.
+    if (nullptr != m_Service)
+    {
+      m_Service->RemoveListener(m_Listener);
+
+      mitk::CoreServices::Unget(m_Service);
+      m_Service = nullptr;
+    }
 
     delete m_Listener;
     m_Listener = nullptr;
-
-    mitk::CoreServices::Unget(m_Service);
-    m_Service = nullptr;
   }
 
   void TaskLifecycle_Success()

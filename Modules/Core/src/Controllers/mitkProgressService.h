@@ -62,10 +62,15 @@ namespace mitk
      *
      * Held by shared_ptr so that a notification in progress keeps the record
      * alive even after RemoveListener() dropped it from m_Registrations.
+     *
+     * Recursive because the lock is held across the listener call: a listener
+     * that reports progress of its own, or that unsubscribes from inside its
+     * own callback, would otherwise deadlock against itself. Overlay code drawn
+     * from a notification is exactly the kind of code that ends up doing that.
      */
     struct Registration
     {
-      std::mutex Mutex;
+      std::recursive_mutex Mutex;
       IProgressListener* Listener;
     };
 

@@ -33,6 +33,38 @@ mitk::ProgressService::ProgressService()
 
 mitk::ProgressService::~ProgressService()
 {
+  // Listeners hold a raw pointer to this service and outlive it in a shutdown
+  // that stops the core before the user interface. Tell them their tasks are
+  // over and drop them, so that nothing is left pointing here.
+  std::vector<ProgressTaskInfo> outstanding;
+  std::shared_ptr<const Registrations> registrations;
+
+  {
+    std::scoped_lock lock(m_Mutex);
+
+    outstanding.reserve(m_Tasks.size());
+
+    for (auto& [id, task] : m_Tasks)
+    {
+      task.Info.Sequence = ++m_NextSequence;
+      task.Info.Finished = true;
+      outstanding.push_back(task.Info);
+    }
+
+    m_Tasks.clear();
+
+    registrations = m_Registrations;
+    m_Registrations = std::make_shared<Registrations>();
+  }
+
+  for (const auto& info : outstanding)
+    Notify(*registrations, info);
+
+  for (const auto& registration : *registrations)
+  {
+    std::scoped_lock lock(registration->Mutex);
+    registration->Listener = nullptr;
+  }
 }
 
 void mitk::ProgressService::Notify(const Registrations& registrations, const ProgressTaskInfo& info)

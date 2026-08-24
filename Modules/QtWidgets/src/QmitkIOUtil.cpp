@@ -279,38 +279,6 @@ QString QmitkIOUtil::Save(const mitk::BaseData *data,
   return Save(dataVector, defaultBaseNames, defaultPath, parent, setPathProperty).back();
 }
 
-void QmitkIOUtil::PrebuildVtkRepresentation(const mitk::BaseData *data)
-{
-  if (nullptr == data)
-    return;
-
-  const auto timeSteps = data->GetTimeSteps();
-
-  if (const auto *image = dynamic_cast<const mitk::Image *>(data); nullptr != image)
-  {
-    const auto channels = image->GetNumberOfChannels();
-
-    for (unsigned int t = 0; t < timeSteps; ++t)
-      for (unsigned int n = 0; n < channels; ++n)
-        static_cast<void>(image->GetVtkImageData(static_cast<int>(t), static_cast<int>(n)));
-  }
-  else if (const auto *surface = dynamic_cast<const mitk::Surface *>(data); nullptr != surface)
-  {
-    for (unsigned int t = 0; t < timeSteps; ++t)
-      static_cast<void>(surface->GetVtkPolyData(t));
-  }
-  else if (const auto *segmentation = dynamic_cast<const mitk::MultiLabelSegmentation *>(data);
-           nullptr != segmentation)
-  {
-    // Not an Image itself, but its group images are the ones the writer reads
-    // and the mappers keep re-extracting.
-    const auto groups = segmentation->GetNumberOfGroups();
-
-    for (unsigned int group = 0; group < groups; ++group)
-      PrebuildVtkRepresentation(segmentation->GetGroupImage(group));
-  }
-}
-
 QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
                               const QStringList &defaultBaseNames,
                               const QString &defaultPath,
@@ -495,12 +463,14 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
     Impl::WriterOptionsDialogFunctor optionsCallback;
 
     std::string errMsg;
-    // Still on the thread that owns the data, which is where its VTK
-    // representation has to be built. See PrebuildVtkRepresentation().
-    for (const auto &saveInfo : saveInfos)
-      PrebuildVtkRepresentation(saveInfo.m_BaseData);
 
-    QmitkRunWithInputBlocked([&]() { errMsg = Save(saveInfos, &optionsCallback, setPathProperty); });
+    std::vector<const mitk::BaseData *> written;
+    written.reserve(saveInfos.size());
+
+    for (const auto &saveInfo : saveInfos)
+      written.push_back(saveInfo.m_BaseData);
+
+    QmitkRunWithInputBlocked([&]() { errMsg = Save(saveInfos, &optionsCallback, setPathProperty); }, written);
     if (!errMsg.empty())
     {
       QMessageBox::warning(parent, "Error writing files", QString::fromStdString(errMsg));

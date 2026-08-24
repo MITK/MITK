@@ -108,11 +108,10 @@ void QmitkExtFileSaveProjectAction::Run()
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
 
-    // Still on the GUI thread, which is where the VTK representation of the
-    // data has to be built rather than by a writer on the worker below. See
-    // QmitkIOUtil::PrebuildVtkRepresentation().
+    std::vector<const mitk::BaseData *> written;
+
     for (auto it = nodesToBeSaved->Begin(); it != nodesToBeSaved->End(); ++it)
-      QmitkIOUtil::PrebuildVtkRepresentation(it->Value()->GetData());
+      written.push_back(it->Value()->GetData());
 
     // Off the GUI thread, so that the notification appears and keeps
     // moving while a large scene is written and compressed.
@@ -120,7 +119,8 @@ void QmitkExtFileSaveProjectAction::Run()
     QmitkRunWithInputBlocked([&]()
       {
         saved = sceneIO->SaveScene(nodesToBeSaved, storage, fileName.toStdString());
-      });
+      },
+      written);
 
     if (!saved)
     {

@@ -196,23 +196,6 @@ public:
 
   using mitk::IOUtil::Save;
 
-  /**
-   * \brief Build the VTK representation of the data before a worker reads it.
-   *
-   * mitk::Image and mitk::Surface build their VTK representation on first
-   * access, so a writer running on a worker thread would build it there while
-   * the mappers on the thread that owns the data are reading the very same
-   * object. Calling this first, on the owning thread, leaves the writer with
-   * nothing to build. mitk::MultiLabelSegmentation is covered through the
-   * group images the writer and the mappers actually read.
-   *
-   * Cheap for anything already on display, since the mappers have built it
-   * already. Does nothing for data that has no VTK representation.
-   *
-   * \param[in] data The data about to be handed to a worker. May be nullptr.
-   */
-  static void PrebuildVtkRepresentation(const mitk::BaseData *data);
-
 private:
   struct Impl;
 };

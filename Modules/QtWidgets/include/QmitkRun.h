@@ -18,6 +18,12 @@ found in the LICENSE file.
 #include <QString>
 
 #include <functional>
+#include <vector>
+
+namespace mitk
+{
+  class BaseData;
+}
 
 /** \brief Keeps the event loop turning until the given condition holds.
  *
@@ -58,6 +64,24 @@ T QmitkRunAsyncBlocking(const QString& title, const QString& label, std::functio
   return result;
 }
 
+/** \brief Build the VTK representation of data before a worker reads it.
+ *
+ * mitk::Image and mitk::Surface build their VTK representation on first
+ * access, so a worker asking for it would build it there while the mappers on
+ * the thread that owns the data read the very same object.
+ * mitk::MultiLabelSegmentation is covered through the group images that both
+ * of them actually read.
+ *
+ * Prefer declaring the data through QmitkRunWithInputBlocked(), which calls
+ * this. Call it directly only where the work is not run through that helper.
+ *
+ * Cheap for anything already on display, since the mappers have built it
+ * already. Does nothing for data that has no VTK representation.
+ *
+ * \param[in] data The data about to be handed to a worker. May be nullptr.
+ */
+MITKQTWIDGETS_EXPORT void QmitkPrebuildVtkRepresentation(const mitk::BaseData *data);
+
 /** \brief Runs a long task in a background thread and blocks user input.
  *
  * The function blocks until the task finishes, but keeps processing events,
@@ -71,7 +95,14 @@ T QmitkRunAsyncBlocking(const QString& title, const QString& label, std::functio
  *
  * Exceptions are caught in the background thread and rethrown in the calling
  * thread.
+ *
+ * \param[in] task The operation to run on a worker.
+ * \param[in] read Data on display that the task reads. Its VTK representation
+ *        is built here, on this thread, so that the task does not build it on
+ *        the worker while the mappers are reading the same object. Declare
+ *        everything the task touches; what it creates itself needs no entry.
  */
-MITKQTWIDGETS_EXPORT void QmitkRunWithInputBlocked(std::function<void()> task);
+MITKQTWIDGETS_EXPORT void QmitkRunWithInputBlocked(std::function<void()> task,
+                                                   const std::vector<const mitk::BaseData *> &read = {});
 
 #endif

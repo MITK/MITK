@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <QScopeGuard>
 #include <QThread>
 #include <QWidget>
+#include <QWindow>
 
 #include <QtConcurrent>
 
@@ -41,22 +42,43 @@ namespace
    * operation leaves the user, so its clicks are the one kind worth letting
    * through.
    *
-   * Decided from where the pointer is rather than from the receiver, for the
-   * reason given below: a press reaches the QWindow before the widget inside
-   * it, and there the receiver is not a QWidget at all.
+   * A press is delivered to the QWindow before the widget inside it, so the
+   * receiver on its own does not answer this. It does say which window, and
+   * inside one known window the rest is a plain hit test.
    */
-  bool IsOverProgressNotification(const QEvent* event)
+  bool IsOverProgressNotification(QObject* watched, const QEvent* event)
   {
     const auto* pointerEvent = dynamic_cast<const QSinglePointEvent*>(event);
 
     if (nullptr == pointerEvent)
       return false;
 
-    auto* widget = QApplication::widgetAt(pointerEvent->globalPosition().toPoint());
+    // Which top-level this is about is not guessed from the pointer position,
+    // as QApplication::widgetAt() would: the event is being delivered to that
+    // window right now, so it is the one thing here that is not in doubt. The
+    // hit test then only has to look inside it.
+    auto* widget = qobject_cast<QWidget*>(watched);
 
-    for (; nullptr != widget; widget = widget->parentWidget())
+    if (nullptr == widget)
     {
-      if (nullptr != qobject_cast<QmitkProgressNotificationOverlay*>(widget))
+      auto* window = qobject_cast<QWindow*>(watched);
+
+      if (nullptr == window)
+        return false;
+
+      widget = QWidget::find(window->winId());
+
+      if (nullptr == widget)
+        return false;
+    }
+
+    widget = widget->window();
+
+    auto* target = widget->childAt(widget->mapFromGlobal(pointerEvent->globalPosition().toPoint()));
+
+    for (; nullptr != target; target = target->parentWidget())
+    {
+      if (nullptr != qobject_cast<QmitkProgressNotificationOverlay*>(target))
         return true;
     }
 
@@ -132,7 +154,7 @@ namespace
         case QEvent::Quit:
           // Only asked here, where the answer decides something, rather than
           // for every event that reaches the filter: it costs a hit test.
-          return !IsOverProgressNotification(event);
+          return !IsOverProgressNotification(watched, event);
 
         default:
           return QObject::eventFilter(watched, event);

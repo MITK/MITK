@@ -140,13 +140,25 @@ namespace mitk
      * refill each other's shadows from five directions, which is both the most
      * expensive option and the flattest. KeyLight keeps two deliberately
      * unequal sources instead: enough to carve form, few enough to stay cheap.
+     *
+     * Headlight is not simply a dimmer rig: a single switched-on headlight at
+     * full intensity is the one configuration for which the ray caster compiles
+     * its default lighting path, where ambient is multiplied by the sample
+     * colour and the shading normal is used as computed. Every other rig takes
+     * the multi-light path, where ambient is an untinted grey added to every
+     * sample and the normal is pushed through the prop matrix. The cost is that
+     * a light at the camera lights exactly what the camera sees, so it casts no
+     * visible shadow and volumetric scattering has nothing to darken.
      */
     enum class LightingMode
     {
       /** vtkLightKit: key, fill, head and two back lights. The default. */
       Studio,
       /** An off-axis directional key light with a dimmer, opposing fill. */
-      KeyLight
+      KeyLight,
+      /** A single headlight at full intensity, for the ray caster's default
+       * lighting path. Shadowless: pointless to combine with scattering. */
+      Headlight
     };
 
     /**
@@ -312,6 +324,7 @@ namespace mitk
     vtkLightKit *m_LightKit;
     vtkLight *m_KeyLight;
     vtkLight *m_FillLight;
+    vtkLight *m_Headlight;
     LightingMode m_LightingMode;
 
     // sorted list of mappers

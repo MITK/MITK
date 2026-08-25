@@ -76,6 +76,7 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin
 
   m_KeyLight = nullptr;
   m_FillLight = nullptr;
+  m_Headlight = nullptr;
   m_LightingMode = LightingMode::Studio;
 
   this->NormalizeLightAmbientColors();
@@ -102,6 +103,9 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
 
   if (m_FillLight != nullptr)
     m_FillLight->Delete();
+
+  if (m_Headlight != nullptr)
+    m_Headlight->Delete();
 
   if (m_VtkRenderer != nullptr)
   {
@@ -154,14 +158,27 @@ void mitk::VtkPropRenderer::NormalizeLightAmbientColors()
 void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
 {
   // 2D renderers have their lights removed on purpose, to keep grey values
-  // faithful to the data; installing either rig would undo that.
+  // faithful to the data; installing any rig would undo that.
   if (this->GetMapperID() != Standard3D || mode == m_LightingMode)
     return;
 
+  // Uninstall whatever is there before installing the new rig. Each rig owns
+  // the whole renderer: the ray caster picks its shading path from how many
+  // lights are switched on, so one left over from the previous rig would
+  // silently change it. Removing a light that is not installed is a no-op.
+  m_LightKit->RemoveLightsFromRenderer(m_VtkRenderer);
+
+  if (m_KeyLight != nullptr)
+    m_VtkRenderer->RemoveLight(m_KeyLight);
+
+  if (m_FillLight != nullptr)
+    m_VtkRenderer->RemoveLight(m_FillLight);
+
+  if (m_Headlight != nullptr)
+    m_VtkRenderer->RemoveLight(m_Headlight);
+
   if (mode == LightingMode::KeyLight)
   {
-    m_LightKit->RemoveLightsFromRenderer(m_VtkRenderer);
-
     if (m_KeyLight == nullptr)
     {
       m_KeyLight = vtkLight::New();
@@ -193,14 +210,24 @@ void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
     m_VtkRenderer->AddLight(m_KeyLight);
     m_VtkRenderer->AddLight(m_FillLight);
   }
+  else if (mode == LightingMode::Headlight)
+  {
+    if (m_Headlight == nullptr)
+    {
+      m_Headlight = vtkLight::New();
+      // The ray caster compiles its default lighting path only for a single
+      // switched-on light, at intensity exactly 1.0, of headlight type. Any
+      // deviation - a second light, a different intensity, a camera light at an
+      // angle - drops it to the multi-light path, where ambient stops being
+      // tinted by the sample colour.
+      m_Headlight->SetLightTypeToHeadlight();
+      m_Headlight->SetIntensity(1.0);
+    }
+
+    m_VtkRenderer->AddLight(m_Headlight);
+  }
   else
   {
-    if (m_KeyLight != nullptr)
-      m_VtkRenderer->RemoveLight(m_KeyLight);
-
-    if (m_FillLight != nullptr)
-      m_VtkRenderer->RemoveLight(m_FillLight);
-
     m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
 

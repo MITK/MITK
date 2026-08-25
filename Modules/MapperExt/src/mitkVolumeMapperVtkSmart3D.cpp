@@ -72,6 +72,30 @@ vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *)
   return m_Volume;
 }
 
+void mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+{
+  auto *imageData = this->GetInputImage();
+
+  if (nullptr == imageData)
+  {
+    Superclass::UpdateVtkTransform(renderer);
+    return;
+  }
+
+  // Read the spacing back from the image the mapper was handed rather than from
+  // the geometry, so the two halves of the placement cannot disagree if the
+  // geometry is rescaled after the image data was built.
+  double spacing[3];
+  imageData->GetSpacing(spacing);
+
+  // IndexToWorld carries the spacing the image itself now supplies. Applying
+  // both would size the volume by it twice.
+  m_DataToWorld->SetMatrix(this->GetDataNode()->GetVtkTransform(this->GetTimestep())->GetMatrix());
+  m_DataToWorld->Scale(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
+
+  m_Volume->SetUserTransform(m_DataToWorld);
+}
+
 void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)
 {
   // GPU_INFO << "SetDefaultProperties";
@@ -118,14 +142,8 @@ vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
 
 void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 {
-  Vector3D spacing;
-  FillVector3D(spacing, 1.0, 1.0, 1.0);
-
-  m_ImageChangeInformation->SetInputData(imageData);
-  m_ImageChangeInformation->SetOutputSpacing(spacing.GetDataPointer());
-
   m_SmartVolumeMapper->SetBlendModeToComposite();
-  m_SmartVolumeMapper->SetInputConnection(m_ImageChangeInformation->GetOutputPort());
+  m_SmartVolumeMapper->SetInputData(imageData);
 }
 
 void mitk::VolumeMapperVtkSmart3D::createVolume()
@@ -253,7 +271,7 @@ mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
   // across neighbouring pixels, which reads as concentric banding. Jittering
   // the offsets trades that for unstructured noise. VTK defaults it off.
   m_SmartVolumeMapper->SetUseJittering(1);
-  m_ImageChangeInformation = vtkSmartPointer<vtkImageChangeInformation>::New();
+  m_DataToWorld = vtkSmartPointer<vtkTransform>::New();
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_Volume = vtkSmartPointer<vtkVolume>::New();
 }

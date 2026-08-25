@@ -21,13 +21,12 @@ found in the LICENSE file.
 #include <mitkVtkMapper.h>
 
 // VTK
-#include <vtkImageChangeInformation.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 #include <vtkVersionMacros.h>
 #include <vtkVolumeProperty.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkImageData.h>
-#include <vtkImageChangeInformation.h>
 
 namespace mitk
 {
@@ -66,6 +65,18 @@ namespace mitk
      */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
+    /** \brief Place the volume, without applying its spacing a second time.
+     *
+     * The ray caster derives the shading gradient, the sample distance and the
+     * extinction per unit length from the input image's spacing, so this mapper
+     * leaves the real spacing on the image rather than resetting it. IndexToWorld
+     * carries that same spacing, so the base class transform would scale the
+     * volume by it twice; this override divides it back out.
+     *
+     * \param[in] renderer The renderer context.
+     */
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+
   protected:
     VolumeMapperVtkSmart3D();
     ~VolumeMapperVtkSmart3D() override;
@@ -78,7 +89,7 @@ namespace mitk
     vtkImageData* GetInputImage();
 
     vtkSmartPointer<vtkVolume> m_Volume;
-    vtkSmartPointer<vtkImageChangeInformation> m_ImageChangeInformation;
+    vtkSmartPointer<vtkTransform> m_DataToWorld;
     vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
     vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
 

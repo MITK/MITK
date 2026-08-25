@@ -387,7 +387,7 @@
       <item row="5" column="1">
        <widget class="QComboBox" name="cinematicModeComboBox">
         <property name="toolTip">
-         <string>Off: surface shading only, lit by the standard five-light rig. The depth settings switch the 3D window to a key light with a dimmer opposing fill, and trace short shadow rays through the volume so that contacts and recesses darken; surface shading and its highlight stay on top of that. The rays are kept short on purpose - long ones let one structure cast onto another, which describes the lighting rather than the anatomy. The three settings differ only in how much of the shading the occlusion accounts for. All of them cost more per frame in a still image, are switched off while you drag, and relight any surface in the same window.</string>
+         <string>Headlight: one light at the camera. Nothing casts a visible shadow, since the light reaches everything you can see, but it is the only rig for which the renderer tints ambient light by the tissue's own colour, so the ambient slider fills rather than veils. Key light: an off-axis key with a dimmer opposing fill, tracing short shadow rays through the volume so that contacts and recesses darken; surface shading and its highlight stay on top of that. The rays are kept short on purpose - long ones let one structure cast onto another, which describes the lighting rather than the anatomy. Ambient is held at zero here because with more than one light the renderer adds it as a flat grey; the fill light does that job instead. It costs more per frame in a still image, is switched off while you drag, and relights any surface in the same window.</string>
         </property>
        </widget>
       </item>

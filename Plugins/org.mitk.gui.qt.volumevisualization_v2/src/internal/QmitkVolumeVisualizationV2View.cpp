@@ -60,8 +60,6 @@ namespace
 
   constexpr float DEFAULT_SCATTERING_BLEND = 0.0f;
   constexpr float DEFAULT_SCATTERING_REACH = 0.0f;
-  constexpr float DEFAULT_SCATTERING_ANISOTROPY = 0.0f;
-  constexpr bool DEFAULT_NORMALS_FROM_OPACITY = false;
 
   /** A lighting model is a fixed point in VTK's parameter space, not a slider
    * position, and it spans the light rig as well as the mapper.
@@ -76,7 +74,14 @@ namespace
    * dial, and it is the one a viewer actually wants - reach only decides how
    * far a shadow reaches, not how heavily it lands. At 1.0 there is no cap left
    * and scattering can replace Phong outright; 2.0 pins c to 1.0 and discards
-   * N.L and specular everywhere. Hence a blend ladder at fixed reach.
+   * N.L and specular everywhere.
+   *
+   * The two models are rigs, not strengths of one effect. Headlight is the only
+   * configuration the ray caster compiles its default lighting path for, which
+   * is the one that multiplies ambient by the sample colour; it is also, being
+   * at the camera, the one that casts no visible shadow, so it carries no
+   * scattering. Key light gives that up to put a light off-axis, which is what
+   * makes a shadow ray describe shape rather than depth.
    *
    * Reach bounds that shadow ray, and the traced fraction of the volume
    * diagonal is 1 - (1 - reach)^0.33 - front-loaded against short values: 0.10
@@ -93,17 +98,23 @@ namespace
    * on without exposing it, so an explicit SampleDistance is discarded whenever
    * it differs from the spacing-derived value.
    *
-   * Ambient stays at the Phong default, tempting as it is to raise it where
-   * the shadow ray has attenuated everything else. Both shading paths add
-   * ambient scaled by the light's ambient colour and never by the sample
-   * colour, so it is an additive grey over the entire image rather than a fill
-   * confined to shadow: it desaturates the whole render long before it rescues
-   * an occluded voxel. Colour in shadow comes from the rig's fill light
-   * instead, whose contribution does carry the sample colour and does get its
-   * own shadow ray.
+   * Ambient is the one field the two models disagree on, because the shader
+   * computes it differently for each. Under the headlight it is multiplied by
+   * the sample colour and behaves as a fill worth having. Under any rig with
+   * more than one light it is scaled by the light's ambient colour and never by
+   * the sample colour, making it an additive grey over the whole image that
+   * desaturates the render long before it rescues an occluded voxel - so the
+   * key light rig sets it to zero and fills from the fill light instead, whose
+   * contribution does carry the sample colour and does get its own shadow ray.
    *
-   * Diffuse sits below the five-light rig's total but above one light's, since
-   * the cinematic rig is a key plus a fill at a fraction of it.
+   * Diffuse rises to compensate where ambient is zero, and the key rig can
+   * afford it: its key plus fill sum above a single light's intensity.
+   *
+   * Specular is written explicitly rather than left at the Phong default, which
+   * no preset used to touch. The shader adds the specular term without the
+   * sample colour, so it is white light laid over the render, and a light at
+   * the camera puts its lobe over everything visible at once rather than off to
+   * one side. At the old default of 0.4 that clips bright tissue to white.
    *
    * Anisotropy stays at 0. VTK's Henyey-Greenstein phase function carries no
    * 1/4pi normalisation, so it is exactly 1.0 at 0 but swings between 0.56 and
@@ -119,16 +130,17 @@ namespace
     bool normalsFromOpacity;
     float ambient;
     float diffuse;
+    float specular;
+    float specularPower;
     mitk::VtkPropRenderer::LightingMode lightingMode;
   };
 
   using LightingMode = mitk::VtkPropRenderer::LightingMode;
 
-  constexpr std::array<CinematicPreset, 4> CINEMATIC_PRESETS { {
-    {"Off",              0.00f, 0.00f, 0.0f, false, DEFAULT_AMBIENT, DEFAULT_DIFFUSE, LightingMode::Studio   },
-    {"Subtle depth",     0.15f, 0.10f, 0.0f, false, DEFAULT_AMBIENT, 0.60f,           LightingMode::KeyLight },
-    {"Depth",            0.25f, 0.10f, 0.0f, false, DEFAULT_AMBIENT, 0.60f,           LightingMode::KeyLight },
-    {"Pronounced depth", 0.40f, 0.12f, 0.0f, false, DEFAULT_AMBIENT, 0.60f,           LightingMode::KeyLight },
+  constexpr std::array<CinematicPreset, 2> CINEMATIC_PRESETS { {
+    //                   blend  reach  aniso  nFromOp ambient diffuse specular power  rig
+    {"Headlight",        0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
+    {"Key light",        0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
   } };
 
   const CinematicPreset &PresetFromComboIndex(int index)
@@ -329,6 +341,12 @@ void QmitkVolumeVisualizationV2View::OnEnabledRendering(bool state)
   {
     m_Controls->presetComboBox->setCurrentIndex(0);
     this->OnTransferFunctionPresetSelected(m_Controls->presetComboBox->itemText(0));
+
+    // The mapper's registered defaults predate the lighting work and describe no
+    // model this view offers, so the combo would name a preset whose values were
+    // never written. Take the lighting over at the same point as the transfer
+    // function rather than changing what the mapper registers for every plugin.
+    this->OnCinematicModeChanged(0);
   }
 
   this->UpdateInterface();
@@ -516,6 +534,8 @@ void QmitkVolumeVisualizationV2View::OnCinematicModeChanged(int index)
   selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", preset.normalsFromOpacity);
   selectedNode->SetFloatProperty("volumerendering.ambient", preset.ambient);
   selectedNode->SetFloatProperty("volumerendering.diffuse", preset.diffuse);
+  selectedNode->SetFloatProperty("volumerendering.specular", preset.specular);
+  selectedNode->SetFloatProperty("volumerendering.specular.power", preset.specularPower);
 
   // The rig is not applied here: UpdateLightingControls derives it from the
   // properties just written, so it stays the single place that installs one.
@@ -547,17 +567,11 @@ void QmitkVolumeVisualizationV2View::OnResetLighting()
     return;
 
   selectedNode->SetBoolProperty("volumerendering.shade", DEFAULT_SHADE);
-  selectedNode->SetFloatProperty("volumerendering.ambient", DEFAULT_AMBIENT);
-  selectedNode->SetFloatProperty("volumerendering.diffuse", DEFAULT_DIFFUSE);
-  selectedNode->SetFloatProperty("volumerendering.specular", DEFAULT_SPECULAR);
-  selectedNode->SetFloatProperty("volumerendering.specular.power", DEFAULT_SPECULAR_POWER);
-  selectedNode->SetFloatProperty("volumerendering.scattering.blend", DEFAULT_SCATTERING_BLEND);
-  selectedNode->SetFloatProperty("volumerendering.scattering.reach", DEFAULT_SCATTERING_REACH);
-  selectedNode->SetFloatProperty("volumerendering.scattering.anisotropy", DEFAULT_SCATTERING_ANISOTROPY);
-  selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", DEFAULT_NORMALS_FROM_OPACITY);
 
-  this->UpdateLightingControls();
-  this->RequestRenderWindowUpdate();
+  // Reset means the baseline this view offers, which is the Off model - not the
+  // mapper's registered defaults, which describe no model in the combo. Sharing
+  // the write keeps the two from drifting apart.
+  this->OnCinematicModeChanged(0);
 }
 
 void QmitkVolumeVisualizationV2View::UpdateLightingControls()

@@ -44,7 +44,6 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <fstream>
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
@@ -59,71 +58,68 @@ namespace
   constexpr float DEFAULT_SPECULAR = 0.40f;
   constexpr float DEFAULT_SPECULAR_POWER = 16.0f;
 
-  constexpr float DEFAULT_SCATTERING_BLEND = 0.0f;
-  constexpr float DEFAULT_SCATTERING_REACH = 0.0f;
-
-  /** A lighting model is a fixed point in VTK's parameter space, not a slider
-   * position, and it spans the light rig as well as the mapper.
+  /** A lighting model is one fixed point in VTK's parameter space, covering
+   * both the light rig installed on the renderer and the material and
+   * scattering properties written to the node. The two entries are not weak
+   * and strong versions of one effect: they pick which of the ray caster's two
+   * shading paths the render takes, and everything else follows from that.
    *
-   * Blend does not add occlusion to Phong shading, it mixes Phong out and a
-   * phase-function scattering model in:
-   * finalColor = (1 - c) * phong + c * scattering.
+   * Headlight is the only rig for which the ray caster compiles its default
+   * lighting path, which requires exactly one switched-on light, at intensity
+   * exactly 1.0, of headlight type. That path is the one where ambient is
+   * multiplied by the sample colour. The cost is that a light at the camera
+   * illuminates precisely what the camera sees, so it casts no visible shadow
+   * and scattering would have nothing to darken - hence no scattering here.
    *
-   * Below 1.0 the uniform is blend/2 and c = 2 * (blend/2) * exp(...), so c
-   * never exceeds blend itself: the value reads directly as the largest share
-   * of the shading the shadow ray can ever account for. That is the strength
-   * dial, and it is the one a viewer actually wants - reach only decides how
-   * far a shadow reaches, not how heavily it lands. At 1.0 there is no cap left
-   * and scattering can replace Phong outright; 2.0 pins c to 1.0 and discards
-   * N.L and specular everywhere.
+   * Key light gives that path up to put a light off-axis, which is what lets a
+   * shadow ray describe shape. The remaining fields are what that costs.
    *
-   * The two models are rigs, not strengths of one effect. Headlight is the only
-   * configuration the ray caster compiles its default lighting path for, which
-   * is the one that multiplies ambient by the sample colour; it is also, being
-   * at the camera, the one that casts no visible shadow, so it carries no
-   * scattering. Key light gives that up to put a light off-axis, which is what
-   * makes a shadow ray describe shape rather than depth.
+   * Blend mixes Phong out and a scattering model in rather than adding
+   * occlusion on top of it: finalColor = (1 - c) * phong + c * scattering,
+   * where c cannot exceed blend. So the value reads as the largest share of
+   * the shading a shadow ray may account for. Keep it under 1.0; above that,
+   * scattering can replace Phong outright and takes the specular highlight
+   * with it.
    *
-   * Reach bounds that shadow ray, and the traced fraction of the volume
-   * diagonal is 1 - (1 - reach)^0.33 - front-loaded against short values: 0.10
-   * traces 3%, 0.30 traces 11%, 0.50 traces 20%, 0.82 traces 43%.
+   * Reach bounds the shadow ray and is where essentially all the cost lives.
+   * It is steeply non-linear: the traced fraction of the volume diagonal is
+   * 1 - (1 - reach)^0.33, so 0.12 traces about 4% and 0.50 about 20%. Short is
+   * deliberate. A long ray lets one structure cast onto another, which
+   * describes the lighting rather than the patient; a short one darkens
+   * contacts and recesses, which is the depth cue worth having. What short
+   * rays cost is grain, and that cannot be bought off by sampling more finely:
+   * vtkSmartVolumeMapper locks the sample distance to the input spacing and
+   * discards any other value.
    *
-   * Reach is held short deliberately. Long rays do integrate more smoothly -
-   * below roughly 20% a sample's shadow is decided by one or two jittered
-   * steps, so neighbouring pixels disagree and the shadow carries visible
-   * grain - but what a long ray buys is one structure casting onto another,
-   * and that describes the light rather than the patient. A short ray darkens
-   * only contacts and recesses, which is the depth cue worth having. The grain
-   * cannot be traded away by sampling finer: the shadow ray steps with the
-   * primary ray, and vtkSmartVolumeMapper turns LockSampleDistanceToInputSpacing
-   * on without exposing it, so an explicit SampleDistance is discarded whenever
-   * it differs from the spacing-derived value.
+   * Ambient is the single field the two models disagree on, and not by
+   * preference - the shader computes it differently for each. Under the
+   * headlight it carries the sample colour and works as a fill. Under any rig
+   * with more than one light it does not, so it lays a flat grey over the
+   * whole image and desaturates the render long before it rescues an occluded
+   * voxel. The key rig therefore holds it at zero and fills from its fill
+   * light instead, whose contribution does carry the sample colour and does
+   * get its own shadow ray.
    *
-   * Ambient is the one field the two models disagree on, because the shader
-   * computes it differently for each. Under the headlight it is multiplied by
-   * the sample colour and behaves as a fill worth having. Under any rig with
-   * more than one light it is scaled by the light's ambient colour and never by
-   * the sample colour, making it an additive grey over the whole image that
-   * desaturates the render long before it rescues an occluded voxel - so the
-   * key light rig sets it to zero and fills from the fill light instead, whose
-   * contribution does carry the sample colour and does get its own shadow ray.
+   * Diffuse rises to make up for that zero, which the key rig can afford
+   * because its key and fill together exceed a single light's intensity.
    *
-   * Diffuse rises to compensate where ambient is zero, and the key rig can
-   * afford it: its key plus fill sum above a single light's intensity.
-   *
-   * Specular is written explicitly rather than left at the Phong default, which
-   * no preset used to touch. The shader adds the specular term without the
-   * sample colour, so it is white light laid over the render, and a light at
-   * the camera puts its lobe over everything visible at once rather than off to
-   * one side. At the old default of 0.4 that clips bright tissue to white.
+   * Specular is written by both models rather than inherited. The shader adds
+   * it without the sample colour, so it is white light laid over the render,
+   * and a light near the camera puts its lobe across everything visible at
+   * once; high values clip bright tissue to white.
    *
    * Anisotropy stays at 0. VTK's Henyey-Greenstein phase function carries no
-   * 1/4pi normalisation, so it is exactly 1.0 at 0 but swings between 0.56 and
-   * 1.88 at 0.2 depending on the light and view geometry - a brightness change
-   * rather than a shape cue.
+   * 1/4pi normalisation, so it is exactly 1.0 at zero but swings either side
+   * of that with the light and view geometry - a brightness change, not a
+   * shape cue.
    */
   struct CinematicPreset
   {
+    /** Stable identifier stored on the node. Kept separate from the label so
+     * that reordering the table or renaming an entry cannot change what an
+     * already-saved scene means.
+     */
+    const char *id;
     const char *label;
     float blend;
     float reach;
@@ -139,10 +135,13 @@ namespace
   using LightingMode = mitk::VtkPropRenderer::LightingMode;
 
   constexpr std::array<CinematicPreset, 2> CINEMATIC_PRESETS { {
-    //                   blend  reach  aniso  nFromOp ambient diffuse specular power  rig
-    {"Headlight",        0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
-    {"Key light",        0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
+    //           id            label          blend  reach  aniso  nFromOp ambient diffuse specular power  rig
+    {"headlight", "Headlight",                0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
+    {"keylight",  "Key light",                0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
   } };
+
+  /** Key under which the chosen model is recorded on the node. */
+  constexpr const char *LIGHTING_MODEL_PROPERTY = "volumerendering.lightingmodel";
 
   const CinematicPreset &PresetFromComboIndex(int index)
   {
@@ -151,30 +150,32 @@ namespace
              : CINEMATIC_PRESETS.front();
   }
 
+  /** \brief Which lighting model a node asks for.
+   *
+   * What the combo box selects is a light rig; the material values a model
+   * writes are a starting point the user is free to move afterwards. So the
+   * choice is recorded rather than inferred from those values - inferring it
+   * would both deselect the model when a slider moves and leave two models
+   * that happen to write the same values indistinguishable.
+   *
+   * \return The entry index, or -1 when the node names no model - an older
+   *         scene, or a volume configured outside this view. Nothing is
+   *         selected then, and the default rig stays installed, rather than
+   *         claiming a model that was never applied.
+   */
   int ComboIndexFromNode(const mitk::DataNode *node)
   {
-    float blend = DEFAULT_SCATTERING_BLEND;
-    float reach = DEFAULT_SCATTERING_REACH;
-    node->GetFloatProperty("volumerendering.scattering.blend", blend);
-    node->GetFloatProperty("volumerendering.scattering.reach", reach);
+    std::string modelId;
 
-    // Blend gates the whole scattering path, so a zero blend is Off whatever
-    // the reach happens to say.
-    if (blend <= 0.0f)
-      return 0;
+    if (!node->GetStringProperty(LIGHTING_MODEL_PROPERTY, modelId))
+      return -1;
 
-    for (std::size_t i = 1; i < CINEMATIC_PRESETS.size(); ++i)
+    for (std::size_t i = 0; i < CINEMATIC_PRESETS.size(); ++i)
     {
-      const auto &preset = CINEMATIC_PRESETS[i];
-
-      if (std::abs(preset.blend - blend) < 1e-4f && std::abs(preset.reach - reach) < 1e-4f)
+      if (modelId == CINEMATIC_PRESETS[i].id)
         return static_cast<int>(i);
     }
 
-    // Scattering is on at a combination no preset describes - an older scene,
-    // or hand-edited properties. Report no selection, as presetComboBox does
-    // for an unrecognised transfer function, rather than naming a preset whose
-    // values differ from what the mapper will render.
     return -1;
   }
 
@@ -554,6 +555,11 @@ void QmitkVolumeVisualizationV2View::OnCinematicModeChanged(int index)
   selectedNode->SetFloatProperty("volumerendering.diffuse", preset.diffuse);
   selectedNode->SetFloatProperty("volumerendering.specular", preset.specular);
   selectedNode->SetFloatProperty("volumerendering.specular.power", preset.specularPower);
+
+  // The rig is what this combo selects, so record it rather than leaving it to
+  // be inferred from the material values written above, which the user may
+  // move afterwards without leaving the model.
+  selectedNode->SetStringProperty(LIGHTING_MODEL_PROPERTY, preset.id);
 
   // The rig is not applied here: UpdateLightingControls derives it from the
   // properties just written, so it stays the single place that installs one.

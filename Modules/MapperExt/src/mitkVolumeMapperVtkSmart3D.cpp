@@ -229,17 +229,19 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   if(this->GetDataNode()->GetBoolProperty("volumerendering.shade", shade, renderer))
     m_VolumeProperty->SetShade(shade ? 1 : 0);
 
-  // vtkGPUVolumeRayCastMapper drops scattering for interactive frames itself,
-  // but decides that on vtkProp::AllocatedRenderTime, which this volume never
-  // receives: only vtkMitkRenderProp is a view prop, so vtkRenderer's per-prop
-  // time allocation never reaches the volume and it reports the vtkProp default
-  // of 10 forever - every frame classed as a still one. The window's update
-  // rate does track interaction, and is what vtkSmartVolumeMapper itself keys
-  // its sample-distance coarsening off, so gate on that instead.
+  // Scattering traces shadow rays, far too slow to rotate with, so it has to
+  // switch off while the user drags. VTK does try that itself, but bases it on
+  // vtkProp::AllocatedRenderTime, and vtkRenderer only budgets props that were
+  // added to it - here that is vtkMitkRenderProp alone, never the volume. So
+  // the volume keeps the vtkProp default of 10 and never counts as interactive.
+  // The render window's update rate does follow interaction, and
+  // vtkSmartVolumeMapper already keys its own interactive coarsening off it.
   //
-  // Going through the setter is the point: it calls Modified(), which is what
-  // makes VTK recompile the shader without the scattering block. Assigning the
-  // value anywhere that skips Modified() leaves the shadow rays compiled in.
+  // The blend has to go through the setter rather than be assigned: only the
+  // setter calls Modified(), and VTK rebuilds the shader by comparing the
+  // mapper's modification time against the last build. Scattering is compiled
+  // into the shader, so without that bump the shadow rays keep running no
+  // matter what the value says.
   const bool isInteractive = IsInteractiveRender(renderer, m_SmartVolumeMapper->GetInteractiveUpdateRate());
 
   // VTK ignores the reach unless the blend is above zero, and both unless Shade is on.

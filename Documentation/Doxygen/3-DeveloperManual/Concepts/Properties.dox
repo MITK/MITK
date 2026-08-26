@@ -186,6 +186,11 @@ surface construction
 properties below are ignored entirely while this is off.
   <li> volumerendering.blendmode - VTK blend mode (composite, maximum
 intensity, minimum intensity, average, additive)
+  <li> volumerendering.lightingmodel - Identifier of the lighting model the
+Volume Visualization view applied to this node ("headlight", "keylight"). It
+records which light rig was asked for, which the mapper properties alone cannot
+express; the mapper itself does not read it. Absent means no model was applied,
+and the renderer keeps its default rig.
   <li> volumerendering.normalsFromOpacity - Derive the shading gradient from the
 opacity rather than the raw scalars, so lighting follows the transfer function
 instead of the data's noise. The scattering blend reads the same gradient's

@@ -40,6 +40,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QToolButton>
 
 #include <algorithm>
 #include <array>
@@ -177,6 +178,17 @@ namespace
     return -1;
   }
 
+  /** The arrow is the only cue that a section folds away, so it is drawn by
+   * the style from arrowType rather than taken from a pixmap: the toolbar
+   * extension chevron the collapsible widgets reach for is deliberately tight
+   * and reads as decoration rather than as a control.
+   */
+  void SetSectionExpanded(QToolButton *header, QWidget *panel, bool expanded)
+  {
+    header->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
+    panel->setVisible(expanded);
+  }
+
   void ConfigureSlider(ctkSliderWidget *slider, int decimals, double minimum, double maximum, double step)
   {
     slider->setDecimals(decimals);
@@ -251,9 +263,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
 
   m_Controls->lightingPanel->setVisible(false);
 
-  m_Controls->tfControlPanelsWidget->setVisible(false);
-  m_Controls->cancelTfCreationButton->setVisible(false);
-  m_Controls->saveUserTfButton->setVisible(false);
+  m_Controls->advancedTfPanel->setVisible(false);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
@@ -265,6 +275,11 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected);
 
   // Transfer Function Adjustments
+  connect(m_Controls->adjustPresetExpandButton, &QToolButton::toggled, this,
+    [this](bool expanded)
+    {
+      SetSectionExpanded(m_Controls->adjustPresetExpandButton, m_Controls->adjustPresetPanel, expanded);
+    });
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
     this, &QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged);
   connect(m_Controls->opacityShiftSlider, &ctkDoubleSlider::valueChanged,
@@ -279,8 +294,11 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
 
   // Lighting Option Controls
-  connect(m_Controls->lightingExpandButton, &ctkExpandButton::toggled,
-    m_Controls->lightingPanel, &QWidget::setVisible);
+  connect(m_Controls->lightingExpandButton, &QToolButton::toggled, this,
+    [this](bool expanded)
+    {
+      SetSectionExpanded(m_Controls->lightingExpandButton, m_Controls->lightingPanel, expanded);
+    });
   connect(m_Controls->shadeCheckBox, &QCheckBox::toggled,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
   connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
@@ -650,16 +668,18 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
 void QmitkVolumeVisualizationV2View::SetTfAdvancedMode(bool active)
 {
   // Controls for the Transfer Function Creation Mode
-  m_Controls->tfControlPanelsWidget->setVisible(active);
-  m_Controls->cancelTfCreationButton->setVisible(active);
-  m_Controls->saveUserTfButton->setVisible(active);
+  m_Controls->advancedTfPanel->setVisible(active);
 
-  // Controls for the Preset Transfer Function Selection
-  m_Controls->combinedTfCanvas->setVisible(!active);
-  m_Controls->adjustPresetPanel->setVisible(!active);
-  m_Controls->createTfButton->setVisible(!active);
-  m_Controls->loadTfButton->setVisible(!active);
-  m_Controls->tfAdvancedLabel->setVisible(!active);
+  // Preset selection and the sliders that adjust it both live in this box, and
+  // authoring supersedes both. Hiding the box takes the collapsible section
+  // with it, so its expanded/collapsed state is left untouched and survives a
+  // trip through advanced mode.
+  m_Controls->transferFunctionGroupBox->setVisible(!active);
+
+  // Lighting is a rendering control rather than part of authoring a function,
+  // so it starts out of the way and below the editor.
+  if (active)
+    m_Controls->lightingExpandButton->setChecked(false);
 }
 
 void QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction()
@@ -799,11 +819,8 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
     m_Controls->enableRenderingCB->setChecked(false);
     m_Controls->enableRenderingCB->setEnabled(false);
     m_Controls->presetComboBox->setEnabled(false);
-    m_Controls->opacityShiftSlider->setEnabled(false);
-    m_Controls->opacityHeightSlider->setEnabled(false);
-    m_Controls->colorShiftSlider->setEnabled(false);
-    m_Controls->colorWidthSlider->setEnabled(false);
-    m_Controls->resetTfButton->setEnabled(false);
+    m_Controls->adjustPresetExpandButton->setEnabled(false);
+    m_Controls->adjustPresetPanel->setEnabled(false);
     m_Controls->combinedTfCanvas->setEnabled(false);
     return;
   }
@@ -816,12 +833,11 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   m_Controls->createTfButton->setEnabled(volumeRenderingOn);
   m_Controls->loadTfButton->setEnabled(volumeRenderingOn);
 
+  // Disabling the section rather than its individual controls is what greys the
+  // header and the row labels too, so an inactive section reads as inactive.
   const bool tfAdjustable = volumeRenderingOn && m_AppliedTransferFunction.IsNotNull();
-  m_Controls->opacityShiftSlider->setEnabled(tfAdjustable);
-  m_Controls->opacityHeightSlider->setEnabled(tfAdjustable);
-  m_Controls->colorShiftSlider->setEnabled(tfAdjustable);
-  m_Controls->colorWidthSlider->setEnabled(tfAdjustable);
-  m_Controls->resetTfButton->setEnabled(tfAdjustable);
+  m_Controls->adjustPresetExpandButton->setEnabled(tfAdjustable);
+  m_Controls->adjustPresetPanel->setEnabled(tfAdjustable);
   m_Controls->combinedTfCanvas->setEnabled(tfAdjustable);
 
   const QSignalBlocker blocker(m_Controls->enableRenderingCB);

@@ -574,6 +574,25 @@ void QmitkVolumeVisualizationV2View::OnResetLighting()
   this->OnCinematicModeChanged(0);
 }
 
+void QmitkVolumeVisualizationV2View::RenderWindowPartActivated(mitk::IRenderWindowPart *)
+{
+  // The incoming part brings a renderer in its default rig, while the node - and
+  // so this view's combo box - still asks for whichever model was last chosen.
+  // Re-deriving the rig from the node is what stops the two disagreeing, and it
+  // matters beyond the lights: the mapper keeps applying the node's scattering
+  // every render pass, so a cinematic node left on the default five-light rig
+  // renders the muddy, five-times-more-expensive combination the models exist
+  // to avoid.
+  this->UpdateLightingControls();
+}
+
+void QmitkVolumeVisualizationV2View::RenderWindowPartDeactivated(mitk::IRenderWindowPart *)
+{
+  // Required by the interface, and deliberately empty: a part that is closing
+  // takes its renderer and rig with it, and one that is merely superseded is
+  // replaced by a part configured in RenderWindowPartActivated.
+}
+
 void QmitkVolumeVisualizationV2View::UpdateLightingControls()
 {
   auto selectedNode = m_SelectedNode.Lock();

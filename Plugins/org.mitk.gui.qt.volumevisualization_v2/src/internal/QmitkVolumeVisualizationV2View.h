@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkVtkPropRenderer.h>
 
 #include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
 
 #include <vtkSmartPointer.h>
 
@@ -35,7 +36,8 @@ namespace Ui
   class QmitkVolumeVisualizationV2View;
 }
 
-class QmitkVolumeVisualizationV2View : public QmitkAbstractView
+class QmitkVolumeVisualizationV2View : public QmitkAbstractView,
+                                       public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -67,6 +69,21 @@ private:
 
   void UpdateInterface();
   void UpdateLightingControls();
+
+  /** \brief Install the light rig on a render window part that has just become
+   * available.
+   *
+   * The rig belongs to the renderer while the model that decides it belongs to
+   * the node, so a part that replaces another one arrives with the default rig
+   * and no knowledge of the node this view has selected. Without this the view
+   * would keep naming a model the new renderer is not in.
+   *
+   * \param[in] renderWindowPart Unused; the rig is installed on whichever part
+   *            is current, as everywhere else in this view.
+   */
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   /** Lights belong to the renderer, so this is 3D-render-window state rather
    * than node state, and every path that leaves cinematic mode has to restore

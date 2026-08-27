@@ -255,7 +255,9 @@ mitk::VolumeMapperVtkSmart3D::LocalStorage::LocalStorage()
 
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_VolumeProperty->ShadeOn();
-  m_VolumeProperty->SetInterpolationType(VTK_CUBIC_INTERPOLATION);
+  // vtkVolumeProperty supports nearest and linear only, and defaults to
+  // nearest. Higher values are silently clamped, so cubic cannot be had here.
+  m_VolumeProperty->SetInterpolationTypeToLinear();
 
   m_DataToWorld = vtkSmartPointer<vtkTransform>::New();
 

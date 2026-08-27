@@ -166,6 +166,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="binaryHintLabel">
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="transferFunctionGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">

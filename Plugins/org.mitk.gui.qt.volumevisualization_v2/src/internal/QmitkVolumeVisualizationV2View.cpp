@@ -205,6 +205,19 @@ namespace
     const QSignalBlocker blocker(slider);
     slider->setValue(value);
   }
+
+  /** mitk::VolumeMapperVtkSmart3D branches on this property before it reads
+   * "TransferFunction", and for a mask it builds a flat colour from the node
+   * colour instead. Every transfer function control is inert on such a node,
+   * so the view has to ask the same question the mapper asks.
+   */
+  bool IsBinaryImage(const mitk::DataNode *node)
+  {
+    bool isBinary = false;
+    node->GetBoolProperty("binary", isBinary);
+
+    return isBinary;
+  }
 }
 
 QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View() 
@@ -265,6 +278,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->lightingPanel->setVisible(false);
 
   m_Controls->advancedTfPanel->setVisible(false);
+
+  m_Controls->binaryHintLabel->setText(
+    tr("Binary image: its appearance is set by the node colour, not by a transfer function."));
+  m_Controls->binaryHintLabel->setVisible(false);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
@@ -330,6 +347,13 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
 
 void QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
+  // Authoring targets the node that was current when it started, and the
+  // pre-edit snapshot is the only way back to that node's previous appearance.
+  // This has to happen before the function is dropped below, or the snapshot
+  // goes with it and the edits are stranded on a node the editor no longer
+  // points at.
+  this->OnCancelTfAdvancedMode();
+
   m_SelectedNode = nullptr;
   m_AppliedTransferFunction = nullptr;
 
@@ -822,14 +846,22 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
   if(selectedNode.IsNull())
   {
+    m_Controls->binaryHintLabel->setVisible(false);
     m_Controls->enableRenderingCB->setChecked(false);
     m_Controls->enableRenderingCB->setEnabled(false);
     m_Controls->presetComboBox->setEnabled(false);
+    m_Controls->createTfButton->setEnabled(false);
+    m_Controls->loadTfButton->setEnabled(false);
     m_Controls->adjustPresetExpandButton->setEnabled(false);
     m_Controls->adjustPresetPanel->setEnabled(false);
     m_Controls->combinedTfCanvas->setEnabled(false);
     return;
   }
+
+  const bool isBinary = IsBinaryImage(selectedNode.GetPointer());
+
+  m_Controls->binaryHintLabel->setVisible(isBinary);
+  m_Controls->transferFunctionGroupBox->setEnabled(!isBinary);
 
   bool volumeRenderingOn = false;
   selectedNode->GetBoolProperty("volumerendering", volumeRenderingOn);

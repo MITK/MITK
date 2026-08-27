@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>
 #include <mitkImage.h>
+#include <mitkLocalStorageHandler.h>
 #include <mitkVtkMapper.h>
 
 // VTK
@@ -77,24 +78,41 @@ namespace mitk
      */
     void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
+    /** \brief The VTK objects one 3D render window renders this volume with.
+     *
+     * A single mapper instance serves every renderer that shows the node, and
+     * every property it reads is renderer-scoped. Holding the objects it writes
+     * those reads into per renderer is what keeps two 3D windows from
+     * overwriting each other's visibility, placement and shading.
+     */
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+      /** \brief The prop handed to the renderer. */
+      vtkSmartPointer<vtkVolume> m_Volume;
+      /** \brief Places the volume, with the image spacing divided back out. */
+      vtkSmartPointer<vtkTransform> m_DataToWorld;
+      /** \brief The ray caster. */
+      vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
+      /** \brief Transfer functions and shading coefficients. */
+      vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+
+      LocalStorage();
+      ~LocalStorage() override;
+    };
+
   protected:
     VolumeMapperVtkSmart3D();
     ~VolumeMapperVtkSmart3D() override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    void createMapper(vtkImageData*);
-    void createVolume();
-    void createVolumeProperty();
     vtkImageData* GetInputImage();
 
-    vtkSmartPointer<vtkVolume> m_Volume;
-    vtkSmartPointer<vtkTransform> m_DataToWorld;
-    vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
-    vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+    void UpdateTransferFunctions(mitk::BaseRenderer *renderer, LocalStorage *localStorage);
+    void UpdateRenderMode(mitk::BaseRenderer *renderer, LocalStorage *localStorage);
 
-    void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
-    void UpdateRenderMode(mitk::BaseRenderer *renderer);
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
   };
 
 } // namespace mitk

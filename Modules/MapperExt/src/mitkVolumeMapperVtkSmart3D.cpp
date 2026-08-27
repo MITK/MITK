@@ -42,34 +42,28 @@ namespace
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  bool value;
-  this->GetDataNode()->GetBoolProperty("volumerendering", value, renderer);
-  if (!value)
+  auto *localStorage = m_LSH.GetLocalStorage(renderer);
+
+  bool volumeRendering = false;
+  this->GetDataNode()->GetBoolProperty("volumerendering", volumeRendering, renderer);
+
+  if (!volumeRendering)
   {
-    m_Volume->VisibilityOff();
+    localStorage->m_Volume->VisibilityOff();
     return;
   }
-  else
-  {
-    createMapper(GetInputImage());
-    m_Volume->VisibilityOn();
-  }
 
-  UpdateTransferFunctions(renderer);
-  UpdateRenderMode(renderer);
-  this->Modified();
+  localStorage->m_SmartVolumeMapper->SetInputData(this->GetInputImage());
+
+  this->UpdateTransferFunctions(renderer, localStorage);
+  this->UpdateRenderMode(renderer, localStorage);
+
+  localStorage->m_Volume->VisibilityOn();
 }
 
-vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *)
+vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  if (!m_Volume->GetMapper())
-  {
-    createMapper(GetInputImage());
-    createVolume();
-    createVolumeProperty();
-  }
-
-  return m_Volume;
+  return m_LSH.GetLocalStorage(renderer)->m_Volume;
 }
 
 void mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
@@ -82,6 +76,8 @@ void mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform(mitk::BaseRenderer *render
     return;
   }
 
+  auto *localStorage = m_LSH.GetLocalStorage(renderer);
+
   // Read the spacing back from the image the mapper was handed rather than from
   // the geometry, so the two halves of the placement cannot disagree if the
   // geometry is rescaled after the image data was built.
@@ -90,10 +86,10 @@ void mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform(mitk::BaseRenderer *render
 
   // IndexToWorld carries the spacing the image itself now supplies. Applying
   // both would size the volume by it twice.
-  m_DataToWorld->SetMatrix(this->GetDataNode()->GetVtkTransform(this->GetTimestep())->GetMatrix());
-  m_DataToWorld->Scale(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
+  localStorage->m_DataToWorld->SetMatrix(this->GetDataNode()->GetVtkTransform(this->GetTimestep())->GetMatrix());
+  localStorage->m_DataToWorld->Scale(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
 
-  m_Volume->SetUserTransform(m_DataToWorld);
+  localStorage->m_Volume->SetUserTransform(localStorage->m_DataToWorld);
 }
 
 void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)
@@ -140,25 +136,7 @@ vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
   return input->GetVtkImageData(this->GetTimestep());
 }
 
-void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
-{
-  m_SmartVolumeMapper->SetBlendModeToComposite();
-  m_SmartVolumeMapper->SetInputData(imageData);
-}
-
-void mitk::VolumeMapperVtkSmart3D::createVolume()
-{
-  m_Volume->SetMapper(m_SmartVolumeMapper);
-  m_Volume->SetProperty(m_VolumeProperty);
-}
-
-void mitk::VolumeMapperVtkSmart3D::createVolumeProperty()
-{
-  m_VolumeProperty->ShadeOn();
-  m_VolumeProperty->SetInterpolationType(VTK_CUBIC_INTERPOLATION);
-}
-
-void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *renderer)
+void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *renderer, LocalStorage *localStorage)
 {
   vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction;
   vtkSmartPointer<vtkPiecewiseFunction> gradientTransferFunction;
@@ -199,35 +177,35 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
       colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
     }
   }
-  m_VolumeProperty->SetColor(colorTransferFunction);
-  m_VolumeProperty->SetScalarOpacity(opacityTransferFunction);
-  m_VolumeProperty->SetGradientOpacity(gradientTransferFunction);
+  localStorage->m_VolumeProperty->SetColor(colorTransferFunction);
+  localStorage->m_VolumeProperty->SetScalarOpacity(opacityTransferFunction);
+  localStorage->m_VolumeProperty->SetGradientOpacity(gradientTransferFunction);
 }
 
 
-void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer)
+void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer, LocalStorage *localStorage)
 {
-  m_SmartVolumeMapper->SetRequestedRenderModeToGPU();
+  localStorage->m_SmartVolumeMapper->SetRequestedRenderModeToGPU();
 
   int blendMode;
   if (this->GetDataNode()->GetIntProperty("volumerendering.blendmode", blendMode))
   {
-    m_SmartVolumeMapper->SetBlendMode(blendMode);
+    localStorage->m_SmartVolumeMapper->SetBlendMode(blendMode);
   }
 
   // shading parameter
   float value = 0;
   bool shade = true;
   if (this->GetDataNode()->GetFloatProperty("volumerendering.ambient", value, renderer))
-    m_VolumeProperty->SetAmbient(value);
+    localStorage->m_VolumeProperty->SetAmbient(value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.diffuse", value, renderer))
-    m_VolumeProperty->SetDiffuse(value);
+    localStorage->m_VolumeProperty->SetDiffuse(value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.specular", value, renderer))
-    m_VolumeProperty->SetSpecular(value);
+    localStorage->m_VolumeProperty->SetSpecular(value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.specular.power", value, renderer))
-    m_VolumeProperty->SetSpecularPower(value);
+    localStorage->m_VolumeProperty->SetSpecularPower(value);
   if(this->GetDataNode()->GetBoolProperty("volumerendering.shade", shade, renderer))
-    m_VolumeProperty->SetShade(shade ? 1 : 0);
+    localStorage->m_VolumeProperty->SetShade(shade ? 1 : 0);
 
   // Scattering traces shadow rays, far too slow to rotate with, so it has to
   // switch off while the user drags. VTK does try that itself, but bases it on
@@ -242,19 +220,20 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   // mapper's modification time against the last build. Scattering is compiled
   // into the shader, so without that bump the shadow rays keep running no
   // matter what the value says.
-  const bool isInteractive = IsInteractiveRender(renderer, m_SmartVolumeMapper->GetInteractiveUpdateRate());
+  const bool isInteractive =
+    IsInteractiveRender(renderer, localStorage->m_SmartVolumeMapper->GetInteractiveUpdateRate());
 
   // VTK ignores the reach unless the blend is above zero, and both unless Shade is on.
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.blend", value, renderer))
-    m_SmartVolumeMapper->SetVolumetricScatteringBlending(isInteractive ? 0.0f : value);
+    localStorage->m_SmartVolumeMapper->SetVolumetricScatteringBlending(isInteractive ? 0.0f : value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.reach", value, renderer))
-    m_SmartVolumeMapper->SetGlobalIlluminationReach(value);
+    localStorage->m_SmartVolumeMapper->SetGlobalIlluminationReach(value);
 
   // Anisotropy feeds only the phase function, which VTK compiles into the
   // shader solely when blending is above zero. Setting it on its own does
   // nothing.
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.anisotropy", value, renderer))
-    m_VolumeProperty->SetScatteringAnisotropy(value);
+    localStorage->m_VolumeProperty->SetScatteringAnisotropy(value);
 
   // Derives the shading gradient from the opacity rather than the raw scalars,
   // so lighting follows the transfer function instead of the data's noise. The
@@ -262,10 +241,10 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   // where scattering gives way to Phong shading.
   bool normalsFromOpacity = false;
   if (this->GetDataNode()->GetBoolProperty("volumerendering.normalsFromOpacity", normalsFromOpacity, renderer))
-    m_SmartVolumeMapper->SetComputeNormalFromOpacity(normalsFromOpacity);
+    localStorage->m_SmartVolumeMapper->SetComputeNormalFromOpacity(normalsFromOpacity);
 }
 
-mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
+mitk::VolumeMapperVtkSmart3D::LocalStorage::LocalStorage()
 {
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_SmartVolumeMapper->SetBlendModeToComposite();
@@ -273,14 +252,32 @@ mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
   // across neighbouring pixels, which reads as concentric banding. Jittering
   // the offsets trades that for unstructured noise. VTK defaults it off.
   m_SmartVolumeMapper->SetUseJittering(1);
-  m_DataToWorld = vtkSmartPointer<vtkTransform>::New();
+
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
+  m_VolumeProperty->ShadeOn();
+  m_VolumeProperty->SetInterpolationType(VTK_CUBIC_INTERPOLATION);
+
+  m_DataToWorld = vtkSmartPointer<vtkTransform>::New();
+
   m_Volume = vtkSmartPointer<vtkVolume>::New();
+  m_Volume->SetMapper(m_SmartVolumeMapper);
+  m_Volume->SetProperty(m_VolumeProperty);
+
+  // GetVtkProp hands this prop out before GenerateDataForRenderer has ever run,
+  // and until it does the ray caster has no input to render.
+  m_Volume->VisibilityOff();
+}
+
+mitk::VolumeMapperVtkSmart3D::LocalStorage::~LocalStorage()
+{
+}
+
+mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
+{
 }
 
 mitk::VolumeMapperVtkSmart3D::~VolumeMapperVtkSmart3D()
 {
-
 }
 
 

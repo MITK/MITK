@@ -102,6 +102,8 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
     return;
 
   node->AddProperty("volumerendering", mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(
+    "volumerendering.blendmode", mitk::IntProperty::New(vtkVolumeMapper::COMPOSITE_BLEND), renderer, overwrite);
 
   node->AddProperty("volumerendering.ambient", mitk::FloatProperty::New(0.1f), renderer, overwrite);
   node->AddProperty("volumerendering.diffuse", mitk::FloatProperty::New(0.50f), renderer, overwrite);
@@ -185,12 +187,16 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
 
 void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer, LocalStorage *localStorage)
 {
-  localStorage->m_SmartVolumeMapper->SetRequestedRenderModeToGPU();
-
   int blendMode;
-  if (this->GetDataNode()->GetIntProperty("volumerendering.blendmode", blendMode))
+  if (this->GetDataNode()->GetIntProperty("volumerendering.blendmode", blendMode, renderer))
   {
     localStorage->m_SmartVolumeMapper->SetBlendMode(blendMode);
+  }
+  else
+  {
+    // Restored rather than left alone: the ray caster keeps the last mode it was
+    // handed, so a node that loses the property would stay on it.
+    localStorage->m_SmartVolumeMapper->SetBlendModeToComposite();
   }
 
   // shading parameter
@@ -247,6 +253,11 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
 mitk::VolumeMapperVtkSmart3D::LocalStorage::LocalStorage()
 {
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+  // Requested explicitly rather than left to VTK's own selection: the jittering
+  // below, and the scattering and normals-from-opacity in UpdateRenderMode, are
+  // honoured only by the GPU ray caster. Letting VTK settle on the CPU mapper
+  // would drop them silently rather than degrade.
+  m_SmartVolumeMapper->SetRequestedRenderModeToGPU();
   m_SmartVolumeMapper->SetBlendModeToComposite();
   // Sampling the ray at regular offsets makes the step boundaries line up
   // across neighbouring pixels, which reads as concentric banding. Jittering

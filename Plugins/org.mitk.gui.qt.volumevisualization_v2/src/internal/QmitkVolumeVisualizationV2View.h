@@ -53,6 +53,7 @@ private Q_SLOTS:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnEnabledRendering(bool state);
   void OnTransferFunctionPresetSelected(const QString &presetName);
+  void OnTechniqueChanged(int index);
   void OnColorWindowChanged();
   void OnResetTransferFunction();
   void OnCanvasOpacityChanged();

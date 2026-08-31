@@ -98,6 +98,13 @@ namespace mitk
       /** \brief Transfer functions and shading coefficients. */
       vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
 
+      /** \brief The last unrenderable blend mode already warned about.
+       *
+       * UpdateRenderMode runs on every render pass, so without remembering this
+       * a single bad value would fill the log while the camera moves.
+       */
+      int m_ReportedBlendMode = -1;
+
       LocalStorage();
       ~LocalStorage() override;
     };

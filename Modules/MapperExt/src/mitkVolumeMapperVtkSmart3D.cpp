@@ -187,16 +187,39 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
 
 void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer, LocalStorage *localStorage)
 {
-  int blendMode;
-  if (this->GetDataNode()->GetIntProperty("volumerendering.blendmode", blendMode, renderer))
+  int blendMode = vtkVolumeMapper::COMPOSITE_BLEND;
+  const bool hasBlendMode =
+    this->GetDataNode()->GetIntProperty("volumerendering.blendmode", blendMode, renderer);
+
+  // Range-checked because the property is a plain int anything can write: the
+  // Properties view offers it as one, and a scene file carries whatever it was
+  // saved with. VTK's setter does not validate, and its ray caster refuses the
+  // entire render for a mode it cannot implement, so an unusable value makes the
+  // volume vanish rather than degrade. Isosurface and slice are excluded along
+  // with the out-of-enum values: VTK names them, but they need iso-values or a
+  // plane that no mapper here supplies, so the ray caster rejects them too.
+  const bool renderable = blendMode >= vtkVolumeMapper::COMPOSITE_BLEND &&
+                          blendMode <= vtkVolumeMapper::ADDITIVE_BLEND;
+
+  if (hasBlendMode && !renderable && blendMode != localStorage->m_ReportedBlendMode)
+  {
+    // Once per value rather than per frame: this runs on every render pass.
+    MITK_WARN << "Volume rendering blend mode " << blendMode
+              << " cannot be rendered; falling back to composite.";
+    localStorage->m_ReportedBlendMode = blendMode;
+  }
+
+  if (hasBlendMode && renderable)
   {
     localStorage->m_SmartVolumeMapper->SetBlendMode(blendMode);
   }
   else
   {
     // Restored rather than left alone: the ray caster keeps the last mode it was
-    // handed, so a node that loses the property would stay on it.
+    // handed, so a node that loses the property, or names an unusable one, would
+    // stay on it.
     localStorage->m_SmartVolumeMapper->SetBlendModeToComposite();
+    blendMode = vtkVolumeMapper::COMPOSITE_BLEND;
   }
 
   // shading parameter
@@ -229,9 +252,19 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   const bool isInteractive =
     IsInteractiveRender(renderer, localStorage->m_SmartVolumeMapper->GetInteractiveUpdateRate());
 
+  // Suppressed outside the composite path, not merely ineffective there: VTK
+  // splices the scattering code into whatever shader it is building, but that
+  // code reads variables - the view direction and the shading gradient - that
+  // only the compositing loop declares. Handing a non-zero blend to any
+  // projection mode therefore emits GLSL that fails to compile, and the volume
+  // vanishes rather than rendering unlit. The node keeps its lighting model
+  // through the excursion; only what reaches the ray caster is held back.
+  const bool composites = blendMode == vtkVolumeMapper::COMPOSITE_BLEND;
+
   // VTK ignores the reach unless the blend is above zero, and both unless Shade is on.
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.blend", value, renderer))
-    localStorage->m_SmartVolumeMapper->SetVolumetricScatteringBlending(isInteractive ? 0.0f : value);
+    localStorage->m_SmartVolumeMapper->SetVolumetricScatteringBlending(
+      isInteractive || !composites ? 0.0f : value);
   if (this->GetDataNode()->GetFloatProperty("volumerendering.scattering.reach", value, renderer))
     localStorage->m_SmartVolumeMapper->SetGlobalIlluminationReach(value);
 

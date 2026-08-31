@@ -27,10 +27,12 @@ found in the LICENSE file.
  *
  * Extends QmitkPiecewiseFunctionCanvas (opacity curve + histogram background +
  * coordinate transforms) by drawing the color transfer function as a gradient
- * beneath the curve, and by replacing per-point editing with two whole-curve
- * gestures: display-only canvas whose opacity curve is shifted/raised through
- * SetOpacityShift / SetOpacityHeight. The color function is shown for context 
- * only and is not edited here.
+ * beneath the curve.
+ *
+ * Nothing is edited by clicking: the base class's per-point editing is
+ * suppressed, and the opacity curve is moved as a whole through
+ * SetOpacityShift and SetOpacityHeight, which the owner drives from its own
+ * controls. The color function is shown for context only.
  *
  * \sa QmitkPiecewiseFunctionCanvas, QmitkColorTransferFunctionCanvas
  */
@@ -59,13 +61,25 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     void SetColorTransferFunction(vtkColorTransferFunction *colorTransferFunction);
 
+    /**
+     * \brief Stop displaying the current functions and histogram.
+     *
+     * The canvas keeps all three as raw pointers owned elsewhere, so a caller
+     * that drops the last reference to them has to say so - otherwise the next
+     * paint reads freed memory.
+     */
+    void Clear();
+
     void paintEvent(QPaintEvent *e) override;
     void mousePressEvent(QMouseEvent *mouseEvent) override;
     void mouseMoveEvent(QMouseEvent *mouseEvent) override;
     void mouseReleaseEvent(QMouseEvent *mouseEvent) override;
-  
+
   signals:
-    /** \brief Emitted after a drag has changed the scalar-opacity curve. */
+    /** \brief Emitted after SetOpacityShift or SetOpacityHeight rebuilt the
+     *         scalar-opacity curve. The curve is already updated; deciding
+     *         whether anything needs re-rendering is left to the receiver.
+     */
     void OpacityChanged();
 
   private:
@@ -79,4 +93,4 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     double m_OpacityHeight;
 };
 
-#endif 
+#endif

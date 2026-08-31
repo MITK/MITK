@@ -32,6 +32,23 @@ void QmitkCombinedTransferFunctionCanvas::SetColorTransferFunction(vtkColorTrans
   this->update();
 }
 
+void QmitkCombinedTransferFunctionCanvas::Clear()
+{
+  m_ColorTransferFunction = nullptr;
+
+  // Owned by the mitk::TransferFunction the caller is dropping, and protected in
+  // QmitkPiecewiseFunctionCanvas, whose SetPiecewiseFunction dereferences its
+  // argument and so cannot be handed a nullptr.
+  m_PiecewiseFunction = nullptr;
+
+  m_OpacityBasePoints.clear();
+  m_OpacityShift = 0.0;
+  m_OpacityHeight = 0.0;
+
+  this->SetHistogram(nullptr);
+  this->update();
+}
+
 void QmitkCombinedTransferFunctionCanvas::PaintColorGradient(QPainter &painter)
 {
   if (m_ColorTransferFunction == nullptr || !this->isEnabled())
@@ -80,7 +97,7 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
   // Draw just the empty frame so the histogram and labels clear instead of
   // lingering from the previous node
   const bool hasContent = this->isEnabled() && m_PiecewiseFunction != nullptr;
-  
+
   if (hasContent)
   {
     // Back to front: histogram, color gradient, then the opacity curve.
@@ -133,7 +150,7 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
     };
 
     // Check if first control Point is above lower display bound, so inside visible axis
-    if (m_Lower < firstX) 
+    if (m_Lower < firstX)
       addPoint(m_Lower, 0.0);
 
     addPoint(firstX, 0.0);
@@ -144,8 +161,8 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
     }
 
     addPoint(lastX, 0.0);
-    
-    // Check if first control Point is below upper display bound, so inside visible axis 
+
+    // Check if first control Point is below upper display bound, so inside visible axis
     if (m_Upper > lastX)
       addPoint(m_Upper, 0.0);
 
@@ -219,5 +236,4 @@ void QmitkCombinedTransferFunctionCanvas::RebuildOpacityFromBaseline()
 
   this->update();
   emit OpacityChanged();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

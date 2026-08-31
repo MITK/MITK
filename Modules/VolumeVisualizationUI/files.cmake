@@ -1,8 +1,9 @@
 set(CPP_FILES
-  mitkTransferFunctionPresets.cpp
-  mitkTransferFunctionTransform.cpp
+  QmitkVolumeLightingWidget.cpp
+  QmitkVolumeTransferFunctionEditor.cpp
 )
 
-set(RESOURCE_FILES
-  MedicalColorPresets.json
+set(UI_FILES
+  QmitkVolumeLightingWidgetControls.ui
+  QmitkVolumeTransferFunctionEditorControls.ui
 )

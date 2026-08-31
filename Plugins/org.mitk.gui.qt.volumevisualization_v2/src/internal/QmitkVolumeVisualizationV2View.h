@@ -17,19 +17,12 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 
-#include <mitkSimpleHistogram.h>
-#include <mitkTransferFunction.h>
-#include <mitkTransferFunctionPresets.h>
 #include <mitkVtkPropRenderer.h>
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
-#include <vtkSmartPointer.h>
-
 #include <memory>
-
-class vtkColorTransferFunction;
 
 namespace Ui
 {
@@ -52,24 +45,23 @@ public:
 private Q_SLOTS:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnEnabledRendering(bool state);
-  void OnTransferFunctionPresetSelected(const QString &presetName);
   void OnTechniqueChanged(int index);
-  void OnColorWindowChanged();
-  void OnResetTransferFunction();
-  void OnCanvasOpacityChanged();
+  void OnTransferFunctionChanged();
   void OnLightingChanged();
-  void OnCinematicModeChanged(int index);
-  void OnResetLighting();
-  void OnCreateUserTransferFunction();
-  void OnImportUserTransferFunction();
-  void OnCancelTfAdvancedMode();
-  void OnSaveUserTransferFunction();
 
 private:
   void CreateQtPartControl(QWidget *parent) override;
 
   void UpdateInterface();
-  void UpdateLightingControls();
+
+  /** \brief Refresh the collapsible lighting section: its header, whether it
+   *         applies at all, and the node the controls inside it act on.
+   *
+   * The controls themselves belong to QmitkVolumeLightingWidget. What stays here
+   * is the part that depends on the blend mode - which the technique combo owns -
+   * and so cannot be the widget's to decide.
+   */
+  void UpdateLightingSection();
 
   /** \brief Install the light rig on a render window part that has just become
    * available.
@@ -92,22 +84,19 @@ private:
    */
   void ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode);
 
-  void ApplyCurrentTransferFunction();
-
-  void SnapshotAppliedTransferFunction();
-  void ResetAdjustSliders();
-  void SetTfAdvancedMode(bool active);
+  /** \brief Install the rig the currently selected node asks for.
+   *
+   * The rig lives on the renderer while the model that decides it lives on the
+   * node, so the two only agree if something reconciles them. This is that
+   * something, kept apart from UpdateLightingControls so that refreshing the
+   * widgets does not silently reconfigure a renderer, and so that the paths
+   * which genuinely need a rig change - a new node, a new model, a new render
+   * window part - say so at the call site.
+   */
+  void ApplyLightingModeFromNode();
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
-  mitk::TransferFunctionPresets m_Presets;
-  mitk::SimpleHistogramCache m_HistogramCache;
-
-  mitk::TransferFunction::Pointer m_AppliedTransferFunction;
-  vtkSmartPointer<vtkColorTransferFunction> m_BaseColorFn;
-  mitk::TransferFunction::Pointer m_PreEditTransferFunction;
-  std::array<double, 2> m_EffectiveRange { 0.0, 0.0 };
-  std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };
 
 #endif

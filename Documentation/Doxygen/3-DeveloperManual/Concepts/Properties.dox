@@ -199,6 +199,24 @@ Volume Visualization view applied to this node ("headlight", "keylight"). It
 records which light rig was asked for, which the mapper properties alone cannot
 express; the mapper itself does not read it. Absent means no model was applied,
 and the renderer keeps its default rig.
+  <li> volumerendering.transferfunction.preset - Name of the built-in preset the
+Volume Visualization view built this node's TransferFunction from. Recorded
+because the view's adjust sliders resample the colour function, after which the
+curve matches no preset and the choice can no longer be recovered from it; the
+mapper does not read it. Absent means the function came from a file or from
+outside the view, and no preset is named in the view.
+  <li> volumerendering.transferfunction.opacityshift,
+volumerendering.transferfunction.opacityheight,
+volumerendering.transferfunction.colorshift,
+volumerendering.transferfunction.colorwidth - The four offsets the view's adjust
+sliders applied on top of the preset named above, which is the baseline they are
+measured from; meaningless without it, and written only as a complete set of
+four, since the neutral colour width is the preset's own span rather than zero.
+Together with the preset name they form a recipe the view re-executes when the
+node is selected again, which is what lets the sliders show their previous
+positions instead of resetting. Where the recipe and the stored TransferFunction
+disagree - the curve having been edited elsewhere - the recipe wins. The mapper
+does not read any of them.
   <li> volumerendering.normalsFromOpacity - Derive the shading gradient from the
 opacity rather than the raw scalars, so lighting follows the transfer function
 instead of the data's noise. The scattering blend reads the same gradient's

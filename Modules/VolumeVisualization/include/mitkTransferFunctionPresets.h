@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkTransferFunctionPresets_h
 #define mitkTransferFunctionPresets_h
 
-#include <MitkVolumeVisualizationUIExports.h>
+#include <MitkVolumeVisualizationExports.h>
 
 #include <mitkTransferFunction.h>
 
@@ -36,22 +36,13 @@ namespace mitk
    * functions (see SaveTransferFunction / LoadTransferFunction), so a saved
    * file is structurally identical to one MedicalColorPresets.json entry.
    */
-  class MITKVOLUMEVISUALIZATIONUI_EXPORT TransferFunctionPresets
+  class MITKVOLUMEVISUALIZATION_EXPORT TransferFunctionPresets
   {
   public:
     TransferFunctionPresets();
 
     /** \brief Names of the available presets, in file order. */
     std::vector<std::string> GetPresetNames() const;
-
-    /**
-     * \brief Intensity window the preset is authored for.
-     * \return {min, max} scalar values in the image's own intensity units
-     * (e.g. Hounsfield units for CT) over which the preset's transfer
-     * function is meaningful. Callers use it to window/scale the volume
-     * so the preset lands on the right value range.
-     */
-    std::array<double, 2> GetEffectiveRange(const std::string &presetName) const;
 
     /**
      * \brief Build a transfer function for the named preset.

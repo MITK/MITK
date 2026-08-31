@@ -76,7 +76,7 @@ namespace
         return "Diverging";
       case VTK_CTF_RGB:
         return "RGB";
-      default: 
+      default:
         return "RGB";
     }
   }
@@ -84,7 +84,7 @@ namespace
 
 mitk::TransferFunctionPresets::TransferFunctionPresets()
 {
-  // GetModuleContext() resolves to THIS module (MitkVolumeVisualizationUI),
+  // GetModuleContext() resolves to THIS module (MitkVolumeVisualization),
   // because this translation unit is compiled with its US_MODULE_NAME. That is
   // why the embedded MedicalColorPresets.json is found here.
   auto resource = us::GetModuleContext()->GetModule()->GetResource("MedicalColorPresets.json");
@@ -127,22 +127,36 @@ std::vector<mitk::TransferFunctionPresets::Preset> mitk::TransferFunctionPresets
       continue;
 
     Preset preset;
-    preset.name = entry["Name"].get<std::string>();
-    preset.colorSpace = entry.value("ColorSpace", std::string("RGB"));
-    preset.color = DecodeColor(entry["RGBPoints"]);
-    preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
 
-    // The effective Range is the itensity window a preset is designed for, i.e.
-    // the range of voxel values over wehich the transfer functin actually varies.
-    // If no effective Range is included, the fallback takes the values of the first 
-    // and last Opacity Value, so the entire range instead of a subset
-    if (entry.contains("EffectiveRange") && entry["EffectiveRange"].is_array() && entry["EffectiveRange"].size()>=2)
+    // The conversions below throw when the file has the right shape but the
+    // wrong types. Caught per entry, so one malformed entry is skipped like the
+    // colormaps above rather than discarding the whole catalog.
+    try
     {
-      preset.effectiveRange = entry["EffectiveRange"].get<std::array<double, 2>>();
+      preset.name = entry["Name"].get<std::string>();
+      preset.colorSpace = entry.value("ColorSpace", std::string("RGB"));
+      preset.color = DecodeColor(entry["RGBPoints"]);
+      preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
+
+      // The effective range is the intensity window a preset is designed for,
+      // i.e. the range of voxel values over which the transfer function
+      // actually varies. Without one, fall back to the first and last opacity
+      // point, so the whole range rather than a subset.
+      if (entry.contains("EffectiveRange") && entry["EffectiveRange"].is_array() &&
+          entry["EffectiveRange"].size() >= 2)
+      {
+        preset.effectiveRange = entry["EffectiveRange"].get<std::array<double, 2>>();
+      }
+      else if (!preset.scalarOpacity.empty())
+      {
+        preset.effectiveRange =
+          std::array<double, 2>{ preset.scalarOpacity.front().first, preset.scalarOpacity.back().first };
+      }
     }
-    else if (!preset.scalarOpacity.empty())
+    catch (const nlohmann::json::exception &e)
     {
-      preset.effectiveRange = std::array<double, 2>{ preset.scalarOpacity.front().first, preset.scalarOpacity.back().first };
+      MITK_WARN << "Skipping malformed transfer function preset entry: " << e.what();
+      continue;
     }
 
     presets.push_back(std::move(preset));
@@ -157,7 +171,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::BuildTransferFunc
 
   if (!preset.scalarOpacity.empty())
     transferFunction->SetScalarOpacityPoints(preset.scalarOpacity);
-  
+
   // A preset defines opacity only between its control points; treat values
   // outside that range as fully transparent rather than clamping to the end value.
   transferFunction->GetScalarOpacityFunction()->ClampingOff();
@@ -206,14 +220,6 @@ std::vector<std::string> mitk::TransferFunctionPresets::GetPresetNames() const
   }
 
   return names;
-}
-
-std::array<double, 2> mitk::TransferFunctionPresets::GetEffectiveRange(const std::string &presetName) const
-{
-  const auto it = std::find_if(m_Presets.begin(), m_Presets.end(), 
-    [&presetName](const Preset &preset) {return preset.name == presetName; });
-
-  return it != m_Presets.end() ? it->effectiveRange : std::array<double, 2> { 0.0, 0.0};
 }
 
 mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFunction(

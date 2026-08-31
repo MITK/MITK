@@ -14,14 +14,12 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
-#include <mitkTransferFunctionProperty.h>
-#include <mitkTransferFunctionTransform.h>
+#include <mitkVolumeRenderingLightingModel.h>
 #include <mitkVtkPropRenderer.h>
-#include <QmitkCombinedTransferFunctionCanvas.h>
+#include <QmitkVolumeLightingWidget.h>
+#include <QmitkVolumeTransferFunctionEditor.h>
 #include <QmitkRenderWindow.h>
 
-#include <vtkColorTransferFunction.h>
-#include <vtkSmartPointer.h>
 #include <vtkVolumeMapper.h>
 
 #include <mitkNodePredicateDataType.h>
@@ -35,115 +33,15 @@ found in the LICENSE file.
 
 #include <ui_QmitkVolumeVisualizationV2View.h>
 
-#include <ctkDoubleSlider.h>
-#include <ctkSliderWidget.h>
-
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QMessageBox>
 #include <QToolButton>
 
 #include <algorithm>
 #include <array>
-#include <fstream>
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
 
 namespace
 {
-  // Mirrors mitk::VolumeMapperVtkSmart3D::SetDefaultProperties, which only runs
-  // via the IOExt object factory; the view has no guarantee that it did.
-  constexpr bool DEFAULT_SHADE = true;
-  constexpr float DEFAULT_AMBIENT = 0.1f;
-  constexpr float DEFAULT_DIFFUSE = 0.50f;
-  constexpr float DEFAULT_SPECULAR = 0.40f;
-  constexpr float DEFAULT_SPECULAR_POWER = 16.0f;
-
-  /** A lighting model is one fixed point in VTK's parameter space, covering
-   * both the light rig installed on the renderer and the material and
-   * scattering properties written to the node. The two entries are not weak
-   * and strong versions of one effect: they pick which of the ray caster's two
-   * shading paths the render takes, and everything else follows from that.
-   *
-   * Headlight is the only rig for which the ray caster compiles its default
-   * lighting path, which requires exactly one switched-on light, at intensity
-   * exactly 1.0, of headlight type. That path is the one where ambient is
-   * multiplied by the sample colour. The cost is that a light at the camera
-   * illuminates precisely what the camera sees, so it casts no visible shadow
-   * and scattering would have nothing to darken - hence no scattering here.
-   *
-   * Key light gives that path up to put a light off-axis, which is what lets a
-   * shadow ray describe shape. The remaining fields are what that costs.
-   *
-   * Blend mixes Phong out and a scattering model in rather than adding
-   * occlusion on top of it: finalColor = (1 - c) * phong + c * scattering,
-   * where c cannot exceed blend. So the value reads as the largest share of
-   * the shading a shadow ray may account for. Keep it under 1.0; above that,
-   * scattering can replace Phong outright and takes the specular highlight
-   * with it.
-   *
-   * Reach bounds the shadow ray and is where essentially all the cost lives.
-   * It is steeply non-linear: the traced fraction of the volume diagonal is
-   * 1 - (1 - reach)^0.33, so 0.12 traces about 4% and 0.50 about 20%. Short is
-   * deliberate. A long ray lets one structure cast onto another, which
-   * describes the lighting rather than the patient; a short one darkens
-   * contacts and recesses, which is the depth cue worth having. What short
-   * rays cost is grain, and that cannot be bought off by sampling more finely:
-   * vtkSmartVolumeMapper locks the sample distance to the input spacing and
-   * discards any other value.
-   *
-   * Ambient is the single field the two models disagree on, and not by
-   * preference - the shader computes it differently for each. Under the
-   * headlight it carries the sample colour and works as a fill. Under any rig
-   * with more than one light it does not, so it lays a flat grey over the
-   * whole image and desaturates the render long before it rescues an occluded
-   * voxel. The key rig therefore holds it at zero and fills from its fill
-   * light instead, whose contribution does carry the sample colour and does
-   * get its own shadow ray.
-   *
-   * Diffuse rises to make up for that zero, which the key rig can afford
-   * because its key and fill together exceed a single light's intensity.
-   *
-   * Specular is written by both models rather than inherited. The shader adds
-   * it without the sample colour, so it is white light laid over the render,
-   * and a light near the camera puts its lobe across everything visible at
-   * once; high values clip bright tissue to white.
-   *
-   * Anisotropy stays at 0. VTK's Henyey-Greenstein phase function carries no
-   * 1/4pi normalisation, so it is exactly 1.0 at zero but swings either side
-   * of that with the light and view geometry - a brightness change, not a
-   * shape cue.
-   */
-  struct CinematicPreset
-  {
-    /** Stable identifier stored on the node. Kept separate from the label so
-     * that reordering the table or renaming an entry cannot change what an
-     * already-saved scene means.
-     */
-    const char *id;
-    const char *label;
-    float blend;
-    float reach;
-    float anisotropy;
-    bool normalsFromOpacity;
-    float ambient;
-    float diffuse;
-    float specular;
-    float specularPower;
-    mitk::VtkPropRenderer::LightingMode lightingMode;
-  };
-
-  using LightingMode = mitk::VtkPropRenderer::LightingMode;
-
-  constexpr std::array<CinematicPreset, 2> CINEMATIC_PRESETS { {
-    //           id            label          blend  reach  aniso  nFromOp ambient diffuse specular power  rig
-    {"headlight", "Headlight",                0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
-    {"keylight",  "Key light",                0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
-  } };
-
-  /** Key under which the chosen model is recorded on the node. */
-  constexpr const char *LIGHTING_MODEL_PROPERTY = "volumerendering.lightingmodel";
-
   /** Key the mapper reads the blend mode from, as a plain VTK enum value. */
   constexpr const char *BLEND_MODE_PROPERTY = "volumerendering.blendmode";
 
@@ -196,6 +94,37 @@ namespace
     return blendMode;
   }
 
+  /** \brief Whether the node is rendered as a volume at all.
+   *
+   * Nothing outside this view writes the property, so it doubles as the marker
+   * that someone deliberately configured this node here. "TransferFunction"
+   * cannot serve that purpose: mitk::VolumeMapperVtkSmart3D registers a default
+   * one on every image node, so its presence says nothing.
+   */
+  bool IsVolumeRenderingOn(const mitk::DataNode *node)
+  {
+    if (node == nullptr)
+      return false;
+
+    bool volumeRenderingOn = false;
+    node->GetBoolProperty("volumerendering", volumeRenderingOn);
+
+    return volumeRenderingOn;
+  }
+
+  /** \brief Whether the node's lighting and shading properties reach the ray
+   *         caster at all.
+   *
+   * Every one of them is applied inside the front-to-back compositing loop, and
+   * only the composite technique runs one. The projection techniques reduce each
+   * ray to a single value and light nothing, so lighting is inert there rather
+   * than merely subtle.
+   */
+  bool LightingApplies(const mitk::DataNode *node)
+  {
+    return IsVolumeRenderingOn(node) && BlendModeFromNode(node) == vtkVolumeMapper::COMPOSITE_BLEND;
+  }
+
   /** \return The matching entry, or nullptr for a mode this view does not
    *          offer - the property is a plain int and reachable from outside.
    */
@@ -207,42 +136,6 @@ namespace
     return it != TECHNIQUES.end() ? &*it : nullptr;
   }
 
-  const CinematicPreset &PresetFromComboIndex(int index)
-  {
-    return index > 0 && index < static_cast<int>(CINEMATIC_PRESETS.size())
-             ? CINEMATIC_PRESETS[index]
-             : CINEMATIC_PRESETS.front();
-  }
-
-  /** \brief Which lighting model a node asks for.
-   *
-   * What the combo box selects is a light rig; the material values a model
-   * writes are a starting point the user is free to move afterwards. So the
-   * choice is recorded rather than inferred from those values - inferring it
-   * would both deselect the model when a slider moves and leave two models
-   * that happen to write the same values indistinguishable.
-   *
-   * \return The entry index, or -1 when the node names no model - an older
-   *         scene, or a volume configured outside this view. Nothing is
-   *         selected then, and the default rig stays installed, rather than
-   *         claiming a model that was never applied.
-   */
-  int ComboIndexFromNode(const mitk::DataNode *node)
-  {
-    std::string modelId;
-
-    if (!node->GetStringProperty(LIGHTING_MODEL_PROPERTY, modelId))
-      return -1;
-
-    for (std::size_t i = 0; i < CINEMATIC_PRESETS.size(); ++i)
-    {
-      if (modelId == CINEMATIC_PRESETS[i].id)
-        return static_cast<int>(i);
-    }
-
-    return -1;
-  }
-
   /** The arrow is the only cue that a section folds away, so it is drawn by
    * the style from arrowType rather than taken from a pixmap: the toolbar
    * extension chevron the collapsible widgets reach for is deliberately tight
@@ -252,22 +145,6 @@ namespace
   {
     header->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
     panel->setVisible(expanded);
-  }
-
-  void ConfigureSlider(ctkSliderWidget *slider, int decimals, double minimum, double maximum, double step)
-  {
-    slider->setDecimals(decimals);
-    slider->setRange(minimum, maximum);
-    slider->setSingleStep(step);
-  }
-
-  void LoadSliderFromNode(const mitk::DataNode *node, const char *propertyKey, float fallback, ctkSliderWidget *slider)
-  {
-    float value = fallback;
-    node->GetFloatProperty(propertyKey, value);
-
-    const QSignalBlocker blocker(slider);
-    slider->setValue(value);
   }
 
   /** mitk::VolumeMapperVtkSmart3D branches on this property before it reads
@@ -284,7 +161,7 @@ namespace
   }
 }
 
-QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View() 
+QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View()
 {
   m_Controls = std::make_unique<Ui::QmitkVolumeVisualizationV2View>();
 }
@@ -293,7 +170,7 @@ QmitkVolumeVisualizationV2View::~QmitkVolumeVisualizationV2View()
 {
 }
 
-void QmitkVolumeVisualizationV2View::SetFocus() 
+void QmitkVolumeVisualizationV2View::SetFocus()
 {
 }
 
@@ -309,35 +186,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
 
-  m_Controls->tfControlPanelsWidget->ShowGradientOpacityFunction(false);
-
-  for (const auto &name : m_Presets.GetPresetNames())
-  {
-    m_Controls->presetComboBox->addItem(QString::fromStdString(name));
-  }
-
-  //select the applied preset, or -1 for "none":
-  m_Controls->presetComboBox->setCurrentIndex(-1);
-  m_Controls->presetComboBox->setEnabled(false);
   m_Controls->enableRenderingCB->setEnabled(false);
-
-  m_Controls->createTfButton->setEnabled(false);
-  m_Controls->loadTfButton->setEnabled(false);
-
-  m_Controls->opacityShiftSlider->setOrientation(Qt::Horizontal);
-  m_Controls->opacityHeightSlider->setOrientation(Qt::Horizontal);
-  m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
-  m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
-
-  ConfigureSlider(m_Controls->ambientSlider, 2, 0.0, 1.0, 0.01);
-  ConfigureSlider(m_Controls->diffuseSlider, 2, 0.0, 1.0, 0.01);
-  ConfigureSlider(m_Controls->specularSlider, 2, 0.0, 1.0, 0.01);
-  ConfigureSlider(m_Controls->specularPowerSlider, 1, 1.0, 128.0, 1.0);
-
-  for (const auto& preset : CINEMATIC_PRESETS)
-  {
-    m_Controls->cinematicModeComboBox->addItem(QString(preset.label));
-  }
 
   for (const auto &technique : TECHNIQUES)
   {
@@ -350,64 +199,45 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   // a volume while the other four project it flat. The separator is what says so.
   m_Controls->techniqueComboBox->insertSeparator(1);
 
-  m_Controls->lightingPanel->setVisible(false);
+  m_Controls->lightingWidget->setVisible(false);
 
   m_Controls->advancedPanel->setVisible(false);
 
-  m_Controls->advancedTfPanel->setVisible(false);
-
   m_Controls->binaryHintLabel->setText(
-    tr("Binary image: its appearance is set by the node colour, not by a transfer function."));
+    "Binary image: its appearance is set by the node colour, not by a transfer function.");
   m_Controls->binaryHintLabel->setVisible(false);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
-    
+
   connect(m_Controls->enableRenderingCB, &QCheckBox::toggled,
     this, &QmitkVolumeVisualizationV2View::OnEnabledRendering);
-  
-  connect(m_Controls->presetComboBox, &QComboBox::textActivated,
-    this, &QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected);
 
-  // Transfer Function Adjustments
-  connect(m_Controls->adjustPresetExpandButton, &QToolButton::toggled, this,
-    [this](bool expanded)
+  // The editor writes the node itself, including switching rendering on when a
+  // function is loaded, so the view has to re-read rather than only re-render.
+  connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::TransferFunctionChanged,
+    this, &QmitkVolumeVisualizationV2View::OnTransferFunctionChanged);
+
+  // Authoring a curve by hand wants the room, and lighting is a rendering
+  // control rather than part of authoring one.
+  connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::CustomModeChanged, this,
+    [this](bool active)
     {
-      SetSectionExpanded(m_Controls->adjustPresetExpandButton, m_Controls->adjustPresetPanel, expanded);
+      if (active)
+        m_Controls->lightingExpandButton->setChecked(false);
     });
-  connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
-    this, &QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged);
-  connect(m_Controls->opacityShiftSlider, &ctkDoubleSlider::valueChanged,
-    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetOpacityShift);
-  connect(m_Controls->opacityHeightSlider, &ctkDoubleSlider::valueChanged,
-    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetOpacityHeight);
-  connect(m_Controls->colorShiftSlider, &ctkDoubleSlider::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnColorWindowChanged);
-  connect(m_Controls->colorWidthSlider, &ctkDoubleSlider::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnColorWindowChanged);
-  connect(m_Controls->resetTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnResetTransferFunction);
 
   // Lighting Option Controls
   connect(m_Controls->lightingExpandButton, &QToolButton::toggled, this,
     [this](bool expanded)
     {
-      SetSectionExpanded(m_Controls->lightingExpandButton, m_Controls->lightingPanel, expanded);
+      SetSectionExpanded(m_Controls->lightingExpandButton, m_Controls->lightingWidget, expanded);
     });
-  connect(m_Controls->shadeCheckBox, &QCheckBox::toggled,
+
+  // The widget writes the node itself; what it cannot do is reach a renderer, so
+  // re-deriving the light rig is what the view contributes here.
+  connect(m_Controls->lightingWidget, &QmitkVolumeLightingWidget::LightingChanged,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-  connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-  connect(m_Controls->diffuseSlider, &ctkSliderWidget::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-  connect(m_Controls->specularSlider, &ctkSliderWidget::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-  connect(m_Controls->specularPowerSlider, &ctkSliderWidget::valueChanged,
-    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-  connect(m_Controls->cinematicModeComboBox, &QComboBox::currentIndexChanged,
-    this, &QmitkVolumeVisualizationV2View::OnCinematicModeChanged);
-  connect(m_Controls->resetLightingButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnResetLighting);
 
   // Advanced Rendering Controls
   connect(m_Controls->advancedExpandButton, &QToolButton::toggled, this,
@@ -418,41 +248,21 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->techniqueComboBox, &QComboBox::currentIndexChanged,
     this, &QmitkVolumeVisualizationV2View::OnTechniqueChanged);
 
-  // Transfer Function User Creation Mode
-  connect(m_Controls->createTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction);
-  connect(m_Controls->loadTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnImportUserTransferFunction);
-  connect(m_Controls->cancelTfCreationButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnCancelTfAdvancedMode);
-  connect(m_Controls->saveUserTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnSaveUserTransferFunction);
-
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
 
 void QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  // Authoring targets the node that was current when it started, and the
-  // pre-edit snapshot is the only way back to that node's previous appearance.
-  // This has to happen before the function is dropped below, or the snapshot
-  // goes with it and the edits are stranded on a node the editor no longer
-  // points at.
-  this->OnCancelTfAdvancedMode();
-
   m_SelectedNode = nullptr;
-  m_AppliedTransferFunction = nullptr;
 
-  if (nodes.empty() || nodes.front().IsNull())
-  {
-    this->UpdateInterface();
-    return;
-  }
+  if (!nodes.empty() && nodes.front().IsNotNull() && nodes.front()->GetDataAs<mitk::Image>() != nullptr)
+    m_SelectedNode = nodes.front();
 
-  auto selectedNode = nodes.front();
-  
-  if (selectedNode->GetDataAs<mitk::Image>() != nullptr)
-    m_SelectedNode = selectedNode;
+  // Only here, and deliberately not from UpdateInterface: binding is where the
+  // editor decides whether the node's existing function is one to adopt, and
+  // re-deciding that right after rendering is switched on would take over the
+  // mapper's registered default instead of leaving room for a preset.
+  m_Controls->transferFunctionEditor->SetDataNode(m_SelectedNode.Lock().GetPointer());
 
   this->UpdateInterface();
 }
@@ -466,38 +276,23 @@ void QmitkVolumeVisualizationV2View::OnEnabledRendering(bool state)
 
   selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
 
-  if (state && m_AppliedTransferFunction.IsNull() && m_Controls->presetComboBox->count() > 0)
+  if (state)
   {
-    m_Controls->presetComboBox->setCurrentIndex(0);
-    this->OnTransferFunctionPresetSelected(m_Controls->presetComboBox->itemText(0));
+    // The mapper's registered defaults predate this view: its transfer function
+    // is one no preset names, and its material values describe no lighting
+    // model. Both are taken over the moment rendering is switched on, rather
+    // than by changing what the mapper registers for every plugin. Each is a
+    // no-op if the node already carries a choice made here.
+    m_Controls->transferFunctionEditor->EnsureTransferFunction();
 
-    // The mapper's registered defaults predate the lighting work and describe no
-    // model this view offers, so the combo would name a preset whose values were
-    // never written. Take the lighting over at the same point as the transfer
-    // function rather than changing what the mapper registers for every plugin.
-    this->OnCinematicModeChanged(0);
+    const auto &models = mitk::VolumeRenderingLightingModel::GetAllModels();
+
+    if (!models.empty() && mitk::VolumeRenderingLightingModel::FromNode(selectedNode) == nullptr)
+      models.front().ApplyTo(selectedNode);
   }
 
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
-}
-
-void QmitkVolumeVisualizationV2View::OnTransferFunctionPresetSelected(const QString &presetName)
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  if (selectedNode.IsNull())
-    return;
-
-  auto preset = m_Presets.CreateTransferFunction(presetName.toStdString());
-
-  if (preset.IsNull())
-    return;
-
-  m_AppliedTransferFunction = preset;
-  m_EffectiveRange = m_Presets.GetEffectiveRange(presetName.toStdString());
-
-  this->ApplyCurrentTransferFunction();
 }
 
 void QmitkVolumeVisualizationV2View::OnTechniqueChanged(int index)
@@ -517,183 +312,6 @@ void QmitkVolumeVisualizationV2View::OnTechniqueChanged(int index)
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkVolumeVisualizationV2View::ApplyCurrentTransferFunction()
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  if (selectedNode.IsNull() || m_AppliedTransferFunction.IsNull())
-    return;
-
-  // Preserve property identity: reuse the existing property, create it only once.
-  auto *tfProperty = dynamic_cast<mitk::TransferFunctionProperty *>(selectedNode->GetProperty("TransferFunction"));
-
-  if(tfProperty != nullptr)
-  {
-    tfProperty->SetValue(m_AppliedTransferFunction);
-  } 
-  else
-  {
-    selectedNode->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(m_AppliedTransferFunction));
-  }
-
-  //m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
-
-  auto *image = selectedNode->GetDataAs<mitk::Image>();
-  mitk::SimpleHistogram *histogram = (image != nullptr) ? m_HistogramCache[image] : nullptr;
-
-  m_Controls->combinedTfCanvas->SetHistogram(histogram);
-  m_Controls->combinedTfCanvas->SetColorTransferFunction(m_AppliedTransferFunction->GetColorTransferFunction());
-  m_Controls->combinedTfCanvas->SetPiecewiseFunction(m_AppliedTransferFunction->GetScalarOpacityFunction());
-
-  if (histogram != nullptr)
-  {
-    // Use the image scalar range as the visible x-axis so histogram, gradient
-    // and curve line up. (SetPiecewiseFunction defaulted these to the function's
-    // own range, so this must come after it.)
-    m_DataRange = { histogram->GetMin(), histogram->GetMax() };
-    m_Controls->combinedTfCanvas->SetMin(histogram->GetMin());
-    m_Controls->combinedTfCanvas->SetMax(histogram->GetMax());
-  }
-
-  m_Controls->combinedTfCanvas->SnapshotOpacityBaseline();
-
-  this->SnapshotAppliedTransferFunction();
-  this->ResetAdjustSliders();
-  this->UpdateInterface();
-  this->RequestRenderWindowUpdate();
-}
-
-void QmitkVolumeVisualizationV2View::SnapshotAppliedTransferFunction()
-{
-  if (m_AppliedTransferFunction.IsNull())
-  {
-    m_BaseColorFn = nullptr;
-    return;
-  }
-
-  // Keep the untouched copy of the color function to resample from:
-  // DeepCopy preserves the color space (HSV) and clamping, so windowing
-  // stays faithful to the preset. Sampling bare RGB points instead would
-  // interpolate in the wrong color space and shift the colors on the
-  // first slider move.
-  m_BaseColorFn = vtkSmartPointer<vtkColorTransferFunction>::New();
-  m_BaseColorFn->DeepCopy(m_AppliedTransferFunction->GetColorTransferFunction());
-}
-
-void QmitkVolumeVisualizationV2View::ResetAdjustSliders()
-{
-  const QSignalBlocker blockOpacityShift(m_Controls->opacityShiftSlider);
-  const QSignalBlocker blockOpacityWidth(m_Controls->opacityHeightSlider);
-  const QSignalBlocker blockShift(m_Controls->colorShiftSlider);
-  const QSignalBlocker blockWidth(m_Controls->colorWidthSlider);
-
-  // Scale the sliders to the image's own value range -- the same axis the canvas
-  // draws -- so the window can be moved and sized across everything you see.
-  const double dataWidth = std::max(1.0, m_DataRange[1] - m_DataRange[0]);
-
-  double colorSpan = dataWidth;
-  if (m_BaseColorFn != nullptr && m_BaseColorFn->GetSize() > 0)
-  {
-    const double *colorRange = m_BaseColorFn->GetRange();
-    colorSpan = std::max(1.0, colorRange[1] - colorRange[0]);
-  }
-
-  // Slide the curve along the intensity range, reaches half the data span either side
-  m_Controls->opacityShiftSlider->setMinimum(-0.5 * dataWidth);
-  m_Controls->opacityShiftSlider->setMaximum(0.5 * dataWidth);
-  m_Controls->opacityShiftSlider->setSingleStep(dataWidth / 1000.0);
-  m_Controls->opacityShiftSlider->setValue(0.0);
-
-  // Signed offset in [-1, 1]; small range needs a fine step (default is 1.0).
-  m_Controls->opacityHeightSlider->setMinimum(-1.0);
-  m_Controls->opacityHeightSlider->setMaximum(1.0);
-  m_Controls->opacityHeightSlider->setSingleStep(0.01);
-  m_Controls->opacityHeightSlider->setValue(0.0);
-
-  // Shift moves the window center (level); 0 keeps the preset's own center.
-  // Sized to the preset's color span, so shift reaches half the preset span either side.
-  m_Controls->colorShiftSlider->setMinimum(-0.5 * colorSpan);
-  m_Controls->colorShiftSlider->setMaximum(0.5 * colorSpan);
-  m_Controls->colorShiftSlider->setValue(0.0);
-
-  // Width is the window size in intensity units; default to the preset's color
-  // span so a fresh preset maps 1:1, and allow narrowing/widening around it.
-  m_Controls->colorWidthSlider->setMinimum(1.0);
-  m_Controls->colorWidthSlider->setMaximum(2.0 * colorSpan);
-  m_Controls->colorWidthSlider->setValue(colorSpan);
-}
-
-void QmitkVolumeVisualizationV2View::OnColorWindowChanged()
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  if (m_AppliedTransferFunction.IsNull() || selectedNode.IsNull() || m_BaseColorFn == nullptr)
-    return;
-
-  if (m_DataRange[1] <= m_DataRange[0]) // no valid histogram range to span
-    return;
-
-  m_AppliedTransferFunction->SetRGBPoints(
-    mitk::ResampleColorWindow(m_BaseColorFn, m_DataRange[0], m_DataRange[1], m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value()));
-
-  m_AppliedTransferFunction->Modified();
-  this->RequestRenderWindowUpdate();
-  //m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
-  m_Controls->combinedTfCanvas->update();
-}
-
-void QmitkVolumeVisualizationV2View::OnLightingChanged()
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  if (selectedNode.IsNull())
-    return;
-
-  selectedNode->SetBoolProperty("volumerendering.shade", m_Controls->shadeCheckBox->isChecked());
-  selectedNode->SetFloatProperty("volumerendering.ambient", static_cast<float>(m_Controls->ambientSlider->value()));
-  selectedNode->SetFloatProperty("volumerendering.diffuse", static_cast<float>(m_Controls->diffuseSlider->value()));
-  selectedNode->SetFloatProperty("volumerendering.specular", static_cast<float>(m_Controls->specularSlider->value()));
-  selectedNode->SetFloatProperty("volumerendering.specular.power", static_cast<float>(m_Controls->specularPowerSlider->value()));
-
-  this->UpdateLightingControls();
-  this->RequestRenderWindowUpdate();
-}
-
-void QmitkVolumeVisualizationV2View::OnCinematicModeChanged(int index)
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  // UpdateLightingControls reports -1 for a configuration no model describes,
-  // but does so behind a QSignalBlocker, so a signal always names a real entry.
-  if (selectedNode.IsNull() || index < 0)
-    return;
-
-  const auto &preset = PresetFromComboIndex(index);
-
-  // VTK ignores both scattering parameters unless shading is on.
-  if (preset.blend > 0.0f)
-    selectedNode->SetBoolProperty("volumerendering.shade", true);
-
-  selectedNode->SetFloatProperty("volumerendering.scattering.blend", preset.blend);
-  selectedNode->SetFloatProperty("volumerendering.scattering.reach", preset.reach);
-  selectedNode->SetFloatProperty("volumerendering.scattering.anisotropy", preset.anisotropy);
-  selectedNode->SetBoolProperty("volumerendering.normalsFromOpacity", preset.normalsFromOpacity);
-  selectedNode->SetFloatProperty("volumerendering.ambient", preset.ambient);
-  selectedNode->SetFloatProperty("volumerendering.diffuse", preset.diffuse);
-  selectedNode->SetFloatProperty("volumerendering.specular", preset.specular);
-  selectedNode->SetFloatProperty("volumerendering.specular.power", preset.specularPower);
-
-  // The rig is what this combo selects, so record it rather than leaving it to
-  // be inferred from the material values written above, which the user may
-  // move afterwards without leaving the model.
-  selectedNode->SetStringProperty(LIGHTING_MODEL_PROPERTY, preset.id);
-
-  // The rig is not applied here: UpdateLightingControls derives it from the
-  // properties just written, so it stays the single place that installs one.
-  this->UpdateLightingControls();
-  this->RequestRenderWindowUpdate();
-}
-
 void QmitkVolumeVisualizationV2View::ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode)
 {
   auto *renderWindowPart = this->GetRenderWindowPart();
@@ -710,31 +328,34 @@ void QmitkVolumeVisualizationV2View::ApplyLightingMode(mitk::VtkPropRenderer::Li
     renderer->SetLightingMode(mode);
 }
 
-void QmitkVolumeVisualizationV2View::OnResetLighting()
+void QmitkVolumeVisualizationV2View::ApplyLightingModeFromNode()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
-  if (selectedNode.IsNull())
-    return;
+  // Null for a node that names no model - an older scene, or a volume configured
+  // outside this view.
+  const auto *model = LightingApplies(selectedNode.GetPointer())
+                        ? mitk::VolumeRenderingLightingModel::FromNode(selectedNode.GetPointer())
+                        : nullptr;
 
-  selectedNode->SetBoolProperty("volumerendering.shade", DEFAULT_SHADE);
-
-  // Reset means the baseline this view offers, which is the Off model - not the
-  // mapper's registered defaults, which describe no model in the combo. Sharing
-  // the write keeps the two from drifting apart.
-  this->OnCinematicModeChanged(0);
+  // Nothing lit needs no directional rig, and neither does a configuration no
+  // model describes - guessing which directional rig was meant would be worse
+  // than the even one. Leaving a directional rig installed would also still
+  // relight every surface sharing the window, for no volume benefit.
+  this->ApplyLightingMode(model != nullptr
+    ? model->lightingMode
+    : mitk::VtkPropRenderer::LightingMode::Studio);
 }
 
 void QmitkVolumeVisualizationV2View::RenderWindowPartActivated(mitk::IRenderWindowPart *)
 {
-  // The incoming part brings a renderer in its default rig, while the node - and
-  // so this view's combo box - still asks for whichever model was last chosen.
-  // Re-deriving the rig from the node is what stops the two disagreeing, and it
-  // matters beyond the lights: the mapper keeps applying the node's scattering
-  // every render pass, so a cinematic node left on the default five-light rig
-  // renders the muddy, five-times-more-expensive combination the models exist
-  // to avoid.
-  this->UpdateLightingControls();
+  // The incoming part brings a renderer in its default rig, while the node still
+  // asks for whichever model was last chosen. It matters beyond the lights: the
+  // mapper keeps applying the node's scattering every render pass, so a
+  // cinematic node left on the default five-light rig renders the muddy,
+  // five-times-more-expensive combination the models exist to avoid. The widgets
+  // need nothing here - the node did not change.
+  this->ApplyLightingModeFromNode();
 }
 
 void QmitkVolumeVisualizationV2View::RenderWindowPartDeactivated(mitk::IRenderWindowPart *)
@@ -744,19 +365,31 @@ void QmitkVolumeVisualizationV2View::RenderWindowPartDeactivated(mitk::IRenderWi
   // replaced by a part configured in RenderWindowPartActivated.
 }
 
-void QmitkVolumeVisualizationV2View::UpdateLightingControls()
+void QmitkVolumeVisualizationV2View::OnTransferFunctionChanged()
+{
+  // A full refresh rather than a repaint: loading a function switches volume
+  // rendering on, so the checkbox and everything gated on it have to catch up.
+  this->UpdateInterface();
+  this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationV2View::OnLightingChanged()
+{
+  // The widget has already written to the node, so the rig it now asks for can
+  // simply be re-derived from there.
+  this->ApplyLightingModeFromNode();
+  this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationV2View::UpdateLightingSection()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
-  bool volumeRenderingOn = false;
+  const bool volumeRenderingOn = IsVolumeRenderingOn(selectedNode.GetPointer());
 
-  if (selectedNode.IsNotNull())
-    selectedNode->GetBoolProperty("volumerendering", volumeRenderingOn);
-
-  // Every parameter in this section reaches the ray caster through the
-  // front-to-back compositing loop, and only the composite technique runs one.
-  // The projection techniques reduce each ray to a single value and light
-  // nothing, so the section is inert there rather than merely subtle.
+  // Narrower than !LightingApplies: specifically "rendering, but the technique
+  // lights nothing", which is the only case the header can explain and offer a
+  // way out of. With nothing selected both are false, and the header stays plain.
   const bool gatedByTechnique =
     volumeRenderingOn && BlendModeFromNode(selectedNode.GetPointer()) != vtkVolumeMapper::COMPOSITE_BLEND;
 
@@ -764,208 +397,30 @@ void QmitkVolumeVisualizationV2View::UpdateLightingControls()
   // whose precondition is written on it teaches the constraint, while a mute
   // one just looks broken.
   m_Controls->lightingExpandButton->setText(
-    gatedByTechnique ? tr("Lighting / shading - Composite only") : tr("Lighting / shading"));
+    gatedByTechnique ? "Lighting / shading - Composite only" : "Lighting / shading");
   m_Controls->lightingExpandButton->setToolTip(gatedByTechnique
-    ? tr("The projection techniques flatten each ray to one value and light nothing. Set Technique back to"
-         " Composite under Advanced to shade the volume.")
+    ? QString("The projection techniques flatten each ray to one value and light nothing. Set Technique back to"
+              " Composite under Advanced to shade the volume.")
     : QString());
 
-  const bool lightingApplies = volumeRenderingOn && !gatedByTechnique;
+  const bool lightingApplies = LightingApplies(selectedNode.GetPointer());
 
   m_Controls->lightingExpandButton->setEnabled(lightingApplies);
-  m_Controls->lightingPanel->setEnabled(lightingApplies);
+  m_Controls->lightingWidget->setEnabled(lightingApplies);
 
-  if (!lightingApplies)
-  {
-    // Either nothing is being rendered volumetrically or nothing is being lit,
-    // so nothing needs the directional rig - and leaving one installed would
-    // still relight every surface sharing the window, for no volume benefit.
-    this->ApplyLightingMode(mitk::VtkPropRenderer::LightingMode::Studio);
-    return;
-  }
-
-  bool shade = DEFAULT_SHADE;
-  selectedNode->GetBoolProperty("volumerendering.shade", shade);
-
-  // Phong parameters; with shading off they do nothing.
-  m_Controls->ambientSlider->setEnabled(shade);
-  m_Controls->diffuseSlider->setEnabled(shade);
-  m_Controls->specularSlider->setEnabled(shade);
-  m_Controls->specularPowerSlider->setEnabled(shade);
-  m_Controls->cinematicModeComboBox->setEnabled(shade);
-
-  const QSignalBlocker blockShade(m_Controls->shadeCheckBox);
-  m_Controls->shadeCheckBox->setChecked(shade);
-
-  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.ambient", DEFAULT_AMBIENT, m_Controls->ambientSlider);
-  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.diffuse", DEFAULT_DIFFUSE, m_Controls->diffuseSlider);
-  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.specular", DEFAULT_SPECULAR, m_Controls->specularSlider);
-  LoadSliderFromNode(selectedNode.GetPointer(), "volumerendering.specular.power", DEFAULT_SPECULAR_POWER, m_Controls->specularPowerSlider);
-
-  // Derive the mode from the node rather than storing it, so the node stays the
-  // single source of truth.
-  const int cinematicIndex = ComboIndexFromNode(selectedNode.GetPointer());
-
-  const QSignalBlocker blockCinematic(m_Controls->cinematicModeComboBox);
-  m_Controls->cinematicModeComboBox->setCurrentIndex(cinematicIndex);
-
-  // The light rig follows the node as well, so selecting a different volume or
-  // reloading a scene lands on the rig the stored properties need. A -1 index
-  // is scattering at values no model describes; leave the even rig in place
-  // rather than guess which directional one was meant.
-  this->ApplyLightingMode(cinematicIndex >= 0
-    ? PresetFromComboIndex(cinematicIndex).lightingMode
-    : mitk::VtkPropRenderer::LightingMode::Studio);
-}
-
-void QmitkVolumeVisualizationV2View::SetTfAdvancedMode(bool active)
-{
-  // Controls for the Transfer Function Creation Mode
-  m_Controls->advancedTfPanel->setVisible(active);
-
-  // Preset selection and the sliders that adjust it both live in this box, and
-  // authoring supersedes both. Hiding the box takes the collapsible section
-  // with it, so its expanded/collapsed state is left untouched and survives a
-  // trip through advanced mode.
-  m_Controls->transferFunctionGroupBox->setVisible(!active);
-
-  // Lighting is a rendering control rather than part of authoring a function,
-  // so it starts out of the way and below the editor.
-  if (active)
-    m_Controls->lightingExpandButton->setChecked(false);
-}
-
-void QmitkVolumeVisualizationV2View::OnCreateUserTransferFunction()
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  if (selectedNode.IsNotNull() && m_AppliedTransferFunction.IsNotNull() && m_BaseColorFn != nullptr)
-  {
-    // Snapshot of the "normal-mode" preset function so Cancel can restore it verbatim
-    // Relevant if preset was adjusted using the sliders
-    m_PreEditTransferFunction = m_AppliedTransferFunction->Clone();
-
-    // Preset selection bakes the color window into 256 evenly spaced RGB point
-    // which would swamp the per-point color editor in the advanced mode.
-    // Currently does not reflect slider adjusted colors when entering advanced mode
-    m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
-    m_AppliedTransferFunction->Modified();
-
-    m_Controls->tfControlPanelsWidget->SetDataNode(selectedNode);
-    this->RequestRenderWindowUpdate();
-  }
-
-  this->SetTfAdvancedMode(true);
-}
-
-void QmitkVolumeVisualizationV2View::OnImportUserTransferFunction()
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  if (selectedNode.IsNull())
-    return;
-
-  auto fileName = QFileDialog::getOpenFileName(nullptr, "Load transfer function", QString(), "Transfer function (*.json)");
-
-  if (fileName.isEmpty())
-    return;
-
-  std::ifstream stream(fileName.toStdString());
-
-  if (!stream.is_open())
-  {
-    QMessageBox::warning(nullptr, "Load transfer function", "Could not open the file.");
-    return;
-  }
-
-  auto transferFunction = mitk::TransferFunctionPresets::LoadTransferFunction(stream);
-
-  if (transferFunction.IsNull())
-  {
-    QMessageBox::warning(nullptr, "Load transfer function", "The file does not contain a valid transfer function.");
-    return;
-  }
-
-  // Enable rendering so the loaded function is visible immediately.
-  selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
-
-  m_AppliedTransferFunction = transferFunction;
-
-  auto &scalarPoints = transferFunction->GetScalarOpacityPoints();
-  m_EffectiveRange = scalarPoints.empty()
-    ? std::array<double, 2>{ 0.0, 0.0 }
-    : std::array<double, 2>{ scalarPoints.front().first, scalarPoints.back().first };
-
-  // A loaded custom function is not one of the named presets.
-  m_Controls->presetComboBox->setCurrentIndex(-1);
-
-  this->ApplyCurrentTransferFunction();
-}
-
-void QmitkVolumeVisualizationV2View::OnCancelTfAdvancedMode()
-{
-  if (m_AppliedTransferFunction.IsNotNull() && m_PreEditTransferFunction.IsNotNull())
-  {
-    // Discard the advanced edits: copy the pre-create functions back into the
-    // live ones in place, so the canvas / node pointers stay valid and
-    // the opacity baseline (unchanged) still matches the restored curve
-    m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_PreEditTransferFunction->GetColorTransferFunction());
-    m_AppliedTransferFunction->GetScalarOpacityFunction()->DeepCopy(m_PreEditTransferFunction->GetScalarOpacityFunction());
-    m_AppliedTransferFunction->GetGradientOpacityFunction()->DeepCopy(m_PreEditTransferFunction->GetGradientOpacityFunction());
-    m_AppliedTransferFunction->Modified();
-    m_PreEditTransferFunction = nullptr;
-
-    m_Controls->combinedTfCanvas->update();
-    this->RequestRenderWindowUpdate();
-  }
-
-  this->SetTfAdvancedMode(false);
-}
-
-void QmitkVolumeVisualizationV2View::OnSaveUserTransferFunction()
-{
-  if (m_AppliedTransferFunction.IsNull())
-    return;
-
-  auto fileName = QFileDialog::getSaveFileName(nullptr, "Save transfer function", QString(), "Transfer function (*.json)");
-
-  if (fileName.isEmpty())
-    return;
-
-  if (!fileName.endsWith(".json", Qt::CaseInsensitive))
-    fileName += ".json";
-
-  std::ofstream stream(fileName.toStdString());
-  const auto name = QFileInfo(fileName).completeBaseName().toStdString();
-
-  if (!stream.is_open() ||
-      !mitk::TransferFunctionPresets::SaveTransferFunction(stream, name, m_AppliedTransferFunction.GetPointer()))
-  {
-    QMessageBox::warning(nullptr, "Save transfer function", "Could not save the transfer function.");
-  }
-}
-
-void QmitkVolumeVisualizationV2View::OnResetTransferFunction()
-{
-  // Reload the current preset: restores both the color map and the opacity curve
-  // to the authored defaults and re-seeds the canvas + sliders.
-  this->OnTransferFunctionPresetSelected(m_Controls->presetComboBox->currentText());
-}
-
-void QmitkVolumeVisualizationV2View::OnCanvasOpacityChanged()
-{
-  if (m_AppliedTransferFunction.IsNotNull())
-    m_AppliedTransferFunction->Modified();
-
-  // Keep the Advanced per-point editor in sync with the canvas edit.
-  //m_Controls->tfControlPanelsWidget->OnUpdateCanvas();
+  // Rebinding rather than a separate refresh call: SetDataNode re-reads, so one
+  // entry point cannot fall out of step with a changed selection.
+  m_Controls->lightingWidget->SetDataNode(selectedNode.GetPointer());
 }
 
 void QmitkVolumeVisualizationV2View::UpdateInterface()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
-  this->UpdateLightingControls();
+  // The rig is 3D-render-window state rather than widget state, but it follows
+  // the node exactly as the widgets do, so both belong to a full refresh.
+  this->UpdateLightingSection();
+  this->ApplyLightingModeFromNode();
 
   if(selectedNode.IsNull())
   {
@@ -973,12 +428,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
     m_Controls->techniqueHintLabel->setVisible(false);
     m_Controls->enableRenderingCB->setChecked(false);
     m_Controls->enableRenderingCB->setEnabled(false);
-    m_Controls->presetComboBox->setEnabled(false);
-    m_Controls->createTfButton->setEnabled(false);
-    m_Controls->loadTfButton->setEnabled(false);
-    m_Controls->adjustPresetExpandButton->setEnabled(false);
-    m_Controls->adjustPresetPanel->setEnabled(false);
-    m_Controls->combinedTfCanvas->setEnabled(false);
+    m_Controls->transferFunctionEditor->setEnabled(false);
     m_Controls->advancedExpandButton->setEnabled(false);
     m_Controls->advancedPanel->setEnabled(false);
     return;
@@ -987,22 +437,15 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   const bool isBinary = IsBinaryImage(selectedNode.GetPointer());
 
   m_Controls->binaryHintLabel->setVisible(isBinary);
-  m_Controls->transferFunctionGroupBox->setEnabled(!isBinary);
 
-  bool volumeRenderingOn = false;
-  selectedNode->GetBoolProperty("volumerendering", volumeRenderingOn);
+  const bool volumeRenderingOn = IsVolumeRenderingOn(selectedNode.GetPointer());
 
   m_Controls->enableRenderingCB->setEnabled(true);
-  m_Controls->presetComboBox->setEnabled(volumeRenderingOn);
-  m_Controls->createTfButton->setEnabled(volumeRenderingOn);
-  m_Controls->loadTfButton->setEnabled(volumeRenderingOn);
 
-  // Disabling the section rather than its individual controls is what greys the
-  // header and the row labels too, so an inactive section reads as inactive.
-  const bool tfAdjustable = volumeRenderingOn && m_AppliedTransferFunction.IsNotNull();
-  m_Controls->adjustPresetExpandButton->setEnabled(tfAdjustable);
-  m_Controls->adjustPresetPanel->setEnabled(tfAdjustable);
-  m_Controls->combinedTfCanvas->setEnabled(tfAdjustable);
+  // Disabling the whole editor rather than its individual controls is what greys
+  // its headers and row labels too, so an inactive section reads as inactive.
+  // Which of its own controls apply within that is the editor's own business.
+  m_Controls->transferFunctionEditor->setEnabled(volumeRenderingOn && !isBinary);
 
   m_Controls->advancedExpandButton->setEnabled(volumeRenderingOn);
   m_Controls->advancedPanel->setEnabled(volumeRenderingOn);
@@ -1025,9 +468,9 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   {
     const auto *technique = TechniqueFromBlendMode(blendMode);
 
-    m_Controls->techniqueHintLabel->setText(tr("Technique: %1")
+    m_Controls->techniqueHintLabel->setText(QString("Technique: %1")
       .arg(technique != nullptr ? QString(technique->label)
-                                : tr("blend mode %1, not offered here").arg(blendMode)));
+                                : QString("blend mode %1, not offered here").arg(blendMode)));
   }
 
   const QSignalBlocker blocker(m_Controls->enableRenderingCB);

@@ -30,7 +30,7 @@ namespace mitk
     const double origSpan = std::max(1e-6, sourceRange[1] - sourceRange[0]);
 
     // Center the window on the source's own range; shift moves the center
-    // (level), width sizes it 
+    // (level), width sizes it
     const double level = 0.5 * (sourceRange[0] + sourceRange[1]) + shift;
     const double windowMin = level - 0.5 * width;
     const double windowSpan = std::max(1e-6, width); // guards width -> 0

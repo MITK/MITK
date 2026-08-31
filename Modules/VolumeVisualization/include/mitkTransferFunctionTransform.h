@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkTransferFunctionTransform_h
 #define mitkTransferFunctionTransform_h
 
-#include <MitkVolumeVisualizationUIExports.h>
+#include <MitkVolumeVisualizationExports.h>
 
 #include <mitkTransferFunction.h>
 
@@ -28,7 +28,7 @@ namespace mitk
    * the window maps it back to, so shift 0 with width == the source range
    * reproduces \p source.
    */
-  MITKVOLUMEVISUALIZATIONUI_EXPORT TransferFunction::RGBControlPoints ResampleColorWindow(
+  MITKVOLUMEVISUALIZATION_EXPORT TransferFunction::RGBControlPoints ResampleColorWindow(
     vtkColorTransferFunction *source,
     double dataMin,
     double dataMax,

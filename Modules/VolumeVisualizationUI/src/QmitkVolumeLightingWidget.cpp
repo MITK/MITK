@@ -93,12 +93,14 @@ void QmitkVolumeLightingWidget::UpdateControls()
 
   const auto material = mitk::VolumeRenderingMaterial::FromNode(node.GetPointer());
 
-  // Phong parameters; with shading off they do nothing.
+  // Phong parameters; with shading off they do nothing. Reset restores those
+  // same values, so with shading off it has nothing to do either.
   m_Controls->ambientSlider->setEnabled(material.shade);
   m_Controls->diffuseSlider->setEnabled(material.shade);
   m_Controls->specularSlider->setEnabled(material.shade);
   m_Controls->specularPowerSlider->setEnabled(material.shade);
   m_Controls->lightingModelComboBox->setEnabled(material.shade);
+  m_Controls->resetButton->setEnabled(material.shade);
 
   const QSignalBlocker blockShade(m_Controls->shadeCheckBox);
   m_Controls->shadeCheckBox->setChecked(material.shade);
@@ -174,17 +176,27 @@ void QmitkVolumeLightingWidget::OnReset()
   if (node.IsNull())
     return;
 
-  const auto &models = mitk::VolumeRenderingLightingModel::GetAllModels();
+  // Back to the values the selected model dictates rather than to a fixed set:
+  // the model is a choice, the slider positions are what was moved afterwards,
+  // and only the latter is what reset undoes. ApplyTo writes exactly the four
+  // material values and the scattering parameters the model owns, and leaves
+  // the shade flag alone unless the model needs it on.
+  const auto *model = mitk::VolumeRenderingLightingModel::FromNode(node.GetPointer());
 
-  if (models.empty())
-    return;
+  // A node bound here normally names a model, since the view applies one when
+  // rendering is switched on. One configured elsewhere need not, and then the
+  // first model is the same fallback the view uses.
+  if (model == nullptr)
+  {
+    const auto &models = mitk::VolumeRenderingLightingModel::GetAllModels();
 
-  // The material defaults first, then the first model over the top. Both are
-  // needed: the first model asks for no scattering, so its ApplyTo deliberately
-  // leaves the shade flag alone, and restoring shading is part of what reset
-  // means here.
-  mitk::VolumeRenderingMaterial().ApplyTo(node);
-  models.front().ApplyTo(node);
+    if (models.empty())
+      return;
+
+    model = &models.front();
+  }
+
+  model->ApplyTo(node);
 
   this->UpdateControls();
 

@@ -111,7 +111,7 @@
      <item>
       <widget class="QPushButton" name="resetButton">
        <property name="text">
-        <string>Reset</string>
+        <string>Reset sliders</string>
        </property>
       </widget>
      </item>

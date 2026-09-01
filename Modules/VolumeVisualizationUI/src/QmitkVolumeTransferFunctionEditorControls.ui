@@ -381,7 +381,7 @@
            <item>
             <widget class="QPushButton" name="resetTfButton">
              <property name="text">
-              <string>Reset Override</string>
+              <string>Reset sliders</string>
              </property>
             </widget>
            </item>

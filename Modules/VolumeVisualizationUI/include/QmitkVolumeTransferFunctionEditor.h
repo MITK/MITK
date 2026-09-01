@@ -42,8 +42,8 @@ namespace Ui
  *        authored point by point.
  *
  * The two modes replace each other in place, so a host sees one widget rather
- * than a mode it has to manage. Authoring can be cancelled, which restores the
- * curve as it stood when authoring began.
+ * than a mode it has to manage. Authoring ends either by keeping the curve it
+ * produced or by cancelling back to the one that stood when authoring began.
  *
  * What the widget records on the node is a recipe rather than only a result -
  * the preset it started from plus the four window offsets - so that returning
@@ -89,8 +89,8 @@ signals:
    * \brief Emitted after the widget changed what the node renders as.
    *
    * The node is already updated, so a host has only to re-render - and to
-   * refresh its own controls, because loading a function switches volume
-   * rendering on so that the result is visible at once.
+   * refresh its own controls, because loading or authoring a function switches
+   * volume rendering on so that the result is visible at once.
    */
   void TransferFunctionChanged();
 
@@ -110,6 +110,7 @@ private slots:
   void OnCreateCustom();
   void OnImportCustom();
   void OnCancelCustom();
+  void OnDoneCustom();
   void OnSaveCustom();
 
 private:
@@ -136,6 +137,11 @@ private:
    *         cannot reproduce.
    */
   void ForgetTransferFunctionRecipe(mitk::DataNode *node);
+
+  /** \brief Deselect any preset, and say in the combo's placeholder whether that
+   *         is because a curve no preset describes is held, or because none is.
+   */
+  void ClearPresetSelection();
 
   void SnapshotAppliedTransferFunction();
 

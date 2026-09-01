@@ -101,8 +101,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   }
 
   // A freshly filled combo lands on its first entry, which would name a preset
-  // nothing has applied. -1 shows the placeholder instead.
-  m_Controls->presetComboBox->setCurrentIndex(-1);
+  // nothing has applied.
+  this->ClearPresetSelection();
 
   m_Controls->opacityShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->opacityHeightSlider->setOrientation(Qt::Horizontal);
@@ -139,6 +139,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     this, &QmitkVolumeTransferFunctionEditor::OnImportCustom);
   connect(m_Controls->cancelTfCreationButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnCancelCustom);
+  connect(m_Controls->doneTfButton, &QPushButton::clicked,
+    this, &QmitkVolumeTransferFunctionEditor::OnDoneCustom);
   connect(m_Controls->saveUserTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnSaveCustom);
 }
@@ -215,9 +217,13 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
   }
 
   // findText yields -1 for the empty name left by a node that records no preset,
-  // and -1 is the placeholder the combo should show in exactly that case.
+  // and that is exactly the state the placeholder is there to describe.
   const int presetIndex = m_Controls->presetComboBox->findText(QString::fromStdString(presetName));
-  m_Controls->presetComboBox->setCurrentIndex(presetIndex);
+
+  if (presetIndex < 0)
+    this->ClearPresetSelection();
+  else
+    m_Controls->presetComboBox->setCurrentIndex(presetIndex);
 
   // Replaying needs a preset the catalog still offers, since that is the
   // baseline the recorded offsets are measured from.
@@ -279,6 +285,15 @@ void QmitkVolumeTransferFunctionEditor::RecordAdjustOffsets()
   if (node.IsNull())
     return;
 
+  // An offset is only meaningful next to the preset it was measured from, so a
+  // node naming none has no baseline these four could describe. Writing them
+  // anyway would leave a recipe nothing can re-execute on the node, and in every
+  // scene saved from it.
+  std::string presetName;
+
+  if (!node->GetStringProperty(TF_PRESET_PROPERTY, presetName))
+    return;
+
   node->SetFloatProperty(TF_OPACITY_SHIFT_PROPERTY,
     static_cast<float>(m_Controls->opacityShiftSlider->value()));
   node->SetFloatProperty(TF_OPACITY_HEIGHT_PROPERTY,
@@ -303,6 +318,17 @@ void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataN
   properties->DeleteProperty(TF_OPACITY_HEIGHT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_SHIFT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_WIDTH_PROPERTY);
+}
+
+void QmitkVolumeTransferFunctionEditor::ClearPresetSelection()
+{
+  // The placeholder is only on show while no preset is named, which is the state
+  // both a loaded file and an authored curve leave the combo in. Naming it
+  // distinguishes a curve nothing in the catalog describes from no curve at all.
+  m_Controls->presetComboBox->setPlaceholderText(
+    m_AppliedTransferFunction.IsNotNull() ? "Custom" : "Choose a preset...");
+
+  m_Controls->presetComboBox->setCurrentIndex(-1);
 }
 
 void QmitkVolumeTransferFunctionEditor::ApplyCurrentTransferFunction()
@@ -579,7 +605,7 @@ void QmitkVolumeTransferFunctionEditor::OnImportCustom()
   // A loaded custom function came from no preset, so there is no baseline any
   // recorded offsets could be measured from either.
   this->ForgetTransferFunctionRecipe(node);
-  m_Controls->presetComboBox->setCurrentIndex(-1);
+  this->ClearPresetSelection();
 
   this->ApplyCurrentTransferFunction();
 }
@@ -606,6 +632,42 @@ void QmitkVolumeTransferFunctionEditor::OnCancelCustom()
   }
 
   this->SetCustomModeActive(false);
+}
+
+void QmitkVolumeTransferFunctionEditor::OnDoneCustom()
+{
+  auto node = m_DataNode.Lock();
+
+  // Before anything else can cancel: SetDataNode cancels authoring on every
+  // selection change, and a snapshot left behind would copy the pre-authoring
+  // curve back over the one just kept.
+  m_PreEditTransferFunction = nullptr;
+
+  if (node.IsNull() || m_AppliedTransferFunction.IsNull())
+  {
+    this->SetCustomModeActive(false);
+    return;
+  }
+
+  // Authored point by point, so the preset name and the four offsets no longer
+  // describe the curve, and replaying them on the next selection would rebuild
+  // the preset and discard it. Same reasoning as a function loaded from a file.
+  this->ForgetTransferFunctionRecipe(node);
+  this->ClearPresetSelection();
+
+  // With no preset recorded, the rendering flag is the only remaining evidence
+  // that this node was configured here, and AdoptTransferFunctionFromNode reads
+  // it to decide whether to take the curve back over. Without it the curve is
+  // dropped on the next selection and EnsureTransferFunction replaces it with
+  // the first preset.
+  node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+
+  this->SetCustomModeActive(false);
+
+  // Re-seeds the combined canvas and re-snapshots both baselines, so the adjust
+  // sliders now measure from the authored curve rather than from the preset it
+  // started out as.
+  this->ApplyCurrentTransferFunction();
 }
 
 void QmitkVolumeTransferFunctionEditor::OnSaveCustom()

@@ -1,5 +1,6 @@
 set(CPP_FILES
   QmitkVolumeLightingWidget.cpp
+  QmitkVolumeThumbnailRenderer.cpp
   QmitkVolumeTransferFunctionEditor.cpp
 )
 

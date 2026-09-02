@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <QmitkCombinedTransferFunctionCanvas.h>
 #include <QmitkTransferFunctionWidget.h>
+#include <QmitkVolumeThumbnailRenderer.h>
 
 #include <ui_QmitkVolumeTransferFunctionEditorControls.h>
 
@@ -27,11 +28,13 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
-#include <QComboBox>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QIcon>
+#include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTimer>
 #include <QToolButton>
 
 #include <algorithm>
@@ -58,6 +61,33 @@ namespace
   constexpr const char *TF_OPACITY_HEIGHT_PROPERTY = "volumerendering.transferfunction.opacityheight";
   constexpr const char *TF_COLOR_SHIFT_PROPERTY = "volumerendering.transferfunction.colorshift";
   constexpr const char *TF_COLOR_WIDTH_PROPERTY = "volumerendering.transferfunction.colorwidth";
+
+  /** \brief The size one preview is drawn and shown at. */
+  const QSize PREVIEW_SIZE(96, 76);
+
+  /** \brief One entry: a preview with room for a name on two lines beneath it.
+   *
+   * The width is what decides how many entries stand side by side.
+   *
+   * The height is what decides the gap between rows, since the gap is whatever
+   * the entry has left over once the preview and two lines of name are in it.
+   */
+  const QSize PRESET_CELL_SIZE(112, 124);
+
+  /** \brief A transparent stand-in for a preview not drawn yet.
+   *
+   * Entries are sized to what they hold, so one that has only its name is
+   * shorter than one with a preview. Filling them all in at the final size
+   * from the start keeps the grid from being laid out twice - once for the
+   * names, and again, entry by entry, as previews arrive.
+   */
+  QIcon PlaceholderPreview()
+  {
+    QPixmap placeholder(PREVIEW_SIZE);
+    placeholder.fill(Qt::transparent);
+
+    return QIcon(placeholder);
+  }
 
   /** \brief Whether the node is rendered as a volume at all.
    *
@@ -95,12 +125,37 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   m_Controls->tfControlPanelsWidget->ShowGradientOpacityFunction(false);
 
+  auto *presetList = m_Controls->presetListWidget;
+
   for (const auto &name : m_Presets.GetPresetNames())
   {
-    m_Controls->presetComboBox->addItem(QString::fromStdString(name));
+    auto *presetItem = new QListWidgetItem(PlaceholderPreview(), QString::fromStdString(name));
+    presetList->addItem(presetItem);
   }
 
-  // A freshly filled combo lands on its first entry, which would name a preset
+  presetList->setViewMode(QListView::IconMode);
+
+  // Every entry is the same size, so the view need not measure them one by one
+  // and can lay the grid out in a single pass.
+  presetList->setUniformItemSizes(true);
+
+  // Without wrapping the entries stay one per row, which is the plain list the
+  // previews are meant to replace.
+  presetList->setWrapping(true);
+  presetList->setResizeMode(QListView::Adjust);
+
+  // Icon mode lets entries be dragged around by default. This is a menu.
+  presetList->setMovement(QListView::Static);
+  presetList->setGridSize(PRESET_CELL_SIZE);
+  presetList->setIconSize(PREVIEW_SIZE);
+
+  // Two lines rather than an ellipsis, since several preset names do not fit a
+  // cell on one.
+  presetList->setWordWrap(true);
+  presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+  // A freshly filled list lands on its first entry, which would name a preset
   // nothing has applied.
   this->ClearPresetSelection();
 
@@ -109,10 +164,31 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
+  m_Controls->presetPanel->setVisible(false);
   m_Controls->advancedTfPanel->setVisible(false);
 
-  connect(m_Controls->presetComboBox, &QComboBox::textActivated,
-    this, &QmitkVolumeTransferFunctionEditor::OnPresetSelected);
+  // A click rather than the current entry changing: the current entry is also
+  // set from what a node records, and reacting to that would re-apply the
+  // preset and discard the curve the node was carrying.
+  connect(m_Controls->presetListWidget, &QListWidget::itemClicked, this,
+    [this](QListWidgetItem *item)
+    {
+      if (item != nullptr)
+        this->OnPresetSelected(item->text());
+    });
+
+  m_ThumbnailRenderer = std::make_unique<QmitkVolumeThumbnailRenderer>(PREVIEW_SIZE);
+
+  connect(m_Controls->presetExpandButton, &QToolButton::toggled, this,
+    [this](bool expanded)
+    {
+      SetSectionExpanded(m_Controls->presetExpandButton, m_Controls->presetPanel, expanded);
+
+      // Worth drawing once the grid is on show, and not for every image
+      // someone clicks past in the data manager.
+      if (expanded)
+        this->StartThumbnailGeneration();
+    });
 
   connect(m_Controls->adjustPresetExpandButton, &QToolButton::toggled, this,
     [this](bool expanded)
@@ -158,16 +234,27 @@ void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
   m_DataNode = node;
   m_AppliedTransferFunction = nullptr;
 
+  // Previews belong to the image they were drawn from, so a different one
+  // leaves them describing nothing that is on screen.
+  if (m_ThumbnailImage != (node != nullptr ? node->GetDataAs<mitk::Image>() : nullptr))
+    this->InvalidateThumbnails();
+
   this->AdoptTransferFunctionFromNode();
+
+  // Expanding the section is the other way in, and it is the only one when the
+  // section was already open: nothing else would ask for the new image's
+  // previews, leaving a grid on show that has been emptied and not refilled.
+  if (m_Controls->presetExpandButton->isChecked())
+    this->StartThumbnailGeneration();
 }
 
 void QmitkVolumeTransferFunctionEditor::EnsureTransferFunction()
 {
-  if (m_AppliedTransferFunction.IsNotNull() || m_Controls->presetComboBox->count() == 0)
+  if (m_AppliedTransferFunction.IsNotNull() || m_Controls->presetListWidget->count() == 0)
     return;
 
-  m_Controls->presetComboBox->setCurrentIndex(0);
-  this->OnPresetSelected(m_Controls->presetComboBox->itemText(0));
+  m_Controls->presetListWidget->setCurrentRow(0);
+  this->OnPresetSelected(m_Controls->presetListWidget->item(0)->text());
 }
 
 void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetName)
@@ -218,12 +305,15 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
 
   // findText yields -1 for the empty name left by a node that records no preset,
   // and that is exactly the state the placeholder is there to describe.
-  const int presetIndex = m_Controls->presetComboBox->findText(QString::fromStdString(presetName));
+  const auto matches =
+    m_Controls->presetListWidget->findItems(QString::fromStdString(presetName), Qt::MatchExactly);
+
+  const int presetIndex = matches.isEmpty() ? -1 : m_Controls->presetListWidget->row(matches.first());
 
   if (presetIndex < 0)
     this->ClearPresetSelection();
   else
-    m_Controls->presetComboBox->setCurrentIndex(presetIndex);
+    m_Controls->presetListWidget->setCurrentRow(presetIndex);
 
   // Replaying needs a preset the catalog still offers, since that is the
   // baseline the recorded offsets are measured from.
@@ -322,13 +412,9 @@ void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataN
 
 void QmitkVolumeTransferFunctionEditor::ClearPresetSelection()
 {
-  // The placeholder is only on show while no preset is named, which is the state
-  // both a loaded file and an authored curve leave the combo in. Naming it
-  // distinguishes a curve nothing in the catalog describes from no curve at all.
-  m_Controls->presetComboBox->setPlaceholderText(
-    m_AppliedTransferFunction.IsNotNull() ? "Custom" : "Choose a preset...");
-
-  m_Controls->presetComboBox->setCurrentIndex(-1);
+  // Which preset is named, if any, is said by the section header, and saying it
+  // there means it is legible while the grid is folded away.
+  m_Controls->presetListWidget->setCurrentRow(-1);
 }
 
 void QmitkVolumeTransferFunctionEditor::ApplyCurrentTransferFunction()
@@ -397,7 +483,17 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
-  m_Controls->presetComboBox->setEnabled(hasNode);
+  // Named on the header, so that it reads while the grid is folded away. A
+  // curve loaded from a file or authored here answers to no preset name, which
+  // is worth telling apart from carrying no curve at all.
+  const auto *currentPreset = m_Controls->presetListWidget->currentItem();
+
+  m_Controls->presetExpandButton->setText(currentPreset != nullptr
+    ? QString("Preset: %1").arg(currentPreset->text())
+    : (m_AppliedTransferFunction.IsNotNull() ? "Preset: Custom" : "Select a preset"));
+
+  m_Controls->presetExpandButton->setEnabled(hasNode);
+  m_Controls->presetListWidget->setEnabled(hasNode);
   m_Controls->createTfButton->setEnabled(hasNode);
   m_Controls->loadTfButton->setEnabled(hasNode);
   m_Controls->adjustPresetExpandButton->setEnabled(adjustable);
@@ -692,4 +788,94 @@ void QmitkVolumeTransferFunctionEditor::OnSaveCustom()
   {
     QMessageBox::warning(this, "Save transfer function", "Could not save the transfer function.");
   }
+}
+
+void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()
+{
+  // Bumping the version is what abandons a generation already under way: its
+  // next step finds the number changed and stops without queuing another.
+  ++m_ThumbnailRun;
+
+  // Before zero, because the volume has to be bound before anything is drawn,
+  // and that is a step of its own.
+  m_NextThumbnailIndex = -1;
+  m_ThumbnailImage = nullptr;
+
+  const int presetCount = m_Controls->presetListWidget->count();
+
+  // Back to the stand-in rather than to nothing, so that clearing the previews
+  // does not resize every entry and scatter the grid.
+  for (int i = 0; i < presetCount; ++i)
+    m_Controls->presetListWidget->item(i)->setIcon(PlaceholderPreview());
+}
+
+void QmitkVolumeTransferFunctionEditor::StartThumbnailGeneration()
+{
+  auto node = m_DataNode.Lock();
+  auto *image = node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr;
+
+  if (image == nullptr)
+    return;
+
+  // Either the previews already describe this image or they are being drawn
+  // for it; neither wants starting again.
+  if (m_ThumbnailImage == image)
+    return;
+
+  // Only false once a bind has actually been refused, so the first attempt is
+  // always made and a machine that can draw previews is never written off.
+  if (!m_ThumbnailRenderer->IsUsable())
+    return;
+
+  this->InvalidateThumbnails();
+  m_ThumbnailImage = image;
+
+  const int run = m_ThumbnailRun;
+  QTimer::singleShot(0, this, [this, run] { this->GenerateNextThumbnail(run); });
+}
+
+void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
+{
+  if (run != m_ThumbnailRun)
+    return;
+
+  auto *presetList = m_Controls->presetListWidget;
+
+  if (m_NextThumbnailIndex < 0)
+  {
+    // Uploading the volume costs far more than drawing from it, so it waits
+    // for the popup to be on screen rather than delaying its appearance.
+    if (!m_ThumbnailRenderer->SetImage(m_ThumbnailImage.Lock().GetPointer()))
+    {
+      // Clearing the bound image matters: it is what lets a later attempt
+      // start, rather than reading as a generation already finished.
+      this->InvalidateThumbnails();
+      return;
+    }
+
+    m_NextThumbnailIndex = 0;
+  }
+  else
+  {
+    auto *presetItem = presetList->item(m_NextThumbnailIndex);
+    const auto presetName = presetItem->text().toStdString();
+
+    if (auto transferFunction = m_Presets.CreateTransferFunction(presetName);
+        transferFunction.IsNotNull())
+    {
+      const auto thumbnail = m_ThumbnailRenderer->Render(transferFunction.GetPointer());
+
+      if (!thumbnail.isNull())
+        presetItem->setIcon(QIcon(thumbnail));
+    }
+
+    ++m_NextThumbnailIndex;
+  }
+
+  if (m_NextThumbnailIndex >= presetList->count())
+    return;
+
+  // Queued rather than looped: returning to the event loop between previews is
+  // what keeps the panel responsive and lets the grid fill in while it is open.
+  QTimer::singleShot(0, this, [this, run] { this->GenerateNextThumbnail(run); });
 }

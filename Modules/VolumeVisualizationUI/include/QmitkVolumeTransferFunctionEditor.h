@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <memory>
 #include <string>
 
+class QmitkVolumeThumbnailRenderer;
 class vtkColorTransferFunction;
 
 namespace Ui
@@ -153,8 +154,50 @@ private:
   /** \brief Swap the preset controls for the per-point editor, or back. */
   void SetCustomModeActive(bool active);
 
+  /**
+   * \brief Begin drawing a preview for every preset, unless they are current.
+   *
+   * Bound to the preset combo opening rather than to the selection changing,
+   * so that clicking through a list of images does not draw previews nobody
+   * asked to see.
+   */
+  void StartThumbnailGeneration();
+
+  /**
+   * \brief Draw one preset's preview and queue the next.
+   *
+   * \param[in] run The generation this call belongs to; it abandons itself if
+   *                the previews have been invalidated since it was queued.
+   */
+  void GenerateNextThumbnail(int run);
+
+  /** \brief Drop every preview, and abandon a generation in progress. */
+  void InvalidateThumbnails();
+
   std::unique_ptr<Ui::QmitkVolumeTransferFunctionEditor> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_DataNode;
+
+  std::unique_ptr<QmitkVolumeThumbnailRenderer> m_ThumbnailRenderer;
+
+  /** \brief The image the previews on show were drawn from. */
+  mitk::WeakPointer<mitk::Image> m_ThumbnailImage;
+
+  /** \brief How far the generation in progress has got.
+   *
+   * The loop counter, kept here rather than on the stack because the loop
+   * returns to the event loop between iterations.
+   */
+  int m_NextThumbnailIndex = 0;
+
+  /** \brief A version number for the previews on show.
+   *
+   * Drawing them is spread across many turns of the event loop, and anything
+   * can happen in between. Every invalidation bumps this; each queued step
+   * remembers the number it was queued under and does nothing if the two no
+   * longer agree, which is how a step left over from a previous image, or
+   * from a run that was cleared part-way, stops on its own.
+   */
+  int m_ThumbnailRun = 0;
 
   mitk::TransferFunctionPresets m_Presets;
   mitk::SimpleHistogramCache m_HistogramCache;

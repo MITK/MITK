@@ -85,6 +85,10 @@ public:
    */
   void EnsureTransferFunction();
 
+protected:
+  /** \brief Re-measure the preset grid when the room it has to fill changes. */
+  bool eventFilter(QObject *watched, QEvent *event) override;
+
 signals:
   /**
    * \brief Emitted after the widget changed what the node renders as.
@@ -153,6 +157,16 @@ private:
 
   /** \brief Swap the preset controls for the per-point editor, or back. */
   void SetCustomModeActive(bool active);
+
+  /**
+   * \brief Size the preset cells to the width the panel currently gives them.
+   *
+   * The panel is a fraction of the workbench window rather than a fixed width,
+   * so the cells are measured from it instead of fixed, and measured again
+   * whenever it changes. What stays fixed is how many previews stand side by
+   * side, which is the point of the grid.
+   */
+  void UpdatePresetGrid();
 
   /**
    * \brief Begin drawing a preview for every preset, unless they are current.

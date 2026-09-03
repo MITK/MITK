@@ -62,7 +62,9 @@ public:
    *
    * No graphics resources are claimed until the first SetImage call.
    *
-   * \param[in] size The pixel size of every pixmap Render returns.
+   * \param[in] size The pixel size of every pixmap Render returns. Callers
+   *            showing previews smaller than this let Qt scale them down,
+   *            which costs nothing next to drawing them again.
    */
   explicit QmitkVolumeThumbnailRenderer(const QSize &size);
 

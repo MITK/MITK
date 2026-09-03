@@ -32,6 +32,8 @@ found in the LICENSE file.
 
 #include <QImage>
 
+#include <cmath>
+
 namespace
 {
   /** \brief The lighting every preview is drawn with.
@@ -199,6 +201,26 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   camera->SetFocalPoint(0.0, 0.0, 0.0);
   camera->SetViewUp(0.0, 0.0, 1.0);
   m_Renderer->ResetCamera();
+
+  // ResetCamera fits the sphere around the volume's box, taking its radius
+  // from the box's full diagonal. The camera looks along +Y, so the Y extent
+  // is depth: it never widens or heightens the picture, but it does inflate
+  // that radius and push the camera back, which is what leaves a preview
+  // mostly background. Zooming by the ratio between the sphere fitted and the
+  // circle the projection actually needs takes that back. That circle still
+  // encloses the projected box, so no volume can be cropped, whatever its
+  // proportions. Zoom rather than Dolly because it narrows the view angle
+  // without moving the camera, leaving the clipping range ResetCamera just
+  // computed valid.
+  double bounds[6];
+  m_Volume->GetBounds(bounds);
+
+  const double width = bounds[1] - bounds[0];
+  const double depth = bounds[3] - bounds[2];
+  const double height = bounds[5] - bounds[4];
+
+  if (const double inPlane = width * width + height * height; inPlane > 0.0)
+    camera->Zoom(std::sqrt((inPlane + depth * depth) / inPlane));
 
   // Uploads the volume, and is the only expensive call here. Whether the ray
   // caster can draw at all depends on the hardware and on this volume's own

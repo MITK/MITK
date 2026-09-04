@@ -31,10 +31,12 @@ found in the LICENSE file.
 #include <QEvent>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFontMetrics>
 #include <QIcon>
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRect>
 #include <QTimer>
 #include <QToolButton>
 
@@ -171,11 +173,10 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   presetList->setViewMode(QListView::IconMode);
 
-  // Tempting, since the entries are all the same size: it lets the view
-  // measure one and reuse that. But it measures the first entry, and it does
-  // so once, whereas the cells here are re-sized whenever the panel is. Every
-  // name would then be laid out in a box measured for the first preset's,
-  // which is short, and the longer ones would lose their last line.
+  // The entries state the size they occupy themselves, so there is nothing
+  // left here for the view to measure and hold on to. Leaving this off is what
+  // has it read that size again after every re-measure, rather than the one it
+  // happened to see first.
   presetList->setUniformItemSizes(false);
 
   // Without wrapping the entries stay one per row, which is the plain list the
@@ -192,6 +193,13 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+  for (const auto &name : m_Presets.GetPresetNames())
+    presetList->addItem(QString::fromStdString(name));
+
+  // Cells are measured from the names they have to hold, so the entries come
+  // first, and the stand-in previews after them, since their size is what the
+  // measurement settles.
+  //
   // The panel is only ever as wide as the workbench window makes it, so the
   // cells are measured from it rather than fixed, and measured again whenever
   // it changes. Watching the viewport rather than overriding this widget's own
@@ -199,14 +207,9 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // geometry by the time that event arrives, and a stale width would be
   // measured.
   this->UpdatePresetGrid();
-  presetList->viewport()->installEventFilter(this);
+  this->InvalidateThumbnails();
 
-  for (const auto &name : m_Presets.GetPresetNames())
-  {
-    auto *presetItem = new QListWidgetItem(PlaceholderPreview(presetList->iconSize()),
-                                           QString::fromStdString(name));
-    presetList->addItem(presetItem);
-  }
+  presetList->viewport()->installEventFilter(this);
 
   // A freshly filled list lands on its first entry, which would name a preset
   // nothing has applied.
@@ -315,15 +318,38 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetGrid()
 
   const QSize previewSize = PreviewSize(cellWidth - 2 * CELL_PADDING);
 
-  // Three lines because the catalogued names are hyphenated and Qt breaks a
-  // line at a hyphen, so CT-Chest-Contrast-Enhanced takes three lines at the
-  // width a cell has here. Measured rather than fixed, since a line is as tall
-  // as the platform's default interface font makes it, and that font is not
-  // the same on Windows, macOS and any given Linux desktop.
-  const int nameHeight = 3 * presetList->fontMetrics().lineSpacing();
+  // How many lines a name takes is not something to assume: the catalogued
+  // ones are hyphenated and Qt breaks a line at a hyphen, so the count follows
+  // from the width a cell has and from how wide the platform's interface font
+  // draws the characters. The rect overload constrains wrapping by its width
+  // and leaves the height free, which is the measurement the delegate itself
+  // makes when it paints a name. The tallest of them keeps every cell the same
+  // height and none of them too short.
+  const QFontMetrics metrics = presetList->fontMetrics();
+  int nameHeight = metrics.lineSpacing();
+
+  for (int i = 0; i < presetList->count(); ++i)
+  {
+    const QRect nameBounds = metrics.boundingRect(QRect(0, 0, previewSize.width(), 0),
+                                                  Qt::TextWordWrap,
+                                                  presetList->item(i)->text());
+
+    nameHeight = std::max(nameHeight, nameBounds.height());
+  }
+
+  const QSize cellSize(cellWidth, previewSize.height() + nameHeight + 2 * CELL_PADDING);
+
+  // The grid decides where a cell goes only for entries that fill it. Left to
+  // size themselves, they come out a couple of pixels narrower - the padding
+  // here is wider than the margin the delegate keeps of its own accord - and
+  // the view then packs each row from its entries' widths rather than from the
+  // grid, so the columns of one row do not line up with those of the next.
+  // Stating the size every entry is going to occupy is what holds them in step.
+  for (int i = 0; i < presetList->count(); ++i)
+    presetList->item(i)->setSizeHint(cellSize);
 
   presetList->setIconSize(previewSize);
-  presetList->setGridSize(QSize(cellWidth, previewSize.height() + nameHeight + 2 * CELL_PADDING));
+  presetList->setGridSize(cellSize);
 }
 
 void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)

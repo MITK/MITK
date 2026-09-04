@@ -7,6 +7,14 @@
           icon="resources/volume_visualization.svg"
           category="General">
       <description>Experimental rework of the volume visualization view</description>
+      <keywordReference id="org.mitk.views.volumevisualization_v2.ViewKeyword"/>
     </view>
+  </extension>
+
+  <!--One keyword element rather than one per word: berry::KeywordRegistry maps
+  each id to a single label, and the view dialog splits that label on spaces.-->
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.volumevisualization_v2.ViewKeyword"
+             label="volume rendering raycasting 3D transfer function preset opacity color colour lighting shading cinematic MIP MinIP projection blendmode"/>
   </extension>
 </plugin>

@@ -1,0 +1,219 @@
+/**
+\page org_mitk_views_volumevisualization_v2 The Volume Visualization v2 View
+
+\imageMacro{volume_visualization_v2-dox.svg,"Icon of the Volume Visualization v2 View.",2.00}
+
+\tableofcontents
+
+\section org_mitk_views_volumevisualization_v2_overview Overview
+
+Volume visualization draws a 3D image as a solid body in the 3D render window.
+Instead of showing one slice at a time, it sends a ray through the volume for
+every pixel and accumulates colour and opacity from every voxel that ray meets.
+Bone, vessels or skin can therefore be seen at once, in depth, without cutting
+the data into planes first.
+
+What decides whether you see bone, skin or fog is the <b>transfer function</b>:
+curves that map each grey value to a colour and to an opacity. Almost everything
+in this view is either a way of choosing a transfer function or a rendering
+option applied on top of one.
+
+\imageMacro{QmitkVolumeVisualizationV2_Overview.png,"The Volume Visualization v2 view.",10.00}
+
+\note Volume rendering is done on the graphics card and has no software
+fallback. On a machine whose GPU cannot run the ray caster, the 3D window stays
+empty and the preset previews described below are not drawn either. Volume
+rendering also needs a large amount of memory; very large images may not fit.
+
+\section org_mitk_views_volumevisualization_v2_image Image
+
+The selector at the top lists the 3D and 4D images in the Data Manager. Pick
+one and tick <b>Volume rendering</b>. Nothing below the selector responds until
+that box is ticked, because there is no volume to configure yet.
+
+Ticking it does more than switch the volume on: a node that carries no transfer
+function is given the first one from the preset catalogue, and one that names no
+lighting model is given the first of those. The first tick therefore produces a
+visible volume rather than an empty 3D window, and you adjust from there.
+
+For a 4D image the volume follows the current time step, so stepping through
+time in the image navigator steps the volume with it.
+
+\section org_mitk_views_volumevisualization_v2_tf Transfer function
+
+\subsection org_mitk_views_volumevisualization_v2_tf_presets Presets
+
+<b>Select a preset</b> folds out a grid of presets, each shown as a small
+rendering of the image you currently have selected. The preview is what applying
+that preset will look like on your data, not a generic illustration, which is
+why the presets are chosen by picture rather than by name. They are drawn when
+the grid opens, one after another, so they appear progressively.
+
+\imageMacro{QmitkVolumeVisualizationV2_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
+
+The catalogue is the Hounsfield-based preset library shared across medical
+viewers, plus a few general-purpose colour maps. The <tt>CT-</tt> presets assume
+Hounsfield units and therefore transfer between CT images unchanged. The
+<tt>MR-</tt> presets cannot make that assumption, because MR intensities are not
+calibrated to a fixed scale, so expect to adjust them per image.
+
+While the grid is folded away its header names the current choice, or reads
+<em>Preset: Custom</em> for a curve that no preset describes.
+
+\subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
+
+Below the preset grid, one canvas shows three things at once: the histogram of
+the image as a backdrop, the opacity curve drawn over it, and the colours the
+transfer function assigns as a gradient beneath. Together they say which grey
+values the current function makes visible and in what colour, against how much
+of that value actually occurs in the image.
+
+The canvas is a display, not an editor. Clicking it does nothing; the curve is
+moved as a whole with the sliders described next. Editing point by point is
+possible, in the separate mode described in
+\ref org_mitk_views_volumevisualization_v2_tf_custom.
+
+\imageMacro{QmitkVolumeVisualizationV2_Canvas.png,"Histogram backdrop with the opacity curve and the colour gradient.",10.00}
+
+\subsection org_mitk_views_volumevisualization_v2_tf_adjust Adjusting a preset
+
+A preset lands where its author put it, which is rarely exactly where your image
+wants it. <b>Adjust preset</b> offers four sliders that move it without
+redrawing it:
+
+<ul>
+<li> <b>Opacity shift</b> slides the opacity curve along the grey-value axis,
+which is what you reach for when a preset shows too much or too little tissue.
+It travels half the image's value range in either direction.
+<li> <b>Opacity height</b> raises or lowers the whole curve, making the volume
+more or less solid without changing which values are visible at all.
+<li> <b>Color shift</b> moves the centre of the range the preset's colours are
+spread over.
+<li> <b>Color width</b> sets how wide that range is. Narrowing it concentrates
+the colours into a smaller band of grey values; widening it spreads them out.
+</ul>
+
+<b>Reset sliders</b> returns all four to neutral. That restores the curve they
+are measured from, which is the untouched preset, or the curve a file supplied
+if the function came from one. It does not reload a preset.
+
+What is remembered is the preset together with the four offsets, rather than
+only the resulting curve, so selecting the image again later brings the sliders
+back to the positions you left them in.
+
+\subsection org_mitk_views_volumevisualization_v2_tf_custom Custom transfer functions
+
+Under the preset grid, <b>Create</b> and <b>Load</b> lead away from presets
+altogether. <b>Load</b> applies a transfer function saved to a JSON file
+earlier, straight away. <b>Create</b> replaces the preset controls with a
+point-by-point editor holding one canvas per curve: grey value to opacity, grey
+value to colour, and grey value and gradient to opacity. The third modulates
+opacity by how sharply the data changes at each voxel, so a low value there
+hides flat interiors and leaves surfaces visible.
+
+In all three canvases:
+
+<ul>
+<li> Left-click adds a point.
+<li> Left-click and drag moves an existing point; the arrow keys move the
+selected one.
+<li> Right-click, or the DELETE key, removes a point.
+<li> Double-clicking a point in the colour canvas opens a colour picker.
+<li> Between points the curves are interpolated linearly.
+</ul>
+
+The editor brings three buttons of its own. <b>Done</b> keeps the curve you
+authored, <b>Cancel</b> restores the one that stood before you started, and
+<b>Save</b> writes the current function to a JSON file in the same format the
+built-in catalogue uses, so your own functions can be kept and shared and read
+back with <b>Load</b>.
+
+\note A curve that has been authored or loaded is no longer described by any
+preset name, so the name is dropped and the adjust sliders start measuring from
+the new curve. The gradient curve is not stored when saving.
+
+\section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
+
+Shading gives the volume the shape cues a flat colour cannot: where a surface
+turns away from the light, where two structures touch, how deep a recess goes.
+
+<b>Shading enabled</b> turns it on or off. The <b>Lighting model</b> below it
+picks how the volume is lit, and the two models are not weaker and stronger
+versions of the same effect - they take different paths through the renderer:
+
+<ul>
+<li> <b>Headlight</b> puts a single light at the camera. Nothing casts a
+visible shadow, because the light reaches exactly what you can see. In exchange
+it is the only model in which the <b>Ambient</b> slider carries the tissue's own
+colour, so ambient light fills the dark areas instead of laying flat grey over
+the picture.
+<li> <b>Key light</b> puts the main light off to one side and adds a dimmer one
+opposite it, then traces short secondary rays through the volume so that
+contacts and recesses darken. The rays are kept short deliberately: long ones
+let one structure cast a shadow onto another, which describes the lighting
+rather than the anatomy. This model costs more per still frame, switches its
+shadows off while you rotate, and also relights any surface sharing the 3D
+window.
+</ul>
+
+<b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>
+control how the material responds to that light. Choosing a model sets all four
+to a sensible starting point; moving them afterwards does not leave the model,
+and <b>Reset sliders</b> puts them back to the values the current model
+prescribes. Ambient is deliberately zero under Key light: with more than one
+light in the scene the renderer adds ambient as a flat grey wash, so the fill
+light does that job instead.
+
+\note This whole section applies to the Composite technique only, and is
+disabled otherwise, with the reason on its header. The projection techniques
+reduce each ray to a single value and light nothing, so lighting there is inert
+rather than merely subtle.
+
+\section org_mitk_views_volumevisualization_v2_technique Technique
+
+<b>Advanced</b> holds the <b>Technique</b>, the rule for combining the samples
+along one viewing ray into one pixel:
+
+<ul>
+<li> <b>Composite (3D)</b> accumulates colour and opacity front to back, so
+nearer tissue hides what lies behind it. It is the only technique that produces
+a three-dimensional image, and the only one lighting and shading reach.
+<li> <b>Maximum intensity (MIP)</b> keeps the brightest sample along each ray.
+Depth is lost, but anything dense stays visible however much tissue surrounds
+it, which is what makes contrast-filled vessels and tracer uptake readable.
+<li> <b>Minimum intensity (MinIP)</b> keeps the darkest sample instead, so air
+stands out against tissue - airways, emphysema, bowel gas.
+<li> <b>Average intensity</b> averages the samples along each ray, which reads
+like a projection radiograph.
+<li> <b>Additive intensity</b> sums them. Like the average but unbounded, so it
+saturates towards white where the volume is deep.
+</ul>
+
+Average and additive ignore the colour curve and produce greyscale; the other
+three use it.
+
+\note The projection techniques want a transfer function that ramps across the
+whole value range, not one drawn to isolate a single tissue - a preset that
+hides everything but bone leaves a maximum-intensity projection almost nothing
+to find. The <tt>CT-MIP</tt> and <tt>MR-MIP</tt> presets are the ones authored
+for this.
+
+VTK also defines an isosurface and a slice mode, which are deliberately absent
+here. Each needs input that nothing in MITK supplies - iso-values, or a cutting
+plane - and the ray caster refuses the whole render when that input is missing
+rather than falling back, which would lose the image entirely.
+
+\section org_mitk_views_volumevisualization_v2_appearance Colour and opacity from the Data Manager
+
+A volume's appearance comes from its transfer function, not from the node's
+generic appearance properties.
+
+The Data Manager's Opacity slider fades the image in the 2D windows, and in the
+3D window it fades the slice planes the image is textured onto - but not the
+volume itself. Use the opacity part of the transfer function for that.
+
+The Color action likewise has no effect on a grey image, whose colour the
+transfer function supplies. On a binary image it does apply: there the volume is
+drawn in that single colour, and the transfer function controls are disabled,
+as the view says when you select such an image.
+*/

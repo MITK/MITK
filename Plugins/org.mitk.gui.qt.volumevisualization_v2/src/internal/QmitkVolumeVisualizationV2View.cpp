@@ -186,8 +186,6 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
 
-  m_Controls->enableRenderingCB->setEnabled(false);
-
   for (const auto &technique : TECHNIQUES)
   {
     m_Controls->techniqueComboBox->addItem(QString(technique.label), static_cast<int>(technique.blendMode));
@@ -247,6 +245,11 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     });
   connect(m_Controls->techniqueComboBox, &QComboBox::currentIndexChanged,
     this, &QmitkVolumeVisualizationV2View::OnTechniqueChanged);
+
+  // Auto-selection reports only a selection it actually made, so on an empty
+  // data storage nothing would ever bring the panel out of the state the .ui
+  // file left it in, which is every section enabled and acting on no node.
+  this->UpdateInterface();
 
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
@@ -431,6 +434,14 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
     m_Controls->transferFunctionEditor->setEnabled(false);
     m_Controls->advancedExpandButton->setEnabled(false);
     m_Controls->advancedPanel->setEnabled(false);
+
+    // A greyed-out control should not still name the node that has just been
+    // deselected. Blocked, unlike the checkbox above, because the technique
+    // handler would write the property back onto the outgoing node.
+    const QSignalBlocker blockTechnique(m_Controls->techniqueComboBox);
+    m_Controls->techniqueComboBox->setCurrentIndex(
+      m_Controls->techniqueComboBox->findData(static_cast<int>(vtkVolumeMapper::COMPOSITE_BLEND)));
+
     return;
   }
 

@@ -251,7 +251,15 @@ QPixmap QmitkVolumeThumbnailRenderer::Render(mitk::TransferFunction *transferFun
   m_VolumeProperty->SetColor(transferFunction->GetColorTransferFunction());
   m_VolumeProperty->SetScalarOpacity(transferFunction->GetScalarOpacityFunction());
 
+  // Every preset is offered for every image, so one authored for a narrow
+  // intensity range gets drawn over data far wider. VTK sizes its opacity
+  // lookup texture as that range over the closest pair of nodes, which then
+  // exceeds any texture size, and warns for every preview. The table it clamps
+  // to is finer than a preview this size resolves.
+  const int warningDisplay = vtkObject::GetGlobalWarningDisplay();
+  vtkObject::GlobalWarningDisplayOff();
   m_RenderWindow->Render();
+  vtkObject::SetGlobalWarningDisplay(warningDisplay);
 
   // The filter holds on to the frame it last read, and the render window is not
   // one of the inputs it notices changing, so it has to be told each time.

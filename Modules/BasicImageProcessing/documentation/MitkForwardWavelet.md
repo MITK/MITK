@@ -36,7 +36,7 @@ MitkForwardWavelet -i <image> -o <output prefix> -e <extension> -levels <n> -ban
 
 ### Output file names
 
-Files are named `<output prefix><index><extension>` with a running index starting at 0, in the order the sub-bands are produced: the sub-bands of each level followed by the final low-pass image. With n levels and m bands, n * m + 1 files are written. The output images are floating point images; the low-pass image and the sub-bands of coarser levels have a larger voxel spacing than the input.
+Files are named `<output prefix><index><extension>` with a running index starting at 0, in the order the sub-bands are produced: the sub-bands of each level followed by the final low-pass image. With n levels and m bands, n * m + 1 files are written. Before the transform the image is padded to a power of two voxels per dimension (using the chosen border condition), so the sub-bands of the first level are at least as large as the input. Every further level halves the number of voxels and doubles the voxel spacing. The output images are double precision images.
 
 The first object in the input file is used. If it is not an image, the app prints a message and exits with code 0 without writing an output.
 

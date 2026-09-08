@@ -107,14 +107,22 @@ int main(int argc, char* argv[])
     break;
   }
 
-  std::vector<mitk::Image::Pointer> results = mitk::TransformationOperation::WaveletForward(image, levels, bands, condition, waveletType);
-  unsigned int level = 0;
-  for (auto image : results)
+  try
   {
-    std::string name = outputFilename + us::Any(level).ToString() + outputExtension;
-    MITK_INFO << "Saving to " << name;
-    mitk::IOUtil::Save(image, name);
-    ++level;
+    std::vector<mitk::Image::Pointer> results = mitk::TransformationOperation::WaveletForward(image, levels, bands, condition, waveletType);
+    unsigned int level = 0;
+    for (auto result : results)
+    {
+      std::string name = outputFilename + us::Any(level).ToString() + outputExtension;
+      MITK_INFO << "Saving to " << name;
+      mitk::IOUtil::Save(result, name);
+      ++level;
+    }
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;

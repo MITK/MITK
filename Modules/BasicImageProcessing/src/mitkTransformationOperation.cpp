@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <itkForwardFFTImageFilter.h>
 #include <itkInverseFFTImageFilter.h>
 #include <itkFFTPadImageFilter.h>
+#include <itkChangeInformationImageFilter.h>
+#include <itkVnlFFTImageFilterInitFactory.h>
 #include <itkZeroFluxNeumannBoundaryCondition.h>
 #include <itkPeriodicBoundaryCondition.h>
 #include <itkConstantBoundaryCondition.h>
@@ -208,7 +210,10 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
 
   // Pad Image so it fits the expect
   typename FFTPadType::Pointer fftpad = FFTPadType::New();
-  fftpad->SetSizeGreatestPrimeFactor(4);
+  // Pad to powers of two: every level halves the size and the VNL FFT only
+  // accepts sizes with the prime factors 2, 3 and 5, so any other padding
+  // can end up at a prime size after a few levels.
+  fftpad->SetSizeGreatestPrimeFactor(2);
   itk::ConstantBoundaryCondition< DoubleImageType > constantBoundaryCondition;
   itk::PeriodicBoundaryCondition< DoubleImageType > periodicBoundaryCondition;
   itk::ZeroFluxNeumannBoundaryCondition< DoubleImageType > zeroFluxNeumannBoundaryCondition;
@@ -228,8 +233,25 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
   }
   fftpad->SetInput(castFilter->GetOutput());
 
+  // FFTPadImageFilter shifts the start index of the padded region to negative
+  // values. WaveletFrequencyForward scales requested regions per level from
+  // that index and ends up outside the largest possible region, so the padded
+  // image is moved back to index zero first.
+  fftpad->UpdateOutputInformation();
+  typedef itk::ChangeInformationImageFilter< DoubleImageType > ChangeInformationType;
+  typename ChangeInformationType::Pointer changeInformation = ChangeInformationType::New();
+  changeInformation->SetInput(fftpad->GetOutput());
+  changeInformation->ChangeRegionOn();
+  typename ChangeInformationType::OutputImageOffsetType regionOffset;
+  const auto paddedIndex = fftpad->GetOutput()->GetLargestPossibleRegion().GetIndex();
+  for (unsigned int i = 0; i < Dimension; ++i)
+  {
+    regionOffset[i] = -paddedIndex[i];
+  }
+  changeInformation->SetOutputOffset(regionOffset);
+
   typename FFTFilterType::Pointer fftFilter = FFTFilterType::New();
-  fftFilter->SetInput(fftpad->GetOutput());
+  fftFilter->SetInput(changeInformation->GetOutput());
 
   // Calculate forward transformation
   typename ForwardWaveletType::Pointer forwardWavelet = ForwardWaveletType::New();
@@ -243,7 +265,7 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
   typename ComplexImageType::SpacingType inputSpacing;
   for (unsigned int i = 0; i < Dimension; ++i)
   {
-    inputSpacing[i] = image->GetLargestPossibleRegion().GetSize()[i];
+    inputSpacing[i] = image->GetSpacing()[i];
   }
   typename ComplexImageType::SpacingType expectedSpacing = inputSpacing;
   typename ComplexImageType::PointType inputOrigin = image->GetOrigin();
@@ -252,7 +274,6 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
   typename ComplexImageType::SizeType expectedSize = inputSize;
 
   // Inverse FFT to obtain filtered images
-  typename InverseFFTFilterType::Pointer inverseFFT = InverseFFTFilterType::New();
   for (unsigned int level = 0; level < numberOfLevels + 1; ++level)
   {
     double scaleFactorPerLevel = std::pow(static_cast< double >(forwardWavelet->GetScaleFactor()),static_cast< double >(level));
@@ -275,6 +296,9 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
         break;
       }
 
+      // The sub-band images shrink with each level, so a fresh filter is needed
+      // per output; reusing one keeps the requested region of the previous size.
+      typename InverseFFTFilterType::Pointer inverseFFT = InverseFFTFilterType::New();
       inverseFFT->SetInput(forwardWavelet->GetOutput(nOutput));
       inverseFFT->Update();
 
@@ -318,6 +342,10 @@ static void ExecuteWaveletTransformation(itk::Image<TPixel, VImageDimension>* im
 
 std::vector<mitk::Image::Pointer> mitk::TransformationOperation::WaveletForward(Image::Pointer & image, unsigned int numberOfLevels, unsigned int numberOfBands, mitk::BorderCondition condition, mitk::WaveletType waveletType)
 {
+  // MITK does not use ITK's automatic factory registration, so the FFT
+  // backend has to be registered explicitly before any FFT filter is created.
+  itk::VnlFFTImageFilterInitFactory::RegisterFactories();
+
   std::vector<Image::Pointer> resultImages;
   AccessByItk_n(image, ExecuteWaveletTransformation, (numberOfLevels, numberOfBands, condition, waveletType, resultImages));
   return resultImages;

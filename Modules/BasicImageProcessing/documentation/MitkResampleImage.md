@@ -48,7 +48,7 @@ Out-of-range values fall back to origin aligned (mapping) and linear (interpolat
 
 Without `--as-double` the output has the pixel type of the input; interpolated values are truncated for integer images unless `--round` is given.
 
-The first object in the input file is used. If it is not an image, the app prints a message and exits with code 0 without writing an output.
+The first object in the input file is used. If the file cannot be read or does not contain an image, the app reports the error and exits with code 1.
 
 ## Examples
 

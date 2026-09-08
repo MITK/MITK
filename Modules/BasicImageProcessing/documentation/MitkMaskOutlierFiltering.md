@@ -30,7 +30,7 @@ MitkMaskOutlierFiltering -i <image> -m <mask> -o <output mask>
 
 ## Details
 
-Image and mask must have the same geometry. The first object of each input file is used; if it is not an image, the app prints a message and exits with code 0 without writing an output.
+Image and mask must have the same geometry. The first object of each input file is used; if a file cannot be read or does not contain an image, the app reports the error and exits with code 1.
 
 ## Examples
 

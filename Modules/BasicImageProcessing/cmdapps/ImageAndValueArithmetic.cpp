@@ -44,7 +44,6 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
-  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("image", "i", mitkCommandLineParser::File, "Input file:", "Input File",us::Any(),false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("value", "v", mitkCommandLineParser::Float, "Input Value:", "Input Value", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
@@ -65,73 +64,86 @@ int main(int argc, char* argv[])
   std::string inputFilename = us::any_cast<std::string>(parsedArgs["image"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
 
-  auto nodes = mitk::IOUtil::Load(inputFilename);
-  if (nodes.size() == 0)
+  try
   {
-    MITK_INFO << "No Image Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
+    auto nodes = mitk::IOUtil::Load(inputFilename);
+    if (nodes.size() == 0)
+    {
+      MITK_ERROR << "No Image Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
 
-  if (image.IsNull())
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data is not of type image";
+      return EXIT_FAILURE;
+    }
+
+    double value = us::any_cast<float>(parsedArgs["value"]);
+    bool resultAsDouble = ConvertToBool(parsedArgs, "as-double");
+    MITK_INFO << "Output image as double: " << resultAsDouble;
+
+    mitk::Image::Pointer tmpImage = image->Clone();
+    if (ConvertToBool(parsedArgs, "image-right"))
+    {
+      if (ConvertToBool(parsedArgs, "add"))
+      {
+        MITK_INFO << " Start Doing Operation: ADD()";
+        tmpImage = mitk::ArithmeticOperation::Add(value, tmpImage, resultAsDouble);
+      }
+      if (ConvertToBool(parsedArgs, "subtract"))
+      {
+        MITK_INFO << " Start Doing Operation: SUB()";
+        tmpImage = mitk::ArithmeticOperation::Subtract(value, tmpImage, resultAsDouble);
+      }
+      if (ConvertToBool(parsedArgs, "multiply"))
+      {
+        MITK_INFO << " Start Doing Operation: MULT()";
+        tmpImage = mitk::ArithmeticOperation::Multiply(value, tmpImage, resultAsDouble);
+      }
+      if (ConvertToBool(parsedArgs, "divide"))
+      {
+        MITK_INFO << " Start Doing Operation: DIV()";
+        tmpImage = mitk::ArithmeticOperation::Divide(value, tmpImage, resultAsDouble);
+      }
+    }
+    else {
+      if (ConvertToBool(parsedArgs, "add"))
+      {
+        MITK_INFO << " Start Doing Operation: ADD()";
+        tmpImage = mitk::ArithmeticOperation::Add(tmpImage, value, resultAsDouble);
+      }
+      if (ConvertToBool(parsedArgs, "subtract"))
+      {
+        MITK_INFO << " Start Doing Operation: SUB()";
+        tmpImage = mitk::ArithmeticOperation::Subtract(tmpImage, value, resultAsDouble);
+      }
+      if (ConvertToBool(parsedArgs, "multiply"))
+      {
+        MITK_INFO << " Start Doing Operation: MULT()";
+        tmpImage = mitk::ArithmeticOperation::Multiply(tmpImage, value, resultAsDouble);
+      }
+      if (ConvertToBool(parsedArgs, "divide"))
+      {
+        MITK_INFO << " Start Doing Operation: DIV()";
+        tmpImage = mitk::ArithmeticOperation::Divide(tmpImage, value, resultAsDouble);
+      }
+
+    }
+
+    mitk::IOUtil::Save(tmpImage, outputFilename);
+
+    return EXIT_SUCCESS;
+  }
+  catch (const std::exception& e)
   {
-    MITK_INFO << "Loaded data is not of type image";
-    return 0;
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
   }
-
-  double value = us::any_cast<float>(parsedArgs["value"]);
-  bool resultAsDouble = ConvertToBool(parsedArgs, "as-double");
-  MITK_INFO << "Output image as double: " << resultAsDouble;
-
-  mitk::Image::Pointer tmpImage = image->Clone();
-  if (ConvertToBool(parsedArgs, "image-right"))
+  catch (...)
   {
-    if (ConvertToBool(parsedArgs, "add"))
-    {
-      MITK_INFO << " Start Doing Operation: ADD()";
-      tmpImage = mitk::ArithmeticOperation::Add(value, tmpImage, resultAsDouble);
-    }
-    if (ConvertToBool(parsedArgs, "subtract"))
-    {
-      MITK_INFO << " Start Doing Operation: SUB()";
-      tmpImage = mitk::ArithmeticOperation::Subtract(value, tmpImage, resultAsDouble);
-    }
-    if (ConvertToBool(parsedArgs, "multiply"))
-    {
-      MITK_INFO << " Start Doing Operation: MULT()";
-      tmpImage = mitk::ArithmeticOperation::Multiply(value, tmpImage, resultAsDouble);
-    }
-    if (ConvertToBool(parsedArgs, "divide"))
-    {
-      MITK_INFO << " Start Doing Operation: DIV()";
-      tmpImage = mitk::ArithmeticOperation::Divide(value, tmpImage, resultAsDouble);
-    }
+    MITK_ERROR << "Unexpected error encountered.";
+    return EXIT_FAILURE;
   }
-  else {
-    if (ConvertToBool(parsedArgs, "add"))
-    {
-      MITK_INFO << " Start Doing Operation: ADD()";
-      tmpImage = mitk::ArithmeticOperation::Add(tmpImage, value, resultAsDouble);
-    }
-    if (ConvertToBool(parsedArgs, "subtract"))
-    {
-      MITK_INFO << " Start Doing Operation: SUB()";
-      tmpImage = mitk::ArithmeticOperation::Subtract(tmpImage, value, resultAsDouble);
-    }
-    if (ConvertToBool(parsedArgs, "multiply"))
-    {
-      MITK_INFO << " Start Doing Operation: MULT()";
-      tmpImage = mitk::ArithmeticOperation::Multiply(tmpImage, value, resultAsDouble);
-    }
-    if (ConvertToBool(parsedArgs, "divide"))
-    {
-      MITK_INFO << " Start Doing Operation: DIV()";
-      tmpImage = mitk::ArithmeticOperation::Divide(tmpImage, value, resultAsDouble);
-    }
-
-  }
-
-  mitk::IOUtil::Save(tmpImage, outputFilename);
-
-  return EXIT_SUCCESS;
 }

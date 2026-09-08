@@ -65,10 +65,12 @@ All apps share the same command-line syntax, provided by the class
 mitkCommandLineParser.
 
 <ul>
-<li> Every argument has a long name with two dashes and a short name with one
-dash, for example <tt>--input</tt> and <tt>-i</tt>. Values follow the argument
-separated by a space: <tt>-i image.nrrd</tt>. List arguments take several
-values: <tt>-i a.nrrd b.nrrd c.nrrd</tt>.
+<li> Arguments have a long name with two dashes, for example
+<tt>--input</tt>, and most of them additionally a short name with one dash,
+for example <tt>-i</tt>. The tables on the app pages list both; where the
+short name column is empty, only the long name works. Values follow the
+argument separated by a space: <tt>-i image.nrrd</tt>. List arguments take
+several values: <tt>-i a.nrrd b.nrrd c.nrrd</tt>.
 <li> <tt>--help</tt> (<tt>-h</tt>) prints a description of all arguments and
 exits with code 0. The help text is also printed when a required argument is
 missing; the app then exits with code 1.
@@ -81,8 +83,7 @@ it; nothing else is printed in this case.
 <li> Otherwise the first line of output is <tt>Running Command Line Utility ...</tt>
 with the app title and the MITK version.
 <li> Apps return exit code 0 on success and 1 on failure unless their page
-documents other codes. Some apps also return 0 when they cannot load the input
-and stop early; the individual pages say so.
+documents other codes.
 </ul>
 
 Input and output files can be any format MITK reads or writes, for example

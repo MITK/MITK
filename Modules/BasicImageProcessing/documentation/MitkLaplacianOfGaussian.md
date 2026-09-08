@@ -33,7 +33,7 @@ MitkLaplacianOfGaussian -i <image> -o <output> -s <sigma> [--as-double]
 
 The Laplacian of Gaussian is signed and usually fractional. Without `--as-double` the result is cast to the pixel type of the input, which truncates values and clips negative values on unsigned images. Use `--as-double` unless you know the input type can hold the result.
 
-The first object in the input file is used. If it is not an image, the app prints a message and exits with code 0 without writing an output.
+The first object in the input file is used. If the file cannot be read or does not contain an image, the app reports the error and exits with code 1.
 
 ## Examples
 

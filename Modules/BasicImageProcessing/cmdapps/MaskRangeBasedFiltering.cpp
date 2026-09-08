@@ -28,10 +28,9 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("image", "i", mitkCommandLineParser::File, "Input image:", "Input Image", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("mask", "m", mitkCommandLineParser::File, "Input mask:", "Input Mask", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Filtered output mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("lower-limit", "lL", mitkCommandLineParser::Float, "Lower Limit", "Lower Limit", us::Any(), true);
   parser.addArgument("upper-limit", "ul", mitkCommandLineParser::Float, "Upper Limit", "Upper Limit", us::Any(), true);
@@ -45,59 +44,72 @@ int main(int argc, char* argv[])
   std::string maskFilename = us::any_cast<std::string>(parsedArgs["mask"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
 
-  auto nodes = mitk::IOUtil::Load(inputFilename);
-  if (nodes.size() == 0)
+  try
   {
-    MITK_INFO << "No Image Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
+    auto nodes = mitk::IOUtil::Load(inputFilename);
+    if (nodes.size() == 0)
+    {
+      MITK_ERROR << "No Image Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
 
-  if (image.IsNull())
-  {
-    MITK_INFO << "Loaded data (image) is not of type image";
-    return 0;
-  }
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data (image) is not of type image";
+      return EXIT_FAILURE;
+    }
 
 
-  auto maskNodes = mitk::IOUtil::Load(maskFilename);
-  if (maskNodes.size() == 0)
-  {
-    MITK_INFO << "No Mask Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(maskNodes[0].GetPointer());
+    auto maskNodes = mitk::IOUtil::Load(maskFilename);
+    if (maskNodes.size() == 0)
+    {
+      MITK_ERROR << "No Mask Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(maskNodes[0].GetPointer());
 
-  if (image.IsNull())
-  {
-    MITK_INFO << "Loaded data (mask) is not of type image";
-    return 0;
-  }
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data (mask) is not of type image";
+      return EXIT_FAILURE;
+    }
 
-  bool useUpperLimit = false;
-  bool useLowerLimit = false;
-  double lowerLimit = 0;
-  double upperLimit = 1;
+    bool useUpperLimit = false;
+    bool useLowerLimit = false;
+    double lowerLimit = 0;
+    double upperLimit = 1;
 
-  if (parsedArgs.count("lower-limit"))
-  {
-    useLowerLimit = true;
-    lowerLimit = us::any_cast<float>(parsedArgs["lower-limit"]);
-  }
-  if (parsedArgs.count("upper-limit"))
-  {
-    useUpperLimit = true;
-    upperLimit = us::any_cast<float>(parsedArgs["upper-limit"]);
-  }
+    if (parsedArgs.count("lower-limit"))
+    {
+      useLowerLimit = true;
+      lowerLimit = us::any_cast<float>(parsedArgs["lower-limit"]);
+    }
+    if (parsedArgs.count("upper-limit"))
+    {
+      useUpperLimit = true;
+      upperLimit = us::any_cast<float>(parsedArgs["upper-limit"]);
+    }
 
-  if (useLowerLimit || useUpperLimit)
-  {
+    if (!useLowerLimit && !useUpperLimit)
+    {
+      MITK_ERROR << "No limit specified. Specify either lower or upper limit";
+      return EXIT_FAILURE;
+    }
+
     mitk::Image::Pointer tmpImage = mitk::MaskCleaningOperation::RangeBasedMasking(image, mask, useLowerLimit, lowerLimit, useUpperLimit, upperLimit);
     mitk::IOUtil::Save(tmpImage, outputFilename);
-  } else
-  {
-    MITK_INFO << "No limit specified. Specify either lower or upper limit";
-  }
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unexpected error encountered.";
+    return EXIT_FAILURE;
+  }
 }

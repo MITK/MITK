@@ -46,7 +46,7 @@ If more than one operation flag is given, the operations are applied in the orde
 
 Without `--as-double` the result keeps the pixel type of the input, so fractional results are truncated for integer images. Use `--as-double` whenever the function produces non-integer values.
 
-The first object in the input file is used. If it is not an image, the app prints a message and exits with code 0 without writing an output.
+The first object in the input file is used. If the file cannot be read or does not contain an image, the app reports the error and exits with code 1.
 
 ## Examples
 

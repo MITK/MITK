@@ -44,7 +44,6 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
-  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input File",us::Any(),false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
@@ -71,87 +70,100 @@ int main(int argc, char* argv[])
   std::string inputFilename = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
 
-  auto nodes = mitk::IOUtil::Load(inputFilename);
-  if (nodes.size() == 0)
+  try
   {
-    MITK_INFO << "No Image Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
+    auto nodes = mitk::IOUtil::Load(inputFilename);
+    if (nodes.size() == 0)
+    {
+      MITK_ERROR << "No Image Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
 
-  if (image.IsNull())
-  {
-    MITK_INFO << "Loaded data is not of type image";
-    return 0;
-  }
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data is not of type image";
+      return EXIT_FAILURE;
+    }
 
-  bool resultAsDouble = ConvertToBool(parsedArgs, "as-double");
-  MITK_INFO << "Output image as double: " << resultAsDouble;
+    bool resultAsDouble = ConvertToBool(parsedArgs, "as-double");
+    MITK_INFO << "Output image as double: " << resultAsDouble;
 
-  mitk::Image::Pointer tmpImage = image->Clone();
+    mitk::Image::Pointer tmpImage = image->Clone();
 
-  if (ConvertToBool(parsedArgs, "tan"))
-  {
-    MITK_INFO << " Start Doing Operation: TAN()";
-    tmpImage = mitk::ArithmeticOperation::Tan(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "atan"))
-  {
-    MITK_INFO << " Start Doing Operation: ATAN()";
-    tmpImage = mitk::ArithmeticOperation::Atan(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "cos"))
-  {
-    MITK_INFO << " Start Doing Operation: COS()";
-    tmpImage = mitk::ArithmeticOperation::Cos(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "acos"))
-  {
-    MITK_INFO << " Start Doing Operation: ACOS()";
-    tmpImage = mitk::ArithmeticOperation::Acos(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "sin"))
-  {
-    MITK_INFO << " Start Doing Operation: SIN()";
-    tmpImage = mitk::ArithmeticOperation::Sin(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "asin"))
-  {
-    MITK_INFO << " Start Doing Operation: ASIN()";
-    tmpImage = mitk::ArithmeticOperation::Asin(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "square"))
-  {
-    MITK_INFO << " Start Doing Operation: SQUARE()";
-    tmpImage = mitk::ArithmeticOperation::Square(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "sqrt"))
-  {
-    MITK_INFO << " Start Doing Operation: SQRT()";
-    tmpImage = mitk::ArithmeticOperation::Sqrt(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "abs"))
-  {
-    MITK_INFO << " Start Doing Operation: ABS()";
-    tmpImage = mitk::ArithmeticOperation::Abs(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "exp"))
-  {
-    MITK_INFO << " Start Doing Operation: EXP()";
-    tmpImage = mitk::ArithmeticOperation::Exp(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "expneg"))
-  {
-    MITK_INFO << " Start Doing Operation: EXPNEG()";
-    tmpImage = mitk::ArithmeticOperation::ExpNeg(tmpImage, resultAsDouble);
-  }
-  if (ConvertToBool(parsedArgs, "log10"))
-  {
-    MITK_INFO << " Start Doing Operation: LOG10()";
-    tmpImage = mitk::ArithmeticOperation::Log10(tmpImage, resultAsDouble);
-  }
+    if (ConvertToBool(parsedArgs, "tan"))
+    {
+      MITK_INFO << " Start Doing Operation: TAN()";
+      tmpImage = mitk::ArithmeticOperation::Tan(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "atan"))
+    {
+      MITK_INFO << " Start Doing Operation: ATAN()";
+      tmpImage = mitk::ArithmeticOperation::Atan(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "cos"))
+    {
+      MITK_INFO << " Start Doing Operation: COS()";
+      tmpImage = mitk::ArithmeticOperation::Cos(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "acos"))
+    {
+      MITK_INFO << " Start Doing Operation: ACOS()";
+      tmpImage = mitk::ArithmeticOperation::Acos(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "sin"))
+    {
+      MITK_INFO << " Start Doing Operation: SIN()";
+      tmpImage = mitk::ArithmeticOperation::Sin(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "asin"))
+    {
+      MITK_INFO << " Start Doing Operation: ASIN()";
+      tmpImage = mitk::ArithmeticOperation::Asin(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "square"))
+    {
+      MITK_INFO << " Start Doing Operation: SQUARE()";
+      tmpImage = mitk::ArithmeticOperation::Square(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "sqrt"))
+    {
+      MITK_INFO << " Start Doing Operation: SQRT()";
+      tmpImage = mitk::ArithmeticOperation::Sqrt(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "abs"))
+    {
+      MITK_INFO << " Start Doing Operation: ABS()";
+      tmpImage = mitk::ArithmeticOperation::Abs(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "exp"))
+    {
+      MITK_INFO << " Start Doing Operation: EXP()";
+      tmpImage = mitk::ArithmeticOperation::Exp(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "expneg"))
+    {
+      MITK_INFO << " Start Doing Operation: EXPNEG()";
+      tmpImage = mitk::ArithmeticOperation::ExpNeg(tmpImage, resultAsDouble);
+    }
+    if (ConvertToBool(parsedArgs, "log10"))
+    {
+      MITK_INFO << " Start Doing Operation: LOG10()";
+      tmpImage = mitk::ArithmeticOperation::Log10(tmpImage, resultAsDouble);
+    }
 
-  mitk::IOUtil::Save(tmpImage, outputFilename);
+    mitk::IOUtil::Save(tmpImage, outputFilename);
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unexpected error encountered.";
+    return EXIT_FAILURE;
+  }
 }

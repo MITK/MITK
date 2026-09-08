@@ -27,9 +27,8 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("image", "i", mitkCommandLineParser::File, "Input image:", "Input Image", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Resampled output mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("spacing-x", "x", mitkCommandLineParser::Float, "Spacing in x direction", "Spacing in x direction", us::Any(), false);
   parser.addArgument("spacing-y", "y", mitkCommandLineParser::Float, "Spacing in y direction", "Spacing in y direction", us::Any(), false);
@@ -46,86 +45,99 @@ int main(int argc, char* argv[])
   std::string inputFilename = us::any_cast<std::string>(parsedArgs["image"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
 
-  auto nodes = mitk::IOUtil::Load(inputFilename);
-  if (nodes.size() == 0)
+  try
   {
-    MITK_INFO << "No Image Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
+    auto nodes = mitk::IOUtil::Load(inputFilename);
+    if (nodes.size() == 0)
+    {
+      MITK_ERROR << "No Image Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
 
-  if (image.IsNull())
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data (image) is not of type image";
+      return EXIT_FAILURE;
+    }
+
+    mitk::Vector3D spacing;
+    spacing[0] = us::any_cast<float>(parsedArgs["spacing-x"]);
+    spacing[1] = us::any_cast<float>(parsedArgs["spacing-y"]);
+    spacing[2] = us::any_cast<float>(parsedArgs["spacing-z"]);
+
+    int interpolator = 0;
+    if (parsedArgs.count("interpolator-type"))
+    {
+      interpolator =  us::any_cast<int>(parsedArgs["interpolator-type"]);
+    }
+
+    mitk::ImageMappingInterpolator::Type interpolatorType;
+    switch (interpolator)
+    {
+    case 0:
+      interpolatorType = mitk::ImageMappingInterpolator::Linear;
+      break;
+
+    case 1:
+      interpolatorType = mitk::ImageMappingInterpolator::BSpline_3;
+      break;
+
+    case 2:
+      interpolatorType = mitk::ImageMappingInterpolator::NearestNeighbor;
+      break;
+
+    case 3:
+      interpolatorType = mitk::ImageMappingInterpolator::WSinc_Hamming;
+      break;
+
+    case 4:
+      interpolatorType = mitk::ImageMappingInterpolator::WSinc_Welch;
+      break;
+
+    default:
+      interpolatorType = mitk::ImageMappingInterpolator::Linear;
+    }
+
+    int position = 0;
+    if (parsedArgs.count("mapping-type"))
+    {
+      position = us::any_cast<int>(parsedArgs["mapping-type"]);
+    }
+
+    mitk::GridInterpolationPositionType gridPosition;
+    switch (position)
+    {
+    case 0:
+      gridPosition = mitk::GridInterpolationPositionType::OriginAligned;
+      break;
+
+    case 1:
+      gridPosition = mitk::GridInterpolationPositionType::CenterAligned;
+      break;
+
+    case 2:
+      gridPosition = mitk::GridInterpolationPositionType::SameSize;
+      break;
+
+    default:
+      gridPosition = mitk::GridInterpolationPositionType::OriginAligned;
+    }
+
+    mitk::Image::Pointer tmpImage = mitk::TransformationOperation::ResampleMask(image, spacing, interpolatorType, gridPosition);
+    mitk::IOUtil::Save(tmpImage, outputFilename);
+
+
+    return EXIT_SUCCESS;
+  }
+  catch (const std::exception& e)
   {
-    MITK_INFO << "Loaded data (image) is not of type image";
-    return 0;
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
   }
-
-  mitk::Vector3D spacing;
-  spacing[0] = us::any_cast<float>(parsedArgs["spacing-x"]);
-  spacing[1] = us::any_cast<float>(parsedArgs["spacing-y"]);
-  spacing[2] = us::any_cast<float>(parsedArgs["spacing-z"]);
-
-  int interpolator = 0;
-  if (parsedArgs.count("interpolator-type"))
+  catch (...)
   {
-    interpolator =  us::any_cast<int>(parsedArgs["interpolator-type"]);
+    MITK_ERROR << "Unexpected error encountered.";
+    return EXIT_FAILURE;
   }
-
-  mitk::ImageMappingInterpolator::Type interpolatorType;
-  switch (interpolator)
-  {
-  case 0:
-    interpolatorType = mitk::ImageMappingInterpolator::Linear;
-    break;
-
-  case 1:
-    interpolatorType = mitk::ImageMappingInterpolator::BSpline_3;
-    break;
-
-  case 2:
-    interpolatorType = mitk::ImageMappingInterpolator::NearestNeighbor;
-    break;
-
-  case 3:
-    interpolatorType = mitk::ImageMappingInterpolator::WSinc_Hamming;
-    break;
-
-  case 4:
-    interpolatorType = mitk::ImageMappingInterpolator::WSinc_Welch;
-    break;
-
-  default:
-    interpolatorType = mitk::ImageMappingInterpolator::Linear;
-  }
-
-  int position = 0;
-  if (parsedArgs.count("mapping-type"))
-  {
-    position = us::any_cast<int>(parsedArgs["mapping-type"]);
-  }
-
-  mitk::GridInterpolationPositionType gridPosition;
-  switch (position)
-  {
-  case 0:
-    gridPosition = mitk::GridInterpolationPositionType::OriginAligned;
-    break;
-
-  case 1:
-    gridPosition = mitk::GridInterpolationPositionType::CenterAligned;
-    break;
-
-  case 2:
-    gridPosition = mitk::GridInterpolationPositionType::SameSize;
-    break;
-
-  default:
-    gridPosition = mitk::GridInterpolationPositionType::OriginAligned;
-  }
-
-  mitk::Image::Pointer tmpImage = mitk::TransformationOperation::ResampleMask(image, spacing, interpolatorType, gridPosition);
-  mitk::IOUtil::Save(tmpImage, outputFilename);
-
-
-  return EXIT_SUCCESS;
 }

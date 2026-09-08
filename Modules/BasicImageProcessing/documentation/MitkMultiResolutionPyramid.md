@@ -36,7 +36,7 @@ MitkMultiResolutionPyramid -i <image> -o <output prefix> -e <extension> -levels 
 
 Files are named `<output prefix><level><extension>`. Level 0 is the highest resolution and level n-1 the lowest, where n is the number of levels. For `-o pyramid/ct -e .nrrd -levels 3` the files `pyramid/ct0.nrrd`, `pyramid/ct1.nrrd` and `pyramid/ct2.nrrd` are written, with `ct2.nrrd` being the coarsest.
 
-The first object in the input file is used. If it is not an image, the app prints a message and exits with code 0 without writing an output.
+The first object in the input file is used. If the file cannot be read or does not contain an image, the app reports the error and exits with code 1.
 
 ## Examples
 

@@ -50,10 +50,9 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
-  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input file",us::Any(),false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("type", "t", mitkCommandLineParser::String, "Type definition:", "Define Scalar data type: int, uint, short, ushort, char, uchar, float, double", us::Any(), false);
+  parser.addArgument("type", "t", mitkCommandLineParser::String, "Type definition:", "Target scalar pixel type: int, uint, short, ushort, char, uchar, float, double, or none to write no output", us::Any(), false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
@@ -64,54 +63,67 @@ int main(int argc, char* argv[])
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
   std::string type = us::any_cast<std::string>(parsedArgs["type"]);
 
-  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputName);
-  mitk::Image::Pointer outputImage = mitk::Image::New();
+  try
+  {
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputName);
+    mitk::Image::Pointer outputImage = mitk::Image::New();
 
-  if (type.compare("int") == 0) {
-    CONVERT_IMAGE_TYPE(int);
-  }
-  else if (type.compare("uint") == 0)
-  {
-    CONVERT_IMAGE_TYPE(unsigned int);
-  }
-  else if (type.compare("char") == 0)
-  {
-    CONVERT_IMAGE_TYPE(char);
-  }
-  else if (type.compare("uchar") == 0)
-  {
-    CONVERT_IMAGE_TYPE(unsigned char);
-  }
-  else if (type.compare("short") == 0)
-  {
-    CONVERT_IMAGE_TYPE(short);
-  }
-  else if (type.compare("ushort") == 0)
-  {
-    CONVERT_IMAGE_TYPE(unsigned short);
-  }
-  else if (type.compare("float") == 0)
-  {
-    CONVERT_IMAGE_TYPE(float);
-  }
-  else if (type.compare("double") == 0)
-  {
-    CONVERT_IMAGE_TYPE(double);
-  }
-  else if (type.compare("none") == 0)
-  {
-    MITK_INFO << " No conversion performed";
+    if (type.compare("int") == 0) {
+      CONVERT_IMAGE_TYPE(int);
+    }
+    else if (type.compare("uint") == 0)
+    {
+      CONVERT_IMAGE_TYPE(unsigned int);
+    }
+    else if (type.compare("char") == 0)
+    {
+      CONVERT_IMAGE_TYPE(char);
+    }
+    else if (type.compare("uchar") == 0)
+    {
+      CONVERT_IMAGE_TYPE(unsigned char);
+    }
+    else if (type.compare("short") == 0)
+    {
+      CONVERT_IMAGE_TYPE(short);
+    }
+    else if (type.compare("ushort") == 0)
+    {
+      CONVERT_IMAGE_TYPE(unsigned short);
+    }
+    else if (type.compare("float") == 0)
+    {
+      CONVERT_IMAGE_TYPE(float);
+    }
+    else if (type.compare("double") == 0)
+    {
+      CONVERT_IMAGE_TYPE(double);
+    }
+    else if (type.compare("none") == 0)
+    {
+      MITK_INFO << " No conversion performed";
+      return EXIT_SUCCESS;
+    }
+    else
+    {
+      MITK_ERROR << "Unknown scalar data type \"" << type << "\". Supported types: int, uint, short, ushort, char, uchar, float, double, none";
+      return EXIT_FAILURE;
+    }
+
+    if (outputImage.IsNull())
+      return EXIT_FAILURE;
+
+    mitk::IOUtil::Save(outputImage, outputName);
     return EXIT_SUCCESS;
   }
-  else
+  catch (const std::exception& e)
   {
-    MITK_ERROR << "Unknown scalar data type \"" << type << "\". Supported types: int, uint, short, ushort, char, uchar, float, double, none";
+    MITK_ERROR << e.what();
     return EXIT_FAILURE;
   }
-
-  if (outputImage.IsNull())
+  catch (...)
+  {
+    MITK_ERROR << "Unexpected error encountered.";
     return EXIT_FAILURE;
-
-  mitk::IOUtil::Save(outputImage, outputName);
-  return EXIT_SUCCESS;
+  }
 }

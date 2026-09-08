@@ -39,7 +39,7 @@ If more than one operation flag is given, the operations are applied in the orde
 
 Without `--as-double` the result keeps the pixel type of the left image. Use `--as-double` for divisions and for subtractions that can become negative on unsigned images.
 
-The first object of each input file is used. If one of them is not an image, the app prints a message and exits with code 0 without writing an output.
+The first object of each input file is used. If a file cannot be read or does not contain an image, the app reports the error and exits with code 1.
 
 ## Examples
 

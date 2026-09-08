@@ -42,10 +42,9 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("image", "i", mitkCommandLineParser::File, "Input image:", "Input Image", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("output-extension", "e", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output prefix:", "Prefix of the output files, including the path", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output-extension", "e", mitkCommandLineParser::File, "Output extension:", "File extension of the output files, including the dot, e.g. .nrrd", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("number-of-levels", "levels", mitkCommandLineParser::Int, "Numbers of pyramid levels", "Number of pyramid levels", us::Any(), false);
   parser.addArgument("as-double", "double", mitkCommandLineParser::Bool, "Result Image as Type Double", "Result Image as Type Double", us::Any(false), true);
@@ -59,31 +58,44 @@ int main(int argc, char* argv[])
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
   std::string outputExtension = us::any_cast<std::string>(parsedArgs["output-extension"]);
 
-  auto nodes = mitk::IOUtil::Load(inputFilename);
-  if (nodes.size() == 0)
+  try
   {
-    MITK_INFO << "No Image Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
+    auto nodes = mitk::IOUtil::Load(inputFilename);
+    if (nodes.size() == 0)
+    {
+      MITK_ERROR << "No Image Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
 
-  if (image.IsNull())
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data (image) is not of type image";
+      return EXIT_FAILURE;
+    }
+
+    int levels = us::any_cast<int>(parsedArgs["number-of-levels"]);
+    bool asDouble = ConvertToBool(parsedArgs, "as-double");
+
+    std::vector<mitk::Image::Pointer> results = mitk::TransformationOperation::MultiResolution(image, levels, asDouble);
+    unsigned int level = 1;
+    for (auto image : results)
+    {
+      std::string name = outputFilename + us::Any(levels - level).ToString() + outputExtension;
+      mitk::IOUtil::Save(image, name);
+      ++level;
+    }
+
+    return EXIT_SUCCESS;
+  }
+  catch (const std::exception& e)
   {
-    MITK_INFO << "Loaded data (image) is not of type image";
-    return 0;
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
   }
-
-  int levels = us::any_cast<int>(parsedArgs["number-of-levels"]);
-  bool asDouble = ConvertToBool(parsedArgs, "as-double");
-
-  std::vector<mitk::Image::Pointer> results = mitk::TransformationOperation::MultiResolution(image, levels, asDouble);
-  unsigned int level = 1;
-  for (auto image : results)
+  catch (...)
   {
-    std::string name = outputFilename + us::Any(levels - level).ToString() + outputExtension;
-    mitk::IOUtil::Save(image, name);
-    ++level;
+    MITK_ERROR << "Unexpected error encountered.";
+    return EXIT_FAILURE;
   }
-
-  return EXIT_SUCCESS;
 }

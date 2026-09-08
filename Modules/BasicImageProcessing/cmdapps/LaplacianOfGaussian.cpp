@@ -42,9 +42,8 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("image", "i", mitkCommandLineParser::File, "Input image:", "Input Image", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Filtered output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("sigma", "s", mitkCommandLineParser::Float, "Sigma for Gaussian", "Sigma for Gaussian", us::Any(), false);
   parser.addArgument("as-double", "double", mitkCommandLineParser::Bool, "Result Image as Type Double", "Result Image as Type Double", us::Any(false), true);
@@ -57,28 +56,41 @@ int main(int argc, char* argv[])
   std::string inputFilename = us::any_cast<std::string>(parsedArgs["image"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
 
-  auto nodes = mitk::IOUtil::Load(inputFilename);
-  if (nodes.size() == 0)
+  try
   {
-    MITK_INFO << "No Image Loaded";
-    return 0;
-  }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
+    auto nodes = mitk::IOUtil::Load(inputFilename);
+    if (nodes.size() == 0)
+    {
+      MITK_ERROR << "No Image Loaded";
+      return EXIT_FAILURE;
+    }
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0].GetPointer());
 
-  if (image.IsNull())
+    if (image.IsNull())
+    {
+      MITK_ERROR << "Loaded data (image) is not of type image";
+      return EXIT_FAILURE;
+    }
+
+    double sigma = us::any_cast<float>(parsedArgs["sigma"]);
+
+
+
+    bool asDouble = ConvertToBool(parsedArgs, "as-double");
+    mitk::Image::Pointer tmpImage = mitk::TransformationOperation::LaplacianOfGaussian(image, sigma, asDouble);
+    mitk::IOUtil::Save(tmpImage, outputFilename);
+
+
+    return EXIT_SUCCESS;
+  }
+  catch (const std::exception& e)
   {
-    MITK_INFO << "Loaded data (image) is not of type image";
-    return 0;
+    MITK_ERROR << e.what();
+    return EXIT_FAILURE;
   }
-
-  double sigma = us::any_cast<float>(parsedArgs["sigma"]);
-
-
-
-  bool asDouble = ConvertToBool(parsedArgs, "as-double");
-  mitk::Image::Pointer tmpImage = mitk::TransformationOperation::LaplacianOfGaussian(image, sigma, asDouble);
-  mitk::IOUtil::Save(tmpImage, outputFilename);
-
-
-  return EXIT_SUCCESS;
+  catch (...)
+  {
+    MITK_ERROR << "Unexpected error encountered.";
+    return EXIT_FAILURE;
+  }
 }

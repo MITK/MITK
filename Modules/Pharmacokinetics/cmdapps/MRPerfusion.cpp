@@ -13,9 +13,6 @@ found in the LICENSE file.
 // std includes
 #include <string>
 
-// itk includes
-#include <itksys/SystemTools.hxx>
-
 // CTK includes
 #include <mitkCommandLineParser.h>
 
@@ -76,6 +73,12 @@ const std::string MODEL_NAME_descriptive = "descriptive";
 const std::string MODEL_NAME_tofts = "tofts";
 const std::string MODEL_NAME_2CX = "2CX";
 
+bool isKnownModel(const std::string& name)
+{
+    return name == MODEL_NAME_descriptive || name == MODEL_NAME_2SL || name == MODEL_NAME_3SL
+        || name == MODEL_NAME_tofts || name == MODEL_NAME_2CX;
+}
+
 void onFitEvent(::itk::Object* caller, const itk::EventObject & event, void* /*data*/)
 {
     itk::ProgressEvent progressEvent;
@@ -126,7 +129,7 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument(
       "aifimage", "a", mitkCommandLineParser::File, "AIF image file", "3D+t image that defines the image that contains the AIF signal. If this flag is not set and the model needs a AIF, the CLI will assume that the AIF is encoded in the normal image. Must have the same geometry as the AIF mask!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument(
-      "hematocrit", "h", mitkCommandLineParser::Float, "Hematocrit Level", "Value needed for correct AIF computation. Only needed if model needs an AIF. Default value is 0.45.", us::Any(0.45));
+      "hematocrit", "hct", mitkCommandLineParser::Float, "Hematocrit Level", "Value needed for correct AIF computation. Only needed if model needs an AIF. Default value is 0.45.", us::Any(0.45));
     parser.endGroup();
 
     parser.beginGroup("Optional parameters");
@@ -632,31 +635,6 @@ void generateAIFbasedModelFit_ROIBased(
 }
 
 
-void storeResultImage(const std::string& name, mitk::Image* image, mitk::modelFit::Parameter::Type nodeType, const mitk::modelFit::ModelFitInfo* modelFitInfo)
-{
-    mitk::modelFit::SetModelFitDataProperties(image, name, nodeType, modelFitInfo);
-
-    std::string ext = ::itksys::SystemTools::GetFilenameLastExtension(outFileName);
-
-    std::string dir = itksys::SystemTools::GetFilenamePath(outFileName);
-    dir = itksys::SystemTools::ConvertToOutputPath(dir);
-
-    std::string rootName = itksys::SystemTools::GetFilenameWithoutLastExtension(outFileName);
-
-    std::string fileName = rootName + "_" + name + ext;
-
-    std::vector<std::string> pathElements;
-    pathElements.push_back(dir);
-    pathElements.push_back(fileName);
-
-    std::string fullOutPath = itksys::SystemTools::ConvertToOutputPath(dir + "/" + fileName);
-
-    mitk::IOUtil::Save(image, fullOutPath);
-
-    std::cout << "Store result (parameter: "<<name<<"): " << fullOutPath << std::endl;
-}
-
-
 void createFitGenerator(mitk::modelFit::ModelFitInfo::Pointer& fitSession, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
   bool isDescBrixFactory = modelName == MODEL_NAME_descriptive;
@@ -796,12 +774,24 @@ int main(int argc, char* argv[])
     //! [do processing]
     try
     {
-		image = mitk::IOUtil::Load<mitk::Image>(inFilename, &readerFilterFunctor);
+        if (!isKnownModel(modelName))
+        {
+            mitkThrow() << "Error. Unknown model \"" << modelName << "\". Valid values for --model are: "
+                << MODEL_NAME_descriptive << ", " << MODEL_NAME_2SL << ", " << MODEL_NAME_3SL << ", "
+                << MODEL_NAME_tofts << ", " << MODEL_NAME_2CX << ".";
+        }
+
+        if (modelName == MODEL_NAME_descriptive && !(brixInjectionTime > 0))
+        {
+            mitkThrow() << "Error. The descriptive model requires a positive injection time (--injectiontime).";
+        }
+
+        image = mitk::IOUtil::Load<mitk::Image>(inFilename, &readerFilterFunctor);
         std::cout << "Input: " << inFilename << std::endl;
 
         if (!maskFileName.empty())
         {
-			mask = mitk::IOUtil::Load<mitk::Image>(maskFileName, &readerFilterFunctor);
+            mask = mitk::IOUtil::Load<mitk::Image>(maskFileName, &readerFilterFunctor);
             std::cout << "Mask:  " << maskFileName << std::endl;
         }
         else
@@ -822,7 +812,7 @@ int main(int argc, char* argv[])
           }
           if (!aifImageFileName.empty())
           {
-   	        aifImage = mitk::IOUtil::Load<mitk::Image>(aifImageFileName, &readerFilterFunctor);
+            aifImage = mitk::IOUtil::Load<mitk::Image>(aifImageFileName, &readerFilterFunctor);
             std::cout << "AIF image:  " << aifImageFileName << std::endl;
           }
           else

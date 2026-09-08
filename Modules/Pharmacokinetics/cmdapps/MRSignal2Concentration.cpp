@@ -38,11 +38,8 @@ bool t1_absolute(false);
 bool t1_relative(false);
 bool t2(false);
 
-float k(1.0);
+float k(0);
 float te(0);
-float rec_time(0);
-float relaxivity(0);
-float rel_time(0);
 
 void setupParser(mitkCommandLineParser& parser)
 {
@@ -79,15 +76,10 @@ void setupParser(mitkCommandLineParser& parser)
       "t2", "", mitkCommandLineParser::Bool, "T2 signal conversion", "Activate conversion for T2 signal enhancement to concentration.");
 
     parser.addArgument(
-      "k", "k", mitkCommandLineParser::Float, "Conversion factor k", "Needed for the following conversion modes: T1-absolute, T1-relative, T2. Default value is 1.", us::Any(1));
+      "k", "k", mitkCommandLineParser::Float, "Conversion factor k", "Required for all conversion modes (T1-absolute, T1-relative, T2).", us::Any(), false);
     parser.addArgument(
-      "recovery-time", "", mitkCommandLineParser::Float, "Recovery time", "Needed for the following conversion modes: T1-flash.");
-    parser.addArgument(
-      "relaxivity", "", mitkCommandLineParser::Float, "Relaxivity", "Needed for the following conversion modes: T1-flash.");
-    parser.addArgument(
-      "relaxation-time", "", mitkCommandLineParser::Float, "Relaxation time", "Needed for the following conversion modes: T1-flash.");
-    parser.addArgument(
-      "te", "", mitkCommandLineParser::Float, "Echo time TE", "Needed for the following conversion modes: T2.", us::Any(1));
+      "te", "", mitkCommandLineParser::Float, "Echo time TE", "Required for the T2 conversion mode.", us::Any());
+    parser.endGroup();
 
     parser.beginGroup("Optional parameters");
     parser.addArgument(
@@ -136,24 +128,6 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
       k = us::any_cast<float>(parsedArgs["k"]);
     }
 
-    relaxivity = 0.0;
-    if (parsedArgs.count("relaxivity"))
-    {
-      relaxivity = us::any_cast<float>(parsedArgs["relaxivity"]);
-    }
-
-    rec_time = 0.0;
-    if (parsedArgs.count("recovery-time"))
-    {
-      rec_time = us::any_cast<float>(parsedArgs["recovery-time"]);
-    }
-
-    rel_time = 0.0;
-    if (parsedArgs.count("relaxation-time"))
-    {
-      rel_time = us::any_cast<float>(parsedArgs["relaxation-time"]);
-    }
-
     te = 0.0;
     if (parsedArgs.count("te"))
     {
@@ -196,7 +170,6 @@ void doConversion()
       mitk::ConcentrationCurveGenerator::New();
     concentrationGen->SetDynamicImage(image);
 
-    //concentrationGen->SetisTurboFlashSequence(t1_flash);
     concentrationGen->SetAbsoluteSignalEnhancement(t1_absolute);
     concentrationGen->SetRelativeSignalEnhancement(t1_relative);
 
@@ -224,6 +197,14 @@ int main(int argc, char* argv[])
     mitkCommandLineParser parser;
     setupParser(parser);
     const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
+
+    // Show a help message
+    if (parsedArgs.count("help") || parsedArgs.count("h"))
+    {
+        std::cout << parser.helpText();
+        return EXIT_SUCCESS;
+    }
+
     try
     {
       if (!configureApplicationSettings(parsedArgs))
@@ -248,13 +229,6 @@ int main(int argc, char* argv[])
     }
 
     mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (autoselect)" }, { "" });
-
-    // Show a help message
-    if (parsedArgs.count("help") || parsedArgs.count("h"))
-    {
-        std::cout << parser.helpText();
-        return EXIT_SUCCESS;
-    }
 
     //! [do processing]
     try

@@ -22,6 +22,7 @@ MitkMRSignal2Concentration -i <input> -o <output> (--t1-absolute | --t1-relative
 |----------|-------|------|-------------|
 | `--input` | `-i` | File | Input 3D+t MR signal image. |
 | `--output` | `-o` | File | Output file for the concentration image. The extension determines the format. |
+| `--k` | `-k` | Float | Conversion factor k, used by all three conversion modes. Must not be 0. |
 
 ### Optional arguments
 
@@ -30,13 +31,9 @@ MitkMRSignal2Concentration -i <input> -o <output> (--t1-absolute | --t1-relative
 | `--t1-absolute` | | Flag | | Convert using T1 absolute signal enhancement. Exactly one of the three mode flags must be given. |
 | `--t1-relative` | | Flag | | Convert using T1 relative signal enhancement. Exactly one of the three mode flags must be given. |
 | `--t2` | | Flag | | Convert a T2 (T2*) weighted signal to concentration. Exactly one of the three mode flags must be given. |
-| `--k` | `-k` | Float | | Conversion factor k. Required in all three modes; the app fails if it is missing or 0. |
 | `--te` | | Float | | Echo time TE. Required in `--t2` mode; the app fails if it is missing or 0 in that mode. Ignored otherwise. |
-| `--recovery-time` | | Float | | Accepted, but not used by any available conversion mode. |
-| `--relaxivity` | | Float | | Accepted, but not used by any available conversion mode. |
-| `--relaxation-time` | | Float | | Accepted, but not used by any available conversion mode. |
 | `--verbose` | `-v` | Flag | | Accepted, but currently has no effect on the output. |
-| `--help` | `-h` | Flag | | Show the help text and exit. Only effective if the other arguments form a valid call, see below. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
 ## Details
 
@@ -50,12 +47,11 @@ Exactly one mode flag must be set. With no mode flag the app fails with "Please 
 | `--t1-relative` | `C(t) = k * (S(t) - S0) / S0` | Result is 0 where `S0` is 0. |
 | `--t2` | `C(t) = -(k / TE) * ln(S(t) / S0)` | Result is 0 where `S(t)` or `S0` is 0. |
 
-The help text of the app mentions a "T1-flash" mode for `--recovery-time`, `--relaxivity` and `--relaxation-time`. This mode is not available in the app; the three values are parsed but never passed on, so they have no effect.
+### Argument validation
 
-### Argument validation and defaults
-
-- `k` and `te` are validated before anything is loaded. The help text reports a default of 1 for both, but the app uses 0 when the argument is absent and then rejects the call ("Please set 'k'" or "Please set 'te'"). Effectively `-k` is always required, and `--te` is required in `--t2` mode.
-- Validation happens before the `--help` check. `MitkMRSignal2Concentration --help` alone therefore prints the help text because the required arguments are missing, but exits with code 1. A call with `-i`, `-o`, a mode flag, `-k` (and `--te` for `--t2`) plus `--help` prints the help text and exits with code 0.
+- `-k` is a required argument. If it is missing, the help text is printed and the app exits with code 1, like for a missing `-i` or `-o`. A value of 0 is rejected ("Please set 'k'").
+- `--te` is validated only in `--t2` mode; a missing or zero value is rejected there ("Please set 'te'").
+- All validation happens before any data is loaded, and `--help` is honoured before validation: a call that contains the required arguments and `--help` prints the help text and exits with code 0 even if the mode flags or `--te` would be rejected.
 
 ### Baseline and output
 

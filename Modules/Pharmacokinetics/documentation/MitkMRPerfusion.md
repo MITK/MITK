@@ -28,27 +28,24 @@ MitkMRPerfusion -i <input> -o <output> [options]
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
 | `--model` | `-l` | String | `tofts` | Model to fit. One of `descriptive` (descriptive pharmacokinetic Brix model), `2SL` (two step linear model), `3SL` (three step linear model), `tofts` (extended Tofts model) or `2CX` (two compartment exchange model). Case-sensitive. |
-| `--injectiontime` | `-j` | Float | `0` | Injection time of the bolus in minutes. Only used by the `descriptive` model, which requires a non-zero value. |
+| `--injectiontime` | `-j` | Float | | Injection time of the bolus in minutes. Only used by the `descriptive` model, which requires a positive value. |
 | `--aifmask` | `-n` | File | | Mask that defines the voxels used to derive the arterial input function (AIF). Required for `tofts` and `2CX`. Must have the same geometry as the AIF image. |
 | `--aifimage` | `-a` | File | | 3D+t image from which the AIF is extracted. If not given, the AIF is extracted from the input image. |
-| `--hematocrit` | `-h` | Float | `0.45` | Hematocrit level used to convert the AIF from blood to plasma concentration. Only used for AIF based models. |
+| `--hematocrit` | `-hct` | Float | `0.45` | Hematocrit level used to convert the AIF from blood to plasma concentration. Only used for AIF based models. |
 | `--mask` | `-m` | File | | Mask that defines the voxels to fit. Optional for pixel based fitting, required for ROI based fitting. Must have the same geometry as the input image. |
 | `--roibased` | `-r` | Flag | | Fit the mean curve of the mask region once instead of fitting each voxel. Requires `--mask`. |
 | `--preview` | `-p` | Flag | | Load the inputs, set up the fit and print the output file paths the app would produce, without fitting. |
 | `--verbose` | `-v` | Flag | | Accepted, but currently has no effect on the output. |
-
-There is no working `--help` argument, see "Help text" below.
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
 ## Details
 
 ### Model selection
 
-`--model` is compared case-sensitively against the five names listed above; `tofts` is used when the argument is omitted. The models fall into two groups:
+`--model` is compared case-sensitively against the five names listed above; `tofts` is used when the argument is omitted. An unknown model name is rejected before any data is loaded; the error message lists the valid names and the app exits with code 1. The models fall into two groups:
 
 - AIF based models (`tofts`, `2CX`) need an arterial input function. `--aifmask` is mandatory for them, `--aifimage` and `--hematocrit` are evaluated.
 - Models without AIF (`descriptive`, `2SL`, `3SL`) silently ignore `--aifmask`, `--aifimage` and `--hematocrit`.
-
-An unknown model name is not rejected up front. It is treated like an AIF based model, so without `--aifmask` the app fails with "Chosen model needs an AIF"; with an AIF mask it fails later with "Model flag is unknown" followed by "Could not initialize fitting job". Both cases exit with code 1.
 
 The time grid of all models is extracted from the time geometry of the input image and used in seconds. Concentration values are expected in mM for the AIF based models.
 
@@ -76,7 +73,7 @@ The console prints the chosen style ("pixel based" or "ROI based"), the model, t
 
 All models are fitted with a Levenberg-Marquardt optimizer using the sum of squared differences as criterion. Parameter scales are 1.0 for all parameters. The default constraints of the model factory are applied: for `tofts` and `2CX` the volume fractions are constrained to 0 <= v_e <= 1, 0 <= v_p <= 1 and v_e + v_p <= 1; `descriptive`, `2SL` and `3SL` run unconstrained. The initial parameter values are the defaults of the respective model parameterizer (for example K^trans = 15, v_e = 0.5, v_p = 0.05 for `tofts`; F_p = 20, PS = 5, v_e = 0.1, v_p = 0.04 for `2CX`; A = 1, k_ep = 4, k_el = 0.2, BAT = 1 for `descriptive`). Debug parameter maps of the optimizer are always generated.
 
-The `descriptive` model needs two static parameters: the injection time (`--injectiontime`, in minutes, stored as `Injection_time`) and the pre-contrast signal (`Pre_contrast_signal`). The pre-contrast signal is taken from the first time step of the input image, per voxel in pixel based mode and as the first value of the ROI mean curve in ROI based mode. An injection time of 0 (the default) makes the model evaluation throw an exception, so `-j` must be given for this model.
+The `descriptive` model needs two static parameters: the injection time (`--injectiontime`, in minutes, stored as `Injection_time`) and the pre-contrast signal (`Pre_contrast_signal`). The pre-contrast signal is taken from the first time step of the input image, per voxel in pixel based mode and as the first value of the ROI mean curve in ROI based mode. The injection time must be positive; if `-j` is missing or not positive for this model, the app fails before loading any data.
 
 ### Output files
 
@@ -157,10 +154,6 @@ The model is constant (`baseline`) before the first change point, `y = y-interce
 
 With `--preview` the app loads the input image and all masks, computes the AIF and, in ROI based mode, the ROI mean curve, but does not fit. It prints one line per result image with its type and output path, followed by "Preview done.".
 
-### Help text
-
-The app declares a `--help`/`-h` argument, but the short name `-h` is already taken by `--hematocrit`, so the help argument is never registered. `-h` always expects a hematocrit value and `--help` is ignored as an unknown argument. The help text is only printed when the app is started without the required `--input` and `--output` arguments; in that case the app exits with code 1.
-
 ### Input requirements
 
 - The input and the AIF image must be 3D+t images. A plain 3D input is rejected because the fitting is only instantiated for four-dimensional images. Any scalar pixel type supported by MITK can be used.
@@ -179,7 +172,7 @@ Extracts the AIF from `dce_concentration.nrrd` inside `aif_mask.nrrd` (divided b
 ### Two compartment exchange model with a separate AIF image
 
 ```bash
-MitkMRPerfusion -i dce_concentration.nrrd -o results/2cx.nrrd -l 2CX -a aif_concentration.nrrd -n aif_mask.nrrd -h 0.42
+MitkMRPerfusion -i dce_concentration.nrrd -o results/2cx.nrrd -l 2CX -a aif_concentration.nrrd -n aif_mask.nrrd -hct 0.42
 ```
 
 Computes the AIF from `aif_concentration.nrrd` inside `aif_mask.nrrd` using a hematocrit of 0.42 and fits the two compartment exchange model to all voxels of the input. Produces `2cx_F_p.nrrd`, `2cx_PS.nrrd`, `2cx_v_e.nrrd`, `2cx_v_p.nrrd` and the criterion, evaluation and debug maps.

@@ -70,7 +70,6 @@ int main(int argc, char* argv[])
   try
   {
     MITK_INFO << "Read images";
-    mitk::Image::Pointer mask1;
     mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
 
     if (parsedArgs.count("float"))
@@ -82,20 +81,25 @@ int main(int argc, char* argv[])
     }
 
     mitk::Image::Pointer mask0 = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask0"].ToString());
-    if (mode > 3)
-    {
-      mask1 = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask1"].ToString());
-    }
     mitk::MRNormLinearStatisticBasedFilter::Pointer oneRegion = mitk::MRNormLinearStatisticBasedFilter::New();
     mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();
     mitk::Image::Pointer output;
 
-    oneRegion->SetInput(image);
-    oneRegion->SetMask(mask0);
-    oneRegion->SetIgnoreOutlier(ignore_outlier);
-    twoRegion->SetInput(image);
-    twoRegion->SetMask1(mask0);
-    twoRegion->SetMask2(mask1);
+    // Only the two-region modes have a second mask, so the two filters are set
+    // up separately instead of feeding a null image into the unused one.
+    if (mode > 3)
+    {
+      mitk::Image::Pointer mask1 = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask1"].ToString());
+      twoRegion->SetInput(image);
+      twoRegion->SetMask1(mask0);
+      twoRegion->SetMask2(mask1);
+    }
+    else
+    {
+      oneRegion->SetInput(image);
+      oneRegion->SetMask(mask0);
+      oneRegion->SetIgnoreOutlier(ignore_outlier);
+    }
 
     if (parsedArgs.count("value"))
     {

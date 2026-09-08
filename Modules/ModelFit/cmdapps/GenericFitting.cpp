@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // std includes
+#include <charconv>
 #include <string>
 
 // itk includes
@@ -75,7 +76,7 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument(
         "function", "f", mitkCommandLineParser::String, "Model function", "Function that should be used to fit the intensity signals. Options are: \"Linear\" or \"Generic-<N>\" for a generic formula with N free parameters (1 to 10), named a, b, c, ... in the formula.", us::Any(std::string("Linear")));
     parser.addArgument(
-        "formular", "y", mitkCommandLineParser::String, "Generic model function formular", "Formular of a generic model (if selected) that will be parsed and fitted.", us::Any());
+        "formular", "y", mitkCommandLineParser::String, "Generic model function formula", "Formula of a generic model (if selected) that will be parsed and fitted. Required for \"Generic-<N>\".", us::Any());
     parser.endGroup();
     parser.beginGroup("Required I/O parameters");
     parser.addArgument(
@@ -96,7 +97,6 @@ void setupParser(mitkCommandLineParser& parser)
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
     parser.addArgument(
         "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intensity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }
@@ -126,11 +126,13 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
             return false;
         }
 
-        try
-        {
-            numberOfParameters = std::stoul(functionName.substr(prefix.size()));
-        }
-        catch (const std::exception&)
+        // from_chars instead of stoul: the whole suffix has to be the number,
+        // otherwise "Generic-7abc" would silently fit seven parameters.
+        const std::string suffix = functionName.substr(prefix.size());
+        const char* const suffixEnd = suffix.data() + suffix.size();
+        const auto [parseEnd, parseError] = std::from_chars(suffix.data(), suffixEnd, numberOfParameters);
+
+        if (parseError != std::errc() || parseEnd != suffixEnd)
         {
             numberOfParameters = 0;
         }

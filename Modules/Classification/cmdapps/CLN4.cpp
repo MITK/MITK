@@ -11,12 +11,27 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCommandLineParser.h>
-#include <mitkException.h>
+#include <mitkExceptionMacro.h>
 #include <mitkIOUtil.h>
 #include <mitkImageCast.h>
 #include <itkN4BiasFieldCorrectionImageFilter.h>
 
 #include <algorithm>
+
+namespace
+{
+  /** All N4 counts end up in unsigned ITK fields, where a negative value would
+      wrap into an enormous bin or iteration count instead of being rejected. */
+  unsigned int GetPositiveInt(const std::map<std::string, us::Any>& parsedArgs, const std::string& name)
+  {
+    const int value = us::any_cast<int>(parsedArgs.at(name));
+
+    if (value < 1)
+      mitkThrow() << "Argument --" << name << " must be greater than 0 but is " << value << '.';
+
+    return static_cast<unsigned int>(value);
+  }
+}
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +47,6 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("mask", "m", mitkCommandLineParser::File, "Mask file:", "Mask image; all voxels other than 0 are used for the bias field estimation", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Corrected output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
@@ -67,25 +81,25 @@ int main(int argc, char* argv[])
 
     if (parsedArgs.count("number-of-controllpoints") > 0)
     {
-      const int variable = us::any_cast<int>(parsedArgs["number-of-controllpoints"]);
+      const unsigned int variable = GetPositiveInt(parsedArgs, "number-of-controllpoints");
       MITK_INFO << "Number of control points: " << variable;
       filter->SetNumberOfControlPoints(variable);
     }
     if (parsedArgs.count("number-of-fitting-levels") > 0)
     {
-      const int variable = us::any_cast<int>(parsedArgs["number-of-fitting-levels"]);
+      const unsigned int variable = GetPositiveInt(parsedArgs, "number-of-fitting-levels");
       MITK_INFO << "Number of fitting levels: " << variable;
       filter->SetNumberOfFittingLevels(variable);
     }
     if (parsedArgs.count("number-of-histogram-bins") > 0)
     {
-      const int variable = us::any_cast<int>(parsedArgs["number-of-histogram-bins"]);
+      const unsigned int variable = GetPositiveInt(parsedArgs, "number-of-histogram-bins");
       MITK_INFO << "Number of histogram bins: " << variable;
       filter->SetNumberOfHistogramBins(variable);
     }
     if (parsedArgs.count("spline-order") > 0)
     {
-      const int variable = us::any_cast<int>(parsedArgs["spline-order"]);
+      const unsigned int variable = GetPositiveInt(parsedArgs, "spline-order");
       MITK_INFO << "Spline Order " << variable;
       filter->SetSplineOrder(variable);
     }
@@ -104,7 +118,7 @@ int main(int argc, char* argv[])
 
     if (parsedArgs.count("number-of-maximum-iterations") > 0)
     {
-      iterationsPerLevel = us::any_cast<int>(parsedArgs["number-of-maximum-iterations"]);
+      iterationsPerLevel = GetPositiveInt(parsedArgs, "number-of-maximum-iterations");
       MITK_INFO << "Number of Maximum Iterations: " << iterationsPerLevel;
     }
 

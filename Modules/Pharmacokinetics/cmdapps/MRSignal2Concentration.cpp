@@ -84,7 +84,6 @@ void setupParser(mitkCommandLineParser& parser)
     parser.beginGroup("Optional parameters");
     parser.addArgument(
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }
@@ -123,13 +122,15 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
     }
 
     k = 0.0;
-    if (parsedArgs.count("k"))
+    const bool kIsSet = parsedArgs.count("k") > 0;
+    if (kIsSet)
     {
       k = us::any_cast<float>(parsedArgs["k"]);
     }
 
     te = 0.0;
-    if (parsedArgs.count("te"))
+    const bool teIsSet = parsedArgs.count("te") > 0;
+    if (teIsSet)
     {
       te = us::any_cast<float>(parsedArgs["te"]);
     }
@@ -150,14 +151,26 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
       mitkThrow() << "Invalid program call. Please select only ONE type of conversion.";
     }
 
-    if (!k && (t2 || t1_absolute || t1_relative))
+    // Test presence, not the value: testing the number itself reported an
+    // explicitly supplied 0 as a missing argument.
+    if (!kIsSet)
     {
       mitkThrow() << "Invalid program call. Please set 'k', if you use t1-absolute, t1-relative or t2.";
     }
 
-    if (!te && t2)
+    if (k == 0.0f)
+    {
+      mitkThrow() << "Invalid program call. 'k' must not be 0.";
+    }
+
+    if (t2 && !teIsSet)
     {
       mitkThrow() << "Invalid program call. Please set 'te', if you use t2 mode.";
+    }
+
+    if (t2 && te == 0.0f)
+    {
+      mitkThrow() << "Invalid program call. 'te' must not be 0.";
     }
 
 

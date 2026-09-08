@@ -18,9 +18,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  TransferFunction::RGBControlPoints ResampleColorWindow(vtkColorTransferFunction* source, double dataMin, double dataMax, double shift, double width, int samples)
+  std::vector<double> ResampleColorWindow(vtkColorTransferFunction* source, double dataMin, double dataMax, double shift, double width, int samples)
   {
-    TransferFunction::RGBControlPoints result;
+    std::vector<double> result;
 
     if (source == nullptr || samples < 2 || dataMax <= dataMin)
       return result;
@@ -35,7 +35,10 @@ namespace mitk
     const double windowMin = level - 0.5 * width;
     const double windowSpan = std::max(1e-6, width); // guards width -> 0
 
-    result.reserve(samples);
+    // Three per sample, and no intensity among them: evenly spaced positions are
+    // implied by [dataMin, dataMax] and the count, so whoever applies the table
+    // derives them rather than reading them back.
+    result.resize(3 * static_cast<std::size_t>(samples));
 
     for (int i = 0; i < samples; ++i)
     {
@@ -44,15 +47,9 @@ namespace mitk
       // Invert the window: which source intensity does this node read from?
       const double srcX = origMin + (x - windowMin) / windowSpan * origSpan;
 
-      double rgb[3];
-      source->GetColor(srcX, rgb); // clamps to the endpoint color outside source's range
-
-      itk::RGBPixel<double> color;
-      color[0] = rgb[0];
-      color[1] = rgb[1];
-      color[2] = rgb[2];
-
-      result.emplace_back(x, color);
+      // Writes the three doubles in place; clamps to the endpoint color outside
+      // source's range.
+      source->GetColor(srcX, result.data() + 3 * static_cast<std::size_t>(i));
     }
 
     return result;

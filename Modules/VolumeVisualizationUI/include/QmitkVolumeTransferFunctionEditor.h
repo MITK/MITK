@@ -143,8 +143,10 @@ private:
    */
   void ForgetTransferFunctionRecipe(mitk::DataNode *node);
 
-  /** \brief Deselect any preset, and say in the combo's placeholder whether that
-   *         is because a curve no preset describes is held, or because none is.
+  /** \brief Deselect any preset, leaving the section header to say why.
+   *
+   * Whether that is because a curve no preset describes is held, or because
+   * none is, is named on the header rather than in the grid.
    */
   void ClearPresetSelection();
 

@@ -53,7 +53,16 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
     return;
   }
 
-  localStorage->m_SmartVolumeMapper->SetInputData(this->GetInputImage());
+  auto *imageData = this->GetInputImage();
+
+  // Nothing to draw where the node's data was cleared or is not an image.
+  if (nullptr == imageData)
+  {
+    localStorage->m_Volume->VisibilityOff();
+    return;
+  }
+
+  localStorage->m_SmartVolumeMapper->SetInputData(imageData);
 
   this->UpdateTransferFunctions(renderer, localStorage);
   this->UpdateRenderMode(renderer, localStorage);
@@ -84,9 +93,20 @@ void mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform(mitk::BaseRenderer *render
   double spacing[3];
   imageData->GetSpacing(spacing);
 
+  // A node carrying no geometry for this timestep yields no transform. The base
+  // class hands that to SetUserTransform, which reads it as "no transform", so
+  // deferring to it here keeps the tolerance this override would otherwise drop.
+  auto *indexToWorld = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+
+  if (nullptr == indexToWorld)
+  {
+    Superclass::UpdateVtkTransform(renderer);
+    return;
+  }
+
   // IndexToWorld carries the spacing the image itself now supplies. Applying
   // both would size the volume by it twice.
-  localStorage->m_DataToWorld->SetMatrix(this->GetDataNode()->GetVtkTransform(this->GetTimestep())->GetMatrix());
+  localStorage->m_DataToWorld->SetMatrix(indexToWorld->GetMatrix());
   localStorage->m_DataToWorld->Scale(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
 
   localStorage->m_Volume->SetUserTransform(localStorage->m_DataToWorld);
@@ -135,6 +155,12 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
 {
   auto input = dynamic_cast<mitk::Image*>(this->GetDataNode()->GetData());
+
+  // UpdateVtkTransform calls this before anything has established that the node
+  // still holds an image, and it runs whether or not rendering is switched on.
+  if (nullptr == input)
+    return nullptr;
+
   return input->GetVtkImageData(this->GetTimestep());
 }
 
@@ -194,10 +220,11 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   // Range-checked because the property is a plain int anything can write: the
   // Properties view offers it as one, and a scene file carries whatever it was
   // saved with. VTK's setter does not validate, and its ray caster refuses the
-  // entire render for a mode it cannot implement, so an unusable value makes the
-  // volume vanish rather than degrade. Isosurface and slice are excluded along
-  // with the out-of-enum values: VTK names them, but they need iso-values or a
-  // plane that no mapper here supplies, so the ray caster rejects them too.
+  // entire render for an out-of-enum mode, so such a value makes the volume
+  // vanish rather than degrade. Isosurface and slice are excluded for a
+  // different reason: the ray caster accepts both, but isosurface draws nothing
+  // without iso-values and slice nothing without a plane, and this mapper
+  // supplies neither.
   const bool renderable = blendMode >= vtkVolumeMapper::COMPOSITE_BLEND &&
                           blendMode <= vtkVolumeMapper::ADDITIVE_BLEND;
 

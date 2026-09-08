@@ -432,8 +432,8 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     }
   }
 
-  // findText yields -1 for the empty name left by a node that records no preset,
-  // and that is exactly the state the placeholder is there to describe.
+  // Nothing matches the empty name a node that records no preset leaves behind,
+  // and that absence is the state the section header describes rather than a row.
   const auto matches =
     m_Controls->presetListWidget->findItems(QString::fromStdString(presetName), Qt::MatchExactly);
 
@@ -587,6 +587,13 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
     auto *image = node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr;
     mitk::SimpleHistogram *histogram = (image != nullptr) ? m_HistogramCache[image] : nullptr;
 
+    // One that failed to compute answers 0 and 1 for its bounds rather than
+    // reporting the failure, and those would pass for a data range and collapse
+    // the axis and all four sliders onto a one-unit span. Taken as absent, which
+    // everything downstream already reads as "no range known".
+    if (histogram != nullptr && !histogram->GetValid())
+      histogram = nullptr;
+
     m_Controls->combinedTfCanvas->SetHistogram(histogram);
     m_Controls->combinedTfCanvas->SetColorTransferFunction(m_AppliedTransferFunction->GetColorTransferFunction());
     m_Controls->combinedTfCanvas->SetPiecewiseFunction(m_AppliedTransferFunction->GetScalarOpacityFunction());
@@ -709,11 +716,18 @@ void QmitkVolumeTransferFunctionEditor::OnColorWindowChanged()
   if (m_DataRange[1] <= m_DataRange[0]) // no valid histogram range to span
     return;
 
-  m_AppliedTransferFunction->SetRGBPoints(
-    mitk::ResampleColorWindow(m_BaseColorFn, m_DataRange[0], m_DataRange[1],
-      m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value()));
+  auto colorTable = mitk::ResampleColorWindow(m_BaseColorFn, m_DataRange[0], m_DataRange[1],
+    m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value());
 
-  m_AppliedTransferFunction->Modified();
+  if (colorTable.empty())
+    return;
+
+  // Sorts the function once for the whole table, where handing the nodes over
+  // one at a time re-sorted it on every insert. Clears what was there first, so
+  // the table stands for the curve entire.
+  m_AppliedTransferFunction->GetColorTransferFunction()->BuildFunctionFromTable(
+    m_DataRange[0], m_DataRange[1], static_cast<int>(colorTable.size() / 3), colorTable.data());
+
   this->RecordAdjustOffsets();
   m_Controls->combinedTfCanvas->update();
 
@@ -725,11 +739,9 @@ void QmitkVolumeTransferFunctionEditor::OnCanvasOpacityChanged()
   if (m_AppliedTransferFunction.IsNull())
     return;
 
-  // The canvas edited the scalar opacity function in place, which leaves the
-  // transfer function's own modification time untouched - and that is what the
-  // mapper compares before it re-uploads. So bump it before asking for a render,
-  // or the render draws the previous curve.
-  m_AppliedTransferFunction->Modified();
+  // Nothing to notify here: the canvas edited the scalar opacity function in
+  // place, and what the ray caster re-uploads against is that function's own
+  // modification time, which the edit already moved.
   this->RecordAdjustOffsets();
 
   emit TransferFunctionChanged();
@@ -782,7 +794,6 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
     // would swamp the per-point editor. Restoring the baseline first keeps the
     // handles countable.
     m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
-    m_AppliedTransferFunction->Modified();
 
     m_Controls->tfControlPanelsWidget->SetDataNode(node);
 
@@ -848,7 +859,6 @@ void QmitkVolumeTransferFunctionEditor::OnCancelCustom()
       m_PreEditTransferFunction->GetScalarOpacityFunction());
     m_AppliedTransferFunction->GetGradientOpacityFunction()->DeepCopy(
       m_PreEditTransferFunction->GetGradientOpacityFunction());
-    m_AppliedTransferFunction->Modified();
     m_PreEditTransferFunction = nullptr;
 
     m_Controls->combinedTfCanvas->update();
@@ -952,11 +962,10 @@ void QmitkVolumeTransferFunctionEditor::StartThumbnailGeneration()
   if (m_ThumbnailImage == image)
     return;
 
-  // Only false once a bind has actually been refused, so the first attempt is
-  // always made and a machine that can draw previews is never written off.
-  if (!m_ThumbnailRenderer->IsUsable())
-    return;
-
+  // Whether previews can be drawn is asked of every image rather than once of
+  // the machine: the ray caster refuses some volumes it is handed, RGB ones
+  // among them, and one such refusal must not write off the images after it.
+  // SetImage reports its own refusal, and GenerateNextThumbnail acts on it.
   this->InvalidateThumbnails();
   m_ThumbnailImage = image;
 

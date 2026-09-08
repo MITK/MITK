@@ -50,9 +50,11 @@ namespace mitk
  * that previews stay comparable with each other and no change to the node can
  * invalidate them. What they do reproduce exactly is the transfer function.
  *
- * The volume ray caster requires a GPU. Where it is unavailable, IsUsable
- * reports false and Render yields null pixmaps rather than failing; callers
- * are expected to fall back to naming the transfer functions instead.
+ * The volume ray caster requires a GPU, and refuses volumes it cannot take,
+ * RGB ones among them. Where a bind is refused, SetImage returns false and
+ * Render yields null pixmaps rather than failing; callers are expected to fall
+ * back to naming the transfer functions instead. A refusal describes the image
+ * that drew it, so the next image is still bound on its own merits.
  */
 class MITKVOLUMEVISUALIZATIONUI_EXPORT QmitkVolumeThumbnailRenderer
 {
@@ -93,10 +95,14 @@ public:
   QPixmap Render(mitk::TransferFunction *transferFunction);
 
   /**
-   * \brief Whether previews can be drawn at all.
+   * \brief Whether the volume bound last can be drawn.
    *
-   * False once a bind attempt found no usable volume ray caster. Only ever
-   * meaningful after the first SetImage call, since nothing is known before.
+   * False once a bind was refused, which the ray caster does for a volume it
+   * cannot take as readily as on a machine that can take none. It describes
+   * that one image, so it must not be used to decide whether to bind the next:
+   * SetImage answers that question per image and reports the answer itself.
+   * Meaningful only after the first SetImage call, since nothing is known
+   * before one.
    */
   bool IsUsable() const;
 

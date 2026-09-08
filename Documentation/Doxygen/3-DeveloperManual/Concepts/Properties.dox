@@ -224,8 +224,12 @@ instead of the data's noise. The scattering blend reads the same gradient's
 magnitude, so this also shifts where scattering gives way to surface shading.
   <li> volumerendering.scattering.blend - Mix between surface shading and
 volumetric scattering: 0 casts no secondary rays, 1 blends the two per sample
-by gradient and opacity, 2 uses the volumetric model alone. Applied after the
-secondary rays are cast, so changing it does not affect performance.
+by gradient and opacity, 2 uses the volumetric model alone. Both 0 and 1 are
+thresholds the ray caster compiles against - below the first it leaves the
+secondary rays out of the shader altogether, and at the second it switches
+blending formula - so crossing either rebuilds the shader once. Moving within
+either band is free; what the scattering costs while it is on is set by
+volumerendering.scattering.reach.
   <li> volumerendering.scattering.reach - Length of the secondary rays, and the
 dominant cost of scattering: 0 shortens each to a single step (ambient
 occlusion), 1 lets them cross the whole volume. Inert while

@@ -15,20 +15,30 @@ found in the LICENSE file.
 
 #include <MitkVolumeVisualizationExports.h>
 
-#include <mitkTransferFunction.h>
+#include <vtkColorTransferFunction.h>
+
+#include <vector>
 
 namespace mitk
 {
   /**
    * \brief Window a color transfer function by a level shift and a width.
    *
-   * Rebuilds the color as \p samples evenly spaced nodes over [dataMin, dataMax].
-   * The window is centered on \p source's own range; \p shift offsets the center
-   * (level) and \p width sizes it. Each node samples \p source at the intensity
-   * the window maps it back to, so shift 0 with width == the source range
+   * Samples the color at \p samples evenly spaced intensities over
+   * [dataMin, dataMax], returned as that many r, g, b triples - 3 * \p samples
+   * doubles - or as nothing where the arguments describe no window. The window
+   * is centered on \p source's own range; \p shift offsets the center (level)
+   * and \p width sizes it. Each triple samples \p source at the intensity the
+   * window maps it back to, so shift 0 with width == the source range
    * reproduces \p source.
+   *
+   * The even spacing is a contract rather than an implementation detail: it is
+   * what allows the result to be applied with
+   * vtkColorTransferFunction::BuildFunctionFromTable(dataMin, dataMax, samples,
+   * data()), which sorts the function once for the whole table where adding the
+   * nodes one at a time re-sorts it on every insert.
    */
-  MITKVOLUMEVISUALIZATION_EXPORT TransferFunction::RGBControlPoints ResampleColorWindow(
+  MITKVOLUMEVISUALIZATION_EXPORT std::vector<double> ResampleColorWindow(
     vtkColorTransferFunction *source,
     double dataMin,
     double dataMax,

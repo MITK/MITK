@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("File Converter");
+  parser.setTitle("Two Image Arithmetic");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Applies a binary mathematical operation (add, subtract, multiply, divide) voxel-wise to two images.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--","-");

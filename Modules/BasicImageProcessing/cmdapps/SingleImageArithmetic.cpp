@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("File Converter");
+  parser.setTitle("Single Image Arithmetic");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Applies a unary mathematical operation (e.g. sin, sqrt, log10) to every voxel of an image.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--","-");

@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
   parser.setTitle("Multi-Resolution Pyramid");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Computes a multi-resolution pyramid of an image, halving the resolution in each level.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     return 0;
   }
 
-  int levels = us::any_cast<float>(parsedArgs["number-of-levels"]);
+  int levels = us::any_cast<int>(parsedArgs["number-of-levels"]);
   bool asDouble = ConvertToBool(parsedArgs, "as-double");
 
   std::vector<mitk::Image::Pointer> results = mitk::TransformationOperation::MultiResolution(image, levels, asDouble);

@@ -20,9 +20,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Multi-Resolution Pyramid");
+  parser.setTitle("Forward Wavelet");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Computes the forward wavelet transformation of an image and writes one image per sub-band.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output-extension", "e", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("number-of-levels", "levels", mitkCommandLineParser::Int, "Numbers of pyramid levels", "Number of pyramid levels", us::Any(), false);
-  parser.addArgument("number-of-bands", "bands", mitkCommandLineParser::Int, "Numbers of pyramid levels", "Number of pyramid levels", us::Any(), false);
+  parser.addArgument("number-of-bands", "bands", mitkCommandLineParser::Int, "Number of bands", "Number of bands", us::Any(), false);
 
   parser.addArgument("wavelet", "w", mitkCommandLineParser::Int, "0: Shannon, 1: Simocelli, 2: Vow, 3: Held", "0: Shannon, 1: Simocelli, 2: Vow, 3: Held", us::Any(), false);
   parser.addArgument("border-condition", "border", mitkCommandLineParser::Int, "0: Constant, 1: Periodic, 2: Zero Flux Neumann", "0: Constant, 1: Periodic, 2: Zero Flux Neumann", us::Any(), false);

@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
   parser.setTitle("Laplacian of Gaussian");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Computes the Laplacian of Gaussian of an image for a given sigma.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");

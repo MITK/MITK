@@ -21,9 +21,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Mask  Outlier filtering");
+  parser.setTitle("Mask Range Based Filtering");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Removes all voxels from a mask whose image intensity lies outside a given range.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");

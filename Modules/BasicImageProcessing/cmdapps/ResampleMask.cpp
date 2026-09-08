@@ -20,9 +20,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Mask  Outlier filtering");
+  parser.setTitle("Resample Mask");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Resamples a binary mask to a new voxel spacing.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   parser.addArgument("spacing-y", "y", mitkCommandLineParser::Float, "Spacing in y direction", "Spacing in y direction", us::Any(), false);
   parser.addArgument("spacing-z", "z", mitkCommandLineParser::Float, "Spacing in z direction", "Spacing in z direction", us::Any(), false);
 
-  parser.addArgument("mapping-type", "mapping", mitkCommandLineParser::Int, "0: Origin aligned, 1: Center aligned, 3: Same size", "0: Origin aligned, 1: Center aligned, 3: Same size", us::Any(), true);
+  parser.addArgument("mapping-type", "mapping", mitkCommandLineParser::Int, "0: Origin aligned, 1: Center aligned, 2: Same size", "0: Origin aligned, 1: Center aligned, 2: Same size", us::Any(), true);
   parser.addArgument("interpolator-type", "interpolator", mitkCommandLineParser::Int, "0: Linear, 1: BSpline 3, 2: Nearest Neighbour, 3: WSinc Hamming, 4: WSinc Welch", "0: Linear, 1: BSpline 3, 2: Nearest Neighbour, 3: WSinc Hamming, 4: WSinc Welch", us::Any(), true);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

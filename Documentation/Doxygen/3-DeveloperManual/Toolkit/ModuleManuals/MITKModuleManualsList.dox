@@ -14,7 +14,6 @@ The modules are shared libraries that provide functionality that can be used by 
 \section MITKModuleManualsListPage_AdditionalInformationOnCertainModules Additional Information on Certain Modules
 <ul>
   <li> \subpage PlanarPropertiesPage
-  <li> \subpage mitkBasicImageProcessingMiniAppsPortalPage
 </ul>
 
 \section MITKModuleManualsListPage_MigrationGuides Migration Guides

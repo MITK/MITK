@@ -24,6 +24,9 @@ visualization, and interaction in a single, modular framework.
 <li><b>Use the Workbench.</b> The \ref UserManualPortal covers common tasks such as
 loading, saving, and navigating data; see \ref PluginListPage for the individual
 tools.
+<li><b>Automate with the command-line apps.</b> The \ref MITKCmdAppsPage lists the
+tools that ship with the Workbench for file conversion, segmentation, registration,
+and model fitting in scripts and batch pipelines.
 <li><b>Develop with MITK.</b> Start with the \ref BuildInstructionsPage, then read
 \ref StartingDevelopment and the \ref HowToNewProject guide. Browse the
 <a href="@MITK_DOXYGEN_GROUPS_PAGE@">API reference</a> and consult the

@@ -9,10 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef mitkCLPolyToNrrd_cpp
-#define mitkCLPolyToNrrd_cpp
 
-#include <time.h>
 #include <sstream>
 #include <fstream>
 
@@ -52,6 +49,7 @@ found in the LICENSE file.
 
 #include <itkImageDuplicator.h>
 #include <itkImageRegionIterator.h>
+#include <itksys/SystemTools.hxx>
 
 
 #include <itkNearestNeighborInterpolateImageFunction.h>
@@ -68,6 +66,23 @@ found in the LICENSE file.
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned short, 3 >          MaskImageType;
+
+namespace
+{
+  /** Inserts a slice index before the file extension so that per-slice outputs do not overwrite each other. */
+  std::string InsertSliceIndex(const std::string& path, unsigned int index)
+  {
+    std::string extension = itksys::SystemTools::GetFilenameLastExtension(path);
+    std::string base = path.substr(0, path.size() - extension.size());
+    if (extension == ".gz")
+    {
+      const std::string innerExtension = itksys::SystemTools::GetFilenameLastExtension(base);
+      base = base.substr(0, base.size() - innerExtension.size());
+      extension = innerExtension + extension;
+    }
+    return base + "_slice-" + std::to_string(index) + extension;
+  }
+}
 
 template <class charT>
 class punct_facet : public std::numpunct<charT> {
@@ -349,8 +364,7 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
 
     std::stringstream ss;
     ss << path << "_Idx-" << index << "_Step-"<<currentStep<<".png";
-    std::string tmpImageName;
-    ss >> tmpImageName;
+    const std::string tmpImageName = ss.str();
     auto fileWriter = vtkPNGWriter::New();
     fileWriter->SetInputConnection(magnifier->GetOutputPort());
     fileWriter->SetFileName(tmpImageName.c_str());
@@ -412,10 +426,10 @@ int main(int argc, char* argv[])
 
   parser.addArgument("--", "-", mitkCommandLineParser::String, "---", "---", us::Any(), true);
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
-  parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
-  parser.addArgument("slice-wise", "slice", mitkCommandLineParser::String, "Int", "Allows to specify if the image is processed slice-wise (number giving direction) ", us::Any());
+  parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Direction", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
+  parser.addArgument("slice-wise", "slice", mitkCommandLineParser::String, "Slice-wise direction", "Allows to specify if the image is processed slice-wise (number giving direction) ", us::Any());
   parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines the format of the output. 0: (Default) results of an image / slice are written in a single row;"
-    " 1: results of an image / slice are written in a single column; 2: store the result of on image as structured radiomocs report (XML).");
+    " 1: results of an image / slice are written in a single column; 2: one row per feature (subject information, feature name and value).");
 
   // General information about the app
   parser.setCategory("Classification Tools");
@@ -521,12 +535,14 @@ int main(int argc, char* argv[])
     if (param.ensureSameSpace)
     {
       MITK_INFO << "Warning!";
-      MITK_INFO << "The origin of the input image and the mask do not match. They are";
-      MITK_INFO << "now corrected. Please check to make sure that the images still match";
+      MITK_INFO << "The origin of the input image was set to the origin of the mask.";
+      MITK_INFO << "Please check to make sure that the images still match";
       image->GetGeometry(0)->SetOrigin(mask->GetGeometry(0)->GetOrigin());
     } else
     {
-      return -1;
+      MITK_INFO << "The origin of the mask and the input image is not equal.";
+      MITK_INFO << "Terminating the program. You may use the '-sp' option";
+      return EXIT_FAILURE;
     }
   }
 
@@ -537,14 +553,14 @@ int main(int argc, char* argv[])
     if (param.ensureSameSpace)
     {
       MITK_INFO << "Warning!";
-      MITK_INFO << "The spacing of the mask was set to match the spacing of the input image.";
-      MITK_INFO << "This might cause unintended spacing of the mask image";
+      MITK_INFO << "The spacing of the input image was set to the spacing of the mask.";
+      MITK_INFO << "This might cause unintended spacing of the input image";
       image->GetGeometry(0)->SetSpacing(mask->GetGeometry(0)->GetSpacing());
     } else
     {
       MITK_INFO << "The spacing of the mask and the input images is not equal.";
-      MITK_INFO << "Terminating the program. You may use the '-fi' option";
-      return -1;
+      MITK_INFO << "Terminating the program. You may use the '-sp', '-rm' or '-fi' options";
+      return EXIT_FAILURE;
     }
   }
 
@@ -661,11 +677,11 @@ int main(int argc, char* argv[])
     }
     if (param.writeAnalysisImage)
     {
-      mitk::IOUtil::Save(cImage, param.anaylsisImagePath);
+      mitk::IOUtil::Save(cImage, sliceWise ? InsertSliceIndex(param.anaylsisImagePath, currentSlice) : param.anaylsisImagePath);
     }
     if (param.writeAnalysisMask)
     {
-      mitk::IOUtil::Save(cMask, param.analysisMaskPath);
+      mitk::IOUtil::Save(cMask, sliceWise ? InsertSliceIndex(param.analysisMaskPath, currentSlice) : param.analysisMaskPath);
     }
 
     mitk::AbstractGlobalImageFeature::FeatureListType stats;
@@ -782,5 +798,3 @@ int main(int argc, char* argv[])
   }
   return returnCode;
 }
-
-#endif

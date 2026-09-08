@@ -36,24 +36,24 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("output",  "o", mitkCommandLineParser::File, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // Optional Parameter
-  parser.addArgument("xml-output", "x", mitkCommandLineParser::File, "XML result file", "Path where the results should be stored as XML result file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("logfile",    "log",         mitkCommandLineParser::File, "Text Logfile", "Path to the location of the target log file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("xml-output", "x", mitkCommandLineParser::File, "XML result file", "Path where the results should be stored as XML result file. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("logfile",    "log",         mitkCommandLineParser::File, "Text Logfile", "Path to the location of the target log file. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
   parser.addArgument("save-image", "save-image",  mitkCommandLineParser::File, "Output Image", "If specified, the image that is used for the analysis is saved to this location.", us::Any(), true, false, false, mitkCommandLineParser::Output);
   parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::File, "Output Image", "If specified, the mask that is used for the analysis is saved to this location. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
   parser.addArgument("save-image-screenshots", "save-screenshot", mitkCommandLineParser::File, "Output Image", "If specified,  a screenshot of each slice is saved. Specify an EXISTING folder with prefix (for example ~/demo/ or ~/demo/image-", us::Any(), true, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("header",            "head",    mitkCommandLineParser::Bool, "Add Header (Labels) to output", "", us::Any());
   parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::Bool, "Add Header (Labels) to first line of output", "", us::Any());
-  parser.addArgument("decimal-point", "decimal", mitkCommandLineParser::String, "Decima Point that is used in Conversion", "", us::Any());
+  parser.addArgument("decimal-point", "decimal", mitkCommandLineParser::String, "Decimal Point that is used in Conversion", "", us::Any());
 
   parser.addArgument("resample-mask",   "rm", mitkCommandLineParser::Bool,  "Bool",  "Resamples the mask to the resolution of the input image ", us::Any());
-  parser.addArgument("same-space",      "sp", mitkCommandLineParser::Bool,  "Bool",  "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
+  parser.addArgument("same-space",      "sp", mitkCommandLineParser::Bool,  "Bool",  "If origin or spacing of image and mask differ, the image geometry is set to the mask geometry. Otherwise the app aborts in this case. ", us::Any());
   parser.addArgument("fixed-isotropic", "fi", mitkCommandLineParser::Float, "Float", "Input image resampled to fixed isotropic resolution given in mm. Should be used with resample-mask ", us::Any());
 
   parser.addArgument("minimum-intensity", "minimum", mitkCommandLineParser::Float, "Float", "Minimum intensity. If set, it is overwritten by more specific intensity minima", us::Any());
   parser.addArgument("maximum-intensity", "maximum", mitkCommandLineParser::Float, "Float", "Maximum intensity. If set, it is overwritten by more specific intensity maxima", us::Any());
   parser.addArgument("bins", "bins", mitkCommandLineParser::Int, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
-  parser.addArgument("binsize", "binsize", mitkCommandLineParser::Float, "Int", "Size of bins that is used. If set, it is overwritten by more specific bin count", us::Any());
+  parser.addArgument("binsize", "binsize", mitkCommandLineParser::Float, "Float", "Size of bins that is used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("ignore-mask-for-histogram", "ignore-mask", mitkCommandLineParser::Bool, "Bool", "If the whole image is used to calculate the histogram. ", us::Any());
   parser.addArgument("encode-parameter-in-name", "encode-parameter", mitkCommandLineParser::Bool, "Bool", "If true, the parameters used for each feature is encoded in its name.", us::Any());
   parser.addArgument("pipeline-uid", "p", mitkCommandLineParser::String, "Pipeline UID", "UID that is stored in the XML output and identifies the processing pipeline the app is used in.", us::Any());

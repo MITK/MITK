@@ -34,8 +34,8 @@ General options:
 | `--morph-mask` | `-morph` | Image | the mask | Separate mask for morphological features. Only the Grey Level Distance Zone class evaluates it; all other classes use `--mask`. |
 | `--xml-output` | `-x` | File | | Additionally write the results of the run as an XML report to this path. Not supported together with `--slice-wise`. |
 | `--logfile` | `-log` | File | | Append a short processing log to this file. |
-| `--save-image` | `-save-image` | File | | Save the image as it is used for the analysis (after resampling and geometry correction) to this path. |
-| `--save-mask` | `-save-mask` | File | | Save the mask as it is used for the analysis (after resampling and geometry correction) to this path. |
+| `--save-image` | `-save-image` | File | | Save the image as it is used for the analysis (after resampling and geometry correction) to this path. In slice-wise mode one file per slice is written, see Details. |
+| `--save-mask` | `-save-mask` | File | | Save the mask as it is used for the analysis (after resampling and geometry correction) to this path. In slice-wise mode one file per slice is written, see Details. |
 | `--save-image-screenshots` | `-save-screenshot` | File | | Render PNG screenshots of every slice of the analysed image and mask. The value is used as a path prefix, see Details. |
 | `--header` | `-head` | Flag | | Write a header row with the feature names before the first result row and add the columns SoftwareVersion, Patient, Image and Segmentation. |
 | `--first-line-header` | `-fl-head` | Flag | | Like `--header`, but only if the output file does not exist yet. |
@@ -108,8 +108,8 @@ If image and mask have different dimensions, a 2D image or a 2D mask is converte
 
 1. `--fixed-isotropic`: the image is resampled to the given isotropic spacing with linear interpolation. The number of voxels per axis becomes `size * spacing / resolution + 1`.
 2. `--resample-mask`: the mask is resampled onto the grid of the image with nearest neighbour interpolation.
-3. Origin check: if the origins differ, the app aborts with exit code -1 unless `--same-space` is set. With `--same-space` the image origin is overwritten with the mask origin.
-4. Spacing check: if the spacings differ, the app aborts with exit code -1 unless `--same-space` is set. With `--same-space` the image spacing is overwritten with the mask spacing. The messages printed in this case state the opposite (that the mask was adapted); the code adapts the image.
+3. Origin check: if the origins differ, the app aborts with exit code 1 unless `--same-space` is set. With `--same-space` the image origin is overwritten with the mask origin.
+4. Spacing check: if the spacings differ, the app aborts with exit code 1 unless `--same-space` is set. With `--same-space` the image spacing is overwritten with the mask spacing.
 
 Image and mask are expected to be 3D volumes. 3D+t data is not handled separately; several processing steps cast the data to 3D ITK images and fail for other dimensions. Split a 3D+t image into 3D volumes first, for example with [MitkSplit4Dto3DImages](@ref MitkSplit4Dto3DImagePage).
 
@@ -126,10 +126,10 @@ The effective settings select the initialisation strategy:
 - minimum, maximum and bin size: the range is fixed and the number of bins follows from the bin size.
 - minimum, bin count and bin size: the range starts at the minimum and spans `bins * binsize`.
 - minimum, maximum and bin count: the range is fixed and divided into the given number of bins.
-- bin size only (optionally with either minimum or maximum): the missing bound is taken from the image, from the masked region by default or from the whole image with `--ignore-mask-for-histogram`.
-- bin count only: the range is taken from the whole image. In this branch a minimum or maximum that is given without the other bound is ignored, and the mask is not considered even without `--ignore-mask-for-histogram`.
+- bin size only (optionally with either minimum or maximum): the missing bound or bounds are taken from the image, from the masked region by default or from the whole image with `--ignore-mask-for-histogram`.
+- bin count only (optionally with either minimum or maximum): the missing bound or bounds are taken from the image, from the masked region by default or from the whole image with `--ignore-mask-for-histogram`.
 
-Since a bin count of 256 is in effect by default, the last case applies when no histogram option is given at all: 256 bins over the intensity range of the whole image.
+Since a bin count of 256 is in effect by default, the last case applies when no histogram option is given at all: 256 bins over the intensity range of the masked region.
 
 With `--encode-parameter-in-name` the effective settings are encoded in the feature names of the text output (for example `Min-0_Max-100_Bins-64` or `Bins-256_FullImage`, followed by `_Range-<n>` for the classes that have a range parameter). The XML report always stores the settings per feature, independent of this flag.
 
@@ -141,7 +141,7 @@ The result file is opened in append mode and written when the app finishes. Valu
 <MITK revision>;<image folder>;<image name>;<mask name>;[<description>;]<slice number>;<value 1>;<value 2>;...;EndOfMeasurement;
 ```
 
-The Description column is present only when `--description` is given. The slice number is 0 when the whole volume is processed. With `--header` (or `--first-line-header` on a new file) a header row with the column names `SoftwareVersion;Patient;Image;Segmentation;[Description;]SliceNumber;<feature names>;EndOfMeasurement;` precedes the first result row. `--output-mode 1` transposes this layout so that every image or slice becomes one column. `--output-mode 2` writes one row per feature in the form `[<description>;]<slice number>;<MITK revision>;<image folder>;<image name>;<mask name>;<feature name>;<value>;;`. The help text describes mode 2 as an XML report, but the XML report is only produced by `--xml-output`.
+The Description column is present only when `--description` is given. The slice number is 0 when the whole volume is processed. With `--header` (or `--first-line-header` on a new file) a header row with the column names `SoftwareVersion;Patient;Image;Segmentation;[Description;]SliceNumber;<feature names>;EndOfMeasurement;` precedes the first result row. `--output-mode 1` transposes this layout so that every image or slice becomes one column. `--output-mode 2` writes one row per feature in the form `[<description>;]<slice number>;<MITK revision>;<image folder>;<image name>;<mask name>;<feature name>;<value>;;`. The XML report is only produced by `--xml-output`.
 
 Feature names in the text output follow the pattern `<class name>::<feature name>`, for example `First Order::Mean`. Every computed feature is also echoed to the console as `<feature name> - <value>`. `--decimal-point` affects both the file and the console output.
 
@@ -149,7 +149,7 @@ Feature names in the text output follow the pattern `<class name>::<feature name
 
 With `--slice-wise <axis>` the image, the mask, the NaN-free mask and the morphological mask are cut into 2D slices perpendicular to the given axis (0, 1 or 2 in index space). Slices without any mask voxel are skipped. Every remaining slice is processed like an independent image and produces its own result row; the slice number column counts the processed slices starting at 0, not the index in the volume. After the last slice two additional rows are appended: the mean over all slices and the population variance over all slices of every feature, with feature names prefixed by `SliceWise Mean` and `SliceWise Var.` and with the total number of processed slices as slice number. In the Segmentation column these two rows carry the mask name with the suffixes ` - Mean` and ` - Var.`.
 
-`--save-image`, `--save-mask` and `--save-image-screenshots` are executed per slice. The first two write to the same path for every slice, so the file contains the last processed slice. `--xml-output` is refused in slice-wise mode: the text output is written, an error is printed and the app returns exit code 1.
+`--save-image`, `--save-mask` and `--save-image-screenshots` are executed per slice. The first two insert the slice number before the file extension (`image.nrrd` becomes `image_slice-0.nrrd`, `image_slice-1.nrrd`, and so on; a `.gz` suffix is kept together with the preceding extension). `--xml-output` is refused in slice-wise mode: the text output is written, an error is printed and the app returns exit code 1.
 
 `--slice-wise` is silently ignored for 2D input.
 
@@ -159,7 +159,7 @@ With `--slice-wise <axis>` the image, the mask, the NaN-free mask and the morpho
 
 ### Screenshots
 
-`--save-image-screenshots <prefix>` renders every slice of the analysed image with the mask overlaid to a PNG file named `<prefix>_Idx-<n>_Step-<s>.png`, where `n` is the slice number of the processed image (0 for the whole volume) and `s` the slice position of the rendered view. The directory part of the prefix is created if necessary; if the prefix ends with a path separator, the files are placed in that directory. Screenshots are 768 x 768 pixels (a 256 x 256 render window magnified three times). The file name is read back through a stream, so prefixes containing whitespace are truncated at the first space.
+`--save-image-screenshots <prefix>` renders every slice of the analysed image with the mask overlaid to a PNG file named `<prefix>_Idx-<n>_Step-<s>.png`, where `n` is the slice number of the processed image (0 for the whole volume) and `s` the slice position of the rendered view. The directory part of the prefix is created if necessary; if the prefix ends with a path separator, the files are placed in that directory. Screenshots are 768 x 768 pixels (a 256 x 256 render window magnified three times).
 
 The app creates a Qt application object unconditionally, even without screenshots, so a Qt platform (a display or an offscreen platform plugin) must be available.
 
@@ -172,8 +172,7 @@ The app creates a Qt application object unconditionally, even without screenshot
 | Code | Meaning |
 |------|---------|
 | 0 | Success. |
-| 1 | No arguments or missing required arguments (help text is printed), or `--xml-output` combined with `--slice-wise` (text output is still written). |
-| -1 | Origin or spacing of image and mask differ and `--same-space` was not given. |
+| 1 | No arguments or missing required arguments (help text is printed), origin or spacing of image and mask differ and `--same-space` was not given, or `--xml-output` combined with `--slice-wise` (text output is still written). |
 
 Runtime errors such as unreadable files raise exceptions that are not caught by the app; the process terminates with the platform-specific code for an unhandled exception.
 
@@ -185,7 +184,7 @@ Runtime errors such as unreadable files raise exceptions that are not caught by 
 MitkCLGlobalImageFeatures -i ct.nrrd -m mask.nrrd -o features.csv -fo -vol -head
 ```
 
-Computes the First Order and Volumetric Features classes for the masked region and appends a header row and one result row to `features.csv`. The histogram of the first order features uses 256 bins over the intensity range of the whole image.
+Computes the First Order and Volumetric Features classes for the masked region and appends a header row and one result row to `features.csv`. The histogram of the first order features uses 256 bins over the intensity range of the masked region.
 
 ### All features with a fixed histogram and an XML report
 

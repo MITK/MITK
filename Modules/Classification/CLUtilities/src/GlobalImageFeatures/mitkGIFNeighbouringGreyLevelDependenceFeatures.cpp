@@ -444,7 +444,7 @@ void mitk::GIFNeighbouringGreyLevelDependenceFeature::AddArguments(mitkCommandLi
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Calculate Neighbouring Grey Level Dependence Features", "Calculate Neighbouring grey level dependence based features", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "NGLD Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::alpha", name + "::alpha", mitkCommandLineParser::Int, "Int", "", us::Any());
+  parser.addArgument(name + "::alpha", name + "::alpha", mitkCommandLineParser::Int, "NGLD Alpha", "Coarseness parameter: two voxels are dependent if their grey level difference is at most alpha (default 0)", us::Any());
 }
 
 mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbouringGreyLevelDependenceFeature::DoCalculateFeatures(const Image* image, const Image* mask)

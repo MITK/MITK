@@ -18,8 +18,8 @@ MitkCLN4 -i <image> -m <mask> -o <output> [options]
 
 | Argument | Short | Type | Description |
 |----------|-------|------|-------------|
-| `--input` | `-i` | File | Path to the input image. The argument is declared as Directory type in the code, but a file path is expected. |
-| `--mask` | `-m` | File | Path to the mask image. All voxels with a value other than 0 are used for the bias field estimation. The help text labels it as an output file; it is an input. |
+| `--input` | `-i` | File | Path to the input image. |
+| `--mask` | `-m` | File | Path to the mask image. All voxels with a value other than 0 are used for the bias field estimation. |
 | `--output` | `-o` | File | Path of the corrected output image. |
 
 ### Optional arguments
@@ -27,9 +27,9 @@ MitkCLN4 -i <image> -m <mask> -o <output> [options]
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
 | `--help` | `-h` | Flag | | Show the help text and exit. |
-| `--number-of-controllpoints` | `-noc` | Int | `4` | Number of B-spline control points per dimension for the initial fitting level. Currently unusable: the code reads the value from a non-existent argument and terminates with an exception whenever this option is given. |
+| `--number-of-controllpoints` | `-noc` | Int | `4` | Number of B-spline control points per dimension for the initial fitting level. |
 | `--number-of-fitting-levels` | `-nofl` | Int | `1` | Number of fitting levels of the multi-scale approach; the B-spline mesh resolution doubles with every level. |
-| `--number-of-histogram-bins` | | Int | `200` | Number of bins of the log intensity histogram. Not available: the argument is declared with the same short name `nofl` as `--number-of-fitting-levels` and is therefore dropped by the argument parser. Passing it has no effect. |
+| `--number-of-histogram-bins` | `-nohb` | Int | `200` | Number of bins of the log intensity histogram. |
 | `--spline-order` | `-so` | Int | `3` | Order of the B-spline used for the bias field estimate. |
 | `--winer-filter-noise` | `-wfn` | Float | `0.01` | Noise estimate of the Wiener filter used for sharpening the histogram. |
 | `--number-of-maximum-iterations` | `-nomi` | Int | `50` | Maximum number of iterations. The value is applied to every fitting level. |
@@ -44,13 +44,11 @@ The defaults in the table are the defaults of the ITK filter, which is used unch
 
 ### Argument handling
 
-The app does not check whether the argument parser accepted the arguments. If a required argument is missing, the parser prints the help text and the app continues with empty file paths, which fails with an exception when loading. `--help` in combination with all required arguments prints the help text and exits with code 0.
-
-The console messages printed while applying the options are partly mislabeled: the Wiener filter noise is reported as "Number of histogram bins".
+If a required argument is missing, the parser prints the help text and the app returns 1. `--help` in combination with all required arguments prints the help text and exits with code 0.
 
 ### Exit behaviour
 
-The app returns 0 after writing the output. Errors (unreadable files, dimension mismatch, the broken `--number-of-controllpoints` option) raise exceptions that are not caught; the process terminates with the platform-specific code for an unhandled exception.
+The app returns 0 after writing the output. Errors during processing (unreadable files, dimension mismatch, unwritable output) are reported on the console and the app returns 1.
 
 ## Examples
 

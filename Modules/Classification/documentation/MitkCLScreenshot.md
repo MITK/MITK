@@ -19,14 +19,13 @@ MitkCLScreenshot -i <image1;image2;...> -o <output prefix>
 | Argument | Short | Type | Description |
 |----------|-------|------|-------------|
 | `--image` | `-i` | Image | One or more image files separated by semicolons. All files are rendered together. |
-| `--output` | `-o` | File | Prefix of the PNG files that are written, see Details. The help text speaks of an appended statistic; the app writes images. |
+| `--output` | `-o` | File | Prefix of the PNG files that are written, see Details. |
 
 ### Optional arguments
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
 | `--help` | `-h` | Flag | | Not a declared argument. The help text is printed by the argument parser whenever a required argument is missing, so calling the app with `-h` alone shows the help; the app then exits with code 1. |
-| `--direction` | `-dir` | String | | Not supported. If given, a warning is printed and the value is ignored. The help text was copied from MitkCLGlobalImageFeatures. |
 
 ## Details
 
@@ -36,11 +35,9 @@ The images are loaded in the given order and added to a data storage that is sho
 
 A node is treated as a segmentation if its `binary` property is true. This property is set automatically when a node is created from an image that MITK detects as binary: a single-component image whose voxels take at most two distinct values (for example 0 and 1, but any two values qualify). Segmentations receive the color, hovering color and selected color of the palette entry `k mod 10`, where `k` counts the segmentations in the order of the input list: red, yellow, green, blue, orange, violet, turquoise, bright green, dark orange, pink.
 
-The check of the `binary` property reuses one variable for all nodes, so a node for which the property cannot be read keeps the result of the previous node.
-
 ### Output files
 
-One PNG file is written per slice of the render window's slice navigation, that is for every slice of the combined bounding geometry along the view direction. The file names are `<prefix>screenshot_step-<n>.png` with `n` starting at 0. The prefix is used verbatim, no separator is inserted: `-o out/case01_` yields `out/case01_screenshot_step-0.png`, whereas `-o out/` yields `out/screenshot_step-0.png`. The directory is not created. The file name is read back through a stream, so prefixes containing whitespace are truncated at the first space.
+One PNG file is written per slice of the render window's slice navigation, that is for every slice of the combined bounding geometry along the view direction. The file names are `<prefix>screenshot_step-<n>.png` with `n` starting at 0. The prefix is used verbatim, no separator is inserted: `-o out/case01_` yields `out/case01_screenshot_step-0.png`, whereas `-o out/` yields `out/screenshot_step-0.png`. The directory is not created.
 
 ### Requirements and exit behaviour
 

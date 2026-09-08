@@ -9,12 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef mitkCLPolyToNrrd_cpp
-#define mitkCLPolyToNrrd_cpp
 
-#include <time.h>
 #include <sstream>
-#include <fstream>
 
 #include <mitkIOUtil.h>
 #include <mitkCommandLineParser.h>
@@ -51,12 +47,12 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
   int numberOfSegmentations = 0;
-  bool isSegmentation = false;
   for (auto name : listOfOutputs)
   {
     mitk::Image::Pointer tmpImage = mitk::IOUtil::Load<mitk::Image>(name);
     auto nodeI = mitk::DataNode::New();
     nodeI->SetData(tmpImage);
+    bool isSegmentation = false;
     nodeI->GetPropertyValue("binary",isSegmentation);
     if (isSegmentation)
     {
@@ -104,8 +100,7 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
 
     std::stringstream ss;
     ss << path << "screenshot_step-"<<currentStep<<".png";
-    std::string tmpImageName;
-    ss >> tmpImageName;
+    const std::string tmpImageName = ss.str();
     auto fileWriter = vtkPNGWriter::New();
     fileWriter->SetInputConnection(magnifier->GetOutputPort());
     fileWriter->SetFileName(tmpImageName.c_str());
@@ -121,13 +116,12 @@ int main(int argc, char* argv[])
 
   // Required Parameter
   parser.addArgument("image", "i", mitkCommandLineParser::Image, "Input Image", "Path to the input image files (Separated with semicolons)", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output prefix", "Prefix of the PNG files that are written. One file <prefix>screenshot_step-<n>.png is written per slice.", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // General information about the app
   parser.setCategory("Classification Tools");
   parser.setTitle("Screenshot of a single image");
-  parser.setDescription("");
+  parser.setDescription("Renders the given images together in a 2D view and saves every slice as a PNG file. Binary images are drawn as colored overlays.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -144,13 +138,6 @@ int main(int argc, char* argv[])
   std::string version = "Version: 1.0";
   MITK_INFO << version;
 
-  //int direction = 0;
-  if (parsedArgs.count("direction"))
-  {
-  MITK_INFO << "Warning: Option direction currently not supported";
-  //  direction = mitk::cl::splitDouble(parsedArgs["direction"].ToString(), ';')[0];
-  }
-
   auto listOfFiles = mitk::cl::splitString(parsedArgs["image"].ToString(), ';');
 
   // Create a QTApplication and a Datastorage
@@ -161,7 +148,5 @@ int main(int argc, char* argv[])
 
   SaveSliceOrImageAsPNG(listOfFiles, parsedArgs["output"].ToString());
 
-  return 0;
+  return EXIT_SUCCESS;
 }
-
-#endif

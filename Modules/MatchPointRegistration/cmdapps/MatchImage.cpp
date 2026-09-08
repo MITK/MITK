@@ -124,7 +124,6 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.addArgument(
     "parameters", "p", mitkCommandLineParser::String, "Parameters", "Json string containing a json object that contains the parameters that should be passed to the algorithm as key value pairs.");
 
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }
 

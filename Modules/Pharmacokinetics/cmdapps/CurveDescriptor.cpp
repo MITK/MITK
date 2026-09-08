@@ -87,7 +87,6 @@ void setupParser(mitkCommandLineParser& parser)
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
     parser.addArgument(
       "preview", "p", mitkCommandLineParser::Bool, "Preview outputs", "The application previews the outputs (filename, type) it would produce with the current settings.");
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }

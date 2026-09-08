@@ -56,7 +56,6 @@ void setupParser(mitkCommandLineParser& parser)
     parser.endGroup();
 
     parser.beginGroup("Optional parameters");
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }

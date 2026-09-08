@@ -30,7 +30,6 @@ void InitializeCommandLineParser(mitkCommandLineParser& parser)
   parser.setContributor("German Cancer Research Center (DKFZ)");
   parser.setArgumentPrefix("--", "-");
 
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("only-own-series", "s", mitkCommandLineParser::Bool, "Only own series", "Analyze only files in the same directory that have the same DICOM Series UID, if a file is provided as input.", us::Any());
   parser.addArgument("check-3d", "d", mitkCommandLineParser::Bool, "Check 3D configs", "Analyze the input by using all known 3D configurations. If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
   parser.addArgument("check-3d+t", "t", mitkCommandLineParser::Bool, "Check 3D+t configs", "Analyze the input by using all known 3D+t configurations (thus dynamic image configurations). If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());

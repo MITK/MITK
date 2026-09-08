@@ -84,7 +84,6 @@ int main(int argc, char* argv[])
   parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "List reader names", "Print names of all available readers.", us::Any());
   parser.addArgument("input-options", "", mitkCommandLineParser::String, "Input reader options", "Json dictionary string containing the options as key and value pairs that should be passed to the reader for loading the input.", us::Any());
   parser.addArgument("output-options", "", mitkCommandLineParser::String, "Output writer options", "Json dictionary string containing the options as key and value pairs that should be passed to the writer for saving the output.", us::Any());
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 
 

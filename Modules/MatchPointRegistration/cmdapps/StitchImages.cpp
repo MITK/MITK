@@ -78,7 +78,6 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument("interpolator", "n", mitkCommandLineParser::Int, "Interpolator type", "Interpolator used for mapping the images. Default: 2; allowed values: 1: Nearest Neighbour, 2: Linear, 3: BSpline 3, 4: WSinc Hamming, 5: WSinc Welch", us::Any(2), true);
     parser.addArgument("strategy", "s", mitkCommandLineParser::Int, "Stitch strategy", "Strategy used for stitching the images. 0: Mean -> computes the mean value of all input images that cover an output pixel (default strategy). 1: BorderDistance -> Uses the input pixel that has the largest minimal distance to its image borders", us::Any(0), true);
     parser.addArgument("padding", "p", mitkCommandLineParser::Float, "Padding value", "Value used for output voxels that are not covered by any input image.", us::Any(0.), true);
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }

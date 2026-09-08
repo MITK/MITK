@@ -219,7 +219,6 @@ namespace
 
     parser.beginGroup("Optional");
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose", "Verbose output.");
-    parser.addArgument("help",    "h", mitkCommandLineParser::Bool, "Help",    "Show this help text.");
     parser.endGroup();
   }
 

@@ -141,7 +141,6 @@ void setupParser(mitkCommandLineParser& parser)
         "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intensity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
     parser.addArgument(
       "preview", "p", mitkCommandLineParser::Bool, "Preview outputs", "The application previews the outputs (filename, type) it would produce with the current settings.");
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }

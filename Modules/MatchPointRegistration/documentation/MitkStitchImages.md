@@ -64,9 +64,7 @@ output grid. The template pixel values are not used.
   image border. This favours the input in which the position is most central
   and suppresses border artifacts in the overlap region.
 
-Any value other than `0` is treated like `1`. The help text of the application
-reports a default of `2` for this argument; the effective default is `0`
-(mean).
+Any value other than `0` is treated like `1`.
 
 ### Interpolation and padding
 

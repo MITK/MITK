@@ -60,12 +60,9 @@ void setupParser(mitkCommandLineParser& parser)
         "o",
         mitkCommandLineParser::File,
         "Output file path",
-        "Path to the fused 3D+t image.",
+        "Path to the stitched 3D image.",
         us::Any(),
         false, false, false, mitkCommandLineParser::Output);
-    parser.endGroup();
-
-    parser.beginGroup("Optional parameters");
     parser.addArgument("template",
       "t",
       mitkCommandLineParser::File,
@@ -73,10 +70,13 @@ void setupParser(mitkCommandLineParser& parser)
       "File path to an image that serves as template for the output geometry.",
       us::Any(),
       false, false, false, mitkCommandLineParser::Input);
+    parser.endGroup();
+
+    parser.beginGroup("Optional parameters");
     parser.addArgument(
       "registrations", "r", mitkCommandLineParser::StringList, "Registration files", "Paths to the registrations that should be used to map the input images. If this parameter is not set, identity transforms are assumed. If this parameter is set, it must have the same number of entries then the parameter inputs. If you want to use and identity transform for a specific input, specify an empty string. The application assumes that inputs and registrations have the same order, so the n-th input should use thr n-th registration.", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument("interpolator", "n", mitkCommandLineParser::Int, "Interpolator type", "Interpolator used for mapping the images. Default: 2; allowed values: 1: Nearest Neighbour, 2: Linear, 3: BSpline 3, 4: WSinc Hamming, 5: WSinc Welch", us::Any(2), true);
-    parser.addArgument("strategy", "s", mitkCommandLineParser::Int, "Stitch strategy", "Strategy used for stitching the images. 0: Mean -> computes the mean value of all input images that cover an output pixel (default strategy). 1: BorderDistance -> Uses the input pixel that has the largest minimal distance to its image borders", us::Any(2), true);
+    parser.addArgument("strategy", "s", mitkCommandLineParser::Int, "Stitch strategy", "Strategy used for stitching the images. 0: Mean -> computes the mean value of all input images that cover an output pixel (default strategy). 1: BorderDistance -> Uses the input pixel that has the largest minimal distance to its image borders", us::Any(0), true);
     parser.addArgument("padding", "p", mitkCommandLineParser::Float, "Padding value", "Value used for output voxels that are not covered by any input image.", us::Any(0.), true);
     parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
@@ -170,6 +170,8 @@ int main(int argc, char* argv[])
       {
         std::cout << "#"<<index<<" " << path << std::endl;
         auto image = mitk::IOUtil::Load<mitk::Image>(path, &readerFilterFunctor);
+        if (image.IsNull())
+          mitkThrow() << "Cannot load input image: " << path;
         images.push_back(image.GetPointer());
         if (regFilenames[index].empty())
         {
@@ -180,16 +182,17 @@ int main(int argc, char* argv[])
         {
           std::cout << "  associated registration: " << regFilenames[index] << std::endl;
           auto reg = mitk::IOUtil::Load<mitk::MAPRegistrationWrapper>(regFilenames[index]);
+          if (reg.IsNull())
+            mitkThrow() << "Cannot load registration: " << regFilenames[index];
           registrations.push_back(reg.GetPointer());
         }
         ++index;
       }
       std::cout << "Reference image: " << refGeometryFileName << std::endl << std::endl;
       auto refImage = mitk::IOUtil::Load<mitk::Image>(refGeometryFileName, &readerFilterFunctor);
-      if (refImage.IsNotNull())
-      {
-        refGeometry = refImage->GetGeometry();
-      }
+      if (refImage.IsNull())
+        mitkThrow() << "Cannot load template image: " << refGeometryFileName;
+      refGeometry = refImage->GetGeometry();
       std::cout << "Padding value: " << paddingValue << std::endl;
       std::cout << "Stitch strategy: ";
       if (itk::StitchStrategy::Mean == stitchStratgy)

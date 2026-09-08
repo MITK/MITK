@@ -68,16 +68,14 @@ void setupParser(mitkCommandLineParser& parser)
 
   parser.beginGroup("Optional parameters");
   parser.addArgument(
-    "registration", "r", mitkCommandLineParser::File, "Registration filee", "Path to the registration that should be used. If no registration is specified, an identity transform is assumed.", us::Any(), true, false, false, mitkCommandLineParser::Input);
+    "registration", "r", mitkCommandLineParser::File, "Registration file", "Path to the registration that should be used. If no registration is specified, an identity transform is assumed.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("template",
     "t",
     mitkCommandLineParser::File,
     "Output template image.",
     "File path to an image that serves as template for the output geometry. If no template is specified, the geometry of the input image will be used.",
     us::Any(),
-    false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument(
-    "registrations", "r", mitkCommandLineParser::StringList, "Registration files", "Paths to the registrations that should be used to map the input images. If this parameter is not set, identity transforms are assumed. If this parameter is set, it must have the same number of entries then the parameter inputs. If you want to use and identity transform for a specific input, specify an empty string. The application assumes that inputs and registrations have the same order, so the n-th input should use thr n-th registration.", us::Any(), true, false, false, mitkCommandLineParser::Input);
+    true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("interpolator", "n", mitkCommandLineParser::Int, "Interpolator type", "Interpolator used for mapping the images. Default: 2; allowed values: 1: Nearest Neighbour, 2: Linear, 3: BSpline 3, 4: WSinc Hamming, 5: WSinc Welch", us::Any(2), true);
   parser.addArgument("padding", "p", mitkCommandLineParser::Float, "Padding value", "Value used for output voxels that are not covered by any input image.", us::Any(0.), true);
   parser.addArgument("super-sampling", "s", mitkCommandLineParser::StringList, "Super sampling factor", "Value used for super sampling of the result. E.g. factor 2 will lead to a doubled resolution compared to the used template. If not specified, no super sampling will be done.", us::Any(), true);

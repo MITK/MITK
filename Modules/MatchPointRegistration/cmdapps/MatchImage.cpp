@@ -57,7 +57,7 @@ void SetupParser(mitkCommandLineParser& parser)
 {
   parser.setTitle("Match Image");
   parser.setCategory("Registration Tools");
-  parser.setDescription("");
+  parser.setDescription("Registers a moving image onto a target image with a deployed MatchPoint algorithm and stores the resulting registration.");
   parser.setContributor("MIC, German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
@@ -219,7 +219,7 @@ mitk::Image::Pointer loadMaskImage(std::string filepath, std::string labelName =
 
     if (labelName.empty())
     {
-      MITK_INFO << "Selected mask has multiple labels. Using first one. If you want a certain label, please specify via the --movingMaskLabel / --targetMaskLabel argument.";
+      MITK_INFO << "Selected mask has multiple labels. Using first one. If you want a certain label, please specify via the --moving_mask_label / --target_mask_label argument.";
       return mitk::CreateLabelMask(maskMultiLabelImage, maskMultiLabelImage->GetAllLabelValues().front());
     }
 
@@ -288,6 +288,7 @@ CheckCastAndSetItkArrayProp(const nlohmann::json& valueSequence)
     {
       const auto castedElement = element.template get<TValueType>();
       castedValue[index] = castedElement;
+      ++index;
     }
     prop = map::core::MetaProperty<::itk::Array<TValueType>>::New(castedValue).GetPointer();
   }

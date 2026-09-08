@@ -19,7 +19,7 @@ instead.
 ## Usage
 
 ```bash
-MitkMapImage -i <input> -o <output> -t <template> [options]
+MitkMapImage -i <input> -o <output> [-t <template>] [options]
 ```
 
 ### Required arguments
@@ -28,13 +28,13 @@ MitkMapImage -i <input> -o <output> -t <template> [options]
 |----------|-------|------|-------------|
 | `--input` | `-i` | File | Image or multi-label segmentation that should be mapped. |
 | `--output` | `-o` | File | Path of the mapped result. The extension selects the output format. |
-| `--template` | `-t` | File | Image whose geometry defines the output grid. See Details for why this is required. |
 
 ### Optional arguments
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
 | `--registration` | `-r` | File | identity | Registration file (`.mapr`) used for mapping. If omitted, an identity transform is used. |
+| `--template` | `-t` | File | input geometry | Image whose geometry defines the output grid. If omitted, the geometry of the input is used. |
 | `--interpolator` | `-n` | Int | `2` | Interpolation for images: `1` nearest neighbour, `2` linear, `3` B-spline (order 3), `4` windowed sinc (Hamming), `5` windowed sinc (Welch). Ignored for segmentations. |
 | `--padding` | `-p` | Float | `0` | Value for output voxels that are not covered by the input image. Ignored for segmentations. |
 | `--super-sampling` | `-s` | String list | | One factor (isotropic) or three factors (x, y, z) that refine the template grid. |
@@ -44,12 +44,8 @@ MitkMapImage -i <input> -o <output> -t <template> [options]
 
 ### Template
 
-The help text of the application states that the input geometry is used when
-no template is given. The argument is nevertheless declared as required, so
-the parser rejects any call without `--template`. Pass the input image itself
-as template if you want to keep its geometry.
-
-Only the spatial geometry of the template's first time step is used. The time
+Without `--template` the output grid is the grid of the input, so a
+registration is applied in place. With a template, only the spatial geometry of the template's first time step is used. The time
 geometry (number and duration of time steps) is taken from the input.
 
 ### Input types and 3D+t data

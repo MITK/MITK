@@ -29,7 +29,7 @@ MitkCLMRNormalization -i <image> -mode <1-6> -m0 <mask0> [-m1 <mask1>] -o <outpu
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
-| `--help` | `-h` | Flag | | Not a declared argument. The help text is printed by the argument parser whenever a required argument is missing, so calling the app with `-h` alone shows the help; the app then exits with code 1. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 | `--mask1` | `-m1` | Image | | Mask of the second reference region. Required for modes 4 to 6, ignored for modes 1 to 3. Voxels with the value 1 belong to the region. |
 | `--ignore-outlier` | `-outlier` | Flag | | Restrict the statistics of the `--mask0` region to the 2nd to 98th percentile and clamp all image intensities to that range before normalization. Only used in modes 1 to 3. |
 | `--value` | `-v` | Float | `0` | Offset added to the center statistic of the `--mask0` region before it is subtracted, see Details. Only used in modes 1 to 3. |

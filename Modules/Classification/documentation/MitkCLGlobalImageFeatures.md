@@ -30,7 +30,7 @@ General options:
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
-| `--help` | `-h` | Flag | | Not a declared argument. The help text is printed by the argument parser whenever a required argument is missing, so calling the app with `-h` alone shows the help; the app then exits with code 1. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 | `--morph-mask` | `-morph` | Image | the mask | Separate mask for morphological features. Only the Grey Level Distance Zone class evaluates it; all other classes use `--mask`. |
 | `--xml-output` | `-x` | File | | Additionally write the results of the run as an XML report to this path. Not supported together with `--slice-wise`. |
 | `--logfile` | `-log` | File | | Append a short processing log to this file. |

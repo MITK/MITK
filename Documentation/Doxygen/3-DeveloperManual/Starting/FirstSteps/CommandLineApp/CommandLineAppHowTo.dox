@@ -82,6 +82,7 @@ Command Line Utility *To Upper Case* (v2026.06) in Category *MITK-Examples*
 An example command-line app that converts the contents of a text file to upper case.
 German Cancer Research Center (DKFZ)
 
+Use --help to print this text.
 Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.
 Use --version to print MITK revision information.
 
@@ -93,11 +94,13 @@ Required I/O parameters
   -o, --output, where to save the output (.txt/.example)
 \endverbatim
 
-The parser also handles two arguments that need no declaration:
-<tt>--version</tt> prints the Git commit hash and branch name of the MITK
-build, and <tt>--xml</tt> prints the XML self-description explained below.
-A <tt>--help</tt> argument is not built in; declare it like any other Bool
-argument and print parser.helpText() when it is present, as the example does.
+The parser handles three informational arguments itself and terminates the
+process with exit code 0 after printing: <tt>--help</tt> (or <tt>-h</tt>)
+prints the help text, <tt>--version</tt> prints the Git commit hash and branch
+name of the MITK build, and <tt>--xml</tt> prints the XML self-description
+explained below. The short name <tt>-h</tt> is therefore reserved. Declaring a
+help argument, as the example does, only makes it appear in the argument list
+of the help text.
 
 \section CommandLineAppHowToPageCMake Registering the executable with CMake
 
@@ -150,9 +153,8 @@ changeParameterGroup method, which must be called before adding the arguments.
 An argument with the short name <tt>h</tt> is omitted from the XML since a
 help flag has no use in a generated interface.
 
-Note that the parser prints the line "Running Command Line Utility ..." before
-any other output, including the XML. A consumer of the XML has to skip that
-first line.
+The XML is the only output in this case; the banner line "Running Command Line
+Utility ..." that precedes a normal run is not printed.
 
 \subsection CommandLineAppHowToPageXMLRepresentationExampleXMLOutput Example XML output
 
@@ -164,7 +166,6 @@ Running the example with argument <tt>--xml</tt> ...
 ... will emit the following XML description:
 
 \verbatim
-Running Command Line Utility *To Upper Case* (v2026.06)
 <executable>
 <category>MITK-Examples</category>
 <title>To Upper Case</title>

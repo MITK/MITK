@@ -173,13 +173,6 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   };
 
-  // Show a help message
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   std::cout << std::endl << "*******************************************" << std::endl;
   std::cout << "Input file:        " << settings.inFileName << std::endl;
   std::cout << "Output file:        " << settings.outFileName << std::endl;

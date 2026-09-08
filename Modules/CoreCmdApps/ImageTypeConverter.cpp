@@ -60,13 +60,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  // Show a help message
-  if ( parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
   std::string type = us::any_cast<std::string>(parsedArgs["type"]);

@@ -51,13 +51,6 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Show a help message
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   try
   {
     MaskImageType::Pointer itkMsk = MaskImageType::New();

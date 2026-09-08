@@ -61,13 +61,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
       return EXIT_FAILURE;
 
-  // Show a help message
-  if ( parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   std::string inputFilename1 = us::any_cast<std::string>(parsedArgs["input-left"]);
   std::string inputFilename2 = us::any_cast<std::string>(parsedArgs["input-right"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);

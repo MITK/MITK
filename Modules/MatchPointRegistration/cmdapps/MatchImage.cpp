@@ -414,13 +414,6 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   };
 
-  // Show a help message
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   std::cout << std::endl << "*******************************************" << std::endl;
   std::cout << "Moving file:        " << settings.movingFileName << std::endl;
   std::cout << "Target file:        " << settings.targetFileName << std::endl;

@@ -130,10 +130,6 @@ int main(int argc, char* argv[])
   {
     return EXIT_FAILURE;
   }
-  if ( parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    return EXIT_SUCCESS;
-  }
 
   std::string version = "Version: 1.0";
   MITK_INFO << version;

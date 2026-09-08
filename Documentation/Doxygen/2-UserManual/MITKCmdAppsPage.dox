@@ -69,13 +69,16 @@ mitkCommandLineParser.
 dash, for example <tt>--input</tt> and <tt>-i</tt>. Values follow the argument
 separated by a space: <tt>-i image.nrrd</tt>. List arguments take several
 values: <tt>-i a.nrrd b.nrrd c.nrrd</tt>.
-<li> <tt>--help</tt> (<tt>-h</tt>) prints a description of all arguments. The
-help text is also printed when a required argument is missing.
-<li> <tt>--version</tt> prints the Git commit and branch the app was built from.
+<li> <tt>--help</tt> (<tt>-h</tt>) prints a description of all arguments and
+exits with code 0. The help text is also printed when a required argument is
+missing; the app then exits with code 1.
+<li> <tt>--version</tt> prints the Git commit and branch the app was built from
+and exits with code 0.
 <li> <tt>--xml</tt> prints a machine-readable description of the app and its
-arguments in the format of the Slicer execution model and exits. This is meant
-for tools that generate user interfaces or pipeline nodes from it.
-<li> The first line of output is always <tt>Running Command Line Utility ...</tt>
+arguments in the format of the Slicer execution model and exits with code 0.
+This is meant for tools that generate user interfaces or pipeline nodes from
+it; nothing else is printed in this case.
+<li> Otherwise the first line of output is <tt>Running Command Line Utility ...</tt>
 with the app title and the MITK version.
 <li> Apps return exit code 0 on success and 1 on failure unless their page
 documents other codes. Some apps also return 0 when they cannot load the input

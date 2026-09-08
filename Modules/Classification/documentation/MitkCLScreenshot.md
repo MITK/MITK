@@ -25,7 +25,7 @@ MitkCLScreenshot -i <image1;image2;...> -o <output prefix>
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
-| `--help` | `-h` | Flag | | Not a declared argument. The help text is printed by the argument parser whenever a required argument is missing, so calling the app with `-h` alone shows the help; the app then exits with code 1. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
 ## Details
 

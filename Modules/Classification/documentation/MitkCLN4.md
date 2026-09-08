@@ -44,7 +44,7 @@ The defaults in the table are the defaults of the ITK filter, which is used unch
 
 ### Argument handling
 
-If a required argument is missing, the parser prints the help text and the app returns 1. `--help` in combination with all required arguments prints the help text and exits with code 0.
+If a required argument is missing, the parser prints the help text and the app returns 1.
 
 ### Exit behaviour
 

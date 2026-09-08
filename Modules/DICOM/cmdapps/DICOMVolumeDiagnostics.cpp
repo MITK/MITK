@@ -53,12 +53,6 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (args.count("help"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   nlohmann::json diagnosticsResult;
 
   try

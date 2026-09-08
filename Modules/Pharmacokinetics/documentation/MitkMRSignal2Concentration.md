@@ -51,7 +51,7 @@ Exactly one mode flag must be set. With no mode flag the app fails with "Please 
 
 - `-k` is a required argument. If it is missing, the help text is printed and the app exits with code 1, like for a missing `-i` or `-o`. A value of 0 is rejected ("Please set 'k'").
 - `--te` is validated only in `--t2` mode; a missing or zero value is rejected there ("Please set 'te'").
-- All validation happens before any data is loaded, and `--help` is honoured before validation: a call that contains the required arguments and `--help` prints the help text and exits with code 0 even if the mode flags or `--te` would be rejected.
+- All validation happens before any data is loaded.
 
 ### Baseline and output
 

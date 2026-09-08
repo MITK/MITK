@@ -28,7 +28,7 @@ MitkContoursToImage -i <contours> -r <reference image> -o <output> [-f binary|la
 |----------|-------|------|---------|-------------|
 | `--format` | `-f` | String | `binary` | Output format: `binary`, `label`, or `multilabel`. |
 
-There is no `--help` argument. Running the app without arguments prints the help text.
+`--help` prints the help text, as does running the app without arguments.
 
 ## Details
 

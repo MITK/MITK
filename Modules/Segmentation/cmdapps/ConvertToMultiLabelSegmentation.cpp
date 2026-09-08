@@ -233,12 +233,6 @@ int main(int argc, char* argv[])
 
   const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
 
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   if (!configureApplicationSettings(parsedArgs))
   {
     MITK_ERROR << "Invalid command line arguments. Use -h or --help for usage information.";

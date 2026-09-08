@@ -93,13 +93,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
       return EXIT_FAILURE;
 
-  // Show a help message
-  if ( parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   std::string inputFilename = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputFilename = us::any_cast<std::string>(parsedArgs["output"]);
 

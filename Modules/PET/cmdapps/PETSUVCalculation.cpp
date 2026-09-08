@@ -320,11 +320,6 @@ int main(int argc, char* argv[])
   setupParser(parser);
 
   const auto parsedArgs = parser.parseArguments(argc, argv);
-  if (parsedArgs.count("help"))
-  {
-    std::cout << parser.helpText();
-    return AsInt(ExitCode::Success);
-  }
 
   Settings s;
   if (!configureSettings(parsedArgs, s))

@@ -147,13 +147,6 @@ int main(int argc, char* argv[])
       return EXIT_FAILURE;
     };
 
-    // Show a help message
-    if (parsedArgs.count("help") || parsedArgs.count("h"))
-    {
-        std::cout << parser.helpText();
-        return EXIT_SUCCESS;
-    }
-
     if(regFilenames.size() != inFilenames.size())
     {
       MITK_ERROR << "Cannot stitch inputs. The number of specified registrations does not match the number of inputs.";

@@ -198,13 +198,6 @@ int main(int argc, char* argv[])
     setupParser(parser);
     const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
 
-    // Show a help message
-    if (parsedArgs.count("help") || parsedArgs.count("h"))
-    {
-        std::cout << parser.helpText();
-        return EXIT_SUCCESS;
-    }
-
     try
     {
       if (!configureApplicationSettings(parsedArgs))

@@ -46,10 +46,6 @@ int main(int argc, char* argv[])
   {
     return EXIT_FAILURE;
   }
-  if ( parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    return EXIT_SUCCESS;
-  }
 
   bool ignore_outlier = false;
   if (parsedArgs.count("ignore-outlier"))

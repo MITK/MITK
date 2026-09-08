@@ -46,10 +46,10 @@ float rel_time(0);
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("MR Signal to Concentration Converter");
-    parser.setDescription("MiniApp that allows to convert a T1 or T2 signal image into a concentration image for perfusion analysis.");
+    parser.setDescription("Converts a T1 or T2 signal image into a concentration image for perfusion analysis.");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 

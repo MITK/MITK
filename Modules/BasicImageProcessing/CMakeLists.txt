@@ -3,4 +3,4 @@ mitk_create_module(
   TARGET_DEPENDS PRIVATE IsotropicWavelets
 )
 
-add_subdirectory(MiniApps)
+add_subdirectory(cmdapps)

@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
 
-  // Miniapp Infos
+  // General information about the app
   parser.setCategory("Classification Tools");
   parser.setTitle("Screenshot of a single image");
   parser.setDescription("");

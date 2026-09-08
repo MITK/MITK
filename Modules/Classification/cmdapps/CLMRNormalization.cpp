@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   parser.addArgument("width", "w", mitkCommandLineParser::Float, "Target Width", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
   parser.addArgument("float", "float", mitkCommandLineParser::Bool, "Target Width", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
 
-  // Miniapp Infos
+  // General information about the app
   parser.setCategory("Classification Tools");
   parser.setTitle("MR Normalization Tool");
   parser.setDescription("Normalizes a MR image. Sets the Median of the tissue covered by mask 0 to 0 and the median of the area covered by mask 1 to 1.");

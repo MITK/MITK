@@ -1,6 +1,6 @@
-option(BUILD_BasicImageProcessingMiniApps "Build commandline tools for Basic Image Processing" OFF)
+option(BUILD_BasicImageProcessingCmdApps "Build command-line apps of the MitkBasicImageProcessing module" OFF)
 
-if(BUILD_BasicImageProcessingMiniApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_BasicImageProcessingCmdApps OR MITK_BUILD_ALL_APPS)
   mitkFunctionCreateCommandLineApp(NAME SingleImageArithmetic DEPENDS MitkBasicImageProcessing)
   mitkFunctionCreateCommandLineApp(NAME TwoImageArithmetic DEPENDS MitkBasicImageProcessing)
   mitkFunctionCreateCommandLineApp(NAME ImageAndValueArithmetic DEPENDS MitkBasicImageProcessing)

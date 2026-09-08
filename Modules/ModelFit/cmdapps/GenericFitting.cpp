@@ -58,10 +58,10 @@ void onFitEvent(::itk::Object* caller, const itk::EventObject & event, void* /*d
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("Generic Fitting");
-    parser.setDescription("MiniApp that allows to make a pixel based fitting on the intensity signal over time for a given model function.");
+    parser.setDescription("Fits a model function pixel by pixel to the intensity signal over time of a dynamic image.");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 

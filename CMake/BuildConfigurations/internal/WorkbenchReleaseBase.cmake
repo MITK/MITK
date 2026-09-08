@@ -28,7 +28,7 @@ if(NOT MITK_USE_SUPERBUILD)
   set(BUILD_MatchPointCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_SegmentationCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_DICOMCmdApps ON CACHE BOOL "" FORCE)
-  set(BUILD_ModelFitMiniApps ON CACHE BOOL "" FORCE)
+  set(BUILD_ModelFitCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_PETCmdApps ON CACHE BOOL "" FORCE)
 endif()
 

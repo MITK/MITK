@@ -21,9 +21,9 @@ found in the LICENSE file.
 #include <mitkExampleDataStructure.h>
 #include <mitkIOUtil.h>
 
-/** \brief Example MiniApp that converts a text file content to upper case
+/** \brief Example command-line app that converts the content of a text file to upper case
  *
- * This MiniApp provides the capability to convert a text file to content to upper case.
+ * This command-line app converts the content of a text file to upper case.
  * This is done loading the text file as a mitk::ExampleDataStructure, getting the string
  * content, using the std to transform it and writing it to file again.
  *
@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
   //! [create parser]
   mitkCommandLineParser parser;
 
-  // set general information about your MiniApp
+  // set general information about the app
   parser.setCategory("MITK-Examples");
   parser.setTitle("To Upper Case");
-  parser.setDescription("An example MiniApp that converts the contents of a test file to upper case.");
+  parser.setDescription("An example command-line app that converts the contents of a text file to upper case.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
   //! [create parser]
 

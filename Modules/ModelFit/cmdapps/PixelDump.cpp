@@ -85,10 +85,10 @@ DumpPixelMapType dumpedPixels;
 
 void setupParser(mitkCommandLineParser& parser)
 {
-  // set general information about your MiniApp
+  // set general information about the app
   parser.setCategory("Generic Analysis Tools");
   parser.setTitle("Pixel Dumper");
-  parser.setDescription("MiniApp that allows to dump the pixel values of all passed files into a csv. The region of dumping can defined by a mask. All images (and mask) must have the same geometry.");
+  parser.setDescription("Dumps the pixel values of all passed images into a CSV file. The dumped region can be defined by a mask. All images (and the mask) must have the same geometry.");
   parser.setContributor("DKFZ MIC");
   //! [create parser]
 

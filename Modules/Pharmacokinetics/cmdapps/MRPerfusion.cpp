@@ -90,10 +90,10 @@ void onFitEvent(::itk::Object* caller, const itk::EventObject & event, void* /*d
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("MR Perfusion");
-    parser.setDescription("MiniApp that allows to fit MRI perfusion models and generates the according parameter maps. IMPORTANT!!!: The app assumes that the input images (signal and AIF) are concentration images. If your images do not hold this assumption, convert the image date before using this app (e.g. by using the signal-to-concentration-converter mini app.");
+    parser.setDescription("Fits MRI perfusion models and generates the according parameter maps. IMPORTANT: The app assumes that the input images (signal and AIF) are concentration images. If your images do not hold this assumption, convert the image data before using this app (e.g. by using MitkMRSignal2Concentration).");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 

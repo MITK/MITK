@@ -1,0 +1,203 @@
+/**
+
+\page CommandLineAppHowToPage How to create a command-line app
+
+\tableofcontents
+
+This page shows how to write a command-line app for MITK, how to declare
+its arguments with mitkCommandLineParser, and how to register the
+executable with CMake. For the apps that ship with MITK and their usage
+see \ref MITKCmdAppsPage.
+
+\section CommandLineAppHowToPageDescription What is a command-line app?
+
+A command-line app is a small executable that performs one processing task
+without a GUI, for example converting a file or fitting a model. It is
+built on top of the MITK modules, so it uses the same readers, writers and
+algorithms as the MITK Workbench. All apps share the same argument syntax
+and the same self-description mechanism, provided by mitkCommandLineParser.
+
+\section CommandLineAppHowToPageSetUp Setting up a command-line app
+
+This section walks through <tt>ExampleToUpperCase.cpp</tt> from the example
+module (<tt>Examples/FirstSteps/NewModule/cmdapps/</tt>). See
+\ref NewModulePage for the suggested structure of a module and its
+<tt>cmdapps/</tt> directory.
+
+Each app has its own main function.
+
+\snippet ExampleToUpperCase.cpp main
+
+The first thing to do is to describe the app and configure the accepted
+arguments with mitkCommandLineParser. Title, category, description and
+contributor appear in the help text and in the XML self-description.
+
+\snippet ExampleToUpperCase.cpp create parser
+
+Our example accepts an input file name, an output file name and an optional
+flag for verbose output.
+
+\snippet ExampleToUpperCase.cpp add arguments
+
+The following argument types are available for the addArgument method:
+\li String
+\li Bool
+\li StringList
+\li Int
+\li Float
+\li Directory
+\li File
+\li Image
+
+The optional channel parameter (Input or Output) marks files and images as
+input or output in the XML self-description. The label string is a short
+human-readable name of the argument, the help string explains it.
+
+Every argument is optional by default. Pass <tt>false</tt> for the optional
+parameter to make it required. If a required argument is missing, the parser
+prints the help text and returns an empty map, which is the conventional
+signal for the app to exit with a failure code.
+
+After the arguments have been declared, parseArguments is called.
+
+\snippet ExampleToUpperCase.cpp parse the arguments
+
+After all arguments have been parsed the actual processing can start. In this
+case we read the file, convert the contained text to upper case and write the
+new data to the specified output location.
+
+\snippet ExampleToUpperCase.cpp do processing
+
+\subsection CommandLineAppHowToPageSetUpExampleHelpOutput Example help output
+
+Running the example without any argument or with wrong ones:
+\code
+./MitkExampleToUpperCase
+\endcode
+
+... will emit the following help text:
+
+\verbatim
+Command Line Utility *To Upper Case* (v2026.06) in Category *MITK-Examples*
+An example command-line app that converts the contents of a text file to upper case.
+German Cancer Research Center (DKFZ)
+
+Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.
+Use --version to print MITK revision information.
+
+Optional parameters
+  -v, --verbose, Whether to produce verbose output (optional)
+
+Required I/O parameters
+  -i, --input, input file (.txt/.example)
+  -o, --output, where to save the output (.txt/.example)
+\endverbatim
+
+The parser also handles two arguments that need no declaration:
+<tt>--version</tt> prints the Git commit hash and branch name of the MITK
+build, and <tt>--xml</tt> prints the XML self-description explained below.
+A <tt>--help</tt> argument is not built in; declare it like any other Bool
+argument and print parser.helpText() when it is present, as the example does.
+
+\section CommandLineAppHowToPageCMake Registering the executable with CMake
+
+A command-line app is created with the CMake function
+<tt>mitkFunctionCreateCommandLineApp</tt>, which wraps
+<tt>mitk_create_executable</tt> and adds the MitkCommandLine module
+dependency. The executable is named after the NAME argument with the module
+prefix, so <tt>NAME ExampleToUpperCase</tt> produces
+<tt>MitkExampleToUpperCase</tt>. By default <tt>NAME.cpp</tt> is compiled;
+pass <tt>CPP_FILES</tt> to use other sources.
+
+\code
+option(BUILD_NewModuleCmdApps "Build command-line apps of the example module" OFF)
+
+if(BUILD_NewModuleCmdApps)
+  mitkFunctionCreateCommandLineApp(
+    NAME ExampleToUpperCase
+    DEPENDS MitkNewModule
+  )
+endif()
+\endcode
+
+Apps in MITK are grouped per module behind a <tt>BUILD_&lt;Module&gt;CmdApps</tt>
+option that additionally honours <tt>MITK_BUILD_ALL_APPS</tt>. Installed apps
+land in the <tt>bin/</tt> directory of a package together with a launcher
+script in <tt>apps/</tt>, see \ref MITKCmdAppsPage. Pass
+<tt>NO_INSTALL</tt> to exclude an app from packaging, as the example module
+does.
+
+Every app shipped with MITK also has a user manual page at
+<tt>Modules/&lt;Module&gt;/documentation/Mitk&lt;App&gt;.md</tt> that is
+linked as a subpage from \ref MITKCmdAppsPage.
+
+\section CommandLineAppHowToPageXMLRepresentation Retrieving the XML argument description
+
+If the app is executed with the argument <tt>--xml</tt>, the parser emits an
+XML description of all declared arguments on the console and returns an empty
+map, so the app exits without processing. The format follows the
+<a href="https://www.slicer.org/wiki/Documentation/Nightly/Developers/SlicerExecutionModel">Slicer execution model</a>,
+which external tools can use to generate a user interface or to integrate the
+app into a pipeline. Title, category, description and contributor are taken
+from the parser configuration:
+
+\snippet ExampleToUpperCase.cpp create parser
+
+All arguments are listed in one <tt>parameters</tt> element with the default
+label "Parameters"; the groups of beginGroup / endGroup only affect the help
+text. Label and description of the element can be set with the parser's
+changeParameterGroup method, which must be called before adding the arguments.
+An argument with the short name <tt>h</tt> is omitted from the XML since a
+help flag has no use in a generated interface.
+
+Note that the parser prints the line "Running Command Line Utility ..." before
+any other output, including the XML. A consumer of the XML has to skip that
+first line.
+
+\subsection CommandLineAppHowToPageXMLRepresentationExampleXMLOutput Example XML output
+
+Running the example with argument <tt>--xml</tt> ...
+\code
+./MitkExampleToUpperCase --xml
+\endcode
+
+... will emit the following XML description:
+
+\verbatim
+Running Command Line Utility *To Upper Case* (v2026.06)
+<executable>
+<category>MITK-Examples</category>
+<title>To Upper Case</title>
+<description>An example command-line app that converts the contents of a text file to upper case.</description>
+<contributor>German Cancer Research Center (DKFZ)</contributor>
+<parameters>
+<label>Parameters</label>
+<description>Parameters</description>
+<file>
+<name>input</name>
+<description>input file (.txt/.example)</description>
+<label>Input file</label>
+<longflag>input</longflag>
+<flag>i</flag>
+<channel>input</channel>
+</file>
+<file>
+<name>output</name>
+<description>where to save the output (.txt/.example)</description>
+<label>Output file</label>
+<longflag>output</longflag>
+<flag>o</flag>
+<channel>output</channel>
+</file>
+<boolean>
+<name>verbose</name>
+<description>Whether to produce verbose output</description>
+<label>Verbose Output</label>
+<longflag>verbose</longflag>
+<flag>v</flag>
+</boolean>
+</parameters>
+</executable>
+\endverbatim
+
+*/

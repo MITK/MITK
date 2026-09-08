@@ -41,10 +41,10 @@ itk::StitchStrategy stitchStratgy = itk::StitchStrategy::Mean;
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Registration Tools");
     parser.setTitle("Stitch 3D Images");
-    parser.setDescription("MiniApp that allows to map and stitch 3D images into a given output geometry.");
+    parser.setDescription("Maps and stitches 3D images into a given output geometry.");
     parser.setContributor("MIC, German Cancer Research Center (DKFZ)");
     //! [create parser]
 

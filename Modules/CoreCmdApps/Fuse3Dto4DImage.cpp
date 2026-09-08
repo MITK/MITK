@@ -33,10 +33,10 @@ std::vector<mitk::TimePointType> timebounds;
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("Fuse 3D to 4D Image");
-    parser.setDescription("MiniApp that allows to fuse several 3D images (with same geometry) into a 3D+t (4D) image that can be processed as dynamic data.");
+    parser.setDescription("Fuses several 3D images with the same geometry into a 3D+t (4D) image that can be processed as dynamic data.");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 

@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines the format of the output. 0: (Default) results of an image / slice are written in a single row;"
     " 1: results of an image / slice are written in a single column; 2: store the result of on image as structured radiomocs report (XML).");
 
-  // Miniapp Infos
+  // General information about the app
   parser.setCategory("Classification Tools");
   parser.setTitle("Global Image Feature calculator");
   parser.setDescription("Calculates different global statistics for a given segmentation / image combination");

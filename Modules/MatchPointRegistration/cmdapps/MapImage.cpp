@@ -42,10 +42,10 @@ struct Settings
 
 void setupParser(mitkCommandLineParser& parser)
 {
-  // set general information about your MiniApp
+  // set general information about the app
   parser.setCategory("Registration Tools");
   parser.setTitle("Map Image");
-  parser.setDescription("MiniApp that allows to map a image into a given output geometry by using a given registration.");
+  parser.setDescription("Maps an image into a given output geometry by using a given registration.");
   parser.setContributor("MIC, German Cancer Research Center (DKFZ)");
   //! [create parser]
 

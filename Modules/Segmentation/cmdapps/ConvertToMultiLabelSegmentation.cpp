@@ -82,7 +82,7 @@ void setupParser(mitkCommandLineParser& parser)
   parser.addArgument("reference", "r",
     mitkCommandLineParser::File,
     "Reference image",
-    "Reference image defining the geometry for conversion (only needed if no input images are provided)",
+    "Reference image defining the geometry for conversion (required if no input images are provided, otherwise it overrides the geometry derived from the input images)",
     us::Any(), true, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("groups", "g",
@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
         // Check data type
         if (IsUnsupportedDataType(inputData))
         {
-          MITK_ERROR << "Unsupported data type ("<< inputData.data->GetNameOfClass() << ")"
+          MITK_ERROR << "Unsupported data type (" << inputData.data->GetNameOfClass() << ") "
             "for file: " << filename;
           return EXIT_FAILURE;
         }

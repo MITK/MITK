@@ -32,8 +32,8 @@ found in the LICENSE file.
                break;                                                                                 \
       case 3 : CONVERT_IMAGE( TYPE , 3);                                                              \
                break;                                                                                 \
-      default: MITK_INFO << "This tool doesn't support a dimension of "<<dimension<<".";              \
-               outputImage = NULL;                                                                    \
+      default: MITK_ERROR << "This tool doesn't support a dimension of "<<dimension<<".";             \
+               outputImage = nullptr;                                                                 \
                break;                                                                                 \
     };                                                                                                \
   }
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
   parser.setTitle("Image Type Converter");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Converts the scalar pixel type of a 2D or 3D image to a given type.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--","-");
@@ -108,16 +108,17 @@ int main(int argc, char* argv[])
   else if (type.compare("none") == 0)
   {
     MITK_INFO << " No conversion performed";
-    outputImage = nullptr;
+    return EXIT_SUCCESS;
   }
   else
   {
-    CONVERT_IMAGE_TYPE(double);
+    MITK_ERROR << "Unknown scalar data type \"" << type << "\". Supported types: int, uint, short, ushort, char, uchar, float, double, none";
+    return EXIT_FAILURE;
   }
 
-  if (outputImage.IsNotNull())
-  {
-    mitk::IOUtil::Save(outputImage, outputName);
-  }
+  if (outputImage.IsNull())
+    return EXIT_FAILURE;
+
+  mitk::IOUtil::Save(outputImage, outputName);
   return EXIT_SUCCESS;
 }

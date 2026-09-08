@@ -44,7 +44,7 @@ With `binary` or `label` format and more than one contour set in the input, one 
 
 ### Input handling
 
-Every object in the input file that is not a contour set is skipped with a warning. Loading the reference image and the contours, as well as writing, use the readers and writers of MITK, so the formats of [MitkFileConverter](@ref MITKFileConverterPage) apply.
+Every object in the input file that is not a contour set is skipped with a warning. A contour set that does not intersect the reference image yields an empty mask; with the `label` and `multilabel` formats an empty label is created for it and a warning is printed. Loading the reference image and the contours, as well as writing, use the readers and writers of MITK, so the formats of [MitkFileConverter](@ref MITKFileConverterPage) apply.
 
 ## Examples
 

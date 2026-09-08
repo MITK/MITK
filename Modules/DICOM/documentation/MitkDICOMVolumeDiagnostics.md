@@ -28,7 +28,7 @@ MitkDICOMVolumeDiagnostics -i <input> [-o <report.json>] [-s] [-d] [-t]
 | `--only-own-series` | `-s` | Flag | | If the input is a file, analyze only the files in its directory that have the same Series Instance UID. Has no effect for directory inputs. |
 | `--check-3d` | `-d` | Flag | | Analyze the input with the built-in 3D reader configurations. |
 | `--check-3d+t` | `-t` | Flag | | Analyze the input with the built-in 3D+t (dynamic image) reader configurations. |
-| `--help` | `-h` | Flag | | Show the help text. The app only prints the help text when `--input` is missing (e.g. when called with `--help` alone); combined with `--input` the flag is ignored and the analysis runs. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
 If neither `--check-3d` nor `--check-3d+t` is given, both sets of configurations are used. If only one of them is given, only that set is used.
 

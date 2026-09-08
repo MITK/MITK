@@ -37,7 +37,7 @@ The output gets an arbitrary time geometry with one time step per input image:
 - Without `--time`, the time steps are `[0, 1)`, `[1, 2)`, ..., `[N-1, N)` ms, i.e. every time step has a duration of 1 ms.
 - With `--time`, exactly N+1 numbers are required for N input images: the first is the minimum bound of the first time step, all following numbers are the maximum bounds of the successive time steps. `-t 2 3.5 10` with two inputs yields the time steps `[2, 3.5)` and `[3.5, 10)` ms. Any other count of numbers is an error and the app exits with 1.
 
-Numbers are parsed with the C locale, so use a period as decimal separator. A value that cannot be parsed as a number is silently treated as 0.
+Numbers are parsed with the C locale, so use a period as decimal separator. A value that cannot be parsed as a number is rejected with an error and the app exits with 1.
 
 ### Geometry, pixel type, and properties
 

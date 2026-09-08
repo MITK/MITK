@@ -44,7 +44,7 @@ MitkImageTypeConverter -i <input> -o <output> -t <type>
 | `double` | double-precision floating point |
 | `none` | no conversion is performed and no output file is written |
 
-Any other value is not rejected: the app silently converts to `double` in that case. Check the `Data Type for Conversion` line in the console output if you are unsure which type was used.
+Any other value is rejected with an error message and exit code 1.
 
 ### Casting behaviour
 
@@ -52,11 +52,11 @@ Pixel values are cast one by one (as with `itk::CastImageFilter`). There is no r
 
 ### Dimensions
 
-Only 2D and 3D images are converted. For any other dimension (e.g. a 3D+t image) the app prints `This tool doesn't support a dimension of <n>.`, writes no output, and still exits with 0. To convert a dynamic image, split it first with [MitkSplit4Dto3DImages](@ref MitkSplit4Dto3DImagePage), convert the time steps, and fuse them again with [MitkFuse3Dto4DImage](@ref MitkFuse3Dto4DImagePage).
+Only 2D and 3D images are converted. For any other dimension (e.g. a 3D+t image) the app prints `This tool doesn't support a dimension of <n>.`, writes no output, and exits with 1. To convert a dynamic image, split it first with [MitkSplit4Dto3DImages](@ref MitkSplit4Dto3DImagePage), convert the time steps, and fuse them again with [MitkFuse3Dto4DImage](@ref MitkFuse3Dto4DImagePage).
 
 ### Exit code
 
-The app exits with 0 whenever the arguments could be parsed, including the `none` and unsupported-dimension cases where no file is written. It exits with 1 only if required arguments are missing.
+The app exits with 0 after writing the output and for `none`, where no file is written on purpose. It exits with 1 if required arguments are missing, the type is unknown, or the image dimension is not supported.
 
 ## Examples
 

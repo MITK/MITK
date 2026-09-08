@@ -130,9 +130,9 @@ namespace
     parser.setCategory("PET Tools");
     parser.setTitle("PET SUV Calculation");
     parser.setDescription(
-      "CLI app that converts a PET image (in [Bq/mL]) into a SUV image. "
-      "Supports body-weight (SUVbw), lean-body-mass (SUVlbm, Janmahasatian), "
-      "and body-surface-area (SUVbsa, DuBois) normalization. Acquisition "
+      "Converts a PET image (in [Bq/mL]) into a SUV image. "
+      "Supports body-weight (SUVbw), lean-body-mass (SUVlbm, Janmahasatian or James), "
+      "ideal-body-weight (SUVibw, Sugawara) and body-surface-area (SUVbsa, DuBois) normalization. Acquisition "
       "parameters (injected dose, half-life, decay timing, patient body "
       "weight / height / sex) are taken from the input's DICOM properties "
       "by default and can be overridden via dedicated flags.");
@@ -168,10 +168,10 @@ namespace
       "Override DICOM (0010,1030) Patient Weight.");
     parser.addArgument("patient-height", "", mitkCommandLineParser::Float,
       "Patient height [m]",
-      "Override DICOM (0010,1020) Patient Size. Required for variant lbm/bsa.");
+      "Override DICOM (0010,1020) Patient Size. Required for the variants lbm-janma, lbm-james128, ibw and bsa.");
     parser.addArgument("patient-sex", "", mitkCommandLineParser::String,
       "Patient sex (M|F|O)",
-      "Override DICOM (0010,0040) Patient Sex. Required for variant lbm. "
+      "Override DICOM (0010,0040) Patient Sex. Required for the variants lbm-janma, lbm-james128 and ibw. "
       "Value 'O' (Other) follows the IBSI-SUV benchmark convention: the "
       "mean of the male- and female-specific normalization factors.");
     parser.addArgument("half-life", "", mitkCommandLineParser::Float,

@@ -69,21 +69,21 @@ int main(int argc, char* argv[])
 
   parser.setTitle("File Converter");
   parser.setCategory("Basic Image Processing");
-  parser.setDescription("");
+  parser.setDescription("Converts data between all file formats MITK can read and write, with control over the used readers, writers and their options.");
   parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.beginGroup("Required I/O parameters");
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input path that should be loaded.",us::Any(),false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output path where the result should be stored. If the input generates multiple outputs the index will be added for all but the first output (before the extension; starting with 0).", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output path where the result should be stored. If the input generates multiple outputs the index will be added for all but the first output (before the extension; starting with 1).", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.endGroup();
 
   parser.beginGroup("Optional parameters");
   parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Enforce a certain reader to be used for loading the input.", us::Any());
   parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "List reader names", "Print names of all available readers.", us::Any());
   parser.addArgument("input-options", "", mitkCommandLineParser::String, "Input reader options", "Json dictionary string containing the options as key and value pairs that should be passed to the reader for loading the input.", us::Any());
-  parser.addArgument("output-options", "", mitkCommandLineParser::String, "Input reader options", "Json dictionary string containing the options as key and value pairs that should be passed to the writer for saving the output.", us::Any());
+  parser.addArgument("output-options", "", mitkCommandLineParser::String, "Output writer options", "Json dictionary string containing the options as key and value pairs that should be passed to the writer for saving the output.", us::Any());
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
         errMsg += "No reader available for '" + loadInfo.m_Path + "'\n";
       }
       MITK_ERROR << errMsg;
-      return EXIT_SUCCESS;
+      return EXIT_FAILURE;
     }
 
     std::cout << "Available Readers: "<<std::endl << "------------------------" << std::endl;
@@ -159,13 +159,13 @@ int main(int argc, char* argv[])
         mitk::PreferenceListReaderOptionsFunctor(preference, emptyList):
         mitk::PreferenceListReaderOptionsFunctor(preference, emptyList, inputOptions);
 
-  mitk::IFileIO::Options ouptputOptions;
+  mitk::IFileIO::Options outputOptions;
   if (parsedArgs.count("output-options"))
   {
     try
     {
       auto optionJson = nlohmann::json::parse(parsedArgs["output-options"].ToString());
-      ouptputOptions = ConvertJsonToOptions(optionJson);
+      outputOptions = ConvertJsonToOptions(optionJson);
     }
     catch (const std::exception& e)
     {
@@ -217,13 +217,13 @@ int main(int argc, char* argv[])
     std::cout << "Write data object #"<<count<<" to: "<<writeName << std::endl;
     try
     {
-      if (ouptputOptions.empty())
+      if (outputOptions.empty())
       {
         mitk::IOUtil::Save(dataObj, writeName);
       }
       else
       {
-        mitk::IOUtil::Save(dataObj, writeName,ouptputOptions);
+        mitk::IOUtil::Save(dataObj, writeName,outputOptions);
       }
     }
     catch (const std::exception& e)

@@ -240,6 +240,8 @@ int main(int argc, char* argv[])
       }
       else
       {
+        mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0;
+
         if (labelSetImage.IsNull())
         {
           labelSetImage = mitk::MultiLabelSegmentation::New();
@@ -247,13 +249,23 @@ int main(int argc, char* argv[])
         }
         else
         {
-          labelSetImage->AddGroup(image);
-          auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
-          label->SetValue(labelValue);
-          labelSetImage->AddLabel(label, labelSetImage->GetActiveLayer(), false, false);
+          groupIndex = labelSetImage->AddGroup(image);
         }
 
         auto label = labelSetImage->GetLabel(labelValue);
+
+        // InitializeByLabeledImage() only creates labels for pixel values that
+        // occur in the image, so a contour set outside the reference geometry
+        // yields no label. Create it explicitly to keep the output consistent.
+        if (label.IsNull())
+        {
+          if (0 == groupIndex)
+            MITK_WARN << "Contour set does not intersect the reference image. Creating empty label.";
+
+          auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
+          newLabel->SetValue(labelValue);
+          label = labelSetImage->AddLabel(newLabel, groupIndex, false, false);
+        }
 
         SetLabelName(input, label);
         SetLabelColor(input, label);

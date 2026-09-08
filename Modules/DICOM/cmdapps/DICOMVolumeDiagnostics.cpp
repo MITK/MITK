@@ -34,7 +34,7 @@ void InitializeCommandLineParser(mitkCommandLineParser& parser)
   parser.addArgument("only-own-series", "s", mitkCommandLineParser::Bool, "Only own series", "Analyze only files in the same directory that have the same DICOM Series UID, if a file is provided as input.", us::Any());
   parser.addArgument("check-3d", "d", mitkCommandLineParser::Bool, "Check 3D configs", "Analyze the input by using all known 3D configurations. If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
   parser.addArgument("check-3d+t", "t", mitkCommandLineParser::Bool, "Check 3D+t configs", "Analyze the input by using all known 3D+t configurations (thus dynamic image configurations). If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
-  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file or path", "Input contour(s)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file or path", "DICOM file or directory containing DICOM files.", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file", "Output file where the diagnostics results are stored as json.", us::Any());
 }
 
@@ -51,6 +51,12 @@ int main(int argc, char* argv[])
   {
     std::cout << parser.helpText();
     return EXIT_FAILURE;
+  }
+
+  if (args.count("help"))
+  {
+    std::cout << parser.helpText();
+    return EXIT_SUCCESS;
   }
 
   nlohmann::json diagnosticsResult;
@@ -122,7 +128,6 @@ int main(int argc, char* argv[])
         nlohmann::json readerInfo;
         readerInfo["class_name"] = reader->GetNameOfClass();
         readerInfo["configuration_label"] = reader->GetConfigurationLabel();
-        readerInfo["configuration_description"] = reader->GetConfigurationDescription();
         readerInfo["configuration_description"] = reader->GetConfigurationDescription();
         std::stringstream config;
         reader->PrintConfiguration(config);

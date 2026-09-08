@@ -42,13 +42,13 @@ A single input can produce more than one data object, for example a DICOM direct
 - the first object is written to `<output>` as given,
 - every further object is written to `<name>_<n><extension>`, where `n` counts up from 1.
 
-For `-o result.nrrd` and three loaded objects this yields `result.nrrd`, `result_1.nrrd`, and `result_2.nrrd`. Note that the built-in help text claims the index starts with 0; the app actually starts with 1.
+For `-o result.nrrd` and three loaded objects this yields `result.nrrd`, `result_1.nrrd`, and `result_2.nrrd`.
 
 ### Reader selection
 
 Without `--reader`, MITK selects the reader with the highest confidence for the input, as it would in the Workbench. With `--reader`, the given description is used as a preference: if a reader with exactly that description is available for the input it is used, otherwise the app silently falls back to the default selection. Use `--list-readers` to see the descriptions that are accepted for a given input.
 
-`--list-readers` needs both `--input` and `--output` (the parser insists on all required arguments), but it does not write anything. If the input file does not exist or no reader is available, an error message is printed; the exit code is still 0 in that case.
+`--list-readers` needs both `--input` and `--output` (the parser insists on all required arguments), but it does not write anything. If the input file does not exist or no reader is available, an error message is printed and the app exits with 1.
 
 ### Reader and writer options
 

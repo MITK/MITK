@@ -45,12 +45,12 @@ void setupParser(mitkCommandLineParser& parser)
     // see mitkCommandLineParser::addArgument for more information
     parser.beginGroup("Required I/O parameters");
     parser.addArgument(
-        "input", "i", mitkCommandLineParser::File, "Input file", "Path to the input image that should be splitted. If the image has only one time point it will be stored as output untouched.", us::Any(), false, false, false, mitkCommandLineParser::Input);
+        "input", "i", mitkCommandLineParser::File, "Input file", "Path to the input image that should be split. If the image has only one time point it will be stored as output untouched.", us::Any(), false, false, false, mitkCommandLineParser::Input);
     parser.addArgument("output",
         "o",
         mitkCommandLineParser::File,
         "Output file(s) path",
-        "Path to the splitted images. If the input has multiple time points the path will be used as pattern and a suffix \"_[time step]\" will be added before the extension.",
+        "Path to the split images. If the input has multiple time points the path will be used as pattern and a suffix \"_[time step]\" will be added before the extension.",
         us::Any(),
         false, false, false, mitkCommandLineParser::Output);
     parser.endGroup();

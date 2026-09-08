@@ -34,8 +34,8 @@ MitkGenericFitting -i <input> -o <output template> [options]
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
-| `--function` | `-f` | String | `Linear` | Model to fit. `Linear` selects the linear model; any other value selects the generic formula model. |
-| `--formular` | `-y` | String | | Formula of the generic model. Required if `--function` is not `Linear`. |
+| `--function` | `-f` | String | `Linear` | Model to fit. `Linear` selects the linear model, `Generic-<N>` the generic formula model with N free parameters (1 to 10). |
+| `--formular` | `-y` | String | | Formula of the generic model. Required for `Generic-<N>`. |
 | `--mask` | `-m` | File | | Mask image that defines the voxels to fit. Must have the same geometry as the input. Required for `--roibased`. |
 | `--roibased` | `-r` | Flag | | Fit the mean curve of the mask region once instead of every voxel. |
 | `--verbose` | `-v` | Flag | | Accepted for compatibility; has no effect. |
@@ -49,15 +49,13 @@ MitkGenericFitting -i <input> -o <output template> [options]
 named `slope` and `y-intercept`; the derived parameter `x-intercept`
 (`-y-intercept / slope`) is stored as well.
 
-Any other value of `--function` selects the generic formula model, whose
-function is the string given with `--formular`. The independent variable is
-`x`, the time of the respective time step in seconds (taken from the time
-geometry of the input). The model as configured by this application has
-exactly one free parameter, named `a`. The value of `--function` is not
-interpreted further, so it does not change the number of parameters; a formula
-that uses further variables (`b`, `c`, ...) makes the fit fail with a parser
-error. The console message "generic (2 parameter)" printed at start does not
-reflect this.
+`--function Generic-<N>` selects the generic formula model with N free
+parameters, whose function is the string given with `--formular`. The
+independent variable is `x`, the time of the respective time step in seconds
+(taken from the time geometry of the input). The free parameters are named
+`a`, `b`, `c`, ... up to the N-th letter; N must be between 1 and 10. Any other
+value of `--function`, an N outside that range, or a missing formula is
+rejected before any data is loaded.
 
 The formula parser understands:
 
@@ -94,7 +92,7 @@ spaces replaced by `_`. The results are:
 
 | Category | Names |
 |----------|-------|
-| Model parameters | `slope`, `y-intercept` (linear) or `a` (generic). |
+| Model parameters | `slope`, `y-intercept` (linear) or `a`, `b`, ... (generic). |
 | Derived parameters | `x-intercept` (linear only). |
 | Fit criterion | `sum_diff^2`, the sum of squared differences between model and data. |
 | Evaluation | `Chi^2`, the normalized sum of squared differences. |
@@ -119,12 +117,13 @@ optimizer debug maps.
 ### Voxel-wise fit of a user-defined formula inside a mask
 
 ```bash
-MitkGenericFitting -i dce_series.nrrd -m tumor_mask.nrrd -o results/washout.nrrd -f Generic -y "a * exp(-0.01 * x)"
+MitkGenericFitting -i dce_series.nrrd -m tumor_mask.nrrd -o results/washout.nrrd -f Generic-2 -y "a * exp(-b * x)"
 ```
 
-Fits the exponential decay with the single free parameter `a` to every voxel
-inside `tumor_mask.nrrd` and writes `results/washout_a.nrrd` together with the
-criterion, evaluation and debug images. Voxels outside the mask are `0`.
+Fits an exponential decay with the two free parameters `a` and `b` to every
+voxel inside `tumor_mask.nrrd` and writes `results/washout_a.nrrd` and
+`results/washout_b.nrrd` together with the criterion, evaluation and debug
+images. Voxels outside the mask are `0`.
 
 ### ROI-based linear fit
 

@@ -40,6 +40,7 @@ bool verbose(false);
 bool roibased(false);
 std::string functionName;
 std::string formular;
+unsigned int numberOfParameters = 1;
 mitk::Image::Pointer image;
 mitk::Image::Pointer mask;
 
@@ -72,7 +73,7 @@ void setupParser(mitkCommandLineParser& parser)
     // see mitkCommandLineParser::addArgument for more information
     parser.beginGroup("Model parameters");
     parser.addArgument(
-        "function", "f", mitkCommandLineParser::String, "Model function", "Function that should be used to fit the intensity signals. Options are: \"Linear\" or \"<Parameter Number>\" (for generic formulas).", us::Any(std::string("Linear")));
+        "function", "f", mitkCommandLineParser::String, "Model function", "Function that should be used to fit the intensity signals. Options are: \"Linear\" or \"Generic-<N>\" for a generic formula with N free parameters (1 to 10), named a, b, c, ... in the formula.", us::Any(std::string("Linear")));
     parser.addArgument(
         "formular", "y", mitkCommandLineParser::String, "Generic model function formular", "Formular of a generic model (if selected) that will be parsed and fitted.", us::Any());
     parser.endGroup();
@@ -115,6 +116,37 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
     {
         formular = us::any_cast<std::string>(parsedArgs["formular"]);
     }
+
+    if (functionName != "Linear")
+    {
+        const std::string prefix = "Generic-";
+        if (functionName.rfind(prefix, 0) != 0)
+        {
+            std::cerr << "Unknown model function \"" << functionName << "\". Use \"Linear\" or \"Generic-<N>\"." << std::endl;
+            return false;
+        }
+
+        try
+        {
+            numberOfParameters = std::stoul(functionName.substr(prefix.size()));
+        }
+        catch (const std::exception&)
+        {
+            numberOfParameters = 0;
+        }
+
+        if (numberOfParameters < 1 || numberOfParameters > 10)
+        {
+            std::cerr << "Invalid number of parameters in model function \"" << functionName << "\". Use \"Generic-<N>\" with N between 1 and 10." << std::endl;
+            return false;
+        }
+
+        if (formular.empty())
+        {
+            std::cerr << "A generic model function requires a formula. Use --formular to specify it." << std::endl;
+            return false;
+        }
+    }
     inFilename = us::any_cast<std::string>(parsedArgs["input"]);
     outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 
@@ -147,6 +179,7 @@ void configureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
 
     if (genericParameterizer)
     {
+        genericParameterizer->SetNumberOfParameters(numberOfParameters);
         genericParameterizer->SetFunctionString(formular);
     }
 }
@@ -258,7 +291,7 @@ void doFitting()
         }
         else
         {
-            std::cout << "Model:  generic (2 parameter)" << std::endl;
+            std::cout << "Model:  generic (" << numberOfParameters << " parameter)" << std::endl;
             if (!roibased)
             {
                 generateModelFit_PixelBased<mitk::GenericParamModelParameterizer>(fitSession, generator);

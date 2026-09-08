@@ -240,6 +240,14 @@ int main(int argc, char* argv[])
       }
       else
       {
+        // The filter paints labelValue into an otherwise empty image, so a
+        // maximum of 0 means the contours missed the reference geometry. Asking
+        // the image rather than the created label keeps the check working for
+        // the second and any further contour set, where AddGroup() never
+        // derives labels from the content.
+        if (0 == image->GetStatistics()->GetScalarValueMax())
+          MITK_WARN << "Contour set does not intersect the reference image. Creating empty label.";
+
         mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0;
 
         if (labelSetImage.IsNull())
@@ -255,13 +263,10 @@ int main(int argc, char* argv[])
         auto label = labelSetImage->GetLabel(labelValue);
 
         // InitializeByLabeledImage() only creates labels for pixel values that
-        // occur in the image, so a contour set outside the reference geometry
-        // yields no label. Create it explicitly to keep the output consistent.
+        // occur in the image, and AddGroup() creates none at all, so the label
+        // has to be created explicitly to keep the output consistent.
         if (label.IsNull())
         {
-          if (0 == groupIndex)
-            MITK_WARN << "Contour set does not intersect the reference image. Creating empty label.";
-
           auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
           newLabel->SetValue(labelValue);
           label = labelSetImage->AddLabel(newLabel, groupIndex, false, false);

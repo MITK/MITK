@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkContourModelSetToImageFilter.h>
 #include <mitkDataStorage.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkImageStatisticsHolder.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>

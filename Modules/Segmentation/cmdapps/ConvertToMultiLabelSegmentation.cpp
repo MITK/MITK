@@ -90,10 +90,6 @@ void setupParser(mitkCommandLineParser& parser)
     "Separate groups",
     "Create separate label groups for each input (default: merge all into single group)",
     us::Any(false), true);
-
-    mitkCommandLineParser::Bool,
-    "Help",
-    "Show this help text");
   parser.endGroup();
 }
 

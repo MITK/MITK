@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkTransformationOperation.h>
 
+#include <mutex>
+
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -236,19 +238,26 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
   // FFTPadImageFilter shifts the start index of the padded region to negative
   // values. WaveletFrequencyForward scales requested regions per level from
   // that index and ends up outside the largest possible region, so the padded
-  // image is moved back to index zero first.
+  // image is moved back to index zero first. The padding is centered, so the
+  // origin has to follow the same shift or the content would be displaced by
+  // half the padding.
   fftpad->UpdateOutputInformation();
+  const auto paddedIndex = fftpad->GetOutput()->GetLargestPossibleRegion().GetIndex();
+  typename DoubleImageType::PointType paddedOrigin;
+  fftpad->GetOutput()->TransformIndexToPhysicalPoint(paddedIndex, paddedOrigin);
+
   typedef itk::ChangeInformationImageFilter< DoubleImageType > ChangeInformationType;
   typename ChangeInformationType::Pointer changeInformation = ChangeInformationType::New();
   changeInformation->SetInput(fftpad->GetOutput());
   changeInformation->ChangeRegionOn();
   typename ChangeInformationType::OutputImageOffsetType regionOffset;
-  const auto paddedIndex = fftpad->GetOutput()->GetLargestPossibleRegion().GetIndex();
   for (unsigned int i = 0; i < Dimension; ++i)
   {
     regionOffset[i] = -paddedIndex[i];
   }
   changeInformation->SetOutputOffset(regionOffset);
+  changeInformation->ChangeOriginOn();
+  changeInformation->SetOutputOrigin(paddedOrigin);
 
   typename FFTFilterType::Pointer fftFilter = FFTFilterType::New();
   fftFilter->SetInput(changeInformation->GetOutput());
@@ -261,28 +270,29 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
   forwardWavelet->SetInput(fftFilter->GetOutput());
   forwardWavelet->Update();
 
-  // Obtain target spacing, size and origin
-  typename ComplexImageType::SpacingType inputSpacing;
-  for (unsigned int i = 0; i < Dimension; ++i)
-  {
-    inputSpacing[i] = image->GetSpacing()[i];
-  }
-  typename ComplexImageType::SpacingType expectedSpacing = inputSpacing;
-  typename ComplexImageType::PointType inputOrigin = image->GetOrigin();
-  typename ComplexImageType::PointType expectedOrigin = inputOrigin;
-  typename ComplexImageType::SizeType inputSize = fftFilter->GetOutput()->GetLargestPossibleRegion().GetSize();
-  typename ComplexImageType::SizeType expectedSize = inputSize;
+  // Obtain target spacing and origin. Both refer to the padded image, which is
+  // the grid the sub-bands are derived from.
+  changeInformation->UpdateOutputInformation();
+  const DoubleImageType* paddedImage = changeInformation->GetOutput();
+  const auto paddedSpacing = paddedImage->GetSpacing();
+
+  typename OutputImageType::SpacingType expectedSpacing;
+  typename OutputImageType::PointType expectedOrigin;
 
   // Inverse FFT to obtain filtered images
   for (unsigned int level = 0; level < numberOfLevels + 1; ++level)
   {
     double scaleFactorPerLevel = std::pow(static_cast< double >(forwardWavelet->GetScaleFactor()),static_cast< double >(level));
+
+    // Each level merges scaleFactorPerLevel voxels into one, so the center of
+    // the new corner voxel lies at that continuous index of the padded grid.
+    itk::ContinuousIndex< double, Dimension > cornerIndex;
     for (unsigned int i = 0; i < Dimension; ++i)
     {
-      expectedSize[i] = inputSize[i] / scaleFactorPerLevel;
-      expectedOrigin[i] = inputOrigin[i];
-      expectedSpacing[i] = inputSpacing[i] * scaleFactorPerLevel;
+      expectedSpacing[i] = paddedSpacing[i] * scaleFactorPerLevel;
+      cornerIndex[i] = -0.5 + 0.5 * scaleFactorPerLevel;
     }
+    paddedImage->TransformContinuousIndexToPhysicalPoint(cornerIndex, expectedOrigin);
     for (unsigned int band = 0; band < highSubBands; ++band)
     {
       unsigned int nOutput = level * forwardWavelet->GetHighPassSubBands() + band;
@@ -304,6 +314,8 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
 
       auto itkOutputImage = inverseFFT->GetOutput();
       itkOutputImage->SetSpacing(expectedSpacing);
+      itkOutputImage->SetOrigin(expectedOrigin);
+      itkOutputImage->SetDirection(paddedImage->GetDirection());
       mitk::Image::Pointer outputImage = mitk::Image::New();
       CastToMitkImage(itkOutputImage, outputImage);
       resultImages.push_back(outputImage);
@@ -344,7 +356,10 @@ std::vector<mitk::Image::Pointer> mitk::TransformationOperation::WaveletForward(
 {
   // MITK does not use ITK's automatic factory registration, so the FFT
   // backend has to be registered explicitly before any FFT filter is created.
-  itk::VnlFFTImageFilterInitFactory::RegisterFactories();
+  // ITK appends to its factory list without checking for duplicates, so this
+  // must happen exactly once per process.
+  static std::once_flag fftFactoryRegistered;
+  std::call_once(fftFactoryRegistered, []() { itk::VnlFFTImageFilterInitFactory::RegisterFactories(); });
 
   std::vector<Image::Pointer> resultImages;
   AccessByItk_n(image, ExecuteWaveletTransformation, (numberOfLevels, numberOfBands, condition, waveletType, resultImages));

@@ -129,7 +129,6 @@ void mitk::ImageWriteAccessor::OrganizeWriteAccess()
       m_Image->m_ReadWriteLock.unlock();
       mitkThrowException(mitk::MemoryIsLockedException)
         << "The image part being ordered by the ImageAccessor is already in use and locked";
-      // MITK_ERROR("Speicherbereich belegt");
       return;
     }
   }

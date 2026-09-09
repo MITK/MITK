@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="filterLabel">
        <property name="sizePolicy">
@@ -36,7 +36,54 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="filterContent"/>
+      <widget class="QLineEdit" name="filterContent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="levelFilter">
+       <property name="toolTip">
+        <string>Minimum log level to show</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="showDetails">
+       <property name="toolTip">
+        <string>Show time and origin of each message</string>
+       </property>
+       <property name="text">
+        <string>Show details</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clear">
+       <property name="toolTip">
+        <string>Discard all messages recorded so far</string>
+       </property>
+       <property name="text">
+        <string>Clear</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="copyToClipboard">
+       <property name="toolTip">
+        <string>Copy the messages currently shown to the clipboard</string>
+       </property>
+       <property name="text">
+        <string>Copy to clipboard</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -47,11 +94,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
      </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -78,7 +120,7 @@
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <property name="textElideMode">
-      <enum>Qt::ElideLeft</enum>
+      <enum>Qt::ElideRight</enum>
      </property>
      <property name="verticalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -98,17 +140,11 @@
      <property name="cornerButtonEnabled">
       <bool>false</bool>
      </property>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>64</number>
-     </attribute>
      <attribute name="horizontalHeaderMinimumSectionSize">
       <number>0</number>
      </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
-     </attribute>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>16</number>
      </attribute>
      <attribute name="verticalHeaderHighlightSections">
       <bool>false</bool>
@@ -117,57 +153,6 @@
       <number>8</number>
      </attribute>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Show</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="ShowCategory">
-       <property name="text">
-        <string>categories</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="ShowAdvancedFields">
-       <property name="text">
-        <string>advanced fields</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="SaveToClipboard">
-       <property name="text">
-        <string>Copy to clipboard</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

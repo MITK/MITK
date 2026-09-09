@@ -27,28 +27,25 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="transferFunctionGroupBox">
+    <widget class="QWidget" name="transferFunctionPanel" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title">
-      <string>Transfer function</string>
-     </property>
      <layout class="QVBoxLayout" name="transferFunctionLayout">
       <property name="spacing">
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>6</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>6</number>
+       <number>12</number>
       </property>
       <property name="rightMargin">
-       <number>6</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
        <number>16</number>
@@ -85,13 +82,13 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
         </property>
         <property name="arrowType">
-         <enum>Qt::ArrowType::RightArrow</enum>
+         <enum>Qt::ArrowType::DownArrow</enum>
         </property>
        </widget>
       </item>
@@ -115,13 +112,13 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>270</height>
+             <height>480</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>420</height>
+             <height>640</height>
             </size>
            </property>
           </widget>
@@ -243,13 +240,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>200</height>
+          <height>140</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>200</height>
+          <height>140</height>
          </size>
         </property>
        </widget>
@@ -334,7 +331,7 @@
           <number>6</number>
          </property>
          <property name="verticalSpacing">
-          <number>4</number>
+          <number>13</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="opacityShiftLabel">
@@ -412,6 +409,30 @@
       <string>Custom transfer function</string>
      </property>
      <layout class="QVBoxLayout" name="advancedTfLayout">
+      <item>
+       <layout class="QHBoxLayout" name="blendModeLayout">
+        <item>
+         <widget class="QLabel" name="blendModeLabel">
+          <property name="text">
+           <string>Blend mode</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="blendModeComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>How the samples along each viewing ray are combined into one pixel. Composite is the only one that builds up a three-dimensional image, and the only one any lighting applies to; the rest flatten each ray to a single value and read as a projection radiograph.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
       <item>
        <widget class="QmitkTransferFunctionWidget" name="tfControlPanelsWidget" native="true">
         <property name="minimumSize">

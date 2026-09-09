@@ -28,12 +28,13 @@ rendering also needs a large amount of memory; very large images may not fit.
 \section org_mitk_views_volumevisualization_v2_image Image
 
 The selector at the top lists the 3D and 4D images in the Data Manager. Pick
-one and tick <b>Volume rendering</b>. Nothing below the selector responds until
-that box is ticked, because there is no volume to configure yet.
+one and switch <b>Volume rendering</b> on; the button names the state it is
+currently in. Nothing below the selector responds while it is off, because
+there is no volume to configure yet.
 
-Ticking it does more than switch the volume on: a node that carries no transfer
+Switching it on does more than show the volume: a node that carries no transfer
 function is given the first one from the preset catalogue, and one that names no
-lighting model is given the first of those. The first tick therefore produces a
+lighting model is given the first of those. Switching on therefore produces a
 visible volume rather than an empty 3D window, and you adjust from there.
 
 For a 4D image the volume follows the current time step, so stepping through
@@ -130,16 +131,61 @@ back with <b>Load</b>.
 
 \note A curve that has been authored or loaded is no longer described by any
 preset name, so the name is dropped and the adjust sliders start measuring from
-the new curve. The gradient curve is not stored when saving.
+the new curve. A saved file records the blend mode the curve was authored for
+alongside it, and <b>Load</b> restores both. The gradient curve is not stored
+when saving.
+
+\section org_mitk_views_volumevisualization_v2_blendmode Blend mode
+
+The blend mode is the rule for combining the samples along one viewing ray into
+one pixel:
+
+<ul>
+<li> <b>Composite (3D)</b> accumulates colour and opacity front to back, so
+nearer tissue hides what lies behind it. It is the only mode that produces a
+three-dimensional image, and the only one lighting and shading reach.
+<li> <b>Maximum intensity (MIP)</b> keeps the brightest sample along each ray.
+Depth is lost, but anything dense stays visible however much tissue surrounds
+it, which is what makes contrast-filled vessels and tracer uptake readable.
+<li> <b>Minimum intensity (MinIP)</b> keeps the darkest sample instead, so air
+stands out against tissue - airways, emphysema, bowel gas.
+<li> <b>Average intensity</b> averages the samples along each ray, which reads
+like a projection radiograph.
+<li> <b>Additive intensity</b> sums them. Like the average but unbounded, so it
+saturates towards white where the volume is deep.
+</ul>
+
+Average and additive ignore the colour curve and produce greyscale; the other
+three use it.
+
+The mode is not a setting of its own but part of a transfer function. The
+projection modes flatten each ray to a single value before the transfer
+function sees it, so a curve drawn to classify tissue and one drawn as a window
+are not interchangeable between them: a preset that hides everything but bone
+leaves a maximum-intensity projection almost nothing to find. Applying a preset
+therefore also applies the mode it was authored for, and the preset previews
+are drawn in that mode. Whenever the result is anything other than Composite,
+the view names it in a line under <b>Volume rendering</b>.
+
+Almost every preset in the catalogue is authored for Composite. <tt>CT-MIP</tt>
+and <tt>MR-MIP</tt> are the two that are not, and they bring curves that ramp
+across the whole value range instead of isolating a tissue, which is what a
+projection needs. To pick a mode yourself, use <b>Blend mode</b> at the top of
+the <b>Create</b> editor, where you are authoring the curve that goes with it.
+
+VTK also defines an isosurface and a slice mode, which are deliberately absent
+here. Each needs input that nothing in MITK supplies - iso-values, or a cutting
+plane - and the ray caster refuses the whole render when that input is missing
+rather than falling back, which would lose the image entirely.
 
 \section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
 
 Shading gives the volume the shape cues a flat colour cannot: where a surface
 turns away from the light, where two structures touch, how deep a recess goes.
 
-<b>Shading enabled</b> turns it on or off. The <b>Lighting model</b> below it
-picks how the volume is lit, and the two models are not weaker and stronger
-versions of the same effect - they take different paths through the renderer:
+It is always on for a volume rendered here. The <b>Lighting model</b> picks how
+the volume is lit, and the two models are not weaker and stronger versions of
+the same effect - they take different paths through the renderer:
 
 <ul>
 <li> <b>Headlight</b> puts a single light at the camera. Nothing casts a
@@ -164,44 +210,10 @@ prescribes. Ambient is deliberately zero under Key light: with more than one
 light in the scene the renderer adds ambient as a flat grey wash, so the fill
 light does that job instead.
 
-\note This whole section applies to the Composite technique only, and is
-disabled otherwise, with the reason on its header. The projection techniques
-reduce each ray to a single value and light nothing, so lighting there is inert
-rather than merely subtle.
-
-\section org_mitk_views_volumevisualization_v2_technique Technique
-
-<b>Advanced</b> holds the <b>Technique</b>, the rule for combining the samples
-along one viewing ray into one pixel:
-
-<ul>
-<li> <b>Composite (3D)</b> accumulates colour and opacity front to back, so
-nearer tissue hides what lies behind it. It is the only technique that produces
-a three-dimensional image, and the only one lighting and shading reach.
-<li> <b>Maximum intensity (MIP)</b> keeps the brightest sample along each ray.
-Depth is lost, but anything dense stays visible however much tissue surrounds
-it, which is what makes contrast-filled vessels and tracer uptake readable.
-<li> <b>Minimum intensity (MinIP)</b> keeps the darkest sample instead, so air
-stands out against tissue - airways, emphysema, bowel gas.
-<li> <b>Average intensity</b> averages the samples along each ray, which reads
-like a projection radiograph.
-<li> <b>Additive intensity</b> sums them. Like the average but unbounded, so it
-saturates towards white where the volume is deep.
-</ul>
-
-Average and additive ignore the colour curve and produce greyscale; the other
-three use it.
-
-\note The projection techniques want a transfer function that ramps across the
-whole value range, not one drawn to isolate a single tissue - a preset that
-hides everything but bone leaves a maximum-intensity projection almost nothing
-to find. The <tt>CT-MIP</tt> and <tt>MR-MIP</tt> presets are the ones authored
-for this.
-
-VTK also defines an isosurface and a slice mode, which are deliberately absent
-here. Each needs input that nothing in MITK supplies - iso-values, or a cutting
-plane - and the ray caster refuses the whole render when that input is missing
-rather than falling back, which would lose the image entirely.
+\note This whole section applies to the Composite blend mode only, and is
+disabled otherwise, with the reason on its header. The projection modes reduce
+each ray to a single value and light nothing, so lighting there is inert rather
+than merely subtle.
 
 \section org_mitk_views_volumevisualization_v2_appearance Colour and opacity from the Data Manager
 

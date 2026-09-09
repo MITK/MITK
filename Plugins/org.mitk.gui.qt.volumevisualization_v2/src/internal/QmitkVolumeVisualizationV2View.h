@@ -45,7 +45,6 @@ public:
 private Q_SLOTS:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnEnabledRendering(bool state);
-  void OnTechniqueChanged(int index);
   void OnTransferFunctionChanged();
   void OnLightingChanged();
 
@@ -58,8 +57,8 @@ private:
    *         applies at all, and the node the controls inside it act on.
    *
    * The controls themselves belong to QmitkVolumeLightingWidget. What stays here
-   * is the part that depends on the blend mode - which the technique combo owns -
-   * and so cannot be the widget's to decide.
+   * is the part that depends on the blend mode - which arrives with the transfer
+   * function - and so cannot be the widget's to decide.
    */
   void UpdateLightingSection();
 

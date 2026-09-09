@@ -14,13 +14,13 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
+#include <mitkVolumeBlendMode.h>
 #include <mitkVolumeRenderingLightingModel.h>
 #include <mitkVtkPropRenderer.h>
 #include <QmitkVolumeLightingWidget.h>
 #include <QmitkVolumeTransferFunctionEditor.h>
 #include <QmitkRenderWindow.h>
-
-#include <vtkVolumeMapper.h>
+#include <QmitkStyleManager.h>
 
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
@@ -33,67 +33,15 @@ found in the LICENSE file.
 
 #include <ui_QmitkVolumeVisualizationV2View.h>
 
+#include <QPushButton>
 #include <QToolButton>
 
-#include <algorithm>
-#include <array>
+#include <optional>
 
 const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
 
 namespace
 {
-  /** Key the mapper reads the blend mode from, as a plain VTK enum value. */
-  constexpr const char *BLEND_MODE_PROPERTY = "volumerendering.blendmode";
-
-  /** A rule for combining the samples along one viewing ray into one pixel.
-   *
-   * The five here are the ones that reinterpret the transfer function already
-   * on the node and need nothing else. VTK has two more, isosurface and slice,
-   * which are deliberately absent: each needs input of its own that nothing in
-   * MITK supplies - iso-values, or a plane - and the ray caster rejects the
-   * mode outright when it is missing, which loses the whole render rather than
-   * degrading.
-   */
-  struct Technique
-  {
-    vtkVolumeMapper::BlendModes blendMode;
-    const char *label;
-    const char *toolTip;
-  };
-
-  constexpr std::array<Technique, 5> TECHNIQUES { {
-    {vtkVolumeMapper::COMPOSITE_BLEND, "Composite (3D)",
-     "Accumulates colour and opacity front to back, so nearer tissue hides what is behind it. The only"
-     " technique that produces a three-dimensional image, and the only one lighting and shading reach."},
-    {vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND, "Maximum intensity (MIP)",
-     "Keeps the brightest sample along each ray. Depth is lost, but anything dense stays visible however"
-     " much tissue surrounds it, which is what makes contrast-filled vessels and tracer uptake readable."
-     " Needs a transfer function that ramps across the whole value range rather than one drawn to isolate"
-     " a tissue: the CT-MIP and MR-MIP presets are the ones authored for it."},
-    {vtkVolumeMapper::MINIMUM_INTENSITY_BLEND, "Minimum intensity (MinIP)",
-     "Keeps the darkest sample along each ray, so air stands out against tissue - airways, emphysema,"
-     " bowel gas."},
-    {vtkVolumeMapper::AVERAGE_INTENSITY_BLEND, "Average intensity",
-     "Averages the samples along each ray, which reads like a projection radiograph. Ignores the colour"
-     " curve and emits greyscale."},
-    {vtkVolumeMapper::ADDITIVE_BLEND, "Additive intensity",
-     "Sums the samples along each ray. Like the average but unbounded, so it saturates towards white"
-     " where the volume is deep. Ignores the colour curve and emits greyscale."},
-  } };
-
-  /** \brief The blend mode a node asks for.
-   *
-   * \return The stored mode, or composite for a node that names none, which is
-   *         the same fallback the mapper applies.
-   */
-  int BlendModeFromNode(const mitk::DataNode *node)
-  {
-    int blendMode = vtkVolumeMapper::COMPOSITE_BLEND;
-    node->GetIntProperty(BLEND_MODE_PROPERTY, blendMode);
-
-    return blendMode;
-  }
-
   /** \brief Whether the node is rendered as a volume at all.
    *
    * Nothing outside this view writes the property, so it doubles as the marker
@@ -116,24 +64,13 @@ namespace
    *         caster at all.
    *
    * Every one of them is applied inside the front-to-back compositing loop, and
-   * only the composite technique runs one. The projection techniques reduce each
-   * ray to a single value and light nothing, so lighting is inert there rather
-   * than merely subtle.
+   * only the composite mode runs one. The projection modes reduce each ray to a
+   * single value and light nothing, so lighting is inert there rather than
+   * merely subtle.
    */
   bool LightingApplies(const mitk::DataNode *node)
   {
-    return IsVolumeRenderingOn(node) && BlendModeFromNode(node) == vtkVolumeMapper::COMPOSITE_BLEND;
-  }
-
-  /** \return The matching entry, or nullptr for a mode this view does not
-   *          offer - the property is a plain int and reachable from outside.
-   */
-  const Technique *TechniqueFromBlendMode(int blendMode)
-  {
-    const auto it = std::find_if(TECHNIQUES.begin(), TECHNIQUES.end(),
-      [blendMode](const Technique &technique) { return technique.blendMode == blendMode; });
-
-    return it != TECHNIQUES.end() ? &*it : nullptr;
+    return IsVolumeRenderingOn(node) && mitk::GetVolumeBlendMode(node) == mitk::VolumeBlendMode::Composite;
   }
 
   /** The arrow is the only cue that a section folds away, so it is drawn by
@@ -145,6 +82,21 @@ namespace
   {
     header->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
     panel->setVisible(expanded);
+  }
+
+  /** \brief Labels the rendering toggle with the state it is in.
+   *
+   * A checked button is a subtle cue next to a checkbox's tick, and the two
+   * words are what say which way the toggle currently sits.
+   *
+   * The leading spaces widen the gap to the icon: Qt draws a button's label
+   * four pixels from it and offers no way to ask for more.
+   */
+  void SetRenderingButtonText(QPushButton *button, bool on)
+  {
+    button->setText(on
+      ? QStringLiteral("  Volume rendering: on")
+      : QStringLiteral("  Volume rendering: off"));
   }
 
   /** mitk::VolumeMapperVtkSmart3D branches on this property before it reads
@@ -186,20 +138,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
 
-  for (const auto &technique : TECHNIQUES)
-  {
-    m_Controls->techniqueComboBox->addItem(QString(technique.label), static_cast<int>(technique.blendMode));
-    m_Controls->techniqueComboBox->setItemData(
-      m_Controls->techniqueComboBox->count() - 1, QString(technique.toolTip), Qt::ToolTipRole);
-  }
-
-  // Composite is not the first of five alternatives, it is the one that renders
-  // a volume while the other four project it flat. The separator is what says so.
-  m_Controls->techniqueComboBox->insertSeparator(1);
+  m_Controls->enableRenderingButton->setIcon(
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
 
   m_Controls->lightingWidget->setVisible(false);
-
-  m_Controls->advancedPanel->setVisible(false);
 
   m_Controls->binaryHintLabel->setText(
     "Binary image: its appearance is set by the node colour, not by a transfer function.");
@@ -208,7 +150,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
 
-  connect(m_Controls->enableRenderingCB, &QCheckBox::toggled,
+  connect(m_Controls->enableRenderingButton, &QPushButton::toggled,
     this, &QmitkVolumeVisualizationV2View::OnEnabledRendering);
 
   // The editor writes the node itself, including switching rendering on when a
@@ -236,15 +178,6 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   // re-deriving the light rig is what the view contributes here.
   connect(m_Controls->lightingWidget, &QmitkVolumeLightingWidget::LightingChanged,
     this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
-
-  // Advanced Rendering Controls
-  connect(m_Controls->advancedExpandButton, &QToolButton::toggled, this,
-    [this](bool expanded)
-    {
-      SetSectionExpanded(m_Controls->advancedExpandButton, m_Controls->advancedPanel, expanded);
-    });
-  connect(m_Controls->techniqueComboBox, &QComboBox::currentIndexChanged,
-    this, &QmitkVolumeVisualizationV2View::OnTechniqueChanged);
 
   // Auto-selection reports only a selection it actually made, so on an empty
   // data storage nothing would ever bring the panel out of the state the .ui
@@ -294,23 +227,6 @@ void QmitkVolumeVisualizationV2View::OnEnabledRendering(bool state)
       models.front().ApplyTo(selectedNode);
   }
 
-  this->UpdateInterface();
-  this->RequestRenderWindowUpdate();
-}
-
-void QmitkVolumeVisualizationV2View::OnTechniqueChanged(int index)
-{
-  auto selectedNode = m_SelectedNode.Lock();
-
-  // UpdateInterface selects behind a QSignalBlocker, and a separator cannot be
-  // selected, so a signal always names a real entry.
-  if (selectedNode.IsNull() || index < 0)
-    return;
-
-  selectedNode->SetIntProperty(BLEND_MODE_PROPERTY, m_Controls->techniqueComboBox->itemData(index).toInt());
-
-  // Whether the lighting section applies at all hangs off this, so the update
-  // has to be the full one rather than a repaint.
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
 }
@@ -390,20 +306,21 @@ void QmitkVolumeVisualizationV2View::UpdateLightingSection()
 
   const bool volumeRenderingOn = IsVolumeRenderingOn(selectedNode.GetPointer());
 
-  // Narrower than !LightingApplies: specifically "rendering, but the technique
+  // Narrower than !LightingApplies: specifically "rendering, but the blend mode
   // lights nothing", which is the only case the header can explain and offer a
   // way out of. With nothing selected both are false, and the header stays plain.
-  const bool gatedByTechnique =
-    volumeRenderingOn && BlendModeFromNode(selectedNode.GetPointer()) != vtkVolumeMapper::COMPOSITE_BLEND;
+  const bool gatedByBlendMode =
+    volumeRenderingOn && mitk::GetVolumeBlendMode(selectedNode.GetPointer()) != mitk::VolumeBlendMode::Composite;
 
   // Named on the header rather than left to a tooltip: a greyed-out section
   // whose precondition is written on it teaches the constraint, while a mute
   // one just looks broken.
   m_Controls->lightingExpandButton->setText(
-    gatedByTechnique ? "Lighting / shading - Composite only" : "Lighting / shading");
-  m_Controls->lightingExpandButton->setToolTip(gatedByTechnique
-    ? QString("The projection techniques flatten each ray to one value and light nothing. Set Technique back to"
-              " Composite under Advanced to shade the volume.")
+    gatedByBlendMode ? "Lighting / shading - Composite only" : "Lighting / shading");
+  m_Controls->lightingExpandButton->setToolTip(gatedByBlendMode
+    ? QString("The projection modes flatten each ray to one value and light nothing. Apply a preset authored for"
+              " composite, or set Blend mode to Composite while creating a custom transfer function, to shade"
+              " the volume.")
     : QString());
 
   const bool lightingApplies = LightingApplies(selectedNode.GetPointer());
@@ -428,19 +345,11 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   if(selectedNode.IsNull())
   {
     m_Controls->binaryHintLabel->setVisible(false);
-    m_Controls->techniqueHintLabel->setVisible(false);
-    m_Controls->enableRenderingCB->setChecked(false);
-    m_Controls->enableRenderingCB->setEnabled(false);
+    m_Controls->blendModeHintLabel->setVisible(false);
+    m_Controls->enableRenderingButton->setChecked(false);
+    m_Controls->enableRenderingButton->setEnabled(false);
+    SetRenderingButtonText(m_Controls->enableRenderingButton, false);
     m_Controls->transferFunctionEditor->setEnabled(false);
-    m_Controls->advancedExpandButton->setEnabled(false);
-    m_Controls->advancedPanel->setEnabled(false);
-
-    // A greyed-out control should not still name the node that has just been
-    // deselected. Blocked, unlike the checkbox above, because the technique
-    // handler would write the property back onto the outgoing node.
-    const QSignalBlocker blockTechnique(m_Controls->techniqueComboBox);
-    m_Controls->techniqueComboBox->setCurrentIndex(
-      m_Controls->techniqueComboBox->findData(static_cast<int>(vtkVolumeMapper::COMPOSITE_BLEND)));
 
     return;
   }
@@ -451,39 +360,33 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
   const bool volumeRenderingOn = IsVolumeRenderingOn(selectedNode.GetPointer());
 
-  m_Controls->enableRenderingCB->setEnabled(true);
+  m_Controls->enableRenderingButton->setEnabled(true);
 
   // Disabling the whole editor rather than its individual controls is what greys
   // its headers and row labels too, so an inactive section reads as inactive.
   // Which of its own controls apply within that is the editor's own business.
   m_Controls->transferFunctionEditor->setEnabled(volumeRenderingOn && !isBinary);
 
-  m_Controls->advancedExpandButton->setEnabled(volumeRenderingOn);
-  m_Controls->advancedPanel->setEnabled(volumeRenderingOn);
-
-  const int blendMode = BlendModeFromNode(selectedNode.GetPointer());
-
-  {
-    // Matched by value rather than used as a row number: the separator holds a
-    // row of its own, so the two stopped lining up the moment it was inserted.
-    const QSignalBlocker blockTechnique(m_Controls->techniqueComboBox);
-    m_Controls->techniqueComboBox->setCurrentIndex(m_Controls->techniqueComboBox->findData(blendMode));
-  }
+  const auto blendMode = mitk::GetVolumeBlendMode(selectedNode.GetPointer());
 
   // Shown only away from the default, so the panel carries no weight for the
   // common case while a greyed-out lighting section always has a visible cause.
-  const bool showTechniqueHint = volumeRenderingOn && blendMode != vtkVolumeMapper::COMPOSITE_BLEND;
-  m_Controls->techniqueHintLabel->setVisible(showTechniqueHint);
+  // A readout rather than a control: the mode comes with the transfer function
+  // now, from the preset applied or from the authoring panel.
+  const bool showBlendModeHint = volumeRenderingOn && blendMode != mitk::VolumeBlendMode::Composite;
+  m_Controls->blendModeHintLabel->setVisible(showBlendModeHint);
 
-  if (showTechniqueHint)
+  if (showBlendModeHint)
   {
-    const auto *technique = TechniqueFromBlendMode(blendMode);
+    const auto *description =
+      blendMode.has_value() ? mitk::VolumeBlendModeDescription::FromMode(*blendMode) : nullptr;
 
-    m_Controls->techniqueHintLabel->setText(QString("Technique: %1")
-      .arg(technique != nullptr ? QString(technique->label)
-                                : QString("blend mode %1, not offered here").arg(blendMode)));
+    m_Controls->blendModeHintLabel->setText(QString("Blend mode: %1")
+      .arg(description != nullptr ? QString::fromStdString(description->label)
+                                  : QString("one this view does not offer")));
   }
 
-  const QSignalBlocker blocker(m_Controls->enableRenderingCB);
-  m_Controls->enableRenderingCB->setChecked(volumeRenderingOn);
+  const QSignalBlocker blocker(m_Controls->enableRenderingButton);
+  m_Controls->enableRenderingButton->setChecked(volumeRenderingOn);
+  SetRenderingButtonText(m_Controls->enableRenderingButton, volumeRenderingOn);
 }

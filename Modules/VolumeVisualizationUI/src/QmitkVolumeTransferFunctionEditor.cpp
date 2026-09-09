@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkTransferFunctionTransform.h>
 
 #include <QmitkCombinedTransferFunctionCanvas.h>
+#include <QmitkStyleManager.h>
 #include <QmitkTransferFunctionWidget.h>
 #include <QmitkVolumeThumbnailRenderer.h>
 
@@ -28,6 +29,8 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
+#include <QComboBox>
+#include <QColor>
 #include <QEvent>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -35,8 +38,10 @@ found in the LICENSE file.
 #include <QIcon>
 #include <QListWidget>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPushButton>
 #include <QRect>
+#include <QSignalBlocker>
 #include <QTimer>
 #include <QToolButton>
 
@@ -93,6 +98,9 @@ namespace
   /** \brief The margin between a preview and the edges of its cell. */
   constexpr int CELL_PADDING = 4;
 
+  /** \brief How strongly the stand-in for a missing preview is drawn. */
+  constexpr double PLACEHOLDER_OPACITY = 0.4;
+
   /** \brief Width left to the view to lay the cells out in.
    *
    * Determined by observation: the view fits one cell fewer than the viewport
@@ -118,17 +126,38 @@ namespace
     return QSize(width, static_cast<int>(std::lround(width * PREVIEW_ASPECT)));
   }
 
-  /** \brief A transparent stand-in for a preview not drawn yet.
+  /** \brief A stand-in for a preview not drawn yet.
    *
    * Entries are sized to what they hold, so one that has only its name is
    * shorter than one with a preview. Filling them all in at the final size
    * from the start keeps the grid from being laid out twice - once for the
    * names, and again, entry by entry, as previews arrive.
+   *
+   * Drawn rather than left blank so that a cell without a preview reads as one
+   * still to come. Nothing distinguishes "no image selected" from "previews are
+   * being drawn" here, and nothing needs to: the view disables the list in the
+   * first case, and Qt fades a disabled item's icon of its own accord.
+   *
+   * \param[in] size  The pixel size the cells reserve for a preview.
+   * \param[in] color The theme's icon colour. Drawn at part opacity, since the
+   *                  mark stands in for content rather than being content.
    */
-  QIcon PlaceholderPreview(const QSize &size)
+  QIcon PlaceholderPreview(const QSize &size, const QColor &color)
   {
     QPixmap placeholder(size);
     placeholder.fill(Qt::transparent);
+
+    QPainter painter(&placeholder);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setOpacity(PLACEHOLDER_OPACITY);
+    painter.setPen(color);
+
+    // Half a pixel in on every side: a one-pixel pen straddles the path it is
+    // given, so a frame on the pixmap's own edge would lose its outer half.
+    const QRectF frame(0.5, 0.5, size.width() - 1.0, size.height() - 1.0);
+
+    painter.drawRoundedRect(frame, 3.0, 3.0);
+    painter.drawLine(frame.topRight(), frame.bottomLeft());
 
     return QIcon(placeholder);
   }
@@ -149,6 +178,15 @@ namespace
     node->GetBoolProperty("volumerendering", volumeRenderingOn);
 
     return volumeRenderingOn;
+  }
+
+  /** \brief The blend mode a node renders in, for callers that need a value
+   *         even where mitk::GetVolumeBlendMode has none: a null node, or one
+   *         naming a mode MITK does not offer. Both read as composite here.
+   */
+  mitk::VolumeBlendMode BlendModeOrComposite(const mitk::DataNode *node)
+  {
+    return mitk::GetVolumeBlendMode(node).value_or(mitk::VolumeBlendMode::Composite);
   }
 
   /** The arrow is the only cue that a section folds away, so it is drawn by the
@@ -220,8 +258,22 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
-  m_Controls->presetPanel->setVisible(false);
   m_Controls->advancedTfPanel->setVisible(false);
+
+  // Identified by their stable ids rather than by row, so that reordering the
+  // modes, or putting a separator between them the way the presets grid does,
+  // cannot silently change what a row selects.
+  for (const auto &description : mitk::VolumeBlendModeDescription::GetAll())
+  {
+    m_Controls->blendModeComboBox->addItem(
+      QString::fromStdString(description.label), QString::fromStdString(description.id));
+    m_Controls->blendModeComboBox->setItemData(
+      m_Controls->blendModeComboBox->count() - 1,
+      QString::fromStdString(description.description), Qt::ToolTipRole);
+  }
+
+  connect(m_Controls->blendModeComboBox, &QComboBox::currentIndexChanged,
+    this, &QmitkVolumeTransferFunctionEditor::OnBlendModeChanged);
 
   // A click rather than the current entry changing: the current entry is also
   // set from what a node records, and reacting to that would re-apply the
@@ -243,8 +295,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     {
       SetSectionExpanded(m_Controls->presetExpandButton, m_Controls->presetPanel, expanded);
 
-      // Worth drawing once the grid is on show, and not for every image
-      // someone clicks past in the data manager.
+      // A preview costs an upload of the volume and one render per preset, so
+      // a collapsed section does not pay for them.
       if (expanded)
         this->StartThumbnailGeneration();
     });
@@ -350,6 +402,10 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetGrid()
 
   presetList->setIconSize(previewSize);
   presetList->setGridSize(cellSize);
+
+  // The size just settled on is the one the stand-ins were built for, and on
+  // the first pass they were built for a viewport no layout had sized yet.
+  this->RefreshPlaceholders();
 }
 
 void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
@@ -394,7 +450,9 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
     return;
 
   const auto name = presetName.toStdString();
-  auto preset = m_Presets.CreateTransferFunction(name);
+
+  auto blendMode = mitk::VolumeBlendMode::Composite;
+  auto preset = m_Presets.CreateTransferFunction(name, blendMode);
 
   if (preset.IsNull())
     return;
@@ -402,7 +460,63 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
   m_AppliedTransferFunction = preset;
   node->SetStringProperty(TF_PRESET_PROPERTY, name.c_str());
 
+  // The mode travels with the curve: a window authored for MIP renders as a
+  // white shell under composite, and a tissue classifier projected flat says
+  // nothing. Applying it unconditionally is what makes the grid mean one thing
+  // - the preset as its author intended it - rather than depending on the mode
+  // the node happened to be left in.
+  this->ApplyBlendMode(blendMode);
+
   this->ApplyCurrentTransferFunction();
+}
+
+void QmitkVolumeTransferFunctionEditor::ApplyBlendMode(mitk::VolumeBlendMode blendMode)
+{
+  auto node = m_DataNode.Lock();
+
+  if (node.IsNull())
+    return;
+
+  mitk::SetVolumeBlendMode(node.GetPointer(), blendMode);
+
+  this->ShowNodeBlendMode();
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowNodeBlendMode()
+{
+  const auto *description =
+    mitk::VolumeBlendModeDescription::FromMode(BlendModeOrComposite(m_DataNode.Lock().GetPointer()));
+
+  if (description == nullptr)
+    return;
+
+  // Blocked because this reports what the node already says; letting it through
+  // would write that same value straight back and, on the way, emit a change
+  // nobody made.
+  const QSignalBlocker blocker(m_Controls->blendModeComboBox);
+
+  m_Controls->blendModeComboBox->setCurrentIndex(
+    m_Controls->blendModeComboBox->findData(QString::fromStdString(description->id)));
+}
+
+void QmitkVolumeTransferFunctionEditor::OnBlendModeChanged(int index)
+{
+  const auto *description =
+    mitk::VolumeBlendModeDescription::FromId(m_Controls->blendModeComboBox->itemData(index).toString().toStdString());
+
+  if (description == nullptr)
+    return;
+
+  auto node = m_DataNode.Lock();
+
+  if (node.IsNull())
+    return;
+
+  mitk::SetVolumeBlendMode(node.GetPointer(), description->mode);
+
+  // The curve itself did not change, but what the render window makes of it
+  // did, and the host has no other signal to redraw on.
+  emit TransferFunctionChanged();
 }
 
 void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
@@ -771,11 +885,11 @@ void QmitkVolumeTransferFunctionEditor::SetCustomModeActive(bool active)
 {
   m_Controls->advancedTfPanel->setVisible(active);
 
-  // Preset selection and the sliders that adjust it both live in this box, and
-  // authoring supersedes both. Hiding the box takes the collapsible section
-  // with it, so its expanded/collapsed state is left untouched and survives a
-  // trip through authoring.
-  m_Controls->transferFunctionGroupBox->setVisible(!active);
+  // Preset selection and the sliders that adjust it both live on this panel,
+  // and authoring supersedes both. Hiding the panel takes the collapsible
+  // section with it, so its expanded/collapsed state is left untouched and
+  // survives a trip through authoring.
+  m_Controls->transferFunctionPanel->setVisible(!active);
 
   emit CustomModeChanged(active);
 }
@@ -789,6 +903,7 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
     // Snapshot of the preset function so Cancel can restore it verbatim, which
     // matters once the adjust sliders have moved.
     m_PreEditTransferFunction = m_AppliedTransferFunction->Clone();
+    m_PreEditBlendMode = BlendModeOrComposite(node.GetPointer());
 
     // A colour window bakes itself into 256 evenly spaced RGB points, which
     // would swamp the per-point editor. Restoring the baseline first keeps the
@@ -799,6 +914,10 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
 
     emit TransferFunctionChanged();
   }
+
+  // The control is only on screen in authoring mode, so this is where it has to
+  // catch up with whatever the preset the node came from left behind.
+  this->ShowNodeBlendMode();
 
   this->SetCustomModeActive(true);
 }
@@ -824,13 +943,18 @@ void QmitkVolumeTransferFunctionEditor::OnImportCustom()
     return;
   }
 
-  auto transferFunction = mitk::TransferFunctionPresets::LoadTransferFunction(stream);
+  auto blendMode = mitk::VolumeBlendMode::Composite;
+  auto transferFunction = mitk::TransferFunctionPresets::LoadTransferFunction(stream, blendMode);
 
   if (transferFunction.IsNull())
   {
     QMessageBox::warning(this, "Load transfer function", "The file does not contain a valid transfer function.");
     return;
   }
+
+  // A curve authored for a projection mode carries that mode in the file, and
+  // reading it back without would render it in a mode it says nothing under.
+  this->ApplyBlendMode(blendMode);
 
   // Enable rendering so the loaded function is visible immediately. The host
   // learns of it through TransferFunctionChanged.
@@ -860,6 +984,8 @@ void QmitkVolumeTransferFunctionEditor::OnCancelCustom()
     m_AppliedTransferFunction->GetGradientOpacityFunction()->DeepCopy(
       m_PreEditTransferFunction->GetGradientOpacityFunction());
     m_PreEditTransferFunction = nullptr;
+
+    this->ApplyBlendMode(m_PreEditBlendMode);
 
     m_Controls->combinedTfCanvas->update();
 
@@ -923,7 +1049,8 @@ void QmitkVolumeTransferFunctionEditor::OnSaveCustom()
   const auto name = QFileInfo(fileName).completeBaseName().toStdString();
 
   if (!stream.is_open() ||
-      !mitk::TransferFunctionPresets::SaveTransferFunction(stream, name, m_AppliedTransferFunction.GetPointer()))
+      !mitk::TransferFunctionPresets::SaveTransferFunction(stream, name, m_AppliedTransferFunction.GetPointer(),
+        BlendModeOrComposite(m_DataNode.Lock().GetPointer())))
   {
     QMessageBox::warning(this, "Save transfer function", "Could not save the transfer function.");
   }
@@ -940,13 +1067,23 @@ void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()
   m_NextThumbnailIndex = -1;
   m_ThumbnailImage = nullptr;
 
-  const int presetCount = m_Controls->presetListWidget->count();
-  const QIcon placeholder = PlaceholderPreview(m_Controls->presetListWidget->iconSize());
-
   // Back to the stand-in rather than to nothing, so that clearing the previews
   // does not resize every entry and scatter the grid.
-  for (int i = 0; i < presetCount; ++i)
-    m_Controls->presetListWidget->item(i)->setIcon(placeholder);
+  this->RefreshPlaceholders();
+}
+
+void QmitkVolumeTransferFunctionEditor::RefreshPlaceholders()
+{
+  auto *presetList = m_Controls->presetListWidget;
+
+  const QIcon placeholder = PlaceholderPreview(presetList->iconSize(),
+                                               QColor(QmitkStyleManager::GetIconColor()));
+
+  // Previews are filled in one after another from the front, so the index of
+  // the next one is also the first entry still showing a stand-in. Below zero
+  // no volume is bound yet and every entry is one.
+  for (int i = std::max(0, m_NextThumbnailIndex); i < presetList->count(); ++i)
+    presetList->item(i)->setIcon(placeholder);
 }
 
 void QmitkVolumeTransferFunctionEditor::StartThumbnailGeneration()
@@ -999,10 +1136,15 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
     auto *presetItem = presetList->item(m_NextThumbnailIndex);
     const auto presetName = presetItem->text().toStdString();
 
-    if (auto transferFunction = m_Presets.CreateTransferFunction(presetName);
+    // Drawn in the mode the preset names, or the two MIP presets would preview
+    // as the white shells their windows composite into, and the grid would
+    // misrepresent exactly the entries hardest to picture.
+    auto blendMode = mitk::VolumeBlendMode::Composite;
+
+    if (auto transferFunction = m_Presets.CreateTransferFunction(presetName, blendMode);
         transferFunction.IsNotNull())
     {
-      const auto thumbnail = m_ThumbnailRenderer->Render(transferFunction.GetPointer());
+      const auto thumbnail = m_ThumbnailRenderer->Render(transferFunction.GetPointer(), blendMode);
 
       if (!thumbnail.isNull())
         presetItem->setIcon(QIcon(thumbnail));

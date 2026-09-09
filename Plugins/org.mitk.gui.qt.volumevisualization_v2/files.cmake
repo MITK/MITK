@@ -17,6 +17,10 @@ set(CACHED_RESOURCE_FILES
   resources/volume_visualization.svg
 )
 
+set(QRC_FILES
+  resources/volumevisualization_v2.qrc
+)
+
 foreach(file ${INTERNAL_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

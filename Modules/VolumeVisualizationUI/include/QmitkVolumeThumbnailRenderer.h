@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <MitkVolumeVisualizationUIExports.h>
 
+#include <mitkVolumeBlendMode.h>
+
 #include <vtkSmartPointer.h>
 
 #include <QPixmap>
@@ -46,9 +48,11 @@ namespace mitk
  * interaction and no need to stay in step with anything else.
  *
  * The preview is deliberately not a faithful copy of what the 3D view shows.
- * Lighting is a fixed headlight rig and the blend mode is always composite, so
- * that previews stay comparable with each other and no change to the node can
- * invalidate them. What they do reproduce exactly is the transfer function.
+ * Lighting is a fixed headlight rig, so that previews stay comparable with each
+ * other and no change to the node can invalidate them. What they do reproduce
+ * exactly is the transfer function and the blend mode it was authored for -
+ * which cannot be fixed the way lighting is, since a curve drawn as a window
+ * renders as a white shell under composite and says nothing about itself.
  *
  * The volume ray caster requires a GPU, and refuses volumes it cannot take,
  * RGB ones among them. Where a bind is refused, SetImage returns false and
@@ -90,9 +94,12 @@ public:
    * \brief Draw the bound volume with one transfer function.
    *
    * \param[in] transferFunction The colour and opacity to draw with.
+   * \param[in] blendMode The mode that transfer function was authored for.
+   *            Taken alongside the function rather than set once, because the
+   *            two only mean anything together.
    * \return The preview, or a null pixmap if nothing can be drawn.
    */
-  QPixmap Render(mitk::TransferFunction *transferFunction);
+  QPixmap Render(mitk::TransferFunction *transferFunction, mitk::VolumeBlendMode blendMode);
 
   /**
    * \brief Whether the volume bound last can be drawn.

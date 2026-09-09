@@ -72,20 +72,16 @@ void mitk::VolumeRenderingLightingModel::ApplyTo(DataNode *node) const
   if (node == nullptr)
     mitkThrow() << "Cannot apply a volume rendering lighting model to a null data node.";
 
-  // Read first, so that shade keeps whatever the user chose. Only the four
-  // values the model actually dictates are overridden.
-  auto material = VolumeRenderingMaterial::FromNode(node);
+  VolumeRenderingMaterial material;
+
+  // Every model describes a shading rig, and with shading off VTK ignores all
+  // of it: the four material values below and both scattering parameters.
+  material.shade = true;
 
   material.ambient = ambient;
   material.diffuse = diffuse;
   material.specular = specular;
   material.specularPower = specularPower;
-
-  // VTK ignores both scattering parameters unless shading is on, so a model
-  // that asks for scattering has to switch it on. One that does not leaves the
-  // choice alone.
-  if (blend > 0.0f)
-    material.shade = true;
 
   material.ApplyTo(node);
 

@@ -193,7 +193,12 @@ single value instead, and 3 and 4 also ignore the colour transfer function and
 emit greyscale. VTK further defines 5 (isosurface) and 6 (slice), which MITK
 cannot render: they need iso-values or a slice plane set on the
 vtkVolumeProperty, which no mapper here supplies, and the ray caster rejects
-the mode outright when they are missing rather than falling back.
+the mode outright when they are missing rather than falling back. The Volume
+Visualization view writes it as part of applying a transfer function rather
+than as a setting of its own, since the projection modes flatten each ray
+before the transfer function sees it and a curve authored for one of them is
+not interchangeable with one authored for compositing. mitk::VolumeBlendMode
+holds the modes MITK offers and the conversions to and from this value.
   <li> volumerendering.lightingmodel - Identifier of the lighting model the
 Volume Visualization view applied to this node ("headlight", "keylight"). It
 records which light rig was asked for, which the mapper properties alone cannot

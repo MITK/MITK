@@ -7,6 +7,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -61,6 +62,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -127,6 +129,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -169,6 +172,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -1000.0,
@@ -215,6 +219,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -269,6 +274,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -323,6 +329,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -383,6 +390,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -431,6 +439,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -479,6 +488,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -533,6 +543,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -593,6 +604,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -653,6 +665,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -701,6 +714,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -1000.0,
@@ -769,6 +783,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -829,6 +844,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -1000.0,
@@ -883,6 +899,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "MaximumIntensity",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -925,6 +942,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -973,6 +991,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -1033,6 +1052,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -1081,6 +1101,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -1123,6 +1144,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -3024.0,
@@ -1157,6 +1179,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -2048.0,
@@ -1211,6 +1234,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       0.0,
@@ -1265,6 +1289,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "MaximumIntensity",
     "AbsoluteRange": true,
     "OpacityPoints": [
       0.0,
@@ -1307,6 +1332,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       0.0,
@@ -1351,6 +1377,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       0.0,
@@ -1413,6 +1440,7 @@
       0
     ],
     "ColorSpace": "RGB",
+    "BlendMode": "Composite",
     "AbsoluteRange": true,
     "OpacityPoints": [
       -10.0,

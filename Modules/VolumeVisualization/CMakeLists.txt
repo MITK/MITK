@@ -4,5 +4,5 @@ mitk_create_module(
     PRIVATE src
   DEPENDS MitkCore
   PACKAGE_DEPENDS
-    PRIVATE nlohmann_json
+    PRIVATE nlohmann_json VTK|RenderingVolume
 )

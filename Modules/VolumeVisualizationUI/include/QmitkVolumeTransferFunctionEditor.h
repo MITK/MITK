@@ -117,10 +117,22 @@ private slots:
   void OnCancelCustom();
   void OnDoneCustom();
   void OnSaveCustom();
+  void OnBlendModeChanged(int index);
 
 private:
   /** \brief Write the held function onto the node and re-seed the editor. */
   void ApplyCurrentTransferFunction();
+
+  /** \brief Record the blend mode on the node, and show it on the control.
+   *
+   * Both, because either one alone leaves the two disagreeing: a preset brings
+   * a mode the control has to catch up with, and the control brings one the
+   * node has to.
+   */
+  void ApplyBlendMode(mitk::VolumeBlendMode blendMode);
+
+  /** \brief Point the blend mode control at what the bound node records. */
+  void ShowNodeBlendMode();
 
   /** \brief Take over the function the bound node already carries. */
   void AdoptTransferFunctionFromNode();
@@ -190,6 +202,17 @@ private:
   /** \brief Drop every preview, and abandon a generation in progress. */
   void InvalidateThumbnails();
 
+  /**
+   * \brief Give every entry still waiting for a preview a stand-in built for
+   *        the cell size the grid currently uses.
+   *
+   * A preview is drawn once at a width no cell exceeds and scaled down from
+   * there, so it survives a re-measure. A stand-in is built at the exact cell
+   * size instead, and a QIcon holding a single pixmap is never scaled up, so a
+   * grid that has grown since would draw it small and centred.
+   */
+  void RefreshPlaceholders();
+
   std::unique_ptr<Ui::QmitkVolumeTransferFunctionEditor> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_DataNode;
 
@@ -221,6 +244,15 @@ private:
   mitk::TransferFunction::Pointer m_AppliedTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BaseColorFn;
   mitk::TransferFunction::Pointer m_PreEditTransferFunction;
+
+  /** \brief The mode that stood when authoring began.
+   *
+   * Meaningful only alongside m_PreEditTransferFunction, and restored with it:
+   * cancelling back to the previous curve while keeping a mode picked during
+   * the abandoned edit would render that curve in a mode nobody chose for it.
+   */
+  mitk::VolumeBlendMode m_PreEditBlendMode { mitk::VolumeBlendMode::Composite };
+
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };
 

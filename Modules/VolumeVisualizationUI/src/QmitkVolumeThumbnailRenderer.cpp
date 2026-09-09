@@ -137,10 +137,6 @@ void QmitkVolumeThumbnailRenderer::CreatePipeline()
   m_Mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_Mapper->SetRequestedRenderModeToGPU();
 
-  // Previews show what a transfer function does, not how the node is projected,
-  // so a node set to maximum intensity still gets composited previews.
-  m_Mapper->SetBlendModeToComposite();
-
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
 
   // VTK defaults to nearest neighbour, which at preview size reads as blocky.
@@ -243,10 +239,13 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   return m_Usable;
 }
 
-QPixmap QmitkVolumeThumbnailRenderer::Render(mitk::TransferFunction *transferFunction)
+QPixmap QmitkVolumeThumbnailRenderer::Render(
+  mitk::TransferFunction *transferFunction, mitk::VolumeBlendMode blendMode)
 {
   if (!m_Usable || m_RenderWindow == nullptr || transferFunction == nullptr)
     return QPixmap();
+
+  m_Mapper->SetBlendMode(mitk::ToVtkBlendMode(blendMode));
 
   m_VolumeProperty->SetColor(transferFunction->GetColorTransferFunction());
   m_VolumeProperty->SetScalarOpacity(transferFunction->GetScalarOpacityFunction());

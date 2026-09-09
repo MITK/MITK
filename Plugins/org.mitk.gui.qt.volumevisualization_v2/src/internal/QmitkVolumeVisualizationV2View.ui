@@ -136,7 +136,7 @@
        </spacer>
       </item>
       <item row="2" column="0" colspan="3">
-       <widget class="QCheckBox" name="enableRenderingCB">
+       <widget class="QPushButton" name="enableRenderingButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -146,7 +146,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>28</height>
+          <height>40</height>
          </size>
         </property>
         <property name="font">
@@ -154,16 +154,22 @@
           <bold>true</bold>
          </font>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QCheckBox::indicator { width: 20px; height: 20px; }</string>
-        </property>
         <property name="text">
          <string>Volume rendering</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="3" column="0" colspan="3">
-       <widget class="QLabel" name="techniqueHintLabel">
+       <widget class="QLabel" name="blendModeHintLabel">
         <property name="textFormat">
          <enum>Qt::TextFormat::PlainText</enum>
         </property>
@@ -232,89 +238,6 @@
    </item>
    <item>
     <widget class="QmitkVolumeLightingWidget" name="lightingWidget" native="true"/>
-   </item>
-   <item alignment="Qt::AlignLeft">
-    <widget class="QToolButton" name="advancedExpandButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Advanced</string>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-     </property>
-     <property name="arrowType">
-      <enum>Qt::ArrowType::RightArrow</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="advancedPanel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <layout class="QGridLayout" name="advancedLayout" columnstretch="0,100">
-      <property name="leftMargin">
-       <number>6</number>
-      </property>
-      <property name="topMargin">
-       <number>6</number>
-      </property>
-      <property name="rightMargin">
-       <number>6</number>
-      </property>
-      <property name="bottomMargin">
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing">
-       <number>4</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="techniqueLabel">
-        <property name="text">
-         <string>Technique</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="techniqueComboBox">
-        <property name="toolTip">
-         <string>How the samples along each viewing ray are combined into one pixel. Composite is the only one that builds up a three-dimensional image, and the only one any lighting applies to; the rest flatten each ray to a single value and read as a projection radiograph.</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

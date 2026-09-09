@@ -225,6 +225,11 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   // different reason: the ray caster accepts both, but isosurface draws nothing
   // without iso-values and slice nothing without a plane, and this mapper
   // supplies neither.
+  //
+  // mitk::VolumeBlendMode enumerates this same set from the other side, for the
+  // views that write the property. The two are kept in step by hand, because the
+  // module holding it sits above this one and this file cannot name it. Adding
+  // either excluded mode there would mean supplying its input here anyway.
   const bool renderable = blendMode >= vtkVolumeMapper::COMPOSITE_BLEND &&
                           blendMode <= vtkVolumeMapper::ADDITIVE_BLEND;
 

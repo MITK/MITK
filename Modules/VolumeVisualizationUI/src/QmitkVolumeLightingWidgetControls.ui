@@ -30,70 +30,63 @@
     <number>6</number>
    </property>
    <property name="verticalSpacing">
-    <number>4</number>
+    <number>13</number>
    </property>
-   <item row="0" column="0" colspan="2">
-    <widget class="QCheckBox" name="shadeCheckBox">
-     <property name="text">
-      <string>Shading enabled</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="0" column="0">
     <widget class="QLabel" name="lightingModelLabel">
      <property name="text">
       <string>Lighting model</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="0" column="1">
     <widget class="QComboBox" name="lightingModelComboBox">
      <property name="toolTip">
       <string>Headlight: one light at the camera. Nothing casts a visible shadow, since the light reaches everything you can see, but it is the only rig for which the renderer tints ambient light by the tissue's own colour, so the ambient slider fills rather than veils. Key light: an off-axis key with a dimmer opposing fill, tracing short shadow rays through the volume so that contacts and recesses darken; surface shading and its highlight stay on top of that. The rays are kept short on purpose - long ones let one structure cast onto another, which describes the lighting rather than the anatomy. Ambient is held at zero here because with more than one light the renderer adds it as a flat grey; the fill light does that job instead. It costs more per frame in a still image, is switched off while you drag, and relights any surface in the same window.</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="ambientLabel">
      <property name="text">
       <string>Ambient</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="1" column="1">
     <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
    </item>
-   <item row="3" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="diffuseLabel">
      <property name="text">
       <string>Diffuse</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="2" column="1">
     <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="specularLabel">
      <property name="text">
       <string>Specular</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="3" column="1">
     <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
    </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="specularPowerLabel">
      <property name="text">
       <string>Specular power</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="4" column="1">
     <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
    </item>
-   <item row="6" column="1">
+   <item row="5" column="1">
     <layout class="QHBoxLayout" name="resetRowLayout">
      <item>
       <spacer name="resetRowSpacer">

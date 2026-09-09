@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 #include <ctkSliderWidget.h>
 
-#include <QCheckBox>
 #include <QComboBox>
 #include <QPushButton>
 
@@ -62,8 +61,6 @@ QmitkVolumeLightingWidget::QmitkVolumeLightingWidget(QWidget *parent, Qt::Window
       QString::fromStdString(model.label), QString::fromStdString(model.id));
   }
 
-  connect(m_Controls->shadeCheckBox, &QCheckBox::toggled,
-    this, &QmitkVolumeLightingWidget::OnMaterialChanged);
   connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
     this, &QmitkVolumeLightingWidget::OnMaterialChanged);
   connect(m_Controls->diffuseSlider, &ctkSliderWidget::valueChanged,
@@ -93,18 +90,6 @@ void QmitkVolumeLightingWidget::UpdateControls()
 
   const auto material = mitk::VolumeRenderingMaterial::FromNode(node.GetPointer());
 
-  // Phong parameters; with shading off they do nothing. Reset restores those
-  // same values, so with shading off it has nothing to do either.
-  m_Controls->ambientSlider->setEnabled(material.shade);
-  m_Controls->diffuseSlider->setEnabled(material.shade);
-  m_Controls->specularSlider->setEnabled(material.shade);
-  m_Controls->specularPowerSlider->setEnabled(material.shade);
-  m_Controls->lightingModelComboBox->setEnabled(material.shade);
-  m_Controls->resetButton->setEnabled(material.shade);
-
-  const QSignalBlocker blockShade(m_Controls->shadeCheckBox);
-  m_Controls->shadeCheckBox->setChecked(material.shade);
-
   SetSliderValueSilently(m_Controls->ambientSlider, material.ambient);
   SetSliderValueSilently(m_Controls->diffuseSlider, material.diffuse);
   SetSliderValueSilently(m_Controls->specularSlider, material.specular);
@@ -130,7 +115,15 @@ void QmitkVolumeLightingWidget::OnMaterialChanged()
 
   mitk::VolumeRenderingMaterial material;
 
-  material.shade = m_Controls->shadeCheckBox->isChecked();
+  // Asserted rather than carried over from the node: with shading off VTK
+  // ignores every value below and both scattering parameters, so there is no
+  // state here worth preserving, and a node that arrives with it off - set
+  // through the Properties view, or saved by a view that offered the choice -
+  // is brought into line as soon as its material is touched. Spelled out
+  // because ApplyTo writes the flag either way, and leaving it to the struct's
+  // own default would put the decision somewhere this function does not name.
+  material.shade = true;
+
   material.ambient = static_cast<float>(m_Controls->ambientSlider->value());
   material.diffuse = static_cast<float>(m_Controls->diffuseSlider->value());
   material.specular = static_cast<float>(m_Controls->specularSlider->value());
@@ -138,8 +131,6 @@ void QmitkVolumeLightingWidget::OnMaterialChanged()
 
   material.ApplyTo(node);
 
-  // Only the shade flag changes what the other controls may do, but one path for
-  // "the node changed, re-read it" is worth more than the saved work.
   this->UpdateControls();
 
   emit LightingChanged();
@@ -179,8 +170,7 @@ void QmitkVolumeLightingWidget::OnReset()
   // Back to the values the selected model dictates rather than to a fixed set:
   // the model is a choice, the slider positions are what was moved afterwards,
   // and only the latter is what reset undoes. ApplyTo writes exactly the four
-  // material values and the scattering parameters the model owns, and leaves
-  // the shade flag alone unless the model needs it on.
+  // material values and the scattering parameters the model owns.
   const auto *model = mitk::VolumeRenderingLightingModel::FromNode(node.GetPointer());
 
   // A node bound here normally names a model, since the view applies one when

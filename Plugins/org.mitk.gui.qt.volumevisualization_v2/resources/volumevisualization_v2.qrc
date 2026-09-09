@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/volumevisualization_v2" >
+    <file>volume_visualization.svg</file>
+  </qresource>
+</RCC>

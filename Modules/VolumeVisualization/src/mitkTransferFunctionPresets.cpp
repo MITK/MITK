@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkTransferFunctionPresets.h"
 
+#include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 
 #include <vtkColorTransferFunction.h>
@@ -138,6 +139,27 @@ std::vector<mitk::TransferFunctionPresets::Preset> mitk::TransferFunctionPresets
       preset.color = DecodeColor(entry["RGBPoints"]);
       preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
 
+      // Absent for a colormap taken from elsewhere, which was authored without
+      // the question in mind. Left to Preset::blendMode's own initialiser
+      // rather than defaulted to an id here, so that composite is asserted in
+      // one place only and a missing key can never be reported as an unknown
+      // mode.
+      if (entry.contains("BlendMode"))
+      {
+        const auto blendModeId = entry["BlendMode"].get<std::string>();
+
+        if (const auto *description = VolumeBlendModeDescription::FromId(blendModeId);
+            description != nullptr)
+        {
+          preset.blendMode = description->mode;
+        }
+        else
+        {
+          MITK_WARN << "Unknown blend mode \"" << blendModeId << "\" in preset \"" << preset.name
+                    << "\"; falling back to composite.";
+        }
+      }
+
       // The effective range is the intensity window a preset is designed for,
       // i.e. the range of voxel values over which the transfer function
       // actually varies. Without one, fall back to the first and last opacity
@@ -223,7 +245,7 @@ std::vector<std::string> mitk::TransferFunctionPresets::GetPresetNames() const
 }
 
 mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFunction(
-  const std::string &presetName) const
+  const std::string &presetName, VolumeBlendMode &blendMode) const
 {
   const auto it = std::find_if(m_Presets.begin(), m_Presets.end(),
     [&presetName](const Preset &preset) { return preset.name == presetName; });
@@ -234,10 +256,13 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
     return nullptr;
   }
 
+  blendMode = it->blendMode;
+
   return BuildTransferFunction(*it);
 }
 
-mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::LoadTransferFunction(std::istream &stream)
+mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::LoadTransferFunction(
+  std::istream &stream, VolumeBlendMode &blendMode)
 {
   const auto presets = ReadPresets(stream);
 
@@ -247,11 +272,14 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::LoadTransferFunct
     return nullptr;
   }
 
+  blendMode = presets.front().blendMode;
+
   return BuildTransferFunction(presets.front());
 }
 
 bool mitk::TransferFunctionPresets::SaveTransferFunction(
-  std::ostream &stream, const std::string &name, mitk::TransferFunction *transferFunction)
+  std::ostream &stream, const std::string &name, mitk::TransferFunction *transferFunction,
+  VolumeBlendMode blendMode)
 {
   if (transferFunction == nullptr || !stream.good())
     return false;
@@ -285,9 +313,20 @@ bool mitk::TransferFunctionPresets::SaveTransferFunction(
   if (scalarOpacityFunction->GetSize() > 0)
     scalarOpacityFunction->GetRange(effectiveRange.data());
 
+  const auto *blendModeDescription = VolumeBlendModeDescription::FromMode(blendMode);
+
+  // GetAll() covers every enumerator, so this can only fire for a value cast
+  // in from outside the enum. Thrown rather than reported like the failures
+  // above - a bad stream, a null function - which a caller can put to the user
+  // and have retried. This one is a programming error, and ToVtkBlendMode
+  // already treats the same input that way.
+  if (blendModeDescription == nullptr)
+    mitkThrow() << "Unhandled volume blend mode " << static_cast<int>(blendMode) << ".";
+
   nlohmann::ordered_json entry;
   entry["Name"] = name;
   entry["ColorSpace"] = ColorSpaceToString(colorFunction->GetColorSpace());
+  entry["BlendMode"] = blendModeDescription->id;
   entry["OpacityPoints"] = opacityPoints;
   entry["RGBPoints"] = rgbPoints;
   entry["EffectiveRange"] = effectiveRange;

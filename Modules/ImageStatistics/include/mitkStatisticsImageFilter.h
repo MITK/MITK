@@ -35,8 +35,12 @@ namespace mitk
    * This filter is a MITK-specific replacement for ITK's itkStatisticsImageFilter.
    * It computes: min, max, mean, sigma, variance, sum, sum of squares/cubes/quadruples,
    * skewness, kurtosis, MPP (mean of positive pixels), entropy, uniformity, UPP
-   * (uniformity of positive pixels), median, and an optional histogram. The median
-   * is exact and computed in the same pass as the other statistics.
+   * (uniformity of positive pixels), median, and an optional histogram.
+   *
+   * Entropy, uniformity, UPP and the median are only computed once histogram
+   * parameters have been set; without them GetMedian() stays at zero. The
+   * median is exact and computed in the same pass as the histogram, not
+   * derived from its bins.
    *
    * The filter is streaming-capable via itk::ImageSink and supports multi-threaded
    * processing.

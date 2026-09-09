@@ -165,6 +165,11 @@ void mitk::StatisticsImageFilter<TInputImage>::BeforeStreamedGenerateData()
   {
     m_Histogram = this->CreateInitializedHistogram();
     m_MedianAccumulator = MedianAccumulator<PixelType>(m_HistogramLowerBound, m_HistogramUpperBound);
+
+    // In value mode the accumulator ends up holding one entry per pixel, so
+    // sizing it once here avoids the reallocation the merges would otherwise
+    // walk through.
+    m_MedianAccumulator.Reserve(this->GetInput()->GetLargestPossibleRegion().GetNumberOfPixels());
   }
 }
 

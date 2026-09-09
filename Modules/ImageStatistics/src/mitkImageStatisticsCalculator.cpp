@@ -376,6 +376,11 @@ namespace mitk
 
     for (LabelPixelType label : relevantLabels)
     {
+      // The background is discarded below, so asking for its histogram would
+      // only pay for a median accumulator over every voxel outside the mask.
+      if (static_cast<LabelPixelType>(ImageStatisticsContainer::NO_MASK_LABEL_VALUE) == label)
+        continue;
+
       minVals[label] = static_cast<ScalarType>(minMaxFilter->GetMin(label));
       maxVals[label] = static_cast<ScalarType>(minMaxFilter->GetMax(label));
 

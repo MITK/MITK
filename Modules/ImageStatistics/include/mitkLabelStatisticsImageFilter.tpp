@@ -125,8 +125,15 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData
 
       if (mapIt == localStats.end())
       {
-        mapIt = m_ComputeHistograms
-          ? localStats.emplace(label, LabelStatistics(m_HistogramSizes[label], m_HistogramLowerBounds[label], m_HistogramUpperBounds[label])).first
+        // Only labels the caller asked for get a histogram, and with it a
+        // median accumulator. Looking the label up instead of subscripting
+        // also keeps the threads from inserting into a shared map.
+        const auto sizeIt = m_ComputeHistograms
+          ? m_HistogramSizes.find(label)
+          : m_HistogramSizes.cend();
+
+        mapIt = m_HistogramSizes.cend() != sizeIt
+          ? localStats.emplace(label, LabelStatistics(sizeIt->second, m_HistogramLowerBounds.at(label), m_HistogramUpperBounds.at(label))).first
           : localStats.emplace(label, LabelStatistics()).first;
       }
 
@@ -153,7 +160,7 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData
         labelStats.m_BoundingBox[i + 1] = std::max(labelStats.m_BoundingBox[i + 1], index[i / 2]);
       }
 
-      if (m_ComputeHistograms)
+      if (labelStats.m_Histogram.IsNotNull())
       {
         histogramMeasurement[0] = value;
         labelStats.m_Histogram->GetIndex(histogramMeasurement, histogramIndex);
@@ -235,7 +242,7 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::AfterStreamedGenerateData() 
     stats.m_Kurtosis = (fourthMoment - 4 * thirdMoment * mean + 6 * secondMoment * std::pow(mean, 2) - 3 * std::pow(mean, 4)) / std::pow(secondMoment - std::pow(mean, 2), 2);
     stats.m_MPP = sumOfPositivePixels / countOfPositivePixels;
 
-    if (m_ComputeHistograms)
+    if (stats.m_Histogram.IsNotNull())
     {
       mitk::HistogramStatisticsCalculator histogramStatisticsCalculator;
       histogramStatisticsCalculator.SetHistogram(stats.m_Histogram);
@@ -294,7 +301,6 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::MergeMap(MapType& map1, MapT
     }
     else
     {
-      const auto label = iter1->first;
       auto& stats1 = iter1->second;
       auto& stats2 = elem2.second;
 
@@ -315,18 +321,12 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::MergeMap(MapType& map1, MapT
         stats1.m_BoundingBox[i + 1] = std::max(stats1.m_BoundingBox[i + 1], stats2.m_BoundingBox[i + 1]);
       }
 
-      if (m_ComputeHistograms)
+      if (stats1.m_Histogram.IsNotNull() && stats2.m_Histogram.IsNotNull())
       {
-        typename HistogramType::IndexType index;
-        index.SetSize(1);
+        const auto histogramSize = stats1.m_Histogram->GetSize(0);
 
-        const auto histogramSize = m_HistogramSizes.at(label);
-
-        for (unsigned int bin = 0; bin < histogramSize; ++bin)
-        {
-          index[0] = bin;
+        for (itk::SizeValueType bin = 0; bin < histogramSize; ++bin)
           stats1.m_Histogram->IncreaseFrequency(bin, stats2.m_Histogram->GetFrequency(bin));
-        }
 
         stats1.m_MedianAccumulator.Merge(std::move(stats2.m_MedianAccumulator));
       }
@@ -374,7 +374,7 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::GetLabelHistogramStatistics(
 {
   const auto& labelStatistics = this->GetLabelStatistics(label);
 
-  if (m_ComputeHistograms && labelStatistics.m_Histogram.IsNotNull())
+  if (labelStatistics.m_Histogram.IsNotNull())
     return labelStatistics;
 
   mitkThrow() << "Histogram was not computed for label " << label;

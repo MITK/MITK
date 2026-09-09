@@ -84,7 +84,6 @@ namespace mitk
     public:
       LabelStatistics();
       LabelStatistics(unsigned int size, RealType lowerBound, RealType upperBound);
-      ~LabelStatistics();
 
       itk::SizeValueType m_Count;
       itk::SizeValueType m_CountOfPositivePixels;

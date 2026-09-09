@@ -77,11 +77,6 @@ mitk::LabelStatisticsImageFilter<TInputImage>::LabelStatistics::LabelStatistics(
 }
 
 template <typename TInputImage>
-mitk::LabelStatisticsImageFilter<TInputImage>::LabelStatistics::~LabelStatistics()
-{
-}
-
-template <typename TInputImage>
 mitk::LabelStatisticsImageFilter<TInputImage>::LabelStatisticsImageFilter()
   : m_ComputeHistograms(false)
 {

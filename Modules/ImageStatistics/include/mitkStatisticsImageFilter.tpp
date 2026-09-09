@@ -193,6 +193,7 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
     histogram = this->CreateInitializedHistogram();
     histogramMeasurement.SetSize(1);
     medianAccumulator = MedianAccumulator<PixelType>(m_HistogramLowerBound, m_HistogramUpperBound);
+    medianAccumulator.Reserve(regionForThread.GetNumberOfPixels());
   }
 
   itk::ImageScanlineConstIterator<TInputImage> it(this->GetInput(), regionForThread);

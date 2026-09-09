@@ -159,10 +159,10 @@ private:
     return mitk::GrabItkImageMemory(itkImage, nullptr, nullptr, false);
   }
 
-  // checks voxel count, mean, and median only; the hand-built small test
-  // images have an irrational standard deviation that is not worth deriving
+  // checks voxel count, mean, and median; the standard deviation of the
+  // hand-built small test images is mostly irrational and not worth deriving
   // by hand just to exercise the median
-  void VerifyMedian(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
+  void VerifyCountMeanAndMedian(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
     mitk::ImageStatisticsContainer::VoxelCountType testN,
     mitk::ImageStatisticsContainer::RealType testMean,
     mitk::ImageStatisticsContainer::RealType testMedian)
@@ -589,7 +589,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImageUnmaskedMedian()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
   auto statisticsObject = statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
 
-  this->VerifyStatistics(statisticsObject, 16.0, 34.0, 4.5);
+  this->VerifyCountMeanAndMedian(statisticsObject, 8, 16.0, 4.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsMedian()
@@ -618,7 +618,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsMedian
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
   auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyMedian(statisticsObject, 2, 115.0, 115.0);
+  this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.0, 115.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedThreeVoxelsMedian()
@@ -646,7 +646,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedThreeVoxelsMedi
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
   auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyMedian(statisticsObject, 3, (78.0 + 152.0 + 200.0) / 3.0, 152.0);
+  this->VerifyCountMeanAndMedian(statisticsObject, 3, (78.0 + 152.0 + 200.0) / 3.0, 152.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsFloatMedian()
@@ -675,7 +675,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsFloatM
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
   auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyMedian(statisticsObject, 2, 115.375, 115.375);
+  this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.375, 115.375);
 }
 
 // T26098 histogram statistics need to be tested (uniformity, UPP, entropy)

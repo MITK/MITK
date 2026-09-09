@@ -24,9 +24,9 @@ namespace mitk
    *        node, as one value.
    *
    * The defaults mirror what mitk::VolumeMapperVtkSmart3D registers in
-   * SetDefaultProperties. They are repeated here because that only runs via the
-   * IOExt object factory, which nothing guarantees, so a node can legitimately
-   * carry none of these.
+   * SetDefaultProperties. They are repeated here because that only runs via
+   * IOExt's mapper provider, and only for a node that already holds an
+   * initialized image, so a node can legitimately carry none of these.
    */
   struct MITKVOLUMEVISUALIZATION_EXPORT VolumeRenderingMaterial
   {

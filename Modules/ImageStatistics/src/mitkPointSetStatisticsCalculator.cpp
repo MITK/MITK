@@ -13,6 +13,8 @@ found in the LICENSE file.
 
 #include <mitkPointSetStatisticsCalculator.h>
 
+#include <mitkMedianAccumulator.h>
+
 mitk::PointSetStatisticsCalculator::PointSetStatisticsCalculator()
 {
   m_PointSet = mitk::PointSet::New();
@@ -99,17 +101,14 @@ return mean;
 double mitk::PointSetStatisticsCalculator::GetMedian(std::vector<double> list)
 {
 if (list.empty()) return 0;
-std::sort(list.begin(), list.end());
-if (list.size() % 2 == 0) //even
-  {
-  double element1 = list.at(list.size()/2 - 1);
-  double element2 = list.at(list.size()/2);
-  return ((element1+element2)/2.0);
-  }
-else //odd
-  {
-  return list.at((list.size())/2);
-  }
+
+mitk::MedianAccumulator<double> medianAccumulator;
+medianAccumulator.Reserve(list.size());
+
+for (double element : list)
+  medianAccumulator.Add(element);
+
+return medianAccumulator.ComputeMedian();
 }
 
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetMean(std::vector<mitk::Point3D> list)

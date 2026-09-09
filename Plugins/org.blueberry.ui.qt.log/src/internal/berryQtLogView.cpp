@@ -81,7 +81,7 @@ QtLogView::QtLogView(QWidget *parent)
     m_FilterModel(new QtLogFilterProxyModel(this)),
     m_FilterTimer(new QTimer(this)),
     m_FollowNewEntries(true),
-    m_ScrolledToNewest(false)
+    m_FirstShow(true)
 {
   ui->setupUi(this);
 
@@ -90,14 +90,11 @@ QtLogView::QtLogView(QWidget *parent)
   // Retired with the two checkboxes the details toggle replaced.
   prefs->Remove("ShowAdvancedFields");
   prefs->Remove("ShowCategory");
+  prefs->Flush();
 
   const bool showDetails = prefs->GetBool("ShowDetails", false);
   const auto minimumLevel = FindLevelByName(
     QString::fromStdString(prefs->Get("MinimumLevel", "Info")), mitk::LogLevel::Info);
-
-  // Connected before the proxy attaches to the same model, so that the position
-  // is sampled while the view still reflects the rows it currently shows.
-  connect(m_Model, &QAbstractItemModel::rowsAboutToBeInserted, this, &QtLogView::OnRowsAboutToBeInserted);
 
   m_FilterModel->setSourceModel(m_Model);
   m_FilterModel->setSortRole(QtPlatformLogModel::SortRole);
@@ -114,10 +111,11 @@ QtLogView::QtLogView(QWidget *parent)
 
   // Every row is a single line, so the rows need no measuring.
   auto* verticalHeader = ui->tableView->verticalHeader();
+  auto* style = ui->tableView->style();
   verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
   verticalHeader->setDefaultSectionSize(
-    std::max(this->fontMetrics().height(), this->style()->pixelMetric(QStyle::PM_SmallIconSize)) +
-    2 * this->style()->pixelMetric(QStyle::PM_FocusFrameVMargin));
+    std::max(ui->tableView->fontMetrics().height(), style->pixelMetric(QStyle::PM_SmallIconSize)) +
+    2 * style->pixelMetric(QStyle::PM_FocusFrameVMargin));
 
   // setSortingEnabled() sorts by the current sort indicator right away, and a
   // fresh header reports section 0, so the indicator has to be cleared
@@ -150,7 +148,9 @@ QtLogView::QtLogView(QWidget *parent)
   connect(ui->showDetails, &QAbstractButton::toggled, this, &QtLogView::OnShowDetailsToggled);
   connect(ui->clear, &QAbstractButton::clicked, this, &QtLogView::OnClearClicked);
   connect(ui->copyToClipboard, &QAbstractButton::clicked, this, &QtLogView::OnCopyToClipboardClicked);
+  connect(m_FilterModel, &QAbstractItemModel::rowsAboutToBeInserted, this, &QtLogView::OnRowsAboutToBeInserted);
   connect(m_FilterModel, &QAbstractItemModel::rowsInserted, this, &QtLogView::OnRowsInserted);
+  connect(header, &QHeaderView::sectionResized, this, &QtLogView::OnSectionResized);
 
   // Installed last, so it runs before the event filter the scroll area put on
   // its own viewport and can suppress the default tool tip handling.
@@ -161,16 +161,19 @@ QtLogView::~QtLogView()
 {
 }
 
-void QtLogView::showEvent(QShowEvent*)
+void QtLogView::showEvent(QShowEvent* event)
 {
-  this->SizeColumnsToContents();
+  QWidget::showEvent(event);
 
-  // A log is read from its end. Only on the first show, though: afterwards the
-  // scroll position is the user's.
-  if (!m_ScrolledToNewest)
+  // Only on the first show. Sizing the columns again would throw away every
+  // width the user has dragged since, and a log is read from its end only
+  // until the user scrolls somewhere else.
+  if (m_FirstShow)
   {
+    m_FirstShow = false;
+
+    this->SizeColumnsToContents();
     ui->tableView->scrollToBottom();
-    m_ScrolledToNewest = true;
   }
 }
 
@@ -192,7 +195,13 @@ bool QtLogView::eventFilter(QObject* watched, QEvent* event)
     if (!tooltip.isEmpty() &&
         (isFileColumn || tooltip.contains(QLatin1Char('\n')) || this->IsElided(index)))
     {
-      QToolTip::showText(helpEvent->globalPos(), tooltip, ui->tableView->viewport());
+      // Rich text, as Qt wraps only that: a long message logged as a single
+      // line would otherwise be one line wider than the screen. Escaped, as
+      // a message is free to contain anything that reads like a tag.
+      QToolTip::showText(helpEvent->globalPos(),
+        QStringLiteral("<div style='white-space:pre-wrap'>") + tooltip.toHtmlEscaped() +
+        QStringLiteral("</div>"),
+        ui->tableView->viewport());
     }
     else
     {
@@ -222,9 +231,16 @@ void QtLogView::resizeEvent(QResizeEvent* event)
 {
   QWidget::resizeEvent(event);
 
-  // Message absorbs the width the view gains or loses, the way a stretched last
-  // section would, but without giving up its own resize handle.
+  // Message absorbs the width the view gains or loses.
   this->FillMessageColumn();
+}
+
+void QtLogView::OnSectionResized(int logicalIndex)
+{
+  // Message absorbs what a dragged divider takes from another column or hands
+  // to it. Not when Message itself was dragged, which would undo the drag.
+  if (logicalIndex != static_cast<int>(QtPlatformLogModel::Column::Message))
+    this->FillMessageColumn();
 }
 
 void QtLogView::SizeColumnsToContents()

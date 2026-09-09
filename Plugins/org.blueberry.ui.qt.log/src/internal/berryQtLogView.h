@@ -53,6 +53,7 @@ private:
     void OnCopyToClipboardClicked();
     void OnRowsAboutToBeInserted();
     void OnRowsInserted(const QModelIndex& parent, int first, int last);
+    void OnSectionResized(int logicalIndex);
 
     void ApplyShowDetails(bool showDetails);
     void SizeColumnsToContents();
@@ -70,7 +71,11 @@ private:
     /** Whether the newest entry was in view when the last insertion started. */
     bool m_FollowNewEntries;
 
-    bool m_ScrolledToNewest;
+    /** Guards the setup that must not undo what the user has done since:
+     *  the column widths and the scroll position are theirs from the first
+     *  time the view is shown.
+     */
+    bool m_FirstShow;
 };
 
 }

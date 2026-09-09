@@ -42,6 +42,7 @@ public:
    *
    * There is deliberately no Count enumerator so that switches over this enum
    * can omit the default label and adding a field is caught at compile time.
+   * ColumnCount takes its place, which is why Line has to stay last.
    */
   enum class Column
   {
@@ -141,6 +142,14 @@ private:
      *  as QList requires an assignable element type.
      */
     ExtendedLogMessage& operator=(const ExtendedLogMessage& src) = delete;
+
+    /** Declaring the assignment operator suppresses the implicit move
+     *  constructor, and every entry is moved once, out of the queue the log
+     *  backend fills and into the table. Declaring the move constructor in turn
+     *  suppresses the implicit copy constructor, hence both.
+     */
+    ExtendedLogMessage(const ExtendedLogMessage& src) = default;
+    ExtendedLogMessage(ExtendedLogMessage&& src) = default;
 
     QVariant getMessage() const
     {

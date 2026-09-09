@@ -23,7 +23,7 @@ MITK_INFO << "no class";
 MITK_INFO("MyClass") << "single class";
 MITK_INFO("MyClass")("MySubClass") << "class with subclass";
 \endcode
-This classes makes it easy to e.g. simply filter all logging messages only for relevant information.
+This classes makes it easy to e.g. simply filter all logging messages only for relevant information. Note that these categories reach the console and the log file only. The \ref org_blueberry_views_logview "Logging view" does not show them; it identifies the origin of a message by its module.
 
 \section LoggingPageSection3 Logging Levels
 MITK offers different logging levels. You may mostly want to use MITK_INFO, but please consider using the other levels,  e.g. when logging debug information or errors.

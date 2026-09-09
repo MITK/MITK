@@ -86,8 +86,8 @@ void QtPlatformLogModel::slotFlushLogEntries()
     const int row = static_cast<int>(m_Entries.size());
     this->beginInsertRows(QModelIndex(), row, row + num - 1);
 
-    for (const auto& entry : *pending)
-      m_Entries.push_back(entry);
+    for (auto& entry : *pending)
+      m_Entries.push_back(std::move(entry));
 
     pending->clear();
     this->endInsertRows();
@@ -110,11 +110,15 @@ void QtPlatformLogModel::slotFlushLogEntries()
 
 void QtPlatformLogModel::addLogEntry(const mitk::LogMessage &msg)
 {
+  // Built before the lock is taken: every thread that logs contends on this
+  // mutex, and preparing an entry parses a path and rewrites the message.
+  ExtendedLogMessage entry(msg);
+
   bool flushPending;
 
   {
     QMutexLocker locker(&m_Mutex);
-    m_Active->push_back(ExtendedLogMessage(msg));
+    m_Active->push_back(std::move(entry));
     flushPending = m_FlushPending;
     m_FlushPending = true;
   }
@@ -138,6 +142,7 @@ QtPlatformLogModel::addLogEntry(const ctkPluginFrameworkEvent& event)
   }
 
   mitk::LogMessage msg(level,"n/a",-1,"n/a");
+  msg.ModuleName = "BlueBerry";
 
   QString str;
   QDebug dbg(&str);
@@ -343,8 +348,9 @@ QVariant QtPlatformLogModel::data(const QModelIndex& index, int role) const
       break;
 
     case Qt::ToolTipRole:
-      // Whether a tool tip is worth showing depends on the column width, which
-      // only the view knows, so the view decides.
+      // Every column offers a tool tip, as any of them can be narrower than the
+      // value it shows. Whether one is worth showing depends on the column
+      // width, which only the view knows, so the view decides.
       switch (column)
       {
         case Column::Message:
@@ -356,7 +362,9 @@ QVariant QtPlatformLogModel::data(const QModelIndex& index, int role) const
         default:
           break;
       }
-      break;
+
+      // Everywhere else the cell already shows the whole value, if it fits.
+      return this->data(index, Qt::DisplayRole);
 
     case SortRole:
       switch (column)

@@ -9,11 +9,11 @@ This plug-in records all logging output of events and progress as specified in t
 
 The 'Filter' text field narrows the table down to the messages containing a certain substring. The combobox next to it sets the lowest level of importance still shown, so that, for example, only warnings and errors remain. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". Note that the default setting hides Debug messages even in builds that emit them.
 
-By default the table shows the level and the message of each entry. The 'Show details' button adds the time of occurrence and the module, function, file and line number the message originated from. The time is the same wall clock the log file records, so a message can be located in either.
+By default the table shows the level and the message of each entry. The 'Show details' button adds the time of occurrence and the module, function, file and line number the message originated from. The time is the same wall clock the log file records, so a message can be located in either. The file column shows the file name alone and offers its path within the source tree on hover.
 
 Clicking a column header sorts the table by that column, a second click reverses the order, and a third restores the order in which the messages arrived. Messages that compare equal keep their arrival order, so sorting by level still lists each level chronologically.
 
-Every row is one line high. Messages spanning several lines, as those forwarded from ITK and VTK and those carrying an exception description do, appear with their line breaks collapsed. Hovering a message that the row cannot show in full, whether because it was logged across several lines or because it is wider than the column, shows it as it was logged. Column widths can be changed by dragging the dividers in the header, and the message column takes whatever width the others leave.
+Every row is one line high. Messages spanning several lines, as those forwarded from ITK and VTK and those carrying an exception description do, appear with their line breaks collapsed. Hovering a cell that cannot show its value in full, whether because the message was logged across several lines or because the value is wider than the column, shows it as it was logged. Column widths can be changed by dragging the dividers in the header, and the message column takes whatever width the others leave.
 
 The 'Clear' button discards all messages recorded so far. Independently of that, only the most recent 10000 messages are kept, so that a long session does not grow without bound. The full log is written to the log file regardless.
 

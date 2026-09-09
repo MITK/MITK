@@ -16,7 +16,7 @@ found in the LICENSE file.
 namespace mitk {
 
 HistogramStatisticsCalculator::HistogramStatisticsCalculator():
-    m_Uniformity(0), m_UPP(0), m_Entropy(0), m_Median(0), m_StatisticsCalculated(false)
+    m_Uniformity(0), m_UPP(0), m_Entropy(0), m_StatisticsCalculated(false)
 {
 
 }
@@ -38,16 +38,6 @@ HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::Ge
         CalculateStatistics();
     }
     return m_Entropy;
-}
-
-HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::GetMedian()
-{
-    if (!m_StatisticsCalculated)
-    {
-        MITK_WARN << "Statistics have not yet been calculated, running calculation now...";
-        CalculateStatistics();
-    }
-    return m_Median;
 }
 
 HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::GetUniformity()
@@ -81,15 +71,10 @@ void HistogramStatisticsCalculator::CalculateStatistics()
     m_Uniformity = 0;
     m_Entropy = 0;
     m_UPP = 0;
-    m_Median = 0;
-
-    MeasurementType cumulativeProbability = 0.0;
-    bool medianFound(false);
 
     for (unsigned int i = 0; i < nBins; i++)
     {
       MeasurementType partialProbability = m_Histogram->GetFrequency(i, 0) / double( m_Histogram->GetTotalFrequency() );
-        cumulativeProbability += partialProbability;
 
         if (partialProbability != 0)
         {
@@ -102,15 +87,6 @@ void HistogramStatisticsCalculator::CalculateStatistics()
             }
 
         }
-
-        if (cumulativeProbability >= 0.5 && !medianFound)
-        {
-            MeasurementType binMin = m_Histogram->GetBinMin(0, i);
-            MeasurementType binMax = m_Histogram->GetBinMax(0, i);
-            m_Median = (binMax + binMin) / 2.0;
-            medianFound = true;
-        }
-
     }
     m_StatisticsCalculated = true;
 }

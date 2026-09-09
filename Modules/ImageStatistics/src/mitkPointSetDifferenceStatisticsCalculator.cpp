@@ -13,13 +13,13 @@ found in the LICENSE file.
 
 #include <mitkPointSetDifferenceStatisticsCalculator.h>
 #include <mitkImageStatisticsConstants.h>
+#include <mitkMedianAccumulator.h>
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator() :
   m_StatisticsCalculated(false)
 {
   m_PointSet1 = mitk::PointSet::New();
   m_PointSet2 = mitk::PointSet::New();
-  //m_Statistics.Reset();
 }
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator(mitk::PointSet::Pointer pSet1, mitk::PointSet::Pointer pSet2)
@@ -27,7 +27,6 @@ mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalcul
   m_PointSet1 = pSet1;
   m_PointSet2 = pSet2;
   m_StatisticsCalculated = false;
-  //m_Statistics.Reset();
 }
 
 mitk::PointSetDifferenceStatisticsCalculator::~PointSetDifferenceStatisticsCalculator()
@@ -45,7 +44,6 @@ void mitk::PointSetDifferenceStatisticsCalculator::SetPointSets(mitk::PointSet::
     m_PointSet2 = pSet2;
   }
   m_StatisticsCalculated = false;
-  //m_Statistics.Reset();
 }
 
 std::vector<double> mitk::PointSetDifferenceStatisticsCalculator::GetDifferences()
@@ -154,6 +152,11 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
   }
   else
   {
+    // Everything below appends to state that survives across calls, and
+    // AddStatistic() does not overwrite an existing key.
+    m_Statistics.Reset();
+    m_SquaredDifferencesVector.clear();
+
     double mean = 0.0;
     double sd = 0.0;
     double rms= 0.0;
@@ -188,15 +191,15 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     double variance = sd/ static_cast<double>(numberOfPoints);
     sd = sqrt(variance);
     std::sort(differencesVector.begin(),differencesVector.end());
-    double median = 0.0;
-    if (numberOfPoints%2 == 0)
-    {
-      median = (differencesVector.at(numberOfPoints/2)+differencesVector.at(numberOfPoints/2-1))/2;
-    }
-    else
-    {
-      median = differencesVector.at((numberOfPoints-1)/2+1);
-    }
+
+    mitk::MedianAccumulator<double> medianAccumulator;
+    medianAccumulator.Reserve(numberOfPoints);
+
+    for (double difference : differencesVector)
+      medianAccumulator.Add(difference);
+
+    const double median = medianAccumulator.ComputeMedian();
+
     m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), mean);
     m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), sd);
     m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::VARIANCE(), sd*sd);

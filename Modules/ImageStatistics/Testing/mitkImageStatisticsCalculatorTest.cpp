@@ -16,11 +16,17 @@ found in the LICENSE file.
 #include <mitkPlanarPolygon.h>
 
 #include <mitkIOUtil.h>
+#include <mitkITKImageImport.h>
 
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkImageMaskGenerator.h>
 #include <mitkMultiLabelMaskGenerator.h>
 #include <mitkImageStatisticsConstants.h>
+
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
+
+#include <vector>
 
 /**
  * \brief Test class for mitkImageStatisticsCalculator
@@ -45,6 +51,10 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestCase10);
   MITK_TEST(TestCase11);
   MITK_TEST(TestCase12);
+  MITK_TEST(TestSmallImageUnmaskedMedian);
+  MITK_TEST(TestSmallImageMaskedTwoVoxelsMedian);
+  MITK_TEST(TestSmallImageMaskedThreeVoxelsMedian);
+  MITK_TEST(TestSmallImageMaskedTwoVoxelsFloatMedian);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -73,6 +83,11 @@ public:
   void TestCase10();
   void TestCase11();
   void TestCase12();
+
+  void TestSmallImageUnmaskedMedian();
+  void TestSmallImageMaskedTwoVoxelsMedian();
+  void TestSmallImageMaskedThreeVoxelsMedian();
+  void TestSmallImageMaskedTwoVoxelsFloatMedian();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -118,6 +133,49 @@ private:
     }
 
     return imgStatCalc->GetStatistics();
+  }
+
+  // builds a small mitk::Image of the given size and pixel type from raw
+  // values, in the iteration order of itk::ImageRegionIterator
+  template <typename TPixel>
+  static mitk::Image::Pointer BuildImage(const itk::Size<3>& size, const std::vector<TPixel>& values)
+  {
+    using ImageType = itk::Image<TPixel, 3>;
+
+    typename ImageType::IndexType start;
+    start.Fill(0);
+    typename ImageType::RegionType region(start, size);
+
+    auto itkImage = ImageType::New();
+    itkImage->SetRegions(region);
+    itkImage->Allocate();
+
+    itk::ImageRegionIterator<ImageType> it(itkImage, region);
+    auto valueIt = values.cbegin();
+
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it, ++valueIt)
+      it.Set(*valueIt);
+
+    return mitk::GrabItkImageMemory(itkImage, nullptr, nullptr, false);
+  }
+
+  // checks voxel count, mean, and median; the standard deviation of the
+  // hand-built small test images is mostly irrational and not worth deriving
+  // by hand just to exercise the median
+  void VerifyCountMeanAndMedian(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
+    mitk::ImageStatisticsContainer::VoxelCountType testN,
+    mitk::ImageStatisticsContainer::RealType testMean,
+    mitk::ImageStatisticsContainer::RealType testMedian)
+  {
+    mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject = 0;
+    mitk::ImageStatisticsContainer::RealType meanObject = 0;
+    mitk::ImageStatisticsContainer::RealType medianObject = 0;
+    CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+    CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
+    CPPUNIT_ASSERT_NO_THROW(medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN()));
+    CPPUNIT_ASSERT_EQUAL(testN, numberOfVoxelsObject);
+    CPPUNIT_ASSERT_MESSAGE("Calculated mean gray value is not equal to the desired value.", std::abs(meanObject - testMean) < mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE("Calculated median gray value is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
   }
 
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
@@ -272,7 +330,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 191.25, 127.5, 253.72499847412109);
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.25, 127.5, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase5()
@@ -302,7 +360,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 191.50, 89.802561210691536, 128.63499999046327);
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.50, 89.802561210691536, 191.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase6()
@@ -332,7 +390,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 89.802561210691536, 128.63499999046327);
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 89.802561210691536, 191.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase7()
@@ -362,7 +420,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 127.50032679696680, 128.7750015258789);
+  this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 127.50032679696680, 128.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase8()
@@ -422,7 +480,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 89.802561210691536, 128.63499999046327);
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 89.802561210691536, 191.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase10()
@@ -452,7 +510,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 127.50032679696680, 128.7750015258789);
+  this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 127.50032679696680, 128.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase11()
@@ -482,7 +540,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 204.0, 105.58003057938019, 253.724998474121083);
+  this->VerifyStatistics(statisticsObjectTimestep0, 204.0, 105.58003057938019, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase12()
@@ -511,7 +569,113 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
-  this->VerifyStatistics(statisticsObjectTimestep0, 212.666666666666667, 73.323484187082443, 254.36499786376954);
+  this->VerifyStatistics(statisticsObjectTimestep0, 212.666666666666667, 73.323484187082443, 255.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImageUnmaskedMedian()
+{
+  /*****************************
+   * 8 voxels, no mask
+   * {1, 2, 3, 4, 5, 6, 7, 100} -> median of 4.5 expected
+   ******************************/
+  MITK_INFO << std::endl << "Test small image unmasked median:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values{ 1, 2, 3, 4, 5, 6, 7, 100 };
+  mitk::Image::Pointer image = BuildImage<short>(size, values);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  auto statisticsObject = statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 8, 16.0, 4.5);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsMedian()
+{
+  /*****************************
+   * mask selects exactly the two voxels 78 and 152 (issue 109: for an even
+   * voxel count the median is the mean of the two middle values)
+   * -> median of 115 expected
+   ******************************/
+  MITK_INFO << std::endl << "Test small image masked two voxels median:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values{ 78, 152, 0, 0, 0, 0, 0, 0 };
+  std::vector<unsigned short> maskValues{ 1, 1, 0, 0, 0, 0, 0, 0 };
+
+  mitk::Image::Pointer image = BuildImage<short>(size, values);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+  imgMaskGen->SetTimePoint(image->GetTimeGeometry()->TimeStepToTimePoint(0));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.0, 115.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedThreeVoxelsMedian()
+{
+  /*****************************
+   * mask selects exactly the three voxels 78, 152 and 200
+   * -> median of 152 expected (the middle value, odd voxel count)
+   ******************************/
+  MITK_INFO << std::endl << "Test small image masked three voxels median:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values{ 78, 152, 200, 0, 0, 0, 0, 0 };
+  std::vector<unsigned short> maskValues{ 1, 1, 1, 0, 0, 0, 0, 0 };
+
+  mitk::Image::Pointer image = BuildImage<short>(size, values);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+  imgMaskGen->SetTimePoint(image->GetTimeGeometry()->TimeStepToTimePoint(0));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 3, (78.0 + 152.0 + 200.0) / 3.0, 152.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsFloatMedian()
+{
+  /*****************************
+   * same two-voxel mask as above, but on a float image with non-integer
+   * values, to exercise the value-collection accumulator path
+   * -> median of 115.375 expected
+   ******************************/
+  MITK_INFO << std::endl << "Test small image masked two voxels float median:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<float> values{ 78.5f, 152.25f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+  std::vector<unsigned short> maskValues{ 1, 1, 0, 0, 0, 0, 0, 0 };
+
+  mitk::Image::Pointer image = BuildImage<float>(size, values);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+  imgMaskGen->SetTimePoint(image->GetTimeGeometry()->TimeStepToTimePoint(0));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.375, 115.375);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

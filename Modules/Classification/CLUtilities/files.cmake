@@ -46,8 +46,8 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFNeighbourhoodGreyToneDifferenceFeatures.cpp
   GlobalImageFeatures/mitkGIFCurvatureStatistic.cpp
 
-  MiniAppUtils/mitkGlobalImageFeaturesParameter.cpp
-  MiniAppUtils/mitkSplitParameterToVector.cpp
+  CmdAppUtils/mitkGlobalImageFeaturesParameter.cpp
+  CmdAppUtils/mitkSplitParameterToVector.cpp
 
   mitkCLUtil.cpp
 )

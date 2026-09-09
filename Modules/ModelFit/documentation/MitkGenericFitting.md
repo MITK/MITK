@@ -1,129 +1,135 @@
-# MitkGenericFitting User Guide {#MitkGenericFittingPage}
+# MitkGenericFitting {#MitkGenericFittingPage}
 
 [TOC]
 
 ## Overview
 
-`MitkGenericFitting` is a command-line tool for fitting model functions to time-resolved imaging data (3D+t). It supports voxel-wise or region-based fitting using a mask and produces parameter images as output.
+MitkGenericFitting fits a model function to the intensity curve over time of
+a dynamic (3D+t) image and writes one image per fitted quantity. The model is
+either a linear function or a user-defined formula that is parsed at runtime.
+Fitting is done voxel by voxel (optionally restricted to a mask) or once for
+the mean curve of a region of interest.
 
-Supported image types for input include `.nrrd`, `.nii`, and DICOM files.
-
-## Supported Models
-
-### Linear Model
-- Model: `y = a + b*t`
-- Specify with: `--function Linear`
-
-### Generic Model (2 parameters)
-- User-defined model formula using two free parameters (`a`, `b`)
-- Example: `y = a * exp(-b*x)`
-- The parser is able to recognize:
-  - sums, differences, products and divisions (a + b, 4 - 3, 2 * x, 9 / 3)
-  - algebraic signs ( +5, -5)
-  - exponentiation ( 2 ^ 4 )
-  - parentheses (3 * (4 + 2))
-  - following unary functions: abs, exp, sin, cos, tan, sind (sine in degrees), cosd (cosine in degrees), tand (tangent in degrees)
-  - variables (x, a, b, ... j)
-
-**Remarks**
-- The variable "x" is reserved. It is the signal position / timepoint.
-- The current version supports 2 model parameter (a, b)
----
+The fit uses a Levenberg-Marquardt optimizer. Besides the model parameters the
+application stores derived parameters, the fit criterion, an evaluation value
+and debug maps of the optimizer. Related applications for dynamic data are
+[MitkCurveDescriptor](@ref MitkCurveDescriptorPage) (descriptive curve
+parameters without a model) and [MitkMRPerfusion](@ref MitkMRPerfusionPage)
+(pharmacokinetic models).
 
 ## Usage
 
 ```bash
-MitkGenericFitting -i <inputImage> -o <outputTemplate> -f <functionType> [options]
+MitkGenericFitting -i <input> -o <output template> [options]
 ```
 
-### Required Arguments
+### Required arguments
 
-| Argument        | Short | Type   | Description |
-|----------------|-------|--------|-------------|
-| `--input`       | `-i`  | file   | Input dynamic image (3D+t). |
-| `--output`      | `-o`  | file   | Output template file path for resulting parameter images. File extensions determine output format. |
-| `--function`      | `-f`  | string | Model type: `"Linear"` or `"Generic-2"` for generic 2 parameter model. Default is `Linear`. |
+| Argument | Short | Type | Description |
+|----------|-------|------|-------------|
+| `--input` | `-i` | File | Dynamic (3D+t) image whose time curves are fitted. |
+| `--output` | `-o` | File | Template path for the result images. Directory, base name and extension are taken from it; a suffix per result is appended to the base name. |
 
+### Optional arguments
 
-### Optional Arguments
+| Argument | Short | Type | Default | Description |
+|----------|-------|------|---------|-------------|
+| `--function` | `-f` | String | `Linear` | Model to fit. `Linear` selects the linear model, `Generic-<N>` the generic formula model with N free parameters (1 to 10). |
+| `--formular` | `-y` | String | | Formula of the generic model. Required for `Generic-<N>`. |
+| `--mask` | `-m` | File | | Mask image that defines the voxels to fit. Must have the same geometry as the input. Required for `--roibased`. |
+| `--roibased` | `-r` | Flag | | Fit the mean curve of the mask region once instead of every voxel. |
+| `--verbose` | `-v` | Flag | | Accepted for compatibility; has no effect. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
-| Argument        | Short | Type   | Description |
-|-----------------|-------|--------|-------------|
-| `--formular`      | `-y`  | string | Model formula string (required for generic models). |
-| `--mask`         | `-m`  | file   | Binary mask image defining ROI. Required for ROI-based fitting. |
-| `--roibased`     | `-r`  | flag   | Use ROI-based fitting (fit mean signal in mask). |
-| `--verbose`      | `-v`  | flag   | Enable verbose output. |
-| `--help`         | `-h`  | flag   | Show help text. |
+## Details
 
+### Models
 
-## Output
+`--function Linear` fits `y(x) = slope * x + y-intercept`. Its parameters are
+named `slope` and `y-intercept`; the derived parameter `x-intercept`
+(`-y-intercept / slope`) is stored as well.
 
-For each fitted model parameter, a separate image will be created. The output filenames will be based on the `--output` template plus a suffix per parameter (e.g., `_Param_0.nrrd`, `_Param_1.nrrd`).  
-A fitting summary and evaluation metric image (e.g., `Chi^2`) will also be generated.
+`--function Generic-<N>` selects the generic formula model with N free
+parameters, whose function is the string given with `--formular`. The
+independent variable is `x`, the time of the respective time step in seconds
+(taken from the time geometry of the input). The free parameters are named
+`a`, `b`, `c`, ... up to the N-th letter; N must be between 1 and 10. Any other
+value of `--function`, an N outside that range, or a missing formula is
+rejected before any data is loaded.
 
-## Fitting Modes
+The formula parser understands:
 
-### Pixel-based Fitting (Default)
+- numeric literals with optional decimal point and exponent (`1.5`, `.5`,
+  `1e-3`);
+- sums, differences, products and divisions (`a + 3`, `4 - x`, `2 * x`,
+  `a / 3`);
+- algebraic signs (`+5`, `-5`);
+- exponentiation (`x ^ 2`);
+- parentheses (`3 * (x + 2)`);
+- the unary functions `abs`, `exp`, `sin`, `cos`, `tan`, `sind`, `cosd`,
+  `tand` (the `d` variants take degrees), `fresnelS` and `fresnelC`.
 
-- The model is fitted to each voxel individually.
-- Mask is optional (if provided, fitting is constrained to masked region).
+Whitespace is only allowed between tokens. All model parameters start at an
+initial value of `1.0`.
 
-### ROI-based Fitting
+### Fitting modes
 
-- The average time-intensity curve within the mask is computed.
-- The model is fitted to the ROI curve.
-- Output will be constant-valued images reflecting the ROI fit result.
+Without `--roibased` the model is fitted to the curve of every voxel. If a
+mask is given, only voxels inside the mask are fitted; the other voxels of the
+result images stay `0`.
 
+With `--roibased` the mean curve over all mask voxels is computed first and
+the model is fitted once to that curve. The fitted values are then written
+into every voxel of the mask; a mask is mandatory in this mode and the
+application fails without one.
+
+### Output files
+
+Every result is stored as a separate image. The file name is
+`<root>_<name>.<ext>`, where `<root>` and `<ext>` come from `--output` and
+`<name>` is the result name with the characters `\ / : ? " < > | % *` and
+spaces replaced by `_`. The results are:
+
+| Category | Names |
+|----------|-------|
+| Model parameters | `slope`, `y-intercept` (linear) or `a`, `b`, ... (generic). |
+| Derived parameters | `x-intercept` (linear only). |
+| Fit criterion | `sum_diff^2`, the sum of squared differences between model and data. |
+| Evaluation | `Chi^2`, the normalized sum of squared differences. |
+| Optimizer debug maps | `optimization_time`, `nr_of_iterations`, `stop_condition`. |
+
+The console lists every stored file. The input and the mask are loaded with
+the "MITK DICOM Reader v2 (autoselect)" reader preferred for DICOM data.
 
 ## Examples
 
-### 1. Linear Model Fit (Pixel-based)
+### Voxel-wise linear fit
 
 ```bash
-MitkGenericFitting -i dyn.nrrd -o result/linFit.nrrd -f Linear
+MitkGenericFitting -i dce_series.nrrd -o results/linear.nrrd
 ```
 
-**Description**:  
-Performs voxel-wise fitting of a linear model on `dyn.nrrd`.
+Fits the linear model to every voxel and writes `results/linear_slope.nrrd`,
+`results/linear_y-intercept.nrrd`, `results/linear_x-intercept.nrrd`,
+`results/linear_sum_diff^2.nrrd`, `results/linear_Chi^2.nrrd` and the three
+optimizer debug maps.
 
-**Naming Strategy**:
-- Output parameter images: `linFit_y-intercept.nrrd` (intercept), `linFit_slope.nrrd` (slope)
-
-**Generated Values**:
-- Each voxel gets individual values for intercept and slope.
-
----
-
-### 2. Exponential Decay (Generic, Pixel-based)
+### Voxel-wise fit of a user-defined formula inside a mask
 
 ```bash
-MitkGenericFitting -i dyn.nrrd -o result/expFit.nrrd -f Generic-2 -y "a*exp(-b*x)"
+MitkGenericFitting -i dce_series.nrrd -m tumor_mask.nrrd -o results/washout.nrrd -f Generic-2 -y "a * exp(-b * x)"
 ```
 
-**Description**:  
-Fits an exponential decay model to each voxel.
+Fits an exponential decay with the two free parameters `a` and `b` to every
+voxel inside `tumor_mask.nrrd` and writes `results/washout_a.nrrd` and
+`results/washout_b.nrrd` together with the criterion, evaluation and debug
+images. Voxels outside the mask are `0`.
 
-**Naming Strategy**:
-- Output files: `expFit_a.nrrd` (a), `expFit_b.nrrd` (b)
-
-**Generated Values**:
-- Each voxel gets a fitted p0 and p1 value for the exponential model.
-
----
-
-### 3. ROI-based Linear Fit
+### ROI-based linear fit
 
 ```bash
-MitkGenericFitting -i dyn.nrrd -o result/roiLinFit.nrrd -f Linear -m mask.nrrd -r
+MitkGenericFitting -i dce_series.nrrd -m tumor_mask.nrrd -o results/roi_linear.nrrd -r
 ```
 
-**Description**:  
-Fits a linear model to the mean curve inside the mask.
-
-**Naming Strategy**:
-- Output parameter images: `roiLinFit_y-intercept.nrrd` (intercept), `roiLinFit_slope.nrrd` (slope)
-
-**Generated Values**:
-- Each output image has constant values representing ROI fit result.
-
----
+Averages the curves of all voxels in `tumor_mask.nrrd`, fits the linear model
+once and writes the fitted values into the mask region of each result image.

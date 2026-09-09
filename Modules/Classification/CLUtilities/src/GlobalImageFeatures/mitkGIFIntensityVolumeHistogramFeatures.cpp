@@ -125,7 +125,7 @@ void mitk::GIFIntensityVolumeHistogramFeatures::AddArguments(mitkCommandLinePars
   AddQuantifierArguments(parser);
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Local Intensity", "calculates local intensity based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Intensity Volume Histogram", "calculates intensity volume histogram based features", us::Any());
 }
 
 mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFIntensityVolumeHistogramFeatures::DoCalculateFeatures(const Image* image, const Image* mask)

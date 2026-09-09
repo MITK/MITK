@@ -85,10 +85,10 @@ DumpPixelMapType dumpedPixels;
 
 void setupParser(mitkCommandLineParser& parser)
 {
-  // set general information about your MiniApp
+  // set general information about the app
   parser.setCategory("Generic Analysis Tools");
   parser.setTitle("Pixel Dumper");
-  parser.setDescription("MiniApp that allows to dump the pixel values of all passed files into a csv. The region of dumping can defined by a mask. All images (and mask) must have the same geometry.");
+  parser.setDescription("Dumps the pixel values of all passed images into a CSV file. The dumped region can be defined by a mask. All images (and the mask) must have the same geometry.");
   parser.setContributor("DKFZ MIC");
   //! [create parser]
 
@@ -113,8 +113,7 @@ void setupParser(mitkCommandLineParser& parser)
   parser.addArgument(
     "mask", "m", mitkCommandLineParser::File, "Mask file", "Mask that defines the spatial image region that should be dumped. Must have the same geometry as the input images!", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "captions", "c", mitkCommandLineParser::StringList, "Captions of image columns", "If provided the pixel columns of the csv will be named according to the passed values instead of using the image paths. Number of images and names must be equal.", us::Any(), false);
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
+    "captions", "c", mitkCommandLineParser::StringList, "Captions of image columns", "If provided the pixel columns of the csv will be named according to the passed values instead of using the image paths. Number of images and names must be equal.", us::Any(), true);
   parser.endGroup();
   //! [add arguments]
 }
@@ -386,13 +385,6 @@ int main(int argc, char* argv[])
   {
     return EXIT_FAILURE;
   };
-
-  // Show a help message
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
 
   if (!captions.empty() && inFilenames.size() != captions.size())
   {

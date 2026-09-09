@@ -1,184 +1,109 @@
-
-# MitkConvertToMultiLabelSegmentation User Guide {#MitkConvertToMultiLabelSegmentationPage}
+# MitkConvertToMultiLabelSegmentation {#MitkConvertToMultiLabelSegmentationPage}
 
 [TOC]
 
 ## Overview
-This command-line tool converts various medical data types (images, surfaces, and contours) into a **multi-label segmentation** using the [Medical Imaging Interaction Toolkit (MITK)](https://www.mitk.org/).
 
-**Features**
+MitkConvertToMultiLabelSegmentation converts one or more images, surfaces, or contours into a single MITK multi-label segmentation. Label images contribute one label per distinct pixel value, surfaces and contours are rasterized into binary masks. All inputs are combined into one segmentation whose geometry is taken from a reference image, and conflicting label values are remapped automatically so that every label value is unique in the result.
 
-- Converts **images**, **surface meshes**, and **contours** into a single **multi-label segmentation** output.
-- Supports **grouping** inputs into distinct label groups.
-- Automatically resolves conflicting label values.
-- Ensures geometry consistency and validates spatial alignment.
-- Accepts DICOM, NIfTI, and other MITK-compatible image formats.
+Use it to turn plain label masks (e.g. the output of an external segmentation tool), surface meshes (`.stl`, `.vtp`, ...), or MITK contour files into a segmentation that the MITK Workbench segmentation tools understand, or to merge several such inputs into one segmentation. For a pure format conversion of an existing segmentation use [MitkFileConverter](@ref MITKFileConverterPage).
 
-
-## Basic Usage
+## Usage
 
 ```bash
-convertToMultiLabelSegmentation -i <input1> <input2> ... -o <output.nrrd> [options]
+MitkConvertToMultiLabelSegmentation -i <input1> [<input2> ...] -o <output> [-r <reference>] [-g]
 ```
 
+### Required arguments
 
-## Required Arguments
+| Argument | Short | Type | Description |
+|----------|-------|------|-------------|
+| `--inputs` | `-i` | String list | Paths to the input files (images, surfaces, or contours) to convert. |
+| `--output` | `-o` | File | Path of the output multi-label segmentation. The extension selects the output format. |
 
-| Argument               | Description                                                 |
-|------------------------|-------------------------------------------------------------|
-| `-i`, `--inputs`       | One or more input files (images, surfaces, or contours).    |
-| `-o`, `--output`       | Output file path for the resulting multi-label segmentation.|
+### Optional arguments
 
-## Optional Arguments
+| Argument | Short | Type | Default | Description |
+|----------|-------|------|---------|-------------|
+| `--reference` | `-r` | File | | Reference image that defines the geometry of the output. Only needed if no image is among the inputs. |
+| `--groups` | `-g` | Flag | | Put every input into its own label group. By default all labels are merged into one group. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
-| Argument                | Description                                                                 |
-|-------------------------|-----------------------------------------------------------------------------|
-| `-r`, `--reference`     | Reference image for defining the output geometry (required if no image inputs are used). |
-| `-g`, `--groups`        | Enable grouping: each input is placed into a separate label group. Default: all inputs are in one group. |
-| `-h`, `--help`          | Show help and usage information.                                            |
+## Details
 
+### Supported inputs
 
-## 🧪 Examples
+Every input file is loaded with the MITK DICOM reader preferred (`MITK DICOM Reader v2 (autoselect)`). Only the first data object loaded from a file is used; if a file yields several objects (e.g. a DICOM folder with several series) the others are ignored. The object must be an image (`mitk::Image`), a surface (`mitk::Surface`), a contour model, or a contour model set; any other type aborts the conversion with an error.
 
-### Example 1: Convert a single binary image mask
+### Reference geometry
+
+The output segmentation is initialized with the geometry of the reference image:
+
+- If `--reference` is given, that image is the reference.
+- Otherwise the reference is the input image with the largest geometry, i.e. the one whose geometry contains the geometries of all other input images. If there is no image among the inputs, the app aborts with an error.
+
+Every input image must either fit into the reference geometry or contain it (sub-geometry check with MITK's default tolerances); otherwise the conversion is aborted with `Geometry mismatch`. Surfaces and contours are not checked, they are rasterized into the reference geometry as they are.
+
+### Label extraction and naming
+
+- Image inputs: the pixel values are cast to the label value type (`unsigned short`). Values above `mitk::Label::MAX_LABEL_VALUE` abort the conversion. Every distinct non-zero value becomes one label; value 0 is background. Both 3D and 3D+t images are supported: for a dynamic image the labels are collected over all time steps and the content of every time step is transferred.
+- Surface inputs are rasterized with `mitk::SurfaceToImageFilter`, contour inputs with `mitk::ContourModelSetToImageFilter`. Each yields one binary mask with the label value 1.
+
+Label names depend on the grouping mode:
+
+| Input type | Default (single group) | `--groups` |
+|------------|------------------------|------------|
+| Image | `<file name> Value <original value>` | `Value <original value>` |
+| Surface, contour | `<file name>` | `<file name>` |
+
+`<file name>` is the file name including its extension, e.g. `liver.stl`. Label names are not made unique; passing the same file twice results in two labels with the same name.
+
+### Label values and collisions
+
+Inputs are processed in the given order. A label keeps its original value unless that value is already used by a previously processed label of the segmentation; in that case it receives the smallest value above the currently highest used value. The label name always refers to the original value (`Value 1`), even if the pixel value in the output was remapped. If no free value is left (all 65535 values are used) the app aborts with an error and suggests splitting the inputs into several conversions.
+
+Label values are unique over all groups. Every label gets a color from the MITK label color scheme.
+
+### Grouping and overlaps
+
+By default all labels end up in group 0, which has no name. With `--groups`, the first input goes to group 0 and every further input to a new group; each group is named after the file name (with extension) of its input.
+
+Labels are created locked, and the content transfer respects locks within a group. In the default single-group mode this means that where two inputs overlap, the pixel keeps the label of the input that was processed first. With `--groups` the inputs live in separate groups and overlaps are preserved.
+
+### Output
+
+The result is saved through the MITK I/O infrastructure; use `.nrrd` for the native MITK segmentation format (see also [MitkFileConverter](@ref MITKFileConverterPage) for other output options such as label stacks). On success the app prints the number of created groups and labels and exits with 0; any error exits with 1.
+
+## Examples
+
+### Convert a single binary mask
 
 ```bash
-convertToMultiLabelSegmentation -i tumor.nii.gz -o tumor.nrrd
+MitkConvertToMultiLabelSegmentation -i tumor.nii.gz -o tumor.nrrd
 ```
 
-**What happens**:  
-A single binary image is converted to a multi-label segmentation with one label.
+The mask becomes a segmentation with one group and one label named `tumor.nii.gz Value 1` with value 1.
 
-**Label & Group Naming**:  
-- Group: _Unnamed default group_
-- Label: `tumor Value 1`
-
-**Resulting Pixel Values**:  
-- Label `tumor Value 1`: value `1`
-
----
-
-### Example 2: Merge multiple binary masks into one group
+### Merge two masks into one group
 
 ```bash
-convertToMultiLabelSegmentation -i mask1.nii.gz mask2.nii.gz -o merged.nrrd
+MitkConvertToMultiLabelSegmentation -i liver.nii.gz spleen.nii.gz -o organs.nrrd
 ```
 
-**What happens**:  
-Two binary image masks are merged into a single label group.
+Both masks contain the value 1. `liver.nii.gz Value 1` keeps value 1, `spleen.nii.gz Value 1` collides and is remapped to value 2. Where the masks overlap, the pixel stays liver.
 
-**Label & Group Naming**:  
-- Group: _Unnamed default group_
-- Labels:
-  - `mask1 Value 1`
-  - `mask2 Value 1`
-
-**Resulting Pixel Values**:  
-- Label `mask1 Value 1`: value `1`  
-- Label `mask2 Value 1`: value `2`
-
----
-
-### Example 3: Group surface inputs into separate label groups (with reference image)
+### Rasterize surfaces into separate groups
 
 ```bash
-convertToMultiLabelSegmentation -i liver.stl spleen.stl kidney.stl -r reference.nii.gz -o organs.nrrd -g
+MitkConvertToMultiLabelSegmentation -i liver.stl spleen.stl kidney.stl -r ct.nrrd -o organs.nrrd -g
 ```
 
-**What happens**:  
-Each surface is rasterized using the reference image and placed in its own group.
+No image is among the inputs, so `ct.nrrd` provides the geometry. Each surface is rasterized into its own group named `liver.stl`, `spleen.stl`, and `kidney.stl`, with one label each (`liver.stl`, value 1; `spleen.stl`, value 2; `kidney.stl`, value 3). Overlapping organs are kept because they live in different groups.
 
-**Label & Group Naming**:  
-- Group `liver`: Label `liver`  
-- Group `spleen`: Label `spleen`  
-- Group `kidney`: Label `kidney`
-
-**Resulting Pixel Values**:  
-- Group `liver`, Label `liver`: value `1`
-- Group `spleen`, Label `spleen`: value `2`  
-- Group `kidney`, Label `kidney`: value `3`
-
----
-
-### Example 4: Convert a contour set using reference image
+### Convert a multi-value label image
 
 ```bash
-convertToMultiLabelSegmentation -i roi.contour -r referenceCT.nii.gz -o contour.nrrd
+MitkConvertToMultiLabelSegmentation -i atlas_labels.nrrd -o atlas.nrrd
 ```
 
-**What happens**:  
-Contours are rasterized into a binary mask using the reference image geometry.
-
-**Label & Group Naming**:  
-- Group: _Unnamed default group_
-- Label: `roi`
-
-**Resulting Pixel Values**:  
-- Label `roi`: value `1`
-
----
-
-### Example 5: Input image with multiple pixel values (multi-label image)
-
-```bash
-convertToMultiLabelSegmentation -i MultiLabelSeg.nii.gz -o resegmented.nrrd
-```
-
-**What happens**:  
-An image containing multiple pixel values (e.g., 1 = liver, 2 = spleen, 3 = kidney) is converted.
-
-**Label & Group Naming**:  
-- Group: _Unnamed default group_  
-- Labels:
-  - `MultiLabelSeg Value 1`  
-  - `MultiLabelSeg Value 2`  
-  - `MultiLabelSeg Value 3`
-
-**Resulting Pixel Values**:  
-- `MultiLabelSeg Value 1`: value `1`  
-- `MultiLabelSeg Value 2`: value `2`  
-- `MultiLabelSeg Value 3`: value `3`
-
----
-
-## 📂 Details
-
-### 🏷 Label Naming Strategy
-
-- **Image inputs**:
-  - Each unique pixel value is treated as a separate label.
-  - Label names follow the format: `<filename> Value <pixel_value>`.
-
-- **Non-image inputs** (surfaces, contours):
-  - Treated as binary masks.
-  - Label name is the filename without extension.
-
-### 📁 Group Naming Strategy
-
-- When `--groups` is **enabled**:
-  - Each input becomes a separate group, named from the input filename.
-
-- When `--groups` is **not enabled** (default):
-  - All labels are placed in a single unnamed group.
-
-### 🎯 Label Value Assignment Strategy
-
-- **Image Inputs**:
-  - Unique pixel values are extracted.
-  - If label values overlap across inputs, the tool automatically remaps values to avoid conflicts.
-  - Label names still reflect original values (e.g., `Value 2`), even if actual pixel values are remapped.
-
-- **Non-Image Inputs**:
-  - Converted into binary masks.
-  - Default pixel value is `1`.
-  - If conflicts exist, remapping is applied.
-
-- Label values after conversion are unique over all groups.
-
-## Output Format
-
-The resulting file is a standard **multi-label segmentation** in NRRD format:
-
-- Can be loaded into MITK or compatible toolkits.
-- Encodes labels and groups as distinct entities.
-- Stores label metadata (names, values, group names).
+An image with the values 1, 2, and 3 becomes one group with the labels `atlas_labels.nrrd Value 1`, `atlas_labels.nrrd Value 2`, and `atlas_labels.nrrd Value 3`; the pixel values stay 1, 2, and 3.

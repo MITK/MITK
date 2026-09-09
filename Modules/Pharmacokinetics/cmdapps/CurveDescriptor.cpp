@@ -56,10 +56,10 @@ void onFitEvent(::itk::Object* caller, const itk::EventObject & event, void* /*d
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("Curve Descriptor");
-    parser.setDescription("MiniApp that allows to generate curve descriptor maps for dynamic image.");
+    parser.setDescription("Generates curve descriptor maps for a dynamic image.");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 
@@ -87,7 +87,6 @@ void setupParser(mitkCommandLineParser& parser)
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
     parser.addArgument(
       "preview", "p", mitkCommandLineParser::Bool, "Preview outputs", "The application previews the outputs (filename, type) it would produce with the current settings.");
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
 }
@@ -187,13 +186,6 @@ int main(int argc, char* argv[])
     {
         return EXIT_FAILURE;
     };
-
-    // Show a help message
-    if (parsedArgs.count("help") || parsedArgs.count("h"))
-    {
-        std::cout << parser.helpText();
-        return EXIT_SUCCESS;
-    }
 
     //! [do processing]
     try

@@ -82,7 +82,7 @@ void setupParser(mitkCommandLineParser& parser)
   parser.addArgument("reference", "r",
     mitkCommandLineParser::File,
     "Reference image",
-    "Reference image defining the geometry for conversion (only needed if no input images are provided)",
+    "Reference image defining the geometry for conversion (required if no input images are provided, otherwise it overrides the geometry derived from the input images)",
     us::Any(), true, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("groups", "g",
@@ -90,11 +90,6 @@ void setupParser(mitkCommandLineParser& parser)
     "Separate groups",
     "Create separate label groups for each input (default: merge all into single group)",
     us::Any(false), true);
-
-  parser.addArgument("help", "h",
-    mitkCommandLineParser::Bool,
-    "Help",
-    "Show this help text");
   parser.endGroup();
 }
 
@@ -233,12 +228,6 @@ int main(int argc, char* argv[])
 
   const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
 
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
   if (!configureApplicationSettings(parsedArgs))
   {
     MITK_ERROR << "Invalid command line arguments. Use -h or --help for usage information.";
@@ -282,7 +271,7 @@ int main(int argc, char* argv[])
         // Check data type
         if (IsUnsupportedDataType(inputData))
         {
-          MITK_ERROR << "Unsupported data type ("<< inputData.data->GetNameOfClass() << ")"
+          MITK_ERROR << "Unsupported data type (" << inputData.data->GetNameOfClass() << ") "
             "for file: " << filename;
           return EXIT_FAILURE;
         }

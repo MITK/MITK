@@ -165,7 +165,9 @@ void mitk::MRNormTwoRegionsBasedFilter::InternalComputeMask(itk::Image<TPixel, V
   double offset = std::min(value0, value1);
   double scaling = std::max(value0, value1) - offset;
   if (scaling < 0.0001)
-    return;
+  {
+    mitkThrow() << "Normalization is not possible: the statistics of the two masked regions differ by only " << scaling << ", which is below 0.0001.";
+  }
 
   itk::ImageRegionIterator<ImageType> inIter(itkImage, itkImage->GetLargestPossibleRegion());
   itk::ImageRegionIterator<ImageType> outIter(outImage, outImage->GetLargestPossibleRegion());

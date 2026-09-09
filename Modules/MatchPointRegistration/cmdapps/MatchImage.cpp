@@ -57,7 +57,7 @@ void SetupParser(mitkCommandLineParser& parser)
 {
   parser.setTitle("Match Image");
   parser.setCategory("Registration Tools");
-  parser.setDescription("");
+  parser.setDescription("Registers a moving image onto a target image with a deployed MatchPoint algorithm and stores the resulting registration.");
   parser.setContributor("MIC, German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
@@ -124,7 +124,6 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.addArgument(
     "parameters", "p", mitkCommandLineParser::String, "Parameters", "Json string containing a json object that contains the parameters that should be passed to the algorithm as key value pairs.");
 
-  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }
 
@@ -219,7 +218,7 @@ mitk::Image::Pointer loadMaskImage(std::string filepath, std::string labelName =
 
     if (labelName.empty())
     {
-      MITK_INFO << "Selected mask has multiple labels. Using first one. If you want a certain label, please specify via the --movingMaskLabel / --targetMaskLabel argument.";
+      MITK_INFO << "Selected mask has multiple labels. Using first one. If you want a certain label, please specify via the --moving_mask_label / --target_mask_label argument.";
       return mitk::CreateLabelMask(maskMultiLabelImage, maskMultiLabelImage->GetAllLabelValues().front());
     }
 
@@ -288,6 +287,7 @@ CheckCastAndSetItkArrayProp(const nlohmann::json& valueSequence)
     {
       const auto castedElement = element.template get<TValueType>();
       castedValue[index] = castedElement;
+      ++index;
     }
     prop = map::core::MetaProperty<::itk::Array<TValueType>>::New(castedValue).GetPointer();
   }
@@ -412,13 +412,6 @@ int main(int argc, char* argv[])
     MITK_ERROR << "Command line arguments are invalid. To see the correct usage please call with -h or --help to show the help information.";
     return EXIT_FAILURE;
   };
-
-  // Show a help message
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
 
   std::cout << std::endl << "*******************************************" << std::endl;
   std::cout << "Moving file:        " << settings.movingFileName << std::endl;

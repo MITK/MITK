@@ -404,17 +404,19 @@ mitk::ImageMappingHelper::GenerateSuperSampledGeometry(const ResultImageGeometry
   resultGeometry->SetBounds(geoBounds);
   resultGeometry->SetSpacing(geoSpacing);
 
-  auto oldOrigin = inputGeometry->GetOrigin();
-
   //if we change the spacing we must also correct the origin to ensure
   //that the voxel matrix still covers the same space. This is due the fact
   //that the origin is not in the corner of the voxel matrix, but in the center
-  // of the voxel that is in the corner.
+  // of the voxel that is in the corner. The center of the new corner voxel
+  // lies at the continuous index -0.5 + 0.5 / scaling of the old grid.
+  mitk::Point3D newCornerIndex;
+  newCornerIndex[0] = -0.5 + 0.5 / xScaling;
+  newCornerIndex[1] = -0.5 + 0.5 / yScaling;
+  newCornerIndex[2] = -0.5 + 0.5 / zScaling;
+
   mitk::Point3D newOrigin;
-  for (mitk::Point3D::SizeType i = 0; i < 3; ++i)
-  {
-    newOrigin[i] = 0.5 * (geoSpacing[i] - oldSpacing[i]) + oldOrigin[i];
-  }
+  inputGeometry->IndexToWorld(newCornerIndex, newOrigin);
+  resultGeometry->SetOrigin(newOrigin);
 
   return resultGeometry;
 }

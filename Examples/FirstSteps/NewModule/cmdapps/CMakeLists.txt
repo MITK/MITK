@@ -1,11 +1,9 @@
-option(BUILD_NewModuleMiniApps "Build commandline tools for the example module" OFF)
+option(BUILD_NewModuleCmdApps "Build command-line apps of the example module" OFF)
 
-if(BUILD_NewModuleMiniApps)
-
+if(BUILD_NewModuleCmdApps)
   mitkFunctionCreateCommandLineApp(
-    NAME ExampleToUpperCaseMiniApp
+    NAME ExampleToUpperCase
     DEPENDS MitkNewModule
     NO_INSTALL
   )
-
 endif()

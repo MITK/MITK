@@ -30,6 +30,7 @@ found in the LICENSE file.
 =========================================================================*/
 
 // STL includes
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
@@ -427,19 +428,6 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
     {
       std::cout << "Processing" << argument;
     }
-    if (!argument.compare("--version"))
-    {
-      std::cout << "Git commit hash: " << MITK_REVISION << std::endl;
-      std::cout << "Git branch name: " << MITK_REVISION_NAME << "\n" << std::endl;
-    }
-
-    if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") ||
-        !argument.compare("-XML"))
-    {
-      this->generateXmlOutput();
-      return map<string, us::Any>();
-    }
-
     // should argument be ignored ?
     if (ignoreRest)
     {
@@ -692,12 +680,36 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
 // -------------------------------------------------------------------------
 map<string, us::Any> mitkCommandLineParser::parseArguments(int argc, char **argv, bool *ok)
 {
-  std::cout << "Running Command Line Utility *" << Title << "* (" << MITK_REVISION_DESC << ')' << std::endl;
-  StringContainerType arguments;
+  const StringContainerType arguments(argv, argv + argc);
 
-  // Create a StringContainerType of arguments
-  for (int i = 0; i < argc; ++i)
-    arguments.push_back(argv[i]);
+  // The informational arguments leave nothing for the app to do. Ending the
+  // process here gives scripts a zero exit code and keeps the output free of
+  // the banner, which matters for consumers of the XML description.
+  for (size_t i = 1; i < arguments.size(); ++i)
+  {
+    const auto &argument = arguments[i];
+
+    if (argument == "--xml" || argument == "-xml" || argument == "--XML" || argument == "-XML")
+    {
+      this->generateXmlOutput();
+      std::exit(EXIT_SUCCESS);
+    }
+
+    if (argument == "--help" || argument == "-h")
+    {
+      std::cout << this->helpText();
+      std::exit(EXIT_SUCCESS);
+    }
+
+    if (argument == "--version")
+    {
+      std::cout << "Git commit hash: " << MITK_REVISION << std::endl;
+      std::cout << "Git branch name: " << MITK_REVISION_NAME << std::endl;
+      std::exit(EXIT_SUCCESS);
+    }
+  }
+
+  std::cout << "Running Command Line Utility *" << Title << "* (" << MITK_REVISION_DESC << ')' << std::endl;
 
   return this->parseArguments(arguments, ok);
 }
@@ -849,6 +861,7 @@ string mitkCommandLineParser::helpText() const
   text = "Command Line Utility *" + Title + "* (" + MITK_REVISION_DESC + ") in Category *" + Category + "*\n";
   text += Description + "\n";
   text += Contributor + "\n\n";
+  text += "Use --help to print this text.\n";
   text += "Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.\n";
   text += "Use --version to print MITK revision information.\n";
 

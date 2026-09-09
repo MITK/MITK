@@ -121,6 +121,37 @@ static void TestComplexCase()
 
     }
 
+static void TestEvenNCase()
+    {
+
+    MITK_TEST_OUTPUT(<< "Starting even-N test case...");
+    mitk::Point3D testPoint;
+    mitk::PointSet::Pointer testPointSet = mitk::PointSet::New();
+
+    //1st point
+    mitk::FillVector3D(testPoint,0,0,0);
+    testPointSet->InsertPoint(0,testPoint);
+
+    //2nd point
+    mitk::FillVector3D(testPoint,1,0,0);
+    testPointSet->InsertPoint(1,testPoint);
+
+    //3rd point
+    mitk::FillVector3D(testPoint,3,0,0);
+    testPointSet->InsertPoint(2,testPoint);
+
+    //4th point
+    mitk::FillVector3D(testPoint,10,0,0);
+    testPointSet->InsertPoint(3,testPoint);
+
+    mitk::PointSetStatisticsCalculator::Pointer myPointSetStatisticsCalculator = mitk::PointSetStatisticsCalculator::New(testPointSet);
+
+    // mean is (3.5,0,0); position errors are 3.5, 2.5, 0.5, 6.5, sorted
+    // 0.5, 2.5, 3.5, 6.5; for an even count the median is the mean of the
+    // two middle values, (2.5+3.5)/2 = 3.0
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMedian(),3.0, 1E-5),".. Testing GetPositionErrorMedian for an even number of points");
+    }
+
 
 };
 
@@ -132,6 +163,7 @@ int mitkPointSetStatisticsCalculatorTest(int, char* [])
   mitkPointSetStatisticsCalculatorTestClass::TestInstantiation();
   mitkPointSetStatisticsCalculatorTestClass::TestSimpleCase();
   mitkPointSetStatisticsCalculatorTestClass::TestComplexCase();
+  mitkPointSetStatisticsCalculatorTestClass::TestEvenNCase();
 
   MITK_TEST_END()
 }

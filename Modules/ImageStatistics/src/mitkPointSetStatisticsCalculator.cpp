@@ -100,9 +100,9 @@ double mitk::PointSetStatisticsCalculator::GetMedian(std::vector<double> list)
 {
 if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
-if (list.size() % 2 == 0.) //even
+if (list.size() % 2 == 0) //even
   {
-  double element1 = list.at(list.size()/2);
+  double element1 = list.at(list.size()/2 - 1);
   double element2 = list.at(list.size()/2);
   return ((element1+element2)/2.0);
   }

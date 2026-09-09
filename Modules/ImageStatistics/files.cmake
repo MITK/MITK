@@ -3,6 +3,7 @@ set(H_FILES
   mitkHotspotMaskGenerator.h
   mitkLabelStatisticsImageFilter.h
   mitkMaskUtilities.h
+  mitkMedianAccumulator.h
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h
   mitkStatisticsImageFilter.h

@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <itkImageLinearConstIteratorWithIndex.h>
 #include <itkImageScanlineConstIterator.h>
 
+#include <utility>
+
 template <typename TInputImage>
 mitk::LabelStatisticsImageFilter<TInputImage>::LabelStatistics::LabelStatistics()
   : m_Count(0),
@@ -70,6 +72,8 @@ mitk::LabelStatisticsImageFilter<TInputImage>::LabelStatistics::LabelStatistics(
   m_Histogram = HistogramType::New();
   m_Histogram->SetMeasurementVectorSize(1);
   m_Histogram->Initialize(histogramSize, histogramLowerBound, histogramUpperBound);
+
+  m_MedianAccumulator = MedianAccumulator<PixelType>(lowerBound, upperBound);
 }
 
 template <typename TInputImage>
@@ -159,6 +163,7 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData
         histogramMeasurement[0] = value;
         labelStats.m_Histogram->GetIndex(histogramMeasurement, histogramIndex);
         labelStats.m_Histogram->IncreaseFrequencyOfIndex(histogramIndex, 1);
+        labelStats.m_MedianAccumulator.Add(it.Get());
       }
 
       ++labelIt;
@@ -244,7 +249,7 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::AfterStreamedGenerateData() 
       stats.m_Entropy = histogramStatisticsCalculator.GetEntropy();
       stats.m_Uniformity = histogramStatisticsCalculator.GetUniformity();
       stats.m_UPP = histogramStatisticsCalculator.GetUPP();
-      stats.m_Median = histogramStatisticsCalculator.GetMedian();
+      stats.m_Median = stats.m_MedianAccumulator.ComputeMedian();
     }
   }
 }
@@ -327,6 +332,8 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::MergeMap(MapType& map1, MapT
           index[0] = bin;
           stats1.m_Histogram->IncreaseFrequency(bin, stats2.m_Histogram->GetFrequency(bin));
         }
+
+        stats1.m_MedianAccumulator.Merge(std::move(stats2.m_MedianAccumulator));
       }
     }
   }

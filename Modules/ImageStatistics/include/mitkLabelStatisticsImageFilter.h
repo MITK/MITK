@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <vector>
 
 #include <mitkLabel.h>
+#include <mitkMedianAccumulator.h>
 
 namespace mitk
 {
@@ -36,6 +37,7 @@ namespace mitk
    * It computes, for each label in a label image, a comprehensive set of statistics:
    * count, min, max, mean, sigma, variance, sum, sum of squares/cubes/quadruples,
    * skewness, kurtosis, MPP, median, uniformity, UPP, entropy, and a histogram.
+   * The median is exact and computed in the same pass as the other statistics.
    *
    * The filter is streaming-capable via itk::ImageSink and supports multi-threaded
    * processing.
@@ -105,6 +107,7 @@ namespace mitk
       RealType m_Kurtosis;
       BoundingBoxType m_BoundingBox;
       HistogramPointer m_Histogram;
+      MedianAccumulator<PixelType> m_MedianAccumulator;
     };
 
     using MapType = std::unordered_map<LabelPixelType, LabelStatistics>;

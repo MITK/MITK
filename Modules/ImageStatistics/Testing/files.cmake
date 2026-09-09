@@ -1,5 +1,6 @@
 set(MODULE_TESTS
   mitkImageStatisticsCalculatorTest.cpp
+  mitkMedianAccumulatorTest.cpp
   mitkPointSetStatisticsCalculatorTest.cpp
   mitkPointSetDifferenceStatisticsCalculatorTest.cpp
   mitkImageStatisticsTextureAnalysisTest.cpp

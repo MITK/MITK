@@ -181,7 +181,7 @@ private:
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
     mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian = 0);
 
-  // T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+  // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
     mitk::ImageStatisticsContainer::VoxelCountType N,
     mitk::ImageStatisticsContainer::RealType mean,
@@ -678,7 +678,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsFloatM
   this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.375, 115.375);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 {
   MITK_INFO << std::endl << "Test Pic3D cropped without mask:-----------------------------------------------------------------------------------";
@@ -729,7 +729,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 {
   MITK_INFO << std::endl << "Test Pic3D cropped binary mask:-----------------------------------------------------------------------------------";
@@ -788,7 +788,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 {
   MITK_INFO << std::endl << "Test Pic3D cropped multi-label mask:-----------------------------------------------------------------------------------";
@@ -847,7 +847,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 {
   MITK_INFO << std::endl << "Test Pic3D cropped planar figure:-----------------------------------------------------------------------------------";
@@ -905,7 +905,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 {
   MITK_INFO << std::endl << "Test US4D cropped without mask time step 1:-----------------------------------------------------------------------------------";
@@ -955,7 +955,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 {
   MITK_INFO << std::endl << "Test US4D cropped with binary mask time step 1:-----------------------------------------------------------------------------------";
@@ -1013,7 +1013,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeStep1()
 {
   MITK_INFO << std::endl << "Test US4D cropped with multi-label mask time step 1:-----------------------------------------------------------------------------------";
@@ -1071,7 +1071,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
     expected_maxIndex);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep1()
 {
   MITK_INFO << std::endl << "Test US4D cropped planar figure time step 1:-----------------------------------------------------------------------------------";
@@ -1227,7 +1227,7 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   CPPUNIT_ASSERT_MESSAGE("Calculated median gray value is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
 }
 
-// T26098 histogram statistics need to be tested (uniformity, UPP, entropy)
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
   mitk::ImageStatisticsContainer::VoxelCountType N,
   mitk::ImageStatisticsContainer::RealType mean,

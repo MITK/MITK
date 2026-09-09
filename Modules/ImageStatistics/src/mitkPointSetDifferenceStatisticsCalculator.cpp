@@ -195,7 +195,7 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     }
     else
     {
-      median = differencesVector.at((numberOfPoints-1)/2+1);
+      median = differencesVector.at((numberOfPoints-1)/2);
     }
     m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), mean);
     m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), sd);

@@ -71,8 +71,8 @@ namespace mitk
 
     /** \brief Name of the MITK module where the log message was emitted.
      *
-     * Automatically set by PseudoLogStream from the \c MITKLOG_MODULENAME macro
-     * before the message is distributed to backends.
+     * Automatically set by the PseudoLogStream constructor, from the
+     * \c MITKLOG_MODULENAME macro as it resolves in the calling module.
      */
     std::string ModuleName;
 

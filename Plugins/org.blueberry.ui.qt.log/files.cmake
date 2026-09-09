@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   berryLogView.cpp
+  berryQtLogFilterProxyModel.cpp
   berryQtLogPlugin.cpp
   berryQtLogView.cpp
   berryQtPlatformLogModel.cpp
@@ -11,6 +12,7 @@ set(INTERNAL_CPP_FILES
 
 set(MOC_H_FILES
   src/internal/berryLogView.h
+  src/internal/berryQtLogFilterProxyModel.h
   src/internal/berryQtLogPlugin.h
   src/internal/berryQtLogView.h
   src/internal/berryQtPlatformLogModel.h

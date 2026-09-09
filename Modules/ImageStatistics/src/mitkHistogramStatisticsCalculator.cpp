@@ -34,7 +34,7 @@ HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::Ge
 {
     if (!m_StatisticsCalculated)
     {
-        MITK_WARN("Statistics have not yet been calculated, running calculation now...");
+        MITK_WARN << "Statistics have not yet been calculated, running calculation now...";
         CalculateStatistics();
     }
     return m_Entropy;
@@ -44,7 +44,7 @@ HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::Ge
 {
     if (!m_StatisticsCalculated)
     {
-        MITK_WARN("Statistics have not yet been calculated, running calculation now...");
+        MITK_WARN << "Statistics have not yet been calculated, running calculation now...";
         CalculateStatistics();
     }
     return m_Median;
@@ -54,7 +54,7 @@ HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::Ge
 {
     if (!m_StatisticsCalculated)
     {
-        MITK_WARN("Statistics have not yet been calculated, running calculation now...");
+        MITK_WARN << "Statistics have not yet been calculated, running calculation now...";
         CalculateStatistics();
     }
     return m_Uniformity;
@@ -64,7 +64,7 @@ HistogramStatisticsCalculator::MeasurementType HistogramStatisticsCalculator::Ge
 {
     if (!m_StatisticsCalculated)
     {
-        MITK_WARN("Statistics have not yet been calculated, running calculation now...");
+        MITK_WARN << "Statistics have not yet been calculated, running calculation now...";
         CalculateStatistics();
     }
     return m_UPP;

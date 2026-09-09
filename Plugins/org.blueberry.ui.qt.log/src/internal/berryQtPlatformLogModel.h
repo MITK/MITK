@@ -17,23 +17,20 @@ found in the LICENSE file.
 
 #include <ctkPluginFrameworkEvent.h>
 
-#include <QtCore/QAbstractTableModel>
-#include <QtCore/QDateTime>
-
-#include <ctime>
-#include <sstream>
-
-#include <berryLog.h>
-
+#include <QAbstractTableModel>
+#include <QDateTime>
+#include <QIcon>
 #include <QMutex>
 
+#include <deque>
 
 namespace berry {
 
-/** Documentation
- *  @brief An object of this class represents a table of logging data.
- *         The table presentation can be modified by the methods
- *         SetShowAdvancedFiels() and SetShowCategory().
+/** \brief A table of the log messages distributed to the MITK log backends.
+ *
+ * The model always exposes all columns of Column. Which of them are shown is up
+ * to the view: a single model instance is shared by every log view, so column
+ * visibility cannot be model state.
  */
 class QtPlatformLogModel : public QAbstractTableModel
 {
@@ -41,109 +38,146 @@ class QtPlatformLogModel : public QAbstractTableModel
 
 public:
 
+  /** \brief The fields of a log message, in display order.
+   *
+   * There is deliberately no Count enumerator so that switches over this enum
+   * can omit the default label and adding a field is caught at compile time.
+   * ColumnCount takes its place, which is why Line has to stay last.
+   */
+  enum class Column
+  {
+    Time,
+    Level,
+    Message,
+    Module,
+    Function,
+    File,
+    Line
+  };
+
+  static constexpr int ColumnCount = static_cast<int>(Column::Line) + 1;
+
+  /** \brief The number of messages kept before the oldest ones are dropped.
+   *
+   * Without a limit the table grows for as long as the application runs.
+   */
+  static constexpr int MaxEntries = 10000;
+
+  /** \brief Custom item data roles.
+   *
+   * LogLevelRole is answered by every column so that filtering by level does not
+   * depend on where the level column sits. SortRole yields naturally ordered
+   * values for the columns whose display string sorts wrongly.
+   */
+  enum Role
+  {
+    LogLevelRole = Qt::UserRole,
+    SortRole
+  };
+
   QtPlatformLogModel(QObject* parent = nullptr);
   ~QtPlatformLogModel() override;
 
-  void SetShowAdvancedFiels( bool showAdvancedFiels );
-  void SetShowCategory( bool showCategory );
-  int rowCount(const QModelIndex&) const override;
-  int columnCount(const QModelIndex&) const override;
-  QVariant data(const QModelIndex& index, int) const override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-  /** Documentation
-   *  @return Returns the complete table data as string representation.
-   */
-  QString GetDataAsString();
+  /** \brief Discard all messages recorded so far. */
+  void Clear();
 
-  QVariant headerData(int section, Qt::Orientation orientation, int) const override;
-
-  void addLogEntry(const mitk::LogMessage &msg);
+  void addLogEntry(const mitk::LogMessage& msg);
 
   Q_SLOT void addLogEntry(const ctkPluginFrameworkEvent& event);
 
-private:
-  bool m_ShowAdvancedFiels;
-  bool m_ShowCategory;
-
-  /** Documentation
-   *  @brief An object of this struct internally represents a logging message.
-   *         It offers methods to convert the logging data into QVaraint objects
-   *         and also adds time and threadid as logging data. The struct is
-   *         internally used to store logging data in the table data model.
+  /** \brief The severity rank of a log level, ascending.
+   *
+   * Debug < Info < Warn < Error < Fatal. The declaration order of mitk::LogLevel
+   * is not its severity order, so the levels cannot be compared directly.
    */
-  struct ExtendedLogMessage {
+  static int GetSeverityRank(mitk::LogLevel level);
+
+  static QString GetLevelName(mitk::LogLevel level);
+  static const QIcon& GetLevelIcon(mitk::LogLevel level);
+
+  /** \brief Whether a column carries information worth showing only on demand.
+   *
+   * The view hides these columns and the filter proxy excludes them from the
+   * text search, so both follow one definition.
+   */
+  static bool IsDetailColumn(Column column);
+
+private:
+
+  /** \brief A log message plus the arrival data the log mechanism does not carry.
+   */
+  struct ExtendedLogMessage
+  {
     mitk::LogMessage message;
-    clock_t time;
-    int threadid;
+    QDateTime time;
 
-    ExtendedLogMessage(const ExtendedLogMessage &src):message(src.message),time(src.time),threadid(src.threadid)
-    {
-    }
+    /** \brief The message with every run of whitespace collapsed to a space.
+     *
+     * Messages forwarded from ITK or VTK and exception descriptions span several
+     * lines, which a single table row cannot show. Cached rather than derived on
+     * demand because it is read on every repaint and on every keystroke in the
+     * filter.
+     */
+    QString singleLineMessage;
 
-    ExtendedLogMessage(const mitk::LogMessage &msg):message(msg),time(std::clock()),threadid(0)
-    {
-    }
+    /** \brief The file the message came from, without its directories.
+     *
+     * The full path is far wider than the column and the same for every message
+     * from one file, so the file column shows only this and offers the path as a
+     * tool tip.
+     */
+    QString fileName;
 
-    ExtendedLogMessage operator = (const ExtendedLogMessage& src)
-    {
-      return ExtendedLogMessage(src);
-    }
+    /** Implemented in the cpp file to save includes. */
+    ExtendedLogMessage(const mitk::LogMessage& msg);
 
-    QVariant getLevel() const
-    {
-    switch(this->message.Level)
-        {
-          default:
-          case mitk::LogLevel::Info:
-            return QVariant(Info);
+    /** mitk::LogMessage has const members, so it is copyable but not assignable.
+     *  Spelling that out keeps a silently discarded assignment from compiling;
+     *  it is also why the entries are kept in a std::deque rather than a QList,
+     *  as QList requires an assignable element type.
+     */
+    ExtendedLogMessage& operator=(const ExtendedLogMessage& src) = delete;
 
-          case mitk::LogLevel::Warn:
-            return QVariant(Warn);
-
-          case mitk::LogLevel::Error:
-            return QVariant(Error);
-
-          case mitk::LogLevel::Fatal:
-            return QVariant(Fatal);
-
-          case mitk::LogLevel::Debug:
-            return QVariant(Debug);
-        }
-    }
+    /** Declaring the assignment operator suppresses the implicit move
+     *  constructor, and every entry is moved once, out of the queue the log
+     *  backend fills and into the table. Declaring the move constructor in turn
+     *  suppresses the implicit copy constructor, hence both.
+     */
+    ExtendedLogMessage(const ExtendedLogMessage& src) = default;
+    ExtendedLogMessage(ExtendedLogMessage&& src) = default;
 
     QVariant getMessage() const
     {
-    return QVariant(QString::fromStdString(this->message.Message));
-    }
-
-    QVariant getCategory() const
-    {
-    return QVariant(QString::fromStdString(this->message.Category));
+      return QVariant(QString::fromStdString(this->message.Message));
     }
 
     QVariant getModuleName() const
     {
-    return QVariant(QString::fromStdString(this->message.ModuleName));
+      return QVariant(QString::fromStdString(this->message.ModuleName));
     }
 
     QVariant getFunctionName() const
     {
-    return QVariant(QString::fromStdString(this->message.FunctionName));
+      return QVariant(QString::fromStdString(this->message.FunctionName));
     }
 
-    QVariant getPath() const
-    {
-    return QVariant(QString::fromStdString(this->message.FilePath));
-    }
+    /** \brief The origin of the message, relative to the MITK source tree.
+     *
+     * Implemented in the cpp file to save includes.
+     */
+    QVariant getPath() const;
 
     QVariant getLine() const
     {
-    return QVariant(QString::number(this->message.LineNumber));
+      return QVariant(QString::number(this->message.LineNumber));
     }
 
-    /** This method is implemented in the cpp file to save includes. */
     QVariant getTime() const;
-
   };
 
   class QtLogBackend : public mitk::LogBackendBase
@@ -186,14 +220,13 @@ private:
 
   } *myBackend;
 
-  QList<ExtendedLogMessage> m_Entries;
-  QList<ExtendedLogMessage> *m_Active,*m_Pending;
+  std::deque<ExtendedLogMessage> m_Entries;
+  std::deque<ExtendedLogMessage> *m_Active,*m_Pending;
 
-  static const QString Error;
-  static const QString Warn;
-  static const QString Fatal;
-  static const QString Info;
-  static const QString Debug;
+  /** Whether a flush is already on the event queue. Messages arriving while one
+   *  is pending are picked up by it rather than queueing an event of their own.
+   */
+  bool m_FlushPending;
 
   QMutex m_Mutex;
 

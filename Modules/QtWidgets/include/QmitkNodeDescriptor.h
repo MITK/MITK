@@ -19,10 +19,18 @@ found in the LICENSE file.
 #include <QAction>
 #include <QIcon>
 #include <QList>
+#include <QPixmap>
 #include <QString>
 #include <QWidgetAction>
 #include <map>
 #include <mitkNodePredicateBase.h>
+
+namespace mitk
+{
+  class Image;
+}
+
+class vtkLookupTable;
 
 /**
  * \ingroup QmitkModule
@@ -59,6 +67,13 @@ public:
   /// Returns an Icon for this class of DataNodes
   ///
   virtual QIcon GetIcon(const mitk::DataNode *node) const;
+  /**
+   * Returns a preview of the given node that fits into a size x size box.
+   *
+   * Falls back to GetIcon() if no preview can be generated for the node.
+   * Override to provide a preview for a specific type of data.
+   */
+  virtual QPixmap GenerateThumbnail(const mitk::DataNode *node, int size) const;
   ///
   /// Returns an Icon for this class of DataNodes
   ///
@@ -90,6 +105,16 @@ public slots:
   void ActionDestroyed(QObject *obj = nullptr);
 
 protected:
+  /**
+   * Renders a preview of the image, colored by the given lookup table, into a
+   * pixmap that fits into a size x size box.
+   *
+   * Returns a null pixmap if no preview can be rendered for the image, so that
+   * callers can fall back to the icon. Intended for GenerateThumbnail()
+   * overrides that supply their own image and lookup table.
+   */
+  static QPixmap RenderThumbnail(const mitk::Image *image, vtkLookupTable *lookupTable, int size);
+
   QString m_ClassName;
   QIcon m_Icon;
   mitk::NodePredicateBase::Pointer m_Predicate;

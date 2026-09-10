@@ -42,8 +42,8 @@ set(CPP_FILES
   QmitkNodeSelectionDialog.cpp
   QmitkNodeSelectionListItemWidget.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
-  QmitkNodeDescriptor.cpp
   QmitkColoredNodeDescriptor.cpp
+  QmitkThemedNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
   QmitkProgressBar.cpp
   QmitkPropertiesTableEditor.cpp

@@ -64,6 +64,9 @@ namespace mitk
     /** \brief The type of the std::vector stored by this property. */
     typedef std::vector<DATATYPE> VectorType;
 
+    /** \brief The type of the value stored by this property. */
+    typedef VectorType ValueType;
+
     // Manually expand most of mitkClassMacro:
     //   mitkClassMacro(VectorProperty<DATATYPE>, mitk::BaseProperty);
     // This manual expansion is done to override explicitly
@@ -92,6 +95,7 @@ namespace mitk
     const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+    mitkNewMacro1Param(Self, const VectorType &);
 
     /**
      * \brief Return the property value as a human-readable string.
@@ -132,8 +136,11 @@ namespace mitk
      */
     bool FromJSON(const nlohmann::json& j) override;
 
+    using BaseProperty::operator=;
+
   protected:
     VectorProperty() = default;
+    explicit VectorProperty(const VectorType &value) : m_PropertyContent(value) {}
     VectorProperty(const Self &other) : BaseProperty(other), m_PropertyContent(other.m_PropertyContent) {}
 
     mitkCloneMacro(Self);

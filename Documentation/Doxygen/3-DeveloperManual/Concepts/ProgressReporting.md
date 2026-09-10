@@ -175,8 +175,9 @@ on the thread that owns it:
 QmitkRunWithInputBlocked([&]() { Save(saveInfos); }, written);
 ~~~
 
-`QmitkPrebuildVtkRepresentation()` does the same for work that does not run
-through that helper.
+It does so through `mitk::BaseData::PrebuildVtkRepresentation()`, which every
+data type with a lazily built representation overrides. Call it directly for
+work that does not run through that helper.
 
 ## What a worker may touch
 

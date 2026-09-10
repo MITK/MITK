@@ -511,6 +511,8 @@ namespace mitk
      *\pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
+    void PrebuildVtkRepresentation() const override;
+
     /** Updates a group image by copying a given source image content.
     * \remark the pixel content of the sourceImage will be simply copied. It won't
     * be checked if the source only contains valid label values for the group.

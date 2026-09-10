@@ -614,6 +614,12 @@ const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType gr
   return m_GroupContainer.at(groupID).GetPointer();
 }
 
+void mitk::MultiLabelSegmentation::PrebuildVtkRepresentation() const
+{
+  for (const auto &groupImage : m_GroupContainer)
+    groupImage->PrebuildVtkRepresentation();
+}
+
 void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep, int sourceAccessOptions)
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot update group image. Group ID is invalid. Invalid ID: " << groupID;

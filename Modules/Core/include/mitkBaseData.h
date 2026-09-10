@@ -356,6 +356,19 @@ namespace mitk
     virtual bool IsEmpty() const;
 
     /**
+     * \brief Build the representation that is otherwise created on first access.
+     *
+     * mitk::Image and mitk::Surface create their VTK representation the first
+     * time it is asked for, on whatever thread asks. Calling this beforehand on
+     * the thread that owns the data keeps that build away from a worker that
+     * only reads, while the mappers on the owning thread read the same object.
+     *
+     * Does nothing by default. A subclass with a lazily built representation
+     * overrides it; a composite type forwards to its parts.
+     */
+    virtual void PrebuildVtkRepresentation() const;
+
+    /**
      * \brief Set the requested region from this data object to match the requested
      * region of the data object passed in as a parameter.
      *

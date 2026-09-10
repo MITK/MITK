@@ -159,6 +159,14 @@ vtkPolyData *mitk::Surface::GetVtkPolyData(unsigned int t) const
   return nullptr;
 }
 
+void mitk::Surface::PrebuildVtkRepresentation() const
+{
+  const auto timeSteps = this->GetTimeSteps();
+
+  for (unsigned int t = 0; t < timeSteps; ++t)
+    static_cast<void>(this->GetVtkPolyData(t));
+}
+
 void mitk::Surface::UpdateOutputInformation()
 {
   if (this->GetSource().IsNotNull())

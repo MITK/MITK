@@ -14,14 +14,9 @@ found in the LICENSE file.
 
 #include <mitkCoreServices.h>
 #include <mitkCustomMimeType.h>
-#include <mitkFileReaderRegistry.h>
-#include <mitkFileWriterRegistry.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkMimeType.h>
 #include <mitkIOUtil.h>
-#include <mitkImage.h>
-#include <mitkLabelSetImage.h>
-#include <mitkSurface.h>
 
 #include <QmitkFileReaderOptionsDialog.h>
 #include <QmitkFileWriterOptionsDialog.h>
@@ -29,16 +24,10 @@ found in the LICENSE file.
 
 // QT
 #include <QApplication>
-#include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QSet>
-#include <QString>
 #include <QStringList>
 #include <QThread>
-
-// ITK
-#include <itksys/SystemTools.hxx>
 
 #include <algorithm>
 

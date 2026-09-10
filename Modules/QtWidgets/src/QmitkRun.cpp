@@ -14,20 +14,13 @@ found in the LICENSE file.
 
 #include <QmitkProgressNotificationOverlay.h>
 
-#include <mitkImage.h>
-#include <mitkLabelSetImage.h>
+#include <mitkBaseData.h>
 #include <mitkLog.h>
-#include <mitkSurface.h>
 
 #include <QApplication>
-#include <QCoreApplication>
-#include <QEventLoop>
 #include <QFutureWatcher>
 #include <QMouseEvent>
 #include <QProgressDialog>
-#include <QScopeGuard>
-#include <QThread>
-#include <QWidget>
 #include <QWindow>
 
 #include <QtConcurrent>
@@ -257,38 +250,6 @@ void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::func
   RunAndWait(task, [&dialog]() { dialog.close(); });
 }
 
-void QmitkPrebuildVtkRepresentation(const mitk::BaseData *data)
-{
-  if (nullptr == data)
-    return;
-
-  const auto timeSteps = data->GetTimeSteps();
-
-  if (const auto *image = dynamic_cast<const mitk::Image *>(data); nullptr != image)
-  {
-    const auto channels = image->GetNumberOfChannels();
-
-    for (unsigned int t = 0; t < timeSteps; ++t)
-      for (unsigned int n = 0; n < channels; ++n)
-        static_cast<void>(image->GetVtkImageData(static_cast<int>(t), static_cast<int>(n)));
-  }
-  else if (const auto *surface = dynamic_cast<const mitk::Surface *>(data); nullptr != surface)
-  {
-    for (unsigned int t = 0; t < timeSteps; ++t)
-      static_cast<void>(surface->GetVtkPolyData(t));
-  }
-  else if (const auto *segmentation = dynamic_cast<const mitk::MultiLabelSegmentation *>(data);
-           nullptr != segmentation)
-  {
-    // Not an Image itself, but its group images are the ones a writer reads
-    // and the mappers keep re-extracting.
-    const auto groups = segmentation->GetNumberOfGroups();
-
-    for (unsigned int group = 0; group < groups; ++group)
-      QmitkPrebuildVtkRepresentation(segmentation->GetGroupImage(group));
-  }
-}
-
 void QmitkRunWithInputBlocked(std::function<void()> task, const std::vector<const mitk::BaseData *> &read)
 {
   // The blocker below keeps user input out, but the list of event types it
@@ -312,7 +273,8 @@ void QmitkRunWithInputBlocked(std::function<void()> task, const std::vector<cons
   // Before the worker starts, and on the thread that owns the data, which is
   // where a representation the mappers read has to be built.
   for (const auto *data : read)
-    QmitkPrebuildVtkRepresentation(data);
+    if (nullptr != data)
+      data->PrebuildVtkRepresentation();
 
   // No dialog: the progress notifications are the feedback.
   InputBlocker blocker;

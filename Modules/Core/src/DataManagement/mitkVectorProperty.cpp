@@ -66,7 +66,11 @@ namespace mitk
   template <typename DATATYPE>
   void VectorProperty<DATATYPE>::SetValue(const VectorType &newValue)
   {
-    m_PropertyContent = newValue;
+    if (m_PropertyContent != newValue)
+    {
+      m_PropertyContent = newValue;
+      this->Modified();
+    }
   }
 
   template <typename DATATYPE>

@@ -116,6 +116,9 @@ namespace mitk
 
     /**
      * \brief Set the content vector.
+     *
+     * Calls Modified() only if the new vector differs from the current content.
+     *
      * \param[in] parameter_vector The new vector to store.
      */
     virtual void SetValue(const VectorType &parameter_vector);

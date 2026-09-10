@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include <vtkNeverTranslucentTexture.h>
 
 #include <vtkAssembly.h>
-#include <vtkDataSetMapper.h>
 #include <vtkFeatureEdges.h>
 #include <vtkHedgeHog.h>
 #include <vtkImageData.h>
@@ -32,8 +31,10 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
+#include <vtkShaderProperty.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTubeFilter.h>
+#include <vtkUniforms.h>
 
 namespace mitk
 {
@@ -396,12 +397,22 @@ namespace mitk
           this->ProcessNode(node, renderer, surface, layerSortedActors);
       }
 
-      // Add all image actors to the assembly, sorted according to
-      // layer property
-      LayerSortedActorList::iterator actorIt;
-      for (actorIt = layerSortedActors.begin(); actorIt != layerSortedActors.end(); ++actorIt)
+      // All image actors share the same plane polydata and are therefore
+      // exactly coplanar. Draw order alone cannot resolve their layer order
+      // since VTK renders opaque and translucent actors in separate passes.
+      // Hence, the layer order is encoded in the depth buffer: the topmost
+      // image keeps the true plane depth (picking hits it exactly), each
+      // lower image is pushed back by one unit of VTK's coincident topology
+      // offset (1/65000 of the depth range).
+      const auto numActors = layerSortedActors.size();
+      std::size_t actorIndex = 0;
+
+      for (const auto &[layer, imageActor] : layerSortedActors)
       {
-        m_ImageAssembly->AddPart(actorIt->second);
+        const auto rankFromTop = static_cast<float>(numActors - 1 - actorIndex++);
+        imageActor->GetShaderProperty()->GetFragmentCustomUniforms()->SetUniformf(
+          "mitkLayerDepthOffset", rankFromTop / 65000.0f);
+        m_ImageAssembly->AddPart(imageActor);
       }
 
       // Configurate the tube-shaped frame: size according to the surface
@@ -467,41 +478,40 @@ namespace mitk
         {
           BaseRenderer::Pointer planeRenderer =
             dynamic_cast<BaseRenderer *>(rendererProp->GetWeakPointer().GetPointer());
-          // Retrieve and update image to be mapped
-          const ImageVtkMapper2D::LocalStorage *localStorage = imageMapper->GetConstLocalStorage(planeRenderer);
 
           if (planeRenderer.IsNotNull())
           {
             // perform update of imagemapper if needed (maybe the respective 2D renderwindow is not rendered/update
             // before)
             imageMapper->Update(planeRenderer);
+            const ImageVtkMapper2D::LocalStorage *localStorage = imageMapper->GetConstLocalStorage(planeRenderer);
 
             // If it has not been initialized already in a previous pass,
             // generate an actor and a texture object to
             // render the image associated with the ImageVtkMapper2D.
             vtkActor *imageActor;
-            vtkDataSetMapper *dataSetMapper = nullptr;
+            vtkPolyDataMapper *polyDataMapper = nullptr;
             vtkTexture *texture;
             if (m_ImageActors.count(imageMapper) == 0)
             {
-              dataSetMapper = vtkDataSetMapper::New();
+              polyDataMapper = vtkPolyDataMapper::New();
 
               texture = vtkNeverTranslucentTexture::New();
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
-              imageActor->SetMapper(dataSetMapper);
+              imageActor->SetMapper(polyDataMapper);
               imageActor->SetTexture(texture);
-              imageActor->GetProperty()->SetOpacity(
-                0.999); // HACK! otherwise VTK wouldn't recognize this as translucent
-                        // surface (if LUT values map to alpha < 255
-              // improvement: apply "opacity" property onle HERE and also in 2D image mapper. DO NOT change LUT to
-              // achieve
-              // translucent images (see method ChangeOpacity in image mapper 2D)
+
+              // Layer-dependent depth offset, see GenerateDataForRenderer()
+              auto *shaderProperty = imageActor->GetShaderProperty();
+              shaderProperty->AddFragmentShaderReplacement(
+                "//VTK::Depth::Impl", true, "gl_FragDepth = gl_FragCoord.z + mitkLayerDepthOffset;\n", false);
+              shaderProperty->GetFragmentCustomUniforms()->SetUniformf("mitkLayerDepthOffset", 0.0f);
 
               // Make imageActor the sole owner of the mapper and texture
               // objects
-              dataSetMapper->UnRegister(nullptr);
+              polyDataMapper->UnRegister(nullptr);
               texture->UnRegister(nullptr);
 
               // Store the actor so that it may be accessed in following
@@ -513,18 +523,18 @@ namespace mitk
               // Else, retrieve the actor and associated objects from the
               // previous pass.
               imageActor = m_ImageActors[imageMapper].m_Actor;
-              dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
+              polyDataMapper = vtkPolyDataMapper::SafeDownCast(imageActor->GetMapper());
               texture = imageActor->GetTexture();
             }
 
             // Set poly data new each time its object changes (e.g. when
             // switching between planar and curved geometries)
-            if ((dataSetMapper != nullptr) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()))
+            if ((polyDataMapper != nullptr) && (polyDataMapper->GetInput() != surface->GetVtkPolyData()))
             {
-              dataSetMapper->SetInputData(surface->GetVtkPolyData());
+              polyDataMapper->SetInputData(surface->GetVtkPolyData());
             }
 
-            dataSetMapper->Update();
+            polyDataMapper->Update();
 
             // Check if the m_ReslicedImage is nullptr.
             // This is the case when no image geometry is met by
@@ -553,7 +563,7 @@ namespace mitk
               // Store this actor to be added to the actor assembly, sort
               // by layer
               int layer = 1;
-              node->GetIntProperty("layer", layer);
+              node->GetIntProperty("layer", layer, renderer);
               layerSortedActors.insert(std::pair<int, vtkActor *>(layer, imageActor));
             }
           }

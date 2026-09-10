@@ -269,6 +269,26 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
     }
   }
   // end draw scale
+
+  if (m_ImageNameVisible && nullptr != m_Manager->GetCurrentNode())
+  {
+    QFont nameFont = this->font();
+    nameFont.setPointSize(8);
+    painter.setFont(nameFont);
+
+    const QFontMetrics metrics(nameFont);
+    const int padding = 2;
+    const QString name = metrics.elidedText(
+      QString::fromStdString(m_Manager->GetCurrentNode()->GetName()), Qt::ElideRight, height() - 2 * padding);
+
+    // Rotated clockwise along the right edge: reads top-down with the glyph tops facing outward.
+    painter.save();
+    painter.translate(width() - padding - metrics.ascent(), (height() - metrics.horizontalAdvance(name)) / 2);
+    painter.rotate(90);
+    painter.drawText(0, 0, name);
+    painter.restore();
+  }
+
   painter.setPen(cl);
   painter.drawLine(m_Rect.topLeft(), m_Rect.topRight());
   painter.drawLine(m_Rect.topLeft(), m_Rect.bottomLeft());
@@ -507,14 +527,17 @@ void QmitkSliderLevelWindowWidget::Update()
 void QmitkSliderLevelWindowWidget::contextMenuEvent(QContextMenuEvent *)
 {
   m_Contextmenu->SetLevelWindowManager(m_Manager.GetPointer());
-  auto contextMenu = new QMenu(this);
-  Q_CHECK_PTR(contextMenu);
+  QMenu contextMenu(this);
   if (m_ScaleVisible)
-    contextMenu->addAction(tr("Hide Scale"), this, SLOT(HideScale()));
+    contextMenu.addAction(tr("Hide Scale"), this, &QmitkSliderLevelWindowWidget::HideScale);
   else
-    contextMenu->addAction(tr("Show Scale"), this, SLOT(ShowScale()));
-  contextMenu->addSeparator();
-  m_Contextmenu->GetContextMenu(contextMenu);
+    contextMenu.addAction(tr("Show Scale"), this, &QmitkSliderLevelWindowWidget::ShowScale);
+  if (m_ImageNameVisible)
+    contextMenu.addAction(tr("Hide Image Name"), this, [this]() { this->SetImageNameVisible(false); });
+  else
+    contextMenu.addAction(tr("Show Image Name"), this, [this]() { this->SetImageNameVisible(true); });
+  contextMenu.addSeparator();
+  m_Contextmenu->GetContextMenu(&contextMenu);
 
   // Fix: Bug #13327 we need to reset the m_MouseDown value
   // otherwise the cursor is not correctly restored afterwards
@@ -531,6 +554,15 @@ void QmitkSliderLevelWindowWidget::ShowScale()
 {
   m_ScaleVisible = true;
   Update();
+}
+
+void QmitkSliderLevelWindowWidget::SetImageNameVisible(bool visible)
+{
+  if (visible == m_ImageNameVisible)
+    return;
+
+  m_ImageNameVisible = visible;
+  this->update();
 }
 
 void QmitkSliderLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)

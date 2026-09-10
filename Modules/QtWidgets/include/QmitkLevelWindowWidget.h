@@ -55,6 +55,10 @@ public slots:
    */
   void SetDataStorage(mitk::DataStorage *ds);
 
+  /** \brief Show or hide the name of the image whose level window is displayed.
+   */
+  void SetImageNameVisible(bool visible);
+
 protected:
   // unsigned long m_ObserverTag;
   mitk::LevelWindowManager::Pointer m_Manager;

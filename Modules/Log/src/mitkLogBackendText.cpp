@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <iomanip>
 #include <iostream>
 #include <locale>
+#include <sstream>
 #include <vector>
 
 #ifdef _WIN32
@@ -27,40 +28,30 @@ found in the LICENSE file.
 
 namespace
 {
-  /** \brief Restores the locale, format flags and precision a stream had.
-   *
-   * All three are sticky, and the backends write to std::cout and to the log
-   * file, which the rest of the application writes to as well. A manipulator
-   * left behind reformats every number written to the stream afterwards, the
-   * numbers of the following log messages included.
+  /* The backends write to std::cout and to the log file, which other threads
+   * write to as well. Formatted insertion is the only operation that may run
+   * concurrently on std::cout. Changing its locale is not one of them, and on
+   * MSVC the locale swapped out is freed while another thread may still be
+   * formatting with it. Numbers are therefore formatted in a private stream
+   * and only the resulting text is inserted into the shared stream, which also
+   * keeps the notation, precision and base from sticking to it.
    */
-  class StreamFormatGuard
+
+  std::string ElapsedSeconds(int precision)
   {
-  public:
-    explicit StreamFormatGuard(std::ostream& stream)
-      : m_Stream(stream),
-        m_Locale(stream.getloc()),
-        m_Flags(stream.flags()),
-        m_Precision(stream.precision())
-    {
-    }
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream << std::fixed << std::setprecision(precision) << static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
+    return stream.str();
+  }
 
-    ~StreamFormatGuard()
-    {
-      m_Stream.precision(m_Precision);
-      m_Stream.flags(m_Flags);
-      m_Stream.imbue(m_Locale);
-    }
-
-    StreamFormatGuard(const StreamFormatGuard&) = delete;
-    StreamFormatGuard& operator=(const StreamFormatGuard&) = delete;
-
-  private:
-    std::ostream& m_Stream;
-    std::locale m_Locale;
-    std::ios_base::fmtflags m_Flags;
-    std::streamsize m_Precision;
-  };
+  std::string HexThreadID(int threadID)
+  {
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream << std::hex << threadID;
+    return stream.str();
+  }
 }
 
 static bool g_init = false;
@@ -328,12 +319,7 @@ void mitk::LogBackendText::FormatSmart(std::ostream &out, const LogMessage &mess
     out << std::endl;
   }
 
-  {
-    const StreamFormatGuard guard(out);
-
-    out.imbue(std::locale("C"));
-    out << std::fixed << std::setprecision(3) << ((double)std::clock()) / CLOCKS_PER_SEC;
-  }
+  out << ElapsedSeconds(3);
 
   out << c_close << " ";
 
@@ -400,10 +386,7 @@ void mitk::LogBackendText::FormatFull(std::ostream &out, const LogMessage &messa
   out << "|" << message.FilePath << "(" << message.LineNumber << ")";
   out << "|" << message.FunctionName;
 
-  {
-    const StreamFormatGuard guard(out);
-    out << "|" << std::hex << threadID;
-  }
+  out << "|" << HexThreadID(threadID);
 
   out << "|" << message.ModuleName;
   out << "|" << message.Category;
@@ -433,9 +416,6 @@ void mitk::LogBackendText::AppendTimeStamp(std::ostream &out)
                      1,
                      " "); // replace \n by " " (separates date/time from following output of relative time since start)
 
-  const StreamFormatGuard guard(out);
-
-  out.imbue(std::locale("C"));
   out << timestring;
 }
 
@@ -556,12 +536,7 @@ void mitk::LogBackendText::FormatSmartWindows(const LogMessage &message, int /*t
 
   ChangeColor(colorTime);
 
-  {
-    const StreamFormatGuard guard(std::cout);
-
-    std::cout.imbue(std::locale("C"));
-    std::cout << std::fixed << std::setprecision(2) << ((double)std::clock()) / CLOCKS_PER_SEC << " ";
-  }
+  std::cout << ElapsedSeconds(2) << " ";
 
   // category
   {

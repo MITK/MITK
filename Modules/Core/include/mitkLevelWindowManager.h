@@ -21,30 +21,33 @@ found in the LICENSE file.
 //  c++
 #include <map>
 #include <utility>
+#include <vector>
 
 namespace mitk
 {
   /**
     @brief Provides access to the LevelWindowProperty object and LevelWindow of the "current" image.
 
-    - provides a LevelWindowProperty for purposes like GUI editors
-    - this property comes from one of two possible sources
-      - either something (e.g. the application) sets the property because of some user selection
-      - OR the "Auto top-most" logic is used to search a DataStorage for the image with the highest "layer" property
-        value
+    The manager observes a DataStorage and decides which image node is the current one. The
+    LevelWindowProperty of that node is exposed for GUI editors and SetLevelWindow() writes
+    back to it. Only nodes returned by GetRelevantNodes() that are visible and rendered with a
+    level-window based "Image Rendering.Mode" are candidates.
 
-    Changes on Level/Window can be set with SetLevelWindow() and will affect either the topmost layer image,
-    if IsAutoTopMost() returns true, or an image which is set by SetLevelWindowProperty(LevelWindowProperty::Pointer
-    levelWindowProperty).
-    Additionally the changes on Level/Window will affect one or multiple selected images, if IsSelectedImages() returns true.
-    Only one of the two different modes can be enabled at the same time.
+    The current node is chosen according to the Mode:
+    - Mode::TopMostImage: the candidate with the highest "layer" property.
+    - Mode::SelectedImage: the candidate with the highest "layer" property among the nodes whose
+      "selected" property is true. Without a selected candidate there is no current node. If
+      GetApplyToAllSelectedImages() is true, SetLevelWindow() additionally writes to all other
+      selected candidates.
+    - Mode::ExplicitImage: the node pinned by SetLevelWindowProperty(). While the pinned node is
+      not a candidate (e.g. invisible), the top-most candidate is shown instead. If the pinned
+      node is removed from the DataStorage, the mode that was active before the pick is restored.
 
-    Changes to Level/Window, when another image gets active or by SetLevelWindow(const LevelWindow& levelWindow),
-    will be sent to all listeners by Modified().
+    The mode is kept across node additions and removals. The bool property "imageForLevelWindow"
+    is written as an informational marker that is true only on the current node; the manager does
+    not read it.
 
-    DataStorageChanged() listens to the DataStorage for new or removed images. Depending on the currently enabled mode,
-    the new image becomes active or not. If an image is removed from the DataStorage and m_AutoTopMost is false,
-    there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
+    Changes of the current node or its level window are sent to all listeners by Modified().
 
     Note that this class is not thread safe at the moment!
   */
@@ -55,6 +58,14 @@ namespace mitk
     mitkClassMacroItkParent(LevelWindowManager, itk::Object);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /** \brief Strategy for choosing the current image node. */
+    enum class Mode
+    {
+      TopMostImage,
+      SelectedImage,
+      ExplicitImage
+    };
 
     /**
      * \brief Set the DataStorage to observe for image nodes.
@@ -73,21 +84,20 @@ namespace mitk
     DataStorage *GetDataStorage();
 
     /**
-    * @brief (Re-)Initialize the LevelWindowManager by setting the topmost image.
-    *        Use the removedNode parameter if a node was removed.
-    *
-    * @param autoTopMost    Set the topmost layer image to be affected by changes, if true.
-    * @param removedNode    A node was removed from the data storage if != nullptr.
-    */
-    void SetAutoTopMostImage(bool autoTopMost, const DataNode *removedNode = nullptr);
+     * \brief Set the strategy for choosing the current image node and apply it.
+     *
+     * Switching to Mode::ExplicitImage pins the node that is current at that moment.
+     * Without a DataStorage the mode is only stored and applied by SetDataStorage().
+     */
+    void SetMode(Mode mode);
+    Mode GetMode() const;
+
     /**
-    * @brief (Re-)Initialize the LevelWindowManager by setting the selected images.
-    *         Use the removedNode parameter if a node was removed.
-    *
-    * @param selectedImagesMode  Set the selected images to be affected by changes, if true.
-    * @param removedNode         A node was removed from the data storage if != nullptr.
-    */
-    void SetSelectedImages(bool selectedImagesMode, const DataNode *removedNode = nullptr);
+     * \brief In Mode::SelectedImage, write level window changes to all visible selected images
+     *        instead of only the displayed one.
+     */
+    void SetApplyToAllSelectedImages(bool apply);
+    bool GetApplyToAllSelectedImages() const;
 
     /**
      * \brief Recalculate the level window for the currently displayed component of selected images.
@@ -98,128 +108,120 @@ namespace mitk
      * The event parameter is unused.
      */
     void RecalculateLevelWindowForSelectedComponent(const itk::EventObject&);
+
     /**
-    * @brief Update the level window.
-    *        This function is called if a property of a data node is changed.
-    *        Relevant properties are defined in the protected 'ObserverToPropertyValueMap'-members.
-    */
+     * \brief Determine the current node again according to the mode.
+     *        This function is called if a relevant property of a data node is changed.
+     */
     void Update(const itk::EventObject&);
+
     /**
-    * @brief Update the level window.
-    *        This function is only called if the 'selected' property of a data node is changed.
-    *        This is done in order to avoid finding the correct image each time a node is selected but
-    *        the 'm_SelectedImages' bool value is set to false (as the normal 'Update'-function would do).
-    *        Changes of the 'selected' property happen quite a lot so this should not slow down the application.
-    */
-    void UpdateSelected(const itk::EventObject&);
-    /**
-     * @brief Set a specific LevelWindowProperty; all changes will affect the image belonging to this property.
-     * @throw mitk::Exception Throw an exception if the there is no image in the data storage which belongs to this
-     *        property.
+     * \brief Pin the image belonging to the given property and switch to Mode::ExplicitImage.
+     * \throw mitk::Exception if no DataStorage is set or no relevant node owns the property.
      */
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
+
     /**
-    *   @brief Set new Level/Window values and inform all listeners about changes.
-    */
+     * \brief Set new Level/Window values and inform all listeners about changes.
+     */
     void SetLevelWindow(const LevelWindow &levelWindow);
+
     /**
-     * @brief Return the current LevelWindowProperty object from the image that is affected by changes.
-     *
-     * @return The current LevelWindowProperty
+     * \brief Return the LevelWindowProperty of the current node, or nullptr if there is none.
      */
     LevelWindowProperty::Pointer GetLevelWindowProperty() const;
+
     /**
-    * @brief Return Level/Window values for the current image
-    *
-    * @return The LevelWindow value for the current image.
-    */
+     * \brief Return Level/Window values of the current node.
+     * \throw mitk::Exception if there is no current node.
+     */
     const LevelWindow &GetLevelWindow() const;
+
     /**
-    * @brief Return true, if level window changes will affect the topmost layer image.
-    *
-    * @return Return the member value that denotes the auto-topmost mode.
-    */
-    bool IsAutoTopMost() const;
-    /**
-    * @brief Return true, if level window changes will affect the currently selected images.
-    *
-    * @return Return the member value that denotes the selected-images mode.
-    */
-    bool IsSelectedImages() const;
-    /**
-     * @brief This method is called when a node is added to the data storage.
+     * \brief This method is called when a node is added to the data storage.
      *        A listener on the data storage is used to call this method automatically after a node was added.
-     * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from
+     * \throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from
      *        the number of nodes.
      */
     void DataStorageAddedNode(const DataNode *dataNode = nullptr);
+
     /**
-     * @brief This method is called when a node is removed from the data storage.
+     * \brief This method is called when a node is removed from the data storage.
      *        A listener on the data storage is used to call this method automatically before a node will be removed.
-     * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from
+     * \throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from
      *        the number of nodes.
      */
     void DataStorageRemovedNode(const DataNode *dataNode = nullptr);
+
     /**
-    * @brief Change notifications from mitkLevelWindowProperty.
-    */
+     * \brief Change notifications from mitkLevelWindowProperty.
+     */
     void OnPropertyModified(const itk::EventObject&);
+
     /**
-    * @brief Return the currently active image.
-    *
-    * @return The member variable holding the currently active image.
-    */
+     * \brief Return the node whose level window is displayed, or nullptr if there is none.
+     */
+    DataNode *GetCurrentNode() const;
+
+    /**
+     * \brief Return the image of the current node, or nullptr if there is none.
+     */
     Image *GetCurrentImage() const;
+
     /**
-     * @brief Return the number of observers for data node's "visible" property.
+     * \brief Return the number of observers for data node's "visible" property.
      *        This basically returns the number of relevant nodes to observe.
-     *
-     * @return The current number of observers which are registered in this object.
      */
     int GetNumberOfObservers() const;
+
     /**
-    * @brief Return all nodes in the data storage that have the following properties:
-    *   - "binary" == false
-    *   - "levelwindow"
-    *   - DataType == Image / DiffusionImage / TensorImage / OdfImage / ShImage
-    *
-    @ return The filtered list of relevant nodes in the data storage
-    */
+     * \brief Return all nodes in the data storage that have the following properties:
+     *   - "binary" == false
+     *   - "levelwindow"
+     *   - DataType == Image / DiffusionImage / TensorImage / OdfImage / ShImage
+     */
     DataStorage::SetOfObjects::ConstPointer GetRelevantNodes() const;
 
   private:
     LevelWindowManager();
     ~LevelWindowManager() override;
 
+    using PropDataPair = std::pair<unsigned long, DataNode::Pointer>;
+    using ObserverToPropertyValueMap = std::map<PropDataPair, BaseProperty::Pointer>;
+
+    void Recompute(const DataNode *removedNode = nullptr);
+    DataNode *FindTopMostVisibleNode(bool selectedOnly, const DataNode *excludedNode) const;
+    void SetCurrentNode(DataNode *node);
+
+    void OnSelectedPropertyModified(const itk::EventObject&);
+    void OnNodeNameModified(const itk::EventObject&);
+
+    void UpdateObservers(const DataNode *excludedNode = nullptr);
+    void ClearPropertyObserverMaps();
+    void CreatePropertyObserverMaps(const DataNode *excludedNode);
+    void ObserveProperty(DataNode *node,
+                         const char *propertyKey,
+                         void (LevelWindowManager::*callback)(const itk::EventObject &),
+                         ObserverToPropertyValueMap &observerMap);
+
     DataStorage::Pointer m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty;
+    DataNode::Pointer m_CurrentNode;
+    DataNode::Pointer m_ExplicitNode;
+    std::vector<DataNode::Pointer> m_DataNodesForLevelWindow;
 
-    typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
-    typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyValueMap;
+    Mode m_Mode = Mode::TopMostImage;
+    Mode m_ModeBeforeExplicitImage = Mode::TopMostImage;
+    bool m_ApplyToAllSelectedImages = false;
+    unsigned long m_PropertyModifiedTag = 0;
+    bool m_IsPropertyModifiedTagSet = false;
 
     ObserverToPropertyValueMap m_ObserverToVisibleProperty;
     ObserverToPropertyValueMap m_ObserverToLayerProperty;
     ObserverToPropertyValueMap m_ObserverToRenderingModeProperty;
     ObserverToPropertyValueMap m_ObserverToDisplayedComponentProperty;
-    ObserverToPropertyValueMap m_ObserverToLevelWindowImageProperty;
     ObserverToPropertyValueMap m_ObserverToSelectedProperty;
-
-    void UpdateObservers();
-    void ClearPropertyObserverMaps();
-    void CreatePropertyObserverMaps();
-
-    bool HasLevelWindowRenderingMode(DataNode *dataNode) const;
-
-    // This variable holds a data node which will be deleted from the datastorage immediately.
-    const DataNode *m_NodeMarkedToDelete;
-
-    bool m_AutoTopMost;
-    bool m_SelectedImagesMode;
-    unsigned long m_PropertyModifiedTag;
-    Image *m_CurrentImage;
-    std::vector<DataNode::Pointer> m_DataNodesForLevelWindow;
-    bool m_IsPropertyModifiedTagSet;
-    bool m_LevelWindowMutex;
+    ObserverToPropertyValueMap m_ObserverToNameProperty;
   };
 }
 

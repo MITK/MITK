@@ -51,5 +51,11 @@ You can pick the levelwindow with the mouse to move it up and down, while moving
 
 With line edit fields below you can directly adjust the levelwindow. The upper field describes the center of the levelwindow, the bottom the span of the window around the center. By selecting one of fields and typing any number you can set these two parameters.
 
+\subsection org_mitk_editors_stdmultiwidget_Levelwindow_Image Which image is adjusted
+
+The name of the image that the levelwindow currently adjusts is written along the right edge of the slider. By default this is the topmost visible image, that is the visible image with the highest layer in the Data Manager. In the <i>Standard Display</i> preference page you can instead let the levelwindow follow the image selected in the Data Manager. In that mode the levelwindow disappears while no visible image is selected, and the option <i>Apply changes to all selected images</i> adjusts all selected visible images together. The preference page also allows hiding the image name.
+
+The <i>Images</i> submenu of the levelwindow's context menu switches between the topmost and the selected image for the current session and additionally lists all visible images, so that you can pick a specific image directly. Such a pick stays in effect until you choose one of the two automatic modes again or the picked image is removed. The context menu also toggles the image name for the current session, next to the entry that toggles the scale.
+
 
 */

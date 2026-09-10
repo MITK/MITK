@@ -21,7 +21,7 @@
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming panning constraint"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="show level window widget image name topmost selected"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode fxaa anti-aliasing"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>

@@ -324,15 +324,6 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("","").AddAnyElement());
 
   RegisterProperties();
-
-  /*
-    There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
-    This code is left here as a reminder, just in case we might need to do that some time.
-
-    vtkNeverTranslucentTextureFactory* textureFactory = vtkNeverTranslucentTextureFactory::New();
-    vtkObjectFactory::RegisterFactory( textureFactory );
-    textureFactory->Delete();
-    */
 }
 
 void MitkCoreActivator::Unload(us::ModuleContext *)

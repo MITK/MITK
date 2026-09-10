@@ -157,6 +157,16 @@ namespace mitk
     /** virtual destructor in order to derive from this class */
     ~VtkMapper() override;
 
+    /**
+     * \brief Applies the opacity and pins the VTK render pass to it.
+     *
+     * Textured image actors are rendered opaque unless their opacity is
+     * below 1, regardless of texture alpha. Pinning the pass also keeps
+     * VTK from scanning every texel of the texture for translucency on
+     * each update.
+     */
+    static void SetOpacityAndRenderPass(vtkActor *actor, double opacity);
+
   private:
     /** copy constructor */
     VtkMapper(const VtkMapper &);

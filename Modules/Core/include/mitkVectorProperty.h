@@ -162,7 +162,7 @@ namespace mitk
     VectorType m_PropertyContent;
   };
 
-/// This should be used in .h files.
+/** This should be used in .h files. */
 #define MITK_DECLARE_VECTOR_PROPERTY(TYPE, PREFIX)                                                                     \
                                                                                                                        \
   typedef VectorProperty<TYPE> PREFIX##VectorProperty;                                                                 \
@@ -174,7 +174,10 @@ namespace mitk
     static const char *prefix() { return #PREFIX; }                                                                    \
   };
 
-/// This should be used in a .cpp file
+/** This should be used in a .cpp file. The type also needs a matching
+ *  MITK_DECLARE_VECTOR_PROPERTY, otherwise GetNameOfClass() reports
+ *  "InvalidVectorProperty" and serialization silently fails.
+ */
 #define MITK_DEFINE_VECTOR_PROPERTY(TYPE) template class VectorProperty<TYPE>;
 
   MITK_DECLARE_VECTOR_PROPERTY(double, Double)

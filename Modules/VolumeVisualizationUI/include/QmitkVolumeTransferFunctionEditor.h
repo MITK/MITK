@@ -77,11 +77,14 @@ public:
   void SetDataNode(mitk::DataNode *node);
 
   /**
-   * \brief Apply the first catalogued preset unless a function is already held.
+   * \brief Apply the preset that suits the image, unless a function is already
+   *        held.
    *
    * For the moment volume rendering is switched on: the node has a transfer
    * function by then, but it is the mapper's registered default, which no
-   * preset names and which the catalogue is meant to supersede.
+   * preset names and which the catalogue is meant to supersede. Which preset
+   * that is follows from the image's DICOM metadata where it has any - see
+   * mitk::TransferFunctionPresets::GetDefaultPresetName.
    */
   void EnsureTransferFunction();
 

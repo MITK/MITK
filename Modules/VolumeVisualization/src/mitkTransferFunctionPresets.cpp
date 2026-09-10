@@ -13,7 +13,9 @@ found in the LICENSE file.
 #include "mitkTransferFunctionPresets.h"
 
 #include <mitkExceptionMacro.h>
+#include <mitkImage.h>
 #include <mitkLog.h>
+#include <mitkPropertyNameHelper.h>
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
@@ -242,6 +244,33 @@ std::vector<std::string> mitk::TransferFunctionPresets::GetPresetNames() const
   }
 
   return names;
+}
+
+std::string mitk::TransferFunctionPresets::GetDefaultPresetName(const Image *image) const
+{
+  std::string modality;
+
+  if (image != nullptr)
+  {
+    GetBackwardsCompatibleDICOMPropertyValue(
+      0x0008, 0x0060, "modality", image->GetPropertyList(), modality);
+  }
+
+  const std::string name = modality == "MR" ? "MR-Default" : "CT-AAA";
+
+  const auto it = std::find_if(m_Presets.begin(), m_Presets.end(),
+    [&name](const Preset &preset) { return preset.name == name; });
+
+  if (it != m_Presets.end())
+    return it->name;
+
+  // Only reachable through an edited or replaced catalog file. Falling back to
+  // the first entry keeps the promise the return value makes - that the name is
+  // one this catalog holds - and it is what this view did before any modality
+  // was consulted, so the failure mode is the old behaviour.
+  MITK_WARN << "The catalog holds no preset \"" << name << "\" to default to.";
+
+  return m_Presets.empty() ? std::string() : m_Presets.front().name;
 }
 
 mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFunction(

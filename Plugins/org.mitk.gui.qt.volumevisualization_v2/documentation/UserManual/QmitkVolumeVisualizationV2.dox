@@ -33,9 +33,15 @@ currently in. Nothing below the selector responds while it is off, because
 there is no volume to configure yet.
 
 Switching it on does more than show the volume: a node that carries no transfer
-function is given the first one from the preset catalogue, and one that names no
-lighting model is given the first of those. Switching on therefore produces a
-visible volume rather than an empty 3D window, and you adjust from there.
+function is given one from the preset catalogue, and one that names no lighting
+model is given the first of those. Switching on therefore produces a visible
+volume rather than an empty 3D window, and you adjust from there.
+
+Which preset that is follows from the image. One whose DICOM metadata reports MR
+starts from <tt>MR-Default</tt>; everything else starts from <tt>CT-AAA</tt>,
+including an image carrying no such metadata - a NIfTI or an NRRD from outside
+MITK usually carries none. Seeing a CT preset on an MR loaded from one of those
+formats is therefore expected; pick an <tt>MR-</tt> preset from the grid.
 
 For a 4D image the volume follows the current time step, so stepping through
 time in the image navigator steps the volume with it.

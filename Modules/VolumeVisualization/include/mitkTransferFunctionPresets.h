@@ -25,6 +25,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class Image;
+
   /**
    * \brief Catalog of built-in volume-rendering transfer function presets.
    *
@@ -52,6 +54,28 @@ namespace mitk
 
     /** \brief Names of the available presets, in file order. */
     std::vector<std::string> GetPresetNames() const;
+
+    /**
+     * \brief The preset to start this image from.
+     *
+     * A first choice rather than a recommendation: what a view applies when
+     * nothing on the node says what to show, before the user picks from the
+     * grid. Worth making at all because the families are not interchangeable -
+     * the CT presets are authored against Hounsfield units, which every CT
+     * shares, and the MR ones against intensities calibrated to no scale, so a
+     * CT curve lands its whole opacity ramp below an MR's data and renders one
+     * flat shell.
+     *
+     * \param[in] image The image to be shown; nullptr is allowed. Anything
+     *            other than an MR - including an image whose metadata names no
+     *            modality at all - is served the CT default: most volume
+     *            rendering is CT, and Hounsfield units are the one scale a
+     *            preset can assume and be right about across scanners.
+     * \return The name of a preset this catalog holds, so that a caller can
+     *         apply it without a fallback of its own. Empty only for an empty
+     *         catalog.
+     */
+    std::string GetDefaultPresetName(const Image *image) const;
 
     /**
      * \brief Build a transfer function for the named preset, and report the

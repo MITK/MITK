@@ -435,11 +435,25 @@ void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
 
 void QmitkVolumeTransferFunctionEditor::EnsureTransferFunction()
 {
-  if (m_AppliedTransferFunction.IsNotNull() || m_Controls->presetListWidget->count() == 0)
+  if (m_AppliedTransferFunction.IsNotNull())
     return;
 
-  m_Controls->presetListWidget->setCurrentRow(0);
-  this->OnPresetSelected(m_Controls->presetListWidget->item(0)->text());
+  auto node = m_DataNode.Lock();
+
+  const auto presetName = QString::fromStdString(m_Presets.GetDefaultPresetName(
+    node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr));
+
+  // The grid was filled from the same catalog, so a name it vouches for has a
+  // row. Nothing matches the empty name an empty catalog returns, which is the
+  // one case this guards.
+  const auto matches = m_Controls->presetListWidget->findItems(presetName, Qt::MatchExactly);
+
+  if (matches.isEmpty())
+    return;
+
+  m_Controls->presetListWidget->setCurrentRow(m_Controls->presetListWidget->row(matches.first()));
+
+  this->OnPresetSelected(presetName);
 }
 
 void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetName)

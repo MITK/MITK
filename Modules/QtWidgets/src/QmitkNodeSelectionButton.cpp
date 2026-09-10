@@ -12,109 +12,13 @@ found in the LICENSE file.
 
 #include <QmitkNodeSelectionButton.h>
 
-// mitk core
-#include <mitkBaseRenderer.h>
-#include <mitkExtractSliceFilter.h>
-#include <vtkMitkLevelWindowFilter.h>
-#include <mitkPlanarFigure.h>
-#include <mitkPropertyNameHelper.h>
-#include <mitkLabelSetImage.h>
-
 // mitk qt widgets module
 #include <QmitkNodeDescriptorManager.h>
-
-#include <vtkLookupTable.h>
 
 #include <QApplication>
 #include <QEvent>
 #include <QPainter>
 #include <QTextDocument>
-
-QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
-{
-  if (nullptr == dataNode)
-  {
-    return QPixmap();
-  }
-
-  const mitk::Image* image = nullptr;
-
-  const mitk::MultiLabelSegmentation* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(dataNode->GetData());
-  if (nullptr != segmentation && segmentation->GetNumberOfGroups()>0)
-  {
-    image = segmentation->GetGroupImage(0);
-  }
-
-  if (nullptr == image) image = dynamic_cast<const mitk::Image*>(dataNode->GetData());
-
-  if ((nullptr == image || !image->IsInitialized()) || // -> must be an image
-    (image->GetPixelType().GetNumberOfComponents() != 1)) // -> for now only single component are allowed
-  {
-    auto descManager = QmitkNodeDescriptorManager::GetInstance();
-    auto desc = descManager->GetDescriptor(dataNode);
-    auto icon = desc->GetIcon(dataNode);
-    auto fallBackMap = icon.pixmap(height, height);
-    return fallBackMap;
-  }
-
-  mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
-  int sliceNumber = image->GetDimension(2) / 2;
-  planeGeometry->InitializeStandardPlane(image->GetGeometry(), mitk::AnatomicalPlane::Axial, sliceNumber);
-
-  mitk::ExtractSliceFilter::Pointer extractSliceFilter = mitk::ExtractSliceFilter::New();
-  extractSliceFilter->SetInput(image);
-  extractSliceFilter->SetInterpolationMode(mitk::ExtractSliceFilter::RESLICE_NEAREST);
-  extractSliceFilter->SetResliceTransformByGeometry(image->GetGeometry());
-  extractSliceFilter->SetWorldGeometry(planeGeometry);
-  extractSliceFilter->SetOutputDimensionality(2);
-  extractSliceFilter->SetVtkOutputRequest(true);
-  extractSliceFilter->Update();
-
-  vtkImageData* imageData = extractSliceFilter->GetVtkOutput();
-
-  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-
-  if (nullptr != segmentation)
-  {
-    lookupTable->DeepCopy(const_cast<vtkLookupTable*>(segmentation->GetLookupTable()->GetVtkLookupTable().GetPointer()));
-    lookupTable->SetTableValue(0, 0., 0., 0.);
-  }
-  else
-  {
-    mitk::LevelWindow levelWindow;
-    dataNode->GetLevelWindow(levelWindow);
-    lookupTable->SetRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
-    lookupTable->SetSaturationRange(0.0, 0.0);
-    lookupTable->SetValueRange(0.0, 1.0);
-    lookupTable->SetHueRange(0.0, 0.0);
-    lookupTable->SetRampToLinear();
-  }
-
-  vtkSmartPointer<vtkMitkLevelWindowFilter> levelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
-  levelWindowFilter->SetLookupTable(lookupTable);
-  levelWindowFilter->SetInputData(imageData);
-  levelWindowFilter->SetMinOpacity(0.0);
-  levelWindowFilter->SetMaxOpacity(1.0);
-  int dims[3];
-  imageData->GetDimensions(dims);
-  double clippingBounds[] = { 0.0, static_cast<double>(dims[0]), 0.0, static_cast<double>(dims[1]) };
-  levelWindowFilter->SetClippingBounds(clippingBounds);
-  levelWindowFilter->Update();
-  imageData = levelWindowFilter->GetOutput();
-
-  QImage thumbnailImage(reinterpret_cast<const unsigned char*>(imageData->GetScalarPointer()), dims[0], dims[1], QImage::Format_ARGB32);
-
-  if (dims[0] > dims[1])
-  {
-    thumbnailImage = thumbnailImage.scaledToWidth(height, Qt::SmoothTransformation).rgbSwapped();
-  }
-  else
-  {
-    thumbnailImage = thumbnailImage.scaledToHeight(height, Qt::SmoothTransformation).rgbSwapped();
-  }
-
-  return QPixmap::fromImage(thumbnailImage);
-}
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
   : QPushButton(parent)
@@ -223,7 +127,8 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     }
     if (dataMTime>m_DataMTime || this->m_OutDatedThumbNail)
     {
-      this->m_ThumbNail = GetPixmapFromImageNode(node, iconLength);
+      auto descriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node);
+      this->m_ThumbNail = descriptor->GenerateThumbnail(node, iconLength);
       this->m_OutDatedThumbNail = false;
       m_DataMTime = dataMTime;
     }

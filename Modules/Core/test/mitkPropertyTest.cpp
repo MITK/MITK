@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkSmartPointerProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkTransferFunctionProperty.h>
+#include <mitkVectorProperty.h>
 #include <mitkWeakPointerProperty.h>
 #include <mitkLog.h>
 // ITK includes
@@ -78,6 +79,8 @@ class mitkPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransferFunctionProperty_Success);
   MITK_TEST(TestWeakPointerProperty_Success);
   MITK_TEST(TestLookupTablePropertyProperty_Success);
+  MITK_TEST(TestDoubleVectorProperty_Success);
+  MITK_TEST(TestIntVectorProperty_Success);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -483,6 +486,16 @@ public:
     std::string strLUT2 = prop2->GetValueAsString();
 
     TestProperty<mitk::LookupTableProperty>(lut1, lut2, strLUT1, strLUT2);
+  }
+
+  void TestDoubleVectorProperty_Success()
+  {
+    TestProperty<mitk::DoubleVectorProperty>({1.5, -2.25}, {0.5}, "1.5\n-2.25", "0.5");
+  }
+
+  void TestIntVectorProperty_Success()
+  {
+    TestProperty<mitk::IntVectorProperty>({-2, 1, 3}, {4, 5}, "-2\n1\n3", "4\n5");
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkProperty)

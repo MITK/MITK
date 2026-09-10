@@ -66,7 +66,11 @@ namespace mitk
   template <typename DATATYPE>
   void VectorProperty<DATATYPE>::SetValue(const VectorType &newValue)
   {
-    m_PropertyContent = newValue;
+    if (m_PropertyContent != newValue)
+    {
+      m_PropertyContent = newValue;
+      this->Modified();
+    }
   }
 
   template <typename DATATYPE>
@@ -92,7 +96,5 @@ namespace mitk
   // Explicit instantiation for defined types.
   MITK_DEFINE_VECTOR_PROPERTY(double)
   MITK_DEFINE_VECTOR_PROPERTY(int)
-  MITK_DEFINE_VECTOR_PROPERTY(unsigned int)
-  MITK_DEFINE_VECTOR_PROPERTY(std::string)
 
 } // namespace mitk

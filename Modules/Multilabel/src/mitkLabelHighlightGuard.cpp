@@ -86,7 +86,6 @@ void mitk::LabelHighlightGuard::UpdateNode(DataNode* node, MultiLabelSegmentatio
 
   mitk::IntVectorProperty::VectorType intValues(labels.begin(), labels.end());
   labelProperty->SetValue(intValues);
-  labelProperty->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
 
   mitk::BoolProperty::Pointer invisibleProperty = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
   if (nullptr == invisibleProperty)
@@ -96,5 +95,4 @@ void mitk::LabelHighlightGuard::UpdateNode(DataNode* node, MultiLabelSegmentatio
   }
 
   invisibleProperty->SetValue(highlightInvisible);
-  invisibleProperty->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
 }

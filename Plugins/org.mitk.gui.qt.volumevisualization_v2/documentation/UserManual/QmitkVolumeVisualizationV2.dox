@@ -110,13 +110,18 @@ back to the positions you left them in.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_custom Custom transfer functions
 
-Under the preset grid, <b>Create</b> and <b>Load</b> lead away from presets
-altogether. <b>Load</b> applies a transfer function saved to a JSON file
-earlier, straight away. <b>Create</b> replaces the preset controls with a
-point-by-point editor holding one canvas per curve: grey value to opacity, grey
-value to colour, and grey value and gradient to opacity. The third modulates
-opacity by how sharply the data changes at each voxel, so a low value there
-hides flat interiors and leaves surfaces visible.
+Under the preset grid, <b>Create custom...</b> and <b>Load from file...</b> lead
+away from presets altogether. <b>Load from file...</b> applies a transfer
+function saved to a JSON file earlier, straight away.
+
+<b>Create custom...</b> hands the whole panel over to a point-by-point editor.
+The image selector and the lighting section are put away for the duration and
+the panel returns to its top, so what you are left looking at is a page that
+names itself, names the image it is editing, and carries a way back at its top
+left. It holds one canvas per curve: grey value to opacity, grey value to
+colour, and grey value and gradient to opacity. The third modulates opacity by
+how sharply the data changes at each voxel, so a low value there hides flat
+interiors and leaves surfaces visible.
 
 In all three canvases:
 
@@ -129,11 +134,13 @@ selected one.
 <li> Between points the curves are interpolated linearly.
 </ul>
 
-The editor brings three buttons of its own. <b>Done</b> keeps the curve you
-authored, <b>Cancel</b> restores the one that stood before you started, and
-<b>Save</b> writes the current function to a JSON file in the same format the
-built-in catalogue uses, so your own functions can be kept and shared and read
-back with <b>Load</b>.
+The page brings three buttons, and the arrow at its top left repeats one of
+them. <b>Keep curve</b> keeps the curve you authored and goes back.
+<b>Discard</b> restores the one that stood before you started, and so does the
+top-left arrow, so that a way out is on screen whatever the page is scrolled to;
+neither asks first. <b>Save to file...</b> writes the current function to a JSON
+file in the same format the built-in catalogue uses, so your own functions can
+be kept and shared and read back with <b>Load from file...</b>.
 
 \note A curve that has been authored or loaded is no longer described by any
 preset name, so the name is dropped and the adjust sliders start measuring from
@@ -177,7 +184,8 @@ Almost every preset in the catalogue is authored for Composite. <tt>CT-MIP</tt>
 and <tt>MR-MIP</tt> are the two that are not, and they bring curves that ramp
 across the whole value range instead of isolating a tissue, which is what a
 projection needs. To pick a mode yourself, use <b>Blend mode</b> at the top of
-the <b>Create</b> editor, where you are authoring the curve that goes with it.
+the <b>Create custom...</b> page, where you are authoring the curve that goes
+with it.
 
 VTK also defines an isosurface and a slice mode, which are deliberately absent
 here. Each needs input that nothing in MITK supplies - iso-values, or a cutting

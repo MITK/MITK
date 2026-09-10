@@ -105,8 +105,11 @@ signals:
   /**
    * \brief Emitted when authoring a curve by hand starts or ends.
    *
-   * Authoring wants the room, so a host laying other sections out around this
-   * widget may want to fold them away for the duration.
+   * Authoring takes the panel, not merely this widget: it wants the room, and a
+   * change confined to one section in the middle of a panel reads as a section
+   * that changed shape rather than as arriving somewhere. A host laying other
+   * sections out around this widget is expected to fold them away for the
+   * duration, and to put the panel back at its top either way.
    */
   void CustomModeChanged(bool active);
 

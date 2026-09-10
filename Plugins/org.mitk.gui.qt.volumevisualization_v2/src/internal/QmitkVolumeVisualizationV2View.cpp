@@ -34,6 +34,9 @@ found in the LICENSE file.
 #include <ui_QmitkVolumeVisualizationV2View.h>
 
 #include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QTimer>
 #include <QToolButton>
 
 #include <optional>
@@ -111,6 +114,26 @@ namespace
 
     return isBinary;
   }
+
+  /** \brief The scroll area a view is shown in, or nullptr where there is none.
+   *
+   * QmitkAbstractView puts every view inside one without handing it over, and
+   * it is the scroll area's viewport that becomes the parent rather than the
+   * scroll area itself, so the chain has to be walked rather than counted.
+   *
+   * \param[in] widget Any widget of the view; the first scroll area above it is
+   *            the one the view is shown in.
+   */
+  QScrollArea *EnclosingScrollArea(const QWidget *widget)
+  {
+    for (auto *ancestor = widget->parentWidget(); ancestor != nullptr; ancestor = ancestor->parentWidget())
+    {
+      if (auto *scrollArea = qobject_cast<QScrollArea *>(ancestor); scrollArea != nullptr)
+        return scrollArea;
+    }
+
+    return nullptr;
+  }
 }
 
 QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View()
@@ -141,8 +164,6 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->enableRenderingButton->setIcon(
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
 
-  m_Controls->lightingWidget->setVisible(false);
-
   m_Controls->binaryHintLabel->setText(
     "Binary image: its appearance is set by the node colour, not by a transfer function.");
   m_Controls->binaryHintLabel->setVisible(false);
@@ -158,14 +179,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::TransferFunctionChanged,
     this, &QmitkVolumeVisualizationV2View::OnTransferFunctionChanged);
 
-  // Authoring a curve by hand wants the room, and lighting is a rendering
-  // control rather than part of authoring one.
-  connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::CustomModeChanged, this,
-    [this](bool active)
-    {
-      if (active)
-        m_Controls->lightingExpandButton->setChecked(false);
-    });
+  // Authoring a curve by hand takes the whole panel: it wants the room, and
+  // nothing the view lays out around the editor is part of authoring a curve.
+  connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::CustomModeChanged,
+    this, &QmitkVolumeVisualizationV2View::OnCustomModeChanged);
 
   // Lighting Option Controls
   connect(m_Controls->lightingExpandButton, &QToolButton::toggled, this,
@@ -300,6 +317,34 @@ void QmitkVolumeVisualizationV2View::OnLightingChanged()
   this->RequestRenderWindowUpdate();
 }
 
+void QmitkVolumeVisualizationV2View::OnCustomModeChanged(bool active)
+{
+  m_CustomModeActive = active;
+
+  // Recorded and then re-decided, rather than hidden from here: what the panel
+  // shows is UpdateInterface's to say, and it runs again while authoring.
+  this->UpdateInterface();
+
+  // Deferred, for two reasons that both outlast this call: the sections have
+  // only posted a layout request, so the scroll area does not know its new
+  // range yet; and hiding the button that was just clicked hands focus
+  // elsewhere, which makes the scroll area scroll to wherever it landed.
+  QTimer::singleShot(0, this, [this] { this->ScrollToTop(); });
+}
+
+void QmitkVolumeVisualizationV2View::ScrollToTop()
+{
+  // Measured from a widget of this view rather than from the editor, so that an
+  // editor which one day scrolls its own contents cannot be found instead.
+  auto *scrollArea = EnclosingScrollArea(m_Controls->headline);
+
+  if (scrollArea == nullptr)
+    return;
+
+  auto *verticalScrollBar = scrollArea->verticalScrollBar();
+  verticalScrollBar->setValue(verticalScrollBar->minimum());
+}
+
 void QmitkVolumeVisualizationV2View::UpdateLightingSection()
 {
   auto selectedNode = m_SelectedNode.Lock();
@@ -335,6 +380,16 @@ void QmitkVolumeVisualizationV2View::UpdateLightingSection()
 
 void QmitkVolumeVisualizationV2View::UpdateInterface()
 {
+  // Above the early return below, because authoring also ends when the node
+  // being authored goes away, and the sections have to come back on that path
+  // too. The lighting panel follows its header rather than being remembered, so
+  // a section left expanded comes back expanded.
+  m_Controls->headline->setVisible(!m_CustomModeActive);
+  m_Controls->imageGroupBox->setVisible(!m_CustomModeActive);
+  m_Controls->lightingExpandButton->setVisible(!m_CustomModeActive);
+  m_Controls->lightingWidget->setVisible(
+    !m_CustomModeActive && m_Controls->lightingExpandButton->isChecked());
+
   auto selectedNode = m_SelectedNode.Lock();
 
   // The rig is 3D-render-window state rather than widget state, but it follows
@@ -356,7 +411,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
   const bool isBinary = IsBinaryImage(selectedNode.GetPointer());
 
-  m_Controls->binaryHintLabel->setVisible(isBinary);
+  m_Controls->binaryHintLabel->setVisible(isBinary && !m_CustomModeActive);
 
   const bool volumeRenderingOn = IsVolumeRenderingOn(selectedNode.GetPointer());
 

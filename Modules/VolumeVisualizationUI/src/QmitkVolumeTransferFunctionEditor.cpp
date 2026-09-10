@@ -326,6 +326,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     this, &QmitkVolumeTransferFunctionEditor::OnImportCustom);
   connect(m_Controls->cancelTfCreationButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnCancelCustom);
+
+  // What a dialog's close box is to its Cancel button: the same way out, said
+  // twice, so that one of them is on screen whatever the panel is scrolled to.
+  connect(m_Controls->backToPresetsButton, &QToolButton::clicked,
+    this, &QmitkVolumeTransferFunctionEditor::OnCancelCustom);
   connect(m_Controls->doneTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnDoneCustom);
   connect(m_Controls->saveUserTfButton, &QPushButton::clicked,
@@ -905,6 +910,14 @@ void QmitkVolumeTransferFunctionEditor::SetCustomModeActive(bool active)
   // survives a trip through authoring.
   m_Controls->transferFunctionPanel->setVisible(!active);
 
+  // The button that was clicked has just been hidden, so focus is about to be
+  // handed back to the window unless it is given somewhere. Both targets sit at
+  // the top of the page they belong to, which is where the panel is scrolled to.
+  if (active)
+    m_Controls->backToPresetsButton->setFocus(Qt::OtherFocusReason);
+  else
+    m_Controls->presetExpandButton->setFocus(Qt::OtherFocusReason);
+
   emit CustomModeChanged(active);
 }
 
@@ -932,6 +945,14 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
   // The control is only on screen in authoring mode, so this is where it has to
   // catch up with whatever the preset the node came from left behind.
   this->ShowNodeBlendMode();
+
+  // The page covers the image selector, so it has to name the image itself.
+  // Escaped, because the label reads its text as markup and a node is named by
+  // whoever loaded it.
+  m_Controls->customHintLabel->setText(node.IsNotNull()
+    ? QString("<small>Editing <b>%1</b>. The 3D window follows every change.</small>")
+        .arg(QString::fromStdString(node->GetName()).toHtmlEscaped())
+    : QString("<small>The 3D window follows every change.</small>"));
 
   this->SetCustomModeActive(true);
 }

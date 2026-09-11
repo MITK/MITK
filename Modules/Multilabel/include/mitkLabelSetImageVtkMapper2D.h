@@ -35,7 +35,7 @@ class vtkImageReslice;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
-class vtkNeverTranslucentTexture;
+class vtkTexture;
 class vtkImageMapToColors;
 
 namespace mitk
@@ -108,7 +108,7 @@ namespace mitk
       /** \brief Vector of image-to-color mappers for each label group layer. */
       std::vector<vtkSmartPointer<vtkImageMapToColors>> m_LayerImageMapToColors;
       /** \brief Vector of textures for each label group layer. */
-      std::vector<vtkSmartPointer<vtkNeverTranslucentTexture>> m_LayerTextureVector;
+      std::vector<vtkSmartPointer<vtkTexture>> m_LayerTextureVector;
 
       /** \brief Empty poly data used as a placeholder. */
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;

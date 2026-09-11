@@ -123,3 +123,10 @@ void mitk::VtkMapper::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtk
   actor->GetProperty()->SetColor(drgba);
   actor->GetProperty()->SetOpacity(drgba[3]);
 }
+
+void mitk::VtkMapper::SetOpacityAndRenderPass(vtkActor *actor, double opacity)
+{
+  actor->GetProperty()->SetOpacity(opacity);
+  actor->SetForceOpaque(opacity >= 1.0);
+  actor->SetForceTranslucent(opacity < 1.0);
+}

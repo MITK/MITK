@@ -35,7 +35,7 @@ found in the LICENSE file.
 
 #include <vtkMitkLevelWindowFilter.h>
 #include <vtkMitkThickSlicesFilter.h>
-#include <vtkNeverTranslucentTexture.h>
+#include <vtkTexture.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -510,7 +510,7 @@ void mitk::DoseImageVtkMapper2D::ApplyOpacity(mitk::BaseRenderer *renderer)
   // check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity(opacity, renderer, "opacity");
   // set the opacity according to the properties
-  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
+  SetOpacityAndRenderPass(localStorage->m_Actor, opacity);
   if (localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1)
   {
     dynamic_cast<vtkActor *>(localStorage->m_Actors->GetParts()->GetItemAsObject(0))
@@ -1121,7 +1121,7 @@ mitk::DoseImageVtkMapper2D::LocalStorage::LocalStorage()
 
   // Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-  m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
+  m_Texture = vtkSmartPointer<vtkTexture>::New();
   m_DefaultLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_BinaryLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_ColorLookupTable = vtkSmartPointer<vtkLookupTable>::New();

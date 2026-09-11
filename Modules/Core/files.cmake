@@ -380,7 +380,6 @@ set(CPP_FILES
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkNeverTranslucentTexture.cpp
 )
 
 set(RESOURCE_FILES

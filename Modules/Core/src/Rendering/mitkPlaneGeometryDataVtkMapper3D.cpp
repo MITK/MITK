@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkWeakPointerProperty.h>
 #include <vtkMitkLevelWindowFilter.h>
-#include <vtkNeverTranslucentTexture.h>
+#include <vtkTexture.h>
 
 #include <vtkAssembly.h>
 #include <vtkFeatureEdges.h>
@@ -496,7 +496,7 @@ namespace mitk
             {
               polyDataMapper = vtkPolyDataMapper::New();
 
-              texture = vtkNeverTranslucentTexture::New();
+              texture = vtkTexture::New();
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
@@ -554,7 +554,7 @@ namespace mitk
               // re-use properties from the 2D image mapper
               auto* property2d = localStorage->m_ImageActor->GetProperty();
               property3d->SetColor(property2d->GetColor());
-              property3d->SetOpacity(property2d->GetOpacity());
+              SetOpacityAndRenderPass(imageActor, property2d->GetOpacity());
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn("texture interpolation", renderer);

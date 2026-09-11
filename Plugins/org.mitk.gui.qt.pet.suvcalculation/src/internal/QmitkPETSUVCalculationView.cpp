@@ -465,7 +465,11 @@ void QmitkPETSUVCalculationView::DetectAndPopulateTracers()
 
   try
   {
-    const auto rpis = mitk::GetRadiopharmaceuticalInfos(image);
+    // The view only inspects tracer identity here; the SUV filter owns the
+    // adaptation record for the run, so this probe discards its own.
+    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+    const auto rpis = mitk::GetRadiopharmaceuticalInfos(
+      image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
     if (rpis.size() > 1U)
     {
       m_MultiTracerDetected = true;
@@ -501,7 +505,11 @@ void QmitkPETSUVCalculationView::RefreshNuclideComboFromImage()
 
   try
   {
-    const auto rpis = mitk::GetRadiopharmaceuticalInfos(image);
+    // The view only inspects tracer identity here; the SUV filter owns the
+    // adaptation record for the run, so this probe discards its own.
+    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+    const auto rpis = mitk::GetRadiopharmaceuticalInfos(
+      image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
     if (!rpis.empty())
     {
       const int idx = m_Controls->nuclideCombo->findText(QString::fromStdString(rpis.front().name));
@@ -922,7 +930,9 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     {
       try
       {
-        const auto rpis = mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Lenient);
+        std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+        const auto rpis = mitk::GetRadiopharmaceuticalInfos(
+          image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
         const int idx   = m_Filter->GetTracerIndex().value_or(0);
         if (idx >= 0 && static_cast<std::size_t>(idx) < rpis.size())
         {

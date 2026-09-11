@@ -209,9 +209,9 @@ namespace
       "other than GE, and AcquisitionTime - FrameReferenceTime for GE; "
       "and (c) resolving an absent or ambiguous Patient Sex (0010,0040) "
       "as the mean of the male- and female-specific normalizations. "
-      "Without this flag the tool applies the recommendations and emits "
-      "a WARN log entry. With this flag, supply unambiguous timing "
-      "(vendor private datetime, "
+      "Without this flag the tool applies the recommendations, emits a "
+      "WARN log entry, and records each one on the output image. With "
+      "this flag, supply unambiguous timing (vendor private datetime, "
       "AcquisitionTime == SeriesTime) or use --decay-time.");
     parser.addArgument("tracer-index", "", mitkCommandLineParser::Int,
       "Radiopharmaceutical sequence item index",

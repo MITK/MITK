@@ -37,6 +37,11 @@ Asserting the type alone would be too weak -- five of them raise
 MissingDICOMPropertyException -- so a regression in weight handling
 could otherwise hide behind an unrelated missing-tag error.
 
+A case may also declare which IBSI-SUV recommendations the filter is
+required to apply, or required not to apply, via
+SUVImageFilter::GetAdaptations(). The log is not reachable from a test,
+so that record -- not MITK_WARN -- is what pins the behaviour.
+
 A DRO may appear twice, once per DICOMReadPolicy. Under Strict, MITK
 deliberately refuses inputs whose computation depends on reinterpreting
 a borderline value, trading benchmark conformance for the guarantee
@@ -135,7 +140,39 @@ namespace
      * contract worth pinning.
      */
     mitk::DICOMReadPolicy policy = mitk::DICOMReadPolicy::Lenient;
+    /** Adaptation rules that must appear in SUVImageFilter::GetAdaptations(). */
+    unsigned requiredAdaptations = 0u;
+    /**
+     * Adaptation rules that must NOT appear. Stated separately from
+     * "required" rather than demanding an exactly-equal set: an emptiness
+     * assertion would break the day an unrelated recommendation fires on the
+     * same input, which is a false alarm, not a regression.
+     */
+    unsigned forbiddenAdaptations = 0u;
   };
+
+  // A bitmask keeps the manifest entries constexpr. Bit positions mirror
+  // SUVAdaptationRule, so the mapping needs no maintenance when the enum
+  // grows.
+  constexpr unsigned AdaptationBit(mitk::SUVAdaptationRule rule)
+  {
+    return 1u << static_cast<unsigned>(rule);
+  }
+
+  constexpr unsigned kAdaptVendorFallback =
+    AdaptationBit(mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback);
+  constexpr unsigned kAdaptUnknownVendor =
+    AdaptationBit(mitk::SUVAdaptationRule::UnrecognizedManufacturer);
+
+  unsigned AdaptationMask(const std::vector<mitk::SUVAdaptation>& adaptations)
+  {
+    unsigned mask = 0u;
+    for (const auto& adaptation : adaptations)
+    {
+      mask |= AdaptationBit(adaptation.rule);
+    }
+    return mask;
+  }
 
   constexpr double kExpectedMin    = 0.20;
   constexpr double kExpectedMedian = 1.00;
@@ -151,7 +188,8 @@ namespace
   constexpr Expectation kTriple  = Expectation::CanonicalTriple;
   constexpr Expectation kRefusal = Expectation::Refusal;
 
-  constexpr mitk::DICOMReadPolicy kStrict = mitk::DICOMReadPolicy::Strict;
+  constexpr mitk::DICOMReadPolicy kLenient = mitk::DICOMReadPolicy::Lenient;
+  constexpr mitk::DICOMReadPolicy kStrict  = mitk::DICOMReadPolicy::Strict;
 
   constexpr BenchmarkCase kBenchmarkCases[] = {
     // default + rescale-slope baseline (BQML pixel semantics).
@@ -182,21 +220,28 @@ namespace
     {"DRO_3_2_1", "DC=START Step 4 (GE -dFrameRef)", kTriple},
     {"DRO_3_2_2", "DC=START Step 3 (Philips T_ave)", kTriple},
     // Step 3 is the general fallback for every manufacturer except GE, so an
-    // unclassifiable vendor resolves through it rather than being refused.
-    {"DRO_3_2_3", "DC=START Step 3 (unrecognized vendor)", kTriple},
+    // unclassifiable vendor resolves through it -- and says so twice: once
+    // for the empirical formula, once for the vendor it could not verify.
+    {"DRO_3_2_3", "DC=START Step 3 (unrecognized vendor)", kTriple, "", "",
+     kLenient, kAdaptVendorFallback | kAdaptUnknownVendor, 0u},
     {"DRO_3_3_0", "DC=START Step 1 (Siemens private datetime)", kTriple},
     {"DRO_3_3_1", "DC=START Step 1 (GE private datetime)", kTriple},
     {"DRO_3_4_0", "DC=NONE multi-AcqTime (Siemens)", kTriple},
     {"DRO_3_4_1", "DC=NONE multi-AcqTime (GE)", kTriple},
     {"DRO_3_4_2", "DC=NONE multi-AcqTime (Philips, CNTS)", kTriple},
-    {"DRO_3_4_3", "DC=NONE multi-AcqTime (unrecognized vendor)", kTriple},
+    // DC=NONE never consults the manufacturer, so an unrecognized vendor
+    // must stay silent here. Asserted negatively on purpose: a warning that
+    // fires everywhere is worth no more than none.
+    {"DRO_3_4_3", "DC=NONE multi-AcqTime (unrecognized vendor)", kTriple, "", "",
+     kLenient, 0u, kAdaptVendorFallback | kAdaptUnknownVendor},
     {"DRO_3_5_0", "DC=START Step 2 (Siemens AcqTime==SeriesTime)", kTriple},
     {"DRO_3_5_1", "DC=START Step 2 (GE AcqTime==SeriesTime)", kTriple},
     {"DRO_3_5_2", "DC=START Step 2 (Philips AcqTime==SeriesTime)", kTriple},
-    // Step 2 carries no empirical content: an AcquisitionTime that already
-    // equals the SeriesTime names the reference instant outright, whoever
-    // built the scanner.
-    {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor)", kTriple},
+    // Step 2 carries no empirical content -- an AcquisitionTime that already
+    // equals the SeriesTime names the reference instant outright -- so an
+    // unrecognized vendor resolves with no adaptation at all.
+    {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor)", kTriple, "", "",
+     kLenient, 0u, kAdaptVendorFallback | kAdaptUnknownVendor},
 
     // Radiopharmaceutical injection time tag variants.
     {"DRO_4_0",   "RP DateTime only ((0018,1078))", kTriple},
@@ -268,7 +313,7 @@ namespace
     // compute it. Without this row a bug that refuses everything under
     // Strict would look like success.
     {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor), Strict still computes",
-     kTriple, "", "", kStrict},
+     kTriple, "", "", kStrict, 0u, kAdaptVendorFallback | kAdaptUnknownVendor},
   };
 
   constexpr std::size_t kBenchmarkCaseCount = sizeof(kBenchmarkCases) / sizeof(kBenchmarkCases[0]);
@@ -282,6 +327,13 @@ namespace
   std::string DROPath(const std::string& dataDir, const char* droId, const char* leaf)
   {
     return JoinPath(JoinPath(JoinPath(dataDir, "DRO"), droId), leaf);
+  }
+
+  std::string ToHex(unsigned value)
+  {
+    std::ostringstream os;
+    os << std::hex << value;
+    return os.str();
   }
 
   // Compute the median of a sorted double vector. Standard convention:
@@ -455,6 +507,22 @@ private:
     filter->SetDICOMReadPolicy(kase.policy);
     filter->Update();
     const mitk::Image::Pointer suvImage = filter->GetOutput();
+
+    // The adaptation record, not the log, is what pins which IBSI-SUV
+    // recommendations fired: MITK_WARN output is not reachable from a test.
+    const unsigned actualAdaptations = AdaptationMask(filter->GetAdaptations());
+    if (kase.requiredAdaptations != (actualAdaptations & kase.requiredAdaptations))
+    {
+      throw std::runtime_error("expected adaptation rules 0x" +
+                               ToHex(kase.requiredAdaptations) + " but the filter recorded 0x" +
+                               ToHex(actualAdaptations) + ".");
+    }
+    if (0u != (actualAdaptations & kase.forbiddenAdaptations))
+    {
+      throw std::runtime_error("filter applied adaptation rules 0x" +
+                               ToHex(actualAdaptations & kase.forbiddenAdaptations) +
+                               " that this input must not need.");
+    }
     if (suvImage.IsNull())
     {
       throw std::runtime_error("SUVImageFilter produced a null output.");

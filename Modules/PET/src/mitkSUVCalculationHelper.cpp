@@ -292,7 +292,8 @@ namespace
 
 std::vector<mitk::RadiopharmaceuticalInfo>
 mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
-                                  mitk::DICOMReadPolicy policy)
+                                  mitk::DICOMReadPolicy policy,
+                                  std::vector<mitk::SUVAdaptation>& adaptations)
 {
   using IndexedMap = std::map<DICOMTagPath::ItemSelectionIndex, RadiopharmaceuticalInfo>;
   IndexedMap byIndex;
@@ -336,7 +337,7 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
   // exception so callers can surface the input issue.
   DICOMTagPath dosePath;
   dosePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1074);
-  enumerate(dosePath, [policy](RadiopharmaceuticalInfo& info, const std::string& v)
+  enumerate(dosePath, [policy, &adaptations](RadiopharmaceuticalInfo& info, const std::string& v)
   {
     const double raw = ConvertDICOMStrToValue<double>(v);
     if (raw > 0.0 && raw < 1.0e4)
@@ -355,6 +356,8 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
                 << " is below the 1e4 plausibility threshold; "
                    "interpreting as MBq and converting to Bq (= "
                 << converted << " Bq) per IBSI-SUV recommendation.";
+      adaptations.push_back({SUVAdaptationRule::DoseReinterpretedAsMBq,
+                             "(0018,1074)", v, std::to_string(converted)});
       info.totalDoseBq = converted;
     }
     else
@@ -564,7 +567,14 @@ namespace
     {
       return providedHalfLifeSeconds;
     }
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(provider);
+    // Only the half-life is wanted here, so the dose-plausibility policy is
+    // irrelevant and the resulting record is discarded: the filter reads the
+    // sequence itself and is the one call that owns the dose adaptation.
+    // Reading leniently also keeps this lookup from throwing on an
+    // implausible dose that the caller may never consult.
+    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(
+      provider, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
     if (infos.empty())
     {
       return std::numeric_limits<double>::quiet_NaN();
@@ -850,6 +860,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
                     << ". This formula is derived from observed scanner "
                        "behaviour, not from the DICOM specification; the "
                        "strict DICOM read policy refuses it.";
+          info.adaptations.push_back(
+            {SUVAdaptationRule::VendorEmpiricalDecayFallback, "", "", stepName});
+
           if (ManufacturerFamily::Other == manuf)
           {
             const std::string rawManufacturer =
@@ -858,6 +871,8 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
                       << "' is not one of the manufacturers this formula was "
                          "validated against. The general rule was applied; "
                          "treat the resulting decay timing with caution.";
+            info.adaptations.push_back({SUVAdaptationRule::UnrecognizedManufacturer,
+                                        "(0008,0070)", rawManufacturer, stepName});
           }
 
           info.decayTimes = std::move(candidateMap);

@@ -125,7 +125,8 @@ namespace
     const mitk::SUVNormalizationInputs&    inputs,
     mitk::DICOMReadPolicy                  policy,
     const char*                            role,
-    bool                                   emitWarnings = true)
+    bool                                   emitWarnings = true,
+    std::vector<mitk::SUVAdaptation>*      adaptations  = nullptr)
   {
     if (!IsSexSpecificVariant(strategy.Variant()))
     {
@@ -160,6 +161,14 @@ namespace
                    "IBSI-SUV recommended mean of male- and female-specific "
                    "scale numerators for the " << role << " variant "
                 << variantName << " (DICOMReadPolicy::Lenient).";
+    }
+
+    if (nullptr != adaptations)
+    {
+      adaptations->push_back({mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
+                              "(0010,0040)",
+                              inputs.sex.has_value() ? "O" : "",
+                              "mean of male- and female-specific scale numerators"});
     }
 
     auto inputsCopy = inputs;
@@ -515,6 +524,14 @@ const mitk::DecayCorrectionInfo& mitk::SUVImageFilter::GetEffectiveDecayCorrecti
   return m_EffectiveDecayCorrection.value();
 }
 
+const std::vector<mitk::SUVAdaptation>& mitk::SUVImageFilter::GetAdaptations() const
+{
+  // Deliberately no RequireConfigured: an unconfigured filter has applied
+  // nothing, and "nothing was adapted" is the honest answer rather than an
+  // error. It is also what a caller polling this on the Strict path sees.
+  return m_Adaptations;
+}
+
 void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* props)
 {
   if (nullptr == props)
@@ -535,6 +552,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   const auto prevHalfLife   = m_EffectiveHalfLifeInSec;
   const auto prevDecay      = m_EffectiveDecayCorrection;
   const auto prevInputModel = m_EffectiveInputModel;
+  const auto prevAdaptations = m_Adaptations;
   const auto prevConf       = m_Configured;
 
   m_Configured = false;
@@ -545,6 +563,9 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   m_EffectiveHalfLifeInSec.reset();
   m_EffectiveDecayCorrection.reset();
   m_EffectiveInputModel.reset();
+  // Cleared on entry so a reconfigure reports this input's
+  // adaptations rather than accumulating across calls.
+  m_Adaptations.clear();
 
   // Reset on entry but, unlike the effective fields above, deliberately not
   // snapshotted for rollback: the detection slot must reflect this call's
@@ -577,7 +598,8 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
 
     if (needsRadioPharma)
     {
-      auto rpiInfos      = GetRadiopharmaceuticalInfos(props, m_DICOMReadPolicy);
+      auto rpiInfos      = GetRadiopharmaceuticalInfos(props, m_DICOMReadPolicy,
+                                                       m_Adaptations);
       const int tracerIx = SelectTracerIndex(rpiInfos, m_TracerIndex);
       const RadiopharmaceuticalInfo tracer = (tracerIx >= 0) ? rpiInfos[tracerIx]
                                                              : RadiopharmaceuticalInfo{};
@@ -690,6 +712,8 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
         m_EffectiveDecayCorrection = DeduceDecayCorrection(image,
                                                            m_EffectiveHalfLifeInSec.value(),
                                                            m_DICOMReadPolicy);
+        const auto& deduced = m_EffectiveDecayCorrection.value().adaptations;
+        m_Adaptations.insert(m_Adaptations.end(), deduced.begin(), deduced.end());
       }
     }
 
@@ -710,17 +734,24 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
       normInputs.sex = m_EffectivePatientSex.value();
     }
     {
+      // This pass owns the adaptation record; the GenerateData pass owns
+      // the log line. Splitting them avoids double-logging while keeping
+      // both driven by the one predicate inside
+      // ResolveScaleNumeratorUnderSexPolicy, so they cannot disagree about
+      // whether the mean was applied.
       auto targetStrategy = MakeSUVNormalizationStrategy(m_TargetVariant);
       (void)ResolveScaleNumeratorUnderSexPolicy(*targetStrategy, normInputs,
                                                 m_DICOMReadPolicy, "target",
-                                                /*emitWarnings=*/false);
+                                                /*emitWarnings=*/false,
+                                                &m_Adaptations);
       if (sourceNeedsRenormPatientData)
       {
         auto sourceStrategy = MakeSUVNormalizationStrategy(sourceVariant);
         (void)ResolveScaleNumeratorUnderSexPolicy(*sourceStrategy, normInputs,
                                                   m_DICOMReadPolicy,
                                                   "source (pre-normalized input)",
-                                                  /*emitWarnings=*/false);
+                                                  /*emitWarnings=*/false,
+                                                  &m_Adaptations);
       }
     }
 
@@ -735,6 +766,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     m_EffectiveHalfLifeInSec        = prevHalfLife;
     m_EffectiveDecayCorrection      = prevDecay;
     m_EffectiveInputModel           = prevInputModel;
+    m_Adaptations                   = prevAdaptations;
     m_Configured                    = prevConf;
     throw;
   }

@@ -347,6 +347,52 @@ namespace mitk
   };
 
   /**
+   * \brief The closed set of IBSI-SUV-recommended reinterpretations the
+   *        SUV pipeline may apply to a borderline input.
+   *
+   * Every value corresponds to one recommendation that \c DICOMReadPolicy
+   * gates: under \c Lenient it is applied and recorded, under \c Strict it
+   * raises the matching exception instead.
+   */
+  enum class SUVAdaptationRule
+  {
+    /** (0018,1074) below 1e4 read as MBq rather than Bq. */
+    DoseReinterpretedAsMBq,
+    /** DC=START resolved through a vendor-empirical reference-time formula. */
+    VendorEmpiricalDecayFallback,
+    /** (0008,0070) Manufacturer unrecognized; the general rule was applied. */
+    UnrecognizedManufacturer,
+    /** Ambiguous patient sex resolved as the mean of the male and female formulas. */
+    AmbiguousPatientSexMeanOfMaleAndFemale
+  };
+
+  /**
+   * \brief One reinterpretation that was applied while computing an SUV.
+   *
+   * A \c MITK_WARN records the same event for a human reading the log, but a
+   * log is not available to a plugin, a pipeline or a Python caller. This
+   * struct is the machine-readable half: it says which recommendation fired,
+   * on which attribute, and what the value became.
+   *
+   * Under \c DICOMReadPolicy::Strict the list is always empty, because the
+   * first adaptation throws instead of being applied. That emptiness is the
+   * guarantee the mode exists to give, not an absence of information.
+   *
+   * \sa SUVImageFilter::GetAdaptations, DICOMReadPolicy
+   */
+  struct MITKPET_EXPORT SUVAdaptation
+  {
+    /** Which recommendation fired. */
+    SUVAdaptationRule rule = SUVAdaptationRule::DoseReinterpretedAsMBq;
+    /** The DICOM tag concerned, e.g. "(0018,1074)". Empty when there is none. */
+    std::string dicomTag;
+    /** The value as stored in the input. */
+    std::string originalValue;
+    /** The value the computation actually used. */
+    std::string usedValue;
+  };
+
+  /**
    * \brief Manufacturer family inferred from DICOM tag (0008,0070) Manufacturer.
    *
    * The IBSI-SUV-conformant decay-correction pipeline branches on
@@ -437,6 +483,12 @@ namespace mitk
   {
     DecayCorrectionStrategy strategy = DecayCorrectionStrategy::None;
     DecayTimeMapType        decayTimes;
+    /**
+     * Reinterpretations applied while deducing the decay correction. Empty
+     * unless a DC=START fallback beyond the spec-clean Steps 1 and 2 was
+     * needed, and always empty under \c DICOMReadPolicy::Strict.
+     */
+    std::vector<SUVAdaptation> adaptations;
   };
 
   /**
@@ -479,11 +531,17 @@ namespace mitk
    * and an \c ImplausibleRadionuclideDoseException is raised. Other
    * fields (half-life, name) are read verbatim regardless of policy.
    *
-   * \param[in] provider Source of DICOM properties; typically the BaseData of a
-   *            PET image.
-   * \param[in] policy   Policy for handling values that the IBSI-SUV
-   *                     benchmark recommends adapting. Defaults to
-   *                     \c DICOMReadPolicy::Lenient (apply with WARN).
+   * \param[in]     provider Source of DICOM properties; typically the BaseData
+   *                of a PET image.
+   * \param[in]     policy   Policy for handling values that the IBSI-SUV
+   *                         benchmark recommends adapting. Defaults to
+   *                         \c DICOMReadPolicy::Lenient (apply with WARN).
+   * \param[in,out] adaptations Appended to when the MBq reinterpretation is
+   *                         applied; never cleared, so a caller can thread one
+   *                         list through several helpers. The parameter is
+   *                         mandatory rather than defaulted precisely so that
+   *                         discarding the record has to be a deliberate act
+   *                         at the call site.
    * \return A vector of RadiopharmaceuticalInfo, ordered by sequence-item
    *         index. Empty if no Radiopharmaceutical Information Sequence is
    *         present or if \p provider is \c nullptr.
@@ -497,7 +555,8 @@ namespace mitk
    */
   std::vector<RadiopharmaceuticalInfo> MITKPET_EXPORT
   GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
-                              DICOMReadPolicy policy = DICOMReadPolicy::Lenient);
+                              DICOMReadPolicy policy,
+                              std::vector<SUVAdaptation>& adaptations);
 
   /**
    * \brief Get the patient's weight from DICOM properties.
@@ -617,8 +676,10 @@ namespace mitk
    * under \c DICOMReadPolicy::Lenient. Under \c DICOMReadPolicy::Strict
    * they are refused and the helper raises
    * \c VendorEmpiricalDecayFallbackRefusedException. Applying either one
-   * emits a \c MITK_WARN, and applying it to an input whose manufacturer
-   * could not be classified emits a second one.
+   * is recorded as \c SUVAdaptationRule::VendorEmpiricalDecayFallback, and
+   * applying it to an input whose manufacturer could not be classified is
+   * additionally recorded as
+   * \c SUVAdaptationRule::UnrecognizedManufacturer.
    *
    * If none of these applies -- typically no private datetime tag and no
    * per-slice frame timing -- the helper raises

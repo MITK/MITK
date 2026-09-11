@@ -215,6 +215,14 @@ input usable. By default they are applied and logged as warnings. With
 | Unverified manufacturer for that fallback | `(0008,0070)` absent, empty or unrecognized *and* step 3 or 4 fires | general rule applied | covered by the row above |
 | Patient sex `O` for a sex-specific variant | `(0010,0040)` or `--patient-sex` is `O` | mean of male and female numerators | `AmbiguousPatientSexAdaptationRefusedException` |
 
+Every adaptation that fires is also recorded on the filter, so a caller
+embedding `mitk::SUVImageFilter` can audit them without parsing the log:
+`GetAdaptations()` returns one entry per applied recommendation, naming the
+rule, the DICOM tag concerned, the stored value and the value used. Under
+`--strict-dicom` that list is necessarily empty, because the first adaptation
+raises instead of being applied -- an empty list under the strict policy is
+the guarantee the mode exists to give, not a lack of information.
+
 `--injected-activity` bypasses the dose adaptation and `--decay-time` bypasses
 the decay-timing fallback regardless of `--strict-dicom`; both values are used
 verbatim.

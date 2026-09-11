@@ -10,8 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <algorithm>
 #include <cmath>
 #include <string>
+#include <vector>
 
 #include <mitkDICOMProperty.h>
 #include <mitkDICOMTagPath.h>
@@ -25,6 +27,24 @@ found in the LICENSE file.
 
 namespace
 {
+  bool HasRule(const mitk::DecayCorrectionInfo& info, mitk::SUVAdaptationRule rule)
+  {
+    return std::any_of(info.adaptations.cbegin(), info.adaptations.cend(),
+                       [rule](const mitk::SUVAdaptation& a) { return rule == a.rule; });
+  }
+
+  // Most cases here only care about the parsed sequence, not about which
+  // IBSI-SUV recommendations fired, so they funnel through this wrapper
+  // rather than declaring an adaptation vector each time. The cases that do
+  // care pass their own vector to mitk::GetRadiopharmaceuticalInfos.
+  std::vector<mitk::RadiopharmaceuticalInfo> ReadRPI(
+    const mitk::IPropertyProvider* provider,
+    mitk::DICOMReadPolicy policy = mitk::DICOMReadPolicy::Lenient)
+  {
+    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+    return mitk::GetRadiopharmaceuticalInfos(provider, policy, ignoredAdaptations);
+  }
+
   // Build a 1x1xnSlicesxnTimeSteps mitk::Image with float pixels. The data
   // buffer is irrelevant for these tests; only the time geometry / slice
   // count is consulted by DeduceDecayCorrection's iteration loop.
@@ -158,13 +178,15 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_None_MissingAcqTime_Throws_MissingDICOMPropertyException);
 
-  // DC=START rule gating
+  // DC=START rule gating and the adaptation record
   MITK_TEST(Start_Step2_UnrecognizedVendor_Computes);
-  MITK_TEST(Start_Step3_UnrecognizedVendor_Computes);
+  MITK_TEST(Start_Step3_UnrecognizedVendor_ComputesAndRecordsBothRules);
   MITK_TEST(Start_Step4_GE_WithoutActualFrameDuration_Computes);
   MITK_TEST(Start_Step4_GE_DoesNotApplyTAve);
   MITK_TEST(Start_Step3_NonGE_ActualFrameDurationAbsent_Refuses);
   MITK_TEST(Start_Step3_NonGE_ActualFrameDurationEmpty_Refuses);
+  MITK_TEST(Radiopharm_DoseBelowThreshold_RecordsAdaptation);
+  MITK_TEST(Radiopharm_DoseAboveThreshold_RecordsNothing);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -276,7 +298,7 @@ public:
   void Radiopharm_Empty_ReturnsEmpty()
   {
     auto image = MakeSyntheticImage(1, 1);
-    CPPUNIT_ASSERT(mitk::GetRadiopharmaceuticalInfos(image).empty());
+    CPPUNIT_ASSERT(ReadRPI(image).empty());
   }
 
   void Radiopharm_SingleItem_FullyPopulated()
@@ -293,7 +315,7 @@ public:
       SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path), "^18F^");
     }
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.26, infos[0].halfLifeSeconds, 1e-9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8,  infos[0].totalDoseBq,     1.0);
@@ -331,7 +353,7 @@ public:
       SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path3), "^68Ga^");
     }
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), infos.size());
 
     // Pairing: each index must hold values from the same source item.
@@ -358,7 +380,7 @@ public:
       SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path), "6586.26");
     }
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), infos.size());
 
     // Item [0]: dose set, half-life NaN, name empty.
@@ -385,7 +407,7 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
   }
@@ -396,7 +418,7 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
   }
@@ -410,7 +432,7 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "10000");
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0e4, infos[0].totalDoseBq, 0.0);
   }
@@ -426,7 +448,7 @@ public:
     {
       auto image = MakeSyntheticImage(1, 1);
       SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "0");
-      const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+      const auto infos = ReadRPI(image);
       CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
       CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, infos[0].totalDoseBq, 0.0);
     }
@@ -434,7 +456,7 @@ public:
     {
       auto image = MakeSyntheticImage(1, 1);
       SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "-5");
-      const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+      const auto infos = ReadRPI(image);
       CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
       CPPUNIT_ASSERT_DOUBLES_EQUAL(-5.0, infos[0].totalDoseBq, 0.0);
     }
@@ -452,7 +474,7 @@ public:
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
 
     CPPUNIT_ASSERT_THROW(
-      mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Strict),
+      ReadRPI(image, mitk::DICOMReadPolicy::Strict),
       mitk::ImplausibleRadionuclideDoseException);
   }
 
@@ -462,7 +484,7 @@ public:
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
 
     CPPUNIT_ASSERT_THROW(
-      mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Strict),
+      ReadRPI(image, mitk::DICOMReadPolicy::Strict),
       mitk::BenchmarkAdaptationRequiredException);
   }
 
@@ -472,7 +494,7 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
 
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Strict);
+    const auto infos = ReadRPI(image, mitk::DICOMReadPolicy::Strict);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
   }
@@ -854,9 +876,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::Start, info.strategy);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds,
                                  info.decayTimes.at(0).at(0), 1e-6);
+    // An AcquisitionTime that already equals the SeriesTime names the
+    // reference instant outright, so nothing was reinterpreted.
+    CPPUNIT_ASSERT(info.adaptations.empty());
   }
 
-  void Start_Step3_UnrecognizedVendor_Computes()
+  void Start_Step3_UnrecognizedVendor_ComputesAndRecordsBothRules()
   {
     auto image = MakeSyntheticImage(1, 1);
     SetupStep34Case(image, "SYNTHETIC");
@@ -866,6 +891,8 @@ public:
     // T_ave is strictly positive, so the general formula lands above the
     // pure -FrameReferenceTime shift rather than on it.
     CPPUNIT_ASSERT(info.decayTimes.at(0).at(0) > kStep4ExpectedDecaySeconds);
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback));
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::UnrecognizedManufacturer));
   }
 
   void Start_Step4_GE_WithoutActualFrameDuration_Computes()
@@ -880,6 +907,9 @@ public:
     const auto info = mitk::DeduceDecayCorrection(image);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(kStep4ExpectedDecaySeconds,
                                  info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback));
+    // GE is recognized, so the unverified-vendor note must stay silent.
+    CPPUNIT_ASSERT(!HasRule(info, mitk::SUVAdaptationRule::UnrecognizedManufacturer));
   }
 
   void Start_Step4_GE_DoesNotApplyTAve()
@@ -927,6 +957,35 @@ public:
 
     CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
                          mitk::AmbiguousDecayTimingException);
+  }
+
+  void Radiopharm_DoseBelowThreshold_RecordsAdaptation()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(
+      image, mitk::DICOMReadPolicy::Lenient, adaptations);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+    CPPUNIT_ASSERT(mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == adaptations[0].rule);
+    CPPUNIT_ASSERT_EQUAL(std::string("(0018,1074)"), adaptations[0].dicomTag);
+    // The stored value is kept verbatim so an auditor can see what was read,
+    // not only what was used.
+    CPPUNIT_ASSERT_EQUAL(std::string("368.08"), adaptations[0].originalValue);
+  }
+
+  void Radiopharm_DoseAboveThreshold_RecordsNothing()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    (void)mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Lenient,
+                                            adaptations);
+    CPPUNIT_ASSERT(adaptations.empty());
   }
 
   // ---- GetManufacturerFamily ----

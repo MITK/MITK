@@ -99,98 +99,245 @@ namespace
     return mitk::ComputeMiliSecDuration(injection, reference) / 1000.0;
   }
 
-  // Resolve the radiopharmaceutical injection time into an absolute OFDateTime.
-  // Returns (parsed time, derivedFromTimeOnlyTag). The bool tells the caller
-  // whether the rollover guard may safely subtract 24 h to recover an
-  // ambiguous timing situation.
-  std::pair<OFDateTime, bool> ResolveInjectionDateTime(
-    const mitk::IPropertyProvider* provider,
-    const std::string& fallbackAcquisitionDate)
+  // Seconds since midnight of the instant \a time denotes, on the same
+  // normalization ConvertOFDateTimeToTimePoint applies: a stamp carrying a
+  // UTC offset is shifted by it, a stamp without one is taken as local to
+  // itself. Both halves of the administration-time rule below must agree on
+  // this or they measure different things -- and no benchmark DRO mixes the
+  // two forms, so nothing but this comment and its unit test guards it.
+  double SecondsOfDayUTC(const OFDateTime& time)
   {
-    // Prefer the unambiguous DateTime tag.
+    constexpr long long kMsPerDay = 24LL * 60LL * 60LL * 1000LL;
+    const auto ms = mitk::ConvertOFDateTimeToTimePoint(time).time_since_epoch().count();
+    // Floor-modulo, not truncating: anonymized inputs carry pre-1970 dates
+    // (DRO_4_4 uses 1960-01-01), where a truncating % yields a negative
+    // time of day.
+    long long remainder = ms % kMsPerDay;
+    if (remainder < 0)
+    {
+      remainder += kMsPerDay;
+    }
+    return static_cast<double>(remainder) / 1000.0;
+  }
+
+  double NormalizeSecondsOfDay(double seconds)
+  {
+    constexpr double kSecondsPerDay = 24.0 * 60.0 * 60.0;
+    double normalized = std::fmod(seconds, kSecondsPerDay);
+    if (normalized < 0.0)
+    {
+      normalized += kSecondsPerDay;
+    }
+    return normalized;
+  }
+
+  /** The two radiopharmaceutical administration-time tags, read once.
+   *
+   * Both are image-level, so they are resolved outside the per-slice loop.
+   * Either may be absent -- that combination is a refusal condition the
+   * consumer reports, not something this function pre-validates. A tag that
+   * is present but unparseable is an error rather than an absence: falling
+   * through to the other tag would silently compute from a different
+   * instant than the one the input names. */
+  struct AdministrationTimeTags
+  {
+    bool       haveStartDateTime = false;   // (0018,1078) present and parsed
+    OFDateTime startDateTime;
+    bool       haveStartTime = false;       // (0018,1072) present and parsed
+    double     startTimeOfDaySeconds = 0.0; // valid only if haveStartTime
+  };
+
+  AdministrationTimeTags ResolveAdministrationTimeTags(const mitk::IPropertyProvider* provider)
+  {
+    AdministrationTimeTags tags;
+
     mitk::DICOMTagPath startDateTimePath;
     startDateTimePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1078);
-    const auto* startDateTimeProp = FindFirstDICOMProperty(provider, startDateTimePath);
-
-    if (startDateTimeProp != nullptr)
+    if (const auto* prop = FindFirstDICOMProperty(provider, startDateTimePath))
     {
-      OFDateTime parsed;
-      // (0018,1078) is a DT VR — date and time are already encoded together.
-      if (!ConvertDICOMDateTimeString("", startDateTimeProp->GetValue(0, 0, true, true), parsed))
+      const std::string raw = prop->GetValue(0, 0, true, true);
+      // (0018,1078) is a DT VR -- date and time are already encoded together.
+      if (!ConvertDICOMDateTimeString("", raw, tags.startDateTime))
       {
         mitkThrowException(mitk::InvalidDICOMPropertyValueException)
           << "Cannot parse Radiopharmaceutical Start DateTime (0018,1078) value '"
-          << startDateTimeProp->GetValue(0, 0, true, true) << "'.";
+          << raw << "'.";
       }
-      return { parsed, false };
+      tags.haveStartDateTime = true;
     }
 
     mitk::DICOMTagPath startTimePath;
     startTimePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1072);
-    const auto* startTimeProp = FindFirstDICOMProperty(provider, startTimePath);
-
-    if (startTimeProp != nullptr)
+    if (const auto* prop = FindFirstDICOMProperty(provider, startTimePath))
     {
-      if (fallbackAcquisitionDate.empty())
-      {
-        mitkThrowException(mitk::MissingDICOMPropertyException)
-          << "Radiopharmaceutical Start Time (0018,1072) is present but no "
-             "fallback acquisition date is available to construct an absolute "
-             "injection timestamp.";
-      }
+      const std::string raw = prop->GetValue(0, 0, true, true);
       OFDateTime parsed;
-      if (!ConvertDICOMDateTimeString(fallbackAcquisitionDate,
-                                      startTimeProp->GetValue(0, 0, true, true),
-                                      parsed))
+      // (0018,1072) is a TM VR and carries no date. Any date parses it into
+      // an absolute instant; only its time of day is ever read back.
+      if (!ConvertDICOMDateTimeString("19700101", raw, parsed))
       {
         mitkThrowException(mitk::InvalidDICOMPropertyValueException)
           << "Cannot parse Radiopharmaceutical Start Time (0018,1072) value '"
-          << startTimeProp->GetValue(0, 0, true, true)
-          << "' with fallback date '" << fallbackAcquisitionDate << "'.";
+          << raw << "'.";
       }
-      return { parsed, true };
+      tags.startTimeOfDaySeconds = SecondsOfDayUTC(parsed);
+      tags.haveStartTime = true;
+    }
+
+    return tags;
+  }
+
+  // Above this half-life an administration date that is wrong by a whole
+  // day still produces a plausible SUV, so the substitution below is not
+  // permitted and the input has to be refused outright.
+  constexpr double kDateSubstitutionHalfLifeLimitSeconds = 41400.0;
+
+  // Reconstruct the decay duration when the stored administration date
+  // cannot be trusted: keep the stored time of day, take the date from the
+  // reference instant. Because the two then share a date by construction,
+  // "reference minus administration" collapses to plain time-of-day
+  // arithmetic -- and subtracting a day from the administration datetime is
+  // the same operation as adding one to the difference. That equivalence is
+  // what lets this avoid calendar arithmetic entirely, and with it a whole
+  // class of month- and year-boundary bugs.
+  double SubstituteAdministrationDate(double referenceTimeOfDaySeconds,
+                                      double administrationTimeOfDaySeconds,
+                                      std::vector<mitk::SUVAdaptation>& adaptations)
+  {
+    constexpr double kSecondsPerDay = 24.0 * 60.0 * 60.0;
+
+    double duration = referenceTimeOfDaySeconds - administrationTimeOfDaySeconds;
+    if (duration < mitk::kEarliestDecayDurationSeconds)
+    {
+      duration += kSecondsPerDay;
+      MITK_WARN << "Reconstructed administration datetime falls after the "
+                   "decay-correction reference time; moving it back one day "
+                   "per the IBSI-SUV recommendation. Decay duration: "
+                << duration << " s.";
+      adaptations.push_back({mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
+                             "", "", std::to_string(duration)});
+    }
+    return duration;
+  }
+
+  /** Residual decay duration for one (timestep, slice), per IBSI-SUV v3.0.1.
+   *
+   * The reference instant arrives as a stored datetime plus an offset in
+   * seconds rather than as a single OFDateTime, because two of the four
+   * call sites compute it as "acquisition datetime + a correction" and
+   * DCMTK offers no datetime-plus-duration arithmetic. */
+  double ResolveDecayDurationSeconds(const AdministrationTimeTags& admin,
+                                     const OFDateTime& referenceBase,
+                                     double referenceOffsetSeconds,
+                                     double halfLifeSeconds,
+                                     mitk::DICOMReadPolicy policy,
+                                     std::vector<mitk::SUVAdaptation>& adaptations)
+  {
+    if (!std::isfinite(halfLifeSeconds) || halfLifeSeconds <= 0.0)
+    {
+      // Every branch below is keyed on the half-life -- even the one that
+      // uses (0018,1078) verbatim, whose acceptance window is 2 * T_half.
+      // Without it there is no rule to apply, so refuse rather than invent
+      // a window.
+      mitkThrowException(mitk::MissingDICOMPropertyException)
+        << "Resolving the radiopharmaceutical administration time requires a "
+           "positive radionuclide half-life (got " << halfLifeSeconds
+        << " s). Provide it via an explicit override or supply DICOM "
+           "(0018,1075).";
+    }
+
+    const double referenceTimeOfDay =
+      NormalizeSecondsOfDay(SecondsOfDayUTC(referenceBase) + referenceOffsetSeconds);
+
+    if (admin.haveStartDateTime)
+    {
+      const double offset =
+        DurationInSeconds(admin.startDateTime, referenceBase) + referenceOffsetSeconds;
+
+      if (offset >= mitk::kEarliestDecayDurationSeconds && offset < 2.0 * halfLifeSeconds)
+      {
+        return offset;
+      }
+
+      if (halfLifeSeconds >= kDateSubstitutionHalfLifeLimitSeconds)
+      {
+        mitkThrowException(mitk::UnrecoverableAdministrationDateException)
+          << "(0018,1078) Radiopharmaceutical Start DateTime yields a decay "
+             "duration of " << offset << " s, outside the plausible window "
+             "[" << mitk::kEarliestDecayDurationSeconds << " s, 2 * half-life). "
+             "Reconstructing the administration date from the reference "
+             "datetime is only permitted below a half-life of "
+          << kDateSubstitutionHalfLifeLimitSeconds << " s, and this "
+             "radionuclide's is " << halfLifeSeconds
+          << " s. Re-export the data with a correct administration date.";
+      }
+
+      if (mitk::DICOMReadPolicy::Strict == policy)
+      {
+        mitkThrowException(mitk::AdministrationDateSubstitutionRefusedException)
+          << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
+             "implausible decay duration of " << offset << " s. The IBSI-SUV "
+             "recommendation reconstructs the administration date from the "
+             "decay-correction reference datetime, but "
+             "DICOMReadPolicy::Strict is active. Re-export the data with a "
+             "correct administration date or relax the policy.";
+      }
+
+      MITK_WARN << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
+                   "implausible decay duration of " << offset
+                << " s; keeping its time of day and taking the date from the "
+                   "decay-correction reference datetime per the IBSI-SUV "
+                   "recommendation.";
+      adaptations.push_back({mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
+                             "(0018,1078)", std::to_string(offset), ""});
+
+      return SubstituteAdministrationDate(referenceTimeOfDay,
+                                          SecondsOfDayUTC(admin.startDateTime),
+                                          adaptations);
+    }
+
+    if (admin.haveStartTime)
+    {
+      if (halfLifeSeconds >= kDateSubstitutionHalfLifeLimitSeconds)
+      {
+        mitkThrowException(mitk::UnrecoverableAdministrationDateException)
+          << "Only (0018,1072) Radiopharmaceutical Start Time is available, "
+             "which carries no date. Reconstructing one from the "
+             "decay-correction reference datetime is only permitted below a "
+             "half-life of " << kDateSubstitutionHalfLifeLimitSeconds
+          << " s, and this radionuclide's is " << halfLifeSeconds
+          << " s -- an uptake longer than a day would be indistinguishable "
+             "from a short one. Re-export the data with (0018,1078) "
+             "Radiopharmaceutical Start DateTime.";
+      }
+
+      if (mitk::DICOMReadPolicy::Strict == policy)
+      {
+        mitkThrowException(mitk::AdministrationDateSubstitutionRefusedException)
+          << "Only (0018,1072) Radiopharmaceutical Start Time is available. "
+             "The IBSI-SUV recommendation reconstructs the administration "
+             "date from the decay-correction reference datetime, but "
+             "DICOMReadPolicy::Strict is active. Re-export the data with "
+             "(0018,1078) Radiopharmaceutical Start DateTime or relax the "
+             "policy.";
+      }
+
+      MITK_WARN << "Only (0018,1072) Radiopharmaceutical Start Time is "
+                   "available; taking the administration date from the "
+                   "decay-correction reference datetime per the IBSI-SUV "
+                   "recommendation.";
+      adaptations.push_back({mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
+                             "(0018,1072)", "", ""});
+
+      return SubstituteAdministrationDate(referenceTimeOfDay,
+                                          admin.startTimeOfDaySeconds,
+                                          adaptations);
     }
 
     mitkThrowException(mitk::MissingDICOMPropertyException)
       << "No radiopharmaceutical injection time available: neither "
          "(0018,1078) Radiopharmaceutical Start DateTime nor (0018,1072) "
          "Radiopharmaceutical Start Time was found.";
-  }
-
-  // Numeric rollover guard for a precomputed (reference - injection)
-  // duration in seconds; it does not compute the difference itself.
-  // - If the result is negative AND the injection time was derived from
-  //   the (0018,1072) TM-only tag (whose date had to be assembled from the
-  //   acquisition date), subtract 24 h from the injection and try once more.
-  //   This recovers the typical "injected last night, scanned this morning"
-  //   ambiguity.
-  // - If the result is still outside [0, 24 h], throw
-  //   AmbiguousDecayTimingException.
-  // - For (0018,1078)-derived data, no rollover correction is applied; any
-  //   negative duration throws.
-  double GuardDecayDurationSeconds(double durationSeconds,
-                                   bool injectionFromTimeOnlyTag)
-  {
-    constexpr double kSecondsIn24h = 24.0 * 60.0 * 60.0;
-
-    double seconds = durationSeconds;
-
-    if (seconds < 0.0 && injectionFromTimeOnlyTag)
-    {
-      seconds += kSecondsIn24h;
-    }
-
-    if (seconds < 0.0 || seconds > kSecondsIn24h)
-    {
-      mitkThrowException(mitk::AmbiguousDecayTimingException)
-        << "Cannot reconcile radiopharmaceutical injection time and "
-           "acquisition / series reference time. Computed decay duration: "
-        << seconds << " s. Please re-export the data with "
-           "(0018,1078) Radiopharmaceutical Start DateTime to remove the "
-           "ambiguity.";
-    }
-
-    return seconds;
   }
 
   // Pull a named property (attached out-of-band — e.g. the lifted vendor
@@ -635,8 +782,13 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
           << "Cannot parse Series Date+Time '" << referenceDate << seriesTime << "'.";
       }
 
-      const auto injection = ResolveInjectionDateTime(data, referenceDate);
+      const auto admin = ResolveAdministrationTimeTags(data);
       const auto manuf = GetManufacturerFamily(data);
+      // Hoisted above Step 1: every reference-time rule now feeds
+      // ResolveDecayDurationSeconds, whose acceptance window is keyed on the
+      // half-life, so it is needed before the first candidate is evaluated
+      // rather than only by the T_ave formula further down.
+      const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
 
       // ---- Step 1: vendor private datetime (per slice via lifted property) ----
       // The PET reader (BaseDICOMReaderService) lifts these values out of
@@ -674,15 +826,15 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
                 allSlicesValid = false;
                 break;
               }
-              const double base = DurationInSeconds(injection.first, ofPrivate);
-              if (base < 0.0)
-              {
-                // Spec's "non-negative" precondition not met for this slice.
-                allSlicesValid = false;
-                break;
-              }
+              // The vendor private datetime carries no plausibility
+              // precondition in the recommendation: "the dose should be
+              // corrected to the datetime stored in the private scan start
+              // datetime if it is present". Once this rule applies we commit
+              // to it; tolerance for a slightly negative offset now lives in
+              // the administration-time window, where it belongs.
               sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-                GuardDecayDurationSeconds(base, injection.second);
+                ResolveDecayDurationSeconds(admin, ofPrivate, 0.0, halfLife,
+                                            policy, info.adaptations);
             }
           }
 
@@ -733,8 +885,8 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
                   << "' at timestep " << t << " slice " << s << ".";
               }
               sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-                GuardDecayDurationSeconds(
-                  DurationInSeconds(injection.first, ofAcq), injection.second);
+                ResolveDecayDurationSeconds(admin, ofAcq, 0.0, halfLife,
+                                            policy, info.adaptations);
             }
           }
           return info;
@@ -751,7 +903,6 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       // a partial result.
       const auto* frameRefProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0054, 0x1300));
       const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
-      const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
 
       // Only the GE rule is manufacturer-specific. Siemens, Philips and any
       // manufacturer we cannot classify share the general T_ave form, so the
@@ -842,9 +993,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
               offset = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife) - frameRefSec;
             }
 
-            const double base = DurationInSeconds(injection.first, ofAcq);
             sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-              GuardDecayDurationSeconds(base + offset, injection.second);
+              ResolveDecayDurationSeconds(admin, ofAcq, offset, halfLife,
+                                          policy, info.adaptations);
           }
         }
 
@@ -939,9 +1090,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
              "or supply DICOM (0018,1075).";
       }
 
-      // Injection time is image-level; resolve once and reuse across all slices/timesteps.
-      const std::string firstSliceAcqDate = acqDateProp->GetValue(0, 0, true, true);
-      const auto injection = ResolveInjectionDateTime(data, firstSliceAcqDate);
+      // Administration tags are image-level; resolve once and reuse across
+      // all slices / timesteps.
+      const auto admin = ResolveAdministrationTimeTags(data);
 
       const auto timeSteps = data->GetTimeSteps();
       for (TimeStepType t = 0; t < timeSteps; ++t)
@@ -974,9 +1125,8 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
           const double tAveSec = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife);
 
           sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-            GuardDecayDurationSeconds(
-              DurationInSeconds(injection.first, ofAcq) + tAveSec,
-              injection.second);
+            ResolveDecayDurationSeconds(admin, ofAcq, tAveSec, halfLife,
+                                        policy, info.adaptations);
         }
       }
       return info;

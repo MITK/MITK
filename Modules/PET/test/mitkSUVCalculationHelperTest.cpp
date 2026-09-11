@@ -174,7 +174,18 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(None_MissingFrameDuration_Throws_MissingDICOMPropertyException);
   MITK_TEST(Prefers_1078_Over_1072);
   MITK_TEST(Rollover_1072_Recovered);
-  MITK_TEST(Rollover_1078_NoSilentCorrection_Throws_AmbiguousDecayTimingException);
+  MITK_TEST(AdminWindow_AcquisitionOneHourEarly_Accepted);
+  MITK_TEST(AdminWindow_JustBelowFloor_SubstitutesDate);
+  MITK_TEST(AdminWindow_JustBelowTwoHalfLives_Accepted);
+  MITK_TEST(AdminWindow_AtTwoHalfLives_SubstitutesDate);
+  MITK_TEST(AdminWindow_HalfLifeJustBelowLimit_SubstitutesDate);
+  MITK_TEST(AdminWindow_HalfLifeAtLimit_Refuses);
+  MITK_TEST(AdminWindow_HalfLifeUnavailable_Refuses);
+  MITK_TEST(AdminWindow_StrictPolicy_RefusesDateSubstitution);
+  MITK_TEST(AdminWindow_StrictPolicy_RefusalIsCatchableAsBaseException);
+  MITK_TEST(AdminTime_UtcOffsetHonoured);
+  MITK_TEST(AdminTime_UnparseableStartDateTime_Throws);
+  MITK_TEST(Start_Step1_NegativeOffset_DoesNotFallThroughToStep2);
   MITK_TEST(Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_None_MissingAcqTime_Throws_MissingDICOMPropertyException);
 
@@ -193,6 +204,9 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
 private:
 
   // Most decay-correction tests share a common acquisition-day setup.
+  // The half-life is part of the fixture because every DC=START path
+  // resolves the administration time through an acceptance window of
+  // 2 * T_half, so there is no rule to apply without one.
   // Series Time 12:15:30, injection (1078) on the same day at 11:00:00 ->
   // SeriesTime - InjectionTime = (12*3600+15*60+30) - (11*3600) = 4530 s.
   // After the IBSI-SUV-conformant DC=START rewrite this fixture exercises
@@ -235,6 +249,8 @@ private:
     SetDicomProperty(image, PropName(0x0008, 0x0032), "121530");            // AcqTime (== SeriesTime)
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
                      "20260430110000");                                     // RP Start DT
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
+                     "6586.26");                                            // Half-life [s]
   }
 
 public:
@@ -686,6 +702,8 @@ public:
     // used. Single-slice -> uniform value.
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
+                     "6586.26");                                            // Half-life [s]
     SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
     SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");
     SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS Healthineers");
@@ -705,6 +723,8 @@ public:
   {
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
+                     "6586.26");                                            // Half-life [s]
     SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
     SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");
     SetDicomProperty(image, PropName(0x0008, 0x0070), "GE MEDICAL SYSTEMS");
@@ -725,6 +745,8 @@ public:
     // carries 12:30:00; injection at 11:00:00 gives 3600 s and 5400 s.
     auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
+                     "6586.26");                                            // Half-life [s]
     SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
     SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");
     SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS Healthineers");
@@ -1124,6 +1146,8 @@ public:
     // fallback chain.
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
+                     "6586.26");                                            // Half-life [s]
     SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
     SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");
     SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS");
@@ -1162,25 +1186,192 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0 * 3600.0, info.decayTimes.at(0).at(0), 1e-3);
   }
 
-  void Rollover_1078_NoSilentCorrection_Throws_AmbiguousDecayTimingException()
+  // ---- Administration-time resolution, IBSI-SUV v3.0.1 ----
+  //
+  // (0018,1078) is used verbatim only while the resulting duration lies in
+  // [-3600 s, 2 * T_half). Outside it the stored date is treated as
+  // untrustworthy and rebuilt from the decay-correction reference datetime,
+  // which is permitted only below a half-life of 41400 s. The fixture below
+  // puts acquisition and series at 12:00:00 so the reference instant is
+  // exactly that, and the administration stamp alone decides the offset.
+  //
+  // These replace an earlier case asserting that any negative duration from
+  // (0018,1078) must throw. v3.0.1 tolerates up to an hour of it, because a
+  // dynamic scan legitimately starts before administration.
+
+  void SetupAdminWindowCase(mitk::Image* image, const char* rpStartDateTime)
   {
-    // (0018,1078) is unambiguous -- a negative delta must surface, not be
-    // silently corrected by +/-24 h. Fixture exercises DC=START Step 2
-    // (Manufacturer Siemens, AcqTime equals SeriesTime); the rollover
-    // guard fires inside the per-slice loop when (acq - inj) is negative.
+    SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");   // SeriesDate
+    SetDicomProperty(image, PropName(0x0008, 0x0031), "120000");     // SeriesTime
+    SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS");
+    SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430");   // AcqDate
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "120000");     // AcqTime == SeriesTime
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078), rpStartDateTime);
+  }
+
+  static constexpr double kF18HalfLifeSeconds = 6586.26;
+
+  void AdminWindow_AcquisitionOneHourEarly_Accepted()
+  {
+    // Exactly at the floor: acquisition 3600 s before administration is the
+    // dynamic-scan case the window exists to admit.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430130000");
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-3600.0, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT(info.adaptations.empty());
+  }
+
+  void AdminWindow_JustBelowFloor_SubstitutesDate()
+  {
+    // One second past the floor. The stored date is discarded and rebuilt
+    // from the reference, which then needs the -24 h correction.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430130001");
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(86400.0 - 3601.0, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime));
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay));
+  }
+
+  void AdminWindow_JustBelowTwoHalfLives_Accepted()
+  {
+    // 2 * T_half is 13172.52 s, so 13172 s is inside the window and the
+    // stamp is used as stored.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430082028");   // 12:00:00 - 13172 s
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(13172.0, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT(info.adaptations.empty());
+  }
+
+  void AdminWindow_AtTwoHalfLives_SubstitutesDate()
+  {
+    // One second further out. Same calendar day, so the reconstruction
+    // happens to yield the same number -- which is exactly why the value
+    // cannot be the assertion here. The adaptation record is what
+    // distinguishes "used as stored" from "rebuilt".
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430082027");   // 12:00:00 - 13173 s
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(13173.0, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime));
+    CPPUNIT_ASSERT(!HasRule(info, mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay));
+  }
+
+  void AdminWindow_HalfLifeJustBelowLimit_SubstitutesDate()
+  {
+    // Offset 200000 s, far outside 2 * T_half for both this case and the
+    // next, so the half-life gate is the only thing that differs.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260428042640");   // 12:00:00 - 200000 s
+
+    const auto info = mitk::DeduceDecayCorrection(image, 41399.0);
+    CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime));
+  }
+
+  void AdminWindow_HalfLifeAtLimit_Refuses()
+  {
+    // At and above 41400 s an administration date that is wrong by whole
+    // days still yields a plausible SUV, so the substitution is forbidden
+    // and the input must be refused. This gate is the only thing keeping
+    // long-lived nuclides with untrustworthy dates from computing silently.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260428042640");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, 41400.0),
+                         mitk::UnrecoverableAdministrationDateException);
+  }
+
+  void AdminWindow_HalfLifeUnavailable_Refuses()
+  {
+    // No (0018,1075) and no override: the acceptance window is undefined,
+    // so there is no rule to apply.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430110000");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  void AdminWindow_StrictPolicy_RefusesDateSubstitution()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430130001");
+
+    CPPUNIT_ASSERT_THROW(
+      mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds,
+                                  mitk::DICOMReadPolicy::Strict),
+      mitk::AdministrationDateSubstitutionRefusedException);
+  }
+
+  void AdminWindow_StrictPolicy_RefusalIsCatchableAsBaseException()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430130001");
+
+    CPPUNIT_ASSERT_THROW(
+      mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds,
+                                  mitk::DICOMReadPolicy::Strict),
+      mitk::BenchmarkAdaptationRequiredException);
+  }
+
+  void AdminTime_UtcOffsetHonoured()
+  {
+    // Acquisition and series carry no UTC offset, so they are read as
+    // local-to-themselves; the administration stamp carries +0100 and must
+    // be shifted to match. Both stamps then name 12:00 UTC and the decay
+    // duration is zero. Ignoring the offset would give -3600 s, which is
+    // inside the acceptance window and would therefore pass silently.
+    //
+    // No benchmark DRO mixes offset-bearing and offset-free stamps -- every
+    // DRO is internally consistent -- so this case is the only guard on the
+    // convention.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "20260430130000+0100");
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, info.decayTimes.at(0).at(0), 1e-6);
+  }
+
+  void AdminTime_UnparseableStartDateTime_Throws()
+  {
+    // A present but malformed (0018,1078) is an error, not an absence: a
+    // silent fall-through to (0018,1072) would compute from a different
+    // instant than the one the input names.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupAdminWindowCase(image, "not-a-datetime");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1072), "110000");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds),
+                         mitk::InvalidDICOMPropertyValueException);
+  }
+
+  void Start_Step1_NegativeOffset_DoesNotFallThroughToStep2()
+  {
+    // The vendor private datetime carries no plausibility precondition, so
+    // a small negative offset must stay on Step 1 rather than dropping to
+    // Step 2. Step 2 would answer +930 s here, Step 1 answers -1800 s, so
+    // the value says which rule ran. No benchmark DRO exercises this.
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
     SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
-    SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");
+    SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");   // SeriesTime
     SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS");
     SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430");
-    SetDicomProperty(image, PropName(0x0008, 0x0032), "121530");
-    // Injection AFTER series time -> negative decay.
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "121530");   // AcqTime == SeriesTime
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
-                     "20260430130000");
+                     "20260430120000");                            // administration 12:00:00
+    SetDicomProperty(image, "mitk.pet.SiemensDecayDateTime",
+                     "20260430113000");                            // reference 11:30:00
 
-    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
-                         mitk::AmbiguousDecayTimingException);
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-1800.0, info.decayTimes.at(0).at(0), 1e-6);
   }
 
   void Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException()

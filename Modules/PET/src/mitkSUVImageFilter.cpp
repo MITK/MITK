@@ -308,13 +308,15 @@ namespace
                "slice " << zEntry.first << " for timestep " << tEntry.first
             << " (timestep has " << slices << " slice(s)).";
         }
-        if (!std::isfinite(zEntry.second) || zEntry.second < 0.0)
+        if (!std::isfinite(zEntry.second)
+            || zEntry.second < mitk::kEarliestDecayDurationSeconds)
         {
           mitkThrowException(mitk::InvalidDecayTimeMapException)
             << "Per-slice decay-time override map has an invalid decay time "
             << zEntry.second << " s for timestep " << tEntry.first
             << ", slice " << zEntry.first
-            << " (must be finite and non-negative).";
+            << " (must be finite and at least "
+            << mitk::kEarliestDecayDurationSeconds << " s).";
         }
       }
     }
@@ -388,14 +390,20 @@ void mitk::SUVImageFilter::SetDecayTimeOverrideInSec(double value)
          "ClearDecayTimeOverrideMap() before engaging the uniform "
          "override.";
   }
-  // Zero is valid (ADMIN-style: residual decay factor 2^0 = 1); a NaN would
-  // propagate to an all-NaN output and a negative duration would scale the
-  // dose upward, both silently. Reject them at the boundary.
-  if (!std::isfinite(value) || value < 0.0)
+  // Zero is valid (ADMIN-style: residual decay factor 2^0 = 1), and so is a
+  // small negative duration: a dynamic scan may begin up to an hour before
+  // administration, which is exactly what the DICOM-derived path now
+  // computes. Beyond that floor a negative duration scales the dose upward
+  // instead of down, and a NaN propagates to an all-NaN output -- both
+  // silently, so both are rejected here. The bound deliberately matches the
+  // deduced path: an override a user cannot express is an override that
+  // cannot reproduce what the pipeline did.
+  if (!std::isfinite(value) || value < mitk::kEarliestDecayDurationSeconds)
   {
     mitkThrowException(InvalidDecayTimeOverrideException)
       << "SUVImageFilter::SetDecayTimeOverrideInSec: decay time must be a "
-         "finite, non-negative duration in seconds (got " << value << ").";
+         "finite duration of at least "
+      << mitk::kEarliestDecayDurationSeconds << " s (got " << value << ").";
   }
   m_DecayTimeOverrideInSec = value;
   this->Modified();

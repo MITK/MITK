@@ -243,13 +243,11 @@ namespace mitk
   /**
    * \brief Acquisition / radiopharmaceutical-injection timing cannot be reconciled.
    *
-   * Raised in two situations:
-   *   - Only (0018,1072) Radiopharmaceutical Start Time is present (no DateTime),
-   *     the resulting decay duration is negative, and even after a single 24 h
-   *     rollover correction it remains outside [0, 24 h].
-   *   - (0018,1078) Radiopharmaceutical Start DateTime is present but yields a
-   *     negative decay duration. The DateTime is unambiguous, so no silent
-   *     rollover correction is applied; the situation is surfaced as an error.
+   * Raised when the DC=START fallback chain is exhausted -- no reference
+   * time can be established from the available tags -- and, through its
+   * subclass \c UnrecoverableAdministrationDateException, when the
+   * administration date cannot be reconstructed because the half-life is
+   * too long for the substitution to be safe.
    *
    * The exception message recommends re-exporting with (0018,1078) where applicable.
    */
@@ -257,6 +255,44 @@ namespace mitk
   {
   public:
     mitkExceptionClassMacro(AmbiguousDecayTimingException, SUVHelperException);
+  };
+
+  /**
+   * \brief An administration *date* is required but cannot be recovered.
+   *
+   * When the offset between the decay-correction reference time and
+   * (0018,1078) falls outside the plausible window, or when only
+   * (0018,1072) is available, the IBSI-SUV recommendation reconstructs the
+   * administration datetime from the reference date plus the stored time of
+   * day. That substitution is only permissible below a half-life of
+   * 41400 s: above it a date that is wrong by a whole day still yields a
+   * plausible-looking SUV, so the error cannot be caught downstream. Such
+   * input is refused under both policies -- unlike the substitution itself,
+   * this is not an adaptation a caller may opt into.
+   *
+   * Derives from AmbiguousDecayTimingException so the refusal keeps the
+   * decay-timing exit code.
+   */
+  class MITKPET_EXPORT UnrecoverableAdministrationDateException : public AmbiguousDecayTimingException
+  {
+  public:
+    mitkExceptionClassMacro(UnrecoverableAdministrationDateException, AmbiguousDecayTimingException);
+  };
+
+  /**
+   * \brief The administration date would have been substituted from the
+   *        decay-correction reference datetime, but the policy is Strict.
+   *
+   * Replacing the stored administration date wholesale is a stronger
+   * reinterpretation than the other benchmark recommendations: it discards
+   * a value the input actually carries. Under
+   * \c DICOMReadPolicy::Lenient it is applied with a \c MITK_WARN and
+   * recorded as an \c SUVAdaptation; under \c Strict it is refused here.
+   */
+  class MITKPET_EXPORT AdministrationDateSubstitutionRefusedException : public BenchmarkAdaptationRequiredException
+  {
+  public:
+    mitkExceptionClassMacro(AdministrationDateSubstitutionRefusedException, BenchmarkAdaptationRequiredException);
   };
 
   /**
@@ -347,6 +383,20 @@ namespace mitk
   };
 
   /**
+   * \brief Earliest decay duration the SUV pipeline accepts, in [s].
+   *
+   * Zero is the usual floor, but a dynamic scan may begin shortly before
+   * administration; the IBSI-SUV recommendation tolerates up to an hour of
+   * it (the manual reports real series acquired up to 166 s early). Below
+   * this bound the decay term scales the dose upward rather than down,
+   * which is never a legitimate reading of the input.
+   *
+   * The DICOM-derived path and the manual decay-time overrides share this
+   * bound, so a user can always express what the pipeline computed.
+   */
+  constexpr double kEarliestDecayDurationSeconds = -3600.0;
+
+  /**
    * \brief The closed set of IBSI-SUV-recommended reinterpretations the
    *        SUV pipeline may apply to a borderline input.
    *
@@ -363,7 +413,23 @@ namespace mitk
     /** (0008,0070) Manufacturer unrecognized; the general rule was applied. */
     UnrecognizedManufacturer,
     /** Ambiguous patient sex resolved as the mean of the male and female formulas. */
-    AmbiguousPatientSexMeanOfMaleAndFemale
+    AmbiguousPatientSexMeanOfMaleAndFemale,
+    /**
+     * The administration date was taken from the decay-correction reference
+     * datetime and only the time component of (0018,1078) was kept.
+     */
+    AdministrationDateFromReferenceWithStartDateTime,
+    /**
+     * Same substitution, driven by (0018,1072), which carries no date of
+     * its own.
+     */
+    AdministrationDateFromReferenceWithStartTime,
+    /**
+     * The substituted administration datetime landed after the reference,
+     * so it was moved back one day ("injected last night, scanned this
+     * morning").
+     */
+    AdministrationTimeShiftedBackOneDay
   };
 
   /**
@@ -696,12 +762,30 @@ namespace mitk
    * is the documented escape hatch for inputs whose timing must be supplied
    * out-of-band.
    *
-   * The radiopharmaceutical injection time is read from
-   * (0054,0016)[*](0018,1078) Radiopharmaceutical Start DateTime if present,
-   * otherwise from (0054,0016)[*](0018,1072) Radiopharmaceutical Start Time
-   * (in which case the acquisition date is used to assemble a complete
-   * timestamp, with a 24 h rollover correction if the resulting decay would
-   * be negative).
+   * \par Administration time
+   * Whichever rule above supplies the reference time, the decay duration
+   * is measured from the radiopharmaceutical administration instant, which
+   * is established in three branches keyed on the offset and the
+   * half-life T:
+   *   -# (0054,0016)[*](0018,1078) Radiopharmaceutical Start DateTime is
+   *      present and the duration lies in [-3600 s, 2*T): use it as stored.
+   *      The negative floor admits dynamic scans, where acquisition begins
+   *      shortly before administration.
+   *   -# (0018,1078) is present but the duration falls outside that window:
+   *      keep its time of day and take the date from the reference instant.
+   *   -# Only (0054,0016)[*](0018,1072) Radiopharmaceutical Start Time is
+   *      present, which carries no date: same reconstruction.
+   *
+   * In branches 2 and 3 an administration instant that still falls after
+   * the reference is moved back one day. Both branches are permitted only
+   * while T is below 41400 s -- above it a date wrong by whole days still
+   * yields a plausible SUV, so the input is refused instead. They are
+   * benchmark adaptations: recorded and warned about under
+   * \c DICOMReadPolicy::Lenient, refused under \c Strict.
+   *
+   * Datetimes carrying a UTC offset are normalized by it; one without an
+   * offset is read as local to itself. Reference and administration
+   * instants are always compared on the same basis.
    *
    * \param[in] data            The input data. Must be a valid SlicedData
    *                            instance whose time geometry and DICOM
@@ -730,10 +814,13 @@ namespace mitk
    *        DC=NONE).
    * \throw InvalidDICOMPropertyValueException if (0054,1102) holds an
    *        unsupported value, or if a tag value cannot be parsed.
-   * \throw AmbiguousDecayTimingException if the radiopharmaceutical injection
-   *        time and the acquisition / series reference time cannot be
-   *        reconciled into a non-negative decay duration within 24 h, or if
-   *        none of the DC=START fallback conditions applies.
+   * \throw AmbiguousDecayTimingException if none of the DC=START fallback
+   *        conditions applies.
+   * \throw UnrecoverableAdministrationDateException if the administration
+   *        date would have to be reconstructed but the half-life is at or
+   *        above 41400 s.
+   * \throw AdministrationDateSubstitutionRefusedException if \p policy is
+   *        \c Strict and that reconstruction would have been applied.
    * \throw VendorEmpiricalDecayFallbackRefusedException if \p policy is
    *        \c Strict and DC=START would have been resolved through
    *        Step 3 or Step 4 of the \ref DCStartFallbackChain "DC=START

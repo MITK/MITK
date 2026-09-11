@@ -155,12 +155,40 @@ determined:
   without `(0008,0022)`, `(0008,0032)` or `(0018,1242)` per slice are rejected
   with exit code 2; use `--decay-time` instead.
 
-The injection time is taken from `(0018,1078)` Radiopharmaceutical Start
-DateTime if present, otherwise from `(0018,1072)` Radiopharmaceutical Start
-Time combined with the acquisition or series date. For the time-only tag a
-negative decay time is corrected once by 24 h (injection on the previous
-day). A decay time that is still negative or exceeds 24 h ends the run with
-exit code 3.
+### Administration time
+
+The decay duration is the interval from radiopharmaceutical administration
+to the reference time resolved above. How the administration instant is
+established depends on which tag is present and on the radionuclide's
+half-life `T`:
+
+1. `(0018,1078)` Radiopharmaceutical Start DateTime is present and the
+   resulting duration lies in `[-3600 s, 2 * T)`: it is used as stored. The
+   negative floor admits dynamic scans, where acquisition legitimately
+   begins shortly before administration.
+2. `(0018,1078)` is present but the duration falls outside that window: the
+   stored date is treated as untrustworthy. Its time of day is kept and the
+   date is taken from the reference datetime instead.
+3. Only `(0018,1072)` Radiopharmaceutical Start Time is present: it carries
+   no date, so the date again comes from the reference datetime.
+
+In cases 2 and 3, if the reconstructed administration instant still falls
+after the reference time, it is moved back one day -- the familiar "injected
+last evening, scanned this morning" case.
+
+Both reconstructions are permitted **only when `T` is below 41400 s**. Above
+that threshold an administration date that is wrong by whole days still
+yields a plausible-looking SUV, so the error could not be caught downstream;
+such input ends the run with exit code 3 instead. This gate is what makes a
+long-lived tracer such as Zr-89 with an uptake beyond 24 h and no
+`(0018,1078)` a refusal rather than a silently wrong image.
+
+Both reconstructions are benchmark adaptations: they are applied with a
+warning by default and refused with `--strict-dicom` (exit code 8).
+
+Datetimes carrying a UTC offset are normalized by it; a datetime without one
+is read as local to itself. The reference and administration instants are
+always compared on the same basis.
 
 The `START` fallback chain is (first applicable step wins):
 
@@ -192,8 +220,10 @@ produced the data; the general rules are still applied. If no step applies
 exit code 3.
 
 `--decay-time` bypasses all of the above and applies the given duration to
-every voxel. `0` reproduces `ADMIN` behaviour. Negative or non-finite values
-are rejected (exit code 1). Because the value is uniform, it is not a
+every voxel. `0` reproduces `ADMIN` behaviour. Values below `-3600` s and
+non-finite values are rejected (exit code 1); the floor matches the one the
+DICOM-derived path uses, so a dynamic scan the pipeline computes by itself
+can also be supplied by hand. Because the value is uniform, it is not a
 substitute for the per-slice handling of `START` and `NONE`.
 
 ### Modality check
@@ -214,6 +244,7 @@ input usable. By default they are applied and logged as warnings. With
 | Empirical decay-timing fallback for `START` | steps 3 or 4 of the fallback chain | applied | `VendorEmpiricalDecayFallbackRefusedException` |
 | Unverified manufacturer for that fallback | `(0008,0070)` absent, empty or unrecognized *and* step 3 or 4 fires | general rule applied | covered by the row above |
 | Patient sex `O` for a sex-specific variant | `(0010,0040)` or `--patient-sex` is `O` | mean of male and female numerators | `AmbiguousPatientSexAdaptationRefusedException` |
+| Administration date rebuilt from the reference datetime | duration outside `[-3600 s, 2 * T)`, or only `(0018,1072)` present | stored time of day kept, date taken from the reference | `AdministrationDateSubstitutionRefusedException` |
 
 Every adaptation that fires is also recorded on the filter, so a caller
 embedding `mitk::SUVImageFilter` can audit them without parsing the log:

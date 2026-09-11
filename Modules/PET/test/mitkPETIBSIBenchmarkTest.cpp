@@ -53,10 +53,9 @@ read as success.
 The manifest is deliberately a subset of the upstream DRO tree: it
 contains only cases the implementation currently satisfies, so the
 suite stays strict-red with no xfail machinery. A DRO present upstream
-and absent here is a declared gap, not an oversight; the gaps are
-DRO_4_4, DRO_4_5, DRO_error_4_1 (administration-datetime resolution)
-and the five DRO_7_* Enhanced PET objects. Each is added as its fix
-lands.
+and absent here is a declared gap, not an oversight; the only gaps
+left are the five DRO_7_* Enhanced PET objects. Each is added as its
+fix lands.
 
 ROI statistics are computed by direct masked iteration over the SUV
 output and the mask image, *not* via mitk::ImageStatisticsCalculator.
@@ -163,6 +162,17 @@ namespace
     AdaptationBit(mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback);
   constexpr unsigned kAdaptUnknownVendor =
     AdaptationBit(mitk::SUVAdaptationRule::UnrecognizedManufacturer);
+  constexpr unsigned kAdaptAdminDateFromStartDateTime =
+    AdaptationBit(mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime);
+  constexpr unsigned kAdaptAdminDateFromStartTime =
+    AdaptationBit(mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime);
+  constexpr unsigned kAdaptAdminShiftedBackOneDay =
+    AdaptationBit(mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay);
+  // Any reconstruction of the administration datetime, whichever tag drove
+  // it. Used to assert that a case did *not* need one.
+  constexpr unsigned kAdaptAnyAdminSubstitution =
+    kAdaptAdminDateFromStartDateTime | kAdaptAdminDateFromStartTime
+    | kAdaptAdminShiftedBackOneDay;
 
   unsigned AdaptationMask(const std::vector<mitk::SUVAdaptation>& adaptations)
   {
@@ -243,11 +253,33 @@ namespace
     {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor)", kTriple, "", "",
      kLenient, 0u, kAdaptVendorFallback | kAdaptUnknownVendor},
 
-    // Radiopharmaceutical injection time tag variants.
-    {"DRO_4_0",   "RP DateTime only ((0018,1078))", kTriple},
-    {"DRO_4_1",   "RP Time only ((0018,1072))", kTriple},
-    {"DRO_4_2",   "RP Time + 24h rollover correction", kTriple},
-    {"DRO_4_3",   "RP DateTime and Time, uptake spanning midnight", kTriple},
+    // Radiopharmaceutical administration time. These six must hold as a
+    // set, because four of them reached the right answer before v3.0.1
+    // through reasoning that has since been replaced: the fixed [0, 24 h]
+    // acceptance window and its unconditional +24 h rollover. What keeps
+    // them right now is the [-3600 s, 2 * T_half) window plus the
+    // half-life-gated date reconstruction, so the branch each one takes is
+    // asserted, not just its value.
+    //
+    // 4_0 and 4_3 are the controls: the only entries expected to need no
+    // reconstruction at all, which is what proves the others are not
+    // adapting spuriously.
+    {"DRO_4_0",   "RP DateTime only ((0018,1078))", kTriple, "", "",
+     kLenient, 0u, kAdaptAnyAdminSubstitution},
+    {"DRO_4_1",   "RP Time only ((0018,1072)), date from reference", kTriple, "", "",
+     kLenient, kAdaptAdminDateFromStartTime, kAdaptAdminShiftedBackOneDay},
+    {"DRO_4_2",   "RP Time only, uptake spanning midnight", kTriple, "", "",
+     kLenient, kAdaptAdminDateFromStartTime | kAdaptAdminShiftedBackOneDay, 0u},
+    {"DRO_4_3",   "RP DateTime and Time, uptake spanning midnight", kTriple, "", "",
+     kLenient, 0u, kAdaptAnyAdminSubstitution},
+    // Acquisition and series dates are anonymized, so (0018,1078) yields a
+    // ~65-year offset; its time of day is kept and the date rebuilt.
+    {"DRO_4_4",   "RP DateTime with anonymized acquisition date", kTriple, "", "",
+     kLenient, kAdaptAdminDateFromStartDateTime | kAdaptAdminShiftedBackOneDay, 0u},
+    // Zr-89, three-day uptake. Inside 2 * T_half = 564552 s, so the stored
+    // datetime is used verbatim -- the old flat 24 h ceiling rejected this.
+    {"DRO_4_5",   "Zr-89, uptake beyond 24 h, within 2 * half-life", kTriple, "", "",
+     kLenient, 0u, kAdaptAnyAdminSubstitution},
 
     // Non-FDG nuclide.
     {"DRO_5_0",   "Radionuclide Ga-68", kTriple},
@@ -288,8 +320,17 @@ namespace
     // expected to turn this case red on the message, and the correct
     // response is to re-pin the evidence on the half-life gate -- never to
     // relax the entry. What must not change is that it keeps refusing.
+    // Zr-89 with no (0018,1078). Rebuilding the date from the reference is
+    // forbidden above a half-life of 41400 s, and that gate is now the only
+    // thing standing between this input and a silently wrong SUV: before
+    // v3.0.1 MITK computed it as a 0 s uptake and returned values 47 % low.
+    {"DRO_error_4_1", "Zr-89, uptake > 24 h, (0018,1078) absent",
+     kRefusal, "41400", "UnrecoverableAdministrationDateException"},
+    // Refused today by the same gate. It used to refuse only by accident --
+    // a ~65-year offset happened to fall outside the old [0, 24 h] window --
+    // so replacing that window had to be watched closely here.
     {"DRO_error_4_2", "uptake > 24 h, (0018,1078) anonymized",
-     kRefusal, "Computed decay duration", "AmbiguousDecayTimingException"},
+     kRefusal, "41400", "UnrecoverableAdministrationDateException"},
     {"DRO_error_5_0", "Radionuclide Half Life absent",
      kRefusal, "(0018,1075)", "MissingDICOMPropertyException"},
 
@@ -314,6 +355,24 @@ namespace
     // Strict would look like success.
     {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor), Strict still computes",
      kTriple, "", "", kStrict, 0u, kAdaptVendorFallback | kAdaptUnknownVendor},
+    // Rebuilding an administration date discards a value the input actually
+    // carries, so Strict refuses it -- and with it three DROs the benchmark
+    // expects to compute. That is the trade the mode exists to make.
+    {"DRO_4_1", "RP Time only, Strict refuses the date reconstruction",
+     kRefusal, "DICOMReadPolicy::Strict", "AdministrationDateSubstitutionRefusedException",
+     kStrict},
+    {"DRO_4_2", "RP Time spanning midnight, Strict refuses the reconstruction",
+     kRefusal, "DICOMReadPolicy::Strict", "AdministrationDateSubstitutionRefusedException",
+     kStrict},
+    {"DRO_4_4", "anonymized acquisition date, Strict refuses the reconstruction",
+     kRefusal, "DICOMReadPolicy::Strict", "AdministrationDateSubstitutionRefusedException",
+     kStrict},
+    // The controls: these need no reconstruction, so Strict must still
+    // compute them. Without them a bug refusing every 4_x under Strict
+    // would read as success.
+    {"DRO_4_0", "RP DateTime only, Strict still computes", kTriple, "", "", kStrict},
+    {"DRO_4_5", "Zr-89 within 2 * half-life, Strict still computes",
+     kTriple, "", "", kStrict},
   };
 
   constexpr std::size_t kBenchmarkCaseCount = sizeof(kBenchmarkCases) / sizeof(kBenchmarkCases[0]);

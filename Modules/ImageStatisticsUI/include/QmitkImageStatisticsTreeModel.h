@@ -19,8 +19,11 @@ found in the LICENSE file.
 //MITK
 #include <MitkImageStatisticsUIExports.h>
 #include <mitkImageStatisticsContainer.h>
+#include <mitkITKEventObserverGuard.h>
 
+#include <atomic>
 #include <mutex>
+#include <vector>
 
 class QmitkImageStatisticsTreeItem;
 
@@ -215,6 +218,18 @@ private:
            --> 4. Level: Timestep [if >1 exist] */
     void BuildHierarchicalModel();
 
+    /** Registers the observers that keep the model in sync with display relevant changes
+    of its inputs: renaming of image or mask nodes and renaming or recoloring of labels of
+    multi label masks. Any previously registered observer is removed first.
+    @remark Must not be called while one of the currently observed senders invokes an event. */
+    void UpdateInputObservers();
+
+    /** Requests a rebuild of the tree from the statistics the model already holds, e.g. after
+    a display name or a label color has changed. The rebuild is deferred to the event loop, so
+    that a batch of changes (e.g. one LabelModifiedEvent per label of a multi label mask)
+    results in a single model update. */
+    void RequestModelUpdate();
+
     StatisticsContainerVector m_Statistics;
 
     /** Relevant images set by the user.*/
@@ -230,6 +245,12 @@ private:
     /** @sa m_TimeStepResolvedImageNodes */
     std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> m_TimeStepResolvedMaskNodes;
     std::vector<std::string> m_StatisticNames;
+
+    /** Observers on the "name" property of every input node and on the label events of every
+    multi label mask. Neither change reaches the model via DataStorage::ChangedNodeEvent.
+    @sa UpdateInputObservers */
+    std::vector<mitk::ITKEventObserverGuard> m_InputObservers;
+    std::atomic<bool> m_ModelUpdatePending = false;
 
     std::mutex m_Mutex;
     std::unique_ptr<QmitkImageStatisticsTreeItem> m_RootItem;

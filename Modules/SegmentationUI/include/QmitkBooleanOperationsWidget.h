@@ -60,6 +60,7 @@ public:
 private slots:
   void OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
   void OnLabelSelectionChanged(mitk::MultiLabelSegmentation::LabelValueVectorType labels);
+  void OnClearSelectionButtonClicked();
   void OnDifferenceButtonClicked();
   void OnIntersectionButtonClicked();
   void OnUnionButtonClicked();

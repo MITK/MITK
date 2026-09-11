@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <mitkInteractionEventConst.h>
 #include <mitkInteractionKeyEvent.h>
+#include <mitkInteractionKeyReleaseEvent.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
 #include <mitkMouseDoubleClickEvent.h>
@@ -440,6 +441,10 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     event = InteractionKeyEvent::New(renderer, key, modifiers);
   }
+  else if (eventClass == "INTERACTIONKEYRELEASEEVENT")
+  {
+    event = InteractionKeyReleaseEvent::New(renderer, key, modifiers);
+  }
   else if (eventClass == "MOUSEWHEELEVENT")
   {
     event = MouseWheelEvent::New(renderer, pos, buttonState, modifiers, wheelDelta);
@@ -526,15 +531,20 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     eventXML += GetPositionInWorld(event);
     eventXML += "\"/>\n";
   }
-  else if (eventClass == "INTERACTIONKEYEVENT")
+  else if (eventClass == "INTERACTIONKEYEVENT" || eventClass == "INTERACTIONKEYRELEASEEVENT")
   {
-    auto *ke = dynamic_cast<mitk::InteractionKeyEvent *>(event);
+    std::string key;
+
+    if (auto *ke = dynamic_cast<mitk::InteractionKeyEvent *>(event); ke != nullptr)
+      key = ke->GetKey();
+    else if (auto *kre = dynamic_cast<mitk::InteractionKeyReleaseEvent *>(event); kre != nullptr)
+      key = kre->GetKey();
 
     // key
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() + " " + InteractionEventConst::xmlParameterName() +
                 "=\"" + InteractionEventConst::xmlEventPropertyKey() + "\" ";
     eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
-    eventXML += ke->GetKey();
+    eventXML += key;
     eventXML += "\"/>\n";
   }
   else

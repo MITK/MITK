@@ -1,49 +1,83 @@
 <statemachine name="PressMoveReleaseWithCTRLInversion">
 
-  <state name="neutral" ID="1" startstate="true">
+  <!--
+    The four states combine two independent conditions: primary button up
+    (neutral, neutralInverted) or down (drawing, inverted), and CTRL not held
+    (neutral, drawing) or held (neutralInverted, inverted). CTRL is tracked
+    through its own key press and release events and additionally through the
+    modifiers of mouse events, which keep the state consistent whenever the key
+    events were not delivered (e.g. the render window had no keyboard focus).
+  -->
 
-    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="drawing" > <!-- EVENT_ID="1" -->
-      <action name="PrimaryButtonPressed" ID="80" />
+  <state name="neutral" startstate="true">
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="drawing">
+      <action name="PrimaryButtonPressed" />
     </transition>
-
-    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="CTRL+press" target="inverted" EVENT_ID="5">
-      <action name="PrimaryButtonPressed" ID="80" />
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="CTRL+press" target="inverted">
+      <action name="PrimaryButtonPressed" />
+      <action name="InvertLogic" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" name="CTRL+move" target="neutralInverted">
+      <action name="InvertLogic" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="CtrlKeyPressed" name="CTRL pressed" target="neutralInverted">
       <action name="InvertLogic" />
     </transition>
   </state>
 
-  <state name="drawing">
-      <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" name="release" target="neutral" EVENT_ID="505">
-      <action name="Release" ID="42" />
+  <state name="neutralInverted">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" name="move" target="neutral">
+      <action name="InvertLogic" />
     </transition>
-    <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="CTRL+move" target="inverted" EVENT_ID="534">
-      <action name="Move" ID="90" />
-      <action name="InvertLogic" ID="49014" />
+    <transition event_class="InteractionKeyReleaseEvent" event_variant="CtrlKeyReleased" name="CTRL released" target="neutral">
+      <action name="InvertLogic" />
     </transition>
-
-    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move w/ left PrimaryButton" target="drawing" EVENT_ID="530">
-      <action name="Move" ID="90" />
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="CTRL+press" target="inverted">
+      <action name="PrimaryButtonPressed" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="drawing">
+      <action name="InvertLogic" />
+      <action name="PrimaryButtonPressed" />
     </transition>
   </state>
 
-  <state name="inverted" ID="2">
-    <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="CTRL+move" target="inverted" EVENT_ID="534">
-      <action name="Move" ID="90" />
+  <state name="drawing">
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move w/ left PrimaryButton" target="drawing">
+      <action name="Move" />
     </transition>
-
-    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move" target="drawing" EVENT_ID="530">
-      <action name="Move" ID="90" />
-      <action name="InvertLogic" ID="49014" />
+    <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="CTRL+move" target="inverted">
+      <action name="Move" />
+      <action name="InvertLogic" />
     </transition>
-
-    <transition event_class="MouseReleaseEvent" event_variant="CtrlPrimaryButtonReleased" name="CTRL+release" target="neutral" EVENT_ID="537">
-      <action name="Release" ID="42" />
-      <action name="InvertLogic" ID="49014" />
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" name="release" target="neutral">
+      <action name="Release" />
     </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="CtrlPrimaryButtonReleased" name="CTRL+release" target="neutralInverted">
+      <action name="Release" />
+      <action name="InvertLogic" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="CtrlKeyPressed" name="CTRL pressed" target="inverted">
+      <action name="InvertLogic" />
+    </transition>
+  </state>
 
-    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" name="release" target="neutral" EVENT_ID="505">
-      <action name="Release" ID="42" />
-      <action name="InvertLogic" ID="49014" />
+  <state name="inverted">
+    <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="CTRL+move" target="inverted">
+      <action name="Move" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move" target="drawing">
+      <action name="Move" />
+      <action name="InvertLogic" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="CtrlPrimaryButtonReleased" name="CTRL+release" target="neutralInverted">
+      <action name="Release" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" name="release" target="neutral">
+      <action name="Release" />
+      <action name="InvertLogic" />
+    </transition>
+    <transition event_class="InteractionKeyReleaseEvent" event_variant="CtrlKeyReleased" name="CTRL released" target="drawing">
+      <action name="InvertLogic" />
     </transition>
   </state>
 </statemachine>

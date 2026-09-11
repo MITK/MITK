@@ -73,6 +73,12 @@ namespace mitk
 
     /** \brief The pixel value used when filling the contour (0 = erase, 1 = draw). */
     int m_PaintingPixelValue;
+
+  private:
+    /** \brief Set the painting pixel value and the matching feedback contour color. */
+    void SetPaintingPixelValue(int paintingPixelValue);
+
+    const int m_InitialPaintingPixelValue;
   };
 
 } // namespace

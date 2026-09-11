@@ -281,6 +281,7 @@ set(CPP_FILES
   Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkInteractionEventObserver.cpp
   Interactions/mitkInteractionKeyEvent.cpp
+  Interactions/mitkInteractionKeyReleaseEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp

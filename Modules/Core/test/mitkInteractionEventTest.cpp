@@ -16,6 +16,8 @@ found in the LICENSE file.
 // MITK includes
 #include <mitkCoreServices.h>
 #include <mitkInteractionEventConst.h>
+#include <mitkInteractionKeyEvent.h>
+#include <mitkInteractionKeyReleaseEvent.h>
 #include <mitkMouseMoveEvent.h>
 #include <mitkMousePressEvent.h>
 #include <mitkMouseReleaseEvent.h>
@@ -28,6 +30,7 @@ class mitkInteractionEventTestSuite : public mitk::TestFixture
   MITK_TEST(MousePressEvent_Success);
   MITK_TEST(MouseReleaseEvent_Success);
   MITK_TEST(MouseMoveEvent_Success);
+  MITK_TEST(InteractionKeyReleaseEvent_Success);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -110,6 +113,20 @@ public:
     
     CPPUNIT_ASSERT_MESSAGE("Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MouseMoveEvent",
                             *mm1 == *mm3 && *mm3 != *mm4);
+  }
+
+  void InteractionKeyReleaseEvent_Success()
+  {
+    auto kr1 = mitk::InteractionKeyReleaseEvent::New(m_Renderer, mitk::InteractionEvent::KeyControl, m_Modifiers);
+    auto kr2 = mitk::InteractionKeyReleaseEvent::New(m_Renderer, mitk::InteractionEvent::KeyControl, m_Modifiers);
+    auto kr3 = mitk::InteractionKeyReleaseEvent::New(m_Renderer, mitk::InteractionEvent::KeyShift, m_Modifiers);
+    auto kr4 = mitk::InteractionKeyReleaseEvent::New(m_Renderer, mitk::InteractionEvent::KeyControl, mitk::InteractionEvent::NoKey);
+    auto kp = mitk::InteractionKeyEvent::New(m_Renderer, mitk::InteractionEvent::KeyControl, m_Modifiers);
+
+    CPPUNIT_ASSERT_MESSAGE("Releases of the same key with the same modifiers are equal", *kr1 == *kr2);
+    CPPUNIT_ASSERT_MESSAGE("Releases of different keys are not equal", *kr1 != *kr3);
+    CPPUNIT_ASSERT_MESSAGE("Releases with different modifiers are not equal", *kr1 != *kr4);
+    CPPUNIT_ASSERT_MESSAGE("Press and release of the same key are not equal", *kr1 != *kp);
   }
 
 };

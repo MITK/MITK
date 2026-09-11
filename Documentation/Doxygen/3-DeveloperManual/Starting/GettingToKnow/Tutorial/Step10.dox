@@ -116,7 +116,7 @@ Note: Technically the LeftMouseButton is also pressed and should be listed in th
 
 <b> Key Events</b> \n
 
-mitk::InteractionKeyEvent represents a pressed key, which key is pressed is provided with the Key attribute like this
+mitk::InteractionKeyEvent represents a pressed key and mitk::InteractionKeyReleaseEvent a released key. Which key is meant is provided with the Key attribute like this
 
 \code
     <attribute name="Key" value="A"/>
@@ -126,14 +126,20 @@ or
     <attribute name="Key" value="Escape"/>
 \endcode
 
-\note Key Events do not require an explicit configuration, for all key events there exists
-a predefined event variant with the name 'Std' + value, that is key a is named 'StdA'.
+\note Key press events do not require an explicit configuration, for all key press events there exists
+a predefined event variant with the name 'Std' + value, that is key a is named 'StdA'. Key release events
+always need an explicit event variant in the configuration.
 
 The names for special keys are listed here:
 
 \dontinclude mitkInteractionEvent.h
 \skipline KeyEsc
-\until KeySpace
+\until KeyAlt
+
+The modifier keys Control, Shift and Alt generate key events of their own. For these events the Modifiers
+attribute describes the other modifier keys held at that time, the key itself is only given by the Key attribute.
+This way the press and the release of a modifier key are described by the same attributes and differ only in
+the event class.
 
 
 <b> Modifier Keys</b> \n
@@ -173,6 +179,10 @@ Examples for key events:
   <event_variant class="InteractionKeyEvent" name="StdB">
     <attribute name="Key" value="B"/>
     <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+  <!-- Event of the control key released -->
+  <event_variant class="InteractionKeyReleaseEvent" name="CtrlKeyReleased">
+    <attribute name="Key" value="Control"/>
   </event_variant>
 </config>
 \endcode

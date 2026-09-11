@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 
 #include <mitkInteractionKeyEvent.h>
+#include <mitkInteractionKeyReleaseEvent.h>
 #include <mitkInternalEvent.h>
 #include <mitkMouseDoubleClickEvent.h>
 #include <mitkMouseMoveEvent.h>
@@ -21,11 +22,13 @@ found in the LICENSE file.
 #include <mitkMouseWheelEvent.h>
 #include <mitkStatusBar.h>
 
+#include <QApplication>
 #include <QCursor>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QPointer>
 #include <QResizeEvent>
 #include <QSurfaceFormat>
 #include <QTimer>
@@ -35,6 +38,96 @@ found in the LICENSE file.
 #include <QmitkMimeTypes.h>
 #include <QmitkRenderWindowMenu.h>
 #include <QmitkStyleManager.h>
+
+namespace
+{
+  // The modifier bit represented by a modifier key itself (NoKey for any other key)
+  mitk::InteractionEvent::ModifierKeys GetOwnModifier(int key)
+  {
+    switch (key)
+    {
+      case Qt::Key_Control:
+        return mitk::InteractionEvent::ControlKey;
+      case Qt::Key_Shift:
+        return mitk::InteractionEvent::ShiftKey;
+      case Qt::Key_Alt:
+        return mitk::InteractionEvent::AltKey;
+      default:
+        return mitk::InteractionEvent::NoKey;
+    }
+  }
+
+  QmitkRenderWindow *GetRenderWindowUnderCursor()
+  {
+    auto widget = QApplication::widgetAt(QCursor::pos());
+
+    while (widget != nullptr)
+    {
+      if (auto renderWindow = qobject_cast<QmitkRenderWindow *>(widget); renderWindow != nullptr)
+        return renderWindow;
+
+      widget = widget->parentWidget();
+    }
+
+    return nullptr;
+  }
+
+  /* Qt delivers key events to the focused widget only, but the effect of a held
+   * modifier key (e.g. an inverted segmentation tool) is expected wherever the
+   * mouse is. This filter additionally forwards modifier key presses and releases
+   * to the render window under the cursor when it does not have the focus. The
+   * event is never consumed, so the focused widget still receives it.
+   */
+  class ModifierKeyForwarder : public QObject
+  {
+  public:
+    using QObject::QObject;
+
+  protected:
+    bool eventFilter(QObject *watched, QEvent *event) override
+    {
+      if (event->type() != QEvent::KeyPress && event->type() != QEvent::KeyRelease)
+        return false;
+
+      // Qt sends a key event to the QWindow first and then to every widget in the
+      // propagation chain. Acting on the QWindow delivery only forwards it once.
+      if (!watched->isWindowType())
+        return false;
+
+      auto keyEvent = static_cast<QKeyEvent *>(event);
+
+      if (keyEvent->isAutoRepeat() || GetOwnModifier(keyEvent->key()) == mitk::InteractionEvent::NoKey)
+        return false;
+
+      auto renderWindow = GetRenderWindowUnderCursor();
+
+      // A focused descendant (render window menu, overlay button) lets the event
+      // reach the render window by propagation already, so forwarding it here
+      // would deliver the same key twice.
+      if (renderWindow == nullptr || renderWindow->isAncestorOf(QApplication::focusWidget()))
+        return false;
+
+      // A copy keeps the accepted state of the original event untouched for the
+      // platform layer, which reads it after the delivery.
+      QKeyEvent copy(keyEvent->type(), keyEvent->key(), keyEvent->modifiers(), keyEvent->text(), false,
+                     static_cast<quint16>(keyEvent->count()));
+      QCoreApplication::sendEvent(renderWindow, &copy);
+
+      return false;
+    }
+  };
+
+  void EnsureModifierKeyForwarder()
+  {
+    static QPointer<ModifierKeyForwarder> forwarder;
+
+    if (forwarder.isNull())
+    {
+      forwarder = new ModifierKeyForwarder(qApp);
+      qApp->installEventFilter(forwarder);
+    }
+  }
+}
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
   : QVTKOpenGLNativeWidget(parent)
@@ -56,6 +149,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   setMouseTracking(true);
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setSizePolicy(sizePolicy);
+
+  EnsureModifierKeyForwarder();
 
   // setup overlay widget to show a warning message with a button
   m_GeometryViolationWarningOverlay = new QmitkButtonOverlayWidget(this);
@@ -240,6 +335,16 @@ bool QmitkRenderWindow::event(QEvent* e)
       mitkEvent = mitk::InteractionKeyEvent::New(m_Renderer, GetKeyLetter(ke), GetModifiers(ke));
       break;
     }
+    case QEvent::KeyRelease:
+    {
+      auto ke = static_cast<QKeyEvent*>(e);
+
+      // X11 reports a held key as a stream of release/press pairs. Only a real release is of interest.
+      if (!ke->isAutoRepeat())
+        mitkEvent = mitk::InteractionKeyReleaseEvent::New(m_Renderer, GetKeyLetter(ke), GetModifiers(ke));
+
+      break;
+    }
     case QEvent::Resize:
     {
       if (nullptr != m_MenuWidget)
@@ -404,6 +509,18 @@ mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QInputEvent
   return modifiers;
 }
 
+mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QKeyEvent *ke) const
+{
+  // Qt reports the modifier state of a modifier key's own press or release
+  // inconsistently across platforms (after the event on Windows, before it on
+  // X11). Excluding the key itself makes the modifiers consistently describe the
+  // other modifier keys held, for the press as well as for the release.
+  const auto modifiers = this->GetModifiers(static_cast<QInputEvent *>(ke));
+  const auto ownModifier = GetOwnModifier(ke->key());
+
+  return static_cast<mitk::InteractionEvent::ModifierKeys>(modifiers & ~ownModifier);
+}
+
 mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEvent *we) const
 {
   mitk::InteractionEvent::MouseButtons buttonState = mitk::InteractionEvent::NoButton;
@@ -515,6 +632,16 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
       break;
     case Qt::Key_Space:
       key = mitk::InteractionEvent::KeySpace;
+      break;
+
+    case Qt::Key_Control:
+      key = mitk::InteractionEvent::KeyControl;
+      break;
+    case Qt::Key_Shift:
+      key = mitk::InteractionEvent::KeyShift;
+      break;
+    case Qt::Key_Alt:
+      key = mitk::InteractionEvent::KeyAlt;
       break;
     }
   }

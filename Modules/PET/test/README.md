@@ -14,14 +14,31 @@ tests registered from `cmake/AddPETSUVCLISmokeTests.cmake`.
 
 ## IBSI-SUV regression test
 
-`mitkPETIBSIBenchmarkTest` runs every digital reference object (DRO) in
+`mitkPETIBSIBenchmarkTest` drives digital reference objects (DROs) from
 the [`oncoray/suv_computation`](https://github.com/oncoray/suv_computation)
-benchmark through `SUVImageFilter` and asserts the canonical SUV triple
-`(SUVmin, SUVmedian, SUVmax) = (0.20, 1.00, 4.00)` inside the shipped
-NIfTI ROI mask. The phantoms are designed such that any correct SUV
+benchmark through `SUVImageFilter`. The upstream tree at the pinned
+commit holds **58 DROs: 43 value objects and 15 `DRO_error_*`
+objects**, and the manifest carries two kinds of entry accordingly:
+
+| `Expectation` | Asserts |
+|---|---|
+| `CanonicalTriple` | `(SUVmin, SUVmedian, SUVmax) = (0.20, 1.00, 4.00)` inside the shipped NIfTI ROI mask. |
+| `Refusal` | `SUVImageFilter` throws; SUV is not computable from this input. |
+
+The value phantoms are designed such that any correct SUV
 implementation produces those three numbers regardless of input
 pixel-unit semantics (BQML / GML / CM2ML / CNTS) or source
 pre-normalization variant, so a single triple suffices for every DRO.
+
+A `Refusal` entry additionally pins **why** the input was refused: the
+expected exception type (`GetNameOfClass()`) and a substring the
+message must contain. Both matter. Five of the error DROs raise
+`MissingDICOMPropertyException`, so asserting the type alone would let
+a regression in, say, weight handling pass behind an unrelated
+missing-tag error; and the type is what the CLI's distinct exit codes
+rest on, notably exit 2 (tag absent) against exit 6 (tag present,
+value invalid). Keep the substrings minimal -- a tag number where there
+is one -- so rewording a message does not churn the manifest.
 
 ### Where the data comes from
 
@@ -46,17 +63,34 @@ After superbuild + a configure pass, the test runs as part of ctest:
 ctest -R mitkPETIBSIBenchmark -V
 ```
 
-Expected runtime: ~30-60 s (32 DROs, each ~20 DICOM slices).
+Expected runtime: ~30 s for the current manifest (each value DRO is
+~20 DICOM slices; refusal cases abort during input classification and
+cost almost nothing).
 
 ### Expected status
 
-The test runs all 32 DROs unconditionally and stays **strict-red** if
-any case deviates. There is no per-DRO xfail wrapper or "expected to
-fail" carve-out -- every case must pass or the suite fails. This is a
-deliberate, permanent invariant: the SUV pipeline must reproduce the
-IBSI reference triple for every shipped DRO, so a regression in any
-variant or input-unit path fails the suite rather than being quietly
-tolerated.
+The test runs every manifest entry unconditionally and stays
+**strict-red** if any case deviates. There is no per-DRO xfail wrapper
+or "expected to fail" carve-out -- every case must pass or the suite
+fails. This is a deliberate, permanent invariant: the SUV pipeline must
+reproduce the IBSI reference triple for every DRO it claims, and must
+refuse every input it cannot compute, so a regression in any variant or
+input-unit path fails the suite rather than being quietly tolerated.
+
+The invariant is what keeps the manifest a **subset** of the upstream
+tree. It contains only the cases the implementation currently
+satisfies; a DRO present upstream and absent from `kBenchmarkCases` is
+a declared gap, not an oversight, and the file header lists the gaps
+with the reason for each. The manifest grows as each fix lands. Without
+that rule, adding a DRO ahead of its fix would turn the MITK build red
+for everyone.
+
+One consequence to keep in mind when the manifest later covers all 58:
+**"58 under test" would not mean "58 conformant".** A `Refusal` entry
+asserts MITK's honest-failure contract, and for a DRO whose upstream
+expected values are `0.20 / 1.00 / 4.00` a refusal still scores as a
+failure against the benchmark itself. A green suite means "nothing
+regressed", not "MITK passes the benchmark".
 
 ### Skip behavior
 
@@ -69,13 +103,24 @@ convention. Primary CI must always have the data.
 
 1. Fetch the new HEAD: `git ls-remote https://github.com/oncoray/suv_computation.git HEAD`.
 2. Set `MITK_PET_IBSI_DATA_GIT_TAG` in `cmake/PETIBSIData.cmake` to the new SHA.
-3. Reconfigure to re-clone: `cmake --build ... --target ...` will trigger FetchContent.
+3. Reconfigure. Note that the bump only takes effect where
+   `MITK_PET_IBSI_DATA_DIR` is *unset* in the cache: the download branch
+   writes that variable with `FORCE`, so in a build tree that has already
+   fetched once the user-supplied branch wins and the new SHA is ignored.
+   Clear the cache entry to re-fetch, or point it at a checkout of the
+   new revision yourself.
 4. Walk the new `DRO/` tree and `docs/DRO_list.csv`. If the case set or
    directory layout has changed, update `kBenchmarkCases` in
    `mitkPETIBSIBenchmarkTest.cpp`. The expected `(0.20, 1.00, 4.00)`
    triple is upstream-truth; if the CSV stops carrying constants, the
    test design assumption is broken and the test must be reworked.
-5. Re-run `ctest -R mitkPETIBSIBenchmark`.
+   Rows whose expected-value columns hold the literal `ERROR` are
+   refusal cases and map to `Expectation::Refusal`. Identify them by the
+   `DRO_error_` id prefix, not by the `Section` column -- upstream reuses
+   `units`, `dose`, `admintime` and `halflife` for both kinds. Nothing in
+   the C++ keys off `Section`.
+5. Re-run `ctest -C <config> -L PET`, not just `-R mitkPETIBSIBenchmark`:
+   the CLI smoke tests read the same data directory.
 
 ## CLI smoke tests
 

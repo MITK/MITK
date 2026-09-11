@@ -29,7 +29,7 @@ MITK_PET_IBSI_DATA_DIR is provided. The data is needed by the PET regression \
 test suite (mitkPETIBSIBenchmarkTest); when neither this option is ON nor \
 MITK_PET_IBSI_DATA_DIR points at a checkout, the test skips at runtime.")
 
-set(MITK_PET_IBSI_DATA_GIT_TAG "d9e3ff83240402d9d9470b854f72cff99c9490a9"
+set(MITK_PET_IBSI_DATA_GIT_TAG "381583521b877a441450e14efc62e07e59e4bef0"
   CACHE STRING "Pinned commit SHA of oncoray/suv_computation. Bumping this \
 SHA may invalidate the BenchmarkCase manifest in mitkPETIBSIBenchmarkTest.cpp; \
 re-validate after every bump.")
@@ -40,13 +40,20 @@ set(MITK_PET_IBSI_DATA_DIR "" CACHE PATH
 PET regression test suite uses this path verbatim and the configure-time \
 download is skipped.")
 
-# Helper: validate a candidate data dir by probing for a known file.
+# Helper: validate a candidate data dir by probing for known content.
+# docs/DRO_list.csv identifies the tree as an IBSI-SUV checkout at all;
+# DRO/DRO_7_0_0 identifies it as v3.0.1 or newer. Without the second probe
+# a stale checkout configures cleanly and then fails at test time as a
+# couple of dozen unexplained "directory not found" cases.
 function(_petibsidata_validate_dir candidate result_var)
-  if(EXISTS "${candidate}/docs/DRO_list.csv")
-    set(${result_var} TRUE PARENT_SCOPE)
-  else()
-    set(${result_var} FALSE PARENT_SCOPE)
+  set(${result_var} FALSE PARENT_SCOPE)
+  if(NOT EXISTS "${candidate}/docs/DRO_list.csv")
+    return()
   endif()
+  if(NOT EXISTS "${candidate}/DRO/DRO_7_0_0/PT")
+    return()
+  endif()
+  set(${result_var} TRUE PARENT_SCOPE)
 endfunction()
 
 if(MITK_PET_IBSI_DATA_DIR)
@@ -54,8 +61,9 @@ if(MITK_PET_IBSI_DATA_DIR)
   if(NOT _ibsi_valid)
     message(FATAL_ERROR
       "MITK_PET_IBSI_DATA_DIR='${MITK_PET_IBSI_DATA_DIR}' does not contain a \
-recognizable IBSI suv_computation tree (missing docs/DRO_list.csv). \
-Provide a correct path or unset to fall back to the FetchContent download.")
+recognizable IBSI suv_computation tree at v3.0.1 or newer (expected \
+docs/DRO_list.csv and DRO/DRO_7_0_0/PT). Provide a correct path or unset \
+to fall back to the FetchContent download.")
   endif()
   message(STATUS "PET IBSI DRO tree: using user-supplied ${MITK_PET_IBSI_DATA_DIR}")
 elseif(MITK_PET_DOWNLOAD_IBSI_DATA)
@@ -76,8 +84,8 @@ elseif(MITK_PET_DOWNLOAD_IBSI_DATA)
   if(NOT _ibsi_valid)
     message(FATAL_ERROR
       "FetchContent populated PETIBSIData at '${petibsidata_SOURCE_DIR}' but \
-docs/DRO_list.csv is missing. The pinned SHA may be wrong or the upstream \
-repository layout has changed.")
+docs/DRO_list.csv or DRO/DRO_7_0_0/PT is missing. The pinned SHA may be \
+wrong or the upstream repository layout has changed.")
   endif()
   set(MITK_PET_IBSI_DATA_DIR "${petibsidata_SOURCE_DIR}" CACHE PATH "" FORCE)
   message(STATUS "PET IBSI DRO tree: ${MITK_PET_IBSI_DATA_DIR}")

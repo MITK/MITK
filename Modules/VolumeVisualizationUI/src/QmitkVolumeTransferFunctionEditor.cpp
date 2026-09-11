@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkVolumeTransferFunctionEditor.h"
 
 #include <mitkImage.h>
+#include <mitkLevelWindow.h>
 #include <mitkProperties.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
@@ -46,8 +47,10 @@ found in the LICENSE file.
 #include <QToolButton>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <fstream>
+#include <optional>
 
 namespace
 {
@@ -187,6 +190,54 @@ namespace
   mitk::VolumeBlendMode BlendModeOrComposite(const mitk::DataNode *node)
   {
     return mitk::GetVolumeBlendMode(node).value_or(mitk::VolumeBlendMode::Composite);
+  }
+
+  /** \brief The intensity band the editor is scaled to.
+   *
+   * Not the image's outermost values: one saturated voxel is enough to set the
+   * axis the canvas draws and all four sliders are sized against, leaving the
+   * curve a pixel wide and a single slider step wider than the curve itself.
+   * mitk::LevelWindow::SetAuto answers with the band instead, substituting the
+   * second extreme for one that too few voxels carry to matter, and is what the
+   * 2D views show the same image over.
+   *
+   * \return The band, the histogram's own bounds where the image names none, or
+   *         nothing where neither can.
+   */
+  std::optional<std::array<double, 2>> WorkingRange(const mitk::Image *image,
+                                                    const mitk::SimpleHistogram *histogram)
+  {
+    if (image != nullptr && image->IsInitialized())
+    {
+      mitk::LevelWindow band;
+
+      // Over the whole volume rather than its central slice, which an outlier
+      // can miss. Only the third argument carries meaning here; SetAuto documents
+      // the second as unused.
+      band.SetAuto(image, true, false);
+
+      double lower = band.GetLowerWindowBound();
+      double upper = band.GetUpperWindowBound();
+
+      // SetAuto pads the range before deciding what to discard from it, and on
+      // an image holding two distinct values the padding is all that survives:
+      // the band then reaches past every voxel in the image. Bounded by the
+      // histogram, which is the axis this had before the band was consulted, so
+      // the worst the band can do is fail to narrow it.
+      if (histogram != nullptr)
+      {
+        lower = std::max(lower, histogram->GetMin());
+        upper = std::min(upper, histogram->GetMax());
+      }
+
+      if (lower < upper)
+        return std::array{ lower, upper };
+    }
+
+    if (histogram != nullptr)
+      return std::array{ histogram->GetMin(), histogram->GetMax() };
+
+    return std::nullopt;
   }
 
   /** The arrow is the only cue that a section folds away, so it is drawn by the
@@ -731,14 +782,14 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
     m_Controls->combinedTfCanvas->SetColorTransferFunction(m_AppliedTransferFunction->GetColorTransferFunction());
     m_Controls->combinedTfCanvas->SetPiecewiseFunction(m_AppliedTransferFunction->GetScalarOpacityFunction());
 
-    if (histogram != nullptr)
+    if (const auto range = WorkingRange(image, histogram); range.has_value())
     {
-      // Use the image scalar range as the visible x-axis so histogram, gradient
-      // and curve line up. (SetPiecewiseFunction defaulted these to the function's
-      // own range, so this must come after it.)
-      m_DataRange = { histogram->GetMin(), histogram->GetMax() };
-      m_Controls->combinedTfCanvas->SetMin(histogram->GetMin());
-      m_Controls->combinedTfCanvas->SetMax(histogram->GetMax());
+      // The visible x-axis, so histogram, gradient and curve line up.
+      // (SetPiecewiseFunction defaulted these to the function's own range, so
+      // this must come after it.)
+      m_DataRange = *range;
+      m_Controls->combinedTfCanvas->SetMin(m_DataRange[0]);
+      m_Controls->combinedTfCanvas->SetMax(m_DataRange[1]);
     }
 
     m_Controls->combinedTfCanvas->SnapshotOpacityBaseline();

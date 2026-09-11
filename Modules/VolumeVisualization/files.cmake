@@ -4,6 +4,7 @@ set(CPP_FILES
   mitkVolumeBlendMode.cpp
   mitkVolumeRenderingLightingModel.cpp
   mitkVolumeRenderingMaterial.cpp
+  mitkVolumeRenderingScalarRange.cpp
 )
 
 set(RESOURCE_FILES

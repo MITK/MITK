@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkImage.h>
 #include <mitkLocalStorageHandler.h>
+#include <mitkVolumeRenderingScalarRange.h>
 #include <mitkVtkMapper.h>
 
 // VTK
@@ -97,6 +98,14 @@ namespace mitk
       vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
       /** \brief Transfer functions and shading coefficients. */
       vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+
+      /** \brief The view of the image the ray caster is being fed through.
+       *
+       * Held per renderer because it stands for what that renderer last drew:
+       * the transfer function is a renderer-scoped property, and the view is
+       * built to fit it.
+       */
+      mitk::ScalarRangeViewCache m_ViewCache;
 
       /** \brief The last unrenderable blend mode already warned about.
        *

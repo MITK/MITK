@@ -62,10 +62,14 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
     return;
   }
 
-  localStorage->m_SmartVolumeMapper->SetInputData(imageData);
-
+  // Before the input is handed over, not after: the ray caster reads the
+  // scalar range off that input and fills its lookup tables over it, so which
+  // image to hand it cannot be decided until the curves are known.
   this->UpdateTransferFunctions(renderer, localStorage);
   this->UpdateRenderMode(renderer, localStorage);
+
+  localStorage->m_SmartVolumeMapper->SetInputData(
+    localStorage->m_ViewCache.GetView(imageData, localStorage->m_VolumeProperty));
 
   localStorage->m_Volume->VisibilityOn();
 }
@@ -227,8 +231,7 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   // supplies neither.
   //
   // mitk::VolumeBlendMode enumerates this same set from the other side, for the
-  // views that write the property. The two are kept in step by hand, because the
-  // module holding it sits above this one and this file cannot name it. Adding
+  // views that write the property. The two are kept in step by hand. Adding
   // either excluded mode there would mean supplying its input here anyway.
   const bool renderable = blendMode >= vtkVolumeMapper::COMPOSITE_BLEND &&
                           blendMode <= vtkVolumeMapper::ADDITIVE_BLEND;

@@ -1,5 +1,5 @@
 mitk_create_module(
-  DEPENDS MitkDataTypesExt
+  DEPENDS MitkDataTypesExt MitkVolumeVisualization
   PACKAGE_DEPENDS PRIVATE VTK|CommonComputationalGeometry+CommonSystem+RenderingVolumeOpenGL2
 )
 

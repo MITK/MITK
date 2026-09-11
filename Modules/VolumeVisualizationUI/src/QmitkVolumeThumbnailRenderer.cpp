@@ -170,6 +170,8 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
 {
   if (image == nullptr || !image->IsInitialized())
   {
+    m_Image = nullptr;
+
     if (m_Mapper != nullptr)
       m_Mapper->RemoveAllInputs();
 
@@ -188,6 +190,11 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   // claims a graphics context.
   if (m_RenderWindow == nullptr)
     this->CreatePipeline();
+
+  // Kept for Render to build its views of, which is what the previews are
+  // drawn through. This bind carries no transfer function yet, so the volume
+  // itself is what proves the ray caster can draw it.
+  m_Image = imageData;
 
   m_Mapper->SetInputData(imageData);
   m_Volume->SetUserTransform(CreateDataToWorldTransform(image, imageData));
@@ -251,14 +258,12 @@ QPixmap QmitkVolumeThumbnailRenderer::Render(
   m_VolumeProperty->SetScalarOpacity(transferFunction->GetScalarOpacityFunction());
 
   // Every preset is offered for every image, so one authored for a narrow
-  // intensity range gets drawn over data far wider. VTK sizes its opacity
-  // lookup texture as that range over the closest pair of nodes, which then
-  // exceeds any texture size, and warns for every preview. The table it clamps
-  // to is finer than a preview this size resolves.
-  const int warningDisplay = vtkObject::GetGlobalWarningDisplay();
-  vtkObject::GlobalWarningDisplayOff();
+  // intensity range is regularly drawn over data far wider. Through a view
+  // reporting the curve's own range, the ray caster resolves it as it was
+  // authored whatever the image holds.
+  m_Mapper->SetInputData(m_ViewCache.GetView(m_Image, m_VolumeProperty));
+
   m_RenderWindow->Render();
-  vtkObject::SetGlobalWarningDisplay(warningDisplay);
 
   // The filter holds on to the frame it last read, and the render window is not
   // one of the inputs it notices changing, so it has to be told each time.

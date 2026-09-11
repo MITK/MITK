@@ -16,12 +16,14 @@ found in the LICENSE file.
 #include <MitkVolumeVisualizationUIExports.h>
 
 #include <mitkVolumeBlendMode.h>
+#include <mitkVolumeRenderingScalarRange.h>
 
 #include <vtkSmartPointer.h>
 
 #include <QPixmap>
 #include <QSize>
 
+class vtkImageData;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSmartVolumeMapper;
@@ -40,8 +42,16 @@ namespace mitk
  *
  * Bind an image once with SetImage, then call Render for each transfer
  * function to preview. Binding is what costs - it uploads the volume to the
- * graphics card - so the pipeline is built once and kept; a render afterwards
- * is a fraction of that, and independent of how large the volume is.
+ * graphics card - so the pipeline is built once and kept.
+ *
+ * A render afterwards is a fraction of that, except where the transfer
+ * function is authored over a different intensity range than the one before
+ * it. The ray caster fills its lookup tables over the range of the image it is
+ * handed, so a preview is drawn through a view of the volume reporting the
+ * range of the curve being previewed (see mitk::ViewWithScalarRange), without
+ * which a curve authored for one modality is resolved by a handful of table
+ * entries on an image from another. Changing that view costs the upload again,
+ * so previews of curves sharing a range are cheapest drawn together.
  *
  * Rendering happens in an offscreen window of this object's own, not through
  * mitk::RenderingManager, because a preview has one volume, one camera, no
@@ -126,6 +136,12 @@ private:
    * would be logged for the lifetime of the session.
    */
   bool m_ReportedUnusable = false;
+
+  /** \brief The volume bound last, which every preview is a view of. */
+  vtkSmartPointer<vtkImageData> m_Image;
+
+  /** \brief The view of it the last preview was drawn through. */
+  mitk::ScalarRangeViewCache m_ViewCache;
 
   vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
   vtkSmartPointer<vtkRenderer> m_Renderer;

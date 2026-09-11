@@ -10,49 +10,44 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkInteractionKeyEvent_h
-#define mitkInteractionKeyEvent_h
+#ifndef mitkInteractionKeyReleaseEvent_h
+#define mitkInteractionKeyReleaseEvent_h
 
-#include <itkObject.h>
-#include <itkObjectFactory.h>
-#include <mitkBaseRenderer.h>
-#include <mitkCommon.h>
 #include <mitkInteractionEvent.h>
-#include <mitkInteractionEventConst.h>
-#include <mitkInteractionPositionEvent.h>
-#include <cstring>
 
 #include <MitkCoreExports.h>
 
-/*
- * Note: A Click with the MiddleButton is to be handled with MousePressEvents
- */
+#include <string>
+
 namespace mitk
 {
   /**
-   * \brief Represents the press of a keyboard key.
+   * \brief Represents the release of a keyboard key.
    *
-   * Stores the pressed key (as a string, including special key constants from
+   * Counterpart of InteractionKeyEvent, which represents a key press. Stores
+   * the released key (as a string, including special key constants from
    * InteractionEvent) and the modifier keys held during the event. Two
-   * InteractionKeyEvents are considered equal if they have the same key
-   * and the same modifiers. The release of a key is represented by
-   * InteractionKeyReleaseEvent.
+   * InteractionKeyReleaseEvents are considered equal if they have the same
+   * key and the same modifiers.
    *
-   * \sa InteractionKeyReleaseEvent
+   * Unlike key presses, key releases have no implicit "Std" + key event
+   * variant. A state machine configuration has to declare an event variant
+   * of this class explicitly.
+   *
+   * \sa InteractionKeyEvent
    * \sa InteractionEvent
-   * \sa InteractionPositionEvent
    * \ingroup Interaction
    */
-  class MITKCORE_EXPORT InteractionKeyEvent : public InteractionEvent
+  class MITKCORE_EXPORT InteractionKeyReleaseEvent : public InteractionEvent
   {
   public:
-    mitkClassMacro(InteractionKeyEvent, InteractionEvent)
+    mitkClassMacro(InteractionKeyReleaseEvent, InteractionEvent);
     mitkNewMacro3Param(Self, BaseRenderer*, const std::string&, ModifierKeys);
 
     /**
-     * \brief Check if the provided event is an InteractionKeyEvent or derived.
+     * \brief Check if the provided event is an InteractionKeyReleaseEvent or derived.
      * \param[in] baseClass The event to check.
-     * \return true if baseClass is an InteractionKeyEvent or derived from it.
+     * \return true if baseClass is an InteractionKeyReleaseEvent or derived from it.
      */
     bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
@@ -63,14 +58,14 @@ namespace mitk
     ModifierKeys GetModifiers() const;
 
     /**
-     * \brief Get the key that was pressed.
+     * \brief Get the key that was released.
      * \return The key as a string. For special keys, this matches the KeyXxx constants.
      */
     std::string GetKey() const;
 
   protected:
-    InteractionKeyEvent(BaseRenderer *, const std::string &key, ModifierKeys modifiers);
-    ~InteractionKeyEvent() override;
+    InteractionKeyReleaseEvent(BaseRenderer *, const std::string &key, ModifierKeys modifiers);
+    ~InteractionKeyReleaseEvent() override;
 
     bool IsEqual(const InteractionEvent &) const override;
 

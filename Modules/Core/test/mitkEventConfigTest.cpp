@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkInteractionEvent.h>
 #include <mitkInteractionEventConst.h>
 #include <mitkInteractionKeyEvent.h>
+#include <mitkInteractionKeyReleaseEvent.h>
 #include <mitkMouseMoveEvent.h>
 #include <mitkMousePressEvent.h>
 #include <mitkMouseReleaseEvent.h>
@@ -85,11 +86,17 @@ int mitkEventConfigTest(int argc, char *argv[])
   mitk::MouseWheelEvent::Pointer mwe1 = mitk::MouseWheelEvent::New(
     nullptr, pos, mitk::InteractionEvent::RightMouseButton, mitk::InteractionEvent::ShiftKey, -2);
   mitk::InteractionKeyEvent::Pointer ke = mitk::InteractionKeyEvent::New(nullptr, "l", mitk::InteractionEvent::NoKey);
+  mitk::InteractionKeyReleaseEvent::Pointer kre =
+    mitk::InteractionKeyReleaseEvent::New(nullptr, "l", mitk::InteractionEvent::NoKey);
+  mitk::InteractionKeyReleaseEvent::Pointer kre2 =
+    mitk::InteractionKeyReleaseEvent::New(nullptr, "m", mitk::InteractionEvent::NoKey);
 
   MITK_TEST_CONDITION_REQUIRED(newConfig.GetMappedEvent(mpe1.GetPointer()) == "Variant1" &&
                                  newConfig.GetMappedEvent(standard1.GetPointer()) == "Standard1" &&
                                  newConfig.GetMappedEvent(mme1.GetPointer()) == "Move2" &&
                                  newConfig.GetMappedEvent(ke.GetPointer()) == "Key1" &&
+                                 newConfig.GetMappedEvent(kre.GetPointer()) == "KeyRelease1" &&
+                                 newConfig.GetMappedEvent(kre2.GetPointer()) == "" && // key releases have no Std fallback
                                  newConfig.GetMappedEvent(mme2.GetPointer()) == "" // does not exist in file
                                ,
                                "03 Check Mouse- and Key-Events ");
@@ -115,6 +122,8 @@ int mitkEventConfigTest(int argc, char *argv[])
                                  newConfig2.GetMappedEvent(standard1.GetPointer()) == "Standard1" &&
                                  newConfig2.GetMappedEvent(mme1.GetPointer()) == "Move2" &&
                                  newConfig2.GetMappedEvent(ke.GetPointer()) == "Key1" &&
+                                 newConfig2.GetMappedEvent(kre.GetPointer()) == "KeyRelease1" &&
+                                 newConfig2.GetMappedEvent(kre2.GetPointer()) == "" && // key releases have no Std fallback
                                  newConfig2.GetMappedEvent(mme2.GetPointer()) == "" // does not exist in file
                                ,
                                "03 Check Mouse- and Key-Events ");

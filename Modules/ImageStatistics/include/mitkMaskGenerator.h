@@ -38,7 +38,6 @@ namespace mitk
  * \sa ImageMaskGenerator
  * \sa PlanarFigureMaskGenerator
  * \sa IgnorePixelMaskGenerator
- * \sa HotspotMaskGenerator
  * \sa MultiLabelMaskGenerator
  */
 class MITKIMAGESTATISTICS_EXPORT MaskGenerator: public itk::Object

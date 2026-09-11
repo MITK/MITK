@@ -192,6 +192,34 @@ namespace
   // permitted and the input has to be refused outright.
   constexpr double kDateSubstitutionHalfLifeLimitSeconds = 41400.0;
 
+  // Announce an adaptation once per deduction rather than once per slice.
+  // ResolveDecayDurationSeconds runs for every (timestep, slice), so without
+  // this a 20-slice volume repeats an identical warning 20 times and fills
+  // the record with duplicates carrying no extra information. Returns
+  // whether the rule was newly recorded, so the caller can gate its log line
+  // on the same condition.
+  //
+  // The record therefore states that a rule fired, not how many slices it
+  // fired on. Where only some slices adapt, the first one speaks for them;
+  // the alternative -- a per-slice record -- would be unreadable and no
+  // caller has asked to distinguish the cases.
+  bool RecordAdaptationOnce(std::vector<mitk::SUVAdaptation>& adaptations,
+                            mitk::SUVAdaptationRule rule,
+                            const std::string& dicomTag,
+                            const std::string& originalValue,
+                            const std::string& usedValue)
+  {
+    const bool alreadyRecorded =
+      std::any_of(adaptations.cbegin(), adaptations.cend(),
+                  [rule](const mitk::SUVAdaptation& entry) { return rule == entry.rule; });
+    if (alreadyRecorded)
+    {
+      return false;
+    }
+    adaptations.push_back({rule, dicomTag, originalValue, usedValue});
+    return true;
+  }
+
   // Reconstruct the decay duration when the stored administration date
   // cannot be trusted: keep the stored time of day, take the date from the
   // reference instant. Because the two then share a date by construction,
@@ -210,12 +238,15 @@ namespace
     if (duration < mitk::kEarliestDecayDurationSeconds)
     {
       duration += kSecondsPerDay;
-      MITK_WARN << "Reconstructed administration datetime falls after the "
-                   "decay-correction reference time; moving it back one day "
-                   "per the IBSI-SUV recommendation. Decay duration: "
-                << duration << " s.";
-      adaptations.push_back({mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
-                             "", "", std::to_string(duration)});
+      if (RecordAdaptationOnce(adaptations,
+                               mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
+                               "", "", std::to_string(duration)))
+      {
+        MITK_WARN << "Reconstructed administration datetime falls after the "
+                     "decay-correction reference time; moving it back one day "
+                     "per the IBSI-SUV recommendation. Decay duration: "
+                  << duration << " s.";
+      }
     }
     return duration;
   }
@@ -283,13 +314,16 @@ namespace
              "correct administration date or relax the policy.";
       }
 
-      MITK_WARN << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
-                   "implausible decay duration of " << offset
-                << " s; keeping its time of day and taking the date from the "
-                   "decay-correction reference datetime per the IBSI-SUV "
-                   "recommendation.";
-      adaptations.push_back({mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
-                             "(0018,1078)", std::to_string(offset), ""});
+      if (RecordAdaptationOnce(adaptations,
+                               mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
+                               "(0018,1078)", std::to_string(offset), ""))
+      {
+        MITK_WARN << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
+                     "implausible decay duration of " << offset
+                  << " s; keeping its time of day and taking the date from the "
+                     "decay-correction reference datetime per the IBSI-SUV "
+                     "recommendation.";
+      }
 
       return SubstituteAdministrationDate(referenceTimeOfDay,
                                           SecondsOfDayUTC(admin.startDateTime),
@@ -322,12 +356,15 @@ namespace
              "policy.";
       }
 
-      MITK_WARN << "Only (0018,1072) Radiopharmaceutical Start Time is "
-                   "available; taking the administration date from the "
-                   "decay-correction reference datetime per the IBSI-SUV "
-                   "recommendation.";
-      adaptations.push_back({mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
-                             "(0018,1072)", "", ""});
+      if (RecordAdaptationOnce(adaptations,
+                               mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
+                               "(0018,1072)", "", ""))
+      {
+        MITK_WARN << "Only (0018,1072) Radiopharmaceutical Start Time is "
+                     "available; taking the administration date from the "
+                     "decay-correction reference datetime per the IBSI-SUV "
+                     "recommendation.";
+      }
 
       return SubstituteAdministrationDate(referenceTimeOfDay,
                                           admin.startTimeOfDaySeconds,

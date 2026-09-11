@@ -96,5 +96,13 @@ Global variant    Event class   Button/Key      Modifiers
   <event_variant class="InteractionKeyEvent" name="KeyMinus">
       <attribute name="Key" value="-"/>
   </event_variant>
+  <!-- Modifier keys generate key events of their own. Their Modifiers attribute lists the
+       other modifiers held, so press and release variants differ only by class. -->
+  <event_variant class="InteractionKeyEvent" name="CtrlKeyPressed">
+      <attribute name="Key" value="Control"/>
+  </event_variant>
+  <event_variant class="InteractionKeyReleaseEvent" name="CtrlKeyReleased">
+      <attribute name="Key" value="Control"/>
+  </event_variant>
   <!-- ... -->
 </config>

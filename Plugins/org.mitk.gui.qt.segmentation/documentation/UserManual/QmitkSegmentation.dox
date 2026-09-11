@@ -43,7 +43,7 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 <tr><td rowspan="3"><b>Label Navigation</b></td><td>Select and center on label</td><td><tt>Double-click</tt> label</td></tr>
 <tr><td>Highlight label in views</td><td><tt>Hover</tt> over label</td></tr>
 <tr><td>Show invisible labels</td><td><tt>Shift+Hover</tt></td></tr>
-<tr><td><b>Tool Modifiers</b></td><td>Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)</td><td><tt>Ctrl+Draw</tt></td></tr>
+<tr><td><b>Tool Modifiers</b></td><td>Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)</td><td><tt>Hold Ctrl</tt></td></tr>
 <tr><td rowspan="4"><b>Lasso Tool</b></td><td>Start/end segmentation</td><td><tt>Double left-click</tt></td></tr>
 <tr><td>Add anchor point</td><td><tt>Ctrl+Left-Click</tt></td></tr>
 <tr><td>Delete anchor point</td><td><tt>Del</tt> (when selected)</td></tr>
@@ -309,11 +309,11 @@ This behavior is disabled as long as any of the manual segmentation tools are ac
 \imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and subtract tools",2.00}
 
 Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation.
-Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of adding voxels, they will be subtracted).
+Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD inverts the current tool's behavior (i.e. instead of adding voxels, they will be subtracted). The cursor and the contour color reflect the inversion as soon as the key is pressed.
 
 <table>
 <tr><th>Category</th><th>Action</th><th>Shortcut</th></tr>
-<tr><td><b>Tool Modifiers</b></td><td>Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)</td><td><tt>Ctrl+Draw</tt></td></tr>
+<tr><td><b>Tool Modifiers</b></td><td>Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)</td><td><tt>Hold Ctrl</tt></td></tr>
 </table>
 
 \subsection org_mitk_views_segmentationlassotool Lasso tool
@@ -348,11 +348,11 @@ Please note that:
 \imageMacro{QmitkSegmentation_IMGIconPaintWipe.png,"Paint and wipe tools",2.00}
 
 Use the <i>Size</i> slider to change the radius of the round paintbrush tool. Move the mouse in any 2D window and press the left button to draw or erase pixels.
-Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of painting voxels, they will be wiped).
+Holding CTRL / CMD inverts the current tool's behavior (i.e. instead of painting voxels, they will be wiped). The cursor and the brush outline color reflect the inversion as soon as the key is pressed.
 
 <table>
 <tr><th>Category</th><th>Action</th><th>Shortcut</th></tr>
-<tr><td><b>Tool Modifiers</b></td><td>Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)</td><td><tt>Ctrl+Draw</tt></td></tr>
+<tr><td><b>Tool Modifiers</b></td><td>Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)</td><td><tt>Hold Ctrl</tt></td></tr>
 </table>
 
 \subsection org_mitk_views_segmentationregiongrowingtool Region growing tool

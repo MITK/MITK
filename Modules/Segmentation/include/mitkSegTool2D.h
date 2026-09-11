@@ -237,8 +237,8 @@ namespace mitk
     /**
     * \brief Filters events that cannot be handled by 2D segmentation tools
     *
-    * Currently an event is discarded if it was not sent by a 2D renderwindow and if it is
-    * not of type InteractionPositionEvent
+    * An event is discarded if it was not sent by a 2D render window or if it is neither
+    * an InteractionPositionEvent nor a key press or release event.
     */
     bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 

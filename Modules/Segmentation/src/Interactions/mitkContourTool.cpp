@@ -12,9 +12,12 @@ found in the LICENSE file.
 
 #include <mitkContourTool.h>
 
+#include <mitkRenderingManager.h>
+
 mitk::ContourTool::ContourTool(int paintingPixelValue)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
-    m_PaintingPixelValue(paintingPixelValue)
+    m_PaintingPixelValue(paintingPixelValue),
+    m_InitialPaintingPixelValue(paintingPixelValue)
 {
 }
 
@@ -33,6 +36,12 @@ void mitk::ContourTool::ConnectActionsAndFunctions()
 void mitk::ContourTool::Activated()
 {
   Superclass::Activated();
+
+  // State machine state and painting value outlive a deactivation. A tool left
+  // inverted, e.g. by switching tools while CTRL is held, would otherwise come
+  // back inverted while its cursor, pushed anew on activation, would not.
+  this->ResetToStartState();
+  this->SetPaintingPixelValue(m_InitialPaintingPixelValue);
 }
 
 void mitk::ContourTool::Deactivated()
@@ -116,12 +125,28 @@ void mitk::ContourTool::OnInvertLogic(StateMachineAction *, InteractionEvent *)
   // Inversion only for 0 and 1 as painting values
   if (m_PaintingPixelValue == 1)
   {
-    m_PaintingPixelValue = 0;
-    FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
+    this->SetPaintingPixelValue(0);
   }
   else if (m_PaintingPixelValue == 0)
   {
-    m_PaintingPixelValue = 1;
+    this->SetPaintingPixelValue(1);
+  }
+
+  // The inversion may be triggered by a key event, which unlike a mouse event
+  // does not cause a render update on its own. The feedback contour is 2D only.
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+}
+
+void mitk::ContourTool::SetPaintingPixelValue(int paintingPixelValue)
+{
+  m_PaintingPixelValue = paintingPixelValue;
+
+  if (0 == paintingPixelValue)
+  {
+    FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
+  }
+  else
+  {
     FeedbackContourTool::SetFeedbackContourColorDefault();
   }
 }

@@ -18,8 +18,32 @@ found in the LICENSE file.
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkMultiLabelEvents.h>
 
 #include <QmitkStyleManager.h>
+
+#include <functional>
+
+namespace
+{
+  /** Observes the "name" property of the passed node, if it has one. The property object
+  itself has to be observed because DataNode::SetName() writes in place into a "name"
+  property owned by the BaseData if there is one (e.g. for DICOM images), which modifies
+  neither the node nor the data. DataNode::GetProperty() resolves both possible owners and
+  is what DataNode::GetName() reads. */
+  void AddNameObserver(const mitk::DataNode* node,
+    std::vector<mitk::ITKEventObserverGuard>& observers,
+    const std::function<void(const itk::EventObject&)>& handler)
+  {
+    if (nullptr == node)
+      return;
+
+    const auto* nameProperty = node->GetProperty("name");
+
+    if (nullptr != nameProperty)
+      observers.emplace_back(nameProperty, itk::ModifiedEvent(), handler);
+  }
+}
 
 QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {
@@ -175,7 +199,8 @@ void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNo
   emit beginResetModel();
   m_TimeStepResolvedImageNodes = std::move(tempNodes);
   m_ImageNodes = nodes;
-  UpdateByDataStorage();
+  this->UpdateInputObservers();
+  this->UpdateByDataStorage();
   emit endResetModel();
   emit modelChanged();
 }
@@ -204,7 +229,8 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
   emit beginResetModel();
   m_TimeStepResolvedMaskNodes = std::move(tempNodes);
   m_MaskNodes = nodes;
-  UpdateByDataStorage();
+  this->UpdateInputObservers();
+  this->UpdateByDataStorage();
   emit endResetModel();
   emit modelChanged();
 }
@@ -212,10 +238,12 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
 void QmitkImageStatisticsTreeModel::Clear()
 {
   emit beginResetModel();
+  m_InputObservers.clear();
   m_Statistics.clear();
   m_ImageNodes.clear();
   m_TimeStepResolvedImageNodes.clear();
   m_MaskNodes.clear();
+  m_TimeStepResolvedMaskNodes.clear();
   m_StatisticNames.clear();
   emit endResetModel();
   emit modelChanged();
@@ -253,6 +281,59 @@ void QmitkImageStatisticsTreeModel::SetHistogramNBins(unsigned int nbins)
 unsigned int QmitkImageStatisticsTreeModel::GetHistogramNBins() const
 {
   return this->m_HistogramNBins;
+}
+
+void QmitkImageStatisticsTreeModel::UpdateInputObservers()
+{
+  m_InputObservers.clear();
+
+  std::function<void(const itk::EventObject&)> handler =
+    [this](const itk::EventObject&) { this->RequestModelUpdate(); };
+
+  for (const auto& node : m_ImageNodes)
+    AddNameObserver(node, m_InputObservers, handler);
+
+  for (const auto& node : m_MaskNodes)
+  {
+    AddNameObserver(node, m_InputObservers, handler);
+
+    // Renaming or recoloring a label modifies only the segmentation, never its node,
+    // therefore the segmentation has to be observed directly.
+    const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(
+      node.IsNull() ? nullptr : node->GetData());
+
+    if (nullptr != segmentation)
+      m_InputObservers.emplace_back(segmentation, mitk::LabelModifiedEvent(), handler);
+  }
+}
+
+void QmitkImageStatisticsTreeModel::RequestModelUpdate()
+{
+  // Atomic, because a label can also be modified by a worker thread, e.g. by a
+  // segmentation algorithm that names its results.
+  if (m_ModelUpdatePending.exchange(true))
+    return;
+
+  // Deferred on purpose: bulk operations on a segmentation (MultiLabelSegmentation::
+  // ApplyToLabels, e.g. behind "show all labels") send one LabelModifiedEvent per label.
+  // Coalescing them avoids one complete model rebuild per event. It also keeps the reset
+  // out of the event invocation of the sender.
+  QMetaObject::invokeMethod(this, [this]()
+    {
+      m_ModelUpdatePending = false;
+
+      emit beginResetModel();
+      {
+        // Deliberately no UpdateByDataStorage(): a renamed node or label does not change
+        // which statistics apply, but modifying a label bumps the modification time of the
+        // segmentation, which would make ImageStatisticsContainerManager discard the still
+        // valid statistics as outdated.
+        std::lock_guard<std::mutex> locked(m_Mutex);
+        this->BuildHierarchicalModel();
+      }
+      emit endResetModel();
+      emit modelChanged();
+    }, Qt::QueuedConnection);
 }
 
 void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
@@ -519,18 +600,25 @@ void QmitkImageStatisticsTreeModel::NodeAdded(const mitk::DataNode * changedNode
 
 void QmitkImageStatisticsTreeModel::NodeChanged(const mitk::DataNode * changedNode)
 {
-  bool isRelevantNode = m_ImageNodes.end() != std::find(m_ImageNodes.begin(), m_ImageNodes.end(), changedNode);
-  isRelevantNode = isRelevantNode || (m_MaskNodes.end() != std::find(m_MaskNodes.begin(), m_MaskNodes.end(), changedNode));
-  isRelevantNode = isRelevantNode || (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData()));
+  bool isInputNode = m_ImageNodes.end() != std::find(m_ImageNodes.begin(), m_ImageNodes.end(), changedNode);
+  isInputNode = isInputNode || (m_MaskNodes.end() != std::find(m_MaskNodes.begin(), m_MaskNodes.end(), changedNode));
 
-  if (isRelevantNode)
+  if (isInputNode)
   {
-    if (m_BuildTime.GetMTime() < changedNode->GetData()->GetMTime())
-    {
-      emit beginResetModel();
-      UpdateByDataStorage();
-      emit endResetModel();
-      emit modelChanged();
-    }
+    // The "name" property object can be created late or be replaced as a whole (e.g. by
+    // DataNode::SetData() clearing the property list), so rebind instead of letting the
+    // observer go stale unnoticed.
+    this->UpdateInputObservers();
+  }
+
+  const auto* data = changedNode->GetData();
+  const bool isRelevantNode = isInputNode || (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(data));
+
+  if (isRelevantNode && nullptr != data && m_BuildTime.GetMTime() < data->GetMTime())
+  {
+    emit beginResetModel();
+    this->UpdateByDataStorage();
+    emit endResetModel();
+    emit modelChanged();
   }
 }

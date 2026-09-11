@@ -357,11 +357,13 @@ namespace mitk
    * Healthineers", "GE MEDICAL SYSTEMS", "GE HEALTHCARE", "Philips
    * Medical Systems".
    *
-   * \c Other covers any unrecognized or empty value. The IBSI-SUV
-   * benchmark spec is silent for these vendors; consuming strategies
-   * must surface this honestly (e.g. raise
-   * \c AmbiguousDecayTimingException) rather than silently extend a
-   * vendor-specific formula to an input we cannot classify.
+   * \c Other covers any unrecognized or empty value. Only the two
+   * private-datetime rules (Step 1) and the GE reference-time formula
+   * (Step 4) are genuinely vendor-specific; the remaining rules apply to
+   * any manufacturer. An \c Other input therefore resolves through the
+   * general rules rather than being refused, and the operator is warned
+   * that an empirical formula was applied to an input whose scanner
+   * behaviour could not be verified.
    */
   enum class ManufacturerFamily
   {
@@ -593,29 +595,35 @@ namespace mitk
    *     GE: (0009,0x0D) "GEMS_PETD_01" scan datetime (lifted to
    *     \c mitk.pet.GEScanDateTime). Used as the uniform reference time
    *     when present and yielding a non-negative decay.
-   *  -# <b>AcquisitionTime equals SeriesTime.</b> Manufacturer in
-   *     {Siemens, GE, Philips} and (0008,0032) AcquisitionTime equals
-   *     (0008,0031) SeriesTime in seconds at slice 0: use per-slice
-   *     AcquisitionTime as the reference.
-   *  -# <b>Siemens / Philips, vendor T_ave formula.</b> Manufacturer in
-   *     {Siemens, Philips}, per-slice (0008,0032) AcquisitionTime,
-   *     (0054,0x1300) FrameReferenceTime, and (0018,0x1242)
-   *     ActualFrameDuration available: per-slice reference time =
-   *     AcquisitionTime + T_ave - FrameReferenceTime, with T_ave the
-   *     closed-form average count-rate time over the frame.
-   *  -# <b>GE, vendor -ΔFrameRef formula.</b> Manufacturer = GE, same
-   *     per-slice tags available: per-slice reference time =
-   *     AcquisitionTime - FrameReferenceTime.
+   *  -# <b>AcquisitionTime equals SeriesTime.</b> (0008,0032)
+   *     AcquisitionTime equals (0008,0031) SeriesTime in seconds at
+   *     slice 0: use per-slice AcquisitionTime as the reference. Applies
+   *     to every manufacturer.
+   *  -# <b>General T_ave formula.</b> Any manufacturer other than GE,
+   *     with per-slice (0008,0032) AcquisitionTime, (0054,0x1300)
+   *     FrameReferenceTime and (0018,0x1242) ActualFrameDuration
+   *     available: per-slice reference time = AcquisitionTime + T_ave -
+   *     FrameReferenceTime, with T_ave the closed-form average count-rate
+   *     time over the frame. This is the general fallback, not a
+   *     Siemens/Philips special case.
+   *  -# <b>GE, -FrameReferenceTime formula.</b> Manufacturer = GE, with
+   *     per-slice AcquisitionTime and FrameReferenceTime: per-slice
+   *     reference time = AcquisitionTime - FrameReferenceTime. Note that
+   *     this rule needs no ActualFrameDuration -- it carries no T_ave
+   *     term -- so a GE input that omits (0018,0x1242) still resolves.
    *
-   * Steps 3 and 4 are vendor-specific empirical formulas; they fire only
+   * Steps 3 and 4 are empirical formulas derived from observed scanner
+   * behaviour rather than from the DICOM specification; they fire only
    * under \c DICOMReadPolicy::Lenient. Under \c DICOMReadPolicy::Strict
    * they are refused and the helper raises
-   * \c VendorEmpiricalDecayFallbackRefusedException.
+   * \c VendorEmpiricalDecayFallbackRefusedException. Applying either one
+   * emits a \c MITK_WARN, and applying it to an input whose manufacturer
+   * could not be classified emits a second one.
    *
-   * If none of these applies — typically an "Other" manufacturer with no
-   * private datetime tag and no per-slice frame timing — the helper raises
-   * \c AmbiguousDecayTimingException rather than silently extending one of
-   * the vendor-specific formulas to an input we cannot classify.
+   * If none of these applies -- typically no private datetime tag and no
+   * per-slice frame timing -- the helper raises
+   * \c AmbiguousDecayTimingException rather than inventing a reference
+   * time.
    *
    * \par DC = NONE
    * Pixel data is not decay-corrected. The voxel value is the count rate

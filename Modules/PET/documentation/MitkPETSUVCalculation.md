@@ -169,20 +169,27 @@ The `START` fallback chain is (first applicable step wins):
    DICOM reader attaches them as `mitk.pet.SiemensDecayDateTime` and
    `mitk.pet.GEScanDateTime`. Used as uniform reference time for all slices.
 2. `(0008,0032)` Acquisition Time equals `(0008,0031)` Series Time (second
-   resolution) at slice 0 and the manufacturer is Siemens, GE or Philips: the
-   per-slice Acquisition Time is the reference.
-3. Siemens or Philips: per-slice reference
+   resolution) at slice 0: the per-slice Acquisition Time is the reference.
+   Applies to every manufacturer -- an acquisition time that already equals
+   the series time identifies the reference instant on its own.
+3. Any manufacturer except GE: per-slice reference
    `AcquisitionTime + T_ave - FrameReferenceTime`, requiring per-slice
    `(0008,0032)`, `(0054,1300)` Frame Reference Time (non-negative),
-   `(0018,1242)` (positive) and a known half-life.
-4. GE: per-slice reference `AcquisitionTime - FrameReferenceTime` with the
-   same tag requirements as step 3.
+   `(0018,1242)` Actual Frame Duration (positive) and a known half-life.
+   This is the general fallback, not a Siemens/Philips special case.
+4. GE: per-slice reference `AcquisitionTime - FrameReferenceTime`, requiring
+   per-slice `(0008,0032)` and `(0054,1300)`. It carries no `T_ave` term and
+   therefore needs neither `(0018,1242)` nor a half-life.
 
-Steps 3 and 4 are empirical vendor formulas and count as benchmark
+Steps 3 and 4 are empirical formulas -- derived from observed scanner
+behaviour rather than from the DICOM specification -- and count as benchmark
 adaptations: they are applied with a warning by default and refused with
-`--strict-dicom` (exit code 8). If no step applies (typically an unknown
-manufacturer without private tags and without per-slice frame timing) the run
-stops with exit code 3.
+`--strict-dicom` (exit code 8). Applying either one to input whose
+`(0008,0070)` Manufacturer is absent, empty or unrecognized emits a second
+warning, because the formula cannot be verified against the scanner that
+produced the data; the general rules are still applied. If no step applies
+(typically no private tag and no per-slice frame timing) the run stops with
+exit code 3.
 
 `--decay-time` bypasses all of the above and applies the given duration to
 every voxel. `0` reproduces `ADMIN` behaviour. Negative or non-finite values
@@ -204,7 +211,8 @@ input usable. By default they are applied and logged as warnings. With
 | Adaptation | Trigger | Default | Strict |
 |------------|---------|---------|--------|
 | Radionuclide Total Dose `(0018,1074)` given in MBq | value strictly between `0` and `1e4` | multiplied by `1e6` | `ImplausibleRadionuclideDoseException` |
-| Vendor decay-timing fallback for `START` | steps 3 or 4 of the fallback chain | applied | `VendorEmpiricalDecayFallbackRefusedException` |
+| Empirical decay-timing fallback for `START` | steps 3 or 4 of the fallback chain | applied | `VendorEmpiricalDecayFallbackRefusedException` |
+| Unverified manufacturer for that fallback | `(0008,0070)` absent, empty or unrecognized *and* step 3 or 4 fires | general rule applied | covered by the row above |
 | Patient sex `O` for a sex-specific variant | `(0010,0040)` or `--patient-sex` is `O` | mean of male and female numerators | `AmbiguousPatientSexAdaptationRefusedException` |
 
 `--injected-activity` bypasses the dose adaptation and `--decay-time` bypasses

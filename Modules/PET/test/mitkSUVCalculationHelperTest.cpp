@@ -148,7 +148,7 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Start_Step3_Siemens_StrictPolicy_Refused);
   MITK_TEST(Start_Step4_GE_DeltaFormula);
   MITK_TEST(Start_Step4_GE_StrictPolicy_Refused);
-  MITK_TEST(Start_Step5_OtherManufacturer_Throws_AmbiguousDecayTimingException);
+  MITK_TEST(Start_NoReferenceTimeSource_Throws_AmbiguousDecayTimingException);
   MITK_TEST(None_PerSliceDecayTime);
   MITK_TEST(None_TaveCorrection_Applied);
   MITK_TEST(None_MissingFrameDuration_Throws_MissingDICOMPropertyException);
@@ -157,6 +157,14 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Rollover_1078_NoSilentCorrection_Throws_AmbiguousDecayTimingException);
   MITK_TEST(Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_None_MissingAcqTime_Throws_MissingDICOMPropertyException);
+
+  // DC=START rule gating
+  MITK_TEST(Start_Step2_UnrecognizedVendor_Computes);
+  MITK_TEST(Start_Step3_UnrecognizedVendor_Computes);
+  MITK_TEST(Start_Step4_GE_WithoutActualFrameDuration_Computes);
+  MITK_TEST(Start_Step4_GE_DoesNotApplyTAve);
+  MITK_TEST(Start_Step3_NonGE_ActualFrameDurationAbsent_Refuses);
+  MITK_TEST(Start_Step3_NonGE_ActualFrameDurationEmpty_Refuses);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -171,6 +179,29 @@ private:
   // the helper picks per-slice AcquisitionTime as the reference. The
   // numeric expectation is unchanged because AcqTime equals SeriesTime.
   static constexpr double kStartExpectedDecaySeconds = 4530.0;
+
+  // Fixture for the cases that must reach Steps 3/4: AcquisitionTime is
+  // present but differs from SeriesTime, so Step 2 cannot fire. Acquisition
+  // 12:10:00 against an 11:00:00 injection gives t_acq - t_inj = 4200 s;
+  // with FrameReferenceTime 600 s the pure GE shift lands on 3600 s.
+  // ActualFrameDuration is deliberately left out -- the cases that need it
+  // set it themselves, and its absence is itself under test.
+  void SetupStep34Case(mitk::Image* image, const char* manufacturer)
+  {
+    SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");          // SeriesDate
+    SetDicomProperty(image, PropName(0x0008, 0x0031), "121530");            // SeriesTime
+    SetDicomProperty(image, PropName(0x0008, 0x0070), manufacturer);
+    SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430");          // AcqDate
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "121000");            // AcqTime != SeriesTime
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
+                     "20260430110000");                                     // RP Start DT
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
+                     "6586.26");                                            // Half-life [s]
+    SetDicomProperty(image, PropName(0x0054, 0x1300), "600000");            // FrameReferenceTime [ms]
+  }
+
+  static constexpr double kStep4ExpectedDecaySeconds = 3600.0;
 
   void SetupCommonStartCase(mitk::Image* image)
   {
@@ -784,11 +815,14 @@ public:
       mitk::VendorEmpiricalDecayFallbackRefusedException);
   }
 
-  void Start_Step5_OtherManufacturer_Throws_AmbiguousDecayTimingException()
+  void Start_NoReferenceTimeSource_Throws_AmbiguousDecayTimingException()
   {
-    // Unknown manufacturer with no private tag, no AcqTime == SeriesTime,
-    // no per-slice frame timing. Spec is silent for this combination;
-    // the helper must refuse rather than guess.
+    // No private datetime, no AcquisitionTime at all, so neither the
+    // AcqTime == SeriesTime rule nor the frame-timing formulas have
+    // anything to work with and the chain is exhausted. The manufacturer
+    // is incidental here: since v3.0.1 only the private-datetime rules and
+    // the GE formula are manufacturer-specific, so an unrecognized vendor
+    // is no longer a reason to refuse on its own.
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
     SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
@@ -796,6 +830,100 @@ public:
     SetDicomProperty(image, PropName(0x0008, 0x0070), "Acme Imaging Inc.");
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
                      "20260430110000");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
+                         mitk::AmbiguousDecayTimingException);
+  }
+
+  // ---- DC=START rule gating, IBSI-SUV v3.0.1 ----
+  //
+  // Only three rules are manufacturer-specific: the two private-datetime
+  // rules and the GE reference-time formula. The AcqTime == SeriesTime rule
+  // and the general T_ave formula apply to any scanner. These cases pin
+  // both halves of that split, because a vendor gate that creeps back would
+  // be invisible in the benchmark until a non-Siemens/GE/Philips export
+  // appears.
+
+  void Start_Step2_UnrecognizedVendor_Computes()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetupCommonStartCase(image);
+    SetDicomProperty(image, PropName(0x0008, 0x0070), "SYNTHETIC");
+
+    const auto info = mitk::DeduceDecayCorrection(image);
+    CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::Start, info.strategy);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds,
+                                 info.decayTimes.at(0).at(0), 1e-6);
+  }
+
+  void Start_Step3_UnrecognizedVendor_Computes()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetupStep34Case(image, "SYNTHETIC");
+    SetDicomProperty(image, PropName(0x0018, 0x1242), "300000");  // ActualFrameDuration [ms]
+
+    const auto info = mitk::DeduceDecayCorrection(image);
+    // T_ave is strictly positive, so the general formula lands above the
+    // pure -FrameReferenceTime shift rather than on it.
+    CPPUNIT_ASSERT(info.decayTimes.at(0).at(0) > kStep4ExpectedDecaySeconds);
+  }
+
+  void Start_Step4_GE_WithoutActualFrameDuration_Computes()
+  {
+    // The GE rule is a pure -FrameReferenceTime shift with no T_ave term,
+    // so it needs no (0018,1242). Requiring the tag for both formulas
+    // refused GE studies the rule resolves perfectly well. No benchmark DRO
+    // covers this combination, so this case is the only thing guarding it.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupStep34Case(image, "GE MEDICAL SYSTEMS");
+
+    const auto info = mitk::DeduceDecayCorrection(image);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStep4ExpectedDecaySeconds,
+                                 info.decayTimes.at(0).at(0), 1e-6);
+  }
+
+  void Start_Step4_GE_DoesNotApplyTAve()
+  {
+    // Identical tags, two manufacturers. Dropping the vendor gate from the
+    // general formula must not also widen it over GE: the two formulas
+    // differ by exactly T_ave, and confusing them would skew every GE study.
+    auto geImage = MakeSyntheticImage(1, 1);
+    SetupStep34Case(geImage, "GE MEDICAL SYSTEMS");
+    SetDicomProperty(geImage, PropName(0x0018, 0x1242), "300000");
+
+    auto otherImage = MakeSyntheticImage(1, 1);
+    SetupStep34Case(otherImage, "SIEMENS");
+    SetDicomProperty(otherImage, PropName(0x0018, 0x1242), "300000");
+
+    const double ge    = mitk::DeduceDecayCorrection(geImage).decayTimes.at(0).at(0);
+    const double other = mitk::DeduceDecayCorrection(otherImage).decayTimes.at(0).at(0);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStep4ExpectedDecaySeconds, ge, 1e-6);
+    CPPUNIT_ASSERT(other > ge);
+  }
+
+  void Start_Step3_NonGE_ActualFrameDurationAbsent_Refuses()
+  {
+    // DRO_error_3_2's shape. Once the vendor gate is gone, the
+    // ActualFrameDuration precondition is the only thing left that makes
+    // this input refuse, so it is worth pinning directly rather than
+    // through the benchmark.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupStep34Case(image, "SIEMENS");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
+                         mitk::AmbiguousDecayTimingException);
+  }
+
+  void Start_Step3_NonGE_ActualFrameDurationEmpty_Refuses()
+  {
+    // The same refusal reached by a different guard: an absent tag fails
+    // the presence check, a present-but-empty one fails the per-slice
+    // numeric check. The upstream DRO omits the tag; real exports ship it
+    // empty, so both shapes need coverage.
+    auto image = MakeSyntheticImage(1, 1);
+    SetupStep34Case(image, "SIEMENS");
+    SetDicomProperty(image, PropName(0x0018, 0x1242), "");
 
     CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
                          mitk::AmbiguousDecayTimingException);

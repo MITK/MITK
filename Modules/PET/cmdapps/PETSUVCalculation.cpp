@@ -203,13 +203,16 @@ namespace
       "Strict DICOM input policy",
       "Refuse IBSI-SUV-recommended empirical adaptations of borderline / "
       "ambiguous DICOM input. Currently affects: (a) reinterpreting "
-      "Radionuclide Total Dose (0018,1074) below 1e4 as MBq, and "
-      "(b) DC=START vendor-specific decay-timing fallbacks (Siemens / "
-      "Philips T_ave - FrameReferenceTime, GE -FrameReferenceTime). "
+      "Radionuclide Total Dose (0018,1074) below 1e4 as MBq; "
+      "(b) the DC=START empirical decay-timing fallbacks, i.e. "
+      "AcquisitionTime + T_ave - FrameReferenceTime for any manufacturer "
+      "other than GE, and AcquisitionTime - FrameReferenceTime for GE; "
+      "and (c) resolving an absent or ambiguous Patient Sex (0010,0040) "
+      "as the mean of the male- and female-specific normalizations. "
       "Without this flag the tool applies the recommendations and emits "
       "a WARN log entry. With this flag, supply unambiguous timing "
-      "(vendor private datetime, AcquisitionTime == SeriesTime) or use "
-      "--decay-time.");
+      "(vendor private datetime, "
+      "AcquisitionTime == SeriesTime) or use --decay-time.");
     parser.addArgument("tracer-index", "", mitkCommandLineParser::Int,
       "Radiopharmaceutical sequence item index",
       "Explicit selection for multi-item Radiopharmaceutical Information "

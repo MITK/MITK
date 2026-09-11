@@ -690,17 +690,14 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       const auto* acqTimeProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0032));
       const bool haveAcqTags = (nullptr != acqDateProp) && (nullptr != acqTimeProp);
 
-      const bool stepVendorMatches =
-           (ManufacturerFamily::Siemens == manuf)
-        || (ManufacturerFamily::GE      == manuf)
-        || (ManufacturerFamily::Philips == manuf);
-
       // ---- Step 2: AcquisitionTime equals SeriesTime in seconds ----
-      // Spec preconditions: vendor in {Siemens, GE, Philips}, per-slice
-      // AcqTime non-negative, AcqTime equals SeriesTime in seconds. The
+      // Spec preconditions: per-slice AcqTime non-negative, AcqTime equals
+      // SeriesTime in seconds. There is no manufacturer condition: an
+      // AcquisitionTime that already equals the SeriesTime identifies the
+      // reference instant directly, whoever built the scanner. The
       // condition is evaluated at slice 0 (single-bed scans, or first bed
       // of multi-bed scans, per the spec).
-      if (haveAcqTags && stepVendorMatches)
+      if (haveAcqTags)
       {
         const std::string firstAcqDate = acqDateProp->GetValue(0, 0, true, true);
         const std::string firstAcqTime = acqTimeProp->GetValue(0, 0, true, true);
@@ -734,23 +731,25 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         }
       }
 
-      // ---- Steps 3/4: vendor T_ave (Siemens/Philips) or -Δt (GE) per slice ----
-      // Both require per-slice (0008,0032) AcqTime, (0054,0x1300)
-      // FrameReferenceTime, (0018,0x1242) ActualFrameDuration, and a known
-      // half-life (for T_ave; GE needs only the half-life-independent Δt).
-      // We require all preconditions across all slices; if any slice is
+      // ---- Steps 3/4: general T_ave formula, or the GE offset, per slice ----
+      // Both require per-slice (0008,0032) AcqTime and (0054,0x1300)
+      // FrameReferenceTime. Step 3 additionally needs (0018,0x1242)
+      // ActualFrameDuration and a half-life, because its T_ave term is
+      // computed from them; Step 4 is a pure shift and needs neither.
+      // We require the preconditions across all slices; if any slice is
       // incomplete we fall through rather than mix per-slice formulas with
       // a partial result.
       const auto* frameRefProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0054, 0x1300));
       const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
       const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
 
-      const bool isStep3 = (ManufacturerFamily::Siemens == manuf
-                         || ManufacturerFamily::Philips == manuf);
-      const bool isStep4 = (ManufacturerFamily::GE      == manuf);
-      // Step 3 needs T_ave -> half-life. Step 4 needs only -Δt.
+      // Only the GE rule is manufacturer-specific. Siemens, Philips and any
+      // manufacturer we cannot classify share the general T_ave form, so the
+      // split is "GE versus everything else" rather than an allow-list.
+      const bool isStep4 = (ManufacturerFamily::GE == manuf);
+      const bool isStep3 = !isStep4;
       const bool halfLifeOK = std::isfinite(halfLife) && halfLife > 0.0;
-      const bool step3Possible = isStep3 && halfLifeOK;
+      const bool step3Possible = isStep3 && halfLifeOK && nullptr != frameDurProp;
       const bool step4Possible = isStep4;
 
       // Steps 3 and 4 are vendor-specific empirical formulas (not derivable
@@ -758,9 +757,10 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       // surface the input ambiguity so the caller can supply timing
       // out-of-band; under Lenient policy we apply them with the
       // benchmark-recommended formula.
-      if (haveAcqTags && (step3Possible || step4Possible)
-          && nullptr != frameRefProp && nullptr != frameDurProp
-          && DICOMReadPolicy::Strict == policy)
+      const bool stepPossible = haveAcqTags && nullptr != frameRefProp
+                             && (step3Possible || step4Possible);
+
+      if (stepPossible && DICOMReadPolicy::Strict == policy)
       {
         mitkThrowException(VendorEmpiricalDecayFallbackRefusedException)
           << "DC=START Steps 1 and 2 do not apply to this input "
@@ -773,8 +773,7 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
              "via --decay-time / a manual decay-time override.";
       }
 
-      if (haveAcqTags && (step3Possible || step4Possible)
-          && nullptr != frameRefProp && nullptr != frameDurProp)
+      if (stepPossible)
       {
         const auto timeSteps = data->GetTimeSteps();
         DecayTimeMapType candidateMap;
@@ -797,33 +796,41 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
               break;
             }
 
-            const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
+            // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
+            // ActualFrameDuration are stored in milliseconds per DICOM.
+            // Spec precondition: FrameReferenceTime non-negative.
             const double frameRefMs = ReadNumericTagAt(frameRefProp, t, s);
-            // Spec preconditions: ActualFrameDuration positive,
-            // FrameReferenceTime non-negative.
-            if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0
-                || !std::isfinite(frameRefMs) || frameRefMs < 0.0)
+            if (!std::isfinite(frameRefMs) || frameRefMs < 0.0)
             {
               allSlicesValid = false;
               break;
             }
-
-            // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
-            // ActualFrameDuration are stored in milliseconds per DICOM.
-            const double frameDurSec = frameDurMs / 1000.0;
             const double frameRefSec = frameRefMs / 1000.0;
 
-            // Step 3 (Siemens/Philips): t_ref = AcqTime + T_ave - FrameReferenceTime
-            // Step 4 (GE):                t_ref = AcqTime - FrameReferenceTime
+            // Step 3 (general): t_ref = AcqTime + T_ave - FrameReferenceTime
+            // Step 4 (GE):      t_ref = AcqTime - FrameReferenceTime
             // The -FrameReferenceTime term undoes the scanner-applied offset
             // from the per-frame midpoint back to the start of acquisition;
             // T_ave additionally compensates for the average count-rate time
             // inside the frame. Without the FrameReferenceTime term, Step 3
             // diverges from IBSI-SUV expectations by exactly that offset
             // (verified against DRO_3_2_0 / DRO_3_2_2).
-            const double offset = step3Possible
-              ? (ComputeTAveSeconds(frameDurSec, halfLife) - frameRefSec)  // Step 3
-              : -frameRefSec;                                              // Step 4 (Δt)
+            //
+            // ActualFrameDuration is read only on the Step 3 branch: it
+            // feeds T_ave and nothing else, so requiring it on the GE path
+            // would refuse inputs that the GE rule resolves perfectly well.
+            double offset = -frameRefSec;
+            if (step3Possible)
+            {
+              const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
+              // Spec precondition: ActualFrameDuration strictly positive.
+              if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0)
+              {
+                allSlicesValid = false;
+                break;
+              }
+              offset = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife) - frameRefSec;
+            }
 
             const double base = DurationInSeconds(injection.first, ofAcq);
             sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
@@ -833,6 +840,26 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
 
         if (allSlicesValid)
         {
+          // Announce the adaptation only once it has actually been applied.
+          // Warning earlier would cry wolf on inputs that fall through to
+          // the exhaustion refusal below.
+          const char* const stepName = step3Possible
+            ? "Step 3 (AcquisitionTime + T_ave - FrameReferenceTime)"
+            : "Step 4 (AcquisitionTime - FrameReferenceTime)";
+          MITK_WARN << "DC=START reference time resolved via " << stepName
+                    << ". This formula is derived from observed scanner "
+                       "behaviour, not from the DICOM specification; the "
+                       "strict DICOM read policy refuses it.";
+          if (ManufacturerFamily::Other == manuf)
+          {
+            const std::string rawManufacturer =
+              mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070));
+            MITK_WARN << "(0008,0070) Manufacturer '" << rawManufacturer
+                      << "' is not one of the manufacturers this formula was "
+                         "validated against. The general rule was applied; "
+                         "treat the resulting decay timing with caution.";
+          }
+
           info.decayTimes = std::move(candidateMap);
           return info;
         }

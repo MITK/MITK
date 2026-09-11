@@ -37,13 +37,21 @@ Asserting the type alone would be too weak -- five of them raise
 MissingDICOMPropertyException -- so a regression in weight handling
 could otherwise hide behind an unrelated missing-tag error.
 
+A DRO may appear twice, once per DICOMReadPolicy. Under Strict, MITK
+deliberately refuses inputs whose computation depends on reinterpreting
+a borderline value, trading benchmark conformance for the guarantee
+that nothing was silently adapted. Those refusals are a contract, so
+they are pinned here alongside a Strict case that must still compute --
+without the latter, a bug that refused everything under Strict would
+read as success.
+
 The manifest is deliberately a subset of the upstream DRO tree: it
 contains only cases the implementation currently satisfies, so the
 suite stays strict-red with no xfail machinery. A DRO present upstream
 and absent here is a declared gap, not an oversight; the gaps are
-DRO_3_2_3, DRO_3_5_3 (vendor-neutral DC=START chain), DRO_4_4, DRO_4_5,
-DRO_error_4_1 (administration-datetime resolution) and the five
-DRO_7_* Enhanced PET objects. Each is added as its fix lands.
+DRO_4_4, DRO_4_5, DRO_error_4_1 (administration-datetime resolution)
+and the five DRO_7_* Enhanced PET objects. Each is added as its fix
+lands.
 
 ROI statistics are computed by direct masked iteration over the SUV
 output and the mask image, *not* via mitk::ImageStatisticsCalculator.
@@ -120,6 +128,13 @@ namespace
      * discriminates (notably 2 vs. 6, absent tag vs. invalid value).
      */
     const char* refusalExceptionClass = "";
+    /**
+     * Read policy the case runs under. A DRO may appear twice -- once
+     * Lenient, once Strict -- as two independent entries, because Strict is
+     * a deliberately non-conformant mode whose refusals are themselves a
+     * contract worth pinning.
+     */
+    mitk::DICOMReadPolicy policy = mitk::DICOMReadPolicy::Lenient;
   };
 
   constexpr double kExpectedMin    = 0.20;
@@ -135,6 +150,8 @@ namespace
 
   constexpr Expectation kTriple  = Expectation::CanonicalTriple;
   constexpr Expectation kRefusal = Expectation::Refusal;
+
+  constexpr mitk::DICOMReadPolicy kStrict = mitk::DICOMReadPolicy::Strict;
 
   constexpr BenchmarkCase kBenchmarkCases[] = {
     // default + rescale-slope baseline (BQML pixel semantics).
@@ -164,6 +181,9 @@ namespace
     {"DRO_3_2_0", "DC=START Step 3 (Siemens T_ave)", kTriple},
     {"DRO_3_2_1", "DC=START Step 4 (GE -dFrameRef)", kTriple},
     {"DRO_3_2_2", "DC=START Step 3 (Philips T_ave)", kTriple},
+    // Step 3 is the general fallback for every manufacturer except GE, so an
+    // unclassifiable vendor resolves through it rather than being refused.
+    {"DRO_3_2_3", "DC=START Step 3 (unrecognized vendor)", kTriple},
     {"DRO_3_3_0", "DC=START Step 1 (Siemens private datetime)", kTriple},
     {"DRO_3_3_1", "DC=START Step 1 (GE private datetime)", kTriple},
     {"DRO_3_4_0", "DC=NONE multi-AcqTime (Siemens)", kTriple},
@@ -173,6 +193,10 @@ namespace
     {"DRO_3_5_0", "DC=START Step 2 (Siemens AcqTime==SeriesTime)", kTriple},
     {"DRO_3_5_1", "DC=START Step 2 (GE AcqTime==SeriesTime)", kTriple},
     {"DRO_3_5_2", "DC=START Step 2 (Philips AcqTime==SeriesTime)", kTriple},
+    // Step 2 carries no empirical content: an AcquisitionTime that already
+    // equals the SeriesTime names the reference instant outright, whoever
+    // built the scanner.
+    {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor)", kTriple},
 
     // Radiopharmaceutical injection time tag variants.
     {"DRO_4_0",   "RP DateTime only ((0018,1078))", kTriple},
@@ -223,6 +247,28 @@ namespace
      kRefusal, "Computed decay duration", "AmbiguousDecayTimingException"},
     {"DRO_error_5_0", "Radionuclide Half Life absent",
      kRefusal, "(0018,1075)", "MissingDICOMPropertyException"},
+
+    // ---- Strict policy -------------------------------------------------
+    //
+    // --strict-dicom trades benchmark conformance for the guarantee that no
+    // borderline value was reinterpreted, so under Strict MITK deliberately
+    // refuses DROs the benchmark expects it to compute. That is a contract,
+    // not a defect, and these rows pin it. Measured, not predicted: every
+    // row below was confirmed by running the CLI with --strict-dicom.
+    {"DRO_3_2_0", "DC=START Step 3 (Siemens), Strict refuses the empirical formula",
+     kRefusal, "DICOMReadPolicy::Strict", "VendorEmpiricalDecayFallbackRefusedException",
+     kStrict},
+    {"DRO_3_2_2", "DC=START Step 3 (Philips), Strict refuses the empirical formula",
+     kRefusal, "DICOMReadPolicy::Strict", "VendorEmpiricalDecayFallbackRefusedException",
+     kStrict},
+    {"DRO_3_2_3", "DC=START Step 3 (unrecognized vendor), Strict refuses",
+     kRefusal, "DICOMReadPolicy::Strict", "VendorEmpiricalDecayFallbackRefusedException",
+     kStrict},
+    // The control for the three above: Step 2 is spec-clean, so Strict must
+    // compute it. Without this row a bug that refuses everything under
+    // Strict would look like success.
+    {"DRO_3_5_3", "DC=START Step 2 (unrecognized vendor), Strict still computes",
+     kTriple, "", "", kStrict},
   };
 
   constexpr std::size_t kBenchmarkCaseCount = sizeof(kBenchmarkCases) / sizeof(kBenchmarkCases[0]);
@@ -297,8 +343,9 @@ public:
       catch (const std::exception& ex)
       {
         ++failureCount;
-        failures << "\n  [" << kase.id << "] (" << kase.description
-                 << "): " << ex.what();
+        failures << "\n  [" << kase.id << "] ("
+                 << (mitk::DICOMReadPolicy::Strict == kase.policy ? "Strict, " : "")
+                 << kase.description << "): " << ex.what();
       }
     }
 
@@ -351,7 +398,7 @@ private:
     auto filter = mitk::SUVImageFilter::New();
     filter->SetInput(petImage);
     filter->SetTargetVariant(mitk::SUVVariant::BW);
-    filter->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    filter->SetDICOMReadPolicy(kase.policy);
 
     std::string actualClass;
     std::string actualMessage;
@@ -405,7 +452,7 @@ private:
     auto filter = mitk::SUVImageFilter::New();
     filter->SetInput(petImage);
     filter->SetTargetVariant(mitk::SUVVariant::BW);
-    filter->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    filter->SetDICOMReadPolicy(kase.policy);
     filter->Update();
     const mitk::Image::Pointer suvImage = filter->GetOutput();
     if (suvImage.IsNull())

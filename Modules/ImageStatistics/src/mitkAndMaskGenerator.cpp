@@ -144,6 +144,22 @@ namespace
     return { image->GetDimension(0), image->GetDimension(1), image->GetDimension(2) };
   }
 
+  bool IsSelected(const IndexArrayType& index,
+                  const IndexArrayType& dimensions,
+                  const LabelValueType* data,
+                  LabelValueType selectedLabel)
+  {
+    for (unsigned int component = 0; component < 3; ++component)
+    {
+      if (index[component] < 0 || index[component] >= dimensions[component])
+      {
+        return false;
+      }
+    }
+
+    return data[index[0] + dimensions[0] * (index[1] + dimensions[1] * index[2])] == selectedLabel;
+  }
+
   mitk::Image::Pointer RestrictToSelectedLabel(const mitk::Image* primary,
                                                const mitk::Image* secondary,
                                                LabelValueType selectedLabel)
@@ -162,39 +178,37 @@ namespace
 
       std::size_t offset = 0;
 
+      // The secondary index is stepped along instead of being recomputed per voxel, which is
+      // exact because the steps are integers.
       for (std::int64_t k = 0; k < primaryDimensions[2]; ++k)
       {
+        IndexArrayType sliceIndex;
+
+        for (unsigned int component = 0; component < 3; ++component)
+        {
+          sliceIndex[component] = mapping.base[component] + k * mapping.step[2][component];
+        }
+
         for (std::int64_t j = 0; j < primaryDimensions[1]; ++j)
         {
+          IndexArrayType secondaryIndex;
+
+          for (unsigned int component = 0; component < 3; ++component)
+          {
+            secondaryIndex[component] = sliceIndex[component] + j * mapping.step[1][component];
+          }
+
           for (std::int64_t i = 0; i < primaryDimensions[0]; ++i, ++offset)
           {
-            if (resultData[offset] == 0)
-            {
-              continue;
-            }
-
-            bool selected = true;
-            IndexArrayType secondaryIndex{};
-
-            for (unsigned int component = 0; component < 3 && selected; ++component)
-            {
-              secondaryIndex[component] = mapping.base[component]
-                + i * mapping.step[0][component]
-                + j * mapping.step[1][component]
-                + k * mapping.step[2][component];
-              selected = 0 <= secondaryIndex[component] && secondaryIndex[component] < secondaryDimensions[component];
-            }
-
-            if (selected)
-            {
-              const auto secondaryOffset = secondaryIndex[0]
-                + secondaryDimensions[0] * (secondaryIndex[1] + secondaryDimensions[1] * secondaryIndex[2]);
-              selected = secondaryData[secondaryOffset] == selectedLabel;
-            }
-
-            if (!selected)
+            if (resultData[offset] != 0 &&
+                !IsSelected(secondaryIndex, secondaryDimensions, secondaryData, selectedLabel))
             {
               resultData[offset] = 0;
+            }
+
+            for (unsigned int component = 0; component < 3; ++component)
+            {
+              secondaryIndex[component] += mapping.step[0][component];
             }
           }
         }
@@ -216,6 +230,17 @@ void mitk::AndMaskGenerator::SetSecondaryLabelValue(LabelValueType labelValue)
   }
 }
 
+std::optional<mitk::AndMaskGenerator::LabelValueType> mitk::AndMaskGenerator::GetSecondaryLabelValue() const
+{
+  return m_SecondaryLabelValue;
+}
+
+void mitk::AndMaskGenerator::SetInputImage(const Image*)
+{
+  mitkThrow() << "Invalid call. AndMaskGenerator has no input image of its own. "
+              << "Set the input image of the chained mask generators instead.";
+}
+
 unsigned int mitk::AndMaskGenerator::GetNumberOfMasks() const
 {
   if (m_PrimaryMaskGenerator.IsNull())
@@ -232,6 +257,10 @@ mitk::Image::ConstPointer mitk::AndMaskGenerator::GetReferenceImage()
   {
     mitkThrow() << "Invalid state. Cannot get reference image. Primary mask generator is not set.";
   }
+
+  // The primary generator may derive its reference image from the mask it would generate, so it
+  // needs the time point here just as much as in DoGetMask().
+  m_PrimaryMaskGenerator->SetTimePoint(m_TimePoint);
 
   return m_PrimaryMaskGenerator->GetReferenceImage();
 }

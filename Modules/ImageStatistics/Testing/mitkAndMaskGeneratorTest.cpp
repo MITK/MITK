@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <itkImageRegionIterator.h>
 #include <itkMath.h>
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <vector>
 
@@ -70,6 +72,28 @@ namespace
     return size;
   }
 
+  itk::Size<4> MakeSize(unsigned int x, unsigned int y, unsigned int z, unsigned int t)
+  {
+    itk::Size<4> size;
+    size[0] = x;
+    size[1] = y;
+    size[2] = z;
+    size[3] = t;
+    return size;
+  }
+
+  // flat buffer offset of the voxel at the in-plane position (u, v) of the slice at
+  // `slice` along `axis`, in a cubic image of the given size
+  std::size_t VoxelOffset(unsigned int axis, unsigned int slice, unsigned int u, unsigned int v, unsigned int size)
+  {
+    std::array<unsigned int, 3> index{};
+    index[axis] = slice;
+    index[0 == axis ? 1 : 0] = u;
+    index[2 == axis ? 1 : 2] = v;
+
+    return index[0] + size * (index[1] + size * index[2]);
+  }
+
   // builds a 3D mitk::Image from raw values in the iteration order of itk::ImageRegionIterator
   template <typename TPixel>
   mitk::Image::Pointer BuildImage(const itk::Size<3>& size, const std::vector<TPixel>& values, const Grid& grid = Grid())
@@ -105,6 +129,57 @@ namespace
     return mitk::GrabItkImageMemory(itkImage, nullptr, nullptr, false);
   }
 
+  // builds a 3D+t mitk::Image on the unit grid, time step by time step
+  template <typename TPixel>
+  mitk::Image::Pointer BuildImage(const itk::Size<4>& size, const std::vector<TPixel>& values)
+  {
+    using ImageType = itk::Image<TPixel, 4>;
+
+    typename ImageType::IndexType start;
+    start.Fill(0);
+
+    auto itkImage = ImageType::New();
+    itkImage->SetRegions(typename ImageType::RegionType(start, size));
+    itkImage->Allocate();
+
+    itk::ImageRegionIterator<ImageType> it(itkImage, itkImage->GetLargestPossibleRegion());
+    auto valueIt = values.cbegin();
+
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it, ++valueIt)
+      it.Set(*valueIt);
+
+    // GrabItkImageMemory would only import the volume of the first time step
+    return mitk::GrabItkImageMemoryChannel(itkImage.GetPointer(), nullptr, nullptr, false);
+  }
+
+  // plane through the voxel centers of the slice at `slice` along `axis`, with in-plane
+  // coordinates in mm along the two remaining image axes
+  mitk::PlaneGeometry::Pointer MakeSlicePlane(const mitk::Image* image, unsigned int axis, unsigned int slice)
+  {
+    const auto* geometry = image->GetGeometry();
+    const unsigned int right = 0 == axis ? 1 : 0;
+    const unsigned int down = 2 == axis ? 1 : 2;
+
+    mitk::Vector3D spacing;
+    spacing[0] = geometry->GetSpacing()[right];
+    spacing[1] = geometry->GetSpacing()[down];
+    spacing[2] = geometry->GetSpacing()[axis];
+
+    auto plane = mitk::PlaneGeometry::New();
+    plane->InitializeStandardPlane(image->GetDimension(right), image->GetDimension(down),
+      geometry->GetAxisVector(right), geometry->GetAxisVector(down), &spacing);
+
+    mitk::Point3D index;
+    index.Fill(0.0);
+    index[axis] = slice;
+
+    mitk::Point3D origin;
+    geometry->IndexToWorld(index, origin);
+    plane->SetOrigin(origin);
+
+    return plane;
+  }
+
   mitk::ImageMaskGenerator::Pointer MakeImageMaskGenerator(const mitk::Image* inputImage, const mitk::Image* mask)
   {
     auto generator = mitk::ImageMaskGenerator::New();
@@ -113,11 +188,12 @@ namespace
     return generator;
   }
 
-  mitk::IgnorePixelMaskGenerator::Pointer MakeIgnoreZeroGenerator(const mitk::Image* inputImage)
+  mitk::IgnorePixelMaskGenerator::Pointer MakeIgnoreGenerator(const mitk::Image* inputImage,
+    mitk::IgnorePixelMaskGenerator::RealType ignoredValue = 0)
   {
     auto generator = mitk::IgnorePixelMaskGenerator::New();
     generator->SetInputImage(inputImage);
-    generator->SetIgnoredPixelValue(0);
+    generator->SetIgnoredPixelValue(ignoredValue);
     return generator;
   }
 
@@ -161,16 +237,22 @@ namespace
              MakePoint2D(0.5 * spacingX, 2.5 * spacingY) };
   }
 
+  template <typename TPixel>
+  std::vector<TPixel> ReadPixels(const mitk::Image* image)
+  {
+    const std::size_t count = image->GetDimension(0) * image->GetDimension(1) * image->GetDimension(2);
+    mitk::ImageReadAccessor access(image);
+    const auto* data = static_cast<const TPixel*>(access.GetData());
+
+    return std::vector<TPixel>(data, data + count);
+  }
+
   LabelVectorType ReadMask(const mitk::Image* mask)
   {
     CPPUNIT_ASSERT_MESSAGE("Mask does not have the label pixel type.",
       mask->GetPixelType() == mitk::MakeScalarPixelType<LabelValueType>());
 
-    const std::size_t count = mask->GetDimension(0) * mask->GetDimension(1) * mask->GetDimension(2);
-    mitk::ImageReadAccessor access(mask);
-    const auto* data = static_cast<const LabelValueType*>(access.GetData());
-
-    return LabelVectorType(data, data + count);
+    return ReadPixels<LabelValueType>(mask);
   }
 }
 
@@ -185,6 +267,10 @@ class mitkAndMaskGeneratorTestSuite : public mitk::TestFixture
   MITK_TEST(TestPlanarFigurePrimaryWithVolumeSecondary);
   MITK_TEST(TestPlanarFigurePrimaryWithAnisotropicSpacing);
   MITK_TEST(TestPlanarFigurePrimaryWithFlippedAxes);
+  MITK_TEST(TestPlanarFigureOnSagittalSlice);
+  MITK_TEST(TestPlanarFigureOnCoronalSlice);
+  MITK_TEST(TestTimePointIsForwardedToChainedGenerators);
+  MITK_TEST(TestReferenceImageFollowsTimePoint);
   MITK_TEST(TestMisalignedGridsThrow);
   MITK_TEST(TestInvalidStateThrows);
   MITK_TEST(TestMTimeFollowsChainedGenerators);
@@ -198,7 +284,7 @@ public:
     auto primaryMask = BuildImage<LabelValueType>(size, { 1, 1, 1, 1, 0, 0, 1, 1 });
 
     auto primary = MakeImageMaskGenerator(image, primaryMask);
-    auto secondary = MakeIgnoreZeroGenerator(image);
+    auto secondary = MakeIgnoreGenerator(image);
     auto generator = MakeAndGenerator(primary, secondary, 1);
 
     CPPUNIT_ASSERT_EQUAL(1u, generator->GetNumberOfMasks());
@@ -297,6 +383,57 @@ public:
     this->VerifyPlanarFigureCase(grid);
   }
 
+  void TestPlanarFigureOnSagittalSlice()
+  {
+    this->VerifyPlanarFigureOnAxis(0);
+  }
+
+  void TestPlanarFigureOnCoronalSlice()
+  {
+    this->VerifyPlanarFigureOnAxis(1);
+  }
+
+  void TestTimePointIsForwardedToChainedGenerators()
+  {
+    // two time steps with different patterns of the ignored values 5 (primary) and 0 (secondary)
+    auto image = BuildImage<short>(MakeSize(2, 2, 2, 2), { 1, 0, 5, 2, 3, 4, 5, 0,
+                                                           5, 5, 1, 1, 0, 0, 2, 2 });
+
+    auto generator = MakeAndGenerator(MakeIgnoreGenerator(image, 5), MakeIgnoreGenerator(image, 0), 1);
+    const auto* timeGeometry = image->GetTimeGeometry();
+
+    generator->SetTimePoint(timeGeometry->TimeStepToTimePoint(0));
+    CPPUNIT_ASSERT(LabelVectorType({ 1, 0, 0, 1, 1, 1, 0, 0 }) == ReadMask(generator->GetMask(0)));
+
+    generator->SetTimePoint(timeGeometry->TimeStepToTimePoint(1));
+    CPPUNIT_ASSERT(LabelVectorType({ 0, 0, 1, 1, 0, 0, 1, 1 }) == ReadMask(generator->GetMask(0)));
+  }
+
+  void TestReferenceImageFollowsTimePoint()
+  {
+    // 4x4x2 with two time steps that differ in value, so the extracted slice identifies the time step
+    std::vector<short> values(2 * 4 * 4 * 2, 10);
+    std::fill(values.begin() + 4 * 4 * 2, values.end(), 20);
+    auto image = BuildImage<short>(MakeSize(4, 4, 2, 2), values);
+
+    auto polygon = MakePolygon(MakeSlicePlane(image, 2, 1), SquareCoveringPixelsOneAndTwo(1.0, 1.0));
+
+    auto primary = mitk::PlanarFigureMaskGenerator::New();
+    primary->SetInputImage(image);
+    primary->SetPlanarFigure(polygon.GetPointer());
+
+    auto generator = MakeAndGenerator(primary, MakeIgnoreGenerator(image), 1);
+    const auto* timeGeometry = image->GetTimeGeometry();
+
+    // the reference image is asked for before any mask, so the time point has to reach the
+    // primary generator here as well
+    generator->SetTimePoint(timeGeometry->TimeStepToTimePoint(1));
+    CPPUNIT_ASSERT(std::vector<short>(16, 20) == ReadPixels<short>(generator->GetReferenceImage()));
+
+    generator->SetTimePoint(timeGeometry->TimeStepToTimePoint(0));
+    CPPUNIT_ASSERT(std::vector<short>(16, 10) == ReadPixels<short>(generator->GetReferenceImage()));
+  }
+
   void TestMisalignedGridsThrow()
   {
     const auto size = MakeSize(2, 2, 1);
@@ -337,18 +474,27 @@ public:
     CPPUNIT_ASSERT_THROW(generator->GetReferenceImage(), mitk::Exception);
     CPPUNIT_ASSERT_THROW(generator->GetMask(0), mitk::Exception);
 
+    // the chained generators carry the input image, this one has none of its own
+    CPPUNIT_ASSERT_THROW(generator->SetInputImage(mask), mitk::Exception);
+
     generator->SetPrimaryMaskGenerator(primary);
+    CPPUNIT_ASSERT(generator->GetPrimaryMaskGenerator() == primary.GetPointer());
     CPPUNIT_ASSERT_EQUAL(1u, generator->GetNumberOfMasks());
     CPPUNIT_ASSERT_THROW(generator->GetMask(0), mitk::Exception); // no secondary generator
 
     generator->SetSecondaryMaskGenerator(secondary);
+    CPPUNIT_ASSERT(generator->GetSecondaryMaskGenerator() == secondary.GetPointer());
+    CPPUNIT_ASSERT(!generator->GetSecondaryLabelValue().has_value());
     CPPUNIT_ASSERT_THROW(generator->GetMask(0), mitk::Exception); // no label value
 
     generator->SetSecondaryLabelValue(1);
+    CPPUNIT_ASSERT(LabelValueType(1) == generator->GetSecondaryLabelValue());
     CPPUNIT_ASSERT_NO_THROW(generator->GetMask(0));
     CPPUNIT_ASSERT_THROW(generator->GetMask(1), mitk::Exception); // primary has a single mask
 
+    CPPUNIT_ASSERT_EQUAL(0u, generator->GetSecondaryMaskID());
     generator->SetSecondaryMaskID(5);
+    CPPUNIT_ASSERT_EQUAL(5u, generator->GetSecondaryMaskID());
     CPPUNIT_ASSERT_THROW(generator->GetMask(0), mitk::Exception); // secondary has a single mask
   }
 
@@ -357,7 +503,7 @@ public:
     const auto size = MakeSize(2, 2, 1);
     auto mask = BuildImage<LabelValueType>(size, LabelVectorType(4, 1));
     auto primary = MakeImageMaskGenerator(mask, mask);
-    auto secondary = MakeIgnoreZeroGenerator(mask);
+    auto secondary = MakeIgnoreGenerator(mask);
     auto generator = MakeAndGenerator(primary, secondary, 1);
 
     auto previous = generator->GetMTime();
@@ -379,6 +525,50 @@ public:
   }
 
 private:
+  // 4x4x4 image of value 10, with a figure on slice 1 along the given axis covering the
+  // in-plane pixels [1,2]x[1,2], and zero voxels inside the figure, inside its footprint but
+  // on the next slice, and on the slice but outside the figure
+  void VerifyPlanarFigureOnAxis(unsigned int axis)
+  {
+    const unsigned int size = 4;
+    const unsigned int slice = 1;
+
+    std::vector<short> values(size * size * size, 10);
+    values[VoxelOffset(axis, slice, 1, 1, size)] = 0;
+    values[VoxelOffset(axis, slice + 1, 2, 2, size)] = 0;
+    values[VoxelOffset(axis, slice, 0, 0, size)] = 0;
+
+    auto image = BuildImage<short>(MakeSize(size, size, size), values);
+    auto polygon = MakePolygon(MakeSlicePlane(image, axis, slice), SquareCoveringPixelsOneAndTwo(1.0, 1.0));
+
+    auto primary = mitk::PlanarFigureMaskGenerator::New();
+    primary->SetInputImage(image);
+    primary->SetPlanarFigure(polygon.GetPointer());
+
+    auto generator = MakeAndGenerator(primary, MakeIgnoreGenerator(image), 1);
+
+    // the extracted slice carries the voxels of the requested image slice, indexed by the two
+    // remaining image axes in increasing order
+    auto referenceImage = primary->GetReferenceImage();
+    CPPUNIT_ASSERT_EQUAL(2u, referenceImage->GetDimension());
+    CPPUNIT_ASSERT_EQUAL(size, referenceImage->GetDimension(0));
+    CPPUNIT_ASSERT_EQUAL(size, referenceImage->GetDimension(1));
+    CPPUNIT_ASSERT(std::vector<short>({  0, 10, 10, 10,
+                                        10,  0, 10, 10,
+                                        10, 10, 10, 10,
+                                        10, 10, 10, 10 }) == ReadPixels<short>(referenceImage));
+
+    CPPUNIT_ASSERT(LabelVectorType({ 0, 0, 0, 0,
+                                     0, 1, 1, 0,
+                                     0, 1, 1, 0,
+                                     0, 0, 0, 0 }) == ReadMask(primary->GetMask(0)));
+
+    CPPUNIT_ASSERT(LabelVectorType({ 0, 0, 0, 0,
+                                     0, 0, 1, 0,
+                                     0, 1, 1, 0,
+                                     0, 0, 0, 0 }) == ReadMask(generator->GetMask(0)));
+  }
+
   // 4x4x3 image with zero voxels at (1,1,1) inside the figure on slice 1, at (2,2,0) inside the
   // footprint of the figure but on another slice, and at (0,0,2) outside the footprint
   void VerifyPlanarFigureCase(const Grid& grid)
@@ -396,7 +586,7 @@ private:
     primary->SetInputImage(image);
     primary->SetPlanarFigure(polygon.GetPointer());
 
-    auto secondary = MakeIgnoreZeroGenerator(image);
+    auto secondary = MakeIgnoreGenerator(image);
     auto generator = MakeAndGenerator(primary, secondary, 1);
 
     // the 2D mask has to lie on the reference slice, otherwise it cannot be matched by world coordinates

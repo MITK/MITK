@@ -33,15 +33,18 @@ namespace mitk
    * The result has the dimension and geometry of the primary mask. Both masks are matched by
    * world coordinates, so they may differ in extent, origin and dimension (for example a 2D
    * planar figure mask against a 3D mask); voxels outside the secondary mask count as not
-   * selected. The voxel grids have to be aligned, i.e. same orientation, spacings that are
-   * integer multiples of each other, and no sub-voxel offset. Otherwise GetMask() throws.
+   * selected. The voxel grids have to be aligned, i.e. same orientation, a primary spacing
+   * that is an integer multiple of the secondary spacing, and no sub-voxel offset. Otherwise
+   * GetMask() throws. Where the primary voxels are the coarser ones, each of them is decided
+   * by the single secondary voxel its center falls into; partial overlap is not weighted.
    * Masks of a pixel type other than unsigned short are converted; pixel types that cannot
    * be converted (e.g. RGB) are rejected with an exception.
    *
    * Primary generator, secondary generator and the selected label value have to be set. The
-   * time point is forwarded to both generators on every GetMask() call, the input image is
-   * not: configure the chained generators directly. GetNumberOfMasks() and
-   * GetReferenceImage() are delegated to the primary generator. Results are not cached.
+   * time point is forwarded to the chained generators whenever they are used. An input image
+   * is not: SetInputImage() throws, the chained generators are configured directly.
+   * GetNumberOfMasks() and GetReferenceImage() are delegated to the primary generator.
+   * Results are not cached.
    *
    * Typical use is any region of interest generator as primary and an IgnorePixelMaskGenerator
    * with selected label value 1 as secondary, to exclude e.g. zero-valued voxels.
@@ -60,15 +63,28 @@ namespace mitk
 
     /** \brief Set the generator whose masks are restricted. Their label values are preserved. */
     itkSetObjectMacro(PrimaryMaskGenerator, MaskGenerator);
+    itkGetObjectMacro(PrimaryMaskGenerator, MaskGenerator);
 
     /** \brief Set the generator whose mask selects the voxels to keep. */
     itkSetObjectMacro(SecondaryMaskGenerator, MaskGenerator);
+    itkGetObjectMacro(SecondaryMaskGenerator, MaskGenerator);
 
     /** \brief Set which mask of the secondary generator is used for the selection. Default is 0. */
     itkSetMacro(SecondaryMaskID, unsigned int);
+    itkGetConstMacro(SecondaryMaskID, unsigned int);
 
     /** \brief Set the label value of the secondary mask that selects voxels. Has to be set before GetMask(). */
     void SetSecondaryLabelValue(LabelValueType labelValue);
+
+    /** \brief The label value that selects voxels, or no value as long as it has not been set. */
+    std::optional<LabelValueType> GetSecondaryLabelValue() const;
+
+    /**
+     * \brief Not supported, this generator has no input image of its own.
+     *
+     * Always throws. Set the input image on the chained generators instead.
+     */
+    void SetInputImage(const Image* image) override;
 
     /**
      * \brief Number of masks of the primary generator.

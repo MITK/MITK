@@ -86,7 +86,11 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   // Philips CNTS variants
   MITK_TEST(CNTS_PhilipsSUVScale_ClassifiesAsPrenormalizedBW);
   MITK_TEST(CNTS_PhilipsActivityScale_ClassifiesAsActivityConcentration);
-  MITK_TEST(CNTS_PhilipsBothFactorsPresent_PrefersSUVScale);
+  MITK_TEST(CNTS_PhilipsBothFactorsPresent_PrefersActivityScale);
+  MITK_TEST(CNTS_PhilipsActivityScaleZero_FallsBackToSUVScale);
+  MITK_TEST(CNTS_SUVScaleWithNonBWSUVType_Throws_UnsupportedPETUnitsException);
+  MITK_TEST(CNTS_SUVScaleWithExplicitBWSUVType_Accepted);
+  MITK_TEST(CNTS_ActivityScaleWithNonBWSUVType_Accepted);
 
   // Error matrix
   MITK_TEST(NoUnits_Throws_MissingDICOMPropertyException);
@@ -284,12 +288,17 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, m.activityScale, 1e-12);
   }
 
-  void CNTS_PhilipsBothFactorsPresent_PrefersSUVScale()
+  void CNTS_PhilipsBothFactorsPresent_PrefersActivityScale()
   {
-    // The two factors are mutually exclusive in real Philips data; the
-    // synthetic input here exercises the ambiguity case explicitly.
-    // When both happen to be present, the classifier prefers the
-    // SUV-scale (pre-normalized) interpretation; pinning that contract.
+    // No benchmark DRO carries both factors -- DRO_2_4 has only the
+    // SUV-scale, DRO_2_5 and DRO_3_4_2 only the activity-scale -- so the
+    // precedence is invisible to the benchmark and this case is the only
+    // thing pinning it.
+    //
+    // The activity-scale wins because its result stays correctable: it
+    // yields Bq/mL and the normalization then uses this run's patient data,
+    // overrides included. The SUV-scale yields SUVbw directly, baking in
+    // whatever weight the scanner held at acquisition time.
     auto img = MakeImage();
     SetDicomTag(img, 0x0054, 0x1001, "CNTS");
     SetDicomTag(img, 0x0008, 0x0070, "Philips Medical Systems");
@@ -298,8 +307,73 @@ public:
 
     const auto m = mitk::ClassifyPETInput(img.GetPointer(),
                                           mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, m.activityScale, 1e-12);
+  }
+
+  void CNTS_PhilipsActivityScaleZero_FallsBackToSUVScale()
+  {
+    // "Absent, empty or zero" are one condition for the precedence: a
+    // factor that cannot scale anything is not a factor.
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "CNTS");
+    SetDicomTag(img, 0x0008, 0x0070, "Philips Medical Systems");
+    SetNamedString(img.GetPointer(), "mitk.pet.PhilipsSUVScale",      "0.0005");
+    SetNamedString(img.GetPointer(), "mitk.pet.PhilipsActivityScale", "0");
+
+    const auto m = mitk::ClassifyPETInput(img.GetPointer(),
+                                          mitk::DICOMReadPolicy::Lenient);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0005, m.prenormScale, 1e-12);
+  }
+
+  void CNTS_SUVScaleWithNonBWSUVType_Throws_UnsupportedPETUnitsException()
+  {
+    // The SUV-scale factor produces SUVbw by definition, so an input
+    // declaring a different SUV Type is internally inconsistent and must
+    // not be silently read as BW.
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "CNTS");
+    SetDicomTag(img, 0x0008, 0x0070, "Philips Medical Systems");
+    SetDicomTag(img, 0x0054, 0x1006, "LBMJANMA");
+    SetNamedString(img.GetPointer(), "mitk.pet.PhilipsSUVScale", "0.0005");
+
+    CPPUNIT_ASSERT_THROW(mitk::ClassifyPETInput(img.GetPointer(),
+                                                mitk::DICOMReadPolicy::Lenient),
+                         mitk::UnsupportedPETUnitsException);
+  }
+
+  void CNTS_SUVScaleWithExplicitBWSUVType_Accepted()
+  {
+    // BW is what the factor yields, so stating it explicitly is consistent
+    // and must not be refused -- the check has to discriminate, not just
+    // reject any present SUV Type.
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "CNTS");
+    SetDicomTag(img, 0x0008, 0x0070, "Philips Medical Systems");
+    SetDicomTag(img, 0x0054, 0x1006, "BW");
+    SetNamedString(img.GetPointer(), "mitk.pet.PhilipsSUVScale", "0.0005");
+
+    const auto m = mitk::ClassifyPETInput(img.GetPointer(),
+                                          mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
+    CPPUNIT_ASSERT(mitk::SUVVariant::BW == m.sourceVariant);
+  }
+
+  void CNTS_ActivityScaleWithNonBWSUVType_Accepted()
+  {
+    // The activity-scale path yields Bq/mL and normalizes afterwards, so a
+    // declared SUV Type places no constraint on it. Only the SUV-scale path
+    // is checked.
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "CNTS");
+    SetDicomTag(img, 0x0008, 0x0070, "Philips Medical Systems");
+    SetDicomTag(img, 0x0054, 0x1006, "LBMJANMA");
+    SetNamedString(img.GetPointer(), "mitk.pet.PhilipsActivityScale", "0.5");
+
+    const auto m = mitk::ClassifyPETInput(img.GetPointer(),
+                                          mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
   }
 
   void NoUnits_Throws_MissingDICOMPropertyException()

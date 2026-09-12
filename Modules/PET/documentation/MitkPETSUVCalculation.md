@@ -103,15 +103,25 @@ Type and, for count data, `(0008,0070)` Manufacturer:
 | `GML` | `BSA` | Rejected as inconsistent (BSA SUV uses `CM2ML`). |
 | `CM2ML` | absent or `BSA` | Pre-normalized SUVbsa; re-normalized to the target variant. |
 | `CM2ML` | other | Rejected as inconsistent. |
-| `CNTS` (Philips) with SUV-scale factor | ignored | `pixel * factor` is SUVbw; re-normalized to the target variant. |
-| `CNTS` (Philips) with activity-scale factor | ignored | `pixel * factor` is `[Bq/mL]`; the kernel is applied. |
+| `CNTS` (Philips) with activity-scale factor | any | `pixel * factor` is `[Bq/mL]`; the kernel is applied. |
+| `CNTS` (Philips) with SUV-scale factor only | absent, empty or `BW` | `pixel * factor` is SUVbw; re-normalized to the target variant. |
+| `CNTS` (Philips) with SUV-scale factor only | other | Rejected (`UnsupportedPETUnitsException`). |
 | `CNTS` (Philips) without factor | any | Rejected (`MissingPhilipsPETScaleException`). |
 | `CNTS` (other manufacturer) | any | Rejected (`UnsupportedPETUnitsException`). |
 | other or missing | any | Rejected. |
 
 The Philips private factors `(7053,xx00)` and `(7053,xx09)` are read by the
 DICOM reader and attached as the properties `mitk.pet.PhilipsSUVScale` and
-`mitk.pet.PhilipsActivityScale`. Re-normalization of pre-normalized inputs is
+`mitk.pet.PhilipsActivityScale`.
+
+When an export carries both, the activity-concentration factor
+`(7053,xx09)` wins. It yields `[Bq/mL]`, so the normalization that follows
+uses the patient data this run was configured with, including any override.
+The SUV-scale factor instead yields SUVbw directly, baking in whatever
+weight the scanner held at acquisition time, which cannot be corrected
+afterwards. A factor that is absent, empty or zero counts as unavailable.
+Because the SUV-scale factor produces SUVbw by definition, it is accepted
+only when `(0054,1006)` SUV Type is absent, empty or `BW`. Re-normalization of pre-normalized inputs is
 
 ```
 SUV_target = pixel * prenormScale * scaleNumerator(target) / scaleNumerator(source)

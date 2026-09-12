@@ -229,19 +229,43 @@ mitk::SUVInputModel mitk::ClassifyPETInput(const IPropertyProvider *provider, DI
     const bool haveSuv = ReadUniformPositiveFactor(provider, "mitk.pet.PhilipsSUVScale", suvScale);
     const bool haveActivity = ReadUniformPositiveFactor(provider, "mitk.pet.PhilipsActivityScale", actScale);
 
-    if (haveSuv)
-    {
-      // pixel * SUV-scale yields SUVbw directly.
-      model.semantics = SUVPixelSemantics::PrenormalizedSUV;
-      model.sourceVariant = SUVVariant::BW;
-      model.prenormScale = suvScale;
-      return model;
-    }
+    // The activity-concentration factor takes precedence. It yields Bq/mL and
+    // then feeds the standard SUV pipeline, so the patient data that goes
+    // into the normalization is the data this run was configured with --
+    // including any override. The SUV-scale factor instead yields SUVbw
+    // directly, baking in whatever weight the scanner held at acquisition
+    // time, which cannot be corrected afterwards. Where an export carries
+    // both, the recoverable path is the right one to take.
+    //
+    // ReadUniformPositiveFactor reports absent, empty and non-positive alike
+    // as "not available", which is exactly the precedence condition.
     if (haveActivity)
     {
       // pixel * activity-scale yields [Bq/mL]; standard SUV pipeline applies.
       model.semantics = SUVPixelSemantics::ActivityConcentration;
       model.activityScale = actScale;
+      return model;
+    }
+    if (haveSuv)
+    {
+      // The SUV-scale factor is defined to produce SUVbw, so it is only
+      // meaningful when the input does not claim to be some other SUV type.
+      // An absent or empty (0054,1006) is the ordinary case and means BW.
+      const auto suvType = ParseSUVTypeProperty(provider);
+      if (suvType.has_value() && SUVVariant::BW != suvType.value())
+      {
+        mitkThrowException(UnsupportedPETUnitsException)
+          << "(0054,1001) Units = 'CNTS' with the Philips SUV-scale factor "
+             "(7053,xx00) yields SUVbw by definition, but (0054,1006) SUV "
+             "Type declares a different variant. Supply the activity "
+             "concentration scale factor (7053,xx09) instead, or correct "
+             "the SUV Type.";
+      }
+
+      // pixel * SUV-scale yields SUVbw directly.
+      model.semantics = SUVPixelSemantics::PrenormalizedSUV;
+      model.sourceVariant = SUVVariant::BW;
+      model.prenormScale = suvScale;
       return model;
     }
 

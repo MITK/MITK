@@ -17,7 +17,6 @@ set(enabled_modules
   Forms
   FormsUI
   GraphAlgorithms
-  ImageExtraction
   ImageStatistics
   IOExt
   Log

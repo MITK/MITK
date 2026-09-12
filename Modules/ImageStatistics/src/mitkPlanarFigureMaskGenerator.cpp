@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <mitkBaseGeometry.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkExtractImageFilter.h>
+#include <mitkExtractSliceFilter.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkIOUtil.h>
@@ -439,12 +439,50 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::Extract2DImageSlice(const I
 
     if (dimension == 3)
     {
-      ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
-      imageExtractor->SetInput( input );
-      imageExtractor->SetSliceDimension( axis );
-      imageExtractor->SetSliceIndex( slice );
-      imageExtractor->Update();
-      return imageExtractor->GetOutput();
+      // The slice plane is built in index space of the image, so the pixels of the
+      // slice correspond to the image indices along the two remaining axes.
+      AnatomicalPlane orientation = AnatomicalPlane::Axial;
+      unsigned int width = input->GetDimension(0);
+      unsigned int height = input->GetDimension(1);
+
+      switch (axis)
+      {
+        case 0:
+          orientation = AnatomicalPlane::Sagittal;
+          width = input->GetDimension(1);
+          height = input->GetDimension(2);
+          break;
+        case 1:
+          orientation = AnatomicalPlane::Coronal;
+          width = input->GetDimension(0);
+          height = input->GetDimension(2);
+          break;
+        default:
+          break;
+      }
+
+      const BaseGeometry* geometry = input->GetGeometry();
+
+      auto plane = PlaneGeometry::New();
+      plane->InitializeStandardPlane(width, height, geometry->GetIndexToWorldTransform(), orientation, static_cast<ScalarType>(slice));
+
+      // ExtractSliceFilter expects the plane origin at the corner of the first pixel
+      // and shifts it to the pixel center itself, both for sampling and for the
+      // geometry of the extracted slice.
+      Point3D cornerIndex;
+      FillVector3D(cornerIndex, -0.5, -0.5, 0.0);
+      plane->SetOrigin(plane->GetIndexToWorldTransform()->TransformPoint(cornerIndex));
+
+      auto extractor = ExtractSliceFilter::New();
+      extractor->SetInput(input);
+      extractor->SetWorldGeometry(plane);
+      extractor->SetInPlaneResampleExtentByGeometry(true);
+      extractor->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
+      extractor->SetVtkOutputRequest(false);
+      extractor->SetResliceTransformByGeometry(geometry);
+      extractor->Update();
+
+      return extractor->GetOutput();
     }
     else if(dimension == 2)
     {

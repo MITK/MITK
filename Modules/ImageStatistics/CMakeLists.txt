@@ -1,5 +1,5 @@
 mitk_create_module(
-  DEPENDS MitkImageExtraction MitkPlanarFigure MitkMultilabel
+  DEPENDS MitkPlanarFigure MitkMultilabel
   PACKAGE_DEPENDS PRIVATE ITK|Convolution+FFT+VTK VTK|IOImage
 )
 

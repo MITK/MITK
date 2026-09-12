@@ -25,9 +25,10 @@ namespace mitk
  * \class MaskGenerator
  * \brief Abstract base class for all mask generators used in image statistics.
  *
- * Mask generators create binary (unsigned short) masks that define regions of
- * interest for image statistics calculations. Derived classes implement the
- * actual mask creation logic in DoGetMask().
+ * Mask generators create label masks (unsigned short, 0 marks the background)
+ * that define regions of interest for image statistics calculations. Derived
+ * classes implement the actual mask creation logic in DoGetMask(). Masks of
+ * several generators are combined by chaining them with AndMaskGenerator.
  *
  * A mask generator may optionally require an input image (set via
  * SetInputImage()) and a time point (set via SetTimePoint()). The public
@@ -39,6 +40,7 @@ namespace mitk
  * \sa PlanarFigureMaskGenerator
  * \sa IgnorePixelMaskGenerator
  * \sa MultiLabelMaskGenerator
+ * \sa AndMaskGenerator
  */
 class MITKIMAGESTATISTICS_EXPORT MaskGenerator: public itk::Object
 {

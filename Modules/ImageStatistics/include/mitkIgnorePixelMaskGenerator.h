@@ -30,9 +30,15 @@ namespace mitk
  * value, which are set to 0. This is commonly used to exclude background
  * or zero-valued voxels from statistics calculations.
  *
+ * To exclude such voxels from a region of interest, use it as the secondary
+ * generator of an AndMaskGenerator with selected label value 1. Used directly
+ * as the mask of an ImageStatisticsCalculator, the statistics of all remaining
+ * voxels are reported under label value 1.
+ *
  * \pre An input image must be set via SetInputImage() before calling GetMask().
  *
  * \sa MaskGenerator
+ * \sa AndMaskGenerator
  * \sa ImageStatisticsCalculator
  */
 class MITKIMAGESTATISTICS_EXPORT IgnorePixelMaskGenerator: public MaskGenerator

@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkImageMaskGenerator.h>
 #include <mitkMultiLabelMaskGenerator.h>
+#include <mitkIgnorePixelMaskGenerator.h>
+#include <mitkAndMaskGenerator.h>
 #include <mitkImageStatisticsConstants.h>
 
 #include <itkImage.h>
@@ -55,6 +57,9 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestSmallImageMaskedTwoVoxelsMedian);
   MITK_TEST(TestSmallImageMaskedThreeVoxelsMedian);
   MITK_TEST(TestSmallImageMaskedTwoVoxelsFloatMedian);
+  MITK_TEST(TestSmallImageIgnoreZeroWithinMask);
+  MITK_TEST(TestSmallImageIgnoreZeroWithoutMask);
+  MITK_TEST(TestSmallImagePlanarFigureIgnoreZero);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -88,6 +93,9 @@ public:
   void TestSmallImageMaskedTwoVoxelsMedian();
   void TestSmallImageMaskedThreeVoxelsMedian();
   void TestSmallImageMaskedTwoVoxelsFloatMedian();
+  void TestSmallImageIgnoreZeroWithinMask();
+  void TestSmallImageIgnoreZeroWithoutMask();
+  void TestSmallImagePlanarFigureIgnoreZero();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -117,8 +125,7 @@ private:
   // universal function to calculate statistics
   const mitk::ImageStatisticsContainer::Pointer
     ComputeStatistics(mitk::Image::ConstPointer image,
-      mitk::MaskGenerator::Pointer maskGen = nullptr,
-      mitk::MaskGenerator::Pointer secondardMaskGen = nullptr)
+      mitk::MaskGenerator::Pointer maskGen = nullptr)
   {
     mitk::ImageStatisticsCalculator::Pointer imgStatCalc = mitk::ImageStatisticsCalculator::New();
     imgStatCalc->SetInputImage(image);
@@ -126,10 +133,6 @@ private:
     if (maskGen.IsNotNull())
     {
       imgStatCalc->SetMask(maskGen.GetPointer());
-      if (secondardMaskGen.IsNotNull())
-      {
-        imgStatCalc->SetSecondaryMask(secondardMaskGen.GetPointer());
-      }
     }
 
     return imgStatCalc->GetStatistics();
@@ -678,6 +681,114 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImageMaskedTwoVoxelsFloatM
   this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.375, 115.375);
 }
 
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImageIgnoreZeroWithinMask()
+{
+  /*****************************
+   * mask selects the voxels 78, 0 and 152; chaining the mask with an
+   * IgnorePixelMaskGenerator through an AndMaskGenerator drops the zero
+   * -> 2 voxels, mean and median of 115 expected
+   ******************************/
+  MITK_INFO << std::endl << "Test small image ignore zero within mask:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values{ 78, 0, 152, 0, 0, 0, 0, 0 };
+  std::vector<unsigned short> maskValues{ 1, 1, 1, 0, 0, 0, 0, 0 };
+
+  mitk::Image::Pointer image = BuildImage<short>(size, values);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::AndMaskGenerator::Pointer andMaskGen = mitk::AndMaskGenerator::New();
+  andMaskGen->SetPrimaryMaskGenerator(imgMaskGen);
+  andMaskGen->SetSecondaryMaskGenerator(ignoreZeroGen);
+  andMaskGen->SetSecondaryLabelValue(1);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, andMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 2, 115.0, 115.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImageIgnoreZeroWithoutMask()
+{
+  /*****************************
+   * no region of interest, an IgnorePixelMaskGenerator is the only mask
+   * -> statistics of the three non-zero voxels, reported under label 1
+   ******************************/
+  MITK_INFO << std::endl << "Test small image ignore zero without mask:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values{ 78, 0, 152, 0, 200, 0, 0, 0 };
+  mitk::Image::Pointer image = BuildImage<short>(size, values);
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, ignoreZeroGen.GetPointer()));
+
+  CPPUNIT_ASSERT(!statisticsContainer->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 3, (78.0 + 152.0 + 200.0) / 3.0, 152.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSmallImagePlanarFigureIgnoreZero()
+{
+  /*****************************
+   * 4x4x3 image of value 10 with a zero voxel at (1,1,1); a square planar
+   * figure on slice 1 covering the voxels [1,2]x[1,2] is chained with an
+   * IgnorePixelMaskGenerator
+   * -> 3 voxels of value 10 expected
+   ******************************/
+  MITK_INFO << std::endl << "Test small image planar figure ignore zero:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 4;
+  size[1] = 4;
+  size[2] = 3;
+  std::vector<short> values(4 * 4 * 3, 10);
+  values[1 + 4 * (1 + 4 * 1)] = 0;
+  mitk::Image::Pointer image = BuildImage<short>(size, values);
+
+  mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
+  mitk::Point2D pnt2; pnt2[0] = 2.5; pnt2[1] = 0.5;
+  mitk::Point2D pnt3; pnt3[0] = 2.5; pnt3[1] = 2.5;
+  mitk::Point2D pnt4; pnt4[0] = 0.5; pnt4[1] = 2.5;
+  auto figure = GeneratePlanarPolygon(image->GetSlicedGeometry()->GetPlaneGeometry(1), { pnt1, pnt2, pnt3, pnt4 });
+
+  mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  planFigMaskGen->SetInputImage(image);
+  planFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::AndMaskGenerator::Pointer andMaskGen = mitk::AndMaskGenerator::New();
+  andMaskGen->SetPrimaryMaskGenerator(planFigMaskGen);
+  andMaskGen->SetSecondaryMaskGenerator(ignoreZeroGen);
+  andMaskGen->SetSecondaryLabelValue(1);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, andMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyCountMeanAndMedian(statisticsObject, 3, 10.0, 10.0);
+}
+
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 {
@@ -770,7 +881,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
   imgMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   VerifyStatistics(statisticsObjectTimestep0,
@@ -829,7 +940,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
   mlMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, mlMaskGen.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, mlMaskGen.GetPointer()));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(2, 0);
 
   VerifyStatistics(statisticsObjectTimestep0,
@@ -995,7 +1106,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
   imgMask1->SetImageMask(us4DCroppedBinMask->GetGroupImage(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer()));
   auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
@@ -1053,7 +1164,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
   mlMask->SetMultiLabelSegmentation(us4DCroppedMultilabelMask);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, mlMask.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, mlMask.GetPointer()));
   auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
@@ -1183,7 +1294,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
   imgMask1->SetImageMask(us4DCropped3DBinMask->GetGroupImage(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer = mitk::ImageStatisticsContainer::New();
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer()));
   auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,

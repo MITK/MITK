@@ -6,7 +6,6 @@ set(H_FILES
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h
   mitkStatisticsImageFilter.h
-  mitkitkMaskImageFilter.h
 )
 
 set(CPP_FILES
@@ -21,6 +20,7 @@ set(CPP_FILES
   mitkImageMaskGenerator.cpp
   mitkHistogramStatisticsCalculator.cpp
   mitkIgnorePixelMaskGenerator.cpp
+  mitkAndMaskGenerator.cpp
   mitkImageStatisticsPredicateHelper.cpp
   mitkImageStatisticsContainerNodeHelper.cpp
   mitkImageStatisticsContainerManager.cpp

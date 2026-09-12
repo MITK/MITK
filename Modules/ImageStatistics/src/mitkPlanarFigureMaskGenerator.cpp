@@ -410,6 +410,9 @@ void PlanarFigureMaskGenerator::CalculateMask()
     //convert itk mask to mitk::Image::Pointer and return it
     mitk::Image::Pointer planarFigureMaskImage;
     planarFigureMaskImage = mitk::GrabItkImageMemory(m_InternalITKImageMask2D);
+    // GrabItkImageMemory can only derive a flat 2D geometry (z = 0) from the
+    // ITK image; the mask has to lie on the plane of the reference slice.
+    planarFigureMaskImage->SetClonedGeometry(inputImageSlice->GetGeometry());
 
     m_ReferenceImage = inputImageSlice;
     m_InternalMask = planarFigureMaskImage;

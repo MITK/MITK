@@ -52,6 +52,8 @@ namespace
     BenchmarkAdaptationRefused = 8,
     InputReadError             = 9,
     OutputWriteError           = 10,
+    UnsupportedPETUnits        = 11,
+    MissingPhilipsPETScale     = 12,
   };
 
   int AsInt(ExitCode c) { return static_cast<int>(c); }
@@ -446,6 +448,16 @@ int main(int argc, char* argv[])
   {
     MITK_ERROR << "Missing SUV input: " << e.GetDescription();
     return AsInt(ExitCode::MissingSUVInput);
+  }
+  catch (const mitk::UnsupportedPETUnitsException& e)
+  {
+    MITK_ERROR << "Unsupported PET units: " << e.GetDescription();
+    return AsInt(ExitCode::UnsupportedPETUnits);
+  }
+  catch (const mitk::MissingPhilipsPETScaleException& e)
+  {
+    MITK_ERROR << "Missing Philips PET scale factor: " << e.GetDescription();
+    return AsInt(ExitCode::MissingPhilipsPETScale);
   }
   catch (const mitk::SUVHelperException& e)
   {

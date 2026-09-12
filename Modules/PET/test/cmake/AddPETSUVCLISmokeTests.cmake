@@ -85,9 +85,7 @@ _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_UnknownSex       4
 # ---- Cases requiring IBSI data (registered only when present) ---------
 #
 # These prove the CLI's strict / variant / multi-tracer wiring against
-# real DICOM input. Defer additional cases until the corresponding
-# pipeline support lands; for now we register only what the current
-# baseline implementation can run end-to-end.
+# real DICOM input.
 
 if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   set(_dro_pt   "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
@@ -98,4 +96,46 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # writing all line up.
   _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_BaselineRun_DRO_0_0 0
     "--input;${_dro_pt};--output;${_dro_out};--variant;bw")
+
+  # ---- Exit-code contract ---------------------------------------------
+  #
+  # mitkPETIBSIBenchmarkTest drives the filter in-process and can assert
+  # exception types, but the mapping from exception type to process exit
+  # code exists only in the CLI and is what calling scripts branch on.
+  # These cases pin that mapping; two per code is enough, because the
+  # pipeline itself is covered elsewhere.
+  #
+  # The codes are append-only. A script that learned "2 means a tag is
+  # missing" must keep being right, so a code is never reassigned even
+  # when the exception hierarchy is reorganized.
+  function(_add_petsuv_cli_exit_code_case name dro expected_exit)
+    if(NOT EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/${dro}/PT")
+      return()
+    endif()
+    _add_petsuv_cli_smoke(${name} ${expected_exit}
+      "--input;${MITK_PET_IBSI_DATA_DIR}/DRO/${dro}/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/${name}_out.nrrd")
+  endfunction()
+
+  # 2 = MissingDICOMProperty against 6 = InvalidDICOMPropertyValue: the
+  # distinction between "the tag is not there" and "the tag is there and
+  # unusable", which decides whether re-exporting can help.
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit2_WeightAbsent
+                                 DRO_error_2_0 2)
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit6_WeightZero
+                                 DRO_error_2_1 6)
+
+  # 3 = AmbiguousDecayTiming, here via the half-life gate on the
+  # administration date. This is the one input the benchmark once
+  # computed silently and wrongly, so its refusal is worth pinning at the
+  # process boundary too.
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit3_UnrecoverableAdminDate
+                                 DRO_error_4_1 3)
+
+  # 11 and 12 replace the catch-all these two used to share with genuine
+  # internal errors; a caller could not previously tell "this input is
+  # not convertible" from "MITK broke".
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit11_UnsupportedUnits
+                                 DRO_error_2_7 11)
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit12_MissingPhilipsScale
+                                 DRO_error_2_6 12)
 endif()

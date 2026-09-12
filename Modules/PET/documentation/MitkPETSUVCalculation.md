@@ -350,3 +350,9 @@ The modality and units checks are bypassed because NRRD carries no DICOM tags.
 | `8` | `--strict-dicom` refused a benchmark adaptation. |
 | `9` | The input image could not be read. |
 | `10` | The output image could not be written. |
+| `11` | `(0054,1001)` Units holds a value the pipeline cannot convert. |
+| `12` | `Units = CNTS` on Philips data without either private scale factor. |
+
+Codes 11 and 12 previously fell into the catch-all `1`, so a calling script
+could not tell "this input is not convertible" from "MITK broke". The table
+is append-only: a code, once published, keeps its meaning.

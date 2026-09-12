@@ -6,7 +6,6 @@ set(H_FILES
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h
   mitkStatisticsImageFilter.h
-  mitkitkMaskImageFilter.h
 )
 
 set(CPP_FILES

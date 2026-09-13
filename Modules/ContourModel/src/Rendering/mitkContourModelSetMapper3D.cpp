@@ -46,6 +46,8 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
 
   if (contourModelSet != nullptr)
   {
+    const auto timestep = this->GetTimestep();
+
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType baseIndex = 0;
@@ -57,8 +59,15 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
     {
       ContourModel *contourModel = it->GetPointer();
 
-      auto vertIt = contourModel->Begin();
-      auto vertEnd = contourModel->End();
+      // A contour of the set may have fewer time steps than the set itself.
+      if (contourModel->IsEmptyTimeStep(timestep))
+      {
+        ++it;
+        continue;
+      }
+
+      auto vertIt = contourModel->IteratorBegin(timestep);
+      auto vertEnd = contourModel->IteratorEnd(timestep);
 
       while (vertIt != vertEnd)
       {
@@ -69,7 +78,7 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
       vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
       vtkIdList *pointIds = line->GetPointIds();
 
-      vtkIdType numPoints = contourModel->GetNumberOfVertices();
+      vtkIdType numPoints = contourModel->GetNumberOfVertices(timestep);
       pointIds->SetNumberOfIds(numPoints + 1);
 
       for (vtkIdType i = 0; i < numPoints; ++i)
@@ -139,7 +148,8 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
       (localStorage->m_LastUpdateTime <
        renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
       ||
-      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()))
+      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < renderer->GetTimeStepUpdateTime())) // was the time step modified?
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastUpdateTime.Modified();

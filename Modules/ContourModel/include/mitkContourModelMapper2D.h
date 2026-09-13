@@ -31,7 +31,8 @@ namespace mitk
    * optional subdivision curve smoothing via the "subdivision curve" property.
    *
    * Properties evaluated by this mapper:
-   * - "contour.color": line color (default: yellow-green)
+   * - "color": line color (default: yellow-green); the legacy name "contour.color"
+   *   still takes precedence where present
    * - "contour.points.color": point marker color
    * - "contour.width": line width in pixels
    * - "contour.points.show": show point markers

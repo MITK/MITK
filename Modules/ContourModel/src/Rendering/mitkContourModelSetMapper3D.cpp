@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkContourModelSetMapper3D.h>
 
+#include "mitkContourModelColorHelper.h"
+
 #include <mitkSurface.h>
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
@@ -188,22 +190,16 @@ void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer *r
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ColorProperty::Pointer colorprop =
-    dynamic_cast<mitk::ColorProperty *>(GetDataNode()->GetProperty("contour.color", renderer));
-  if (colorprop)
-  {
-    // set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
+  const auto color = GetContourColor(this->GetDataNode(), renderer);
 
-    vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
-    localStorage->m_Assembly->GetActors(collection);
-    collection->InitTraversal();
-    for (vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
-    {
-      vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetColor(red, green, blue);
-    }
+  vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
+  localStorage->m_Assembly->GetActors(collection);
+  collection->InitTraversal();
+  for (vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
+  {
+    vtkActor::SafeDownCast(collection->GetNextProp())
+      ->GetProperty()
+      ->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
   }
 }
 
@@ -225,7 +221,7 @@ void mitk::ContourModelSetMapper3D::SetDefaultProperties(mitk::DataNode *node,
                                                          mitk::BaseRenderer *renderer,
                                                          bool overwrite)
 {
-  node->AddProperty("color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.3D.width", mitk::FloatProperty::New(0.5), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

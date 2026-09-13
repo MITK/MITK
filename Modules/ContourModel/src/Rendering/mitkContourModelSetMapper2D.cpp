@@ -82,7 +82,7 @@ void mitk::ContourModelSetMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                            mitk::BaseRenderer *renderer,
                                                            bool overwrite)
 {
-  node->AddProperty("contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.points.show", mitk::BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("contour.segments.show", mitk::BoolProperty::New(true), renderer, overwrite);

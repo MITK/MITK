@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkContourModelMapper3D.h>
 
+#include "mitkContourModelColorHelper.h"
+
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkProperty.h>
@@ -192,16 +194,9 @@ void mitk::ContourModelMapper3D::ApplyContourProperties(mitk::BaseRenderer *rend
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ColorProperty::Pointer colorprop =
-    dynamic_cast<mitk::ColorProperty *>(GetDataNode()->GetProperty("contour.color", renderer));
-  if (colorprop)
-  {
-    // set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
-    localStorage->m_Actor->GetProperty()->SetColor(red, green, blue);
-  }
+  const auto color = GetContourColor(this->GetDataNode(), renderer);
+
+  localStorage->m_Actor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 
 /*+++++++++++++++++++ LocalStorage part +++++++++++++++++++++++++*/
@@ -226,7 +221,7 @@ void mitk::ContourModelMapper3D::SetDefaultProperties(mitk::DataNode *node,
                                                       mitk::BaseRenderer *renderer,
                                                       bool overwrite)
 {
-  node->AddProperty("color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.3D.width", mitk::FloatProperty::New(0.5), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

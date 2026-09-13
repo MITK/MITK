@@ -137,7 +137,7 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
                                           unsigned int currentTimeStep)
 {
   // check if the timesteps in contourModel have to be expanded
-  if (currentTimeStep != newContourModel->GetTimeSteps())
+  if (currentTimeStep >= newContourModel->GetTimeSteps())
   {
     newContourModel->Expand(currentTimeStep + 1);
   }

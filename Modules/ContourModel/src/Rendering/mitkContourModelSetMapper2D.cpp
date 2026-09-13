@@ -58,7 +58,14 @@ int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk
     while (it != end)
     {
         //we have the assumption that each contour model vertex has the same z coordinate
-        auto currentZValue = (*it)->GetVertexAt(0)->Coordinates[2];
+        const auto* firstVertex = (*it)->GetVertexAt(0);
+        if (nullptr == firstVertex)
+        {
+            ++it;
+            continue;
+        }
+
+        auto currentZValue = firstVertex->Coordinates[2];
         double acceptedDeviationInMM = 5.0;
         //only draw contour if it is visible
         if (currentZValue - acceptedDeviationInMM < centerOfViewPointZ && currentZValue + acceptedDeviationInMM > centerOfViewPointZ){

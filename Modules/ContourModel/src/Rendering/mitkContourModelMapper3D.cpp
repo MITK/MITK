@@ -74,6 +74,11 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
+  // VtkPropRenderer::Update() walks every node regardless of visibility, so
+  // without this a hidden contour keeps rebuilding its geometry.
+  if (!visible)
+    return;
+
   auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
   if (data == nullptr)
   {

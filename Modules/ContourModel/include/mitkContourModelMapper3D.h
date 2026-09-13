@@ -66,9 +66,9 @@ namespace mitk
     class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Actor of a 2D render window. */
+      /** \brief Actor of a 3D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
-      /** \brief Mapper of a 2D render window. */
+      /** \brief Mapper of a 3D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
 
       vtkSmartPointer<vtkTubeFilter> m_TubeFilter;

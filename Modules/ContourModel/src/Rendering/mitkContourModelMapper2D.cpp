@@ -15,9 +15,7 @@ found in the LICENSE file.
 #include <mitkColorProperty.h>
 #include <mitkContourModel.h>
 #include <mitkContourModelSubDivisionFilter.h>
-#include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
-#include <vtkLinearTransform.h>
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
   : m_SubdivisionContour(mitk::ContourModel::New()), m_InitSubdivisionCurve(true)

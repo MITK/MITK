@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <mitkContourModelSet.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
-#include <vtkLinearTransform.h>
 
 mitk::ContourModelSetMapper2D::ContourModelSetMapper2D()
 {

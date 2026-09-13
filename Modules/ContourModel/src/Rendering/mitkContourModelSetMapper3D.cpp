@@ -106,9 +106,6 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
 
     localStorage->m_Mapper->SetInputData(polyData);
   }
-
-  this->ApplyContourProperties(renderer);
-  this->ApplyContourModelSetProperties(renderer);
 }
 
 void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)

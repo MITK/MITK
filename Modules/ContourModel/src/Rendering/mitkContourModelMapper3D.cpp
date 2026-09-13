@@ -49,8 +49,6 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour);
 
-  this->ApplyContourProperties(renderer);
-
   // tube filter the polyData
   localStorage->m_TubeFilter->SetInputData(localStorage->m_OutlinePolyData);
 

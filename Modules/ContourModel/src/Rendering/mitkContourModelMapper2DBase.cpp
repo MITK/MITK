@@ -10,10 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkContourModelSetMapper2D.h>
+#include <mitkContourModelMapper2DBase.h>
 
+#include <mitkBaseRenderer.h>
 #include <mitkColorProperty.h>
-#include <mitkContourModelSet.h>
+#include <mitkContourModel.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <vtkContext2D.h>
@@ -21,15 +22,8 @@ found in the LICENSE file.
 #include <vtkOpenGLContextDevice2D.h>
 #include <vtkPen.h>
 
-#include <mitkManualPlacementAnnotationRenderer.h>
-#include <mitkBaseRenderer.h>
-#include <mitkContourModel.h>
-#include <mitkTextAnnotation2D.h>
-
 mitk::ContourModelMapper2DBase::ContourModelMapper2DBase()
 {
-  m_PointNumbersAnnotation = mitk::TextAnnotation2D::New();
-  m_ControlPointNumbersAnnotation = mitk::TextAnnotation2D::New();
 }
 
 mitk::ContourModelMapper2DBase::~ContourModelMapper2DBase()
@@ -54,23 +48,6 @@ void mitk::ContourModelMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRe
 }
 
 void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer)
-{
-  if (std::find(m_RendererList.begin(), m_RendererList.end(), renderer) == m_RendererList.end())
-  {
-    m_RendererList.push_back(renderer);
-  }
-
-  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_PointNumbersAnnotation.GetPointer(), renderer);
-  m_PointNumbersAnnotation->SetVisibility(false);
-
-  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_ControlPointNumbersAnnotation.GetPointer(), renderer);
-  m_ControlPointNumbersAnnotation->SetVisibility(false);
-
-  InternalDrawContour(renderingContour, renderer);
-}
-
-void mitk::ContourModelMapper2DBase::InternalDrawContour(mitk::ContourModel *renderingContour,
-                                                           mitk::BaseRenderer *renderer)
 {
   if (!renderingContour)
     return;
@@ -143,12 +120,6 @@ void mitk::ContourModelMapper2DBase::InternalDrawContour(mitk::ContourModel *ren
     bool showPoints = false;
     dataNode->GetBoolProperty("contour.points.show", showPoints);
 
-    bool showPointsNumbers = false;
-    dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
-
-    bool showControlPointsNumbers = false;
-    dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
-
     bool projectmode = false;
     dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
 
@@ -156,8 +127,6 @@ void mitk::ContourModelMapper2DBase::InternalDrawContour(mitk::ContourModel *ren
 
     Point2D pt2d; // projected_p in display coordinates
     Point2D lastPt2d;
-
-    int index = 0;
 
     mitk::ScalarType maxDiff = 0.25;
 
@@ -274,38 +243,6 @@ void mitk::ContourModelMapper2DBase::InternalDrawContour(mitk::ContourModel *ren
             colorprop->GetColor().GetRed(), colorprop->GetColor().GetGreen(), colorprop->GetColor().GetBlue());
           localStorage->Context->DrawPoint(pt2d[0], pt2d[1]);
         }
-
-        if (showPointsNumbers)
-        {
-          std::string l;
-          std::stringstream ss;
-          ss << index;
-          l.append(ss.str());
-
-          float rgb[3];
-          rgb[0] = 0.0;
-          rgb[1] = 0.0;
-          rgb[2] = 0.0;
-
-          WriteTextWithAnnotation(m_PointNumbersAnnotation, l.c_str(), rgb, pt2d, renderer);
-        }
-
-        if (showControlPointsNumbers && (*pointsIt)->IsControlPoint)
-        {
-          std::string l;
-          std::stringstream ss;
-          ss << index;
-          l.append(ss.str());
-
-          float rgb[3];
-          rgb[0] = 1.0;
-          rgb[1] = 1.0;
-          rgb[2] = 0.0;
-
-          WriteTextWithAnnotation(m_ControlPointNumbersAnnotation, l.c_str(), rgb, pt2d, renderer);
-        }
-
-        index++;
       }
 
       pointsIt++;
@@ -369,18 +306,4 @@ void mitk::ContourModelMapper2DBase::InternalDrawContour(mitk::ContourModel *ren
 
   localStorage->Context = nullptr;
   localStorage->Device = nullptr;
-}
-
-void mitk::ContourModelMapper2DBase::WriteTextWithAnnotation(TextAnnotationPointerType textAnnotation,
-                                                            const char *text,
-                                                            float rgb[3],
-                                                            Point2D /*pt2d*/,
-                                                            mitk::BaseRenderer * /*renderer*/)
-{
-  textAnnotation->SetText(text);
-  textAnnotation->SetColor(rgb);
-  textAnnotation->SetOpacity(1);
-  textAnnotation->SetFontSize(16);
-  textAnnotation->SetBoolProperty("drawShadow", false);
-  textAnnotation->SetVisibility(true);
 }

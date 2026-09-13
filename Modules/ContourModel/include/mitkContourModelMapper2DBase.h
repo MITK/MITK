@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkMapper.h>
-#include <mitkTextAnnotation2D.h>
 #include <MitkContourModelExports.h>
 #include <vtkSmartPointer.h>
 
@@ -50,24 +49,11 @@ namespace mitk
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor = nullptr) override;
 
   protected:
-    typedef TextAnnotation2D::Pointer TextAnnotationPointerType;
-
     ContourModelMapper2DBase();
 
     ~ContourModelMapper2DBase() override;
 
     void DrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer);
-
-    void WriteTextWithAnnotation(
-      TextAnnotationPointerType textAnnotation, const char *text, float rgb[3], Point2D pt2d, mitk::BaseRenderer *);
-
-    virtual void InternalDrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer);
-
-    TextAnnotationPointerType m_PointNumbersAnnotation;
-    TextAnnotationPointerType m_ControlPointNumbersAnnotation;
-
-    typedef std::vector<BaseRenderer *> RendererListType;
-    RendererListType m_RendererList;
 
   private:
     struct LocalStorage

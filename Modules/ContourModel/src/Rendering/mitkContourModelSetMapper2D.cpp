@@ -90,8 +90,6 @@ void mitk::ContourModelSetMapper2D::SetDefaultProperties(mitk::DataNode *node,
   node->AddProperty("contour.width", mitk::FloatProperty::New(1.0), renderer, overwrite);
   node->AddProperty("contour.hovering.width", mitk::FloatProperty::New(3.0), renderer, overwrite);
   node->AddProperty("contour.hovering", mitk::BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("contour.points.text", mitk::BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("contour.controlpoints.text", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("contour.project-onto-plane", mitk::BoolProperty::New(false), renderer, overwrite);
 

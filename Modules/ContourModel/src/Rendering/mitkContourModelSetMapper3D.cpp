@@ -129,25 +129,31 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
 
-  // check if something important has changed and we need to rerender
-  if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
+  // Rebuild the geometry only for what the geometry is made of. Note that a
+  // property change also moves the node's own MTime, so that one must not be
+  // part of this condition or every property change would rebuild.
+  if ((localStorage->m_LastUpdateTime < data->GetMTime()) // was the data modified?
       ||
-      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // Was the data modified?
+      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // was the pipeline modified?
       ||
       (localStorage->m_LastUpdateTime <
        renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
       ||
-      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
-      ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()))
   {
     this->GenerateDataForRenderer(renderer);
+    localStorage->m_LastUpdateTime.Modified();
   }
 
-  // since we have checked that nothing important has changed, we can set
-  // m_LastUpdateTime to the current time
-  localStorage->m_LastUpdateTime.Modified();
+  // None of the properties of this mapper affect the generated geometry, so a
+  // property change only has to be pushed to the actor.
+  if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+  {
+    this->ApplyContourProperties(renderer);
+    this->ApplyContourModelSetProperties(renderer);
+    localStorage->m_LastPropertyUpdateTime.Modified();
+  }
 }
 
 void mitk::ContourModelSetMapper3D::ApplyContourModelSetProperties(BaseRenderer *renderer)

@@ -77,8 +77,11 @@ namespace mitk
 
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
-      /** \brief Timestamp of last update of stored data. */
+      /** \brief Timestamp of the last geometry generation. */
       itk::TimeStamp m_LastUpdateTime;
+
+      /** \brief Timestamp of the last property application. */
+      itk::TimeStamp m_LastPropertyUpdateTime;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

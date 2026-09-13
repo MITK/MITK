@@ -73,32 +73,37 @@ namespace mitk
      *
      * \param[in] renderer The renderer to render into.
      * \param[in] type The render pass type (Opaque, Translucent, Overlay, Volumetric).
+     * \return Number of props rendered.
      */
-    void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
+    int MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     /**
      * \brief Check visibility and render the overlay pass.
      * \param[in] renderer The renderer to render into.
+     * \return Number of props rendered.
      */
-    virtual void MitkRenderOverlay(BaseRenderer *renderer);
+    virtual int MitkRenderOverlay(BaseRenderer *renderer);
 
     /**
      * \brief Check visibility and render opaque (untransparent) geometry.
      * \param[in] renderer The renderer to render into.
+     * \return Number of props rendered.
      */
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer *renderer);
+    virtual int MitkRenderOpaqueGeometry(BaseRenderer *renderer);
 
     /**
      * \brief Check visibility and render translucent (transparent) geometry.
      * \param[in] renderer The renderer to render into.
+     * \return Number of props rendered.
      */
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer *renderer);
+    virtual int MitkRenderTranslucentGeometry(BaseRenderer *renderer);
 
     /**
      * \brief Check visibility and render volumetric geometry.
      * \param[in] renderer The renderer to render into.
+     * \return Number of props rendered.
      */
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer *renderer);
+    virtual int MitkRenderVolumetricGeometry(BaseRenderer *renderer);
 
     /**
      * \brief Check whether this mapper owns the specified vtkProp for the given renderer.

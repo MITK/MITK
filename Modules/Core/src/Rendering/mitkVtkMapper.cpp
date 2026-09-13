@@ -20,76 +20,74 @@ mitk::VtkMapper::~VtkMapper()
 {
 }
 
-void mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
+int mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
   switch (type)
   {
     case mitk::VtkPropRenderer::Opaque:
-      this->MitkRenderOpaqueGeometry(renderer);
-      break;
+      return this->MitkRenderOpaqueGeometry(renderer);
     case mitk::VtkPropRenderer::Translucent:
-      this->MitkRenderTranslucentGeometry(renderer);
-      break;
+      return this->MitkRenderTranslucentGeometry(renderer);
     case mitk::VtkPropRenderer::Overlay:
-      this->MitkRenderOverlay(renderer);
-      break;
+      return this->MitkRenderOverlay(renderer);
     case mitk::VtkPropRenderer::Volumetric:
-      this->MitkRenderVolumetricGeometry(renderer);
-      break;
+      return this->MitkRenderVolumetricGeometry(renderer);
   }
+
+  return 0;
 }
 
-void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer *renderer)
+int mitk::VtkMapper::MitkRenderOverlay(BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
-    return;
+    return 0;
 
   if (this->GetVtkProp(renderer)->GetVisibility())
-  {
-    GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-  }
+    return this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
+
+  return 0;
 }
 
-void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer *renderer)
+int mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
-    return;
+    return 0;
 
   if (this->GetVtkProp(renderer)->GetVisibility())
-  {
-    GetVtkProp(renderer)->RenderOpaqueGeometry(renderer->GetVtkRenderer());
-  }
+    return this->GetVtkProp(renderer)->RenderOpaqueGeometry(renderer->GetVtkRenderer());
+
+  return 0;
 }
 
-void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer *renderer)
+int mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
-    return;
+    return 0;
 
   if (this->GetVtkProp(renderer)->GetVisibility())
-  {
-    GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-  }
+    return this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
+
+  return 0;
 }
 
-void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer *renderer)
+int mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
-    return;
+    return 0;
 
-  if (GetVtkProp(renderer)->GetVisibility())
-  {
-    GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
-  }
+  if (this->GetVtkProp(renderer)->GetVisibility())
+    return this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
+
+  return 0;
 }
 
 bool mitk::VtkMapper::HasVtkProp(const vtkProp *prop, BaseRenderer *renderer)

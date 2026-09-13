@@ -58,8 +58,9 @@ namespace mitk
        *
        * \param[in] renderer The renderer for the current render window.
        * \param[in] type The render type (opaque, transparent, overlay).
+       * \return Number of props rendered.
        */
-      void MitkRender(BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
+      int MitkRender(BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     /** \brief Set default rendering properties for ContourModel nodes.
      * \param[in] node The data node to configure.

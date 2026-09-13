@@ -26,7 +26,7 @@ mitk::ContourModelSetMapper2D::~ContourModelSetMapper2D()
 {
 }
 
-void mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
+int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
 {
     BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
@@ -35,7 +35,7 @@ void mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mit
     dataNode->GetVisibility(visible, nullptr);
 
     if (!visible)
-        return;
+        return 0;
 
     mitk::ContourModelSet::Pointer input = this->GetInput();
 
@@ -57,9 +57,11 @@ void mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mit
     }
 
     if (input->GetSize() < 1)
-        return;
+        return 0;
 
     ls->UpdateGenerateDataTime();
+
+    return 1;
 }
 
 mitk::ContourModelSet *mitk::ContourModelSetMapper2D::GetInput(void)

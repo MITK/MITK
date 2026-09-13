@@ -152,10 +152,6 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
       ||
       (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // was the pipeline modified?
       ||
-      (localStorage->m_LastUpdateTime <
-       renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
-      ||
-      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
       (localStorage->m_LastUpdateTime < renderer->GetTimeStepUpdateTime())) // was the time step modified?
   {
     this->GenerateDataForRenderer(renderer);

@@ -180,7 +180,7 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
                                                        pointsColor->GetColor().GetBlue());
             localStorage->Context->GetPen()->SetWidth(1);
             // a rectangle around the point with the selected color
-            auto* rectPts = new float[8];
+            float rectPts[8];
             tmp = pt2d - horz;
             rectPts[0] = tmp[0];
             rectPts[1] = tmp[1];
@@ -216,7 +216,7 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
                                                      pointsColor->GetColor().GetBlue());
           localStorage->Context->GetPen()->SetWidth(1);
           // a rectangle around the point with the selected color
-          auto* rectPts = new float[8];
+          float rectPts[8];
           tmp = pt2d - horz;
           rectPts[0] = tmp[0];
           rectPts[1] = tmp[1];
@@ -279,7 +279,7 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
         localStorage->Context->GetPen()->SetColorF(0.0, 1.0, 0.0);
         localStorage->Context->GetPen()->SetWidth(1);
         // a rectangle around the point with the selected color
-        auto* rectPts = new float[8];
+        float rectPts[8];
         // a diamond around the point
         // begin from upper left corner and paint clockwise
         rectPts[0] = pt2d[0] - pointsize;

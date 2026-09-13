@@ -79,15 +79,19 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
         ++vertIt;
       }
 
+      const bool isClosed = contourModel->IsClosed(timestep);
+
       vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
       vtkIdList *pointIds = line->GetPointIds();
 
-      pointIds->SetNumberOfIds(numPoints + 1);
+      pointIds->SetNumberOfIds(isClosed ? numPoints + 1 : numPoints);
 
       for (vtkIdType i = 0; i < numPoints; ++i)
         pointIds->SetId(i, baseIndex + i);
 
-      pointIds->SetId(numPoints, baseIndex);
+      // Back to the first vertex, which is where a closed contour ends.
+      if (isClosed)
+        pointIds->SetId(numPoints, baseIndex);
 
       cells->InsertNextCell(line);
 

@@ -26,8 +26,14 @@ mitk::ContourModelSetMapper2D::~ContourModelSetMapper2D()
 {
 }
 
-int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
+int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
+    // Drawing happens immediately through a vtkContext2D without a vtkProp, so the
+    // contours have to be painted in exactly one pass. Overlay is the last one and
+    // therefore the pass that determines the final pixels.
+    if (type != mitk::VtkPropRenderer::Overlay)
+        return 0;
+
     BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
     mitk::DataNode::Pointer dataNode = this->GetDataNode();
@@ -39,10 +45,15 @@ int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk
 
     mitk::ContourModelSet::Pointer input = this->GetInput();
 
+    if (input->GetSize() < 1)
+        return 0;
+
     auto centerOfViewPointZ = renderer->GetCurrentWorldPlaneGeometry()->GetCenter()[2];
     auto it = input->Begin();
 
     auto end = input->End();
+
+    int numberOfRenderedContours = 0;
 
     while (it != end)
     {
@@ -52,16 +63,14 @@ int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk
         //only draw contour if it is visible
         if (currentZValue - acceptedDeviationInMM < centerOfViewPointZ && currentZValue + acceptedDeviationInMM > centerOfViewPointZ){
             this->DrawContour(it->GetPointer(), renderer);
+            ++numberOfRenderedContours;
         }
         ++it;
     }
 
-    if (input->GetSize() < 1)
-        return 0;
-
     ls->UpdateGenerateDataTime();
 
-    return 1;
+    return numberOfRenderedContours;
 }
 
 mitk::ContourModelSet *mitk::ContourModelSetMapper2D::GetInput(void)

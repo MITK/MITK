@@ -28,8 +28,14 @@ mitk::ContourModelMapper2D::~ContourModelMapper2D()
 {
 }
 
-int mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
+int mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
+  // Drawing happens immediately through a vtkContext2D without a vtkProp, so the
+  // contour has to be painted in exactly one pass. Overlay is the last one and
+  // therefore the pass that determines the final pixels.
+  if (type != mitk::VtkPropRenderer::Overlay)
+    return 0;
+
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
   mitk::DataNode *dataNode = this->GetDataNode();

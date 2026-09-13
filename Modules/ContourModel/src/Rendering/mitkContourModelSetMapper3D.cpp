@@ -100,7 +100,7 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *data = GetDataNode()->GetData();
   if (data == nullptr)
   {
     return;
@@ -111,8 +111,13 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  if (this->GetTimestep() == TIMESTEP_INVALID)
+  // Check if time step is valid
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+      (!dataTimeGeometry->IsValidTimePoint(renderer->GetTime())) || (this->GetTimestep() == TIMESTEP_INVALID))
   {
+    // clear the rendered polydata
+    localStorage->m_Mapper->SetInputData(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 

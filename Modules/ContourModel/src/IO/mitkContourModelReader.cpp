@@ -94,7 +94,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
 
             this->ReadPoints(newContourModel, currentTimeSeries, currentTimeStep);
 
-            int isClosed;
+            int isClosed = 0;
             currentTimeSeries->QueryIntAttribute("isClosed", &isClosed);
             if (isClosed)
             {
@@ -158,12 +158,16 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
       y = atof(currentPoint->FirstChildElement("y")->GetText());
       z = atof(currentPoint->FirstChildElement("z")->GetText());
 
-      int isActivePoint;
-      currentPoint->QueryIntAttribute("isActive", &isActivePoint);
+      int isControlPoint = 0;
+      if (tinyxml2::XML_SUCCESS != currentPoint->QueryIntAttribute("IsControlPoint", &isControlPoint))
+      {
+        // Accept the name this reader used to look for as well.
+        currentPoint->QueryIntAttribute("isActive", &isControlPoint);
+      }
 
       mitk::Point3D point;
       mitk::FillVector3D(point, x, y, z);
-      newContourModel->AddVertex(point, isActivePoint, currentTimeStep);
+      newContourModel->AddVertex(point, isControlPoint != 0, currentTimeStep);
     }
   }
   else

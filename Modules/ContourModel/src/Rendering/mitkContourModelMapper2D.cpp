@@ -71,7 +71,9 @@ int mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::V
     renderingContour = this->m_SubdivisionContour;
   }
 
+  this->BeginDrawing(renderer);
   this->DrawContour(renderingContour, renderer);
+  this->EndDrawing(renderer);
 
   ls->UpdateGenerateDataTime();
 

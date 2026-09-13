@@ -36,7 +36,7 @@ void mitk::ContourModelMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRe
 {
   auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
-  if (localStorage->Context->GetPen() == nullptr)
+  if (localStorage->Context == nullptr || localStorage->Context->GetPen() == nullptr)
   {
     return;
   }
@@ -49,18 +49,33 @@ void mitk::ContourModelMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRe
   localStorage->Context->GetPen()->SetColorF(color.GetRed(), color.GetGreen(), color.GetBlue(), opacity);
 }
 
+void mitk::ContourModelMapper2DBase::BeginDrawing(mitk::BaseRenderer *renderer)
+{
+  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+
+  if (localStorage->Device == nullptr)
+  {
+    localStorage->Device = vtkSmartPointer<vtkOpenGLContextDevice2D>::New();
+    localStorage->Context = vtkSmartPointer<vtkContext2D>::New();
+  }
+
+  localStorage->Device->Begin(renderer->GetVtkRenderer());
+  localStorage->Context->Begin(localStorage->Device);
+}
+
+void mitk::ContourModelMapper2DBase::EndDrawing(mitk::BaseRenderer *renderer)
+{
+  // Releases the reference that Begin() took on the device; the device itself
+  // stays alive in the local storage and is reused next frame.
+  m_LocalStorageHandler.GetLocalStorage(renderer)->Context->End();
+}
+
 void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer)
 {
   if (!renderingContour)
     return;
 
   auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-
-  localStorage->Device = vtkSmartPointer<vtkOpenGLContextDevice2D>::New();
-  localStorage->Context = vtkSmartPointer<vtkContext2D>::New();
-
-  localStorage->Device->Begin(renderer->GetVtkRenderer());
-  localStorage->Context->Begin(localStorage->Device);
 
   mitk::DataNode *dataNode = this->GetDataNode();
 
@@ -295,7 +310,4 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
       //------------------------------------
     }
   }
-
-  localStorage->Context = nullptr;
-  localStorage->Device = nullptr;
 }

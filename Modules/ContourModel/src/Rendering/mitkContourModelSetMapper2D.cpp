@@ -55,6 +55,8 @@ int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk
 
     int numberOfRenderedContours = 0;
 
+    this->BeginDrawing(renderer);
+
     while (it != end)
     {
         //we have the assumption that each contour model vertex has the same z coordinate
@@ -74,6 +76,8 @@ int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk
         }
         ++it;
     }
+
+    this->EndDrawing(renderer);
 
     ls->UpdateGenerateDataTime();
 

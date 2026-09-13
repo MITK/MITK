@@ -53,6 +53,18 @@ namespace mitk
 
     ~ContourModelMapper2DBase() override;
 
+    /** \brief Prepare the drawing context of a renderer for one frame.
+     *
+     * Brackets any number of DrawContour() calls together with EndDrawing().
+     * The context and its device are kept per renderer and reused across
+     * frames, so only the painting itself is repeated.
+     */
+    void BeginDrawing(mitk::BaseRenderer *renderer);
+
+    /** \brief Release the drawing context of a renderer again. */
+    void EndDrawing(mitk::BaseRenderer *renderer);
+
+    /** \brief Draw one contour. Only valid between BeginDrawing() and EndDrawing(). */
     void DrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer);
 
   private:

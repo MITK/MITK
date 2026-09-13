@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <mitkContourModelSet.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
-#include <vtkLinearTransform.h>
 
 mitk::ContourModelSetMapper2D::ContourModelSetMapper2D()
 {
@@ -26,42 +25,62 @@ mitk::ContourModelSetMapper2D::~ContourModelSetMapper2D()
 {
 }
 
-int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
+int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
+    // Drawing happens immediately through a vtkContext2D without a vtkProp, so the
+    // contours have to be painted in exactly one pass. Overlay is the last one and
+    // therefore the pass that determines the final pixels.
+    if (type != mitk::VtkPropRenderer::Overlay)
+        return 0;
+
     BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
     mitk::DataNode::Pointer dataNode = this->GetDataNode();
     bool visible = true;
-    dataNode->GetVisibility(visible, nullptr);
+    dataNode->GetVisibility(visible, renderer);
 
     if (!visible)
         return 0;
 
     mitk::ContourModelSet::Pointer input = this->GetInput();
 
+    if (input->GetSize() < 1)
+        return 0;
+
     auto centerOfViewPointZ = renderer->GetCurrentWorldPlaneGeometry()->GetCenter()[2];
     auto it = input->Begin();
 
     auto end = input->End();
 
+    int numberOfRenderedContours = 0;
+
+    this->BeginDrawing(renderer);
+
     while (it != end)
     {
         //we have the assumption that each contour model vertex has the same z coordinate
-        auto currentZValue = (*it)->GetVertexAt(0)->Coordinates[2];
+        const auto* firstVertex = (*it)->GetVertexAt(0);
+        if (nullptr == firstVertex)
+        {
+            ++it;
+            continue;
+        }
+
+        auto currentZValue = firstVertex->Coordinates[2];
         double acceptedDeviationInMM = 5.0;
         //only draw contour if it is visible
         if (currentZValue - acceptedDeviationInMM < centerOfViewPointZ && currentZValue + acceptedDeviationInMM > centerOfViewPointZ){
             this->DrawContour(it->GetPointer(), renderer);
+            ++numberOfRenderedContours;
         }
         ++it;
     }
 
-    if (input->GetSize() < 1)
-        return 0;
+    this->EndDrawing(renderer);
 
     ls->UpdateGenerateDataTime();
 
-    return 1;
+    return numberOfRenderedContours;
 }
 
 mitk::ContourModelSet *mitk::ContourModelSetMapper2D::GetInput(void)
@@ -73,7 +92,7 @@ void mitk::ContourModelSetMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                            mitk::BaseRenderer *renderer,
                                                            bool overwrite)
 {
-  node->AddProperty("contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.points.show", mitk::BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("contour.segments.show", mitk::BoolProperty::New(true), renderer, overwrite);
@@ -81,8 +100,6 @@ void mitk::ContourModelSetMapper2D::SetDefaultProperties(mitk::DataNode *node,
   node->AddProperty("contour.width", mitk::FloatProperty::New(1.0), renderer, overwrite);
   node->AddProperty("contour.hovering.width", mitk::FloatProperty::New(3.0), renderer, overwrite);
   node->AddProperty("contour.hovering", mitk::BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("contour.points.text", mitk::BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("contour.controlpoints.text", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("contour.project-onto-plane", mitk::BoolProperty::New(false), renderer, overwrite);
 

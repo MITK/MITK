@@ -11,7 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkContourModelSetMapper3D.h>
 
-#include <mitkSurface.h>
+#include "mitkContourModelColorHelper.h"
+
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
@@ -34,21 +35,19 @@ const mitk::ContourModelSet *mitk::ContourModelSetMapper3D::GetInput(void)
 vtkProp *mitk::ContourModelSetMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   // return the actor corresponding to the renderer
-  return m_LSH.GetLocalStorage(renderer)->m_Assembly;
+  return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
 
 void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  /* First convert the contourModel to vtkPolyData, then tube filter it and
-   * set it input for our mapper
-   */
-
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   auto *contourModelSet = dynamic_cast<ContourModelSet *>(this->GetDataNode()->GetData());
 
   if (contourModelSet != nullptr)
   {
+    const auto timestep = this->GetTimestep();
+
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType baseIndex = 0;
@@ -60,8 +59,19 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
     {
       ContourModel *contourModel = it->GetPointer();
 
-      auto vertIt = contourModel->Begin();
-      auto vertEnd = contourModel->End();
+      // Fewer time steps than the set yields a negative count, a step that was
+      // never filled yields zero. Neither makes a polyline, and a cell holding
+      // a single vertex would index past the end of the points.
+      const vtkIdType numPoints = contourModel->GetNumberOfVertices(timestep);
+
+      if (numPoints < 1)
+      {
+        ++it;
+        continue;
+      }
+
+      auto vertIt = contourModel->IteratorBegin(timestep);
+      auto vertEnd = contourModel->IteratorEnd(timestep);
 
       while (vertIt != vertEnd)
       {
@@ -69,16 +79,19 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
         ++vertIt;
       }
 
+      const bool isClosed = contourModel->IsClosed(timestep);
+
       vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
       vtkIdList *pointIds = line->GetPointIds();
 
-      vtkIdType numPoints = contourModel->GetNumberOfVertices();
-      pointIds->SetNumberOfIds(numPoints + 1);
+      pointIds->SetNumberOfIds(isClosed ? numPoints + 1 : numPoints);
 
       for (vtkIdType i = 0; i < numPoints; ++i)
         pointIds->SetId(i, baseIndex + i);
 
-      pointIds->SetId(numPoints, baseIndex);
+      // Back to the first vertex, which is where a closed contour ends.
+      if (isClosed)
+        pointIds->SetId(numPoints, baseIndex);
 
       cells->InsertNextCell(line);
 
@@ -91,16 +104,8 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
     polyData->SetPoints(points);
     polyData->SetLines(cells);
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-
-    mapper->SetInputData(polyData);
-
-    localStorage->m_Assembly->AddPart(actor);
+    localStorage->m_Mapper->SetInputData(polyData);
   }
-  this->ApplyContourProperties(renderer);
-  this->ApplyContourModelSetProperties(renderer);
 }
 
 void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
@@ -108,7 +113,12 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  // VtkPropRenderer::Update() walks every node regardless of visibility, so
+  // without this a hidden contour keeps rebuilding its geometry.
+  if (!visible)
+    return;
+
+  auto *data = GetDataNode()->GetData();
   if (data == nullptr)
   {
     return;
@@ -119,92 +129,60 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  if (this->GetTimestep() == TIMESTEP_INVALID)
+  // Check if time step is valid
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+      (!dataTimeGeometry->IsValidTimePoint(renderer->GetTime())) || (this->GetTimestep() == TIMESTEP_INVALID))
   {
+    // clear the rendered polydata
+    localStorage->m_Mapper->SetInputData(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
 
-  // check if something important has changed and we need to rerender
-  if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
+  // Rebuild the geometry only for what the geometry is made of. Note that a
+  // property change also moves the node's own MTime, so that one must not be
+  // part of this condition or every property change would rebuild.
+  if ((localStorage->m_LastUpdateTime < data->GetMTime()) // was the data modified?
       ||
-      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // Was the data modified?
+      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // was the pipeline modified?
       ||
-      (localStorage->m_LastUpdateTime <
-       renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
-      ||
-      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
-      ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+      (localStorage->m_LastUpdateTime < renderer->GetTimeStepUpdateTime())) // was the time step modified?
   {
     this->GenerateDataForRenderer(renderer);
+    localStorage->m_LastUpdateTime.Modified();
   }
 
-  // since we have checked that nothing important has changed, we can set
-  // m_LastUpdateTime to the current time
-  localStorage->m_LastUpdateTime.Modified();
-}
-
-vtkSmartPointer<vtkPolyData> mitk::ContourModelSetMapper3D::CreateVtkPolyDataFromContour(
-  mitk::ContourModel *inputContour, mitk::BaseRenderer *renderer)
-{
-  const auto timestep = this->GetTimestep();
-
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
-  localStorage->m_contourToPolyData->SetInput(inputContour);
-  localStorage->m_contourToPolyData->Update();
-
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-  polyData = localStorage->m_contourToPolyData->GetOutput()->GetVtkPolyData(timestep);
-
-  return polyData;
+  // None of the properties of this mapper affect the generated geometry, so a
+  // property change only has to be pushed to the actor.
+  if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+  {
+    this->ApplyContourProperties(renderer);
+    this->ApplyContourModelSetProperties(renderer);
+    localStorage->m_LastPropertyUpdateTime.Modified();
+  }
 }
 
 void mitk::ContourModelSetMapper3D::ApplyContourModelSetProperties(BaseRenderer *renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  DataNode *dataNode = this->GetDataNode();
 
-  if (dataNode != nullptr)
-  {
-    float lineWidth = 1;
-    dataNode->GetFloatProperty("contour.3D.width", lineWidth, renderer);
+  float lineWidth = 1;
+  this->GetDataNode()->GetFloatProperty("contour.3D.width", lineWidth, renderer);
 
-    vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
-    localStorage->m_Assembly->GetActors(collection);
-    collection->InitTraversal();
-    for (vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
-    {
-      vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetLineWidth(lineWidth);
-    }
-  }
+  localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
 }
 
 void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer *renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ColorProperty::Pointer colorprop =
-    dynamic_cast<mitk::ColorProperty *>(GetDataNode()->GetProperty("contour.color", renderer));
-  if (colorprop)
-  {
-    // set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
+  const auto color = GetContourColor(this->GetDataNode(), renderer);
 
-    vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
-    localStorage->m_Assembly->GetActors(collection);
-    collection->InitTraversal();
-    for (vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
-    {
-      vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetColor(red, green, blue);
-    }
-  }
+  localStorage->m_Actor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 
 /*+++++++++++++++++++ LocalStorage part +++++++++++++++++++++++++*/
@@ -217,15 +195,16 @@ mitk::ContourModelSetMapper3D::LocalStorage *mitk::ContourModelSetMapper3D::GetL
 
 mitk::ContourModelSetMapper3D::LocalStorage::LocalStorage()
 {
-  m_Assembly = vtkSmartPointer<vtkAssembly>::New();
-  m_contourToPolyData = mitk::ContourModelToSurfaceFilter::New();
+  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Actor = vtkSmartPointer<vtkActor>::New();
+  m_Actor->SetMapper(m_Mapper);
 }
 
 void mitk::ContourModelSetMapper3D::SetDefaultProperties(mitk::DataNode *node,
                                                          mitk::BaseRenderer *renderer,
                                                          bool overwrite)
 {
-  node->AddProperty("color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.3D.width", mitk::FloatProperty::New(0.5), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

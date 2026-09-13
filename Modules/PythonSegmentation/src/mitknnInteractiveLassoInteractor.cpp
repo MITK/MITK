@@ -133,7 +133,7 @@ namespace
     {
       m_ContourColor = color;
       if (m_FeedbackNode.IsNotNull())
-        m_FeedbackNode->SetColor(color, nullptr, "contour.color");
+        m_FeedbackNode->SetColor(color);
     }
 
     // Drops the live feedback node and any in-flight contour state.
@@ -335,7 +335,7 @@ namespace
       m_FeedbackNode->SetProperty("helper object", mitk::BoolProperty::New(true));
       m_FeedbackNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
       m_FeedbackNode->SetFloatProperty("contour.width", 3.0f);
-      m_FeedbackNode->SetColor(m_ContourColor, nullptr, "contour.color");
+      m_FeedbackNode->SetColor(m_ContourColor);
       mitk::nnInteractive::HideNodeIn3DRenderWindows(m_FeedbackNode);
 
       if (m_DataStorage != nullptr)
@@ -456,7 +456,7 @@ namespace mitk::nnInteractive
       auto node = DataNode::New();
       node->SetData(contour);
       node->SetName(this->CreateLassoNodeName());
-      node->SetColor(GetColor(promptType, ColorIntensity::Muted), nullptr, "contour.color");
+      node->SetColor(GetColor(promptType, ColorIntensity::Muted));
       node->SetFloatProperty("contour.width", 3.0f);
       node->SetBoolProperty("helper object", true);
       node->SetBoolProperty("includeInBoundingBox", false);

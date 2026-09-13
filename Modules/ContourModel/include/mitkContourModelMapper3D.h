@@ -66,9 +66,9 @@ namespace mitk
     class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Actor of a 2D render window. */
+      /** \brief Actor of a 3D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
-      /** \brief Mapper of a 2D render window. */
+      /** \brief Mapper of a 3D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
 
       vtkSmartPointer<vtkTubeFilter> m_TubeFilter;
@@ -77,8 +77,11 @@ namespace mitk
 
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
-      /** \brief Timestamp of last update of stored data. */
+      /** \brief Timestamp of the last geometry generation. */
       itk::TimeStamp m_LastUpdateTime;
+
+      /** \brief Timestamp of the last property application. */
+      itk::TimeStamp m_LastPropertyUpdateTime;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

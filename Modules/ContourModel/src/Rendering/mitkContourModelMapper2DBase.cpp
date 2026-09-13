@@ -263,7 +263,7 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
       mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
       mitk::FillArray(p, vtkp);
-      renderer->WorldToDisplay(p, pt2d);
+      renderer->WorldToView(p, pt2d);
 
       localStorage->Context->GetPen()->SetWidth(lineWidth);
       localStorage->Context->DrawLine(lastPt2d[0], lastPt2d[1], pt2d[0], pt2d[1]);
@@ -280,7 +280,7 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
       transform->TransformPoint(vtkp, vtkp);
       mitk::FillArray(p, vtkp);
 
-      renderer->WorldToDisplay(p, pt2d);
+      renderer->WorldToView(p, pt2d);
 
       ScalarType scalardiff = fabs(renderer->GetCurrentWorldPlaneGeometry()->SignedDistance(p));
       //----------------------------------

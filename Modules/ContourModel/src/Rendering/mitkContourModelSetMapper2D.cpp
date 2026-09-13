@@ -38,7 +38,7 @@ int mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk
 
     mitk::DataNode::Pointer dataNode = this->GetDataNode();
     bool visible = true;
-    dataNode->GetVisibility(visible, nullptr);
+    dataNode->GetVisibility(visible, renderer);
 
     if (!visible)
         return 0;

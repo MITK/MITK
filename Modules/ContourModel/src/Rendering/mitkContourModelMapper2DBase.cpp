@@ -109,21 +109,21 @@ void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingCo
     bool drawit = false;
 
     bool isHovering = false;
-    dataNode->GetBoolProperty("contour.hovering", isHovering);
+    dataNode->GetBoolProperty("contour.hovering", isHovering, renderer);
 
     if (isHovering)
-      dataNode->GetFloatProperty("contour.hovering.width", lineWidth);
+      dataNode->GetFloatProperty("contour.hovering.width", lineWidth, renderer);
     else
-      dataNode->GetFloatProperty("contour.width", lineWidth);
+      dataNode->GetFloatProperty("contour.width", lineWidth, renderer);
 
     bool showSegments = false;
-    dataNode->GetBoolProperty("contour.segments.show", showSegments);
+    dataNode->GetBoolProperty("contour.segments.show", showSegments, renderer);
 
     bool showControlPoints = false;
-    dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
+    dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints, renderer);
 
     bool showPoints = false;
-    dataNode->GetBoolProperty("contour.points.show", showPoints);
+    dataNode->GetBoolProperty("contour.points.show", showPoints, renderer);
 
     bool projectmode = false;
     dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");

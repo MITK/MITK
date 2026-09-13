@@ -162,13 +162,15 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   }
 
   // go through the generated list and let the sorted mappers paint
+  int numberOfRenderedProps = 0;
+
   for (auto it = m_MappersMap.cbegin(); it != m_MappersMap.cend(); it++)
   {
     Mapper *mapper = (*it).second;
-    mapper->MitkRender(this, type);
+    numberOfRenderedProps += mapper->MitkRender(this, type);
   }
 
-  return 1;
+  return numberOfRenderedProps;
 }
 
 /*!

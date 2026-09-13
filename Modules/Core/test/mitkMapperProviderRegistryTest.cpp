@@ -44,7 +44,7 @@ namespace
   public:
     mitkClassMacro(TestMapperBase, mitk::Mapper);
 
-    void MitkRender(mitk::BaseRenderer *, mitk::VtkPropRenderer::RenderType) override {}
+    int MitkRender(mitk::BaseRenderer *, mitk::VtkPropRenderer::RenderType) override { return 0; }
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *, vtkActor *) override {}
   };
 

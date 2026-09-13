@@ -139,7 +139,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
   m_InternalRenderWindow->SetMultiSamples(0);
-  m_InternalRenderWindow->SetAlphaBitPlanes(0);
 
   setRenderWindow(m_InternalRenderWindow);
 

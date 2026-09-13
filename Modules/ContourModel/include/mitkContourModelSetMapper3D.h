@@ -21,22 +21,19 @@ found in the LICENSE file.
 
 #include <mitkContourModel.h>
 #include <mitkContourModelSet.h>
-#include <mitkContourModelToSurfaceFilter.h>
 
 #include <vtkActor.h>
-#include <vtkAssembly.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProp.h>
 #include <vtkSmartPointer.h>
-#include <vtkTubeFilter.h>
 
 namespace mitk
 {
   /** \brief VTK-based mapper to display a mitk::ContourModelSet in a 3D render window.
    *
-   * Creates VTK polydata from each ContourModel in the set and assembles them
-   * into a single vtkAssembly for 3D rendering with tube filtering.
+   * Merges the vertices of every ContourModel in the set into one vtkPolyData,
+   * one closed polyline per contour, rendered by a single actor.
    *
    * \sa ContourModelSet, ContourModelMapper3D, ContourModelSetMapper2D
    * \ingroup MitkContourModelModule
@@ -61,17 +58,17 @@ namespace mitk
 
     /** \brief Return the top-level VTK prop for the given renderer.
      * \param[in] renderer The renderer for which to retrieve the VTK prop.
-     * \return The vtkAssembly representing all contours in the 3D render window.
+     * \return The actor representing all contours in the 3D render window.
      */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Assembly of contours. */
-      vtkSmartPointer<vtkAssembly> m_Assembly;
-
-      mitk::ContourModelToSurfaceFilter::Pointer m_contourToPolyData;
+      /** \brief Actor holding all contours of the set. */
+      vtkSmartPointer<vtkActor> m_Actor;
+      /** \brief Mapper of the actor. */
+      vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
@@ -103,9 +100,6 @@ namespace mitk
     ~ContourModelSetMapper3D() override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-
-    virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel *inputContour,
-                                                                      mitk::BaseRenderer *renderer);
 
     virtual void ApplyContourProperties(mitk::BaseRenderer *renderer);
     virtual void ApplyContourModelSetProperties(BaseRenderer *renderer);

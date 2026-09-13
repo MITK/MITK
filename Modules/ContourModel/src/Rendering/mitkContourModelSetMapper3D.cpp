@@ -13,7 +13,6 @@ found in the LICENSE file.
 
 #include "mitkContourModelColorHelper.h"
 
-#include <mitkSurface.h>
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
@@ -36,15 +35,11 @@ const mitk::ContourModelSet *mitk::ContourModelSetMapper3D::GetInput(void)
 vtkProp *mitk::ContourModelSetMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   // return the actor corresponding to the renderer
-  return m_LSH.GetLocalStorage(renderer)->m_Assembly;
+  return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
 
 void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  /* First convert the contourModel to vtkPolyData, then tube filter it and
-   * set it input for our mapper
-   */
-
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   auto *contourModelSet = dynamic_cast<ContourModelSet *>(this->GetDataNode()->GetData());
@@ -93,14 +88,9 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
     polyData->SetPoints(points);
     polyData->SetLines(cells);
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-
-    mapper->SetInputData(polyData);
-
-    localStorage->m_Assembly->AddPart(actor);
+    localStorage->m_Mapper->SetInputData(polyData);
   }
+
   this->ApplyContourProperties(renderer);
   this->ApplyContourModelSetProperties(renderer);
 }
@@ -150,40 +140,14 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
   localStorage->m_LastUpdateTime.Modified();
 }
 
-vtkSmartPointer<vtkPolyData> mitk::ContourModelSetMapper3D::CreateVtkPolyDataFromContour(
-  mitk::ContourModel *inputContour, mitk::BaseRenderer *renderer)
-{
-  const auto timestep = this->GetTimestep();
-
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
-  localStorage->m_contourToPolyData->SetInput(inputContour);
-  localStorage->m_contourToPolyData->Update();
-
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-  polyData = localStorage->m_contourToPolyData->GetOutput()->GetVtkPolyData(timestep);
-
-  return polyData;
-}
-
 void mitk::ContourModelSetMapper3D::ApplyContourModelSetProperties(BaseRenderer *renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  DataNode *dataNode = this->GetDataNode();
 
-  if (dataNode != nullptr)
-  {
-    float lineWidth = 1;
-    dataNode->GetFloatProperty("contour.3D.width", lineWidth, renderer);
+  float lineWidth = 1;
+  this->GetDataNode()->GetFloatProperty("contour.3D.width", lineWidth, renderer);
 
-    vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
-    localStorage->m_Assembly->GetActors(collection);
-    collection->InitTraversal();
-    for (vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
-    {
-      vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetLineWidth(lineWidth);
-    }
-  }
+  localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
 }
 
 void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer *renderer)
@@ -192,15 +156,7 @@ void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer *r
 
   const auto color = GetContourColor(this->GetDataNode(), renderer);
 
-  vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
-  localStorage->m_Assembly->GetActors(collection);
-  collection->InitTraversal();
-  for (vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
-  {
-    vtkActor::SafeDownCast(collection->GetNextProp())
-      ->GetProperty()
-      ->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
-  }
+  localStorage->m_Actor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 
 /*+++++++++++++++++++ LocalStorage part +++++++++++++++++++++++++*/
@@ -213,8 +169,9 @@ mitk::ContourModelSetMapper3D::LocalStorage *mitk::ContourModelSetMapper3D::GetL
 
 mitk::ContourModelSetMapper3D::LocalStorage::LocalStorage()
 {
-  m_Assembly = vtkSmartPointer<vtkAssembly>::New();
-  m_contourToPolyData = mitk::ContourModelToSurfaceFilter::New();
+  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Actor = vtkSmartPointer<vtkActor>::New();
+  m_Actor->SetMapper(m_Mapper);
 }
 
 void mitk::ContourModelSetMapper3D::SetDefaultProperties(mitk::DataNode *node,

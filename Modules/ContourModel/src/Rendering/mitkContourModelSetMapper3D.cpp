@@ -59,8 +59,12 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
     {
       ContourModel *contourModel = it->GetPointer();
 
-      // A contour of the set may have fewer time steps than the set itself.
-      if (contourModel->IsEmptyTimeStep(timestep))
+      // Fewer time steps than the set yields a negative count, a step that was
+      // never filled yields zero. Neither makes a polyline, and a cell holding
+      // a single vertex would index past the end of the points.
+      const vtkIdType numPoints = contourModel->GetNumberOfVertices(timestep);
+
+      if (numPoints < 1)
       {
         ++it;
         continue;
@@ -78,7 +82,6 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
       vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
       vtkIdList *pointIds = line->GetPointIds();
 
-      vtkIdType numPoints = contourModel->GetNumberOfVertices(timestep);
       pointIds->SetNumberOfIds(numPoints + 1);
 
       for (vtkIdType i = 0; i < numPoints; ++i)

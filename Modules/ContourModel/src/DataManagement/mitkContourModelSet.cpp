@@ -42,12 +42,14 @@ void mitk::ContourModelSet::AddContourModel(mitk::ContourModel &contourModel)
 {
   this->m_Contours.push_back(&contourModel);
   m_UpdateBoundingBox = true;
+  this->Modified();
 }
 
 void mitk::ContourModelSet::AddContourModel(mitk::ContourModel::Pointer contourModel)
 {
   this->m_Contours.push_back(contourModel);
   m_UpdateBoundingBox = true;
+  this->Modified();
 }
 
 mitk::ContourModel *mitk::ContourModelSet::GetContourModelAt(int index) const
@@ -85,6 +87,7 @@ bool mitk::ContourModelSet::RemoveContourModel(mitk::ContourModel *contourModel)
     {
       this->m_Contours.erase(it);
       m_UpdateBoundingBox = true;
+      this->Modified();
       return true;
     }
 
@@ -100,6 +103,7 @@ bool mitk::ContourModelSet::RemoveContourModelAt(int index)
   {
     this->m_Contours.erase(this->m_Contours.begin() + index);
     m_UpdateBoundingBox = true;
+    this->Modified();
     return true;
   }
   else
@@ -112,6 +116,7 @@ void mitk::ContourModelSet::Clear()
 {
   this->m_Contours.clear();
   m_UpdateBoundingBox = true;
+  this->Modified();
 }
 
 void mitk::ContourModelSet::UpdateOutputInformation()

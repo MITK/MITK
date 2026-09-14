@@ -155,7 +155,9 @@ namespace
       return mapper.GetPointer();
     }
 
-    void SetDefaultProperties(mitk::DataNode *) const override {}
+    void SetDefaultProperties(mitk::DataNode *) const override { ++m_DefaultsApplied; }
+
+    int GetDefaultsApplied() const { return m_DefaultsApplied; }
 
   private:
     us::ServiceRegistration<mitk::IMapperProvider> Register(us::ModuleContext *context, MapperSlotId slotId)
@@ -169,6 +171,7 @@ namespace
 
     us::ServiceRegistration<mitk::IMapperProvider> m_Registration2D;
     us::ServiceRegistration<mitk::IMapperProvider> m_Registration3D;
+    mutable int m_DefaultsApplied = 0;
   };
 
   mitk::DataNode::Pointer CreateNode(mitk::BaseData *data)
@@ -192,9 +195,11 @@ class mitkMapperProviderRegistryTestSuite : public mitk::TestFixture
   MITK_TEST(CreateMapper_UnregisteringOneSlotKeepsTheOther);
   MITK_TEST(CreateMapper_SlotIsolation);
   MITK_TEST(CreateMapper_NullData);
-  MITK_TEST(ApplyDefaultProperties_BaseClassAppliedFirst);
-  MITK_TEST(ApplyDefaultProperties_MostDerivedOverridesBaseClass);
+  MITK_TEST(ApplyDefaultProperties_SubclassFallsBackToBaseRegistration);
+  MITK_TEST(ApplyDefaultProperties_BaseClassSkippedForServedSlot);
+  MITK_TEST(ApplyDefaultProperties_BaseClassAppliedForUnservedSlot);
   MITK_TEST(ApplyDefaultProperties_HigherRankingAppliedLast);
+  MITK_TEST(ApplyDefaultProperties_DualSlotProviderAppliedOnce);
   MITK_TEST(ApplyDefaultProperties_NullData);
   CPPUNIT_TEST_SUITE_END();
 
@@ -329,7 +334,19 @@ public:
     CPPUNIT_ASSERT(this->Registry().CreateMapper(nullptr, mitk::BaseRenderer::Standard2D).IsNull());
   }
 
-  void ApplyDefaultProperties_BaseClassAppliedFirst()
+  void ApplyDefaultProperties_SubclassFallsBackToBaseRegistration()
+  {
+    auto node = CreateNode(TestDataSub::New());
+
+    mitk::MapperProviderBase<TestMapperA, TestData> baseProvider(mitk::BaseRenderer::Standard2D);
+
+    this->Registry().ApplyDefaultProperties(node);
+
+    bool applied = false;
+    CPPUNIT_ASSERT(node->GetBoolProperty("test.appliedA", applied) && applied);
+  }
+
+  void ApplyDefaultProperties_BaseClassSkippedForServedSlot()
   {
     auto node = CreateNode(TestDataSub::New());
 
@@ -338,30 +355,32 @@ public:
 
     this->Registry().ApplyDefaultProperties(node);
 
-    // Both mappers add "test.marker" without overwriting, so the base class
-    // value stands and the more derived one defers to it.
+    // The base class mapper loses the election for TestDataSub and never
+    // renders the node, so its defaults must not reach the node either.
     std::string marker;
     CPPUNIT_ASSERT(node->GetStringProperty("test.marker", marker));
-    CPPUNIT_ASSERT_EQUAL(std::string("A"), marker);
+    CPPUNIT_ASSERT_EQUAL(std::string("Sub"), marker);
 
     bool applied = false;
-    CPPUNIT_ASSERT(node->GetBoolProperty("test.appliedA", applied) && applied);
-    applied = false;
     CPPUNIT_ASSERT(node->GetBoolProperty("test.appliedSub", applied) && applied);
+    CPPUNIT_ASSERT(node->GetProperty("test.appliedA") == nullptr);
   }
 
-  void ApplyDefaultProperties_MostDerivedOverridesBaseClass()
+  void ApplyDefaultProperties_BaseClassAppliedForUnservedSlot()
   {
     auto node = CreateNode(TestDataSub::New());
 
-    mitk::MapperProviderBase<TestMapperA, TestData> baseProvider(mitk::BaseRenderer::Standard2D);
-    mitk::MapperProviderBase<TestMapperOverriding, TestDataSub> subProvider(mitk::BaseRenderer::Standard2D);
+    mitk::MapperProviderBase<TestMapperA, TestData> base3DProvider(mitk::BaseRenderer::Standard3D);
+    mitk::MapperProviderBase<TestMapperSub, TestDataSub> sub2DProvider(mitk::BaseRenderer::Standard2D);
 
     this->Registry().ApplyDefaultProperties(node);
 
-    std::string marker;
-    CPPUNIT_ASSERT(node->GetStringProperty("test.marker", marker));
-    CPPUNIT_ASSERT_EQUAL(std::string("Overriding"), marker);
+    // Election is per slot: the 3D slot falls back to the base class
+    // registration, whose mapper does render the node.
+    bool applied = false;
+    CPPUNIT_ASSERT(node->GetBoolProperty("test.appliedSub", applied) && applied);
+    applied = false;
+    CPPUNIT_ASSERT(node->GetBoolProperty("test.appliedA", applied) && applied);
   }
 
   void ApplyDefaultProperties_HigherRankingAppliedLast()
@@ -376,6 +395,17 @@ public:
     std::string marker;
     CPPUNIT_ASSERT(node->GetStringProperty("test.marker", marker));
     CPPUNIT_ASSERT_EQUAL(std::string("Ranked"), marker);
+  }
+
+  void ApplyDefaultProperties_DualSlotProviderAppliedOnce()
+  {
+    auto node = CreateNode(TestData::New());
+
+    DualSlotProvider provider;
+
+    this->Registry().ApplyDefaultProperties(node);
+
+    CPPUNIT_ASSERT_EQUAL(1, provider.GetDefaultsApplied());
   }
 
   void ApplyDefaultProperties_NullData()

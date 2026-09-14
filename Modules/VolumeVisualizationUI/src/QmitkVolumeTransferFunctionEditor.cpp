@@ -527,6 +527,11 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
   if (preset.IsNull())
     return;
 
+  // Picking a preset starts a new recipe: the offsets the previous one left are
+  // measured from a baseline this curve does not have. The name goes with them
+  // and is written again immediately below.
+  this->ForgetTransferFunctionRecipe(node);
+
   m_AppliedTransferFunction = preset;
   node->SetStringProperty(TF_PRESET_PROPERTY, name.c_str());
 

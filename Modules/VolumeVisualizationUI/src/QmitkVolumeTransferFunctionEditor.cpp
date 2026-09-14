@@ -958,6 +958,16 @@ void QmitkVolumeTransferFunctionEditor::OnResetAdjustments()
 
 void QmitkVolumeTransferFunctionEditor::SetCustomModeActive(bool active)
 {
+  // SetDataNode cancels authoring on every selection change, whether or not any
+  // was in progress. Everything below is a transition - it moves focus and has
+  // the host lay its panel out again - so a request for the mode already in
+  // force stops here, or selecting an image scrolls the host's panel back to
+  // its top and takes focus off whatever the user was working in.
+  if (active == m_CustomModeActive)
+    return;
+
+  m_CustomModeActive = active;
+
   m_Controls->advancedTfPanel->setVisible(active);
 
   // Preset selection and the sliders that adjust it both live on this panel,

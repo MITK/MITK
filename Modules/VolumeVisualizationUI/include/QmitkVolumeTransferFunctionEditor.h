@@ -175,7 +175,13 @@ private:
 
   void ResetAdjustSliders();
 
-  /** \brief Swap the preset controls for the per-point editor, or back. */
+  /**
+   * \brief Swap the preset controls for the per-point editor, or back.
+   *
+   * A request for the mode already in force does nothing. SetDataNode cancels
+   * authoring on every selection change, whether any was in progress or not,
+   * and relies on that call being inert.
+   */
   void SetCustomModeActive(bool active);
 
   /**
@@ -258,6 +264,14 @@ private:
    * the abandoned edit would render that curve in a mode nobody chose for it.
    */
   mitk::VolumeBlendMode m_PreEditBlendMode { mitk::VolumeBlendMode::Composite };
+
+  /** \brief Whether the per-point editor is the mode currently in force.
+   *
+   * Kept rather than read back from the panels it swaps: a view sitting behind
+   * another tab has its part control hidden, and every widget in it then
+   * reports isVisible() false whatever mode the editor is in.
+   */
+  bool m_CustomModeActive = false;
 
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };

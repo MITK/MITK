@@ -45,8 +45,8 @@ namespace mitk
    * ranking greater than zero to override a default provider registered by
    * MITK for the same data class.
    *
-   * Default properties are applied in the opposite order, so that the
-   * provider winning selection writes last. See
+   * Default properties come only from the providers elected this way, so a
+   * mapper that never renders a node does not configure it either. See
    * MapperProviderRegistry::ApplyDefaultProperties().
    *
    * \sa MapperProviderBase

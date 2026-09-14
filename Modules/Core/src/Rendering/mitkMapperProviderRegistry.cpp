@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <map>
 #include <mutex>
+#include <set>
 #include <vector>
 
 class mitk::MapperProviderRegistry::Impl : private us::ServiceTrackerCustomizer<IMapperProvider>
@@ -66,11 +67,46 @@ public:
     return it != m_MapperIndex.end() ? it->second : std::vector<Entry>();
   }
 
-  std::vector<Entry> GetDefaultsCandidates(const std::string &className) const
+  // The providers whose mappers CreateMapper() elects for data of the given
+  // class hierarchy, over all slots, in application order. Only they
+  // contribute default properties: a base class provider outranked by a more
+  // derived registration never renders the node, so its defaults would only
+  // leak into a mapper that does not know them.
+  std::vector<Entry> GetElectedCandidates(const std::vector<std::string> &classHierarchy) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    auto it = m_DefaultsIndex.find(className);
-    return it != m_DefaultsIndex.end() ? it->second : std::vector<Entry>();
+
+    std::set<MapperSlotId> slots;
+    for (const auto &indexEntry : m_MapperIndex)
+      slots.insert(indexEntry.first.second);
+
+    std::vector<Entry> elected;
+
+    for (const auto slotId : slots)
+    {
+      for (const auto &className : classHierarchy)
+      {
+        auto it = m_MapperIndex.find(std::make_pair(className, slotId));
+        if (it == m_MapperIndex.end())
+          continue;
+
+        // One provider object may serve several slots; apply its defaults once.
+        for (const auto &entry : it->second)
+        {
+          if (std::none_of(elected.begin(), elected.end(), [&entry](const Entry &other) {
+                return other.provider == entry.provider;
+              }))
+          {
+            elected.push_back(entry);
+          }
+        }
+
+        break;
+      }
+    }
+
+    std::sort(elected.begin(), elected.end(), ByApplicationOrder);
+    return elected;
   }
 
 private:
@@ -111,10 +147,8 @@ private:
     const Entry entry{provider, ranking, serviceId};
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    this->InsertSorted(m_MapperIndex[std::make_pair(dataType, static_cast<MapperSlotId>(slotId))],
-                       entry,
-                       ByElectionOrder);
-    this->InsertSorted(m_DefaultsIndex[dataType], entry, ByApplicationOrder);
+    auto &candidates = m_MapperIndex[std::make_pair(dataType, static_cast<MapperSlotId>(slotId))];
+    candidates.insert(std::lower_bound(candidates.begin(), candidates.end(), entry, ByElectionOrder), entry);
 
     return provider;
   }
@@ -131,8 +165,7 @@ private:
       const auto serviceId = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
 
       std::lock_guard<std::mutex> lock(m_Mutex);
-      this->RemoveRegistration(m_MapperIndex, serviceId);
-      this->RemoveRegistration(m_DefaultsIndex, serviceId);
+      this->RemoveRegistration(serviceId);
     }
     m_Context->UngetService(reference);
   }
@@ -144,40 +177,33 @@ private:
     return lhs.ranking != rhs.ranking ? lhs.ranking > rhs.ranking : lhs.serviceId < rhs.serviceId;
   }
 
-  // Order in which ApplyDefaultProperties() applies candidates: lowest ranking
-  // first, so the preferred provider writes last and wins conflicting values.
+  // Order in which ApplyDefaultProperties() applies the elected providers:
+  // lowest ranking first, so the preferred provider writes last and wins
+  // conflicting values.
   static bool ByApplicationOrder(const Entry &lhs, const Entry &rhs)
   {
     return lhs.ranking != rhs.ranking ? lhs.ranking < rhs.ranking : lhs.serviceId < rhs.serviceId;
   }
 
-  template <typename TCompare>
-  static void InsertSorted(std::vector<Entry> &entries, const Entry &entry, TCompare compare)
+  void RemoveRegistration(long serviceId)
   {
-    entries.insert(std::lower_bound(entries.begin(), entries.end(), entry, compare), entry);
-  }
-
-  template <typename TIndex>
-  static void RemoveRegistration(TIndex &index, long serviceId)
-  {
-    for (auto it = index.begin(); it != index.end();)
+    for (auto it = m_MapperIndex.begin(); it != m_MapperIndex.end();)
     {
       auto &entries = it->second;
       entries.erase(std::remove_if(entries.begin(), entries.end(), [serviceId](const Entry &entry) {
         return entry.serviceId == serviceId;
       }), entries.end());
 
-      it = entries.empty() ? index.erase(it) : std::next(it);
+      it = entries.empty() ? m_MapperIndex.erase(it) : std::next(it);
     }
   }
 
   us::ServiceTracker<IMapperProvider> *m_Tracker = nullptr;
   us::ModuleContext *m_Context = nullptr;
 
-  // Mapper candidates in election order, defaults candidates in application
-  // order, both with registration order as deterministic tie-breaker.
+  // Mapper candidates per data class and slot in election order, with
+  // registration order as deterministic tie-breaker.
   std::map<std::pair<std::string, MapperSlotId>, std::vector<Entry>> m_MapperIndex;
-  std::map<std::string, std::vector<Entry>> m_DefaultsIndex;
   mutable std::mutex m_Mutex;
 };
 
@@ -237,13 +263,6 @@ void mitk::MapperProviderRegistry::ApplyDefaultProperties(DataNode *node) const
   if (data == nullptr)
     return;
 
-  const auto classHierarchy = data->GetClassHierarchy();
-
-  // Base class first, so a provider registered for a more derived class
-  // applies its defaults last and can override those of a base class.
-  for (auto className = classHierarchy.rbegin(); className != classHierarchy.rend(); ++className)
-  {
-    for (const auto &entry : m_Impl->GetDefaultsCandidates(*className))
-      entry.provider->SetDefaultProperties(node);
-  }
+  for (const auto &entry : m_Impl->GetElectedCandidates(data->GetClassHierarchy()))
+    entry.provider->SetDefaultProperties(node);
 }

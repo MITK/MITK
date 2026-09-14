@@ -161,12 +161,13 @@ providers registered for the same data class and slot: register with a ranking g
 than zero to replace a mapper that MITK registers by default for the same data class.
 
 The mapper's static SetDefaultProperties() is applied to a node whenever data of a
-matching type is assigned to it. Defaults are applied in the opposite order of provider
-selection, base data class first and within one data class by ascending ranking, so the
-most specific and highest ranked mapper writes last. Claim a property against a base
-class or a lower ranked provider by writing it unconditionally, via SetProperty() or
-AddProperty() with overwrite; with AddProperty() alone the mapper defers to the value
-already present.
+matching type is assigned to it. Only the providers that win selection for the node's
+data contribute defaults, per mapper slot: a provider registered for a base class is
+skipped as soon as a subclass registration serves the slot, since its mapper never
+renders the node. Within one data class, providers are applied by ascending ranking, so
+the highest ranked mapper writes last. Claim a property against a lower ranked provider
+by writing it unconditionally, via SetProperty() or AddProperty() with overwrite; with
+AddProperty() alone the mapper defers to the value already present.
 
 For adapting code that still registers mappers through the removed
 mitk::CoreObjectFactory, see \ref MapperRegistrationMigration.

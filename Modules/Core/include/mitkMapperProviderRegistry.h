@@ -62,14 +62,22 @@ namespace mitk
     Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) const;
 
     /**
-     * \brief Apply default properties of all providers matching the node's
-     *        data type, across all mapper slots.
+     * \brief Apply the default properties of the providers elected for the
+     *        node's data, across all mapper slots.
      *
-     * Providers are applied base data class first, and within one data class
-     * by ascending service ranking, so the most specific and highest ranked
-     * provider writes last. A mapper claims a property against a base class
-     * or a lower ranked provider by writing it unconditionally, via
-     * SetProperty() or AddProperty(..., overwrite = true); with
+     * For each slot, the candidates of the most derived class level with a
+     * registration for that slot are taken, as CreateMapper() elects them.
+     * Providers registered for a base class are skipped once a more derived
+     * level serves the slot: their mappers never render the node, so their
+     * defaults would only leak into a mapper that does not know them.
+     * Whether a candidate would decline the node in CreateMapper() is not
+     * probed.
+     *
+     * The elected providers are applied by ascending service ranking, so the
+     * highest ranked provider writes last, each provider once even if it
+     * serves several slots. A mapper claims a property against a lower
+     * ranked provider by writing it unconditionally, via SetProperty() or
+     * AddProperty(..., overwrite = true); with
      * AddProperty(..., overwrite = false) it defers to the value already
      * present, which is what that argument asks for.
      *

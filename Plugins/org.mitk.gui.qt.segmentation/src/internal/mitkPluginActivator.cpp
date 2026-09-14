@@ -28,7 +28,6 @@ found in the LICENSE file.
 #include "QmitkConvertSurfaceToLabelAction.h"
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
-#include <mitkBoundingShapeMapperProviders.h>
 
 #include <usModuleInitialization.h>
 
@@ -67,8 +66,6 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateMultiLabelSegmentationAction, context)
-  
-  RegisterBoundingShapeMapperProviders();
   this->m_context = context;
 }
 

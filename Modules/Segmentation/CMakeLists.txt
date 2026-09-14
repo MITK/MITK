@@ -12,7 +12,6 @@ mitk_create_module(
     mitkTool.h
   DEPENDS
     MitkAlgorithmsExt
-    MitkBoundingShape
     MitkContourModel
     MitkGraphAlgorithms
     MitkMultilabel

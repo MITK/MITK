@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <MitkVolumeVisualizationExports.h>
 
-#include <vtkColorTransferFunction.h>
-
 #include <vector>
+
+class vtkColorTransferFunction;
 
 namespace mitk
 {

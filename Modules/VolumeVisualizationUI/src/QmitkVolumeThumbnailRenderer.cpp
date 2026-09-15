@@ -171,6 +171,10 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   if (image == nullptr || !image->IsInitialized())
   {
     m_Image = nullptr;
+    m_ImageData = nullptr;
+
+    // Its view shares the voxels just released, so it has to go with them.
+    m_ViewCache.Reset();
 
     if (m_Mapper != nullptr)
       m_Mapper->RemoveAllInputs();
@@ -191,10 +195,18 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   if (m_RenderWindow == nullptr)
     this->CreatePipeline();
 
+  // The cached view belongs to the image this bind is about to release.
+  if (m_Image.GetPointer() != image)
+    m_ViewCache.Reset();
+
   // Kept for Render to build its views of, which is what the previews are
-  // drawn through. This bind carries no transfer function yet, so the volume
-  // itself is what proves the ray caster can draw it.
-  m_Image = imageData;
+  // drawn through. The image is kept alongside because it owns the voxels the
+  // representation only wraps: mitk::ImageDataItem hands them to VTK with
+  // save = 1, so they are freed with the image while the wrapper lives on.
+  // This bind carries no transfer function yet, so the volume itself is what
+  // proves the ray caster can draw it.
+  m_Image = image;
+  m_ImageData = imageData;
 
   m_Mapper->SetInputData(imageData);
   m_Volume->SetUserTransform(CreateDataToWorldTransform(image, imageData));
@@ -249,7 +261,7 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
 QPixmap QmitkVolumeThumbnailRenderer::Render(
   mitk::TransferFunction *transferFunction, mitk::VolumeBlendMode blendMode)
 {
-  if (!m_Usable || m_RenderWindow == nullptr || transferFunction == nullptr)
+  if (!m_Usable || m_RenderWindow == nullptr || m_ImageData == nullptr || transferFunction == nullptr)
     return QPixmap();
 
   m_Mapper->SetBlendMode(mitk::ToVtkBlendMode(blendMode));
@@ -261,7 +273,7 @@ QPixmap QmitkVolumeThumbnailRenderer::Render(
   // intensity range is regularly drawn over data far wider. Through a view
   // reporting the curve's own range, the ray caster resolves it as it was
   // authored whatever the image holds.
-  m_Mapper->SetInputData(m_ViewCache.GetView(m_Image, m_VolumeProperty));
+  m_Mapper->SetInputData(m_ViewCache.GetView(m_ImageData, m_VolumeProperty));
 
   m_RenderWindow->Render();
 

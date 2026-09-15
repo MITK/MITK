@@ -280,7 +280,13 @@ namespace
 
 QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f),
-    m_Controls(std::make_unique<Ui::QmitkVolumeTransferFunctionEditor>())
+    m_Controls(std::make_unique<Ui::QmitkVolumeTransferFunctionEditor>()),
+    // Drawn once at the width the widest cell could want, and scaled down to
+    // whatever the current one allows, so that resizing the panel relays the
+    // grid out rather than drawing every preview again. Built here rather than
+    // in the body because InvalidateThumbnails releases the volume through it,
+    // and the body calls that before it is done setting the widget up.
+    m_ThumbnailRenderer(std::make_unique<QmitkVolumeThumbnailRenderer>(PreviewSize(PREVIEW_RENDER_WIDTH)))
 {
   m_Controls->setupUi(this);
 
@@ -363,11 +369,6 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
       if (item != nullptr)
         this->OnPresetSelected(item->text());
     });
-
-  // Drawn once at the width the widest cell could want, and scaled down to
-  // whatever the current one allows, so that resizing the panel relays the
-  // grid out rather than drawing every preview again.
-  m_ThumbnailRenderer = std::make_unique<QmitkVolumeThumbnailRenderer>(PreviewSize(PREVIEW_RENDER_WIDTH));
 
   connect(m_Controls->presetExpandButton, &QToolButton::toggled, this,
     [this](bool expanded)
@@ -1208,6 +1209,11 @@ void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()
   m_NextThumbnailIndex = -1;
   m_ThumbnailImage = nullptr;
 
+  // The renderer keeps the volume it has bound alive, and nothing here applies
+  // to it any more - including the case where the node it came with has just
+  // been removed, which nothing else would free it on.
+  m_ThumbnailRenderer->SetImage(nullptr);
+
   // Back to the stand-in rather than to nothing, so that clearing the previews
   // does not resize every entry and scatter the grid.
   this->RefreshPlaceholders();
@@ -1270,7 +1276,8 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
   if (m_NextThumbnailIndex < 0)
   {
     // Uploading the volume costs far more than drawing from it, so it waits
-    // for the popup to be on screen rather than delaying its appearance.
+    // for the preset section to be on screen rather than delaying its
+    // appearance.
     if (!m_ThumbnailRenderer->SetImage(m_ThumbnailImage.Lock().GetPointer()))
     {
       // Clearing the bound image matters: it is what lets a later attempt

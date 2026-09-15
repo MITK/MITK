@@ -108,6 +108,14 @@ namespace mitk
      */
     vtkImageData *GetView(vtkImageData *image, vtkVolumeProperty *property);
 
+    /**
+     * \brief Drop the view held.
+     *
+     * The view shares the source's voxels, so whoever releases those has to
+     * say so: until then the cache holds a view of memory nobody owns.
+     */
+    void Reset();
+
   private:
     vtkSmartPointer<vtkImageData> m_View;
     const vtkImageData *m_Source = nullptr;

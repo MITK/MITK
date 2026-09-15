@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkVolumeBlendMode.h>
 #include <mitkVolumeRenderingScalarRange.h>
 
+#include <itkSmartPointer.h>
+
 #include <vtkSmartPointer.h>
 
 #include <QPixmap>
@@ -137,8 +139,16 @@ private:
    */
   bool m_ReportedUnusable = false;
 
-  /** \brief The volume bound last, which every preview is a view of. */
-  vtkSmartPointer<vtkImageData> m_Image;
+  /** \brief The image bound last.
+   *
+   * Held for its voxels: the representation below does not own them, and
+   * previews are drawn across turns of the event loop, so the image has to
+   * outlive the last of them rather than the call that bound it.
+   */
+  itk::SmartPointer<const mitk::Image> m_Image;
+
+  /** \brief Its VTK representation, which every preview is a view of. */
+  vtkSmartPointer<vtkImageData> m_ImageData;
 
   /** \brief The view of it the last preview was drawn through. */
   mitk::ScalarRangeViewCache m_ViewCache;

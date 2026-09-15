@@ -147,3 +147,12 @@ vtkImageData *mitk::ScalarRangeViewCache::GetView(vtkImageData *image, vtkVolume
 
   return min < max ? this->GetView(image, min, max) : image;
 }
+
+void mitk::ScalarRangeViewCache::Reset()
+{
+  m_View = nullptr;
+  m_Source = nullptr;
+  m_SourceTime = 0;
+  m_Range[0] = 0.0;
+  m_Range[1] = 0.0;
+}

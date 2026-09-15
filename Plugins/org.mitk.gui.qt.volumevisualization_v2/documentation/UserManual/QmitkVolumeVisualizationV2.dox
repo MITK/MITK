@@ -60,9 +60,13 @@ the grid opens, one after another, so they appear progressively.
 
 The catalogue is the Hounsfield-based preset library shared across medical
 viewers, plus a few general-purpose colour maps. The <tt>CT-</tt> presets assume
-Hounsfield units and therefore transfer between CT images unchanged. The
-<tt>MR-</tt> presets cannot make that assumption, because MR intensities are not
-calibrated to a fixed scale, so expect to adjust them per image.
+Hounsfield units, so which tissue a preset picks out transfers between CT images
+unchanged. How solid that tissue looks does not: opacity accumulates over the
+distance a ray travels in millimetres, so the same preset comes out denser on a
+coarsely sampled image than on a finely sampled one. <b>Opacity height</b> is
+the slider that compensates. The <tt>MR-</tt> presets cannot assume even the
+units, because MR intensities are not calibrated to a fixed scale, so expect to
+adjust those per image.
 
 While the grid is folded away its header names the current choice, or reads
 <em>Preset: Custom</em> for a curve that no preset describes.
@@ -118,12 +122,10 @@ function saved to a JSON file earlier, straight away.
 The image selector and the lighting section are put away for the duration and
 the panel returns to its top, so what you are left looking at is a page that
 names itself, names the image it is editing, and carries a way back at its top
-left. It holds one canvas per curve: grey value to opacity, grey value to
-colour, and grey value and gradient to opacity. The third modulates opacity by
-how sharply the data changes at each voxel, so a low value there hides flat
-interiors and leaves surfaces visible.
+left. It holds one canvas per curve: grey value to opacity, and grey value to
+colour.
 
-In all three canvases:
+In both canvases:
 
 <ul>
 <li> Left-click adds a point.
@@ -145,8 +147,7 @@ be kept and shared and read back with <b>Load from file...</b>.
 \note A curve that has been authored or loaded is no longer described by any
 preset name, so the name is dropped and the adjust sliders start measuring from
 the new curve. A saved file records the blend mode the curve was authored for
-alongside it, and <b>Load</b> restores both. The gradient curve is not stored
-when saving.
+alongside it, and <b>Load</b> restores both.
 
 \section org_mitk_views_volumevisualization_v2_blendmode Blend mode
 
@@ -189,8 +190,8 @@ with it.
 
 VTK also defines an isosurface and a slice mode, which are deliberately absent
 here. Each needs input that nothing in MITK supplies - iso-values, or a cutting
-plane - and the ray caster refuses the whole render when that input is missing
-rather than falling back, which would lose the image entirely.
+plane - and without it the ray caster draws nothing at all rather than falling
+back, so offering either would only ever produce an empty 3D window.
 
 \section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
 

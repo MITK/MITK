@@ -133,6 +133,11 @@ void mitk::VtkPropRenderer::NormalizeLightAmbientColors()
   // scaled by that light's intensity - would render vtkVolumeProperty's
   // ambient coefficient inert. Normalising the sum to 1.0 keeps the
   // coefficient on the same scale whichever rig is installed.
+  //
+  // A lone headlight at intensity 1.0 is the near-exception: it takes the ray
+  // caster's default lighting path, which tints ambient with the sample's own
+  // colour and reads the light's ambient colour only once volumetric scattering
+  // is switched on. Normalising it too costs nothing and keeps that case right.
   auto *lights = m_VtkRenderer->GetLights();
   double totalIntensity = 0.0;
 

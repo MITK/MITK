@@ -124,10 +124,16 @@ void QmitkVolumeThumbnailRenderer::CreatePipeline()
   m_Renderer = vtkSmartPointer<vtkRenderer>::New();
   m_RenderWindow->AddRenderer(m_Renderer);
 
-  // vtkLight leaves its ambient colour black, and the ray caster multiplies the
-  // volume's ambient coefficient by it, so without this the coefficient set
-  // below would have no effect at all. One light at full intensity makes the
-  // normalisation mitk::VtkPropRenderer applies to its own rigs come out at 1.
+  // One headlight at intensity 1.0 and nothing else: that exact rig is what
+  // selects the ray caster's default lighting path, where ambient is tinted by
+  // the sample's own colour rather than laid over the picture as flat grey. It
+  // is also the rig mitk::VtkPropRenderer installs for the headlight model, so
+  // a preview is lit the way the 3D window will light the node.
+  //
+  // Ambient colour 1.0 is what VtkPropRenderer's normalisation works out to for
+  // that rig. This lighting path never reads it, but the volumetric scattering
+  // path does, so setting it keeps the two rigs identical and the preview right
+  // if scattering is ever switched on here.
   auto light = vtkSmartPointer<vtkLight>::New();
   light->SetLightTypeToHeadlight();
   light->SetIntensity(1.0);

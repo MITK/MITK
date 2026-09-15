@@ -30,9 +30,9 @@ namespace mitk
    * A subset of VTK's blend modes: the five that reinterpret the transfer
    * function already on the node and need nothing else. Isosurface and slice
    * are deliberately absent, because each needs input of its own that nothing
-   * in MITK supplies - iso-values, or a plane - and the ray caster rejects the
-   * mode outright when it is missing, which loses the whole render rather than
-   * degrading.
+   * in MITK supplies - iso-values, or a plane. The ray caster accepts both
+   * regardless and then draws nothing, so offering either would buy an empty
+   * 3D window rather than a degraded image.
    *
    * Which one applies is part of a transfer function's recipe rather than an
    * independent axis: the projection modes reduce each ray to a single scalar

@@ -192,8 +192,8 @@ intensity), 3 (average intensity) and 4 (additive) each flatten the ray to a
 single value instead, and 3 and 4 also ignore the colour transfer function and
 emit greyscale. VTK further defines 5 (isosurface) and 6 (slice), which MITK
 cannot render: they need iso-values or a slice plane set on the
-vtkVolumeProperty, which no mapper here supplies, and the ray caster rejects
-the mode outright when they are missing rather than falling back. The Volume
+vtkVolumeProperty, which no mapper here supplies, and without that input the
+ray caster draws nothing rather than falling back. The Volume
 Visualization view writes it as part of applying a transfer function rather
 than as a setting of its own, since the projection modes flatten each ray
 before the transfer function sees it and a curve authored for one of them is

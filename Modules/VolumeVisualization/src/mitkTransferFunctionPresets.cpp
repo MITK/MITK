@@ -316,8 +316,10 @@ bool mitk::TransferFunctionPresets::SaveTransferFunction(
   auto *scalarOpacityFunction = transferFunction->GetScalarOpacityFunction();
   auto *colorFunction = transferFunction->GetColorTransferFunction();
 
-  // Read points straight from the VTK functions: they are the source of truth
-  // the editor canvases mutate (the STL-copy getters can lag behind).
+  // The VTK functions are the source of truth the editor canvases mutate. Read
+  // from them rather than through TransferFunction's getters: those rebuild a
+  // cached member on every call and return a reference to it, which makes them
+  // non-const and the reference good only until the next call.
   auto opacityPoints = nlohmann::ordered_json::array();
   double opacityNode[4];
   for (int i = 0; i < scalarOpacityFunction->GetSize(); ++i)

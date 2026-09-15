@@ -29,7 +29,10 @@ namespace Ui
 
 /**
  * \brief Controls for the shading and lighting of one volume-rendered node:
- *        the shading switch, a lighting model, and the four Phong values.
+ *        a lighting model and the four Phong values.
+ *
+ * Shading is not among them. It is asserted on whenever the widget writes the
+ * material, because everything the widget does offer is inert while it is off.
  *
  * Reads and writes the node's properties through mitk::VolumeRenderingMaterial
  * and mitk::VolumeRenderingLightingModel, so the widget carries no knowledge of

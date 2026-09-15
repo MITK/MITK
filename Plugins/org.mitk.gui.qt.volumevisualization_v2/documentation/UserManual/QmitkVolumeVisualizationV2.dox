@@ -214,7 +214,7 @@ contacts and recesses darken. The rays are kept short deliberately: long ones
 let one structure cast a shadow onto another, which describes the lighting
 rather than the anatomy. This model costs more per still frame, switches its
 shadows off while you rotate, and also relights any surface sharing the 3D
-window.
+window for as long as this view is open.
 </ul>
 
 <b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>

@@ -88,8 +88,8 @@ private:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   /** Lights belong to the renderer, so this is 3D-render-window state rather
-   * than node state, and every path that leaves cinematic mode has to restore
-   * it.
+   * than node state, and every path that stops asking for a directional rig
+   * has to restore the default - the view's own destructor included.
    */
   void ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode);
 

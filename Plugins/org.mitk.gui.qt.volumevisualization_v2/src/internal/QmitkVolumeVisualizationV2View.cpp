@@ -143,6 +143,11 @@ QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View()
 
 QmitkVolumeVisualizationV2View::~QmitkVolumeVisualizationV2View()
 {
+  // Lights are the renderer's, and nothing tells a closing view to hand them
+  // back: the coordinator drops it from its render window listeners without a
+  // callback. A directional rig left behind keeps relighting every surface in
+  // that window, and no control anywhere selects the default one back.
+  this->ApplyLightingMode(mitk::VtkPropRenderer::LightingMode::Studio);
 }
 
 void QmitkVolumeVisualizationV2View::SetFocus()
@@ -260,8 +265,22 @@ void QmitkVolumeVisualizationV2View::ApplyLightingMode(mitk::VtkPropRenderer::Li
   if (renderWindow == nullptr)
     return;
 
-  if (auto *renderer = renderWindow->GetRenderer(); renderer != nullptr)
-    renderer->SetLightingMode(mode);
+  auto *renderer = renderWindow->GetRenderer();
+
+  if (renderer == nullptr)
+    return;
+
+  const auto previousMode = renderer->GetLightingMode();
+  renderer->SetLightingMode(mode);
+
+  // Swapping the lights marks the renderer modified but schedules nothing, and
+  // the rig changes on paths that alter nothing else - a selection arriving,
+  // a view reopening - so the repaint belongs here rather than at the call
+  // sites, which would otherwise each have to know they touched the renderer.
+  // Asked for only on a real change, so the refreshes that reapply the mode
+  // the renderer already carries stay free.
+  if (renderer->GetLightingMode() != previousMode)
+    this->RequestRenderWindowUpdate();
 }
 
 void QmitkVolumeVisualizationV2View::ApplyLightingModeFromNode()

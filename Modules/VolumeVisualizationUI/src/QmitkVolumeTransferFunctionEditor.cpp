@@ -848,7 +848,8 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
   this->ResetAdjustSliders();
 
   // The adjust controls and the canvas mean nothing without a function to act
-  // on, and the preset combo and authoring buttons need a node to write to.
+  // on, and neither does authoring, which starts from the applied curve.
+  // Picking a preset or loading one from file gets by with a node alone.
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
@@ -863,7 +864,7 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
 
   m_Controls->presetExpandButton->setEnabled(hasNode);
   m_Controls->presetListWidget->setEnabled(hasNode);
-  m_Controls->createTfButton->setEnabled(hasNode);
+  m_Controls->createTfButton->setEnabled(adjustable);
   m_Controls->loadTfButton->setEnabled(hasNode);
   m_Controls->adjustPresetExpandButton->setEnabled(adjustable);
   m_Controls->adjustPresetPanel->setEnabled(adjustable);
@@ -1035,22 +1036,25 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
 {
   auto node = m_DataNode.Lock();
 
-  if (node.IsNotNull() && m_AppliedTransferFunction.IsNotNull() && m_BaseColorFn != nullptr)
-  {
-    // Snapshot of the preset function so Cancel can restore it verbatim, which
-    // matters once the adjust sliders have moved.
-    m_PreEditTransferFunction = m_AppliedTransferFunction->Clone();
-    m_PreEditBlendMode = BlendModeOrComposite(node.GetPointer());
+  // Authoring is what hands the per-point editor the node it writes to, so
+  // entering the mode with nothing to hand over would leave it bound to the
+  // node it was given last while the page names this one.
+  if (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
+    return;
 
-    // A colour window bakes itself into 256 evenly spaced RGB points, which
-    // would swamp the per-point editor. Restoring the baseline first keeps the
-    // handles countable.
-    m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
+  // Snapshot of the preset function so Cancel can restore it verbatim, which
+  // matters once the adjust sliders have moved.
+  m_PreEditTransferFunction = m_AppliedTransferFunction->Clone();
+  m_PreEditBlendMode = BlendModeOrComposite(node.GetPointer());
 
-    m_Controls->tfControlPanelsWidget->SetDataNode(node);
+  // A colour window bakes itself into 256 evenly spaced RGB points, which
+  // would swamp the per-point editor. Restoring the baseline first keeps the
+  // handles countable.
+  m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
 
-    emit TransferFunctionChanged();
-  }
+  m_Controls->tfControlPanelsWidget->SetDataNode(node);
+
+  emit TransferFunctionChanged();
 
   // The control is only on screen in authoring mode, so this is where it has to
   // catch up with whatever the preset the node came from left behind.
@@ -1059,10 +1063,9 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
   // The page covers the image selector, so it has to name the image itself.
   // Escaped, because the label reads its text as markup and a node is named by
   // whoever loaded it.
-  m_Controls->customHintLabel->setText(node.IsNotNull()
-    ? QString("<small>Editing <b>%1</b>. The 3D window follows every change.</small>")
-        .arg(QString::fromStdString(node->GetName()).toHtmlEscaped())
-    : QString("<small>The 3D window follows every change.</small>"));
+  m_Controls->customHintLabel->setText(
+    QString("<small>Editing <b>%1</b>. The 3D window follows every change.</small>")
+      .arg(QString::fromStdString(node->GetName()).toHtmlEscaped()));
 
   this->SetCustomModeActive(true);
 }

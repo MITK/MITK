@@ -373,11 +373,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     [this](bool expanded)
     {
       SetSectionExpanded(m_Controls->presetExpandButton, m_Controls->presetPanel, expanded);
-
-      // A preview costs an upload of the volume and one render per preset, so
-      // a collapsed section does not pay for them.
-      if (expanded)
-        this->StartThumbnailGeneration();
+      this->StartThumbnailGeneration();
     });
 
   connect(m_Controls->adjustPresetExpandButton, &QToolButton::toggled, this,
@@ -424,6 +420,16 @@ bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *ev
     this->UpdatePresetGrid();
 
   return QWidget::eventFilter(watched, event);
+}
+
+void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
+{
+  QWidget::changeEvent(event);
+
+  // Nothing else announces that the previews became worth drawing: switching
+  // volume rendering on deliberately does not re-bind the node.
+  if (event->type() == QEvent::EnabledChange && this->isEnabled())
+    this->StartThumbnailGeneration();
 }
 
 void QmitkVolumeTransferFunctionEditor::UpdatePresetGrid()
@@ -510,11 +516,7 @@ void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
 
   this->AdoptTransferFunctionFromNode();
 
-  // Expanding the section is the other way in, and it is the only one when the
-  // section was already open: nothing else would ask for the new image's
-  // previews, leaving a grid on show that has been emptied and not refilled.
-  if (m_Controls->presetExpandButton->isChecked())
-    this->StartThumbnailGeneration();
+  this->StartThumbnailGeneration();
 }
 
 void QmitkVolumeTransferFunctionEditor::EnsureTransferFunction()
@@ -1253,6 +1255,15 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
 {
   if (run != m_ThumbnailRun)
     return;
+
+  // Asked here rather than where generation is requested: a selection change
+  // binds the node first and settles whether the editor applies to it second,
+  // so only a turn of the event loop later is the answer the current one.
+  if (!this->isEnabled() || !m_Controls->presetExpandButton->isChecked())
+  {
+    this->InvalidateThumbnails();
+    return;
+  }
 
   auto *presetList = m_Controls->presetListWidget;
 

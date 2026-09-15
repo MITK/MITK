@@ -94,6 +94,9 @@ protected:
   /** \brief Re-measure the preset grid when the room it has to fill changes. */
   bool eventFilter(QObject *watched, QEvent *event) override;
 
+  /** \brief Draw the preset previews once the editor is live for its node. */
+  void changeEvent(QEvent *event) override;
+
 signals:
   /**
    * \brief Emitted after the widget changed what the node renders as.
@@ -205,11 +208,12 @@ private:
   void UpdatePresetGrid();
 
   /**
-   * \brief Begin drawing a preview for every preset, unless they are current.
+   * \brief Ask for a preview of every preset, unless they are current.
    *
-   * Bound to the preset combo opening rather than to the selection changing,
-   * so that clicking through a list of images does not draw previews nobody
-   * asked to see.
+   * A request rather than an order: whether previews are worth drawing at all
+   * is settled one turn of the event loop later, in GenerateNextThumbnail.
+   * Binding a node and greying the editor out for it are two steps of the same
+   * selection change, and the second has not run yet when the first asks.
    */
   void StartThumbnailGeneration();
 

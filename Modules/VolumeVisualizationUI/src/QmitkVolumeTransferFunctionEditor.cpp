@@ -66,13 +66,25 @@ namespace
    * not infer it.
    *
    * The offsets are meaningful only alongside the preset name, and all five are
-   * absent on a function that came from a file or from outside this widget.
+   * absent on a curve no preset describes. TF_CUSTOM_PROPERTY is what then tells
+   * a curve chosen here apart from one that came from outside this widget.
    */
   constexpr const char *TF_PRESET_PROPERTY = "volumerendering.transferfunction.preset";
   constexpr const char *TF_OPACITY_SHIFT_PROPERTY = "volumerendering.transferfunction.opacityshift";
   constexpr const char *TF_OPACITY_HEIGHT_PROPERTY = "volumerendering.transferfunction.opacityheight";
   constexpr const char *TF_COLOR_SHIFT_PROPERTY = "volumerendering.transferfunction.colorshift";
   constexpr const char *TF_COLOR_WIDTH_PROPERTY = "volumerendering.transferfunction.colorwidth";
+
+  /** Records that the node's curve was authored here or loaded from a file.
+   *
+   * The keys above cannot say so: what makes such a curve custom is precisely
+   * that no recipe describes it. What is recorded is therefore only that the
+   * curve was chosen here at all, which is what AdoptTransferFunctionFromNode
+   * needs to take it back over rather than leave it to be replaced. Written true
+   * or removed, never false, so absence keeps the single meaning the keys above
+   * already give it.
+   */
+  constexpr const char *TF_CUSTOM_PROPERTY = "volumerendering.transferfunction.custom";
 
   /** \brief A preview's shape.
    *
@@ -181,6 +193,22 @@ namespace
     node->GetBoolProperty("volumerendering", volumeRenderingOn);
 
     return volumeRenderingOn;
+  }
+
+  /** \brief Whether the node's curve was authored here or loaded from a file.
+   *
+   * The other half of the evidence that this node was configured here, for the
+   * curves the recorded preset name cannot cover. See TF_CUSTOM_PROPERTY.
+   */
+  bool IsCustomTransferFunction(const mitk::DataNode *node)
+  {
+    if (node == nullptr)
+      return false;
+
+    bool customTransferFunction = false;
+    node->GetBoolProperty(TF_CUSTOM_PROPERTY, customTransferFunction);
+
+    return customTransferFunction;
   }
 
   /** \brief The blend mode a node renders in, for callers that need a value
@@ -604,14 +632,16 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
   {
     node->GetStringProperty(TF_PRESET_PROPERTY, presetName);
 
-    // A recorded preset is the most direct evidence that this node was set up
-    // here, and it survives the rendering flag being switched off. The flag
-    // covers what predates the recipe: nodes configured before it existed, or by
-    // the v1 view. What cannot serve as evidence is the TransferFunction
+    // A recorded preset and the custom marker are the direct evidence that this
+    // node was set up here, and both survive the rendering flag being switched
+    // off. Between them they cover every curve this widget applies. The flag
+    // covers what predates them: nodes configured before the recipe existed, or
+    // by the v1 view. What cannot serve as evidence is the TransferFunction
     // property itself - see IsVolumeRenderingOn. Adopting the mapper's default
     // would show a curve nobody chose and would also suppress
     // EnsureTransferFunction, which fires only while no function is held.
-    if (!presetName.empty() || IsVolumeRenderingOn(node.GetPointer()))
+    if (!presetName.empty() || IsCustomTransferFunction(node.GetPointer()) ||
+        IsVolumeRenderingOn(node.GetPointer()))
     {
       if (const auto *tfProperty =
             dynamic_cast<const mitk::TransferFunctionProperty *>(node->GetProperty("TransferFunction")))
@@ -718,7 +748,7 @@ void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataN
     return;
 
   // Removing the keys rather than blanking them keeps absence as the single
-  // meaning of "no recipe", which is what the restore path reads.
+  // meaning each of them carries, which is what the restore path reads.
   auto *properties = node->GetPropertyList();
 
   properties->DeleteProperty(TF_PRESET_PROPERTY);
@@ -726,6 +756,17 @@ void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataN
   properties->DeleteProperty(TF_OPACITY_HEIGHT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_SHIFT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_WIDTH_PROPERTY);
+  properties->DeleteProperty(TF_CUSTOM_PROPERTY);
+}
+
+void QmitkVolumeTransferFunctionEditor::RecordCustomTransferFunction(mitk::DataNode *node)
+{
+  if (node == nullptr)
+    return;
+
+  this->ForgetTransferFunctionRecipe(node);
+
+  node->SetBoolProperty(TF_CUSTOM_PROPERTY, true);
 }
 
 void QmitkVolumeTransferFunctionEditor::ClearPresetSelection()
@@ -1065,7 +1106,7 @@ void QmitkVolumeTransferFunctionEditor::OnImportCustom()
 
   // A loaded custom function came from no preset, so there is no baseline any
   // recorded offsets could be measured from either.
-  this->ForgetTransferFunctionRecipe(node);
+  this->RecordCustomTransferFunction(node);
   this->ClearPresetSelection();
 
   this->ApplyCurrentTransferFunction();
@@ -1114,14 +1155,11 @@ void QmitkVolumeTransferFunctionEditor::OnDoneCustom()
   // Authored point by point, so the preset name and the four offsets no longer
   // describe the curve, and replaying them on the next selection would rebuild
   // the preset and discard it. Same reasoning as a function loaded from a file.
-  this->ForgetTransferFunctionRecipe(node);
+  this->RecordCustomTransferFunction(node);
   this->ClearPresetSelection();
 
-  // With no preset recorded, the rendering flag is the only remaining evidence
-  // that this node was configured here, and AdoptTransferFunctionFromNode reads
-  // it to decide whether to take the curve back over. Without it the curve is
-  // dropped on the next selection and EnsureTransferFunction replaces it with
-  // the first preset.
+  // Enable rendering so the authored curve is visible immediately. The host
+  // learns of it through TransferFunctionChanged.
   node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
 
   this->SetCustomModeActive(false);

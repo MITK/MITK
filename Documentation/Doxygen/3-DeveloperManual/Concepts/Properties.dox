@@ -208,9 +208,10 @@ and the renderer keeps its default rig.
 Volume Visualization view built this node's TransferFunction from. Recorded
 because the view's adjust sliders resample the colour function, after which the
 curve matches no preset and the choice can no longer be recovered from it; the
-mapper does not read it. Absent means the function was authored point by point
-in the view, came from a file, or came from outside the view, and no preset is
-named in the view.
+mapper does not read it. Absent means no preset is named in the view: for a
+curve authored point by point there or loaded from a file,
+volumerendering.transferfunction.custom says so; for one that came from
+outside the view, nothing does.
   <li> volumerendering.transferfunction.opacityshift,
 volumerendering.transferfunction.opacityheight,
 volumerendering.transferfunction.colorshift,
@@ -223,6 +224,13 @@ node is selected again, which is what lets the sliders show their previous
 positions instead of resetting. Where the recipe and the stored TransferFunction
 disagree - the curve having been edited elsewhere - the recipe wins. The mapper
 does not read any of them.
+  <li> volumerendering.transferfunction.custom - Set where the Volume
+Visualization view's TransferFunction was authored point by point there or
+loaded from a file, and removed again when a preset is chosen instead. No
+recipe describes such a curve - that is what makes it custom - so what is
+recorded is only that the curve was chosen in the view at all, which is what
+the view reads to take it back over on the next selection rather than let it
+be replaced. Written true or removed, never false; the mapper does not read it.
   <li> volumerendering.normalsFromOpacity - Derive the shading gradient from the
 opacity rather than the raw scalars, so lighting follows the transfer function
 instead of the data's noise. The scattering blend reads the same gradient's

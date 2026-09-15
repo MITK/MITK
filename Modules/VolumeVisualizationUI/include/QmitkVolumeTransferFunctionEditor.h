@@ -48,7 +48,9 @@ namespace Ui
  *
  * What the widget records on the node is a recipe rather than only a result -
  * the preset it started from plus the four window offsets - so that returning
- * to a node restores the controls as they were left. See the
+ * to a node restores the controls as they were left. Where no recipe can
+ * describe the curve, because it was authored here or loaded from a file, what
+ * is recorded instead is that the curve was chosen here at all. See the
  * volumerendering.transferfunction.* entries in the property documentation.
  *
  * \sa mitk::TransferFunctionPresets, QmitkCombinedTransferFunctionCanvas
@@ -156,10 +158,18 @@ private:
   /** \brief Record the adjust sliders' current offsets on the node. */
   void RecordAdjustOffsets();
 
-  /** \brief Drop the recorded preset and offsets, for a function the widget
-   *         cannot reproduce.
+  /** \brief Drop everything this widget records about how the node's curve was
+   *         arrived at, for a function it cannot reproduce.
    */
   void ForgetTransferFunctionRecipe(mitk::DataNode *node);
+
+  /** \brief Record that the node's curve was authored here or loaded from a
+   *         file.
+   *
+   * Dropping the recipe and recording the fact are one act rather than two:
+   * what makes such a curve custom is precisely that no recipe describes it.
+   */
+  void RecordCustomTransferFunction(mitk::DataNode *node);
 
   /** \brief Deselect any preset, leaving the section header to say why.
    *

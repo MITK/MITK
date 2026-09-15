@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
+#include <QPointer>
 #include <QScopeGuard>
 #include <QShortcut>
 #include <QTimer>
@@ -1059,7 +1060,13 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
   auto segmentationPtr = m_AutoCreatedLabelSegmentation.Lock();
   const auto value = *m_AutoCreatedLabelValue;
   const auto previousActive = m_PreviousActiveLabelValue;
-  auto* inspector = this->GetMultiLabelInspector();
+
+  // The inspector belongs to the host view, not to this GUI, and the deferred
+  // call below outlives both: closing the Segmentation View deactivates the tool
+  // (which gets us here) and then destroys the view's widget tree, so a raw
+  // pointer would dangle by the time the lambda runs.
+  const QPointer<QmitkMultiLabelInspector> inspector = this->GetMultiLabelInspector();
+
   this->InvalidateAutoCreatedLabel();
 
   if (segmentationPtr.IsNull())
@@ -1117,7 +1124,7 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
       {
         segmentation->SetActiveLabel(fallback);
 
-        if (inspector != nullptr)
+        if (!inspector.isNull())
           inspector->SetSelectedLabel(fallback);
       }
     }

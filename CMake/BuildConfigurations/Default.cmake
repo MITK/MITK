@@ -15,6 +15,7 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.properties
   org.mitk.gui.qt.segmentation
   org.mitk.gui.qt.volumevisualization
+  org.mitk.gui.qt.volumevisualization_v2
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.pointsetinteraction
   org.mitk.gui.qt.remeshing

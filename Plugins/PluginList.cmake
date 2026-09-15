@@ -39,7 +39,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.renderwindowmanager:OFF
   org.mitk.gui.qt.volumevisualization:OFF
-  org.mitk.gui.qt.volumevisualization_v2:ON
+  org.mitk.gui.qt.volumevisualization_v2:OFF
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.overlaymanager:OFF
   org.mitk.matchpoint.core.helper:OFF

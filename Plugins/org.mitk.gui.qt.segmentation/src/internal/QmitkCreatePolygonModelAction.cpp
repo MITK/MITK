@@ -21,12 +21,12 @@ found in the LICENSE file.
 #include <mitkSurface.h>
 
 #include <vtkImageData.h>
-#include <vtkImageThreshold.h>
+#include <vtkImageBinaryThreshold.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 
 #include <QApplication>
 
@@ -85,13 +85,13 @@ namespace
     auto transform = vtkSmartPointer<vtkTransform>::New();
     transform->SetMatrix(MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(geometry));
 
-    auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+    auto transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
     transformFilter->SetInputData(poly);
     transformFilter->SetTransform(transform);
     transformFilter->Update();
 
     auto result = vtkSmartPointer<vtkPolyData>::New();
-    result->ShallowCopy(transformFilter->GetOutput());
+    result->ShallowCopy(transformFilter->GetPolyDataOutput());
     return result;
   }
 
@@ -101,10 +101,13 @@ namespace
     // (commonly 0/255 binary masks) extract correctly when we ask vtkSurfaceNets3D for
     // label 1. Mirrors the threshold(0.5) behavior of the previous mitkShowSegmentationAsSurface
     // path.
-    auto thresholdFilter = vtkSmartPointer<vtkImageThreshold>::New();
+    auto thresholdFilter = vtkSmartPointer<vtkImageBinaryThreshold>::New();
     thresholdFilter->SetInputData(mask);
-    thresholdFilter->ThresholdByUpper(0.5);
+    thresholdFilter->SetThresholdFunction(vtkImageBinaryThreshold::THRESHOLD_UPPER);
+    thresholdFilter->SetLowerThreshold(0.5);
+    thresholdFilter->ReplaceInOn();
     thresholdFilter->SetInValue(1);
+    thresholdFilter->ReplaceOutOn();
     thresholdFilter->SetOutValue(0);
     thresholdFilter->SetOutputScalarTypeToUnsignedChar();
     thresholdFilter->Update();

@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
 #include <vtkShaderProperty.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 #include <vtkTubeFilter.h>
 #include <vtkUniforms.h>
 
@@ -53,8 +53,8 @@ namespace mitk
     m_Edges->NonManifoldEdgesOff();
     m_Edges->ManifoldEdgesOff();
 
-    m_EdgeTransformer = vtkTransformPolyDataFilter::New();
-    m_NormalsTransformer = vtkTransformPolyDataFilter::New();
+    m_EdgeTransformer = vtkTransformFilter::New();
+    m_NormalsTransformer = vtkTransformFilter::New();
     m_EdgeActor = vtkActor::New();
     m_BackgroundMapper = vtkPolyDataMapper::New();
     m_BackgroundActor = vtkActor::New();

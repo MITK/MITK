@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 
 #include <itkTriangleMeshToBinaryImageFilter.h>
 
@@ -114,7 +114,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   if (!polydata)
     mitkThrow() << "Polydata is null.";
 
-  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  vtkSmartPointer<vtkTransformFilter> transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
   transformFilter->SetInputData(polydata);
   //  transformFilter->ReleaseDataFlagOn();
 
@@ -130,7 +130,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   transformFilter->SetTransform(transform);
   transformFilter->Update();
 
-  polydata = transformFilter->GetOutput();
+  polydata = transformFilter->GetPolyDataOutput();
 
   if (!polydata || !polydata->GetNumberOfPoints())
     mitkThrow() << "Polydata retrieved from transformation is null or has no points.";

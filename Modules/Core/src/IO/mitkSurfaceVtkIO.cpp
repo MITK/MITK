@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <vtkLinearTransform.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -35,7 +35,7 @@ namespace mitk
   {
     const auto *input = dynamic_cast<const Surface *>(this->GetInput());
 
-    vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+    vtkSmartPointer<vtkTransformFilter> transformPolyData = vtkSmartPointer<vtkTransformFilter>::New();
 
     // surfaces do not have to exist in all timesteps; therefor, only write valid surfaces
     if (input->GetVtkPolyData(t) == nullptr)
@@ -78,7 +78,7 @@ namespace mitk
     transformPolyData->SetTransform(geometry->GetVtkTransform());
     transformPolyData->UpdateWholeExtent();
 
-    vtkSmartPointer<vtkPolyData> polyData = transformPolyData->GetOutput();
+    vtkSmartPointer<vtkPolyData> polyData = transformPolyData->GetPolyDataOutput();
     return polyData;
   }
 

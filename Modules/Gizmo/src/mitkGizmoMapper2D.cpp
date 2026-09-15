@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include <vtkMath.h>
 #include <vtkPointData.h>
 #include <vtkSphereSource.h>
-#include <vtkVectorOperators.h>
 
 mitk::GizmoMapper2D::LocalStorage::LocalStorage()
 {

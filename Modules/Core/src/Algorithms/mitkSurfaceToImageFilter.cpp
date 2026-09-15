@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <vtkPolyDataToImageStencil.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
   : m_MakeOutputBinary(false), m_UShortBinaryPixelType(false), m_BackgroundValue(-10000), m_Tolerance(0.0)
@@ -144,7 +144,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   vtkPolyData *polydata = ((mitk::Surface *)GetInput())->GetVtkPolyData(surfaceTimeStep);
   if (polydata)
   {
-    vtkSmartPointer<vtkTransformPolyDataFilter> move = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+    vtkSmartPointer<vtkTransformFilter> move = vtkSmartPointer<vtkTransformFilter>::New();
     move->SetInputData(polydata);
     move->ReleaseDataFlagOn();
 

@@ -35,7 +35,7 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkPolyDataPlaneCutter.h>
 #include <vtkReverseSense.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
@@ -228,7 +228,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   // Transform the data according to its geometry.
   // See UpdateVtkTransform documentation for details.
   vtkSmartPointer<vtkLinearTransform> vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
-  vtkSmartPointer<vtkTransformPolyDataFilter> filter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  vtkSmartPointer<vtkTransformFilter> filter = vtkSmartPointer<vtkTransformFilter>::New();
   filter->SetTransform(vtktransform);
   filter->SetInputData(inputPolyData);
   localStorage->m_Cutter->SetInputConnection(filter->GetOutputPort());

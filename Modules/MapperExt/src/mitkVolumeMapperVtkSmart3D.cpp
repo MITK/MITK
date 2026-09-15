@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkVolumeRenderingMaterial.h>
 #include <vtkObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
@@ -129,11 +130,17 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   node->AddProperty(
     "volumerendering.blendmode", mitk::IntProperty::New(vtkVolumeMapper::COMPOSITE_BLEND), renderer, overwrite);
 
-  node->AddProperty("volumerendering.ambient", mitk::FloatProperty::New(0.1f), renderer, overwrite);
-  node->AddProperty("volumerendering.diffuse", mitk::FloatProperty::New(0.50f), renderer, overwrite);
-  node->AddProperty("volumerendering.specular", mitk::FloatProperty::New(0.40f), renderer, overwrite);
-  node->AddProperty("volumerendering.specular.power", mitk::FloatProperty::New(16.0f), renderer, overwrite);
-  node->AddProperty("volumerendering.shade", mitk::BoolProperty::New(true), renderer, overwrite);
+  // One definition of these, shared with the views that read them back for a
+  // node the early return above skipped.
+  using Material = mitk::VolumeRenderingMaterial;
+  const Material material;
+
+  node->AddProperty(Material::AMBIENT_PROPERTY, mitk::FloatProperty::New(material.ambient), renderer, overwrite);
+  node->AddProperty(Material::DIFFUSE_PROPERTY, mitk::FloatProperty::New(material.diffuse), renderer, overwrite);
+  node->AddProperty(Material::SPECULAR_PROPERTY, mitk::FloatProperty::New(material.specular), renderer, overwrite);
+  node->AddProperty(
+    Material::SPECULAR_POWER_PROPERTY, mitk::FloatProperty::New(material.specularPower), renderer, overwrite);
+  node->AddProperty(Material::SHADE_PROPERTY, mitk::BoolProperty::New(material.shade), renderer, overwrite);
   node->AddProperty("volumerendering.scattering.blend", mitk::FloatProperty::New(0.0f), renderer, overwrite);
   // Reach bounds the secondary rays and is the whole cost of scattering; 0.0
   // collapses each to a single step. Default to the affordable end so enabling
@@ -260,15 +267,17 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   // shading parameter
   float value = 0;
   bool shade = true;
-  if (this->GetDataNode()->GetFloatProperty("volumerendering.ambient", value, renderer))
+  using Material = mitk::VolumeRenderingMaterial;
+
+  if (this->GetDataNode()->GetFloatProperty(Material::AMBIENT_PROPERTY, value, renderer))
     localStorage->m_VolumeProperty->SetAmbient(value);
-  if (this->GetDataNode()->GetFloatProperty("volumerendering.diffuse", value, renderer))
+  if (this->GetDataNode()->GetFloatProperty(Material::DIFFUSE_PROPERTY, value, renderer))
     localStorage->m_VolumeProperty->SetDiffuse(value);
-  if (this->GetDataNode()->GetFloatProperty("volumerendering.specular", value, renderer))
+  if (this->GetDataNode()->GetFloatProperty(Material::SPECULAR_PROPERTY, value, renderer))
     localStorage->m_VolumeProperty->SetSpecular(value);
-  if (this->GetDataNode()->GetFloatProperty("volumerendering.specular.power", value, renderer))
+  if (this->GetDataNode()->GetFloatProperty(Material::SPECULAR_POWER_PROPERTY, value, renderer))
     localStorage->m_VolumeProperty->SetSpecularPower(value);
-  if(this->GetDataNode()->GetBoolProperty("volumerendering.shade", shade, renderer))
+  if (this->GetDataNode()->GetBoolProperty(Material::SHADE_PROPERTY, shade, renderer))
     localStorage->m_VolumeProperty->SetShade(shade ? 1 : 0);
 
   // Scattering traces shadow rays, far too slow to rotate with, so it has to

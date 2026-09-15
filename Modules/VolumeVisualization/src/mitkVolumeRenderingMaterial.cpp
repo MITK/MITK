@@ -15,15 +15,6 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkExceptionMacro.h>
 
-namespace
-{
-  constexpr const char *SHADE_PROPERTY = "volumerendering.shade";
-  constexpr const char *AMBIENT_PROPERTY = "volumerendering.ambient";
-  constexpr const char *DIFFUSE_PROPERTY = "volumerendering.diffuse";
-  constexpr const char *SPECULAR_PROPERTY = "volumerendering.specular";
-  constexpr const char *SPECULAR_POWER_PROPERTY = "volumerendering.specular.power";
-}
-
 mitk::VolumeRenderingMaterial mitk::VolumeRenderingMaterial::FromNode(const DataNode *node)
 {
   VolumeRenderingMaterial material;

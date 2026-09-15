@@ -23,10 +23,18 @@ namespace mitk
    * \brief The shading and Phong material properties of a volume-rendering
    *        node, as one value.
    *
-   * The defaults mirror what mitk::VolumeMapperVtkSmart3D registers in
-   * SetDefaultProperties. They are repeated here because that only runs via
-   * IOExt's mapper provider, and only for a node that already holds an
-   * initialized image, so a node can legitimately carry none of these.
+   * The field initialisers are the one definition of MITK's volume material
+   * defaults. mitk::VolumeMapperVtkSmart3D registers them from here, and FromNode
+   * falls back to them for a node carrying none of the properties - a lasting
+   * state, since SetDefaultProperties runs only from DataNode::SetData, only via
+   * IOExt's mapper provider, and only for an already initialized image.
+   *
+   * They deliberately match no mitk::VolumeRenderingLightingModel. A model's
+   * values are half of a pair whose other half is a light rig only a view can
+   * install; these describe a node nobody configured, which renders under the
+   * renderer's default five-light kit. Ambient is the one that cannot cross
+   * between the two at all - the shader computes it differently depending on how
+   * many lights are switched on.
    */
   struct MITKVOLUMEVISUALIZATION_EXPORT VolumeRenderingMaterial
   {
@@ -59,6 +67,19 @@ namespace mitk
      * \throws mitk::Exception if \p node is nullptr.
      */
     void ApplyTo(DataNode *node) const;
+
+    /**
+     * \brief Keys under which the five properties are stored.
+     *
+     * Public because mitk::VolumeMapperVtkSmart3D both registers the defaults
+     * under them and reads them back each frame. Two spellings of one name fail
+     * silently, leaving a slider that moves a value nothing renders.
+     */
+    static constexpr const char *SHADE_PROPERTY = "volumerendering.shade";
+    static constexpr const char *AMBIENT_PROPERTY = "volumerendering.ambient";
+    static constexpr const char *DIFFUSE_PROPERTY = "volumerendering.diffuse";
+    static constexpr const char *SPECULAR_PROPERTY = "volumerendering.specular";
+    static constexpr const char *SPECULAR_POWER_PROPERTY = "volumerendering.specular.power";
   };
 }
 

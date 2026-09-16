@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <itkHistogram.h>
 
 #include <QPointF>
+#include <QRectF>
 #include <QWidget>
 
 #include <map>
@@ -86,7 +87,7 @@ public:
   /**
    * \brief Resets all controls to their default settings.
    *
-   * Enables the default number of bins checkbox and sets bins to 100.
+   * Enables the default number of bins checkbox and restores the default bin count.
    */
   void ResetDefault();
 
@@ -121,19 +122,17 @@ private:
   /** \brief Removes the current bar highlight (does not replot). */
   void ClearHighlight();
 
-//slots
-	/** \brief  Saves the histogram to the clipboard. */
-	void OnClipboardButtonClicked();
-	/** \brief Enables / Disables SpinBox to change the number of bins. */
-	void OnDefaultNBinsCheckBoxChanged();
-	/** \brief Emits the signal RequestHistogramUpdate(unsigned int nBins) with the updated value. */
-	void OnNBinsSpinBoxValueChanged();
-	/** \brief Enables / Disables SpinBoxes to set custom min and max values */
-	void OnViewMinMaxCheckBoxChanged();
-	/**\brief */
-	void OnMaxValueSpinBoxValueChanged();
-	/** \brief */
-	void OnMinValueSpinBoxValueChanged();
+  //slots
+  /** \brief Saves the histogram to the clipboard. */
+  void OnClipboardButtonClicked();
+  /** \brief Enables / Disables SpinBox to change the number of bins. */
+  void OnDefaultNBinsCheckBoxChanged();
+  /** \brief Emits the signal RequestHistogramUpdate(unsigned int nBins) with the updated value. */
+  void OnNBinsSpinBoxValueChanged();
+  /** \brief Zooms the plot to the x range given by the min and max spin boxes. */
+  void OnZoomRangeEdited();
+  /** \brief Mirrors the current zoom rectangle in the min and max spin boxes. */
+  void OnZoomed(const QRectF& rect);
 
 private:
   std::unique_ptr<Ui::QmitkHistogramVisualizationControls> m_Controls;

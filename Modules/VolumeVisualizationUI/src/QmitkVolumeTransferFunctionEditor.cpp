@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkLevelWindow.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
 
@@ -1080,7 +1082,12 @@ void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
   // handles countable.
   m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
 
-  m_Controls->tfControlPanelsWidget->SetDataNode(node);
+  // The per-point editor draws one time step's histogram and defaults to the
+  // first, which on a 4D image is not the one the navigator is showing.
+  const auto timeStep =
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
+
+  m_Controls->tfControlPanelsWidget->SetDataNode(node, timeStep);
 
   emit TransferFunctionChanged();
 

@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitkRemeshing.h>
 #include <mitkExceptionMacro.h>
 
-#include <vtkCellArray.h>
 #include <vtkIdList.h>
 #include <vtkIntArray.h>
 #include <vtkIsotropicDiscreteRemeshing.h>
@@ -81,12 +80,6 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
 
   auto surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
   surfacePolyData->DeepCopy(const_cast<Surface *>(surface)->GetVtkPolyData(t));
-
-  // ACVD hands out raw vtkIdType pointers into the polygon connectivity, so it requires
-  // 64-bit array-of-structs cell storage. VTK 9.7 filters such as vtkSurfaceNets3D emit
-  // fixed-size 32-bit storage instead, which vtkSurface::CreateFromPolyData() dereferences
-  // as null.
-  surfacePolyData->GetPolys()->ConvertTo64BitStorage();
 
   auto mesh = vtkSmartPointer<vtkSurface>::New();
 

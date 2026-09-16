@@ -40,7 +40,8 @@ private:
     polyData->DeepCopy(source->GetOutput());
 
     // The cell layout vtkSurfaceNets3D and other VTK 9.7 filters emit for
-    // triangle meshes; ACVD's raw pointer access cannot handle it.
+    // triangle meshes. ACVD reads polygons through raw 64-bit pointers and
+    // crashed on it before converting the storage in CreateFromPolyData().
     if (fixedSize32BitCells)
       CPPUNIT_ASSERT(polyData->GetPolys()->ConvertToFixedSize32BitStorage());
 

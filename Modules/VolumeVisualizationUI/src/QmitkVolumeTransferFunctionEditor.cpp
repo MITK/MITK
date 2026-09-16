@@ -936,15 +936,35 @@ void QmitkVolumeTransferFunctionEditor::ResetAdjustSliders()
   m_Controls->opacityHeightSlider->setValue(0.0);
 
   // Shift moves the window center (level); 0 keeps the preset's own center.
-  // Sized to the preset's color span, so shift reaches half the preset span either side.
-  m_Controls->colorShiftSlider->setMinimum(-0.5 * colorSpan);
-  m_Controls->colorShiftSlider->setMaximum(0.5 * colorSpan);
+  //
+  // The window is colorSpan wide and slides along the image's own axis, so the
+  // reach has to cover both before it can be carried clear of either end. Sized
+  // to the preset alone, a preset authored over a narrower range than the image
+  // - any MR- preset on an uncalibrated volume - stays stuck near where its
+  // author put it however far the data extends.
+  const double colorShiftReach = dataWidth + colorSpan;
+
+  m_Controls->colorShiftSlider->setMinimum(-0.5 * colorShiftReach);
+  m_Controls->colorShiftSlider->setMaximum(0.5 * colorShiftReach);
+  m_Controls->colorShiftSlider->setSingleStep(colorShiftReach / 1000.0);
   m_Controls->colorShiftSlider->setValue(0.0);
 
   // Width is the window size in intensity units; default to the preset's color
   // span so a fresh preset maps 1:1, and allow narrowing/widening around it.
+  //
+  // Measured against the image as well as the preset, for the same reason the
+  // shift is: a window that cannot be opened past the preset's own span can
+  // never cover a volume wider than it. The window grows about the preset's
+  // center rather than the image's - the CT- presets name absolute Hounsfield
+  // values and have to keep them - so half of any widening falls outside the
+  // data, and the shift is what carries it back.
+  const double colorWidthReach = 2.0 * std::max(colorSpan, dataWidth);
+
+  // Stepped, because ctkDoubleSlider defaults to a step of 1.0, which leaves a
+  // preset whose span is small - DTI-FA-Brain's is 0.995 - two usable positions.
   m_Controls->colorWidthSlider->setMinimum(1.0);
-  m_Controls->colorWidthSlider->setMaximum(2.0 * colorSpan);
+  m_Controls->colorWidthSlider->setMaximum(colorWidthReach);
+  m_Controls->colorWidthSlider->setSingleStep(colorWidthReach / 1000.0);
   m_Controls->colorWidthSlider->setValue(colorSpan);
 }
 

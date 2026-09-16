@@ -32,6 +32,9 @@ class mitkCrashDumpDatabaseTestSuite : public mitk::TestFixture
   MITK_TEST(UnacknowledgedIsEverythingWithoutWatermark);
   MITK_TEST(WatermarkHidesOlderDumps);
   MITK_TEST(UnreadableWatermarkCountsAsAbsent);
+  MITK_TEST(RemoveCrashReportResidueRemovesMetaAndAttachments);
+  MITK_TEST(RemoveCrashReportResidueNeedsAnAbsoluteDatabase);
+  MITK_TEST(RemoveCrashReportResidueIgnoresDotNamedReports);
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_DatabaseDirectory;
@@ -61,6 +64,20 @@ public:
       std::filesystem::file_time_type::clock::now() - std::chrono::seconds(ageInSeconds));
 
     return path;
+  }
+
+  /** The bookkeeping Crashpad keeps for one report, next to its dump. */
+  std::filesystem::path CreateReportResidue(const std::filesystem::path& dumpPath)
+  {
+    const auto reportId = dumpPath.stem();
+
+    std::ofstream(std::filesystem::path(dumpPath).replace_extension(".meta")) << "report metadata";
+
+    const auto attachments = m_DatabaseDirectory / "attachments" / reportId;
+    std::filesystem::create_directories(attachments);
+    std::ofstream(attachments / "note.txt") << "attachment";
+
+    return attachments;
   }
 
   void ScanOrdersNewestFirst()
@@ -168,6 +185,53 @@ public:
 
     CPPUNIT_ASSERT(!mitk::ReadLastAcknowledgedTime(m_DatabaseDirectory).has_value());
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::ScanUnacknowledgedCrashDumps(m_DatabaseDirectory).size());
+  }
+
+  void RemoveCrashReportResidueRemovesMetaAndAttachments()
+  {
+    const auto dump = this->CreateDump("pending/report.dmp", 10);
+    const auto attachments = this->CreateReportResidue(dump);
+    const auto metadata = std::filesystem::path(dump).replace_extension(".meta");
+
+    mitk::RemoveCrashReportResidue(m_DatabaseDirectory, dump);
+
+    CPPUNIT_ASSERT(!std::filesystem::exists(metadata));
+    CPPUNIT_ASSERT(!std::filesystem::exists(attachments));
+    CPPUNIT_ASSERT_MESSAGE("only the bookkeeping goes; the dump is the caller's to place",
+      std::filesystem::exists(dump));
+  }
+
+  /** A caller without facility state passes an empty database directory, and
+   *  "attachments/<uuid>" resolved against the working directory would be a
+   *  recursive delete somewhere unintended. */
+  void RemoveCrashReportResidueNeedsAnAbsoluteDatabase()
+  {
+    const auto dump = this->CreateDump("pending/report.dmp", 10);
+    const auto attachments = this->CreateReportResidue(dump);
+    const auto metadata = std::filesystem::path(dump).replace_extension(".meta");
+
+    mitk::RemoveCrashReportResidue({}, dump);
+    mitk::RemoveCrashReportResidue("relative/database", dump);
+
+    CPPUNIT_ASSERT(std::filesystem::exists(metadata));
+    CPPUNIT_ASSERT(std::filesystem::exists(attachments));
+  }
+
+  /** "..dmp" and "...dmp" are dumps as far as the scan is concerned, and their
+   *  stems are "." and "..", which would send the recursive delete to the
+   *  attachments root and to the database itself. */
+  void RemoveCrashReportResidueIgnoresDotNamedReports()
+  {
+    const auto dump = this->CreateDump("pending/report.dmp", 10);
+    const auto attachments = this->CreateReportResidue(dump);
+
+    mitk::RemoveCrashReportResidue(m_DatabaseDirectory, m_DatabaseDirectory / "pending" / "..dmp");
+    mitk::RemoveCrashReportResidue(m_DatabaseDirectory, m_DatabaseDirectory / "pending" / "...dmp");
+
+    CPPUNIT_ASSERT_MESSAGE("a dot-named report must not reach the recursive delete",
+      std::filesystem::exists(attachments));
+    CPPUNIT_ASSERT(std::filesystem::exists(m_DatabaseDirectory / "attachments"));
+    CPPUNIT_ASSERT(std::filesystem::exists(dump));
   }
 };
 

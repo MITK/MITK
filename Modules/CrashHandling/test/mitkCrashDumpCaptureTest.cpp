@@ -64,6 +64,42 @@ namespace
     return result;
   }
 
+  /** Crashpad's bookkeeping for the report that produced \p dumpPath: the
+   *  sibling metadata file and the report's attachment directory. Both are
+   *  keyed by the report UUID, which is the dump's stem as Crashpad wrote it -
+   *  so this only answers for a dump still under the name Crashpad gave it.
+   *  For one MITK has filed, use AnyReportResidueExists(). */
+  bool ReportResidueExists(const std::filesystem::path& databaseDirectory,
+    const std::filesystem::path& dumpPath)
+  {
+    const auto uuid = dumpPath.stem();
+
+    return std::filesystem::exists(std::filesystem::path(dumpPath).replace_extension(".meta"))
+        || std::filesystem::exists(databaseDirectory / "attachments" / uuid);
+  }
+
+  /** Whether any Crashpad report record is left anywhere in the database,
+   *  without assuming a UUID: filing a snapshot renames it, so its own path no
+   *  longer names the report it came from. */
+  bool AnyReportResidueExists(const std::filesystem::path& databaseDirectory)
+  {
+    const auto attachments = databaseDirectory / "attachments";
+
+    if (std::filesystem::exists(attachments) && !std::filesystem::is_empty(attachments))
+      return true;
+
+    std::error_code error;
+    for (const auto& entry :
+      std::filesystem::recursive_directory_iterator(databaseDirectory,
+        std::filesystem::directory_options::skip_permission_denied, error))
+    {
+      if (entry.is_regular_file(error) && entry.path().extension() == ".meta")
+        return true;
+    }
+
+    return false;
+  }
+
   /** The out-of-process handler finishes writing after the crashed helper
    *  is already gone, so give it time before reading the database. */
   std::vector<mitk::CrashDumpInfo> WaitForDumps(const std::filesystem::path& databaseDirectory,
@@ -95,6 +131,8 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   // which its macOS client does not provide.
 #ifndef __APPLE__
   MITK_TEST(OnDemandSnapshotIsCapturedButNotSurfaced);
+  MITK_TEST(RepeatedSnapshotsAreAllCaptured);
+  MITK_TEST(DeleteDumpLeavesNoReportResidue);
   MITK_TEST(HardKilledFreezeLeavesProvisionalDump);
   MITK_TEST(RecoveredFreezeLeavesNoDump);
 #endif
@@ -261,10 +299,27 @@ public:
       result.Exited && result.ExitValue == EXIT_SUCCESS);
 
     // The snapshot was written...
-    CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::ScanCrashDumps(m_DatabaseDirectory).size());
+    const auto dumps = mitk::ScanCrashDumps(m_DatabaseDirectory);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), dumps.size());
     // ...into the on-demand subdirectory, so it is excluded from the
     // surfacable set and never triggers the next-start dialog.
     CPPUNIT_ASSERT(mitk::ScanCrashDumps(m_DatabaseDirectory, { "mitk-snapshots" }).empty());
+
+    // Filing the snapshot must free the report Crashpad wrote it as; an
+    // orphaned record keeps the session's report ID claimed and blocks every
+    // later capture. Filing renames the dump, so the report can only be found
+    // by sweeping the database, not from the filed name.
+    CPPUNIT_ASSERT_MESSAGE("a filed snapshot must leave no Crashpad report behind",
+      !AnyReportResidueExists(m_DatabaseDirectory));
+
+    // Only a dump Crashpad has finished writing may be filed, so the staging
+    // directory is neither a source nor a leftover.
+    CPPUNIT_ASSERT_MESSAGE("a snapshot must never be filed out of the staging directory",
+      dumps.front().Path.string().find("/new/") == std::string::npos &&
+      dumps.front().Path.string().find("\\new\\") == std::string::npos);
+    CPPUNIT_ASSERT_MESSAGE("nothing may be left staged",
+      !std::filesystem::exists(m_DatabaseDirectory / "new") ||
+      std::filesystem::is_empty(m_DatabaseDirectory / "new"));
 
     // The facility's typed view of the same facts (what the crash-test
     // plugin's dump list consumes).
@@ -281,6 +336,49 @@ public:
     CPPUNIT_ASSERT(
       mitk::CrashDumpFacility::ListSnapshots(mitk::SnapshotKind::WatchdogProvisional).empty());
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListDumps().empty());
+
+    mitk::CrashDumpFacility::Shutdown();
+  }
+
+  /** Every capture in a session must be filed, under its own name: the
+   *  watchdog's per-episode captures and the error dialog's "Capture
+   *  diagnostics" button both take more than one snapshot per session. */
+  void RepeatedSnapshotsAreAllCaptured()
+  {
+    const auto result = RunHelper("snapshot-twice", m_DatabaseDirectory);
+
+    if (result.Exited && result.ExitValue == 77)
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_MESSAGE("snapshot-twice helper must exit cleanly",
+      result.Exited && result.ExitValue == EXIT_SUCCESS);
+
+    const auto snapshots = mitk::ScanCrashDumps(m_DatabaseDirectory / "mitk-snapshots");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("two captures must leave two dumps",
+      std::size_t(2), snapshots.size());
+    CPPUNIT_ASSERT(snapshots[0].Path != snapshots[1].Path);
+    CPPUNIT_ASSERT(snapshots[0].SizeInBytes > 0 && snapshots[1].SizeInBytes > 0);
+  }
+
+  /** Discarding a dump must take Crashpad's record of it along, as
+   *  CrashDumpFacility::DeleteDump documents. */
+  void DeleteDumpLeavesNoReportResidue()
+  {
+    this->RunCrashModeAndExpectOneDump("segv");
+
+    mitk::CrashDumpFacility::Config config;
+    config.DatabaseDirectory = m_DatabaseDirectory;
+    config.ApplicationName = "mitkCrashDumpCaptureTest";
+    config.ApplicationVersion = "1.0";
+
+    if (!mitk::CrashDumpFacility::Initialize(config))
+      this->FailOrSkipUnarmedHelper();
+
+    const auto dumpPath = mitk::CrashDumpFacility::ListDumps().front().Path;
+    CPPUNIT_ASSERT(ReportResidueExists(m_DatabaseDirectory, dumpPath));
+
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(dumpPath));
+    CPPUNIT_ASSERT(!ReportResidueExists(m_DatabaseDirectory, dumpPath));
 
     mitk::CrashDumpFacility::Shutdown();
   }

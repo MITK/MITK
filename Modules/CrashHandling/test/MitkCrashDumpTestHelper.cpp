@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
   if (argc != 3)
   {
     std::cerr << "Usage: MitkCrashDumpTestHelper "
-                 "<noop|segv|abort|stackoverflow|snapshot|freeze|freeze-recover> <database-dir>" << std::endl;
+                 "<noop|segv|abort|stackoverflow|snapshot|snapshot-twice|freeze|freeze-recover> "
+                 "<database-dir>" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -80,6 +81,27 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
+  if (mode == "snapshot-twice")
+  {
+    const auto first = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::OnDemand);
+    const auto second = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::OnDemand);
+    mitk::CrashDumpFacility::Shutdown();
+
+    if (!first.has_value() || !second.has_value())
+    {
+      std::cerr << "A session must be able to capture more than one snapshot." << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    if (*first == *second)
+    {
+      std::cerr << "Both snapshots were filed as '" << first->string() << "'." << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+  }
+
   if (mode == "freeze" || mode == "freeze-recover")
   {
     mitk::HeartbeatMonitor::Config config;
@@ -93,7 +115,10 @@ int main(int argc, char* argv[])
       [] { mitk::CrashDumpFacility::PurgeProvisionalSnapshots(); });
     monitor.Start();
 
-    // Simulate a freeze by never beating; wait for the provisional dump.
+    // Report in once to arm stall detection, then simulate a freeze by never
+    // beating again; wait for the provisional dump.
+    monitor.Beat();
+
     bool captured = false;
     for (int i = 0; i < 100 && !captured; ++i)
     {

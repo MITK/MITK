@@ -126,7 +126,10 @@ namespace mitk
      *  empty list when the area does not exist. */
     static std::vector<CrashDumpInfo> ListSnapshots(SnapshotKind kind);
 
-    /** \brief Remove one dump file (and, best effort, its metadata). */
+    /** \brief Remove one dump file, along with the crash report that owned
+     *  it: its metadata and anything the handler attached to it. Returns
+     *  whether the dump file itself went; the report is released either way
+     *  and best effort, so a false return does not mean nothing changed. */
     static bool DeleteDump(const std::filesystem::path& dumpPath);
 
     static std::filesystem::path GetDatabaseDirectory();

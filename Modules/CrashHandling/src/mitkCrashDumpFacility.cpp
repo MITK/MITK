@@ -28,8 +28,11 @@ found in the LICENSE file.
 #endif
 
 #include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <mutex>
 #include <set>
+#include <sstream>
 #include <thread>
 
 namespace
@@ -43,6 +46,12 @@ namespace
   // purged unless the process is hard-killed mid-freeze.
   const std::filesystem::path kSnapshotsSubdir = "mitk-snapshots";
   const std::filesystem::path kPendingFreezeSubdir = "mitk-pending-freeze";
+
+  // Crashpad's POSIX database stages a dump here and moves it into the report
+  // area only once it is complete. Taking one out from under the handler
+  // yields a truncated dump and breaks the handler's move. The Windows backend
+  // has no staging directory, so there excluding this name matches nothing.
+  const std::filesystem::path kCrashpadStagingSubdir = "new";
 
   std::filesystem::path SubdirForKind(mitk::SnapshotKind kind)
   {
@@ -79,6 +88,34 @@ namespace
   };
 
   FacilityState s_State;
+
+  // Crashpad names every report of a session after the same report ID, so the
+  // capture time is what keeps repeated snapshots apart - and reading their
+  // spacing off the file names is what tells a permanent wedge from a
+  // slow-moving loop when one freeze episode produces several dumps.
+  [[maybe_unused]] std::string CaptureTimestamp()
+  {
+    const auto now = std::chrono::system_clock::now();
+    const auto whole = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    const auto milliseconds =
+      std::chrono::duration_cast<std::chrono::milliseconds>(now - whole).count();
+
+    const auto time = std::chrono::system_clock::to_time_t(whole);
+    std::tm utc{};
+#if defined(_WIN32)
+    gmtime_s(&utc, &time);
+#else
+    gmtime_r(&time, &utc);
+#endif
+
+    char date[16];
+    std::strftime(date, sizeof(date), "%Y%m%dT%H%M%S", &utc);
+
+    std::ostringstream timestamp;
+    timestamp << date << '.' << std::setw(3) << std::setfill('0') << milliseconds << 'Z';
+
+    return timestamp.str();
+  }
 
   std::filesystem::path CurrentExecutablePath()
   {
@@ -188,7 +225,7 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
     // own retention (see CaptureSnapshot) and pending-freeze survivors must
     // not be evicted here before the next-start dialog can surface them.
     PruneCrashDumps(s_State.DatabaseDirectory, kMaxRetainedDumps,
-      { kSnapshotsSubdir, kPendingFreezeSubdir });
+      { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir });
 
     return true;
   }
@@ -230,19 +267,21 @@ void mitk::CrashDumpFacility::ClearCrashedLastRun()
 
   // Watermark from the newest surfacable dump, so an on-demand snapshot
   // (excluded from the surfacable set) can never mask a real crash dump.
-  const auto dumps = ScanCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
+  const auto dumps = ScanCrashDumps(s_State.DatabaseDirectory,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir });
   if (!dumps.empty())
     WriteLastAcknowledgedTime(s_State.DatabaseDirectory, dumps.front().LastWriteTime);
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListDumps()
 {
-  return ScanCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
+  return ScanCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir });
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListUnacknowledgedDumps()
 {
-  return ScanUnacknowledgedCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
+  return ScanUnacknowledgedCrashDumps(s_State.DatabaseDirectory,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir });
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListSnapshots(SnapshotKind kind)
@@ -258,7 +297,11 @@ std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListSnapshots(Snapshot
 bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
 {
   std::error_code error;
-  return std::filesystem::remove(dumpPath, error) && !error;
+  const bool removed = std::filesystem::remove(dumpPath, error) && !error;
+
+  RemoveCrashReportResidue(s_State.DatabaseDirectory, dumpPath);
+
+  return removed;
 }
 
 std::filesystem::path mitk::CrashDumpFacility::GetDatabaseDirectory()
@@ -288,10 +331,12 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
   const auto& database = s_State.DatabaseDirectory;
 
   // DumpWithoutCrash writes into Crashpad's report area; diff it against the
-  // set present before the call to find the freshly written file. The two
-  // facility subdirectories are excluded so a previously filed snapshot is
-  // never mistaken for the new one.
-  const std::vector<std::filesystem::path> reportArea = { kSnapshotsSubdir, kPendingFreezeSubdir };
+  // set present before the call to find the freshly written file. The facility
+  // subdirectories are excluded so a previously filed snapshot is never
+  // mistaken for the new one, and the staging directory so a dump the handler
+  // has not finished is never taken for a complete one.
+  const std::vector<std::filesystem::path> reportArea = {
+    kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir };
 
   std::set<std::filesystem::path> before;
   for (const auto& dump : ScanCrashDumps(database, reportArea))
@@ -333,15 +378,27 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
   std::error_code error;
   std::filesystem::create_directories(destinationDir, error);
 
-  const auto destination = destinationDir / newDump.filename();
-  std::filesystem::rename(newDump, destination, error);
-  if (error)
+  const auto destination = destinationDir /
+    (newDump.stem().string() + "-" + CaptureTimestamp() + newDump.extension().string());
+
+  std::error_code renameError;
+  std::filesystem::rename(newDump, destination, renameError);
+
+  if (renameError)
   {
     MITK_WARN << "Could not file the diagnostic snapshot under '" << destinationDir.string()
-              << "': " << error.message();
+              << "': " << renameError.message();
     std::filesystem::remove(newDump, error); // avoid a stray dump surfacing as a crash
-    return std::nullopt;
   }
+
+  // Either way the dump is no longer Crashpad's to hold - filed under its
+  // kind, or discarded above - so the report has to be released here, after
+  // the discard rather than before it: a report released while its dump is
+  // still in the report area would leave that dump behind unrecorded.
+  RemoveCrashReportResidue(database, newDump);
+
+  if (renameError)
+    return std::nullopt;
 
   if (SnapshotKind::WatchdogProvisional == kind)
     s_State.ProvisionalSnapshots.push_back(destination);

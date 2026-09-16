@@ -23,6 +23,14 @@ namespace
   // Crashpad ignores files it does not know.
   const std::filesystem::path kAcknowledgedMarkerFileName = "mitk-last-acknowledged";
 
+  // Crashpad's POSIX database layout: one <report-uuid>.meta next to the dump
+  // and one attachments/<report-uuid>/ directory under the database root. The
+  // Windows backend keeps report metadata in a single database-wide file and
+  // the macOS one in extended attributes on the dump, so the .meta half finds
+  // nothing there.
+  const std::filesystem::path kMetadataExtension = ".meta";
+  const std::filesystem::path kAttachmentsSubdir = "attachments";
+
   bool HasDumpExtension(const std::filesystem::path& path)
   {
     auto extension = path.extension().string();
@@ -31,13 +39,18 @@ namespace
     return extension == ".dmp";
   }
 
+  /** Excluded names are matched against \p path below \p databaseDirectory
+   *  only. Matching the whole path would let a component of the database's
+   *  own location (an installation under a directory called "new", say)
+   *  exclude every dump in it. */
   bool IsExcluded(const std::filesystem::path& path,
+    const std::filesystem::path& databaseDirectory,
     const std::vector<std::filesystem::path>& excludedSubdirs)
   {
     if (excludedSubdirs.empty())
       return false;
 
-    for (const auto& component : path)
+    for (const auto& component : path.lexically_relative(databaseDirectory))
     {
       if (std::find(excludedSubdirs.begin(), excludedSubdirs.end(), component) != excludedSubdirs.end())
         return true;
@@ -70,7 +83,7 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
       if (!entry.is_regular_file(error) || !HasDumpExtension(entry.path()))
         continue;
 
-      if (IsExcluded(entry.path(), excludedSubdirs))
+      if (IsExcluded(entry.path(), databaseDirectory, excludedSubdirs))
         continue;
 
       const auto lastWriteTime = entry.last_write_time(error);
@@ -127,6 +140,22 @@ std::size_t mitk::PruneCrashDumps(const std::filesystem::path& databaseDirectory
   }
 
   return deleted;
+}
+
+void mitk::RemoveCrashReportResidue(const std::filesystem::path& databaseDirectory,
+  const std::filesystem::path& dumpPath)
+{
+  const auto reportId = dumpPath.stem();
+
+  // "." and ".." are legal stems (a file called "..dmp" yields the former),
+  // and either would make the remove_all below escape the report's own
+  // directory - into the attachments root, or the database itself.
+  if (!databaseDirectory.is_absolute() || reportId.empty() || reportId == "." || reportId == "..")
+    return;
+
+  std::error_code error;
+  std::filesystem::remove(std::filesystem::path(dumpPath).replace_extension(kMetadataExtension), error);
+  std::filesystem::remove_all(databaseDirectory / kAttachmentsSubdir / reportId, error);
 }
 
 std::filesystem::path mitk::GetAcknowledgedMarkerFilePath(const std::filesystem::path& databaseDirectory)

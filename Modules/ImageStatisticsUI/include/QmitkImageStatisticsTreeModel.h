@@ -35,8 +35,10 @@ class QmitkImageStatisticsTreeItem;
  * The results are presented in a hierarchical tree structure:
  * - Level 1: Image
  * - Level 2: Mask (if present)
- * - Level 3: Label instances (if the mask has multiple labels)
- * - Level 4: Time steps (if more than one exists)
+ * - Level 3: Group (if the mask is a segmentation with more than one group)
+ * - Level 4: Label instances (if the mask has multiple labels), ordered like in the
+ *   Segmentation View: by label name, then by label value
+ * - Level 5: Time steps (if more than one exists)
  *
  * \sa QmitkAbstractDataStorageModel
  * \sa mitk::ImageStatisticsContainer

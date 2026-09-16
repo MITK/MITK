@@ -177,6 +177,11 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    /** \brief In addition to Tool::CanHandle(), requires the reference data to be an
+     * Image and the working data a MultiLabelSegmentation that already contains at
+     * least one label, as 2D tools operate on existing labels. */
+    bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const override;
+
     itkSetMacro(IsTimePointChangeAware, bool);
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);

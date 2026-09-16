@@ -880,7 +880,7 @@ void QmitkVolumeTransferFunctionEditor::SnapshotAppliedTransferFunction()
   }
 
   // Keep the untouched copy of the color function to resample from:
-  // DeepCopy preserves the color space (HSV) and clamping, so windowing
+  // DeepCopy preserves the color space and clamping, so windowing
   // stays faithful to the preset. Sampling bare RGB points instead would
   // interpolate in the wrong color space and shift the colors on the
   // first slider move.

@@ -65,24 +65,6 @@ namespace
 
     return points;
   }
-
-  // Inverse of the SetColorSpaceTo* switch in BuildTransferFunction.
-  std::string ColorSpaceToString(int vtkColorSpace)
-  {
-    switch (vtkColorSpace)
-    {
-      case VTK_CTF_HSV:
-        return "HSV";
-      case VTK_CTF_LAB:
-        return "Lab";
-      case VTK_CTF_DIVERGING:
-        return "Diverging";
-      case VTK_CTF_RGB:
-        return "RGB";
-      default:
-        return "RGB";
-    }
-  }
 }
 
 mitk::TransferFunctionPresets::TransferFunctionPresets()
@@ -137,9 +119,26 @@ std::vector<mitk::TransferFunctionPresets::Preset> mitk::TransferFunctionPresets
     try
     {
       preset.name = entry["Name"].get<std::string>();
-      preset.colorSpace = entry.value("ColorSpace", std::string("RGB"));
       preset.color = DecodeColor(entry["RGBPoints"]);
       preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
+
+      // Left to Preset::colorSpace's own initialiser when absent, for the same
+      // reason as the blend mode below: one place asserts the fallback, and a
+      // missing key can never be reported as an unknown space.
+      if (entry.contains("ColorSpace"))
+      {
+        const auto colorSpaceName = entry["ColorSpace"].get<std::string>();
+
+        if (const auto colorSpace = TransferFunctionColorSpaceFromString(colorSpaceName))
+        {
+          preset.colorSpace = *colorSpace;
+        }
+        else
+        {
+          MITK_WARN << "Unknown color space \"" << colorSpaceName << "\" in preset \"" << preset.name
+                    << "\"; falling back to RGB.";
+        }
+      }
 
       // Absent for a colormap taken from elsewhere, which was authored without
       // the question in mind. Left to Preset::blendMode's own initialiser
@@ -205,30 +204,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::BuildTransferFunc
   // The gradient opacity function is intentionally left at its default
   // (constant 1): the preset format defines no gradient component.
 
-  auto *colorFunction = transferFunction->GetColorTransferFunction();
-
-  if (preset.colorSpace == "RGB")
-  {
-    colorFunction->SetColorSpaceToRGB();
-  }
-  else if (preset.colorSpace == "HSV")
-  {
-    colorFunction->SetColorSpaceToHSV();
-  }
-  else if (preset.colorSpace == "Lab")
-  {
-    colorFunction->SetColorSpaceToLab();
-  }
-  else if (preset.colorSpace == "Diverging")
-  {
-    colorFunction->SetColorSpaceToDiverging();
-  }
-  else
-  {
-    MITK_WARN << "Unknown color space \"" << preset.colorSpace << "\" in preset \""
-              << preset.name << "\"; falling back to RGB.";
-    colorFunction->SetColorSpaceToRGB();
-  }
+  transferFunction->SetColorSpace(preset.colorSpace);
 
   return transferFunction;
 }
@@ -356,7 +332,7 @@ bool mitk::TransferFunctionPresets::SaveTransferFunction(
 
   nlohmann::ordered_json entry;
   entry["Name"] = name;
-  entry["ColorSpace"] = ColorSpaceToString(colorFunction->GetColorSpace());
+  entry["ColorSpace"] = TransferFunctionColorSpaceToString(transferFunction->GetColorSpace());
   entry["BlendMode"] = blendModeDescription->id;
   entry["OpacityPoints"] = opacityPoints;
   entry["RGBPoints"] = rgbPoints;

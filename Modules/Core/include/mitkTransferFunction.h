@@ -26,11 +26,53 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
+#include <optional>
 #include <set>
+#include <string>
 #include <vector>
 
 namespace mitk
 {
+  /**
+   * \brief The space a color transfer function interpolates in between its control points.
+   *
+   * A transfer function stores color only at its control points; everything in
+   * between is interpolated, and the space that interpolation happens in decides
+   * what those in-between colors look like. Red to blue passes through a dull
+   * grey-purple in RGB and through saturated magenta in HSV. The control points
+   * alone therefore do not determine the rendered result, which is why the color
+   * space belongs to a transfer function's data rather than to the renderer.
+   *
+   * Covers every space vtkColorTransferFunction supports, so the mapping in both
+   * directions is total and no conversion has to guess.
+   */
+  enum class TransferFunctionColorSpace
+  {
+    RGB,
+    HSV,
+    Lab,
+    Diverging,
+    LabCIEDE2000,
+    ProLab,
+    Step
+  };
+
+  /**
+   * \brief Name of a color space, for file formats and messages.
+   * \return A stable identifier, never null.
+   */
+  MITKCORE_EXPORT const char *TransferFunctionColorSpaceToString(TransferFunctionColorSpace colorSpace);
+
+  /**
+   * \brief Parse a color space name as written by TransferFunctionColorSpaceToString().
+   * \param[in] name The name to parse. Case-sensitive.
+   * \return The color space, or no value if the name names none. Callers decide
+   *         what an unrecognised name means; this function does not substitute a
+   *         default of its own.
+   */
+  MITKCORE_EXPORT std::optional<TransferFunctionColorSpace> TransferFunctionColorSpaceFromString(
+    const std::string &name);
+
   /**
    * \brief Wrapper for VTK scalar opacity, gradient opacity, and color transfer functions.
    *
@@ -82,6 +124,22 @@ namespace mitk
     /** \brief Get/Set wrapped vtk transfer function. */
     itkGetMacro(ColorTransferFunction, vtkColorTransferFunction *);
     itkSetMacro(ColorTransferFunction, vtkSmartPointer<vtkColorTransferFunction>);
+
+    /**
+     * \brief Get the space the color function interpolates in between its control points.
+     * \return The current color space.
+     */
+    TransferFunctionColorSpace GetColorSpace() const;
+
+    /**
+     * \brief Set the space the color function interpolates in between its control points.
+     *
+     * Leaves the control points untouched; only the colors rendered between them
+     * change.
+     *
+     * \param[in] colorSpace The color space to interpolate in.
+     */
+    void SetColorSpace(TransferFunctionColorSpace colorSpace);
 
     /** \brief Get histogram used for transfer function initialization. */
     itkGetConstObjectMacro(Histogram, HistogramGenerator::HistogramType);
@@ -196,7 +254,8 @@ namespace mitk
     /**
      * \brief Compare two TransferFunction objects for equality.
      * \param[in] other The TransferFunction to compare against.
-     * \return True if all three transfer functions have identical control points.
+     * \return True if both render alike: identical control points in all three
+     *         functions, the same color space, and the same clamping.
      */
     bool operator==(Self &other);
 

@@ -127,7 +127,7 @@ namespace mitk
     struct Preset
     {
       std::string name;
-      std::string colorSpace;
+      TransferFunctionColorSpace colorSpace {TransferFunctionColorSpace::RGB};
       VolumeBlendMode blendMode {VolumeBlendMode::Composite};
       TransferFunction::ControlPoints scalarOpacity;
       TransferFunction::RGBControlPoints color;

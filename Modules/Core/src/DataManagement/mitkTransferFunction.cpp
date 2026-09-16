@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkTransferFunction.h>
+#include <mitkExceptionMacro.h>
 #include <mitkHistogramGenerator.h>
 #include <mitkImageToItk.h>
 
@@ -20,6 +21,108 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  namespace
+  {
+    int ToVtkColorSpace(TransferFunctionColorSpace colorSpace)
+    {
+      switch (colorSpace)
+      {
+        case TransferFunctionColorSpace::RGB:
+          return VTK_CTF_RGB;
+        case TransferFunctionColorSpace::HSV:
+          return VTK_CTF_HSV;
+        case TransferFunctionColorSpace::Lab:
+          return VTK_CTF_LAB;
+        case TransferFunctionColorSpace::Diverging:
+          return VTK_CTF_DIVERGING;
+        case TransferFunctionColorSpace::LabCIEDE2000:
+          return VTK_CTF_LAB_CIEDE2000;
+        case TransferFunctionColorSpace::ProLab:
+          return VTK_CTF_PROLAB;
+        case TransferFunctionColorSpace::Step:
+          return VTK_CTF_STEP;
+      }
+
+      mitkThrow() << "Unknown transfer function color space " << static_cast<int>(colorSpace) << ".";
+    }
+
+    TransferFunctionColorSpace FromVtkColorSpace(int vtkColorSpace)
+    {
+      switch (vtkColorSpace)
+      {
+        case VTK_CTF_RGB:
+          return TransferFunctionColorSpace::RGB;
+        case VTK_CTF_HSV:
+          return TransferFunctionColorSpace::HSV;
+        case VTK_CTF_LAB:
+          return TransferFunctionColorSpace::Lab;
+        case VTK_CTF_DIVERGING:
+          return TransferFunctionColorSpace::Diverging;
+        case VTK_CTF_LAB_CIEDE2000:
+          return TransferFunctionColorSpace::LabCIEDE2000;
+        case VTK_CTF_PROLAB:
+          return TransferFunctionColorSpace::ProLab;
+        case VTK_CTF_STEP:
+          return TransferFunctionColorSpace::Step;
+      }
+
+      // Reachable only if VTK gains a color space this enum does not name. Naming
+      // one of the existing spaces instead would misreport what is rendered.
+      mitkThrow() << "Unknown VTK color transfer function color space " << vtkColorSpace << ".";
+    }
+  }
+
+  const char *TransferFunctionColorSpaceToString(TransferFunctionColorSpace colorSpace)
+  {
+    // These names appear in scene files and in saved transfer function presets.
+    // Renaming one silently invalidates every file that already holds it.
+    switch (colorSpace)
+    {
+      case TransferFunctionColorSpace::RGB:
+        return "RGB";
+      case TransferFunctionColorSpace::HSV:
+        return "HSV";
+      case TransferFunctionColorSpace::Lab:
+        return "Lab";
+      case TransferFunctionColorSpace::Diverging:
+        return "Diverging";
+      case TransferFunctionColorSpace::LabCIEDE2000:
+        return "LabCIEDE2000";
+      case TransferFunctionColorSpace::ProLab:
+        return "ProLab";
+      case TransferFunctionColorSpace::Step:
+        return "Step";
+    }
+
+    mitkThrow() << "Unknown transfer function color space " << static_cast<int>(colorSpace) << ".";
+  }
+
+  std::optional<TransferFunctionColorSpace> TransferFunctionColorSpaceFromString(const std::string &name)
+  {
+    if (name == "RGB")
+      return TransferFunctionColorSpace::RGB;
+
+    if (name == "HSV")
+      return TransferFunctionColorSpace::HSV;
+
+    if (name == "Lab")
+      return TransferFunctionColorSpace::Lab;
+
+    if (name == "Diverging")
+      return TransferFunctionColorSpace::Diverging;
+
+    if (name == "LabCIEDE2000")
+      return TransferFunctionColorSpace::LabCIEDE2000;
+
+    if (name == "ProLab")
+      return TransferFunctionColorSpace::ProLab;
+
+    if (name == "Step")
+      return TransferFunctionColorSpace::Step;
+
+    return std::nullopt;
+  }
+
   TransferFunction::TransferFunction() : m_Min(0), m_Max(0)
   {
     m_ScalarOpacityFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -33,7 +136,12 @@ namespace mitk
     m_GradientOpacityFunction->AddPoint(0, 1);
 
     m_ColorTransferFunction->RemoveAllPoints();
+
+    // VTK defaults to RGB. MITK diverges deliberately: the TransferFunctionInitializer
+    // presets and every scene written before the color space was serialized were
+    // authored under HSV, and both rely on this default to still look the way they did.
     m_ColorTransferFunction->SetColorSpaceToHSV();
+
     m_ColorTransferFunction->AddRGBPoint(0, 1, 1, 1);
   }
 
@@ -55,9 +163,30 @@ namespace mitk
   }
 
   TransferFunction::~TransferFunction() {}
+
+  TransferFunctionColorSpace TransferFunction::GetColorSpace() const
+  {
+    return FromVtkColorSpace(m_ColorTransferFunction->GetColorSpace());
+  }
+
+  void TransferFunction::SetColorSpace(TransferFunctionColorSpace colorSpace)
+  {
+    m_ColorTransferFunction->SetColorSpace(ToVtkColorSpace(colorSpace));
+  }
+
   bool TransferFunction::operator==(Self &other)
   {
     if ((m_Min != other.m_Min) || (m_Max != other.m_Max))
+      return false;
+
+    // Identical control points still render differently when interpolated in
+    // different spaces, or when values outside the point range clamp instead of
+    // dropping to zero.
+    if (this->GetColorSpace() != other.GetColorSpace())
+      return false;
+
+    if ((m_ScalarOpacityFunction->GetClamping() != other.m_ScalarOpacityFunction->GetClamping()) ||
+        (m_GradientOpacityFunction->GetClamping() != other.m_GradientOpacityFunction->GetClamping()))
       return false;
 
     bool sizes = (m_ScalarOpacityFunction->GetSize() == other.m_ScalarOpacityFunction->GetSize()) &&

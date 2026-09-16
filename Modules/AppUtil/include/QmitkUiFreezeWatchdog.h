@@ -30,8 +30,10 @@ class QTimer;
 /**
  * \brief UI-thread shell around the crash-handling mitk::HeartbeatMonitor.
  *
- * A QTimer on the UI thread bumps the monitor's heartbeat once a second. If
- * the UI thread wedges, the timer stops firing; after the configured timeout
+ * A QTimer on the UI thread bumps the monitor's heartbeat once a second; the
+ * monitor starts watching for a stall only once that first beat arrives, so
+ * the startup window before the event loop runs is not mistaken for a freeze.
+ * If the UI thread wedges, the timer stops firing; after the configured timeout
  * the monitor (on its own worker thread) captures provisional diagnostic
  * snapshots of the whole process - which include the stuck UI thread - and
  * purges them again if the UI recovers. Only a freeze that ends in a hard

@@ -23,6 +23,7 @@ class mitkHeartbeatMonitorTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkHeartbeatMonitorTestSuite);
   MITK_TEST(NoStallWhileBeating);
+  MITK_TEST(NoStallBeforeFirstBeat);
   MITK_TEST(StallFiresStallCallback);
   MITK_TEST(RecoveryFiresWhenBeatingResumes);
   MITK_TEST(CapturesAreBoundedPerEpisode);
@@ -77,12 +78,31 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, m_StallCount.load());
   }
 
+  /** A thread that has never reported in has not stalled, it has not started
+   *  yet. Without that rule the monitor trips during application startup,
+   *  where plugin loading routinely outlasts the timeout before the event
+   *  loop exists to beat for the first time. */
+  void NoStallBeforeFirstBeat()
+  {
+    auto monitor = this->MakeMonitor();
+    monitor.Start();
+
+    // Several timeout windows without a single beat.
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    monitor.Stop();
+
+    CPPUNIT_ASSERT_EQUAL(0, m_StallCount.load());
+    CPPUNIT_ASSERT_EQUAL(0, m_RecoveryCount.load());
+  }
+
   void StallFiresStallCallback()
   {
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Never beat; wait past the timeout and let a capture or two happen.
+    // Report in once to arm stall detection, then go silent: wait past the
+    // timeout and let a capture or two happen.
+    monitor.Beat();
     std::this_thread::sleep_for(std::chrono::milliseconds(400));
     monitor.Stop();
 
@@ -95,7 +115,8 @@ public:
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Stall first...
+    // Arm, then stall...
+    monitor.Beat();
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     CPPUNIT_ASSERT(m_StallCount.load() >= 1);
 
@@ -115,7 +136,9 @@ public:
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Stall for far longer than MaxCapturesPerEpisode * CaptureInterval.
+    // Arm, then stall for far longer than
+    // MaxCapturesPerEpisode * CaptureInterval.
+    monitor.Beat();
     std::this_thread::sleep_for(std::chrono::milliseconds(900));
     monitor.Stop();
 

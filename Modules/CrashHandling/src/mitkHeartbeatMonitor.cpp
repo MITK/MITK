@@ -61,6 +61,11 @@ void mitk::HeartbeatMonitor::Run()
   auto lastSeen = m_Heartbeat.load(std::memory_order_relaxed);
   auto lastChange = clock::now();
 
+  // Silence until the monitored thread has reported in once (see Start()). A
+  // beat that lands before this thread starts is covered by the snapshot
+  // above; one that lands after arms via the heartbeat-advanced branch.
+  bool armed = lastSeen != 0;
+
   bool stalled = false;
   int capturesThisEpisode = 0;
   int episodes = 0;
@@ -84,6 +89,7 @@ void mitk::HeartbeatMonitor::Run()
     {
       lastSeen = current;
       lastChange = now;
+      armed = true;
 
       if (stalled)
       {
@@ -95,7 +101,7 @@ void mitk::HeartbeatMonitor::Run()
     }
     else if (!stalled)
     {
-      if (now - lastChange >= m_Config.Timeout && episodes < m_Config.MaxEpisodesPerSession)
+      if (armed && now - lastChange >= m_Config.Timeout && episodes < m_Config.MaxEpisodesPerSession)
       {
         stalled = true;
         ++episodes;

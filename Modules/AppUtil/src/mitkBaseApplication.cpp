@@ -887,22 +887,31 @@ namespace mitk
 #ifdef MITK_HAS_CRASHHANDLING
       // Opt-in UI-freeze watchdog. Options are already parsed at this point;
       // the environment variable takes precedence over the command-line one.
-      if (CrashDumpFacility::IsActive())
+      const auto watchdogEnvValue = qEnvironmentVariable("MITK_UI_WATCHDOG");
+      const bool watchdogFromEnvironment = !watchdogEnvValue.isEmpty();
+
+      const auto watchdogSeconds = watchdogFromEnvironment
+        ? watchdogEnvValue.toInt()
+        : QString::fromStdString(this->config().getString(ARG_UI_WATCHDOG.toStdString(), "")).toInt();
+
+      if (watchdogSeconds > 0)
       {
-        int watchdogSeconds = 0;
-
-        const auto envValue = qEnvironmentVariable("MITK_UI_WATCHDOG");
-        if (!envValue.isEmpty())
-          watchdogSeconds = envValue.toInt();
-        else
-          watchdogSeconds = QString::fromStdString(
-            this->config().getString(ARG_UI_WATCHDOG.toStdString(), "")).toInt();
-
-        if (watchdogSeconds > 0)
+        if (CrashDumpFacility::IsActive())
         {
+          // An armed watchdog is otherwise silent until it fires, which makes
+          // "did it even arm?" unanswerable from a session's output.
+          MITK_INFO << "UI-freeze watchdog armed with a timeout of " << watchdogSeconds
+                    << " s (from " << (watchdogFromEnvironment ? "MITK_UI_WATCHDOG" : "--ui-watchdog")
+                    << ").";
+
           // Parented to the application: it lives for the session and its
           // QTimer runs on the UI thread once the event loop starts.
           new QmitkUiFreezeWatchdog(std::chrono::seconds(watchdogSeconds), d->m_QApp);
+        }
+        else
+        {
+          MITK_WARN << "UI-freeze watchdog not armed: the crash-dump facility is inactive, "
+                       "so a freeze could not be captured anyway.";
         }
       }
 #endif

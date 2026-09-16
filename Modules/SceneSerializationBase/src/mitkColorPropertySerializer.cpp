@@ -39,9 +39,9 @@ namespace mitk
 
         auto *element = doc.NewElement("color");
         Color color = prop->GetValue();
-        element->SetAttribute("r", boost::lexical_cast<std::string>(color[0]).c_str());
-        element->SetAttribute("g", boost::lexical_cast<std::string>(color[1]).c_str());
-        element->SetAttribute("b", boost::lexical_cast<std::string>(color[2]).c_str());
+        element->SetAttribute("r", mitk::ToString(color[0]).c_str());
+        element->SetAttribute("g", mitk::ToString(color[1]).c_str());
+        element->SetAttribute("b", mitk::ToString(color[2]).c_str());
         return element;
       }
       else
@@ -69,7 +69,7 @@ namespace mitk
       {
         StringsToNumbers<double>(3, c_string, c);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch (mitk::BadLexicalCast &e)
       {
         MITK_ERROR << "Could not parse string as number: " << e.what();
         return nullptr;

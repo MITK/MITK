@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkConcentrationCurveGenerator.h>
 #include <mitkTestDynamicImageGenerator.h>
 #include <mitkImagePixelReadAccessor.h>
-#include <boost/math/constants/constants.hpp>
+#include <numbers>
 
 
 class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture
@@ -166,8 +166,8 @@ public:
     m_concentrationGen->SetRepetitionTime(1.0);
     m_concentrationGen->SetRelaxivity(1.0/1000.0);
     m_concentrationGen->SetPDWImage(PDWImage);
-    m_concentrationGen->SetFlipAngle(2.0 / 360 * 2 * boost::math::constants::pi<double>());
-    m_concentrationGen->SetFlipAnglePDW(1.0 / 360 * 2 * boost::math::constants::pi<double>());
+    m_concentrationGen->SetFlipAngle(2.0 / 360 * 2 * std::numbers::pi);
+    m_concentrationGen->SetFlipAnglePDW(1.0 / 360 * 2 * std::numbers::pi);
     m_concentrationGen->SetBaselineStartTimeStep(0);
     m_concentrationGen->SetBaselineEndTimeStep(0);
     m_convertedImage = m_concentrationGen->GetConvertedImage();

@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkSegChangeOperationApplier.h>
+#include <mitkRenderingManager.h>
 
 #include <QmitkNodeSelectionDialog.h>
 #include <QMessageBox>
@@ -178,7 +179,7 @@ QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentation
   m_Controls->inputNodesSelector->SetNodePredicate(GetInputPredicate());
   m_Controls->inputNodesSelector->SetSelectionCheckFunction(CheckForSameGeometry(nullptr));
   m_Controls->inputNodesSelector->SetSelectionIsOptional(false);
-  m_Controls->inputNodesSelector->SetInvalidInfo(QStringLiteral("Please select inputs (images, surfaces or contours) for conversion"));
+  m_Controls->inputNodesSelector->SetInvalidInfo(QStringLiteral("Click \"Change selection\" below to select images, surfaces, or contours for conversion."));
   m_Controls->inputNodesSelector->SetPopUpTitel(QStringLiteral("Select inputs"));
   m_Controls->inputNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple inputs for conversion. But all selected images must have the same geometry or a sub geometry."));
 
@@ -201,6 +202,7 @@ QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentation
   this->ConfigureWidgets();
 
   connect (m_Controls->btnConvert, &QAbstractButton::clicked, this, &QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed);
+  connect (m_Controls->btnRemoveResult, &QAbstractButton::clicked, this, &QmitkConvertToMultiLabelSegmentationWidget::OnRemoveResultPressed);
   connect(m_Controls->inputNodesSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkConvertToMultiLabelSegmentationWidget::OnInputSelectionChanged);
   connect(m_Controls->refNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
@@ -251,6 +253,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConfigureWidgets()
   bool refIsOK = !m_Controls->radioNewSeg->isChecked() || !m_Controls->refNodeSelector->isVisible() || m_Controls->refNodeSelector->GetSelectedNode().IsNotNull();
 
   m_Controls->btnConvert->setEnabled(inputIsOK && outputIsOK && refIsOK);
+  this->UpdateRemoveResultButton();
   m_InternalEvent = false;
 }
 
@@ -278,6 +281,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
     mitkThrow() << "QmitkConvertToMultiLabelSegmentationWidget is in invalid state. No datastorage is set.";
   }
 
+  m_LastResultNodes.clear();
+
   auto nodes = m_Controls->inputNodesSelector->GetSelectedNodes();
   mitk::ProgressBar::GetInstance()->Reset();
   mitk::ProgressBar::GetInstance()->AddStepsToDo(3 * nodes.size() + 1);
@@ -293,6 +298,19 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
   {
     this->ConvertNodes(nodes);
   }
+
+  QList<mitk::DataNode::Pointer> resultNodes;
+  for (const auto& weakNode : m_LastResultNodes)
+  {
+    auto node = weakNode.Lock();
+    if (node.IsNotNull())
+      resultNodes.append(node);
+  }
+
+  this->UpdateRemoveResultButton();
+
+  if (!resultNodes.empty())
+    emit NewResultsReady(resultNodes);
 }
 
 void CheckForLabelCollision(const QmitkNodeSelectionDialog::NodeList& nodes,
@@ -541,7 +559,46 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
     auto dataStorage = m_DataStorage.Lock();
     dataStorage->Add(outNode);
+
+    m_LastResultNodes.emplace_back(outNode.GetPointer());
   }
   mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
+}
+
+void QmitkConvertToMultiLabelSegmentationWidget::OnRemoveResultPressed()
+{
+  auto dataStorage = m_DataStorage.Lock();
+  if (dataStorage.IsNotNull())
+  {
+    for (const auto& weakNode : m_LastResultNodes)
+    {
+      auto node = weakNode.Lock();
+      if (node.IsNotNull() && dataStorage->Exists(node))
+        dataStorage->Remove(node);
+    }
+  }
+
+  m_LastResultNodes.clear();
+  this->UpdateRemoveResultButton();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkConvertToMultiLabelSegmentationWidget::UpdateRemoveResultButton()
+{
+  auto dataStorage = m_DataStorage.Lock();
+  bool canRemove = false;
+  if (dataStorage.IsNotNull())
+  {
+    for (const auto& weakNode : m_LastResultNodes)
+    {
+      auto node = weakNode.Lock();
+      if (node.IsNotNull() && dataStorage->Exists(node))
+      {
+        canRemove = true;
+        break;
+      }
+    }
+  }
+  m_Controls->btnRemoveResult->setEnabled(canRemove);
 }

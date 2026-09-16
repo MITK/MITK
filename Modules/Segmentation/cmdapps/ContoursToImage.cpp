@@ -15,15 +15,14 @@ found in the LICENSE file.
 #include <mitkContourModelSetToImageFilter.h>
 #include <mitkDataStorage.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkImageStatisticsHolder.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/replace.hpp>
-
 #include <mitkFileSystem.h>
+#include <mitkStringUtil.h>
 
 enum class OutputFormat
 {
@@ -56,9 +55,9 @@ std::string GetSafeName(const mitk::IPropertyProvider* propertyProvider)
 
     if (!name.empty())
     {
-      boost::trim(name);
-      boost::replace_all(name, "/", "_");
-      boost::replace_all(name, "\\", "_");
+      mitk::Trim(name);
+      mitk::ReplaceAll(name, "/", "_");
+      mitk::ReplaceAll(name, "\\", "_");
 
       // If you read this, feel free to handle invalid filename characters here. :)
     }
@@ -242,6 +241,16 @@ int main(int argc, char* argv[])
       }
       else
       {
+        // The filter paints labelValue into an otherwise empty image, so a
+        // maximum of 0 means the contours missed the reference geometry. Asking
+        // the image rather than the created label keeps the check working for
+        // the second and any further contour set, where AddGroup() never
+        // derives labels from the content.
+        if (0 == image->GetStatistics()->GetScalarValueMax())
+          MITK_WARN << "Contour set does not intersect the reference image. Creating empty label.";
+
+        mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0;
+
         if (labelSetImage.IsNull())
         {
           labelSetImage = mitk::MultiLabelSegmentation::New();
@@ -249,13 +258,20 @@ int main(int argc, char* argv[])
         }
         else
         {
-          labelSetImage->AddGroup(image);
-          auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
-          label->SetValue(labelValue);
-          labelSetImage->AddLabel(label, labelSetImage->GetActiveLayer(), false, false);
+          groupIndex = labelSetImage->AddGroup(image);
         }
 
         auto label = labelSetImage->GetLabel(labelValue);
+
+        // InitializeByLabeledImage() only creates labels for pixel values that
+        // occur in the image, and AddGroup() creates none at all, so the label
+        // has to be created explicitly to keep the output consistent.
+        if (label.IsNull())
+        {
+          auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
+          newLabel->SetValue(labelValue);
+          label = labelSetImage->AddLabel(newLabel, groupIndex, false, false);
+        }
 
         SetLabelName(input, label);
         SetLabelColor(input, label);

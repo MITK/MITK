@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include <mitkCoreObjectFactory.h>
 #include <mitkCoreServices.h>
 #include <mitkIDataStorageService.h>
 #include <mitkNodePredicateNot.h>

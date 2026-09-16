@@ -93,7 +93,7 @@ if(MITK_USE_sentry AND MITK_EXTERNAL_PROJECT_PREFIX)
 endif()
 
 #-----------------------------------------------------------------------------
-# Deploy Qt runtime dependencies (plugins, qt.conf, WebEngine resources).
+# Deploy Qt runtime dependencies (plugins, qt.conf).
 #
 # This runs AFTER install(RUNTIME_DEPENDENCY_SET) so that windeployqt can see
 # all MITK DLLs in bin/ and correctly trace their transitive Qt dependencies.

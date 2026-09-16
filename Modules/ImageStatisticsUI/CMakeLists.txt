@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore MitkChart MitkImageStatistics MitkQtWidgets
+  DEPENDS MitkCore MitkImageStatistics MitkQtWidgets MitkQtWidgetsExt
 )
 
 if(BUILD_TESTING)

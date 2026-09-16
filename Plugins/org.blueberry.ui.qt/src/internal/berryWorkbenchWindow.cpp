@@ -869,7 +869,12 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
     //
     //      public void runWithException() {
-    if (!shellBounds.intersects(displayBounds))
+    // Re-center if the saved bounds are off-screen or would push the window
+    // frame past the top/left edge (e.g. bounds saved while in borderless
+    // full-screen), which would leave the title bar unreachable.
+    if (!shellBounds.intersects(displayBounds)
+        || shellBounds.top() <= displayBounds.top()
+        || shellBounds.left() < displayBounds.left())
     {
       // Center on default screen
       QRect clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
@@ -1416,14 +1421,27 @@ MenuManager *WorkbenchWindow::GetMenuManager() const
   return this->GetMenuBarManager();
 }
 
+namespace
+{
+  // A frameless or full-screen shell (kiosk / borderless full-screen) has no
+  // meaningful windowed bounds or maximized state to persist and restore.
+  bool HasNoRestorableState(QWidget* control)
+  {
+    return control != nullptr
+      && (control->isFullScreen() || control->windowFlags().testFlag(Qt::FramelessWindowHint));
+  }
+}
+
 bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
 {
   //  MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
   //        WorkbenchMessages.WorkbenchWindow_problemsSavingWindow, null);
   bool result = true;
 
-  // Save the window's state and bounds.
-  if (GetShell()->GetMaximized() || asMaximizedState)
+  // Save the window's state and bounds. A frameless / full-screen shell has no
+  // restorable state, so it must not persist a maximized flag or bounds.
+  const bool hasNoRestorableState = HasNoRestorableState(GetShell()->GetControl());
+  if (!hasNoRestorableState && (GetShell()->GetMaximized() || asMaximizedState))
   {
     memento->PutString(WorkbenchConstants::TAG_MAXIMIZED, "true");
   }
@@ -1431,7 +1449,7 @@ bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
   {
     memento->PutString(WorkbenchConstants::TAG_MINIMIZED, "true");
   }
-  if (normalBounds.isEmpty())
+  if (normalBounds.isEmpty() && !hasNoRestorableState)
   {
     normalBounds = GetShell()->GetBounds();
   }
@@ -1886,6 +1904,12 @@ void WorkbenchWindow::ShellEventFilter::SaveBounds(const QRect& newBounds)
   //  {
   //    return;
   //  }
+  // A frameless or full-screen shell (borderless full-screen / kiosk mode) has
+  // no restorable windowed state; do not record its bounds or maximized flag.
+  if (HasNoRestorableState(shell->GetControl()))
+  {
+    return;
+  }
   if (shell->GetMinimized())
   {
     return;

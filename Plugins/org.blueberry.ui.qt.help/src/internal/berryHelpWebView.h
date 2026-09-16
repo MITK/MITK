@@ -14,86 +14,81 @@ found in the LICENSE file.
 #ifndef BERRYHELPWEBVIEW_H
 #define BERRYHELPWEBVIEW_H
 
-#include <QFont>
-#include <QAction>
-
-#include <QWebEnginePage>
-#include <QWebEngineView>
+#include <QmitkHtmlWidget.h>
 
 #include <berryIEditorSite.h>
+
+#include <QList>
+#include <QUrl>
+
+class QMouseEvent;
+class QWheelEvent;
 
 namespace berry {
 
 class QHelpEngineWrapper;
 
-class HelpWebView : public QWebEngineView
+/**
+ * \brief Help page viewer built on the litehtml renderer.
+ *
+ * Serves qthelp:// pages and their resources out of the QHelpEngine, routes
+ * external links to the system browser, and maintains a simple back/forward
+ * navigation history (litehtml provides none).
+ */
+class HelpWebView : public QmitkHtmlWidget
 {
   Q_OBJECT
 
 public:
-  explicit HelpWebView(IEditorSite::Pointer editorSite, QWidget *parent, qreal zoom = 0.0);
+  explicit HelpWebView(IEditorSite::Pointer editorSite, QWidget *parent);
   ~HelpWebView() override;
-
-  QFont viewerFont() const;
-  void setViewerFont(const QFont &font);
-
-  qreal scale() const { return this->zoomFactor(); }
 
   bool handleForwardBackwardMouseButtons(QMouseEvent *e);
 
   void setSource(const QUrl &url);
 
-  inline QString documentTitle() const
-  { return title(); }
+  QString documentTitle() const
+  { return this->DocumentTitle(); }
 
-  inline bool hasSelection() const
-  { return !selectedText().isEmpty(); } // ### this is suboptimal
+  bool isForwardAvailable() const
+  { return m_HistoryIndex < m_History.size() - 1; }
+  bool isBackwardAvailable() const
+  { return m_HistoryIndex > 0; }
 
-  inline void copy()
-  { return triggerPageAction(QWebEnginePage::Copy); }
-
-  inline bool isForwardAvailable() const
-  { return pageAction(QWebEnginePage::Forward)->isEnabled(); }
-  inline bool isBackwardAvailable() const
-  { return pageAction(QWebEnginePage::Back)->isEnabled(); }
-  inline bool hasLoadFinished() const
-  { return m_LoadFinished; }
-
-  static QString mimeFromUrl(const QUrl &url);
-  static bool canOpenPage(const QString &url);
-  static bool isLocalUrl(const QUrl &url);
-  static bool launchWithExternalApp(const QUrl &url);
   static const QString m_MissingContextMessage;
   static const QString m_PageNotFoundMessage;
 
 public Q_SLOTS:
 
-  void backward() { back(); }
+  void backward();
+  void forward();
   void home();
 
   void scaleUp();
   void scaleDown();
-  void resetScale();
 
 Q_SIGNALS:
-  void copyAvailable(bool enabled);
-  void forwardAvailable(bool enabled);
   void backwardAvailable(bool enabled);
-  void highlighted(const QString &);
+  void forwardAvailable(bool enabled);
   void sourceChanged(const QUrl &);
 
 protected:
+  void mousePressEvent(QMouseEvent *) override;
   void wheelEvent(QWheelEvent *) override;
 
 private Q_SLOTS:
-  void actionChanged();
-  void setLoadStarted();
-  void setLoadFinished(bool ok);
+  void onLinkClicked(const QUrl &url);
 
 private:
+  /** \brief Fetch and render the page at url without touching the history. */
+  void load(const QUrl &url);
+  void updateHistoryButtons();
 
-  bool m_LoadFinished;
   QHelpEngineWrapper& m_HelpEngine;
+
+  QUrl m_CurrentUrl;
+  QList<QUrl> m_History;
+  int m_HistoryIndex;
 };
 
 }

@@ -50,8 +50,8 @@ if(NOT DEFINED VTK_DIR)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    GIT_REPOSITORY https://github.com/Kitware/VTK.git
-    GIT_TAG 7c0494a68bff379d32d6b1fbaa3d10d27a73af54 # v9.5.2
+    GIT_REPOSITORY https://github.com/MITK/VTK.git
+    GIT_TAG ad5e466024c6e1d4ee5877ea4170d04f25ef8ecb # v9.7.0-patched
     GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
@@ -59,7 +59,6 @@ if(NOT DEFINED VTK_DIR)
       ${ep_common_args}
       "-DQt6_DIR:PATH=${Qt6_DIR}"
       -DVTK_ENABLE_WRAPPING:BOOL=OFF
-      -DVTK_LEGACY_REMOVE:BOOL=ON
       -DVTK_MODULE_ENABLE_VTK_TestingRendering:STRING=YES
       -DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2:STRING=YES
       -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=YES

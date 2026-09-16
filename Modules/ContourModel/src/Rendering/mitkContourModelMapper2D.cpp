@@ -15,9 +15,7 @@ found in the LICENSE file.
 #include <mitkColorProperty.h>
 #include <mitkContourModel.h>
 #include <mitkContourModelSubDivisionFilter.h>
-#include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
-#include <vtkLinearTransform.h>
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
   : m_SubdivisionContour(mitk::ContourModel::New()), m_InitSubdivisionCurve(true)
@@ -28,8 +26,14 @@ mitk::ContourModelMapper2D::~ContourModelMapper2D()
 {
 }
 
-void mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
+int mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
+  // Drawing happens immediately through a vtkContext2D without a vtkProp, so the
+  // contour has to be painted in exactly one pass. Overlay is the last one and
+  // therefore the pass that determines the final pixels.
+  if (type != mitk::VtkPropRenderer::Overlay)
+    return 0;
+
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
   mitk::DataNode *dataNode = this->GetDataNode();
@@ -38,7 +42,7 @@ void mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   dataNode->GetVisibility(visible, renderer, "visible");
 
   if (!visible)
-    return;
+    return 0;
 
   mitk::ContourModel *input = this->GetInput();
 
@@ -65,9 +69,13 @@ void mitk::ContourModelMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
     renderingContour = this->m_SubdivisionContour;
   }
 
+  this->BeginDrawing(renderer);
   this->DrawContour(renderingContour, renderer);
+  this->EndDrawing(renderer);
 
   ls->UpdateGenerateDataTime();
+
+  return 1;
 }
 
 mitk::ContourModel *mitk::ContourModelMapper2D::GetInput(void)
@@ -79,7 +87,7 @@ void mitk::ContourModelMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                         mitk::BaseRenderer *renderer,
                                                         bool overwrite)
 {
-  node->AddProperty("contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.points.show", mitk::BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("contour.segments.show", mitk::BoolProperty::New(true), renderer, overwrite);
@@ -87,8 +95,6 @@ void mitk::ContourModelMapper2D::SetDefaultProperties(mitk::DataNode *node,
   node->AddProperty("contour.width", mitk::FloatProperty::New(1.0), renderer, overwrite);
   node->AddProperty("contour.hovering.width", mitk::FloatProperty::New(3.0), renderer, overwrite);
   node->AddProperty("contour.hovering", mitk::BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("contour.points.text", mitk::BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("contour.controlpoints.text", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("subdivision curve", mitk::BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("contour.project-onto-plane", mitk::BoolProperty::New(false), renderer, overwrite);

@@ -26,11 +26,8 @@ namespace Ui
 /**
  * \brief Dialog displaying information about the MITK application.
  *
- * Shows the application name, revision, toolkit versions (ITK, VTK, Qt),
- * and provides a button to view loaded CppMicroServices modules.
+ * Shows the application name, revision, and toolkit versions (ITK, VTK, Qt).
  * The about text, caption, and revision labels can be customized.
- *
- * \sa QmitkModulesDialog
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkAboutDialog : public QDialog
 {
@@ -82,10 +79,6 @@ public:
    * \param[in] text The new revision text (may contain HTML).
    */
   void SetRevisionText(const QString &text);
-
-protected slots:
-  /** \brief Open a QmitkModulesDialog to show loaded CppMicroServices modules. */
-  void ShowModules();
 
 private:
   std::unique_ptr<Ui::QmitkAboutDialog> m_GUI;

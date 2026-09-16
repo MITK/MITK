@@ -22,9 +22,29 @@ found in the LICENSE file.
 
 #include <functional>
 #include <limits>
+#include <locale>
+
+namespace
+{
+  // mimics locales like de_DE where '.' groups thousands and ',' is the
+  // decimal separator
+  struct GroupingNumpunct : std::numpunct<char>
+  {
+    char do_decimal_point() const override { return ','; }
+    char do_thousands_sep() const override { return '.'; }
+    std::string do_grouping() const override { return "\3"; }
+  };
+
+  struct GlobalLocaleGuard
+  {
+    explicit GlobalLocaleGuard(const std::locale& newLocale) : m_Previous(std::locale::global(newLocale)) {}
+    ~GlobalLocaleGuard() { std::locale::global(m_Previous); }
+    std::locale m_Previous;
+  };
+}
 
 //!
-//! Verifies boost::lexical<cast> for MITK's serialization purposes
+//! Verifies mitk::LexicalCast / mitk::ToString for MITK's serialization purposes
 //!
 //! Verifies:
 //! - special numbers behavior:
@@ -40,6 +60,10 @@ class mitkFloatToStringTestSuite : public mitk::TestFixture
   MITK_TEST(ConfirmStringValues<double>);
   MITK_TEST(TestConversions<float>);
   MITK_TEST(TestConversions<double>);
+  MITK_TEST(RejectsInvalidInput<float>);
+  MITK_TEST(RejectsInvalidInput<double>);
+  MITK_TEST(LocaleIndependence<float>);
+  MITK_TEST(LocaleIndependence<double>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -47,14 +71,14 @@ public:
   void ConfirmNumberToString(DATATYPE number, const std::string &s)
 
   {
-    CPPUNIT_ASSERT_EQUAL(boost::lexical_cast<std::string>(number), s);
+    CPPUNIT_ASSERT_EQUAL(mitk::ToString(number), s);
   }
 
   template <typename DATATYPE>
   void ConfirmStringToNumber(const std::string &s, DATATYPE number)
 
   {
-    CPPUNIT_ASSERT_EQUAL(number, boost::lexical_cast<DATATYPE>(s));
+    CPPUNIT_ASSERT_EQUAL(number, mitk::LexicalCast<DATATYPE>(s));
   }
 
   template <typename DATATYPE>
@@ -62,12 +86,12 @@ public:
   {
     // we want to make sure that the following strings will be accepted and returned
     // by our conversion functions. This must not change in the future to ensure compatibility
-    auto nan = boost::lexical_cast<DATATYPE>("nan");
+    auto nan = mitk::LexicalCast<DATATYPE>("nan");
     CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
-    nan = boost::lexical_cast<DATATYPE>("NAN");
+    nan = mitk::LexicalCast<DATATYPE>("NAN");
     CPPUNIT_ASSERT_MESSAGE("NAN==NAN must be false", !(nan == nan));
 
-    std::string s_nan = boost::lexical_cast<std::string>(nan);
+    std::string s_nan = mitk::ToString(nan);
     CPPUNIT_ASSERT_EQUAL(std::string("nan"), s_nan);
 
     ConfirmStringToNumber("inf", std::numeric_limits<DATATYPE>::infinity());
@@ -87,8 +111,8 @@ public:
   template <typename DATATYPE>
   void CheckRoundTrip(DATATYPE number, DATATYPE tolerance)
   {
-    std::string s = boost::lexical_cast<std::string>(number);
-    auto number2 = boost::lexical_cast<DATATYPE>(s);
+    std::string s = mitk::ToString(number);
+    auto number2 = mitk::LexicalCast<DATATYPE>(s);
 
     CPPUNIT_ASSERT_MESSAGE(std::string("Must not parse string ") + s + " as NaN", number2 == number2);
     if (tolerance == 0)
@@ -104,13 +128,53 @@ public:
   template <typename DATATYPE>
   void CheckRoundTrip(const std::string &input)
   {
-    auto number = boost::lexical_cast<DATATYPE>(input);
-    std::string result = boost::lexical_cast<std::string>(number);
+    auto number = mitk::LexicalCast<DATATYPE>(input);
+    std::string result = mitk::ToString(number);
 
     // There are normal imprecisions when converting to string
     // We do only compare if the numeric values match "close enough"
-    auto number2 = boost::lexical_cast<DATATYPE>(result);
+    auto number2 = mitk::LexicalCast<DATATYPE>(result);
     CPPUNIT_ASSERT(mitk::Equal(number, number2));
+  }
+
+  template <typename DATATYPE>
+  void RejectsInvalidInput()
+  {
+    // The conversion contract is to throw on anything that is not a complete,
+    // valid number: pure garbage, a valid prefix with trailing characters, and
+    // the empty string.
+    CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>("abc"), mitk::BadLexicalCast);
+    CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>("1.5 and more"), mitk::BadLexicalCast);
+    CPPUNIT_ASSERT_THROW(mitk::LexicalCast<DATATYPE>(""), mitk::BadLexicalCast);
+  }
+
+  template <typename DATATYPE>
+  void LocaleIndependence()
+  {
+    // The documented contract is locale-INDEPENDENT conversion: results must
+    // not change when a host application installs a global locale whose
+    // numpunct groups thousands with '.' (de_DE style). Expected values are
+    // computed under the classic locale first.
+    const auto expectedGrouped = mitk::LexicalCast<DATATYPE>("1.234");
+    const auto expectedSmall = mitk::LexicalCast<DATATYPE>("0.001");
+    const auto expectedExponent = mitk::LexicalCast<DATATYPE>("1.234e2");
+    const auto number = static_cast<DATATYPE>(1234.5);
+    const std::string expectedString = mitk::ToString(number);
+
+    GlobalLocaleGuard guard(std::locale(std::locale::classic(), new GroupingNumpunct));
+
+    CPPUNIT_ASSERT_EQUAL(expectedGrouped, mitk::LexicalCast<DATATYPE>("1.234"));
+    CPPUNIT_ASSERT_EQUAL(expectedSmall, mitk::LexicalCast<DATATYPE>("0.001"));
+    CPPUNIT_ASSERT_EQUAL(expectedExponent, mitk::LexicalCast<DATATYPE>("1.234e2"));
+    CPPUNIT_ASSERT_EQUAL(expectedString, mitk::ToString(number));
+    CPPUNIT_ASSERT_EQUAL(number, mitk::LexicalCast<DATATYPE>(mitk::ToString(number)));
+
+    // the special values from ConfirmStringValues must work under any locale
+    ConfirmStringToNumber("inf", std::numeric_limits<DATATYPE>::infinity());
+    ConfirmStringToNumber("-INFINITY", -std::numeric_limits<DATATYPE>::infinity());
+    const auto nan = mitk::LexicalCast<DATATYPE>("nan");
+    CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
+    ConfirmNumberToString(std::numeric_limits<DATATYPE>::infinity(), "inf");
   }
 
   template <typename DATATYPE>

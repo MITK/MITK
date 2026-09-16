@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveInstall.h>
 
 #include <mitkIPreferences.h>
+#include <mitkPythonHelper.h>
 #include <mitkPythonUtil.h>
 #include <mitknnInteractiveVersion.h>
 
@@ -38,6 +39,24 @@ namespace
 #endif
   }
 
+  // torch 2.8 is the last release whose CUDA builds contain Pascal kernels
+  // (sm_61, GeForce 10 series), and it publishes no wheels for CPython 3.14 or
+  // newer. There the oldest usable release is 2.10 -- 2.9 has a blocking defect
+  // for us -- which no longer runs on Pascal, so the minimum GPU rises to
+  // Turing. Keep in sync with the compute capability floor in
+  // mitknnInteractiveTool.cpp and the GPU list in QmitknnInteractiveToolGUI.cpp.
+  //
+  // torchvision has to be pinned alongside torch and installed from the same
+  // index, because every torchvision release hard-pins one torch version; the
+  // torch upper bound is what keeps it on the matching minor.
+  std::vector<std::string> TorchRequirements()
+  {
+    if constexpr (mitk::PythonHelper::VERSION_MINOR >= 14)
+      return { "torch>=2.10.0,<2.11.0", "torchvision>=0.25.0,<1.0.0" };
+    else
+      return { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+  }
+
   // The install groups shared by a fresh install and an in-place upgrade. Client
   // only installs the lightweight, torch-free nninteractive-client; full mode
   // installs PyTorch (from the CUDA wheel index on Windows) and nnInteractive.
@@ -58,7 +77,7 @@ namespace
     }
 
     mitk::PipInstallGroup torchGroup;
-    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+    torchGroup.requirements = TorchRequirements();
     torchGroup.indexUrl = CudaIndexUrl();
     groups.push_back(std::move(torchGroup));
 

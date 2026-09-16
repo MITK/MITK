@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitkExtWorkbenchWindowAdvisor.h"
 #include "QmitkExtActionBarAdvisor.h"
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QLayout>
 #include <QMenu>
@@ -24,6 +26,7 @@ found in the LICENSE file.
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
+#include <QTimer>
 
 #include <ctkPluginException.h>
 #include <service/event/ctkEventAdmin.h>
@@ -372,37 +375,7 @@ public:
   {
     if (perspectivesClosed)
     {
-      QListIterator<QAction*> i(windowAdvisor->viewActions);
-      while (i.hasNext())
-      {
-        i.next()->setEnabled(true);
-      }
-
-      //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
-      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
-      {
-        windowAdvisor->openDicomEditorAction->setEnabled(true);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
-      {
-        windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(true);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
-      {
-        windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(true);
-      }
-
-      windowAdvisor->fileSaveProjectAction->setEnabled(true);
-      windowAdvisor->closeProjectAction->setEnabled(true);
-      windowAdvisor->undoAction->setEnabled(true);
-      windowAdvisor->redoAction->setEnabled(true);
-      windowAdvisor->imageNavigatorAction->setEnabled(true);
-      windowAdvisor->viewNavigatorAction->setEnabled(true);
-      windowAdvisor->resetPerspAction->setEnabled(true);
-      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
-      {
-        windowAdvisor->closePerspAction->setEnabled(true);
-      }
+      this->SetActionsEnabled(true);
     }
 
     perspectivesClosed = false;
@@ -422,41 +395,37 @@ public:
     if (allClosed)
     {
       perspectivesClosed = true;
-
-      QListIterator<QAction*> i(windowAdvisor->viewActions);
-      while (i.hasNext())
-      {
-        i.next()->setEnabled(false);
-      }
-
-      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
-      {
-        windowAdvisor->openDicomEditorAction->setEnabled(false);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
-      {
-        windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(false);
-      }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
-      {
-        windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(false);
-      }
-
-      windowAdvisor->fileSaveProjectAction->setEnabled(false);
-      windowAdvisor->closeProjectAction->setEnabled(false);
-      windowAdvisor->undoAction->setEnabled(false);
-      windowAdvisor->redoAction->setEnabled(false);
-      windowAdvisor->imageNavigatorAction->setEnabled(false);
-      windowAdvisor->viewNavigatorAction->setEnabled(false);
-      windowAdvisor->resetPerspAction->setEnabled(false);
-      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
-      {
-        windowAdvisor->closePerspAction->setEnabled(false);
-      }
+      this->SetActionsEnabled(false);
     }
   }
 
 private:
+  // The optional actions are created only when their editor or view is part of the
+  // build, so the null check stands in for repeating each creation condition here.
+  static void SetEnabled(QAction* action, bool enabled)
+  {
+    if (nullptr != action)
+      action->setEnabled(enabled);
+  }
+
+  void SetActionsEnabled(bool enabled)
+  {
+    for (auto viewAction : std::as_const(windowAdvisor->viewActions))
+      viewAction->setEnabled(enabled);
+
+    SetEnabled(windowAdvisor->openDicomEditorAction, enabled);
+    SetEnabled(windowAdvisor->openStdMultiWidgetEditorAction, enabled);
+    SetEnabled(windowAdvisor->openMxNMultiWidgetEditorAction, enabled);
+    SetEnabled(windowAdvisor->fileSaveProjectAction, enabled);
+    SetEnabled(windowAdvisor->closeProjectAction, enabled);
+    SetEnabled(windowAdvisor->undoAction, enabled);
+    SetEnabled(windowAdvisor->redoAction, enabled);
+    SetEnabled(windowAdvisor->imageNavigatorAction, enabled);
+    SetEnabled(windowAdvisor->viewNavigatorAction, enabled);
+    SetEnabled(windowAdvisor->resetPerspAction, enabled);
+    SetEnabled(windowAdvisor->closePerspAction, enabled);
+  }
+
   QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
   bool perspectivesClosed;
 };
@@ -608,6 +577,65 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const QString& wndIcon)
   windowIcon = wndIcon;
 }
 
+namespace
+{
+  // Both help menu entries need org.blueberry.ui.qt.help: it contributes the help
+  // index view as well as the handler for the context help event.
+  bool IsHelpPluginAvailable()
+  {
+    auto context = QmitkCommonExtPlugin::getContext();
+
+    if (nullptr == context)
+      return false;
+
+    const auto plugins = context->getPlugins();
+
+    return std::any_of(plugins.cbegin(), plugins.cend(), [](const QSharedPointer<ctkPlugin>& plugin) {
+      return "org.blueberry.ui.qt.help" == plugin->getSymbolicName();
+    });
+  }
+
+#ifdef Q_OS_WIN
+  // On Windows, use a borderless window instead of true full-screen. The render
+  // views are OpenGL widgets, so Qt composites the whole window through OpenGL;
+  // a GL window that exactly fills the screen makes the OS bypass desktop
+  // composition (exclusive full-screen), throttling Qt widget repaints to a few
+  // FPS. A frameless window overflowing the screen by one pixel keeps
+  // composition active. Replace the flags (do not just add the frameless hint)
+  // so no title bar survives.
+  QRect BorderlessFullScreenBounds(const QMainWindow* window)
+  {
+    return window->screen()->geometry().adjusted(-1, -1, 1, 1);
+  }
+
+  void SetBorderlessFullScreen(QMainWindow* window)
+  {
+    window->setWindowFlags(Qt::FramelessWindowHint);
+    window->setGeometry(BorderlessFullScreenBounds(window));
+  }
+
+  // Toggle window flags and geometry on an already-visible window. setWindowFlags()
+  // hides the window; show() must run before setGeometry() so the geometry lands
+  // on a realized window and cascades a resize event into the central widget's
+  // layout. Setting the geometry while hidden updates the stored size first, so
+  // the size reported after show() matches it, Qt suppresses the resize event,
+  // and the editor area stays one toggle behind the window.
+  //
+  // The geometry is deferred by one event-loop turn: Qt's Windows backend caches
+  // the frame margins and only recalculates them once the flag change has been
+  // processed. A synchronous setGeometry() after leaving the frameless state
+  // still converts with zero margins, placing the outer frame on the requested
+  // client rect, so the restored window shrinks by the frame size on every
+  // toggle (and Qt warns "Unable to set geometry").
+  void ReshowWithFlagsAndGeometry(QMainWindow* window, Qt::WindowFlags flags, const QRect& bounds)
+  {
+    window->setWindowFlags(flags);
+    window->show();
+    QTimer::singleShot(0, window, [window, bounds]() { window->setGeometry(bounds); });
+  }
+#endif
+}
+
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
   // very bad hack...
@@ -627,13 +655,20 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // Style icons of Qt's standard message boxes
   QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
-  // Enable full screen support
-  if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
+  // Start in full-screen (kiosk) mode when requested on the command line.
+  const bool fullScreenMode = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance())->getFullScreenMode();
+  if (fullScreenMode)
   {
-    mainWindow->setWindowFlags(Qt::FramelessWindowHint);
-    // Used that way as mainWindow->showFullscreen() renders the application very
-    // unresponsive with around 5 FPS.
-    mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
+#ifdef Q_OS_WIN
+    SetBorderlessFullScreen(mainWindow);
+#else
+    // Native full-screen. On X11 it sets the EWMH full-screen state, so the
+    // window manager keeps the window matched to the display when its
+    // resolution changes (e.g. RANDR resizes in remote-desktop setups). On
+    // macOS it correctly clears the menu bar and notch (uses the full-screen
+    // button hint set in the shell factory).
+    mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
+#endif
   }
 
   // ==== Application menu ============================
@@ -749,6 +784,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       windowMenu->addSeparator();
     }
 
+    if (!fullScreenMode)
+    {
+      windowMenu->addAction("&Full Screen", QKeySequence(QKeySequence::FullScreen),
+        QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onFullScreen()));
+      windowMenu->addSeparator();
+    }
+
     QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
 
     QMenu* viewMenu = nullptr;
@@ -813,9 +855,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // ===== Help menu ====================================
     QMenu* helpMenu = menuBar->addMenu("&Help");
-    helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-    helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
-    helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
+
+    if (window->GetWorkbench()->GetIntroManager()->HasIntro())
+      helpMenu->addAction("&Welcome", this, SLOT(onIntro()));
+
+    if (IsHelpPluginAvailable())
+    {
+      helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
+      helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
+    }
+
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================
   }
@@ -839,7 +888,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
   imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
-  bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+  bool imageNavigatorViewFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.imagenavigator");
 
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
   {
@@ -874,7 +923,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
 
   viewNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
-  viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigator");
+  viewNavigatorFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator");
   if (viewNavigatorFound)
   {
     QObject::connect(viewNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onViewNavigator()));
@@ -1103,9 +1152,9 @@ void QmitkExtWorkbenchWindowAdvisor::onHelp()
   QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
 }
 
-void QmitkExtWorkbenchWindowAdvisor::onHelpOpenHelpPerspective()
+void QmitkExtWorkbenchWindowAdvisor::onHelpOpenHelpView()
 {
-  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpPerspective();
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpView();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onAbout()
@@ -1174,6 +1223,10 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 // to cover for all possible cases of closed pages etc.
 static void SafeHandleNavigatorView(QString view_query_name)
 {
+  // ShowView() throws for an unknown ID, which would escape into the Qt event loop.
+  if (!mitk::WorkbenchUtil::IsViewAvailable(view_query_name))
+    return;
+
   berry::IWorkbench* wbench = berry::PlatformUI::GetWorkbench();
   if( wbench == nullptr )
     return;
@@ -1246,6 +1299,36 @@ void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
   berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(nullptr);
 }
 
+void QmitkExtWorkbenchWindowAdvisorHack::onFullScreen()
+{
+  auto window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  auto* mainWindow = qobject_cast<QMainWindow*>(window->GetShell()->GetControl());
+  if (nullptr == mainWindow)
+    return;
+
+#ifndef Q_OS_WIN
+  mainWindow->isFullScreen() ? mainWindow->showNormal() : mainWindow->showFullScreen();
+#else
+  // Toggle borderless full-screen. See SetBorderlessFullScreen for why true
+  // full-screen is avoided on Windows. The original flags and geometry are
+  // saved so the decorated window can be restored on exit.
+  if (mainWindow->property("mitkBorderlessFullScreen").toBool())
+  {
+    mainWindow->setProperty("mitkBorderlessFullScreen", false);
+    ReshowWithFlagsAndGeometry(mainWindow,
+      Qt::WindowFlags(mainWindow->property("mitkWindowedFlags").toInt()),
+      mainWindow->property("mitkWindowedGeometry").toRect());
+  }
+  else
+  {
+    mainWindow->setProperty("mitkBorderlessFullScreen", true);
+    mainWindow->setProperty("mitkWindowedFlags", static_cast<int>(mainWindow->windowFlags()));
+    mainWindow->setProperty("mitkWindowedGeometry", mainWindow->geometry());
+    ReshowWithFlagsAndGeometry(mainWindow, Qt::FramelessWindowHint, BorderlessFullScreenBounds(mainWindow));
+  }
+#endif
+}
+
 void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 {
   if (berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro())
@@ -1303,10 +1386,21 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
   }
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
+void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpView()
 {
-  berry::PlatformUI::GetWorkbench()->ShowPerspective("org.blueberry.perspectives.help",
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
+  // ShowView() throws for an unknown ID, which would escape into the Qt event loop.
+  if (!mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex"))
+    return;
+
+  auto window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  if (window.IsNull())
+    return;
+
+  auto page = window->GetActivePage();
+  if (page.IsNull())
+    return;
+
+  page->ShowView("org.blueberry.views.helpindex");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()

@@ -287,7 +287,7 @@ CalcSignalFromFunction(const mitk::Point3D& position, const mitk::modelFit::Mode
     double x = timeGrid[t];
     parameterMap[fitInfo->x] = x;
 
-    double y = parser.parse(fitInfo->function);
+    double y = parser.Parse(fitInfo->function);
     values.emplace_back(std::make_pair(x, y));
   }
 

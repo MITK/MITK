@@ -112,6 +112,60 @@ void PointSetDifferenceStatisticsCalculator_PointSetsOfSameSizeWithDifferentPoin
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),0.0),".. Testing GetMedian");
 }
 
+void PointSetDifferenceStatisticsCalculator_ThreePointPairs_MedianIsTheMiddleDifference()
+{
+  Setup();
+
+  MITK_TEST_OUTPUT(<< "Starting odd point count test case...");
+
+  mitk::Point3D tmpPoint;
+
+  //Differences of 1, 5 and 3 along the x axis, deliberately not in sorted order
+  tmpPoint.Fill(0);
+  m_myTestPointSet1->InsertPoint(0,tmpPoint);
+  m_myTestPointSet1->InsertPoint(1,tmpPoint);
+  m_myTestPointSet1->InsertPoint(2,tmpPoint);
+
+  mitk::FillVector3D(tmpPoint,1,0,0);
+  m_myTestPointSet2->InsertPoint(0,tmpPoint);
+  mitk::FillVector3D(tmpPoint,5,0,0);
+  m_myTestPointSet2->InsertPoint(1,tmpPoint);
+  mitk::FillVector3D(tmpPoint,3,0,0);
+  m_myTestPointSet2->InsertPoint(2,tmpPoint);
+
+  //Ground truth values (No logic in tests! Do not change values! :))
+  const double median = 3.0;
+  const double min = 1.0;
+  const double max = 5.0;
+
+  m_myPointSetDifferenceStatisticsCalculator->SetPointSets(m_myTestPointSet1, m_myTestPointSet2);
+
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMin(),min,1E-6),".. Testing GetMin");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMax(),max,1E-6),".. Testing GetMax");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),median,1E-6),".. Testing GetMedian for an odd number of point pairs");
+}
+
+void PointSetDifferenceStatisticsCalculator_OnePointPair_MedianIsTheOnlyDifference()
+{
+  Setup();
+
+  MITK_TEST_OUTPUT(<< "Starting single point pair test case...");
+
+  mitk::Point3D tmpPoint;
+
+  tmpPoint.Fill(0);
+  m_myTestPointSet1->InsertPoint(0,tmpPoint);
+  mitk::FillVector3D(tmpPoint,2,0,0);
+  m_myTestPointSet2->InsertPoint(0,tmpPoint);
+
+  //Ground truth values (No logic in tests! Do not change values! :))
+  const double median = 2.0;
+
+  m_myPointSetDifferenceStatisticsCalculator->SetPointSets(m_myTestPointSet1, m_myTestPointSet2);
+
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),median,1E-6),".. Testing GetMedian for a single point pair");
+}
+
 void PointSetDifferenceStatisticsCalculator_TwoPointSetsOfDifferentSize_ThrowsException()
 {
   Setup();
@@ -140,6 +194,8 @@ int mitkPointSetDifferenceStatisticsCalculatorTest(int, char* [])
   PointSetDifferenceStatisticsCalculator_DefaultConstructor_ResultIsNotNull();
   PointSetDifferenceStatisticsCalculator_NonDefaultConstructor_ResultIsNotNull();
   PointSetDifferenceStatisticsCalculator_TwoSimplePointSetsOfSizeTwo_ResultsInGroundTruthValues();
+  PointSetDifferenceStatisticsCalculator_ThreePointPairs_MedianIsTheMiddleDifference();
+  PointSetDifferenceStatisticsCalculator_OnePointPair_MedianIsTheOnlyDifference();
   PointSetDifferenceStatisticsCalculator_PointSetWithSizeZero_ThrowsException();
   PointSetDifferenceStatisticsCalculator_TwoPointSetsOfDifferentSize_ThrowsException();
   PointSetDifferenceStatisticsCalculator_PointSetsOfSameSizeWithDifferentPointIDs_ResultsInGroundTruth();

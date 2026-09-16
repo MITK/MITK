@@ -26,6 +26,8 @@ found in the LICENSE file.
 #include <QUrl>
 #endif
 
+#include <cstdlib>
+
 /**
  * \brief Safely delivers a Qt event, catching and displaying any exceptions.
  *
@@ -80,7 +82,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   if (clicked == exitButton)
   {
     MITK_ERROR << "The program was closed.";
-    app->closeAllWindows();
+    std::exit(EXIT_FAILURE);
   }
   else if (clicked == ignoreButton)
   {

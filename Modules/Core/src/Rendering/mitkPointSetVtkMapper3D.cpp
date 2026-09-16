@@ -30,7 +30,7 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkSphereSource.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 #include <vtkTubeFilter.h>
 #include <vtkVectorText.h>
 
@@ -290,7 +290,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       aLabelTransform->Scale(5.7, 5.7, 5.7);
 
       //# Move the label to a new position.
-      vtkSmartPointer<vtkTransformPolyDataFilter> labelTransform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+      vtkSmartPointer<vtkTransformFilter> labelTransform = vtkSmartPointer<vtkTransformFilter>::New();
       labelTransform->SetTransform(aLabelTransform);
       labelTransform->SetInputConnection(label->GetOutputPort());
 

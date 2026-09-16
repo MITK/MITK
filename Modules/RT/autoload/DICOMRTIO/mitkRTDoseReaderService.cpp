@@ -147,7 +147,7 @@ namespace mitk
       return result;
     }
     else {
-      gridScaling = boost::lexical_cast<double>(findingsGridScaling.front().value);
+      gridScaling = mitk::LexicalCast<double>(findingsGridScaling.front().value);
     }
 
     AccessByItk_1(originalImage, MultiplyGridScaling, gridScaling);

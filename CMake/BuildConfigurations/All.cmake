@@ -6,7 +6,8 @@ set(_package_excludes
   ${_apple_package_excludes}
   OpenMP
   SYSTEM_Boost
-  Boost_LIBRARIES
+  Boost_HEADER_LIBRARIES
+  Boost_COMPILED_LIBRARIES
   SYSTEM_PYTHON
   SUPERBUILD
 )

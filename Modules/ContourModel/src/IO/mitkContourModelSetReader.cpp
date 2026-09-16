@@ -63,6 +63,11 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelSetReader::DoRe
     }
     result.push_back(dynamic_cast<mitk::BaseData *>(contourSet.GetPointer()));
   }
+  catch (const Exception &)
+  {
+    // The contour reader already names what is wrong with the file.
+    throw;
+  }
   catch (...)
   {
     MITK_ERROR << "Cannot read contourModel.";

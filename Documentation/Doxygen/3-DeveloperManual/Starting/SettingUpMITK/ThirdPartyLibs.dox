@@ -43,6 +43,10 @@ https://itk.org/
 
 https://github.com/nlohmann/json
 
+\par litehtml
+
+https://github.com/litehtml/litehtml
+
 \par lz4
 
 https://github.com/lz4/lz4
@@ -50,6 +54,10 @@ https://github.com/lz4/lz4
 \par MatchPoint
 
 https://github.com/MIC-DKFZ/MatchPoint
+
+\par nnInteractive
+
+https://github.com/MIC-DKFZ/nnInteractive
 
 \par oneAPI Threading Building Blocks (oneTBB)
 
@@ -82,6 +90,10 @@ https://github.com/getsentry/sentry-native
 \par TinyXML-2
 
 https://www.grinninglizard.com/tinyxml2/
+
+\par TotalSegmentator
+
+https://github.com/wasserth/TotalSegmentator
 
 \par VTK
 

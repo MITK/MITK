@@ -15,9 +15,10 @@ found in the LICENSE file.
 
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkAbstractView.h>
-#include <QmitkChartWidget.h>
 #include <QmitkNodeSelectionDialog.h>
 #include <QmitkSliceNavigationListener.h>
+
+#include <QmitkPlotStyle.h>
 
 #include <mitkImageStatisticsContainer.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -68,7 +69,7 @@ protected:
   void UpdateIntensityProfile();
   void UpdateHistogramWidget();
 
-  QmitkChartWidget::ColorTheme GetColorTheme() const;
+  QmitkPlotStyle GetColorTheme() const;
 
   void ResetGUI();
 

@@ -41,36 +41,36 @@ tinyxml2::XMLElement *mitk::Geometry3DToXML::ToXML(tinyxml2::XMLDocument& doc, c
   // coefficients are matrix[row][column]!
   auto *matrixElem = doc.NewElement("IndexToWorld");
   matrixElem->SetAttribute("type", "Matrix3x3");
-  matrixElem->SetAttribute("m_0_0", boost::lexical_cast<std::string>(matrix[0][0]).c_str());
-  matrixElem->SetAttribute("m_0_1", boost::lexical_cast<std::string>(matrix[0][1]).c_str());
-  matrixElem->SetAttribute("m_0_2", boost::lexical_cast<std::string>(matrix[0][2]).c_str());
-  matrixElem->SetAttribute("m_1_0", boost::lexical_cast<std::string>(matrix[1][0]).c_str());
-  matrixElem->SetAttribute("m_1_1", boost::lexical_cast<std::string>(matrix[1][1]).c_str());
-  matrixElem->SetAttribute("m_1_2", boost::lexical_cast<std::string>(matrix[1][2]).c_str());
-  matrixElem->SetAttribute("m_2_0", boost::lexical_cast<std::string>(matrix[2][0]).c_str());
-  matrixElem->SetAttribute("m_2_1", boost::lexical_cast<std::string>(matrix[2][1]).c_str());
-  matrixElem->SetAttribute("m_2_2", boost::lexical_cast<std::string>(matrix[2][2]).c_str());
+  matrixElem->SetAttribute("m_0_0", mitk::ToString(matrix[0][0]).c_str());
+  matrixElem->SetAttribute("m_0_1", mitk::ToString(matrix[0][1]).c_str());
+  matrixElem->SetAttribute("m_0_2", mitk::ToString(matrix[0][2]).c_str());
+  matrixElem->SetAttribute("m_1_0", mitk::ToString(matrix[1][0]).c_str());
+  matrixElem->SetAttribute("m_1_1", mitk::ToString(matrix[1][1]).c_str());
+  matrixElem->SetAttribute("m_1_2", mitk::ToString(matrix[1][2]).c_str());
+  matrixElem->SetAttribute("m_2_0", mitk::ToString(matrix[2][0]).c_str());
+  matrixElem->SetAttribute("m_2_1", mitk::ToString(matrix[2][1]).c_str());
+  matrixElem->SetAttribute("m_2_2", mitk::ToString(matrix[2][2]).c_str());
   geomElem->InsertEndChild(matrixElem);
 
   auto *offsetElem = doc.NewElement("Offset");
   offsetElem->SetAttribute("type", "Vector3D");
-  offsetElem->SetAttribute("x", boost::lexical_cast<std::string>(offset[0]).c_str());
-  offsetElem->SetAttribute("y", boost::lexical_cast<std::string>(offset[1]).c_str());
-  offsetElem->SetAttribute("z", boost::lexical_cast<std::string>(offset[2]).c_str());
+  offsetElem->SetAttribute("x", mitk::ToString(offset[0]).c_str());
+  offsetElem->SetAttribute("y", mitk::ToString(offset[1]).c_str());
+  offsetElem->SetAttribute("z", mitk::ToString(offset[2]).c_str());
   geomElem->InsertEndChild(offsetElem);
 
   auto *boundsElem = doc.NewElement("Bounds");
   auto *boundsMinElem = doc.NewElement("Min");
   boundsMinElem->SetAttribute("type", "Vector3D");
-  boundsMinElem->SetAttribute("x", boost::lexical_cast<std::string>(bounds[0]).c_str());
-  boundsMinElem->SetAttribute("y", boost::lexical_cast<std::string>(bounds[2]).c_str());
-  boundsMinElem->SetAttribute("z", boost::lexical_cast<std::string>(bounds[4]).c_str());
+  boundsMinElem->SetAttribute("x", mitk::ToString(bounds[0]).c_str());
+  boundsMinElem->SetAttribute("y", mitk::ToString(bounds[2]).c_str());
+  boundsMinElem->SetAttribute("z", mitk::ToString(bounds[4]).c_str());
   boundsElem->InsertEndChild(boundsMinElem);
   auto *boundsMaxElem = doc.NewElement("Max");
   boundsMaxElem->SetAttribute("type", "Vector3D");
-  boundsMaxElem->SetAttribute("x", boost::lexical_cast<std::string>(bounds[1]).c_str());
-  boundsMaxElem->SetAttribute("y", boost::lexical_cast<std::string>(bounds[3]).c_str());
-  boundsMaxElem->SetAttribute("z", boost::lexical_cast<std::string>(bounds[5]).c_str());
+  boundsMaxElem->SetAttribute("x", mitk::ToString(bounds[1]).c_str());
+  boundsMaxElem->SetAttribute("y", mitk::ToString(bounds[3]).c_str());
+  boundsMaxElem->SetAttribute("z", mitk::ToString(bounds[5]).c_str());
   boundsElem->InsertEndChild(boundsMaxElem);
   geomElem->InsertEndChild(boundsElem);
 
@@ -117,9 +117,9 @@ mitk::Geometry3D::Pointer mitk::Geometry3DToXML::FromXML(const tinyxml2::XMLElem
         {
           try
           {
-            matrix[r][c] = boost::lexical_cast<double>(string_value);
+            matrix[r][c] = mitk::LexicalCast<double>(string_value);
           }
-          catch ( const boost::bad_lexical_cast &e )
+          catch ( const mitk::BadLexicalCast &e )
           {
             MITK_ERROR << "Could not parse '" << string_value << "' as number: " << e.what();
             return nullptr;
@@ -162,9 +162,9 @@ mitk::Geometry3D::Pointer mitk::Geometry3DToXML::FromXML(const tinyxml2::XMLElem
     for (unsigned int d = 0; d < 3; ++d)
       try
       {
-        offset[d] = boost::lexical_cast<double>(offset_string[d]);
+        offset[d] = mitk::LexicalCast<double>(offset_string[d]);
       }
-      catch ( const boost::bad_lexical_cast &e )
+      catch ( const mitk::BadLexicalCast &e )
       {
         MITK_ERROR << "Could not parse '" << offset_string[d] << "' as number: " << e.what();
         return nullptr;
@@ -216,9 +216,9 @@ mitk::Geometry3D::Pointer mitk::Geometry3DToXML::FromXML(const tinyxml2::XMLElem
     for (unsigned int d = 0; d < 6; ++d)
       try
       {
-        bounds[d] = boost::lexical_cast<double>(bounds_string[d]);
+        bounds[d] = mitk::LexicalCast<double>(bounds_string[d]);
       }
-      catch ( const boost::bad_lexical_cast &e )
+      catch ( const mitk::BadLexicalCast &e )
       {
         MITK_ERROR << "Could not parse '" << bounds_string[d] << "' as number: " << e.what();
         return nullptr;

@@ -45,10 +45,6 @@ found in the LICENSE file.
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTimeGeometry.h>
 
-// boost
-#include <boost/algorithm/string.hpp>
-#include <boost/tokenizer.hpp>
-
 // stl
 #include <algorithm>
 #include <iostream>

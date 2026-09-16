@@ -53,9 +53,8 @@ namespace mitk
     itk::ObjectFactoryBase that is registered
         to the top-level itk::ObjectFactory. For an example, see mitkContourToolFactory.h. (this limitation of
     one-class-one-factory is due
-        to the implementation of itk::ObjectFactory).
-        In MITK, the right place to register the factories to itk::ObjectFactory is the mitk::QMCoreObjectFactory or
-    mitk::SBCoreObjectFactory.
+        to the implementation of itk::ObjectFactory). The factories register themselves with
+    itk::ObjectFactory when their module is loaded, usually via the MITK_TOOL_MACRO.
 
      \li ToolManager knows a set of "reference" DataNodes and a set of "working" DataNodes. The first application are
     segmentation tools, where the

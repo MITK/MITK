@@ -70,7 +70,6 @@ protected:
   bool m_OutDatedThumbNail;
   QPixmap m_ThumbNail;
   itk::ModifiedTimeType m_DataMTime;
-  itk::ModifiedTimeType m_SelectionPropMTime;
 
   bool m_IsOptional;
 

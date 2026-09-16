@@ -16,7 +16,7 @@ if(MITK_USE_MatchPoint)
   endif()
 
   set(proj MatchPoint)
-  set(proj_DEPENDENCIES Boost ITK)
+  set(proj_DEPENDENCIES ITK)
 
   set(MatchPoint_DEPENDS ${proj})
 
@@ -35,24 +35,20 @@ if(MITK_USE_MatchPoint)
 
     set(MatchPoint_VERSION "0.14")
 
-    string(REPLACE "-DBOOST_ALL_DYN_LINK" "" modified_ep_common_args "${ep_common_args}")
-
     ExternalProject_Add(${proj}
        ${download_step}
-       # INSTALL_COMMAND "${CMAKE_COMMAND} -P cmake_install.cmake"
        CMAKE_GENERATOR ${gen}
        CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
-         ${modified_ep_common_args}
+         ${ep_common_args}
          ${additional_cmake_args}
          -DBUILD_TESTING:BOOL=OFF
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build
-         "-DBoost_DIR:PATH=${Boost_DIR}"
          -DMAP_USE_SYSTEM_GDCM:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
-         -DMAP_BUILD_Ontology:BOOL=ON
-         -DMAP_BUILD_Ontology_simple:BOOL=ON
+         -DMAP_DEPLOY_INCLUDED_ALGORITHMS:BOOL=OFF
+         -DMAP_BUILD_APPS:BOOL=OFF
          -DGDCM_DIR:PATH=${GDCM_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}

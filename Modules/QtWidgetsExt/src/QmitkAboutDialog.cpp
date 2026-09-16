@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include <QmitkAboutDialog.h>
 #include <ui_QmitkAboutDialogGUI.h>
-#include <QmitkModulesDialog.h>
-#include <QPushButton>
 #include <QRegularExpression>
 #include <itkConfigure.h>
 #include <mitkVersion.h>
@@ -61,21 +59,11 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
   m_GUI->m_ToolkitVersionsLabel->setText(CreateToolkitVersionsLabelText());
   m_GUI->m_AboutLabel->setText(MatchDocumentationToReleaseVersion(m_GUI->m_AboutLabel->text()));
 
-  auto* btnModules = new QPushButton(QIcon(":/QtWidgetsExt/ModuleView.png"), "Modules");
-  m_GUI->m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
-
-  connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));
   connect(m_GUI->m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 QmitkAboutDialog::~QmitkAboutDialog()
 {
-}
-
-void QmitkAboutDialog::ShowModules()
-{
-  QmitkModulesDialog dialog(this);
-  dialog.exec();
 }
 
 QString QmitkAboutDialog::GetAboutText() const

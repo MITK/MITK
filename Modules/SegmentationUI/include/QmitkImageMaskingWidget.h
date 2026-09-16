@@ -58,6 +58,10 @@ public:
   /** \brief Destructor. */
   ~QmitkImageMaskingWidget() override;
 
+signals:
+  /** \brief Emitted after a masking result node was added to the data storage. */
+  void NewResultsReady(const QList<mitk::DataNode::Pointer>& nodes);
+
 private:
 
   /** \brief Called when the image selection changes. */
@@ -69,6 +73,9 @@ private:
   /** \brief Called when the user clicks the mask image button. */
   void OnMaskImagePressed();
 
+  /** \brief Removes the result created by the most recent masking run from the data storage. */
+  void OnRemoveResultPressed();
+
   /** \brief Called when the user toggles the "Custom" radio button. */
   void OnCustomValueButtonToggled(bool checked);
 
@@ -79,11 +86,15 @@ private:
   /** \brief Masks an image with a given binary mask. The input image and the mask image must be of the same size. */
   itk::SmartPointer<mitk::Image> MaskImage(itk::SmartPointer<mitk::Image> referenceImage, itk::SmartPointer<mitk::Image> maskImage );
 
-  /** \brief Adds a new data object to the DataStorage. */
-  void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
+  /** \brief Adds a new data object to the DataStorage and returns the created node. */
+  mitk::DataNode::Pointer AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
                         const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 
+  /** \brief Enables the remove-result button only while the last result still exists in the data storage. */
+  void UpdateRemoveResultButton();
+
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  mitk::WeakPointer<mitk::DataNode> m_LastResultNode;
   std::unique_ptr<Ui::QmitkImageMaskingWidgetControls> m_Controls;
 };
 

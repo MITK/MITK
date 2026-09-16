@@ -3,7 +3,7 @@ SET(ALGORITHM_PROFILE_UID_Name "MultiModal.rigid.slabbedHead")
 SET(ALGORITHM_PROFILE_UID_Version "1.0.0")
 
 SET(ALGORITHM_PROFILE_Description "Algorithm is used to solve a special case of head registration problems. It is configured to register the slabbed MRI head data (thus data where only a part of the head is visible) onto whole Head images (e.g.CT planning data). Differenz to the default rigid algorithm is that this algorithms is very defensive with rotating out of the slice plan (so roll or pitch). Uses 3 Resolution levels. By default initializes via image centers.")
-SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; mitk-users@lists.sourceforge.net")
+SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; https://github.com/MITK/MITK/issues")
 
 SET(ALGORITHM_PROFILE_DataType "Image")
 SET(ALGORITHM_PROFILE_ResolutionStyle "3 (multi res)")

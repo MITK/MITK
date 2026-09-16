@@ -103,6 +103,7 @@ private:
   QmitkNodeDescriptor* m_SegmentDataNodeDescriptor;
   QmitkNodeDescriptor* m_SurfaceDataNodeDescriptor;
   QmitkNodeDescriptor* m_PointSetNodeDescriptor;
+  QmitkNodeDescriptor* m_GeometryDataNodeDescriptor;
   QmitkNodeDescriptor* m_PlanarLineNodeDescriptor;
   QmitkNodeDescriptor* m_PlanarCircleNodeDescriptor;
   QmitkNodeDescriptor* m_PlanarEllipseNodeDescriptor;

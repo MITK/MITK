@@ -170,15 +170,15 @@ void mitk::ContourModelWriter::WriteXML(const mitk::ContourModel *contourModel, 
     val.push_back(ConvertToString(i));
 
     at.push_back("isClosed");
-    val.push_back(ConvertToString(contourModel->IsClosed()));
+    val.push_back(ConvertToString(contourModel->IsClosed(i)));
 
     WriteStartElementWithAttribut(XML_TIME_STEP, at, val, out);
 
     /*++++ <controlPoints> ++++*/
     WriteStartElement(XML_CONTROL_POINTS, out);
 
-    auto it = contourModel->IteratorBegin();
-    auto end = contourModel->IteratorEnd();
+    auto it = contourModel->IteratorBegin(i);
+    auto end = contourModel->IteratorEnd(i);
 
     while (it != end)
     {

@@ -1,18 +1,41 @@
 /**
 \page org_mitk_views_screenshotmaker The Screenshot Maker View
 
-This view provides the functionality to create and save screenshots of the data.
+\imageMacro{QmitkMovieMaker_ScreenshotMakerInterface.png,"The Screenshot Maker user interface",7.09}
 
-\imageMacro{QmitkMovieMaker_ScreenshotMakerInterface.png,"The Screenshot Maker User Interface",7.09}
+The Screenshot Maker saves screenshots of the display (render) windows. It works with any
+display editor, including the Standard Display and the MxN Display.
 
-\section QmitkScreenshotMakerUserManualUse Usage
+Screenshots capture the window contents (image data, crosshair and the chosen background).
+Corner annotations, window borders and the MITK logo are left out so the result is a clean
+image.
 
-The first section offers the option to create a screenshot of selected view plane (axial, sagittal or coronal). Upon clicking the 'Single' button in the '2D Screenshot' section, the Screenshot Maker asks for a filename in which the screenshot is to be stored. The 'Multiplanar' button asks for a folder, in which screenshots of the three 2D views will be stored with default names.
+\section QmitkScreenshotMakerSingle Screenshot of a single display window
 
-If you tick the 'All Components' checkbox, you can take a screenshot of every channel of your multi-channel image. Otherwise, only the visible channel is captured.
+Click "Screenshot single display window". The button stays pressed and a hint appears below
+it. While it is active, moving the mouse over a display window highlights that window with a
+white frame and dims the others, so it is clear which window will be captured.
 
-The '3D Screenshots (High-res)' section works the same as the simple screenshot section, aside from the fact, that the user can choose a magnification ('Upsampling') factor. The 'Single' button creates a screenshot of the current 3D render window and the 'Multiplanar' button creates three screenshots from different perspectives.
+Click the highlighted window to capture it. A dialog asks where to save the image; the
+proposed file name counts up automatically (screenshot_001.png, screenshot_002.png, ...) so
+existing screenshots are not overwritten.
 
-In the 'Options' section, one can choose the background color for the screenshots, default is black.
+To cancel without taking a screenshot, press Escape, click the button again, or right-click a
+display window.
+
+\section QmitkScreenshotMakerAll Screenshot of all display windows
+
+Click "Screenshot all display windows" and choose a folder. One screenshot per display window
+is saved into that folder, named after the window (for example Axial.png, Sagittal.png,
+Coronal.png and 3D.png for the Standard Display).
+
+\section QmitkScreenshotMakerOptions Options
+
+\li Background: choose the background of the screenshot: white, black, transparent, or a custom
+color (the last button opens a color dialog). Transparent screenshots are always saved as PNG,
+because JPEG does not support transparency.
+\li High resolution: an upsampling factor. 1x captures at the on-screen resolution; higher
+values (2x, 3x, ...) produce a correspondingly larger image. This works for both 2D and 3D
+display windows.
 
 */

@@ -367,6 +367,17 @@ MARKDOWN_SUPPORT       = YES
 
 TOC_INCLUDE_HEADINGS   = 5
 
+# The MARKDOWN_ID_STYLE tag can be used to specify the algorithm used to
+# generate identifiers for the Markdown headings. Note: Every identifier is
+# unique.
+# Possible values are: DOXYGEN use a fixed 'autotoc_md' string followed by a
+# sequence number starting at 0 and GITHUB use the lower case version of title
+# with any whitespace replaced by '-' and punctuation characters removed.
+# The default value is: DOXYGEN.
+# This tag requires that the tag MARKDOWN_SUPPORT is set to YES.
+
+MARKDOWN_ID_STYLE      = GITHUB
+
 # When enabled doxygen tries to link words that correspond to documented
 # classes, or namespaces to their corresponding documentation. Such a link can
 # be prevented in individual cases by putting a % sign in front of the word or
@@ -986,6 +997,7 @@ EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
                          "@MITK_SOURCE_DIR@/CODE_OF_CONDUCT.md" \
                          "@MITK_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@MITK_SOURCE_DIR@/README.md" \
+                         "@MITK_SOURCE_DIR@/Wrapping/Python/docs" \
                          "@MITK_BINARY_DIR@/Documentation/Doxygen" \
                          "@MITK_BINARY_DIR@/bin/" \
                          "@MITK_BINARY_DIR@/PT/" \

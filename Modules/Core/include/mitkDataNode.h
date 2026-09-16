@@ -53,8 +53,8 @@ namespace mitk
    * parameters such as visibility, color, and opacity.
    *
    * Mappers are created on demand for each mapper slot (e.g., 2D mapper, 3D mapper) via
-   * the CoreObjectFactory and are responsible for translating the node's data and properties
-   * into visual representations.
+   * the registered IMapperProvider services and are responsible for translating the node's
+   * data and properties into visual representations.
    *
    * DataNodes are managed by a DataStorage, which organizes them in a directed acyclic graph
    * with parent-child ("was created by") relationships.
@@ -169,7 +169,8 @@ namespace mitk
      * \brief Get the Mapper for the given mapper slot, creating it on demand if necessary.
      *
      * Each mapper slot corresponds to a specific rendering context (e.g., 2D or 3D).
-     * If no mapper exists yet for the given slot, one is created via CoreObjectFactory.
+     * If no mapper exists yet for the given slot, one is created via the
+     * MapperProviderRegistry from the registered IMapperProvider services.
      *
      * \param[in] id  The mapper slot identifier.
      * \return Pointer to the mapper, or nullptr if no mapper could be created.

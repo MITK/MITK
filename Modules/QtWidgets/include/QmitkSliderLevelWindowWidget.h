@@ -41,14 +41,14 @@ class QmitkLevelWindowWidgetContextMenu;
  * image by giving new values to LevelWindowManager. LevelWindowManager
  * then sends a signal to tell other listeners about changes.
  *
- * Which image is changed is determined by mitkLevelWindowManager. If
- * m_AutoTopMost is true, always the topmost image in data tree (layer
- * property) is affected by changes. The image which is affected by
- * changes can also be changed by QmitkLevelWindowWidgetContextMenu,
- * the context menu for QmitkSliderLevelWindowWidget and
- * QmitkLineEditLevelWindowWidget. There you have the possibility to
- * set a certain image or always the topmost image in the data tree
- * (layer property) to be affected by changes.
+ * Which image is changed is determined by the mitk::LevelWindowManager::Mode
+ * of the manager: by default the topmost visible image (layer property),
+ * alternatively the image selected in the data storage, or an image
+ * picked explicitly. The mode and the explicit image can be chosen in
+ * the "Images" submenu of QmitkLevelWindowWidgetContextMenu, the context
+ * menu of QmitkSliderLevelWindowWidget and QmitkLineEditLevelWindowWidget.
+ * The name of the affected image is painted along the right edge of the
+ * slider unless hidden via SetImageNameVisible() or the context menu.
  *
  * The internal mitk::LevelWindow variable contains a range that is
  * valid for a given image. It should not be possible to move the
@@ -106,6 +106,11 @@ public:
    */
   mitk::LevelWindowManager *GetManager();
 
+  /**
+   * \brief Show or hide the name of the image whose level window is displayed.
+   */
+  void SetImageNameVisible(bool visible);
+
   /** \brief Stores the current level/window values. */
   mitk::LevelWindow m_LevelWindow;
 
@@ -140,6 +145,7 @@ protected:
   bool m_CtrlPressed;
   int m_MoveHeight;
   bool m_ScaleVisible;
+  bool m_ImageNameVisible = true;
   QRect m_LowerBound;
   QRect m_UpperBound;
   unsigned long m_ObserverTag;

@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkImageStatisticsTreeItem.h"
 
+#include <variant>
+
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
   const ImageStatisticsObject& statisticsData,
   const StatisticNameVector& statisticNames,
@@ -60,7 +62,7 @@ int QmitkImageStatisticsTreeItem::columnCount() const
   return m_statisticNames.size() + 1;
 }
 
-struct StatValueVisitor : boost::static_visitor<QVariant>
+struct StatValueVisitor
 {
   QVariant operator()(const mitk::ImageStatisticsContainer::RealType& val) const
   {
@@ -101,7 +103,7 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
         auto statisticKey = m_statisticNames.at(column - 1);
         if (m_statistics.HasStatistic(statisticKey))
         {
-          return boost::apply_visitor(StatValueVisitor(), m_statistics.GetValueNonConverted(statisticKey));
+          return std::visit(StatValueVisitor(), m_statistics.GetValueNonConverted(statisticKey));
         }
         else
         {

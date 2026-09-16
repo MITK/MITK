@@ -21,12 +21,14 @@ namespace mitk
 {
   struct IFileReader;
   struct IFileWriter;
+  class IMapperProvider;
 
   /**
    * \brief Module activator for the IOExt module.
    *
    * Registers various file reader and writer services for formats such as
-   * OBJ, and PLY when the module is loaded.
+   * OBJ, and PLY when the module is loaded, as well as the mapper provider
+   * for 3D volume rendering of images.
    */
   class IOExtActivator : public us::ModuleActivator
   {
@@ -42,6 +44,8 @@ namespace mitk
     std::unique_ptr<IFileWriter> m_ObjWriter;
 
     std::unique_ptr<IFileReader> m_PlyReader;
+
+    std::unique_ptr<IMapperProvider> m_VolumeMapperProvider;
   };
 }
 

@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkImageStatisticsConstants.h>
 
-#include <boost/variant.hpp>
+#include <variant>
 
 namespace mitk
 {
@@ -55,8 +55,8 @@ namespace mitk
 
     /**
     \brief Container class for storing the computed image statistics.
-    @details The statistics are stored in a map <name,value> with value as boost::variant<RealType, VoxelCountType, IndexType >.
-    The type used to create the boost::variant is important as only this type can be recovered later on.
+    @details The statistics are stored in a map <name,value> with value as std::variant<RealType, VoxelCountType, IndexType >.
+    The type used to create the std::variant is important as only this type can be recovered later on.
     */
     class MITKIMAGESTATISTICS_EXPORT ImageStatisticsObject {
     public:
@@ -66,7 +66,7 @@ namespace mitk
       using IndexType = vnl_vector<int>;
       using VoxelCountType = unsigned long;
 
-      using StatisticsVariantType = boost::variant<RealType, VoxelCountType, IndexType >;
+      using StatisticsVariantType = std::variant<RealType, VoxelCountType, IndexType >;
 
       /**
       \brief Adds a statistic to the statistics object
@@ -115,7 +115,7 @@ namespace mitk
       TType GetValueConverted(const std::string_view name) const
       {
         auto value = GetValueNonConverted(name);
-        return boost::get<TType>(value);
+        return std::get<TType>(value);
       }
 
       /**

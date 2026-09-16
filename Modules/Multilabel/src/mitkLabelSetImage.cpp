@@ -253,7 +253,9 @@ mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 {
   if (m_GroupContainer.empty()) mitkThrow() << "Cannot return active group index. No group is available.";
-  if (m_ActiveLabelValue == UNLABELED_VALUE) return 0;
+  // A stale active value must never abort a caller on the render hot path
+  // (the 2D mapper queries this every frame); treat it like "no active label".
+  if (m_ActiveLabelValue == UNLABELED_VALUE || !this->ExistLabel(m_ActiveLabelValue)) return 0;
 
   return this->GetGroupIndexOfLabel(m_ActiveLabelValue);
 }
@@ -648,6 +650,17 @@ void mitk::MultiLabelSegmentation::SetGroupName(GroupIndexType groupID, const st
 
 void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
 {
+  // The active label is soft selection state that UI/async model churn can
+  // request for a value that was just removed. Accepting such a value would
+  // either leave m_ActiveLabelValue referring to a label that no longer
+  // exists or throw in GetGroupIndexOfLabel below, so it is ignored, keeping
+  // the previous selection, and reported instead of being fatal.
+  if (UNLABELED_VALUE != label && !this->ExistLabel(label))
+  {
+    MITK_WARN << "Ignored request to activate a label that does not exist. Invalid label value: " << label;
+    return;
+  }
+
   if (m_ActiveLabelValue != label)
   {
     bool eventNeeded = false;

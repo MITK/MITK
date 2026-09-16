@@ -5,8 +5,7 @@ set(H_FILES
 
 set(CPP_FILES
   mitkMAPRegistrationWrapper.cpp
-  mitkMAPRegistrationWrapperObjectFactory.cpp
-  mitkRegEvaluationObjectFactory.cpp
+  mitkMatchPointRegistrationActivator.cpp
   mitkRegEvaluationObject.cpp
   mitkRegistrationManipulationInteractor.cpp
   Helper/mitkUIDHelper.cpp

@@ -84,7 +84,7 @@ void QmitkConvertGeometryDataToROIAction::Run(const QList<mitk::DataNode::Pointe
       mitk::ROI::Element element(id++);
       element.SetProperty("name", mitk::StringProperty::New(node->GetName()));
 
-      if (auto* color = node->GetProperty("Bounding Shape.Deselected Color"); color != nullptr)
+      if (auto* color = node->GetProperty("color"); color != nullptr)
         element.SetProperty("color", color);
 
       const auto* geometry = node->GetData()->GetGeometry();

@@ -14,11 +14,23 @@ found in the LICENSE file.
 
 #include <MitkImageStatisticsUIExports.h>
 
+#include <QmitkPlotStyle.h>
+
 // itk
 #include <itkHistogram.h>
 
-#include <QmitkChartWidget.h>
+#include <QPointF>
+#include <QRectF>
+#include <QWidget>
+
+#include <map>
 #include <memory>
+#include <string>
+
+class QEvent;
+class QwtPlot;
+class QwtPlotHistogram;
+class QwtPlotZoomer;
 
 namespace Ui
 {
@@ -28,12 +40,11 @@ namespace Ui
 /**
  * \brief Widget for displaying and interacting with histogram visualizations.
  *
- * Provides a chart-based histogram display with controls for adjusting the number of bins,
- * toggling a subchart view, setting custom min/max value ranges, and copying histogram data
- * to the clipboard. Multiple histograms can be displayed simultaneously, each identified by
- * a data label.
+ * Provides a Qwt-based histogram display with controls for adjusting the number
+ * of bins, setting a custom min/max value zoom range, and copying histogram data
+ * to the clipboard. Multiple histograms can be displayed simultaneously, each
+ * identified by a data label.
  *
- * \sa QmitkChartWidget
  * \sa QmitkImageStatisticsWidget
  */
 
@@ -68,15 +79,15 @@ public:
   void Reset();
 
   /**
-   * \brief Sets the color theme for the chart widget.
-   * \param[in] style The color theme to apply (dark or light).
+   * \brief Sets the color theme for the plot.
+   * \param[in] style The plot style to apply (dark or light).
    */
-  void SetTheme(QmitkChartWidget::ColorTheme style);
+  void SetTheme(QmitkPlotStyle style);
 
   /**
    * \brief Resets all controls to their default settings.
    *
-   * Enables the default number of bins checkbox, sets bins to 100, and disables the subchart.
+   * Enables the default number of bins checkbox and restores the default bin count.
    */
   void ResetDefault();
 
@@ -97,27 +108,31 @@ public:
    */
   void RequestHistogramUpdate(unsigned int nBins);
 
+protected:
+  /** \brief Clears the bar highlight when the cursor leaves the plot canvas. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
   void CreateConnections();
   void SetGUIElementsEnabled(bool enabled);
-  /** \brief Helper function to convert the histogram in order to forward it to the ChartWidget. */
-  std::vector<std::pair<double, double> > ConvertHistogramToPairList(itk::Statistics::Histogram<double>::ConstPointer histogram) const;
+  /** \brief Applies m_Style (canvas background and axis colors) to the plot. */
+  void ApplyTheme();
+  /** \brief Highlights the histogram bar under the cursor, clearing it off any bar. */
+  void OnHover(const QPointF& pos);
+  /** \brief Removes the current bar highlight (does not replot). */
+  void ClearHighlight();
 
-//slots
-	/** \brief  Saves the histogram to the clipboard. */
-	void OnClipboardButtonClicked();
-	/** \brief Enables / Disables SpinBox to change the number of bins. */
-	void OnDefaultNBinsCheckBoxChanged();
-	/** \brief Emits the signal RequestHistogramUpdate(unsigned int nBins) with the updated value. */
-	void OnNBinsSpinBoxValueChanged();
-	/** \brief Shows / Hides the subchart. */
-	void OnShowSubchartCheckBoxChanged();
-	/** \brief Enables / Disables SpinBoxes to set custom min and max values */
-	void OnViewMinMaxCheckBoxChanged();
-	/**\brief */
-	void OnMaxValueSpinBoxValueChanged();
-	/** \brief */
-	void OnMinValueSpinBoxValueChanged();
+  //slots
+  /** \brief Saves the histogram to the clipboard. */
+  void OnClipboardButtonClicked();
+  /** \brief Enables / Disables SpinBox to change the number of bins. */
+  void OnDefaultNBinsCheckBoxChanged();
+  /** \brief Emits the signal RequestHistogramUpdate(unsigned int nBins) with the updated value. */
+  void OnNBinsSpinBoxValueChanged();
+  /** \brief Zooms the plot to the x range given by the min and max spin boxes. */
+  void OnZoomRangeEdited();
+  /** \brief Mirrors the current zoom rectangle in the min and max spin boxes. */
+  void OnZoomed(const QRectF& rect);
 
 private:
   std::unique_ptr<Ui::QmitkHistogramVisualizationControls> m_Controls;
@@ -125,7 +140,12 @@ private:
   const unsigned int m_MinNBins = 10;
   const unsigned int m_MaxNBins = 10000;
 
-  std::map < std::string, itk::Statistics::Histogram<double>::ConstPointer> m_Histograms;
+  QwtPlot* m_Plot;
+  QwtPlotHistogram* m_HighlightItem;
+  QwtPlotZoomer* m_Zoomer;
+  std::map<std::string, QwtPlotHistogram*> m_HistogramItems;
+  std::map<std::string, itk::Statistics::Histogram<double>::ConstPointer> m_Histograms;
+  QmitkPlotStyle m_Style = QmitkPlotStyle::Dark;
 };
 
 #endif

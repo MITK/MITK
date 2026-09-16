@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <QWidget>
 #include <memory>
+#include <vector>
 
 namespace Ui
 {
@@ -60,6 +61,10 @@ public:
   /** \brief Destructor. */
   ~QmitkExtractFromMultiLabelSegmentationWidget() override;
 
+signals:
+  /** \brief Emitted after extraction result node(s) were added to the data storage. */
+  void NewResultsReady(const QList<mitk::DataNode::Pointer>& nodes);
+
 private slots:
 
   /** \brief Called when the segmentation selection in the workbench changes. */
@@ -68,13 +73,20 @@ private slots:
   /** \brief Called when the user clicks the extract button. */
   void OnExtractPressed();
 
+  /** \brief Removes the result node(s) created by the most recent extraction run. */
+  void OnRemoveResultPressed();
+
 private:
   bool m_InternalEvent = false;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  std::vector<mitk::WeakPointer<mitk::DataNode>> m_LastResultNodes;
 
   void ConfigureWidgets();
 
-  void StoreToDataStorage(mitk::Image* image, const std::string& name, mitk::DataNode* parent);
+  mitk::DataNode::Pointer StoreToDataStorage(mitk::Image* image, const std::string& name, mitk::DataNode* parent);
+
+  /** \brief Enables the remove-result button only while a last result still exists in the data storage. */
+  void UpdateRemoveResultButton();
 
   std::unique_ptr<Ui::QmitkExtractFromMultiLabelSegmentationWidgetControls> m_Controls;
 };

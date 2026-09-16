@@ -21,7 +21,7 @@ found in the LICENSE file.
 namespace mitk
 {
 /**
-     * \brief Computes histogram-based statistics: Uniformity, UPP, Entropy, and Median.
+     * \brief Computes histogram-based statistics: Uniformity, UPP, and Entropy.
      *
      * This class takes an itk::Statistics::Histogram<double> as input and computes
      * the following statistics from it:
@@ -29,7 +29,6 @@ namespace mitk
      * - UPP (Uniformity of Positive Pixels): uniformity computed only over bins
      *   with positive measurement values.
      * - Entropy: Shannon entropy of the histogram distribution.
-     * - Median: approximation of the median from histogram bin boundaries.
      *
      * Call SetHistogram() followed by CalculateStatistics() before querying results.
      *
@@ -76,14 +75,7 @@ namespace mitk
         MeasurementType GetEntropy();
 
         /**
-         * \brief Get the approximated median from the histogram.
-         * \return The Median value.
-         * \pre CalculateStatistics() must have been called.
-         */
-        MeasurementType GetMedian();
-
-        /**
-         * \brief Compute all histogram statistics (Uniformity, UPP, Entropy, Median).
+         * \brief Compute all histogram statistics (Uniformity, UPP, Entropy).
          * \pre A histogram must have been set via SetHistogram().
          */
         void CalculateStatistics();
@@ -92,7 +84,7 @@ namespace mitk
 
     private:
         HistogramType::Pointer m_Histogram;
-        MeasurementType m_Uniformity, m_UPP, m_Entropy, m_Median;
+        MeasurementType m_Uniformity, m_UPP, m_Entropy;
         bool m_StatisticsCalculated;
     };
 }

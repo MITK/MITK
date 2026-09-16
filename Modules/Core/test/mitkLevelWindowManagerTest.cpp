@@ -18,28 +18,35 @@ found in the LICENSE file.
 #include <mitkRenderingModeProperty.h>
 #include <mitkStandaloneDataStorage.h>
 
-#include <itkComposeImageFilter.h>
 #include <itkEventObject.h>
-#include <itkImageDuplicator.h>
-#include <itkImageIterator.h>
-#include <mitkImageCast.h>
 
 class mitkLevelWindowManagerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLevelWindowManagerTestSuite);
   MITK_TEST(TestModes);
+  MITK_TEST(TestSetModeWithoutDataStorage);
   MITK_TEST(TestSetLevelWindowProperty);
   MITK_TEST(TestVisibilityPropertyChanged);
   MITK_TEST(TestLayerPropertyChanged);
   MITK_TEST(TestImageRenderingModePropertyChanged);
-  MITK_TEST(TestImageForLevelWindowPropertyChanged);
   MITK_TEST(TestSelectedPropertyChanged);
+  MITK_TEST(TestDeterministicTopMostSelectedNode);
+  MITK_TEST(TestApplyToAllSelectedImages);
+  MITK_TEST(TestExplicitImageSticks);
+  MITK_TEST(TestExplicitNodeInvisibleThenVisible);
+  MITK_TEST(TestModeSticksAcrossNodeAdd);
+  MITK_TEST(TestModeSticksAcrossSetDataStorage);
   MITK_TEST(TestRemoveDataNodes);
+  MITK_TEST(TestRemoveNodeInSelectedImageMode);
+  MITK_TEST(TestRemoveNodeInExplicitImageMode);
+  MITK_TEST(TestCurrentNodeAndNameChange);
   MITK_TEST(TestCombinedPropertiesChanged);
 
   CPPUNIT_TEST_SUITE_END();
 
 private:
+
+  using Mode = mitk::LevelWindowManager::Mode;
 
   mitk::LevelWindowManager::Pointer m_LevelWindowManager;
   mitk::StandaloneDataStorage::Pointer m_DataManager;
@@ -52,18 +59,14 @@ private:
   mitk::DataNode::Pointer m_DataNode2;
   mitk::DataNode::Pointer m_DataNode3;
 
-  mitk::Image::Pointer m_mitkMultiComponentImage;
-  mitk::Image::Pointer m_mitkImageComponent1;
-  mitk::Image::Pointer m_mitkImageComponent2;
-
   bool AssertImageForLevelWindowProperty(bool assert1, bool assert2, bool assert3)
   {
-    bool imageForLevelWindowProperty1, imageForLevelWindowProperty2, imageForLevelWindowProperty3;
+    bool imageForLevelWindowProperty1 = false, imageForLevelWindowProperty2 = false, imageForLevelWindowProperty3 = false;
 
     m_DataNode1->GetBoolProperty("imageForLevelWindow", imageForLevelWindowProperty1);
     m_DataNode2->GetBoolProperty("imageForLevelWindow", imageForLevelWindowProperty2);
     m_DataNode3->GetBoolProperty("imageForLevelWindow", imageForLevelWindowProperty3);
-    
+
     return (assert1 == imageForLevelWindowProperty1) &&
            (assert2 == imageForLevelWindowProperty2) &&
            (assert3 == imageForLevelWindowProperty3);
@@ -80,10 +83,27 @@ private:
 
     // Check if the active level window property of the manager is equal to any of the level window properties of the nodes
     auto managerLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
-    
+
     return (assert1 == (managerLevelWindowProperty == levelWindowProperty1)) &&
            (assert2 == (managerLevelWindowProperty == levelWindowProperty2)) &&
            (assert3 == (managerLevelWindowProperty == levelWindowProperty3));
+  }
+
+  bool AssertCurrentNode(const mitk::DataNode *node)
+  {
+    return m_LevelWindowManager->GetCurrentNode() == node;
+  }
+
+  static mitk::LevelWindowProperty *GetLevelWindowProperty(const mitk::DataNode *node)
+  {
+    return dynamic_cast<mitk::LevelWindowProperty *>(node->GetProperty("levelwindow"));
+  }
+
+  mitk::DataNode::Pointer LoadAdditionalNode(int layer)
+  {
+    auto node = mitk::IOUtil::Load(m_ImagePath1, *m_DataManager)->GetElement(0);
+    node->SetIntProperty("layer", layer);
+    return node;
   }
 
 public:
@@ -124,54 +144,79 @@ public:
       m_LevelWindowManager->GetNumberOfObservers() == 3);
 
     m_DataNode3->SetIntProperty("layer", 3);
-    AssertImageForLevelWindowProperty(false, false, true);
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode3));
   }
 
   void tearDown() override {}
 
   void TestModes()
   {
-    CPPUNIT_ASSERT_MESSAGE("AutoTopMost mode is not enabled per default", m_LevelWindowManager->IsAutoTopMost());
-    CPPUNIT_ASSERT_MESSAGE("SelectedImagesMode mode is not disabled per default", !m_LevelWindowManager->IsSelectedImages());
+    CPPUNIT_ASSERT_MESSAGE("TopMostImage is not the default mode", Mode::TopMostImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Apply to all selected images is not disabled per default", !m_LevelWindowManager->GetApplyToAllSelectedImages());
 
-    m_LevelWindowManager->SetSelectedImages(true);
-    CPPUNIT_ASSERT_MESSAGE("AutoTopMost mode was not disabled on mode switch", !m_LevelWindowManager->IsAutoTopMost());
-    CPPUNIT_ASSERT_MESSAGE("SelectedImagesMode mode was not enabled on mode switch", m_LevelWindowManager->IsSelectedImages());
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    CPPUNIT_ASSERT_MESSAGE("Mode was not switched to SelectedImage", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("No node is selected but there is a current node", AssertCurrentNode(nullptr));
+    CPPUNIT_ASSERT_MESSAGE("No node is selected but there is a level window property", m_LevelWindowManager->GetLevelWindowProperty().IsNull());
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
 
-    m_LevelWindowManager->SetSelectedImages(false);
-    CPPUNIT_ASSERT_MESSAGE("AutoTopMost mode was not disabled on mode switch", !m_LevelWindowManager->IsAutoTopMost());
-    CPPUNIT_ASSERT_MESSAGE("SelectedImagesMode mode was not disabled on mode switch", !m_LevelWindowManager->IsSelectedImages());
+    m_LevelWindowManager->SetMode(Mode::TopMostImage);
+    CPPUNIT_ASSERT_MESSAGE("Mode was not switched to TopMostImage", Mode::TopMostImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode3));
 
-    m_LevelWindowManager->SetSelectedImages(true); // to enable "SelectedImagesMode"
-    m_LevelWindowManager->SetAutoTopMostImage(true);
-    CPPUNIT_ASSERT_MESSAGE("AutoTopMost mode was not enabled on mode switch", m_LevelWindowManager->IsAutoTopMost());
-    CPPUNIT_ASSERT_MESSAGE("SelectedImagesMode mode was not disabled on mode switch", !m_LevelWindowManager->IsSelectedImages());
+    // Switching to ExplicitImage pins the current node
+    m_LevelWindowManager->SetMode(Mode::ExplicitImage);
+    CPPUNIT_ASSERT_MESSAGE("Mode was not switched to ExplicitImage", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode3));
+
+    m_DataNode1->SetIntProperty("layer", 10);
+    CPPUNIT_ASSERT_MESSAGE("Pinned node was not kept after a layer change", AssertCurrentNode(m_DataNode3));
+
+    m_LevelWindowManager->SetMode(Mode::TopMostImage);
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode1));
+  }
+
+  void TestSetModeWithoutDataStorage()
+  {
+    auto levelWindowManager = mitk::LevelWindowManager::New();
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("SetMode threw without a data storage", levelWindowManager->SetMode(Mode::SelectedImage));
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("SetApplyToAllSelectedImages threw without a data storage", levelWindowManager->SetApplyToAllSelectedImages(true));
+    CPPUNIT_ASSERT_MESSAGE("Mode was not stored", Mode::SelectedImage == levelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Option was not stored", levelWindowManager->GetApplyToAllSelectedImages());
+    CPPUNIT_ASSERT_THROW_MESSAGE("SetLevelWindowProperty did not throw without a data storage",
+      levelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode1)), mitk::Exception);
+
+    m_DataNode1->SetSelected(true);
+    levelWindowManager->SetDataStorage(m_DataManager);
+    CPPUNIT_ASSERT_MESSAGE("Mode did not survive SetDataStorage", Mode::SelectedImage == levelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", levelWindowManager->GetCurrentNode() == m_DataNode1);
   }
 
   void TestSetLevelWindowProperty()
   {
-    m_LevelWindowManager->SetAutoTopMostImage(false);
-
-    // Setting the level window property of the manager
-    // will make the corresponding node be the "imageForLevelWindow" node.
-    auto levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
-    m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty);
+    // Setting the level window property of the manager pins the corresponding node
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode1));
+    CPPUNIT_ASSERT_MESSAGE("Mode was not switched to ExplicitImage", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode1));
 
-    levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode2->GetProperty("levelwindow"));
-    m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty);
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode2));
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode2));
 
-    levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode3->GetProperty("levelwindow"));
-    m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty);
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode3));
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode3));
 
-    levelWindowProperty = mitk::LevelWindowProperty::New();
-    //CPPUNIT_ASSERT_THROW_MESSAGE("Expected exception for an invalid level window property was not thrown",
-      //m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Expected exception for an unknown level window property was not thrown",
+      m_LevelWindowManager->SetLevelWindowProperty(mitk::LevelWindowProperty::New()), mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("Failed call changed the current node", AssertCurrentNode(m_DataNode3));
+    CPPUNIT_ASSERT_MESSAGE("Failed call changed the mode", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
   }
 
   void TestVisibilityPropertyChanged()
@@ -224,7 +269,7 @@ public:
       mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == renderingMode->GetRenderingMode());
 
     // Changing the "Image Rendering.Mode" of a node to either "LOOKUPTABLE_COLOR" or
-    // "COLORTRANSFERFUNCTION_COLOR" will ignore this node for the level window 
+    // "COLORTRANSFERFUNCTION_COLOR" will ignore this node for the level window
     m_DataNode3->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
       mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
@@ -247,79 +292,25 @@ public:
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
   }
 
-  void TestImageForLevelWindowPropertyChanged()
+  void TestSelectedPropertyChanged()
   {
-    m_LevelWindowManager->SetAutoTopMostImage(false);
+    // In TopMostImage mode the selection is ignored
+    m_DataNode1->SetSelected(true);
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
 
-    m_DataNode1->SetBoolProperty("imageForLevelWindow", true);
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
 
-    m_DataNode2->SetBoolProperty("imageForLevelWindow", true);
+    // Among several selected nodes the one with the highest layer wins
+    m_DataNode2->SetSelected(true);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
 
-    m_DataNode3->SetBoolProperty("imageForLevelWindow", true);
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
-
-    // The top level node will always be used as a fall back node
-    // if no specific mode is selected.
-    m_DataNode3->SetBoolProperty("imageForLevelWindow", false);
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
-  }
-
-  void TestSelectedPropertyChanged()
-  {
-    // Selecting a node will make this node be the "imageForLevelWindow" node, if
-    // the "SelectedImagesMode" is enabled (disabled per default).
-    m_DataNode1->SetSelected(true); // selection mode not enabled - node3 stays the "imageForLevelWindow" node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
-
-    // This will immediately check for the selected node (node 1).
-    m_LevelWindowManager->SetSelectedImages(true);
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
-
-    // Second node will be selected (node 1 and node 2 selected).
-    // It is not specified which data node will be used for the "imageForLevelWindow" / "levelwindow" property,
-    // since the data storage access to the nodes is non-deterministic.
-    // At least check for any valid level window property.
-    m_DataNode2->SetSelected(true);
-    CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is null", m_LevelWindowManager->GetLevelWindowProperty());
-
-    // Third node will be selected (node 1, node 2 and node 3 selected)
-    // It is not specified which data node will be used for the "imageForLevelWindow" / "levelwindow" property,
-    // since the data storage access to the nodes is non-deterministic.
-    // At least check for any valid level window property.
     m_DataNode3->SetSelected(true);
-    auto usedLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
-    CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is null", usedLevelWindowProperty);
-
-    // All three nodes are selected: Check if only one node has the "imageForLevelWindow" property set and this node's
-    // "levelwindow" property is used by the level window manager.
-    auto levelWindowProperty1 = dynamic_cast<mitk::LevelWindowProperty*>(m_DataNode1->GetProperty("imageForLevelWindow"));
-    if (usedLevelWindowProperty == levelWindowProperty1)
-    {
-      CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
-      CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
-    }
-
-    auto levelWindowProperty2 = dynamic_cast<mitk::LevelWindowProperty*>(m_DataNode2->GetProperty("imageForLevelWindow"));
-    if (usedLevelWindowProperty == levelWindowProperty2)
-    {
-      CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
-      CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
-    }
-
-    auto levelWindowProperty3 = dynamic_cast<mitk::LevelWindowProperty*>(m_DataNode3->GetProperty("imageForLevelWindow"));
-    if (usedLevelWindowProperty == levelWindowProperty3)
-    {
-      CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-      CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
-    }
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
 
     m_DataNode1->SetSelected(false);
     m_DataNode2->SetSelected(false);
@@ -327,76 +318,140 @@ public:
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
     CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is not null", !m_LevelWindowManager->GetLevelWindowProperty());
+    CPPUNIT_ASSERT_MESSAGE("Current node is not null", AssertCurrentNode(nullptr));
   }
 
-  void TestCombinedPropertiesChanged()
+  void TestDeterministicTopMostSelectedNode()
   {
-    m_LevelWindowManager->SetSelectedImages(true);
-    m_DataNode1->SetSelected(true); // selection mode enabled - node1 becomes the "imageForLevelWindow" node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode1->SetSelected(true);
+    m_DataNode2->SetSelected(true);
+    m_DataNode3->SetSelected(true);
+    CPPUNIT_ASSERT_MESSAGE("Topmost selected node is not the current node", AssertCurrentNode(m_DataNode3));
 
-    m_DataNode2->SetIntProperty("layer", itk::NumericTraits<int>::max()); // selection mode enabled - node1 stays the "imageForLevelWindow" node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+    m_DataNode3->SetIntProperty("layer", itk::NumericTraits<int>::min());
+    CPPUNIT_ASSERT_MESSAGE("Topmost selected node is not the current node", AssertCurrentNode(m_DataNode2));
 
-    m_DataNode1->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
-      mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR)); // selection mode enabled - but node1 is ignored - no active level window property
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+    m_DataNode2->SetSelected(false);
+    CPPUNIT_ASSERT_MESSAGE("Topmost selected node is not the current node", AssertCurrentNode(m_DataNode1));
 
-    m_DataNode3->SetBoolProperty("imageForLevelWindow", true); // selection mode enabled - no valid node selected, no active level window property
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+    // An invisible selected node is not a candidate and there is no fallback
+    m_DataNode1->SetVisibility(false);
+    CPPUNIT_ASSERT_MESSAGE("Current node is not null", AssertCurrentNode(nullptr));
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed", Mode::SelectedImage == m_LevelWindowManager->GetMode());
 
-    m_LevelWindowManager->SetSelectedImages(false); // no mode enabled - however, level window is not modified / updated
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+    m_DataNode1->SetVisibility(true);
+    CPPUNIT_ASSERT_MESSAGE("Topmost selected node is not the current node", AssertCurrentNode(m_DataNode1));
+  }
 
-    m_LevelWindowManager->Update(itk::ModifiedEvent()); // no mode enabled - level window is modified / updated with topmost visible node2 as fallback
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+  void TestApplyToAllSelectedImages()
+  {
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode1->SetSelected(true);
+    m_DataNode2->SetSelected(true);
+    CPPUNIT_ASSERT_MESSAGE("Topmost selected node is not the current node", AssertCurrentNode(m_DataNode2));
 
-    m_DataNode3->SetBoolProperty("imageForLevelWindow", true); // no mode enabled - use node3 with "imageForLevelWindow" property set
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    const mitk::LevelWindow unchangedLevelWindow = GetLevelWindowProperty(m_DataNode3)->GetLevelWindow();
 
-    m_DataNode3->SetVisibility(false); // node3 with "imageForLevelWindow" property not visible - use topmost visible node2 as fallback
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+    m_LevelWindowManager->SetApplyToAllSelectedImages(true);
+    const mitk::LevelWindow sharedLevelWindow(100.0, 50.0);
+    m_LevelWindowManager->SetLevelWindow(sharedLevelWindow);
+    CPPUNIT_ASSERT_MESSAGE("Level window not applied to the current node", GetLevelWindowProperty(m_DataNode2)->GetLevelWindow() == sharedLevelWindow);
+    CPPUNIT_ASSERT_MESSAGE("Level window not applied to the other selected node", GetLevelWindowProperty(m_DataNode1)->GetLevelWindow() == sharedLevelWindow);
+    CPPUNIT_ASSERT_MESSAGE("Level window applied to an unselected node", GetLevelWindowProperty(m_DataNode3)->GetLevelWindow() == unchangedLevelWindow);
+
+    m_LevelWindowManager->SetApplyToAllSelectedImages(false);
+    const mitk::LevelWindow singleLevelWindow(200.0, 80.0);
+    m_LevelWindowManager->SetLevelWindow(singleLevelWindow);
+    CPPUNIT_ASSERT_MESSAGE("Level window not applied to the current node", GetLevelWindowProperty(m_DataNode2)->GetLevelWindow() == singleLevelWindow);
+    CPPUNIT_ASSERT_MESSAGE("Level window applied to the other selected node", GetLevelWindowProperty(m_DataNode1)->GetLevelWindow() == sharedLevelWindow);
+  }
+
+  void TestExplicitImageSticks()
+  {
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode1));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode1));
+
+    m_DataNode2->SetIntProperty("layer", 10);
+    CPPUNIT_ASSERT_MESSAGE("Pinned node not kept after a layer change", AssertCurrentNode(m_DataNode1));
+
+    m_DataNode3->SetVisibility(false);
+    m_DataNode3->SetVisibility(true);
+    CPPUNIT_ASSERT_MESSAGE("Pinned node not kept after a visibility change", AssertCurrentNode(m_DataNode1));
+
+    m_DataNode2->SetSelected(true);
+    CPPUNIT_ASSERT_MESSAGE("Pinned node not kept after a selection change", AssertCurrentNode(m_DataNode1));
 
     m_DataNode2->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
-      mitk::RenderingModeProperty::LOOKUPTABLE_COLOR)); // fallback node2 is ignored - but "imageForLevelWindow" and "levelWindow" stay "true" for node2
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+      mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
+    m_DataNode2->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
+      mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node not kept after a rendering mode change", AssertCurrentNode(m_DataNode1));
 
-    m_LevelWindowManager->SetAutoTopMostImage(true); // no visible node exists that is not ignored
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
 
-    auto levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode3->GetProperty("levelwindow"));
-    m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty); // explicitly set the level window to node3
+    m_LevelWindowManager->SetMode(Mode::TopMostImage);
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode2));
+  }
+
+  void TestExplicitNodeInvisibleThenVisible()
+  {
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode1));
+
+    // While the pinned node is hidden, the topmost visible node is shown but the pin is kept
+    m_DataNode1->SetVisibility(false);
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not shown while the pinned node is hidden", AssertCurrentNode(m_DataNode3));
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+
+    m_DataNode1->SetVisibility(true);
+    CPPUNIT_ASSERT_MESSAGE("Pinned node did not come back", AssertCurrentNode(m_DataNode1));
+
+    // The same applies to a pinned node that is not rendered with a level window
+    m_DataNode1->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
+      mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not shown while the pinned node is not level-window rendered", AssertCurrentNode(m_DataNode3));
 
     m_DataNode1->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
-      mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR)); // auto topmost mode enabled - node1 is the only visible non-ignored node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+      mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node did not come back", AssertCurrentNode(m_DataNode1));
+  }
 
-    m_DataNode2->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
-      mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR)); // auto topmost mode enabled - node2 is topmost visible node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+  void TestModeSticksAcrossNodeAdd()
+  {
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode1->SetSelected(true);
+    CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", AssertCurrentNode(m_DataNode1));
 
-    m_DataNode2->SetIntProperty("layer", itk::NumericTraits<int>::min()); // auto topmost mode enabled - node1 is topmost visible node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+    auto dataNode4 = this->LoadAdditionalNode(4);
+    CPPUNIT_ASSERT_MESSAGE("Not four observers created for the relevant nodes", m_LevelWindowManager->GetNumberOfObservers() == 4);
+    CPPUNIT_ASSERT_MESSAGE("Mode was reset by adding a node", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", AssertCurrentNode(m_DataNode1));
 
-    m_DataNode3->SetVisibility(true); // auto topmost mode enabled - node3 is topmost visible node
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode2));
+    auto dataNode5 = this->LoadAdditionalNode(5);
+    CPPUNIT_ASSERT_MESSAGE("Mode was reset by adding a node", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode2));
 
+    m_LevelWindowManager->SetMode(Mode::TopMostImage);
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(dataNode5));
+  }
+
+  void TestModeSticksAcrossSetDataStorage()
+  {
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode1->SetSelected(true);
+
+    m_LevelWindowManager->SetDataStorage(m_DataManager);
+    CPPUNIT_ASSERT_MESSAGE("Mode was reset by setting the data storage again", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", AssertCurrentNode(m_DataNode1));
+    CPPUNIT_ASSERT_MESSAGE("Observers were duplicated", m_LevelWindowManager->GetNumberOfObservers() == 3);
+
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode2));
+    m_LevelWindowManager->SetDataStorage(m_DataManager);
+    CPPUNIT_ASSERT_MESSAGE("Mode was reset by setting the data storage again", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode2));
   }
 
   void TestRemoveDataNodes()
@@ -410,8 +465,8 @@ public:
     m_DataNode2->GetBoolProperty("imageForLevelWindow", isImageForLevelWindow2);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", !isImageForLevelWindow1 && isImageForLevelWindow2);
 
-    auto levelWindowProperty1 = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
-    auto levelWindowProperty2 = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode2->GetProperty("levelwindow"));
+    auto levelWindowProperty1 = GetLevelWindowProperty(m_DataNode1);
+    auto levelWindowProperty2 = GetLevelWindowProperty(m_DataNode2);
     auto managerLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set",
       (false == (managerLevelWindowProperty == levelWindowProperty1)) &&
@@ -424,7 +479,7 @@ public:
     m_DataNode1->GetBoolProperty("imageForLevelWindow", isImageForLevelWindow1);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", isImageForLevelWindow1);
 
-    levelWindowProperty1 = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
+    levelWindowProperty1 = GetLevelWindowProperty(m_DataNode1);
     managerLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", true == (managerLevelWindowProperty == levelWindowProperty1));
 
@@ -433,6 +488,140 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Observer not correctly removed", m_LevelWindowManager->GetNumberOfObservers() == 0);
 
     CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is not null", !m_LevelWindowManager->GetLevelWindowProperty());
+    CPPUNIT_ASSERT_MESSAGE("Current node is not null", AssertCurrentNode(nullptr));
+  }
+
+  void TestRemoveNodeInSelectedImageMode()
+  {
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode1->SetSelected(true);
+    m_DataNode2->SetSelected(true);
+    CPPUNIT_ASSERT_MESSAGE("Topmost selected node is not the current node", AssertCurrentNode(m_DataNode2));
+
+    m_DataManager->Remove(m_DataNode2);
+    CPPUNIT_ASSERT_MESSAGE("Observer not correctly removed", m_LevelWindowManager->GetNumberOfObservers() == 2);
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed by removing the current node", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Remaining selected node is not the current node", AssertCurrentNode(m_DataNode1));
+
+    m_DataManager->Remove(m_DataNode1);
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed by removing the current node", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Current node is not null", AssertCurrentNode(nullptr));
+    CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is not null", !m_LevelWindowManager->GetLevelWindowProperty());
+  }
+
+  void TestRemoveNodeInExplicitImageMode()
+  {
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode1));
+
+    m_DataManager->Remove(m_DataNode3);
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed by removing another node", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode1));
+
+    m_DataManager->Remove(m_DataNode1);
+    CPPUNIT_ASSERT_MESSAGE("Mode did not revert to TopMostImage after removing the pinned node", Mode::TopMostImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode2));
+
+    // A pick made in SelectedImage mode returns to SelectedImage mode
+    auto dataNode4 = this->LoadAdditionalNode(4);
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode2->SetSelected(true);
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(dataNode4));
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(dataNode4));
+
+    m_DataManager->Remove(dataNode4);
+    CPPUNIT_ASSERT_MESSAGE("Mode did not revert to SelectedImage after removing the pinned node", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", AssertCurrentNode(m_DataNode2));
+
+    // The same applies to a pin made via SetMode
+    m_LevelWindowManager->SetMode(Mode::ExplicitImage);
+    m_DataNode2->SetSelected(false);
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode2));
+
+    m_DataManager->Remove(m_DataNode2);
+    CPPUNIT_ASSERT_MESSAGE("Mode did not revert to SelectedImage after removing the pinned node", Mode::SelectedImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Current node is not null", AssertCurrentNode(nullptr));
+  }
+
+  void TestCurrentNodeAndNameChange()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Current node is wrong", AssertCurrentNode(m_DataNode3));
+    CPPUNIT_ASSERT_MESSAGE("Current image is wrong", m_LevelWindowManager->GetCurrentImage() == m_DataNode3->GetData());
+
+    const auto modifiedTime = m_LevelWindowManager->GetMTime();
+    m_DataNode3->SetName("renamed");
+    CPPUNIT_ASSERT_MESSAGE("Renaming a node did not modify the manager", m_LevelWindowManager->GetMTime() > modifiedTime);
+
+    m_DataNode1->SetVisibility(false);
+    m_DataNode2->SetVisibility(false);
+    m_DataNode3->SetVisibility(false);
+    CPPUNIT_ASSERT_MESSAGE("Current node is not null", AssertCurrentNode(nullptr));
+    CPPUNIT_ASSERT_MESSAGE("Current image is not null", nullptr == m_LevelWindowManager->GetCurrentImage());
+  }
+
+  void TestCombinedPropertiesChanged()
+  {
+    m_LevelWindowManager->SetMode(Mode::SelectedImage);
+    m_DataNode1->SetSelected(true); // node1 is the only selected node
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+
+    m_DataNode2->SetIntProperty("layer", itk::NumericTraits<int>::max()); // node2 is not selected and therefore ignored
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+
+    m_DataNode1->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
+      mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR)); // node1 is ignored - no current node
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+
+    m_LevelWindowManager->SetMode(Mode::TopMostImage); // node2 has the highest layer
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode3)); // pin node3
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("Mode was not switched to ExplicitImage", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+
+    m_DataNode3->SetVisibility(false); // pinned node3 hidden - topmost visible node2 is shown, pin is kept
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+
+    m_DataNode2->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
+      mitk::RenderingModeProperty::LOOKUPTABLE_COLOR)); // no candidate left: node1 and node2 are not level-window rendered, node3 is hidden
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is not null", !m_LevelWindowManager->GetLevelWindowProperty());
+
+    m_LevelWindowManager->SetMode(Mode::TopMostImage); // still no candidate
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+
+    m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode3)); // pin the hidden node3 - no candidate for the fallback
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
+    CPPUNIT_ASSERT_MESSAGE("Mode was not switched to ExplicitImage", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+
+    m_DataNode1->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
+      mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR)); // pinned node3 hidden - node1 is the only candidate for the fallback
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+
+    m_DataNode2->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(
+      mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR)); // pinned node3 hidden - node2 is the topmost candidate
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+
+    m_DataNode2->SetIntProperty("layer", itk::NumericTraits<int>::min()); // pinned node3 hidden - node1 is the topmost candidate
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+
+    m_DataNode3->SetVisibility(true); // pinned node3 is visible again
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    CPPUNIT_ASSERT_MESSAGE("Mode was changed", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
+    CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode3));
   }
 };
 

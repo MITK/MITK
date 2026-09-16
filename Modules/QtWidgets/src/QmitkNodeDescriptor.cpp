@@ -12,10 +12,20 @@ found in the LICENSE file.
 
 #include <QmitkNodeDescriptor.h>
 #include <memory>
+#include <mitkExtractSliceFilter.h>
+#include <mitkImage.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
+
+#include <vtkImageData.h>
+#include <vtkLookupTable.h>
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkSmartPointer.h>
+
+#include <QImage>
 
 QmitkNodeDescriptor::QmitkNodeDescriptor(const QString &_ClassName,
                                          const QString &_PathToIcon,
@@ -46,6 +56,80 @@ QString QmitkNodeDescriptor::GetNameOfClass() const
 QIcon QmitkNodeDescriptor::GetIcon(const mitk::DataNode *) const
 {
   return m_Icon;
+}
+
+QPixmap QmitkNodeDescriptor::GenerateThumbnail(const mitk::DataNode *node, int size) const
+{
+  if (nullptr == node)
+    return QPixmap();
+
+  QPixmap thumbnail;
+
+  if (const auto *image = dynamic_cast<const mitk::Image *>(node->GetData()); nullptr != image)
+  {
+    mitk::LevelWindow levelWindow;
+    node->GetLevelWindow(levelWindow);
+
+    auto lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+    lookupTable->SetRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
+    lookupTable->SetSaturationRange(0.0, 0.0);
+    lookupTable->SetValueRange(0.0, 1.0);
+    lookupTable->SetHueRange(0.0, 0.0);
+    lookupTable->SetRampToLinear();
+
+    thumbnail = RenderThumbnail(image, lookupTable, size);
+  }
+
+  return thumbnail.isNull()
+    ? this->GetIcon(node).pixmap(size, size)
+    : thumbnail;
+}
+
+QPixmap QmitkNodeDescriptor::RenderThumbnail(const mitk::Image *image, vtkLookupTable *lookupTable, int size)
+{
+  if (nullptr == image || !image->IsInitialized() || nullptr == lookupTable)
+    return QPixmap();
+
+  // The QImage below wraps the filter output buffer as ARGB32 without
+  // conversion, so anything but a single component would be misread.
+  if (image->GetPixelType().GetNumberOfComponents() != 1)
+    return QPixmap();
+
+  auto planeGeometry = mitk::PlaneGeometry::New();
+  const int sliceNumber = image->GetDimension(2) / 2;
+  planeGeometry->InitializeStandardPlane(image->GetGeometry(), mitk::AnatomicalPlane::Axial, sliceNumber);
+
+  auto extractSliceFilter = mitk::ExtractSliceFilter::New();
+  extractSliceFilter->SetInput(image);
+  extractSliceFilter->SetInterpolationMode(mitk::ExtractSliceFilter::RESLICE_NEAREST);
+  extractSliceFilter->SetResliceTransformByGeometry(image->GetGeometry());
+  extractSliceFilter->SetWorldGeometry(planeGeometry);
+  extractSliceFilter->SetOutputDimensionality(2);
+  extractSliceFilter->SetVtkOutputRequest(true);
+  extractSliceFilter->Update();
+
+  vtkImageData *imageData = extractSliceFilter->GetVtkOutput();
+
+  int dims[3];
+  imageData->GetDimensions(dims);
+
+  auto levelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
+  levelWindowFilter->SetLookupTable(lookupTable);
+  levelWindowFilter->SetInputData(imageData);
+  levelWindowFilter->SetMinOpacity(0.0);
+  levelWindowFilter->SetMaxOpacity(1.0);
+  double clippingBounds[] = { 0.0, static_cast<double>(dims[0]), 0.0, static_cast<double>(dims[1]) };
+  levelWindowFilter->SetClippingBounds(clippingBounds);
+  levelWindowFilter->Update();
+  imageData = levelWindowFilter->GetOutput();
+
+  QImage thumbnailImage(reinterpret_cast<const unsigned char *>(imageData->GetScalarPointer()), dims[0], dims[1], QImage::Format_ARGB32);
+
+  thumbnailImage = dims[0] > dims[1]
+    ? thumbnailImage.scaledToWidth(size, Qt::SmoothTransformation).rgbSwapped()
+    : thumbnailImage.scaledToHeight(size, Qt::SmoothTransformation).rgbSwapped();
+
+  return QPixmap::fromImage(thumbnailImage);
 }
 
 QList<QAction *> QmitkNodeDescriptor::GetActions() const

@@ -34,7 +34,7 @@ namespace mitk
    * </Values>
    * \endverbatim
    *
-   * This class is implemented as a template and uses boost::lexical_cast
+   * This class is implemented as a template and uses mitk::LexicalCast
    * for conversions between specific data types and strings.
    *
    * \tparam DATATYPE The element type stored in the VectorProperty (e.g., double, int).
@@ -102,7 +102,7 @@ namespace mitk
 
           auto *entryElement = doc.NewElement("Value");
           entryElement->SetAttribute("idx", indexS.str().c_str());
-          entryElement->SetAttribute("value", boost::lexical_cast<std::string>(listEntry).c_str());
+          entryElement->SetAttribute("value", mitk::ToString(listEntry).c_str());
           listElement->InsertEndChild(entryElement);
         }
 
@@ -118,7 +118,7 @@ namespace mitk
      * \brief Deserializes an XML "Values" element back into a VectorProperty.
      *
      * Reads child "Value" elements, parses each "value" attribute using
-     * boost::lexical_cast, and constructs a new VectorProperty containing
+     * mitk::LexicalCast, and constructs a new VectorProperty containing
      * the parsed values.
      *
      * \param[in] listElement The XML "Values" element to deserialize. May be nullptr.
@@ -145,9 +145,9 @@ namespace mitk
 
           try
           {
-            value = boost::lexical_cast<DATATYPE>(valueString);
+            value = mitk::LexicalCast<DATATYPE>(valueString);
           }
-          catch (boost::bad_lexical_cast &e)
+          catch (mitk::BadLexicalCast &e)
           {
             MITK_ERROR << "Could not parse '" << valueString << "' as number: " << e.what();
             return nullptr;

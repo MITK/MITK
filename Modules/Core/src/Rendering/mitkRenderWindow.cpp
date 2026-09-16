@@ -26,7 +26,6 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin, const char *name)
   {
     m_vtkRenderWindow = vtkRenderWindow::New();
     m_vtkRenderWindow->SetMultiSamples(0); // We do not support MSAA as it is incompatible with depth peeling
-    m_vtkRenderWindow->SetAlphaBitPlanes(1); // Necessary for depth peeling
   }
 
   if (m_vtkRenderWindow->GetSize()[0] <= 10)

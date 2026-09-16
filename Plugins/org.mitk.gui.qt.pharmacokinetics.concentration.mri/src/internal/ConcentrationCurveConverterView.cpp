@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <mitkConvertToConcentrationAbsoluteFunctor.h>
 #include <mitkConvertToConcentrationRelativeFunctor.h>
 #include <itkBinaryFunctorImageFilter.h>
-#include <boost/math/constants/constants.hpp>
+#include <numbers>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
@@ -377,9 +377,9 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
     concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
     concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
     //Convert Flipangle from degree to radiant
-    double alpha = m_Controls->FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+    double alpha = m_Controls->FlipangleSpinBox->value()/360*2* std::numbers::pi;
     concentrationGen->SetFlipAngle(alpha);
-    double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+    double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * std::numbers::pi;
     concentrationGen->SetFlipAnglePDW(alphaPDW);
   }
 

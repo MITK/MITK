@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define BERRYQHELPENGINEWRAPPER_H
 
 #include <QHelpEngine>
+#include <QUrl>
 
 
 namespace berry {
@@ -29,8 +30,8 @@ public:
   ~QHelpEngineWrapper() override;
 
   /*
-   * To be called after the initial search for qch files finished.
-   * This will mainly cause the search index to be updated, if necessary.
+   * To be called after the initial search for qch files finished, so
+   * the index and contents are set up for the registered documentation.
    */
   void initialDocSetupDone();
 
@@ -40,6 +41,12 @@ public:
 Q_SIGNALS:
 
   void homePageChanged(const QString& page);
+
+  /*
+   * Emitted whenever the help editor navigates to a page (link, history
+   * or context help), so views can sync to the currently shown page.
+   */
+  void currentPageChanged(const QUrl& url);
 
 private:
 

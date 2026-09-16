@@ -40,7 +40,7 @@ namespace mitk
         LocaleSwitch localeSwitch("C");
 
         auto *element = doc.NewElement("double");
-        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()).c_str());
+        element->SetAttribute("value", mitk::ToString(prop->GetValue()).c_str());
         return element;
       }
       else
@@ -59,9 +59,9 @@ namespace mitk
       {
         try
         {
-          return DoubleProperty::New(boost::lexical_cast<double>(d)).GetPointer();
+          return DoubleProperty::New(mitk::LexicalCast<double>(d)).GetPointer();
         }
-        catch (boost::bad_lexical_cast &e)
+        catch (mitk::BadLexicalCast &e)
         {
           MITK_ERROR << "Could not parse string as number: " << e.what();
           return nullptr;

@@ -27,10 +27,12 @@ rendering also needs a large amount of memory; very large images may not fit.
 
 \section org_mitk_views_volumevisualization_v2_image Image
 
-The selector at the top lists the 3D and 4D images in the Data Manager. Pick
-one and switch <b>Volume rendering</b> on; the button names the state it is
-currently in. Nothing below the selector responds while it is off, because
-there is no volume to configure yet.
+The selector at the top lists the 3D and 4D images in the Data Manager. Until
+one is picked the rest of the view is not shown at all, since every control in
+it acts on an image. Pick one and press <b>Enable volume rendering</b>; the
+button names what pressing it does, so it reads <b>Disable volume rendering</b>
+once the volume is on. Nothing below the selector responds while it is off,
+because there is no volume to configure yet.
 
 Switching it on does more than show the volume: a node that carries no transfer
 function is given one from the preset catalogue, and one that names no lighting

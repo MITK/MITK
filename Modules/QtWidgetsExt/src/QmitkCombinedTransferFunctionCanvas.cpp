@@ -94,7 +94,7 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
   QPainter painter(this);
 
   // No image/preset selected, or volume rendering is off -> nothing to show.
-  // Draw just the empty frame so the histogram and labels clear instead of
+  // Draw just the empty frame so the histogram and the curve clear instead of
   // lingering from the previous node
   const bool hasContent = this->isEnabled() && m_PiecewiseFunction != nullptr;
 
@@ -112,28 +112,10 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
   if (!hasContent)
     return;
 
-   {
-    const QString minText = QString::number(m_Min, 'g', 4);
-    const QString maxText = QString::number(m_Max, 'g', 4);
-    const QRect minRect = painter.fontMetrics().boundingRect(minText);
-    const QRect maxRect = painter.fontMetrics().boundingRect(maxText);
-
-    int y = contents.height() - minRect.height() + 5;
-    painter.setPen(Qt::black);
-    painter.drawText(QPoint(11, y + 1), minText);
-    painter.setPen(Qt::white);
-    painter.drawText(QPoint(10, y), minText);
-
-    y = contents.height() - maxRect.height() + 5;
-    const int x = contents.width() - maxRect.width() - 6;
-    painter.setPen(Qt::black);
-    painter.drawText(QPoint(x, y + 1), maxText);
-    painter.setPen(Qt::white);
-    painter.drawText(QPoint(x, y), maxText);
-  }
-
-  // Opacity curve + control points
-  if (m_PiecewiseFunction != nullptr && this->isEnabled() && m_PiecewiseFunction->GetSize() > 0)
+  // The opacity curve. Its control points are deliberately not drawn: they
+  // cannot be grabbed here, so handles would offer an edit the canvas does not
+  // allow, and the shape of the curve is the whole of what it has to say.
+  if (m_PiecewiseFunction->GetSize() > 0)
   {
     double *dp = m_PiecewiseFunction->GetDataPointer();
     const int size = m_PiecewiseFunction->GetSize();
@@ -168,17 +150,6 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
 
     painter.setPen(QPen(Qt::black, 2));
     painter.drawPolyline(curve);
-
-    // Control-point handles.
-    painter.setPen(Qt::black);
-    painter.setBrush(QBrush(Qt::white));
-
-    for (int i = 0; i < size; ++i)
-    {
-      const std::pair<int, int> point = this->FunctionToCanvas(std::make_pair(dp[i * 2], dp[i * 2 + 1]));
-      painter.drawEllipse(point.first - 4, point.second - 4, 8, 8);
-    }
-    painter.setBrush(Qt::NoBrush);
   }
 }
 

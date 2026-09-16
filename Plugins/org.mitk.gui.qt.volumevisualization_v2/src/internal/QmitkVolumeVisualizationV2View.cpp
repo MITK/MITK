@@ -87,10 +87,7 @@ namespace
     panel->setVisible(expanded);
   }
 
-  /** \brief Labels the rendering toggle with the state it is in.
-   *
-   * A checked button is a subtle cue next to a checkbox's tick, and the two
-   * words are what say which way the toggle currently sits.
+  /** \brief Labels the rendering toggle with what pressing it does.
    *
    * The leading spaces widen the gap to the icon: Qt draws a button's label
    * four pixels from it and offers no way to ask for more.
@@ -98,8 +95,8 @@ namespace
   void SetRenderingButtonText(QPushButton *button, bool on)
   {
     button->setText(on
-      ? QStringLiteral("  Volume rendering: on")
-      : QStringLiteral("  Volume rendering: off"));
+      ? QStringLiteral("  Disable volume rendering")
+      : QStringLiteral("  Enable volume rendering"));
   }
 
   /** mitk::VolumeMapperVtkSmart3D branches on this property before it reads
@@ -176,8 +173,8 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
       this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
 
-  connect(m_Controls->enableRenderingButton, &QPushButton::toggled,
-    this, &QmitkVolumeVisualizationV2View::OnEnabledRendering);
+  connect(m_Controls->enableRenderingButton, &QPushButton::clicked,
+    this, &QmitkVolumeVisualizationV2View::OnToggleRendering);
 
   // The editor writes the node itself, including switching rendering on when a
   // function is loaded, so the view has to re-read rather than only re-render.
@@ -225,12 +222,17 @@ void QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged(QList<mitk::DataN
   this->UpdateInterface();
 }
 
-void QmitkVolumeVisualizationV2View::OnEnabledRendering(bool state)
+void QmitkVolumeVisualizationV2View::OnToggleRendering()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
   if (selectedNode.IsNull())
     return;
+
+  // The node is what says which way the toggle currently sits: the button
+  // carries no checked state of its own, and other paths - a transfer function
+  // loaded from a file - switch rendering on without going through here.
+  const bool state = !IsVolumeRenderingOn(selectedNode.GetPointer());
 
   selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
 
@@ -399,30 +401,39 @@ void QmitkVolumeVisualizationV2View::UpdateLightingSection()
 
 void QmitkVolumeVisualizationV2View::UpdateInterface()
 {
+  auto selectedNode = m_SelectedNode.Lock();
+  const bool hasNode = selectedNode.IsNotNull();
+
   // Above the early return below, because authoring also ends when the node
   // being authored goes away, and the sections have to come back on that path
   // too. The lighting panel follows its header rather than being remembered, so
   // a section left expanded comes back expanded.
+  //
+  // Everything below the image section acts on a node, so with none selected it
+  // is put away rather than greyed out: the panel then asks for the one thing it
+  // needs instead of showing a page of controls none of which can be used.
   m_Controls->headline->setVisible(!m_CustomModeActive);
   m_Controls->imageGroupBox->setVisible(!m_CustomModeActive);
-  m_Controls->lightingExpandButton->setVisible(!m_CustomModeActive);
+  m_Controls->transferFunctionEditor->setVisible(hasNode);
+  m_Controls->lightingExpandButton->setVisible(hasNode && !m_CustomModeActive);
   m_Controls->lightingWidget->setVisible(
-    !m_CustomModeActive && m_Controls->lightingExpandButton->isChecked());
-
-  auto selectedNode = m_SelectedNode.Lock();
+    hasNode && !m_CustomModeActive && m_Controls->lightingExpandButton->isChecked());
 
   // The rig is 3D-render-window state rather than widget state, but it follows
   // the node exactly as the widgets do, so both belong to a full refresh.
   this->UpdateLightingSection();
   this->ApplyLightingModeFromNode();
 
-  if(selectedNode.IsNull())
+  if (!hasNode)
   {
     m_Controls->binaryHintLabel->setVisible(false);
     m_Controls->blendModeHintLabel->setVisible(false);
-    m_Controls->enableRenderingButton->setChecked(false);
     m_Controls->enableRenderingButton->setEnabled(false);
     SetRenderingButtonText(m_Controls->enableRenderingButton, false);
+
+    // Disabled as well as hidden: the editor draws its preset previews when it
+    // is enabled again, which is how a hidden one is kept from rendering a
+    // catalogue nobody is looking at.
     m_Controls->transferFunctionEditor->setEnabled(false);
 
     return;
@@ -460,7 +471,5 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
                                   : QString("one this view does not offer")));
   }
 
-  const QSignalBlocker blocker(m_Controls->enableRenderingButton);
-  m_Controls->enableRenderingButton->setChecked(volumeRenderingOn);
   SetRenderingButtonText(m_Controls->enableRenderingButton, volumeRenderingOn);
 }

@@ -44,7 +44,7 @@ public:
 
 private Q_SLOTS:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
-  void OnEnabledRendering(bool state);
+  void OnToggleRendering();
   void OnTransferFunctionChanged();
   void OnLightingChanged();
   void OnCustomModeChanged(bool active);

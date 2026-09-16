@@ -39,6 +39,9 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(LabelRecolored_ModelIsUpdated);
   MITK_TEST(MultipleLabelsModified_UpdateIsCoalesced);
   MITK_TEST(InputReplaced_FormerInputIsNoLongerObserved);
+  MITK_TEST(LabelsAddedOutOfAlphabeticalOrder_ModelOrdersByName);
+  MITK_TEST(MultipleGroups_ModelShowsGroupRowsInSegmentationViewOrder);
+  MITK_TEST(GroupRenamed_ModelIsUpdated);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
@@ -124,6 +127,27 @@ public:
     m_DataStorage->Add(mitk::CreateImageStatisticsNode(container, "statistics"));
   }
 
+  /** Adds a node for the passed segmentation, together with statistics of the fixture image
+  for all of its labels. Labels have to be added before, see AddStatistics(). */
+  mitk::DataNode::Pointer AddMaskNode(mitk::MultiLabelSegmentation* mask)
+  {
+    auto maskNode = mitk::DataNode::New();
+    maskNode->SetData(mask);
+    maskNode->SetName("Other mask");
+    m_DataStorage->Add(maskNode);
+    this->AddStatistics(m_Image, mask);
+
+    return maskNode;
+  }
+
+  static mitk::Label::PixelType AddLabel(mitk::MultiLabelSegmentation* mask, const std::string& name, mitk::MultiLabelSegmentation::GroupIndexType groupID)
+  {
+    mitk::Color white;
+    white.Set(1.0f, 1.0f, 1.0f);
+
+    return mask->AddLabel(name, white, groupID)->GetValue();
+  }
+
   /** Lets the deferred model update run. */
   static void Settle()
   {
@@ -153,6 +177,16 @@ public:
   static std::string LabelText(const QmitkImageStatisticsTreeModel& model, int row)
   {
     return model.data(LabelIndex(model, row), Qt::DisplayRole).toString().toStdString();
+  }
+
+  static std::string Text(const QmitkImageStatisticsTreeModel& model, const QModelIndex& index)
+  {
+    return model.data(index, Qt::DisplayRole).toString().toStdString();
+  }
+
+  static std::string FirstColumnHeader(const QmitkImageStatisticsTreeModel& model)
+  {
+    return model.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString().toStdString();
   }
 
   static bool StartsWith(const std::string& text, const std::string& prefix)
@@ -236,7 +270,9 @@ public:
     m_Mask->GetLabel(m_LabelA)->SetName("Renamed label");
     Settle();
 
-    CPPUNIT_ASSERT_EQUAL(std::string("Renamed label"), LabelText(model, 0));
+    // Labels are ordered by name, so the renamed label moves behind "Label B".
+    CPPUNIT_ASSERT_EQUAL(std::string("Label B"), LabelText(model, 0));
+    CPPUNIT_ASSERT_EQUAL(std::string("Renamed label"), LabelText(model, 1));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The statistics must survive a label rename.",
       2, model.rowCount(MaskIndex(model)));
   }
@@ -324,6 +360,85 @@ public:
     Settle();
 
     CPPUNIT_ASSERT_EQUAL(std::string("Renamed other image"), ImageText(model));
+  }
+
+  void LabelsAddedOutOfAlphabeticalOrder_ModelOrdersByName()
+  {
+    auto mask = mitk::MultiLabelSegmentation::New();
+    mask->Initialize(CreateTestImage());
+    AddLabel(mask, "Zeta", 0);
+    AddLabel(mask, "Alpha", 0);
+    auto maskNode = this->AddMaskNode(mask);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ maskNode.GetPointer() });
+
+    // Ordered by label value, "Zeta" would come first.
+    CPPUNIT_ASSERT_EQUAL(2, model.rowCount(MaskIndex(model)));
+    CPPUNIT_ASSERT_EQUAL(std::string("Alpha"), LabelText(model, 0));
+    CPPUNIT_ASSERT_EQUAL(std::string("Zeta"), LabelText(model, 1));
+    CPPUNIT_ASSERT_MESSAGE("A single group must not add a group level.",
+      !model.hasChildren(LabelIndex(model, 0)));
+  }
+
+  void MultipleGroups_ModelShowsGroupRowsInSegmentationViewOrder()
+  {
+    // Ordered by label value, this would read Label 1, Label 2, Label 3.
+    auto mask = mitk::MultiLabelSegmentation::New();
+    mask->Initialize(CreateTestImage());
+    AddLabel(mask, "Label 1", 0);
+    mask->AddGroup();
+    AddLabel(mask, "Label 2", 1);
+    AddLabel(mask, "Label 3", 0);
+    auto maskNode = this->AddMaskNode(mask);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ maskNode.GetPointer() });
+
+    const auto firstGroup = LabelIndex(model, 0);
+    const auto secondGroup = LabelIndex(model, 1);
+
+    CPPUNIT_ASSERT_EQUAL(2, model.rowCount(MaskIndex(model)));
+    CPPUNIT_ASSERT_EQUAL(std::string("Group 1"), Text(model, firstGroup));
+    CPPUNIT_ASSERT_EQUAL(std::string("Group 2"), Text(model, secondGroup));
+
+    CPPUNIT_ASSERT_EQUAL(2, model.rowCount(firstGroup));
+    CPPUNIT_ASSERT_EQUAL(std::string("Label 1"), Text(model, model.index(0, 0, firstGroup)));
+    CPPUNIT_ASSERT_EQUAL(std::string("Label 3"), Text(model, model.index(1, 0, firstGroup)));
+
+    CPPUNIT_ASSERT_EQUAL(1, model.rowCount(secondGroup));
+    CPPUNIT_ASSERT_EQUAL(std::string("Label 2"), Text(model, model.index(0, 0, secondGroup)));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Images/Masks/Groups"), FirstColumnHeader(model));
+  }
+
+  void GroupRenamed_ModelIsUpdated()
+  {
+    auto mask = mitk::MultiLabelSegmentation::New();
+    mask->Initialize(CreateTestImage());
+    AddLabel(mask, "Label 1", 0);
+    mask->AddGroup();
+    AddLabel(mask, "Label 2", 1);
+    auto maskNode = this->AddMaskNode(mask);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ maskNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: no group rows.",
+      std::string("Group 1"), LabelText(model, 0));
+
+    mask->SetGroupName(0, "Organs");
+    Settle();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Organs"), LabelText(model, 0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The statistics must survive a group rename.",
+      1, model.rowCount(LabelIndex(model, 0)));
   }
 };
 

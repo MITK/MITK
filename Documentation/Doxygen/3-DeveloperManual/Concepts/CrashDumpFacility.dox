@@ -19,6 +19,28 @@ the \c MitkCrashHandling module; a second target linking it would duplicate
 process-global handler state, so all consumers go through
 mitk::CrashDumpFacility.
 
+\section CrashDumpFacilityPage_HardCrash What a hard crash looks like
+
+What the user sees after a hard crash differs per platform, and only Windows
+ends the process by itself. The dump is written and complete either way.
+
+On Windows the out-of-process handler terminates the client once it has the
+dump, so the application simply disappears.
+
+On Linux there is no equivalent mechanism. Crashpad installs an in-process
+signal handler, writes the dump synchronously from inside it while every
+thread is stopped, and returns - it does not end the process, and it restores
+whatever handler it replaced (in a MITK application that is Poco's, installed
+earlier during mitk::BaseApplication construction). The faulting instruction
+then re-executes and the second fault lands in a handler that has nothing left
+to do, so the application stops responding instead of exiting. The user must
+terminate it. macOS likewise leaves the process behind for the user to
+terminate.
+
+Terminating loses nothing: the minidump is on disk and complete before the
+process stops responding, and it records the original fault - a SIGSEGV stays
+a SIGSEGV in the dump, whatever signal the process dies from afterwards.
+
 \section CrashDumpFacilityPage_Content What a dump contains
 
 A minidump contains the stacks of all threads, CPU context, the list of
@@ -103,10 +125,13 @@ tooling can inspect them without knowing the directory layout.
 
 The watchdog is opt-in and silent. A Qt-free mitk::HeartbeatMonitor runs a
 worker thread that watches a heartbeat counter; QmitkUiFreezeWatchdog bumps
-that counter from a QTimer on the UI thread. If the UI thread wedges, the
-timer stops firing; after the timeout (default 180 s) the monitor captures up
-to three provisional snapshots a few seconds apart, so an analyst can tell a
-permanent wedge from a slow loop. If the heartbeat resumes, the provisional
+that counter from a QTimer on the UI thread. Detection begins with the first
+heartbeat, not with the monitor: plugin loading routinely outlasts the timeout
+before the event loop exists to beat at all, and a thread that has never
+reported in has not stalled. If the UI thread then wedges, the timer stops
+firing; after the timeout (default 180 s) the monitor captures up to three
+provisional snapshots a few seconds apart, so an analyst can tell a permanent
+wedge from a slow loop. If the heartbeat resumes, the provisional
 snapshots from that episode are purged - so a temporary freeze leaves nothing
 behind and never prompts on the next start. Only a freeze that ends in a hard
 kill (the out-of-process handler already wrote the dumps) survives.
@@ -173,10 +198,19 @@ normally, but no dump is written.
 
 To exercise real-crash capture from Visual Studio, launch without the
 debugger (Start Without Debugging / Ctrl+F5) or start the application
-from \c startMitkWorkbench_release.bat. The on-demand and watchdog
-snapshots use Crashpad's DumpWithoutCrash, which does not go through the
-unhandled-exception path, so those are still written under a debugger;
-only genuine crashes are intercepted.
+from \c startMitkWorkbench_release.bat.
+
+Linux and macOS reach the same outcome by a different route. There is no
+debugger-detection bypass there; Crashpad's handler is an ordinary signal
+handler, and gdb and lldb stop on a fatal signal before the process sees
+it. The crash lands in the debugger and the handler never runs. Passing
+the signal through (<tt>handle SIGSEGV nostop noprint pass</tt> in gdb)
+does let the dump be written, but the simpler way to capture a real crash
+is to run the binary directly.
+
+The on-demand and watchdog snapshots use Crashpad's DumpWithoutCrash on
+every platform, which goes through neither path, so those are still
+written under a debugger; only genuine crashes are intercepted.
 
 \section CrashDumpFacilityPage_Testing Testing
 
@@ -188,7 +222,9 @@ per-episode capture bound, no crash handler needed), and integration tests
 that spawn a helper executable (\c mitkCrashDumpCaptureTest). The helper
 really crashes (modes \c segv / \c abort / \c stackoverflow) to assert the
 handler wrote a dump; captures an on-demand snapshot (\c snapshot) to assert
-it is written but excluded from the surfacable set; and drives the watchdog
+it is written but excluded from the surfacable set, and two in a row
+(\c snapshot-twice) to assert a session is not limited to one; and drives the
+watchdog
 in both directions (\c freeze / \c freeze-recover) to assert a hard-killed
 freeze leaves a provisional dump while a recovered one leaves none. The suite
 also walks the full facility cycle headlessly after a real crash - arm, list,

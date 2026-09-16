@@ -24,7 +24,17 @@
    <item>
     <widget class="QLabel" name="debuggerNoteLabel">
      <property name="text">
-      <string>Note: under a debugger (Visual Studio F5), a hard crash breaks into the debugger and no dump is written. Use Start Without Debugging (Ctrl+F5) or startMitkWorkbench_release.bat to capture real crashes. On-demand and freeze snapshots still work under a debugger.</string>
+      <string>Note: under a debugger, a hard crash breaks into the debugger and no dump is written. On Windows use Start Without Debugging (Ctrl+F5) or startMitkWorkbench_release.bat; on Linux and macOS run the binary directly rather than under gdb or lldb. On-demand and freeze snapshots still work under a debugger.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="platformNoteLabel">
+     <property name="text">
+      <string>What to expect from a hard crash: a dump is written and offered on the next start. On Windows the application closes by itself. On Linux and macOS it stops responding and you must terminate it - the dump is already complete at that point, so terminating it loses nothing.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -34,7 +44,7 @@
    <item>
     <widget class="QPushButton" name="crashButton">
      <property name="toolTip">
-      <string>Null-pointer write on the UI thread. The application terminates immediately; the next start offers the crash dump (unless running under a debugger - see the note above).</string>
+      <string>Null-pointer write on the UI thread. Under a debugger no dump is written; see the notes above.</string>
      </property>
      <property name="text">
       <string>Trigger hard crash</string>

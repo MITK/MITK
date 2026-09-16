@@ -73,6 +73,13 @@ minidump-stackwalk crash.dmp symbols/
 
 Repeat step 1 for each module whose frames you need resolved.
 
+A dump collected from a live hard crash on Linux usually required a Force Quit,
+because the application stops responding instead of exiting
+(\ref CrashDumpFacilityPage_HardCrash). Such a dump is complete and valid: it
+was written before the application became unresponsive, and its exception
+record names the original fault (SIGSEGV for an access violation), not the
+signal the process was finally killed with.
+
 \section AnalyzingCrashDumpsHowTo_macOS macOS
 
 macOS debug info lives in <tt>.dSYM</tt> bundles (see

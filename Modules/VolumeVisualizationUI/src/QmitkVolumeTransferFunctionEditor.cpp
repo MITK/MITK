@@ -840,6 +840,14 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
       m_Controls->combinedTfCanvas->SetMin(m_DataRange[0]);
       m_Controls->combinedTfCanvas->SetMax(m_DataRange[1]);
     }
+    else
+    {
+      // Nothing measured the image, so the canvas is still on the function's own
+      // range. Following it is what keeps ResetAdjustSliders from scaling the
+      // sliders against whichever node was selected before.
+      m_DataRange = { m_Controls->combinedTfCanvas->GetMin(),
+                      m_Controls->combinedTfCanvas->GetMax() };
+    }
 
     m_Controls->combinedTfCanvas->SnapshotOpacityBaseline();
   }

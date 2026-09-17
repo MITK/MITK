@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
+#include <mitkSegSourceReferenceTestHelpers.h>
 #include <mitkSegTestSourceImageFactory.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTestFixture.h>
@@ -32,6 +33,7 @@ found in the LICENSE file.
 
 #include <filesystem>
 #include <fstream>
+#include <set>
 #include <sstream>
 #include <string>
 
@@ -272,6 +274,46 @@ namespace
     if (ff.getDataset()->findAndGetOFString(tag, tmp).bad())
       return {};
     return tmp.c_str();
+  }
+
+  // The per-slice source SOP Instance UIDs an image declares. Reading them
+  // off the image ties the expectation to the fixture object instead of to a
+  // second copy of the UIDs the factory happens to mint.
+  std::set<std::string> GetPerSliceSOPInstanceUIDs(const mitk::IPropertyProvider* provider)
+  {
+    std::set<std::string> result;
+
+    const auto prop = provider->GetConstProperty(DICOMKey(0x0008, 0x0018));
+    if (const auto* tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty*>(prop.GetPointer()))
+    {
+      for (const auto timeStep : tsProp->GetAvailableTimeSteps())
+      {
+        for (const auto slice : tsProp->GetAvailableSlices(timeStep))
+          result.insert(tsProp->GetValue(timeStep, slice));
+      }
+    }
+
+    return result;
+  }
+
+  // Assert that the SEG at segPath references exactly the source's own
+  // per-slice instances. Presence alone would pass on a SEG that referenced
+  // the real instances and a minted series besides, and a real relation must
+  // suppress synthesis outright - so the reference set may not exceed the
+  // source's either.
+  void AssertSourceReferencesAreExactly(const std::string& segPath,
+                                        const mitk::IPropertyProvider* source,
+                                        const std::string& mode)
+  {
+    const auto expected = GetPerSliceSOPInstanceUIDs(source);
+    CPPUNIT_ASSERT_MESSAGE("Test precondition: the source declares per-slice SOP Instance UIDs",
+                           !expected.empty());
+
+    const auto diff = mitk::test::DiffSourceReferences(
+      expected, mitk::test::ReadReferencedSOPInstanceUIDs(segPath));
+
+    if (!diff.empty())
+      CPPUNIT_FAIL(mode + "-mode SEG must reference exactly the source's own instances:" + diff);
   }
 
   // Build a seg derived from a DICOM-flavoured source image. Mirrors the
@@ -917,6 +959,11 @@ public:
     mitk::IFileWriter::Options options;
     const auto path = WriteSegToTempFile(seg, options, "wf-strict");
 
+    // Strict mode only guarantees the write found source items at all. That
+    // they are the source's own instances is what makes the written
+    // provenance true rather than merely present.
+    AssertSourceReferencesAreExactly(path, source, "Strict");
+
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Source's PatientID survives into the written SEG",
                                  std::string("Wf-PID"), ReadTopLevelString(path, DCM_PatientID));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Source's StudyInstanceUID survives into the written SEG",
@@ -967,6 +1014,11 @@ public:
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
     const auto path = WriteSegToTempFile(seg, options, "wf-synth");
+
+    // Synthetic is a fallback, not an override: with a real relation attached
+    // the writer must not reach BuildSyntheticSourceItems, so the references
+    // stay the source's own rather than freshly minted ones.
+    AssertSourceReferencesAreExactly(path, source, "Synthetic");
 
     const auto writtenSeriesUID = ReadTopLevelString(path, DCM_SeriesInstanceUID);
     CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write produces a non-empty SeriesInstanceUID",

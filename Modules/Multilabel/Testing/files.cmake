@@ -22,5 +22,6 @@ set(MODULE_CUSTOM_TESTS
     mitkDICOMSegmentationIONonZOrderedTest.cpp
     mitkDICOMSegmentationIOLabelmapRegressionTest.cpp
     mitkDICOMSegmentationLegacyMigrationTest.cpp
+    mitkDICOMSegSourceReferenceTest.cpp
 )
 

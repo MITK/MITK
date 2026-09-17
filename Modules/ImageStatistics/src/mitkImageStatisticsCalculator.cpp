@@ -358,24 +358,25 @@ namespace mitk
       // find min, max, minindex and maxindex
       // make sure to only look in the masked region, use a masker for this
 
-      vnl_vector<int> minIndex, maxIndex;
+      vnl_vector<int> minIndex(3), maxIndex(3);
       Point3D worldCoordinateMin;
       Point3D worldCoordinateMax;
-      Point3D indexCoordinateMin;
-      Point3D indexCoordinateMax;
+      itk::Index<3> imageIndexMin;
+      itk::Index<3> imageIndexMax;
       m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMinIndex(labelValue), worldCoordinateMin);
       m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMaxIndex(labelValue), worldCoordinateMax);
-      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMin, indexCoordinateMin);
-      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMax, indexCoordinateMax);
 
-      minIndex.set_size(3);
-      maxIndex.set_size(3);
+      // The reference image may be a 2D slice (planar figure masks), so the index
+      // has to go through world coordinates. On rotated geometries the inverse
+      // transform carries floating-point noise, so the result has to be rounded
+      // rather than truncated.
+      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMin, imageIndexMin);
+      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMax, imageIndexMax);
 
-      // for (unsigned int i=0; i < tmpMaxIndex.GetIndexDimension(); i++)
-      for (unsigned int i = 0; i < 3; i++)
+      for (unsigned int i = 0; i < 3; ++i)
       {
-        minIndex[i] = indexCoordinateMin[i];
-        maxIndex[i] = indexCoordinateMax[i];
+        minIndex[i] = static_cast<int>(imageIndexMin[i]);
+        maxIndex[i] = static_cast<int>(imageIndexMax[i]);
       }
 
       statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), minIndex);

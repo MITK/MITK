@@ -8,3 +8,7 @@ set(UI_FILES
   QmitkVolumeLightingWidgetControls.ui
   QmitkVolumeTransferFunctionEditorControls.ui
 )
+
+set(QRC_FILES
+  VolumeVisualizationUI.qrc
+)

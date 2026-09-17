@@ -91,7 +91,9 @@ public:
   void EnsureTransferFunction();
 
 protected:
-  /** \brief Re-measure the preset grid when the room it has to fill changes. */
+  /** \brief Re-measure the preset entries when the room they have to fill
+   *         changes.
+   */
   bool eventFilter(QObject *watched, QEvent *event) override;
 
   /** \brief Draw the preset previews once the editor is live for its node. */
@@ -198,14 +200,25 @@ private:
   void SetCustomModeActive(bool active);
 
   /**
+   * \brief Lay the presets out as a grid of previews, or as a list of names
+   *        each beside a small one.
+   *
+   * Both presentations draw the same previews from the same pixmaps; what
+   * differs is how much of one an entry gets, so nothing is rendered again on
+   * a switch.
+   */
+  void SetCompactPresetList(bool compact);
+
+  /**
    * \brief Size the preset cells to the width the panel currently gives them.
    *
    * The panel is a fraction of the workbench window rather than a fixed width,
    * so the cells are measured from it instead of fixed, and measured again
    * whenever it changes. What stays fixed is how many previews stand side by
-   * side, which is the point of the grid.
+   * side, which is the point of the grid; a list has one entry per row and
+   * hands it the whole width.
    */
-  void UpdatePresetGrid();
+  void UpdatePresetLayout();
 
   /**
    * \brief Ask for a preview of every preset, unless they are current.
@@ -286,6 +299,16 @@ private:
    * reports isVisible() false whatever mode the editor is in.
    */
   bool m_CustomModeActive = false;
+
+  /** \brief Whether the presets are listed as names beside small previews
+   *         rather than laid out as a grid of large ones.
+   *
+   * The only record of the choice. The button that makes it is not checkable,
+   * since its icon names the presentation pressing it brings rather than the
+   * one in force, and a second copy of the state is a second thing to keep in
+   * step with this one.
+   */
+  bool m_CompactPresetList = false;
 
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };

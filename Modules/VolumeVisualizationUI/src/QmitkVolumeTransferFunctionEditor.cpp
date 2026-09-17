@@ -112,6 +112,14 @@ namespace
    */
   constexpr int PREFERRED_CELL_WIDTH = 118;
 
+  /** \brief The width of a preview standing beside a name rather than above it.
+   *
+   * Small enough that a row stays close to the height of a line of text, which
+   * is the point of that presentation: a preview large enough to study is what
+   * the grid is for, and one this size only says which colours a preset brings.
+   */
+  constexpr int COMPACT_PREVIEW_WIDTH = 32;
+
   /** \brief The margin between a preview and the edges of its cell. */
   constexpr int CELL_PADDING = 4;
 
@@ -296,25 +304,17 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   auto *presetList = m_Controls->presetListWidget;
 
-  presetList->setViewMode(QListView::IconMode);
-
   // The entries state the size they occupy themselves, so there is nothing
   // left here for the view to measure and hold on to. Leaving this off is what
   // has it read that size again after every re-measure, rather than the one it
   // happened to see first.
   presetList->setUniformItemSizes(false);
 
-  // Without wrapping the entries stay one per row, which is the plain list the
-  // previews are meant to replace.
-  presetList->setWrapping(true);
   presetList->setResizeMode(QListView::Adjust);
 
   // Icon mode lets entries be dragged around by default. This is a menu.
   presetList->setMovement(QListView::Static);
 
-  // Wrapped rather than cut short with an ellipsis, since hardly any preset
-  // name fits a cell on one line.
-  presetList->setWordWrap(true);
   presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
@@ -323,7 +323,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   // Cells are measured from the names they have to hold, so the entries come
   // first, and the stand-in previews after them, since their size is what the
-  // measurement settles.
+  // measurement settles. The grid of previews is what it opens in, and asking
+  // for it is also what puts the first icon on the button offering the other.
   //
   // The panel is only ever as wide as the workbench window makes it, so the
   // cells are measured from it rather than fixed, and measured again whenever
@@ -331,7 +332,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // resizeEvent: the layout has not necessarily handed the list its new
   // geometry by the time that event arrives, and a stale width would be
   // measured.
-  this->UpdatePresetGrid();
+  this->SetCompactPresetList(false);
   this->InvalidateThumbnails();
 
   presetList->viewport()->installEventFilter(this);
@@ -376,8 +377,16 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     [this](bool expanded)
     {
       SetSectionExpanded(m_Controls->presetExpandButton, m_Controls->presetPanel, expanded);
+
+      // It offers the other way of laying the entries out, and a folded-away
+      // section has none to lay out.
+      m_Controls->presetViewModeButton->setVisible(expanded);
+
       this->StartThumbnailGeneration();
     });
+
+  connect(m_Controls->presetViewModeButton, &QToolButton::clicked, this,
+    [this] { this->SetCompactPresetList(!m_CompactPresetList); });
 
   connect(m_Controls->adjustPresetExpandButton, &QToolButton::toggled, this,
     [this](bool expanded)
@@ -420,7 +429,7 @@ QmitkVolumeTransferFunctionEditor::~QmitkVolumeTransferFunctionEditor() = defaul
 bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *event)
 {
   if (event->type() == QEvent::Resize && watched == m_Controls->presetListWidget->viewport())
-    this->UpdatePresetGrid();
+    this->UpdatePresetLayout();
 
   return QWidget::eventFilter(watched, event);
 }
@@ -435,7 +444,43 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
     this->StartThumbnailGeneration();
 }
 
-void QmitkVolumeTransferFunctionEditor::UpdatePresetGrid()
+void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
+{
+  m_CompactPresetList = compact;
+
+  auto *presetList = m_Controls->presetListWidget;
+
+  presetList->setViewMode(compact ? QListView::ListMode : QListView::IconMode);
+
+  // Setting a mode adjusts only the properties nobody has set explicitly, so
+  // the movement, the resize mode and the scrolling from the constructor come
+  // through it and the flow follows the mode. Wrapping was set there too, so it
+  // has to be said again: a list keeps one entry per row rather than packing
+  // them across. Word wrap is no mode's business either way - a name beside its
+  // preview has the row to itself, and is cut short rather than broken in two.
+  presetList->setWrapping(!compact);
+  presetList->setWordWrap(!compact);
+
+  this->UpdatePresetLayout();
+
+  // The two presentations put the same entry at different heights, and what a
+  // reader looks for first after a switch is the one in force.
+  if (auto *currentPreset = presetList->currentItem(); currentPreset != nullptr)
+    presetList->scrollToItem(currentPreset);
+
+  // The icon names the presentation pressing the button brings rather than the
+  // one in force, the way the view's rendering button names what pressing it
+  // does.
+  m_Controls->presetViewModeButton->setIcon(QmitkStyleManager::ThemeIcon(compact
+    ? QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")
+    : QStringLiteral(":/VolumeVisualizationUI/view-list-details.svg")));
+
+  m_Controls->presetViewModeButton->setToolTip(compact
+    ? "Show the presets as a grid of previews."
+    : "Show the presets as a list, with a smaller preview beside each name.");
+}
+
+void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
 {
   auto *presetList = m_Controls->presetListWidget;
 
@@ -454,35 +499,53 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetGrid()
   // that costs nothing visible while covering styles that take more.
   const int usable = available - VIEWPORT_RESERVE;
 
-  const int columns = std::max(MIN_COLUMNS, usable / PREFERRED_CELL_WIDTH);
+  QSize previewSize;
+  QSize cellSize;
 
-  // Dividing the width by the columns rather than the other way around is what
-  // has the cells share out what there is, instead of leaving whatever the
-  // last column did not need unused at the right.
-  const int cellWidth = usable / columns;
-
-  const QSize previewSize = PreviewSize(cellWidth - 2 * CELL_PADDING);
-
-  // How many lines a name takes is not something to assume: the catalogued
-  // ones are hyphenated and Qt breaks a line at a hyphen, so the count follows
-  // from the width a cell has and from how wide the platform's interface font
-  // draws the characters. The rect overload constrains wrapping by its width
-  // and leaves the height free, which is the measurement the delegate itself
-  // makes when it paints a name. The tallest of them keeps every cell the same
-  // height and none of them too short.
-  const QFontMetrics metrics = presetList->fontMetrics();
-  int nameHeight = metrics.lineSpacing();
-
-  for (int i = 0; i < presetList->count(); ++i)
+  if (m_CompactPresetList)
   {
-    const QRect nameBounds = metrics.boundingRect(QRect(0, 0, previewSize.width(), 0),
-                                                  Qt::TextWordWrap,
-                                                  presetList->item(i)->text());
+    previewSize = PreviewSize(COMPACT_PREVIEW_WIDTH);
 
-    nameHeight = std::max(nameHeight, nameBounds.height());
+    // A row takes the width it is given rather than the width it wants: stated
+    // here, the entry in force is marked across the whole panel instead of
+    // only behind its name. Its height is the taller of what it has to hold,
+    // since a preview this small can come out shorter than a line of text.
+    cellSize = QSize(usable,
+                     std::max(previewSize.height(), presetList->fontMetrics().height()) +
+                       2 * CELL_PADDING);
   }
+  else
+  {
+    const int columns = std::max(MIN_COLUMNS, usable / PREFERRED_CELL_WIDTH);
 
-  const QSize cellSize(cellWidth, previewSize.height() + nameHeight + 2 * CELL_PADDING);
+    // Dividing the width by the columns rather than the other way around is
+    // what has the cells share out what there is, instead of leaving whatever
+    // the last column did not need unused at the right.
+    const int cellWidth = usable / columns;
+
+    previewSize = PreviewSize(cellWidth - 2 * CELL_PADDING);
+
+    // How many lines a name takes is not something to assume: the catalogued
+    // ones are hyphenated and Qt breaks a line at a hyphen, so the count
+    // follows from the width a cell has and from how wide the platform's
+    // interface font draws the characters. The rect overload constrains
+    // wrapping by its width and leaves the height free, which is the
+    // measurement the delegate itself makes when it paints a name. The tallest
+    // of them keeps every cell the same height and none of them too short.
+    const QFontMetrics metrics = presetList->fontMetrics();
+    int nameHeight = metrics.lineSpacing();
+
+    for (int i = 0; i < presetList->count(); ++i)
+    {
+      const QRect nameBounds = metrics.boundingRect(QRect(0, 0, previewSize.width(), 0),
+                                                    Qt::TextWordWrap,
+                                                    presetList->item(i)->text());
+
+      nameHeight = std::max(nameHeight, nameBounds.height());
+    }
+
+    cellSize = QSize(cellWidth, previewSize.height() + nameHeight + 2 * CELL_PADDING);
+  }
 
   // The grid decides where a cell goes only for entries that fill it. Left to
   // size themselves, they come out a couple of pixels narrower - the padding
@@ -494,7 +557,10 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetGrid()
     presetList->item(i)->setSizeHint(cellSize);
 
   presetList->setIconSize(previewSize);
-  presetList->setGridSize(cellSize);
+
+  // An invalid size is how a view is told it has no grid, which is what a
+  // single column of entries sized to the panel already is.
+  presetList->setGridSize(m_CompactPresetList ? QSize() : cellSize);
 
   // The size just settled on is the one the stand-ins were built for, and on
   // the first pass they were built for a viewport no layout had sized yet.
@@ -873,6 +939,7 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
     : (m_AppliedTransferFunction.IsNotNull() ? "Preset: Custom" : "Select a preset"));
 
   m_Controls->presetExpandButton->setEnabled(hasNode);
+  m_Controls->presetViewModeButton->setEnabled(hasNode);
   m_Controls->presetListWidget->setEnabled(hasNode);
   m_Controls->createTfButton->setEnabled(adjustable);
   m_Controls->loadTfButton->setEnabled(hasNode);

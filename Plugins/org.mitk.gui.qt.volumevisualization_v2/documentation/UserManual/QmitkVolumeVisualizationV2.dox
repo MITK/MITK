@@ -60,6 +60,14 @@ the grid opens, one after another, so they appear progressively.
 
 \imageMacro{QmitkVolumeVisualizationV2_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
 
+The button at the right of the section header lays the same presets out as a
+list instead: one row each, the name beside a preview too small to study but
+large enough to say which colours a preset brings. More of the catalogue is on
+screen that way, and the names line up in one column, which is the quicker way
+in once they are familiar. Pressing it again brings the grid back; nothing is
+drawn a second time either way. The view starts in the grid every time it is
+opened.
+
 The catalogue is the Hounsfield-based preset library shared across medical
 viewers, plus a few general-purpose colour maps. The <tt>CT-</tt> presets assume
 Hounsfield units, so which tissue a preset picks out transfers between CT images

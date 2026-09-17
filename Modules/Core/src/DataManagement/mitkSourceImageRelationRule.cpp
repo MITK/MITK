@@ -353,15 +353,22 @@ void mitk::SourceImageRelationRule::Connect_datalayer(IPropertyOwner * source,
   else if (destInstanceUIDProp.IsNotNull() || destClassUIDProp.IsNotNull())
   {
     // A Source Image Sequence item needs both referenced UIDs, so half an
-    // identity is unusable. A destination carrying only one of them
-    // came from a stored property list, not a live DICOM read, and for
-    // such data this half identity is systematic rather than sporadic -
-    // ordinary legacy data, not corruption.
+    // identity is unusable. Images persisted before SOP Class UID joined
+    // the default tags of interest (commit cb90011c7c, "Register SOP Class
+    // UID as DICOM tag of interest") carry exactly this half, which is why
+    // the condition is reported rather than treated as corruption. Other
+    // producers reach it too, so the half identity implies nothing about
+    // where the destination came from.
     const auto presentUID = destInstanceUIDProp.IsNotNull()
       ? "SOP Instance UID present: " + destInstanceUIDProp->GetValueAsString()
       : "SOP Class UID present: " + destClassUIDProp->GetValueAsString();
 
-    MITK_WARN << "Cannot connect SourceImageRelationRule on data layer. The referenced source image (the rule's destination) has only one of DICOM SOP Instance UID(0x0008, 0x0018) and DICOM SOP Class UID(0x0008, 0x0016); both are required. Re-read that image from its DICOM series to restore the complete identity. No Source Image Sequence item is written for this connection. " << presentUID << ".";
+    MITK_WARN << "Cannot connect SourceImageRelationRule on data layer. The referenced source image "
+                 "(the rule's destination) has only one of DICOM SOP Instance UID(0x0008, 0x0018) and "
+                 "DICOM SOP Class UID(0x0008, 0x0016); both are required. No Source Image Sequence item "
+                 "is written for this connection. If the image was read from a DICOM series, re-reading "
+                 "it restores the complete identity. "
+              << presentUID << ".";
   }
   else
   {

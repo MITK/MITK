@@ -114,6 +114,9 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestSmallImagePlanarFigureIgnoreZero);
   MITK_TEST(TestRotatedImageMaskMinMaxPosition);
   MITK_TEST(TestRotatedImagePlanarFigureMinMaxPosition);
+  MITK_TEST(TestNegativeFloatImageUnmaskedMinMaxPosition);
+  MITK_TEST(TestNegativeFloatImageMaskedMinMaxPosition);
+  MITK_TEST(TestZeroImageMinMaxPosition);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -152,6 +155,9 @@ public:
   void TestSmallImagePlanarFigureIgnoreZero();
   void TestRotatedImageMaskMinMaxPosition();
   void TestRotatedImagePlanarFigureMinMaxPosition();
+  void TestNegativeFloatImageUnmaskedMinMaxPosition();
+  void TestNegativeFloatImageMaskedMinMaxPosition();
+  void TestZeroImageMinMaxPosition();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -249,6 +255,32 @@ private:
     CPPUNIT_ASSERT_MESSAGE("Calculated median gray value is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
   }
 
+  // checks the extrema and their positions in indices of the input image; the
+  // suffix names the case in the assertion messages
+  void VerifyExtrema(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
+    mitk::ImageStatisticsContainer::RealType min, const itk::Index<3>& minIndex,
+    mitk::ImageStatisticsContainer::RealType max, const itk::Index<3>& maxIndex,
+    const std::string& suffix = "")
+  {
+    mitk::ImageStatisticsContainer::RealType minObject = 0;
+    mitk::ImageStatisticsContainer::RealType maxObject = 0;
+    mitk::ImageStatisticsContainer::IndexType minIndexObject(3, 0);
+    mitk::ImageStatisticsContainer::IndexType maxIndexObject(3, 0);
+    CPPUNIT_ASSERT_NO_THROW(minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM()));
+    CPPUNIT_ASSERT_NO_THROW(maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM()));
+    CPPUNIT_ASSERT_NO_THROW(minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION()));
+    CPPUNIT_ASSERT_NO_THROW(maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION()));
+
+    CPPUNIT_ASSERT_MESSAGE("Minimum" + suffix, std::abs(minObject - min) < mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE("Maximum" + suffix, std::abs(maxObject - max) < mitk::eps);
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("MinPosition" + suffix, static_cast<int>(minIndex[i]), minIndexObject[i]);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("MaxPosition" + suffix, static_cast<int>(maxIndex[i]), maxIndexObject[i]);
+    }
+  }
+
   // checks that the statistics describe exactly one voxel with the given value
   // at the given index of the input image
   void VerifySingleVoxel(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
@@ -259,25 +291,10 @@ private:
     const std::string voxel = ss.str();
 
     mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject = 0;
-    mitk::ImageStatisticsContainer::RealType minObject = 0;
-    mitk::ImageStatisticsContainer::RealType maxObject = 0;
-    mitk::ImageStatisticsContainer::IndexType minIndexObject(3, 0);
-    mitk::ImageStatisticsContainer::IndexType maxIndexObject(3, 0);
     CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
-    CPPUNIT_ASSERT_NO_THROW(minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM()));
-    CPPUNIT_ASSERT_NO_THROW(maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM()));
-    CPPUNIT_ASSERT_NO_THROW(minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION()));
-    CPPUNIT_ASSERT_NO_THROW(maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION()));
-
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel count" + voxel, mitk::ImageStatisticsContainer::VoxelCountType(1), numberOfVoxelsObject);
-    CPPUNIT_ASSERT_MESSAGE("Mask does not select the intended voxel" + voxel, std::abs(minObject - value) < mitk::eps);
-    CPPUNIT_ASSERT_MESSAGE("Mask does not select the intended voxel" + voxel, std::abs(maxObject - value) < mitk::eps);
 
-    for (unsigned int i = 0; i < 3; ++i)
-    {
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("MinPosition" + voxel, static_cast<int>(index[i]), minIndexObject[i]);
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("MaxPosition" + voxel, static_cast<int>(index[i]), maxIndexObject[i]);
-    }
+    this->VerifyExtrema(stats, value, index, value, index, voxel);
   }
 
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
@@ -982,6 +999,82 @@ void mitkImageStatisticsCalculatorTestSuite::TestRotatedImagePlanarFigureMinMaxP
       }
     }
   }
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestNegativeFloatImageUnmaskedMinMaxPosition()
+{
+  /*****************************
+   * 2x2x2 float image with only negative values
+   * -> Min -8 at (1,1,0), Max -1 at (1,0,0)
+   ******************************/
+  MITK_INFO << std::endl << "Test negative float image unmasked min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<float> values{ -5.f, -1.f, -3.f, -8.f, -2.f, -7.f, -4.f, -6.f };
+  mitk::Image::Pointer image = BuildImage<float>(size, values);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  auto statisticsObject = statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
+
+  this->VerifyExtrema(statisticsObject, -8.0, MakeIndex(1, 1, 0), -1.0, MakeIndex(1, 0, 0));
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestNegativeFloatImageMaskedMinMaxPosition()
+{
+  /*****************************
+   * 2x2x2 float image with only negative values, the mask selects the
+   * second slice
+   * -> Min -7 at (1,0,1), Max -2 at (0,0,1)
+   ******************************/
+  MITK_INFO << std::endl << "Test negative float image masked min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<float> values{ -5.f, -1.f, -3.f, -8.f, -2.f, -7.f, -4.f, -6.f };
+  std::vector<unsigned short> maskValues{ 0, 0, 0, 0, 1, 1, 1, 1 };
+  mitk::Image::Pointer image = BuildImage<float>(size, values);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyExtrema(statisticsObject, -7.0, MakeIndex(1, 0, 1), -2.0, MakeIndex(0, 0, 1));
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestZeroImageMinMaxPosition()
+{
+  /*****************************
+   * 2x2x2 unsigned char image holding only zeros, unmasked and with a mask
+   * selecting the second slice; zero is the lowest value of the pixel type,
+   * so the maximum never improves on a sentinel seed
+   * -> Min and Max 0 at the first voxel of the evaluated region
+   ******************************/
+  MITK_INFO << std::endl << "Test zero image min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  mitk::Image::Pointer image = BuildImage<unsigned char>(size, std::vector<unsigned char>(8, 0));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  this->VerifyExtrema(statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0),
+    0.0, MakeIndex(0, 0, 0), 0.0, MakeIndex(0, 0, 0), " unmasked");
+
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, { 0, 0, 0, 0, 1, 1, 1, 1 });
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  this->VerifyExtrema(statisticsContainer->GetStatistics(1, 0), 0.0, MakeIndex(0, 0, 1), 0.0, MakeIndex(0, 0, 1), " masked");
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

@@ -18,7 +18,9 @@ found in the LICENSE file.
 #include <itkImage.h>
 #include <itkImageToImageFilter.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
+
 #include <unordered_map>
+#include <vector>
 
 
 namespace itk
@@ -65,6 +67,9 @@ public:
 
     /**
      * \brief Container holding minimum/maximum values and their indices for a single label.
+     *
+     * Extrema always describe at least one pixel, so they are constructed from the
+     * first pixel of the label rather than from sentinel values.
      */
     class LabelExtrema
     {
@@ -72,9 +77,11 @@ public:
         PixelType m_Min, m_Max;
         IndexType m_MinIndex, m_MaxIndex;
 
-        LabelExtrema():
-            m_Min(std::numeric_limits<PixelType>::max()),
-            m_Max(std::numeric_limits<PixelType>::min())
+        LabelExtrema(PixelType value, const IndexType& index):
+            m_Min(value),
+            m_Max(value),
+            m_MinIndex(index),
+            m_MaxIndex(index)
         {}
     };
 
@@ -87,32 +94,22 @@ public:
      * \brief Get the minimum pixel value for the given label.
      * \param[in] label The label value to query.
      * \return The minimum pixel value for that label.
+     * \throws itk::ExceptionObject if the label does not occur in the label image.
      */
     PixelType GetMin(LabelPixelType label) const
     {
-        ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
-        if (it == m_LabelExtrema.end())
-        {
-            MITK_ERROR << "invalid label";
-        }
-
-        return (*it).second.m_Min;
+        return this->GetExtrema(label).m_Min;
     }
 
     /**
      * \brief Get the maximum pixel value for the given label.
      * \param[in] label The label value to query.
      * \return The maximum pixel value for that label.
+     * \throws itk::ExceptionObject if the label does not occur in the label image.
      */
     PixelType GetMax(LabelPixelType label) const
     {
-        ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
-        if (it == m_LabelExtrema.end())
-        {
-            MITK_ERROR << "invalid label";
-        }
-
-        return (*it).second.m_Max;
+        return this->GetExtrema(label).m_Max;
     }
 
     /**
@@ -132,35 +129,23 @@ public:
     /**
      * \brief Get the index of the minimum pixel value for the given label.
      * \param[in] label The label value to query.
-     * \return The image index of the minimum pixel for that label.
+     * \return The image index of the minimum pixel for that label; for a repeated minimum the first one in scan order.
+     * \throws itk::ExceptionObject if the label does not occur in the label image.
      */
     IndexType GetMinIndex(LabelPixelType label) const
     {
-        ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
-        if (it == m_LabelExtrema.end())
-        {
-            MITK_ERROR << "invalid label";
-        }
-
-        return (*it).second.m_MinIndex;
-
+        return this->GetExtrema(label).m_MinIndex;
     }
 
     /**
      * \brief Get the index of the maximum pixel value for the given label.
      * \param[in] label The label value to query.
-     * \return The image index of the maximum pixel for that label.
+     * \return The image index of the maximum pixel for that label; for a repeated maximum the first one in scan order.
+     * \throws itk::ExceptionObject if the label does not occur in the label image.
      */
     IndexType GetMaxIndex(LabelPixelType label) const
     {
-        ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
-        if (it == m_LabelExtrema.end())
-        {
-            MITK_ERROR << "invalid label";
-        }
-
-        return (*it).second.m_MaxIndex;
-
+        return this->GetExtrema(label).m_MaxIndex;
     }
 
     /**
@@ -235,6 +220,19 @@ protected:
     void AfterThreadedGenerateData() override;
 
 private:
+    const LabelExtrema& GetExtrema(LabelPixelType label) const
+    {
+        const auto it = m_LabelExtrema.find(label);
+
+        if (it == m_LabelExtrema.end())
+        {
+            itkExceptionMacro(<< "Label " << static_cast<typename NumericTraits<LabelPixelType>::PrintType>(label)
+                              << " does not occur in the label image.");
+        }
+
+        return it->second;
+    }
+
     std::vector<ExtremaMapType> m_ThreadExtrema;
 
     ExtremaMapType m_LabelExtrema;

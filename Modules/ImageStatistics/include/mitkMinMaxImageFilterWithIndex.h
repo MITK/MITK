@@ -19,7 +19,8 @@ found in the LICENSE file.
 #include <itkImageToImageFilter.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 
-
+#include <optional>
+#include <vector>
 
 namespace itk
 {
@@ -76,7 +77,7 @@ public:
 
     /**
      * \brief Get the image index of the minimum pixel value.
-     * \return The index of the minimum pixel.
+     * \return The index of the minimum pixel; for a repeated minimum the first one in scan order.
      */
     IndexType GetMinIndex() const
     {
@@ -85,7 +86,7 @@ public:
 
     /**
      * \brief Get the image index of the maximum pixel value.
-     * \return The index of the maximum pixel.
+     * \return The index of the maximum pixel; for a repeated maximum the first one in scan order.
      */
     IndexType GetMaxIndex() const
     {
@@ -109,10 +110,16 @@ protected:
     void AfterThreadedGenerateData() override;
 
 private:
-    std::vector<PixelType> m_ThreadMin;
-    std::vector<PixelType> m_ThreadMax;
-    std::vector<IndexType> m_ThreadMinIndex;
-    std::vector<IndexType> m_ThreadMaxIndex;
+    struct ThreadExtrema
+    {
+        PixelType m_Min;
+        PixelType m_Max;
+        IndexType m_MinIndex;
+        IndexType m_MaxIndex;
+    };
+
+    // a thread that is not assigned a region leaves its entry empty
+    std::vector<std::optional<ThreadExtrema>> m_ThreadExtrema;
 
     PixelType m_Min;
     PixelType m_Max;

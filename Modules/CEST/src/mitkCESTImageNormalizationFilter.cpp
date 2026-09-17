@@ -53,6 +53,7 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
   resultMitkImage->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
   resultMitkImage->GetPropertyList()->SetStringProperty(CEST_PROPERTY_NAME_OFFSETS().c_str(), m_RealOffsets.c_str());
   // remove uids
+  resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0008.0016");
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0008.0018");
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000D");
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000E");

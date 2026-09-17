@@ -37,18 +37,20 @@ set(_dicomSegLabelmapLiverInput
   "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/liver_seg.nrrd")
 set(_dicomSegLabelmapSpineInput
   "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/spine_seg.nrrd")
-set(_dicomSegLabelmapSourceDicomList
-  "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/ct-3slice/01.dcm"
-  "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/ct-3slice/02.dcm"
-  "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/ct-3slice/03.dcm")
-string(REPLACE ";" "," _dicomSegLabelmapSourceDicoms "${_dicomSegLabelmapSourceDicomList}")
+set(_dicomSegCt3SliceDir
+  "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/ct-3slice")
+set(_dicomSegCt3SliceList
+  "${_dicomSegCt3SliceDir}/01.dcm"
+  "${_dicomSegCt3SliceDir}/02.dcm"
+  "${_dicomSegCt3SliceDir}/03.dcm")
+string(REPLACE ";" "," _dicomSegLabelmapSourceDicoms "${_dicomSegCt3SliceList}")
 set(_dicomSegLabelmapReference
   "${MITK_DATA_DIR}/Multilabel/DICOMSegmentationIO/liver-spine-labelmap-dcmqi-reference.nrrd")
 
-set(_dicomSegLabelmapAllInputsExist TRUE)
-foreach(_path IN LISTS _dicomSegLabelmapSourceDicomList)
+set(_dicomSegCt3SliceExists TRUE)
+foreach(_path IN LISTS _dicomSegCt3SliceList)
   if(NOT EXISTS "${_path}")
-    set(_dicomSegLabelmapAllInputsExist FALSE)
+    set(_dicomSegCt3SliceExists FALSE)
   endif()
 endforeach()
 
@@ -56,7 +58,7 @@ if(EXISTS "${_dicomSegLabelmapMetadata}"
    AND EXISTS "${_dicomSegLabelmapLiverInput}"
    AND EXISTS "${_dicomSegLabelmapSpineInput}"
    AND EXISTS "${_dicomSegLabelmapReference}"
-   AND _dicomSegLabelmapAllInputsExist)
+   AND _dicomSegCt3SliceExists)
   mitkAddCustomModuleTest(mitkDICOMSegmentationIOLabelmapRegressionTest_LiverSpine
     mitkDICOMSegmentationIOLabelmapRegressionTest
     ${_dicomSegLabelmapMetadata}
@@ -72,11 +74,30 @@ endif()
 # End-to-end coverage for the legacy referenceFiles -> SegSourceImageRelationRule
 # migration helper. Uses the same three dcmqi-checked-in source DICOMs as the
 # labelmap regression so the test only registers when those files exist.
-if(_dicomSegLabelmapAllInputsExist)
+if(_dicomSegCt3SliceExists)
   mitkAddCustomModuleTest(mitkDICOMSegmentationLegacyMigrationTest
     mitkDICOMSegmentationLegacyMigrationTest
-    ${_dicomSegLabelmapSourceDicomList})
+    ${_dicomSegCt3SliceList})
 else()
   message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegmentationLegacyMigrationTest "
+    "(dcmqi ct-3slice source DICOMs not found under ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI).")
+endif()
+
+# DICOM SEG source references written from a reader-produced source. Shares the
+# ct-3slice gate above so an absent dcmqi checkout skips the registration rather
+# than the run. The fixture directory reaches the test through a compile
+# definition rather than argv: MITK_TEST_SUITE_REGISTRATION drops the driver's
+# argv, so a CppUnit fixture has no way to read it.
+if(_dicomSegCt3SliceExists)
+  mitkAddCustomModuleTest(mitkDICOMSegSourceReferenceTest
+    mitkDICOMSegSourceReferenceTest)
+
+  if(TARGET ${TESTDRIVER})
+    file(TO_CMAKE_PATH "${_dicomSegCt3SliceDir}" _dicomSegCt3SliceBakedDir)
+    target_compile_definitions(${TESTDRIVER} PRIVATE
+      MITK_MULTILABEL_DCMQI_CT3SLICE_DIR="${_dicomSegCt3SliceBakedDir}")
+  endif()
+else()
+  message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegSourceReferenceTest "
     "(dcmqi ct-3slice source DICOMs not found under ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI).")
 endif()

@@ -212,6 +212,17 @@ namespace mitk
 
     const char* GetGroup() const override;
 
+    /** \brief If true (default), CanHandle() rejects segmentations without labels.
+     *
+     * Tools that only add their own result labels and never write into an
+     * existing one switch this off, so hosts can offer them on segmentations
+     * that do not contain any labels yet. A segmentation without groups is
+     * rejected regardless, as the preview needs a target group.
+     */
+    itkSetMacro(RequiresExistingLabels, bool);
+    itkGetConstMacro(RequiresExistingLabels, bool);
+    itkBooleanMacro(RequiresExistingLabels);
+
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimeStep(const Image* image, TimeStepType timestep);
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
@@ -413,6 +424,8 @@ namespace mitk
      * Call RequestDeactivationConfirmationOn() in the tool class to avail this feature.
      */
     bool m_RequestDeactivationConfirmation = false;
+
+    bool m_RequiresExistingLabels = true;
   };
 
 } // namespace

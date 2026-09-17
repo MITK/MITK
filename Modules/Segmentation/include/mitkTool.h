@@ -192,6 +192,13 @@ namespace mitk
     /**
      * \brief Checks if a tool can handle the given reference data and optional working data.
      *
+     * The answer may depend on the current state of the data, not only on their
+     * types. For example, tools that operate on existing labels return false for
+     * a MultiLabelSegmentation without labels, while tools that only add their
+     * own result labels accept it. Since the state can change while the data
+     * objects stay the same, hosts re-evaluate on such changes (e.g. when labels
+     * are added or removed) and not only when the data objects are replaced.
+     *
      * \param[in] referenceData Pointer to the data that should be checked as valid reference for the tool.
      * \param[in] workingData Pointer to the data that should be checked as valid working data for this tool.
      *            This parameter can be null if no working data is specified so far.

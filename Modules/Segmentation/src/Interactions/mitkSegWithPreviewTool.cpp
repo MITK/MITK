@@ -94,6 +94,12 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
   if (labelSet == nullptr)
     return false;
 
+  if (labelSet->GetNumberOfGroups() == 0)
+    return false;
+
+  if (m_RequiresExistingLabels && labelSet->GetTotalNumberOfLabels() == 0)
+    return false;
+
   return true;
 }
 

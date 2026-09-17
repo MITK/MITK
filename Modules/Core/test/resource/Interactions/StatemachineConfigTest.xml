@@ -16,4 +16,7 @@
     <event_variant class="InteractionKeyEvent" name="Key1">
         <attribute name="Key" value="l"/>
     </event_variant>
+    <event_variant class="InteractionKeyReleaseEvent" name="KeyRelease1">
+        <attribute name="Key" value="l"/>
+    </event_variant>
 </config>

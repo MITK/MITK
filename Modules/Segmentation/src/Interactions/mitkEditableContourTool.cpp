@@ -133,7 +133,7 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_ContourNode->SetProperty("layer", IntProperty::New(100));
   m_ContourNode->AddProperty("fixedLayer", BoolProperty::New(true));
   m_ContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_ContourNode->AddProperty("contour.color", ColorProperty::New(1.0f, 1.0f, 0.0f), nullptr, true);
+  m_ContourNode->AddProperty("color", ColorProperty::New(1.0f, 1.0f, 0.0f), nullptr, true);
   m_ContourNode->AddProperty("contour.points.color", ColorProperty::New(1.0f, 0.0f, 0.1f), nullptr, true);
   m_ContourNode->AddProperty("contour.controlpoints.show", BoolProperty::New(true), nullptr, true);
 
@@ -144,7 +144,7 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_PreviewContourNode->SetProperty("layer", IntProperty::New(101));
   m_PreviewContourNode->AddProperty("fixedLayer", BoolProperty::New(true));
   m_PreviewContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PreviewContourNode->AddProperty("contour.color", ColorProperty::New(0.1f, 1.0f, 0.1f), nullptr, true);
+  m_PreviewContourNode->AddProperty("color", ColorProperty::New(0.1f, 1.0f, 0.1f), nullptr, true);
   m_PreviewContourNode->AddProperty("contour.width", mitk::FloatProperty::New(4.0f), nullptr, true);
 
 
@@ -155,7 +155,7 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_ClosureContourNode->SetProperty("layer", IntProperty::New(101));
   m_ClosureContourNode->AddProperty("fixedLayer", BoolProperty::New(true));
   m_ClosureContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_ClosureContourNode->AddProperty("contour.color", ColorProperty::New(0.0f, 1.0f, 0.1f), nullptr, true);
+  m_ClosureContourNode->AddProperty("color", ColorProperty::New(0.0f, 1.0f, 0.1f), nullptr, true);
   m_ClosureContourNode->AddProperty("contour.width", mitk::FloatProperty::New(2.0f), nullptr, true);
 
   m_CurrentRestrictedArea = this->CreateNewContour();

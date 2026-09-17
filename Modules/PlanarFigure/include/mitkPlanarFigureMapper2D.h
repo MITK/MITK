@@ -117,7 +117,7 @@ namespace mitk
     /**
     * reimplemented from Baseclass
     */
-      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
+      int MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 

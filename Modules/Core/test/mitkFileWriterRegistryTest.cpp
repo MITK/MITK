@@ -251,7 +251,6 @@ int mitkFileWriterRegistryTest(int /*argc*/, char * /*argv*/ [])
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2 *>(returnedList.front()),
                                "Testing correctness of result from former query");
 
-  // mitk::CoreObjectFactory::GetInstance();
   // mitk::FileReaderRegistry readerRegistry;
   // mitk::Image::Pointer image = readerRegistry.Read<mitk::Image>("F://Build//MITK-Data//Pic2DplusT.nrrd");
 

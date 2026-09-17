@@ -21,9 +21,14 @@ sanity test; comprehensive binding coverage lives in the pytest suite under
 Usage:
   python test_wheel.py --build-dir <MITK-build>     # discover wheel in build dir
   python test_wheel.py                               # discover wheel in CWD
+  python test_wheel.py --python <interpreter>         # test another CPython series
 
 The script creates a temporary virtual environment, installs the wheel,
 runs the tests, and cleans up automatically.
+
+A build tree can hold one wheel per CPython series, and each only installs on
+the series it was compiled against. The wheel is therefore selected by the ABI
+tag of the interpreter under test; pass --wheel to override that choice.
 """
 
 import argparse
@@ -131,9 +136,15 @@ def run_tests():
 # Driver: discover wheel, create venv, install, run tests in subprocess
 # ---------------------------------------------------------------------------
 
-def find_wheel(search_dir):
-    """Find the MITK wheel in the given directory."""
-    pattern = os.path.join(search_dir, "mitk_python-*.whl")
+def get_abi(python_exe):
+    """Return the CPython ABI tag of the given interpreter, e.g. 'cp313'."""
+    code = "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')"
+    return subprocess.check_output([python_exe, "-c", code], text=True).strip()
+
+
+def find_wheel(search_dir, abi):
+    """Find the MITK wheel for one ABI tag in the given directory."""
+    pattern = os.path.join(search_dir, f"mitk_python-*-{abi}-*.whl")
     wheels = sorted(glob.glob(pattern))
     if not wheels:
         return None
@@ -148,6 +159,17 @@ def main():
         help="Path to MITK-build directory to discover the wheel (default: CWD)",
     )
     parser.add_argument(
+        "--python",
+        default=None,
+        help="Interpreter to test against; its ABI tag selects the wheel "
+             "(default: the interpreter running this script)",
+    )
+    parser.add_argument(
+        "--wheel",
+        default=None,
+        help="Wheel to test, bypassing discovery",
+    )
+    parser.add_argument(
         "--run-tests",
         action="store_true",
         help=argparse.SUPPRESS,  # internal: run test functions directly
@@ -159,20 +181,28 @@ def main():
         return run_tests()
 
     # Outer mode: discover wheel, create venv, run tests in subprocess
-    search_dir = os.path.abspath(args.build_dir) if args.build_dir else os.getcwd()
-    wheel_path = find_wheel(search_dir)
+    base_python = args.python or sys.executable
+    abi = get_abi(base_python)
 
-    if not wheel_path:
-        print(f"Error: no mitk_python-*.whl found in {search_dir}", file=sys.stderr)
-        return 1
+    if args.wheel:
+        wheel_path = os.path.abspath(args.wheel)
+    else:
+        search_dir = os.path.abspath(args.build_dir) if args.build_dir else os.getcwd()
+        wheel_path = find_wheel(search_dir, abi)
 
+        if not wheel_path:
+            print(f"Error: no mitk_python-*-{abi}-*.whl found in {search_dir}",
+                  file=sys.stderr)
+            return 1
+
+    print(f"Interpreter: {base_python} ({abi})")
     print(f"Wheel: {wheel_path}")
 
     with tempfile.TemporaryDirectory() as venv_dir:
         venv_path = os.path.join(venv_dir, "venv")
 
         # Create venv
-        subprocess.check_call([sys.executable, "-m", "venv", venv_path])
+        subprocess.check_call([base_python, "-m", "venv", venv_path])
 
         # Find the venv Python
         if sys.platform == "win32":

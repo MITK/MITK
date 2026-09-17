@@ -15,7 +15,7 @@ set(MITK_MODULES
 \endcode
 
 A simple example module is provided in the MITK/Examples/FirstSteps/NewModule directory, it includes a new data type
-(more information at \ref NewDataTypePage) and adds a MiniApp for that data type (more information at \ref MiniAppCommandLineToolHowToPage).
+(more information at \ref NewDataTypePage) and adds a command-line app for that data type (more information at \ref CommandLineAppHowToPage).
 
 Within the module we recommend using a Unix like directory structure. This helps others finding their way around your code.
 Depending on your use case you might not need every directory.
@@ -44,7 +44,7 @@ For an example of an autoload module take a look at NewModule/autoload/IO.
 
 \subsection NewModulePageCreateFolderCmdApps cmdapps
 
-This directory contains all cmdapps (command line tools) related to your module. For more information see \ref MiniAppCommandLineToolHowToPage.
+This directory contains all command-line apps related to your module. For more information see \ref CommandLineAppHowToPage.
 
 \subsection NewModulePageCreateFolderDoc doc
 

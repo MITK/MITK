@@ -64,6 +64,9 @@ namespace mitk
     /** \brief The type of the std::vector stored by this property. */
     typedef std::vector<DATATYPE> VectorType;
 
+    /** \brief The type of the value stored by this property. */
+    typedef VectorType ValueType;
+
     // Manually expand most of mitkClassMacro:
     //   mitkClassMacro(VectorProperty<DATATYPE>, mitk::BaseProperty);
     // This manual expansion is done to override explicitly
@@ -92,6 +95,7 @@ namespace mitk
     const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+    mitkNewMacro1Param(Self, const VectorType &);
 
     /**
      * \brief Return the property value as a human-readable string.
@@ -112,6 +116,9 @@ namespace mitk
 
     /**
      * \brief Set the content vector.
+     *
+     * Calls Modified() only if the new vector differs from the current content.
+     *
      * \param[in] parameter_vector The new vector to store.
      */
     virtual void SetValue(const VectorType &parameter_vector);
@@ -132,8 +139,11 @@ namespace mitk
      */
     bool FromJSON(const nlohmann::json& j) override;
 
+    using BaseProperty::operator=;
+
   protected:
     VectorProperty() = default;
+    explicit VectorProperty(const VectorType &value) : m_PropertyContent(value) {}
     VectorProperty(const Self &other) : BaseProperty(other), m_PropertyContent(other.m_PropertyContent) {}
 
     mitkCloneMacro(Self);
@@ -152,7 +162,7 @@ namespace mitk
     VectorType m_PropertyContent;
   };
 
-/// This should be used in .h files.
+/** This should be used in .h files. */
 #define MITK_DECLARE_VECTOR_PROPERTY(TYPE, PREFIX)                                                                     \
                                                                                                                        \
   typedef VectorProperty<TYPE> PREFIX##VectorProperty;                                                                 \
@@ -164,7 +174,10 @@ namespace mitk
     static const char *prefix() { return #PREFIX; }                                                                    \
   };
 
-/// This should be used in a .cpp file
+/** This should be used in a .cpp file. The type also needs a matching
+ *  MITK_DECLARE_VECTOR_PROPERTY, otherwise GetNameOfClass() reports
+ *  "InvalidVectorProperty" and serialization silently fails.
+ */
 #define MITK_DEFINE_VECTOR_PROPERTY(TYPE) template class VectorProperty<TYPE>;
 
   MITK_DECLARE_VECTOR_PROPERTY(double, Double)

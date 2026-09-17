@@ -261,7 +261,7 @@ namespace mitk
 
       refROI->ContourModelSet = contourSet;
       contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
-      contourSet->SetProperty("contour.color", mitk::ColorProperty::New(
+      contourSet->SetProperty("color", mitk::ColorProperty::New(
         refROI->DisplayColor[0],
         refROI->DisplayColor[1],
         refROI->DisplayColor[2]));
@@ -271,9 +271,6 @@ namespace mitk
     for (auto const& aROI : ROISequenceVector)
     {
       result.push_back(aROI.ContourModelSet.GetPointer());
-      result.at(result.size() - 1)->SetProperty("name", aROI.ContourModelSet->GetProperty("name"));
-      result.at(result.size() - 1)->SetProperty("color", aROI.ContourModelSet->GetProperty("contour.color"));
-      result.at(result.size() - 1)->SetProperty("contour.color", aROI.ContourModelSet->GetProperty("contour.color"));
       DICOMIOHelper::SetProperties(result.at(result.size() - 1).GetPointer(), findings);
     }
 

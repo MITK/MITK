@@ -42,7 +42,7 @@ More information regarding implementing IO and MimeTypes is available at \ref Re
 
 \section NewDataTypePageAddingMappers Adding a mapper
 
-If your data type needs a special way to render its data for the user, you need to implement a new mapper. More information can be found at \ref QVTKRendering.
+If your data type needs a special way to render its data for the user, you need to implement a new mapper. Analogous to readers and writers, mappers are registered as micro services: register a mitk::MapperProviderBase instance for your mapper and data type in your module activator, one per mapper slot (2D/3D). See \ref QVTKRendering_registerMapper for the registration recipe and \ref QVTKRendering for the rendering concept in general.
 
 <p>
 If you meet any difficulties during this How-To, don't hesitate to open an issue on <a href="https://github.com/MITK/MITK/issues">GitHub</a>!

@@ -142,26 +142,34 @@ namespace mitk
      * \param[in] filePath     Source file path (typically \c __FILE__).
      * \param[in] lineNumber   Source line number (typically \c __LINE__).
      * \param[in] functionName Source function name (typically \c __FUNCTION__).
+     * \param[in] moduleName   Module the message originates from. Leave it to the
+     *                         default, which resolves to the module being compiled.
+     *
+     * \note The default argument is what makes \c MITKLOG_MODULENAME expand in the
+     *       translation unit of the caller. This class is exported, so its inline
+     *       members are compiled into MitkLog and imported by everyone else: a
+     *       module name taken inside one of them would read \c MitkLog for every
+     *       message, whichever module logged it.
      */
-    PseudoLogStream(LogLevel level, const std::string& filePath, int lineNumber, const std::string& functionName)
+    PseudoLogStream(LogLevel level, const std::string& filePath, int lineNumber, const std::string& functionName,
+                    const std::string& moduleName = MITKLOG_MODULENAME)
       : m_Disabled(false),
         m_Message(level, filePath, lineNumber, functionName),
         m_Stream(std::stringstream::out)
     {
+      m_Message.ModuleName = moduleName;
     }
 
     /** \brief Destructor that distributes the assembled log message to all backends.
      *
-     * If the stream has not been disabled, the accumulated message text and the
-     * module name (from \c MITKLOG_MODULENAME) are set on the internal LogMessage,
-     * which is then passed to DistributeToBackends().
+     * If the stream has not been disabled, the accumulated message text is set on
+     * the internal LogMessage, which is then passed to DistributeToBackends().
      */
     ~PseudoLogStream()
     {
       if (!m_Disabled)
       {
         m_Message.Message = m_Stream.str();
-        m_Message.ModuleName = MITKLOG_MODULENAME;
         DistributeToBackends(m_Message);
       }
     }

@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkTotalSegmentatorInstall.h>
 
+#include <mitkPythonHelper.h>
+
 #include <utility>
 
 namespace
@@ -31,6 +33,17 @@ namespace
 #else
     return {};
 #endif
+  }
+
+  // Also kept identical to the nnInteractive install: torch 2.8 has no wheels
+  // for CPython 3.14 or newer, where the oldest usable release is 2.10. See
+  // TorchRequirements() in mitknnInteractiveInstall.cpp for the full rationale.
+  std::vector<std::string> TorchRequirements()
+  {
+    if constexpr (mitk::PythonHelper::VERSION_MINOR >= 14)
+      return { "torch>=2.10.0,<2.11.0", "torchvision>=0.25.0,<1.0.0" };
+    else
+      return { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
   }
 
   // Dumps a { task: { labelId: labelName } } map to <venv>/mitk_totalseg_tasks.json
@@ -84,10 +97,10 @@ os.replace(_tmp, _path)
     // transitive dependency timm pulls torchvision, and each torchvision release
     // hard-pins a matching torch (e.g. torchvision 0.27.1 requires torch 2.12.1).
     // Without pinning it here, the TotalSegmentator resolve grabs the latest
-    // torchvision and drags torch off the CUDA 2.8 wheel onto a non-CUDA PyPI
-    // build. The torch upper bound constrains torchvision to its 0.23.x pair.
+    // torchvision and drags torch off the CUDA wheel onto a non-CUDA PyPI build.
+    // The torch upper bound constrains torchvision to its matching pair.
     mitk::PipInstallGroup torchGroup;
-    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+    torchGroup.requirements = TorchRequirements();
     torchGroup.indexUrl = CudaIndexUrl();
     groups.push_back(std::move(torchGroup));
 

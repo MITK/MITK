@@ -98,9 +98,9 @@ public:
    * us::Any values can safely be converted to the type specified in the
    * addArgument() method call.
    *
-   * If the special argument \c --xml is encountered, XML output is generated
-   * and an empty map is returned. If \c --version is encountered, the MITK
-   * revision information is printed.
+   * This overload performs plain parsing. The informational arguments
+   * \c --help, \c --xml and \c --version are handled by the argc/argv
+   * overload only.
    *
    * \param[in] arguments A StringContainerType containing command line arguments.
    * \param[out] ok If not \c nullptr, set to \c true if parsing succeeded, \c false otherwise.
@@ -112,6 +112,14 @@ public:
    *
    * Converts \p argc and \p argv to a StringContainerType and delegates to
    * parseArguments(const StringContainerType&, bool*).
+   *
+   * Before parsing, the informational arguments are handled: \c --help (or
+   * \c -h) prints helpText(), \c --xml (or \c -xml) prints the XML
+   * description and \c --version prints the MITK revision. In all three
+   * cases the process is terminated with \c EXIT_SUCCESS, since a
+   * command-line app has nothing left to do. The short name \c -h is
+   * therefore reserved for help. Otherwise a banner line naming the app and
+   * the MITK version is printed and parsing proceeds.
    *
    * \param[in] argc The argument count from main().
    * \param[in] argv The argument array from main().

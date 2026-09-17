@@ -150,7 +150,11 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
                                                QMessageBox::Yes | QMessageBox::No,
                                                QMessageBox::No))
   {
-    toolButton->setChecked(false);
+    // The tool stays active, but Qt already toggled the clicked button. Restore
+    // the state the still-active tool implies: checked if the declined click was
+    // that tool's own toggle-off, unchecked if another tool was picked.
+    const auto activeToolButton = m_ButtonIDForToolID.find(m_ToolManager->GetActiveToolID());
+    toolButton->setChecked(activeToolButton != m_ButtonIDForToolID.end() && activeToolButton->second == id);
     return;
   }
 

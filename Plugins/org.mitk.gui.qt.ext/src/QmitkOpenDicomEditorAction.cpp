@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QFileInfo>
 
-#include <mitkCoreObjectFactory.h>
 #include <mitkSceneIO.h>
 #include <mitkProgressBar.h>
 

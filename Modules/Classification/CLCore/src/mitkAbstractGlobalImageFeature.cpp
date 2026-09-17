@@ -162,7 +162,7 @@ void  mitk::AbstractGlobalImageFeature::AddQuantifierArguments(mitkCommandLinePa
   parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::Int, "Number of Bins", "Define the number of bins that is used ", us::Any());
   parser.addArgument(name + "::binsize", name + "::binsize", mitkCommandLineParser::Float, "Binsize", "Define the size of the used bins", us::Any());
   parser.addArgument(name + "::ignore-global-histogram", name + "::ignore-global-histogram", mitkCommandLineParser::Bool, "Ignore the global histogram Parameters", "Ignores the global histogram parameters", us::Any());
-  parser.addArgument(name + "::ignore-mask-for-histogram", name + "::ignore-mask", mitkCommandLineParser::Bool, "Ignore the global histogram Parameters", "Ignores the global histogram parameters", us::Any());
+  parser.addArgument(name + "::ignore-mask-for-histogram", name + "::ignore-mask", mitkCommandLineParser::Bool, "Ignore the mask for the histogram", "Derives the histogram range from the whole image instead of the masked region", us::Any());
 }
 
 void  mitk::AbstractGlobalImageFeature::ConfigureQuantifierSettingsByParameters()
@@ -281,7 +281,7 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image* image,
     m_Quantifier->InitializeByImageAndMinimum(image, GetMinimumIntensity(), GetBins());
   else if (GetUseBins() && GetIgnoreMask() && GetUseMaximumIntensity())
     m_Quantifier->InitializeByImageAndMaximum(image, GetMaximumIntensity(), GetBins());
-  else if (GetUseBins())
+  else if (GetUseBins() && GetIgnoreMask())
     m_Quantifier->InitializeByImage(image, GetBins());
   // Initialize from Image, Mask and Bins
   else if (GetUseBins() && GetUseMinimumIntensity())
@@ -348,7 +348,7 @@ std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString() const
     ss << "Min-" << GetMinimumIntensity() << "_Bins-" << GetBins() << "_FullImage";
   else if (GetUseBins() && GetIgnoreMask() && GetUseMaximumIntensity())
     ss << "Max-" << GetMaximumIntensity() << "_Bins-" << GetBins() << "_FullImage";
-  else if (GetUseBins())
+  else if (GetUseBins() && GetIgnoreMask())
     ss << "Bins-" << GetBins() << "_FullImage";
   // Initialize from Image, Mask and Bins
   else if (GetUseBins() && GetUseMinimumIntensity())
@@ -392,7 +392,7 @@ mitk::FeatureID mitk::AbstractGlobalImageFeature::CreateTemplateFeatureID(std::s
     }
     if (GetUseMaximumIntensity())
     {
-      newID.parameters["minimum-intensity"] = us::Any(GetMaximumIntensity());
+      newID.parameters["maximum-intensity"] = us::Any(GetMaximumIntensity());
     }
     if (GetUseBinsize())
     {

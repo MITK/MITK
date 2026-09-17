@@ -52,6 +52,9 @@ private:
   /** @brief When sync is enabled, copy the changed 2D window's background to the other 2D windows. */
   void OnBackgroundChanged(int sourceIndex);
 
+  /** @brief Enable the level/window sub-options according to the widget and mode selection. */
+  void UpdateLevelWindowControls();
+
   std::unique_ptr<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
 
   /** @brief One color editor per render window, ordered widget0..widget3. */

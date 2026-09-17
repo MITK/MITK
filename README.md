@@ -37,7 +37,7 @@ MITK is available as free open-source software under a [3-clause BSD license][li
 Download
 --------
 
-The *MitkWorkbench* application and a bunch of command-line apps are released twice per year on our [Download][download] page and the [GitHub Releases][releases] page.
+The *MitkWorkbench* application and a set of [command-line apps][cmdapps] are released twice per year on our [Download][download] page and the [GitHub Releases][releases] page.
 
 The official MITK source code is available in the [MITK Git repository][git_repo]. The Git clone command is
 
@@ -88,6 +88,7 @@ Useful links
 [dkfz]: https://www.dkfz.de
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [download]: https://www.mitk.org/#downloads
+[cmdapps]: https://docs.mitk.org/latest/MITKCmdAppsPage.html
 [releases]: https://github.com/MITK/MITK/releases
 [git_repo]: https://github.com/MITK/MITK
 [contribute]: https://github.com/MITK/MITK/blob/master/CONTRIBUTING.md

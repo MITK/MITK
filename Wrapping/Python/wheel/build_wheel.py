@@ -19,7 +19,12 @@ into a wheel-compatible layout, generates wheel metadata, packs the wheel,
 and runs a platform-specific delocator to bundle all native dependencies.
 
 Usage:
-  python build_wheel.py --build-dir <MITK-build>
+  python build_wheel.py --build-dir <MITK-build> [--abi cp313]
+
+pybind11 has no stable-ABI support, so a wheel only installs on the CPython
+series its extension module was compiled against. One build tree can serve
+several series; --abi selects which one to pack and defaults to the interpreter
+running this script.
 
 The wheel version is resolved in this order of precedence: the
 ``--version`` argument, the ``MITK_WHEEL_VERSION`` CMake cache entry,
@@ -85,16 +90,17 @@ def get_platform_tag():
         raise RuntimeError(f"Unsupported platform: {system}")
 
 
-def get_python_tag():
-    """Return the Python version tag (e.g., 'cp312')."""
-    impl = "cp"  # CPython
-    ver = f"{sys.version_info.major}{sys.version_info.minor}"
-    return f"{impl}{ver}"
+def get_default_abi():
+    """Return the ABI tag of the running interpreter (e.g., 'cp312')."""
+    return f"cp{sys.version_info.major}{sys.version_info.minor}"
 
 
-def get_abi_tag():
-    """Return the ABI tag (e.g., 'cp312')."""
-    return get_python_tag()
+def parse_abi(abi):
+    """Return (major, minor) for a CPython ABI tag such as 'cp313'."""
+    match = re.fullmatch(r"cp(\d)(\d+)", abi)
+    if not match:
+        raise ValueError(f"not a CPython ABI tag: {abi!r}")
+    return int(match.group(1)), int(match.group(2))
 
 
 def get_source_dir(build_dir):
@@ -179,19 +185,25 @@ def normalize_version(version):
     return str(parsed)
 
 
-def cmake_install_wheel_component(build_dir, staging_dir, cmake_command="cmake"):
-    """Run cmake --install to stage the wheel component."""
-    cmd = [
-        cmake_command,
-        "--install", str(build_dir),
-        "--component", "wheel",
-        "--prefix", str(staging_dir),
-    ]
-    if platform.system() == "Windows":
-        cmd.extend(["--config", "Release"])
+def cmake_install_wheel_components(build_dir, staging_dir, abi, cmake_command="cmake"):
+    """Stage the shared wheel payload plus the extension module for one ABI.
 
-    print(f"Staging wheel component: {' '.join(cmd)}")
-    subprocess.check_call(cmd)
+    'wheel' holds everything a wheel contains regardless of the CPython series
+    (pure-Python files and the auto-load modules); 'wheel_<abi>' holds only that
+    series' extension module. Both land in the same prefix.
+    """
+    for component in ("wheel", f"wheel_{abi}"):
+        cmd = [
+            cmake_command,
+            "--install", str(build_dir),
+            "--component", component,
+            "--prefix", str(staging_dir),
+        ]
+        if platform.system() == "Windows":
+            cmd.extend(["--config", "Release"])
+
+        print(f"Staging {component}: {' '.join(cmd)}")
+        subprocess.check_call(cmd)
 
 
 def set_staged_version(staging_dir, version):
@@ -240,14 +252,17 @@ def get_mitk_version(build_dir):
     )
 
 
-def write_dist_info(staging_dir, version):
+def write_dist_info(staging_dir, version, abi):
     """Write wheel metadata (METADATA, WHEEL, top_level.txt, RECORD)."""
     dist_info_dir = staging_dir / f"{WHEEL_FILE_STEM}-{version}.dist-info"
     dist_info_dir.mkdir(parents=True, exist_ok=True)
 
-    python_tag = get_python_tag()
-    abi_tag = get_abi_tag()
+    # pybind11 has no stable-ABI support, so the wheel is specific to one
+    # CPython series and the Python tag doubles as the ABI tag.
+    python_tag = abi
+    abi_tag = abi
     platform_tag = get_platform_tag()
+    abi_major, abi_minor = parse_abi(abi)
 
     # The long description is the METADATA message body (everything after the
     # headers and a blank line); its format is declared by
@@ -277,7 +292,7 @@ def write_dist_info(staging_dir, version):
         "Author: German Cancer Research Center (DKFZ)",
         "License: BSD-3-Clause",
         *[f"Classifier: {c}" for c in classifiers],
-        f"Requires-Python: >={sys.version_info.major}.{sys.version_info.minor}",
+        f"Requires-Python: >={abi_major}.{abi_minor}",
         "Requires-Dist: numpy>=2.0",
         "Project-URL: Homepage, https://www.mitk.org",
         "Project-URL: Documentation, https://mitk-python.readthedocs.io/en/latest/",
@@ -344,10 +359,15 @@ def pack_wheel(staging_dir, output_dir):
     return wheels[0]
 
 
-def get_library_search_paths(build_dir):
+def get_library_search_paths(build_dir, abi):
     """Collect library search paths for the delocator."""
     build_dir = Path(build_dir)
     paths = []
+
+    # Output directory of an additional ABI's extension module, if this is one.
+    abi_dir = build_dir / "Wrapping" / "wheel" / abi / "mitk"
+    if abi_dir.is_dir():
+        paths.append(str(abi_dir))
 
     # MITK build output (Windows: bin/, Linux/macOS: lib/)
     bin_dir = build_dir / "bin"
@@ -382,18 +402,24 @@ def get_library_search_paths(build_dir):
     return paths
 
 
-def repair_wheel(wheel_path, output_dir, search_paths):
+def repair_wheel(wheel_path, output_dir, search_paths, abi):
     """Run the platform-specific delocator to bundle native dependencies."""
     system = platform.system()
 
     if system == "Windows":
         add_path = ";".join(search_paths)
+        abi_major, abi_minor = parse_abi(abi)
         cmd = [
             sys.executable, "-m", "delvewheel", "repair",
             str(wheel_path),
             "--add-path", add_path,
             "--no-mangle-all",  # CppMicroServices appends zip resources to DLLs (overlay)
             "--analyze-existing",  # trace deps of auto-load DLLs already in the wheel
+            # A wheel must never carry libpython. The target ABI is not
+            # necessarily the ABI of the interpreter running this script, so name
+            # the DLL explicitly instead of relying on the delocator's own idea
+            # of which Python is in play.
+            "--exclude", f"python{abi_major}{abi_minor}.dll",
             "--wheel-dir", str(output_dir),
         ]
     elif system == "Linux":
@@ -472,6 +498,13 @@ def main():
              "MITK_WHEEL_VERSION cache entry, else derive from git.",
     )
     parser.add_argument(
+        "--abi",
+        default=None,
+        help="CPython ABI tag to pack, e.g. cp313 (default: the running "
+             "interpreter). The build must provide a matching wheel_<abi> "
+             "install component.",
+    )
+    parser.add_argument(
         "--skip-repair",
         action="store_true",
         help="Skip the delocator step (for debugging)",
@@ -483,6 +516,13 @@ def main():
 
     if not build_dir.is_dir():
         print(f"Error: build directory not found: {build_dir}", file=sys.stderr)
+        return 1
+
+    abi = args.abi or get_default_abi()
+    try:
+        parse_abi(abi)
+    except ValueError as error:
+        print(f"Error: {error}", file=sys.stderr)
         return 1
 
     # Version precedence: --version, then the MITK_WHEEL_VERSION cache entry,
@@ -503,8 +543,8 @@ def main():
         staging_dir = Path(tmpdir) / "staging"
         staging_dir.mkdir()
 
-        # Stage wheel component
-        cmake_install_wheel_component(build_dir, staging_dir, args.cmake)
+        # Stage wheel components
+        cmake_install_wheel_components(build_dir, staging_dir, abi, args.cmake)
 
         # Verify staging
         mitk_pkg = staging_dir / "mitk"
@@ -516,7 +556,7 @@ def main():
         set_staged_version(staging_dir, version)
 
         # Write dist-info
-        dist_info_dir = write_dist_info(staging_dir, version)
+        dist_info_dir = write_dist_info(staging_dir, version, abi)
         write_record(staging_dir, dist_info_dir)
 
         # Pack raw wheel
@@ -531,9 +571,9 @@ def main():
             print(f"Output (unrepaired): {output_dir / raw_wheel.name}")
         else:
             # Repair with platform delocator
-            search_paths = get_library_search_paths(build_dir)
+            search_paths = get_library_search_paths(build_dir, abi)
             print(f"Library search paths: {search_paths}")
-            repaired = repair_wheel(raw_wheel, output_dir, search_paths)
+            repaired = repair_wheel(raw_wheel, output_dir, search_paths, abi)
             print(f"Output: {repaired}")
 
     return 0

@@ -141,7 +141,9 @@ void mitk::MRNormLinearStatisticBasedFilter::InternalComputeMask(itk::Image<TPix
   double offset = value0+m_TargetValue;
   double scaling = stddev*m_TargetWidth;
   if (scaling < 0.0001)
-    return;
+  {
+    mitkThrow() << "Normalization is not possible: the standard deviation of the masked region multiplied by the target width is " << scaling << ", which is below 0.0001.";
+  }
 
   itk::ImageRegionIterator<ImageType> inIter(itkImage, itkImage->GetLargestPossibleRegion());
   itk::ImageRegionIterator<ImageType> outIter(outImage, outImage->GetLargestPossibleRegion());

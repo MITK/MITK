@@ -22,6 +22,7 @@ found in the LICENSE file.
 
 #include <QCheckBox>
 #include <QColor>
+#include <QComboBox>
 #include <QFont>
 #include <QFrame>
 #include <QGridLayout>
@@ -38,6 +39,9 @@ found in the LICENSE file.
 
 namespace
 {
+  // Index of "Selected image" in the m_LevelWindowImageMode combo box
+  constexpr int SelectedImageModeIndex = 1;
+
   mitk::IPreferences* GetPreferences()
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -144,6 +148,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Ui->m_ColorGroup->setSizePolicy(colorGroupPolicy);
 
   connect(m_Ui->m_ResetButton, &QPushButton::clicked, this, &QmitkStdMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI);
+  connect(m_Ui->m_ShowLevelWindowWidget, &QCheckBox::toggled, this, &QmitkStdMultiWidgetEditorPreferencePage::UpdateLevelWindowControls);
+  connect(m_Ui->m_LevelWindowImageMode, &QComboBox::currentIndexChanged, this, &QmitkStdMultiWidgetEditorPreferencePage::UpdateLevelWindowControls);
 
   this->Update();
 }
@@ -184,6 +190,9 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 
   prefs->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
   prefs->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
+  prefs->Put("Level/window image mode", m_Ui->m_LevelWindowImageMode->currentIndex() == SelectedImageModeIndex ? "selected" : "topmost");
+  prefs->PutBool("Apply level/window to all selected images", m_Ui->m_ApplyToAllSelectedImages->isChecked());
+  prefs->PutBool("Show level/window image name", m_Ui->m_ShowLevelWindowImageName->isChecked());
   prefs->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   prefs->PutBool("sync 2D background colors", m_SyncCheckBox->isChecked());
 
@@ -242,9 +251,25 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_ColorWidgets[3]->SetLogoVisible(IsDepartmentLogoVisible(prefs));
 
   m_Ui->m_ShowLevelWindowWidget->setChecked(prefs->GetBool("Show level/window widget", true));
+  m_Ui->m_LevelWindowImageMode->setCurrentIndex(prefs->Get("Level/window image mode", "topmost") == "selected" ? SelectedImageModeIndex : 0);
+  m_Ui->m_ApplyToAllSelectedImages->setChecked(prefs->GetBool("Apply level/window to all selected images", false));
+  m_Ui->m_ShowLevelWindowImageName->setChecked(prefs->GetBool("Show level/window image name", true));
   m_Ui->m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
   m_Ui->m_CrosshairGapSize->setValue(prefs->GetInt("crosshair gap size", 32));
   m_SyncCheckBox->setChecked(prefs->GetBool("sync 2D background colors", true));
+
+  this->UpdateLevelWindowControls();
+}
+
+void QmitkStdMultiWidgetEditorPreferencePage::UpdateLevelWindowControls()
+{
+  const bool widgetShown = m_Ui->m_ShowLevelWindowWidget->isChecked();
+  const bool selectedImageMode = m_Ui->m_LevelWindowImageMode->currentIndex() == SelectedImageModeIndex;
+
+  m_Ui->m_LevelWindowImageModeLabel->setEnabled(widgetShown);
+  m_Ui->m_LevelWindowImageMode->setEnabled(widgetShown);
+  m_Ui->m_ApplyToAllSelectedImages->setEnabled(widgetShown && selectedImageMode);
+  m_Ui->m_ShowLevelWindowImageName->setEnabled(widgetShown);
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()

@@ -9,19 +9,18 @@ The modules are shared libraries that provide functionality that can be used by 
 
 <ul>
   <li> \subpage AnnotationModulePage
-  <li> \subpage ChartModule
 </ul>
 
 \section MITKModuleManualsListPage_AdditionalInformationOnCertainModules Additional Information on Certain Modules
 <ul>
   <li> \subpage PlanarPropertiesPage
-  <li> \subpage mitkBasicImageProcessingMiniAppsPortalPage
 </ul>
 
 \section MITKModuleManualsListPage_MigrationGuides Migration Guides
 <ul>
   <li> \subpage GeometryMigration
   <li> \subpage InteractionMigration
+  <li> \subpage MapperRegistrationMigration
   <li> \subpage OverlayMigration
 </ul>
 */

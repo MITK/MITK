@@ -6,9 +6,9 @@ need to build MITK from source to use the Python bindings.
 
 ## Requirements
 
-- A Python version matching one of the published wheel tags (typically
-  CPython 3.10, 3.11, 3.12, or 3.13). The wheel is a binary build pinned
-  to a specific CPython ABI; `pip` will refuse to install the wrong tag.
+- A Python version matching one of the published wheel tags: CPython 3.12,
+  3.13, or 3.14. The wheel is a binary build pinned to a specific CPython
+  ABI; `pip` will refuse to install the wrong tag.
 - NumPy 2.0 or newer (installed automatically as a dependency).
 - A supported platform: Windows x86_64, Linux x86_64 (glibc 2.39+ /
   manylinux), or macOS (x86_64 and arm64).

@@ -1,25 +1,202 @@
 /**
-\page MITKCmdAppsPage MITK Command Line Apps
+\page MITKCmdAppsPage MITK Command-Line Apps
 
-MITK provides a set of small command line tools, each designed to perform a specific task.
-For example, resampling an image or converting between file formats.
+\tableofcontents
 
-These tools offer command line access to various MITK features, making it easier to process data in batch workflows.
+\section MITKCmdAppsPageIntro What are command-line apps?
 
-Below is a list of the command line apps included in the MITK Workbench release configuration, along with usage instructions.
+MITK command-line apps are small executables that each perform one processing
+task without a graphical user interface: converting files, fusing 3D images
+into a dynamic image, rasterizing contours, registering and mapping images,
+fitting models to time series, computing SUV images, and more. They are built
+on the same MITK modules as the MITK Workbench, so they read and write the same
+file formats and produce the same results as the corresponding Workbench
+plugins.
 
-<h2>List of Command Line Apps</h2>
+Use them to process many datasets in a script, to integrate MITK functionality
+into a pipeline, or to run MITK on a machine without a display.
+
+\section MITKCmdAppsPageWhere Where to find them
+
+\subsection MITKCmdAppsPageWhereInstaller In the MITK Workbench installer
+
+The apps marked "Workbench installer" in the tables below are part of the
+official MITK Workbench release for Windows and Linux. After installation you
+find
+
 <ul>
-  <li> \subpage MitkConvertToMultiLabelSegmentationPage – Converts input data into an MITK Multi-Label Segmentation </li>
-  <li> \subpage MitkDICOMVolumeDiagnosticsPage – Performs diagnostics on DICOM volume reading </li>
-  <li> \subpage MITKFileConverterPage – Converts between supported MITK file formats </li>
-  <li> \subpage MitkImageTypeConverterPage – Converts scalar pixel types </li>
-  <li> \subpage MitkFuse3Dto4DImagePage – Fuses multiple 3D images into a 4D dynamic image </li>
-  <li> \subpage MitkGenericFittingPage – Performs generic fitting on 4D image data </li>
-  <li> \subpage MitkMapImagePage – Maps an image or segmentation based on a registration </li>
-  <li> \subpage MitkMatchImagePage – Determines the registration between a moving and a target image </li>
-  <li> \subpage MitkPETSUVCalculationPage – Computes PET SUV images (SUVbw, SUVlbm, SUVbsa) </li>
-  <li> \subpage MitkSplit4Dto3DImagePage – Splits a 4D dynamic image into individual 3D frames </li>
-  <li> \subpage MitkStitch3DImagesPage – Stitches multiple 3D images into a larger composite image </li>
+<li> the executables in the <tt>bin/</tt> directory next to
+<tt>MitkWorkbench</tt>, and
+<li> a launcher script per app in the <tt>apps/</tt> directory
+(<tt>apps/MitkFileConverter.bat</tt> on Windows,
+<tt>apps/MitkFileConverter.sh</tt> on Linux).
 </ul>
+
+Use the launcher scripts. They set up the library search path and forward all
+arguments to the executable, so you can call them from any working directory:
+
+\code
+C:\Program Files\MITK 2026.06\apps\MitkFileConverter.bat -i image.dcm -o image.nrrd
+~/MITK-2026.06/apps/MitkFileConverter.sh -i image.dcm -o image.nrrd
+\endcode
+
+On macOS the executables are located inside the application bundle at
+<tt>MitkWorkbench.app/Contents/MacOS/</tt> and can be started from there
+directly.
+
+\subsection MITKCmdAppsPageWhereBuild In a build tree
+
+In your own build of MITK the executables are located in the <tt>bin/</tt>
+directory of the MITK build tree (on Windows in <tt>bin/Release/</tt> or
+<tt>bin/Debug/</tt>). On Windows use the generated batch files
+<tt>bin/Mitk&lt;App&gt;_release.bat</tt> and <tt>bin/Mitk&lt;App&gt;_debug.bat</tt>,
+which set up the PATH and forward all arguments.
+
+Which apps are built is controlled per module by a CMake option named
+<tt>BUILD_&lt;Module&gt;CmdApps</tt> (see the tables below). The build
+configuration <tt>WorkbenchRelease</tt> enables the apps that ship in the
+installer, <tt>MITK_BUILD_ALL_APPS</tt> enables all of them, and the build
+configuration <tt>CoreCmdApps</tt> builds only the file conversion apps without
+Qt for headless machines. See \ref BuildInstructionsPage for building MITK.
+
+\section MITKCmdAppsPageConventions Common conventions
+
+All apps share the same command-line syntax, provided by the class
+mitkCommandLineParser.
+
+<ul>
+<li> Arguments have a long name with two dashes, for example
+<tt>--input</tt>, and most of them additionally a short name with one dash,
+for example <tt>-i</tt>. The tables on the app pages list both; where the
+short name column is empty, only the long name works. Values follow the
+argument separated by a space: <tt>-i image.nrrd</tt>. List arguments take
+several values: <tt>-i a.nrrd b.nrrd c.nrrd</tt>.
+<li> <tt>--help</tt> (<tt>-h</tt>) prints a description of all arguments and
+exits with code 0. The help text is also printed when a required argument is
+missing; the app then exits with code 1.
+<li> <tt>--version</tt> prints the Git commit and branch the app was built from
+and exits with code 0.
+<li> <tt>--xml</tt> prints a machine-readable description of the app and its
+arguments in the format of the Slicer execution model and exits with code 0.
+This is meant for tools that generate user interfaces or pipeline nodes from
+it; nothing else is printed in this case.
+<li> Otherwise the first line of output is <tt>Running Command Line Utility ...</tt>
+with the app title and the MITK version.
+<li> Apps return exit code 0 on success and 1 on failure unless their page
+documents other codes.
+</ul>
+
+Input and output files can be any format MITK reads or writes, for example
+NRRD, NIfTI, MetaImage, or DICOM. A directory of DICOM files can be passed as
+input wherever an image is expected. Multi-label segmentations are read and
+written in MITK's NRRD based segmentation format or as DICOM SEG.
+
+\subsection MITKCmdAppsPageConventionsJson Passing JSON option strings
+
+Some apps take JSON dictionaries as argument values, for example
+<tt>--input-options</tt> of MitkFileConverter or <tt>--parameters</tt> of
+MitkMatchImage. The quoting depends on the shell:
+
+<ul>
+<li> bash, zsh and other Unix shells: enclose the JSON in single quotes.
+\code
+MitkFileConverter -i seg.nrrd -o seg.nii.gz --output-options '{"Save strategy": "instance"}'
+\endcode
+<li> Windows Command Prompt (cmd.exe): enclose the JSON in double quotes and
+double every inner double quote.
+\code
+MitkFileConverter -i seg.nrrd -o seg.nii.gz --output-options "{""Save strategy"": ""instance""}"
+\endcode
+<li> PowerShell 7.3 and newer: single quotes work as in bash. Older PowerShell
+versions pass the argument through the Windows command line, so the inner
+double quotes have to be escaped with a backslash.
+\code
+MitkFileConverter -i seg.nrrd -o seg.nii.gz --output-options '{\"Save strategy\": \"instance\"}'
+\endcode
+</ul>
+
+\section MITKCmdAppsPageList List of command-line apps
+
+The "Availability" column tells whether an app is part of the MITK Workbench
+installer or which CMake option builds it.
+
+\subsection MITKCmdAppsPageListCore File conversion and image handling
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MITKFileConverterPage "MitkFileConverter" | Converts between all file formats MITK can read and write, with control over readers, writers and their options. | Workbench installer |
+| \subpage MitkImageTypeConverterPage "MitkImageTypeConverter" | Converts the pixel type of an image, e.g. to float or unsigned short. | Workbench installer |
+| \subpage MitkFuse3Dto4DImagePage "MitkFuse3Dto4DImage" | Fuses several 3D images with the same geometry into one dynamic (3D+t) image. | Workbench installer |
+| \subpage MitkSplit4Dto3DImagePage "MitkSplit4Dto3DImages" | Splits a dynamic (3D+t) image into one 3D image per time step. | Workbench installer |
+
+\subsection MITKCmdAppsPageListSegmentation Segmentation
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkConvertToMultiLabelSegmentationPage "MitkConvertToMultiLabelSegmentation" | Merges images, surfaces and contours into one multi-label segmentation. | Workbench installer |
+| \subpage MitkContoursToImagePage "MitkContoursToImage" | Rasterizes contours (e.g. DICOM RTSTRUCT) into binary masks or segmentations. | Workbench installer |
+
+\subsection MITKCmdAppsPageListDICOM DICOM
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkDICOMVolumeDiagnosticsPage "MitkDICOMVolumeDiagnostics" | Reports how MITK would group a set of DICOM files into volumes and why volumes are split. | Workbench installer |
+
+\subsection MITKCmdAppsPageListRegistration Registration
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkMatchImagePage "MitkMatchImage" | Registers a moving image to a target image with a MatchPoint algorithm and stores the registration. | Workbench installer |
+| \subpage MitkMapImagePage "MitkMapImage" | Maps an image or segmentation into a target geometry using a registration. | Workbench installer |
+| \subpage MitkStitch3DImagesPage "MitkStitchImages" | Maps and stitches several 3D images into one image with a common geometry. | Workbench installer |
+
+\subsection MITKCmdAppsPageListModelFit Dynamic data and model fitting
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkGenericFittingPage "MitkGenericFitting" | Fits a linear or user-defined model to the time curve of every voxel of a dynamic image. | Workbench installer |
+| \subpage MitkPixelDumpPage "MitkPixelDump" | Writes the voxel values of one or more images, optionally within a mask, into a CSV file. | Workbench installer |
+
+\subsection MITKCmdAppsPageListPerfusion Perfusion (pharmacokinetics)
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkMRSignal2ConcentrationPage "MitkMRSignal2Concentration" | Converts dynamic T1 or T2 weighted MR signal images into contrast agent concentration images. | <tt>BUILD_PerfusionCmdApps</tt> |
+| \subpage MitkMRPerfusionPage "MitkMRPerfusion" | Fits pharmacokinetic models (e.g. Tofts) to dynamic contrast enhanced MR data and writes parameter maps. | <tt>BUILD_PerfusionCmdApps</tt> |
+| \subpage MitkCurveDescriptorPage "MitkCurveDescriptor" | Computes descriptive parameters (e.g. area under the curve, time to peak) of the time curves of a dynamic image. | <tt>BUILD_PerfusionCmdApps</tt> |
+
+\subsection MITKCmdAppsPageListPET PET
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkPETSUVCalculationPage "MitkPETSUVCalculation" | Converts a PET activity image into a standardized uptake value (SUV) image. | Workbench installer |
+
+\subsection MITKCmdAppsPageListBasic Basic image processing
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkSingleImageArithmeticPage "MitkSingleImageArithmetic" | Applies unary functions (sqrt, log10, sin, ...) to every voxel of an image. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkTwoImageArithmeticPage "MitkTwoImageArithmetic" | Adds, subtracts, multiplies or divides two images voxel by voxel. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkImageAndValueArithmeticPage "MitkImageAndValueArithmetic" | Adds, subtracts, multiplies or divides an image and a constant value. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkMaskRangeBasedFilteringPage "MitkMaskRangeBasedFiltering" | Removes mask voxels whose image intensity is outside a given range. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkMaskOutlierFilteringPage "MitkMaskOutlierFiltering" | Removes mask voxels whose image intensity is a statistical outlier (3 sigma). | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkResampleImagePage "MitkResampleImage" | Resamples an image to a new voxel spacing. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkResampleMaskPage "MitkResampleMask" | Resamples a binary mask to a new voxel spacing while keeping it binary. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkLaplacianOfGaussianPage "MitkLaplacianOfGaussian" | Computes the Laplacian of Gaussian of an image at a given scale. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkMultiResolutionPyramidPage "MitkMultiResolutionPyramid" | Computes a Gaussian multi-resolution pyramid, one image per level. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+| \subpage MitkForwardWaveletPage "MitkForwardWavelet" | Computes an isotropic wavelet decomposition, one image per sub-band. | <tt>BUILD_BasicImageProcessingCmdApps</tt> |
+
+\subsection MITKCmdAppsPageListClassification Radiomics and classification
+
+| App | Purpose | Availability |
+| --- | --- | --- |
+| \subpage MitkCLGlobalImageFeaturesPage "MitkCLGlobalImageFeatures" | Computes radiomics features (first order, texture, shape, ...) of an image within a mask. | <tt>BUILD_ClassificationCmdApps</tt> |
+| \subpage MitkCLMRNormalizationPage "MitkCLMRNormalization" | Normalizes MR intensities with respect to a reference region. | <tt>BUILD_ClassificationCmdApps</tt> |
+| \subpage MitkCLN4Page "MitkCLN4" | Corrects MR bias fields with the N4 algorithm. | <tt>BUILD_ClassificationCmdApps</tt> |
+| \subpage MitkCLScreenshotPage "MitkCLScreenshot" | Renders screenshots of an image with overlaid segmentations. | <tt>BUILD_ClassificationCmdApps</tt> |
+
+\section MITKCmdAppsPageDevelop Writing your own command-line app
+
+The developer manual explains how to create a command-line app for your own
+module, see \ref CommandLineAppHowToPage.
 */

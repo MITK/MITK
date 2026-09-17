@@ -41,6 +41,7 @@ set(H_FILES
   mitkLexicalCast.h
   mitkLine.h
   mitkLocalStorageHandler.h
+  mitkMapperProviderBase.h
   mitkMatrix.h
   mitkMatrixConvert.h
   mitkMessage.h
@@ -70,8 +71,6 @@ set(H_FILES
 
 set(CPP_FILES
   mitkCoreActivator.cpp
-  mitkCoreObjectFactory.cpp
-  mitkCoreObjectFactoryBase.cpp
   mitkCoreServices.cpp
   mitkEnvironment.cpp
   mitkException.cpp
@@ -282,6 +281,7 @@ set(CPP_FILES
   Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkInteractionEventObserver.cpp
   Interactions/mitkInteractionKeyEvent.cpp
+  Interactions/mitkInteractionKeyReleaseEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
@@ -360,7 +360,9 @@ set(CPP_FILES
   Rendering/mitkBaseRendererHelper.cpp
   Rendering/mitkCrosshairVtkMapper2D.cpp
   Rendering/mitkImageVtkMapper2D.cpp
+  Rendering/mitkIMapperProvider.cpp
   Rendering/mitkMapper.cpp
+  Rendering/mitkMapperProviderRegistry.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp
@@ -379,7 +381,6 @@ set(CPP_FILES
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkNeverTranslucentTexture.cpp
 )
 
 set(RESOURCE_FILES

@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 
-#include <mitkCoreObjectFactory.h>
 #include <mitkCoreServices.h>
 #include <mitkExceptionMacro.h>
 #include <mitkFileReaderRegistry.h>

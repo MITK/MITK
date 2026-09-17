@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include <mitkImageVtkMapper2D.h>
 #include <vtkMitkLevelWindowFilter.h>
 #include <vtkMitkThickSlicesFilter.h>
-#include <vtkNeverTranslucentTexture.h>
+#include <vtkTexture.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -563,7 +563,7 @@ void mitk::ImageVtkMapper2D::ApplyOpacity(mitk::BaseRenderer *renderer)
   // check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity(opacity, renderer, "opacity");
   // set the opacity according to the properties
-  localStorage->m_ImageActor->GetProperty()->SetOpacity(opacity);
+  SetOpacityAndRenderPass(localStorage->m_ImageActor, opacity);
   localStorage->m_ShadowOutlineActor->GetProperty()->SetOpacity(opacity);
 }
 
@@ -724,6 +724,9 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
+
+  if (image.IsNull() || !image->IsInitialized())
+    return;
 
   // Properties common for both images and segmentations
   node->AddProperty("depthOffset", mitk::FloatProperty::New(0.0), renderer, overwrite);
@@ -1109,7 +1112,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   // Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-  m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
+  m_Texture = vtkSmartPointer<vtkTexture>::New();
   m_DefaultLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_BinaryLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_ColorLookupTable = vtkSmartPointer<vtkLookupTable>::New();

@@ -1,12 +1,11 @@
 set(H_FILES
   itkMultiGaussianImageSource.h
-  mitkHotspotMaskGenerator.h
   mitkLabelStatisticsImageFilter.h
   mitkMaskUtilities.h
+  mitkMedianAccumulator.h
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h
   mitkStatisticsImageFilter.h
-  mitkitkMaskImageFilter.h
 )
 
 set(CPP_FILES
@@ -15,14 +14,13 @@ set(CPP_FILES
   mitkPointSetStatisticsCalculator.cpp
   mitkPointSetDifferenceStatisticsCalculator.cpp
   mitkIntensityProfile.cpp
-  #See T30375
-  #mitkHotspotMaskGenerator.cpp
   mitkMaskGenerator.cpp
   mitkPlanarFigureMaskGenerator.cpp
   mitkMultiLabelMaskGenerator.cpp
   mitkImageMaskGenerator.cpp
   mitkHistogramStatisticsCalculator.cpp
   mitkIgnorePixelMaskGenerator.cpp
+  mitkAndMaskGenerator.cpp
   mitkImageStatisticsPredicateHelper.cpp
   mitkImageStatisticsContainerNodeHelper.cpp
   mitkImageStatisticsContainerManager.cpp

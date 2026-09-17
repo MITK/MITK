@@ -27,16 +27,22 @@ All postprocessing operations provide one or more selection widgets, which allow
 
 \section org_mitk_views_segmentationUtilitiesBooleanOperations Boolean operations
 
-Boolean operations allows to perform the following fundamental operations on two or more segmentations:
+Boolean operations allow to combine two or more labels of a single multi-label segmentation:
 
 <ul>
-	<li> <b>Difference:</b> Subtracts the second segmentation from the first segmentation.
-	<li> <b>Intersection:</b> Extracts the overlapping areas of all selected segmentations.
-	<li> <b>Union:</b> Combines the two existing segmentations.
+	<li> <b>Difference:</b> Subtracts the union of the secondary operands from the first operand.
+	<li> <b>Intersection:</b> Keeps only the area that is covered by all operands.
+	<li> <b>Union:</b> Combines the areas of all operands.
 </ul>
 
-The selected segmentations must have the same geometry (size, spacing, ...) in order for the operations to work correctly.
-The result will be stored in a new data node as a child node of the first selected segmentation.
+Select a segmentation first, then select at least two of its labels in the label inspector.
+The operands are derived from that selection in the order it was made: the label selected first is the first operand, all further selected labels are the secondary operands.
+Both are shown in the <b>Selected operands</b> section.
+
+As the first operand always is the label that was selected first, the button next to the operands clears the whole selection, which is the quickest way to pick a different first operand.
+
+The result is added to the same segmentation as a new label in a new group.
+Its name states the operation and the labels it was computed from.
 
 \imageMacro{QmitkSegmentationUtilities_BooleanOperations.png,"Boolean operations",6.00}
 

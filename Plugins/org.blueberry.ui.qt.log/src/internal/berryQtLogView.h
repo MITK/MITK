@@ -14,9 +14,10 @@ found in the LICENSE file.
 #define BERRYQTLOGVIEW_H
 
 #include <QWidget>
-#include <QSortFilterProxyModel>
-#include "berryQtPlatformLogModel.h"
+
 #include <memory>
+
+class QTimer;
 
 namespace Ui
 {
@@ -25,6 +26,9 @@ namespace Ui
 
 namespace berry {
 
+class QtLogFilterProxyModel;
+class QtPlatformLogModel;
+
 class QtLogView : public QWidget
 {
     Q_OBJECT
@@ -32,22 +36,46 @@ class QtLogView : public QWidget
 public:
     QtLogView(QWidget *parent = nullptr);
     ~QtLogView() override;
-    QtPlatformLogModel *model;
-    QSortFilterProxyModel *filterModel;
+
+    /** Decides whether a message needs a tool tip, which depends on the column
+     *  width and so cannot be answered by the model.
+     */
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
+    void showEvent(QShowEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
+
+    void ApplyFilter();
+    void OnMinimumLevelChanged(int index);
+    void OnShowDetailsToggled(bool checked);
+    void OnClearClicked();
+    void OnCopyToClipboardClicked();
+    void OnRowsAboutToBeInserted();
+    void OnRowsInserted(const QModelIndex& parent, int first, int last);
+    void OnSectionResized(int logicalIndex);
+
+    void ApplyShowDetails(bool showDetails);
+    void SizeColumnsToContents();
+    void FillMessageColumn();
+    bool IsElided(const QModelIndex& index) const;
+
     std::unique_ptr<Ui::QtLogViewClass> ui;
 
-    void showEvent ( QShowEvent * event ) override;
+    QtPlatformLogModel* m_Model;
+    QtLogFilterProxyModel* m_FilterModel;
 
-protected slots:
-    void slotFilterChange( const QString& );
-    void slotRowAdded( const QModelIndex & , int , int  );
-    void slotScrollDown( );
-    void on_ShowAdvancedFields_clicked( bool checked = false );
-    void on_ShowCategory_clicked( bool checked = false );
-    void on_SaveToClipboard_clicked();
+    /** Coalesces the keystrokes in the filter into a single filter pass. */
+    QTimer* m_FilterTimer;
 
+    /** Whether the newest entry was in view when the last insertion started. */
+    bool m_FollowNewEntries;
+
+    /** Guards the setup that must not undo what the user has done since:
+     *  the column widths and the scroll position are theirs from the first
+     *  time the view is shown.
+     */
+    bool m_FirstShow;
 };
 
 }

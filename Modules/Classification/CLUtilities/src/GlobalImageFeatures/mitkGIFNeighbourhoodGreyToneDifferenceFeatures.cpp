@@ -162,7 +162,7 @@ void mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::AddArguments(mitkCommandL
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Neighbourhood Grey Tone Difference", "calculates Neighborhood Grey Tone based features", us::Any());
-  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::Int, "Range for the local intensity", "Give the range that should be used for the local intensity in mm", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::Int, "NGTD Range", "Radius of the neighbourhood in voxels that is used for the grey tone difference (default 1)", us::Any());
 }
 
 mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::DoCalculateFeatures(const Image* image, const Image* mask)

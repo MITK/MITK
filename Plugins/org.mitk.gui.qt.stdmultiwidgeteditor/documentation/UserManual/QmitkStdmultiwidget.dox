@@ -13,7 +13,7 @@ Alternatively, go to the <i>Help</i> menu and select <i>User Manuals</i>. A view
 
 The four window view is the heart of the MITK image viewing. The standard layout is three 2D windows and one 3D window, with the axial window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
 
-Once you select a point within the picture, information about it is displayed at the bottom of the screen.
+Once you select a point within the picture, its value is displayed by the Pixel Value view, which is located next to the Image Navigator in the lower left corner by default.
 
 \subsection org_mitk_editors_stdmultiwidget_FourWindowView_Navigation Navigation
 
@@ -33,6 +33,8 @@ Activating either of the rotation modes allows you to rotate the planes visible 
 
 The swivel mode is recommended only for advanced users as the planes can be moved freely by clicking and dragging anywhere within a 2D window.
 
+The last entry of the crosshair menu is the TS (thick slice) slider. It is available in the 2D windows only. As long as it is set to zero, a single slice is displayed. Any higher value renders a maximum intensity projection (MIP) instead, which integrates as many slices in front of and behind the current one as set with the slider. The number to the right of the slider is the resulting slab thickness, that is the total number of projected slices. In the other 2D windows the extent of the slab is indicated by two additional lines parallel to the line of the corresponding plane. The upper limit of the slider defaults to 50 and can be changed in the <i>Editors</i> preference page (<i>Maximum virtual slice thickness (TS)</i>).
+
 The middle button expands the corresponding window to fullscreen within the four window view.
 
 \imageMacro{org_mitk_editors_stdmultiwidget_ViewsChoices.png,"Layout Choices",5.19}
@@ -48,6 +50,12 @@ The pixels with a value between the lower and upper boundary are displayed in di
 You can pick the levelwindow with the mouse to move it up and down, while moving the mouse cursor to the left or right to change its size. Picking one of the boundaries with a left click allows you to change the size symmetrically. Holding CTRL and clicking a boundary adjusts only that value.
 
 With line edit fields below you can directly adjust the levelwindow. The upper field describes the center of the levelwindow, the bottom the span of the window around the center. By selecting one of fields and typing any number you can set these two parameters.
+
+\subsection org_mitk_editors_stdmultiwidget_Levelwindow_Image Which image is adjusted
+
+The name of the image that the levelwindow currently adjusts is written along the right edge of the slider. By default this is the topmost visible image, that is the visible image with the highest layer in the Data Manager. In the <i>Standard Display</i> preference page you can instead let the levelwindow follow the image selected in the Data Manager. In that mode the levelwindow disappears while no visible image is selected, and the option <i>Apply changes to all selected images</i> adjusts all selected visible images together. The preference page also allows hiding the image name.
+
+The <i>Images</i> submenu of the levelwindow's context menu switches between the topmost and the selected image for the current session and additionally lists all visible images, so that you can pick a specific image directly. Such a pick stays in effect until you choose one of the two automatic modes again or the picked image is removed. The context menu also toggles the image name for the current session, next to the entry that toggles the scale.
 
 
 */

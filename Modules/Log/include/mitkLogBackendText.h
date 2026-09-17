@@ -94,7 +94,7 @@ namespace mitk
     /** \brief Append the current wall-clock time to the given stream.
      *
      * Writes the result of \c ctime() (with trailing newline replaced by a space)
-     * to the stream using the "C" locale.
+     * to the stream.
      *
      * \param[out] out The output stream to append the timestamp to.
      */

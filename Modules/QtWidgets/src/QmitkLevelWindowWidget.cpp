@@ -34,6 +34,11 @@ void QmitkLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)
   m_Manager->SetDataStorage(ds);
 }
 
+void QmitkLevelWindowWidget::SetImageNameVisible(bool visible)
+{
+  ui->SliderLevelWindowWidget->SetImageNameVisible(visible);
+}
+
 mitk::LevelWindowManager *QmitkLevelWindowWidget::GetManager()
 {
   return m_Manager.GetPointer();

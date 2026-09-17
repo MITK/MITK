@@ -43,9 +43,9 @@ namespace mitk
    * vtkSurfaceNets3D writes; component 0 holds the foreground label of each face
    * (background or higher labels go to component 1).
    *
-   * The class also encapsulates a workaround for a vtkSurfaceNets3D bug in VTK 9.5.2,
-   * where the boundary cache may be reused without populating the local newScalars,
-   * causing TransformMeshType to dereference null in the smoothed path.
+   * The class also encapsulates a workaround for a vtkSurfaceNets3D caching hazard
+   * (present up to at least VTK 9.7): label or input changes alone do not invalidate
+   * its boundary cache, and the reused cache crashes the smoothed triangle path.
    */
   class MITKMULTILABEL_EXPORT MultiLabelSurfaceNetsExtractor
   {
@@ -80,12 +80,14 @@ namespace mitk
       const std::vector<LabelValueType>& labelValues);
 
     /**
-     * \brief Per-label variant. Returns one polydata per label, restricted to that
-     * label's exterior faces (vtkSurfaceNets3D OUTPUT_STYLE_SELECTED).
+     * \brief Per-label variant. Returns one polydata per label, restricted to the
+     * cells bounding that label (both towards background and towards other labels).
      *
-     * Smoothing is applied across all labels in the input list, so the per-label
-     * output keeps consistent boundaries with adjacent labels. Labels with no
-     * boundary in the group are absent from the returned map.
+     * The surface net is extracted once for all labels in the input list and split
+     * per label by vtkSurfaceNetsAtlas, so the per-label output keeps consistent
+     * boundaries with adjacent labels. Component 0 of "BoundaryLabels" is always the
+     * label itself and normals point outward. Labels with no boundary in the group
+     * are absent from the returned map.
      */
     std::map<LabelValueType, vtkSmartPointer<vtkPolyData>> ExtractPerLabel(
       vtkImageData* groupImage,
@@ -99,12 +101,12 @@ namespace mitk
      * 4x4 matrix is the [direction | origin] transform that places those coordinates back
      * into world space. The live 3D mapper applies it as the actor's UserMatrix; consumers
      * of the polydata that bypass the rendering pipeline (e.g. the convert-to-surface action)
-     * should bake it into the polydata via vtkTransformPolyDataFilter.
+     * should bake it into the polydata via vtkTransformFilter.
      */
     static vtkSmartPointer<vtkMatrix4x4> GetImageToWorldMatrix(const BaseGeometry* geometry);
 
   private:
-    void ConfigureLabels(const std::vector<LabelValueType>& labelValues);
+    void UpdateSurfaceNets(vtkImageData* groupImage, const std::vector<LabelValueType>& labelValues);
 
     vtkSmartPointer<vtkSurfaceNets3D> m_SurfaceNets;
     vtkSmartPointer<vtkPolyDataNormals> m_NormalsFilter;

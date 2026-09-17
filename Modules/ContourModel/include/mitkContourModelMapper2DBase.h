@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkMapper.h>
-#include <mitkTextAnnotation2D.h>
 #include <MitkContourModelExports.h>
 #include <vtkSmartPointer.h>
 
@@ -50,24 +49,23 @@ namespace mitk
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor = nullptr) override;
 
   protected:
-    typedef TextAnnotation2D::Pointer TextAnnotationPointerType;
-
     ContourModelMapper2DBase();
 
     ~ContourModelMapper2DBase() override;
 
+    /** \brief Prepare the drawing context of a renderer for one frame.
+     *
+     * Brackets any number of DrawContour() calls together with EndDrawing().
+     * The context and its device are kept per renderer and reused across
+     * frames, so only the painting itself is repeated.
+     */
+    void BeginDrawing(mitk::BaseRenderer *renderer);
+
+    /** \brief Release the drawing context of a renderer again. */
+    void EndDrawing(mitk::BaseRenderer *renderer);
+
+    /** \brief Draw one contour. Only valid between BeginDrawing() and EndDrawing(). */
     void DrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer);
-
-    void WriteTextWithAnnotation(
-      TextAnnotationPointerType textAnnotation, const char *text, float rgb[3], Point2D pt2d, mitk::BaseRenderer *);
-
-    virtual void InternalDrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer);
-
-    TextAnnotationPointerType m_PointNumbersAnnotation;
-    TextAnnotationPointerType m_ControlPointNumbersAnnotation;
-
-    typedef std::vector<BaseRenderer *> RendererListType;
-    RendererListType m_RendererList;
 
   private:
     struct LocalStorage

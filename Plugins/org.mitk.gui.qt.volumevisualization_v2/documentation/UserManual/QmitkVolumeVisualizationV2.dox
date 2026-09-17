@@ -52,16 +52,16 @@ time in the image navigator steps the volume with it.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_presets Presets
 
-<b>Select a preset</b> folds out a grid of presets, each shown as a small
-rendering of the image you currently have selected. The preview is what applying
-that preset will look like on your data, not a generic illustration, which is
-why the presets are chosen by picture rather than by name. They are drawn when
-the grid opens, one after another, so they appear progressively.
+The presets are laid out as a grid, each one shown as a small rendering of the
+image you currently have selected. The preview is what applying that preset will
+look like on your data, not a generic illustration, which is why the presets are
+chosen by picture rather than by name. They are drawn one after another, so they
+appear progressively.
 
 \imageMacro{QmitkVolumeVisualizationV2_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
 
-The button at the right of the section header lays the same presets out as a
-list instead: one row each, the name beside a preview too small to study but
+The button above the grid, at its right, lays the same presets out as a list
+instead: one row each, the name beside a preview too small to study but
 large enough to say which colours a preset brings. More of the catalogue is on
 screen that way, and the names line up in one column, which is the quicker way
 in once they are familiar. Pressing it again brings the grid back; nothing is
@@ -73,13 +73,14 @@ viewers, plus a few general-purpose colour maps. The <tt>CT-</tt> presets assume
 Hounsfield units, so which tissue a preset picks out transfers between CT images
 unchanged. How solid that tissue looks does not: opacity accumulates over the
 distance a ray travels in millimetres, so the same preset comes out denser on a
-coarsely sampled image than on a finely sampled one. <b>Opacity height</b> is
-the slider that compensates. The <tt>MR-</tt> presets cannot assume even the
-units, because MR intensities are not calibrated to a fixed scale, so expect to
-adjust those per image.
+coarsely sampled image than on a finely sampled one. <b>Height</b>, under
+<b>Opacity curve</b>, is the slider that compensates. The <tt>MR-</tt> presets
+cannot assume even the units, because MR intensities are not calibrated to a
+fixed scale, so expect to adjust those per image.
 
-While the grid is folded away its header names the current choice, or reads
-<em>Preset: Custom</em> for a curve that no preset describes.
+The preset in force is the entry marked in the grid. A curve that no preset
+describes - one edited point by point, or loaded from a file - leaves no entry
+marked.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
 
@@ -99,24 +100,29 @@ possible, in the separate mode described in
 \subsection org_mitk_views_volumevisualization_v2_tf_adjust Adjusting a preset
 
 A preset lands where its author put it, which is rarely exactly where your image
-wants it. <b>Adjust preset</b> offers four sliders that move it without
-redrawing it:
+wants it. Below the canvas, four sliders move it without redrawing it. Two of
+them, under <b>Opacity curve</b>, act on how much is visible:
 
 <ul>
-<li> <b>Opacity shift</b> slides the opacity curve along the grey-value axis,
-which is what you reach for when a preset shows too much or too little tissue.
-It travels half the image's value range in either direction.
-<li> <b>Opacity height</b> raises or lowers the whole curve, making the volume
-more or less solid without changing which values are visible at all.
-<li> <b>Color shift</b> moves the centre of the range the preset's colours are
-spread over.
-<li> <b>Color width</b> sets how wide that range is. Narrowing it concentrates
-the colours into a smaller band of grey values; widening it spreads them out.
+<li> <b>Position</b> slides the opacity curve along the grey-value axis, which
+is what you reach for when a preset shows too much or too little tissue. It
+travels half the image's value range in either direction.
+<li> <b>Height</b> raises or lowers the whole curve, making the volume more or
+less solid without changing which values are visible at all.
 </ul>
 
-<b>Reset sliders</b> returns all four to neutral. That restores the curve they
-are measured from, which is the untouched preset, or the curve a file supplied
-if the function came from one. It does not reload a preset.
+The other two, under <b>Color</b>, act on the range those colours are spread
+over:
+
+<ul>
+<li> <b>Position</b> moves the centre of that range.
+<li> <b>Width</b> sets how wide it is. Narrowing it concentrates the colours
+into a smaller band of grey values; widening it spreads them out.
+</ul>
+
+<b>Reset</b> returns all four to neutral. That restores the curve they are
+measured from, which is the untouched preset, or the curve a file supplied if
+the function came from one. It does not reload a preset.
 
 What is remembered is the preset together with the four offsets, rather than
 only the resulting curve, so selecting the image again later brings the sliders
@@ -230,10 +236,10 @@ window for as long as this view is open.
 <b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>
 control how the material responds to that light. Choosing a model sets all four
 to a sensible starting point; moving them afterwards does not leave the model,
-and <b>Reset sliders</b> puts them back to the values the current model
-prescribes. Ambient is deliberately zero under Key light: with more than one
-light in the scene the renderer adds ambient as a flat grey wash, so the fill
-light does that job instead.
+and <b>Reset</b> puts them back to the values the current model prescribes.
+Ambient is deliberately zero under Key light: with more than one light in the
+scene the renderer adds ambient as a flat grey wash, so the fill light does
+that job instead.
 
 \note This whole section applies to the Composite blend mode only, and is
 disabled otherwise, with the reason on its header. The projection modes reduce

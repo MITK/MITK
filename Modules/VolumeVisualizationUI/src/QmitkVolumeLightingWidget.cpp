@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkVolumeRenderingLightingModel.h>
 #include <mitkVolumeRenderingMaterial.h>
 
+#include <QmitkStyleManager.h>
+
 #include <ui_QmitkVolumeLightingWidgetControls.h>
 
 #include <ctkSliderWidget.h>
@@ -52,6 +54,11 @@ QmitkVolumeLightingWidget::QmitkVolumeLightingWidget(QWidget *parent, Qt::Window
   ConfigureSlider(m_Controls->diffuseSlider, 2, 0.0, 1.0, 0.01);
   ConfigureSlider(m_Controls->specularSlider, 2, 0.0, 1.0, 0.01);
   ConfigureSlider(m_Controls->specularPowerSlider, 1, 1.0, 128.0, 1.0);
+
+  // Set here rather than in the .ui: the resource is authored with a
+  // placeholder fill that QmitkStyleManager swaps for the theme's icon colour,
+  // so a direct reference from the .ui would draw it in that placeholder.
+  m_Controls->resetButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
   // The label is for the reader, the id for the code: carrying the id on the row
   // keeps every lookup independent of the fill order.

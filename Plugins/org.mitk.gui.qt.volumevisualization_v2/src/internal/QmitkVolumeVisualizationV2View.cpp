@@ -187,6 +187,15 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
     this, &QmitkVolumeVisualizationV2View::OnCustomModeChanged);
 
   // Lighting Option Controls
+
+  // The application stylesheet gives a checked button an accent border without
+  // guarding it on enabled, so a section left folded out stays fully marked
+  // while it is greyed out. Translucent grey rather than a fixed colour: it has
+  // to hold over a dark and a light background alike, and the theme exposes
+  // nothing but its icon colours to ask for.
+  m_Controls->lightingExpandButton->setStyleSheet(
+    "QToolButton:checked:disabled { border: 1px solid rgba(127, 127, 127, 90); }");
+
   connect(m_Controls->lightingExpandButton, &QToolButton::toggled, this,
     [this](bool expanded)
     {

@@ -176,10 +176,10 @@ private:
    */
   void RecordCustomTransferFunction(mitk::DataNode *node);
 
-  /** \brief Deselect any preset, leaving the section header to say why.
+  /** \brief Leave the grid with no entry marked.
    *
-   * Whether that is because a curve no preset describes is held, or because
-   * none is, is named on the header rather than in the grid.
+   * Either a curve that no preset describes is held, or none is held at all.
+   * Nothing on the panel tells the two apart.
    */
   void ClearPresetSelection();
 

@@ -277,15 +277,6 @@ namespace
 
     return std::nullopt;
   }
-
-  /** The arrow is the only cue that a section folds away, so it is drawn by the
-   * style from arrowType rather than taken from a pixmap.
-   */
-  void SetSectionExpanded(QToolButton *header, QWidget *panel, bool expanded)
-  {
-    header->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
-    panel->setVisible(expanded);
-  }
 }
 
 QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *parent, Qt::WindowFlags f)
@@ -318,6 +309,14 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+  // The application stylesheet greys a disabled item's text but not the
+  // selection behind it, so the preset in force would keep a full-strength
+  // highlight while the editor is switched off. Translucent rather than a fixed
+  // colour, since it has to lighten a dark background and darken a light one,
+  // and QmitkStyleManager exposes only icon colours to ask the theme for.
+  presetList->setStyleSheet(
+    "QListWidget::item:selected:disabled { background-color: rgba(127, 127, 127, 90); }");
+
   for (const auto &name : m_Presets.GetPresetNames())
     presetList->addItem(QString::fromStdString(name));
 
@@ -346,6 +345,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   m_Controls->colorShiftSlider->setOrientation(Qt::Horizontal);
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
+  // Set here rather than in the .ui: the resource is authored with a
+  // placeholder fill that QmitkStyleManager swaps for the theme's icon colour,
+  // so a direct reference from the .ui would draw it in that placeholder.
+  m_Controls->resetTfButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
+
   m_Controls->advancedTfPanel->setVisible(false);
 
   // Identified by their stable ids rather than by row, so that reordering the
@@ -373,26 +377,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
         this->OnPresetSelected(item->text());
     });
 
-  connect(m_Controls->presetExpandButton, &QToolButton::toggled, this,
-    [this](bool expanded)
-    {
-      SetSectionExpanded(m_Controls->presetExpandButton, m_Controls->presetPanel, expanded);
-
-      // It offers the other way of laying the entries out, and a folded-away
-      // section has none to lay out.
-      m_Controls->presetViewModeButton->setVisible(expanded);
-
-      this->StartThumbnailGeneration();
-    });
-
   connect(m_Controls->presetViewModeButton, &QToolButton::clicked, this,
     [this] { this->SetCompactPresetList(!m_CompactPresetList); });
-
-  connect(m_Controls->adjustPresetExpandButton, &QToolButton::toggled, this,
-    [this](bool expanded)
-    {
-      SetSectionExpanded(m_Controls->adjustPresetExpandButton, m_Controls->adjustPresetPanel, expanded);
-    });
 
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
     this, &QmitkVolumeTransferFunctionEditor::OnCanvasOpacityChanged);
@@ -723,7 +709,7 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
   }
 
   // Nothing matches the empty name a node that records no preset leaves behind,
-  // and that absence is the state the section header describes rather than a row.
+  // which is what then leaves the grid with no entry marked.
   const auto matches =
     m_Controls->presetListWidget->findItems(QString::fromStdString(presetName), Qt::MatchExactly);
 
@@ -842,8 +828,6 @@ void QmitkVolumeTransferFunctionEditor::RecordCustomTransferFunction(mitk::DataN
 
 void QmitkVolumeTransferFunctionEditor::ClearPresetSelection()
 {
-  // Which preset is named, if any, is said by the section header, and saying it
-  // there means it is legible while the grid is folded away.
   m_Controls->presetListWidget->setCurrentRow(-1);
 }
 
@@ -929,21 +913,10 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
-  // Named on the header, so that it reads while the grid is folded away. A
-  // curve loaded from a file or authored here answers to no preset name, which
-  // is worth telling apart from carrying no curve at all.
-  const auto *currentPreset = m_Controls->presetListWidget->currentItem();
-
-  m_Controls->presetExpandButton->setText(currentPreset != nullptr
-    ? QString("Preset: %1").arg(currentPreset->text())
-    : (m_AppliedTransferFunction.IsNotNull() ? "Preset: Custom" : "Select a preset"));
-
-  m_Controls->presetExpandButton->setEnabled(hasNode);
   m_Controls->presetViewModeButton->setEnabled(hasNode);
   m_Controls->presetListWidget->setEnabled(hasNode);
   m_Controls->createTfButton->setEnabled(adjustable);
   m_Controls->loadTfButton->setEnabled(hasNode);
-  m_Controls->adjustPresetExpandButton->setEnabled(adjustable);
   m_Controls->adjustPresetPanel->setEnabled(adjustable);
   m_Controls->combinedTfCanvas->setEnabled(adjustable);
 }
@@ -1113,9 +1086,7 @@ void QmitkVolumeTransferFunctionEditor::SetCustomModeActive(bool active)
   m_Controls->advancedTfPanel->setVisible(active);
 
   // Preset selection and the sliders that adjust it both live on this panel,
-  // and authoring supersedes both. Hiding the panel takes the collapsible
-  // section with it, so its expanded/collapsed state is left untouched and
-  // survives a trip through authoring.
+  // and authoring supersedes both.
   m_Controls->transferFunctionPanel->setVisible(!active);
 
   // The button that was clicked has just been hidden, so focus is about to be
@@ -1124,7 +1095,7 @@ void QmitkVolumeTransferFunctionEditor::SetCustomModeActive(bool active)
   if (active)
     m_Controls->backToPresetsButton->setFocus(Qt::OtherFocusReason);
   else
-    m_Controls->presetExpandButton->setFocus(Qt::OtherFocusReason);
+    m_Controls->presetListWidget->setFocus(Qt::OtherFocusReason);
 
   emit CustomModeChanged(active);
 }
@@ -1370,7 +1341,7 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
   // Asked here rather than where generation is requested: a selection change
   // binds the node first and settles whether the editor applies to it second,
   // so only a turn of the event loop later is the answer the current one.
-  if (!this->isEnabled() || !m_Controls->presetExpandButton->isChecked())
+  if (!this->isEnabled())
   {
     this->InvalidateThumbnails();
     return;
@@ -1380,9 +1351,9 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
 
   if (m_NextThumbnailIndex < 0)
   {
-    // Uploading the volume costs far more than drawing from it, so it waits
-    // for the preset section to be on screen rather than delaying its
-    // appearance.
+    // Uploading the volume costs far more than drawing from it, so it gets a
+    // turn of the event loop to itself rather than holding up the selection
+    // change that asked for it.
     if (!m_ThumbnailRenderer->SetImage(m_ThumbnailImage.Lock().GetPointer()))
     {
       // Clearing the bound image matters: it is what lets a later attempt

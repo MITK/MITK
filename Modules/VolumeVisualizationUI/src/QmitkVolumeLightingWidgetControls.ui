@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>220</height>
+    <height>340</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,77 +16,156 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <layout class="QGridLayout" name="lightingLayout" columnstretch="0,100">
-   <property name="leftMargin">
+  <layout class="QVBoxLayout" name="lightingLayout">
+   <property name="spacing">
     <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>6</number>
+    <number>8</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
-   <property name="verticalSpacing">
-    <number>13</number>
-   </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="lightingModelLabel">
+   <item>
+    <widget class="QLabel" name="lightingModelGroupLabel">
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
      <property name="text">
-      <string>Lighting model</string>
+      <string>&lt;small&gt;&lt;b&gt;LIGHTING MODEL&lt;/b&gt;&lt;/small&gt;</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item>
     <widget class="QComboBox" name="lightingModelComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="toolTip">
       <string>Headlight: one light at the camera. Nothing casts a visible shadow, since the light reaches everything you can see, but it is the only rig for which the renderer tints ambient light by the tissue's own colour, so the ambient slider fills rather than veils. Key light: an off-axis key with a dimmer opposing fill, tracing short shadow rays through the volume so that contacts and recesses darken; surface shading and its highlight stay on top of that. The rays are kept short on purpose - long ones let one structure cast onto another, which describes the lighting rather than the anatomy. Ambient is held at zero here because with more than one light the renderer adds it as a flat grey; the fill light does that job instead. It costs more per frame in a still image, is switched off while you drag, and relights any surface in the same window.</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="ambientLabel">
+   <item>
+    <spacer name="materialGroupSpacerAbove">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>12</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="materialGroupLabel">
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
      <property name="text">
-      <string>Ambient</string>
+      <string>&lt;small&gt;&lt;b&gt;MATERIAL&lt;/b&gt;&lt;/small&gt;</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="diffuseLabel">
-     <property name="text">
-      <string>Diffuse</string>
+   <item>
+    <layout class="QVBoxLayout" name="ambientRow">
+     <property name="spacing">
+      <number>2</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="ambientLabel">
+       <property name="text">
+        <string>Ambient</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
+     </item>
+    </layout>
    </item>
-   <item row="2" column="1">
-    <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="specularLabel">
-     <property name="text">
-      <string>Specular</string>
+   <item>
+    <layout class="QVBoxLayout" name="diffuseRow">
+     <property name="spacing">
+      <number>2</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="diffuseLabel">
+       <property name="text">
+        <string>Diffuse</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
+     </item>
+    </layout>
    </item>
-   <item row="3" column="1">
-    <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="specularPowerLabel">
-     <property name="text">
-      <string>Specular power</string>
+   <item>
+    <layout class="QVBoxLayout" name="specularRow">
+     <property name="spacing">
+      <number>2</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="specularLabel">
+       <property name="text">
+        <string>Specular</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
+     </item>
+    </layout>
    </item>
-   <item row="4" column="1">
-    <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
+   <item>
+    <layout class="QVBoxLayout" name="specularPowerRow">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="specularPowerLabel">
+       <property name="text">
+        <string>Specular power</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
+     </item>
+    </layout>
    </item>
-   <item row="5" column="1">
+   <item>
+    <spacer name="resetSpacerAbove">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>6</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="resetRowLayout">
      <item>
       <spacer name="resetRowSpacer">
@@ -104,7 +183,7 @@
      <item>
       <widget class="QPushButton" name="resetButton">
        <property name="text">
-        <string>Reset sliders</string>
+        <string>Reset</string>
        </property>
       </widget>
      </item>

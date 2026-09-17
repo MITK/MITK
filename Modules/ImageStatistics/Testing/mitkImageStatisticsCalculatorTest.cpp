@@ -117,6 +117,8 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestNegativeFloatImageUnmaskedMinMaxPosition);
   MITK_TEST(TestNegativeFloatImageMaskedMinMaxPosition);
   MITK_TEST(TestZeroImageMinMaxPosition);
+  MITK_TEST(TestSubRegionMaskMinMaxPosition);
+  MITK_TEST(TestIncompatibleMaskThrows);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -158,6 +160,8 @@ public:
   void TestNegativeFloatImageUnmaskedMinMaxPosition();
   void TestNegativeFloatImageMaskedMinMaxPosition();
   void TestZeroImageMinMaxPosition();
+  void TestSubRegionMaskMinMaxPosition();
+  void TestIncompatibleMaskThrows();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -257,7 +261,7 @@ private:
 
   // checks the extrema and their positions in indices of the input image; the
   // suffix names the case in the assertion messages
-  void VerifyExtrema(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
+  void VerifyExtrema(const mitk::ImageStatisticsContainer::ImageStatisticsObject& stats,
     mitk::ImageStatisticsContainer::RealType min, const itk::Index<3>& minIndex,
     mitk::ImageStatisticsContainer::RealType max, const itk::Index<3>& maxIndex,
     const std::string& suffix = "")
@@ -276,14 +280,15 @@ private:
 
     for (unsigned int i = 0; i < 3; ++i)
     {
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("MinPosition" + suffix, static_cast<int>(minIndex[i]), minIndexObject[i]);
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("MaxPosition" + suffix, static_cast<int>(maxIndex[i]), maxIndexObject[i]);
+      const std::string axis = "[" + std::to_string(i) + "]" + suffix;
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("MinPosition" + axis, static_cast<int>(minIndex[i]), minIndexObject[i]);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("MaxPosition" + axis, static_cast<int>(maxIndex[i]), maxIndexObject[i]);
     }
   }
 
   // checks that the statistics describe exactly one voxel with the given value
   // at the given index of the input image
-  void VerifySingleVoxel(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
+  void VerifySingleVoxel(const mitk::ImageStatisticsContainer::ImageStatisticsObject& stats,
     mitk::ImageStatisticsContainer::RealType value, const itk::Index<3>& index)
   {
     std::stringstream ss;
@@ -1075,6 +1080,79 @@ void mitkImageStatisticsCalculatorTestSuite::TestZeroImageMinMaxPosition()
 
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
   this->VerifyExtrema(statisticsContainer->GetStatistics(1, 0), 0.0, MakeIndex(0, 0, 1), 0.0, MakeIndex(0, 0, 1), " masked");
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSubRegionMaskMinMaxPosition()
+{
+  /*****************************
+   * 4x4x4 image on a rotated grid, a 2x2x2 mask on the same grid covering
+   * the image voxels [1,2]x[2,3]x[1,2]
+   * -> 8 voxels, Min 26 at (1,2,1), Max 47 at (2,3,2) in image indices
+   ******************************/
+  MITK_INFO << std::endl << "Test sub-region mask min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(4);
+  const Grid grid = RotatedGrid();
+
+  std::vector<short> values(4 * 4 * 4);
+  std::iota(values.begin(), values.end(), static_cast<short>(1));
+  mitk::Image::Pointer image = BuildImage<short>(size, values, grid);
+
+  Grid maskGrid = grid;
+  image->GetGeometry()->IndexToWorld(MakeIndex(1, 2, 1), maskGrid.origin);
+  itk::Size<3> maskSize;
+  maskSize.Fill(2);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(maskSize, std::vector<unsigned short>(8, 1), maskGrid);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxels = 0;
+  CPPUNIT_ASSERT_NO_THROW(numberOfVoxels = statisticsObject.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+  CPPUNIT_ASSERT_EQUAL(mitk::ImageStatisticsContainer::VoxelCountType(8), numberOfVoxels);
+
+  this->VerifyExtrema(statisticsObject, 26.0, MakeIndex(1, 2, 1), 47.0, MakeIndex(2, 3, 2));
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestIncompatibleMaskThrows()
+{
+  /*****************************
+   * masks that are not on the voxel grid of the image are rejected
+   ******************************/
+  MITK_INFO << std::endl << "Test incompatible mask throws:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values(8, 10);
+  std::vector<unsigned short> maskValues(8, 1);
+  const Grid grid = RotatedGrid();
+  mitk::Image::Pointer image = BuildImage<short>(size, values, grid);
+
+  // shifted by half a voxel along the first image axis
+  Grid shifted = grid;
+  mitk::Point3D halfVoxel;
+  mitk::FillVector3D(halfVoxel, 0.5, 0.0, 0.0);
+  image->GetGeometry()->IndexToWorld(halfVoxel, shifted.origin);
+
+  mitk::ImageMaskGenerator::Pointer shiftedMaskGen = mitk::ImageMaskGenerator::New();
+  shiftedMaskGen->SetInputImage(image);
+  shiftedMaskGen->SetImageMask(BuildImage<unsigned short>(size, maskValues, shifted));
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image, shiftedMaskGen.GetPointer()), mitk::Exception);
+
+  // different spacing
+  Grid coarse = grid;
+  coarse.spacing[0] = 4.0;
+
+  mitk::ImageMaskGenerator::Pointer coarseMaskGen = mitk::ImageMaskGenerator::New();
+  coarseMaskGen->SetInputImage(image);
+  coarseMaskGen->SetImageMask(BuildImage<unsigned short>(size, maskValues, coarse));
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image, coarseMaskGen.GetPointer()), mitk::Exception);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

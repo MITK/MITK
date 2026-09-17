@@ -19,10 +19,11 @@ found in the LICENSE file.
 #include <mitkImageStatisticsConstants.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToItk.h>
-#include <mitkMaskUtilities.h>
 #include <mitkMinMaxImageFilterWithIndex.h>
 #include <mitkMinMaxLabelmageFilterWithIndex.h>
 #include <mitkNodePredicateGeometry.h>
+
+#include <itkRegionOfInterestImageFilter.h>
 
 namespace mitk
 {
@@ -107,26 +108,23 @@ namespace mitk
 
         for (unsigned int maskID = 0; maskID < numbersOfMasks; ++maskID)
         {
+          // A mask generator may compute its mask on a reference image of its own
+          // (e.g. the slice of a planar figure); the statistics then run on that image.
+          Image::ConstPointer imageForStatistics = m_Image;
+          m_InternalMask = nullptr;
+
           if (m_MaskGenerator.IsNotNull())
           {
             m_MaskGenerator->SetTimePoint(timePoint);
             m_InternalMask = m_MaskGenerator->GetMask(maskID);
-            if (m_MaskGenerator->GetReferenceImage().IsNotNull())
-            {
-              m_InternalImageForStatistics = m_MaskGenerator->GetReferenceImage();
-            }
-            else
-            {
-              m_InternalImageForStatistics = m_Image;
-            }
-          }
-          else
-          {
-            m_InternalImageForStatistics = m_Image;
-            m_InternalMask = nullptr;
+
+            const auto referenceImage = m_MaskGenerator->GetReferenceImage();
+
+            if (referenceImage.IsNotNull())
+              imageForStatistics = referenceImage;
           }
 
-          m_ImageTimeSlice = SelectImageByTimeStep(m_InternalImageForStatistics, timeStep);
+          m_ImageTimeSlice = SelectImageByTimeStep(imageForStatistics, timeStep);
 
           // Calculate statistics with/without mask
           if (m_MaskGenerator.IsNull())
@@ -265,8 +263,54 @@ namespace mitk
     typedef itk::Image<MaskPixelType, VImageDimension> MaskType;
     typedef typename MaskType::PixelType LabelPixelType;
     typedef LabelStatisticsImageFilter<ImageType> ImageStatisticsFilterType;
-    typedef MaskUtilities<TPixel, VImageDimension> MaskUtilType;
     typedef typename itk::MinMaxLabelImageFilterWithIndex<ImageType, MaskType> MinMaxLabelFilterType;
+    typedef itk::RegionOfInterestImageFilter<ImageType, ImageType> RegionOfInterestFilterType;
+
+    const BaseGeometry* referenceGeometry = m_ImageTimeSlice->GetGeometry();
+    const BaseGeometry* maskGeometry = m_InternalMask->GetGeometry();
+
+    // verbose makes IsSubGeometry log the check that failed; it stays silent on success
+    if (!IsSubGeometry(*maskGeometry, *referenceGeometry,
+                       NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+                       NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
+                       true))
+    {
+      mitkThrow() << "Mask is not a sub geometry of the image (see the log for the failed check): "
+                     "it has to lie on the voxel grid of the image and within its extent.";
+    }
+
+    // A mask may cover only a sub-region of the image. The filters then run on
+    // that region and report indices relative to it.
+    itk::Index<3> maskOffset;
+    referenceGeometry->WorldToIndex(maskGeometry->GetOrigin(), maskOffset);
+
+    // Maps an index of the (possibly cropped) statistics image to an index of the
+    // input image. The reference image may be a 2D slice (planar figure masks), so
+    // the index has to go through world coordinates. On rotated geometries the
+    // inverse transform carries floating-point noise, so the result is rounded
+    // rather than truncated.
+    const BaseGeometry* imageGeometry = m_Image->GetGeometry(timeStep);
+    auto toImageIndex = [&](const typename ImageType::IndexType& index)
+    {
+      itk::Index<3> referenceIndex;
+      referenceIndex.Fill(0);
+
+      for (unsigned int i = 0; i < VImageDimension; ++i)
+        referenceIndex[i] = index[i] + maskOffset[i];
+
+      Point3D world;
+      referenceGeometry->IndexToWorld(referenceIndex, world);
+
+      itk::Index<3> imageIndex;
+      imageGeometry->WorldToIndex(world, imageIndex);
+
+      vnl_vector<int> result(3);
+
+      for (unsigned int i = 0; i < 3; ++i)
+        result[i] = static_cast<int>(imageIndex[i]);
+
+      return result;
+    };
 
     // maskImage has to have the same dimension as image
     typename MaskType::ConstPointer maskImage = MaskType::New();
@@ -284,14 +328,24 @@ namespace mitk
       maskImage = noneConstMaskImage;
     }
 
-    typename MaskUtilType::Pointer maskUtil = MaskUtilType::New();
-    maskUtil->SetImage(image);
-    maskUtil->SetMask(maskImage.GetPointer());
+    typename ImageType::ConstPointer adaptedImage = image;
 
-    // if mask is smaller than image, extract the image region where the mask is
-    typename ImageType::ConstPointer adaptedImage = ImageType::New();
+    if (maskImage->GetLargestPossibleRegion().GetSize() != image->GetLargestPossibleRegion().GetSize())
+    {
+      typename ImageType::RegionType maskRegion = maskImage->GetLargestPossibleRegion();
+      typename ImageType::IndexType regionIndex;
 
-    adaptedImage = maskUtil->ExtractMaskImageRegion(); // this also checks mask sanity
+      for (unsigned int i = 0; i < VImageDimension; ++i)
+        regionIndex[i] = maskOffset[i];
+
+      maskRegion.SetIndex(regionIndex);
+
+      auto regionOfInterestFilter = RegionOfInterestFilterType::New();
+      regionOfInterestFilter->SetInput(image);
+      regionOfInterestFilter->SetRegionOfInterest(maskRegion);
+      regionOfInterestFilter->Update();
+      adaptedImage = regionOfInterestFilter->GetOutput();
+    }
 
     // find min, max, minindex and maxindex
     typename MinMaxLabelFilterType::Pointer minMaxFilter = MinMaxLabelFilterType::New();
@@ -355,32 +409,8 @@ namespace mitk
 
       ImageStatisticsContainer::ImageStatisticsObject statObj;
 
-      // find min, max, minindex and maxindex
-      // make sure to only look in the masked region, use a masker for this
-
-      vnl_vector<int> minIndex(3), maxIndex(3);
-      Point3D worldCoordinateMin;
-      Point3D worldCoordinateMax;
-      itk::Index<3> imageIndexMin;
-      itk::Index<3> imageIndexMax;
-      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMinIndex(labelValue), worldCoordinateMin);
-      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMaxIndex(labelValue), worldCoordinateMax);
-
-      // The reference image may be a 2D slice (planar figure masks), so the index
-      // has to go through world coordinates. On rotated geometries the inverse
-      // transform carries floating-point noise, so the result has to be rounded
-      // rather than truncated.
-      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMin, imageIndexMin);
-      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMax, imageIndexMax);
-
-      for (unsigned int i = 0; i < 3; ++i)
-      {
-        minIndex[i] = static_cast<int>(imageIndexMin[i]);
-        maxIndex[i] = static_cast<int>(imageIndexMax[i]);
-      }
-
-      statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), minIndex);
-      statObj.AddStatistic(ImageStatisticsConstants::MAXIMUMPOSITION(), maxIndex);
+      statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), toImageIndex(minMaxFilter->GetMinIndex(labelValue)));
+      statObj.AddStatistic(ImageStatisticsConstants::MAXIMUMPOSITION(), toImageIndex(minMaxFilter->GetMaxIndex(labelValue)));
 
       auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
       auto numberOfVoxels =

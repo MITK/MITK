@@ -267,13 +267,7 @@ namespace
   // Returns empty string when the file or tag is absent.
   std::string ReadTopLevelString(const std::string& segPath, const DcmTagKey& tag)
   {
-    DcmFileFormat ff;
-    if (ff.loadFile(segPath.c_str()).bad())
-      return {};
-    OFString tmp;
-    if (ff.getDataset()->findAndGetOFString(tag, tmp).bad())
-      return {};
-    return tmp.c_str();
+    return mitk::test::ReadTag(segPath, tag);
   }
 
   // The per-slice source SOP Instance UIDs an image declares. Reading them

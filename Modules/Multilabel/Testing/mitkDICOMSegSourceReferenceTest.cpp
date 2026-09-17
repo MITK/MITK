@@ -26,8 +26,6 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include <dcmtk/dcmdata/dcdeftag.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include <dcmtk/ofstd/ofstring.h>
 
 #include <cstdlib>
 #include <filesystem>
@@ -83,24 +81,11 @@ private:
 
       // CppUnit reports an exception from setUp as a test error, so exiting
       // is the only route from inside a fixture to the 77 exit code ctest
-      // reads as a skip - cf. Modules/Core/test/mitkImageDataItemTest.cpp.
+      // reads as a skip - cf. Modules/PET/test/mitkPETPrivateTagLiftTest.cpp.
       std::exit(77);
     }
 
     return dir;
-  }
-
-  static std::string ReadTag(const std::string& path, const DcmTagKey& tag)
-  {
-    DcmFileFormat ff;
-    if (ff.loadFile(path.c_str()).bad() || ff.getDataset() == nullptr)
-      return {};
-
-    OFString value;
-    if (ff.getDataset()->findAndGetOFString(tag, value).bad())
-      return {};
-
-    return value.c_str();
   }
 
   /** Build the segmentation the Workbench would build: initialised from the
@@ -181,7 +166,7 @@ public:
       if (entry.path().extension() != ".dcm")
         continue;
 
-      const auto sopInstanceUID = ReadTag(entry.path().string(), DCM_SOPInstanceUID);
+      const auto sopInstanceUID = mitk::test::ReadTag(entry.path().string(), DCM_SOPInstanceUID);
       if (!sopInstanceUID.empty())
         m_ExpectedSOPInstanceUIDs.insert(sopInstanceUID);
     }

@@ -91,16 +91,13 @@ endif()
 if(_dicomSegCt3SliceExists)
   mitkAddCustomModuleTest(mitkDICOMSegSourceReferenceTest
     mitkDICOMSegSourceReferenceTest)
+
+  if(TARGET ${TESTDRIVER})
+    file(TO_CMAKE_PATH "${_dicomSegCt3SliceDir}" _dicomSegCt3SliceBakedDir)
+    target_compile_definitions(${TESTDRIVER} PRIVATE
+      MITK_MULTILABEL_DCMQI_CT3SLICE_DIR="${_dicomSegCt3SliceBakedDir}")
+  endif()
 else()
   message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegSourceReferenceTest "
     "(dcmqi ct-3slice source DICOMs not found under ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI).")
-endif()
-
-if(TARGET ${TESTDRIVER})
-  set(_dicomSegCt3SliceBakedDir "")
-  if(_dicomSegCt3SliceExists)
-    file(TO_CMAKE_PATH "${_dicomSegCt3SliceDir}" _dicomSegCt3SliceBakedDir)
-  endif()
-  target_compile_definitions(${TESTDRIVER} PRIVATE
-    MITK_MULTILABEL_DCMQI_CT3SLICE_DIR="${_dicomSegCt3SliceBakedDir}")
 endif()

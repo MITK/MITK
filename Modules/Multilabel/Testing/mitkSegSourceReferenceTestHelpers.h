@@ -28,6 +28,27 @@ namespace mitk
   namespace test
   {
     /**
+     * \brief The value of a top-level DICOM tag of the file at \c path.
+     *
+     * \return The tag's value as a string. An unreadable file, an absent
+     *         dataset or a missing tag all yield an empty string, so a
+     *         caller that compares against an expected value fails rather
+     *         than reading a stale or partial result.
+     */
+    inline std::string ReadTag(const std::string &path, const DcmTagKey &tag)
+    {
+      DcmFileFormat ff;
+      if (ff.loadFile(path.c_str()).bad() || ff.getDataset() == nullptr)
+        return {};
+
+      OFString value;
+      if (ff.getDataset()->findAndGetOFString(tag, value).bad())
+        return {};
+
+      return value.c_str();
+    }
+
+    /**
      * \brief Collect every ReferencedSOPInstanceUID below \c item, at any
      *        nesting depth.
      *

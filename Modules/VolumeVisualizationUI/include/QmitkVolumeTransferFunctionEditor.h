@@ -38,13 +38,13 @@ namespace Ui
 }
 
 /**
- * \brief The transfer function of one volume-rendered node, in two modes: a
- *        catalogued preset adjusted by colour and opacity windows, or a curve
- *        authored point by point.
+ * \brief The transfer function of one volume-rendered node: a catalogued preset
+ *        adjusted by colour and opacity windows, or a curve edited point by
+ *        point on the canvas that shows it.
  *
- * The two modes replace each other in place, so a host sees one widget rather
- * than a mode it has to manage. Authoring ends either by keeping the curve it
- * produced or by cancelling back to the one that stood when authoring began.
+ * Editing happens on that canvas rather than on a page of its own, so a host
+ * sees one widget throughout and has no mode to lay out around. What is drawn
+ * is kept; the curve that stood before it is not held on to.
  *
  * What the widget records on the node is a recipe rather than only a result -
  * the preset it started from plus the four window offsets - so that returning
@@ -104,48 +104,28 @@ signals:
    * \brief Emitted after the widget changed what the node renders as.
    *
    * The node is already updated, so a host has only to re-render - and to
-   * refresh its own controls, because loading or authoring a function switches
+   * refresh its own controls, because loading a function from a file switches
    * volume rendering on so that the result is visible at once.
    */
   void TransferFunctionChanged();
-
-  /**
-   * \brief Emitted when authoring a curve by hand starts or ends.
-   *
-   * Authoring takes the panel, not merely this widget: it wants the room, and a
-   * change confined to one section in the middle of a panel reads as a section
-   * that changed shape rather than as arriving somewhere. A host laying other
-   * sections out around this widget is expected to fold them away for the
-   * duration, and to put the panel back at its top either way.
-   */
-  void CustomModeChanged(bool active);
 
 private slots:
   void OnPresetSelected(const QString &presetName);
   void OnColorWindowChanged();
   void OnCanvasOpacityChanged();
   void OnResetAdjustments();
-  void OnCreateCustom();
   void OnImportCustom();
-  void OnCancelCustom();
-  void OnDoneCustom();
-  void OnSaveCustom();
-  void OnBlendModeChanged(int index);
 
 private:
   /** \brief Write the held function onto the node and re-seed the editor. */
   void ApplyCurrentTransferFunction();
 
-  /** \brief Record the blend mode on the node, and show it on the control.
+  /** \brief Record on the node the blend mode a preset or a loaded file brings.
    *
-   * Both, because either one alone leaves the two disagreeing: a preset brings
-   * a mode the control has to catch up with, and the control brings one the
-   * node has to.
+   * The mode travels with the curve rather than being chosen on its own, so
+   * whatever supplies the curve supplies this too.
    */
   void ApplyBlendMode(mitk::VolumeBlendMode blendMode);
-
-  /** \brief Point the blend mode control at what the bound node records. */
-  void ShowNodeBlendMode();
 
   /** \brief Take over the function the bound node already carries. */
   void AdoptTransferFunctionFromNode();
@@ -154,6 +134,17 @@ private:
    *         clear them when none is held.
    */
   void ShowAppliedTransferFunction();
+
+  /**
+   * \brief Enable the controls that apply to the node, the function and the
+   *        mode in force.
+   *
+   * Apart from ShowAppliedTransferFunction, which re-seeds the canvas and both
+   * baselines: entering an edit changes what may be done to the curve without
+   * changing the curve, and re-seeding for that would measure the sliders from
+   * an edit not yet made.
+   */
+  void UpdateControlAvailability();
 
   /** \brief Rebuild the function from the preset and offsets the node records.
    *  \return True if a complete recipe was found and re-executed.
@@ -191,13 +182,37 @@ private:
   void ResetAdjustSliders();
 
   /**
-   * \brief Swap the preset controls for the per-point editor, or back.
+   * \brief Hand the canvas over to point-by-point editing, or take it back.
    *
-   * A request for the mode already in force does nothing. SetDataNode cancels
-   * authoring on every selection change, whether any was in progress or not,
-   * and relies on that call being inert.
+   * Leaving keeps whatever was drawn - there is no way back to the curve that
+   * stood before it - so leaving is also where a curve that was really edited
+   * is recorded as answering to no preset.
+   *
+   * A request for the mode already in force does nothing. SetDataNode ends
+   * editing on every selection change, whether any was in progress or not, and
+   * relies on that call being inert.
    */
-  void SetCustomModeActive(bool active);
+  void SetEditModeActive(bool active);
+
+  /**
+   * \brief Point the canvas at the target the buttons name, and show which one
+   *        that is.
+   *
+   * The one place that turns "editing, on the colours" into what the canvas and
+   * the panel do about it, so that entering, leaving and switching target all
+   * arrive at the same state by the same route.
+   */
+  void ShowEditMode();
+
+  /**
+   * \brief Give the colour function back the handful of points it can be taken
+   *        hold of by, without changing the colours it shows.
+   *
+   * Once per edit: the window bakes itself into hundreds of evenly spaced
+   * points, and doing this a second time would copy over the colours just
+   * edited. Does nothing where there is nothing to restore.
+   */
+  void RestoreColorHandles();
 
   /**
    * \brief Lay the presets out as a grid of previews, or as a list of names
@@ -282,23 +297,33 @@ private:
 
   mitk::TransferFunction::Pointer m_AppliedTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BaseColorFn;
-  mitk::TransferFunction::Pointer m_PreEditTransferFunction;
 
-  /** \brief The mode that stood when authoring began.
+  /** \brief Whether the canvas is currently editable.
    *
-   * Meaningful only alongside m_PreEditTransferFunction, and restored with it:
-   * cancelling back to the previous curve while keeping a mode picked during
-   * the abandoned edit would render that curve in a mode nobody chose for it.
+   * Kept rather than read back from the button that sets it, which is also set
+   * from here, and which reports nothing at all while the panel it sits on is
+   * hidden behind another tab.
    */
-  mitk::VolumeBlendMode m_PreEditBlendMode { mitk::VolumeBlendMode::Composite };
+  bool m_EditModeActive = false;
 
-  /** \brief Whether the per-point editor is the mode currently in force.
+  /** \brief Whether any point was added, moved, removed or recoloured since
+   *         editing began.
    *
-   * Kept rather than read back from the panels it swaps: a view sitting behind
-   * another tab has its part control hidden, and every widget in it then
-   * reports isVisible() false whatever mode the editor is in.
+   * What separates leaving an edit from never having made one: an untouched
+   * curve is still the preset it came from, and dropping the recipe for it
+   * would cost the sliders their baseline for nothing.
    */
-  bool m_CustomModeActive = false;
+  bool m_CurveEdited = false;
+
+  /** \brief Whether the colour function has been reduced to countable handles
+   *         for the edit in progress.
+   *
+   * A colour window bakes itself into hundreds of evenly spaced points, which
+   * no one can edit by hand, so editing colours starts by putting the same
+   * colours back on the baseline's own nodes. Once per edit: a second reduction
+   * would copy over the colours just edited.
+   */
+  bool m_ColorHandlesRestored = false;
 
   /** \brief Whether the presets are listed as names beside small previews
    *         rather than laid out as a grid of large ones.

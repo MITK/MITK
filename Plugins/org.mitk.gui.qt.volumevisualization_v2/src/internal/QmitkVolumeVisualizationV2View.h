@@ -47,7 +47,6 @@ private Q_SLOTS:
   void OnToggleRendering();
   void OnTransferFunctionChanged();
   void OnLightingChanged();
-  void OnCustomModeChanged(bool active);
 
 private:
   void CreateQtPartControl(QWidget *parent) override;
@@ -62,15 +61,6 @@ private:
    * function - and so cannot be the widget's to decide.
    */
   void UpdateLightingSection();
-
-  /** \brief Put the panel back at its top.
-   *
-   * The panel is taller than the room it gets and sits in a scroll area it
-   * neither owns nor is told about, so entering or leaving a mode that changes
-   * which sections exist would otherwise leave the view scrolled to an offset
-   * measured against sections that are no longer there.
-   */
-  void ScrollToTop();
 
   /** \brief Install the light rig on a render window part that has just become
    * available.
@@ -106,15 +96,6 @@ private:
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
-
-  /** \brief Whether the editor has taken the panel over to author a curve.
-   *
-   * Kept here because UpdateInterface decides what the panel shows and runs
-   * again while authoring - the blend mode control changes the transfer
-   * function, which the view answers with a full refresh. Were the sections
-   * hidden where the mode changes instead, that refresh would bring them back.
-   */
-  bool m_CustomModeActive = false;
 };
 
 #endif

@@ -15,14 +15,11 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkLevelWindow.h>
 #include <mitkProperties.h>
-#include <mitkRenderingManager.h>
-#include <mitkTimeNavigationController.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
 
 #include <QmitkCombinedTransferFunctionCanvas.h>
 #include <QmitkStyleManager.h>
-#include <QmitkTransferFunctionWidget.h>
 #include <QmitkVolumeThumbnailRenderer.h>
 
 #include <ui_QmitkVolumeTransferFunctionEditorControls.h>
@@ -32,7 +29,7 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
-#include <QComboBox>
+#include <QButtonGroup>
 #include <QColor>
 #include <QEvent>
 #include <QFileDialog>
@@ -221,15 +218,6 @@ namespace
     return customTransferFunction;
   }
 
-  /** \brief The blend mode a node renders in, for callers that need a value
-   *         even where mitk::GetVolumeBlendMode has none: a null node, or one
-   *         naming a mode MITK does not offer. Both read as composite here.
-   */
-  mitk::VolumeBlendMode BlendModeOrComposite(const mitk::DataNode *node)
-  {
-    return mitk::GetVolumeBlendMode(node).value_or(mitk::VolumeBlendMode::Composite);
-  }
-
   /** \brief The intensity band the editor is scaled to.
    *
    * Not the image's outermost values: one saturated voxel is enough to set the
@@ -291,8 +279,6 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 {
   m_Controls->setupUi(this);
 
-  m_Controls->tfControlPanelsWidget->ShowGradientOpacityFunction(false);
-
   auto *presetList = m_Controls->presetListWidget;
 
   // The entries state the size they occupy themselves, so there is nothing
@@ -350,22 +336,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
-  m_Controls->advancedTfPanel->setVisible(false);
-
-  // Identified by their stable ids rather than by row, so that reordering the
-  // modes, or putting a separator between them the way the presets grid does,
-  // cannot silently change what a row selects.
-  for (const auto &description : mitk::VolumeBlendModeDescription::GetAll())
-  {
-    m_Controls->blendModeComboBox->addItem(
-      QString::fromStdString(description.label), QString::fromStdString(description.id));
-    m_Controls->blendModeComboBox->setItemData(
-      m_Controls->blendModeComboBox->count() - 1,
-      QString::fromStdString(description.description), Qt::ToolTipRole);
-  }
-
-  connect(m_Controls->blendModeComboBox, &QComboBox::currentIndexChanged,
-    this, &QmitkVolumeTransferFunctionEditor::OnBlendModeChanged);
+  // Exclusive, so exactly one target is named for as long as editing is on, and
+  // the pair reads as one switch with two positions.
+  auto *editTargetGroup = new QButtonGroup(this);
+  editTargetGroup->addButton(m_Controls->editTargetCurveButton);
+  editTargetGroup->addButton(m_Controls->editTargetColorButton);
 
   // A click rather than the current entry changing: the current entry is also
   // set from what a node records, and reacting to that would re-apply the
@@ -393,21 +368,23 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnResetAdjustments);
 
-  connect(m_Controls->createTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnCreateCustom);
   connect(m_Controls->loadTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnImportCustom);
-  connect(m_Controls->cancelTfCreationButton, &QPushButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnCancelCustom);
 
-  // What a dialog's close box is to its Cancel button: the same way out, said
-  // twice, so that one of them is on screen whatever the panel is scrolled to.
-  connect(m_Controls->backToPresetsButton, &QToolButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnCancelCustom);
-  connect(m_Controls->doneTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnDoneCustom);
-  connect(m_Controls->saveUserTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnSaveCustom);
+  connect(m_Controls->editModeButton, &QToolButton::toggled,
+    this, &QmitkVolumeTransferFunctionEditor::SetEditModeActive);
+
+  // One connection for the pair: checking either one unchecks the other, so
+  // both halves of a switch arrive as this button changing.
+  connect(m_Controls->editTargetCurveButton, &QToolButton::toggled,
+    this, [this] { this->ShowEditMode(); });
+
+  connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::PointsChanged,
+    this, [this] { m_CurveEdited = true; });
+
+  // Editing starts on the curve, and starts off.
+  m_Controls->editTargetCurveButton->setChecked(true);
+  this->ShowEditMode();
 }
 
 QmitkVolumeTransferFunctionEditor::~QmitkVolumeTransferFunctionEditor() = default;
@@ -424,10 +401,21 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
 {
   QWidget::changeEvent(event);
 
+  if (event->type() != QEvent::EnabledChange)
+    return;
+
   // Nothing else announces that the previews became worth drawing: switching
   // volume rendering on deliberately does not re-bind the node.
-  if (event->type() == QEvent::EnabledChange && this->isEnabled())
+  if (this->isEnabled())
+  {
     this->StartThumbnailGeneration();
+    return;
+  }
+
+  // Switching volume rendering off is what greys the editor out, and an edit
+  // cannot outlive the thing it was being made to. What was drawn stays on the
+  // node: it was written into the function as it was drawn.
+  this->SetEditModeActive(false);
 }
 
 void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
@@ -555,11 +543,11 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
 
 void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
 {
-  // Authoring targets the node that was current when it started, and the
-  // pre-edit snapshot is the only way back to that node's previous appearance.
-  // This has to happen before the function is dropped below, or the snapshot
-  // goes with it and the edits are stranded on a node nothing points at.
-  this->OnCancelCustom();
+  // An edit belongs to the node that was current when it started, and leaving
+  // is what records the curve on that node. This has to happen before the
+  // function is dropped below, or the record is written against the wrong node
+  // - or against none at all.
+  this->SetEditModeActive(false);
 
   m_DataNode = node;
   m_AppliedTransferFunction = nullptr;
@@ -638,45 +626,6 @@ void QmitkVolumeTransferFunctionEditor::ApplyBlendMode(mitk::VolumeBlendMode ble
     return;
 
   mitk::SetVolumeBlendMode(node.GetPointer(), blendMode);
-
-  this->ShowNodeBlendMode();
-}
-
-void QmitkVolumeTransferFunctionEditor::ShowNodeBlendMode()
-{
-  const auto *description =
-    mitk::VolumeBlendModeDescription::FromMode(BlendModeOrComposite(m_DataNode.Lock().GetPointer()));
-
-  if (description == nullptr)
-    return;
-
-  // Blocked because this reports what the node already says; letting it through
-  // would write that same value straight back and, on the way, emit a change
-  // nobody made.
-  const QSignalBlocker blocker(m_Controls->blendModeComboBox);
-
-  m_Controls->blendModeComboBox->setCurrentIndex(
-    m_Controls->blendModeComboBox->findData(QString::fromStdString(description->id)));
-}
-
-void QmitkVolumeTransferFunctionEditor::OnBlendModeChanged(int index)
-{
-  const auto *description =
-    mitk::VolumeBlendModeDescription::FromId(m_Controls->blendModeComboBox->itemData(index).toString().toStdString());
-
-  if (description == nullptr)
-    return;
-
-  auto node = m_DataNode.Lock();
-
-  if (node.IsNull())
-    return;
-
-  mitk::SetVolumeBlendMode(node.GetPointer(), description->mode);
-
-  // The curve itself did not change, but what the render window makes of it
-  // did, and the host has no other signal to redraw on.
-  emit TransferFunctionChanged();
 }
 
 void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
@@ -907,17 +856,28 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
   this->SnapshotAppliedTransferFunction();
   this->ResetAdjustSliders();
 
+  this->UpdateControlAvailability();
+}
+
+void QmitkVolumeTransferFunctionEditor::UpdateControlAvailability()
+{
+  auto node = m_DataNode.Lock();
+
   // The adjust controls and the canvas mean nothing without a function to act
-  // on, and neither does authoring, which starts from the applied curve.
-  // Picking a preset or loading one from file gets by with a node alone.
+  // on, and neither does editing, which starts from the applied curve. Picking
+  // a preset or loading one from file gets by with a node alone.
+  //
+  // While a curve is being edited the three that would replace it stand down:
+  // the sliders replay a baseline snapshotted before the edits began, and a
+  // preset or a file would overwrite the curve outright.
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
   m_Controls->presetViewModeButton->setEnabled(hasNode);
-  m_Controls->presetListWidget->setEnabled(hasNode);
-  m_Controls->createTfButton->setEnabled(adjustable);
-  m_Controls->loadTfButton->setEnabled(hasNode);
-  m_Controls->adjustPresetPanel->setEnabled(adjustable);
+  m_Controls->presetListWidget->setEnabled(hasNode && !m_EditModeActive);
+  m_Controls->loadTfButton->setEnabled(hasNode && !m_EditModeActive);
+  m_Controls->editModeButton->setEnabled(adjustable);
+  m_Controls->adjustPresetPanel->setEnabled(adjustable && !m_EditModeActive);
   m_Controls->combinedTfCanvas->setEnabled(adjustable);
 }
 
@@ -1071,76 +1031,131 @@ void QmitkVolumeTransferFunctionEditor::OnResetAdjustments()
   m_Controls->colorWidthSlider->setValue(this->NeutralColorWidth());
 }
 
-void QmitkVolumeTransferFunctionEditor::SetCustomModeActive(bool active)
+void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 {
-  // SetDataNode cancels authoring on every selection change, whether or not any
-  // was in progress. Everything below is a transition - it moves focus and has
-  // the host lay its panel out again - so a request for the mode already in
-  // force stops here, or selecting an image scrolls the host's panel back to
-  // its top and takes focus off whatever the user was working in.
-  if (active == m_CustomModeActive)
+  // SetDataNode ends editing on every selection change, whether or not any was
+  // under way. Everything below is a transition, so a request for the mode
+  // already in force stops here rather than re-running it.
+  if (active == m_EditModeActive)
     return;
 
-  m_CustomModeActive = active;
-
-  m_Controls->advancedTfPanel->setVisible(active);
-
-  // Preset selection and the sliders that adjust it both live on this panel,
-  // and authoring supersedes both.
-  m_Controls->transferFunctionPanel->setVisible(!active);
-
-  // The button that was clicked has just been hidden, so focus is about to be
-  // handed back to the window unless it is given somewhere. Both targets sit at
-  // the top of the page they belong to, which is where the panel is scrolled to.
-  if (active)
-    m_Controls->backToPresetsButton->setFocus(Qt::OtherFocusReason);
-  else
-    m_Controls->presetListWidget->setFocus(Qt::OtherFocusReason);
-
-  emit CustomModeChanged(active);
-}
-
-void QmitkVolumeTransferFunctionEditor::OnCreateCustom()
-{
   auto node = m_DataNode.Lock();
 
-  // Authoring is what hands the per-point editor the node it writes to, so
-  // entering the mode with nothing to hand over would leave it bound to the
-  // node it was given last while the page names this one.
-  if (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
+  if (active && (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr))
+  {
+    // Nothing to put handles on. The button that asked has already gone down,
+    // so it is put back where the state says it belongs.
+    this->ShowEditMode();
+    return;
+  }
+
+  m_EditModeActive = active;
+
+  if (active)
+  {
+    m_CurveEdited = false;
+    m_ColorHandlesRestored = false;
+
+    // The curve is the half a preset is usually wanted for, so editing opens on
+    // it and the colours are a switch away.
+    m_Controls->editTargetCurveButton->setChecked(true);
+
+    // Nothing about the function changed, only what may now be done to it -
+    // which is why this is not ShowAppliedTransferFunction: re-seeding here
+    // would take the colour baseline from an already windowed function and
+    // snap all four sliders to neutral for an edit not yet made.
+    this->ShowEditMode();
+
+    return;
+  }
+
+  this->ShowEditMode();
+
+  // An untouched curve is still the preset it came from, and everything below
+  // would take that away for nothing: the recipe the node records, and the
+  // positions the sliders were left in, which are offsets from a baseline that
+  // has not moved either.
+  if (!m_CurveEdited)
     return;
 
-  // Snapshot of the preset function so Cancel can restore it verbatim, which
-  // matters once the adjust sliders have moved.
-  m_PreEditTransferFunction = m_AppliedTransferFunction->Clone();
-  m_PreEditBlendMode = BlendModeOrComposite(node.GetPointer());
+  if (node.IsNotNull())
+  {
+    // Drawn by hand, so neither a preset name nor a set of offsets describes
+    // the curve any more, and replaying them on the next selection would
+    // rebuild the preset over it.
+    this->RecordCustomTransferFunction(node);
+    this->ClearPresetSelection();
+  }
 
-  // A colour window bakes itself into 256 evenly spaced RGB points, which
-  // would swamp the per-point editor. Restoring the baseline first keeps the
-  // handles countable.
-  m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_BaseColorFn);
+  // Re-seeds the canvas and re-snapshots both baselines, so the sliders now
+  // measure from the curve that was drawn rather than from the one it started
+  // out as. They return to neutral because that is where the curve now on show
+  // sits: carrying the old offsets over would apply them a second time on the
+  // next nudge.
+  this->ApplyCurrentTransferFunction();
+}
 
-  // The per-point editor draws one time step's histogram and defaults to the
-  // first, which on a 4D image is not the one the navigator is showing.
-  const auto timeStep =
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
+void QmitkVolumeTransferFunctionEditor::ShowEditMode()
+{
+  using EditTarget = QmitkCombinedTransferFunctionCanvas::EditTarget;
 
-  m_Controls->tfControlPanelsWidget->SetDataNode(node, timeStep);
+  // The pair is exclusive, so one button's state describes both positions.
+  const bool editingColor = !m_Controls->editTargetCurveButton->isChecked();
+
+  const auto target = !m_EditModeActive
+    ? EditTarget::None
+    : (editingColor ? EditTarget::Color : EditTarget::Opacity);
+
+  if (target == EditTarget::Color)
+    this->RestoreColorHandles();
+
+  m_Controls->combinedTfCanvas->SetEditTarget(target);
+
+  {
+    // The button is both what asks for the mode and what reports it, so letting
+    // this through would come straight back as a request to change it.
+    const QSignalBlocker blocker(m_Controls->editModeButton);
+    m_Controls->editModeButton->setChecked(m_EditModeActive);
+  }
+
+  m_Controls->editTargetCurveButton->setVisible(m_EditModeActive);
+  m_Controls->editTargetColorButton->setVisible(m_EditModeActive);
+  m_Controls->canvasHintLabel->setVisible(m_EditModeActive);
+
+  // A context menu would name these; buttons cannot, and a gesture nothing
+  // mentions is one nobody finds.
+  m_Controls->canvasHintLabel->setText(editingColor
+    ? "<small>Left-click adds a colour, drag moves it, right-click removes it, "
+      "double-click recolours it.</small>"
+    : "<small>Left-click adds a point, drag moves it, right-click removes it.</small>");
+
+  // Which controls would replace the curve being edited depends on the mode
+  // this just changed.
+  this->UpdateControlAvailability();
+}
+
+void QmitkVolumeTransferFunctionEditor::RestoreColorHandles()
+{
+  if (m_ColorHandlesRestored || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
+    return;
+
+  auto *colorFunction = m_AppliedTransferFunction->GetColorTransferFunction();
+
+  // A colour window bakes itself into 256 evenly spaced RGB points, which no
+  // one can take hold of. DeepCopy brings back the baseline's own handful -
+  // and, with them, the colour space and clamping the window was faithful to -
+  // and the window is then applied to those nodes instead of to samples, so the
+  // colours become editable without moving.
+  colorFunction->DeepCopy(m_BaseColorFn);
+
+  mitk::ApplyColorWindow(colorFunction, m_DataRange[0], m_DataRange[1],
+    m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value());
+
+  m_ColorHandlesRestored = true;
+
+  m_Controls->combinedTfCanvas->update();
 
   emit TransferFunctionChanged();
-
-  // The control is only on screen in authoring mode, so this is where it has to
-  // catch up with whatever the preset the node came from left behind.
-  this->ShowNodeBlendMode();
-
-  // The page covers the image selector, so it has to name the image itself.
-  // Escaped, because the label reads its text as markup and a node is named by
-  // whoever loaded it.
-  m_Controls->customHintLabel->setText(
-    QString("<small>Editing <b>%1</b>. The 3D window follows every change.</small>")
-      .arg(QString::fromStdString(node->GetName()).toHtmlEscaped()));
-
-  this->SetCustomModeActive(true);
 }
 
 void QmitkVolumeTransferFunctionEditor::OnImportCustom()
@@ -1189,89 +1204,6 @@ void QmitkVolumeTransferFunctionEditor::OnImportCustom()
   this->ClearPresetSelection();
 
   this->ApplyCurrentTransferFunction();
-}
-
-void QmitkVolumeTransferFunctionEditor::OnCancelCustom()
-{
-  if (m_AppliedTransferFunction.IsNotNull() && m_PreEditTransferFunction.IsNotNull())
-  {
-    // Discard the authoring edits: copy the pre-edit functions back into the
-    // live ones in place, so the canvas and node pointers stay valid and the
-    // opacity baseline, unchanged, still matches the restored curve.
-    m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(
-      m_PreEditTransferFunction->GetColorTransferFunction());
-    m_AppliedTransferFunction->GetScalarOpacityFunction()->DeepCopy(
-      m_PreEditTransferFunction->GetScalarOpacityFunction());
-    m_AppliedTransferFunction->GetGradientOpacityFunction()->DeepCopy(
-      m_PreEditTransferFunction->GetGradientOpacityFunction());
-    m_PreEditTransferFunction = nullptr;
-
-    this->ApplyBlendMode(m_PreEditBlendMode);
-
-    m_Controls->combinedTfCanvas->update();
-
-    emit TransferFunctionChanged();
-  }
-
-  this->SetCustomModeActive(false);
-}
-
-void QmitkVolumeTransferFunctionEditor::OnDoneCustom()
-{
-  auto node = m_DataNode.Lock();
-
-  // Before anything else can cancel: SetDataNode cancels authoring on every
-  // selection change, and a snapshot left behind would copy the pre-authoring
-  // curve back over the one just kept.
-  m_PreEditTransferFunction = nullptr;
-
-  if (node.IsNull() || m_AppliedTransferFunction.IsNull())
-  {
-    this->SetCustomModeActive(false);
-    return;
-  }
-
-  // Authored point by point, so the preset name and the four offsets no longer
-  // describe the curve, and replaying them on the next selection would rebuild
-  // the preset and discard it. Same reasoning as a function loaded from a file.
-  this->RecordCustomTransferFunction(node);
-  this->ClearPresetSelection();
-
-  // Enable rendering so the authored curve is visible immediately. The host
-  // learns of it through TransferFunctionChanged.
-  node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
-
-  this->SetCustomModeActive(false);
-
-  // Re-seeds the combined canvas and re-snapshots both baselines, so the adjust
-  // sliders now measure from the authored curve rather than from the preset it
-  // started out as.
-  this->ApplyCurrentTransferFunction();
-}
-
-void QmitkVolumeTransferFunctionEditor::OnSaveCustom()
-{
-  if (m_AppliedTransferFunction.IsNull())
-    return;
-
-  auto fileName =
-    QFileDialog::getSaveFileName(this, "Save transfer function", QString(), "Transfer function (*.json)");
-
-  if (fileName.isEmpty())
-    return;
-
-  if (!fileName.endsWith(".json", Qt::CaseInsensitive))
-    fileName += ".json";
-
-  std::ofstream stream(fileName.toStdString());
-  const auto name = QFileInfo(fileName).completeBaseName().toStdString();
-
-  if (!stream.is_open() ||
-      !mitk::TransferFunctionPresets::SaveTransferFunction(stream, name, m_AppliedTransferFunction.GetPointer(),
-        BlendModeOrComposite(m_DataNode.Lock().GetPointer())))
-  {
-    QMessageBox::warning(this, "Save transfer function", "Could not save the transfer function.");
-  }
 }
 
 void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()

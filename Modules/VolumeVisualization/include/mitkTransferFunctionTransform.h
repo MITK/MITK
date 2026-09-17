@@ -45,6 +45,31 @@ namespace mitk
     double shift,
     double width,
     int samples = 256);
+
+  /**
+   * \brief Window a color transfer function in place, by moving the nodes it
+   *        already has rather than by sampling new ones.
+   *
+   * The same window as ResampleColorWindow, over the same range, and the same
+   * colors - carried by the function's own handful of nodes instead of 256
+   * evenly spaced samples. That is what makes the result editable by hand: one
+   * node per color the function names, where the table has one per pixel column
+   * and no way to tell which of them was meant.
+   *
+   * The window is read from \p function's own range, before anything moves, so
+   * windowing a function twice windows it twice over.
+   *
+   * Nodes are left no closer than (dataMax - dataMin) / 255 - the spacing the
+   * resampled table guarantees - because VTK sizes its lookup table by the
+   * smallest gap between nodes, and a window narrow enough to collapse them
+   * would ask the renderer for a table of millions of entries.
+   */
+  MITKVOLUMEVISUALIZATION_EXPORT void ApplyColorWindow(
+    vtkColorTransferFunction *function,
+    double dataMin,
+    double dataMax,
+    double shift,
+    double width);
 }
 
 #endif

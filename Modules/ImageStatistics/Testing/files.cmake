@@ -8,6 +8,7 @@ set(MODULE_TESTS
   mitkImageStatisticsTextureAnalysisTest.cpp
   mitkImageStatisticsContainerTest.cpp
   mitkImageStatisticsContainerManagerTest.cpp
+  mitkMinMaxLabelImageFilterWithIndexTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

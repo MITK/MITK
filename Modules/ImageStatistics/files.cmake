@@ -1,7 +1,6 @@
 set(H_FILES
   itkMultiGaussianImageSource.h
   mitkLabelStatisticsImageFilter.h
-  mitkMaskUtilities.h
   mitkMedianAccumulator.h
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h

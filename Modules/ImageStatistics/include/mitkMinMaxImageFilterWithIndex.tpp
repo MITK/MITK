@@ -25,84 +25,74 @@ void MinMaxImageFilterWithIndex< TInputImage >::ThreadedGenerateData(const Regio
                                       outputRegionForThread,
                                       ThreadIdType threadId)
 {
-  const SizeValueType size0 = outputRegionForThread.GetSize(0);
-  if( size0 == 0)
-    {
+  if (outputRegionForThread.GetNumberOfPixels() == 0)
+  {
     return;
-    }
-  PixelType value;
-
-  PixelType threadMin, threadMax;
-  IndexType threadMinIndex;
-  IndexType threadMaxIndex;
-  threadMinIndex.Fill(0);
-  threadMaxIndex.Fill(0);
-
-  threadMin = std::numeric_limits<PixelType>::max();
-  threadMax = std::numeric_limits<PixelType>::min();
+  }
 
   ImageRegionConstIteratorWithIndex< TInputImage > it (this->GetInput(), outputRegionForThread);
 
-  // do the work
-  while ( !it.IsAtEnd() )
+  // The first pixel seeds the extrema. Seeding with numeric limits instead would
+  // never accept a region whose pixels all equal that limit, which for unsigned
+  // types is an all-zero region.
+  ThreadExtrema extrema{ it.Get(), it.Get(), it.GetIndex(), it.GetIndex() };
+
+  for (++it; !it.IsAtEnd(); ++it)
   {
-    value = it.Get();
-    if (value < threadMin)
+    const PixelType value = it.Get();
+
+    if (value < extrema.m_Min)
     {
-      threadMin = value;
-      threadMinIndex = it.GetIndex();
+      extrema.m_Min = value;
+      extrema.m_MinIndex = it.GetIndex();
     }
-    if (value > threadMax)
+    if (value > extrema.m_Max)
     {
-      threadMax = value;
-      threadMaxIndex = it.GetIndex();
+      extrema.m_Max = value;
+      extrema.m_MaxIndex = it.GetIndex();
     }
-    ++it;
   }
 
-  m_ThreadMax[threadId] = threadMax;
-  m_ThreadMin[threadId] = threadMin;
-  m_ThreadMaxIndex[threadId] = threadMaxIndex;
-  m_ThreadMinIndex[threadId] = threadMinIndex;
+  m_ThreadExtrema[threadId] = extrema;
 }
 
 template< typename TInputImage >
 void MinMaxImageFilterWithIndex< TInputImage >::BeforeThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
-  m_ThreadMin.resize(numberOfThreads);
-  m_ThreadMax.resize(numberOfThreads);
-  m_ThreadMinIndex.resize(numberOfThreads);
-  m_ThreadMaxIndex.resize(numberOfThreads);
-
-  for (unsigned int i =0; i < numberOfThreads; i++)
-  {
-    m_ThreadMin[i] = std::numeric_limits<PixelType>::max();
-    m_ThreadMax[i] = std::numeric_limits<PixelType>::min();
-  }
+  m_ThreadExtrema.assign(this->GetNumberOfWorkUnits(), std::nullopt);
 
   m_Min = std::numeric_limits<PixelType>::max();
-  m_Max = std::numeric_limits<PixelType>::min();
-
+  m_Max = std::numeric_limits<PixelType>::lowest();
+  m_MinIndex.Fill(0);
+  m_MaxIndex.Fill(0);
 }
 
 template< typename TInputImage >
 void MinMaxImageFilterWithIndex< TInputImage >::AfterThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
+  // The first thread with a region seeds the result, so ties resolve to the
+  // lowest thread, i.e. the first pixel in scan order.
+  bool first = true;
 
-  for (ThreadIdType i = 0; i < numberOfThreads; i++)
+  for (const auto& threadExtrema : m_ThreadExtrema)
   {
-    if (m_ThreadMin[i] < m_Min)
+    if (!threadExtrema.has_value())
     {
-      m_Min = m_ThreadMin[i];
-      m_MinIndex = m_ThreadMinIndex[i];
+      continue;
     }
-    if (m_ThreadMax[i] > m_Max)
+
+    if (first || threadExtrema->m_Min < m_Min)
     {
-      m_Max = m_ThreadMax[i];
-      m_MaxIndex = m_ThreadMaxIndex[i];
+      m_Min = threadExtrema->m_Min;
+      m_MinIndex = threadExtrema->m_MinIndex;
     }
+    if (first || threadExtrema->m_Max > m_Max)
+    {
+      m_Max = threadExtrema->m_Max;
+      m_MaxIndex = threadExtrema->m_MaxIndex;
+    }
+
+    first = false;
   }
 }
 }

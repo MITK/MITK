@@ -26,8 +26,9 @@ namespace mitk
  *
  * This mask generator takes an external binary or label image (set via
  * SetImageMask()) and provides it as a mask for the ImageStatisticsCalculator.
- * The mask image is internally adapted (e.g., time step extraction) to match
- * the input image geometry.
+ * Only the time step matching the requested time point is selected. The mask
+ * has to lie on the voxel grid of the input image (see mitk::IsSubGeometry);
+ * it may cover a sub-region of the image.
  *
  * \sa MaskGenerator
  * \sa ImageStatisticsCalculator

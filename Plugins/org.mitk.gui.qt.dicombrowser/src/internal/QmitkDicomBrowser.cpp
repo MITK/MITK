@@ -125,8 +125,7 @@ namespace
         auto structNode = mitk::DataNode::New();
         structNode->SetData(countourModelSet);
         structNode->SetProperty("name", aStruct->GetProperty("name"));
-        structNode->SetProperty("color", aStruct->GetProperty("contour.color"));
-        structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
+        structNode->SetProperty("color", aStruct->GetProperty("color"));
         structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
 
         dataStorage->Add(structNode);

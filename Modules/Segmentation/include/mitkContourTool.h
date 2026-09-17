@@ -27,7 +27,7 @@ namespace mitk
     \brief Simple contour filling tool.
 
     \sa FeedbackContourTool
-    \sa ExtractImageFilter
+    \sa ExtractSliceFilter
 
     \ingroup Interaction
     \ingroup ToolManagerEtAl

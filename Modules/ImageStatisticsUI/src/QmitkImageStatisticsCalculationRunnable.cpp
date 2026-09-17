@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkImageMaskGenerator.h>
 #include <mitkMultiLabelMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
+#include <mitkAndMaskGenerator.h>
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkImageStatisticsContainerManager.h>
@@ -108,6 +109,8 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   // Bug 13416 : The ImageStatistics::SetImageMask() method can throw exceptions, i.e. when the dimensionality
   // of the masked and input image differ, we need to catch them and mark the calculation as failed
   // the same holds for the ::SetPlanarFigure()
+  mitk::MaskGenerator::Pointer roiMaskGenerator;
+
   try
   {
     auto multiLabelMask = dynamic_cast<const mitk::MultiLabelSegmentation*>(m_MaskData.GetPointer());
@@ -116,23 +119,23 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
 
     if (nullptr != multiLabelMask)
     {
-      mitk::MultiLabelMaskGenerator::Pointer imgMask = mitk::MultiLabelMaskGenerator::New();
-      imgMask->SetMultiLabelSegmentation(multiLabelMask);
-      calculator->SetMask(imgMask.GetPointer());
+      auto multiLabelMaskGen = mitk::MultiLabelMaskGenerator::New();
+      multiLabelMaskGen->SetMultiLabelSegmentation(multiLabelMask);
+      roiMaskGenerator = multiLabelMaskGen;
     }
     else if (nullptr != binLabelMask)
     {
-      mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
-      imgMask->SetInputImage(m_StatisticsImage);
-      imgMask->SetImageMask(binLabelMask);
-      calculator->SetMask(imgMask.GetPointer());
+      auto imgMaskGen = mitk::ImageMaskGenerator::New();
+      imgMaskGen->SetInputImage(m_StatisticsImage);
+      imgMaskGen->SetImageMask(binLabelMask);
+      roiMaskGenerator = imgMaskGen;
     }
     else if (nullptr != pfMask)
     {
-      mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
+      auto pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
       pfMaskGen->SetInputImage(m_StatisticsImage);
       pfMaskGen->SetPlanarFigure(pfMask->Clone());
-      calculator->SetMask(pfMaskGen.GetPointer());
+      roiMaskGenerator = pfMaskGen;
     }
   }
   catch (const std::exception &e)
@@ -142,17 +145,31 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
     statisticCalculationSuccessful = false;
   }
 
+  mitk::MaskGenerator::Pointer maskGenerator = roiMaskGenerator;
+
   if (this->m_IgnoreZeros)
   {
-    mitk::IgnorePixelMaskGenerator::Pointer ignorePixelValueMaskGen = mitk::IgnorePixelMaskGenerator::New();
-    ignorePixelValueMaskGen->SetIgnoredPixelValue(0);
-    ignorePixelValueMaskGen->SetInputImage(m_StatisticsImage);
-    calculator->SetSecondaryMask(ignorePixelValueMaskGen.GetPointer());
+    auto ignoreZeroMaskGen = mitk::IgnorePixelMaskGenerator::New();
+    ignoreZeroMaskGen->SetIgnoredPixelValue(0);
+    ignoreZeroMaskGen->SetInputImage(m_StatisticsImage);
+
+    if (roiMaskGenerator.IsNotNull())
+    {
+      auto andMaskGen = mitk::AndMaskGenerator::New();
+      andMaskGen->SetPrimaryMaskGenerator(roiMaskGenerator);
+      andMaskGen->SetSecondaryMaskGenerator(ignoreZeroMaskGen);
+      andMaskGen->SetSecondaryLabelValue(1);
+      maskGenerator = andMaskGen;
+    }
+    else
+    {
+      // Without a region of interest the ignore mask is the mask itself, so the
+      // statistics are reported under its label value 1.
+      maskGenerator = ignoreZeroMaskGen;
+    }
   }
-  else
-  {
-    calculator->SetSecondaryMask(nullptr);
-  }
+
+  calculator->SetMask(maskGenerator);
 
   calculator->SetNBinsForHistogramStatistics(m_HistogramNBins);
 

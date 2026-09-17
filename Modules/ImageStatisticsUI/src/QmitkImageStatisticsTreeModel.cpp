@@ -297,13 +297,16 @@ void QmitkImageStatisticsTreeModel::UpdateInputObservers()
   {
     AddNameObserver(node, m_InputObservers, handler);
 
-    // Renaming or recoloring a label modifies only the segmentation, never its node,
-    // therefore the segmentation has to be observed directly.
+    // Renaming or recoloring a label or renaming a group modifies only the segmentation,
+    // never its node, therefore the segmentation has to be observed directly.
     const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(
       node.IsNull() ? nullptr : node->GetData());
 
     if (nullptr != segmentation)
+    {
       m_InputObservers.emplace_back(segmentation, mitk::LabelModifiedEvent(), handler);
+      m_InputObservers.emplace_back(segmentation, mitk::GroupModifiedEvent(), handler);
+    }
   }
 }
 
@@ -458,12 +461,68 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
   }
 }
 
+/** Adds the label rows of a mask, ordered like the Segmentation View if the mask is a
+segmentation: grouped by group, within a group by class name and then by label value.
+The value order comes for free because the statistics container enumerates its label
+values sorted, and SplitLabelValuesByClassName keeps that order inside a class. Group rows
+are only added if the segmentation has more than one group, so the common single-group
+case keeps its compact tree. Returns true if group rows were added. */
+bool AddLabelTreeItemsForMask(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, const mitk::ImageStatisticsContainer::LabelValueVectorType& labelValues, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem, bool& hasMultipleTimesteps)
+{
+  const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(maskNode->GetData());
+
+  if (nullptr == segmentation)
+  {
+    AddLabelTreeItems(statistic, imageNode, maskNode, labelValues, statisticNames, isWIP, parentItem, hasMultipleTimesteps);
+    return false;
+  }
+
+  // Statistics can outlive a label (e.g. after a label was removed and the statistics were
+  // not recomputed yet), so only values the segmentation still knows can be grouped.
+  mitk::ImageStatisticsContainer::LabelValueVectorType knownValues;
+  mitk::ImageStatisticsContainer::LabelValueVectorType unknownValues;
+
+  for (const auto labelValue : labelValues)
+    (segmentation->ExistLabel(labelValue) ? knownValues : unknownValues).push_back(labelValue);
+
+  const bool showGroups = segmentation->GetNumberOfGroups() > 1;
+  bool groupsAdded = false;
+
+  for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < segmentation->GetNumberOfGroups(); ++groupID)
+  {
+    mitk::ImageStatisticsContainer::LabelValueVectorType groupValues;
+
+    for (const auto& [className, classValues] : mitk::LabelSetImageHelper::SplitLabelValuesByClassName(segmentation, groupID, knownValues))
+      groupValues.insert(groupValues.end(), classValues.begin(), classValues.end());
+
+    if (groupValues.empty())
+      continue;
+
+    auto groupParentItem = parentItem;
+
+    if (showGroups)
+    {
+      const auto groupLabel = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(segmentation, groupID));
+      groupParentItem = new QmitkImageStatisticsTreeItem(statisticNames, groupLabel, isWIP, false, parentItem, imageNode, maskNode);
+      parentItem->appendChild(groupParentItem);
+      groupsAdded = true;
+    }
+
+    AddLabelTreeItems(statistic, imageNode, maskNode, groupValues, statisticNames, isWIP, groupParentItem, hasMultipleTimesteps);
+  }
+
+  AddLabelTreeItems(statistic, imageNode, maskNode, unknownValues, statisticNames, isWIP, parentItem, hasMultipleTimesteps);
+
+  return groupsAdded;
+}
+
 void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 {
   // reset old model
   m_RootItem.reset(new QmitkImageStatisticsTreeItem());
 
   bool hasMask = false;
+  bool hasGroups = false;
   bool hasMultipleTimesteps = false;
 
   std::map<mitk::DataNode::ConstPointer, QmitkImageStatisticsTreeItem *> dataNodeToTreeItem;
@@ -540,7 +599,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
         // 3. hierarchy level: labels (optional, only if more then one label in statistic)
         if (labelValues.size() > 1)
         {
-          AddLabelTreeItems(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+          hasGroups = AddLabelTreeItemsForMask(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps) || hasGroups;
         }
         else if (!labelValues.empty())
         {
@@ -564,6 +623,10 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   if (hasMask)
   {
     headerString += "/Masks";
+  }
+  if (hasGroups)
+  {
+    headerString += "/Groups";
   }
   if (hasMultipleTimesteps)
   {

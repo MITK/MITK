@@ -97,16 +97,16 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls->imageNodesSelector->SetNodePredicate(mitk::GetImageStatisticsImagePredicate());
   m_Controls->imageNodesSelector->SetSelectionCheckFunction(this->CheckForSameGeometry());
   m_Controls->imageNodesSelector->SetSelectionIsOptional(false);
-  m_Controls->imageNodesSelector->SetInvalidInfo(QStringLiteral("Please select images for statistics"));
+  m_Controls->imageNodesSelector->SetInvalidInfo(QStringLiteral("No images selected"));
   m_Controls->imageNodesSelector->SetPopUpTitel(QStringLiteral("Select input images"));
-  m_Controls->imageNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple images for the statistics computation. But all selected images must have the same geometry."));
+  m_Controls->imageNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple images for the statistics computation. All selected images must share the same geometry."));
 
   m_Controls->roiNodesSelector->SetDataStorage(this->GetDataStorage());
   m_Controls->roiNodesSelector->SetNodePredicate(this->GenerateROIPredicate());
   m_Controls->roiNodesSelector->SetSelectionIsOptional(true);
-  m_Controls->roiNodesSelector->SetEmptyInfo(QStringLiteral("Please select ROIs"));
+  m_Controls->roiNodesSelector->SetEmptyInfo(QStringLiteral("No ROIs selected"));
   m_Controls->roiNodesSelector->SetPopUpTitel(QStringLiteral("Select ROIs for statistics computation"));
-  m_Controls->roiNodesSelector->SetPopUpHint(QStringLiteral("You may select ROIs (e.g. planar figures, segmentations) that should be used for the statistics computation. The statistics will only computed for the image parts defined by the ROIs."));
+  m_Controls->roiNodesSelector->SetPopUpHint(QStringLiteral("You may select ROIs like segmentations or planar figures to restrict the statistics computation."));
 
   CreateConnections();
 

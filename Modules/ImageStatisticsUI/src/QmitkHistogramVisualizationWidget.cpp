@@ -37,7 +37,7 @@ found in the LICENSE file.
 #include <QVBoxLayout>
 #include <QVector>
 
-#include <limits>
+#include <cmath>
 
 namespace
 {
@@ -184,18 +184,13 @@ void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<
   }
 
   it->second->setSamples(ToIntervalSamples(histogram));
-  m_Plot->replot();
 
-  QRectF bounds;
-  bool first = true;
-  for (const auto& entry : m_HistogramItems)
-  {
-    const QRectF itemBounds = entry.second->boundingRect();
-    bounds = first ? itemBounds : bounds.united(itemBounds);
-    first = false;
-  }
-  if (!m_HistogramItems.empty() && bounds.isValid())
-    m_Zoomer->setZoomBase(bounds);
+  // A previous mouse zoom leaves fixed axis scales behind. Re-enable autoscaling
+  // so the replot fits all histograms, then take that view as the zoom base.
+  m_Plot->setAxisAutoScale(QwtPlot::xBottom);
+  m_Plot->setAxisAutoScale(QwtPlot::yLeft);
+  m_Zoomer->setZoomBase(true);
+  this->OnZoomed(m_Zoomer->zoomRect());
 
   if (m_Histograms.empty() != histogramWasEmpty)
     this->SetGUIElementsEnabled(!m_Histograms.empty());
@@ -213,6 +208,7 @@ void QmitkHistogramVisualizationWidget::Reset()
   this->ClearHighlight();
 
   m_Plot->setAxisAutoScale(QwtPlot::xBottom);
+  m_Plot->setAxisAutoScale(QwtPlot::yLeft);
   m_Plot->replot();
 
   SetGUIElementsEnabled(false);
@@ -226,7 +222,7 @@ void QmitkHistogramVisualizationWidget::ResetDefault()
 {
   m_Controls->checkBoxUseDefaultNBins->setChecked(true);
   m_Controls->spinBoxNBins->setEnabled(false);
-  m_Controls->spinBoxNBins->setValue(100);
+  m_Controls->spinBoxNBins->setValue(m_DefaultNBins);
 }
 
 void QmitkHistogramVisualizationWidget::SetTheme(QmitkPlotStyle style)
@@ -306,21 +302,18 @@ void QmitkHistogramVisualizationWidget::CreateConnections()
   connect(m_Controls->buttonCopyHistogramToClipboard, &QPushButton::clicked, this, &QmitkHistogramVisualizationWidget::OnClipboardButtonClicked);
   connect(m_Controls->checkBoxUseDefaultNBins, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnDefaultNBinsCheckBoxChanged);
   connect(m_Controls->spinBoxNBins, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged);
-  connect(m_Controls->checkBoxViewMinMax, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged);
-  connect(m_Controls->doubleSpinBoxMaxValue, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged);
-  connect(m_Controls->doubleSpinBoxMinValue, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged);
+  connect(m_Controls->doubleSpinBoxMinValue, &QDoubleSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnZoomRangeEdited);
+  connect(m_Controls->doubleSpinBoxMaxValue, &QDoubleSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnZoomRangeEdited);
+  connect(m_Controls->buttonResetZoom, &QPushButton::clicked, this, [this]() { m_Zoomer->zoom(0); });
+  connect(m_Zoomer, &QwtPlotZoomer::zoomed, this, &QmitkHistogramVisualizationWidget::OnZoomed);
 }
 
 void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
 {
+  // Children follow the widget's own state; only the bins spin box carries an
+  // extra dependency on the default checkbox.
   this->setEnabled(enabled);
-  m_Controls->tabWidgetPlot->setEnabled(enabled);
-  m_Controls->checkBoxUseDefaultNBins->setEnabled(enabled);
   m_Controls->spinBoxNBins->setEnabled(!m_Controls->checkBoxUseDefaultNBins->isChecked());
-  m_Controls->buttonCopyHistogramToClipboard->setEnabled(enabled);
-  m_Controls->checkBoxViewMinMax->setEnabled(enabled);
-  m_Controls->doubleSpinBoxMaxValue->setEnabled(m_Controls->checkBoxViewMinMax->isChecked());
-  m_Controls->doubleSpinBoxMinValue->setEnabled(m_Controls->checkBoxViewMinMax->isChecked());
 }
 
 void QmitkHistogramVisualizationWidget::OnClipboardButtonClicked()
@@ -369,54 +362,32 @@ void QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged()
   emit RequestHistogramUpdate(m_Controls->spinBoxNBins->value());
 }
 
-void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
+void QmitkHistogramVisualizationWidget::OnZoomRangeEdited()
 {
-  double min = std::numeric_limits<double>::max();
-  double max = std::numeric_limits<double>::lowest();
-  for (const auto& histogram : m_Histograms)
-  {
-    auto aMin = histogram.second->GetBinMin(0, 0);
-    if (min > aMin) min = aMin;
+  QRectF rect = m_Zoomer->zoomRect();
+  rect.setLeft(m_Controls->doubleSpinBoxMinValue->value());
+  rect.setRight(m_Controls->doubleSpinBoxMaxValue->value());
 
-    auto maxVector = histogram.second->GetDimensionMaxs(0);
-    if (m_Controls->checkBoxUseDefaultNBins->isChecked())
-    {
-      max = std::max(max, maxVector[m_DefaultNBins - 1]);
-    }
-    else
-    {
-      max = std::max(max, maxVector[m_Controls->spinBoxNBins->value() - 1]);
-    }
-  }
-
-  if (!m_Controls->checkBoxViewMinMax->isChecked())
-  {
-    m_Controls->doubleSpinBoxMaxValue->setEnabled(false);
-    m_Controls->doubleSpinBoxMinValue->setEnabled(false);
-    m_Plot->setAxisAutoScale(QwtPlot::xBottom);
-    m_Plot->replot();
-  }
-  else
-  {
-    m_Controls->doubleSpinBoxMinValue->setMinimum(min);
-    m_Controls->doubleSpinBoxMinValue->setValue(min);
-    m_Controls->doubleSpinBoxMaxValue->setMaximum(max);
-    m_Controls->doubleSpinBoxMaxValue->setValue(max);
-    m_Controls->doubleSpinBoxMaxValue->setEnabled(true);
-    m_Controls->doubleSpinBoxMinValue->setEnabled(true);
-  }
+  // Goes through the zoomer so the rectangle lands on its zoom stack and
+  // mouse navigation continues from there; zoomed() then syncs the spin boxes.
+  m_Zoomer->zoom(rect);
 }
 
-void QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged()
+void QmitkHistogramVisualizationWidget::OnZoomed(const QRectF& rect)
 {
-  m_Controls->doubleSpinBoxMaxValue->setMinimum(m_Controls->doubleSpinBoxMinValue->value()+1);
-  m_Plot->setAxisScale(QwtPlot::xBottom, m_Controls->doubleSpinBoxMinValue->value(), m_Controls->doubleSpinBoxMaxValue->value());
-  m_Plot->replot();
-}
+  auto* minBox = m_Controls->doubleSpinBoxMinValue;
+  auto* maxBox = m_Controls->doubleSpinBoxMaxValue;
+  const QRectF base = m_Zoomer->zoomBase();
 
-void QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged()
-{
-  m_Controls->doubleSpinBoxMinValue->setMaximum(m_Controls->doubleSpinBoxMaxValue->value()-1);
-  m_Plot->setAxisScale(QwtPlot::xBottom, m_Controls->doubleSpinBoxMinValue->value(), m_Controls->doubleSpinBoxMaxValue->value());
-  m_Plot->replot();
+  // Widen both boxes to the full range first so neither value is clamped by a
+  // limit left over from the previous zoom rectangle.
+  minBox->setRange(base.left(), base.right());
+  maxBox->setRange(base.left(), base.right());
+  minBox->setValue(rect.left());
+  maxBox->setValue(rect.right());
+
+  // Keep min strictly below max by at least one displayed unit.
+  const double minWidth = std::pow(10.0, -minBox->decimals());
+  minBox->setMaximum(maxBox->value() - minWidth);
+  maxBox->setMinimum(minBox->value() + minWidth);
 }

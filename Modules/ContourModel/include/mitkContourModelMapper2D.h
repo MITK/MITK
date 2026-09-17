@@ -31,7 +31,8 @@ namespace mitk
    * optional subdivision curve smoothing via the "subdivision curve" property.
    *
    * Properties evaluated by this mapper:
-   * - "contour.color": line color (default: yellow-green)
+   * - "color": line color (default: yellow-green); the legacy name "contour.color"
+   *   still takes precedence where present
    * - "contour.points.color": point marker color
    * - "contour.width": line width in pixels
    * - "contour.points.show": show point markers
@@ -58,8 +59,9 @@ namespace mitk
        *
        * \param[in] renderer The renderer for the current render window.
        * \param[in] type The render type (opaque, transparent, overlay).
+       * \return Number of props rendered.
        */
-      void MitkRender(BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
+      int MitkRender(BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     /** \brief Set default rendering properties for ContourModel nodes.
      * \param[in] node The data node to configure.

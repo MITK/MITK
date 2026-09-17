@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkContourModelMapper3D.h>
 
+#include "mitkContourModelColorHelper.h"
+
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkProperty.h>
@@ -47,8 +49,6 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour);
 
-  this->ApplyContourProperties(renderer);
-
   // tube filter the polyData
   localStorage->m_TubeFilter->SetInputData(localStorage->m_OutlinePolyData);
 
@@ -71,6 +71,11 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  // VtkPropRenderer::Update() walks every node regardless of visibility, so
+  // without this a hidden contour keeps rebuilding its geometry.
+  if (!visible)
+    return;
 
   auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
   if (data == nullptr)
@@ -95,25 +100,32 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
 
-  // check if something important has changed and we need to rerender
-  if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
+  // "contour.3D.width" is the radius of the tube filter and therefore the one
+  // property this mapper's geometry depends on.
+  const auto *widthProperty = this->GetDataNode()->GetProperty("contour.3D.width", renderer);
+  const bool widthModified = widthProperty != nullptr && localStorage->m_LastUpdateTime < widthProperty->GetMTime();
+
+  // Rebuild the geometry only for what the geometry is made of. Note that a
+  // property change also moves the node's own MTime, so that one must not be
+  // part of this condition or every property change would rebuild.
+  if (widthModified ||
+      (localStorage->m_LastUpdateTime < data->GetMTime()) // was the data modified?
       ||
-      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // Was the data modified?
+      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // was the pipeline modified?
       ||
-      (localStorage->m_LastUpdateTime <
-       renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
-      ||
-      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
-      ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+      (localStorage->m_LastUpdateTime < renderer->GetTimeStepUpdateTime())) // was the time step modified?
   {
     this->GenerateDataForRenderer(renderer);
+    localStorage->m_LastUpdateTime.Modified();
   }
 
-  // since we have checked that nothing important has changed, we can set
-  // m_LastUpdateTime to the current time
-  localStorage->m_LastUpdateTime.Modified();
+  // Every other property only has to be pushed to the actor.
+  if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+  {
+    this->ApplyContourProperties(renderer);
+    localStorage->m_LastPropertyUpdateTime.Modified();
+  }
 }
 
 vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromContour(mitk::ContourModel *inputContour)
@@ -192,16 +204,9 @@ void mitk::ContourModelMapper3D::ApplyContourProperties(mitk::BaseRenderer *rend
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ColorProperty::Pointer colorprop =
-    dynamic_cast<mitk::ColorProperty *>(GetDataNode()->GetProperty("contour.color", renderer));
-  if (colorprop)
-  {
-    // set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
-    localStorage->m_Actor->GetProperty()->SetColor(red, green, blue);
-  }
+  const auto color = GetContourColor(this->GetDataNode(), renderer);
+
+  localStorage->m_Actor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 
 /*+++++++++++++++++++ LocalStorage part +++++++++++++++++++++++++*/
@@ -226,7 +231,7 @@ void mitk::ContourModelMapper3D::SetDefaultProperties(mitk::DataNode *node,
                                                       mitk::BaseRenderer *renderer,
                                                       bool overwrite)
 {
-  node->AddProperty("color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite);
   node->AddProperty("contour.3D.width", mitk::FloatProperty::New(0.5), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

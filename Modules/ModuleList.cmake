@@ -20,7 +20,6 @@ set(MITK_MODULES
   SceneSerializationBase
   PlanarFigure
   ImageDenoising
-  ImageExtraction
   SceneSerialization
   Gizmo
   GraphAlgorithms

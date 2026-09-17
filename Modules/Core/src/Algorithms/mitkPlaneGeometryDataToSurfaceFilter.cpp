@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 #include <vtkPlaneSource.h>
 #include <vtkPolyData.h>
-#include <vtkTransformPolyDataFilter.h>
 
 #include <vtkBox.h>
 #include <vtkClipPolyData.h>
@@ -30,7 +29,7 @@ found in the LICENSE file.
 #include <vtkPlane.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 #include <vtkContourTriangulator.h>
 
 mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
@@ -44,7 +43,7 @@ mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
   m_Transform = vtkTransform::New();
 
   m_CubeSource = vtkCubeSource::New();
-  m_PolyDataTransformer = vtkTransformPolyDataFilter::New();
+  m_PolyDataTransformer = vtkTransformFilter::New();
 
   m_Plane = vtkPlane::New();
   m_PlaneCutter = vtkCutter::New();
@@ -55,7 +54,7 @@ mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
   m_Box = vtkBox::New();
   m_PlaneClipper = vtkClipPolyData::New();
 
-  m_VtkTransformPlaneFilter = vtkTransformPolyDataFilter::New();
+  m_VtkTransformPlaneFilter = vtkTransformFilter::New();
   m_VtkTransformPlaneFilter->SetInputConnection(m_PlaneSource->GetOutputPort());
 }
 

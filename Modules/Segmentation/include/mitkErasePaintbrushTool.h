@@ -27,7 +27,7 @@ namespace mitk
     \brief Paintbrush erasing tool for interactive segmentation.
 
     \sa FeedbackContourTool
-    \sa ExtractImageFilter
+    \sa ExtractSliceFilter
     \sa PaintbrushTool
 
     \ingroup Interaction

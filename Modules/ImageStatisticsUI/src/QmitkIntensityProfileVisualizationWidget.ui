@@ -57,7 +57,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Copy to Clipboard</string>
+         <string>Copy to clipboard</string>
         </property>
        </widget>
       </item>

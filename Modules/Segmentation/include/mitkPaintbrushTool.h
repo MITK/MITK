@@ -27,7 +27,7 @@ namespace mitk
    \brief Paintbrush tool for InteractiveSegmentation
 
    \sa FeedbackContourTool
-   \sa ExtractImageFilter
+   \sa ExtractSliceFilter
 
    \ingroup Interaction
    \ingroup ToolManagerEtAl

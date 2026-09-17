@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <vtkCleanPolyData.h>
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
 
 #include <mitkAnisotropicIterativeClosestPointRegistration.h>

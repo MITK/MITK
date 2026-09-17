@@ -2,6 +2,7 @@ set(MODULE_TESTS
   mitkDICOMReaderConfiguratorTest.cpp
   mitkDICOMDCMTKTagScannerTest.cpp
   mitkDICOMSimpleVolumeImportTest.cpp
+  mitkDICOMSourceImageRelationTest.cpp
   mitkDICOMTagPathTest.cpp
   mitkDICOMPropertyTest.cpp
   mitkDICOMTagsOfInterestHelperTest.cpp

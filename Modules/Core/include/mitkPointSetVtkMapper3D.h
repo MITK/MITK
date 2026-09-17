@@ -25,7 +25,7 @@ class vtkAppendPolyData;
 class vtkPolyData;
 class vtkTubeFilter;
 class vtkPolyDataMapper;
-class vtkTransformPolyDataFilter;
+class vtkTransformFilter;
 
 namespace mitk
 {
@@ -179,7 +179,7 @@ namespace mitk
     vtkSmartPointer<vtkPoints> m_VtkPoints;
     vtkSmartPointer<vtkCellArray> m_VtkPointConnections;
 
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_VtkPointsTransformer;
+    vtkSmartPointer<vtkTransformFilter> m_VtkPointsTransformer;
 
     vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
     vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;

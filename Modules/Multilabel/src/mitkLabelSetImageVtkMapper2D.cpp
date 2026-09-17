@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 
 // MITK Rendering
-#include <vtkNeverTranslucentTexture.h>
+#include <vtkTexture.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -308,7 +308,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
     // set the texture for the actor
     localStorage->m_LayerActorVector[groupID]->SetTexture(localStorage->m_LayerTextureVector[groupID]);
-    localStorage->m_LayerActorVector[groupID]->GetProperty()->SetOpacity(opacity);
+    SetOpacityAndRenderPass(localStorage->m_LayerActorVector[groupID], opacity);
   }
 
   const auto activeLayer = segmentation->GetActiveLayer();
@@ -349,7 +349,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
         localStorage->m_GroupImageIDs.push_back(nullptr);
         localStorage->m_ReslicedImageVector.push_back(vtkSmartPointer<vtkImageData>::New());
         localStorage->m_ReslicerVector.push_back(mitk::ExtractSliceFilter::New());
-        localStorage->m_LayerTextureVector.push_back(vtkSmartPointer<vtkNeverTranslucentTexture>::New());
+        localStorage->m_LayerTextureVector.push_back(vtkSmartPointer<vtkTexture>::New());
         localStorage->m_LayerMapperVector.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
         localStorage->m_LayerActorVector.push_back(vtkSmartPointer<vtkActor>::New());
         localStorage->m_LayerImageMapToColors.push_back(vtkSmartPointer<vtkImageMapToColors>::New());

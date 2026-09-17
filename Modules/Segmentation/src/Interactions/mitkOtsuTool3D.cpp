@@ -32,6 +32,7 @@ mitk::OtsuTool3D::OtsuTool3D()
 {
   this->ResetsToEmptyPreviewOn();
   this->UseSpecialPreviewColorOff();
+  this->RequiresExistingLabelsOff();
 }
 
 void mitk::OtsuTool3D::Activated()

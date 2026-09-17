@@ -256,6 +256,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   {
     workingNodeChanged = true;
 
+    m_WorkingNodeObserver.Reset();
     this->RemoveObserversFromWorkingImage();
 
     // Remove visibility observer for the current working node
@@ -281,6 +282,10 @@ void QmitkSegmentationView::OnAnySelectionChanged()
         m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
 
       this->AddObserversToWorkingImage();
+      m_WorkingNodeObserver.Reset(m_WorkingNode, itk::ModifiedEvent(), [this](const itk::EventObject&)
+        {
+          this->OnWorkingNodeModified();
+        });
     }
   }
 
@@ -302,6 +307,11 @@ void QmitkSegmentationView::OnLabelAdded(mitk::MultiLabelSegmentation::LabelValu
 }
 
 void QmitkSegmentationView::OnLabelRemoved(mitk::MultiLabelSegmentation::LabelValueType)
+{
+  this->UpdateControlsOnLabelChanges();
+}
+
+void QmitkSegmentationView::OnGroupAdded(mitk::MultiLabelSegmentation::GroupIndexType)
 {
   this->UpdateControlsOnLabelChanges();
 }
@@ -338,6 +348,11 @@ void QmitkSegmentationView::AddObserversToWorkingImage()
         widget.OnLabelRemoved(labelEvent->GetLabelValue());
       });
 
+    m_GroupAddedObserver.Reset(workingImage, mitk::GroupAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupAdded(groupEvent->GetGroupID());
+      });
     m_GroupRemovedObserver.Reset(workingImage, mitk::GroupRemovedEvent(), [&widget](const itk::EventObject& event)
       {
         auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
@@ -350,9 +365,21 @@ void QmitkSegmentationView::RemoveObserversFromWorkingImage()
 {
   m_LabelAddedObserver.Reset();
   m_LabelRemovedObserver.Reset();
+  m_GroupAddedObserver.Reset();
   m_GroupRemovedObserver.Reset();
 
   m_ObservedSegmentation = nullptr;
+}
+
+void QmitkSegmentationView::OnWorkingNodeModified()
+{
+  // Property changes fire the same event; only a data replacement matters here.
+  if (this->GetWorkingImage() == m_ObservedSegmentation.GetPointer())
+    return;
+
+  this->RemoveObserversFromWorkingImage();
+  this->AddObserversToWorkingImage();
+  this->UpdateGUI();
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()
@@ -382,9 +409,15 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
     return;
   }
 
+  const auto* activeLabel = workingImage->GetActiveLabel();
+  if (nullptr == activeLabel)
+  {
+    return;
+  }
+
   this->WaitCursorOn();
   auto labels = workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer());
-  auto it = std::find(labels.begin(), labels.end(), workingImage->GetActiveLabel()->GetValue());
+  auto it = std::find(labels.begin(), labels.end(), activeLabel->GetValue());
 
   if (it != labels.end())
     ++it;
@@ -1109,12 +1142,28 @@ void QmitkSegmentationView::UpdateControlsOnLabelChanges()
   auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode.IsNotNull() ? workingNode->GetData() : nullptr);
   unsigned int numberOfLabels = labelSetImage ? labelSetImage->GetTotalNumberOfLabels() : 0;
 
-  // Enable tools only if we have both nodes, labels, and no visibility warnings
-  bool toolSelectionBoxesEnabled = referenceNode.IsNotNull() && workingNode.IsNotNull() && numberOfLabels > 0 && !m_VisibleSegViolationOverlay->isVisible() && !m_GeometryViolationOverlay->isVisible();
+  // Enable the tool boxes only if we have both nodes and no visibility warnings.
+  // Whether a tool needs existing labels is decided per tool via CanHandle().
+  bool toolSelectionBoxesEnabled = referenceNode.IsNotNull() && workingNode.IsNotNull() && !m_VisibleSegViolationOverlay->isVisible() && !m_GeometryViolationOverlay->isVisible();
 
   m_Controls->toolSelectionBox2D->setEnabled(toolSelectionBoxesEnabled);
   m_Controls->toolSelectionBox3D->setEnabled(toolSelectionBoxesEnabled);
-  m_Controls->slicesInterpolator->setEnabled(toolSelectionBoxesEnabled);
+  m_Controls->slicesInterpolator->setEnabled(toolSelectionBoxesEnabled && numberOfLabels > 0);
+
+  auto* activeTool = m_ToolManager->GetActiveTool();
+  if (activeTool != nullptr)
+  {
+    const auto referenceDataNode = m_ToolManager->GetReferenceData(0);
+    const auto workingDataNode = m_ToolManager->GetWorkingData(0);
+    const mitk::BaseData* referenceData = referenceDataNode != nullptr ? referenceDataNode->GetData() : nullptr;
+    const mitk::BaseData* workingData = workingDataNode != nullptr ? workingDataNode->GetData() : nullptr;
+
+    if (!activeTool->CanHandle(referenceData, workingData))
+      m_ToolManager->ActivateTool(-1);
+  }
+
+  m_Controls->toolSelectionBox2D->UpdateButtonsEnabledState();
+  m_Controls->toolSelectionBox3D->UpdateButtonsEnabledState();
 }
 
 void QmitkSegmentationView::CheckForReferenceVisibilityWarnings() const

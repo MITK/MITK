@@ -27,7 +27,7 @@ namespace mitk
     \brief Simple contour filling tool.
 
     \sa FeedbackContourTool
-    \sa ExtractImageFilter
+    \sa ExtractSliceFilter
 
     \ingroup Interaction
     \ingroup ToolManagerEtAl
@@ -73,6 +73,12 @@ namespace mitk
 
     /** \brief The pixel value used when filling the contour (0 = erase, 1 = draw). */
     int m_PaintingPixelValue;
+
+  private:
+    /** \brief Set the painting pixel value and the matching feedback contour color. */
+    void SetPaintingPixelValue(int paintingPixelValue);
+
+    const int m_InitialPaintingPixelValue;
   };
 
 } // namespace

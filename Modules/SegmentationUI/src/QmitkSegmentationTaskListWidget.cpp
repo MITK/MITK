@@ -1311,5 +1311,10 @@ void QmitkSegmentationTaskListWidget::OnAcceptButtonClicked()
   this->LoadNextUnfinishedTask();
 
   if (toolManager != nullptr)
-    toolManager->ActivateTool(activeToolId);
+  {
+    const bool restored = toolManager->ActivateTool(activeToolId);
+
+    if (!restored && activeToolId != -1)
+      MITK_INFO << "The previously active tool cannot handle the segmentation of the next task and stays inactive.";
+  }
 }

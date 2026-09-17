@@ -32,7 +32,6 @@ found in the LICENSE file.
 #include <vtkPolyDataNormals.h>
 #include <vtkRenderWindow.h>
 #include <vtkSphereSource.h>
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkTubeFilter.h>
 
 // ITK includes

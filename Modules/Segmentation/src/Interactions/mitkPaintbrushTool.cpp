@@ -23,6 +23,7 @@ found in the LICENSE file.
 mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
     m_FillMode(startWithFillMode),
+    m_InitialFillMode(startWithFillMode),
     m_Size(10),
     m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
@@ -52,6 +53,12 @@ int mitk::PaintbrushTool::GetFillValue() const
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
+
+  // State machine state and fill mode outlive a deactivation. A tool left
+  // inverted, e.g. by switching tools while CTRL is held, would otherwise come
+  // back inverted while its cursor, pushed anew on activation, would not.
+  this->ResetToStartState();
+  m_FillMode = m_InitialFillMode;
 
   SizeChanged.Send(m_Size);
   this->GetToolManager()->WorkingDataChanged +=
@@ -481,7 +488,8 @@ void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent 
   m_FillMode = !m_FillMode;
   UpdateFeedbackColor();
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  // The brush outline and the painting node are 2D only.
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)

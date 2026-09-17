@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkContourModelReader.h"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -33,6 +34,24 @@ namespace
     file.close();
     std::regex regex("><\\?xml.+\\?>");
     return std::regex_replace(string, regex, ">");
+  }
+
+  // A coordinate that is absent or unreadable cannot be defaulted without
+  // inventing geometry, so a malformed point fails the file it is in.
+  double ReadCoordinate(const tinyxml2::XMLElement* point, const char* name)
+  {
+    const auto* element = point->FirstChildElement(name);
+    const char* text = nullptr != element ? element->GetText() : nullptr;
+
+    char* end = nullptr;
+    const double value = nullptr != text ? std::strtod(text, &end) : 0.0;
+
+    if (nullptr == text || end == text)
+    {
+      mitkThrow() << "Contour file contains a point without a readable " << name << " coordinate.";
+    }
+
+    return value;
   }
 }
 
@@ -80,21 +99,27 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
            currentContourElement = currentContourElement->NextSiblingElement())
       {
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
-        if (currentContourElement->FirstChildElement("data")->FirstChildElement("timestep") != nullptr)
+
+        const auto *dataElement = currentContourElement->FirstChildElement("data");
+        const auto *firstTimeSeries = nullptr != dataElement ? dataElement->FirstChildElement("timestep") : nullptr;
+
+        if (nullptr != firstTimeSeries)
         {
           /*++++ handle n timesteps within timestep tags ++++*/
-          for (auto *currentTimeSeries =
-                 currentContourElement->FirstChildElement("data")->FirstChildElement("timestep")->ToElement();
+          for (const auto *currentTimeSeries = firstTimeSeries;
                currentTimeSeries != nullptr;
                currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
-            unsigned int currentTimeStep(0);
+            unsigned int currentTimeStep = 0;
 
-            currentTimeStep = atoi(currentTimeSeries->Attribute("n"));
+            if (tinyxml2::XML_SUCCESS != currentTimeSeries->QueryUnsignedAttribute("n", &currentTimeStep))
+            {
+              mitkThrow() << "Contour file " << location << " has a time step without a readable n attribute.";
+            }
 
             this->ReadPoints(newContourModel, currentTimeSeries, currentTimeStep);
 
-            int isClosed;
+            int isClosed = 0;
             currentTimeSeries->QueryIntAttribute("isClosed", &isClosed);
             if (isClosed)
             {
@@ -119,6 +144,12 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
       MITK_WARN << "XML parser error!";
     }
   }
+  catch (const Exception &)
+  {
+    // Already names what is wrong with the file, and DoRead is documented to
+    // throw. Flattening it into the message below would drop that.
+    throw;
+  }
   catch (...)
   {
     MITK_ERROR << "Cannot read contourModel.";
@@ -137,37 +168,37 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
                                           unsigned int currentTimeStep)
 {
   // check if the timesteps in contourModel have to be expanded
-  if (currentTimeStep != newContourModel->GetTimeSteps())
+  if (currentTimeStep >= newContourModel->GetTimeSteps())
   {
     newContourModel->Expand(currentTimeStep + 1);
   }
 
   // read all points within controlPoints tag
-  if (currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point") != nullptr)
-  {
-    for (auto *currentPoint =
-           currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point")->ToElement();
-         currentPoint != nullptr;
-         currentPoint = currentPoint->NextSiblingElement())
-    {
-      double x(0.0);
-      double y(0.0);
-      double z(0.0);
+  const auto *controlPoints = currentTimeSeries->FirstChildElement("controlPoints");
 
-      x = atof(currentPoint->FirstChildElement("x")->GetText());
-      y = atof(currentPoint->FirstChildElement("y")->GetText());
-      z = atof(currentPoint->FirstChildElement("z")->GetText());
-
-      int isActivePoint;
-      currentPoint->QueryIntAttribute("isActive", &isActivePoint);
-
-      mitk::Point3D point;
-      mitk::FillVector3D(point, x, y, z);
-      newContourModel->AddVertex(point, isActivePoint, currentTimeStep);
-    }
-  }
-  else
+  if (nullptr == controlPoints)
   {
     // nothing to read
+    return;
+  }
+
+  for (const auto *currentPoint = controlPoints->FirstChildElement("point");
+       currentPoint != nullptr;
+       currentPoint = currentPoint->NextSiblingElement())
+  {
+    const double x = ReadCoordinate(currentPoint, "x");
+    const double y = ReadCoordinate(currentPoint, "y");
+    const double z = ReadCoordinate(currentPoint, "z");
+
+    int isControlPoint = 0;
+    if (tinyxml2::XML_SUCCESS != currentPoint->QueryIntAttribute("IsControlPoint", &isControlPoint))
+    {
+      // Accept the name this reader used to look for as well.
+      currentPoint->QueryIntAttribute("isActive", &isControlPoint);
+    }
+
+    mitk::Point3D point;
+    mitk::FillVector3D(point, x, y, z);
+    newContourModel->AddVertex(point, isControlPoint != 0, currentTimeStep);
   }
 }

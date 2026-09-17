@@ -34,7 +34,6 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkVector.h>
-#include <vtkVectorOperators.h>
 
 mitk::GizmoInteractor::GizmoInteractor()
 {

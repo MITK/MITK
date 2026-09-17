@@ -177,6 +177,11 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    /** \brief In addition to Tool::CanHandle(), requires the reference data to be an
+     * Image and the working data a MultiLabelSegmentation that already contains at
+     * least one label, as 2D tools operate on existing labels. */
+    bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const override;
+
     itkSetMacro(IsTimePointChangeAware, bool);
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);
@@ -237,8 +242,8 @@ namespace mitk
     /**
     * \brief Filters events that cannot be handled by 2D segmentation tools
     *
-    * Currently an event is discarded if it was not sent by a 2D renderwindow and if it is
-    * not of type InteractionPositionEvent
+    * An event is discarded if it was not sent by a 2D render window or if it is neither
+    * an InteractionPositionEvent nor a key press or release event.
     */
     bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 

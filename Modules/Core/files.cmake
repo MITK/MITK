@@ -281,6 +281,7 @@ set(CPP_FILES
   Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkInteractionEventObserver.cpp
   Interactions/mitkInteractionKeyEvent.cpp
+  Interactions/mitkInteractionKeyReleaseEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
@@ -380,7 +381,6 @@ set(CPP_FILES
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkNeverTranslucentTexture.cpp
 )
 
 set(RESOURCE_FILES

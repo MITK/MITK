@@ -1,5 +1,6 @@
 set(MODULE_TESTS
   mitkImageStatisticsCalculatorTest.cpp
+  mitkAndMaskGeneratorTest.cpp
   mitkMedianAccumulatorTest.cpp
   mitkStatisticsFilterMedianTest.cpp
   mitkPointSetStatisticsCalculatorTest.cpp
@@ -7,6 +8,7 @@ set(MODULE_TESTS
   mitkImageStatisticsTextureAnalysisTest.cpp
   mitkImageStatisticsContainerTest.cpp
   mitkImageStatisticsContainerManagerTest.cpp
+  mitkMinMaxLabelImageFilterWithIndexTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

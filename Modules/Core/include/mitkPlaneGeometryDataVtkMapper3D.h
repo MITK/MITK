@@ -27,7 +27,7 @@ class vtkPolyDataMapper;
 class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;
-class vtkTransformPolyDataFilter;
+class vtkTransformFilter;
 class vtkHedgeHog;
 
 namespace mitk
@@ -148,7 +148,7 @@ namespace mitk
     vtkFeatureEdges *m_Edges;
 
     /** \brief Filter to apply object transform to the extracted edges */
-    vtkTransformPolyDataFilter *m_EdgeTransformer;
+    vtkTransformFilter *m_EdgeTransformer;
 
     /** \brief Source to create the tube-shaped frame  */
     vtkTubeFilter *m_EdgeTuber;
@@ -166,7 +166,7 @@ namespace mitk
     vtkActor *m_BackgroundActor;
 
     /** \brief Transforms the surface before applying the glyph filter */
-    vtkTransformPolyDataFilter *m_NormalsTransformer;
+    vtkTransformFilter *m_NormalsTransformer;
 
     /** \brief Mapper for normals representation (thin lines) */
     vtkPolyDataMapper *m_FrontNormalsMapper;

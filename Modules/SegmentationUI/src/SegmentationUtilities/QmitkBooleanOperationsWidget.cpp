@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <QmitkBooleanOperationsWidget.h>
 #include <ui_QmitkBooleanOperationsWidgetControls.h>
 
+#include <QmitkStyleManager.h>
+
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
@@ -50,11 +52,15 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
 
   m_Controls->labelInspector->SetMultiSelectionMode(true);
 
+  m_Controls->clearSelectionButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+
   connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkBooleanOperationsWidget::OnSegSelectionChanged);
 
   connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
     this, &QmitkBooleanOperationsWidget::OnLabelSelectionChanged);
+
+  connect(m_Controls->clearSelectionButton, &QPushButton::clicked, this, &QmitkBooleanOperationsWidget::OnClearSelectionButtonClicked);
 
   connect(m_Controls->differenceButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnDifferenceButtonClicked);
   connect(m_Controls->intersectionButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnIntersectionButtonClicked);
@@ -115,9 +121,16 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
     m_Controls->lineOtherLabels->SetSelectedLabels(otherLabelValues);
   }
 
+  m_Controls->clearSelectionButton->setEnabled(!selectedLabelValues.empty());
   m_Controls->differenceButton->setEnabled(selectedLabelValues.size()>1);
   m_Controls->intersectionButton->setEnabled(selectedLabelValues.size() > 1);
   m_Controls->unionButton->setEnabled(selectedLabelValues.size() > 1);
+}
+
+void QmitkBooleanOperationsWidget::OnClearSelectionButtonClicked()
+{
+  m_Controls->labelInspector->SetSelectedLabels({});
+  this->ConfigureWidgets();
 }
 
 void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()

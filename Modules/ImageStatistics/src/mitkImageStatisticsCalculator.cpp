@@ -19,11 +19,11 @@ found in the LICENSE file.
 #include <mitkImageStatisticsConstants.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToItk.h>
-#include <mitkMaskUtilities.h>
 #include <mitkMinMaxImageFilterWithIndex.h>
 #include <mitkMinMaxLabelmageFilterWithIndex.h>
-#include <mitkitkMaskImageFilter.h>
 #include <mitkNodePredicateGeometry.h>
+
+#include <itkRegionOfInterestImageFilter.h>
 
 namespace mitk
 {
@@ -41,15 +41,6 @@ namespace mitk
     if (mask != m_MaskGenerator)
     {
       m_MaskGenerator = mask;
-      this->Modified();
-    }
-  }
-
-  void ImageStatisticsCalculator::SetSecondaryMask(mitk::MaskGenerator *mask)
-  {
-    if (mask != m_SecondaryMaskGenerator)
-    {
-      m_SecondaryMaskGenerator = mask;
       this->Modified();
     }
   }
@@ -115,42 +106,28 @@ namespace mitk
         const unsigned int numbersOfMasks = m_MaskGenerator.IsNotNull() ? m_MaskGenerator->GetNumberOfMasks() : 1;
         auto timePoint = timeGeometry->TimeStepToTimePoint(timeStep);
 
-        // Hard coded maskID == 0 for secondary mask is a workaround.
-        // As soon as T30372 is done and it is solved by a generator chain,
-        // the complete secondary mask code is removed anyways.
-        if (m_SecondaryMaskGenerator.IsNotNull())
-        {
-          if (m_SecondaryMaskGenerator->GetNumberOfMasks() != 1)
-            mitkThrow() << "Cannot generate secondary mask. ImageStatisticsCalculator does only support secondary mask generators with one mask. Number of masks provided: "
-            << m_SecondaryMaskGenerator->GetNumberOfMasks();
-          m_SecondaryMaskGenerator->SetTimePoint(timePoint);
-          m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);
-        }
-
         for (unsigned int maskID = 0; maskID < numbersOfMasks; ++maskID)
         {
+          // A mask generator may compute its mask on a reference image of its own
+          // (e.g. the slice of a planar figure); the statistics then run on that image.
+          Image::ConstPointer imageForStatistics = m_Image;
+          m_InternalMask = nullptr;
+
           if (m_MaskGenerator.IsNotNull())
           {
             m_MaskGenerator->SetTimePoint(timePoint);
             m_InternalMask = m_MaskGenerator->GetMask(maskID);
-            if (m_MaskGenerator->GetReferenceImage().IsNotNull())
-            {
-              m_InternalImageForStatistics = m_MaskGenerator->GetReferenceImage();
-            }
-            else
-            {
-              m_InternalImageForStatistics = m_Image;
-            }
-          }
-          else
-          {
-            m_InternalImageForStatistics = m_Image;
+
+            const auto referenceImage = m_MaskGenerator->GetReferenceImage();
+
+            if (referenceImage.IsNotNull())
+              imageForStatistics = referenceImage;
           }
 
-          m_ImageTimeSlice = SelectImageByTimeStep(m_InternalImageForStatistics, timeStep);
+          m_ImageTimeSlice = SelectImageByTimeStep(imageForStatistics, timeStep);
 
           // Calculate statistics with/without mask
-          if (m_MaskGenerator.IsNull() && m_SecondaryMaskGenerator.IsNull())
+          if (m_MaskGenerator.IsNull())
           {
             // 1) calculate statistics unmasked:
             AccessByItk_1(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeStep)
@@ -286,18 +263,54 @@ namespace mitk
     typedef itk::Image<MaskPixelType, VImageDimension> MaskType;
     typedef typename MaskType::PixelType LabelPixelType;
     typedef LabelStatisticsImageFilter<ImageType> ImageStatisticsFilterType;
-    typedef MaskUtilities<TPixel, VImageDimension> MaskUtilType;
     typedef typename itk::MinMaxLabelImageFilterWithIndex<ImageType, MaskType> MinMaxLabelFilterType;
+    typedef itk::RegionOfInterestImageFilter<ImageType, ImageType> RegionOfInterestFilterType;
 
-    // workaround: if m_SecondaryMaskGenerator is not null but m_MaskGenerator is! (this is the case if we request a
-    // 'ignore zero valued pixels' mask in the gui but do not define a primary mask)
-    bool swapMasks = false;
-    if (m_SecondaryMask.IsNotNull() && m_InternalMask.IsNull())
+    const BaseGeometry* referenceGeometry = m_ImageTimeSlice->GetGeometry();
+    const BaseGeometry* maskGeometry = m_InternalMask->GetGeometry();
+
+    // verbose makes IsSubGeometry log the check that failed; it stays silent on success
+    if (!IsSubGeometry(*maskGeometry, *referenceGeometry,
+                       NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+                       NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
+                       true))
     {
-      m_InternalMask = m_SecondaryMask;
-      m_SecondaryMask = nullptr;
-      swapMasks = true;
+      mitkThrow() << "Mask is not a sub geometry of the image (see the log for the failed check): "
+                     "it has to lie on the voxel grid of the image and within its extent.";
     }
+
+    // A mask may cover only a sub-region of the image. The filters then run on
+    // that region and report indices relative to it.
+    itk::Index<3> maskOffset;
+    referenceGeometry->WorldToIndex(maskGeometry->GetOrigin(), maskOffset);
+
+    // Maps an index of the (possibly cropped) statistics image to an index of the
+    // input image. The reference image may be a 2D slice (planar figure masks), so
+    // the index has to go through world coordinates. On rotated geometries the
+    // inverse transform carries floating-point noise, so the result is rounded
+    // rather than truncated.
+    const BaseGeometry* imageGeometry = m_Image->GetGeometry(timeStep);
+    auto toImageIndex = [&](const typename ImageType::IndexType& index)
+    {
+      itk::Index<3> referenceIndex;
+      referenceIndex.Fill(0);
+
+      for (unsigned int i = 0; i < VImageDimension; ++i)
+        referenceIndex[i] = index[i] + maskOffset[i];
+
+      Point3D world;
+      referenceGeometry->IndexToWorld(referenceIndex, world);
+
+      itk::Index<3> imageIndex;
+      imageGeometry->WorldToIndex(world, imageIndex);
+
+      vnl_vector<int> result(3);
+
+      for (unsigned int i = 0; i < 3; ++i)
+        result[i] = static_cast<int>(imageIndex[i]);
+
+      return result;
+    };
 
     // maskImage has to have the same dimension as image
     typename MaskType::ConstPointer maskImage = MaskType::New();
@@ -315,48 +328,24 @@ namespace mitk
       maskImage = noneConstMaskImage;
     }
 
-    // if we have a secondary mask (say a ignoreZeroPixelMask) we need to combine the masks (corresponds to AND)
-    if (m_SecondaryMask.IsNotNull())
+    typename ImageType::ConstPointer adaptedImage = image;
+
+    if (maskImage->GetLargestPossibleRegion().GetSize() != image->GetLargestPossibleRegion().GetSize())
     {
-      // dirty workaround for a bug when pf mask + any other mask is used in conjunction. We need a proper fix for this
-      // (Fabian Isensee is responsible and probably working on it!)
-      if (m_InternalMask->GetDimension() == 2 &&
-          (m_SecondaryMask->GetDimension() == 3 || m_SecondaryMask->GetDimension() == 4))
-      {
-        Image::ConstPointer old_img = m_SecondaryMaskGenerator->GetReferenceImage();
-        m_SecondaryMaskGenerator->SetInputImage(m_MaskGenerator->GetReferenceImage());
-        m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);
-        m_SecondaryMaskGenerator->SetInputImage(old_img);
-      }
-      typename MaskType::ConstPointer secondaryMaskImage = MaskType::New();
-      secondaryMaskImage = ImageToItkImage<MaskPixelType, VImageDimension>(m_SecondaryMask);
+      typename ImageType::RegionType maskRegion = maskImage->GetLargestPossibleRegion();
+      typename ImageType::IndexType regionIndex;
 
-      // secondary mask should be a ignore zero value pixel mask derived from image. it has to be cropped to the mask
-      // region (which may be planar or simply smaller)
-      typename MaskUtilities<MaskPixelType, VImageDimension>::Pointer secondaryMaskMaskUtil =
-        MaskUtilities<MaskPixelType, VImageDimension>::New();
-      secondaryMaskMaskUtil->SetImage(secondaryMaskImage.GetPointer());
-      secondaryMaskMaskUtil->SetMask(maskImage.GetPointer());
-      typename MaskType::ConstPointer adaptedSecondaryMaskImage = secondaryMaskMaskUtil->ExtractMaskImageRegion();
+      for (unsigned int i = 0; i < VImageDimension; ++i)
+        regionIndex[i] = maskOffset[i];
 
-      typename itk::MaskImageFilter2<MaskType, MaskType, MaskType>::Pointer maskFilter =
-        itk::MaskImageFilter2<MaskType, MaskType, MaskType>::New();
-      maskFilter->SetInput1(maskImage);
-      maskFilter->SetInput2(adaptedSecondaryMaskImage);
-      maskFilter->SetMaskingValue(
-        1); // all pixels of maskImage where secondaryMaskImage==1 will be kept, all the others are set to 0
-      maskFilter->UpdateLargestPossibleRegion();
-      maskImage = maskFilter->GetOutput();
+      maskRegion.SetIndex(regionIndex);
+
+      auto regionOfInterestFilter = RegionOfInterestFilterType::New();
+      regionOfInterestFilter->SetInput(image);
+      regionOfInterestFilter->SetRegionOfInterest(maskRegion);
+      regionOfInterestFilter->Update();
+      adaptedImage = regionOfInterestFilter->GetOutput();
     }
-
-    typename MaskUtilType::Pointer maskUtil = MaskUtilType::New();
-    maskUtil->SetImage(image);
-    maskUtil->SetMask(maskImage.GetPointer());
-
-    // if mask is smaller than image, extract the image region where the mask is
-    typename ImageType::ConstPointer adaptedImage = ImageType::New();
-
-    adaptedImage = maskUtil->ExtractMaskImageRegion(); // this also checks mask sanity
 
     // find min, max, minindex and maxindex
     typename MinMaxLabelFilterType::Pointer minMaxFilter = MinMaxLabelFilterType::New();
@@ -420,31 +409,8 @@ namespace mitk
 
       ImageStatisticsContainer::ImageStatisticsObject statObj;
 
-      // find min, max, minindex and maxindex
-      // make sure to only look in the masked region, use a masker for this
-
-      vnl_vector<int> minIndex, maxIndex;
-      Point3D worldCoordinateMin;
-      Point3D worldCoordinateMax;
-      Point3D indexCoordinateMin;
-      Point3D indexCoordinateMax;
-      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMinIndex(labelValue), worldCoordinateMin);
-      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMaxIndex(labelValue), worldCoordinateMax);
-      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMin, indexCoordinateMin);
-      m_Image->GetGeometry()->WorldToIndex(worldCoordinateMax, indexCoordinateMax);
-
-      minIndex.set_size(3);
-      maxIndex.set_size(3);
-
-      // for (unsigned int i=0; i < tmpMaxIndex.GetIndexDimension(); i++)
-      for (unsigned int i = 0; i < 3; i++)
-      {
-        minIndex[i] = indexCoordinateMin[i];
-        maxIndex[i] = indexCoordinateMax[i];
-      }
-
-      statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), minIndex);
-      statObj.AddStatistic(ImageStatisticsConstants::MAXIMUMPOSITION(), maxIndex);
+      statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), toImageIndex(minMaxFilter->GetMinIndex(labelValue)));
+      statObj.AddStatistic(ImageStatisticsConstants::MAXIMUMPOSITION(), toImageIndex(minMaxFilter->GetMaxIndex(labelValue)));
 
       auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
       auto numberOfVoxels =
@@ -478,13 +444,6 @@ namespace mitk
         << labelValue << " ; conflicting time step: " << timeStep;
       m_StatisticContainer->SetStatistics(labelValue, timeStep, statObj);
     }
-
-    // swap maskGenerators back
-    if (swapMasks)
-    {
-      m_SecondaryMask = m_InternalMask;
-      m_InternalMask = nullptr;
-    }
   }
 
   bool ImageStatisticsCalculator::IsUpdateRequired() const
@@ -513,15 +472,6 @@ namespace mitk
     {
       const auto maskGeneratorTimeStamp = m_MaskGenerator->GetMTime();
       if (maskGeneratorTimeStamp > statisticsTimeStamp) // there is a mask generator and it has changed
-      {
-        return true;
-      }
-    }
-
-    if (m_SecondaryMaskGenerator.IsNotNull())
-    {
-      const auto maskGeneratorTimeStamp = m_SecondaryMaskGenerator->GetMTime();
-      if (maskGeneratorTimeStamp > statisticsTimeStamp) // there is a secondary mask generator and it has changed
       {
         return true;
       }

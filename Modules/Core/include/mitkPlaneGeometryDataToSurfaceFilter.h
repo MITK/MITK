@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <vtkSystemIncludes.h>
 
 class vtkPlaneSource;
-class vtkTransformPolyDataFilter;
+class vtkTransformFilter;
 class vtkCubeSource;
 class vtkTransform;
 class vtkPlane;
@@ -189,7 +189,7 @@ namespace mitk
     /** \brief Filter to create the vtk-representation of the PlaneGeometry, which is a
     *  transformation of the m_PlaneSource
     */
-    vtkTransformPolyDataFilter *m_VtkTransformPlaneFilter;
+    vtkTransformFilter *m_VtkTransformPlaneFilter;
 
     /** \brief If \a true, use Geometry3D::GetParametricBounds() to define the resolution in parameter space,
     *  otherwise use m_XResolution and m_YResolution
@@ -231,7 +231,7 @@ namespace mitk
 
     vtkCubeSource *m_CubeSource;
     vtkTransform *m_Transform;
-    vtkTransformPolyDataFilter *m_PolyDataTransformer;
+    vtkTransformFilter *m_PolyDataTransformer;
 
     vtkPlane *m_Plane;
     vtkCutter *m_PlaneCutter;

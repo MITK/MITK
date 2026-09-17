@@ -27,7 +27,7 @@ namespace mitk
    \brief Paintbrush tool for InteractiveSegmentation
 
    \sa FeedbackContourTool
-   \sa ExtractImageFilter
+   \sa ExtractSliceFilter
 
    \ingroup Interaction
    \ingroup ToolManagerEtAl
@@ -113,6 +113,7 @@ namespace mitk
     void OnToolManagerWorkingDataModified();
 
     bool m_FillMode;
+    const bool m_InitialFillMode;
     int m_Size;
 
     ContourModel::Pointer m_MasterContour;

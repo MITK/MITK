@@ -65,6 +65,7 @@ mitk::TotalSegmentatorTool::TotalSegmentatorTool()
   // Stay active after a segmentation is confirmed, so the user can run another
   // task without having to reselect the tool.
   this->KeepActiveAfterAcceptOn();
+  this->RequiresExistingLabelsOff();
 }
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()

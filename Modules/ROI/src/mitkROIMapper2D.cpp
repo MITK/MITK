@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataPlaneCutter.h>
 #include <vtkPropAssembly.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransformFilter.h>
 
 #include <regex>
 
@@ -127,7 +127,7 @@ void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
       cube->SetBounds(min[0], max[0], min[1], max[1], min[2], max[2]);
 
-      auto transform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+      auto transform = vtkSmartPointer<vtkTransformFilter>::New();
       transform->SetTransform(geometry->GetVtkTransform());
       transform->SetInputConnection(cube->GetOutputPort());
 

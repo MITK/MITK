@@ -233,6 +233,14 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(RecordAdaptation_StrictPolicy_RefusesEvenWithoutARecord);
   MITK_TEST(RecordAdaptation_LenientPolicy_AppendsAndToleratesNullRecord);
 
+  // Rescale plausibility diagnostics
+  MITK_TEST(Rescale_PlausibleValues_NoFindings);
+  MITK_TEST(Rescale_AbsentSlope_IsReported);
+  MITK_TEST(Rescale_NonPositiveSlope_IsReported);
+  MITK_TEST(Rescale_NonZeroIntercept_IsReported);
+  MITK_TEST(Rescale_BothObjectionable_ReportsBoth);
+  MITK_TEST(Rescale_NullProvider_NoFindings);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -820,6 +828,70 @@ public:
     CPPUNIT_ASSERT_NO_THROW(
       mitk::RecordAdaptation(nullptr, mitk::DICOMReadPolicy::Lenient,
                              mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "", "", ""));
+  }
+
+  // ---- Rescale plausibility ----
+  //
+  // Diagnostics, not adaptations: the reader has already applied these to the
+  // pixel buffer, so nothing here changes a value. They are returned rather
+  // than only logged so a front end can put them in front of the operator,
+  // which is the only reason they are testable at all.
+
+  void Rescale_PlausibleValues_NoFindings()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0028, 0x1053), "1.0");
+    SetDicomProperty(image, PropName(0x0028, 0x1052), "0.0");
+    CPPUNIT_ASSERT(mitk::CheckRescalePlausibility(image).empty());
+  }
+
+  void Rescale_AbsentSlope_IsReported()
+  {
+    // An absent slope is silently treated as 1.0, which is the case worth
+    // knowing about: the values look scaled and may not be.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0028, 0x1052), "0.0");
+
+    const auto findings = mitk::CheckRescalePlausibility(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), findings.size());
+    CPPUNIT_ASSERT(findings[0].find("(0028,1053)") != std::string::npos);
+  }
+
+  void Rescale_NonPositiveSlope_IsReported()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0028, 0x1053), "-2.0");
+    SetDicomProperty(image, PropName(0x0028, 0x1052), "0.0");
+
+    const auto findings = mitk::CheckRescalePlausibility(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), findings.size());
+    CPPUNIT_ASSERT(findings[0].find("-2.0") != std::string::npos);
+  }
+
+  void Rescale_NonZeroIntercept_IsReported()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0028, 0x1053), "1.0");
+    SetDicomProperty(image, PropName(0x0028, 0x1052), "-1024");
+
+    const auto findings = mitk::CheckRescalePlausibility(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), findings.size());
+    CPPUNIT_ASSERT(findings[0].find("(0028,1052)") != std::string::npos);
+    CPPUNIT_ASSERT(findings[0].find("-1024") != std::string::npos);
+  }
+
+  void Rescale_BothObjectionable_ReportsBoth()
+  {
+    // Each tag is judged on its own; one bad value must not mask the other.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0028, 0x1053), "0");
+    SetDicomProperty(image, PropName(0x0028, 0x1052), "5");
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), mitk::CheckRescalePlausibility(image).size());
+  }
+
+  void Rescale_NullProvider_NoFindings()
+  {
+    CPPUNIT_ASSERT(mitk::CheckRescalePlausibility(nullptr).empty());
   }
 
   // ---- Patient height ----

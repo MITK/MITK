@@ -416,6 +416,21 @@ int main(int argc, char* argv[])
                 << "\nRerun with --strict-dicom to refuse these instead.";
     }
 
+    // Reported next to the adaptations because an operator reads them the
+    // same way -- something about this input is worth a second look -- even
+    // though these changed nothing and --strict-dicom does not refuse them.
+    const auto& rescaleFindings = filter->GetRescaleFindings();
+    if (!rescaleFindings.empty())
+    {
+      std::string rescaleSummary = "Rescale values worth checking ("
+                                 + std::to_string(rescaleFindings.size()) + "):";
+      for (const auto& finding : rescaleFindings)
+      {
+        rescaleSummary += "\n  - " + finding;
+      }
+      MITK_WARN << rescaleSummary;
+    }
+
     // ---- Save -----------------------------------------------------------
     //
     // Wrapped separately so an output-write failure is distinguishable

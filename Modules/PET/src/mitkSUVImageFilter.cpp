@@ -541,6 +541,11 @@ const std::vector<mitk::SUVAdaptation>& mitk::SUVImageFilter::GetAdaptations() c
   return m_Adaptations;
 }
 
+const std::vector<std::string>& mitk::SUVImageFilter::GetRescaleFindings() const
+{
+  return m_RescaleFindings;
+}
+
 void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* props)
 {
   if (nullptr == props)
@@ -562,6 +567,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   const auto prevDecay      = m_EffectiveDecayCorrection;
   const auto prevInputModel = m_EffectiveInputModel;
   const auto prevAdaptations = m_Adaptations;
+  const auto prevRescaleFindings = m_RescaleFindings;
   const auto prevConf       = m_Configured;
 
   m_Configured = false;
@@ -592,8 +598,13 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
                                    : ClassifyPETInput(props, m_DICOMReadPolicy));
 
     // Diagnostic only, and deliberately after classification so it runs
-    // once per configure on an input the pipeline has accepted.
-    WarnOnImplausibleRescale(props);
+    // once per configure on an input the pipeline has accepted. Kept as
+    // well as logged so a front end can put them in front of the operator.
+    m_RescaleFindings = CheckRescalePlausibility(props);
+    for (const auto& finding : m_RescaleFindings)
+    {
+      MITK_WARN << finding;
+    }
 
     // Sticky detection slot: keep the classification result across
     // subsequent validation failures in this same Configure call so
@@ -781,6 +792,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     m_EffectiveDecayCorrection      = prevDecay;
     m_EffectiveInputModel           = prevInputModel;
     m_Adaptations                   = prevAdaptations;
+    m_RescaleFindings               = prevRescaleFindings;
     m_Configured                    = prevConf;
     throw;
   }

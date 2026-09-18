@@ -851,29 +851,33 @@ bool mitk::IsEnhancedPETInput(const mitk::IPropertyProvider* provider)
   return ENHANCED_PET_SOP_CLASS_UID == sopClassUID;
 }
 
-void mitk::WarnOnImplausibleRescale(const mitk::IPropertyProvider* provider)
+std::vector<std::string> mitk::CheckRescalePlausibility(const mitk::IPropertyProvider* provider)
 {
+  std::vector<std::string> findings;
+
   if (nullptr == provider || IsEnhancedPETInput(provider))
   {
-    return;
+    return findings;
   }
 
   const std::string rawSlope =
     TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x1053)));
   if (rawSlope.empty())
   {
-    MITK_WARN << "(0028,1053) Rescale Slope is absent or empty. The IBSI-SUV "
-                 "recommendations require it to be present; the reader has "
-                 "treated the stored values as already scaled.";
+    findings.push_back(
+      "(0028,1053) Rescale Slope is absent or empty. The IBSI-SUV "
+      "recommendations require it to be present; the reader has treated the "
+      "stored values as already scaled.");
   }
   else
   {
     const double slope = ConvertDICOMStrToValue<double>(rawSlope);
     if (!std::isfinite(slope) || slope <= 0.0)
     {
-      MITK_WARN << "(0028,1053) Rescale Slope is " << rawSlope
-                << ". The IBSI-SUV recommendations expect a positive value; a "
-                   "non-positive slope inverts or flattens the activity scale.";
+      findings.push_back(
+        "(0028,1053) Rescale Slope is " + rawSlope +
+        ". The IBSI-SUV recommendations expect a positive value; a "
+        "non-positive slope inverts or flattens the activity scale.");
     }
   }
 
@@ -881,20 +885,23 @@ void mitk::WarnOnImplausibleRescale(const mitk::IPropertyProvider* provider)
     TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x1052)));
   if (rawIntercept.empty())
   {
-    MITK_WARN << "(0028,1052) Rescale Intercept is absent or empty. The "
-                 "IBSI-SUV recommendations require it to be present.";
+    findings.push_back(
+      "(0028,1052) Rescale Intercept is absent or empty. The IBSI-SUV "
+      "recommendations require it to be present.");
   }
   else
   {
     const double intercept = ConvertDICOMStrToValue<double>(rawIntercept);
     if (!std::isfinite(intercept) || 0.0 != intercept)
     {
-      MITK_WARN << "(0028,1052) Rescale Intercept is " << rawIntercept
-                << ". The IBSI-SUV recommendations expect zero for PET; a "
-                   "non-zero intercept offsets every voxel of the activity "
-                   "concentration.";
+      findings.push_back(
+        "(0028,1052) Rescale Intercept is " + rawIntercept +
+        ". The IBSI-SUV recommendations expect zero for PET; a non-zero "
+        "intercept offsets every voxel of the activity concentration.");
     }
   }
+
+  return findings;
 }
 
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)

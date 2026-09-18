@@ -73,6 +73,9 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms);
 
   // Adaptation record on the output, and across a save
+  MITK_TEST(RescaleFindings_ImplausibleIntercept_ReachTheFilter);
+  MITK_TEST(RescaleFindings_PlausibleValues_AreEmpty);
+  MITK_TEST(RescaleFindings_NoRescaleTagsAtAll_ReportsBothAbsent);
   MITK_TEST(AdaptationRecord_IsWrittenToTheOutput);
   MITK_TEST(AdaptationRecord_SurvivesSaveAndReload);
   MITK_TEST(AdaptationRecord_UnadaptedInput_RecordsEmptyAndStillDescribesTheDerivation);
@@ -309,6 +312,29 @@ private:
     return f;
   }
 
+  static void SetRescaleTags(mitk::Image* image, const char* slope, const char* intercept)
+  {
+    const auto set = [image](unsigned group, unsigned element, const char* value) {
+      const std::string key =
+        mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(group, element));
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, value);
+      image->SetProperty(key.c_str(), prop);
+    };
+    set(0x0010, 0x1030, "70");
+    set(0x0028, 0x1053, slope);
+    set(0x0028, 0x1052, intercept);
+  }
+
+  static mitk::SUVImageFilter::Pointer MakeBwFilterFor(mitk::Image* image)
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(image);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    return f;
+  }
+
   static std::string ReadStringProperty(const mitk::Image* image, const std::string& name)
   {
     auto prop = image->GetProperty(name.c_str());
@@ -508,6 +534,49 @@ public:
   }
 
   // ---- Patient's Weight reaching the computation ----
+
+  // ---- Rescale findings reach the filter ----
+
+  void RescaleFindings_ImplausibleIntercept_ReachTheFilter()
+  {
+    // No benchmark DRO carries an objectionable rescale, so this is the only
+    // coverage of the path from the helper through ConfigureFromProperties.
+    auto img = MakeMinimalImage();
+    SetRescaleTags(img, "1.0", "-1024");
+
+    auto f = MakeBwFilterFor(img);
+    f->ConfigureFromProperties(img.GetPointer());
+
+    const auto& findings = f->GetRescaleFindings();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), findings.size());
+    CPPUNIT_ASSERT(findings[0].find("(0028,1052)") != std::string::npos);
+
+    // Diagnostics, never adaptations: recording them would populate the
+    // record that Strict guarantees to be empty.
+    CPPUNIT_ASSERT(f->GetAdaptations().empty());
+  }
+
+  void RescaleFindings_PlausibleValues_AreEmpty()
+  {
+    auto img = MakeMinimalImage();
+    SetRescaleTags(img, "1.0", "0.0");
+
+    auto f = MakeBwFilterFor(img);
+    f->ConfigureFromProperties(img.GetPointer());
+
+    CPPUNIT_ASSERT(f->GetRescaleFindings().empty());
+  }
+
+  void RescaleFindings_NoRescaleTagsAtAll_ReportsBothAbsent()
+  {
+    // An image carrying no rescale tags -- a plain NRRD, or any non-DICOM
+    // input -- reports both as absent. Pinned because it is the common case
+    // for the override-driven workflow, and the volume of the diagnostic is
+    // a deliberate choice rather than an oversight.
+    auto f = MakeFilterWithGramEncodedWeight();
+    f->ConfigureFromProperties(f->GetInput());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), f->GetRescaleFindings().size());
+  }
 
   // ---- The adaptation record survives a save ----
 

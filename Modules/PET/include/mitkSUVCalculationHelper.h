@@ -638,23 +638,30 @@ namespace mitk
   bool MITKPET_EXPORT IsEnhancedPETInput(const mitk::IPropertyProvider* provider);
 
   /**
-   * \brief Warn about a Rescale Slope or Intercept the IBSI-SUV manual
-   *        would object to.
+   * \brief Findings about a Rescale Slope or Intercept the IBSI-SUV
+   *        recommendations would object to.
    *
-   * Purely diagnostic: the values are never read back into the
-   * computation. GDCM has already applied them to the pixel buffer by the
-   * time MITK sees the image, so re-applying them here would scale twice.
-   * What this catches is input the operator should know about --
-   * an absent slope, which GDCM silently treats as 1.0, or a non-zero
-   * intercept, which shifts every voxel.
+   * Diagnostic only: the values are never read back into the computation.
+   * The reader has already applied them to the pixel buffer by the time
+   * MITK sees the image, so re-applying them here would scale twice. What
+   * this catches is input the operator should know about -- an absent
+   * slope, which is silently treated as 1.0, or a non-zero intercept,
+   * which shifts every voxel.
    *
-   * Enhanced PET objects are skipped: they carry no top-level rescale, and
-   * their functional-group equivalents are validated by the Enhanced PET
-   * classifier instead.
+   * Returned rather than only logged so a caller can put them in front of
+   * the operator. They are not \c SUVAdaptation entries: nothing is
+   * reinterpreted, and recording them would populate the adaptation record
+   * under Strict, where the documented guarantee is that it is empty.
+   *
+   * Enhanced PET objects yield no findings: they carry no top-level
+   * rescale, and their functional-group equivalents are validated by the
+   * Enhanced PET classifier instead.
    *
    * \param[in] provider Source of DICOM properties.
+   * \return One human-readable finding per objection; empty when the
+   *         rescale values are unremarkable.
    */
-  void MITKPET_EXPORT WarnOnImplausibleRescale(const mitk::IPropertyProvider* provider);
+  std::vector<std::string> MITKPET_EXPORT CheckRescalePlausibility(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Strategy describing how (or whether) the input pixel data has been

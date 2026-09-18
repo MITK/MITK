@@ -339,6 +339,13 @@ are diagnostics, not adaptations: nothing is reinterpreted, so nothing is
 recorded and `--strict-dicom` does not refuse them. Enhanced PET objects carry
 no top-level rescale and are validated by their own classifier instead.
 
+They are also collected and reported together after a successful run, next to
+the adaptation summary, so they do not have to be found among the rest of the
+log. An input carrying no rescale tags at all -- a plain NRRD driven entirely
+by overrides, for instance -- reports both as absent. That is intended: an
+image whose activity scale cannot be confirmed is exactly the case the
+recommendation is about, whatever the reason.
+
 `--injected-activity` bypasses the dose adaptation and `--decay-time` bypasses
 the decay-timing fallback regardless of `--strict-dicom`; both values are used
 verbatim.

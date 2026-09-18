@@ -204,6 +204,20 @@ namespace mitk
     const std::vector<SUVAdaptation>& GetAdaptations() const;
 
     /**
+     * \brief Objections to the input's Rescale Slope and Intercept.
+     *
+     * Populated by ConfigureFromProperties and empty until it has run.
+     * Purely diagnostic -- the values never enter the computation -- but
+     * worth putting in front of an operator, so a front end can render
+     * these alongside \c GetAdaptations().
+     *
+     * Unlike the adaptation record this does not depend on the read
+     * policy: nothing is reinterpreted, so Strict has nothing to refuse
+     * and the findings are the same either way.
+     */
+    const std::vector<std::string>& GetRescaleFindings() const;
+
+    /**
      * \brief Optional explicit selection for multi-item Radiopharmaceutical
      *        Information Sequence (0054,0016).
      *
@@ -332,6 +346,7 @@ namespace mitk
     std::optional<DecayCorrectionInfo> m_EffectiveDecayCorrection;
     std::optional<SUVInputModel> m_EffectiveInputModel;
     std::vector<SUVAdaptation> m_Adaptations;
+    std::vector<std::string>   m_RescaleFindings;
 
     // Detected input model: sticky across rollbacks (does not need to
     // round-trip the failure case because classification is a pure

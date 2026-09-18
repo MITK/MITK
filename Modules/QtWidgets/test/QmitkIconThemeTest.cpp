@@ -78,6 +78,7 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkIconThemeTestSuite);
   MITK_TEST(ThemeSwitchRecolorsExistingIcon);
   MITK_TEST(AccentColorFollowsTheme);
+  MITK_TEST(CustomColorOverridesThemeColor);
   MITK_TEST(RefreshEmitsChanged);
   MITK_TEST(ColorsFollowRefresh);
   MITK_TEST(RendersAtTheRequestedSize);
@@ -121,6 +122,21 @@ public:
 
     ApplyTheme("#000000", "#0000ff");
     CPPUNIT_ASSERT_EQUAL(std::string("#0000ff"), CenterColor(icon, 16));
+  }
+
+  void CustomColorOverridesThemeColor()
+  {
+    ApplyTheme("#ff0000", "#ffffff");
+
+    const QIcon icon = QmitkIconTheme::GetIcon(Svg("#00ff00", 16), "#123456");
+    CPPUNIT_ASSERT_EQUAL(std::string("#123456"), CenterColor(icon, 16));
+
+    ApplyTheme("#0000ff", "#ffffff");
+    CPPUNIT_ASSERT_EQUAL(std::string("#123456"), CenterColor(icon, 16));
+
+    // A custom color equal to the magic color must not be themed away
+    const QIcon greenIcon = QmitkIconTheme::GetIcon(Svg("#00ff00", 16), "#00ff00");
+    CPPUNIT_ASSERT_EQUAL(std::string("#00ff00"), CenterColor(greenIcon, 16));
   }
 
   void RefreshEmitsChanged()

@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <QSvgRenderer>
 
 #include <memory>
+#include <optional>
 
 namespace
 {
@@ -79,9 +80,9 @@ namespace
     return QString(svg).replace(re, themeColor);
   }
 
-  QByteArray ThemeSVG(const QByteArray &originalSVG)
+  QByteArray ThemeSVG(const QByteArray &originalSVG, const std::optional<QString> &color)
   {
-    auto themedSVG = QmitkIconTheme::ReplaceColor(QString(originalSVG), QmitkIconTheme::GetColor());
+    auto themedSVG = QmitkIconTheme::ReplaceColor(QString(originalSVG), color.value_or(QmitkIconTheme::GetColor()));
     themedSVG = ReplaceMagicColor(themedSVG, QStringLiteral("ff00ff|f0f"), QmitkIconTheme::GetAccentColor());
 
     return themedSVG.toUtf8();
@@ -96,10 +97,11 @@ namespace
   class ThemedIconEngine : public QIconEngine
   {
   public:
-    explicit ThemedIconEngine(const QByteArray &originalSVG)
+    ThemedIconEngine(const QByteArray &originalSVG, const std::optional<QString> &color)
       // Deep copy: QmitkToolSelectionBox passes QByteArray::fromRawData() over
       // a buffer it frees right after GetIcon() returns.
-      : m_SVG(originalSVG.constData(), originalSVG.size())
+      : m_SVG(originalSVG.constData(), originalSVG.size()),
+        m_Color(color)
     {
     }
 
@@ -176,7 +178,7 @@ namespace
 
     QIconEngine *clone() const override
     {
-      return new ThemedIconEngine(m_SVG);
+      return new ThemedIconEngine(m_SVG, m_Color);
     }
 
   private:
@@ -185,7 +187,7 @@ namespace
       if (m_Generation == s_Generation)
         return;
 
-      const auto themedSVG = ThemeSVG(m_SVG);
+      const auto themedSVG = ThemeSVG(m_SVG, m_Color);
 
       m_Renderer = std::make_unique<QSvgRenderer>(themedSVG);
       m_Renderer->setAspectRatioMode(Qt::KeepAspectRatio);
@@ -211,6 +213,7 @@ namespace
     }
 
     QByteArray m_SVG;
+    std::optional<QString> m_Color;
     std::unique_ptr<QSvgRenderer> m_Renderer;
     QString m_CacheKeyPrefix;
     unsigned m_Generation = 0;
@@ -229,7 +232,12 @@ QmitkIconTheme *QmitkIconTheme::GetInstance()
 
 QIcon QmitkIconTheme::GetIcon(const QByteArray &originalSVG)
 {
-  return QIcon(new ThemedIconEngine(originalSVG));
+  return QIcon(new ThemedIconEngine(originalSVG, std::nullopt));
+}
+
+QIcon QmitkIconTheme::GetIcon(const QByteArray &originalSVG, const QString &color)
+{
+  return QIcon(new ThemedIconEngine(originalSVG, color));
 }
 
 QIcon QmitkIconTheme::GetIcon(const QString &resourcePath)

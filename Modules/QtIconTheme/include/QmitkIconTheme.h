@@ -51,6 +51,19 @@ public:
   static QIcon GetIcon(const QByteArray &originalSVG);
 
   /**
+   * \brief Creates an icon from raw SVG data with a custom icon color.
+   *
+   * The magic icon color is replaced by \p color instead of the icon color
+   * of the current theme, while the magic accent color still follows the
+   * theme.
+   *
+   * \param[in] originalSVG The original SVG content as a byte array.
+   * \param[in] color A CSS-compatible color string (e.g., "#ff0000").
+   * \return A QIcon that renders the SVG in the given icon color.
+   */
+  static QIcon GetIcon(const QByteArray &originalSVG, const QString &color);
+
+  /**
    * \brief Creates a theme-colored icon from an SVG resource file.
    * \param[in] resourcePath The Qt resource path to the SVG file.
    * \return A QIcon that renders in the icon colors of the current theme,

@@ -22,8 +22,9 @@ found in the LICENSE file.
  *
  * This class extends QmitkNodeDescriptor by replacing the magic color \c \#00ff00
  * (or \c \#0f0) in the provided SVG icon template with the actual color of the
- * mitk::DataNode. Recolored icons are cached internally so that each unique
- * color is only rendered once.
+ * mitk::DataNode. The icons are created through QmitkIconTheme, so they render
+ * at display size and their accent color follows the theme. One icon per
+ * unique node color is kept.
  *
  * \sa QmitkNodeDescriptor
  * \sa QmitkNodeDescriptorManager

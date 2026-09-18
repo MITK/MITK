@@ -208,8 +208,11 @@ and the renderer keeps its default rig.
 Volume Visualization view built this node's TransferFunction from. Recorded
 because the view's adjust sliders resample the colour function, after which the
 curve matches no preset and the choice can no longer be recovered from it; the
-mapper does not read it. Absent means no preset is named in the view: for a
-curve authored point by point there or loaded from a file,
+mapper does not read it. A curve authored point by point in the view keeps the
+name of the preset it was drawn over, which from then on is provenance rather
+than a recipe and is what has the view mark that preset as edited; what is
+dropped alongside it are the four offsets below. Absent means no preset is named
+in the view: for a curve loaded from a file,
 volumerendering.transferfunction.custom says so; for one that came from
 outside the view, nothing does.
   <li> volumerendering.transferfunction.opacityshift,
@@ -222,15 +225,20 @@ four, since the neutral colour width is the preset's own span rather than zero.
 Together with the preset name they form a recipe the view re-executes when the
 node is selected again, which is what lets the sliders show their previous
 positions instead of resetting. Where the recipe and the stored TransferFunction
-disagree - the curve having been edited elsewhere - the recipe wins. The mapper
-does not read any of them.
+disagree - the curve having been edited elsewhere - the recipe wins, which is
+why all four are removed as soon as the curve is drawn over in the view: with
+them gone there is no recipe to re-execute, and the drawing is what the next
+selection brings back. The mapper does not read any of them.
   <li> volumerendering.transferfunction.custom - Set where the Volume
 Visualization view's TransferFunction was authored point by point there or
 loaded from a file, and removed again when a preset is chosen instead. No
 recipe describes such a curve - that is what makes it custom - so what is
 recorded is only that the curve was chosen in the view at all, which is what
 the view reads to take it back over on the next selection rather than let it
-be replaced. Written true or removed, never false; the mapper does not read it.
+be replaced. Where a preset name survives beside it, for a curve drawn over one,
+this is also what keeps the offsets above from being written afresh the next
+time a slider moves, which would rebuild that recipe over the drawing. Written
+true or removed, never false; the mapper does not read it.
   <li> volumerendering.normalsFromOpacity - Derive the shading gradient from the
 opacity rather than the raw scalars, so lighting follows the transfer function
 instead of the data's noise. The scattering blend reads the same gradient's

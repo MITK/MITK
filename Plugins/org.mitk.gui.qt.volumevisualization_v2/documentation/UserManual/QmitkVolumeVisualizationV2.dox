@@ -78,9 +78,11 @@ coarsely sampled image than on a finely sampled one. <b>Height</b>, under
 cannot assume even the units, because MR intensities are not calibrated to a
 fixed scale, so expect to adjust those per image.
 
-The preset in force is the entry marked in the grid. A curve that no preset
-describes - one edited point by point, or loaded from a file - leaves no entry
-marked.
+The preset in force is the entry marked in the grid. An asterisk after its name
+says the curve has since been moved away from it, whether by the sliders
+described below or by editing it point by point; clicking that entry again
+rebuilds the preset as its author wrote it. Only a curve that no preset
+describes at all - one loaded from a file - leaves no entry marked.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
 
@@ -161,9 +163,11 @@ file in the same format the built-in catalogue uses, so your own functions can
 be kept and shared and read back with <b>Load from file...</b>.
 
 \note A curve that has been authored or loaded is no longer described by any
-preset name, so the name is dropped and the adjust sliders start measuring from
-the new curve. A saved file records the blend mode the curve was authored for
-alongside it, and <b>Load</b> restores both.
+preset name. One edited point by point keeps the name of the preset it was drawn
+over, marked with an asterisk to say it is no longer that preset; one loaded
+from a file has no name to keep. Either way the adjust sliders start measuring
+from the new curve. A saved file records the blend mode the curve was authored
+for alongside it, and <b>Load</b> restores both.
 
 \section org_mitk_views_volumevisualization_v2_blendmode Blend mode
 

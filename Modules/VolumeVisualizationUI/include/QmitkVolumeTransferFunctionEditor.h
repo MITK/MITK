@@ -48,9 +48,12 @@ namespace Ui
  *
  * What the widget records on the node is a recipe rather than only a result -
  * the preset it started from plus the four window offsets - so that returning
- * to a node restores the controls as they were left. Where no recipe can
- * describe the curve, because it was authored here or loaded from a file, what
- * is recorded instead is that the curve was chosen here at all. See the
+ * to a node restores the controls as they were left. A curve drawn over by hand
+ * keeps the preset name, which from then on is provenance rather than a recipe,
+ * and loses the offsets, so that the next selection brings the drawing back
+ * instead of rebuilding the preset over it; the panel marks such an entry as
+ * edited. A curve loaded from a file answers to no catalogue entry at all, and
+ * what is recorded for it is only that it was chosen here. See the
  * volumerendering.transferfunction.* entries in the property documentation.
  *
  * \sa mitk::TransferFunctionPresets, QmitkCombinedTransferFunctionCanvas
@@ -156,6 +159,17 @@ private:
   /** \brief Record the adjust sliders' current offsets on the node. */
   void RecordAdjustOffsets();
 
+  /**
+   * \brief Drop the four offsets, leaving the rest of what the node records
+   *        about how its curve was arrived at.
+   *
+   * What lets a curve drawn over by hand keep its preset name. The offsets
+   * describe the preset that was drawn over rather than the drawing, and
+   * nothing records the drawing but the curve itself, so replaying them on the
+   * next selection would put the catalogue's curve back over it.
+   */
+  void ForgetAdjustOffsets(mitk::DataNode *node);
+
   /** \brief Drop everything this widget records about how the node's curve was
    *         arrived at, for a function it cannot reproduce.
    */
@@ -215,6 +229,19 @@ private:
    * copy of that state is one thing to keep right.
    */
   void ShowColorStops();
+
+  /** \brief Mark the preset in force as edited, or take the mark away. */
+  void ShowPresetEdited();
+
+  /**
+   * \brief Whether the curve on show is no longer what the preset in force
+   *        would produce.
+   *
+   * Answered from the sliders and from what the node records, rather than kept
+   * as a flag, so that a node coming back into the panel is described by what
+   * it carries rather than by what was last done here.
+   */
+  bool DiffersFromPreset() const;
 
   /**
    * \brief Give the colour function back the handful of points it can be taken

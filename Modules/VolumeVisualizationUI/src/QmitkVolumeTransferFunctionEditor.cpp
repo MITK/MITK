@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <QFontMetrics>
 #include <QIcon>
 #include <QListWidget>
+#include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
@@ -86,6 +87,25 @@ namespace
    * already give it.
    */
   constexpr const char *TF_CUSTOM_PROPERTY = "volumerendering.transferfunction.custom";
+
+  /** \brief Where an entry keeps the name of the preset it stands for.
+   *
+   * Not the text it shows: that gains a marker once the curve has been moved
+   * away from the preset, and then matches no name in the catalogue.
+   */
+  constexpr int PRESET_NAME_ROLE = Qt::UserRole;
+
+  /** \brief What an entry adds to its name while it is showing such a curve.
+   *
+   * Held apart from the name by a non-breaking space, and written as a code
+   * point rather than as a literal so that it survives whatever encoding a
+   * compiler reads this file in. A breaking one would let a name wrapped across
+   * the lines of a cell leave the marker stranded on a line of its own.
+   */
+  QString PresetEditedMarker()
+  {
+    return QChar(0x00A0) + QStringLiteral("*");
+  }
 
   /** \brief A preview's shape.
    *
@@ -201,6 +221,42 @@ namespace
     painter.drawRect(0, 0, swatch.width() - 1, swatch.height() - 1);
 
     return QIcon(swatch);
+  }
+
+  /** \brief The preset an entry stands for. */
+  QString PresetName(const QListWidgetItem *item)
+  {
+    return item->data(PRESET_NAME_ROLE).toString();
+  }
+
+  /** \brief The row holding the named preset, or -1.
+   *
+   * \param[in] presetName The name to look for. The empty name a node records
+   *                       no preset under matches nothing, which is what leaves
+   *                       the grid with no entry marked.
+   */
+  int FindPresetRow(const QListWidget *presetList, const QString &presetName)
+  {
+    for (int i = 0; i < presetList->count(); ++i)
+    {
+      if (PresetName(presetList->item(i)) == presetName)
+        return i;
+    }
+
+    return -1;
+  }
+
+  /** \brief Whether a slider has been carried off the value given here.
+   *
+   * Measured against half a step rather than by equality: ctkDoubleSlider
+   * rounds a value onto an integer slider and re-bases an offset so as to
+   * answer with what it was handed, and two such round trips need not come back
+   * bit-identical. Half a step is also the smallest difference a slider can be
+   * put at all.
+   */
+  bool DiffersFrom(const ctkDoubleSlider *slider, double neutral)
+  {
+    return std::abs(slider->value() - neutral) > 0.5 * slider->singleStep();
   }
 
   /** \brief Whether the node is rendered as a volume at all.
@@ -323,7 +379,14 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     "QListWidget::item:selected:disabled { background-color: rgba(127, 127, 127, 90); }");
 
   for (const auto &name : m_Presets.GetPresetNames())
-    presetList->addItem(QString::fromStdString(name));
+  {
+    const auto presetName = QString::fromStdString(name);
+
+    // The name goes in beside the text as well as in it, because the text is
+    // what the edited marker is appended to. See PRESET_NAME_ROLE.
+    auto *presetItem = new QListWidgetItem(presetName, presetList);
+    presetItem->setData(PRESET_NAME_ROLE, presetName);
+  }
 
   // Cells are measured from the names they have to hold, so the entries come
   // first, and the stand-in previews after them, since their size is what the
@@ -362,7 +425,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     [this](QListWidgetItem *item)
     {
       if (item != nullptr)
-        this->OnPresetSelected(item->text());
+        this->OnPresetSelected(PresetName(item));
     });
 
   connect(m_Controls->presetViewModeButton, &QToolButton::clicked, this,
@@ -388,7 +451,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     this, &QmitkVolumeTransferFunctionEditor::SetEditModeActive);
 
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::PointsChanged,
-    this, [this] { m_CurveEdited = true; });
+    this, [this]
+    {
+      m_CurveEdited = true;
+      this->ShowPresetEdited();
+    });
 
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::ColorStopsChanged,
     this, &QmitkVolumeTransferFunctionEditor::ShowColorStops);
@@ -528,6 +595,11 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
     // wrapping by its width and leaves the height free, which is the
     // measurement the delegate itself makes when it paints a name. The tallest
     // of them keeps every cell the same height and none of them too short.
+    //
+    // Measured with the edited marker on every name, though at most one wears
+    // it: cells are sized here and not again when one appears, so a name the
+    // marker carries onto another line would be cut off in a cell measured
+    // without it.
     const QFontMetrics metrics = presetList->fontMetrics();
     int nameHeight = metrics.lineSpacing();
 
@@ -535,7 +607,8 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
     {
       const QRect nameBounds = metrics.boundingRect(QRect(0, 0, previewSize.width(), 0),
                                                     Qt::TextWordWrap,
-                                                    presetList->item(i)->text());
+                                                    PresetName(presetList->item(i)) +
+                                                      PresetEditedMarker());
 
       nameHeight = std::max(nameHeight, nameBounds.height());
     }
@@ -597,12 +670,12 @@ void QmitkVolumeTransferFunctionEditor::EnsureTransferFunction()
   // The grid was filled from the same catalog, so a name it vouches for has a
   // row. Nothing matches the empty name an empty catalog returns, which is the
   // one case this guards.
-  const auto matches = m_Controls->presetListWidget->findItems(presetName, Qt::MatchExactly);
+  const int presetIndex = FindPresetRow(m_Controls->presetListWidget, presetName);
 
-  if (matches.isEmpty())
+  if (presetIndex < 0)
     return;
 
-  m_Controls->presetListWidget->setCurrentRow(m_Controls->presetListWidget->row(matches.first()));
+  m_Controls->presetListWidget->setCurrentRow(presetIndex);
 
   this->OnPresetSelected(presetName);
 }
@@ -679,12 +752,8 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     }
   }
 
-  // Nothing matches the empty name a node that records no preset leaves behind,
-  // which is what then leaves the grid with no entry marked.
-  const auto matches =
-    m_Controls->presetListWidget->findItems(QString::fromStdString(presetName), Qt::MatchExactly);
-
-  const int presetIndex = matches.isEmpty() ? -1 : m_Controls->presetListWidget->row(matches.first());
+  const int presetIndex =
+    FindPresetRow(m_Controls->presetListWidget, QString::fromStdString(presetName));
 
   if (presetIndex < 0)
     this->ClearPresetSelection();
@@ -760,6 +829,13 @@ void QmitkVolumeTransferFunctionEditor::RecordAdjustOffsets()
   if (!node->GetStringProperty(TF_PRESET_PROPERTY, presetName))
     return;
 
+  // A curve drawn over by hand keeps the name of the preset it was drawn over,
+  // but the sliders no longer measure from that preset - they measure from the
+  // drawing - so what they read describes no baseline the name stands for.
+  // Writing it would restore a recipe ForgetAdjustOffsets took away on purpose.
+  if (IsCustomTransferFunction(node.GetPointer()))
+    return;
+
   node->SetFloatProperty(TF_OPACITY_SHIFT_PROPERTY,
     static_cast<float>(m_Controls->opacityShiftSlider->value()));
   node->SetFloatProperty(TF_OPACITY_HEIGHT_PROPERTY,
@@ -770,7 +846,7 @@ void QmitkVolumeTransferFunctionEditor::RecordAdjustOffsets()
     static_cast<float>(m_Controls->colorWidthSlider->value()));
 }
 
-void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataNode *node)
+void QmitkVolumeTransferFunctionEditor::ForgetAdjustOffsets(mitk::DataNode *node)
 {
   if (node == nullptr)
     return;
@@ -779,11 +855,22 @@ void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataN
   // meaning each of them carries, which is what the restore path reads.
   auto *properties = node->GetPropertyList();
 
-  properties->DeleteProperty(TF_PRESET_PROPERTY);
   properties->DeleteProperty(TF_OPACITY_SHIFT_PROPERTY);
   properties->DeleteProperty(TF_OPACITY_HEIGHT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_SHIFT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_WIDTH_PROPERTY);
+}
+
+void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataNode *node)
+{
+  if (node == nullptr)
+    return;
+
+  this->ForgetAdjustOffsets(node);
+
+  auto *properties = node->GetPropertyList();
+
+  properties->DeleteProperty(TF_PRESET_PROPERTY);
   properties->DeleteProperty(TF_CUSTOM_PROPERTY);
 }
 
@@ -878,6 +965,12 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
   this->SnapshotAppliedTransferFunction();
   this->ResetAdjustSliders();
 
+  // Whatever is on show is the baseline from here on, so an edit that led to it
+  // is over rather than outstanding. Left set, it would mark the next preset
+  // clicked as edited before anything touched it.
+  m_CurveEdited = false;
+
+  this->ShowPresetEdited();
   this->UpdateControlAvailability();
 }
 
@@ -1015,6 +1108,7 @@ void QmitkVolumeTransferFunctionEditor::OnColorWindowChanged()
     m_DataRange[0], m_DataRange[1], static_cast<int>(colorTable.size() / 3), colorTable.data());
 
   this->RecordAdjustOffsets();
+  this->ShowPresetEdited();
   m_Controls->combinedTfCanvas->update();
 
   emit TransferFunctionChanged();
@@ -1029,6 +1123,7 @@ void QmitkVolumeTransferFunctionEditor::OnCanvasOpacityChanged()
   // place, and what the ray caster re-uploads against is that function's own
   // modification time, which the edit already moved.
   this->RecordAdjustOffsets();
+  this->ShowPresetEdited();
 
   emit TransferFunctionChanged();
 }
@@ -1098,11 +1193,12 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 
   if (node.IsNotNull())
   {
-    // Drawn by hand, so neither a preset name nor a set of offsets describes
-    // the curve any more, and replaying them on the next selection would
-    // rebuild the preset over it.
-    this->RecordCustomTransferFunction(node);
-    this->ClearPresetSelection();
+    // Drawn by hand, so the offsets no longer describe the curve, and replaying
+    // them on the next selection would rebuild the preset over it. The preset
+    // is still where the curve came from, though, which is worth keeping and
+    // worth saying: the name stays, and the panel marks the entry as edited.
+    this->ForgetAdjustOffsets(node);
+    node->SetBoolProperty(TF_CUSTOM_PROPERTY, true);
   }
 
   // Re-seeds the canvas and re-snapshots both baselines, so the sliders now
@@ -1192,6 +1288,49 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
   m_Controls->colorStopColorButton->setStyleSheet(hasSelection
     ? "background-color:" + canvas->GetColorStopColor(selected).name()
     : QString());
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()
+{
+  auto *presetList = m_Controls->presetListWidget;
+
+  const int editedRow = this->DiffersFromPreset() ? presetList->currentRow() : -1;
+
+  // Every entry rather than the one row that can wear the marker, so that the
+  // entry the selection has just left is not left wearing it too.
+  for (int i = 0; i < presetList->count(); ++i)
+  {
+    auto *presetItem = presetList->item(i);
+
+    const QString text =
+      i == editedRow ? PresetName(presetItem) + PresetEditedMarker() : PresetName(presetItem);
+
+    // An entry tells the view it changed whether or not it did, and this runs
+    // on every step of a slider drag.
+    if (presetItem->text() == text)
+      continue;
+
+    presetItem->setText(text);
+
+    // A marker nothing names is one nobody can read, and the way back is not
+    // Reset: that measures from the curve as it now stands.
+    presetItem->setToolTip(i == editedRow
+      ? "Moved away from this preset. Click it to go back to it."
+      : QString());
+  }
+}
+
+bool QmitkVolumeTransferFunctionEditor::DiffersFromPreset() const
+{
+  // The edit in progress, which nothing has recorded yet, and the one already
+  // left, which the node carries.
+  if (m_CurveEdited || IsCustomTransferFunction(m_DataNode.Lock().GetPointer()))
+    return true;
+
+  return DiffersFrom(m_Controls->opacityShiftSlider, 0.0) ||
+         DiffersFrom(m_Controls->opacityHeightSlider, 0.0) ||
+         DiffersFrom(m_Controls->colorShiftSlider, 0.0) ||
+         DiffersFrom(m_Controls->colorWidthSlider, this->NeutralColorWidth());
 }
 
 void QmitkVolumeTransferFunctionEditor::OnPickColorStopColor()
@@ -1409,7 +1548,7 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
   else
   {
     auto *presetItem = presetList->item(m_NextThumbnailIndex);
-    const auto presetName = presetItem->text().toStdString();
+    const auto presetName = PresetName(presetItem).toStdString();
 
     // Drawn in the mode the preset names, or the two MIP presets would preview
     // as the white shells their windows composite into, and the grid would

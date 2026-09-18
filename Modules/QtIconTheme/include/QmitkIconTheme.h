@@ -17,33 +17,43 @@ found in the LICENSE file.
 
 #include <QByteArray>
 #include <QIcon>
+#include <QObject>
 #include <QString>
 
 /**
- * \brief Utility class for theme-aware icon and color management.
+ * \brief Theme-aware icon and color management.
  *
- * Provides static methods to create icons whose colors adapt to the current
- * application theme (dark/light mode). SVG icons are recolored by replacing
- * magic colors with the theme-appropriate colors.
- *
- * This class cannot be instantiated.
+ * SVG icons are recolored by replacing magic colors with the icon colors
+ * declared in the application style sheet. Icons created by GetIcon() follow
+ * theme switches at runtime: after Refresh() they re-render in the current
+ * colors on their next repaint, so callers can store them like any other
+ * QIcon. Consumers that derive and cache anything else from the theme colors
+ * connect to Changed().
  *
  * \sa QmitkColoredNodeDescriptor
  */
-class MITKQTICONTHEME_EXPORT QmitkIconTheme
+class MITKQTICONTHEME_EXPORT QmitkIconTheme : public QObject
 {
+  Q_OBJECT
+
 public:
+  /**
+   * \brief Returns the single instance, which exists to emit Changed().
+   */
+  static QmitkIconTheme *GetInstance();
+
   /**
    * \brief Creates a theme-colored icon from raw SVG data.
    * \param[in] originalSVG The original SVG content as a byte array.
-   * \return A QIcon with colors adapted to the current theme.
+   * \return A QIcon that renders in the icon colors of the current theme.
    */
   static QIcon GetIcon(const QByteArray &originalSVG);
 
   /**
    * \brief Creates a theme-colored icon from an SVG resource file.
    * \param[in] resourcePath The Qt resource path to the SVG file.
-   * \return A QIcon with colors adapted to the current theme.
+   * \return A QIcon that renders in the icon colors of the current theme,
+   *         or a null icon if the resource cannot be read.
    */
   static QIcon GetIcon(const QString &resourcePath);
 
@@ -71,8 +81,24 @@ public:
    */
   static QString GetAccentColor();
 
-  QmitkIconTheme() = delete;
-  ~QmitkIconTheme() = delete;
+  /**
+   * \brief Re-reads the icon colors from the application style sheet.
+   *
+   * All icons created by GetIcon() re-render in the new colors on their
+   * next repaint, and Changed() is emitted. Call this right after
+   * QApplication::setStyleSheet().
+   */
+  static void Refresh();
+
+Q_SIGNALS:
+  /**
+   * \brief Emitted by Refresh() after the icon colors have been re-read.
+   */
+  void Changed();
+
+private:
+  QmitkIconTheme();
+  ~QmitkIconTheme() override;
 };
 
 #endif

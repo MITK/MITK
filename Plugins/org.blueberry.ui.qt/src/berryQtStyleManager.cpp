@@ -29,6 +29,8 @@ found in the LICENSE file.
 
 #include <mitkIPreferences.h>
 
+#include <QmitkIconTheme.h>
+
 namespace berry
 {
 const QString QtStyleManager::DEFAULT_FONT = QStringLiteral("Roboto");
@@ -343,6 +345,7 @@ void QtStyleManager::UpdateWorkbenchStyleSheet() const
     .arg(currentStyle->stylesheet);
 
   qApp->setStyleSheet(sheet);
+  QmitkIconTheme::Refresh();
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

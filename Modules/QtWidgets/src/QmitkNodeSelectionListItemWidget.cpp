@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <ui_QmitkNodeSelectionListItemWidget.h>
 
 #include <QmitkNodeDetailsDialog.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QMouseEvent>
 
@@ -31,7 +31,7 @@ QmitkNodeSelectionListItemWidget::QmitkNodeSelectionListItemWidget(QWidget *pare
   m_Controls->btnSelect->SetNodeInfo("No valid selection");
   m_Controls->btnClear->setVisible(false);
 
-  m_Controls->btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+  m_Controls->btnClear->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/times.svg")));
 
   connect(m_Controls->btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
 }

@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageConverter.h>
 #include <mitkRenderingManager.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QMessageBox>
 
@@ -57,7 +57,7 @@ namespace
     if (hiddenCount > 0)
     {
       hint += QStringLiteral("<p style=\"color:%1;\">%2 segmentation%3 hidden: geometry does not match the selected image.</p>")
-        .arg(QmitkStyleManager::GetIconAccentColor())
+        .arg(QmitkIconTheme::GetAccentColor())
         .arg(hiddenCount)
         .arg(hiddenCount == 1 ? QString() : QStringLiteral("s"));
     }

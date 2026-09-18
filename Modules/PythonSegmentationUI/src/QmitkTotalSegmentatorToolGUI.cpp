@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 
 #include <QmitkPipInstallDialog.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <QmitkVenvProcess.h>
 
 #include <QApplication>
@@ -202,7 +202,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout* mainLayout)
   // row with; a QComboBox's default height is otherwise slightly shorter.
   m_Ui->taskComboBox->setMinimumHeight(m_Ui->settingsButton->sizeHint().height());
 
-  m_Ui->runButton->setIcon(QmitkStyleManager::ThemeIcon(
+  m_Ui->runButton->setIcon(QmitkIconTheme::GetIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg")));
 
   connect(m_Ui->installButton, &QPushButton::clicked, this, &Self::OnInstallButtonClicked);

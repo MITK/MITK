@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 
 #include <QmitkRun.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <array>
 
@@ -266,8 +266,8 @@ void QmitkPythonEnvironmentsView::CreateQtPartControl(QWidget* parent)
 
   m_Ui->setupUi(parent);
 
-  m_Ui->deleteVirtualEnvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/trash.svg")));
-  m_Ui->refreshVirtualEnvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/arrow-rotate-right.svg")));
+  m_Ui->deleteVirtualEnvsButton->setIcon(QmitkIconTheme::GetIcon(QLatin1String(":/QmitkPythonEnvironmentsView/trash.svg")));
+  m_Ui->refreshVirtualEnvsButton->setIcon(QmitkIconTheme::GetIcon(QLatin1String(":/QmitkPythonEnvironmentsView/arrow-rotate-right.svg")));
 
   m_Ui->virtualEnvsTreeWidget->setColumnWidth(0, 40);
   m_Ui->virtualEnvsTreeWidget->setColumnWidth(1, 250);

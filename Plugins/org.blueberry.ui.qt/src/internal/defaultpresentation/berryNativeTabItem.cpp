@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "berryNativeTabFolder.h"
 #include "berryQCTabBar.h"
-#include "berryQtStyleManager.h"
+#include <QmitkIconTheme.h>
 
 #include "berryConstants.h"
 
@@ -91,7 +91,7 @@ QWidget* NativeTabItem::GetCloseButton()
 {
   if (!closeButton)
   {
-    QIcon iconCloseTab = QtStyleManager::ThemeIcon(QStringLiteral(":/org.blueberry.ui.qt/tab_close.svg"));
+    QIcon iconCloseTab = QmitkIconTheme::GetIcon(QStringLiteral(":/org.blueberry.ui.qt/tab_close.svg"));
     closeButton = new QToolButton(parent->GetControl());
     closeButton->setObjectName("TabCloseButton");
     closeButton->setContentsMargins(0, 0, 0, 0);

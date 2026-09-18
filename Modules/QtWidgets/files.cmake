@@ -43,7 +43,6 @@ set(CPP_FILES
   QmitkNodeSelectionListItemWidget.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkColoredNodeDescriptor.cpp
-  QmitkThemedNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
   QmitkProgressBar.cpp
   QmitkPropertiesTableEditor.cpp
@@ -73,7 +72,6 @@ set(CPP_FILES
   QmitkPropertyItem.cpp
   QmitkPropertyItemDelegate.cpp
   QmitkPropertyItemModel.cpp
-  QmitkStyleManager.cpp
   QmitkAbstractDataStorageInspector.cpp
   QmitkDataStorageFavoriteNodesInspector.cpp
   QmitkDataStorageListInspector.cpp

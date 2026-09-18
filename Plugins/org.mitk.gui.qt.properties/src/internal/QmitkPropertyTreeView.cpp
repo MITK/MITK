@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "QmitkPropertyItemSortFilterProxyModel.h"
 #include "QmitkPropertyTreeView.h"
 #include <ui_QmitkPropertyTreeView.h>
-#include <berryQtStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
@@ -162,16 +162,16 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   const int ICON_SIZE = 32;
 
-  auto icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tags.svg"));
+  auto icon = QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tags.svg"));
   m_Controls->tagsLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
-  icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tag.svg"));
+  icon = QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tag.svg"));
   m_Controls->tagLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
-  icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
+  icon = QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
   m_Controls->saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
-  icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Properties/transient.svg"));
+  icon = QmitkIconTheme::GetIcon(QStringLiteral(":/Properties/transient.svg"));
   m_Controls->transientLabel->setPixmap(icon.pixmap(ICON_SIZE));
   m_Controls->transientLabel->setToolTip(QStringLiteral("This property is transient and is not saved with the scene."));
 

@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 
 // Qmitk
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <QmitkMultiLabelPresetHelper.h>
 
 // Qt
@@ -52,14 +52,14 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
   m_Controls->labelInspector->SetAllowLabelModification(true);
 
-  m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
-  m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
-  m_Controls->btnAddLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")));
-  m_Controls->btnAddInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")));
-  m_Controls->btnAddGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_add.svg")));
-  m_Controls->btnRemoveLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")));
-  m_Controls->btnRemoveInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")));
-  m_Controls->btnRemoveGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
+  m_Controls->btnSavePreset->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  m_Controls->btnLoadPreset->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
+  m_Controls->btnAddLabel->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")));
+  m_Controls->btnAddInstance->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")));
+  m_Controls->btnAddGroup->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_group_add.svg")));
+  m_Controls->btnRemoveLabel->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")));
+  m_Controls->btnRemoveInstance->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")));
+  m_Controls->btnRemoveGroup->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
 
   connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector,
     [inspector = this->m_Controls->labelInspector]() { inspector->AddNewLabel(); });

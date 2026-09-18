@@ -15,6 +15,8 @@ found in the LICENSE file.
 // mitk qt widgets module
 #include <QmitkNodeDescriptorManager.h>
 
+#include <QmitkIconTheme.h>
+
 #include <QApplication>
 #include <QEvent>
 #include <QPainter>
@@ -28,6 +30,12 @@ QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
   , m_NodeModifiedObserverTag(0)
   , m_NodeObserved(false)
 {
+  // The thumbnail is a pixmap, so it does not follow theme switches on its own.
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]
+  {
+    m_OutDatedThumbNail = true;
+    this->update();
+  });
 }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()

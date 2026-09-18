@@ -6,6 +6,7 @@
 #include <mitkITKEventObserverGuard.h>
 
 // Qt includes
+#include <QIcon>
 #include <QItemSelection>
 #include <QStandardItemModel>
 
@@ -59,6 +60,8 @@ private:
 
   std::unique_ptr<Ui::QmitkUndoRedoViewControls> m_Controls;
   QStandardItemModel* m_UndoRedoModel;
+  QIcon m_UndoIcon;
+  QIcon m_RedoIcon;
 
   mitk::ITKEventObserverGuard m_UndoStackObserverGuard;
   std::unique_ptr<mitk::UndoController> m_UndoController;

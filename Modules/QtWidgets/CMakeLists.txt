@@ -6,7 +6,7 @@ MITK_CREATE_MODULE(
     qvariant.h
     qwidget.h
   DEPENDS
-    PUBLIC MitkPlanarFigure MitkAnnotation
+    PUBLIC MitkPlanarFigure MitkAnnotation MitkQtIconTheme
   PACKAGE_DEPENDS
     PUBLIC VTK|GUISupportQt+RenderingQt Qt6|Concurrent+Widgets+OpenGL+Core CTK|CTKWidgets
     PRIVATE nlohmann_json

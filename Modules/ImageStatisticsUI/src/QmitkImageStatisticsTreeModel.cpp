@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkMultiLabelEvents.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <functional>
 
@@ -48,6 +48,7 @@ namespace
 QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {
   m_RootItem = std::make_unique<QmitkImageStatisticsTreeItem>();
+  m_WIPIcon = QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/hourglass-half-solid.svg"));
 }
 
 QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
@@ -106,7 +107,7 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   else if (role == Qt::DecorationRole && index.column() == 0)
   {
     if (item->isWIP() && item->childCount() == 0)
-      return QVariant(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/hourglass-half-solid.svg")));
+      return QVariant(m_WIPIcon);
     else if (!item->isWIP())
     {
       auto label = item->GetLabelInstance();

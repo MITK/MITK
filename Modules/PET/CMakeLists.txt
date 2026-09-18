@@ -4,7 +4,7 @@ MITK_CREATE_MODULE(PET
   DEPENDS
     PUBLIC MitkCore MitkDICOM
   PACKAGE_DEPENDS
-    PRIVATE DCMTK|ofstd+dcmdata
+    PRIVATE DCMTK|ofstd+dcmdata nlohmann_json
 )
 
 add_subdirectory(cmdapps)

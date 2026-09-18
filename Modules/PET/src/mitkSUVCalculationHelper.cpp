@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyProvider.h>
 #include <mitkLog.h>
 #include <mitkSlicedGeometry3D.h>
+#include <nlohmann/json.hpp>
 
 #include <chrono>
 namespace
@@ -204,6 +205,7 @@ namespace
   // the alternative -- a per-slice record -- would be unreadable and no
   // caller has asked to distinguish the cases.
   bool RecordAdaptationOnce(std::vector<mitk::SUVAdaptation>& adaptations,
+                            mitk::DICOMReadPolicy policy,
                             mitk::SUVAdaptationRule rule,
                             const std::string& dicomTag,
                             const std::string& originalValue,
@@ -216,7 +218,7 @@ namespace
     {
       return false;
     }
-    adaptations.push_back({rule, dicomTag, originalValue, usedValue});
+    mitk::RecordAdaptation(&adaptations, policy, rule, dicomTag, originalValue, usedValue);
     return true;
   }
 
@@ -230,6 +232,7 @@ namespace
   // class of month- and year-boundary bugs.
   double SubstituteAdministrationDate(double referenceTimeOfDaySeconds,
                                       double administrationTimeOfDaySeconds,
+                                      mitk::DICOMReadPolicy policy,
                                       std::vector<mitk::SUVAdaptation>& adaptations)
   {
     constexpr double kSecondsPerDay = 24.0 * 60.0 * 60.0;
@@ -238,7 +241,7 @@ namespace
     if (duration < mitk::kEarliestDecayDurationSeconds)
     {
       duration += kSecondsPerDay;
-      if (RecordAdaptationOnce(adaptations,
+      if (RecordAdaptationOnce(adaptations, policy,
                                mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
                                "", "", std::to_string(duration)))
       {
@@ -314,7 +317,7 @@ namespace
              "correct administration date or relax the policy.";
       }
 
-      if (RecordAdaptationOnce(adaptations,
+      if (RecordAdaptationOnce(adaptations, policy,
                                mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
                                "(0018,1078)", std::to_string(offset), ""))
       {
@@ -327,7 +330,7 @@ namespace
 
       return SubstituteAdministrationDate(referenceTimeOfDay,
                                           SecondsOfDayUTC(admin.startDateTime),
-                                          adaptations);
+                                          policy, adaptations);
     }
 
     if (admin.haveStartTime)
@@ -356,7 +359,7 @@ namespace
              "policy.";
       }
 
-      if (RecordAdaptationOnce(adaptations,
+      if (RecordAdaptationOnce(adaptations, policy,
                                mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
                                "(0018,1072)", "", ""))
       {
@@ -368,7 +371,7 @@ namespace
 
       return SubstituteAdministrationDate(referenceTimeOfDay,
                                           admin.startTimeOfDaySeconds,
-                                          adaptations);
+                                          policy, adaptations);
     }
 
     mitkThrowException(mitk::MissingDICOMPropertyException)
@@ -474,6 +477,131 @@ namespace
   }
 }
 
+const char* mitk::SUVAdaptationRuleToString(mitk::SUVAdaptationRule rule)
+{
+  switch (rule)
+  {
+    case SUVAdaptationRule::DoseReinterpretedAsMBq:
+      return "DoseReinterpretedAsMBq";
+    case SUVAdaptationRule::VendorEmpiricalDecayFallback:
+      return "VendorEmpiricalDecayFallback";
+    case SUVAdaptationRule::UnrecognizedManufacturer:
+      return "UnrecognizedManufacturer";
+    case SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale:
+      return "AmbiguousPatientSexMeanOfMaleAndFemale";
+    case SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime:
+      return "AdministrationDateFromReferenceWithStartDateTime";
+    case SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime:
+      return "AdministrationDateFromReferenceWithStartTime";
+    case SUVAdaptationRule::AdministrationTimeShiftedBackOneDay:
+      return "AdministrationTimeShiftedBackOneDay";
+    case SUVAdaptationRule::WeightReinterpretedAsGrams:
+      return "WeightReinterpretedAsGrams";
+  }
+
+  // No default, so adding a rule without a name is a compiler warning
+  // rather than a silent "Unknown" in every persisted record.
+  return "Unknown";
+}
+
+void mitk::RecordAdaptation(std::vector<mitk::SUVAdaptation>* adaptations,
+                            mitk::DICOMReadPolicy policy,
+                            mitk::SUVAdaptationRule rule,
+                            const std::string& dicomTag,
+                            const std::string& originalValue,
+                            const std::string& usedValue)
+{
+  if (DICOMReadPolicy::Strict == policy)
+  {
+    mitkThrowException(BenchmarkAdaptationRequiredException)
+      << "The IBSI-SUV recommendation '" << SUVAdaptationRuleToString(rule)
+      << "' was applied under DICOMReadPolicy::Strict, which forbids it. "
+         "This rule reached the adaptation record without a rule-specific "
+         "refusal, which is an implementation defect -- please report it. "
+         "Re-export the input so no adaptation is needed, or relax the "
+         "policy to Lenient.";
+  }
+
+  if (nullptr == adaptations)
+  {
+    return;
+  }
+
+  adaptations->push_back({rule, dicomTag, originalValue, usedValue});
+}
+
+std::string mitk::FormatAdaptationSummary(const std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  if (adaptations.empty())
+  {
+    return std::string();
+  }
+
+  std::ostringstream summary;
+  summary << "IBSI-SUV input adaptations applied (" << adaptations.size() << "):";
+
+  for (const auto& adaptation : adaptations)
+  {
+    summary << "\n  - " << SUVAdaptationRuleToString(adaptation.rule);
+    if (!adaptation.dicomTag.empty())
+    {
+      summary << " " << adaptation.dicomTag;
+    }
+
+    if (!adaptation.originalValue.empty() && !adaptation.usedValue.empty())
+    {
+      summary << ": " << adaptation.originalValue << " -> " << adaptation.usedValue;
+    }
+    else if (!adaptation.usedValue.empty())
+    {
+      summary << ": " << adaptation.usedValue;
+    }
+    else if (!adaptation.originalValue.empty())
+    {
+      summary << ": " << adaptation.originalValue;
+    }
+  }
+
+  return summary.str();
+}
+
+std::string mitk::SerializeAdaptations(const std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  auto entries = nlohmann::json::array();
+
+  for (const auto& adaptation : adaptations)
+  {
+    entries.push_back({{"rule", SUVAdaptationRuleToString(adaptation.rule)},
+                       {"dicomTag", adaptation.dicomTag},
+                       {"originalValue", adaptation.originalValue},
+                       {"usedValue", adaptation.usedValue}});
+  }
+
+  return entries.dump();
+}
+
+std::string mitk::FormatDerivationDescription(const std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  // (0008,2111) is LO: 64 characters, and DICOM forbids exceeding them.
+  constexpr std::string::size_type kLongStringLimit = 64u;
+
+  std::ostringstream description;
+  description << "MITK SUV";
+  if (!adaptations.empty())
+  {
+    description << "; " << adaptations.size() << " IBSI-SUV input adaptation"
+                << (1u == adaptations.size() ? "" : "s") << " applied";
+  }
+
+  std::string text = description.str();
+  if (text.size() > kLongStringLimit)
+  {
+    text.resize(kLongStringLimit);
+  }
+
+  return text;
+}
+
 std::vector<mitk::RadiopharmaceuticalInfo>
 mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
                                   mitk::DICOMReadPolicy policy,
@@ -540,8 +668,8 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
                 << " is below the 1e4 plausibility threshold; "
                    "interpreting as MBq and converting to Bq (= "
                 << converted << " Bq) per IBSI-SUV recommendation.";
-      adaptations.push_back({SUVAdaptationRule::DoseReinterpretedAsMBq,
-                             "(0018,1074)", v, std::to_string(converted)});
+      RecordAdaptation(&adaptations, policy, SUVAdaptationRule::DoseReinterpretedAsMBq,
+                       "(0018,1074)", v, std::to_string(converted));
       info.totalDoseBq = converted;
     }
     else
@@ -625,8 +753,8 @@ double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider,
   MITK_WARN << "(0010,1030) Patient's Weight is " << stored << ", which is not "
                "a plausible weight in kilograms; interpreting it as grams ("
             << weightKg << " kg) per the IBSI-SUV recommendation.";
-  adaptations.push_back({SUVAdaptationRule::WeightReinterpretedAsGrams,
-                         "(0010,1030)", raw, std::to_string(weightKg)});
+  RecordAdaptation(&adaptations, policy, SUVAdaptationRule::WeightReinterpretedAsGrams,
+                   "(0010,1030)", raw, std::to_string(weightKg));
 
   return weightKg;
 }
@@ -1329,8 +1457,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
                     << ". This formula is derived from observed scanner "
                        "behaviour, not from the DICOM specification; the "
                        "strict DICOM read policy refuses it.";
-          info.adaptations.push_back(
-            {SUVAdaptationRule::VendorEmpiricalDecayFallback, "", "", stepName});
+          RecordAdaptation(&info.adaptations, policy,
+                           SUVAdaptationRule::VendorEmpiricalDecayFallback,
+                           "", "", stepName);
 
           if (ManufacturerFamily::Other == manuf)
           {
@@ -1340,8 +1469,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
                       << "' is not one of the manufacturers this formula was "
                          "validated against. The general rule was applied; "
                          "treat the resulting decay timing with caution.";
-            info.adaptations.push_back({SUVAdaptationRule::UnrecognizedManufacturer,
-                                        "(0008,0070)", rawManufacturer, stepName});
+            RecordAdaptation(&info.adaptations, policy,
+                             SUVAdaptationRule::UnrecognizedManufacturer,
+                             "(0008,0070)", rawManufacturer, stepName);
           }
 
           info.decayTimes = std::move(candidateMap);

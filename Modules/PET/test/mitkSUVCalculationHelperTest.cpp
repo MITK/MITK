@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cmath>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -217,6 +218,20 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(PatientWeight_PlausibleWeight_RecordsNothing);
   MITK_TEST(PatientWeight_GramEncoded_StrictPolicy_Throws);
   MITK_TEST(PatientWeight_PlausibleWeight_StrictPolicy_PassesThrough);
+
+  // Adaptation record: naming, rendering, serialization
+  MITK_TEST(RuleToString_EveryRuleHasADistinctStableName);
+  MITK_TEST(FormatAdaptationSummary_EmptyRecord_IsEmpty);
+  MITK_TEST(FormatAdaptationSummary_RendersTagAndTransition);
+  MITK_TEST(FormatAdaptationSummary_OmitsAbsentTagAndOriginal);
+  MITK_TEST(FormatAdaptationSummary_CountsEveryEntry);
+  MITK_TEST(SerializeAdaptations_EmptyRecord_IsEmptyJSONArray);
+  MITK_TEST(SerializeAdaptations_CarriesAllFourFields);
+  MITK_TEST(FormatDerivationDescription_EmptyRecord_StillNamesTheDerivation);
+  MITK_TEST(FormatDerivationDescription_CountLeadsAndAgreesInNumber);
+  MITK_TEST(FormatDerivationDescription_NeverExceedsTheLOLimit);
+  MITK_TEST(RecordAdaptation_StrictPolicy_RefusesEvenWithoutARecord);
+  MITK_TEST(RecordAdaptation_LenientPolicy_AppendsAndToleratesNullRecord);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -635,6 +650,176 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0010, 0x1030), "70");
     CPPUNIT_ASSERT_DOUBLES_EQUAL(70.0, ReadWeight(image, mitk::DICOMReadPolicy::Strict), 1e-9);
+  }
+
+  // ---- The adaptation record: naming, rendering, serialization ----
+  //
+  // These three renderings are what leaves the process -- the persisted
+  // property, the (0008,2111) description and the operator-facing summary --
+  // so they are pinned independently of the rules that produce them.
+
+  void RuleToString_EveryRuleHasADistinctStableName()
+  {
+    // Distinctness matters because the names are the persisted form: two
+    // rules sharing one would make a saved record ambiguous. The literals
+    // are spelled out rather than derived so that renaming a rule fails
+    // here, where the compatibility break is visible, and not silently.
+    const std::vector<std::pair<mitk::SUVAdaptationRule, std::string>> expected{
+      {mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "DoseReinterpretedAsMBq"},
+      {mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback, "VendorEmpiricalDecayFallback"},
+      {mitk::SUVAdaptationRule::UnrecognizedManufacturer, "UnrecognizedManufacturer"},
+      {mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
+       "AmbiguousPatientSexMeanOfMaleAndFemale"},
+      {mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
+       "AdministrationDateFromReferenceWithStartDateTime"},
+      {mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
+       "AdministrationDateFromReferenceWithStartTime"},
+      {mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
+       "AdministrationTimeShiftedBackOneDay"},
+      {mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "WeightReinterpretedAsGrams"}};
+
+    std::set<std::string> seen;
+    for (const auto& [rule, name] : expected)
+    {
+      CPPUNIT_ASSERT_EQUAL(name, std::string(mitk::SUVAdaptationRuleToString(rule)));
+      CPPUNIT_ASSERT_MESSAGE("duplicate rule name: " + name, seen.insert(name).second);
+    }
+
+    // Guards the list above against a rule added to the enum but not here.
+    // kRuleCount must be the last rule's value plus one.
+    constexpr auto kRuleCount =
+      static_cast<size_t>(mitk::SUVAdaptationRule::WeightReinterpretedAsGrams) + 1u;
+    CPPUNIT_ASSERT_EQUAL(kRuleCount, expected.size());
+  }
+
+  void FormatAdaptationSummary_EmptyRecord_IsEmpty()
+  {
+    // So a caller can print it unconditionally and stay silent.
+    CPPUNIT_ASSERT(mitk::FormatAdaptationSummary({}).empty());
+  }
+
+  void FormatAdaptationSummary_RendersTagAndTransition()
+  {
+    const std::vector<mitk::SUVAdaptation> adaptations{
+      {mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "(0010,1030)", "70000", "70"}};
+
+    const std::string summary = mitk::FormatAdaptationSummary(adaptations);
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("IBSI-SUV input adaptations applied (1):"
+                  "\n  - WeightReinterpretedAsGrams (0010,1030): 70000 -> 70"),
+      summary);
+  }
+
+  void FormatAdaptationSummary_OmitsAbsentTagAndOriginal()
+  {
+    // The vendor fallback concerns no single tag and reinterprets no stored
+    // value; it records only which rule resolved the reference time. The
+    // summary must not invent an empty tag or a "-> " with nothing before it.
+    const std::vector<mitk::SUVAdaptation> adaptations{
+      {mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback, "", "", "Step 4"}};
+
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("IBSI-SUV input adaptations applied (1):"
+                  "\n  - VendorEmpiricalDecayFallback: Step 4"),
+      mitk::FormatAdaptationSummary(adaptations));
+  }
+
+  void FormatAdaptationSummary_CountsEveryEntry()
+  {
+    const std::vector<mitk::SUVAdaptation> adaptations{
+      {mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "(0018,1074)", "400", "400000000"},
+      {mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "(0010,1030)", "70000", "70"}};
+
+    const std::string summary = mitk::FormatAdaptationSummary(adaptations);
+    CPPUNIT_ASSERT(summary.find("(2):") != std::string::npos);
+    CPPUNIT_ASSERT(summary.find("DoseReinterpretedAsMBq") != std::string::npos);
+    CPPUNIT_ASSERT(summary.find("WeightReinterpretedAsGrams") != std::string::npos);
+  }
+
+  void SerializeAdaptations_EmptyRecord_IsEmptyJSONArray()
+  {
+    CPPUNIT_ASSERT_EQUAL(std::string("[]"), mitk::SerializeAdaptations({}));
+  }
+
+  void SerializeAdaptations_CarriesAllFourFields()
+  {
+    const std::vector<mitk::SUVAdaptation> adaptations{
+      {mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "(0018,1074)", "400", "400000000"}};
+
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("[{\"dicomTag\":\"(0018,1074)\",\"originalValue\":\"400\","
+                  "\"rule\":\"DoseReinterpretedAsMBq\",\"usedValue\":\"400000000\"}]"),
+      mitk::SerializeAdaptations(adaptations));
+  }
+
+  void FormatDerivationDescription_EmptyRecord_StillNamesTheDerivation()
+  {
+    // The image is derived whether or not anything was adapted, and
+    // (0008,2111) is where a viewer looks for that.
+    CPPUNIT_ASSERT_EQUAL(std::string("MITK SUV"), mitk::FormatDerivationDescription({}));
+  }
+
+  void FormatDerivationDescription_CountLeadsAndAgreesInNumber()
+  {
+    const std::vector<mitk::SUVAdaptation> one{
+      {mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "(0010,1030)", "70000", "70"}};
+    const std::vector<mitk::SUVAdaptation> two{
+      one[0], {mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "(0018,1074)", "400", "4e8"}};
+
+    CPPUNIT_ASSERT_EQUAL(std::string("MITK SUV; 1 IBSI-SUV input adaptation applied"),
+                         mitk::FormatDerivationDescription(one));
+    CPPUNIT_ASSERT_EQUAL(std::string("MITK SUV; 2 IBSI-SUV input adaptations applied"),
+                         mitk::FormatDerivationDescription(two));
+  }
+
+  void FormatDerivationDescription_NeverExceedsTheLOLimit()
+  {
+    // (0008,2111) is LO. A description that overran it would be rejected or
+    // truncated by whatever writes the DICOM object, outside MITK's control.
+    std::vector<mitk::SUVAdaptation> many(
+      99u, {mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "(0010,1030)", "70000", "70"});
+
+    CPPUNIT_ASSERT(mitk::FormatDerivationDescription(many).size() <= 64u);
+    CPPUNIT_ASSERT(mitk::FormatDerivationDescription({}).size() <= 64u);
+  }
+
+  // ---- The Strict backstop ----
+
+  void RecordAdaptation_StrictPolicy_RefusesEvenWithoutARecord()
+  {
+    // Every rule has a refusal of its own that fires before this point, so
+    // reaching it means one was added without a gate. The backstop exists so
+    // that mistake surfaces as a loud generic refusal rather than as a
+    // silent adaptation under the policy whose entire purpose is to forbid
+    // adaptation. The null record is the case that matters: the policy must
+    // be checked before the caller's interest in collecting the record.
+    std::vector<mitk::SUVAdaptation> adaptations;
+    CPPUNIT_ASSERT_THROW(
+      mitk::RecordAdaptation(&adaptations, mitk::DICOMReadPolicy::Strict,
+                             mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "", "", ""),
+      mitk::BenchmarkAdaptationRequiredException);
+    CPPUNIT_ASSERT_THROW(
+      mitk::RecordAdaptation(nullptr, mitk::DICOMReadPolicy::Strict,
+                             mitk::SUVAdaptationRule::WeightReinterpretedAsGrams, "", "", ""),
+      mitk::BenchmarkAdaptationRequiredException);
+    CPPUNIT_ASSERT(adaptations.empty());
+  }
+
+  void RecordAdaptation_LenientPolicy_AppendsAndToleratesNullRecord()
+  {
+    std::vector<mitk::SUVAdaptation> adaptations;
+    mitk::RecordAdaptation(&adaptations, mitk::DICOMReadPolicy::Lenient,
+                           mitk::SUVAdaptationRule::DoseReinterpretedAsMBq,
+                           "(0018,1074)", "400", "400000000");
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+    CPPUNIT_ASSERT(mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == adaptations[0].rule);
+    CPPUNIT_ASSERT_EQUAL(std::string("400000000"), adaptations[0].usedValue);
+
+    // A caller that does not collect the record is a supported case.
+    CPPUNIT_ASSERT_NO_THROW(
+      mitk::RecordAdaptation(nullptr, mitk::DICOMReadPolicy::Lenient,
+                             mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "", "", ""));
   }
 
   // ---- Patient height ----

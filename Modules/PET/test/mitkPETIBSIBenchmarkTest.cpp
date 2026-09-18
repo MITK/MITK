@@ -94,6 +94,7 @@ arrays after a strict np.allclose grid check).
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -446,10 +447,59 @@ namespace
 class mitkPETIBSIBenchmarkTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPETIBSIBenchmarkTestSuite);
+  MITK_TEST(ManifestPairsAdaptationCasesWithStrictCoverage);
   MITK_TEST(RunIBSIBenchmark);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+
+  /**
+   * \brief Every input needing an adaptation is also covered under Strict.
+   *
+   * Strict exists to refuse the recommendations Lenient applies, so a
+   * Lenient row asserting that a rule fired is only half a statement: the
+   * other half is that the same input is refused when the operator asks
+   * for refusal. Nothing in the manifest's shape enforces the pairing, and
+   * an unpaired Lenient row is invisible -- the suite stays green while the
+   * refusal it implies goes untested.
+   *
+   * Pure manifest arithmetic, so it runs without the DRO data.
+   */
+  void ManifestPairsAdaptationCasesWithStrictCoverage()
+  {
+    std::set<std::string> refusedUnderStrict;
+    for (const auto& kase : kBenchmarkCases)
+    {
+      if (mitk::DICOMReadPolicy::Strict == kase.policy
+          && Expectation::Refusal == kase.expectation)
+      {
+        refusedUnderStrict.insert(kase.id);
+      }
+    }
+
+    std::vector<std::string> unpaired;
+    for (const auto& kase : kBenchmarkCases)
+    {
+      const bool lenientAdaptation = mitk::DICOMReadPolicy::Lenient == kase.policy
+                                     && 0u != kase.requiredAdaptations;
+      if (lenientAdaptation && 0u == refusedUnderStrict.count(kase.id))
+      {
+        unpaired.push_back(kase.id);
+      }
+    }
+
+    if (!unpaired.empty())
+    {
+      std::string message =
+        "these cases require an adaptation under Lenient but have no Strict "
+        "row asserting the refusal:";
+      for (const auto& id : unpaired)
+      {
+        message += "\n  " + id;
+      }
+      CPPUNIT_FAIL(message);
+    }
+  }
 
   /**
    * \brief Drive every IBSI DRO through SUVImageFilter and assert the

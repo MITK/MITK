@@ -501,6 +501,89 @@ namespace mitk
   };
 
   /**
+   * \brief Stable identifier for an adaptation rule.
+   *
+   * The returned strings are part of the persisted record and of the
+   * operator-facing summary, so they are fixed: renaming one silently
+   * reinterprets every SUV image written before the change. The enum's
+   * numeric values are deliberately not persisted for the same reason --
+   * inserting a rule mid-enum would shift them all.
+   *
+   * \param[in] rule The rule to name.
+   * \return The rule's stable identifier.
+   */
+  MITKPET_EXPORT const char* SUVAdaptationRuleToString(SUVAdaptationRule rule);
+
+  /**
+   * \brief Append an adaptation to \p adaptations, refusing under Strict.
+   *
+   * The single funnel through which the record is written. Every rule
+   * has its own refusal that fires earlier under
+   * \c DICOMReadPolicy::Strict, with an exception type specific enough
+   * for a caller to act on; reaching the check here means a rule was
+   * added without one. Refusing generically is the wrong diagnostic but
+   * the right behaviour -- silently adapting under the policy that exists
+   * to forbid adaptation is the one outcome that must not happen.
+   *
+   * The policy is checked before \p adaptations is, so a missing gate is
+   * caught even when the caller is not collecting the record.
+   *
+   * \param[in,out] adaptations Record to append to; may be null.
+   * \param[in] policy Active read policy.
+   * \param[in] rule The rule that fired.
+   * \param[in] dicomTag The tag concerned, or empty when there is none.
+   * \param[in] originalValue The value as stored in the input.
+   * \param[in] usedValue The value the computation used.
+   * \throws BenchmarkAdaptationRequiredException under Strict.
+   */
+  void MITKPET_EXPORT RecordAdaptation(std::vector<SUVAdaptation>* adaptations,
+                                       DICOMReadPolicy policy,
+                                       SUVAdaptationRule rule,
+                                       const std::string& dicomTag,
+                                       const std::string& originalValue,
+                                       const std::string& usedValue);
+
+  /**
+   * \brief Render the adaptation record as an operator-facing summary.
+   *
+   * One line per adaptation, naming the rule, the tag it concerns and the
+   * transition from the stored to the used value. Returns an empty string
+   * for an empty record so a caller can print it unconditionally and stay
+   * silent when nothing was adapted.
+   *
+   * \param[in] adaptations The record to render.
+   * \return The summary, without a trailing newline, or empty.
+   */
+  std::string MITKPET_EXPORT FormatAdaptationSummary(const std::vector<SUVAdaptation>& adaptations);
+
+  /**
+   * \brief Serialize the adaptation record as a JSON array.
+   *
+   * The value of the \c mitk.pet.suv.adaptations property. Machine-readable
+   * counterpart to the (0008,2111) Derivation Description, which is \c LO
+   * and cannot carry the record itself.
+   *
+   * \param[in] adaptations The record to serialize.
+   * \return A JSON array, "[]" for an empty record.
+   */
+  std::string MITKPET_EXPORT SerializeAdaptations(const std::vector<SUVAdaptation>& adaptations);
+
+  /**
+   * \brief Render the (0008,2111) Derivation Description for an SUV image.
+   *
+   * (0008,2111) is \c LO, 64 characters, so it carries the count rather
+   * than the record. The count leads the string, which keeps it the first
+   * thing lost to nothing and the last thing lost to truncation.
+   *
+   * \param[in] adaptations The record to describe.
+   * \return A description of at most 64 characters.
+   */
+  std::string MITKPET_EXPORT FormatDerivationDescription(const std::vector<SUVAdaptation>& adaptations);
+
+  /** \brief Property holding the SUV adaptation record as JSON. */
+  constexpr const char* SUV_ADAPTATIONS_PROPERTY_NAME = "mitk.pet.suv.adaptations";
+
+  /**
    * \brief Manufacturer family inferred from DICOM tag (0008,0070) Manufacturer.
    *
    * The IBSI-SUV-conformant decay-correction pipeline branches on

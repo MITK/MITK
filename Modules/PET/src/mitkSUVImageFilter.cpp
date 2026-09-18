@@ -164,13 +164,11 @@ namespace
                 << variantName << " (DICOMReadPolicy::Lenient).";
     }
 
-    if (nullptr != adaptations)
-    {
-      adaptations->push_back({mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
-                              "(0010,0040)",
-                              inputs.sex.has_value() ? "O" : "",
-                              "mean of male- and female-specific scale numerators"});
-    }
+    mitk::RecordAdaptation(adaptations, policy,
+                           mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
+                           "(0010,0040)",
+                           inputs.sex.has_value() ? "O" : "",
+                           "mean of male- and female-specific scale numerators");
 
     auto inputsCopy = inputs;
     inputsCopy.sex  = mitk::Sex::Male;

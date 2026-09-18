@@ -11,8 +11,8 @@ Philips count data with private scale factors) are recognised from their DICOM
 tags and re-normalized to the requested variant instead.
 
 Five normalization variants are available: body weight (`bw`), lean body mass
-after Janmahasatian (`lbm-janma`), James (`lbm-james128`) or Morgan
-(`lbm-morgan`), ideal body weight
+after Janmahasatian (`lbm-janma`) or James (`lbm-james128`), ideal body
+weight
 (`ibw`) and body surface area (`bsa`). The acquisition parameters (injected
 dose, half-life, decay timing, patient weight, height and sex) are read from
 the DICOM properties of the input by default and can be overridden
@@ -41,7 +41,7 @@ MitkPETSUVCalculation -i <input> -o <output> [options]
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
-| `--variant` | | String | `bw` | Output SUV variant: `bw`, `lbm-janma`, `lbm-james128`, `lbm-morgan`, `ibw` or `bsa` (case-insensitive). |
+| `--variant` | | String | `bw` | Output SUV variant: `bw`, `lbm-janma`, `lbm-james128`, `ibw` or `bsa` (case-insensitive). |
 | `--injected-activity` | | Float | | Injected activity in Bq. Overrides `(0018,1074)` Radionuclide Total Dose. |
 | `--body-weight` | | Float | | Patient weight in kg. Overrides `(0010,1030)` Patient Weight. |
 | `--patient-height` | | Float | | Patient height in m. Overrides `(0010,1020)` Patient Size. |
@@ -60,6 +60,11 @@ MitkPETSUVCalculation -i <input> -o <output> [options]
 
 ### Normalization variants
 
+Morgan (1994) is missing from the table below on purpose. The IBSI-SUV
+manual requires SUV Type `LBM` to be *convertible* and calls the formula
+obsolete, so this tool reads such an image and re-normalizes from it but
+will not produce a new one. It is an input variant only.
+
 All variants share the same kernel for activity concentration inputs:
 
 ```
@@ -75,12 +80,11 @@ The variant determines `scaleNumerator` and thereby the output unit
 | `bw` | `W * 1000` (Strauss and Conti 1991). | `g/mL` |
 | `lbm-janma` | Janmahasatian (2005): `LBM_male = (9270 * W) / (6680 + 216 * BMI)`, `LBM_female = (9270 * W) / (8780 + 244 * BMI)`, times 1000. IBSI-SUV recommended LBM formula. | `g/mL` |
 | `lbm-james128` | James (1976): `LBM_male = 1.10 * W - 0.0128 * W^2 / H^2`, `LBM_female = 1.07 * W - 0.0148 * W^2 / H^2`, times 1000. | `g/mL` |
-| `lbm-morgan` | Morgan (1994): `LBM_male = 1.10 * W - 0.0120 * W^2 / H^2`, `LBM_female = 1.07 * W - 0.0148 * W^2 / H^2`, times 1000. The variant DICOM labels SUV Type `LBM`. Obsolete, but convertible and therefore supported. | `g/mL` |
 | `ibw` | Sugawara (1999): `IBW_male = 48.0 + 1.06 * (H_cm - 152)`, `IBW_female = 45.5 + 0.91 * (H_cm - 152)`, times 1000. Not clamped below 152 cm. | `g/mL` |
 | `bsa` | DuBois (1916): `BSA = 0.007184 * W^0.425 * H_cm^0.725` in m^2, times 10000. | `cm^2/mL` |
 
 Required patient data per variant: `bw` needs the weight; `bsa` needs weight
-and height; `lbm-janma`, `lbm-james128`, `lbm-morgan` and `ibw` need weight,
+and height; `lbm-janma`, `lbm-james128` and `ibw` need weight,
 height and sex
 (the weight is needed by every variant because it is also the denominator of
 the re-normalization path). Missing data ends the run with exit code 2 (DICOM
@@ -101,7 +105,7 @@ Type and, for count data, `(0008,0070)` Manufacturer:
 |---------------|---------------|----------|
 | `BQML` | ignored | Activity concentration; the kernel above is applied. |
 | `GML` | absent, empty or `BW` | Pre-normalized SUVbw; re-normalized to the target variant. |
-| `GML` | `LBMJANMA`, `LBMJAMES128`, `LBM`, `IBW` | Pre-normalized SUV of that variant; re-normalized to the target variant. `LBM` is the Morgan formula. |
+| `GML` | `LBMJANMA`, `LBMJAMES128`, `LBM`, `IBW` | Pre-normalized SUV of that variant; re-normalized to the target variant. `LBM` is the Morgan (1994) formula, `LBM_male = 1.10 * W - 0.0120 * W^2 / H^2`, `LBM_female = 1.07 * W - 0.0148 * W^2 / H^2`. |
 | `GML` | `BSA` | Rejected as inconsistent (BSA SUV uses `CM2ML`). |
 | `CM2ML` | absent or `BSA` | Pre-normalized SUVbsa; re-normalized to the target variant. |
 | `CM2ML` | other | Rejected as inconsistent. |
@@ -352,7 +356,6 @@ Rescale Slope to `1.0`:
 | `bw` | `GML` | `BW` |
 | `lbm-janma` | `GML` | `LBMJANMA` |
 | `lbm-james128` | `GML` | `LBMJAMES128` |
-| `lbm-morgan` | `GML` | `LBM` |
 | `ibw` | `GML` | `IBW` |
 | `bsa` | `CM2ML` | `BSA` |
 
@@ -407,8 +410,7 @@ MitkPETSUVCalculation -i ./fdg_pet/ -o suv_lbm.nrrd --variant lbm-janma
 ```
 
 Additionally reads patient height and sex from DICOM. Use
-`--variant lbm-james128` for the James formula, or `--variant lbm-morgan`
-for the Morgan variant (the one DICOM labels SUV Type `LBM`).
+or `--variant lbm-james128` for the James formula.
 
 ### Body surface area with a manual height
 

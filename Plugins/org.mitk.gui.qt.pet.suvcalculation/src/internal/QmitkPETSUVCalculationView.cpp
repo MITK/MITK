@@ -114,6 +114,7 @@ namespace
       case V::BW:                return QStringLiteral("BW");
       case V::LBM_Janmahasatian: return QStringLiteral("LBM-Janmahasatian");
       case V::LBM_James128:      return QStringLiteral("LBM-James128");
+      case V::LBM_Morgan:        return QStringLiteral("LBM-Morgan (obsolete)");
       case V::IBW:               return QStringLiteral("IBW (Sugawara)");
       case V::BSA:               return QStringLiteral("BSA (DuBois)");
     }

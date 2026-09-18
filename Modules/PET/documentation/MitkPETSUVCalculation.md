@@ -328,7 +328,7 @@ no top-level rescale and are validated by their own classifier instead.
 the decay-timing fallback regardless of `--strict-dicom`; both values are used
 verbatim.
 
-### Output
+### Output {#MitkPETSUVCalculationOutput}
 
 The output image has pixel type `double`, the geometry and time steps of the
 input, and a copy of the input's properties (including the DICOM properties).
@@ -344,6 +344,31 @@ Rescale Slope to `1.0`:
 | `lbm-morgan` | `GML` | `LBM` |
 | `ibw` | `GML` | `IBW` |
 | `bsa` | `CM2ML` | `BSA` |
+
+The adaptation record is written to the output as well, so an SUV image
+carries its own provenance:
+
+| Property | Content |
+|----------|---------|
+| `mitk.pet.suv.adaptations` | The record as a JSON array; `[]` when nothing was adapted. Each entry has `rule`, `dicomTag`, `originalValue` and `usedValue`. |
+| `(0008,2111)` Derivation Description | `MITK SUV`, followed by the number of adaptations when there were any. The tag is `LO` and holds the count, not the record. |
+
+Where an adaptation reinterpreted a tag, the output carries the value the
+computation actually used rather than the input's original: the corrected
+`(0010,1030)` Patient's Weight in kilograms, and the corrected
+`(0054,0016)[0].(0018,1074)` Radionuclide Total Dose in becquerel. Without
+this the output would inherit the misleading original, and a reader taking
+`(0010,1030)` at face value would conclude the SUV came from a one-tonne
+patient.
+
+The reconstructed administration datetime is deliberately *not* mirrored onto
+`(0018,1078)`. The record holds what the substitution consumed -- the
+implausible duration, or the tag that drove it -- but never the resolved
+datetime itself, because the computation needs only the decay duration and
+never forms one. Writing the tag would mean deriving a value that does not
+otherwise exist, per slice for a `START` correction, purely to restate what
+the record already says. The record names the substitution, the tag that
+triggered it and the original value, which is what a reader needs.
 
 DICOM defines a distinct SUV Type for each lean-body-mass formula, and the
 written tag names the one actually used. An SUV image is therefore readable

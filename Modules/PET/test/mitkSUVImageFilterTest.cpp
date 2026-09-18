@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkDICOMProperty.h>
 #include <mitkDICOMTagPath.h>
+#include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 
@@ -23,6 +24,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -69,6 +71,11 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(OutputTags_EachVariantWritesItsOwnSUVType);
   MITK_TEST(OutputTags_RoundTripThroughClassifier);
   MITK_TEST(GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms);
+
+  // Adaptation record on the output, and across a save
+  MITK_TEST(AdaptationRecord_IsWrittenToTheOutput);
+  MITK_TEST(AdaptationRecord_SurvivesSaveAndReload);
+  MITK_TEST(AdaptationRecord_UnadaptedInput_RecordsEmptyAndStillDescribesTheDerivation);
 
   // Per-(timestep, slice) decay-time override map
   MITK_TEST(SetClear_DecayTimeOverrideMap);
@@ -282,6 +289,32 @@ private:
     return img;
   }
 
+  // A filter over a one-voxel image whose Patient's Weight is gram-encoded,
+  // which is the cheapest input that makes the pipeline record an adaptation
+  // without needing a DRO.
+  static mitk::SUVImageFilter::Pointer MakeFilterWithGramEncodedWeight()
+  {
+    auto img = MakeMinimalImage();
+    const std::string key =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030));
+    auto prop = mitk::DICOMProperty::New();
+    prop->SetValue(0, 0, "70000");
+    img->SetProperty(key.c_str(), prop);
+
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    return f;
+  }
+
+  static std::string ReadStringProperty(const mitk::Image* image, const std::string& name)
+  {
+    auto prop = image->GetProperty(name.c_str());
+    return prop.IsNull() ? std::string() : prop->GetValueAsString();
+  }
+
   static mitk::SUVInputModel MakePrenormalizedBwInputModel()
   {
     mitk::SUVInputModel m;
@@ -475,6 +508,94 @@ public:
   }
 
   // ---- Patient's Weight reaching the computation ----
+
+  // ---- The adaptation record survives a save ----
+
+  void AdaptationRecord_IsWrittenToTheOutput()
+  {
+    auto f = MakeFilterWithGramEncodedWeight();
+    f->Update();
+    auto output = f->GetOutput();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), f->GetAdaptations().size());
+
+    CPPUNIT_ASSERT_EQUAL(
+      mitk::SerializeAdaptations(f->GetAdaptations()),
+      ReadStringProperty(output, mitk::SUV_ADAPTATIONS_PROPERTY_NAME));
+
+    const std::string derivation = ReadStringProperty(
+      output, mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0008, 0x2111)));
+    CPPUNIT_ASSERT(derivation.find("1 IBSI-SUV input adaptation applied") != std::string::npos);
+
+    // The corrected weight, not the input's gram-encoded original: a reader
+    // taking (0010,1030) at face value must not conclude the SUV came from
+    // a one-tonne patient.
+    const std::string weight = ReadStringProperty(
+      output, mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030)));
+    CPPUNIT_ASSERT(weight.find("70") != std::string::npos);
+    CPPUNIT_ASSERT(weight.find("70000") == std::string::npos);
+  }
+
+  void AdaptationRecord_SurvivesSaveAndReload()
+  {
+    // The stage's real assertion. mitk::ItkImageIO drops a property whose
+    // name has no registered persistence info without an error, a warning
+    // or a log line, so an unregistered record would pass every in-memory
+    // test above and vanish on disk. Only a round-trip catches that.
+    auto f = MakeFilterWithGramEncodedWeight();
+    f->Update();
+
+    const std::string expectedRecord =
+      ReadStringProperty(f->GetOutput(), mitk::SUV_ADAPTATIONS_PROPERTY_NAME);
+    const std::string derivationName =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0008, 0x2111));
+    const std::string expectedDerivation = ReadStringProperty(f->GetOutput(), derivationName);
+    CPPUNIT_ASSERT(!expectedRecord.empty());
+    CPPUNIT_ASSERT(!expectedDerivation.empty());
+
+    const std::string path =
+      mitk::IOUtil::CreateTemporaryFile("mitkSUVAdaptationsXXXXXX.nrrd");
+    mitk::IOUtil::Save(f->GetOutput(), path);
+    auto reloaded = mitk::IOUtil::Load<mitk::Image>(path);
+    CPPUNIT_ASSERT(reloaded.IsNotNull());
+
+    // Asserted first and separately because this one is registered by the
+    // PET module's own activator, which linking the module guarantees has
+    // run. If it survives and a DICOM-homed property does not, the fault is
+    // in the test binary's module context, not in the filter.
+    CPPUNIT_ASSERT_EQUAL(expectedRecord,
+                         ReadStringProperty(reloaded, mitk::SUV_ADAPTATIONS_PROPERTY_NAME));
+    CPPUNIT_ASSERT_EQUAL(expectedDerivation, ReadStringProperty(reloaded, derivationName));
+
+    std::remove(path.c_str());
+  }
+
+  void AdaptationRecord_UnadaptedInput_RecordsEmptyAndStillDescribesTheDerivation()
+  {
+    auto img = MakeMinimalImage();
+    const std::string key =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030));
+    auto prop = mitk::DICOMProperty::New();
+    prop->SetValue(0, 0, "70");
+    img->SetProperty(key.c_str(), prop);
+
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    f->Update();
+
+    CPPUNIT_ASSERT(f->GetAdaptations().empty());
+    CPPUNIT_ASSERT_EQUAL(std::string("[]"),
+                         ReadStringProperty(f->GetOutput(), mitk::SUV_ADAPTATIONS_PROPERTY_NAME));
+    // Derived either way, so the description is written either way -- its
+    // absence must not be the signal that nothing was adapted.
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("MITK SUV"),
+      ReadStringProperty(f->GetOutput(),
+                         mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0008, 0x2111))));
+  }
 
   void GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms()
   {

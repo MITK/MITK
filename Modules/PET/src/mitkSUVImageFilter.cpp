@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkSUVImageFilter.h>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <memory>
@@ -27,6 +28,7 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkPixelType.h>
 #include <mitkProperties.h>
+#include <mitkStringProperty.h>
 
 #include <itkIndexedUnaryFunctorImageFilter.h>
 #include <itkUnaryFunctorImageFilter.h>
@@ -941,11 +943,22 @@ namespace
     return nullptr;
   }
 
+  // The entry of \p adaptations for \p rule, or nullptr.
+  const mitk::SUVAdaptation* FindAdaptation(const std::vector<mitk::SUVAdaptation>& adaptations,
+                                            mitk::SUVAdaptationRule rule)
+  {
+    const auto hit = std::find_if(adaptations.cbegin(), adaptations.cend(),
+                                  [rule](const mitk::SUVAdaptation& entry)
+                                  { return rule == entry.rule; });
+    return adaptations.cend() == hit ? nullptr : &(*hit);
+  }
+
   // Set / overwrite the output's PET-image-module DICOM tags so they
   // describe the produced SUV image rather than the (now-stale) input.
   // RescaleIntercept and RescaleSlope are reset because SUV is already
   // in physical units; the filter applies no further rescale.
-  void ApplyOutputTagPolicy(mitk::Image* output, mitk::SUVVariant target)
+  void ApplyOutputTagPolicy(mitk::Image* output, mitk::SUVVariant target,
+                            const std::vector<mitk::SUVAdaptation>& adaptations)
   {
     auto setStr = [output](const mitk::DICOMTagPath& path, const char* value) {
       if (nullptr == value) return;
@@ -958,6 +971,29 @@ namespace
     setStr(mitk::DICOMTagPath(0x0054, 0x1006), OutputSUVTypeValue(target));
     setStr(mitk::DICOMTagPath(0x0028, 0x1052), "0.0");
     setStr(mitk::DICOMTagPath(0x0028, 0x1053), "1.0");
+
+    // Where an adaptation reinterpreted a tag, the output carries the value
+    // the computation used. Without this the output inherits the input's
+    // misleading original -- a reader taking (0010,1030) at face value would
+    // conclude the SUV was computed from a one-tonne patient.
+    if (const auto* dose = FindAdaptation(adaptations, mitk::SUVAdaptationRule::DoseReinterpretedAsMBq))
+    {
+      mitk::DICOMTagPath dosePath;
+      dosePath.AddSelection(0x0054, 0x0016, 0).AddElement(0x0018, 0x1074);
+      setStr(dosePath, dose->usedValue.c_str());
+    }
+    if (const auto* weight = FindAdaptation(adaptations, mitk::SUVAdaptationRule::WeightReinterpretedAsGrams))
+    {
+      setStr(mitk::DICOMTagPath(0x0010, 0x1030), weight->usedValue.c_str());
+    }
+
+    // The record itself, in both the place a DICOM viewer shows and the
+    // place a program can parse. (0008,2111) is LO and holds only the
+    // count; mitk.pet.suv.adaptations holds the entries.
+    setStr(mitk::DICOMTagPath(0x0008, 0x2111),
+           mitk::FormatDerivationDescription(adaptations).c_str());
+    output->SetProperty(mitk::SUV_ADAPTATIONS_PROPERTY_NAME,
+                        mitk::StringProperty::New(mitk::SerializeAdaptations(adaptations)));
   }
 }
 
@@ -1078,5 +1114,5 @@ void mitk::SUVImageFilter::GenerateData()
     }
   }
 
-  ApplyOutputTagPolicy(outputImage, m_TargetVariant);
+  ApplyOutputTagPolicy(outputImage, m_TargetVariant, m_Adaptations);
 }

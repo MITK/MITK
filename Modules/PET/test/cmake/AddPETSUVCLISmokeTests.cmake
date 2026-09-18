@@ -41,13 +41,32 @@ string(REGEX REPLACE "\;" "\\\;" _smoke_path "${_smoke_path}")
 #
 # Args is a CMake list (semicolon-separated) of arguments to pass to the
 # CLI. Pass an empty list with quoted "" if no args.
+#
+# Two optional keyword arguments, each taking one regex:
+#
+#   EXPECT_OUTPUT <regex>   the run must print something matching it
+#   REJECT_OUTPUT <regex>   the run must print nothing matching it
+#
+# They pin contracts an exit code cannot carry -- a successful run that
+# still owes the operator a diagnostic, or one that must stay quiet.
 function(_add_petsuv_cli_smoke name expected_exit)
-  set(_args "${ARGN}")
+  cmake_parse_arguments(_smoke "" "EXPECT_OUTPUT;REJECT_OUTPUT" "" ${ARGN})
+  set(_args "${_smoke_UNPARSED_ARGUMENTS}")
+
+  set(_output_assertions "")
+  if(DEFINED _smoke_EXPECT_OUTPUT)
+    list(APPEND _output_assertions "-DEXPECT_OUTPUT=${_smoke_EXPECT_OUTPUT}")
+  endif()
+  if(DEFINED _smoke_REJECT_OUTPUT)
+    list(APPEND _output_assertions "-DREJECT_OUTPUT=${_smoke_REJECT_OUTPUT}")
+  endif()
+
   add_test(NAME ${name}
     COMMAND ${CMAKE_COMMAND}
             -DEXPECTED=${expected_exit}
             -DCMD=${_cli_exe}
             "-DARGS=${_args}"
+            ${_output_assertions}
             -P "${_assert_script}")
   set_property(TEST ${name} APPEND PROPERTY ENVIRONMENT "PATH=${_smoke_path}")
   set_property(TEST ${name} PROPERTY LABELS "PET" "PETSUVCLI")
@@ -95,7 +114,21 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # Validates that --input directory loading + filter wiring + --output
   # writing all line up.
   _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_BaselineRun_DRO_0_0 0
-    "--input;${_dro_pt};--output;${_dro_out};--variant;bw")
+    "--input;${_dro_pt};--output;${_dro_out};--variant;bw"
+    REJECT_OUTPUT "IBSI-SUV input adaptations applied")
+
+  # DRO_3_2_3 needs two recommendations to be computable at all: the
+  # empirical DC=START formula, and applying it to a manufacturer the
+  # formula was never validated against. A run that reinterprets its input
+  # that far and says nothing is the failure this case exists to prevent,
+  # and no exit code can express it -- the run legitimately succeeds.
+  # The baseline case above holds the other half: silence when the input
+  # needed nothing, so that "always warns" cannot pass both.
+  if(EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_3_2_3/PT")
+    _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_ReportsAdaptations_DRO_3_2_3 0
+      "--input;${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_3_2_3/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_DRO_3_2_3_out.nrrd;--variant;bw"
+      EXPECT_OUTPUT "VendorEmpiricalDecayFallback")
+  endif()
 
   # ---- Exit-code contract ---------------------------------------------
   #

@@ -299,13 +299,24 @@ input usable. By default they are applied and logged as warnings. With
 | Administration date rebuilt from the reference datetime | duration outside `[-3600 s, 2 * T)`, or only `(0018,1072)` present | stored time of day kept, date taken from the reference | `AdministrationDateSubstitutionRefusedException` |
 | Patient's Weight `(0010,1030)` given in grams | value `>= 1000` | divided by 1000 | `ImplausiblePatientWeightException` |
 
-Every adaptation that fires is also recorded on the filter, so a caller
-embedding `mitk::SUVImageFilter` can audit them without parsing the log:
-`GetAdaptations()` returns one entry per applied recommendation, naming the
-rule, the DICOM tag concerned, the stored value and the value used. Under
-`--strict-dicom` that list is necessarily empty, because the first adaptation
-raises instead of being applied -- an empty list under the strict policy is
-the guarantee the mode exists to give, not a lack of information.
+Every adaptation that fires is also recorded, so it can be audited without
+parsing the log. The record holds one entry per applied recommendation,
+naming the rule, the DICOM tag concerned, the stored value and the value
+used, and it leaves the process three ways:
+
+- **On the console.** After a successful run the CLI prints a consolidated
+  block listing every adaptation, regardless of `--verbose`. The per-rule
+  warnings the pipeline emits while it works are interleaved with everything
+  else; this is the one place the whole set appears together.
+- **In the output image**, as the properties described under
+  [Output](#MitkPETSUVCalculationOutput), which survive a save.
+- **In process**, via `mitk::SUVImageFilter::GetAdaptations()`, for a caller
+  embedding the filter.
+
+Under `--strict-dicom` that record is necessarily empty, because the first
+adaptation raises instead of being applied -- an empty record under the
+strict policy is the guarantee the mode exists to give, not a lack of
+information.
 
 DICOM prescribes kilograms for `(0010,1030)`, and no patient weighs 1000 of
 them, so a value at or above that identifies a gram-encoded export. Read at

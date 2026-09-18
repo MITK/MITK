@@ -402,6 +402,20 @@ int main(int argc, char* argv[])
 
     auto output = filter->GetOutput();
 
+    // Consolidated, after the per-rule warnings the pipeline emitted while
+    // it worked. Those are interleaved with everything else the run logs;
+    // this is the block an operator can actually read, and the one place
+    // the whole set of reinterpretations appears together. Not gated on
+    // --verbose: an input that had to be reinterpreted to be usable is not
+    // a detail the caller opts in to.
+    const std::string adaptationSummary =
+      mitk::FormatAdaptationSummary(filter->GetAdaptations());
+    if (!adaptationSummary.empty())
+    {
+      MITK_WARN << adaptationSummary
+                << "\nRerun with --strict-dicom to refuse these instead.";
+    }
+
     // ---- Save -----------------------------------------------------------
     //
     // Wrapped separately so an output-write failure is distinguishable

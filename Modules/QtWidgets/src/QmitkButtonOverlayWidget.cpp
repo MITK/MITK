@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include <QmitkButtonOverlayWidget.h>
 
-#include <QmitkIconTheme.h>
 #include <QVBoxLayout>
 #include <QApplication>
 

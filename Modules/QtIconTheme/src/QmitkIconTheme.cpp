@@ -101,8 +101,8 @@ namespace
   {
   public:
     ThemedIconEngine(const QByteArray &originalSVG, const std::optional<QString> &color)
-      // Deep copy: QmitkToolSelectionBox passes QByteArray::fromRawData() over
-      // a buffer it frees right after GetIcon() returns.
+      // Deep copy: callers may pass a QByteArray::fromRawData() view over a
+      // buffer that is gone by the time the icon is first painted.
       : m_SVG(originalSVG.constData(), originalSVG.size()),
         m_Color(color)
     {

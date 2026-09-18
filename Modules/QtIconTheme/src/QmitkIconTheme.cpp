@@ -271,7 +271,15 @@ QString QmitkIconTheme::GetAccentColor()
 
 void QmitkIconTheme::Refresh()
 {
+  const auto color = s_Color;
+  const auto accentColor = s_AccentColor;
+
   s_Parsed = false;
+  EnsureParsed();
+
+  if (color == s_Color && accentColor == s_AccentColor)
+    return;
+
   ++s_Generation;
 
   emit GetInstance()->Changed();

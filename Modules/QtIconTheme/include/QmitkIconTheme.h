@@ -88,15 +88,15 @@ public:
   /**
    * \brief Re-reads the icon colors from the application style sheet.
    *
-   * All icons created by GetIcon() re-render in the new colors on their
-   * next repaint, and Changed() is emitted. Call this right after
-   * QApplication::setStyleSheet().
+   * If the colors changed, all icons created by GetIcon() re-render in the
+   * new colors on their next repaint, and Changed() is emitted. Call this
+   * right after QApplication::setStyleSheet().
    */
   static void Refresh();
 
 Q_SIGNALS:
   /**
-   * \brief Emitted by Refresh() after the icon colors have been re-read.
+   * \brief Emitted by Refresh() when the icon colors have changed.
    */
   void Changed();
 

@@ -147,11 +147,18 @@ public:
     int count = 0;
     const auto connection = QObject::connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, [&count] { ++count; });
 
+    ApplyTheme("#ff0000", "#ffffff");
+    ApplyTheme("#0000ff", "#ffffff");
+    const auto countAfterNewColors = count;
+
+    // Same style sheet again
     QmitkIconTheme::Refresh();
-    QmitkIconTheme::Refresh();
+    const auto countAfterSameColors = count;
 
     QObject::disconnect(connection);
-    CPPUNIT_ASSERT_EQUAL(2, count);
+
+    CPPUNIT_ASSERT_EQUAL(2, countAfterNewColors);
+    CPPUNIT_ASSERT_EQUAL(2, countAfterSameColors);
   }
 
   void ColorsFollowRefresh()

@@ -419,8 +419,9 @@ public:
   void OutputTags_EachVariantWritesItsOwnSUVType()
   {
     // The three lean-body-mass codes must stay distinct. DICOM defines one
-    // per formula, so a collapsed code cannot say which one produced the
-    // image.
+    // per formula, and Morgan differs from James-128 by about 2 % of lean
+    // body mass in males -- small enough that a collapsed code would be
+    // read back as the wrong formula without anything looking wrong.
     const struct
     {
       mitk::SUVVariant variant;
@@ -430,6 +431,7 @@ public:
       { mitk::SUVVariant::BW,                "GML",   "BW"          },
       { mitk::SUVVariant::LBM_Janmahasatian, "GML",   "LBMJANMA"    },
       { mitk::SUVVariant::LBM_James128,      "GML",   "LBMJAMES128" },
+      { mitk::SUVVariant::LBM_Morgan,        "GML",   "LBM"         },
       { mitk::SUVVariant::IBW,               "GML",   "IBW"         },
       { mitk::SUVVariant::BSA,               "CM2ML", "BSA"         },
     };
@@ -456,6 +458,7 @@ public:
       mitk::SUVVariant::BW,
       mitk::SUVVariant::LBM_Janmahasatian,
       mitk::SUVVariant::LBM_James128,
+      mitk::SUVVariant::LBM_Morgan,
       mitk::SUVVariant::IBW,
       mitk::SUVVariant::BSA,
     };

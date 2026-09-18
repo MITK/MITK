@@ -113,10 +113,10 @@ namespace
   // Resolve (0054,1006) SUV Type into a SUV variant. Per the IBSI-SUV
   // spec the Units tag carries only the unit (g/mL, cm^2/mL); the
   // specific variant lives in (0054,1006). When the tag is absent or
-  // empty, IBSI prescribes BW as the default. The standard SUVType
-  // value LBM (Morgan) is explicitly called out by IBSI as obsolete and
-  // not covered by the DROs; we refuse it rather than silently picking
-  // a different LBM formula.
+  // empty, IBSI prescribes BW as the default. Every standard SUV Type is
+  // accepted, LBM (Morgan) included: it is obsolete and no DRO covers it,
+  // but it is convertible and refusing it would leave real data
+  // unreadable.
   //
   // Returns std::nullopt when the tag is absent or empty so the caller
   // can apply the Units-implied default.
@@ -136,16 +136,14 @@ namespace
       return mitk::SUVVariant::IBW;
     if ("BSA" == v)
       return mitk::SUVVariant::BSA;
+    // "LBM" is the Morgan variant. The IBSI-SUV manual calls it obsolete
+    // but lists it among the SUV Types that must be convertible, and data
+    // carrying it exists regardless of what a reader would prefer.
     if ("LBM" == v)
-    {
-      mitkThrowException(mitk::UnsupportedPETUnitsException)
-        << "(0054,1006) SUV Type = 'LBM' (Morgan) is obsolete per the "
-           "IBSI-SUV recommendations and not supported. Use 'LBMJANMA' "
-           "or 'LBMJAMES128' to specify the formula explicitly.";
-    }
+      return mitk::SUVVariant::LBM_Morgan;
     mitkThrowException(mitk::UnsupportedPETUnitsException) << "(0054,1006) SUV Type = '" << raw
-                                                           << "' is not supported. Recognised values: BW, LBMJANMA, "
-                                                              "LBMJAMES128, IBW, BSA.";
+                                                           << "' is not supported. Recognised values: BW, LBM, "
+                                                              "LBMJANMA, LBMJAMES128, IBW, BSA.";
   }
 } // namespace
 

@@ -74,7 +74,6 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   MITK_TEST(GML_SUVType_LBMJANMA_ClassifiesAsPrenormalizedLBMJanma);
   MITK_TEST(GML_SUVType_LBMJAMES128_ClassifiesAsPrenormalizedLBMJames128);
   MITK_TEST(GML_SUVType_IBW_ClassifiesAsPrenormalizedIBW);
-  MITK_TEST(GML_SUVType_LBM_Morgan_Throws);
   MITK_TEST(GML_SUVType_BSA_Throws_Inconsistent);
   MITK_TEST(GML_SUVType_Unknown_Throws);
   MITK_TEST(CM2ML_SUVType_BSA_OK);
@@ -99,6 +98,9 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   MITK_TEST(CNTS_PhilipsNoFactor_Throws_MissingPhilipsPETScaleException);
 
   // Defensive contract
+  MITK_TEST(GML_SUVTypeLBMJANMA_ClassifiesAsJanmahasatian);
+  MITK_TEST(GML_SUVTypeLBMJAMES128_ClassifiesAsJames128);
+  MITK_TEST(GML_SUVTypeLBM_ClassifiesAsMorgan);
   MITK_TEST(NullProvider_Throws);
 
   CPPUNIT_TEST_SUITE_END();
@@ -186,20 +188,6 @@ public:
                                           mitk::DICOMReadPolicy::Lenient);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
     CPPUNIT_ASSERT(mitk::SUVVariant::IBW == m.sourceVariant);
-  }
-
-  void GML_SUVType_LBM_Morgan_Throws()
-  {
-    // SUV Type 'LBM' (Morgan) is explicitly called out by the IBSI-SUV
-    // spec as obsolete and not covered by the DROs; we refuse it
-    // rather than silently picking a different LBM formula.
-    auto img = MakeImage();
-    SetDicomTag(img, 0x0054, 0x1001, "GML");
-    SetDicomTag(img, 0x0054, 0x1006, "LBM");
-
-    CPPUNIT_ASSERT_THROW(mitk::ClassifyPETInput(img.GetPointer(),
-                                                mitk::DICOMReadPolicy::Lenient),
-                         mitk::UnsupportedPETUnitsException);
   }
 
   void GML_SUVType_BSA_Throws_Inconsistent()
@@ -420,6 +408,54 @@ public:
     CPPUNIT_ASSERT_THROW(mitk::ClassifyPETInput(img.GetPointer(),
                                                 mitk::DICOMReadPolicy::Strict),
                          mitk::MissingPhilipsPETScaleException);
+  }
+
+  // ---- SUV Type round trip ----
+  //
+  // ApplyOutputTagPolicy stamps (0054,1006) on every SUV image this module
+  // produces, and (0054,1001) = GML plus a SUV Type is exactly the
+  // pre-normalized input that DRO_2_1_x and DRO_2_6_x exercise. So an SUV
+  // output is a legitimate input, and the classifier has to read back the
+  // variant the filter wrote. These cases pin each lean-body-mass code
+  // separately: they once all collapsed onto the generic "LBM", which made
+  // the output unreadable and -- once "LBM" gained a meaning -- would have
+  // resolved a Janmahasatian image to Morgan instead.
+
+  void GML_SUVTypeLBMJANMA_ClassifiesAsJanmahasatian()
+  {
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "GML");
+    SetDicomTag(img, 0x0054, 0x1006, "LBMJANMA");
+
+    const auto m = mitk::ClassifyPETInput(img.GetPointer(),
+                                          mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVVariant::LBM_Janmahasatian == m.sourceVariant);
+  }
+
+  void GML_SUVTypeLBMJAMES128_ClassifiesAsJames128()
+  {
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "GML");
+    SetDicomTag(img, 0x0054, 0x1006, "LBMJAMES128");
+
+    const auto m = mitk::ClassifyPETInput(img.GetPointer(),
+                                          mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVVariant::LBM_James128 == m.sourceVariant);
+  }
+
+  void GML_SUVTypeLBM_ClassifiesAsMorgan()
+  {
+    // Previously refused outright. The IBSI-SUV manual calls the formula
+    // obsolete but lists it among the convertible SUV Types, and data
+    // carrying it exists.
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0054, 0x1001, "GML");
+    SetDicomTag(img, 0x0054, 0x1006, "LBM");
+
+    const auto m = mitk::ClassifyPETInput(img.GetPointer(),
+                                          mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
+    CPPUNIT_ASSERT(mitk::SUVVariant::LBM_Morgan == m.sourceVariant);
   }
 
   void NullProvider_Throws()

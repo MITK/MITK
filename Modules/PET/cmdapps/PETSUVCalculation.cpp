@@ -102,6 +102,7 @@ namespace
     if ("BW"           == v) return mitk::SUVVariant::BW;
     if ("LBM-JANMA"    == v) return mitk::SUVVariant::LBM_Janmahasatian;
     if ("LBM-JAMES128" == v) return mitk::SUVVariant::LBM_James128;
+    if ("LBM-MORGAN"   == v) return mitk::SUVVariant::LBM_Morgan;
     if ("IBW"          == v) return mitk::SUVVariant::IBW;
     if ("BSA"          == v) return mitk::SUVVariant::BSA;
     return std::nullopt;
@@ -156,8 +157,9 @@ namespace
       "SUV variant",
       "One of: bw (body weight, default), lbm-janma (lean body mass, "
       "Janmahasatian 2005, IBSI-SUV recommended), lbm-james128 (lean body "
-      "mass, James 1976), ibw (ideal body weight, Sugawara 1999), "
-      "bsa (body surface area, DuBois).",
+      "mass, James 1976), lbm-morgan (lean body mass, Morgan 1994; the "
+      "variant DICOM labels SUV Type LBM, and obsolete), ibw (ideal body "
+      "weight, Sugawara 1999), bsa (body surface area, DuBois).",
       us::Any(std::string("bw")));
     parser.endGroup();
 
@@ -170,10 +172,10 @@ namespace
       "Override DICOM (0010,1030) Patient Weight.");
     parser.addArgument("patient-height", "", mitkCommandLineParser::Float,
       "Patient height [m]",
-      "Override DICOM (0010,1020) Patient Size. Required for the variants lbm-janma, lbm-james128, ibw and bsa.");
+      "Override DICOM (0010,1020) Patient Size. Required for the variants lbm-janma, lbm-james128, lbm-morgan, ibw and bsa.");
     parser.addArgument("patient-sex", "", mitkCommandLineParser::String,
       "Patient sex (M|F|O)",
-      "Override DICOM (0010,0040) Patient Sex. Required for the variants lbm-janma, lbm-james128 and ibw. "
+      "Override DICOM (0010,0040) Patient Sex. Required for the variants lbm-janma, lbm-james128, lbm-morgan and ibw. "
       "Value 'O' (Other) follows the IBSI-SUV benchmark convention: the "
       "mean of the male- and female-specific normalization factors.");
     parser.addArgument("half-life", "", mitkCommandLineParser::Float,
@@ -248,7 +250,8 @@ namespace
       if (!v.has_value())
       {
         MITK_ERROR << "Invalid --variant value '" << raw
-                   << "'. Expected one of bw, lbm-janma, lbm-james128, ibw, bsa.";
+                   << "'. Expected one of bw, lbm-janma, lbm-james128, lbm-morgan, "
+                      "ibw, bsa.";
         return false;
       }
       s.variant = v.value();

@@ -84,6 +84,7 @@ namespace
       case mitk::SUVVariant::BW:                return "BW";
       case mitk::SUVVariant::LBM_Janmahasatian: return "LBM-Janmahasatian";
       case mitk::SUVVariant::LBM_James128:      return "LBM-James128";
+      case mitk::SUVVariant::LBM_Morgan:        return "LBM-Morgan";
       case mitk::SUVVariant::IBW:               return "IBW (Sugawara)";
       case mitk::SUVVariant::BSA:               return "BSA (DuBois)";
     }
@@ -907,6 +908,7 @@ namespace
       case mitk::SUVVariant::BW:
       case mitk::SUVVariant::LBM_Janmahasatian:
       case mitk::SUVVariant::LBM_James128:
+      case mitk::SUVVariant::LBM_Morgan:
       case mitk::SUVVariant::IBW:
         return "GML";
       case mitk::SUVVariant::BSA:
@@ -915,12 +917,13 @@ namespace
     return nullptr;
   }
 
-  // DICOM defines a distinct SUV Type per lean-body-mass formula, so the
-  // specific one is written out rather than collapsed to the generic
+  // DICOM defines a distinct SUV Type for each lean-body-mass formula, so
+  // the specific one is written out rather than collapsed to the generic
   // "LBM". Collapsing made the output unreadable by this module's own
-  // classifier, which accepts only the specific codes -- and an SUV image
-  // is a legitimate input: Units = GML plus a SUV Type is the
-  // pre-normalized case DRO_2_1_x and DRO_2_6_x exercise.
+  // classifier, which accepts the specific codes: re-reading an SUV image
+  // to renormalize it -- the pre-normalized input path DRO_2_1_x and
+  // DRO_2_6_x exercise -- would pick the wrong formula, and Morgan differs
+  // from James-128 by about 2 % of lean body mass in male patients.
   const char* OutputSUVTypeValue(mitk::SUVVariant target)
   {
     switch (target)
@@ -928,6 +931,7 @@ namespace
       case mitk::SUVVariant::BW:                return "BW";
       case mitk::SUVVariant::LBM_Janmahasatian: return "LBMJANMA";
       case mitk::SUVVariant::LBM_James128:      return "LBMJAMES128";
+      case mitk::SUVVariant::LBM_Morgan:        return "LBM";
       case mitk::SUVVariant::IBW:               return "IBW";
       case mitk::SUVVariant::BSA:               return "BSA";
     }

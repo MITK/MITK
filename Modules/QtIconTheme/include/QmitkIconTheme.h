@@ -23,13 +23,15 @@ found in the LICENSE file.
 /**
  * \brief Theme-aware icon and color management.
  *
- * SVG icons are recolored by replacing magic colors with the icon colors
- * declared in the application style sheet. Icons created by GetIcon() are
- * rendered from the SVG at the size and device pixel ratio they are displayed
- * with, so they stay sharp at any scale, and they follow theme switches at
- * runtime: after Refresh() they re-render in the current colors on their next
- * repaint, so callers can store them like any other QIcon. Consumers that
- * derive and cache anything else from the theme colors connect to Changed().
+ * SVG icons are recolored by replacing the magic icon color \#00ff00 and the
+ * magic accent color \#ff00ff, in six-digit or three-digit notation, with the
+ * icon colors declared in the application style sheet. Icons created by
+ * GetIcon() are rendered from the SVG at the size and device pixel ratio they
+ * are displayed with, so they stay sharp at any scale, and they follow theme
+ * switches at runtime: after Refresh() they re-render in the current colors
+ * on their next repaint, so callers can store them like any other QIcon.
+ * Consumers that derive and cache anything else from the theme colors connect
+ * to Changed().
  *
  * \sa QmitkColoredNodeDescriptor
  */
@@ -70,18 +72,6 @@ public:
    *         or a null icon if the resource cannot be read.
    */
   static QIcon GetIcon(const QString &resourcePath);
-
-  /**
-   * \brief Replaces the magic icon color in SVG data by a custom color.
-   *
-   * Both the six-digit and the equivalent three-digit notation of the magic
-   * color are replaced.
-   *
-   * \param[in] svg The original SVG content.
-   * \param[in] color A CSS-compatible color string (e.g., "#ffffff").
-   * \return The SVG content with the magic icon color replaced.
-   */
-  static QString ReplaceColor(const QString &svg, const QString &color);
 
   /**
    * \brief Returns the primary icon color for the current theme.

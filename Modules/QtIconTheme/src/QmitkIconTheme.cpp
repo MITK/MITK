@@ -86,7 +86,7 @@ namespace
   QByteArray ThemeSVG(const QByteArray &originalSVG, const std::optional<QString> &color)
   {
     auto themedSVG = ReplaceMagicColor(QString(originalSVG), QStringLiteral("ff00ff|f0f"), QmitkIconTheme::GetAccentColor());
-    themedSVG = QmitkIconTheme::ReplaceColor(themedSVG, color.value_or(QmitkIconTheme::GetColor()));
+    themedSVG = ReplaceMagicColor(themedSVG, QStringLiteral("00ff00|0f0"), color.value_or(QmitkIconTheme::GetColor()));
 
     return themedSVG.toUtf8();
   }
@@ -255,11 +255,6 @@ QIcon QmitkIconTheme::GetIcon(const QString &resourcePath)
 
   MITK_WARN << "Could not read " << resourcePath.toStdString();
   return QIcon();
-}
-
-QString QmitkIconTheme::ReplaceColor(const QString &svg, const QString &color)
-{
-  return ReplaceMagicColor(svg, QStringLiteral("00ff00|0f0"), color);
 }
 
 QString QmitkIconTheme::GetColor()

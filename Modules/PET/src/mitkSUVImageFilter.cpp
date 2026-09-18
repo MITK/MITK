@@ -915,16 +915,19 @@ namespace
     return nullptr;
   }
 
-  // Both LBM variants share the standard SUV Type code "LBM"; the
-  // specific formula is recorded externally (e.g. via filename or in a
-  // study log).
+  // DICOM defines a distinct SUV Type per lean-body-mass formula, so the
+  // specific one is written out rather than collapsed to the generic
+  // "LBM". Collapsing made the output unreadable by this module's own
+  // classifier, which accepts only the specific codes -- and an SUV image
+  // is a legitimate input: Units = GML plus a SUV Type is the
+  // pre-normalized case DRO_2_1_x and DRO_2_6_x exercise.
   const char* OutputSUVTypeValue(mitk::SUVVariant target)
   {
     switch (target)
     {
       case mitk::SUVVariant::BW:                return "BW";
-      case mitk::SUVVariant::LBM_Janmahasatian: return "LBM";
-      case mitk::SUVVariant::LBM_James128:      return "LBM";
+      case mitk::SUVVariant::LBM_Janmahasatian: return "LBMJANMA";
+      case mitk::SUVVariant::LBM_James128:      return "LBMJAMES128";
       case mitk::SUVVariant::IBW:               return "IBW";
       case mitk::SUVVariant::BSA:               return "BSA";
     }

@@ -10,6 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkDICOMProperty.h>
+#include <mitkDICOMTagPath.h>
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 
@@ -21,6 +23,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <string>
 #include <vector>
 
 class mitkSUVImageFilterTestSuite : public mitk::TestFixture
@@ -61,6 +64,10 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   // Reconfigure-on-change (M1): a target-variant change after configure
   // re-resolves at Update instead of reusing stale resolved state.
   MITK_TEST(TargetVariantChange_AfterConfigure_RequiresSex);
+
+  // Output DICOM tags
+  MITK_TEST(OutputTags_EachVariantWritesItsOwnSUVType);
+  MITK_TEST(OutputTags_RoundTripThroughClassifier);
 
   // Per-(timestep, slice) decay-time override map
   MITK_TEST(SetClear_DecayTimeOverrideMap);
@@ -367,6 +374,99 @@ public:
     {
       auto f = MakeFilterSwitchedToSexSpecificTarget(mitk::DICOMReadPolicy::Lenient);
       CPPUNIT_ASSERT_THROW(f->Update(), mitk::MissingDICOMPropertyException);
+    }
+  }
+
+  // ---- Output DICOM tags ----
+  //
+  // ApplyOutputTagPolicy stamps (0054,1001) Units and (0054,1006) SUV Type
+  // on every image the filter produces, so the output describes itself
+  // rather than inheriting the input's now-stale tags. Nothing covered
+  // those tags before, which is how they came to be written lossily: all
+  // three lean-body-mass variants collapsed onto the generic "LBM".
+  //
+  // That matters because an SUV image is a legitimate input. Units = GML
+  // plus a SUV Type is exactly the pre-normalized case DRO_2_1_x and
+  // DRO_2_6_x exercise, so the classifier must be able to read back what
+  // the filter wrote. These cases assert the full round trip: compute with
+  // a variant, then classify the output and get the same variant.
+
+  static std::string ReadOutputTag(const mitk::Image* image,
+                                   unsigned int group, unsigned int element)
+  {
+    const std::string key = mitk::DICOMTagPathToPropertyName(
+      mitk::DICOMTagPath(group, element));
+    const auto prop = image->GetConstProperty(key.c_str());
+    const auto* dicomProp = dynamic_cast<const mitk::DICOMProperty*>(prop.GetPointer());
+    return (nullptr != dicomProp) ? dicomProp->GetValue(0, 0, true, true) : std::string();
+  }
+
+  static mitk::Image::Pointer ComputeWithTarget(mitk::SUVVariant target)
+  {
+    auto f   = mitk::SUVImageFilter::New();
+    auto img = MakeMinimalImage();
+    f->SetInput(img);
+    f->SetTargetVariant(target);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetPatientHeightInCm(170.0);
+    f->SetPatientSex(mitk::Sex::Male);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    f->Update();
+    return f->GetOutput();
+  }
+
+  void OutputTags_EachVariantWritesItsOwnSUVType()
+  {
+    // The three lean-body-mass codes must stay distinct. DICOM defines one
+    // per formula, so a collapsed code cannot say which one produced the
+    // image.
+    const struct
+    {
+      mitk::SUVVariant variant;
+      const char*      units;
+      const char*      suvType;
+    } expectations[] = {
+      { mitk::SUVVariant::BW,                "GML",   "BW"          },
+      { mitk::SUVVariant::LBM_Janmahasatian, "GML",   "LBMJANMA"    },
+      { mitk::SUVVariant::LBM_James128,      "GML",   "LBMJAMES128" },
+      { mitk::SUVVariant::IBW,               "GML",   "IBW"         },
+      { mitk::SUVVariant::BSA,               "CM2ML", "BSA"         },
+    };
+
+    for (const auto& e : expectations)
+    {
+      const auto output = ComputeWithTarget(e.variant);
+      CPPUNIT_ASSERT(output.IsNotNull());
+      CPPUNIT_ASSERT_EQUAL(std::string(e.units),
+                           ReadOutputTag(output, 0x0054, 0x1001));
+      CPPUNIT_ASSERT_EQUAL(std::string(e.suvType),
+                           ReadOutputTag(output, 0x0054, 0x1006));
+    }
+  }
+
+  void OutputTags_RoundTripThroughClassifier()
+  {
+    // The assertion that actually matters: feed each output back through
+    // the classifier and recover the variant it was computed with. A
+    // missing enumerator in OutputSUVTypeValue would write no tag at all
+    // (it returns nullptr and the setter skips), and a collapsed code
+    // would resolve to the wrong formula; both fail here.
+    const mitk::SUVVariant variants[] = {
+      mitk::SUVVariant::BW,
+      mitk::SUVVariant::LBM_Janmahasatian,
+      mitk::SUVVariant::LBM_James128,
+      mitk::SUVVariant::IBW,
+      mitk::SUVVariant::BSA,
+    };
+
+    for (const auto variant : variants)
+    {
+      const auto output = ComputeWithTarget(variant);
+      const auto model  = mitk::ClassifyPETInput(output.GetPointer(),
+                                                 mitk::DICOMReadPolicy::Lenient);
+      CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == model.semantics);
+      CPPUNIT_ASSERT(variant == model.sourceVariant);
     }
   }
 

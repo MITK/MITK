@@ -279,13 +279,18 @@ Rescale Slope to `1.0`:
 | Variant | `(0054,1001)` | `(0054,1006)` |
 |---------|---------------|---------------|
 | `bw` | `GML` | `BW` |
-| `lbm-janma` | `GML` | `LBM` |
-| `lbm-james128` | `GML` | `LBM` |
+| `lbm-janma` | `GML` | `LBMJANMA` |
+| `lbm-james128` | `GML` | `LBMJAMES128` |
 | `ibw` | `GML` | `IBW` |
 | `bsa` | `CM2ML` | `BSA` |
 
-Both LBM variants share the standard SUV Type code `LBM`; record the chosen
-formula elsewhere (e.g. in the file name).
+DICOM defines a distinct SUV Type for each lean-body-mass formula, and the
+written tag names the one actually used. An SUV image is therefore readable
+as an input again: feeding it back re-normalizes from the correct source
+variant. Earlier versions collapsed all lean-body-mass variants onto the
+generic `LBM`, which made the output unreadable by this tool; if you hold
+such a file, its SUV Type does not identify the formula and the value has to
+come from elsewhere.
 
 ## Examples
 

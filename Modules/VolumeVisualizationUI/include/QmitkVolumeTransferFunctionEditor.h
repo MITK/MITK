@@ -115,6 +115,8 @@ private slots:
   void OnCanvasOpacityChanged();
   void OnResetAdjustments();
   void OnImportCustom();
+  void OnAddColorStop();
+  void OnPickColorStopColor();
 
 private:
   /** \brief Write the held function onto the node and re-seed the editor. */
@@ -195,14 +197,24 @@ private:
   void SetEditModeActive(bool active);
 
   /**
-   * \brief Point the canvas at the target the buttons name, and show which one
-   *        that is.
+   * \brief Give the canvas its handles, or take them away, and show which of the
+   *        two the panel is in.
    *
-   * The one place that turns "editing, on the colours" into what the canvas and
-   * the panel do about it, so that entering, leaving and switching target all
-   * arrive at the same state by the same route.
+   * The one place that turns "editing" into what the canvas and the panel do
+   * about it, so that entering and leaving arrive at their states by the same
+   * route.
    */
   void ShowEditMode();
+
+  /**
+   * \brief Point the colour stop controls at what the canvas currently holds and
+   *        has selected.
+   *
+   * Driven by the canvas rather than kept alongside it: a stop can be added,
+   * moved, recoloured or selected on the canvas just as well as here, and one
+   * copy of that state is one thing to keep right.
+   */
+  void ShowColorStops();
 
   /**
    * \brief Give the colour function back the handful of points it can be taken

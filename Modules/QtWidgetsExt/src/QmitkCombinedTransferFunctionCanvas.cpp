@@ -18,8 +18,31 @@ found in the LICENSE file.
 #include <QColorDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPolygon>
 
 #include <algorithm>
+
+namespace
+{
+  /** \brief Room below the plot for the colour stop markers. */
+  constexpr int RAIL_HEIGHT = 15;
+
+  /** \brief How far a marker's roof reaches up past the frame.
+   *
+   * What makes it read as pointing at a value on the gradient rather than
+   * sitting somewhere underneath it. One short of the roof's own height, so that
+   * what overlaps the plot is the roof and what fills the rail is the body.
+   */
+  constexpr int ROOF_OVERLAP = 4;
+
+  constexpr int ROOF_HEIGHT = 5;
+  constexpr int MARKER_WIDTH = 15;
+  constexpr int MARKER_WIDTH_SELECTED = 17;
+
+  /** \brief Height of the wedge marking the selected stop at the top of the plot. */
+  constexpr int SELECTION_MARK_HEIGHT = 6;
+  constexpr int SELECTION_MARK_WIDTH = 9;
+}
 
 QmitkCombinedTransferFunctionCanvas::QmitkCombinedTransferFunctionCanvas(QWidget *parent, Qt::WindowFlags f)
 : QmitkPiecewiseFunctionCanvas(parent, f),
@@ -27,6 +50,12 @@ QmitkCombinedTransferFunctionCanvas::QmitkCombinedTransferFunctionCanvas(QWidget
   m_OpacityShift(0.0),
   m_OpacityHeight(0.0)
 {
+  // Everything that maps between values and pixels goes through contentsRect(),
+  // so reserving the rail here is all it takes for the histogram, the gradient
+  // and the curve to keep to the plot above it. Reserved whether or not there is
+  // anything to draw in it, so that the canvas does not change height when
+  // editing begins.
+  this->setContentsMargins(1, 1, 1, RAIL_HEIGHT);
 }
 
 void QmitkCombinedTransferFunctionCanvas::SetColorTransferFunction(vtkColorTransferFunction *colorTransferFunction)
@@ -35,20 +64,22 @@ void QmitkCombinedTransferFunctionCanvas::SetColorTransferFunction(vtkColorTrans
   this->update();
 }
 
-void QmitkCombinedTransferFunctionCanvas::SetEditTarget(EditTarget target)
+void QmitkCombinedTransferFunctionCanvas::SetEditable(bool editable)
 {
-  m_EditTarget = target;
+  if (editable == m_Editable)
+    return;
 
-  // The grabbed handle is an index into the function being edited, so it means
-  // something else - or nothing at all - the moment the target changes.
+  m_Editable = editable;
+
+  // The selection is an index into one of the two functions, so it means nothing
+  // once nothing is being edited - and one left over from a previous edit would
+  // name a stop this one never selected.
   m_GrabbedHandle = -1;
+  m_ActiveFunction = ActiveFunction::Opacity;
 
   this->update();
-}
 
-QmitkCombinedTransferFunctionCanvas::EditTarget QmitkCombinedTransferFunctionCanvas::GetEditTarget() const
-{
-  return m_EditTarget;
+  emit ColorStopsChanged();
 }
 
 void QmitkCombinedTransferFunctionCanvas::Clear()
@@ -66,10 +97,22 @@ void QmitkCombinedTransferFunctionCanvas::Clear()
 
   // Both functions are gone, so there is nothing left to edit - and nothing for
   // the point accessors to be asked about.
-  this->SetEditTarget(EditTarget::None);
+  this->SetEditable(false);
 
   this->SetHistogram(nullptr);
   this->update();
+}
+
+QRect QmitkCombinedTransferFunctionCanvas::ColorStopRail() const
+{
+  const QRect contents = this->contentsRect();
+
+  return QRect(contents.x(), contents.bottom() + 1, contents.width(), RAIL_HEIGHT);
+}
+
+bool QmitkCombinedTransferFunctionCanvas::IsOnColorStopRail(int y) const
+{
+  return y > this->contentsRect().bottom();
 }
 
 void QmitkCombinedTransferFunctionCanvas::PaintColorGradient(QPainter &painter)
@@ -179,70 +222,134 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
 
 void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
 {
-  if (m_EditTarget == EditTarget::None)
+  if (!m_Editable)
     return;
 
   painter.save();
 
-  // The point accessors answer for whichever function is being edited, so one
-  // loop serves both targets and only the shape drawn differs.
-  for (int i = 0; i < this->GetFunctionSize(); ++i)
+  // Both functions carry handles at once: which one a gesture means follows from
+  // where it lands, so hiding either would only hide what can be done.
+  if (m_PiecewiseFunction != nullptr)
   {
-    const bool grabbed = i == m_GrabbedHandle;
-    const auto handle =
-      this->FunctionToCanvas(std::make_pair(this->GetFunctionX(i), this->GetFunctionY(i)));
+    double *dp = m_PiecewiseFunction->GetDataPointer();
 
-    if (m_EditTarget == EditTarget::Color)
+    for (int i = 0; i < m_PiecewiseFunction->GetSize(); ++i)
     {
-      // Filled with the colour it carries, so the strip reads as a row of
-      // swatches; a colour point answers 0 for its height, which is what sets
-      // that strip on the bottom edge.
-      double rgb[3];
-      m_ColorTransferFunction->GetColor(this->GetFunctionX(i), rgb);
+      const bool grabbed = m_ActiveFunction == ActiveFunction::Opacity && i == m_GrabbedHandle;
+      const auto handle = this->FunctionToCanvas(std::make_pair(dp[i * 2], dp[i * 2 + 1]));
 
-      const int width = grabbed ? 13 : 11;
-      const int height = grabbed ? 18 : 14;
-      const QRect swatch(handle.first - width / 2, handle.second - height, width, height);
-
-      painter.setPen(Qt::NoPen);
-      painter.setBrush(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
-      painter.drawRect(swatch);
-
-      // A swatch shows the colour the gradient already shows behind it, so an
-      // outline of any one colour is lost against some of them. Two nested ones
-      // cannot be: whichever of the two the background swallows, the other
-      // stands against it.
-      painter.setBrush(Qt::NoBrush);
-      painter.setPen(grabbed ? Qt::red : Qt::white);
-      painter.drawRect(swatch);
-      painter.setPen(Qt::black);
-      painter.drawRect(swatch.adjusted(-1, -1, 1, 1));
-    }
-    else
-    {
       painter.setPen(Qt::black);
       painter.setBrush(grabbed ? Qt::red : Qt::white);
       painter.drawEllipse(handle.first - 4, handle.second - 4, 8, 8);
     }
   }
 
+  const int selected = this->GetSelectedColorStop();
+
+  // The selected one last, since markers are wide enough that two close stops
+  // overlap and the one being worked on is the one that has to stay whole.
+  for (int i = 0; i < this->GetColorStopCount(); ++i)
+  {
+    if (i != selected)
+      this->PaintColorStop(painter, i, false);
+  }
+
+  if (selected != -1)
+    this->PaintColorStop(painter, selected, true);
+
   painter.restore();
+}
+
+void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int index, bool selected)
+{
+  const QRect contents = this->contentsRect();
+  const QRect rail = this->ColorStopRail();
+
+  const int x = this->FunctionToCanvas(std::make_pair(this->GetColorStopValue(index), 0.0)).first;
+
+  const int halfWidth = (selected ? MARKER_WIDTH_SELECTED : MARKER_WIDTH) / 2;
+  const int apexY = contents.bottom() - ROOF_OVERLAP;
+  const int eavesY = apexY + ROOF_HEIGHT;
+  const int baseY = rail.bottom() - 1;
+
+  // Half a pixel in: a one-pixel pen straddles the path it is given, so an
+  // outline on whole coordinates lands half on each neighbouring pixel and comes
+  // out grey instead of black.
+  QPolygonF marker;
+  marker << QPointF(x + 0.5, apexY + 0.5)
+         << QPointF(x + halfWidth + 0.5, eavesY + 0.5)
+         << QPointF(x + halfWidth + 0.5, baseY + 0.5)
+         << QPointF(x - halfWidth + 0.5, baseY + 0.5)
+         << QPointF(x - halfWidth + 0.5, eavesY + 0.5);
+
+  const QColor color = this->GetColorStopColor(index);
+
+  // Without this the roof comes out as a blunt stub: its tip is one pixel wide
+  // and the outline alone is as thick.
+  painter.setRenderHint(QPainter::Antialiasing);
+
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(color);
+  painter.drawPolygon(marker);
+
+  // A marker carries a colour of its own, and its roof stands against the
+  // gradient while its body stands against the panel, so an outline of any one
+  // colour is lost against some of them. A pale halo laid down first and a thin
+  // dark line drawn over it cannot be: whichever of the two the background
+  // swallows, the other stands against it. The dark line goes last so that it
+  // stays the width it was asked for rather than being half covered.
+  painter.setBrush(Qt::NoBrush);
+  painter.setPen(QPen(Qt::white, 3));
+  painter.drawPolygon(marker);
+  painter.setPen(QPen(selected ? Qt::red : Qt::black, selected ? 2 : 1));
+  painter.drawPolygon(marker);
+
+  if (!selected)
+    return;
+
+  // The dot sits on the stop's own colour, so which of black and white shows up
+  // is the colour's to decide rather than something that can be fixed here.
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(color.lightnessF() > 0.5 ? Qt::black : Qt::white);
+  painter.drawEllipse(QPointF(x, 0.5 * (eavesY + baseY)), 2.5, 2.5);
+
+  // A second mark at the top of the plot, where the eye is while the gradient is
+  // being read, rather than only down among the markers.
+  QPolygon selectionMark;
+  selectionMark << QPoint(x, contents.top() + SELECTION_MARK_HEIGHT)
+                << QPoint(x - SELECTION_MARK_WIDTH / 2, contents.top())
+                << QPoint(x + SELECTION_MARK_WIDTH / 2, contents.top());
+
+  painter.setPen(Qt::black);
+  painter.setBrush(Qt::white);
+  painter.drawPolygon(selectionMark);
 }
 
 void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEvent)
 {
-  // With no target named the canvas is a picture, and gating the handlers is
-  // what suppresses the base class's per-point editing: the curve is moved as a
-  // whole through the owner's sliders instead.
-  if (m_EditTarget == EditTarget::None)
+  // Until editing is on the canvas is a picture, and gating the handlers is what
+  // suppresses the base class's per-point editing: the curve is moved as a whole
+  // through the owner's sliders instead.
+  if (!m_Editable)
     return;
 
+  const int previous = this->GetSelectedColorStop();
+
+  m_ActiveFunction = this->IsOnColorStopRail(mouseEvent->position().toPoint().y())
+    ? ActiveFunction::Color
+    : ActiveFunction::Opacity;
+
   QmitkPiecewiseFunctionCanvas::mousePressEvent(mouseEvent);
+
+  // Adding and removing announce themselves; this is for a press that only moved
+  // the selection, including one that moved it off the stops altogether.
+  if (this->GetSelectedColorStop() != previous)
+    emit ColorStopsChanged();
 }
 
 void QmitkCombinedTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
-  if (m_EditTarget == EditTarget::None)
+  if (!m_Editable)
     return;
 
   QmitkPiecewiseFunctionCanvas::mouseMoveEvent(mouseEvent);
@@ -250,7 +357,7 @@ void QmitkCombinedTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent
 
 void QmitkCombinedTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent *mouseEvent)
 {
-  if (m_EditTarget == EditTarget::None)
+  if (!m_Editable)
     return;
 
   QmitkPiecewiseFunctionCanvas::mouseReleaseEvent(mouseEvent);
@@ -258,8 +365,12 @@ void QmitkCombinedTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent *mouseEv
 
 void QmitkCombinedTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent *mouseEvent)
 {
-  if (m_EditTarget == EditTarget::None)
+  if (!m_Editable)
     return;
+
+  m_ActiveFunction = this->IsOnColorStopRail(mouseEvent->position().toPoint().y())
+    ? ActiveFunction::Color
+    : ActiveFunction::Opacity;
 
   QmitkPiecewiseFunctionCanvas::mouseDoubleClickEvent(mouseEvent);
 }
@@ -270,7 +381,7 @@ void QmitkCombinedTransferFunctionCanvas::keyPressEvent(QKeyEvent *keyEvent)
   // checking that there is one, and this canvas is shown for an image whose
   // histogram failed to compute too. Dragging clamps against the axis instead,
   // so only the keyboard has to stand down for such an image.
-  if (m_EditTarget == EditTarget::None || this->GetHistogram() == nullptr)
+  if (!m_Editable || this->GetHistogram() == nullptr)
     return;
 
   QmitkPiecewiseFunctionCanvas::keyPressEvent(keyEvent);
@@ -278,39 +389,55 @@ void QmitkCombinedTransferFunctionCanvas::keyPressEvent(QKeyEvent *keyEvent)
 
 int QmitkCombinedTransferFunctionCanvas::GetNearHandle(int x, int y, unsigned int maxSquaredDistance)
 {
-  if (m_EditTarget != EditTarget::Color)
+  if (m_ActiveFunction != ActiveFunction::Color)
     return QmitkPiecewiseFunctionCanvas::GetNearHandle(x, y, maxSquaredDistance);
 
-  // A colour point has no height, so only the distance along the axis decides
-  // which one a click means - anywhere above a handle counts as on it.
+  // A colour stop has no height, so only the distance along the axis decides
+  // which one a click means. The nearest rather than the first within reach:
+  // markers are wide enough to stand side by side and still overlap.
+  int nearest = -1;
+  unsigned int nearestDistance = maxSquaredDistance;
+
   for (int i = 0; i < this->GetFunctionSize(); ++i)
   {
     const auto handle = this->FunctionToCanvas(std::make_pair(this->GetFunctionX(i), 0.0));
     const int distance = handle.first - x;
+    const auto squaredDistance = static_cast<unsigned int>(distance * distance);
 
-    if (static_cast<unsigned int>(distance * distance) < maxSquaredDistance)
-      return i;
+    if (squaredDistance < nearestDistance)
+    {
+      nearest = i;
+      nearestDistance = squaredDistance;
+    }
   }
 
-  return -1;
+  return nearest;
 }
 
 int QmitkCombinedTransferFunctionCanvas::AddFunctionPoint(double x, double val)
 {
   int index = -1;
 
-  if (m_EditTarget == EditTarget::Color)
+  if (m_ActiveFunction == ActiveFunction::Color)
   {
-    // The new point takes the colour the gradient already has where it lands,
-    // so adding one marks a place to recolour rather than changing anything.
+    // The new stop takes the colour the gradient already has where it lands, so
+    // adding one marks a place to recolour rather than changing anything.
     double rgb[3];
     m_ColorTransferFunction->GetColor(x, rgb);
     index = m_ColorTransferFunction->AddRGBPoint(x, rgb[0], rgb[1], rgb[2]);
+
+    // Selecting it here rather than leaving it to the caller is what lets adding
+    // one from a button and adding one by clicking the rail end up in the same
+    // state, and what keeps this to a single announcement.
+    m_GrabbedHandle = index;
+
+    emit PointsChanged();
+    emit ColorStopsChanged();
+
+    return index;
   }
-  else
-  {
-    index = QmitkPiecewiseFunctionCanvas::AddFunctionPoint(x, val);
-  }
+
+  index = QmitkPiecewiseFunctionCanvas::AddFunctionPoint(x, val);
 
   emit PointsChanged();
 
@@ -319,54 +446,57 @@ int QmitkCombinedTransferFunctionCanvas::AddFunctionPoint(double x, double val)
 
 void QmitkCombinedTransferFunctionCanvas::RemoveFunctionPoint(double x)
 {
-  if (m_EditTarget == EditTarget::Color)
+  if (m_ActiveFunction == ActiveFunction::Color)
   {
     m_ColorTransferFunction->RemovePoint(x);
+
+    emit PointsChanged();
+    emit ColorStopsChanged();
+
+    return;
   }
-  else
-  {
-    QmitkPiecewiseFunctionCanvas::RemoveFunctionPoint(x);
-  }
+
+  QmitkPiecewiseFunctionCanvas::RemoveFunctionPoint(x);
 
   emit PointsChanged();
 }
 
 void QmitkCombinedTransferFunctionCanvas::MoveFunctionPoint(int index, std::pair<double, double> pos)
 {
-  if (m_EditTarget == EditTarget::Color)
+  if (m_ActiveFunction == ActiveFunction::Color)
   {
-    // There is no height to move to, and the point carries its colour along:
-    // read it, drop the point, put it back where the drag asks for it.
+    // There is no height to move to, and the stop carries its colour along:
+    // read it, drop the stop, put it back where the drag asks for it.
     const double from = this->GetFunctionX(index);
+    const QColor color = this->GetColorStopColor(index);
 
-    double rgb[3];
-    m_ColorTransferFunction->GetColor(from, rgb);
     m_ColorTransferFunction->RemovePoint(from);
-    m_ColorTransferFunction->AddRGBPoint(pos.first, rgb[0], rgb[1], rgb[2]);
+    m_ColorTransferFunction->AddRGBPoint(pos.first, color.redF(), color.greenF(), color.blueF());
+
+    emit PointsChanged();
+    emit ColorStopsChanged();
+
+    return;
   }
-  else
-  {
-    QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(index, pos);
-  }
+
+  QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(index, pos);
 
   emit PointsChanged();
 }
 
 double QmitkCombinedTransferFunctionCanvas::GetFunctionX(int index)
 {
-  // Four doubles per colour point - position, red, green, blue - against the
-  // two of an opacity point.
-  if (m_EditTarget == EditTarget::Color)
-    return m_ColorTransferFunction->GetDataPointer()[index * 4];
+  if (m_ActiveFunction == ActiveFunction::Color)
+    return this->GetColorStopValue(index);
 
   return QmitkPiecewiseFunctionCanvas::GetFunctionX(index);
 }
 
 double QmitkCombinedTransferFunctionCanvas::GetFunctionY(int index)
 {
-  // A colour point sits on the axis, which is what puts its handle on the
-  // bottom edge without the drawing or the hit test having to say so.
-  if (m_EditTarget == EditTarget::Color)
+  // A colour stop sits on the axis, which is what puts its marker at the bottom
+  // edge without the drawing or the hit test having to say so.
+  if (m_ActiveFunction == ActiveFunction::Color)
     return 0.0;
 
   return QmitkPiecewiseFunctionCanvas::GetFunctionY(index);
@@ -374,8 +504,8 @@ double QmitkCombinedTransferFunctionCanvas::GetFunctionY(int index)
 
 int QmitkCombinedTransferFunctionCanvas::GetFunctionSize()
 {
-  if (m_EditTarget == EditTarget::Color)
-    return m_ColorTransferFunction->GetSize();
+  if (m_ActiveFunction == ActiveFunction::Color)
+    return this->GetColorStopCount();
 
   return QmitkPiecewiseFunctionCanvas::GetFunctionSize();
 }
@@ -384,25 +514,115 @@ void QmitkCombinedTransferFunctionCanvas::DoubleClickOnHandle(int handle)
 {
   // Opacity is edited by dragging a handle up and down, so a second click has
   // nothing left to ask about - as in the base class.
-  if (m_EditTarget != EditTarget::Color)
+  if (m_ActiveFunction != ActiveFunction::Color)
     return;
 
-  const double x = this->GetFunctionX(handle);
+  m_GrabbedHandle = handle;
 
-  double rgb[3];
-  m_ColorTransferFunction->GetColor(x, rgb);
+  const auto picked = QColorDialog::getColor(this->GetColorStopColor(handle), this);
 
-  const auto picked = QColorDialog::getColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]), this);
+  if (picked.isValid())
+    this->SetSelectedColorStopColor(picked);
+}
 
-  if (!picked.isValid())
+int QmitkCombinedTransferFunctionCanvas::GetColorStopCount() const
+{
+  return m_ColorTransferFunction != nullptr
+    ? m_ColorTransferFunction->GetSize()
+    : 0;
+}
+
+double QmitkCombinedTransferFunctionCanvas::GetColorStopValue(int index) const
+{
+  // Four doubles per colour stop - position, red, green, blue - against the two
+  // of an opacity point.
+  return m_ColorTransferFunction->GetDataPointer()[index * 4];
+}
+
+QColor QmitkCombinedTransferFunctionCanvas::GetColorStopColor(int index) const
+{
+  // Read off the node rather than asked of the function: GetColor interpolates,
+  // and what it interpolates in is the function's colour space, so a stop's own
+  // colour is the one place that answer must not be arrived at that way.
+  const double *stop = m_ColorTransferFunction->GetDataPointer() + index * 4;
+
+  return QColor::fromRgbF(stop[1], stop[2], stop[3]);
+}
+
+int QmitkCombinedTransferFunctionCanvas::GetSelectedColorStop() const
+{
+  if (!m_Editable || m_ActiveFunction != ActiveFunction::Color)
+    return -1;
+
+  return m_GrabbedHandle < this->GetColorStopCount() ? m_GrabbedHandle : -1;
+}
+
+void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStop(int index)
+{
+  if (index < 0 || index >= this->GetColorStopCount() || index == this->GetSelectedColorStop())
     return;
 
-  m_ColorTransferFunction->AddRGBPoint(x, picked.redF(), picked.greenF(), picked.blueF());
+  m_ActiveFunction = ActiveFunction::Color;
+  m_GrabbedHandle = index;
+
+  this->update();
+
+  emit ColorStopsChanged();
+}
+
+void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopColor(const QColor &color)
+{
+  const int index = this->GetSelectedColorStop();
+
+  if (index == -1 || !color.isValid())
+    return;
+
+  // VTK replaces a node added at a position it already has one at, so the stop
+  // keeps both its place and its index.
+  m_ColorTransferFunction->AddRGBPoint(
+    this->GetColorStopValue(index), color.redF(), color.greenF(), color.blueF());
 
   this->update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   emit PointsChanged();
+  emit ColorStopsChanged();
+}
+
+int QmitkCombinedTransferFunctionCanvas::AddColorStop(double value)
+{
+  if (m_ColorTransferFunction == nullptr)
+    return -1;
+
+  m_ActiveFunction = ActiveFunction::Color;
+
+  const int index = this->AddFunctionPoint(value, 0.0);
+
+  this->update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  return index;
+}
+
+void QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop()
+{
+  const int index = this->GetSelectedColorStop();
+
+  // A gradient has to keep a colour to be a gradient at all - the same guard the
+  // right-click path observes, in QmitkTransferFunctionCanvas::mousePressEvent.
+  if (index == -1 || this->GetColorStopCount() < 2)
+    return;
+
+  const double value = this->GetColorStopValue(index);
+
+  // Dropped before the removal so that the one announcement it makes already
+  // describes the selection as well.
+  m_GrabbedHandle = -1;
+
+  this->RemoveFunctionPoint(value);
+
+  this->update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkCombinedTransferFunctionCanvas::SnapshotOpacityBaseline()

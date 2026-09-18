@@ -18,6 +18,8 @@ found in the LICENSE file.
 
 #include <vtkColorTransferFunction.h>
 
+#include <QColor>
+
 #include <utility>
 #include <vector>
 
@@ -27,14 +29,18 @@ found in the LICENSE file.
  *
  * Extends QmitkPiecewiseFunctionCanvas (opacity curve + histogram background +
  * coordinate transforms) by drawing the color transfer function as a gradient
- * beneath the curve.
+ * beneath the curve, and its control points as markers in a rail along the
+ * bottom edge.
  *
- * Nothing is edited by clicking until an edit target is named: until then the
- * base class's per-point editing is suppressed, and the opacity curve is moved
- * as a whole through SetOpacityShift and SetOpacityHeight, which the owner
- * drives from its own controls. Naming a target gives that one function
- * grabbable handles and hands the mouse and keyboard to the base class; the
- * other function stays on show as context.
+ * Nothing is edited by clicking until SetEditable turns editing on: until then
+ * the base class's per-point editing is suppressed, and the opacity curve is
+ * moved as a whole through SetOpacityShift and SetOpacityHeight, which the owner
+ * drives from its own controls.
+ *
+ * Once editing is on, both functions carry handles at once and the region
+ * clicked decides which one a gesture means: the plot belongs to the opacity
+ * curve, the rail below it to the colors. A caller therefore has no mode to
+ * offer and no mode to keep in step.
  *
  * \sa QmitkPiecewiseFunctionCanvas, QmitkColorTransferFunctionCanvas
  */
@@ -43,27 +49,18 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
   Q_OBJECT
 
   public:
-    /** \brief What the mouse edits on this canvas, if anything. */
-    enum class EditTarget
-    {
-      None,    /**< Display only. */
-      Opacity, /**< The control points of the opacity curve. */
-      Color    /**< The colour points along the bottom edge. */
-    };
-
     QmitkCombinedTransferFunctionCanvas(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
     /**
-     * \brief Choose which of the two functions the mouse and keyboard act on.
+     * \brief Give both functions grabbable handles, or take them away again.
      *
-     * Both are drawn whatever the target is; what changes is which one carries
-     * handles and answers to a click.
+     * Turning editing off also drops the selection, which indexes a function
+     * and so means nothing once nothing is being edited.
      */
-    void SetEditTarget(EditTarget target);
-    EditTarget GetEditTarget() const;
+    void SetEditable(bool editable);
 
     /** \brief Capture the current opacity curve as the baseline the shift/height
-     *        offsets apply to, and reset both offsets to 0.
+     *         offsets apply to, and reset both offsets to 0.
      */
     void SnapshotOpacityBaseline();
     /** \brief Shift the whole opacity curve along the intensity axis
@@ -89,6 +86,35 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     void Clear();
 
+    /**
+     * \brief The color stops, for an owner presenting them as a list.
+     *
+     * Reading them here rather than from the vtkColorTransferFunction directly
+     * keeps one place answering for what a stop is and where it sits, which is
+     * the same place the gestures write to.
+     */
+    int GetColorStopCount() const;
+    double GetColorStopValue(int index) const;
+    QColor GetColorStopColor(int index) const;
+
+    /** \brief The selected color stop, or -1 when the selection is an opacity
+     *         point or there is none.
+     */
+    int GetSelectedColorStop() const;
+    void SetSelectedColorStop(int index);
+
+    /** \brief Recolor the selected stop, leaving it where it is. */
+    void SetSelectedColorStopColor(const QColor &color);
+
+    /**
+     * \brief Add a stop, in the color the gradient already has at that value.
+     * \return The index of the new stop, which is also left selected.
+     */
+    int AddColorStop(double value);
+
+    /** \brief Remove the selected stop, unless it is the only one left. */
+    void RemoveSelectedColorStop();
+
     void paintEvent(QPaintEvent *e) override;
     void mousePressEvent(QMouseEvent *mouseEvent) override;
     void mouseMoveEvent(QMouseEvent *mouseEvent) override;
@@ -98,7 +124,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
 
     /**
      * \brief The point accessors the base class edits through, answered for
-     *        whichever function the current target names.
+     *        whichever function the gesture in progress concerns.
      *
      * The base drives every gesture through these, so overriding them is what
      * lets one canvas edit two functions. The colour function is not a
@@ -129,17 +155,54 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     void PointsChanged();
 
+    /**
+     * \brief Emitted after the color stops, or which of them is selected,
+     *        changed.
+     *
+     * Separate from PointsChanged because that one also fires for every
+     * intermediate position of an opacity drag, which says nothing about the
+     * colors and would have an owner rebuilding a list of them per mouse move.
+     */
+    void ColorStopsChanged();
+
   private:
+    /** \brief Which function the selection, and so the mouse and the keyboard,
+     *         acts on.
+     *
+     * Follows from where a press landed rather than from a mode a caller sets,
+     * and then stands for the rest of that gesture and until the next press -
+     * which is exactly as long as m_GrabbedHandle indexes that function.
+     */
+    enum class ActiveFunction
+    {
+      Opacity,
+      Color
+    };
+
+    /** \brief The strip along the bottom edge that the color stops sit in. */
+    QRect ColorStopRail() const;
+
+    /** \brief Whether a point at this position belongs to the rail rather than
+     *         to the plot.
+     */
+    bool IsOnColorStopRail(int y) const;
+
     void PaintColorGradient(QPainter &painter);
 
-    /** \brief Draw grabbable handles for the points of the current target. */
+    /** \brief Draw grabbable handles for both functions. */
     void PaintHandles(QPainter &painter);
+
+    /** \brief One marker per color stop: a house whose roof points at the value
+     *         the color applies to.
+     */
+    void PaintColorStop(QPainter &painter, int index, bool selected);
 
     void RebuildOpacityFromBaseline();
 
     vtkColorTransferFunction *m_ColorTransferFunction;
 
-    EditTarget m_EditTarget { EditTarget::None };
+    bool m_Editable { false };
+    ActiveFunction m_ActiveFunction { ActiveFunction::Opacity };
 
     std::vector<std::pair<double,double>> m_OpacityBasePoints;
     double m_OpacityShift;

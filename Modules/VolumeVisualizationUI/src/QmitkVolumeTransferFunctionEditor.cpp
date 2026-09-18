@@ -29,8 +29,9 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
-#include <QButtonGroup>
 #include <QColor>
+#include <QColorDialog>
+#include <QComboBox>
 #include <QEvent>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -39,6 +40,7 @@ found in the LICENSE file.
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPainter>
+#include <QPixmap>
 #include <QPushButton>
 #include <QRect>
 #include <QSignalBlocker>
@@ -182,6 +184,23 @@ namespace
     painter.drawLine(frame.topRight(), frame.bottomLeft());
 
     return QIcon(placeholder);
+  }
+
+  /** \brief A colour stop as one entry of a list can show it.
+   *
+   * Outlined, because a stop whose colour is near the list's own background
+   * would otherwise be an entry with nothing in front of its name.
+   */
+  QIcon ColorSwatch(const QColor &color)
+  {
+    QPixmap swatch(12, 12);
+    swatch.fill(color);
+
+    QPainter painter(&swatch);
+    painter.setPen(Qt::gray);
+    painter.drawRect(0, 0, swatch.width() - 1, swatch.height() - 1);
+
+    return QIcon(swatch);
   }
 
   /** \brief Whether the node is rendered as a volume at all.
@@ -336,12 +355,6 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
-  // Exclusive, so exactly one target is named for as long as editing is on, and
-  // the pair reads as one switch with two positions.
-  auto *editTargetGroup = new QButtonGroup(this);
-  editTargetGroup->addButton(m_Controls->editTargetCurveButton);
-  editTargetGroup->addButton(m_Controls->editTargetColorButton);
-
   // A click rather than the current entry changing: the current entry is also
   // set from what a node records, and reacting to that would re-apply the
   // preset and discard the curve the node was carrying.
@@ -374,16 +387,25 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->editModeButton, &QToolButton::toggled,
     this, &QmitkVolumeTransferFunctionEditor::SetEditModeActive);
 
-  // One connection for the pair: checking either one unchecks the other, so
-  // both halves of a switch arrive as this button changing.
-  connect(m_Controls->editTargetCurveButton, &QToolButton::toggled,
-    this, [this] { this->ShowEditMode(); });
-
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::PointsChanged,
     this, [this] { m_CurveEdited = true; });
 
-  // Editing starts on the curve, and starts off.
-  m_Controls->editTargetCurveButton->setChecked(true);
+  connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::ColorStopsChanged,
+    this, &QmitkVolumeTransferFunctionEditor::ShowColorStops);
+
+  // Each of these hands the request straight to the canvas, which is where the
+  // rules about what may happen to a stop live, so that a stop moved from here
+  // and one dragged on the canvas cannot come out differently.
+  connect(m_Controls->colorStopComboBox, &QComboBox::currentIndexChanged,
+    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetSelectedColorStop);
+  connect(m_Controls->colorStopColorButton, &QPushButton::clicked,
+    this, &QmitkVolumeTransferFunctionEditor::OnPickColorStopColor);
+  connect(m_Controls->removeColorStopButton, &QToolButton::clicked,
+    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop);
+  connect(m_Controls->addColorStopButton, &QToolButton::clicked,
+    this, &QmitkVolumeTransferFunctionEditor::OnAddColorStop);
+
+  // Editing starts off.
   this->ShowEditMode();
 }
 
@@ -1056,10 +1078,6 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
     m_CurveEdited = false;
     m_ColorHandlesRestored = false;
 
-    // The curve is the half a preset is usually wanted for, so editing opens on
-    // it and the colours are a switch away.
-    m_Controls->editTargetCurveButton->setChecked(true);
-
     // Nothing about the function changed, only what may now be done to it -
     // which is why this is not ShowAppliedTransferFunction: re-seeding here
     // would take the colour baseline from an already windowed function and
@@ -1097,19 +1115,14 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 
 void QmitkVolumeTransferFunctionEditor::ShowEditMode()
 {
-  using EditTarget = QmitkCombinedTransferFunctionCanvas::EditTarget;
-
-  // The pair is exclusive, so one button's state describes both positions.
-  const bool editingColor = !m_Controls->editTargetCurveButton->isChecked();
-
-  const auto target = !m_EditModeActive
-    ? EditTarget::None
-    : (editingColor ? EditTarget::Color : EditTarget::Opacity);
-
-  if (target == EditTarget::Color)
+  // A colour window bakes the function into hundreds of evenly spaced points,
+  // which no one can take hold of. The stops are on show for as long as editing
+  // is, rather than only while the colours are being asked for, so bringing them
+  // back is part of entering it.
+  if (m_EditModeActive)
     this->RestoreColorHandles();
 
-  m_Controls->combinedTfCanvas->SetEditTarget(target);
+  m_Controls->combinedTfCanvas->SetEditable(m_EditModeActive);
 
   {
     // The button is both what asks for the mode and what reports it, so letting
@@ -1118,20 +1131,117 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
     m_Controls->editModeButton->setChecked(m_EditModeActive);
   }
 
-  m_Controls->editTargetCurveButton->setVisible(m_EditModeActive);
-  m_Controls->editTargetColorButton->setVisible(m_EditModeActive);
   m_Controls->canvasHintLabel->setVisible(m_EditModeActive);
+  m_Controls->colorStopPanel->setVisible(m_EditModeActive);
 
   // A context menu would name these; buttons cannot, and a gesture nothing
-  // mentions is one nobody finds.
-  m_Controls->canvasHintLabel->setText(editingColor
-    ? "<small>Left-click adds a colour, drag moves it, right-click removes it, "
-      "double-click recolours it.</small>"
-    : "<small>Left-click adds a point, drag moves it, right-click removes it.</small>");
+  // mentions is one nobody finds. Both functions answer at once now, so what has
+  // to be said is which part of the canvas belongs to which.
+  m_Controls->canvasHintLabel->setText(
+    "<small>On the curve: left-click adds a point, drag moves it, right-click removes it. "
+    "The markers along the bottom carry the colours: click one to select it, "
+    "double-click to recolour it.</small>");
+
+  this->ShowColorStops();
 
   // Which controls would replace the curve being edited depends on the mode
   // this just changed.
   this->UpdateControlAvailability();
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowColorStops()
+{
+  auto *canvas = m_Controls->combinedTfCanvas;
+
+  const int count = canvas->GetColorStopCount();
+  const int selected = canvas->GetSelectedColorStop();
+
+  // The list is also what asks for a selection, so filling it in from the canvas
+  // would come straight back as a request to change the canvas.
+  const QSignalBlocker stopBlocker(m_Controls->colorStopComboBox);
+
+  // Rebuilt only when stops came or went: dragging one would otherwise empty and
+  // refill the list on every mouse move.
+  if (m_Controls->colorStopComboBox->count() != count)
+  {
+    m_Controls->colorStopComboBox->clear();
+
+    // Numbered left to right rather than named by the grey value they sit at.
+    // The canvas carries no scale, so the value says nothing about which marker
+    // an entry is, which is the only thing the list is asked.
+    for (int i = 0; i < count; ++i)
+      m_Controls->colorStopComboBox->addItem(QString::number(i + 1));
+  }
+
+  for (int i = 0; i < count; ++i)
+    m_Controls->colorStopComboBox->setItemIcon(i, ColorSwatch(canvas->GetColorStopColor(i)));
+
+  m_Controls->colorStopComboBox->setCurrentIndex(selected);
+
+  const bool hasSelection = selected != -1;
+
+  m_Controls->colorStopComboBox->setEnabled(count > 0);
+  m_Controls->colorStopColorButton->setEnabled(hasSelection);
+  m_Controls->addColorStopButton->setEnabled(count > 0);
+
+  // A gradient has to keep a colour to be a gradient at all.
+  m_Controls->removeColorStopButton->setEnabled(hasSelection && count > 1);
+
+  // The button is the colour rather than a control that names one, so with
+  // nothing selected it has nothing to show and goes back to being a button.
+  m_Controls->colorStopColorButton->setStyleSheet(hasSelection
+    ? "background-color:" + canvas->GetColorStopColor(selected).name()
+    : QString());
+}
+
+void QmitkVolumeTransferFunctionEditor::OnPickColorStopColor()
+{
+  auto *canvas = m_Controls->combinedTfCanvas;
+
+  const int selected = canvas->GetSelectedColorStop();
+
+  if (selected == -1)
+    return;
+
+  const auto picked = QColorDialog::getColor(canvas->GetColorStopColor(selected), this);
+
+  if (picked.isValid())
+    canvas->SetSelectedColorStopColor(picked);
+}
+
+void QmitkVolumeTransferFunctionEditor::OnAddColorStop()
+{
+  auto *canvas = m_Controls->combinedTfCanvas;
+
+  const int count = canvas->GetColorStopCount();
+
+  if (count == 0)
+    return;
+
+  // The middle of the widest gap: where a stop is most use, and the one place it
+  // cannot land on top of one that is already there. The stretches between the
+  // outermost stops and the ends of the range count as gaps too, so that the
+  // flat ends of the gradient can be reached as well.
+  double where = 0.0;
+  double widest = -1.0;
+
+  const auto consider = [&where, &widest](double from, double to)
+  {
+    if (to - from > widest)
+    {
+      widest = to - from;
+      where = 0.5 * (from + to);
+    }
+  };
+
+  consider(m_DataRange[0], canvas->GetColorStopValue(0));
+
+  for (int i = 0; i < count - 1; ++i)
+    consider(canvas->GetColorStopValue(i), canvas->GetColorStopValue(i + 1));
+
+  consider(canvas->GetColorStopValue(count - 1), m_DataRange[1]);
+
+  canvas->AddColorStop(where);
 }
 
 void QmitkVolumeTransferFunctionEditor::RestoreColorHandles()

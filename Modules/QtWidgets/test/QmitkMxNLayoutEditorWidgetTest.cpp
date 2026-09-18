@@ -81,7 +81,6 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Assign_FillEmptyMode_KeepsLinkedAxes);
   MITK_TEST(Assign_FillEmptyMode_SelectionOnlyWhenResting);
   MITK_TEST(Assign_MergeMode_OverwritesCoveredKeepsRest);
-  MITK_TEST(JoinModeFromModifiers_MapsKeys);
   MITK_TEST(Selection_TogglesForUserGroup);
   MITK_TEST(MultiSelect_SurvivesActiveMirror);
 
@@ -921,17 +920,6 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A multi-selection must survive the active-window mirror",
                                  2, static_cast<int>(cellMap->GetSelectedWindowIds().size()));
-  }
-
-  void JoinModeFromModifiers_MapsKeys()
-  {
-    // The drop-time modifier contract both drop targets share.
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::Replace
-                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::NoModifier));
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::MergeOverwriteCollisions
-                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::AltModifier));
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::FillEmpty
-                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::ShiftModifier));
   }
 
   // --- Destructive-layout-change guard predicate ------------------------------

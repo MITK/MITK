@@ -199,7 +199,7 @@ namespace
   protected:
     void mousePressEvent(QMouseEvent* event) override
     {
-      if (event->button() == Qt::LeftButton)
+      if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
       {
         m_PressPosition = event->pos();
       }
@@ -208,11 +208,19 @@ namespace
 
     void mouseMoveEvent(QMouseEvent* event) override
     {
-      if (event->buttons().testFlag(Qt::LeftButton)
+      const bool dragging = event->buttons().testFlag(Qt::LeftButton)
+                            || event->buttons().testFlag(Qt::RightButton);
+      if (dragging
           && (event->pos() - m_PressPosition).manhattanLength() >= QApplication::startDragDistance())
       {
         auto* mimeData = new QMimeData();
         mimeData->setData(QmitkMxNCellMapWidget::GroupMimeType, m_GroupId.toUtf8());
+        if (event->buttons().testFlag(Qt::RightButton))
+        {
+          // Same gesture as on the cell map: the right button defers the join mode
+          // to a menu on drop, so the modifiers stay optional.
+          mimeData->setData(QmitkMxNCellMapWidget::AskModeMimeType, QByteArray());
+        }
         auto* drag = new QDrag(this);
         drag->setMimeData(mimeData);
         drag->exec(Qt::CopyAction);
@@ -241,10 +249,18 @@ namespace
     {
       m_DropHighlight = false;
       this->update();
+
+      const auto mode = QmitkMxNCellMapWidget::ResolveJoinMode(
+        event->mimeData(), event->modifiers(), this,
+        this->mapToGlobal(event->position().toPoint()));
+      if (!mode.has_value())
+      {
+        return;
+      }
+
       const auto ids = QString::fromUtf8(
         event->mimeData()->data(QmitkMxNCellMapWidget::CellsMimeType));
-      m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts),
-                       QmitkMxNCellMapWidget::JoinModeFromModifiers(event->modifiers()));
+      m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts), *mode);
       event->acceptProposedAction();
     }
 
@@ -302,12 +318,14 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   m_CellMap = new QmitkMxNCellMapWidget(mapPane);
   m_CellMap->setMinimumHeight(200);
-  m_CellMap->setToolTip(tr("Select render windows by click or Ctrl-click; "
+  m_CellMap->setToolTip(tr("Select render windows by click, Ctrl-click to toggle one, or "
+                           "Shift-click to select the range from the last one clicked; "
                            "assign them by dropping them onto a group (or a group's color "
-                           "onto a window). A plain drop replaces the window's groups; hold "
-                           "Alt to merge, Shift to fill only its unsynced axes. Each window "
-                           "shows its sync axes as glyphs: the seven dimensions plus data "
-                           "selection, tinted by group, a gap where the window is not "
+                           "onto a window). Drag with the right button to pick the join mode "
+                           "from a menu on drop; a left drop replaces the window's groups, "
+                           "with Alt to merge and Shift to fill only its unsynced axes. Each "
+                           "window shows its sync axes as glyphs: the seven dimensions plus "
+                           "data selection, tinted by group, a gap where the window is not "
                            "synchronized on that axis."));
   connect(m_CellMap, &QmitkMxNCellMapWidget::AssignRequested, this,
           [this](const QString& group, const QStringList& windowIds, QmitkMxNGroupJoinMode mode)
@@ -1415,8 +1433,9 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   card->setFrameShape(QFrame::Box);
   card->setLineWidth(1);
   card->setToolTip(tr("Drag this card onto a render window in the map to assign the group; "
-                      "drop cells from the map here to add them. A plain drop replaces; hold "
-                      "Alt to merge, Shift to fill only unsynced axes."));
+                      "drop cells from the map here to add them. Drag with the right button "
+                      "to pick the join mode from a menu on drop; a left drop replaces, with "
+                      "Alt to merge and Shift to fill only unsynced axes."));
   auto* cardLayout = new QVBoxLayout(card);
   cardLayout->setContentsMargins(0, 0, 6, 6);
   cardLayout->setSpacing(4);

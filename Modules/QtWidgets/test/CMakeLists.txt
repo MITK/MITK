@@ -36,6 +36,10 @@ mitkAddCustomModuleTest(QmitkMxNLayoutEditorWidgetTest QmitkMxNLayoutEditorWidge
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNCellMapWidgetTest QmitkMxNCellMapWidgetTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNCellOverlayTest QmitkMxNCellOverlayTest
   -platform minimal
 )

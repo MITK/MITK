@@ -23,8 +23,10 @@ found in the LICENSE file.
 #include <QStringList>
 #include <QWidget>
 
+#include <optional>
 #include <vector>
 
+class QMimeData;
 class QmitkMxNMultiWidget;
 
 /**
@@ -39,14 +41,18 @@ class QmitkMxNMultiWidget;
  * filled with the linked group's hue, left as a gap when unsynced, with a
  * notch marking links that carry an offset.
  *
- * Cells are selected by click or Ctrl-click (a press on empty space clears the
- * selection); selected tiles can be dragged onto a group (or a group dropped onto
- * a tile) - the widget only reports these gestures via signals, the owning editor
- * performs the engine mutation.
+ * Selection follows the file-explorer model: a plain click selects exactly the
+ * clicked cell, Ctrl-click toggles one cell, Shift-click replaces the selection
+ * with the range spanned from the last clicked cell (Ctrl+Shift adds that range
+ * instead), and a press on empty space clears it. Selected tiles can be dragged
+ * onto a group (or a group dropped onto a tile) - the widget only reports these
+ * gestures via signals, the owning editor performs the engine mutation.
  *
  * Mime types: dragged cells use "application/x-mitk-mxn-cells" (newline-
  * separated window ids); accepted group drops use
- * "application/x-mitk-mxn-group" (the group id).
+ * "application/x-mitk-mxn-group" (the group id). A drag started with the right
+ * button additionally carries "application/x-mitk-mxn-askmode", which makes the
+ * drop ask for its join mode through a menu instead of reading modifier keys.
  */
 class MITKQTWIDGETS_EXPORT QmitkMxNCellMapWidget : public QWidget
 {
@@ -56,6 +62,14 @@ public:
 
   static const char* CellsMimeType;
   static const char* GroupMimeType;
+  static const char* AskModeMimeType;
+
+  /** \brief One entry of the join-mode menu a right-button drop offers. */
+  struct JoinModeEntry
+  {
+    QmitkMxNGroupJoinMode mode;
+    QString label;
+  };
 
   explicit QmitkMxNCellMapWidget(QWidget* parent = nullptr);
   ~QmitkMxNCellMapWidget() override;
@@ -90,6 +104,21 @@ public:
    *         the mode. Shared by both drop targets (this map and the editor's group
    *         cards) so the modifier meaning is identical everywhere. */
   static QmitkMxNGroupJoinMode JoinModeFromModifiers(Qt::KeyboardModifiers modifiers);
+
+  /** \brief The join modes a right-button drop offers, in menu order. The single
+   *         source of the offered set, so both drop targets present the same one. */
+  static std::vector<JoinModeEntry> JoinModeMenuEntries();
+
+  /** \brief The join mode a drop asks for: a drag carrying AskModeMimeType (one
+   *         started with the right button) pops the menu at 'globalPosition' and
+   *         yields the chosen mode, or nothing when the user dismisses it; any
+   *         other drag reads its modifiers. The modifier path stays available
+   *         during a right-button drag, so the two never need to agree.
+   *         Shared by both drop targets so the gesture means the same everywhere. */
+  static std::optional<QmitkMxNGroupJoinMode> ResolveJoinMode(const QMimeData* mimeData,
+                                                              Qt::KeyboardModifiers modifiers,
+                                                              QWidget* parent,
+                                                              const QPoint& globalPosition);
 
 Q_SIGNALS:
 
@@ -137,6 +166,12 @@ private:
   void UpdateTileRects();
   int TileAt(const QPoint& position) const;
 
+  /** \brief The window ids of every tile the rectangle spanned by the 'anchor'
+   *         and 'target' tiles touches. Defined geometrically rather than by
+   *         row/column, because a loaded layout need not be a uniform grid. An
+   *         anchor that no longer exists degenerates to just 'target'. */
+  QStringList TilesBetween(const QString& anchor, const QString& target) const;
+
   /** \brief The rect the tile's sync barcode is painted into - the single source
    *         of the band geometry, shared by paintEvent and the hover hit-test so
    *         the two cannot drift. */
@@ -160,6 +195,9 @@ private:
 
   QPoint m_PressPosition;  // press origin for the cell-drag start threshold
   bool m_DragCandidate = false;
+  bool m_DragAsksMode = false;  // the armed drag began on the right button
+  QString m_PressedWindowId;    // tile under a plain press, collapsed to on release
+  QString m_SelectionAnchor;    // origin of a Shift range, the last tile clicked
   int m_DropTargetTile = -1;  // tile highlighted under a hovering group drag
 
   // Sync-highlight-on-hover: the glyph the pointer is over, and the set of cells

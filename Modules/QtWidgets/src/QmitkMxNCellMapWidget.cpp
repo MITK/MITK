@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
@@ -33,6 +34,7 @@ found in the LICENSE file.
 
 const char* QmitkMxNCellMapWidget::CellsMimeType = "application/x-mitk-mxn-cells";
 const char* QmitkMxNCellMapWidget::GroupMimeType = "application/x-mitk-mxn-group";
+const char* QmitkMxNCellMapWidget::AskModeMimeType = "application/x-mitk-mxn-askmode";
 
 namespace
 {
@@ -146,6 +148,15 @@ void QmitkMxNCellMapWidget::Rebuild()
   if (survivingSelection.size() != m_Selection.size())
   {
     this->SetSelection(survivingSelection);
+  }
+
+  // A range anchor pointing at a removed cell would span from nowhere; dropping
+  // it degrades the next Shift-click to a plain one rather than a stale range.
+  if (!m_SelectionAnchor.isEmpty()
+      && std::none_of(m_Tiles.begin(), m_Tiles.end(),
+                      [this](const Tile& tile) { return tile.windowId == m_SelectionAnchor; }))
+  {
+    m_SelectionAnchor.clear();
   }
 
   // The sync highlight is keyed by window id (transient hover state), so keep it
@@ -339,7 +350,9 @@ void QmitkMxNCellMapWidget::SetSelection(const QStringList& windowIds)
 
 void QmitkMxNCellMapWidget::mousePressEvent(QMouseEvent* event)
 {
-  if (event->button() != Qt::LeftButton)
+  const bool leftButton = Qt::LeftButton == event->button();
+  const bool rightButton = Qt::RightButton == event->button();
+  if (!leftButton && !rightButton)
   {
     event->ignore();
     return;
@@ -350,15 +363,66 @@ void QmitkMxNCellMapWidget::mousePressEvent(QMouseEvent* event)
 
   if (index < 0)
   {
-    // Empty area: clear the selection. Multi-select is by Ctrl-click.
+    // Empty area: clear the selection. Multi-select is by Ctrl- and Shift-click.
     m_DragCandidate = false;
+    m_PressedWindowId.clear();
+    m_SelectionAnchor.clear();
     this->SetSelection(QStringList());
     event->accept();
     return;
   }
 
   const auto& windowId = m_Tiles[static_cast<std::size_t>(index)].windowId;
-  if (event->modifiers().testFlag(Qt::ControlModifier))
+
+  // A right press arms a drag that will ask for its join mode on drop, and
+  // otherwise behaves like the left one: it takes an unselected tile into the
+  // selection so the drag carries what the user pointed at.
+  if (rightButton)
+  {
+    if (!m_Selection.contains(windowId))
+    {
+      this->SetSelection(QStringList{ windowId });
+      m_SelectionAnchor = windowId;
+    }
+    m_PressedWindowId.clear();  // only a left click collapses on release
+    m_DragCandidate = true;
+    m_DragAsksMode = true;
+    event->accept();
+    return;
+  }
+
+  if (event->modifiers().testFlag(Qt::ShiftModifier))
+  {
+    // Range select from the anchor, the file-explorer way: Shift replaces the
+    // selection with the range, Ctrl+Shift adds it. The anchor stays put so the
+    // range can be re-spanned from the same origin. A range press never becomes a
+    // drag - Shift is also the FillEmpty drop modifier, and dragging out of a
+    // range press would conflate choosing cells with choosing a join mode.
+    const QStringList range = this->TilesBetween(m_SelectionAnchor, windowId);
+    if (event->modifiers().testFlag(Qt::ControlModifier))
+    {
+      auto selection = m_Selection;
+      for (const auto& id : range)
+      {
+        if (!selection.contains(id))
+        {
+          selection.append(id);
+        }
+      }
+      this->SetSelection(selection);
+    }
+    else
+    {
+      this->SetSelection(range);
+    }
+    if (m_SelectionAnchor.isEmpty())
+    {
+      m_SelectionAnchor = windowId;
+    }
+    m_DragCandidate = false;
+    m_PressedWindowId.clear();
+  }
+  else if (event->modifiers().testFlag(Qt::ControlModifier))
   {
     auto selection = m_Selection;
     if (selection.contains(windowId))
@@ -370,19 +434,26 @@ void QmitkMxNCellMapWidget::mousePressEvent(QMouseEvent* event)
       selection.append(windowId);
     }
     this->SetSelection(selection);
+    m_SelectionAnchor = windowId;
     m_DragCandidate = false;
+    m_PressedWindowId.clear();
   }
   else
   {
-    // Pressing an already-selected tile keeps the selection so it can be
-    // dragged as a whole; pressing an unselected tile selects it.
+    // Pressing an already-selected tile holds the selection so a multi-tile drag
+    // can carry all of it; the release collapses to the pressed tile when no drag
+    // follows. Tiles cover the map bar a 2 px gutter, so without that collapse a
+    // full selection would have no reachable way back to a single cell.
     if (!m_Selection.contains(windowId))
     {
       this->SetSelection(QStringList{ windowId });
     }
+    m_PressedWindowId = windowId;
+    m_SelectionAnchor = windowId;
     m_DragCandidate = true;
   }
 
+  m_DragAsksMode = false;
   event->accept();
 }
 
@@ -409,7 +480,21 @@ void QmitkMxNCellMapWidget::mouseMoveEvent(QMouseEvent* event)
 
 void QmitkMxNCellMapWidget::mouseReleaseEvent(QMouseEvent* event)
 {
+  // A plain press that held a wider selection (see mousePressEvent) and never
+  // grew into a drag resolves here: the click meant "select just this tile".
+  const bool collapseToPressedTile = m_DragCandidate
+                                     && Qt::LeftButton == event->button()
+                                     && !m_PressedWindowId.isEmpty();
+
   m_DragCandidate = false;
+  m_DragAsksMode = false;
+
+  if (collapseToPressedTile)
+  {
+    this->SetSelection(QStringList{ m_PressedWindowId });
+  }
+  m_PressedWindowId.clear();
+
   event->ignore();
 }
 
@@ -487,10 +572,15 @@ void QmitkMxNCellMapWidget::StartCellDrag()
 
   auto* mimeData = new QMimeData();
   mimeData->setData(CellsMimeType, m_Selection.join(QStringLiteral("\n")).toUtf8());
+  if (m_DragAsksMode)
+  {
+    mimeData->setData(AskModeMimeType, QByteArray());
+  }
 
   auto* drag = new QDrag(this);
   drag->setMimeData(mimeData);
   drag->exec(Qt::CopyAction);
+  m_DragAsksMode = false;
 }
 
 void QmitkMxNCellMapWidget::dragEnterEvent(QDragEnterEvent* event)
@@ -545,6 +635,13 @@ void QmitkMxNCellMapWidget::dropEvent(QDropEvent* event)
     return;
   }
 
+  const auto mode = ResolveJoinMode(event->mimeData(), event->modifiers(), this,
+                                    this->mapToGlobal(event->position().toPoint()));
+  if (!mode.has_value())
+  {
+    return;
+  }
+
   const auto group = QString::fromUtf8(event->mimeData()->data(GroupMimeType));
   const auto& windowId = m_Tiles[static_cast<std::size_t>(index)].windowId;
 
@@ -552,7 +649,7 @@ void QmitkMxNCellMapWidget::dropEvent(QDropEvent* event)
   // unselected tile just that cell.
   const QStringList targets = m_Selection.contains(windowId) ? m_Selection
                                                              : QStringList{ windowId };
-  emit AssignRequested(group, targets, JoinModeFromModifiers(event->modifiers()));
+  emit AssignRequested(group, targets, *mode);
   event->acceptProposedAction();
 }
 
@@ -570,4 +667,73 @@ QmitkMxNGroupJoinMode QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::KeyboardM
     return QmitkMxNGroupJoinMode::FillEmpty;
   }
   return QmitkMxNGroupJoinMode::Replace;
+}
+
+std::vector<QmitkMxNCellMapWidget::JoinModeEntry> QmitkMxNCellMapWidget::JoinModeMenuEntries()
+{
+  return { { QmitkMxNGroupJoinMode::Replace, tr("Replace the cells' synchronization") },
+           { QmitkMxNGroupJoinMode::MergeOverwriteCollisions, tr("Merge, overwriting collisions") },
+           { QmitkMxNGroupJoinMode::FillEmpty, tr("Fill only unsynchronized axes") } };
+}
+
+std::optional<QmitkMxNGroupJoinMode> QmitkMxNCellMapWidget::ResolveJoinMode(
+  const QMimeData* mimeData, Qt::KeyboardModifiers modifiers, QWidget* parent,
+  const QPoint& globalPosition)
+{
+  if (nullptr == mimeData || !mimeData->hasFormat(AskModeMimeType))
+  {
+    return JoinModeFromModifiers(modifiers);
+  }
+
+  QMenu menu(parent);
+  std::vector<QAction*> actions;
+  const auto entries = JoinModeMenuEntries();
+  actions.reserve(entries.size());
+  for (const auto& entry : entries)
+  {
+    actions.push_back(menu.addAction(entry.label));
+  }
+  menu.addSeparator();
+  menu.addAction(tr("Cancel"));
+
+  const QAction* chosen = menu.exec(globalPosition);
+  for (std::size_t i = 0; i < actions.size(); ++i)
+  {
+    if (chosen == actions[i])
+    {
+      return entries[i].mode;
+    }
+  }
+  return std::nullopt;
+}
+
+QStringList QmitkMxNCellMapWidget::TilesBetween(const QString& anchor, const QString& target) const
+{
+  const auto tileOf = [this](const QString& windowId) -> const Tile* {
+    const auto it = std::find_if(m_Tiles.begin(), m_Tiles.end(),
+                                 [&windowId](const Tile& tile) { return tile.windowId == windowId; });
+    return it != m_Tiles.end() ? &*it : nullptr;
+  };
+
+  const Tile* anchorTile = tileOf(anchor);
+  const Tile* targetTile = tileOf(target);
+  if (nullptr == targetTile)
+  {
+    return QStringList();
+  }
+  if (nullptr == anchorTile || !anchorTile->mapRect.isValid() || !targetTile->mapRect.isValid())
+  {
+    return QStringList{ target };
+  }
+
+  const QRect span = anchorTile->mapRect.united(targetTile->mapRect);
+  QStringList range;
+  for (const auto& tile : m_Tiles)
+  {
+    if (tile.mapRect.isValid() && span.intersects(tile.mapRect))
+    {
+      range.append(tile.windowId);
+    }
+  }
+  return range;
 }

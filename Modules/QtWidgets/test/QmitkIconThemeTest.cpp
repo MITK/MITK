@@ -134,9 +134,12 @@ public:
     ApplyTheme("#0000ff", "#ffffff");
     CPPUNIT_ASSERT_EQUAL(std::string("#123456"), CenterColor(icon, 16));
 
-    // A custom color equal to the magic color must not be themed away
+    // A custom color equal to either magic color must not be themed away
     const QIcon greenIcon = QmitkIconTheme::GetIcon(Svg("#00ff00", 16), "#00ff00");
     CPPUNIT_ASSERT_EQUAL(std::string("#00ff00"), CenterColor(greenIcon, 16));
+
+    const QIcon magentaIcon = QmitkIconTheme::GetIcon(Svg("#00ff00", 16), "#ff00ff");
+    CPPUNIT_ASSERT_EQUAL(std::string("#ff00ff"), CenterColor(magentaIcon, 16));
   }
 
   void RefreshEmitsChanged()

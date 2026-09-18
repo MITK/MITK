@@ -80,10 +80,13 @@ namespace
     return QString(svg).replace(re, themeColor);
   }
 
+  /* The accent color goes first, so that a custom icon color equal to the
+   * magic accent color is not themed away again.
+   */
   QByteArray ThemeSVG(const QByteArray &originalSVG, const std::optional<QString> &color)
   {
-    auto themedSVG = QmitkIconTheme::ReplaceColor(QString(originalSVG), color.value_or(QmitkIconTheme::GetColor()));
-    themedSVG = ReplaceMagicColor(themedSVG, QStringLiteral("ff00ff|f0f"), QmitkIconTheme::GetAccentColor());
+    auto themedSVG = ReplaceMagicColor(QString(originalSVG), QStringLiteral("ff00ff|f0f"), QmitkIconTheme::GetAccentColor());
+    themedSVG = QmitkIconTheme::ReplaceColor(themedSVG, color.value_or(QmitkIconTheme::GetColor()));
 
     return themedSVG.toUtf8();
   }

@@ -206,7 +206,13 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 
   m_Ui->selectionWidget->SetNodePredicate(mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New());
 
-  m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkIconTheme::GetAccentColor()));
+  const auto updateProgressBarStyle = [this]
+  {
+    m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkIconTheme::GetAccentColor()));
+  };
+
+  updateProgressBarStyle();
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, updateProgressBarStyle);
 
   m_Ui->findButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_find.svg")));
   m_Ui->storeButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));

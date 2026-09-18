@@ -895,7 +895,11 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
   }
   else if (nullptr != image)
   {
-    try { m_Controls->weightSpinBox->setValue(mitk::GetPatientsWeight(image)); }
+    // Prefills the control; the filter owns the adaptation record for the
+    // run, so this probe discards its own.
+    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+    try { m_Controls->weightSpinBox->setValue(
+            mitk::GetPatientsWeight(image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations)); }
     catch (const mitk::Exception&) { m_Controls->weightSpinBox->setValue(0.0); }
   }
   else

@@ -578,7 +578,9 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
   return result;
 }
 
-double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider)
+double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider,
+                               mitk::DICOMReadPolicy policy,
+                               std::vector<mitk::SUVAdaptation>& adaptations)
 {
   if (nullptr == provider)
   {
@@ -596,7 +598,37 @@ double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider)
          "(0010,1030) Patient Weight was found.";
   }
 
-  return ConvertDICOMStrToValue<double>(props.begin()->second->GetValueAsString());
+  const std::string raw = props.begin()->second->GetValueAsString();
+  const double stored = ConvertDICOMStrToValue<double>(raw);
+
+  // DICOM prescribes kilograms, and no human weighs 1000 of them, so a value
+  // at or above the threshold is a gram-encoded export rather than a very
+  // large patient. Taken at face value it makes every SUV 1000x too small.
+  constexpr double kGramEncodingThresholdKg = 1000.0;
+  if (!std::isfinite(stored) || stored < kGramEncodingThresholdKg)
+  {
+    return stored;
+  }
+
+  if (DICOMReadPolicy::Strict == policy)
+  {
+    mitkThrowException(ImplausiblePatientWeightException)
+      << "(0010,1030) Patient's Weight is " << stored << ", which is not a "
+         "plausible weight in the kilograms DICOM prescribes. The IBSI-SUV "
+         "recommendation reads values at or above "
+      << kGramEncodingThresholdKg << " as grams, but DICOMReadPolicy::Strict "
+         "is active. Re-export with the weight in kilograms or relax the "
+         "policy.";
+  }
+
+  const double weightKg = stored / 1000.0;
+  MITK_WARN << "(0010,1030) Patient's Weight is " << stored << ", which is not "
+               "a plausible weight in kilograms; interpreting it as grams ("
+            << weightKg << " kg) per the IBSI-SUV recommendation.";
+  adaptations.push_back({SUVAdaptationRule::WeightReinterpretedAsGrams,
+                         "(0010,1030)", raw, std::to_string(weightKg)});
+
+  return weightKg;
 }
 
 double mitk::GetPatientsHeight(const mitk::IPropertyProvider* provider)
@@ -689,6 +721,52 @@ bool mitk::IsEnhancedPETInput(const mitk::IPropertyProvider* provider)
   const std::string sopClassUID =
     TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0008, 0x0016)));
   return ENHANCED_PET_SOP_CLASS_UID == sopClassUID;
+}
+
+void mitk::WarnOnImplausibleRescale(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider || IsEnhancedPETInput(provider))
+  {
+    return;
+  }
+
+  const std::string rawSlope =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x1053)));
+  if (rawSlope.empty())
+  {
+    MITK_WARN << "(0028,1053) Rescale Slope is absent or empty. The IBSI-SUV "
+                 "recommendations require it to be present; the reader has "
+                 "treated the stored values as already scaled.";
+  }
+  else
+  {
+    const double slope = ConvertDICOMStrToValue<double>(rawSlope);
+    if (!std::isfinite(slope) || slope <= 0.0)
+    {
+      MITK_WARN << "(0028,1053) Rescale Slope is " << rawSlope
+                << ". The IBSI-SUV recommendations expect a positive value; a "
+                   "non-positive slope inverts or flattens the activity scale.";
+    }
+  }
+
+  const std::string rawIntercept =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x1052)));
+  if (rawIntercept.empty())
+  {
+    MITK_WARN << "(0028,1052) Rescale Intercept is absent or empty. The "
+                 "IBSI-SUV recommendations require it to be present.";
+  }
+  else
+  {
+    const double intercept = ConvertDICOMStrToValue<double>(rawIntercept);
+    if (!std::isfinite(intercept) || 0.0 != intercept)
+    {
+      MITK_WARN << "(0028,1052) Rescale Intercept is " << rawIntercept
+                << ". The IBSI-SUV recommendations expect zero for PET; a "
+                   "non-zero intercept offsets every voxel of the activity "
+                   "concentration.";
+    }
+  }
 }
 
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)

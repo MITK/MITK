@@ -37,6 +37,15 @@ namespace
   // IBSI-SUV recommendations fired, so they funnel through this wrapper
   // rather than declaring an adaptation vector each time. The cases that do
   // care pass their own vector to mitk::GetRadiopharmaceuticalInfos.
+  // Most weight cases do not care which recommendations fired, so they
+  // funnel through this wrapper rather than declaring a record each time.
+  double ReadWeight(const mitk::IPropertyProvider* provider,
+                    mitk::DICOMReadPolicy policy = mitk::DICOMReadPolicy::Lenient)
+  {
+    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
+    return mitk::GetPatientsWeight(provider, policy, ignoredAdaptations);
+  }
+
   std::vector<mitk::RadiopharmaceuticalInfo> ReadRPI(
     const mitk::IPropertyProvider* provider,
     mitk::DICOMReadPolicy policy = mitk::DICOMReadPolicy::Lenient)
@@ -198,6 +207,16 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Start_Step3_NonGE_ActualFrameDurationEmpty_Refuses);
   MITK_TEST(Radiopharm_DoseBelowThreshold_RecordsAdaptation);
   MITK_TEST(Radiopharm_DoseAboveThreshold_RecordsNothing);
+
+  // Patient's Weight gram encoding
+  MITK_TEST(PatientWeight_BelowThreshold_TakenAsKilograms);
+  MITK_TEST(PatientWeight_JustBelowThreshold_TakenAsKilograms);
+  MITK_TEST(PatientWeight_AtThreshold_TakenAsGrams);
+  MITK_TEST(PatientWeight_GramEncoded_TakenAsGrams);
+  MITK_TEST(PatientWeight_GramEncoded_RecordsAdaptation);
+  MITK_TEST(PatientWeight_PlausibleWeight_RecordsNothing);
+  MITK_TEST(PatientWeight_GramEncoded_StrictPolicy_Throws);
+  MITK_TEST(PatientWeight_PlausibleWeight_StrictPolicy_PassesThrough);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -520,14 +539,102 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0010, 0x1030), "70.5");
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(70.5, mitk::GetPatientsWeight(image), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70.5, ReadWeight(image), 1e-9);
   }
 
   void PatientWeight_Missing_Throws_MissingDICOMPropertyException()
   {
     auto image = MakeSyntheticImage(1, 1);
-    CPPUNIT_ASSERT_THROW(mitk::GetPatientsWeight(image),
+    CPPUNIT_ASSERT_THROW(ReadWeight(image),
                          mitk::MissingDICOMPropertyException);
+  }
+
+  // ---- Patient's Weight, gram-encoded exports ----
+  //
+  // DICOM prescribes kilograms for (0010,1030). Exports storing grams exist,
+  // and a value at or above 1000 identifies one: nobody weighs a tonne. Read
+  // at face value the weight is 1000x too large and every SUV derived from it
+  // 1000x too small.
+  //
+  // The boundary is stated in the unit the helper returns, kilograms, so the
+  // reinterpretation is visible as a change of value rather than of unit.
+  // No benchmark DRO carries a gram-encoded weight -- the manual says so
+  // outright -- which makes these cases the only coverage.
+
+  void PatientWeight_BelowThreshold_TakenAsKilograms()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70");
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70.0, ReadWeight(image), 1e-9);
+  }
+
+  void PatientWeight_JustBelowThreshold_TakenAsKilograms()
+  {
+    // 999 kg is not a plausible patient either, but the recommendation draws
+    // the line at 1000 and MITK does not second-guess it: a threshold that
+    // moves with the reader is worse than one that is merely generous.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "999");
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(999.0, ReadWeight(image), 1e-9);
+  }
+
+  void PatientWeight_AtThreshold_TakenAsGrams()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "1000");
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, ReadWeight(image), 1e-9);
+  }
+
+  void PatientWeight_GramEncoded_TakenAsGrams()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70000");
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70.0, ReadWeight(image), 1e-9);
+  }
+
+  void PatientWeight_GramEncoded_RecordsAdaptation()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70000");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    const double weightKg =
+      mitk::GetPatientsWeight(image, mitk::DICOMReadPolicy::Lenient, adaptations);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70.0, weightKg, 1e-9);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+    CPPUNIT_ASSERT(mitk::SUVAdaptationRule::WeightReinterpretedAsGrams == adaptations[0].rule);
+    CPPUNIT_ASSERT_EQUAL(std::string("(0010,1030)"), adaptations[0].dicomTag);
+    CPPUNIT_ASSERT_EQUAL(std::string("70000"), adaptations[0].originalValue);
+  }
+
+  void PatientWeight_PlausibleWeight_RecordsNothing()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    (void)mitk::GetPatientsWeight(image, mitk::DICOMReadPolicy::Lenient, adaptations);
+    CPPUNIT_ASSERT(adaptations.empty());
+  }
+
+  void PatientWeight_GramEncoded_StrictPolicy_Throws()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70000");
+
+    CPPUNIT_ASSERT_THROW(ReadWeight(image, mitk::DICOMReadPolicy::Strict),
+                         mitk::ImplausiblePatientWeightException);
+    CPPUNIT_ASSERT_THROW(ReadWeight(image, mitk::DICOMReadPolicy::Strict),
+                         mitk::BenchmarkAdaptationRequiredException);
+  }
+
+  void PatientWeight_PlausibleWeight_StrictPolicy_PassesThrough()
+  {
+    // Strict must not penalise input that needs no reinterpretation.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70");
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70.0, ReadWeight(image, mitk::DICOMReadPolicy::Strict), 1e-9);
   }
 
   // ---- Patient height ----

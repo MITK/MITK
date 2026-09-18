@@ -155,6 +155,26 @@ namespace mitk
   public:
     mitkExceptionClassMacro(ImplausibleRadionuclideDoseException, BenchmarkAdaptationRequiredException);
   };
+  /**
+   * \brief Patient's Weight would have been reinterpreted as grams, but
+   *        the active policy is Strict.
+   *
+   * DICOM prescribes kilograms for (0010,1030), but exports storing
+   * grams exist and are trivially recognizable: a value at or above
+   * 1000 is not a plausible human weight in kilograms. The IBSI-SUV
+   * recommendation reads such values as grams. Taken at face value
+   * instead, the weight is 1000x too large and every SUV derived from
+   * it 1000x too small -- an error large enough to be obvious, but only
+   * to someone who looks.
+   *
+   * Under \c DICOMReadPolicy::Strict the reinterpretation is refused and
+   * this exception raised instead.
+   */
+  class MITKPET_EXPORT ImplausiblePatientWeightException : public BenchmarkAdaptationRequiredException
+  {
+  public:
+    mitkExceptionClassMacro(ImplausiblePatientWeightException, BenchmarkAdaptationRequiredException);
+  };
 
   /**
    * \brief Strategy DC=START would have been resolved via a vendor-specific
@@ -449,7 +469,9 @@ namespace mitk
      * so it was moved back one day ("injected last night, scanned this
      * morning").
      */
-    AdministrationTimeShiftedBackOneDay
+    AdministrationTimeShiftedBackOneDay,
+    /** (0010,1030) Patient's Weight at or above 1000 read as grams. */
+    WeightReinterpretedAsGrams
   };
 
   /**
@@ -531,6 +553,25 @@ namespace mitk
    * \return true when (0008,0016) equals the Enhanced PET SOP Class UID.
    */
   bool MITKPET_EXPORT IsEnhancedPETInput(const mitk::IPropertyProvider* provider);
+
+  /**
+   * \brief Warn about a Rescale Slope or Intercept the IBSI-SUV manual
+   *        would object to.
+   *
+   * Purely diagnostic: the values are never read back into the
+   * computation. GDCM has already applied them to the pixel buffer by the
+   * time MITK sees the image, so re-applying them here would scale twice.
+   * What this catches is input the operator should know about --
+   * an absent slope, which GDCM silently treats as 1.0, or a non-zero
+   * intercept, which shifts every voxel.
+   *
+   * Enhanced PET objects are skipped: they carry no top-level rescale, and
+   * their functional-group equivalents are validated by the Enhanced PET
+   * classifier instead.
+   *
+   * \param[in] provider Source of DICOM properties.
+   */
+  void MITKPET_EXPORT WarnOnImplausibleRescale(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Strategy describing how (or whether) the input pixel data has been
@@ -672,7 +713,9 @@ namespace mitk
    * \throw MissingDICOMPropertyException if \p provider is \c nullptr or contains
    *        no patient-weight property.
    */
-  double MITKPET_EXPORT GetPatientsWeight(const mitk::IPropertyProvider* provider);
+  double MITKPET_EXPORT GetPatientsWeight(const mitk::IPropertyProvider* provider,
+                                         DICOMReadPolicy policy,
+                                         std::vector<SUVAdaptation>& adaptations);
 
   /**
    * \brief Get the patient's height (size) from DICOM properties.

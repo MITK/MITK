@@ -297,6 +297,7 @@ input usable. By default they are applied and logged as warnings. With
 | Unverified manufacturer for that fallback | `(0008,0070)` absent, empty or unrecognized *and* step 3 or 4 fires | general rule applied | covered by the row above |
 | Patient sex `O` for a sex-specific variant | `(0010,0040)` or `--patient-sex` is `O` | mean of male and female numerators | `AmbiguousPatientSexAdaptationRefusedException` |
 | Administration date rebuilt from the reference datetime | duration outside `[-3600 s, 2 * T)`, or only `(0018,1072)` present | stored time of day kept, date taken from the reference | `AdministrationDateSubstitutionRefusedException` |
+| Patient's Weight `(0010,1030)` given in grams | value `>= 1000` | divided by 1000 | `ImplausiblePatientWeightException` |
 
 Every adaptation that fires is also recorded on the filter, so a caller
 embedding `mitk::SUVImageFilter` can audit them without parsing the log:
@@ -305,6 +306,23 @@ rule, the DICOM tag concerned, the stored value and the value used. Under
 `--strict-dicom` that list is necessarily empty, because the first adaptation
 raises instead of being applied -- an empty list under the strict policy is
 the guarantee the mode exists to give, not a lack of information.
+
+DICOM prescribes kilograms for `(0010,1030)`, and no patient weighs 1000 of
+them, so a value at or above that identifies a gram-encoded export. Read at
+face value it makes the weight 1000x too large and every SUV 1000x too small.
+`--body-weight` bypasses the reinterpretation entirely.
+
+### Rescale slope and intercept
+
+`(0028,1053)` Rescale Slope and `(0028,1052)` Rescale Intercept are read for
+validation only and never re-applied: the reader has already scaled the pixel
+buffer with them by the time the SUV pipeline sees the image, so applying them
+again would scale twice. A warning is emitted when the slope is absent or
+non-positive, or the intercept absent or non-zero -- an absent slope in
+particular is silently treated as `1.0`, which is worth knowing about. These
+are diagnostics, not adaptations: nothing is reinterpreted, so nothing is
+recorded and `--strict-dicom` does not refuse them. Enhanced PET objects carry
+no top-level rescale and are validated by their own classifier instead.
 
 `--injected-activity` bypasses the dose adaptation and `--decay-time` bypasses
 the decay-timing fallback regardless of `--strict-dicom`; both values are used

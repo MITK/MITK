@@ -68,6 +68,7 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   // Output DICOM tags
   MITK_TEST(OutputTags_EachVariantWritesItsOwnSUVType);
   MITK_TEST(OutputTags_RoundTripThroughClassifier);
+  MITK_TEST(GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms);
 
   // Per-(timestep, slice) decay-time override map
   MITK_TEST(SetClear_DecayTimeOverrideMap);
@@ -471,6 +472,36 @@ public:
       CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == model.semantics);
       CPPUNIT_ASSERT(variant == model.sourceVariant);
     }
+  }
+
+  // ---- Patient's Weight reaching the computation ----
+
+  void GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms()
+  {
+    // The helper returns kilograms and the filter multiplies by 1000, so a
+    // gram-encoded export and its kilogram equivalent have to arrive at the
+    // same effective weight. Asserting at the filter rather than the helper
+    // is what shows the reinterpretation actually reaches the SUV -- the
+    // 1000x error it prevents lives in this multiplication.
+    const auto effectiveFor = [](const char* storedWeight) {
+      auto img = MakeMinimalImage();
+      const std::string key = mitk::DICOMTagPathToPropertyName(
+        mitk::DICOMTagPath(0x0010, 0x1030));
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, storedWeight);
+      img->SetProperty(key.c_str(), prop);
+
+      auto f = mitk::SUVImageFilter::New();
+      f->SetInput(img);
+      f->SetTargetVariant(mitk::SUVVariant::BW);
+      f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+      f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+      f->ConfigureFromProperties(img.GetPointer());
+      return f->GetEffectivePatientWeightInGram();
+    };
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70000.0, effectiveFor("70"), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70000.0, effectiveFor("70000"), 1e-6);
   }
 
   // ---- Per-(timestep, slice) decay-time override map ----

@@ -591,6 +591,10 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
       : (IsEnhancedPETInput(props) ? ClassifyEnhancedPETInput(props, m_DICOMReadPolicy)
                                    : ClassifyPETInput(props, m_DICOMReadPolicy));
 
+    // Diagnostic only, and deliberately after classification so it runs
+    // once per configure on an input the pipeline has accepted.
+    WarnOnImplausibleRescale(props);
+
     // Sticky detection slot: keep the classification result across
     // subsequent validation failures in this same Configure call so
     // the UI can keep showing source-variant affordances even if the
@@ -653,7 +657,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     // renormalization path. Always required.
     const double weightG = m_PatientWeightInGram.has_value()
       ? m_PatientWeightInGram.value()
-      : GetPatientsWeight(props) * 1000.0;
+      : GetPatientsWeight(props, m_DICOMReadPolicy, m_Adaptations) * 1000.0;
     if (!std::isfinite(weightG) || weightG <= 0.0)
     {
       mitkThrowException(InvalidDICOMPropertyValueException)

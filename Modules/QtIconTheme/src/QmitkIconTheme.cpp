@@ -72,13 +72,10 @@ namespace
 
   QIcon BakeIcon(const QByteArray &originalSVG)
   {
-    if (qApp->styleSheet().isEmpty())
-      return QPixmap::fromImage(QImage::fromData(originalSVG));
-
     auto themedSVG = QmitkIconTheme::ReplaceColor(QString(originalSVG), QmitkIconTheme::GetColor());
     themedSVG = ReplaceMagicColor(themedSVG, QStringLiteral("ff00ff|f0f"), QmitkIconTheme::GetAccentColor());
 
-    return QPixmap::fromImage(QImage::fromData(themedSVG.toLatin1()));
+    return QPixmap::fromImage(QImage::fromData(themedSVG.toUtf8()));
   }
 
   /* Keeps the SVG and re-bakes it lazily whenever the theme generation moved,

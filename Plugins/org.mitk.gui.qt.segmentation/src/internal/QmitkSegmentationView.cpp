@@ -42,7 +42,7 @@ found in the LICENSE file.
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include "QmitkNewSegmentationDialog.h"
 #include <QmitkMultiLabelManager.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 // us
 #include <usModuleResource.h>
@@ -90,7 +90,7 @@ namespace
     if (hiddenCount > 0)
     {
       hint += QStringLiteral("<p style=\"color:%1;\">%2 segmentation%3 hidden: geometry does not match the selected image.</p>")
-        .arg(QmitkStyleManager::GetIconAccentColor())
+        .arg(QmitkIconTheme::GetAccentColor())
         .arg(hiddenCount)
         .arg(hiddenCount == 1 ? QString() : QStringLiteral("s"));
     }
@@ -618,7 +618,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      "</p>"));
    m_GeometryViolationOverlay->SetButtonText(" Align views");
    m_GeometryViolationOverlay->setOpacity(200);
-   m_GeometryViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+   m_GeometryViolationOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg")));
 
    m_VisibleSegViolationOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
    m_VisibleSegViolationOverlay->setVisible(false);
@@ -629,7 +629,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      "</p>"));
    m_VisibleSegViolationOverlay->SetButtonText(" Show segmentation");
    m_VisibleSegViolationOverlay->setOpacity(200);
-   m_VisibleSegViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")));
+   m_VisibleSegViolationOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg")));
 
    // *------------------------
    // * SHORTCUTS

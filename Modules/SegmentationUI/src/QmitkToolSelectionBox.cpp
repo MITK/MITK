@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 //#define MBILOG_ENABLE_DEBUG 1
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <QmitkToolSelectionBox.h>
 #include <QmitkToolGUI.h>
 #include <mitkBaseRenderer.h>
@@ -511,7 +511,7 @@ void QmitkToolSelectionBox::RecreateButtons()
 
       if (isSVG)
       {
-        button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray::fromRawData(data, length)));
+        button->setIcon(QmitkIconTheme::GetIcon(QByteArray::fromRawData(data, length)));
       }
       else
       {

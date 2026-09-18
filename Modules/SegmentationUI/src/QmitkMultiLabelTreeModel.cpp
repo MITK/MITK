@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 #include <mitkSegChangeOperationApplier.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 
 class QmitkMultiLabelSegTreeItem

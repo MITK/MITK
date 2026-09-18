@@ -21,8 +21,9 @@ found in the LICENSE file.
  * \brief Node descriptor that recolors an SVG icon to match the DataNode color.
  *
  * This class extends QmitkNodeDescriptor by replacing the magic color \c \#00ff00
- * in the provided SVG icon template with the actual color of the mitk::DataNode.
- * Recolored icons are cached internally so that each unique color is only rendered once.
+ * (or \c \#0f0) in the provided SVG icon template with the actual color of the
+ * mitk::DataNode. Recolored icons are cached internally so that each unique
+ * color is only rendered once.
  *
  * \sa QmitkNodeDescriptor
  * \sa QmitkNodeDescriptorManager
@@ -36,7 +37,7 @@ public:
    * \brief Constructs a colored node descriptor.
    *
    * \param[in] className   The class name this descriptor is associated with.
-   * \param[in] pathToIcon  Path to an SVG file containing the magic color \c \#00ff00.
+   * \param[in] pathToIcon  Path to an SVG file containing the magic color \c \#00ff00 (or \c \#0f0).
    * \param[in] predicate   Node predicate that determines which nodes this descriptor matches.
    * \param[in] parent      Optional parent QObject.
    */

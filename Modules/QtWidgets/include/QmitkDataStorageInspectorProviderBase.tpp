@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usPrototypeServiceFactory.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QFile>
 
@@ -116,7 +116,7 @@ template<class TInspector>
 QIcon
   QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorIcon() const
 {
-  return QmitkStyleManager::ThemeIcon(d->m_SVG);
+  return QmitkIconTheme::GetIcon(d->m_SVG);
 }
 
 template<class TInspector>

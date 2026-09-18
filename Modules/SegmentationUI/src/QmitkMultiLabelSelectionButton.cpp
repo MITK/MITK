@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 
 // Qmitk
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QApplication>
 #include <QEvent>

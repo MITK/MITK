@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkThemedStyle.h"
 
-#include <berryQtStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QFile>
 
@@ -57,7 +57,7 @@ QIcon QmitkThemedStyle::standardIcon(StandardPixmap sp, const QStyleOption* opt,
     const auto path = QString(":/org_mitk_icons/icons/awesome/scalable/%1.svg").arg(name);
 
     if (QFile::exists(path))
-      return berry::QtStyleManager::ThemeIcon(path);
+      return QmitkIconTheme::GetIcon(path);
   }
 
   return QProxyStyle::standardIcon(sp, opt, widget);

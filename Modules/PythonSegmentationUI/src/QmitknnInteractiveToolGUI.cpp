@@ -30,7 +30,7 @@ found in the LICENSE file.
 #include <QmitknnInteractiveInstallModeDialog.h>
 #include <QmitkPipInstallDialog.h>
 #include <mitkPipPackageInfo.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QApplication>
 #include <QBoxLayout>
@@ -101,7 +101,7 @@ namespace
 
   void SetIcon(QAbstractButton* button, const char* icon)
   {
-    button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
+    button->setIcon(QmitkIconTheme::GetIcon(QString(":/nnInteractive/%1").arg(icon)));
   }
 
   QCursor CreateCursor(const std::string& svg)
@@ -387,7 +387,7 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
     auto icon = interactor->GetIcon();
 
     if (!icon.empty())
-      button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray(icon.data(), icon.size())));
+      button->setIcon(QmitkIconTheme::GetIcon(QByteArray(icon.data(), icon.size())));
 
     connect(button, &QPushButton::toggled, [this, interactionType](bool checked) {
       this->OnInteractorToggled(interactionType, checked);

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkEditableContourToolGUIBase.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <ui_QmitkEditableContourToolGUIControls.h>
 
@@ -29,8 +29,8 @@ QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase()
   m_Controls->m_ClearButton->hide();
   m_Controls->m_Information->hide();
 
-  m_Controls->m_AddBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/lasso_mode_add.svg")));
-  m_Controls->m_SubtractBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/lasso_mode_subtract.svg")));
+  m_Controls->m_AddBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/lasso_mode_add.svg")));
+  m_Controls->m_SubtractBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/lasso_mode_subtract.svg")));
 
   connect(m_Controls->m_AddBtn, &QPushButton::clicked, this, [=, this](bool)
     {

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkStyleManager_h
-#define QmitkStyleManager_h
+#ifndef QmitkIconTheme_h
+#define QmitkIconTheme_h
 
-#include <MitkQtWidgetsExports.h>
+#include <MitkQtIconThemeExports.h>
 
 #include <QByteArray>
 #include <QIcon>
@@ -24,13 +24,13 @@ found in the LICENSE file.
  *
  * Provides static methods to create icons whose colors adapt to the current
  * application theme (dark/light mode). SVG icons are recolored by replacing
- * a placeholder color with the theme-appropriate icon color.
+ * magic colors with the theme-appropriate colors.
  *
  * This class cannot be instantiated.
  *
  * \sa QmitkColoredNodeDescriptor
  */
-class MITKQTWIDGETS_EXPORT QmitkStyleManager
+class MITKQTICONTHEME_EXPORT QmitkIconTheme
 {
 public:
   /**
@@ -38,29 +38,41 @@ public:
    * \param[in] originalSVG The original SVG content as a byte array.
    * \return A QIcon with colors adapted to the current theme.
    */
-  static QIcon ThemeIcon(const QByteArray &originalSVG);
+  static QIcon GetIcon(const QByteArray &originalSVG);
 
   /**
    * \brief Creates a theme-colored icon from an SVG resource file.
    * \param[in] resourcePath The Qt resource path to the SVG file.
    * \return A QIcon with colors adapted to the current theme.
    */
-  static QIcon ThemeIcon(const QString &resourcePath);
+  static QIcon GetIcon(const QString &resourcePath);
+
+  /**
+   * \brief Replaces the magic icon color in SVG data by a custom color.
+   *
+   * Both the six-digit and the equivalent three-digit notation of the magic
+   * color are replaced.
+   *
+   * \param[in] svg The original SVG content.
+   * \param[in] color A CSS-compatible color string (e.g., "#ffffff").
+   * \return The SVG content with the magic icon color replaced.
+   */
+  static QString ReplaceColor(const QString &svg, const QString &color);
 
   /**
    * \brief Returns the primary icon color for the current theme.
    * \return A CSS-compatible color string (e.g., "#ffffff").
    */
-  static QString GetIconColor();
+  static QString GetColor();
 
   /**
    * \brief Returns the accent icon color for the current theme.
    * \return A CSS-compatible color string.
    */
-  static QString GetIconAccentColor();
+  static QString GetAccentColor();
 
-  QmitkStyleManager() = delete;
-  ~QmitkStyleManager() = delete;
+  QmitkIconTheme() = delete;
+  ~QmitkIconTheme() = delete;
 };
 
 #endif

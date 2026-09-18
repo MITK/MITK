@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 // mitk qt widgets
 #include <QmitkRenderWindow.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 // itk
 #include <itkSpatialOrientationAdapter.h>

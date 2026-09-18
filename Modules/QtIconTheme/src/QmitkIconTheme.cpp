@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkLog.h>
 
@@ -33,39 +33,54 @@ namespace
       ? match.captured(1)
       : fallback;
   }
+
+  /* SVG allows both the six-digit and the equivalent three-digit notation of a
+   * hexadecimal color code, hence both spellings of a magic color must be
+   * replaced. The negative lookahead keeps the three-digit notation from
+   * matching the leading half of an unrelated six-digit color code.
+   */
+  QString ReplaceMagicColor(const QString &svg, const QString &magicColors, const QString &themeColor)
+  {
+    const QRegularExpression re(QString("#(?:%1)(?![0-9a-f])").arg(magicColors),
+      QRegularExpression::CaseInsensitiveOption);
+
+    return QString(svg).replace(re, themeColor);
+  }
 }
 
-QIcon QmitkStyleManager::ThemeIcon(const QByteArray &originalSVG)
+QIcon QmitkIconTheme::GetIcon(const QByteArray &originalSVG)
 {
   auto styleSheet = qApp->styleSheet();
 
   if (styleSheet.isEmpty())
     return QPixmap::fromImage(QImage::fromData(originalSVG));
 
-  auto iconColor = GetIconColor();
-  auto iconAccentColor = GetIconAccentColor();
-
-  auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
-  themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
+  auto themedSVG = ReplaceColor(QString(originalSVG), GetColor());
+  themedSVG = ReplaceMagicColor(themedSVG, QStringLiteral("ff00ff|f0f"), GetAccentColor());
 
   return QPixmap::fromImage(QImage::fromData(themedSVG.toLatin1()));
 }
 
-QIcon QmitkStyleManager::ThemeIcon(const QString &resourcePath)
+QIcon QmitkIconTheme::GetIcon(const QString &resourcePath)
 {
   QFile resourceFile(resourcePath);
 
   if (resourceFile.open(QIODevice::ReadOnly))
   {
     auto originalSVG = resourceFile.readAll();
-    return ThemeIcon(originalSVG);
+    return GetIcon(originalSVG);
   }
 
   MITK_WARN << "Could not read " << resourcePath.toStdString();
   return QIcon();
 }
 
-QString QmitkStyleManager::GetIconColor()
+QString QmitkIconTheme::ReplaceColor(const QString &svg, const QString &color)
+{
+  return ReplaceMagicColor(svg, QStringLiteral("00ff00|0f0"), color);
+}
+
+QString QmitkIconTheme::GetColor()
 {
   const auto styleSheet = qApp->styleSheet();
   const auto fallback = QStringLiteral("#000000");
@@ -75,7 +90,7 @@ QString QmitkStyleManager::GetIconColor()
     : fallback;
 }
 
-QString QmitkStyleManager::GetIconAccentColor()
+QString QmitkIconTheme::GetAccentColor()
 {
   const auto styleSheet = qApp->styleSheet();
   const auto fallback = QStringLiteral("#ffffff");

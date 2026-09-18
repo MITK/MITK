@@ -24,7 +24,7 @@ found in the LICENSE file.
  * descriptor that themes its icon in the constructor and is created before
  * that freezes the placeholder colors of the untouched SVG.
  *
- * \sa QmitkStyleManager
+ * \sa QmitkIconTheme
  * \sa QmitkNodeDescriptor
  * \sa QmitkNodeDescriptorManager
  */
@@ -37,7 +37,7 @@ public:
    * \brief Constructs a themed node descriptor.
    *
    * \param[in] className   The class name this descriptor is associated with.
-   * \param[in] pathToIcon  Path to an SVG file containing the magic colors understood by QmitkStyleManager.
+   * \param[in] pathToIcon  Path to an SVG file containing the magic colors understood by QmitkIconTheme.
    * \param[in] predicate   Node predicate that determines which nodes this descriptor matches.
    * \param[in] parent      Optional parent QObject.
    */

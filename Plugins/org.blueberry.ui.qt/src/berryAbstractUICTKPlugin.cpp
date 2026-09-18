@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "internal/berryBundleUtility.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "berryQtStyleManager.h"
+#include <QmitkIconTheme.h>
 #include "berryPlatformUI.h"
 
 #include <QApplication>
@@ -261,7 +261,7 @@ QIcon AbstractUICTKPlugin::ImageDescriptorFromPlugin(
   QByteArray imgContent = plugin->getResource(imageFilePath);
 
   if (imageFilePath.endsWith(".svg", Qt::CaseInsensitive))
-    return QtStyleManager::ThemeIcon(imgContent);
+    return QmitkIconTheme::GetIcon(imgContent);
 
   QImage image = QImage::fromData(imgContent);
   QPixmap pixmap = QPixmap::fromImage(image);

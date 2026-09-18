@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include <ui_QmitkRemeshingViewControls.h>
 
-#include <berryQtStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
@@ -42,7 +42,7 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls->setupUi(parent);
 
-  m_Controls->remeshPushButton->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
+  m_Controls->remeshPushButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
 
   m_Controls->selectionWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->selectionWidget->SetSelectionIsOptional(true);

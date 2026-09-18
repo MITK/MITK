@@ -13,7 +13,7 @@
 #include <QStandardItem>
 #include <QIcon>
 #include <QInputDialog>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <ui_QmitkUndoRedoView.h>
 
@@ -47,8 +47,8 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
   }
 
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
-  m_Controls->undoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-undo.svg"));
-  m_Controls->redoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-redo.svg"));
+  m_Controls->undoButton->setIcon(QmitkIconTheme::GetIcon(basePath + "edit-undo.svg"));
+  m_Controls->redoButton->setIcon(QmitkIconTheme::GetIcon(basePath + "edit-redo.svg"));
 
   // Setup the model for the list view
   m_UndoRedoModel = new QStandardItemModel(this);
@@ -190,7 +190,7 @@ void QmitkUndoRedoView::UpdateUndoRedoList()
   {
     const auto& [id, description] = *it;
     QStandardItem* item = new QStandardItem(QString::fromStdString("Undo: " + description));
-    item->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-undo.svg"));
+    item->setIcon(QmitkIconTheme::GetIcon(basePath + "edit-undo.svg"));
     m_UndoRedoModel->appendRow(item);
   }
 
@@ -201,7 +201,7 @@ void QmitkUndoRedoView::UpdateUndoRedoList()
   for (const auto& [id, description] : redoDescriptions)
   {
     QStandardItem* item = new QStandardItem(QString::fromStdString("Redo: " + description));
-    item->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-redo.svg"));
+    item->setIcon(QmitkIconTheme::GetIcon(basePath + "edit-redo.svg"));
     m_UndoRedoModel->appendRow(item);
   }
 }

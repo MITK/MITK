@@ -73,7 +73,6 @@ set(CPP_FILES
   QmitkPropertyItem.cpp
   QmitkPropertyItemDelegate.cpp
   QmitkPropertyItemModel.cpp
-  QmitkStyleManager.cpp
   QmitkAbstractDataStorageInspector.cpp
   QmitkDataStorageFavoriteNodesInspector.cpp
   QmitkDataStorageListInspector.cpp

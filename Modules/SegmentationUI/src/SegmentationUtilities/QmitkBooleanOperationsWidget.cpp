@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QmitkBooleanOperationsWidget.h>
 #include <ui_QmitkBooleanOperationsWidgetControls.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkDataStorage.h>
 #include <mitkException.h>
@@ -52,7 +52,7 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
 
   m_Controls->labelInspector->SetMultiSelectionMode(true);
 
-  m_Controls->clearSelectionButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+  m_Controls->clearSelectionButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/times.svg")));
 
   connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkBooleanOperationsWidget::OnSegSelectionChanged);

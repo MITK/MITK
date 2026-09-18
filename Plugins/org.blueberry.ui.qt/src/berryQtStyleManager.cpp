@@ -16,12 +16,10 @@ found in the LICENSE file.
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
-#include <QRegularExpression>
 #include <QStringList>
 #include <QDirIterator>
 #include <QFont>
 #include <QFontDatabase>
-#include <QIcon>
 
 #include <berryLog.h>
 #include "berryPlatformUI.h"
@@ -31,58 +29,10 @@ found in the LICENSE file.
 
 #include <mitkIPreferences.h>
 
-namespace
-{
-  QString ParseColor(const QString& subject, const QString& pattern, const QString& fallback)
-  {
-    QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
-    auto match = re.match(subject);
-
-    return match.hasMatch()
-      ? match.captured(1)
-      : fallback;
-  }
-}
-
 namespace berry
 {
 const QString QtStyleManager::DEFAULT_FONT = QStringLiteral("Roboto");
 const int QtStyleManager::DEFAULT_FONT_SIZE = 10;
-
-QIcon QtStyleManager::ThemeIcon(const QByteArray &originalSVG)
-{
-  auto styleSheet = qApp->styleSheet();
-
-  if (styleSheet.isEmpty())
-    return QPixmap::fromImage(QImage::fromData(originalSVG));
-
-  auto iconColor = ParseColor(styleSheet,
-    QStringLiteral("iconColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
-    QStringLiteral("#000000"));
-
-  auto iconAccentColor = ParseColor(styleSheet,
-    QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
-    QStringLiteral("#ffffff"));
-
-  auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
-  themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
-
-  return QPixmap::fromImage(QImage::fromData(themedSVG.toLatin1()));
-}
-
-QIcon QtStyleManager::ThemeIcon(const QString &resourcePath)
-{
-  QFile resourceFile(resourcePath);
-
-  if (resourceFile.open(QIODevice::ReadOnly))
-  {
-    auto originalSVG = resourceFile.readAll();
-    return ThemeIcon(originalSVG);
-  }
-
-  BERRY_WARN << "Could not read " << resourcePath;
-  return QIcon();
-}
 
 QtStyleManager::QtStyleManager()
   : m_currentFont(DEFAULT_FONT),

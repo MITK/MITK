@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkThemedNodeDescriptor.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QApplication>
 
@@ -43,7 +43,7 @@ QIcon QmitkThemedNodeDescriptor::GetIcon(const mitk::DataNode *) const
 
   if (!m_Impl->Themed || styleSheet != m_Impl->StyleSheet)
   {
-    m_Impl->Icon = QmitkStyleManager::ThemeIcon(m_Impl->PathToIcon);
+    m_Impl->Icon = QmitkIconTheme::GetIcon(m_Impl->PathToIcon);
     m_Impl->StyleSheet = styleSheet;
     m_Impl->Themed = true;
   }

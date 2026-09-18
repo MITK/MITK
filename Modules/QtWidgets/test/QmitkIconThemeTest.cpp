@@ -39,16 +39,32 @@ namespace
     QmitkIconTheme::Refresh();
   }
 
+  /* A filled rectangle of the given size. Without explicit root attributes the
+   * SVG declares that size as width and height.
+   */
+  QByteArray Svg(const QString &fill, int width, int height, QString rootAttributes = QString())
+  {
+    if (rootAttributes.isEmpty())
+      rootAttributes = QStringLiteral("width=\"%1\" height=\"%2\"").arg(width).arg(height);
+
+    return QStringLiteral("<svg xmlns=\"http://www.w3.org/2000/svg\" %1><rect width=\"%2\" height=\"%3\" fill=\"%4\"/></svg>")
+      .arg(rootAttributes, QString::number(width), QString::number(height), fill)
+      .toUtf8();
+  }
+
   QByteArray Svg(const QString &fill, int size)
   {
-    return QStringLiteral("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%2\" height=\"%2\">"
-                          "<rect width=\"%2\" height=\"%2\" fill=\"%1\"/></svg>")
-      .arg(fill).arg(size).toUtf8();
+    return Svg(fill, size, size);
+  }
+
+  std::string ColorAt(const QPixmap &pixmap, int x, int y)
+  {
+    return pixmap.toImage().pixelColor(x, y).name().toStdString();
   }
 
   std::string CenterColor(const QIcon &icon, int size)
   {
-    return icon.pixmap(size, size).toImage().pixelColor(size / 2, size / 2).name().toStdString();
+    return ColorAt(icon.pixmap(size, size), size / 2, size / 2);
   }
 
   std::string ToString(const QSize &size)
@@ -64,9 +80,13 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   MITK_TEST(AccentColorFollowsTheme);
   MITK_TEST(RefreshEmitsChanged);
   MITK_TEST(ColorsFollowRefresh);
-  MITK_TEST(MatchesStaticallyBakedIconGeometry);
+  MITK_TEST(RendersAtTheRequestedSize);
+  MITK_TEST(RendersInDevicePixels);
+  MITK_TEST(KeepsTheAspectRatio);
+  MITK_TEST(GeneratesModeVariants);
   MITK_TEST(SvgBytesAreCopied);
   MITK_TEST(MissingResourceYieldsNullIcon);
+  MITK_TEST(InvalidSvgYieldsNullIcon);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -123,32 +143,60 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("#abcdef"), QmitkIconTheme::GetAccentColor().toStdString());
   }
 
-  void MatchesStaticallyBakedIconGeometry()
+  void RendersAtTheRequestedSize()
   {
     ApplyTheme("#ff0000", "#ffffff");
 
-    const auto svg = Svg("#00ff00", 48);
-    const QIcon icon = QmitkIconTheme::GetIcon(svg);
-    const QIcon reference(QPixmap::fromImage(QImage::fromData(svg)));
-
-    const auto assertSameGeometry = [&icon, &reference](const QSize &size, qreal devicePixelRatio)
-    {
-      const auto pixmap = icon.pixmap(size, devicePixelRatio);
-      const auto referencePixmap = reference.pixmap(size, devicePixelRatio);
-
-      CPPUNIT_ASSERT_EQUAL(ToString(referencePixmap.size()), ToString(pixmap.size()));
-      CPPUNIT_ASSERT_EQUAL(referencePixmap.devicePixelRatio(), pixmap.devicePixelRatio());
+    // A declared size, a viewBox only, and the relative size some icons in the tree use
+    const std::vector<QByteArray> svgs = {
+      Svg("#00ff00", 48),
+      Svg("#00ff00", 128, 128, QStringLiteral("viewBox=\"0 0 128 128\"")),
+      Svg("#00ff00", 1792, 1792, QStringLiteral("width=\"10%\" height=\"10%\" viewBox=\"0 0 1792 1792\""))
     };
 
-    assertSameGeometry(QSize(16, 16), 1.0);
-    assertSameGeometry(QSize(16, 16), 2.0);
-    assertSameGeometry(QSize(256, 256), 1.0);
+    for (const auto &svg : svgs)
+    {
+      const QIcon icon = QmitkIconTheme::GetIcon(svg);
 
-    // A request at ratio 2 must come back in device pixels
-    CPPUNIT_ASSERT_EQUAL(std::string("32x32"), ToString(icon.pixmap(QSize(16, 16), 2.0).size()));
+      CPPUNIT_ASSERT(!icon.isNull());
+      CPPUNIT_ASSERT_EQUAL(std::string("16x16"), ToString(icon.actualSize(QSize(16, 16))));
+      CPPUNIT_ASSERT_EQUAL(std::string("256x256"), ToString(icon.actualSize(QSize(256, 256))));
+      CPPUNIT_ASSERT_EQUAL(std::string("256x256"), ToString(icon.pixmap(256, 256).size()));
+      CPPUNIT_ASSERT_EQUAL(std::string("#ff0000"), CenterColor(icon, 256));
+    }
+  }
 
-    // A pixmap-backed icon never grows beyond its natural size
-    CPPUNIT_ASSERT_EQUAL(std::string("48x48"), ToString(icon.actualSize(QSize(256, 256))));
+  void RendersInDevicePixels()
+  {
+    ApplyTheme("#ff0000", "#ffffff");
+
+    const QIcon icon = QmitkIconTheme::GetIcon(Svg("#00ff00", 48));
+    const auto pixmap = icon.pixmap(QSize(16, 16), 2.0);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("32x32"), ToString(pixmap.size()));
+    CPPUNIT_ASSERT_EQUAL(2.0, pixmap.devicePixelRatio());
+    CPPUNIT_ASSERT_EQUAL(std::string("#ff0000"), ColorAt(pixmap, 16, 16));
+  }
+
+  void KeepsTheAspectRatio()
+  {
+    ApplyTheme("#ff0000", "#ffffff");
+
+    const QIcon icon = QmitkIconTheme::GetIcon(Svg("#00ff00", 48, 24));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("32x16"), ToString(icon.actualSize(QSize(32, 32))));
+    CPPUNIT_ASSERT_EQUAL(std::string("32x16"), ToString(icon.pixmap(32, 32).size()));
+  }
+
+  void GeneratesModeVariants()
+  {
+    ApplyTheme("#ff0000", "#ffffff");
+
+    const QIcon icon = QmitkIconTheme::GetIcon(Svg("#00ff00", 48));
+    const auto disabled = icon.pixmap(QSize(16, 16), 1.0, QIcon::Disabled);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("16x16"), ToString(disabled.size()));
+    CPPUNIT_ASSERT(ColorAt(disabled, 8, 8) != std::string("#ff0000"));
   }
 
   void SvgBytesAreCopied()
@@ -169,6 +217,14 @@ public:
   void MissingResourceYieldsNullIcon()
   {
     CPPUNIT_ASSERT(QmitkIconTheme::GetIcon(QStringLiteral(":/QmitkIconThemeTest/missing.svg")).isNull());
+  }
+
+  void InvalidSvgYieldsNullIcon()
+  {
+    const QIcon icon = QmitkIconTheme::GetIcon(QByteArrayLiteral("not an svg"));
+
+    CPPUNIT_ASSERT(icon.isNull());
+    CPPUNIT_ASSERT(icon.pixmap(16, 16).isNull());
   }
 };
 

@@ -15,16 +15,25 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <QApplication>
+#include <QCryptographicHash>
 #include <QFile>
 #include <QIconEngine>
 #include <QImage>
+#include <QPainter>
 #include <QPixmap>
+#include <QPixmapCache>
 #include <QRegularExpression>
+#include <QStyle>
+#include <QStyleOption>
+#include <QSvgRenderer>
+
+#include <memory>
 
 namespace
 {
-  /* Icons are baked on the GUI thread only, so plain statics suffice. The
-   * generation counter starts at 1 because 0 marks an engine that never baked.
+  /* Icons are rendered on the GUI thread only, so plain statics suffice. The
+   * generation counter starts at 1 because 0 marks an engine that never
+   * themed its SVG.
    */
   unsigned s_Generation = 1;
   bool s_Parsed = false;
@@ -70,19 +79,19 @@ namespace
     return QString(svg).replace(re, themeColor);
   }
 
-  QIcon BakeIcon(const QByteArray &originalSVG)
+  QByteArray ThemeSVG(const QByteArray &originalSVG)
   {
     auto themedSVG = QmitkIconTheme::ReplaceColor(QString(originalSVG), QmitkIconTheme::GetColor());
     themedSVG = ReplaceMagicColor(themedSVG, QStringLiteral("ff00ff|f0f"), QmitkIconTheme::GetAccentColor());
 
-    return QPixmap::fromImage(QImage::fromData(themedSVG.toUtf8()));
+    return themedSVG.toUtf8();
   }
 
-  /* Keeps the SVG and re-bakes it lazily whenever the theme generation moved,
-   * forwarding everything else to the baked QIcon. Delegating to a regular
-   * pixmap-backed QIcon keeps Qt's mode handling (disabled, active, selected
-   * variants via QStyle::generatedIconPixmap), its shrink-only actualSize()
-   * and its pixmap caching identical to a statically baked icon.
+  /* Renders the themed SVG at the size and device pixel ratio it is displayed
+   * with, so icons stay sharp on high-DPI screens and no icon is rasterized at
+   * the arbitrary size declared in its file. Rendered pixmaps are shared
+   * through QPixmapCache under a key derived from the themed SVG content, so a
+   * theme switch simply leads to new keys and needs no invalidation.
    */
   class ThemedIconEngine : public QIconEngine
   {
@@ -96,45 +105,78 @@ namespace
 
     void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state) override
     {
-      this->EnsureCurrent();
-      m_Icon.paint(painter, rect, Qt::AlignCenter, mode, state);
+      const auto *device = painter->device();
+      const auto scale = device != nullptr
+        ? device->devicePixelRatio()
+        : qApp->devicePixelRatio();
+
+      painter->drawPixmap(rect, this->scaledPixmap(rect.size(), mode, state, scale));
     }
 
     QPixmap pixmap(const QSize &size, QIcon::Mode mode, QIcon::State state) override
     {
-      this->EnsureCurrent();
-      return m_Icon.pixmap(size, 1.0, mode, state);
+      return this->scaledPixmap(size, mode, state, 1.0);
     }
 
-    // Since Qt 6.8, QIcon::pixmap() hands the device-independent size and the
-    // device pixel ratio straight through, so both are forwarded unchanged.
     QPixmap scaledPixmap(const QSize &size, QIcon::Mode mode, QIcon::State state, qreal scale) override
     {
       this->EnsureCurrent();
-      return m_Icon.pixmap(size, scale > 0.0 ? scale : 1.0, mode, state);
+
+      if (!m_Renderer->isValid())
+        return QPixmap();
+
+      const auto ratio = scale > 0.0 ? scale : 1.0;
+      const auto deviceSize = (QSizeF(this->actualSize(size, mode, state)) * ratio).toSize();
+
+      if (deviceSize.isEmpty())
+        return QPixmap();
+
+      // The disabled variant is derived from the palette, hence the key includes it.
+      const auto key = QStringLiteral("%1/%2x%3@%4/%5/%6")
+        .arg(m_CacheKeyPrefix)
+        .arg(deviceSize.width())
+        .arg(deviceSize.height())
+        .arg(qRound(ratio * 1000))
+        .arg(static_cast<int>(mode))
+        .arg(QApplication::palette().cacheKey());
+
+      QPixmap pixmap;
+
+      if (!QPixmapCache::find(key, &pixmap))
+      {
+        pixmap = this->Render(deviceSize);
+
+        if (mode != QIcon::Normal)
+        {
+          QStyleOption option;
+          option.palette = QApplication::palette();
+          pixmap = QApplication::style()->generatedIconPixmap(mode, pixmap, &option);
+        }
+
+        pixmap.setDevicePixelRatio(ratio);
+        QPixmapCache::insert(key, pixmap);
+      }
+
+      return pixmap;
     }
 
-    QSize actualSize(const QSize &size, QIcon::Mode mode, QIcon::State state) override
+    QSize actualSize(const QSize &size, QIcon::Mode, QIcon::State) override
     {
       this->EnsureCurrent();
-      return m_Icon.actualSize(size, mode, state);
-    }
 
-    QList<QSize> availableSizes(QIcon::Mode mode, QIcon::State state) override
-    {
-      this->EnsureCurrent();
-      return m_Icon.availableSizes(mode, state);
+      // Only the aspect ratio of the declared size matters for a vector icon.
+      return m_Renderer->defaultSize().scaled(size, Qt::KeepAspectRatio);
     }
 
     bool isNull() override
     {
       this->EnsureCurrent();
-      return m_Icon.isNull();
+      return !m_Renderer->isValid();
     }
 
     QIconEngine *clone() const override
     {
-      return new ThemedIconEngine(*this);
+      return new ThemedIconEngine(m_SVG);
     }
 
   private:
@@ -143,12 +185,34 @@ namespace
       if (m_Generation == s_Generation)
         return;
 
-      m_Icon = BakeIcon(m_SVG);
+      const auto themedSVG = ThemeSVG(m_SVG);
+
+      m_Renderer = std::make_unique<QSvgRenderer>(themedSVG);
+      m_Renderer->setAspectRatioMode(Qt::KeepAspectRatio);
+
+      m_CacheKeyPrefix = QStringLiteral("QmitkIconTheme/")
+        + QString::fromLatin1(QCryptographicHash::hash(themedSVG, QCryptographicHash::Md5).toHex());
+
       m_Generation = s_Generation;
     }
 
+    QPixmap Render(const QSize &deviceSize) const
+    {
+      QImage image(deviceSize, QImage::Format_ARGB32_Premultiplied);
+      image.fill(Qt::transparent);
+
+      {
+        QPainter painter(&image);
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+        m_Renderer->render(&painter);
+      }
+
+      return QPixmap::fromImage(image);
+    }
+
     QByteArray m_SVG;
-    QIcon m_Icon;
+    std::unique_ptr<QSvgRenderer> m_Renderer;
+    QString m_CacheKeyPrefix;
     unsigned m_Generation = 0;
   };
 }

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
-#include <QmitkThemedNodeDescriptor.h>
+#include <QmitkIconTheme.h>
 #include <QList>
 #include <QSet>
 #include <QResource>
@@ -44,13 +44,13 @@ void QmitkNodeDescriptorManager::Initialize()
   AddDescriptor(new QmitkNodeDescriptor("MultiLabelSegmentation", ":/Qmitk/SegmentationIcon_48.png", isLabelSetImage, this));
 
   auto isSegmentationTaskList = mitk::NodePredicateDataType::New("SegmentationTaskList");
-  AddDescriptor(new QmitkThemedNodeDescriptor("SegmentationTaskList", QStringLiteral(":/Qmitk/SegmentationTaskListIcon.svg"), isSegmentationTaskList, this));
+  AddDescriptor(new QmitkNodeDescriptor("SegmentationTaskList", QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/SegmentationTaskListIcon.svg")), isSegmentationTaskList, this));
 
   auto isROI = mitk::NodePredicateDataType::New("ROI");
-  AddDescriptor(new QmitkThemedNodeDescriptor("ROI", QStringLiteral(":/Qmitk/ROIIcon.svg"), isROI, this));
+  AddDescriptor(new QmitkNodeDescriptor("ROI", QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/ROIIcon.svg")), isROI, this));
 
   auto isGeometryData = mitk::NodePredicateDataType::New("GeometryData");
-  AddDescriptor(new QmitkThemedNodeDescriptor("GeometryData", QStringLiteral(":/Qmitk/GeometryDataIcon.svg"), isGeometryData, this));
+  AddDescriptor(new QmitkNodeDescriptor("GeometryData", QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/GeometryDataIcon.svg")), isGeometryData, this));
 
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
   AddDescriptor(new QmitkNodeDescriptor("PointSet", ":/Qmitk/PointSet_48.png", isPointSet, this));

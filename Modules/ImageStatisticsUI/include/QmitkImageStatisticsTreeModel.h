@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkImageStatisticsContainer.h>
 #include <mitkITKEventObserverGuard.h>
 
+#include <QIcon>
+
 #include <atomic>
 #include <mutex>
 #include <vector>
@@ -257,6 +259,7 @@ private:
     std::mutex m_Mutex;
     std::unique_ptr<QmitkImageStatisticsTreeItem> m_RootItem;
     QVariant m_HeaderFirstColumn;
+    QIcon m_WIPIcon;
     itk::TimeStamp m_BuildTime;
 
     bool m_IgnoreZeroValueVoxel = false;

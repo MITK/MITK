@@ -219,10 +219,15 @@ public:
     ApplyTheme("#ff0000", "#ffffff");
 
     const QIcon icon = QmitkIconTheme::GetIcon(Svg("#00ff00", 48));
+    const auto normal = icon.pixmap(QSize(16, 16), 1.0, QIcon::Normal);
     const auto disabled = icon.pixmap(QSize(16, 16), 1.0, QIcon::Disabled);
 
     CPPUNIT_ASSERT_EQUAL(std::string("16x16"), ToString(disabled.size()));
-    CPPUNIT_ASSERT(ColorAt(disabled, 8, 8) != std::string("#ff0000"));
+
+    // Styles derive the disabled variant differently: QCommonStyle remaps the
+    // colors toward gray, QMacStyle only halves the alpha. Compare the full
+    // ARGB pixel, so the assertion holds for both.
+    CPPUNIT_ASSERT(disabled.toImage().pixelColor(8, 8).rgba() != normal.toImage().pixelColor(8, 8).rgba());
   }
 
   void SvgBytesAreCopied()

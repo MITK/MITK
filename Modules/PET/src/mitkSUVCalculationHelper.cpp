@@ -680,6 +680,17 @@ mitk::ManufacturerFamily mitk::GetManufacturerFamily(const mitk::IPropertyProvid
   return ManufacturerFamily::Other;
 }
 
+bool mitk::IsEnhancedPETInput(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider)
+  {
+    return false;
+  }
+  const std::string sopClassUID =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0008, 0x0016)));
+  return ENHANCED_PET_SOP_CLASS_UID == sopClassUID;
+}
+
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)
 {
   const DICOMTagPath decayCorrPath(0x0054, 0x1102);
@@ -767,6 +778,171 @@ namespace
   }
 }
 
+
+  // Distinct values of a per-frame functional-group attribute, compared as
+  // strings. Used for the frame datetimes, where the stored form is the
+  // meaning -- unlike the rescale numbers, where "4" and "4.0" are the same
+  // value written two ways.
+  std::vector<std::string> DistinctPerFrameStrings(const mitk::IPropertyProvider* provider,
+                                                   const mitk::DICOMTagPath& path)
+  {
+    std::vector<std::string> distinct;
+    for (const auto& match : mitk::GetPropertyByDICOMTagPath(provider, path))
+    {
+      if (match.second.IsNull())
+      {
+        continue;
+      }
+      const std::string value = TrimAsciiWhitespace(match.second->GetValueAsString());
+      if (value.empty())
+      {
+        continue;
+      }
+      if (std::find(distinct.cbegin(), distinct.cend(), value) == distinct.cend())
+      {
+        distinct.push_back(value);
+      }
+    }
+    return distinct;
+  }
+
+  mitk::DICOMTagPath PerFrameFunctionalGroupPath(unsigned int innerGroup, unsigned int innerElement,
+                                                 unsigned int leafGroup, unsigned int leafElement)
+  {
+    mitk::DICOMTagPath path;
+    path.AddAnySelection(0x5200, 0x9230);
+    path.AddAnySelection(innerGroup, innerElement);
+    return path.AddElement(leafGroup, leafElement);
+  }
+
+  // Resolve the decay-correction reference instant of an Enhanced PET object.
+  //
+  // (0018,9758) Decay Corrected replaces (0054,1102) for this SOP class:
+  //   YES -- the pixels are corrected to (0018,9701), a single top-level
+  //          datetime, and the per-frame acquisition times say nothing about
+  //          the correction that was applied.
+  //   NO  -- the pixels are uncorrected, so the reference is the moment each
+  //          frame was measured: (0018,9151) Frame Reference DateTime, or
+  //          (0018,9074) plus T_ave when it is absent.
+  //
+  // The distinction decides whether per-frame frame times matter at all,
+  // which is why the variance check lives inside the NO branch. DRO_7_3_0 and
+  // DRO_7_3_1 carry identical, non-uniform frame times and differ only in
+  // this tag: checking unconditionally would refuse the one that is perfectly
+  // computable.
+  // The reference instant, expressed the way ResolveDecayDurationSeconds
+  // consumes one: a stored datetime plus a correction in seconds. The NO
+  // branch needs the pair, because its reference is "acquisition plus T_ave"
+  // and DCMTK offers no datetime-plus-duration arithmetic.
+  struct EnhancedPETReference
+  {
+    OFDateTime base;
+    double     offsetSeconds = 0.0;
+  };
+
+  EnhancedPETReference ResolveEnhancedPETReferenceTime(const mitk::SlicedData* data,
+                                                       double halfLifeSeconds)
+  {
+    const std::string decayCorrected =
+      ToUpperAscii(TrimAsciiWhitespace(
+        mitk::GetFirstDICOMValueAsString(data, mitk::DICOMTagPath(0x0018, 0x9758))));
+
+    if ("YES" == decayCorrected)
+    {
+      const std::string raw = TrimAsciiWhitespace(
+        mitk::GetFirstDICOMValueAsString(data, mitk::DICOMTagPath(0x0018, 0x9701)));
+      OFDateTime reference;
+      if (raw.empty() || !ParseDICOMDateTime(raw, reference))
+      {
+        mitkThrowException(mitk::MissingDICOMPropertyException)
+          << "Enhanced PET declares (0018,9758) Decay Corrected = YES, so the "
+             "reference instant is (0018,9701) Decay Correction DateTime, but "
+             "it is absent or unparseable (got '" << raw << "').";
+      }
+      return {reference, 0.0};
+    }
+
+    if ("NO" == decayCorrected)
+    {
+      const auto frameReference =
+        DistinctPerFrameStrings(data, PerFrameFunctionalGroupPath(0x0020, 0x9111, 0x0018, 0x9151));
+      if (frameReference.size() > 1u)
+      {
+        mitkThrowException(mitk::EnhancedPETPerFrameVariationException)
+          << "(0018,9151) Frame Reference DateTime differs between frames ('"
+          << frameReference[0] << "' vs '" << frameReference[1] << "'), and the "
+             "pixels are not decay corrected, so each frame needs its own "
+             "reference instant. MITK models one frame per file and would "
+             "apply a single instant to the whole volume. The input is "
+             "correct; MITK cannot represent it yet.";
+      }
+      if (1u == frameReference.size())
+      {
+        OFDateTime reference;
+        if (!ParseDICOMDateTime(frameReference[0], reference))
+        {
+          mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+            << "Cannot parse (0018,9151) Frame Reference DateTime value '"
+            << frameReference[0] << "'.";
+        }
+        return {reference, 0.0};
+      }
+
+      // No Frame Reference DateTime: fall back to the acquisition instant
+      // plus the average count-rate time over the frame, the same correction
+      // classic DC=NONE applies.
+      const auto frameAcquisition =
+        DistinctPerFrameStrings(data, PerFrameFunctionalGroupPath(0x0020, 0x9111, 0x0018, 0x9074));
+      if (frameAcquisition.size() > 1u)
+      {
+        mitkThrowException(mitk::EnhancedPETPerFrameVariationException)
+          << "(0018,9074) Frame Acquisition DateTime differs between frames ('"
+          << frameAcquisition[0] << "' vs " << frameAcquisition[1] << "'), and "
+             "the pixels are not decay corrected. MITK models one frame per "
+             "file and cannot carry a per-frame reference instant.";
+      }
+      if (frameAcquisition.empty())
+      {
+        mitkThrowException(mitk::MissingDICOMPropertyException)
+          << "Enhanced PET declares (0018,9758) Decay Corrected = NO, so a "
+             "measurement instant per frame is required, but neither "
+             "(0018,9151) Frame Reference DateTime nor (0018,9074) Frame "
+             "Acquisition DateTime is present.";
+      }
+
+      OFDateTime acquisition;
+      if (!ParseDICOMDateTime(frameAcquisition[0], acquisition))
+      {
+        mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+          << "Cannot parse (0018,9074) Frame Acquisition DateTime value '"
+          << frameAcquisition[0] << "'.";
+      }
+
+      const auto frameDuration =
+        DistinctPerFrameStrings(data, PerFrameFunctionalGroupPath(0x0020, 0x9111, 0x0018, 0x9220));
+      if (frameDuration.empty())
+      {
+        mitkThrowException(mitk::MissingDICOMPropertyException)
+          << "Enhanced PET without (0018,9151) Frame Reference DateTime needs "
+             "(0018,9220) Frame Acquisition Duration to place the measurement "
+             "instant inside the frame; it is absent.";
+      }
+      const double durationMs = mitk::ConvertDICOMStrToValue<double>(frameDuration[0]);
+      if (!std::isfinite(durationMs) || durationMs <= 0.0)
+      {
+        mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+          << "(0018,9220) Frame Acquisition Duration is not a positive value "
+             "(got " << frameDuration[0] << ").";
+      }
+      return {acquisition, ComputeTAveSeconds(durationMs / 1000.0, halfLifeSeconds)};
+    }
+
+    mitkThrowException(mitk::MissingDICOMPropertyException)
+      << "Enhanced PET requires (0018,9758) Decay Corrected to say whether the "
+         "pixels are already decay corrected; it is absent or holds an "
+         "unsupported value (got '" << decayCorrected << "'). Expected YES or NO.";
+  }
+
 // "Step 1" .. "Step 4" in the comments below refer to the canonical
 // DC=START fallback chain documented in the public Doxygen of
 // DeduceDecayCorrection() in mitkSUVCalculationHelper.h (Doxygen
@@ -781,6 +957,33 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
   }
 
   DecayCorrectionInfo info;
+
+  // ---- Enhanced PET ------------------------------------------------------
+  //
+  // An Enhanced PET object carries no (0054,1102) Decay Correction at all, so
+  // the strategy chain below cannot classify it. (0018,9758) Decay Corrected
+  // answers the same question and the reference instant follows from it, after
+  // which the administration-time rule is the classic one, unchanged.
+  //
+  // Reported as DecayCorrectionStrategy::Start because that is what it is: the
+  // pixels are corrected to a scanner-chosen reference rather than to the
+  // administration time. Only how the reference is found differs.
+  if (IsEnhancedPETInput(data))
+  {
+    const auto admin = ResolveAdministrationTimeTags(data);
+    const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
+    const auto reference = ResolveEnhancedPETReferenceTime(data, halfLife);
+
+    info.strategy = DecayCorrectionStrategy::Start;
+
+    const double duration = ResolveDecayDurationSeconds(admin, reference.base,
+                                                        reference.offsetSeconds,
+                                                        halfLife, policy,
+                                                        info.adaptations);
+    FillUniformDecayMap(data, duration, info.decayTimes);
+    return info;
+  }
+
   info.strategy = GetDecayCorrectionStrategy(data);
 
   switch (info.strategy)

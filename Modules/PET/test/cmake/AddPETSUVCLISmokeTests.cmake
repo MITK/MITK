@@ -138,4 +138,13 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
                                  DRO_error_2_7 11)
   _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit12_MissingPhilipsScale
                                  DRO_error_2_6 12)
+
+  # 13 says "this file needs per-frame support MITK does not have", which a
+  # caller must be able to tell from "this file is broken". Both Enhanced PET
+  # cases are pinned because they refuse through different attributes: the
+  # per-frame rescale and the per-frame frame reference datetime.
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit13_PerFrameRescale
+                                 DRO_7_1_0 13)
+  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit13_PerFrameFrameTime
+                                 DRO_7_3_1 13)
 endif()

@@ -54,6 +54,7 @@ namespace
     OutputWriteError           = 10,
     UnsupportedPETUnits        = 11,
     MissingPhilipsPETScale     = 12,
+    EnhancedPETPerFrameVariation = 13,
   };
 
   int AsInt(ExitCode c) { return static_cast<int>(c); }
@@ -451,6 +452,11 @@ int main(int argc, char* argv[])
   {
     MITK_ERROR << "Missing SUV input: " << e.GetDescription();
     return AsInt(ExitCode::MissingSUVInput);
+  }
+  catch (const mitk::EnhancedPETPerFrameVariationException& e)
+  {
+    MITK_ERROR << "Enhanced PET per-frame variation: " << e.GetDescription();
+    return AsInt(ExitCode::EnhancedPETPerFrameVariation);
   }
   catch (const mitk::UnsupportedPETUnitsException& e)
   {

@@ -278,6 +278,26 @@ namespace mitk
   public:
     mitkExceptionClassMacro(UnrecoverableAdministrationDateException, AmbiguousDecayTimingException);
   };
+  /**
+   * \brief An Enhanced PET object carries per-frame values that differ
+   *        between frames, which MITK's read model cannot represent.
+   *
+   * The DICOM reader attaches one property set per *file*, so a
+   * multi-frame object collapses each attribute to a single value. Where
+   * the per-frame values agree that is harmless. Where they differ -- and
+   * where the varying attribute actually feeds the computation -- an SUV
+   * would silently be built from one frame's value applied to the whole
+   * volume, so the input is refused under both policies.
+   *
+   * This is a MITK limitation rather than a defect in the input, and the
+   * message says so: the data is correct and a reader with a per-frame
+   * model would handle it.
+   */
+  class MITKPET_EXPORT EnhancedPETPerFrameVariationException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(EnhancedPETPerFrameVariationException, SUVHelperException);
+  };
 
   /**
    * \brief The administration date would have been substituted from the
@@ -496,6 +516,21 @@ namespace mitk
    * \return The inferred manufacturer family.
    */
   ManufacturerFamily MITKPET_EXPORT GetManufacturerFamily(const mitk::IPropertyProvider* provider);
+
+  /** \brief SOP Class UID of Enhanced PET Image Storage. */
+  constexpr const char* ENHANCED_PET_SOP_CLASS_UID = "1.2.840.10008.5.1.4.1.1.130";
+
+  /**
+   * \brief Whether the input is an Enhanced PET Image Storage object.
+   *
+   * Decided solely by (0008,0016) SOP Class UID, so the Enhanced PET code
+   * paths stay unreachable for every other input. Classic PET objects are
+   * unaffected by anything this predicate gates.
+   *
+   * \param[in] provider Source of DICOM properties.
+   * \return true when (0008,0016) equals the Enhanced PET SOP Class UID.
+   */
+  bool MITKPET_EXPORT IsEnhancedPETInput(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Strategy describing how (or whether) the input pixel data has been

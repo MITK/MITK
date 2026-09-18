@@ -588,7 +588,8 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
 
     m_EffectiveInputModel = m_InputModelOverride.has_value()
       ? m_InputModelOverride.value()
-      : ClassifyPETInput(props, m_DICOMReadPolicy);
+      : (IsEnhancedPETInput(props) ? ClassifyEnhancedPETInput(props, m_DICOMReadPolicy)
+                                   : ClassifyPETInput(props, m_DICOMReadPolicy));
 
     // Sticky detection slot: keep the classification result across
     // subsequent validation failures in this same Configure call so

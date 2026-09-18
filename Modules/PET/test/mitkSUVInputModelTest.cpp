@@ -22,6 +22,9 @@ found in the LICENSE file.
 
 #include <mitkSUVInputModel.h>
 
+#include <string>
+#include <vector>
+
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -48,6 +51,58 @@ namespace
     auto prop = mitk::DICOMProperty::New();
     prop->SetValue(0, 0, value);
     image->SetProperty(key.c_str(), prop);
+  }
+
+  // Property name for a functional-group path with concrete item indices,
+  // matching what the DICOM reader produces for an Enhanced PET object:
+  // DICOM.5200.9230.[frame].GGGG.EEEE.[item].GGGG.EEEE
+  std::string PerFrameName(unsigned int frame,
+                           unsigned int innerGroup, unsigned int innerElement, unsigned int item,
+                           unsigned int leafGroup, unsigned int leafElement)
+  {
+    mitk::DICOMTagPath path;
+    path.AddSelection(0x5200, 0x9230, static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(frame));
+    path.AddSelection(innerGroup, innerElement,
+                      static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(item));
+    path.AddElement(leafGroup, leafElement);
+    return mitk::DICOMTagPathToPropertyName(path);
+  }
+
+  void SetProperty(mitk::Image* image, const std::string& name, const std::string& value)
+  {
+    auto prop = mitk::DICOMProperty::New();
+    prop->SetValue(0, 0, value);
+    image->SetProperty(name.c_str(), prop);
+  }
+
+  // A minimal Enhanced PET object: the SOP Class UID that selects the code
+  // path, a frame count, and per-frame unit codes and rescale values.
+  mitk::Image::Pointer MakeEnhancedImage(unsigned int frames, const std::string& unitCode,
+                                         const std::vector<std::string>& perFrameSlopes)
+  {
+    auto image = MakeImage();
+    SetDicomTag(image, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    SetDicomTag(image, 0x0028, 0x0008, std::to_string(frames));
+    for (unsigned int f = 0; f < frames; ++f)
+    {
+      if (!unitCode.empty())
+      {
+        SetProperty(image, PerFrameName(f, 0x0040, 0x9096, 0, 0x0040, 0x08EA), "");
+        SetProperty(image,
+                    mitk::DICOMTagPathToPropertyName(
+                      mitk::DICOMTagPath()
+                        .AddSelection(0x5200, 0x9230, static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(f))
+                        .AddSelection(0x0040, 0x9096, 0)
+                        .AddSelection(0x0040, 0x08EA, 0)
+                        .AddElement(0x0008, 0x0100)),
+                    unitCode);
+      }
+      if (f < perFrameSlopes.size())
+      {
+        SetProperty(image, PerFrameName(f, 0x0028, 0x9145, 0, 0x0028, 0x1053), perFrameSlopes[f]);
+      }
+    }
+    return image;
   }
 
   // Set a lifted private-tag property (the names BaseDICOMReaderService
@@ -101,6 +156,18 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   MITK_TEST(GML_SUVTypeLBMJANMA_ClassifiesAsJanmahasatian);
   MITK_TEST(GML_SUVTypeLBMJAMES128_ClassifiesAsJames128);
   MITK_TEST(GML_SUVTypeLBM_ClassifiesAsMorgan);
+  // Enhanced PET
+  MITK_TEST(EnhancedPET_BqMl_ClassifiesAsActivityConcentration);
+  MITK_TEST(EnhancedPET_GmlSUVbw_ClassifiesAsPrenormalizedBW);
+  MITK_TEST(EnhancedPET_UniformPerFrameRescale_Accepted);
+  MITK_TEST(EnhancedPET_RescaleWrittenTwoWays_Accepted);
+  MITK_TEST(EnhancedPET_VaryingPerFrameRescale_Refuses);
+  MITK_TEST(EnhancedPET_FewerRescaleValuesThanFrames_Refuses);
+  MITK_TEST(EnhancedPET_UnitDiffersBetweenFrames_Refuses);
+  MITK_TEST(EnhancedPET_NoUsableUnit_Throws);
+  MITK_TEST(EnhancedPET_RescaleTypeFallback_Accepted);
+  MITK_TEST(IsEnhancedPETInput_OnlyForTheEnhancedSOPClass);
+
   MITK_TEST(NullProvider_Throws);
 
   CPPUNIT_TEST_SUITE_END();
@@ -456,6 +523,133 @@ public:
                                           mitk::DICOMReadPolicy::Lenient);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
     CPPUNIT_ASSERT(mitk::SUVVariant::LBM_Morgan == m.sourceVariant);
+  }
+
+  // ---- Enhanced PET Image Storage ----
+  //
+  // These objects carry none of the classic attributes, so the classifier
+  // reads the unit out of the functional groups instead. The guards below
+  // matter as much as the mapping: MITK models one frame per file, so a
+  // per-frame value that differs between frames would silently be applied
+  // to the whole volume.
+
+  void EnhancedPET_BqMl_ClassifiesAsActivityConcentration()
+  {
+    auto img = MakeEnhancedImage(4, "Bq/ml", {"1.0", "1.0", "1.0", "1.0"});
+
+    const auto m = mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                  mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+  }
+
+  void EnhancedPET_GmlSUVbw_ClassifiesAsPrenormalizedBW()
+  {
+    auto img = MakeEnhancedImage(4, "g/ml{SUVbw}", {"1.0", "1.0", "1.0", "1.0"});
+
+    const auto m = mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                  mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
+    CPPUNIT_ASSERT(mitk::SUVVariant::BW == m.sourceVariant);
+  }
+
+  void EnhancedPET_UniformPerFrameRescale_Accepted()
+  {
+    // The guard must detect variation, not the mere existence of per-frame
+    // values -- otherwise it degenerates into "refuse all Enhanced PET".
+    auto img = MakeEnhancedImage(4, "Bq/ml", {"4.0", "4.0", "4.0", "4.0"});
+
+    CPPUNIT_ASSERT_NO_THROW(mitk::ClassifyEnhancedPETInput(
+      img.GetPointer(), mitk::DICOMReadPolicy::Lenient));
+  }
+
+  void EnhancedPET_RescaleWrittenTwoWays_Accepted()
+  {
+    // "4" and "4.0" are the same slope written in two VRs -- DS through the
+    // Pixel Value Transformation Sequence, FD through the Real World Value
+    // Mapping Sequence. Comparing the strings would report variation on a
+    // perfectly uniform object.
+    auto img = MakeEnhancedImage(3, "Bq/ml", {"4", "4.0", "4.00"});
+
+    CPPUNIT_ASSERT_NO_THROW(mitk::ClassifyEnhancedPETInput(
+      img.GetPointer(), mitk::DICOMReadPolicy::Lenient));
+  }
+
+  void EnhancedPET_VaryingPerFrameRescale_Refuses()
+  {
+    auto img = MakeEnhancedImage(4, "Bq/ml", {"4.0", "4.0", "3.0", "4.0"});
+
+    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                        mitk::DICOMReadPolicy::Lenient),
+                         mitk::EnhancedPETPerFrameVariationException);
+  }
+
+  void EnhancedPET_FewerRescaleValuesThanFrames_Refuses()
+  {
+    // A path that resolves to fewer values than the object has frames has
+    // not observed the per-frame values; concluding "uniform" would be an
+    // accident. This is the failure mode a mis-specified or unregistered
+    // tag path produces, and it must not read as success.
+    auto img = MakeEnhancedImage(4, "Bq/ml", {"4.0", "4.0"});
+
+    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                        mitk::DICOMReadPolicy::Lenient),
+                         mitk::EnhancedPETPerFrameVariationException);
+  }
+
+  void EnhancedPET_UnitDiffersBetweenFrames_Refuses()
+  {
+    auto img = MakeEnhancedImage(2, "Bq/ml", {"1.0", "1.0"});
+    // Overwrite the second frame's unit so the two disagree.
+    SetProperty(img.GetPointer(),
+                mitk::DICOMTagPathToPropertyName(
+                  mitk::DICOMTagPath()
+                    .AddSelection(0x5200, 0x9230, 1)
+                    .AddSelection(0x0040, 0x9096, 0)
+                    .AddSelection(0x0040, 0x08EA, 0)
+                    .AddElement(0x0008, 0x0100)),
+                "g/ml{SUVbw}");
+
+    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                        mitk::DICOMReadPolicy::Lenient),
+                         mitk::EnhancedPETPerFrameVariationException);
+  }
+
+  void EnhancedPET_NoUsableUnit_Throws()
+  {
+    auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
+
+    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                        mitk::DICOMReadPolicy::Lenient),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  void EnhancedPET_RescaleTypeFallback_Accepted()
+  {
+    // No Measurement Units Code Sequence, but Rescale Type names a unit the
+    // pipeline converts. The manual marks this a fallback because Rescale
+    // Type is supposed to be "US" for PET.
+    auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
+    SetProperty(img.GetPointer(), PerFrameName(0, 0x0028, 0x9145, 0, 0x0028, 0x1054), "BQML");
+
+    const auto m = mitk::ClassifyEnhancedPETInput(img.GetPointer(),
+                                                  mitk::DICOMReadPolicy::Lenient);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+  }
+
+  void IsEnhancedPETInput_OnlyForTheEnhancedSOPClass()
+  {
+    // The Enhanced PET code path must be unreachable for anything else, or
+    // classic PET inputs would start taking it.
+    auto enhanced = MakeImage();
+    SetDicomTag(enhanced, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    CPPUNIT_ASSERT(mitk::IsEnhancedPETInput(enhanced.GetPointer()));
+
+    auto classic = MakeImage();
+    SetDicomTag(classic, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.128");
+    CPPUNIT_ASSERT(!mitk::IsEnhancedPETInput(classic.GetPointer()));
+
+    auto none = MakeImage();
+    CPPUNIT_ASSERT(!mitk::IsEnhancedPETInput(none.GetPointer()));
   }
 
   void NullProvider_Throws()

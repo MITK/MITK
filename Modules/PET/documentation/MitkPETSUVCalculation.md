@@ -238,6 +238,46 @@ DICOM-derived path uses, so a dynamic scan the pipeline computes by itself
 can also be supplied by hand. Because the value is uniform, it is not a
 substitute for the per-slice handling of `START` and `NONE`.
 
+### Supported SOP classes
+
+| SOP class | Support |
+|-----------|---------|
+| PET Image Storage `1.2.840.10008.5.1.4.1.1.128` | Full. |
+| Enhanced PET Image Storage `1.2.840.10008.5.1.4.1.1.130` | Supported where the per-frame attributes agree across frames; see below. |
+| Legacy Converted Enhanced PET `1.2.840.10008.5.1.4.1.1.128.1` | Not supported. |
+
+An Enhanced PET object carries none of the classic PET attributes. The unit
+comes from the Measurement Units Code Sequence `(0040,08EA)` inside the Real
+World Value Mapping Sequence `(0040,9096)` inside the functional groups,
+falling back to `(0028,1054)` Rescale Type; the decay state comes from
+`(0018,9758)` Decay Corrected instead of `(0054,1102)`, with the reference
+instant taken from `(0018,9701)` when it is `YES` and from the per-frame
+`(0018,9151)` Frame Reference DateTime when it is `NO`. Administration time
+is resolved exactly as for classic PET.
+
+#### What is not supported, and why it refuses
+
+MITK's DICOM reader models one frame per file, so a multi-frame object
+collapses each attribute to a single value. Where the per-frame values agree
+that is harmless. Where they differ, the collapsed value would be applied to
+the whole volume and the result would be wrong without anything indicating
+it, so the run stops with exit code 13 instead. This affects:
+
+- a per-frame rescale slope or intercept that differs between frames;
+- a per-frame Frame Reference DateTime (or Frame Acquisition DateTime) that
+  differs between frames, when `(0018,9758)` is `NO` and those times are
+  therefore what the correction is computed from;
+- a unit that differs between frames.
+
+The refusal says the input is correct and MITK cannot yet represent it,
+because that is the case: these files are valid DICOM and a reader with a
+per-frame model would handle them.
+
+Note the condition on the second item. When `(0018,9758)` is `YES` the
+reference instant is the single top-level `(0018,9701)`, and per-frame
+acquisition times play no part in the result -- so varying frame times are
+accepted there and refused only when they actually feed the computation.
+
 ### Modality check
 
 By default `(0008,0060)` Modality must be `PT` (trimmed, case-insensitive).
@@ -361,6 +401,7 @@ The modality and units checks are bypassed because NRRD carries no DICOM tags.
 | `10` | The output image could not be written. |
 | `11` | `(0054,1001)` Units holds a value the pipeline cannot convert. |
 | `12` | `Units = CNTS` on Philips data without either private scale factor. |
+| `13` | An Enhanced PET object carries per-frame values that differ between frames. |
 
 Codes 11 and 12 previously fell into the catch-all `1`, so a calling script
 could not tell "this input is not convertible" from "MITK broke". The table

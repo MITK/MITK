@@ -105,6 +105,46 @@ namespace mitk
    */
   SUVInputModel MITKPET_EXPORT ClassifyPETInput(const IPropertyProvider* provider,
                                                  DICOMReadPolicy          policy);
+
+  /**
+   * \brief Classify the input pixel semantics of an Enhanced PET object.
+   *
+   * An Enhanced PET Image Storage object carries none of the classic PET
+   * attributes: no (0054,1001) Units, no (0028,1052/1053) Rescale. The unit
+   * lives in the Measurement Units Code Sequence inside the Real World
+   * Value Mapping Sequence inside the functional groups, and the rescale in
+   * the Pixel Value Transformation Sequence beside it. This reads those and
+   * produces the same \c SUVInputModel the classic classifier does, so the
+   * rest of the pipeline is unchanged.
+   *
+   * Pixel values arrive already rescaled -- GDCM applies the slope and
+   * intercept at read time, exactly as for classic PET -- so this names the
+   * unit and never re-applies a scale.
+   *
+   * \warning MITK's DICOM reader attaches one property set per file, so a
+   *          multi-frame object collapses each attribute to a single value.
+   *          Where the per-frame rescale differs between frames, the
+   *          collapsed value would be applied to the whole volume; this
+   *          refuses instead. It also refuses when it can see fewer values
+   *          than the object has frames, since a path that resolves to
+   *          nothing would otherwise read as uniform.
+   *
+   * \param[in] provider Source of DICOM properties.
+   * \param[in] policy   Currently informational, as for ClassifyPETInput.
+   * \return The classification result.
+   *
+   * \pre \p provider is not null and is an Enhanced PET object
+   *      (\c IsEnhancedPETInput).
+   *
+   * \throw MissingDICOMPropertyException if no usable unit can be found.
+   * \throw UnsupportedPETUnitsException if the unit code is outside the
+   *        set the pipeline converts.
+   * \throw EnhancedPETPerFrameVariationException if the per-frame rescale
+   *        varies, or if fewer per-frame values are visible than the object
+   *        has frames.
+   */
+  SUVInputModel MITKPET_EXPORT ClassifyEnhancedPETInput(const IPropertyProvider* provider,
+                                                        DICOMReadPolicy          policy);
 }
 
 #endif

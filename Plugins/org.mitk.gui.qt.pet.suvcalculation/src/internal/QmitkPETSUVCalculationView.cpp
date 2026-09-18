@@ -225,6 +225,41 @@ namespace
         "Either uncheck 'Strict DICOM input policy' or supply explicit "
         "overrides.\n\nDetails: %1").arg(raw);
     }
+    if (dynamic_cast<const EnhancedPETPerFrameVariationException*>(&e))
+    {
+      return QObject::tr(
+        "This Enhanced PET object stores a value per frame that differs "
+        "between frames, and MITK's DICOM reader models one frame per file, "
+        "so the variation cannot be honoured. Computing from a single frame's "
+        "value would be silently wrong for the others.\n\nDetails: %1").arg(raw);
+    }
+    if (dynamic_cast<const ImplausiblePatientWeightException*>(&e))
+    {
+      return QObject::tr(
+        "Patient's Weight is not plausible in the kilograms DICOM prescribes "
+        "and looks gram-encoded. The strict DICOM policy refuses to "
+        "reinterpret it. Untick the strict option, or set the weight "
+        "explicitly.\n\nDetails: %1").arg(raw);
+    }
+    if (dynamic_cast<const AdministrationDateSubstitutionRefusedException*>(&e))
+    {
+      return QObject::tr(
+        "The administration date would have to be reconstructed from the "
+        "decay-correction reference time, and the strict DICOM policy refuses "
+        "that. Untick the strict option, or set the decay time "
+        "explicitly.\n\nDetails: %1").arg(raw);
+    }
+    if (dynamic_cast<const MultiItemRadiopharmaceuticalSequenceException*>(&e))
+    {
+      return QObject::tr(
+        "This image lists more than one radiopharmaceutical and none was "
+        "chosen. Pick one under Tracer.\n\nDetails: %1").arg(raw);
+    }
+    if (dynamic_cast<const InvalidDecayTimeOverrideException*>(&e))
+    {
+      return QObject::tr(
+        "The decay time override is not usable.\n\nDetails: %1").arg(raw);
+    }
     if (dynamic_cast<const MissingPhilipsPETScaleException*>(&e))
     {
       return QObject::tr(
@@ -387,6 +422,12 @@ mitk::Image* QmitkPETSUVCalculationView::CurrentInputImage() const
 {
   auto node = m_Controls->petNodeSelector->GetSelectedNode();
   return node.IsNull() ? nullptr : dynamic_cast<mitk::Image*>(node->GetData());
+}
+
+mitk::DICOMReadPolicy QmitkPETSUVCalculationView::CurrentReadPolicy() const
+{
+  return m_Controls->checkStrictDicom->isChecked() ? mitk::DICOMReadPolicy::Strict
+                                                   : mitk::DICOMReadPolicy::Lenient;
 }
 
 void QmitkPETSUVCalculationView::ReconfigureFilterFromCurrentImage()
@@ -896,11 +937,12 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
   }
   else if (nullptr != image)
   {
-    // Prefills the control; the filter owns the adaptation record for the
-    // run, so this probe discards its own.
+    // Reached only when configuration failed; the configured case above
+    // uses the filter's resolved value. The probe follows the active policy
+    // so a weight the strict policy refused is not shown as if accepted.
     std::vector<mitk::SUVAdaptation> ignoredAdaptations;
     try { m_Controls->weightSpinBox->setValue(
-            mitk::GetPatientsWeight(image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations)); }
+            mitk::GetPatientsWeight(image, this->CurrentReadPolicy(), ignoredAdaptations)); }
     catch (const mitk::Exception&) { m_Controls->weightSpinBox->setValue(0.0); }
   }
   else
@@ -937,7 +979,7 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
       {
         std::vector<mitk::SUVAdaptation> ignoredAdaptations;
         const auto rpis = mitk::GetRadiopharmaceuticalInfos(
-          image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
+          image, this->CurrentReadPolicy(), ignoredAdaptations);
         const int idx   = m_Filter->GetTracerIndex().value_or(0);
         if (idx >= 0 && static_cast<std::size_t>(idx) < rpis.size())
         {
@@ -1058,6 +1100,46 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     return plain.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
   };
   QString diagHtml = toHtml(this->BuildDetectedInfoText());
+
+  // The IBSI-SUV recommendations the filter had to apply to make this input
+  // usable. Shown at configure time rather than after Calculate, because
+  // that is while the user can still act on it -- by supplying an override,
+  // or by ticking the strict box to refuse the reinterpretation outright.
+  // Warning-styled: these change the resulting numbers.
+  if (m_Configured)
+  {
+    const QString adaptations =
+      QString::fromStdString(mitk::FormatAdaptationSummary(m_Filter->GetAdaptations()));
+    if (!adaptations.isEmpty())
+    {
+      if (!diagHtml.isEmpty()) diagHtml.append(QStringLiteral("<br><br>"));
+      diagHtml.append(QStringLiteral("<font class=\"warning\">"))
+              .append(toHtml(adaptations))
+              .append(QStringLiteral("</font>"));
+    }
+  }
+
+  // Diagnostics, not adaptations: nothing was reinterpreted and the strict
+  // policy does not refuse them. Shown because an absent slope is silently
+  // treated as 1.0 and a non-zero intercept shifts every voxel, and neither
+  // is visible anywhere else in this view.
+  if (m_Configured)
+  {
+    const auto& rescaleFindings = m_Filter->GetRescaleFindings();
+    if (!rescaleFindings.empty())
+    {
+      QStringList lines;
+      for (const auto& finding : rescaleFindings)
+        lines << QString::fromStdString(finding);
+
+      if (!diagHtml.isEmpty()) diagHtml.append(QStringLiteral("<br><br>"));
+      diagHtml.append(QStringLiteral("<font class=\"warning\">"))
+              .append(toHtml(tr("Rescale values worth checking:\n  %1")
+                               .arg(lines.join(QStringLiteral("\n  ")))))
+              .append(QStringLiteral("</font>"));
+    }
+  }
+
   if (!m_LastConfigActionable.empty())
   {
     if (!diagHtml.isEmpty()) diagHtml.append(QStringLiteral("<br><br>"));

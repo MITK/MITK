@@ -1089,15 +1089,30 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     m_Controls->strategyLabel->clear();
   }
 
-  // Diagnostics widget: auto-detected summary on top, then either an
-  // actionable error or an OK confirmation. Both blocks coexist so the
-  // user always sees what the filter deduced from the input, even when
-  // the configuration ultimately failed.
+  // Diagnostics widget: the auto-detected summary, then any warning
+  // blocks that apply, then the verdict. All of them coexist so the user
+  // always sees what the filter deduced from the input, even when the
+  // configuration ultimately failed.
   //
-  // Rendered as HTML so the actionable error portion can carry the
-  // shared `font.warning` styling (red/bold; see the BlueBerry QSS).
+  // Rendered as HTML so the warning blocks can carry the shared
+  // `font.warning` styling (red/bold; see the BlueBerry QSS).
+  //
+  // Leading indentation carries the list structure of the summaries
+  // below, and HTML collapses runs of spaces; the widget has no
+  // white-space rule to lean on.
   auto toHtml = [](const QString& plain) {
-    return plain.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
+    const QStringList plainLines = plain.split(QLatin1Char('\n'));
+    QStringList htmlLines;
+    htmlLines.reserve(plainLines.size());
+
+    for (const QString& line : plainLines)
+    {
+      qsizetype indent = 0;
+      while (indent < line.size() && QLatin1Char(' ') == line.at(indent)) ++indent;
+      htmlLines << QStringLiteral("&nbsp;").repeated(indent) + line.mid(indent).toHtmlEscaped();
+    }
+
+    return htmlLines.join(QStringLiteral("<br>"));
   };
   QString diagHtml = toHtml(this->BuildDetectedInfoText());
 
@@ -1114,7 +1129,9 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     {
       if (!diagHtml.isEmpty()) diagHtml.append(QStringLiteral("<br><br>"));
       diagHtml.append(QStringLiteral("<font class=\"warning\">"))
-              .append(toHtml(adaptations))
+              .append(toHtml(adaptations + tr(
+                "\nSupply an explicit override to avoid them, or tick "
+                "'Strict DICOM input policy' to refuse them outright.")))
               .append(QStringLiteral("</font>"));
     }
   }

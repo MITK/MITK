@@ -20,6 +20,8 @@ The first step to perform measurements is to select a reference image on top of 
 
 After selecting an image, you can click on any of the geometrical symbols. The respective measurement will appear as soon as you click on the image location you want to measure.
 
+A measurement that has not been placed yet can be canceled by pressing Esc, by clicking the active tool button again, or by switching to another tool.
+
 The view offers a variety of measurement options that are introduced in the following:
 
 <ul>

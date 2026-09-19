@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkHistogramStatisticsCalculator.h>
 #include <itkImageScanlineConstIterator.h>
 
+#include <utility>
+
 template <typename TInputImage>
 mitk::StatisticsImageFilter<TInputImage>::StatisticsImageFilter()
   : m_ComputeHistogram(false),
@@ -160,7 +162,15 @@ void mitk::StatisticsImageFilter<TInputImage>::BeforeStreamedGenerateData()
   m_Max = itk::NumericTraits<PixelType>::NonpositiveMin();
 
   if (m_ComputeHistogram)
+  {
     m_Histogram = this->CreateInitializedHistogram();
+    m_MedianAccumulator = MedianAccumulator<PixelType>(m_HistogramLowerBound, m_HistogramUpperBound);
+
+    // In value mode the accumulator ends up holding one entry per pixel, so
+    // sizing it once here avoids the reallocation the merges would otherwise
+    // walk through.
+    m_MedianAccumulator.Reserve(this->GetInput()->GetLargestPossibleRegion().GetNumberOfPixels());
+  }
 }
 
 template <typename TInputImage>
@@ -181,11 +191,14 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
   HistogramPointer histogram;
   typename HistogramType::MeasurementVectorType histogramMeasurement;
   typename HistogramType::IndexType histogramIndex;
+  MedianAccumulator<PixelType> medianAccumulator;
 
   if (m_ComputeHistogram) // Initialize histogram
   {
     histogram = this->CreateInitializedHistogram();
     histogramMeasurement.SetSize(1);
+    medianAccumulator = MedianAccumulator<PixelType>(m_HistogramLowerBound, m_HistogramUpperBound);
+    medianAccumulator.Reserve(regionForThread.GetNumberOfPixels());
   }
 
   itk::ImageScanlineConstIterator<TInputImage> it(this->GetInput(), regionForThread);
@@ -202,6 +215,7 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
         histogramMeasurement[0] = realValue;
         histogram->GetIndex(histogramMeasurement, histogramIndex);
         histogram->IncreaseFrequencyOfIndex(histogramIndex, 1);
+        medianAccumulator.Add(value);
       }
 
       min = std::min(min, value);
@@ -239,6 +253,8 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
       m_Histogram->IncreaseFrequencyOfIndex(histogramIndex, histogramIt.GetFrequency());
       ++histogramIt;
     }
+
+    m_MedianAccumulator.Merge(std::move(medianAccumulator));
   }
 
   m_Sum += sum;
@@ -302,7 +318,7 @@ void mitk::StatisticsImageFilter<TInputImage>::AfterStreamedGenerateData()
     this->SetEntropy(histogramStatisticsCalculator.GetEntropy());
     this->SetUniformity(histogramStatisticsCalculator.GetUniformity());
     this->SetUPP(histogramStatisticsCalculator.GetUPP());
-    this->SetMedian(histogramStatisticsCalculator.GetMedian());
+    this->SetMedian(m_MedianAccumulator.ComputeMedian());
   }
 }
 

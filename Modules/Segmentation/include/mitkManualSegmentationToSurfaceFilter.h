@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <vtkImageGaussianSmooth.h>
 #include <vtkImageMedian3D.h>
 #include <vtkImageResample.h>
-#include <vtkImageThreshold.h>
 
 namespace mitk
 {

@@ -70,5 +70,5 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage], versi
 available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 
 [homepage]: https://www.contributor-covenant.org
-[contact]: https://www.mitk.org/wiki/Contact
+[contact]: https://www.mitk.org
 

@@ -12,13 +12,28 @@ found in the LICENSE file.
 
 /**
  * \file mitkLexicalCast.h
- * \brief Provides a robust lexical cast from strings to numeric types with a fallback for edge-case values.
+ * \brief Locale-independent conversion between strings and numeric types.
  *
- * This header wraps \c boost::lexical_cast and adds a fallback using \c std::istringstream
- * for certain compiler/platform combinations (e.g. Apple LLVM) that fail to convert
- * very small floating-point numbers such as \c 0.2225e-307. It also provides template
- * specializations that redirect \c boost::lexical_cast\<float\>, \c boost::lexical_cast\<double\>,
- * and \c boost::lexical_cast\<long\ double\> through the MITK implementation.
+ * These wrappers are intentionally backed by \c boost::lexical_cast rather than
+ * \c std::from_chars / \c std::to_chars. The standard route looks like the
+ * obvious replacement, but its floating-point support is not portable yet:
+ * libc++ (Apple/macOS) ships the floating-point \c \<charconv\> overloads only
+ * in very recent releases. \c boost::lexical_cast handles integers, normal
+ * floats, "inf"/"-inf"/"nan" (any case) correctly on every platform, and is
+ * header-only, so it adds no compiled Boost library or linkage cost.
+ *
+ * Two caveats, both handled here. First, boost::lexical_cast converts through
+ * streams that consult the GLOBAL C++ locale: under a locale whose numpunct
+ * groups thousands with '.' (de_DE style), "1.234" would silently parse as
+ * 1234. The wrappers therefore use boost::lexical_cast only while the global
+ * locale is the classic one (the normal case) and otherwise convert through
+ * explicitly classic-imbued streams, with the special values "inf"/"infinity"
+ * and "nan" handled by hand because stream extraction does not parse them
+ * portably. Second, boost::lexical_cast, like libc++'s stream \c num_get,
+ * rejects the smallest subnormals on Apple/libc++ (e.g. \c denorm_min()),
+ * reporting the underflow as an error; the same classic-locale stream
+ * conversion rescues those. Revisit once std::from_chars for floating-point
+ * types is universally available.
  *
  * \ingroup Core
  */
@@ -26,85 +41,123 @@ found in the LICENSE file.
 #ifndef mitkLexicalCast_h
 #define mitkLexicalCast_h
 
+#include <mitkExceptionMacro.h>
+
 #include <boost/lexical_cast.hpp>
+
+#include <limits>
+#include <locale>
+#include <sstream>
+#include <string>
 
 namespace mitk
 {
   /**
-   * \brief Convert a string to a numeric target type with an \c std::istringstream fallback.
+   * \brief Thrown when a string cannot be interpreted as the requested numeric type.
+   */
+  class BadLexicalCast : public Exception
+  {
+  public:
+    mitkExceptionClassMacro(BadLexicalCast, Exception);
+  };
+
+  /**
+   * \brief Convert a string to a numeric target type (locale-independent).
    *
-   * First attempts conversion via \c boost::conversion::detail::try_lexical_convert.
-   * If that fails (e.g. for very small floating-point values on certain compilers),
-   * falls back to parsing via \c std::istringstream.
+   * "inf"/"infinity" and "nan" are recognized case-independently, matching the
+   * output of \ref ToString.
    *
-   * \tparam Target The numeric type to convert to (e.g. \c float, \c double).
+   * \tparam Target The numeric type to convert to (e.g. \c float, \c double, \c int).
    * \param arg The string to convert.
    * \return The converted value of type \a Target.
-   * \throw boost::bad_lexical_cast If neither conversion path succeeds.
+   * \throw BadLexicalCast If the string is not a valid representation of \a Target.
    */
   template <typename Target>
-  inline Target lexical_cast(const std::string &arg)
+  inline Target LexicalCast(const std::string &arg)
   {
-    Target result = Target();
-
-    // Let Boost try to do the lexical cast, which will most probably succeed!
-    if (!boost::conversion::detail::try_lexical_convert(arg, result))
+    if (std::locale() == std::locale::classic())
     {
-      // Fallback to our own conversion using std::istringstream. This happens with
-      // Apple LLVM version 9.1.0 (clang-902.0.39.1) on darwin17.5.0 and very small
-      // floating point numbers like 0.2225e-307.
-      std::istringstream stream(arg);
-      stream.exceptions(std::ios::badbit);
-
       try
       {
-        stream.unsetf(std::ios::skipws);
-        stream.precision(boost::detail::lcast_precision<Target>::value);
-        stream >> result;
+        return boost::lexical_cast<Target>(arg);
       }
-      catch (const std::ios_base::failure &)
+      catch (const boost::bad_lexical_cast &)
       {
-        boost::conversion::detail::throw_bad_cast<std::string, Target>();
+        // Fall through to the stream conversion below, which rescues the
+        // smallest subnormals that boost::lexical_cast rejects on
+        // Apple/libc++ (reported as an underflow error).
       }
     }
+    else if constexpr (std::numeric_limits<Target>::has_infinity)
+    {
+      // boost::lexical_cast is bypassed completely: it converts through the
+      // non-classic global locale. It would have handled the special values,
+      // which stream extraction does not parse portably, so they are handled
+      // by hand (ASCII-only case folding on purpose).
+      std::string token = arg;
+      for (auto &c : token)
+      {
+        if (c >= 'A' && c <= 'Z')
+          c = static_cast<char>(c - 'A' + 'a');
+      }
+
+      Target sign = static_cast<Target>(1);
+      if (!token.empty() && ('+' == token.front() || '-' == token.front()))
+      {
+        if ('-' == token.front())
+          sign = static_cast<Target>(-1);
+
+        token.erase(0, 1);
+      }
+
+      if ("inf" == token || "infinity" == token)
+        return sign * std::numeric_limits<Target>::infinity();
+
+      if ("nan" == token)
+        return std::numeric_limits<Target>::quiet_NaN();
+    }
+
+    // A classic-locale istringstream yields the value even for underflowing
+    // subnormals: the underflow sets failbit, but the whole string is
+    // consumed, so the stream reaches eof. An ordinary parse failure (garbage,
+    // trailing characters, empty input) also sets failbit but stops short of
+    // eof, so require full consumption instead of trusting failbit.
+    Target result{};
+    std::istringstream stream{arg};
+    stream.imbue(std::locale::classic());
+    stream.unsetf(std::ios::skipws);
+    stream >> result;
+
+    if (arg.empty() || !stream.eof())
+      mitkThrowException(BadLexicalCast) << "Cannot interpret \"" << arg << "\" as a number";
 
     return result;
   }
-}
-
-namespace boost
-{
-  /**
-   * \brief Specialization of boost::lexical_cast for string-to-float conversion.
-   *
-   * Delegates to mitk::lexical_cast\<float\> to benefit from the istringstream fallback.
-   */
-  template <>
-  inline float lexical_cast<float, std::string>(const std::string &arg)
-  {
-    return mitk::lexical_cast<float>(arg);
-  }
 
   /**
-   * \brief Specialization of boost::lexical_cast for string-to-double conversion.
+   * \brief Convert a numeric value to its string representation (locale-independent).
    *
-   * Delegates to mitk::lexical_cast\<double\> to benefit from the istringstream fallback.
+   * Infinity and NaN are written as "inf", "-inf" and "nan". The result reads
+   * back to the original value via \ref LexicalCast.
+   *
+   * \tparam Source The numeric type to convert from.
+   * \param value The value to convert.
+   * \return The string representation of \a value.
    */
-  template <>
-  inline double lexical_cast<double, std::string>(const std::string &arg)
+  template <typename Source>
+  inline std::string ToString(const Source &value)
   {
-    return mitk::lexical_cast<double>(arg);
-  }
+    if (std::locale() == std::locale::classic())
+      return boost::lexical_cast<std::string>(value);
 
-  /**
-   * \brief Specialization of boost::lexical_cast for string-to-long-double conversion.
-   *
-   * Delegates to mitk::lexical_cast\<long double\> to benefit from the istringstream fallback.
-   */
-  template <>
-  inline long double lexical_cast<long double, std::string>(const std::string &arg)
-  {
-    return mitk::lexical_cast<long double>(arg);
+    // boost::lexical_cast writes through the non-classic global locale, which
+    // would apply digit grouping and its decimal separator. The precision
+    // matches the round-trip precision boost::lexical_cast uses.
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream.precision(std::numeric_limits<Source>::max_digits10);
+    stream << value;
+    return stream.str();
   }
 }
 

@@ -39,9 +39,9 @@ namespace mitk
 
         auto *element = doc.NewElement("vector");
         Vector3D point = prop->GetValue();
-        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]).c_str());
-        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]).c_str());
-        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]).c_str());
+        element->SetAttribute("x", mitk::ToString(point[0]).c_str());
+        element->SetAttribute("y", mitk::ToString(point[1]).c_str());
+        element->SetAttribute("z", mitk::ToString(point[2]).c_str());
         return element;
       }
       else
@@ -67,7 +67,7 @@ namespace mitk
       {
         StringsToNumbers<double>(3, v_str, v);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch (mitk::BadLexicalCast &e)
       {
         MITK_ERROR << "Could not parse strings as numbers: " << e.what();
         return nullptr;

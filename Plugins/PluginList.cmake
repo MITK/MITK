@@ -19,7 +19,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
   org.mitk.gui.qt.mxnmultiwidgeteditor:OFF
-  org.mitk.gui.qt.chartExample:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.datastorageviewertest:OFF
@@ -37,6 +36,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.remeshing:OFF
+  org.mitk.gui.qt.segmentation.helper:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.renderwindowmanager:OFF

@@ -60,7 +60,7 @@ void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *)
   this->m_Pen = vtkSmartPointer<vtkPen>::New();
 }
 
-void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
+int mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
   ///* This is a temporary fix because the rendering of planar figures causes problems when two windows try to show the
   // same figure, which can happen a lot when using the MxNMultiWidget. Therefore, rendering is completely
@@ -71,7 +71,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   //if (std::regex_search(renderer->GetName(), match, pattern))
   //  return;
 
-  if (type != mitk::VtkPropRenderer::Overlay) return;
+  if (type != mitk::VtkPropRenderer::Overlay) return 0;
   if (!this->m_Initialized)
   {
     this->Initialize(renderer);
@@ -81,7 +81,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
-    return;
+    return 0;
 
 
   // Obtain the associated vtkRenderWindow
@@ -89,14 +89,14 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   if (!vtkRenderer)
   {
     MITK_WARN << "No valid vtkRenderer found.";
-    return;
+    return 0;
   }
 
   auto glRenderWindow = dynamic_cast<vtkOpenGLRenderWindow*>(vtkRenderer->GetRenderWindow());
   if (!glRenderWindow || !glRenderWindow->IsCurrent())
   {
     MITK_WARN << "OpenGL context is not current or render window invalid. Skipping draw.";
-    return;
+    return 0;
   }
 
   vtkNew<vtkOpenGLContextDevice2D> device;
@@ -112,7 +112,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   // Check if PlanarFigure has already been placed; otherwise, do nothing
   if (!planarFigure->IsPlaced())
   {
-    return;
+    return 0;
   }
 
   // Get 2D geometry frame of PlanarFigure
@@ -120,7 +120,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   if (planarFigurePlaneGeometry == nullptr)
   {
     MITK_ERROR << "PlanarFigure does not have valid PlaneGeometry!";
-    return;
+    return 0;
   }
 
   // Get current world 2D geometry from renderer
@@ -138,13 +138,13 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
     {
       // Planes are not parallel or renderer plane is not within PlanarFigure
       // geometry bounds --> exit
-      return;
+      return 0;
     }
   }
   else
   {
     // Plane is not valid (curved reformations are not possible yet)
-    return;
+    return 0;
   }
 
   // Apply visual appearance properties from the PropertyList
@@ -201,6 +201,8 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   }
 
   context2D->End();
+
+  return 1;
 }
 
 void mitk::PlanarFigureMapper2D::PaintPolyLine(const PlanarFigure::PolyLineType& vertices,

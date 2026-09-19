@@ -1,57 +1,133 @@
-# MitkMatchImage User Guide {#MitkMatchImagePage}
+# MitkMatchImage {#MitkMatchImagePage}
 
 [TOC]
 
 ## Overview
 
-**MitkMatchImage** is a lightweight, command-line image registration tool built using the **MITK** (Medical Imaging Interaction Toolkit) and **MatchPoint** libraries. This tool enables users to register a moving image to a target image using a specified registration algorithm and supports advanced configurations like masking and parameter tuning.
-It is often used together with the application MitkMapImage which allows applying a registration to an image and map it accordingly into the target space.
+MitkMatchImage registers a moving image onto a target image with a deployed
+MatchPoint registration algorithm and stores the resulting registration in a
+file. It does not resample the moving image; the registration file is meant to
+be applied afterwards with [MitkMapImage](@ref MitkMapImagePage) (map a single
+image or segmentation) or [MitkStitchImages](@ref MitkStitch3DImagesPage) (map
+and fuse several images into one).
 
-**Features**
-
-- Register images using a plugin-based algorithm.
-- Apply optional image masks for targeted registration.
-- Accepts custom algorithm parameters via JSON input.
-- Supports multi-label image segmentation.
-- Outputs registration results as a file.
+The registration algorithm is not built into the application. It is loaded at
+runtime from a MatchPoint deployment library (a `.dll`, `.so` or `.dylib`
+file). MITK ships a set of such libraries next to its executables; their file
+names start with `mdra-` (e.g. `mdra-<version>_MITK_MultiModal_rigid_default`).
+Optional masks restrict the image regions the algorithm evaluates, and
+algorithm parameters can be set through a JSON string.
 
 ## Usage
 
 ```bash
-MitkMatchImage -m <movingImage> -t <targetImage> -a <algorithmDLL> -o <outputFile> [optional parameters]
+MitkMatchImage -m <moving> -t <target> -a <algorithm library> -o <registration.mapr> [options]
 ```
 
-### Required Arguments
+### Required arguments
 
-| Argument | Short | Description |
-|----------|-------|-------------|
-| `--moving` | `-m` | Path to the moving image file. |
-| `--target` | `-t` | Path to the target image file. |
-| `--algorithm` | `-a` | Path to the deployed registration algorithm DLL. |
-| `--output` | `-o` | Output file for the computed registration result. |
+| Argument | Short | Type | Description |
+|----------|-------|------|-------------|
+| `--moving` | `-m` | File | Image that should be registered onto the target. |
+| `--target` | `-t` | File | Image that defines the target space of the registration. |
+| `--algorithm` | `-a` | File | Deployed MatchPoint registration algorithm library. |
+| `--output` | `-o` | File | Registration file to write. Use the `.mapr` extension. |
 
-### Optional Arguments
+### Optional arguments
 
-| Argument | Short | Description |
-|----------|-------|-------------|
-| `--moving_mask` | `-mm` | Mask for the moving image. |
-| `--moving_mask_label` | `-mml` | Label name to extract from the moving mask if it is a MITK Segmentation with multiple labels. |
-| `--target_mask` | `-tm` | Mask for the target image. |
-| `--target_mask_label` | `-tml` | Label name to extract from the target mask if it is a MITK Segmentation with multiple labels. |
-| `--parameters` | `-p` | JSON string of algorithm parameters. |
-| `--help` | `-h` | Show help text. |
+| Argument | Short | Type | Default | Description |
+|----------|-------|------|---------|-------------|
+| `--moving_mask` | `-mm` | File | | Mask (image or multi-label segmentation) that restricts the moving image region used for registration. |
+| `--moving_mask_label` | `-mml` | String | | Name of the label to use if the moving mask is a multi-label segmentation with more than one label. |
+| `--target_mask` | `-tm` | File | | Mask (image or multi-label segmentation) that restricts the target image region used for registration. |
+| `--target_mask_label` | `-tml` | String | | Name of the label to use if the target mask is a multi-label segmentation with more than one label. |
+| `--parameters` | `-p` | String | | JSON object with algorithm parameters as key-value pairs. |
+| `--help` | `-h` | Flag | | Show the help text and exit. |
 
-## Example
+## Details
+
+### Algorithm library
+
+The library must be a MatchPoint deployment library (built with MatchPoint's
+deployment support). On start the application prints the algorithm identifier
+(UID) of the loaded library and reports algorithm events (initializing,
+starting, stopping condition, finalizing) on the console while the
+registration runs.
+
+Moving and target images are passed to the algorithm as they are if the
+algorithm accepts their pixel types. Otherwise they are cast to the pixel type
+the algorithm expects. Algorithms that cannot work on images at all cause the
+application to fail.
+
+### Time steps
+
+Only the first time step of the moving and of the target image is used. If an
+image has more than one time step, this is reported on the console.
+
+### Masks
+
+A mask file may contain a plain image or an MITK multi-label segmentation.
+For a multi-label segmentation the mask is derived as follows:
+
+- exactly one label: that label is used;
+- several labels and no label name given: the first label is used and a
+  message is printed;
+- several labels and a label name given: the label with that name is searched
+  in all groups. If no label or more than one label has that name, the
+  application fails.
+
+Masks are only passed on if the algorithm implements MatchPoint's masked
+registration interface and the mask dimension matches the algorithm's
+dimension. Otherwise the masks are ignored without a message.
+
+### Parameters
+
+The value of `--parameters` must be a JSON object. Each key must name a
+writable meta property of the loaded algorithm. The application fails with a
+message if the JSON string cannot be parsed, if a key is unknown to the
+algorithm (the message lists all known property names), if the property is not
+writable, or if the value cannot be converted to the property type. Supported
+property types are integers (`int`, `unsigned int`, `long`, `unsigned long`),
+floating point values (`float`, `double`), `bool`, strings, and arrays of
+`double`. If the algorithm does not support meta properties at all, the
+parameters are ignored with a warning.
+
+Which properties an algorithm offers depends on the library. Passing an
+unknown key is a convenient way to get the list of known properties printed.
+
+### Output
+
+The registration is written with the MatchPoint registration writer, which is
+selected by the `.mapr` extension. The file contains the registration only,
+not a resampled image.
+
+## Examples
+
+### Rigid registration with a shipped algorithm
 
 ```bash
-MitkMatchImage   -m lungCT_moving.nii.gz   -t lungCT_target.nii.gz   -a rigidReg.dll   -o outputReg.mapr   -mm movingSeg.nrrd   -mml "lung"   -tm targetSeg.nrrd   -tml "lung"   -p '{"maxIterations": 200, "tolerance": 1e-6}'
+MitkMatchImage -m pet.nrrd -t ct.nrrd -a mdra-0-14_MITK_MultiModal_rigid_default.dll -o pet_to_ct.mapr
 ```
 
-**What happens**:  
-Registred the moving image `lungCT_moving.nii.gz` onto the target image `lungCT_target.nii.gz` by using the registration algorithm provided by `rigidReg.dll`. The algorithm will use a moving segmentation `movingSeg.nrrd` and a target segmentation `targetSeg.nrrd` to guide the registration. Both segmentations are supposed to be multi-label, so the label `lung` is selected for both. The resulting registration is stored in `outputReg.mapr`. The registration algorithm is also configured by passing some explicit parameter settings.
+Registers `pet.nrrd` onto `ct.nrrd` with the shipped multi-modal rigid
+algorithm (adjust the version part of the file name to your installation) and
+writes the registration to `pet_to_ct.mapr`.
 
-## Notes
+### Masked registration with multi-label segmentations
 
-- **DLL Compatibility:** Ensure the algorithm DLL is compiled with MatchPoint deployment support.
-- **Masks:** When using multi-label segmentations, specify a label name to extract the right region.
-- **Time Series:** Only the first time step of a 4D image is considered.
+```bash
+MitkMatchImage -m followup_ct.nrrd -t baseline_ct.nrrd -a mdra-0-14_MITK_MultiModal_rigid_default.dll -o followup_to_baseline.mapr -mm followup_seg.nrrd -mml "Liver" -tm baseline_seg.nrrd -tml "Liver"
+```
+
+Both masks are multi-label segmentations; the label named `Liver` is
+extracted from each and passed to the algorithm as moving and target mask.
+
+### Passing algorithm parameters
+
+```bash
+MitkMatchImage -m t2.nrrd -t t1.nrrd -a mdra-0-14_MITK_MultiModal_affine_default.dll -o t2_to_t1.mapr -p "{\"MaximumIterations\": 500}"
+```
+
+Sets the meta property `MaximumIterations` of the algorithm before the
+registration starts. The property names depend on the algorithm; the
+application prints the known names if an unknown key is passed.

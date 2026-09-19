@@ -15,9 +15,8 @@ found in the LICENSE file.
 #include <gdcmGlobal.h>
 #include <gdcmDicts.h>
 
-#include <boost/algorithm/string.hpp>
-
 #include <mitkLog.h>
+#include <mitkStringUtil.h>
 #include <dcmtk/ofstd/ofstd.h>
 
 mitk::DICOMTag
@@ -130,7 +129,7 @@ void mitk::DICOMStringToOrientationVectors( const std::string& s,
   try
   {
     std::vector<std::string> strs;
-    boost::split( strs, s, boost::is_any_of( "\\" ) );
+    strs = mitk::Split(s, '\\');
     if ( strs.size() == 6 )
     {
       int i = 0;
@@ -166,7 +165,7 @@ mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarTyp
   try
   {
     std::vector<std::string> strs;
-    boost::split( strs, s, boost::is_any_of( "\\" ) );
+    strs = mitk::Split(s, '\\');
     if ( strs.size() > 1 )
     {
       spacingY = OFStandard::atof( strs[0].c_str() );
@@ -190,7 +189,7 @@ mitk::Point3D mitk::DICOMStringToPoint3D( const std::string& s, bool& successful
   try
   {
     std::vector<std::string> strs;
-    boost::split( strs, s, boost::is_any_of( "\\" ) );
+    strs = mitk::Split(s, '\\');
     if ( strs.size() == 3 )
     {
       for ( int i = 0; i < 3; ++i )

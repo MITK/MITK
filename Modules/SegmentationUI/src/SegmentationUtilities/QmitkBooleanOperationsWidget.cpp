@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <QmitkBooleanOperationsWidget.h>
 #include <ui_QmitkBooleanOperationsWidgetControls.h>
 
+#include <QmitkStyleManager.h>
+
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
@@ -21,6 +23,8 @@ found in the LICENSE file.
 #include <mitkProgressBar.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
+
+#include <QSignalBlocker>
 
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
@@ -48,11 +52,15 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
 
   m_Controls->labelInspector->SetMultiSelectionMode(true);
 
+  m_Controls->clearSelectionButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+
   connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkBooleanOperationsWidget::OnSegSelectionChanged);
 
   connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
     this, &QmitkBooleanOperationsWidget::OnLabelSelectionChanged);
+
+  connect(m_Controls->clearSelectionButton, &QPushButton::clicked, this, &QmitkBooleanOperationsWidget::OnClearSelectionButtonClicked);
 
   connect(m_Controls->differenceButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnDifferenceButtonClicked);
   connect(m_Controls->intersectionButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnIntersectionButtonClicked);
@@ -70,9 +78,17 @@ QmitkBooleanOperationsWidget::~QmitkBooleanOperationsWidget()
 void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/)
 {
   auto node = m_Controls->segNodeSelector->GetSelectedNode();
-  m_Controls->labelInspector->SetMultiLabelNode(node);
-  m_Controls->line1stLabel->SetMultiLabelNode(node);
-  m_Controls->lineOtherLabels->SetMultiLabelNode(node);
+
+  // Setting the node on the inspector emits CurrentSelectionChanged synchronously while it recovers
+  // a selection during the model reset. If that reaches ConfigureWidgets before line1stLabel /
+  // lineOtherLabels have their segmentation, they receive a selection with no segmentation set. Assign
+  // all three nodes with the inspector's signals blocked, then configure once from the settled state.
+  {
+    QSignalBlocker blockInspectorSignals(m_Controls->labelInspector);
+    m_Controls->labelInspector->SetMultiLabelNode(node);
+    m_Controls->line1stLabel->SetMultiLabelNode(node);
+    m_Controls->lineOtherLabels->SetMultiLabelNode(node);
+  }
 
   this->ConfigureWidgets();
 }
@@ -105,9 +121,16 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
     m_Controls->lineOtherLabels->SetSelectedLabels(otherLabelValues);
   }
 
+  m_Controls->clearSelectionButton->setEnabled(!selectedLabelValues.empty());
   m_Controls->differenceButton->setEnabled(selectedLabelValues.size()>1);
   m_Controls->intersectionButton->setEnabled(selectedLabelValues.size() > 1);
   m_Controls->unionButton->setEnabled(selectedLabelValues.size() > 1);
+}
+
+void QmitkBooleanOperationsWidget::OnClearSelectionButtonClicked()
+{
+  m_Controls->labelInspector->SetSelectedLabels({});
+  this->ConfigureWidgets();
 }
 
 void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()

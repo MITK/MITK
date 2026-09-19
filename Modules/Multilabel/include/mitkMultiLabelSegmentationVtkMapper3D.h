@@ -56,6 +56,7 @@ namespace mitk
    *   - "org.mitk.multilabel.3D.smoothed" (BoolProperty)
    *   - "/org.mitk.views.segmentation" -> "activate 3D rendering" preference
    *   - "/org.mitk.views.segmentation" -> "3D rendering smoothed" preference
+   *   - "/org.mitk.views.segmentation" -> "opacity factor" preference
    *   - LabelHighlightGuard properties to fade non-highlighted labels
    *
    * \ingroup Mapper
@@ -138,6 +139,14 @@ namespace mitk
 
       /** \brief Pointer to the segmentation preferences. */
       IPreferences* m_SegPreferences;
+
+      /** \brief The "opacity factor" preference value baked into the current LUT.
+       *
+       * The factor is a global preference, not a node property, so it carries no
+       * MTime. Caching the applied value lets Update()/GenerateDataForRenderer detect
+       * a change and rebuild the LUT, mirroring m_LastSmoothed / m_3DRenderingPreference.
+       */
+      float m_LastOpacityFactor;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

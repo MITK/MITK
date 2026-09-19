@@ -21,12 +21,14 @@ found in the LICENSE file.
 namespace mitk
 {
     /**
-     * \brief Computes image statistics, optionally restricted by one or two masks.
+     * \brief Computes image statistics, optionally restricted by a mask.
      *
      * ImageStatisticsCalculator is the central class for computing pixel statistics
      * on MITK images. It supports single images and time-series images, and can
-     * restrict computation to regions defined by one or two MaskGenerator instances
-     * (combined via pixel-wise AND).
+     * restrict computation to the regions defined by a MaskGenerator. Statistics
+     * are computed per label value of the mask; label value 0 is the background
+     * and skipped. Several criteria (e.g. a region of interest and ignored pixel
+     * values) are combined by chaining generators with AndMaskGenerator.
      *
      * Computed statistics include: mean, standard deviation, variance, minimum,
      * maximum, RMS, skewness, kurtosis, MPP (mean of positive pixels), entropy,
@@ -37,6 +39,7 @@ namespace mitk
      *
      * \sa ImageStatisticsContainer
      * \sa MaskGenerator
+     * \sa AndMaskGenerator
      * \sa HistogramStatisticsCalculator
      */
     class MITKIMAGESTATISTICS_EXPORT ImageStatisticsCalculator: public itk::Object
@@ -71,24 +74,13 @@ namespace mitk
         void SetInputImage(const mitk::Image* image);
 
         /**
-         * \brief Set the primary mask generator for restricting statistics computation.
+         * \brief Set the mask generator for restricting statistics computation.
          *
          * If no mask is desired, pass nullptr to clear the mask.
          *
          * \param[in] mask Pointer to a MaskGenerator, or nullptr.
          */
         void SetMask(mitk::MaskGenerator* mask);
-
-        /**
-         * \brief Set a secondary mask generator for additional region restriction.
-         *
-         * When set, the secondary mask is combined with the primary mask via
-         * pixel-wise AND operation. The secondary mask does not need to be the
-         * same size as the primary, but they must have some spatial overlap.
-         *
-         * \param[in] mask Pointer to a secondary MaskGenerator, or nullptr.
-         */
-        void SetSecondaryMask(mitk::MaskGenerator* mask);
 
         /**
          * \brief Set the number of histogram bins for histogram statistics.
@@ -165,9 +157,6 @@ namespace mitk
 
         mitk::MaskGenerator::Pointer m_MaskGenerator;
         mitk::Image::ConstPointer m_InternalMask;
-
-        mitk::MaskGenerator::Pointer m_SecondaryMaskGenerator;
-        mitk::Image::ConstPointer m_SecondaryMask;
 
         unsigned int m_nBinsForHistogramStatistics;
         double m_binSizeForHistogramStatistics;

@@ -30,13 +30,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Represents a keyboard interaction event.
+   * \brief Represents the press of a keyboard key.
    *
    * Stores the pressed key (as a string, including special key constants from
    * InteractionEvent) and the modifier keys held during the event. Two
    * InteractionKeyEvents are considered equal if they have the same key
-   * and the same modifiers.
+   * and the same modifiers. The release of a key is represented by
+   * InteractionKeyReleaseEvent.
    *
+   * \sa InteractionKeyReleaseEvent
    * \sa InteractionEvent
    * \sa InteractionPositionEvent
    * \ingroup Interaction

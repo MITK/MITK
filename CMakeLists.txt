@@ -34,12 +34,6 @@ cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION}...${MITK_C
  ]]
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
-if(POLICY CMP0167)
-  # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
-  # The FindBoost module is removed.
-  cmake_policy(SET CMP0167 OLD)
-endif()
-
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
@@ -51,7 +45,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2025.12.99)
+  project(MITK VERSION 2026.06.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -59,7 +53,17 @@ endif()
 # MITK Extension Feature
 #-----------------------------------------------------------------------------
 
-set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+set(MITK_EXTENSION_DIRS "" CACHE PATH "")
+
+# MITK_EXTENSION_DIRS may be provided with native backslashes (for example
+# "D:\MyExtension" on Windows). Normalize them to forward slashes; otherwise the
+# raw value is written verbatim into the generated MITK-Configure initial cache
+# file, where CMake rejects a backslash as an invalid escape sequence.
+# The PATH type only improves the CMake GUI (directory picker); the value is
+# still a string, so a semicolon-separated list of directories keeps working.
+string(REPLACE "\\" "/" _mitk_extension_dirs "${MITK_EXTENSION_DIRS}")
+set(MITK_EXTENSION_DIRS "${_mitk_extension_dirs}" CACHE PATH "" FORCE)
+unset(_mitk_extension_dirs)
 
 unset(MITK_ABSOLUTE_EXTENSION_DIRS)
 
@@ -327,23 +331,19 @@ if(MITK_USE_Qt6)
     Concurrent
     Core
     Core5Compat
-    CoreTools
-    Designer
-    DesignerComponentsPrivate
     Gui
     Help
     LinguistTools
     Network
     OpenGL
     OpenGLWidgets
+    PrintSupport
     Qml
     Sql
     StateMachine
     Svg
     ToolsTools
     UiTools
-    WebEngineCore
-    WebEngineWidgets
     Widgets
     Xml
   )
@@ -439,7 +439,28 @@ else()
   find_package(OpenSSL 3)
 endif()
 
-set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
+# MITK's own header-only Boost usage. The dependency closure of these libraries
+# (and of the compiled ones below) is resolved and provisioned automatically.
+set(_mitk_minimum_boost_libraries "lexical_cast;preprocessor;uuid")
+set(MITK_USE_Boost_HEADER_LIBRARIES "${_mitk_minimum_boost_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)")
+
+# MITK cannot build without its minimum header set. Restore any of these
+# libraries that were individually removed from the cache value, while keeping
+# any extra libraries the user added.
+set(_boost_header_libraries ${MITK_USE_Boost_HEADER_LIBRARIES})
+set(_restored_boost_libraries FALSE)
+foreach(_lib IN LISTS _mitk_minimum_boost_libraries)
+  if(NOT _lib IN_LIST _boost_header_libraries)
+    list(APPEND _boost_header_libraries ${_lib})
+    set(_restored_boost_libraries TRUE)
+  endif()
+endforeach()
+if(_restored_boost_libraries)
+  set(MITK_USE_Boost_HEADER_LIBRARIES "${_boost_header_libraries}" CACHE STRING "Semicolon-separated Boost libraries used header-only (dependency closure resolved automatically)" FORCE)
+endif()
+
+# Boost libraries that are compiled and linked (none by default; e.g. process).
+set(MITK_USE_Boost_COMPILED_LIBRARIES "" CACHE STRING "Semicolon-separated Boost libraries to compile and link (dependency closure resolved automatically)")
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
   set(openssl_message "Could not find OpenSSL.\n")
@@ -624,6 +645,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(MITK_ROOT_FOLDER "MITK" CACHE STRING "")
 mark_as_advanced(MITK_ROOT_FOLDER)
 
+# Collect the helper targets that CMake generates for AUTOMOC/AUTOUIC/AUTORCC
+# (<target>_autogen, <target>_autogen_timestamp_deps, RCC) into one folder
+# instead of scattering them next to the real targets. Global property, so it
+# is a single folder for the whole solution.
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "${MITK_ROOT_FOLDER}/Autogen")
+
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
@@ -670,6 +697,13 @@ if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   # cannot cope with a postfix yet.
   #set(CMAKE_DEBUG_POSTFIX d)
 endif()
+
+# MITK does not use C++20 named modules or "import std;". At C++20 the compiler
+# toolchain scans every source for module dependencies by default, a per-target
+# cost that buys nothing here. Disabling it cut a full clean build by about 14%
+# in our measurements (Visual Studio 2026 / MSVC). Applies to the MITK build,
+# not the SuperBuild. Re-enable if MITK ever adopts C++20 modules.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 #-----------------------------------------------------------------------------
 # Output directories.
@@ -992,6 +1026,48 @@ set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
+
+# Isolate configure-time Python probes (e.g. FindPython3's NumPy
+# component) from user site-packages, so numpy resolves against MITK's
+# standalone Python instead of a shadowing user-site install.
+set(ENV{PYTHONNOUSERSITE} 1)
+
+# FindPython3 caches the artifacts it discovered. The superbuild stages every
+# CPython version to the same location, so those entries survive a switch of
+# MITK_Python3_VERSION and end up inconsistent: the interpreter is re-probed,
+# but a cached path to the previous version's runtime library is not, which
+# makes the Development component fail to be found. Discard what FindPython3
+# owns whenever the version changes and let it search again.
+#
+# Matched by prefix rather than by name: which entries the module caches is an
+# implementation detail that differs between CMake versions and platforms,
+# while namespacing them after the package is not. Entries naming an
+# interpreter or a root directory are kept, because they are the input to the
+# new search rather than a result of the old one.
+if(MITK_USE_Python3 AND DEFINED MITK_Python3_VERSION AND
+   NOT MITK_Python3_VERSION STREQUAL MITK_Python3_CACHED_VERSION)
+  get_cmake_property(_cache_variables CACHE_VARIABLES)
+
+  foreach(_cache_variable IN LISTS _cache_variables)
+    if(_cache_variable MATCHES "^_?Python3?_" AND
+       NOT _cache_variable MATCHES "_(EXECUTABLE|ROOT_DIR)$")
+      unset(${_cache_variable} CACHE)
+    endif()
+  endforeach()
+
+  # pybind11's FindPythonLibsNew caches the module suffix under its own prefix.
+  foreach(_cache_variable PYTHON_IS_DEBUG PYTHON_MODULE_DEBUG_POSTFIX PYTHON_MODULE_EXTENSION)
+    unset(${_cache_variable} CACHE)
+  endforeach()
+
+  if(MITK_Python3_CACHED_VERSION)
+    message(STATUS "Embedded CPython changed from ${MITK_Python3_CACHED_VERSION} to "
+      "${MITK_Python3_VERSION}, discarded cached Python3 artifacts")
+  endif()
+
+  set(MITK_Python3_CACHED_VERSION "${MITK_Python3_VERSION}" CACHE INTERNAL
+    "CPython version the cached Python3 artifacts in this build tree belong to")
+endif()
 
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)

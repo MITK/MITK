@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QmitkLevelWindowRangeChangeDialog.h>
 
 // qt
+#include <QActionGroup>
 #include <QCursor>
 
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f)
@@ -125,33 +126,15 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
 {
   if (imageAction == m_AutoTopmostAction)
   {
-    if (m_Manager->IsAutoTopMost() == false)
-    {
-      m_Manager->SetAutoTopMostImage(true);
-      m_SelectedImagesAction->setChecked(false);
-    }
-    else
-    {
-      m_Manager->SetAutoTopMostImage(false);
-    }
+    m_Manager->SetMode(mitk::LevelWindowManager::Mode::TopMostImage);
   }
-  else if(imageAction == m_SelectedImagesAction)
+  else if (imageAction == m_SelectedImagesAction)
   {
-    if (m_Manager->IsSelectedImages() == false)
-    {
-      m_Manager->SetSelectedImages(true);
-      m_AutoTopmostAction->setChecked(false);
-    }
-    else
-    {
-      m_Manager->SetSelectedImages(false);
-    }
+    m_Manager->SetMode(mitk::LevelWindowManager::Mode::SelectedImage);
   }
-  else
+  else if (auto image = m_Images.find(imageAction); image != m_Images.end())
   {
-    m_AutoTopmostAction->setChecked(false);
-    m_SelectedImagesAction->setChecked(false);
-    m_Manager->SetLevelWindowProperty(m_Images.at(imageAction));
+    m_Manager->SetLevelWindowProperty(image->second);
   }
 }
 
@@ -180,8 +163,8 @@ void QmitkLevelWindowWidgetContextMenu::GetContextMenu(QMenu *contextMenu)
     contextMenu->addAction(tr("Default scale range"), this, &QmitkLevelWindowWidgetContextMenu::OnSetDefaultScaleRange);
     contextMenu->addSeparator();
 
-    m_PresetSubmenu = new QMenu(this);
-    m_PresetSubmenu->setTitle("Presets");
+    m_PresetSubmenu = new QMenu(contextMenu);
+    m_PresetSubmenu->setTitle(tr("Presets"));
     m_PresetAction = m_PresetSubmenu->addAction(tr("Preset definition"), this, &QmitkLevelWindowWidgetContextMenu::OnAddPreset);
     m_PresetSubmenu->addSeparator();
     std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
@@ -194,27 +177,26 @@ void QmitkLevelWindowWidgetContextMenu::GetContextMenu(QMenu *contextMenu)
     connect(m_PresetSubmenu, &QMenu::triggered, this, &QmitkLevelWindowWidgetContextMenu::OnSetPreset);
     contextMenu->addMenu(m_PresetSubmenu);
     contextMenu->addSeparator();
-    m_ImageSubmenu = new QMenu(this);
-    m_ImageSubmenu->setTitle("Images");
+    m_ImageSubmenu = new QMenu(contextMenu);
+    m_ImageSubmenu->setTitle(tr("Images"));
 
-    // add action for "auto topmost image" action
-    m_AutoTopmostAction = m_ImageSubmenu->addAction(tr("Set topmost image"));
+    const auto mode = m_Manager->GetMode();
+    auto *imageGroup = new QActionGroup(m_ImageSubmenu);
+
+    m_AutoTopmostAction = m_ImageSubmenu->addAction(tr("Topmost visible image"));
     m_AutoTopmostAction->setCheckable(true);
-    if (m_Manager->IsAutoTopMost())
-    {
-      m_AutoTopmostAction->setChecked(true);
-    }
+    m_AutoTopmostAction->setChecked(mitk::LevelWindowManager::Mode::TopMostImage == mode);
+    imageGroup->addAction(m_AutoTopmostAction);
 
-    // add action for "selected images" action
-    m_SelectedImagesAction = m_ImageSubmenu->addAction(tr("Use selected images"));
+    m_SelectedImagesAction = m_ImageSubmenu->addAction(tr("Selected image"));
     m_SelectedImagesAction->setCheckable(true);
-    if (m_Manager->IsSelectedImages())
-    {
-      m_SelectedImagesAction->setChecked(true);
-    }
+    m_SelectedImagesAction->setChecked(mitk::LevelWindowManager::Mode::SelectedImage == mode);
+    imageGroup->addAction(m_SelectedImagesAction);
 
-    // add action for individual images
     m_ImageSubmenu->addSeparator();
+
+    m_Images.clear();
+    const auto *currentNode = m_Manager->GetCurrentNode();
 
     mitk::DataStorage::SetOfObjects::ConstPointer allObjects = m_Manager->GetRelevantNodes();
     for (mitk::DataStorage::SetOfObjects::ConstIterator objectIter = allObjects->Begin();
@@ -245,16 +227,11 @@ void QmitkLevelWindowWidgetContextMenu::GetContextMenu(QMenu *contextMenu)
 
       if (levelWindowProperty.IsNotNull())
       {
-        std::string name;
-        node->GetName(name);
-        QString item = name.c_str();
-        QAction *id = m_ImageSubmenu->addAction(item);
-        id->setCheckable(true);
-        m_Images[id] = levelWindowProperty;
-        if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
-        {
-          id->setChecked(true);
-        }
+        QAction *imageAction = m_ImageSubmenu->addAction(QString::fromStdString(node->GetName()));
+        imageAction->setCheckable(true);
+        imageAction->setChecked(mitk::LevelWindowManager::Mode::ExplicitImage == mode && node == currentNode);
+        imageGroup->addAction(imageAction);
+        m_Images[imageAction] = levelWindowProperty;
       }
     }
 

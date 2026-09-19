@@ -173,6 +173,7 @@ private:
   mitk::InteractionEvent::MouseButtons GetEventButton(QMouseEvent *me) const;
   mitk::InteractionEvent::MouseButtons GetButtonState(QMouseEvent *me) const;
   mitk::InteractionEvent::ModifierKeys GetModifiers(QInputEvent *me) const;
+  mitk::InteractionEvent::ModifierKeys GetModifiers(QKeyEvent *ke) const;
   mitk::InteractionEvent::MouseButtons GetButtonState(QWheelEvent *we) const;
   std::string GetKeyLetter(QKeyEvent *ke) const;
   int GetDelta(QWheelEvent *we) const;

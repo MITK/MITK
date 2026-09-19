@@ -32,8 +32,6 @@ class QmitkModuleTableModelPrivate;
  * Provides four columns: ID, Name, Version, and Location. Listens for
  * module events and automatically updates when modules are loaded or unloaded.
  * Unloaded modules are displayed with gray text. Tooltips show detailed module info.
- *
- * \sa QmitkModulesDialog
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkModuleTableModel : public QAbstractTableModel
 {

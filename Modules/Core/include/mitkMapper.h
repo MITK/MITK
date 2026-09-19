@@ -92,8 +92,9 @@ namespace mitk
      *
      * \param[in] renderer The renderer to render into.
      * \param[in] type The render pass type.
+     * \return Number of props rendered.
      */
-    virtual void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) = 0;
+    virtual int MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) = 0;
 
     /**
      * \brief Apply color and opacity properties read from the PropertyList to the rendering actor.

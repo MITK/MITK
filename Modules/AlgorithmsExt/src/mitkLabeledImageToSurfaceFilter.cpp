@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <vtkImageChangeInformation.h>
 #include <vtkImageGaussianSmooth.h>
 #include <vtkImageMarchingCubes.h>
-#include <vtkImageThreshold.h>
+#include <vtkImageBinaryThreshold.h>
 #include <vtkLinearTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPolyData.h>
@@ -164,12 +164,16 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface(int time,
   indexCoordinatesImageFilter->SetInputData(vtkimage);
   indexCoordinatesImageFilter->SetOutputOrigin(0.0, 0.0, 0.0);
 
-  vtkImageThreshold *threshold = vtkImageThreshold::New();
+  vtkImageBinaryThreshold *threshold = vtkImageBinaryThreshold::New();
   threshold->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort());
   // indexCoordinatesImageFilter->Delete();
+  threshold->SetThresholdFunction(vtkImageBinaryThreshold::THRESHOLD_BETWEEN);
+  threshold->SetLowerThreshold(label);
+  threshold->SetUpperThreshold(label);
+  threshold->ReplaceInOn();
   threshold->SetInValue(100);
+  threshold->ReplaceOutOn();
   threshold->SetOutValue(0);
-  threshold->ThresholdBetween(label, label);
   threshold->SetOutputScalarTypeToUnsignedChar();
   threshold->ReleaseDataFlagOn();
 

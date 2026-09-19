@@ -385,11 +385,6 @@ bool EditorReference::SetInput(IEditorInput::Pointer input)
       // of playing nice.
       if (expectingInputChange)
       {
-
-        // Log the fact that this editor is broken
-        this->ReportMalfunction(
-            "Editor is not firing a PROP_INPUT event in response to IReusableEditor.setInput(...)"); //$NON-NLS-1$
-
         // Fire the property for free (can't be relied on since there are other ways the input
         // can change, but we do it here to be consistent with older versions of the workbench)
         FirePropertyChange(IWorkbenchPartConstants::PROP_INPUT);

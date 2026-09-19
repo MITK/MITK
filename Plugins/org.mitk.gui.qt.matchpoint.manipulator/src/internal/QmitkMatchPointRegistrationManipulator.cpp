@@ -61,8 +61,6 @@ found in the LICENSE file.
 
 #include <itkCompositeTransform.h>
 
-#include <boost/math/constants/constants.hpp>
-
 #include <ui_QmitkMatchPointRegistrationManipulator.h>
 
 const std::string QmitkMatchPointRegistrationManipulator::VIEW_ID =

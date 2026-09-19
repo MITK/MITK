@@ -26,6 +26,16 @@ namespace mitk::PythonHelper
   // This header is auto-generated from mitkPythonHelper.h.in by CMake.
   // To make changes, modify mitkPythonHelper.h.in instead.
 
+  /** \brief Version of the CPython embedded in MITK (MITK_Python3_VERSION).
+   *
+   * Virtual environments are created from that interpreter, so these values also
+   * describe every venv MITK manages. Exposed here rather than read from
+   * <Python.h> so that code deciding on version-dependent package requirements
+   * needs no dependency on Python itself.
+   */
+  constexpr int VERSION_MAJOR = @Python3_VERSION_MAJOR@;
+  constexpr int VERSION_MINOR = @Python3_VERSION_MINOR@;
+
   MITKPYTHONHELPER_EXPORT fs::path GetHomePath();
   MITKPYTHONHELPER_EXPORT fs::path GetLibraryPath();
   MITKPYTHONHELPER_EXPORT fs::path GetExecutablePath();

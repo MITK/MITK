@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkDataNode.h>
-#include <mitkCoreObjectFactory.h>
+#include <mitkMapperProviderRegistry.h>
 #include <vtkTransform.h>
 
 #include <mitkGroupTagProperty.h>
@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkStringProperty.h>
 //#include "mitkMaterialProperty.h"
 #include <mitkColorProperty.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkGenericProperty.h>
 #include <mitkGeometry3D.h>
 #include <mitkImageSource.h>
@@ -36,12 +35,10 @@ mitk::Mapper *mitk::DataNode::GetMapper(MapperSlotId id) const
 {
   if ((id >= m_Mappers.size()) || (m_Mappers[id].IsNull()))
   {
-    if (id >= m_Mappers.capacity())
-    {
-      //      int i, size=id-m_Mappers.capacity()+10;
+    if (id >= m_Mappers.size())
       m_Mappers.resize(id + 10);
-    }
-    m_Mappers[id] = CoreObjectFactory::GetInstance()->CreateMapper(const_cast<DataNode *>(this), id);
+
+    m_Mappers[id] = MapperProviderRegistry::GetInstance().CreateMapper(const_cast<DataNode *>(this), id);
   }
   return m_Mappers[id];
 }
@@ -69,13 +66,13 @@ void mitk::DataNode::SetData(mitk::BaseData *baseData)
       {
         m_Data = baseData;
         this->GetPropertyList()->Clear();
-        mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+        MapperProviderRegistry::GetInstance().ApplyDefaultProperties(this);
       }
     }
     else
     {
       m_Data = baseData;
-      mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+      MapperProviderRegistry::GetInstance().ApplyDefaultProperties(this);
     }
 
     m_DataReferenceChangedTime.Modified();

@@ -263,7 +263,7 @@ MITK uses `qt_generate_deploy_app_script()` only on macOS (for `.app` bundles). 
 
 **Windows**: Uses `qt_generate_deploy_script()` with `qt_deploy_runtime_dependencies()`. The `--no-opengl-sw` option is passed to `windeployqt` to skip the software OpenGL fallback. If OpenSSL is available, its root directory is passed via `--openssl-root`.
 
-After deployment, a post-install step moves `resources/` and `translations/` directories from the install prefix root into `bin/`, because `windeployqt` places them at the prefix root level and provides no option to change this.
+After deployment, a post-install step moves the `translations/` directory from the install prefix root into `bin/`, because `windeployqt` places it at the prefix root level and provides no option to change this.
 
 **Linux**: Uses `qt_generate_deploy_script()` with overridden `QT_DEPLOY_*` variables so that everything goes under `bin/` instead of the default FHS-style directories:
 
@@ -279,22 +279,16 @@ set(QT_DEPLOY_DATA_DIR "bin")
 
 Without these overrides, Qt would deploy libraries to `lib/`, executables to `libexec/`, plugins to `plugins/` at the prefix root, etc. — scattering files across the install tree and breaking MITK's RPATH-based portable layout.
 
-These overrides also affect internal deployment hooks (e.g. the WebEngine deployment hook), which is critical: it ensures that `QtWebEngineProcess`, resource `.pak` files, and locale data all land under `bin/` rather than at the prefix root.
+### qt.conf on Linux
 
-### The qt.conf Problem on Linux
-
-After the Qt deploy script runs on Linux, `qt.conf` is overwritten. The reason: Qt's WebEngine deployment hook generates `qt.conf` with an **absolute staging path** as the prefix (e.g. `/tmp/cpack-staging/install/bin`). This makes the deployment non-relocatable.
-
-The fixup overwrites it with a correct relative prefix:
+A post-install step writes `qt.conf` into `bin/` with a relative prefix:
 
 ```ini
 [Paths]
 Prefix = .
 ```
 
-Since `qt.conf` lives in `bin/` and the prefix is `.`, Qt looks for plugins at `bin/plugins/`, QML modules at `bin/qml/`, etc. — all relative to `bin/`.
-
-This fixup is fragile. If Qt's internal deployment hooks change their `qt.conf` generation behavior in a future version, the overwrite may need to be adjusted.
+Since `qt.conf` lives in `bin/` and the prefix is `.`, Qt looks for plugins at `bin/plugins/`, QML modules at `bin/qml/`, etc. — all relative to `bin/`. Writing it explicitly guarantees a relative prefix, since the Qt deploy script can otherwise leave an absolute staging path (e.g. `/tmp/cpack-staging/install/bin`), which would make the package non-relocatable.
 
 ## RPATH Configuration
 
@@ -352,7 +346,7 @@ Wrapper scripts launch MITK executables from the install root. They exist becaus
 
 | Script | Used by | Behavior |
 |---|---|---|
-| `RunInstalledWin32App.bat` | BlueBerry apps | `start "" /B "%~dp0bin\%~n0.exe" -style windowsvista %*` — launches detached with Qt style |
+| `RunInstalledWin32App.bat` | BlueBerry apps | `start "" /B "%~dp0bin\%~n0.exe" %*`: launches detached (the app sets its own Qt style) |
 | `RunInstalledApp.bat` | Regular executables | `"%~dp0bin\%~n0.exe" %*` — direct launch from root |
 | `RunInstalledCmdLineApp.bat` | Command-line apps | `"%~dp0..\bin\%~n0.exe" %*` — launch from `apps/` subdirectory |
 
@@ -469,8 +463,6 @@ External projects register their library paths via `mitkFunctionAddLibrarySearch
 │   │   ├── org_blueberry_*.dll/.so
 │   │   ├── imageformats/          # Qt plugin subdirectories
 │   │   └── platforms/
-│   ├── resources/                  # Qt WebEngine resources
-│   │   └── *.pak
 │   └── translations/              # Qt translations
 └── python/                         # Python distribution (if enabled)
     ├── bin/ or python.exe
@@ -524,32 +516,9 @@ MITK's own code (modules, executables, CppMicroServices, CTK/BlueBerry plugins) 
 
 ## External Project Special Cases
 
-### Boost DLL Relocation (Windows)
+### Boost
 
-Boost builds its DLLs into `lib/`. A post-install step (`Boost-post_install-WIN32.cmake`) moves them to `bin/` so they are found alongside other DLLs:
-
-```cmake
-file(GLOB boost_dlls boost_*.dll)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ../bin)
-foreach(boost_dll ${boost_dlls})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${boost_dll} ../bin)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${boost_dll})
-endforeach()
-```
-
-### Boost macOS RPATH
-
-Boost does not follow the common practice of using `@rpath` for inter-library references on macOS. A post-install step (`Boost-post_install-APPLE.cmake`) fixes this with `install_name_tool`:
-
-```cmake
-foreach(boost_dylib ${boost_dylibs})
-  execute_process(COMMAND install_name_tool -id @rpath/${boost_dylib} ${boost_dylib})
-  foreach(other_boost_dylib ${boost_dylibs})
-    execute_process(COMMAND install_name_tool -change ${other_boost_dylib}
-      @rpath/${other_boost_dylib} ${boost_dylib})
-  endforeach()
-endforeach()
-```
+Boost is provisioned through its own CMake support rather than b2 (see `CMakeExternals/Boost.cmake`). Two cache variables declare which libraries MITK needs: `MITK_USE_Boost_HEADER_LIBRARIES` for libraries used header-only and `MITK_USE_Boost_COMPILED_LIBRARIES` for libraries that are compiled and linked (none by default; e.g. `process`). The dependency closure of both sets is resolved from a committed map (`CMakeExternals/Boost/boost-deps.cmake`) and fetched sparse and shallow, so only the needed modules are downloaded. Header-only libraries are copied into `include/boost`; only the compiled set (and its genuine compiled dependencies) is built with `BoostRoot`, so a default MITK build compiles no Boost library at all. Compiled libraries install through CMake's `install(TARGETS ...)`, so shared libraries land in the conventional locations, DLLs in `bin/` and import libraries in `lib/` on Windows, `.so`/`.dylib` in `lib/` on Unix, with the superbuild's shared `CMAKE_INSTALL_RPATH`. The former post-install steps that moved Boost DLLs from `lib/` to `bin/` on Windows and rewrote install names with `install_name_tool` on macOS are therefore no longer needed and have been removed. To add a Boost library, append it to the appropriate cache variable; no build files need editing.
 
 ### External CMake Project Installation
 
@@ -707,14 +676,12 @@ The current install system replaced several legacy approaches:
 
 - **macOS autoload modules in Python**: The `FixMacOSInstaller.cmake` `@loader_path` fix does not cover autoload modules. Importing `mitk` in a standalone Python interpreter on macOS will not load autoload modules. Running Python as a subprocess of an MITK application works correctly.
 
-- **Qt WebEngine `qt.conf` on Linux**: The Qt WebEngine deployment hook writes `qt.conf` with an absolute staging path. A post-install step overwrites it, but this is fragile and depends on the hook's behavior not changing across Qt versions.
-
 ## File Reference
 
 | File | Purpose |
 |---|---|
 | `CMake/mitkInstallRules.cmake` | Central install orchestration: CppMicroServices, Python, dependency resolution, Qt deployment loop |
-| `CMake/mitkFunctionDeployQt.cmake` | `mitkFunctionDeployQt()` — Qt plugin, qt.conf, and WebEngine deployment |
+| `CMake/mitkFunctionDeployQt.cmake` | `mitkFunctionDeployQt()` — Qt plugin and qt.conf deployment |
 | `CMake/mitkFunctionCreateModule.cmake` | `mitk_create_module()` — module install rules and RPATH overrides |
 | `CMake/mitkMacroCreateExecutable.cmake` | `mitk_create_executable()` — executable install rules and wrapper scripts |
 | `CMake/mitkFunctionCreateCommandLineApp.cmake` | `mitkFunctionCreateCommandLineApp()` — wraps `mitk_create_executable()` with MitkCommandLine dependency |
@@ -736,8 +703,6 @@ The current install system replaced several legacy approaches:
 | `CMake/RunInstalledCmdLineApp.bat` | Windows wrapper for command-line apps |
 | `CMake/RunInstalledApp.sh` | Linux wrapper for regular executables and BlueBerry apps |
 | `CMake/RunInstalledCmdLineApp.sh` | Linux wrapper for command-line apps |
-| `CMakeExternals/Boost-post_install-WIN32.cmake` | Moves Boost DLLs from `lib/` to `bin/` |
-| `CMakeExternals/Boost-post_install-APPLE.cmake` | Fixes Boost inter-library references to use `@rpath` |
 | `Modules/CppMicroServices/cmake/usFunctionEmbedResources.cmake` | APPEND and LINK mode resource embedding into shared libraries |
 | `Modules/CppMicroServices/cmake/usFunctionAddResources.cmake` | Creates ZIP archives from resource files for embedding |
 | `Modules/CppMicroServices/cmake/usFunctionCheckResourceLinking.cmake` | Platform capability detection for LINK mode; sets `US_DEFAULT_RESOURCE_MODE` |

@@ -39,8 +39,8 @@ namespace mitk
       for (auto iter = scalarOpacityPoints.begin(); iter != scalarOpacityPoints.end(); ++iter)
       {
         auto *pointel = doc.NewElement("point");
-        pointel->SetAttribute("x", boost::lexical_cast<std::string>(iter->first).c_str());
-        pointel->SetAttribute("y", boost::lexical_cast<std::string>(iter->second).c_str());
+        pointel->SetAttribute("x", mitk::ToString(iter->first).c_str());
+        pointel->SetAttribute("y", mitk::ToString(iter->second).c_str());
         scalarOpacityPointlist->InsertEndChild(pointel);
       }
       element->InsertEndChild(scalarOpacityPointlist);
@@ -50,8 +50,8 @@ namespace mitk
       for (auto iter = gradientOpacityPoints.begin(); iter != gradientOpacityPoints.end(); ++iter)
       {
         auto *pointel = doc.NewElement("point");
-        pointel->SetAttribute("x", boost::lexical_cast<std::string>(iter->first).c_str());
-        pointel->SetAttribute("y", boost::lexical_cast<std::string>(iter->second).c_str());
+        pointel->SetAttribute("x", mitk::ToString(iter->first).c_str());
+        pointel->SetAttribute("y", mitk::ToString(iter->second).c_str());
         gradientOpacityPointlist->InsertEndChild(pointel);
       }
       element->InsertEndChild(gradientOpacityPointlist);
@@ -66,12 +66,12 @@ namespace mitk
         double myVal[6];
         ctf->GetNodeValue(i, myVal);
         auto *pointel = doc.NewElement("point");
-        pointel->SetAttribute("x", boost::lexical_cast<std::string>(myVal[0]).c_str());
-        pointel->SetAttribute("r", boost::lexical_cast<std::string>(myVal[1]).c_str());
-        pointel->SetAttribute("g", boost::lexical_cast<std::string>(myVal[2]).c_str());
-        pointel->SetAttribute("b", boost::lexical_cast<std::string>(myVal[3]).c_str());
-        pointel->SetAttribute("midpoint", boost::lexical_cast<std::string>(myVal[4]).c_str());
-        pointel->SetAttribute("sharpness", boost::lexical_cast<std::string>(myVal[5]).c_str());
+        pointel->SetAttribute("x", mitk::ToString(myVal[0]).c_str());
+        pointel->SetAttribute("r", mitk::ToString(myVal[1]).c_str());
+        pointel->SetAttribute("g", mitk::ToString(myVal[2]).c_str());
+        pointel->SetAttribute("b", mitk::ToString(myVal[3]).c_str());
+        pointel->SetAttribute("midpoint", mitk::ToString(myVal[4]).c_str());
+        pointel->SetAttribute("sharpness", mitk::ToString(myVal[5]).c_str());
         pointlist->InsertEndChild(pointel);
       }
       element->InsertEndChild(pointlist);
@@ -141,7 +141,7 @@ namespace mitk
         const char* y = pointElement->Attribute("y");
         if (nullptr == x || nullptr == y)
           return nullptr;
-        tf->AddScalarOpacityPoint(boost::lexical_cast<double>(x), boost::lexical_cast<double>(y));
+        tf->AddScalarOpacityPoint(mitk::LexicalCast<double>(x), mitk::LexicalCast<double>(y));
       }
 
       auto *gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
@@ -159,7 +159,7 @@ namespace mitk
         const char* y = pointElement->Attribute("y");
         if (nullptr == x || nullptr == y)
           return nullptr;
-        tf->AddGradientOpacityPoint(boost::lexical_cast<double>(x), boost::lexical_cast<double>(y));
+        tf->AddGradientOpacityPoint(mitk::LexicalCast<double>(x), mitk::LexicalCast<double>(y));
       }
 
       auto *rgbPointlist = element->FirstChildElement("Color");
@@ -186,15 +186,15 @@ namespace mitk
         const char* sharpness = pointElement->Attribute("sharpness");
         if (nullptr == x || nullptr == r || nullptr == g || nullptr == b || nullptr == midpoint || nullptr == sharpness)
           return nullptr;
-        ctf->AddRGBPoint(boost::lexical_cast<double>(x),
-                         boost::lexical_cast<double>(r),
-                         boost::lexical_cast<double>(g),
-                         boost::lexical_cast<double>(b),
-                         boost::lexical_cast<double>(midpoint),
-                         boost::lexical_cast<double>(sharpness));
+        ctf->AddRGBPoint(mitk::LexicalCast<double>(x),
+                         mitk::LexicalCast<double>(r),
+                         mitk::LexicalCast<double>(g),
+                         mitk::LexicalCast<double>(b),
+                         mitk::LexicalCast<double>(midpoint),
+                         mitk::LexicalCast<double>(sharpness));
       }
     }
-    catch (boost::bad_lexical_cast &e)
+    catch (mitk::BadLexicalCast &e)
     {
       MITK_ERROR << "Could not parse string as number: " << e.what();
 

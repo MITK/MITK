@@ -137,7 +137,7 @@ void mitk::SegWithPreviewTool::Activated()
   {
     this->GetToolManager()->ActivateTool(-1);
   }
-  m_IsPreviewGenerated = false;
+  m_HasUnconfirmedPreview = false;
 }
 
 void mitk::SegWithPreviewTool::Deactivated()
@@ -183,6 +183,10 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
   }
 
   CreateResultSegmentationFromPreview();
+
+  // Cleared before ConfirmCleanUp() so a tool that regenerates a preview in that
+  // hook ends up flagged again.
+  m_HasUnconfirmedPreview = false;
 
   RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -643,7 +647,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;
-  m_IsPreviewGenerated = false;
+  m_HasUnconfirmedPreview = false;
   this->UpdatePrepare();
 
   const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
@@ -701,7 +705,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
       RenderingManager::GetInstance()->RequestUpdateAll();
       if (!previewImage->GetAllLabelValues().empty())
       { // check if labels exits for the preview
-        m_IsPreviewGenerated = true;
+        m_HasUnconfirmedPreview = true;
       }
     }
   }
@@ -873,5 +877,5 @@ mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetTargetSegmentation() 
 
 bool mitk::SegWithPreviewTool::ConfirmBeforeDeactivation()
 {
-  return m_IsPreviewGenerated && m_RequestDeactivationConfirmation;
+  return m_HasUnconfirmedPreview && m_RequestDeactivationConfirmation;
 }

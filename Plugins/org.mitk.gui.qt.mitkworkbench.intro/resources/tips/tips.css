@@ -1,0 +1,49 @@
+/* Style sheet shared by the workbench welcome tips. It is linked from each
+   tip HTML document in this folder and rendered by QmitkHtmlWidget.
+
+   Keep the body background in sync with TIP_CARD_COLOR in
+   QmitkMitkWorkbenchIntroPart.cpp so each tip blends into its rounded card. */
+
+body {
+  background-color: #3f3f46;
+  color: #f1f1f1;
+  font-family: "Roboto", "Open Sans", sans-serif;
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 0;
+}
+
+h2 {
+  font-size: 24px;
+  margin: 0 0 8px 0;
+}
+
+h3 {
+  font-size: 18px;
+  text-align: center;
+  margin: 4px 0;
+}
+
+p {
+  margin: 8px 0;
+}
+
+.tip-content {
+  overflow: hidden;
+}
+
+.center {
+  display: block;
+  margin: 0 auto;
+}
+
+.cell {
+  background-color: #2d2d30;
+  padding: 8px 16px;
+  vertical-align: top;
+}
+
+.float-left {
+  float: left;
+  margin-right: 32px;
+}

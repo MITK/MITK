@@ -4,9 +4,19 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.gui.qt.pet.suvcalculation"
           name="PET SUV Calculation View"
-		  category="PET"
+          category="PET"
           class="QmitkPETSUVCalculationView"
-          icon="resources/petsuv.png" />
+          icon="resources/petsuv.png" >
+      <description>Convert a PET image into a Standardized Uptake Value (SUV) image.</description>
+      <keywordReference id="org.mitk.gui.qt.pet.suvcalculation.ViewKeyword"/>
+    </view>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.pet.suvcalculation.ViewKeyword" label="PET" />
+    <keyword id="org.mitk.gui.qt.pet.suvcalculation.ViewKeyword" label="SUV" />
+    <keyword id="org.mitk.gui.qt.pet.suvcalculation.ViewKeyword" label="Standardized Uptake Value" />
+    <keyword id="org.mitk.gui.qt.pet.suvcalculation.ViewKeyword" label="Quantification" />
   </extension>
 
 </plugin>

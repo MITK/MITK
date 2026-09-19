@@ -21,7 +21,6 @@ found in the LICENSE file.
 #include <mitkInteractionConst.h>
 #include <mitkNumericTypes.h>
 #include <mitkRotationOperation.h>
-#include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
 
 #include <cstdlib>
@@ -45,12 +44,6 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
-
-// use this to create the test volume on the fly
-#define CREATE_VOLUME
-
-// use this to save the created volume
-//#define SAVE_VOLUME
 
 // use this to calculate the error from the sphere mathematical model to our pixel based one
 //#define CALC_TESTFAILURE_DEVIATION
@@ -638,40 +631,8 @@ public:
   /* create a sphere with the size of the given testVolumeSize*/
   static void InitializeTestVolume()
   {
-#ifdef CREATE_VOLUME
-
     // do sphere creation
     ItkVolumeGeneration();
-
-#ifdef SAVE_VOLUME
-    // save in file
-    mitk::ImageWriter::Pointer writer = mitk::ImageWriter::New();
-    writer->SetInput(TestVolume);
-
-    std::string file;
-
-    std::ostringstream filename;
-    filename << "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\sphere_";
-    filename << TestvolumeSize;
-    filename << ".nrrd";
-
-    file = filename.str();
-
-    writer->SetFileName(file);
-    writer->Update();
-#endif // SAVE_VOLUME
-
-#endif
-
-#ifndef CREATE_VOLUME // read from file
-
-    mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-
-    std::string filename = locator->FindFile("sphere_512.nrrd.mhd", "Modules/ImageExtraction/Testing/Data");
-
-    TestVolume = mitk::IOUtil::Load<mitk::Image>(filename);
-
-#endif
 
 #ifdef CALC_TESTFAILURE_DEVIATION
     // get the TestFailureDeviation in %

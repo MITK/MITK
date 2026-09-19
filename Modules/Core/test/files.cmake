@@ -21,7 +21,6 @@ set(MODULE_TESTS
 
   ################# RUNNING TESTS ###################################################
   mitkAccessByItkTest.cpp
-  mitkCoreObjectFactoryTest.cpp
   mitkDataNodeTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
@@ -46,6 +45,7 @@ set(MODULE_TESTS
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkLevelWindowTest.cpp
+  mitkMapperProviderRegistryTest.cpp
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
@@ -90,6 +90,7 @@ set(MODULE_TESTS
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
+  mitkITKThreadingHelperTest.cpp
   mitkUIDGeneratorTest.cpp
   mitkPlanePositionManagerTest.cpp
   mitkAffineTransformBaseTest.cpp
@@ -130,6 +131,7 @@ set(MODULE_TESTS
   mitkPropertyJsonSerializationTest.cpp
   mitkDataStorageServiceTest.cpp
   mitkStringUtilTest.cpp
+  mitkBase64Test.cpp
 )
 
 set(MODULE_RENDERING_TESTS

@@ -41,7 +41,7 @@ function(mitkFunctionCreateCommandLineApp)
 
   if(NOT CMDAPP_NAME)
     message(FATAL_ERROR "NAME argument cannot be empty.")
-    # mitk_create_module(EXECUTABLE) also relies on CMDADD_NAME, do not rename.
+    # mitk_create_module(EXECUTABLE) also relies on CMDAPP_NAME, do not rename.
   endif()
 
   if(NOT CMDAPP_CPP_FILES)
@@ -56,7 +56,7 @@ function(mitkFunctionCreateCommandLineApp)
   mitk_create_executable(${CMDAPP_NAME}
   DEPENDS MitkCommandLine ${CMDAPP_DEPENDS}
   PACKAGE_DEPENDS ${CMDAPP_PACKAGE_DEPENDS}
-  TARGET_DEPENDS ${TARGET_DEPENDS}
+  TARGET_DEPENDS ${CMDAPP_TARGET_DEPENDS}
   CPP_FILES ${CMDAPP_CPP_FILES}
   ${_CMDAPP_OPTIONS}
   )

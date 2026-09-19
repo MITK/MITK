@@ -45,7 +45,6 @@ found in the LICENSE file.
 #include "internal/handlers/berryCloseAllPerspectivesHandler.h"
 #include "internal/handlers/berryClosePerspectiveHandler.h"
 #include "internal/handlers/berryDynamicHelpHandler.h"
-#include "internal/handlers/berryHelpContentsHandler.h"
 #include "internal/handlers/berryIntroHandler.h"
 #include "internal/handlers/berryOpenInNewWindowHandler.h"
 #include "internal/handlers/berryNewEditorHandler.h"
@@ -401,7 +400,6 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenPerspectivePropertyTester, context)
   BERRY_REGISTER_EXTENSION_CLASS(PerspectiveParameterValues, context)
 
-  BERRY_REGISTER_EXTENSION_CLASS(HelpContentsHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(DynamicHelpHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(IntroHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenInNewWindowHandler, context)

@@ -127,6 +127,10 @@ namespace mitk
     static const std::string KeyPageUp;   ///< "PageUp" key constant.
     static const std::string KeyPageDown; ///< "PageDown" key constant.
     static const std::string KeySpace;    ///< "Space" key constant.
+
+    static const std::string KeyControl;  /**< "Control" key constant (modifier key). */
+    static const std::string KeyShift;    /**< "Shift" key constant (modifier key). */
+    static const std::string KeyAlt;      /**< "Alt" key constant (modifier key). */
     ///@}
 
   protected:

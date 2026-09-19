@@ -33,13 +33,6 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   QmitkExtWorkbenchWindowAdvisor* advisor = new
     QmitkExtWorkbenchWindowAdvisor(this, configurer);
 
-  // Exclude the help perspective from org.blueberry.ui.qt.help from
-  // the normal perspective list.
-  // The perspective gets a dedicated menu entry in the help menu
-  QList<QString> excludePerspectives;
-  excludePerspectives.push_back("org.blueberry.perspectives.help");
-  advisor->SetPerspectiveExcludeList(excludePerspectives);
-
   // Exclude some views from the normal view list
   QList<QString> excludeViews;
   excludeViews.push_back("org.mitk.views.modules");

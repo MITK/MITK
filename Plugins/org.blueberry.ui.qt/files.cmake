@@ -217,7 +217,6 @@ set(INTERNAL_CPP_FILES
   handlers/berryCloseAllPerspectivesHandler.cpp
   handlers/berryClosePerspectiveHandler.cpp
   handlers/berryDynamicHelpHandler.cpp
-  handlers/berryHelpContentsHandler.cpp
   handlers/berryIntroHandler.cpp
   handlers/berryNewEditorHandler.cpp
   handlers/berryOpenInNewWindowHandler.cpp
@@ -470,7 +469,6 @@ set(MOC_H_FILES
   src/internal/handlers/berryCloseAllPerspectivesHandler.h
   src/internal/handlers/berryClosePerspectiveHandler.h
   src/internal/handlers/berryDynamicHelpHandler.h
-  src/internal/handlers/berryHelpContentsHandler.h
   src/internal/handlers/berryIntroHandler.h
   src/internal/handlers/berryNewEditorHandler.h
   src/internal/handlers/berryOpenInNewWindowHandler.h

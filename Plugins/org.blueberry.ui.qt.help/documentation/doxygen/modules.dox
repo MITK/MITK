@@ -19,8 +19,8 @@
   
   - \b org/blueberry/help/CONTEXTHELP_REQUESTED signals a request for showing context
     sensitive help. If no properties are attached to the event, a qthelp url is constructed
-    using the currently active part ID from the workbench. If the url is invalid, the
-    home page is shown instead.
+    using the currently active part ID from the workbench. If no manual can be resolved
+    for the active part, no page is shown.
     <br><br>
     Supported event properties are:
       - \e url Show the given url

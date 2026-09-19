@@ -3,7 +3,7 @@ SET(ALGORITHM_PROFILE_UID_Name "LevelSetMotion.3D.multiRes.default")
 SET(ALGORITHM_PROFILE_UID_Version "1.0.0")
 
 SET(ALGORITHM_PROFILE_Description "This algorithm is an default option for monomodal deformable problem statements in DIPP. Deformable 3D registration algorithm based on an level set motion approach and using a 4 level multi resolution approach to get faster and more robust results. This algorithm is only suitable for mono modal tasks.")
-SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; mitk-users@lists.sourceforge.net")
+SET(ALGORITHM_PROFILE_Contact "Ralf Floca\; https://github.com/MITK/MITK/issues")
 SET(ALGORITHM_PROFILE_Citation "B.C. Vemuri, J. Ye, Y. Chen, C.M. Leonard.: Image registration via level-set motion: applications to atlas-based segmentation. Medical Image Analysis. Vol. 7. pp. 1-20. 2003.")
 
 SET(ALGORITHM_PROFILE_DataType "Image")

@@ -48,12 +48,12 @@ found in the LICENSE file.
 #include <mitkMaskedDynamicImageStatisticsGenerator.h>
 #include <mitkExtractTimeGrid.h>
 #include <mitkInitialParameterizationDelegateBase.h>
+#include <mitkStringUtil.h>
 
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QmitkDataStorageComboBox.h>
 #include <QFileDialog>
-#include <boost/tokenizer.hpp>
 
 
 // Includes for image casting between ITK and MITK
@@ -927,7 +927,6 @@ void PETDynamicView::LoadAIFfromFile()
 
   std::string m_aifFilePath = fileName.toStdString();
   //Read Input
-  typedef boost::tokenizer< boost::escaped_list_separator<char> > Tokenizer;
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //AIF Data
 
@@ -944,8 +943,7 @@ void PETDynamicView::LoadAIFfromFile()
 
   while (getline(in1, line1))
   {
-    Tokenizer tok(line1);
-    vec1.assign(tok.begin(), tok.end());
+    vec1 = mitk::Split(line1, ',');
 
     if (vec1.size() < 2)
     {

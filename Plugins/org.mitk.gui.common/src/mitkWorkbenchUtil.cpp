@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
+#include <berryIViewRegistry.h>
 #include <berryCoreException.h>
 
 #include "mitkDataStorageEditorInput.h"
@@ -24,7 +25,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkCoreServices.h>
 #include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
@@ -480,6 +480,27 @@ namespace mitk {
     }
 
     return true;
+  }
+
+  bool WorkbenchUtil::IsViewAvailable(const QString& viewId)
+  {
+    if (!berry::PlatformUI::IsWorkbenchRunning())
+      return false;
+
+    return berry::PlatformUI::GetWorkbench()->GetViewRegistry()->Find(viewId).IsNotNull();
+  }
+
+  QStringList WorkbenchUtil::FilterAvailableViewIds(const QStringList& viewIds)
+  {
+    QStringList availableViewIds;
+
+    for (const auto& viewId : viewIds)
+    {
+      if (IsViewAvailable(viewId))
+        availableViewIds.append(viewId);
+    }
+
+    return availableViewIds;
   }
 
 } // namespace mitk

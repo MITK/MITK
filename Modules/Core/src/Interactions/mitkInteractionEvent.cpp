@@ -42,6 +42,10 @@ const std::string mitk::InteractionEvent::KeyPageUp = "PageUp";
 const std::string mitk::InteractionEvent::KeyPageDown = "PageDown";
 const std::string mitk::InteractionEvent::KeySpace = "Space";
 
+const std::string mitk::InteractionEvent::KeyControl = "Control";
+const std::string mitk::InteractionEvent::KeyShift = "Shift";
+const std::string mitk::InteractionEvent::KeyAlt = "Alt";
+
 mitk::InteractionEvent::InteractionEvent(BaseRenderer *baseRenderer) : m_Sender(baseRenderer)
 {
 }

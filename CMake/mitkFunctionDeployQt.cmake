@@ -1,8 +1,8 @@
 #
 # Deploy Qt runtime dependencies for a target.
 #
-# This installs Qt plugins, shared libraries, qt.conf, and platform-specific
-# resources (e.g. QtWebEngine on Linux). Called centrally from mitkInstallRules
+# This installs Qt plugins, shared libraries, and qt.conf. Called centrally from
+# mitkInstallRules
 # AFTER runtime dependencies have been deployed, so that windeployqt can trace
 # transitive Qt dependencies from MITK DLLs already present in bin/.
 #
@@ -51,9 +51,9 @@ function(mitkFunctionDeployQt _target)
       endif()
     endif()
 
-    # On Linux, override QT_DEPLOY_* variables so that everything (including
-    # the WebEngine deployment hook) goes under bin/ instead of the default
-    # lib/, libexec/, plugins/, translations/ at the prefix root.
+    # On Linux, override QT_DEPLOY_* variables so that everything goes under
+    # bin/ instead of the default lib/, libexec/, plugins/, translations/ at
+    # the prefix root.
     set(_deploy_prefix_overrides "")
     if(LINUX)
       set(_deploy_prefix_overrides "
@@ -94,9 +94,10 @@ qt_deploy_runtime_dependencies(
   endif()
   install(SCRIPT ${_deploy_script})
 
-  # On Linux the WebEngine deployment hook generates qt.conf with an
-  # absolute staging path as prefix. Overwrite it with a correct
-  # relative prefix after the deploy script has run.
+  # On Linux, write qt.conf with a relative prefix so the deployed bin/ layout
+  # stays relocatable: Qt then resolves plugins at bin/plugins/, QML at
+  # bin/qml/, etc. relative to bin/. The Qt deploy script can otherwise leave
+  # an absolute staging path as the prefix.
   if(LINUX)
     install(CODE "
       set(_qt_conf \"\${CMAKE_INSTALL_PREFIX}/bin/qt.conf\")
@@ -106,10 +107,10 @@ qt_deploy_runtime_dependencies(
   endif()
 
   if(WIN32)
-    # windeployqt places resources and translations at the prefix root.
+    # windeployqt places translations at the prefix root.
     # Move them into bin/ to keep everything in one directory.
     install(CODE "
-      foreach(_qt_dir resources translations)
+      foreach(_qt_dir translations)
         set(_root_dir \"\${CMAKE_INSTALL_PREFIX}/\${_qt_dir}\")
         if(IS_DIRECTORY \"\${_root_dir}\")
           message(STATUS \"MITK_DEPLOY: Moving root-level \${_qt_dir}/ to bin/\${_qt_dir}/\")

@@ -15,11 +15,12 @@ found in the LICENSE file.
 
 #include <berryQtViewPart.h>
 
+#include <QHash>
 #include <QModelIndex>
 #include <QListView>
 #include <QUrl>
 
-class ctkSearchBox;
+class QLineEdit;
 class QHelpIndexWidget;
 
 namespace berry {
@@ -101,6 +102,9 @@ private Q_SLOTS:
   void setIndexWidgetBusy();
   void unsetIndexWidgetBusy();
 
+  void buildKeywordMap();
+  void syncSelectionToUrl(const QUrl &url);
+
 private:
 
   bool eventFilter(QObject *obj, QEvent *e) override;
@@ -109,8 +113,10 @@ private:
 
   Q_DISABLE_COPY(HelpIndexView)
 
-  ctkSearchBox* m_SearchLineEdit;
+  QLineEdit* m_SearchLineEdit;
   HelpIndexWidget* m_IndexWidget;
+
+  QHash<QString, QString> m_UrlToKeyword;
 
 };
 

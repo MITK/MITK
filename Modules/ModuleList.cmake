@@ -21,17 +21,16 @@ set(MITK_MODULES
   SceneSerializationBase
   PlanarFigure
   ImageDenoising
-  ImageExtraction
   SceneSerialization
   Gizmo
   GraphAlgorithms
   Multilabel
-  Chart
   ImageStatistics
   ContourModel
   SurfaceInterpolation
   BoundingShape
   Segmentation
+  QtHtml
   QtWidgets
   QtWidgetsExt
   ImageStatisticsUI

@@ -34,7 +34,6 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkSphereSource.h>
-#include <vtkTransformPolyDataFilter.h>
 
 #include <vtkPolyDataAlgorithm.h>
 

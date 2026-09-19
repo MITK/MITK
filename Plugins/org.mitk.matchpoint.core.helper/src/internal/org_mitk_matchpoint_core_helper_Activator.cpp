@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "MatchPointBrowserPreferencesPage.h"
 
 #include <QmitkNodeDescriptorManager.h>
-#include <QmitkStyleManager.h>
+#include <QmitkThemedNodeDescriptor.h>
 #include <mitkNodePredicateDataType.h>
 
 #include <usModuleInitialization.h>
@@ -46,8 +46,8 @@ void org_mitk_matchpoint_core_helper_Activator::start(ctkPluginContext* context)
 
     mitk::NodePredicateDataType::Pointer isMITKRegistrationWrapper =
         mitk::NodePredicateDataType::New("MAPRegistrationWrapper");
-    auto desc = new QmitkNodeDescriptor(QObject::tr("MAPRegistrationWrapper"),
-      QmitkStyleManager::ThemeIcon(QStringLiteral(":/QmitkMatchPointCore/MAPRegData.svg")), isMITKRegistrationWrapper, manager);
+    auto desc = new QmitkThemedNodeDescriptor(QObject::tr("MAPRegistrationWrapper"),
+      QStringLiteral(":/QmitkMatchPointCore/MAPRegData.svg"), isMITKRegistrationWrapper, manager);
 
     manager->AddDescriptor(desc);
 }

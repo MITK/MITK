@@ -33,10 +33,10 @@ std::vector<mitk::TimePointType> timebounds;
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information about the app
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("Fuse 3D to 4D Image");
-    parser.setDescription("MiniApp that allows to fuse several 3D images (with same geometry) into a 3D+t (4D) image that can be processed as dynamic data.");
+    parser.setDescription("Fuses several 3D images with the same geometry into a 3D+t (4D) image that can be processed as dynamic data.");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 
@@ -59,8 +59,7 @@ void setupParser(mitkCommandLineParser& parser)
 
     parser.beginGroup("Optional parameters");
     parser.addArgument(
-        "time", "t", mitkCommandLineParser::StringList, "Time bounds", "Defines the time geometry of the resulting dynamic image in [ms]. The first number is the start time point of the first time step. All other numbers are the max bound of a time step. So the structure is [minBound0 maxBound1 [maxBound2 [... maxBoundN]]]; e.g. \"2 3.5 10\" encodes a time geometry with two time steps and that starts at 2 ms and the second time step starts at 3.5 ms and ends at 10 ms. If not set e proportional time geometry with 1 ms duration will be generated!", us::Any(), true, false, false, mitkCommandLineParser::Input);
-    parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
+        "time", "t", mitkCommandLineParser::StringList, "Time bounds", "Defines the time geometry of the resulting dynamic image in [ms]. The first number is the start time point of the first time step. All other numbers are the max bound of a time step. So the structure is [minBound0 maxBound1 [maxBound2 [... maxBoundN]]]; e.g. \"2 3.5 10\" encodes a time geometry with two time steps and that starts at 2 ms and the second time step starts at 3.5 ms and ends at 10 ms. If not set, a proportional time geometry with 1 ms duration per time step will be generated.", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.endGroup();
     //! [add arguments]
 }
@@ -81,8 +80,13 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
           std::istringstream stream;
           stream.imbue(std::locale("C"));
           stream.str(timeBoundStr);
-          mitk::TimePointType time = 0 ;
+          mitk::TimePointType time = 0;
           stream >> time;
+          if (stream.fail() || !stream.eof())
+          {
+            std::cerr << "Cannot fuse images. Invalid time bound: \"" << timeBoundStr << "\"" << std::endl;
+            return false;
+          }
           timebounds.emplace_back(time);
         }
     }
@@ -102,13 +106,6 @@ int main(int argc, char* argv[])
     {
         return EXIT_FAILURE;
     };
-
-    // Show a help message
-    if (parsedArgs.count("help") || parsedArgs.count("h"))
-    {
-        std::cout << parser.helpText();
-        return EXIT_SUCCESS;
-    }
 
     if (timebounds.empty())
     {

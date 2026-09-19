@@ -27,12 +27,12 @@ This view provides an easy interface to quickly compute some features of a whole
 \section QmitkImageStatisticsUserManualUsage Usage
 
 
-To select the input data, either use the quick selection button (labeled "+"), or select the input data via the "Input Data" tab.
+To select the input data, either use the "Select data..." button at the top of the "Statistics" tab, or pick images and ROIs separately on the "Selected data" tab. Multiple images can be selected as long as they share the same geometry.
 
-\imageMacro{QmitkImageStatistics_InputData.png,"Select the input data via the \"Input data\" tab (marked red) or via the quick selection button (marked yellow)",10}
+\imageMacro{QmitkImageStatistics_InputData.png,"Select the input data via the \"Selected data\" tab (marked red) or via the quick selection button (marked yellow)",10}
 
 \subsection QmitkImageStatisticStatistics Statistics
-After selection of an image or a binary mask as input data, the image statistics are calculated and displayed in the "Statistics" section. If masks (ROIs: segmentations, planarfigures, ...) are selected, the statistics for these masks are shown. For time data the statistics for each time step are calculated correspondingly.
+After selection of an image, the image statistics are calculated and displayed in the "Statistics" section. If ROIs (segmentations or planar figures) are selected, the statistics are restricted to these ROIs and listed per ROI and, for multi-label segmentations, per label. For time data the statistics for each time step are calculated correspondingly.
 
 An example of parts of the calculated statistical features (Mean, Median, StandardDeviation, RMS, Max, MaxPosition, Min, MinPosition, Voxel, Volume [mm^3], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
 
@@ -44,17 +44,17 @@ Check "Ignore zero-valued voxels" to hide voxels with grayvalue zero.
 
 Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
 
-The histogram window is currently only available for a single image and no or one ROI: When selection multiple images and/or multiple masks, the histogram window is deactivated!
+The histogram is only available for a single image with no or one ROI that contains a single label. When multiple images, multiple ROIs, or a segmentation with several labels are selected, the histogram section is hidden.
 
-Draw a rectangular window with a pressed left button to zoom in on the histogram. With a double click in the view area you can zoom out to the default viewport. You can also pan the view in horizontal or vertical direction by dragging with the left mouse button in the respective direction. Additionally, different options like "Custom Zoom", to set the maximum and minimum value, or by adjusting the number of bins, can be used to modify the view.
+Draw a rectangle with the left mouse button to zoom in on the histogram. A right click zooms out one step, Ctrl and right click zooms out to the full range, and the mouse wheel zooms in and out. Pan the view by dragging with the middle mouse button. The visible gray value range is also shown in the "Zoom range" fields below the plot, where you can type an exact range or reset the zoom with the "Reset" button. The number of histogram bins can be changed after unchecking "Use default".
 
-If the mask is not a closed planar figure or a segmentation an intensity profile is created instead of the histogram.
+If the ROI is an open planar figure, such as a line or a path, an intensity profile along the figure is shown instead of the histogram.
 
 A tooltip is available by hovering over one of the bins.
 
 \subsection QmitkImageStatisticsUserManualCopytoClipboard Copy to Clipboard
 
-At the bottom of each view is a "Copy to Clipboard" button, allowing to copy the respective data in csv format to the clipboard.
+The "Statistics" and "Histogram" sections each have a "Copy to clipboard" button, allowing to copy the respective data in tabular text format to the clipboard.
 Be aware of the following information regarding this functionality:
 \li The values are separated by tabulator.
 \li  Numeric values will be converted using the system language (e.g. with German as system language the decimal separator will be ",", with English it will be '.').

@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <mitkApplicationCursor.h>
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
+#include <mitkInteractionKeyEvent.h>
+#include <mitkInteractionKeyReleaseEvent.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkTimeNavigationController.h>
 #include <mitkImageAccessByItk.h>
@@ -75,13 +77,17 @@ mitk::SegTool2D::~SegTool2D()
 
 bool mitk::SegTool2D::FilterEvents(InteractionEvent *interactionEvent, DataNode *)
 {
-  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  // 2D tools operate on the slice shown in a 2D render window. Internal events
+  // are broadcast without a sender.
+  const auto *sender = interactionEvent->GetSender();
 
-  bool isValidEvent =
-    (positionEvent && // Only events of type mitk::InteractionPositionEvent
-     interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D // Only events from the 2D renderwindows
-     );
-  return isValidEvent;
+  if (nullptr == sender || sender->GetMapperID() != BaseRenderer::Standard2D)
+    return false;
+
+  // Besides positions, key events are needed, e.g. to invert a tool while a modifier key is held.
+  return nullptr != dynamic_cast<const InteractionPositionEvent *>(interactionEvent) ||
+         nullptr != dynamic_cast<const InteractionKeyEvent *>(interactionEvent) ||
+         nullptr != dynamic_cast<const InteractionKeyReleaseEvent *>(interactionEvent);
 }
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice(const Image *image,

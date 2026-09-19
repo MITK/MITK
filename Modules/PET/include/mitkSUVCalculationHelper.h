@@ -396,7 +396,7 @@ namespace mitk
     /** Pixel data is already decay-corrected to the radiopharmaceutical
      *  administration time. No further correction is needed. */
     Admin,
-    /** Pixel data is decay-corrected to the Series Time (DICOM (0008,0031)). */
+    /** Pixel data is decay-corrected to a vendor-specific reference time, resolved by the DC=START fallback chain described above. */
     Start,
     /** Pixel data is not decay-corrected. The residual correction uses the
      *  per-slice acquisition date and time. */

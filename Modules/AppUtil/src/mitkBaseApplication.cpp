@@ -47,12 +47,11 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QLibrary>
 #include <QRunnable>
 #include <QSplashScreen>
 #include <QStandardPaths>
 #include <QTime>
-#include <QWebEngineUrlScheme>
-#include <QQuickWindow>
 
 #include <fstream>
 #include <sstream>
@@ -689,12 +688,31 @@ namespace mitk
     // qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
 #endif
 
-    // Prevent conflicts between native OpenGL applications and QWebEngine
-    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-      QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
-#else
-      QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+#ifdef Q_OS_MACOS
+    // macOS reports 72 logical DPI, so point-based font sizes render about
+    // 25% smaller than on Windows and Linux (96 DPI). Pin the font DPI to 96
+    // for a consistent cross-platform text size. Respect an explicit user
+    // override.
+    if (qEnvironmentVariableIsEmpty("QT_FONT_DPI"))
+      qputenv("QT_FONT_DPI", "96");
+
+    // Force the Fusion style on macOS. The native macOS style uses larger
+    // toolbar icons and layout spacing and does not fully honor our style
+    // sheet, so the Workbench looks inconsistent with Windows and Linux.
+    // Fusion is built into Qt Widgets, so no style plugin has to be deployed.
+    // A -style command-line argument still takes precedence.
+    if (qEnvironmentVariableIsEmpty("QT_STYLE_OVERRIDE"))
+      qputenv("QT_STYLE_OVERRIDE", "Fusion");
+#endif
+
+#ifdef Q_OS_WIN
+    // Force the Windows Vista style. Qt's default windows11 style does not play
+    // well with our UI (for example, it miscalculates spin box size hints,
+    // QTBUG-124150, so the spin buttons occlude the value). windowsvista is
+    // built into Qt Widgets, so no style plugin has to be deployed. A -style
+    // command-line argument still takes precedence.
+    if (qEnvironmentVariableIsEmpty("QT_STYLE_OVERRIDE"))
+      qputenv("QT_STYLE_OVERRIDE", "windowsvista");
 #endif
 
     // If parameters have been set before, we have to store them to hand them
@@ -714,10 +732,6 @@ namespace mitk
     qInstallMessageHandler(!d->m_LogQtMessages
       ? outputImportantQtMessage
       : outputQtMessage);
-
-    QWebEngineUrlScheme qtHelpScheme("qthelp");
-    qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
-    QWebEngineUrlScheme::registerScheme(qtHelpScheme);
   }
 
   void BaseApplication::initialize(Poco::Util::Application &self)
@@ -789,7 +803,14 @@ namespace mitk
     //     correct framework properties.
     d->parseProvisioningFile(this->getProvisioningFilePath());
 
-    // 10. Set the CTK Plugin Framework properties
+    // 10. Never unload plug-in libraries. Static data of a plug-in can outlive
+    //     its library, most notably Qt's registry of static plugins: Qt Print
+    //     Support is registered once per plug-in that indirectly depends on it
+    //     and the registry keeps referencing the freed meta data.
+    d->m_FWProps[ctkPluginConstants::FRAMEWORK_PLUGIN_LOAD_HINTS] =
+      QVariant::fromValue<QLibrary::LoadHints>(QLibrary::PreventUnloadHint);
+
+    // 11. Set the CTK Plugin Framework properties
     ctkPluginFrameworkLauncher::setFrameworkProperties(d->m_FWProps);
   }
 

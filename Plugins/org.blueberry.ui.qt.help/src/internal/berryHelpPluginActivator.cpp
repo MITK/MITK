@@ -12,14 +12,10 @@ found in the LICENSE file.
 
 #include "berryHelpPluginActivator.h"
 
-#include "berryHelpContentView.h"
 #include "berryHelpIndexView.h"
-#include "berryHelpSearchView.h"
 #include "berryHelpEditor.h"
 #include "berryHelpEditorInput.h"
 #include "berryHelpEditorInputFactory.h"
-#include "berryHelpPerspective.h"
-#include "berryHelpWebView.h"
 
 #include "berryQHelpEngineConfiguration.h"
 #include "berryQHelpEngineWrapper.h"
@@ -31,189 +27,15 @@ found in the LICENSE file.
 #include <QDir>
 #include <QDateTime>
 #include <QTimer>
-#include <QWebEngineProfile>
-#include <QWebEngineUrlRequestJob>
-#include <QWebEngineUrlSchemeHandler>
-
-namespace
-{
-  class HelpDeviceReply final : public QIODevice
-  {
-  public:
-    HelpDeviceReply(const QUrl& request, const QByteArray& fileData);
-    ~HelpDeviceReply() override;
-
-    qint64 bytesAvailable() const override;
-    void close() override;
-
-  private:
-    qint64 readData(char* data, qint64 maxlen) override;
-    qint64 writeData(const char* data, qint64 maxlen) override;
-
-    QByteArray m_Data;
-    const qint64 m_OrigLen;
-  };
-
-  HelpDeviceReply::HelpDeviceReply(const QUrl&, const QByteArray& fileData)
-    : m_Data(fileData),
-    m_OrigLen(fileData.length())
-  {
-    this->setOpenMode(QIODevice::ReadOnly);
-
-    QTimer::singleShot(0, this, &QIODevice::readyRead);
-    QTimer::singleShot(0, this, &QIODevice::readChannelFinished);
-  }
-
-  HelpDeviceReply::~HelpDeviceReply()
-  {
-  }
-
-  qint64 HelpDeviceReply::bytesAvailable() const
-  {
-    return m_Data.length() + QIODevice::bytesAvailable();
-  }
-
-  void HelpDeviceReply::close()
-  {
-    QIODevice::close();
-    this->deleteLater();
-  }
-
-  qint64 HelpDeviceReply::readData(char* data, qint64 maxlen)
-  {
-    qint64 len = qMin(qint64(m_Data.length()), maxlen);
-
-    if (len)
-    {
-      memcpy(data, m_Data.constData(), len);
-      m_Data.remove(0, len);
-    }
-
-    return len;
-  }
-
-  qint64 HelpDeviceReply::writeData(const char*, qint64)
-  {
-    return 0;
-  }
-
-
-  class HelpUrlSchemeHandler final : public QWebEngineUrlSchemeHandler
-  {
-  public:
-    explicit HelpUrlSchemeHandler(QObject* parent = nullptr);
-    ~HelpUrlSchemeHandler() override;
-
-    void requestStarted(QWebEngineUrlRequestJob* job) override;
-  };
-
-  HelpUrlSchemeHandler::HelpUrlSchemeHandler(QObject* parent)
-    : QWebEngineUrlSchemeHandler(parent)
-  {
-  }
-
-  HelpUrlSchemeHandler::~HelpUrlSchemeHandler()
-  {
-  }
-
-  enum class ResolveUrlResult
-  {
-    Error,
-    Redirect,
-    Data
-  };
-
-  ResolveUrlResult ResolveUrl(const QUrl& url, QUrl& redirectedUrl, QByteArray& data)
-  {
-    auto& helpEngine = berry::HelpPluginActivator::getInstance()->getQHelpEngine();
-
-    const auto targetUrl = helpEngine.findFile(url);
-
-    if (!targetUrl.isValid())
-      return ResolveUrlResult::Error;
-
-    if (targetUrl != url)
-    {
-      redirectedUrl = targetUrl;
-      return ResolveUrlResult::Redirect;
-    }
-
-    data = helpEngine.fileData(targetUrl);
-    return ResolveUrlResult::Data;
-  }
-
-
-  void HelpUrlSchemeHandler::requestStarted(QWebEngineUrlRequestJob* job)
-  {
-    QUrl url = job->requestUrl();
-    QUrl redirectedUrl;
-    QByteArray data;
-
-    switch (ResolveUrl(url, redirectedUrl, data))
-    {
-    case ResolveUrlResult::Data:
-      job->reply(
-        berry::HelpWebView::mimeFromUrl(url).toLatin1(),
-        new HelpDeviceReply(url, data));
-      break;
-
-    case ResolveUrlResult::Redirect:
-      job->redirect(redirectedUrl);
-      break;
-
-    case ResolveUrlResult::Error:
-      job->reply(
-        QByteArrayLiteral("text/html"),
-        new HelpDeviceReply(url, berry::HelpWebView::m_PageNotFoundMessage.arg(url.toString()).toUtf8()));
-      break;
-    }
-  }
-}
 
 namespace berry {
-
-class HelpPerspectiveListener : public IPerspectiveListener
-{
-public:
-
-  Events::Types GetPerspectiveEventTypes() const override;
-
-  using IPerspectiveListener::PerspectiveChanged;
-
-  void PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective) override;
-  void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective, const QString &changeId) override;
-};
-
-class HelpWindowListener : public IWindowListener
-{
-public:
-
-  HelpWindowListener();
-  ~HelpWindowListener() override;
-
-  void WindowClosed(const IWorkbenchWindow::Pointer& window) override;
-  void WindowOpened(const IWorkbenchWindow::Pointer& window) override;
-
-private:
-
-  // We use the same perspective listener for every window
-  QScopedPointer<IPerspectiveListener> perspListener;
-};
-
 
 HelpPluginActivator* HelpPluginActivator::instance = nullptr;
 
 HelpPluginActivator::HelpPluginActivator()
-  : helpSchemeHandler(const_cast<QWebEngineUrlSchemeHandler*>(QWebEngineProfile::defaultProfile()->urlSchemeHandler("qthelp"))),
-    pluginListener(nullptr)
+  : pluginListener(nullptr)
 {
   this->instance = this;
-
-  if (helpSchemeHandler == nullptr)
-  {
-    helpSchemeHandler = new HelpUrlSchemeHandler(this);
-    QWebEngineProfile::defaultProfile()->installUrlSchemeHandler("qthelp", helpSchemeHandler);
-  }
 }
 
 HelpPluginActivator::~HelpPluginActivator()
@@ -224,12 +46,9 @@ HelpPluginActivator::~HelpPluginActivator()
 void
 HelpPluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(berry::HelpContentView, context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpIndexView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(berry::HelpSearchView, context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpEditor, context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpEditorInputFactory, context)
-  BERRY_REGISTER_EXTENSION_CLASS(berry::HelpPerspective, context)
 
   QFileInfo qhcInfo = context->getDataFile("qthelpcollection.qhc");
   helpEngine.reset(new QHelpEngineWrapper(qhcInfo.absoluteFilePath()));
@@ -251,12 +70,6 @@ HelpPluginActivator::start(ctkPluginContext* context)
 
   helpEngine->initialDocSetupDone();
 
-  // Register a wnd listener which registers a perspective listener for each
-  // new window. The perspective listener opens the help home page in the window
-  // if no other help page is opened yet.
-  wndListener.reset(new HelpWindowListener());
-  PlatformUI::GetWorkbench()->AddWindowListener(wndListener.data());
-
   // Register an event handler for CONTEXTHELP_REQUESTED events
   helpContextHandler.reset(new HelpContextHandler);
   ctkDictionary helpHandlerProps;
@@ -269,12 +82,6 @@ HelpPluginActivator::stop(ctkPluginContext* /*context*/)
 {
   delete pluginListener;
   pluginListener = nullptr;
-
-  if (PlatformUI::IsWorkbenchRunning())
-  {
-    PlatformUI::GetWorkbench()->RemoveWindowListener(wndListener.data());
-  }
-  wndListener.reset();
 
   helpEngineConfiguration.reset();
   helpEngine.reset();
@@ -489,63 +296,6 @@ void QCHPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
 
 }
 
-IPerspectiveListener::Events::Types HelpPerspectiveListener::GetPerspectiveEventTypes() const
-{
-  return Events::OPENED | Events::CHANGED;
-}
-
-void HelpPerspectiveListener::PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective)
-{
-  // if no help editor is opened, open one showing the home page
-  if (perspective->GetId() == HelpPerspective::ID &&
-      page->FindEditors(IEditorInput::Pointer(nullptr), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID).empty())
-  {
-    IEditorInput::Pointer input(new HelpEditorInput());
-    page->OpenEditor(input, HelpEditor::EDITOR_ID);
-  }
-}
-
-void HelpPerspectiveListener::PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective, const QString &changeId)
-{
-  if (perspective->GetId() == HelpPerspective::ID && changeId == IWorkbenchPage::CHANGE_RESET)
-  {
-    PerspectiveOpened(page, perspective);
-  }
-}
-
-HelpWindowListener::HelpWindowListener()
-  : perspListener(new HelpPerspectiveListener())
-{
-  // Register perspective listener for already opened windows
-  typedef QList<IWorkbenchWindow::Pointer> WndVec;
-  WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
-  for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)
-  {
-    (*i)->AddPerspectiveListener(perspListener.data());
-  }
-}
-
-HelpWindowListener::~HelpWindowListener()
-{
-  if (!PlatformUI::IsWorkbenchRunning()) return;
-
-  typedef QList<IWorkbenchWindow::Pointer> WndVec;
-  WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
-  for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)
-  {
-    (*i)->RemovePerspectiveListener(perspListener.data());
-  }
-}
-
-void HelpWindowListener::WindowClosed(const IWorkbenchWindow::Pointer& window)
-{
-  window->RemovePerspectiveListener(perspListener.data());
-}
-
-void HelpWindowListener::WindowOpened(const IWorkbenchWindow::Pointer& window)
-{
-  window->AddPerspectiveListener(perspListener.data());
-}
 
 void HelpContextHandler::handleEvent(const ctkEvent &event)
 {
@@ -563,6 +313,14 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
       else
       {
         helpUrl = contextUrl();
+
+        // Context help (F1) only opens a page when the active part actually
+        // resolves to a manual; otherwise it does nothing.
+        if (!helpUrl.isValid() || helpUrl.toString().trimmed().isEmpty())
+        {
+          delete this;
+          return;
+        }
       }
 
       HelpPluginActivator::linkActivated(PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage(),

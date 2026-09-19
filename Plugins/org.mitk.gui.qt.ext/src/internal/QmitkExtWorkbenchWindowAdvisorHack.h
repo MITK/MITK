@@ -34,6 +34,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onResetPerspective();
     void onClosePerspective();
     void onNewWindow();
+    void onFullScreen();
     void onIntro();
 
     /**
@@ -42,7 +43,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
      */
     void onHelp();
 
-    void onHelpOpenHelpPerspective();
+    void onHelpOpenHelpView();
 
     /**
      * @brief This slot is called if the user clicks in help menu the about button

@@ -18,7 +18,6 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkCommon.h>
-#include <mitkCoreObjectFactory.h>
 #include <mitkEnumerationProperty.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>

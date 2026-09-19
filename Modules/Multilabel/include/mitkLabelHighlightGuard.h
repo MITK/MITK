@@ -20,6 +20,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Opacity applied to a hovered/highlighted label by the multi-label mappers.
+   *
+   * Absolute, i.e. decoupled from the base segmentation opacity (node "opacity" times the
+   * "opacity factor" preference), so highlighting stays legible no matter how transparent
+   * the base is. Consumed by LabelSetImageVtkMapper2D and MultiLabelSegmentationVtkMapper3D. */
+  inline constexpr double HIGHLIGHTED_LABEL_OPACITY = 1.0;
+
+  /** \brief Opacity floor applied to the other labels while one is hovered/highlighted.
+   *
+   * A faded label is never rendered more opaque than its normal appearance, so the mappers
+   * clamp this against the label's base opacity. */
+  inline constexpr double FADED_LABEL_OPACITY = 0.1;
+
   /**
    * \brief RAII guard for managing label highlighting on data nodes.
    *

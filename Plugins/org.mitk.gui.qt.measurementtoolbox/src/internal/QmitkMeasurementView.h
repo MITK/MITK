@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 /// forward declarations
 struct QmitkMeasurementViewData;
+class QAction;
 namespace mitk
 {
   class PlanarFigure;
@@ -75,7 +76,7 @@ protected Q_SLOTS:
 private:
 
     void CreateConnections();
-    mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+    mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& baseName, unsigned int& counter);
 
     void SelectNode(const mitk::DataNode::Pointer& node);
 
@@ -84,6 +85,9 @@ private:
     void UpdateMeasurementText();
     void AddAllInteractors();
     void PlanarFigureInitialized();
+    void OnPlanarFigureFinished();
+    void CancelPlacement();
+    bool BeginDrawAction(QAction* action, bool checked);
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;

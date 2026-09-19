@@ -1,0 +1,26 @@
+/**
+  \defgroup org_mitk_gui_qt_segmentation_helper org.mitk.gui.qt.segmentation.helper
+  \ingroup MITKPlugins
+
+  \brief Registers the multi-label segmentation node descriptor.
+
+  This plug-in contributes nothing to the user interface of its own. It replaces
+  the built-in "MultiLabelSegmentation" node descriptor of
+  QmitkNodeDescriptorManager with one that renders node thumbnails from the label
+  colors of the segmentation.
+
+  It activates eagerly so that the descriptor is in place before any view is
+  created, and it is deliberately kept separate from org.mitk.gui.qt.segmentation
+  so that eager activation does not pull the whole segmentation stack into every
+  application start.
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_segmentation_helper_internal Internal
+  \ingroup org_mitk_gui_qt_segmentation_helper
+
+  \brief This subcategory includes the internal classes of the
+  org.mitk.gui.qt.segmentation.helper plugin. Other plugins must not rely on these
+  classes. They contain implementation details and their interface may change at
+  any time. We mean it.
+*/

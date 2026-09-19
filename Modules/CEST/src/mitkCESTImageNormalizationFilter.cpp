@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 
-#include <boost/algorithm/string.hpp>
-
 mitk::CESTImageNormalizationFilter::CESTImageNormalizationFilter()
 {
 }

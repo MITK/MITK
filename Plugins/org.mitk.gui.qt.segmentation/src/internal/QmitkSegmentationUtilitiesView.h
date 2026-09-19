@@ -14,7 +14,10 @@ found in the LICENSE file.
 #define QmitkSegmentationUtilitiesView_h
 
 #include <mitkIRenderWindowPartListener.h>
+#include <mitkDataNode.h>
 #include <QmitkAbstractView.h>
+
+#include <QList>
 #include <memory>
 
 namespace Ui
@@ -44,6 +47,9 @@ public:
 
 private:
   void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);
+
+  /** \brief Selects the newly created utility result node(s) in the Data Manager. */
+  void OnNewResultsReady(const QList<mitk::DataNode::Pointer>& nodes);
 
   std::unique_ptr<Ui::QmitkSegmentationUtilitiesViewControls> m_Controls;
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;

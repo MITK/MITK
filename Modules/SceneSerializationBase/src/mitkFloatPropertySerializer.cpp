@@ -36,7 +36,7 @@ namespace mitk
         LocaleSwitch localeSwitch("C");
 
         auto *element = doc.NewElement("float");
-        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()).c_str());
+        element->SetAttribute("value", mitk::ToString(prop->GetValue()).c_str());
         return element;
       }
       else
@@ -55,9 +55,9 @@ namespace mitk
       {
         try
         {
-          return FloatProperty::New(boost::lexical_cast<float>(f_string)).GetPointer();
+          return FloatProperty::New(mitk::LexicalCast<float>(f_string)).GetPointer();
         }
-        catch (boost::bad_lexical_cast &e)
+        catch (mitk::BadLexicalCast &e)
         {
           MITK_ERROR << "Could not parse string as number: " << e.what();
           return nullptr;

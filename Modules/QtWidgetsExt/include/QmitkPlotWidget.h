@@ -43,8 +43,7 @@ found in the LICENSE file.
  *   widget->Replot();
  * \endcode
  *
- * \note QmitkChartWidget is the preferred alternative for new code.
- * \sa QmitkPlotDialog, QwtPlot, QmitkChartWidget
+ * \sa QmitkPlotDialog, QwtPlot
  */
 
 class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget

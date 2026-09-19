@@ -15,6 +15,7 @@ set(H_FILES
   mitkAnatomicalPlanes.h
   mitkAntiAliasing.h
   mitkArray.h
+  mitkBase64.h
   mitkBaseDataTestImplementation.h
   mitkCommon.h
   mitkDisplayActionEvents.h
@@ -40,6 +41,7 @@ set(H_FILES
   mitkLexicalCast.h
   mitkLine.h
   mitkLocalStorageHandler.h
+  mitkMapperProviderBase.h
   mitkMatrix.h
   mitkMatrixConvert.h
   mitkMessage.h
@@ -59,6 +61,7 @@ set(H_FILES
   mitkStatusBarImplementation.h
   mitkStdFunctionCommand.h
   mitkStorageThreadDispatcherBase.h
+  mitkStringUtil.h
   mitkTimeHelper.h
   mitkUndoModel.h
   mitkUndoRedoPreferenceHelper.h
@@ -68,8 +71,6 @@ set(H_FILES
 
 set(CPP_FILES
   mitkCoreActivator.cpp
-  mitkCoreObjectFactory.cpp
-  mitkCoreObjectFactoryBase.cpp
   mitkCoreServices.cpp
   mitkEnvironment.cpp
   mitkException.cpp
@@ -89,6 +90,7 @@ set(CPP_FILES
   Algorithms/mitkImageTimeSelector.cpp
   Algorithms/mitkImageToImageFilter.cpp
   Algorithms/mitkImageToSurfaceFilter.cpp
+  Algorithms/mitkITKThreadingHelper.cpp
   Algorithms/mitkMultiComponentImageDataComparisonFilter.cpp
   Algorithms/mitkPlaneGeometryDataToSurfaceFilter.cpp
   Algorithms/mitkPointSetSource.cpp
@@ -279,6 +281,7 @@ set(CPP_FILES
   Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkInteractionEventObserver.cpp
   Interactions/mitkInteractionKeyEvent.cpp
+  Interactions/mitkInteractionKeyReleaseEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
@@ -301,6 +304,7 @@ set(CPP_FILES
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
+  IO/mitkBase64.cpp
   IO/mitkCustomMimeType.cpp
   IO/mitkFileReaderRegistry.cpp
   IO/mitkFileReaderSelector.cpp
@@ -356,7 +360,9 @@ set(CPP_FILES
   Rendering/mitkBaseRendererHelper.cpp
   Rendering/mitkCrosshairVtkMapper2D.cpp
   Rendering/mitkImageVtkMapper2D.cpp
+  Rendering/mitkIMapperProvider.cpp
   Rendering/mitkMapper.cpp
+  Rendering/mitkMapperProviderRegistry.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp
@@ -375,7 +381,6 @@ set(CPP_FILES
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkNeverTranslucentTexture.cpp
 )
 
 set(RESOURCE_FILES

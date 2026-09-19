@@ -13,6 +13,9 @@ found in the LICENSE file.
 #ifndef mitkGenericParamModel_h
 #define mitkGenericParamModel_h
 
+#include <mutex>
+
+#include <mitkFormulaParser.h>
 #include <mitkModelBase.h>
 
 #include <MitkModelFitExports.h>
@@ -102,6 +105,14 @@ namespace mitk
 
     /**Number of parameters the model should offer / the function string contains.*/
     ParametersSizeType m_NumberOfParameters;
+
+    /**Variable look-up table and parser reused across evaluations, so the function
+     * string is compiled only once per instance. Guarded by m_FormulaParserMutex to
+     * keep concurrent evaluations on the same instance safe. Deliberately not copied
+     * by the copy constructor: each instance's parser must be bound to its own map.*/
+    mutable FormulaParser::VariableMapType m_VariableMap;
+    mutable FormulaParser m_FormulaParser{ &m_VariableMap };
+    mutable std::mutex m_FormulaParserMutex;
 
     void operator=(const Self&);  //purposely not implemented
 

@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <locale>
+#include <sstream>
 #include <vector>
 
 #ifdef _WIN32
@@ -23,6 +25,34 @@ found in the LICENSE file.
 #include <Windows.h>
 #include "mitkLogDictionary.h"
 #endif
+
+namespace
+{
+  /* The backends write to std::cout and to the log file, which other threads
+   * write to as well. Formatted insertion is the only operation that may run
+   * concurrently on std::cout. Changing its locale is not one of them, and on
+   * MSVC the locale swapped out is freed while another thread may still be
+   * formatting with it. Numbers are therefore formatted in a private stream
+   * and only the resulting text is inserted into the shared stream, which also
+   * keeps the notation, precision and base from sticking to it.
+   */
+
+  std::string ElapsedSeconds(int precision)
+  {
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream << std::fixed << std::setprecision(precision) << static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
+    return stream.str();
+  }
+
+  std::string HexThreadID(int threadID)
+  {
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream << std::hex << threadID;
+    return stream.str();
+  }
+}
 
 static bool g_init = false;
 
@@ -289,13 +319,7 @@ void mitk::LogBackendText::FormatSmart(std::ostream &out, const LogMessage &mess
     out << std::endl;
   }
 
-  std::locale C("C");
-  std::locale originalLocale = out.getloc();
-  out.imbue(C);
-
-  out << std::fixed << std::setprecision(3) << ((double)std::clock()) / CLOCKS_PER_SEC;
-
-  out.imbue(originalLocale);
+  out << ElapsedSeconds(3);
 
   out << c_close << " ";
 
@@ -361,7 +385,9 @@ void mitk::LogBackendText::FormatFull(std::ostream &out, const LogMessage &messa
   out << "|";
   out << "|" << message.FilePath << "(" << message.LineNumber << ")";
   out << "|" << message.FunctionName;
-  out << "|" << std::hex << threadID;
+
+  out << "|" << HexThreadID(threadID);
+
   out << "|" << message.ModuleName;
   out << "|" << message.Category;
 
@@ -390,13 +416,7 @@ void mitk::LogBackendText::AppendTimeStamp(std::ostream &out)
                      1,
                      " "); // replace \n by " " (separates date/time from following output of relative time since start)
 
-  std::locale C("C");
-  std::locale originalLocale = out.getloc();
-  out.imbue(C);
-
   out << timestring;
-
-  out.imbue(originalLocale);
 }
 
 #ifdef MITK_WIN32_CONSOLE_COLOR
@@ -516,13 +536,7 @@ void mitk::LogBackendText::FormatSmartWindows(const LogMessage &message, int /*t
 
   ChangeColor(colorTime);
 
-  std::locale C("C");
-  std::locale originalLocale = std::cout.getloc();
-  std::cout.imbue(C);
-
-  std::cout << std::fixed << std::setprecision(2) << ((double)std::clock()) / CLOCKS_PER_SEC << " ";
-
-  std::cout.imbue(originalLocale);
+  std::cout << ElapsedSeconds(2) << " ";
 
   // category
   {

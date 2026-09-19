@@ -44,6 +44,8 @@ struct QmitkStdMultiWidgetEditor::Impl final
 
   QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
   QmitkLevelWindowWidget* m_LevelWindowWidget;
+  std::string m_LevelWindowImageMode;
+  bool m_ShowLevelWindowImageName = true;
 };
 
 QmitkStdMultiWidgetEditor::Impl::Impl()
@@ -182,17 +184,7 @@ void QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSche
 
 void QmitkStdMultiWidgetEditor::ShowLevelWindowWidget(bool show)
 {
-  if (show)
-  {
-    m_Impl->m_LevelWindowWidget->disconnect(this);
-    m_Impl->m_LevelWindowWidget->SetDataStorage(GetDataStorage());
-    m_Impl->m_LevelWindowWidget->show();
-  }
-  else
-  {
-    m_Impl->m_LevelWindowWidget->disconnect(this);
-    m_Impl->m_LevelWindowWidget->hide();
-  }
+  m_Impl->m_LevelWindowWidget->setVisible(show);
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()
@@ -243,6 +235,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     sizePolicy.setHeightForWidth(m_Impl->m_LevelWindowWidget->sizePolicy().hasHeightForWidth());
     m_Impl->m_LevelWindowWidget->setSizePolicy(sizePolicy);
     m_Impl->m_LevelWindowWidget->setMaximumWidth(50);
+    m_Impl->m_LevelWindowWidget->SetDataStorage(GetDataStorage());
   }
 
   layout->addWidget(m_Impl->m_LevelWindowWidget);
@@ -287,6 +280,28 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   // level window setting
   bool showLevelWindowWidget = preferences->GetBool("Show level/window widget", true);
   ShowLevelWindowWidget(showLevelWindowWidget);
+
+  auto* levelWindowWidget = m_Impl->m_LevelWindowWidget;
+  auto* levelWindowManager = levelWindowWidget->GetManager();
+  levelWindowManager->SetApplyToAllSelectedImages(preferences->GetBool("Apply level/window to all selected images", false));
+
+  // Only changed preferences override the image name visibility and the mode, so that
+  // choices made in the widget's context menu survive unrelated preference edits.
+  const bool showLevelWindowImageName = preferences->GetBool("Show level/window image name", true);
+  if (showLevelWindowImageName != m_Impl->m_ShowLevelWindowImageName)
+  {
+    m_Impl->m_ShowLevelWindowImageName = showLevelWindowImageName;
+    levelWindowWidget->SetImageNameVisible(showLevelWindowImageName);
+  }
+
+  const auto levelWindowImageMode = preferences->Get("Level/window image mode", "topmost");
+  if (levelWindowImageMode != m_Impl->m_LevelWindowImageMode)
+  {
+    m_Impl->m_LevelWindowImageMode = levelWindowImageMode;
+    levelWindowManager->SetMode(levelWindowImageMode == "selected"
+      ? mitk::LevelWindowManager::Mode::SelectedImage
+      : mitk::LevelWindowManager::Mode::TopMostImage);
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

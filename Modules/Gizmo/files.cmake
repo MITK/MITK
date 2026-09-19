@@ -1,7 +1,7 @@
 set(CPP_FILES
   mitkGizmo.cpp
+  mitkGizmoActivator.cpp
   mitkGizmoInteractor.cpp
-  mitkGizmoObjectFactory.cpp
   mitkGizmoMapper2D.cpp
 )
 

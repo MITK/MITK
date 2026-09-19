@@ -45,32 +45,32 @@ tinyxml2::XMLElement *mitk::LookupTablePropertySerializer::Serialize(tinyxml2::X
     range = lut->GetHueRange();
     auto *child = doc.NewElement("HueRange");
     element->InsertEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
+    child->SetAttribute("min", mitk::ToString(range[0]).c_str());
+    child->SetAttribute("max", mitk::ToString(range[1]).c_str());
 
     range = lut->GetValueRange();
     child = doc.NewElement("ValueRange");
     element->InsertEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
+    child->SetAttribute("min", mitk::ToString(range[0]).c_str());
+    child->SetAttribute("max", mitk::ToString(range[1]).c_str());
 
     range = lut->GetSaturationRange();
     child = doc.NewElement("SaturationRange");
     element->InsertEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
+    child->SetAttribute("min", mitk::ToString(range[0]).c_str());
+    child->SetAttribute("max", mitk::ToString(range[1]).c_str());
 
     range = lut->GetAlphaRange();
     child = doc.NewElement("AlphaRange");
     element->InsertEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
+    child->SetAttribute("min", mitk::ToString(range[0]).c_str());
+    child->SetAttribute("max", mitk::ToString(range[1]).c_str());
 
     range = lut->GetTableRange();
     child = doc.NewElement("TableRange");
     element->InsertEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
+    child->SetAttribute("min", mitk::ToString(range[0]).c_str());
+    child->SetAttribute("max", mitk::ToString(range[1]).c_str());
 
     child = doc.NewElement("Table");
     element->InsertEndChild(child);
@@ -78,10 +78,10 @@ tinyxml2::XMLElement *mitk::LookupTablePropertySerializer::Serialize(tinyxml2::X
     {
       auto grandChild = doc.NewElement("RgbaColor");
       rgba = lut->GetTableValue(index);
-      grandChild->SetAttribute("R", boost::lexical_cast<std::string>(rgba[0]).c_str());
-      grandChild->SetAttribute("G", boost::lexical_cast<std::string>(rgba[1]).c_str());
-      grandChild->SetAttribute("B", boost::lexical_cast<std::string>(rgba[2]).c_str());
-      grandChild->SetAttribute("A", boost::lexical_cast<std::string>(rgba[3]).c_str());
+      grandChild->SetAttribute("R", mitk::ToString(rgba[0]).c_str());
+      grandChild->SetAttribute("G", mitk::ToString(rgba[1]).c_str());
+      grandChild->SetAttribute("B", mitk::ToString(rgba[2]).c_str());
+      grandChild->SetAttribute("A", mitk::ToString(rgba[3]).c_str());
       child->InsertEndChild(grandChild);
     }
     return element;
@@ -214,7 +214,7 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(con
       }
     }
   }
-  catch (boost::bad_lexical_cast &e)
+  catch (mitk::BadLexicalCast &e)
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
     return nullptr;

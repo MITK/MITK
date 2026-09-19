@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include "MRPerfusionView.h"
 #include <ui_MRPerfusionViewControls.h>
 
-#include <boost/tokenizer.hpp>
-#include <boost/math/constants/constants.hpp>
+#include <numbers>
 #include <iostream>
 
 #include <mitkWorkbenchUtil.h>
+#include <mitkStringUtil.h>
 
 #include <mitkAterialInputFunctionGenerator.h>
 #include <mitkConcentrationCurveGenerator.h>
@@ -57,6 +57,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QFileDialog>
+#include <QStringList>
 
 
 // Includes for image casting between ITK and MITK
@@ -103,7 +104,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls->timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls->timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
 
-  m_Controls->maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->maskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls->maskNodeSelector->SetSelectionIsOptional(true);
   m_Controls->maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
@@ -138,7 +139,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls->aifFilePath->setText("Please select AIF file.");
   m_Controls->radioAIFImage->setChecked(true);
   m_Controls->AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls->AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
+  m_Controls->AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->AIFMaskNodeSelector->setVisible(true);
   m_Controls->AIFMaskNodeSelector->setEnabled(true);
   m_Controls->AIFMaskLabelSelector->hide();
@@ -234,6 +235,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls->AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
+  this->UpdateMaskStatusInfo();
 }
 
 
@@ -495,6 +497,7 @@ void MRPerfusionView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>
   }
 
   UpdateGUIControls();
+  this->UpdateMaskStatusInfo();
 }
 
 
@@ -522,6 +525,7 @@ void MRPerfusionView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/
   }
 
   UpdateGUIControls();
+  this->UpdateMaskStatusInfo();
 }
 
 void MRPerfusionView::OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
@@ -543,6 +547,29 @@ void MRPerfusionView::OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointe
   }
 
   UpdateGUIControls();
+}
+
+void MRPerfusionView::UpdateMaskStatusInfo()
+{
+  QStringList lines;
+
+  if (m_selectedImage.IsNotNull())
+  {
+    const auto hiddenCount = mitk::GetGeometryMismatchedSegmentationCount(
+      this->GetDataStorage(), m_selectedImage->GetGeometry());
+    if (hiddenCount > 0)
+    {
+      lines << tr("%1 segmentation(s) hidden from the Selected Mask list: geometry does not match the selected time series.").arg(hiddenCount);
+    }
+
+    if (m_selectedMaskNode.IsNull())
+    {
+      lines << tr("ROI-based fitting requires a selected mask.");
+    }
+  }
+
+  m_Controls->labelMaskStatus->setText(lines.join(QStringLiteral("<br/>")));
+  m_Controls->labelMaskStatus->setVisible(!lines.isEmpty());
 }
 
 bool MRPerfusionView::CheckModelSettings() const
@@ -954,8 +981,6 @@ MRPerfusionView::MRPerfusionView()
   mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
   mitk::NodePredicateAnd::Pointer is3DImage = mitk::NodePredicateAnd::New(isImage, is3D, isNoMask);
 
-  this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
-
   this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
   auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
@@ -1075,9 +1100,9 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
       concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
       concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
       //Convert Flipangle from degree to radiant
-      double alpha = m_Controls->FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+      double alpha = m_Controls->FlipangleSpinBox->value()/360*2* std::numbers::pi;
       concentrationGen->SetFlipAngle(alpha);
-      double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+      double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * std::numbers::pi;
       concentrationGen->SetFlipAnglePDW(alphaPDW);
 
   }
@@ -1195,7 +1220,6 @@ void MRPerfusionView::LoadAIFfromFile()
 
   std::string m_aifFilePath = fileName.toStdString();
   //Read Input
-  typedef boost::tokenizer< boost::escaped_list_separator<char> > Tokenizer;
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //AIF Data
 
@@ -1212,8 +1236,7 @@ void MRPerfusionView::LoadAIFfromFile()
 
   while (getline(in1, line1))
   {
-    Tokenizer tok(line1);
-    vec1.assign(tok.begin(), tok.end());
+    vec1 = mitk::Split(line1, ',');
 
     if (vec1.size() < 2)
     {

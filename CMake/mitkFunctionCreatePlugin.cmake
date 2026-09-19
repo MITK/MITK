@@ -64,7 +64,10 @@ function(mitk_create_plugin)
     set(is_test_plugin)
   endif()
 
-  set(_PLUGIN_MOC_OPTIONS "-DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED ${_PLUGIN_MOC_OPTIONS}")
+  list(PREPEND _PLUGIN_MOC_OPTIONS
+    -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
+    -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
+  )
 
   set(PLUGIN_TARGET ${PROJECT_NAME})
 
@@ -125,6 +128,7 @@ function(mitk_create_plugin)
       EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
+    set(PLUGIN_DOXYGEN_STYLESHEET "${MITK_SOURCE_DIR}/Documentation/mitk_doxygen_plugin_manual_extra.css")
 
     # Create a list of Doxygen tag files from the plug-in dependencies.
     #
@@ -179,18 +183,19 @@ function(mitk_create_plugin)
 
   mitkFunctionOrganizeSources(
     SOURCE ${_PLUGIN_CPP_FILES}
-    HEADER ${_PLUGIN_H_FILES}
+    HEADER ${_PLUGIN_H_FILES} ${_PLUGIN_MOC_H_FILES}
     UI ${_PLUGIN_UI_FILES}
     QRC ${_PLUGIN_QRC_FILES} ${_PLUGIN_CACHED_RESOURCE_FILES}
     META ${_PLUGIN_META_FILES}
   )
 
+  # ctkMacroBuildPlugin() relies on AUTOMOC, which only sees headers that are
+  # target sources, hence MOC_H_FILES are passed as regular sources.
   ctkMacroBuildPlugin(
     NAME ${PLUGIN_TARGET}
     EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
-    SRCS ${_PLUGIN_CPP_FILES} ${_PLUGIN_H_FILES} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES}
-    MOC_SRCS ${_PLUGIN_MOC_H_FILES}
-    MOC_OPTIONS ${_PLUGIN_MOC_OPTIONS}
+    SRCS ${_PLUGIN_CPP_FILES} ${_PLUGIN_H_FILES} ${_PLUGIN_MOC_H_FILES}
+         ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES}
     UI_FORMS ${_PLUGIN_UI_FILES}
     EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
     RESOURCES ${_PLUGIN_QRC_FILES}
@@ -202,6 +207,8 @@ function(mitk_create_plugin)
     NO_SOURCE_GROUPS # we organize sources ourselves
     ${is_test_plugin}
   )
+
+  set_property(TARGET ${PLUGIN_TARGET} PROPERTY AUTOMOC_MOC_OPTIONS "${_PLUGIN_MOC_OPTIONS}")
 
   mitk_use_modules(TARGET ${PLUGIN_TARGET}
     MODULES ${_PLUGIN_MODULE_DEPENDS}
@@ -356,7 +363,7 @@ function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file)
                      COMMAND ${DOXYGEN_EXECUTABLE} ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
                      # Generate the final Qt compressed help file (.qch)
                      COMMAND ${QT_HELPGENERATOR_EXECUTABLE} ${_generated_qhp_file} -o ${${qch_file}}
-                     DEPENDS ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf ${_file_dependencies}
+                     DEPENDS ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf ${_file_dependencies} ${PLUGIN_DOXYGEN_STYLESHEET}
                      )
 
   #set_source_files_properties(${qch_file} PROPERTIES GENERATED 1)

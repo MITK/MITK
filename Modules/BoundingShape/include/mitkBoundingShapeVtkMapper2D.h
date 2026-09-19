@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkSmartPointer.h>
-#include <vtkCubeSource.h>
 
 namespace mitk
 {
@@ -31,7 +30,8 @@ namespace mitk
    *
    * Renders the intersection of a bounding box (GeometryData) with the current 2D slice
    * plane, along with interactive handles for resizing. Handles are displayed as small
-   * cubes at the face centers of the bounding box where they intersect the slice.
+   * cubes on the sides (face handles) and corners (edge handles) of the rendered
+   * cross-section outline.
    *
    * \sa BoundingShapeVtkMapper3D, BoundingShapeInteractor, VtkMapper
    */
@@ -54,7 +54,6 @@ namespace mitk
       vtkSmartPointer<vtkCutter> m_Cutter;
       vtkSmartPointer<vtkPlane> m_CuttingPlane;
       unsigned int m_LastSliceNumber;
-      std::vector<vtkSmartPointer<vtkCubeSource>> m_Handles;
       vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
       double m_ZoomFactor;
 

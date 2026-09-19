@@ -35,7 +35,7 @@ class vtkImageReslice;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
-class vtkNeverTranslucentTexture;
+class vtkTexture;
 class vtkImageMapToColors;
 
 namespace mitk
@@ -108,7 +108,7 @@ namespace mitk
       /** \brief Vector of image-to-color mappers for each label group layer. */
       std::vector<vtkSmartPointer<vtkImageMapToColors>> m_LayerImageMapToColors;
       /** \brief Vector of textures for each label group layer. */
-      std::vector<vtkSmartPointer<vtkNeverTranslucentTexture>> m_LayerTextureVector;
+      std::vector<vtkSmartPointer<vtkTexture>> m_LayerTextureVector;
 
       /** \brief Empty poly data used as a placeholder. */
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
@@ -153,6 +153,12 @@ namespace mitk
 
       /** \brief The label value of the last active label. */
       MultiLabelSegmentation::LabelValueType m_LastActiveLabelValue = MultiLabelSegmentation::UNLABELED_VALUE;
+
+      /** \brief The "opacity factor" preference value baked into the current LUT.
+       *
+       * The factor is a global preference (no MTime), so a change is detected by
+       * comparing against this cached value to trigger a LUT rebuild. */
+      float m_LastOpacityFactor = 1.0f;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

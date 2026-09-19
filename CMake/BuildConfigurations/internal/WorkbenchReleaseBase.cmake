@@ -19,6 +19,7 @@ set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
   org.mitk.gui.qt.pharmacokinetics.mri
   org.mitk.gui.qt.pharmacokinetics.concentration.mri
   org.mitk.gui.qt.pharmacokinetics.curvedescriptor
+  org.mitk.gui.qt.pet.suvcalculation
   org.mitk.gui.qt.restapi
 )
 
@@ -27,7 +28,8 @@ if(NOT MITK_USE_SUPERBUILD)
   set(BUILD_MatchPointCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_SegmentationCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_DICOMCmdApps ON CACHE BOOL "" FORCE)
-  set(BUILD_ModelFitMiniApps ON CACHE BOOL "" FORCE)
+  set(BUILD_ModelFitCmdApps ON CACHE BOOL "" FORCE)
+  set(BUILD_PETCmdApps ON CACHE BOOL "" FORCE)
 endif()
 
 set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "Enable VTK Debug Leaks" FORCE)

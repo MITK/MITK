@@ -16,6 +16,7 @@ found in the LICENSE file.
 // This file is based on ITK's itkStatisticsImageFilter.h
 
 #include <mitkCommon.h>
+#include <mitkMedianAccumulator.h>
 
 #include <itkArray.h>
 #include <itkCompensatedSummation.h>
@@ -35,6 +36,11 @@ namespace mitk
    * It computes: min, max, mean, sigma, variance, sum, sum of squares/cubes/quadruples,
    * skewness, kurtosis, MPP (mean of positive pixels), entropy, uniformity, UPP
    * (uniformity of positive pixels), median, and an optional histogram.
+   *
+   * Entropy, uniformity, UPP and the median are only computed once histogram
+   * parameters have been set; without them GetMedian() stays at zero. The
+   * median is exact and computed in the same pass as the histogram, not
+   * derived from its bins.
    *
    * The filter is streaming-capable via itk::ImageSink and supports multi-threaded
    * processing.
@@ -153,6 +159,8 @@ namespace mitk
     itk::SizeValueType m_CountOfPositivePixels;
     PixelType m_Min;
     PixelType m_Max;
+
+    MedianAccumulator<PixelType> m_MedianAccumulator;
 
     std::mutex m_Mutex;
   };

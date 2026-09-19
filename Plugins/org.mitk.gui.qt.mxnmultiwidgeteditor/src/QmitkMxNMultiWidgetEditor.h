@@ -42,22 +42,15 @@ public:
   /**
   * @brief Overridden from berry::IPartListener
   */
-  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
   void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
-  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
-  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   void OnLayoutSet(int row, int column) override;
   void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
+
+  /** \brief The interaction scheme currently in effect for this editor. The
+   *         layout editor hosts the toggle for it and reads this to show the
+   *         live state. */
+  mitk::InteractionSchemeSwitcher::InteractionScheme GetInteractionScheme() const;
 
 private Q_SLOTS:
 

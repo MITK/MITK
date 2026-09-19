@@ -801,6 +801,10 @@ void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
 //////////////////////////////////////////////////////////////////////////
 void QmitkMxNMultiWidget::SetLayoutImpl()
 {
+  // The maximized cell is a view state over the current grid; the grid is about
+  // to change underneath it, so drop it rather than leave siblings hidden.
+  this->SetMaximizedCell(QString());
+
   int requiredRenderWindowWidgets = this->GetRowCount() * this->GetColumnCount();
   int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
 
@@ -955,6 +959,9 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   renderWindowWidget->SetUtilityWidgetAutoHide(true);
   proximity->AddEventSource(utilityWidget);
 
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::PopupVisibilityChanged,
+          proximity, &QmitkRenderWindowProximity::SetPinned);
+
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CleanViewToggled,
           this, &QmitkMxNMultiWidget::SetCleanView);
   connect(this, &QmitkMxNMultiWidget::CleanViewChanged,
@@ -1040,6 +1047,84 @@ namespace
       splitter->setSizes(sizes);
     }
   }
+}
+
+void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
+{
+  auto* root = this->RootSplitter();
+  if (nullptr == root)
+  {
+    return;
+  }
+
+  const auto cells = this->GetRenderWindowWidgets();
+  const auto target = cells.find(windowId);
+  QmitkRenderWindowWidget* maximized = windowId.isEmpty() || target == cells.end()
+    ? nullptr
+    : target->second.get();
+
+  // Hiding a child zeroes its splitter size, which would otherwise both lose the
+  // user's divider positions and put an unloadable size 0 into a saved layout.
+  if (nullptr != maximized && m_PreMaximizeSizes.empty())
+  {
+    m_PreMaximizeSizes.emplace_back(root, root->sizes());
+    for (int row = 0; row < root->count(); ++row)
+    {
+      if (auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(row)))
+      {
+        m_PreMaximizeSizes.emplace_back(rowSplit, rowSplit->sizes());
+      }
+    }
+  }
+
+  for (int row = 0; row < root->count(); ++row)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(row));
+    if (nullptr == rowSplit)
+    {
+      continue;
+    }
+
+    bool rowHoldsTarget = false;
+    for (int column = 0; column < rowSplit->count(); ++column)
+    {
+      auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(rowSplit->widget(column));
+      if (nullptr == cell)
+      {
+        continue;
+      }
+
+      const bool isTarget = cell == maximized;
+      rowHoldsTarget = rowHoldsTarget || isTarget;
+      cell->setVisible(nullptr == maximized || isTarget);
+    }
+
+    // A row with nothing visible in it would still claim splitter space.
+    rowSplit->setVisible(nullptr == maximized || rowHoldsTarget);
+  }
+
+  if (nullptr == maximized && !m_PreMaximizeSizes.empty())
+  {
+    for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
+    {
+      splitter->setSizes(sizes);
+    }
+    m_PreMaximizeSizes.clear();
+  }
+
+  const QString resolved = nullptr != maximized ? windowId : QString();
+  if (resolved == m_MaximizedCell)
+  {
+    return;
+  }
+
+  m_MaximizedCell = resolved;
+  emit MaximizedCellChanged(m_MaximizedCell);
+}
+
+QString QmitkMxNMultiWidget::GetMaximizedCell() const
+{
+  return m_MaximizedCell;
 }
 
 QSplitter* QmitkMxNMultiWidget::RootSplitter() const
@@ -1477,7 +1562,20 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
   node["type"] = "split";
   node["orientation"] = (splitter->orientation() == Qt::Vertical) ? "vertical" : "horizontal";
 
-  const auto sizes = splitter->sizes();
+  // While a cell is maximized its siblings are hidden, so the live sizes read
+  // 0 for them - and the loader rejects size < 1. Serialize the proportions the
+  // grid had before, so a layout saved from a maximized editor still describes
+  // the grid and can be loaded back.
+  QList<int> sizes = splitter->sizes();
+  for (const auto& [captured, capturedSizes] : m_PreMaximizeSizes)
+  {
+    if (captured == splitter)
+    {
+      sizes = capturedSizes;
+      break;
+    }
+  }
+
   auto children = nlohmann::json::array();
   for (int i = 0; i < splitter->count(); ++i)
   {
@@ -2022,6 +2120,8 @@ void QmitkMxNMultiWidget::ValidateIdsForThisEditor(const nlohmann::json& doc) co
 
 void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 {
+  this->SetMaximizedCell(QString());
+
   // 'didMutate' guards rollback. As long as we are in the validation phase
   // (no engine state touched yet) a throw must rethrow without rolling back,
   // so a malformed document does not destroy the user's existing layout.

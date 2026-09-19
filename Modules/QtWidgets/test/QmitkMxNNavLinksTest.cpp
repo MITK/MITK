@@ -70,6 +70,9 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(AdjustLevelWindow_Grouped_PreservesMemberDifferences);
   MITK_TEST(LevelWindow_ContractViolations_Throw);
   MITK_TEST(GroupColor_AssignedByRegistrationOrder);
+  MITK_TEST(Maximize_SliceSyncReachesHiddenPeers);
+  MITK_TEST(Maximize_ZoomSyncReachesHiddenPeers);
+  MITK_TEST(Maximize_DoesNotPerturbSyncedPeers);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -176,6 +179,70 @@ public:
     mitk::Point2D startCoordinate;
     startCoordinate.Fill(8.0);
     Fire<mitk::DisplayZoomEvent>(senderIndex, factor, startCoordinate);
+  }
+
+  // --- Maximizing one cell must not cost the group anything -------------------
+
+  void Maximize_SliceSyncReachesHiddenPeers()
+  {
+    // Maximizing hides the peers' widgets. Synchronization runs on the
+    // renderers, not on the painted widgets, so a gesture in the maximized cell
+    // must still move its group - the hidden peers simply repaint on restore.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+
+    m_Editor->SetMaximizedCell(CellId(0));
+    FireScroll(0, 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The maximized cell moves", 5u, SlicePos(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A hidden group member follows while maximized",
+                                 5u, SlicePos(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A hidden non-member still must not follow", 4u, SlicePos(2));
+
+    m_Editor->SetMaximizedCell(QString());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Restoring shows the peer at the position it followed to",
+                                 5u, SlicePos(1));
+  }
+
+  void Maximize_ZoomSyncReachesHiddenPeers()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "zoom");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "zoom");
+
+    const double peerBefore = Camera(1)->GetParallelScale();
+    const double outsiderBefore = Camera(2)->GetParallelScale();
+
+    m_Editor->SetMaximizedCell(CellId(0));
+    FireZoom(0, 2.0f);
+    m_Editor->SetMaximizedCell(QString());
+
+    CPPUNIT_ASSERT_MESSAGE("A hidden group member follows a zoom made while maximized",
+                           std::abs(Camera(1)->GetParallelScale() - peerBefore) > 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A cell outside the zoom group is untouched",
+                                         outsiderBefore, Camera(2)->GetParallelScale(), 1e-6);
+  }
+
+  void Maximize_DoesNotPerturbSyncedPeers()
+  {
+    // Maximizing is a view op: on its own it must move nothing. The cell's
+    // widget changes size, and a size change is exactly what could leak into a
+    // zoom-synced group as a spurious propagation.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "zoom");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "zoom");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+
+    const double peerScale = Camera(1)->GetParallelScale();
+    const unsigned int peerSlice = SlicePos(1);
+
+    m_Editor->SetMaximizedCell(CellId(0));
+    m_Editor->SetMaximizedCell(QString());
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A maximize round trip leaves the group's zoom alone",
+                                         peerScale, Camera(1)->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A maximize round trip leaves the group's slice alone",
+                                 peerSlice, SlicePos(1));
   }
 
   void SliceLink_PropagatesToGroupOnly()

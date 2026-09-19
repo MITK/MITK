@@ -65,6 +65,8 @@ class QmitkRenderWindowProximityTestSuite : public mitk::TestFixture
   MITK_TEST(Leave_CollapsesToIdle);
   MITK_TEST(Suppress_ForcesIdleImmediately);
   MITK_TEST(Unsuppress_ReevaluatesImmediately);
+  MITK_TEST(Pin_HoldsRevealedWhilePointerIsAway);
+  MITK_TEST(Pin_LosesToSuppression);
   MITK_TEST(MultiRegion_IndependentStates);
   MITK_TEST(Unregister_StopsEmissions);
   CPPUNIT_TEST_SUITE_END();
@@ -343,6 +345,43 @@ public:
     m_Proximity->SetSuppressed(false);
 
     CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+  }
+
+  void Pin_HoldsRevealedWhilePointerIsAway()
+  {
+    // A popup owned by the furniture takes a pointer grab, so the cell sees a
+    // leave; the pin is what keeps the strip the user just clicked on screen.
+    const auto id = this->RegisterRightEdgeRegion();
+    m_Proximity->HandlePointerMoved(m_NearPoint);
+
+    m_Proximity->SetPinned(true);
+    CPPUNIT_ASSERT(m_Proximity->IsPinned());
+
+    m_Proximity->HandlePointerLeft();
+    ProcessEventsFor(WaitPastCollapse);
+
+    CPPUNIT_ASSERT_MESSAGE("A pinned region survives the pointer leaving",
+                           State::Active == m_Proximity->GetRegionState(id));
+
+    // Unpinning resolves against where the pointer actually is, which is away.
+    m_Proximity->SetPinned(false);
+    ProcessEventsFor(WaitPastCollapse);
+
+    CPPUNIT_ASSERT_MESSAGE("Unpinning collapses once the pointer is gone",
+                           State::Idle == m_Proximity->GetRegionState(id));
+  }
+
+  void Pin_LosesToSuppression()
+  {
+    // Clean view is absolute: it hides the furniture for a screenshot, and a
+    // popup left pinned must not punch a hole in it.
+    const auto id = this->RegisterRightEdgeRegion();
+    m_Proximity->HandlePointerMoved(m_NearPoint);
+    m_Proximity->SetPinned(true);
+
+    m_Proximity->SetSuppressed(true);
+
+    CPPUNIT_ASSERT(State::Idle == m_Proximity->GetRegionState(id));
   }
 
   void MultiRegion_IndependentStates()

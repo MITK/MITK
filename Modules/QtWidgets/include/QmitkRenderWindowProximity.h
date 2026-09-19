@@ -178,6 +178,18 @@ public:
   bool IsSuppressed() const;
 
   /**
+   * \brief Hold every region revealed regardless of where the pointer is, for
+   *        as long as a popup the furniture itself owns is open.
+   *
+   *        A Qt popup takes a pointer grab, so the cell sees a leave the moment
+   *        one opens and would otherwise collapse the very strip the user just
+   *        clicked. Suppression still wins over a pin, so clean view stays
+   *        absolute.
+   */
+  void SetPinned(bool pinned);
+  bool IsPinned() const;
+
+  /**
    * \brief Feed a pointer position in the cell's coordinate space.
    *
    * \param positionInCell  Pointer position in the cell's coordinates.
@@ -236,6 +248,7 @@ private:
   bool m_PointerInside = false;
   bool m_ButtonsPressed = false;
   bool m_Suppressed = false;
+  bool m_Pinned = false;
 
 };
 

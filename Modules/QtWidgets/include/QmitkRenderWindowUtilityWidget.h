@@ -128,6 +128,14 @@ Q_SIGNALS:
   */
   void LayoutEditorRequested();
 
+  /**
+  * \brief Emitted while a popup owned by this strip (currently the data
+  *        selection) is open. The popup's pointer grab reads to the cell as the
+  *        pointer leaving, so the owning multi widget holds the furniture
+  *        revealed for as long as this is true.
+  */
+  void PopupVisibilityChanged(bool visible);
+
 protected:
 
   /** \brief Paints the translucent rounded backing behind the controls. */

@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include <vector>
 
+class QCheckBox;
 class QmitkMxNLayoutEditorWidget;
 
 /**
@@ -58,6 +59,10 @@ private:
   bool ConfirmDestructiveLayoutChange();
 
   QmitkMxNLayoutEditorWidget* m_LayoutEditorWidget = nullptr;
+
+  /** \brief Editor-wide mouse-interaction scheme toggle, live only while an MxN
+   *         editor part is active. */
+  QCheckBox* m_PacsSchemeBox = nullptr;
 
   /** \brief Per-attachment connections of the layout-shape controls to the
    *         active editor part; dropped on part deactivation. */

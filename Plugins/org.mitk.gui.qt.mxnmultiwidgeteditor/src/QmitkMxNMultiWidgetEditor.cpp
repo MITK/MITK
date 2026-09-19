@@ -27,7 +27,6 @@ found in the LICENSE file.
 // mitk qt widgets module
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkInteractionSchemeToolBar.h>
-#include <QmitkMultiWidgetConfigurationToolBar.h>
 
 // qt
 #include <QHBoxLayout>
@@ -40,12 +39,15 @@ struct QmitkMxNMultiWidgetEditor::Impl final
   ~Impl() = default;
 
   QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
-  QmitkMultiWidgetConfigurationToolBar* m_ConfigurationToolBar;
+
+  // The scheme is editor-wide state the layout editor's toggle reads back, so
+  // the two cannot disagree about which mode is live.
+  mitk::InteractionSchemeSwitcher::InteractionScheme m_InteractionScheme;
 };
 
 QmitkMxNMultiWidgetEditor::Impl::Impl()
   : m_InteractionSchemeToolBar(nullptr)
-  , m_ConfigurationToolBar(nullptr)
+  , m_InteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard)
 {
   // nothing here
 }
@@ -67,19 +69,9 @@ QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 
 berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes() const
 {
-  return Events::CLOSED | Events::OPENED | Events::HIDDEN | Events::VISIBLE;
-}
-
-void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->ActivateMenuWidget(false);
-    }
-  }
+  // Only OPENED: the other three existed solely to switch the built-in
+  // render-window menu on and off, and this editor never shows it.
+  return Events::OPENED;
 }
 
 void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
@@ -90,31 +82,6 @@ void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference:
     if (nullptr != multiWidget)
     {
       multiWidget->EnableCrosshair();
-      multiWidget->ActivateMenuWidget(true);
-    }
-  }
-}
-
-void QmitkMxNMultiWidgetEditor::PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->ActivateMenuWidget(false);
-    }
-  }
-}
-
-void QmitkMxNMultiWidgetEditor::PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->ActivateMenuWidget(true);
     }
   }
 }
@@ -137,16 +104,20 @@ void QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSche
     return;
   }
 
-  if (mitk::InteractionSchemeSwitcher::PACSStandard == scheme)
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(true);
-  }
-  else
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
-  }
+  m_Impl->m_InteractionScheme = scheme;
+
+  // The left toolbar selects which action the left button performs, which only
+  // exists in the PACS scheme.
+  m_Impl->m_InteractionSchemeToolBar->setVisible(
+    mitk::InteractionSchemeSwitcher::PACSStandard == scheme);
 
   QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
+}
+
+mitk::InteractionSchemeSwitcher::InteractionScheme
+QmitkMxNMultiWidgetEditor::GetInteractionScheme() const
+{
+  return m_Impl->m_InteractionScheme;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -192,19 +163,11 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
   layout->addWidget(multiWidget);
 
-  // create right toolbar: configuration toolbar to change the render window widget layout
-  if (nullptr == m_Impl->m_ConfigurationToolBar)
-  {
-    m_Impl->m_ConfigurationToolBar = new QmitkMultiWidgetConfigurationToolBar(multiWidget);
-    layout->addWidget(m_Impl->m_ConfigurationToolBar);
-  }
-
-  // The layout editor is summoned from the per-cell sync barcode (relayed via
-  // QmitkMxNMultiWidget::LayoutEditorRequested, connected above), and
-  // synchronization is managed there too, so the configuration toolbar now only
-  // carries the interaction-scheme switch.
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
-          this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
+  // No configuration toolbar on the right: the layout editor is summoned from
+  // the per-cell sync barcode and owns the layout and synchronization controls,
+  // which left that toolbar holding the interaction-scheme switch alone - a
+  // full-height column for one button. The switch lives in the layout editor
+  // with the rest of the editor-wide configuration.
 
   GetSite()->GetPage()->AddPartListener(this);
 

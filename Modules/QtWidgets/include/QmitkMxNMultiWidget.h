@@ -528,6 +528,21 @@ public:
   bool IsNavigatorExpanded() const;
 
   /**
+  * \brief Give one cell the whole editor area, hiding its siblings; an empty
+  *        or unknown id restores the grid.
+  *
+  *        Purely transient view state, deliberately implemented by toggling
+  *        widget visibility: the splitter structure is untouched, so a
+  *        maximized cell is invisible to 'SerializeLayout' and cannot be
+  *        persisted. A layout change restores the grid first, because the cell
+  *        set it was maximizing out of no longer exists afterwards.
+  */
+  void SetMaximizedCell(const QString& windowId);
+
+  /** \brief The maximized cell's window id, empty when the grid is shown. */
+  QString GetMaximizedCell() const;
+
+  /**
   * \brief Ask the hosting layer for the layout editor (emits
   *        'LayoutEditorRequested'). Entry point for furniture that cannot
   *        emit the editor's signal itself (e.g. the seams' editor hook).
@@ -817,6 +832,9 @@ Q_SIGNALS:
   void SyncGroupAdded(const GroupSyncIndexType index, const QString& label);
   void CleanViewChanged(bool cleanView);
   void NavigatorExpandedChanged(bool expanded);
+
+  /** \brief The maximized cell changed; empty id means the grid is back. */
+  void MaximizedCellChanged(const QString& windowId);
 
   /**
   * \brief A selection group's display label changed (cosmetic rename);
@@ -1240,6 +1258,16 @@ private:
 
   /** \brief Sticky clean-view state; applied to cells created later, too. */
   bool m_CleanView = false;
+
+  /** \brief Window id of the maximized cell, empty while the grid is shown. */
+  QString m_MaximizedCell;
+
+  /**
+  * \brief Splitter proportions as they were before maximizing, restored on the
+  *        way out and serialized in place of the live ones while maximized.
+  *        Empty exactly when no cell is maximized.
+  */
+  std::vector<std::pair<QSplitter*, QList<int>>> m_PreMaximizeSizes;
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;

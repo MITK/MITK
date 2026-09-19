@@ -153,6 +153,22 @@ void QmitkRenderWindowProximity::SetSuppressed(bool suppressed)
   }
 }
 
+void QmitkRenderWindowProximity::SetPinned(bool pinned)
+{
+  if (pinned == m_Pinned)
+  {
+    return;
+  }
+
+  m_Pinned = pinned;
+  this->EvaluateAllRegions();
+}
+
+bool QmitkRenderWindowProximity::IsPinned() const
+{
+  return m_Pinned;
+}
+
 bool QmitkRenderWindowProximity::IsSuppressed() const
 {
   return m_Suppressed;
@@ -231,7 +247,19 @@ bool QmitkRenderWindowProximity::eventFilter(QObject* watched, QEvent* event)
 
 QmitkRenderWindowProximity::State QmitkRenderWindowProximity::ComputeState(const Region& region) const
 {
-  if (m_Suppressed || !m_PointerInside)
+  if (m_Suppressed)
+  {
+    return State::Idle;
+  }
+
+  // A pin outranks the pointer: the popup that pinned us holds a grab, so the
+  // cell reads as "pointer outside" for as long as it is open.
+  if (m_Pinned)
+  {
+    return State::Active;
+  }
+
+  if (!m_PointerInside)
   {
     return State::Idle;
   }

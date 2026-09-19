@@ -16,10 +16,13 @@ found in the LICENSE file.
 #include <QmitkMultiWidgetLayoutSelectionWidget.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNMultiWidgetEditor.h>
 
 #include <mitkDataNode.h>
 
+#include <QCheckBox>
 #include <QMessageBox>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 const std::string QmitkMxNLayoutEditorView::VIEW_ID = "org.mitk.views.mxnlayouteditor";
@@ -28,6 +31,15 @@ void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
 {
   auto* layout = new QVBoxLayout(parent);
   layout->setContentsMargins(0, 0, 0, 0);
+
+  // Editor-wide mouse-interaction scheme. It lives here rather than in a
+  // toolbar of its own because it is the only editor-wide control left outside
+  // this view, and a full-height toolbar column for one checkbox costs canvas
+  // the render windows can use.
+  m_PacsSchemeBox = new QCheckBox(tr("PACS-like mouse interaction"), parent);
+  m_PacsSchemeBox->setToolTip(tr("Select the left mouse button's action from a toolbar beside the "
+                                 "render windows, instead of the MITK default button assignment"));
+  layout->addWidget(m_PacsSchemeBox);
 
   m_LayoutEditorWidget = new QmitkMxNLayoutEditorWidget(parent);
   layout->addWidget(m_LayoutEditorWidget);
@@ -59,6 +71,24 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
 
   this->DisconnectLayoutControls();
   m_LayoutEditorWidget->SetMultiWidget(multiWidget);
+
+  // The scheme toggle belongs to the MxN editor part, so it is only live while
+  // one is active; it shows the scheme already in effect rather than a default.
+  auto* mxnEditor = dynamic_cast<QmitkMxNMultiWidgetEditor*>(multiWidgetEditor);
+  m_PacsSchemeBox->setEnabled(nullptr != mxnEditor);
+  if (nullptr != mxnEditor)
+  {
+    const QSignalBlocker blocker(m_PacsSchemeBox);
+    m_PacsSchemeBox->setChecked(
+      mitk::InteractionSchemeSwitcher::PACSStandard == mxnEditor->GetInteractionScheme());
+
+    m_LayoutConnections.push_back(connect(
+      m_PacsSchemeBox, &QCheckBox::toggled, m_LayoutEditorWidget, [mxnEditor](bool pacs) {
+        mxnEditor->OnInteractionSchemeChanged(pacs
+          ? mitk::InteractionSchemeSwitcher::PACSStandard
+          : mitk::InteractionSchemeSwitcher::MITKStandard);
+      }));
+  }
 
   if (nullptr == multiWidget)
   {

@@ -650,7 +650,13 @@ QRect QmitkMxNCellOverlay::NavigatorBandRect() const
 
   const int bandBottom = area.bottom() - passiveBottom - NavRowGap;
   const int left = area.left() + ReadoutMargin;
-  const int right = area.right() - ActiveRibbonWidth - ReadoutMargin;
+  // Stop where the intensity cluster begins. The colorbar is not just the
+  // ribbon: its range labels occupy a further TickScaleWidth to the ribbon's
+  // left, and a slider running under them makes both unreadable. A cell with no
+  // level window paints neither, so there the band takes the full width.
+  const int right = m_HasLevelWindow
+    ? this->RibbonRect().left() - TickScaleWidth - ReadoutMargin
+    : area.right() - ReadoutMargin;
   if (right <= left)
   {
     return QRect();
@@ -1952,6 +1958,27 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
         MITK_WARN << "Context menu: re-converge ignored: " << e.GetDescription();
       }
     }
+  });
+
+  menu.addSeparator();
+
+  // Re-homed from the built-in render-window menu, which the MxN utility strip
+  // covers: the two controls of that menu that still mean something for a cell
+  // whose arrangement the layout editor owns.
+  const bool isMaximized = m_Editor->GetMaximizedCell() == windowId;
+  auto* maximizeAction = menu.addAction(isMaximized ? tr("Restore layout")
+                                                    : tr("Maximize this window"));
+  connect(maximizeAction, &QAction::triggered, this, [this, windowId, isMaximized]()
+  {
+    m_Editor->SetMaximizedCell(isMaximized ? QString() : windowId);
+  });
+
+  auto* crosshairAction = menu.addAction(tr("Show crosshair"));
+  crosshairAction->setCheckable(true);
+  crosshairAction->setChecked(m_Editor->GetCrosshairVisibility());
+  connect(crosshairAction, &QAction::toggled, this, [this](bool visible)
+  {
+    m_Editor->SetCrosshairVisibility(visible);
   });
 
   menu.addSeparator();

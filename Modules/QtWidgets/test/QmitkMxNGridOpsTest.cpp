@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <QCoreApplication>
+
 #include <string>
 
 /**
@@ -48,6 +50,10 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(AddGridRow_AppendsBottomRow);
   MITK_TEST(RemoveGridRow_DropsBottom_NoOrphanSplitter_GuardsAtOneRow);
   MITK_TEST(GridOps_NoOpOnNonGridLayout);
+  MITK_TEST(Maximize_ShowsOnlyTheTargetCell);
+  MITK_TEST(Maximize_UnknownIdRestoresTheGrid);
+  MITK_TEST(Maximize_IsInvisibleToSerialization);
+  MITK_TEST(Maximize_LayoutChangeRestoresTheGrid);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -96,6 +102,90 @@ public:
       }
     }
     return false;
+  }
+
+  /** How many of the grid's cells are currently visible widgets. */
+  int VisibleCellCount() const
+  {
+    int visible = 0;
+    for (const auto& [id, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      if (cell->isVisible())
+      {
+        ++visible;
+      }
+    }
+    return visible;
+  }
+
+  // ---------- Maximize (transient view state) ----------
+
+  void Maximize_ShowsOnlyTheTargetCell()
+  {
+    m_Editor->SetLayout(2, 2);
+    // The widgets must be realized for visibility to mean anything; without a
+    // show the whole tree is hidden and the count below would be vacuously 0.
+    m_Editor->show();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("All four cells start visible", 4, this->VisibleCellCount());
+
+    m_Editor->SetMaximizedCell(CellId(2));
+
+    CPPUNIT_ASSERT_EQUAL(CellId(2).toStdString(), m_Editor->GetMaximizedCell().toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Only the maximized cell stays visible", 1,
+                                 this->VisibleCellCount());
+    CPPUNIT_ASSERT(m_Editor->GetRenderWindowWidgets().at(CellId(2))->isVisible());
+
+    m_Editor->SetMaximizedCell(QString());
+
+    CPPUNIT_ASSERT(m_Editor->GetMaximizedCell().isEmpty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Restoring brings every cell back", 4, this->VisibleCellCount());
+  }
+
+  void Maximize_UnknownIdRestoresTheGrid()
+  {
+    m_Editor->SetLayout(2, 2);
+    m_Editor->show();
+    m_Editor->SetMaximizedCell(CellId(1));
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__nosuchwindow"));
+
+    CPPUNIT_ASSERT_MESSAGE("An unknown id cannot leave cells hidden",
+                           m_Editor->GetMaximizedCell().isEmpty());
+    CPPUNIT_ASSERT_EQUAL(4, this->VisibleCellCount());
+  }
+
+  void Maximize_IsInvisibleToSerialization()
+  {
+    // Maximizing is a view state, not layout: it must not reach the document,
+    // or reopening a saved layout would come back with cells missing.
+    m_Editor->SetLayout(2, 2);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "sg");
+    m_Editor->show();
+
+    const auto plain = m_Editor->SerializeLayout();
+    m_Editor->SetMaximizedCell(CellId(3));
+    const auto maximized = m_Editor->SerializeLayout();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A maximized cell does not change the layout document",
+                                 plain.dump(), maximized.dump());
+  }
+
+  void Maximize_LayoutChangeRestoresTheGrid()
+  {
+    m_Editor->SetLayout(2, 2);
+    m_Editor->show();
+    m_Editor->SetMaximizedCell(CellId(0));
+    CPPUNIT_ASSERT_EQUAL(1, this->VisibleCellCount());
+
+    // The cell set it was maximizing out of is gone; leaving siblings hidden
+    // would strand the new grid. A rebuilt grid realizes its cells on the next
+    // event-loop turn, so settle before counting.
+    m_Editor->SetLayout(1, 3);
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_MESSAGE("A layout change drops the maximized state",
+                           m_Editor->GetMaximizedCell().isEmpty());
+    CPPUNIT_ASSERT_EQUAL(3, this->VisibleCellCount());
   }
 
   // ---------- AddGridColumn ----------

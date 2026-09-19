@@ -74,6 +74,11 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
   dataMenu->addAction(dataAction);
   dataButton->setMenu(dataMenu);
+  // The menu grabs the pointer, which reads to the cell as the pointer leaving
+  // and would collapse the strip the user just clicked; report it so the owner
+  // can hold the furniture open for as long as the popup lives.
+  connect(dataMenu, &QMenu::aboutToShow, this, [this]() { emit PopupVisibilityChanged(true); });
+  connect(dataMenu, &QMenu::aboutToHide, this, [this]() { emit PopupVisibilityChanged(false); });
   layout->addWidget(dataButton);
 
   // Data-selection group membership is no longer a per-cell combobox: it is one

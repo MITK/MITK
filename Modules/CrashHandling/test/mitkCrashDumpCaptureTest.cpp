@@ -64,6 +64,9 @@ namespace
     return result;
   }
 
+  // Only the snapshot and delete tests inspect Crashpad's bookkeeping, and
+  // those are excluded on macOS.
+#ifndef __APPLE__
   /** Crashpad's bookkeeping for the report that produced \p dumpPath: the
    *  sibling metadata file and the report's attachment directory. Both are
    *  keyed by the report UUID, which is the dump's stem as Crashpad wrote it -
@@ -99,6 +102,7 @@ namespace
 
     return false;
   }
+#endif
 
   /** The out-of-process handler finishes writing after the crashed helper
    *  is already gone, so give it time before reading the database. */

@@ -104,13 +104,13 @@ int main(int argc, char* argv[])
 
   if (mode == "freeze" || mode == "freeze-recover")
   {
-    mitk::HeartbeatMonitor::Config config;
-    config.Timeout = std::chrono::milliseconds(200);
-    config.CaptureInterval = std::chrono::milliseconds(100);
-    config.PollInterval = std::chrono::milliseconds(30);
-    config.MaxCapturesPerEpisode = 1;
+    mitk::HeartbeatMonitor::Config monitorConfig;
+    monitorConfig.Timeout = std::chrono::milliseconds(200);
+    monitorConfig.CaptureInterval = std::chrono::milliseconds(100);
+    monitorConfig.PollInterval = std::chrono::milliseconds(30);
+    monitorConfig.MaxCapturesPerEpisode = 1;
 
-    mitk::HeartbeatMonitor monitor(config,
+    mitk::HeartbeatMonitor monitor(monitorConfig,
       [] { mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::WatchdogProvisional); },
       [] { mitk::CrashDumpFacility::PurgeProvisionalSnapshots(); });
     monitor.Start();

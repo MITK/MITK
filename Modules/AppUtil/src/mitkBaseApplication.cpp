@@ -29,7 +29,6 @@ found in the LICENSE file.
 #include <QmitkUiFreezeWatchdog.h>
 
 #include <chrono>
-#include <cstring>
 #endif
 
 #include <Poco/Util/HelpFormatter.h>

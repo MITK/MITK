@@ -41,7 +41,7 @@ found in the LICENSE file.
 #include <berryIProduct.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryQtPreferences.h>
-#include <berryQtStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <berryWorkbenchPlugin.h>
 
 #include <internal/berryQtShowViewAction.h>
@@ -680,14 +680,14 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
 
-  auto fileOpenAction = new QmitkFileOpenAction(berry::QtStyleManager::ThemeIcon(basePath + "document-open.svg"), window);
+  auto fileOpenAction = new QmitkFileOpenAction(QmitkIconTheme::GetIcon(basePath + "document-open.svg"), window);
   fileOpenAction->setShortcut(QKeySequence::Open);
-  auto fileSaveAction = new QmitkFileSaveAction(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"), window);
+  auto fileSaveAction = new QmitkFileSaveAction(QmitkIconTheme::GetIcon(basePath + "document-save.svg"), window);
   fileSaveAction->setShortcut(QKeySequence::Save);
   fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-  fileSaveProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"));
+  fileSaveProjectAction->setIcon(QmitkIconTheme::GetIcon(basePath + "document-save.svg"));
   closeProjectAction = new QmitkCloseProjectAction(window);
-  closeProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "edit-delete.svg"));
+  closeProjectAction->setIcon(QmitkIconTheme::GetIcon(basePath + "edit-delete.svg"));
 
   auto   perspGroup = new QActionGroup(menuBar);
   std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
@@ -750,7 +750,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileMenu->addSeparator();
 
     QAction* fileExitAction = new QmitkFileExitAction(window);
-    fileExitAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "system-log-out.svg"));
+    fileExitAction->setIcon(QmitkIconTheme::GetIcon(basePath + "system-log-out.svg"));
     fileExitAction->setShortcut(QKeySequence::Quit);
     fileExitAction->setObjectName("QmitkFileExitAction");
     fileMenu->addAction(fileExitAction);
@@ -758,14 +758,14 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     // another bad hack to get an edit/undo menu...
     QMenu* editMenu = menuBar->addMenu("&Edit");
     undoAction = editMenu->addAction(
-      berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
+      QmitkIconTheme::GetIcon(basePath + "edit-undo.svg"),
       "&Undo",
       QKeySequence("CTRL+Z"),
       QmitkExtWorkbenchWindowAdvisorHack::undohack,
       SLOT(onUndo()));
     undoAction->setToolTip("Undo the last action (not supported by all modules)");
     redoAction = editMenu->addAction(
-      berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
+      QmitkIconTheme::GetIcon(basePath + "edit-redo.svg"),
       "&Redo",
       QKeySequence("CTRL+Y"),
       QmitkExtWorkbenchWindowAdvisorHack::undohack,
@@ -866,9 +866,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
   else
   {
-    undoAction = new QmitkUndoAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"), nullptr);
+    undoAction = new QmitkUndoAction(QmitkIconTheme::GetIcon(basePath + "edit-undo.svg"), nullptr);
     undoAction->setShortcut(QKeySequence::Undo);
-    redoAction = new QmitkRedoAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"), nullptr);
+    redoAction = new QmitkRedoAction(QmitkIconTheme::GetIcon(basePath + "edit-redo.svg"), nullptr);
     redoAction->setShortcut(QKeySequence::Redo);
   }
 
@@ -883,20 +883,20 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 #endif
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
-  imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
+  imageNavigatorAction = new QAction(QmitkIconTheme::GetIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
   bool imageNavigatorViewFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.imagenavigator");
 
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
   {
-    openDicomEditorAction = new QmitkOpenDicomEditorAction(berry::QtStyleManager::ThemeIcon(basePath + "dicom.svg"), window);
+    openDicomEditorAction = new QmitkOpenDicomEditorAction(QmitkIconTheme::GetIcon(basePath + "dicom.svg"), window);
   }
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
   {
-    openStdMultiWidgetEditorAction = new QmitkOpenStdMultiWidgetEditorAction(berry::QtStyleManager::ThemeIcon(basePath + "Editor.svg"), window);
+    openStdMultiWidgetEditorAction = new QmitkOpenStdMultiWidgetEditorAction(QmitkIconTheme::GetIcon(basePath + "Editor.svg"), window);
   }
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
   {
-    openMxNMultiWidgetEditorAction = new QmitkOpenMxNMultiWidgetEditorAction(berry::QtStyleManager::ThemeIcon(basePath + "Editor.svg"), window);
+    openMxNMultiWidgetEditorAction = new QmitkOpenMxNMultiWidgetEditorAction(QmitkIconTheme::GetIcon(basePath + "Editor.svg"), window);
   }
 
   if (imageNavigatorViewFound)
@@ -918,7 +918,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
   }
 
-  viewNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
+  viewNavigatorAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
   viewNavigatorFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator");
   if (viewNavigatorFound)
   {

@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include <ui_QmitkNodeSelectionDialog.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkDataStorageInspectorGenerator.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
@@ -105,7 +105,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   this->SetErrorText("");
 
-  m_Controls->btnAddToFav->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
+  m_Controls->btnAddToFav->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
   connect(m_Controls->btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
   connect(m_Controls->buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);

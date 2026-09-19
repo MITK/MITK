@@ -45,7 +45,7 @@ enum class QmitkMxNAxisGlyph
  *        pixmap.
  *
  * The glyphs are embedded SVG resources whose placeholder color (`#00ff00`,
- * the same convention QmitkStyleManager uses) is swapped for 'color' at load,
+ * the same convention QmitkIconTheme uses) is swapped for 'color' at load,
  * so a glyph can take any foreground (a group hue, a grayed decoupled state)
  * and stay crisp at any size. Returns a null pixmap if the resource is missing.
  */

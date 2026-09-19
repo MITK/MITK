@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureMaskGenerator.h>
 
+#include <QmitkIconTheme.h>
 #include <QmitkImageStatisticsDataGenerator.h>
 
 #include <mitkImageStatisticsContainerManager.h>
@@ -133,6 +134,13 @@ void QmitkImageStatisticsView::CreateConnections()
 
   connect(m_Controls->widget_histogram, &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
     this, &QmitkImageStatisticsView::OnRequestHistogramUpdate);
+
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]
+  {
+    const auto style = this->GetColorTheme();
+    m_Controls->widget_histogram->SetTheme(style);
+    m_Controls->widget_intensityProfile->SetTheme(style);
+  });
 
   connect(m_DataGenerator, &QmitkImageStatisticsDataGenerator::DataGenerationStarted,
     this, &QmitkImageStatisticsView::OnGenerationStarted);

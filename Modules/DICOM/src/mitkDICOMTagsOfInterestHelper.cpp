@@ -225,6 +225,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 
     //SOP
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0018))); //SOP Instance UID
+    result.insert(MakeEntry(DICOMTag(0x0008, 0x0016))); //SOP Class UID
     result.insert(MakeEntry(DICOMTag(0x0020, 0x0013))); //Instance number
     result.insert(MakeEntry(DICOMTag(0x0020, 0x1041))); //Slice location
 

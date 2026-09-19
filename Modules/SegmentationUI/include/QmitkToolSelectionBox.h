@@ -121,10 +121,18 @@ public slots:
    */
   void SetMultiLabelInspector(QmitkMultiLabelInspector *inspector);
 
+  /** \brief Re-evaluates mitk::Tool::CanHandle() for every tool button.
+   *
+   * Runs automatically when the reference or working data of the tool manager
+   * are replaced. Hosts call it when the state of the working data changes in a
+   * way that affects CanHandle() without the data object itself changing, e.g.
+   * when labels are added to or removed from a segmentation.
+   */
+  void UpdateButtonsEnabledState();
+
 protected slots:
 
   void toolButtonClicked(int id);
-  void UpdateButtonsEnabledState();
 
 protected:
 

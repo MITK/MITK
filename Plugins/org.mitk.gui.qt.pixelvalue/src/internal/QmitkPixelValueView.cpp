@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkPixelValueView.h"
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
@@ -55,7 +55,7 @@ void QmitkPixelValueView::CreateQtPartControl(QWidget* parent)
 {
   m_Ui->setupUi(parent);
 
-  auto clipboardIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/clipboard.svg"));
+  auto clipboardIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/clipboard.svg"));
   m_Ui->copyIndexCoordButton->setIcon(clipboardIcon);
   m_Ui->copyWorldCoordButton->setIcon(clipboardIcon);
 

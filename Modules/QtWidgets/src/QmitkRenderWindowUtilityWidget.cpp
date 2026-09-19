@@ -29,8 +29,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 
 // mitk qt widgets
+#include <QmitkIconTheme.h>
 #include <QmitkRenderWindow.h>
-#include <QmitkStyleManager.h>
 
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent/* = nullptr */,
@@ -91,7 +91,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
     "QToolButton:hover { background: rgba(255, 255, 255, 26); }"
     "QToolButton:checked { background: rgba(255, 255, 255, 38); border-color: %1; }"
     "QToolButton:focus { border-color: %1; }"
-    "QToolButton::menu-indicator { image: none; }").arg(QmitkStyleManager::GetIconAccentColor()));
+    "QToolButton::menu-indicator { image: none; }").arg(QmitkIconTheme::GetAccentColor()));
 
   auto* dataButton = new QToolButton(this);
   dataButton->setAutoRaise(true);
@@ -132,7 +132,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_NavigatorToggleButton = new QToolButton(this);
   m_NavigatorToggleButton->setAutoRaise(true);
   m_NavigatorToggleButton->setIconSize(QSize(iconExtent, iconExtent));
-  m_NavigatorToggleButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/mxn-navigator.svg")));
+  m_NavigatorToggleButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mxn-navigator.svg")));
   m_NavigatorToggleButton->setCheckable(true);
   m_NavigatorToggleButton->setToolTip(tr("Expanded navigator: show the full 3D crosshair and "
                                          "coordinate entry in every cell instead of the compact "
@@ -163,7 +163,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_CrosshairButton = new QToolButton(this);
   m_CrosshairButton->setAutoRaise(true);
   m_CrosshairButton->setIconSize(QSize(iconExtent, iconExtent));
-  m_CrosshairButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/mxn-crosshair.svg")));
+  m_CrosshairButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mxn-crosshair.svg")));
   m_CrosshairButton->setCheckable(true);
   m_CrosshairButton->setToolTip(tr("Show the crosshair in every render window"));
   connect(m_CrosshairButton, &QToolButton::toggled, this, [this](bool checked) {
@@ -202,7 +202,7 @@ void QmitkRenderWindowUtilityWidget::UpdateMaximizeIcon()
 {
   // The enter/leave pair the built-in menu used, so the icon states what the
   // next click does rather than what the window currently is.
-  m_MaximizeButton->setIcon(QmitkStyleManager::ThemeIcon(
+  m_MaximizeButton->setIcon(QmitkIconTheme::GetIcon(
     m_MaximizeButton->isChecked() ? QStringLiteral(":/Qmitk/mxn-restore.svg")
                                   : QStringLiteral(":/Qmitk/mxn-maximize.svg")));
 }
@@ -211,7 +211,7 @@ void QmitkRenderWindowUtilityWidget::UpdateCleanViewIcon()
 {
   // Clean view states the outcome rather than the action: the furniture the
   // frame is about to lose, or the bare image left once it is gone.
-  m_CleanViewButton->setIcon(QmitkStyleManager::ThemeIcon(
+  m_CleanViewButton->setIcon(QmitkIconTheme::GetIcon(
     m_CleanViewButton->isChecked() ? QStringLiteral(":/Qmitk/mxn-clean-on.svg")
                                    : QStringLiteral(":/Qmitk/mxn-clean-off.svg")));
 }

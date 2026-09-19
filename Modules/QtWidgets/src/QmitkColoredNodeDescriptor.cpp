@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkColoredNodeDescriptor.h>
+#include <QmitkIconTheme.h>
 #include <mitkNodePredicateDataType.h>
 #include <QFile>
 
@@ -27,14 +28,12 @@ struct QmitkColoredNodeDescriptor::Impl
   void CreateCachedIcon(const QString &hexColorCode);
 
   QHash<QString, QIcon> IconCache;
-  QString IconTemplate;
+  QByteArray IconTemplate;
 };
 
 void QmitkColoredNodeDescriptor::Impl::CreateCachedIcon(const QString &hexColorCode)
 {
-  auto icon = this->IconTemplate;
-  icon.replace(QStringLiteral("#00ff00"), hexColorCode, Qt::CaseInsensitive);
-  this->IconCache[hexColorCode] = QPixmap::fromImage(QImage::fromData(icon.toLatin1()));
+  this->IconCache[hexColorCode] = QmitkIconTheme::GetIcon(this->IconTemplate, hexColorCode);
 }
 
 QmitkColoredNodeDescriptor::QmitkColoredNodeDescriptor(const QString &className, const QString &pathToIcon, mitk::NodePredicateBase *predicate, QObject *parent)

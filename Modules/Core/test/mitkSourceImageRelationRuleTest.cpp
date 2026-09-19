@@ -22,7 +22,39 @@ found in the LICENSE file.
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkPropertyNameHelper.h>
 
+#include <mitkLog.h>
+#include <mitkLogBackendBase.h>
+
 #include <regex>
+
+namespace
+{
+  /** \brief Counts log messages by severity while registered.
+   *
+   * Connect_datalayer distinguishes a destination that simply is not a DICOM
+   * object from one that carries only part of the DICOM identity it needs.
+   * Both skip the data layer, so the connect outcome alone cannot tell them
+   * apart; the severity of what gets logged is the only observable
+   * difference. Counting by level asserts that behaviour without pinning the
+   * message wording.
+   */
+  class LevelCountingBackend : public mitk::LogBackendBase
+  {
+  public:
+    void ProcessMessage(const mitk::LogMessage& message) override
+    {
+      if (message.Level == mitk::LogLevel::Warn)
+        ++m_WarnCount;
+    }
+
+    OutputType GetOutputType() const override { return OutputType::Other; }
+
+    unsigned int GetWarnCount() const { return m_WarnCount; }
+
+  private:
+    unsigned int m_WarnCount = 0u;
+  };
+}
 
 class mitkSourceImageRelationRuleTestSuite : public mitk::TestFixture
 {
@@ -45,6 +77,7 @@ class mitkSourceImageRelationRuleTestSuite : public mitk::TestFixture
   MITK_TEST(Disconnect);
   MITK_TEST(Connect_abstract);
   MITK_TEST(Disconnect_abstract);
+  MITK_TEST(Connect_partiallyTaggedDestinationWarns);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -966,6 +999,47 @@ public:
 
     abstractRule->Disconnect(source_otherPurpose, dest_1);
     CPPUNIT_ASSERT_MESSAGE("Data of other rule type was removed.", !this->hasRelationProperties(source_otherPurpose, "1"));
+  }
+
+  void Connect_partiallyTaggedDestinationWarns()
+  {
+    const auto instanceUIDPropName = mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0018);
+    const auto classUIDPropName = mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0016);
+
+    auto noTags = mitk::Image::New();
+
+    auto instanceUIDOnly = mitk::Image::New();
+    instanceUIDOnly->SetProperty(instanceUIDPropName,
+                                 mitk::TemporoSpatialStringProperty::New("instanceOnly"));
+
+    auto classUIDOnly = mitk::Image::New();
+    classUIDOnly->SetProperty(classUIDPropName, mitk::TemporoSpatialStringProperty::New("image"));
+
+    // Scope each backend to a single Connect invocation, so a case's
+    // warning count reflects only that call, independent of fixture
+    // setup and of the lambda's other invocations.
+    const auto countWarnsForConnect = [this](const mitk::Image* destination) {
+      LevelCountingBackend backend;
+      auto source = mitk::Image::New();
+
+      mitk::RegisterBackend(&backend);
+      rule->Connect(source, destination);
+      mitk::UnregisterBackend(&backend);
+
+      return backend.GetWarnCount();
+    };
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "A destination with no DICOM identity at all is an ordinary non-DICOM source and must stay silent",
+      0u, countWarnsForConnect(noTags));
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "A destination carrying only the SOP Instance UID warns",
+      countWarnsForConnect(instanceUIDOnly) >= 1u);
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "A destination carrying only the SOP Class UID warns",
+      countWarnsForConnect(classUIDOnly) >= 1u);
   }
 
 };

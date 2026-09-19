@@ -119,6 +119,13 @@ void mitk::SegSourceImageRelationRule::Connect_datalayer(IPropertyOwner* source,
   // the base in that case already skipped its data-layer work too, so the
   // relation is ID-layer-only and the SEG writer will emit no
   // ReferencedSeriesSequence entry for it.
+  //
+  // The two halves track each other for whole sources but are not
+  // biconditional. A destination holding only one of the two SOP UIDs leaves
+  // the base skipping while seriesProp is set; conversely the per-slice
+  // Connect overload above writes no series property when handed an empty
+  // source series UID, leaving the base's data layer written while
+  // seriesProp is null. Either way the record is partial, not contradictory.
   const auto seriesProp = destination->GetConstProperty(GeneratePropertyNameForDICOMTag(0x0020, 0x000e));
   if (seriesProp.IsNotNull())
   {

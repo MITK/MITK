@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include <QmitknnUNetGPU.h>
 #include <QmitkRun.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QComboBox>
 #include <QFrame>
@@ -173,10 +173,10 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
 
   // MITK has no themed-link helper, and the default anchor colour is a dark blue
   // that is hard to read on the dark theme. Colour the links from the active
-  // theme via QmitkStyleManager (its accent colour is parsed from the current
+  // theme via QmitkIconTheme (its accent colour is parsed from the current
   // light/dark stylesheet) and present the text as a bordered, padded info panel,
   // so it reads well in both themes without hardcoding a colour.
-  const QString linkColor = QmitkStyleManager::GetIconAccentColor();
+  const QString linkColor = QmitkIconTheme::GetAccentColor();
   m_Ui->licenseInfoLabel->setTextFormat(Qt::RichText);
   m_Ui->licenseInfoLabel->setOpenExternalLinks(true);
   m_Ui->licenseInfoLabel->setWordWrap(true);

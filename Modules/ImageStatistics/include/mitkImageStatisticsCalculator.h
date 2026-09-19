@@ -76,7 +76,8 @@ namespace mitk
         /**
          * \brief Set the mask generator for restricting statistics computation.
          *
-         * If no mask is desired, pass nullptr to clear the mask.
+         * If no mask is desired, pass nullptr to clear the mask. See GetStatistics()
+         * for the geometric requirements on the masks the generator provides.
          *
          * \param[in] mask Pointer to a MaskGenerator, or nullptr.
          */
@@ -126,7 +127,16 @@ namespace mitk
          * If statistics have not been computed yet or are out of date, this method
          * triggers recomputation before returning the results.
          *
+         * A mask has to be a sub geometry of the input image (see mitk::IsSubGeometry):
+         * it lies on the voxel grid of the image and within its extent, and may cover
+         * a sub-region of it. The positions of the extrema
+         * (ImageStatisticsConstants::MINIMUMPOSITION() and MAXIMUMPOSITION()) are
+         * indices of the input image, also if the mask generator provides a reference
+         * image of its own, such as the slice of a planar figure.
+         *
          * \return Pointer to the ImageStatisticsContainer holding all results.
+         * \throws mitk::Exception if no input image is set or a mask is not a sub
+         *         geometry of the input image.
          */
         ImageStatisticsContainer* GetStatistics();
 
@@ -153,7 +163,6 @@ namespace mitk
 
         mitk::Image::ConstPointer m_Image;
         mitk::Image::ConstPointer m_ImageTimeSlice;
-        mitk::Image::ConstPointer m_InternalImageForStatistics;
 
         mitk::MaskGenerator::Pointer m_MaskGenerator;
         mitk::Image::ConstPointer m_InternalMask;

@@ -27,8 +27,60 @@ found in the LICENSE file.
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
+#include <itkMath.h>
 
+#include <cmath>
+#include <numeric>
+#include <sstream>
+#include <string>
 #include <vector>
+
+namespace
+{
+  // geometry of a hand-built test image
+  struct Grid
+  {
+    mitk::Point3D origin;
+    mitk::Vector3D spacing;
+    itk::Matrix<double, 3, 3> direction;
+
+    Grid()
+    {
+      origin.Fill(0.0);
+      spacing.Fill(1.0);
+      direction.SetIdentity();
+    }
+  };
+
+  // grid modelled on brain.nrrd: 2 mm spacing, flipped x axis, and a 20 degree
+  // rotation about x, so that the index-to-world transform does not invert
+  // exactly in floating point
+  Grid RotatedGrid()
+  {
+    const double angle = 20.0 * itk::Math::pi / 180.0;
+
+    Grid grid;
+    grid.origin[0] = 89.0;
+    grid.origin[1] = -49.3;
+    grid.origin[2] = -113.8;
+    grid.spacing.Fill(2.0);
+    grid.direction(0, 0) = -1.0;
+    grid.direction(1, 1) = std::cos(angle);
+    grid.direction(2, 1) = std::sin(angle);
+    grid.direction(1, 2) = -std::sin(angle);
+    grid.direction(2, 2) = std::cos(angle);
+    return grid;
+  }
+
+  itk::Index<3> MakeIndex(unsigned int x, unsigned int y, unsigned int z)
+  {
+    itk::Index<3> index;
+    index[0] = x;
+    index[1] = y;
+    index[2] = z;
+    return index;
+  }
+}
 
 /**
  * \brief Test class for mitkImageStatisticsCalculator
@@ -60,6 +112,13 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestSmallImageIgnoreZeroWithinMask);
   MITK_TEST(TestSmallImageIgnoreZeroWithoutMask);
   MITK_TEST(TestSmallImagePlanarFigureIgnoreZero);
+  MITK_TEST(TestRotatedImageMaskMinMaxPosition);
+  MITK_TEST(TestRotatedImagePlanarFigureMinMaxPosition);
+  MITK_TEST(TestNegativeFloatImageUnmaskedMinMaxPosition);
+  MITK_TEST(TestNegativeFloatImageMaskedMinMaxPosition);
+  MITK_TEST(TestZeroImageMinMaxPosition);
+  MITK_TEST(TestSubRegionMaskMinMaxPosition);
+  MITK_TEST(TestIncompatibleMaskThrows);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -96,6 +155,13 @@ public:
   void TestSmallImageIgnoreZeroWithinMask();
   void TestSmallImageIgnoreZeroWithoutMask();
   void TestSmallImagePlanarFigureIgnoreZero();
+  void TestRotatedImageMaskMinMaxPosition();
+  void TestRotatedImagePlanarFigureMinMaxPosition();
+  void TestNegativeFloatImageUnmaskedMinMaxPosition();
+  void TestNegativeFloatImageMaskedMinMaxPosition();
+  void TestZeroImageMinMaxPosition();
+  void TestSubRegionMaskMinMaxPosition();
+  void TestIncompatibleMaskThrows();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -141,7 +207,7 @@ private:
   // builds a small mitk::Image of the given size and pixel type from raw
   // values, in the iteration order of itk::ImageRegionIterator
   template <typename TPixel>
-  static mitk::Image::Pointer BuildImage(const itk::Size<3>& size, const std::vector<TPixel>& values)
+  static mitk::Image::Pointer BuildImage(const itk::Size<3>& size, const std::vector<TPixel>& values, const Grid& grid = Grid())
   {
     using ImageType = itk::Image<TPixel, 3>;
 
@@ -149,8 +215,20 @@ private:
     start.Fill(0);
     typename ImageType::RegionType region(start, size);
 
+    typename ImageType::PointType origin;
+    typename ImageType::SpacingType spacing;
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      origin[i] = grid.origin[i];
+      spacing[i] = grid.spacing[i];
+    }
+
     auto itkImage = ImageType::New();
     itkImage->SetRegions(region);
+    itkImage->SetOrigin(origin);
+    itkImage->SetSpacing(spacing);
+    itkImage->SetDirection(grid.direction);
     itkImage->Allocate();
 
     itk::ImageRegionIterator<ImageType> it(itkImage, region);
@@ -179,6 +257,49 @@ private:
     CPPUNIT_ASSERT_EQUAL(testN, numberOfVoxelsObject);
     CPPUNIT_ASSERT_MESSAGE("Calculated mean gray value is not equal to the desired value.", std::abs(meanObject - testMean) < mitk::eps);
     CPPUNIT_ASSERT_MESSAGE("Calculated median gray value is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
+  }
+
+  // checks the extrema and their positions in indices of the input image; the
+  // suffix names the case in the assertion messages
+  void VerifyExtrema(const mitk::ImageStatisticsContainer::ImageStatisticsObject& stats,
+    mitk::ImageStatisticsContainer::RealType min, const itk::Index<3>& minIndex,
+    mitk::ImageStatisticsContainer::RealType max, const itk::Index<3>& maxIndex,
+    const std::string& suffix = "")
+  {
+    mitk::ImageStatisticsContainer::RealType minObject = 0;
+    mitk::ImageStatisticsContainer::RealType maxObject = 0;
+    mitk::ImageStatisticsContainer::IndexType minIndexObject(3, 0);
+    mitk::ImageStatisticsContainer::IndexType maxIndexObject(3, 0);
+    CPPUNIT_ASSERT_NO_THROW(minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM()));
+    CPPUNIT_ASSERT_NO_THROW(maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM()));
+    CPPUNIT_ASSERT_NO_THROW(minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION()));
+    CPPUNIT_ASSERT_NO_THROW(maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION()));
+
+    CPPUNIT_ASSERT_MESSAGE("Minimum" + suffix, std::abs(minObject - min) < mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE("Maximum" + suffix, std::abs(maxObject - max) < mitk::eps);
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      const std::string axis = "[" + std::to_string(i) + "]" + suffix;
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("MinPosition" + axis, static_cast<int>(minIndex[i]), minIndexObject[i]);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("MaxPosition" + axis, static_cast<int>(maxIndex[i]), maxIndexObject[i]);
+    }
+  }
+
+  // checks that the statistics describe exactly one voxel with the given value
+  // at the given index of the input image
+  void VerifySingleVoxel(const mitk::ImageStatisticsContainer::ImageStatisticsObject& stats,
+    mitk::ImageStatisticsContainer::RealType value, const itk::Index<3>& index)
+  {
+    std::stringstream ss;
+    ss << " of voxel " << index;
+    const std::string voxel = ss.str();
+
+    mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject = 0;
+    CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel count" + voxel, mitk::ImageStatisticsContainer::VoxelCountType(1), numberOfVoxelsObject);
+
+    this->VerifyExtrema(stats, value, index, value, index, voxel);
   }
 
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
@@ -787,6 +908,251 @@ void mitkImageStatisticsCalculatorTestSuite::TestSmallImagePlanarFigureIgnoreZer
   auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyCountMeanAndMedian(statisticsObject, 3, 10.0, 10.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRotatedImageMaskMinMaxPosition()
+{
+  /*****************************
+   * 4x4x4 image on a rotated grid, a mask selecting a single voxel is used
+   * for every voxel of the image
+   * -> MinPosition and MaxPosition equal the index of that voxel
+   ******************************/
+  MITK_INFO << std::endl << "Test rotated image mask min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(4);
+  const Grid grid = RotatedGrid();
+
+  std::vector<short> values(4 * 4 * 4);
+  std::iota(values.begin(), values.end(), static_cast<short>(1));
+  mitk::Image::Pointer image = BuildImage<short>(size, values, grid);
+
+  for (unsigned int z = 0; z < 4; ++z)
+  {
+    for (unsigned int y = 0; y < 4; ++y)
+    {
+      for (unsigned int x = 0; x < 4; ++x)
+      {
+        const std::size_t offset = x + 4 * (y + 4 * z);
+        std::vector<unsigned short> maskValues(4 * 4 * 4, 0);
+        maskValues[offset] = 1;
+        mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues, grid);
+
+        mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+        imgMaskGen->SetInputImage(image);
+        imgMaskGen->SetImageMask(mask);
+
+        mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+        CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+
+        this->VerifySingleVoxel(statisticsContainer->GetStatistics(1, 0), values[offset], MakeIndex(x, y, z));
+      }
+    }
+  }
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRotatedImagePlanarFigureMinMaxPosition()
+{
+  /*****************************
+   * 4x4x4 image on a rotated grid, a square planar figure enclosing only the
+   * center of a single pixel is used for every voxel of the image
+   * -> MinPosition and MaxPosition equal the index of that voxel
+   ******************************/
+  MITK_INFO << std::endl << "Test rotated image planar figure min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(4);
+  const Grid grid = RotatedGrid();
+
+  std::vector<short> values(4 * 4 * 4);
+  std::iota(values.begin(), values.end(), static_cast<short>(1));
+  mitk::Image::Pointer image = BuildImage<short>(size, values, grid);
+
+  const double dx = 0.25 * grid.spacing[0];
+  const double dy = 0.25 * grid.spacing[1];
+
+  for (unsigned int z = 0; z < 4; ++z)
+  {
+    mitk::PlaneGeometry::Pointer plane = image->GetSlicedGeometry()->GetPlaneGeometry(z);
+
+    for (unsigned int y = 0; y < 4; ++y)
+    {
+      for (unsigned int x = 0; x < 4; ++x)
+      {
+        const auto index = MakeIndex(x, y, z);
+
+        // the square is placed in plane coordinates around the pixel center
+        mitk::Point3D center;
+        image->GetGeometry()->IndexToWorld(index, center);
+        mitk::Point2D center2D;
+        CPPUNIT_ASSERT(plane->Map(center, center2D));
+
+        mitk::Point2D pnt1; pnt1[0] = center2D[0] - dx; pnt1[1] = center2D[1] - dy;
+        mitk::Point2D pnt2; pnt2[0] = center2D[0] + dx; pnt2[1] = center2D[1] - dy;
+        mitk::Point2D pnt3; pnt3[0] = center2D[0] + dx; pnt3[1] = center2D[1] + dy;
+        mitk::Point2D pnt4; pnt4[0] = center2D[0] - dx; pnt4[1] = center2D[1] + dy;
+        auto figure = GeneratePlanarPolygon(plane, { pnt1, pnt2, pnt3, pnt4 });
+
+        mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+        planFigMaskGen->SetInputImage(image);
+        planFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+        mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+        CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, planFigMaskGen.GetPointer()));
+
+        this->VerifySingleVoxel(statisticsContainer->GetStatistics(1, 0), values[x + 4 * (y + 4 * z)], index);
+      }
+    }
+  }
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestNegativeFloatImageUnmaskedMinMaxPosition()
+{
+  /*****************************
+   * 2x2x2 float image with only negative values
+   * -> Min -8 at (1,1,0), Max -1 at (1,0,0)
+   ******************************/
+  MITK_INFO << std::endl << "Test negative float image unmasked min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<float> values{ -5.f, -1.f, -3.f, -8.f, -2.f, -7.f, -4.f, -6.f };
+  mitk::Image::Pointer image = BuildImage<float>(size, values);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  auto statisticsObject = statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
+
+  this->VerifyExtrema(statisticsObject, -8.0, MakeIndex(1, 1, 0), -1.0, MakeIndex(1, 0, 0));
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestNegativeFloatImageMaskedMinMaxPosition()
+{
+  /*****************************
+   * 2x2x2 float image with only negative values, the mask selects the
+   * second slice
+   * -> Min -7 at (1,0,1), Max -2 at (0,0,1)
+   ******************************/
+  MITK_INFO << std::endl << "Test negative float image masked min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<float> values{ -5.f, -1.f, -3.f, -8.f, -2.f, -7.f, -4.f, -6.f };
+  std::vector<unsigned short> maskValues{ 0, 0, 0, 0, 1, 1, 1, 1 };
+  mitk::Image::Pointer image = BuildImage<float>(size, values);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, maskValues);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  this->VerifyExtrema(statisticsObject, -7.0, MakeIndex(1, 0, 1), -2.0, MakeIndex(0, 0, 1));
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestZeroImageMinMaxPosition()
+{
+  /*****************************
+   * 2x2x2 unsigned char image holding only zeros, unmasked and with a mask
+   * selecting the second slice; zero is the lowest value of the pixel type,
+   * so the maximum never improves on a sentinel seed
+   * -> Min and Max 0 at the first voxel of the evaluated region
+   ******************************/
+  MITK_INFO << std::endl << "Test zero image min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  mitk::Image::Pointer image = BuildImage<unsigned char>(size, std::vector<unsigned char>(8, 0));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  this->VerifyExtrema(statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0),
+    0.0, MakeIndex(0, 0, 0), 0.0, MakeIndex(0, 0, 0), " unmasked");
+
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(size, { 0, 0, 0, 0, 1, 1, 1, 1 });
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  this->VerifyExtrema(statisticsContainer->GetStatistics(1, 0), 0.0, MakeIndex(0, 0, 1), 0.0, MakeIndex(0, 0, 1), " masked");
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestSubRegionMaskMinMaxPosition()
+{
+  /*****************************
+   * 4x4x4 image on a rotated grid, a 2x2x2 mask on the same grid covering
+   * the image voxels [1,2]x[2,3]x[1,2]
+   * -> 8 voxels, Min 26 at (1,2,1), Max 47 at (2,3,2) in image indices
+   ******************************/
+  MITK_INFO << std::endl << "Test sub-region mask min/max position:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(4);
+  const Grid grid = RotatedGrid();
+
+  std::vector<short> values(4 * 4 * 4);
+  std::iota(values.begin(), values.end(), static_cast<short>(1));
+  mitk::Image::Pointer image = BuildImage<short>(size, values, grid);
+
+  Grid maskGrid = grid;
+  image->GetGeometry()->IndexToWorld(MakeIndex(1, 2, 1), maskGrid.origin);
+  itk::Size<3> maskSize;
+  maskSize.Fill(2);
+  mitk::Image::Pointer mask = BuildImage<unsigned short>(maskSize, std::vector<unsigned short>(8, 1), maskGrid);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(mask);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  auto statisticsObject = statisticsContainer->GetStatistics(1, 0);
+
+  mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxels = 0;
+  CPPUNIT_ASSERT_NO_THROW(numberOfVoxels = statisticsObject.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+  CPPUNIT_ASSERT_EQUAL(mitk::ImageStatisticsContainer::VoxelCountType(8), numberOfVoxels);
+
+  this->VerifyExtrema(statisticsObject, 26.0, MakeIndex(1, 2, 1), 47.0, MakeIndex(2, 3, 2));
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestIncompatibleMaskThrows()
+{
+  /*****************************
+   * masks that are not on the voxel grid of the image are rejected
+   ******************************/
+  MITK_INFO << std::endl << "Test incompatible mask throws:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  std::vector<short> values(8, 10);
+  std::vector<unsigned short> maskValues(8, 1);
+  const Grid grid = RotatedGrid();
+  mitk::Image::Pointer image = BuildImage<short>(size, values, grid);
+
+  // shifted by half a voxel along the first image axis
+  Grid shifted = grid;
+  mitk::Point3D halfVoxel;
+  mitk::FillVector3D(halfVoxel, 0.5, 0.0, 0.0);
+  image->GetGeometry()->IndexToWorld(halfVoxel, shifted.origin);
+
+  mitk::ImageMaskGenerator::Pointer shiftedMaskGen = mitk::ImageMaskGenerator::New();
+  shiftedMaskGen->SetInputImage(image);
+  shiftedMaskGen->SetImageMask(BuildImage<unsigned short>(size, maskValues, shifted));
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image, shiftedMaskGen.GetPointer()), mitk::Exception);
+
+  // different spacing
+  Grid coarse = grid;
+  coarse.spacing[0] = 4.0;
+
+  mitk::ImageMaskGenerator::Pointer coarseMaskGen = mitk::ImageMaskGenerator::New();
+  coarseMaskGen->SetInputImage(image);
+  coarseMaskGen->SetImageMask(BuildImage<unsigned short>(size, maskValues, coarse));
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image, coarseMaskGen.GetPointer()), mitk::Exception);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

@@ -9,6 +9,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkDataStorageListModelTest.cpp
   QmitkDataStorageTreeModelTest.cpp
   QmitkAbstractNodeSelectionWidgetTest.cpp
+  QmitkIconThemeTest.cpp
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNGeometryAuthorityTest.cpp
   QmitkMxNLayoutV2Test.cpp

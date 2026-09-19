@@ -17,11 +17,6 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
 
-#include <mitkSegChangeOperationApplier.h>
-
-#include <QmitkStyleManager.h>
-
-
 class QmitkMultiLabelSegTreeItem
 {
 public:

@@ -75,6 +75,21 @@ mitk::SegTool2D::~SegTool2D()
 {
 }
 
+bool mitk::SegTool2D::CanHandle(const BaseData *referenceData, const BaseData *workingData) const
+{
+  if (!Superclass::CanHandle(referenceData, workingData))
+    return false;
+
+  if (dynamic_cast<const Image*>(referenceData) == nullptr)
+    return false;
+
+  auto* segmentation = dynamic_cast<const MultiLabelSegmentation*>(workingData);
+  if (segmentation == nullptr)
+    return false;
+
+  return segmentation->GetTotalNumberOfLabels() > 0;
+}
+
 bool mitk::SegTool2D::FilterEvents(InteractionEvent *interactionEvent, DataNode *)
 {
   // 2D tools operate on the slice shown in a 2D render window. Internal events

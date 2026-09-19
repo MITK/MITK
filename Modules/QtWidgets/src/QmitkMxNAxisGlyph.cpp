@@ -45,7 +45,7 @@ QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, in
   }
 
   // Swap the placeholder color for the requested one, the same recolor trick
-  // QmitkStyleManager uses for theme icons - here the color is a group hue (or
+  // QmitkIconTheme uses for theme icons - here the color is a group hue (or
   // a grayed decoupled state) rather than the theme's icon color.
   QString svg = QString::fromUtf8(file.readAll());
   svg.replace(QStringLiteral("#00ff00"), color.name(QColor::HexRgb), Qt::CaseInsensitive);

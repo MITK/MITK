@@ -30,6 +30,7 @@ set(MITK_MODULES
   BoundingShape
   Segmentation
   QtHtml
+  QtIconTheme
   QtWidgets
   QtWidgetsExt
   ImageStatisticsUI

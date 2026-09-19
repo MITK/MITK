@@ -38,7 +38,7 @@ found in the LICENSE file.
 #include <berryIProduct.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryQtPreferences.h>
-#include <berryQtStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <berryWorkbenchPlugin.h>
 
 #include <internal/berryQtShowViewAction.h>
@@ -437,7 +437,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
 
   fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-  fileSaveProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"));
+  fileSaveProjectAction->setIcon(QmitkIconTheme::GetIcon(basePath + "document-save.svg"));
 
   auto   perspGroup = new QActionGroup(menuBar);
   std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
@@ -495,19 +495,19 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   fileMenu->addSeparator();
 
   QAction* fileExitAction = new QmitkFileExitAction(window);
-  fileExitAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "system-log-out.svg"));
+  fileExitAction->setIcon(QmitkIconTheme::GetIcon(basePath + "system-log-out.svg"));
   fileExitAction->setShortcut(QKeySequence::Quit);
   fileExitAction->setObjectName("QmitkFileExitAction");
   fileMenu->addAction(fileExitAction);
 
   // another bad hack to get an edit/undo menu...
   QMenu* editMenu = menuBar->addMenu("&Edit");
-  undoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
+  undoAction = editMenu->addAction(QmitkIconTheme::GetIcon(basePath + "edit-undo.svg"),
     "&Undo",
     QKeySequence("CTRL+Z"),
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onUndo);
   undoAction->setToolTip("Undo the last action (not supported by all modules)");
-  redoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
+  redoAction = editMenu->addAction(QmitkIconTheme::GetIcon(basePath + "edit-redo.svg"),
     "&Redo",
     QKeySequence("CTRL+Y"),
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onRedo);
@@ -582,7 +582,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 #endif
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
-  imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
+  imageNavigatorAction = new QAction(QmitkIconTheme::GetIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
   bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
 
   if (imageNavigatorViewFound)

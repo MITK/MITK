@@ -95,6 +95,7 @@ private Q_SLOTS:
 
   void OnLabelAdded(mitk::MultiLabelSegmentation::LabelValueType labelValue);
   void OnLabelRemoved(mitk::MultiLabelSegmentation::LabelValueType labelValue);
+  void OnGroupAdded(mitk::MultiLabelSegmentation::GroupIndexType groupIndex);
   void OnGroupRemoved(mitk::MultiLabelSegmentation::GroupIndexType groupIndex);
 
 private:
@@ -104,6 +105,7 @@ private:
   mitk::MultiLabelSegmentation* GetWorkingImage();
   void AddObserversToWorkingImage();
   void RemoveObserversFromWorkingImage();
+  void OnWorkingNodeModified();
 
   void CreateQtPartControl(QWidget* parent) override;
 
@@ -195,7 +197,12 @@ private:
 
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+  mitk::ITKEventObserverGuard m_GroupAddedObserver;
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;
+
+  /** Detects the working node receiving another segmentation in place, which
+   *  the selection-based bookkeeping above does not see. */
+  mitk::ITKEventObserverGuard m_WorkingNodeObserver;
 
   mitk::LabelSuggestionHelper::Pointer m_LabelSuggestionHelper;
 

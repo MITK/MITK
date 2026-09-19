@@ -96,6 +96,18 @@ public Q_SLOTS:
   void SetNavigatorChecked(bool expanded);
 
   /**
+  * \brief Mirror the editor-wide crosshair visibility into this cell's toggle
+  *        button without re-emitting 'CrosshairToggled'.
+  */
+  void SetCrosshairChecked(bool visible);
+
+  /**
+  * \brief Mirror whether this cell is the maximized one into its toggle button
+  *        without re-emitting 'MaximizeToggled'.
+  */
+  void SetMaximizeChecked(bool maximized);
+
+  /**
   * \brief Set the sync barcode for this cell: one slot per axis (glyph, hue,
   *        tooltip; an invalid color is an unsynced gap). Pushed by the owning
   *        multi widget from the group registry.
@@ -122,6 +134,21 @@ Q_SIGNALS:
   void NavigatorToggled(bool expanded);
 
   /**
+  * \brief Emitted when the user toggles the crosshair from this cell. Like
+  *        clean view the state is editor-wide; the owning multi widget applies
+  *        it and mirrors it back via 'SetCrosshairChecked'.
+  */
+  void CrosshairToggled(bool visible);
+
+  /**
+  * \brief Emitted when the user maximizes this cell, or restores the grid from
+  *        it. Unlike the other toggles this one is per cell; the owning multi
+  *        widget resolves which cell asked and mirrors the result back to every
+  *        strip via 'SetMaximizeChecked'.
+  */
+  void MaximizeToggled(bool maximized);
+
+  /**
   * \brief Emitted when the user asks for the editor-wide layout editor from
   *        this cell's "Sync" button; the owning multi widget relays it to
   *        whoever hosts the view.
@@ -143,10 +170,19 @@ protected:
 
 private:
 
+  /** \brief Point the maximize button's icon at what the next click will do. */
+  void UpdateMaximizeIcon();
+
+  /** \brief Show either the furniture clean view hides, or the bare frame it
+   *         leaves behind, according to the current state. */
+  void UpdateCleanViewIcon();
+
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
   QToolButton* m_CleanViewButton;
   QToolButton* m_NavigatorToggleButton;
+  QToolButton* m_CrosshairButton;
+  QToolButton* m_MaximizeButton;
   QmitkMxNSyncBarcodeWidget* m_SyncBarcode;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;

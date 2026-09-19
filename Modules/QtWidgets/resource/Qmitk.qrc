@@ -20,6 +20,12 @@
     <file>mxn-axis-windowing.svg</file>
     <file>mxn-axis-lut.svg</file>
     <file>mxn-axis-selection.svg</file>
+    <file>mxn-crosshair.svg</file>
+    <file>mxn-maximize.svg</file>
+    <file>mxn-restore.svg</file>
+    <file>mxn-clean-off.svg</file>
+    <file>mxn-clean-on.svg</file>
+    <file>mxn-navigator.svg</file>
     <file>mm_contrast.png</file>
     <file>mm_pan.png</file>
     <file>mm_pointer.png</file>

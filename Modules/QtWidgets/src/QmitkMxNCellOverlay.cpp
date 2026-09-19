@@ -1965,12 +1965,15 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   // Re-homed from the built-in render-window menu, which the MxN utility strip
   // covers: the two controls of that menu that still mean something for a cell
   // whose arrangement the layout editor owns.
-  const bool isMaximized = m_Editor->GetMaximizedCell() == windowId;
-  auto* maximizeAction = menu.addAction(isMaximized ? tr("Restore layout")
-                                                    : tr("Maximize this window"));
-  connect(maximizeAction, &QAction::triggered, this, [this, windowId, isMaximized]()
+  // No icons on the checkable entries: a style draws the check mark and the icon
+  // in the same column, so an icon silently replaces the tick and the state
+  // stops being readable. The strip carries the icons; the menu carries state.
+  auto* maximizeAction = menu.addAction(tr("Maximized"));
+  maximizeAction->setCheckable(true);
+  maximizeAction->setChecked(m_Editor->GetMaximizedCell() == windowId);
+  connect(maximizeAction, &QAction::toggled, this, [this, windowId](bool maximized)
   {
-    m_Editor->SetMaximizedCell(isMaximized ? QString() : windowId);
+    m_Editor->SetMaximizedCell(maximized ? windowId : QString());
   });
 
   auto* crosshairAction = menu.addAction(tr("Show crosshair"));
@@ -1979,6 +1982,14 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   connect(crosshairAction, &QAction::toggled, this, [this](bool visible)
   {
     m_Editor->SetCrosshairVisibility(visible);
+  });
+
+  auto* cleanViewAction = menu.addAction(tr("Clean view"));
+  cleanViewAction->setCheckable(true);
+  cleanViewAction->setChecked(m_Editor->IsCleanView());
+  connect(cleanViewAction, &QAction::toggled, this, [this](bool cleanView)
+  {
+    m_Editor->SetCleanView(cleanView);
   });
 
   menu.addSeparator();
@@ -1995,14 +2006,6 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   connect(expandedNavigatorAction, &QAction::toggled, this, [this](bool expanded)
   {
     m_Editor->SetNavigatorExpanded(expanded);
-  });
-
-  auto* cleanViewAction = menu.addAction(tr("Clean view"));
-  cleanViewAction->setCheckable(true);
-  cleanViewAction->setChecked(m_Editor->IsCleanView());
-  connect(cleanViewAction, &QAction::toggled, this, [this](bool cleanView)
-  {
-    m_Editor->SetCleanView(cleanView);
   });
 
   menu.exec(globalPosition);

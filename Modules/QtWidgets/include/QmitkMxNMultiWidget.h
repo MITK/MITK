@@ -836,6 +836,10 @@ Q_SIGNALS:
   /** \brief The maximized cell changed; empty id means the grid is back. */
   void MaximizedCellChanged(const QString& windowId);
 
+  /** \brief Editor-wide crosshair visibility changed, so per-cell affordances
+   *         can mirror it. */
+  void CrosshairVisibilityChanged(bool visible);
+
   /**
   * \brief A selection group's display label changed (cosmetic rename);
   *        per-cell group selectors update their row text.

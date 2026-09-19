@@ -399,7 +399,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
-  , m_CrosshairVisibility(false)
+  , m_CrosshairVisibility(true)
 {
   // Reject malformed names at construction; once stored, an `_` in the
   // editor name would later produce schema-invalid ids or break the
@@ -681,28 +681,29 @@ const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widg
 
 void QmitkMxNMultiWidget::SetCrosshairVisibility(bool visible)
 {
-  // get the specific render window that sent the signal
-  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
-  if (nullptr == renderWindow)
+  m_CrosshairVisibility = visible;
+
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
-    return;
+    try
+    {
+      renderWindowWidget->SetCrosshairVisibility(visible);
+    }
+    catch (const mitk::Exception& e)
+    {
+      // The crosshair node reaches the data storage when the editor part opens
+      // (EnableCrosshair); until then a cell has no crosshair to show or hide.
+      MITK_WARN << "Crosshair visibility for " << windowId.toStdString()
+                << " ignored: " << e.GetDescription();
+    }
   }
 
-  auto renderWindowWidget = this->GetRenderWindowWidget(renderWindow);
-  renderWindowWidget->SetCrosshairVisibility(visible);
+  emit CrosshairVisibilityChanged(visible);
 }
 
 bool QmitkMxNMultiWidget::GetCrosshairVisibility() const
 {
-  // get the specific render window that sent the signal
-  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
-  if (nullptr == renderWindow)
-  {
-    return false;
-  }
-
-  auto renderWindowWidget = this->GetRenderWindowWidget(renderWindow);
-  return renderWindowWidget->GetCrosshairVisibility();
+  return m_CrosshairVisibility;
 }
 
 void QmitkMxNMultiWidget::SetCrosshairGap(unsigned int gapSize)
@@ -859,6 +860,12 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
 
   this->GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 
+  // The shared default-layout routine switches the built-in render-window menu
+  // back on for every cell, and it is what covers this editor's utility strip.
+  // Undo it here, after the layout pass rather than at cell creation, because
+  // each rebuild re-arms it.
+  this->ActivateMenuWidget(false);
+
   // Layout-tracking furniture (layout editor, seams) follows this signal;
   // without it a shrink leaves them rendering removed cells.
   emit LayoutChanged();
@@ -973,6 +980,26 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(this, &QmitkMxNMultiWidget::NavigatorExpandedChanged,
           utilityWidget, &QmitkRenderWindowUtilityWidget::SetNavigatorChecked);
   utilityWidget->SetNavigatorChecked(m_NavigatorExpanded);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CrosshairToggled,
+          this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
+  connect(this, &QmitkMxNMultiWidget::CrosshairVisibilityChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetCrosshairChecked);
+  utilityWidget->SetCrosshairChecked(m_CrosshairVisibility);
+
+  // Maximizing is the one per-cell toggle in the strip, so the cell's id is
+  // bound here; every strip then mirrors the single maximized cell, which is
+  // what lets any of them restore the grid.
+  const QString cellId = renderWindowWidget->GetWidgetName();
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::MaximizeToggled,
+          this, [this, cellId](bool maximized) {
+            this->SetMaximizedCell(maximized ? cellId : QString());
+          });
+  connect(this, &QmitkMxNMultiWidget::MaximizedCellChanged,
+          utilityWidget, [utilityWidget, cellId](const QString& maximizedId) {
+            utilityWidget->SetMaximizeChecked(maximizedId == cellId);
+          });
+  utilityWidget->SetMaximizeChecked(m_MaximizedCell == cellId);
 
   // The cell's data-selection group is now one axis among the others: it is
   // assigned from the layout editor and shown in the sync barcode, so the

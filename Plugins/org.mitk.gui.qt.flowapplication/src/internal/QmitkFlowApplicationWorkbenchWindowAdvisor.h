@@ -54,8 +54,6 @@ public:
 
     void ShowViewToolbar(bool show);
 
-    void ShowVersionInfo(bool show);
-
     void ShowMitkVersionInfo(bool show);
 
     void ShowMemoryIndicator(bool show);
@@ -127,7 +125,6 @@ private:
 
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
-  bool showVersionInfo;
   bool showMitkVersionInfo;
   bool showMemoryIndicator;
   QString productName;

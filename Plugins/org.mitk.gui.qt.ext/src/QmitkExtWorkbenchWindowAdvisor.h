@@ -58,8 +58,6 @@ public:
 
     void ShowPerspectiveToolbar(bool show);
 
-    void ShowVersionInfo(bool show);
-
     void ShowMitkVersionInfo(bool show);
 
     void ShowViewMenuItem(bool show);
@@ -141,7 +139,6 @@ private:
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
   bool showPerspectiveToolbar;
-  bool showVersionInfo;
   bool showMitkVersionInfo;
   bool showViewMenuItem;
   bool showNewWindowMenuItem;

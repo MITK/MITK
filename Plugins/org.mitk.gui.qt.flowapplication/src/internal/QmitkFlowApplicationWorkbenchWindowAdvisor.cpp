@@ -56,7 +56,6 @@ found in the LICENSE file.
 #include <QmitkApplicationConstants.h>
 #include "QmitkExtFileSaveProjectAction.h"
 
-#include <itkConfigure.h>
 #include <mitkVersion.h>
 #include <mitkBaseApplication.h>
 #include <mitkCoreServices.h>
@@ -64,7 +63,6 @@ found in the LICENSE file.
 #include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkWorkbenchUtil.h>
-#include <vtkVersionMacros.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -330,7 +328,6 @@ QmitkFlowApplicationWorkbenchWindowAdvisor::QmitkFlowApplicationWorkbenchWindowA
   , lastInput(nullptr)
   , wbAdvisor(wbAdvisor)
   , showViewToolbar(true)
-  , showVersionInfo(true)
   , showMitkVersionInfo(true)
   , showMemoryIndicator(true)
   , dropTargetListener(new QmitkDefaultDropTargetListener)
@@ -368,11 +365,6 @@ bool QmitkFlowApplicationWorkbenchWindowAdvisor::GetShowMemoryIndicator()
 void QmitkFlowApplicationWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
   showViewToolbar = show;
-}
-
-void QmitkFlowApplicationWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
-{
-  showVersionInfo = show;
 }
 
 void QmitkFlowApplicationWorkbenchWindowAdvisor::ShowMitkVersionInfo(bool show)
@@ -800,17 +792,6 @@ QString QmitkFlowApplicationWorkbenchWindowAdvisor::ComputeTitle()
       mitkVersionInfo = MITK_VERSION_STRING;
 
     title += " " + mitkVersionInfo;
-  }
-
-  if (showVersionInfo)
-  {
-    // add version informatioin
-    QString versions = QString(" (ITK %1.%2.%3 | VTK %4.%5.%6 | Qt %7)")
-      .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
-      .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
-      .arg(QT_VERSION_STR);
-
-    title += versions;
   }
 
   if (currentPage)

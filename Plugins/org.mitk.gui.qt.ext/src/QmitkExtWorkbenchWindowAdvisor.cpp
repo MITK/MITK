@@ -64,7 +64,6 @@ found in the LICENSE file.
 #include "QmitkOpenStdMultiWidgetEditorAction.h"
 #include <QmitkApplicationConstants.h>
 
-#include <itkConfigure.h>
 #include <mitkBaseApplication.h>
 #include <mitkVersion.h>
 #include <mitkCoreServices.h>
@@ -75,7 +74,6 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
-#include <vtkVersionMacros.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
@@ -471,7 +469,6 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
   , wbAdvisor(wbAdvisor)
   , showViewToolbar(true)
   , showPerspectiveToolbar(false)
-  , showVersionInfo(true)
   , showMitkVersionInfo(true)
   , showViewMenuItem(true)
   , showNewWindowMenuItem(false)
@@ -551,11 +548,6 @@ void QmitkExtWorkbenchWindowAdvisor::ShowViewMenuItem(bool show)
 void QmitkExtWorkbenchWindowAdvisor::ShowPerspectiveToolbar(bool show)
 {
   showPerspectiveToolbar = show;
-}
-
-void QmitkExtWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
-{
-  showVersionInfo = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowMitkVersionInfo(bool show)
@@ -1437,17 +1429,6 @@ QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
       mitkVersionInfo = MITK_VERSION_STRING;
 
     title += " " + mitkVersionInfo;
-  }
-
-  if (showVersionInfo)
-  {
-    // add version informatioin
-    QString versions = QString(" (ITK %1.%2.%3 | VTK %4.%5.%6 | Qt %7)")
-      .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
-      .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
-      .arg(QT_VERSION_STR);
-
-    title += versions;
   }
 
   if (currentPage)

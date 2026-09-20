@@ -71,7 +71,7 @@ By default all loaded data nodes are visible in the <em>Standard Display</em>. T
 If a data node is visible, the checkbox is filled - an empty checkbox indicates a hidden data node (see \ref ParentChild "Parent-Child-Relation" screenshot).
 <em>Hint: The data nodes are rendered on top of each other, such that the topmost visible data node is always displayed on top of other data nodes. By hiding
 the topmost visible data node the next data node becomes the topmost visible data node and the hidden data node is not rendered anymore.</em>
-<em>Note: "Visible" does not mean that the node is correctly displayed inside the render windows. The user might have to re-initialize a data node to have it correctly displayed.</em>
+<em>Note: "Visible" does not mean that the node lies inside the region that the render windows currently display. The user might have to use "Fit views to selection" from the context menu to bring it into view.</em>
 
 \subsection DataManagerNodeSelection Selection of data nodes
 
@@ -99,17 +99,18 @@ The context menu allows to quickly perform common actions on data nodes. These a
 For more actions see the respective modules and plugins (e.g. <tt>QmitkCreatePolygonModelAction</tt> inside the <tt>org_mitk_gui_qt_segmentation</tt>-plugin.
 
 <ul>
-  <li> <em>Global Reinit</em>: Re-initializes the render windows to the common bounding box of all data nodes of the data storage that
+  <li> <em>Align views to image</em>: Makes the render windows adopt the slice grid of the selected image, that is its orientation, spacing and extent.
+    The crosshair position, the current time step and the zoom are kept. Use this to display an image without resampling artifacts, for example to
+    work on it with the <em>Segmentation</em> plugin. Requires a single selected image.
+  <li> <em>Fit views to selection</em>: Frames the selected data nodes in the render windows and resets the camera. If exactly one image is selected,
+    the render windows additionally adopt its slice grid, just like <em>Align views to image</em> does. Data nodes that
     <ul>
-      <li> have not set <tt>"includeInBoundingBox"</tt> to false
-      <li> are <tt>"visible"</tt>.
+      <li> have set <tt>"includeInBoundingBox"</tt> to false
+      <li> or are not <tt>"visible"</tt>
     </ul>
-    In this case it does not matter on which node this action is performed.
-	<li> <em>Reinit</em>: Re-initializes the render windows to the common bounding box of all selected data nodes of the data storage that
-    <ul>
-      <li> have not set <tt>"includeInBoundingBox"</tt> to false
-      <li> are <tt>"visible"</tt>.
-    </ul>
+    are ignored.
+  <li> <em>Fit views to all data</em>: Frames all data nodes of the data storage in the render windows and resets the camera. The same data nodes are
+    ignored as for <em>Fit views to selection</em>. In this case it does not matter on which node this action is performed.
   <li> <em>Save</em>: see \ref DataManagerSavingData "Saving Data" section
   <li> <em>Remove</em>: Removes all selected data nodes from the data storage.
   <li> <em>Show only selected nodes</em>: Enables the visibility of all selected data nodes and hides all other data nodes.
@@ -171,18 +172,15 @@ The user can customize the hotkeys by accessing the <em>preference page</em>:
 
 <ul>
   <li> <em>Delete selected nodes</em> Removes all selected data nodes from the data storage.
-  <li> <em>Global reinit</em> Re-initializes the render windows to the common bounding box of all data nodes of the data storage that
+  <li> <em>Fit views to all data</em> Frames all data nodes of the data storage in the render windows and resets the camera. Data nodes that
     <ul>
-      <li> have not set <tt>"includeInBoundingBox"</tt> to false
-      <li> are <tt>"visible"</tt>
+      <li> have set <tt>"includeInBoundingBox"</tt> to false
+      <li> or are not <tt>"visible"</tt>
     </ul>
-    In this case it does not matter on which node this action is performed.
+    are ignored. In this case it does not matter on which node this action is performed.
+  <li> <em>Fit views to selection</em> Frames the selected data nodes in the render windows and resets the camera. If exactly one image is selected,
+    the render windows additionally adopt its slice grid. The same data nodes are ignored as for <em>Fit views to all data</em>.
   <li> <em>Make all nodes invisible</em> Hides all data nodes of the data storage.
-  <li> <em>Reinit selected nodes</em> Re-initializes the render windows to the common bounding box of all selected data nodes of the data storage that
-    <ul>
-      <li> have not set <tt>"includeInBoundingBox"</tt> to false
-      <li> are <tt>"visible"</tt>
-    </ul>
   <li> <em>Show node information</em> Opens a pop-up window with detailed information about each node, like data type, geometry, DICOM information, file path etc.
   <li> <em>Toggle visibility of selected nodes</em>: Shows / hides each selected data node according to each node's current visibility state.
 </ul>

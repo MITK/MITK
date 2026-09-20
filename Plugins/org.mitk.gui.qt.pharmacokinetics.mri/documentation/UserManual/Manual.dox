@@ -105,7 +105,7 @@ This can be improved by setting reasonable initial parameters and fitting constr
 \n
 
 - <b>I have generated a parameter map and it is shown as data node in the data manager. Why can't I see it in the standard display window?</b>\n
-You might be in a slice of a 3D image, in which the map is not visible. Right-click on the parameter map and select "Reinit".
+You might be in a slice of a 3D image, in which the map is not visible. Right-click on the parameter map and select "Fit views to selection".
 Now you can scroll through the slices until you see the map in the standard display. \n
 Make sure that the "Concentration" node is toggled off. \n
 The level-window might be set such that the map is not visible. When the map is open in the standard display,

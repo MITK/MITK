@@ -100,6 +100,7 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWo
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
   setText(tr("Fit views to selection"));
+  setStatusTip(tr("One image: adopt its slices and center; otherwise frame the selection"));
   InitializeAction();
 }
 
@@ -108,6 +109,7 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWo
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {
   setText(tr("Fit views to selection"));
+  setStatusTip(tr("One image: adopt its slices and center; otherwise frame the selection"));
   InitializeAction();
 }
 

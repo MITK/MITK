@@ -47,6 +47,7 @@ QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QWidget* parent
   , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   setText(tr("Fit views to all data"));
+  setStatusTip(tr("Frame everything visible"));
   InitializeAction();
 }
 
@@ -55,6 +56,7 @@ QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QWidget* parent
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Fit views to all data"));
+  setStatusTip(tr("Frame everything visible"));
   InitializeAction();
 }
 

@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkBaseGeometry.h>
 
 #include <vtkCellData.h>
+#include <vtkImageConstantPad.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPartitionedDataSetCollection.h>
@@ -35,6 +36,37 @@ namespace
       scalars->Modified();
 
     groupImage->Modified();
+  }
+
+  // vtkSurfaceNets3D refuses input that is a single sample wide along any axis, yet a
+  // segmentation of a 2D reference image is a legitimate 3D image with one slice. The
+  // filter already treats the volume border as background, so padding a degenerate
+  // axis by one background sample yields the same closed one-voxel slab that a
+  // single-slice label inside a full volume produces.
+  vtkSmartPointer<vtkImageData> PadDegenerateAxes(vtkImageData* groupImage, double backgroundLabel)
+  {
+    int extent[6];
+    groupImage->GetExtent(extent);
+
+    bool degenerate = false;
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      if (extent[2 * axis] == extent[2 * axis + 1])
+      {
+        ++extent[2 * axis + 1];
+        degenerate = true;
+      }
+    }
+
+    if (!degenerate)
+      return groupImage;
+
+    auto padFilter = vtkSmartPointer<vtkImageConstantPad>::New();
+    padFilter->SetInputData(groupImage);
+    padFilter->SetOutputWholeExtent(extent);
+    padFilter->SetConstant(backgroundLabel);
+    padFilter->Update();
+    return padFilter->GetOutput();
   }
 
   vtkSmartPointer<vtkPolyData> ComputeNormals(vtkPolyDataNormals* normalsFilter, vtkPolyData* mesh)
@@ -81,7 +113,9 @@ void mitk::MultiLabelSurfaceNetsExtractor::UpdateSurfaceNets(
 {
   PrepareInput(groupImage);
 
-  m_SurfaceNets->SetInputData(groupImage);
+  const auto input = PadDegenerateAxes(groupImage, m_SurfaceNets->GetBackgroundLabel());
+
+  m_SurfaceNets->SetInputData(input);
   m_SurfaceNets->SetSmoothing(m_Smoothing);
   m_SurfaceNets->SetNumberOfLabels(static_cast<int>(labelValues.size()));
   for (size_t i = 0; i < labelValues.size(); ++i)

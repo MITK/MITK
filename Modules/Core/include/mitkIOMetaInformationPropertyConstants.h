@@ -26,6 +26,11 @@ namespace mitk
    * These constants define the property key paths used to store meta information
    * about how data was read, including the reader description, MITK version,
    * MIME type, and input location.
+   *
+   * The reader annotations are runtime information that AbstractFileReader::Read()
+   * renews on every read, hence they are not written into data files. Only
+   * VOLUME_SPLIT_REASON is persisted because it describes how the volume was
+   * assembled and cannot be recovered once the data was converted.
    */
   struct MITKCORE_EXPORT IOMetaInformationPropertyConstants
   {

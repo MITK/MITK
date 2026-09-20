@@ -310,12 +310,11 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
 
   //add properties that should be persistent (if possible/supported by the writer)
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_VERSION());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_OPTIONS_ANY());
+  //The remaining reader annotations of AbstractFileReader::Read() are deliberately
+  //absent: they describe the last read instead of the data, are renewed on every
+  //read, and the input location would leak local paths into shared files. The
+  //split reason describes how the volume was assembled and cannot be recovered
+  //once the data was converted.
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON());
 
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath());

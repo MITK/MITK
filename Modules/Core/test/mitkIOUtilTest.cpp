@@ -14,7 +14,10 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingConfig.h>
 
+#include <mitkCoreServices.h>
 #include <mitkIOUtil.h>
+#include <mitkIPropertyPersistence.h>
+#include <mitkPropertyPersistenceInfo.h>
 #include <mitkUtf8Util.h>
 #include <mitkImageGenerator.h>
 #include <mitkIOMetaInformationPropertyConstants.h>
@@ -37,6 +40,7 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestIOMetaInformation);
+  MITK_TEST(TestLegacyIOMetaInformationIsNotRePersisted);
   MITK_TEST(TestUtf8);
   CPPUNIT_TEST_SUITE_END();
 
@@ -265,7 +269,7 @@ public:
     value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_VERSION()).c_str())->GetValueAsString();
     CPPUNIT_ASSERT_EQUAL(std::string(MITK_VERSION_STRING), value);
 
-    //check if the information is persistet correctly on save.
+    //check that the information is not written into the file on save.
     std::ofstream tmpStream;
     std::string imagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "ioMeta_XXXXXX.nrrd");
     tmpStream.close();
@@ -276,19 +280,50 @@ public:
     io->ReadImageInformation();
     auto metaDict = io->GetMetaDataDictionary();
 
-    auto metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION());
-    CPPUNIT_ASSERT_EQUAL(std::string("ITK NrrdImageIO"), metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION());
-    CPPUNIT_ASSERT_EQUAL(m_ImagePath, metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY());
-    CPPUNIT_ASSERT_EQUAL(std::string("Images"), metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
-    CPPUNIT_ASSERT_EQUAL(std::string("application/vnd.mitk.image.nrrd"), metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_VERSION());
-    CPPUNIT_ASSERT_EQUAL(std::string(MITK_VERSION_STRING), metaValue);
+    CPPUNIT_ASSERT(!metaDict.HasKey(GenerateMetaDictKey(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION())));
+    CPPUNIT_ASSERT(!metaDict.HasKey(GenerateMetaDictKey(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION())));
+    CPPUNIT_ASSERT(!metaDict.HasKey(GenerateMetaDictKey(mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY())));
+    CPPUNIT_ASSERT(!metaDict.HasKey(GenerateMetaDictKey(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME())));
+    CPPUNIT_ASSERT(!metaDict.HasKey(GenerateMetaDictKey(mitk::IOMetaInformationPropertyConstants::READER_VERSION())));
 
     // delete the files after the test is done
     std::remove(imagePath.c_str());
+  }
+
+  void TestLegacyIOMetaInformationIsNotRePersisted()
+  {
+    const auto inputLocation = mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION();
+    const auto propertyName = mitk::PropertyKeyPathToPropertyName(inputLocation);
+
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    CPPUNIT_ASSERT(!persistence->HasInfo(propertyName));
+
+    //craft a file as older MITK versions wrote them by registering the persistence
+    //info they used to register.
+    auto info = mitk::PropertyPersistenceInfo::New();
+    info->SetNameAndKey(propertyName, GenerateMetaDictKey(inputLocation));
+    persistence->AddInfo(info);
+
+    std::ofstream tmpStream;
+    std::string legacyPath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "legacyIOMeta_XXXXXX.nrrd");
+    tmpStream.close();
+
+    auto img = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
+    mitk::IOUtil::Save(img, legacyPath);
+
+    persistence->RemoveInfo(propertyName);
+
+    auto io = itk::NrrdImageIO::New();
+    io->SetFileName(legacyPath);
+    io->ReadImageInformation();
+    CPPUNIT_ASSERT_EQUAL(m_ImagePath, GetValueFromMetaDict(io->GetMetaDataDictionary(), inputLocation));
+
+    //reading such a file must not make the annotation persistent again.
+    CPPUNIT_ASSERT(mitk::IOUtil::Load<mitk::Image>(legacyPath).IsNotNull());
+    CPPUNIT_ASSERT(!persistence->HasInfo(propertyName));
+
+    // delete the files after the test is done
+    std::remove(legacyPath.c_str());
   }
 
   void TestUtf8()

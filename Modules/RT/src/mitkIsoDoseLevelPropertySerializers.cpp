@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitkBasePropertySerializer.h>
 #include <mitkIsoDoseLevelSetProperty.h>
 #include <mitkIsoDoseLevelVectorProperty.h>
-#include <mitkLocaleSwitch.h>
 #include <mitkStringsToNumbers.h>
 
 #include <array>
@@ -98,8 +97,6 @@ namespace mitk
       if (nullptr == prop)
         return nullptr;
 
-      LocaleSwitch localeSwitch("C");
-
       auto *element = doc.NewElement("isoDoseLevelSet");
       const auto *levelSet = prop->GetValue();
 
@@ -117,8 +114,9 @@ namespace mitk
       if (nullptr == element)
         return nullptr;
 
-      LocaleSwitch localeSwitch("C");
-
+      // A null level set is written as an empty element and therefore reloads
+      // as an empty set. Consumers dereference the value, so of the two states
+      // the element cannot distinguish, the empty set is the safe one.
       auto levelSet = IsoDoseLevelSet::New();
 
       for (const auto *levelElement = element->FirstChildElement("level"); nullptr != levelElement;
@@ -154,8 +152,6 @@ namespace mitk
       if (nullptr == prop)
         return nullptr;
 
-      LocaleSwitch localeSwitch("C");
-
       auto *element = doc.NewElement("isoDoseLevelVector");
       const auto *levelVector = prop->GetValue();
 
@@ -163,8 +159,13 @@ namespace mitk
       {
         for (const auto &level : *levelVector)
         {
-          if (level.IsNotNull())
-            element->InsertEndChild(SerializeLevel(doc, *level));
+          if (level.IsNull())
+          {
+            MITK_WARN << "Skipping null iso dose level entry";
+            continue;
+          }
+
+          element->InsertEndChild(SerializeLevel(doc, *level));
         }
       }
 
@@ -175,8 +176,6 @@ namespace mitk
     {
       if (nullptr == element)
         return nullptr;
-
-      LocaleSwitch localeSwitch("C");
 
       auto levelVector = IsoDoseLevelVector::New();
 

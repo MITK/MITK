@@ -25,7 +25,7 @@ class mitkIsoDoseLevelPropertySerializerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkIsoDoseLevelPropertySerializerTestSuite);
   MITK_TEST(RoundTripLevelSet);
   MITK_TEST(RoundTripLevelVector);
-  MITK_TEST(RoundTripEmptyProperties);
+  MITK_TEST(NullValuesLoadAsEmpty);
   MITK_TEST(CompareByContent);
   CPPUNIT_TEST_SUITE_END();
 
@@ -139,20 +139,41 @@ public:
     secondVector->push_back(MakeLevel(0.3, 0.9f, 0.8f, 0.7f, true, false));
     CPPUNIT_ASSERT_MESSAGE("Level vectors of different length compare unequal",
       !(*mitk::IsoDoseLevelVectorProperty::New(firstVector) == *mitk::IsoDoseLevelVectorProperty::New(secondVector)));
+
+    auto thirdVector = mitk::IsoDoseLevelVector::New();
+    thirdVector->push_back(MakeLevel(1.2, 0.1f, 0.2f, 0.3f, true, false));
+    CPPUNIT_ASSERT_MESSAGE("Level vectors differing in a level compare unequal",
+      !(*mitk::IsoDoseLevelVectorProperty::New(firstVector) == *mitk::IsoDoseLevelVectorProperty::New(thirdVector)));
+
+    auto nullEntryVector = mitk::IsoDoseLevelVector::New();
+    nullEntryVector->push_back(mitk::IsoDoseLevel::Pointer());
+    CPPUNIT_ASSERT_MESSAGE("A null entry and a level compare unequal",
+      !(*mitk::IsoDoseLevelVectorProperty::New(firstVector) == *mitk::IsoDoseLevelVectorProperty::New(nullEntryVector)));
+
+    auto otherNullEntryVector = mitk::IsoDoseLevelVector::New();
+    otherNullEntryVector->push_back(mitk::IsoDoseLevel::Pointer());
+    CPPUNIT_ASSERT_MESSAGE("Two null entries compare equal",
+      *mitk::IsoDoseLevelVectorProperty::New(nullEntryVector) == *mitk::IsoDoseLevelVectorProperty::New(otherNullEntryVector));
+
+    CPPUNIT_ASSERT_MESSAGE("Null and non-null level vectors compare unequal",
+      !(*mitk::IsoDoseLevelVectorProperty::New() == *mitk::IsoDoseLevelVectorProperty::New(firstVector)));
+
+    CPPUNIT_ASSERT_MESSAGE("Two null level vectors compare equal",
+      *mitk::IsoDoseLevelVectorProperty::New() == *mitk::IsoDoseLevelVectorProperty::New());
   }
 
-  void RoundTripEmptyProperties()
+  void NullValuesLoadAsEmpty()
   {
     const auto setProperty = RoundTrip(mitk::IsoDoseLevelSetProperty::New());
     const auto *setResult = dynamic_cast<const mitk::IsoDoseLevelSetProperty *>(setProperty.GetPointer());
-    CPPUNIT_ASSERT_MESSAGE("Empty level set property round-trips", nullptr != setResult);
-    CPPUNIT_ASSERT_MESSAGE("Empty level set property yields a level set", nullptr != setResult->GetValue());
+    CPPUNIT_ASSERT_MESSAGE("Null level set property round-trips", nullptr != setResult);
+    CPPUNIT_ASSERT_MESSAGE("Null level set property reloads as an empty level set", nullptr != setResult->GetValue());
     CPPUNIT_ASSERT_EQUAL(mitk::IsoDoseLevelSet::IsoLevelIndexType(0), setResult->GetValue()->Size());
 
     const auto vectorProperty = RoundTrip(mitk::IsoDoseLevelVectorProperty::New());
     const auto *vectorResult = dynamic_cast<const mitk::IsoDoseLevelVectorProperty *>(vectorProperty.GetPointer());
-    CPPUNIT_ASSERT_MESSAGE("Empty level vector property round-trips", nullptr != vectorResult);
-    CPPUNIT_ASSERT_MESSAGE("Empty level vector property yields a level vector", nullptr != vectorResult->GetValue());
+    CPPUNIT_ASSERT_MESSAGE("Null level vector property round-trips", nullptr != vectorResult);
+    CPPUNIT_ASSERT_MESSAGE("Null level vector property reloads as an empty level vector", nullptr != vectorResult->GetValue());
     CPPUNIT_ASSERT(vectorResult->GetValue()->empty());
   }
 };

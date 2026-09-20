@@ -39,16 +39,16 @@ bool mitk::IsoDoseLevelSetProperty::IsEqual(const BaseProperty& property) const
   if (m_IsoLevelSet.IsNull() || other.IsNull())
     return m_IsoLevelSet == other;
 
-  if (m_IsoLevelSet->Size() != other->Size())
-    return false;
+  auto lhs = m_IsoLevelSet->Begin();
+  auto rhs = other->Begin();
 
-  for (IsoDoseLevelSet::IsoLevelIndexType i = 0; i < m_IsoLevelSet->Size(); ++i)
+  for (; lhs != m_IsoLevelSet->End() && rhs != other->End(); ++lhs, ++rhs)
   {
-    if (!(m_IsoLevelSet->GetIsoDoseLevel(i) == other->GetIsoDoseLevel(i)))
+    if (!(*lhs == *rhs))
       return false;
   }
 
-  return true;
+  return lhs == m_IsoLevelSet->End() && rhs == other->End();
 }
 
 bool mitk::IsoDoseLevelSetProperty::Assign(const BaseProperty& property)

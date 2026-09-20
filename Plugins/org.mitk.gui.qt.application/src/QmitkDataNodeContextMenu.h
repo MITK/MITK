@@ -122,7 +122,7 @@ private:
   //////////////////////////////////////////////////////////////////////////
   QmitkDataNodeGlobalReinitAction* m_GlobalReinitAction;
   QmitkDataNodeReinitAction* m_ReinitAction;
-  QmitkDataNodeResetGeometryAction* m_ResetGeometryAction;
+  //QmitkDataNodeResetGeometryAction* m_ResetGeometryAction; // see InitDefaultActions()
   QmitkDataNodeRemoveAction* m_RemoveAction;
   QmitkDataNodeRenameAction* m_RenameAction;
   QmitkDataNodeShowSelectedNodesAction* m_ShowSelectedNodesAction;

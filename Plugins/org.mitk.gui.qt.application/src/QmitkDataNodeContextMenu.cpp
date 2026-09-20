@@ -104,10 +104,12 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
 {
   auto workbenchPartSite = m_WorkbenchPartSite.Lock();
 
-  m_ResetGeometryAction = new QmitkDataNodeResetGeometryAction(m_Parent, workbenchPartSite);
-  m_ResetGeometryAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_ResetGeometryAction, true);
-  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ResetGeometryAction));
+  // Trial: hidden to find out whether users miss it. This also hides it from
+  // the render window context menu of the Render Window Manager view.
+  //m_ResetGeometryAction = new QmitkDataNodeResetGeometryAction(m_Parent, workbenchPartSite);
+  //m_ResetGeometryAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
+  //m_UnknownDataNodeDescriptor->AddAction(m_ResetGeometryAction, true);
+  //m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ResetGeometryAction));
 
   m_ReinitAction = new QmitkDataNodeReinitAction(m_Parent, workbenchPartSite);
   m_ReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));

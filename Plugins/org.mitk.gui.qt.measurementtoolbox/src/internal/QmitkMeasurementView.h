@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
+#include <mitkIRenderWindowPartListener.h>
+
 #include <usServiceRegistration.h>
 
 /// forward declarations
@@ -33,7 +35,7 @@ namespace mitk
 /// 2. A textbrowser which shows details for the selected PlanarFigures
 /// 3. A button for copying all details to the clipboard
 ///
-class QmitkMeasurementView : public QmitkAbstractView
+class QmitkMeasurementView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -75,12 +77,24 @@ protected Q_SLOTS:
 
 private:
 
+    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+    void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& baseName, unsigned int& counter);
 
     void SelectNode(const mitk::DataNode::Pointer& node);
 
     void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+    void OnAlignViewsClicked();
+
+    /**
+     * Shows the alignment overlay and enables the drawing tools according to the
+     * reference image selection and the alignment of the render windows. Cancels
+     * a pending placement when the views are not aligned.
+     */
+    void UpdateDrawingControls();
 
     void UpdateMeasurementText();
     void AddAllInteractors();

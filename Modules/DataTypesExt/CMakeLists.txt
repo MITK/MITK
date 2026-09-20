@@ -1,5 +1,5 @@
 mitk_create_module(
-  DEPENDS MitkCore
+  DEPENDS MitkCore MitkSceneSerializationBase
   TARGET_DEPENDS PRIVATE LZ4::lz4_shared
 )
 

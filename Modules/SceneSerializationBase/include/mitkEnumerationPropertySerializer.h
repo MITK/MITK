@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkBasePropertySerializer.h>
 
 #include <mitkEnumerationProperty.h>
+#include <mitkLog.h>
 
 namespace mitk
 {
@@ -59,7 +60,8 @@ namespace mitk
  * needs its own serializer even though the XML format is shared. This macro
  * generates that serializer: serialization is inherited from
  * EnumerationPropertySerializer, deserialization instantiates \a classname and
- * sets the stored value by its name.
+ * sets the stored value by its name. A name the class does not know fails the
+ * deserialization instead of silently yielding the default value.
  *
  * Use it at global scope in a .cpp file that includes the property's header
  * and tinyxml2.h.
@@ -86,7 +88,12 @@ namespace mitk                                                                  
         return nullptr;                                                                     \
                                                                                             \
       classname::Pointer property = classname::New();                                       \
-      property->SetValue(value);                                                            \
+                                                                                            \
+      if (!property->SetValue(value))                                                       \
+      {                                                                                     \
+        MITK_ERROR << "Unknown " #classname " value: " << value;                            \
+        return nullptr;                                                                     \
+      }                                                                                     \
                                                                                             \
       return property.GetPointer();                                                         \
     }                                                                                       \

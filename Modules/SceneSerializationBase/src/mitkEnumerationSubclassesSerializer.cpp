@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkPlaneOrientationProperty.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkResliceMethodProperty.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>
@@ -31,3 +32,4 @@ MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkScalarModeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(ModalityProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(RenderingModeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PointSetShapeProperty);
+MITK_REGISTER_ENUM_SUB_SERIALIZER(ResliceMethodProperty);

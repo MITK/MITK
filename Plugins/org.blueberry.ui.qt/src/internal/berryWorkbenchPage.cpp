@@ -2967,6 +2967,21 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       {
 
         IMemento::Pointer current = perspMems[i];
+
+        // A saved perspective whose extension is gone (e.g. dropped by an
+        // upgrade) is skipped. Restored, it would turn into an unregistered
+        // local copy that cannot be reset and that FixOrphan() persists as
+        // a custom perspective.
+        QString savedPerspId;
+        if (const IMemento::Pointer descMem = current->GetChild(WorkbenchConstants::TAG_DESCRIPTOR))
+          descMem->GetString(WorkbenchConstants::TAG_ID, savedPerspId);
+
+        if (WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(savedPerspId).IsNull())
+        {
+          WorkbenchPlugin::Log("Skipping saved perspective \"" + savedPerspId + "\": no corresponding perspective extension.");
+          continue;
+        }
+
         //          StartupThreading
         //          .runWithoutExceptions(new StartupRunnable()
         //              {
@@ -3027,6 +3042,21 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       {
         activePerspective = perspList.GetNextActive();
         perspList.SetActive(activePerspective);
+      }
+      if (activePerspective.IsNull())
+      {
+        // Nothing could be restored (see the skip above). Fall back to the
+        // default perspective like WorkbenchWindow::RestoreState does for a
+        // window without pages, so the page does not end up without a layout.
+        IPerspectiveRegistry* registry = WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry();
+        PerspectiveDescriptor::Pointer defaultDesc =
+            registry->FindPerspectiveWithId(registry->GetDefaultPerspective()).Cast<PerspectiveDescriptor>();
+
+        if (defaultDesc.IsNotNull())
+        {
+          activePerspective = this->CreatePerspective(defaultDesc, true);
+          perspList.SetActive(activePerspective);
+        }
       }
       if (activePerspective && restoreActivePerspective)
       {

@@ -19,12 +19,5 @@
        class="berry::ExtensionFactory:stylePreferencePage">
        <keywordreference id="org.blueberry.ui.style"/>
      </page>
-     <page
-       id="org.blueberry.ui.preferencePages.Perspectives"
-       name="Perspectives"
-       category="org.mitk.GeneralPreferencePage"
-       class="berry::ExtensionFactory:perspectivesPreferencePage">
-       <keywordreference id="org.blueberry.ui.perspectives"/>
-     </page>
    </extension>
 </plugin>

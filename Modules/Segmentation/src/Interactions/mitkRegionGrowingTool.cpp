@@ -107,7 +107,7 @@ void mitk::RegionGrowingTool::GetNeighborhoodAverage(const itk::Image<TPixel, im
 {
   // maybe assert that image dimension is only 2 or 3?
   auto neighborhoodInt = (int)neighborhood;
-  TPixel averageValue(0);
+  ScalarType averageValue(0); // not TPixel: summing nine unsigned char pixels overflows
   unsigned int numberOfPixels = (2 * neighborhood + 1) * (2 * neighborhood + 1);
   if (imageDimension == 3)
   {
@@ -156,8 +156,7 @@ void mitk::RegionGrowingTool::GetNeighborhoodAverage(const itk::Image<TPixel, im
     }
   }
 
-  *result = (ScalarType)averageValue;
-  *result /= numberOfPixels;
+  *result = averageValue / numberOfPixels;
 }
 
 // Do the region growing (i.e. call an ITK filter that does it)

@@ -141,23 +141,11 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
     emit NavigatorToggled(checked);
   });
 
-  // Per-axis sync barcode for this cell; filled by the multi widget. The strip
-  // doubles as the entry point to the layout editor, replacing the former
-  // "Sync" button.
-  m_SyncBarcode = new QmitkMxNSyncBarcodeWidget(this);
-  connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::Clicked, this, [this]() {
-    emit LayoutEditorRequested();
-  });
-  // The barcode takes the row's slack rather than a spacer: given the width it
-  // switches from color slots to legible glyphs (ComputeLayout), and expanding
-  // it is also what pushes the presentation group to the far edge.
-  layout->addWidget(m_SyncBarcode, 1);
-
   // What the window presents rather than what it shows: the navigator and
-  // crosshair overlays, then clean view and maximize. Crosshair and maximize
-  // come from the built-in render-window menu this strip covers, and hold its
-  // top-right corner so the gesture stays where the Standard Display taught
-  // users to look.
+  // crosshair overlays, then clean view. They join the data button in one
+  // cluster at the leading edge, so the row reads as controls first and state
+  // second; only maximize keeps the trailing corner, where a window manager
+  // puts it.
   layout->addWidget(m_NavigatorToggleButton);
 
   m_CrosshairButton = new QToolButton(this);
@@ -183,6 +171,20 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   });
   this->UpdateCleanViewIcon();
   layout->addWidget(m_CleanViewButton);
+
+  // The gap that separates the controls from the cell's state read-out.
+  layout->addStretch(1);
+
+  // Per-axis sync barcode for this cell; filled by the multi widget. The strip
+  // doubles as the entry point to the layout editor. Parked behind the gap it
+  // gets no slack to grow into, so it asks for the width its glyphs need rather
+  // than the compact color slots; a narrow cell squeezes it back to those.
+  m_SyncBarcode = new QmitkMxNSyncBarcodeWidget(this);
+  m_SyncBarcode->SetPreferGlyphWidth(true);
+  connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::Clicked, this, [this]() {
+    emit LayoutEditorRequested();
+  });
+  layout->addWidget(m_SyncBarcode);
 
   m_MaximizeButton = new QToolButton(this);
   m_MaximizeButton->setAutoRaise(true);

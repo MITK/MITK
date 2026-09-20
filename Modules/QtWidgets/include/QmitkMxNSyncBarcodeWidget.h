@@ -130,6 +130,17 @@ public:
   void SetAxisClickable(bool clickable);
 
   /**
+   * \brief Ask for the width the glyph rendering needs instead of the compact
+   *        color-bar width.
+   *
+   *        A strip that shares a row's slack grows into the glyph rendering on
+   *        its own; one parked against the row's trailing edge never does and
+   *        would be granted the color bar forever. The minimum size hint stays
+   *        the color bar either way, so a narrow host still collapses to it.
+   */
+  void SetPreferGlyphWidth(bool prefer);
+
+  /**
    * \brief True when no slot is synchronized (the list is empty or every color
    *        is invalid); the widget then paints the "not synchronized" hint
    *        instead of a row of gaps.
@@ -189,6 +200,7 @@ private:
   bool m_Hovered = false;         // whole-strip hover (passive per-cell strip)
   int m_HoveredSlot = -1;         // single hovered axis (axis-clickable mode)
   bool m_AxisClickable = false;
+  bool m_PreferGlyphWidth = false;
   QPoint m_PressPos;
 };
 

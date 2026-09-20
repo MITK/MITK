@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkMxNSyncBarcodeWidget.h"
 
 #include <QApplication>
+#include <QFontMetrics>
 #include <QHelpEvent>
 #include <QMouseEvent>
 #include <QPainter>
@@ -66,6 +67,15 @@ void QmitkMxNSyncBarcodeWidget::SetAxisClickable(bool clickable)
   m_AxisClickable = clickable;
 }
 
+void QmitkMxNSyncBarcodeWidget::SetPreferGlyphWidth(bool prefer)
+{
+  if (prefer != m_PreferGlyphWidth)
+  {
+    m_PreferGlyphWidth = prefer;
+    this->updateGeometry();
+  }
+}
+
 bool QmitkMxNSyncBarcodeWidget::IsEmptyState() const
 {
   return std::none_of(m_Slots.begin(), m_Slots.end(),
@@ -74,15 +84,31 @@ bool QmitkMxNSyncBarcodeWidget::IsEmptyState() const
 
 QSize QmitkMxNSyncBarcodeWidget::sizeHint() const
 {
+  const int slotCount = std::max(1, static_cast<int>(m_Slots.size()));
+  if (m_PreferGlyphWidth)
+  {
+    // What the glyph rendering needs: one row of boxes sized like the text
+    // beside them, so the strip follows font scaling rather than a fixed width,
+    // and never narrower than the empty-state hint it shows instead of glyphs.
+    // The height hint stays the color bar's - the host row sets the height, and
+    // asking for more here would only make the row taller.
+    const QFontMetrics metrics(this->font());
+    const int box = std::clamp(metrics.height(), MinGlyphBox, MaxGlyphBox);
+    const int glyphWidth = 1 + slotCount * box + (slotCount - 1) * IconGap;
+    return QSize(std::max(glyphWidth, metrics.horizontalAdvance(tr("not synchronized"))),
+                 BarcodeHeight);
+  }
   // The compact color-slot size is the minimum the layout must grant; extra
   // width lets the paint switch to the wider icon rendering.
-  const int slotCount = std::max(1, static_cast<int>(m_Slots.size()));
   return QSize(slotCount * ColorSlotWidth + (slotCount - 1) * SlotGap, BarcodeHeight);
 }
 
 QSize QmitkMxNSyncBarcodeWidget::minimumSizeHint() const
 {
-  return this->sizeHint();
+  // Always the compact color bar: a strip that prefers the glyph width must
+  // still be allowed to collapse to slots when its host runs out of room.
+  const int slotCount = std::max(1, static_cast<int>(m_Slots.size()));
+  return QSize(slotCount * ColorSlotWidth + (slotCount - 1) * SlotGap, BarcodeHeight);
 }
 
 QmitkMxNSyncBarcodeWidget::BarcodeLayout

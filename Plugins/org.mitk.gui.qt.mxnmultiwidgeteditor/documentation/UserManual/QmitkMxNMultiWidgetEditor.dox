@@ -67,16 +67,11 @@
 	<tt>python3 Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py &lt;file.json&gt;</tt>
 
 	The script writes a v2.0 document to standard output (or to the path given via <tt>-o</tt>)
-	that the editor's "Load layout" action accepts unchanged.
+	that the editor's "Load..." action accepts unchanged.
 
-	By moving the cursor to the upper right corner of any window you can activate the window menu. It consists of three buttons:
-	<ul>
-		<li> The crosshair button allows to toggle the crosshair and to reset the view.
-		<li> The middle button expands the corresponding window to fullscreen.
-		<li> The right button allows you to choose between many different arrangements of the available windows.
-	</ul>
-
-	\imageMacro{layoutArrangements.png, "Layout arrangement", 16.00}
+	The crosshair and full-screen gestures of the Standard Display's window menu are
+	buttons of the MxN utility menu here
+	(see \ref org_mitk_editors_mxnmultiwidget_Utility).
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Synchronization Window synchronization
 	If data is displayed inside a window view you can interact with the window / loaded image using your mouse.
@@ -115,21 +110,26 @@
 	Each window view has an MxN utility menu along its top edge. It is collapsed to a
 	thin strip by default to leave the image unobstructed and reveals - together with
 	the rest of the window's furniture - as one frame when the pointer approaches an
-	edge, without resizing the render window. It is a separate chrome from the built-in
-	render-window menu in the top-right corner (crosshair mode, full screen, window
-	arrangements), which is unchanged from the Standard Display. Its elements:
+	edge, without resizing the render window. It takes the place of the Standard
+	Display's built-in render-window menu: the crosshair and full-screen gestures that
+	menu offered are buttons of this strip.
+
+	The buttons sit together at the leading edge and the sync barcode reads as state at
+	the trailing edge, with only the maximize button beyond it, in the corner where a
+	window manager puts it. Its elements:
 	<ul>
 		<li> Data selection button: Select which data should be selected and visible inside the window view
-		<li> Sync button: Open the MxN Layout Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
-		<li> Sync Group drop down menu: Select the current sync group to synchronize with other windows
-		<li> "+" button: Create a new sync group from the current selection
-		<li> Clean button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
-		<li> Navigator button ("Nav"): Switch the per-cell navigator between its compact and
+		<li> Navigator button: Switch the per-cell navigator between its compact and
 			expanded forms for every window at once (see \ref org_mitk_editors_mxnmultiwidget_Navigator)
+		<li> Crosshair button: Show or hide the crosshair in every window
+		<li> Clean button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
 		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
-			crosshair, orientation, windowing, LUT, colored with the linked group's hue and
-			left empty where the window is not synchronized - the same barcode the layout
-			editor's window tiles carry
+			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
+			linked group's hue and left empty where the window is not synchronized - the same
+			barcode the layout editor's window tiles carry. Clicking it opens the MxN Layout
+			Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
+		<li> Maximize button: Give this window the whole editor area, and bring the other
+			windows back
 	</ul>
 
 	The slice control and the view-direction control are no longer in this menu: slice

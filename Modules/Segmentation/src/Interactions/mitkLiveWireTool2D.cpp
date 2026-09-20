@@ -86,9 +86,16 @@ void mitk::LiveWireTool2D::OnTimePointChanged()
   if (nullptr == reference || m_PlaneGeometry.IsNull() || m_LiveWireFilter.IsNull() || m_PreviewContourNode.IsNull())
     return;
 
-  auto timeStep = reference->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
+  const auto timePoint = this->GetLastTimePointTriggered();
+  if (!reference->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    return;
 
-  m_ReferenceDataSlice = GetAffectedImageSliceAs2DImageByTimePoint(m_PlaneGeometry, reference, timeStep);
+  const auto timeStep = reference->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+  m_ReferenceDataSlice = this->GetAffectedReferenceSlice(m_PlaneGeometry, timeStep);
+  if (m_ReferenceDataSlice.IsNull())
+    return;
+
   m_LiveWireFilter->SetInput(m_ReferenceDataSlice);
 
   m_LiveWireFilter->Update();

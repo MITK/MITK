@@ -5,17 +5,13 @@ set(INTERNAL_CPP_FILES
   QmitkExtApplication.cpp
   QmitkExtApplicationPlugin.cpp
   QmitkExtAppWorkbenchAdvisor.cpp
-  perspectives/QmitkEditorPerspective.cpp
   perspectives/QmitkExtDefaultPerspective.cpp
-  perspectives/QmitkVisualizationPerspective.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkExtApplication.h
   src/internal/QmitkExtApplicationPlugin.h
-  src/internal/perspectives/QmitkEditorPerspective.h
   src/internal/perspectives/QmitkExtDefaultPerspective.h
-  src/internal/perspectives/QmitkVisualizationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -25,8 +21,6 @@ set(CACHED_RESOURCE_FILES
 # plug-in views in the workbench
   plugin.xml
   resources/icon_research.xpm
-  resources/perspectives/eye.png
-  resources/perspectives/viewer_icon.png
 )
 
 set(QRC_FILES

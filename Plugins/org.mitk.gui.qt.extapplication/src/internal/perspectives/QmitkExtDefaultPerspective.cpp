@@ -72,7 +72,4 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
     for (const auto& viewId : bottomViews)
       bottomFolder->AddPlaceholder(viewId);
   }
-
-  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.editor");
-  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.visualization");
 }

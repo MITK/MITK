@@ -439,7 +439,23 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
   fileSaveProjectAction->setIcon(QmitkIconTheme::GetIcon(basePath + "document-save.svg"));
 
-  auto   perspGroup = new QActionGroup(menuBar);
+  auto perspGroup = new QActionGroup(menuBar);
+
+  // Built before the menus: the Window menu only offers perspective
+  // handling when there is more than one perspective to choose from.
+  const auto perspectives = window->GetWorkbench()->GetPerspectiveRegistry()->GetPerspectives();
+
+  for (const auto& perspective : perspectives)
+  {
+    if (perspectiveExcludeList.contains(perspective->GetId()))
+      continue;
+
+    auto perspAction = new berry::QtOpenPerspectiveAction(window, perspective, perspGroup);
+    mapPerspIdToAction.insert(perspective->GetId(), perspAction);
+  }
+
+  hasMultiplePerspectives = perspGroup->actions().size() > 1;
+
   std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
 
   // sort elements (converting vector to map...)
@@ -516,51 +532,17 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   // ==== Window Menu ==========================
   QMenu* windowMenu = menuBar->addMenu("Window");
 
-  QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
+  if (hasMultiplePerspectives)
+    windowMenu->addMenu("&Open Perspective")->addActions(perspGroup->actions());
 
   windowMenu->addSeparator();
-  resetPerspAction = windowMenu->addAction("&Reset Perspective",
+  resetPerspAction = windowMenu->addAction(hasMultiplePerspectives ? "&Reset Perspective" : "&Reset Layout",
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
 
   windowMenu->addSeparator();
   windowMenu->addAction("&Preferences...",
     QKeySequence("CTRL+P"),
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onEditPreferences);
-
-  // fill perspective menu
-  berry::IPerspectiveRegistry* perspRegistry =
-    window->GetWorkbench()->GetPerspectiveRegistry();
-
-  QList<berry::IPerspectiveDescriptor::Pointer> perspectives(
-    perspRegistry->GetPerspectives());
-
-  skip = false;
-  for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
-    perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
-  {
-    // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-    // should not appear as an menu-entry in the perspective menu
-    if (perspectiveExcludeList.size() > 0)
-    {
-      for (int i=0; i<perspectiveExcludeList.size(); i++)
-      {
-        if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-        {
-          skip = true;
-          break;
-        }
-      }
-      if (skip)
-      {
-        skip = false;
-        continue;
-      }
-    }
-
-    QAction* perspAction = new berry::QtOpenPerspectiveAction(window, *perspIt, perspGroup);
-    mapPerspIdToAction.insert((*perspIt)->GetId(), perspAction);
-  }
-  perspMenu->addActions(perspGroup->actions());
 
   // ===== Help menu ====================================
   QMenu* helpMenu = menuBar->addMenu("&Help");
@@ -839,12 +821,16 @@ QString QmitkFlowApplicationWorkbenchWindowAdvisor::ComputeTitle()
       if (!lastEditorTitle.isEmpty())
         title = lastEditorTitle + " - " + title;
     }
-    berry::IPerspectiveDescriptor::Pointer persp = currentPage->GetPerspective();
-    QString label = "";
-    if (persp)
+    QString label;
+
+    if (hasMultiplePerspectives)
     {
-      label = persp->GetLabel();
+      const berry::IPerspectiveDescriptor::Pointer persp = currentPage->GetPerspective();
+
+      if (persp.IsNotNull())
+        label = persp->GetLabel();
     }
+
     berry::IAdaptable* input = currentPage->GetInput();
     if (input && input != wbAdvisor->GetDefaultPageInput())
     {

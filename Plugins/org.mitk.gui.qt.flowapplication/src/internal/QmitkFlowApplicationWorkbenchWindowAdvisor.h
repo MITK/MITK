@@ -153,6 +153,8 @@ private:
   QAction* imageNavigatorAction;
   QAction* resetPerspAction;
 
+  bool hasMultiplePerspectives = false;
+
   mitk::ITKEventObserverGuard m_UndoStackObserverGuard;
 };
 

@@ -177,6 +177,8 @@ private:
   QAction* openStdMultiWidgetEditorAction = nullptr;
   QAction* openMxNMultiWidgetEditorAction = nullptr;
 
+  bool hasMultiplePerspectives = false;
+
   mitk::ITKEventObserverGuard m_UndoStackObserverGuard;
 };
 

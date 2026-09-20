@@ -56,6 +56,26 @@ bool mitk::Tool::CanHandle(const BaseData* referenceData, const BaseData* /*work
   return true;
 }
 
+bool mitk::Tool::IsSingleComponentScalarImage(const Image* image)
+{
+  if (image == nullptr)
+    return false;
+
+  const auto& pixelType = image->GetPixelType();
+
+  return pixelType.GetPixelType() == itk::IOPixelEnum::SCALAR && pixelType.GetNumberOfComponents() == 1;
+}
+
+bool mitk::Tool::HasSingleComponentSlices(const Image* image)
+{
+  if (image == nullptr)
+    return false;
+
+  const auto& pixelType = image->GetPixelType();
+
+  return pixelType.GetNumberOfComponents() == 1 || pixelType.GetPixelType() == itk::IOPixelEnum::VECTOR;
+}
+
 bool mitk::Tool::IsEligibleForAutoInit() const
 {
   return true;

@@ -90,6 +90,12 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
   if (referenceImage == nullptr)
     return false;
 
+  if (m_RequiresScalarReference && !IsSingleComponentScalarImage(referenceImage))
+    return false;
+
+  if (m_RequiresVolumetricReference && referenceImage->GetDimension() < 3)
+    return false;
+
   auto* labelSet = dynamic_cast<const MultiLabelSegmentation*>(workingData);
   if (labelSet == nullptr)
     return false;
@@ -715,14 +721,24 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
       }
     }
   }
-  catch (itk::ExceptionObject & excep)
+  catch (const itk::ExceptionObject& e)
   {
-    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
 
     m_ProgressCommand->SetProgress(progress_steps);
 
-    std::string msg = excep.GetDescription();
-    ErrorMessage.Send(msg);
+    ErrorMessage.Send(e.GetDescription());
+  }
+  catch (const std::exception& e)
+  {
+    // Covers mitk::AccessByItkException, which is not an ITK exception, so an
+    // unsupported pixel type ends up in the error message as well instead of
+    // unwinding through the tool activation.
+    MITK_ERROR << "Exception caught: " << e.what();
+
+    m_ProgressCommand->SetProgress(progress_steps);
+
+    ErrorMessage.Send(e.what());
   }
   catch (...)
   {

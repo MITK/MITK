@@ -37,7 +37,6 @@ set(CPP_FILES
   Controllers/mitkToolManagerProvider.cpp
   DataManagement/mitkSegmentationTaskList.cpp
   Interactions/mitkAddContourTool.cpp
-  Interactions/mitkAutoCropTool.cpp
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
@@ -61,13 +60,11 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSegWithPreviewTool.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
-  Interactions/mitkLabelSelectionTool.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )

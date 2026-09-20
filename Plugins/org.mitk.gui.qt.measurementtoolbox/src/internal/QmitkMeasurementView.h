@@ -25,6 +25,7 @@ class QAction;
 namespace mitk
 {
   class PlanarFigure;
+  class TimeGeometry;
 }
 
 ///
@@ -95,6 +96,13 @@ private:
      * a pending placement when the views are not aligned.
      */
     void UpdateDrawingControls();
+
+    /**
+     * Forwards the interaction reference geometry to the render window part, if there
+     * is one, and swallows the exception thrown for a time point the geometry does not
+     * cover. Passing nullptr lifts the requirement.
+     */
+    void SetInteractionReferenceGeometry(const mitk::TimeGeometry* geometry);
 
     void UpdateMeasurementText();
     void AddAllInteractors();

@@ -22,7 +22,7 @@ After selecting an image, you can click on any of the geometrical symbols. The r
 
 A measurement that has not been placed yet can be canceled by pressing Esc, by clicking the active tool button again, or by switching to another tool.
 
-Measurements are placed on the slices of the reference image, so the render windows have to be aligned to it. Selecting a reference image aligns the views to it. If the views are later initialized to other data, for example via <i>Reinit</i> in the Data Manager, the tools are covered by a notice and a measurement that is currently being placed is canceled. Click <i>Align views</i> to align the views to the reference image again. In displays with independent render windows, every render window that is not aligned to the reference image shows its own <i>Reset geometry</i> notice while a measurement is being placed.
+Measurements are placed on the slices of the reference image, so the render windows have to be aligned to it. Whenever they are not, the drawing tools are covered by a notice; click <i>Align views</i> to align the views to the reference image. This is the case when the view is opened while the views show something else, and when the views are initialized to other data afterwards, for example via <i>Reinit</i> in the Data Manager. Switching to another reference image aligns the views to it right away. A measurement that is currently being placed is canceled in all of these cases. In displays with independent render windows, every render window that is not aligned to the reference image shows its own <i>Reset geometry</i> notice while a measurement is being placed.
 
 The view offers a variety of measurement options that are introduced in the following:
 

@@ -42,6 +42,13 @@ namespace mitk
      *       count as aligned. A stricter comparison of the index-to-world transforms
      *       is not done yet.
      *
+     * \note The test is anchored to the world geometry the render windows slice, not to the
+     *       orientation of the individual planes. Rotating the planes with the crosshair or
+     *       reorienting them via SliceNavigationController::ReorientSlices leaves that world
+     *       geometry untouched, so oblique slices of the given geometry count as aligned.
+     *       This is deliberate: placing data on a tilted slice stays possible for users who
+     *       ask for it.
+     *
      * \param[in] renderWindowPart  The render window part whose world geometry is compared. May be nullptr.
      * \param[in] geometry          The geometry to compare against. May be nullptr.
      * \return False if the part has coupled render windows whose world geometry differs from

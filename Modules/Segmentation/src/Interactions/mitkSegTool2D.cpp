@@ -80,7 +80,11 @@ bool mitk::SegTool2D::CanHandle(const BaseData *referenceData, const BaseData *w
   if (!Superclass::CanHandle(referenceData, workingData))
     return false;
 
-  if (dynamic_cast<const Image*>(referenceData) == nullptr)
+  auto* referenceImage = dynamic_cast<const Image*>(referenceData);
+  if (referenceImage == nullptr)
+    return false;
+
+  if (m_RequiresScalarReferenceSlice && !HasSingleComponentSlices(referenceImage))
     return false;
 
   auto* segmentation = dynamic_cast<const MultiLabelSegmentation*>(workingData);

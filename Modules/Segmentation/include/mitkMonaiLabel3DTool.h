@@ -66,7 +66,7 @@ namespace mitk
     void WriteBackResults(MultiLabelSegmentation *previewImage, MultiLabelSegmentation *segResults, TimeStepType timeStep) const override;
 
   protected:
-    MonaiLabel3DTool() = default;
+    MonaiLabel3DTool();
     ~MonaiLabel3DTool() = default;
   };
 } // namespace mitk

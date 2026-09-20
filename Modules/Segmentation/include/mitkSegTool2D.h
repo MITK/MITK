@@ -96,7 +96,7 @@ namespace mitk
     *
     * \param positionEvent Event that specifies the plane that should be used to slice
     * \param image Image that should be sliced
-    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
+    * \param component  The component to be extracted of a given multi-component image. Defaults to the first component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
     *         getting the image data at that position.
@@ -109,7 +109,7 @@ namespace mitk
     * \param planeGeometry Geometry defining the slice that should be cut out.
     * \param image Image that should be sliced
     * \param timeStep TimeStep of the image that should be sliced
-    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
+    * \param component  The component to be extracted of a given multi-component image. Defaults to the first component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
     *         getting the image data at that position.
@@ -179,7 +179,9 @@ namespace mitk
 
     /** \brief In addition to Tool::CanHandle(), requires the reference data to be an
      * Image and the working data a MultiLabelSegmentation that already contains at
-     * least one label, as 2D tools operate on existing labels. */
+     * least one label, as 2D tools operate on existing labels. Tools that read the
+     * reference slice additionally require Tool::HasSingleComponentSlices(), see
+     * RequiresScalarReferenceSlice. */
     bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const override;
 
     itkSetMacro(IsTimePointChangeAware, bool);
@@ -205,6 +207,17 @@ namespace mitk
     SegTool2D();             // purposely hidden
     SegTool2D(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~SegTool2D() override;
+
+    /** \brief If true, CanHandle() rejects reference images whose slices do not
+     * reduce to a single component (see Tool::HasSingleComponentSlices()).
+     *
+     * Off by default, as most 2D tools only modify the segmentation slice.
+     * Tools that evaluate the intensities of the reference slice (e.g. region
+     * growing, live wire) switch this on.
+     */
+    itkSetMacro(RequiresScalarReferenceSlice, bool);
+    itkGetConstMacro(RequiresScalarReferenceSlice, bool);
+    itkBooleanMacro(RequiresScalarReferenceSlice);
 
     /**
      * This function can be reimplemented by derived classes to react on changes of the current
@@ -357,6 +370,7 @@ namespace mitk
     static bool m_SurfaceInterpolationEnabled;
 
     bool m_IsTimePointChangeAware = true;
+    bool m_RequiresScalarReferenceSlice = false;
 
     TimePointType m_LastTimePointTriggered = 0.;
 

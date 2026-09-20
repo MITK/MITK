@@ -28,6 +28,7 @@ namespace mitk
 mitk::LiveWireTool2D::LiveWireTool2D()
   : EditableContourTool(), m_CreateAndUseDynamicCosts(false)
 {
+  this->RequiresScalarReferenceSliceOn();
 }
 
 mitk::LiveWireTool2D::~LiveWireTool2D()

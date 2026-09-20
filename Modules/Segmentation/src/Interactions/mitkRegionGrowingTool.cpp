@@ -50,6 +50,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
     m_FillFeedbackContour(true),
     m_ConnectedComponentValue(1)
 {
+  this->RequiresScalarReferenceSliceOn();
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()

@@ -90,6 +90,12 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
   if (referenceImage == nullptr)
     return false;
 
+  if (m_RequiresScalarReference && !IsSingleComponentScalarImage(referenceImage))
+    return false;
+
+  if (m_RequiresVolumetricReference && referenceImage->GetDimension() < 3)
+    return false;
+
   auto* labelSet = dynamic_cast<const MultiLabelSegmentation*>(workingData);
   if (labelSet == nullptr)
     return false;

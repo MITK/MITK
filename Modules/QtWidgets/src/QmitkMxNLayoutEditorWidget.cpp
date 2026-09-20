@@ -530,6 +530,11 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
     connect(m_MultiWidget, &QmitkMxNMultiWidget::LayoutChanged,
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
+    // A dragged divider moves the cells without changing the cell set, so the
+    // map only needs its geometry back - not the coalesced full rebuild, which
+    // would re-query every descriptor and link for each step of the drag.
+    connect(m_MultiWidget, &QmitkMxNMultiWidget::LayoutProportionsChanged,
+            m_CellMap, &QmitkMxNCellMapWidget::RefreshTileGeometry);
     connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncGroupAdded,
             this, [this]() { this->ScheduleRebuild(); });
     // Reverse of the tile-selects-active link: when the editor's active render

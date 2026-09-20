@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <nlohmann/json.hpp>
 
 #include <QCoreApplication>
+#include <QSplitter>
 
 #include <string>
 
@@ -54,6 +55,9 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(Maximize_UnknownIdRestoresTheGrid);
   MITK_TEST(Maximize_IsInvisibleToSerialization);
   MITK_TEST(Maximize_LayoutChangeRestoresTheGrid);
+  MITK_TEST(NormalizedRects_MirrorTheGrid);
+  MITK_TEST(NormalizedRects_FollowLoadedProportions);
+  MITK_TEST(NormalizedRects_DescribeTheGridWhileMaximized);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -116,6 +120,106 @@ public:
       }
     }
     return visible;
+  }
+
+  /** Lay out a grid in an editor with a real extent, settled. A splitter needs
+   *  a size of its own before setSizes() means anything. */
+  void SizedEditor(int rows, int columns) const
+  {
+    m_Editor->resize(1200, 800);
+    m_Editor->show();
+    m_Editor->SetLayout(rows, columns);
+    QCoreApplication::processEvents();
+  }
+
+  /** The normalized rect the editor reports for a cell, or an invalid rect. */
+  QRectF NormalizedRectOf(const QString& windowId) const
+  {
+    for (const auto& [id, rect] : m_Editor->GetNormalizedCellRects())
+    {
+      if (id == windowId)
+      {
+        return rect;
+      }
+    }
+    return QRectF();
+  }
+
+  // ---------- Normalized cell rects (the layout map's geometry source) -------
+
+  void NormalizedRects_MirrorTheGrid()
+  {
+    // These drive the layout editor's cell map. They come from the splitter
+    // proportions rather than on-screen geometry precisely so they are right
+    // without a layout pass - which is what this test relies on too.
+    // A splitter has to have an extent before it can distribute one, so the
+    // editor is sized and shown; on an unrealized widget the sizes come back
+    // roughly even whatever was asked for.
+    SizedEditor(2, 2);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), m_Editor->GetNormalizedCellRects().size());
+
+    // Splitters deal in whole pixels, so an even grid can land a pixel off
+    // centre. The tolerance is that rounding, not slack.
+    const double pixelRounding = 0.02;
+
+    const QRectF topLeft = NormalizedRectOf(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("Every cell is placed", topLeft.isValid());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, topLeft.x(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, topLeft.y(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, topLeft.width(), pixelRounding);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, topLeft.height(), pixelRounding);
+
+    const QRectF bottomRight = NormalizedRectOf(CellId(3));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, bottomRight.x(), pixelRounding);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, bottomRight.y(), pixelRounding);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The grid covers the full width",
+                                         1.0, bottomRight.right(), pixelRounding);
+  }
+
+  void NormalizedRects_FollowLoadedProportions()
+  {
+    // The case that exposed this: a loaded layout is not a regular grid, so the
+    // map cannot fall back on a row/column count and must read the document's
+    // proportions. Round-tripping the editor's own document keeps the input
+    // schema-valid while giving the two cells a 3:1 split.
+    SizedEditor(1, 2);
+
+    auto doc = m_Editor->SerializeLayout();
+    auto& windows = doc["root"]["children"][0].contains("children")
+      ? doc["root"]["children"][0]["children"]
+      : doc["root"]["children"];
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The 1x2 document holds two windows",
+                                 std::size_t(2), windows.size());
+    // Pixels, not ratios: QSplitter::setSizes clamps anything below a child's
+    // minimum width and splits the remainder evenly, so the values have to be
+    // large enough to survive on a 1200 px editor.
+    windows[0]["size"] = 900;
+    windows[1]["size"] = 300;
+
+    m_Editor->ApplyLayout(doc);
+    QCoreApplication::processEvents();
+
+    const double pixelRounding = 0.02;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The wide cell takes three quarters",
+                                         0.75, NormalizedRectOf(CellId(0)).width(), pixelRounding);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The narrow cell starts at three quarters",
+                                         0.75, NormalizedRectOf(CellId(1)).x(), pixelRounding);
+  }
+
+  void NormalizedRects_DescribeTheGridWhileMaximized()
+  {
+    // Maximizing hides the siblings, zeroing their splitter sizes. The map must
+    // keep describing the grid the user will come back to, so the derivation
+    // reads the proportions captured on the way in.
+    m_Editor->SetLayout(2, 2);
+    m_Editor->show();
+    m_Editor->SetMaximizedCell(CellId(0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every cell is still placed while maximized",
+                                 std::size_t(4), m_Editor->GetNormalizedCellRects().size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The maximized cell does not swallow the map",
+                                         0.5, NormalizedRectOf(CellId(0)).width(), 1e-6);
   }
 
   // ---------- Maximize (transient view state) ----------

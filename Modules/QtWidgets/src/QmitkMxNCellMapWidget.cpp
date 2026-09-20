@@ -88,50 +88,35 @@ void QmitkMxNCellMapWidget::Rebuild()
       descriptors.clear();  // transient mid-layout-change state
     }
 
-    // For a regular grid, lay the tiles out uniformly from the row/column count
-    // and the row-major descriptor order. This is robust right after a structural
-    // change (e.g. adding a row): the live cell geometry is not yet updated by
-    // Qt's layout pass at that moment, so reading it would collapse every tile to
-    // the top-left. Irregular (loaded) layouts fall back to mirroring the real
-    // on-screen proportions, which are valid once the layout has settled.
-    const int rows = m_MultiWidget->GetRowCount();
-    const int columns = m_MultiWidget->GetColumnCount();
-    const bool uniformGrid = rows > 0 && columns > 0
-                             && static_cast<int>(descriptors.size()) == rows * columns;
-    const QRect editorRect = m_MultiWidget->rect();
-    int index = 0;
+    // Proportions come from the splitter tree, not from the cells' on-screen
+    // geometry. The sizes are set as the tree is built, so they are already
+    // right when a rebuild follows a structural change; widget geometry at that
+    // moment still awaits Qt's layout pass and would collapse the tiles. It also
+    // means a dragged divider shows up here, which reading a row/column count
+    // never could.
+    const auto normalizedRects = m_MultiWidget->GetNormalizedCellRects();
+
     for (const auto& descriptor : descriptors)
     {
       const auto cell = m_MultiWidget->GetRenderWindowWidget(descriptor.id);
       if (nullptr == cell)
       {
-        ++index;
         continue;
+      }
+
+      const auto entry = std::find_if(normalizedRects.begin(), normalizedRects.end(),
+                                      [&descriptor](const std::pair<QString, QRectF>& candidate)
+                                      { return candidate.first == descriptor.id; });
+      if (entry == normalizedRects.end())
+      {
+        continue;  // not in the splitter tree (transient mid-surgery state)
       }
 
       Tile tile;
       tile.windowId = descriptor.id;
       tile.label = BareCellLabel(descriptor);
-
-      if (uniformGrid)
-      {
-        const int row = index / columns;
-        const int column = index % columns;
-        tile.normalizedRect = QRectF(static_cast<qreal>(column) / columns,
-                                     static_cast<qreal>(row) / rows,
-                                     1.0 / columns, 1.0 / rows);
-      }
-      else if (editorRect.width() > 0 && editorRect.height() > 0)
-      {
-        const QRect cellRect(cell->mapTo(m_MultiWidget, QPoint(0, 0)), cell->size());
-        tile.normalizedRect = QRectF(
-          static_cast<qreal>(cellRect.x()) / editorRect.width(),
-          static_cast<qreal>(cellRect.y()) / editorRect.height(),
-          static_cast<qreal>(cellRect.width()) / editorRect.width(),
-          static_cast<qreal>(cellRect.height()) / editorRect.height());
-      }
+      tile.normalizedRect = entry->second;
       m_Tiles.push_back(std::move(tile));
-      ++index;
     }
   }
 
@@ -224,6 +209,29 @@ void QmitkMxNCellMapWidget::UpdateTileRects()
                          qRound(tile.normalizedRect.width() * area.width()) - TileSpacing,
                          qRound(tile.normalizedRect.height() * area.height()) - TileSpacing);
   }
+}
+
+void QmitkMxNCellMapWidget::RefreshTileGeometry()
+{
+  if (m_MultiWidget.isNull() || m_Tiles.empty())
+  {
+    return;
+  }
+
+  const auto normalizedRects = m_MultiWidget->GetNormalizedCellRects();
+  for (auto& tile : m_Tiles)
+  {
+    const auto entry = std::find_if(normalizedRects.begin(), normalizedRects.end(),
+                                    [&tile](const std::pair<QString, QRectF>& candidate)
+                                    { return candidate.first == tile.windowId; });
+    if (entry != normalizedRects.end())
+    {
+      tile.normalizedRect = entry->second;
+    }
+  }
+
+  this->UpdateTileRects();
+  this->update();
 }
 
 QRect QmitkMxNCellMapWidget::TileBarcodeRect(const Tile& tile) const

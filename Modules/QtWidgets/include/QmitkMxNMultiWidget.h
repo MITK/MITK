@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <nlohmann/json.hpp>
 
 #include <QColor>
+#include <QRectF>
 
 #include <array>
 #include <functional>
@@ -543,6 +544,19 @@ public:
   QString GetMaximizedCell() const;
 
   /**
+  * \brief Each cell's rectangle within the editor, as a fraction of the whole,
+  *        keyed by window id.
+  *
+  *        Derived from the splitter proportions rather than from on-screen
+  *        geometry: the sizes are set as the tree is built, so these are right
+  *        before Qt's layout pass has run, where widget geometry would still be
+  *        stale. While a cell is maximized the proportions captured on the way
+  *        in are used, so the map describes the grid rather than the one
+  *        visible cell - the same source 'SerializeLayout' reports.
+  */
+  std::vector<std::pair<QString, QRectF>> GetNormalizedCellRects() const;
+
+  /**
   * \brief Ask the hosting layer for the layout editor (emits
   *        'LayoutEditorRequested'). Entry point for furniture that cannot
   *        emit the editor's signal itself (e.g. the seams' editor hook).
@@ -841,6 +855,13 @@ Q_SIGNALS:
   void CrosshairVisibilityChanged(bool visible);
 
   /**
+  * \brief A divider was dragged, so the cells still are what they were but no
+  *        longer where. Surfaces the splitters' own 'splitterMoved' without
+  *        exposing the tree, for anything mirroring the layout's proportions.
+  */
+  void LayoutProportionsChanged();
+
+  /**
   * \brief A selection group's display label changed (cosmetic rename);
   *        per-cell group selectors update their row text.
   */
@@ -931,6 +952,19 @@ private:
   *        'ListWindowDescriptors'.
   */
   QSplitter* RootSplitter() const;
+
+  /**
+  * \brief Relay every layout splitter's 'splitterMoved' to
+  *        'LayoutProportionsChanged'.
+  *
+  *        Splitters are created in a dozen places, several of them in the
+  *        shared layout manager, so the tree is walked after a structural
+  *        change instead of wiring each construction site. The connection is
+  *        unique, which makes re-walking idempotent, and the walk is by
+  *        child index rather than findChildren so splitters that belong to a
+  *        render window rather than the layout stay out of it.
+  */
+  void RelaySplitterProportionChanges();
 
   /**
   * \brief Tear down a single cell during grid surgery: capture its selection

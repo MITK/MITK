@@ -80,6 +80,14 @@ public:
    *         where the cells still exist. */
   void Rebuild();
 
+  /**
+   * \brief Re-read only where the cells sit, for a dragged divider: the cell
+   *        set and its link state are unchanged, so this skips the descriptor
+   *        and link queries a full rebuild makes. Dragging emits continuously,
+   *        which is why it is worth the separate path.
+   */
+  void RefreshTileGeometry();
+
   QStringList GetSelectedWindowIds() const;
 
   /** \brief Set the selected tiles (e.g. to mirror the editor's active render

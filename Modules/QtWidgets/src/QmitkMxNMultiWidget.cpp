@@ -46,6 +46,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <functional>
+#include <numeric>
 #include <fstream>
 #include <vector>
 
@@ -868,6 +869,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
 
   // Layout-tracking furniture (layout editor, seams) follows this signal;
   // without it a shrink leaves them rendering removed cells.
+  this->RelaySplitterProportionChanges();
   emit LayoutChanged();
 }
 
@@ -1154,6 +1156,99 @@ QString QmitkMxNMultiWidget::GetMaximizedCell() const
   return m_MaximizedCell;
 }
 
+void QmitkMxNMultiWidget::RelaySplitterProportionChanges()
+{
+  auto* root = this->RootSplitter();
+  if (nullptr == root)
+  {
+    return;
+  }
+
+  std::function<void(QSplitter*)> walk = [this, &walk](QSplitter* split)
+  {
+    // Signal to signal, and deliberately not a lambda: Qt honours
+    // Qt::UniqueConnection only for member-function connections, so a functor
+    // here would silently stack another connection every time the tree is
+    // re-walked, and one drag would then emit once per structural change the
+    // editor has seen. The arity difference is fine - a connection may drop
+    // trailing arguments.
+    connect(split, &QSplitter::splitterMoved,
+            this, &QmitkMxNMultiWidget::LayoutProportionsChanged, Qt::UniqueConnection);
+
+    for (int i = 0; i < split->count(); ++i)
+    {
+      if (auto* sub = dynamic_cast<QSplitter*>(split->widget(i)))
+      {
+        walk(sub);
+      }
+    }
+  };
+
+  walk(root);
+}
+
+std::vector<std::pair<QString, QRectF>> QmitkMxNMultiWidget::GetNormalizedCellRects() const
+{
+  std::vector<std::pair<QString, QRectF>> rects;
+
+  const auto* root = this->RootSplitter();
+  if (nullptr == root)
+  {
+    return rects;
+  }
+
+  // Recursion mirrors SerializeSplitter's walk, and reads the same sizes it
+  // serializes - including the pre-maximize capture, so a maximized editor
+  // still reports the grid it will return to instead of one full-width cell
+  // and a row of zeroes.
+  std::function<void(const QSplitter*, const QRectF&)> walk =
+    [this, &rects, &walk](const QSplitter* split, const QRectF& area)
+  {
+    QList<int> sizes = split->sizes();
+    for (const auto& [captured, capturedSizes] : m_PreMaximizeSizes)
+    {
+      if (captured == split)
+      {
+        sizes = capturedSizes;
+        break;
+      }
+    }
+
+    const int total = std::accumulate(sizes.begin(), sizes.end(), 0);
+    const bool vertical = split->orientation() == Qt::Vertical;
+    const int count = split->count();
+
+    double offset = 0.0;
+    for (int i = 0; i < count; ++i)
+    {
+      // An all-zero splitter has no proportions to read; fall back to equal
+      // shares so the map still describes the structure.
+      const double fraction = total > 0 && i < sizes.size()
+        ? static_cast<double>(sizes[i]) / total
+        : 1.0 / std::max(1, count);
+
+      const QRectF childArea = vertical
+        ? QRectF(area.x(), area.y() + offset * area.height(), area.width(), fraction * area.height())
+        : QRectF(area.x() + offset * area.width(), area.y(), fraction * area.width(), area.height());
+
+      auto* child = split->widget(i);
+      if (auto* sub = dynamic_cast<const QSplitter*>(child))
+      {
+        walk(sub, childArea);
+      }
+      else if (auto* cell = dynamic_cast<const QmitkRenderWindowWidget*>(child))
+      {
+        rects.emplace_back(cell->GetWidgetName(), childArea);
+      }
+
+      offset += fraction;
+    }
+  };
+
+  walk(root, QRectF(0.0, 0.0, 1.0, 1.0));
+  return rects;
+}
+
 QSplitter* QmitkMxNMultiWidget::RootSplitter() const
 {
   auto* topLayout = this->layout();
@@ -1291,6 +1386,7 @@ void QmitkMxNMultiWidget::FinalizeGridSurgery()
   {
     this->SetGridDimensions(rows, columns);
   }
+  this->RelaySplitterProportionChanges();
   emit LayoutChanged();
 }
 
@@ -2398,7 +2494,8 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
 
     this->EnableCrosshair();
-    emit LayoutChanged();
+    this->RelaySplitterProportionChanges();
+  emit LayoutChanged();
   }
   catch (const mitk::Exception&)
   {
@@ -2495,6 +2592,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   }
 
   this->EnableCrosshair();
+  this->RelaySplitterProportionChanges();
   emit LayoutChanged();
 }
 

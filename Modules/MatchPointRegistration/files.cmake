@@ -29,6 +29,7 @@ set(CPP_FILES
   Rendering/mitkRegVisHelper.cpp
   Rendering/mitkRegEvalStyleProperty.cpp
   Rendering/mitkRegEvalWipeStyleProperty.cpp
+  Rendering/mitkRegPropertySerializers.cpp
 )
 
 set(RESOURCE_FILES

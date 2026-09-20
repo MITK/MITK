@@ -246,14 +246,16 @@
 	\ref org_mitk_editors_mxnmultiwidget_Layout.
 
 	Below it, the <b>window map</b> mirrors the current layout: one tile per render
-	window, filled with its navigation group's color (a neutral fill marks windows
-	whose navigation dimensions belong to different groups). The stripe at each tile's
+	window, carrying a bar in its navigation group's color along its top edge (no bar
+	marks windows whose navigation dimensions belong to different groups). Selected
+	tiles are tinted, which keeps the tile edges free to carry group colors. The stripe at each tile's
 	bottom is the window's <b>sync barcode</b>: one slot per dimension in a fixed order
 	(pan, zoom, slice, crosshair, orientation, windowing, LUT), colored with the linked
 	group's hue, left empty when the dimension is not synchronized, with a small notch
 	when the link carries an offset.
 
-	Windows are selected in the map by click, Ctrl-click, or dragging a rubber band.
+	Windows are selected in the map by click, by Ctrl-click to toggle a single window,
+	or by Shift-click to take the range from the window clicked last.
 	To assign them to a group, click the group's "Assign selection" button, drag the
 	tiles onto the group's card, or drag the group's color swatch onto a tile.
 	"Remove selection" takes the selected windows out of the group again.

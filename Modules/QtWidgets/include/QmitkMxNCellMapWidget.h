@@ -34,8 +34,8 @@ class QmitkMxNMultiWidget;
  *        synchronization-group membership.
  *
  * Tiles mirror the live splitter geometry. Each tile shows the cell's name,
- * its navigation group (fill in the group hue when the four navigation
- * dimensions agree; a neutral fill marks hybrid cells), and a per-dimension
+ * its navigation group (a top bar in the group hue when the four navigation
+ * dimensions agree; no bar marks hybrid cells), and a per-dimension
  * "sync barcode" along the tile bottom: one slot per dimension in the fixed
  * engine order (pan, zoom, slice, crosshair, orientation, windowing, LUT),
  * filled with the linked group's hue, left as a gap when unsynced, with a
@@ -97,9 +97,9 @@ public:
   /** \brief Ring the given tiles in 'hue' and brighten their 'axisIndex' glyph,
    *         marking every cell that shares one synchronization (a group on one
    *         axis). Driven by the owning editor from a glyph hover; an empty list
-   *         (or axisIndex -1) clears the highlight. The ring is distinct from the
-   *         blue selection/drop-target border, so a highlighted cell stays
-   *         readable whatever else it is. */
+   *         (or axisIndex -1) clears the highlight. The ring is the only hue a
+   *         tile edge carries besides the drop-target border, so a highlighted
+   *         cell stays readable whatever else it is. */
   void SetHighlightedCells(const QStringList& windowIds, int axisIndex, const QColor& hue);
 
   /** \brief The currently sync-highlighted window ids (for tests). */

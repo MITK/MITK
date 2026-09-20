@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPalette>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -36,8 +37,14 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
 {
   ui->setupUi(this);
 
-  auto stylesheet = "QTableWidget::item{background-color: white;}\nQTableWidget::item:selected{background-color: #1C97EA;}";
-  ui->tableWidget->setStyleSheet(stylesheet);
+  // The table is a grid preview, not a data view: its cells are painted flat
+  // and the picked extent is marked by the selection color. Both come from the
+  // palette so the preview follows the active theme.
+  const QPalette& palette = ui->tableWidget->palette();
+  ui->tableWidget->setStyleSheet(
+    QStringLiteral("QTableWidget::item { background-color: %1; }\n"
+                   "QTableWidget::item:selected { background-color: %2; }")
+      .arg(palette.color(QPalette::Base).name(), palette.color(QPalette::Highlight).name()));
 
   m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
   connect(m_AutomatedDataLayoutWidget, &QmitkAutomatedLayoutWidget::SetDataBasedLayout, this, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout);

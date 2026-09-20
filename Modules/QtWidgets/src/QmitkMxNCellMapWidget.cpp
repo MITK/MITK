@@ -284,24 +284,28 @@ void QmitkMxNCellMapWidget::paintEvent(QPaintEvent* /*event*/)
                        identity.hue);
     }
 
-    // Highlight the tile a dragged group would drop onto.
+    // Selection is a fill, drag feedback is a frame. Ringing the selection would
+    // put it on the same channel as the group hue (the sync-highlight ring
+    // below), where the two colors compete on one edge; tinting keeps the frames
+    // for the group alone. The tile a dragged group would drop onto takes the
+    // same tint plus a frame - that frame is what tells the two states apart.
     const bool dropTarget = static_cast<int>(tileIndex) == m_DropTargetTile;
-    if (dropTarget)
+    const bool selected = m_Selection.contains(tile.windowId);
+    if (dropTarget || selected)
     {
       QColor tint = this->palette().color(QPalette::Highlight);
       tint.setAlpha(70);
       painter.fillRect(tile.mapRect, tint);
     }
 
-    const bool selected = m_Selection.contains(tile.windowId);
-    painter.setPen(QPen(dropTarget || selected ? this->palette().color(QPalette::Highlight)
-                                               : this->palette().color(QPalette::Mid),
-                        dropTarget || selected ? 2 : 1));
+    painter.setPen(QPen(dropTarget ? this->palette().color(QPalette::Highlight)
+                                   : this->palette().color(QPalette::Mid),
+                        dropTarget ? 2 : 1));
     painter.drawRect(tile.mapRect.adjusted(0, 0, -1, -1));
 
     // Sync-highlight ring: a cell sharing the hovered (group, axis) is ringed in
     // that group's hue, inset from the border so it reads distinctly from the
-    // blue selection/drop-target border a cell may also carry.
+    // drop-target border a cell may also carry.
     const bool highlighted = m_HighlightCells.contains(tile.windowId);
     if (highlighted && m_HighlightHue.isValid())
     {

@@ -14,6 +14,7 @@ set(CPP_FILES
   mitkCylinder.cpp
   mitkDataStorageSelection.cpp
   mitkEllipsoid.cpp
+  mitkGridPropertySerializers.cpp
   mitkGridRepresentationProperty.cpp
   mitkGridVolumeMapperProperty.cpp
   mitkLabeledImageLookupTable.cpp

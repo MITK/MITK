@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE_TESTS()
+MITK_CREATE_MODULE_TESTS(DEPENDS MitkSceneSerializationBase)
 if(TARGET ${TESTDRIVER})
   mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|TestingRendering)
 

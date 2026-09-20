@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkPlaneOrientationProperty.h>
+#include <mitkResliceMethodProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkInterpolationProperty.h>
@@ -87,6 +88,7 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   propList->SetProperty("VtkRepresentationProperty", mitk::VtkRepresentationProperty::New("Surface"));
   propList->SetProperty("VtkResliceInterpolationProperty", mitk::VtkResliceInterpolationProperty::New("Cubic"));
   propList->SetProperty("VtkScalarModeProperty", mitk::VtkScalarModeProperty::New("PointFieldData"));
+  propList->SetProperty("ResliceMethodProperty", mitk::ResliceMethodProperty::New("mip"));
   mitk::BoolLookupTable blt;
   blt.SetTableValue(0, true);
   blt.SetTableValue(1, false);

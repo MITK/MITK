@@ -10,6 +10,7 @@ set(MITK_MODULES
   CommandLine
   CoreCmdApps
   AppUtil
+  SceneSerializationBase
   DataTypesExt
   Annotation
   AlgorithmsExt
@@ -17,7 +18,6 @@ set(MITK_MODULES
   DICOM
   DICOMQI
   DICOMTesting
-  SceneSerializationBase
   PlanarFigure
   ImageDenoising
   SceneSerialization

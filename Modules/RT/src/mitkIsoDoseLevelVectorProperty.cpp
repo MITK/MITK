@@ -13,6 +13,8 @@ found in the LICENSE file.
 
 #include <mitkIsoDoseLevelVectorProperty.h>
 
+#include <algorithm>
+
 
 mitk::IsoDoseLevelVectorProperty::IsoDoseLevelVectorProperty()
 {
@@ -34,7 +36,19 @@ mitk::IsoDoseLevelVectorProperty::~IsoDoseLevelVectorProperty()
 
 bool mitk::IsoDoseLevelVectorProperty::IsEqual(const BaseProperty& property) const
 {
-  return this->m_IsoLevelVector == static_cast<const Self&>(property).m_IsoLevelVector;
+  const auto& other = static_cast<const Self&>(property).m_IsoLevelVector;
+
+  if (m_IsoLevelVector.IsNull() || other.IsNull())
+    return m_IsoLevelVector == other;
+
+  return std::equal(m_IsoLevelVector->begin(), m_IsoLevelVector->end(), other->begin(), other->end(),
+    [](const IsoDoseLevel::Pointer& lhs, const IsoDoseLevel::Pointer& rhs)
+    {
+      if (lhs.IsNull() || rhs.IsNull())
+        return lhs == rhs;
+
+      return *lhs == *rhs;
+    });
 }
 
 bool mitk::IsoDoseLevelVectorProperty::Assign(const BaseProperty& property)

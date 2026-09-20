@@ -283,13 +283,11 @@ namespace mitk
   as
   readable string
     - <b>dicomseriesreader.ReaderImplementationLevel</b> : Confidence /Support level of the reader for this image as
-  enum
-  value of type ReaderImplementationLevel
+  IntProperty holding the numeric value of the ReaderImplementationLevel enum
     - <b>dicomseriesreader.PixelSpacingInterpretationString</b> : Appropriate interpreteation of pixel spacing for this
   Image as readable string
     - <b>dicomseriesreader.PixelSpacingInterpretation</b> : Appropriate interpreteation of pixel spacing for this Image
-  as
-  enum value of type PixelSpacingInterpretation
+  as IntProperty holding the numeric value of the PixelSpacingInterpretation enum
     - <b>dicomseriesreader.MultiFrameImage</b> : bool flag to mark multi-frame images
     - <b>dicomseriesreader.GantyTiltCorrected</b> : bool flag to mark images where a gantry tilt was corrected to fit
   slices into an mitk::Image
@@ -307,7 +305,7 @@ namespace mitk
    are evaluated and the pixel spacing is set to the spacing within the patient when tags allow that.
    The result of pixel spacing interpretation can be read from a property
   "dicomseriesreader.PixelSpacingInterpretation",
-   which refers to one of the enumerated values of type PixelSpacingInterpretation;
+   an IntProperty holding one of the enumerated values of type PixelSpacingInterpretation;
 
    \section DicomSeriesReader_supportedmodalities Limitations for specific modalities
 

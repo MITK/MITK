@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkDICOMImageBlockDescriptor.h>
 #include <mitkStringProperty.h>
+#include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkPropertyKeyPath.h>
 #include <mitkDICOMIOMetaInformationPropertyConstants.h>
@@ -477,11 +478,11 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING()),
     StringProperty::New(PixelSpacingInterpretationToString(this->GetPixelSpacingInterpretation())));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION()),
-    GenericProperty<PixelSpacingInterpretation>::New(this->GetPixelSpacingInterpretation()));
+    IntProperty::New(static_cast<int>(this->GetPixelSpacingInterpretation())));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL_STRING()),
     StringProperty::New(ReaderImplementationLevelToString(m_ReaderImplementationLevel)));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL()),
-    GenericProperty<ReaderImplementationLevel>::New(m_ReaderImplementationLevel));
+    IntProperty::New(static_cast<int>(m_ReaderImplementationLevel)));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_GANTRY_TILT_CORRECTED()),
     BoolProperty::New(this->GetTiltInformation().IsRegularGantryTilt()));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_3D_plus_t()), BoolProperty::New(this->GetFlag("3D+t", false)));
@@ -532,14 +533,14 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
     StringProperty::New( PixelSpacingInterpretationToString( this->GetPixelSpacingInterpretation() ) ) );
   mitkImage->SetProperty(
     "dicomseriesreader.PixelSpacingInterpretation",
-    GenericProperty<PixelSpacingInterpretation>::New( this->GetPixelSpacingInterpretation() ) );
+    IntProperty::New( static_cast<int>( this->GetPixelSpacingInterpretation() ) ) );
 
   mitkImage->SetProperty(
     "dicomseriesreader.ReaderImplementationLevelString",
     StringProperty::New( ReaderImplementationLevelToString( m_ReaderImplementationLevel ) ) );
 
   mitkImage->SetProperty( "dicomseriesreader.ReaderImplementationLevel",
-                          GenericProperty<ReaderImplementationLevel>::New( m_ReaderImplementationLevel ) );
+                          IntProperty::New( static_cast<int>( m_ReaderImplementationLevel ) ) );
 
   mitkImage->SetProperty( "dicomseriesreader.GantyTiltCorrected",
                           BoolProperty::New( this->GetTiltInformation().IsRegularGantryTilt() ) );

@@ -116,6 +116,7 @@ between <ul> and its first <li>, hence the position here.
     are ignored.
   <li> <em>Fit views to all data</em>: Frames all data nodes of the data storage in the render windows and resets the camera. The same data nodes are
     ignored as for <em>Fit views to selection</em>. In this case it does not matter on which node this action is performed.
+  <li> <em>Rename</em>: see \ref DataManagerNodeRenaming "Renaming data nodes" section
   <li> <em>Save</em>: see \ref DataManagerSavingData "Saving Data" section
   <li> <em>Remove</em>: Removes all selected data nodes from the data storage.
   <li> <em>Show only selected nodes</em>: Enables the visibility of all selected data nodes and hides all other data nodes.

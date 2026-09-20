@@ -27,7 +27,7 @@ By moving the cursor to the upper right corner of any window you can activate th
 
 \imageMacro{org_mitk_editors_stdmultiwidget_CrosshairModes.png,"Crosshair",8.72}
 
-The crosshair button allows you toggle the crosshair, reset the view and change the behaviour of the planes.
+The crosshair button allows you to toggle the crosshair, to fit the views to all data and to change the behaviour of the planes.
 
 Activating either of the rotation modes allows you to rotate the planes visible in a 2D window by moving the mouse cursor close to them and click and dragging once it changes to indicate that rotation can be done.
 

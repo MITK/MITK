@@ -368,15 +368,12 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   m_CellMap = new QmitkMxNCellMapWidget(mapPane);
   m_CellMap->setMinimumHeight(200);
-  m_CellMap->setToolTip(tr("Select render windows by click, Ctrl-click to toggle one, or "
-                           "Shift-click to select the range from the last one clicked; "
-                           "assign them by dropping them onto a group (or a group's color "
-                           "onto a window). Drag with the right button to pick the join mode "
-                           "from a menu on drop; a left drop replaces the window's groups, "
-                           "with Alt to merge and Shift to fill only its unsynced axes. Each "
-                           "window shows its sync axes as glyphs: the seven dimensions plus "
-                           "data selection, tinted by group, a gap where the window is not "
-                           "synchronized on that axis."));
+  // Purpose plus the gestures a user would not guess; the join modes, the
+  // barcode legend and the corner cases live in the view's manual page (F1).
+  // A map-wide tooltip sits over the tiles being worked on, so it stays short.
+  m_CellMap->setToolTip(tr("The layout's render windows. Select them (Ctrl-click toggles one, "
+                           "Shift-click takes a range) and drop them on a group card to "
+                           "synchronize them; press F1 for all gestures."));
   connect(m_CellMap, &QmitkMxNCellMapWidget::AssignRequested, this,
           [this](const QString& group, const QStringList& windowIds, QmitkMxNGroupJoinMode mode)
           {
@@ -488,9 +485,8 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   m_AdvancedButton = new QToolButton(groupsBox);
   m_AdvancedButton->setText(tr("Advanced"));
   m_AdvancedButton->setCheckable(true);
-  m_AdvancedButton->setToolTip(tr("Show the full per-window, per-dimension link matrix with "
-                                  "offset editors below, for precise live editing of the "
-                                  "associations"));
+  m_AdvancedButton->setToolTip(tr("Show the per-window, per-dimension link matrix with its "
+                                  "offset editors"));
   connect(m_AdvancedButton, &QToolButton::toggled, this, [this](bool on)
   {
     m_MatrixPane->setVisible(on);
@@ -1487,10 +1483,8 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   // A plain (non-hue) box frame delimits each card as its own object.
   card->setFrameShape(QFrame::Box);
   card->setLineWidth(1);
-  card->setToolTip(tr("Drag this card onto a render window in the map to assign the group; "
-                      "drop cells from the map here to add them. Drag with the right button "
-                      "to pick the join mode from a menu on drop; a left drop replaces, with "
-                      "Alt to merge and Shift to fill only unsynced axes."));
+  card->setToolTip(tr("Drop windows here to add them to this group, or drag the card onto a "
+                      "window in the map"));
   auto* cardLayout = new QVBoxLayout(card);
   cardLayout->setContentsMargins(0, 0, 6, 6);
   cardLayout->setSpacing(4);
@@ -1628,10 +1622,8 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   auto* strip = new QmitkMxNSyncBarcodeWidget(card);
   strip->SetAxisClickable(true);
   strip->setFixedHeight(24);
-  strip->setToolTip(tr("Synchronization axes for this group. Click an axis to link or unlink it "
-                       "for every window in the group; a dashed axis is linked for only some. "
-                       "For an empty group, select windows in the map first, then click an axis "
-                       "to add them."));
+  strip->setToolTip(tr("The dimensions this group synchronizes. Click an axis to link or "
+                       "unlink it for the whole group"));
   strip->SetSlots(this->BuildGroupBarcodeSlots(groupId));
   connect(strip, &QmitkMxNSyncBarcodeWidget::AxisClicked, this, [this, groupId](int index)
   {

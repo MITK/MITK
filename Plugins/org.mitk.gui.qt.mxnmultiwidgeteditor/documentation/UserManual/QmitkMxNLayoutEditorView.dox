@@ -1,0 +1,102 @@
+/**
+\page org_mitk_views_mxnlayouteditor The MxN Layout Editor
+
+\imageMacro{QmitkMxNMultiWidgetEditor.svg,"Icon of the MxN Layout Editor",16.00}
+
+\tableofcontents
+
+\section org_mitk_views_mxnlayouteditor_Overview Overview
+	The MxN Layout Editor is the authoritative view of the whole layout document of an
+	MxN display (\ref org_mitk_editors_mxnmultiwidget): the window arrangement and all
+	synchronization groups. Open it with the display's layout button, by clicking the
+	sync barcode in any window's utility menu, or via <i>Window &rarr; Show View</i>.
+	As a dockable view it stays open during review sessions and doubles as a live
+	legend of the current coupling.
+
+\section org_mitk_views_mxnlayouteditor_Layout The layout row
+	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
+	<ul>
+		<li> <b>Presets</b> applies one of the arrangements that ship with MITK.
+		<li> <b>Load...</b> replaces the current layout with one read from a layout file
+			(see \ref org_mitk_editors_mxnmultiwidget_LayoutFile).
+		<li> <b>Save...</b> writes the current layout to a file. A saved layout carries the
+			synchronization groups as well as the window arrangement, so this is also how
+			a change made purely on the synchronization side is kept.
+	</ul>
+
+	Applying a preset or a file replaces the window arrangement and discards the
+	current synchronization groups, so the view asks for confirmation first unless the
+	layout is still the trivial default.
+
+	The grid of the arrangement is edited below the window map: the row and column
+	buttons add or remove a trailing row or column in place, which leaves the existing
+	windows and their settings untouched, while <b>Edit grid...</b> opens the picker for
+	a grid of a chosen size or for an arrangement derived from the loaded data.
+
+\section org_mitk_views_mxnlayouteditor_Map The window map
+	The window map mirrors the current layout: one tile per render window, carrying a
+	bar in its navigation group's color along its top edge (no bar marks windows whose
+	navigation dimensions belong to different groups). Selected tiles are tinted, which
+	keeps the tile edges free to carry group colors.
+
+	Each tile shows the window's <b>sync barcode</b>: one glyph per dimension in a fixed
+	order (pan, zoom, slice, crosshair, orientation, windowing, LUT) plus the data
+	selection, tinted with the linked group's hue and left as a gap where the window is
+	not synchronized on that dimension. Hovering one of the glyphs lights up every
+	window that shares that synchronization, which makes the coupling legible at a
+	glance.
+
+\subsection org_mitk_views_mxnlayouteditor_Selection Selecting windows
+	Selection follows the file-explorer model: a click selects the window clicked,
+	Ctrl-click toggles a single window, and Shift-click takes the range from the window
+	clicked last (Ctrl+Shift adds that range to the selection). A click on empty space
+	clears the selection. Selecting a window in the map also makes it the active one in
+	the display.
+
+\subsection org_mitk_views_mxnlayouteditor_Assign Assigning windows to a group
+	Selected windows join a group by clicking the group card's "Assign selection"
+	button, by dragging the tiles onto the card, or by dragging the group's color swatch
+	from the card onto a tile. "Remove selection" takes them out of the group again.
+
+	A drop can join in three ways. A plain drop <b>replaces</b>: the window leaves its
+	other groups and wholly joins the target. Holding <i>Alt</i> <b>merges</b>, keeping
+	the window's links on dimensions the target group does not cover. Holding
+	<i>Shift</i> <b>fills</b> only the dimensions on which the window is not yet
+	synchronized. Dragging with the right mouse button instead asks for the mode in a
+	menu when the drop happens.
+
+	A window that joins a group which does not synchronize anything yet gets the
+	navigation bundle (pan, zoom, slice, crosshair) as the common-case default.
+
+\section org_mitk_views_mxnlayouteditor_Groups Group cards
+	Each group card offers:
+	<ul>
+		<li> The color swatch sets the group's hue - the color that identifies the group
+			on all synchronization surfaces. It is saved with the layout.
+		<li> The name field sets the group's display name, shown identically everywhere.
+		<li> The card's own sync barcode shows which dimensions the group synchronizes.
+			Clicking an axis links or unlinks it for every window in the group; an axis
+			drawn dashed is linked for only some of them. For a group that has no windows
+			yet, select windows in the map first and then click an axis to add them.
+		<li> The dimension checkboxes control the same links for all member windows;
+			"Link navigation" applies the pan, zoom, slice and crosshair bundle explicitly.
+		<li> "Re-converge" re-establishes reference + offset for the group's
+			slice/zoom/pan members after drift (e.g. from boundary clamping).
+		<li> "Reinit geometry" re-initializes the shared reference geometry of the
+			group's slice/orientation neighborhood; only these windows are affected,
+			unlike the application-wide reinit of the Data Manager.
+	</ul>
+
+\section org_mitk_views_mxnlayouteditor_Advanced The advanced matrix
+	The <b>Advanced</b> toggle switches to the power-user face: every window as a row,
+	every dimension as a column. Each entry selects the group the window links for that
+	dimension (typing a new name creates the group) and, for slice, zoom and pan, edits
+	the offset relative to the group - the way to author a movie-frame layout showing
+	slices -1 / 0 / +1, or a detail view kept twice as zoomed.
+
+	This face exposes the complete layout-file link model, including couplings between
+	windows that are not adjacent on screen, and it is the deliberate way to author a
+	partial group state in which only some windows are linked on a dimension. Everyday
+	assignment is expected to happen in the map instead.
+
+*/

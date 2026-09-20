@@ -38,7 +38,12 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
     </ul>
   </li>
   <li> \subpage org_mitk_editors_stdmultiwidget </li>
-  <li> \subpage org_mitk_editors_mxnmultiwidget </li>
+  <li> MxN
+    <ul>
+      <li> \subpage org_mitk_editors_mxnmultiwidget </li>
+      <li> \subpage org_mitk_views_mxnlayouteditor </li>
+    </ul>
+  </li>
   <li> \subpage org_mitk_views_viewnavigator </li>
   <li> \subpage org_mitk_views_volumevisualization </li>
   <li> \subpage org_mitk_views_properties </li>

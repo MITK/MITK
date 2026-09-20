@@ -34,7 +34,21 @@ mitk::IsoDoseLevelSetProperty::~IsoDoseLevelSetProperty()
 
 bool mitk::IsoDoseLevelSetProperty::IsEqual(const BaseProperty& property) const
 {
-  return this->m_IsoLevelSet == static_cast<const Self&>(property).m_IsoLevelSet;
+  const auto& other = static_cast<const Self&>(property).m_IsoLevelSet;
+
+  if (m_IsoLevelSet.IsNull() || other.IsNull())
+    return m_IsoLevelSet == other;
+
+  if (m_IsoLevelSet->Size() != other->Size())
+    return false;
+
+  for (IsoDoseLevelSet::IsoLevelIndexType i = 0; i < m_IsoLevelSet->Size(); ++i)
+  {
+    if (!(m_IsoLevelSet->GetIsoDoseLevel(i) == other->GetIsoDoseLevel(i)))
+      return false;
+  }
+
+  return true;
 }
 
 bool mitk::IsoDoseLevelSetProperty::Assign(const BaseProperty& property)

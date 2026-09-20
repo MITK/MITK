@@ -157,7 +157,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   m_GeometryViolationWarningOverlay->SetOverlayText(
     QStringLiteral("<font color=\"red\"><p style=\"text-align:center\">Interaction is not possible because the "
                    "render window geometry<br>does not match the interaction reference geometry.</p></center></font>"));
-  m_GeometryViolationWarningOverlay->SetButtonText("Reset geometry");
+  m_GeometryViolationWarningOverlay->SetButtonText("Align view to image");
   m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg")));
 
   connect(m_GeometryViolationWarningOverlay, &QmitkButtonOverlayWidget::Clicked,

@@ -24,7 +24,7 @@ found in the LICENSE file.
 // namespace that contains the concrete action
 namespace ResetGeometryAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, const mitk::TimeGeometry* referenceGeometry, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, const mitk::TimeGeometry* referenceGeometry, mitk::BaseRenderer* baseRenderer)
   {
 
     if (workbenchPartSite.IsNull())
@@ -79,7 +79,7 @@ QmitkDataNodeResetGeometryAction::QmitkDataNodeResetGeometryAction(QWidget* pare
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
-  this->setText(tr("Reset geometry"));
+  this->setText(tr("Align views to image"));
   this->InitializeAction();
 }
 

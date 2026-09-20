@@ -99,7 +99,7 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWo
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
-  setText(tr("Reinit"));
+  setText(tr("Fit views to selection"));
   InitializeAction();
 }
 
@@ -107,7 +107,7 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWo
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {
-  setText(tr("Reinit"));
+  setText(tr("Fit views to selection"));
   InitializeAction();
 }
 

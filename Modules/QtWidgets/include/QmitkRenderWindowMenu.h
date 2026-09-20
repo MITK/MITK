@@ -109,7 +109,7 @@ protected:
 
 Q_SIGNALS:
 
-  void ResetView(); // == "global reinit"
+  void ResetView(); // fits the view(s) to all visible data
 
   void CrosshairVisibilityChanged(bool);
 

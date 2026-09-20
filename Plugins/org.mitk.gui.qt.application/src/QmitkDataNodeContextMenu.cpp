@@ -104,20 +104,20 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
 {
   auto workbenchPartSite = m_WorkbenchPartSite.Lock();
 
-  m_GlobalReinitAction = new QmitkDataNodeGlobalReinitAction(m_Parent, workbenchPartSite);
-  m_GlobalReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_GlobalReinitAction, true);
-  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_GlobalReinitAction));
+  m_ResetGeometryAction = new QmitkDataNodeResetGeometryAction(m_Parent, workbenchPartSite);
+  m_ResetGeometryAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
+  m_UnknownDataNodeDescriptor->AddAction(m_ResetGeometryAction, true);
+  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ResetGeometryAction));
 
   m_ReinitAction = new QmitkDataNodeReinitAction(m_Parent, workbenchPartSite);
   m_ReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_ReinitAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ReinitAction));
 
-  m_ResetGeometryAction = new QmitkDataNodeResetGeometryAction(m_Parent, workbenchPartSite);
-  m_ResetGeometryAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_ResetGeometryAction, true);
-  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ResetGeometryAction));
+  m_GlobalReinitAction = new QmitkDataNodeGlobalReinitAction(m_Parent, workbenchPartSite);
+  m_GlobalReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
+  m_UnknownDataNodeDescriptor->AddAction(m_GlobalReinitAction, true);
+  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_GlobalReinitAction));
 
   m_RenameAction = new QmitkDataNodeRenameAction(m_Parent, workbenchPartSite);
   m_UnknownDataNodeDescriptor->AddAction(m_RenameAction, true);

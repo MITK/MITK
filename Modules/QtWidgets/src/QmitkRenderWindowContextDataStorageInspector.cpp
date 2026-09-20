@@ -125,8 +125,8 @@ void QmitkRenderWindowContextDataStorageInspector::ModelRowsInserted(const QMode
 void QmitkRenderWindowContextDataStorageInspector::OnContextMenuRequested(const QPoint& pos)
 {
   QMenu contextMenu;
-  contextMenu.addAction(tr("Reinit with node"), this, &QmitkRenderWindowContextDataStorageInspector::OnReinit);
-  contextMenu.addAction(tr("Reset to node geometry"), this, &QmitkRenderWindowContextDataStorageInspector::OnReset);
+  contextMenu.addAction(tr("Align view to image"), this, &QmitkRenderWindowContextDataStorageInspector::OnReset);
+  contextMenu.addAction(tr("Fit view to selection"), this, &QmitkRenderWindowContextDataStorageInspector::OnReinit);
 
   contextMenu.exec(this->mapToGlobal(pos));
 }

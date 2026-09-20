@@ -20,8 +20,8 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager global reinit parent helper objects single click property editing nodes top show containing data deleted added call"></keyword>
-    <keyword id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords" label="data manager hotkeys delete selected nodes global reinit invisible show information toggle visibility selected"></keyword>
+    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager fit views align all data reinit parent helper objects single click property editing nodes top show containing deleted added call"></keyword>
+    <keyword id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords" label="data manager hotkeys delete selected nodes fit views align all data selection reinit invisible show information toggle visibility"></keyword>
   </extension>
 
   <extension-point id="contextMenuActions" name="Context menu actions"/>

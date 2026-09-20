@@ -126,7 +126,8 @@ public slots:
    * Runs automatically when the reference or working data of the tool manager
    * are replaced. Hosts call it when the state of the working data changes in a
    * way that affects CanHandle() without the data object itself changing, e.g.
-   * when labels are added to or removed from a segmentation.
+   * when labels are added to or removed from a segmentation. Disabled buttons
+   * get a tooltip that says the tool is not available for the selected data.
    */
   void UpdateButtonsEnabledState();
 

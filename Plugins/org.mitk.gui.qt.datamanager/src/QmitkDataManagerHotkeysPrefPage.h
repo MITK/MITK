@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <QWidget>
 
 // c++
-#include <map>
+#include <vector>
 
 class QmitkHotkeyLineEdit;
 
@@ -55,11 +55,20 @@ public:
 
 protected:
   /**
-  * @brief Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit
+  * @brief A single hotkey row.
   *
-  *
+  * The preference key is deliberately separate from the displayed label so
+  * that labels can be reworded without discarding hotkeys that users have
+  * customized. QmitkNodeTableViewKeyFilter looks up the same keys.
   */
-  std::map<QString, QmitkHotkeyLineEdit*> m_HotkeyEditors;
+  struct Hotkey
+  {
+    QString key;
+    QString label;
+    QmitkHotkeyLineEdit* editor;
+  };
+
+  std::vector<Hotkey> m_Hotkeys;
 
   QWidget* m_MainControl;
 };

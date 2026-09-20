@@ -91,13 +91,13 @@ namespace mitk
      * \brief Handle POST /rendering/reinit request.
      *
      * Three operating modes:
-     * - No body (or body without "uids"): global reinit -- fits all render windows to the
-     *   bounding box of all currently visible data. Calls
+     * - No body (or body without "uids"): fits all render windows to the bounding box of
+     *   all currently visible data. Calls
      *   RenderingManager::InitializeViewsByBoundingObjects(dataStorage).
-     * - Body with "uids" containing one UID: single-node reinit -- fits render windows to
-     *   the bounding geometry of that node.
-     * - Body with "uids" containing multiple UIDs: multi-node reinit -- fits render windows
-     *   to the combined bounding geometry of all listed nodes.
+     * - Body with "uids" containing one UID: fits render windows to the bounding geometry
+     *   of that node.
+     * - Body with "uids" containing multiple UIDs: fits render windows to the combined
+     *   bounding geometry of all listed nodes.
      *   Both node cases call RenderingManager::InitializeViews(geometry, REQUEST_UPDATE_ALL, true).
      *
      * \pre DataStorage must be connected (503 otherwise).
@@ -113,8 +113,8 @@ namespace mitk
     /**
      * \brief Handle GET /rendering/selected-position request.
      *
-     * Returns the current crosshair position and the world-space AABB
-     * (i.e. the reinit geometry). If no input geometry is available,
+     * Returns the current crosshair position and the world-space AABB of the
+     * geometry the views are fitted to. If no input geometry is available,
      * bounds.min_position and bounds.max_position are null.
      *
      * Returns 503 if no render window bridge or position getter is connected.

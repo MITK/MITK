@@ -25,6 +25,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <functional>
+#include <iosfwd>
 #include <map>
 
 class QmitkMxNCellMapWidget;
@@ -56,9 +57,10 @@ class QVBoxLayout;
  * The widget drives the multi widget's public sync API directly (a peer in
  * the same module; no delegate interface until a second consumer exists) and
  * follows the engine's change signals, so it doubles as a live legend while
- * docked. The embedded layout selection controls are exposed via
- * GetLayoutSelectionWidget so the hosting view can wire their apply/save/
- * load signals to the editor part exactly like the former toolbar popup.
+ * docked. It also owns the layout document's own actions - the preset, load
+ * and save controls in its header row, and the grid-shape picker behind "Edit
+ * grid..." - and reports them as signals for the hosting view to apply to its
+ * editor part, which is where the destructive paths are gated.
  *
  * UI-handler mutations are exposed as public methods so tests can drive the
  * widget against a real multi widget headlessly.
@@ -80,11 +82,10 @@ public:
   QmitkMxNMultiWidget* GetMultiWidget() const;
 
   /**
-   * \brief The embedded layout-shape controls (grid size, presets,
-   *        save/load). The hosting view connects their signals to the
-   *        editor part; they are not wired module-internally.
+   * \brief The data storage the data-based layout option derives an
+   *        arrangement from. Without it that option has nothing to offer.
    */
-  QmitkMultiWidgetLayoutSelectionWidget* GetLayoutSelectionWidget() const;
+  void SetDataStorage(mitk::DataStorage* dataStorage);
 
   /**
    * \brief Add every given cell to 'group' on the group's currently
@@ -206,6 +207,22 @@ public Q_SLOTS:
 
   /** \brief Coalesced full refresh from the engine state. */
   void ScheduleRebuild();
+
+Q_SIGNALS:
+
+  /**
+   * \brief The layout actions the user asked for, for the hosting view to apply
+   *        to its editor part. All but SaveLayout replace the whole arrangement
+   *        and discard the current synchronization groups, so a host is expected
+   *        to confirm them; the widget itself never applies them.
+   */
+  void LayoutSet(int row, int column);
+  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
+  void LoadLayout(const nlohmann::json* jsonData);
+
+  /** \brief Write the current layout into the given stream. Connect directly:
+   *         the stream is only valid for the duration of the emit. */
+  void SaveLayout(std::ostream* outStream);
 
 private:
 

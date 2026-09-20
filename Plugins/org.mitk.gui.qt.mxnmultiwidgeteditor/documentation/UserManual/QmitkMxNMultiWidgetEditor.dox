@@ -41,14 +41,20 @@
 \subsubsection org_mitk_editors_mxnmultiwidget_Layout MxN display layout
 	There are several options to customize the MxN display layout.
 
-	The "Layout" section of the MxN Layout Editor (opened via the toolbar's layout button)
-	allows to customize the layout the following way:
+	The MxN Layout Editor (opened via the toolbar's layout button) offers them in two places:
 	<ul>
-		<li> By choosing the desired amount of windows and confirming via "Set multi widget layout". The window views are arranged in a rectangular grid, as specified.
-			Depending on the selected number of window views, existing window views will be removed or additional window views will be added.
-			New window views will have a sagittal view direction. Window views that stay untouched will keep their settings and continue displaying their selected data.
-		<li> By selecting one of the provided layout presets.
-		<li> By saving / loading a custom layout, either created using the previous methods and further refinement or by handcrafting a suitable file.
+		<li> Its "Layout" row at the top applies one of the presets that ship with MITK, loads a
+			layout file, or saves the current layout. A saved layout carries the synchronization
+			groups as well as the window arrangement, so saving is also how a change made purely
+			on the synchronization side is kept.
+		<li> The grid controls below the window map add or remove a trailing row or column in
+			place, which leaves the existing window views and their settings untouched.
+		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
+			widget layout"), or for an arrangement derived from the loaded data ("Data-based
+			layout"). Depending on the selected number of window views, existing window views will
+			be removed or additional window views will be added. New window views will have a
+			sagittal view direction. Window views that stay untouched will keep their settings and
+			continue displaying their selected data.
 	</ul>
 
 	\imageMacro{layoutWidget.png, "Layout widget" , 16.00}
@@ -56,7 +62,7 @@
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutFile Layout file format
 	Saved layouts are persisted as v3.0 JSON documents. The canonical reference for fields,
 	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v3.schema.json</tt>;
-	both the in-tree presets and any file produced by "Save layout" follow this schema.
+	both the in-tree presets and any file produced by "Save..." follow this schema.
 	v2.0 documents remain loadable unchanged; per-dimension synchronization links and
 	per-group display names and colors are v3.0 additions.
 
@@ -242,8 +248,9 @@
 	stays open during review sessions and doubles as a live legend of the current
 	coupling.
 
-	The <b>Layout</b> section holds the grid/preset/save/load controls described in
-	\ref org_mitk_editors_mxnmultiwidget_Layout.
+	Its <b>Layout</b> row holds the preset, load and save actions for the whole layout
+	document; the grid controls sit below the window map
+	(see \ref org_mitk_editors_mxnmultiwidget_Layout).
 
 	Below it, the <b>window map</b> mirrors the current layout: one tile per render
 	window, carrying a bar in its navigation group's color along its top edge (no bar

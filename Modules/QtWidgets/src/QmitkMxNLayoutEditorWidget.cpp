@@ -12,7 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkMxNLayoutEditorWidget.h"
 
-#include <QmitkMultiWidgetLayoutSelectionWidget.h>
+#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+
 #include <QmitkMxNCellMapWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 
@@ -291,13 +292,62 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   auto* mainLayout = new QVBoxLayout(this);
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
-  // The grid-shape picker (grid size, presets, save/load) is no longer an
-  // always-on box: it opens on demand in a modal "Edit grid..." dialog
-  // (ShowGridDialog). It is created here, hidden, so the hosting view can bind its
-  // data storage and apply signals before the dialog exists, and the same
-  // instance is reparented into the dialog and reused on each open.
+  // The grid-shape picker is not an always-on box: it opens on demand in a modal
+  // "Edit grid..." dialog (ShowGridDialog). It is created here, hidden, so it can
+  // take the data storage and serve the presets before the dialog exists, and the
+  // same instance is reparented into the dialog and reused on each open.
   m_LayoutSelection = new QmitkMultiWidgetLayoutSelectionWidget(this);
   m_LayoutSelection->hide();
+
+  // Applying a layout is the hosting view's call - it confirms the destructive
+  // paths against the live editor - so the picker's actions are forwarded
+  // untouched rather than acted on here.
+  connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet,
+          this, &QmitkMxNLayoutEditorWidget::LayoutSet);
+  connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout,
+          this, &QmitkMxNLayoutEditorWidget::SetDataBasedLayout);
+  connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout,
+          this, &QmitkMxNLayoutEditorWidget::LoadLayout);
+  connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::SaveLayout,
+          this, &QmitkMxNLayoutEditorWidget::SaveLayout);
+
+  // The layout document's own actions, at the top of the view: a preset, a file
+  // load and a save act on the whole document - the arrangement together with
+  // its synchronization groups - so none of them is a grid operation, and saving
+  // is what a user reaches for after changing only the synchronization.
+  auto* documentRow = new QHBoxLayout();
+  documentRow->addWidget(new QLabel(tr("Layout:"), this));
+
+  auto* presetButton = new QToolButton(this);
+  presetButton->setText(tr("Presets"));
+  presetButton->setToolTip(tr("Replace the current layout with one of the arrangements that ship "
+                              "with MITK"));
+  presetButton->setPopupMode(QToolButton::InstantPopup);
+  auto* presetMenu = new QMenu(presetButton);
+  const QStringList presetNames = m_LayoutSelection->PresetNames();
+  for (int preset = 0; preset < presetNames.size(); ++preset)
+  {
+    connect(presetMenu->addAction(presetNames[preset]), &QAction::triggered, this,
+            [this, preset]() { m_LayoutSelection->ApplyPreset(preset); });
+  }
+  presetButton->setMenu(presetMenu);
+  presetButton->setEnabled(!presetNames.isEmpty());
+  documentRow->addWidget(presetButton);
+
+  auto* loadButton = new QToolButton(this);
+  loadButton->setText(tr("Load..."));
+  loadButton->setToolTip(tr("Replace the current layout with one read from a layout file"));
+  connect(loadButton, &QToolButton::clicked, this, [this]() { m_LayoutSelection->RequestLoad(); });
+  documentRow->addWidget(loadButton);
+
+  auto* saveButton = new QToolButton(this);
+  saveButton->setText(tr("Save..."));
+  saveButton->setToolTip(tr("Write the current layout - the window arrangement and its "
+                            "synchronization groups - to a layout file"));
+  connect(saveButton, &QToolButton::clicked, this, [this]() { m_LayoutSelection->RequestSave(); });
+  documentRow->addWidget(saveButton);
+  documentRow->addStretch();
+  mainLayout->addLayout(documentRow);
 
   // The cell map is the primary canvas, front and center; the "Sync groups" box
   // reads as a legend below it. A vertical splitter lets the user trade space
@@ -411,9 +461,9 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   gridRow->addSpacing(12);
   m_EditGridButton = new QToolButton(mapPane);
   m_EditGridButton->setText(tr("Edit grid..."));
-  m_EditGridButton->setToolTip(tr("Choose a grid size or preset, or load or save a layout. "
-                                  "Applying a new layout replaces the current window "
-                                  "arrangement and its synchronization groups."));
+  m_EditGridButton->setToolTip(tr("Choose a grid size, or derive an arrangement from the loaded "
+                                  "data. Either replaces the current window arrangement and its "
+                                  "synchronization groups."));
   connect(m_EditGridButton, &QToolButton::clicked, this, [this]() { this->ShowGridDialog(); });
   gridRow->addWidget(m_EditGridButton);
   gridRow->addStretch();
@@ -554,9 +604,9 @@ QmitkMxNMultiWidget* QmitkMxNLayoutEditorWidget::GetMultiWidget() const
   return m_MultiWidget;
 }
 
-QmitkMultiWidgetLayoutSelectionWidget* QmitkMxNLayoutEditorWidget::GetLayoutSelectionWidget() const
+void QmitkMxNLayoutEditorWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
-  return m_LayoutSelection;
+  m_LayoutSelection->SetDataStorage(dataStorage);
 }
 
 void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds,

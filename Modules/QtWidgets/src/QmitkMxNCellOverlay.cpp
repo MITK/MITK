@@ -79,8 +79,10 @@ namespace
   constexpr int TimeTriangleHalfWidth = 3;
   constexpr int NavRowHeight = 16;        // one navigator slider row
   constexpr int NavRowGap = 4;
-  constexpr int NavLabelWidth = 78;       // left label column of a navigator row
+  constexpr double NavLabelMaxFraction = 0.4;  // cap on the label column's share of a row
   constexpr int NavKnobRadius = 5;
+  constexpr int NavKnobHotRadius = NavKnobRadius + 1;  // the hovered or dragged knob
+  constexpr int NavLabelGap = 6;          // between a row's label and its knob travel
   constexpr int NavTrackThickness = 2;
   // The active colorbar does not span the whole edge: it is inset top and
   // bottom so the range labels never crowd the top chrome or the W/L readout,
@@ -90,6 +92,13 @@ namespace
 
   const QColor IdleText(255, 255, 255, 140);    // 55 % white
   const QColor ActiveText(255, 255, 255, 216);  // 85 % white
+
+  /** \brief A navigator row's grab area: its track plus the knob's reach at
+   *         both ends, so the knob stays grabbable where it sits at an extreme. */
+  QRect NavGrabRect(const QRect& track)
+  {
+    return track.adjusted(-NavKnobHotRadius, 0, NavKnobHotRadius, 0);
+  }
 
   /** \brief Reveal margin for a furniture edge: a fraction of the render
    *         extent perpendicular to that edge (so it scales with the canvas),
@@ -597,12 +606,28 @@ std::vector<QmitkMxNCellOverlay::NavRow> QmitkMxNCellOverlay::NavigatorRows() co
   const bool hasPlane = m_NavigatorExpanded
     && this->NavigatorInPlaneState(origin, rightUnit, upUnit, extentRight, extentUp, rightCoord, upCoord);
 
-  const int trackLeft = band.left() + NavLabelWidth + NavRowGap;
-  const int trackWidth = std::max(1, band.right() - trackLeft);
+  // The label column is only as wide as the widest label, capped so a long
+  // plane name cannot eat the track. A fixed column stranded a short label
+  // ('Time') far from the track it names while the track ran on to the
+  // colorbar, so a row read as belonging to the colorbar instead.
+  const QFontMetrics labelMetrics(ReadoutFont(this->font()));
+  int labelColumn = 0;
+  for (const auto& row : rows)
+  {
+    labelColumn = std::max(labelColumn, labelMetrics.horizontalAdvance(row.label));
+  }
+  labelColumn = std::min(labelColumn, qRound(NavLabelMaxFraction * band.width()));
+
+  // Both ends are inset by the knob's radius: the knob is centered on the
+  // track's end points, so without the inset it would cover the label at one
+  // end and be clipped by the intensity cluster at the other.
+  const int trackLeft = band.left() + labelColumn + NavLabelGap + NavKnobHotRadius;
+  const int trackWidth = std::max(1, band.right() - NavKnobHotRadius - trackLeft);
   for (std::size_t i = 0; i < rows.size(); ++i)
   {
     const int rowTop = band.top() + static_cast<int>(i) * (NavRowHeight + NavRowGap);
     rows[i].track = QRect(trackLeft, rowTop, trackWidth, NavRowHeight);
+    rows[i].labelRect = QRect(band.left(), rowTop, labelColumn, NavRowHeight);
 
     double normalized = 0.0;
     switch (rows[i].kind)
@@ -1133,10 +1158,9 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
         // active color like the slice / plane / W-L labels.
         painter.setFont(labelFont);
         painter.setPen(Faded(rowHot ? ActiveText : IdleText, m_RevealProgress));
-        painter.drawText(QRect(row.track.left() - NavLabelWidth - NavRowGap, row.track.top(),
-                               NavLabelWidth, row.track.height()),
-                         Qt::AlignLeft | Qt::AlignVCenter,
-                         labelMetrics.elidedText(row.label, Qt::ElideRight, NavLabelWidth));
+        painter.drawText(row.labelRect, Qt::AlignLeft | Qt::AlignVCenter,
+                         labelMetrics.elidedText(row.label, Qt::ElideRight,
+                                                 row.labelRect.width()));
 
         const int thickness = rowHot ? NavTrackThickness + 1 : NavTrackThickness;
         painter.fillRect(
@@ -1144,7 +1168,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
           Faded(IdleText, rowAlpha));
 
         const int knobX = row.track.left() + qRound(row.normalized * row.track.width());
-        const int knobRadius = rowHot ? NavKnobRadius + 1 : NavKnobRadius;
+        const int knobRadius = rowHot ? NavKnobHotRadius : NavKnobRadius;
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setPen(Qt::NoPen);
         painter.setBrush(Faded(ActiveText, rowHot ? m_RevealProgress : baseAlpha));
@@ -1242,7 +1266,7 @@ void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
     const auto rows = this->NavigatorRows();
     for (std::size_t i = 0; i < rows.size(); ++i)
     {
-      if (rows[i].track.contains(position))
+      if (NavGrabRect(rows[i].track).contains(position))
       {
         m_NavDragRow = static_cast<int>(i);
         this->ApplyNavigatorRow(rows[i],
@@ -1320,7 +1344,7 @@ void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
     const auto rows = this->NavigatorRows();
     for (int i = 0; i < static_cast<int>(rows.size()); ++i)
     {
-      if (rows[static_cast<std::size_t>(i)].track.contains(event->pos()))
+      if (NavGrabRect(rows[static_cast<std::size_t>(i)].track).contains(event->pos()))
       {
         navRow = i;
         break;

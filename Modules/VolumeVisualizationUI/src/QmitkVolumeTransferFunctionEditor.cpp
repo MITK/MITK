@@ -405,6 +405,20 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   presetList->viewport()->installEventFilter(this);
 
+  // Dragging across the grid, by as little as a pixel, is a selection rectangle
+  // to the view: it covers no entry, so the selection it draws is empty and the
+  // one that was there is cleared. Ctrl-clicking the marked entry drops it just
+  // as directly. Neither says which preset is applied - the current entry is
+  // what records that - so the mark goes back on it.
+  connect(presetList, &QListWidget::itemSelectionChanged, this,
+    [this]
+    {
+      auto *currentPreset = m_Controls->presetListWidget->currentItem();
+
+      if (currentPreset != nullptr && !currentPreset->isSelected())
+        currentPreset->setSelected(true);
+    });
+
   // A freshly filled list lands on its first entry, which would name a preset
   // nothing has applied.
   this->ClearPresetSelection();

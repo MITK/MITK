@@ -146,7 +146,6 @@ Q_SIGNALS:
 
   void NotifyCrosshairVisibilityChanged(bool visible);
   void NotifyCrosshair3DVisibilityChanged(bool visible);
-  void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
 
   void WheelMoved(QWheelEvent *);
   void Moved();

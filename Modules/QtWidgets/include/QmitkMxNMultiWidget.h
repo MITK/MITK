@@ -350,8 +350,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-  void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
-
   void WheelMoved(QWheelEvent *);
   void Moved();
   void UpdateUtilityWidgetViewPlanes();

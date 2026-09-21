@@ -25,6 +25,33 @@ found in the LICENSE file.
 // c++
 #include <iomanip>
 
+namespace
+{
+  // Exhaustive rather than defaulted, so that a scheme added later is flagged here.
+  QmitkCrosshairRotationMode CrosshairRotationMode(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+  {
+    switch (scheme)
+    {
+      case mitk::InteractionSchemeSwitcher::MITKRotationUncoupled:
+        return QmitkCrosshairRotationMode::Single;
+      case mitk::InteractionSchemeSwitcher::MITKRotationCoupled:
+        return QmitkCrosshairRotationMode::Coupled;
+      case mitk::InteractionSchemeSwitcher::MITKSwivel:
+        return QmitkCrosshairRotationMode::Swivel;
+      case mitk::InteractionSchemeSwitcher::MITKStandard:
+      case mitk::InteractionSchemeSwitcher::PACSBase:
+      case mitk::InteractionSchemeSwitcher::PACSStandard:
+      case mitk::InteractionSchemeSwitcher::PACSLevelWindow:
+      case mitk::InteractionSchemeSwitcher::PACSPan:
+      case mitk::InteractionSchemeSwitcher::PACSScroll:
+      case mitk::InteractionSchemeSwitcher::PACSZoom:
+        break;
+    }
+
+    return QmitkCrosshairRotationMode::None;
+  }
+}
+
 struct QmitkAbstractMultiWidget::Impl final
 {
   Impl(QmitkAbstractMultiWidget* multiWidget, const QString& multiWidgetName);
@@ -169,6 +196,7 @@ void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitc
   m_Impl->m_InteractionScheme = scheme;
 
   emit InteractionSchemeChanged(scheme);
+  emit NotifyCrosshairRotationModeChanged(CrosshairRotationMode(scheme));
 }
 
 mitk::InteractionSchemeSwitcher::InteractionScheme QmitkAbstractMultiWidget::GetInteractionScheme() const

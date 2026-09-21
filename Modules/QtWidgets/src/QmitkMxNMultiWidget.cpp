@@ -442,9 +442,9 @@ void QmitkMxNMultiWidget::ResetCrosshair()
 
   // Resetting the rotation mode would switch to a MITK scheme, so PACS mode
   // is left alone here.
-  if (!IsPACSScheme(GetInteractionScheme()))
+  if (!IsPACSScheme(this->GetInteractionScheme()))
   {
-    SetWidgetPlaneMode(QmitkCrosshairRotationMode::None);
+    this->SetWidgetPlaneMode(QmitkCrosshairRotationMode::None);
   }
 }
 
@@ -453,20 +453,18 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
   switch (mode)
   {
     case QmitkCrosshairRotationMode::None:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
       break;
     case QmitkCrosshairRotationMode::Single:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
       break;
     case QmitkCrosshairRotationMode::Coupled:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
       break;
     case QmitkCrosshairRotationMode::Swivel:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
       break;
   }
-
-  emit NotifyCrosshairRotationModeChanged(mode);
 }
 
 void QmitkMxNMultiWidget::EnableCrosshair()
@@ -674,7 +672,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
-  connect(this, &QmitkMxNMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
+  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   return renderWindowWidget;
 }

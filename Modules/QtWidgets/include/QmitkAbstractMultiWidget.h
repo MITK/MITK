@@ -128,8 +128,9 @@ public:
    *
    * The matching event configuration is applied to the interaction event
    * handler even if the scheme is already the active one, since others
-   * replace that configuration temporarily. InteractionSchemeChanged() is
-   * emitted only when the scheme actually changes.
+   * replace that configuration temporarily. InteractionSchemeChanged() and
+   * NotifyCrosshairRotationModeChanged() are emitted only when the scheme
+   * actually changes.
    *
    * \param[in] scheme The interaction scheme to use.
    */
@@ -360,6 +361,15 @@ signals:
 
   void ActiveRenderWindowChanged();
   void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+  /**
+   * \brief Reports the crosshair rotation mode that the applied scheme realizes.
+   *
+   * The rotation modes are one of the ways to look at the interaction scheme,
+   * so they are reported from where the scheme is owned rather than from
+   * SetWidgetPlaneMode(). Switching to a PACS scheme, which binds no rotation
+   * at all, therefore no longer leaves the crosshair menus claiming one.
+   */
+  void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
 
 private slots:
 

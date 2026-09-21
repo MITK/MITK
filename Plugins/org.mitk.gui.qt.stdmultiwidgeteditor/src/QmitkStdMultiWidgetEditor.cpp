@@ -35,12 +35,10 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include <QmitkMultiWidgetDecorationManager.h>
 
-const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
+// c++
+#include <optional>
 
-namespace
-{
-  const std::string PACS_INTERACTION_PREFERENCE = "PACS like mouse interaction";
-}
+const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
 struct QmitkStdMultiWidgetEditor::Impl final
 {
@@ -51,6 +49,8 @@ struct QmitkStdMultiWidgetEditor::Impl final
   QmitkLevelWindowWidget* m_LevelWindowWidget;
   std::string m_LevelWindowImageMode;
   bool m_ShowLevelWindowImageName = true;
+  /** Empty until the preferences have been read for the first time. */
+  std::optional<bool> m_PACSInteraction;
 };
 
 QmitkStdMultiWidgetEditor::Impl::Impl()
@@ -278,13 +278,17 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);
 
-  // Only a change of the preference itself overrides the interaction scheme,
-  // so that the PACS tool or crosshair rotation mode the user picked survives
-  // unrelated preference edits.
-  const bool pacsInteractionScheme = preferences->GetBool(PACS_INTERACTION_PREFERENCE, false);
-  if (pacsInteractionScheme != QmitkAbstractMultiWidget::IsPACSScheme(multiWidget->GetInteractionScheme()))
+  // Only a change of the preference itself overrides the interaction scheme, so
+  // that the PACS tool or the crosshair rotation mode the user picked survives
+  // unrelated preference edits. A change that the active scheme already agrees
+  // with is no reason to reset it either.
+  const bool pacsInteraction = preferences->GetBool("PACS like mouse interaction", false);
+  const bool preferenceChanged = m_Impl->m_PACSInteraction != pacsInteraction;
+  m_Impl->m_PACSInteraction = pacsInteraction;
+
+  if (preferenceChanged && pacsInteraction != QmitkAbstractMultiWidget::IsPACSScheme(multiWidget->GetInteractionScheme()))
   {
-    OnInteractionSchemeChanged(pacsInteractionScheme ?
+    this->OnInteractionSchemeChanged(pacsInteraction ?
       mitk::InteractionSchemeSwitcher::PACSStandard :
       mitk::InteractionSchemeSwitcher::MITKStandard);
   }

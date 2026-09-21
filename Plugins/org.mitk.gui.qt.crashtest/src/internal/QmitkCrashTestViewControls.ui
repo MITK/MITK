@@ -66,7 +66,7 @@
      <item>
       <widget class="QPushButton" name="freezeButton">
        <property name="toolTip">
-        <string>Blocks the UI thread for the chosen duration. With the UI-freeze watchdog enabled (e.g. --ui-watchdog 5), provisional dumps are captured while frozen.</string>
+        <string>Blocks the UI thread for the chosen duration. With the UI-freeze watchdog enabled (e.g. --MITK.ui-watchdog 5), provisional dumps are captured while frozen.</string>
        </property>
        <property name="text">
         <string>Freeze UI thread</string>

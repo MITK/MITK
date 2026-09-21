@@ -129,7 +129,7 @@ that counter from a QTimer on the UI thread. Detection begins with the first
 heartbeat, not with the monitor: plugin loading routinely outlasts the timeout
 before the event loop exists to beat at all, and a thread that has never
 reported in has not stalled. If the UI thread then wedges, the timer stops
-firing; after the timeout (default 180 s) the monitor captures up to three
+firing; after the configured timeout the monitor captures up to three
 provisional snapshots a few seconds apart, so an analyst can tell a permanent
 wedge from a slow loop. If the heartbeat resumes, the provisional
 snapshots from that episode are purged - so a temporary freeze leaves nothing
@@ -139,7 +139,7 @@ kill (the out-of-process handler already wrote the dumps) survives.
 It is off by default - legitimate long UI-thread operations exist, and false
 positives would erode trust. Enable it with a timeout in seconds via the
 environment variable \c MITK_UI_WATCHDOG or the command-line option
-\c --ui-watchdog (the environment variable takes precedence).
+\c --MITK.ui-watchdog (the command-line option takes precedence).
 
 \section CrashDumpFacilityPage_Wiring Application wiring
 
@@ -160,7 +160,7 @@ spawns cannot drift apart.
 Because arming happens before option parsing, the facility can only be
 disabled through the raw command line or the environment:
 
-- command-line flag \c --no-crash-dumps
+- command-line flag \c --MITK.no-crash-dumps
 - environment variable \c MITK_NO_CRASH_DUMPS
 
 An application <tt>.ini</tt> file cannot gate the facility; its options are
@@ -247,8 +247,8 @@ with the \c org.mitk.gui.qt.crashtest plugin. Its Crash Test view offers one
 button per failure path: a hard crash (null-pointer write on the UI thread),
 an unhandled mitk::Exception (reaches the safe-mode error dialog), and a UI
 freeze of configurable duration (run the application with
-<tt>--ui-watchdog 5</tt> to watch the watchdog react without waiting for the
-default timeout). The view also lists the dumps currently in the database,
+<tt>--MITK.ui-watchdog 5</tt> to watch the watchdog react in seconds rather
+than at a realistic timeout). The view also lists the dumps in the database,
 including the snapshot areas the next-start dialog never shows - captures are
 thereby observable in-session, before a clean shutdown purges provisional
 snapshots or a dialog discard removes crash dumps. The plugin is a QA aid

@@ -51,10 +51,11 @@ k                REM call stack of the crashing thread
 \section AnalyzingCrashDumpsHowTo_Linux Linux
 
 Linux binaries are shipped unstripped, and the bulk of the debug info sits
-beside them as split DWARF (see \ref CrashDumpFacilityPage_Symbols); both are in
-the symbols archive. Minidumps are not a native ELF format, so a debugger does
-not open them directly - convert the debug info to a Breakpad symbol file and
-walk the dump against it.
+beside them as split DWARF (see \ref CrashDumpFacilityPage_Symbols). The symbols
+archive carries the packed <tt>.dwp</tt> sidecars only, so put a sidecar next to
+the matching binary from the package before running the tools below. Minidumps
+are not a native ELF format, so a debugger does not open them directly - convert
+the debug info to a Breakpad symbol file and walk the dump against it.
 
 The general flow (exact invocation depends on the tool you pick):
 
@@ -87,7 +88,7 @@ macOS debug info lives in <tt>.dSYM</tt> bundles (see
 the same as on Linux, reading from the <tt>.dSYM</tt> instead of split DWARF:
 
 \code
-dump_syms MitkCore.framework.dSYM > MitkCore.sym
+dump_syms libMitkCore.dylib.dSYM > MitkCore.sym
 # then the same symbol-tree layout and walker as on Linux
 \endcode
 
@@ -137,6 +138,6 @@ produce a dump on demand with the \c org.mitk.gui.qt.crashtest plugin (a QA aid,
 off by default; build with \c MITK_BUILD_org.mitk.gui.qt.crashtest, see
 \ref CrashDumpFacilityPage_Testing). Its Crash Test view offers one button per
 failure path: a hard crash, an unhandled mitk::Exception, and a UI freeze of
-configurable duration. Start the application with <tt>--ui-watchdog 5</tt> to
-let the freeze watchdog react within seconds instead of the default timeout.
+configurable duration. Start the application with <tt>--MITK.ui-watchdog 5</tt>
+so the freeze watchdog reacts in seconds rather than at a realistic timeout.
 */

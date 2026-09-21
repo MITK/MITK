@@ -77,8 +77,8 @@ If MITK closed unexpectedly, a diagnostic snapshot (crash dump) of that session 
   <li><b>Discard</b> (the default, also chosen when you simply close the dialog) deletes them immediately.</li>
 </ul>
 
-A crash dump contains parts of the application's memory from the crashed session and may therefore include patient data. MITK never uploads crash dumps; they stay on your computer until you delete them or pass them on yourself. Kept dumps are not shown again on later starts, and only the 20 most recent dumps are retained.
+A crash dump contains parts of the application's memory from the crashed session and may therefore include patient data. MITK never uploads crash dumps; they stay on your computer until you delete them or pass them on yourself. Kept dumps are not shown again on later starts, and only the 10 most recent dumps are retained.
 
-If you do not want MITK to write crash dumps at all, start the application with the command-line option <tt>\--no-crash-dumps</tt> or set the environment variable <tt>MITK_NO_CRASH_DUMPS</tt>.
+If you do not want MITK to write crash dumps at all, start the application with the command-line option <tt>\--MITK.no-crash-dumps</tt> or set the environment variable <tt>MITK_NO_CRASH_DUMPS</tt>.
 
 */

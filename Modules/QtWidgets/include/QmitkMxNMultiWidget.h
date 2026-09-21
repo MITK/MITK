@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <nlohmann/json.hpp>
 
 #include <QColor>
+#include <QPointer>
 #include <QRectF>
 
 #include <array>
@@ -42,6 +43,7 @@ found in the LICENSE file.
 
 class QmitkRenderWindowProximity;
 class QSplitter;
+class QTimer;
 
 namespace mitk
 {
@@ -416,6 +418,64 @@ public:
   *   eight gap slots for an unknown cell.
   */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildBarcodeSlots(const QString& windowId) const;
+
+  /**
+  * \brief A cell's name for display: its layout-document display name, or, for
+  *        a layout that never named it, the bare tail of its id after the
+  *        editor prefix.
+  */
+  QString CellLabel(const QString& windowId) const;
+
+  /**
+  * \brief Raise or lower the sync peek in every visible cell that can host it,
+  *        emphasising 'axisIndex' - or none of them when it is negative, which
+  *        is what the pointer resting on a barcode between two glyphs shows.
+  *        Applies immediately, without the pointer dwell the hover path uses.
+  *        Public so the peek is testable without a pointer.
+  *
+  *   The state is held even in a layout where no cell can host a plate (nothing
+  *   is shown then, which is a documented limit), so the gesture reads the same
+  *   whatever the geometry.
+  */
+  void SetSyncPeek(bool visible, int axisIndex);
+
+  /** \brief Whether the sync peek is up. */
+  bool IsSyncPeekVisible() const;
+
+  /** \brief The axis the sync peek emphasises, or -1 for none. */
+  int GetSyncPeekAxis() const;
+
+  /**
+  * \brief Override the pointer dwell and the teardown grace, in milliseconds.
+  *        Defaults are 250 and 150. Exposed so a test can collapse both to zero
+  *        and drive the gesture deterministically instead of against the clock.
+  */
+  void SetSyncPeekTimings(int dwellMs, int graceMs);
+
+  /**
+  * \brief The glyph box side every plate of this layout uses: the smallest
+  *        desirable box across the visible cells that can host a plate, clamped
+  *        to the legible range. Zero when no cell can host one, which is how
+  *        the peek stays down in a layout of slivers.
+  *
+  *   A cell too small for a plate shows none rather than dragging every other
+  *   window down to its size: the comparison survives a missing member better
+  *   than it survives eight different geometries.
+  */
+  int ResolvePeekGlyphBox() const;
+
+  /**
+  * \brief Pointer report from one cell's barcode: starts the dwell when the peek
+  *        is down, changes the emphasised axis immediately when it is up, and
+  *        starts the teardown grace once the pointer is off the strip.
+  *
+  *   The peek's lifetime is the pointer's stay on the barcode, not on one glyph:
+  *   the strip is a single surface, and the answer must survive the gaps between
+  *   its glyphs and its inert trailing space. The emphasis latches for the same
+  *   reason - it moves when another glyph claims it and is dropped when the
+  *   pointer leaves, never by the gap in between.
+  */
+  void OnSyncPeekHovered(bool overStrip, int axisIndex);
 
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
@@ -1323,6 +1383,22 @@ private:
   std::string m_LayoutName;
 
   bool m_CrosshairVisibility;
+
+  /** \brief Whether the peek is up, which axis it emphasises (-1 for none), and
+   *         the axis a started dwell will raise with. */
+  bool m_SyncPeekVisible = false;
+  int m_SyncPeekAxis = -1;
+  int m_SyncPeekPendingAxis = -1;
+
+  /** \brief The pointer rest that raises the peek, and the window a pointer off
+   *         the strip must survive before it lowers again. */
+  QTimer* m_SyncPeekDwell = nullptr;
+  QTimer* m_SyncPeekGrace = nullptr;
+  int m_SyncPeekDwellMs = 250;
+  int m_SyncPeekGraceMs = 150;
+
+  /** \brief Lower the peek and forget any pending dwell. */
+  void LowerSyncPeek();
 
 };
 

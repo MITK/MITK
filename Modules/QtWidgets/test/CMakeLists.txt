@@ -60,6 +60,10 @@ mitkAddCustomModuleTest(QmitkMxNSynchronizeScopeTest QmitkMxNSynchronizeScopeTes
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNSyncPeekTest QmitkMxNSyncPeekTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNDataBasedLayoutTest QmitkMxNDataBasedLayoutTest
   -platform minimal
 )

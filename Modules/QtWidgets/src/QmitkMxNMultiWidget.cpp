@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QSplitter>
+#include <QTimer>
 
 #include <algorithm>
 #include <functional>
@@ -423,6 +424,28 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshFrameColors);
   connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
   connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
+
+  m_SyncPeekDwell = new QTimer(this);
+  m_SyncPeekDwell->setSingleShot(true);
+  connect(m_SyncPeekDwell, &QTimer::timeout, this, [this]()
+  {
+    this->SetSyncPeek(true, m_SyncPeekPendingAxis);
+  });
+  m_SyncPeekGrace = new QTimer(this);
+  m_SyncPeekGrace->setSingleShot(true);
+  connect(m_SyncPeekGrace, &QTimer::timeout, this, [this]()
+  {
+    this->SetSyncPeek(false, -1);
+  });
+
+  // The peek answers a question about the cells as they are now: a layout
+  // change tears down the strip the gesture came from, and maximizing leaves
+  // the plates the comparison was made of hidden. Clean view already suppresses
+  // the paint, but lowering there too keeps a pending dwell from firing into a
+  // suppressed layout and leaving stale state behind.
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+  connect(this, &QmitkMxNMultiWidget::MaximizedCellChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+  connect(this, &QmitkMxNMultiWidget::CleanViewChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -1027,6 +1050,11 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // hosting it lives above this module, so the request is only relayed.
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::LayoutEditorRequested,
           this, &QmitkMxNMultiWidget::LayoutEditorRequested);
+
+  // Pointing at an axis in one cell's barcode asks a question about the whole
+  // layout, so the strip only reports and the editor answers in every cell.
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncPeekHovered,
+          this, &QmitkMxNMultiWidget::OnSyncPeekHovered);
 
   // The Synchronize macro covers every cell of the editor, including cells
   // created while it is active - not only those present at toggle time.
@@ -3644,6 +3672,161 @@ void QmitkMxNMultiWidget::RequestLayoutEditor()
   emit LayoutEditorRequested();
 }
 
+namespace
+{
+  // What a plate's glyphs should measure against the cell they sit in, before
+  // the cell's own ceiling and the legible range cut it down.
+  constexpr double PeekDesiredShortEdgeFraction = 0.13;
+
+  /** \brief The size a cell's peek plate is laid out against: its render
+   *         window, the same rect the cell overlay centres the plate in. */
+  QSize PeekCellSize(const QmitkRenderWindowWidget* cell)
+  {
+    auto* renderWindow = cell->GetRenderWindow();
+    return nullptr != renderWindow ? renderWindow->geometry().size() : QSize();
+  }
+}
+
+int QmitkMxNMultiWidget::ResolvePeekGlyphBox() const
+{
+  // Every cell inherits this widget's font, which is what lets one line height
+  // stand for all of them.
+  const int textLineHeight = QmitkMxNCellOverlay::PeekTextLineHeight(this->font());
+
+  int box = 0;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    // A maximized layout keeps the hidden cells registered; sizing from a
+    // hidden sliver would shrink the one plate the user can see.
+    if (!renderWindowWidget->isVisible())
+    {
+      continue;
+    }
+
+    const QSize cellSize = PeekCellSize(renderWindowWidget.get());
+    const int maxBox = QmitkMxNCellOverlay::MaxPeekGlyphBox(cellSize, textLineHeight);
+    if (maxBox <= 0)
+    {
+      continue;
+    }
+
+    const int shortEdge = std::min(cellSize.width(), cellSize.height());
+    const int desired = std::min(qRound(PeekDesiredShortEdgeFraction * shortEdge), maxBox);
+    box = box == 0 ? desired : std::min(box, desired);
+  }
+
+  // Clamping up to the floor is safe: every cell counted admits at least that
+  // much, so no eligible cell is asked for more than it can host.
+  return box == 0
+    ? 0
+    : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
+}
+
+void QmitkMxNMultiWidget::SetSyncPeek(bool visible, int axisIndex)
+{
+  m_SyncPeekVisible = visible;
+  m_SyncPeekAxis = visible && axisIndex >= 0 ? axisIndex : -1;
+
+  const int box = visible ? this->ResolvePeekGlyphBox() : 0;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+      QString(), Qt::FindDirectChildrenOnly);
+    if (nullptr == cellOverlay)
+    {
+      continue;
+    }
+    // Only hosting and sizing are decided over the visible cells; lowering
+    // reaches every cell, or one hidden while the peek was up would come back
+    // still showing it.
+    const bool hosts = box > 0 && renderWindowWidget->isVisible();
+    cellOverlay->SetSyncPeek(hosts, m_SyncPeekAxis, hosts ? box : 0);
+  }
+}
+
+bool QmitkMxNMultiWidget::IsSyncPeekVisible() const
+{
+  return m_SyncPeekVisible;
+}
+
+int QmitkMxNMultiWidget::GetSyncPeekAxis() const
+{
+  return m_SyncPeekAxis;
+}
+
+void QmitkMxNMultiWidget::SetSyncPeekTimings(int dwellMs, int graceMs)
+{
+  m_SyncPeekDwellMs = std::max(0, dwellMs);
+  m_SyncPeekGraceMs = std::max(0, graceMs);
+}
+
+void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, int axisIndex)
+{
+  if (overStrip)
+  {
+    m_SyncPeekGrace->stop();
+    if (m_SyncPeekVisible)
+    {
+      // Once the peek is up the user is comparing axes; a per-axis delay there
+      // would feel sluggish. The dwell guards only the first engagement.
+      //
+      // The emphasis latches: the gaps between glyph boxes are an artifact of
+      // the strip's layout, not the user withdrawing the question, and letting
+      // them clear it makes a slide along the row flicker axis - none - axis at
+      // every boundary. It moves only when another glyph claims it, and is
+      // dropped only when the pointer leaves the strip.
+      this->SetSyncPeek(true, axisIndex >= 0 ? axisIndex : m_SyncPeekAxis);
+      return;
+    }
+
+    if (axisIndex >= 0)
+    {
+      // A different glyph restarts the rest, which is what keeps a pointer that
+      // sweeps across the strip from raising anything.
+      m_SyncPeekPendingAxis = axisIndex;
+      m_SyncPeekDwell->start(m_SyncPeekDwellMs);
+    }
+    else if (!m_SyncPeekDwell->isActive())
+    {
+      // Entered the strip on a gap: still an engagement, just not on an axis yet.
+      m_SyncPeekDwell->start(m_SyncPeekDwellMs);
+    }
+    return;
+  }
+
+  // The pointer left the strip. A short grace covers a clipped corner on the way
+  // along it and the crossing from one cell's strip to another's, where Qt sends
+  // the leave before the enter.
+  if (m_SyncPeekVisible)
+  {
+    m_SyncPeekGrace->start(m_SyncPeekGraceMs);
+    return;
+  }
+  m_SyncPeekDwell->stop();
+  m_SyncPeekPendingAxis = -1;
+}
+
+void QmitkMxNMultiWidget::LowerSyncPeek()
+{
+  m_SyncPeekDwell->stop();
+  m_SyncPeekGrace->stop();
+  m_SyncPeekPendingAxis = -1;
+  this->SetSyncPeek(false, -1);
+}
+
+QString QmitkMxNMultiWidget::CellLabel(const QString& windowId) const
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr != cell && !cell->GetDisplayName().isEmpty())
+  {
+    return cell->GetDisplayName();
+  }
+  // A layout built by SetLayout never names its cells, so the bare tail of the
+  // id is what a window is called in the absence of a display name.
+  const auto separator = windowId.indexOf(QStringLiteral("__"));
+  return separator >= 0 ? windowId.mid(separator + 2) : windowId;
+}
+
 
 QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
 QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
@@ -3671,6 +3854,7 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
 
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
     slot.glyph = glyph;
+    slot.label = label;
     if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
     {
       try
@@ -3697,6 +3881,7 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
   // frame - so the default group is not treated as a special "no sync" case.
   QmitkMxNSyncBarcodeWidget::AxisSlot selectionSlot;
   selectionSlot.glyph = QmitkMxNAxisGlyph::Selection;
+  selectionSlot.label = tr("Data selection");
   const auto renderWindowWidget = this->GetRenderWindowWidget(windowId);
   auto* utilityWidget = renderWindowWidget ? renderWindowWidget->GetUtilityWidget() : nullptr;
   if (nullptr != utilityWidget)
@@ -3831,6 +4016,7 @@ void QmitkMxNMultiWidget::RefreshFrameColors()
     // Dark-theme colors; a light theme would derive its own (deferred).
     const auto identity = this->ResolveCellGroupIdentity(windowId);
     const QColor border = (CellGroupIdentityKind::Mono == identity.kind) ? identity.hue : QColor(0x60, 0x60, 0x60);
+
     renderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
                                       border.name(QColor::HexRgb) + "; }");
 

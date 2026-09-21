@@ -39,17 +39,6 @@ const char* QmitkMxNCellMapWidget::AskModeMimeType = "application/x-mitk-mxn-ask
 namespace
 {
   constexpr int TileSpacing = 2;
-
-  QString BareCellLabel(const QmitkMxNMultiWidget::WindowDescriptor& descriptor)
-  {
-    if (!descriptor.displayName.isEmpty())
-    {
-      return descriptor.displayName;
-    }
-    const auto separator = descriptor.id.indexOf(QStringLiteral("__"));
-    return separator >= 0 ? descriptor.id.mid(separator + 2) : descriptor.id;
-  }
-
 }
 
 QmitkMxNCellMapWidget::QmitkMxNCellMapWidget(QWidget* parent)
@@ -114,7 +103,7 @@ void QmitkMxNCellMapWidget::Rebuild()
 
       Tile tile;
       tile.windowId = descriptor.id;
-      tile.label = BareCellLabel(descriptor);
+      tile.label = m_MultiWidget->CellLabel(descriptor.id);
       tile.normalizedRect = entry->second;
       m_Tiles.push_back(std::move(tile));
     }

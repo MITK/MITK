@@ -156,6 +156,14 @@ Q_SIGNALS:
   void LayoutEditorRequested();
 
   /**
+  * \brief Where the pointer is on this cell's sync barcode: on the strip at all,
+  *        and which of the eight axis glyphs it is over (-1 between glyphs). The
+  *        owning multi widget turns this into the editor-wide sync peek; the
+  *        strip itself only reports.
+  */
+  void SyncPeekHovered(bool overStrip, int axisIndex);
+
+  /**
   * \brief Emitted while a popup owned by this strip (currently the data
   *        selection) is open. The popup's pointer grab reads to the cell as the
   *        pointer leaving, so the owning multi widget holds the furniture

@@ -366,6 +366,20 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
       this->update();
     }
     this->setCursor(over ? Qt::PointingHandCursor : Qt::ArrowCursor);
+
+    // Reporting is separate from the whole-strip hover above: it tells a receiver
+    // that answers editor-wide (the sync peek) where the pointer is, and touches
+    // nothing this strip paints. Only glyph rendering reports - a collapsed
+    // colour-bar slot is a featureless 7 px column, so the user cannot see which
+    // axis they are pointing at.
+    const bool reportable = over && layout.mode == BarcodeLayout::Mode::Glyphs;
+    const int reportedSlot = reportable ? this->SlotAt(event->pos()) : -1;
+    if (reportable != m_ReportedOverStrip || reportedSlot != m_ReportedSlot)
+    {
+      m_ReportedOverStrip = reportable;
+      m_ReportedSlot = reportedSlot;
+      emit PeekHovered(reportable, reportedSlot);
+    }
   }
   QWidget::mouseMoveEvent(event);
 }
@@ -373,15 +387,22 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
 void QmitkMxNSyncBarcodeWidget::leaveEvent(QEvent* event)
 {
   const bool hadHoveredSlot = m_HoveredSlot != -1;
+  const bool hadReport = m_ReportedOverStrip;
   if (m_Hovered || m_HoveredSlot != -1)
   {
     m_Hovered = false;
     m_HoveredSlot = -1;
     this->update();
   }
+  m_ReportedOverStrip = false;
+  m_ReportedSlot = -1;
   if (hadHoveredSlot)
   {
     emit AxisHovered(-1);
+  }
+  if (hadReport)
+  {
+    emit PeekHovered(false, -1);
   }
   QWidget::leaveEvent(event);
 }
@@ -422,7 +443,10 @@ void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
 
 bool QmitkMxNSyncBarcodeWidget::event(QEvent* event)
 {
-  if (event->type() == QEvent::ToolTip)
+  // The interactive strip explains an axis in words; the passive strip's axes
+  // are explained by the editor's sync peek, and two popups over the same image
+  // would say overlapping things.
+  if (m_AxisClickable && event->type() == QEvent::ToolTip)
   {
     auto* helpEvent = static_cast<QHelpEvent*>(event);
     const int slot = this->SlotAt(helpEvent->pos());

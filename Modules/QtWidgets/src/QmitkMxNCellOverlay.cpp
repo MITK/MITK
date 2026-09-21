@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkMxNCellOverlay.h"
 
+#include <QmitkMxNAxisGlyph.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
@@ -48,6 +49,7 @@ found in the LICENSE file.
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPixmap>
 #include <QPolygon>
 #include <QPropertyAnimation>
 #include <QSpinBox>
@@ -92,6 +94,60 @@ namespace
 
   const QColor IdleText(255, 255, 255, 140);    // 55 % white
   const QColor ActiveText(255, 255, 255, 216);  // 85 % white
+
+  // ---- Sync peek plate ----
+  constexpr int PeekGlyphGap = 8;         // between two glyph boxes in the row
+  constexpr int PeekPlatePadX = 14;
+  constexpr int PeekPlatePadY = 12;
+  constexpr int PeekCaptionGap = 6;       // caption baseline block to glyph row
+  constexpr int PeekNameGap = 7;          // glyph row to the window name
+  constexpr int PeekPlateRadius = 7;
+  constexpr double PeekPumpScale = 1.75;  // the pointed-at glyph's side, in boxes
+  // The plate is content-sized, never a scrim: it may claim this much of the
+  // cell and no more, which is also what decides whether a cell hosts one.
+  constexpr double PeekPlateWidthFraction = 0.86;
+  constexpr double PeekPlateHeightFraction = 0.60;
+  constexpr int PeekFadeInMs = 120;
+  constexpr int PeekFadeOutMs = 80;
+  constexpr double PeekAbsentWeight = 0.35;  // an axis this window does not synchronize
+
+  const QColor PeekPlateFill(7, 9, 11, 158);
+  const QColor PeekPlateBorder(255, 255, 255, 26);
+  // The recolor path takes an RGB hex and drops any alpha, so an unsynchronized
+  // axis has to read as absent by hue: a flat neutral no group palette entry can
+  // be mistaken for.
+  const QColor PeekAbsentGlyph(144, 150, 156);
+
+  /** \brief The pumped glyph's overhang per side: half of what it gains. */
+  int PeekPumpHalf(int box)
+  {
+    return qRound(0.5 * (PeekPumpScale - 1.0) * box);
+  }
+
+  /** \brief The glyph row's width. Both ends reserve the pumped glyph's
+   *         displacement, so the row is the same width whichever axis is
+   *         pumped - and wide enough for the overhang at either end. */
+  int PeekRowWidth(int box)
+  {
+    const int push = PeekPumpHalf(box) + PeekGlyphGap;
+    return QmitkMxNCellOverlay::PeekAxisCount * box
+      + (QmitkMxNCellOverlay::PeekAxisCount - 1) * PeekGlyphGap + 2 * push;
+  }
+
+  int PeekRowHeight(int box)
+  {
+    return qRound(PeekPumpScale * box);
+  }
+
+  /** \brief The plate's outer size. Both text lines are reserved even when the
+   *         window has no name, so every plate of a layout is one object
+   *         repeated rather than eight differently sized ones. */
+  QSize PeekPlateSize(int box, int textLineHeight)
+  {
+    return QSize(PeekRowWidth(box) + 2 * PeekPlatePadX,
+                 2 * textLineHeight + PeekCaptionGap + PeekRowHeight(box) + PeekNameGap
+                   + 2 * PeekPlatePadY);
+  }
 
   /** \brief A navigator row's grab area: its track plus the knob's reach at
    *         both ends, so the knob stays grabbable where it sits at an extreme. */
@@ -222,6 +278,10 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
   // collapse delay and hysteresis, this only the easing.
   m_RevealAnimation = new QPropertyAnimation(this, "revealProgress", this);
   m_RevealAnimation->setDuration(QmitkRenderWindowProximity::RevealDurationMs);
+
+  // The sync peek fades on its own clock: it answers a deliberate pointer rest
+  // rather than the frame's approach, and it leaves faster than it arrives.
+  m_PeekAnimation = new QPropertyAnimation(this, "peekProgress", this);
 
   // Context-menu handling needs the render window's own mouse stream (the
   // overlay is transparent there); the base class already filters the cell.
@@ -482,6 +542,164 @@ void QmitkMxNCellOverlay::SetRevealProgress(qreal progress)
   }
   m_RevealProgress = progress;
   this->UpdateInteractivity();
+  this->update();
+}
+
+int QmitkMxNCellOverlay::PeekTextLineHeight(const QFont& baseFont)
+{
+  return QFontMetrics(ReadoutFont(baseFont)).height();
+}
+
+int QmitkMxNCellOverlay::MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight)
+{
+  // Both plate dimensions grow monotonically with the box, so walking up from
+  // the legible floor and stopping at the first box that overflows gives the
+  // largest that fits. The row alone is wider than eight boxes, which bounds
+  // the walk.
+  const int ceiling = cellSize.width() / PeekAxisCount + 1;
+  int best = 0;
+  for (int box = PeekGlyphBoxMin; box <= ceiling; ++box)
+  {
+    const QSize plate = PeekPlateSize(box, textLineHeight);
+    if (plate.width() > PeekPlateWidthFraction * cellSize.width()
+        || plate.height() > PeekPlateHeightFraction * cellSize.height())
+    {
+      break;
+    }
+    best = box;
+  }
+  return best;
+}
+
+QmitkMxNCellOverlay::PeekPlateLayout
+QmitkMxNCellOverlay::ComputePeekPlate(const QSize& cellSize, int glyphBox, int pumpedAxis,
+                                      int textLineHeight)
+{
+  PeekPlateLayout layout;
+  if (glyphBox < PeekGlyphBoxMin || pumpedAxis >= PeekAxisCount)
+  {
+    return layout;
+  }
+
+  const QSize plateSize = PeekPlateSize(glyphBox, textLineHeight);
+  if (plateSize.width() > cellSize.width() || plateSize.height() > cellSize.height())
+  {
+    return layout;
+  }
+
+  layout.plate = QRect(QPoint((cellSize.width() - plateSize.width()) / 2,
+                              (cellSize.height() - plateSize.height()) / 2),
+                       plateSize);
+
+  const int rowWidth = PeekRowWidth(glyphBox);
+  const int rowHeight = PeekRowHeight(glyphBox);
+  const int rowLeft = layout.plate.left() + PeekPlatePadX;
+  const int captionTop = layout.plate.top() + PeekPlatePadY;
+  const int rowTop = captionTop + textLineHeight + PeekCaptionGap;
+
+  layout.caption = QRect(rowLeft, captionTop, rowWidth, textLineHeight);
+  layout.name = QRect(rowLeft, rowTop + rowHeight + PeekNameGap, rowWidth, textLineHeight);
+
+  // Every glyph on a side of the pumped one moves, not just its neighbour, so
+  // the spacing along the row stays uniform and the clearance around the pumped
+  // glyph is exactly two gaps whatever the box.
+  const int push = PeekPumpHalf(glyphBox) + PeekGlyphGap;
+  const int pumpedSide = qRound(PeekPumpScale * glyphBox);
+  for (int axis = 0; axis < PeekAxisCount; ++axis)
+  {
+    const int nominalLeft = rowLeft + push + axis * (glyphBox + PeekGlyphGap);
+    if (axis == pumpedAxis)
+    {
+      layout.glyphs[axis] = QRect(nominalLeft + glyphBox / 2 - pumpedSide / 2, rowTop,
+                                  pumpedSide, pumpedSide);
+    }
+    else
+    {
+      // Nothing emphasised: every glyph sits at its nominal place, and the
+      // displacement reserved at both ends simply stays empty.
+      const int shift = pumpedAxis < 0 ? 0 : (axis < pumpedAxis ? -push : push);
+      layout.glyphs[axis] = QRect(nominalLeft + shift,
+                                  rowTop + (rowHeight - glyphBox) / 2, glyphBox, glyphBox);
+    }
+  }
+  return layout;
+}
+
+void QmitkMxNCellOverlay::SetSyncPeek(bool visible, int axisIndex, int glyphBox)
+{
+  const bool up = visible && glyphBox >= PeekGlyphBoxMin;
+  const int axis = up && axisIndex >= 0 && axisIndex < PeekAxisCount ? axisIndex : -1;
+  const int box = up ? glyphBox : 0;
+  if (up == m_SyncPeekVisible && axis == m_SyncPeekAxis && box == m_SyncPeekGlyphBox)
+  {
+    return;
+  }
+
+  const bool wasUp = m_SyncPeekVisible;
+  m_SyncPeekVisible = up;
+  m_SyncPeekAxis = axis;
+  m_SyncPeekGlyphBox = box;
+  this->UpdateInteractivity();
+
+  // Changing which axis is emphasised while the peek is up only repaints: the
+  // user is comparing axes and a fade between them would read as a flicker.
+  if (wasUp == up)
+  {
+    this->update();
+    return;
+  }
+
+  const qreal target = up ? 1.0 : 0.0;
+  if (m_PeekAnimation.isNull() || !this->AnimationsEnabled())
+  {
+    this->SetPeekProgress(target);
+    this->update();
+    return;
+  }
+
+  m_PeekAnimation->stop();
+  m_PeekAnimation->setDuration(up ? PeekFadeInMs : PeekFadeOutMs);
+  m_PeekAnimation->setStartValue(m_PeekProgress);
+  m_PeekAnimation->setEndValue(target);
+  m_PeekAnimation->start();
+  this->update();
+}
+
+bool QmitkMxNCellOverlay::IsSyncPeekVisible() const
+{
+  return m_SyncPeekVisible;
+}
+
+int QmitkMxNCellOverlay::SyncPeekAxis() const
+{
+  return m_SyncPeekAxis;
+}
+
+int QmitkMxNCellOverlay::SyncPeekGlyphBox() const
+{
+  return m_SyncPeekGlyphBox;
+}
+
+qreal QmitkMxNCellOverlay::PeekProgress() const
+{
+  return m_PeekProgress;
+}
+
+void QmitkMxNCellOverlay::SetPeekProgress(qreal progress)
+{
+  progress = std::clamp<qreal>(progress, 0.0, 1.0);
+  if (qFuzzyCompare(progress, m_PeekProgress))
+  {
+    return;
+  }
+  const bool wasPainting = m_PeekProgress > 0.0;
+  m_PeekProgress = progress;
+  if (wasPainting != (m_PeekProgress > 0.0))
+  {
+    // The mask doubles as the paint clip, so it has to gain and lose the plate
+    // as the fade starts and finishes.
+    this->UpdateInteractivity();
+  }
   this->update();
 }
 
@@ -893,6 +1111,18 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
   }
   mask += QRect(0, 0, this->width(), TopStripHeight);
 
+  // The peek plate is paint-only, but this mask clips painting as well as input,
+  // and the cell whose barcode is being pointed at is normally masked (the strip
+  // sits at the trailing edge, inside the colorbar's reveal margin). Leaving the
+  // plate out clipped it away in exactly the window the pointer was in. It costs
+  // VTK the pointer over the plate for as long as the peek is up, which is only
+  // while the pointer rests on the barcode.
+  const QRect peekPlate = this->SyncPeekPlateRect();
+  if (peekPlate.isValid())
+  {
+    mask += peekPlate;
+  }
+
   // The active-cell corner brackets sit at the frame corners; keep those small
   // squares in the mask so the brackets are not clipped while revealed.
   const int corner = 12;
@@ -1201,6 +1431,99 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
   {
     painter.fillRect(QRect(0, 0, this->width(), TopStripHeight), QColor(255, 255, 255, 40));
   }
+
+  // Last, so the plate reads over the furniture as well as over the image.
+  this->PaintSyncPeek(painter);
+}
+
+QRect QmitkMxNCellOverlay::SyncPeekPlateRect() const
+{
+  if (!m_SyncPeekVisible && m_PeekProgress <= 0.0)
+  {
+    return QRect();
+  }
+  const QRect area = this->RenderWindowRect();
+  const PeekPlateLayout layout = ComputePeekPlate(
+    area.size(), m_SyncPeekGlyphBox, m_SyncPeekAxis, PeekTextLineHeight(this->font()));
+  return layout.plate.isValid() ? layout.plate.translated(area.topLeft()) : QRect();
+}
+
+void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
+{
+  if (!m_SyncPeekVisible && m_PeekProgress <= 0.0)
+  {
+    return;
+  }
+
+  const QRect area = this->RenderWindowRect();
+  const PeekPlateLayout layout = ComputePeekPlate(
+    area.size(), m_SyncPeekGlyphBox, m_SyncPeekAxis, PeekTextLineHeight(this->font()));
+  if (!layout.plate.isValid())
+  {
+    return;
+  }
+
+  // Each window answers for itself: no partner set is computed anywhere, so an
+  // axis reads on the plate exactly as it reads in this cell's own strip.
+  const auto axisSlots = m_Editor->BuildBarcodeSlots(m_Cell->GetWidgetName());
+  if (axisSlots.size() != PeekAxisCount)
+  {
+    return;
+  }
+
+  painter.save();
+  painter.translate(area.topLeft());
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setOpacity(m_PeekProgress);
+
+  painter.setPen(QPen(PeekPlateBorder, 1));
+  painter.setBrush(PeekPlateFill);
+  painter.drawRoundedRect(QRectF(layout.plate).adjusted(0.5, 0.5, -0.5, -0.5),
+                          PeekPlateRadius, PeekPlateRadius);
+
+  const qreal dpr = nullptr != painter.device() ? painter.device()->devicePixelRatioF() : 1.0;
+  for (int axis = 0; axis < PeekAxisCount; ++axis)
+  {
+    const auto& axisSlot = axisSlots[axis];
+    const bool synced = axisSlot.color.isValid();
+    // The two carriers are kept independent: opacity says whether this window
+    // synchronizes the axis, size says which axis the pointer is on. That lets
+    // one row be read either way round - the window's whole coupling at a
+    // glance, and the pointed-at axis from the pump - instead of emphasis and
+    // membership fighting over the same channel.
+    const qreal weight = synced ? 1.0 : PeekAbsentWeight;
+    const QRect box = layout.glyphs[axis];
+    QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, synced ? axisSlot.color : PeekAbsentGlyph,
+                                            qRound(box.width() * dpr));
+    if (glyph.isNull())
+    {
+      continue;
+    }
+    glyph.setDevicePixelRatio(dpr);
+    painter.setOpacity(m_PeekProgress * weight);
+    painter.drawPixmap(box.topLeft(), glyph);
+  }
+
+  // Both lines are elided into the width the glyph row dictates; measuring text
+  // into the plate would resize it as the pointed-at axis or the window changes.
+  painter.setOpacity(m_PeekProgress);
+  painter.setFont(ReadoutFont(this->font()));
+  const QFontMetrics metrics(painter.font());
+  painter.setPen(ActiveText);
+  // The caption names the emphasised axis. Reaching the strip between two glyphs
+  // emphasises none; the line stays reserved but empty so the plate never
+  // resizes under the pointer.
+  if (m_SyncPeekAxis >= 0)
+  {
+    painter.drawText(layout.caption, Qt::AlignHCenter | Qt::AlignVCenter,
+                     metrics.elidedText(axisSlots[m_SyncPeekAxis].label, Qt::ElideRight,
+                                        layout.caption.width()));
+  }
+  painter.setPen(IdleText);
+  painter.drawText(layout.name, Qt::AlignHCenter | Qt::AlignVCenter,
+                   metrics.elidedText(m_Editor->CellLabel(m_Cell->GetWidgetName()), Qt::ElideRight,
+                                      layout.name.width()));
+  painter.restore();
 }
 
 void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)

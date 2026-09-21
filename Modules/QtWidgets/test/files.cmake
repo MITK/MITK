@@ -22,6 +22,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNNavigatorTest.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
+  QmitkMxNSyncPeekTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp
   QmitkRenderWindowProximityTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp

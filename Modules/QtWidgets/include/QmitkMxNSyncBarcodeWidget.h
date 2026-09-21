@@ -55,6 +55,7 @@ public:
     QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;  // which axis icon to draw
     QColor color;     // invalid == this cell is unsynced on the axis (a gap)
     QString tooltip;  // per-slot hover text
+    QString label;    // the axis's display name, for a surface that names it in words
 
     // Heterogeneous state for the group perspective: the color is the group hue
     // but only some of the group's member windows are linked on this axis. The
@@ -166,6 +167,19 @@ Q_SIGNALS:
    *         sharing that axis's synchronization. */
   void AxisHovered(int index);
 
+  /**
+   * \brief Where the pointer is on a passive strip: 'overStrip' is true while it
+   *        is anywhere on the drawn slots - the same area the click reacts to -
+   *        and 'axisIndex' names the glyph under it, or -1 between glyphs.
+   *
+   *        The two are deliberately separate. A receiver that answers the strip
+   *        (the editor's sync peek) stays up for as long as the pointer is on it
+   *        and only changes which axis it emphasises, so crossing the gap between
+   *        two glyphs does not tear the answer down. Only glyph rendering reports:
+   *        a collapsed colour-bar slot shows the user nothing to point at.
+   */
+  void PeekHovered(bool overStrip, int axisIndex);
+
 protected:
 
   void paintEvent(QPaintEvent* event) override;
@@ -199,6 +213,11 @@ private:
   QList<AxisSlot> m_Slots;
   bool m_Hovered = false;         // whole-strip hover (passive per-cell strip)
   int m_HoveredSlot = -1;         // single hovered axis (axis-clickable mode)
+  // What a passive strip last reported. Deliberately not m_Hovered /
+  // m_HoveredSlot: those drive the paint, and the passive strip's pixels must
+  // stay exactly what they were before it began reporting.
+  bool m_ReportedOverStrip = false;
+  int m_ReportedSlot = -1;
   bool m_AxisClickable = false;
   bool m_PreferGlyphWidth = false;
   QPoint m_PressPos;

@@ -132,11 +132,35 @@
 		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
 			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
 			linked group's hue and left empty where the window is not synchronized - the same
-			barcode the layout editor's window tiles carry. Clicking it opens the MxN Layout
+			barcode the layout editor's window tiles carry. Pointing at one of its axis
+			glyphs shows the sync peek described below; clicking it opens the MxN Layout
 			Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
 		<li> Maximize button: Give this window the whole editor area, and bring the other
 			windows back
 	</ul>
+
+	Pointing at one of the barcode's axis glyphs and resting there for a moment brings
+	up a small plate in the middle of every window that has room for one. Each plate
+	shows that window's eight axes tinted by synchronization group, with the axis you
+	are pointing at enlarged, named above the row, and the window's own name below it.
+	An axis the window synchronizes is drawn solid in its group's hue; one it does not
+	is faint and uncolored, whether or not it is the enlarged one - so a plate reads
+	both ways round, as the window's whole coupling and as the answer for the axis you
+	are on. Windows whose enlarged glyph carries the same hue are synchronized with
+	each other on that axis.
+
+	Sliding along the row moves the emphasis as each glyph is reached and holds it over
+	the gaps in between, so the row does not flicker under the pointer. The plates stay
+	up for as long as the pointer is anywhere on the barcode and go away once it leaves
+	- nothing is pinned, and a single click still opens the layout editor.
+
+	Any axis answers, including one the window you are pointing from does not
+	synchronize: that is a legitimate question about the other windows. Two limits are
+	worth knowing. A window that synchronizes nothing shows the "not synchronized"
+	hint instead of glyphs, so it offers no axis to point at - reach the peek from
+	another window's barcode instead. And a window too small to hold a legible plate
+	shows none, rather than shrinking the plates in every other window down to its
+	size and making them harder to read against each other.
 
 	The slice control and the view-direction control are no longer in this menu: slice
 	scrolling lives in the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator),

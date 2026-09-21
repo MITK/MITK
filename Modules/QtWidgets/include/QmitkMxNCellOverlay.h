@@ -29,12 +29,15 @@ found in the LICENSE file.
 #include <QImage>
 #include <QPointer>
 #include <QRect>
+#include <QSize>
 #include <QString>
 
+#include <array>
 #include <vector>
 
 class QmitkMxNMultiWidget;
 class QmitkRenderWindowWidget;
+class QFont;
 class QPropertyAnimation;
 class vtkRenderWindow;
 
@@ -103,6 +106,9 @@ class MITKQTWIDGETS_EXPORT QmitkMxNCellOverlay : public QmitkOverlayWidget
   // 0 = interactive frame collapsed, 1 = fully revealed. Animated by
   // QPropertyAnimation so the reveal eases in / out as one coordinated frame.
   Q_PROPERTY(qreal revealProgress READ RevealProgress WRITE SetRevealProgress)
+
+  // 0 = the sync peek plate is down, 1 = fully faded in.
+  Q_PROPERTY(qreal peekProgress READ PeekProgress WRITE SetPeekProgress)
 
 public:
 
@@ -173,6 +179,78 @@ public:
 
   qreal RevealProgress() const;
   void SetRevealProgress(qreal progress);
+
+  /** \brief The number of synchronization axes a peek plate shows, matching the
+   *         sync barcode's slot count. */
+  static constexpr int PeekAxisCount = 8;
+
+  /** \brief The legible range of a peek plate's glyph box side. */
+  static constexpr int PeekGlyphBoxMin = 20;
+  static constexpr int PeekGlyphBoxMax = 40;
+
+  /**
+  * \brief Show or hide this cell's sync peek plate at the layout-wide 'glyphBox'
+  *        side, emphasising 'axisIndex' - or none of them when it is negative,
+  *        which is how the plate looks while the pointer rests on the barcode
+  *        between two glyphs. The box is handed in rather than derived here:
+  *        every plate in the layout must share one geometry, or the rows stop
+  *        being comparable.
+  */
+  void SetSyncPeek(bool visible, int axisIndex, int glyphBox);
+
+  /** \brief Whether this cell's peek plate is up. Exposed for verification. */
+  bool IsSyncPeekVisible() const;
+
+  /** \brief The axis this cell's peek emphasises, or -1 for none. Exposed for
+   *         verification. */
+  int SyncPeekAxis() const;
+
+  /** \brief The glyph box this cell's peek was given, or 0. Exposed for
+   *         verification. */
+  int SyncPeekGlyphBox() const;
+
+  /** \brief Where a peek plate and its parts land in a cell of 'cellSize'. */
+  struct PeekPlateLayout
+  {
+    QRect plate;                              // invalid when the cell cannot host a plate
+    std::array<QRect, PeekAxisCount> glyphs;  // axis order; the pumped one is the large rect
+    QRect caption;                            // the pointed-at axis name, above the row
+    QRect name;                               // the window name, below the row
+  };
+
+  /**
+  * \brief The plate geometry for one cell: the plate centred in 'cellSize', the
+  *        eight glyph rects for 'glyphBox' with 'pumpedAxis' enlarged and the
+  *        rest displaced, and the two text rects. A negative 'pumpedAxis' lays
+  *        the row out with nothing emphasised. Returns an invalid plate when the
+  *        cell cannot host one. Static so the geometry is testable without a
+  *        realized overlay.
+  *
+  *   The plate reserves the pumped glyph's overhang and both text lines whatever
+  *   the pumped axis is, so its rect depends only on 'cellSize', 'glyphBox' and
+  *   'textLineHeight': switching axes while the peek is up moves and resizes
+  *   nothing.
+  */
+  static PeekPlateLayout ComputePeekPlate(const QSize& cellSize, int glyphBox,
+                                          int pumpedAxis, int textLineHeight);
+
+  /**
+  * \brief The largest glyph box a cell of 'cellSize' can host within the plate's
+  *        share of the cell, or 0 below the legible floor. The multi widget
+  *        calls this per cell to derive the one box the whole layout uses.
+  */
+  static int MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight);
+
+  /**
+  * \brief The height of one peek text line for a widget whose font is
+  *        'baseFont'. The plate's lines are set in the peripheral readout font,
+  *        which the multi widget cannot measure on its own: it passes its own
+  *        font, the one every cell inherits.
+  */
+  static int PeekTextLineHeight(const QFont& baseFont);
+
+  qreal PeekProgress() const;
+  void SetPeekProgress(qreal progress);
 
 protected:
 
@@ -321,6 +399,18 @@ private:
    */
   void UpdateInteractivity();
 
+  /** \brief The peek plate's rect in overlay coordinates, invalid while the
+   *         peek is down. */
+  QRect SyncPeekPlateRect() const;
+
+  /**
+   * \brief Paint the sync peek plate over the image. Deliberately not routed
+   *        through QmitkMxNSyncBarcodeWidget::PaintInto: that renderer lays out
+   *        a uniform grid, while the plate scales and displaces per glyph. The
+   *        artwork stays shared through QmitkMxNRenderAxisGlyph.
+   */
+  void PaintSyncPeek(QPainter& painter);
+
   /** \brief Coalesce VTK render-end notifications into one refresh per cycle. */
   void ScheduleValueRefresh();
 
@@ -375,6 +465,15 @@ private:
   qreal m_RevealProgress = 0.0;
   QPointer<QPropertyAnimation> m_RevealAnimation;
   bool m_FrameRevealed = false;
+
+  // The sync peek: whether the plate is up, which axis it emphasises (-1 for
+  // none), the layout-wide glyph box it was handed, and the fade driven by
+  // m_PeekAnimation.
+  bool m_SyncPeekVisible = false;
+  int m_SyncPeekAxis = -1;
+  int m_SyncPeekGlyphBox = 0;
+  qreal m_PeekProgress = 0.0;
+  QPointer<QPropertyAnimation> m_PeekAnimation;
 
   bool m_ReadoutVisible = true;
   bool m_CleanView = false;

@@ -184,6 +184,8 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::Clicked, this, [this]() {
     emit LayoutEditorRequested();
   });
+  connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::PeekHovered,
+          this, &QmitkRenderWindowUtilityWidget::SyncPeekHovered);
   layout->addWidget(m_SyncBarcode);
 
   m_MaximizeButton = new QToolButton(this);

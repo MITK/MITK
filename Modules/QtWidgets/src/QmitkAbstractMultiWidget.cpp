@@ -204,6 +204,7 @@ mitk::InteractionSchemeSwitcher::InteractionScheme QmitkAbstractMultiWidget::Get
   return m_Impl->m_InteractionScheme;
 }
 
+// Exhaustive rather than defaulted, so that a scheme added later is flagged here.
 bool QmitkAbstractMultiWidget::IsPACSScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
   switch (scheme)
@@ -215,9 +216,14 @@ bool QmitkAbstractMultiWidget::IsPACSScheme(mitk::InteractionSchemeSwitcher::Int
     case mitk::InteractionSchemeSwitcher::PACSScroll:
     case mitk::InteractionSchemeSwitcher::PACSZoom:
       return true;
-    default:
-      return false;
+    case mitk::InteractionSchemeSwitcher::MITKStandard:
+    case mitk::InteractionSchemeSwitcher::MITKRotationUncoupled:
+    case mitk::InteractionSchemeSwitcher::MITKRotationCoupled:
+    case mitk::InteractionSchemeSwitcher::MITKSwivel:
+      break;
   }
+
+  return false;
 }
 
 mitk::InteractionEventHandler* QmitkAbstractMultiWidget::GetInteractionEventHandler()

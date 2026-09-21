@@ -57,7 +57,11 @@ public:
   void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   void OnLayoutSet(int row, int column) override;
-  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
+  /**
+  * @brief Syncs both tool bars with the scheme the multi widget has actually
+  *        applied, wherever the change came from.
+  */
+  void OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
 private Q_SLOTS:
 

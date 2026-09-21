@@ -167,25 +167,12 @@ bool QmitkStdMultiWidgetEditor::IsSlicingPlanesEnabled() const
   }
 }
 
-void QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+void QmitkStdMultiWidgetEditor::OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  const auto& multiWidget = GetMultiWidget();
-  if (nullptr == multiWidget)
-  {
-    return;
-  }
-
-  QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
-
-  // Read back what was actually applied. The multi widget also changes the
-  // scheme on its own, for example when a crosshair rotation mode is picked,
-  // and this slot is what keeps the toolbar from claiming otherwise.
-  const auto appliedScheme = multiWidget->GetInteractionScheme();
-
   if (nullptr != m_Impl->m_InteractionSchemeToolBar)
   {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(appliedScheme));
-    m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(appliedScheme);
+    m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
+    m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(scheme);
   }
 }
 
@@ -214,11 +201,14 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   if (nullptr == m_Impl->m_InteractionSchemeToolBar)
   {
     m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
-    // Matches the MITK scheme a fresh multi widget starts with. The preferences
-    // below show the toolbar again if PACS mode is on.
+    // Keeps the tool bar from showing before the applied scheme is known; the
+    // sync at the end of this method decides whether it stays hidden.
     m_Impl->m_InteractionSchemeToolBar->setVisible(false);
     layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
 
+    // The tool bar only requests a scheme; the multi widget reports back what it
+    // applied. Keeping the two directions apart is what lets the tool bar follow
+    // scheme changes that did not originate from it.
     connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
       this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged);
   }
@@ -233,7 +223,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     SetMultiWidget(multiWidget);
 
     connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
-      this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged);
+      this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeApplied);
   }
 
   layout->addWidget(multiWidget);
@@ -258,7 +248,9 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   GetSite()->GetPage()->AddPartListener(this);
 
   InitializePreferences(preferences);
-  OnPreferencesChanged(preferences);
+  this->OnPreferencesChanged(preferences);
+
+  this->OnInteractionSchemeApplied(multiWidget->GetInteractionScheme());
 }
 
 void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* preferences)

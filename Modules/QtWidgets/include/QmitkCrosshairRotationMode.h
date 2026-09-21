@@ -26,8 +26,7 @@ enum class QmitkCrosshairRotationMode
 {
   None = 0,
   Single,
-  Coupled,
-  Swivel
+  Coupled
 };
 
 Q_DECLARE_METATYPE(QmitkCrosshairRotationMode)

@@ -40,7 +40,6 @@ namespace mitk
   * - MITKStandard : Sets the cross position for the MPR
   * - MITKRotationUncoupled : Rotates a single plane
   * - MITKRotationCoupled : Rotates two planes at once
-  * - MITKSwivel : Swivels a single plane
   *
   * The PACS schemes share DisplayConfigPACSBase.xml, which behaves more
   * like a PACS workstation:
@@ -75,7 +74,6 @@ namespace mitk
       MITKStandard = 0,
       MITKRotationUncoupled,
       MITKRotationCoupled,
-      MITKSwivel,
       PACSBase,
       PACSStandard,
       PACSLevelWindow,

@@ -474,14 +474,6 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
     coupledCrosshairRotation->setData(QVariant::fromValue(QmitkCrosshairRotationMode::Coupled));
     crosshairModesMenu->addAction(coupledCrosshairRotation);
 
-    QAction *swivelMode = new QAction(crosshairModesMenu);
-    swivelMode->setActionGroup(rotationModeActionGroup);
-    swivelMode->setText("Swivel mode");
-    swivelMode->setCheckable(true);
-    swivelMode->setChecked(m_CrosshairRotationMode == QmitkCrosshairRotationMode::Swivel);
-    swivelMode->setData(QVariant::fromValue(QmitkCrosshairRotationMode::Swivel));
-    crosshairModesMenu->addAction(swivelMode);
-
     connect(rotationModeActionGroup, &QActionGroup::triggered, this, &QmitkRenderWindowMenu::OnCrosshairRotationModeSelected);
   }
 

@@ -74,7 +74,7 @@ namespace mitk
     /** \brief Calculate the bounding box of the resliced image.
      *
      * This is necessary for arbitrarily rotated planes in an image volume.
-     * A rotated plane (e.g. in swivel mode) will have a new bounding box,
+     * A rotated plane (e.g. in crosshair rotation) will have a new bounding box,
      * which needs to be calculated by clipping the bounding geometry edges
      * against the plane.
      *

@@ -36,8 +36,6 @@ namespace
         return QmitkCrosshairRotationMode::Single;
       case mitk::InteractionSchemeSwitcher::MITKRotationCoupled:
         return QmitkCrosshairRotationMode::Coupled;
-      case mitk::InteractionSchemeSwitcher::MITKSwivel:
-        return QmitkCrosshairRotationMode::Swivel;
       case mitk::InteractionSchemeSwitcher::MITKStandard:
       case mitk::InteractionSchemeSwitcher::PACSBase:
       case mitk::InteractionSchemeSwitcher::PACSStandard:
@@ -217,7 +215,6 @@ bool QmitkAbstractMultiWidget::IsPACSScheme(mitk::InteractionSchemeSwitcher::Int
     case mitk::InteractionSchemeSwitcher::MITKStandard:
     case mitk::InteractionSchemeSwitcher::MITKRotationUncoupled:
     case mitk::InteractionSchemeSwitcher::MITKRotationCoupled:
-    case mitk::InteractionSchemeSwitcher::MITKSwivel:
       break;
   }
 

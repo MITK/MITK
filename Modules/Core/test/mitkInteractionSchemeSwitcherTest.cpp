@@ -86,7 +86,7 @@ class mitkInteractionSchemeSwitcherTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkInteractionSchemeSwitcherTestSuite);
   MITK_TEST(SetInteractionScheme_NoEventHandler_Throws);
   MITK_TEST(MITKStandard_BindsCrosshairAndNavigation);
-  MITK_TEST(MITKSwivel_ReplacesCrosshairBySwivel);
+  MITK_TEST(MITKRotation_ReplacesCrosshairByRotation);
   MITK_TEST(PACSBase_LeavesLeftMouseButtonUnbound);
   MITK_TEST(PACS_BindsRightMouseButtonInEveryScheme);
   MITK_TEST(PACS_BindsNavigationKeysInEveryScheme);
@@ -136,11 +136,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("PlaneDown"), MapWheel(config, -1));
   }
 
-  void MITKSwivel_ReplacesCrosshairBySwivel()
+  void MITKRotation_ReplacesCrosshairByRotation()
   {
-    const auto config = Apply(mitk::InteractionSchemeSwitcher::MITKSwivel);
+    const auto config = Apply(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("StartSwivel"),
+    CPPUNIT_ASSERT_EQUAL(std::string("StartRotate"),
       MapMousePress(config, mitk::InteractionEvent::LeftMouseButton, mitk::InteractionEvent::NoKey));
   }
 

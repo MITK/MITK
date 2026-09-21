@@ -50,8 +50,6 @@ The crosshair button allows you to toggle the crosshair, to fit the views to all
 
 Activating either of the rotation modes allows you to rotate the planes visible in a 2D window by moving the mouse cursor close to them and click and dragging once it changes to indicate that rotation can be done.
 
-The swivel mode is recommended only for advanced users as the planes can be moved freely by clicking and dragging anywhere within a 2D window.
-
 The last entry of the crosshair menu is the TS (thick slice) slider. It is available in the 2D windows only. As long as it is set to zero, a single slice is displayed. Any higher value renders a maximum intensity projection (MIP) instead, which integrates as many slices in front of and behind the current one as set with the slider. The number to the right of the slider is the resulting slab thickness, that is the total number of projected slices. In the other 2D windows the extent of the slab is indicated by two additional lines parallel to the line of the corresponding plane. The upper limit of the slider defaults to 50 and can be changed in the <i>Editors</i> preference page (<i>Maximum virtual slice thickness (TS)</i>).
 
 The middle button expands the corresponding window to fullscreen within the four window view.

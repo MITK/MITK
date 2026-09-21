@@ -45,12 +45,6 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
       interactionEventHandler->AddEventConfig("DisplayConfigActivateCoupling.xml");
       break;
     }
-    case MITKSwivel:
-    {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
-      interactionEventHandler->AddEventConfig("DisplayConfigSwivel.xml");
-      break;
-    }
     // PACS MODE
     case PACSBase:
     {

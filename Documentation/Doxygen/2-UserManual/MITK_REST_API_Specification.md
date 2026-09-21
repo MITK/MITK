@@ -1874,7 +1874,7 @@ Query parameters, request body, response content-types and shared error shapes a
 
 #### GET /api/v1/rendering/editors/stdmulti/windows
 
-Lists the StdMultiWidget render windows. `view_direction` is the persisted slot mapping (axial / sagittal / coronal); it is omitted for the 3D window and is *not* a live-orientation read. Under swivel mode or node-initialised geometry the live plane is not guaranteed to match `view_direction` — live orientation, when needed, is derivable from the window's `/camera`.
+Lists the StdMultiWidget render windows. `view_direction` is the persisted slot mapping (axial / sagittal / coronal); it is omitted for the 3D window and is *not* a live-orientation read. Under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match `view_direction` — live orientation, when needed, is derivable from the window's `/camera`.
 
 **Response 200 (`application/json`):**
 
@@ -2045,7 +2045,7 @@ Returns the currently selected step, the world position of the slice center, and
 }
 ```
 
-When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window id identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under swivel mode; read orientation from the window's `/camera` if needed.
+When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window id identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under crosshair rotation; read orientation from the window's `/camera` if needed.
 
 **Error responses:**
 
@@ -2167,7 +2167,7 @@ Returns the MxN editor's cells in pre-order traversal of the current layout. Eac
 | `view_direction` | string | One of `"axial"`, `"sagittal"`, `"coronal"`, `"original"`. Persisted state from the layout document — *authoring intent*, not live orientation. Read live orientation from `/camera` if needed. |
 | `links` | object | Per-cell synchronisation links from the layout document. v2 has only the `selection` dimension; v3 will add more dimension keys here additively without breaking v2 clients. |
 
-Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under swivel mode) and intentionally not asserted by `view_direction`.
+Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under crosshair rotation) and intentionally not asserted by `view_direction`.
 
 **Error responses:**
 

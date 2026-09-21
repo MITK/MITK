@@ -461,9 +461,6 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
     case QmitkCrosshairRotationMode::Coupled:
       this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
       break;
-    case QmitkCrosshairRotationMode::Swivel:
-      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
-      break;
   }
 }
 

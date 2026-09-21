@@ -148,25 +148,36 @@ namespace
     if (framesPerTimeStep <= 0) return false;
 
     bool anyValue = false;
+    std::string lastFilename;
+    std::string lastValue;
     for (std::size_t i = 0; i < frameList.size(); ++i)
     {
       const auto& frame = frameList[i];
       if (frame.IsNull() || frame->Filename.empty()) return false;
 
-      DcmFileFormat dff;
-      // ERM_autoDetect (default): we need the dataset, not just the file
-      // meta header. The vendor private tags live in groups 0x0071 / 0x0009
-      // in the dataset, which ERM_metaOnly skips.
-      if (!dff.loadFile(frame->Filename.c_str(), EXS_Unknown,
-                        EGL_noChange, DCM_MaxReadLength,
-                        ERM_autoDetect).good())
+      // Frames of one file are consecutive in a block's frame list, so
+      // remembering the last file opens a multi-frame file once instead of
+      // once per frame.
+      if (frame->Filename != lastFilename)
       {
-        return false;
-      }
-      DcmDataset* ds = dff.getDataset();
-      if (nullptr == ds) return false;
+        DcmFileFormat dff;
+        // ERM_autoDetect (default): we need the dataset, not just the file
+        // meta header. The vendor private tags live in groups 0x0071 / 0x0009
+        // in the dataset, which ERM_metaOnly skips.
+        if (!dff.loadFile(frame->Filename.c_str(), EXS_Unknown,
+                          EGL_noChange, DCM_MaxReadLength,
+                          ERM_autoDetect).good())
+        {
+          return false;
+        }
+        DcmDataset* ds = dff.getDataset();
+        if (nullptr == ds) return false;
 
-      const std::string v = ReadPrivateString(ds, group, creator, elementOffset);
+        lastFilename = frame->Filename;
+        lastValue = ReadPrivateString(ds, group, creator, elementOffset);
+      }
+
+      const std::string v = lastValue;
       if (v.empty()) return false;
 
       const unsigned int t =

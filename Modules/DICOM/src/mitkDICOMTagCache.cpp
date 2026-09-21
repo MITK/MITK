@@ -31,3 +31,19 @@ void mitk::DICOMTagCache::SetInputFiles(const StringList& filenames)
   m_InputFilenames = filenames;
   this->Modified();
 }
+
+mitk::DICOMFrameLayout mitk::DICOMTagCache::GetFrameLayout(const DICOMImageFrameInfo* /*frame*/) const
+{
+  return DICOMFrameLayout();
+}
+
+bool mitk::DICOMTagCache::HasAnyFrameModel() const
+{
+  return false;
+}
+
+mitk::DICOMDatasetAccessingImageFrameInfo::Pointer mitk::DICOMTagCache::GetFrameInfo(
+  const std::string& /*filename*/, unsigned int /*frameNo*/) const
+{
+  return nullptr;
+}

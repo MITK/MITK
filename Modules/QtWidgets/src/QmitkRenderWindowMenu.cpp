@@ -207,6 +207,11 @@ void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(QmitkCrosshairRotationMo
   m_CrosshairRotationMode = mode;
 }
 
+void QmitkRenderWindowMenu::UpdateLightingMode(int mode)
+{
+  m_LightingMode = mode;
+}
+
 void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 {
   int moveX = floor(static_cast<double>(this->m_Parent->width()) - static_cast<double>(this->width()) - 4.0);
@@ -280,6 +285,23 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_LayoutDesignButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
   m_LayoutDesignButton->setAutoRaise(true);
   layout->addWidget(m_LayoutDesignButton);
+
+  if (m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D) 
+  {
+    m_LightingMenu = new QMenu(this);
+    connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
+
+    m_LightingModeButton = new QToolButton(this);
+    m_LightingModeButton->setMaximumSize(15, 15);
+    m_LightingModeButton->setIconSize(size);
+    m_LightingModeButton->setMenu(m_LightingMenu);
+    m_LightingModeButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
+    m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
+    m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+    m_LightingModeButton->setAutoRaise(true);
+    layout->addWidget(m_LightingModeButton);
+  }
+  
 
   connect(m_FullScreenButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnFullScreenButton);
   connect(m_LayoutDesignButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnLayoutDesignButton);
@@ -584,6 +606,52 @@ void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction *action)
 {
   UpdateCrosshairRotationMode(action->data().value<QmitkCrosshairRotationMode>());
   emit CrosshairRotationModeChanged(m_CrosshairRotationMode);
+}
+
+void QmitkRenderWindowMenu::OnLightingMenuAboutToShow() 
+{
+  QMenu *lightingModesMenu = m_LightingMenu;
+
+  lightingModesMenu->clear();
+
+  {
+    QActionGroup *lightingModeActionGroup = new QActionGroup(lightingModesMenu);
+    lightingModeActionGroup->setExclusive(true);
+
+    QAction *defaultLighting = new QAction(lightingModesMenu);
+    defaultLighting->setActionGroup(lightingModeActionGroup);
+    defaultLighting->setText("Default lighting");
+    defaultLighting->setCheckable(true);
+    defaultLighting->setChecked(m_LightingMode == 0);
+    defaultLighting->setData(0);
+    lightingModesMenu->addAction(defaultLighting);
+
+    QAction *headLighting = new QAction(lightingModesMenu);
+    headLighting->setActionGroup(lightingModeActionGroup);
+    headLighting->setText("Head Light");
+    headLighting->setCheckable(true);
+    headLighting->setChecked(m_LightingMode == 1);
+    headLighting->setData(1);
+    lightingModesMenu->addAction(headLighting);
+
+    QAction *keyLighting = new QAction(lightingModesMenu);
+    keyLighting->setActionGroup(lightingModeActionGroup);
+    keyLighting->setText("Key Light");
+    keyLighting->setCheckable(true);
+    keyLighting->setChecked(m_LightingMode == 2);
+    keyLighting->setData(2);
+    lightingModesMenu->addAction(keyLighting);
+  
+
+     connect(lightingModeActionGroup, &QActionGroup::triggered, this, &QmitkRenderWindowMenu::OnLightingModeSelected);
+  }
+
+}
+
+void QmitkRenderWindowMenu::OnLightingModeSelected(QAction *action)
+{
+  UpdateLightingMode(action->data().toInt());
+  emit LightingModeChanged(m_LightingMode);
 }
 
 void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)

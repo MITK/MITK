@@ -89,6 +89,8 @@ public:
 
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
+  void UpdateLightingMode(int mode);
+
 /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
 is activated.*/
   void MoveWidgetToCorrectPos();
@@ -119,6 +121,8 @@ Q_SIGNALS:
 
   void CrosshairRotationModeChanged(QmitkCrosshairRotationMode);
 
+  void LightingModeChanged(int);
+
   /*! emit signal, when layout design changed by the setting menu.*/
   void LayoutDesignChanged(LayoutDesign layoutDesign);
 
@@ -138,6 +142,9 @@ protected Q_SLOTS:
   void OnCrosshairVisibilityChanged(bool);
   void OnCrosshair3DVisibilityChanged(bool);
   void OnCrosshairRotationModeSelected(QAction *);
+
+  void OnLightingMenuAboutToShow();
+  void OnLightingModeSelected(QAction *);
 
   /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of
   m_FullScreenButton.
@@ -159,6 +166,7 @@ protected:
   QToolButton* m_FullScreenButton;
 
   QToolButton* m_LayoutDesignButton;
+  QToolButton* m_LightingModeButton;
   QMenu* m_LayoutActionsMenu;
   QAction* m_DefaultLayoutAction;
   QAction* m_All2DTop3DBottomLayoutAction;
@@ -175,6 +183,7 @@ protected:
   QLabel *m_TSLabel;
 
   QMenu *m_CrosshairMenu;
+  QMenu *m_LightingMenu;
 
   /*! Flag if full-screen mode is activated or deactivated. */
   bool m_FullScreenMode;
@@ -195,6 +204,8 @@ private:
   QmitkCrosshairRotationMode m_CrosshairRotationMode;
   bool m_CrosshairVisibility;
   bool m_Crosshair3DVisibility;
+
+  int m_LightingMode;
 
   LayoutIndex m_Layout;
   LayoutDesign m_LayoutDesign;

@@ -23,6 +23,7 @@ found in the LICENSE file.
 
 // qt
 #include <QAction>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QLabel>
 #include <QMenuBar>
@@ -125,7 +126,7 @@ protected Q_SLOTS:
 
   /// this function is continuously called by a timer
   /// to do the auto rotation
-  void AutoRotateNextStep();
+  void AutoRotateNextFrame();
 
   /// this function is invoked when the auto-rotate action
   /// is clicked
@@ -183,6 +184,8 @@ private:
   mitk::BaseRenderer::Pointer m_Renderer;
 
   QTimer* m_AutoRotationTimer;
+  /** Measures how far the camera has to be rotated on the next timer tick. */
+  QElapsedTimer m_AutoRotationElapsed;
 
   QWidget *m_Parent;
 

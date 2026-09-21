@@ -1400,6 +1400,17 @@ private:
   /** \brief Lower the peek and forget any pending dwell. */
   void LowerSyncPeek();
 
+  /**
+  * \brief The border colour each cell's stylesheet was last set to.
+  *
+  *   'QWidget::setStyleSheet' has no early-out on an unchanged string and
+  *   repolishes the whole cell subtree, so 'RefreshFrameColors' consults this
+  *   and writes only on a real change. Entries are dropped as cells are
+  *   created and torn down, so a rebuilt cell that reuses an id always gets
+  *   its first write.
+  */
+  std::map<QString, QColor> m_CellBorderColors;
+
 };
 
 #endif

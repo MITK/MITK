@@ -961,6 +961,10 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   }
 
   // create the render window widget and connect signal / slot
+  // A new widget starts with no stylesheet, so any colour remembered for this
+  // id belongs to a cell that no longer exists.
+  m_CellBorderColors.erase(id);
+
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
   // The cell's plane label is drawn by the Qt overlay in the same layer as the
   // slice readout (so the two align); the VTK corner annotation, which would
@@ -2167,6 +2171,7 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   //      from its parent splitter's child list during ~QObject).
   // Only then is the splitter empty and safe to delete.
   this->SetActiveRenderWindowWidget(nullptr);
+  m_CellBorderColors.clear();
 
   std::vector<QString> names;
   for ([[maybe_unused]] const auto& [name, widget] : this->GetRenderWindowWidgets())
@@ -4017,8 +4022,17 @@ void QmitkMxNMultiWidget::RefreshFrameColors()
     const auto identity = this->ResolveCellGroupIdentity(windowId);
     const QColor border = (CellGroupIdentityKind::Mono == identity.kind) ? identity.hue : QColor(0x60, 0x60, 0x60);
 
-    renderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
-                                      border.name(QColor::HexRgb) + "; }");
+    // Writing the sheet repolishes the whole cell subtree, which costs
+    // milliseconds; building a layout refreshes every cell once per cell it
+    // creates, so almost every write here would re-set a border to the colour
+    // it already has.
+    QColor& lastBorder = m_CellBorderColors[windowId];
+    if (lastBorder != border)
+    {
+      lastBorder = border;
+      renderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
+                                        border.name(QColor::HexRgb) + "; }");
+    }
 
     // Repaint the overlay so its active-corner brackets track the active change.
     if (auto* overlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(QString(), Qt::FindDirectChildrenOnly))

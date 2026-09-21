@@ -21,6 +21,25 @@ Left click in any of the 2D windows centers the crosshair on that point. Pressin
 
 In the 3D window you can <B>rotate</B> the object by pressing the left mouse button and moving the mouse, <B>zoom</B> either with the right mouse button as in 2D or with the mouse wheel, and <B>pan</B> the object by moving the mouse while the mouse wheel is pressed. Placing the cursor within the 3D window and holding the "F" key allows <B>free flight</B> into the 3D view.
 
+In the 2D windows the up and down arrow keys navigate through the slices as the mouse wheel does, and the left and right arrow keys step through the time steps of a dynamic image.
+
+\subsection org_mitk_editors_stdmultiwidget_FourWindowView_PACS PACS mouse interaction
+
+The navigation described above is the MITK interaction scheme. The <i>Standard Display</i> preference page offers an alternative scheme that behaves more like a PACS workstation, <i>Use PACS like mouse interaction</i>. Enabling it adds a toolbar to the left of the four window view that determines what the left mouse button does; the remaining bindings are the same for every entry of that toolbar:
+
+<ul>
+  <li> right mouse button: adjusting the level window of the topmost visible image under the mouse cursor
+  <li> CTRL + right mouse button: zooming in and out
+  <li> SHIFT + right mouse button: panning
+  <li> middle mouse button: no interaction
+  <li> mouse wheel, up / down arrow key: navigating through the slices, starting over at the other end of the volume
+  <li> left / right arrow key: stepping through the time steps
+</ul>
+
+The toolbar offers <i>Pointer</i> (centering the crosshair, the default), <i>Level/Window</i>, <i>Pan</i>, <i>Scroll</i> and <i>Zoom</i> for the left mouse button. Clicking the active entry again deselects it, which leaves the left mouse button without any effect.
+
+The crosshair rotation modes described below are realized by the MITK interaction scheme, so selecting one of them leaves the PACS scheme and the toolbar disappears. Neither scheme has an effect in the 3D window.
+
 \subsection org_mitk_editors_stdmultiwidget_FourWindowView_Customizing Customizing
 
 By moving the cursor to the upper right corner of any window you can activate the window menu. It consists of three buttons.

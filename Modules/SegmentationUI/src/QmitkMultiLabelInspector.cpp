@@ -1719,8 +1719,6 @@ void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index)
 {
   if (m_SegmentationNode.IsNotNull())
   {
-    auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-
     auto highlightedValues = m_Model->GetLabelsInSubTree(index);
 
     m_LabelHighlightGuard.SetHighlightedLabels(highlightedValues);
@@ -1757,7 +1755,7 @@ void QmitkMultiLabelInspector::keyReleaseEvent(QKeyEvent* event)
     m_LabelHighlightGuard.SetHighlightInvisibleLabels(false);
   }
 
-  QWidget::keyPressEvent(event);
+  QWidget::keyReleaseEvent(event);
 }
 
 void QmitkMultiLabelInspector::OnSearchLabel()

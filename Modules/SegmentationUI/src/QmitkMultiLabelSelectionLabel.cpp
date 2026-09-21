@@ -16,10 +16,6 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>
 
-// Qmitk
-#include <QmitkStyleManager.h>
-
-
 #include <ui_QmitkMultiLabelSelectionLabel.h>
 
 

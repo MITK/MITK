@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractMultiWidget.h>
 #include <QmitkEditPointDialog.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkPointSetDataInteractor.h>
 
@@ -92,36 +92,36 @@ void QmitkPointListWidget::SetupUi()
   m_ToggleAddPoint->setMaximumSize(25, 25);
   m_ToggleAddPoint->setCheckable(true);
   m_ToggleAddPoint->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
-  m_ToggleAddPoint->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/plus.svg")));
+  m_ToggleAddPoint->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/plus.svg")));
 
   m_AddPoint = new QPushButton();
   m_AddPoint->setMaximumSize(25, 25);
   m_AddPoint->setToolTip("Manually add point");
-  m_AddPoint->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/plus-xyz.svg")));
+  m_AddPoint->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/plus-xyz.svg")));
 
   m_RemovePointBtn = new QPushButton();
   m_RemovePointBtn->setMaximumSize(25, 25);
-  m_RemovePointBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/eraser.svg")));
+  m_RemovePointBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/eraser.svg")));
   m_RemovePointBtn->setToolTip("Erase one point from list   (Hotkey: DEL)");
 
   m_MovePointUpBtn = new QPushButton();
   m_MovePointUpBtn->setMaximumSize(25, 25);
-  m_MovePointUpBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/arrow-up.svg")));
+  m_MovePointUpBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/arrow-up.svg")));
   m_MovePointUpBtn->setToolTip("Swap selected point upwards   (Hotkey: F2)");
 
   m_MovePointDownBtn = new QPushButton();
   m_MovePointDownBtn->setMaximumSize(25, 25);
-  m_MovePointDownBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/arrow-down.svg")));
+  m_MovePointDownBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/arrow-down.svg")));
   m_MovePointDownBtn->setToolTip("Swap selected point downwards   (Hotkey: F3)");
 
   m_SavePointsBtn = new QPushButton();
   m_SavePointsBtn->setMaximumSize(25, 25);
-  m_SavePointsBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/save.svg")));
+  m_SavePointsBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/save.svg")));
   m_SavePointsBtn->setToolTip("Save points to file");
 
   m_LoadPointsBtn = new QPushButton();
   m_LoadPointsBtn->setMaximumSize(25, 25);
-  m_LoadPointsBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/folder-open.svg")));
+  m_LoadPointsBtn->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/QtWidgetsExt/folder-open.svg")));
   m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
 
   int i;

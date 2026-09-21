@@ -89,7 +89,9 @@ namespace mitk
      *
      * The default implementation calls DoRead() and then annotates each
      * resulting BaseData with meta-information about the reader, MIME type,
-     * input location, and reader options.
+     * input location, and reader options. These annotations describe the read
+     * that just happened and are renewed on every read, so they are runtime
+     * information and are not written into data files.
      *
      * \return A vector of created BaseData objects.
      * \throws mitk::Exception if reading fails.

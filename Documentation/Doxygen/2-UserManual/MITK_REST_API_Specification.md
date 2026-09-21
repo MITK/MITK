@@ -40,7 +40,7 @@ The REST API serves as the **primary control interface** (control plane) as defi
 
 ### Scope
 
-This specification covers the **Data Storage API** (nodes, data, properties) and the **Rendering API** (render window update and reinit). Future specifications will cover:
+This specification covers the **Data Storage API** (nodes, data, properties) and the **Rendering API** (render window update and fitting the views to data). Future specifications will cover:
 
 - Project Management API
 - Task/Async Operations API
@@ -1585,12 +1585,12 @@ Content-Type: application/json
 
 #### POST /api/v1/rendering/reinit
 
-Fit all render windows to the bounding box of all currently visible data (global reinit), or to the bounding geometry of one or more specific nodes when UIDs are supplied. Equivalent to clicking the global reinit button in the Workbench toolbar.
+Fit all render windows to the bounding box of all currently visible data, or to the bounding geometry of one or more specific nodes when UIDs are supplied. Equivalent to *Fit views to all data* (no body) and *Fit views to selection* (with UIDs) in the Data Manager context menu of the Workbench.
 
 Three operating modes:
-- **No body**: global reinit — fits all render windows to the bounding box of all visible data.
-- **`{"uids": ["node-001"]}`**: single-node reinit — fits render windows to that node's geometry.
-- **`{"uids": ["node-001", "node-002"]}`**: multi-node reinit — fits render windows to the combined bounding geometry of all listed nodes.
+- **No body**: fits all render windows to the bounding box of all visible data.
+- **`{"uids": ["node-001"]}`**: fits render windows to that node's geometry.
+- **`{"uids": ["node-001", "node-002"]}`**: fits render windows to the combined bounding geometry of all listed nodes.
 
 Every UID in the `uids` array must identify an existing node with data and a valid time geometry; the first failure returns an error.
 
@@ -1600,12 +1600,12 @@ Every UID in the `uids` array must identify an existing node with data and a val
 |-------|------|---------|-------------|
 | `uids` | array of string (minItems: 1) | (none) | When provided, fit views to the bounding geometry of the specified nodes |
 
-**Example (global reinit — fit all views to all visible data):**
+**Example (fit all views to all visible data):**
 ```http
 POST /api/v1/rendering/reinit
 ```
 
-**Example (single-node reinit — fit views to a specific node):**
+**Example (fit views to a specific node):**
 ```http
 POST /api/v1/rendering/reinit
 Content-Type: application/json
@@ -1613,7 +1613,7 @@ Content-Type: application/json
 {"uids": ["node-001"]}
 ```
 
-**Example (multi-node reinit — fit views to the combined bounding box of several nodes):**
+**Example (fit views to the combined bounding box of several nodes):**
 ```http
 POST /api/v1/rendering/reinit
 Content-Type: application/json
@@ -1636,7 +1636,7 @@ Content-Type: application/json
 
 #### GET /api/v1/rendering/selected-position
 
-Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) from the reinit geometry (TimeNavigationController input world time geometry).
+Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) of the geometry the views are currently fitted to (TimeNavigationController input world time geometry).
 
 Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise). If no input geometry is available, `bounds.min_position` and `bounds.max_position` are `null`.
 
@@ -2922,7 +2922,7 @@ All endpoints are relative to the base URL `/api/v1`.
 | `/datastorage/nodes/{uid}/properties` | ✓ Read | — | ✓ Replace all | ✓ Update | — |
 | `/datastorage/nodes/{uid}/properties/{name}` | ✓ Read | — | ✓ Set | — | ✓ Delete |
 | `/rendering/update` | — | ✓ Update | — | — | — |
-| `/rendering/reinit` | — | ✓ Reinit (global or node-scoped) | — | — | — |
+| `/rendering/reinit` | — | ✓ Fit views (all data or node-scoped) | — | — | — |
 | `/rendering/selected-position` | ✓ Read | — | ✓ Set | — | — |
 | `/rendering/selected-time` | ✓ Read | — | ✓ Set | — | — |
 | `/rendering/screenshot` | ✓ Active editor | — | — | — | — |

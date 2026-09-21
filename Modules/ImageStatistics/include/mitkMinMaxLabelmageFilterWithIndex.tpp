@@ -3,6 +3,7 @@
 
 #include <mitkMinMaxLabelmageFilterWithIndex.h>
 #include <limits>
+#include <utility>
 
 namespace itk
 {
@@ -25,104 +26,95 @@ void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::ThreadedGenera
                                       outputRegionForThread,
                                       ThreadIdType threadId)
 {
-  const SizeValueType size0 = outputRegionForThread.GetSize(0);
-  if( size0 == 0)
-    {
-    return;
-    }
-  PixelType value;
-  LabelPixelType label;
-
   ExtremaMapType threadExtrema;
-  ExtremaMapTypeIterator threadExtremaIt;
 
   ImageRegionConstIteratorWithIndex< TInputImage > it (this->GetInput(), outputRegionForThread);
   ImageRegionConstIteratorWithIndex< TLabelImage > labelit (this->GetLabelInput(), outputRegionForThread);
 
-  // do the work
-  while ( !it.IsAtEnd() )
+  for (; !it.IsAtEnd(); ++it, ++labelit)
   {
-    value = it.Get();
-    label = labelit.Get();
+    const PixelType value = it.Get();
 
-    threadExtremaIt = threadExtrema.find(label);
+    // The first pixel of a label seeds its extrema. Seeding with numeric limits
+    // instead would never accept a label whose pixels all equal that limit, which
+    // for unsigned types is an all-zero label.
+    auto [extremaIt, inserted] = threadExtrema.try_emplace(labelit.Get(), value, it.GetIndex());
 
-    // if label does not exist yet, create a new entry in the map.
-    if (threadExtremaIt == threadExtrema.end())
+    if (inserted)
     {
-      threadExtremaIt = threadExtrema.insert( MapValueType(label, LabelExtrema()) ).first;
+      continue;
     }
 
-    if (value < (*threadExtremaIt).second.m_Min)
+    LabelExtrema& extrema = extremaIt->second;
+
+    if (value < extrema.m_Min)
     {
-      (*threadExtremaIt).second.m_Min = value;
-      (*threadExtremaIt).second.m_MinIndex = it.GetIndex();
+      extrema.m_Min = value;
+      extrema.m_MinIndex = it.GetIndex();
     }
-    if (value > (*threadExtremaIt).second.m_Max)
+    if (value > extrema.m_Max)
     {
-      (*threadExtremaIt).second.m_Max = value;
-      (*threadExtremaIt).second.m_MaxIndex = it.GetIndex();
+      extrema.m_Max = value;
+      extrema.m_MaxIndex = it.GetIndex();
     }
-    ++it;
-    ++labelit;
   }
 
-  m_ThreadExtrema[threadId] = threadExtrema;
+  m_ThreadExtrema[threadId] = std::move(threadExtrema);
 }
 
 template< typename TInputImage, typename TLabelImage >
 void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::BeforeThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
-  m_ThreadExtrema.resize(numberOfThreads);
-
-  for (unsigned int i =0; i < numberOfThreads; i++)
-  {
-    m_ThreadExtrema[i] = ExtremaMapType();
-  }
+  m_ThreadExtrema.assign(this->GetNumberOfWorkUnits(), ExtremaMapType());
+  m_LabelExtrema.clear();
 }
 
 template< typename TInputImage, typename TLabelImage >
 void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::AfterThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
-
   m_GlobalMin = std::numeric_limits<PixelType>::max();
-  m_GlobalMax = std::numeric_limits<PixelType>::min();
+  m_GlobalMax = std::numeric_limits<PixelType>::lowest();
+  m_GlobalMinIndex.Fill(0);
+  m_GlobalMaxIndex.Fill(0);
 
-  ExtremaMapTypeIterator it;
+  // The first thread that saw a label seeds its merged extrema, so ties resolve
+  // to the lowest thread, i.e. the first pixel in scan order.
+  bool first = true;
 
-  for (ThreadIdType i = 0; i < numberOfThreads; i++)
+  for (const auto& threadExtrema : m_ThreadExtrema)
   {
-    for (auto&& it2 : m_ThreadExtrema[i])
+    for (const auto& [label, extrema] : threadExtrema)
     {
-      it = m_LabelExtrema.find(it2.first);
-      if (it == m_LabelExtrema.end())
-      {
-        it = m_LabelExtrema.insert( MapValueType(it2.first, LabelExtrema()) ).first;
-      }
+      auto [mergedIt, inserted] = m_LabelExtrema.try_emplace(label, extrema);
 
-      if (it2.second.m_Min < (*it).second.m_Min)
+      if (!inserted)
       {
-        (*it).second.m_Min = it2.second.m_Min;
-        (*it).second.m_MinIndex = it2.second.m_MinIndex;
-        if (it2.second.m_Min < m_GlobalMin)
+        LabelExtrema& merged = mergedIt->second;
+
+        if (extrema.m_Min < merged.m_Min)
         {
-          m_GlobalMin = it2.second.m_Min;
-          m_GlobalMinIndex = it2.second.m_MinIndex;
+          merged.m_Min = extrema.m_Min;
+          merged.m_MinIndex = extrema.m_MinIndex;
+        }
+        if (extrema.m_Max > merged.m_Max)
+        {
+          merged.m_Max = extrema.m_Max;
+          merged.m_MaxIndex = extrema.m_MaxIndex;
         }
       }
 
-      if (it2.second.m_Max > (*it).second.m_Max)
+      if (first || extrema.m_Min < m_GlobalMin)
       {
-        (*it).second.m_Max = it2.second.m_Max;
-        (*it).second.m_MaxIndex = it2.second.m_MaxIndex;
-        if (it2.second.m_Max > m_GlobalMax)
-        {
-          m_GlobalMax = it2.second.m_Max;
-          m_GlobalMaxIndex = it2.second.m_MaxIndex;
-        }
+        m_GlobalMin = extrema.m_Min;
+        m_GlobalMinIndex = extrema.m_MinIndex;
       }
+      if (first || extrema.m_Max > m_GlobalMax)
+      {
+        m_GlobalMax = extrema.m_Max;
+        m_GlobalMaxIndex = extrema.m_MaxIndex;
+      }
+
+      first = false;
     }
   }
 }

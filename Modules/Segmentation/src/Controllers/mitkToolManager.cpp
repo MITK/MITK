@@ -196,7 +196,15 @@ bool mitk::ToolManager::ActivateTool(int id)
   {
     return true;
   }
-  inActivateTool = true;
+
+  // Reset by the guard also when Tool::Activated() throws, otherwise every
+  // later activation would return early and no tool could be activated again.
+  struct ReentrancyGuard
+  {
+    bool& flag;
+    explicit ReentrancyGuard(bool& f) : flag(f) { flag = true; }
+    ~ReentrancyGuard() { flag = false; }
+  } guard(inActivateTool);
 
   while (nextTool != m_ActiveToolID)
   {
@@ -247,7 +255,6 @@ bool mitk::ToolManager::ActivateTool(int id)
     }
   }
 
-  inActivateTool = false;
   return (m_ActiveTool != nullptr);
 }
 

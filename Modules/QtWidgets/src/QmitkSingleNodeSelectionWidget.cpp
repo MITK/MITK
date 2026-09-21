@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 #include <QmitkNodeSelectionDialog.h>
 #include <QmitkNodeDetailsDialog.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QMouseEvent>
 
@@ -34,7 +34,7 @@ QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   m_Controls->btnSelect->setVisible(true);
   m_Controls->btnClear->setVisible(false);
 
-  m_Controls->btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+  m_Controls->btnClear->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/times.svg")));
 
   this->UpdateInfo();
 

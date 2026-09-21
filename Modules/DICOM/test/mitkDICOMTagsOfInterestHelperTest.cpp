@@ -281,6 +281,7 @@ public:
   void SOPTags()
   {
     RequireTopLevel(0x0008, 0x0018, "(0008,0018) SOPInstanceUID");
+    RequireTopLevel(0x0008, 0x0016, "(0008,0016) SOPClassUID");
     RequireTopLevel(0x0020, 0x0013, "(0020,0013) InstanceNumber");
     RequireTopLevel(0x0020, 0x1041, "(0020,1041) SliceLocation");
   }

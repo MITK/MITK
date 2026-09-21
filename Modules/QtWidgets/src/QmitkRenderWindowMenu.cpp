@@ -415,7 +415,7 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
   crosshairModesMenu->clear();
 
   QAction *resetViewAction = new QAction(crosshairModesMenu);
-  resetViewAction->setText("Reset view");
+  resetViewAction->setText("Fit views to all data");
   crosshairModesMenu->addAction(resetViewAction);
   connect(resetViewAction, &QAction::triggered, this, &QmitkRenderWindowMenu::ResetView);
 

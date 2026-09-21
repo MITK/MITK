@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QIcon>
 #include <QMessageBox>
@@ -100,7 +100,7 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
           QOverload<int>::of(&QComboBox::activated),
           [=, this](int index) { OnModelChanged(m_Controls->modelBox->itemText(index)); });
   QIcon refreshIcon =
-    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
+    QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls->fetchUrl->setIcon(refreshIcon);
   m_Controls->previewButton->setEnabled(false);
   Superclass::InitializeUI(mainLayout);

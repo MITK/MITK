@@ -192,6 +192,13 @@ namespace mitk
     /**
      * \brief Checks if a tool can handle the given reference data and optional working data.
      *
+     * The answer may depend on the current state of the data, not only on their
+     * types. For example, tools that operate on existing labels return false for
+     * a MultiLabelSegmentation without labels, while tools that only add their
+     * own result labels accept it. Since the state can change while the data
+     * objects stay the same, hosts re-evaluate on such changes (e.g. when labels
+     * are added or removed) and not only when the data objects are replaced.
+     *
      * \param[in] referenceData Pointer to the data that should be checked as valid reference for the tool.
      * \param[in] workingData Pointer to the data that should be checked as valid working data for this tool.
      *            This parameter can be null if no working data is specified so far.
@@ -220,6 +227,23 @@ namespace mitk
     /** Returns the data storage provided by the toolmanager. May be null (e.g. if
      ToolManager is not set).*/
     mitk::DataStorage* GetDataStorage() const;
+
+    /** \brief True if the image has exactly one scalar component per pixel.
+     *
+     * This is what the ITK access macros can process. RGB, RGBA and vector pixel
+     * types fail there, as do images that are typed as scalar but carry several
+     * components (e.g. imported from VTK).
+     */
+    static bool IsSingleComponentScalarImage(const Image* image);
+
+    /** \brief True if a 2D slice of the image reduces to one meaningful component.
+     *
+     * Single-component images qualify. Vector images qualify because the slice
+     * extraction picks the displayed component. Composite RGB and RGBA images do
+     * not, as they have no displayed component and their first component (red)
+     * does not represent what the user sees.
+     */
+    static bool HasSingleComponentSlices(const Image* image);
 
     void ConnectActionsAndFunctions() override;
 

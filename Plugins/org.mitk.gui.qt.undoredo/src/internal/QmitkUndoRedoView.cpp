@@ -13,7 +13,7 @@
 #include <QStandardItem>
 #include <QIcon>
 #include <QInputDialog>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <ui_QmitkUndoRedoView.h>
 
@@ -46,9 +46,12 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
     return;
   }
 
-  auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
-  m_Controls->undoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-undo.svg"));
-  m_Controls->redoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-redo.svg"));
+  const auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
+  m_UndoIcon = QmitkIconTheme::GetIcon(basePath + "edit-undo.svg");
+  m_RedoIcon = QmitkIconTheme::GetIcon(basePath + "edit-redo.svg");
+
+  m_Controls->undoButton->setIcon(m_UndoIcon);
+  m_Controls->redoButton->setIcon(m_RedoIcon);
 
   // Setup the model for the list view
   m_UndoRedoModel = new QStandardItemModel(this);
@@ -183,14 +186,12 @@ void QmitkUndoRedoView::UpdateUndoRedoList()
   currentPositionItem->setForeground(QBrush(m_Controls->undoRedoListView->palette().color(QPalette::Dark)));
   currentPositionItem->setFlags(Qt::ItemIsEnabled); // Make it non-selectable
 
-  auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
-
   // Add undo-able operations (in reverse order - most recent first)
   for (auto it = undoDescriptions.rbegin(); it != undoDescriptions.rend(); ++it)
   {
     const auto& [id, description] = *it;
     QStandardItem* item = new QStandardItem(QString::fromStdString("Undo: " + description));
-    item->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-undo.svg"));
+    item->setIcon(m_UndoIcon);
     m_UndoRedoModel->appendRow(item);
   }
 
@@ -201,7 +202,7 @@ void QmitkUndoRedoView::UpdateUndoRedoList()
   for (const auto& [id, description] : redoDescriptions)
   {
     QStandardItem* item = new QStandardItem(QString::fromStdString("Redo: " + description));
-    item->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-redo.svg"));
+    item->setIcon(m_RedoIcon);
     m_UndoRedoModel->appendRow(item);
   }
 }

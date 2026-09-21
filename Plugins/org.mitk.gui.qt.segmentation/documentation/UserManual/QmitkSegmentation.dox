@@ -71,7 +71,9 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 The Segmentation View has a few prerequisites regarding segmentations and their reference image:
 
 - Images must be two or three-dimensional and may be either static or dynamic, e.g., are time-resolved resp. have different pixel values for different time steps.
-- Images must be single-valued, i.e. CT, MRI or ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
+- Images should be single-valued, i.e. CT, MRI or ultrasound. Tools that evaluate image intensities (Threshold, UL Threshold, Otsu, GrowCut, Region Growing, Live Wire and the AI-based tools) are not available for color (RGB) or other multi-component images. Tools that only modify the segmentation (e.g. Add, Subtract, Paint, Wipe, Fill, Erase, Close, Lasso, Picking) work on any image.
+- GrowCut and the AI-based tools require a three-dimensional (static or dynamic) image and are not available for two-dimensional images.
+- Tools that are not available for the selected image and segmentation are greyed out, and their tooltip says so.
 - Segmentations must be congruent to their reference images, e.g., their voxel grids must match.
 
 \section org_mitk_views_segmentationdataselection Image selection and creating new segmentations

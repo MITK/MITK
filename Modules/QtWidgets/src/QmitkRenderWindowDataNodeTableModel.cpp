@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <QmitkEnums.h>
 #include <QmitkMimeTypes.h>
 #include <QmitkNodeDescriptorManager.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QIcon>
 #include <QIODevice>
@@ -32,10 +32,10 @@ QmitkRenderWindowDataNodeTableModel::QmitkRenderWindowDataNodeTableModel(QObject
 {
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
 
-  m_VisibleIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg"));
-  m_InvisibleIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg"));
-  m_ArrowIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg"));
-  m_TimesIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/times.svg"));
+  m_VisibleIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg"));
+  m_InvisibleIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/invisible.svg"));
+  m_ArrowIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg"));
+  m_TimesIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/times.svg"));
 }
 
 void QmitkRenderWindowDataNodeTableModel::UpdateModelData()

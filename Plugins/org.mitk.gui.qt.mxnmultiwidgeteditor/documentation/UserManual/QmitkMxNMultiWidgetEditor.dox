@@ -68,7 +68,7 @@
 
 	By moving the cursor to the upper right corner of any window you can activate the window menu. It consists of three buttons:
 	<ul>
-		<li> The crosshair button allows to toggle the crosshair and to reset the view.
+		<li> The crosshair button allows to toggle the crosshair and to fit the window to all visible data.
 		<li> The middle button expands the corresponding window to fullscreen.
 		<li> The right button allows you to choose between many different arrangements of the available windows.
 	</ul>

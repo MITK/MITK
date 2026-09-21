@@ -37,7 +37,7 @@ found in the LICENSE file.
 
 #include <QmitkMimeTypes.h>
 #include <QmitkRenderWindowMenu.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 namespace
 {
@@ -157,8 +157,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   m_GeometryViolationWarningOverlay->SetOverlayText(
     QStringLiteral("<font color=\"red\"><p style=\"text-align:center\">Interaction is not possible because the "
                    "render window geometry<br>does not match the interaction reference geometry.</p></center></font>"));
-  m_GeometryViolationWarningOverlay->SetButtonText("Reset geometry");
-  m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+  m_GeometryViolationWarningOverlay->SetButtonText("Align view to image");
+  m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg")));
 
   connect(m_GeometryViolationWarningOverlay, &QmitkButtonOverlayWidget::Clicked,
           this, &QmitkRenderWindow::ResetGeometry);

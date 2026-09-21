@@ -38,7 +38,7 @@ found in the LICENSE file.
 #include <berryIProduct.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryQtPreferences.h>
-#include <berryQtStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <berryWorkbenchPlugin.h>
 
 #include <internal/berryQtShowViewAction.h>
@@ -68,7 +68,6 @@ found in the LICENSE file.
 #include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkWorkbenchUtil.h>
-#include <vtkVersionMacros.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -334,7 +333,6 @@ QmitkFlowApplicationWorkbenchWindowAdvisor::QmitkFlowApplicationWorkbenchWindowA
   , lastInput(nullptr)
   , wbAdvisor(wbAdvisor)
   , showViewToolbar(true)
-  , showVersionInfo(true)
   , showMitkVersionInfo(true)
   , showMemoryIndicator(true)
   , dropTargetListener(new QmitkDefaultDropTargetListener)
@@ -372,11 +370,6 @@ bool QmitkFlowApplicationWorkbenchWindowAdvisor::GetShowMemoryIndicator()
 void QmitkFlowApplicationWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
   showViewToolbar = show;
-}
-
-void QmitkFlowApplicationWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
-{
-  showVersionInfo = show;
 }
 
 void QmitkFlowApplicationWorkbenchWindowAdvisor::ShowMitkVersionInfo(bool show)
@@ -441,9 +434,25 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
 
   fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-  fileSaveProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"));
+  fileSaveProjectAction->setIcon(QmitkIconTheme::GetIcon(basePath + "document-save.svg"));
 
-  auto   perspGroup = new QActionGroup(menuBar);
+  auto perspGroup = new QActionGroup(menuBar);
+
+  // Built before the menus: the Window menu only offers perspective
+  // handling when there is more than one perspective to choose from.
+  const auto perspectives = window->GetWorkbench()->GetPerspectiveRegistry()->GetPerspectives();
+
+  for (const auto& perspective : perspectives)
+  {
+    if (perspectiveExcludeList.contains(perspective->GetId()))
+      continue;
+
+    auto perspAction = new berry::QtOpenPerspectiveAction(window, perspective, perspGroup);
+    mapPerspIdToAction.insert(perspective->GetId(), perspAction);
+  }
+
+  hasMultiplePerspectives = perspGroup->actions().size() > 1;
+
   std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
 
   // sort elements (converting vector to map...)
@@ -499,19 +508,19 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   fileMenu->addSeparator();
 
   QAction* fileExitAction = new QmitkFileExitAction(window);
-  fileExitAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "system-log-out.svg"));
+  fileExitAction->setIcon(QmitkIconTheme::GetIcon(basePath + "system-log-out.svg"));
   fileExitAction->setShortcut(QKeySequence::Quit);
   fileExitAction->setObjectName("QmitkFileExitAction");
   fileMenu->addAction(fileExitAction);
 
   // another bad hack to get an edit/undo menu...
   QMenu* editMenu = menuBar->addMenu("&Edit");
-  undoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
+  undoAction = editMenu->addAction(QmitkIconTheme::GetIcon(basePath + "edit-undo.svg"),
     "&Undo",
     QKeySequence("CTRL+Z"),
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onUndo);
   undoAction->setToolTip("Undo the last action (not supported by all modules)");
-  redoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
+  redoAction = editMenu->addAction(QmitkIconTheme::GetIcon(basePath + "edit-redo.svg"),
     "&Redo",
     QKeySequence("CTRL+Y"),
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onRedo);
@@ -520,51 +529,17 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   // ==== Window Menu ==========================
   QMenu* windowMenu = menuBar->addMenu("Window");
 
-  QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
+  if (hasMultiplePerspectives)
+    windowMenu->addMenu("&Open Perspective")->addActions(perspGroup->actions());
 
   windowMenu->addSeparator();
-  resetPerspAction = windowMenu->addAction("&Reset Perspective",
+  resetPerspAction = windowMenu->addAction(hasMultiplePerspectives ? "&Reset Perspective" : "&Reset Layout",
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
 
   windowMenu->addSeparator();
   windowMenu->addAction("&Preferences...",
     QKeySequence("CTRL+P"),
     QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onEditPreferences);
-
-  // fill perspective menu
-  berry::IPerspectiveRegistry* perspRegistry =
-    window->GetWorkbench()->GetPerspectiveRegistry();
-
-  QList<berry::IPerspectiveDescriptor::Pointer> perspectives(
-    perspRegistry->GetPerspectives());
-
-  skip = false;
-  for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
-    perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
-  {
-    // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-    // should not appear as an menu-entry in the perspective menu
-    if (perspectiveExcludeList.size() > 0)
-    {
-      for (int i=0; i<perspectiveExcludeList.size(); i++)
-      {
-        if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-        {
-          skip = true;
-          break;
-        }
-      }
-      if (skip)
-      {
-        skip = false;
-        continue;
-      }
-    }
-
-    QAction* perspAction = new berry::QtOpenPerspectiveAction(window, *perspIt, perspGroup);
-    mapPerspIdToAction.insert((*perspIt)->GetId(), perspAction);
-  }
-  perspMenu->addActions(perspGroup->actions());
 
   // ===== Help menu ====================================
   QMenu* helpMenu = menuBar->addMenu("&Help");
@@ -586,7 +561,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 #endif
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
-  imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
+  imageNavigatorAction = new QAction(QmitkIconTheme::GetIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
   bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
 
   if (imageNavigatorViewFound)
@@ -828,17 +803,6 @@ QString QmitkFlowApplicationWorkbenchWindowAdvisor::ComputeTitle()
     title += " " + mitkVersionInfo;
   }
 
-  if (showVersionInfo)
-  {
-    // add version informatioin
-    QString versions = QString(" (ITK %1.%2.%3 | VTK %4.%5.%6 | Qt %7)")
-      .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
-      .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
-      .arg(QT_VERSION_STR);
-
-    title += versions;
-  }
-
   if (currentPage)
   {
     if (activeEditor)
@@ -847,12 +811,16 @@ QString QmitkFlowApplicationWorkbenchWindowAdvisor::ComputeTitle()
       if (!lastEditorTitle.isEmpty())
         title = lastEditorTitle + " - " + title;
     }
-    berry::IPerspectiveDescriptor::Pointer persp = currentPage->GetPerspective();
-    QString label = "";
-    if (persp)
+    QString label;
+
+    if (hasMultiplePerspectives)
     {
-      label = persp->GetLabel();
+      const berry::IPerspectiveDescriptor::Pointer persp = currentPage->GetPerspective();
+
+      if (persp.IsNotNull())
+        label = persp->GetLabel();
     }
+
     berry::IAdaptable* input = currentPage->GetInput();
     if (input && input != wbAdvisor->GetDefaultPageInput())
     {

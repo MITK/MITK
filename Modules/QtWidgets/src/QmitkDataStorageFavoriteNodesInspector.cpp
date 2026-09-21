@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 
 #include <QPushButton>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <ui_QmitkDataStorageListInspector.h>
 
@@ -27,7 +27,7 @@ QmitkDataStorageFavoriteNodesInspector::QmitkDataStorageFavoriteNodesInspector(Q
   auto favoriteNodesButton = new QPushButton(parent);
   QmitkDataStorageListInspector::m_Controls->verticalLayout->addWidget(favoriteNodesButton, 0, Qt::AlignRight);
 
-  favoriteNodesButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_remove.svg")));
+  favoriteNodesButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/favorite_remove.svg")));
   favoriteNodesButton->setIconSize(QSize(24, 24));
   favoriteNodesButton->setToolTip("Remove selected nodes as favorite");
 

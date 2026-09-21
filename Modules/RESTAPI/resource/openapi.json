@@ -46,7 +46,7 @@
     },
     {
       "name": "Rendering",
-      "description": "Render window update and reinit operations"
+      "description": "Render window update and view fitting operations"
     }
   ],
   "paths": {
@@ -2058,8 +2058,8 @@
         "tags": [
           "Rendering"
         ],
-        "summary": "Reinit -- fit all views to visible data or specific nodes",
-        "description": "Three operating modes: (1) No body -- global reinit, fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- single-node reinit, fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs -- multi-node reinit, fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
+        "summary": "Fit all views to visible data or specific nodes",
+        "description": "Three operating modes: (1) No body -- fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs -- fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to 'Fit views to all data' (no body) and 'Fit views to selection' (with UIDs) in the Data Manager context menu of the Workbench.",
         "operationId": "postRenderingReinit",
         "requestBody": {
           "required": false,
@@ -2072,24 +2072,24 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "minItems": 1,
-                    "description": "When provided, fit views to the bounding geometry of the specified nodes. Use one UID for single-node reinit, multiple UIDs for multi-node reinit. Every listed node must exist and have a usable geometry.",
+                    "description": "When provided, fit views to the bounding geometry of the specified nodes. Every listed node must exist and have a usable geometry.",
                     "example": ["node_1", "node_2"]
                   }
                 }
               },
               "examples": {
                 "global": {
-                  "summary": "Global reinit (no body)",
+                  "summary": "Fit views to all visible data (no body)",
                   "value": {}
                 },
                 "node-scoped": {
-                  "summary": "Single-node reinit",
+                  "summary": "Fit views to a single node",
                   "value": {
                     "uids": ["node_1"]
                   }
                 },
                 "multi-node-scoped": {
-                  "summary": "Multi-node reinit",
+                  "summary": "Fit views to multiple nodes",
                   "value": {
                     "uids": ["node_1", "node_2"]
                   }
@@ -2100,7 +2100,7 @@
         },
         "responses": {
           "204": {
-            "description": "Reinit performed successfully"
+            "description": "Views fitted successfully"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -2178,7 +2178,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get crosshair position and scene bounds",
-        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min_position and bounds.max_position are null. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
+        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB of the geometry the views are currently fitted to (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min_position and bounds.max_position are null. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
         "operationId": "getRenderingSelectedPosition",
         "responses": {
           "200": {

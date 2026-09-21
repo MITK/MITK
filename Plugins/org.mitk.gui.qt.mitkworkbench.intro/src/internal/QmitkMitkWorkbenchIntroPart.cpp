@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkMitkWorkbenchIntroPart.h"
 
-#include <berryIPerspectiveDescriptor.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
@@ -117,17 +116,6 @@ QmitkMitkWorkbenchIntroPart::~QmitkMitkWorkbenchIntroPart()
   auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, showIntro);
   workbenchPrefs->Flush();
-
-  // if workbench is not closing (Just welcome screen closing), open last used perspective
-  if (this->GetIntroSite()->GetPage()->GetPerspective()->GetId()
-    == "org.mitk.mitkworkbench.perspectives.editor" && !this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
-    {
-    berry::IPerspectiveDescriptor::Pointer perspective = this->GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->GetPerspectiveRegistry()->FindPerspectiveWithId("org.mitk.mitkworkbench.perspectives.editor");
-    if (perspective)
-    {
-      this->GetIntroSite()->GetPage()->SetPerspective(perspective);
-    }
-  }
 }
 
 void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)

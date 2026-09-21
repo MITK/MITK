@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkExtApplicationPlugin.h"
 #include "perspectives/QmitkExtDefaultPerspective.h"
-#include "perspectives/QmitkEditorPerspective.h"
-#include "perspectives/QmitkVisualizationPerspective.h"
 #include "QmitkExtApplication.h"
 
 #include <mitkVersion.h>
@@ -48,10 +46,7 @@ void QmitkExtApplicationPlugin::start(ctkPluginContext* context)
   this->context = context;
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtDefaultPerspective, context);
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorPerspective, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtApplication, context);
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkVisualizationPerspective, context);
-
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
   ctkConfigurationAdmin* configAdmin = nullptr;

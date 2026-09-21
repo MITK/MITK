@@ -11,6 +11,7 @@ set(MITK_MODULES
   CoreCmdApps
   CrashHandling
   AppUtil
+  SceneSerializationBase
   DataTypesExt
   Annotation
   AlgorithmsExt
@@ -18,7 +19,6 @@ set(MITK_MODULES
   DICOM
   DICOMQI
   DICOMTesting
-  SceneSerializationBase
   PlanarFigure
   ImageDenoising
   SceneSerialization
@@ -31,6 +31,7 @@ set(MITK_MODULES
   BoundingShape
   Segmentation
   QtHtml
+  QtIconTheme
   QtWidgets
   QtWidgetsExt
   ImageStatisticsUI

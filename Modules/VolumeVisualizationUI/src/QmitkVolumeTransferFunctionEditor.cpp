@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <QColor>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QEvent>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -467,6 +468,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetSelectedColorStop);
   connect(m_Controls->colorStopColorButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnPickColorStopColor);
+  connect(m_Controls->colorStopOffsetSpinBox, &QDoubleSpinBox::valueChanged,
+    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopOffset);
   connect(m_Controls->removeColorStopButton, &QToolButton::clicked,
     m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop);
   connect(m_Controls->addColorStopButton, &QToolButton::clicked,
@@ -1252,21 +1255,22 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
   const int count = canvas->GetColorStopCount();
   const int selected = canvas->GetSelectedColorStop();
 
-  // The list is also what asks for a selection, so filling it in from the canvas
-  // would come straight back as a request to change the canvas.
+  // Both of these are what ask for a change as well as what report one, so
+  // filling them in from the canvas would come straight back as a request to
+  // change the canvas.
   const QSignalBlocker stopBlocker(m_Controls->colorStopComboBox);
+  const QSignalBlocker offsetBlocker(m_Controls->colorStopOffsetSpinBox);
 
   // Rebuilt only when stops came or went: dragging one would otherwise empty and
-  // refill the list on every mouse move.
+  // refill the list on every mouse move. Entries carry a swatch and nothing
+  // else, and stand in the order the stops do, which is what says which marker
+  // each one is.
   if (m_Controls->colorStopComboBox->count() != count)
   {
     m_Controls->colorStopComboBox->clear();
 
-    // Numbered left to right rather than named by the grey value they sit at.
-    // The canvas carries no scale, so the value says nothing about which marker
-    // an entry is, which is the only thing the list is asked.
     for (int i = 0; i < count; ++i)
-      m_Controls->colorStopComboBox->addItem(QString::number(i + 1));
+      m_Controls->colorStopComboBox->addItem(QString());
   }
 
   for (int i = 0; i < count; ++i)
@@ -1278,6 +1282,7 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
 
   m_Controls->colorStopComboBox->setEnabled(count > 0);
   m_Controls->colorStopColorButton->setEnabled(hasSelection);
+  m_Controls->colorStopOffsetSpinBox->setEnabled(hasSelection);
   m_Controls->addColorStopButton->setEnabled(count > 0);
 
   // A gradient has to keep a colour to be a gradient at all.
@@ -1288,6 +1293,9 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
   m_Controls->colorStopColorButton->setStyleSheet(hasSelection
     ? "background-color:" + canvas->GetColorStopColor(selected).name()
     : QString());
+
+  m_Controls->colorStopOffsetSpinBox->setValue(
+    hasSelection ? canvas->GetSelectedColorStopOffset() : 0.0);
 }
 
 void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()

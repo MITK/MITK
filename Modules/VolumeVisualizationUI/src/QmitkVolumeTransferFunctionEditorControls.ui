@@ -277,18 +277,12 @@
          <item>
           <widget class="QLabel" name="colorStopLabel">
            <property name="text">
-            <string>Color Point</string>
+            <string>Color stops</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QComboBox" name="colorStopComboBox">
-           <property name="minimumSize">
-            <size>
-             <width>72</width>
-             <height>0</height>
-            </size>
-           </property>
            <property name="toolTip">
             <string>The colour stop the controls beside it act on.</string>
            </property>
@@ -299,9 +293,15 @@
          </item>
          <item>
           <widget class="QPushButton" name="colorStopColorButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
-             <width>96</width>
+             <width>72</width>
              <height>26</height>
             </size>
            </property>
@@ -310,6 +310,22 @@
            </property>
            <property name="text">
             <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="colorStopOffsetSpinBox">
+           <property name="toolTip">
+            <string>Where this stop sits in the value range, from 0 at its start to 1 at its end.</string>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>

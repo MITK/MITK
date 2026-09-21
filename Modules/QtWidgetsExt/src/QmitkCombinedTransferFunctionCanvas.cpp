@@ -37,11 +37,14 @@ namespace
 
   constexpr int ROOF_HEIGHT = 5;
   constexpr int MARKER_WIDTH = 15;
-  constexpr int MARKER_WIDTH_SELECTED = 17;
 
-  /** \brief Height of the wedge marking the selected stop at the top of the plot. */
-  constexpr int SELECTION_MARK_HEIGHT = 6;
-  constexpr int SELECTION_MARK_WIDTH = 9;
+  /** \brief The grey below which a stop's own colour is too dark for a black
+   *         dot to show on it.
+   */
+  constexpr int DARK_MARKER_GREY = 128;
+
+  /** \brief Opacity of the light ring just outside a marker's outline. */
+  constexpr int MARKER_HALO_ALPHA = 120;
 }
 
 QmitkCombinedTransferFunctionCanvas::QmitkCombinedTransferFunctionCanvas(QWidget *parent, Qt::WindowFlags f)
@@ -267,7 +270,7 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
 
   const int x = this->FunctionToCanvas(std::make_pair(this->GetColorStopValue(index), 0.0)).first;
 
-  const int halfWidth = (selected ? MARKER_WIDTH_SELECTED : MARKER_WIDTH) / 2;
+  const int halfWidth = MARKER_WIDTH / 2;
   const int apexY = contents.bottom() - ROOF_OVERLAP;
   const int eavesY = apexY + ROOF_HEIGHT;
   const int baseY = rail.bottom() - 1;
@@ -288,20 +291,16 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
   // and the outline alone is as thick.
   painter.setRenderHint(QPainter::Antialiasing);
 
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(color);
+  // A faint light ring laid down first, of which only the pixel outside the
+  // outline survives the fill and the outline drawn over it. Enough to lift a
+  // dark marker off a dark stretch of gradient without reading as part of the
+  // marker itself.
+  painter.setBrush(Qt::NoBrush);
+  painter.setPen(QPen(QColor(255, 255, 255, MARKER_HALO_ALPHA), 3));
   painter.drawPolygon(marker);
 
-  // A marker carries a colour of its own, and its roof stands against the
-  // gradient while its body stands against the panel, so an outline of any one
-  // colour is lost against some of them. A pale halo laid down first and a thin
-  // dark line drawn over it cannot be: whichever of the two the background
-  // swallows, the other stands against it. The dark line goes last so that it
-  // stays the width it was asked for rather than being half covered.
-  painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(Qt::white, 3));
-  painter.drawPolygon(marker);
-  painter.setPen(QPen(selected ? Qt::red : Qt::black, selected ? 2 : 1));
+  painter.setBrush(color);
+  painter.setPen(QPen(Qt::black, 1));
   painter.drawPolygon(marker);
 
   if (!selected)
@@ -309,20 +308,11 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
 
   // The dot sits on the stop's own colour, so which of black and white shows up
   // is the colour's to decide rather than something that can be fixed here.
+  // Weighted grey rather than HSL lightness, which calls a saturated orange dark
+  // and would put a white dot on it.
   painter.setPen(Qt::NoPen);
-  painter.setBrush(color.lightnessF() > 0.5 ? Qt::black : Qt::white);
-  painter.drawEllipse(QPointF(x, 0.5 * (eavesY + baseY)), 2.5, 2.5);
-
-  // A second mark at the top of the plot, where the eye is while the gradient is
-  // being read, rather than only down among the markers.
-  QPolygon selectionMark;
-  selectionMark << QPoint(x, contents.top() + SELECTION_MARK_HEIGHT)
-                << QPoint(x - SELECTION_MARK_WIDTH / 2, contents.top())
-                << QPoint(x + SELECTION_MARK_WIDTH / 2, contents.top());
-
-  painter.setPen(Qt::black);
-  painter.setBrush(Qt::white);
-  painter.drawPolygon(selectionMark);
+  painter.setBrush(qGray(color.rgb()) < DARK_MARKER_GREY ? Qt::white : Qt::black);
+  painter.drawEllipse(QPointF(x + 0.5, 0.5 * (eavesY + baseY)), 2.5, 2.5);
 }
 
 void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEvent)
@@ -587,6 +577,41 @@ void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopColor(const QColor
 
   emit PointsChanged();
   emit ColorStopsChanged();
+}
+
+double QmitkCombinedTransferFunctionCanvas::GetSelectedColorStopOffset() const
+{
+  const int index = this->GetSelectedColorStop();
+
+  if (index == -1 || m_Max <= m_Min)
+    return -1.0;
+
+  return (this->GetColorStopValue(index) - m_Min) / (m_Max - m_Min);
+}
+
+void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopOffset(double offset)
+{
+  const int index = this->GetSelectedColorStop();
+
+  if (index == -1 || m_Max <= m_Min)
+    return;
+
+  const double value = m_Min + std::clamp(offset, 0.0, 1.0) * (m_Max - m_Min);
+
+  // The bounds a drag observes: a stop cannot reach its neighbours, since two
+  // at one position are one stop as far as VTK is concerned. Refused rather
+  // than nudged, so that what the stop did and what the control asked for do
+  // not quietly differ.
+  const double lower = index > 0 ? this->GetColorStopValue(index - 1) : m_Min;
+  const double upper = index < this->GetColorStopCount() - 1 ? this->GetColorStopValue(index + 1) : m_Max;
+
+  if (value <= lower || value >= upper)
+    return;
+
+  this->MoveFunctionPoint(index, std::make_pair(value, 0.0));
+
+  this->update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 int QmitkCombinedTransferFunctionCanvas::AddColorStop(double value)

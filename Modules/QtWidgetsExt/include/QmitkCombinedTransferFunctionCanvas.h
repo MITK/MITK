@@ -107,6 +107,25 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     void SetSelectedColorStopColor(const QColor &color);
 
     /**
+     * \brief Where the selected stop sits in the displayed range, 0 at its
+     *        start and 1 at its end.
+     *
+     * A fraction rather than the value itself, because the canvas carries no
+     * scale for a value to be read against.
+     *
+     * \return The offset, or -1 where no stop is selected.
+     */
+    double GetSelectedColorStopOffset() const;
+
+    /**
+     * \brief Move the selected stop to a fraction of the displayed range.
+     *
+     * Clamped between its neighbours, as dragging it is, so that the two ways
+     * of moving a stop cannot disagree.
+     */
+    void SetSelectedColorStopOffset(double offset);
+
+    /**
      * \brief Add a stop, in the color the gradient already has at that value.
      * \return The index of the new stop, which is also left selected.
      */

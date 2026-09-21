@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkThreeDnTDICOMSeriesReader.h>
 #include <mitkITKDICOMSeriesReaderHelper.h>
 
+#include <algorithm>
+
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)
 :DICOMITKSeriesGDCMReader(decimalPlacesForOrientation)
@@ -117,6 +119,20 @@ mitk::ThreeDnTDICOMSeriesReader
 
   SortingBlockList remainingBlocks = resultOf3DGrouping;
 
+  // A file with a frame model must reach the base class unmerged: only there is
+  // it expanded into its frames and given its per-frame Pixel Value
+  // Transformation. Condensing it here would read it as one slice per file and
+  // silently drop every other frame.
+  const auto tagCache = this->GetTagCache();
+  const bool anyFrameModel = tagCache.IsNotNull() && tagCache->HasAnyFrameModel();
+  const auto blockHasFrameModel = [&](const DICOMDatasetAccessingImageFrameList& block)
+  {
+    return anyFrameModel
+        && std::any_of(block.cbegin(), block.cend(),
+                       [&](const DICOMDatasetAccessingImageFrameInfo::Pointer& frame)
+                       { return tagCache->GetFrameLayout(frame).HasFrameModel(); });
+  };
+
   SortingBlockList non3DnTBlocks;
   SortingBlockList true3DnTBlocks;
   std::vector<unsigned int> true3DnTBlocksTimeStepCount;
@@ -143,9 +159,11 @@ mitk::ThreeDnTDICOMSeriesReader
 
     remainingBlocks.erase( remainingBlocks.begin() );
 
+    const bool currentBlockHasFrameModel = blockHasFrameModel( firstBlock );
+
     // compare all other blocks against the first one
     for (auto otherBlockIter = remainingBlocks.begin();
-         otherBlockIter != remainingBlocks.cend();
+         otherBlockIter != remainingBlocks.cend() && !currentBlockHasFrameModel;
          /*++otherBlockIter*/) // <-- inside loop
     {
       // get block characteristics from first block
@@ -158,7 +176,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
-      if ( BlockShouldBeCondensed(m_OnlyCondenseSameSeries, currentBlockNumberOfSlices, otherBlockNumberOfSlices,
+      if ( !blockHasFrameModel(otherBlock)
+        && BlockShouldBeCondensed(m_OnlyCondenseSameSeries, currentBlockNumberOfSlices, otherBlockNumberOfSlices,
         currentBlockFirstOrigin, currentBlockLastOrigin,
         otherBlockFirstOrigin, otherBlockLastOrigin,
         currentBlockSeriesInstanceUID, otherBlockSeriesInstanceUID))

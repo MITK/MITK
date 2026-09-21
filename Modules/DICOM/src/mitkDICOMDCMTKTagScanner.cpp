@@ -15,8 +15,126 @@ found in the LICENSE file.
 
 #include <mitkFileSystem.h>
 
+#include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcpath.h>
+#include <dcmtk/dcmdata/dcsequen.h>
+
+#include <algorithm>
+#include <optional>
+#include <vector>
+
+namespace
+{
+  std::optional<mitk::DICOMFrameLayout::Rescale> ReadPixelValueTransformation(DcmItem& group)
+  {
+    DcmItem* transformation = nullptr;
+    if (group.findAndGetSequenceItem(DCM_PixelValueTransformationSequence, transformation, 0).bad()
+        || nullptr == transformation)
+    {
+      return std::nullopt;
+    }
+
+    mitk::DICOMFrameLayout::Rescale rescale;
+    Float64 value = 0.0;
+    if (transformation->findAndGetFloat64(DCM_RescaleSlope, value).good())
+    {
+      rescale.slope = value;
+    }
+    if (transformation->findAndGetFloat64(DCM_RescaleIntercept, value).good())
+    {
+      rescale.intercept = value;
+    }
+
+    return rescale;
+  }
+
+  mitk::DICOMFrameLayout ReadFrameLayout(DcmDataset& dataset,
+                                         const std::string& filename,
+                                         std::vector<mitk::DICOMFrameModelFinding>& warningsThisScan)
+  {
+    mitk::DICOMFrameLayout layout;
+
+    // Per-frame groups first, and almost nothing else when they are absent.
+    // DcmItem::search walks the whole top-level element list with no early break
+    // on tag order, so an absent tag costs a full walk and the number of lookups
+    // is what a single-frame input pays for this feature.
+    DcmSequenceOfItems* perFrame = nullptr;
+    const bool hasPerFrameGroups =
+      dataset.findAndGetSequence(DCM_PerFrameFunctionalGroupsSequence, perFrame).good() && nullptr != perFrame;
+
+    Sint32 frames = 1;
+    if (dataset.findAndGetSint32(DCM_NumberOfFrames, frames).good() && frames > 1)
+    {
+      layout.frameCount = static_cast<unsigned int>(frames);
+    }
+
+    if (!hasPerFrameGroups)
+    {
+      // Two walks and out. The frame count is still read because the diagnostics
+      // report names it for a plain multi-frame object.
+      return layout;
+    }
+
+    layout.perFrameItemCount = static_cast<unsigned int>(perFrame->card());
+    layout.perFrameRescale.assign(layout.perFrameItemCount, std::nullopt);
+    for (unsigned int k = 0; k < layout.perFrameItemCount; ++k)
+    {
+      if (DcmItem* item = perFrame->getItem(k))
+      {
+        layout.perFrameRescale[k] = ReadPixelValueTransformation(*item);
+      }
+    }
+
+    if (std::none_of(layout.perFrameRescale.cbegin(), layout.perFrameRescale.cend(),
+                     [](const auto& rescale) { return rescale.has_value(); }))
+    {
+      layout.perFrameRescale.clear();
+    }
+
+    // Reached only for a file that has per-frame groups, which is also the only
+    // file whose shared rescale anything reads.
+    DcmItem* shared = nullptr;
+    if (dataset.findAndGetSequenceItem(DCM_SharedFunctionalGroupsSequence, shared, 0).good() && nullptr != shared)
+    {
+      layout.sharedRescale = ReadPixelValueTransformation(*shared);
+    }
+
+    for (const auto& finding : mitk::CollectFrameModelFindings(layout, filename))
+    {
+      if (mitk::DICOMFrameModelSeverity::Warning == finding.severity)
+      {
+        warningsThisScan.push_back(finding);
+      }
+    }
+
+    return layout;
+  }
+
+  /** One line per distinct condition rather than one per file: a directory of
+      non-conformant files would otherwise produce an identical line per file. */
+  void ReportWarnings(const std::vector<mitk::DICOMFrameModelFinding>& warnings)
+  {
+    for (const auto issue : mitk::AllDICOMFrameModelIssues())
+    {
+      const auto first = std::find_if(warnings.cbegin(), warnings.cend(),
+                                      [issue](const auto& finding) { return finding.issue == issue; });
+      if (warnings.cend() == first)
+      {
+        continue;
+      }
+
+      const auto count = std::count_if(warnings.cbegin(), warnings.cend(),
+                                       [issue](const auto& finding) { return finding.issue == issue; });
+
+      MITK_WARN << mitk::DICOMFrameModelIssueToString(issue)
+                << " Frames: " << first->frameCount
+                << ", per-frame items: " << first->perFrameItemCount
+                << ". First file: " << first->files.front()
+                << (count > 1 ? " (and " + std::to_string(count - 1) + " more)" : "");
+    }
+  }
+}
 
 mitk::DICOMDCMTKTagScanner::DICOMDCMTKTagScanner()
 {
@@ -110,6 +228,7 @@ void mitk::DICOMDCMTKTagScanner::Scan()
     processor.setItemWildcardSupport(true);
 
     DICOMGenericTagCache::Pointer newCache = DICOMGenericTagCache::New();
+    std::vector<DICOMFrameModelFinding> warningsThisScan;
 
     for (const auto& fileName : this->m_InputFilenames)
     {
@@ -158,9 +277,14 @@ void mitk::DICOMDCMTKTagScanner::Scan()
             }
           }
         }
+        // Before AddFrameInfo, which reads the layout to maintain the
+        // cache-level frame-model flag.
+        info->SetFrameLayout(ReadFrameLayout(*dfile.getDataset(), fileName, warningsThisScan));
         newCache->AddFrameInfo(info);
       }
     }
+
+    ReportWarnings(warningsThisScan);
 
     m_Cache = newCache;
 

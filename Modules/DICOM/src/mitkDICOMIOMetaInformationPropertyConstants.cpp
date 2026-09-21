@@ -20,6 +20,11 @@ namespace mitk
     return PropertyKeyPath({ "MITK", "IO", "reader", "DICOM", "files" });
   }
 
+  PropertyKeyPath DICOMIOMetaInformationPropertyConstants::READER_FRAMES()
+  {
+    return PropertyKeyPath({ "MITK", "IO", "reader", "DICOM", "frames" });
+  }
+
   PropertyKeyPath DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "DICOM", "PixelSpacingInterpretationString" });

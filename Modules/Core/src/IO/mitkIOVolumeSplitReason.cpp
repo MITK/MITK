@@ -73,6 +73,10 @@ std::string mitk::IOVolumeSplitReason::TypeToString(ReasonType reasonType)
     return "value_split_difference";
   case ReasonType::MissingSlices:
     return "missing_slices";
+  case ReasonType::MultiFrameFileSeparated:
+    return "multi_frame_file_separated";
+  case ReasonType::FrameCountMismatch:
+    return "frame_count_mismatch";
   default: return "unknown";
   }
 }
@@ -93,6 +97,10 @@ mitk::IOVolumeSplitReason::ReasonType mitk::IOVolumeSplitReason::StringToType(co
     return ReasonType::ValueSplitDifference;
   else if (reasonStr == "missing_slices")
     return ReasonType::MissingSlices;
+  else if (reasonStr == "multi_frame_file_separated")
+    return ReasonType::MultiFrameFileSeparated;
+  else if (reasonStr == "frame_count_mismatch")
+    return ReasonType::FrameCountMismatch;
 
   return ReasonType::Unknown;
 }

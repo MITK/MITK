@@ -18,9 +18,12 @@ found in the LICENSE file.
 #include <mitkDICOMIOMetaInformationPropertyConstants.h>
 #include <mitkIOMetaInformationPropertyConstants.h>
 #include <gdcmUIDs.h>
-#include <vector>
 #include <gdcmVersion.h>
 #include <dcmtk/config/osconfig.h>
+
+#include <algorithm>
+#include <set>
+#include <vector>
 
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
@@ -475,6 +478,11 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
     return mitkImage;
 
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_FILES()), this->GetProperty("filenamesForSlices"));
+
+  if (auto* framesForSlices = this->GetProperty("framesForSlices"))
+  {
+    mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_FRAMES()), framesForSlices);
+  }
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING()),
     StringProperty::New(PixelSpacingInterpretationToString(this->GetPixelSpacingInterpretation())));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION()),
@@ -643,8 +651,15 @@ int mitk::DICOMImageBlockDescriptor::GetNumberOfFramesPerTimeStep() const
 {
   const int numberOfTimesteps = this->GetNumberOfTimeSteps();
   int numberOfFramesPerTimestep = this->m_ImageFrameList.size() / numberOfTimesteps;
+
+  // More than one time step is set only by
+  // ThreeDnTDICOMSeriesReader::Condense3DBlocks, which appends to a block only
+  // blocks whose slice count equals the first one's, so the division is exact
+  // for every block that reader produces. A frame-aware 3D+t decomposition
+  // would be the first thing to break that, and would have to replace this
+  // assert by a real check.
   assert(int(double((double)this->m_ImageFrameList.size() / (double)numberOfTimesteps))
-    == numberOfFramesPerTimestep); // this should hold
+    == numberOfFramesPerTimestep);
 
   return numberOfFramesPerTimestep;
 };
@@ -811,12 +826,34 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     StringLookupTable SOPInstanceUIDForSlices;
     StringLookupTable filenamesForSlices_deprecated;
     DICOMCachedValueLookupTable filenamesForSlices;
+    DICOMCachedValueLookupTable framesForSlices;
+
+    // Hoisted out of the slice loop on purpose: testing the layout per slice
+    // would cost one lookup per slice for a fact that is a property of the block.
+    // The cache-level flag in front keeps a classic series from walking its frame
+    // list for this at all.
+    const bool blockHasFrameModel =
+      tagCache->HasAnyFrameModel()
+      && std::any_of(m_ImageFrameList.cbegin(), m_ImageFrameList.cend(),
+                     [&](const DICOMImageFrameInfo::Pointer& frame)
+                     { return tagCache->GetFrameLayout(frame).HasFrameModel(); });
 
     const DICOMTag tagSliceLocation( 0x0020, 0x1041 );
     const DICOMTag tagInstanceNumber( 0x0020, 0x0013 );
     const DICOMTag tagSOPInstanceNumber( 0x0008, 0x0018 );
 
     std::unordered_map<std::string, DICOMCachedValueLookupTable> additionalTagResultList;
+    std::set<std::string> keysFilledFromFunctionalGroup;
+    std::set<std::string> reportedDuplicateKeys;
+    const auto WarnAboutDuplicate = [&reportedDuplicateKeys](const std::string& propKey,
+                                                             const std::string& file)
+    {
+      if (reportedDuplicateKeys.insert(propKey).second)
+      {
+        MITK_WARN << "Attribute " << propKey << " is present both at the top level and in a functional "
+                     "group of " << file << ". Using the frame's value.";
+      }
+    };
 
     unsigned int slice(0);
     int timePoint(-1);
@@ -843,6 +880,12 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
       filenamesForSlices_deprecated.SetTableValue( slice, filename );
       filenamesForSlices.SetTableValue(slice, { static_cast<unsigned int>(timePoint), zSlice, filename });
 
+      if (blockHasFrameModel)
+      {
+        framesForSlices.SetTableValue(slice, { static_cast<unsigned int>(timePoint), zSlice,
+                                               std::to_string((*frameIter)->FrameNo) });
+      }
+
       MITK_DEBUG << "Tag info for slice " << slice << ": SL '" << sliceLocation << "' IN '" << instanceNumber
                  << "' SOP instance UID '" << sopInstanceUID << "'";
 
@@ -853,9 +896,43 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
         {
           if (finding.isValid)
           {
-            std::string propKey = (tag.second.empty()) ? DICOMTagPathToPropertyName(finding.path) : tag.second;
-          DICOMCachedValueInfo info{ static_cast<unsigned int>(timePoint), zSlice, finding.value };
-            additionalTagResultList[propKey].SetTableValue(slice, info);
+            const std::string propKey = (tag.second.empty()) ? DICOMTagPathToPropertyName(finding.path) : tag.second;
+            const DICOMCachedValueInfo info{ static_cast<unsigned int>(timePoint), zSlice, finding.value };
+
+            if (!blockHasFrameModel)
+            {
+              additionalTagResultList[propKey].SetTableValue(slice, info);
+              continue;
+            }
+
+            // Two findings reach one key only when a file carries an attribute
+            // both at the top level and in a functional group whose
+            // frame-relative path is the same one. The frame is the more
+            // specific source, so it wins whichever of the two the tag map
+            // happens to yield first.
+            const bool fromFunctionalGroup = IsFunctionalGroupRooted(tag.first);
+            const bool keyHasFrameValue = keysFilledFromFunctionalGroup.cend()
+                                          != keysFilledFromFunctionalGroup.find(propKey);
+
+            if (fromFunctionalGroup)
+            {
+              if (!keyHasFrameValue
+                  && additionalTagResultList[propKey].GetLookupTable().find(slice)
+                       != additionalTagResultList[propKey].GetLookupTable().cend())
+              {
+                WarnAboutDuplicate(propKey, filename);
+              }
+              keysFilledFromFunctionalGroup.insert(propKey);
+              additionalTagResultList[propKey].SetTableValue(slice, info);
+            }
+            else if (keyHasFrameValue)
+            {
+              WarnAboutDuplicate(propKey, filename);
+            }
+            else
+            {
+              additionalTagResultList[propKey].SetTableValue(slice, info);
+            }
           }
         }
       }
@@ -874,6 +951,11 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
     thisInstance->SetProperty( "filenamesForSlices_deprecated", StringLookupTableProperty::New( filenamesForSlices_deprecated ) );
     thisInstance->SetProperty("filenamesForSlices", m_PropertyFunctor(filenamesForSlices));
+
+    if (blockHasFrameModel)
+    {
+      thisInstance->SetProperty("framesForSlices", m_PropertyFunctor(framesForSlices));
+    }
 
     //add properties for additional tags of interest
 

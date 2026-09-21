@@ -75,3 +75,27 @@ mitk::GetFirstDICOMValueAsString(const mitk::IPropertyProvider* provider, const 
   // an IPropertyProvider may carry, not only the DICOM reader's output.
   return baseProp->GetValueAsString();
 }
+
+std::string
+mitk::GetDICOMValueAtSlot(const mitk::IPropertyProvider* provider,
+                          const mitk::DICOMTagPath& path,
+                          mitk::TimeStepType t,
+                          mitk::SlicedData::IndexValueType z)
+{
+  const auto matches = GetPropertyByDICOMTagPath(provider, path);
+  if (matches.empty())
+  {
+    return {};
+  }
+
+  const auto& baseProp = matches.begin()->second;
+  const auto* dicomProp = dynamic_cast<const mitk::DICOMProperty*>(baseProp.GetPointer());
+  if (nullptr != dicomProp)
+  {
+    return dicomProp->GetValue(t, z, false, false);
+  }
+
+  // A uniform-value property has one value for the whole image, so every slot
+  // legitimately answers with it.
+  return baseProp->GetValueAsString();
+}

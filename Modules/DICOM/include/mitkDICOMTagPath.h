@@ -307,6 +307,26 @@ namespace mitk
   /** returns the correct property name for a given DICOMTagPath instance. */
   MITKDICOM_EXPORT std::string DICOMTagPathToPropertyName(const DICOMTagPath& tagPath);
 
+  /**
+   * \brief Whether the path is rooted in a functional-group sequence.
+   *
+   * True for a first node naming (5200,9229) Shared Functional Groups Sequence
+   * or (5200,9230) Per-Frame Functional Groups Sequence.
+   */
+  MITKDICOM_EXPORT bool IsFunctionalGroupRooted(const DICOMTagPath& tagPath);
+
+  /**
+   * \brief The path relative to the functional-group item.
+   *
+   * Drops the leading (5200,9229) or (5200,9230) node, so that the shared and
+   * the per-frame placement of one macro yield the same path; returns the path
+   * unchanged when it is not rooted in a functional-group sequence. This is the
+   * form under which the reader publishes a functional-group value, because
+   * whether the encoder put the macro in the shared or in the per-frame group
+   * is an encoding choice a consumer should not have to know.
+   */
+  MITKDICOM_EXPORT DICOMTagPath FunctionalGroupRelativePath(const DICOMTagPath& tagPath);
+
   /** Converts a DICOM tag path to a human-readable description.
    * This function uses DCMTK/GDCM dictionaries to resolve tag names.
    * For sequences, it shows the hierarchy with proper descriptions.

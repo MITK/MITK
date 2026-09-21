@@ -82,7 +82,7 @@ public:
 
   virtual void ResetCrosshair() override;
 
-  virtual void SetWidgetPlaneMode(int mode) override;
+  virtual void SetWidgetPlaneMode(QmitkCrosshairRotationMode mode) override;
 
 
   void AddPlanesToDataStorage();
@@ -146,7 +146,7 @@ Q_SIGNALS:
 
   void NotifyCrosshairVisibilityChanged(bool visible);
   void NotifyCrosshair3DVisibilityChanged(bool visible);
-  void NotifyCrosshairRotationModeChanged(int mode);
+  void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
 
   void WheelMoved(QWheelEvent *);
   void Moved();
@@ -154,7 +154,6 @@ Q_SIGNALS:
 private:
 
   virtual void SetLayoutImpl() override;
-  virtual void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidgets();
 

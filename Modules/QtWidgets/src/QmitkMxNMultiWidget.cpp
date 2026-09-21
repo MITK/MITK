@@ -440,28 +440,33 @@ void QmitkMxNMultiWidget::ResetCrosshair()
 
   mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetVtkRenderWindow(), dataStorage);
 
-  SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
+  // Resetting the rotation mode would switch to a MITK scheme, so PACS mode
+  // is left alone here.
+  if (!IsPACSScheme(GetInteractionScheme()))
+  {
+    SetWidgetPlaneMode(QmitkCrosshairRotationMode::None);
+  }
 }
 
-void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
+void QmitkMxNMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
 {
-  MITK_DEBUG << "Changing crosshair mode to " << userMode;
-
-  switch (userMode)
+  switch (mode)
   {
-    case 0:
+    case QmitkCrosshairRotationMode::None:
       SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
       break;
-    case 1:
+    case QmitkCrosshairRotationMode::Single:
       SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
       break;
-    case 2:
+    case QmitkCrosshairRotationMode::Coupled:
       SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
       break;
-    case 3:
+    case QmitkCrosshairRotationMode::Swivel:
       SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
       break;
   }
+
+  emit NotifyCrosshairRotationModeChanged(mode);
 }
 
 void QmitkMxNMultiWidget::EnableCrosshair()
@@ -669,6 +674,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
+  connect(this, &QmitkMxNMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   return renderWindowWidget;
 }

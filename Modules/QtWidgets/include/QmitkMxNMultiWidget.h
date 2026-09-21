@@ -98,7 +98,7 @@ public:
 
   void ResetCrosshair() override;
 
-  void SetWidgetPlaneMode(int userMode) override;
+  void SetWidgetPlaneMode(QmitkCrosshairRotationMode mode) override;
 
   mitk::SliceNavigationController* GetTimeNavigationController();
 
@@ -350,6 +350,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
+  void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
+
   void WheelMoved(QWheelEvent *);
   void Moved();
   void UpdateUtilityWidgetViewPlanes();
@@ -377,7 +379,6 @@ protected:
 private:
 
   void SetLayoutImpl() override;
-  void SetInteractionSchemeImpl() override { }
 
   /**
   * \brief Pre-mutation check that every window id in `doc` belongs to this

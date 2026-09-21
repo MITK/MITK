@@ -49,6 +49,10 @@ struct QmitkAbstractMultiWidget::Impl final
   {
     m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
     m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
+
+    // Apply the default scheme right away, so that the handler never runs
+    // without an event configuration.
+    mitk::InteractionSchemeSwitcher::New()->SetInteractionScheme(m_DisplayActionEventBroadcast.GetPointer(), m_InteractionScheme);
   }
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -73,6 +77,7 @@ struct QmitkAbstractMultiWidget::Impl final
 
   // interaction
   unsigned long m_RenderWindowFocusObserverTag;
+  mitk::InteractionSchemeSwitcher::InteractionScheme m_InteractionScheme;
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
   std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
   QmitkMultiWidgetLayoutManager* m_LayoutManager;
@@ -84,6 +89,7 @@ QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget, cons
   , m_MultiWidgetRows(0)
   , m_MultiWidgetColumns(0)
   , m_RenderWindowFocusObserverTag(0)
+  , m_InteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard)
   , m_DisplayActionEventBroadcast(nullptr)
   , m_DisplayActionEventHandler(nullptr)
   , m_LayoutManager(new QmitkMultiWidgetLayoutManager(multiWidget))
@@ -141,6 +147,9 @@ void QmitkAbstractMultiWidget::SetLayout(int row, int column)
 
 void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
+  // The configuration is applied even when the scheme is unchanged, because
+  // others temporarily replace it on the same event handler; a tool that
+  // blocks the left mouse button while it is active is the common case.
   auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
   auto interactionEventHandler = GetInteractionEventHandler();
   try
@@ -152,7 +161,35 @@ void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitc
     return;
   }
 
-  SetInteractionSchemeImpl();
+  if (scheme == m_Impl->m_InteractionScheme)
+  {
+    return;
+  }
+
+  m_Impl->m_InteractionScheme = scheme;
+
+  emit InteractionSchemeChanged(scheme);
+}
+
+mitk::InteractionSchemeSwitcher::InteractionScheme QmitkAbstractMultiWidget::GetInteractionScheme() const
+{
+  return m_Impl->m_InteractionScheme;
+}
+
+bool QmitkAbstractMultiWidget::IsPACSScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+{
+  switch (scheme)
+  {
+    case mitk::InteractionSchemeSwitcher::PACSBase:
+    case mitk::InteractionSchemeSwitcher::PACSStandard:
+    case mitk::InteractionSchemeSwitcher::PACSLevelWindow:
+    case mitk::InteractionSchemeSwitcher::PACSPan:
+    case mitk::InteractionSchemeSwitcher::PACSScroll:
+    case mitk::InteractionSchemeSwitcher::PACSZoom:
+      return true;
+    default:
+      return false;
+  }
 }
 
 mitk::InteractionEventHandler* QmitkAbstractMultiWidget::GetInteractionEventHandler()

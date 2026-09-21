@@ -12,23 +12,23 @@ found in the LICENSE file.
 
 #include <QmitkInteractionSchemeToolBar.h>
 
+#include <QmitkIconTheme.h>
+
+#include <QAction>
 #include <QActionGroup>
 
 QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* = nullptr*/)
   : QToolBar(parent)
   , m_ActionGroup(new QActionGroup(this))
-  , m_InteractionEventHandler(nullptr)
 {
   QToolBar::setOrientation(Qt::Vertical);
-  QToolBar::setIconSize(QSize(17, 17));
-  QToolBar::setFixedWidth(33);
   m_ActionGroup->setExclusive(false); // allow having no action selected
 
-  AddButton(InteractionScheme::PACSStandard, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true);
-  AddButton(InteractionScheme::PACSLevelWindow, tr("Level/Window"), QIcon(":/Qmitk/mm_contrast.png"));
-  AddButton(InteractionScheme::PACSPan, tr("Pan"), QIcon(":/Qmitk/mm_pan.png"));
-  AddButton(InteractionScheme::PACSScroll, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png"));
-  AddButton(InteractionScheme::PACSZoom, tr("Zoom"), QIcon(":/Qmitk/mm_zoom.png"));
+  AddButton(InteractionScheme::PACSStandard, tr("Pointer"), QStringLiteral(":/Qmitk/mm_pointer.svg"));
+  AddButton(InteractionScheme::PACSLevelWindow, tr("Level/Window"), QStringLiteral(":/Qmitk/mm_contrast.svg"));
+  AddButton(InteractionScheme::PACSPan, tr("Pan"), QStringLiteral(":/Qmitk/mm_pan.svg"));
+  AddButton(InteractionScheme::PACSScroll, tr("Scroll"), QStringLiteral(":/Qmitk/mm_scroll.svg"));
+  AddButton(InteractionScheme::PACSZoom, tr("Zoom"), QStringLiteral(":/Qmitk/mm_zoom.svg"));
 }
 
 QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
@@ -36,55 +36,45 @@ QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
   // nothing here
 }
 
-void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::InteractionEventHandler::Pointer interactionEventHandler)
+void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionScheme, const QString& toolName, const QString& iconResource)
 {
-  if (interactionEventHandler == m_InteractionEventHandler)
+  auto* action = new QAction(QmitkIconTheme::GetIcon(iconResource), toolName, this);
+  action->setCheckable(true);
+  action->setActionGroup(m_ActionGroup);
+  action->setData(interactionScheme);
+  connect(action, &QAction::triggered, this, &QmitkInteractionSchemeToolBar::OnActionTriggered);
+  QToolBar::addAction(action);
+}
+
+void QmitkInteractionSchemeToolBar::OnActionTriggered()
+{
+  auto* action = qobject_cast<QAction*>(sender());
+  if (nullptr == action)
   {
     return;
   }
 
-  m_InteractionEventHandler = interactionEventHandler;
-}
-
-void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionScheme, const QString& toolName, const QIcon& icon, bool on)
-{
-  QAction* action = new QAction(icon, toolName, this);
-  action->setCheckable(true);
-  action->setActionGroup(m_ActionGroup);
-  action->setChecked(on);
-  action->setData(interactionScheme);
-  connect(action, &QAction::triggered, this, &QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged);
-  QToolBar::addAction(action);
-}
-
-void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
-{
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (nullptr != action)
+  for (auto* otherAction : m_ActionGroup->actions())
   {
-    for (auto actionIter : m_ActionGroup->actions())
+    if (otherAction != action)
     {
-      if (actionIter != action)
-      {
-        actionIter->setChecked(false);
-      }
+      otherAction->setChecked(false);
     }
+  }
 
-    InteractionScheme interactionScheme = static_cast<InteractionScheme>(action->data().toInt());
-    // If the selected option is unchecked, use the base interaction with no primary tool
-    if (!action->isChecked())
-    {
-      interactionScheme = InteractionScheme::PACSBase;
-    }
+  // Unchecking the active tool falls back to the base scheme, where the left
+  // mouse button has no effect at all.
+  const auto interactionScheme = action->isChecked()
+    ? static_cast<InteractionScheme>(action->data().toInt())
+    : InteractionScheme::PACSBase;
 
-    auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
-    try
-    {
-      interactionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
-    }
-    catch (const mitk::Exception &)
-    {
-      return;
-    }
+  emit InteractionSchemeChanged(interactionScheme);
+}
+
+void QmitkInteractionSchemeToolBar::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme interactionScheme)
+{
+  for (auto* action : m_ActionGroup->actions())
+  {
+    action->setChecked(static_cast<InteractionScheme>(action->data().toInt()) == interactionScheme);
   }
 }

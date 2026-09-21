@@ -37,6 +37,11 @@ found in the LICENSE file.
 
 const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
+namespace
+{
+  const std::string PACS_INTERACTION_PREFERENCE = "PACS like mouse interaction";
+}
+
 struct QmitkStdMultiWidgetEditor::Impl final
 {
   Impl();
@@ -170,16 +175,18 @@ void QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSche
     return;
   }
 
-  if (mitk::InteractionSchemeSwitcher::PACSStandard == scheme)
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(true);
-  }
-  else
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
-  }
-
   QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
+
+  // Read back what was actually applied. The multi widget also changes the
+  // scheme on its own, for example when a crosshair rotation mode is picked,
+  // and this slot is what keeps the toolbar from claiming otherwise.
+  const auto appliedScheme = multiWidget->GetInteractionScheme();
+
+  if (nullptr != m_Impl->m_InteractionSchemeToolBar)
+  {
+    m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(appliedScheme));
+    m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(appliedScheme);
+  }
 }
 
 void QmitkStdMultiWidgetEditor::ShowLevelWindowWidget(bool show)
@@ -203,22 +210,30 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
   auto* preferences = this->GetPreferences();
 
+  // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves (in PACS mode)
+  if (nullptr == m_Impl->m_InteractionSchemeToolBar)
+  {
+    m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
+    // Matches the MITK scheme a fresh multi widget starts with. The preferences
+    // below show the toolbar again if PACS mode is on.
+    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
+    layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
+
+    connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
+      this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged);
+  }
+
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
     multiWidget = new QmitkStdMultiWidget(parent);
 
-    // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves (in PACS mode)
-    if (nullptr == m_Impl->m_InteractionSchemeToolBar)
-    {
-      m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
-      layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
-    }
-    m_Impl->m_InteractionSchemeToolBar->SetInteractionEventHandler(multiWidget->GetInteractionEventHandler());
-
     multiWidget->SetDataStorage(GetDataStorage());
     multiWidget->InitializeMultiWidget();
     SetMultiWidget(multiWidget);
+
+    connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
+      this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged);
   }
 
   layout->addWidget(multiWidget);
@@ -271,11 +286,16 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);
 
-  // mouse modes switcher toolbar
-  bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
-  OnInteractionSchemeChanged(PACSInteractionScheme ?
-    mitk::InteractionSchemeSwitcher::PACSStandard :
-    mitk::InteractionSchemeSwitcher::MITKStandard);
+  // Only a change of the preference itself overrides the interaction scheme,
+  // so that the PACS tool or crosshair rotation mode the user picked survives
+  // unrelated preference edits.
+  const bool pacsInteractionScheme = preferences->GetBool(PACS_INTERACTION_PREFERENCE, false);
+  if (pacsInteractionScheme != QmitkAbstractMultiWidget::IsPACSScheme(multiWidget->GetInteractionScheme()))
+  {
+    OnInteractionSchemeChanged(pacsInteractionScheme ?
+      mitk::InteractionSchemeSwitcher::PACSStandard :
+      mitk::InteractionSchemeSwitcher::MITKStandard);
+  }
 
   // level window setting
   bool showLevelWindowWidget = preferences->GetBool("Show level/window widget", true);

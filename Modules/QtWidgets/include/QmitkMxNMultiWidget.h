@@ -42,6 +42,9 @@ found in the LICENSE file.
 #include <vector>
 
 class QmitkRenderWindowProximity;
+class QDialog;
+class QLabel;
+class QProgressBar;
 class QSplitter;
 class QTimer;
 
@@ -615,6 +618,24 @@ public:
   *        visible cell - the same source 'SerializeLayout' reports.
   */
   std::vector<std::pair<QString, QRectF>> GetNormalizedCellRects() const;
+
+  /**
+  * \brief Raise a modal "loading layout" dialog, or take it down.
+  *
+  *   A dialog rather than an overlay widget, deliberately. The editor's cells
+  *   are 'QVTKOpenGLNativeWidget's, and a raster widget stacked above nested
+  *   render-to-texture widgets is not composited on top of them - an overlay
+  *   covering the editor is painted and simply never seen. A dialog is a window
+  *   of its own, with no compositing relationship to the editor's cells.
+  *
+  *   The caller must raise it, return to the event loop once so it is presented,
+  *   and only then apply the layout: 'ApplyLayout' blocks the UI thread, and a
+  *   thread that pumps no messages gets nothing composited, so anything raised
+  *   after the rebuild starts stays invisible until it ends. Nothing is shown
+  *   for a hidden editor.
+  */
+  void ShowLayoutLoadFeedback();
+  void HideLayoutLoadFeedback();
 
   /**
   * \brief Ask the hosting layer for the layout editor (emits
@@ -1410,6 +1431,27 @@ private:
   *   its first write.
   */
   std::map<QString, QColor> m_CellBorderColors;
+
+  /** \brief The "loading layout" dialog and its two contents, null whenever
+   *         none is up, and the cell count its bar is scaled against.
+   *
+   *   Deliberately a plain dialog rather than a QProgressDialog: that one owns
+   *   the decision of when to make itself visible, through an internal
+   *   estimation timer that 'setValue' restarts, and the whole difficulty here
+   *   has been getting something on screen before the UI thread stops
+   *   answering. This one shows when it is told to.
+   */
+  QPointer<QDialog> m_LoadDialog;
+  QPointer<QLabel> m_LoadLabel;
+  QPointer<QProgressBar> m_LoadBar;
+  int m_LoadCellTarget = 0;
+  int m_LoadCellsDone = 0;
+
+  /** \brief Move the load dialog's bar to 'percent' under 'label'. */
+  void StepLayoutLoadFeedback(int percent, const QString& label);
+
+  /** \brief Account for one more cell built, and caption it. */
+  void TickLayoutLoadFeedbackCell();
 
 };
 

@@ -21,6 +21,9 @@ found in the LICENSE file.
 
 #include <QCheckBox>
 #include <QMessageBox>
+#include <QTimer>
+
+#include <memory>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
@@ -127,10 +130,38 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::LoadLayout,
     m_LayoutEditorWidget, [this, multiWidget](const nlohmann::json* jsonData)
     {
-      if (this->ConfirmDestructiveLayoutChange())
+      if (!this->ConfirmDestructiveLayoutChange())
       {
-        multiWidget->LoadLayout(jsonData);
+        return;
       }
+
+      // Applying blocks the UI thread for a second or more on a large document,
+      // and a window whose thread pumps no messages is not composited - so an
+      // overlay raised and painted inside the apply never reaches the screen.
+      // Raise it here, let this handler return so the event loop presents it,
+      // and apply from a short timer.
+      //
+      // The document must be copied: 'jsonData' points at a local in the
+      // emitter and dies with this emit. The sender's try/catch frame dies with
+      // it too, so failures are reported here instead.
+      multiWidget->ShowLayoutLoadFeedback();
+      auto document = std::make_shared<nlohmann::json>(*jsonData);
+
+      // One display frame is ~16 ms; this leaves the compositor room to present
+      // the overlay before the thread stops answering.
+      QTimer::singleShot(50, multiWidget, [this, multiWidget, document]()
+      {
+        try
+        {
+          multiWidget->ApplyLayout(*document);
+        }
+        catch (const std::exception& e)
+        {
+          QMessageBox::warning(m_LayoutEditorWidget, tr("Layout load failed"),
+                               QString::fromUtf8(e.what()));
+        }
+        multiWidget->HideLayoutLoadFeedback();
+      });
     }));
 }
 

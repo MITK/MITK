@@ -39,11 +39,19 @@ found in the LICENSE file.
 
 // qt
 #include <QBoxLayout>
+#include <QCoreApplication>
+#include <QDialog>
+#include <QElapsedTimer>
+#include <QEventLoop>
 #include <QGridLayout>
+#include <QLabel>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QRegularExpression>
 #include <QSplitter>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QWindow>
 
 #include <algorithm>
 #include <functional>
@@ -53,6 +61,11 @@ found in the LICENSE file.
 
 namespace
 {
+  // Where per-cell construction sits on the load dialog's bar; the ends leave
+  // room for the teardown before it and the group wiring after.
+  constexpr int LoadPercentCellsBegin = 15;
+  constexpr int LoadPercentCellsEnd = 80;
+
   // The no-underscore rule on the editor-name segment is what makes the
   // first-`__` split into editor-name and bare-id unambiguous.
   const QRegularExpression EDITOR_NAME_PATTERN(QStringLiteral("^[A-Za-z][A-Za-z0-9.-]*$"));
@@ -964,6 +977,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // A new widget starts with no stylesheet, so any colour remembered for this
   // id belongs to a cell that no longer exists.
   m_CellBorderColors.erase(id);
+  this->TickLayoutLoadFeedbackCell();
 
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
   // The cell's plane label is drawn by the Qt overlay in the same layer as the
@@ -2445,6 +2459,9 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // / GetColumnCount() return 0 to signal callers that the cell set must
     // be enumerated through the cell map. The rollback path also re-runs
     // SetLayout(1, 1), which restores both fields to (1, 1).
+    m_LoadCellTarget = static_cast<int>(seedingOrder.size());
+    m_LoadCellsDone = 0;
+    this->StepLayoutLoadFeedback(2, tr("Closing the previous layout"));
     this->ResetGridState();
     this->TearDownAllCells();
     m_LayoutName = stashedName;
@@ -2490,10 +2507,12 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
 
     // ----- Construct the new cell tree -----
+    this->StepLayoutLoadFeedback(LoadPercentCellsBegin, tr("Creating windows"));
     auto* rootSplitter = this->BuildSplitterFromJson(doc.at("root"), nameToInt, /*parent=*/nullptr);
     auto* hBoxLayout = new QHBoxLayout(this);
     this->setLayout(hBoxLayout);
     hBoxLayout->addWidget(rootSplitter);
+    this->StepLayoutLoadFeedback(LoadPercentCellsEnd, tr("Linking synchronization groups"));
 
     // ----- Group seeding pass + divergence detection -----
     // Make the seed cell of each group authoritative for the group's runtime
@@ -2516,6 +2535,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
         this->SetSyncLink(QString::fromStdString(windowId), spec.dimension, spec.group, spec.offset);
       }
     }
+    this->StepLayoutLoadFeedback(92, tr("Preparing the views"));
     this->RefreshSyncControls();
 
     // Point at the first cell so downstream code that dereferences
@@ -3675,6 +3695,119 @@ bool QmitkMxNMultiWidget::IsNavigatorExpanded() const
 void QmitkMxNMultiWidget::RequestLayoutEditor()
 {
   emit LayoutEditorRequested();
+}
+
+void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
+{
+  if (!this->isVisible() || !m_LoadDialog.isNull())
+  {
+    return;
+  }
+
+  auto* dialog = new QDialog(this);
+  dialog->setWindowTitle(tr("Loading layout"));
+  // Modal so that whatever the pumping below delivers cannot reach the editor
+  // while its cell tree is half rebuilt.
+  dialog->setWindowModality(Qt::ApplicationModal);
+
+  auto* label = new QLabel(tr("Reading the layout..."), dialog);
+  auto* bar = new QProgressBar(dialog);
+  bar->setRange(0, 100);
+  bar->setValue(0);
+  bar->setTextVisible(false);
+
+  auto* dialogLayout = new QVBoxLayout(dialog);
+  dialogLayout->addWidget(label);
+  dialogLayout->addWidget(bar);
+  dialog->setFixedWidth(360);
+  dialog->show();
+
+  // The caller blocks the UI thread immediately after this, and a window the
+  // platform has not exposed yet is never presented - Qt paints it into a
+  // surface nobody is showing. The first dialog of a session is the slow one
+  // (window creation plus the stylesheet cascade); a later one is instant
+  // because the first already paid for it. Waiting for the exposure here rather
+  // than trusting a fixed delay is what makes the first load behave like the
+  // rest. Safe at this point: the editor has not been touched yet, so nothing
+  // delivered can reach a half-rebuilt cell tree, and user input stays out.
+  QElapsedTimer exposeClock;
+  exposeClock.start();
+  while (exposeClock.elapsed() < 1000)
+  {
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 10);
+    auto* handle = dialog->windowHandle();
+    if (nullptr != handle && handle->isExposed())
+    {
+      break;
+    }
+  }
+
+  m_LoadDialog = dialog;
+  m_LoadLabel = label;
+  m_LoadBar = bar;
+}
+
+void QmitkMxNMultiWidget::StepLayoutLoadFeedback(int percent, const QString& label)
+{
+  if (m_LoadDialog.isNull())
+  {
+    return;
+  }
+
+  if (!m_LoadLabel.isNull())
+  {
+    m_LoadLabel->setText(label);
+  }
+  if (!m_LoadBar.isNull())
+  {
+    m_LoadBar->setValue(percent);
+  }
+
+  // The rebuild holds the UI thread, and a thread that pumps no messages gets
+  // nothing composited - so without this the bar would not move at all. User
+  // input stays excluded, and the dialog is modal, so nothing delivered here
+  // reaches the editor.
+  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+}
+
+void QmitkMxNMultiWidget::TickLayoutLoadFeedbackCell()
+{
+  if (m_LoadDialog.isNull() || m_LoadCellTarget <= 0)
+  {
+    return;
+  }
+
+  ++m_LoadCellsDone;
+  // Cell construction dominates a load, so it owns the middle of the bar.
+  const int span = LoadPercentCellsEnd - LoadPercentCellsBegin;
+  this->StepLayoutLoadFeedback(
+    LoadPercentCellsBegin + span * (m_LoadCellsDone - 1) / m_LoadCellTarget,
+    tr("Creating window %1 of %2").arg(m_LoadCellsDone).arg(m_LoadCellTarget));
+}
+
+void QmitkMxNMultiWidget::HideLayoutLoadFeedback()
+{
+  m_LoadCellTarget = 0;
+  m_LoadCellsDone = 0;
+  if (m_LoadDialog.isNull())
+  {
+    return;
+  }
+
+  auto* dialog = m_LoadDialog.data();
+  m_LoadDialog = nullptr;
+  m_LoadLabel = nullptr;
+  m_LoadBar = nullptr;
+
+  // Not now: applying a layout leaves the realization of the new windows and
+  // their first render to the event loop, and that tail is as long as the
+  // blocking part. Closing when the apply returns uncovers a still-frozen
+  // editor for the rest of it.
+  QTimer::singleShot(0, dialog, [dialog]()
+  {
+    dialog->close();
+    dialog->deleteLater();
+  });
 }
 
 namespace

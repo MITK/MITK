@@ -22,6 +22,7 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 
+#include <algorithm>
 #include <functional>
 
 namespace
@@ -42,6 +43,16 @@ namespace
 
     if (nullptr != nameProperty)
       observers.emplace_back(nameProperty, itk::ModifiedEvent(), handler);
+  }
+
+  /** Appends the label values of all label rows below item in depth-first (tree) order. */
+  void CollectLabelValues(QmitkImageStatisticsTreeItem* item, std::vector<mitk::ImageStatisticsContainer::LabelValueType>& values)
+  {
+    if (const auto label = item->GetLabelInstance(); label.IsNotNull())
+      values.push_back(label->GetValue());
+
+    for (int row = 0; row < item->childCount(); ++row)
+      CollectLabelValues(item->child(row), values);
   }
 }
 
@@ -121,7 +132,83 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
       }
     }
   }
+  else if (role == Qt::CheckStateRole && this->IsCheckable(index))
+  {
+    const bool checked = this->IsLabelChecked(item->GetLabelInstance()->GetValue());
+    return static_cast<int>(checked ? Qt::Checked : Qt::Unchecked);
+  }
+  else if (role == Qt::ToolTipRole && this->IsCheckable(index))
+  {
+    return QStringLiteral("Show the histogram of this label");
+  }
   return QVariant();
+}
+
+bool QmitkImageStatisticsTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+  if (role != Qt::CheckStateRole || !this->IsCheckable(index) || !m_CheckedLabelValues.has_value())
+    return false;
+
+  const auto* item = static_cast<const QmitkImageStatisticsTreeItem*>(index.internalPointer());
+  const auto labelValue = item->GetLabelInstance()->GetValue();
+  const bool checked = value.toInt() == Qt::Checked;
+
+  if (checked == this->IsLabelChecked(labelValue))
+    return false;
+
+  if (checked)
+    m_CheckedLabelValues->insert(labelValue);
+  else
+    m_CheckedLabelValues->erase(labelValue);
+
+  emit dataChanged(index, index, { Qt::CheckStateRole });
+  emit labelCheckStateChanged();
+
+  return true;
+}
+
+bool QmitkImageStatisticsTreeModel::IsLabelChecked(mitk::ImageStatisticsContainer::LabelValueType labelValue) const
+{
+  return m_LabelRowValues.size() <= 1 || !m_CheckedLabelValues.has_value() || m_CheckedLabelValues->contains(labelValue);
+}
+
+void QmitkImageStatisticsTreeModel::ReconcileCheckedLabels()
+{
+  if (m_LabelRowValues.empty())
+    return;
+
+  if (m_CheckedLabelValues.has_value())
+  {
+    std::erase_if(*m_CheckedLabelValues, [this](const auto labelValue)
+    {
+      return std::find(m_LabelRowValues.begin(), m_LabelRowValues.end(), labelValue) == m_LabelRowValues.end();
+    });
+  }
+
+  if (!m_CheckedLabelValues.has_value() || m_CheckedLabelValues->empty())
+    m_CheckedLabelValues.emplace().insert(m_LabelRowValues.front());
+}
+
+void QmitkImageStatisticsTreeModel::SetLabelsCheckable(bool checkable)
+{
+  if (m_LabelsCheckable == checkable)
+    return;
+
+  // A reset rather than dataChanged() per label row: the rows live at varying depths
+  // (group rows are optional), and every other setter of this model resets as well.
+  emit beginResetModel();
+  m_LabelsCheckable = checkable;
+  emit endResetModel();
+  emit modelChanged();
+}
+
+bool QmitkImageStatisticsTreeModel::IsCheckable(const QModelIndex& index) const
+{
+  if (!m_LabelsCheckable || m_LabelRowValues.size() <= 1 || !index.isValid() || index.column() != 0)
+    return false;
+
+  const auto* item = static_cast<const QmitkImageStatisticsTreeItem*>(index.internalPointer());
+  return item->GetLabelInstance().IsNotNull();
 }
 
 QModelIndex QmitkImageStatisticsTreeModel::index(int row, int column, const QModelIndex &parent) const
@@ -162,7 +249,12 @@ Qt::ItemFlags QmitkImageStatisticsTreeModel::flags(const QModelIndex &index) con
   if (!index.isValid())
     return {};
 
-  return QAbstractItemModel::flags(index);
+  auto flags = QAbstractItemModel::flags(index);
+
+  if (this->IsCheckable(index))
+    flags |= Qt::ItemIsUserCheckable;
+
+  return flags;
 }
 
 QVariant QmitkImageStatisticsTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -200,6 +292,7 @@ void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNo
   emit beginResetModel();
   m_TimeStepResolvedImageNodes = std::move(tempNodes);
   m_ImageNodes = nodes;
+  m_CheckedLabelValues.reset();
   this->UpdateInputObservers();
   this->UpdateByDataStorage();
   emit endResetModel();
@@ -230,6 +323,7 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
   emit beginResetModel();
   m_TimeStepResolvedMaskNodes = std::move(tempNodes);
   m_MaskNodes = nodes;
+  m_CheckedLabelValues.reset();
   this->UpdateInputObservers();
   this->UpdateByDataStorage();
   emit endResetModel();
@@ -246,6 +340,7 @@ void QmitkImageStatisticsTreeModel::Clear()
   m_MaskNodes.clear();
   m_TimeStepResolvedMaskNodes.clear();
   m_StatisticNames.clear();
+  m_CheckedLabelValues.reset();
   emit endResetModel();
   emit modelChanged();
 }
@@ -337,6 +432,7 @@ void QmitkImageStatisticsTreeModel::RequestModelUpdate()
       }
       emit endResetModel();
       emit modelChanged();
+      emit inputDisplayChanged();
     }, Qt::QueuedConnection);
 }
 
@@ -583,29 +679,34 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       QString maskLabel = QString::fromStdString(mask->GetName());
       QmitkImageStatisticsTreeItem* maskItem;
 
-      if (statistic->GetTimeSteps() == 1 && labelValues.size() == 1)
+      // A segmentation always gets one row per label so that the name and color of a
+      // label are shown even if it is the only one left. Other masks with a single label
+      // collapse into the mask row.
+      const bool showLabelRows = labelValues.size() > 1
+        || nullptr != dynamic_cast<const mitk::MultiLabelSegmentation*>(mask->GetData());
+
+      if (labelValues.empty())
+      {
+        //all labels are empty -> no stats are computed
+        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, true, imageItem, image, mask);
+      }
+      else if (statistic->GetTimeSteps() == 1 && !showLabelRows)
       {
         // add statistical values directly in this hierarchy level
         auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(labelValues.front(), 0);
         maskItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, maskLabel, isWIP, imageItem, image, mask);
       }
-      else if(labelValues.empty())
-      {
-        //all labels are empty -> no stats are computed
-        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, true, imageItem, image, mask);
-      }
       else
       {
         maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, false, imageItem, image, mask);
-        // 3. hierarchy level: labels (optional, only if more then one label in statistic)
-        if (labelValues.size() > 1)
+
+        if (showLabelRows)
         {
           hasGroups = AddLabelTreeItemsForMask(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps) || hasGroups;
         }
-        else if (!labelValues.empty())
+        else
         {
-          mitk::Label::PixelType labelValue = isWIP ? 0 : labelValues.front();
-          AddTimeStepTreeItems(statistic, image, mask, labelValue, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+          AddTimeStepTreeItems(statistic, image, mask, labelValues.front(), m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
         }
       }
 
@@ -634,6 +735,10 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     headerString += "/Timesteps";
   }
   m_HeaderFirstColumn = headerString;
+
+  m_LabelRowValues.clear();
+  CollectLabelValues(m_RootItem.get(), m_LabelRowValues);
+  this->ReconcileCheckedLabels();
 }
 
 void QmitkImageStatisticsTreeModel::NodeRemoved(const mitk::DataNode* changedNode)

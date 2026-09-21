@@ -31,12 +31,19 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent)
   m_Controls->treeViewStatistics->setModel(m_ProxyModel);
   m_ProxyModel->setSourceModel(m_imageStatisticsModel);
   connect(m_imageStatisticsModel, &QmitkImageStatisticsTreeModel::dataAvailable, this, &QmitkImageStatisticsWidget::OnDataAvailable);
-  connect(m_imageStatisticsModel,
-          &QmitkImageStatisticsTreeModel::modelChanged,
-          m_Controls->treeViewStatistics,
-          &QTreeView::expandAll);
+  connect(m_imageStatisticsModel, &QmitkImageStatisticsTreeModel::modelChanged, this, [this]()
+  {
+    auto* treeView = m_Controls->treeViewStatistics;
+    treeView->expandAll();
+    // Only expanded rows count, so the names of all labels and time steps fit.
+    treeView->resizeColumnToContents(0);
+  });
   connect(m_Controls->checkBoxIgnoreZeroValuedVoxel, &QCheckBox::checkStateChanged,
       this, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged);
+  connect(m_imageStatisticsModel, &QmitkImageStatisticsTreeModel::labelCheckStateChanged,
+      this, &QmitkImageStatisticsWidget::LabelCheckStateChanged);
+  connect(m_imageStatisticsModel, &QmitkImageStatisticsTreeModel::inputDisplayChanged,
+      this, &QmitkImageStatisticsWidget::InputDisplayChanged);
 }
 
 QmitkImageStatisticsWidget::~QmitkImageStatisticsWidget()
@@ -85,6 +92,16 @@ void QmitkImageStatisticsWidget::SetHistogramNBins(unsigned int nbins)
 unsigned int QmitkImageStatisticsWidget::GetHistogramNBins() const
 {
   return this->m_imageStatisticsModel->GetHistogramNBins();
+}
+
+void QmitkImageStatisticsWidget::SetLabelsCheckable(bool checkable)
+{
+  m_imageStatisticsModel->SetLabelsCheckable(checkable);
+}
+
+bool QmitkImageStatisticsWidget::IsLabelChecked(mitk::ImageStatisticsContainer::LabelValueType labelValue) const
+{
+  return m_imageStatisticsModel->IsLabelChecked(labelValue);
 }
 
 void QmitkImageStatisticsWidget::CreateConnections()

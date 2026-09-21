@@ -1,6 +1,4 @@
 <config>
-  <!-- scrolling either by moving mouse leftright or updown -->
-  <param name="scrollDirection" value="updown"/>
    <event_variant class="MousePressEvent" name="StartScroll">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>

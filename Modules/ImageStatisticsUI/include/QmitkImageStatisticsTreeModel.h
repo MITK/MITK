@@ -25,6 +25,8 @@ found in the LICENSE file.
 
 #include <atomic>
 #include <mutex>
+#include <optional>
+#include <set>
 #include <vector>
 
 class QmitkImageStatisticsTreeItem;
@@ -38,8 +40,8 @@ class QmitkImageStatisticsTreeItem;
  * - Level 1: Image
  * - Level 2: Mask (if present)
  * - Level 3: Group (if the mask is a segmentation with more than one group)
- * - Level 4: Label instances (if the mask has multiple labels), ordered like in the
- *   Segmentation View: by label name, then by label value
+ * - Level 4: Label instances (for segmentations, or if another mask has multiple labels),
+ *   ordered like in the Segmentation View: by label name, then by label value
  * - Level 5: Time steps (if more than one exists)
  *
  * \sa QmitkAbstractDataStorageModel
@@ -117,6 +119,30 @@ public:
   unsigned int GetHistogramNBins() const;
 
   /**
+   * \brief Offers or hides check boxes on the label rows.
+   *
+   * The check state of a label row selects whether the histogram of that label is shown.
+   * Histograms are only shown for a single image with a single mask, so the check boxes
+   * should be enabled for exactly that configuration and no check box without effect is
+   * offered otherwise. A tree with a single label row never shows a check box.
+   *
+   * \param[in] checkable True to offer check boxes on the label rows.
+   */
+  void SetLabelsCheckable(bool checkable);
+
+  /**
+   * \brief Returns whether the histogram of the given label is selected.
+   *
+   * By default only the first label row of the tree is checked. If a checked label
+   * disappears (e.g. it was removed from the segmentation), the first remaining label row
+   * takes over. With at most one label row every label counts as checked.
+   *
+   * \param[in] labelValue The label value as used by the statistics container.
+   * \return True if the label is checked or if there is at most one label row.
+   */
+  bool IsLabelChecked(mitk::ImageStatisticsContainer::LabelValueType labelValue) const;
+
+  /**
    * \brief Returns the item flags for the given model index.
    * \param[in] index The model index to query.
    * \return The Qt item flags for the index.
@@ -126,14 +152,21 @@ public:
   /**
    * \brief Returns the data for the given index and role.
    *
-   * Supports Qt::DisplayRole for statistics values and Qt::DecorationRole for label color icons
-   * and WIP hourglass indicators in the first column.
+   * Supports Qt::DisplayRole for statistics values, Qt::DecorationRole for label color icons
+   * and WIP hourglass indicators in the first column, and Qt::CheckStateRole for label rows
+   * while check boxes are offered.
    *
    * \param[in] index The model index to query.
    * \param[in] role The data role (e.g. Qt::DisplayRole, Qt::DecorationRole).
    * \return The data as QVariant, or an invalid QVariant if not applicable.
    */
   QVariant data(const QModelIndex &index, int role) const override;
+
+  /**
+   * \brief Sets the check state of a label row. Only Qt::CheckStateRole is supported.
+   * \return True if the state changed.
+   */
+  bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
   /**
    * \brief Returns the header data for the given section and orientation.
@@ -189,6 +222,19 @@ signals:
    */
   void modelChanged();
 
+  /**
+   * \brief Emitted when the user changed the check state of a label row.
+   * \sa IsLabelChecked
+   */
+  void labelCheckStateChanged();
+
+  /**
+   * \brief Emitted after the model was rebuilt because a display property of an input
+   * changed: an image or mask node was renamed, a label was renamed or recolored, or a group
+   * was renamed. The statistics themselves are unchanged.
+   */
+  void inputDisplayChanged();
+
 protected:
   /*
   * @brief See 'QmitkAbstractDataStorageModel'
@@ -218,9 +264,15 @@ private:
     /* builds a hierarchical tree model for the image statistics
     1. Level: Image
     --> 2. Level: Mask [if exist]
-        --> 3. Level: Label instances [if Mask has more then one label]
+        --> 3. Level: Label instances [for segmentations or if the mask has more than one label]
            --> 4. Level: Timestep [if >1 exist] */
     void BuildHierarchicalModel();
+
+    /** Brings the check state in line with the label rows of a freshly built tree: checked
+    labels that are gone are dropped and, if no checked label row is left, the first label
+    row is checked. Skipped while the tree has no label rows (e.g. while statistics are
+    recomputed), so the check state survives a recomputation. */
+    void ReconcileCheckedLabels();
 
     /** Registers the observers that keep the model in sync with display relevant changes
     of its inputs: renaming of image or mask nodes and renaming or recoloring of labels of
@@ -234,7 +286,18 @@ private:
     results in a single model update. */
     void RequestModelUpdate();
 
+    /** True if the index denotes the first column of a label row while check boxes are offered. */
+    bool IsCheckable(const QModelIndex& index) const;
+
     StatisticsContainerVector m_Statistics;
+
+    /** Label values of the label rows in tree order, collected when the tree is built. */
+    std::vector<mitk::ImageStatisticsContainer::LabelValueType> m_LabelRowValues;
+    /** Checked label rows, keyed by label value. Label values are unique within a mask and
+    check boxes are only offered for a single mask, so the mask needs no part in the key.
+    Empty until the first build that produces label rows, which checks the first label row. */
+    std::optional<std::set<mitk::ImageStatisticsContainer::LabelValueType>> m_CheckedLabelValues;
+    bool m_LabelsCheckable = false;
 
     /** Relevant images set by the user.*/
     std::vector<mitk::DataNode::ConstPointer> m_ImageNodes;

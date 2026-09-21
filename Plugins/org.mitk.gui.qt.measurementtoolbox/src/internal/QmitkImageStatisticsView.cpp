@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkImageStatisticsPredicateHelper.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkIntensityProfile.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateGeometry.h>
 #include <mitkNodePredicateSubGeometry.h>
@@ -33,8 +34,11 @@ found in the LICENSE file.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureMaskGenerator.h>
 
+#include <QmitkHistogramVisualizationWidget.h>
 #include <QmitkIconTheme.h>
 #include <QmitkImageStatisticsDataGenerator.h>
+
+#include <QColor>
 
 #include <mitkImageStatisticsContainerManager.h>
 #include <mitkPlanarFigureInteractor.h>
@@ -81,9 +85,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls->groupBox_histogram->setVisible(false);
   m_Controls->groupBox_intensityProfile->setVisible(false);
   m_Controls->label_currentlyComputingStatistics->setVisible(false);
-  m_Controls->sliderWidget_histogram->setPrefix("Time: ");
-  m_Controls->sliderWidget_histogram->setDecimals(0);
-  m_Controls->sliderWidget_histogram->setVisible(false);
   m_Controls->sliderWidget_intensityProfile->setPrefix("Time: ");
   m_Controls->sliderWidget_intensityProfile->setDecimals(0);
   m_Controls->sliderWidget_intensityProfile->setVisible(false);
@@ -134,6 +135,10 @@ void QmitkImageStatisticsView::CreateConnections()
 
   connect(m_Controls->widget_histogram, &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
     this, &QmitkImageStatisticsView::OnRequestHistogramUpdate);
+  connect(m_Controls->widget_statistics, &QmitkImageStatisticsWidget::LabelCheckStateChanged,
+    this, &QmitkImageStatisticsView::UpdateHistogramWidget);
+  connect(m_Controls->widget_statistics, &QmitkImageStatisticsWidget::InputDisplayChanged,
+    this, &QmitkImageStatisticsView::UpdateHistogramWidget);
 
   connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]
   {
@@ -212,62 +217,89 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
   const auto selectedImageNodes = m_Controls->imageNodesSelector->GetSelectedNodes();
   const auto selectedMaskNodes = m_Controls->roiNodesSelector->GetSelectedNodes();
 
-  if (selectedImageNodes.size() == 1 && selectedMaskNodes.size()<=1)
-  { //currently only supported for one image and roi due to histogram widget limitations.
-    auto imageNode = selectedImageNodes.front();
-    const mitk::DataNode* roiNode = nullptr;
-    const mitk::PlanarFigure* planarFigure = nullptr;
-    if (!selectedMaskNodes.empty())
-    {
-      roiNode = selectedMaskNodes.front();
-      planarFigure = dynamic_cast<const mitk::PlanarFigure*>(roiNode->GetData());
-    }
+  // Histograms are only shown for one image and at most one ROI. The check boxes
+  // in the statistics tree select the label histograms, so they are offered for
+  // exactly this configuration.
+  const bool singleSelection = selectedImageNodes.size() == 1 && selectedMaskNodes.size() <= 1;
+  m_Controls->widget_statistics->SetLabelsCheckable(singleSelection);
 
-    if ((planarFigure == nullptr || planarFigure->IsClosed())
-        && imageNode->GetData()->GetTimeGeometry()->IsValidTimePoint(m_TimePointChangeListener.GetCurrentSelectedTimePoint()))
-    { //if a planar figure is not closed, we show the intensity profile instead of the histogram.
-      auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode, true);
+  if (!singleSelection)
+    return;
 
-      if (statisticsNode.IsNotNull())
-      {
-        auto statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
+  auto imageNode = selectedImageNodes.front();
+  const mitk::DataNode* roiNode = nullptr;
+  const mitk::PlanarFigure* planarFigure = nullptr;
+  const mitk::MultiLabelSegmentation* segmentation = nullptr;
 
-        if (statistics && !statistics->IsWIP())
-        {
-          //currently only supports rois with one label due to histogram widget limitations.
-          auto labelValues = statistics->GetExistingLabelValues();
-          if (labelValues.size() == 1)
-          {
-            auto labelValue = labelValues.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : labelValues.front();
-
-            const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
-
-            if (statistics->StatisticsExist(labelValue, timeStep))
-            {
-              std::stringstream label;
-              label << imageNode->GetName();
-              if (imageNode->GetData()->GetTimeSteps() > 1)
-              {
-                label << "[" << timeStep << "]";
-              }
-
-              if (roiNode)
-              {
-                label << " with " << roiNode->GetName();
-              }
-
-              //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
-              //do not allow correct removal or sound update/insertion of several charts.
-              //only thing that works for now is always to update/overwrite the same data label
-              //This is a quick fix for T28223 and T28221
-              m_Controls->widget_histogram->SetHistogram(statistics->GetHistogram(labelValue, timeStep), "histogram");
-              m_Controls->groupBox_histogram->setVisible(true);
-            }
-          }
-        }
-      }
-    }
+  if (!selectedMaskNodes.empty())
+  {
+    roiNode = selectedMaskNodes.front();
+    planarFigure = dynamic_cast<const mitk::PlanarFigure*>(roiNode->GetData());
+    segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(roiNode->GetData());
   }
+
+  // An open planar figure shows the intensity profile instead of the histogram.
+  if (planarFigure != nullptr && !planarFigure->IsClosed())
+    return;
+
+  const auto timeGeometry = imageNode->GetData()->GetTimeGeometry();
+  const auto timePoint = m_TimePointChangeListener.GetCurrentSelectedTimePoint();
+
+  if (!timeGeometry->IsValidTimePoint(timePoint))
+    return;
+
+  const auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode, true);
+
+  if (statisticsNode.IsNull())
+    return;
+
+  const auto* statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
+
+  if (statistics == nullptr || statistics->IsWIP())
+    return;
+
+  const auto timeStep = timeGeometry->TimePointToTimeStep(timePoint);
+  std::vector<QmitkHistogramVisualizationWidget::HistogramSeries> series;
+
+  for (const auto labelValue : statistics->GetExistingLabelValues())
+  {
+    if (!statistics->StatisticsExist(labelValue, timeStep) || !m_Controls->widget_statistics->IsLabelChecked(labelValue))
+      continue;
+
+    QmitkHistogramVisualizationWidget::HistogramSeries entry;
+    entry.histogram = statistics->GetHistogram(labelValue, timeStep);
+
+    if (segmentation != nullptr)
+    {
+      const auto label = segmentation->GetLabel(labelValue);
+
+      // Statistics can outlive a label; the tree shows such values as N/A.
+      if (label.IsNull())
+        continue;
+
+      const auto& color = label->GetColor();
+      entry.name = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(segmentation, label));
+      entry.color = QColor::fromRgbF(color.GetRed(), color.GetGreen(), color.GetBlue());
+    }
+    else
+    {
+      std::stringstream name;
+      name << imageNode->GetName();
+
+      if (imageNode->GetData()->GetTimeSteps() > 1)
+        name << "[" << timeStep << "]";
+
+      if (roiNode != nullptr)
+        name << " with " << roiNode->GetName();
+
+      entry.name = QString::fromStdString(name.str());
+    }
+
+    series.push_back(std::move(entry));
+  }
+
+  m_Controls->widget_histogram->SetHistograms(series);
+  m_Controls->groupBox_histogram->setVisible(true);
 }
 
 QmitkPlotStyle QmitkImageStatisticsView::GetColorTheme() const

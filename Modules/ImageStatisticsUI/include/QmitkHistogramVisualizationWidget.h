@@ -19,13 +19,14 @@ found in the LICENSE file.
 // itk
 #include <itkHistogram.h>
 
+#include <QColor>
 #include <QPointF>
 #include <QRectF>
+#include <QString>
 #include <QWidget>
 
-#include <map>
 #include <memory>
-#include <string>
+#include <vector>
 
 class QEvent;
 class QwtPlot;
@@ -42,8 +43,8 @@ namespace Ui
  *
  * Provides a Qwt-based histogram display with controls for adjusting the number
  * of bins, setting a custom min/max value zoom range, and copying histogram data
- * to the clipboard. Multiple histograms can be displayed simultaneously, each
- * identified by a data label.
+ * to the clipboard. Several histograms (e.g. one per label of a segmentation) can
+ * be shown at once, each in its own color.
  *
  * \sa QmitkImageStatisticsWidget
  */
@@ -53,6 +54,18 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkHistogramVisualizationWidget : public QW
   Q_OBJECT
 
 public:
+  using HistogramType = itk::Statistics::Histogram<double>;
+
+  /** \brief One histogram to show, with the name and color it is shown with. */
+  struct HistogramSeries
+  {
+    /** Shown in the tooltip (if several series are shown) and used in the clipboard export. */
+    QString name;
+    /** An invalid color selects the default bar color. */
+    QColor color;
+    HistogramType::ConstPointer histogram;
+  };
+
   /**
    * \brief Constructs the histogram visualization widget.
    * \param[in] parent Optional parent widget.
@@ -63,18 +76,18 @@ public:
   ~QmitkHistogramVisualizationWidget() override;
 
   /**
-   * \brief Displays a histogram in the chart and enables the GUI controls.
+   * \brief Replaces the shown histograms and enables the GUI controls.
    *
-   * If a histogram with the given label already exists, it is updated. Otherwise, a new
-   * histogram series is added to the chart.
+   * A zoomed-in view survives the call as long as it overlaps the new value range.
+   * Series without a histogram are skipped. An empty vector leaves an empty plot
+   * with disabled controls.
    *
-   * \param[in] histogram The ITK histogram to display. If nullptr, the call is ignored.
-   * \param[in] dataLabel A unique label identifying this histogram series.
+   * \param[in] series The histograms to show, in drawing order.
    */
-  void SetHistogram(itk::Statistics::Histogram<double>::ConstPointer histogram, const std::string &dataLabel);
+  void SetHistograms(const std::vector<HistogramSeries>& series);
 
   /**
-   * \brief Clears all histogram data and disables all GUI elements.
+   * \brief Clears all histogram data including the zoom and disables all GUI elements.
    */
   void Reset();
 
@@ -97,7 +110,7 @@ public:
    */
   int GetBins();
 
- signals:
+signals:
   /**
    * \brief Emitted when the user changes the number of bins.
    *
@@ -113,10 +126,18 @@ protected:
   bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
+  struct SeriesItem
+  {
+    HistogramSeries series;
+    QwtPlotHistogram* item = nullptr;
+  };
+
   void CreateConnections();
   void SetGUIElementsEnabled(bool enabled);
   /** \brief Applies m_Style (canvas background and axis colors) to the plot. */
   void ApplyTheme();
+  /** \brief Detaches and deletes all series items and clears the highlight (does not replot). */
+  void RemoveSeries();
   /** \brief Highlights the histogram bar under the cursor, clearing it off any bar. */
   void OnHover(const QPointF& pos);
   /** \brief Removes the current bar highlight (does not replot). */
@@ -143,8 +164,7 @@ private:
   QwtPlot* m_Plot;
   QwtPlotHistogram* m_HighlightItem;
   QwtPlotZoomer* m_Zoomer;
-  std::map<std::string, QwtPlotHistogram*> m_HistogramItems;
-  std::map<std::string, itk::Statistics::Histogram<double>::ConstPointer> m_Histograms;
+  std::vector<SeriesItem> m_Series;
   QmitkPlotStyle m_Style = QmitkPlotStyle::Dark;
 };
 

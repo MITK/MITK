@@ -42,6 +42,14 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(LabelsAddedOutOfAlphabeticalOrder_ModelOrdersByName);
   MITK_TEST(MultipleGroups_ModelShowsGroupRowsInSegmentationViewOrder);
   MITK_TEST(GroupRenamed_ModelIsUpdated);
+  MITK_TEST(LabelsCheckable_OnlyLabelRowsAreCheckable);
+  MITK_TEST(LabelsCheckable_FirstLabelIsCheckedByDefault);
+  MITK_TEST(LabelChecked_StateSurvivesLabelRename);
+  MITK_TEST(MaskNodesSet_CheckStateIsReset);
+  MITK_TEST(SingleLabel_NoCheckBoxesAndLabelCountsAsChecked);
+  MITK_TEST(CheckedLabelRemoved_FirstRemainingLabelIsChecked);
+  MITK_TEST(CheckedLabelRemoved_OtherCheckStatesAreKept);
+  MITK_TEST(LabelsRecolored_InputDisplayChangedIsEmittedOnce);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
@@ -187,6 +195,16 @@ public:
   static std::string FirstColumnHeader(const QmitkImageStatisticsTreeModel& model)
   {
     return model.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString().toStdString();
+  }
+
+  static bool IsCheckable(const QmitkImageStatisticsTreeModel& model, const QModelIndex& index)
+  {
+    return model.flags(index).testFlag(Qt::ItemIsUserCheckable);
+  }
+
+  static int CheckState(const QmitkImageStatisticsTreeModel& model, const QModelIndex& index)
+  {
+    return model.data(index, Qt::CheckStateRole).toInt();
   }
 
   static bool StartsWith(const std::string& text, const std::string& prefix)
@@ -439,6 +457,182 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("Organs"), LabelText(model, 0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The statistics must survive a group rename.",
       1, model.rowCount(LabelIndex(model, 0)));
+  }
+
+  void LabelsCheckable_OnlyLabelRowsAreCheckable()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+
+    CPPUNIT_ASSERT_MESSAGE("Check boxes must be off by default.", !IsCheckable(model, LabelIndex(model, 0)));
+    CPPUNIT_ASSERT(!model.data(LabelIndex(model, 0), Qt::CheckStateRole).isValid());
+
+    model.SetLabelsCheckable(true);
+
+    CPPUNIT_ASSERT(IsCheckable(model, LabelIndex(model, 0)));
+    CPPUNIT_ASSERT(IsCheckable(model, LabelIndex(model, 1)));
+    CPPUNIT_ASSERT_MESSAGE("Only the first column carries the check box.",
+      !IsCheckable(model, model.index(0, 1, MaskIndex(model))));
+    CPPUNIT_ASSERT(!IsCheckable(model, MaskIndex(model)));
+    CPPUNIT_ASSERT(!IsCheckable(model, model.index(0, 0)));
+    CPPUNIT_ASSERT(!model.data(MaskIndex(model), Qt::CheckStateRole).isValid());
+  }
+
+  void LabelsCheckable_FirstLabelIsCheckedByDefault()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+    model.SetLabelsCheckable(true);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(Qt::Checked), CheckState(model, LabelIndex(model, 0)));
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(Qt::Unchecked), CheckState(model, LabelIndex(model, 1)));
+    CPPUNIT_ASSERT(model.IsLabelChecked(m_LabelA));
+    CPPUNIT_ASSERT(!model.IsLabelChecked(m_LabelB));
+  }
+
+  void LabelChecked_StateSurvivesLabelRename()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+    model.SetLabelsCheckable(true);
+
+    int checkStateChangedCount = 0;
+    QObject::connect(&model, &QmitkImageStatisticsTreeModel::labelCheckStateChanged,
+      [&checkStateChangedCount]() { ++checkStateChangedCount; });
+
+    CPPUNIT_ASSERT(model.setData(LabelIndex(model, 1), Qt::Checked, Qt::CheckStateRole));
+    CPPUNIT_ASSERT_EQUAL(1, checkStateChangedCount);
+    CPPUNIT_ASSERT(model.IsLabelChecked(m_LabelB));
+
+    CPPUNIT_ASSERT_MESSAGE("Setting the same state again must be a no-op.",
+      !model.setData(LabelIndex(model, 1), Qt::Checked, Qt::CheckStateRole));
+    CPPUNIT_ASSERT_EQUAL(1, checkStateChangedCount);
+
+    // The rename moves "Label A" behind "Label B" and rebuilds the tree.
+    m_Mask->GetLabel(m_LabelA)->SetName("Renamed label");
+    Settle();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Label B"), LabelText(model, 0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(Qt::Checked), CheckState(model, LabelIndex(model, 0)));
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(Qt::Checked), CheckState(model, LabelIndex(model, 1)));
+    CPPUNIT_ASSERT(model.IsLabelChecked(m_LabelA));
+    CPPUNIT_ASSERT(model.IsLabelChecked(m_LabelB));
+  }
+
+  void MaskNodesSet_CheckStateIsReset()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+    model.SetLabelsCheckable(true);
+
+    model.setData(LabelIndex(model, 1), Qt::Checked, Qt::CheckStateRole);
+    model.setData(LabelIndex(model, 0), Qt::Unchecked, Qt::CheckStateRole);
+
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the check state was not changed.",
+      !model.IsLabelChecked(m_LabelA) && model.IsLabelChecked(m_LabelB));
+
+    model.SetMaskNodes({ m_MaskNode.GetPointer() });
+
+    CPPUNIT_ASSERT(model.IsLabelChecked(m_LabelA));
+    CPPUNIT_ASSERT(!model.IsLabelChecked(m_LabelB));
+  }
+
+  void SingleLabel_NoCheckBoxesAndLabelCountsAsChecked()
+  {
+    auto mask = mitk::MultiLabelSegmentation::New();
+    mask->Initialize(CreateTestImage());
+    const auto onlyLabel = AddLabel(mask, "Only label", 0);
+    auto maskNode = this->AddMaskNode(mask);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ maskNode.GetPointer() });
+    model.SetLabelsCheckable(true);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A segmentation shows its label even if it is the only one.",
+      1, model.rowCount(MaskIndex(model)));
+    CPPUNIT_ASSERT_EQUAL(std::string("Only label"), LabelText(model, 0));
+    CPPUNIT_ASSERT_MESSAGE("A single label row must not offer a check box.",
+      !IsCheckable(model, LabelIndex(model, 0)));
+    CPPUNIT_ASSERT(model.IsLabelChecked(onlyLabel));
+  }
+
+  /** Sets up a model on the fixture mask with a third label "Label C" and check boxes. */
+  mitk::Label::PixelType SetUpModelWithThreeLabels(QmitkImageStatisticsTreeModel& model)
+  {
+    const auto labelC = AddLabel(m_Mask, "Label C", 0);
+    this->AddStatistics(m_Image, m_Mask);
+
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ m_MaskNode.GetPointer() });
+    model.SetLabelsCheckable(true);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: unexpected number of label rows.",
+      3, model.rowCount(MaskIndex(model)));
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the first label is not checked.",
+      model.IsLabelChecked(m_LabelA));
+
+    return labelC;
+  }
+
+  /** Removes the label from the fixture mask and adds recomputed statistics, as the
+  data generator would after the removal outdated the former ones. */
+  void RemoveLabelAndRecompute(mitk::Label::PixelType labelValue)
+  {
+    m_Mask->RemoveLabel(labelValue);
+    this->AddStatistics(m_Image, m_Mask);
+    Settle();
+  }
+
+  void CheckedLabelRemoved_FirstRemainingLabelIsChecked()
+  {
+    QmitkImageStatisticsTreeModel model;
+    const auto labelC = this->SetUpModelWithThreeLabels(model);
+
+    this->RemoveLabelAndRecompute(m_LabelA);
+
+    CPPUNIT_ASSERT_EQUAL(2, model.rowCount(MaskIndex(model)));
+    CPPUNIT_ASSERT_EQUAL(std::string("Label B"), LabelText(model, 0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(Qt::Checked), CheckState(model, LabelIndex(model, 0)));
+    CPPUNIT_ASSERT(model.IsLabelChecked(m_LabelB));
+    CPPUNIT_ASSERT(!model.IsLabelChecked(labelC));
+  }
+
+  void CheckedLabelRemoved_OtherCheckStatesAreKept()
+  {
+    QmitkImageStatisticsTreeModel model;
+    const auto labelC = this->SetUpModelWithThreeLabels(model);
+    model.setData(LabelIndex(model, 2), Qt::Checked, Qt::CheckStateRole);
+
+    this->RemoveLabelAndRecompute(m_LabelA);
+
+    CPPUNIT_ASSERT(!model.IsLabelChecked(m_LabelB));
+    CPPUNIT_ASSERT(model.IsLabelChecked(labelC));
+  }
+
+  void LabelsRecolored_InputDisplayChangedIsEmittedOnce()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+
+    int inputDisplayChangedCount = 0;
+    QObject::connect(&model, &QmitkImageStatisticsTreeModel::inputDisplayChanged,
+      [&inputDisplayChangedCount]() { ++inputDisplayChangedCount; });
+
+    mitk::Color blue;
+    blue.Set(0.0f, 0.0f, 1.0f);
+    m_Mask->GetLabel(m_LabelA)->SetColor(blue);
+    m_Mask->GetLabel(m_LabelB)->SetColor(blue);
+    Settle();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A batch of label modifications must result in one signal.",
+      1, inputDisplayChangedCount);
+
+    // A rebuild for any other reason must not pretend that an input display changed.
+    model.SetHistogramNBins(50);
+    CPPUNIT_ASSERT_EQUAL(1, inputDisplayChangedCount);
   }
 };
 

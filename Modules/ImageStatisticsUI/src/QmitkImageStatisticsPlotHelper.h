@@ -17,6 +17,8 @@ found in the LICENSE file.
 
 #include <QColor>
 
+#include <limits>
+
 class QString;
 class QwtPlot;
 class QwtPlotZoomer;
@@ -36,10 +38,13 @@ namespace QmitkImageStatisticsPlot
   /** Dark-on-light tracker tooltip shared by the plot pickers. */
   QwtText MakeTooltip(const QString& text);
 
-  /** Adds interactive navigation: left-drag box zoom (right-click to zoom out),
-      middle-drag pan, and mouse-wheel zoom. Returns the zoomer so its base can
-      be re-synced to the data range. */
-  QwtPlotZoomer* SetupNavigation(QwtPlot* plot);
+  /** Adds interactive navigation: left-drag box zoom (right-click to zoom out,
+      also from a panned or wheel-zoomed view), middle-drag pan, and mouse-wheel
+      zoom along x around the cursor. Returns the zoomer so its base can be
+      re-synced to the data range. No navigation shows y values below minimumY:
+      a zoom rectangle is cut off there, panning shifts the visible range up
+      instead. */
+  QwtPlotZoomer* SetupNavigation(QwtPlot* plot, double minimumY = std::numeric_limits<double>::lowest());
 
   /** Applies the light/dark canvas background and axis palette to the plot. */
   void ApplyTheme(QwtPlot* plot, QmitkPlotStyle style);

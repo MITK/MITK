@@ -26,6 +26,8 @@ found in the LICENSE file.
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include <set>
+
 namespace
 {
   QString FormatDump(const mitk::CrashDumpInfo& dump)
@@ -112,8 +114,15 @@ void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)
 
   if (keep)
   {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(
-      QString::fromStdWString(dumps.front().Path.parent_path().wstring())));
+    // Crash dumps and hard-killed freeze survivors are filed in different
+    // subdirectories, so a single folder need not cover the whole list.
+    std::set<std::filesystem::path> folders;
+
+    for (const auto& dump : dumps)
+      folders.insert(dump.Path.parent_path());
+
+    for (const auto& folder : folders)
+      QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folder.wstring())));
   }
   else
   {

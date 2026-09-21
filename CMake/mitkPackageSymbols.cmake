@@ -16,6 +16,9 @@
 #   MITK_SYMBOL_STAGING_DIR  scratch directory for staging
 # Optional:
 #   MITK_SYMBOL_CONFIG       build configuration (multi-config generators)
+#   MITK_SYMBOL_LIBRARY_DIR  library output directory (CMAKE_LIBRARY_OUTPUT_DIRECTORY).
+#                            Where the shared libraries are on ELF and Mach-O;
+#                            on Windows the DLLs are runtime artifacts instead.
 
 foreach(_required MITK_SYMBOL_RUNTIME_DIR MITK_SYMBOL_OUTPUT MITK_SYMBOL_STAGING_DIR)
   if(NOT DEFINED ${_required})
@@ -26,10 +29,18 @@ endforeach()
 # Non-shippable test binaries; their symbols do not belong in a release archive.
 set(_exclude_regex "TestDriver|Test(ing)?Helper")
 
-# Per-config runtime dir: multi-config generators nest binaries in <dir>/<config>.
+# Per-config runtime dir: multi-config generators nest binaries in <dir>/<config>,
+# single-config ones write straight into <dir>.
 set(_bin_dir "${MITK_SYMBOL_RUNTIME_DIR}")
+set(_per_config_layout FALSE)
 if(MITK_SYMBOL_CONFIG AND EXISTS "${MITK_SYMBOL_RUNTIME_DIR}/${MITK_SYMBOL_CONFIG}")
   set(_bin_dir "${MITK_SYMBOL_RUNTIME_DIR}/${MITK_SYMBOL_CONFIG}")
+  set(_per_config_layout TRUE)
+endif()
+
+set(_lib_dir "${MITK_SYMBOL_LIBRARY_DIR}")
+if(_lib_dir AND MITK_SYMBOL_CONFIG AND EXISTS "${_lib_dir}/${MITK_SYMBOL_CONFIG}")
+  set(_lib_dir "${_lib_dir}/${MITK_SYMBOL_CONFIG}")
 endif()
 
 file(REMOVE_RECURSE "${MITK_SYMBOL_STAGING_DIR}")
@@ -40,10 +51,12 @@ set(_staged 0)
 # In script mode (cmake -P) key off the CMAKE_HOST_* variables.
 if(CMAKE_HOST_WIN32)
   # MSVC emits one .pdb next to each linked DLL/EXE (bin/<config>,
-  # bin/plugins/<config>, ...). Collect and flatten them.
+  # bin/plugins/<config>, ...). Globbing starts at the runtime dir rather than
+  # _bin_dir because the plugin output is a sibling subtree; in a per-config
+  # layout the config filter is what keeps the other configs out of the archive.
   file(GLOB_RECURSE _pdbs "${MITK_SYMBOL_RUNTIME_DIR}/*.pdb")
   foreach(_pdb ${_pdbs})
-    if(MITK_SYMBOL_CONFIG AND NOT _pdb MATCHES "/${MITK_SYMBOL_CONFIG}/")
+    if(_per_config_layout AND NOT _pdb MATCHES "/${MITK_SYMBOL_CONFIG}/")
       continue()
     endif()
     if(_pdb MATCHES "${_exclude_regex}")
@@ -58,12 +71,37 @@ else()
   # ELF, dsymutil (.dSYM) on macOS. Best effort - warns and skips if the tool
   # is unavailable (e.g. the -g fallback leaves debug info embedded instead).
   if(CMAKE_HOST_APPLE)
-    file(GLOB_RECURSE _binaries "${_bin_dir}/*.dylib" "${_bin_dir}/*.so")
     find_program(_dsymutil dsymutil)
   else()
-    file(GLOB_RECURSE _binaries "${_bin_dir}/*.so")
     find_program(_dwp NAMES dwp)
   endif()
+
+  set(_search_dirs "${_bin_dir}")
+  if(_lib_dir AND NOT _lib_dir STREQUAL _bin_dir)
+    list(APPEND _search_dirs "${_lib_dir}")
+  endif()
+
+  set(_binaries "")
+  foreach(_dir ${_search_dirs})
+    if(CMAKE_HOST_APPLE)
+      file(GLOB_RECURSE _libraries "${_dir}/*.dylib" "${_dir}/*.so")
+    else()
+      file(GLOB_RECURSE _libraries "${_dir}/*.so")
+    endif()
+    list(APPEND _binaries ${_libraries})
+
+    # Application executables carry no extension on ELF and Mach-O, so the
+    # library globs above miss them and their frames would stay unresolved.
+    file(GLOB_RECURSE _candidates "${_dir}/*")
+    foreach(_candidate ${_candidates})
+      get_filename_component(_candidate_name "${_candidate}" NAME)
+      if(NOT _candidate_name MATCHES "\\.")
+        list(APPEND _binaries "${_candidate}")
+      endif()
+    endforeach()
+  endforeach()
+
+  list(REMOVE_DUPLICATES _binaries)
 
   foreach(_binary ${_binaries})
     if(_binary MATCHES "${_exclude_regex}")

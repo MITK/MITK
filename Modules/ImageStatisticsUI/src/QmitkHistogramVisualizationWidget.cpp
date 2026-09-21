@@ -280,13 +280,14 @@ void QmitkHistogramVisualizationWidget::SetHistograms(const std::vector<Histogra
 
   const QRectF base = m_Zoomer->zoomBase();
 
-  // The zoom is about the gray value range, so it survives as long as it still
-  // overlaps the new data horizontally. A frequency range that does not (e.g.
-  // after switching from a large to a small label) would leave the plot empty
-  // and is widened to the new full range instead.
-  if (wasZoomed && OverlapsHorizontally(previousView, base))
+  // A zoom is about the gray value range, so a former view survives as long as
+  // it still overlaps the new data horizontally. A frequency range that does
+  // not (e.g. after switching from a large to a small label) would leave the
+  // plot empty and is widened to the new full range instead.
+  const auto fitToData = [&base](QRectF view) -> std::optional<QRectF>
   {
-    QRectF view = previousView;
+    if (!OverlapsHorizontally(view, base))
+      return std::nullopt;
 
     if (!OverlapsVertically(view, base))
     {
@@ -294,15 +295,30 @@ void QmitkHistogramVisualizationWidget::SetHistograms(const std::vector<Histogra
       view.setBottom(base.bottom());
     }
 
+    return view;
+  };
+
+  std::optional<QRectF> view;
+
+  if (wasZoomed)
+    view = fitToData(previousView);
+
+  if (view)
+  {
     // The former view replaces the stack entry it was based on, so panning or
-    // the widened y range do not leave a stale rectangle behind.
+    // the widened y range do not leave a stale rectangle behind. Earlier zoom
+    // steps are kept on the same terms, so zooming out step by step never
+    // passes through an empty view.
     QStack<QRectF> zoomStack = m_Zoomer->zoomStack();
 
     for (int i = 1; i < previousZoomIndex; ++i)
-      zoomStack.push(previousZoomStack[i]);
+    {
+      if (const auto step = fitToData(previousZoomStack[i]); step && *step != zoomStack.top())
+        zoomStack.push(*step);
+    }
 
-    if (view != zoomStack.top())
-      zoomStack.push(view);
+    if (*view != zoomStack.top())
+      zoomStack.push(*view);
 
     m_Zoomer->setZoomStack(zoomStack, static_cast<int>(zoomStack.size()) - 1);
   }
@@ -480,12 +496,15 @@ void QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged()
 
 void QmitkHistogramVisualizationWidget::OnZoomRangeEdited()
 {
-  QRectF rect = m_Zoomer->zoomRect();
+  // The visible rather than the zoomer's rectangle: after panning the two
+  // differ in y, and editing the gray value range must not snap the frequency
+  // range back.
+  QRectF rect = VisibleRect(m_Plot);
   rect.setLeft(m_Controls->doubleSpinBoxMinValue->value());
   rect.setRight(m_Controls->doubleSpinBoxMaxValue->value());
 
   // Goes through the zoomer so the rectangle lands on its zoom stack and
-  // mouse navigation continues from there; zoomed() then syncs the spin boxes.
+  // mouse navigation continues from there. The axis then syncs the spin boxes.
   m_Zoomer->zoom(rect);
 }
 
@@ -493,12 +512,13 @@ void QmitkHistogramVisualizationWidget::OnZoomed(const QRectF& rect)
 {
   auto* minBox = m_Controls->doubleSpinBoxMinValue;
   auto* maxBox = m_Controls->doubleSpinBoxMaxValue;
-  const QRectF base = m_Zoomer->zoomBase();
-
-  // Widen both boxes to the full range first so neither value is clamped by a
-  // limit left over from the previous zoom rectangle.
-  minBox->setRange(base.left(), base.right());
-  maxBox->setRange(base.left(), base.right());
+  // Panning and wheel zoom can show more than the data range, so the boxes
+  // accept the whole visible range and not just the zoom base. Widen both
+  // boxes first so neither value is clamped by a limit left over from the
+  // previous zoom rectangle.
+  const QRectF range = m_Zoomer->zoomBase().united(rect);
+  minBox->setRange(range.left(), range.right());
+  maxBox->setRange(range.left(), range.right());
   minBox->setValue(rect.left());
   maxBox->setValue(rect.right());
 

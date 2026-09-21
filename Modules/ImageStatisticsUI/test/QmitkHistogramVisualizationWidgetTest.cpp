@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <QDoubleSpinBox>
 #include <QPen>
 #include <QPushButton>
+#include <QStack>
 
 class QmitkHistogramVisualizationWidgetTestSuite : public mitk::TestFixture
 {
@@ -40,11 +41,14 @@ class QmitkHistogramVisualizationWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(SetHistograms_NonIntersectingZoomFallsBackToFullRange);
   MITK_TEST(SetHistograms_KeepsGrayValueRangeWhenFrequenciesDiffer);
   MITK_TEST(SetHistograms_KeepsPannedView);
+  MITK_TEST(SetHistograms_DropsZoomStepsOutsideNewData);
   MITK_TEST(SetHistograms_EmptyDisablesControls);
   MITK_TEST(SetHistograms_EmptyKeepsZoomForNextSeries);
   MITK_TEST(Reset_RemovesSeriesAndZoom);
   MITK_TEST(Zoom_NeverBelowZero);
   MITK_TEST(Zoom_ResetAfterPanReturnsToFullRange);
+  MITK_TEST(ZoomRangeFields_FollowViewBeyondData);
+  MITK_TEST(ZoomRangeEdited_KeepsPannedFrequencyRange);
   MITK_TEST(Clipboard_OneBlockPerSeries);
   CPPUNIT_TEST_SUITE_END();
 
@@ -120,13 +124,13 @@ public:
     return zoomer;
   }
 
-  /** Moves the x axis the way the panner and the magnifier do: behind the zoom stack's back. */
-  static void PanTo(QmitkHistogramVisualizationWidget& widget, double lower, double upper)
+  /** Moves an axis the way the panner and the magnifier do: behind the zoom stack's back. */
+  static void PanTo(QmitkHistogramVisualizationWidget& widget, double lower, double upper, QwtPlot::Axis axis = QwtPlot::xBottom)
   {
     auto* plot = widget.findChild<QwtPlot*>();
     CPPUNIT_ASSERT_MESSAGE("The widget must own a plot.", nullptr != plot);
 
-    plot->setAxisScale(QwtPlot::xBottom, lower, upper);
+    plot->setAxisScale(axis, lower, upper);
     plot->replot();
   }
 
@@ -244,6 +248,25 @@ public:
     CPPUNIT_ASSERT_EQUAL(60.0, zoomer->zoomRect().right());
   }
 
+  void SetHistograms_DropsZoomStepsOutsideNewData()
+  {
+    QmitkHistogramVisualizationWidget widget;
+    widget.SetHistograms({ Series("A", QColor(), 0.0, 100.0) });
+
+    auto* zoomer = Zoomer(widget);
+    zoomer->zoom(QRectF(60.0, 0.0, 20.0, 3.0));
+    const QRectF currentZoom(10.0, 0.0, 20.0, 3.0);
+    zoomer->zoom(currentZoom);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: two zoom steps expected.", 2u, zoomer->zoomRectIndex());
+
+    // The first step lies entirely outside the new data, the current one inside.
+    widget.SetHistograms({ Series("B", QColor(), 0.0, 40.0) });
+
+    CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(zoomer->zoomStack().size()));
+    CPPUNIT_ASSERT_EQUAL(1u, zoomer->zoomRectIndex());
+    AssertRect(currentZoom, zoomer->zoomRect());
+  }
+
   void SetHistograms_EmptyDisablesControls()
   {
     QmitkHistogramVisualizationWidget widget;
@@ -322,6 +345,39 @@ public:
     CPPUNIT_ASSERT_EQUAL(zoomer->zoomBase().left(), plot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
     CPPUNIT_ASSERT_EQUAL(zoomer->zoomBase().right(), plot->axisScaleDiv(QwtPlot::xBottom).upperBound());
     CPPUNIT_ASSERT_EQUAL(zoomer->zoomBase().left(), SpinBoxValue(widget, "doubleSpinBoxMinValue"));
+  }
+
+  void ZoomRangeFields_FollowViewBeyondData()
+  {
+    QmitkHistogramVisualizationWidget widget;
+    widget.SetHistograms({ Series("A", QColor(), 0.0, 100.0) });
+
+    // Wheel zoom and panning can show more than the data range.
+    PanTo(widget, -50.0, 150.0);
+
+    CPPUNIT_ASSERT_EQUAL(-50.0, SpinBoxValue(widget, "doubleSpinBoxMinValue"));
+    CPPUNIT_ASSERT_EQUAL(150.0, SpinBoxValue(widget, "doubleSpinBoxMaxValue"));
+  }
+
+  void ZoomRangeEdited_KeepsPannedFrequencyRange()
+  {
+    QmitkHistogramVisualizationWidget widget;
+    widget.SetHistograms({ Series("A", QColor(), 0.0, 100.0) });
+
+    // A vertical pan is not on the zoom stack, but editing the gray value range
+    // must keep it anyway.
+    PanTo(widget, 1.0, 4.0, QwtPlot::yLeft);
+
+    auto* minBox = widget.findChild<QDoubleSpinBox*>("doubleSpinBoxMinValue");
+    CPPUNIT_ASSERT_MESSAGE("Spin box not found.", nullptr != minBox);
+    minBox->setValue(20.0);
+    Q_EMIT minBox->editingFinished();
+
+    auto* zoomer = Zoomer(widget);
+    CPPUNIT_ASSERT_EQUAL(1u, zoomer->zoomRectIndex());
+    CPPUNIT_ASSERT_EQUAL(20.0, zoomer->zoomRect().left());
+    CPPUNIT_ASSERT_EQUAL(1.0, zoomer->zoomRect().top());
+    CPPUNIT_ASSERT_EQUAL(4.0, zoomer->zoomRect().bottom());
   }
 
   void Clipboard_OneBlockPerSeries()

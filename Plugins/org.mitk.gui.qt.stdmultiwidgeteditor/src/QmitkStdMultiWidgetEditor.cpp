@@ -35,6 +35,9 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include <QmitkMultiWidgetDecorationManager.h>
 
+// c++
+#include <optional>
+
 const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
 struct QmitkStdMultiWidgetEditor::Impl final
@@ -46,6 +49,8 @@ struct QmitkStdMultiWidgetEditor::Impl final
   QmitkLevelWindowWidget* m_LevelWindowWidget;
   std::string m_LevelWindowImageMode;
   bool m_ShowLevelWindowImageName = true;
+  /** Empty until the preferences have been read for the first time. */
+  std::optional<bool> m_PACSInteraction;
 };
 
 QmitkStdMultiWidgetEditor::Impl::Impl()
@@ -162,24 +167,13 @@ bool QmitkStdMultiWidgetEditor::IsSlicingPlanesEnabled() const
   }
 }
 
-void QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+void QmitkStdMultiWidgetEditor::OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  const auto& multiWidget = GetMultiWidget();
-  if (nullptr == multiWidget)
+  if (nullptr != m_Impl->m_InteractionSchemeToolBar)
   {
-    return;
+    m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
+    m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(scheme);
   }
-
-  if (mitk::InteractionSchemeSwitcher::PACSStandard == scheme)
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(true);
-  }
-  else
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
-  }
-
-  QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
 }
 
 void QmitkStdMultiWidgetEditor::ShowLevelWindowWidget(bool show)
@@ -203,22 +197,33 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
   auto* preferences = this->GetPreferences();
 
+  // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves (in PACS mode)
+  if (nullptr == m_Impl->m_InteractionSchemeToolBar)
+  {
+    m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
+    // Keeps the tool bar from showing before the applied scheme is known; the
+    // sync at the end of this method decides whether it stays hidden.
+    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
+    layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
+
+    // The tool bar only requests a scheme; the multi widget reports back what it
+    // applied. Keeping the two directions apart is what lets the tool bar follow
+    // scheme changes that did not originate from it.
+    connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
+      this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged);
+  }
+
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
     multiWidget = new QmitkStdMultiWidget(parent);
 
-    // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves (in PACS mode)
-    if (nullptr == m_Impl->m_InteractionSchemeToolBar)
-    {
-      m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
-      layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
-    }
-    m_Impl->m_InteractionSchemeToolBar->SetInteractionEventHandler(multiWidget->GetInteractionEventHandler());
-
     multiWidget->SetDataStorage(GetDataStorage());
     multiWidget->InitializeMultiWidget();
     SetMultiWidget(multiWidget);
+
+    connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
+      this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeApplied);
   }
 
   layout->addWidget(multiWidget);
@@ -243,7 +248,9 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   GetSite()->GetPage()->AddPartListener(this);
 
   InitializePreferences(preferences);
-  OnPreferencesChanged(preferences);
+  this->OnPreferencesChanged(preferences);
+
+  this->OnInteractionSchemeApplied(multiWidget->GetInteractionScheme());
 }
 
 void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* preferences)
@@ -271,11 +278,20 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);
 
-  // mouse modes switcher toolbar
-  bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
-  OnInteractionSchemeChanged(PACSInteractionScheme ?
-    mitk::InteractionSchemeSwitcher::PACSStandard :
-    mitk::InteractionSchemeSwitcher::MITKStandard);
+  // Only a change of the preference itself overrides the interaction scheme, so
+  // that the PACS tool or the crosshair rotation mode the user picked survives
+  // unrelated preference edits. A change that the active scheme already agrees
+  // with is no reason to reset it either.
+  const bool pacsInteraction = preferences->GetBool("PACS like mouse interaction", false);
+  const bool preferenceChanged = m_Impl->m_PACSInteraction != pacsInteraction;
+  m_Impl->m_PACSInteraction = pacsInteraction;
+
+  if (preferenceChanged && pacsInteraction != QmitkAbstractMultiWidget::IsPACSScheme(multiWidget->GetInteractionScheme()))
+  {
+    this->OnInteractionSchemeChanged(pacsInteraction ?
+      mitk::InteractionSchemeSwitcher::PACSStandard :
+      mitk::InteractionSchemeSwitcher::MITKStandard);
+  }
 
   // level window setting
   bool showLevelWindowWidget = preferences->GetBool("Show level/window widget", true);

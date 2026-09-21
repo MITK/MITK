@@ -286,30 +286,28 @@ void QmitkStdMultiWidget::ResetCrosshair()
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 
-  SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
+  // Resetting the rotation mode would switch to a MITK scheme, so PACS mode
+  // is left alone here.
+  if (!IsPACSScheme(this->GetInteractionScheme()))
+  {
+    this->SetWidgetPlaneMode(QmitkCrosshairRotationMode::None);
+  }
 }
 
-void QmitkStdMultiWidget::SetWidgetPlaneMode(int userMode)
+void QmitkStdMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
 {
-  MITK_DEBUG << "Changing crosshair mode to " << userMode;
-
-  switch (userMode)
+  switch (mode)
   {
-  case 0:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+  case QmitkCrosshairRotationMode::None:
+    this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
     break;
-  case 1:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+  case QmitkCrosshairRotationMode::Single:
+    this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
     break;
-  case 2:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
-    break;
-  case 3:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+  case QmitkCrosshairRotationMode::Coupled:
+    this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
     break;
   }
-
-  emit NotifyCrosshairRotationModeChanged(userMode);
 }
 
 void QmitkStdMultiWidget::AddPlanesToDataStorage()
@@ -728,21 +726,21 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   connect(renderWindow1, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
   connect(renderWindow1, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshairVisibilityChanged, renderWindow1, &QmitkRenderWindow::UpdateCrosshairVisibility);
-  connect(this, &QmitkStdMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow1, &QmitkRenderWindow::UpdateCrosshairRotationMode);
+  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow1, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   connect(renderWindow2, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
   connect(renderWindow2, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
   connect(renderWindow2, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
   connect(renderWindow2, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshairVisibilityChanged, renderWindow2, &QmitkRenderWindow::UpdateCrosshairVisibility);
-  connect(this, &QmitkStdMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow2, &QmitkRenderWindow::UpdateCrosshairRotationMode);
+  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow2, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   connect(renderWindow3, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
   connect(renderWindow3, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
   connect(renderWindow3, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
   connect(renderWindow3, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshairVisibilityChanged, renderWindow3, &QmitkRenderWindow::UpdateCrosshairVisibility);
-  connect(this, &QmitkStdMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow3, &QmitkRenderWindow::UpdateCrosshairRotationMode);
+  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow3, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   connect(renderWindow4, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
   connect(renderWindow4, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
@@ -751,5 +749,5 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   connect(renderWindow4, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshairVisibilityChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshairVisibility);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshair3DVisibilityChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshair3DVisibility);
-  connect(this, &QmitkStdMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshairRotationMode);
+  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 }

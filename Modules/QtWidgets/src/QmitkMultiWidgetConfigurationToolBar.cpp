@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 // mitk qt widgets module
 #include <QmitkAbstractMultiWidget.h>
+#include <QmitkIconTheme.h>
 #include <QmitkMultiWidgetLayoutSelectionWidget.h>
 
 QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget)
@@ -21,7 +22,6 @@ QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(Qmitk
   , m_MultiWidget(multiWidget)
 {
   QToolBar::setOrientation(Qt::Vertical);
-  QToolBar::setIconSize(QSize(17, 17));
 
   InitializeToolBar();
 }
@@ -47,21 +47,37 @@ void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
 
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
-  QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Set multi widget layout"), this);
+  QAction* setLayoutAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwLayout.svg")), tr("Set multi widget layout"), this);
   connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
   QToolBar::addAction(setLayoutAction);
 
-  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwDesynchronized.png"), tr("Synchronize render windows"), this);
+  m_SynchronizeAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwDesynchronized.svg")), tr("Synchronize render windows"), this);
   m_SynchronizeAction->setCheckable(true);
   m_SynchronizeAction->setChecked(false);
   connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
   QToolBar::addAction(m_SynchronizeAction);
 
-  m_InteractionSchemeChangeAction = new QAction(QIcon(":/Qmitk/mwMITK.png"), tr("Change to PACS interaction"), this);
+  m_InteractionSchemeChangeAction = new QAction(this);
   m_InteractionSchemeChangeAction->setCheckable(true);
-  m_InteractionSchemeChangeAction->setChecked(false);
+  this->UpdateInteractionSchemeAction(false);
   connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(m_InteractionSchemeChangeAction);
+}
+
+void QmitkMultiWidgetConfigurationToolBar::UpdateInteractionSchemeAction(bool pacs)
+{
+  m_InteractionSchemeChangeAction->setChecked(pacs);
+
+  if (pacs)
+  {
+    m_InteractionSchemeChangeAction->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwPACS.svg")));
+    m_InteractionSchemeChangeAction->setText(tr("Change to MITK interaction"));
+  }
+  else
+  {
+    m_InteractionSchemeChangeAction->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwMITK.svg")));
+    m_InteractionSchemeChangeAction->setText(tr("Change to PACS interaction"));
+  }
 }
 
 void QmitkMultiWidgetConfigurationToolBar::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
@@ -86,12 +102,12 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
   bool synchronized = m_SynchronizeAction->isChecked();
   if (synchronized)
   {
-    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/mwSynchronized.png"));
+    m_SynchronizeAction->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwSynchronized.svg")));
     m_SynchronizeAction->setText(tr("Desynchronize render windows"));
   }
   else
   {
-    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/mwDesynchronized.png"));
+    m_SynchronizeAction->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwDesynchronized.svg")));
     m_SynchronizeAction->setText(tr("Synchronize render windows"));
   }
 
@@ -101,19 +117,16 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
 
 void QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged()
 {
-  bool PACSInteractionScheme = m_InteractionSchemeChangeAction->isChecked();
-  if (PACSInteractionScheme)
-  {
-    m_InteractionSchemeChangeAction->setIcon(QIcon(":/Qmitk/mwPACS.png"));
-    m_InteractionSchemeChangeAction->setText(tr("Change to MITK interaction"));
-    emit InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::PACSStandard);
-  }
-  else
-  {
-    m_InteractionSchemeChangeAction->setIcon(QIcon(":/Qmitk/mwMITK.png"));
-    m_InteractionSchemeChangeAction->setText(tr("Change to PACS interaction"));
-    emit InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::MITKStandard);
-  }
+  const bool pacs = m_InteractionSchemeChangeAction->isChecked();
 
-  m_InteractionSchemeChangeAction->setChecked(PACSInteractionScheme);
+  this->UpdateInteractionSchemeAction(pacs);
+
+  emit InteractionSchemeChanged(pacs
+    ? mitk::InteractionSchemeSwitcher::PACSStandard
+    : mitk::InteractionSchemeSwitcher::MITKStandard);
+}
+
+void QmitkMultiWidgetConfigurationToolBar::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+{
+  this->UpdateInteractionSchemeAction(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
 }

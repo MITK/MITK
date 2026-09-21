@@ -132,6 +132,7 @@ set(MODULE_TESTS
   mitkDataStorageServiceTest.cpp
   mitkStringUtilTest.cpp
   mitkBase64Test.cpp
+  mitkInteractionSchemeSwitcherTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

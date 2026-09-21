@@ -25,6 +25,31 @@ found in the LICENSE file.
 // c++
 #include <iomanip>
 
+namespace
+{
+  // Exhaustive rather than defaulted, so that a scheme added later is flagged here.
+  QmitkCrosshairRotationMode CrosshairRotationMode(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+  {
+    switch (scheme)
+    {
+      case mitk::InteractionSchemeSwitcher::MITKRotationUncoupled:
+        return QmitkCrosshairRotationMode::Single;
+      case mitk::InteractionSchemeSwitcher::MITKRotationCoupled:
+        return QmitkCrosshairRotationMode::Coupled;
+      case mitk::InteractionSchemeSwitcher::MITKStandard:
+      case mitk::InteractionSchemeSwitcher::PACSBase:
+      case mitk::InteractionSchemeSwitcher::PACSStandard:
+      case mitk::InteractionSchemeSwitcher::PACSLevelWindow:
+      case mitk::InteractionSchemeSwitcher::PACSPan:
+      case mitk::InteractionSchemeSwitcher::PACSScroll:
+      case mitk::InteractionSchemeSwitcher::PACSZoom:
+        break;
+    }
+
+    return QmitkCrosshairRotationMode::None;
+  }
+}
+
 struct QmitkAbstractMultiWidget::Impl final
 {
   Impl(QmitkAbstractMultiWidget* multiWidget, const QString& multiWidgetName);
@@ -49,6 +74,10 @@ struct QmitkAbstractMultiWidget::Impl final
   {
     m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
     m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
+
+    // Apply the default scheme right away, so that the handler never runs
+    // without an event configuration.
+    mitk::InteractionSchemeSwitcher::SetInteractionScheme(m_DisplayActionEventBroadcast.GetPointer(), m_InteractionScheme);
   }
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -73,6 +102,7 @@ struct QmitkAbstractMultiWidget::Impl final
 
   // interaction
   unsigned long m_RenderWindowFocusObserverTag;
+  mitk::InteractionSchemeSwitcher::InteractionScheme m_InteractionScheme;
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
   std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
   QmitkMultiWidgetLayoutManager* m_LayoutManager;
@@ -84,6 +114,7 @@ QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget, cons
   , m_MultiWidgetRows(0)
   , m_MultiWidgetColumns(0)
   , m_RenderWindowFocusObserverTag(0)
+  , m_InteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard)
   , m_DisplayActionEventBroadcast(nullptr)
   , m_DisplayActionEventHandler(nullptr)
   , m_LayoutManager(new QmitkMultiWidgetLayoutManager(multiWidget))
@@ -141,18 +172,53 @@ void QmitkAbstractMultiWidget::SetLayout(int row, int column)
 
 void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
-  auto interactionEventHandler = GetInteractionEventHandler();
+  // The configuration is applied even when the scheme is unchanged, because
+  // others temporarily replace it on the same event handler; a tool that
+  // blocks the left mouse button while it is active is the common case.
   try
   {
-    interactionSchemeSwitcher->SetInteractionScheme(interactionEventHandler, scheme);
+    mitk::InteractionSchemeSwitcher::SetInteractionScheme(this->GetInteractionEventHandler(), scheme);
   }
   catch (const mitk::Exception&)
   {
     return;
   }
 
-  SetInteractionSchemeImpl();
+  if (scheme == m_Impl->m_InteractionScheme)
+  {
+    return;
+  }
+
+  m_Impl->m_InteractionScheme = scheme;
+
+  emit InteractionSchemeChanged(scheme);
+  emit NotifyCrosshairRotationModeChanged(CrosshairRotationMode(scheme));
+}
+
+mitk::InteractionSchemeSwitcher::InteractionScheme QmitkAbstractMultiWidget::GetInteractionScheme() const
+{
+  return m_Impl->m_InteractionScheme;
+}
+
+// Exhaustive rather than defaulted, so that a scheme added later is flagged here.
+bool QmitkAbstractMultiWidget::IsPACSScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+{
+  switch (scheme)
+  {
+    case mitk::InteractionSchemeSwitcher::PACSBase:
+    case mitk::InteractionSchemeSwitcher::PACSStandard:
+    case mitk::InteractionSchemeSwitcher::PACSLevelWindow:
+    case mitk::InteractionSchemeSwitcher::PACSPan:
+    case mitk::InteractionSchemeSwitcher::PACSScroll:
+    case mitk::InteractionSchemeSwitcher::PACSZoom:
+      return true;
+    case mitk::InteractionSchemeSwitcher::MITKStandard:
+    case mitk::InteractionSchemeSwitcher::MITKRotationUncoupled:
+    case mitk::InteractionSchemeSwitcher::MITKRotationCoupled:
+      break;
+  }
+
+  return false;
 }
 
 mitk::InteractionEventHandler* QmitkAbstractMultiWidget::GetInteractionEventHandler()

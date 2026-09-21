@@ -25,11 +25,11 @@
 	The MxNDisplay is initialized with a single window view and a configuration toolbar on the right side.
 	In the toolbar you can find three icons / actions, where two buttons have an on/off state.
 	<table style="border: none;">
-		<tr><td>\imageMacro{QtWidgets/resource/mwLayout.png, "Layout button", 16.00}
-		<tr><td>\imageMacro{QtWidgets/resource/mwSynchronized.png, "Synchronize button", 16.00}
-			<td>\imageMacro{QtWidgets/resource/mwDesynchronized.png, "Desynchronize button", 16.00}
-		<tr><td>\imageMacro{QtWidgets/resource/mwMITK.png, "MITK mode button", 16.00}
-			<td>\imageMacro{QtWidgets/resource/mwPACS.png, "PACS mode button", 16.00}
+		<tr><td>\imageMacro{mwLayout-dox.svg, "Layout button", 16.00}
+		<tr><td>\imageMacro{mwSynchronized-dox.svg, "Synchronize button", 16.00}
+			<td>\imageMacro{mwDesynchronized-dox.svg, "Desynchronize button", 16.00}
+		<tr><td>\imageMacro{mwMITK-dox.svg, "MITK mode button", 16.00}
+			<td>\imageMacro{mwPACS-dox.svg, "PACS mode button", 16.00}
 	</table>
 
 	<ul>
@@ -77,9 +77,9 @@
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Synchronization Window synchronization
 	If data is displayed inside a window view you can interact with the window / loaded image using your mouse.
-	As long as the interaction synchronization is disabled (<img src="mwDesynchronized.png">), mouse interactions,
+	As long as the interaction synchronization is disabled (<img src="mwDesynchronized-dox.svg">), mouse interactions,
 	such as zooming, setting the point of interest, mouse wheel scrolling etc. will affect only the window view you click in.
-	If the interaction synchronization is enabled (<img src="mwSynchronized.png">), performing any of the mouse interactions inside a window view
+	If the interaction synchronization is enabled (<img src="mwSynchronized-dox.svg">), performing any of the mouse interactions inside a window view
 	will perform the same interaction in any other visible window view.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Interaction_Mode Mouse interaction mode
@@ -90,23 +90,30 @@
 	MxN display: It allows to select the action to perform for the left mouse button.
 	The difference between the MITK and PACS mode is as follows:
 
-	MITK interaction mouse mode <img src="mwMITK.png">
+	MITK interaction mouse mode <img src="mwMITK-dox.svg">
 	<ul>
 		<li> left mouse button: setting the point of interest
 		<li> right mouse button: zooming in and out while moving the mouse
 		<li> middle mouse button / pressing mouse wheel: moving the image while moving the mouse
 		<li> mouse wheel: scrolling through the displayed image slices
+		<li> up / down arrow key: scrolling through the displayed image slices
+		<li> left / right arrow key: stepping through the time steps
 	</ul>
 
-	PACS interaction mouse mode <img src="mwPACS.png">
+	PACS interaction mouse mode <img src="mwPACS-dox.svg">
 	<ul>
 		<li> left mouse button: depending on the selected mode in the interaction tool bar
 		<li> right mouse button: changing the level window for the topmost visible image under the mouse cursor
 		<li> middle mouse button / clicking mouse wheel: no interaction
 		<li> mouse wheel: scrolling through the displayed image slices
-		<li> strg-key + right mouse button: zooming in and out while moving the mouse
-	<li> shif-key + right mouse button: moving the image while moving the mouse
+		<li> ctrl-key + right mouse button: zooming in and out while moving the mouse
+		<li> shift-key + right mouse button: moving the image while moving the mouse
+		<li> up / down arrow key: scrolling through the displayed image slices
+		<li> left / right arrow key: stepping through the time steps
 	</ul>
+
+	The crosshair rotation modes are realized by the MITK interaction mouse mode. Selecting one of them
+	from the crosshair menu of a window view therefore leaves the PACS interaction mouse mode.
 
 \subsection org_mitk_editors_mxnmultiwidget_Utility Utility Menu
 	Each window view has a utility menu at the top with four UI elements that allow to perform the following actions:

@@ -76,7 +76,7 @@ void mitk::DoseImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer *renderer, dou
 
   float depth = this->CalculateLayerDepth(renderer);
   // Set the origin to (xMin; yMin; depth) of the plane. This is necessary for obtaining the correct
-  // plane size in crosshair rotation and swivel mode.
+  // plane size in crosshair rotation.
   localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depth);
   // These two points define the axes of the plane in combination with the origin.
   // Point 1 is the x-axis and point 2 the y-axis.

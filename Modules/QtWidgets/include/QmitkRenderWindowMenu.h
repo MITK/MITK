@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 // mitk qtwidgets module
 #include <MitkQtWidgetsExports.h>
+#include <QmitkCrosshairRotationMode.h>
 #include <QmitkMultiWidgetLayoutManager.h>
 
 // mitk core
@@ -22,6 +23,7 @@ found in the LICENSE file.
 
 // qt
 #include <QAction>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QLabel>
 #include <QMenuBar>
@@ -85,7 +87,7 @@ public:
 
   void UpdateCrosshair3DVisibility(bool visible);
 
-  void UpdateCrosshairRotationMode(int mode);
+  void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
 /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
 is activated.*/
@@ -115,8 +117,7 @@ Q_SIGNALS:
 
   void Crosshair3DVisibilityChanged(bool);
 
-  // \brief int parameters are enum from QmitkStdMultiWidget
-  void CrosshairRotationModeChanged(int);
+  void CrosshairRotationModeChanged(QmitkCrosshairRotationMode);
 
   /*! emit signal, when layout design changed by the setting menu.*/
   void LayoutDesignChanged(LayoutDesign layoutDesign);
@@ -125,7 +126,7 @@ protected Q_SLOTS:
 
   /// this function is continuously called by a timer
   /// to do the auto rotation
-  void AutoRotateNextStep();
+  void AutoRotateNextFrame();
 
   /// this function is invoked when the auto-rotate action
   /// is clicked
@@ -183,13 +184,15 @@ private:
   mitk::BaseRenderer::Pointer m_Renderer;
 
   QTimer* m_AutoRotationTimer;
+  /** Measures how far the camera has to be rotated on the next timer tick. */
+  QElapsedTimer m_AutoRotationElapsed;
 
   QWidget *m_Parent;
 
   //memory because mode is set to default for slice num = 1
   static unsigned int m_DefaultThickMode;
 
-  int m_CrosshairRotationMode;
+  QmitkCrosshairRotationMode m_CrosshairRotationMode;
   bool m_CrosshairVisibility;
   bool m_Crosshair3DVisibility;
 

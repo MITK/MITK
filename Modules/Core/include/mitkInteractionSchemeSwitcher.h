@@ -17,73 +17,63 @@ found in the LICENSE file.
 
 #include <mitkInteractionEventHandler.h>
 
-#include <itkObject.h>
-
 namespace mitk
 {
-#ifdef __GNUC__
-#pragma GCC visibility push(default)
-#endif
-  /**
-    \brief Can be observed by GUI class to update button states when type is changed programmatically.
-  */
-  itkEventMacroDeclaration(InteractionSchemeChangedEvent, itk::AnyEvent);
-#ifdef __GNUC__
-#pragma GCC visibility pop
-#endif
-
   /***********************************************************************
   *
   * \brief Class that offers a convenient way to switch between different
   * interaction schemes.
   *
-  * This class offers the possibility to switch between the different
-  * interaction schemes that are available:
+  * A scheme is a stack of event configuration files that is loaded into a
+  * given interaction event handler. All schemes drive the same display
+  * interaction state machine (DisplayInteraction.xml); they differ only in
+  * which input events are mapped to its event variants.
   *
-  * - MITKStandard : The original MITK interaction scheme
-  * - MITKRotationUncoupled : A modified MITK interaction scheme with rotation
-  * - MITKRotationCoupled : A modified MTIK interaction scheme with coupled rotation
-  * - MITKSwivel : A modified MITK interaction scheme with plane swiveling
+  * The MITK schemes share DisplayConfigMITKBase.xml:
   *
-  * - PACS : An alternative interaction scheme that behaves more like a
-  *          PACS workstation
-  *   - left mouse button   : behavior depends on current PACS scheme
-  *   Always enabled:
-  *   - middle mouse button : fast scrolling
-  *   - right mouse button  : level-window
-  *   - ctrl + right button : zooming
-  *   - shift+ right button : panning
+  * - left mouse button   : depends on the scheme (see below)
+  * - middle mouse button : panning
+  * - right mouse button  : zooming
+  * - mouse wheel, up / down arrow : scrolling through slices
+  * - left / right arrow  : stepping through time steps
   *
-  *   There are 6 different PACS schemes.
-  *   Each scheme defines the interaction that is performed on a left
-  *   mouse button click:
-  *   - PACSBase : No interaction on a left mouse button click
-        - This scheme serves as a base for other PACS schemes and defines the right
-          and middle mouse button clicks, which are available in every PACS scheme.
-  *   - PACSStandard : Sets the cross position for the MPR
-  *   - PACSLevelWindow : Sets the level window
-  *   - PACSPan : Moves the slice
-  *   - PACSScroll : Scrolls through the slices stepwise
-  *   - PACSZoom : Zooms into / out of the slice
+  * - MITKStandard : Sets the cross position for the MPR
+  * - MITKRotationUncoupled : Rotates a single plane
+  * - MITKRotationCoupled : Rotates two planes at once
   *
-  * When the interaction scheme is changed, this class sets the corresponding
-  * interaction .xml-files for a given interaction event handler.
+  * The PACS schemes share DisplayConfigPACSBase.xml, which behaves more
+  * like a PACS workstation:
+  *
+  * - left mouse button   : depends on the scheme (see below)
+  * - middle mouse button : unused
+  * - right mouse button  : level window
+  * - ctrl + right button : zooming
+  * - shift + right button: panning
+  * - mouse wheel, up / down arrow : scrolling through slices
+  * - left / right arrow  : stepping through time steps
+  *
+  * - PACSBase : No interaction on a left mouse button click. This scheme
+  *              serves as the base for the other PACS schemes.
+  * - PACSStandard : Sets the cross position for the MPR
+  * - PACSLevelWindow : Sets the level window
+  * - PACSPan : Moves the slice
+  * - PACSScroll : Scrolls through the slices stepwise
+  * - PACSZoom : Zooms into / out of the slice
+  *
+  * Display interaction is disabled for 3D render windows, so none of the
+  * schemes has an effect there.
   *
   ***********************************************************************/
 
-  class MITKCORE_EXPORT InteractionSchemeSwitcher : public itk::Object
+  class MITKCORE_EXPORT InteractionSchemeSwitcher
   {
   public:
-    mitkClassMacroItkParent(InteractionSchemeSwitcher, itk::Object);
-    itkFactorylessNewMacro(Self);
-
     // enum of the different interaction schemes that are available
     enum InteractionScheme
     {
       MITKStandard = 0,
       MITKRotationUncoupled,
       MITKRotationCoupled,
-      MITKSwivel,
       PACSBase,
       PACSStandard,
       PACSLevelWindow,
@@ -99,7 +89,6 @@ namespace mitk
      * Based on the given interaction scheme different configuration files are loaded into the interaction event handler.
      * The interaction scheme can be a variant of the MITK-scheme or the PACS-scheme (see InteractionScheme).
      * The default is MITKStandard.
-     * If the interaction scheme has been changed, an InteractionSchemeChangedEvent will be invoked.
      *
      * \pre The interaction event handler has to be valid (not nullptr).
      * \throw mitk::Exception if the interaction event handler is invalid (nullptr).
@@ -107,13 +96,7 @@ namespace mitk
      * \param interactionEventHandler The interaction event handler that defines the interaction scheme via configuration files.
      * \param interactionScheme The interaction scheme that should be used for the currently active interaction event handler.
      */
-    void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
-
-  protected:
-
-    InteractionSchemeSwitcher();
-    ~InteractionSchemeSwitcher() override;
-
+    static void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
   };
 } // namespace mitk
 

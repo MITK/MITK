@@ -213,7 +213,7 @@ void QmitkRenderWindow::UpdateCrosshair3DVisibility(bool visible)
   m_MenuWidget->UpdateCrosshair3DVisibility(visible);
 }
 
-void QmitkRenderWindow::UpdateCrosshairRotationMode(int mode)
+void QmitkRenderWindow::UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode)
 {
   m_MenuWidget->UpdateCrosshairRotationMode(mode);
 }

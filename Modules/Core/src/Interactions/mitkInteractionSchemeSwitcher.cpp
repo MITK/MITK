@@ -16,21 +16,6 @@ found in the LICENSE file.
 #include <mitkInteractionEventObserver.h>
 #include <mitkExceptionMacro.h>
 
-namespace mitk
-{
-  itkEventMacroDefinition(InteractionSchemeChangedEvent, itk::AnyEvent);
-}
-
-mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
-{
-  // nothing here
-}
-
-mitk::InteractionSchemeSwitcher::~InteractionSchemeSwitcher()
-{
-  // nothing here
-}
-
 void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
 {
   if (nullptr == interactionEventHandler)
@@ -58,12 +43,6 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
       interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigActivateCoupling.xml");
-      break;
-    }
-    case MITKSwivel:
-    {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
-      interactionEventHandler->AddEventConfig("DisplayConfigSwivel.xml");
       break;
     }
     // PACS MODE
@@ -108,6 +87,4 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
       interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
     }
   }
-
-  InvokeEvent(InteractionSchemeChangedEvent());
 }

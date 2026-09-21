@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 // mitk qt widgets module
 #include <MitkQtWidgetsExports.h>
+#include <QmitkCrosshairRotationMode.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -124,9 +125,28 @@ public:
   virtual void Synchronize(bool) { };
   /**
    * \brief Sets the interaction scheme for the multi widget.
+   *
+   * The matching event configuration is applied to the interaction event
+   * handler even if the scheme is already the active one, since others
+   * replace that configuration temporarily. InteractionSchemeChanged() and
+   * NotifyCrosshairRotationModeChanged() are emitted only when the scheme
+   * actually changes.
+   *
    * \param[in] scheme The interaction scheme to use.
    */
   virtual void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+  /**
+   * \brief Returns the interaction scheme that is currently applied.
+   */
+  mitk::InteractionSchemeSwitcher::InteractionScheme GetInteractionScheme() const;
+  /**
+   * \brief Returns whether the given scheme belongs to the PACS family.
+   *
+   * The PACS and the MITK schemes are mutually exclusive. Callers that
+   * only mean to change something within the MITK family (the crosshair
+   * rotation mode, for example) use this to leave a PACS scheme alone.
+   */
+  static bool IsPACSScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   /**
    * \brief Returns the interaction event handler.
@@ -317,10 +337,14 @@ public:
   virtual void ResetCrosshair() = 0;
 
   /**
-   * \brief Sets the widget plane mode (e.g., rotation, swivel).
-   * \param[in] mode The plane mode identifier.
+   * \brief Selects how the left mouse button manipulates the crosshair planes.
+   *
+   * The rotation modes are realized by the MITK interaction schemes, so
+   * this leaves a PACS scheme if one is active.
+   *
+   * \param[in] mode The crosshair rotation mode to use.
    */
-  virtual void SetWidgetPlaneMode(int mode) = 0;
+  virtual void SetWidgetPlaneMode(QmitkCrosshairRotationMode mode) = 0;
 
   /**
    * \brief Activates or deactivates the render window menu widget.
@@ -336,6 +360,16 @@ public:
 signals:
 
   void ActiveRenderWindowChanged();
+  void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+  /**
+   * \brief Reports the crosshair rotation mode that the applied scheme realizes.
+   *
+   * The rotation modes are one of the ways to look at the interaction scheme,
+   * so they are reported from where the scheme is owned rather than from
+   * SetWidgetPlaneMode(). Switching to a PACS scheme, which binds no rotation
+   * at all, therefore no longer leaves the crosshair menus claiming one.
+   */
+  void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
 
 private slots:
 
@@ -386,10 +420,6 @@ private:
   * \brief Called by SetLayout() and can be customized in subclasses.
   */
   virtual void SetLayoutImpl() = 0;
-  /**
-  * \brief Called by SetInteractionScheme() and can be customized in subclasses.
-  */
-  virtual void SetInteractionSchemeImpl() = 0;
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;

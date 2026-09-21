@@ -74,6 +74,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::LabelRenameRequested, this, &QmitkMultiLabelManager::OnLabelRenameRequested);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::OnSelectedLabelChanged);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentItemChanged, this, &QmitkMultiLabelManager::UpdateControls);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::ModelUpdated, this, &QmitkMultiLabelManager::OnModelUpdated);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::SegmentationChanged, this, &QmitkMultiLabelManager::OnSegmentationChanged);
 
@@ -238,7 +239,8 @@ void QmitkMultiLabelManager::UpdateControls()
   if (nullptr != m_AddLabelInstanceShortcut)
     m_AddLabelInstanceShortcut->setEnabled(hasWorkingData && labels.size() == 1 && instanceAllowed);
 
-  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
+  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && segmentation->GetNumberOfGroups() > 1
+    && this->m_Controls->labelInspector->GetGroupIDForRemoval().has_value());
   m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
   m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
 

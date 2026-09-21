@@ -16,11 +16,6 @@ found in the LICENSE file.
 #include <mitkInteractionEventObserver.h>
 #include <mitkExceptionMacro.h>
 
-namespace mitk
-{
-  itkEventMacroDefinition(InteractionSchemeChangedEvent, itk::AnyEvent);
-}
-
 mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
 {
   // nothing here
@@ -108,6 +103,4 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
       interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
     }
   }
-
-  InvokeEvent(InteractionSchemeChangedEvent());
 }

@@ -16,16 +16,6 @@ found in the LICENSE file.
 #include <mitkInteractionEventObserver.h>
 #include <mitkExceptionMacro.h>
 
-mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
-{
-  // nothing here
-}
-
-mitk::InteractionSchemeSwitcher::~InteractionSchemeSwitcher()
-{
-  // nothing here
-}
-
 void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
 {
   if (nullptr == interactionEventHandler)

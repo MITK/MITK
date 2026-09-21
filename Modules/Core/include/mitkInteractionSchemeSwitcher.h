@@ -17,8 +17,6 @@ found in the LICENSE file.
 
 #include <mitkInteractionEventHandler.h>
 
-#include <itkObject.h>
-
 namespace mitk
 {
   /***********************************************************************
@@ -68,12 +66,9 @@ namespace mitk
   *
   ***********************************************************************/
 
-  class MITKCORE_EXPORT InteractionSchemeSwitcher : public itk::Object
+  class MITKCORE_EXPORT InteractionSchemeSwitcher
   {
   public:
-    mitkClassMacroItkParent(InteractionSchemeSwitcher, itk::Object);
-    itkFactorylessNewMacro(Self);
-
     // enum of the different interaction schemes that are available
     enum InteractionScheme
     {
@@ -103,13 +98,7 @@ namespace mitk
      * \param interactionEventHandler The interaction event handler that defines the interaction scheme via configuration files.
      * \param interactionScheme The interaction scheme that should be used for the currently active interaction event handler.
      */
-    void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
-
-  protected:
-
-    InteractionSchemeSwitcher();
-    ~InteractionSchemeSwitcher() override;
-
+    static void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
   };
 } // namespace mitk
 

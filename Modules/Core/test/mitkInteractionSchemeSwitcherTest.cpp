@@ -95,12 +95,11 @@ class mitkInteractionSchemeSwitcherTestSuite : public mitk::TestFixture
 
 private:
 
-  mitk::InteractionSchemeSwitcher::Pointer m_Switcher;
   TestEventHandler::Pointer m_EventHandler;
 
   mitk::EventConfig Apply(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
   {
-    m_Switcher->SetInteractionScheme(m_EventHandler, scheme);
+    mitk::InteractionSchemeSwitcher::SetInteractionScheme(m_EventHandler, scheme);
     return m_EventHandler->GetEventConfig();
   }
 
@@ -108,20 +107,18 @@ public:
 
   void setUp() override
   {
-    m_Switcher = mitk::InteractionSchemeSwitcher::New();
     m_EventHandler = TestEventHandler::New();
   }
 
   void tearDown() override
   {
-    m_Switcher = nullptr;
     m_EventHandler = nullptr;
   }
 
   void SetInteractionScheme_NoEventHandler_Throws()
   {
     CPPUNIT_ASSERT_THROW(
-      m_Switcher->SetInteractionScheme(nullptr, mitk::InteractionSchemeSwitcher::MITKStandard),
+      mitk::InteractionSchemeSwitcher::SetInteractionScheme(nullptr, mitk::InteractionSchemeSwitcher::MITKStandard),
       mitk::Exception);
   }
 

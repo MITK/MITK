@@ -79,7 +79,7 @@ struct QmitkAbstractMultiWidget::Impl final
 
     // Apply the default scheme right away, so that the handler never runs
     // without an event configuration.
-    mitk::InteractionSchemeSwitcher::New()->SetInteractionScheme(m_DisplayActionEventBroadcast.GetPointer(), m_InteractionScheme);
+    mitk::InteractionSchemeSwitcher::SetInteractionScheme(m_DisplayActionEventBroadcast.GetPointer(), m_InteractionScheme);
   }
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -177,11 +177,9 @@ void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitc
   // The configuration is applied even when the scheme is unchanged, because
   // others temporarily replace it on the same event handler; a tool that
   // blocks the left mouse button while it is active is the common case.
-  auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
-  auto interactionEventHandler = GetInteractionEventHandler();
   try
   {
-    interactionSchemeSwitcher->SetInteractionScheme(interactionEventHandler, scheme);
+    mitk::InteractionSchemeSwitcher::SetInteractionScheme(this->GetInteractionEventHandler(), scheme);
   }
   catch (const mitk::Exception&)
   {

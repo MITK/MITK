@@ -81,6 +81,7 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
   connect(m_Model, &QmitkMultiLabelTreeModel::modelChanged, this, &QmitkMultiLabelInspector::OnModelChanged);
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
+  connect(view->selectionModel(), &QItemSelectionModel::currentChanged, this, &QmitkMultiLabelInspector::CurrentItemChanged);
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
   connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
@@ -146,6 +147,15 @@ void QmitkMultiLabelInspector::Initialize()
       this->SetSelectedLabel(labelVariant.value<LabelValueType>());
       m_Controls->view->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::NoUpdate);
     }
+  }
+  else if (m_Segmentation.IsNotNull() && m_Segmentation->GetTotalNumberOfLabels() == 0)
+  {
+    //Without labels nothing can be selected, as groups are not selectable. Focussing the first
+    //group still gives group wide operations (e.g. removing a group) a defined target.
+    auto firstIndex = m_Model->indexOfGroup(0);
+
+    if (firstIndex.isValid())
+      m_Controls->view->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::NoUpdate);
   }
 
   this->RefreshCompleter();
@@ -502,6 +512,29 @@ QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetCurr
   return m_Model->GetLabelsInSubTree(currentIndex);
 }
 
+std::optional<mitk::MultiLabelSegmentation::GroupIndexType> QmitkMultiLabelInspector::GetCurrentGroupID() const
+{
+  const auto groupIDVariant = m_Controls->view->currentIndex().data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+
+  if (!groupIDVariant.isValid())
+    return std::nullopt;
+
+  return groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
+}
+
+std::optional<mitk::MultiLabelSegmentation::GroupIndexType> QmitkMultiLabelInspector::GetGroupIDForRemoval() const
+{
+  if (m_Segmentation.IsNull())
+    return std::nullopt;
+
+  const auto* selectedLabel = this->GetFirstSelectedLabelObject();
+
+  if (nullptr != selectedLabel)
+    return m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+
+  return this->GetCurrentGroupID();
+}
+
 QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetLabelInstancesOfSelectedFirstLabel() const
 {
   if (m_Segmentation.IsNull())
@@ -638,7 +671,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabel(bool skipNamingPrompt)
   auto currentLabel = this->GetFirstSelectedLabelObject();
   mitk::MultiLabelSegmentation::GroupIndexType groupID = nullptr != currentLabel
     ? m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue())
-    : 0;
+    : this->GetCurrentGroupID().value_or(0);
 
   auto result = AddNewLabelInternal(groupID, skipNamingPrompt);
 
@@ -897,6 +930,28 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkMultiLabelInspector::RemoveGroupWithConfirmation(mitk::MultiLabelSegmentation::GroupIndexType groupID)
+{
+  auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
+
+  auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
+  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+  if (answer != QMessageBox::Yes)
+    return;
+
+  this->RemoveGroupInternal(groupID);
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+  }
+}
+
 void QmitkMultiLabelInspector::RemoveGroup()
 {
   if (!m_AllowLabelModification)
@@ -911,21 +966,12 @@ void QmitkMultiLabelInspector::RemoveGroup()
     return;
   }
 
-  const auto* selectedLabel = this->GetFirstSelectedLabelObject();
+  const auto groupID = this->GetGroupIDForRemoval();
 
-  if (selectedLabel == nullptr)
+  if (!groupID.has_value())
     return;
 
-  const auto groupID = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
-  auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
-
-  auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
-  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-  if (answer != QMessageBox::Yes)
-    return;
-
-  this->RemoveGroupInternal(groupID);
+  this->RemoveGroupWithConfirmation(groupID.value());
 }
 
 void QmitkMultiLabelInspector::OnDeleteGroup()
@@ -936,31 +982,11 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
   if (m_Segmentation.IsNull())
     return;
 
-  auto currentIndex = this->m_Controls->view->currentIndex();
-  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+  const auto groupID = this->GetCurrentGroupID();
 
-  if (groupIDVariant.isValid())
-  {
-    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
-    auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
-    auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
-    auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-    if (answer != QMessageBox::Yes)
-      return;
-
-    this->RemoveGroupInternal(groupID);
-
-    // this is needed as workaround for (T27307). It circumvents the fact that modifications
-    // of data (here the segmentation) does not directly trigger the modification of the
-    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
-    // listens to the datastorage for modification would not get notified.
-    if (m_SegmentationNode.IsNotNull())
-    {
-      m_SegmentationNode->Modified();
-    }
-  }
-};
+  if (groupID.has_value())
+    this->RemoveGroupWithConfirmation(groupID.value());
+}
 
 
 void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
@@ -1444,13 +1470,11 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnAddLabel()
 {
-  auto currentIndex = this->m_Controls->view->currentIndex();
-  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+  const auto groupID = this->GetCurrentGroupID();
 
-  if (groupIDVariant.isValid())
+  if (groupID.has_value())
   {
-    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
-    this->AddNewLabelInternal(groupID);
+    this->AddNewLabelInternal(groupID.value());
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
     // of data (here the segmentation) does not directly trigger the modification of the
@@ -1522,12 +1546,11 @@ void QmitkMultiLabelInspector::OnRenameGroup()
   if (m_Segmentation.IsNull())
     return;
 
-  auto currentIndex = this->m_Controls->view->currentIndex();
-  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+  const auto currentGroupID = this->GetCurrentGroupID();
 
-  if (groupIDVariant.isValid())
+  if (currentGroupID.has_value())
   {
-    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
+    const auto groupID = currentGroupID.value();
 
     bool dlgOK;
     auto groupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
@@ -1719,8 +1742,6 @@ void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index)
 {
   if (m_SegmentationNode.IsNotNull())
   {
-    auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-
     auto highlightedValues = m_Model->GetLabelsInSubTree(index);
 
     m_LabelHighlightGuard.SetHighlightedLabels(highlightedValues);
@@ -1757,7 +1778,7 @@ void QmitkMultiLabelInspector::keyReleaseEvent(QKeyEvent* event)
     m_LabelHighlightGuard.SetHighlightInvisibleLabels(false);
   }
 
-  QWidget::keyPressEvent(event);
+  QWidget::keyReleaseEvent(event);
 }
 
 void QmitkMultiLabelInspector::OnSearchLabel()

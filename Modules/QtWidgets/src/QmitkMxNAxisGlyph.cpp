@@ -12,9 +12,11 @@ found in the LICENSE file.
 
 #include "QmitkMxNAxisGlyph.h"
 
+#include <QBuffer>
 #include <QColor>
 #include <QFile>
 #include <QImage>
+#include <QImageReader>
 #include <QPixmap>
 
 namespace
@@ -50,11 +52,21 @@ QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, in
   QString svg = QString::fromUtf8(file.readAll());
   svg.replace(QStringLiteral("#00ff00"), color.name(QColor::HexRgb), Qt::CaseInsensitive);
 
-  const QImage image = QImage::fromData(svg.toUtf8(), "svg");
+  // Rasterise at the requested size rather than at the resource's own 24 px and
+  // scaling that up: the reader hands the size to the SVG renderer, so a glyph
+  // stays crisp wherever it is drawn large (a peek plate's pumped axis is nearly
+  // three times the resource size, where an upscale reads as a blurred bitmap).
+  QByteArray data = svg.toUtf8();
+  QBuffer buffer(&data);
+  buffer.open(QIODevice::ReadOnly);
+  QImageReader reader(&buffer, "svg");
+  reader.setScaledSize(QSize(sizePx, sizePx));
+
+  const QImage image = reader.read();
   if (image.isNull())
   {
     return QPixmap();
   }
 
-  return QPixmap::fromImage(image.scaled(sizePx, sizePx, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  return QPixmap::fromImage(image);
 }

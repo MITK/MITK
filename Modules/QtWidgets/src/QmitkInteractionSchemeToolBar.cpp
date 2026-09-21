@@ -22,13 +22,17 @@ QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* =
   , m_ActionGroup(new QActionGroup(this))
 {
   QToolBar::setOrientation(Qt::Vertical);
-  m_ActionGroup->setExclusive(false); // allow having no action selected
 
-  AddButton(InteractionScheme::PACSStandard, tr("Pointer"), QStringLiteral(":/Qmitk/mm_pointer.svg"));
-  AddButton(InteractionScheme::PACSLevelWindow, tr("Level/Window"), QStringLiteral(":/Qmitk/mm_contrast.svg"));
-  AddButton(InteractionScheme::PACSPan, tr("Pan"), QStringLiteral(":/Qmitk/mm_pan.svg"));
-  AddButton(InteractionScheme::PACSScroll, tr("Scroll"), QStringLiteral(":/Qmitk/mm_scroll.svg"));
-  AddButton(InteractionScheme::PACSZoom, tr("Zoom"), QStringLiteral(":/Qmitk/mm_zoom.svg"));
+  // Unchecks the active tool when it is clicked again, instead of insisting on
+  // one checked action the way a plain exclusive group does.
+  m_ActionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
+  connect(m_ActionGroup, &QActionGroup::triggered, this, &QmitkInteractionSchemeToolBar::OnActionTriggered);
+
+  this->AddButton(InteractionScheme::PACSStandard, tr("Pointer"), QStringLiteral(":/Qmitk/mm_pointer.svg"));
+  this->AddButton(InteractionScheme::PACSLevelWindow, tr("Level/Window"), QStringLiteral(":/Qmitk/mm_contrast.svg"));
+  this->AddButton(InteractionScheme::PACSPan, tr("Pan"), QStringLiteral(":/Qmitk/mm_pan.svg"));
+  this->AddButton(InteractionScheme::PACSScroll, tr("Scroll"), QStringLiteral(":/Qmitk/mm_scroll.svg"));
+  this->AddButton(InteractionScheme::PACSZoom, tr("Zoom"), QStringLiteral(":/Qmitk/mm_zoom.svg"));
 }
 
 QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
@@ -42,26 +46,11 @@ void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionSchem
   action->setCheckable(true);
   action->setActionGroup(m_ActionGroup);
   action->setData(interactionScheme);
-  connect(action, &QAction::triggered, this, &QmitkInteractionSchemeToolBar::OnActionTriggered);
   QToolBar::addAction(action);
 }
 
-void QmitkInteractionSchemeToolBar::OnActionTriggered()
+void QmitkInteractionSchemeToolBar::OnActionTriggered(QAction* action)
 {
-  auto* action = qobject_cast<QAction*>(sender());
-  if (nullptr == action)
-  {
-    return;
-  }
-
-  for (auto* otherAction : m_ActionGroup->actions())
-  {
-    if (otherAction != action)
-    {
-      otherAction->setChecked(false);
-    }
-  }
-
   // Unchecking the active tool falls back to the base scheme, where the left
   // mouse button has no effect at all.
   const auto interactionScheme = action->isChecked()

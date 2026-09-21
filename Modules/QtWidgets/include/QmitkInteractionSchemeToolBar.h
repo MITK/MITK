@@ -20,6 +20,7 @@ found in the LICENSE file.
 
 #include <QToolBar>
 
+class QAction;
 class QActionGroup;
 
 /**
@@ -58,7 +59,7 @@ Q_SIGNALS:
 private:
 
   void AddButton(InteractionScheme interactionScheme, const QString& toolName, const QString& iconResource);
-  void OnActionTriggered();
+  void OnActionTriggered(QAction* action);
 
   QActionGroup* m_ActionGroup;
 

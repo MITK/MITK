@@ -59,7 +59,7 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 
   m_InteractionSchemeChangeAction = new QAction(this);
   m_InteractionSchemeChangeAction->setCheckable(true);
-  UpdateInteractionSchemeAction(false);
+  this->UpdateInteractionSchemeAction(false);
   connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(m_InteractionSchemeChangeAction);
 }
@@ -119,7 +119,7 @@ void QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged()
 {
   const bool pacs = m_InteractionSchemeChangeAction->isChecked();
 
-  UpdateInteractionSchemeAction(pacs);
+  this->UpdateInteractionSchemeAction(pacs);
 
   emit InteractionSchemeChanged(pacs
     ? mitk::InteractionSchemeSwitcher::PACSStandard
@@ -128,5 +128,5 @@ void QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged()
 
 void QmitkMultiWidgetConfigurationToolBar::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  UpdateInteractionSchemeAction(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
+  this->UpdateInteractionSchemeAction(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
 }

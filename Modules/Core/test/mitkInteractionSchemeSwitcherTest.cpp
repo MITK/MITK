@@ -33,7 +33,7 @@ namespace
   class TestEventHandler : public mitk::InteractionEventHandler
   {
   public:
-    mitkClassMacroItkParent(TestEventHandler, mitk::InteractionEventHandler);
+    mitkClassMacro(TestEventHandler, mitk::InteractionEventHandler);
     itkFactorylessNewMacro(Self);
   };
 

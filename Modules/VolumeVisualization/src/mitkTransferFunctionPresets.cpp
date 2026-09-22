@@ -266,6 +266,41 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::CreateTransferFun
   return BuildTransferFunction(*it);
 }
 
+std::string mitk::TransferFunctionPresets::AddPreset(std::istream &stream)
+{
+  auto presets = ReadPresets(stream);
+
+  // An entry naming itself nothing cannot be taken in: the name is what a node
+  // records its preset under and what the catalog is searched by, and the empty
+  // one already means "no preset" to both.
+  if (presets.empty() || presets.front().name.empty())
+    return std::string();
+
+  auto &preset = presets.front();
+
+  const auto isTaken = [this](const std::string &name)
+  {
+    return std::any_of(m_Presets.begin(), m_Presets.end(),
+      [&name](const Preset &other) { return other.name == name; });
+  };
+
+  // A name is the only thing CreateTransferFunction can find a preset by, so two
+  // presets sharing one would leave the second unreachable. The numbering is the
+  // same in every session: the built-ins are read first and in file order, and
+  // what is added after them is added in the order a caller adds it.
+  const std::string wanted = preset.name;
+
+  for (int suffix = 2; isTaken(preset.name); ++suffix)
+    preset.name = wanted + " (" + std::to_string(suffix) + ")";
+
+  // Read before the move below, which leaves what it took from unspecified.
+  const std::string name = preset.name;
+
+  m_Presets.push_back(std::move(preset));
+
+  return name;
+}
+
 mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::LoadTransferFunction(
   std::istream &stream, VolumeBlendMode &blendMode)
 {

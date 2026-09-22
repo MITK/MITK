@@ -12,8 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkVolumeTransferFunctionEditor.h"
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkImage.h>
 #include <mitkLevelWindow.h>
+#include <mitkLog.h>
 #include <mitkProperties.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
@@ -41,12 +45,14 @@ found in the LICENSE file.
 #include <QIcon>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
 #include <QPushButton>
 #include <QRect>
 #include <QSignalBlocker>
+#include <QStringList>
 #include <QTimer>
 #include <QToolButton>
 
@@ -90,12 +96,89 @@ namespace
    */
   constexpr const char *TF_CUSTOM_PROPERTY = "volumerendering.transferfunction.custom";
 
+  /** \brief Where the files presets were saved to are remembered.
+   *
+   * This widget belongs to a module rather than to a view, so it has no site to
+   * ask for a preference node of its own and has to name one. This is the id the
+   * volume visualization v2 view declares in its plugin.xml, and it has to
+   * follow that file should the view ever be renamed. mitk::VideoRecorder names
+   * the movie maker view's node from a module in the same way.
+   */
+  constexpr const char *PRESET_PREFERENCE_NODE = "/org.mitk.views.volumevisualization_v2";
+
+  /** \brief The key the remembered paths stand under, as one joined string.
+   *
+   * mitk::IPreferences stores strings, numbers and bools but no list, so a list
+   * has to be one string, and joining paths with a semicolon is what the rest of
+   * MITK does with one. Nothing escapes the separator, there or here, so a path
+   * carrying one is refused where a preset is saved rather than quietly split in
+   * two on the way back in.
+   */
+  constexpr const char *PRESET_FILES_PREFERENCE = "customPresetFiles";
+
+  constexpr QLatin1Char PRESET_FILE_SEPARATOR(';');
+
+  /** \brief The preference node the remembered preset files stand in. */
+  mitk::IPreferences *PresetPreferences()
+  {
+    mitk::CoreServicePointer preferencesService(mitk::CoreServices::GetPreferencesService());
+
+    auto *preferences = preferencesService->GetSystemPreferences();
+
+    return preferences != nullptr ? preferences->Node(PRESET_PREFERENCE_NODE) : nullptr;
+  }
+
+  /** \brief The files presets were saved to, in the order they were saved. */
+  QStringList RememberedPresetFiles()
+  {
+    auto *preferences = PresetPreferences();
+
+    if (preferences == nullptr)
+      return QStringList();
+
+    const auto remembered = QString::fromStdString(preferences->Get(PRESET_FILES_PREFERENCE, ""));
+
+    return remembered.split(PRESET_FILE_SEPARATOR, Qt::SkipEmptyParts);
+  }
+
+  /** \brief Record which files to look for presets in next time. */
+  void RememberPresetFiles(const QStringList &presetFiles)
+  {
+    auto *preferences = PresetPreferences();
+
+    if (preferences == nullptr)
+      return;
+
+    preferences->Put(PRESET_FILES_PREFERENCE,
+                     presetFiles.join(PRESET_FILE_SEPARATOR).toStdString());
+
+    // Written out here because nothing else will: the preferences dialog flushes
+    // the nodes its own pages own, and this one belongs to no page.
+    preferences->Flush();
+  }
+
   /** \brief Where an entry keeps the name of the preset it stands for.
    *
    * Not the text it shows: that gains a marker once the curve has been moved
    * away from the preset, and then matches no name in the catalogue.
    */
   constexpr int PRESET_NAME_ROLE = Qt::UserRole;
+
+  /** \brief Where a preset in the grid came from.
+   *
+   * The catalogue holds both kinds side by side and answers to a name whichever
+   * it is, so a name alone no longer says which was meant. What a node records
+   * carries this beside the name, to be read in the Properties view or in a
+   * scene opened where none of these files are.
+   */
+  enum class PresetOrigin
+  {
+    Internal, /**< From the catalogue embedded in MitkVolumeVisualization. */
+    File      /**< From a file saved here, and remembered since. */
+  };
+
+  /** \brief Where an entry keeps the origin of the preset it stands for. */
+  constexpr int PRESET_ORIGIN_ROLE = Qt::UserRole + 1;
 
   /** \brief What an entry adds to its name while it is showing such a curve.
    *
@@ -229,6 +312,47 @@ namespace
   QString PresetName(const QListWidgetItem *item)
   {
     return item->data(PRESET_NAME_ROLE).toString();
+  }
+
+  /** \brief Where the preset an entry stands for came from. */
+  PresetOrigin PresetOriginOf(const QListWidgetItem *item)
+  {
+    return static_cast<PresetOrigin>(item->data(PRESET_ORIGIN_ROLE).toInt());
+  }
+
+  /** \brief What a node records a preset of this origin under.
+   *
+   * The one place the recorded spelling is written, so that nothing else can
+   * arrive at a different one.
+   */
+  QString PresetOriginPrefix(PresetOrigin origin)
+  {
+    return origin == PresetOrigin::File ? QStringLiteral("file:") : QStringLiteral("internal:");
+  }
+
+  /** \brief A preset as a node records it. */
+  struct RecordedPreset
+  {
+    PresetOrigin origin;
+    QString name;
+  };
+
+  /** \brief What a recorded value stands for.
+   *
+   * A value carrying no origin was written before origins were recorded, when a
+   * preset from the embedded catalogue was the only kind there was.
+   */
+  RecordedPreset ParseRecordedPreset(const QString &recorded)
+  {
+    for (const auto origin : { PresetOrigin::Internal, PresetOrigin::File })
+    {
+      const QString prefix = PresetOriginPrefix(origin);
+
+      if (recorded.startsWith(prefix))
+        return { origin, recorded.mid(prefix.length()) };
+    }
+
+    return { PresetOrigin::Internal, recorded };
   }
 
   /** \brief The row holding the named preset, or -1.
@@ -380,14 +504,28 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   presetList->setStyleSheet(
     "QListWidget::item:selected:disabled { background-color: rgba(127, 127, 127, 90); }");
 
-  for (const auto &name : m_Presets.GetPresetNames())
+  // Taken before the remembered files are read in, which is what lets the loop
+  // below tell the two apart: what the catalogue already held is its own, and
+  // everything standing after it came from a file.
+  const auto builtInPresetCount = m_Presets.GetPresetNames().size();
+
+  // Before the grid is filled rather than after, so that what was saved in
+  // earlier sessions is in the catalogue by the time the loop below reads it
+  // and needs no entry of its own making.
+  this->LoadRememberedPresets();
+
+  const auto presetNames = m_Presets.GetPresetNames();
+
+  for (std::size_t i = 0; i < presetNames.size(); ++i)
   {
-    const auto presetName = QString::fromStdString(name);
+    const auto presetName = QString::fromStdString(presetNames[i]);
 
     // The name goes in beside the text as well as in it, because the text is
     // what the edited marker is appended to. See PRESET_NAME_ROLE.
     auto *presetItem = new QListWidgetItem(presetName, presetList);
     presetItem->setData(PRESET_NAME_ROLE, presetName);
+    presetItem->setData(PRESET_ORIGIN_ROLE, static_cast<int>(
+      i < builtInPresetCount ? PresetOrigin::Internal : PresetOrigin::File));
   }
 
   // Cells are measured from the names they have to hold, so the entries come
@@ -444,6 +582,13 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
         this->OnPresetSelected(PresetName(item));
     });
 
+  // The policy rather than an overridden contextMenuEvent, which is how the rest
+  // of MITK asks a view for a menu.
+  m_Controls->presetListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  connect(m_Controls->presetListWidget, &QListWidget::customContextMenuRequested,
+    this, &QmitkVolumeTransferFunctionEditor::OnPresetContextMenu);
+
   connect(m_Controls->presetViewModeButton, &QToolButton::clicked, this,
     [this] { this->SetCompactPresetList(!m_CompactPresetList); });
 
@@ -498,6 +643,39 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 }
 
 QmitkVolumeTransferFunctionEditor::~QmitkVolumeTransferFunctionEditor() = default;
+
+void QmitkVolumeTransferFunctionEditor::LoadRememberedPresets()
+{
+  const QStringList rememberedFiles = RememberedPresetFiles();
+
+  QStringList foundFiles;
+
+  for (const auto &presetFile : rememberedFiles)
+  {
+    std::ifstream stream(presetFile.toStdString());
+
+    if (!stream.is_open())
+    {
+      MITK_ERROR << "Transfer function preset file \"" << presetFile.toStdString()
+                 << "\" is no longer there, and is no longer offered.";
+      continue;
+    }
+
+    if (m_Presets.AddPreset(stream).empty())
+    {
+      MITK_ERROR << "Transfer function preset file \"" << presetFile.toStdString()
+                 << "\" holds no preset, and is no longer offered.";
+      continue;
+    }
+
+    foundFiles.append(presetFile);
+  }
+
+  // Only once something has gone, because flushing writes out every preference
+  // the application holds, and the list is otherwise already what it says.
+  if (foundFiles.size() != rememberedFiles.size())
+    RememberPresetFiles(foundFiles);
+}
 
 bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *event)
 {
@@ -668,6 +846,9 @@ void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
   m_DataNode = node;
   m_AppliedTransferFunction = nullptr;
 
+  // A drawing belongs to the node it was made on, and nothing recorded it there.
+  m_CurveDrawnOver = false;
+
   // Previews belong to the image they were drawn from, so a different one
   // leaves them describing nothing that is on screen.
   if (m_ThumbnailImage != (node != nullptr ? node->GetDataAs<mitk::Image>() : nullptr))
@@ -722,7 +903,23 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
   this->ForgetTransferFunctionRecipe(node);
 
   m_AppliedTransferFunction = preset;
-  node->SetStringProperty(TF_PRESET_PROPERTY, name.c_str());
+
+  // The preset stands in place of whatever was drawn over it.
+  m_CurveDrawnOver = false;
+
+  // Recorded with where it came from, since the catalogue answers to a name
+  // whichever kind it holds and the name alone would not say. Looked up rather
+  // than handed in: AddPreset keeps names unique across the catalogue, so the
+  // entry wearing this one is the only entry it could mean.
+  const int presetRow = FindPresetRow(m_Controls->presetListWidget, presetName);
+
+  const auto origin = presetRow >= 0
+    ? PresetOriginOf(m_Controls->presetListWidget->item(presetRow))
+    : PresetOrigin::Internal;
+
+  const auto recordedPreset = (PresetOriginPrefix(origin) + presetName).toStdString();
+
+  node->SetStringProperty(TF_PRESET_PROPERTY, recordedPreset.c_str());
 
   // The mode travels with the curve: a window authored for MIP renders as a
   // white shell under composite, and a tissue classifier projected flat says
@@ -748,11 +945,11 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
 {
   auto node = m_DataNode.Lock();
 
-  std::string presetName;
+  std::string recordedPreset;
 
   if (node.IsNotNull())
   {
-    node->GetStringProperty(TF_PRESET_PROPERTY, presetName);
+    node->GetStringProperty(TF_PRESET_PROPERTY, recordedPreset);
 
     // A recorded preset and the custom marker are the direct evidence that this
     // node was set up here, and both survive the rendering flag being switched
@@ -762,7 +959,7 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     // property itself - see IsVolumeRenderingOn. Adopting the mapper's default
     // would show a curve nobody chose and would also suppress
     // EnsureTransferFunction, which fires only while no function is held.
-    if (!presetName.empty() || IsCustomTransferFunction(node.GetPointer()) ||
+    if (!recordedPreset.empty() || IsCustomTransferFunction(node.GetPointer()) ||
         IsVolumeRenderingOn(node.GetPointer()))
     {
       if (const auto *tfProperty =
@@ -773,23 +970,29 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     }
   }
 
-  const int presetIndex =
-    FindPresetRow(m_Controls->presetListWidget, QString::fromStdString(presetName));
+  // The name is the key either way: AddPreset keeps it unique across the
+  // catalogue, and the origin recorded beside it is there to be read rather
+  // than to be searched by.
+  const auto presetName = ParseRecordedPreset(QString::fromStdString(recordedPreset)).name;
+
+  const int presetIndex = FindPresetRow(m_Controls->presetListWidget, presetName);
 
   if (presetIndex < 0)
     this->ClearPresetSelection();
   else
     m_Controls->presetListWidget->setCurrentRow(presetIndex);
 
-  // Replaying needs a preset the catalog still offers, since that is the
-  // baseline the recorded offsets are measured from.
-  if (presetIndex >= 0 && this->ReplayAdjustOffsets(presetName))
+  // A node naming a preset the catalogue still offers is described by its
+  // recipe, and the recipe is what comes back. Only a curve no preset describes
+  // - one loaded from a file, or one that came from outside this view - is shown
+  // as it stands.
+  if (presetIndex >= 0 && this->ReplayRecipe(presetName))
     return;
 
   this->ShowAppliedTransferFunction();
 }
 
-bool QmitkVolumeTransferFunctionEditor::ReplayAdjustOffsets(const std::string &presetName)
+bool QmitkVolumeTransferFunctionEditor::ReplayRecipe(const QString &presetName)
 {
   auto node = m_DataNode.Lock();
 
@@ -803,25 +1006,27 @@ bool QmitkVolumeTransferFunctionEditor::ReplayAdjustOffsets(const std::string &p
 
   // All four or none. The neutral colour width is the preset's own span rather
   // than zero, so a missing value cannot be told apart from a deliberate one and
-  // a partial recipe cannot be completed with defaults.
-  if (!node->GetFloatProperty(TF_OPACITY_SHIFT_PROPERTY, opacityShift) ||
-      !node->GetFloatProperty(TF_OPACITY_HEIGHT_PROPERTY, opacityHeight) ||
-      !node->GetFloatProperty(TF_COLOR_SHIFT_PROPERTY, colorShift) ||
-      !node->GetFloatProperty(TF_COLOR_WIDTH_PROPERTY, colorWidth))
-  {
-    return false;
-  }
+  // a partial recipe cannot be completed with defaults. Read before the preset
+  // is applied, which is what clears them.
+  const bool hasOffsets =
+    node->GetFloatProperty(TF_OPACITY_SHIFT_PROPERTY, opacityShift) &&
+    node->GetFloatProperty(TF_OPACITY_HEIGHT_PROPERTY, opacityHeight) &&
+    node->GetFloatProperty(TF_COLOR_SHIFT_PROPERTY, colorShift) &&
+    node->GetFloatProperty(TF_COLOR_WIDTH_PROPERTY, colorWidth);
 
   // Re-apply the preset first, so the baselines the offsets are measured from
   // are the pristine curves again. Showing an offset against an already-adjusted
   // baseline would make the next drag apply the whole offset a second time.
   //
-  // The recipe therefore wins over the stored curve. The two agree wherever the
-  // curve was produced here, and where they do not - the function was edited
-  // through the Properties view, or by the v1 view - the edit is what gets
+  // The recipe therefore wins over the stored curve, whether the two came apart
+  // here - a curve drawn point by point over the preset - or elsewhere, through
+  // the Properties view or the v1 view. Either way the curve is what gets
   // discarded. That is the price of being able to keep adjusting a preset, and
   // the same trade the lighting model's recorded id already makes.
-  this->OnPresetSelected(QString::fromStdString(presetName));
+  this->OnPresetSelected(presetName);
+
+  if (!hasOffsets)
+    return true;
 
   // Left to the sliders' own signals rather than applied directly: they are
   // already wired to the canvas and to OnColorWindowChanged, and each of those
@@ -848,13 +1053,6 @@ void QmitkVolumeTransferFunctionEditor::RecordAdjustOffsets()
   std::string presetName;
 
   if (!node->GetStringProperty(TF_PRESET_PROPERTY, presetName))
-    return;
-
-  // A curve drawn over by hand keeps the name of the preset it was drawn over,
-  // but the sliders no longer measure from that preset - they measure from the
-  // drawing - so what they read describes no baseline the name stands for.
-  // Writing it would restore a recipe ForgetAdjustOffsets took away on purpose.
-  if (IsCustomTransferFunction(node.GetPointer()))
     return;
 
   node->SetFloatProperty(TF_OPACITY_SHIFT_PROPERTY,
@@ -1205,28 +1403,23 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 
   this->ShowEditMode();
 
-  // An untouched curve is still the preset it came from, and everything below
-  // would take that away for nothing: the recipe the node records, and the
-  // positions the sliders were left in, which are offsets from a baseline that
-  // has not moved either.
+  // An untouched curve is still the preset it came from, and re-seeding for it
+  // would cost the sliders their baseline for nothing.
   if (!m_CurveEdited)
     return;
 
-  if (node.IsNotNull())
-  {
-    // Drawn by hand, so the offsets no longer describe the curve, and replaying
-    // them on the next selection would rebuild the preset over it. The preset
-    // is still where the curve came from, though, which is worth keeping and
-    // worth saying: the name stays, and the panel marks the entry as edited.
-    this->ForgetAdjustOffsets(node);
-    node->SetBoolProperty(TF_CUSTOM_PROPERTY, true);
-  }
+  // Nothing about the drawing is recorded on the node: it goes on naming the
+  // preset that was drawn over and the offsets in force, and rebuilding those is
+  // what the next selection does - a drawing does not outlive it, and keeping
+  // one means saving it as a preset of its own. Carried here instead, so that
+  // the panel can go on saying the curve is not the preset after the re-seed
+  // below has cleared m_CurveEdited.
+  m_CurveDrawnOver = true;
 
   // Re-seeds the canvas and re-snapshots both baselines, so the sliders now
   // measure from the curve that was drawn rather than from the one it started
-  // out as. They return to neutral because that is where the curve now on show
-  // sits: carrying the old offsets over would apply them a second time on the
-  // next nudge.
+  // out as. Both are derived from their baseline rather than nudged, so without
+  // this the first shift would rebuild the preset over the drawing.
   this->ApplyCurrentTransferFunction();
 }
 
@@ -1407,10 +1600,14 @@ void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()
 
 bool QmitkVolumeTransferFunctionEditor::DiffersFromPreset() const
 {
-  // The edit in progress, which nothing has recorded yet, and the one already
-  // left, which the node carries.
-  if (m_CurveEdited || IsCustomTransferFunction(m_DataNode.Lock().GetPointer()))
+  // The edit in progress, the one already left - which only this widget knows
+  // about, a drawing being recorded nowhere - and a curve that came from a file,
+  // which the node carries.
+  if (m_CurveEdited || m_CurveDrawnOver ||
+      IsCustomTransferFunction(m_DataNode.Lock().GetPointer()))
+  {
     return true;
+  }
 
   return DiffersFrom(m_Controls->opacityShiftSlider, 0.0) ||
          DiffersFrom(m_Controls->opacityHeightSlider, 0.0) ||
@@ -1468,22 +1665,31 @@ void QmitkVolumeTransferFunctionEditor::OnAddColorStop()
   canvas->AddColorStop(where);
 }
 
+vtkSmartPointer<vtkColorTransferFunction> QmitkVolumeTransferFunctionEditor::WindowedColorHandles() const
+{
+  auto handles = vtkSmartPointer<vtkColorTransferFunction>::New();
+
+  // Brings the colour space and the clamping over along with the points, which
+  // the window has to stay faithful to.
+  handles->DeepCopy(m_BaseColorFn);
+
+  mitk::ApplyColorWindow(handles, m_DataRange[0], m_DataRange[1],
+    m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value());
+
+  return handles;
+}
+
 void QmitkVolumeTransferFunctionEditor::RestoreColorHandles()
 {
   if (m_ColorHandlesRestored || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
     return;
 
-  auto *colorFunction = m_AppliedTransferFunction->GetColorTransferFunction();
-
   // A colour window bakes itself into 256 evenly spaced RGB points, which no
-  // one can take hold of. DeepCopy brings back the baseline's own handful -
-  // and, with them, the colour space and clamping the window was faithful to -
-  // and the window is then applied to those nodes instead of to samples, so the
-  // colours become editable without moving.
-  colorFunction->DeepCopy(m_BaseColorFn);
-
-  mitk::ApplyColorWindow(colorFunction, m_DataRange[0], m_DataRange[1],
-    m_Controls->colorShiftSlider->value(), m_Controls->colorWidthSlider->value());
+  // one can take hold of. Laying the handles over them puts the same colours
+  // back on the baseline's own nodes, so they become editable without moving.
+  // Copied into the function the node already carries rather than put in its
+  // place, so that nothing holding a pointer to it has to be told.
+  m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(this->WindowedColorHandles());
 
   m_ColorHandlesRestored = true;
 
@@ -1531,6 +1737,7 @@ void QmitkVolumeTransferFunctionEditor::OnImportCustom()
   node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
 
   m_AppliedTransferFunction = transferFunction;
+  m_CurveDrawnOver = false;
 
   // A loaded custom function came from no preset, so there is no baseline any
   // recorded offsets could be measured from either.
@@ -1538,6 +1745,155 @@ void QmitkVolumeTransferFunctionEditor::OnImportCustom()
   this->ClearPresetSelection();
 
   this->ApplyCurrentTransferFunction();
+}
+
+void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
+{
+  QMenu menu;
+
+  // A greyed entry says only that it is greyed, and what it would take to reach
+  // it is the whole of what there is to explain.
+  menu.setToolTipsVisible(true);
+
+  auto *saveAction = menu.addAction("Save as preset...");
+
+  // The condition that marks an entry as edited, so that the menu and the marker
+  // cannot disagree. It asks about the curve in force rather than the entry
+  // under the cursor, which is what lets a curve loaded from a file - marking no
+  // entry at all - be saved as well.
+  saveAction->setEnabled(m_AppliedTransferFunction.IsNotNull() && this->DiffersFromPreset());
+  saveAction->setToolTip("Available once the curve has been moved away from its preset.");
+
+  // The position arrives relative to the viewport rather than to the widget.
+  if (menu.exec(m_Controls->presetListWidget->viewport()->mapToGlobal(pos)) == saveAction)
+    this->SaveCustomPreset();
+}
+
+void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
+{
+  auto node = m_DataNode.Lock();
+
+  if (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
+    return;
+
+  auto *presetList = m_Controls->presetListWidget;
+  auto *currentPreset = presetList->currentItem();
+
+  // The file name becomes the entry's name, so the suggestion starts from the
+  // preset the curve was carried away from, beside the last preset saved.
+  const QString suggestedName =
+    (currentPreset != nullptr ? PresetName(currentPreset) : QStringLiteral("transfer-function")) +
+    QStringLiteral("-custom.json");
+
+  const QStringList rememberedFiles = RememberedPresetFiles();
+
+  const QString suggestion = rememberedFiles.isEmpty()
+    ? suggestedName
+    : QFileInfo(rememberedFiles.last()).absolutePath() + QLatin1Char('/') + suggestedName;
+
+  auto fileName = QFileDialog::getSaveFileName(this, "Save transfer function", suggestion,
+    "Transfer function (*.json)");
+
+  if (fileName.isEmpty())
+    return;
+
+  if (!fileName.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive))
+    fileName += QStringLiteral(".json");
+
+  // Nothing escapes the separator the remembered paths are joined by, so a path
+  // carrying one could not be read back as itself.
+  if (fileName.contains(PRESET_FILE_SEPARATOR))
+  {
+    QMessageBox::warning(this, "Save transfer function",
+      "The path must not contain a semicolon, which separates the remembered "
+      "preset files from one another. Please choose another name.");
+    return;
+  }
+
+  // A copy, so that saving cannot alter the curve it is saving, and with the
+  // colours as handles: a windowed function holds 256 evenly spaced samples, and
+  // a preset made of those is one nobody could take hold of again. The opacity
+  // curve needs no such care - nothing bakes that one into a table.
+  auto savedFunction = mitk::TransferFunction::New();
+
+  savedFunction->SetColorSpace(m_AppliedTransferFunction->GetColorSpace());
+  savedFunction->SetColorTransferFunction(this->WindowedColorHandles());
+  savedFunction->GetScalarOpacityFunction()->DeepCopy(
+    m_AppliedTransferFunction->GetScalarOpacityFunction());
+
+  const auto blendMode =
+    mitk::GetVolumeBlendMode(node.GetPointer()).value_or(mitk::VolumeBlendMode::Composite);
+
+  const QString presetName = QFileInfo(fileName).completeBaseName();
+
+  {
+    // Scoped, because a stream closes with its destructor and the file has to be
+    // closed before it is read back below.
+    std::ofstream stream(fileName.toStdString());
+
+    if (!stream.is_open() ||
+        !mitk::TransferFunctionPresets::SaveTransferFunction(stream, presetName.toStdString(),
+          savedFunction.GetPointer(), blendMode))
+    {
+      QMessageBox::warning(this, "Save transfer function", "Could not write the file.");
+      return;
+    }
+  }
+
+  // Read straight back rather than added from memory, so that a preset saved now
+  // and one found at the next start arrive by the same route.
+  std::ifstream stream(fileName.toStdString());
+
+  const auto addedName = stream.is_open()
+    ? QString::fromStdString(m_Presets.AddPreset(stream))
+    : QString();
+
+  if (addedName.isEmpty())
+  {
+    QMessageBox::warning(this, "Save transfer function",
+      "The file was written, but could not be read back as a preset.");
+    return;
+  }
+
+  // Asked before the entry is appended, since appending moves the end the
+  // previews were drawn as far as.
+  const bool thumbnailsComplete = m_NextThumbnailIndex >= presetList->count();
+
+  auto *presetItem = new QListWidgetItem(addedName, presetList);
+  presetItem->setData(PRESET_NAME_ROLE, addedName);
+  presetItem->setData(PRESET_ORIGIN_ROLE, static_cast<int>(PresetOrigin::File));
+
+  // Measures the cells against a name none of them was measured for, and leaves
+  // the new entry a stand-in preview to hold its place.
+  this->UpdatePresetLayout();
+
+  // A finished run has stopped and nothing else would start it again; one still
+  // under way reaches the new entry by itself. Either way the next preview due
+  // is the one just appended, so a single step draws it and stops.
+  if (thumbnailsComplete)
+  {
+    const int run = m_ThumbnailRun;
+    QTimer::singleShot(0, this, [this, run] { this->GenerateNextThumbnail(run); });
+  }
+
+  // Absolute, because the directory this was launched from is not the one it
+  // will be launched from next time.
+  const QString presetFile = QFileInfo(fileName).absoluteFilePath();
+
+  // Saving over a file already known moves where it stands rather than leaving
+  // it remembered twice, which would offer it twice at the next start.
+  QStringList presetFiles = rememberedFiles;
+
+  presetFiles.removeAll(presetFile);
+  presetFiles.append(presetFile);
+
+  RememberPresetFiles(presetFiles);
+
+  // The curve now answers to a catalogue entry rather than being one a preset
+  // was moved away from, so that entry is marked and the marker goes.
+  presetList->setCurrentRow(presetList->count() - 1);
+
+  this->OnPresetSelected(addedName);
 }
 
 void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()

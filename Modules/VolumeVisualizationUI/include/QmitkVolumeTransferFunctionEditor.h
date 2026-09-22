@@ -48,13 +48,14 @@ namespace Ui
  *
  * What the widget records on the node is a recipe rather than only a result -
  * the preset it started from plus the four window offsets - so that returning
- * to a node restores the controls as they were left. A curve drawn over by hand
- * keeps the preset name, which from then on is provenance rather than a recipe,
- * and loses the offsets, so that the next selection brings the drawing back
- * instead of rebuilding the preset over it; the panel marks such an entry as
- * edited. A curve loaded from a file answers to no catalogue entry at all, and
- * what is recorded for it is only that it was chosen here. See the
- * volumerendering.transferfunction.* entries in the property documentation.
+ * to a node restores the controls as they were left. The recipe is also all that
+ * outlives the selection: a curve drawn over a preset point by point is recorded
+ * nowhere, so coming back to the node rebuilds the preset and the offsets and
+ * the drawing is gone. The panel marks such a curve as edited while it is on
+ * show, and keeping one means saving it as a preset of its own. A curve loaded
+ * from a file answers to no catalogue entry at all, and what is recorded for it
+ * is only that it was chosen here. See the volumerendering.transferfunction.*
+ * entries in the property documentation.
  *
  * \sa mitk::TransferFunctionPresets, QmitkCombinedTransferFunctionCanvas
  */
@@ -118,10 +119,30 @@ private slots:
   void OnCanvasOpacityChanged();
   void OnResetAdjustments();
   void OnImportCustom();
+  void OnPresetContextMenu(const QPoint &pos);
   void OnAddColorStop();
   void OnPickColorStopColor();
 
 private:
+  /**
+   * \brief Take the presets saved from here in earlier sessions into the
+   *        catalogue, and forget the files that are no longer there.
+   *
+   * Runs before the grid is filled, so that they reach it as any other entry
+   * does - at its end, which is where the catalogue keeps what is added to it.
+   */
+  void LoadRememberedPresets();
+
+  /**
+   * \brief Write the curve on show to a file of the user's choosing, and offer
+   *        it from then on as a preset of its own.
+   *
+   * The file is what the preset is: it is read straight back in, remembered, and
+   * looked for again at every later start. Nothing is written for a curve that
+   * is still the preset it came from - see DiffersFromPreset.
+   */
+  void SaveCustomPreset();
+
   /** \brief Write the held function onto the node and re-seed the editor. */
   void ApplyCurrentTransferFunction();
 
@@ -151,10 +172,17 @@ private:
    */
   void UpdateControlAvailability();
 
-  /** \brief Rebuild the function from the preset and offsets the node records.
-   *  \return True if a complete recipe was found and re-executed.
+  /**
+   * \brief Rebuild the function from the preset the node names, and from the
+   *        four offsets where it records them too.
+   *
+   * What the node stores as its curve is not consulted: a curve drawn over a
+   * preset point by point is no part of the recipe, and rebuilding is what
+   * discards it.
+   *
+   * \return True unless there is no node to rebuild for.
    */
-  bool ReplayAdjustOffsets(const std::string &presetName);
+  bool ReplayRecipe(const QString &presetName);
 
   /** \brief Record the adjust sliders' current offsets on the node. */
   void RecordAdjustOffsets();
@@ -257,6 +285,20 @@ private:
    * it carries rather than by what was last done here.
    */
   bool DiffersFromPreset() const;
+
+  /**
+   * \brief The colours on show, carried by points that can be taken hold of.
+   *
+   * A colour window bakes itself into hundreds of evenly spaced samples, which
+   * name no colour in particular: there is one per pixel column and no way to
+   * tell which of them was meant. The same window laid over the baseline's own
+   * nodes instead carries the same colours at the points the curve actually
+   * names them, which is the form to edit in and the form to save in.
+   *
+   * The window is measured from the baseline's own range, so a baseline must be
+   * held and must be one nothing has windowed yet.
+   */
+  vtkSmartPointer<vtkColorTransferFunction> WindowedColorHandles() const;
 
   /**
    * \brief Give the colour function back the handful of points it can be taken
@@ -368,6 +410,18 @@ private:
    * would cost the sliders their baseline for nothing.
    */
   bool m_CurveEdited = false;
+
+  /** \brief Whether the curve on show was drawn over the preset it names.
+   *
+   * What m_CurveEdited says while an edit is under way, kept on after it is
+   * over: leaving makes the drawing the baseline, and that clears the other
+   * flag. Held here rather than on the node because a drawing is recorded
+   * nowhere - the node goes on describing the preset and the offsets, and
+   * rebuilding those is what the next selection does - so this lasts exactly as
+   * long as the drawing does, which is as long as this node is on show. It is
+   * also what keeps the entry marked, and so the curve saveable, in between.
+   */
+  bool m_CurveDrawnOver = false;
 
   /** \brief Whether the colour function has been reduced to countable handles
    *         for the edit in progress.

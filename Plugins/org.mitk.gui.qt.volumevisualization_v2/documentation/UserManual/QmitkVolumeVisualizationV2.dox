@@ -84,6 +84,19 @@ described below or by editing it point by point; clicking that entry again
 rebuilds the preset as its author wrote it. Only a curve that no preset
 describes at all - one loaded from a file - leaves no entry marked.
 
+Right-clicking the grid offers <b>Save as preset...</b> for the curve you have
+arrived at. It is available exactly while the asterisk is showing and greyed out
+otherwise, since a curve that is still its preset is one the catalogue already
+holds. Choose where to write it and it joins the end of the grid as an entry of
+its own, with its own preview, marked and no longer starred: it is a preset now
+rather than a departure from one.
+
+A saved preset is remembered by the file it was written to rather than copied
+anywhere, so it is in the grid again at the next start, and editing that file
+changes what its entry brings. One whose file has since been moved or deleted is
+dropped from the grid, with the reason written to the log, and is not looked for
+again.
+
 \subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
 
 Below the preset grid, one canvas shows three things at once: the histogram of
@@ -154,19 +167,22 @@ selected one.
 <li> Between points the curves are interpolated linearly.
 </ul>
 
-The page brings three buttons, and the arrow at its top left repeats one of
+The page brings two buttons, and the arrow at its top left repeats one of
 them. <b>Keep curve</b> keeps the curve you authored and goes back.
 <b>Discard</b> restores the one that stood before you started, and so does the
 top-left arrow, so that a way out is on screen whatever the page is scrolled to;
-neither asks first. <b>Save to file...</b> writes the current function to a JSON
-file in the same format the built-in catalogue uses, so your own functions can
-be kept and shared and read back with <b>Load from file...</b>.
+neither asks first. To keep a curve you have authored beyond the session,
+right-click the preset grid and choose <b>Save as preset...</b>: it writes a
+JSON file in the same format the built-in catalogue uses, so your own functions
+can be kept and shared and read back with <b>Load from file...</b>.
 
-\note A curve that has been authored or loaded is no longer described by any
-preset name. One edited point by point keeps the name of the preset it was drawn
-over, marked with an asterisk to say it is no longer that preset; one loaded
-from a file has no name to keep. Either way the adjust sliders start measuring
-from the new curve. A saved file records the blend mode the curve was authored
+\note A curve edited point by point is not kept. What the view records is the
+preset it was drawn over together with the slider positions, so selecting
+another image and coming back rebuilds those and the drawing is gone; the
+asterisk says the curve is no longer the preset while it is still on screen, and
+<b>Save as preset...</b> is how to keep one. Slider positions are kept, since
+they are part of that record rather than a departure from it. A curve loaded
+from a file has no preset name to keep at all. A saved file records the blend mode the curve was authored
 for alongside it, and <b>Load</b> restores both.
 
 \section org_mitk_views_volumevisualization_v2_blendmode Blend mode

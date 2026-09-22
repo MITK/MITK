@@ -28,7 +28,7 @@ namespace mitk
   class Image;
 
   /**
-   * \brief Catalog of built-in volume-rendering transfer function presets.
+   * \brief Catalog of volume-rendering transfer function presets.
    *
    * Parses the embedded module resource MedicalColorPresets.json once on
    * construction and builds mitk::TransferFunction instances on demand. The
@@ -45,7 +45,9 @@ namespace mitk
    *
    * The same format is used to save and load individual user-created transfer
    * functions (see SaveTransferFunction / LoadTransferFunction), so a saved
-   * file is structurally identical to one MedicalColorPresets.json entry.
+   * file is structurally identical to one MedicalColorPresets.json entry - and
+   * AddPreset takes such an entry back into the catalog, where it is reachable
+   * by name like any built-in one.
    */
   class MITKVOLUMEVISUALIZATION_EXPORT TransferFunctionPresets
   {
@@ -91,6 +93,26 @@ namespace mitk
      */
     mitk::TransferFunction::Pointer CreateTransferFunction(const std::string &presetName,
       VolumeBlendMode &blendMode) const;
+
+    /**
+     * \brief Take a preset read from a stream into this catalog, so that it can
+     *        be built by name like a built-in one.
+     *
+     * A stream rather than a path, as in LoadTransferFunction: where a preset is
+     * read from - a file the user chose, the embedded resource, a buffer in a
+     * test - is the caller's business, and leaving it there is what spares this
+     * class a file it could fail to open and an error it would have to report.
+     *
+     * \param[in] stream The stream to read, in the format SaveTransferFunction
+     *            writes. Only its first valid entry is taken.
+     * \return The name the preset was added under: the one the stream gives it,
+     *         unless another preset already holds that name. Names are how
+     *         CreateTransferFunction finds a preset, so a second CT-Bone could
+     *         never be reached, and is added as "CT-Bone (2)" instead. Empty for
+     *         a stream holding no valid entry, in which case the catalog is left
+     *         as it was.
+     */
+    std::string AddPreset(std::istream &stream);
 
     /**
      * \brief Load a transfer function stored in the preset JSON format from

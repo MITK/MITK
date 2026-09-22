@@ -37,11 +37,11 @@ namespace mitk
     static PropertyKeyPath READER_FILES();
     /** \brief Path to the property containing the PixelSpacingInterpretation as a human-readable string. */
     static PropertyKeyPath READER_PIXEL_SPACING_INTERPRETATION_STRING();
-    /** \brief Path to the property containing the PixelSpacingInterpretation enum value. */
+    /** \brief Path to the property containing the numeric PixelSpacingInterpretation enum value as an IntProperty. */
     static PropertyKeyPath READER_PIXEL_SPACING_INTERPRETATION();
     /** \brief Path to the property containing the ReaderImplementationLevel as a human-readable string. */
     static PropertyKeyPath READER_IMPLEMENTATION_LEVEL_STRING();
-    /** \brief Path to the property containing the ReaderImplementationLevel enum value. */
+    /** \brief Path to the property containing the numeric ReaderImplementationLevel enum value as an IntProperty. */
     static PropertyKeyPath READER_IMPLEMENTATION_LEVEL();
     /** \brief Path to the property indicating whether gantry tilt was corrected when reading the data. */
     static PropertyKeyPath READER_GANTRY_TILT_CORRECTED();

@@ -391,7 +391,6 @@ set(RESOURCE_FILES
   Interactions/DisplayConfigCrosshair.xml
   Interactions/DisplayConfigRotation.xml
   Interactions/DisplayConfigActivateCoupling.xml
-  Interactions/DisplayConfigSwivel.xml
   Interactions/DisplayConfigPACSPan.xml
   Interactions/DisplayConfigPACSScroll.xml
   Interactions/DisplayConfigPACSZoom.xml

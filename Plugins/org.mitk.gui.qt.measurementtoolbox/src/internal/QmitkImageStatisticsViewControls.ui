@@ -137,9 +137,6 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="ctkSliderWidget" name="sliderWidget_histogram" native="true"/>
-          </item>
-          <item>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_2">

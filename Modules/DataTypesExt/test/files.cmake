@@ -1,5 +1,6 @@
 set(MODULE_TESTS
   mitkColorSequenceRainbowTest.cpp
+  mitkGridPropertySerializerTest.cpp
   mitkMultiStepperTest.cpp
 )
 

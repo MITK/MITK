@@ -1,4 +1,5 @@
 set(H_FILES
+  QmitkCrosshairRotationMode.h
   QmitkCustomVariants.h
   QmitkDataStorageInspectorProviderBase.h
   QmitkEnums.h

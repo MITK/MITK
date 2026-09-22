@@ -101,13 +101,6 @@ namespace mitk
      */
     bool CheckRotationPossible(const InteractionEvent* interactionEvent);
 
-    /**
-     * \brief Check if swivel is possible given the current interaction state.
-     * \param interactionEvent The current interaction event.
-     * \return \c true if swivel can be performed.
-     */
-    bool CheckSwivelPossible(const InteractionEvent* interactionEvent);
-
     /** \brief Initialize interaction coordinates at the start of a gesture. */
     void Init(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
@@ -140,9 +133,6 @@ namespace mitk
 
     /** \brief Perform a plane rotation based on mouse movement. */
     void Rotate(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
-
-    /** \brief Perform a plane swivel based on mouse movement. */
-    void Swivel(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
     /** \brief Increase the current time step by one. */
     void IncreaseTimeStep(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
@@ -207,15 +197,6 @@ namespace mitk
 
     Point3D m_LastCursorPosition;
     Point3D m_CenterOfRotation;
-
-    Point2D m_ReferenceCursor;
-
-    Vector3D m_RotationPlaneNormal;
-    Vector3D m_RotationPlaneXVector;
-    Vector3D m_RotationPlaneYVector;
-
-    Vector3D m_PreviousRotationAxis;
-    ScalarType m_PreviousRotationAngle;
   };
 } // end namespace
 

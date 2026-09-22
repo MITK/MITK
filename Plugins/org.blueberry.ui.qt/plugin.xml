@@ -441,6 +441,6 @@
 
    <extension point="org.blueberry.ui.keywords">
      <keyword id="org.blueberry.ui.style" label="themes skins styles appearance icons search path "/>
-     <keyword id="org.blueberry.ui.perspectives" label="open view switch perspectives same window new help research available viewer visualization"/>
+     <keyword id="org.blueberry.ui.perspectives" label="open view switch perspectives same window new help"/>
    </extension>
 </plugin>

@@ -1,5 +1,9 @@
 MITK_CREATE_MODULE_TESTS()
 
+mitkAddCustomModuleTest(QmitkHistogramVisualizationWidgetTest QmitkHistogramVisualizationWidgetTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkImageStatisticsDataGeneratorTest QmitkImageStatisticsDataGeneratorTest
   -platform minimal
 )

@@ -20,13 +20,6 @@ found in the LICENSE file.
 // qt
 #include <QAction>
 
-namespace ResetGeometryAction
-{
-  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite,
-                       const QList<mitk::DataNode::Pointer>& selectedNodes = QList<mitk::DataNode::Pointer>(),
-                       mitk::BaseRenderer* baseRenderer = nullptr);
-}
-
 class MITK_QT_APP QmitkDataNodeResetGeometryAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT

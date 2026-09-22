@@ -770,26 +770,26 @@ void QmitkMxNMultiWidget::ResetCrosshair()
 
   mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetVtkRenderWindow(), dataStorage);
 
-  SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
+  // Resetting the rotation mode would switch to a MITK scheme, so PACS mode
+  // is left alone here.
+  if (!IsPACSScheme(this->GetInteractionScheme()))
+  {
+    this->SetWidgetPlaneMode(QmitkCrosshairRotationMode::None);
+  }
 }
 
-void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
+void QmitkMxNMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
 {
-  MITK_DEBUG << "Changing crosshair mode to " << userMode;
-
-  switch (userMode)
+  switch (mode)
   {
-    case 0:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+    case QmitkCrosshairRotationMode::None:
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
       break;
-    case 1:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+    case QmitkCrosshairRotationMode::Single:
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
       break;
-    case 2:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
-      break;
-    case 3:
-      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+    case QmitkCrosshairRotationMode::Coupled:
+      this->SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
       break;
   }
 }
@@ -1064,6 +1064,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
+  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   // The cell's "Sync" button opens the editor-wide layout editor; the view
   // hosting it lives above this module, so the request is only relayed.

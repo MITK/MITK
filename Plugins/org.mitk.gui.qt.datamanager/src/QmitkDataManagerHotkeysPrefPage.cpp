@@ -48,21 +48,23 @@ void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer)
 
 void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
-  m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+V");
-  m_HotkeyEditors["Toggle visibility of selected nodes"] = new QmitkHotkeyLineEdit("V");
-  m_HotkeyEditors["Delete selected nodes"] = new QmitkHotkeyLineEdit("Del");
-  m_HotkeyEditors["Reinit selected nodes"] = new QmitkHotkeyLineEdit("R");
-  m_HotkeyEditors["Global reinit"] = new QmitkHotkeyLineEdit("Ctrl+R");
-  m_HotkeyEditors["Show node information"] = new QmitkHotkeyLineEdit("Ctrl+I");
+  m_Hotkeys = {
+    { "Delete selected nodes", "Delete selected nodes", new QmitkHotkeyLineEdit("Del") },
+    { "Global reinit", "Fit views to all data", new QmitkHotkeyLineEdit("Ctrl+R") },
+    { "Reinit selected nodes", "Fit views to selection", new QmitkHotkeyLineEdit("R") },
+    { "Make all nodes invisible", "Make all nodes invisible", new QmitkHotkeyLineEdit("Ctrl+V") },
+    { "Show node information", "Show node information", new QmitkHotkeyLineEdit("Ctrl+I") },
+    { "Toggle visibility of selected nodes", "Toggle visibility of selected nodes", new QmitkHotkeyLineEdit("V") }
+  };
 
   m_MainControl = new QWidget(parent);
 
   auto layout = new QGridLayout;
   int i = 0;
-  for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
+  for (const auto& hotkey : m_Hotkeys)
   {
-    layout->addWidget(new QLabel(it->first), i, 0);
-    layout->addWidget(it->second, i, 1);
+    layout->addWidget(new QLabel(hotkey.label), i, 0);
+    layout->addWidget(hotkey.editor, i, 1);
     layout->setRowStretch(i, 0);
     ++i;
   }
@@ -85,24 +87,23 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
   {
     QString keyString;
     QString errString;
-    for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
+    for (auto it = m_Hotkeys.begin(); it != m_Hotkeys.end(); ++it)
     {
-      keyString = it->second->GetKeySequenceAsString();
+      keyString = it->editor->GetKeySequenceAsString();
 
       if (keyString.isEmpty())
       {
-        errString = QString("No valid key sequence for \"%1\"").arg(it->first);
+        errString = QString("No valid key sequence for \"%1\"").arg(it->label);
       }
 
       if (errString.isEmpty())
       {
-        std::map<QString, QmitkHotkeyLineEdit*>::iterator it2;
         // search for duplicated key
-        for (it2 = m_HotkeyEditors.begin(); it2 != m_HotkeyEditors.end(); ++it2)
+        for (auto it2 = m_Hotkeys.begin(); it2 != m_Hotkeys.end(); ++it2)
         {
-          if (it->first != it2->first && keyString == it2->second->GetKeySequenceAsString())
+          if (it != it2 && keyString == it2->editor->GetKeySequenceAsString())
           {
-            errString = QString("Duplicate hot key for \"%1\" and \"%2\"").arg(it->first).arg(it2->first);
+            errString = QString("Duplicate hot key for \"%1\" and \"%2\"").arg(it->label).arg(it2->label);
             break;
           }
         }
@@ -116,10 +117,9 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
     }
 
     // no errors -> save all values and flush to file
-    for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
+    for (const auto& hotkey : m_Hotkeys)
     {
-      QString keySequence = it->second->GetKeySequenceAsString();
-      prefs->Put(it->first.toStdString(), it->second->GetKeySequenceAsString().toStdString());
+      prefs->Put(hotkey.key.toStdString(), hotkey.editor->GetKeySequenceAsString().toStdString());
     }
 
     prefs->Flush();
@@ -139,7 +139,7 @@ void QmitkDataManagerHotkeysPrefPage::Update()
 
   if (prefs != nullptr)
   {
-    for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
-      it->second->setText(QString::fromStdString(prefs->Get(it->first.toStdString(), it->second->text().toStdString())));
+    for (const auto& hotkey : m_Hotkeys)
+      hotkey.editor->setText(QString::fromStdString(prefs->Get(hotkey.key.toStdString(), hotkey.editor->text().toStdString())));
   }
 }

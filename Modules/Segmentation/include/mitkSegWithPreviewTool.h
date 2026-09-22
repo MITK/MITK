@@ -223,6 +223,28 @@ namespace mitk
     itkGetConstMacro(RequiresExistingLabels, bool);
     itkBooleanMacro(RequiresExistingLabels);
 
+    /** \brief If true (default), CanHandle() rejects reference images that are not
+     * single-component scalar images (see Tool::IsSingleComponentScalarImage()).
+     *
+     * Tools that evaluate the intensities of the reference image cannot process
+     * RGB, RGBA or vector images. Tools that only work on the segmentation
+     * (e.g. PickingTool) switch this off.
+     */
+    itkSetMacro(RequiresScalarReference, bool);
+    itkGetConstMacro(RequiresScalarReference, bool);
+    itkBooleanMacro(RequiresScalarReference);
+
+    /** \brief If true, CanHandle() rejects reference images with less than three
+     * dimensions.
+     *
+     * For tools whose algorithm is fixed to volumes. A 2D+t image qualifies,
+     * as each of its time steps is a single-slice volume, a static 2D image
+     * does not.
+     */
+    itkSetMacro(RequiresVolumetricReference, bool);
+    itkGetConstMacro(RequiresVolumetricReference, bool);
+    itkBooleanMacro(RequiresVolumetricReference);
+
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimeStep(const Image* image, TimeStepType timestep);
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
@@ -426,6 +448,8 @@ namespace mitk
     bool m_RequestDeactivationConfirmation = false;
 
     bool m_RequiresExistingLabels = true;
+    bool m_RequiresScalarReference = true;
+    bool m_RequiresVolumetricReference = false;
   };
 
 } // namespace

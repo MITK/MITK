@@ -356,7 +356,13 @@ void QmitkToolSelectionBox::UpdateButtonsEnabledState()
     const auto toolID = m_ToolIDForButtonID[buttonID];
     const auto tool = m_ToolManager->GetToolById(toolID);
 
-    button->setEnabled(tool->CanHandle(refData, workingData));
+    const bool canHandle = tool->CanHandle(refData, workingData);
+    button->setEnabled(canHandle);
+
+    QString tooltip = tool->GetName();
+    if (!canHandle)
+      tooltip += "\n" + tr("Not available for the selected image or segmentation");
+    button->setToolTip(tooltip);
   }
 }
 
@@ -480,14 +486,11 @@ void QmitkToolSelectionBox::RecreateButtons()
       label += "&";
     }
     label += tool->GetName();
-    QString tooltip = tool->GetName();
-    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '"
-               << tooltip.toLocal8Bit().constData();
+    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData();
 
     if (m_ShowNames)
     {
       button->setText(label); // a label
-      button->setToolTip(tooltip);
 
       QFont currentFont = button->font();
       currentFont.setBold(false);
@@ -535,7 +538,6 @@ void QmitkToolSelectionBox::RecreateButtons()
       {
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setIconSize(QSize(32, 32));
-        button->setToolTip(tooltip);
       }
     }
 

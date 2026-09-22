@@ -95,7 +95,7 @@ public:
    * \brief Updates the crosshair rotation mode in the menu widget.
    * \param[in] mode The new rotation mode.
    */
-  void UpdateCrosshairRotationMode(int mode);
+  void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
   /**
    * \brief Activates or deactivates the render window menu widget.
@@ -150,7 +150,7 @@ Q_SIGNALS:
 
   void ResetGeometry();
 
-  void CrosshairRotationModeChanged(int);
+  void CrosshairRotationModeChanged(QmitkCrosshairRotationMode);
 
   void CrosshairVisibilityChanged(bool);
 

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkEditorPerspective.h"
+#include <mitkEnumerationPropertySerializer.h>
 
-void QmitkEditorPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
-{
-  layout->GetEditorArea();
+#include <mitkGridRepresentationProperty.h>
+#include <mitkGridVolumeMapperProperty.h>
 
-  layout->AddPerspectiveShortcut("org.mitk.extapp.defaultperspective");
-  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.visualization");
-}
+#include <tinyxml2.h>
+
+MITK_REGISTER_ENUM_SUB_SERIALIZER(GridRepresentationProperty);
+MITK_REGISTER_ENUM_SUB_SERIALIZER(GridVolumeMapperProperty);

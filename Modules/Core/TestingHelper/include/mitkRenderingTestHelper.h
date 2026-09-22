@@ -87,7 +87,7 @@ namespace mitk
       **/
     void SetViewDirection(mitk::AnatomicalPlane viewDirection);
 
-    /** \brief Reorient the slice (e.g. rotation and translation like the swivel mode).
+    /** \brief Reorient the slice (e.g. rotation and translation like the crosshair rotation).
       **/
     void ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation);
 

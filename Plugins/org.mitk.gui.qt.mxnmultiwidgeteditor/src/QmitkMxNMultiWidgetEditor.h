@@ -45,7 +45,11 @@ public:
   void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   void OnLayoutSet(int row, int column) override;
-  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
+  /**
+  * @brief Syncs both tool bars with the scheme the multi widget has actually
+  *        applied, wherever the change came from.
+  */
+  void OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   /** \brief The interaction scheme currently in effect for this editor. The
    *         layout editor hosts the toggle for it and reads this to show the

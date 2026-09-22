@@ -228,6 +228,23 @@ namespace mitk
      ToolManager is not set).*/
     mitk::DataStorage* GetDataStorage() const;
 
+    /** \brief True if the image has exactly one scalar component per pixel.
+     *
+     * This is what the ITK access macros can process. RGB, RGBA and vector pixel
+     * types fail there, as do images that are typed as scalar but carry several
+     * components (e.g. imported from VTK).
+     */
+    static bool IsSingleComponentScalarImage(const Image* image);
+
+    /** \brief True if a 2D slice of the image reduces to one meaningful component.
+     *
+     * Single-component images qualify. Vector images qualify because the slice
+     * extraction picks the displayed component. Composite RGB and RGBA images do
+     * not, as they have no displayed component and their first component (red)
+     * does not represent what the user sees.
+     */
+    static bool HasSingleComponentSlices(const Image* image);
+
     void ConnectActionsAndFunctions() override;
 
     /**

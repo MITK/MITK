@@ -51,14 +51,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
             <action name="setCrosshair"/>
         </transition>
 
-        <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="swivel">
-            <condition name="check_can_swivel"/>
-        </transition>
-        <!-- Case when we do crosshair instead of swivel) -->
-        <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="crosshair">
-            <condition name="check_can_swivel" inverted="true"/>
-            <action name="setCrosshair"/>
-        </transition>
          <!-- Change TimeSteps by clicking left or right Arrow-->
         <transition event_class="InteractionEvent" event_variant="IncreaseTimeStep" target="start">
           <action name="IncreaseTimeStep"/>
@@ -78,11 +70,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="setCrosshair"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndRotate" target="start"/>
-      <!-- Case when we do crosshair instead of swivel) -->
-      <transition event_class="InteractionPositionEvent"  event_variant="Swivel" target="crosshair">
-        <action name="setCrosshair"/>
-      </transition>
-      <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
       <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="move">
@@ -152,13 +139,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
       <transition event_class="InteractionPositionEvent" event_variant="EndRotate" target="start">
         <action name="endRotation"/>
       </transition>
-      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
-    </state>
-    <state name="swivel">
-      <transition event_class="InteractionPositionEvent" event_variant="Swivel" target="swivel">
-        <action name="swivel"/>
-      </transition>
-      <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
       <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
 

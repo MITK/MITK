@@ -23,10 +23,8 @@ This dialogue supports undo and redo operations.
 
 \subsection MITKWorkbenchManualPage_Menu_Window Window
 
-This dialogue allows you to change between the \ref MITKWorkbenchManualPage_Perspectives and reset your current ones to default settings.
-
-If you want to use certain \ref MITKWorkbenchManualPage_Views within a perspective the "Show View" menu allows to select a specific function that is opened and can be moved within the working areas according to your wishes.
-Be aware that not every view works with every perspective in a meaningful way.
+The "Show View" menu opens a specific \ref MITKWorkbenchManualPage_Views "view", which can then be moved within the working area according to your wishes.
+"Reset Layout" restores the default arrangement of the views.
 
 The Preferences dialogue allows you to adjust and save your general and view-specific custom settings.
 
@@ -34,20 +32,11 @@ The Preferences dialogue allows you to adjust and save your general and view-spe
 
 \subsection MITKWorkbenchManualPage_Menu_Help Help
 
-This dialogue contains the help perspective containing the view-specific documentation, the welcome screen and information about MITK.
-
-
-\section MITKWorkbenchManualPage_Perspectives Perspectives
-
-The different tasks that arise in medical imaging need very different approaches. To acknowledge this circumstance MITK supplies a framework that can be build upon by very different solutions to those tasks.
-These solutions are called perspectives, each of them works independently of others although they might be used in sequence to achieve the solution of more difficult problems.
-
-It is possible to switch between the perspectives using the "Window"->"Open Perspective" dialogue. Available default perspective are "Research", "Viewer" and "Visualization".
-Various views can be added to each perspective to tailor the chosen perspective to your specific requirements.
+This dialogue contains the user manuals view with the view-specific documentation, the welcome screen and information about MITK.
 
 \section MITKWorkbenchManualPage_Views Views
 
-Each solution for a specific problem is realized as a self contained view. Thus you can create a workflow for your problem by combining the capabilities of different views to suit your needs within a perspective.
+Each solution for a specific problem is realized as a self contained view. Thus you can create a workflow for your problem by combining the capabilities of different views to suit your needs within the working area.
 
 By pressing and holding the left mouse button on a view tab you can move it around to suit your needs, even out of the application window.
 

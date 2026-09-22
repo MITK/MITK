@@ -30,12 +30,6 @@ found in the LICENSE file.
 
 class vtkImageData;
 
-namespace itk
-{
-  template <class T>
-  class MutexLockHolder;
-}
-
 namespace mitk
 {
   class SubImageSelector;

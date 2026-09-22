@@ -21,10 +21,16 @@ found in the LICENSE file.
 #include <QTextBrowser>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QVBoxLayout>
 
 #include <mitkCoreServices.h>
+#include <mitkException.h>
 #include <mitkIPropertyFilters.h>
+#include <mitkIRenderWindowPart.h>
+#include <mitkITKEventObserverGuard.h>
 #include <mitkPropertyFilter.h>
+#include <mitkRenderingManager.h>
+#include <mitkRenderWindowPartHelper.h>
 #include <mitkVtkLayerController.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarEllipse.h>
@@ -46,6 +52,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 
+#include <QmitkButtonOverlayWidget.h>
+#include <QmitkIconTheme.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkSingleNodeSelectionWidget.h>
 
@@ -57,7 +65,26 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleInitialization.h>
 
+#include <optional>
+
 US_INITIALIZE_MODULE
+
+namespace
+{
+  /** All render windows of a part share a single interaction reference geometry. */
+  mitk::TimeGeometry::ConstPointer GetInteractionReferenceGeometry(const mitk::IRenderWindowPart* renderWindowPart)
+  {
+    const auto renderWindows = renderWindowPart->GetQmitkRenderWindows();
+
+    for (auto* renderWindow : renderWindows)
+    {
+      if (auto* renderer = renderWindow->GetRenderer(); nullptr != renderer)
+        return renderer->GetInteractionReferenceGeometry();
+    }
+
+    return nullptr;
+  }
+}
 
 struct QmitkPlanarFigureData
 {
@@ -115,7 +142,10 @@ struct QmitkMeasurementViewData
       m_Thickness(nullptr),
       m_FixedParameterBox(nullptr),
       m_DrawLabel(nullptr),
-      m_HintLabel(nullptr)
+      m_HintLabel(nullptr),
+      m_DrawingControls(nullptr),
+      m_AlignmentOverlay(nullptr),
+      m_RenderWindowPart(nullptr)
   {
   }
 
@@ -160,6 +190,14 @@ struct QmitkMeasurementViewData
   QGroupBox* m_FixedParameterBox;
   QLabel* m_DrawLabel;
   QLabel* m_HintLabel;
+  QWidget* m_DrawingControls;
+  QmitkButtonOverlayWidget* m_AlignmentOverlay;
+  mitk::IRenderWindowPart* m_RenderWindowPart;
+  mitk::ITKEventObserverGuard m_ViewsInitializedObserver;
+
+  /** Set while a figure is being placed: the interaction reference geometry to hand
+      back afterwards. Holds a null geometry if there was none to begin with. */
+  std::optional<mitk::TimeGeometry::ConstPointer> m_RestoreInteractionReferenceGeometry;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -304,20 +342,46 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_HintLabel->setWordWrap(true);
   d->m_HintLabel->hide();
 
+  // The alignment overlay covers exactly this container, so the reference image
+  // selector and the details text stay usable while the views are not aligned.
+  d->m_DrawingControls = new QWidget;
+  auto drawingLayout = new QVBoxLayout(d->m_DrawingControls);
+  drawingLayout->setContentsMargins(0, 0, 0, 0);
+  drawingLayout->addWidget(d->m_DrawActionsToolBar);
+  drawingLayout->addWidget(d->m_DrawLabel);
+  drawingLayout->addWidget(d->m_HintLabel);
+  drawingLayout->addWidget(d->m_FixedParameterBox);
+
+  d->m_AlignmentOverlay = new QmitkButtonOverlayWidget(d->m_DrawingControls);
+  d->m_AlignmentOverlay->setVisible(false);
+  d->m_AlignmentOverlay->SetOverlayText(QStringLiteral(
+    "<p style=\"color:red; text-align:center\">"
+      "The views are not aligned to the reference image.<br>"
+      "Align the views to draw measurements."
+    "</p>"));
+  d->m_AlignmentOverlay->SetButtonText(" Align views");
+  d->m_AlignmentOverlay->setOpacity(200);
+  d->m_AlignmentOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg")));
+
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 0);
   d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 1, 1, 1);
-  d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_DrawLabel, 2, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_HintLabel, 3, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_FixedParameterBox, 4, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 5, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_CopyToClipboard, 6, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_DrawingControls, 1, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 2, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_CopyToClipboard, 3, 0, 1, 2);
 
   d->m_Parent->setLayout(d->m_Layout);
 
   this->CreateConnections();
   this->AddAllInteractors();
+
+  d->m_ViewsInitializedObserver.Reset(mitk::RenderingManager::GetInstance(), mitk::RenderingManagerViewsInitializedEvent(),
+    [this](const itk::EventObject&) { this->UpdateDrawingControls(); });
+
+  // The view coordinator notifies listeners only once an editor becomes visible.
+  // Pick up an editor that is already active at this point.
+  if (auto* renderWindowPart = this->GetRenderWindowPart(); nullptr != renderWindowPart)
+    this->RenderWindowPartActivated(renderWindowPart);
 
   // placed after CreateConnections to trigger update of the current selection
   d->m_SingleNodeSelectionWidget->SetAutoSelectNewNodes(true);
@@ -339,24 +403,95 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_DrawBezierCurve, SIGNAL(triggered(bool)), this, SLOT(OnDrawBezierCurveTriggered(bool)));
   connect(d->m_DrawSubdivisionPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawSubdivisionPolygonTriggered(bool)));
   connect(d->m_CancelPlacementShortcut, &QShortcut::activated, this, &QmitkMeasurementView::CancelPlacement);
+  connect(d->m_AlignmentOverlay, &QmitkButtonOverlayWidget::Clicked, this, &QmitkMeasurementView::OnAlignViewsClicked);
   connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
   connect(d->m_Radius, QOverload<double>::of(&ctkDoubleSpinBox::valueChanged), d->m_Thickness, &ctkDoubleSpinBox::setMaximum);
 }
 
 void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  if (nodes.empty() || nodes.front().IsNull())
+  // A pending figure sits on a plane of the current reference image and is added
+  // below it in the data storage, so it cannot outlive a change of that image.
+  this->CancelPlacement();
+
+  const auto previousImageNode = d->m_SelectedImageNode;
+  d->m_SelectedImageNode = nodes.empty() ? mitk::DataNode::Pointer() : nodes.front();
+
+  // Aligning the views is reserved for a switch between two reference images. The
+  // first one is picked by the auto-selection, when the view opens or when an image
+  // appears while nothing is selected, and which one that is reflects no user intent,
+  // so moving the views for it would be a surprise. As long as the views are not
+  // aligned, the overlay offers to align them.
+  const bool isSwitch = previousImageNode.IsNotNull() && d->m_SelectedImageNode.IsNotNull()
+    && previousImageNode != d->m_SelectedImageNode;
+
+  if (isSwitch && nullptr != d->m_RenderWindowPart)
   {
-    d->m_SelectedImageNode = nullptr;
-    d->m_DrawActionsToolBar->setEnabled(false);
-    d->m_FixedParameterBox->setEnabled(false);
+    const auto* referenceData = d->m_SelectedImageNode->GetData();
+
+    if (nullptr != referenceData
+      && !mitk::RenderWindowPartHelper::IsRenderWindowPartAlignedWithGeometry(d->m_RenderWindowPart, referenceData->GetGeometry()))
+    {
+      d->m_RenderWindowPart->InitializeViews(referenceData->GetTimeGeometry(), false);
+    }
   }
-  else
-  {
-    d->m_SelectedImageNode = nodes.front();
-    d->m_DrawActionsToolBar->setEnabled(true);
-    d->m_FixedParameterBox->setEnabled(true);
-  }
+
+  this->UpdateDrawingControls();
+}
+
+void QmitkMeasurementView::OnAlignViewsClicked()
+{
+  if (d->m_SelectedImageNode.IsNull() || nullptr == d->m_RenderWindowPart)
+    return;
+
+  const auto* referenceData = d->m_SelectedImageNode->GetData();
+
+  if (nullptr == referenceData)
+    return;
+
+  // The views may currently show data located elsewhere, so also reset the camera.
+  d->m_RenderWindowPart->InitializeViews(referenceData->GetTimeGeometry(), true);
+}
+
+void QmitkMeasurementView::UpdateDrawingControls()
+{
+  if (nullptr == d->m_AlignmentOverlay)
+    return; // render window part notification before CreateQtPartControl()
+
+  const auto* referenceData = d->m_SelectedImageNode.IsNotNull() ? d->m_SelectedImageNode->GetData() : nullptr;
+  const bool hasReference = nullptr != referenceData;
+  const bool isAligned = !hasReference
+    || mitk::RenderWindowPartHelper::IsRenderWindowPartAlignedWithGeometry(d->m_RenderWindowPart, referenceData->GetGeometry());
+
+  // The overlay only covers this view. A pending figure would still accept clicks
+  // in the render windows and end up on the wrong plane.
+  if (!isAligned)
+    this->CancelPlacement();
+
+  d->m_AlignmentOverlay->setVisible(hasReference && !isAligned);
+  d->m_DrawActionsToolBar->setEnabled(hasReference && isAligned);
+  d->m_FixedParameterBox->setEnabled(hasReference && isAligned);
+}
+
+void QmitkMeasurementView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  d->m_RenderWindowPart = renderWindowPart;
+  this->UpdateDrawingControls();
+}
+
+void QmitkMeasurementView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
+{
+  // Cancel while the part is still alive so PlanarFigureInitialized() can hand the
+  // interaction reference geometry back to it.
+  this->CancelPlacement();
+
+  d->m_RenderWindowPart = nullptr;
+  this->UpdateDrawingControls();
+}
+
+void QmitkMeasurementView::RenderWindowPartInputChanged(mitk::IRenderWindowPart*)
+{
+  this->UpdateDrawingControls();
 }
 
 void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
@@ -540,6 +675,28 @@ void QmitkMeasurementView::PlanarFigureInitialized()
 
   d->m_DrawLabel->hide();
   d->m_HintLabel->hide();
+
+  if (d->m_RestoreInteractionReferenceGeometry.has_value())
+  {
+    this->SetInteractionReferenceGeometry(*d->m_RestoreInteractionReferenceGeometry);
+    d->m_RestoreInteractionReferenceGeometry.reset();
+  }
+}
+
+void QmitkMeasurementView::SetInteractionReferenceGeometry(const mitk::TimeGeometry* geometry)
+{
+  if (nullptr == d->m_RenderWindowPart)
+    return;
+
+  try
+  {
+    d->m_RenderWindowPart->SetInteractionReferenceGeometry(geometry);
+  }
+  catch (const mitk::Exception& e)
+  {
+    // Thrown when the selected time point lies outside the geometry's time range.
+    MITK_WARN << "Could not set the interaction reference geometry: " << e.GetDescription();
+  }
 }
 
 void QmitkMeasurementView::CancelPlacement()
@@ -843,6 +1000,19 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   d->m_PendingCounter = &counter;
   d->m_CancelPlacementShortcut->setEnabled(true);
   d->m_DrawLabel->show();
+
+  // Decoupled render windows compare themselves against this geometry while the
+  // figure is being placed and offer a per-window reset (see QmitkRenderWindow).
+  // There is only one such geometry per renderer and the Segmentation view claims
+  // it for as long as one of its tools is active, so borrow it for the placement
+  // and hand it back afterwards instead of clearing it.
+  const auto* referenceData = d->m_SelectedImageNode.IsNotNull() ? d->m_SelectedImageNode->GetData() : nullptr;
+
+  if (nullptr != d->m_RenderWindowPart && nullptr != referenceData)
+  {
+    d->m_RestoreInteractionReferenceGeometry = GetInteractionReferenceGeometry(d->m_RenderWindowPart);
+    this->SetInteractionReferenceGeometry(referenceData->GetTimeGeometry());
+  }
 
   return newNode;
 }

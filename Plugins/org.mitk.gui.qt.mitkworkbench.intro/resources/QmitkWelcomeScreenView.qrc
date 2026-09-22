@@ -9,8 +9,10 @@
         <file>img/theme/moon.svg</file>
         <file>img/theme/sun.svg</file>
         <file>img/tips/lightbulb.svg</file>
+        <file>img/viewalignment/fit-views.svg</file>
         <file>tips/tips.css</file>
         <file>tips/image-contrast.html</file>
         <file>tips/mouse-navigation.html</file>
+        <file>tips/view-alignment.html</file>
     </qresource>
 </RCC>

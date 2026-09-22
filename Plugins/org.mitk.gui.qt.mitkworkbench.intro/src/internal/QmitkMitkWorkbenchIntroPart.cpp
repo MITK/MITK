@@ -111,6 +111,9 @@ namespace
       case 5:
         return "image-contrast";
 
+      case 10:
+        return "view-alignment";
+
       default:
         return QString();
     }

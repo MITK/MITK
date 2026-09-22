@@ -157,6 +157,17 @@ QHeaderView::section:vertical:pressed {
   font-weight: bold;
 }
 
+/* A table's top-left corner is a QTableCornerButton, which the QHeaderView
+   rules above do not reach. Unstyled it falls back to the palette and reads as
+   a white block in the corner of every dark table, so it repeats the section
+   look here. */
+QTableCornerButton::section {
+  background-color: #2d2d30;
+  border: 1px solid transparent;
+  border-right: 1px solid #3f3f46;
+  border-bottom: 1px solid #3f3f46;
+}
+
 QHeaderView::down-arrow {
   image: url(:/org.blueberry.ui.qt/dark/down-arrow.svg);
   height: 16px;

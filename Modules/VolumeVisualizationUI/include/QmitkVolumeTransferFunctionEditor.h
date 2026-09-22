@@ -23,12 +23,14 @@ found in the LICENSE file.
 
 #include <vtkSmartPointer.h>
 
+#include <QStringList>
 #include <QWidget>
 
 #include <array>
 #include <memory>
 #include <string>
 
+class QListWidgetItem;
 class QmitkVolumeThumbnailRenderer;
 class vtkColorTransferFunction;
 
@@ -130,8 +132,13 @@ private:
    *
    * Runs before the grid is filled, so that they reach it as any other entry
    * does - at its end, which is where the catalogue keeps what is added to it.
+   *
+   * \return The files whose presets reached the catalogue, in the order they
+   *         were added: the nth of these is the file the nth catalogue entry
+   *         after the built-in ones stands for. What the entries are stamped
+   *         with, so that removing one can forget the right file.
    */
-  void LoadRememberedPresets();
+  QStringList LoadRememberedPresets();
 
   /**
    * \brief Write the curve on show to a file of the user's choosing, and offer
@@ -142,6 +149,24 @@ private:
    * is still the preset it came from - see DiffersFromPreset.
    */
   void SaveCustomPreset();
+
+  /**
+   * \brief Stop offering a preset that was saved from here.
+   *
+   * The entry leaves the grid and its file leaves the ones looked for at the
+   * next start. The file itself is left where the user put it: a preset is that
+   * file rather than a copy of it, and it may be one shared with others.
+   *
+   * The curve on show is not touched, whichever entry is removed. What a node
+   * naming this preset records instead becomes a curve that answers to no
+   * preset - the same as one loaded from a file - since nothing is left to
+   * rebuild it from.
+   *
+   * \param[in] presetItem The entry to remove. Ignored unless it stands for a
+   *            preset of file origin: the embedded catalogue is read afresh at
+   *            every start and would offer a built-in one again regardless.
+   */
+  void RemoveCustomPreset(QListWidgetItem *presetItem);
 
   /** \brief Write the held function onto the node and re-seed the editor. */
   void ApplyCurrentTransferFunction();

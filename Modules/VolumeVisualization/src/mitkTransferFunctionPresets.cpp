@@ -301,6 +301,19 @@ std::string mitk::TransferFunctionPresets::AddPreset(std::istream &stream)
   return name;
 }
 
+bool mitk::TransferFunctionPresets::RemovePreset(const std::string &presetName)
+{
+  const auto it = std::find_if(m_Presets.begin(), m_Presets.end(),
+    [&presetName](const Preset &preset) { return preset.name == presetName; });
+
+  if (it == m_Presets.end())
+    return false;
+
+  m_Presets.erase(it);
+
+  return true;
+}
+
 mitk::TransferFunction::Pointer mitk::TransferFunctionPresets::LoadTransferFunction(
   std::istream &stream, VolumeBlendMode &blendMode)
 {

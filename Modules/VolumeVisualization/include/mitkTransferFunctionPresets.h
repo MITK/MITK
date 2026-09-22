@@ -115,6 +115,22 @@ namespace mitk
     std::string AddPreset(std::istream &stream);
 
     /**
+     * \brief Take a preset back out of this catalog.
+     *
+     * The counterpart to AddPreset, for a preset a caller offered and no longer
+     * does. Names are unique across the catalog, so the name AddPreset returned
+     * is all it takes to name the entry it added.
+     *
+     * A built-in preset can be removed just as well - nothing here tells the two
+     * apart - but only until the next construction, which reads the embedded
+     * resource afresh.
+     *
+     * \param[in] presetName The preset to remove.
+     * \return True if the catalog held that name and no longer does.
+     */
+    bool RemovePreset(const std::string &presetName);
+
+    /**
      * \brief Load a transfer function stored in the preset JSON format from
      * any stream (a file, the embedded resource, an in-memory buffer).
      * \param[in] stream The input stream to read from.

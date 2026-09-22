@@ -180,6 +180,16 @@ namespace
   /** \brief Where an entry keeps the origin of the preset it stands for. */
   constexpr int PRESET_ORIGIN_ROLE = Qt::UserRole + 1;
 
+  /** \brief Where an entry of file origin keeps the file it was read from.
+   *
+   * Removing such an entry means forgetting that file, and the name will not
+   * say which it is: AddPreset numbers a name the catalogue already holds, and
+   * the numbered one answers to no file's own name.
+   *
+   * Empty on an entry from the embedded catalogue, which stands for no file.
+   */
+  constexpr int PRESET_FILE_ROLE = Qt::UserRole + 2;
+
   /** \brief What an entry adds to its name while it is showing such a curve.
    *
    * Held apart from the name by a non-breaking space, and written as a code
@@ -318,6 +328,14 @@ namespace
   PresetOrigin PresetOriginOf(const QListWidgetItem *item)
   {
     return static_cast<PresetOrigin>(item->data(PRESET_ORIGIN_ROLE).toInt());
+  }
+
+  /** \brief The file an entry was read from, empty for one of the embedded
+   *         catalogue's.
+   */
+  QString PresetFile(const QListWidgetItem *item)
+  {
+    return item->data(PRESET_FILE_ROLE).toString();
   }
 
   /** \brief What a node records a preset of this origin under.
@@ -512,20 +530,27 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // Before the grid is filled rather than after, so that what was saved in
   // earlier sessions is in the catalogue by the time the loop below reads it
   // and needs no entry of its own making.
-  this->LoadRememberedPresets();
+  const QStringList presetFiles = this->LoadRememberedPresets();
 
   const auto presetNames = m_Presets.GetPresetNames();
 
   for (std::size_t i = 0; i < presetNames.size(); ++i)
   {
     const auto presetName = QString::fromStdString(presetNames[i]);
+    const bool builtIn = i < builtInPresetCount;
 
     // The name goes in beside the text as well as in it, because the text is
     // what the edited marker is appended to. See PRESET_NAME_ROLE.
     auto *presetItem = new QListWidgetItem(presetName, presetList);
     presetItem->setData(PRESET_NAME_ROLE, presetName);
     presetItem->setData(PRESET_ORIGIN_ROLE, static_cast<int>(
-      i < builtInPresetCount ? PresetOrigin::Internal : PresetOrigin::File));
+      builtIn ? PresetOrigin::Internal : PresetOrigin::File));
+
+    // The files were read in the order the catalogue took them, and it appends,
+    // so the entries standing after the built-in ones are those files in order.
+    if (!builtIn)
+      presetItem->setData(PRESET_FILE_ROLE,
+        presetFiles.value(static_cast<qsizetype>(i - builtInPresetCount)));
   }
 
   // Cells are measured from the names they have to hold, so the entries come
@@ -644,7 +669,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
 QmitkVolumeTransferFunctionEditor::~QmitkVolumeTransferFunctionEditor() = default;
 
-void QmitkVolumeTransferFunctionEditor::LoadRememberedPresets()
+QStringList QmitkVolumeTransferFunctionEditor::LoadRememberedPresets()
 {
   const QStringList rememberedFiles = RememberedPresetFiles();
 
@@ -675,6 +700,8 @@ void QmitkVolumeTransferFunctionEditor::LoadRememberedPresets()
   // the application holds, and the list is otherwise already what it says.
   if (foundFiles.size() != rememberedFiles.size())
     RememberPresetFiles(foundFiles);
+
+  return foundFiles;
 }
 
 bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *event)
@@ -1764,9 +1791,23 @@ void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
   saveAction->setEnabled(m_AppliedTransferFunction.IsNotNull() && this->DiffersFromPreset());
   saveAction->setToolTip("Available once the curve has been moved away from its preset.");
 
+  // The entry under the cursor rather than the one in force, which is what
+  // saving asks about: what is removed is a preset, not the curve on show.
+  auto *presetItem = m_Controls->presetListWidget->itemAt(pos);
+
+  auto *removeAction = menu.addAction("Remove preset");
+
+  removeAction->setEnabled(presetItem != nullptr &&
+                           PresetOriginOf(presetItem) == PresetOrigin::File);
+  removeAction->setToolTip("Right-click a preset saved from here. The catalogue's own cannot be removed.");
+
   // The position arrives relative to the viewport rather than to the widget.
-  if (menu.exec(m_Controls->presetListWidget->viewport()->mapToGlobal(pos)) == saveAction)
+  auto *chosenAction = menu.exec(m_Controls->presetListWidget->viewport()->mapToGlobal(pos));
+
+  if (chosenAction == saveAction)
     this->SaveCustomPreset();
+  else if (chosenAction == removeAction)
+    this->RemoveCustomPreset(presetItem);
 }
 
 void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
@@ -1840,6 +1881,10 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
     }
   }
 
+  // Absolute, because the directory this was launched from is not the one it
+  // will be launched from next time.
+  const QString presetFile = QFileInfo(fileName).absoluteFilePath();
+
   // Read straight back rather than added from memory, so that a preset saved now
   // and one found at the next start arrive by the same route.
   std::ifstream stream(fileName.toStdString());
@@ -1862,6 +1907,7 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
   auto *presetItem = new QListWidgetItem(addedName, presetList);
   presetItem->setData(PRESET_NAME_ROLE, addedName);
   presetItem->setData(PRESET_ORIGIN_ROLE, static_cast<int>(PresetOrigin::File));
+  presetItem->setData(PRESET_FILE_ROLE, presetFile);
 
   // Measures the cells against a name none of them was measured for, and leaves
   // the new entry a stand-in preview to hold its place.
@@ -1875,10 +1921,6 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
     const int run = m_ThumbnailRun;
     QTimer::singleShot(0, this, [this, run] { this->GenerateNextThumbnail(run); });
   }
-
-  // Absolute, because the directory this was launched from is not the one it
-  // will be launched from next time.
-  const QString presetFile = QFileInfo(fileName).absoluteFilePath();
 
   // Saving over a file already known moves where it stands rather than leaving
   // it remembered twice, which would offer it twice at the next start.
@@ -1894,6 +1936,75 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
   presetList->setCurrentRow(presetList->count() - 1);
 
   this->OnPresetSelected(addedName);
+}
+
+void QmitkVolumeTransferFunctionEditor::RemoveCustomPreset(QListWidgetItem *presetItem)
+{
+  if (presetItem == nullptr || PresetOriginOf(presetItem) != PresetOrigin::File)
+    return;
+
+  // Both read while the entry is still there to read them from.
+  const QString presetName = PresetName(presetItem);
+  const QString presetFile = PresetFile(presetItem);
+
+  QMessageBox confirmation(QMessageBox::Question, "Remove preset",
+    QString("Remove \"%1\" from the presets?").arg(presetName), QMessageBox::Cancel, this);
+
+  // Which file rather than only that there is one: the preset is that file, and
+  // this is the last place that names it.
+  confirmation.setInformativeText(
+    QString("The file it was saved to is kept:\n%1").arg(presetFile));
+
+  auto *removeButton = confirmation.addButton("Remove", QMessageBox::AcceptRole);
+
+  // Asked at all because the grid is clicked in to apply a preset, over and
+  // over, and a menu entry a hand's breadth from that click is not where a
+  // preset should be lost. Defaulting to Cancel is the rest of the same thought.
+  confirmation.setDefaultButton(QMessageBox::Cancel);
+  confirmation.exec();
+
+  if (confirmation.clickedButton() != removeButton)
+    return;
+
+  auto *presetList = m_Controls->presetListWidget;
+  const int presetRow = presetList->row(presetItem);
+
+  // The curve on show is left as it stands - what goes is the entry it answers
+  // to, not the rendering. But a node naming a preset the catalogue no longer
+  // holds has nothing to be rebuilt from, so it is recorded as carrying a curve
+  // no preset describes, which is what a curve loaded from a file already is.
+  if (presetRow == presetList->currentRow())
+  {
+    auto node = m_DataNode.Lock();
+
+    if (node.IsNotNull())
+      this->RecordCustomTransferFunction(node);
+
+    this->ClearPresetSelection();
+  }
+
+  m_Presets.RemovePreset(presetName.toStdString());
+
+  // A preview still due stands one place further back once this entry is out of
+  // the way. Without this the entry that takes its index is stepped over, and
+  // keeps its stand-in for as long as the panel is open.
+  if (presetRow < m_NextThumbnailIndex)
+    --m_NextThumbnailIndex;
+
+  // Taking an entry out of a list widget hands its ownership back, and nothing
+  // else frees it.
+  delete presetList->takeItem(presetRow);
+
+  // The cells may have been measured against the name just taken out.
+  this->UpdatePresetLayout();
+
+  // The file is left where the user put it: it may be one they keep elsewhere
+  // or share. What is dropped is the promise to look for it again.
+  QStringList presetFiles = RememberedPresetFiles();
+
+  presetFiles.removeAll(presetFile);
+
+  RememberPresetFiles(presetFiles);
 }
 
 void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()

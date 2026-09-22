@@ -97,6 +97,18 @@ changes what its entry brings. One whose file has since been moved or deleted is
 dropped from the grid, with the reason written to the log, and is not looked for
 again.
 
+Right-clicking a preset of your own offers <b>Remove preset</b> for the entry
+under the cursor, after asking. That entry leaves the grid and is not looked for
+again at the next start, while the file it was saved to stays where you put it -
+a preset is that file rather than a copy of it, and <b>Load from file...</b>
+still reads it. The menu entry is greyed out over the catalogue's own presets,
+which are read afresh at every start and would be offered again regardless.
+
+Removing the preset a volume is currently rendered with leaves the rendering
+untouched. Its curve stays exactly as it is and becomes one that answers to no
+preset, as a curve loaded from a file does, so no entry is marked for it any
+more.
+
 \subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
 
 Below the preset grid, one canvas shows three things at once: the histogram of

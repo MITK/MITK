@@ -22,6 +22,8 @@ found in the LICENSE file.
 /** Overlay that renders a passed string and draws an icon as a push button.
  You may pass an html string that will be rendered accordingly
  respecting the current application style sheet.
+ The message is wrapped to the overlay's width, so it stays readable in a
+ host too narrow for it; an explicit break in the string is still honored.
  The button will return the 'Clicked' signal which can be connected to
  a slot in the calling class.*/
 class MITKQTWIDGETS_EXPORT QmitkButtonOverlayWidget : public QmitkOverlayWidget

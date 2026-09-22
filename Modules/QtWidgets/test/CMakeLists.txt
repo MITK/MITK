@@ -12,6 +12,10 @@ mitkAddCustomModuleTest(QmitkIconThemeTest QmitkIconThemeTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkButtonOverlayWidgetTest QmitkButtonOverlayWidgetTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNExplicitNameTest QmitkMxNExplicitNameTest
   -platform minimal
 )

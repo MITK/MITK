@@ -18,18 +18,31 @@ found in the LICENSE file.
 QmitkButtonOverlayWidget::QmitkButtonOverlayWidget(QWidget* parent)
   : QmitkOverlayWidget(parent)
 {
+  // The message wraps, and is given the width to wrap into: an overlay explains
+  // why what is underneath it cannot be used, which is a sentence, and a
+  // sentence laid out at its single-line width is simply cut off by a host that
+  // is narrower than it. Callers may still break a line themselves where they
+  // want one; wrapping only decides what happens to the rest.
   m_MessageLabel = new QLabel(this);
-  m_MessageLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+  m_MessageLabel->setWordWrap(true);
+  m_MessageLabel->setAlignment(Qt::AlignCenter);
+  QSizePolicy messagePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+  messagePolicy.setHeightForWidth(true);
+  m_MessageLabel->setSizePolicy(messagePolicy);
 
   m_PushButton = new QPushButton(this);
   connect(m_PushButton, &QPushButton::clicked,
     this, &QmitkButtonOverlayWidget::Clicked);
   m_PushButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
+  // No alignment on the layout or on the label: either one would place them at
+  // their own size hint instead of the overlay's width, and the label would go
+  // on asking for its whole text in one line however narrow the overlay got.
+  // The stretches above and below still centre the pair vertically, and the
+  // button keeps its alignment because it should stay its own width.
   auto* layout = new QVBoxLayout(this);
-  layout->setAlignment(Qt::AlignCenter);
   layout->addStretch();
-  layout->addWidget(m_MessageLabel, 0, Qt::AlignCenter);
+  layout->addWidget(m_MessageLabel);
   layout->addWidget(m_PushButton, 0, Qt::AlignCenter);
   layout->addStretch();
 

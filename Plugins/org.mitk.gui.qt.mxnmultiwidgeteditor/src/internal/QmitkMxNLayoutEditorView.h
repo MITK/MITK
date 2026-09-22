@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <vector>
 
 class QCheckBox;
+class QmitkButtonOverlayWidget;
 class QmitkMxNLayoutEditorWidget;
 
 /**
@@ -51,6 +52,9 @@ protected:
 
 private:
 
+  /** \brief Open the MxN display, so the view has something to configure. */
+  void OpenMxNDisplay();
+
   void DisconnectLayoutControls();
 
   /** \brief Ask the user before a layout change discards a non-trivial
@@ -63,6 +67,11 @@ private:
   /** \brief Editor-wide mouse-interaction scheme toggle, live only while an MxN
    *         editor part is active. */
   QCheckBox* m_PacsSchemeBox = nullptr;
+
+  /** Covers the editor while no MxN display is open: with nothing to configure
+   *  the controls would otherwise sit there greyed out and unexplained. Carries
+   *  the action that resolves it, so the display is one click away. */
+  QmitkButtonOverlayWidget* m_NoDisplayOverlay = nullptr;
 
   /** \brief Per-attachment connections of the layout-shape controls to the
    *         active editor part; dropped on part deactivation. */

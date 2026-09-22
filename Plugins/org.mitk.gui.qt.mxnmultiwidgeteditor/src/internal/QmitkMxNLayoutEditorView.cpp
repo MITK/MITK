@@ -13,11 +13,18 @@ found in the LICENSE file.
 #include "QmitkMxNLayoutEditorView.h"
 
 #include <QmitkAbstractMultiWidgetEditor.h>
+#include <QmitkButtonOverlayWidget.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNMultiWidgetEditor.h>
 
+#include <berryIWorkbenchPage.h>
+
+#include <mitkCoreServices.h>
 #include <mitkDataNode.h>
+#include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
+#include <mitkIDataStorageService.h>
 
 #include <QCheckBox>
 #include <QMessageBox>
@@ -46,9 +53,51 @@ void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
   m_LayoutEditorWidget = new QmitkMxNLayoutEditorWidget(parent);
   layout->addWidget(m_LayoutEditorWidget);
 
+  // The view configures a display it does not own, so without one it has
+  // nothing to act on. Rather than leave the controls greyed out and
+  // unexplained, say so over them and offer the one action that resolves it.
+  //
+  // Parented to the whole part, not to the editor widget: detaching disables
+  // that widget, and Qt disables every child of a disabled widget - the
+  // overlay's own button among them, which is exactly the button the user needs
+  // at that moment. Covering the part also covers the scheme box, which is
+  // equally inert without a display.
+  m_NoDisplayOverlay = new QmitkButtonOverlayWidget(parent);
+  m_NoDisplayOverlay->SetOverlayText(tr(
+    "<b>No MxN display is open.</b><br/>This view configures the window "
+    "arrangement and the synchronization of an MxN display."));
+  m_NoDisplayOverlay->SetButtonText(tr(" Open MxN display"));
+  m_NoDisplayOverlay->SetButtonIcon(QIcon(QStringLiteral(":/Qmitk/mwLayout.png")));
+  m_NoDisplayOverlay->setOpacity(200);
+  m_NoDisplayOverlay->setVisible(false);
+  connect(m_NoDisplayOverlay, &QmitkButtonOverlayWidget::Clicked,
+          this, &QmitkMxNLayoutEditorView::OpenMxNDisplay);
+
   // Wire the render window part that is already active when the view opens;
   // later activations arrive through the part listener.
   this->RenderWindowPartActivated(this->GetRenderWindowPart());
+}
+
+void QmitkMxNLayoutEditorView::OpenMxNDisplay()
+{
+  auto page = this->GetSite()->GetPage();
+  if (page.IsNull())
+  {
+    return;
+  }
+
+  mitk::CoreServicePointer<mitk::IDataStorageService> storageService(
+    mitk::CoreServices::GetDataStorageService());
+  if (!storageService)
+  {
+    return;
+  }
+
+  // MATCH_ID: raise the display that is already there rather than open a second.
+  auto storage = storageService->GetActiveDataStorageReference();
+  berry::IEditorInput::Pointer input(new mitk::DataStorageEditorInput(storage));
+  page->OpenEditor(input, QmitkMxNMultiWidgetEditor::EDITOR_ID, true,
+                   berry::IWorkbenchPage::MATCH_ID);
 }
 
 void QmitkMxNLayoutEditorView::SetFocus()
@@ -73,6 +122,10 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
 
   this->DisconnectLayoutControls();
   m_LayoutEditorWidget->SetMultiWidget(multiWidget);
+  if (nullptr != m_NoDisplayOverlay)
+  {
+    m_NoDisplayOverlay->setVisible(nullptr == multiWidget);
+  }
 
   // The scheme toggle belongs to the MxN editor part, so it is only live while
   // one is active; it shows the scheme already in effect rather than a default.

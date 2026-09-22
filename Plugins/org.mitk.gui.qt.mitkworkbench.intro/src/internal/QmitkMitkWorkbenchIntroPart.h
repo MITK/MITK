@@ -16,6 +16,8 @@ found in the LICENSE file.
 
 #include <berryQtIntroPart.h>
 
+#include <QPointer>
+
 class QLabel;
 class QWidget;
 class QmitkWelcomeRecentDataPage;
@@ -26,9 +28,10 @@ class QmitkWelcomeTipsPage;
  * \brief Welcome screen shown in the editor area of the MITK Workbench.
  *
  * Introduces the Workbench with a short description above three tabs: usage
- * tips, the most common settings, and recently opened data. The recent data is
- * shown first if there is any, otherwise the settings, so that new users see
- * them first. The screen follows the application theme at runtime.
+ * tips, the most common settings, and recently opened data. A few early starts
+ * of the Workbench show a particular tip first. Otherwise, the recent data is
+ * shown first if there is any, else the settings, so that new users see them
+ * first. The screen follows the application theme at runtime.
  */
 class QmitkMitkWorkbenchIntroPart : public berry::QtIntroPart
 {
@@ -48,7 +51,8 @@ public:
 private:
   void ApplyTheme();
 
-  QWidget* m_Content;
+  // Root of all widgets below, which the workbench may destroy before the part.
+  QPointer<QWidget> m_Content;
   QLabel* m_Links;
   QmitkWelcomeTipsPage* m_TipsPage;
   QmitkWelcomeRecentDataPage* m_RecentDataPage;

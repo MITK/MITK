@@ -245,6 +245,9 @@ void QmitkMitkWorkbenchIntroPart::SetFocus()
 
 void QmitkMitkWorkbenchIntroPart::ApplyTheme()
 {
+  if (m_Content.isNull())
+    return;
+
   const auto palette = QmitkWelcomePalette::GetCurrent();
 
   m_Content->setStyleSheet(CreateStyleSheet(palette));

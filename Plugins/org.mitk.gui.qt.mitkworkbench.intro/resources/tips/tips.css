@@ -2,7 +2,7 @@
    tip HTML document in this folder and rendered by QmitkHtmlWidget.
 
    Colors are left to tips/theme.css, which each tip links as well. It is
-   generated from the palette of the current theme by QmitkWelcomeHintsPage. */
+   generated from the palette of the current theme by QmitkWelcomeTipsPage. */
 
 body {
   font-family: "Roboto", "Open Sans", sans-serif;

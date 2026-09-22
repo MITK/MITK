@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QCursor>
 #include <QDialog>
 #include <QDoubleSpinBox>
 #include <QDrag>
@@ -32,7 +33,6 @@ found in the LICENSE file.
 #include <QDragLeaveEvent>
 #include <QDropEvent>
 #include <QFrame>
-#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QIcon>
@@ -43,20 +43,28 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
+#include <QItemSelectionModel>
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QShortcut>
+#include <QSignalBlocker>
 #include <QSpinBox>
 #include <QSplitter>
+#include <QStyledItemDelegate>
 #include <QTableWidget>
+#include <QTabWidget>
 #include <QTimer>
 #include <QToolButton>
 #include <QVBoxLayout>
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <functional>
 #include <initializer_list>
+#include <optional>
+#include <utility>
 
 namespace
 {
@@ -123,30 +131,120 @@ namespace
 
   const QString NotLinkedEntry = QStringLiteral("(not linked)");
 
-  /**
-   * Tint an advanced-matrix link combo's text with the linked group's hue, so the
-   * matrix speaks the same color language as the cards and tiles. A cleared or
-   * unlinked combo drops back to the default ink.
-   */
-  void ColorizeLinkCombo(QComboBox* combo, QmitkMxNMultiWidget* multiWidget, const QString& group)
+  /** Readable ink on a filled group hue, shared by every surface that fills with one. */
+  QColor InkFor(const QColor& hue)
   {
-    QString sheet;
-    if (nullptr != multiWidget && !group.isEmpty() && group != NotLinkedEntry)
+    const double luminance = 0.299 * hue.red() + 0.587 * hue.green() + 0.114 * hue.blue();
+    return luminance > 140.0 ? QColor(0x1a, 0x1a, 0x1a) : QColor(Qt::white);
+  }
+
+  /** A group's hue as a menu / combo swatch. */
+  QPixmap SwatchFor(const QColor& hue)
+  {
+    QPixmap pixmap(12, 12);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(hue.isValid() ? hue : QColor(Qt::gray));
+    painter.drawRoundedRect(QRect(0, 0, 12, 12), 2, 2);
+    return pixmap;
+  }
+
+  // Matrix chip item data. The display role carries the same text unelided, so
+  // the view can measure a column and a screen reader still reads something.
+  constexpr int ChipGroupRole = Qt::UserRole;
+  constexpr int ChipNameRole = Qt::UserRole + 1;
+  constexpr int ChipHueRole = Qt::UserRole + 2;
+  constexpr int ChipOffsetRole = Qt::UserRole + 3;
+  constexpr int ChipHighlightRole = Qt::UserRole + 4;
+
+  // Out-of-domain values the offset editors rest on when the selected cells
+  // disagree, surfaced through specialValueText. An offset the user cannot mean,
+  // so committing one is refused rather than writing a value nobody chose - the
+  // same contract as a text editor showing a blank font size for a mixed
+  // selection.
+  constexpr int MixedSliceOffset = -10000;
+  constexpr double MixedZoomOffset = 0.0;
+  constexpr double MixedPanOffset = -100001.0;
+
+  /** A slice offset with its sign, which is how it reads everywhere it is shown. */
+  QString SliceOffsetLabel(int steps)
+  {
+    return QStringLiteral("%1%2").arg(steps > 0 ? "+" : "").arg(steps);
+  }
+
+
+  /**
+   * Paints a matrix cell as a chip filled in its group's hue: the group name,
+   * elided from the middle so auto-named groups stay apart by their trailing
+   * digit, and the offset pinned right where it is never the part that elides.
+   * Selection is drawn as a frame rather than a fill, so it never hides the hue
+   * it sits on. Paint only - the matrix is a read surface, edited from its
+   * action bar.
+   */
+  class MatrixChipDelegate : public QStyledItemDelegate
+  {
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    void paint(QPainter* painter, const QStyleOptionViewItem& option,
+               const QModelIndex& index) const override
     {
-      try
+      painter->save();
+      painter->setRenderHint(QPainter::Antialiasing, true);
+
+      auto hue = index.data(ChipHueRole).value<QColor>();
+      if (hue.isValid())
       {
-        const QColor hue = multiWidget->GetSyncGroupColor(group.toStdString());
-        if (hue.isValid())
+        // A chip sharing the hovered synchronization brightens, the same way the
+        // map brightens the hovered glyph. A ring would be invisible here - the
+        // chip is already filled in the group hue - and the selection frame
+        // already owns the highlight color.
+        if (index.data(ChipHighlightRole).toBool())
         {
-          sheet = QStringLiteral("QComboBox { color: %1; }").arg(hue.name());
+          hue = hue.lighter(145);
+        }
+        const QRect chip = option.rect.adjusted(2, 2, -2, -2);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(hue);
+        painter->drawRoundedRect(chip, 3, 3);
+
+        painter->setPen(InkFor(hue));
+        QRect text = chip.adjusted(4, 0, -4, 0);
+        const auto offset = index.data(ChipOffsetRole).toString();
+        if (!offset.isEmpty())
+        {
+          painter->drawText(text, Qt::AlignRight | Qt::AlignVCenter, offset);
+          text.setRight(text.right() - option.fontMetrics.horizontalAdvance(offset) - 4);
+        }
+        if (text.width() > 0)
+        {
+          painter->drawText(text, Qt::AlignLeft | Qt::AlignVCenter,
+                            option.fontMetrics.elidedText(index.data(ChipNameRole).toString(),
+                                                          Qt::ElideMiddle, text.width()));
         }
       }
-      catch (const mitk::Exception&)
+
+      if (option.state & QStyle::State_Selected)
       {
+        QPen pen(option.palette.color(QPalette::Highlight));
+        pen.setWidth(2);
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRoundedRect(option.rect.adjusted(1, 1, -1, -1), 3, 3);
       }
+      painter->restore();
     }
-    combo->setStyleSheet(sheet);
-  }
+
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+      auto size = QStyledItemDelegate::sizeHint(option, index);
+      size.setWidth(size.width() + 10);  // the chip inset and its inner padding
+      size.setHeight(size.height() + 6);
+      return size;
+    }
+  };
 
   /**
    * Style a group card's header as a solid bar in the group hue, with the name,
@@ -156,8 +254,7 @@ namespace
   void StyleGroupHeader(QFrame* header, QLabel* name, QLabel* count, QToolButton* menuButton,
                         const QColor& hue)
   {
-    const double luminance = 0.299 * hue.red() + 0.587 * hue.green() + 0.114 * hue.blue();
-    const QString ink = luminance > 140.0 ? QStringLiteral("#1a1a1a") : QStringLiteral("#ffffff");
+    const QString ink = InkFor(hue).name();
     header->setStyleSheet(QStringLiteral("background-color: %1; border-top-left-radius: 3px; "
                                          "border-top-right-radius: 3px;").arg(hue.name()));
     name->setStyleSheet(QStringLiteral("color: %1; font-weight: bold; background: transparent;").arg(ink));
@@ -392,6 +489,7 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
                 m_MultiWidget->SetActiveRenderWindowWidget(cell);
               }
             }
+            this->MirrorMapSelectionToMatrix(windowIds);
             this->ScheduleRebuild();
           });
   // Hovering a tile's axis glyph lights up every cell that shares that
@@ -468,39 +566,29 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   splitter->addWidget(mapPane);
 
-  // "Sync groups" gathers the group actions and the group-card list into one
-  // bounded object below the map. Its header carries the group actions: create a
-  // group, and open the advanced per-window matrix.
-  auto* groupsBox = new QGroupBox(tr("Sync groups"), splitter);
-  auto* groupsBoxLayout = new QVBoxLayout(groupsBox);
-  groupsBoxLayout->setContentsMargins(4, 4, 4, 4);
+  // Two faces of the same configuration, as tabs below the map: "Sync groups"
+  // for the everyday card work, "Advanced" for the per-window link matrix. They
+  // are mutually exclusive - one configuration surface at a time - so the map
+  // keeps its share of the editor whichever face is up.
+  m_FacesTab = new QTabWidget(splitter);
+  m_FacesTab->setObjectName(QStringLiteral("QmitkMxNLayoutEditorFaces"));
+
+  auto* groupsPage = new QWidget(m_FacesTab);
+  auto* groupsPageLayout = new QVBoxLayout(groupsPage);
+  groupsPageLayout->setContentsMargins(4, 4, 4, 4);
 
   auto* groupsActionRow = new QHBoxLayout();
-  m_AddGroupButton = new QToolButton(groupsBox);
+  m_AddGroupButton = new QToolButton(groupsPage);
   m_AddGroupButton->setText(tr("+ Group"));
   m_AddGroupButton->setToolTip(tr("Create a new synchronization group"));
   connect(m_AddGroupButton, &QToolButton::clicked, this, [this]() { this->CreateGroup(); });
   groupsActionRow->addWidget(m_AddGroupButton);
   groupsActionRow->addStretch();
-  m_AdvancedButton = new QToolButton(groupsBox);
-  m_AdvancedButton->setText(tr("Advanced"));
-  m_AdvancedButton->setCheckable(true);
-  m_AdvancedButton->setToolTip(tr("Show the per-window, per-dimension link matrix with its "
-                                  "offset editors"));
-  connect(m_AdvancedButton, &QToolButton::toggled, this, [this](bool on)
-  {
-    m_MatrixPane->setVisible(on);
-    if (on)
-    {
-      this->RebuildMatrixNow();
-    }
-  });
-  groupsActionRow->addWidget(m_AdvancedButton);
-  groupsBoxLayout->addLayout(groupsActionRow);
+  groupsPageLayout->addLayout(groupsActionRow);
 
-  // Cards scroll when they outgrow the box; no inner frame, so the box border is
-  // the only one.
-  auto* cardsScroll = new QScrollArea(groupsBox);
+  // Cards scroll when they outgrow the page; no inner frame, so the tab frame is
+  // the only border.
+  auto* cardsScroll = new QScrollArea(groupsPage);
   cardsScroll->setWidgetResizable(true);
   cardsScroll->setFrameShape(QFrame::NoFrame);
   auto* groupsContainer = new QWidget(cardsScroll);
@@ -509,37 +597,128 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   m_GroupsLayout->setSpacing(6);
   m_GroupsLayout->addStretch();
   cardsScroll->setWidget(groupsContainer);
-  groupsBoxLayout->addWidget(cardsScroll, 1);
+  groupsPageLayout->addWidget(cardsScroll, 1);
 
-  splitter->addWidget(groupsBox);
+  m_FacesTab->addTab(groupsPage, tr("Sync groups"));
 
-  // The advanced matrix stays inside the editor - a third splitter pane, hidden
-  // until the "Advanced" toggle reveals it - so associations can be edited live
-  // beside the map and cards. It rebuilds only on structural changes (a cell or
-  // group added/removed), never on a routine link refresh, so an open combo is
-  // not torn down mid-edit.
-  m_MatrixPane = new QWidget(splitter);
+  // The advanced matrix is the editor's second face: every window a row, every
+  // axis a column. The table itself is a read surface - chips, no editors - and
+  // everything is edited from the action bar underneath it, so an edit never
+  // covers the grid it acts on. Group creation stays with the cards, which keeps
+  // this face to what it is for: association and offset.
+  m_MatrixPane = new QWidget(m_FacesTab);
   auto* matrixPaneLayout = new QVBoxLayout(m_MatrixPane);
-  matrixPaneLayout->setContentsMargins(0, 0, 0, 0);
-  auto* matrixHint = new QLabel(
-    tr("Per-window, per-dimension links. Type a group name to create it; use the offset "
-       "editors for the exact per-window relationship. This is the deliberate way to author "
-       "a partial ('some windows') group state."),
-    m_MatrixPane);
-  matrixHint->setWordWrap(true);
-  matrixPaneLayout->addWidget(matrixHint);
+  matrixPaneLayout->setContentsMargins(4, 4, 4, 4);
+
+  // The same action in the same corner as on the cards page, so the gesture
+  // carries over between the two faces.
+  auto* matrixActionRow = new QHBoxLayout();
+  m_MatrixAddGroupButton = new QToolButton(m_MatrixPane);
+  m_MatrixAddGroupButton->setText(tr("+ Group"));
+  m_MatrixAddGroupButton->setToolTip(tr("Create a new synchronization group"));
+  connect(m_MatrixAddGroupButton, &QToolButton::clicked, this, [this]() { this->CreateGroup(); });
+  matrixActionRow->addWidget(m_MatrixAddGroupButton);
+  matrixActionRow->addStretch();
+  matrixPaneLayout->addLayout(matrixActionRow);
+
   m_Matrix = new QTableWidget(m_MatrixPane);
-  m_Matrix->setSelectionMode(QAbstractItemView::NoSelection);
-  m_Matrix->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  m_Matrix->setObjectName(QStringLiteral("QmitkMxNLayoutEditorMatrix"));
+  m_Matrix->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_Matrix->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_Matrix->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_Matrix->setItemDelegate(new MatrixChipDelegate(m_Matrix));
+  m_Matrix->setContextMenuPolicy(Qt::CustomContextMenu);
+  // Clickable headers take the whole line, which is what turns "link every
+  // window on one dimension to this group" and "unlink this window entirely"
+  // into two gestures. Qt's own header press handles the plain case; eventFilter
+  // takes the modified ones over (see there).
+  m_Matrix->horizontalHeader()->setSectionsClickable(true);
+  m_Matrix->verticalHeader()->setSectionsClickable(true);
+  m_Matrix->horizontalHeader()->viewport()->installEventFilter(this);
+  m_Matrix->verticalHeader()->viewport()->installEventFilter(this);
   m_Matrix->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   matrixPaneLayout->addWidget(m_Matrix, 1);
-  m_MatrixPane->setVisible(false);
-  splitter->addWidget(m_MatrixPane);
 
-  // Cell grid roughly a third, group list two thirds; the cell pane cannot shrink
-  // below its content (the map's minimum height). setSizes seeds the initial
-  // split; the stretch factors keep the ratio on resize. The hidden matrix pane
-  // takes no space until revealed.
+  // The group picker also as a popup at the pointer, for the single quick edit
+  // that does not warrant a trip to the action bar.
+  connect(m_Matrix, &QWidget::customContextMenuRequested, this, [this](const QPoint& pos)
+  {
+    const auto index = m_Matrix->indexAt(pos);
+    if (index.isValid() && !m_Matrix->selectionModel()->isSelected(index))
+    {
+      m_Matrix->setCurrentIndex(index);
+    }
+    this->ShowMatrixGroupMenu(m_Matrix->viewport()->mapToGlobal(pos));
+  });
+  connect(m_Matrix, &QTableWidget::doubleClicked, this,
+          [this](const QModelIndex&) { this->ShowMatrixGroupMenu(QCursor::pos()); });
+
+  // Hovering a chip lights up every window sharing that synchronization, in the
+  // map as well as here - the same resolution a tile's glyph hover runs, so the
+  // two surfaces read as one.
+  m_Matrix->viewport()->setMouseTracking(true);
+  m_Matrix->viewport()->installEventFilter(this);
+  connect(m_Matrix, &QAbstractItemView::entered, this, [this](const QModelIndex& index)
+  {
+    const auto* item = m_Matrix->item(index.row(), index.column());
+    const auto group = nullptr != item ? item->data(ChipGroupRole).toString() : QString();
+    if (group.isEmpty())
+    {
+      this->ClearSyncHighlight();
+      return;
+    }
+    this->HighlightGroupAxis(group, index.column());
+  });
+
+  auto* clearShortcut = new QShortcut(QKeySequence::Delete, m_Matrix);
+  clearShortcut->setContext(Qt::WidgetShortcut);
+  connect(clearShortcut, &QShortcut::activated, this,
+          [this]() { this->ApplyGroupToMatrixSelection({}); });
+
+  connect(m_Matrix->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+          [this](const QItemSelection&, const QItemSelection&)
+  {
+    this->UpdateMatrixActionBar();
+    if (m_MirroringSelection)
+    {
+      return;
+    }
+    QStringList windowIds;
+    for (const auto& [windowId, axis] : this->MatrixSelection())
+    {
+      if (!windowIds.contains(windowId))
+      {
+        windowIds.append(windowId);
+      }
+    }
+    m_MirroringSelection = true;
+    m_CellMap->SetSelectedWindowIds(windowIds);
+    m_MirroringSelection = false;
+  });
+
+  matrixPaneLayout->addWidget(this->BuildMatrixActionBar());
+
+  m_FacesTab->addTab(m_MatrixPane, tr("Advanced"));
+  m_FacesTab->setTabToolTip(
+    m_FacesTab->indexOf(m_MatrixPane),
+    tr("The per-window, per-dimension link matrix with its offset editors"));
+
+  // The matrix is only kept current while its face is up (see
+  // RefreshAdvancedMatrixIfVisible), so raising the tab has to catch it up on
+  // everything that happened while the cards were showing.
+  connect(m_FacesTab, &QTabWidget::currentChanged, this, [this](int)
+  {
+    if (this->AdvancedFaceIsCurrent())
+    {
+      this->RebuildMatrixNow();
+    }
+  });
+
+  splitter->addWidget(m_FacesTab);
+
+  // Cell grid roughly a third, configuration face two thirds; the cell pane
+  // cannot shrink below its content (the map's minimum height). setSizes seeds
+  // the initial split; the stretch factors keep the ratio on resize.
   splitter->setStretchFactor(0, 1);
   splitter->setStretchFactor(1, 2);
   splitter->setSizes(QList<int>{ 200, 400 });
@@ -550,6 +729,78 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
 QmitkMxNLayoutEditorWidget::~QmitkMxNLayoutEditorWidget()
 {
+}
+
+bool QmitkMxNLayoutEditorWidget::eventFilter(QObject* watched, QEvent* event)
+{
+  if (nullptr != m_Matrix && QEvent::Leave == event->type()
+      && watched == m_Matrix->viewport())
+  {
+    this->ClearSyncHighlight();
+    return false;  // observed, not consumed: the view still wants its own leave
+  }
+
+  if (nullptr != m_Matrix && QEvent::MouseButtonPress == event->type())
+  {
+    const bool vertical = watched == m_Matrix->verticalHeader()->viewport();
+    if (vertical || watched == m_Matrix->horizontalHeader()->viewport())
+    {
+      auto* mouse = static_cast<QMouseEvent*>(event);
+      const auto modifiers = mouse->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+      if (Qt::LeftButton == mouse->button() && modifiers != Qt::NoModifier)
+      {
+        auto* header = vertical ? m_Matrix->verticalHeader() : m_Matrix->horizontalHeader();
+        const auto position = mouse->position().toPoint();
+        const int section = header->logicalIndexAt(vertical ? position.y() : position.x());
+        if (section >= 0)
+        {
+          this->SelectMatrixLine(section, vertical, modifiers);
+          return true;
+        }
+      }
+    }
+  }
+  return QWidget::eventFilter(watched, event);
+}
+
+void QmitkMxNLayoutEditorWidget::SelectMatrixLine(int section, bool wholeRow,
+                                                  Qt::KeyboardModifiers modifiers)
+{
+  auto* model = m_Matrix->model();
+  auto* selectionModel = m_Matrix->selectionModel();
+  const int lastRow = m_Matrix->rowCount() - 1;
+  const int lastColumn = m_Matrix->columnCount() - 1;
+  if (nullptr == selectionModel || lastRow < 0 || lastColumn < 0)
+  {
+    return;
+  }
+
+  const auto block = [&](int from, int to)
+  {
+    return wholeRow ? QItemSelection(model->index(std::min(from, to), 0),
+                                     model->index(std::max(from, to), lastColumn))
+                    : QItemSelection(model->index(0, std::min(from, to)),
+                                     model->index(lastRow, std::max(from, to)));
+  };
+
+  if (modifiers.testFlag(Qt::ShiftModifier))
+  {
+    // Extend from the line the last plain press left current, as a file list does.
+    const auto current = selectionModel->currentIndex();
+    const int anchor = !current.isValid() ? section
+                                          : (wholeRow ? current.row() : current.column());
+    selectionModel->select(block(anchor, section), QItemSelectionModel::ClearAndSelect);
+  }
+  else
+  {
+    const bool selected = wholeRow ? selectionModel->isRowSelected(section)
+                                   : selectionModel->isColumnSelected(section);
+    selectionModel->select(block(section, section), selected ? QItemSelectionModel::Deselect
+                                                             : QItemSelectionModel::Select);
+    selectionModel->setCurrentIndex(
+      wholeRow ? model->index(section, 0) : model->index(0, section),
+      QItemSelectionModel::NoUpdate);
+  }
 }
 
 void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget)
@@ -1158,7 +1409,7 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
     m_Matrix->setRowCount(0);
     m_Matrix->setColumnCount(0);
     // Invalidate the reflected-structure signature so the trailing refresh forces
-    // a fresh matrix build when the advanced pane is open.
+    // a fresh matrix build when the advanced face is up.
     m_MatrixCellIds.clear();
     m_MatrixGroupIds.clear();
   }
@@ -1289,7 +1540,11 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   {
   }
 
+  // The group perspective speaks for several windows at once, so it marks that
+  // an offset exists somewhere in the group but leaves the number to the
+  // per-window surfaces, which can say whose it is.
   const auto stateSlot = [total](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked,
+                                 bool anyOffset,
                                  const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
   {
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
@@ -1298,8 +1553,13 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
     {
       slot.color = groupHue;
       slot.partial = linked < total;
+      slot.hasOffset = anyOffset;
       slot.tooltip = slot.partial ? QObject::tr("%1 - %2 of %3 windows").arg(label).arg(linked).arg(total)
                                    : QObject::tr("%1 - all %2 windows").arg(label).arg(total);
+      if (anyOffset)
+      {
+        slot.tooltip += QObject::tr(", some offset from the group");
+      }
     }
     else
     {
@@ -1312,6 +1572,7 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
     int linked = 0;
+    bool anyOffset = false;
     if (useCache)
     {
       linked = cacheIt->second[axisIndex] ? 1 : 0;
@@ -1324,10 +1585,12 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
         if (link.has_value() && link->group == group)
         {
           ++linked;
+          anyOffset = anyOffset
+                      || !QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset).isEmpty();
         }
       }
     }
-    result.append(stateSlot(GlyphFor(dimension), hue, linked,
+    result.append(stateSlot(GlyphFor(dimension), hue, linked, anyOffset,
                             QString::fromUtf8(DimensionLabel(dimension))));
     ++axisIndex;
   }
@@ -1347,7 +1610,9 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
       }
     }
   }
-  result.append(stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, tr("Data selection")));
+  // Data selection has no offset to carry, so it never takes the footnote mark.
+  result.append(
+    stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, false, tr("Data selection")));
 
   return result;
 }
@@ -1426,6 +1691,7 @@ void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, int ax
     }
   }
   m_CellMap->SetHighlightedCells(members, axisIndex, hue);
+  this->SetMatrixHighlight(members, axisIndex);
 }
 
 void QmitkMxNLayoutEditorWidget::HighlightCellAxis(const QString& windowId, int axisIndex)
@@ -1463,6 +1729,45 @@ void QmitkMxNLayoutEditorWidget::ClearSyncHighlight()
   if (nullptr != m_CellMap)
   {
     m_CellMap->SetHighlightedCells(QStringList(), -1, QColor());
+  }
+  this->SetMatrixHighlight(QStringList(), -1);
+}
+
+void QmitkMxNLayoutEditorWidget::SetMatrixHighlight(const QStringList& windowIds, int axisIndex)
+{
+  if (nullptr == m_Matrix)
+  {
+    return;
+  }
+
+  // Touch only what changes: hover moves arrive per mouse move, and repainting
+  // the whole grid for each would be work the eye never sees.
+  for (const auto& [row, column] : m_MatrixHighlighted)
+  {
+    if (auto* item = m_Matrix->item(row, column))
+    {
+      item->setData(ChipHighlightRole, false);
+    }
+  }
+  m_MatrixHighlighted.clear();
+
+  if (axisIndex < 0 || axisIndex >= m_Matrix->columnCount())
+  {
+    return;
+  }
+  for (int row = 0; row < m_Matrix->rowCount(); ++row)
+  {
+    const auto id = static_cast<std::size_t>(row) < m_MatrixCellIds.size()
+                      ? m_MatrixCellIds[static_cast<std::size_t>(row)]
+                      : QString();
+    if (windowIds.contains(id))
+    {
+      if (auto* item = m_Matrix->item(row, axisIndex))
+      {
+        item->setData(ChipHighlightRole, true);
+        m_MatrixHighlighted.emplace_back(row, axisIndex);
+      }
+    }
   }
 }
 
@@ -1731,10 +2036,14 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrixNow()
     MITK_DEBUG << "Layout editor: skipped matrix rebuild: " << e.GetDescription();
     return;
   }
+
+  // An edit can empty a group out of existence, which is a structural change and
+  // so a full rebuild - mid-gesture. Carrying the selection by (window, axis)
+  // rather than by (row, column) keeps it over any such rebuild.
+  const auto selection = this->MatrixSelection();
+
   this->RebuildMatrix(infos, descriptors);
 
-  // Record the structure the matrix now reflects, so RefreshAdvancedMatrixIfVisible
-  // can rebuild on a cell- or group-set change but skip a pure link edit.
   m_MatrixCellIds.clear();
   for (const auto& descriptor : descriptors)
   {
@@ -1745,87 +2054,129 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrixNow()
   {
     m_MatrixGroupIds.push_back(info.id);
   }
+
+  this->RefreshMatrixCells();
+
+  // Measure the columns against the content once, then hold them: the chips are
+  // repainted on every engine change, and a width that tracked their text would
+  // shift the grid under the pointer mid-interaction.
+  const int columnCount = m_Matrix->columnCount();
+  m_Matrix->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  m_Matrix->resizeColumnsToContents();
+  std::vector<int> widths;
+  widths.reserve(static_cast<std::size_t>(columnCount));
+  for (int column = 0; column < columnCount; ++column)
+  {
+    widths.push_back(std::max(m_Matrix->columnWidth(column), 34));
+  }
+  m_Matrix->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+  for (int column = 0; column < columnCount; ++column)
+  {
+    m_Matrix->setColumnWidth(column, widths[static_cast<std::size_t>(column)]);
+  }
+
+  QItemSelection restored;
+  for (const auto& [windowId, axis] : selection)
+  {
+    const auto row = std::find(m_MatrixCellIds.begin(), m_MatrixCellIds.end(), windowId);
+    if (row != m_MatrixCellIds.end() && axis < columnCount)
+    {
+      const auto index = m_Matrix->model()->index(
+        static_cast<int>(std::distance(m_MatrixCellIds.begin(), row)), axis);
+      restored.select(index, index);
+    }
+  }
+  if (!restored.isEmpty())
+  {
+    m_Matrix->selectionModel()->select(restored, QItemSelectionModel::ClearAndSelect);
+  }
+  this->UpdateMatrixActionBar();
+}
+
+bool QmitkMxNLayoutEditorWidget::AdvancedFaceIsCurrent() const
+{
+  // The raised tab, not widget visibility: a docked-away view hides every child,
+  // and reading that as "matrix not shown" would skip the rebuilds that keep it
+  // current, leaving a stale matrix when the view comes back.
+  return nullptr != m_FacesTab && nullptr != m_MatrixPane
+      && m_FacesTab->currentWidget() == m_MatrixPane;
 }
 
 void QmitkMxNLayoutEditorWidget::RefreshAdvancedMatrixIfVisible()
 {
-  // Only while the matrix is revealed. Rebuild it when the cell set (a grid
-  // resize / layout load changes the rows) or the group set (a group added or
-  // removed changes the column dropdowns) differs from what it reflects - but
-  // never on a pure link/selection edit, so an editable combo the user is
-  // interacting with is not torn down mid-edit.
-  if (nullptr == m_AdvancedButton || !m_AdvancedButton->isChecked() || m_MultiWidget.isNull())
+  // Only while the matrix face is up. A changed cell set (a grid resize or a
+  // layout load changes the rows) or group set needs the whole table back; for
+  // everything else repainting the chips in place is enough, and it leaves the
+  // measured column widths and the selection alone.
+  if (!this->AdvancedFaceIsCurrent() || m_MultiWidget.isNull())
   {
     return;
   }
 
-  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
-  std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
+  std::vector<QString> cellIds;
+  std::vector<std::string> groupIds;
   try
   {
-    infos = m_MultiWidget->GetSyncGroupInfos();
-    descriptors = m_MultiWidget->ListWindowDescriptors();
+    for (const auto& descriptor : m_MultiWidget->ListWindowDescriptors())
+    {
+      cellIds.push_back(descriptor.id);
+    }
+    for (const auto& info : m_MultiWidget->GetSyncGroupInfos())
+    {
+      groupIds.push_back(info.id);
+    }
   }
   catch (const mitk::Exception&)
   {
     return;
   }
 
-  std::vector<QString> cellIds;
-  for (const auto& descriptor : descriptors)
-  {
-    cellIds.push_back(descriptor.id);
-  }
-  std::vector<std::string> groupIds;
-  for (const auto& info : infos)
-  {
-    groupIds.push_back(info.id);
-  }
-
   if (cellIds != m_MatrixCellIds || groupIds != m_MatrixGroupIds)
   {
     this->RebuildMatrixNow();
   }
+  else
+  {
+    this->RefreshMatrixCells();
+    this->UpdateMatrixActionBar();
+  }
 }
 
 void QmitkMxNLayoutEditorWidget::RebuildMatrix(
-  const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
+  const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>&,
   const std::vector<QmitkMxNMultiWidget::WindowDescriptor>& descriptors)
 {
-  QStringList groupNames;
-  for (const auto& info : infos)
-  {
-    groupNames.append(QString::fromStdString(info.id));
-  }
-
   // Eight axes: the seven QmitkMxNSyncDimension links plus the data-selection axis
   // in the last column, matching the tiles and group headers.
   const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
-  const int selectionColumn = dimensionCount;
+  m_Matrix->clear();
   m_Matrix->setColumnCount(dimensionCount + 1);
   m_Matrix->setRowCount(static_cast<int>(descriptors.size()));
 
-  // Column headers carry the same axis glyph the tiles and barcodes use, recolored
-  // to the header ink, next to the dimension name.
+  // Glyph-only column headers: the same axis glyph the tiles and barcodes use,
+  // named in the tooltip. Eight spelled-out dimension names do not fit a docked
+  // view, and the glyphs are the language the rest of the editor speaks.
   const QColor headerInk = this->palette().color(QPalette::Text);
   int headerColumn = 0;
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
-    auto* headerItem = new QTableWidgetItem(QString::fromUtf8(DimensionLabel(dimension)));
+    auto* headerItem = new QTableWidgetItem();
     const QPixmap glyph = QmitkMxNRenderAxisGlyph(GlyphFor(dimension), headerInk, 16);
     if (!glyph.isNull())
     {
       headerItem->setIcon(QIcon(glyph));
     }
+    headerItem->setToolTip(QString::fromUtf8(DimensionLabel(dimension)));
     m_Matrix->setHorizontalHeaderItem(headerColumn++, headerItem);
   }
-  auto* selectionHeader = new QTableWidgetItem(tr("Data selection"));
+  auto* selectionHeader = new QTableWidgetItem();
   const QPixmap selectionGlyph = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Selection, headerInk, 16);
   if (!selectionGlyph.isNull())
   {
     selectionHeader->setIcon(QIcon(selectionGlyph));
   }
-  m_Matrix->setHorizontalHeaderItem(selectionColumn, selectionHeader);
+  selectionHeader->setToolTip(tr("Data selection"));
+  m_Matrix->setHorizontalHeaderItem(dimensionCount, selectionHeader);
 
   QStringList rowLabels;
   for (const auto& descriptor : descriptors)
@@ -1834,189 +2185,811 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
   }
   m_Matrix->setVerticalHeaderLabels(rowLabels);
 
-  for (std::size_t row = 0; row < descriptors.size(); ++row)
+  // The recorded highlight indexes point at items that are about to be replaced.
+  m_MatrixHighlighted.clear();
+
+  // Empty items now; RefreshMatrixCells fills every chip from the engine, on
+  // this build and on every later edit.
+  for (int row = 0; row < static_cast<int>(descriptors.size()); ++row)
   {
-    const auto windowId = descriptors[row].id;
-    for (std::size_t column = 0; column < QmitkMxNAllSyncDimensions.size(); ++column)
+    for (int column = 0; column <= dimensionCount; ++column)
     {
-      const auto dimension = QmitkMxNAllSyncDimensions[column];
-      const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
-
-      auto* cellWidget = new QWidget(m_Matrix);
-      auto* cellLayout = new QHBoxLayout(cellWidget);
-      cellLayout->setContentsMargins(2, 2, 2, 2);
-
-      auto* combo = new QComboBox(cellWidget);
-      combo->setEditable(true);  // typing a new name creates the group on commit
-      combo->addItem(NotLinkedEntry);
-      combo->addItems(groupNames);
-      combo->setCurrentText(link.has_value() ? QString::fromStdString(link->group)
-                                             : NotLinkedEntry);
-      ColorizeLinkCombo(combo, m_MultiWidget, combo->currentText());
-      cellLayout->addWidget(combo);
-
-      QSpinBox* sliceOffset = nullptr;
-      QDoubleSpinBox* zoomOffset = nullptr;
-      QDoubleSpinBox* panOffsetX = nullptr;
-      QDoubleSpinBox* panOffsetY = nullptr;
-      switch (dimension)
-      {
-        case QmitkMxNSyncDimension::Slice:
-          sliceOffset = new QSpinBox(cellWidget);
-          sliceOffset->setRange(-9999, 9999);
-          sliceOffset->setToolTip(tr("Slice offset (steps relative to the group seed)"));
-          if (link.has_value() && std::holds_alternative<int>(link->offset))
-          {
-            sliceOffset->setValue(std::get<int>(link->offset));
-          }
-          cellLayout->addWidget(sliceOffset);
-          break;
-        case QmitkMxNSyncDimension::Zoom:
-          zoomOffset = new QDoubleSpinBox(cellWidget);
-          zoomOffset->setRange(0.01, 100.0);
-          zoomOffset->setSingleStep(0.1);
-          zoomOffset->setValue(1.0);
-          zoomOffset->setToolTip(tr("Zoom factor relative to the group seed"));
-          if (link.has_value() && std::holds_alternative<double>(link->offset))
-          {
-            zoomOffset->setValue(std::get<double>(link->offset));
-          }
-          cellLayout->addWidget(zoomOffset);
-          break;
-        case QmitkMxNSyncDimension::Pan:
-        {
-          panOffsetX = new QDoubleSpinBox(cellWidget);
-          panOffsetY = new QDoubleSpinBox(cellWidget);
-          for (auto* box : { panOffsetX, panOffsetY })
-          {
-            box->setRange(-1.0e5, 1.0e5);
-            box->setToolTip(tr("Pan offset in world mm relative to the group seed"));
-            cellLayout->addWidget(box);
-          }
-          if (link.has_value() && std::holds_alternative<mitk::Vector2D>(link->offset))
-          {
-            const auto offset = std::get<mitk::Vector2D>(link->offset);
-            panOffsetX->setValue(offset[0]);
-            panOffsetY->setValue(offset[1]);
-          }
-          break;
-        }
-        default:
-          break;
-      }
-
-      const auto commit = [this, windowId, dimension, combo,
-                           sliceOffset, zoomOffset, panOffsetX, panOffsetY]()
-      {
-        if (m_MultiWidget.isNull())
-        {
-          return;
-        }
-        const auto text = combo->currentText().trimmed();
-        try
-        {
-          if (text.isEmpty() || text == NotLinkedEntry)
-          {
-            m_MultiWidget->ClearSyncLink(windowId, dimension);
-          }
-          else
-          {
-            QmitkMxNMultiWidget::SyncOffset offset;
-            if (nullptr != sliceOffset)
-            {
-              offset = sliceOffset->value();
-            }
-            else if (nullptr != zoomOffset)
-            {
-              offset = zoomOffset->value();
-            }
-            else if (nullptr != panOffsetX)
-            {
-              mitk::Vector2D pan;
-              pan[0] = panOffsetX->value();
-              pan[1] = panOffsetY->value();
-              offset = pan;
-            }
-            m_MultiWidget->SetSyncLink(windowId, dimension, text.toStdString(), offset);
-          }
-        }
-        catch (const mitk::Exception& e)
-        {
-          // The engine-signal-driven rebuild snaps the matrix back to the
-          // authoritative state.
-          MITK_WARN << "Layout editor: link change for '" << windowId.toStdString()
-                    << "' ignored: " << e.GetDescription();
-        }
-        // Recolor immediately so the hue tracks the selection even when the edit
-        // is not structural enough to rebuild the matrix (e.g. switching between
-        // two existing groups).
-        ColorizeLinkCombo(combo, m_MultiWidget, text);
-        this->ScheduleRebuild();
-      };
-
-      connect(combo, QOverload<int>::of(&QComboBox::activated), this, [commit](int) { commit(); });
-      connect(combo->lineEdit(), &QLineEdit::editingFinished, this, commit);
-      for (auto* box : std::initializer_list<QAbstractSpinBox*>{ sliceOffset, zoomOffset,
-                                                                 panOffsetX, panOffsetY })
-      {
-        if (nullptr != box)
-        {
-          connect(box, &QAbstractSpinBox::editingFinished, this, commit);
-        }
-      }
-
-      m_Matrix->setCellWidget(static_cast<int>(row), static_cast<int>(column), cellWidget);
-    }
-
-    // The data-selection axis (the 8th): single-valued per cell and offset-free,
-    // so a plain combo. Empty reverts the cell to the default group; any other
-    // name moves its selection there (creating the group on commit).
-    {
-      auto* selectionCell = new QWidget(m_Matrix);
-      auto* selectionLayout = new QHBoxLayout(selectionCell);
-      selectionLayout->setContentsMargins(2, 2, 2, 2);
-
-      auto* selectionCombo = new QComboBox(selectionCell);
-      selectionCombo->setEditable(true);
-      selectionCombo->addItems(groupNames);
-      selectionCombo->setCurrentText(
-        QString::fromStdString(m_MultiWidget->GetCellSelectionGroup(windowId)));
-      ColorizeLinkCombo(selectionCombo, m_MultiWidget, selectionCombo->currentText());
-      selectionLayout->addWidget(selectionCombo);
-
-      const auto commitSelection = [this, windowId, selectionCombo]()
-      {
-        if (m_MultiWidget.isNull())
-        {
-          return;
-        }
-        const auto text = selectionCombo->currentText().trimmed();
-        try
-        {
-          if (text.isEmpty())
-          {
-            m_MultiWidget->ClearCellSelectionGroup(windowId);
-          }
-          else
-          {
-            m_MultiWidget->SetCellSelectionGroup(windowId, text.toStdString());
-          }
-        }
-        catch (const mitk::Exception& e)
-        {
-          MITK_WARN << "Layout editor: selection change for '" << windowId.toStdString()
-                    << "' ignored: " << e.GetDescription();
-        }
-        ColorizeLinkCombo(selectionCombo, m_MultiWidget, text);
-        this->ScheduleRebuild();
-      };
-      connect(selectionCombo, QOverload<int>::of(&QComboBox::activated), this,
-              [commitSelection](int) { commitSelection(); });
-      connect(selectionCombo->lineEdit(), &QLineEdit::editingFinished, this, commitSelection);
-
-      m_Matrix->setCellWidget(static_cast<int>(row), selectionColumn, selectionCell);
+      m_Matrix->setItem(row, column, new QTableWidgetItem());
     }
   }
+}
+
+void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
+{
+  if (m_MultiWidget.isNull() || nullptr == m_Matrix)
+  {
+    return;
+  }
+
+  const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  for (int row = 0; row < m_Matrix->rowCount(); ++row)
+  {
+    if (row >= static_cast<int>(m_MatrixCellIds.size()))
+    {
+      break;
+    }
+    const auto windowId = m_MatrixCellIds[static_cast<std::size_t>(row)];
+    for (int column = 0; column <= dimensionCount && column < m_Matrix->columnCount(); ++column)
+    {
+      auto* item = m_Matrix->item(row, column);
+      if (nullptr == item)
+      {
+        continue;
+      }
+
+      std::string group;
+      QString offset;
+      QString axisName;
+      try
+      {
+        if (column == dimensionCount)
+        {
+          // Data selection always resolves to a group - it has no unlinked
+          // state - so this column is never empty.
+          group = m_MultiWidget->GetCellSelectionGroup(windowId);
+          axisName = tr("Data selection");
+        }
+        else
+        {
+          const auto dimension = QmitkMxNAllSyncDimensions[static_cast<std::size_t>(column)];
+          axisName = QString::fromUtf8(DimensionLabel(dimension));
+          if (const auto link = m_MultiWidget->GetSyncLink(windowId, dimension))
+          {
+            group = link->group;
+            offset = QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset);
+          }
+        }
+      }
+      catch (const mitk::Exception&)
+      {
+        // Transient mid-layout-change state; the next engine signal refreshes.
+        continue;
+      }
+
+      if (group.empty())
+      {
+        item->setData(ChipGroupRole, QString());
+        item->setData(ChipNameRole, QString());
+        item->setData(ChipHueRole, QColor());
+        item->setData(ChipOffsetRole, QString());
+        item->setText(QString());
+        item->setToolTip(tr("%1: not linked").arg(axisName));
+        continue;
+      }
+
+      QString displayName = QString::fromStdString(group);
+      QColor hue;
+      try
+      {
+        displayName = QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(group));
+        hue = m_MultiWidget->GetSyncGroupColor(group);
+      }
+      catch (const mitk::Exception&)
+      {
+      }
+      if (!hue.isValid())
+      {
+        hue = this->palette().color(QPalette::Mid);
+      }
+
+      item->setData(ChipGroupRole, QString::fromStdString(group));
+      item->setData(ChipNameRole, displayName);
+      item->setData(ChipHueRole, hue);
+      item->setData(ChipOffsetRole, offset);
+      // Unelided, so the column measurement and anything reading the model
+      // rather than the painted chip see the whole text.
+      item->setText(offset.isEmpty() ? displayName
+                                     : QStringLiteral("%1 %2").arg(displayName, offset));
+      item->setToolTip(offset.isEmpty()
+                         ? tr("%1: %2").arg(axisName, displayName)
+                         : tr("%1: %2, offset %3").arg(axisName, displayName, offset));
+    }
+  }
+
+  // Grow a column a chip has outgrown, never shrink one. Growing keeps group
+  // names whole - a name is only ever shortened by a width the user chose
+  // themselves - while never shrinking keeps the grid from shifting under the
+  // pointer between two edits. resizeColumnsToContents measures synchronously
+  // against the current chips, so widening is its result taken as a floor.
+  const int columnCount = m_Matrix->columnCount();
+  std::vector<int> held;
+  held.reserve(static_cast<std::size_t>(columnCount));
+  for (int column = 0; column < columnCount; ++column)
+  {
+    held.push_back(m_Matrix->columnWidth(column));
+  }
+  m_Matrix->resizeColumnsToContents();
+  for (int column = 0; column < columnCount; ++column)
+  {
+    m_Matrix->setColumnWidth(
+      column, std::max(held[static_cast<std::size_t>(column)], m_Matrix->columnWidth(column)));
+  }
+}
+
+QmitkMxNLayoutEditorWidget::MatrixCellContent
+QmitkMxNLayoutEditorWidget::AdvancedMatrixCell(const QString& windowId, int axisIndex) const
+{
+  MatrixCellContent content;
+  if (nullptr == m_Matrix)
+  {
+    return content;
+  }
+  const auto row = std::find(m_MatrixCellIds.begin(), m_MatrixCellIds.end(), windowId);
+  if (row == m_MatrixCellIds.end() || axisIndex < 0 || axisIndex >= m_Matrix->columnCount())
+  {
+    return content;
+  }
+  if (const auto* item = m_Matrix->item(
+        static_cast<int>(std::distance(m_MatrixCellIds.begin(), row)), axisIndex))
+  {
+    content.group = item->data(ChipGroupRole).toString().toStdString();
+    content.offset = item->data(ChipOffsetRole).toString();
+    content.highlighted = item->data(ChipHighlightRole).toBool();
+  }
+  return content;
+}
+
+QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
+{
+  auto* bar = new QFrame(m_MatrixPane);
+  bar->setFrameShape(QFrame::StyledPanel);
+  auto* barLayout = new QVBoxLayout(bar);
+  barLayout->setContentsMargins(6, 6, 6, 6);
+  barLayout->setSpacing(4);
+
+  // Doubles as the face's standing explanation while nothing is selected, so
+  // the hint costs no permanent space once the user is working.
+  auto* descriptionRow = new QHBoxLayout();
+  descriptionRow->setContentsMargins(0, 0, 0, 0);
+  descriptionRow->setSpacing(6);
+  m_MatrixAxisIconLabel = new QLabel(bar);
+  m_MatrixAxisIconLabel->setObjectName(QStringLiteral("mxnMatrixAxisIcon"));
+  m_MatrixAxisIconLabel->setVisible(false);
+  descriptionRow->addWidget(m_MatrixAxisIconLabel, 0, Qt::AlignTop);
+  m_MatrixSelectionLabel = new QLabel(bar);
+  m_MatrixSelectionLabel->setWordWrap(true);
+  descriptionRow->addWidget(m_MatrixSelectionLabel, 1);
+  barLayout->addLayout(descriptionRow);
+
+  auto* groupRow = new QHBoxLayout();
+  groupRow->addWidget(new QLabel(tr("Group"), bar));
+  m_MatrixGroupPicker = new QComboBox(bar);
+  m_MatrixGroupPicker->setToolTip(tr("Assign the selected cells to a group. '%1' removes the "
+                                     "link; on the data-selection axis, which is always in some "
+                                     "group, it returns the window to the default one. Groups "
+                                     "are created with '+ Group'.").arg(NotLinkedEntry));
+  // activated, not currentIndexChanged: repopulating the picker for a new
+  // selection must not write that selection's own group back to the engine.
+  connect(m_MatrixGroupPicker, &QComboBox::activated, this, [this](int index)
+  {
+    this->ApplyGroupToMatrixSelection(
+      m_MatrixGroupPicker->itemData(index).toString().toStdString());
+  });
+  groupRow->addWidget(m_MatrixGroupPicker, 1);
+  m_MatrixClearButton = new QToolButton(bar);
+  m_MatrixClearButton->setText(tr("Clear"));
+  m_MatrixClearButton->setToolTip(tr("Unlink the selected cells"));
+  connect(m_MatrixClearButton, &QToolButton::clicked, this,
+          [this]() { this->ApplyGroupToMatrixSelection({}); });
+  groupRow->addWidget(m_MatrixClearButton);
+  barLayout->addLayout(groupRow);
+
+  // One row holding every offset editor; UpdateMatrixActionBar shows the pair
+  // that fits the selected dimension and hides the row entirely when none does.
+  m_MatrixOffsetRow = new QWidget(bar);
+  auto* offsetLayout = new QHBoxLayout(m_MatrixOffsetRow);
+  offsetLayout->setContentsMargins(0, 0, 0, 0);
+
+  m_MatrixOffsetLabel = new QLabel(tr("Offset"), m_MatrixOffsetRow);
+  offsetLayout->addWidget(m_MatrixOffsetLabel);
+
+  // Each editor's range reaches one step past its domain, and that extra value
+  // is the marker for "the selected cells disagree" (see MixedSliceOffset).
+  // Writing the marker is refused, so a mixed selection is never flattened onto
+  // one cell's value by accident.
+  m_SliceOffsetEdit = new QSpinBox(m_MatrixOffsetRow);
+  m_SliceOffsetEdit->setObjectName(QStringLiteral("mxnMatrixSliceOffset"));
+  m_SliceOffsetEdit->setRange(MixedSliceOffset, 9999);
+  m_SliceOffsetEdit->setSpecialValueText(tr("multiple"));
+  m_SliceOffsetEdit->setToolTip(tr("Slice offset in steps, relative to the group's seed"));
+  connect(m_SliceOffsetEdit, &QAbstractSpinBox::editingFinished, this, [this]()
+  {
+    // Detaching the editor disables it, which moves focus out of whichever spin
+    // box holds it and so arrives here with nothing left to write to.
+    if (m_MultiWidget.isNull() || MixedSliceOffset == m_SliceOffsetEdit->value())
+    {
+      return;
+    }
+    for (const auto& [windowId, axis] : this->MatrixSelection())
+    {
+      this->WriteCellDimensionOffset(windowId, QmitkMxNSyncDimension::Slice,
+                                     m_SliceOffsetEdit->value());
+    }
+    m_MultiWidget->RefreshSyncControls();
+  });
+  offsetLayout->addWidget(m_SliceOffsetEdit);
+
+  m_ZoomOffsetEdit = new QDoubleSpinBox(m_MatrixOffsetRow);
+  m_ZoomOffsetEdit->setObjectName(QStringLiteral("mxnMatrixZoomOffset"));
+  m_ZoomOffsetEdit->setRange(MixedZoomOffset, 100.0);
+  m_ZoomOffsetEdit->setSingleStep(0.1);
+  m_ZoomOffsetEdit->setSpecialValueText(tr("multiple"));
+  m_ZoomOffsetEdit->setToolTip(tr("Zoom factor relative to the group's seed"));
+  connect(m_ZoomOffsetEdit, &QAbstractSpinBox::editingFinished, this, [this]()
+  {
+    if (m_MultiWidget.isNull() || m_ZoomOffsetEdit->value() <= MixedZoomOffset)
+    {
+      return;
+    }
+    for (const auto& [windowId, axis] : this->MatrixSelection())
+    {
+      this->WriteCellDimensionOffset(windowId, QmitkMxNSyncDimension::Zoom,
+                                     m_ZoomOffsetEdit->value());
+    }
+    m_MultiWidget->RefreshSyncControls();
+  });
+  offsetLayout->addWidget(m_ZoomOffsetEdit);
+
+  m_PanOffsetLabel = new QLabel(tr("mm"), m_MatrixOffsetRow);
+  m_PanOffsetXEdit = new QDoubleSpinBox(m_MatrixOffsetRow);
+  m_PanOffsetXEdit->setObjectName(QStringLiteral("mxnMatrixPanOffsetX"));
+  m_PanOffsetYEdit = new QDoubleSpinBox(m_MatrixOffsetRow);
+  for (auto* box : { m_PanOffsetXEdit, m_PanOffsetYEdit })
+  {
+    box->setRange(MixedPanOffset, 1.0e5);
+    box->setSpecialValueText(tr("multiple"));
+    box->setToolTip(tr("Pan offset in world mm, relative to the group's seed"));
+    connect(box, &QAbstractSpinBox::editingFinished, this, [this]()
+    {
+      if (m_MultiWidget.isNull() || m_PanOffsetXEdit->value() <= MixedPanOffset
+          || m_PanOffsetYEdit->value() <= MixedPanOffset)
+      {
+        return;
+      }
+      mitk::Vector2D pan;
+      pan[0] = m_PanOffsetXEdit->value();
+      pan[1] = m_PanOffsetYEdit->value();
+      for (const auto& [windowId, axis] : this->MatrixSelection())
+      {
+        this->WriteCellDimensionOffset(windowId, QmitkMxNSyncDimension::Pan, pan);
+      }
+      m_MultiWidget->RefreshSyncControls();
+    });
+  }
+  offsetLayout->addWidget(m_PanOffsetXEdit);
+  offsetLayout->addWidget(m_PanOffsetLabel);
+  offsetLayout->addWidget(m_PanOffsetYEdit);
+
+  m_RampLabel = new QLabel(tr("Ramp from"), m_MatrixOffsetRow);
+  m_RampFromEdit = new QSpinBox(m_MatrixOffsetRow);
+  m_RampFromEdit->setRange(-9999, 9999);
+  m_RampFromEdit->setValue(-1);
+  m_RampStepLabel = new QLabel(tr("by"), m_MatrixOffsetRow);
+  m_RampStepEdit = new QSpinBox(m_MatrixOffsetRow);
+  m_RampStepEdit->setRange(-9999, 9999);
+  m_RampStepEdit->setValue(1);
+  m_RampApplyButton = new QToolButton(m_MatrixOffsetRow);
+  m_RampApplyButton->setObjectName(QStringLiteral("mxnMatrixRampApply"));
+  m_RampApplyButton->setText(tr("Set"));
+  m_RampApplyButton->setToolTip(tr("Spread slice offsets over the selected cells, in the order "
+                                   "the windows are listed above. This is how a -1 / 0 / +1 "
+                                   "movie frame is authored."));
+  connect(m_RampApplyButton, &QToolButton::clicked, this, [this]()
+  {
+    QStringList windowIds;
+    for (const auto& [windowId, axis] : this->MatrixSelection())
+    {
+      windowIds.append(windowId);
+    }
+    this->ApplySliceOffsetRamp(windowIds, m_RampFromEdit->value(), m_RampStepEdit->value());
+  });
+  // The offsets the ramp would write, in the order it writes them, so its effect
+  // is readable against the window list above before it is applied.
+  m_RampPreviewLabel = new QLabel(m_MatrixOffsetRow);
+  m_RampPreviewLabel->setObjectName(QStringLiteral("mxnMatrixRampPreview"));
+  for (auto* box : { m_RampFromEdit, m_RampStepEdit })
+  {
+    connect(box, &QSpinBox::valueChanged, this, [this](int) { this->UpdateRampPreview(); });
+  }
+  offsetLayout->addWidget(m_RampLabel);
+  offsetLayout->addWidget(m_RampFromEdit);
+  offsetLayout->addWidget(m_RampStepLabel);
+  offsetLayout->addWidget(m_RampStepEdit);
+  offsetLayout->addWidget(m_RampApplyButton);
+  offsetLayout->addWidget(m_RampPreviewLabel);
+  offsetLayout->addStretch();
+
+  barLayout->addWidget(m_MatrixOffsetRow);
+
+  this->UpdateMatrixActionBar();
+  return bar;
+}
+
+std::vector<std::pair<QString, int>> QmitkMxNLayoutEditorWidget::MatrixSelection() const
+{
+  std::vector<std::pair<QString, int>> selection;
+  if (nullptr == m_Matrix || nullptr == m_Matrix->selectionModel())
+  {
+    return selection;
+  }
+
+  auto indexes = m_Matrix->selectionModel()->selectedIndexes();
+  // Row then column: row order is the layout's pre-order, which is the order a
+  // ramp spreads over and the order the description reads windows in.
+  std::sort(indexes.begin(), indexes.end(), [](const QModelIndex& a, const QModelIndex& b)
+  {
+    return a.row() != b.row() ? a.row() < b.row() : a.column() < b.column();
+  });
+  for (const auto& index : indexes)
+  {
+    const auto row = static_cast<std::size_t>(index.row());
+    if (index.row() >= 0 && row < m_MatrixCellIds.size())
+    {
+      selection.emplace_back(m_MatrixCellIds[row], index.column());
+    }
+  }
+  return selection;
+}
+
+void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
+{
+  if (nullptr == m_MatrixSelectionLabel)
+  {
+    return;
+  }
+
+  const auto selection = this->MatrixSelection();
+  const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+
+  if (selection.empty() || m_MultiWidget.isNull())
+  {
+    m_MatrixSelectionLabel->setText(
+      tr("Select cells to link them - drag across the grid, or click an axis or window header "
+         "for a whole line. This is where a partial ('some windows') group state and the "
+         "per-window offsets are authored."));
+    m_MatrixAxisIconLabel->setVisible(false);
+    m_MatrixGroupPicker->clear();
+    m_MatrixGroupPicker->setEnabled(false);
+    m_MatrixClearButton->setEnabled(false);
+    m_MatrixOffsetRow->setVisible(false);
+    return;
+  }
+
+  // Which axes and which windows the selection spans, for the description and
+  // for deciding whether a single dimension's offset editors apply.
+  std::vector<int> axes;
+  QStringList windowLabels;
+  for (const auto& [windowId, axis] : selection)
+  {
+    if (std::find(axes.begin(), axes.end(), axis) == axes.end())
+    {
+      axes.push_back(axis);
+    }
+    // The row header already carries the label the map uses for the window.
+    const auto row = std::find(m_MatrixCellIds.begin(), m_MatrixCellIds.end(), windowId);
+    const auto* header = row == m_MatrixCellIds.end()
+                           ? nullptr
+                           : m_Matrix->verticalHeaderItem(
+                               static_cast<int>(std::distance(m_MatrixCellIds.begin(), row)));
+    const auto label = nullptr != header ? header->text() : windowId;
+    if (!windowLabels.contains(label))
+    {
+      windowLabels.append(label);
+    }
+  }
+
+  QString axisPart;
+  QmitkMxNAxisGlyph axisGlyph = QmitkMxNAxisGlyph::Selection;
+  const bool singleAxis = 1 == axes.size();
+  if (singleAxis)
+  {
+    if (axes.front() == dimensionCount)
+    {
+      axisPart = tr("Data selection");
+      axisGlyph = QmitkMxNAxisGlyph::Selection;
+    }
+    else
+    {
+      const auto axisDimension = QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axes.front())];
+      axisPart = QString::fromUtf8(DimensionLabel(axisDimension));
+      axisGlyph = GlyphFor(axisDimension);
+    }
+  }
+  else
+  {
+    axisPart = tr("%n dimension(s)", nullptr, static_cast<int>(axes.size()));
+  }
+
+  // Name the axis in the bar with the same glyph the column header and the tiles
+  // carry, so the bar is visibly about the column the user is working in. Only
+  // for a single axis: a glyph for "3 dimensions" would name none of them.
+  const QPixmap axisIcon =
+    singleAxis ? QmitkMxNRenderAxisGlyph(axisGlyph, this->palette().color(QPalette::Text),
+                                         m_MatrixAxisIconLabel->fontMetrics().height())
+               : QPixmap();
+  m_MatrixAxisIconLabel->setPixmap(axisIcon);
+  m_MatrixAxisIconLabel->setVisible(!axisIcon.isNull());
+
+  constexpr int maxListedWindows = 4;
+  QString windowPart = windowLabels.mid(0, maxListedWindows).join(QStringLiteral(", "));
+  if (windowLabels.size() > maxListedWindows)
+  {
+    windowPart += tr(", and %n more", nullptr,
+                     static_cast<int>(windowLabels.size()) - maxListedWindows);
+  }
+  m_MatrixSelectionLabel->setText(tr("%n cell(s)", nullptr, static_cast<int>(selection.size()))
+                                  + QStringLiteral(" - ") + axisPart
+                                  + QStringLiteral(" - ") + windowPart);
+
+  // The group every selected cell already shares, if they share one; otherwise
+  // the picker rests on nothing so it cannot read as a false common value.
+  bool common = true;
+  std::string commonGroup;
+  bool allLinked = true;
+  for (std::size_t i = 0; i < selection.size(); ++i)
+  {
+    const auto content = this->AdvancedMatrixCell(selection[i].first, selection[i].second);
+    if (content.group.empty())
+    {
+      allLinked = false;
+    }
+    if (0 == i)
+    {
+      commonGroup = content.group;
+    }
+    else if (content.group != commonGroup)
+    {
+      common = false;
+    }
+  }
+
+  m_MatrixGroupPicker->setEnabled(true);
+  m_MatrixClearButton->setEnabled(true);
+  m_MatrixGroupPicker->clear();
+  m_MatrixGroupPicker->addItem(NotLinkedEntry, QString());
+  try
+  {
+    for (const auto& info : m_MultiWidget->GetSyncGroupInfos())
+    {
+      m_MatrixGroupPicker->addItem(SwatchFor(info.color),
+                                   QString::fromStdString(info.displayName),
+                                   QString::fromStdString(info.id));
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+  }
+  const int currentIndex =
+    common && !commonGroup.empty()
+      ? m_MatrixGroupPicker->findData(QString::fromStdString(commonGroup))
+      : (common ? 0 : -1);
+  m_MatrixGroupPicker->setCurrentIndex(currentIndex);
+
+  // Offsets are per dimension and relative to a group seed, so they apply only
+  // to a selection wholly on one offset-bearing dimension whose cells are all
+  // linked - an offset on an unlinked cell would have nothing to be relative to.
+  std::optional<QmitkMxNSyncDimension> dimension;
+  if (1 == axes.size() && axes.front() < dimensionCount)
+  {
+    dimension = QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axes.front())];
+  }
+  const bool slice = QmitkMxNSyncDimension::Slice == dimension;
+  const bool zoom = QmitkMxNSyncDimension::Zoom == dimension;
+  const bool pan = QmitkMxNSyncDimension::Pan == dimension;
+
+  m_MatrixOffsetRow->setVisible(allLinked && (slice || zoom || pan));
+  m_MatrixOffsetLabel->setVisible(slice || zoom || pan);
+  m_SliceOffsetEdit->setVisible(slice);
+  m_ZoomOffsetEdit->setVisible(zoom);
+  m_PanOffsetXEdit->setVisible(pan);
+  m_PanOffsetYEdit->setVisible(pan);
+  m_PanOffsetLabel->setVisible(pan);
+  // Slice only: zoom composes multiplicatively and a pan ramp has no
+  // unambiguous direction in two dimensions. One group only: a ramp lays out
+  // positions within a single series, and offsets in different groups are
+  // measured from different seeds, so spreading across them means nothing.
+  const bool ramp = slice && selection.size() > 1 && common && !commonGroup.empty();
+  m_RampLabel->setVisible(ramp);
+  m_RampFromEdit->setVisible(ramp);
+  m_RampStepLabel->setVisible(ramp);
+  m_RampStepEdit->setVisible(ramp);
+  m_RampApplyButton->setVisible(ramp);
+  m_RampPreviewLabel->setVisible(ramp);
+  this->UpdateRampPreview();
+
+  // Seed the editors from the selection: its shared value where the cells agree,
+  // otherwise the "multiple" marker, so a mixed selection reads as mixed instead
+  // of as whichever cell happened to come first.
+  if (allLinked && dimension.has_value())
+  {
+    std::vector<QmitkMxNMultiWidget::SyncOffset> offsets;
+    try
+    {
+      for (const auto& [windowId, axis] : selection)
+      {
+        if (const auto link = m_MultiWidget->GetSyncLink(windowId, *dimension))
+        {
+          offsets.push_back(link->offset);
+        }
+      }
+    }
+    catch (const mitk::Exception&)
+    {
+      offsets.clear();
+    }
+
+    const bool uniform =
+      !offsets.empty()
+      && std::all_of(offsets.begin(), offsets.end(),
+                     [&offsets](const QmitkMxNMultiWidget::SyncOffset& offset)
+                     { return offset == offsets.front(); });
+
+    if (slice)
+    {
+      QSignalBlocker blocker(m_SliceOffsetEdit);
+      m_SliceOffsetEdit->setValue(uniform && std::holds_alternative<int>(offsets.front())
+                                    ? std::get<int>(offsets.front())
+                                    : MixedSliceOffset);
+    }
+    else if (zoom)
+    {
+      QSignalBlocker blocker(m_ZoomOffsetEdit);
+      m_ZoomOffsetEdit->setValue(uniform && std::holds_alternative<double>(offsets.front())
+                                   ? std::get<double>(offsets.front())
+                                   : MixedZoomOffset);
+    }
+    else if (pan)
+    {
+      QSignalBlocker blockX(m_PanOffsetXEdit);
+      QSignalBlocker blockY(m_PanOffsetYEdit);
+      const bool known = uniform && std::holds_alternative<mitk::Vector2D>(offsets.front());
+      const auto offset = known ? std::get<mitk::Vector2D>(offsets.front()) : mitk::Vector2D();
+      m_PanOffsetXEdit->setValue(known ? offset[0] : MixedPanOffset);
+      m_PanOffsetYEdit->setValue(known ? offset[1] : MixedPanOffset);
+    }
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::UpdateRampPreview()
+{
+  if (nullptr == m_RampPreviewLabel || !m_RampPreviewLabel->isVisibleTo(m_MatrixOffsetRow))
+  {
+    return;
+  }
+
+  // Long selections would push the action bar wider than the matrix; the first
+  // few values already show the direction and the spacing.
+  constexpr int maxPreviewed = 6;
+  const auto selection = this->MatrixSelection();
+  QStringList steps;
+  for (int position = 0;
+       position < static_cast<int>(selection.size()) && position < maxPreviewed; ++position)
+  {
+    steps.append(SliceOffsetLabel(m_RampFromEdit->value() + position * m_RampStepEdit->value()));
+  }
+  if (static_cast<int>(selection.size()) > maxPreviewed)
+  {
+    steps.append(QStringLiteral("..."));
+  }
+  m_RampPreviewLabel->setText(QStringLiteral("= ") + steps.join(QStringLiteral(", ")));
+}
+
+void QmitkMxNLayoutEditorWidget::ApplyGroupToMatrixSelection(const std::string& group)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+
+  for (const auto& [windowId, axis] : this->MatrixSelection())
+  {
+    if (group.empty())
+    {
+      this->WriteCellAxisCleared(windowId, axis);
+    }
+    else
+    {
+      this->WriteCellAxisGroup(windowId, axis, group);
+    }
+  }
+  m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::ShowMatrixGroupMenu(const QPoint& globalPos)
+{
+  if (m_MultiWidget.isNull() || this->MatrixSelection().empty())
+  {
+    return;
+  }
+
+  QMenu menu(this);
+  try
+  {
+    for (const auto& info : m_MultiWidget->GetSyncGroupInfos())
+    {
+      const auto id = info.id;
+      connect(menu.addAction(SwatchFor(info.color), QString::fromStdString(info.displayName)),
+              &QAction::triggered, this, [this, id]() { this->ApplyGroupToMatrixSelection(id); });
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
+  }
+  menu.addSeparator();
+  connect(menu.addAction(NotLinkedEntry), &QAction::triggered, this,
+          [this]() { this->ApplyGroupToMatrixSelection({}); });
+  menu.exec(globalPos);
+}
+
+void QmitkMxNLayoutEditorWidget::MirrorMapSelectionToMatrix(const QStringList& windowIds)
+{
+  if (m_MirroringSelection || nullptr == m_Matrix || nullptr == m_Matrix->selectionModel())
+  {
+    return;
+  }
+
+  // A map selection names windows, not axes, so it takes the whole row - the
+  // matrix's reading of "these windows".
+  QItemSelection selection;
+  const int lastColumn = m_Matrix->columnCount() - 1;
+  for (int row = 0; row < m_Matrix->rowCount() && lastColumn >= 0; ++row)
+  {
+    const auto id = static_cast<std::size_t>(row) < m_MatrixCellIds.size()
+                      ? m_MatrixCellIds[static_cast<std::size_t>(row)]
+                      : QString();
+    if (windowIds.contains(id))
+    {
+      selection.select(m_Matrix->model()->index(row, 0),
+                       m_Matrix->model()->index(row, lastColumn));
+    }
+  }
+
+  m_MirroringSelection = true;
+  m_Matrix->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+  m_MirroringSelection = false;
+  this->UpdateMatrixActionBar();
+}
+
+void QmitkMxNLayoutEditorWidget::SetCellAxisGroup(const QString& windowId, int axisIndex,
+                                                  const std::string& group)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  this->WriteCellAxisGroup(windowId, axisIndex, group);
+  m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, int axisIndex,
+                                                    const std::string& group)
+{
+  const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  if (m_MultiWidget.isNull() || group.empty() || axisIndex < 0 || axisIndex > dimensionCount)
+  {
+    return;
+  }
+
+  try
+  {
+    if (axisIndex == dimensionCount)
+    {
+      m_MultiWidget->SetCellSelectionGroup(windowId, group);
+    }
+    else
+    {
+      // Carry any offset over: re-grouping a cell keeps the relationship the
+      // user authored, it only changes what that relationship is measured from.
+      const auto dimension = QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)];
+      const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
+      m_MultiWidget->SetSyncLink(windowId, dimension, group,
+                                 link.has_value() ? link->offset
+                                                  : QmitkMxNMultiWidget::SyncOffset{});
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "Layout editor: link change for '" << windowId.toStdString()
+              << "' ignored: " << e.GetDescription();
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::ClearCellAxis(const QString& windowId, int axisIndex)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  this->WriteCellAxisCleared(windowId, axisIndex);
+  m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::WriteCellAxisCleared(const QString& windowId, int axisIndex)
+{
+  const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  if (m_MultiWidget.isNull() || axisIndex < 0 || axisIndex > dimensionCount)
+  {
+    return;
+  }
+
+  try
+  {
+    if (axisIndex == dimensionCount)
+    {
+      m_MultiWidget->ClearCellSelectionGroup(windowId);
+    }
+    else
+    {
+      m_MultiWidget->ClearSyncLink(windowId,
+                                   QmitkMxNAllSyncDimensions[static_cast<std::size_t>(axisIndex)]);
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "Layout editor: unlink of '" << windowId.toStdString()
+              << "' ignored: " << e.GetDescription();
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::SetCellDimensionOffset(
+  const QString& windowId, QmitkMxNSyncDimension dimension,
+  const QmitkMxNMultiWidget::SyncOffset& offset)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+  this->WriteCellDimensionOffset(windowId, dimension, offset);
+  m_MultiWidget->RefreshSyncControls();
+}
+
+void QmitkMxNLayoutEditorWidget::WriteCellDimensionOffset(
+  const QString& windowId, QmitkMxNSyncDimension dimension,
+  const QmitkMxNMultiWidget::SyncOffset& offset)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+
+  try
+  {
+    const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
+    if (!link.has_value())
+    {
+      return;
+    }
+    m_MultiWidget->SetSyncLink(windowId, dimension, link->group, offset);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "Layout editor: offset change for '" << windowId.toStdString()
+              << "' ignored: " << e.GetDescription();
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::ApplySliceOffsetRamp(const QStringList& windowIds, int from,
+                                                      int step)
+{
+  if (m_MultiWidget.isNull())
+  {
+    return;
+  }
+
+  int position = 0;
+  for (const auto& windowId : windowIds)
+  {
+    this->WriteCellDimensionOffset(windowId, QmitkMxNSyncDimension::Slice,
+                                   from + position * step);
+    ++position;
+  }
+  m_MultiWidget->RefreshSyncControls();
 }
 
 bool QmitkMxNLayoutEditorWidget::HasCachedGroupIntent(const std::string& group) const

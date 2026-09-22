@@ -30,7 +30,12 @@ found in the LICENSE file.
 
 class QmitkMxNCellMapWidget;
 class QmitkMultiWidgetLayoutSelectionWidget;
+class QComboBox;
 class QDialog;
+class QDoubleSpinBox;
+class QLabel;
+class QSpinBox;
+class QTabWidget;
 class QTableWidget;
 class QToolButton;
 class QVBoxLayout;
@@ -42,17 +47,21 @@ class QVBoxLayout;
  * cell arrangement (grid size, presets, save/load - the embedded layout
  * selection controls) and the per-dimension synchronization groups.
  *
- * The default face is visual: an interactive cell map mirroring the live
- * layout (tiles colored by navigation group, with a per-dimension sync
- * barcode), plus one card per group (hue, editable display name, dimension
- * checkboxes, re-converge, geometry reinit). Cells join a group by selecting
- * tiles and clicking the card's assign button, or by drag and drop in either
- * direction. Joining a group that synchronizes nothing yet links the
- * navigation bundle (pan/zoom/slice/crosshair) as the common-case default.
+ * An interactive cell map mirroring the live layout (tiles colored by
+ * navigation group, with a per-dimension sync barcode) is the permanent
+ * canvas. Below it, two mutually exclusive configuration faces share a tab
+ * widget, so only one is up at a time and the map keeps its share of the
+ * editor either way.
  *
- * The power-user face - the full per-dimension matrix with offset editors,
- * the complete v3-layout link model - is deliberately tucked behind the
- * "Advanced" toggle.
+ * "Sync groups" is the default face: one card per group (hue, editable
+ * display name, dimension checkboxes, re-converge, geometry reinit). Cells
+ * join a group by selecting tiles and clicking the card's assign button, or
+ * by drag and drop in either direction. Joining a group that synchronizes
+ * nothing yet links the navigation bundle (pan/zoom/slice/crosshair) as the
+ * common-case default.
+ *
+ * "Advanced" is the power-user face: the full per-dimension matrix with
+ * offset editors, the complete v3-layout link model.
  *
  * The widget drives the multi widget's public sync API directly (a peer in
  * the same module; no delegate interface until a second consumer exists) and
@@ -80,6 +89,15 @@ public:
    */
   void SetMultiWidget(QmitkMxNMultiWidget* multiWidget);
   QmitkMxNMultiWidget* GetMultiWidget() const;
+
+  /**
+   * \brief Takes a modifier-held press on one of the matrix's header viewports.
+   *        Qt selects a whole line on a header press but resolves the selection
+   *        command without the mouse event, so Ctrl would replace the selection
+   *        rather than add to it. Plain presses are left to Qt, which keeps
+   *        section drag-resize working.
+   */
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
   /**
    * \brief The data storage the data-based layout option derives an
@@ -149,6 +167,51 @@ public:
 
   /** \brief Create a fresh synchronization group and return its id. */
   std::string CreateGroup();
+
+  /**
+   * \brief Link one cell on one barcode axis to 'group' (0..6 the
+   *        QmitkMxNAllSyncDimensions, the last index the data-selection axis).
+   *        An existing offset on the axis is carried over, so re-grouping a cell
+   *        keeps the relationship the user authored. Public so the advanced
+   *        matrix's edits are testable headlessly.
+   */
+  void SetCellAxisGroup(const QString& windowId, int axisIndex, const std::string& group);
+
+  /**
+   * \brief Unlink one cell on one barcode axis. Data selection has no unlinked
+   *        state, so the last axis returns the cell to the default group instead.
+   */
+  void ClearCellAxis(const QString& windowId, int axisIndex);
+
+  /**
+   * \brief Set one cell's offset relative to its group's seed on an
+   *        offset-bearing dimension, keeping its group. A no-op for a cell that
+   *        is not linked on the dimension: an offset needs a seed to be relative
+   *        to.
+   */
+  void SetCellDimensionOffset(const QString& windowId, QmitkMxNSyncDimension dimension,
+                              const QmitkMxNMultiWidget::SyncOffset& offset);
+
+  /**
+   * \brief Spread slice offsets over the given cells in the order they are
+   *        passed: the first gets 'from', each following one 'step' more. This is
+   *        how a movie-frame layout showing slices -1 / 0 / +1 is authored.
+   *        Restricted to slice because zoom composes multiplicatively and a pan
+   *        ramp has no unambiguous direction in two dimensions.
+   */
+  void ApplySliceOffsetRamp(const QStringList& windowIds, int from, int step);
+
+  /** \brief What the advanced matrix shows for one cell: the linked group's id
+   *         (empty when the cell is unlinked on the axis) and the offset exactly as
+   *         the chip renders it (empty when the offset is the neutral one).
+   *         Read-only; public so the matrix's rendering is testable headlessly. */
+  struct MatrixCellContent
+  {
+    std::string group;
+    QString offset;
+    bool highlighted = false;
+  };
+  MatrixCellContent AdvancedMatrixCell(const QString& windowId, int axisIndex) const;
 
   /**
    * \brief Remove a synchronization group entirely (its cells are unsynchronized
@@ -258,13 +321,79 @@ private:
    *         resetting its transient state so it opens fresh. */
   void ShowGridDialog();
 
-  /** \brief Rebuild the advanced matrix from the current engine state. */
+  /** \brief Rebuild the advanced matrix from the current engine state: headers,
+   *         rows, and the column widths measured from the content. Restores the
+   *         selection onto the cells that survive. */
   void RebuildMatrixNow();
 
-  /** \brief Rebuild the advanced matrix only while it is revealed (the "Advanced"
-   *         toggle is on). Called from the structural rebuild paths and on reveal,
-   *         never from the routine card refresh, so an editable combo the user is
-   *         interacting with is not recreated mid-edit. */
+  /** \brief Build the matrix's action bar: the selection description, the group
+   *         picker, and the offset and ramp editors. */
+  QWidget* BuildMatrixActionBar();
+
+  /** \brief Repaint the matrix's chips from the engine without touching its
+   *         structure or its column widths, so an edit does not shift the grid
+   *         under the pointer and the selection survives. */
+  void RefreshMatrixCells();
+
+  /** \brief The selected matrix cells as (window id, barcode axis) pairs, in row
+   *         then column order - row order being the layout's pre-order, which is
+   *         the order a slice ramp spreads over. */
+  std::vector<std::pair<QString, int>> MatrixSelection() const;
+
+  /** \brief Re-describe the selection in the action bar and offer exactly the
+   *         controls that apply to it: the group picker always, the offset editors
+   *         only for a selection wholly on one offset-bearing dimension whose cells
+   *         are all linked, the ramp only for slice. */
+  void UpdateMatrixActionBar();
+
+  /** \brief Assign every selected matrix cell to 'group', or unlink them all when
+   *         it is empty. */
+  void ApplyGroupToMatrixSelection(const std::string& group);
+
+  /** \brief Re-read the offsets the ramp would write, in the order it writes
+   *         them, into its preview. */
+  void UpdateRampPreview();
+
+  /** \brief Mark the matrix cells of 'windowIds' on 'axisIndex' as sharing the
+   *         hovered synchronization; a negative axis clears the marking. Driven
+   *         from HighlightGroupAxis, so the map and the matrix always show the
+   *         same set. */
+  void SetMatrixHighlight(const QStringList& windowIds, int axisIndex);
+
+  /**
+   * \brief The write half of SetCellAxisGroup / ClearCellAxis /
+   *        SetCellDimensionOffset. These do not notify: the sync furniture
+   *        (per-cell barcodes, frame colors, cell overlays) must not repaint a
+   *        half-applied batch, so the caller calls RefreshSyncControls once when
+   *        its batch is done - the same contract QmitkMxNMultiWidget's own
+   *        mutators keep.
+   */
+  void WriteCellAxisGroup(const QString& windowId, int axisIndex, const std::string& group);
+  void WriteCellAxisCleared(const QString& windowId, int axisIndex);
+  void WriteCellDimensionOffset(const QString& windowId, QmitkMxNSyncDimension dimension,
+                                const QmitkMxNMultiWidget::SyncOffset& offset);
+
+  /** \brief Select a whole matrix row ('wholeRow') or column under a modifier:
+   *         Ctrl adds the line, or takes it away when it is already wholly
+   *         selected; Shift takes the block from the current line to this one. */
+  void SelectMatrixLine(int section, bool wholeRow, Qt::KeyboardModifiers modifiers);
+
+  /** \brief The group picker as a popup at the pointer, for editing the selection
+   *         without travelling to the action bar. */
+  void ShowMatrixGroupMenu(const QPoint& globalPos);
+
+  /** \brief Select the rows of 'windowIds' in the matrix, mirroring a map
+   *         selection. Guarded against the echo of its own mirroring. */
+  void MirrorMapSelectionToMatrix(const QStringList& windowIds);
+
+  /** \brief Whether the "Advanced" face is the raised tab. Independent of widget
+   *         visibility, which a docked-away view would also report as false. */
+  bool AdvancedFaceIsCurrent() const;
+
+  /** \brief Rebuild the advanced matrix only while its face is up. Called from the
+   *         structural rebuild paths and when the tab is raised, never from the
+   *         routine card refresh, so an editable combo the user is interacting with
+   *         is not recreated mid-edit. */
   void RefreshAdvancedMatrixIfVisible();
 
   /**
@@ -277,6 +406,8 @@ private:
   void ReconcileGroupCards(const std::vector<std::string>& currentIds,
                            const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos);
   QWidget* BuildGroupCard(const QmitkMxNMultiWidget::SyncGroupInfo& info);
+  /** \brief Lay out the matrix's headers and its empty items for the current
+   *         window set. RefreshMatrixCells fills the chips. */
   void RebuildMatrix(const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
                      const std::vector<QmitkMxNMultiWidget::WindowDescriptor>& descriptors);
 
@@ -312,10 +443,40 @@ private:
   QmitkMxNCellMapWidget* m_CellMap;
   QVBoxLayout* m_GroupsLayout;    // card list inside the scrollable lower pane
   QTableWidget* m_Matrix;         // the advanced link matrix, inside m_MatrixPane
-  QWidget* m_MatrixPane = nullptr;      // third splitter pane, hidden until "Advanced" is on
+  QTabWidget* m_FacesTab = nullptr;     // hosts the "Sync groups" and "Advanced" faces
+  QWidget* m_MatrixPane = nullptr;      // the "Advanced" face's page
+
+  // The matrix's action bar: the only place the matrix is edited, so the table
+  // itself stays a read surface and nothing covers the grid being worked on.
+  QLabel* m_MatrixAxisIconLabel = nullptr;
+  QLabel* m_MatrixSelectionLabel = nullptr;
+  QComboBox* m_MatrixGroupPicker = nullptr;
+  QToolButton* m_MatrixClearButton = nullptr;
+  QWidget* m_MatrixOffsetRow = nullptr;
+  QLabel* m_MatrixOffsetLabel = nullptr;
+  QSpinBox* m_SliceOffsetEdit = nullptr;
+  QDoubleSpinBox* m_ZoomOffsetEdit = nullptr;
+  QLabel* m_PanOffsetLabel = nullptr;
+  QDoubleSpinBox* m_PanOffsetXEdit = nullptr;
+  QDoubleSpinBox* m_PanOffsetYEdit = nullptr;
+  QLabel* m_RampLabel = nullptr;
+  QSpinBox* m_RampFromEdit = nullptr;
+  QLabel* m_RampStepLabel = nullptr;
+  QSpinBox* m_RampStepEdit = nullptr;
+  QToolButton* m_RampApplyButton = nullptr;
+  QLabel* m_RampPreviewLabel = nullptr;
+
+  // The matrix cells currently marked as sharing the hovered synchronization, so
+  // a hover move repaints only what changes rather than the whole grid.
+  std::vector<std::pair<int, int>> m_MatrixHighlighted;
+
+  // Guards the map <-> matrix selection mirroring against its own echo: each
+  // side emits on change, so an unguarded round trip would widen a column
+  // selection in the matrix back to whole rows.
+  bool m_MirroringSelection = false;
   QDialog* m_GridDialog = nullptr;      // on-demand modal grid-shape picker host
   QToolButton* m_AddGroupButton;
-  QToolButton* m_AdvancedButton;
+  QToolButton* m_MatrixAddGroupButton = nullptr;
   QToolButton* m_EditGridButton;
   QToolButton* m_AddRowButton;
   QToolButton* m_RemoveRowButton;

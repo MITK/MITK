@@ -31,8 +31,18 @@ found in the LICENSE file.
 #include <QLayout>
 #include <QMimeData>
 #include <QPointF>
+#include <QHeaderView>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QToolButton>
 
 #include <algorithm>
+#include <array>
+#include <variant>
 
 /**
  * Drives the layout editor widget's mutation API against a real
@@ -97,6 +107,30 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteGroup_RemovesEmptyCreatedGroup);
   MITK_TEST(DeleteGroup_MainIsNoOp);
 
+  MITK_TEST(Matrix_UnlinkedCellCarriesNoChipOrOffset);
+  MITK_TEST(Matrix_LinkedCellChipNamesGroupAndOffset);
+  MITK_TEST(Matrix_AxisAssignAndClearRoundTrip);
+  MITK_TEST(Matrix_SelectionAxisClearReturnsToDefault);
+  MITK_TEST(Matrix_RegroupKeepsTheAuthoredOffset);
+  MITK_TEST(Matrix_OffsetOnUnlinkedCellIsIgnored);
+  MITK_TEST(Matrix_SliceRampSpreadsOverCellsInOrder);
+  MITK_TEST(Matrix_TracksAnEditMadeOnTheCards);
+  MITK_TEST(Matrix_DetachLeavesNoChipsBehind);
+  MITK_TEST(Matrix_CtrlClickOnRowHeaderAddsTheRow);
+  MITK_TEST(Matrix_MixedOffsetsReadAsMultiple);
+  MITK_TEST(Matrix_MixedOffsetMarkerIsNotWritable);
+  MITK_TEST(Matrix_RampHiddenForCellsInDifferentGroups);
+  MITK_TEST(Matrix_ColumnGrowsToFitALongGroupName);
+  MITK_TEST(Matrix_EditNotifiesTheSyncFurniture);
+  MITK_TEST(Matrix_BatchNotifiesOnceForTheWholeGesture);
+  MITK_TEST(SyncHighlight_MatrixMarksTheSharedCells);
+  MITK_TEST(SyncHighlight_MatrixMarkingClearsWithTheMap);
+  MITK_TEST(Offset_CellBarcodeMarksAndWordsTheOffset);
+  MITK_TEST(Offset_GroupBarcodeMarksWithoutNumbering);
+  MITK_TEST(Offset_WordingIsTheSameOnEverySurface);
+  MITK_TEST(ActionBar_NamesTheAxisWithItsGlyph);
+  MITK_TEST(ActionBar_OffsetCommitAfterDetachIsHarmless);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -156,6 +190,61 @@ public:
       }
     }
     return -1;
+  }
+
+  /** Raise the "Advanced" face, which is what makes the matrix track the engine
+   *  (see QmitkMxNLayoutEditorWidget::AdvancedFaceIsCurrent), and let its build
+   *  settle. */
+  void RaiseAdvancedFace() const
+  {
+    auto* faces = m_Widget->findChild<QTabWidget*>(QStringLiteral("QmitkMxNLayoutEditorFaces"));
+    CPPUNIT_ASSERT_MESSAGE("The editor has its two faces on a tab widget", nullptr != faces);
+    faces->setCurrentIndex(1);
+    Pump();
+  }
+
+  /** Count SyncLinksChanged over a scope: the signal the per-cell barcodes, frame
+   *  colors and cell overlays repaint on, so it is the contract an editor
+   *  mutation owes to every surface outside this widget. */
+  class SyncNotificationCounter
+  {
+  public:
+    explicit SyncNotificationCounter(QmitkMxNMultiWidget* editor)
+    {
+      m_Connection = QObject::connect(editor, &QmitkMxNMultiWidget::SyncLinksChanged,
+                                      [this]() { ++m_Count; });
+    }
+    ~SyncNotificationCounter() { QObject::disconnect(m_Connection); }
+    SyncNotificationCounter(const SyncNotificationCounter&) = delete;
+    SyncNotificationCounter& operator=(const SyncNotificationCounter&) = delete;
+    int Count() const { return m_Count; }
+
+  private:
+    QMetaObject::Connection m_Connection;
+    int m_Count = 0;
+  };
+
+  /** The advanced matrix, by its stable object name. */
+  QTableWidget* Matrix() const
+  {
+    auto* matrix =
+      m_Widget->findChild<QTableWidget*>(QStringLiteral("QmitkMxNLayoutEditorMatrix"));
+    CPPUNIT_ASSERT_MESSAGE("The advanced face holds the matrix", nullptr != matrix);
+    return matrix;
+  }
+
+  /** Select one matrix cell per (row, axis) pair, as a drag across the grid would. */
+  void SelectMatrixCells(const std::vector<std::pair<int, int>>& cells) const
+  {
+    auto* matrix = Matrix();
+    QItemSelection selection;
+    for (const auto& [row, axis] : cells)
+    {
+      const auto index = matrix->model()->index(row, axis);
+      selection.select(index, index);
+    }
+    matrix->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+    Pump();
   }
 
   /** The group's card widget by its stable object name, or nullptr. */
@@ -1119,6 +1208,559 @@ public:
     cellMap->SetHighlightedCells(QStringList(), -1, QColor());
     CPPUNIT_ASSERT_MESSAGE("Clearing empties the highlight",
                            cellMap->GetHighlightedWindowIds().isEmpty());
+  }
+
+  // --- The advanced matrix -----------------------------------------------------
+
+  void Matrix_UnlinkedCellCarriesNoChipOrOffset()
+  {
+    // A cell that is not linked on a dimension has no group and no offset to
+    // show. Zoom in particular: the neutral factor is 1, which must not read as
+    // an authored "x1" relationship on a cell that is not in a zoom group.
+    this->RaiseAdvancedFace();
+
+    CPPUNIT_ASSERT_MESSAGE("The fixture's cells start unlinked on zoom",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom).has_value());
+
+    const auto cell =
+      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Zoom));
+    CPPUNIT_ASSERT_MESSAGE("An unlinked cell names no group", cell.group.empty());
+    CPPUNIT_ASSERT_MESSAGE("An unlinked cell shows no offset", cell.offset.isEmpty());
+  }
+
+  void Matrix_LinkedCellChipNamesGroupAndOffset()
+  {
+    this->RaiseAdvancedFace();
+
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, 2);
+    Pump();
+
+    const auto slice =
+      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chip names the linked group", id, slice.group);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A positive slice offset reads with its sign",
+                                 std::string("+2"), slice.offset.toStdString());
+
+    // Crosshair carries no offset, so its chip shows the group alone.
+    const auto crosshair =
+      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Crosshair));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The navigation bundle links crosshair too", id, crosshair.group);
+    CPPUNIT_ASSERT_MESSAGE("An offset-free dimension shows no offset", crosshair.offset.isEmpty());
+  }
+
+  void Matrix_AxisAssignAndClearRoundTrip()
+  {
+    const auto id = m_Widget->CreateGroup();
+
+    m_Widget->SetCellAxisGroup(CellId(1), AxisIndexOf(QmitkMxNSyncDimension::Pan), id);
+    CPPUNIT_ASSERT_MESSAGE("Assigning one axis links exactly it",
+                           IsLinked(1, QmitkMxNSyncDimension::Pan, id));
+    CPPUNIT_ASSERT_MESSAGE("Assigning one axis leaves the others alone",
+                           !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom).has_value());
+
+    m_Widget->ClearCellAxis(CellId(1), AxisIndexOf(QmitkMxNSyncDimension::Pan));
+    CPPUNIT_ASSERT_MESSAGE("Clearing the axis unlinks it",
+                           !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan).has_value());
+  }
+
+  void Matrix_SelectionAxisClearReturnsToDefault()
+  {
+    // Data selection has no unlinked state, so clearing the last axis returns
+    // the cell to the default group rather than leaving it in none.
+    const auto id = m_Widget->CreateGroup();
+    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+
+    m_Widget->SetCellAxisGroup(CellId(2), selectionAxis, id);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The selection axis moves to the named group", id,
+                                 m_Editor->GetCellSelectionGroup(CellId(2)));
+
+    m_Widget->ClearCellAxis(CellId(2), selectionAxis);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Clearing returns the selection to the default group",
+                                 std::string("main"), m_Editor->GetCellSelectionGroup(CellId(2)));
+  }
+
+  void Matrix_RegroupKeepsTheAuthoredOffset()
+  {
+    // Moving a cell to another group changes what its offset is measured from,
+    // not the relationship the user authored.
+    const auto first = m_Widget->CreateGroup();
+    const auto second = m_Widget->CreateGroup();
+
+    m_Widget->SetCellAxisGroup(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice), first);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, -3);
+    m_Widget->SetCellAxisGroup(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice), second);
+
+    const auto link = m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice);
+    CPPUNIT_ASSERT_MESSAGE("The cell is now in the second group",
+                           link.has_value() && link->group == second);
+    CPPUNIT_ASSERT_MESSAGE("The slice offset survives the move",
+                           std::holds_alternative<int>(link->offset)
+                             && -3 == std::get<int>(link->offset));
+  }
+
+  void Matrix_OffsetOnUnlinkedCellIsIgnored()
+  {
+    // An offset is relative to a group's seed, so a cell with no group has
+    // nothing for it to be relative to.
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 5);
+
+    CPPUNIT_ASSERT_MESSAGE("An unlinked cell is not linked by setting an offset",
+                           !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice).has_value());
+  }
+
+  void Matrix_SliceRampSpreadsOverCellsInOrder()
+  {
+    // The movie-frame case: three windows on one slice group showing -1 / 0 / +1.
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1), CellId(2) }, id);
+
+    m_Widget->ApplySliceOffsetRamp(QStringList{ CellId(0), CellId(1), CellId(2) }, -1, 1);
+
+    const std::array<int, 3> expected{ -1, 0, 1 };
+    for (std::size_t cell = 0; cell < expected.size(); ++cell)
+    {
+      const auto link = m_Editor->GetSyncLink(CellId(cell), QmitkMxNSyncDimension::Slice);
+      CPPUNIT_ASSERT_MESSAGE("Every ramped cell keeps its group",
+                             link.has_value() && link->group == id);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The ramp steps once per cell in the given order",
+                                   expected[cell], std::get<int>(link->offset));
+    }
+  }
+
+  void Matrix_TracksAnEditMadeOnTheCards()
+  {
+    // The two faces are two views of one state: an assignment made through the
+    // cards' API shows on the matrix's chips without reopening the face.
+    this->RaiseAdvancedFace();
+
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(2) }, id);
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The chip follows an edit made on the other face", id,
+      m_Widget->AdvancedMatrixCell(CellId(2), AxisIndexOf(QmitkMxNSyncDimension::Slice)).group);
+
+    m_Widget->SetCellMembership(CellId(2), id, false);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "The chip clears when the cell leaves the group",
+      m_Widget->AdvancedMatrixCell(CellId(2), AxisIndexOf(QmitkMxNSyncDimension::Slice))
+        .group.empty());
+  }
+
+  void Matrix_DetachLeavesNoChipsBehind()
+  {
+    // Detaching must empty the matrix rather than leave it painting the state of
+    // an editor it no longer follows.
+    this->RaiseAdvancedFace();
+
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The attached editor's links are on the chips", id,
+      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice)).group);
+
+    m_Widget->SetMultiWidget(nullptr);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "A detached editor leaves no chip behind",
+      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice))
+        .group.empty());
+  }
+
+  void Matrix_CtrlClickOnRowHeaderAddsTheRow()
+  {
+    // A header click selects the whole line through QTableView's own
+    // sectionPressed wiring, which honours the modifiers. A second handler on
+    // sectionClicked used to re-run the selection on release and toggle a
+    // Ctrl-added row straight back off.
+    this->RaiseAdvancedFace();
+    auto* matrix = Matrix();
+    auto* header = matrix->verticalHeader();
+
+    const auto pressRow = [header](int row, Qt::KeyboardModifiers modifiers)
+    {
+      const QPointF pos(5.0, header->sectionViewportPosition(row) + header->sectionSize(row) / 2.0);
+      const QPointF global = header->viewport()->mapToGlobal(pos);
+      QMouseEvent press(QEvent::MouseButtonPress, pos, global, Qt::LeftButton, Qt::LeftButton,
+                        modifiers);
+      QCoreApplication::sendEvent(header->viewport(), &press);
+      QMouseEvent release(QEvent::MouseButtonRelease, pos, global, Qt::LeftButton, Qt::NoButton,
+                          modifiers);
+      QCoreApplication::sendEvent(header->viewport(), &release);
+      Pump();
+    };
+
+    pressRow(0, Qt::NoModifier);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A plain header click takes exactly its own row", 1,
+                                 static_cast<int>(matrix->selectionModel()->selectedRows().size()));
+
+    pressRow(2, Qt::ControlModifier);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Ctrl adds the second row rather than replacing the first", 2,
+                                 static_cast<int>(matrix->selectionModel()->selectedRows().size()));
+  }
+
+  void Matrix_MixedOffsetsReadAsMultiple()
+  {
+    // Cells that disagree must read as disagreeing, not as whichever one came
+    // first - the same contract a text editor gives a mixed font size.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, 1);
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 4);
+    Pump();
+
+    auto* sliceOffset = m_Widget->findChild<QSpinBox*>(QStringLiteral("mxnMatrixSliceOffset"));
+    CPPUNIT_ASSERT(nullptr != sliceOffset);
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+
+    SelectMatrixCells({ { 0, sliceAxis } });
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A single cell shows its own offset", 1, sliceOffset->value());
+
+    SelectMatrixCells({ { 0, sliceAxis }, { 1, sliceAxis } });
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Disagreeing cells rest on the 'multiple' marker",
+                                 sliceOffset->minimum(), sliceOffset->value());
+    CPPUNIT_ASSERT_MESSAGE("The marker is shown as text, not as a number",
+                           !sliceOffset->specialValueText().isEmpty());
+
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 1);
+    Pump();
+    SelectMatrixCells({ { 0, sliceAxis }, { 1, sliceAxis } });
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Agreeing cells show their shared offset", 1,
+                                 sliceOffset->value());
+  }
+
+  void Matrix_MixedOffsetMarkerIsNotWritable()
+  {
+    // Committing the marker would flatten a mixed selection onto a value nobody
+    // chose, so it is refused.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, 1);
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 4);
+    Pump();
+
+    auto* sliceOffset = m_Widget->findChild<QSpinBox*>(QStringLiteral("mxnMatrixSliceOffset"));
+    CPPUNIT_ASSERT(nullptr != sliceOffset);
+    SelectMatrixCells({ { 0, AxisIndexOf(QmitkMxNSyncDimension::Slice) },
+                        { 1, AxisIndexOf(QmitkMxNSyncDimension::Slice) } });
+
+    emit sliceOffset->editingFinished();
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The first cell keeps its own offset", 1,
+      std::get<int>(m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice)->offset));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The second cell keeps its own offset", 4,
+      std::get<int>(m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice)->offset));
+  }
+
+  void Matrix_RampHiddenForCellsInDifferentGroups()
+  {
+    // A ramp lays out positions within one series; offsets in different groups
+    // are measured from different seeds, so spreading across them means nothing.
+    this->RaiseAdvancedFace();
+    const auto first = m_Widget->CreateGroup();
+    const auto second = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, first);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(2) }, second);
+    Pump();
+
+    auto* rampApply = m_Widget->findChild<QToolButton*>(QStringLiteral("mxnMatrixRampApply"));
+    CPPUNIT_ASSERT(nullptr != rampApply);
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+
+    SelectMatrixCells({ { 0, sliceAxis }, { 1, sliceAxis } });
+    CPPUNIT_ASSERT_MESSAGE("Cells of one group can be ramped",
+                           rampApply->isVisibleTo(rampApply->parentWidget()));
+
+    SelectMatrixCells({ { 0, sliceAxis }, { 2, sliceAxis } });
+    CPPUNIT_ASSERT_MESSAGE("Cells of different groups cannot",
+                           !rampApply->isVisibleTo(rampApply->parentWidget()));
+  }
+
+  void Matrix_ColumnGrowsToFitALongGroupName()
+  {
+    // A group name is only ever shortened by a column width the user chose; a
+    // chip that outgrows its column widens it instead of eliding. Renaming an
+    // established group is the case a structural rebuild does not cover - the
+    // cell and group sets are unchanged, so only the in-place refresh runs.
+    this->RaiseAdvancedFace();
+    auto* matrix = Matrix();
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->SetCellAxisGroup(CellId(0), sliceAxis, id);
+    Pump();
+    const int before = matrix->columnWidth(sliceAxis);
+
+    m_Editor->SetSyncGroupDisplayName(id, "a-deliberately-long-group-name");
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chip carries the whole group name",
+                                 std::string("a-deliberately-long-group-name"),
+                                 matrix->item(0, sliceAxis)->text().toStdString());
+    CPPUNIT_ASSERT_MESSAGE("The column grows to fit the longer chip",
+                           matrix->columnWidth(sliceAxis) > before);
+  }
+
+  void Matrix_EditNotifiesTheSyncFurniture()
+  {
+    // The matrix is not the only surface that reads link state: the per-cell
+    // barcodes, frame colors and cell overlays repaint on SyncLinksChanged, so
+    // an edit made here has to raise it or they go stale.
+    const auto id = m_Widget->CreateGroup();
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+
+    {
+      SyncNotificationCounter counter(m_Editor.get());
+      m_Widget->SetCellAxisGroup(CellId(0), sliceAxis, id);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Linking a cell notifies once", 1, counter.Count());
+    }
+    {
+      SyncNotificationCounter counter(m_Editor.get());
+      m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, 2);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Changing an offset notifies once", 1, counter.Count());
+    }
+    {
+      SyncNotificationCounter counter(m_Editor.get());
+      m_Widget->ClearCellAxis(CellId(0), sliceAxis);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Unlinking a cell notifies once", 1, counter.Count());
+    }
+  }
+
+  void SyncHighlight_MatrixMarksTheSharedCells()
+  {
+    // The map and the matrix are two views of one synchronization, so a hover
+    // resolved on either marks the same set on both.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
+    Pump();
+
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    const int panAxis = AxisIndexOf(QmitkMxNSyncDimension::Pan);
+    m_Widget->HighlightCellAxis(CellId(0), sliceAxis);
+
+    CPPUNIT_ASSERT_MESSAGE("The hovered cell is marked",
+                           m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+    CPPUNIT_ASSERT_MESSAGE("Its synchronized partner is marked too",
+                           m_Widget->AdvancedMatrixCell(CellId(2), sliceAxis).highlighted);
+    CPPUNIT_ASSERT_MESSAGE("A window outside the group is not",
+                           !m_Widget->AdvancedMatrixCell(CellId(1), sliceAxis).highlighted);
+    CPPUNIT_ASSERT_MESSAGE("Only the hovered axis is marked, not the whole row",
+                           !m_Widget->AdvancedMatrixCell(CellId(0), panAxis).highlighted);
+
+    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
+    CPPUNIT_ASSERT(nullptr != cellMap);
+    QStringList mapHighlight = cellMap->GetHighlightedWindowIds();
+    mapHighlight.sort();
+    QStringList expected{ CellId(0), CellId(2) };
+    expected.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The map marks exactly the same windows",
+                                 expected.join(QStringLiteral(",")).toStdString(),
+                                 mapHighlight.join(QStringLiteral(",")).toStdString());
+  }
+
+  void SyncHighlight_MatrixMarkingClearsWithTheMap()
+  {
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
+    Pump();
+
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    m_Widget->HighlightCellAxis(CellId(0), sliceAxis);
+    CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+
+    m_Widget->ClearSyncHighlight();
+    CPPUNIT_ASSERT_MESSAGE("Clearing unmarks the hovered cell",
+                           !m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+    CPPUNIT_ASSERT_MESSAGE("Clearing unmarks its partner",
+                           !m_Widget->AdvancedMatrixCell(CellId(2), sliceAxis).highlighted);
+
+    // A marking left over from before a grid change must not survive onto the
+    // items the rebuild puts in its place.
+    m_Widget->HighlightCellAxis(CellId(0), sliceAxis);
+    m_Editor->SetLayout(1, 2);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("A rebuild leaves no stale marking",
+                           !m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+  }
+
+  void Offset_CellBarcodeMarksAndWordsTheOffset()
+  {
+    // An offset is otherwise invisible outside the matrix: a window parked at
+    // slice -1 would read exactly like one sitting on its group.
+    const auto id = m_Widget->CreateGroup();
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+
+    auto axisSlots = m_Editor->BuildBarcodeSlots(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("An unshifted cell carries no mark", !axisSlots[sliceAxis].hasOffset);
+    CPPUNIT_ASSERT_MESSAGE("nor a value", axisSlots[sliceAxis].offsetText.isEmpty());
+
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, -1);
+    axisSlots = m_Editor->BuildBarcodeSlots(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("A shifted cell is marked", axisSlots[sliceAxis].hasOffset);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("and words the shift with its sign", std::string("-1"),
+                                 axisSlots[sliceAxis].offsetText.toStdString());
+    CPPUNIT_ASSERT_MESSAGE("The tooltip says it too",
+                           axisSlots[sliceAxis].tooltip.contains(QStringLiteral("-1")));
+
+    const auto partner = m_Editor->BuildBarcodeSlots(CellId(1));
+    CPPUNIT_ASSERT_MESSAGE("A partner that was not shifted stays unmarked",
+                           !partner[sliceAxis].hasOffset);
+
+    // An offset-free dimension can never take the mark.
+    CPPUNIT_ASSERT_MESSAGE("Crosshair carries no offset",
+                           !axisSlots[AxisIndexOf(QmitkMxNSyncDimension::Crosshair)].hasOffset);
+  }
+
+  void Offset_GroupBarcodeMarksWithoutNumbering()
+  {
+    // The group perspective speaks for several windows, so it can say that an
+    // offset exists but not whose it is.
+    const auto id = m_Widget->CreateGroup();
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+
+    auto axisSlots = m_Widget->BuildGroupBarcodeSlots(id);
+    CPPUNIT_ASSERT_MESSAGE("A group with no shifted member is unmarked",
+                           !axisSlots[sliceAxis].hasOffset);
+
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 3);
+    axisSlots = m_Widget->BuildGroupBarcodeSlots(id);
+    CPPUNIT_ASSERT_MESSAGE("One shifted member marks the group's axis",
+                           axisSlots[sliceAxis].hasOffset);
+    CPPUNIT_ASSERT_MESSAGE("but the group perspective names no number",
+                           axisSlots[sliceAxis].offsetText.isEmpty());
+
+    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+    CPPUNIT_ASSERT_MESSAGE("Data selection never takes the mark",
+                           !axisSlots[selectionAxis].hasOffset);
+  }
+
+  void Offset_WordingIsTheSameOnEverySurface()
+  {
+    // The barcodes, the sync peek and the matrix all read one rule, so a shift
+    // cannot be worded one way on the tile and another in the editor.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, 2);
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The chip and the barcode word the shift identically",
+      m_Editor->BuildBarcodeSlots(CellId(0))[sliceAxis].offsetText.toStdString(),
+      m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).offset.toStdString());
+
+    // The neutral value of each dimension is not an authored shift.
+    CPPUNIT_ASSERT_MESSAGE(
+      "Slice 0 is no shift",
+      QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Slice, 0).isEmpty());
+    CPPUNIT_ASSERT_MESSAGE(
+      "Zoom x1 is no shift",
+      QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Zoom, 1.0).isEmpty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Zoom reads as a factor", std::string("x2"),
+      QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Zoom, 2.0).toStdString());
+    CPPUNIT_ASSERT_MESSAGE(
+      "Crosshair has no offset to word",
+      QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Crosshair, {}).isEmpty());
+
+    // A pan is two numbers, and must not read as one: "5,-3" could pass for a
+    // single value with a separator.
+    mitk::Vector2D pan;
+    pan[0] = 5.0;
+    pan[1] = -3.0;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "A pan reads as a pair", std::string("(5|-3)"),
+      QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Pan, pan).toStdString());
+    CPPUNIT_ASSERT_MESSAGE(
+      "A pan of zero is no shift",
+      QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Pan,
+                                            mitk::Vector2D(0.0)).isEmpty());
+  }
+
+  void ActionBar_NamesTheAxisWithItsGlyph()
+  {
+    // The bar acts on a column of the grid, so it carries that column's glyph -
+    // but only when the selection is on one axis, since a glyph for "three
+    // dimensions" would name none of them.
+    this->RaiseAdvancedFace();
+    auto* icon = m_Widget->findChild<QLabel*>(QStringLiteral("mxnMatrixAxisIcon"));
+    CPPUNIT_ASSERT_MESSAGE("The action bar has an axis icon", nullptr != icon);
+
+    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
+    const int panAxis = AxisIndexOf(QmitkMxNSyncDimension::Pan);
+
+    SelectMatrixCells({ { 0, sliceAxis }, { 1, sliceAxis } });
+    CPPUNIT_ASSERT_MESSAGE("One axis: the glyph shows", !icon->pixmap().isNull());
+
+    SelectMatrixCells({ { 0, sliceAxis }, { 0, panAxis } });
+    CPPUNIT_ASSERT_MESSAGE("Two axes: no glyph names the selection",
+                           !icon->isVisibleTo(icon->parentWidget()));
+
+    SelectMatrixCells({});
+    CPPUNIT_ASSERT_MESSAGE("Nothing selected: no glyph",
+                           !icon->isVisibleTo(icon->parentWidget()));
+  }
+
+  void ActionBar_OffsetCommitAfterDetachIsHarmless()
+  {
+    // Detaching drops the editor and disables the widget, which moves focus out
+    // of whichever offset editor holds it - and a spin box losing focus commits.
+    // So the commit can arrive with nothing left to write to.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+    Pump();
+    SelectMatrixCells({ { 0, AxisIndexOf(QmitkMxNSyncDimension::Slice) } });
+
+    auto* sliceOffset = m_Widget->findChild<QSpinBox*>(QStringLiteral("mxnMatrixSliceOffset"));
+    auto* zoomOffset = m_Widget->findChild<QDoubleSpinBox*>(QStringLiteral("mxnMatrixZoomOffset"));
+    auto* panOffset = m_Widget->findChild<QDoubleSpinBox*>(QStringLiteral("mxnMatrixPanOffsetX"));
+    CPPUNIT_ASSERT(nullptr != sliceOffset && nullptr != zoomOffset && nullptr != panOffset);
+
+    m_Widget->SetMultiWidget(nullptr);
+    Pump();
+
+    sliceOffset->setValue(3);
+    emit sliceOffset->editingFinished();
+    zoomOffset->setValue(2.0);
+    emit zoomOffset->editingFinished();
+    panOffset->setValue(5.0);
+    emit panOffset->editingFinished();
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE("A commit after detaching changes nothing and does not crash",
+                           nullptr == m_Widget->GetMultiWidget());
+  }
+
+  void Matrix_BatchNotifiesOnceForTheWholeGesture()
+  {
+    // One gesture, one notification: the furniture must not repaint a
+    // half-applied batch, and a ramp over N cells is one edit, not N.
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1), CellId(2) }, id);
+
+    SyncNotificationCounter counter(m_Editor.get());
+    m_Widget->ApplySliceOffsetRamp(QStringList{ CellId(0), CellId(1), CellId(2) }, -1, 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A three-cell ramp notifies once, not three times", 1,
+                                 counter.Count());
   }
 };
 

@@ -13,6 +13,10 @@
 	As a dockable view it stays open during review sessions and doubles as a live
 	legend of the current coupling.
 
+	The window map is the permanent canvas. Below it, the synchronization side has two
+	faces on their own tabs: <b>Sync groups</b>, the group cards used for everyday
+	work, and <b>Advanced</b>, the per-window link matrix. Only one is up at a time.
+
 \section org_mitk_views_mxnlayouteditor_Layout The layout row
 	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
 	<ul>
@@ -42,9 +46,14 @@
 	Each tile shows the window's <b>sync barcode</b>: one glyph per dimension in a fixed
 	order (pan, zoom, slice, crosshair, orientation, windowing, LUT) plus the data
 	selection, tinted with the linked group's hue and left as a gap where the window is
-	not synchronized on that dimension. Hovering one of the glyphs lights up every
-	window that shares that synchronization, which makes the coupling legible at a
-	glance.
+	not synchronized on that dimension. An axis the window sits at an offset on has its
+	box's upper-right corner filled in; only slice, zoom and pan can be offset, so the
+	mark stays rare. The sync peek writes the value itself, which a tile has no room
+	for. On a narrow tile the eight axes wrap into an even grid rather than shrink, so
+	the glyphs stay as large as the tile allows. Hovering one of the glyphs lights up every window that shares that
+	synchronization, which makes the coupling legible at a glance - and, while the
+	<b>Advanced</b> tab is up, marks the same windows on its matrix. Hovering a chip
+	there does the same in reverse, so the two surfaces answer as one.
 
 \subsection org_mitk_views_mxnlayouteditor_Selection Selecting windows
 	Selection follows the file-explorer model: a click selects the window clicked,
@@ -76,8 +85,11 @@
 		<li> The name field sets the group's display name, shown identically everywhere.
 		<li> The card's own sync barcode shows which dimensions the group synchronizes.
 			Clicking an axis links or unlinks it for every window in the group; an axis
-			drawn dashed is linked for only some of them. For a group that has no windows
-			yet, select windows in the map first and then click an axis to add them.
+			drawn dashed is linked for only some of them, and one with a filled upper
+			corner has at least one member sitting at an offset - the card speaks for
+			several windows, so it marks that a shift exists without saying whose. For
+			a group that has no windows yet, select windows in the map first and then
+			click an axis to add them.
 		<li> The dimension checkboxes control the same links for all member windows;
 			"Link navigation" applies the pan, zoom, slice and crosshair bundle explicitly.
 		<li> "Re-converge" re-establishes reference + offset for the group's
@@ -88,15 +100,62 @@
 	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Advanced The advanced matrix
-	The <b>Advanced</b> toggle switches to the power-user face: every window as a row,
-	every dimension as a column. Each entry selects the group the window links for that
-	dimension (typing a new name creates the group) and, for slice, zoom and pan, edits
-	the offset relative to the group - the way to author a movie-frame layout showing
-	slices -1 / 0 / +1, or a detail view kept twice as zoomed.
+	The <b>Advanced</b> tab is the power-user face: every window as a row, every
+	dimension as a column. Each cell shows the group the window links on that dimension
+	as a chip in the group's color, carrying the group's name and, where one was
+	authored, the offset. An empty cell is a window that is not synchronized on that
+	dimension. The data-selection column is never empty, because a window's selection
+	always belongs to some group. A column widens to keep its chips whole, so names
+	are only ever shortened by a width you set yourself - widen the view rather than
+	read an abbreviation.
 
 	This face exposes the complete layout-file link model, including couplings between
 	windows that are not adjacent on screen, and it is the deliberate way to author a
 	partial group state in which only some windows are linked on a dimension. Everyday
 	assignment is expected to happen in the map instead.
+
+\subsection org_mitk_views_mxnlayouteditor_AdvancedEditing Editing the matrix
+	The matrix is read; the bar beneath it is where it is edited, so nothing ever covers
+	the grid being worked on. Select cells - drag across the grid, <i>Ctrl</i>-click to
+	add one, <i>Shift</i>-click for a range - and the bar names the selection and offers
+	what applies to it.
+
+	When the selection is on a single dimension the bar carries that axis's glyph beside
+	its name, the same glyph the column header and the tiles use; a selection spanning
+	several dimensions shows none, because no one glyph would name it.
+
+	Selecting windows in the map above selects their rows here, and selecting cells here
+	selects those windows in the map. Hovering a chip marks every window sharing that
+	synchronization, here and on the map at once. Clicking an axis header takes that
+	whole column, clicking a window header that whole row, so linking every window on
+	one dimension, or unlinking one window entirely, is two gestures.
+
+	<ul>
+		<li> <b>Group</b> assigns every selected cell. The list holds the groups that
+			exist; groups are created with <b>+ Group</b>, in the same corner as on the
+			<b>Sync groups</b> tab. Choosing "(not linked)" unlinks the selection, and
+			on the data-selection axis returns the windows to the default group. The
+			same list opens as a popup on right-click or double-click for a single
+			quick edit, and <i>Del</i> unlinks the selection.
+		<li> <b>Offset</b> appears for a selection that sits wholly on slice, zoom or pan
+			and whose cells are all linked - an offset is relative to the group's seed,
+			so an unlinked cell has nothing for it to be relative to. This is how a
+			detail view is kept twice as zoomed, or a window parked a fixed distance
+			from its group. Where the selected cells carry different offsets the editor
+			reads "multiple" rather than any one of them, and that marker cannot be
+			applied: dial a real value to give the whole selection one.
+		<li> <b>Ramp</b> spreads slice offsets over the selected cells in the order the
+			windows are listed in the line above, which authors a movie-frame layout
+			showing slices -1 / 0 / +1 in one step. The offsets it would write are
+			previewed beside it, so the effect reads against that window list before it
+			is applied. It needs a selection wholly in one group: offsets in different
+			groups are measured from different seeds, so a series spread across them
+			would mean nothing. Slice only, for the same reason in a different form -
+			zoom composes multiplicatively rather than by steps, and a pan ramp has no
+			unambiguous direction in two dimensions.
+	</ul>
+
+	A change applies as soon as it is made and both faces show it at once, so an
+	assignment made on the cards is on the chips here without reopening the tab.
 
 */

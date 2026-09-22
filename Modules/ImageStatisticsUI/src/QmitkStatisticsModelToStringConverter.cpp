@@ -112,7 +112,9 @@ QString QmitkStatisticsModelToStringConverter::Iterate(const QModelIndex &index,
   {
     if (index.isValid())
     {
-      auto data = index.data();
+      // The unformatted value on purpose: the export keeps the full precision, while the
+      // view rounds to a fixed number of decimal places.
+      auto data = index.data(Qt::EditRole);
       if (data.typeId() == QMetaType::Double)
       {
         content = QString("%L1").arg(data.toDouble(), 0, 'f');

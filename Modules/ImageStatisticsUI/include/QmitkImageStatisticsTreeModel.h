@@ -152,9 +152,10 @@ public:
   /**
    * \brief Returns the data for the given index and role.
    *
-   * Supports Qt::DisplayRole for statistics values, Qt::DecorationRole for label color icons
-   * and WIP hourglass indicators in the first column, and Qt::CheckStateRole for label rows
-   * while check boxes are offered.
+   * Supports Qt::DisplayRole for statistics values formatted for reading, Qt::EditRole for
+   * the same values unformatted, Qt::TextAlignmentRole, Qt::DecorationRole for label color
+   * icons and WIP hourglass indicators in the first column, and Qt::CheckStateRole for label
+   * rows while check boxes are offered.
    *
    * \param[in] index The model index to query.
    * \param[in] role The data role (e.g. Qt::DisplayRole, Qt::DecorationRole).
@@ -171,13 +172,13 @@ public:
   /**
    * \brief Returns the header data for the given section and orientation.
    *
-   * The first column header is dynamically generated based on whether masks and
-   * multiple time steps are present. Subsequent columns show statistic names.
+   * Statistic columns are headed by a readable name of the statistic instead of its
+   * technical key, and offer a tooltip that spells out abbreviations.
    *
    * \param[in] section The column index.
    * \param[in] orientation The header orientation (only Qt::Horizontal is supported).
-   * \param[in] role The data role (only Qt::DisplayRole is supported).
-   * \return The header text as QVariant.
+   * \param[in] role The data role (Qt::DisplayRole, Qt::ToolTipRole or Qt::TextAlignmentRole).
+   * \return The header data as QVariant.
    */
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
@@ -312,6 +313,9 @@ private:
     /** @sa m_TimeStepResolvedImageNodes */
     std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> m_TimeStepResolvedMaskNodes;
     std::vector<std::string> m_StatisticNames;
+    /** Decimal places of each statistic column, in the order of m_StatisticNames. Chosen per
+    column so that the values of a column line up at the decimal point. */
+    std::vector<int> m_ColumnDecimals;
 
     /** Observers on the "name" property of every input node and on the label events of every
     multi label mask. Neither change reaches the model via DataStorage::ChangedNodeEvent.
@@ -321,7 +325,6 @@ private:
 
     std::mutex m_Mutex;
     std::unique_ptr<QmitkImageStatisticsTreeItem> m_RootItem;
-    QVariant m_HeaderFirstColumn;
     QIcon m_WIPIcon;
     itk::TimeStamp m_BuildTime;
 

@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkImageStatisticsTreeItem.h"
 
+#include <QStringList>
+
 #include <variant>
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
@@ -76,9 +78,12 @@ struct StatValueVisitor
 
   QVariant operator()(const mitk::ImageStatisticsContainer::IndexType& val) const
   {
-    std::stringstream ss;
-    ss << val;
-    return QVariant(QString::fromStdString(ss.str()));
+    QStringList components;
+
+    for (unsigned int i = 0; i < val.size(); ++i)
+      components.append(QString::number(val[i]));
+
+    return QVariant(QStringLiteral("[") + components.join(QStringLiteral(", ")) + QStringLiteral("]"));
   }
 
 };

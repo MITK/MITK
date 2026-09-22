@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <QmitkImageStatisticsTreeModel.h>
 
 #include "QmitkImageStatisticsTreeItem.h"
+#include <mitkImageStatisticsConstants.h>
 #include <mitkImageStatisticsContainerManager.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkStatisticsToImageRelationRule.h>
@@ -22,11 +23,152 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 
+#include <QLocale>
+
 #include <algorithm>
+#include <cmath>
 #include <functional>
+#include <iterator>
+#include <map>
+#include <variant>
 
 namespace
 {
+  /** Header text and header tooltip of a statistic. An empty tooltip means that the header
+  text already says everything there is to say. */
+  struct StatisticDisplay
+  {
+    QString name;
+    QString toolTip;
+  };
+
+  /** Maps the keys of mitk::ImageStatisticsConstants to what the header shows. The keys are
+  identifiers, hence they stay technical, while the header spells things out. Statistics
+  without an entry, e.g. contributed by other modules, are shown by their key. */
+  const std::map<std::string, StatisticDisplay>& GetStatisticDisplays()
+  {
+    using Constants = mitk::ImageStatisticsConstants;
+
+    static const std::map<std::string, StatisticDisplay> displays = {
+      { Constants::MEAN(), { QStringLiteral("Mean"), QStringLiteral("Arithmetic mean") } },
+      { Constants::MEDIAN(), { QStringLiteral("Median"), QStringLiteral("Middle value of the distribution") } },
+      { Constants::STANDARDDEVIATION(), { QStringLiteral("Std. dev."), QStringLiteral("Standard deviation") } },
+      { Constants::VARIANCE(), { QStringLiteral("Variance"), QStringLiteral("Squared standard deviation") } },
+      { Constants::RMS(), { QStringLiteral("RMS"), QStringLiteral("Root mean square") } },
+      { Constants::MAXIMUM(), { QStringLiteral("Max"), QStringLiteral("Maximum intensity") } },
+      { Constants::MAXIMUMPOSITION(), { QStringLiteral("Max position"), QStringLiteral("Voxel index of the maximum intensity") } },
+      { Constants::MINIMUM(), { QStringLiteral("Min"), QStringLiteral("Minimum intensity") } },
+      { Constants::MINIMUMPOSITION(), { QStringLiteral("Min position"), QStringLiteral("Voxel index of the minimum intensity") } },
+      { Constants::NUMBEROFVOXELS(), { QStringLiteral("Voxels"), QStringLiteral("Number of voxels") } },
+      // The superscript is written as its UTF-8 bytes to keep the source file plain ASCII.
+      { Constants::VOLUME(), { QStringLiteral("Volume [mm\xC2\xB3]"), QStringLiteral("Volume in cubic millimeters") } },
+      { Constants::SKEWNESS(), { QStringLiteral("Skewness"), QStringLiteral("Asymmetry of the intensity distribution") } },
+      { Constants::KURTOSIS(), { QStringLiteral("Kurtosis"), QStringLiteral("Tailedness of the intensity distribution") } },
+      { Constants::UNIFORMITY(), { QStringLiteral("Uniformity"), QStringLiteral("Sum of the squared histogram probabilities") } },
+      { Constants::ENTROPY(), { QStringLiteral("Entropy"), QStringLiteral("Shannon entropy of the histogram") } },
+      { Constants::MPP(), { QStringLiteral("MPP"), QStringLiteral("Mean of positive pixels") } },
+      { Constants::UPP(), { QStringLiteral("UPP"), QStringLiteral("Uniformity of positive pixels") } }
+    };
+
+    return displays;
+  }
+
+  QString GetStatisticName(const std::string& key)
+  {
+    const auto& displays = GetStatisticDisplays();
+    const auto finding = displays.find(key);
+
+    return displays.cend() != finding
+      ? finding->second.name
+      : QString::fromStdString(key);
+  }
+
+  QString GetStatisticToolTip(const std::string& key)
+  {
+    const auto& displays = GetStatisticDisplays();
+    const auto finding = displays.find(key);
+
+    return displays.cend() != finding
+      ? finding->second.toolTip
+      : QString();
+  }
+
+  /** Significant digits the largest value of a column should show, and the range the
+  resulting number of decimal places is kept in. */
+  constexpr int SIGNIFICANT_DIGITS = 5;
+  constexpr int MIN_DECIMALS = 2;
+  constexpr int MAX_DECIMALS = 6;
+
+  int GetDecimals(double maxAbsValue)
+  {
+    const int magnitude = maxAbsValue > 0.0
+      ? static_cast<int>(std::floor(std::log10(maxAbsValue)))
+      : 0;
+
+    return std::clamp(SIGNIFICANT_DIGITS - 1 - magnitude, MIN_DECIMALS, MAX_DECIMALS);
+  }
+
+  /** Decimal places are chosen per column instead of per value: all values of a column then
+  share the position of the decimal point, while columns of very different magnitude, e.g.
+  volume and uniformity, still show a comparable number of significant digits. */
+  std::vector<int> ComputeColumnDecimals(const std::vector<mitk::ImageStatisticsContainer::ConstPointer>& statistics,
+    const std::vector<std::string>& statisticNames)
+  {
+    std::vector<double> maxAbsValues(statisticNames.size(), 0.0);
+
+    for (const auto& container : statistics)
+    {
+      for (const auto labelValue : container->GetExistingLabelValues())
+      {
+        for (mitk::TimeStepType timeStep = 0; timeStep < container->GetTimeSteps(); ++timeStep)
+        {
+          if (!container->StatisticsExist(labelValue, timeStep))
+            continue;
+
+          const auto& statisticsObject = container->GetStatistics(labelValue, timeStep);
+
+          for (size_t i = 0; i < statisticNames.size(); ++i)
+          {
+            if (!statisticsObject.HasStatistic(statisticNames[i]))
+              continue;
+
+            const auto value = statisticsObject.GetValueNonConverted(statisticNames[i]);
+            const auto* realValue = std::get_if<mitk::ImageStatisticsContainer::RealType>(&value);
+
+            // A non-finite value, e.g. the skewness of a single voxel, must not set the format.
+            if (nullptr != realValue && std::isfinite(*realValue))
+              maxAbsValues[i] = std::max(maxAbsValues[i], std::abs(*realValue));
+          }
+        }
+      }
+    }
+
+    std::vector<int> decimals;
+    decimals.reserve(maxAbsValues.size());
+
+    std::transform(maxAbsValues.cbegin(), maxAbsValues.cend(), std::back_inserter(decimals), GetDecimals);
+
+    return decimals;
+  }
+
+  /** Formats a statistic value for display in the locale of the user. Anything but a number,
+  e.g. a voxel index or a placeholder of a pending calculation, is passed through. */
+  QVariant FormatValue(const QVariant& value, int decimals)
+  {
+    switch (value.typeId())
+    {
+      case QMetaType::Double:
+        return QLocale().toString(value.toDouble(), 'f', decimals);
+
+      case QMetaType::ULong:
+      case QMetaType::ULongLong:
+        return QLocale().toString(value.toULongLong());
+
+      default:
+        return value;
+    }
+  }
+
   /** Observes the "name" property of the passed node, if it has one. The property object
   itself has to be observed because DataNode::SetName() writes in place into a "name"
   property owned by the BaseData if there is one (e.g. for DICOM images), which modifies
@@ -113,7 +255,21 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
 
   if (role == Qt::DisplayRole)
   {
+    const auto column = index.column();
+
+    if (column > 0 && static_cast<size_t>(column - 1) < m_ColumnDecimals.size())
+      return FormatValue(item->data(column), m_ColumnDecimals[column - 1]);
+
+    return item->data(column);
+  }
+  else if (role == Qt::EditRole)
+  {
+    // The unformatted value, e.g. for the clipboard export.
     return item->data(index.column());
+  }
+  else if (role == Qt::TextAlignmentRole && index.column() > 0)
+  {
+    return QVariant(static_cast<int>(Qt::AlignRight | Qt::AlignVCenter));
   }
   else if (role == Qt::DecorationRole && index.column() == 0)
   {
@@ -259,17 +415,30 @@ Qt::ItemFlags QmitkImageStatisticsTreeModel::flags(const QModelIndex &index) con
 
 QVariant QmitkImageStatisticsTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if ((Qt::DisplayRole == role) && (Qt::Horizontal == orientation))
+  if (Qt::Horizontal != orientation)
+    return QVariant();
+
+  if (Qt::DisplayRole == role)
+  {
+    return section == 0
+      ? QVariant(QStringLiteral("Images / Masks"))
+      : QVariant(GetStatisticName(m_StatisticNames.at(section - 1)));
+  }
+  else if (Qt::ToolTipRole == role)
   {
     if (section == 0)
-    {
-      return m_HeaderFirstColumn;
-    }
-    else
-    {
-      return QVariant(m_StatisticNames.at(section - 1).c_str());
-    }
+      return QVariant(QStringLiteral("Images and their masks, broken down into groups, labels and time steps"));
+
+    const auto toolTip = GetStatisticToolTip(m_StatisticNames.at(section - 1));
+
+    if (!toolTip.isEmpty())
+      return QVariant(toolTip);
   }
+  else if (Qt::TextAlignmentRole == role)
+  {
+    return QVariant(static_cast<int>(Qt::AlignCenter));
+  }
+
   return QVariant();
 }
 
@@ -340,6 +509,7 @@ void QmitkImageStatisticsTreeModel::Clear()
   m_MaskNodes.clear();
   m_TimeStepResolvedMaskNodes.clear();
   m_StatisticNames.clear();
+  m_ColumnDecimals.clear();
   m_CheckedLabelValues.reset();
   emit endResetModel();
   emit modelChanged();
@@ -484,7 +654,7 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
   }
 }
 
-void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, mitk::ImageStatisticsContainer::LabelValueType labelValue, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem, bool& hasMultipleTimesteps)
+void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, mitk::ImageStatisticsContainer::LabelValueType labelValue, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem)
 {
   // 4. hierarchy level: time steps (optional, only if >1 time step)
   if (statistic->GetTimeSteps() > 1)
@@ -506,10 +676,9 @@ void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, const
       }
     }
   }
-  hasMultipleTimesteps = hasMultipleTimesteps || (statistic->GetTimeSteps() > 1);
 }
 
-void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, mitk::ImageStatisticsContainer::LabelValueVectorType labelValues, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem, bool& hasMultipleTimesteps)
+void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, mitk::ImageStatisticsContainer::LabelValueVectorType labelValues, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem)
 {
   // 3. hierarchy level: labels (optional, only if labels >1)
   for (const auto labelValue : labelValues)
@@ -545,7 +714,7 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
         else
         {
           labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, false, parentItem, imageNode, maskNode, labelInstance);
-          AddTimeStepTreeItems(statistic, imageNode, maskNode, labelValue, statisticNames, isWIP, labelItem, hasMultipleTimesteps);
+          AddTimeStepTreeItems(statistic, imageNode, maskNode, labelValue, statisticNames, isWIP, labelItem);
         }
       }
       else
@@ -563,15 +732,15 @@ segmentation: grouped by group, within a group by class name and then by label v
 The value order comes for free because the statistics container enumerates its label
 values sorted, and SplitLabelValuesByClassName keeps that order inside a class. Group rows
 are only added if the segmentation has more than one group, so the common single-group
-case keeps its compact tree. Returns true if group rows were added. */
-bool AddLabelTreeItemsForMask(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, const mitk::ImageStatisticsContainer::LabelValueVectorType& labelValues, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem, bool& hasMultipleTimesteps)
+case keeps its compact tree. */
+void AddLabelTreeItemsForMask(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* imageNode, const mitk::DataNode* maskNode, const mitk::ImageStatisticsContainer::LabelValueVectorType& labelValues, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem)
 {
   const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(maskNode->GetData());
 
   if (nullptr == segmentation)
   {
-    AddLabelTreeItems(statistic, imageNode, maskNode, labelValues, statisticNames, isWIP, parentItem, hasMultipleTimesteps);
-    return false;
+    AddLabelTreeItems(statistic, imageNode, maskNode, labelValues, statisticNames, isWIP, parentItem);
+    return;
   }
 
   // Statistics can outlive a label (e.g. after a label was removed and the statistics were
@@ -583,7 +752,6 @@ bool AddLabelTreeItemsForMask(const mitk::ImageStatisticsContainer* statistic, c
     (segmentation->ExistLabel(labelValue) ? knownValues : unknownValues).push_back(labelValue);
 
   const bool showGroups = segmentation->GetNumberOfGroups() > 1;
-  bool groupsAdded = false;
 
   for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < segmentation->GetNumberOfGroups(); ++groupID)
   {
@@ -602,15 +770,12 @@ bool AddLabelTreeItemsForMask(const mitk::ImageStatisticsContainer* statistic, c
       const auto groupLabel = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(segmentation, groupID));
       groupParentItem = new QmitkImageStatisticsTreeItem(statisticNames, groupLabel, isWIP, false, parentItem, imageNode, maskNode);
       parentItem->appendChild(groupParentItem);
-      groupsAdded = true;
     }
 
-    AddLabelTreeItems(statistic, imageNode, maskNode, groupValues, statisticNames, isWIP, groupParentItem, hasMultipleTimesteps);
+    AddLabelTreeItems(statistic, imageNode, maskNode, groupValues, statisticNames, isWIP, groupParentItem);
   }
 
-  AddLabelTreeItems(statistic, imageNode, maskNode, unknownValues, statisticNames, isWIP, parentItem, hasMultipleTimesteps);
-
-  return groupsAdded;
+  AddLabelTreeItems(statistic, imageNode, maskNode, unknownValues, statisticNames, isWIP, parentItem);
 }
 
 void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
@@ -618,9 +783,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   // reset old model
   m_RootItem.reset(new QmitkImageStatisticsTreeItem());
 
-  bool hasMask = false;
-  bool hasGroups = false;
-  bool hasMultipleTimesteps = false;
+  m_ColumnDecimals = ComputeColumnDecimals(m_Statistics, m_StatisticNames);
 
   std::map<mitk::DataNode::ConstPointer, QmitkImageStatisticsTreeItem *> dataNodeToTreeItem;
 
@@ -702,39 +865,24 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 
         if (showLabelRows)
         {
-          hasGroups = AddLabelTreeItemsForMask(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps) || hasGroups;
+          AddLabelTreeItemsForMask(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem);
         }
         else
         {
-          AddTimeStepTreeItems(statistic, image, mask, labelValues.front(), m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+          AddTimeStepTreeItems(statistic, image, mask, labelValues.front(), m_StatisticNames, isWIP, maskItem);
         }
       }
 
       imageItem->appendChild(maskItem);
-      hasMask = true;
     }
     else
     {
       //no mask -> but multi time step
       auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
 
-      AddTimeStepTreeItems(statistic, image, nullptr, labelValue, m_StatisticNames, isWIP, imageItem, hasMultipleTimesteps);
+      AddTimeStepTreeItems(statistic, image, nullptr, labelValue, m_StatisticNames, isWIP, imageItem);
     }
   }
-  QString headerString = "Images";
-  if (hasMask)
-  {
-    headerString += "/Masks";
-  }
-  if (hasGroups)
-  {
-    headerString += "/Groups";
-  }
-  if (hasMultipleTimesteps)
-  {
-    headerString += "/Timesteps";
-  }
-  m_HeaderFirstColumn = headerString;
 
   m_LabelRowValues.clear();
   CollectLabelValues(m_RootItem.get(), m_LabelRowValues);

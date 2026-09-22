@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkProgressBar.h>
 #include <mitkProperties.h>
+#include <mitkRecentData.h>
 #include <mitkSceneIO.h>
 
 #include <berryIEditorPart.h>
@@ -108,6 +109,10 @@ void QmitkExtFileSaveProjectAction::Run()
                                "Scene could not be written completely. Please check the log.",
                                QMessageBox::Ok);
 
+    }
+    else
+    {
+      mitk::RecentData::Add({ fileName });
     }
     mitk::ProgressBar::GetInstance()->Progress(2);
 

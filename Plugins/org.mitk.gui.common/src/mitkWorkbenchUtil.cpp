@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include "mitkDataStorageEditorInput.h"
 #include <mitkRenderingManager.h>
 #include "mitkIRenderingManager.h"
+#include "mitkRecentData.h"
 
 #include <mitkProperties.h>
 #include <mitkNodePredicateData.h>
@@ -166,6 +167,9 @@ namespace mitk {
       return;
     }
     const bool dsmodified = !data->empty();
+
+    if (dsmodified)
+      RecentData::Add(fileNames);
 
     // Set ASSERT status back to previous status.
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)

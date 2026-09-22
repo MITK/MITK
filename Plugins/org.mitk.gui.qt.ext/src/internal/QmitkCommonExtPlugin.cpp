@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkRecentData.h>
 
 #include <mitkBaseApplication.h>
 
@@ -86,6 +87,10 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
     {
        mitk::DataStorage::Pointer dataStorage = dsService->GetDefaultDataStorage();
 
+       // Unzipped scenes (.mitksceneindex) are left out since they can only be
+       // loaded from the command line.
+       QStringList recentData;
+
        int argumentsAdded = 0;
        for (int i = 0; i < arguments.size(); ++i)
        {
@@ -98,6 +103,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            dataStorage = sceneIO->LoadScene( arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
            mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
+           recentData.append(arguments[i]);
          }
          else if (arguments[i].right(15) == ".mitksceneindex")
          {
@@ -122,6 +128,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
              }
 
              argumentsAdded++;
+             recentData.append(arguments[i]);
            }
            catch(...)
            {
@@ -129,6 +136,8 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            }
          }
        } // end for each command line argument
+
+       mitk::RecentData::Add(recentData);
 
        if (argumentsAdded > 0 && globalReinit)
        {

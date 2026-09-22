@@ -20,6 +20,7 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkBaseRenderer.h>
+#include <mitkVtkPropRenderer.h>
 
 // qt
 #include <QAction>
@@ -89,7 +90,15 @@ public:
 
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
-  void UpdateLightingMode(int mode);
+  /**
+   * \brief The lighting rig last selected from this menu.
+   *
+   * Not necessarily the rig the renderer currently carries: anything that
+   * installs one directly - a volume being rendered - overrides the selection
+   * without replacing it. This is what the window falls back to once nothing
+   * overrides it any more.
+   */
+  mitk::VtkPropRenderer::LightingMode GetPreferredLightingMode() const;
 
 /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
 is activated.*/
@@ -121,7 +130,7 @@ Q_SIGNALS:
 
   void CrosshairRotationModeChanged(QmitkCrosshairRotationMode);
 
-  void LightingModeChanged(int);
+  void LightingModeChanged(mitk::VtkPropRenderer::LightingMode);
 
   /*! emit signal, when layout design changed by the setting menu.*/
   void LayoutDesignChanged(LayoutDesign layoutDesign);
@@ -205,7 +214,7 @@ private:
   bool m_CrosshairVisibility;
   bool m_Crosshair3DVisibility;
 
-  int m_LightingMode;
+  mitk::VtkPropRenderer::LightingMode m_PreferredLightingMode;
 
   LayoutIndex m_Layout;
   LayoutDesign m_LayoutDesign;

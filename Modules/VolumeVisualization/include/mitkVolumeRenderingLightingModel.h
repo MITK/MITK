@@ -43,6 +43,12 @@ namespace mitk
    * Key light gives that path up to put a light off-axis, which is what lets a
    * shadow ray describe shape. The remaining fields are what that costs.
    *
+   * Default lighting is the renderer's own five-light kit, carried here so that
+   * the look of an unconfigured node has a name that can be chosen back. It
+   * takes the multi-light path like the key rig but carries no scattering:
+   * five lights refill each other's shadows, so a shadow ray buys nothing
+   * there and costs five times as much.
+   *
    * Blend mixes Phong out and a scattering model in rather than adding
    * occlusion on top of it: finalColor = (1 - c) * phong + c * scattering,
    * where c cannot exceed blend. So the value reads as the largest share of
@@ -147,6 +153,16 @@ namespace mitk
      * \return The model, or nullptr for an identifier no model uses.
      */
     static const VolumeRenderingLightingModel *FromId(const std::string &id);
+
+    /**
+     * \brief The model tuned for the given light rig.
+     *
+     * The rig a window is on is what a volume entering it has to be shaded for,
+     * so this is the direction the rig-first controls ask in.
+     *
+     * \return The model, or nullptr for a rig no model is tuned for.
+     */
+    static const VolumeRenderingLightingModel *FromLightingMode(VtkPropRenderer::LightingMode mode);
 
     /**
      * \brief Key under which ApplyTo records the model's identifier.

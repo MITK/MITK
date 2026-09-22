@@ -36,9 +36,13 @@ const std::vector<mitk::VolumeRenderingLightingModel> &mitk::VolumeRenderingLigh
   // Function-local static: built once on first use, and alive for the rest of
   // the program, which is what lets FromId and FromNode return pointers into it.
   static const std::vector<VolumeRenderingLightingModel> models {
-    //  id           label         blend  reach  aniso  nFromOp ambient diffuse specular power  rig
-    { "headlight", "Headlight",    0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
-    { "keylight",  "Key light",    0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
+    //  id           label                blend  reach  aniso  nFromOp ambient diffuse specular power  rig
+    { "headlight", "Headlight",           0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
+    { "keylight",  "Key light",           0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
+    // The studio row repeats mitk::VolumeRenderingMaterial's defaults on purpose:
+    // it names the state an unconfigured node already renders in, so the two have
+    // to stay in step.
+    { "studio",    "Default lighting",    0.00f, 0.00f, 0.0f,  false,  0.10f,  0.50f,  0.40f,   16.0f, LightingMode::Studio    },
   };
 
   return models;
@@ -50,6 +54,17 @@ const mitk::VolumeRenderingLightingModel *mitk::VolumeRenderingLightingModel::Fr
 
   const auto it = std::find_if(models.begin(), models.end(),
     [&id](const VolumeRenderingLightingModel &model) { return model.id == id; });
+
+  return it != models.end() ? &*it : nullptr;
+}
+
+const mitk::VolumeRenderingLightingModel *mitk::VolumeRenderingLightingModel::FromLightingMode(
+  VtkPropRenderer::LightingMode mode)
+{
+  const auto &models = GetAllModels();
+
+  const auto it = std::find_if(models.begin(), models.end(),
+    [mode](const VolumeRenderingLightingModel &model) { return model.lightingMode == mode; });
 
   return it != models.end() ? &*it : nullptr;
 }

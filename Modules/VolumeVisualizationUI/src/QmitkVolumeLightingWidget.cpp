@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 #include <ctkSliderWidget.h>
 
-#include <QComboBox>
 #include <QPushButton>
 
 namespace
@@ -60,14 +59,6 @@ QmitkVolumeLightingWidget::QmitkVolumeLightingWidget(QWidget *parent, Qt::Window
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
-  // The label is for the reader, the id for the code: carrying the id on the row
-  // keeps every lookup independent of the fill order.
-  for (const auto &model : mitk::VolumeRenderingLightingModel::GetAllModels())
-  {
-    m_Controls->lightingModelComboBox->addItem(
-      QString::fromStdString(model.label), QString::fromStdString(model.id));
-  }
-
   connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
     this, &QmitkVolumeLightingWidget::OnMaterialChanged);
   connect(m_Controls->diffuseSlider, &ctkSliderWidget::valueChanged,
@@ -76,8 +67,6 @@ QmitkVolumeLightingWidget::QmitkVolumeLightingWidget(QWidget *parent, Qt::Window
     this, &QmitkVolumeLightingWidget::OnMaterialChanged);
   connect(m_Controls->specularPowerSlider, &ctkSliderWidget::valueChanged,
     this, &QmitkVolumeLightingWidget::OnMaterialChanged);
-  connect(m_Controls->lightingModelComboBox, &QComboBox::currentIndexChanged,
-    this, &QmitkVolumeLightingWidget::OnModelChanged);
   connect(m_Controls->resetButton, &QPushButton::clicked,
     this, &QmitkVolumeLightingWidget::OnReset);
 }
@@ -101,16 +90,6 @@ void QmitkVolumeLightingWidget::UpdateControls()
   SetSliderValueSilently(m_Controls->diffuseSlider, material.diffuse);
   SetSliderValueSilently(m_Controls->specularSlider, material.specular);
   SetSliderValueSilently(m_Controls->specularPowerSlider, material.specularPower);
-
-  // Derived from the node rather than remembered, so the node stays the single
-  // source of truth. Matched by the id each row carries rather than by row
-  // number, so nothing here depends on the combo's fill order.
-  const auto *model = mitk::VolumeRenderingLightingModel::FromNode(node.GetPointer());
-
-  const QSignalBlocker blockModel(m_Controls->lightingModelComboBox);
-  m_Controls->lightingModelComboBox->setCurrentIndex(model != nullptr
-    ? m_Controls->lightingModelComboBox->findData(QString::fromStdString(model->id))
-    : -1);
 }
 
 void QmitkVolumeLightingWidget::OnMaterialChanged()
@@ -137,30 +116,6 @@ void QmitkVolumeLightingWidget::OnMaterialChanged()
   material.specularPower = static_cast<float>(m_Controls->specularPowerSlider->value());
 
   material.ApplyTo(node);
-
-  this->UpdateControls();
-
-  emit LightingChanged();
-}
-
-void QmitkVolumeLightingWidget::OnModelChanged(int index)
-{
-  auto node = m_DataNode.Lock();
-
-  // UpdateControls reports -1 for a node naming no model, but does so behind a
-  // QSignalBlocker, so a signal always names a real row.
-  if (node.IsNull() || index < 0)
-    return;
-
-  const auto *model = mitk::VolumeRenderingLightingModel::FromId(
-    m_Controls->lightingModelComboBox->itemData(index).toString().toStdString());
-
-  // A row carrying an id no model claims is not something this widget can build,
-  // so it is a programming error rather than a state to handle.
-  if (model == nullptr)
-    return;
-
-  model->ApplyTo(node);
 
   this->UpdateControls();
 

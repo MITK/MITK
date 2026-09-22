@@ -33,45 +33,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="lightingModelGroupLabel">
-     <property name="textFormat">
-      <enum>Qt::TextFormat::RichText</enum>
-     </property>
-     <property name="text">
-      <string>&lt;small&gt;&lt;b&gt;LIGHTING MODEL&lt;/b&gt;&lt;/small&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="lightingModelComboBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="toolTip">
-      <string>Headlight: one light at the camera. Nothing casts a visible shadow, since the light reaches everything you can see, but it is the only rig for which the renderer tints ambient light by the tissue's own colour, so the ambient slider fills rather than veils. Key light: an off-axis key with a dimmer opposing fill, tracing short shadow rays through the volume so that contacts and recesses darken; surface shading and its highlight stay on top of that. The rays are kept short on purpose - long ones let one structure cast onto another, which describes the lighting rather than the anatomy. Ambient is held at zero here because with more than one light the renderer adds it as a flat grey; the fill light does that job instead. It costs more per frame in a still image, is switched off while you drag, and relights any surface in the same window.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="materialGroupSpacerAbove">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Policy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>12</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <widget class="QLabel" name="materialGroupLabel">
      <property name="textFormat">
       <enum>Qt::TextFormat::RichText</enum>

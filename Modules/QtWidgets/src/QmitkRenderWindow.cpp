@@ -218,6 +218,15 @@ void QmitkRenderWindow::UpdateCrosshairRotationMode(QmitkCrosshairRotationMode m
   m_MenuWidget->UpdateCrosshairRotationMode(mode);
 }
 
+mitk::VtkPropRenderer::LightingMode QmitkRenderWindow::GetPreferredLightingMode() const
+{
+  // The menu is built on demand, so a window whose menu was never activated has
+  // no selection to report and the renderer's own default is the answer.
+  return nullptr != m_MenuWidget
+    ? m_MenuWidget->GetPreferredLightingMode()
+    : mitk::VtkPropRenderer::LightingMode::Studio;
+}
+
 void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)
@@ -241,6 +250,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::LightingModeChanged, this, &QmitkRenderWindow::LightingModeChanged);
   }
   else
   {
@@ -249,6 +259,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LightingModeChanged, this, &QmitkRenderWindow::LightingModeChanged);
 
     m_MenuWidget->hide();
   }

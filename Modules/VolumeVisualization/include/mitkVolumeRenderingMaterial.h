@@ -29,12 +29,12 @@ namespace mitk
    * state, since SetDefaultProperties runs only from DataNode::SetData, only via
    * IOExt's mapper provider, and only for an already initialized image.
    *
-   * They deliberately match no mitk::VolumeRenderingLightingModel. A model's
-   * values are half of a pair whose other half is a light rig only a view can
-   * install; these describe a node nobody configured, which renders under the
-   * renderer's default five-light kit. Ambient is the one that cannot cross
-   * between the two at all - the shader computes it differently depending on how
-   * many lights are switched on.
+   * They describe a node nobody configured, which renders under the renderer's
+   * default five-light kit. The "studio" mitk::VolumeRenderingLightingModel
+   * repeats them, so that state can be chosen deliberately rather than only
+   * fallen into; the two have to stay in step. The tuned models hold different
+   * values because ambient cannot cross between them - the shader computes it
+   * differently depending on how many lights are switched on.
    */
   struct MITKVOLUMEVISUALIZATION_EXPORT VolumeRenderingMaterial
   {

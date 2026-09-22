@@ -17,12 +17,16 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 
+#include <mitkVolumeRenderingLightingModel.h>
 #include <mitkVtkPropRenderer.h>
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
 #include <memory>
+#include <vector>
+
+class QmitkRenderWindow;
 
 namespace Ui
 {
@@ -48,6 +52,15 @@ private Q_SLOTS:
   void OnTransferFunctionChanged();
   void OnLightingChanged();
 
+  /** \brief React to a lighting rig picked from the 3D window's own menu.
+   *
+   * The window carries one rig for everything drawn in it, so the volumes lit by
+   * it are moved onto the model tuned for that rig. Without this the lights would
+   * change while the material and scattering values chosen for the old ones stay
+   * on the nodes.
+   */
+  void OnRenderWindowLightingModeChanged(mitk::VtkPropRenderer::LightingMode mode);
+
 private:
   void CreateQtPartControl(QWidget *parent) override;
 
@@ -62,40 +75,62 @@ private:
    */
   void UpdateLightingSection();
 
-  /** \brief Install the light rig on a render window part that has just become
+  /** \brief Take over the 3D window of a render window part that has just become
    * available.
    *
-   * The rig belongs to the renderer while the model that decides it belongs to
-   * the node, so a part that replaces another one arrives with the default rig
-   * and no knowledge of the node this view has selected. Without this the view
-   * would keep naming a model the new renderer is not in.
+   * A part that replaces another one arrives with the default rig and with a
+   * menu this view is not listening to, so both have to be picked up again.
    *
-   * \param[in] renderWindowPart Unused; the rig is installed on whichever part
-   *            is current, as everywhere else in this view.
+   * \param[in] renderWindowPart Unused; the current part is used, as everywhere
+   *            else in this view.
    */
   void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
+  /** \brief The 3D render window of the current part, or nullptr when there is none. */
+  QmitkRenderWindow *Get3DRenderWindow() const;
+
+  /** \brief The volume-rendered nodes currently drawn in the 3D window.
+   *
+   * Not only the selected one: the rig lights everything in that window, so
+   * every volume in it has a say in which rig belongs there.
+   */
+  std::vector<mitk::DataNode *> GetRenderedVolumes() const;
+
+  /** \brief The lighting model the 3D window is currently lit by.
+   *
+   * The window carries one rig, so the first volume naming a model decides it
+   * for all of them.
+   *
+   * \return The model, or nullptr when no volume is lit there.
+   */
+  const mitk::VolumeRenderingLightingModel *GetRenderedLightingModel() const;
+
+  /** \brief Listen to the lighting menu of whichever part is current. */
+  void ConnectLightingMode();
+
   /** Lights belong to the renderer, so this is 3D-render-window state rather
-   * than node state, and every path that stops asking for a directional rig
-   * has to restore the default - the view's own destructor included.
+   * than node state.
    */
   void ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode);
 
-  /** \brief Install the rig the currently selected node asks for.
+  /** \brief Bring the 3D window's light rig into line with what is drawn there.
    *
-   * The rig lives on the renderer while the model that decides it lives on the
-   * node, so the two only agree if something reconciles them. This is that
-   * something, kept apart from UpdateLightingControls so that refreshing the
-   * widgets does not silently reconfigure a renderer, and so that the paths
-   * which genuinely need a rig change - a new node, a new model, a new render
-   * window part - say so at the call site.
+   * The rig belongs to the window, so it follows the volumes rendered in it and
+   * falls back to the rig chosen in that window's own menu when none is. This
+   * view is deliberately not part of that rule: opening or closing it changes
+   * nothing about how the scene is lit.
    */
-  void ApplyLightingModeFromNode();
+  void UpdateLightingRig();
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+
+  /** Kept so that a part change can drop the old window's menu before taking up
+   * the new one, rather than leaving this view listening to both.
+   */
+  QMetaObject::Connection m_LightingModeConnection;
 };
 
 #endif

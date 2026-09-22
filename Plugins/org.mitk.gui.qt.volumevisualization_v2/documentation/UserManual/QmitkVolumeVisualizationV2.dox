@@ -218,32 +218,44 @@ back, so offering either would only ever produce an empty 3D window.
 Shading gives the volume the shape cues a flat colour cannot: where a surface
 turns away from the light, where two structures touch, how deep a recess goes.
 
-It is always on for a volume rendered here. The <b>Lighting model</b> picks how
-the volume is lit, and the two models are not weaker and stronger versions of
-the same effect - they take different paths through the renderer:
+It is always on for a volume rendered here. How the volume is lit is chosen on
+the 3D render window itself, from the lighting button in its top right corner.
+The lights belong to the window rather than to any one volume, so the choice
+applies to every volume drawn there, and it stays as you left it after this view
+is closed.
+
+The three models are not weaker and stronger versions of the same effect - they
+take different paths through the renderer:
 
 <ul>
+<li> <b>Default lighting</b> is the renderer's own five-light kit, which a 3D
+window uses until something asks for anything else. It is the flattest of the
+three and the most expensive to shade a volume with, and is offered so that a
+window can be put back the way it was.
 <li> <b>Headlight</b> puts a single light at the camera. Nothing casts a
 visible shadow, because the light reaches exactly what you can see. In exchange
 it is the only model in which the <b>Ambient</b> slider carries the tissue's own
 colour, so ambient light fills the dark areas instead of laying flat grey over
-the picture.
+the picture. A volume switched on in a window still on Default lighting starts
+here; one switched on in a window already set to another model takes that model
+instead.
 <li> <b>Key light</b> puts the main light off to one side and adds a dimmer one
 opposite it, then traces short secondary rays through the volume so that
 contacts and recesses darken. The rays are kept short deliberately: long ones
 let one structure cast a shadow onto another, which describes the lighting
 rather than the anatomy. This model costs more per still frame, switches its
 shadows off while you rotate, and also relights any surface sharing the 3D
-window for as long as this view is open.
+window.
 </ul>
 
 <b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>
-control how the material responds to that light. Choosing a model sets all four
-to a sensible starting point; moving them afterwards does not leave the model,
-and <b>Reset</b> puts them back to the values the current model prescribes.
-Ambient is deliberately zero under Key light: with more than one light in the
-scene the renderer adds ambient as a flat grey wash, so the fill light does
-that job instead.
+control how one volume's material responds to that light, and stay in this
+panel because they are per volume rather than per window. Choosing a model sets
+all four to a sensible starting point; moving them afterwards does not leave the
+model, and <b>Reset</b> puts them back to the values the current model
+prescribes. Ambient is deliberately zero under Key light: with more than one
+light in the scene the renderer adds ambient as a flat grey wash, so the fill
+light does that job instead.
 
 \note This whole section applies to the Composite blend mode only, and is
 disabled otherwise, with the reason on its header. The projection modes reduce

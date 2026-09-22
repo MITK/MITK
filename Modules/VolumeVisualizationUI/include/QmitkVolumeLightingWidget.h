@@ -28,20 +28,22 @@ namespace Ui
 }
 
 /**
- * \brief Controls for the shading and lighting of one volume-rendered node:
- *        a lighting model and the four Phong values.
+ * \brief Controls for the shading of one volume-rendered node: the four Phong
+ *        values, and a reset back to what its lighting model dictates.
  *
- * Shading is not among them. It is asserted on whenever the widget writes the
- * material, because everything the widget does offer is inert while it is off.
+ * Which lighting model the node is on is not among them. A model comes with the
+ * light rig it is tuned for, rigs belong to the render window, and one window
+ * lights every volume drawn in it - so that choice is made on the window itself
+ * and applies to all of them at once. These values are the per-node tuning left
+ * over once it is made.
+ *
+ * Shading is not offered either. It is asserted on whenever the widget writes
+ * the material, because everything the widget does offer is inert while it is
+ * off.
  *
  * Reads and writes the node's properties through mitk::VolumeRenderingMaterial
  * and mitk::VolumeRenderingLightingModel, so the widget carries no knowledge of
  * property keys or of what a given model is worth.
- *
- * What it deliberately does not do is install the light rig a model needs. Rigs
- * belong to the renderer, and reaching one needs a render window that only a
- * plugin can supply, so the widget reports that the node changed and leaves the
- * rig to the host - see LightingChanged.
  *
  * The host also decides whether these controls apply at all. Every property here
  * reaches the ray caster through the compositing loop that only the composite
@@ -86,7 +88,6 @@ signals:
 
 private slots:
   void OnMaterialChanged();
-  void OnModelChanged(int index);
   void OnReset();
 
 private:

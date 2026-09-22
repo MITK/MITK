@@ -197,19 +197,25 @@ int main(int argc, char* argv[])
 
             const auto distinctFiles = mitk::DistinctFilesInOrder(frameList);
 
-            const auto layout = frameList.empty() ? mitk::DICOMFrameLayout()
-                                                  : scanCache->GetFrameLayout(frameList.front());
-
             outputInfo["files"] = outputFiles;
             outputInfo["timesteps"] = output.GetNumberOfTimeSteps();
             outputInfo["frames_per_timesteps"] = output.GetNumberOfFramesPerTimeStep();
             outputInfo["frames"] = frameList.size();
             outputInfo["distinct_files"] = distinctFiles;
-            outputInfo["frame_model"] = layout.HasFrameModel();
 
-            if (!frameList.empty())
+            bool anyFrameModel = false;
+
+            for (const auto& distinctFile : distinctFiles)
             {
-              for (const auto& finding : mitk::CollectFrameModelFindings(layout, frameList.front()->Filename))
+              const auto frameOfFile = std::find_if(frameList.begin(), frameList.end(), [&distinctFile](const mitk::DICOMImageFrameInfo::Pointer& frame)
+                {
+                  return frame->Filename == distinctFile;
+                });
+
+              const auto layout = scanCache->GetFrameLayout(*frameOfFile);
+              anyFrameModel = anyFrameModel || layout.HasFrameModel();
+
+              for (const auto& finding : mitk::CollectFrameModelFindings(layout, distinctFile))
               {
                 nlohmann::json entry;
                 entry["type"] = mitk::DICOMFrameModelIssueToKey(finding.issue);
@@ -230,6 +236,9 @@ int main(int argc, char* argv[])
                 }
               }
             }
+
+            outputInfo["frame_model"] = anyFrameModel;
+
             if (output.GetSplitReason()!=nullptr && output.GetSplitReason()->HasReasons())
             {
               outputInfo["volume_split_reason"] = mitk::IOVolumeSplitReason::ToJSON(output.GetSplitReason());

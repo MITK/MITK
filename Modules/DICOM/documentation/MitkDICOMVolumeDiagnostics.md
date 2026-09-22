@@ -55,6 +55,8 @@ For every volume, the report lists its files in slice order, the number of time 
 
 The app analyzes the files a second time with the DCMTK-based scanner before reporting, because that is what the reader does before loading and only that scanner can look into sequences. Without it the report would show no frame model at all. The second scan roughly doubles the analysis time, which is accepted for a diagnostics tool.
 
+A volume's `frame_model` is a per-volume flag: it is `true` if any file that makes up the volume has a frame model, even if the others do not.
+
 A file that carries a Per-Frame Functional Groups Sequence with one item per frame gets the per-frame read model: one frame per entry rather than one file per entry. Two consequences show up in the report. `frames` counts the frames of the volume while `distinct_files` counts the files they come from, so for a 20-frame single-file volume `frames` is 20 and `distinct_files` has one entry. And `frames_per_timesteps` counts frames as well, so it is 20 for that volume where it was 1 before the frame model existed.
 
 ### Missing slice warning
@@ -127,7 +129,7 @@ The `frame_count_mismatch` reason exists but cannot appear here, because it is r
 
 ### Findings
 
-`findings` lists what the multi-frame analysis noticed, and `findings_summary` counts them by severity so a script can triage without walking the array. Both are always present; `findings` is an empty array when there is nothing to report. Each entry has a stable snake_case `type`, a `severity`, a human-readable `message`, the `volume_index` it belongs to, the `files` it was found in, and a `details` object carrying only the counts that apply. The `message` may be reworded between releases; the `type` and `severity` keys are the machine-readable contract.
+`findings` lists what the multi-frame analysis noticed, and `findings_summary` counts them by severity so a script can triage without walking the array. Both are always present; `findings` is an empty array when there is nothing to report. The analysis runs per file, so a volume made of several files can contribute a finding for each of them. Each entry has a stable snake_case `type`, a `severity`, a human-readable `message`, the `volume_index` it belongs to, the `files` it was found in, and a `details` object carrying only the counts that apply. The `message` may be reworded between releases; the `type` and `severity` keys are the machine-readable contract.
 
 | `type` | `severity` | Meaning | `details` |
 |--------|------------|---------|-----------|

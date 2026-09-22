@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QIcon>
+#include <QLocale>
 
 class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
 {
@@ -50,8 +51,14 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(CheckedLabelRemoved_FirstRemainingLabelIsChecked);
   MITK_TEST(CheckedLabelRemoved_OtherCheckStatesAreKept);
   MITK_TEST(LabelsRecolored_InputDisplayChangedIsEmittedOnce);
+  MITK_TEST(Headers_ShowReadableNamesAndToolTips);
+  MITK_TEST(Headers_AreExportedByTheirKeys);
+  MITK_TEST(Values_AreFormattedForReadingAndAvailableUnformatted);
+  MITK_TEST(Values_ShareTheDecimalPlacesOfTheirColumn);
+  MITK_TEST(RoundedValue_ToolTipShowsItUnrounded);
   CPPUNIT_TEST_SUITE_END();
 
+  QLocale m_DefaultLocale;
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
   mitk::Image::Pointer m_Image;
   mitk::DataNode::Pointer m_ImageNode;
@@ -77,6 +84,11 @@ public:
     // QGuiApplication. Use the shared, never-destroyed instance so '-platform minimal'
     // from the driver args is honoured.
     EnsureQApplication();
+
+    // Statistics are formatted in the locale of the user. Pin it, so that the expected
+    // strings of the formatting tests hold on any machine.
+    m_DefaultLocale = QLocale();
+    QLocale::setDefault(QLocale::c());
 
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
@@ -109,6 +121,8 @@ public:
 
   void tearDown() override
   {
+    QLocale::setDefault(m_DefaultLocale);
+
     m_DataStorage = nullptr;
     m_ImageNode = nullptr;
     m_MaskNode = nullptr;
@@ -116,15 +130,25 @@ public:
     m_Mask = nullptr;
   }
 
-  void AddStatistics(const mitk::Image* image, const mitk::MultiLabelSegmentation* mask)
+  void AddStatistics(const mitk::Image* image, const mitk::MultiLabelSegmentation* mask, double mean = 1.0)
   {
     auto container = mitk::ImageStatisticsContainer::New();
     container->SetTimeGeometry(image->GetTimeGeometry()->Clone());
     container->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
     container->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
 
+    mitk::ImageStatisticsContainer::IndexType minPosition(3);
+    minPosition[0] = 1;
+    minPosition[1] = 2;
+    minPosition[2] = 3;
+
     mitk::ImageStatisticsContainer::ImageStatisticsObject statistics;
-    statistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), 1.0);
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), mean);
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(),
+      static_cast<mitk::ImageStatisticsContainer::VoxelCountType>(999));
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::MINIMUMPOSITION(), minPosition);
+    // Stands for the statistics other modules contribute, which the model knows nothing about.
+    statistics.AddStatistic("CustomStat", 0.5);
 
     for (const auto labelValue : mask->GetAllLabelValues())
       container->SetStatistics(labelValue, 0, statistics);
@@ -137,13 +161,13 @@ public:
 
   /** Adds a node for the passed segmentation, together with statistics of the fixture image
   for all of its labels. Labels have to be added before, see AddStatistics(). */
-  mitk::DataNode::Pointer AddMaskNode(mitk::MultiLabelSegmentation* mask)
+  mitk::DataNode::Pointer AddMaskNode(mitk::MultiLabelSegmentation* mask, double mean = 1.0)
   {
     auto maskNode = mitk::DataNode::New();
     maskNode->SetData(mask);
     maskNode->SetName("Other mask");
     m_DataStorage->Add(maskNode);
-    this->AddStatistics(m_Image, mask);
+    this->AddStatistics(m_Image, mask, mean);
 
     return maskNode;
   }
@@ -195,6 +219,47 @@ public:
   static std::string FirstColumnHeader(const QmitkImageStatisticsTreeModel& model)
   {
     return model.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString().toStdString();
+  }
+
+  /** Returns the column headed by the passed name, or -1 if there is none. */
+  static int ColumnOf(const QmitkImageStatisticsTreeModel& model, const QString& header)
+  {
+    for (int column = 1; column < model.columnCount(); ++column)
+    {
+      if (header == model.headerData(column, Qt::Horizontal, Qt::DisplayRole).toString())
+        return column;
+    }
+
+    return -1;
+  }
+
+  static std::string ToolTip(const QmitkImageStatisticsTreeModel& model, int column)
+  {
+    return model.headerData(column, Qt::Horizontal, Qt::ToolTipRole).toString().toStdString();
+  }
+
+  /** Returns the technical key a column is exported by. */
+  static std::string ExportedHeader(const QmitkImageStatisticsTreeModel& model, int column)
+  {
+    return model.headerData(column, Qt::Horizontal, Qt::EditRole).toString().toStdString();
+  }
+
+  /** Returns the cell of the passed statistic in the first label row. */
+  static QModelIndex ValueIndex(const QmitkImageStatisticsTreeModel& model, const QString& header)
+  {
+    return model.index(0, ColumnOf(model, header), MaskIndex(model));
+  }
+
+  /** Returns the displayed value of the passed statistic in the first label row. */
+  static std::string ValueText(const QmitkImageStatisticsTreeModel& model, const QString& header)
+  {
+    return model.data(ValueIndex(model, header), Qt::DisplayRole).toString().toStdString();
+  }
+
+  /** Returns the exported value of the passed statistic in the first label row. */
+  static std::string ExportedValueText(const QmitkImageStatisticsTreeModel& model, const QString& header)
+  {
+    return model.data(ValueIndex(model, header), Qt::EditRole).toString().toStdString();
   }
 
   static bool IsCheckable(const QmitkImageStatisticsTreeModel& model, const QModelIndex& index)
@@ -430,8 +495,6 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(1, model.rowCount(secondGroup));
     CPPUNIT_ASSERT_EQUAL(std::string("Label 2"), Text(model, model.index(0, 0, secondGroup)));
-
-    CPPUNIT_ASSERT_EQUAL(std::string("Images/Masks/Groups"), FirstColumnHeader(model));
   }
 
   void GroupRenamed_ModelIsUpdated()
@@ -633,6 +696,110 @@ public:
     // A rebuild for any other reason must not pretend that an input display changed.
     model.SetHistogramNBins(50);
     CPPUNIT_ASSERT_EQUAL(1, inputDisplayChangedCount);
+  }
+
+  void Headers_ShowReadableNamesAndToolTips()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Images / Masks"), FirstColumnHeader(model));
+
+    const auto standardDeviation = ColumnOf(model, QStringLiteral("Std. dev."));
+    CPPUNIT_ASSERT_MESSAGE("The standard deviation must not be headed by its key.", standardDeviation > 0);
+    CPPUNIT_ASSERT_EQUAL(std::string("Standard deviation"), ToolTip(model, standardDeviation));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Mean of positive pixels"), ToolTip(model, ColumnOf(model, QStringLiteral("MPP"))));
+
+    CPPUNIT_ASSERT_MESSAGE("The superscript of the volume must be a single character.",
+      ColumnOf(model, QStringLiteral("Volume [mm\u00B3]")) > 0);
+
+    const auto custom = ColumnOf(model, QStringLiteral("CustomStat"));
+    CPPUNIT_ASSERT_MESSAGE("An unknown statistic must be headed by its key.", custom > 0);
+    CPPUNIT_ASSERT_MESSAGE("An unknown statistic must not offer an empty tooltip.",
+      model.headerData(custom, Qt::Horizontal, Qt::ToolTipRole).isNull());
+  }
+
+  void Headers_AreExportedByTheirKeys()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Images / Masks"), ExportedHeader(model, 0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The export has to stay machine readable.",
+      mitk::ImageStatisticsConstants::STANDARDDEVIATION(),
+      ExportedHeader(model, ColumnOf(model, QStringLiteral("Std. dev."))));
+
+    CPPUNIT_ASSERT_EQUAL(mitk::ImageStatisticsConstants::VOLUME(),
+      ExportedHeader(model, ColumnOf(model, QStringLiteral("Volume [mm\u00B3]"))));
+  }
+
+  void Values_AreFormattedForReadingAndAvailableUnformatted()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+
+    const auto mean = model.index(0, ColumnOf(model, QStringLiteral("Mean")), MaskIndex(model));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("1.0000"), model.data(mean, Qt::DisplayRole).toString().toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The raw value is what the clipboard export builds on.",
+      static_cast<int>(QMetaType::Double), model.data(mean, Qt::EditRole).typeId());
+    CPPUNIT_ASSERT_EQUAL(1.0, model.data(mean, Qt::EditRole).toDouble());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("999"), ValueText(model, QStringLiteral("Voxels")));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("[1, 2, 3]"), ValueText(model, QStringLiteral("Min position")));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The export keeps the technical rendering of a position.",
+      std::string("1 2 3"), ExportedValueText(model, QStringLiteral("Min position")));
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(Qt::AlignRight | Qt::AlignVCenter),
+      model.data(mean, Qt::TextAlignmentRole).toInt());
+  }
+
+  void Values_ShareTheDecimalPlacesOfTheirColumn()
+  {
+    auto otherMask = mitk::MultiLabelSegmentation::New();
+    otherMask->Initialize(CreateTestImage());
+    AddLabel(otherMask, "Label C", 0);
+    auto otherMaskNode = this->AddMaskNode(otherMask, 999.5);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ m_MaskNode.GetPointer(), otherMaskNode.GetPointer() });
+
+    const auto column = ColumnOf(model, QStringLiteral("Mean"));
+    const auto imageIndex = model.index(0, 0);
+    const auto otherMaskIndex = model.index(1, 0, imageIndex);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: the second mask was not picked up.",
+      std::string("Other mask"), Text(model, otherMaskIndex));
+
+    // Two decimal places for both, because the largest value of the column has three digits.
+    CPPUNIT_ASSERT_EQUAL(std::string("1.00"),
+      Text(model, model.index(0, column, MaskIndex(model))));
+    CPPUNIT_ASSERT_EQUAL(std::string("999.50"),
+      Text(model, model.index(0, column, otherMaskIndex)));
+  }
+
+  void RoundedValue_ToolTipShowsItUnrounded()
+  {
+    auto mask = mitk::MultiLabelSegmentation::New();
+    mask->Initialize(CreateTestImage());
+    AddLabel(mask, "Label C", 0);
+    auto maskNode = this->AddMaskNode(mask, 1234.56789);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ m_ImageNode.GetPointer() });
+    model.SetMaskNodes({ maskNode.GetPointer() });
+
+    const auto mean = model.index(0, ColumnOf(model, QStringLiteral("Mean")), MaskIndex(model));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("1234.57"), Text(model, mean));
+    CPPUNIT_ASSERT_EQUAL(std::string("1234.56789"),
+      model.data(mean, Qt::ToolTipRole).toString().toStdString());
   }
 };
 

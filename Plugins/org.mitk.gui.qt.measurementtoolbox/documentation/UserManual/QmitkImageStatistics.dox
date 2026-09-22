@@ -34,7 +34,9 @@ To select the input data, either use the "Select data..." button at the top of t
 \subsection QmitkImageStatisticStatistics Statistics
 After selection of an image, the image statistics are calculated and displayed in the "Statistics" section. If ROIs (segmentations or planar figures) are selected, the statistics are restricted to these ROIs and listed per ROI and, for segmentations, per label. For time data the statistics for each time step are calculated correspondingly.
 
-An example of parts of the calculated statistical features (Mean, Median, StandardDeviation, RMS, Max, MaxPosition, Min, MinPosition, Voxel, Volume [mm^3], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
+An example of parts of the calculated statistical features (Mean, Median, Std. dev., RMS, Max, Max position, Min, Min position, Voxels, Volume [mm³], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
+
+Hover over a column header to see what the column stands for. The values of a column share a fixed number of decimal places, chosen so that the largest value of the column is shown with a useful precision. Hover over a value to see it unrounded. The "Copy to clipboard" button exports the unrounded values under the technical keys of the statistics.
 
 \imageMacro{QmitkImageStatistics_statistics.png, "Example of parts of the statistics for different masks and timestamps", 1.00}
 

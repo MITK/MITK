@@ -113,7 +113,6 @@ namespace mitk
 
     protected:
       ValueStorePointer m_Store;
-      bool m_FrameScoped = false;
 
       explicit DICOMGenericImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
       DICOMGenericImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
@@ -121,6 +120,8 @@ namespace mitk
     private:
       Self& operator = (const Self&);
       DICOMGenericImageFrameInfo(const Self&);
+
+      bool m_FrameScoped = false;
   };
 
 }

@@ -21,9 +21,13 @@ found in the LICENSE file.
 #include <QListWidget>
 #include <QMenu>
 #include <QPainter>
+#include <QPromise>
 #include <QPushButton>
 #include <QStyledItemDelegate>
+#include <QThreadPool>
 #include <QVBoxLayout>
+
+#include <memory>
 
 namespace
 {
@@ -107,7 +111,8 @@ QmitkWelcomeRecentDataPage::QmitkWelcomeRecentDataPage(berry::IWorkbenchWindow::
     m_Window(window),
     m_Palette(palette),
     m_Projects{ mitk::RecentData::Kind::Project, nullptr, nullptr, nullptr },
-    m_Files{ mitk::RecentData::Kind::File, nullptr, nullptr, nullptr }
+    m_Files{ mitk::RecentData::Kind::File, nullptr, nullptr, nullptr },
+    m_IsAvailabilityCheckPending(false)
 {
   auto* cards = new QHBoxLayout;
   cards->setSpacing(16);
@@ -119,6 +124,17 @@ QmitkWelcomeRecentDataPage::QmitkWelcomeRecentDataPage(berry::IWorkbenchWindow::
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addLayout(cards);
   layout->addStretch(1);
+
+  connect(&m_AvailabilityCheck, &QFutureWatcherBase::finished, this, &QmitkWelcomeRecentDataPage::OnAvailabilityChecked);
+
+  mitk::RecentData::OnChanged().AddListener(
+    mitk::MessageDelegate<QmitkWelcomeRecentDataPage>(this, &QmitkWelcomeRecentDataPage::OnRecentDataChanged));
+}
+
+QmitkWelcomeRecentDataPage::~QmitkWelcomeRecentDataPage()
+{
+  mitk::RecentData::OnChanged().RemoveListener(
+    mitk::MessageDelegate<QmitkWelcomeRecentDataPage>(this, &QmitkWelcomeRecentDataPage::OnRecentDataChanged));
 }
 
 void QmitkWelcomeRecentDataPage::SetPalette(const QmitkWelcomePalette& palette)
@@ -131,8 +147,8 @@ void QmitkWelcomeRecentDataPage::SetPalette(const QmitkWelcomePalette& palette)
 
 void QmitkWelcomeRecentDataPage::showEvent(QShowEvent* event)
 {
-  // Data is loaded while other editors are in front, so catching up whenever
-  // the page becomes visible is sufficient.
+  // Catch up on recent data that changed while the page was hidden, and on
+  // files that appeared or vanished in the meantime.
   this->UpdateLists();
   QWidget::showEvent(event);
 }
@@ -153,10 +169,9 @@ QWidget* QmitkWelcomeRecentDataPage::CreateCard(const QString& title, const QStr
 
   const auto kind = recentList.Kind;
 
-  connect(recentList.ClearButton, &QPushButton::clicked, this, [this, kind]()
+  connect(recentList.ClearButton, &QPushButton::clicked, this, [kind]()
   {
     mitk::RecentData::Clear(kind);
-    this->UpdateLists();
   });
 
   auto* titleRow = new QHBoxLayout;
@@ -212,10 +227,11 @@ void QmitkWelcomeRecentDataPage::UpdateList(const RecentList& recentList)
     item->setData(PATH_ROLE, path);
     item->setData(FOLDER_ROLE, QDir::toNativeSeparators(fileInfo.absolutePath()));
     item->setToolTip(QDir::toNativeSeparators(path));
-    item->setFlags(fileInfo.exists() ? Qt::ItemIsEnabled : Qt::NoItemFlags);
 
     recentList.List->addItem(item);
   }
+
+  this->UpdateAvailability(recentList);
 
   recentList.List->setVisible(!paths.isEmpty());
   recentList.Hint->setVisible(paths.isEmpty());
@@ -226,6 +242,51 @@ void QmitkWelcomeRecentDataPage::UpdateLists()
 {
   this->UpdateList(m_Projects);
   this->UpdateList(m_Files);
+  this->CheckAvailability();
+}
+
+void QmitkWelcomeRecentDataPage::UpdateAvailability(const RecentList& recentList)
+{
+  // Entries count as available until a check finds them missing.
+  for (int i = 0; i < recentList.List->count(); ++i)
+  {
+    auto* item = recentList.List->item(i);
+    const bool isAvailable = !m_MissingPaths.contains(item->data(PATH_ROLE).toString());
+    item->setFlags(isAvailable ? Qt::ItemIsEnabled : Qt::NoItemFlags);
+  }
+}
+
+void QmitkWelcomeRecentDataPage::CheckAvailability()
+{
+  // A check of an unreachable network path may block for a long time, so
+  // further checks wait for it instead of tying up more pool threads.
+  if (m_AvailabilityCheck.isRunning())
+  {
+    m_IsAvailabilityCheckPending = true;
+    return;
+  }
+
+  const auto paths = mitk::RecentData::Get(mitk::RecentData::Kind::Project) + mitk::RecentData::Get(mitk::RecentData::Kind::File);
+
+  // Started here, so that the check counts as running before the thread pool
+  // picks it up.
+  auto promise = std::make_shared<QPromise<QSet<QString>>>();
+  promise->start();
+  m_AvailabilityCheck.setFuture(promise->future());
+
+  QThreadPool::globalInstance()->start([promise, paths]()
+  {
+    QSet<QString> missingPaths;
+
+    for (const auto& path : paths)
+    {
+      if (!QFileInfo::exists(path))
+        missingPaths.insert(path);
+    }
+
+    promise->addResult(missingPaths);
+    promise->finish();
+  });
 }
 
 void QmitkWelcomeRecentDataPage::OnItemClicked(const QListWidgetItem* item)
@@ -252,11 +313,35 @@ void QmitkWelcomeRecentDataPage::OnContextMenuRequested(QListWidget* list, const
 
   QMenu menu(this);
 
-  connect(menu.addAction("Remove from list"), &QAction::triggered, this, [this, path]()
+  connect(menu.addAction("Remove from list"), &QAction::triggered, this, [path]()
   {
     mitk::RecentData::Remove(path);
-    this->UpdateLists();
   });
 
   menu.exec(list->viewport()->mapToGlobal(pos));
+}
+
+void QmitkWelcomeRecentDataPage::OnRecentDataChanged()
+{
+  // Hidden pages catch up in showEvent(). The update is queued, since clicking
+  // an entry changes the recent data while its list still handles the click.
+  if (this->isVisible())
+    QMetaObject::invokeMethod(this, &QmitkWelcomeRecentDataPage::UpdateLists, Qt::QueuedConnection);
+}
+
+void QmitkWelcomeRecentDataPage::OnAvailabilityChecked()
+{
+  if (m_AvailabilityCheck.future().resultCount() > 0)
+  {
+    m_MissingPaths = m_AvailabilityCheck.result();
+
+    this->UpdateAvailability(m_Projects);
+    this->UpdateAvailability(m_Files);
+  }
+
+  if (m_IsAvailabilityCheckPending)
+  {
+    m_IsAvailabilityCheckPending = false;
+    this->CheckAvailability();
+  }
 }

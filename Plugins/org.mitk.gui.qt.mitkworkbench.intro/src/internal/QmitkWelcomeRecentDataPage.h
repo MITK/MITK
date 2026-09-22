@@ -19,6 +19,8 @@ found in the LICENSE file.
 
 #include <berryIWorkbenchWindow.h>
 
+#include <QFutureWatcher>
+#include <QSet>
 #include <QWidget>
 
 class QLabel;
@@ -31,7 +33,8 @@ class QPushButton;
  *
  * Clicking an entry loads it like File > Open, i.e., into the data that is
  * already loaded. Entries whose files no longer exist are shown but cannot be
- * opened.
+ * opened. Whether they exist is checked in the background, since unreachable
+ * network paths can take long to answer.
  */
 class QmitkWelcomeRecentDataPage : public QWidget
 {
@@ -39,6 +42,7 @@ class QmitkWelcomeRecentDataPage : public QWidget
 
 public:
   QmitkWelcomeRecentDataPage(berry::IWorkbenchWindow::Pointer window, const QmitkWelcomePalette& palette, QWidget* parent = nullptr);
+  ~QmitkWelcomeRecentDataPage() override;
 
   void SetPalette(const QmitkWelcomePalette& palette);
 
@@ -57,14 +61,21 @@ private:
   QWidget* CreateCard(const QString& title, const QString& hint, RecentList& recentList);
   void UpdateList(const RecentList& recentList);
   void UpdateLists();
+  void UpdateAvailability(const RecentList& recentList);
+  void CheckAvailability();
 
   void OnItemClicked(const QListWidgetItem* item);
   void OnContextMenuRequested(QListWidget* list, const QPoint& pos);
+  void OnRecentDataChanged();
+  void OnAvailabilityChecked();
 
   berry::IWorkbenchWindow::WeakPtr m_Window;
   QmitkWelcomePalette m_Palette;
   RecentList m_Projects;
   RecentList m_Files;
+  QSet<QString> m_MissingPaths;
+  QFutureWatcher<QSet<QString>> m_AvailabilityCheck;
+  bool m_IsAvailabilityCheckPending;
 };
 
 #endif

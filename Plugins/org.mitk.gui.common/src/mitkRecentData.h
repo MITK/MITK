@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <org_mitk_gui_common_Export.h>
 
+#include <mitkMessage.h>
+
 #include <QString>
 #include <QStringList>
 
@@ -27,7 +29,8 @@ namespace mitk
    *
    * Projects (MITK scene files) and all other files are kept in separate
    * lists, so that frequently opened files do not push projects out. Each
-   * list starts with the most recent entry and is limited in length.
+   * list starts with the most recent entry and is limited in length. On
+   * Windows and macOS, paths that differ only in case are the same entry.
    */
   class MITK_GUI_COMMON_PLUGIN RecentData
   {
@@ -54,6 +57,11 @@ namespace mitk
     static void Remove(const QString& path);
 
     static void Clear(Kind kind);
+
+    /**
+     * \brief Sent once after each Add(), Remove(), or Clear() that changed a list.
+     */
+    static const Message<>& OnChanged();
   };
 }
 

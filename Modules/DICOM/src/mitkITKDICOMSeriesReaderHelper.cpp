@@ -203,6 +203,13 @@ namespace
       return loaded;
     }
 
+    if (loaded->GetPixelType().GetNumberOfComponents() > 1)
+    {
+      MITK_WARN << "The per-frame Pixel Value Transformation is not applied to multi-component "
+                << "(for example colour) images.";
+      return loaded;
+    }
+
     const auto storedType = ToGDCMScalarType(io.GetInternalComponentType());
     auto targetType = RescaledType(storedType, effective.front());
     for (const auto& rescale : effective)
@@ -260,14 +267,15 @@ namespace
       result = mitk::Image::New();
       result->Initialize(targetPixelType, *loaded->GetTimeGeometry(), 1, 1);
 
-      std::vector<unsigned char> buffer(targetStride * sliceCount);
+      mitk::ImageWriteAccessor writer(result, result->GetVolumeData(0));
+      auto* target = static_cast<unsigned char*>(writer.GetData());
       mitk::ImageReadAccessor reader(loaded, loaded->GetVolumeData(0));
       const auto* volume = static_cast<const unsigned char*>(reader.GetData());
       for (unsigned int z = 0; z < sliceCount; ++z)
       {
-        RescaleSlice(volume + z * sourceStride, buffer.data() + z * targetStride, z);
+        RescaleSlice(volume + z * sourceStride, target + z * targetStride, z);
       }
-      result->SetVolume(buffer.data(), 0);
+      result->Modified();
     }
 
     MITK_INFO << "Applied the per-frame Pixel Value Transformation to " << corrected << " of "

@@ -74,6 +74,21 @@ public:
   static QIcon GetIcon(const QString &resourcePath);
 
   /**
+   * \brief Recolors raw SVG data like GetIcon(const QByteArray&, const QString&).
+   *
+   * For SVG that is not rendered as an icon, like illustrations in HTML
+   * documents. Both notations of the magic colors are replaced, regardless
+   * of case.
+   *
+   * \param[in] originalSVG The original SVG content as a byte array.
+   * \param[in] color A CSS-compatible color string that replaces the magic
+   *            icon color.
+   * \return The SVG content with the magic icon color replaced by \p color
+   *         and the magic accent color by the accent color of the current theme.
+   */
+  static QByteArray GetThemedSVG(const QByteArray &originalSVG, const QString &color);
+
+  /**
    * \brief Returns the primary icon color for the current theme.
    * \return A CSS-compatible color string (e.g., "#ffffff").
    */

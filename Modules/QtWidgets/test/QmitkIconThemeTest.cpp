@@ -79,6 +79,7 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   MITK_TEST(ThemeSwitchRecolorsExistingIcon);
   MITK_TEST(AccentColorFollowsTheme);
   MITK_TEST(CustomColorOverridesThemeColor);
+  MITK_TEST(ThemedSvgMatchesAllNotations);
   MITK_TEST(RefreshEmitsChanged);
   MITK_TEST(ColorsFollowRefresh);
   MITK_TEST(RendersAtTheRequestedSize);
@@ -140,6 +141,18 @@ public:
 
     const QIcon magentaIcon = QmitkIconTheme::GetIcon(Svg("#00ff00", 16), "#ff00ff");
     CPPUNIT_ASSERT_EQUAL(std::string("#ff00ff"), CenterColor(magentaIcon, 16));
+  }
+
+  void ThemedSvgMatchesAllNotations()
+  {
+    ApplyTheme("#ff0000", "#0000ff");
+
+    const auto themedSVG = QmitkIconTheme::GetThemedSVG(
+      QByteArrayLiteral("#00ff00 #00FF00 #0f0 #0F0 #ff00ff #FF00FF #f0f #F0F #0f0f0f"), "#123456");
+
+    // The last color only starts like a magic color in three-digit notation
+    CPPUNIT_ASSERT_EQUAL(std::string("#123456 #123456 #123456 #123456 #0000ff #0000ff #0000ff #0000ff #0f0f0f"),
+      themedSVG.toStdString());
   }
 
   void RefreshEmitsChanged()

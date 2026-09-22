@@ -14,6 +14,7 @@ set(SRC_CPP_FILES
   mitkIRenderWindowPart.cpp
   mitkIRenderWindowPartListener.h
   mitkIRenderWindowPartListener.cpp
+  mitkRecentData.cpp
   mitkRenderWindowPartHelper.cpp
   mitkIZombieViewPart.h
   mitkIZombieViewPart.cpp

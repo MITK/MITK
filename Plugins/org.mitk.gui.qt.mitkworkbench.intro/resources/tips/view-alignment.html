@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="tips/tips.css">
+<link rel="stylesheet" href="tips/theme.css">
+</head>
+<body>
+<h2>Aligning views to an image</h2>
+<div class="tip-content">
+<img class="float-left" style="width: 40%" alt="Views before and after fitting them to a tilted image and to one of two overlapping images" src="img/viewalignment/fit-views.svg">
+<p>An image is a grid of discrete voxels. The views, however, are not tied to any
+particular image: after loading, they span all data along the standard anatomical
+directions. Their slices then do not necessarily match the voxel layers of an image,
+for example because the image is tilted (top) or because several images with
+different voxel grids are loaded (bottom).</p>
+<p>That is fine for viewing, but some plugins work on the individual voxels of one
+particular image. They need views that lock onto the voxel grid of that image, so
+that every slice matches exactly one layer of its voxels.</p>
+<p>To align the views to an image, right-click it in the Data Manager and choose
+<b>Fit views to selection</b>. Some plugins detect views that are not aligned and
+prominently present an <b>Align views</b> button.</p>
+</div>
+</body>
+</html>

@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkWelcomeTipsPage.h"
 
 #include <QmitkHtmlWidget.h>
+#include <QmitkIconTheme.h>
 
 #include <QDir>
 #include <QFile>
@@ -142,12 +143,11 @@ QByteArray QmitkWelcomeTipsPage::GetResource(const QUrl& url) const
   if (path == THEME_STYLE_SHEET)
     return CreateThemeStyleSheet(m_Palette);
 
-  auto data = ReadResource(QLatin1Char(':') + path);
+  const auto data = ReadResource(QLatin1Char(':') + path);
 
-  if (path.endsWith(QStringLiteral(".svg"), Qt::CaseInsensitive))
-    data.replace("#00ff00", m_Palette.Text.name().toLatin1());
-
-  return data;
+  return path.endsWith(QStringLiteral(".svg"), Qt::CaseInsensitive)
+    ? QmitkIconTheme::GetThemedSVG(data, m_Palette.Text.name())
+    : data;
 }
 
 void QmitkWelcomeTipsPage::ShowTip(int index)

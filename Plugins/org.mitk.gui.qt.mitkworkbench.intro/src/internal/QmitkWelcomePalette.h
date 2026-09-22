@@ -20,8 +20,8 @@ found in the LICENSE file.
  *
  * The welcome screen paints its own panels instead of inheriting the theme's
  * flat widget background, so it needs a matching set of colors per theme.
- * Illustrations use the magic color \#00ff00 (as MitkQtIconTheme icons do)
- * wherever they need the text color.
+ * Illustrations use the magic colors of MitkQtIconTheme icons, with the text
+ * color in place of the icon color.
  */
 struct QmitkWelcomePalette
 {

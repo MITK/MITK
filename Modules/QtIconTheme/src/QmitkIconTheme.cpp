@@ -257,6 +257,11 @@ QIcon QmitkIconTheme::GetIcon(const QString &resourcePath)
   return QIcon();
 }
 
+QByteArray QmitkIconTheme::GetThemedSVG(const QByteArray &originalSVG, const QString &color)
+{
+  return ThemeSVG(originalSVG, color);
+}
+
 QString QmitkIconTheme::GetColor()
 {
   EnsureParsed();

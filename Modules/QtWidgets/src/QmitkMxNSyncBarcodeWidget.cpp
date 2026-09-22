@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <QHelpEvent>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
+#include <QResizeEvent>
 #include <QPixmap>
 #include <QToolTip>
 
@@ -29,8 +31,27 @@ namespace
   constexpr int SlotGap = 1;
   constexpr int IconGap = 2;          // gap between framed glyph boxes
   constexpr int IconInset = 3;        // glyph padding inside its framed box
+  // A box's frame is part of the box, so it needs room of its own: without it
+  // the grid grows until the frame is stroked along the host's very edge, and
+  // whether that line survives is then at the mercy of the backing store, the
+  // device pixel ratio and whatever paints behind the strip. One pixel top and
+  // bottom keeps every edge of every box inside the canvas.
+  constexpr int FrameRoom = 1;
   constexpr int MinGlyphBox = 12;     // smallest box that still reads as a glyph
-  constexpr int MaxGlyphBox = 24;     // glyphs beyond this just waste space
+  // The box the width hint asks for, tied to the host's text so the strip
+  // follows font scaling. Only a request: the paint takes whatever height the
+  // host actually grants, which is how the strip fills its chrome rather than
+  // sitting inside it with slack above and below.
+  constexpr int HintGlyphBox = 24;
+
+  /** The widget always renders one line: it lives in a chrome row or a group
+   *  card header, where a second line would push the whole row taller. Only a
+   *  surface that paints the barcode into a rect of its own - the layout
+   *  editor's cell map - has the room to wrap. */
+  QmitkMxNSyncBarcodeWidget::BarcodeFit StripFit()
+  {
+    return { false, 0 };
+  }
 
   // Furniture neutral: a faint white, matching the hairline tokens used across
   // the MxN viewport furniture over its translucent dark backing.
@@ -87,13 +108,16 @@ QSize QmitkMxNSyncBarcodeWidget::sizeHint() const
   const int slotCount = std::max(1, static_cast<int>(m_Slots.size()));
   if (m_PreferGlyphWidth)
   {
-    // What the glyph rendering needs: one row of boxes sized like the text
-    // beside them, so the strip follows font scaling rather than a fixed width,
-    // and never narrower than the empty-state hint it shows instead of glyphs.
-    // The height hint stays the color bar's - the host row sets the height, and
+    // What the glyph rendering needs: one row of square boxes, and never
+    // narrower than the empty-state hint it shows instead of glyphs. The box is
+    // the height the host has actually granted, not the text's - a width asked
+    // for font-sized boxes caps the glyphs at that size however tall the row
+    // is, which is why the strip's glyphs stayed smaller than its chrome. The
+    // height hint stays the color bar's: the host row sets the height, and
     // asking for more here would only make the row taller.
     const QFontMetrics metrics(this->font());
-    const int box = std::clamp(metrics.height(), MinGlyphBox, MaxGlyphBox);
+    const int box =
+      std::max(std::clamp(metrics.height(), MinGlyphBox, HintGlyphBox), this->height());
     const int glyphWidth = 1 + slotCount * box + (slotCount - 1) * IconGap;
     return QSize(std::max(glyphWidth, metrics.horizontalAdvance(tr("not synchronized"))),
                  BarcodeHeight);
@@ -112,7 +136,8 @@ QSize QmitkMxNSyncBarcodeWidget::minimumSizeHint() const
 }
 
 QmitkMxNSyncBarcodeWidget::BarcodeLayout
-QmitkMxNSyncBarcodeWidget::ComputeLayout(int width, int height, int slotCount)
+QmitkMxNSyncBarcodeWidget::ComputeLayout(int width, int height, int slotCount,
+                                         const BarcodeFit& fit)
 {
   BarcodeLayout layout;
   if (slotCount <= 0)
@@ -127,23 +152,50 @@ QmitkMxNSyncBarcodeWidget::ComputeLayout(int width, int height, int slotCount)
   int bestBox = 0;
   int bestColumns = 0;
   int bestRows = 0;
-  for (int columns = 1; columns <= slotCount; ++columns)
+  const int firstColumns = fit.allowWrap ? 1 : slotCount;
+
+  // Even splits only: 8, or 4+4, never 3+3+2. A ragged last row reads as a
+  // mistake beside a full one, and the eye reads a rectangle of glyphs faster
+  // than it reads two shapes. Where no even split is legible - a slot count
+  // with no useful divisors - any wrapping is better than collapsing to colour
+  // slots, so the search is repeated without the constraint.
+  for (const bool evenOnly : { true, false })
   {
-    const int rows = (slotCount + columns - 1) / columns;
-    const int boxByWidth = (width - 1 - (columns - 1) * IconGap) / columns;  // 1 = left inset
-    const int boxByHeight = (height - (rows - 1) * IconGap) / rows;
-    const int box = std::min(boxByWidth, boxByHeight);
-    if (box < MinGlyphBox)
+    for (int columns = firstColumns; columns <= slotCount; ++columns)
     {
-      continue;
+      if (evenOnly && 0 != slotCount % columns)
+      {
+        continue;
+      }
+      const int rows = (slotCount + columns - 1) / columns;
+      const int boxByWidth = (width - 1 - (columns - 1) * IconGap) / columns;  // 1 = left inset
+      const int boxByHeight =
+        (height - 2 * FrameRoom - (rows - 1) * IconGap) / rows;
+      // Bounded by the rect, and by the host's ceiling where it set one.
+      // Without a ceiling the box takes whatever it is granted, so a strip
+      // fills the full height of its chrome instead of leaving slack above and
+      // below it.
+      int box = std::min(boxByWidth, boxByHeight);
+      if (fit.maxBox > 0)
+      {
+        box = std::min(box, fit.maxBox);
+      }
+      if (box < MinGlyphBox)
+      {
+        continue;
+      }
+      // Largest box wins - a host that allows wrapping would rather break the
+      // row than shrink the glyphs. On a tie, fewer rows: flatter reads better.
+      if (box > bestBox || (box == bestBox && (0 == bestRows || rows < bestRows)))
+      {
+        bestBox = box;
+        bestColumns = columns;
+        bestRows = rows;
+      }
     }
-    const int clamped = std::min(box, MaxGlyphBox);
-    // Largest box wins; on a tie prefer fewer rows (flatter reads better).
-    if (clamped > bestBox || (clamped == bestBox && (bestRows == 0 || rows < bestRows)))
+    if (bestBox >= MinGlyphBox)
     {
-      bestBox = clamped;
-      bestColumns = columns;
-      bestRows = rows;
+      break;
     }
   }
 
@@ -168,9 +220,13 @@ QRect QmitkMxNSyncBarcodeWidget::ContentRectIn(const QRect& target, const Barcod
   {
     const int gridWidth = layout.columns * layout.box + (layout.columns - 1) * IconGap;
     const int gridHeight = layout.rows * layout.box + (layout.rows - 1) * IconGap;
-    // Centered vertically; left-aligned (with the 1 px inset) horizontally so
-    // the strip reads left-to-right and any trailing space stays inert.
-    const int top = target.top() + std::max(0, (target.height() - gridHeight) / 2);
+    // Centered vertically in what is left once the frames have their room;
+    // left-aligned (with the 1 px inset) horizontally so the strip reads
+    // left-to-right and any trailing space stays inert. Derived from the same
+    // budget ComputeLayout sized the box against, so the paint and the hit-test
+    // cannot disagree about where a glyph is.
+    const int top = target.top() + FrameRoom
+                    + std::max(0, (target.height() - 2 * FrameRoom - gridHeight) / 2);
     return QRect(target.left() + 1, top, gridWidth, gridHeight);
   }
   const int barWidth = slotCount * ColorSlotWidth + (slotCount - 1) * SlotGap;
@@ -193,13 +249,14 @@ QRect QmitkMxNSyncBarcodeWidget::ContentRect(const BarcodeLayout& layout) const
   return ContentRectIn(this->rect(), layout, m_Slots.size());
 }
 
-int QmitkMxNSyncBarcodeWidget::SlotAtIn(const QRect& target, int slotCount, const QPoint& pos)
+int QmitkMxNSyncBarcodeWidget::SlotAtIn(const QRect& target, int slotCount, const QPoint& pos,
+                                        const BarcodeFit& fit)
 {
   if (slotCount <= 0)
   {
     return -1;
   }
-  const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), slotCount);
+  const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), slotCount, fit);
   const QRect content = ContentRectIn(target, layout, slotCount);
   if (!content.contains(pos))
   {
@@ -227,14 +284,15 @@ int QmitkMxNSyncBarcodeWidget::SlotAt(const QPoint& pos) const
 
 void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target,
                                           const QList<AxisSlot>& axisSlots, bool hovered,
-                                          const QColor& gapColor, int hoveredSlot)
+                                          const QColor& gapColor, int hoveredSlot,
+                                          const BarcodeFit& fit)
 {
   const int n = axisSlots.size();
   if (n == 0)
   {
     return;
   }
-  const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), n);
+  const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), n, fit);
   const QRect content = ContentRectIn(target, layout, n);
 
   if (layout.mode == BarcodeLayout::Mode::Glyphs)
@@ -246,6 +304,17 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     // lights a single axis (the editor targets axes individually).
     const int inner = std::max(1, layout.box - 2 * IconInset);
     const qreal dpr = nullptr != painter.device() ? painter.device()->devicePixelRatioF() : 1.0;
+
+    // A box may sit flush against the target's edge - it does whenever the strip
+    // fills the height of its chrome - so the frame is stroked half a pixel
+    // inside the box rather than along it. A pen centred on the boundary puts
+    // half its width outside the canvas, which costs the top line the moment
+    // the grid grows to the full height, and costs it most when the frame is
+    // lit and so drawn part-transparent. Antialiasing keeps that half-pixel
+    // stroke crisp and the corner mark smooth; it is restored afterwards
+    // because the painter belongs to the caller.
+    const bool hadAntialiasing = painter.testRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
     for (int slot = 0; slot < n; ++slot)
     {
@@ -266,7 +335,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       }
       painter.setPen(framePen);
       painter.setBrush(Qt::NoBrush);
-      painter.drawRect(boxRect.adjusted(0, 0, -1, -1));
+      painter.drawRect(QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5));
 
       painter.setOpacity(synced ? 1.0 : (lit ? 0.8 : 0.4));
       QPixmap glyph = QmitkMxNRenderAxisGlyph(s.glyph, color, qRound(inner * dpr));
@@ -275,8 +344,28 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
         glyph.setDevicePixelRatio(dpr);
         painter.drawPixmap(QPoint(boxRect.center().x() - inner / 2, boxRect.center().y() - inner / 2), glyph);
       }
+
+      // The offset footnote: the box's upper-right corner filled. At the sizes
+      // the boxes now reach it carries further than an outline does, and a
+      // glyph is still recognisable with one corner covered.
+      if (s.hasOffset && synced)
+      {
+        painter.setOpacity(1.0);
+        const QRectF frameRect = QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5);
+        const qreal mark = std::max(4, layout.box / 3);
+        QPainterPath corner;
+        corner.moveTo(frameRect.right() - mark, frameRect.top());
+        corner.lineTo(frameRect.right(), frameRect.top());
+        corner.lineTo(frameRect.right(), frameRect.top() + mark);
+        corner.closeSubpath();
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(frameColor);
+        painter.drawPath(corner);
+        painter.setBrush(Qt::NoBrush);
+      }
       painter.setOpacity(1.0);
     }
+    painter.setRenderHint(QPainter::Antialiasing, hadAntialiasing);
     return;
   }
 
@@ -318,6 +407,18 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
   }
 }
 
+void QmitkMxNSyncBarcodeWidget::resizeEvent(QResizeEvent* event)
+{
+  QWidget::resizeEvent(event);
+  // The width the glyphs need is derived from the granted height, so a change
+  // of height has to re-ask for width - otherwise the strip keeps the width it
+  // wanted when it was shorter and the boxes stay bound by that instead.
+  if (m_PreferGlyphWidth && event->oldSize().height() != event->size().height())
+  {
+    this->updateGeometry();
+  }
+}
+
 void QmitkMxNSyncBarcodeWidget::paintEvent(QPaintEvent* /*event*/)
 {
   QPainter painter(this);
@@ -336,7 +437,7 @@ void QmitkMxNSyncBarcodeWidget::paintEvent(QPaintEvent* /*event*/)
   }
 
   PaintInto(painter, this->rect(), m_Slots, m_Hovered, this->palette().color(QPalette::Mid),
-            m_HoveredSlot);
+            m_HoveredSlot, StripFit());
 }
 
 void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
@@ -345,7 +446,8 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
   // its content, and that surrounding space must not highlight or read as
   // clickable. Axis-clickable mode highlights the single axis under the pointer;
   // the passive strip highlights as a whole.
-  const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
+  const BarcodeLayout layout =
+    ComputeLayout(this->width(), this->height(), m_Slots.size(), StripFit());
   if (m_AxisClickable)
   {
     const int slot = this->SlotAt(event->pos());
@@ -421,7 +523,8 @@ void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
   // A click (not a drag) on the drawn slots is a button; the surrounding space
   // is inert. In axis-clickable mode the click targets the axis under the
   // pointer (AxisClicked); otherwise the whole strip opens the editor (Clicked).
-  const BarcodeLayout layout = ComputeLayout(this->width(), this->height(), m_Slots.size());
+  const BarcodeLayout layout =
+    ComputeLayout(this->width(), this->height(), m_Slots.size(), StripFit());
   if (event->button() == Qt::LeftButton
       && (event->pos() - m_PressPos).manhattanLength() < QApplication::startDragDistance()
       && this->ContentRect(layout).contains(event->pos()))

@@ -223,6 +223,16 @@ void QmitkMxNCellMapWidget::RefreshTileGeometry()
   this->update();
 }
 
+QmitkMxNSyncBarcodeWidget::BarcodeFit QmitkMxNCellMapWidget::TileBarcodeFit()
+{
+  // A tile has vertical room to spare, so the barcode would rather break its row
+  // than shrink its glyphs - an even break, 4+4 rather than 3+3+2, since the
+  // rows cost the same and an even one reads calmer. The ceiling is what keeps
+  // that from running away: a one- or two-cell layout has enormous tiles, and
+  // unbounded glyphs there would dwarf everything else in the editor.
+  return { true, 24 };
+}
+
 QRect QmitkMxNCellMapWidget::TileBarcodeRect(const Tile& tile) const
 {
   const int barcodeBand = std::clamp(tile.mapRect.height() / 2, 8, 56);
@@ -322,7 +332,8 @@ void QmitkMxNCellMapWidget::paintEvent(QPaintEvent* /*event*/)
                         : (static_cast<int>(tileIndex) == m_HoverTile ? m_HoverSlot : -1);
     QmitkMxNSyncBarcodeWidget::PaintInto(painter, barcodeRect,
                                          m_MultiWidget->BuildBarcodeSlots(tile.windowId),
-                                         false, this->palette().color(QPalette::Mid), litSlot);
+                                         false, this->palette().color(QPalette::Mid), litSlot,
+                                         TileBarcodeFit());
   }
 }
 
@@ -523,7 +534,8 @@ void QmitkMxNCellMapWidget::UpdateGlyphHover(const QPoint& position)
   if (tile >= 0)
   {
     const QRect barcodeRect = this->TileBarcodeRect(m_Tiles[static_cast<std::size_t>(tile)]);
-    slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(barcodeRect, SyncAxisCount, position);
+    slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(barcodeRect, SyncAxisCount, position,
+                                               TileBarcodeFit());
     if (slot < 0)
     {
       tile = -1;  // over a tile but not its barcode: nothing to highlight

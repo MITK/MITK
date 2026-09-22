@@ -309,6 +309,16 @@ public:
   */
   void RefreshSyncControls();
 
+  /**
+  * \brief One cell's offset on one dimension in words: slice in signed steps,
+  *        zoom as a factor, pan as whole millimetres. Empty for the neutral
+  *        offset and for a dimension that carries none, so a surface shows an
+  *        offset only where one was actually authored. Static and public so
+  *        every surface that shows offsets - the barcodes, the sync peek, the
+  *        layout editor's matrix - words them identically.
+  */
+  static QString FormatSyncOffset(QmitkMxNSyncDimension dimension, const SyncOffset& offset);
+
   /** \brief Sorted names of all groups any live cell links for the dimension. */
   std::vector<std::string> GetSyncGroupNames(QmitkMxNSyncDimension dimension) const;
 

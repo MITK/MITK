@@ -54,6 +54,7 @@ found in the LICENSE file.
 #include <QWindow>
 
 #include <algorithm>
+#include <cmath>
 #include <functional>
 #include <numeric>
 #include <fstream>
@@ -3154,6 +3155,44 @@ void QmitkMxNMultiWidget::RefreshSyncControls()
   emit SyncLinksChanged();
 }
 
+QString QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension dimension,
+                                              const SyncOffset& offset)
+{
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Slice:
+      if (std::holds_alternative<int>(offset))
+      {
+        const int steps = std::get<int>(offset);
+        return 0 == steps ? QString()
+                          : QStringLiteral("%1%2").arg(steps > 0 ? "+" : "").arg(steps);
+      }
+      break;
+    case QmitkMxNSyncDimension::Zoom:
+      if (std::holds_alternative<double>(offset))
+      {
+        const double factor = std::get<double>(offset);
+        return std::abs(factor - 1.0) < 1e-6 ? QString()
+                                             : QStringLiteral("x%1").arg(factor, 0, 'g', 3);
+      }
+      break;
+    case QmitkMxNSyncDimension::Pan:
+      if (std::holds_alternative<mitk::Vector2D>(offset))
+      {
+        const auto pan = std::get<mitk::Vector2D>(offset);
+        // Bracketed and bar-separated: "5,-3" reads as one number with a
+        // thousands separator, "(5|-3)" can only be a pair.
+        return pan.GetNorm() < 1e-6
+                 ? QString()
+                 : QStringLiteral("(%1|%2)").arg(pan[0], 0, 'f', 0).arg(pan[1], 0, 'f', 0);
+      }
+      break;
+    default:
+      break;
+  }
+  return {};
+}
+
 QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const
 {
   for (const auto& descriptor : this->ListWindowDescriptors())
@@ -3998,8 +4037,12 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
       try
       {
         slot.color = this->GetSyncGroupColor(link->group);
-        slot.tooltip = tr("%1 - group %2").arg(label,
-          QString::fromStdString(this->GetSyncGroupDisplayName(link->group)));
+        slot.offsetText = FormatSyncOffset(dimension, link->offset);
+        slot.hasOffset = !slot.offsetText.isEmpty();
+        const auto groupName = QString::fromStdString(this->GetSyncGroupDisplayName(link->group));
+        slot.tooltip = slot.hasOffset
+                         ? tr("%1 - group %2, offset %3").arg(label, groupName, slot.offsetText)
+                         : tr("%1 - group %2").arg(label, groupName);
       }
       catch (const mitk::Exception&)
       {

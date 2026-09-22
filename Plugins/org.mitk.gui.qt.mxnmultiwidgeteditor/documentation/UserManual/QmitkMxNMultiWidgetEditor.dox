@@ -149,6 +149,17 @@
 	are on. Windows whose enlarged glyph carries the same hue are synchronized with
 	each other on that axis.
 
+	Where the window sits at an offset from its group - a slice step away, a zoom factor
+	apart, a pan written as a pair of millimetres like <tt>(5|-3)</tt> - the value sits
+	directly beneath that axis's glyph, in the group's own hue, so the pair reads as one
+	object and the plate says both what this window is coupled to and how far it departs
+	from it. The axis you are pointing at grows its value along with its glyph, so the
+	answer is largest exactly where you are asking. Only slice, zoom and pan can be
+	offset at all, so that line is mostly empty and the few values on it are what the
+	eye lands on. On the window barcodes and the group cards, which have no room for a
+	number, the same offset shows as a filled upper-right corner on the axis box;
+	the group card marks that some member is offset without saying which.
+
 	Sliding along the row moves the emphasis as each glyph is reached and holds it over
 	the gaps in between, so the row does not flicker under the pointer. The plates stay
 	up for as long as the pointer is anywhere on the barcode and go away once it leaves

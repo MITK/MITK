@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <QmitkMxNGroupJoinMode.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
 
 #include <QColor>
 #include <QPointer>
@@ -184,6 +185,11 @@ private:
    *         of the band geometry, shared by paintEvent and the hover hit-test so
    *         the two cannot drift. */
   QRect TileBarcodeRect(const Tile& tile) const;
+
+  /** \brief What a tile lets its barcode do with that rect: wrap rather than
+   *         shrink, up to a glyph ceiling. Shared by the paint and the hit-test
+   *         so the two cannot disagree about where a glyph is. */
+  static QmitkMxNSyncBarcodeWidget::BarcodeFit TileBarcodeFit();
 
   /** \brief Resolve the tile-glyph under 'position' and report it via
    *         GlyphHovered / GlyphHoverCleared when it changes. */

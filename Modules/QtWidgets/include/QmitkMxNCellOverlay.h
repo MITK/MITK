@@ -215,7 +215,8 @@ public:
     QRect plate;                              // invalid when the cell cannot host a plate
     std::array<QRect, PeekAxisCount> glyphs;  // axis order; the pumped one is the large rect
     QRect caption;                            // the pointed-at axis name, above the row
-    QRect name;                               // the window name, below the row
+    QRect values;                             // the per-axis offsets, under the row
+    QRect name;                               // the window name, below the values
   };
 
   /**
@@ -226,10 +227,11 @@ public:
   *        cell cannot host one. Static so the geometry is testable without a
   *        realized overlay.
   *
-  *   The plate reserves the pumped glyph's overhang and both text lines whatever
-  *   the pumped axis is, so its rect depends only on 'cellSize', 'glyphBox' and
-  *   'textLineHeight': switching axes while the peek is up moves and resizes
-  *   nothing.
+  *   The plate reserves the pumped glyph's overhang and all three text lines -
+  *   axis name, offset values, window name - whatever the pumped axis is and
+  *   whatever this window is offset by, so its rect depends only on 'cellSize',
+  *   'glyphBox' and 'textLineHeight': switching axes while the peek is up moves
+  *   and resizes nothing.
   */
   static PeekPlateLayout ComputePeekPlate(const QSize& cellSize, int glyphBox,
                                           int pumpedAxis, int textLineHeight);

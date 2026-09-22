@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QImage>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QPixmap>
 
 #include <algorithm>
@@ -51,6 +52,14 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(PeekPlate_PlateIsTheSameWhicheverAxisIsPumped);
   MITK_TEST(PeekPlate_NoAxisEmphasisedKeepsTheSamePlate);
   MITK_TEST(PeekPlate_CellTooSmallHasNoPlate);
+  MITK_TEST(PeekPlate_ValueBandSitsUnderTheRowAndAboveTheName);
+  MITK_TEST(PeekPlate_ValueBandIsReservedWhicheverAxisIsPumped);
+  MITK_TEST(Barcode_GlyphBoxFillsTheHeightItIsGranted);
+  MITK_TEST(Barcode_WidthAskedForFollowsTheGrantedHeight);
+  MITK_TEST(Barcode_WrapsRatherThanShrinksWhenTheHostAllowsIt);
+  MITK_TEST(Barcode_WrapsEvenlyAndNeverWhenForbidden);
+  MITK_TEST(Barcode_HostCeilingBoundsTheGlyph);
+  MITK_TEST(Barcode_FrameStaysInsideTheTargetAtEveryPixelRatio);
   MITK_TEST(MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCell);
   MITK_TEST(ResolvePeekGlyphBox_LegibleAndDrivenByTheDensestGrid);
   MITK_TEST(ResolvePeekGlyphBox_ZeroWhenNoCellQualifies);
@@ -324,6 +333,231 @@ public:
       QmitkMxNCellOverlay::PeekAxisCount, LineHeight());
     CPPUNIT_ASSERT_MESSAGE("An axis past the eight gets no plate",
                            !noSuchAxis.plate.isValid());
+  }
+
+  void Barcode_WrapsRatherThanShrinksWhenTheHostAllowsIt()
+  {
+    // A cell-map tile has vertical room to spare, and a legible glyph matters
+    // more there than a shallow band: breaking the row buys a far larger box
+    // than squeezing eight of them into the width.
+    constexpr int slotCount = 8;
+    const QSize band(120, 56);
+
+    const auto wrapped = QmitkMxNSyncBarcodeWidget::ComputeLayout(
+      band.width(), band.height(), slotCount, { true, 0 });
+    const auto flat = QmitkMxNSyncBarcodeWidget::ComputeLayout(
+      band.width(), band.height(), slotCount, { false, 0 });
+
+    CPPUNIT_ASSERT_MESSAGE("Allowed to wrap, it does", wrapped.rows > 1);
+    CPPUNIT_ASSERT_MESSAGE("and comes out with a larger glyph than one row allows",
+                           wrapped.box > flat.box);
+  }
+
+  void Barcode_WrapsEvenlyAndNeverWhenForbidden()
+  {
+    // An even split reads calmer than a ragged last row, and costs the same.
+    constexpr int slotCount = 8;
+    for (const QSize band : { QSize(120, 56), QSize(90, 80), QSize(70, 90) })
+    {
+      const auto layout = QmitkMxNSyncBarcodeWidget::ComputeLayout(
+        band.width(), band.height(), slotCount, { true, 0 });
+      if (layout.mode != QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs)
+      {
+        continue;
+      }
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Every row holds the same number of glyphs", 0,
+                                   slotCount % layout.columns);
+    }
+
+    // A chrome row must stay one line whatever the rect would allow.
+    const auto forbidden = QmitkMxNSyncBarcodeWidget::ComputeLayout(120, 90, slotCount,
+                                                                   { false, 0 });
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Forbidden to wrap, it stays one line", 1, forbidden.rows);
+  }
+
+  /** The ink in one device row of a painted strip, summed over the row. */
+  static int RowInk(const QImage& canvas, int row)
+  {
+    int ink = 0;
+    for (int x = 0; x < canvas.width(); ++x)
+    {
+      ink += qGray(canvas.pixel(x, row));
+    }
+    return ink;
+  }
+
+  void Barcode_FrameStaysInsideTheTargetAtEveryPixelRatio()
+  {
+    // A box sits flush against the target's edge whenever the strip fills the
+    // height of its chrome. A frame stroked along that edge puts half its width
+    // outside the canvas, which loses the top line - and loses it worst when the
+    // frame is lit, because a lit frame is drawn part-transparent. Stroked half a
+    // pixel inside, the top line survives and matches the bottom one.
+    constexpr int slotCount = 8;
+    QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
+    for (int axis = 0; axis < slotCount; ++axis)
+    {
+      QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+      slot.color = QColor(Qt::red);
+      axisSlots.append(slot);
+    }
+
+    for (const qreal ratio : { qreal(1.0), qreal(1.5), qreal(2.0) })
+    {
+      const QSize logical(240, 24);
+      QImage canvas(QSize(qRound(logical.width() * ratio), qRound(logical.height() * ratio)),
+                    QImage::Format_ARGB32_Premultiplied);
+      canvas.setDevicePixelRatio(ratio);
+      canvas.fill(Qt::black);
+      {
+        QPainter painter(&canvas);
+        // hovered: every frame lit, which is the state the top line vanished in
+        QmitkMxNSyncBarcodeWidget::PaintInto(painter, QRect(QPoint(0, 0), logical), axisSlots,
+                                             true, QColor(Qt::gray), -1, { false, 0 });
+      }
+
+      const auto layout =
+        QmitkMxNSyncBarcodeWidget::ComputeLayout(logical.width(), logical.height(), slotCount,
+                                                 { false, 0 });
+      const QRect content = QRect(QPoint(0, 0), logical);
+
+      // Every edge of every box lands inside the target, whatever the ratio, so
+      // no part of a frame depends on what happens at the canvas boundary.
+      const int gridTop = qRound((content.top() + 1) * ratio);
+      const int gridBottom = qRound((content.top() + 1 + layout.box - 1) * ratio);
+      CPPUNIT_ASSERT_MESSAGE("The grid starts inside the target", gridTop >= 1);
+      CPPUNIT_ASSERT_MESSAGE("and ends inside it", gridBottom <= canvas.height() - 1);
+      CPPUNIT_ASSERT_MESSAGE("The top frame line carries ink", RowInk(canvas, gridTop) > 0);
+      CPPUNIT_ASSERT_MESSAGE("and the canvas edge above it is untouched",
+                             0 == RowInk(canvas, 0));
+    }
+  }
+
+  void Barcode_HostCeilingBoundsTheGlyph()
+  {
+    // Unbounded, a two-cell layout's enormous tiles would render glyphs larger
+    // than anything else in the editor.
+    constexpr int slotCount = 8;
+    const auto capped = QmitkMxNSyncBarcodeWidget::ComputeLayout(400, 200, slotCount,
+                                                                 { true, 24 });
+    const auto free = QmitkMxNSyncBarcodeWidget::ComputeLayout(400, 200, slotCount,
+                                                               { true, 0 });
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The ceiling binds", 24, capped.box);
+    CPPUNIT_ASSERT_MESSAGE("and without one the rect alone does", free.box > 24);
+  }
+
+  void Barcode_WidthAskedForFollowsTheGrantedHeight()
+  {
+    // A strip parked at a row's trailing edge is granted exactly the width it
+    // asks for. Asking for font-sized boxes therefore capped the glyphs at the
+    // font's height however tall the row was - the width, not the height, was
+    // what kept the strip's glyphs smaller than its chrome.
+    QmitkMxNSyncBarcodeWidget strip;
+    strip.SetPreferGlyphWidth(true);
+    QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
+    for (int axis = 0; axis < 8; ++axis)
+    {
+      QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+      slot.color = QColor(Qt::red);
+      axisSlots.append(slot);
+    }
+    strip.SetSlots(axisSlots);
+
+    strip.resize(strip.sizeHint().width(), 16);
+    const int shortWidth = strip.sizeHint().width();
+
+    strip.resize(shortWidth, 32);
+    const int tallWidth = strip.sizeHint().width();
+
+    CPPUNIT_ASSERT_MESSAGE("A taller strip asks for more width", tallWidth > shortWidth);
+    // Enough for boxes as tall as the row allows - all of it but the pixel each
+    // frame keeps above and below itself.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("enough for boxes as tall as the row allows", 30,
+                                 QmitkMxNSyncBarcodeWidget::ComputeLayout(tallWidth, 32, 8).box);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A short strip still renders glyphs at its own height", 14,
+                                 QmitkMxNSyncBarcodeWidget::ComputeLayout(shortWidth, 16, 8).box);
+  }
+
+  void Barcode_GlyphBoxFillsTheHeightItIsGranted()
+  {
+    // A strip that left slack above and below its glyphs wasted the chrome it
+    // was given and made the axes harder to tell apart; the box takes the
+    // height on offer, bounded only by the width it has to share.
+    constexpr int slotCount = 8;
+    constexpr int wide = 1000;  // wide enough that height is the binding limit
+
+    for (const int height : { 18, 24, 32, 48 })
+    {
+      const auto layout = QmitkMxNSyncBarcodeWidget::ComputeLayout(wide, height, slotCount);
+      CPPUNIT_ASSERT_MESSAGE("A wide strip renders glyphs",
+                             layout.mode == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("One row, so the box takes the height", 1, layout.rows);
+      // All of it but the pixel each frame needs above and below itself, which
+      // is what keeps a box's own edges inside the canvas.
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("and nothing beyond the frames' own room is left over",
+                                   height - 2, layout.box);
+    }
+
+    // Width still bounds it: eight boxes plus their gaps have to fit.
+    const auto narrow = QmitkMxNSyncBarcodeWidget::ComputeLayout(160, 200, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("A narrow, tall strip is bounded by its width",
+                           narrow.box < 200);
+  }
+
+  void PeekPlate_ValueBandSitsUnderTheRowAndAboveTheName()
+  {
+    // The offsets are read off the row, so their band belongs between the
+    // glyphs and the window name - and inside the plate, like every other part.
+    const QSize cell(600, 400);
+    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight());
+    CPPUNIT_ASSERT(box >= QmitkMxNCellOverlay::PeekGlyphBoxMin);
+
+    constexpr int pumped = 2;
+    const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+    CPPUNIT_ASSERT(layout.plate.isValid());
+
+    // Each value hugs its own glyph, so the band reaches from just under a
+    // resting glyph down past the pumped one - which therefore overlaps it.
+    for (int axis = 0; axis < QmitkMxNCellOverlay::PeekAxisCount; ++axis)
+    {
+      if (axis == pumped)
+      {
+        continue;
+      }
+      CPPUNIT_ASSERT_MESSAGE("A resting glyph sits above the values",
+                             layout.glyphs[axis].bottom() <= layout.values.top());
+      CPPUNIT_ASSERT_MESSAGE("and has room for its value below it",
+                             layout.values.top() - layout.glyphs[axis].bottom() < LineHeight());
+    }
+    CPPUNIT_ASSERT_MESSAGE("The band reaches below the pumped glyph",
+                           layout.values.bottom() > layout.glyphs[pumped].bottom());
+    CPPUNIT_ASSERT_MESSAGE("with room there for a value grown to match it",
+                           layout.values.bottom() - layout.glyphs[pumped].bottom()
+                             >= LineHeight());
+    CPPUNIT_ASSERT_MESSAGE("The window name sits below them all",
+                           layout.values.bottom() <= layout.name.top());
+    CPPUNIT_ASSERT_MESSAGE("The band stays inside the plate",
+                           layout.plate.contains(layout.values));
+  }
+
+  void PeekPlate_ValueBandIsReservedWhicheverAxisIsPumped()
+  {
+    // The band is reserved whether or not this window is offset anywhere, so a
+    // plate never resizes as the pointer moves along the row or as offsets are
+    // authored.
+    const QSize cell(600, 400);
+    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight());
+    const auto reference = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight());
+    CPPUNIT_ASSERT(reference.plate.isValid());
+
+    for (int pumped = 0; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
+    {
+      const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+      CPPUNIT_ASSERT_MESSAGE("The plate does not move or resize with the pumped axis",
+                             layout.plate == reference.plate);
+      CPPUNIT_ASSERT_MESSAGE("nor does the value band",
+                             layout.values == reference.values);
+    }
   }
 
   void MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCell()

@@ -100,6 +100,7 @@ namespace
   constexpr int PeekPlatePadX = 14;
   constexpr int PeekPlatePadY = 12;
   constexpr int PeekCaptionGap = 6;       // caption baseline block to glyph row
+  constexpr int PeekValueGap = 1;         // a glyph to the ink of the value under it
   constexpr int PeekNameGap = 7;          // glyph row to the window name
   constexpr int PeekPlateRadius = 7;
   constexpr double PeekPumpScale = 1.75;  // the pointed-at glyph's side, in boxes
@@ -142,11 +143,22 @@ namespace
   /** \brief The plate's outer size. Both text lines are reserved even when the
    *         window has no name, so every plate of a layout is one object
    *         repeated rather than eight differently sized ones. */
+  /** \brief A pumped offset value's line height: the value grows with the glyph
+   *         it belongs to, so it is legible exactly where the pointer is. */
+  int PeekValueLineHeight(int textLineHeight)
+  {
+    return qRound(PeekPumpScale * textLineHeight);
+  }
+
   QSize PeekPlateSize(int box, int textLineHeight)
   {
+    // Three text lines: the axis name above the row, the offset values under it,
+    // and the window name. The value line is reserved at its pumped height
+    // whether or not this window is offset anywhere, so the plate's size never
+    // depends on its contents nor on which axis is pumped.
     return QSize(PeekRowWidth(box) + 2 * PeekPlatePadX,
-                 2 * textLineHeight + PeekCaptionGap + PeekRowHeight(box) + PeekNameGap
-                   + 2 * PeekPlatePadY);
+                 2 * textLineHeight + PeekValueLineHeight(textLineHeight) + PeekCaptionGap
+                   + PeekRowHeight(box) + PeekValueGap + PeekNameGap + 2 * PeekPlatePadY);
   }
 
   /** \brief A navigator row's grab area: its track plus the knob's reach at
@@ -597,8 +609,17 @@ QmitkMxNCellOverlay::ComputePeekPlate(const QSize& cellSize, int glyphBox, int p
   const int captionTop = layout.plate.top() + PeekPlatePadY;
   const int rowTop = captionTop + textLineHeight + PeekCaptionGap;
 
+  // Each value hugs its own glyph rather than sharing one baseline far below the
+  // resting ones - at the row's full height they would sit as far from their
+  // glyphs as from the window name, and read as belonging to neither. The band
+  // therefore spans from a resting glyph's value down to the pumped glyph's,
+  // and is reserved at that full extent whichever axis is pumped.
+  const int restingBottom = rowTop + (rowHeight + glyphBox) / 2;
+  const int valuesBottom = rowTop + rowHeight + PeekValueGap
+                           + PeekValueLineHeight(textLineHeight);
   layout.caption = QRect(rowLeft, captionTop, rowWidth, textLineHeight);
-  layout.name = QRect(rowLeft, rowTop + rowHeight + PeekNameGap, rowWidth, textLineHeight);
+  layout.values = QRect(rowLeft, restingBottom, rowWidth, valuesBottom - restingBottom);
+  layout.name = QRect(rowLeft, valuesBottom + PeekNameGap, rowWidth, textLineHeight);
 
   // Every glyph on a side of the pumped one moves, not just its neighbour, so
   // the spacing along the row stays uniform and the clearance around the pumped
@@ -1502,6 +1523,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     glyph.setDevicePixelRatio(dpr);
     painter.setOpacity(m_PeekProgress * weight);
     painter.drawPixmap(box.topLeft(), glyph);
+
   }
 
   // Both lines are elided into the width the glyph row dictates; measuring text
@@ -1519,6 +1541,43 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
                      metrics.elidedText(axisSlots[m_SyncPeekAxis].label, Qt::ElideRight,
                                         layout.caption.width()));
   }
+
+  // The offsets, read straight off the row: each value directly under the glyph
+  // it belongs to and in that group's hue - the hue the glyph above it already
+  // carries - so the pair reads as one object and the shift is tied to what it
+  // is measured from without a word spent saying so. The pointed-at axis grows
+  // its value with its glyph, so the answer is largest exactly where the
+  // pointer is. Only slice, zoom and pan can be offset, so most of this line is
+  // empty and the few values on it are what the eye lands on. A value keeps its
+  // own size rather than shrinking to clear its neighbours: three adjacent
+  // shifts may crowd, which is rarer than needing to read one.
+  QFont valueFont = painter.font();
+  QFont pumpedValueFont = valueFont;
+  pumpedValueFont.setPointSizeF(PeekPumpScale * valueFont.pointSizeF());
+  for (int axis = 0; axis < PeekAxisCount; ++axis)
+  {
+    const auto& axisSlot = axisSlots[axis];
+    if (axisSlot.offsetText.isEmpty() || !axisSlot.color.isValid())
+    {
+      continue;
+    }
+    const bool pumped = axis == m_SyncPeekAxis;
+    painter.setFont(pumped ? pumpedValueFont : valueFont);
+    const QFontMetrics valueMetrics(painter.font());
+    const QRect glyphRect = layout.glyphs[axis];
+    const int width = valueMetrics.horizontalAdvance(axisSlot.offsetText);
+    // A line box is taller than the digits sitting in it. Lifting the box by
+    // that slack makes PeekValueGap the gap the eye actually sees, which is what
+    // binds the value to its glyph rather than to the window name below.
+    const int slack =
+      (valueMetrics.height() - valueMetrics.tightBoundingRect(axisSlot.offsetText).height()) / 2;
+    const QRect at(glyphRect.center().x() - width / 2,
+                   glyphRect.bottom() + PeekValueGap - slack, width, valueMetrics.height());
+    painter.setPen(axisSlot.color);
+    painter.drawText(at, Qt::AlignHCenter | Qt::AlignVCenter, axisSlot.offsetText);
+  }
+  painter.setFont(valueFont);
+  painter.setPen(ActiveText);
   painter.setPen(IdleText);
   painter.drawText(layout.name, Qt::AlignHCenter | Qt::AlignVCenter,
                    metrics.elidedText(m_Editor->CellLabel(m_Cell->GetWidgetName()), Qt::ElideRight,

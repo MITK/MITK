@@ -34,8 +34,10 @@ class QPainter;
  * The widget is a passive presenter: the owner computes one slot per axis
  * (which axis glyph, the group hue, a tooltip) and pushes them via SetSlots.
  * When the strip is wide enough it draws the self-describing axis glyphs
- * (tinted to the hue when linked, grayed when not); when it is too narrow it
- * collapses to plain color slots.
+ * (tinted to the hue when linked, grayed when not), marking an axis that carries
+ * an offset by filling its box's upper-right corner; when it is too narrow it
+ * collapses to plain color slots, which have no room for that mark and so omit
+ * it.
  *
  * The whole strip doubles as a button: it emits Clicked so the owner can open
  * the layout editor, and it hints "not synchronized" when nothing is linked.
@@ -63,6 +65,32 @@ public:
     // not. Rendered as a broken variant of the hue so "some" reads distinctly
     // from "all" (solid) and "none" (gap).
     bool partial = false;
+
+    // The axis carries an offset relative to its group's seed. Marked by filling
+    // the box's upper-right corner, because an offset is otherwise invisible
+    // outside the layout editor's matrix, and a window parked at slice -1 looks
+    // exactly like one sitting on the group.
+    bool hasOffset = false;
+
+    // That offset in words, where a single window's is meant. Empty on the group
+    // perspective, which speaks for several windows at once and so can mark that
+    // an offset exists but not say which.
+    QString offsetText;
+  };
+
+  /**
+   * \brief What a host will allow the strip to do with the rect it grants.
+   *
+   * Wrapping trades vertical room for larger glyphs. A strip in a chrome row
+   * must stay one line whatever happens, so it forbids it; a cell-map tile has
+   * room to spare and would rather break the row than shrink the glyphs, so it
+   * allows it and caps their size instead - unbounded, a two-cell layout's
+   * enormous tiles would render glyphs larger than anything else on screen.
+   */
+  struct BarcodeFit
+  {
+    bool allowWrap = true;  // may the row wrap into a grid
+    int maxBox = 0;         // glyph box ceiling; 0 = bounded only by the rect
   };
 
   /**
@@ -89,7 +117,8 @@ public:
    *        so the wrap/collapse decision is unit-testable without a realized
    *        widget.
    */
-  static BarcodeLayout ComputeLayout(int width, int height, int slotCount);
+  static BarcodeLayout ComputeLayout(int width, int height, int slotCount,
+                                     const BarcodeFit& fit = {});
 
   /**
    * \brief Paint the given slots into an arbitrary rect: the wrapping glyph grid
@@ -101,7 +130,7 @@ public:
    */
   static void PaintInto(QPainter& painter, const QRect& target,
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,
-                        int hoveredSlot = -1);
+                        int hoveredSlot = -1, const BarcodeFit& fit = {});
 
   /**
    * \brief The slot index under 'pos' when 'slotCount' slots are painted into
@@ -111,7 +140,8 @@ public:
    *        over. Uses the same ComputeLayout geometry as the render, so hit-test
    *        and paint cannot drift.
    */
-  static int SlotAtIn(const QRect& target, int slotCount, const QPoint& pos);
+  static int SlotAtIn(const QRect& target, int slotCount, const QPoint& pos,
+                      const BarcodeFit& fit = {});
 
   explicit QmitkMxNSyncBarcodeWidget(QWidget* parent = nullptr);
   ~QmitkMxNSyncBarcodeWidget() override;
@@ -136,8 +166,10 @@ public:
    *
    *        A strip that shares a row's slack grows into the glyph rendering on
    *        its own; one parked against the row's trailing edge never does and
-   *        would be granted the color bar forever. The minimum size hint stays
-   *        the color bar either way, so a narrow host still collapses to it.
+   *        would be granted the color bar forever. The width asked for follows
+   *        the height the host grants, so the boxes come out square and the
+   *        strip fills its chrome. The minimum size hint stays the color bar
+   *        either way, so a narrow host still collapses to it.
    */
   void SetPreferGlyphWidth(bool prefer);
 
@@ -183,6 +215,10 @@ Q_SIGNALS:
 protected:
 
   void paintEvent(QPaintEvent* event) override;
+
+  /** \brief Re-asks for the width the glyphs need whenever the granted height
+   *         changes, since the box is square and follows that height. */
+  void resizeEvent(QResizeEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
 
   /** \brief Tracks hover over the glyph area (lights the strip to advertise it

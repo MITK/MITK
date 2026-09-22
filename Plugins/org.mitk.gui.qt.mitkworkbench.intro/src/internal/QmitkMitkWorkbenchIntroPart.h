@@ -16,20 +16,19 @@ found in the LICENSE file.
 
 #include <berryQtIntroPart.h>
 
-#include <QStringList>
-
-class QmitkHtmlWidget;
+class QLabel;
 class QWidget;
+class QmitkWelcomeRecentDataPage;
+class QmitkWelcomeTipsPage;
 
 /**
  * \ingroup org_mitk_gui_qt_welcomescreen_internal
  * \brief Welcome screen shown in the editor area of the MITK Workbench.
  *
- * Introduces the Workbench to first-time users with a short description and a
- * set of usage tips. The header and the tip frame are native Qt widgets; the
- * cycling tip content is HTML rendered by a QmitkHtmlWidget. The "show tips"
- * preference decides whether the tips box is shown, and a random tip is picked
- * whenever the page is (re)loaded.
+ * Introduces the Workbench with a short description above three tabs: usage
+ * tips, the most common settings, and recently opened data. The recent data is
+ * shown first if there is any, otherwise the settings, so that new users see
+ * them first. The screen follows the application theme at runtime.
  */
 class QmitkMitkWorkbenchIntroPart : public berry::QtIntroPart
 {
@@ -45,16 +44,14 @@ public:
   void CreateQtPartControl(QWidget *parent) override;
   void StandbyStateChanged(bool) override;
   void SetFocus() override;
-  void ReloadPage();
 
 private:
-  void ApplyTipsPreference();
-  void ShowTip(int index);
+  void ApplyTheme();
 
-  QWidget* m_TipsBox;
-  QmitkHtmlWidget* m_TipView;
-  QStringList m_TipFiles;
-  int m_CurrentTip;
+  QWidget* m_Content;
+  QLabel* m_Links;
+  QmitkWelcomeTipsPage* m_TipsPage;
+  QmitkWelcomeRecentDataPage* m_RecentDataPage;
 };
 
 #endif

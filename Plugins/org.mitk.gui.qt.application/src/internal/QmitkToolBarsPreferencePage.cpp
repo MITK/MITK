@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 
 #include "QmitkApplicationConstants.h"
+#include "QmitkToolBarPresets.h"
 
 #include <berryPlatformUI.h>
 
@@ -27,33 +28,6 @@ namespace
   {
     auto prefService = mitk::CoreServices::GetPreferencesService();
     return prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
-  }
-
-  // Find a toolbar by object name and apply preferences.
-  bool ApplyPreferences(const QList<QToolBar*>& toolBars, const QString& name, bool isVisible, bool showCategory)
-  {
-    auto it = std::find_if(toolBars.cbegin(), toolBars.cend(), [&name](const QToolBar* toolBar) {
-      return toolBar->objectName() == name;
-    });
-
-    if (it != toolBars.cend())
-    {
-      auto toolBar = *it;
-      toolBar->setVisible(isVisible);
-
-      for (auto action : toolBar->actions())
-      {
-        if (action->objectName() == "category")
-        {
-          action->setVisible(showCategory);
-          break;
-        }
-      }
-
-      return true;
-    }
-
-    return false;
   }
 }
 
@@ -115,19 +89,16 @@ bool QmitkToolBarsPreferencePage::PerformOk()
 
   prefs->PutBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, showCategories);
 
-  const auto toolBars = berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().first()->GetToolBars();
-
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {
     const auto* item = m_Ui->treeWidget->topLevelItem(i);
-    const auto category = item->text(0);
+    const auto category = item->text(0).toStdString();
     const bool isVisible = item->checkState(0) == Qt::Checked;
 
-    prefs->PutBool(category.toStdString(), isVisible);
-
-    if (!ApplyPreferences(toolBars, category, isVisible, showCategories))
-      MITK_WARN << "Could not find tool bar for category \"" << category << "\" to set its visibility!";
+    prefs->PutBool(category, isVisible);
   }
+
+  QmitkToolBarPresets::ApplyToWorkbench();
 
   return true;
 }

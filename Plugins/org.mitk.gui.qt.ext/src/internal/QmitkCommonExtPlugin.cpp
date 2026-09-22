@@ -16,7 +16,6 @@ found in the LICENSE file.
 
 #include "QmitkAboutHandler.h"
 #include "QmitkAppInstancesPreferencePage.h"
-#include "QmitkStartupPreferencePage.h"
 
 #include "QmitkModuleView.h"
 
@@ -54,7 +53,6 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAboutHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStartupPreferencePage, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)
 

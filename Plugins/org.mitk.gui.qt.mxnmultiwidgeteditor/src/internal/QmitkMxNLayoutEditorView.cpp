@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractMultiWidgetEditor.h>
 #include <QmitkButtonOverlayWidget.h>
+#include <QmitkIconTheme.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNMultiWidgetEditor.h>
@@ -67,7 +68,8 @@ void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
     "<b>No MxN display is open.</b><br/>This view configures the window "
     "arrangement and the synchronization of an MxN display."));
   m_NoDisplayOverlay->SetButtonText(tr(" Open MxN display"));
-  m_NoDisplayOverlay->SetButtonIcon(QIcon(QStringLiteral(":/Qmitk/mwLayout.png")));
+  m_NoDisplayOverlay->SetButtonIcon(
+    QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwLayout.svg")));
   m_NoDisplayOverlay->setOpacity(200);
   m_NoDisplayOverlay->setVisible(false);
   connect(m_NoDisplayOverlay, &QmitkButtonOverlayWidget::Clicked,

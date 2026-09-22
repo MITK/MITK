@@ -50,6 +50,29 @@ found in the LICENSE file.
  * The functional-group tags of interest are registered by the suite itself.
  * They are not part of the default registry, so without this a scan would not
  * look for them and every assertion here would grade an empty property set.
+ *
+ * The scenarios covered span:
+ * - per-slice bookkeeping, with one frame info per slice naming its source
+ *   file;
+ * - frame-relative placement, one property and one value per slot whether
+ *   the encoder put the macro in the shared group or the per-frame group,
+ *   and for more than one macro's attribute;
+ * - the pixel data itself, which follows the same per-frame rescale, with
+ *   the loaded component type set by GDCM's widest-pair rule;
+ * - top-level and shared-group attributes, which stay uniform across every
+ *   slice;
+ * - persistence, so a save/reload round trip keeps every per-slot value;
+ * - which inputs get a frame model at all: none for a multi-frame object
+ *   without functional groups, and one for any object that has them,
+ *   single frame or not;
+ * - the per-slot source-frame record that keeps the file-to-image mapping
+ *   recoverable;
+ * - conflict resolution when an attribute appears both at the top level and
+ *   inside a functional group;
+ * - a ragged Per-Frame Functional Groups Sequence, which falls back to the
+ *   one-frame model; and
+ * - series composition, where several multi-frame files become separate
+ *   complete volumes rather than one merged one.
  */
 class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
 {
@@ -262,7 +285,7 @@ public:
     }
   }
 
-  /** (a) One frame info per frame, so every per-slice property has a slot per
+  /** One frame info per frame, so every per-slice property has a slot per
       slice, all naming the one file the frames came from. */
   void PerSliceFilesAndSOPInstanceUID()
   {
@@ -287,7 +310,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Per-slice SOP Instance UID property is present", sopInstanceUIDs.IsNotNull());
   }
 
-  /** (b) Per-frame placement: one property, frame-relative key, frame z's
+  /** Per-frame placement: one property, frame-relative key, frame z's
       value at slot (0, z). */
   void PerFrameRescaleIsOneFrameRelativeProperty()
   {
@@ -313,7 +336,7 @@ public:
     this->AssertNoRootedKeys(image);
   }
 
-  /** (b) Shared placement: the same key, the shared value repeated per slot. */
+  /** Shared placement: the same key, the shared value repeated per slot. */
   void SharedRescaleIsOneFrameRelativeProperty()
   {
     auto object = this->MakeEnhanced();
@@ -336,7 +359,7 @@ public:
     this->AssertNoRootedKeys(image);
   }
 
-  /** (b) One value repeated at every per-frame item: still one property, and
+  /** One value repeated at every per-frame item: still one property, and
       still one value per slot rather than a collapsed single value. */
   void UniformPerFrameRescaleIsOneFrameRelativeProperty()
   {
@@ -349,7 +372,6 @@ public:
                                  std::size_t(FRAME_COUNT), dicomProperty->GetAvailableSlices(0).size());
   }
 
-  /** (c) The same for an attribute of another macro. */
   /**
    * One file carrying a shared attribute and a per-frame one at the same time.
    *
@@ -386,6 +408,9 @@ public:
     }
   }
 
+  /** Frame Reference DateTime, from the Frame Content macro, reaches every
+   *  slot the same way the Pixel Value Transformation attributes do.
+   */
   void FrameReferenceDateTimeReachesEverySlot()
   {
     const auto image = this->LoadOne(this->MakeEnhanced().Write(this->CaseDir(), "enhanced.dcm"));
@@ -402,7 +427,7 @@ public:
     }
   }
 
-  /** (c) The mapping invariant: the value at a slot and the pixels at that
+  /** The mapping invariant: the value at a slot and the pixels at that
       slot come from one frame. Asserted against the pixel constant rather
       than against a z number, so a future reordering that moves pixels
       without values, or the reverse, fails here. In-Stack Position descends
@@ -437,7 +462,7 @@ public:
     }
   }
 
-  /** (i) The stored frame index per slot, so the file-to-image mapping stays
+  /** The stored frame index per slot, so the file-to-image mapping stays
       recoverable from the loaded image. */
   void SourceFramePropertyNamesTheFrameOfEverySlot()
   {
@@ -456,7 +481,7 @@ public:
     }
   }
 
-  /** (d) Each frame's own Pixel Value Transformation reaches its pixels, and
+  /** Each frame's own Pixel Value Transformation reaches its pixels, and
       the component type is the one GDCM's rule gives for the widest pair. */
   void PixelsUsePerFrameRescale()
   {
@@ -481,7 +506,7 @@ public:
     }
   }
 
-  /** (d) A non-integral pair makes GDCM's rule pick double, and the
+  /** A non-integral pair makes GDCM's rule pick double, and the
       correction must not narrow it. */
   void NonIntegralInterceptLoadsAsDouble()
   {
@@ -505,7 +530,7 @@ public:
     }
   }
 
-  /** (e) A top-level attribute has one value for the whole image, whatever
+  /** A top-level attribute has one value for the whole image, whatever
       the frame model does. */
   void TopLevelValuesAreUniformAcrossSlices()
   {
@@ -518,7 +543,7 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Modality is uniform", std::string("PT"), modality);
   }
 
-  /** (f) The published keys are persisted, so a round trip keeps the per-slot
+  /** The published keys are persisted, so a round trip keeps the per-slot
       values. A property without persistence info is dropped on save without a
       log line, which is exactly what this guards. */
   void PerFrameValuesSurviveSaveAndReload()
@@ -561,7 +586,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The per-slot source frame property survives", frames.IsNotNull());
   }
 
-  /** (g) A multi-frame object without functional groups gets no frame model:
+  /** A multi-frame object without functional groups gets no frame model:
       one entry in READER_FILES and the pixels it always had. */
   void PlainMultiFrameIsNotExpanded()
   {
@@ -590,7 +615,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No source frame property without a frame model", frames.IsNull());
   }
 
-  /** (h) A single-frame file without functional groups is untouched. */
+  /** A single-frame file without functional groups is untouched. */
   void SingleFrameWithoutGroupsIsUnchanged()
   {
     auto object = this->MakeEnhanced(1);
@@ -610,7 +635,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No source frame property without a frame model", frames.IsNull());
   }
 
-  /** (h) A single-frame object that does have functional groups gets the
+  /** A single-frame object that does have functional groups gets the
       frame model, so every such object presents its values the same way. */
   void SingleFrameEnhancedGetsFrameRelativeKeys()
   {
@@ -632,7 +657,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A single-frame functional-group object still records its frame", frames.IsNotNull());
   }
 
-  /** (j) A non-conformant file carrying one attribute both at the top level
+  /** A non-conformant file carrying one attribute both at the top level
       and in a functional group: the frame's value wins. */
   void TopLevelDuplicateLosesAgainstTheFrame()
   {
@@ -662,7 +687,7 @@ public:
     }
   }
 
-  /** (k) A Per-Frame Functional Groups Sequence that does not describe every
+  /** A Per-Frame Functional Groups Sequence that does not describe every
       frame cannot be mapped to slots, so the file keeps the one-frame model
       and publishes rooted keys as it does today. */
   void RaggedObjectKeepsTheOneFrameModel()
@@ -716,7 +741,7 @@ public:
     return directory;
   }
 
-  /** (l) Two conformant functional-group files of one series.
+  /** Two conformant functional-group files of one series.
    *
    * They reach the reader as two blocks whatever the frame model does, because
    * a conformant object carries Image Position (Patient) in the Plane Position
@@ -764,7 +789,7 @@ public:
                                  std::size_t(2), slopes.size());
   }
 
-  /** (l) The separation itself, on the only input that reaches it.
+  /** The separation itself, on the only input that reaches it.
    *
    * A file that carries both top-level geometry and per-frame functional groups
    * is non-conformant but does occur, and it is the one case the sorters put
@@ -909,7 +934,7 @@ public:
     }
   }
 
-  /** (l) A multi-frame functional-group file among single-frame files of one
+  /** A multi-frame functional-group file among single-frame files of one
    *  series.
    *
    * The sorters split the two kinds apart before the frame model sees them,

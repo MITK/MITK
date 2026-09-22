@@ -46,6 +46,9 @@ struct QmitkMxNMultiWidgetEditor::Impl final
   // The scheme is editor-wide state the layout editor's toggle reads back, so
   // the two cannot disagree about which mode is live.
   mitk::InteractionSchemeSwitcher::InteractionScheme m_InteractionScheme;
+
+  /** Empty until the preferences have been read for the first time. */
+  std::optional<bool> m_PACSInteraction;
 };
 
 QmitkMxNMultiWidgetEditor::Impl::Impl()

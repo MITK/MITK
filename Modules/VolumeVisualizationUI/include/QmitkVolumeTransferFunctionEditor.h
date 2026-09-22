@@ -221,6 +221,21 @@ private:
   void ShowEditMode();
 
   /**
+   * \brief Scale the canvas axis, to the image's intensity band or to the whole
+   *        curve.
+   *
+   * The band is what the 2D views show the image over, and a preset authored on
+   * its modality's own scale reaches well past it, so the curve's outermost
+   * points can sit off the axis. Widening brings them on, at the price of the
+   * band - where the image actually is - shrinking into part of the plot.
+   *
+   * The band remains the range the sliders and the colour window are measured
+   * against either way: this is what the canvas shows, not what the panel means
+   * by the data.
+   */
+  void ApplyAxisRange();
+
+  /**
    * \brief Point the colour stop controls at what the canvas currently holds and
    *        has selected.
    *

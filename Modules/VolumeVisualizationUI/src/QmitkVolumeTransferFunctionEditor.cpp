@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
+#include <QCheckBox>
 #include <QColor>
 #include <QColorDialog>
 #include <QComboBox>
@@ -474,6 +475,9 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::ColorStopsChanged,
     this, &QmitkVolumeTransferFunctionEditor::ShowColorStops);
+
+  connect(m_Controls->fitAxisCheckBox, &QCheckBox::toggled,
+    this, &QmitkVolumeTransferFunctionEditor::ApplyAxisRange);
 
   // Each of these hands the request straight to the canvas, which is where the
   // rules about what may happen to a stop live, so that a stop moved from here
@@ -960,12 +964,7 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
 
     if (const auto range = WorkingRange(image, histogram); range.has_value())
     {
-      // The visible x-axis, so histogram, gradient and curve line up.
-      // (SetPiecewiseFunction defaulted these to the function's own range, so
-      // this must come after it.)
       m_DataRange = *range;
-      m_Controls->combinedTfCanvas->SetMin(m_DataRange[0]);
-      m_Controls->combinedTfCanvas->SetMax(m_DataRange[1]);
     }
     else
     {
@@ -975,6 +974,11 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
       m_DataRange = { m_Controls->combinedTfCanvas->GetMin(),
                       m_Controls->combinedTfCanvas->GetMax() };
     }
+
+    // The visible x-axis, so histogram, gradient and curve line up. (Both
+    // branches above leave the canvas on the range SetPiecewiseFunction defaulted
+    // it to - the function's own - so this must come after them.)
+    this->ApplyAxisRange();
 
     m_Controls->combinedTfCanvas->SnapshotOpacityBaseline();
   }
@@ -1246,6 +1250,19 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
 
   m_Controls->canvasHintLabel->setVisible(m_EditModeActive);
   m_Controls->colorStopPanel->setVisible(m_EditModeActive);
+  m_Controls->fitAxisCheckBox->setVisible(m_EditModeActive);
+
+  {
+    // Each visit starts on the band however the last one was left: the axis
+    // returns to it on the way out, so a box that remembered otherwise would
+    // describe a view that is not there.
+    const QSignalBlocker blocker(m_Controls->fitAxisCheckBox);
+    m_Controls->fitAxisCheckBox->setChecked(true);
+  }
+
+  // The wider axis is an aid to editing, so it comes and goes with editing
+  // rather than outlasting the control that explains it.
+  this->ApplyAxisRange();
 
   // A context menu would name these; buttons cannot, and a gesture nothing
   // mentions is one nobody finds. Both functions answer at once now, so what has
@@ -1260,6 +1277,52 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   // Which controls would replace the curve being edited depends on the mode
   // this just changed.
   this->UpdateControlAvailability();
+}
+
+void QmitkVolumeTransferFunctionEditor::ApplyAxisRange()
+{
+  // Nothing measured, so there is no axis to scale and nothing on the canvas to
+  // scale it for.
+  if (m_DataRange[1] <= m_DataRange[0])
+    return;
+
+  double lower = m_DataRange[0];
+  double upper = m_DataRange[1];
+
+  // Cleared, so the axis is let out to wherever the curve reaches; ticked, it
+  // keeps to the band. Only while the curve is being edited: off the axis is
+  // only a problem for what has to be taken hold of, and the band is the more
+  // honest picture of where the image is.
+  const bool wholeRange = m_EditModeActive &&
+                          !m_Controls->fitAxisCheckBox->isChecked() &&
+                          m_AppliedTransferFunction.IsNotNull();
+
+  if (wholeRange)
+  {
+    // A function carrying no points answers 0 to both ends, which is not a range
+    // to make room for.
+    const auto widen = [&lower, &upper](const double *range)
+    {
+      if (range[0] < range[1])
+      {
+        lower = std::min(lower, range[0]);
+        upper = std::max(upper, range[1]);
+      }
+    };
+
+    widen(m_AppliedTransferFunction->GetColorTransferFunction()->GetRange());
+    widen(m_AppliedTransferFunction->GetScalarOpacityFunction()->GetRange());
+  }
+
+  // SetMin/SetMax rather than the display bounds alone: the canvas clamps a drag
+  // to the data range, so a point is only movable once that range reaches it.
+  m_Controls->combinedTfCanvas->SetMin(lower);
+  m_Controls->combinedTfCanvas->SetMax(upper);
+  m_Controls->combinedTfCanvas->update();
+
+  // Which stops the axis reaches decides what the offsets read, and whether a
+  // marker stands on a value or on an edge.
+  this->ShowColorStops();
 }
 
 void QmitkVolumeTransferFunctionEditor::ShowColorStops()

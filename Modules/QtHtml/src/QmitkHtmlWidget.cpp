@@ -183,7 +183,13 @@ public:
   {
     // Lay the document out at the requested width to obtain the content height.
     m_Document->render(static_cast<litehtml::pixel_t>(width / m_Zoom));
-    return qRound(m_Document->height() * m_Zoom);
+    const int height = qRound(m_Document->height() * m_Zoom);
+
+    // Layouts also query widths the widget never gets, so restore the layout
+    // for the current viewport, which painting and hit testing rely on.
+    m_Document->render(static_cast<litehtml::pixel_t>(q->viewport()->width() / m_Zoom));
+
+    return height;
   }
 
   void Render()

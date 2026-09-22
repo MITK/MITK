@@ -155,11 +155,16 @@ namespace mitk {
       }
     }
 
+    std::vector<IOUtil::LoadInfo> loadInfos;
+
+    for (const auto& fileName : fileNames)
+      loadInfos.push_back(IOUtil::LoadInfo(fileName.toLocal8Bit().constData()));
+
     // Do the actual work of loading the data into the data storage
     DataStorage::SetOfObjects::Pointer data;
     try
     {
-      data = QmitkIOUtil::Load(fileNames, *dataStorage);
+      data = QmitkIOUtil::Load(loadInfos, *dataStorage);
     }
     catch (const mitk::Exception& e)
     {
@@ -168,8 +173,15 @@ namespace mitk {
     }
     const bool dsmodified = !data->empty();
 
-    if (dsmodified)
-      RecentData::Add(fileNames);
+    QStringList loadedFileNames;
+
+    for (int i = 0; i < fileNames.size(); ++i)
+    {
+      if (!loadInfos[i].m_Output.empty())
+        loadedFileNames.append(fileNames[i]);
+    }
+
+    RecentData::Add(loadedFileNames);
 
     // Set ASSERT status back to previous status.
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)

@@ -185,6 +185,13 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList &pa
     loadInfos.push_back(LoadInfo(file.toLocal8Bit().constData()));
   }
 
+  return Load(loadInfos, storage, parent);
+}
+
+mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(std::vector<LoadInfo> &loadInfos,
+                                                           mitk::DataStorage &storage,
+                                                           QWidget *parent)
+{
   mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
   Impl::ReaderOptionsDialogFunctor optionsCallback;
   std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback);

@@ -100,10 +100,14 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
 
            bool clearDataStorageFirst(false);
            mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+           const auto nodeCount = dataStorage->GetAll()->Size();
            dataStorage = sceneIO->LoadScene( arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
            mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
-           recentData.append(arguments[i]);
+
+           // LoadScene only logs its errors, so a scene that adds no nodes failed.
+           if (dataStorage->GetAll()->Size() > nodeCount)
+             recentData.append(arguments[i]);
          }
          else if (arguments[i].right(15) == ".mitksceneindex")
          {

@@ -187,7 +187,10 @@ public:
 
     // Layouts also query widths the widget never gets, so restore the layout
     // for the current viewport, which painting and hit testing rely on.
-    m_Document->render(static_cast<litehtml::pixel_t>(q->viewport()->width() / m_Zoom));
+    const int viewportWidth = q->viewport()->width();
+
+    if (width != viewportWidth)
+      m_Document->render(static_cast<litehtml::pixel_t>(viewportWidth / m_Zoom));
 
     return height;
   }

@@ -153,9 +153,9 @@ public:
    * \brief Returns the data for the given index and role.
    *
    * Supports Qt::DisplayRole for statistics values formatted for reading, Qt::EditRole for
-   * the same values unformatted, Qt::TextAlignmentRole, Qt::DecorationRole for label color
-   * icons and WIP hourglass indicators in the first column, and Qt::CheckStateRole for label
-   * rows while check boxes are offered.
+   * the raw values, Qt::ToolTipRole for the unrounded value of a cell, Qt::TextAlignmentRole,
+   * Qt::DecorationRole for label color icons and WIP hourglass indicators in the first column,
+   * and Qt::CheckStateRole for label rows while check boxes are offered.
    *
    * \param[in] index The model index to query.
    * \param[in] role The data role (e.g. Qt::DisplayRole, Qt::DecorationRole).
@@ -173,11 +173,13 @@ public:
    * \brief Returns the header data for the given section and orientation.
    *
    * Statistic columns are headed by a readable name of the statistic instead of its
-   * technical key, and offer a tooltip that spells out abbreviations.
+   * technical key, and offer a tooltip that spells out abbreviations. Qt::EditRole yields
+   * the key, so that an export stays machine readable.
    *
    * \param[in] section The column index.
    * \param[in] orientation The header orientation (only Qt::Horizontal is supported).
-   * \param[in] role The data role (Qt::DisplayRole, Qt::ToolTipRole or Qt::TextAlignmentRole).
+   * \param[in] role The data role (Qt::DisplayRole, Qt::EditRole, Qt::ToolTipRole or
+   * Qt::TextAlignmentRole).
    * \return The header data as QVariant.
    */
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;

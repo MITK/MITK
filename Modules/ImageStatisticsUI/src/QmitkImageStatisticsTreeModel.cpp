@@ -34,8 +34,9 @@ found in the LICENSE file.
 
 namespace
 {
-  /** Header text and header tooltip of a statistic. An empty tooltip means that the header
-  text already says everything there is to say. */
+  using ValueFormat = QmitkImageStatisticsTreeItem::ValueFormat;
+
+  /** Header text and header tooltip of a statistic. */
   struct StatisticDisplay
   {
     QString name;
@@ -60,8 +61,8 @@ namespace
       { Constants::MINIMUM(), { QStringLiteral("Min"), QStringLiteral("Minimum intensity") } },
       { Constants::MINIMUMPOSITION(), { QStringLiteral("Min position"), QStringLiteral("Voxel index of the minimum intensity") } },
       { Constants::NUMBEROFVOXELS(), { QStringLiteral("Voxels"), QStringLiteral("Number of voxels") } },
-      // The superscript is written as its UTF-8 bytes to keep the source file plain ASCII.
-      { Constants::VOLUME(), { QStringLiteral("Volume [mm\xC2\xB3]"), QStringLiteral("Volume in cubic millimeters") } },
+      // The superscript is escaped to keep the source file plain ASCII.
+      { Constants::VOLUME(), { QStringLiteral("Volume [mm\u00B3]"), QStringLiteral("Volume in cubic millimeters") } },
       { Constants::SKEWNESS(), { QStringLiteral("Skewness"), QStringLiteral("Asymmetry of the intensity distribution") } },
       { Constants::KURTOSIS(), { QStringLiteral("Kurtosis"), QStringLiteral("Tailedness of the intensity distribution") } },
       { Constants::UNIFORMITY(), { QStringLiteral("Uniformity"), QStringLiteral("Sum of the squared histogram probabilities") } },
@@ -73,24 +74,14 @@ namespace
     return displays;
   }
 
-  QString GetStatisticName(const std::string& key)
+  const StatisticDisplay* FindStatisticDisplay(const std::string& key)
   {
     const auto& displays = GetStatisticDisplays();
     const auto finding = displays.find(key);
 
     return displays.cend() != finding
-      ? finding->second.name
-      : QString::fromStdString(key);
-  }
-
-  QString GetStatisticToolTip(const std::string& key)
-  {
-    const auto& displays = GetStatisticDisplays();
-    const auto finding = displays.find(key);
-
-    return displays.cend() != finding
-      ? finding->second.toolTip
-      : QString();
+      ? &finding->second
+      : nullptr;
   }
 
   /** Significant digits the largest value of a column should show, and the range the
@@ -256,16 +247,17 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   if (role == Qt::DisplayRole)
   {
     const auto column = index.column();
+    const auto value = item->data(column, ValueFormat::Display);
 
     if (column > 0 && static_cast<size_t>(column - 1) < m_ColumnDecimals.size())
-      return FormatValue(item->data(column), m_ColumnDecimals[column - 1]);
+      return FormatValue(value, m_ColumnDecimals[column - 1]);
 
-    return item->data(column);
+    return value;
   }
   else if (role == Qt::EditRole)
   {
-    // The unformatted value, e.g. for the clipboard export.
-    return item->data(index.column());
+    // The raw value, e.g. for the clipboard export.
+    return item->data(index.column(), ValueFormat::Raw);
   }
   else if (role == Qt::TextAlignmentRole && index.column() > 0)
   {
@@ -293,9 +285,17 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
     const bool checked = this->IsLabelChecked(item->GetLabelInstance()->GetValue());
     return static_cast<int>(checked ? Qt::Checked : Qt::Unchecked);
   }
-  else if (role == Qt::ToolTipRole && this->IsCheckable(index))
+  else if (role == Qt::ToolTipRole)
   {
-    return QStringLiteral("Show the histogram of this label");
+    if (this->IsCheckable(index))
+      return QStringLiteral("Show the histogram of this label");
+
+    // The decimal places of a column are chosen for its largest value, which can round a
+    // small value of the same column down to nothing.
+    const auto value = item->data(index.column(), ValueFormat::Raw);
+
+    if (QMetaType::Double == value.typeId())
+      return QLocale().toString(value.toDouble(), 'f', QLocale::FloatingPointShortest);
   }
   return QVariant();
 }
@@ -418,21 +418,32 @@ QVariant QmitkImageStatisticsTreeModel::headerData(int section, Qt::Orientation 
   if (Qt::Horizontal != orientation)
     return QVariant();
 
-  if (Qt::DisplayRole == role)
+  if (Qt::DisplayRole == role || Qt::EditRole == role)
   {
-    return section == 0
-      ? QVariant(QStringLiteral("Images / Masks"))
-      : QVariant(GetStatisticName(m_StatisticNames.at(section - 1)));
+    if (section == 0)
+      return QVariant(QStringLiteral("Images / Masks"));
+
+    const auto& key = m_StatisticNames.at(section - 1);
+
+    // The key on purpose: an export has to stay machine readable.
+    if (Qt::EditRole == role)
+      return QVariant(QString::fromStdString(key));
+
+    const auto* display = FindStatisticDisplay(key);
+
+    return QVariant(nullptr != display
+      ? display->name
+      : QString::fromStdString(key));
   }
   else if (Qt::ToolTipRole == role)
   {
     if (section == 0)
       return QVariant(QStringLiteral("Images and their masks, broken down into groups, labels and time steps"));
 
-    const auto toolTip = GetStatisticToolTip(m_StatisticNames.at(section - 1));
+    const auto* display = FindStatisticDisplay(m_StatisticNames.at(section - 1));
 
-    if (!toolTip.isEmpty())
-      return QVariant(toolTip);
+    if (nullptr != display)
+      return QVariant(display->toolTip);
   }
   else if (Qt::TextAlignmentRole == role)
   {

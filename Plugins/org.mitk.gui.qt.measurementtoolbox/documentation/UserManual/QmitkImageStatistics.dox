@@ -36,7 +36,7 @@ After selection of an image, the image statistics are calculated and displayed i
 
 An example of parts of the calculated statistical features (Mean, Median, Std. dev., RMS, Max, Max position, Min, Min position, Voxels, Volume [mm³], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
 
-Hover over a column header to see what the column stands for. The values of a column share a fixed number of decimal places, chosen so that the largest value of the column is shown with a useful precision. The "Copy to clipboard" button exports the unrounded values.
+Hover over a column header to see what the column stands for. The values of a column share a fixed number of decimal places, chosen so that the largest value of the column is shown with a useful precision. Hover over a value to see it unrounded. The "Copy to clipboard" button exports the unrounded values under the technical keys of the statistics.
 
 \imageMacro{QmitkImageStatistics_statistics.png, "Example of parts of the statistics for different masks and timestamps", 1.00}
 

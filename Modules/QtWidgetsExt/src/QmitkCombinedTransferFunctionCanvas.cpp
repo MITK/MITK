@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 
 #include <QColorDialog>
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPolygon>
@@ -38,6 +39,13 @@ namespace
   constexpr int ROOF_HEIGHT = 5;
   constexpr int MARKER_WIDTH = 15;
 
+  /** \brief Room beside the plot for the outer half of a marker, plus the frame.
+   *
+   * A stop at either end of the axis is drawn on the end of the axis, so without
+   * this half of its marker would fall outside the widget and be clipped away.
+   */
+  constexpr int SIDE_MARGIN = 1 + MARKER_WIDTH / 2;
+
   /** \brief The grey below which a stop's own colour is too dark for a black
    *         dot to show on it.
    */
@@ -45,6 +53,13 @@ namespace
 
   /** \brief Opacity of the light ring just outside a marker's outline. */
   constexpr int MARKER_HALO_ALPHA = 120;
+
+  /** \brief Opacity of a marker standing for a stop the axis does not reach.
+   *
+   * Faded rather than shaped differently, so that it still carries the colour it
+   * is there to give hold of, and still reads as one of the markers.
+   */
+  constexpr int OFF_AXIS_ALPHA = 110;
 }
 
 QmitkCombinedTransferFunctionCanvas::QmitkCombinedTransferFunctionCanvas(QWidget *parent, Qt::WindowFlags f)
@@ -54,11 +69,11 @@ QmitkCombinedTransferFunctionCanvas::QmitkCombinedTransferFunctionCanvas(QWidget
   m_OpacityHeight(0.0)
 {
   // Everything that maps between values and pixels goes through contentsRect(),
-  // so reserving the rail here is all it takes for the histogram, the gradient
-  // and the curve to keep to the plot above it. Reserved whether or not there is
-  // anything to draw in it, so that the canvas does not change height when
-  // editing begins.
-  this->setContentsMargins(1, 1, 1, RAIL_HEIGHT);
+  // so reserving the rail and the marker's half-width here is all it takes for
+  // the histogram, the gradient and the curve to keep to the plot they leave.
+  // Reserved whether or not there is anything to draw in it, so that the canvas
+  // does not change size when editing begins.
+  this->setContentsMargins(SIDE_MARGIN, 1, SIDE_MARGIN, RAIL_HEIGHT);
 }
 
 void QmitkCombinedTransferFunctionCanvas::SetColorTransferFunction(vtkColorTransferFunction *colorTransferFunction)
@@ -116,6 +131,59 @@ QRect QmitkCombinedTransferFunctionCanvas::ColorStopRail() const
 bool QmitkCombinedTransferFunctionCanvas::IsOnColorStopRail(int y) const
 {
   return y > this->contentsRect().bottom();
+}
+
+bool QmitkCombinedTransferFunctionCanvas::IsColorStopOffAxis(int index) const
+{
+  const double value = this->GetColorStopValue(index);
+
+  return value < m_Lower || value > m_Upper;
+}
+
+int QmitkCombinedTransferFunctionCanvas::EdgeColorStop(AxisEdge edge) const
+{
+  const int count = this->GetColorStopCount();
+  int nearest = -1;
+
+  // VTK keeps its nodes in order, so the nearest stop below the axis is the last
+  // one under it and the nearest above is the first one over it.
+  for (int i = 0; i < count; ++i)
+  {
+    const double value = this->GetColorStopValue(i);
+
+    if (edge == AxisEdge::Lower && value < m_Lower)
+      nearest = i;
+
+    if (edge == AxisEdge::Upper && value > m_Upper && nearest == -1)
+      nearest = i;
+  }
+
+  return nearest;
+}
+
+int QmitkCombinedTransferFunctionCanvas::MarkerX(int index)
+{
+  const QRect contents = this->contentsRect();
+  const int halfWidth = MARKER_WIDTH / 2;
+  const double value = this->GetColorStopValue(index);
+
+  // Against the outside of the frame, so that the half of it the widget has room
+  // for is the half that reads as pointing away from the plot.
+  if (value < m_Lower)
+    return contents.left() - halfWidth - 1;
+
+  if (value > m_Upper)
+    return contents.right() + halfWidth + 1;
+
+  return this->FunctionToCanvas(std::make_pair(value, 0.0)).first;
+}
+
+bool QmitkCombinedTransferFunctionCanvas::GrabbedStopIsOffAxis() const
+{
+  return m_ActiveFunction == ActiveFunction::Color &&
+         m_GrabbedHandle != -1 &&
+         m_GrabbedHandle < this->GetColorStopCount() &&
+         this->IsColorStopOffAxis(m_GrabbedHandle);
 }
 
 void QmitkCombinedTransferFunctionCanvas::PaintColorGradient(QPainter &painter)
@@ -176,7 +244,7 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
 
   const QRect contents = this->contentsRect();
   painter.setPen(Qt::gray);
-  painter.drawRect(0, 0, contents.width() + 1, contents.height() + 1);
+  painter.drawRect(contents.x() - 1, contents.y() - 1, contents.width() + 1, contents.height() + 1);
 
   if (!hasContent)
     return;
@@ -248,12 +316,24 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
   }
 
   const int selected = this->GetSelectedColorStop();
+  const int lowerEdge = this->EdgeColorStop(AxisEdge::Lower);
+  const int upperEdge = this->EdgeColorStop(AxisEdge::Upper);
+
+  // Every stop beyond an end of the axis is drawn on that end, so only the one
+  // nearest it is: the rest would land underneath and say nothing. The selected
+  // one is always drawn, so that picking one from the list beside the canvas
+  // shows here too.
+  const auto isShown = [&](int index)
+  {
+    return index == selected || index == lowerEdge || index == upperEdge ||
+           !this->IsColorStopOffAxis(index);
+  };
 
   // The selected one last, since markers are wide enough that two close stops
   // overlap and the one being worked on is the one that has to stay whole.
   for (int i = 0; i < this->GetColorStopCount(); ++i)
   {
-    if (i != selected)
+    if (i != selected && isShown(i))
       this->PaintColorStop(painter, i, false);
   }
 
@@ -268,7 +348,8 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
   const QRect contents = this->contentsRect();
   const QRect rail = this->ColorStopRail();
 
-  const int x = this->FunctionToCanvas(std::make_pair(this->GetColorStopValue(index), 0.0)).first;
+  const int x = this->MarkerX(index);
+  const bool offAxis = this->IsColorStopOffAxis(index);
 
   const int halfWidth = MARKER_WIDTH / 2;
   const int apexY = contents.bottom() - ROOF_OVERLAP;
@@ -285,7 +366,12 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
          << QPointF(x - halfWidth + 0.5, baseY + 0.5)
          << QPointF(x - halfWidth + 0.5, eavesY + 0.5);
 
-  const QColor color = this->GetColorStopColor(index);
+  QColor color = this->GetColorStopColor(index);
+
+  // Drawn on the edge rather than on a value, so it is faded to say that it
+  // stands for a stop out beyond the axis rather than naming a place on it.
+  if (offAxis)
+    color.setAlpha(OFF_AXIS_ALPHA);
 
   // Without this the roof comes out as a blunt stub: its tip is one pixel wide
   // and the outline alone is as thick.
@@ -300,11 +386,17 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
   painter.drawPolygon(marker);
 
   painter.setBrush(color);
-  painter.setPen(QPen(Qt::black, 1));
+  painter.setPen(QPen(QColor(0, 0, 0, color.alpha()), 1));
   painter.drawPolygon(marker);
 
   if (!selected)
     return;
+
+  // An edge marker straddles the frame with half of it outside the widget, so
+  // the dot goes in the half that is on show.
+  const double dotX = offAxis
+    ? (x < contents.left() ? x + 0.5 * halfWidth : x - 0.5 * halfWidth)
+    : x + 0.5;
 
   // The dot sits on the stop's own colour, so which of black and white shows up
   // is the colour's to decide rather than something that can be fixed here.
@@ -312,7 +404,7 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
   // and would put a white dot on it.
   painter.setPen(Qt::NoPen);
   painter.setBrush(qGray(color.rgb()) < DARK_MARKER_GREY ? Qt::white : Qt::black);
-  painter.drawEllipse(QPointF(x + 0.5, 0.5 * (eavesY + baseY)), 2.5, 2.5);
+  painter.drawEllipse(QPointF(dotX, 0.5 * (eavesY + baseY)), 2.5, 2.5);
 }
 
 void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEvent)
@@ -324,10 +416,21 @@ void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEven
     return;
 
   const int previous = this->GetSelectedColorStop();
+  const QPoint pos = mouseEvent->position().toPoint();
 
-  m_ActiveFunction = this->IsOnColorStopRail(mouseEvent->position().toPoint().y())
+  m_ActiveFunction = this->IsOnColorStopRail(pos.y())
     ? ActiveFunction::Color
     : ActiveFunction::Opacity;
+
+  // The margins beside the plot are the markers' room rather than part of the
+  // axis, so a press there names no value: left to the base class it would add a
+  // point just off the end of the axis. What it can still mean is one of the
+  // handles reaching into the margin, so only a press on nothing is dropped.
+  const QRect contents = this->contentsRect();
+
+  if ((pos.x() < contents.left() || pos.x() > contents.right()) &&
+      this->GetNearHandle(pos.x(), pos.y()) == -1)
+    return;
 
   QmitkPiecewiseFunctionCanvas::mousePressEvent(mouseEvent);
 
@@ -340,6 +443,13 @@ void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEven
 void QmitkCombinedTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
   if (!m_Editable)
+    return;
+
+  // There is no position under the cursor for a stop that is not on the axis:
+  // the base class clamps a move onto it, so a drag begun on an edge marker
+  // would fetch its stop in from wherever out there it sits. Moving one is what
+  // the offset control and the wider axis are for.
+  if (this->GrabbedStopIsOffAxis())
     return;
 
   QmitkPiecewiseFunctionCanvas::mouseMoveEvent(mouseEvent);
@@ -374,6 +484,14 @@ void QmitkCombinedTransferFunctionCanvas::keyPressEvent(QKeyEvent *keyEvent)
   if (!m_Editable || this->GetHistogram() == nullptr)
     return;
 
+  // As with a drag, and for the same reason. Only the movement is refused:
+  // deleting a stop still means the same thing wherever it sits.
+  const bool moves = keyEvent->key() == Qt::Key_Left || keyEvent->key() == Qt::Key_Right ||
+                     keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down;
+
+  if (moves && this->GrabbedStopIsOffAxis())
+    return;
+
   QmitkPiecewiseFunctionCanvas::keyPressEvent(keyEvent);
 }
 
@@ -390,6 +508,12 @@ int QmitkCombinedTransferFunctionCanvas::GetNearHandle(int x, int y, unsigned in
 
   for (int i = 0; i < this->GetFunctionSize(); ++i)
   {
+    // Passed over rather than measured: a stop beyond the axis is drawn on the
+    // edge instead of where it sits, so its own position says nothing about
+    // what a click means - and is far enough out to overflow the squaring.
+    if (this->IsColorStopOffAxis(i))
+      continue;
+
     const auto handle = this->FunctionToCanvas(std::make_pair(this->GetFunctionX(i), 0.0));
     const int distance = handle.first - x;
     const auto squaredDistance = static_cast<unsigned int>(distance * distance);
@@ -401,7 +525,22 @@ int QmitkCombinedTransferFunctionCanvas::GetNearHandle(int x, int y, unsigned in
     }
   }
 
-  return nearest;
+  if (nearest != -1)
+    return nearest;
+
+  // Nothing on the axis was within reach, so a gesture past either end of the
+  // plot is one on the marker standing for what lies beyond that end. The stops
+  // on the axis are answered for first, since a stop sitting on the very end is
+  // drawn across the frame and would otherwise be unreachable.
+  const QRect contents = this->contentsRect();
+
+  if (x < contents.left())
+    return this->EdgeColorStop(AxisEdge::Lower);
+
+  if (x > contents.right())
+    return this->EdgeColorStop(AxisEdge::Upper);
+
+  return -1;
 }
 
 int QmitkCombinedTransferFunctionCanvas::AddFunctionPoint(double x, double val)

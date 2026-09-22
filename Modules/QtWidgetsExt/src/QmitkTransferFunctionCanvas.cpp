@@ -156,8 +156,14 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
 
     p.setPen(Qt::gray);
 
-    int displayWidth = contentsRect().width();
-    int displayHeight = contentsRect().height();
+    // The plot is the contents rect, which is where the curve and the coordinate
+    // transforms put it; only a margin no wider than the frame keeps that within
+    // a pixel of the widget's own corner.
+    const QRect contents = this->contentsRect();
+    p.translate(contents.topLeft());
+
+    int displayWidth = contents.width();
+    int displayHeight = contents.height();
 
     double windowLeft = m_Lower;
     double windowRight = m_Upper;

@@ -198,6 +198,13 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
       Color
     };
 
+    /** \brief An end of the displayed value range, which a stop can lie beyond. */
+    enum class AxisEdge
+    {
+      Lower,
+      Upper
+    };
+
     /** \brief The strip along the bottom edge that the color stops sit in. */
     QRect ColorStopRail() const;
 
@@ -206,13 +213,48 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     bool IsOnColorStopRail(int y) const;
 
+    /**
+     * \brief Whether a stop names a value the axis does not reach.
+     *
+     * The presets are authored on the scale their modality is measured in, while
+     * the axis covers the band the image occupies, so the outermost stops of a
+     * preset routinely sit outside it.
+     */
+    bool IsColorStopOffAxis(int index) const;
+
+    /**
+     * \brief The stop standing for everything beyond one end of the axis.
+     *
+     * The nearest one out there rather than the outermost: it is the stop the
+     * visible end of the gradient is interpolated against, and the one a gesture
+     * at that end is most likely to mean.
+     *
+     * \return The index, or -1 where nothing lies beyond that end.
+     */
+    int EdgeColorStop(AxisEdge edge) const;
+
+    /** \brief Where a stop's marker is drawn: on the value it names, or pressed
+     *         against the edge it lies beyond.
+     */
+    int MarkerX(int index);
+
+    /** \brief Whether the gesture in progress has hold of a stop that is not on
+     *         the axis, and so has nowhere on the axis to be moved to.
+     */
+    bool GrabbedStopIsOffAxis() const;
+
     void PaintColorGradient(QPainter &painter);
 
     /** \brief Draw grabbable handles for both functions. */
     void PaintHandles(QPainter &painter);
 
-    /** \brief One marker per color stop: a house whose roof points at the value
-     *         the color applies to.
+    /**
+     * \brief One marker per color stop: a house whose roof points at the value
+     *        the color applies to.
+     *
+     * A stop the axis does not reach is drawn half outside the frame and faded,
+     * which says that it lies beyond that end rather than claiming a value on
+     * the axis for it.
      */
     void PaintColorStop(QPainter &painter, int index, bool selected);
 

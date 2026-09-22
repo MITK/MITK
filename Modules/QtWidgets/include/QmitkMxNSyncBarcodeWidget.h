@@ -207,8 +207,10 @@ Q_SIGNALS:
    *        The two are deliberately separate. A receiver that answers the strip
    *        (the editor's sync peek) stays up for as long as the pointer is on it
    *        and only changes which axis it emphasises, so crossing the gap between
-   *        two glyphs does not tear the answer down. Only glyph rendering reports:
-   *        a collapsed colour-bar slot shows the user nothing to point at.
+   *        two glyphs does not tear the answer down. Being on the strip is
+   *        reported in either render mode; a collapsed colour-bar slot simply
+   *        names no axis, since a featureless 7 px column shows nothing to point
+   *        at, and the receiver answers with none emphasised.
    */
   void PeekHovered(bool overStrip, int axisIndex);
 

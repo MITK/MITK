@@ -471,16 +471,20 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
 
     // Reporting is separate from the whole-strip hover above: it tells a receiver
     // that answers editor-wide (the sync peek) where the pointer is, and touches
-    // nothing this strip paints. Only glyph rendering reports - a collapsed
-    // colour-bar slot is a featureless 7 px column, so the user cannot see which
-    // axis they are pointing at.
-    const bool reportable = over && layout.mode == BarcodeLayout::Mode::Glyphs;
-    const int reportedSlot = reportable ? this->SlotAt(event->pos()) : -1;
-    if (reportable != m_ReportedOverStrip || reportedSlot != m_ReportedSlot)
+    // nothing this strip paints. Being on the strip is reported in either render
+    // mode, because the answer is about the whole window and not only about one
+    // axis. Only the emphasis needs a glyph to point at: a collapsed colour-bar
+    // slot is a featureless 7 px column, so it names no axis and the receiver
+    // answers with none emphasised - the same state as resting between two
+    // glyphs.
+    const int reportedSlot = over && layout.mode == BarcodeLayout::Mode::Glyphs
+                               ? this->SlotAt(event->pos())
+                               : -1;
+    if (over != m_ReportedOverStrip || reportedSlot != m_ReportedSlot)
     {
-      m_ReportedOverStrip = reportable;
+      m_ReportedOverStrip = over;
       m_ReportedSlot = reportedSlot;
-      emit PeekHovered(reportable, reportedSlot);
+      emit PeekHovered(over, reportedSlot);
     }
   }
   QWidget::mouseMoveEvent(event);

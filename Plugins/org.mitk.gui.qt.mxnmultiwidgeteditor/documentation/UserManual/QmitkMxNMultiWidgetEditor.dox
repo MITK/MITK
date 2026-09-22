@@ -173,6 +173,11 @@
 	shows none, rather than shrinking the plates in every other window down to its
 	size and making them harder to read against each other.
 
+	A barcode squeezed too narrow for glyphs collapses to plain colour slots. Pointing
+	at it still brings the plates up - the answer is about the whole window, not only
+	about one axis - but a colour slot names no axis, so they come up with none
+	emphasised.
+
 	The slice control and the view-direction control are no longer in this menu: slice
 	scrolling lives in the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator),
 	and the view direction is changed by clicking the plane label

@@ -80,7 +80,7 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Glyph_LargeRenderIsNotAnUpscaledResource);
   MITK_TEST(Barcode_PassiveStripReportsTheGlyphUnderThePointer);
   MITK_TEST(Barcode_PassiveStripReportsLeavingTheGlyphsButNotTheStrip);
-  MITK_TEST(Barcode_PassiveStripIsSilentInColorBarMode);
+  MITK_TEST(Barcode_PassiveStripReportsColorBarModeWithoutAnAxis);
   MITK_TEST(Barcode_PassiveStripStillOpensTheLayoutEditor);
   MITK_TEST(Barcode_ClickableStripReportsInBothRenderModes);
   MITK_TEST(PaintPath_PlateDoesNotCrash);
@@ -870,8 +870,12 @@ public:
                            !recorder.onStrip.back());
   }
 
-  void Barcode_PassiveStripIsSilentInColorBarMode()
+  void Barcode_PassiveStripReportsColorBarModeWithoutAnAxis()
   {
+    // The peek answers for the whole window, so a strip too narrow for glyphs
+    // still has something to show. It just names no axis: a featureless colour
+    // slot gives the user nothing to point at, so the answer comes up with none
+    // emphasised rather than not at all.
     QmitkMxNSyncBarcodeWidget strip;
     strip.SetSlots(EightSlots());
     strip.resize(63, 16);
@@ -883,8 +887,13 @@ public:
 
     MoveTo(strip, QPoint(3, 8));
     MoveTo(strip, QPoint(27, 8));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("A featureless color slot gives the user nothing to point at",
-                                 0, static_cast<int>(recorder.peekAxes.size()));
+
+    CPPUNIT_ASSERT_MESSAGE("Being on a collapsed strip is still reported",
+                           !recorder.onStrip.isEmpty() && recorder.onStrip.back());
+    for (const int axis : recorder.peekAxes)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("but it names no axis", -1, axis);
+    }
   }
 
   void Barcode_PassiveStripStillOpensTheLayoutEditor()

@@ -1,5 +1,9 @@
 MITK_CREATE_MODULE_TESTS()
 
+mitkAddCustomModuleTest(QmitkDataStorageListModelTest QmitkDataStorageListModelTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkDataStorageTreeModelTest QmitkDataStorageTreeModelTest
   -platform minimal
 )

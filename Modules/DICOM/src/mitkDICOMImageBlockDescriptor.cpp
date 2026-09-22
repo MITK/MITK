@@ -843,7 +843,6 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     const DICOMTag tagSOPInstanceNumber( 0x0008, 0x0018 );
 
     std::unordered_map<std::string, DICOMCachedValueLookupTable> additionalTagResultList;
-    std::set<std::string> keysFilledFromFunctionalGroup;
     std::set<std::string> reportedDuplicateKeys;
     const auto WarnAboutDuplicate = [&reportedDuplicateKeys](const std::string& propKey,
                                                              const std::string& file)
@@ -889,6 +888,7 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
       MITK_DEBUG << "Tag info for slice " << slice << ": SL '" << sliceLocation << "' IN '" << instanceNumber
                  << "' SOP instance UID '" << sopInstanceUID << "'";
 
+      std::set<std::string> keysFilledFromFunctionalGroup;
       for (const auto& tag : m_AdditionalTagMap)
       {
         const DICOMTagCache::FindingsListType findings = tagCache->GetTagValue( *frameIter, tag.first );

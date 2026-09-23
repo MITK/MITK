@@ -170,9 +170,9 @@ void mitk::DICOMDCMTKTagScanner::AddTagPaths(const DICOMTagPathList& paths)
   }
 }
 
-void mitk::DICOMDCMTKTagScanner::SetExpandFunctionalGroups(bool expand)
+void mitk::DICOMDCMTKTagScanner::SetReadFrameModel(bool read)
 {
-  m_ExpandFunctionalGroups = expand;
+  m_ReadFrameModel = read;
 }
 
 void mitk::DICOMDCMTKTagScanner::SetInputFiles( const StringList& filenames )
@@ -265,13 +265,7 @@ namespace
 
   mitk::DICOMTagPath RootedIn(const DcmTagKey& root, const mitk::DICOMTagPath& path)
   {
-    mitk::DICOMTagPath result;
-    result.AddAnySelection(root.getGroup(), root.getElement());
-    for (const auto& node : path.GetNodes())
-    {
-      result.AddNode(node);
-    }
-    return result;
+    return mitk::DICOMTagPath().AddAnySelection(root.getGroup(), root.getElement()) + path;
   }
 
   /** A path rooted in a functional group is searched as registered and never
@@ -319,12 +313,13 @@ void mitk::DICOMDCMTKTagScanner::Scan()
         DICOMGenericImageFrameInfo::Pointer info = DICOMGenericImageFrameInfo::New(fileName);
         DcmDataset& dataset = *dfile.getDataset();
 
-        const auto layout = ReadFrameLayout(dataset, fileName, warningsThisScan);
+        const auto layout = m_ReadFrameModel ? ReadFrameLayout(dataset, fileName, warningsThisScan)
+                                             : DICOMFrameLayout();
 
-        // Only the frame-model reader reads findings under a functional-group
-        // root, and only for a file it reads frame by frame; every other file
-        // keeps file-level infos, which never answer with such a finding.
-        const bool expand = m_ExpandFunctionalGroups && layout.HasFrameModel();
+        // Only a file the reader reads frame by frame is searched under the
+        // functional-group roots; every other file keeps file-level infos,
+        // which never answer with such a finding.
+        const bool expand = layout.HasFrameModel();
 
         for (const auto& path : this->m_ScannedTags)
         {
@@ -349,10 +344,10 @@ void mitk::DICOMDCMTKTagScanner::Scan()
 
     ReportWarnings(warningsThisScan);
 
-    // Gated on a frame model rather than on the switch alone: a rooted
-    // registration loses its property only for a frame-model file, so warning
-    // on a classic series would repeat a message that does not apply to it.
-    if (m_ExpandFunctionalGroups && newCache->HasAnyFrameModel())
+    // A rooted registration loses its property only for a frame-model file,
+    // so warning on a classic series would repeat a message that does not
+    // apply to it.
+    if (newCache->HasAnyFrameModel())
     {
       WarnAboutRootedRegistrations(this->m_ScannedTags);
     }

@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 
         auto scanner = mitk::DICOMDCMTKTagScanner::New();
         scanner->AddTagPaths(reader->GetTagsOfInterest());
-        scanner->SetExpandFunctionalGroups(true);
+        scanner->SetReadFrameModel(true);
         scanner->SetInputFiles(relevantFiles);
         scanner->Scan();
 

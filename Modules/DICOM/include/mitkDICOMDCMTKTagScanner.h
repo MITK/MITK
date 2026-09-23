@@ -79,14 +79,16 @@ namespace mitk
       DICOMTagCache::Pointer GetScanCache() const override;
 
       /**
-      \brief Also search every registered path inside the shared and per-frame
-      functional groups of a file that has a frame model.
+      \brief Detect the frame model of every scanned file, and for a file that
+      has one, also search every registered path inside its shared and
+      per-frame functional groups.
 
-      Only a reader that builds frame-scoped infos reads those findings, so this
-      is off by default and a scanner that does not ask for it behaves as it
-      always has.
+      Only a reader that builds frame-scoped infos needs either, so this is off
+      by default. Without it every file reports an empty frame layout, no
+      frame-model finding is collected or logged, and the scan stores only
+      what the registered paths find as registered.
       */
-      void SetExpandFunctionalGroups(bool expand);
+      void SetReadFrameModel(bool read);
 
     protected:
 
@@ -96,7 +98,7 @@ namespace mitk
       std::set<DICOMTagPath> m_ScannedTags;
       StringList m_InputFilenames;
       DICOMGenericTagCache::Pointer m_Cache;
-      bool m_ExpandFunctionalGroups = false;
+      bool m_ReadFrameModel = false;
 
     private:
       DICOMDCMTKTagScanner(const DICOMDCMTKTagScanner&);

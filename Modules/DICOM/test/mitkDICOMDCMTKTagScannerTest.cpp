@@ -47,6 +47,7 @@ class mitkDICOMDCMTKTagScannerTestSuite : public mitk::TestFixture
   MITK_TEST(SingleElementPathIsNotExpanded);
   MITK_TEST(RootedRegistrationIsNotExpandedAndWarnsOncePerScan);
   MITK_TEST(RootedRegistrationDoesNotWarnWithoutFrameModel);
+  MITK_TEST(NoFrameModelWithoutTheSwitch);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -78,13 +79,7 @@ private:
 
   static mitk::DICOMTagPath Rooted(unsigned int rootElement, const mitk::DICOMTagPath& path)
   {
-    mitk::DICOMTagPath result;
-    result.AddAnySelection(0x5200, rootElement);
-    for (const auto& node : path.GetNodes())
-    {
-      result.AddNode(node);
-    }
-    return result;
+    return mitk::DICOMTagPath().AddAnySelection(0x5200, rootElement) + path;
   }
 
   static mitk::DICOMTagPath Explicit(unsigned int rootElement, unsigned int item,
@@ -135,7 +130,7 @@ private:
     {
       aScanner->AddTagPath(path);
     }
-    aScanner->SetExpandFunctionalGroups(expand);
+    aScanner->SetReadFrameModel(expand);
     aScanner->Scan();
 
     return aScanner->GetFrameInfoList();
@@ -380,6 +375,26 @@ public:
     Scan(ctFiles, { rooted }, true);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("No warning without a frame-model file", 0u, warnings.GetCount());
+  }
+
+  /** A scanner that does not feed a frame-model reader, such as the RT, SEG or
+      CEST ones, neither detects a frame model nor warns about one, however
+      the file is laid out. */
+  void NoFrameModelWithoutTheSwitch()
+  {
+    auto ragged = this->MakeEnhanced();
+    ragged.perFrameItemCountOverride = FRAME_COUNT - 1;
+    const std::string raggedFile = this->Write(ragged);
+
+    auto aScanner = mitk::DICOMDCMTKTagScanner::New();
+    aScanner->SetInputFiles({ this->Write(this->MakeEnhanced()), raggedFile });
+    aScanner->AddTagPath(RescaleSlope());
+
+    mitk::DICOMTestWarningCounter warnings(raggedFile);
+    aScanner->Scan();
+
+    CPPUNIT_ASSERT_MESSAGE("No frame model without the switch", !aScanner->GetScanCache()->HasAnyFrameModel());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("No frame-model warning without the switch", 0u, warnings.GetCount());
   }
 };
 

@@ -386,7 +386,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
 
           mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
           scanner->AddTagPaths(reader->GetTagsOfInterest());
-          scanner->SetExpandFunctionalGroups(true);
+          scanner->SetReadFrameModel(true);
           scanner->SetInputFiles(relevantFiles);
           scanner->Scan();
 

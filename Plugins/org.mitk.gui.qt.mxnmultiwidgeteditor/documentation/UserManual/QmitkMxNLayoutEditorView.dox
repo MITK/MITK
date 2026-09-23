@@ -8,8 +8,9 @@
 \section org_mitk_views_mxnlayouteditor_Overview Overview
 	The MxN Layout Editor is the authoritative view of the whole layout document of an
 	MxN display (\ref org_mitk_editors_mxnmultiwidget): the window arrangement and all
-	synchronization groups. Open it with the display's layout button, by clicking the
-	sync barcode in any window's utility menu, or via <i>Window &rarr; Show View</i>.
+	synchronization groups. Open it by clicking the sync barcode in any window's utility
+	menu, with "Open layout editor" from a window view's context menu, or via
+	<i>Window &rarr; Show View</i>.
 	As a dockable view it stays open during review sessions and doubles as a live
 	legend of the current coupling.
 
@@ -63,9 +64,9 @@
 	the display.
 
 \subsection org_mitk_views_mxnlayouteditor_Assign Assigning windows to a group
-	Selected windows join a group by clicking the group card's "Assign selection"
-	button, by dragging the tiles onto the card, or by dragging the group's color swatch
-	from the card onto a tile. "Remove selection" takes them out of the group again.
+	Selected windows join a group with "Add selected windows" from the group card's "..."
+	menu, by dragging the tiles onto the card, or by dragging the card onto a tile.
+	"Remove selected windows" in the same menu takes them out of the group again.
 
 	A drop can join in three ways. A plain drop <b>replaces</b>: the window leaves its
 	other groups and wholly joins the target. Holding <i>Alt</i> <b>merges</b>, keeping
@@ -94,9 +95,9 @@
 			"Link navigation" applies the pan, zoom, slice and crosshair bundle explicitly.
 		<li> "Re-converge" re-establishes reference + offset for the group's
 			slice/zoom/pan members after drift (e.g. from boundary clamping).
-		<li> "Reinit geometry" re-initializes the shared reference geometry of the
-			group's slice/orientation neighborhood; only these windows are affected,
-			unlike the application-wide reinit of the Data Manager.
+		<li> "Fit views to visible data" frames the group's slice/orientation
+			neighborhood around the data visible in its first window; only these windows
+			are affected, unlike the application-wide "Fit views to ..." actions.
 	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Advanced The advanced matrix

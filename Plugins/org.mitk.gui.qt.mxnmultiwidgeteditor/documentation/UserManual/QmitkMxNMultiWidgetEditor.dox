@@ -21,27 +21,15 @@
 	The following sections describe how to work with the MxN display. The MxN display can be customized and several
 	properties can be set to modify the behavior.
 
-\subsection org_mitk_editors_mxnmultiwidget_Configuration Configuration Toolbar
-	The MxNDisplay is initialized with a single window view and a configuration toolbar on the right side.
-	In the toolbar you can find three icons / actions, where two buttons have an on/off state.
-	<table style="border: none;">
-		<tr><td>\imageMacro{mwLayout-dox.svg, "Layout button", 16.00}
-		<tr><td>\imageMacro{mwSynchronized-dox.svg, "Synchronize button", 16.00}
-			<td>\imageMacro{mwDesynchronized-dox.svg, "Desynchronize button", 16.00}
-		<tr><td>\imageMacro{mwMITK-dox.svg, "MITK mode button", 16.00}
-			<td>\imageMacro{mwPACS-dox.svg, "PACS mode button", 16.00}
-	</table>
-
-	<ul>
-		<li> Layout button: Open the MxN Layout Editor view (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor), which holds the grid/preset/save/load controls and the synchronization groups
-		<li> Synchronization button: Enable or disable synchronized interaction across the window views
-		<li> Interaction mode button: Switch between the MITK interaction mouse mode and the PACS interaction mouse mode
-	</ul>
+\subsection org_mitk_editors_mxnmultiwidget_Configuration Configuring the display
+	The MxN display starts with a single window view. Its arrangement, the layout files and the
+	synchronization groups are configured in the MxN Layout Editor view
+	(see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor).
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Layout MxN display layout
 	There are several options to customize the MxN display layout.
 
-	The MxN Layout Editor (opened via the toolbar's layout button) offers them in two places:
+	The MxN Layout Editor offers them in two places:
 	<ul>
 		<li> Its "Layout" row at the top applies one of the presets that ship with MITK, loads a
 			layout file, or saves the current layout. A saved layout carries the synchronization
@@ -81,20 +69,21 @@
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Synchronization Window synchronization
 	If data is displayed inside a window view you can interact with the window / loaded image using your mouse.
-	As long as the interaction synchronization is disabled (<img src="mwDesynchronized-dox.svg">), mouse interactions,
-	such as zooming, setting the point of interest, mouse wheel scrolling etc. will affect only the window view you click in.
-	If the interaction synchronization is enabled (<img src="mwSynchronized-dox.svg">), performing any of the mouse interactions inside a window view
-	will perform the same interaction in any other visible window view.
+	Navigation such as zooming, moving the image, setting the point of interest or scrolling through slices
+	affects the window view you interact with and every window view that shares a synchronization group with
+	it for that dimension (see \ref org_mitk_editors_mxnmultiwidget_DimSync). A window view without a group for
+	a dimension is navigated on its own.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Interaction_Mode Mouse interaction mode
 	As mentioned before, you can use the mouse to interact with each window / loaded image.
-	There are two interaction modes which can be switched between using the interaction mode button:
+	There are two interaction modes which can be switched between with the "PACS-like mouse interaction"
+	check box of the MxN Layout Editor, or with the corresponding preference:
 	the MITK interaction mouse mode and the PACS interaction mouse mode.
 	If the PACS interaction mouse mode is selected, an interaction tool bar is added to the left side of the
 	MxN display: It allows to select the action to perform for the left mouse button.
 	The difference between the MITK and PACS mode is as follows:
 
-	MITK interaction mouse mode <img src="mwMITK-dox.svg">
+	MITK interaction mouse mode
 	<ul>
 		<li> left mouse button: setting the point of interest
 		<li> right mouse button: zooming in and out while moving the mouse
@@ -104,7 +93,7 @@
 		<li> left / right arrow key: stepping through the time steps
 	</ul>
 
-	PACS interaction mouse mode <img src="mwPACS-dox.svg">
+	PACS interaction mouse mode
 	<ul>
 		<li> left mouse button: depending on the selected mode in the interaction tool bar
 		<li> right mouse button: changing the level window for the topmost visible image under the mouse cursor
@@ -185,8 +174,7 @@
 	about one axis - but a colour slot names no axis, so they come up with none
 	emphasised.
 
-	The slice control and the view-direction control are no longer in this menu: slice
-	scrolling lives in the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator),
+	Slice scrolling lives in the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator),
 	and the view direction is changed by clicking the plane label
 	(\ref org_mitk_editors_mxnmultiwidget_View_Direction).
 
@@ -233,7 +221,7 @@
 \subsubsection org_mitk_editors_mxnmultiwidget_ContextMenu Context menu
 	A right click into a window view (without dragging - the right-button gestures
 	keep working) opens a context menu with per-window data visibility toggles, the
-	view direction, the sync actions (re-converge, reinit group geometry), the layout
+	view direction, the sync actions (re-converge, fit group views to visible data), the layout
 	editor, and the clean view toggle. Visibility changes affect only the clicked
 	window.
 
@@ -280,7 +268,7 @@
 	orientation group, the change propagates to the group's other windows.
 
 \subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
-	Beyond the editor-wide synchronize toggle, window views can be coupled per dimension:
+	Window views are coupled per dimension:
 	pan, zoom, slice, crosshair, orientation, windowing (level/window), and LUT (colormap).
 	Cells that share a named group for a dimension follow each other on exactly that
 	dimension. Slice, zoom, and pan links can additionally carry an offset relative to the
@@ -290,8 +278,8 @@
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutEditor The MxN Layout Editor
 	The MxN Layout Editor is the authoritative view of the whole layout document: the
 	window arrangement, the layout file actions, and all synchronization groups. Open
-	it with the display's layout button, by clicking the sync barcode in any window's
-	utility menu, or via <i>Window &rarr; Show View</i>. As a dockable view it stays
+	it by clicking the sync barcode in any window's utility menu, with "Open layout
+	editor" from a window view's context menu, or via <i>Window &rarr; Show View</i>. As a dockable view it stays
 	open during review sessions and doubles as a live legend of the current coupling.
 
 	Its own manual page describes the window map, the group cards and the advanced

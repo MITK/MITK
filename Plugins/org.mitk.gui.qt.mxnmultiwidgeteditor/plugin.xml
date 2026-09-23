@@ -13,7 +13,7 @@
           name="MxN Layout Editor"
           class="QmitkMxNLayoutEditorView"
           icon="resources/MxNMultiWidgetEditor.svg"
-          category="org.mitk.views.general"/>
+          category="General"/>
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

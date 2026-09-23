@@ -147,6 +147,16 @@
          </spacer>
         </item>
         <item>
+         <widget class="QComboBox" name="blendModeComboBox">
+          <property name="toolTip">
+           <string>How the samples along each viewing ray are combined into one pixel. Composite is the only one that builds up a three-dimensional image, and the only one any lighting applies to; the rest flatten each ray to a single value and read as a projection radiograph.</string>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="editModeButton">
           <property name="toolTip">
            <string>Edit the transfer function point by point.</string>

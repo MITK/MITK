@@ -540,8 +540,8 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
   // Shown only away from the default, so the panel carries no weight for the
   // common case while a greyed-out lighting section always has a visible cause.
-  // A readout rather than a control: the mode comes with the transfer function
-  // now, from the preset applied.
+  // A readout rather than a control: the mode comes with the transfer function,
+  // from the preset applied, and is changed only while editing that curve.
   const bool showBlendModeHint = volumeRenderingOn && blendMode != mitk::VolumeBlendMode::Composite;
   m_Controls->blendModeHintLabel->setVisible(showBlendModeHint);
 

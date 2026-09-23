@@ -127,6 +127,7 @@ private slots:
   void OnPresetContextMenu(const QPoint &pos);
   void OnAddColorStop();
   void OnPickColorStopColor();
+  void OnBlendModeChanged(int index);
 
 private:
   /**
@@ -215,6 +216,13 @@ private:
    * whatever supplies the curve supplies this too.
    */
   void ApplyBlendMode(mitk::VolumeBlendMode blendMode);
+
+  /** \brief Point the blend mode control at what the bound node records.
+   *
+   * A mode outside the set MITK offers selects no entry rather than passing for
+   * one of them - see mitk::GetVolumeBlendMode.
+   */
+  void ShowNodeBlendMode();
 
   /** \brief Take over the function the bound node already carries. */
   void AdoptTransferFunctionFromNode();

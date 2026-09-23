@@ -85,8 +85,9 @@ three-dimensional image in which nearer tissue hides what lies behind it.
 <tt>CT-MIP</tt> and <tt>MR-MIP</tt> are the exceptions: they render a maximum
 intensity projection, which keeps the brightest value along each viewing ray.
 Depth is lost, but dense structures such as contrast-filled vessels stay visible
-however much tissue surrounds them. The mode comes with the preset, and while it
-is anything other than Composite, a line under the rendering button names it.
+however much tissue surrounds them. The mode comes with the preset, can be
+changed while editing the curve, and while it is anything other than Composite,
+a line under the rendering button names it.
 
 The preset in force is the entry marked in the grid. An asterisk after its name
 says the curve has since been moved away from it, whether by the sliders
@@ -222,6 +223,13 @@ to take in every point of both curves, so that each stop stands at its own value
 and can be dragged like any other. The image's band then takes up only part of
 the plot. Every edit starts with the box ticked, and the axis returns to the
 band when the edit ends.
+
+The list beside <b>Edit</b>, shown only while editing, is the blend mode the
+curve is rendered in. It starts on the mode the preset brought. Changing it
+counts as an edit like any drawn on the canvas: the preset's entry is starred,
+and the choice lasts as long as the drawing does, so <b>Save as preset...</b>
+is how to keep it. Only <b>Composite</b> builds a three-dimensional image and
+takes lighting; the others flatten each ray to a single value.
 
 Ending the edit keeps whatever you drew; there is no way back to the curve that
 stood before it other than clicking the preset's entry, which rebuilds the

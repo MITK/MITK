@@ -801,6 +801,19 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->fitAxisCheckBox, &QCheckBox::toggled,
     this, &QmitkVolumeTransferFunctionEditor::ApplyAxisRange);
 
+  // Identified by their stable ids rather than by row, so that reordering the
+  // modes cannot silently change what a row selects.
+  for (const auto &description : mitk::VolumeBlendModeDescription::GetAll())
+  {
+    m_Controls->blendModeComboBox->addItem(
+      QString::fromStdString(description.label), QString::fromStdString(description.id));
+    m_Controls->blendModeComboBox->setItemData(m_Controls->blendModeComboBox->count() - 1,
+      QString::fromStdString(description.description), Qt::ToolTipRole);
+  }
+
+  connect(m_Controls->blendModeComboBox, &QComboBox::currentIndexChanged,
+    this, &QmitkVolumeTransferFunctionEditor::OnBlendModeChanged);
+
   // Each of these hands the request straight to the canvas, which is where the
   // rules about what may happen to a stop live, so that a stop moved from here
   // and one dragged on the canvas cannot come out differently.
@@ -1145,6 +1158,43 @@ void QmitkVolumeTransferFunctionEditor::ApplyBlendMode(mitk::VolumeBlendMode ble
     return;
 
   mitk::SetVolumeBlendMode(node.GetPointer(), blendMode);
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowNodeBlendMode()
+{
+  const auto blendMode = mitk::GetVolumeBlendMode(m_DataNode.Lock().GetPointer());
+
+  const auto *description =
+    blendMode.has_value() ? mitk::VolumeBlendModeDescription::FromMode(*blendMode) : nullptr;
+
+  // Blocked because this reports what the node already says; letting it through
+  // would write that same value straight back and mark the curve as edited.
+  const QSignalBlocker blocker(m_Controls->blendModeComboBox);
+
+  m_Controls->blendModeComboBox->setCurrentIndex(description != nullptr
+    ? m_Controls->blendModeComboBox->findData(QString::fromStdString(description->id))
+    : -1);
+}
+
+void QmitkVolumeTransferFunctionEditor::OnBlendModeChanged(int index)
+{
+  const auto *description = mitk::VolumeBlendModeDescription::FromId(
+    m_Controls->blendModeComboBox->itemData(index).toString().toStdString());
+
+  if (description == nullptr)
+    return;
+
+  this->ApplyBlendMode(description->mode);
+
+  // An edit like any drawn on the canvas: the preset names a mode of its own,
+  // and the next selection's replay puts that one back, so saving it as a
+  // preset is how a mode chosen here is kept.
+  m_CurveEdited = true;
+  this->ShowPresetEdited();
+
+  // The curve did not change, but what the render window makes of it did, and
+  // the host gates its lighting section on the mode.
+  emit TransferFunctionChanged();
 }
 
 void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
@@ -1646,6 +1696,13 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   m_Controls->canvasHintLabel->setVisible(m_EditModeActive);
   m_Controls->colorStopPanel->setVisible(m_EditModeActive);
   m_Controls->fitAxisCheckBox->setVisible(m_EditModeActive);
+  m_Controls->blendModeComboBox->setVisible(m_EditModeActive);
+
+  // Only on show while editing, and the preset grid that would change the mode
+  // behind its back is greyed out for as long, so entering is the one moment it
+  // has to catch up with what a preset or another node left behind.
+  if (m_EditModeActive)
+    this->ShowNodeBlendMode();
 
   {
     // Each visit starts on the band however the last one was left: the axis

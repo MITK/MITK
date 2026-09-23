@@ -340,7 +340,7 @@ public:
   void SharedRescaleIsOneFrameRelativeProperty()
   {
     auto object = this->MakeEnhanced();
-    object.rescaleInSharedGroup = true;
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::Shared;
     object.frames.front().slope = 7.0;
 
     const auto image = this->LoadOne(object.Write(this->CaseDir(), "enhanced.dcm"));
@@ -383,7 +383,7 @@ public:
   void SharedAndPerFrameAttributesBothReachEverySlot()
   {
     auto object = this->MakeEnhanced();
-    object.rescaleInSharedGroup = true;
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::Shared;
     object.frames.front().slope = 7.0;
 
     const auto image = this->LoadOne(object.Write(this->CaseDir(), "shared_and_per_frame.dcm"));

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QClipboard>
 #include <QGridLayout>
 #include <QShortcut>
+#include <QTimer>
 #include <QToolBar>
 #include <QTextBrowser>
 #include <QCheckBox>
@@ -202,6 +203,9 @@ struct QmitkMeasurementViewData
 
   /** Active while a figure is being placed. */
   mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
+
+  /** Observes the figure that is being placed, to cancel the placement once it gets deselected. */
+  mitk::ITKEventObserverGuard m_PlacementSelectionObserver;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -663,6 +667,7 @@ void QmitkMeasurementView::OnPlanarFigureFinished()
 
 void QmitkMeasurementView::PlanarFigureInitialized()
 {
+  d->m_PlacementSelectionObserver.Reset();
   d->m_UninitializedNode = nullptr;
   d->m_PendingCounter = nullptr;
   d->m_ExclusiveInteractionClaim.Reset();
@@ -1021,6 +1026,20 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   d->m_PendingCounter = &counter;
   d->m_CancelPlacementShortcut->setEnabled(true);
   d->m_DrawLabel->show();
+
+  // The planar figure interactor ignores points added to a figure that is not
+  // selected, so the placement ends once something else takes the selection,
+  // e.g. the Data Manager when another node gets selected. The cancellation is
+  // deferred to not remove the figure while its deselection is still processed.
+  d->m_PlacementSelectionObserver.Reset(newNode, itk::ModifiedEvent(), [this](const itk::EventObject&) {
+    if (d->m_UninitializedNode.IsNull() || d->m_UninitializedNode->IsSelected())
+      return;
+
+    QTimer::singleShot(0, this, [this]() {
+      if (d->m_UninitializedNode.IsNotNull() && !d->m_UninitializedNode->IsSelected())
+        this->CancelPlacement();
+    });
+  });
 
   // Decoupled render windows compare themselves against this geometry while the
   // figure is being placed and offer a per-window reset (see QmitkRenderWindow).

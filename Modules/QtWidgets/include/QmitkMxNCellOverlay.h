@@ -222,8 +222,9 @@ public:
 
   /**
   * \brief The plate geometry for one cell: the plate centred in 'cellSize', the
-  *        eight glyph rects for 'glyphBox' with 'pumpedAxis' enlarged and the
-  *        rest displaced, and the two text rects. A negative 'pumpedAxis' lays
+  *        eight glyph rects for 'glyphBox' with 'pumpedAxis' enlarged around its
+  *        own slot, and the text rects. Every other glyph keeps its slot, so
+  *        the pumped one may overlap its neighbours. A negative 'pumpedAxis' lays
   *        the row out with nothing emphasised. Returns an invalid plate when the
   *        cell cannot host one. Static so the geometry is testable without a
   *        realized overlay.

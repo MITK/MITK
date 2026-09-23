@@ -74,6 +74,7 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(PeekPlate_PlateIsTheSameWhicheverAxisIsPumped);
   MITK_TEST(PeekPlate_NoAxisEmphasisedKeepsTheSamePlate);
   MITK_TEST(PeekPlate_CellTooSmallHasNoPlate);
+  MITK_TEST(PeekPlate_PumpingLeavesEveryOtherGlyphInPlace);
   MITK_TEST(PeekPlate_ValueBandSitsUnderTheRowAndAboveTheName);
   MITK_TEST(PeekPlate_ValueBandIsReservedWhicheverAxisIsPumped);
   MITK_TEST(Barcode_GlyphBoxFillsTheHeightItIsGranted);
@@ -100,6 +101,9 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Gesture_AddingACellLowersThePeek);
   MITK_TEST(Gesture_CleanViewLowersThePeek);
   MITK_TEST(Glyph_LargeRenderIsNotAnUpscaledResource);
+  MITK_TEST(Glyph_RepeatedRenderIsServedFromTheCache);
+  MITK_TEST(Glyph_StickerRingsTheGlyphWhiteOutsideDarkInside);
+  MITK_TEST(Glyph_StickerOutlineStaysCrispWhereTheGlyphFades);
   MITK_TEST(Barcode_PassiveStripReportsTheGlyphUnderThePointer);
   MITK_TEST(Barcode_PassiveStripReportsLeavingTheGlyphsButNotTheStrip);
   MITK_TEST(Barcode_PassiveStripReportsColorBarModeWithoutAnAxis);
@@ -256,9 +260,15 @@ public:
         {
           CPPUNIT_ASSERT_MESSAGE("Every glyph lies inside the plate",
                                  layout.plate.contains(layout.glyphs[axis]));
+          // The pumped glyph may overlap its neighbours; the resting ones never
+          // touch each other.
           for (int other = axis + 1; other < QmitkMxNCellOverlay::PeekAxisCount; ++other)
           {
-            CPPUNIT_ASSERT_MESSAGE("No two glyphs overlap",
+            if (axis == pumped || other == pumped)
+            {
+              continue;
+            }
+            CPPUNIT_ASSERT_MESSAGE("No two resting glyphs overlap",
                                    !layout.glyphs[axis].intersects(layout.glyphs[other]));
           }
         }
@@ -355,6 +365,46 @@ public:
       QmitkMxNCellOverlay::PeekAxisCount, LineHeight());
     CPPUNIT_ASSERT_MESSAGE("An axis past the eight gets no plate",
                            !noSuchAxis.plate.isValid());
+  }
+
+  void PeekPlate_PumpingLeavesEveryOtherGlyphInPlace()
+  {
+    const QSize cell(900, 700);
+    for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin;
+         box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
+    {
+      const auto nominal = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight());
+      for (int pumped = -1; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
+      {
+        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+        for (int axis = 0; axis < QmitkMxNCellOverlay::PeekAxisCount; ++axis)
+        {
+          if (axis != pumped)
+          {
+            CPPUNIT_ASSERT_MESSAGE("A resting glyph sits at its nominal slot whatever is pumped",
+                                   layout.glyphs[axis] == nominal.glyphs[axis]);
+          }
+        }
+        if (pumped < 0)
+        {
+          continue;
+        }
+
+        const QRect pumpedRect = layout.glyphs[pumped];
+        const QRect slot = nominal.glyphs[pumped];
+        CPPUNIT_ASSERT_MESSAGE("The pumped glyph lies inside the plate",
+                               layout.plate.contains(pumpedRect));
+        // The caption spans exactly the glyph row, so this is the check that the
+        // row's end reserve covers the overhang - the plate padding alone would
+        // hide a one-pixel overrun.
+        CPPUNIT_ASSERT_MESSAGE("The pumped glyph stays within the row's reserve",
+                               pumpedRect.left() >= layout.caption.left()
+                                 && pumpedRect.right() <= layout.caption.right());
+        const QPointF offset = QRectF(pumpedRect).center() - QRectF(slot).center();
+        CPPUNIT_ASSERT_MESSAGE("The pumped glyph grows around its own slot",
+                               std::abs(offset.x()) <= 1.0 && std::abs(offset.y()) <= 1.0);
+      }
+    }
   }
 
   void Barcode_WrapsRatherThanShrinksWhenTheHostAllowsIt()
@@ -985,6 +1035,97 @@ public:
     // against, so any real separation here means the glyph was drawn as vector
     // art at the requested size.
     CPPUNIT_ASSERT_MESSAGE("A large glyph must be rendered, not upscaled", difference > 2.0);
+  }
+
+  void Glyph_RepeatedRenderIsServedFromTheCache()
+  {
+    // A persistent plate repaints on every render-end value change, so the
+    // artwork must not be re-read and re-rasterised on each call.
+    const QColor color(200, 120, 60);
+    const QPixmap first = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, color, 35);
+    const QPixmap second = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, color, 35);
+    CPPUNIT_ASSERT(!first.isNull());
+    CPPUNIT_ASSERT_EQUAL(first.cacheKey(), second.cacheKey());
+
+    const QPixmap otherColor = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, QColor(60, 120, 200), 35);
+    const QPixmap otherSize = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, color, 36);
+    CPPUNIT_ASSERT(first.cacheKey() != otherColor.cacheKey());
+    CPPUNIT_ASSERT(first.cacheKey() != otherSize.cacheKey());
+
+    const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Zoom, color, 35, 2.0);
+    const QPixmap stickerAgain = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Zoom, color, 35, 2.0);
+    CPPUNIT_ASSERT(!sticker.isNull());
+    CPPUNIT_ASSERT_EQUAL(sticker.cacheKey(), stickerAgain.cacheKey());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The sticker comes with its pixel ratio already set",
+                                 2.0, sticker.devicePixelRatio());
+    const QPixmap otherRatio = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Zoom, color, 35, 1.0);
+    CPPUNIT_ASSERT(sticker.cacheKey() != otherRatio.cacheKey());
+  }
+
+  void Glyph_StickerRingsTheGlyphWhiteOutsideDarkInside()
+  {
+    const QColor hue(200, 120, 60);
+    constexpr int side = 35;
+    const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Crosshair, hue, side, 1.0);
+    CPPUNIT_ASSERT(!sticker.isNull());
+    const int margin = QmitkMxNAxisGlyphStickerMargin(side);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The rings grow outward, around the full-size glyph",
+                                 side + 2 * margin, sticker.width());
+
+    const auto opaque = [](QRgb pixel) { return qAlpha(pixel) > 200; };
+    const auto white = [&](QRgb pixel) { return opaque(pixel) && qRed(pixel) > 220 && qGreen(pixel) > 220 && qBlue(pixel) > 220; };
+    const auto dark = [&](QRgb pixel) { return opaque(pixel) && qRed(pixel) < 40 && qGreen(pixel) < 40 && qBlue(pixel) < 40; };
+    const auto inHue = [&](QRgb pixel)
+    {
+      return opaque(pixel) && std::abs(qRed(pixel) - hue.red()) < 30
+             && std::abs(qGreen(pixel) - hue.green()) < 30 && std::abs(qBlue(pixel) - hue.blue()) < 30;
+    };
+
+    // Walking in from the left edge, a line through the glyph must meet the
+    // outer ring, then the inner ring, then the glyph itself.
+    const QImage image = sticker.toImage().convertToFormat(QImage::Format_ARGB32);
+    bool found = false;
+    for (int y = 0; y < image.height() && !found; ++y)
+    {
+      int stage = 0;
+      for (int x = 0; x < image.width() && stage < 3; ++x)
+      {
+        const QRgb pixel = image.pixel(x, y);
+        if ((0 == stage && white(pixel)) || (1 == stage && dark(pixel)) || (2 == stage && inHue(pixel)))
+        {
+          ++stage;
+        }
+      }
+      found = 3 == stage;
+    }
+    CPPUNIT_ASSERT_MESSAGE("White outer ring, dark inner ring, then the glyph", found);
+  }
+
+  void Glyph_StickerOutlineStaysCrispWhereTheGlyphFades()
+  {
+    // The lookup-table glyph is a gradient that fades out towards its left end.
+    // Its outline must still be solid there, or the sticker loses its edge on
+    // exactly the side where the glyph itself is faint.
+    const QPixmap sticker =
+      QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Lut, QColor(80, 140, 240), 70, 1.0);
+    CPPUNIT_ASSERT(!sticker.isNull());
+    const QImage image = sticker.toImage().convertToFormat(QImage::Format_ARGB32);
+    const int y = image.height() / 2;
+    int first = -1;
+    for (int x = 0; x < image.width() && first < 0; ++x)
+    {
+      if (qAlpha(image.pixel(x, y)) > 0)
+      {
+        first = x;
+      }
+    }
+    CPPUNIT_ASSERT(first >= 0);
+    int peak = 0;
+    for (int x = first; x < std::min(image.width(), first + 4); ++x)
+    {
+      peak = std::max(peak, qAlpha(image.pixel(x, y)));
+    }
+    CPPUNIT_ASSERT_MESSAGE("The outer ring is opaque at the faded end", peak > 240);
   }
 
   void PaintPath_PlateDoesNotCrash()

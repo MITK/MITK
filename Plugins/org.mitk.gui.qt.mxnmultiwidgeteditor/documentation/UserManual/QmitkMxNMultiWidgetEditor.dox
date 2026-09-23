@@ -139,6 +139,8 @@
 	up a small plate in the middle of every window that has room for one. Each plate
 	shows that window's eight axes tinted by synchronization group, with the axis you
 	are pointing at enlarged, named above the row, and the window's own name below it.
+	The enlarged glyph grows in place and is outlined like a sticker, so it may overlap
+	its neighbours but never pushes them aside: the row keeps its shape wherever you point.
 	An axis the window synchronizes is drawn solid in its group's hue; one it does not
 	is faint and uncolored, whether or not it is the enlarged one - so a plate reads
 	both ways round, as the window's whole coupling and as the answer for the axis you

@@ -60,6 +60,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <numeric>
 #include <utility>
 
 namespace
@@ -119,25 +120,31 @@ namespace
   // be mistaken for.
   const QColor PeekAbsentGlyph(144, 150, 156);
 
-  /** \brief The pumped glyph's overhang per side: half of what it gains. */
-  int PeekPumpHalf(int box)
+  int PeekPumpedSide(int box)
   {
-    return qRound(0.5 * (PeekPumpScale - 1.0) * box);
+    return qRound(PeekPumpScale * box);
   }
 
-  /** \brief The glyph row's width. Both ends reserve the pumped glyph's
-   *         displacement, so the row is the same width whichever axis is
-   *         pumped - and wide enough for the overhang at either end. */
+  /** \brief How far the pumped glyph reaches past its slot on the side where it
+   *         reaches further: centring an odd growth leaves the two sides a
+   *         pixel apart, and the row has to cover the larger one. */
+  int PeekPumpOverhang(int box)
+  {
+    return (PeekPumpedSide(box) - box + 1) / 2;
+  }
+
+  /** \brief The glyph row's width: the eight slots plus the pumped glyph's
+   *         overhang at either end, so the row is the same width whichever
+   *         axis is pumped. */
   int PeekRowWidth(int box)
   {
-    const int push = PeekPumpHalf(box) + PeekGlyphGap;
     return QmitkMxNCellOverlay::PeekAxisCount * box
-      + (QmitkMxNCellOverlay::PeekAxisCount - 1) * PeekGlyphGap + 2 * push;
+      + (QmitkMxNCellOverlay::PeekAxisCount - 1) * PeekGlyphGap + 2 * PeekPumpOverhang(box);
   }
 
   int PeekRowHeight(int box)
   {
-    return qRound(PeekPumpScale * box);
+    return PeekPumpedSide(box);
   }
 
   /** \brief The plate's outer size. Both text lines are reserved even when the
@@ -621,27 +628,18 @@ QmitkMxNCellOverlay::ComputePeekPlate(const QSize& cellSize, int glyphBox, int p
   layout.values = QRect(rowLeft, restingBottom, rowWidth, valuesBottom - restingBottom);
   layout.name = QRect(rowLeft, valuesBottom + PeekNameGap, rowWidth, textLineHeight);
 
-  // Every glyph on a side of the pumped one moves, not just its neighbour, so
-  // the spacing along the row stays uniform and the clearance around the pumped
-  // glyph is exactly two gaps whatever the box.
-  const int push = PeekPumpHalf(glyphBox) + PeekGlyphGap;
-  const int pumpedSide = qRound(PeekPumpScale * glyphBox);
+  // The pumped glyph grows in place over its neighbours rather than making room
+  // among them. Nothing else moves, so the rect a glyph occupies never depends
+  // on which axis is pumped: the pointer cannot end up on a neighbour that slid
+  // under it, and emphasis looks the same wherever it comes from.
+  const int pumpedSide = PeekPumpedSide(glyphBox);
   for (int axis = 0; axis < PeekAxisCount; ++axis)
   {
-    const int nominalLeft = rowLeft + push + axis * (glyphBox + PeekGlyphGap);
-    if (axis == pumpedAxis)
-    {
-      layout.glyphs[axis] = QRect(nominalLeft + glyphBox / 2 - pumpedSide / 2, rowTop,
-                                  pumpedSide, pumpedSide);
-    }
-    else
-    {
-      // Nothing emphasised: every glyph sits at its nominal place, and the
-      // displacement reserved at both ends simply stays empty.
-      const int shift = pumpedAxis < 0 ? 0 : (axis < pumpedAxis ? -push : push);
-      layout.glyphs[axis] = QRect(nominalLeft + shift,
-                                  rowTop + (rowHeight - glyphBox) / 2, glyphBox, glyphBox);
-    }
+    const int nominalLeft =
+      rowLeft + PeekPumpOverhang(glyphBox) + axis * (glyphBox + PeekGlyphGap);
+    layout.glyphs[axis] = axis == pumpedAxis
+      ? QRect(nominalLeft + glyphBox / 2 - pumpedSide / 2, rowTop, pumpedSide, pumpedSide)
+      : QRect(nominalLeft, rowTop + (rowHeight - glyphBox) / 2, glyphBox, glyphBox);
   }
   return layout;
 }
@@ -1502,8 +1500,18 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   painter.drawRoundedRect(QRectF(layout.plate).adjusted(0.5, 0.5, -0.5, -0.5),
                           PeekPlateRadius, PeekPlateRadius);
 
+  // The pumped axis goes last in each pass, glyphs before values: it overlaps
+  // its neighbours, and whatever is lifted to the front must be drawn on top.
+  std::array<int, PeekAxisCount> paintOrder;
+  std::iota(paintOrder.begin(), paintOrder.end(), 0);
+  if (m_SyncPeekAxis >= 0)
+  {
+    std::rotate(paintOrder.begin() + m_SyncPeekAxis, paintOrder.begin() + m_SyncPeekAxis + 1,
+                paintOrder.end());
+  }
+
   const qreal dpr = nullptr != painter.device() ? painter.device()->devicePixelRatioF() : 1.0;
-  for (int axis = 0; axis < PeekAxisCount; ++axis)
+  for (const int axis : paintOrder)
   {
     const auto& axisSlot = axisSlots[axis];
     const bool synced = axisSlot.color.isValid();
@@ -1511,19 +1519,31 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     // synchronizes the axis, size says which axis the pointer is on. That lets
     // one row be read either way round - the window's whole coupling at a
     // glance, and the pointed-at axis from the pump - instead of emphasis and
-    // membership fighting over the same channel.
+    // membership fighting over the same channel. The sticker's rings belong to
+    // the size carrier, so they fade with the glyph they outline.
     const qreal weight = synced ? 1.0 : PeekAbsentWeight;
     const QRect box = layout.glyphs[axis];
-    QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, synced ? axisSlot.color : PeekAbsentGlyph,
-                                            qRound(box.width() * dpr));
+    const QColor color = synced ? axisSlot.color : PeekAbsentGlyph;
+    const int sizePx = qRound(box.width() * dpr);
+    painter.setOpacity(m_PeekProgress * weight);
+    if (axis == m_SyncPeekAxis)
+    {
+      const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(axisSlot.glyph, color, sizePx, dpr);
+      if (!sticker.isNull())
+      {
+        const QSizeF stickerSize = QSizeF(sticker.size()) / dpr;
+        painter.drawPixmap(QRectF(box).center() - QPointF(stickerSize.width(), stickerSize.height()) / 2,
+                           sticker);
+      }
+      continue;
+    }
+    QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, color, sizePx);
     if (glyph.isNull())
     {
       continue;
     }
     glyph.setDevicePixelRatio(dpr);
-    painter.setOpacity(m_PeekProgress * weight);
     painter.drawPixmap(box.topLeft(), glyph);
-
   }
 
   // Both lines are elided into the width the glyph row dictates; measuring text
@@ -1554,7 +1574,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   QFont valueFont = painter.font();
   QFont pumpedValueFont = valueFont;
   pumpedValueFont.setPointSizeF(PeekPumpScale * valueFont.pointSizeF());
-  for (int axis = 0; axis < PeekAxisCount; ++axis)
+  for (const int axis : paintOrder)
   {
     const auto& axisSlot = axisSlots[axis];
     if (axisSlot.offsetText.isEmpty() || !axisSlot.color.isValid())
@@ -1562,8 +1582,8 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
       continue;
     }
     const bool pumped = axis == m_SyncPeekAxis;
-    painter.setFont(pumped ? pumpedValueFont : valueFont);
-    const QFontMetrics valueMetrics(painter.font());
+    const QFont& font = pumped ? pumpedValueFont : valueFont;
+    const QFontMetrics valueMetrics(font);
     const QRect glyphRect = layout.glyphs[axis];
     const int width = valueMetrics.horizontalAdvance(axisSlot.offsetText);
     // A line box is taller than the digits sitting in it. Lifting the box by
@@ -1573,6 +1593,15 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
       (valueMetrics.height() - valueMetrics.tightBoundingRect(axisSlot.offsetText).height()) / 2;
     const QRect at(glyphRect.center().x() - width / 2,
                    glyphRect.bottom() + PeekValueGap - slack, width, valueMetrics.height());
+    if (pumped)
+    {
+      // The line box is exactly one line tall and exactly as wide as the text,
+      // so its top-left plus the ascent is where drawText would put the baseline.
+      QmitkMxNPaintStickerText(painter, QPointF(at.left(), at.top() + valueMetrics.ascent()), font,
+                               axisSlot.offsetText, axisSlot.color);
+      continue;
+    }
+    painter.setFont(font);
     painter.setPen(axisSlot.color);
     painter.drawText(at, Qt::AlignHCenter | Qt::AlignVCenter, axisSlot.offsetText);
   }

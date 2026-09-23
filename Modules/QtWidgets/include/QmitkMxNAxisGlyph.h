@@ -15,8 +15,14 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
+#include <QtGlobal>
+
 class QColor;
+class QFont;
+class QPainter;
 class QPixmap;
+class QPointF;
+class QString;
 
 /**
  * \brief The synchronization axes that carry a compact viewport glyph: the
@@ -50,5 +56,37 @@ enum class QmitkMxNAxisGlyph
  * and stay crisp at any size. Returns a null pixmap if the resource is missing.
  */
 MITKQTWIDGETS_EXPORT QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx);
+
+/**
+ * \brief Render an axis glyph as a sticker: the glyph in 'color' at 'sizePx'
+ *        (device pixels), outlined by a dark inner and a white outer ring - a
+ *        glyph lifted to the front of whatever it overlaps.
+ *
+ * The rings grow outward, so the pixmap is larger than the glyph by
+ * QmitkMxNAxisGlyphStickerMargin(sizePx) on every side; draw it centred on
+ * where the plain glyph would go. The pixmap already carries
+ * 'devicePixelRatio'. Glyph and rings form one composite, so painting it at
+ * reduced opacity fades the sticker as a whole rather than letting the rings
+ * show through the glyph. Returns a null pixmap if the resource is missing.
+ */
+MITKQTWIDGETS_EXPORT QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph glyph,
+                                                            const QColor& color,
+                                                            int sizePx,
+                                                            qreal devicePixelRatio);
+
+/** \brief The device pixels a sticker of 'sizePx' extends past its glyph on
+ *         each side. */
+MITKQTWIDGETS_EXPORT int QmitkMxNAxisGlyphStickerMargin(int sizePx);
+
+/**
+ * \brief Paint 'text' in 'color' from 'baseline' with the sticker's two rings,
+ *        so a value lifted over its neighbours stays legible and reads as part
+ *        of the sticker glyph it belongs to.
+ */
+MITKQTWIDGETS_EXPORT void QmitkMxNPaintStickerText(QPainter& painter,
+                                                   const QPointF& baseline,
+                                                   const QFont& font,
+                                                   const QString& text,
+                                                   const QColor& color);
 
 #endif

@@ -157,9 +157,13 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
     const std::string spacing = ToDicomString(this->sliceSpacing) + "\\" + ToDicomString(this->sliceSpacing);
     Require(measures.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");
 
-    if (this->rescaleInSharedGroup)
+    if (RescalePlacement::Shared == this->rescalePlacement)
     {
       WritePixelValueTransformation(shared, this->frames.front().slope, this->frames.front().intercept);
+    }
+    else if (RescalePlacement::SharedAndPerFrame == this->rescalePlacement)
+    {
+      WritePixelValueTransformation(shared, this->sharedSlopeAlongsidePerFrame, 0.0);
     }
 
     if (this->topLevelGeometry)
@@ -199,9 +203,15 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
                 PositionString(this->zOffset + k * this->sliceSpacing).c_str()),
               "Image Position (Patient)");
 
-      if (!this->rescaleInSharedGroup)
+      if (RescalePlacement::Shared != this->rescalePlacement)
       {
         WritePixelValueTransformation(perFrame, frame.slope, frame.intercept);
+      }
+
+      if (this->imageCommentsInPerFrameItems)
+      {
+        Require(perFrame.putAndInsertString(DCM_ImageComments, ("frame " + std::to_string(k)).c_str()),
+                "Image Comments");
       }
     }
   }

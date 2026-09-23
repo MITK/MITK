@@ -59,9 +59,28 @@ namespace mitk
         top-level geometry and rescale and no (5200,92xx) sequence at all. */
     bool functionalGroups = true;
 
-    /** Write the Pixel Value Transformation into (5200,9229) instead of per
-        frame. The frames' first slope and intercept are used for it. */
-    bool rescaleInSharedGroup = false;
+    /** Which functional group carries the Pixel Value Transformation. */
+    enum class RescalePlacement
+    {
+      /** One item per frame, from each frame's slope and intercept. */
+      PerFrame,
+      /** Only (5200,9229), from the first frame's slope and intercept. */
+      Shared,
+      /** Per frame as for PerFrame and additionally in (5200,9229) with
+          sharedSlopeAlongsidePerFrame, which PS3.3 C.7.6.16 forbids. */
+      SharedAndPerFrame
+    };
+    RescalePlacement rescalePlacement = RescalePlacement::PerFrame;
+
+    /** The shared slope SharedAndPerFrame writes; distinct from every frame's,
+        so a test can tell which of the two findings reached a slot. */
+    double sharedSlopeAlongsidePerFrame = 88.0;
+
+    /** Write (0020,4000) Image Comments directly into every per-frame item. A
+        functional-group item holds only macro sequences on a conformant file, so
+        this is the one way to place a single element where only an expansion of
+        single-element paths would find it. */
+    bool imageCommentsInPerFrameItems = false;
 
     /** Greater than zero: write that many per-frame items while Number of Frames
         stays at the frame count, i.e. a sequence that does not describe every

@@ -57,9 +57,9 @@ namespace mitk
       /**
        * \brief Retrieve tag values for a specific frame and tag path.
        * \param[in] frame The image frame to query. The passed info decides which
-       *            view answers: a file-level info reports the file under literal
-       *            rooted paths, a frame-scoped one reports its frame under
-       *            frame-relative paths.
+       *            view answers, and in which terms it is queried: a file-level
+       *            info reports the file under literal rooted paths, a
+       *            frame-scoped one reports its frame under frame-relative paths.
        * \param[in] path The DICOM tag path to retrieve.
        * \return A list of findings matching the given path.
        */

@@ -170,6 +170,11 @@ void mitk::DICOMDCMTKTagScanner::AddTagPaths(const DICOMTagPathList& paths)
   }
 }
 
+void mitk::DICOMDCMTKTagScanner::SetExpandFunctionalGroups(bool expand)
+{
+  m_ExpandFunctionalGroups = expand;
+}
+
 void mitk::DICOMDCMTKTagScanner::SetInputFiles( const StringList& filenames )
 {
   m_InputFilenames = filenames;
@@ -218,6 +223,74 @@ mitk::DICOMTagPath DcmPathToTagPath(DcmPath * dcmpath)
   return result;
 }
 
+namespace
+{
+  /** Stores every finding of one registered path under its explicit path, as
+      DCMTK resolved it. */
+  void SearchAndStore(DcmPathProcessor& processor,
+                      DcmDataset& dataset,
+                      const mitk::DICOMTagPath& path,
+                      mitk::DICOMGenericImageFrameInfo& info)
+  {
+    const std::string tagPath = mitk::DICOMTagPathToDCMTKSearchPath(path);
+    if (processor.findOrCreatePath(&dataset, tagPath.c_str()).bad())
+    {
+      return;
+    }
+
+    OFList< DcmPath * > findings;
+    processor.getResults(findings);
+    for (const auto& finding : findings)
+    {
+      auto element = dynamic_cast<DcmElement*>(finding->back()->m_obj);
+      if (!element)
+      {
+        auto item = dynamic_cast<DcmItem*>(finding->back()->m_obj);
+        if (item)
+        {
+          element = item->getElement(finding->back()->m_itemNo);
+        }
+      }
+
+      if (element)
+      {
+        OFString value;
+        if (element->getOFStringArray(value).good())
+        {
+          info.SetTagValue(DcmPathToTagPath(finding), std::string(value.c_str()));
+        }
+      }
+    }
+  }
+
+  mitk::DICOMTagPath RootedIn(const DcmTagKey& root, const mitk::DICOMTagPath& path)
+  {
+    mitk::DICOMTagPath result;
+    result.AddAnySelection(root.getGroup(), root.getElement());
+    for (const auto& node : path.GetNodes())
+    {
+      result.AddNode(node);
+    }
+    return result;
+  }
+
+  /** A path rooted in a functional group is searched as registered and never
+      expanded, so for a frame-model file its findings reach no property: the
+      frame-scoped info compares a rooted query with nothing. Silent otherwise. */
+  void WarnAboutRootedRegistrations(const std::set<mitk::DICOMTagPath>& paths)
+  {
+    for (const auto& path : paths)
+    {
+      if (mitk::IsFunctionalGroupRooted(path))
+      {
+        MITK_WARN << "Tag of interest " << path.ToStr() << " is rooted in a functional-group sequence. It yields "
+                     "no property for an object with per-frame functional groups; register the path inside the "
+                     "functional-group macro instead.";
+      }
+    }
+  }
+}
+
 void mitk::DICOMDCMTKTagScanner::Scan()
 {
   this->PushLocale();
@@ -244,47 +317,45 @@ void mitk::DICOMDCMTKTagScanner::Scan()
       else
       {
         DICOMGenericImageFrameInfo::Pointer info = DICOMGenericImageFrameInfo::New(fileName);
+        DcmDataset& dataset = *dfile.getDataset();
+
+        const auto layout = ReadFrameLayout(dataset, fileName, warningsThisScan);
+
+        // Only the frame-model reader reads findings under a functional-group
+        // root, and only for a file it reads frame by frame; every other file
+        // keeps file-level infos, which never answer with such a finding.
+        const bool expand = m_ExpandFunctionalGroups && layout.HasFrameModel();
 
         for (const auto& path : this->m_ScannedTags)
         {
-          std::string tagPath = DICOMTagPathToDCMTKSearchPath(path);
-          cond = processor.findOrCreatePath(dfile.getDataset(), tagPath.c_str());
-          if (cond.good())
-          {
-            OFList< DcmPath * > findings;
-            processor.getResults(findings);
-            for (const auto& finding : findings)
-            {
-              auto element = dynamic_cast<DcmElement*>(finding->back()->m_obj);
-              if (!element)
-              {
-                auto item = dynamic_cast<DcmItem*>(finding->back()->m_obj);
-                if (item)
-                {
-                  element = item->getElement(finding->back()->m_itemNo);
-                }
-              }
+          SearchAndStore(processor, dataset, path, *info);
 
-              if (element)
-              {
-                OFString value;
-                cond = element->getOFStringArray(value);
-                if (cond.good())
-                {
-                  info->SetTagValue(DcmPathToTagPath(finding), std::string(value.c_str()));
-                }
-              }
-            }
+          // A functional-group item holds only macro sequences (PS3.3
+          // C.7.6.16), so a single-element path cannot resolve inside one; a
+          // path that already names a group is not rooted twice.
+          if (expand && path.Size() > 1 && !IsFunctionalGroupRooted(path))
+          {
+            SearchAndStore(processor, dataset, RootedIn(DCM_SharedFunctionalGroupsSequence, path), *info);
+            SearchAndStore(processor, dataset, RootedIn(DCM_PerFrameFunctionalGroupsSequence, path), *info);
           }
         }
+
         // Before AddFrameInfo, which reads the layout to maintain the
         // cache-level frame-model flag.
-        info->SetFrameLayout(ReadFrameLayout(*dfile.getDataset(), fileName, warningsThisScan));
+        info->SetFrameLayout(layout);
         newCache->AddFrameInfo(info);
       }
     }
 
     ReportWarnings(warningsThisScan);
+
+    // Gated on a frame model rather than on the switch alone: a rooted
+    // registration loses its property only for a frame-model file, so warning
+    // on a classic series would repeat a message that does not apply to it.
+    if (m_ExpandFunctionalGroups && newCache->HasAnyFrameModel())
+    {
+      WarnAboutRootedRegistrations(this->m_ScannedTags);
+    }
 
     m_Cache = newCache;
 

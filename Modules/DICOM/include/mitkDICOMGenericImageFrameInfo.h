@@ -40,8 +40,12 @@ namespace mitk
       finding reported under its path relative to the functional-group item.
       Other frames' items are omitted.
 
-    A query is always matched against the stored path; only the reported path is
-    frame-relative.
+    Each view is queried in the terms it answers in. A file-level info matches
+    a query against the literal stored paths, so a path relative to the
+    functional-group item finds nothing there. A frame-scoped info matches a
+    query against the frame-relative path of a functional-group finding and
+    against the stored path of a top-level one, so a path rooted in a
+    functional-group sequence finds no functional-group finding there.
 
     \sa DICOMDatasetAccessingImageFrameInfo, DICOMGenericTagCache, DICOMGDCMImageFrameInfo
   */
@@ -78,7 +82,7 @@ namespace mitk
 
       /**
        * \brief Retrieve tag values as strings for a DICOM tag path.
-       * \param[in] path The tag path to query, matched against the stored paths.
+       * \param[in] path The tag path to query, in the terms of this info's view.
        * \return A list of findings matching the path. For a frame-scoped info,
        *         only this frame's findings, reported under their frame-relative path.
        */

@@ -78,6 +78,16 @@ namespace mitk
       */
       DICOMTagCache::Pointer GetScanCache() const override;
 
+      /**
+      \brief Also search every registered path inside the shared and per-frame
+      functional groups of a file that has a frame model.
+
+      Only a reader that builds frame-scoped infos reads those findings, so this
+      is off by default and a scanner that does not ask for it behaves as it
+      always has.
+      */
+      void SetExpandFunctionalGroups(bool expand);
+
     protected:
 
       DICOMDCMTKTagScanner();
@@ -86,6 +96,7 @@ namespace mitk
       std::set<DICOMTagPath> m_ScannedTags;
       StringList m_InputFilenames;
       DICOMGenericTagCache::Pointer m_Cache;
+      bool m_ExpandFunctionalGroups = false;
 
     private:
       DICOMDCMTKTagScanner(const DICOMDCMTKTagScanner&);

@@ -207,9 +207,6 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
-  if (m_DataInteractor.IsNotNull())
-    m_DataInteractor->SetDataNode(newNode);
-
   ObserveNewNode(newNode);
   dynamic_cast<QmitkPointListModel *>(this->m_PointListView->model())->SetPointSetNode(newNode);
 }
@@ -429,18 +426,14 @@ void QmitkPointListWidget::EnableEditButton(bool enabled)
 
 void QmitkPointListWidget::ObserveNewNode(mitk::DataNode *node)
 {
-  if (m_DataInteractor.IsNotNull())
-    m_DataInteractor->SetDataNode(node);
+  // Adding points ends with the node it was started on. Unchecking removes the
+  // interactor from the current node, so it has to happen before the switch.
+  m_ToggleAddPoint->setChecked(false);
+  m_DataInteractor = nullptr;
 
   // remove old observer
   if (m_PointSetNode)
   {
-    if (m_DataInteractor)
-    {
-      m_DataInteractor = nullptr;
-      m_ToggleAddPoint->setChecked(false);
-    }
-
     m_PointSetNode->RemoveObserver(m_NodeObserverTag);
     m_NodeObserverTag = 0;
   }

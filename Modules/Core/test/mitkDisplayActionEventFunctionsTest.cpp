@@ -17,8 +17,11 @@ found in the LICENSE file.
 #include <mitkDisplayActionEvents.h>
 #include <mitkImageGenerator.h>
 #include <mitkInteractionEvent.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 #include <mitkVtkPropRenderer.h>
@@ -55,9 +58,13 @@ class mitkDisplayActionEventFunctionsTestSuite : public mitk::TestFixture
   MITK_TEST(Pan_PredicateScopesTargets);
   MITK_TEST(Zoom_PredicateScopesTargets);
   MITK_TEST(Crosshair_PredicateScopesTargets);
+  MITK_TEST(LevelWindow_ForeignSender_NoOp);
+  MITK_TEST(LevelWindow_UngroupedSender_WritesNodeGlobal);
+  MITK_TEST(LevelWindow_GroupedSender_WritesRendererSpecificOnTargets);
   MITK_TEST(NullPredicate_Throws);
   MITK_TEST(Handler_NullPredicate_WiresSenderOnlyAction);
   MITK_TEST(Handler_DimensionsScopeIndependently);
+  MITK_TEST(Handler_HalfLevelWindowPair_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -67,10 +74,19 @@ class mitkDisplayActionEventFunctionsTestSuite : public mitk::TestFixture
     mitk::VtkPropRenderer::Pointer renderer;
   };
 
+  static constexpr mitk::ScalarType InitialLevel = 100.0;
+  static constexpr mitk::ScalarType InitialWindow = 50.0;
+  static constexpr mitk::ScalarType LevelDelta = 10.0;
+  static constexpr mitk::ScalarType WindowDelta = 20.0;
+
   mitk::Image::Pointer m_Image;
   Window m_A0; // "editorA__w0" - sender in most tests
   Window m_A1; // "editorA__w1" - same-editor member
   Window m_B0; // "editorB__w0" - foreign window
+
+  // Level-window tests only (see AttachImageNode).
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::DataNode::Pointer m_Node;
 
 public:
   void setUp() override
@@ -92,6 +108,8 @@ public:
     DestroyWindow(m_A0);
     DestroyWindow(m_A1);
     DestroyWindow(m_B0);
+    m_Node = nullptr;
+    m_DataStorage = nullptr;
     m_Image = nullptr;
   }
 
@@ -150,6 +168,62 @@ public:
   static vtkCamera* Camera(const Window& window)
   {
     return window.renderer->GetVtkRenderer()->GetActiveCamera();
+  }
+
+  static mitk::DisplayActionEventFunctions::LevelWindowScopeClassifier ConstantScope(
+    mitk::DisplayActionEventFunctions::LevelWindowScope scope)
+  {
+    return [scope](const mitk::BaseRenderer*) { return scope; };
+  }
+
+  /** Put the image into a data storage every window renders, with a
+   *  node-global level/window for the gestures to change. */
+  void AttachImageNode()
+  {
+    m_DataStorage = mitk::StandaloneDataStorage::New();
+    m_Node = mitk::DataNode::New();
+    m_Node->SetName("image");
+    m_Node->SetData(m_Image);
+    m_Node->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(InitialLevel, InitialWindow)));
+    m_DataStorage->Add(m_Node);
+
+    for (auto* window : { &m_A0, &m_A1, &m_B0 })
+    {
+      window->renderer->SetDataStorage(m_DataStorage);
+    }
+  }
+
+  /** Run 'action' on a level-window gesture from 'sender', positioned over the
+   *  image so the action resolves the image node under the pointer. */
+  void FireLevelWindow(const mitk::StdFunctionCommand::ActionFunction& action, const Window& sender) const
+  {
+    // Display/world conversion needs a viewport with an extent.
+    sender.vtkWindow->SetSize(64, 64);
+
+    mitk::Point2D displayPoint;
+    sender.renderer->WorldToDisplay(m_Image->GetGeometry()->GetCenter(), displayPoint);
+    mitk::Point3D worldPoint;
+    sender.renderer->DisplayToWorld(displayPoint, worldPoint);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the gesture position must lie inside the image",
+                           m_Image->GetGeometry()->IsInside(worldPoint));
+
+    auto interactionEvent = mitk::InteractionPositionEvent::New(sender.renderer, displayPoint);
+    action(mitk::DisplaySetLevelWindowEvent(interactionEvent, LevelDelta, WindowDelta));
+  }
+
+  mitk::LevelWindow NodeGlobalLevelWindow() const
+  {
+    mitk::LevelWindow levelWindow;
+    CPPUNIT_ASSERT_MESSAGE("The node must keep a node-global level/window", m_Node->GetLevelWindow(levelWindow));
+    return levelWindow;
+  }
+
+  /** The renderer-specific level/window written for 'window', null if none. */
+  const mitk::LevelWindowProperty* RendererLevelWindow(const Window& window) const
+  {
+    return dynamic_cast<const mitk::LevelWindowProperty*>(
+      m_Node->GetPropertyList(window.renderer)->GetProperty("levelwindow"));
   }
 
   void Scroll_PredicateScopesTargets()
@@ -326,8 +400,74 @@ public:
                                  2u, SlicePos(m_B0));
   }
 
+  void LevelWindow_ForeignSender_NoOp()
+  {
+    using mitk::DisplayActionEventFunctions::LevelWindowScope;
+    this->AttachImageNode();
+    auto action = mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(
+      ConstantScope(LevelWindowScope::Foreign), SameEditorPredicate("editorA__"));
+
+    this->FireLevelWindow(action, m_B0);
+
+    const auto levelWindow = this->NodeGlobalLevelWindow();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A foreign sender must not change the node-global level",
+      InitialLevel, levelWindow.GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A foreign sender must not change the node-global window",
+      InitialWindow, levelWindow.GetWindow(), 1e-6);
+    for (const auto* window : { &m_A0, &m_A1, &m_B0 })
+    {
+      CPPUNIT_ASSERT_MESSAGE("A foreign sender must not write a renderer-specific level/window",
+                             nullptr == this->RendererLevelWindow(*window));
+    }
+  }
+
+  void LevelWindow_UngroupedSender_WritesNodeGlobal()
+  {
+    using mitk::DisplayActionEventFunctions::LevelWindowScope;
+    this->AttachImageNode();
+    auto action = mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(
+      ConstantScope(LevelWindowScope::Ungrouped), SameEditorPredicate("editorA__"));
+
+    this->FireLevelWindow(action, m_A0);
+
+    const auto levelWindow = this->NodeGlobalLevelWindow();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An ungrouped sender must shift the node-global level",
+      InitialLevel + LevelDelta, levelWindow.GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An ungrouped sender must shift the node-global window",
+      InitialWindow + WindowDelta, levelWindow.GetWindow(), 1e-6);
+    for (const auto* window : { &m_A0, &m_A1, &m_B0 })
+    {
+      CPPUNIT_ASSERT_MESSAGE("An ungrouped sender must not write a renderer-specific level/window",
+                             nullptr == this->RendererLevelWindow(*window));
+    }
+  }
+
+  void LevelWindow_GroupedSender_WritesRendererSpecificOnTargets()
+  {
+    using mitk::DisplayActionEventFunctions::LevelWindowScope;
+    this->AttachImageNode();
+    auto action = mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(
+      ConstantScope(LevelWindowScope::Grouped), SameEditorPredicate("editorA__"));
+
+    this->FireLevelWindow(action, m_A0);
+
+    for (const auto* window : { &m_A0, &m_A1 })
+    {
+      const auto* property = this->RendererLevelWindow(*window);
+      CPPUNIT_ASSERT_MESSAGE("A grouped sender must write a renderer-specific level/window on every target",
+                             nullptr != property);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(InitialLevel + LevelDelta, property->GetLevelWindow().GetLevel(), 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(InitialWindow + WindowDelta, property->GetLevelWindow().GetWindow(), 1e-6);
+    }
+    CPPUNIT_ASSERT_MESSAGE("A grouped sender must not write on a window its predicate rejects",
+                           nullptr == this->RendererLevelWindow(m_B0));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A grouped sender must leave the node-global level alone",
+      InitialLevel, this->NodeGlobalLevelWindow().GetLevel(), 1e-6);
+  }
+
   void NullPredicate_Throws()
   {
+    using mitk::DisplayActionEventFunctions::LevelWindowScope;
     const mitk::DisplayActionEventFunctions::TargetPredicate nullPredicate;
 
     CPPUNIT_ASSERT_THROW(
@@ -339,20 +479,26 @@ public:
     CPPUNIT_ASSERT_THROW(
       mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction(
         mitk::DisplayActionEventFunctions::TargetPredicate()), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(
+      mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(
+        ConstantScope(LevelWindowScope::Grouped), nullPredicate), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(
+      mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(
+        mitk::DisplayActionEventFunctions::LevelWindowScopeClassifier(), SameEditorPredicate("editorA__")),
+      mitk::Exception);
   }
 
   void Handler_NullPredicate_WiresSenderOnlyAction()
   {
-    auto broadcast = mitk::DisplayActionEventBroadcast::New();
-    mitk::DisplayActionEventHandlerSynchronized handler;
-    handler.SetObservableBroadcast(broadcast);
-
     // Slice deliberately not synchronized (null); the other dimensions are.
     mitk::DisplayActionEventHandlerSynchronized::Predicates predicates;
     predicates.pan = SameEditorPredicate("editorA__");
     predicates.zoom = SameEditorPredicate("editorA__");
     predicates.crosshair = SameEditorPredicate("editorA__");
-    handler.SetPredicates(predicates);
+
+    auto broadcast = mitk::DisplayActionEventBroadcast::New();
+    mitk::DisplayActionEventHandlerSynchronized handler(predicates);
+    handler.SetObservableBroadcast(broadcast);
     handler.InitActions("editorA__");
 
     auto interactionEvent = mitk::InteractionEvent::New(m_A0.renderer);
@@ -365,14 +511,13 @@ public:
 
   void Handler_DimensionsScopeIndependently()
   {
-    auto broadcast = mitk::DisplayActionEventBroadcast::New();
-    mitk::DisplayActionEventHandlerSynchronized handler;
-    handler.SetObservableBroadcast(broadcast);
-
     // Slice couples the two editorA windows; zoom couples nothing (null).
     mitk::DisplayActionEventHandlerSynchronized::Predicates predicates;
     predicates.slice = SameEditorPredicate("editorA__");
-    handler.SetPredicates(predicates);
+
+    auto broadcast = mitk::DisplayActionEventBroadcast::New();
+    mitk::DisplayActionEventHandlerSynchronized handler(predicates);
+    handler.SetObservableBroadcast(broadcast);
     handler.InitActions("editorA__");
 
     const double a1ScaleBefore = Camera(m_A1)->GetParallelScale();
@@ -387,6 +532,23 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Synchronized slice dimension must propagate", 3u, SlicePos(m_A1));
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Unsynchronized zoom dimension must not propagate",
       a1ScaleBefore, Camera(m_A1)->GetParallelScale(), 1e-6);
+  }
+
+  void Handler_HalfLevelWindowPair_Throws()
+  {
+    using mitk::DisplayActionEventFunctions::LevelWindowScope;
+
+    mitk::DisplayActionEventHandlerSynchronized::Predicates targetsOnly;
+    targetsOnly.levelWindow = SameEditorPredicate("editorA__");
+    mitk::DisplayActionEventHandlerSynchronized::Predicates scopeOnly;
+    scopeOnly.levelWindowScope = ConstantScope(LevelWindowScope::Grouped);
+
+    CPPUNIT_ASSERT_THROW(mitk::DisplayActionEventHandlerSynchronized{ targetsOnly }, mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::DisplayActionEventHandlerSynchronized{ scopeOnly }, mitk::Exception);
+
+    mitk::DisplayActionEventHandlerSynchronized handler(mitk::DisplayActionEventHandlerSynchronized::Predicates{});
+    CPPUNIT_ASSERT_THROW(handler.SetPredicates(targetsOnly), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(handler.SetPredicates(scopeOnly), mitk::Exception);
   }
 
 private:

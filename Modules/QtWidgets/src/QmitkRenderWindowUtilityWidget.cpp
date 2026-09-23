@@ -110,16 +110,8 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   connect(dataMenu, &QMenu::aboutToHide, this, [this]() { emit PopupVisibilityChanged(false); });
   layout->addWidget(dataButton);
 
-  // Data-selection group membership is no longer a per-cell combobox: it is one
-  // axis among the others, assigned in the layout editor and shown in the sync
-  // barcode. The cell's selection group is stored on the node selection widget
-  // (see GetSyncGroup), which stays the authoritative store.
-
-  // The per-cell slice scrub control lives in the viewport navigator, and
-  // reorientation is driven by clicking the cell's plane label; the utility
-  // row no longer hosts a slice slider or a view-direction combobox. The
-  // direction controller stays: it is how a reorientation (or a relayed
-  // orientation-group change) is applied to this cell's renderer, via
+  // The direction controller applies a reorientation, from the plane label or a
+  // relayed orientation-group change, to this cell's renderer via
   // 'SetViewDirectionSelection'.
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ m_BaseRenderer };
   m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
@@ -184,8 +176,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::Clicked, this, [this]() {
     emit LayoutEditorRequested();
   });
-  connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::PeekHovered,
-          this, &QmitkRenderWindowUtilityWidget::SyncPeekHovered);
+  connect(m_SyncBarcode, &QmitkMxNSyncBarcodeWidget::PeekHovered, this,
+          [this](bool overStrip, int index) {
+            emit SyncPeekHovered(overStrip, QmitkMxNSyncAxisFromSlot(index));
+          });
   layout->addWidget(m_SyncBarcode);
 
   m_MaximizeButton = new QToolButton(this);

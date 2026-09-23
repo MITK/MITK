@@ -34,6 +34,28 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <optional>
+#include <string>
+
+using PeekAxis = std::optional<QmitkMxNSyncAxis>;
+
+namespace CppUnit
+{
+  /** Lets CPPUNIT_ASSERT_EQUAL compare and print a peek emphasis. */
+  template <>
+  struct assertion_traits<PeekAxis>
+  {
+    static bool equal(const PeekAxis& expected, const PeekAxis& actual)
+    {
+      return expected == actual;
+    }
+
+    static std::string toString(const PeekAxis& axis)
+    {
+      return axis.has_value() ? "axis " + std::to_string(QmitkMxNSyncAxisToSlot(*axis)) : "no axis";
+    }
+  };
+}
 
 /**
  * Headless tests for the MxN sync peek: the plate geometry, the one glyph box
@@ -621,7 +643,7 @@ public:
   void Broadcast_EveryVisibleCellSharesOneGeometry()
   {
     this->Arrange(1, 3);
-    m_Editor->SetSyncPeek(true, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
 
     const int box = this->Overlay(0)->SyncPeekGlyphBox();
     CPPUNIT_ASSERT_MESSAGE("The layout hosts a plate", box > 0);
@@ -629,20 +651,20 @@ public:
     {
       CPPUNIT_ASSERT_MESSAGE("Every visible cell raises its plate",
                              this->Overlay(index)->IsSyncPeekVisible());
-      CPPUNIT_ASSERT_EQUAL(2, this->Overlay(index)->SyncPeekAxis());
+      CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Slice), this->Overlay(index)->SyncPeekAxis());
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Every plate of a layout uses one glyph box",
                                    box, this->Overlay(index)->SyncPeekGlyphBox());
     }
-    CPPUNIT_ASSERT_EQUAL(2, m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Slice), m_Editor->GetSyncPeekAxis());
   }
 
   void Broadcast_NegativeAxisClears()
   {
     this->Arrange(1, 2);
-    m_Editor->SetSyncPeek(true, 5);
-    CPPUNIT_ASSERT_EQUAL(5, this->Overlay(0)->SyncPeekAxis());
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Windowing);
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Windowing), this->Overlay(0)->SyncPeekAxis());
 
-    m_Editor->SetSyncPeek(false, -1);
+    m_Editor->SetSyncPeek(false, std::nullopt);
     CPPUNIT_ASSERT_MESSAGE("Lowering clears the editor's own state",
                            !m_Editor->IsSyncPeekVisible());
     for (int index = 0; index < 2; ++index)
@@ -659,7 +681,7 @@ public:
     m_Editor->SetMaximizedCell(CellId(0));
     Pump();
 
-    m_Editor->SetSyncPeek(true, 1);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Zoom);
     CPPUNIT_ASSERT_MESSAGE("The visible cell shows the peek",
                            this->Overlay(0)->IsSyncPeekVisible());
     CPPUNIT_ASSERT_MESSAGE("A hidden cell shows no plate",
@@ -672,13 +694,13 @@ public:
   {
     this->Arrange(1, 2);
 
-    m_Editor->OnSyncPeekHovered(true, 3);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Crosshair);
     CPPUNIT_ASSERT_MESSAGE("The dwell has not elapsed yet", !m_Editor->IsSyncPeekVisible());
     Pump();
     CPPUNIT_ASSERT(m_Editor->IsSyncPeekVisible());
-    CPPUNIT_ASSERT_EQUAL(3, m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Crosshair), m_Editor->GetSyncPeekAxis());
 
-    m_Editor->OnSyncPeekHovered(false, -1);
+    m_Editor->OnSyncPeekHovered(false, std::nullopt);
     CPPUNIT_ASSERT_MESSAGE("The grace has not elapsed yet", m_Editor->IsSyncPeekVisible());
     Pump();
     CPPUNIT_ASSERT_MESSAGE("Leaving the strip lowers the peek", !m_Editor->IsSyncPeekVisible());
@@ -688,57 +710,57 @@ public:
   {
     this->Arrange(1, 2);
 
-    m_Editor->OnSyncPeekHovered(true, 3);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Crosshair);
     Pump();
-    CPPUNIT_ASSERT_EQUAL(3, m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Crosshair), m_Editor->GetSyncPeekAxis());
 
-    m_Editor->OnSyncPeekHovered(true, 6);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Lut);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparing axes must not wait out a second dwell",
-                                 6, m_Editor->GetSyncPeekAxis());
-    CPPUNIT_ASSERT_EQUAL(6, this->Overlay(0)->SyncPeekAxis());
+                                 PeekAxis(QmitkMxNSyncAxis::Lut), m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Lut), this->Overlay(0)->SyncPeekAxis());
   }
 
   void Gesture_NewAxisWithinTheGraceKeepsThePeek()
   {
     this->Arrange(1, 2);
 
-    m_Editor->OnSyncPeekHovered(true, 3);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Crosshair);
     Pump();
 
     // Clipping a corner off the strip and coming straight back must not tear the
     // peek down; the grace window covers it.
-    m_Editor->OnSyncPeekHovered(false, -1);
-    m_Editor->OnSyncPeekHovered(true, 4);
+    m_Editor->OnSyncPeekHovered(false, std::nullopt);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Orientation);
     Pump();
     CPPUNIT_ASSERT(m_Editor->IsSyncPeekVisible());
-    CPPUNIT_ASSERT_EQUAL(4, m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Orientation), m_Editor->GetSyncPeekAxis());
   }
 
   void Gesture_GapBetweenGlyphsKeepsTheEmphasis()
   {
     this->Arrange(1, 2);
 
-    m_Editor->OnSyncPeekHovered(true, 3);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Crosshair);
     Pump();
-    CPPUNIT_ASSERT_EQUAL(3, m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Crosshair), m_Editor->GetSyncPeekAxis());
 
     // The pointer is still on the strip, just in the 2 px gap between two glyph
     // boxes. Dropping the emphasis there would flicker axis - none - axis at
     // every boundary of a slide along the row, so it latches instead.
-    m_Editor->OnSyncPeekHovered(true, -1);
+    m_Editor->OnSyncPeekHovered(true, std::nullopt);
     Pump();
     CPPUNIT_ASSERT_MESSAGE("The strip is one surface; its gaps do not lower the peek",
                            m_Editor->IsSyncPeekVisible());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A gap does not clear the emphasis",
-                                 3, m_Editor->GetSyncPeekAxis());
-    CPPUNIT_ASSERT_EQUAL(3, this->Overlay(0)->SyncPeekAxis());
+                                 PeekAxis(QmitkMxNSyncAxis::Crosshair), m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Crosshair), this->Overlay(0)->SyncPeekAxis());
 
     // Only another glyph moves it.
-    m_Editor->OnSyncPeekHovered(true, 6);
-    CPPUNIT_ASSERT_EQUAL(6, m_Editor->GetSyncPeekAxis());
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Lut);
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(QmitkMxNSyncAxis::Lut), m_Editor->GetSyncPeekAxis());
 
     // And only leaving the strip drops it.
-    m_Editor->OnSyncPeekHovered(false, -1);
+    m_Editor->OnSyncPeekHovered(false, std::nullopt);
     Pump();
     CPPUNIT_ASSERT(!m_Editor->IsSyncPeekVisible());
   }
@@ -749,21 +771,21 @@ public:
 
     // Reaching the strip between two glyphs is still an engagement: the plate
     // comes up, with nothing emphasised until a glyph is actually reached.
-    m_Editor->OnSyncPeekHovered(true, -1);
+    m_Editor->OnSyncPeekHovered(true, std::nullopt);
     Pump();
     CPPUNIT_ASSERT(m_Editor->IsSyncPeekVisible());
-    CPPUNIT_ASSERT_EQUAL(-1, m_Editor->GetSyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(), m_Editor->GetSyncPeekAxis());
     CPPUNIT_ASSERT_MESSAGE("The cells raise a plate with no axis pumped",
                            this->Overlay(0)->IsSyncPeekVisible());
-    CPPUNIT_ASSERT_EQUAL(-1, this->Overlay(0)->SyncPeekAxis());
+    CPPUNIT_ASSERT_EQUAL(PeekAxis(), this->Overlay(0)->SyncPeekAxis());
   }
 
   void Gesture_LeavingBeforeTheDwellNeverRaises()
   {
     this->Arrange(1, 2);
 
-    m_Editor->OnSyncPeekHovered(true, 3);
-    m_Editor->OnSyncPeekHovered(false, -1);
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Crosshair);
+    m_Editor->OnSyncPeekHovered(false, std::nullopt);
     Pump();
     CPPUNIT_ASSERT_MESSAGE("A pointer that crosses without resting raises nothing",
                            !m_Editor->IsSyncPeekVisible());
@@ -772,7 +794,7 @@ public:
   void Gesture_MaximizingLowersThePeek()
   {
     this->Arrange(1, 2);
-    m_Editor->SetSyncPeek(true, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
     CPPUNIT_ASSERT(m_Editor->IsSyncPeekVisible());
 
     m_Editor->SetMaximizedCell(CellId(0));
@@ -783,7 +805,7 @@ public:
   void Gesture_LayoutChangeLowersThePeek()
   {
     this->Arrange(1, 2);
-    m_Editor->SetSyncPeek(true, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
 
     this->Arrange(2, 1);
     CPPUNIT_ASSERT(!m_Editor->IsSyncPeekVisible());
@@ -792,14 +814,14 @@ public:
   void Gesture_AddingACellLowersThePeek()
   {
     this->Arrange(1, 2);
-    m_Editor->SetSyncPeek(true, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
 
     // A grid op changes the set of cells the comparison was made of, and it
     // reaches the peek through the same LayoutChanged the grid rebuild emits.
     m_Editor->AddGridColumn();
     CPPUNIT_ASSERT(!m_Editor->IsSyncPeekVisible());
 
-    m_Editor->SetSyncPeek(true, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
     m_Editor->RemoveGridColumn();
     CPPUNIT_ASSERT(!m_Editor->IsSyncPeekVisible());
   }
@@ -807,7 +829,7 @@ public:
   void Gesture_CleanViewLowersThePeek()
   {
     this->Arrange(1, 2);
-    m_Editor->SetSyncPeek(true, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
 
     m_Editor->SetCleanView(true);
     CPPUNIT_ASSERT(!m_Editor->IsSyncPeekVisible());
@@ -977,7 +999,7 @@ public:
     // An axis this cell does not synchronize still raises the peek: the plate
     // draws it in the absent state rather than skipping it.
     m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing);
-    m_Editor->SetSyncPeek(true, 5);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Windowing);
     CPPUNIT_ASSERT_MESSAGE("The layout must host a plate for the paint smoke to mean anything",
                            this->Overlay(0)->SyncPeekGlyphBox() > 0);
 
@@ -986,7 +1008,7 @@ public:
     overlay->grab();  // forces a synchronous paintEvent
 
     // The plate with nothing emphasised drives the empty-caption branch.
-    m_Editor->SetSyncPeek(true, -1);
+    m_Editor->SetSyncPeek(true, std::nullopt);
     overlay->SetPeekProgress(1.0);
     overlay->grab();
 

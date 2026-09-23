@@ -29,9 +29,10 @@ namespace mitk
    * changes are propagated to every renderer admitted by the respective
    * dimension's target predicate (see SetPredicates). The predicates are
    * supplied by the editor that owns the synchronization group membership;
-   * each dimension scopes independently. Without a levelWindow predicate the
-   * level-window action keeps its classic node-global property write, gated
-   * by the prefix filter passed to InitActions.
+   * each dimension scopes independently. Without the level-window pair
+   * (levelWindowScope and levelWindow) the level-window action keeps its
+   * classic node-global property write, gated by the prefix filter passed to
+   * InitActions.
    *
    * \sa DisplayActionEventHandler DisplayActionEventFunctions
    */
@@ -50,10 +51,10 @@ namespace mitk
      * nothing propagates. With all members null the handler behaves like
      * DisplayActionEventHandlerDesynchronized.
      *
-     * The levelWindow predicate carries the double contract documented on
-     * SetLevelWindowSynchronizedAction: `isTarget(sender, sender)` selects
-     * between the node-global legacy write and the renderer-specific grouped
-     * write.
+     * Level-window synchronization takes a pair: levelWindowScope classifies
+     * the gesture's sender and levelWindow admits the targets of a grouped
+     * sender (see SetLevelWindowSynchronizedAction). Both are set or both are
+     * null.
      */
     struct Predicates
     {
@@ -61,13 +62,28 @@ namespace mitk
       DisplayActionEventFunctions::TargetPredicate zoom;
       DisplayActionEventFunctions::TargetPredicate slice;
       DisplayActionEventFunctions::TargetPredicate crosshair;
+      DisplayActionEventFunctions::LevelWindowScopeClassifier levelWindowScope;
       DisplayActionEventFunctions::TargetPredicate levelWindow;
     };
+
+    /**
+     * \brief Construct with the per-dimension target predicates.
+     *
+     * There is deliberately no default constructor: a handler without
+     * predicates synchronizes nothing, so that state has to be asked for
+     * explicitly with an empty Predicates.
+     *
+     * \throws mitk::Exception under the same condition as SetPredicates.
+     */
+    explicit DisplayActionEventHandlerSynchronized(const Predicates& predicates);
 
     /**
      * \brief Set the per-dimension target predicates.
      *
      * Takes effect on the next InitActions call, which re-wires all actions.
+     *
+     * \throws mitk::Exception if exactly one of levelWindowScope and
+     *         levelWindow is set.
      */
     void SetPredicates(const Predicates& predicates);
 

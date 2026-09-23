@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
+#include <QmitkMxNSyncDimension.h>
 #include <QmitkOverlayWidget.h>
 #include <QmitkRenderWindowProximity.h>
 
@@ -33,6 +34,7 @@ found in the LICENSE file.
 #include <QString>
 
 #include <array>
+#include <optional>
 #include <vector>
 
 class QmitkMxNMultiWidget;
@@ -182,7 +184,7 @@ public:
 
   /** \brief The number of synchronization axes a peek plate shows, matching the
    *         sync barcode's slot count. */
-  static constexpr int PeekAxisCount = 8;
+  static constexpr int PeekAxisCount = QmitkMxNSyncAxisCount;
 
   /** \brief The legible range of a peek plate's glyph box side. */
   static constexpr int PeekGlyphBoxMin = 20;
@@ -190,20 +192,19 @@ public:
 
   /**
   * \brief Show or hide this cell's sync peek plate at the layout-wide 'glyphBox'
-  *        side, emphasising 'axisIndex' - or none of them when it is negative,
-  *        which is how the plate looks while the pointer rests on the barcode
-  *        between two glyphs. The box is handed in rather than derived here:
-  *        every plate in the layout must share one geometry, or the rows stop
-  *        being comparable.
+  *        side, emphasising 'axis' - or none of them without one, which is how
+  *        the plate looks while the pointer rests on the barcode between two
+  *        glyphs. The box is handed in rather than derived here: every plate in
+  *        the layout must share one geometry, or the rows stop being comparable.
   */
-  void SetSyncPeek(bool visible, int axisIndex, int glyphBox);
+  void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox);
 
   /** \brief Whether this cell's peek plate is up. Exposed for verification. */
   bool IsSyncPeekVisible() const;
 
-  /** \brief The axis this cell's peek emphasises, or -1 for none. Exposed for
+  /** \brief The axis this cell's peek emphasises, if any. Exposed for
    *         verification. */
-  int SyncPeekAxis() const;
+  std::optional<QmitkMxNSyncAxis> SyncPeekAxis() const;
 
   /** \brief The glyph box this cell's peek was given, or 0. Exposed for
    *         verification. */

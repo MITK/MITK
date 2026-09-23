@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkMxNSyncDimension_h
 
 #include <array>
+#include <cstddef>
 #include <optional>
 #include <string>
 
@@ -69,6 +70,71 @@ inline std::optional<QmitkMxNSyncDimension> QmitkMxNSyncDimensionFromLinkKey(con
     }
   }
   return std::nullopt;
+}
+
+/**
+ * \brief The axes the MxN synchronization surfaces (barcodes, cell map,
+ *        advanced matrix, sync peek) present: the seven synchronization
+ *        dimensions followed by data selection, in slot order.
+ */
+enum class QmitkMxNSyncAxis
+{
+  Pan,
+  Zoom,
+  Slice,
+  Crosshair,
+  Orientation,
+  Windowing,
+  Lut,
+  Selection
+};
+
+inline constexpr int QmitkMxNSyncAxisCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;
+
+static_assert(static_cast<int>(QmitkMxNSyncAxis::Selection) + 1 == QmitkMxNSyncAxisCount,
+              "QmitkMxNSyncAxis must list the synchronization dimensions, then Selection");
+static_assert([] {
+                for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+                {
+                  if (static_cast<std::size_t>(QmitkMxNAllSyncDimensions[i]) != i)
+                  {
+                    return false;
+                  }
+                }
+                return true;
+              }(),
+              "QmitkMxNAllSyncDimensions must follow the QmitkMxNSyncDimension declaration order");
+
+/** \brief The axis's position on the synchronization surfaces. */
+inline constexpr int QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis axis)
+{
+  return static_cast<int>(axis);
+}
+
+/** \brief The axis at a surface position; empty outside [0, QmitkMxNSyncAxisCount). */
+inline constexpr std::optional<QmitkMxNSyncAxis> QmitkMxNSyncAxisFromSlot(int slot)
+{
+  if (slot < 0 || slot >= QmitkMxNSyncAxisCount)
+  {
+    return std::nullopt;
+  }
+  return static_cast<QmitkMxNSyncAxis>(slot);
+}
+
+/** \brief The dimension an axis synchronizes; empty for Selection. */
+inline constexpr std::optional<QmitkMxNSyncDimension> QmitkMxNSyncAxisDimension(QmitkMxNSyncAxis axis)
+{
+  if (QmitkMxNSyncAxis::Selection == axis)
+  {
+    return std::nullopt;
+  }
+  return static_cast<QmitkMxNSyncDimension>(static_cast<int>(axis));
+}
+
+/** \brief The axis presenting a dimension. */
+inline constexpr QmitkMxNSyncAxis QmitkMxNSyncAxisOf(QmitkMxNSyncDimension dimension)
+{
+  return static_cast<QmitkMxNSyncAxis>(static_cast<int>(dimension));
 }
 
 #endif

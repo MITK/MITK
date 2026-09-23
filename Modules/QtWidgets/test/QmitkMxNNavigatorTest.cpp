@@ -36,6 +36,7 @@ found in the LICENSE file.
 
 #include <cmath>
 #include <memory>
+#include <vector>
 
 /**
  * Engine-facing tests for the per-cell navigator's synchronization contract:
@@ -57,6 +58,7 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(SyncBarcode_ReflectsMembership);
   MITK_TEST(SyncBarcode_LayoutWrapsToGeometry);
   MITK_TEST(SyncBarcode_SlotAtInHitTest);
+  MITK_TEST(LayoutEditorRequest_BarcodeTogglesContextMenuShows);
   MITK_TEST(AxisGlyphResources_PresentAndThemeable);
   CPPUNIT_TEST_SUITE_END();
 
@@ -328,6 +330,28 @@ public:
     const auto tiny = QmitkMxNSyncBarcodeWidget::ComputeLayout(40, 14, slotCount);
     CPPUNIT_ASSERT_MESSAGE("a cramped strip collapses to the color bar",
                            tiny.mode == Layout::Mode::ColorBar);
+  }
+
+  void LayoutEditorRequest_BarcodeTogglesContextMenuShows()
+  {
+    // A second barcode press closes the editor the first one opened; the
+    // context menu's "Open layout editor" must never close it.
+    std::vector<QmitkMxNMultiWidget::LayoutEditorRequest> requests;
+    const auto connection = QObject::connect(
+      m_Editor.get(), &QmitkMxNMultiWidget::LayoutEditorRequested,
+      [&requests](QmitkMxNMultiWidget::LayoutEditorRequest request) { requests.push_back(request); });
+
+    auto* utility = m_Editor->GetRenderWindowWidget(CellId(0))->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    emit utility->LayoutEditorRequested();
+    m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
+    QObject::disconnect(connection);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), requests.size());
+    CPPUNIT_ASSERT_MESSAGE("A barcode press toggles the editor",
+                           QmitkMxNMultiWidget::LayoutEditorRequest::Toggle == requests[0]);
+    CPPUNIT_ASSERT_MESSAGE("A context-menu request only shows it",
+                           QmitkMxNMultiWidget::LayoutEditorRequest::Show == requests[1]);
   }
 
   void SyncBarcode_SlotAtInHitTest()

@@ -182,14 +182,7 @@ public:
   /** The barcode axis index of a sync dimension (selection is the last axis). */
   static int AxisIndexOf(QmitkMxNSyncDimension dimension)
   {
-    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
-    {
-      if (QmitkMxNAllSyncDimensions[i] == dimension)
-      {
-        return static_cast<int>(i);
-      }
-    }
-    return -1;
+    return QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxisOf(dimension));
   }
 
   /** Raise the "Advanced" face, which is what makes the matrix track the engine
@@ -589,8 +582,8 @@ public:
     // axis click on this empty group toggles the intent cache, not the engine.
     const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
     const int windowingAxis = AxisIndexOf(QmitkMxNSyncDimension::Windowing);
-    m_Widget->ToggleGroupAxis(group, sliceAxis);
-    m_Widget->ToggleGroupAxis(group, windowingAxis);
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Windowing);
 
     // The barcode reflects exactly those two axes as linked (a valid hue).
     const auto barcodeSlots = m_Widget->BuildGroupBarcodeSlots(group);
@@ -617,8 +610,8 @@ public:
     }
 
     // Toggling both axes back off returns the barcode to all-gap.
-    m_Widget->ToggleGroupAxis(group, sliceAxis);
-    m_Widget->ToggleGroupAxis(group, windowingAxis);
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Windowing);
     for (const auto& slot : m_Widget->BuildGroupBarcodeSlots(group))
     {
       CPPUNIT_ASSERT_MESSAGE("Toggling every axis back off clears the displayed intent",
@@ -630,7 +623,7 @@ public:
   {
     const auto group = m_Widget->CreateGroup();
     Pump();
-    m_Widget->ToggleGroupAxis(group, AxisIndexOf(QmitkMxNSyncDimension::Slice));  // cache Slice only
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);  // cache Slice only
 
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
 
@@ -664,7 +657,7 @@ public:
     // cache - it must NOT assign the active/selected cell to the group.
     m_Editor->SetActiveRenderWindowWidget(m_Editor->GetRenderWindowWidget(CellId(1)));
 
-    m_Widget->ToggleGroupAxis(group, AxisIndexOf(QmitkMxNSyncDimension::Slice));
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);
 
     for (std::size_t cell = 0; cell < 3; ++cell)
     {
@@ -684,13 +677,12 @@ public:
     // The data-selection axis toggles on/off for a non-default group like any
     // other axis (this is the empty-group path's non-empty counterpart).
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "G");  // cell 0 is a member of G
-    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
 
-    m_Widget->ToggleGroupAxis("G", selectionAxis);
+    m_Widget->ToggleGroupAxis("G", QmitkMxNSyncAxis::Selection);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Toggling the selection axis on links the member's selection to the group",
                                  std::string("G"), m_Editor->GetCellSelectionGroup(CellId(0)));
 
-    m_Widget->ToggleGroupAxis("G", selectionAxis);
+    m_Widget->ToggleGroupAxis("G", QmitkMxNSyncAxis::Selection);
     CPPUNIT_ASSERT_MESSAGE("Toggling it off returns the member to the default selection group",
                            m_Editor->GetCellSelectionGroup(CellId(0)) != "G");
   }
@@ -802,7 +794,7 @@ public:
     // With every cell a member of "main" (via the appearance axes), the "main"
     // card is a live group: an axis-glyph click homogenizes that axis across all
     // members rather than toggling an empty-group intent cache.
-    m_Widget->ToggleGroupAxis("main", AxisIndexOf(QmitkMxNSyncDimension::Slice));
+    m_Widget->ToggleGroupAxis("main", QmitkMxNSyncAxis::Slice);
 
     for (std::size_t cell = 0; cell < 3; ++cell)
     {
@@ -1134,7 +1126,7 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
 
     QStringList members =
-      m_Widget->CellsSharingAxis(QString::fromStdString(id), AxisIndexOf(QmitkMxNSyncDimension::Slice));
+      m_Widget->CellsSharingAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
     members.sort();
     QStringList expected{ CellId(0), CellId(2) };
     expected.sort();
@@ -1144,10 +1136,10 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("An axis no member links resolves to nothing",
                            m_Widget->CellsSharingAxis(QString::fromStdString(id),
-                             AxisIndexOf(QmitkMxNSyncDimension::Orientation)).isEmpty());
+                             QmitkMxNSyncAxis::Orientation).isEmpty());
     CPPUNIT_ASSERT_MESSAGE("An unknown group resolves to nothing",
                            m_Widget->CellsSharingAxis(QStringLiteral("no-such-group"),
-                             AxisIndexOf(QmitkMxNSyncDimension::Slice)).isEmpty());
+                             QmitkMxNSyncAxis::Slice).isEmpty());
   }
 
   void SyncHighlight_CellsSharingSelectionAxis()
@@ -1157,8 +1149,7 @@ public:
     m_Editor->SetCellSelectionGroup(CellId(0), "sel");
     m_Editor->SetCellSelectionGroup(CellId(1), "sel");
 
-    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
-    QStringList members = m_Widget->CellsSharingAxis(QStringLiteral("sel"), selectionAxis);
+    QStringList members = m_Widget->CellsSharingAxis(QStringLiteral("sel"), QmitkMxNSyncAxis::Selection);
     members.sort();
     QStringList expected{ CellId(0), CellId(1) };
     expected.sort();
@@ -1178,7 +1169,7 @@ public:
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "g5");
     m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "g5");
 
-    m_Widget->HighlightCellAxis(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice));
+    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
     QStringList highlight = cellMap->GetHighlightedWindowIds();
     highlight.sort();
     QStringList expected{ CellId(0), CellId(2) };
@@ -1187,7 +1178,7 @@ public:
                                  expected.join(QStringLiteral(",")).toStdString(),
                                  highlight.join(QStringLiteral(",")).toStdString());
 
-    m_Widget->HighlightCellAxis(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Orientation));
+    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Orientation);
     CPPUNIT_ASSERT_MESSAGE("Hovering an axis the cell does not link clears the highlight",
                            cellMap->GetHighlightedWindowIds().isEmpty());
   }
@@ -1200,12 +1191,12 @@ public:
     CPPUNIT_ASSERT(nullptr != cellMap);
 
     const QStringList highlight{ CellId(0), CellId(2) };
-    cellMap->SetHighlightedCells(highlight, AxisIndexOf(QmitkMxNSyncDimension::Slice), QColor(Qt::red));
+    cellMap->SetHighlightedCells(highlight, QmitkMxNSyncAxis::Slice, QColor(Qt::red));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The cell map stores the highlighted set",
                                  highlight.join(QStringLiteral(",")).toStdString(),
                                  cellMap->GetHighlightedWindowIds().join(QStringLiteral(",")).toStdString());
 
-    cellMap->SetHighlightedCells(QStringList(), -1, QColor());
+    cellMap->SetHighlightedCells(QStringList(), std::nullopt, QColor());
     CPPUNIT_ASSERT_MESSAGE("Clearing empties the highlight",
                            cellMap->GetHighlightedWindowIds().isEmpty());
   }
@@ -1223,7 +1214,7 @@ public:
                            !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom).has_value());
 
     const auto cell =
-      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Zoom));
+      m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Zoom);
     CPPUNIT_ASSERT_MESSAGE("An unlinked cell names no group", cell.group.empty());
     CPPUNIT_ASSERT_MESSAGE("An unlinked cell shows no offset", cell.offset.isEmpty());
   }
@@ -1238,14 +1229,14 @@ public:
     Pump();
 
     const auto slice =
-      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice));
+      m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The chip names the linked group", id, slice.group);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A positive slice offset reads with its sign",
                                  std::string("+2"), slice.offset.toStdString());
 
     // Crosshair carries no offset, so its chip shows the group alone.
     const auto crosshair =
-      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Crosshair));
+      m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Crosshair);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The navigation bundle links crosshair too", id, crosshair.group);
     CPPUNIT_ASSERT_MESSAGE("An offset-free dimension shows no offset", crosshair.offset.isEmpty());
   }
@@ -1254,13 +1245,13 @@ public:
   {
     const auto id = m_Widget->CreateGroup();
 
-    m_Widget->SetCellAxisGroup(CellId(1), AxisIndexOf(QmitkMxNSyncDimension::Pan), id);
+    m_Widget->SetCellAxisGroup(CellId(1), QmitkMxNSyncAxis::Pan, id);
     CPPUNIT_ASSERT_MESSAGE("Assigning one axis links exactly it",
                            IsLinked(1, QmitkMxNSyncDimension::Pan, id));
     CPPUNIT_ASSERT_MESSAGE("Assigning one axis leaves the others alone",
                            !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom).has_value());
 
-    m_Widget->ClearCellAxis(CellId(1), AxisIndexOf(QmitkMxNSyncDimension::Pan));
+    m_Widget->ClearCellAxis(CellId(1), QmitkMxNSyncAxis::Pan);
     CPPUNIT_ASSERT_MESSAGE("Clearing the axis unlinks it",
                            !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan).has_value());
   }
@@ -1270,13 +1261,12 @@ public:
     // Data selection has no unlinked state, so clearing the last axis returns
     // the cell to the default group rather than leaving it in none.
     const auto id = m_Widget->CreateGroup();
-    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
 
-    m_Widget->SetCellAxisGroup(CellId(2), selectionAxis, id);
+    m_Widget->SetCellAxisGroup(CellId(2), QmitkMxNSyncAxis::Selection, id);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The selection axis moves to the named group", id,
                                  m_Editor->GetCellSelectionGroup(CellId(2)));
 
-    m_Widget->ClearCellAxis(CellId(2), selectionAxis);
+    m_Widget->ClearCellAxis(CellId(2), QmitkMxNSyncAxis::Selection);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Clearing returns the selection to the default group",
                                  std::string("main"), m_Editor->GetCellSelectionGroup(CellId(2)));
   }
@@ -1288,9 +1278,9 @@ public:
     const auto first = m_Widget->CreateGroup();
     const auto second = m_Widget->CreateGroup();
 
-    m_Widget->SetCellAxisGroup(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice), first);
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Slice, first);
     m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, -3);
-    m_Widget->SetCellAxisGroup(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice), second);
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Slice, second);
 
     const auto link = m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice);
     CPPUNIT_ASSERT_MESSAGE("The cell is now in the second group",
@@ -1341,14 +1331,14 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "The chip follows an edit made on the other face", id,
-      m_Widget->AdvancedMatrixCell(CellId(2), AxisIndexOf(QmitkMxNSyncDimension::Slice)).group);
+      m_Widget->AdvancedMatrixCell(CellId(2), QmitkMxNSyncAxis::Slice).group);
 
     m_Widget->SetCellMembership(CellId(2), id, false);
     Pump();
 
     CPPUNIT_ASSERT_MESSAGE(
       "The chip clears when the cell leaves the group",
-      m_Widget->AdvancedMatrixCell(CellId(2), AxisIndexOf(QmitkMxNSyncDimension::Slice))
+      m_Widget->AdvancedMatrixCell(CellId(2), QmitkMxNSyncAxis::Slice)
         .group.empty());
   }
 
@@ -1363,14 +1353,14 @@ public:
     Pump();
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "The attached editor's links are on the chips", id,
-      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice)).group);
+      m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).group);
 
     m_Widget->SetMultiWidget(nullptr);
     Pump();
 
     CPPUNIT_ASSERT_MESSAGE(
       "A detached editor leaves no chip behind",
-      m_Widget->AdvancedMatrixCell(CellId(0), AxisIndexOf(QmitkMxNSyncDimension::Slice))
+      m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice)
         .group.empty());
   }
 
@@ -1499,7 +1489,7 @@ public:
     const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
 
     const auto id = m_Widget->CreateGroup();
-    m_Widget->SetCellAxisGroup(CellId(0), sliceAxis, id);
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Slice, id);
     Pump();
     const int before = matrix->columnWidth(sliceAxis);
 
@@ -1519,11 +1509,10 @@ public:
     // barcodes, frame colors and cell overlays repaint on SyncLinksChanged, so
     // an edit made here has to raise it or they go stale.
     const auto id = m_Widget->CreateGroup();
-    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
 
     {
       SyncNotificationCounter counter(m_Editor.get());
-      m_Widget->SetCellAxisGroup(CellId(0), sliceAxis, id);
+      m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Slice, id);
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Linking a cell notifies once", 1, counter.Count());
     }
     {
@@ -1533,7 +1522,7 @@ public:
     }
     {
       SyncNotificationCounter counter(m_Editor.get());
-      m_Widget->ClearCellAxis(CellId(0), sliceAxis);
+      m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Unlinking a cell notifies once", 1, counter.Count());
     }
   }
@@ -1547,18 +1536,16 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
     Pump();
 
-    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
-    const int panAxis = AxisIndexOf(QmitkMxNSyncDimension::Pan);
-    m_Widget->HighlightCellAxis(CellId(0), sliceAxis);
+    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
 
     CPPUNIT_ASSERT_MESSAGE("The hovered cell is marked",
-                           m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+                           m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
     CPPUNIT_ASSERT_MESSAGE("Its synchronized partner is marked too",
-                           m_Widget->AdvancedMatrixCell(CellId(2), sliceAxis).highlighted);
+                           m_Widget->AdvancedMatrixCell(CellId(2), QmitkMxNSyncAxis::Slice).highlighted);
     CPPUNIT_ASSERT_MESSAGE("A window outside the group is not",
-                           !m_Widget->AdvancedMatrixCell(CellId(1), sliceAxis).highlighted);
+                           !m_Widget->AdvancedMatrixCell(CellId(1), QmitkMxNSyncAxis::Slice).highlighted);
     CPPUNIT_ASSERT_MESSAGE("Only the hovered axis is marked, not the whole row",
-                           !m_Widget->AdvancedMatrixCell(CellId(0), panAxis).highlighted);
+                           !m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Pan).highlighted);
 
     auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
     CPPUNIT_ASSERT(nullptr != cellMap);
@@ -1578,23 +1565,22 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
     Pump();
 
-    const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
-    m_Widget->HighlightCellAxis(CellId(0), sliceAxis);
-    CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
 
     m_Widget->ClearSyncHighlight();
     CPPUNIT_ASSERT_MESSAGE("Clearing unmarks the hovered cell",
-                           !m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+                           !m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
     CPPUNIT_ASSERT_MESSAGE("Clearing unmarks its partner",
-                           !m_Widget->AdvancedMatrixCell(CellId(2), sliceAxis).highlighted);
+                           !m_Widget->AdvancedMatrixCell(CellId(2), QmitkMxNSyncAxis::Slice).highlighted);
 
     // A marking left over from before a grid change must not survive onto the
     // items the rebuild puts in its place.
-    m_Widget->HighlightCellAxis(CellId(0), sliceAxis);
+    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
     m_Editor->SetLayout(1, 2);
     Pump();
     CPPUNIT_ASSERT_MESSAGE("A rebuild leaves no stale marking",
-                           !m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).highlighted);
+                           !m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
   }
 
   void Offset_CellBarcodeMarksAndWordsTheOffset()
@@ -1664,7 +1650,7 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "The chip and the barcode word the shift identically",
       m_Editor->BuildBarcodeSlots(CellId(0))[sliceAxis].offsetText.toStdString(),
-      m_Widget->AdvancedMatrixCell(CellId(0), sliceAxis).offset.toStdString());
+      m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).offset.toStdString());
 
     // The neutral value of each dimension is not an authored shift.
     CPPUNIT_ASSERT_MESSAGE(

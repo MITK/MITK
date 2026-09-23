@@ -646,19 +646,19 @@ QmitkMxNCellOverlay::ComputePeekPlate(const QSize& cellSize, int glyphBox, int p
   return layout;
 }
 
-void QmitkMxNCellOverlay::SetSyncPeek(bool visible, int axisIndex, int glyphBox)
+void QmitkMxNCellOverlay::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox)
 {
   const bool up = visible && glyphBox >= PeekGlyphBoxMin;
-  const int axis = up && axisIndex >= 0 && axisIndex < PeekAxisCount ? axisIndex : -1;
+  const int slot = up && axis.has_value() ? QmitkMxNSyncAxisToSlot(*axis) : -1;
   const int box = up ? glyphBox : 0;
-  if (up == m_SyncPeekVisible && axis == m_SyncPeekAxis && box == m_SyncPeekGlyphBox)
+  if (up == m_SyncPeekVisible && slot == m_SyncPeekAxis && box == m_SyncPeekGlyphBox)
   {
     return;
   }
 
   const bool wasUp = m_SyncPeekVisible;
   m_SyncPeekVisible = up;
-  m_SyncPeekAxis = axis;
+  m_SyncPeekAxis = slot;
   m_SyncPeekGlyphBox = box;
   this->UpdateInteractivity();
 
@@ -691,9 +691,9 @@ bool QmitkMxNCellOverlay::IsSyncPeekVisible() const
   return m_SyncPeekVisible;
 }
 
-int QmitkMxNCellOverlay::SyncPeekAxis() const
+std::optional<QmitkMxNSyncAxis> QmitkMxNCellOverlay::SyncPeekAxis() const
 {
-  return m_SyncPeekAxis;
+  return QmitkMxNSyncAxisFromSlot(m_SyncPeekAxis);
 }
 
 int QmitkMxNCellOverlay::SyncPeekGlyphBox() const
@@ -2324,7 +2324,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
 
   menu.addSeparator();
 
-  auto* reinitAction = menu.addAction(tr("Reinit group geometry"));
+  auto* reinitAction = menu.addAction(tr("Fit group views to visible data"));
   connect(reinitAction, &QAction::triggered, this, [this, windowId]()
   {
     try
@@ -2403,7 +2403,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   auto* editorAction = menu.addAction(tr("Open layout editor"));
   connect(editorAction, &QAction::triggered, this, [this]()
   {
-    m_Editor->RequestLayoutEditor();
+    m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
   });
 
   auto* expandedNavigatorAction = menu.addAction(tr("Expanded navigator"));

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkException.h>
+#include <mitkImageGenerator.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -46,6 +47,7 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(AddGridColumn_SerializeRoundTrips);
   MITK_TEST(RemoveGridColumn_DropsRightmost_GuardsAtOneColumn);
   MITK_TEST(RemoveGridColumn_ReclaimsEmptiedSelectionGroup);
+  MITK_TEST(SetLayoutShrink_ReclaimsEmptiedSelectionGroup);
   MITK_TEST(RemoveGridColumn_KeepsActive_WhenNotRemoved);
   MITK_TEST(RemoveGridColumn_RepointsActive_WhenRemoved);
   MITK_TEST(AddGridRow_AppendsBottomRow);
@@ -55,6 +57,13 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(Maximize_UnknownIdRestoresTheGrid);
   MITK_TEST(Maximize_IsInvisibleToSerialization);
   MITK_TEST(Maximize_LayoutChangeRestoresTheGrid);
+  MITK_TEST(Maximize_AddGridColumnRestoresTheGrid);
+  MITK_TEST(Maximize_RemoveGridColumnRestoresTheGrid);
+  MITK_TEST(Maximize_AddGridRowRestoresTheGrid);
+  MITK_TEST(Maximize_RemoveGridRowRestoresTheGrid);
+  MITK_TEST(Maximize_DataBasedLayoutRestoresTheGrid);
+  MITK_TEST(Crosshair_NewCellsJoinTheEnabledCrosshair);
+  MITK_TEST(Crosshair_NewCellsFollowVisibilityAndGap);
   MITK_TEST(NormalizedRects_MirrorTheGrid);
   MITK_TEST(NormalizedRects_FollowLoadedProportions);
   MITK_TEST(NormalizedRects_DescribeTheGridWhileMaximized);
@@ -130,6 +139,24 @@ public:
     m_Editor->show();
     m_Editor->SetLayout(rows, columns);
     QCoreApplication::processEvents();
+  }
+
+  /** Maximize a cell of a 2x2 grid, run a grid op, and check the op restored
+   *  the grid. The maximize is taken over the cell set the op changes, and the
+   *  splitter sizes it recorded would go stale (or dangle, for a removed row)
+   *  if it survived. */
+  void AssertGridOpRestoresTheGrid(void (QmitkMxNMultiWidget::*gridOp)(), int expectedCells) const
+  {
+    this->SizedEditor(2, 2);
+    m_Editor->SetMaximizedCell(CellId(0));
+    CPPUNIT_ASSERT_EQUAL(1, this->VisibleCellCount());
+
+    (m_Editor.get()->*gridOp)();
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_MESSAGE("A grid op drops the maximized state",
+                           m_Editor->GetMaximizedCell().isEmpty());
+    CPPUNIT_ASSERT_EQUAL(expectedCells, this->VisibleCellCount());
   }
 
   /** The normalized rect the editor reports for a cell, or an invalid rect. */
@@ -292,6 +319,92 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, this->VisibleCellCount());
   }
 
+  void Maximize_AddGridColumnRestoresTheGrid()
+  {
+    this->AssertGridOpRestoresTheGrid(&QmitkMxNMultiWidget::AddGridColumn, 6);
+  }
+
+  void Maximize_RemoveGridColumnRestoresTheGrid()
+  {
+    this->AssertGridOpRestoresTheGrid(&QmitkMxNMultiWidget::RemoveGridColumn, 2);
+  }
+
+  void Maximize_AddGridRowRestoresTheGrid()
+  {
+    this->AssertGridOpRestoresTheGrid(&QmitkMxNMultiWidget::AddGridRow, 6);
+  }
+
+  void Maximize_RemoveGridRowRestoresTheGrid()
+  {
+    this->AssertGridOpRestoresTheGrid(&QmitkMxNMultiWidget::RemoveGridRow, 2);
+  }
+
+  /** The crosshair node a cell's crosshair manager owns, or null while it is
+   *  not in the data storage. */
+  mitk::DataNode* CrosshairNodeOf(const QString& windowId) const
+  {
+    return m_DataStorage->GetNamedNode(windowId.toStdString() + "crosshairData");
+  }
+
+  void Crosshair_NewCellsJoinTheEnabledCrosshair()
+  {
+    m_Editor->SetLayout(2, 2);
+    m_Editor->EnableCrosshair();
+
+    m_Editor->AddGridColumn();
+    m_Editor->AddGridRow();
+
+    for (const auto& [id, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      CPPUNIT_ASSERT_MESSAGE("Every cell's crosshair reaches the data storage: " + id.toStdString(),
+                             nullptr != this->CrosshairNodeOf(id));
+    }
+  }
+
+  void Crosshair_NewCellsFollowVisibilityAndGap()
+  {
+    m_Editor->SetLayout(1, 2);
+    m_Editor->EnableCrosshair();
+    m_Editor->SetCrosshairVisibility(false);
+    m_Editor->SetCrosshairGap(7);
+
+    m_Editor->AddGridColumn();
+
+    for (const auto& [id, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      CPPUNIT_ASSERT_MESSAGE("A new cell adopts the editor's crosshair visibility: " + id.toStdString(),
+                             !cell->GetCrosshairVisibility());
+      auto* node = this->CrosshairNodeOf(id);
+      CPPUNIT_ASSERT(nullptr != node);
+      int gap = 0;
+      CPPUNIT_ASSERT(node->GetIntProperty("Crosshair.Gap Size", gap));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A new cell adopts the editor's crosshair gap: " + id.toStdString(), 7, gap);
+    }
+  }
+
+  void Maximize_DataBasedLayoutRestoresTheGrid()
+  {
+    // SetDataBasedLayout reinitializes each window to the node's geometry, so
+    // the node must carry real image data.
+    auto image = mitk::DataNode::New();
+    image->SetName("image");
+    image->SetData(mitk::ImageGenerator::GenerateGradientImage<unsigned char>(8, 8, 8));
+    image->SetIntProperty("layer", 1);
+    m_DataStorage->Add(image);
+
+    this->SizedEditor(2, 2);
+    m_Editor->SetMaximizedCell(CellId(0));
+
+    // The rebuild frees every splitter the maximize recorded sizes for.
+    m_Editor->SetDataBasedLayout(QList<mitk::DataNode::Pointer>{ image });
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_MESSAGE("A data-based layout drops the maximized state",
+                           m_Editor->GetMaximizedCell().isEmpty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One image, three view directions -> three visible windows",
+                                 3, this->VisibleCellCount());
+  }
+
   // ---------- AddGridColumn ----------
 
   void AddGridColumn_PreservesLinks_AddsEmptyColumn()
@@ -419,6 +532,19 @@ public:
 
     CPPUNIT_ASSERT(nullptr == m_Editor->GetRenderWindowWidget(CellId(1)));
     CPPUNIT_ASSERT_MESSAGE("An emptied, method-allocated selection group must be reclaimed",
+                           !HasGroup("solo"));
+  }
+
+  void SetLayoutShrink_ReclaimsEmptiedSelectionGroup()
+  {
+    m_Editor->SetLayout(1, 2);  // widget0, widget1
+    m_Editor->SetCellSelectionGroup(CellId(1), "solo");  // fresh connector, sole member
+    CPPUNIT_ASSERT(HasGroup("solo"));
+
+    m_Editor->SetLayout(1, 1);  // the shrink removes widget1
+
+    CPPUNIT_ASSERT(nullptr == m_Editor->GetRenderWindowWidget(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("A shrink reclaims an emptied, method-allocated selection group",
                            !HasGroup("solo"));
   }
 

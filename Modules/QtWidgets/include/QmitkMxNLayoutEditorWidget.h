@@ -140,11 +140,9 @@ public:
    *        does not touch the engine; an empty group with a map selection
    *        bootstraps - it links the selected windows on the axis; a non-empty
    *        group homogenizes the axis over its members (link all / unlink all).
-   *        'axisIndex' indexes the eight barcode axes (the seven
-   *        QmitkMxNAllSyncDimensions, then data selection). Public so tests can
-   *        drive the axis interaction directly.
+   *        Public so tests can drive the axis interaction directly.
    */
-  void ToggleGroupAxis(const std::string& groupId, int axisIndex);
+  void ToggleGroupAxis(const std::string& groupId, QmitkMxNSyncAxis axis);
 
   /**
    * \brief Add a cell to / remove a cell from a group (see
@@ -169,19 +167,18 @@ public:
   std::string CreateGroup();
 
   /**
-   * \brief Link one cell on one barcode axis to 'group' (0..6 the
-   *        QmitkMxNAllSyncDimensions, the last index the data-selection axis).
-   *        An existing offset on the axis is carried over, so re-grouping a cell
-   *        keeps the relationship the user authored. Public so the advanced
-   *        matrix's edits are testable headlessly.
+   * \brief Link one cell on one axis to 'group'. An existing offset on the axis
+   *        is carried over, so re-grouping a cell keeps the relationship the user
+   *        authored. Public so the advanced matrix's edits are testable
+   *        headlessly.
    */
-  void SetCellAxisGroup(const QString& windowId, int axisIndex, const std::string& group);
+  void SetCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis, const std::string& group);
 
   /**
-   * \brief Unlink one cell on one barcode axis. Data selection has no unlinked
-   *        state, so the last axis returns the cell to the default group instead.
+   * \brief Unlink one cell on one axis. Data selection has no unlinked state,
+   *        so the selection axis returns the cell to the default group instead.
    */
-  void ClearCellAxis(const QString& windowId, int axisIndex);
+  void ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis);
 
   /**
    * \brief Set one cell's offset relative to its group's seed on an
@@ -211,7 +208,7 @@ public:
     QString offset;
     bool highlighted = false;
   };
-  MatrixCellContent AdvancedMatrixCell(const QString& windowId, int axisIndex) const;
+  MatrixCellContent AdvancedMatrixCell(const QString& windowId, QmitkMxNSyncAxis axis) const;
 
   /**
    * \brief Remove a synchronization group entirely (its cells are unsynchronized
@@ -245,25 +242,24 @@ public:
 
   /**
    * \brief The window ids that share one synchronization: the members of 'group'
-   *        on barcode axis 'axisIndex' (0..6 the QmitkMxNAllSyncDimensions,
-   *        the last index the data-selection axis). Empty for an unknown group,
-   *        an out-of-range axis, an axis the group links for no cell, or a
-   *        transient mid-layout-change state. Read-only; public so the hover
-   *        highlight resolution is testable headlessly.
+   *        on 'axis'. Empty for an unknown group, an axis the group links for no
+   *        cell, or a transient mid-layout-change state. Read-only; public so the
+   *        hover highlight resolution is testable headlessly.
    */
-  QStringList CellsSharingAxis(const QString& group, int axisIndex) const;
+  QStringList CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const;
 
   /**
    * \brief Sync-highlight-on-hover. Resolve the cells sharing (group, axis) and
-   *        ring them in the cell map; a negative axis clears the highlight.
+   *        ring them in the cell map; ClearSyncHighlight removes the highlight.
    *        HighlightGroupAxis is driven by a group card's glyph hover;
    *        HighlightCellAxis by a cell tile's glyph hover (it resolves the cell's
    *        group for that axis first - the per-dimension link, or the selection
-   *        connector for the last axis - then delegates, clearing when the cell
-   *        syncs nothing there). Public so the resolution is testable headlessly.
+   *        connector for the selection axis - then delegates, clearing when the
+   *        cell syncs nothing there). Public so the resolution is testable
+   *        headlessly.
    */
-  void HighlightGroupAxis(const QString& group, int axisIndex);
-  void HighlightCellAxis(const QString& windowId, int axisIndex);
+  void HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis);
+  void HighlightCellAxis(const QString& windowId, QmitkMxNSyncAxis axis);
   void ClearSyncHighlight();
 
 public Q_SLOTS:
@@ -335,10 +331,10 @@ private:
    *         under the pointer and the selection survives. */
   void RefreshMatrixCells();
 
-  /** \brief The selected matrix cells as (window id, barcode axis) pairs, in row
-   *         then column order - row order being the layout's pre-order, which is
-   *         the order a slice ramp spreads over. */
-  std::vector<std::pair<QString, int>> MatrixSelection() const;
+  /** \brief The selected matrix cells as (window id, axis) pairs, in row then
+   *         column order - row order being the layout's pre-order, which is the
+   *         order a slice ramp spreads over. */
+  std::vector<std::pair<QString, QmitkMxNSyncAxis>> MatrixSelection() const;
 
   /** \brief Re-describe the selection in the action bar and offer exactly the
    *         controls that apply to it: the group picker always, the offset editors
@@ -354,11 +350,11 @@ private:
    *         them, into its preview. */
   void UpdateRampPreview();
 
-  /** \brief Mark the matrix cells of 'windowIds' on 'axisIndex' as sharing the
-   *         hovered synchronization; a negative axis clears the marking. Driven
+  /** \brief Mark the matrix cells of 'windowIds' in 'column' as sharing the
+   *         hovered synchronization; a negative column clears the marking. Driven
    *         from HighlightGroupAxis, so the map and the matrix always show the
    *         same set. */
-  void SetMatrixHighlight(const QStringList& windowIds, int axisIndex);
+  void SetMatrixHighlight(const QStringList& windowIds, int column);
 
   /**
    * \brief The write half of SetCellAxisGroup / ClearCellAxis /
@@ -368,8 +364,8 @@ private:
    *        its batch is done - the same contract QmitkMxNMultiWidget's own
    *        mutators keep.
    */
-  void WriteCellAxisGroup(const QString& windowId, int axisIndex, const std::string& group);
-  void WriteCellAxisCleared(const QString& windowId, int axisIndex);
+  void WriteCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis, const std::string& group);
+  void WriteCellAxisCleared(const QString& windowId, QmitkMxNSyncAxis axis);
   void WriteCellDimensionOffset(const QString& windowId, QmitkMxNSyncDimension dimension,
                                 const QmitkMxNMultiWidget::SyncOffset& offset);
 

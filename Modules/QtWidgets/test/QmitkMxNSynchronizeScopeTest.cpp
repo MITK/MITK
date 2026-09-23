@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <mitkDisplayActionEvents.h>
 #include <mitkImageGenerator.h>
 #include <mitkInteractionEvent.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
@@ -57,6 +59,7 @@ class QmitkMxNSynchronizeScopeTestSuite : public mitk::TestFixture
   MITK_TEST(Pan_Synchronized_CouplesEditorCells_NotForeign);
   MITK_TEST(Zoom_Synchronized_CouplesEditorCells_NotForeign);
   MITK_TEST(Crosshair_Synchronized_CouplesEditorCells_NotForeign);
+  MITK_TEST(LevelWindow_ForeignSender_DoesNotChangeTheImage);
   MITK_TEST(Desynchronized_ScrollMovesOnlySender);
 
   CPPUNIT_TEST_SUITE_END();
@@ -258,6 +261,40 @@ public:
                                  cell0Pos, cell1Pos);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Crosshair must not move a foreign window's slice",
                                  2u, SlicePos(m_ForeignRenderer));
+  }
+
+  void LevelWindow_ForeignSender_DoesNotChangeTheImage()
+  {
+    // The image lies under the foreign window's pointer and carries a
+    // node-global level/window, so a handler that admitted the foreign
+    // gesture would shift it.
+    auto node = mitk::DataNode::New();
+    node->SetName("image");
+    node->SetData(m_Image);
+    node->SetIntProperty("layer", 0);
+    node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 50.0)));
+    m_DataStorage->Add(node);
+    m_ForeignRenderer->SetDataStorage(m_DataStorage);
+
+    // Display/world conversion needs a viewport with an extent.
+    m_ForeignVtkWindow->SetSize(64, 64);
+    mitk::Point2D displayPoint;
+    m_ForeignRenderer->WorldToDisplay(m_Image->GetGeometry()->GetCenter(), displayPoint);
+    mitk::Point3D worldPoint;
+    m_ForeignRenderer->DisplayToWorld(displayPoint, worldPoint);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the gesture position must lie inside the image",
+                           m_Image->GetGeometry()->IsInside(worldPoint));
+
+    auto interactionEvent = mitk::InteractionPositionEvent::New(m_ForeignRenderer, displayPoint);
+    m_Editor->GetInteractionEventHandler()->InvokeEvent(
+      mitk::DisplaySetLevelWindowEvent(interactionEvent, 10.0, 20.0));
+
+    mitk::LevelWindow levelWindow;
+    node->GetLevelWindow(levelWindow);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(
+      "A foreign window's level/window gesture must not reach an MxN editor's handler",
+      100.0, levelWindow.GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(50.0, levelWindow.GetWindow(), 1e-6);
   }
 
   void Desynchronized_ScrollMovesOnlySender()

@@ -69,6 +69,9 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(SetLevelWindow_Unlinked_WritesNodeGlobal);
   MITK_TEST(AdjustLevelWindow_Grouped_PreservesMemberDifferences);
   MITK_TEST(LevelWindow_ContractViolations_Throw);
+  MITK_TEST(Appearance_RemovedCellLeavesNothingForItsReusedId);
+  MITK_TEST(Windowing_UnlinkReturnsTheCellToNodeGlobal);
+  MITK_TEST(Windowing_GroupedWriteWithoutLevelWindowCreatesNone);
   MITK_TEST(GroupColor_AssignedByRegistrationOrder);
   MITK_TEST(Maximize_SliceSyncReachesHiddenPeers);
   MITK_TEST(Maximize_ZoomSyncReachesHiddenPeers);
@@ -445,6 +448,60 @@ public:
   {
     return dynamic_cast<mitk::LevelWindowProperty*>(
       m_ImageNode->GetPropertyList(Renderer(index))->GetProperty("levelwindow"));
+  }
+
+  void Appearance_RemovedCellLeavesNothingForItsReusedId()
+  {
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(42.0, 84.0)), Renderer(2));
+    m_ImageNode->SetProperty("LookupTable",
+      mitk::LookupTableProperty::New(mitk::LookupTable::New()), Renderer(2));
+
+    // The shrink removes mxn__widget2; the regrow creates a new cell with the
+    // same id, i.e. the same renderer name and property context.
+    m_Editor->SetLayout(1, 2);
+    m_Editor->SetLayout(1, 3);
+
+    auto* context = m_ImageNode->GetPropertyList(Renderer(2));
+    CPPUNIT_ASSERT_MESSAGE("A new cell must not inherit a removed cell's level/window",
+                           nullptr == context->GetProperty("levelwindow"));
+    CPPUNIT_ASSERT_MESSAGE("A new cell must not inherit a removed cell's lookup table",
+                           nullptr == context->GetProperty("LookupTable"));
+  }
+
+  void Windowing_UnlinkReturnsTheCellToNodeGlobal()
+  {
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, "wl");
+    FireLevelWindowDelta(0, 10.0, 20.0);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the grouped gesture writes renderer-specific",
+                           nullptr != RendererLevelWindow(0));
+
+    m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing);
+
+    CPPUNIT_ASSERT_MESSAGE("An unlinked cell falls back to the node-global level/window",
+                           nullptr == RendererLevelWindow(0));
+    CPPUNIT_ASSERT_MESSAGE("The remaining group member keeps its value",
+                           nullptr != RendererLevelWindow(1));
+  }
+
+  void Windowing_GroupedWriteWithoutLevelWindowCreatesNone()
+  {
+    auto bare = mitk::DataNode::New();
+    bare->SetName("no level/window");
+    m_DataStorage->Add(bare);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, "wl");
+
+    m_Editor->AdjustLevelWindow(CellId(0), bare, 10.0, 20.0);
+
+    for (std::size_t member : { std::size_t(0), std::size_t(1) })
+    {
+      CPPUNIT_ASSERT_MESSAGE("A node without level/window gets none made up for it",
+                             nullptr == bare->GetPropertyList(Renderer(member))->GetProperty("levelwindow"));
+    }
   }
 
   void Windowing_GroupedGesture_WritesPerRendererToMembers()

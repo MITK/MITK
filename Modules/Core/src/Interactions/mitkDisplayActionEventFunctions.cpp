@@ -326,17 +326,27 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(TargetPredicate isTarget)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(
+  LevelWindowScopeClassifier classifySender, TargetPredicate isTarget)
 {
+  if (!classifySender)
+  {
+    mitkThrow() << "SetLevelWindowSynchronizedAction: the sender classifier must not be null.";
+  }
   ThrowOnNullPredicate(isTarget, "SetLevelWindowSynchronizedAction");
 
-  auto actionFunction = [isTarget](const itk::EventObject& displayInteractorEvent)
+  auto actionFunction = [classifySender, isTarget](const itk::EventObject& displayInteractorEvent)
   {
     if (DisplaySetLevelWindowEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplaySetLevelWindowEvent* displayActionEvent = dynamic_cast<const DisplaySetLevelWindowEvent*>(&displayInteractorEvent);
       const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
       if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+      const auto scope = classifySender(sendingRenderer);
+      if (LevelWindowScope::Foreign == scope)
       {
         return;
       }
@@ -363,10 +373,10 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetL
         return;
       }
 
-      if (!isTarget(sendingRenderer, sendingRenderer))
+      if (LevelWindowScope::Ungrouped == scope)
       {
-        // Sender not level-window-linked: the classic node-global write keeps
-        // ungrouped renderers coupled to the global level/window controls.
+        // The classic node-global write keeps ungrouped renderers coupled to
+        // the global level/window controls.
         LevelWindow levelWindow;
         node->GetLevelWindow(levelWindow);
         levelWindow.SetLevelWindow(levelWindow.GetLevel() + displayActionEvent->GetLevel(),
@@ -393,7 +403,10 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetL
           // keep their relative differences and the mapper prefers the
           // renderer-specific property from now on.
           LevelWindow levelWindow;
-          node->GetLevelWindow(levelWindow, targetRenderer);
+          if (!node->GetLevelWindow(levelWindow, targetRenderer))
+          {
+            continue;  // no level/window to shift, as in the node-global write
+          }
           levelWindow.SetLevelWindow(levelWindow.GetLevel() + displayActionEvent->GetLevel(),
                                      levelWindow.GetWindow() + displayActionEvent->GetWindow());
           node->SetProperty("levelwindow", LevelWindowProperty::New(levelWindow), targetRenderer);

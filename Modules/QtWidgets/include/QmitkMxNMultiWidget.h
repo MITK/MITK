@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QmitkSynchronizedWidgetConnector.h>
 
 // mitk core
+#include <mitkDisplayActionEventFunctions.h>
 #include <mitkVector.h>
 
 #include <nlohmann/json.hpp>
@@ -33,6 +34,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <functional>
+#include <initializer_list>
 #include <map>
 #include <optional>
 #include <set>
@@ -79,6 +81,15 @@ public:
   ~QmitkMxNMultiWidget();
 
   void InitializeMultiWidget() override;
+
+  using QmitkAbstractMultiWidget::RemoveRenderWindowWidget;
+
+  /**
+  * \brief Remove the cell, and with it the renderer-specific level/window and
+  *        lookup table this editor wrote for it (see
+  *        'RemoveCellRendererProperties').
+  */
+  void RemoveRenderWindowWidget(const QString& widgetName) override;
 
   /**
   * \brief Editor-scoped synchronization macro over the four broadcast
@@ -267,9 +278,9 @@ public:
   *   itself is never converged. Convergence is skipped while the involved
   *   render windows have no world geometry yet; use 'ReconvergeSyncGroup'
   *   once they do. `Crosshair` links carry no convergence bookkeeping
-  *   (propagation is absolute). `Orientation` / `Windowing` / `Lut` links
-  *   are stored and serialized, but no synchronization engine drives them
-  *   yet.
+  *   (propagation is absolute). An `Orientation` join aligns the cell to the
+  *   group's plane. `Windowing` / `Lut` joins do not converge: the cell keeps
+  *   its own value until the group's next change propagates.
   *
   * \param windowId   Canonical window id of the cell. Must name an existing cell.
   * \param dimension  The synchronization dimension to link.
@@ -441,8 +452,8 @@ public:
 
   /**
   * \brief Raise or lower the sync peek in every visible cell that can host it,
-  *        emphasising 'axisIndex' - or none of them when it is negative, which
-  *        is what the pointer resting on a barcode between two glyphs shows.
+  *        emphasising 'axis' - or none of them without one, which is what the
+  *        pointer resting on a barcode between two glyphs shows.
   *        Applies immediately, without the pointer dwell the hover path uses.
   *        Public so the peek is testable without a pointer.
   *
@@ -450,13 +461,13 @@ public:
   *   is shown then, which is a documented limit), so the gesture reads the same
   *   whatever the geometry.
   */
-  void SetSyncPeek(bool visible, int axisIndex);
+  void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis);
 
   /** \brief Whether the sync peek is up. */
   bool IsSyncPeekVisible() const;
 
-  /** \brief The axis the sync peek emphasises, or -1 for none. */
-  int GetSyncPeekAxis() const;
+  /** \brief The axis the sync peek emphasises, if any. */
+  std::optional<QmitkMxNSyncAxis> GetSyncPeekAxis() const;
 
   /**
   * \brief Override the pointer dwell and the teardown grace, in milliseconds.
@@ -488,7 +499,7 @@ public:
   *   reason - it moves when another glyph claims it and is dropped when the
   *   pointer leaves, never by the gap in between.
   */
-  void OnSyncPeekHovered(bool overStrip, int axisIndex);
+  void OnSyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis);
 
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
@@ -647,12 +658,20 @@ public:
   void ShowLayoutLoadFeedback();
   void HideLayoutLoadFeedback();
 
+  /** \brief How a layout-editor request treats an editor that is already
+   *         visible: Toggle hides it, Show leaves it up. */
+  enum class LayoutEditorRequest
+  {
+    Toggle,
+    Show
+  };
+
   /**
   * \brief Ask the hosting layer for the layout editor (emits
   *        'LayoutEditorRequested'). Entry point for furniture that cannot
-  *        emit the editor's signal itself (e.g. the seams' editor hook).
+  *        emit the editor's signal itself (e.g. a cell's context menu).
   */
-  void RequestLayoutEditor();
+  void RequestLayoutEditor(LayoutEditorRequest request);
 
   /**
   * \brief Re-initialize the geometry of the cell's geometry-authority
@@ -966,11 +985,11 @@ Q_SIGNALS:
   void SyncLinksChanged();
 
   /**
-  * \brief A cell's "Sync" button asked for the layout editor. The hosting
-  *        layer (the BlueBerry editor part) shows/toggles the view; the
-  *        module only relays the request.
+  * \brief A cell asked for the layout editor: its sync barcode toggles the
+  *        view, its context menu shows it. The hosting layer (the BlueBerry
+  *        editor part) acts on the request; the module only relays it.
   */
-  void LayoutEditorRequested();
+  void LayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request);
 
 protected:
 
@@ -1087,7 +1106,7 @@ private:
   void FinalizeGridSurgery();
 
   /**
-  * \brief Recursive serializer for a 'split' subtree. Emits a v2 JSON node.
+  * \brief Recursive serializer for a 'split' subtree. Emits a v3 JSON node.
   *
   *   The root's 'size' field is omitted not by a flag but structurally:
   *   the parent loop attaches 'size' to each child before pushing into
@@ -1241,12 +1260,18 @@ private:
                    const mitk::BaseRenderer* target) const;
 
   /**
-  * \brief Membership predicate for the level-window gesture. Unlike the
-  *        navigation predicate there is no singleton fallback: an unlinked
-  *        sender is rejected outright (`isTarget(sender, sender)` false),
-  *        which makes the synchronized level-window action fall back to the
-  *        classic node-global write, keeping ungrouped cells coupled to the
-  *        global level/window controls.
+  * \brief Sender classification for the level-window gesture: foreign for a
+  *        renderer that is not a cell of this editor (so that several
+  *        editors' broadcasts do not double-handle each other's windows),
+  *        ungrouped for a cell without a windowing link (the node-global
+  *        write keeps it coupled to the global level/window controls),
+  *        grouped otherwise.
+  */
+  mitk::DisplayActionEventFunctions::LevelWindowScope WindowingScopeOf(const mitk::BaseRenderer* sender) const;
+
+  /**
+  * \brief Membership predicate for a grouped sender's level-window gesture:
+  *        both renderers are cells of this editor sharing a windowing group.
   */
   bool IsWindowingTarget(const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target) const;
 
@@ -1261,6 +1286,15 @@ private:
   *        (see GetSyncGroupColor).
   */
   void RegisterGroupForHue(const std::string& group);
+
+  /**
+  * \brief Remove the renderer-specific 'propertyKeys' of cell 'windowId' from
+  *        every node. Cell ids are reused and a renderer-specific value
+  *        outranks the node-global one, so a leftover would restyle whichever
+  *        cell next takes the id - or keep an unlinked cell detached from the
+  *        global controls.
+  */
+  void RemoveCellRendererProperties(const QString& windowId, std::initializer_list<const char*> propertyKeys);
 
   /**
   * \brief Shared member loop of 'SetLevelWindow' / 'AdjustLevelWindow':
@@ -1412,13 +1446,17 @@ private:
   */
   std::string m_LayoutName;
 
+  /** \brief Crosshair state every cell is created with, so a cell added after
+   *         the editor configured its crosshairs matches the others. */
   bool m_CrosshairVisibility;
+  bool m_CrosshairEnabled = false;
+  unsigned int m_CrosshairGap = 32;
 
-  /** \brief Whether the peek is up, which axis it emphasises (-1 for none), and
-   *         the axis a started dwell will raise with. */
+  /** \brief Whether the peek is up, which axis it emphasises, and the axis a
+   *         started dwell will raise with. */
   bool m_SyncPeekVisible = false;
-  int m_SyncPeekAxis = -1;
-  int m_SyncPeekPendingAxis = -1;
+  std::optional<QmitkMxNSyncAxis> m_SyncPeekAxis;
+  std::optional<QmitkMxNSyncAxis> m_SyncPeekPendingAxis;
 
   /** \brief The pointer rest that raises the peek, and the window a pointer off
    *         the strip must survive before it lowers again. */

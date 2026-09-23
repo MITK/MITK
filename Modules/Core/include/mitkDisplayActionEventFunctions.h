@@ -46,6 +46,32 @@ namespace mitk
      */
     using TargetPredicate =
       std::function<bool(const BaseRenderer* sender, const BaseRenderer* target)>;
+
+    /**
+     * \brief How the sender of a level-window gesture relates to the
+     *        synchronization scope of the handler observing it.
+     *
+     * Foreign: the sender is not one of the handler's renderers; the gesture
+     * is ignored (its own handler serves it). Ungrouped: the sender is the
+     * handler's own renderer but belongs to no level-window group; the
+     * gesture writes the node-global property, keeping the renderer coupled
+     * to the global level/window controls. Grouped: the sender belongs to a
+     * level-window group; the gesture writes renderer-specific values on
+     * every group member admitted by the TargetPredicate.
+     */
+    enum class LevelWindowScope
+    {
+      Foreign,
+      Ungrouped,
+      Grouped
+    };
+
+    /**
+     * \brief Classifies the sender of a level-window gesture; see
+     *        LevelWindowScope. The sender is non-null when the classifier is
+     *        evaluated.
+     */
+    using LevelWindowScopeClassifier = std::function<LevelWindowScope(const BaseRenderer* sender)>;
     /**
      * \brief Create an action that moves the sending renderer's camera.
      *
@@ -168,22 +194,24 @@ namespace mitk
      * \brief Create an action that adjusts the level-window of the topmost visible
      *        image as a renderer-specific property on a set of renderers.
      *
-     * Reacts to DisplaySetLevelWindowEvent. The predicate carries a double
-     * contract: `isTarget(sender, sender)` decides the write path - false means
-     * the sender is not level-window-linked and the action falls back to the
-     * classic node-global property write (staying coupled to the global
-     * level/window controls); true switches to renderer-specific writes, where
-     * every admitted target renderer gets the gesture's delta applied to its
+     * Reacts to DisplaySetLevelWindowEvent. 'classifySender' decides the
+     * write path (see LevelWindowScope): a foreign sender is ignored, an
+     * ungrouped sender gets the classic node-global property write, and a
+     * grouped sender switches to renderer-specific writes, where every target
+     * renderer admitted by 'isTarget' gets the gesture's delta applied to its
      * own current value (renderer-specific, falling back to the node-global
      * value). Renderer-specific values take precedence over the node-global
      * property in the mapper, so grouped renderers detach from the global
      * level/window controls by design.
      *
-     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
+     * \param classifySender Sender classification. Must not be null.
+     * \param isTarget       Scoping predicate for the grouped write; see
+     *                       TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
-     * \throws mitk::Exception if isTarget is null.
+     * \throws mitk::Exception if classifySender or isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowSynchronizedAction(TargetPredicate isTarget);
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowSynchronizedAction(
+      LevelWindowScopeClassifier classifySender, TargetPredicate isTarget);
 
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk

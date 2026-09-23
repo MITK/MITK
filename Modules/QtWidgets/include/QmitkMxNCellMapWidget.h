@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkMxNSyncDimension.h>
 
 #include <QColor>
 #include <QPointer>
@@ -95,13 +96,14 @@ public:
    *         window). Emits SelectionChanged only when the selection changes. */
   void SetSelectedWindowIds(const QStringList& windowIds);
 
-  /** \brief Ring the given tiles in 'hue' and brighten their 'axisIndex' glyph,
+  /** \brief Ring the given tiles in 'hue' and brighten their 'axis' glyph,
    *         marking every cell that shares one synchronization (a group on one
    *         axis). Driven by the owning editor from a glyph hover; an empty list
-   *         (or axisIndex -1) clears the highlight. The ring is the only hue a
+   *         (or no axis) clears the highlight. The ring is the only hue a
    *         tile edge carries besides the drop-target border, so a highlighted
    *         cell stays readable whatever else it is. */
-  void SetHighlightedCells(const QStringList& windowIds, int axisIndex, const QColor& hue);
+  void SetHighlightedCells(const QStringList& windowIds, std::optional<QmitkMxNSyncAxis> axis,
+                           const QColor& hue);
 
   /** \brief The currently sync-highlighted window ids (for tests). */
   QStringList GetHighlightedWindowIds() const;
@@ -138,11 +140,10 @@ Q_SIGNALS:
   void AssignRequested(const QString& group, const QStringList& windowIds,
                        QmitkMxNGroupJoinMode mode);
 
-  /** \brief The pointer is over a tile's axis glyph (window id, and the barcode
-   *         axis index: 0..6 the dimensions, 7 data selection). The owning editor
-   *         resolves which cells share that synchronization and calls back
+  /** \brief The pointer is over a tile's axis glyph. The owning editor resolves
+   *         which cells share that synchronization and calls back
    *         SetHighlightedCells. */
-  void GlyphHovered(const QString& windowId, int axisIndex);
+  void GlyphHovered(const QString& windowId, QmitkMxNSyncAxis axis);
 
   /** \brief The pointer left every tile glyph; the editor clears the highlight. */
   void GlyphHoverCleared();
@@ -219,7 +220,7 @@ private:
   int m_HoverTile = -1;             // tile whose glyph is hovered, or -1
   int m_HoverSlot = -1;             // hovered barcode axis, or -1
   QStringList m_HighlightCells;     // cells to ring (editor-driven)
-  int m_HighlightAxis = -1;         // the shared axis to brighten on them
+  std::optional<QmitkMxNSyncAxis> m_HighlightAxis;  // the shared axis to brighten on them
   QColor m_HighlightHue;            // the shared group's hue
 
 };

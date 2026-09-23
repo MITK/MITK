@@ -150,7 +150,7 @@ void QmitkMxNCellMapWidget::Rebuild()
     m_HighlightCells = survivingHighlight;
     if (m_HighlightCells.isEmpty())
     {
-      m_HighlightAxis = -1;
+      m_HighlightAxis.reset();
     }
   }
   m_HoverTile = -1;
@@ -170,15 +170,16 @@ void QmitkMxNCellMapWidget::SetSelectedWindowIds(const QStringList& windowIds)
   this->SetSelection(windowIds);
 }
 
-void QmitkMxNCellMapWidget::SetHighlightedCells(const QStringList& windowIds, int axisIndex,
+void QmitkMxNCellMapWidget::SetHighlightedCells(const QStringList& windowIds,
+                                                std::optional<QmitkMxNSyncAxis> axis,
                                                 const QColor& hue)
 {
-  if (windowIds == m_HighlightCells && axisIndex == m_HighlightAxis && hue == m_HighlightHue)
+  if (windowIds == m_HighlightCells && axis == m_HighlightAxis && hue == m_HighlightHue)
   {
     return;
   }
   m_HighlightCells = windowIds;
-  m_HighlightAxis = axisIndex;
+  m_HighlightAxis = axis;
   m_HighlightHue = hue;
   this->update();
 }
@@ -328,7 +329,8 @@ void QmitkMxNCellMapWidget::paintEvent(QPaintEvent* /*event*/)
     // this cell's window perspective (each axis linked or not). Brighten the
     // shared axis on a highlighted cell, else the locally hovered glyph, so the
     // hovered synchronization pops on every cell that shares it.
-    const int litSlot = highlighted ? m_HighlightAxis
+    const int highlightSlot = m_HighlightAxis.has_value() ? QmitkMxNSyncAxisToSlot(*m_HighlightAxis) : -1;
+    const int litSlot = highlighted ? highlightSlot
                         : (static_cast<int>(tileIndex) == m_HoverTile ? m_HoverSlot : -1);
     QmitkMxNSyncBarcodeWidget::PaintInto(painter, barcodeRect,
                                          m_MultiWidget->BuildBarcodeSlots(tile.windowId),
@@ -527,14 +529,12 @@ void QmitkMxNCellMapWidget::UpdateGlyphHover(const QPoint& position)
   // The tile barcode always carries the eight sync axes (the seven dimensions
   // plus data selection); hit-test against the same rect and slot count the
   // paint uses.
-  static constexpr int SyncAxisCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;
-
   int tile = this->TileAt(position);
   int slot = -1;
   if (tile >= 0)
   {
     const QRect barcodeRect = this->TileBarcodeRect(m_Tiles[static_cast<std::size_t>(tile)]);
-    slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(barcodeRect, SyncAxisCount, position,
+    slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(barcodeRect, QmitkMxNSyncAxisCount, position,
                                                TileBarcodeFit());
     if (slot < 0)
     {
@@ -549,9 +549,10 @@ void QmitkMxNCellMapWidget::UpdateGlyphHover(const QPoint& position)
   m_HoverTile = tile;
   m_HoverSlot = slot;
 
-  if (tile >= 0 && slot >= 0)
+  const auto axis = QmitkMxNSyncAxisFromSlot(slot);
+  if (tile >= 0 && axis.has_value())
   {
-    emit GlyphHovered(m_Tiles[static_cast<std::size_t>(tile)].windowId, slot);
+    emit GlyphHovered(m_Tiles[static_cast<std::size_t>(tile)].windowId, *axis);
   }
   else
   {
@@ -564,10 +565,10 @@ void QmitkMxNCellMapWidget::DiscardHoverHighlight()
 {
   m_HoverTile = -1;
   m_HoverSlot = -1;
-  if (!m_HighlightCells.isEmpty() || m_HighlightAxis != -1)
+  if (!m_HighlightCells.isEmpty() || m_HighlightAxis.has_value())
   {
     m_HighlightCells.clear();
-    m_HighlightAxis = -1;
+    m_HighlightAxis.reset();
     this->update();
   }
 }

@@ -12,11 +12,23 @@ found in the LICENSE file.
 
 #include <mitkDisplayActionEventHandlerSynchronized.h>
 
+#include <mitkExceptionMacro.h>
+
 // itk
 #include <itkEventObject.h>
 
+mitk::DisplayActionEventHandlerSynchronized::DisplayActionEventHandlerSynchronized(const Predicates& predicates)
+{
+  this->SetPredicates(predicates);
+}
+
 void mitk::DisplayActionEventHandlerSynchronized::SetPredicates(const Predicates& predicates)
 {
+  if (static_cast<bool>(predicates.levelWindowScope) != static_cast<bool>(predicates.levelWindow))
+  {
+    mitkThrow() << "DisplayActionEventHandlerSynchronized::SetPredicates: levelWindowScope and "
+                << "levelWindow must be set together; set neither to leave level-window unsynchronized.";
+  }
   m_Predicates = predicates;
 }
 
@@ -43,6 +55,7 @@ void mitk::DisplayActionEventHandlerSynchronized::InitActionsImpl(const std::str
                        : ScrollSliceStepperAction(prefixFilter));
 
   ConnectDisplayActionEvent(DisplaySetLevelWindowEvent(nullptr, ScalarType(), ScalarType()),
-    m_Predicates.levelWindow ? SetLevelWindowSynchronizedAction(m_Predicates.levelWindow)
-                             : SetLevelWindowAction(prefixFilter));
+    m_Predicates.levelWindow
+      ? SetLevelWindowSynchronizedAction(m_Predicates.levelWindowScope, m_Predicates.levelWindow)
+      : SetLevelWindowAction(prefixFilter));
 }

@@ -18,6 +18,7 @@ found in the LICENSE file.
 // qt widgets module
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkMxNSyncDimension.h>
 #include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
 
@@ -73,10 +74,10 @@ public:
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
   /**
-  * \brief Apply the cell's view direction to its renderer. Both the source
-  *        cell's plane-label picker (via MxN::SetViewDirection) and an
-  *        orientation-group relay (via MxN::PropagateOrientation) funnel
-  *        through here. Only 'AnatomicalPlane::Axial' / 'Coronal' /
+  * \brief Apply the cell's view direction to its renderer. The source cell's
+  *        plane-label picker (via MxN::SetViewDirection), an orientation-group
+  *        relay (via MxN::PropagateOrientation) and a cell joining an
+  *        orientation group (via MxN::SetSyncLink) funnel through here. Only 'AnatomicalPlane::Axial' / 'Coronal' /
   *        'Sagittal' are supported; other planes are ignored.
   */
   void SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection);
@@ -150,18 +151,18 @@ Q_SIGNALS:
 
   /**
   * \brief Emitted when the user asks for the editor-wide layout editor from
-  *        this cell's "Sync" button; the owning multi widget relays it to
+  *        this cell's sync barcode; the owning multi widget relays it to
   *        whoever hosts the view.
   */
   void LayoutEditorRequested();
 
   /**
   * \brief Where the pointer is on this cell's sync barcode: on the strip at all,
-  *        and which of the eight axis glyphs it is over (-1 between glyphs). The
-  *        owning multi widget turns this into the editor-wide sync peek; the
-  *        strip itself only reports.
+  *        and which axis glyph it is over (none between glyphs). The owning
+  *        multi widget turns this into the editor-wide sync peek; the strip
+  *        itself only reports.
   */
-  void SyncPeekHovered(bool overStrip, int axisIndex);
+  void SyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis);
 
   /**
   * \brief Emitted while a popup owned by this strip (currently the data

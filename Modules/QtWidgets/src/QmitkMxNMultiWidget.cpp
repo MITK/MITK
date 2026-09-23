@@ -449,7 +449,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   m_SyncPeekGrace->setSingleShot(true);
   connect(m_SyncPeekGrace, &QTimer::timeout, this, [this]()
   {
-    this->SetSyncPeek(false, -1);
+    this->SetSyncPeek(false, std::nullopt);
   });
 
   // The peek answers a question about the cells as they are now: a layout
@@ -464,6 +464,44 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 {
+  // A reopened editor takes the same cell ids again.
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
+  }
+}
+
+void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
+{
+  this->RemoveCellRendererProperties(widgetName, { "levelwindow", "LookupTable" });
+  QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
+}
+
+void QmitkMxNMultiWidget::RemoveCellRendererProperties(const QString& windowId,
+                                                       std::initializer_list<const char*> propertyKeys)
+{
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  // Cell ids are the renderer names, i.e. the property contexts. GetAll()
+  // returns a fresh container its smart pointer alone keeps alive, so hold it.
+  const auto context = windowId.toStdString();
+  const auto nodes = dataStorage->GetAll();
+  for (const auto& node : *nodes)
+  {
+    const auto contexts = node->GetPropertyListNames();
+    if (std::find(contexts.begin(), contexts.end(), context) == contexts.end())
+    {
+      continue;  // RemoveProperty throws for a context the node does not have
+    }
+    for (const auto* propertyKey : propertyKeys)
+    {
+      node->RemoveProperty(propertyKey, context);
+    }
+  }
 }
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
@@ -476,8 +514,6 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
 
 void QmitkMxNMultiWidget::InstallSynchronizedHandler()
 {
-  auto handler = std::make_unique<mitk::DisplayActionEventHandlerSynchronized>();
-
   auto navPredicate = [this](QmitkMxNSyncDimension dimension)
   {
     return mitk::DisplayActionEventFunctions::TargetPredicate(
@@ -491,14 +527,18 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
   predicates.zoom = navPredicate(QmitkMxNSyncDimension::Zoom);
   predicates.slice = navPredicate(QmitkMxNSyncDimension::Slice);
   predicates.crosshair = navPredicate(QmitkMxNSyncDimension::Crosshair);
+  predicates.levelWindowScope = [this](const mitk::BaseRenderer* sender)
+  {
+    return this->WindowingScopeOf(sender);
+  };
   predicates.levelWindow = [this](const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target)
   {
     return this->IsWindowingTarget(sender, target);
   };
-  handler->SetPredicates(predicates);
-  SetDisplayActionEventHandler(std::move(handler));
+  auto handler = std::make_unique<mitk::DisplayActionEventHandlerSynchronized>(predicates);
+  this->SetDisplayActionEventHandler(std::move(handler));
 
-  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  auto displayActionEventHandler = this->GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
     displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
@@ -537,6 +577,27 @@ bool QmitkMxNMultiWidget::IsNavTarget(QmitkMxNSyncDimension dimension,
   const auto& senderGroup = senderLinks->second.groups[DimensionIndex(dimension)];
   const auto& targetGroup = targetLinks->second.groups[DimensionIndex(dimension)];
   return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
+}
+
+mitk::DisplayActionEventFunctions::LevelWindowScope QmitkMxNMultiWidget::WindowingScopeOf(
+  const mitk::BaseRenderer* sender) const
+{
+  using mitk::DisplayActionEventFunctions::LevelWindowScope;
+
+  const auto editorPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  if (!senderId.startsWith(editorPrefix))
+  {
+    return LevelWindowScope::Foreign;
+  }
+
+  const auto senderLinks = m_CellSyncLinks.find(senderId);
+  if (senderLinks == m_CellSyncLinks.end()
+      || !senderLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)].has_value())
+  {
+    return LevelWindowScope::Ungrouped;
+  }
+  return LevelWindowScope::Grouped;
 }
 
 bool QmitkMxNMultiWidget::IsWindowingTarget(const mitk::BaseRenderer* sender,
@@ -619,8 +680,8 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
   QmitkAbstractMultiWidget::SetActiveRenderWindowWidget(activeRenderWindowWidget);
 
   // The frame color carries group identity, not active-ness; the active cell is
-  // marked by a color-independent inner ring the overlay paints. Restyle every
-  // cell and repaint the overlays so the ring follows the active-cell change.
+  // marked by white corner brackets the overlay paints. Restyle every cell and
+  // repaint the overlays so the brackets follow the active-cell change.
   this->RefreshFrameColors();
 }
 
@@ -746,6 +807,8 @@ bool QmitkMxNMultiWidget::GetCrosshairVisibility() const
 
 void QmitkMxNMultiWidget::SetCrosshairGap(unsigned int gapSize)
 {
+  m_CrosshairGap = gapSize;
+
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -796,6 +859,8 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
 
 void QmitkMxNMultiWidget::EnableCrosshair()
 {
+  m_CrosshairEnabled = true;
+
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -805,6 +870,8 @@ void QmitkMxNMultiWidget::EnableCrosshair()
 
 void QmitkMxNMultiWidget::DisableCrosshair()
 {
+  m_CrosshairEnabled = false;
+
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -866,10 +933,9 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     for (std::size_t i = this->GetNumberOfRenderWindowWidgets(); i-- > 0; )
     {
       const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER + QStringLiteral("widget") + QString::number(i);
-      if (nullptr != this->GetRenderWindowWidget(id))
+      if (const auto cell = this->GetRenderWindowWidget(id))
       {
-        this->RemoveRenderWindowWidget(id);
-        m_CellSyncLinks.erase(id);
+        this->DetachAndDestroyCell(cell.get());
         removed = true;
         break;
       }
@@ -1030,6 +1096,12 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(this, &QmitkMxNMultiWidget::CrosshairVisibilityChanged,
           utilityWidget, &QmitkRenderWindowUtilityWidget::SetCrosshairChecked);
   utilityWidget->SetCrosshairChecked(m_CrosshairVisibility);
+  renderWindowWidget->SetCrosshairVisibility(m_CrosshairVisibility);
+  renderWindowWidget->SetCrosshairGap(m_CrosshairGap);
+  if (m_CrosshairEnabled)
+  {
+    renderWindowWidget->EnableCrosshair();
+  }
 
   // Maximizing is the one per-cell toggle in the strip, so the cell's id is
   // bound here; every strip then mirrors the single maximized cell, which is
@@ -1044,12 +1116,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
             utilityWidget->SetMaximizeChecked(maximizedId == cellId);
           });
   utilityWidget->SetMaximizeChecked(m_MaximizedCell == cellId);
-
-  // The cell's data-selection group is now one axis among the others: it is
-  // assigned from the layout editor and shown in the sync barcode, so the
-  // utility widget no longer carries a group combobox to wire up. The
-  // authoritative store is the node selection widget, set via
-  // 'SetSynchronizationGroup' during layout construction / editor edits.
 
   // Initialize the node selection widget with all nodes. The cell is left
   // unattached to any sync group; placement into a group is the caller's
@@ -1066,10 +1132,10 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
   connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
-  // The cell's "Sync" button opens the editor-wide layout editor; the view
+  // The cell's sync barcode toggles the editor-wide layout editor; the view
   // hosting it lives above this module, so the request is only relayed.
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::LayoutEditorRequested,
-          this, &QmitkMxNMultiWidget::LayoutEditorRequested);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::LayoutEditorRequested, this,
+          [this]() { emit LayoutEditorRequested(LayoutEditorRequest::Toggle); });
 
   // Pointing at an axis in one cell's barcode asks a question about the whole
   // layout, so the strip only reports and the editor answers in every cell.
@@ -1448,6 +1514,8 @@ void QmitkMxNMultiWidget::AddGridColumn()
     return;
   }
 
+  this->SetMaximizedCell(QString());
+
   auto* root = this->RootSplitter();
   // The tree is transiently non-rectangular during this loop (already-grown rows
   // have columns+1 cells, later rows still columns). Nothing reads
@@ -1480,6 +1548,8 @@ void QmitkMxNMultiWidget::RemoveGridColumn()
     return;
   }
 
+  this->SetMaximizedCell(QString());
+
   auto* root = this->RootSplitter();
 
   std::vector<QmitkRenderWindowWidget*> removalSet;
@@ -1508,6 +1578,8 @@ void QmitkMxNMultiWidget::AddGridRow()
     MITK_WARN << "AddGridRow: current layout is not a rectangular grid; no-op.";
     return;
   }
+
+  this->SetMaximizedCell(QString());
 
   auto* root = this->RootSplitter();
 
@@ -1545,6 +1617,8 @@ void QmitkMxNMultiWidget::RemoveGridRow()
     MITK_WARN << "RemoveGridRow: a grid must keep at least one row; no-op.";
     return;
   }
+
+  this->SetMaximizedCell(QString());
 
   auto* root = this->RootSplitter();
   auto* lastRow = dynamic_cast<QSplitter*>(root->widget(rows - 1));
@@ -1593,7 +1667,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetWind
 }
 
 //////////////////////////////////////////////////////////////////////////
-// V2 LAYOUT FORMAT — Serialize / Apply (see mxn-layout-v2.schema.json)
+// LAYOUT FORMAT - Serialize (v3.0) / Apply (v2.0, v3.0); see mxn-layout-v3.schema.json
 //////////////////////////////////////////////////////////////////////////
 
 void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
@@ -2583,6 +2657,8 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
 {
+  this->SetMaximizedCell(QString());
+
   // Tear the existing cell tree down first. The previous implementation
   // tried to recycle existing 'widget<i>' cells by positional index, which
   // misses entirely after a v2 layout with custom names is loaded
@@ -3039,8 +3115,9 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
 
   // Converge the joining cell to the group's reference. The pre-order first
   // member is the seed and defines the reference, so it is never converged
-  // itself. Crosshair propagation is absolute (no state to converge);
-  // windowing / lut have no engine yet.
+  // itself. Crosshair propagation is absolute (no state to converge); a
+  // windowing / lut member keeps its own value and only later changes
+  // propagate.
   if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Zoom == dimension
       || QmitkMxNSyncDimension::Pan == dimension)
   {
@@ -3070,6 +3147,15 @@ void QmitkMxNMultiWidget::ClearSyncLink(const QString& windowId, QmitkMxNSyncDim
     case QmitkMxNSyncDimension::Slice: links.sliceOffset = 0; break;
     case QmitkMxNSyncDimension::Zoom:  links.zoomOffset = 1.0; break;
     case QmitkMxNSyncDimension::Pan:   links.panOffset = mitk::Vector2D(0.0); break;
+    case QmitkMxNSyncDimension::Windowing:
+    {
+      // An unlinked cell renders the node-global level/window again, which is
+      // what keeps it coupled to the global level/window controls.
+      this->RemoveCellRendererProperties(windowId, { "levelwindow" });
+      const auto widget = this->GetRenderWindowWidget(windowId);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
+      break;
+    }
     default: break;
   }
 }
@@ -3656,7 +3742,10 @@ void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNo
     // specific: same per-member semantics as the synchronized gesture, so the
     // mapper prefers the member's own value from now on.
     mitk::LevelWindow levelWindow;
-    node->GetLevelWindow(levelWindow, targetRenderer);
+    if (!node->GetLevelWindow(levelWindow, targetRenderer))
+    {
+      continue;  // nothing to derive a member value from
+    }
     modify(levelWindow);
     node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow), targetRenderer);
     mitk::RenderingManager::GetInstance()->RequestUpdate(
@@ -3732,9 +3821,9 @@ bool QmitkMxNMultiWidget::IsNavigatorExpanded() const
   return m_NavigatorExpanded;
 }
 
-void QmitkMxNMultiWidget::RequestLayoutEditor()
+void QmitkMxNMultiWidget::RequestLayoutEditor(LayoutEditorRequest request)
 {
-  emit LayoutEditorRequested();
+  emit LayoutEditorRequested(request);
 }
 
 void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
@@ -3900,10 +3989,10 @@ int QmitkMxNMultiWidget::ResolvePeekGlyphBox() const
     : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
 }
 
-void QmitkMxNMultiWidget::SetSyncPeek(bool visible, int axisIndex)
+void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis)
 {
   m_SyncPeekVisible = visible;
-  m_SyncPeekAxis = visible && axisIndex >= 0 ? axisIndex : -1;
+  m_SyncPeekAxis = visible ? axis : std::nullopt;
 
   const int box = visible ? this->ResolvePeekGlyphBox() : 0;
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
@@ -3927,7 +4016,7 @@ bool QmitkMxNMultiWidget::IsSyncPeekVisible() const
   return m_SyncPeekVisible;
 }
 
-int QmitkMxNMultiWidget::GetSyncPeekAxis() const
+std::optional<QmitkMxNSyncAxis> QmitkMxNMultiWidget::GetSyncPeekAxis() const
 {
   return m_SyncPeekAxis;
 }
@@ -3938,7 +4027,7 @@ void QmitkMxNMultiWidget::SetSyncPeekTimings(int dwellMs, int graceMs)
   m_SyncPeekGraceMs = std::max(0, graceMs);
 }
 
-void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, int axisIndex)
+void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis)
 {
   if (overStrip)
   {
@@ -3953,15 +4042,15 @@ void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, int axisIndex)
       // them clear it makes a slide along the row flicker axis - none - axis at
       // every boundary. It moves only when another glyph claims it, and is
       // dropped only when the pointer leaves the strip.
-      this->SetSyncPeek(true, axisIndex >= 0 ? axisIndex : m_SyncPeekAxis);
+      this->SetSyncPeek(true, axis.has_value() ? axis : m_SyncPeekAxis);
       return;
     }
 
-    if (axisIndex >= 0)
+    if (axis.has_value())
     {
       // A different glyph restarts the rest, which is what keeps a pointer that
       // sweeps across the strip from raising anything.
-      m_SyncPeekPendingAxis = axisIndex;
+      m_SyncPeekPendingAxis = axis;
       m_SyncPeekDwell->start(m_SyncPeekDwellMs);
     }
     else if (!m_SyncPeekDwell->isActive())
@@ -3981,15 +4070,15 @@ void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, int axisIndex)
     return;
   }
   m_SyncPeekDwell->stop();
-  m_SyncPeekPendingAxis = -1;
+  m_SyncPeekPendingAxis.reset();
 }
 
 void QmitkMxNMultiWidget::LowerSyncPeek()
 {
   m_SyncPeekDwell->stop();
   m_SyncPeekGrace->stop();
-  m_SyncPeekPendingAxis = -1;
-  this->SetSyncPeek(false, -1);
+  m_SyncPeekPendingAxis.reset();
+  this->SetSyncPeek(false, std::nullopt);
 }
 
 QString QmitkMxNMultiWidget::CellLabel(const QString& windowId) const

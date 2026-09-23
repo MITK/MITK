@@ -57,7 +57,7 @@ The app analyzes the files a second time with the DCMTK-based scanner before rep
 
 A volume's `frame_model` is a per-volume flag: it is `true` if any file that makes up the volume has a frame model, even if the others do not.
 
-A file that carries a Per-Frame Functional Groups Sequence with one item per frame gets the per-frame read model: one frame per entry rather than one file per entry. Two consequences show up in the report. `frames` counts the frames of the volume while `distinct_files` counts the files they come from, so for a 20-frame single-file volume `frames` is 20 and `distinct_files` has one entry. And `frames_per_timesteps` counts frames as well, so it is 20 for that volume where it was 1 before the frame model existed.
+A file that carries a Per-Frame Functional Groups Sequence with one item per frame gets the per-frame read model: one frame per entry rather than one file per entry. Three consequences show up in the report. `frames` counts the frames of the volume while `distinct_files` counts the files they come from, so for a 20-frame single-file volume `frames` is 20 and `distinct_files` has one entry. `files` holds one entry per frame, so for that volume it repeats the one filename 20 times. And `frames_per_timesteps` counts frames as well, so it is 20 for that volume where it was 1 before the frame model existed.
 
 ### Missing slice warning
 
@@ -107,36 +107,41 @@ The report is printed to standard output with an indentation of two spaces. The 
       "volume_split_reason": [["missing_slices", "2"], ["slice_distance_inconsistency", "3.0"]]
     }
   ],
-  "findings": [
-    {
-      "type": "no_per_frame_metadata",
-      "severity": "info",
-      "message": "Multi-frame object without per-frame functional groups; per-frame values are not available.",
-      "volume_index": 0,
-      "files": ["/data/patient123/RD.dcm"],
-      "details": { "frame_count": 263 }
-    }
-  ],
-  "findings_summary": { "warning": 0, "info": 1 }
+  "findings": [],
+  "findings_summary": { "warning": 0, "info": 0 }
 }
 ```
 
 `volume_split_reason` is only present if the volume has at least one split reason. It is an array of arrays; each inner array holds the reason type and, if available, a detail string. Possible reason types are `value_split_difference`, `value_sort_distance`, `image_position_missing`, `overlapping_slices`, `gantry_tilt_difference`, `slice_distance_inconsistency`, `missing_slices`, `multi_frame_file_separated`, and `unknown`. For `missing_slices` the detail is the estimated number of missing slices, for `slice_distance_inconsistency` the detected inconsistency value, and for `multi_frame_file_separated` the number of volumes the block became.
 
-`multi_frame_file_separated` is the expected path, not an error: a file with the per-frame read model cannot share a volume with another file, so each one gets a volume of its own and loads completely.
+`multi_frame_file_separated` is the expected path, not an error: a file with the per-frame read model and more than one frame cannot share a volume with another file, so each one gets a volume of its own and loads completely. The remaining files of the block, including single-frame files with the per-frame read model, keep one volume together. Every volume the block became carries the reason, the one of the remaining files as well.
 
 The `frame_count_mismatch` reason exists but cannot appear here, because it is raised while pixel data is read and this tool does not load images.
 
 ### Findings
 
-`findings` lists what the multi-frame analysis noticed, and `findings_summary` counts them by severity so a script can triage without walking the array. Both are always present; `findings` is an empty array when there is nothing to report. The analysis runs per file, so a volume made of several files can contribute a finding for each of them. Each entry has a stable snake_case `type`, a `severity`, a human-readable `message`, the `volume_index` it belongs to, the `files` it was found in, and a `details` object carrying only the counts that apply. The `message` may be reworded between releases; the `type` and `severity` keys are the machine-readable contract.
+`findings` lists what the multi-frame analysis noticed, and `findings_summary` counts them by severity so a script can triage without walking the array. Both are always present; `findings` is an empty array when there is nothing to report. The analysis runs per file, so a volume made of several files can contribute a finding for each of them. Each entry has a stable snake_case `type`, a `severity`, a human-readable `message`, the `volume_index` it belongs to, the `files` it was found in, and a `details` object carrying only the counts that apply. The `message` may be reworded between releases; the `type` and `severity` keys are the machine-readable contract. For a volume made of a single RT Dose file, for example:
+
+```json
+"findings": [
+  {
+    "type": "no_per_frame_metadata",
+    "severity": "info",
+    "message": "Multi-frame object without per-frame functional groups; per-frame values are not available.",
+    "volume_index": 0,
+    "files": ["/data/patient123/RD.dcm"],
+    "details": { "frame_count": 263 }
+  }
+],
+"findings_summary": { "warning": 0, "info": 1 }
+```
 
 | `type` | `severity` | Meaning | `details` |
 |--------|------------|---------|-----------|
 | `no_per_frame_metadata` | `info` | More than one frame and no per-frame functional groups at all. The normal state of RT Dose, multi-frame NM, SC and US: the frames load as slices, but no per-frame value is available. | `frame_count` |
 | `ragged_functional_groups` | `warning` | The Per-Frame Functional Groups Sequence has items, but not one per frame, so its values cannot be mapped to slices. The file is read as a single frame and its functional-group values are not published. | `frame_count`, `per_frame_item_count` |
-| `varying_per_frame_rescale` | `info` | The Pixel Value Transformation differs between frames. The reader applies each frame's own pair; reported because the pixel values of such a file differ from what a reader without the per-frame model produces. | `distinct_rescale_pairs` |
-| `shared_and_per_frame_rescale` | `warning` | A shared and a per-frame Pixel Value Transformation are both present, which is not conformant. The per-frame one is used as the more specific. | |
+| `varying_per_frame_rescale` | `info` | The Pixel Value Transformation differs between frames. The reader applies each frame's own pair; reported because the pixel values of such a file differ from what a reader without the per-frame model produces. | `frame_count`, `per_frame_item_count`, `distinct_rescale_pairs` |
+| `shared_and_per_frame_rescale` | `warning` | A shared and a per-frame Pixel Value Transformation are both present, which is not conformant. The per-frame one is used as the more specific. | `frame_count`, `per_frame_item_count` |
 
 There is no `error` severity. Nothing the multi-frame analysis detects stops a volume from loading.
 

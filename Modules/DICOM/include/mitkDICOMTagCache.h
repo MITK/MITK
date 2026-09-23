@@ -85,8 +85,7 @@ namespace mitk
        * \brief Whether at least one scanned file has a frame model.
        *
        * The gate every frame-aware step tests first, so that an input without
-       * per-frame functional groups runs exactly the code it ran before the
-       * frame model existed.
+       * per-frame functional groups skips all of them.
        */
       virtual bool HasAnyFrameModel() const;
 

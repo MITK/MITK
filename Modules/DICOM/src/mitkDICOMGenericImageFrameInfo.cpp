@@ -22,9 +22,9 @@ found in the LICENSE file.
  * per distinct normalized path, and so that a frame-scoped query then visits
  * only its own frame's entries plus the frame-independent ones.
  *
- * For a file without functional groups the normalized path is the path, every
- * bucket holds exactly one entry, and the container is the std::map keyed by
- * DICOMTagPath that this class has always used.
+ * For a file without functional groups the normalized path is the path and
+ * every bucket holds exactly one entry, so the store is a plain std::map keyed
+ * by DICOMTagPath.
  */
 class mitk::DICOMGenericImageFrameInfo::ValueStore
 {
@@ -47,8 +47,8 @@ public:
     entry.path = explicitPath;
     entry.value = value;
 
-    // A path that is not functional-group rooted is stored under itself, which
-    // is what this class has always done: one bucket, one entry, one path copy.
+    // A path that is not functional-group rooted is stored under itself: one
+    // bucket, one entry.
     if (!IsFunctionalGroupRooted(explicitPath))
     {
       this->Insert(explicitPath, std::move(entry));

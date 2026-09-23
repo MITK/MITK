@@ -49,8 +49,9 @@ namespace mitk
     /** The Pixel Value Transformation of (5200,9229)[0], when it has one. */
     std::optional<Rescale> sharedRescale;
 
-    /** Indexed by frame. Empty when no per-frame item carries a Pixel Value
-        Transformation at all. */
+    /** Indexed by per-frame item and sized to perFrameItemCount, which differs
+        from frameCount for a file without a frame model. Empty when no
+        per-frame item carries a Pixel Value Transformation at all. */
     std::vector<std::optional<Rescale>> perFrameRescale;
 
     /**

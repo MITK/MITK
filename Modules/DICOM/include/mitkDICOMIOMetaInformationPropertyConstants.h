@@ -37,9 +37,9 @@ namespace mitk
     static PropertyKeyPath READER_FILES();
     /** \brief Path to the property naming, per (t, z) slot, the stored frame of its file whose pixels fill that slot.
      *
-     * Only written for a block built from multi-frame files with per-frame functional groups. The files property
-     * repeats one filename for all slots of such a file, so without this the frame-to-slot mapping would not be
-     * recoverable from the loaded image.
+     * Only written for a block containing a file with a frame model, i.e. with one per-frame functional-group item
+     * per frame, a single-frame file included. The files property repeats one filename for all slots of a
+     * multi-frame file, so without this the frame-to-slot mapping would not be recoverable from the loaded image.
      */
     static PropertyKeyPath READER_FRAMES();
     /** \brief Path to the property containing the PixelSpacingInterpretation as a human-readable string. */

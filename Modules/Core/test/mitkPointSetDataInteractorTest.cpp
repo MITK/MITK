@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <mitkInteractionTestHelper.h>
 #include <mitkRenderingTestHelper.h>
+#include <mitkInteractionKeyEvent.h>
 #include <mitkIOUtil.h>
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
@@ -31,6 +32,7 @@ class mitkPointSetDataInteractorTestSuite : public mitk::TestFixture
 
   MITK_TEST(AddPointInteraction);
   MITK_TEST(MoveDeletePointInteraction);
+  MITK_TEST(EscapeDetachesInteractor);
   // MITK_TEST(RotatedPlanesInteraction);
   CPPUNIT_TEST_SUITE_END();
 
@@ -100,6 +102,22 @@ public:
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
     CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(*referencePointSet, *m_TestPointSet, .001, true, false));
+  }
+
+  void EscapeDetachesInteractor()
+  {
+    // Only needed to set up the render windows, the recorded interaction is not played back.
+    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestAddPoints.xml");
+
+    mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
+    interactionTestHelper.AddNodeToStorage(m_TestPointSetNode);
+
+    auto renderer = interactionTestHelper.GetRenderWindow(0)->GetRenderer();
+    auto escape = mitk::InteractionKeyEvent::New(renderer, mitk::InteractionEvent::KeyEsc, mitk::InteractionEvent::NoKey);
+    renderer->GetDispatcher()->ProcessEvent(escape);
+
+    CPPUNIT_ASSERT(m_TestPointSetNode->GetDataInteractor().IsNull());
+    CPPUNIT_ASSERT(m_DataInteractor->GetDataNode() == nullptr);
   }
 
   void RotatedPlanesInteraction()

@@ -164,6 +164,7 @@ protected slots:
 protected:
   void SetupUi();
   void ObserveNewNode(mitk::DataNode *node);
+  void OnNodeInteractorChanged();
 
   QmitkPointListView *m_PointListView;
 
@@ -185,6 +186,7 @@ protected:
   int m_TimeStep;
   bool m_EditAllowed;
   unsigned long m_NodeObserverTag;
+  unsigned long m_InteractorObserverTag;
 
   QmitkPointListModel *m_PointListModel;
 

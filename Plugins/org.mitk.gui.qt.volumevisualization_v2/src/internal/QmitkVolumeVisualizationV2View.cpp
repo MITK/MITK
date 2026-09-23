@@ -212,8 +212,8 @@ void QmitkVolumeVisualizationV2View::OnToggleRendering()
     return;
 
   // The node is what says which way the toggle currently sits: the button
-  // carries no checked state of its own, and other paths - a transfer function
-  // loaded from a file - switch rendering on without going through here.
+  // carries no checked state of its own, and other paths - the Properties view,
+  // or the v1 view - switch rendering on without going through here.
   const bool state = !IsVolumeRenderingOn(selectedNode.GetPointer());
 
   selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
@@ -380,8 +380,8 @@ void QmitkVolumeVisualizationV2View::RenderWindowPartDeactivated(mitk::IRenderWi
 
 void QmitkVolumeVisualizationV2View::OnTransferFunctionChanged()
 {
-  // A full refresh rather than a repaint: loading a function switches volume
-  // rendering on, so the checkbox and everything gated on it have to catch up.
+  // A full refresh rather than a repaint: a preset brings the blend mode it was
+  // authored for, and the lighting section is gated on that mode.
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
 }

@@ -82,7 +82,8 @@ The preset in force is the entry marked in the grid. An asterisk after its name
 says the curve has since been moved away from it, whether by the sliders
 described below or by editing it point by point; clicking that entry again
 rebuilds the preset as its author wrote it. Only a curve that no preset
-describes at all - one loaded from a file - leaves no entry marked.
+describes at all - one whose preset was removed while in use - leaves no entry
+marked.
 
 Right-clicking the grid offers <b>Save as preset...</b> for the curve you have
 arrived at. It is available exactly while the asterisk is showing and greyed out
@@ -97,17 +98,22 @@ changes what its entry brings. One whose file has since been moved or deleted is
 dropped from the grid, with the reason written to the log, and is not looked for
 again.
 
+The last entry of the grid, <b>Load preset...</b>, adds a preset from a JSON
+file written earlier - here, or on another machine and shared. The file joins
+the grid and is remembered exactly like a preset saved here, and is applied
+straight away. Choosing a file the grid already offers applies its entry rather
+than adding it a second time.
+
 Right-clicking a preset of your own offers <b>Remove preset</b> for the entry
 under the cursor, after asking. That entry leaves the grid and is not looked for
 again at the next start, while the file it was saved to stays where you put it -
-a preset is that file rather than a copy of it, and <b>Load from file...</b>
-still reads it. The menu entry is greyed out over the catalogue's own presets,
+a preset is that file rather than a copy of it, and the <b>Load preset...</b>
+entry brings it back. The menu entry is greyed out over the catalogue's own presets,
 which are read afresh at every start and would be offered again regardless.
 
 Removing the preset a volume is currently rendered with leaves the rendering
 untouched. Its curve stays exactly as it is and becomes one that answers to no
-preset, as a curve loaded from a file does, so no entry is marked for it any
-more.
+preset, so no entry is marked for it any more.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
 
@@ -148,8 +154,8 @@ into a smaller band of grey values; widening it spreads them out.
 </ul>
 
 <b>Reset</b> returns all four to neutral. That restores the curve they are
-measured from, which is the untouched preset, or the curve a file supplied if
-the function came from one. It does not reload a preset.
+measured from, which is the untouched preset, or the curve on show when its
+preset was removed. It does not reload a preset.
 
 What is remembered is the preset together with the four offsets, rather than
 only the resulting curve, so selecting the image again later brings the sliders
@@ -157,9 +163,8 @@ back to the positions you left them in.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_custom Custom transfer functions
 
-Under the preset grid, <b>Create custom...</b> and <b>Load from file...</b> lead
-away from presets altogether. <b>Load from file...</b> applies a transfer
-function saved to a JSON file earlier, straight away.
+Under the preset grid, <b>Create custom...</b> leads away from presets
+altogether.
 
 <b>Create custom...</b> hands the whole panel over to a point-by-point editor.
 The image selector and the lighting section are put away for the duration and
@@ -186,16 +191,16 @@ top-left arrow, so that a way out is on screen whatever the page is scrolled to;
 neither asks first. To keep a curve you have authored beyond the session,
 right-click the preset grid and choose <b>Save as preset...</b>: it writes a
 JSON file in the same format the built-in catalogue uses, so your own functions
-can be kept and shared and read back with <b>Load from file...</b>.
+can be kept and shared and added back with the <b>Load preset...</b> entry.
 
 \note A curve edited point by point is not kept. What the view records is the
 preset it was drawn over together with the slider positions, so selecting
 another image and coming back rebuilds those and the drawing is gone; the
 asterisk says the curve is no longer the preset while it is still on screen, and
 <b>Save as preset...</b> is how to keep one. Slider positions are kept, since
-they are part of that record rather than a departure from it. A curve loaded
-from a file has no preset name to keep at all. A saved file records the blend mode the curve was authored
-for alongside it, and <b>Load</b> restores both.
+they are part of that record rather than a departure from it. A saved file
+records the blend mode the curve was authored for alongside it, and loading it
+restores both.
 
 \section org_mitk_views_volumevisualization_v2_blendmode Blend mode
 

@@ -54,10 +54,10 @@ namespace Ui
  * outlives the selection: a curve drawn over a preset point by point is recorded
  * nowhere, so coming back to the node rebuilds the preset and the offsets and
  * the drawing is gone. The panel marks such a curve as edited while it is on
- * show, and keeping one means saving it as a preset of its own. A curve loaded
- * from a file answers to no catalogue entry at all, and what is recorded for it
- * is only that it was chosen here. See the volumerendering.transferfunction.*
- * entries in the property documentation.
+ * show, and keeping one means saving it as a preset of its own. A curve whose
+ * preset has been removed answers to no catalogue entry at all, and what is
+ * recorded for it is only that it was chosen here. See the
+ * volumerendering.transferfunction.* entries in the property documentation.
  *
  * \sa mitk::TransferFunctionPresets, QmitkCombinedTransferFunctionCanvas
  */
@@ -98,7 +98,11 @@ public:
 
 protected:
   /** \brief Re-measure the preset entries when the room they have to fill
-   *         changes.
+   *         changes, and take the clicks meant for the load entry.
+   *
+   * A press on the load entry never reaches the view: the view would make it the
+   * current entry, which is what records the preset in force, and would clear
+   * the selection marking that preset, since the load entry cannot be selected.
    */
   bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -110,8 +114,8 @@ signals:
    * \brief Emitted after the widget changed what the node renders as.
    *
    * The node is already updated, so a host has only to re-render - and to
-   * refresh its own controls, because loading a function from a file switches
-   * volume rendering on so that the result is visible at once.
+   * refresh its own controls, because a preset brings the blend mode it was
+   * authored for, and that decides what else applies to the node.
    */
   void TransferFunctionChanged();
 
@@ -120,7 +124,6 @@ private slots:
   void OnColorWindowChanged();
   void OnCanvasOpacityChanged();
   void OnResetAdjustments();
-  void OnImportCustom();
   void OnPresetContextMenu(const QPoint &pos);
   void OnAddColorStop();
   void OnPickColorStopColor();
@@ -151,22 +154,57 @@ private:
   void SaveCustomPreset();
 
   /**
-   * \brief Stop offering a preset that was saved from here.
+   * \brief Offer a preset file of the user's choosing from now on, and apply
+   *        it.
+   *
+   * The same as a preset saved from here from then on: remembered, and looked
+   * for again at every later start. A file already offered is not read a second
+   * time; its entry is applied instead.
+   */
+  void LoadPreset();
+
+  /**
+   * \brief Take the preset a file holds into the catalogue and the grid,
+   *        remember the file, and apply the preset.
+   *
+   * Where saving and loading meet, so that a preset saved now, one loaded now
+   * and one found at the next start all arrive by the same route.
+   *
+   * \param[in] presetFile An absolute path, and one the remembered files can
+   *            hold - see PRESET_FILE_SEPARATOR.
+   * \return False, with nothing changed, if the file cannot be read or holds no
+   *         preset.
+   */
+  bool AddPresetFromFile(const QString &presetFile);
+
+  /**
+   * \brief Stop offering a preset that was saved or loaded here.
    *
    * The entry leaves the grid and its file leaves the ones looked for at the
    * next start. The file itself is left where the user put it: a preset is that
    * file rather than a copy of it, and it may be one shared with others.
-   *
-   * The curve on show is not touched, whichever entry is removed. What a node
-   * naming this preset records instead becomes a curve that answers to no
-   * preset - the same as one loaded from a file - since nothing is left to
-   * rebuild it from.
    *
    * \param[in] presetItem The entry to remove. Ignored unless it stands for a
    *            preset of file origin: the embedded catalogue is read afresh at
    *            every start and would offer a built-in one again regardless.
    */
   void RemoveCustomPreset(QListWidgetItem *presetItem);
+
+  /**
+   * \brief Take an entry out of the grid and its preset out of the catalogue,
+   *        leaving the remembered files alone.
+   *
+   * The curve on show is not touched, whichever entry this is. What a node
+   * naming this preset records instead becomes a curve that answers to no
+   * preset, since nothing is left to rebuild it from.
+   */
+  void DropPresetEntry(QListWidgetItem *presetItem);
+
+  /** \brief How many entries of the grid stand for presets.
+   *
+   * All of them but the load entry, which is kept last.
+   */
+  int PresetCount() const;
 
   /** \brief Write the held function onto the node and re-seed the editor. */
   void ApplyCurrentTransferFunction();
@@ -228,8 +266,8 @@ private:
    */
   void ForgetTransferFunctionRecipe(mitk::DataNode *node);
 
-  /** \brief Record that the node's curve was authored here or loaded from a
-   *         file.
+  /** \brief Record that the node's curve was chosen here but answers to no
+   *         preset.
    *
    * Dropping the recipe and recording the fact are one act rather than two:
    * what makes such a curve custom is precisely that no recipe describes it.
@@ -379,7 +417,8 @@ private:
 
   /**
    * \brief Give every entry still waiting for a preview a stand-in built for
-   *        the cell size the grid currently uses.
+   *        the cell size the grid currently uses, and the load entry its icon
+   *        at that size.
    *
    * A preview is drawn once at a width no cell exceeds and scaled down from
    * there, so it survives a re-measure. A stand-in is built at the exact cell
@@ -390,6 +429,13 @@ private:
 
   std::unique_ptr<Ui::QmitkVolumeTransferFunctionEditor> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_DataNode;
+
+  /** \brief The entry after the last preset that loads another one.
+   *
+   * Owned by the grid. Kept last: presets are inserted in front of it, so the
+   * entries before it are the catalogue's in the order it holds them.
+   */
+  QListWidgetItem *m_LoadPresetItem = nullptr;
 
   std::unique_ptr<QmitkVolumeThumbnailRenderer> m_ThumbnailRenderer;
 

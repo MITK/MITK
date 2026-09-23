@@ -218,7 +218,7 @@ it; the mapper does not read it. Together with the four offsets below it is the
 whole of what the view restores: a curve drawn point by point over the preset is
 recorded nowhere, so selecting the node again rebuilds the preset and the
 offsets and discards the drawing. Absent means no preset is named
-in the view: for a curve loaded from a file,
+in the view: for a curve whose preset was removed from the view,
 volumerendering.transferfunction.custom says so; for one that came from
 outside the view, nothing does.
   <li> volumerendering.transferfunction.opacityshift,
@@ -234,9 +234,11 @@ positions instead of resetting. Where the recipe and the stored TransferFunction
 disagree - the curve having been drawn over in the view, or edited elsewhere
 through the Properties view or the v1 view - the recipe wins and the stored
 curve is discarded. The mapper does not read any of them.
-  <li> volumerendering.transferfunction.custom - Set where the Volume
-Visualization view's TransferFunction was loaded from a file there, and removed
-again when a preset is chosen instead. No recipe describes such a curve - that
+  <li> volumerendering.transferfunction.custom - Set where the preset the Volume
+Visualization view built this node's TransferFunction from was removed from the
+view while in use, and removed again when a preset is chosen instead. Scenes
+written by earlier versions of the view carry it for a curve loaded from a file
+as well, and are read the same way. No recipe describes such a curve - that
 is what makes it custom - so what is recorded is only that the curve was chosen
 in the view at all, which is what the view reads to take it back over on the
 next selection rather than let it be replaced. A curve drawn point by point over

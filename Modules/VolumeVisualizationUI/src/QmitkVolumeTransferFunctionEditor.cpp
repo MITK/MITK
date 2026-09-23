@@ -47,6 +47,7 @@ found in the LICENSE file.
 #include <QListWidgetItem>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
 #include <QPushButton>
@@ -85,7 +86,8 @@ namespace
   constexpr const char *TF_COLOR_SHIFT_PROPERTY = "volumerendering.transferfunction.colorshift";
   constexpr const char *TF_COLOR_WIDTH_PROPERTY = "volumerendering.transferfunction.colorwidth";
 
-  /** Records that the node's curve was authored here or loaded from a file.
+  /** Records that the node's curve was chosen here but answers to no preset: the
+   * one it was built from has since been removed from the grid.
    *
    * The keys above cannot say so: what makes such a curve custom is precisely
    * that no recipe describes it. What is recorded is therefore only that the
@@ -155,6 +157,26 @@ namespace
     // Written out here because nothing else will: the preferences dialog flushes
     // the nodes its own pages own, and this one belongs to no page.
     preferences->Flush();
+  }
+
+  /** \brief Check that a file can stand among the remembered ones, and tell the
+   *         user why not where it cannot.
+   *
+   * Nothing escapes the separator the remembered paths are joined by, so a path
+   * carrying one could not be read back as itself.
+   *
+   * \return True if the path passed, false once the user has been warned.
+   */
+  bool ValidatePresetFilePath(QWidget *parent, const QString &title, const QString &fileName)
+  {
+    if (!fileName.contains(PRESET_FILE_SEPARATOR))
+      return true;
+
+    QMessageBox::warning(parent, title,
+      "The path must not contain a semicolon, which separates the remembered "
+      "preset files from one another. Please choose a file whose path has none.");
+
+    return false;
   }
 
   /** \brief Where an entry keeps the name of the preset it stands for.
@@ -301,6 +323,44 @@ namespace
     return QIcon(placeholder);
   }
 
+  /** \brief What the entry that loads a preset shows in place of a preview.
+   *
+   * The stand-in's frame, so that it reads as a cell of the same grid, with a
+   * plus where the stand-in has its line: a cell still to be filled, and by
+   * whoever clicks it.
+   *
+   * \param[in] size  The pixel size the cells reserve for a preview.
+   * \param[in] color The theme's icon colour.
+   */
+  QIcon LoadPresetIcon(const QSize &size, const QColor &color)
+  {
+    QPixmap icon(size);
+    icon.fill(Qt::transparent);
+
+    QPainter painter(&icon);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setOpacity(PLACEHOLDER_OPACITY);
+    painter.setPen(color);
+
+    const QRectF frame(0.5, 0.5, size.width() - 1.0, size.height() - 1.0);
+
+    painter.drawRoundedRect(frame, 3.0, 3.0);
+
+    // Sized from the shorter side, so that the list's small previews still get
+    // a plus rather than a smudge.
+    const double arm = 0.2 * std::min(frame.width(), frame.height());
+    const QPointF centre = frame.center();
+
+    // At full strength, unlike the frame: the frame says the cell is empty, the
+    // plus that clicking it does something, and a faded one reads as disabled.
+    painter.setOpacity(1.0);
+    painter.setPen(QPen(color, 2.0));
+    painter.drawLine(centre - QPointF(arm, 0.0), centre + QPointF(arm, 0.0));
+    painter.drawLine(centre - QPointF(0.0, arm), centre + QPointF(0.0, arm));
+
+    return QIcon(icon);
+  }
+
   /** \brief A colour stop as one entry of a list can show it.
    *
    * Outlined, because a stop whose colour is near the list's own background
@@ -377,10 +437,14 @@ namespace
    *
    * \param[in] presetName The name to look for. The empty name a node records
    *                       no preset under matches nothing, which is what leaves
-   *                       the grid with no entry marked.
+   *                       the grid with no entry marked - not even the load
+   *                       entry, which carries no name either.
    */
   int FindPresetRow(const QListWidget *presetList, const QString &presetName)
   {
+    if (presetName.isEmpty())
+      return -1;
+
     for (int i = 0; i < presetList->count(); ++i)
     {
       if (PresetName(presetList->item(i)) == presetName)
@@ -388,6 +452,26 @@ namespace
     }
 
     return -1;
+  }
+
+  /** \brief The entry read from the given file, or nullptr.
+   *
+   * By file rather than by name: the name a file's preset gets is only its own
+   * while no other preset holds it, and the file is what saving and loading are
+   * asked about.
+   *
+   * \param[in] presetFile An absolute path. Never empty, so the entries that
+   *                       stand for no file match nothing.
+   */
+  QListWidgetItem *FindPresetFileItem(const QListWidget *presetList, const QString &presetFile)
+  {
+    for (int i = 0; i < presetList->count(); ++i)
+    {
+      if (PresetFile(presetList->item(i)) == presetFile)
+        return presetList->item(i);
+    }
+
+    return nullptr;
   }
 
   /** \brief Whether a slider has been carried off the value given here.
@@ -421,7 +505,7 @@ namespace
     return volumeRenderingOn;
   }
 
-  /** \brief Whether the node's curve was authored here or loaded from a file.
+  /** \brief Whether the node's curve was chosen here but answers to no preset.
    *
    * The other half of the evidence that this node was configured here, for the
    * curves the recorded preset name cannot cover. See TF_CUSTOM_PROPERTY.
@@ -553,6 +637,15 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
         presetFiles.value(static_cast<qsizetype>(i - builtInPresetCount)));
   }
 
+  // Before the cells are measured below, so that it is measured and given its
+  // icon along with them.
+  m_LoadPresetItem = new QListWidgetItem(QStringLiteral("Load preset..."), presetList);
+  m_LoadPresetItem->setToolTip("Add a preset from a transfer function saved to a JSON file.");
+
+  // Enabled, so that it is not drawn greyed out, but never selected: the
+  // selection marks the preset in force, and this is none.
+  m_LoadPresetItem->setFlags(Qt::ItemIsEnabled);
+
   // Cells are measured from the names they have to hold, so the entries come
   // first, and the stand-in previews after them, since their size is what the
   // measurement settles. The grid of previews is what it opens in, and asking
@@ -630,9 +723,6 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnResetAdjustments);
 
-  connect(m_Controls->loadTfButton, &QPushButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnImportCustom);
-
   connect(m_Controls->editModeButton, &QToolButton::toggled,
     this, &QmitkVolumeTransferFunctionEditor::SetEditModeActive);
 
@@ -706,8 +796,29 @@ QStringList QmitkVolumeTransferFunctionEditor::LoadRememberedPresets()
 
 bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *event)
 {
-  if (event->type() == QEvent::Resize && watched == m_Controls->presetListWidget->viewport())
-    this->UpdatePresetLayout();
+  auto *presetList = m_Controls->presetListWidget;
+
+  if (watched == presetList->viewport())
+  {
+    if (event->type() == QEvent::Resize)
+      this->UpdatePresetLayout();
+
+    // A double click as well as a press, since the view takes a double click on
+    // an entry it did not see pressed as a press of its own. The release is left
+    // to the view: a press it did see, elsewhere, still has to be finished.
+    if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
+    {
+      const auto *mouseEvent = static_cast<QMouseEvent *>(event);
+
+      if (presetList->itemAt(mouseEvent->position().toPoint()) == m_LoadPresetItem)
+      {
+        if (event->type() == QEvent::MouseButtonPress && mouseEvent->button() == Qt::LeftButton)
+          this->LoadPreset();
+
+        return true;
+      }
+    }
+  }
 
   return QWidget::eventFilter(watched, event);
 }
@@ -827,17 +938,19 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
     // marker carries onto another line would be cut off in a cell measured
     // without it.
     const QFontMetrics metrics = presetList->fontMetrics();
+
+    const auto wrappedHeight = [&](const QString &text)
+    {
+      return metrics.boundingRect(QRect(0, 0, previewSize.width(), 0), Qt::TextWordWrap, text).height();
+    };
+
     int nameHeight = metrics.lineSpacing();
 
-    for (int i = 0; i < presetList->count(); ++i)
-    {
-      const QRect nameBounds = metrics.boundingRect(QRect(0, 0, previewSize.width(), 0),
-                                                    Qt::TextWordWrap,
-                                                    PresetName(presetList->item(i)) +
-                                                      PresetEditedMarker());
+    for (int i = 0; i < this->PresetCount(); ++i)
+      nameHeight = std::max(nameHeight, wrappedHeight(PresetName(presetList->item(i)) + PresetEditedMarker()));
 
-      nameHeight = std::max(nameHeight, nameBounds.height());
-    }
+    // Its text is not a preset's name, and never wears the marker.
+    nameHeight = std::max(nameHeight, wrappedHeight(m_LoadPresetItem->text()));
 
     cellSize = QSize(cellWidth, previewSize.height() + nameHeight + 2 * CELL_PADDING);
   }
@@ -1011,8 +1124,8 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
 
   // A node naming a preset the catalogue still offers is described by its
   // recipe, and the recipe is what comes back. Only a curve no preset describes
-  // - one loaded from a file, or one that came from outside this view - is shown
-  // as it stands.
+  // - one whose preset was removed, or one that came from outside this view - is
+  // shown as it stands.
   if (presetIndex >= 0 && this->ReplayRecipe(presetName))
     return;
 
@@ -1226,17 +1339,16 @@ void QmitkVolumeTransferFunctionEditor::UpdateControlAvailability()
 
   // The adjust controls and the canvas mean nothing without a function to act
   // on, and neither does editing, which starts from the applied curve. Picking
-  // a preset or loading one from file gets by with a node alone.
+  // or loading a preset gets by with a node alone.
   //
-  // While a curve is being edited the three that would replace it stand down:
+  // While a curve is being edited the two that would replace it stand down:
   // the sliders replay a baseline snapshotted before the edits began, and a
-  // preset or a file would overwrite the curve outright.
+  // preset, picked or loaded, would overwrite the curve outright.
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
   m_Controls->presetViewModeButton->setEnabled(hasNode);
   m_Controls->presetListWidget->setEnabled(hasNode && !m_EditModeActive);
-  m_Controls->loadTfButton->setEnabled(hasNode && !m_EditModeActive);
   m_Controls->editModeButton->setEnabled(adjustable);
   m_Controls->adjustPresetPanel->setEnabled(adjustable && !m_EditModeActive);
   m_Controls->combinedTfCanvas->setEnabled(adjustable);
@@ -1603,7 +1715,7 @@ void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()
 
   // Every entry rather than the one row that can wear the marker, so that the
   // entry the selection has just left is not left wearing it too.
-  for (int i = 0; i < presetList->count(); ++i)
+  for (int i = 0; i < this->PresetCount(); ++i)
   {
     auto *presetItem = presetList->item(i);
 
@@ -1628,8 +1740,8 @@ void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()
 bool QmitkVolumeTransferFunctionEditor::DiffersFromPreset() const
 {
   // The edit in progress, the one already left - which only this widget knows
-  // about, a drawing being recorded nowhere - and a curve that came from a file,
-  // which the node carries.
+  // about, a drawing being recorded nowhere - and a curve that answers to no
+  // preset, which the node carries.
   if (m_CurveEdited || m_CurveDrawnOver ||
       IsCustomTransferFunction(m_DataNode.Lock().GetPointer()))
   {
@@ -1725,53 +1837,45 @@ void QmitkVolumeTransferFunctionEditor::RestoreColorHandles()
   emit TransferFunctionChanged();
 }
 
-void QmitkVolumeTransferFunctionEditor::OnImportCustom()
+void QmitkVolumeTransferFunctionEditor::LoadPreset()
 {
-  auto node = m_DataNode.Lock();
-
-  if (node.IsNull())
+  if (m_DataNode.Lock().IsNull())
     return;
 
-  auto fileName =
-    QFileDialog::getOpenFileName(this, "Load transfer function", QString(), "Transfer function (*.json)");
+  const QString title = QStringLiteral("Load preset");
 
-  if (fileName.isEmpty())
+  // Beside the last preset saved or loaded, which is where the next one is most
+  // likely to be.
+  const QStringList rememberedFiles = RememberedPresetFiles();
+
+  const QString directory = rememberedFiles.isEmpty()
+    ? QString()
+    : QFileInfo(rememberedFiles.last()).absolutePath();
+
+  const auto fileName = QFileDialog::getOpenFileName(this, title, directory, "Transfer function (*.json)");
+
+  if (fileName.isEmpty() || !ValidatePresetFilePath(this, title, fileName))
     return;
 
-  std::ifstream stream(fileName.toStdString());
+  // Absolute, as the remembered files are, so that a file already offered is
+  // recognised however the dialog spelled it.
+  const QString presetFile = QFileInfo(fileName).absoluteFilePath();
 
-  if (!stream.is_open())
+  auto *presetList = m_Controls->presetListWidget;
+
+  // Applied rather than read a second time, which would offer the same file
+  // twice, the second time under a numbered name.
+  if (auto *knownItem = FindPresetFileItem(presetList, presetFile); knownItem != nullptr)
   {
-    QMessageBox::warning(this, "Load transfer function", "Could not open the file.");
+    presetList->setCurrentItem(knownItem);
+    presetList->scrollToItem(knownItem);
+
+    this->OnPresetSelected(PresetName(knownItem));
     return;
   }
 
-  auto blendMode = mitk::VolumeBlendMode::Composite;
-  auto transferFunction = mitk::TransferFunctionPresets::LoadTransferFunction(stream, blendMode);
-
-  if (transferFunction.IsNull())
-  {
-    QMessageBox::warning(this, "Load transfer function", "The file does not contain a valid transfer function.");
-    return;
-  }
-
-  // A curve authored for a projection mode carries that mode in the file, and
-  // reading it back without would render it in a mode it says nothing under.
-  this->ApplyBlendMode(blendMode);
-
-  // Enable rendering so the loaded function is visible immediately. The host
-  // learns of it through TransferFunctionChanged.
-  node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
-
-  m_AppliedTransferFunction = transferFunction;
-  m_CurveDrawnOver = false;
-
-  // A loaded custom function came from no preset, so there is no baseline any
-  // recorded offsets could be measured from either.
-  this->RecordCustomTransferFunction(node);
-  this->ClearPresetSelection();
-
-  this->ApplyCurrentTransferFunction();
+  if (!this->AddPresetFromFile(presetFile))
+    QMessageBox::warning(this, title, "The file could not be read, or holds no transfer function preset.");
 }
 
 void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
@@ -1786,14 +1890,18 @@ void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
 
   // The condition that marks an entry as edited, so that the menu and the marker
   // cannot disagree. It asks about the curve in force rather than the entry
-  // under the cursor, which is what lets a curve loaded from a file - marking no
-  // entry at all - be saved as well.
+  // under the cursor, which is what lets a curve whose preset was removed -
+  // marking no entry at all - be saved as well.
   saveAction->setEnabled(m_AppliedTransferFunction.IsNotNull() && this->DiffersFromPreset());
   saveAction->setToolTip("Available once the curve has been moved away from its preset.");
 
   // The entry under the cursor rather than the one in force, which is what
   // saving asks about: what is removed is a preset, not the curve on show.
   auto *presetItem = m_Controls->presetListWidget->itemAt(pos);
+
+  // Stands for no preset, and would otherwise read as one of the catalogue's.
+  if (presetItem == m_LoadPresetItem)
+    presetItem = nullptr;
 
   auto *removeAction = menu.addAction("Remove preset");
 
@@ -1841,15 +1949,8 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
   if (!fileName.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive))
     fileName += QStringLiteral(".json");
 
-  // Nothing escapes the separator the remembered paths are joined by, so a path
-  // carrying one could not be read back as itself.
-  if (fileName.contains(PRESET_FILE_SEPARATOR))
-  {
-    QMessageBox::warning(this, "Save transfer function",
-      "The path must not contain a semicolon, which separates the remembered "
-      "preset files from one another. Please choose another name.");
+  if (!ValidatePresetFilePath(this, "Save transfer function", fileName))
     return;
-  }
 
   // A copy, so that saving cannot alter the curve it is saving, and with the
   // colours as handles: a windowed function holds 256 evenly spaced samples, and
@@ -1885,29 +1986,45 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
   // will be launched from next time.
   const QString presetFile = QFileInfo(fileName).absoluteFilePath();
 
-  // Read straight back rather than added from memory, so that a preset saved now
-  // and one found at the next start arrive by the same route.
-  std::ifstream stream(fileName.toStdString());
+  // Saving over a file already offered replaces its entry: the file now holds
+  // only the curve just written. Dropped before the file is read back, so that
+  // the name it frees is the one the new entry gets rather than a numbered one.
+  if (auto *knownItem = FindPresetFileItem(presetList, presetFile); knownItem != nullptr)
+    this->DropPresetEntry(knownItem);
+
+  if (!this->AddPresetFromFile(presetFile))
+  {
+    QMessageBox::warning(this, "Save transfer function",
+      "The file was written, but could not be read back as a preset.");
+  }
+}
+
+bool QmitkVolumeTransferFunctionEditor::AddPresetFromFile(const QString &presetFile)
+{
+  auto *presetList = m_Controls->presetListWidget;
+
+  // Read from the file rather than added from memory, so that a preset added
+  // now and one found at the next start arrive by the same route.
+  std::ifstream stream(presetFile.toStdString());
 
   const auto addedName = stream.is_open()
     ? QString::fromStdString(m_Presets.AddPreset(stream))
     : QString();
 
   if (addedName.isEmpty())
-  {
-    QMessageBox::warning(this, "Save transfer function",
-      "The file was written, but could not be read back as a preset.");
-    return;
-  }
+    return false;
 
-  // Asked before the entry is appended, since appending moves the end the
+  // Asked before the entry is inserted, since inserting moves the end the
   // previews were drawn as far as.
-  const bool thumbnailsComplete = m_NextThumbnailIndex >= presetList->count();
+  const bool thumbnailsComplete = m_NextThumbnailIndex >= this->PresetCount();
 
-  auto *presetItem = new QListWidgetItem(addedName, presetList);
+  auto *presetItem = new QListWidgetItem(addedName);
   presetItem->setData(PRESET_NAME_ROLE, addedName);
   presetItem->setData(PRESET_ORIGIN_ROLE, static_cast<int>(PresetOrigin::File));
   presetItem->setData(PRESET_FILE_ROLE, presetFile);
+
+  // In front of the load entry, which stays last.
+  presetList->insertItem(this->PresetCount(), presetItem);
 
   // Measures the cells against a name none of them was measured for, and leaves
   // the new entry a stand-in preview to hold its place.
@@ -1915,27 +2032,29 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
 
   // A finished run has stopped and nothing else would start it again; one still
   // under way reaches the new entry by itself. Either way the next preview due
-  // is the one just appended, so a single step draws it and stops.
+  // is the one just inserted, so a single step draws it and stops.
   if (thumbnailsComplete)
   {
     const int run = m_ThumbnailRun;
     QTimer::singleShot(0, this, [this, run] { this->GenerateNextThumbnail(run); });
   }
 
-  // Saving over a file already known moves where it stands rather than leaving
-  // it remembered twice, which would offer it twice at the next start.
-  QStringList presetFiles = rememberedFiles;
+  // A file already remembered moves to the end rather than being remembered
+  // twice, which would offer it twice at the next start.
+  QStringList presetFiles = RememberedPresetFiles();
 
   presetFiles.removeAll(presetFile);
   presetFiles.append(presetFile);
 
   RememberPresetFiles(presetFiles);
 
-  // The curve now answers to a catalogue entry rather than being one a preset
-  // was moved away from, so that entry is marked and the marker goes.
-  presetList->setCurrentRow(presetList->count() - 1);
+  // The curve now answers to a catalogue entry, so that entry is marked, and
+  // for a curve saved from here the edited marker goes.
+  presetList->setCurrentItem(presetItem);
 
   this->OnPresetSelected(addedName);
+
+  return true;
 }
 
 void QmitkVolumeTransferFunctionEditor::RemoveCustomPreset(QListWidgetItem *presetItem)
@@ -1966,13 +2085,28 @@ void QmitkVolumeTransferFunctionEditor::RemoveCustomPreset(QListWidgetItem *pres
   if (confirmation.clickedButton() != removeButton)
     return;
 
+  this->DropPresetEntry(presetItem);
+
+  // The file is left where the user put it: it may be one they keep elsewhere
+  // or share. What is dropped is the promise to look for it again.
+  QStringList presetFiles = RememberedPresetFiles();
+
+  presetFiles.removeAll(presetFile);
+
+  RememberPresetFiles(presetFiles);
+}
+
+void QmitkVolumeTransferFunctionEditor::DropPresetEntry(QListWidgetItem *presetItem)
+{
   auto *presetList = m_Controls->presetListWidget;
+
+  const QString presetName = PresetName(presetItem);
   const int presetRow = presetList->row(presetItem);
 
   // The curve on show is left as it stands - what goes is the entry it answers
   // to, not the rendering. But a node naming a preset the catalogue no longer
   // holds has nothing to be rebuilt from, so it is recorded as carrying a curve
-  // no preset describes, which is what a curve loaded from a file already is.
+  // no preset describes.
   if (presetRow == presetList->currentRow())
   {
     auto node = m_DataNode.Lock();
@@ -1997,14 +2131,11 @@ void QmitkVolumeTransferFunctionEditor::RemoveCustomPreset(QListWidgetItem *pres
 
   // The cells may have been measured against the name just taken out.
   this->UpdatePresetLayout();
+}
 
-  // The file is left where the user put it: it may be one they keep elsewhere
-  // or share. What is dropped is the promise to look for it again.
-  QStringList presetFiles = RememberedPresetFiles();
-
-  presetFiles.removeAll(presetFile);
-
-  RememberPresetFiles(presetFiles);
+int QmitkVolumeTransferFunctionEditor::PresetCount() const
+{
+  return m_Controls->presetListWidget->count() - 1;
 }
 
 void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()
@@ -2032,14 +2163,16 @@ void QmitkVolumeTransferFunctionEditor::RefreshPlaceholders()
 {
   auto *presetList = m_Controls->presetListWidget;
 
-  const QIcon placeholder = PlaceholderPreview(presetList->iconSize(),
-                                               QColor(QmitkStyleManager::GetIconColor()));
+  const QColor iconColor(QmitkStyleManager::GetIconColor());
+  const QIcon placeholder = PlaceholderPreview(presetList->iconSize(), iconColor);
 
   // Previews are filled in one after another from the front, so the index of
   // the next one is also the first entry still showing a stand-in. Below zero
   // no volume is bound yet and every entry is one.
-  for (int i = std::max(0, m_NextThumbnailIndex); i < presetList->count(); ++i)
+  for (int i = std::max(0, m_NextThumbnailIndex); i < this->PresetCount(); ++i)
     presetList->item(i)->setIcon(placeholder);
+
+  m_LoadPresetItem->setIcon(LoadPresetIcon(presetList->iconSize(), iconColor));
 }
 
 void QmitkVolumeTransferFunctionEditor::StartThumbnailGeneration()
@@ -2119,7 +2252,7 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
     ++m_NextThumbnailIndex;
   }
 
-  if (m_NextThumbnailIndex >= presetList->count())
+  if (m_NextThumbnailIndex >= this->PresetCount())
     return;
 
   // Queued rather than looped: returning to the event loop between previews is

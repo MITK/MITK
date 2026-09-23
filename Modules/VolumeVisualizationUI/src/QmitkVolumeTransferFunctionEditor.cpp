@@ -1493,8 +1493,8 @@ void QmitkVolumeTransferFunctionEditor::OnResetAdjustments()
 
   // Reset returns the four offsets to neutral rather than reloading the preset.
   // The sliders are measured from whatever baseline the editor holds - a pristine
-  // preset, or a loaded file's own curve - so neutral restores that baseline
-  // either way and needs no preset to be named.
+  // preset, a curve drawn over it, or one whose preset was removed - so neutral
+  // restores that baseline either way and needs no preset to be named.
   //
   // Driven through the sliders rather than by rebuilding the function, so that
   // the canvas and the colour window follow and the handles end up where the

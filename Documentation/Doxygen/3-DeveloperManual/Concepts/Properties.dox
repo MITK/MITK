@@ -200,10 +200,12 @@ before the transfer function sees it and a curve authored for one of them is
 not interchangeable with one authored for compositing. mitk::VolumeBlendMode
 holds the modes MITK offers and the conversions to and from this value.
   <li> volumerendering.lightingmodel - Identifier of the lighting model the
-Volume Visualization view applied to this node ("headlight", "keylight"). It
-records which light rig was asked for, which the mapper properties alone cannot
-express; the mapper itself does not read it. Absent means no model was applied,
-and the renderer keeps its default rig.
+Volume Visualization view applied to this node ("headlight", "keylight", or
+"studio" for the renderer's default five-light kit, chosen from the 3D render
+window's lighting menu). It records which light rig was asked for, which the
+mapper properties alone cannot express; the mapper itself does not read it.
+Absent means no model was applied, and the node has no say in the 3D window's
+light rig.
   <li> volumerendering.transferfunction.preset - The preset the Volume
 Visualization view built this node's TransferFunction from, as its origin and
 its name: "internal:CT-AAA" for one of the presets embedded in

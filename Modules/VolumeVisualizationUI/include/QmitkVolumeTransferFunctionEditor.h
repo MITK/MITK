@@ -209,7 +209,7 @@ private:
   /** \brief Write the held function onto the node and re-seed the editor. */
   void ApplyCurrentTransferFunction();
 
-  /** \brief Record on the node the blend mode a preset or a loaded file brings.
+  /** \brief Record on the node the blend mode a preset brings.
    *
    * The mode travels with the curve rather than being chosen on its own, so
    * whatever supplies the curve supplies this too.

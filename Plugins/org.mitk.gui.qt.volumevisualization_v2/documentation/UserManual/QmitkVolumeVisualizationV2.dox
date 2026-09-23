@@ -18,7 +18,7 @@ curves that map each grey value to a colour and to an opacity. Almost everything
 in this view is either a way of choosing a transfer function or a rendering
 option applied on top of one.
 
-\imageMacro{QmitkVolumeVisualizationV2_Overview.png,"The Volume Visualization v2 view.",10.00}
+\imageMacro{QmitkVolumeVisualizationV2_Overview.png,"An abdominal CT rendered as a volume with the CT-AAA preset.",7.00}
 
 \note Volume rendering is done on the graphics card and has no software
 fallback. On a machine whose GPU cannot run the ray caster, the 3D window stays
@@ -36,8 +36,10 @@ because there is no volume to configure yet.
 
 Switching it on does more than show the volume: a node that carries no transfer
 function is given one from the preset catalogue, and one that names no lighting
-model is given the first of those. Switching on therefore produces a visible
-volume rather than an empty 3D window, and you adjust from there.
+model is given the one the 3D window is lit for, as described in
+\ref org_mitk_views_volumevisualization_v2_lighting. Switching on therefore
+produces a visible volume rather than an empty 3D window, and you adjust from
+there.
 
 Which preset that is follows from the image. One whose DICOM metadata reports MR
 starts from <tt>MR-Default</tt>; everything else starts from <tt>CT-AAA</tt>,
@@ -77,6 +79,14 @@ coarsely sampled image than on a finely sampled one. <b>Height</b>, under
 <b>Opacity curve</b>, is the slider that compensates. The <tt>MR-</tt> presets
 cannot assume even the units, because MR intensities are not calibrated to a
 fixed scale, so expect to adjust those per image.
+
+\note Almost every preset uses the <b>Composite</b> blend mode, which builds a
+three-dimensional image in which nearer tissue hides what lies behind it.
+<tt>CT-MIP</tt> and <tt>MR-MIP</tt> are the exceptions: they render a maximum
+intensity projection, which keeps the brightest value along each viewing ray.
+Depth is lost, but dense structures such as contrast-filled vessels stay visible
+however much tissue surrounds them. The mode comes with the preset, and while it
+is anything other than Composite, a line under the rendering button names it.
 
 The preset in force is the entry marked in the grid. An asterisk after its name
 says the curve has since been moved away from it, whether by the sliders
@@ -123,12 +133,10 @@ transfer function assigns as a gradient beneath. Together they say which grey
 values the current function makes visible and in what colour, against how much
 of that value actually occurs in the image.
 
-The canvas is a display, not an editor. Clicking it does nothing; the curve is
-moved as a whole with the sliders described next. Editing point by point is
-possible, in the separate mode described in
-\ref org_mitk_views_volumevisualization_v2_tf_custom.
-
-\imageMacro{QmitkVolumeVisualizationV2_Canvas.png,"Histogram backdrop with the opacity curve and the colour gradient.",10.00}
+Until you ask to edit it, the canvas is a display. Clicking it does nothing; the
+curve is moved as a whole with the sliders described next. The <b>Edit</b>
+button above it, at its right, turns the same canvas into a point-by-point
+editor, described in \ref org_mitk_views_volumevisualization_v2_tf_custom.
 
 \subsection org_mitk_views_volumevisualization_v2_tf_adjust Adjusting a preset
 
@@ -154,44 +162,78 @@ into a smaller band of grey values; widening it spreads them out.
 </ul>
 
 <b>Reset</b> returns all four to neutral. That restores the curve they are
-measured from, which is the untouched preset, or the curve on show when its
-preset was removed. It does not reload a preset.
+measured from, which is the untouched preset, the curve as you left it after
+editing it point by point, or the curve on show when its preset was removed. It
+does not reload a preset; clicking the preset's entry does.
 
 What is remembered is the preset together with the four offsets, rather than
 only the resulting curve, so selecting the image again later brings the sliders
 back to the positions you left them in.
 
-\subsection org_mitk_views_volumevisualization_v2_tf_custom Custom transfer functions
+\subsection org_mitk_views_volumevisualization_v2_tf_custom Editing the curve point by point
 
-Under the preset grid, <b>Create custom...</b> leads away from presets
-altogether.
+<b>Edit</b>, above the canvas, hands that canvas over to editing the curve on
+show point by point; pressing it again ends the edit. The preset grid and the
+four sliders are greyed out in the meantime, since either would replace what you
+are drawing.
 
-<b>Create custom...</b> hands the whole panel over to a point-by-point editor.
-The image selector and the lighting section are put away for the duration and
-the panel returns to its top, so what you are left looking at is a page that
-names itself, names the image it is editing, and carries a way back at its top
-left. It holds one canvas per curve: grey value to opacity, and grey value to
-colour.
+\imageMacro{QmitkVolumeVisualizationV2_EditMode.png,"The canvas while editing.",10.00}
 
-In both canvases:
+<ol>
+<li> <b>Edit</b> starts and ends the edit.
+<li> <b>Fit to curve</b> decides how far the axis reaches, as described below.
+<li> The handles of the opacity curve.
+<li> The colour stops, as markers along the bottom edge. A faded one standing on
+an edge lies beyond the axis.
+<li> The <b>Color stops</b> row, for the stop selected on the canvas.
+</ol>
+
+The canvas edits both curves at once, each in a region of its own:
 
 <ul>
-<li> Left-click adds a point.
-<li> Left-click and drag moves an existing point; the arrow keys move the
-selected one.
-<li> Right-click, or the DELETE key, removes a point.
-<li> Double-clicking a point in the colour canvas opens a colour picker.
+<li> In the plot, the handles are the points of the opacity curve. Left-click
+adds a point, dragging moves one, and right-click removes it. The arrow keys
+move the selected point and DELETE removes it.
+<li> Along the bottom edge, below the plot, the markers are the colour stops,
+each pointing at the grey value its colour applies to. Click one to select it,
+drag it to move it, double-click it to pick its colour, and right-click it to
+remove it. Clicking the strip between markers adds a stop there, taking the
+colour the gradient already has at that point, so that adding one changes
+nothing until you recolour it.
 <li> Between points the curves are interpolated linearly.
 </ul>
 
-The page brings two buttons, and the arrow at its top left repeats one of
-them. <b>Keep curve</b> keeps the curve you authored and goes back.
-<b>Discard</b> restores the one that stood before you started, and so does the
-top-left arrow, so that a way out is on screen whatever the page is scrolled to;
-neither asks first. To keep a curve you have authored beyond the session,
-right-click the preset grid and choose <b>Save as preset...</b>: it writes a
-JSON file in the same format the built-in catalogue uses, so your own functions
-can be kept and shared and added back with the <b>Load preset...</b> entry.
+A row under the canvas, <b>Color stops</b>, reaches the same stops without
+aiming at a marker. Its list shows each stop as a swatch, in the order the
+markers stand in. The colour field beside it is the selected stop's colour and
+opens a colour picker. The number gives the stop's position as a fraction of the
+axis, 0 at its left end and 1 at its right; typing a value moves the stop. The
+<b>+</b> button adds a stop in the middle of the widest gap, and <b>-</b>
+removes the selected one. A gradient keeps at least one stop, and the curve at
+least one point.
+
+The axis covers the band of grey values the image occupies, while the presets
+are authored on their modality's full scale, so a preset's outermost stops
+often lie beyond either end of the axis. The one nearest each end is then drawn
+faded on that end, to say it exists rather than where it is. It can be selected
+and recoloured there, but not dragged, since there is no place on the axis to
+drag it from. Clearing <b>Fit to curve</b>, beside <b>Edit</b>, widens the axis
+to take in every point of both curves, so that each stop stands at its own value
+and can be dragged like any other. The image's band then takes up only part of
+the plot. Every edit starts with the box ticked, and the axis returns to the
+band when the edit ends.
+
+Ending the edit keeps whatever you drew; there is no way back to the curve that
+stood before it other than clicking the preset's entry, which rebuilds the
+preset. If you changed nothing, the preset and the slider positions are left as
+they were. If you did, the preset's entry is starred, and the drawing becomes
+what the sliders are measured from: they return to neutral and from then on move
+the drawing rather than the preset.
+
+To keep a curve you have drawn beyond the session, right-click the preset grid
+and choose <b>Save as preset...</b>: it writes a JSON file in the same format
+the built-in catalogue uses, so your own functions can be kept and shared and
+added back with the <b>Load preset...</b> entry.
 
 \note A curve edited point by point is not kept. What the view records is the
 preset it was drawn over together with the slider positions, so selecting
@@ -201,50 +243,6 @@ asterisk says the curve is no longer the preset while it is still on screen, and
 they are part of that record rather than a departure from it. A saved file
 records the blend mode the curve was authored for alongside it, and loading it
 restores both.
-
-\section org_mitk_views_volumevisualization_v2_blendmode Blend mode
-
-The blend mode is the rule for combining the samples along one viewing ray into
-one pixel:
-
-<ul>
-<li> <b>Composite (3D)</b> accumulates colour and opacity front to back, so
-nearer tissue hides what lies behind it. It is the only mode that produces a
-three-dimensional image, and the only one lighting and shading reach.
-<li> <b>Maximum intensity (MIP)</b> keeps the brightest sample along each ray.
-Depth is lost, but anything dense stays visible however much tissue surrounds
-it, which is what makes contrast-filled vessels and tracer uptake readable.
-<li> <b>Minimum intensity (MinIP)</b> keeps the darkest sample instead, so air
-stands out against tissue - airways, emphysema, bowel gas.
-<li> <b>Average intensity</b> averages the samples along each ray, which reads
-like a projection radiograph.
-<li> <b>Additive intensity</b> sums them. Like the average but unbounded, so it
-saturates towards white where the volume is deep.
-</ul>
-
-Average and additive ignore the colour curve and produce greyscale; the other
-three use it.
-
-The mode is not a setting of its own but part of a transfer function. The
-projection modes flatten each ray to a single value before the transfer
-function sees it, so a curve drawn to classify tissue and one drawn as a window
-are not interchangeable between them: a preset that hides everything but bone
-leaves a maximum-intensity projection almost nothing to find. Applying a preset
-therefore also applies the mode it was authored for, and the preset previews
-are drawn in that mode. Whenever the result is anything other than Composite,
-the view names it in a line under <b>Volume rendering</b>.
-
-Almost every preset in the catalogue is authored for Composite. <tt>CT-MIP</tt>
-and <tt>MR-MIP</tt> are the two that are not, and they bring curves that ramp
-across the whole value range instead of isolating a tissue, which is what a
-projection needs. To pick a mode yourself, use <b>Blend mode</b> at the top of
-the <b>Create custom...</b> page, where you are authoring the curve that goes
-with it.
-
-VTK also defines an isosurface and a slice mode, which are deliberately absent
-here. Each needs input that nothing in MITK supplies - iso-values, or a cutting
-plane - and without it the ray caster draws nothing at all rather than falling
-back, so offering either would only ever produce an empty 3D window.
 
 \section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
 
@@ -256,6 +254,8 @@ the 3D render window itself, from the lighting button in its top right corner.
 The lights belong to the window rather than to any one volume, so the choice
 applies to every volume drawn there, and it stays as you left it after this view
 is closed.
+
+\imageMacro{QmitkVolumeVisualizationV2_LightingMenu.png,"The lighting menu of the 3D render window.",5.00}
 
 The three models are not weaker and stronger versions of the same effect - they
 take different paths through the renderer:
@@ -290,10 +290,10 @@ prescribes. Ambient is deliberately zero under Key light: with more than one
 light in the scene the renderer adds ambient as a flat grey wash, so the fill
 light does that job instead.
 
-\note This whole section applies to the Composite blend mode only, and is
-disabled otherwise, with the reason on its header. The projection modes reduce
-each ray to a single value and light nothing, so lighting there is inert rather
-than merely subtle.
+\note This whole section applies to the Composite blend mode only. With
+<tt>CT-MIP</tt> or <tt>MR-MIP</tt> it is disabled, with the reason on its
+header: a maximum intensity projection reduces each ray to a single value and
+lights nothing, so lighting there is inert rather than merely subtle.
 
 \section org_mitk_views_volumevisualization_v2_appearance Colour and opacity from the Data Manager
 

@@ -436,8 +436,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingSection()
     gatedByBlendMode ? "Lighting / shading - Composite only" : "Lighting / shading");
   m_Controls->lightingExpandButton->setToolTip(gatedByBlendMode
     ? QString("The projection modes flatten each ray to one value and light nothing. Apply a preset authored for"
-              " composite, or set Blend mode to Composite while creating a custom transfer function, to shade"
-              " the volume.")
+              " composite to shade the volume.")
     : QString());
 
   const bool lightingApplies = LightingApplies(selectedNode.GetPointer());
@@ -505,7 +504,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   // Shown only away from the default, so the panel carries no weight for the
   // common case while a greyed-out lighting section always has a visible cause.
   // A readout rather than a control: the mode comes with the transfer function
-  // now, from the preset applied or from the authoring panel.
+  // now, from the preset applied.
   const bool showBlendModeHint = volumeRenderingOn && blendMode != mitk::VolumeBlendMode::Composite;
   m_Controls->blendModeHintLabel->setVisible(showBlendModeHint);
 

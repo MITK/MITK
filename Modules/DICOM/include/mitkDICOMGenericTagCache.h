@@ -100,7 +100,7 @@ namespace mitk
     private:
       const DICOMGenericImageFrameInfo* FindFile(const std::string& filename) const;
 
-      std::unordered_map<std::string, DICOMGenericImageFrameInfo*> m_ByFilename;
+      std::unordered_map<std::string, const DICOMGenericImageFrameInfo*> m_ByFilename;
       bool m_HasAnyFrameModel = false;
 
       /** Frame-scoped infos are created on demand and kept, so that resolving the

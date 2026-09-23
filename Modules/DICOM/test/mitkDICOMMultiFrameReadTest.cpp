@@ -239,9 +239,9 @@ private:
   }
 
   /** The split reason the reader recorded on the block an image came from. */
-  static mitk::IOVolumeSplitReason::Pointer SplitReasonOf(const mitk::Image* image)
+  static mitk::IOVolumeSplitReason::Pointer SplitReasonOf(const mitk::IPropertyProvider* provider)
   {
-    const auto reason = image->GetConstProperty(
+    const auto reason = provider->GetConstProperty(
       mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()));
     CPPUNIT_ASSERT_MESSAGE("The image carries a split reason", reason.IsNotNull());
 
@@ -255,19 +255,19 @@ private:
 
   /** The single property the given path must resolve to, with its published
       name checked, so a test cannot pass on a differently shaped key. */
-  mitk::BaseProperty::ConstPointer TheOnlyProperty(const mitk::Image* image,
+  mitk::BaseProperty::ConstPointer TheOnlyProperty(const mitk::IPropertyProvider* provider,
                                                    const mitk::DICOMTagPath& path,
                                                    const std::string& expectedName)
   {
-    const auto matches = mitk::GetPropertyByDICOMTagPath(image, path);
+    const auto matches = mitk::GetPropertyByDICOMTagPath(provider, path);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Exactly one property for " + path.ToStr(), std::size_t(1), matches.size());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Published property name", expectedName, matches.begin()->first);
     return matches.begin()->second;
   }
 
-  void AssertNoRootedKeys(const mitk::Image* image)
+  void AssertNoRootedKeys(const mitk::IPropertyProvider* provider)
   {
-    for (const auto& key : image->GetPropertyKeys())
+    for (const auto& key : provider->GetPropertyKeys())
     {
       CPPUNIT_ASSERT_MESSAGE("No property key is rooted in a functional-group sequence: " + key,
                              key.rfind("DICOM.5200.", 0) != 0);
@@ -761,12 +761,14 @@ public:
 
   /**
    * The two views on one file's values. A file-level info answers in literal
-   * terms and must not start answering a frame-relative query, or every
-   * consumer of GetFrameInfoList() would see functional-group findings it never
-   * saw before; a frame-scoped info answers exactly that query.
+   * terms and must not answer a frame-relative query, or every consumer of
+   * GetFrameInfoList() would see functional-group findings under paths it did
+   * not register; a frame-scoped info answers exactly that query.
    *
-   * The scan registers the rooted path, so the entries exist without any
-   * functional-group expansion and the case is about the store alone.
+   * The scan registers the rooted path, which is searched as registered and
+   * never rooted again, so the entries are the same for both views and the
+   * case is about the store alone. The frame model is read only so that the
+   * cache resolves frame-scoped infos.
    */
   void FileLevelInfoDoesNotAnswerAFrameRelativeQuery()
   {
@@ -780,6 +782,7 @@ public:
     auto scanner = mitk::DICOMDCMTKTagScanner::New();
     scanner->SetInputFiles({ file });
     scanner->AddTagPath(Rooted(0x5200, 0x9230, 0x0028, 0x9145, 0x0028, 0x1053));
+    scanner->SetReadFrameModel(true);
     scanner->Scan();
 
     const auto files = scanner->GetFrameInfoList();
@@ -996,8 +999,8 @@ public:
   }
 
   /**
-   * Single-frame functional-group instances of one series stack, as they did
-   * before the frame model existed.
+   * Single-frame functional-group instances of one series stack into one
+   * volume.
    *
    * The separation rule exists because ITK's multi-file branch keeps only one
    * frame per file. At one frame per file that is the correct result already, so

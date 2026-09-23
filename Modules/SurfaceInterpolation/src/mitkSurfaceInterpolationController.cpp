@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToSurfaceFilter.h>
+#include <mitkProgressTask.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateProperty.h>
@@ -335,6 +336,9 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
   bool removedIt = false;
 
+  // Removed further down, once the lock below is released.
+  mitk::DataNode::Pointer planeNodeToRemove;
+
   {
     std::lock_guard<std::shared_mutex> cpiGuard(cpiMutex);
 
@@ -367,8 +371,6 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
         if (m_DataStorage.IsNotNull())
         {
-          mitk::DataNode::Pointer contourPlaneGeometryDataNode;
-
           auto contourNodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(m_DataStorage, selectedSegmentation), currentLabel, currentTimeStep);
 
           //  Go through the nodes and check if the contour position matches them.
@@ -381,7 +383,7 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
             if (samePlane)
             {
-              m_DataStorage->Remove(it->Value());
+              planeNodeToRemove = it->Value();
               break;
             }
           }
@@ -391,6 +393,13 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
       ++it;
     }
   }
+
+  // Not under the lock above. Removing a node is handed over to the thread that
+  // owns the data storage and blocks until it has run there, and the observers
+  // it fires there reach back into this controller. Holding an exclusive lock
+  // across that hands the two threads a deadlock.
+  if (planeNodeToRemove.IsNotNull())
+    m_DataStorage->Remove(planeNodeToRemove);
 
   return removedIt;
 }
@@ -497,6 +506,44 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
 
   if (!CPICacheIsOutdated(segmentationImage, labelValue, timeStep)) return;
 
+  // Created after the early return, so that an up-to-date cache does not
+  // make a notification flash up for an interpolation that never runs. That
+  // puts it under the lock taken above: a progress listener must therefore not
+  // reach back into this controller, and must not mutate the data storage,
+  // either of which would deadlock against a non-recursive lock held here.
+  //
+  // Each filter gets a fixed share rather than adding its own steps to the
+  // task: they announce themselves one after another as they start, which
+  // would move the bar backwards every time one of them did. The shares
+  // reflect how long each stage takes, the distance image dominating.
+  constexpr unsigned int NORMALS_SHARE = 10;
+  constexpr unsigned int DISTANCE_IMAGE_SHARE = 50;
+  constexpr unsigned int SURFACE_SHARE = 40;
+
+  mitk::ProgressTask task("Interpolating surface",
+    NORMALS_SHARE + DISTANCE_IMAGE_SHARE + SURFACE_SHARE);
+
+  // The three handles below are destroyed in reverse order of declaration, and
+  // ending a reporting task reports its own share as done, so on the way out
+  // each of them names a lower absolute value than the one before. The service
+  // never takes a task's progress backwards, so those trailing reports are
+  // ignored rather than walking the bar down through the earlier shares.
+  mitk::ProgressTask normalsProgress([&task](float progress)
+    {
+      task.SetProgress(static_cast<unsigned int>(NORMALS_SHARE * progress));
+    });
+
+  mitk::ProgressTask distanceImageProgress([&task](float progress)
+    {
+      task.SetProgress(NORMALS_SHARE + static_cast<unsigned int>(DISTANCE_IMAGE_SHARE * progress));
+    });
+
+  mitk::ProgressTask surfaceProgress([&task](float progress)
+    {
+      task.SetProgress(NORMALS_SHARE + DISTANCE_IMAGE_SHARE
+        + static_cast<unsigned int>(SURFACE_SHARE * progress));
+    });
+
   mitk::Surface::Pointer interpolationResult = nullptr;
 
   auto reduceFilter = ReduceContourSetFilter::New();
@@ -522,11 +569,8 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   normalsFilter->SetMaxSpacing(maxSpacing);
   interpolateSurfaceFilter->SetDistanceImageVolume(m_DistanceImageVolume);
 
-  reduceFilter->SetUseProgressBar(false);
-  normalsFilter->SetUseProgressBar(true);
-  normalsFilter->SetProgressStepSize(1);
-  interpolateSurfaceFilter->SetUseProgressBar(true);
-  interpolateSurfaceFilter->SetProgressStepSize(7);
+  normalsFilter->SetProgressTask(&normalsProgress);
+  interpolateSurfaceFilter->SetProgressTask(&distanceImageProgress);
 
   //  Set reference image for interpolation surface filter
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
@@ -562,11 +606,9 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
         interpolateSurfaceFilter->SetInput(i, normalsFilter->GetOutput(i));
       }
 
-      // Setting up progress bar
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-
       // create a surface from the distance-image
       auto imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
+      imageToSurfaceFilter->SetProgressTask(&surfaceProgress);
       imageToSurfaceFilter->SetInput(interpolateSurfaceFilter->GetOutput());
       imageToSurfaceFilter->SetThreshold(0);
       imageToSurfaceFilter->SetSmooth(true);
@@ -582,9 +624,6 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
 
       interpolationResult->SetVtkPolyData(imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), timeStep);
       interpolationResult->DisconnectPipeline();
-
-      // Last progress step
-      mitk::ProgressBar::GetInstance()->Progress(20);
 
     }
   }

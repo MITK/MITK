@@ -50,6 +50,25 @@ namespace mitk
   class MITKCORE_EXPORT IOUtil
   {
   public:
+    /**
+     * \brief Keeps Load() and Save() from raising notifications of their own.
+     *
+     * For a caller that reports on their behalf, such as saving a scene,
+     * where one notification for the scene is wanted rather than one per
+     * file it happens to write.
+     *
+     * Applies to the thread it was created on, for as long as it exists.
+     */
+    class MITKCORE_EXPORT QuietProgress final
+    {
+    public:
+      QuietProgress();
+      ~QuietProgress();
+
+      QuietProgress(const QuietProgress&) = delete;
+      QuietProgress& operator=(const QuietProgress&) = delete;
+    };
+
     /** \brief Contains information about the current loading process.
      *
      * Holds the path to be loaded, all found readers for the load path, and the resulting

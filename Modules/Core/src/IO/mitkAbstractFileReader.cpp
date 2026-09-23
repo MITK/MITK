@@ -290,6 +290,11 @@ namespace mitk
     d->RemoveProgressCallback(callback);
   }
 
+  void AbstractFileReader::ReportProgress(float progress) { d->ReportProgress(progress); }
+
+  void AbstractFileReader::SetProgressTask(ProgressTask *task) { d->SetProgressTask(task); }
+  ProgressTask *AbstractFileReader::GetProgressTask() const { return d->GetProgressTask(); }
+
   void AbstractFileReader::SetProperties(const PropertyList* properties)
   {
     d->m_Properties = properties;

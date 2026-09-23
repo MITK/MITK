@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \ingroup IO
    *
@@ -141,6 +143,22 @@ namespace mitk
      * \param[in] callback The callback delegate to remove.
      */
     virtual void RemoveProgressCallback(const ProgressCallback &callback) = 0;
+
+    /**
+     * \brief Set the task this reader or writer reports its progress into.
+     *
+     * Set by whoever drives the reading or writing, so that an implementation
+     * that already reports in steps, or that drives further reads of its own,
+     * contributes to the operation the user is watching instead of raising
+     * one of its own. The task is owned by the caller and only valid for the
+     * duration of the call.
+     *
+     * \param[in] task The task to report into, or nullptr for none.
+     */
+    virtual void SetProgressTask(ProgressTask *task) = 0;
+
+    /** \brief Get the task to report progress into, or nullptr. */
+    virtual ProgressTask *GetProgressTask() const = 0;
 
     /**
      * \brief Service property name for a human-readable description.

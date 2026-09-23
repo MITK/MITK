@@ -14,7 +14,9 @@ found in the LICENSE file.
 #include <Poco/Path.h>
 #include <mitkBaseRenderer.h>
 #include <mitkIOUtil.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
+
+#include <optional>
 #include "mitkPropertyListDeserializer.h"
 #include "mitkSceneReaderHelpers.h"
 #include <mitkSerializerMacros.h>
@@ -99,7 +101,25 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     ++listSize;
   }
 
-  ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
+  // Reports through the caller when there is one, so that opening a scene
+  // file raises a single notification rather than one for the file and
+  // another for the scene inside it.
+  std::optional<ProgressTask> ownTask;
+
+  if (nullptr == m_ProgressTask)
+    ownTask.emplace(std::string("Loading scene"), listSize * 2);
+
+  auto& task = ownTask.has_value()
+    ? ownTask.value()
+    : *m_ProgressTask;
+
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(listSize * 2);
+
+  // Each node is read through IOUtil, which would otherwise both raise a
+  // notification per node and, by adding its own steps here, keep moving
+  // this bar backwards as it discovers them.
+  IOUtil::QuietProgress quietProgress;
 
   // Deserialize base data properties before reading the actual data to be
   // able to provide them as read-only meta data to the data reader.
@@ -154,7 +174,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 
     DataNodes.push_back(dataNode);
 
-    ProgressBar::GetInstance()->Progress();
+    task.Progress();
   }
 
   // iterate all nodes
@@ -206,7 +226,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
       }
     }
 
-    ProgressBar::GetInstance()->Progress();
+    task.Progress();
   } // end for all <node>
 
   // sort our nodes by their "layer" property
@@ -274,6 +294,9 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
         storage->Add(nodesIter->first, parents);
 
+        if (nullptr != m_LoadedNodes)
+          m_LoadedNodes->push_back(nodesIter->first);
+
         // remove this node from m_OrderedNodePairs
         m_OrderedNodePairs.erase(nodesIter);
 
@@ -289,6 +312,10 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
        ++nodesIter)
   {
     storage->Add(nodesIter->first);
+
+    if (nullptr != m_LoadedNodes)
+      m_LoadedNodes->push_back(nodesIter->first);
+
     MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage "
                  "without parents.";
     error = true;

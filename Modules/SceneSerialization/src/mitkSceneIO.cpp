@@ -23,9 +23,11 @@ found in the LICENSE file.
 #include <mitkSceneReader.h>
 
 #include <mitkBaseRenderer.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkFileSystem.h>
+#include <mitkIOUtil.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkStringUtil.h>
@@ -36,6 +38,7 @@ found in the LICENSE file.
 
 #include <itkObjectFactoryBase.h>
 
+#include <algorithm>
 #include <fstream>
 #include <mitkIOUtil.h>
 #include <sstream>
@@ -44,7 +47,71 @@ found in the LICENSE file.
 
 #include <tinyxml2.h>
 
-mitk::SceneIO::SceneIO() : m_WorkingDirectory(""), m_UnzipErrors(0)
+namespace
+{
+  /**
+   * Shares of a scene save. Which of the two dominates depends on the scene,
+   * so they are given equal weight.
+   */
+  constexpr unsigned int SERIALIZATION_SHARE = 50;
+  constexpr unsigned int COMPRESSION_SHARE = 50;
+
+  /** Reports the share of the task that compressing accounts for. */
+  class ZipProgress
+  {
+  public:
+    ZipProgress(mitk::ProgressTask& task, unsigned int entryCount)
+      : m_Task(task),
+        m_EntryCount(entryCount),
+        m_Compressed(0)
+    {
+    }
+
+    void OnDone(const void*, const Poco::Zip::ZipLocalFileHeader&)
+    {
+      ++m_Compressed;
+
+      m_Task.SetProgress(SERIALIZATION_SHARE + (0 != m_EntryCount
+        ? COMPRESSION_SHARE * m_Compressed / m_EntryCount
+        : COMPRESSION_SHARE));
+    }
+
+  private:
+    mitk::ProgressTask& m_Task;
+    unsigned int m_EntryCount;
+    unsigned int m_Compressed;
+  };
+
+  /**
+   * Counts what compressing the working directory is going to report. Poco
+   * announces one entry per file and one per directory below the root, so
+   * directories count here too: counting only the files makes the compression
+   * share saturate well before compressing is done.
+   */
+  unsigned int CountZipEntries(const std::string& directory)
+  {
+    const fs::recursive_directory_iterator end;
+
+    std::error_code error;
+    unsigned int count = 0;
+
+    // Incremented explicitly rather than by a range-for, whose operator++
+    // throws on an unreadable entry instead of reporting it.
+    for (auto it = fs::recursive_directory_iterator(directory, error); !error && it != end; it.increment(error))
+      ++count;
+
+    // A count that could not be taken is reported as none, which makes the
+    // share jump to full on the first entry rather than stall below it.
+    return error
+      ? 0
+      : count;
+  }
+}
+
+mitk::SceneIO::SceneIO()
+  : m_LoadedNodes(DataStorage::SetOfObjects::New()),
+    m_WorkingDirectory(""),
+    m_UnzipErrors(0)
 {
 }
 
@@ -93,6 +160,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
 {
   mitk::LocaleSwitch localeSwitch("C");
 
+  // A load reports the nodes it adds, so start the list over.
+  m_LoadedNodes = DataStorage::SetOfObjects::New();
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if (storage.IsNull())
@@ -117,6 +187,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
     try
     {
       SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      jsonReader->SetProgressTask(m_ProgressTask);
+      jsonReader->SetLoadedNodes(m_LoadedNodes);
       if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
       {
         MITK_ERROR << "There were errors while loading scene file " << filename
@@ -196,6 +268,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
 {
   mitk::LocaleSwitch localeSwitch("C");
 
+  // A load reports the nodes it adds, so start the list over.
+  m_LoadedNodes = DataStorage::SetOfObjects::New();
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if (storage.IsNull())
@@ -223,6 +298,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
     try
     {
       SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      jsonReader->SetProgressTask(m_ProgressTask);
+      jsonReader->SetLoadedNodes(m_LoadedNodes);
       if (!jsonReader->LoadScene(indexfilename, storage, clearStorageFirst))
       {
         MITK_ERROR << "There were errors while loading scene file " << indexfilename
@@ -259,6 +336,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
   }
 
   SceneReader::Pointer reader = SceneReader::New();
+  reader->SetProgressTask(m_ProgressTask);
+  reader->SetLoadedNodes(m_LoadedNodes);
+
   if (!reader->LoadScene(document, workingDir, storage))
   {
     MITK_ERROR << "There were errors while loading scene file " << indexfilename << ". Your data may be corrupted";
@@ -309,6 +389,33 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
     // DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
+    // Declared out here because compressing the working directory happens
+    // after the loop over the nodes and belongs to the same operation.
+    // Serializing the nodes and compressing the result each get a fixed
+    // share. How many files there will be to compress is only known once
+    // the nodes are written, and adding them to the budget then would move
+    // the bar backwards.
+    //
+    // Reports through the caller when there is one, so that writing a scene
+    // file shows one notification instead of one for the file and another for
+    // the scene inside it. The shares are absolute, so what the caller is
+    // handed is the fraction they add up to rather than steps of its own.
+    // The task handed down by a reader or writer arrives Indeterminate, since
+    // what a scene file contains is only known once it is open. So the share
+    // reported below has to be added to it before there is anything to report a
+    // fraction of. Added once, before any of the work starts, so the bar does
+    // not fall back partway through.
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->AddStepsToDo(SERIALIZATION_SHARE + COMPRESSION_SHARE);
+
+    ProgressTask task = nullptr != m_ProgressTask
+      ? MakeProgressShare(m_ProgressTask, SERIALIZATION_SHARE + COMPRESSION_SHARE)
+      : ProgressTask("Saving scene", SERIALIZATION_SHARE + COMPRESSION_SHARE);
+
+    // The serializers below write one file per node through IOUtil, which
+    // would otherwise raise a notification per file on top of this one.
+    IOUtil::QuietProgress quietProgress;
+
     if (sceneNodes.IsNull())
     {
       MITK_WARN << "Saving empty scene to " << filename;
@@ -329,7 +436,8 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         return false;
       }
 
-      ProgressBar::GetInstance()->AddStepsToDo(sceneNodes->size());
+      const auto nodeCount = sceneNodes->size();
+      std::size_t serializedNodes = 0;
 
       // find out about dependencies
       typedef std::map<DataNode *, std::string> UIDMapType;
@@ -466,7 +574,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           MITK_WARN << "Ignoring nullptr node during scene serialization.";
         }
 
-        ProgressBar::GetInstance()->Progress();
+        ++serializedNodes;
+        task.SetProgress(0 != nodeCount
+          ? static_cast<unsigned int>(SERIALIZATION_SHARE * serializedNodes / nodeCount)
+          : SERIALIZATION_SHARE);
       } // end for all nodes
     }   // end if sceneNodes
 
@@ -498,10 +609,21 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
         else
         {
+          // Compressing the working directory is what dominates saving a large
+          // scene, so it carries half of the task rather than trailing behind
+          // the serialization the bar was showing.
+          ZipProgress zipProgress(task, CountZipEntries(m_WorkingDirectory));
+
           Poco::Zip::Compress zipper(file, true);
+          zipper.EDone += Poco::Delegate<ZipProgress, const Poco::Zip::ZipLocalFileHeader>(
+            &zipProgress, &ZipProgress::OnDone);
+
           Poco::Path tmpdir(m_WorkingDirectory);
           zipper.addRecursive(tmpdir);
           zipper.close();
+
+          zipper.EDone -= Poco::Delegate<ZipProgress, const Poco::Zip::ZipLocalFileHeader>(
+            &zipProgress, &ZipProgress::OnDone);
         }
         try
         {
@@ -656,6 +778,11 @@ const mitk::SceneIO::FailedBaseDataListType *mitk::SceneIO::GetFailedNodes()
   return m_FailedNodes.GetPointer();
 }
 
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::SceneIO::GetLoadedNodes() const
+{
+  return m_LoadedNodes.GetPointer();
+}
+
 const mitk::PropertyList *mitk::SceneIO::GetFailedProperties()
 {
   return m_FailedProperties;
@@ -672,4 +799,14 @@ void mitk::SceneIO::OnUnzipOk(const void * /*pSender*/,
                               std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> & /*info*/)
 {
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
+}
+
+void mitk::SceneIO::SetProgressTask(ProgressTask* task)
+{
+  m_ProgressTask = task;
+}
+
+mitk::ProgressTask* mitk::SceneIO::GetProgressTask() const
+{
+  return m_ProgressTask;
 }

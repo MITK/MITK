@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkMaskImageFilter.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateGeometry.h>
@@ -170,10 +170,10 @@ void QmitkImageMaskingWidget::OnCustomValueButtonToggled(bool checked)
 
 void QmitkImageMaskingWidget::OnMaskImagePressed()
 {
-  //Disable Buttons during calculation and initialize Progressbar
   this->EnableButtons(false);
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
-  mitk::ProgressBar::GetInstance()->Progress();
+
+  mitk::ProgressTask task("Masking image", 4);
+  task.Progress();
 
   //create result image, get mask node and reference image
   mitk::Image::Pointer resultImage(nullptr);
@@ -184,7 +184,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
     mitkThrow() << "QmitkImageMaskingWidget is in an invalid state. OnMaskImagePressed was called without a selected image node.";
   mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(imageNode->GetData());
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  task.Progress();
 
   auto selectedLabels = m_Controls->labelInspector->GetSelectedLabels();
   if (selectedLabels.empty())
@@ -192,14 +192,13 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   auto labelImage = mitk::CreateLabelMask(segmentation, selectedLabels.front(), true);
   resultImage = this->MaskImage(referenceImage, labelImage);
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  task.Progress();
 
   if( resultImage.IsNull() )
   {
     MITK_ERROR << "Masking failed";
     QMessageBox::information( this, "Image Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
     this->EnableButtons(true);
-    mitk::ProgressBar::GetInstance()->Progress(4);
     return;
   }
 
@@ -217,7 +216,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
   this->EnableButtons(true);
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  task.Progress();
 }
 
 mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage )

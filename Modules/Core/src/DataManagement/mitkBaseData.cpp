@@ -159,6 +159,10 @@ bool mitk::BaseData::IsEmpty() const
   return true;
 }
 
+void mitk::BaseData::PrebuildVtkRepresentation() const
+{
+}
+
 itk::SmartPointer<mitk::BaseDataSource> mitk::BaseData::GetSource() const
 {
   return static_cast<mitk::BaseDataSource *>(Superclass::GetSource().GetPointer());

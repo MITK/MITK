@@ -13,11 +13,12 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 
 #include <mitkCoreServices.h>
+#include <mitkStorageThreadDispatcherBase.h>
 #include <mitkExceptionMacro.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
 #include <mitkIMimeTypeProvider.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkStandaloneDataStorage.h>
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>
@@ -36,8 +37,10 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkTriangleFilter.h>
 
+#include <algorithm>
 #include <cerrno>
 #include <cstdlib>
+#include <optional>
 
 static std::string GetLastErrorStr()
 {
@@ -274,8 +277,117 @@ static char *mkdtemps_compat(char *tmpl, int suffixlen)
 //**************************************************************
 // mitk::IOUtil method definitions
 
+namespace
+{
+  /**
+   * Resolution of a single file within its task. Readers and writers report
+   * a fraction, and this is what that fraction is spread over.
+   */
+  constexpr unsigned int STEPS_PER_FILE = 100;
+
+  /** Nesting depth of IOUtil::QuietProgress on this thread. */
+  thread_local unsigned int s_QuietDepth = 0;
+
+  /**
+   * Owns one file's share of a task. Whatever the reader or writer reports is
+   * mapped into that share, and the remainder of it is credited once the file
+   * is done with, however that happens.
+   *
+   * Constructed before it is known whether the file has a reader at all, so
+   * that a file which is skipped still moves the bar. Without that, an
+   * operation whose budget counts every input but whose first reader consumes
+   * several of them, as a DICOM series reader does, would leave the bar
+   * standing at a fraction of a percent for its whole duration.
+   *
+   * Steps are reported relative rather than absolute, so that a task shared
+   * with the caller keeps whatever progress the caller made itself.
+   */
+  class FileProgressForwarder final
+  {
+  public:
+    explicit FileProgressForwarder(mitk::ProgressTask* task)
+      : m_FileIO(nullptr),
+        m_Task(task),
+        m_Reported(0),
+        m_FileTask([this](float progress) { this->OnProgress(progress); })
+    {
+    }
+
+    /** Starts forwarding what the given reader or writer reports. */
+    void Attach(mitk::IFileIO* fileIO)
+    {
+      if (nullptr == m_Task || nullptr == fileIO)
+        return;
+
+      m_FileIO = fileIO;
+
+      m_FileIO->AddProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
+        this, &FileProgressForwarder::OnProgress));
+
+      // A reader that reports in steps of its own, or that drives further
+      // reads, gets a task rather than a callback. It maps into this
+      // file's share, so whatever it adds cannot grow the budget of the
+      // operation around it.
+      m_FileIO->SetProgressTask(&m_FileTask);
+    }
+
+    ~FileProgressForwarder()
+    {
+      if (nullptr != m_FileIO)
+      {
+        m_FileIO->SetProgressTask(nullptr);
+        m_FileIO->RemoveProgressCallback(mitk::MessageDelegate1<FileProgressForwarder, float>(
+          this, &FileProgressForwarder::OnProgress));
+      }
+
+      // Ended here rather than left to the member's own destructor, which runs
+      // after this body and would call back into an object whose lifetime is
+      // already over.
+      m_FileTask.Finish();
+
+      // Whatever the file reported, its share of the work is over. Formats
+      // that report nothing at all advance here in one go.
+      this->Advance(STEPS_PER_FILE);
+    }
+
+    FileProgressForwarder(const FileProgressForwarder&) = delete;
+    FileProgressForwarder& operator=(const FileProgressForwarder&) = delete;
+
+  private:
+    void OnProgress(float progress)
+    {
+      const auto clamped = std::clamp(progress, 0.0f, 1.0f);
+      this->Advance(static_cast<unsigned int>(clamped * STEPS_PER_FILE));
+    }
+
+    void Advance(unsigned int reached)
+    {
+      if (nullptr != m_Task && reached > m_Reported)
+      {
+        m_Task->Progress(reached - m_Reported);
+        m_Reported = reached;
+      }
+    }
+
+    mitk::IFileIO* m_FileIO;
+    mitk::ProgressTask* m_Task;
+    unsigned int m_Reported;
+    mitk::ProgressTask m_FileTask;
+  };
+}
+
 namespace mitk
 {
+  IOUtil::QuietProgress::QuietProgress()
+  {
+    ++s_QuietDepth;
+  }
+
+  IOUtil::QuietProgress::~QuietProgress()
+  {
+    --s_QuietDepth;
+  }
+
   struct IOUtil::Impl
   {
     struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
@@ -585,8 +697,16 @@ namespace mitk
       return "No input files given";
     }
 
-    int filesToRead = loadInfos.size();
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2 * filesToRead);
+    const auto steps = static_cast<unsigned int>(STEPS_PER_FILE * loadInfos.size());
+
+    std::optional<ProgressTask> ownTask;
+
+    if (0 == s_QuietDepth)
+      ownTask.emplace("Loading files", steps);
+
+    auto* task = ownTask.has_value()
+      ? &ownTask.value()
+      : nullptr;
 
     std::string errMsg;
 
@@ -595,6 +715,10 @@ namespace mitk
     std::vector< std::string > read_files;
     for (auto &loadInfo : loadInfos)
     {
+      // Declared before the skips below so that this file's share of the task
+      // is credited on every way out of the iteration.
+      FileProgressForwarder fileProgress(task);
+
       if(std::find(read_files.begin(), read_files.end(), loadInfo.m_Path) != read_files.end())
         continue;
 
@@ -679,6 +803,11 @@ namespace mitk
 
       reader->SetProperties(loadInfo.m_Properties);
 
+      if (nullptr != task)
+        task->SetName("Loading " + itksys::SystemTools::GetFilenameName(loadInfo.m_Path));
+
+      fileProgress.Attach(reader);
+
       // Do the actual reading
       try
       {
@@ -719,7 +848,14 @@ namespace mitk
             continue;
           }
 
-          data->SetProperty("path", mitk::StringProperty::New(Utf8Util::Local8BitToUtf8(loadInfo.m_Path)));
+          // The reader has already handed this node to the data storage, so the
+          // thread that owns the storage may be rendering it by now. Writing to
+          // it has to happen there, exactly as the save side below does.
+          RunWhereTheDataLives([&data, &loadInfo]()
+            {
+              data->SetProperty("path",
+                mitk::StringProperty::New(Utf8Util::Local8BitToUtf8(loadInfo.m_Path)));
+            });
 
           loadInfo.m_Output.push_back(data);
           if (nodeResult)
@@ -737,16 +873,12 @@ namespace mitk
       {
         errMsg += "Exception occurred when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
       }
-      mitk::ProgressBar::GetInstance()->Progress(2);
-      --filesToRead;
     }
 
     if (!errMsg.empty())
     {
       MITK_ERROR << errMsg;
     }
-
-    mitk::ProgressBar::GetInstance()->Progress(2 * filesToRead);
 
     return errMsg;
   }
@@ -889,8 +1021,14 @@ namespace mitk
       return "No data for saving available";
     }
 
-    int filesToWrite = saveInfos.size();
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2 * filesToWrite);
+    std::optional<ProgressTask> ownTask;
+
+    if (0 == s_QuietDepth)
+      ownTask.emplace("Saving files", static_cast<unsigned int>(STEPS_PER_FILE * saveInfos.size()));
+
+    auto* task = ownTask.has_value()
+      ? &ownTask.value()
+      : nullptr;
 
     std::string errMsg;
 
@@ -898,6 +1036,10 @@ namespace mitk
 
     for (auto &saveInfo : saveInfos)
     {
+      // Declared before the skip below so that this file's share of the task
+      // is credited on every way out of the iteration.
+      FileProgressForwarder fileProgress(task);
+
       const std::string baseDataType = saveInfo.m_BaseData->GetNameOfClass();
 
       std::vector<FileWriterSelector::Item> writers = saveInfo.m_WriterSelector.Get();
@@ -961,6 +1103,11 @@ namespace mitk
         break;
       }
 
+      if (nullptr != task)
+        task->SetName("Saving " + itksys::SystemTools::GetFilenameName(saveInfo.m_Path));
+
+      fileProgress.Attach(writer);
+
       // Do the actual writing
       try
       {
@@ -973,18 +1120,19 @@ namespace mitk
       }
 
       if (setPathProperty)
-        saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
-
-      mitk::ProgressBar::GetInstance()->Progress(2);
-      --filesToWrite;
+      {
+        RunWhereTheDataLives([&saveInfo]()
+          {
+            saveInfo.m_BaseData->GetPropertyList()->SetStringProperty(
+              "path", Utf8Util::Local8BitToUtf8(saveInfo.m_Path).c_str());
+          });
+      }
     }
 
     if (!errMsg.empty())
     {
       MITK_ERROR << errMsg;
     }
-
-    mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
 
     return errMsg;
   }

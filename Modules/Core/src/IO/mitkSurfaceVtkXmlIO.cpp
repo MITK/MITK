@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSurfaceVtkXmlIO.h"
+#include "mitkVtkFileIOProgressObserver.h"
 
 #include <mitkIOMimeTypes.h>
 #include <mitkSurface.h>
@@ -67,6 +68,11 @@ namespace mitk
     {
       reader->SetFileName(this->GetInputLocation().c_str());
     }
+    VtkFileIOProgressObserver progress(reader, [this](float p)
+      {
+        this->AbstractFileReader::ReportProgress(p);
+      });
+
     reader->Update();
 
     if (reader->GetOutput() != nullptr)
@@ -134,6 +140,11 @@ namespace mitk
       {
         writer->SetFileName(fileName.c_str());
       }
+
+      VtkFileIOProgressObserver progress(writer, [this, t, timesteps](float p)
+        {
+          this->AbstractFileWriter::ReportProgress((t + p) / timesteps);
+        });
 
       if (writer->Write() == 0 || writer->GetErrorCode() != 0)
       {

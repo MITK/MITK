@@ -18,6 +18,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   class ContourModelSet;
   class ContourModel;
 
@@ -86,6 +88,15 @@ namespace mitk
 
     const mitk::Image *GetImage(void);
 
+    /**
+     * \brief Report progress into the given task, or nowhere if it is nullptr.
+     *
+     * The filter contributes one step per contour of its input.
+     *
+     * \param[in] task The task of the operation this filter contributes to.
+     */
+    void SetProgressTask(ProgressTask *task);
+
   protected:
     ContourModelSetToImageFilter();
 
@@ -103,6 +114,8 @@ namespace mitk
     unsigned int m_TimeStep;
 
     const mitk::Image *m_ReferenceImage;
+
+    ProgressTask *m_ProgressTask;
   };
 
   /**
@@ -110,17 +123,21 @@ namespace mitk
    *
    * \param[in] refImage Image that serves as geometry template for the output.
    * \param[in] contourSet The contour set to convert.
+   * \param[in] progressTask Task to report one step per contour into, or
+   *        nullptr for no reporting. A set can hold hundreds of contours, so
+   *        this is worth passing wherever there is a task to pass.
    * \return A binary image suitable for use as label content in a segmentation.
    */
-  MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet);
+  MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet, ProgressTask* progressTask = nullptr);
 
   /**
    * \brief Converts a contour model into a binary label mask image.
    *
    * \param[in] refImage Image that serves as geometry template for the output.
    * \param[in] contourModel The contour model to convert.
+   * \param[in] progressTask Task to report into, or nullptr for no reporting.
    * \return A binary image suitable for use as label content in a segmentation.
    */
-  MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel);
+  MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel, ProgressTask* progressTask = nullptr);
 }
 #endif

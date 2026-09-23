@@ -129,6 +129,8 @@ namespace mitk
      */
     bool IsEmptyTimeStep(unsigned int t) const override;
 
+    void PrebuildVtkRepresentation() const override;
+
     /**
      * \brief Print the surface information to the output stream.
      *

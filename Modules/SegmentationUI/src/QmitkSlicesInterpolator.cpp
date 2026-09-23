@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkInteractionConst.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkOperationEvent.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkSegTool2D.h>
@@ -925,13 +925,10 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     }
 
     const auto numSlices = m_Segmentation->GetDimensions()[sliceDimension];
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
+    mitk::ProgressTask task("Accepting interpolations", numSlices);
 
     unsigned int totalChangedSlices = 0;
-    unsigned int completedSlices = 0;
 
-    // The try starts here (not at the loop) so that a throw from New() or
-    // TimePointToTimeStep() under memory pressure still rewinds the progress steps.
     try
     {
       m_Interpolator->EnableSliceImageCache();
@@ -975,8 +972,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
           ++totalChangedSlices;
         }
 
-        mitk::ProgressBar::GetInstance()->Progress();
-        ++completedSlices;
+        task.Progress();
       }
 
       m_Interpolator->DisableSliceImageCache();
@@ -1020,9 +1016,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       // The slice cache must not outlive this method: it is keyed only by slice
       // index and time step, so a later run would silently reuse stale slices.
       m_Interpolator->DisableSliceImageCache();
-
-      if (completedSlices < numSlices)
-        mitk::ProgressBar::GetInstance()->Progress(numSlices - completedSlices);
 
       m_FeedbackNode->SetData(nullptr);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <MitkSurfaceInterpolationExports.h>
 
 #include <mitkImageSource.h>
-#include <mitkProgressBar.h>
 #include <mitkSurface.h>
 
 #include <vnl/vnl_vector_fixed.h>
@@ -27,6 +26,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /** \brief Filter that creates a distance image from contour surface points using Radial Basis Function interpolation.
    *
    * Given a set of contour edge points with associated normals (as mitk::Surface inputs),
@@ -93,18 +94,11 @@ namespace mitk
     void Reset();
 
     /**
-      \brief Set whether the mitkProgressBar should be used
+      \brief Report progress into the given task, or nowhere if it is nullptr
 
-      \a Parameter true for using the progress bar, false otherwise
+      The filter contributes five steps to the task.
     */
-    void SetUseProgressBar(bool);
-
-    /**
-      \brief Set the stepsize which the progress bar should proceed
-
-      \a Parameter The stepsize for progressing
-    */
-    void SetProgressStepSize(unsigned int stepSize);
+    void SetProgressTask(ProgressTask* task);
 
     void SetReferenceImage(itk::ImageBase<3>::Pointer referenceImage);
 
@@ -157,8 +151,7 @@ namespace mitk
     double m_DistanceImageDefaultBufferValue;
     unsigned int m_DistanceImageVolume;
 
-    bool m_UseProgressBar;
-    unsigned int m_ProgressStepSize;
+    ProgressTask* m_ProgressTask;
   };
 
 } // namespace

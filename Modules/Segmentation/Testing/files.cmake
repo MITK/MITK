@@ -2,6 +2,7 @@ set(MODULE_TESTS
   mitkContourModelSetToImageFilterTest.cpp
   mitkImageToContourFilterTest.cpp
   mitkSegmentationInterpolationTest.cpp
+  mitkOtsuSegmentationFilterTest.cpp
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp

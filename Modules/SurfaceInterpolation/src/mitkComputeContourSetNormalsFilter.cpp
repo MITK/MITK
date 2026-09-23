@@ -14,14 +14,14 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 #include <mitkImagePixelReadAccessor.h>
+#include <mitkProgressTask.h>
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
   : m_SegmentationBinaryImage(nullptr),
     m_MaxSpacing(5),
     m_NegativeNormalCounter(0),
     m_PositiveNormalCounter(0),
-    m_UseProgressBar(false),
-    m_ProgressStepSize(1)
+    m_ProgressTask(nullptr)
 {
   mitk::Surface::Pointer output = mitk::Surface::New();
   this->SetNthOutput(0, output.GetPointer());
@@ -33,6 +33,12 @@ mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
 
 void mitk::ComputeContourSetNormalsFilter::GenerateData()
 {
+  // Each filter announces its own contribution, so that no caller has to
+  // guess how much work the pipeline it assembled amounts to. The relative
+  // weights are what make the task advance roughly with elapsed time.
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(1);
+
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
 
   // Iterating over each input
@@ -240,9 +246,8 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     surface->GetVtkPolyData()->GetCellData()->SetNormals(normals);
   } // end for all inputs
 
-  // Setting progressbar
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress();
 }
 
 mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface()
@@ -332,12 +337,7 @@ void mitk::ComputeContourSetNormalsFilter::Reset()
   this->SetNthOutput(0, output.GetPointer());
 }
 
-void mitk::ComputeContourSetNormalsFilter::SetUseProgressBar(bool status)
+void mitk::ComputeContourSetNormalsFilter::SetProgressTask(ProgressTask* task)
 {
-  this->m_UseProgressBar = status;
-}
-
-void mitk::ComputeContourSetNormalsFilter::SetProgressStepSize(unsigned int stepSize)
-{
-  this->m_ProgressStepSize = stepSize;
+  m_ProgressTask = task;
 }

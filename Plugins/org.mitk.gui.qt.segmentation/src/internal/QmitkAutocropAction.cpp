@@ -13,14 +13,12 @@ found in the LICENSE file.
 
 #include <mitkAutoCropImageFilter.h>
 #include <mitkImageCast.h>
-#include <mitkImageWriteAccessor.h>
+#include <mitkProgressTask.h>
 #include <mitkRenderingManager.h>
-#include <mitkProgressBar.h>
+
+#include <QmitkRun.h>
 
 #include <itkConstantPadImageFilter.h>
-
-//needed for qApp
-#include <QCoreApplication>
 
 QmitkAutocropAction::QmitkAutocropAction()
 {
@@ -39,76 +37,52 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNull()) return;
 
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-      mitk::ProgressBar::GetInstance()->Progress(2);
+      mitk::Image::Pointer croppedImage;
 
-      qApp->processEvents();
-
-      mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
-      cropFilter->SetInput( image );
-      cropFilter->SetBackgroundValue( 0 );
       try
       {
-        cropFilter->Update();
-
-        image = cropFilter->GetOutput();
-
-        if (image.IsNotNull())
-        {
-
-          if (image->GetDimension() == 4)
+        // Off the GUI thread, so that the notification appears and keeps moving
+        // while a large image is cropped. A crop that runs here instead reaches
+        // no event loop, and the card is then only shown once the work it was
+        // announcing is over.
+        QmitkRunWithInputBlocked([&]()
           {
-            MITK_INFO << "4D AUTOCROP DOES NOT WORK AT THE MOMENT";
-            throw "4D AUTOCROP DOES NOT WORK AT THE MOMENT";
+            // Neither the crop nor the padding below reports anything of its
+            // own, so there are no steps to count.
+            mitk::ProgressTask task("Cropping image");
 
-            unsigned int timesteps = image->GetDimension(3);
-            for (unsigned int i = 0; i < timesteps; i++)
+            auto cropFilter = mitk::AutoCropImageFilter::New();
+            cropFilter->SetInput(image);
+            cropFilter->SetBackgroundValue(0);
+            cropFilter->Update();
+
+            mitk::Image::Pointer croppedInput = cropFilter->GetOutput();
+
+            if (croppedInput.IsNull())
+              return;
+
+            if (4 == croppedInput->GetDimension())
             {
-              mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-              imageTimeSelector->SetInput(image);
-              imageTimeSelector->SetTimeNr(i);
-              imageTimeSelector->UpdateLargestPossibleRegion();
-
-              // We split a long nested code line into separate calls for debugging:
-              mitk::ImageSource::OutputImageType *_3dSlice = imageTimeSelector->GetOutput();
-              mitk::Image::Pointer _cropped3dSlice = this->IncreaseCroppedImageSize(_3dSlice);
-
-              // +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++
-              mitk::ImageWriteAccessor imAccess(_cropped3dSlice);
-              void *_data = imAccess.GetData();
-
-              // <ToBeRemoved>
-              // We write some stripes into the image
-              if ((i & 1) == 0)
-              {
-              int depth = _cropped3dSlice->GetDimension(2);
-              int height = _cropped3dSlice->GetDimension(1);
-              int width = _cropped3dSlice->GetDimension(0);
-
-              for (int z = 0; z < depth; ++z)
-                for (int y = 0; y < height; ++y)
-                  for (int x = 0; x < width; ++x)
-                    reinterpret_cast<unsigned char *>(_data)[(width * height * z) + (width * y) + x] = x & 1;
-              // </ToBeRemoved>
-              }
-
-              image->SetVolume(_data, i);
+              MITK_ERROR << "4D autocrop does not work at the moment";
+              return;
             }
-            node->SetData( image ); // bug fix 3145
-          }
-          else
-          {
-            node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
-          }
-          // Reinit node
-          mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry());
-        }
+
+            croppedImage = this->IncreaseCroppedImageSize(croppedInput);
+          },
+          { image.GetPointer() });
       }
-      catch(...)
+      catch (...)
       {
         MITK_ERROR << "Cropping image failed...";
       }
-      mitk::ProgressBar::GetInstance()->Progress(8);
+
+      if (croppedImage.IsNotNull())
+      {
+        // Back on the GUI thread, which is where what the renderers read is
+        // allowed to change.
+        node->SetData(croppedImage);
+        mitk::RenderingManager::GetInstance()->InitializeViews(croppedImage->GetTimeGeometry());
+      }
     }
     else
     {

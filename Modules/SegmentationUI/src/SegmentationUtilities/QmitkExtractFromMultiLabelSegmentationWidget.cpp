@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
 #include <mitkLabelSetImage.h>
 #include <mitkMultiLabelPredicateHelper.h>
@@ -113,12 +113,14 @@ mitk::DataNode::Pointer QmitkExtractFromMultiLabelSegmentationWidget::StoreToDat
 
 void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   auto selectedNodes = m_Controls->segNodeSelector->GetSelectedNodes();
   if (selectedNodes.empty())
   {
     return;
   }
+
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+
   auto node = selectedNodes.front();
 
   m_LastResultNodes.clear();
@@ -136,8 +138,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
   if (m_Controls->checkInstanceMask->isChecked()) numSteps += selectedLabelValues.size();
   if (m_Controls->checkClassMap->isChecked()) numSteps += groupLabelValueMap.size();
 
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(numSteps);
+  mitk::ProgressTask task("Extracting from segmentation", numSteps);
 
   for (auto& [groupID, labelValues] : groupLabelValueMap)
   {
@@ -151,14 +152,14 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
 
       std::string name = "InstanceMap group "+std::to_string(groupID);
       m_LastResultNodes.emplace_back(this->StoreToDataStorage(image, name, node).GetPointer());
-      mitk::ProgressBar::GetInstance()->Progress();
+      task.Progress();
     }
     if (m_Controls->checkClassMap->isChecked())
     {
       auto [image,lookup] = mitk::CreateLabelClassMap(seg, groupID, labelValues);
       std::string name = "ClassMap group " + std::to_string(groupID);
       m_LastResultNodes.emplace_back(this->StoreToDataStorage(image, name, node).GetPointer());
-      mitk::ProgressBar::GetInstance()->Progress();
+      task.Progress();
     }
     if (m_Controls->checkInstanceMask->isChecked())
     {
@@ -167,7 +168,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
         auto image = mitk::CreateLabelMask(seg,labelValue,false);
         std::string name = "LabelMask " + seg->GetLabel(labelValue)->GetName() + " [" + std::to_string(labelValue) + "]";
         m_LastResultNodes.emplace_back(this->StoreToDataStorage(image, name, node).GetPointer());
-        mitk::ProgressBar::GetInstance()->Progress();
+        task.Progress();
       }
     }
   }
@@ -184,7 +185,6 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
   if (!resultNodes.empty())
     emit NewResultsReady(resultNodes);
 
-  mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
 }
 

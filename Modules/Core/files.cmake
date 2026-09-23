@@ -53,10 +53,11 @@ set(H_FILES
   mitkPixelTypeTraits.h
   mitkPlaneClipping.h
   mitkPoint.h
-  mitkProgressBarImplementation.h
+  mitkProgressTaskInfo.h
   mitkQuaternion.h
   mitkReferenceCountWatcher.h
   mitkRenderingManagerFactory.h
+  mitkScopedProgressTask.h
   mitkServiceInterface.h
   mitkStatusBarImplementation.h
   mitkStdFunctionCommand.h
@@ -109,10 +110,13 @@ set(CPP_FILES
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
   Controllers/mitkCrosshairManager.cpp
+  Controllers/mitkIProgressListener.cpp
+  Controllers/mitkIProgressService.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
   Controllers/mitkPlanePositionManager.cpp
-  Controllers/mitkProgressBar.cpp
+  Controllers/mitkProgressService.cpp
+  Controllers/mitkProgressTask.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
   Controllers/mitkSliceNavigationHelper.cpp
@@ -245,6 +249,7 @@ set(CPP_FILES
   DataManagement/mitkSmartPointerProperty.cpp
   DataManagement/mitkSourceImageRelationRule.cpp
   DataManagement/mitkStandaloneDataStorage.cpp
+  DataManagement/mitkStorageThreadDispatcherBase.cpp
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
@@ -350,6 +355,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkLegacyIO.cpp
   IO/mitkSurfaceVtkXmlIO.cpp
   IO/mitkUtf8Util.cpp
+  IO/mitkVtkFileIOProgressObserver.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkXMLPreferencesStorage.cpp
 

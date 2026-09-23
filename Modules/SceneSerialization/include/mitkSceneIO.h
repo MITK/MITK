@@ -28,6 +28,8 @@ namespace tinyxml2
 
 namespace mitk
 {
+  class ProgressTask;
+
   class BaseData;
   class IPropertyTransience;
   class PropertyList;
@@ -59,6 +61,21 @@ namespace mitk
     mitkClassMacroItkParent(SceneIO, itk::Object);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /**
+     * \brief Report progress into the given task rather than raising a
+     *        notification of its own.
+     *
+     * Set by a caller that already reports on this operation's behalf, so
+     * that opening a scene shows one notification instead of one for the
+     * file and another for the scene inside it.
+     *
+     * \param[in] task The task to report into, or nullptr for none.
+     */
+    void SetProgressTask(ProgressTask* task);
+
+    /** \brief Get the task this reports into, or nullptr. */
+    ProgressTask* GetProgressTask() const;
 
       /** \brief Type for a list of DataNodes whose BaseData failed to serialize/deserialize. */
       typedef DataStorage::SetOfObjects FailedBaseDataListType;
@@ -160,6 +177,18 @@ namespace mitk
     const FailedBaseDataListType *GetFailedNodes();
 
     /**
+     * \brief Returns the nodes added by the most recent load.
+     *
+     * Reported by the reader that added them rather than worked out by
+     * comparing the storage before and after, which cannot tell a node the
+     * scene brought from one that reached the same storage some other way
+     * while the load was running on a worker thread.
+     *
+     * \return The nodes of the last load, empty before the first one.
+     */
+    DataStorage::SetOfObjects::ConstPointer GetLoadedNodes() const;
+
+    /**
      * \brief Returns properties that failed to be written during the most
      *        recent SaveScene() call.
      *
@@ -189,7 +218,13 @@ namespace mitk
     FailedBaseDataListType::Pointer m_FailedNodes;
     PropertyList::Pointer m_FailedProperties;
 
+    /** \brief The nodes the last load added, as reported by its reader. */
+    DataStorage::SetOfObjects::Pointer m_LoadedNodes;
+
     std::string m_WorkingDirectory;
+
+    /** \brief Null unless a caller reports on this scene's behalf. */
+    ProgressTask* m_ProgressTask = nullptr;
     unsigned int m_UnzipErrors;
   };
 }

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkImageVtkXmlIO.h"
+#include "mitkVtkFileIOProgressObserver.h"
 
 #include <mitkIOMimeTypes.h>
 #include <mitkImage.h>
@@ -67,6 +68,11 @@ namespace mitk
     {
       reader->SetFileName(this->GetInputLocation().c_str());
     }
+    VtkFileIOProgressObserver progress(reader, [this](float p)
+      {
+        this->AbstractFileReader::ReportProgress(p);
+      });
+
     reader->Update();
 
     if (reader->GetOutput() != nullptr)
@@ -121,6 +127,11 @@ namespace mitk
 
     ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), nullptr, input->GetVtkImageData());
     writer->SetInputData(const_cast<vtkImageData *>(vtkReadAccessor.GetVtkImageData()));
+
+    VtkFileIOProgressObserver progress(writer, [this](float p)
+      {
+        this->AbstractFileWriter::ReportProgress(p);
+      });
 
     if (writer->Write() == 0 || writer->GetErrorCode() != 0)
     {

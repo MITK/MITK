@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkIPropertyRelations.h>
 #include <mitkIPropertyTransience.h>
 #include <mitkIPreferencesService.h>
+#include <mitkIProgressService.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -40,9 +41,23 @@ namespace mitk
     return mutex;
   }
 
-  std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>> &s_ContextToServicesMap()
+  /**
+   * One entry per service handed out, with how many times that happened. The
+   * count matters because GetService() raises the framework's own use count on
+   * every call: a service fetched twice and released twice has to be released
+   * twice there too, or its use count never returns to zero. Overlapping
+   * progress tasks and data storage mutations fetch the same service
+   * concurrently all the time.
+   */
+  struct ServiceUse
   {
-    static std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>> serviceMap;
+    us::ServiceReferenceU Reference;
+    std::size_t Count;
+  };
+
+  std::map<us::ModuleContext *, std::map<void *, ServiceUse>> &s_ContextToServicesMap()
+  {
+    static std::map<us::ModuleContext *, std::map<void *, ServiceUse>> serviceMap;
     return serviceMap;
   }
 
@@ -63,7 +78,9 @@ namespace mitk
     if (coreService != nullptr)
     {
       std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
-      s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
+      auto &use = s_ContextToServicesMap()[context][coreService];
+      use.Reference = serviceRef;
+      ++use.Count;
     }
 
     return coreService;
@@ -129,6 +146,11 @@ namespace mitk
     return GetCoreService<IPreferencesService>(context);
   }
 
+  IProgressService *CoreServices::GetProgressService(us::ModuleContext *context)
+  {
+    return GetCoreService<IProgressService>(context, true);
+  }
+
   bool CoreServices::Unget(us::ModuleContext *context, const std::string & /*interfaceId*/, void *service)
   {
     bool success = false;
@@ -141,11 +163,11 @@ namespace mitk
       auto iter2 = iter->second.find(service);
       if (iter2 != iter->second.end())
       {
-        us::ServiceReferenceU serviceRef = iter2->second;
+        us::ServiceReferenceU serviceRef = iter2->second.Reference;
         if (serviceRef)
         {
           success = context->UngetService(serviceRef);
-          if (success)
+          if (success && 0 == --iter2->second.Count)
           {
             iter->second.erase(iter2);
           }

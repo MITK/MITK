@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <vtkImageConstantPad.h>
 #include <vtkSmartPointer.h>
 
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
 {
@@ -47,13 +47,11 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   ScalarType thresholdExpanded = this->m_Threshold;
 
-  if ((tmax - tstart) > 0)
+  // Four steps per time step here plus the three that the inherited
+  // CreateSurface() reports for each of them.
+  if (nullptr != m_ProgressTask && (tmax - tstart) > 0)
   {
-    ProgressBar::GetInstance()->AddStepsToDo(4 * (tmax - tstart));
-  }
-  else
-  {
-    ProgressBar::GetInstance()->AddStepsToDo(4);
+    m_ProgressTask->AddStepsToDo(7 * (tmax - tstart));
   }
 
   for (int t = tstart; t < tmax; ++t)
@@ -90,7 +88,8 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimage = median->GetOutput(); //->Out
       median->Delete();
     }
-    ProgressBar::GetInstance()->Progress();
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
 
     // Interpolate image spacing
     // MITK_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
@@ -108,7 +107,8 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimage = imageresample->GetOutput(); //->Output
       imageresample->Delete();
     }
-    ProgressBar::GetInstance()->Progress();
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
 
     // MITK_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
     if (m_UseGaussianImageSmooth) // gauss
@@ -143,11 +143,13 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->Delete();
       scalefilter->Delete();
     }
-    ProgressBar::GetInstance()->Progress();
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
 
     // Create surface for t-Slice
     CreateSurface(t, vtkimage, surface, thresholdExpanded);
-    ProgressBar::GetInstance()->Progress();
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
   }
 
   // MITK_INFO << "Updating Time Geometry to ensure right timely displaying";

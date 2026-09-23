@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
-#include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
 #include <mitkIOUtil.h>
 #include <mitkCoreServices.h>
@@ -99,10 +98,8 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
            bool clearDataStorageFirst(false);
-           mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
            const auto nodeCount = dataStorage->GetAll()->Size();
            dataStorage = sceneIO->LoadScene( arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
-           mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
 
            // LoadScene only logs its errors, so a scene that adds no nodes failed.
@@ -114,9 +111,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
            bool clearDataStorageFirst(false);
-           mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
            dataStorage = sceneIO->LoadSceneUnzipped(arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst);
-           mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
          }
          else

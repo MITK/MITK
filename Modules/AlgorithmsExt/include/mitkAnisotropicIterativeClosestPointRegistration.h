@@ -32,6 +32,8 @@ class vtkKdTreePointLocator;
 
 namespace mitk
 {
+  class ProgressTask;
+
   class Surface;
   class WeightedPointTransform;
 
@@ -130,6 +132,9 @@ namespace mitk
 
     /** Max amount of iterations. Default is 1000.*/
     unsigned int m_MaxIterations;
+
+    /** Task to report progress into, or nullptr to report none.*/
+    ProgressTask* m_ProgressTask;
 
     /** Threshold used for termination. Default is 1.0e-6.*/
     double m_Threshold;
@@ -260,6 +265,20 @@ namespace mitk
         * Set fixed surface that includes the point set (Y).
         */
       itkSetMacro(FixedSurface, itk::SmartPointer<Surface>);
+
+      /**
+        * Report progress into the given task, or nowhere if it is nullptr.
+        *
+        * One step per iteration, and no step count: how many iterations this
+        * needs is not known until it converges, so a caller that wants a bar
+        * rather than a spinner has to size the task itself.
+        */
+      itkSetMacro(ProgressTask, ProgressTask*);
+
+      /**
+        * Returns the task progress is reported into, or nullptr.
+        */
+      itkGetConstMacro(ProgressTask, ProgressTask*);
 
       /**
         * Returns the 3x1 translation vector computed by the algorithm.

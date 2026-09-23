@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
 
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   : m_Smooth(false),
@@ -32,7 +32,8 @@ mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
     m_Threshold(1.0),
     m_TargetReduction(0.95f),
     m_SmoothIteration(50),
-    m_SmoothRelaxation(0.1)
+    m_SmoothRelaxation(0.1),
+    m_ProgressTask(nullptr)
 {
 }
 
@@ -79,7 +80,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
     polydata->Register(nullptr); // RC++
     smoother->Delete();
   }
-  ProgressBar::GetInstance()->Progress();
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress();
 
   // decimate = to reduce number of polygons
   if (m_Decimate == DecimatePro)
@@ -115,7 +117,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
     decimate->Delete();
   }
 
-  ProgressBar::GetInstance()->Progress();
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress();
 
   if (polydata->GetNumberOfPoints() > 0)
   {
@@ -142,7 +145,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
     }
     vtkmatrix->Delete();
   }
-  ProgressBar::GetInstance()->Progress();
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->Progress();
 
   // determine point_data normals for the poly data points.
   vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -174,9 +178,9 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   int tstart = outputRegion.GetIndex(3);
   int tmax = tstart + outputRegion.GetSize(3); // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
 
-  if ((tmax - tstart) > 0)
+  if (nullptr != m_ProgressTask && (tmax - tstart) > 0)
   {
-    ProgressBar::GetInstance()->AddStepsToDo(4 * (tmax - tstart));
+    m_ProgressTask->AddStepsToDo(4 * (tmax - tstart));
   }
 
   int t;
@@ -184,8 +188,15 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   {
     vtkImageData *vtkimagedata = image->GetVtkImageData(t);
     CreateSurface(t, vtkimagedata, surface, m_Threshold);
-    ProgressBar::GetInstance()->Progress();
+
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
   }
+}
+
+void mitk::ImageToSurfaceFilter::SetProgressTask(ProgressTask *task)
+{
+  m_ProgressTask = task;
 }
 
 void mitk::ImageToSurfaceFilter::SetSmoothIteration(int smoothIteration)

@@ -56,7 +56,7 @@ found in the LICENSE file.
 #include <QmitkRedoAction.h>
 #include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
-#include <QmitkProgressBar.h>
+#include <QmitkProgressNotificationOverlay.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
 #include "QmitkOpenDicomEditorAction.h"
@@ -974,14 +974,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
 
-  auto  progBar = new QmitkProgressBar();
-
-  qStatusBar->addPermanentWidget(progBar, 0);
-  progBar->hide();
-  // progBar->AddStepsToDo(2);
-  // progBar->Progress(1);
-
   mainWindow->setStatusBar(qStatusBar);
+
+  // Owned by mainWindow. Floats above the status bar and reports every
+  // long-running operation separately, so that concurrent operations can no
+  // longer overwrite each other's progress.
+  new QmitkProgressNotificationOverlay(mainWindow);
 
   if (showMemoryIndicator)
   {

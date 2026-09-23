@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <vtkPolygon.h>
 #include <MitkSegmentationExports.h>
 
-#include <mitkProgressBar.h>
 
 namespace mitk
 {
@@ -58,20 +57,6 @@ namespace mitk
     typedef PolyLineParametricPath2D::VertexListType ContourPath;
 
     /**
-      \brief Set whether the mitkProgressBar should be used
-
-      \a Parameter true for using the progress bar, false otherwise
-    */
-    void SetUseProgressBar(bool);
-
-    /**
-      \brief Set the stepsize which the progress bar should proceed
-
-      \a Parameter The stepsize for progressing
-    */
-    void SetProgressStepSize(unsigned int stepSize);
-
-    /**
      * \brief Sets the contour value to be extracted if there are multiple contours.
      */
     itkSetMacro (ContourValue, ScalarType);
@@ -84,8 +69,6 @@ namespace mitk
 
   private:
     const BaseGeometry *m_SliceGeometry;
-    bool m_UseProgressBar;
-    unsigned int m_ProgressStepSize;
     ScalarType m_ContourValue;
 
     template <typename TPixel, unsigned int VImageDimension>

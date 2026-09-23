@@ -56,7 +56,7 @@ set(MODULE_TESTS
   mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetPointOperationsTest.cpp
-  mitkProgressBarTest.cpp
+  mitkProgressTaskTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkPropertyPersistenceTest.cpp
@@ -66,6 +66,7 @@ set(MODULE_TESTS
   mitkPropertyTransienceTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
+  mitkStorageThreadDispatcherTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp

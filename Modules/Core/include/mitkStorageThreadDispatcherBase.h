@@ -48,11 +48,21 @@ namespace mitk
       if (this->IsDispatchThread())
       {
         task();
+        return;
       }
-      else
-      {
-        this->ExecuteDispatched(task);
-      }
+
+      if (this->ExecuteDispatched(task))
+        return;
+
+      // Dropping it would turn a data storage mutation into a silent no-op, so
+      // it runs here instead. That is not safe: whatever the owning thread is
+      // doing with the data carries on while this writes to it. Correct code
+      // never gets here, which is why it is reported rather than left to be
+      // met later as a crash with no obvious cause.
+      MITK_ERROR << "A data storage mutation could not be handed to the thread "
+                    "that owns the storage, and ran on the calling thread.";
+
+      task();
     }
 
     /**
@@ -106,12 +116,71 @@ namespace mitk
      *
      * \param[in] task the task to execute on the dispatch thread.
      * \pre task must not be empty.
+     * \return True if the task was delivered and has run. False if it could not
+     *         be delivered, in which case Execute() runs it here instead.
      */
-    virtual void ExecuteDispatched(std::function<void()> task) = 0;
+    virtual bool ExecuteDispatched(std::function<void()> task) = 0;
 
     StorageThreadDispatcherBase() = default;
     ~StorageThreadDispatcherBase() override = default;
   };
+
+  /**
+   * \brief Run a task on the thread that owns the data storage.
+   *
+   * Mutating the storage notifies observers synchronously, and those observers
+   * are rendering and user interface code that belongs to one thread. So work
+   * running elsewhere hands the whole operation over instead of doing it where
+   * it happens to be.
+   *
+   * Handing over blocks until the task has run, so the owning thread must be
+   * able to reach its event loop. Waiting for a worker without one, as a bare
+   * QFuture::waitForFinished() does, deadlocks instead.
+   *
+   * An exception the task throws is carried back and rethrown here. Left to
+   * itself it would unwind the owning thread's event loop rather than reach the
+   * caller, which is where the error belongs.
+   *
+   * The dispatcher is resolved on every call rather than cached. It belongs to
+   * the data storage service and dies with the plugin that installed it, which
+   * a caller outliving that plugin has no way of being told about.
+   *
+   * \param[in] task The operation to run on the owning thread.
+   * \return True if the task was handed over and has already run. False if
+   *         there is nothing to hand over to, as in a command line tool, or
+   *         this is already the owning thread; the task has *not* run then and
+   *         the caller carries on itself.
+   */
+  MITKCORE_EXPORT bool DispatchToStorageThread(const std::function<void()> &task);
+
+  /**
+   * \brief Run a task on the thread that owns the data storage, or here if this
+   *        already is that thread or there is no such thread.
+   *
+   * The unconditional form of DispatchToStorageThread(), for writing to data
+   * that is already on display: it has to happen where everything else reads
+   * it, and the caller does not care which thread that turns out to be.
+   *
+   * \param[in] task The operation to run.
+   */
+  MITKCORE_EXPORT void RunWhereTheDataLives(const std::function<void()> &task);
+
+  /**
+   * \brief Warn when data the storage thread reads is built somewhere else.
+   *
+   * A mitk::Image or mitk::Surface builds its VTK representation on first
+   * access, on whatever thread asks. Doing that on a worker while the mappers
+   * on the owning thread read the same object is a race that nothing else
+   * catches: the work is supposed to be done on the owning thread before the
+   * data is handed over, and forgetting it fails only sometimes.
+   *
+   * Silent where there is no thread that owns the data, as in a command line
+   * tool or a test, and silent on that thread itself.
+   *
+   * \param[in] what Names the action, for the message, for example
+   *        "Building the VTK representation of an image".
+   */
+  MITKCORE_EXPORT void WarnIfOffStorageThread(const char *what);
 }
 
 #endif

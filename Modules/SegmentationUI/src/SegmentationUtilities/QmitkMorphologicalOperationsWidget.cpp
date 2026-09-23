@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
 #include <mitkMultiLabelPredicateHelper.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
@@ -189,11 +189,11 @@ void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(
 void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionType> morphFunction, const std::string& opsName) const
 {
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(3);
+
+  mitk::ProgressTask task("Morphological " + opsName, 3);
 
   mitk::Image::Pointer image = this->GetSelectedLabelMask();
-  mitk::ProgressBar::GetInstance()->Progress();
+  task.Progress();
 
   mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
 
@@ -210,10 +210,9 @@ void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionT
     MITK_WARN << "Exception caught: " << exception.GetDescription();
 
     QApplication::restoreOverrideCursor();
-    mitk::ProgressBar::GetInstance()->Reset();
     return;
   }
-  mitk::ProgressBar::GetInstance()->Progress();
+  task.Progress();
 
   auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
   auto labels = m_Controls->labelInspector->GetSelectedLabels();
@@ -222,8 +221,7 @@ void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionT
   labelName << opsName << " " << " (r=" << factor << ") " << seg->GetLabel(labels.front())->GetName();
 
   this->SaveResultLabelMask(image, labelName.str(), "Morphological " + opsName);
-  mitk::ProgressBar::GetInstance()->Progress();
+  task.Progress();
 
   QApplication::restoreOverrideCursor();
-  mitk::ProgressBar::GetInstance()->Reset();
 }

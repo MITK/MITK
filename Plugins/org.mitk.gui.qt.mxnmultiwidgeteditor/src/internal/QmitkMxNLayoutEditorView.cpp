@@ -135,9 +135,13 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   m_PacsSchemeBox->setEnabled(nullptr != mxnEditor);
   if (nullptr != mxnEditor)
   {
-    const QSignalBlocker blocker(m_PacsSchemeBox);
-    m_PacsSchemeBox->setChecked(
-      mitk::InteractionSchemeSwitcher::PACSStandard == mxnEditor->GetInteractionScheme());
+    // The box only requests a scheme; it shows what the multi widget applied,
+    // wherever the change came from.
+    auto showScheme = [this](mitk::InteractionSchemeSwitcher::InteractionScheme scheme) {
+      const QSignalBlocker blocker(m_PacsSchemeBox);
+      m_PacsSchemeBox->setChecked(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
+    };
+    showScheme(mxnEditor->GetInteractionScheme());
 
     m_LayoutConnections.push_back(connect(
       m_PacsSchemeBox, &QCheckBox::toggled, m_LayoutEditorWidget, [mxnEditor](bool pacs) {
@@ -145,6 +149,11 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
           ? mitk::InteractionSchemeSwitcher::PACSStandard
           : mitk::InteractionSchemeSwitcher::MITKStandard);
       }));
+    if (nullptr != multiWidget)
+    {
+      m_LayoutConnections.push_back(connect(
+        multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged, m_PacsSchemeBox, showScheme));
+    }
   }
 
   if (nullptr == multiWidget)

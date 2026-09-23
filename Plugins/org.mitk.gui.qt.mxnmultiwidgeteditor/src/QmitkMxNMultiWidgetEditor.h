@@ -16,11 +16,10 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
 
 #include <QmitkAbstractMultiWidgetEditor.h>
+#include <QmitkMxNMultiWidget.h>
 
 // c++
 #include <memory>
-
-class QmitkMxNMultiWidget;
 
 class MXNMULTIWIDGETEDITOR_EXPORT QmitkMxNMultiWidgetEditor final : public QmitkAbstractMultiWidgetEditor
 {
@@ -60,9 +59,9 @@ private Q_SLOTS:
 
   void OnLayoutChanged();
 
-  /** \brief Toggle the dockable MxN layout editor view (cell "Sync" button,
-   *         toolbar layout button). */
-  void OnLayoutEditorRequested();
+  /** \brief Toggle (a cell's sync barcode) or show ("Open layout editor" in a
+   *         cell's context menu) the dockable MxN layout editor view. */
+  void OnLayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request);
 
 private:
   /**

@@ -104,20 +104,9 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
 
 void QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  const auto &multiWidget = GetMultiWidget();
-  if (nullptr == multiWidget)
-  {
-    return;
-  }
-
   m_Impl->m_InteractionScheme = scheme;
-
-  // The left toolbar selects which action the left button performs, which only
-  // exists in the PACS scheme.
-  m_Impl->m_InteractionSchemeToolBar->setVisible(
-    mitk::InteractionSchemeSwitcher::PACSStandard == scheme);
-
-  QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
+  m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
+  m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(scheme);
 }
 
 mitk::InteractionSchemeSwitcher::InteractionScheme
@@ -236,10 +225,11 @@ void QmitkMxNMultiWidgetEditor::OnLayoutChanged()
   FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
 }
 
-void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested()
+void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request)
 {
-  // Toggle: a second press on the requesting button hides an already-visible
-  // layout editor instead of re-activating it.
+  // A toggle request hides an already-visible layout editor instead of
+  // re-activating it, so a second press on the barcode closes what the first
+  // opened; a show request only ever brings the editor up.
   auto page = this->GetSite()->GetPage();
   if (page.IsNull())
   {
@@ -248,7 +238,8 @@ void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested()
 
   const QString viewId = QStringLiteral("org.mitk.views.mxnlayouteditor");
   auto view = page->FindView(viewId);
-  if (view.IsNotNull() && page->IsPartVisible(view))
+  if (QmitkMxNMultiWidget::LayoutEditorRequest::Toggle == request && view.IsNotNull()
+      && page->IsPartVisible(view))
   {
     page->HideView(view);
     return;

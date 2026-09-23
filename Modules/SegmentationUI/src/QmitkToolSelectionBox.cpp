@@ -34,6 +34,14 @@ found in the LICENSE file.
 
 namespace
 {
+  // The box is registered as a client of its tool manager while it is enabled
+  // by itself. QWidget::isEnabled() does not tell, as it is also false while a
+  // parent is disabled.
+  bool IsEnabledByItself(const QWidget* widget)
+  {
+    return !widget->testAttribute(Qt::WA_ForceDisabled);
+  }
+
   bool ConfirmDiscardingResults(const mitk::Tool& tool)
   {
     return QMessageBox::Yes == QMessageBox::question(nullptr,
@@ -122,7 +130,7 @@ void QmitkToolSelectionBox::SetToolManager(
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
-  if (QWidget::isEnabled())
+  if (IsEnabledByItself(this))
   {
     m_ToolManager->UnregisterClient();
   }
@@ -139,7 +147,7 @@ void QmitkToolSelectionBox::SetToolManager(
   m_ToolManager->WorkingDataChanged +=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
-  if (QWidget::isEnabled())
+  if (IsEnabledByItself(this))
   {
     m_ToolManager->RegisterClient();
   }
@@ -324,7 +332,7 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 
 void QmitkToolSelectionBox::setEnabled(bool enable)
 {
-  if (QWidget::isEnabled() == enable)
+  if (IsEnabledByItself(this) == enable)
     return;
 
   QWidget::setEnabled(enable);

@@ -281,6 +281,7 @@ set(CPP_FILES
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
   Interactions/mitkEventStateMachine.cpp
+  Interactions/mitkExclusiveInteraction.cpp
   Interactions/mitkInteractionEvent.cpp
   Interactions/mitkInteractionEventConst.cpp
   Interactions/mitkInteractionEventHandler.cpp

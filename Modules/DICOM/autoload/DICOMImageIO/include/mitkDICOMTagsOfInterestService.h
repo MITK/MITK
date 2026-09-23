@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <string>
 #include <mutex>
 #include <vector>
-#include <map>
+#include <set>
 #include <mitkIDICOMTagsOfInterest.h>
 
 namespace mitk
@@ -48,23 +48,7 @@ namespace mitk
 
   private:
 
-    /** Registers description and, on request, persistence for one published key
-        shape. Separate from AddTagOfInterest because a functional-group-rooted
-        tag of interest is scanned under its root but published under its
-        frame-relative path, so both forms need a registration while only the
-        root belongs in the scan set. */
-    void RegisterDescriptionAndPersistence(const DICOMTagPath& tagPath, bool makePersistant);
-    void UnregisterDescriptionAndPersistence(const DICOMTagPath& tagPath);
-
-    /** Re-registers a published key that a removal just cleared, if any
-        remaining tag of interest still publishes under it. */
-    void RestoreKeyIfStillWanted(const DICOMTagPath& publishedKey);
-
-    /** The registered tags, each mapped to the persistence request it was added
-        with. The flag is kept because removing one functional-group root has to
-        re-register the frame-relative key its surviving siblings still need, and
-        can only do so faithfully if it knows what they asked for. */
-    typedef std::map<DICOMTagPath, bool> InternalTagSetType;
+    typedef std::set<DICOMTagPath> InternalTagSetType;
     typedef std::lock_guard<std::mutex> MutexHolder;
 
     InternalTagSetType m_Tags;

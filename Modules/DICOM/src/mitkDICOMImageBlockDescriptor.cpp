@@ -21,8 +21,26 @@ found in the LICENSE file.
 #include <dcmtk/config/osconfig.h>
 
 #include <algorithm>
+#include <map>
 #include <set>
 #include <vector>
+
+namespace
+{
+  std::string FindingOriginToString(mitk::DICOMFindingOrigin origin)
+  {
+    switch (origin)
+    {
+      case mitk::DICOMFindingOrigin::TopLevel:
+        return "the top level";
+      case mitk::DICOMFindingOrigin::SharedFunctionalGroup:
+        return "the shared functional group";
+      case mitk::DICOMFindingOrigin::PerFrameFunctionalGroup:
+        return "the per-frame functional group";
+    }
+    return "an unknown placement";
+  }
+}
 
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
@@ -844,12 +862,15 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     std::unordered_map<std::string, DICOMCachedValueLookupTable> additionalTagResultList;
     std::set<std::string> reportedDuplicateKeys;
     const auto WarnAboutDuplicate = [&reportedDuplicateKeys](const std::string& propKey,
-                                                             const std::string& file)
+                                                             const std::string& file,
+                                                             DICOMFindingOrigin first,
+                                                             DICOMFindingOrigin second)
     {
       if (reportedDuplicateKeys.insert(propKey).second)
       {
-        MITK_WARN << "Attribute " << propKey << " is present both at the top level and in a functional "
-                     "group of " << file << ". Using the frame's value.";
+        MITK_WARN << "Attribute " << propKey << " is present both in " << FindingOriginToString(first)
+                  << " and in " << FindingOriginToString(second) << " of " << file << ". Using the value from "
+                  << FindingOriginToString(std::max(first, second)) << ".";
       }
     };
 
@@ -887,7 +908,7 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
       MITK_DEBUG << "Tag info for slice " << slice << ": SL '" << sliceLocation << "' IN '" << instanceNumber
                  << "' SOP instance UID '" << sopInstanceUID << "'";
 
-      std::set<std::string> keysFilledFromFunctionalGroup;
+      std::map<std::string, DICOMFindingOrigin> originOfKeyAtThisSlot;
       for (const auto& tag : m_AdditionalTagMap)
       {
         const DICOMTagCache::FindingsListType findings = tagCache->GetTagValue( *frameIter, tag.first );
@@ -904,32 +925,23 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
               continue;
             }
 
-            // Two findings reach one key only when a file carries an attribute
-            // both at the top level and in a functional group whose
-            // frame-relative path is the same one. The frame is the more
-            // specific source, so it wins whichever of the two the tag map
-            // happens to yield first.
-            const bool fromFunctionalGroup = IsFunctionalGroupRooted(tag.first);
-            const bool keyHasFrameValue = keysFilledFromFunctionalGroup.cend()
-                                          != keysFilledFromFunctionalGroup.find(propKey);
-
-            if (fromFunctionalGroup)
+            // A key receives a second finding for one slot when a non-conformant
+            // file carries an attribute at more than one placement: the top
+            // level, the shared group, the per-frame group. The most specific
+            // placement describes the frame, so it wins whatever order the
+            // findings arrive in.
+            const auto written = originOfKeyAtThisSlot.find(propKey);
+            if (originOfKeyAtThisSlot.cend() == written)
             {
-              if (!keyHasFrameValue
-                  && additionalTagResultList[propKey].GetLookupTable().find(slice)
-                       != additionalTagResultList[propKey].GetLookupTable().cend())
-              {
-                WarnAboutDuplicate(propKey, filename);
-              }
-              keysFilledFromFunctionalGroup.insert(propKey);
+              originOfKeyAtThisSlot.emplace(propKey, finding.origin);
               additionalTagResultList[propKey].SetTableValue(slice, info);
+              continue;
             }
-            else if (keyHasFrameValue)
+
+            WarnAboutDuplicate(propKey, filename, written->second, finding.origin);
+            if (finding.origin > written->second)
             {
-              WarnAboutDuplicate(propKey, filename);
-            }
-            else
-            {
+              written->second = finding.origin;
               additionalTagResultList[propKey].SetTableValue(slice, info);
             }
           }

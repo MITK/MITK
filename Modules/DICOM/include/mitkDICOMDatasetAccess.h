@@ -22,6 +22,21 @@ namespace mitk
 {
   /**
    * \ingroup DICOMModule
+   * \brief Where in the dataset a finding was read.
+   *
+   * The enumerators are ordered by specificity, lowest first, because a
+   * frame-scoped consumer that receives one path from several places keeps the
+   * most specific value.
+   */
+  enum class DICOMFindingOrigin
+  {
+    TopLevel,
+    SharedFunctionalGroup,
+    PerFrameFunctionalGroup
+  };
+
+  /**
+   * \ingroup DICOMModule
    * \brief Result structure for DICOMDatasetAccess::GetTagValueAsString.
    *
    * Holds the result of a DICOM tag value query, including validity flag,
@@ -34,14 +49,20 @@ namespace mitk
     bool isValid;       ///< Indicates if the finding is valid (tag was found).
     std::string value;  ///< The found tag value as a string.
     DICOMTagPath path;  ///< The tag path of the found value.
+    DICOMFindingOrigin origin; ///< Where in the dataset the value was read.
 
     /**
      * \brief Construct a DICOMDatasetFinding.
      * \param[in] valid Whether the finding is valid.
      * \param[in] aValue The tag value string.
      * \param[in] aPath The tag path.
+     * \param[in] anOrigin Where in the dataset the value was read.
      */
-    DICOMDatasetFinding(bool valid = false, const std::string& aValue = "", const DICOMTagPath& aPath = DICOMTagPath()) : isValid(valid), value(aValue), path(aPath)
+    DICOMDatasetFinding(bool valid = false,
+                        const std::string& aValue = "",
+                        const DICOMTagPath& aPath = DICOMTagPath(),
+                        DICOMFindingOrigin anOrigin = DICOMFindingOrigin::TopLevel)
+      : isValid(valid), value(aValue), path(aPath), origin(anOrigin)
     {};
   };
 

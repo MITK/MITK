@@ -11,7 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkDICOMMultiFrameTestObject.h"
+#include "mitkDICOMTestWarningCounter.h"
 
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkDICOMGenericImageFrameInfo.h>
+#include <mitkDICOMGenericTagCache.h>
+#include <mitkDICOMImageBlockDescriptor.h>
 #include <mitkDICOMIOMetaInformationPropertyConstants.h>
 #include <mitkDICOMProperty.h>
 #include <mitkDICOMTagPath.h>
@@ -36,6 +41,48 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <itksys/SystemTools.hxx>
+
+namespace
+{
+  /** Answers one path with a per-frame finding followed by a shared one, the
+      order a read never produces, and nothing else. */
+  class ReversedFindingsFrameInfo : public mitk::DICOMDatasetAccessingImageFrameInfo
+  {
+  public:
+    mitkClassMacro(ReversedFindingsFrameInfo, mitk::DICOMDatasetAccessingImageFrameInfo);
+    mitkNewMacro2Param(ReversedFindingsFrameInfo, const std::string&, const mitk::DICOMTagPath&);
+
+    mitk::DICOMDatasetFinding GetTagValueAsString(const mitk::DICOMTag&) const override
+    {
+      return mitk::DICOMDatasetFinding();
+    }
+
+    FindingsListType GetTagValueAsString(const mitk::DICOMTagPath& path) const override
+    {
+      if (!path.Equals(m_Path))
+      {
+        return {};
+      }
+
+      return { mitk::DICOMDatasetFinding(true, "per-frame", m_Path, mitk::DICOMFindingOrigin::PerFrameFunctionalGroup),
+               mitk::DICOMDatasetFinding(true, "shared", m_Path, mitk::DICOMFindingOrigin::SharedFunctionalGroup) };
+    }
+
+    std::string GetFilenameIfAvailable() const override
+    {
+      return this->Filename;
+    }
+
+  protected:
+    ReversedFindingsFrameInfo(const std::string& filename, const mitk::DICOMTagPath& path)
+      : mitk::DICOMDatasetAccessingImageFrameInfo(filename, 0), m_Path(path)
+    {
+    }
+
+  private:
+    mitk::DICOMTagPath m_Path;
+  };
+}
 
 /**
  * \brief Covers the per-frame read model for multi-frame objects with
@@ -95,6 +142,10 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(SingleFrameEnhancedGetsFrameRelativeKeys);
   MITK_TEST(TopLevelDuplicateLosesAgainstTheFrame);
   MITK_TEST(RaggedObjectKeepsTheOneFrameModel);
+  MITK_TEST(FileLevelInfoDoesNotAnswerAFrameRelativeQuery);
+  MITK_TEST(PerFrameGroupWinsOverSharedGroup);
+  MITK_TEST(SharedGroupWinsOverTopLevel);
+  MITK_TEST(MoreSpecificOriginWinsWhateverTheOrder);
   MITK_TEST(TwoEnhancedFilesInOneSeriesBecomeTwoCompleteVolumes);
   MITK_TEST(EnhancedFilesWithTopLevelGeometryAreSeparated);
   MITK_TEST(EnhancedFileIsSeparatedFromSingleFrameFiles);
@@ -134,8 +185,8 @@ private:
     return path;
   }
 
-  /** The published key shape: the attribute's path relative to the
-      functional-group item, with the macro's own item index kept. */
+  /** The registered and the published shape: the attribute's path relative
+      to the functional-group item, with the macro's own item index kept. */
   static mitk::DICOMTagPath FrameRelative(unsigned int macroGroup,
                                           unsigned int macroElement,
                                           unsigned int leafGroup,
@@ -259,14 +310,12 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Test precondition: the tags-of-interest service resolves",
                            nullptr != m_TagsOfInterest);
 
-    // Both roots of each attribute: the reader must publish one key whichever
-    // group the encoder used, which is only testable if both are scanned.
-    this->Register(Rooted(0x5200, 0x9230, 0x0028, 0x9145, 0x0028, 0x1053));
-    this->Register(Rooted(0x5200, 0x9229, 0x0028, 0x9145, 0x0028, 0x1053));
-    this->Register(Rooted(0x5200, 0x9230, 0x0028, 0x9145, 0x0028, 0x1052));
-    this->Register(Rooted(0x5200, 0x9229, 0x0028, 0x9145, 0x0028, 0x1052));
-    this->Register(Rooted(0x5200, 0x9230, 0x0020, 0x9111, 0x0018, 0x9151));
-    this->Register(Rooted(0x5200, 0x9230, 0x0020, 0x9111, 0x0020, 0x9057));
+    // Registered as the path inside the macro, as every registrant does; the
+    // reader finds it at the top level, in the shared and in the per-frame group.
+    this->Register(FrameRelative(0x0028, 0x9145, 0x0028, 0x1053));
+    this->Register(FrameRelative(0x0028, 0x9145, 0x0028, 0x1052));
+    this->Register(FrameRelative(0x0020, 0x9111, 0x0018, 0x9151));
+    this->Register(FrameRelative(0x0020, 0x9111, 0x0020, 0x9057));
   }
 
   void tearDown() override
@@ -661,11 +710,6 @@ public:
       and in a functional group: the frame's value wins. */
   void TopLevelDuplicateLosesAgainstTheFrame()
   {
-    // The collision only exists when the frame-relative form is scanned as a
-    // top-level path of its own, which is what makes the two findings share
-    // one published key.
-    this->Register(RescaleSlopeRelative());
-
     auto object = this->MakeEnhanced();
     object.duplicateAtTopLevel = true;
     for (unsigned int k = 0; k < FRAME_COUNT; ++k)
@@ -689,7 +733,8 @@ public:
 
   /** A Per-Frame Functional Groups Sequence that does not describe every
       frame cannot be mapped to slots, so the file keeps the one-frame model
-      and publishes rooted keys as it does today. */
+      and publishes no functional-group key at all: a key whose shape changed
+      with the conformance of the input would be worse than an absent one. */
   void RaggedObjectKeepsTheOneFrameModel()
   {
     auto object = this->MakeEnhanced();
@@ -707,16 +752,140 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A ragged object publishes no frame-relative key",
                            mitk::GetPropertyByDICOMTagPath(image, RescaleSlopeRelative()).empty());
 
-    bool foundRootedKey = false;
-    for (const auto& key : image->GetPropertyKeys())
-    {
-      foundRootedKey |= key.rfind("DICOM.5200.", 0) == 0;
-    }
-    CPPUNIT_ASSERT_MESSAGE("A ragged object keeps the rooted keys", foundRootedKey);
+    this->AssertNoRootedKeys(image);
 
     const auto frames = image->GetConstProperty(
       mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_FRAMES()));
     CPPUNIT_ASSERT_MESSAGE("No source frame property without a frame model", frames.IsNull());
+  }
+
+  /**
+   * The two views on one file's values. A file-level info answers in literal
+   * terms and must not start answering a frame-relative query, or every
+   * consumer of GetFrameInfoList() would see functional-group findings it never
+   * saw before; a frame-scoped info answers exactly that query.
+   *
+   * The scan registers the rooted path, so the entries exist without any
+   * functional-group expansion and the case is about the store alone.
+   */
+  void FileLevelInfoDoesNotAnswerAFrameRelativeQuery()
+  {
+    auto object = this->MakeEnhanced();
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      object.frames[k].slope = 1.0 + k;
+    }
+    const std::string file = object.Write(this->CaseDir(), "enhanced.dcm");
+
+    auto scanner = mitk::DICOMDCMTKTagScanner::New();
+    scanner->SetInputFiles({ file });
+    scanner->AddTagPath(Rooted(0x5200, 0x9230, 0x0028, 0x9145, 0x0028, 0x1053));
+    scanner->Scan();
+
+    const auto files = scanner->GetFrameInfoList();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One file-level info", std::size_t(1), files.size());
+    CPPUNIT_ASSERT_MESSAGE("The file-level info does not answer the frame-relative query",
+                           files.front()->GetTagValueAsString(RescaleSlopeRelative()).empty());
+
+    const auto frame = scanner->GetScanCache()->GetFrameInfo(file, 2);
+    CPPUNIT_ASSERT_MESSAGE("The cache resolves frame 2", frame.IsNotNull());
+    const auto findings = frame->GetTagValueAsString(RescaleSlopeRelative());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The frame-scoped info answers with its frame's one finding",
+                                 std::size_t(1), findings.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Frame 2's slope", 3.0, std::stod(findings.front().value), 1e-9);
+    CPPUNIT_ASSERT_MESSAGE("Reported under the frame-relative path",
+                           findings.front().path.Equals(RescaleSlopeRelative()) && findings.front().path.IsExplicit());
+    CPPUNIT_ASSERT_MESSAGE("Its origin is the per-frame group",
+                           mitk::DICOMFindingOrigin::PerFrameFunctionalGroup == findings.front().origin);
+  }
+
+  /** One macro in both the shared and the per-frame group, which PS3.3
+      C.7.6.16 forbids: the per-frame value is the more specific one. */
+  void PerFrameGroupWinsOverSharedGroup()
+  {
+    auto object = this->MakeEnhanced();
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::SharedAndPerFrame;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      object.frames[k].slope = 1.0 + k;
+    }
+
+    mitk::DICOMTestWarningCounter warnings("DICOM.0028.9145.[0].0028.1053");
+    const auto image = this->LoadOne(object.Write(this->CaseDir(), "shared_and_per_frame.dcm"));
+
+    const auto property = this->TheOnlyProperty(image, RescaleSlopeRelative(), "DICOM.0028.9145.[0].0028.1053");
+    const auto* dicomProperty = AsDICOMProperty(property);
+    CPPUNIT_ASSERT_MESSAGE("Rescale slope is a temporo-spatial property", nullptr != dicomProperty);
+
+    for (unsigned int z = 0; z < FRAME_COUNT; ++z)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The per-frame value wins at slot " + std::to_string(z),
+                                   mitk::ConvertValueToDICOMStr(1.0 + z),
+                                   Trimmed(dicomProperty->GetValue(0, z, false, false)));
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning for the block", 1u, warnings.GetCount());
+  }
+
+  /** The same attribute at the top level and in the shared group: the shared
+      group describes the frame, so it wins. */
+  void SharedGroupWinsOverTopLevel()
+  {
+    auto object = this->MakeEnhanced();
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::Shared;
+    object.frames.front().slope = 7.0;
+    object.duplicateAtTopLevel = true;
+
+    mitk::DICOMTestWarningCounter warnings("DICOM.0028.9145.[0].0028.1053");
+    const auto image = this->LoadOne(object.Write(this->CaseDir(), "shared_and_top_level.dcm"));
+
+    const auto property = this->TheOnlyProperty(image, RescaleSlopeRelative(), "DICOM.0028.9145.[0].0028.1053");
+    const auto* dicomProperty = AsDICOMProperty(property);
+    CPPUNIT_ASSERT_MESSAGE("Rescale slope is a temporo-spatial property", nullptr != dicomProperty);
+
+    for (unsigned int z = 0; z < FRAME_COUNT; ++z)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The shared value wins at slot " + std::to_string(z),
+                                   mitk::ConvertValueToDICOMStr(7.0),
+                                   Trimmed(dicomProperty->GetValue(0, z, false, false)));
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning for the block", 1u, warnings.GetCount());
+  }
+
+  /**
+   * The precedence rule decides by origin, not by the order in which findings
+   * arrive. A read yields the shared finding first only because of how the
+   * value store happens to be ordered, so this case feeds the block descriptor
+   * the per-frame finding first and checks that the shared one arriving second
+   * does not overwrite it.
+   */
+  void MoreSpecificOriginWinsWhateverTheOrder()
+  {
+    const std::string filename = "reversed.dcm";
+
+    mitk::DICOMFrameLayout layout;
+    layout.perFrameItemCount = 1;
+
+    auto file = mitk::DICOMGenericImageFrameInfo::New(filename);
+    file->SetFrameLayout(layout);
+    auto cache = mitk::DICOMGenericTagCache::New();
+    cache->AddFrameInfo(file);
+
+    mitk::DICOMTagPath explicitPath;
+    explicitPath.AddSelection(0x0028, 0x9145, 0).AddElement(0x0028, 0x1053);
+    auto frame = ReversedFindingsFrameInfo::New(filename, explicitPath);
+
+    mitk::DICOMImageBlockDescriptor block;
+    block.SetTagCache(cache);
+    block.SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
+    block.SetAdditionalTagsOfInterest({ { RescaleSlopeRelative(), "" } });
+    block.SetImageFrameList({ frame.GetPointer() });
+
+    mitk::DICOMTestWarningCounter warnings("DICOM.0028.9145.[0].0028.1053");
+    const auto* property = AsDICOMProperty(block.GetProperty("DICOM.0028.9145.[0].0028.1053"));
+    CPPUNIT_ASSERT_MESSAGE("The block publishes the attribute", nullptr != property);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The per-frame value survives the shared one arriving after it",
+                                 std::string("per-frame"), property->GetValue(0, 0, false, false));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning for the block", 1u, warnings.GetCount());
   }
 
   /** Writes \p count objects of one series into one directory, applying

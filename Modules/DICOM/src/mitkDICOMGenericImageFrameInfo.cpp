@@ -33,9 +33,10 @@ public:
   {
     /** As found in the file, explicit. */
     DICOMTagPath path;
-    /** Equals path unless functional-group rooted. */
+    /** Empty unless functional-group rooted. */
     DICOMTagPath frameRelativePath;
     std::string value;
+    DICOMFindingOrigin origin = DICOMFindingOrigin::TopLevel;
     /** The k of a (5200,9230)[k] root. */
     std::optional<unsigned int> perFrameItem;
   };
@@ -67,10 +68,12 @@ public:
       // the item selector is what tells them apart inside the bucket.
       // A shared-group entry keeps its own (5200,9229) bucket.
       entry.perFrameItem = static_cast<unsigned int>(root.selection);
+      entry.origin = DICOMFindingOrigin::PerFrameFunctionalGroup;
       normalized.AddNode(DICOMTagPath::NodeInfo(root.tag, DICOMTagPath::NodeInfo::NodeType::AnySelection));
     }
     else
     {
+      entry.origin = DICOMFindingOrigin::SharedFunctionalGroup;
       normalized.AddNode(root);
     }
 
@@ -90,6 +93,9 @@ public:
    */
   struct Bucket
   {
+    /** The bucket key relative to the functional-group item; empty for a key
+        that is not functional-group rooted. */
+    DICOMTagPath relativeKey;
     /** Top-level and (5200,9229) findings: they answer for every frame. */
     std::vector<Entry> frameIndependent;
     /** (5200,9230)[k] findings, keyed by k. */
@@ -98,33 +104,42 @@ public:
 
   /**
    * \param query          The path to match.
-   * \param onlyFrameItem  When set, per-frame entries of other items are not
-   *                       visited at all; frame-independent entries always are.
+   * \param onlyFrameItem  Unset for a file-level info, whose query is compared
+   *                       with the stored path only. Set for a frame-scoped
+   *                       info, whose query is compared with the stored path of
+   *                       a top-level entry and with the frame-relative path of a
+   *                       functional-group entry; per-frame entries of other
+   *                       items are then not visited at all.
    */
   std::vector<const Entry*> Matching(const DICOMTagPath& query,
                                      const std::optional<unsigned int>& onlyFrameItem = std::nullopt) const
   {
     std::vector<const Entry*> result;
 
-    // The bucket key generalises the item selector, so a query that names a
-    // concrete item still has to be tested against the stored path.
-    const auto collect = [&](const std::vector<Entry>& entries)
-    {
-      for (const auto& entry : entries)
-      {
-        if (query.Equals(entry.path))
-        {
-          result.push_back(&entry);
-        }
-      }
-    };
-
     for (const auto& [normalized, bucket] : m_ByNormalizedPath)
     {
-      if (!query.Equals(normalized))
+      // The comparison has to happen at the bucket key as well: a
+      // frame-relative query can never equal a rooted key, because both node
+      // lists must end together.
+      const bool relative = onlyFrameItem.has_value() && !bucket.relativeKey.IsEmpty();
+
+      if (!query.Equals(relative ? bucket.relativeKey : normalized))
       {
         continue;
       }
+
+      // The bucket key generalises the item selectors, so a query that names a
+      // concrete item still has to be tested against each entry.
+      const auto collect = [&](const std::vector<Entry>& entries)
+      {
+        for (const auto& entry : entries)
+        {
+          if (query.Equals(relative ? entry.frameRelativePath : entry.path))
+          {
+            result.push_back(&entry);
+          }
+        }
+      };
 
       collect(bucket.frameIndependent);
 
@@ -165,6 +180,10 @@ private:
   void Insert(const DICOMTagPath& normalized, Entry&& entry)
   {
     auto& bucket = m_ByNormalizedPath[normalized];
+    if (!entry.frameRelativePath.IsEmpty() && bucket.relativeKey.IsEmpty())
+    {
+      bucket.relativeKey = FunctionalGroupRelativePath(normalized);
+    }
     auto& entries = entry.perFrameItem.has_value() ? bucket.byFrameItem[*entry.perFrameItem]
                                                    : bucket.frameIndependent;
 
@@ -249,7 +268,7 @@ mitk::DICOMGenericImageFrameInfo::GetTagValueAsString(const DICOMTagPath& path) 
     // Only a functional-group finding has a frame-relative path; every other
     // one reports the path it was found at, in both views.
     const bool reportRelative = m_FrameScoped && !entry->frameRelativePath.IsEmpty();
-    result.emplace_back(true, entry->value, reportRelative ? entry->frameRelativePath : entry->path);
+    result.emplace_back(true, entry->value, reportRelative ? entry->frameRelativePath : entry->path, entry->origin);
   }
 
   return result;

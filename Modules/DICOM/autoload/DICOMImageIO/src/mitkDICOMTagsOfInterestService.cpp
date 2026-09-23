@@ -67,9 +67,17 @@ mitk::DICOMTagsOfInterestService::
 
 void
 mitk::DICOMTagsOfInterestService::
-RegisterDescriptionAndPersistence(const DICOMTagPath& tagPath, bool makePersistant)
+AddTagOfInterest(const DICOMTagPath& tagPath, bool makePersistant)
 {
+  if (tagPath.Size() == 0)
+  {
+    MITK_DEBUG << "Indication for wrong DICOMTagsOfInterestService::AddTagOfInterest() usage. Empty DICOM tag path was passed.";
+    return;
+  }
+
+  MutexHolder lock(m_Lock);
   std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tagPath);
+  this->m_Tags.insert(tagPath);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
   if (descriptionSrv)
@@ -102,34 +110,6 @@ RegisterDescriptionAndPersistence(const DICOMTagPath& tagPath, bool makePersista
   }
 };
 
-void
-mitk::DICOMTagsOfInterestService::
-AddTagOfInterest(const DICOMTagPath& tagPath, bool makePersistant)
-{
-  if (tagPath.Size() == 0)
-  {
-    MITK_DEBUG << "Indication for wrong DICOMTagsOfInterestService::AddTagOfInterest() usage. Empty DICOM tag path was passed.";
-    return;
-  }
-
-  MutexHolder lock(m_Lock);
-  // Only the scanned form belongs in m_Tags: the derived path would make the
-  // scanner hunt a functional-group macro at the top level of every file.
-  this->m_Tags[tagPath] = makePersistant;
-
-  this->RegisterDescriptionAndPersistence(tagPath, makePersistant);
-
-  if (mitk::IsFunctionalGroupRooted(tagPath))
-  {
-    // The reader publishes a functional-group finding under its frame-relative
-    // key, so without this the property matches no persistence info and
-    // ItkImageIO drops it on save without a log line. The rooted form stays
-    // registered: a file whose per-frame item count does not match its frame
-    // count keeps the one-frame model and publishes rooted keys.
-    this->RegisterDescriptionAndPersistence(mitk::FunctionalGroupRelativePath(tagPath), makePersistant);
-  }
-};
-
 mitk::DICOMTagPathMapType
 mitk::DICOMTagsOfInterestService::
 GetTagsOfInterest() const
@@ -137,9 +117,9 @@ GetTagsOfInterest() const
   MutexHolder lock(m_Lock);
   DICOMTagPathMapType result;
 
-  for (const auto& tag : this->m_Tags)
+  for (auto tag : this->m_Tags)
   {
-    result.insert(std::make_pair(tag.first, ""));
+    result.insert(std::make_pair(tag, ""));
   }
 
   return result;
@@ -154,9 +134,11 @@ HasTag(const DICOMTagPath& tag) const
 
 void
 mitk::DICOMTagsOfInterestService::
-UnregisterDescriptionAndPersistence(const DICOMTagPath& tagPath)
+RemoveTag(const DICOMTagPath& tag)
 {
-  std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tagPath);
+  MutexHolder lock(m_Lock);
+  this->m_Tags.erase(tag);
+  std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tag);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
   if (descriptionSrv)
@@ -173,69 +155,24 @@ UnregisterDescriptionAndPersistence(const DICOMTagPath& tagPath)
 
 void
 mitk::DICOMTagsOfInterestService::
-RestoreKeyIfStillWanted(const DICOMTagPath& publishedKey)
-{
-  // Several tags can publish under one key: the shared and the per-frame root of
-  // one attribute both derive to it, and it can be a tag of interest in its own
-  // right. Removing one of them must leave what the others asked for standing,
-  // with their persistence rather than a guess. Persistence is the union,
-  // because one holder needing it is enough.
-  bool stillWanted = false;
-  bool stillPersistent = false;
-
-  for (const auto& remaining : this->m_Tags)
-  {
-    const bool publishesUnderKey =
-      remaining.first == publishedKey
-      || (mitk::IsFunctionalGroupRooted(remaining.first)
-          && mitk::FunctionalGroupRelativePath(remaining.first) == publishedKey);
-
-    if (publishesUnderKey)
-    {
-      stillWanted = true;
-      stillPersistent = stillPersistent || remaining.second;
-    }
-  }
-
-  if (stillWanted)
-  {
-    this->RegisterDescriptionAndPersistence(publishedKey, stillPersistent);
-  }
-};
-
-void
-mitk::DICOMTagsOfInterestService::
-RemoveTag(const DICOMTagPath& tag)
-{
-  MutexHolder lock(m_Lock);
-  this->m_Tags.erase(tag);
-  this->UnregisterDescriptionAndPersistence(tag);
-
-  // The removed path can itself be the key a functional-group tag publishes
-  // under, so its registration is restored on the same terms as any other.
-  this->RestoreKeyIfStillWanted(tag);
-
-  if (mitk::IsFunctionalGroupRooted(tag))
-  {
-    const DICOMTagPath derived = mitk::FunctionalGroupRelativePath(tag);
-    this->UnregisterDescriptionAndPersistence(derived);
-    this->RestoreKeyIfStillWanted(derived);
-  }
-};
-
-void
-mitk::DICOMTagsOfInterestService::
 RemoveAllTags()
 {
   MutexHolder lock(m_Lock);
+  mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
+  mitk::IPropertyPersistence* persSrv = GetPersistenceService();
 
   for (const auto& tag : m_Tags)
   {
-    this->UnregisterDescriptionAndPersistence(tag.first);
+    std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tag);
 
-    if (mitk::IsFunctionalGroupRooted(tag.first))
+    if (descriptionSrv)
     {
-      this->UnregisterDescriptionAndPersistence(mitk::FunctionalGroupRelativePath(tag.first));
+      descriptionSrv->RemoveDescription(propRegEx);
+    }
+
+    if (persSrv)
+    {
+      persSrv->RemoveInfo(propRegEx);
     }
   }
 

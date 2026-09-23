@@ -13,8 +13,6 @@ found in the LICENSE file.
 #include "mitkRegistrationManipulationInteractor.h"
 
 #include <mitkApplicationCursor.h>
-#include <mitkDisplayActionEventBroadcast.h>
-#include <mitkInteractionEventObserver.h>
 #include <mitkInteractionPositionEvent.h>
 
 #include <usGetModuleContext.h>
@@ -254,56 +252,6 @@ void mitk::RegistrationManipulationInteractor::SelectPosition(StateMachineAction
 
   m_SelectPosition = positionEvent->GetPositionInWorld();
   this->InvokeEvent(RegistrationSelectPositionEvent());
-}
-
-// --- Display interaction management ---
-
-void mitk::RegistrationManipulationInteractor::DisableOriginalInteraction()
-{
-  if (m_OriginalInteractionDisabled)
-    return;
-
-  m_DisplayInteractionConfigs.clear();
-  const auto eventObservers = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-  for (const auto& eventObserver : eventObservers)
-  {
-    auto* displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(
-      us::GetModuleContext()->GetService<InteractionEventObserver>(eventObserver));
-    if (displayActionEventBroadcast != nullptr)
-    {
-      m_DisplayInteractionConfigs.insert(
-        std::make_pair(eventObserver, displayActionEventBroadcast->GetEventConfig()));
-      // Block LMB display interactions (pan, scroll, position-select) to prevent
-      // conflict with our modifier+drag manipulation gestures. Our DataInteractor
-      // handles all LMB events on the moving image, including plain click for
-      // navigator position selection.
-      displayActionEventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
-    }
-  }
-
-  m_OriginalInteractionDisabled = true;
-}
-
-void mitk::RegistrationManipulationInteractor::EnableOriginalInteraction()
-{
-  if (!m_OriginalInteractionDisabled)
-    return;
-
-  for (const auto& displayInteractionConfig : m_DisplayInteractionConfigs)
-  {
-    if (displayInteractionConfig.first)
-    {
-      auto* displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(
-        us::GetModuleContext()->GetService<InteractionEventObserver>(displayInteractionConfig.first));
-      if (displayActionEventBroadcast != nullptr)
-      {
-        displayActionEventBroadcast->SetEventConfig(displayInteractionConfig.second);
-      }
-    }
-  }
-
-  m_DisplayInteractionConfigs.clear();
-  m_OriginalInteractionDisabled = false;
 }
 
 // --- Cursor management ---

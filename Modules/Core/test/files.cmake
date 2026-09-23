@@ -134,6 +134,7 @@ set(MODULE_TESTS
   mitkStringUtilTest.cpp
   mitkBase64Test.cpp
   mitkInteractionSchemeSwitcherTest.cpp
+  mitkDisplayActionEventBroadcastTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

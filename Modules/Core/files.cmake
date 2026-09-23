@@ -401,7 +401,6 @@ set(RESOURCE_FILES
   Interactions/DisplayConfigPACSScroll.xml
   Interactions/DisplayConfigPACSZoom.xml
   Interactions/DisplayConfigPACSLevelWindow.xml
-  Interactions/DisplayConfigBlockLMB.xml
   Interactions/PointSet.xml
   Interactions/PointSetConfig.xml
   Interactions/PointSetConfigLMB.xml

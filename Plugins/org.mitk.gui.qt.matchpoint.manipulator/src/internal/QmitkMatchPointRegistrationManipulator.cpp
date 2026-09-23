@@ -671,10 +671,6 @@ void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
   selectPosCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition);
   m_SelectPositionObserverTag = m_Interactor->AddObserver(mitk::RegistrationSelectPositionEvent(), selectPosCmd);
 
-  // Block LMB display interactions (via DisplayConfigBlockLMB.xml) to prevent
-  // conflict with our modifier+drag and plain-click gestures
-  m_Interactor->DisableOriginalInteraction();
-
   m_InteractionToolActive = true;
 
   // Push the base manipulation cursor
@@ -689,14 +685,13 @@ void QmitkMatchPointRegistrationManipulator::DeactivateInteractionTool()
   if (!m_InteractionToolActive)
     return;
 
-  // Disconnect observers and restore display interactions
+  // Disconnect observers and release the interactor
   if (m_Interactor.IsNotNull())
   {
     m_Interactor->PopManipulationCursor();
     m_Interactor->RemoveObserver(m_TranslationObserverTag);
     m_Interactor->RemoveObserver(m_RotationObserverTag);
     m_Interactor->RemoveObserver(m_SelectPositionObserverTag);
-    m_Interactor->EnableOriginalInteraction();
     m_Interactor->SetDataNode(nullptr);
   }
   m_Interactor = nullptr;

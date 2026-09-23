@@ -163,14 +163,12 @@ private:
 
   void ConfigureTransformCenter(int centerType);
 
-  /** Activates the mouse interaction tool: creates the interactor, suppresses the
-   *  conflicting default display interactions, connects observers, and pushes the
-   *  manipulation cursor. */
+  /** Activates the mouse interaction tool: creates the interactor, connects
+   *  observers, and pushes the manipulation cursor. */
   void ActivateInteractionTool();
 
   /** Deactivates the mouse interaction tool: pops the manipulation cursor, removes
-   *  observers, restores the default display interactions, and releases the
-   *  interactor. */
+   *  observers, and releases the interactor. */
   void DeactivateInteractionTool();
 
   /** Creates or updates the on-screen center-of-rotation indicator (a yellow

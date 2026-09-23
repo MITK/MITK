@@ -36,10 +36,8 @@ namespace mitk
 }
 
 mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
-  : m_EventConfig(""),
-    m_ToolManager(nullptr),
+  : m_ToolManager(nullptr),
     m_InteractorType(type),
-    m_DisplayInteractionConfigs(),
     m_InteractorModule(interactorModule)
 {
 }
@@ -153,46 +151,13 @@ mitk::DataStorage* mitk::Tool::GetDataStorage() const
 
 void mitk::Tool::Activated()
 {
-  // As a legacy solution the display interaction of the new interaction framework is disabled here to avoid conflicts
-  // with tools
-  // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction
-  // will still be enabled
-  m_DisplayInteractionConfigs.clear();
-  auto eventObservers = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-  for (const auto& eventObserver : eventObservers)
-  {
-    auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(
-      us::GetModuleContext()->GetService<InteractionEventObserver>(eventObserver));
-    if (nullptr != displayActionEventBroadcast)
-    {
-      // remember the original configuration
-      m_DisplayInteractionConfigs.insert(std::make_pair(eventObserver, displayActionEventBroadcast->GetEventConfig()));
-      // here the alternative configuration is loaded
-      displayActionEventBroadcast->AddEventConfig(m_EventConfig.c_str());
-    }
-  }
+  if (m_BlocksDisplayLeftButton)
+    m_DisplayLeftButtonBlock = DisplayActionEventBroadcast::BlockLeftButton();
 }
 
 void mitk::Tool::Deactivated()
 {
-  // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
-  // in new interaction framework
-  for (const auto& displayInteractionConfig : m_DisplayInteractionConfigs)
-  {
-    if (displayInteractionConfig.first)
-    {
-      auto displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast*>(
-        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractionConfig.first));
-
-      if (nullptr != displayActionEventBroadcast)
-      {
-        // here the regular configuration is loaded again
-        displayActionEventBroadcast->SetEventConfig(displayInteractionConfig.second);
-      }
-    }
-  }
-
-  m_DisplayInteractionConfigs.clear();
+  m_DisplayLeftButtonBlock.Reset();
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string &toolkitPrefix, const std::string &toolkitPostfix)

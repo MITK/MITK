@@ -4,84 +4,38 @@
 
 \tableofcontents
 
-\section EnableDisableInteraction How to disable/re-enable/modify Display Interaction using Microservices
+\section EnableDisableInteraction How to keep Display Interaction from reacting to the left mouse button
 
-Display Interaction is implemented as EventObservers that are registered as Microservices. This allows them to be queried and modified from
-anywhere in the code. Application scenarios are e.g. wanting to disable certain interaction during a task, to avoid any conflicting actions,
-or to adapt the behavior to a special tool that is selected.
-One example in the MITK Workbench are the measurement tools. They are designed to operate on a single slice, such that we do not want the user
-to move the cross-hair once he started a measurement. Once he finished the measurement the usual interaction should be restored.
-The following code demonstrates how this is done.
+Display interaction (setting the crosshair, panning, zooming, scrolling, ...) is implemented by
+mitk::DisplayActionEventBroadcast, one per multi widget, each registered as an mitk::InteractionEventObserver.
+Observers are notified about every event that no mitk::DataInteractor handled. A tool that is an observer
+itself, like the segmentation tools, therefore gets the same left mouse button press as the display
+interaction, and a single click would both draw and move the crosshair.
 
-To change the mitk::DisplayActionEventBroadcast behavior, we first need to set up MicroService capabilities in the module by adding:
-
-\code
-#include <usModuleInitialization.h>
-US_INITIALIZE_MODULE
-\endcode
-
-Furthermore, following includes are needed for the code snipped to work:
+Such a tool blocks left mouse button presses for display actions while it is active:
 
 \code
-// Header
-#include "usServiceRegistration.h"
-#include <mitkEventConfig.h>
+#include <mitkDisplayActionEventBroadcast.h>
 
-// Source
-#include "mitkInteractionEventObserver.h"
-#include "mitkDisplayActionEventBroadcast.h"
+// Member
+mitk::DisplayActionEventBroadcast::LeftButtonBlock m_DisplayLeftButtonBlock;
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+// On activation
+m_DisplayLeftButtonBlock = mitk::DisplayActionEventBroadcast::BlockLeftButton();
+
+// On deactivation (destroying the block releases it as well)
+m_DisplayLeftButtonBlock.Reset();
 \endcode
 
-The first code snippet queries the us for the DisplayActionEventBroadcast and then exchanges its configuration for a minimal version,
-that does not allow cross-hair actions.
-The original configuration is stored in a member that allows restoration of the original behavior once we're done with our action.
+The block applies to all broadcasts, including broadcasts created while it is held, and switching the
+interaction scheme does not lift it. Blocks are counted, so independent tools do not need to coordinate
+their blocks. All other display interaction, like the mouse wheel, the middle and right mouse buttons,
+and the keyboard, stays available.
 
-\code
-  m_DisplayInteractorConfigs.clear();
-  auto eventObservers = us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
-  for (const auto& eventObserver : eventObservers)
-  {
-    auto displayActionEventBroadcast = dynamic_cast<mitk::DisplayActionEventBroadcast*>(
-      us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(eventObserver));
+Tools derived from mitk::Tool do not hold a block themselves but switch on BlocksDisplayLeftButton in
+their constructor; mitk::SegTool2D does this for all 2D segmentation tools.
 
-    if (nullptr != displayActionEventBroadcast)
-    {
-      // remember the original configuration
-      m_DisplayInteractorConfigs.insert(std::make_pair(eventObserver, displayActionEventBroadcast->GetEventConfig()));
-      // here the alternative configuration is loaded
-      displayActionEventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
-    }
-  }
-\endcode
-
-To restore the old configuration, query the DisplayActionEventBroadcast again and then restore the saved configuration:
-
-\code
-  for (const auto& displayInteractorConfig : m_DisplayInteractorConfigs)
-  {
-    if (displayInteractorConfig.first)
-    {
-      auto displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast *>(
-        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractorConfig.first));
-
-      if (nullptr != displayActionEventBroadcast)
-      {
-        // here the regular configuration is loaded again
-        displayActionEventBroadcast->SetEventConfig(displayInteractorConfig.second);
-      }
-    }
-  }
-
-  m_DisplayInteractorConfigs.clear();
-\endcode
-
-Member declaration:
-\code
-  // holds configuration objects that have been deactivated
-  std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
-\endcode
+A mitk::DataInteractor does not need a block for events it handles, since handled events are not passed
+on to the display interaction.
 
 */

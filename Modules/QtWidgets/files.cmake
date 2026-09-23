@@ -36,7 +36,6 @@ set(CPP_FILES
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp
   QmitkMultiNodeSelectionWidget.cpp
-  QmitkMultiWidgetConfigurationToolBar.cpp
   QmitkMultiWidgetLayoutManager.cpp
   QmitkMultiWidgetLayoutSelectionWidget.cpp
   QmitkNodeDescriptor.cpp

@@ -506,7 +506,11 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
   auto isPositionMarker = false;
   node->GetBoolProperty("isContourMarker", isPositionMarker);
 
-  if (planarFigure.IsNotNull() && !isPositionMarker)
+  // Helper objects belong to other components, which interact with them on their own.
+  auto isHelperObject = false;
+  node->GetBoolProperty("helper object", isHelperObject);
+
+  if (planarFigure.IsNotNull() && !isPositionMarker && !isHelperObject)
   {
     auto nonConstNode = const_cast<mitk::DataNode*>(node);
     mitk::PlanarFigureInteractor::Pointer interactor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
@@ -1101,8 +1105,8 @@ void QmitkMeasurementView::AddAllInteractors()
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkMeasurementView::GetAllPlanarFigures() const
 {
   auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
-  auto isNotHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(false));
-  auto isNotHelperButPlanarFigure = mitk::NodePredicateAnd::New( isPlanarFigure, isNotHelperObject );
+  auto isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  auto isNotHelperButPlanarFigure = mitk::NodePredicateAnd::New(isPlanarFigure, mitk::NodePredicateNot::New(isHelperObject));
 
-  return this->GetDataStorage()->GetSubset(isPlanarFigure);
+  return this->GetDataStorage()->GetSubset(isNotHelperButPlanarFigure);
 }

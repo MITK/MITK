@@ -211,18 +211,26 @@ Visualization view built this node's TransferFunction from, as its origin and
 its name: "internal:CT-AAA" for one of the presets embedded in
 MitkVolumeVisualization, "file:my-curve" for one saved from the view to a file
 and remembered since. A value carrying no origin was written before origins were
-recorded and names an embedded one. The name is what the view searches its
-catalogue by and is unique across it; the origin is there to be read, since a
-file the view no longer finds leaves a name nothing in the catalogue answers to.
-Recorded because the view's adjust sliders resample the colour function, after
-which the curve matches no preset and the choice can no longer be recovered from
-it; the mapper does not read it. Together with the four offsets below it is the
-whole of what the view restores: a curve drawn point by point over the preset is
-recorded nowhere, so selecting the node again rebuilds the preset and the
-offsets and discards the drawing. Absent means no preset is named
-in the view: for a curve whose preset was removed from the view,
-volumerendering.transferfunction.custom says so; for one that came from
-outside the view, nothing does.
+recorded and names an embedded one. An embedded preset is found again by its
+name. One from a file is found by volumerendering.transferfunction.presetfile
+instead, since another file can carry the same name. Where the view offers no
+matching preset - the file is not among those it offers, or the node records no
+file - the stored TransferFunction is shown as it stands. Recorded because the
+view's adjust sliders resample the colour function, after which the curve
+matches no preset and the choice can no longer be recovered from it; the mapper
+does not read it. Together with the four offsets below it is the whole of what
+the view restores: a curve drawn point by point over the preset is recorded
+nowhere, so selecting the node again rebuilds the preset and the offsets and
+discards the drawing. Absent means no preset is named in the view: for a curve
+whose preset was removed from the view, volumerendering.transferfunction.custom
+says so; for one that came from outside the view, nothing does.
+  <li> volumerendering.transferfunction.presetfile - Absolute path of the file
+the preset named above was read from, for a preset of file origin only. The
+name cannot stand in for it: it is derived from the file name, the view suggests
+the same "-custom" name for every preset saved from a given one, and a name
+already taken is numbered in whatever order the files are read. It is the path
+that is matched, not the contents, so a file at the same path that has been
+written over since is taken to be the same preset. The mapper does not read it.
   <li> volumerendering.transferfunction.opacityshift,
 volumerendering.transferfunction.opacityheight,
 volumerendering.transferfunction.colorshift,

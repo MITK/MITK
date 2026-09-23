@@ -76,11 +76,24 @@ namespace
    * mitk::VolumeRenderingLightingModel::MODEL_PROPERTY: record the choice, do
    * not infer it.
    *
-   * The offsets are meaningful only alongside the preset name, and all five are
+   * The offsets are meaningful only alongside the preset name, and all six are
    * absent on a curve no preset describes. TF_CUSTOM_PROPERTY is what then tells
    * a curve chosen here apart from one that came from outside this widget.
    */
   constexpr const char *TF_PRESET_PROPERTY = "volumerendering.transferfunction.preset";
+
+  /** The file a preset of file origin was read from, beside its name.
+   *
+   * The name cannot identify such a preset on its own: it is taken from the file
+   * name, "-custom.json" is what saving suggests for every one of them, and
+   * AddPreset numbers a name that is already taken in whatever order the files
+   * happen to be read. So a scene opened where a different file carries the
+   * same name - on a colleague's machine, or here after the files offered have
+   * changed - would otherwise have that file's curve replayed over its own.
+   * Absent for a preset from the embedded catalogue, which is the same wherever
+   * it is read.
+   */
+  constexpr const char *TF_PRESET_FILE_PROPERTY = "volumerendering.transferfunction.presetfile";
   constexpr const char *TF_OPACITY_SHIFT_PROPERTY = "volumerendering.transferfunction.opacityshift";
   constexpr const char *TF_OPACITY_HEIGHT_PROPERTY = "volumerendering.transferfunction.opacityheight";
   constexpr const char *TF_COLOR_SHIFT_PROPERTY = "volumerendering.transferfunction.colorshift";
@@ -413,24 +426,46 @@ namespace
   {
     PresetOrigin origin;
     QString name;
+
+    /** \brief Empty unless the origin is PresetOrigin::File, and empty there too
+     *         on a node recorded before files were.
+     */
+    QString file;
   };
 
-  /** \brief What a recorded value stands for.
+  /** \brief What a node records about the preset its curve was built from.
    *
    * A value carrying no origin was written before origins were recorded, when a
    * preset from the embedded catalogue was the only kind there was.
+   *
+   * \param[in] node The node to read; nullptr, like a node recording nothing,
+   *            yields an empty name.
    */
-  RecordedPreset ParseRecordedPreset(const QString &recorded)
+  RecordedPreset ReadRecordedPreset(const mitk::DataNode *node)
   {
+    std::string recordedPreset;
+    std::string recordedFile;
+
+    if (node != nullptr)
+    {
+      node->GetStringProperty(TF_PRESET_PROPERTY, recordedPreset);
+      node->GetStringProperty(TF_PRESET_FILE_PROPERTY, recordedFile);
+    }
+
+    const auto recorded = QString::fromStdString(recordedPreset);
+
     for (const auto origin : { PresetOrigin::Internal, PresetOrigin::File })
     {
       const QString prefix = PresetOriginPrefix(origin);
 
       if (recorded.startsWith(prefix))
-        return { origin, recorded.mid(prefix.length()) };
+      {
+        return { origin, recorded.mid(prefix.length()),
+                 origin == PresetOrigin::File ? QString::fromStdString(recordedFile) : QString() };
+      }
     }
 
-    return { PresetOrigin::Internal, recorded };
+    return { PresetOrigin::Internal, recorded, QString() };
   }
 
   /** \brief The row holding the named preset, or -1.
@@ -472,6 +507,33 @@ namespace
     }
 
     return nullptr;
+  }
+
+  /** \brief The entry standing for the preset a node records, or nullptr.
+   *
+   * Only an entry of the recorded origin qualifies. One of file origin is found
+   * by its file, since its name says nothing about which file that is - see
+   * TF_PRESET_FILE_PROPERTY. A node that recorded no file therefore finds no
+   * entry, and is shown as the curve it carries rather than as a preset that
+   * might not be its own.
+   */
+  QListWidgetItem *FindRecordedPresetItem(const QListWidget *presetList, const RecordedPreset &recorded)
+  {
+    if (recorded.origin == PresetOrigin::File)
+    {
+      return !recorded.file.isEmpty()
+        ? FindPresetFileItem(presetList, recorded.file)
+        : nullptr;
+    }
+
+    const int presetRow = FindPresetRow(presetList, recorded.name);
+
+    if (presetRow < 0)
+      return nullptr;
+
+    auto *presetItem = presetList->item(presetRow);
+
+    return PresetOriginOf(presetItem) == PresetOrigin::Internal ? presetItem : nullptr;
   }
 
   /** \brief Whether a slider has been carried off the value given here.
@@ -1052,14 +1114,18 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
   // than handed in: AddPreset keeps names unique across the catalogue, so the
   // entry wearing this one is the only entry it could mean.
   const int presetRow = FindPresetRow(m_Controls->presetListWidget, presetName);
+  const auto *presetItem = presetRow >= 0 ? m_Controls->presetListWidget->item(presetRow) : nullptr;
 
-  const auto origin = presetRow >= 0
-    ? PresetOriginOf(m_Controls->presetListWidget->item(presetRow))
-    : PresetOrigin::Internal;
+  const auto origin = presetItem != nullptr ? PresetOriginOf(presetItem) : PresetOrigin::Internal;
 
   const auto recordedPreset = (PresetOriginPrefix(origin) + presetName).toStdString();
 
   node->SetStringProperty(TF_PRESET_PROPERTY, recordedPreset.c_str());
+
+  // The file too, since that is what the next selection finds a preset of file
+  // origin by. See TF_PRESET_FILE_PROPERTY.
+  if (origin == PresetOrigin::File)
+    node->SetStringProperty(TF_PRESET_FILE_PROPERTY, PresetFile(presetItem).toStdString().c_str());
 
   // The mode travels with the curve: a window authored for MIP renders as a
   // white shell under composite, and a tissue classifier projected flat says
@@ -1085,12 +1151,10 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
 {
   auto node = m_DataNode.Lock();
 
-  std::string recordedPreset;
+  const auto recorded = ReadRecordedPreset(node.GetPointer());
 
   if (node.IsNotNull())
   {
-    node->GetStringProperty(TF_PRESET_PROPERTY, recordedPreset);
-
     // A recorded preset and the custom marker are the direct evidence that this
     // node was set up here, and both survive the rendering flag being switched
     // off. Between them they cover every curve this widget applies. The flag
@@ -1099,7 +1163,7 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     // property itself - see IsVolumeRenderingOn. Adopting the mapper's default
     // would show a curve nobody chose and would also suppress
     // EnsureTransferFunction, which fires only while no function is held.
-    if (!recordedPreset.empty() || IsCustomTransferFunction(node.GetPointer()) ||
+    if (!recorded.name.isEmpty() || IsCustomTransferFunction(node.GetPointer()) ||
         IsVolumeRenderingOn(node.GetPointer()))
     {
       if (const auto *tfProperty =
@@ -1110,23 +1174,21 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     }
   }
 
-  // The name is the key either way: AddPreset keeps it unique across the
-  // catalogue, and the origin recorded beside it is there to be read rather
-  // than to be searched by.
-  const auto presetName = ParseRecordedPreset(QString::fromStdString(recordedPreset)).name;
+  auto *presetItem = FindRecordedPresetItem(m_Controls->presetListWidget, recorded);
 
-  const int presetIndex = FindPresetRow(m_Controls->presetListWidget, presetName);
-
-  if (presetIndex < 0)
+  if (presetItem == nullptr)
     this->ClearPresetSelection();
   else
-    m_Controls->presetListWidget->setCurrentRow(presetIndex);
+    m_Controls->presetListWidget->setCurrentItem(presetItem);
 
   // A node naming a preset the catalogue still offers is described by its
   // recipe, and the recipe is what comes back. Only a curve no preset describes
-  // - one whose preset was removed, or one that came from outside this view - is
-  // shown as it stands.
-  if (presetIndex >= 0 && this->ReplayRecipe(presetName))
+  // - one whose preset was removed, whose file is not offered here, or that came
+  // from outside this view - is shown as it stands.
+  //
+  // Replayed under the name the entry wears now rather than the recorded one,
+  // which a file's preset only keeps while no file read before it takes it.
+  if (presetItem != nullptr && this->ReplayRecipe(PresetName(presetItem)))
     return;
 
   this->ShowAppliedTransferFunction();
@@ -1230,6 +1292,7 @@ void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataN
   auto *properties = node->GetPropertyList();
 
   properties->DeleteProperty(TF_PRESET_PROPERTY);
+  properties->DeleteProperty(TF_PRESET_FILE_PROPERTY);
   properties->DeleteProperty(TF_CUSTOM_PROPERTY);
 }
 

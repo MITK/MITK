@@ -134,7 +134,7 @@ The `frame_count_mismatch` reason exists but cannot appear here, because it is r
 | `type` | `severity` | Meaning | `details` |
 |--------|------------|---------|-----------|
 | `no_per_frame_metadata` | `info` | More than one frame and no per-frame functional groups at all. The normal state of RT Dose, multi-frame NM, SC and US: the frames load as slices, but no per-frame value is available. | `frame_count` |
-| `ragged_functional_groups` | `warning` | The Per-Frame Functional Groups Sequence has items, but not one per frame, so its values cannot be mapped to slices. The file is read as a single frame and its values keep the sequence-rooted property names. | `frame_count`, `per_frame_item_count` |
+| `ragged_functional_groups` | `warning` | The Per-Frame Functional Groups Sequence has items, but not one per frame, so its values cannot be mapped to slices. The file is read as a single frame and its functional-group values are not published. | `frame_count`, `per_frame_item_count` |
 | `varying_per_frame_rescale` | `info` | The Pixel Value Transformation differs between frames. The reader applies each frame's own pair; reported because the pixel values of such a file differ from what a reader without the per-frame model produces. | `distinct_rescale_pairs` |
 | `shared_and_per_frame_rescale` | `warning` | A shared and a per-frame Pixel Value Transformation are both present, which is not conformant. The per-frame one is used as the more specific. | |
 

@@ -45,16 +45,30 @@ Files remain the unit of sorting and frames are never reordered.
 An attribute inside a functional group appears as one
 mitk::TemporoSpatialStringProperty per attribute, named by the path of the
 attribute relative to the functional-group item, with one value per (t, z)
-slot, once it has been registered as a tag of interest with a path rooted at
-the shared (5200,9229) or per-frame (5200,9230) functional group sequence
-(mitk::IDICOMTagsOfInterest::AddTagOfInterest); registering the rooted path
-also registers its frame-relative form, which is what lets the property
-survive a save:
+slot, once it has been registered as a tag of interest
+(mitk::IDICOMTagsOfInterest::AddTagOfInterest). It is registered by that same
+path, the one inside the macro, e.g. (0028,9145)[*].(0028,1053); the reader
+searches it at the top level of every file and, for a file with a frame model,
+also in the shared (5200,9229) and the per-frame (5200,9230) group. So one
+registration covers every placement, and the registered path is the pattern of
+the published key, which is what lets the property survive a save:
 
 \code
 DICOM.0028.9145.[0].0028.1053     Pixel Value Transformation, Rescale Slope
 DICOM.0020.9111.[0].0018.9151     Frame Content, Frame Reference DateTime
 \endcode
+
+A path rooted in (5200,9229) or (5200,9230) is not supported: it yields no
+property for a file with a frame model, and the reader warns once per scan.
+Only paths of more than one element are searched inside the groups, because a
+functional-group item holds only macro sequences. The search covers every such
+registered path, not only the functional-group macros: a sequence registered
+with classic objects in mind that also occurs directly in a functional-group
+item becomes per-frame for an object with a frame model.
+
+When a non-conformant file carries one attribute at several placements, the most
+specific one wins at each slot: the per-frame group, then the shared group, then
+the top level. The reader warns once per block and attribute.
 
 This registration governs only the per-attribute properties; frame expansion
 into per-frame mitk::DICOMImageFrameInfo, the per-slot frame record described
@@ -91,8 +105,10 @@ remains a consumer concern.
 \subsection DICOMModule_multiframe_limits What is not covered
 
  - A file whose per-frame item count does not match its frame count cannot be
-   mapped to slots. It keeps the one-frame model, publishes its values under the
-   rooted keys as before, and the reader says so once per scan.
+   mapped to slots. It keeps the one-frame model and publishes no
+   functional-group value at all, and the reader says so once per scan. A key
+   whose shape depended on the conformance of the input would be worse than an
+   absent one.
  - A file without functional groups (RT Dose, multi-frame NM, SC, US) keeps the
    one-frame model as well. Its frames load as slices and no per-frame value is
    available, which is normal rather than an error; mitkDICOMVolumeDiagnostics

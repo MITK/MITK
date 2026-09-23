@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QSignalBlocker>
 #include <mitkIOUtil.h>
 
 #include <QmitkAbstractMultiWidget.h>
@@ -335,10 +336,29 @@ void QmitkPointListWidget::MoveSelectedPointUp()
 
 void QmitkPointListWidget::OnBtnAddPoint(bool checked)
 {
+  if (!checked)
+    m_ExclusiveInteractionClaim.Reset();
+
   if (m_PointSetNode.IsNotNull())
   {
     if (checked)
     {
+      if (!m_ExclusiveInteractionClaim.IsActive())
+      {
+        m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+          m_ToggleAddPoint->setChecked(false);
+          return true;
+        });
+
+        // The armed tool of another view keeps the exclusive interaction.
+        if (!m_ExclusiveInteractionClaim.IsActive())
+        {
+          const QSignalBlocker blocker(m_ToggleAddPoint);
+          m_ToggleAddPoint->setChecked(false);
+          return;
+        }
+      }
+
       m_DataInteractor = m_PointSetNode->GetDataInteractor();
       // If no data Interactor is present create a new one
       if (m_DataInteractor.IsNull())

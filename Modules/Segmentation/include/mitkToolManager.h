@@ -28,6 +28,7 @@ found in the LICENSE file.
 #pragma GCC visibility pop
 #endif
 
+#include <functional>
 #include <vector>
 
 namespace mitk
@@ -128,8 +129,29 @@ namespace mitk
       \param id The tool to activate. Provide -1 for disabling any tools.
       Counting starts with 0.
       Registers a listener for NodeRemoved event at DataStorage (see mitk::ToolManager::OnNodeRemoved).
+      \return True if a tool is active afterwards. A tool that claims the exclusive
+      interaction (see Tool::GetClaimsExclusiveInteraction()) is not activated if
+      the armed tool of another view refuses to be disarmed.
     */
     bool ActivateTool(int id);
+
+    /**
+      \brief Asks the user whether an active tool may discard its unconfirmed results.
+
+      \sa SetDeactivationConfirmation()
+    */
+    using DeactivationConfirmation = std::function<bool(const Tool&)>;
+
+    /**
+      \brief Sets the function that is asked before another view disarms the active tool.
+
+      Consulted when a component of another view acquires the exclusive
+      interaction (see ExclusiveInteraction) while the active tool requests a
+      confirmation (see Tool::ConfirmBeforeDeactivation()). If the function
+      returns false or none is set, the tool stays active and the other component
+      does not arm.
+    */
+    void SetDeactivationConfirmation(DeactivationConfirmation confirmation);
 
     /**
      * \brief Returns the ID (index) of the first tool matching the given type.
@@ -321,6 +343,11 @@ namespace mitk
     void StopTimeObservation();
 
   private:
+    /** Revoke function of the exclusive interaction claimed for the active tool. */
+    static bool RevokeExclusiveInteraction();
+
+    DeactivationConfirmation m_DeactivationConfirmation;
+
     /** Time point of last detected change*/
     TimePointType m_LastTimePoint = 0;
     /** Tag of the observer that listens to time changes*/

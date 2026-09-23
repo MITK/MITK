@@ -32,6 +32,20 @@ found in the LICENSE file.
 
 #include <mitkToolManagerProvider.h>
 
+namespace
+{
+  bool ConfirmDiscardingResults(const mitk::Tool& tool)
+  {
+    return QMessageBox::Yes == QMessageBox::question(nullptr,
+                                                     tool.GetName(),
+                                                     QStringLiteral("The %1 tool currently has unconfirmed results. "
+                                                                    "Do you really want to discard the results by "
+                                                                    "exiting the tool now?").arg(tool.GetName()),
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No);
+  }
+}
+
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage *)
   : QWidget(parent),
     m_SelfCall(false),
@@ -49,6 +63,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
   QWidget::setFont(currentFont);
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  m_ToolManager->SetDeactivationConfirmation(&ConfirmDiscardingResults);
 
   // QButtonGroup
   m_ToolButtonGroup = new QButtonGroup(this);
@@ -113,6 +128,7 @@ void QmitkToolSelectionBox::SetToolManager(
   }
 
   m_ToolManager = &newManager;
+  m_ToolManager->SetDeactivationConfirmation(&ConfirmDiscardingResults);
   RecreateButtons();
 
   // greet the new one
@@ -141,14 +157,7 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
 
   QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
   mitk::Tool *tool = m_ToolManager->GetActiveTool();
-  if (tool && tool->ConfirmBeforeDeactivation() &&
-      QMessageBox::No == QMessageBox::question(nullptr,
-                                               tool->GetName(),
-                                               QStringLiteral("The %1 tool currently has unconfirmed results. "
-                                                              "Do you really want to discard the results by "
-                                                              "exiting the tool now?").arg(tool->GetName()),
-                                               QMessageBox::Yes | QMessageBox::No,
-                                               QMessageBox::No))
+  if (tool && tool->ConfirmBeforeDeactivation() && !ConfirmDiscardingResults(*tool))
   {
     // The tool stays active, but Qt already toggled the clicked button. Restore
     // the state the still-active tool implies: checked if the declined click was
@@ -175,9 +184,13 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
       // enable the corresponding tool
       m_SelfCall = true;
 
-      m_ToolManager->ActivateTool(m_ToolIDForButtonID[id]);
+      const bool isActivated = m_ToolManager->ActivateTool(m_ToolIDForButtonID[id]);
 
       m_SelfCall = false;
+
+      // Refused when the armed tool of another view keeps the exclusive interaction.
+      if (!isActivated)
+        toolButton->setChecked(false);
     }
   }
 }

@@ -69,6 +69,7 @@ mitk::SegTool2D::SegTool2D(const char *type, const us::Module *interactorModule)
   : Tool(type, interactorModule), m_Contourmarkername("Position")
 {
   this->BlocksDisplayLeftButtonOn();
+  this->ClaimsExclusiveInteractionOn();
 }
 
 mitk::SegTool2D::~SegTool2D()

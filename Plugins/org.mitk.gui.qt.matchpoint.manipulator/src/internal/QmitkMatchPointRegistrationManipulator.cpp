@@ -49,6 +49,7 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QErrorMessage>
+#include <QSignalBlocker>
 #include <QTimer>
 #include <QThreadPool>
 
@@ -649,6 +650,19 @@ void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
   if (nullptr == regModule)
     return;
 
+  m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+    m_Controls->pbInteractionTool->setChecked(false);
+    return true;
+  });
+
+  // The armed tool of another view keeps the exclusive interaction.
+  if (!m_ExclusiveInteractionClaim.IsActive())
+  {
+    const QSignalBlocker blocker(m_Controls->pbInteractionTool);
+    m_Controls->pbInteractionTool->setChecked(false);
+    return;
+  }
+
   // Create and configure the interactor, attached to the moving data node
   m_Interactor = mitk::RegistrationManipulationInteractor::New();
   m_Interactor->LoadStateMachine("RegistrationManipulationStates.xml", regModule);
@@ -704,6 +718,7 @@ void QmitkMatchPointRegistrationManipulator::DeactivateInteractionTool()
   m_CenterOfRotationIndicatorNode = nullptr;
 
   m_InteractionToolActive = false;
+  m_ExclusiveInteractionClaim.Reset();
 }
 
 void QmitkMatchPointRegistrationManipulator::UpdateCenterOfRotationIndicator()

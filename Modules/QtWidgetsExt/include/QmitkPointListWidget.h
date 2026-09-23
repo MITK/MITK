@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <mitkDataInteractor.h>
 #include <mitkDataNode.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkPointSet.h>
 
 #include <QPushButton>
@@ -186,6 +187,9 @@ protected:
   unsigned long m_NodeObserverTag;
 
   QmitkPointListModel *m_PointListModel;
+
+  /** Active while points can be added. */
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
 };
 
 #endif

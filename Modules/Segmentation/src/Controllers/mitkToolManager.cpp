@@ -17,7 +17,9 @@ found in the LICENSE file.
 #include <itkObjectFactoryBase.h>
 
 #include <list>
+#include <utility>
 
+#include <mitkExclusiveInteraction.h>
 #include <mitkInteractionEventObserver.h>
 #include <mitkSegTool2D.h>
 #include <mitkRenderingManager.h>
@@ -25,6 +27,14 @@ found in the LICENSE file.
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
+
+namespace
+{
+  // Shared by all tool managers, as ActivateTool() keeps a single active tool across them.
+  mitk::ExclusiveInteraction::Claim ExclusiveInteractionClaim;
+
+  bool IsActivatingTool = false;
+}
 
 mitk::ToolManager::ToolManager(DataStorage *storage)
   : m_ActiveTool(nullptr), m_ActiveToolID(-1), m_RegisteredClients(0), m_DataStorage(storage)
@@ -79,6 +89,9 @@ mitk::ToolManager::~ToolManager()
     m_ActiveTool->Deactivated();
     m_ActiveToolRegistration.Unregister();
 
+    if (m_ActiveTool->GetClaimsExclusiveInteraction())
+      ExclusiveInteractionClaim.Reset();
+
     m_ActiveTool = nullptr;
     m_ActiveToolID = -1; // no tool active
 
@@ -100,6 +113,9 @@ void mitk::ToolManager::InitializeTools()
   {
     m_ActiveTool->Deactivated();
     m_ActiveToolRegistration.Unregister();
+
+    if (m_ActiveTool->GetClaimsExclusiveInteraction())
+      ExclusiveInteractionClaim.Reset();
 
     m_ActiveTool = nullptr;
     m_ActiveToolID = -1; // no tool active
@@ -188,11 +204,20 @@ bool mitk::ToolManager::ActivateTool(int id)
   if (GetToolById(id) == m_ActiveTool)
     return true; // no change needed
 
+  const auto* requestedTool = this->GetToolById(id);
+
+  if (nullptr != requestedTool && requestedTool->GetClaimsExclusiveInteraction() && !ExclusiveInteractionClaim.IsActive())
+  {
+    ExclusiveInteractionClaim = ExclusiveInteraction::Acquire(&ToolManager::RevokeExclusiveInteraction);
+
+    if (!ExclusiveInteractionClaim.IsActive())
+      return false;
+  }
+
   static int nextTool = -1;
   nextTool = id;
 
-  static bool inActivateTool = false;
-  if (inActivateTool)
+  if (IsActivatingTool)
   {
     return true;
   }
@@ -204,7 +229,7 @@ bool mitk::ToolManager::ActivateTool(int id)
     bool& flag;
     explicit ReentrancyGuard(bool& f) : flag(f) { flag = true; }
     ~ReentrancyGuard() { flag = false; }
-  } guard(inActivateTool);
+  } guard(IsActivatingTool);
 
   while (nextTool != m_ActiveToolID)
   {
@@ -238,6 +263,13 @@ bool mitk::ToolManager::ActivateTool(int id)
       }
     }
 
+    // Released before a tool that does not claim gets activated, as it may
+    // still arm parts of its own that do, like prompt interactors.
+    const auto* nextActiveTool = this->GetToolById(nextTool);
+
+    if (nullptr == nextActiveTool || !nextActiveTool->GetClaimsExclusiveInteraction())
+      ExclusiveInteractionClaim.Reset();
+
     m_ActiveTool = GetToolById(nextTool);
     m_ActiveToolID = m_ActiveTool ? nextTool : -1; // current ID if tool is valid, otherwise -1
 
@@ -256,6 +288,39 @@ bool mitk::ToolManager::ActivateTool(int id)
   }
 
   return (m_ActiveTool != nullptr);
+}
+
+void mitk::ToolManager::SetDeactivationConfirmation(DeactivationConfirmation confirmation)
+{
+  m_DeactivationConfirmation = std::move(confirmation);
+}
+
+bool mitk::ToolManager::RevokeExclusiveInteraction()
+{
+  // Deactivating from within ActivateTool() would take over its pending switch.
+  if (IsActivatingTool)
+    return false;
+
+  for (const auto& entry : ToolManagerProvider::GetInstance()->GetToolManagers())
+  {
+    auto* toolManager = entry.second.GetPointer();
+    auto* tool = toolManager->m_ActiveTool;
+
+    if (nullptr == tool)
+      continue;
+
+    if (tool->ConfirmBeforeDeactivation())
+    {
+      const auto& confirm = toolManager->m_DeactivationConfirmation;
+
+      if (!confirm || !confirm(*tool))
+        return false;
+    }
+
+    toolManager->ActivateTool(-1);
+  }
+
+  return true;
 }
 
 void mitk::ToolManager::SetReferenceData(DataVectorType data)

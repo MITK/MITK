@@ -270,6 +270,17 @@ namespace mitk
     itkGetConstMacro(BlocksDisplayLeftButton, bool);
     itkBooleanMacro(BlocksDisplayLeftButton);
 
+    /** \brief If true, the tool is armed exclusively while it is active.
+     *
+     * Default is false. Tools that take input in the render windows switch it
+     * on. Activating such a tool disarms the armed tools of other views, and
+     * arming a tool in another view deactivates it (see ExclusiveInteraction
+     * and ToolManager::SetDeactivationConfirmation()).
+     */
+    itkSetMacro(ClaimsExclusiveInteraction, bool);
+    itkGetConstMacro(ClaimsExclusiveInteraction, bool);
+    itkBooleanMacro(ClaimsExclusiveInteraction);
+
     Tool(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~Tool() override;
 
@@ -284,6 +295,8 @@ namespace mitk
 
     bool m_BlocksDisplayLeftButton = false;
     DisplayActionEventBroadcast::LeftButtonBlock m_DisplayLeftButtonBlock;
+
+    bool m_ClaimsExclusiveInteraction = false;
 
     const us::Module *m_InteractorModule;
   };

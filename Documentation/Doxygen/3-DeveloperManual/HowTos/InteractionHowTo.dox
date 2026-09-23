@@ -38,4 +38,55 @@ their constructor; mitk::SegTool2D does this for all 2D segmentation tools.
 A mitk::DataInteractor does not need a block for events it handles, since handled events are not passed
 on to the display interaction.
 
+\section ExclusiveInteractionHowTo How to keep tools of different views from being armed at the same time
+
+A tool is armed while it waits for or processes input in the render windows, for example an active
+segmentation tool, a measurement figure that is about to be placed, or a point list in adding mode. Tools of
+different views know nothing about each other, so without coordination a user could arm a tool in one view
+while a tool of another view is still armed, and both would react to the same clicks.
+
+mitk::ExclusiveInteraction lets at most one tool be armed at a time. A component acquires a claim when it arms
+a tool and passes a revoke function that disarms it again. Acquiring calls the revoke function of the current
+claim first:
+
+\code
+#include <mitkExclusiveInteraction.h>
+
+// Member
+mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
+
+// When the user arms the tool
+if (!m_ExclusiveInteractionClaim.IsActive())
+{
+  m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+    m_ToolButton->setChecked(false); // Disarms the tool through the button's toggled() handler
+    return true;
+  });
+
+  // The armed tool of another view refused to be disarmed.
+  if (!m_ExclusiveInteractionClaim.IsActive())
+  {
+    const QSignalBlocker blocker(m_ToolButton);
+    m_ToolButton->setChecked(false);
+    return;
+  }
+}
+
+// When the tool is disarmed (destroying the claim releases it as well)
+m_ExclusiveInteractionClaim.Reset();
+\endcode
+
+Keep the claim while switching between tools of the same component: acquiring again would revoke the own claim
+first. The revoke function may return false to keep the claim, for example after the user declined to discard
+unconfirmed results. The previous tool is disarmed before Acquire() returns, so the new tool never has to share
+the render windows with it.
+
+Segmentation tools do not use claims directly. Tools that take input in the render windows switch on
+ClaimsExclusiveInteraction in their constructor, and mitk::ToolManager holds the claim while such a tool is
+active. Before another view disarms a tool with unconfirmed results, the tool manager asks the function set by
+mitk::ToolManager::SetDeactivationConfirmation(), which the tool selection box provides.
+
+Display interaction and the interactors of data that can merely be edited, like the control points of finished
+planar figures, do not take part. They stay available next to the armed tool.
+
 */

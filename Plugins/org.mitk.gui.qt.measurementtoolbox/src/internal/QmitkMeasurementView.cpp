@@ -25,6 +25,7 @@ found in the LICENSE file.
 
 #include <mitkCoreServices.h>
 #include <mitkException.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkITKEventObserverGuard.h>
@@ -198,6 +199,9 @@ struct QmitkMeasurementViewData
   /** Set while a figure is being placed: the interaction reference geometry to hand
       back afterwards. Holds a null geometry if there was none to begin with. */
   std::optional<mitk::TimeGeometry::ConstPointer> m_RestoreInteractionReferenceGeometry;
+
+  /** Active while a figure is being placed. */
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -658,6 +662,7 @@ void QmitkMeasurementView::PlanarFigureInitialized()
 {
   d->m_UninitializedNode = nullptr;
   d->m_PendingCounter = nullptr;
+  d->m_ExclusiveInteractionClaim.Reset();
 
   d->m_CancelPlacementShortcut->setEnabled(false);
 
@@ -726,6 +731,19 @@ bool QmitkMeasurementView::BeginDrawAction(QAction* action, bool checked)
   }
 
   this->CancelPlacement();
+
+  d->m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+    this->CancelPlacement();
+    return true;
+  });
+
+  // The armed tool of another view keeps the exclusive interaction, e.g. to
+  // keep its unconfirmed results.
+  if (!d->m_ExclusiveInteractionClaim.IsActive())
+  {
+    action->setChecked(false);
+    return false;
+  }
 
   // CancelPlacement() unchecks all draw actions, including the clicked one
   action->setChecked(true);

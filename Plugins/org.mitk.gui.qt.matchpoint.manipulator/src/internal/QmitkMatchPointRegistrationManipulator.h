@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkMAPRegistrationWrapper.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkRegistrationManipulationInteractor.h>
 #include <itkEuler3DTransform.h>
 
@@ -227,6 +228,7 @@ private:
   mitk::RegistrationManipulationInteractor::Pointer m_Interactor;
   mitk::DataNode::Pointer m_CenterOfRotationIndicatorNode;
   bool m_InteractionToolActive = false;
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
 
   // 3D preview members
   mitk::DataNode::Pointer m_3DPreviewCloneNode;

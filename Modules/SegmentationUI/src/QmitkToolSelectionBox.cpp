@@ -112,6 +112,11 @@ QmitkToolSelectionBox::~QmitkToolSelectionBox()
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
+
+  if (IsEnabledByItself(this))
+  {
+    m_ToolManager->UnregisterClient();
+  }
 }
 
 mitk::ToolManager *QmitkToolSelectionBox::GetToolManager()

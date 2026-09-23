@@ -253,7 +253,12 @@ It is always on for a volume rendered here. How the volume is lit is chosen on
 the 3D render window itself, from the lighting button in its top right corner.
 The lights belong to the window rather than to any one volume, so the choice
 applies to every volume drawn there, and it stays as you left it after this view
-is closed.
+is closed. A choice made while this view is closed is kept as well: opening the
+view again moves the volumes onto the lighting you chose. Until then they keep
+the settings tuned for the previous lighting, and may look different or render
+more slowly than they will once the view has caught up. Default lighting is
+the exception - a window on it is taken to be one nobody has set, so the
+volumes bring back the lighting they were last shown with.
 
 \imageMacro{QmitkVolumeVisualizationV2_LightingMenu.png,"The lighting menu of the 3D render window.",5.00}
 

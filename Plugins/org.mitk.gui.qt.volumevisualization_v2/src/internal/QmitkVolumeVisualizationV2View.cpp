@@ -180,6 +180,10 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   // its menu has to be picked up here.
   this->ConnectLightingMode();
 
+  // Before UpdateInterface, which lets the volumes set the rig: run after it,
+  // they would already have undone a rig chosen while this view was closed.
+  this->AdoptWindowLightingMode();
+
   // Auto-selection reports only a selection it actually made, so on an empty
   // data storage nothing would ever bring the panel out of the state the .ui
   // file left it in, which is every section enabled and acting on no node.
@@ -357,6 +361,39 @@ void QmitkVolumeVisualizationV2View::UpdateLightingRig()
   this->ApplyLightingMode(model != nullptr
     ? model->lightingMode
     : renderWindow->GetPreferredLightingMode());
+}
+
+void QmitkVolumeVisualizationV2View::AdoptWindowLightingMode()
+{
+  auto *renderWindow = this->Get3DRenderWindow();
+  auto *renderer = renderWindow != nullptr ? renderWindow->GetRenderer() : nullptr;
+
+  if (renderer == nullptr)
+    return;
+
+  const auto mode = renderer->GetLightingMode();
+
+  // Default lighting is where every window starts, so a window on it says
+  // nothing about a choice - and it is the rig volumes are steered away from
+  // anyway. There the volumes keep deciding, which is also what brings a loaded
+  // scene back lit as it was saved.
+  if (mode == mitk::VtkPropRenderer::LightingMode::Studio)
+    return;
+
+  const auto *model = mitk::VolumeRenderingLightingModel::FromLightingMode(mode);
+
+  if (model == nullptr)
+    return;
+
+  for (auto *volume : this->GetRenderedVolumes())
+  {
+    if (LightingApplies(volume) && mitk::VolumeRenderingLightingModel::FromNode(volume) != model)
+      model->ApplyTo(volume);
+  }
+
+  // The sliders show the selected node's values, which this may have rewritten.
+  this->UpdateLightingSection();
+  this->RequestRenderWindowUpdate();
 }
 
 void QmitkVolumeVisualizationV2View::RenderWindowPartActivated(mitk::IRenderWindowPart *)

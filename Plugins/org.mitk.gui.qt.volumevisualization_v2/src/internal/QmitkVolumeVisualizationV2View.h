@@ -118,11 +118,26 @@ private:
   /** \brief Bring the 3D window's light rig into line with what is drawn there.
    *
    * The rig belongs to the window, so it follows the volumes rendered in it and
-   * falls back to the rig chosen in that window's own menu when none is. This
-   * view is deliberately not part of that rule: opening or closing it changes
-   * nothing about how the scene is lit.
+   * falls back to the rig chosen in that window's own menu when none is.
+   * Closing this view restores nothing: the rig stays whatever the window and
+   * its volumes last made it. See AdoptWindowLightingMode for what opening the
+   * view does when the two disagree.
    */
   void UpdateLightingRig();
+
+  /** \brief Move the lit volumes onto the model for the 3D window's rig, unless
+   *         the window is on Default lighting.
+   *
+   * The menu can switch the rig while this view is closed, and then nothing
+   * moves the volumes along with it. Without this, reopening the view would let
+   * the volumes put their old rig back and undo the user's choice.
+   *
+   * Only volumes on another model are moved; one already on it keeps the values
+   * tuned for it by hand. Default lighting is left to the volumes to override:
+   * every window starts on it, so it does not tell a choice from an untouched
+   * window, and volumes are steered away from it anyway.
+   */
+  void AdoptWindowLightingMode();
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;

@@ -311,7 +311,9 @@ namespace mitk
    * \brief Whether the path is rooted in a functional-group sequence.
    *
    * True for a first node naming (5200,9229) Shared Functional Groups Sequence
-   * or (5200,9230) Per-Frame Functional Groups Sequence.
+   * or (5200,9230) Per-Frame Functional Groups Sequence that is followed by at
+   * least one further node. A bare functional-group sequence names no attribute
+   * inside a frame, so it is not rooted.
    */
   MITKDICOM_EXPORT bool IsFunctionalGroupRooted(const DICOMTagPath& tagPath);
 

@@ -597,11 +597,13 @@ bool mitk::DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(
 
     mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo, layout );
 
-    // Should never fire: a frame-model file gets a block of its own, so its
-    // frame count is its slice count. It is kept because the alternative to an
-    // unreachable check here is a silently wrong image. Gated on the frame
-    // model because a plain multi-frame object (RT dose, NM, SC, US)
-    // legitimately has one frame info and N slices.
+    // Should never fire: a frame-model file with more than one frame gets a
+    // block of its own, so its frame count is its slice count, and a
+    // single-frame one contributes one frame and one slice to a multi-file
+    // block. It is kept because the alternative to an unreachable check here
+    // is a silently wrong image. Gated on the frame model because a plain
+    // multi-frame object (RT dose, NM, SC, US) legitimately has one frame info
+    // and N slices.
     if ( mitkImage.IsNotNull() && blockHasFrameModel
          && mitkImage->GetDimension( 2 ) != frames.size() )
     {

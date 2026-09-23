@@ -60,7 +60,7 @@ namespace mitk
       GantryTiltDifference,       ///< Split because the gantry tilts of at least two input files differ.
       SliceDistanceInconsistency, ///< Split because slice distances are inconsistent (heterogeneous z-spacing or missing slices). Details contain the detected inconsistency value.
       MissingSlices,              ///< Split due to missing slices (a sub-class of SliceDistanceInconsistency). Details contain the assumed number of missing slices.
-      MultiFrameFileSeparated,    ///< A multi-frame file with per-frame functional groups cannot be combined with another file in one volume, so it was given a volume of its own. Details contain the number of volumes the sorted block became. This is the expected path, not an error.
+      MultiFrameFileSeparated,    ///< A file with per-frame functional groups for more than one frame cannot be combined with another file in one volume, so each such file was given a volume of its own and the remaining files share one. Every volume the sorted block became carries this reason. Details contain the number of those volumes. This is the expected path, not an error.
       FrameCountMismatch          ///< The number of loaded slices does not match the number of frames the block describes. Details contain both counts.
     };
 

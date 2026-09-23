@@ -115,10 +115,13 @@ remains a consumer concern.
    reports it as an informational finding.
  - Geometry comes from GDCM. An object whose frames are not stored in spatial
    order keeps GDCM's unit-spacing fallback.
- - A file with a frame model is never combined with another file in one block,
-   because ITK's multi-file branch sets the moving dimension to the file count
-   and would keep one frame per file. Such a block is separated into one volume
-   per file, each flagged mitk::IOVolumeSplitReason::ReasonType::MultiFrameFileSeparated.
+ - A file whose frame model describes more than one frame is never combined
+   with another file in one block, because ITK's multi-file branch sets the
+   moving dimension to the file count and would keep one frame per file. Such a
+   block is separated into one volume per such file plus one for the remaining
+   files, each flagged mitk::IOVolumeSplitReason::ReasonType::MultiFrameFileSeparated.
+   A single-frame file with a frame model is not separated, since one frame per
+   file is all it has; it stacks with the other files of its series.
    Note that a conformant functional-group object carries Image Position
    (Patient) in the Plane Position macro and nothing at the top level, so the
    sorters already give it a block of its own; the separation matters for

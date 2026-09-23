@@ -32,10 +32,12 @@ namespace mitk
    *
    * A functional-group attribute is registered by its path inside the macro,
    * e.g. (0028,9145)[*].(0028,1053). For an object with per-frame functional
-   * groups the reader finds it in the shared and the per-frame group and
-   * publishes it under that path with one value per slice. A path rooted in
-   * (5200,9229) or (5200,9230) is not supported: it yields no property for an
-   * object that the reader reads frame by frame.
+   * groups the DICOM image reader finds it in the shared and the per-frame
+   * group and publishes it under that path with one value per slice; readers
+   * that scan for themselves, such as the RT and SEG ones, find it only where
+   * it appears at the top level. A path rooted in (5200,9229) or (5200,9230)
+   * is not supported: it yields no property for an object that the reader
+   * reads frame by frame.
    */
   class MITKDICOM_EXPORT IDICOMTagsOfInterest
   {

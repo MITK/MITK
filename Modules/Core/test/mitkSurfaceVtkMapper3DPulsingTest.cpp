@@ -33,6 +33,10 @@ public:
     node->SetData(mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("ball.stl")));
     node->SetBoolProperty("pulsing", true);
 
+    // Translucent, like the surface of the 3D interpolation: the replacement then has to
+    // survive the depth peeling shader as well.
+    node->SetOpacity(0.5f);
+
     mitk::RenderingTestHelper renderingHelper(300, 300);
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();

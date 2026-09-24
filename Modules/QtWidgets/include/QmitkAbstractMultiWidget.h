@@ -126,11 +126,9 @@ public:
   /**
    * \brief Sets the interaction scheme for the multi widget.
    *
-   * The matching event configuration is applied to the interaction event
-   * handler even if the scheme is already the active one, since others
-   * replace that configuration temporarily. InteractionSchemeChanged() and
-   * NotifyCrosshairRotationModeChanged() are emitted only when the scheme
-   * actually changes.
+   * Applies the matching event configuration to the interaction event handler
+   * and emits InteractionSchemeChanged() and NotifyCrosshairRotationModeChanged().
+   * Does nothing if the scheme is already the active one.
    *
    * \param[in] scheme The interaction scheme to use.
    */

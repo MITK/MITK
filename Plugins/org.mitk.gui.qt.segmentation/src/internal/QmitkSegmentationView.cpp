@@ -840,6 +840,9 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     return;
   }
 
+  // Re-enables the tool boxes that RenderWindowPartDeactivated() disabled.
+  this->UpdateControlsOnLabelChanges();
+
   if (nullptr != m_RenderWindowPart)
   {
     auto all2DWindows = Get2DWindows(m_RenderWindowPart->GetQmitkRenderWindows().values());
@@ -863,6 +866,11 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   {
     m_Parent->setEnabled(false);
   }
+
+  // Disabling the parent does not reach the tool boxes, as QWidget::setEnabled()
+  // is not virtual. Disabled boxes deactivate the active tool.
+  m_Controls->toolSelectionBox2D->setEnabled(false);
+  m_Controls->toolSelectionBox3D->setEnabled(false);
 
   // remove message-connection to make sure no message is processed if no render window part is available
   m_ToolManager->ActiveToolChanged -=

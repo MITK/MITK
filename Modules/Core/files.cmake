@@ -281,6 +281,7 @@ set(CPP_FILES
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
   Interactions/mitkEventStateMachine.cpp
+  Interactions/mitkExclusiveInteraction.cpp
   Interactions/mitkInteractionEvent.cpp
   Interactions/mitkInteractionEventConst.cpp
   Interactions/mitkInteractionEventHandler.cpp
@@ -401,7 +402,6 @@ set(RESOURCE_FILES
   Interactions/DisplayConfigPACSScroll.xml
   Interactions/DisplayConfigPACSZoom.xml
   Interactions/DisplayConfigPACSLevelWindow.xml
-  Interactions/DisplayConfigBlockLMB.xml
   Interactions/PointSet.xml
   Interactions/PointSetConfig.xml
   Interactions/PointSetConfigLMB.xml

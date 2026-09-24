@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkMAPRegistrationWrapper.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkRegistrationManipulationInteractor.h>
 #include <itkEuler3DTransform.h>
 
@@ -163,14 +164,12 @@ private:
 
   void ConfigureTransformCenter(int centerType);
 
-  /** Activates the mouse interaction tool: creates the interactor, suppresses the
-   *  conflicting default display interactions, connects observers, and pushes the
-   *  manipulation cursor. */
+  /** Activates the mouse interaction tool: creates the interactor, connects
+   *  observers, and pushes the manipulation cursor. */
   void ActivateInteractionTool();
 
   /** Deactivates the mouse interaction tool: pops the manipulation cursor, removes
-   *  observers, restores the default display interactions, and releases the
-   *  interactor. */
+   *  observers, and releases the interactor. */
   void DeactivateInteractionTool();
 
   /** Creates or updates the on-screen center-of-rotation indicator (a yellow
@@ -229,6 +228,7 @@ private:
   mitk::RegistrationManipulationInteractor::Pointer m_Interactor;
   mitk::DataNode::Pointer m_CenterOfRotationIndicatorNode;
   bool m_InteractionToolActive = false;
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
 
   // 3D preview members
   mitk::DataNode::Pointer m_3DPreviewCloneNode;

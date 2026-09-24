@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitknnInteractiveToolGUI_h
 
 #include <QmitkSegWithPreviewToolGUIBase.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkIPreferences.h>
 #include <mitkLabelSetImage.h>
 #include <mitknnInteractiveTool.h>
@@ -432,6 +433,10 @@ private:
   QButtonGroup* m_PromptTypeButtonGroup;
   PromptType m_PromptType;
   std::unordered_map<InteractionType, QPushButton*> m_InteractorButtons;
+
+  // Active while an interactor button is checked, so a revocation only switches
+  // off the prompt and keeps the session.
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
 
   std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_AutoCreatedLabelValue;
   std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_PreviousActiveLabelValue;

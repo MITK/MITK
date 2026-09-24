@@ -10,6 +10,7 @@ set(MODULE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp #new cpp unit style
   mitkToolInteractionTest.cpp
   mitkToolCanHandleTest.cpp
+  mitkToolManagerExclusiveInteractionTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

@@ -42,6 +42,12 @@ built the same way; single-frame instances of them included), the reader creates
 one mitk::DICOMImageFrameInfo per frame, with FrameNo the stored frame index.
 Files remain the unit of sorting and frames are never reordered.
 
+All of this section presumes that the reader analyzes with a tag cache that
+holds the frame model: one from a mitk::DICOMDCMTKTagScanner with
+SetReadFrameModel(true), handed over via SetTagCache, as
+mitk::AnalyzeWithFrameModel does. A reader that scans for itself reads every
+file with the one-frame model of a classic object.
+
 An attribute inside a functional group appears as one
 mitk::TemporoSpatialStringProperty per attribute, named by the path of the
 attribute relative to the functional-group item, with one value per (t, z)

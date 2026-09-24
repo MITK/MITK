@@ -26,8 +26,9 @@ namespace mitk
    * \brief Layout of one multi-frame file as far as the frame model needs it.
    *
    * Recorded by the scanner that parses the file and handed out by its tag
-   * cache. A cache that cannot look into sequences reports the default, which
-   * is the one-frame model every single-frame file has.
+   * cache. A cache that cannot look into sequences, or whose scanner was not
+   * asked to read the frame model, reports the default, which is the one-frame
+   * model every single-frame file has.
    *
    * \sa DICOMTagCache::GetFrameLayout, DICOMDCMTKTagScanner
    */
@@ -40,7 +41,8 @@ namespace mitk
       double intercept = 0.0;
     };
 
-    /** (0028,0008) Number of Frames; 1 when the attribute is absent. */
+    /** (0028,0008) Number of Frames; 1 when the attribute is absent or the
+        frame model was not read. */
     unsigned int frameCount = 1;
 
     /** Number of items in (5200,9230); 0 when the sequence is absent. */

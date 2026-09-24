@@ -415,8 +415,16 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   auto* documentRow = new QHBoxLayout();
   documentRow->addWidget(new QLabel(tr("Layout:"), this));
 
+  // The text stays beside the icons: the row is where the layout document is
+  // handled, and naming the actions keeps them findable without a tooltip.
+  // The size the segmentation view's preset buttons use, so the two views'
+  // document actions look alike.
+  const QSize documentIconSize(20, 24);
   auto* presetButton = new QToolButton(this);
   presetButton->setText(tr("Presets"));
+  presetButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwLayout.svg")));
+  presetButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  presetButton->setIconSize(documentIconSize);
   presetButton->setToolTip(tr("Replace the current layout with one of the arrangements that ship "
                               "with MITK"));
   presetButton->setPopupMode(QToolButton::InstantPopup);
@@ -433,12 +441,20 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   auto* loadButton = new QToolButton(this);
   loadButton->setText(tr("Load..."));
+  loadButton->setIcon(QmitkIconTheme::GetIcon(
+    QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
+  loadButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  loadButton->setIconSize(documentIconSize);
   loadButton->setToolTip(tr("Replace the current layout with one read from a layout file"));
   connect(loadButton, &QToolButton::clicked, this, [this]() { m_LayoutSelection->RequestLoad(); });
   documentRow->addWidget(loadButton);
 
   auto* saveButton = new QToolButton(this);
   saveButton->setText(tr("Save..."));
+  saveButton->setIcon(QmitkIconTheme::GetIcon(
+    QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  saveButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  saveButton->setIconSize(documentIconSize);
   saveButton->setToolTip(tr("Write the current layout - the window arrangement and its "
                             "synchronization groups - to a layout file"));
   connect(saveButton, &QToolButton::clicked, this, [this]() { m_LayoutSelection->RequestSave(); });

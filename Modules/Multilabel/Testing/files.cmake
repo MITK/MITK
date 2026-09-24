@@ -11,6 +11,7 @@ set(MODULE_TESTS
     mitkMultiLabelSegmentationIOTest.cpp
     mitkMultiLabelSegmentationStackReaderTest.cpp
     mitkMultiLabelSegmentationStackWriterTest.cpp
+    mitkMultiLabelSurfaceExtractionSchedulerTest.cpp
     mitkMultiLabelSurfaceNetsExtractorTest.cpp
     mitkSegSourceImageRelationRoundTripTest.cpp
     mitkSegSourceImageRelationRuleTest.cpp

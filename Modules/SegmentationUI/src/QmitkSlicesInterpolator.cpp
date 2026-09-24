@@ -77,7 +77,10 @@ namespace
 {
   mitk::IPreferences* GetSegmentationPreferences()
   {
-    return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    // Absent outside the Workbench.
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto* systemPreferences = nullptr != preferencesService ? preferencesService->GetSystemPreferences() : nullptr;
+    return nullptr != systemPreferences ? systemPreferences->Node("/org.mitk.views.segmentation") : nullptr;
   }
 
   template <typename T = mitk::BaseData>
@@ -1265,7 +1268,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   // The 3D rendering of the segmentation shows the result already, so the surface is kept as
   // a node of its own only on request.
-  if (!GetSegmentationPreferences()->GetBool("add 3D interpolation mesh", false))
+  const auto* preferences = GetSegmentationPreferences();
+
+  if (nullptr == preferences || !preferences->GetBool("add 3D interpolation mesh", false))
     return;
 
   mitk::TimeBounds timeBounds;

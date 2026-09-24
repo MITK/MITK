@@ -159,17 +159,17 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
 
   const auto labelValues = image->GetAllLabelValues();
 
-  mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_LABELS_HIGHLIGHTED()));
-  const auto highlightedLabelValues = prop.IsNotNull() ? prop->GetValue() : std::vector<int>({});
+  const auto* prop = dynamic_cast<const mitk::IntVectorProperty*>(node->GetProperty(LabelHighlightGuard::PROPERTY_NAME_LABELS_HIGHLIGHTED(), nullptr, false));
+  const auto highlightedLabelValues = nullptr != prop ? prop->GetValue() : std::vector<int>{};
   auto highlightEnd = highlightedLabelValues.cend();
 
-  mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
-  const bool highlightInvisibleLabels = boolProp.IsNull() ? false : boolProp->GetValue();
+  const auto* boolProp = dynamic_cast<const mitk::BoolProperty*>(node->GetProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE(), nullptr, false));
+  const bool highlightInvisibleLabels = nullptr != boolProp && boolProp->GetValue();
   const bool highlightingActive = !highlightedLabelValues.empty();
   localStorage->m_UseFadedPipeline = highlightingActive;
 
-  mitk::IntVectorProperty::Pointer hiddenProp = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(PROPERTY_NAME_3D_HIDDEN_LABELS()));
-  const auto hiddenLabelValues = hiddenProp.IsNotNull() ? hiddenProp->GetValue() : std::vector<int>({});
+  const auto* hiddenProp = dynamic_cast<const mitk::IntVectorProperty*>(node->GetProperty(PROPERTY_NAME_3D_HIDDEN_LABELS(), nullptr, false));
+  const auto hiddenLabelValues = nullptr != hiddenProp ? hiddenProp->GetValue() : std::vector<int>{};
 
   float nodeOpacity = 1.0f;
   node->GetFloatProperty("opacity", nodeOpacity);
@@ -504,12 +504,16 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
     localStorage->m_LastGenerateTime.Modified();
   }
 
-  // Set on every render: it is cheap, and a geometry-only edit may leave the MTime of the
-  // segmentation unchanged, which would keep the check above closed.
+  // Checked on every render: a geometry-only edit may leave the MTime of the segmentation
+  // unchanged, which would keep the check above closed. Set only on a change, as setting
+  // it modifies the actor.
   const auto imageToWorld = MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(segmentation->GetGeometry());
   for (auto& [groupImage, pipeline] : localStorage->m_GroupPipelines)
   {
-    pipeline->m_Actor->SetUserMatrix(imageToWorld);
+    const auto* current = pipeline->m_Actor->GetUserMatrix();
+
+    if (nullptr == current || !std::equal(current->GetData(), current->GetData() + 16, imageToWorld->GetData()))
+      pipeline->m_Actor->SetUserMatrix(imageToWorld);
   }
 }
 

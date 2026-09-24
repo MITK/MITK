@@ -369,14 +369,14 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage*
 
     const auto wanted = Scheduler::Stamp::Of(groupImage, timeStep, smoothed);
 
-    ShowIfBetter(pipeline, m_Scheduler->GetResult(groupImage), wanted);
+    ShowIfBetter(pipeline, m_Scheduler->GetResult(groupImage, timeStep, smoothed), wanted);
 
     if (pipeline.m_Shown != wanted)
     {
       m_Scheduler->Request(groupImage, timeStep, smoothed, segmentation->GetLabelValuesByGroup(groupID));
 
       // Without a thread that owns the data storage, the extraction has already happened.
-      ShowIfBetter(pipeline, m_Scheduler->GetResult(groupImage), wanted);
+      ShowIfBetter(pipeline, m_Scheduler->GetResult(groupImage, timeStep, smoothed), wanted);
     }
 
     hasPendingExtractions = hasPendingExtractions || pipeline.m_Shown != wanted;

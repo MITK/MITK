@@ -36,6 +36,9 @@ namespace
 {
   using Scheduler = mitk::MultiLabelSurfaceExtractionScheduler;
 
+  // A group image and a smoothing.
+  using QueueEntry = std::pair<const mitk::Image*, bool>;
+
   // Keeps alive what the worker reads, and is released on the thread that owns the data
   // storage, since releasing an image notifies its observers. The image is declared first so
   // that it is destroyed last: the VTK accessors of the volume refer back to it from their
@@ -61,11 +64,44 @@ namespace
     Scheduler::Stamp m_Stamp;
   };
 
+  // Queued jobs and results are kept per smoothing, which renderers may want differently. Not
+  // per time step, which renderers share: while scrubbing through time, only the time step
+  // arrived at is to wait for the worker.
   struct Group
   {
-    std::optional<Job> m_Queued;
+    std::map<bool, Job> m_Queued;
     std::optional<RunningJob> m_Running;
-    std::optional<Scheduler::Result> m_Result;
+
+    // All from the same data, see Store().
+    std::map<bool, Scheduler::Result> m_Results;
+
+    // Whether the stamp is being extracted or has been.
+    bool IsCovered(const Scheduler::Stamp& stamp) const
+    {
+      if (m_Running.has_value() && m_Running->m_Stamp == stamp)
+        return true;
+
+      const auto found = m_Results.find(stamp.m_Smoothed);
+      return found != m_Results.end() && found->second.m_Stamp == stamp;
+    }
+
+    // Keeps only the results of the newest data: a result from older data than a kept one is
+    // dropped, and one from newer data drops the kept ones.
+    void Store(Scheduler::Result result)
+    {
+      const auto dataMTime = result.m_Stamp.m_DataMTime;
+
+      const bool outdated = std::any_of(m_Results.cbegin(), m_Results.cend(),
+        [dataMTime](const auto& entry) { return entry.second.m_Stamp.m_DataMTime > dataMTime; });
+
+      if (outdated)
+        return;
+
+      std::erase_if(m_Results,
+        [dataMTime](const auto& entry) { return entry.second.m_Stamp.m_DataMTime < dataMTime; });
+
+      m_Results.insert_or_assign(result.m_Stamp.m_Smoothed, std::move(result));
+    }
   };
 
   bool HasStorageThread()
@@ -114,12 +150,6 @@ namespace
 
     return vtkSmartPointer<vtkPolyData>::New();
   }
-
-  bool IsCovered(const Group& group, const Scheduler::Stamp& stamp)
-  {
-    return (group.m_Running.has_value() && group.m_Running->m_Stamp == stamp) ||
-      (group.m_Result.has_value() && group.m_Result->m_Stamp == stamp);
-  }
 }
 
 // Shared with the threads, so that it outlives a scheduler whose worker is still extracting.
@@ -130,14 +160,17 @@ struct mitk::MultiLabelSurfaceExtractionScheduler::Shared
 
   std::map<const Image*, Group> m_Groups;
 
-  // Groups with a queued job, the longest waiting first.
-  std::deque<const Image*> m_Queue;
+  // Groups and smoothings with a queued job, the longest waiting first.
+  std::deque<QueueEntry> m_Queue;
 
   std::uint64_t m_LastJobId = 0;
   bool m_Extracting = false;
   bool m_Stop = false;
 
   static void Work(std::shared_ptr<Shared> shared);
+
+  // Removes what is queued for the smoothing, if anything, for the caller to release.
+  std::optional<Job> Unqueue(const Image* groupImage, Group& group, bool smoothed);
 };
 
 void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Shared> shared)
@@ -153,11 +186,13 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Sh
     if (shared->m_Stop)
       return;
 
-    const auto* key = shared->m_Queue.front();
+    const auto [key, smoothed] = shared->m_Queue.front();
     shared->m_Queue.pop_front();
 
     auto& group = shared->m_Groups.at(key);
-    auto job = std::move(*std::exchange(group.m_Queued, std::nullopt));
+    const auto queued = group.m_Queued.find(smoothed);
+    auto job = std::move(queued->second);
+    group.m_Queued.erase(queued);
     group.m_Running = RunningJob{ job.m_Id, job.m_Stamp };
     shared->m_Extracting = true;
 
@@ -175,7 +210,7 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Sh
       found != shared->m_Groups.end() && found->second.m_Running.has_value() && found->second.m_Running->m_Id == job.m_Id)
     {
       found->second.m_Running.reset();
-      found->second.m_Result = Result{ surface, job.m_Stamp };
+      found->second.Store(Result{ surface, job.m_Stamp });
     }
 
     lock.unlock();
@@ -186,6 +221,21 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Sh
 
     lock.lock();
   }
+}
+
+std::optional<Job> mitk::MultiLabelSurfaceExtractionScheduler::Shared::Unqueue(const Image* groupImage, Group& group,
+  bool smoothed)
+{
+  const auto queued = group.m_Queued.find(smoothed);
+
+  if (queued == group.m_Queued.end())
+    return std::nullopt;
+
+  std::optional<Job> job = std::move(queued->second);
+  group.m_Queued.erase(queued);
+  std::erase(m_Queue, QueueEntry{ groupImage, smoothed });
+
+  return job;
 }
 
 mitk::MultiLabelSurfaceExtractionScheduler::Stamp mitk::MultiLabelSurfaceExtractionScheduler::Stamp::Of(
@@ -246,13 +296,14 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Request(const Image* groupImage
     {
       auto& group = found->second;
 
-      if (group.m_Queued.has_value() && group.m_Queued->m_Stamp == stamp)
+      if (auto queued = group.m_Queued.find(smoothed); queued != group.m_Queued.end() && queued->second.m_Stamp == stamp)
         return;
 
-      if (IsCovered(group, stamp))
+      if (group.IsCovered(stamp))
       {
-        replaced = std::exchange(group.m_Queued, std::nullopt);
-        std::erase(m_Shared->m_Queue, groupImage);
+        // Whatever is still queued for the smoothing was asked for before, and is no longer
+        // wanted.
+        replaced = m_Shared->Unqueue(groupImage, group, smoothed);
         return;
       }
     }
@@ -268,12 +319,11 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Request(const Image* groupImage
     std::lock_guard lock(m_Shared->m_Mutex);
 
     auto& group = m_Shared->m_Groups[groupImage];
-    replaced = std::exchange(group.m_Queued, std::nullopt);
-    std::erase(m_Shared->m_Queue, groupImage);
+    replaced = m_Shared->Unqueue(groupImage, group, smoothed);
 
     // Newer than whatever may still be running.
     group.m_Running.reset();
-    group.m_Result = Result{ surface, stamp };
+    group.Store(Result{ surface, stamp });
 
     return;
   }
@@ -288,17 +338,24 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Request(const Image* groupImage
 
     auto& group = m_Shared->m_Groups[groupImage];
 
-    if (!group.m_Queued.has_value())
-      m_Shared->m_Queue.push_back(groupImage);
-
-    replaced = std::exchange(group.m_Queued, std::move(job));
+    // A replaced job keeps its place in the queue.
+    if (auto queued = group.m_Queued.find(smoothed); queued != group.m_Queued.end())
+    {
+      replaced = std::move(queued->second);
+      queued->second = std::move(job);
+    }
+    else
+    {
+      m_Shared->m_Queue.push_back({ groupImage, smoothed });
+      group.m_Queued.emplace(smoothed, std::move(job));
+    }
   }
 
   m_Shared->m_Wake.notify_all();
 }
 
 std::optional<mitk::MultiLabelSurfaceExtractionScheduler::Result> mitk::MultiLabelSurfaceExtractionScheduler::GetResult(
-  const Image* groupImage) const
+  const Image* groupImage, TimeStepType timeStep, bool smoothed) const
 {
   std::lock_guard lock(m_Shared->m_Mutex);
 
@@ -307,7 +364,15 @@ std::optional<mitk::MultiLabelSurfaceExtractionScheduler::Result> mitk::MultiLab
   if (found == m_Shared->m_Groups.end())
     return std::nullopt;
 
-  return found->second.m_Result;
+  const auto& results = found->second.m_Results;
+
+  for (const bool preferred : { smoothed, !smoothed })
+  {
+    if (const auto result = results.find(preferred); result != results.end() && result->second.m_Stamp.m_TimeStep == timeStep)
+      return result->second;
+  }
+
+  return std::nullopt;
 }
 
 bool mitk::MultiLabelSurfaceExtractionScheduler::IsPending(const Image* groupImage) const
@@ -316,7 +381,7 @@ bool mitk::MultiLabelSurfaceExtractionScheduler::IsPending(const Image* groupIma
 
   const auto found = m_Shared->m_Groups.find(groupImage);
 
-  return found != m_Shared->m_Groups.end() && (found->second.m_Queued.has_value() || found->second.m_Running.has_value());
+  return found != m_Shared->m_Groups.end() && (!found->second.m_Queued.empty() || found->second.m_Running.has_value());
 }
 
 void mitk::MultiLabelSurfaceExtractionScheduler::Forget(const Image* groupImage)
@@ -333,5 +398,5 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Forget(const Image* groupImage)
 
   forgotten = std::move(found->second);
   m_Shared->m_Groups.erase(found);
-  std::erase(m_Shared->m_Queue, groupImage);
+  std::erase_if(m_Shared->m_Queue, [groupImage](const QueueEntry& entry) { return entry.first == groupImage; });
 }

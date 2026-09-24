@@ -35,10 +35,12 @@ namespace mitk
    * renderers share the results. Exported only for the tests.
    *
    * Where a thread owns the data storage, as in the Workbench, Request() queues the extraction
-   * for a worker and returns at once. Per group, only the latest request waits, and only the
-   * last finished extraction is kept. When one finishes, the 3D windows are asked to render
-   * again. Without such a thread, as in a command line tool or a test, Request() extracts
-   * right away.
+   * for a worker and returns at once. Per group and smoothing, only the latest request waits,
+   * and only the last finished extraction is kept; a result from newer data drops those from
+   * older data. Renderers may thus ask for different smoothings of one group without
+   * displacing each other. They are expected to share the time step. When an extraction
+   * finishes, the 3D windows are asked to render again. Without such a thread, as in a command
+   * line tool or a test, Request() extracts right away.
    *
    * The worker reads the group image without a lock, unlike other work off the storage thread
    * (see ImageVtkReadView): with a read lock, every brush stroke would wait for the extraction.
@@ -88,9 +90,9 @@ namespace mitk
     /**
      * \brief Ask for the surface of a group image as it is now.
      *
-     * Only the latest request per group waits for the worker: this one replaces what is
-     * queued, or clears it if an extraction with the same stamp is already running or
-     * finished.
+     * Only the latest request per group and smoothing waits for the worker: this one replaces
+     * what is queued for them, or clears it if an extraction with the same stamp is already
+     * running or finished.
      *
      * \param[in] groupImage The group image, which also identifies the group.
      * \param[in] timeStep The time step to extract.
@@ -102,17 +104,23 @@ namespace mitk
     void Request(const Image* groupImage, TimeStepType timeStep, bool smoothed,
       const std::vector<LabelValueType>& labelValues);
 
-    /** \brief The last finished extraction of a group image, if any. */
-    std::optional<Result> GetResult(const Image* groupImage) const;
+    /**
+     * \brief The finished extraction of a time step of a group image that fits best, if any.
+     *
+     * All kept results are from the same data. Among those of the time step, the one with
+     * the given smoothing is preferred, so that painting shows progress even before the
+     * wanted smoothing has arrived.
+     */
+    std::optional<Result> GetResult(const Image* groupImage, TimeStepType timeStep, bool smoothed) const;
 
     /** \brief Whether an extraction of a group image is queued or running. */
     bool IsPending(const Image* groupImage) const;
 
     /**
-     * \brief Drop what is queued for a group image, and its result.
+     * \brief Drop what is queued for a group image, and its results.
      *
      * A running extraction of it is discarded when it finishes. Call this when a group goes
-     * away: its result would otherwise stay alive, and be found for a new image at the same
+     * away: its results would otherwise stay alive, and be found for a new image at the same
      * address.
      */
     void Forget(const Image* groupImage);

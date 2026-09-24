@@ -1156,7 +1156,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   // Pointing at an axis in one cell's barcode asks a question about the whole
   // layout, so the strip only reports and the editor answers in every cell.
-  // The strip also says whose barcode it is, so arrange mode can ring the
+  // The strip also says whose barcode it is, so arrange mode can mark the
   // cells sharing that cell's synchronization on the pointed-at axis.
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncPeekHovered, this,
           [this, id](bool overStrip, std::optional<QmitkMxNSyncAxis> axis)

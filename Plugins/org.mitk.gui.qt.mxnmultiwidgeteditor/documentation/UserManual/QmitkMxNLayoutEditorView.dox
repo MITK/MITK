@@ -14,9 +14,12 @@
 	As a dockable view it stays open during review sessions and doubles as a live
 	legend of the current coupling.
 
-	The window map is the permanent canvas. Below it, the synchronization side has two
-	faces on their own tabs: <b>Sync groups</b>, the group cards used for everyday
-	work, and <b>Advanced</b>, the per-window link matrix. Only one is up at a time.
+	The windows themselves are arranged where they are, in the display: while the view is
+	visible, every window shows its sync plate, and the plates are where windows are
+	selected and assigned (see \ref org_mitk_views_mxnlayouteditor_Arrange). In the view,
+	the synchronization side has two faces on their own tabs: <b>Sync groups</b>, the
+	group cards used for everyday work, and <b>Advanced</b>, the per-window link matrix.
+	Only one is up at a time.
 
 \section org_mitk_views_mxnlayouteditor_Layout The layout row
 	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
@@ -33,50 +36,83 @@
 	current synchronization groups, so the view asks for confirmation first unless the
 	layout is still the trivial default.
 
-	The grid of the arrangement is edited below the window map: the row and column
-	buttons add or remove a trailing row or column in place, which leaves the existing
-	windows and their settings untouched, while <b>Edit grid...</b> opens the picker for
-	a grid of a chosen size or for an arrangement derived from the loaded data.
+	The grid of the arrangement is edited in the row below: the row and column buttons
+	add or remove a trailing row or column in place, which leaves the existing windows
+	and their settings untouched, while <b>Edit grid...</b> opens the picker for a grid of
+	a chosen size or for an arrangement derived from the loaded data.
 
-\section org_mitk_views_mxnlayouteditor_Map The window map
-	The window map mirrors the current layout: one tile per render window, carrying a
-	bar in its navigation group's color along its top edge (no bar marks windows whose
-	navigation dimensions belong to different groups). Selected tiles are tinted, which
-	keeps the tile edges free to carry group colors.
+\section org_mitk_views_mxnlayouteditor_Arrange Arranging the windows
+	While the MxN Layout Editor is visible, its MxN display is in <i>arrange mode</i>:
+	every window that has room for one shows its sync plate - the same plate that pointing
+	at a window's sync barcode brings up for a moment (see
+	\ref org_mitk_editors_mxnmultiwidget_Utility) - and keeps it up. Closing the view,
+	hiding it behind another view, or clicking the close button on a plate ends arrange
+	mode and takes the plates away. Each plate shows the window's eight synchronization
+	axes in the fixed order pan, zoom, slice, crosshair, orientation, windowing, LUT and
+	data selection, tinted with the hue of the group the window is linked to, and the
+	window's name.
 
-	Each tile shows the window's <b>sync barcode</b>: one glyph per dimension in a fixed
-	order (pan, zoom, slice, crosshair, orientation, windowing, LUT) plus the data
-	selection, tinted with the linked group's hue and left as a gap where the window is
-	not synchronized on that dimension. An axis the window sits at an offset on has its
-	box's upper-right corner filled in; only slice, zoom and pan can be offset, so the
-	mark stays rare. The sync peek writes the value itself, which a tile has no room
-	for. On a narrow tile the eight axes wrap into an even grid rather than shrink, so
-	the glyphs stay as large as the tile allows. Hovering one of the glyphs lights up every window that shares that
-	synchronization, which makes the coupling legible at a glance - and, while the
-	<b>Advanced</b> tab is up, marks the same windows on its matrix. Hovering a chip
-	there does the same in reverse, so the two surfaces answer as one.
+	Nothing else about the display changes. Only the plates themselves take the mouse:
+	scrolling, the crosshair, zoom and pan work everywhere else in the window exactly as
+	before, so a synchronization can be tried out the moment it is made.
+
+	Pointing at a glyph on a plate enlarges that axis on every plate, names it above the
+	row, and draws the frame of every window that shares this window's synchronization on
+	that axis bold in the group's hue - which windows belong together is visible at a
+	glance. The thin frames keep showing each window's group as always; only the bold ones
+	answer the axis you point at. Pointing at a glyph on a group card, a chip in the
+	<b>Advanced</b> matrix or a window's sync barcode does the same; the bold frames always
+	answer the last thing pointed at. A group card dragged over a window marks that
+	window's frame as the drop target.
 
 \subsection org_mitk_views_mxnlayouteditor_Selection Selecting windows
-	Selection follows the file-explorer model: a click selects the window clicked,
-	Ctrl-click toggles a single window, and Shift-click takes the range from the window
-	clicked last (Ctrl+Shift adds that range to the selection). A click on empty space
-	clears the selection. Selecting a window in the map also makes it the active one in
-	the display.
+	Selection follows the file-explorer model: a click on a plate selects that window,
+	Ctrl-click toggles a single window, and Shift-click takes every window in the rectangle
+	spanned from the window clicked last (Ctrl+Shift adds that range to the selection).
+	Clicking the only selected window again deselects it, and "Clear selection" in the
+	plate menu selects nothing. A selected window's plate is framed in the selection color.
+	The first selected window also becomes the active one in the display, and clicking a
+	window's image selects that window.
 
 \subsection org_mitk_views_mxnlayouteditor_Assign Assigning windows to a group
-	Selected windows join a group with "Add selected windows" from the group card's "..."
-	menu, by dragging the tiles onto the card, or by dragging the card onto a tile.
-	"Remove selected windows" in the same menu takes them out of the group again.
+	Selected windows join a group by dragging their plates onto the group card, by
+	dragging the card onto a window, with "Add to group" from the plate menu, or with "Add
+	selected windows" from the card's "..." menu. A card may be dropped anywhere on a
+	window, not only on its plate. Dropped on a selected window, it takes the whole
+	selection; dropped on any other, just that window. "Remove from group" in the plate
+	menu, or "Remove selected windows" in the card's menu, takes windows out again; the
+	plate menu lists every group the window is on, because a window can be linked to
+	different groups on different axes.
 
 	A drop can join in three ways. A plain drop <b>replaces</b>: the window leaves its
 	other groups and wholly joins the target. Holding <i>Alt</i> <b>merges</b>, keeping
 	the window's links on dimensions the target group does not cover. Holding
 	<i>Shift</i> <b>fills</b> only the dimensions on which the window is not yet
 	synchronized. Dragging with the right mouse button instead asks for the mode in a
-	menu when the drop happens.
+	menu when the drop happens. The plate menu's "Add to group" replaces, like a plain
+	drop.
 
 	A window that joins a group which does not synchronize anything yet gets the
 	navigation bundle (pan, zoom, slice, crosshair) as the common-case default.
+
+\subsection org_mitk_views_mxnlayouteditor_PlateButtons The plate buttons
+	The plate under the pointer carries two buttons in its top-right corner: the menu
+	button (three dots) opens the plate menu, which a right-click on the plate opens as
+	well, and the close button ends arrange mode.
+
+\subsection org_mitk_views_mxnlayouteditor_ArrangeLimits Limits
+	<ul>
+		<li> A window too small to hold a legible plate shows none, so it cannot be clicked
+			to select it. A group card can still be dropped onto it, and the <b>Advanced</b>
+			matrix reaches every window.
+		<li> While one window is maximized, only its plate is shown; the hidden windows can
+			be arranged once the grid is restored. The view warns about it while it is the
+			case.
+		<li> Clean view hides the rest of the window furniture, but not the plates and
+			the bold frames while the view is open.
+		<li> A plate covers the middle of its window. The image under it stays live, but
+			mouse interaction that starts on the plate goes to the plate.
+	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Groups Group cards
 	Each group card offers:
@@ -89,8 +125,8 @@
 			drawn dashed is linked for only some of them, and one with a filled upper
 			corner has at least one member sitting at an offset - the card speaks for
 			several windows, so it marks that a shift exists without saying whose. For
-			a group that has no windows yet, select windows in the map first and then
-			click an axis to add them.
+			a group that has no windows yet, clicking an axis only prepares which
+			dimensions the first windows assigned to it will get.
 		<li> The dimension checkboxes control the same links for all member windows;
 			"Link navigation" applies the pan, zoom, slice and crosshair bundle explicitly.
 		<li> "Re-converge" re-establishes reference + offset for the group's
@@ -113,7 +149,7 @@
 	This face exposes the complete layout-file link model, including couplings between
 	windows that are not adjacent on screen, and it is the deliberate way to author a
 	partial group state in which only some windows are linked on a dimension. Everyday
-	assignment is expected to happen in the map instead.
+	assignment is expected to happen on the plates instead.
 
 \subsection org_mitk_views_mxnlayouteditor_AdvancedEditing Editing the matrix
 	The matrix is read; the bar beneath it is where it is edited, so nothing ever covers
@@ -122,12 +158,12 @@
 	what applies to it.
 
 	When the selection is on a single dimension the bar carries that axis's glyph beside
-	its name, the same glyph the column header and the tiles use; a selection spanning
+	its name, the same glyph the column header and the plates use; a selection spanning
 	several dimensions shows none, because no one glyph would name it.
 
-	Selecting windows in the map above selects their rows here, and selecting cells here
-	selects those windows in the map. Hovering a chip marks every window sharing that
-	synchronization, here and on the map at once. Clicking an axis header takes that
+	Selecting windows on their plates selects their rows here, and selecting cells here
+	selects those windows on the plates. Hovering a chip marks every window sharing that
+	synchronization, here and in the display at once. Clicking an axis header takes that
 	whole column, clicking a window header that whole row, so linking every window on
 	one dimension, or unlinking one window entirely, is two gestures.
 

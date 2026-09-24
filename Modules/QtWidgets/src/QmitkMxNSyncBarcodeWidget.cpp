@@ -46,8 +46,8 @@ namespace
 
   /** The widget always renders one line: it lives in a chrome row or a group
    *  card header, where a second line would push the whole row taller. Only a
-   *  surface that paints the barcode into a rect of its own - the layout
-   *  editor's cell map - has the room to wrap. */
+   *  surface that paints the barcode into a rect of its own has the room to
+   *  wrap. */
   QmitkMxNSyncBarcodeWidget::BarcodeFit StripFit()
   {
     return { false, 0 };

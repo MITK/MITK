@@ -18,7 +18,6 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNGridOpsTest.cpp
   QmitkMxNNavLinksTest.cpp
   QmitkMxNLayoutEditorWidgetTest.cpp
-  QmitkMxNCellMapWidgetTest.cpp
   QmitkMxNArrangeModeTest.cpp
   QmitkMxNCellOverlayTest.cpp
   QmitkMxNNavigatorTest.cpp

@@ -40,6 +40,8 @@ namespace
   bool s_Parsed = false;
   QString s_Color;
   QString s_AccentColor;
+  QString s_SelectionColor;
+  QString s_WarningColor;
 
   QString ParseColor(const QString &subject, const QString &colorName, const QString &fallback)
   {
@@ -64,6 +66,15 @@ namespace
 
     s_Color = ParseColor(styleSheet, QStringLiteral("iconColor"), QStringLiteral("#000000"));
     s_AccentColor = ParseColor(styleSheet, QStringLiteral("iconAccentColor"), QStringLiteral("#ffffff"));
+    s_SelectionColor = ParseColor(styleSheet, QStringLiteral("selectionColor"), QString());
+
+    // Warnings already have a rule of their own, for rich text; reading it
+    // keeps the theme from stating the colour twice.
+    static const QRegularExpression warningRule(
+      QStringLiteral("font\\.warning\\s*\\{[^}]*?color\\s*:\\s*(#[0-9a-f]{6})"),
+      QRegularExpression::CaseInsensitiveOption);
+    const auto warning = warningRule.match(styleSheet);
+    s_WarningColor = warning.hasMatch() ? warning.captured(1) : QString();
     s_Parsed = true;
   }
 
@@ -269,15 +280,30 @@ QString QmitkIconTheme::GetAccentColor()
   return s_AccentColor;
 }
 
+QString QmitkIconTheme::GetSelectionColor()
+{
+  EnsureParsed();
+  return s_SelectionColor;
+}
+
+QString QmitkIconTheme::GetWarningColor()
+{
+  EnsureParsed();
+  return s_WarningColor;
+}
+
 void QmitkIconTheme::Refresh()
 {
   const auto color = s_Color;
   const auto accentColor = s_AccentColor;
+  const auto selectionColor = s_SelectionColor;
+  const auto warningColor = s_WarningColor;
 
   s_Parsed = false;
   EnsureParsed();
 
-  if (color == s_Color && accentColor == s_AccentColor)
+  if (color == s_Color && accentColor == s_AccentColor && selectionColor == s_SelectionColor
+      && warningColor == s_WarningColor)
     return;
 
   ++s_Generation;

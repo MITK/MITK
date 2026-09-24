@@ -176,7 +176,7 @@ public:
 
   void NormalizedRects_MirrorTheGrid()
   {
-    // These drive the layout editor's cell map. They come from the splitter
+    // These drive the arrange mode's Shift ranges. They come from the splitter
     // proportions rather than on-screen geometry precisely so they are right
     // without a layout pass - which is what this test relies on too.
     // A splitter has to have an extent before it can distribute one, so the

@@ -28,7 +28,6 @@ found in the LICENSE file.
 #include <iosfwd>
 #include <map>
 
-class QmitkMxNCellMapWidget;
 class QmitkMultiWidgetLayoutSelectionWidget;
 class QComboBox;
 class QDialog;
@@ -47,15 +46,15 @@ class QVBoxLayout;
  * cell arrangement (grid size, presets, save/load - the embedded layout
  * selection controls) and the per-dimension synchronization groups.
  *
- * An interactive cell map mirroring the live layout (tiles colored by
- * navigation group, with a per-dimension sync barcode) is the permanent
- * canvas. Below it, two mutually exclusive configuration faces share a tab
- * widget, so only one is up at a time and the map keeps its share of the
- * editor either way.
+ * The windows themselves are arranged in the display: while the hosting view
+ * is visible, the editor is in arrange mode (QmitkMxNArrangeMode) and every
+ * window's peek plate is where cells are selected and assigned. This widget
+ * follows that selection. Two mutually exclusive configuration faces share a
+ * tab widget, so only one is up at a time.
  *
  * "Sync groups" is the default face: one card per group (hue, editable
  * display name, dimension checkboxes, re-converge, geometry reinit). Cells
- * join a group by selecting tiles and clicking the card's assign button, or
+ * join a group by selecting them on their plates and using the card's menu, or
  * by drag and drop in either direction. Joining a group that synchronizes
  * nothing yet links the navigation bundle (pan/zoom/slice/crosshair) as the
  * common-case default.
@@ -134,13 +133,12 @@ public:
   void ApplySelectionToGroup(const std::string& group, bool enabled);
 
   /**
-   * \brief Handle an axis-glyph click on a group's header barcode. Three cases:
-   *        an empty group with no windows selected in the map toggles a per-group
-   *        intent cache (applied to the first windows assigned, then cleared) and
-   *        does not touch the engine; an empty group with a map selection
-   *        bootstraps - it links the selected windows on the axis; a non-empty
-   *        group homogenizes the axis over its members (link all / unlink all).
-   *        Public so tests can drive the axis interaction directly.
+   * \brief Handle an axis-glyph click on a group's header barcode. An empty
+   *        group toggles a per-group intent cache (applied to the first windows
+   *        assigned, then cleared) and does not touch the engine, whatever is
+   *        selected; a non-empty group homogenizes the axis over its members
+   *        (link all / unlink all). Public so tests can drive the axis
+   *        interaction directly.
    */
   void ToggleGroupAxis(const std::string& groupId, QmitkMxNSyncAxis axis);
 
@@ -241,10 +239,11 @@ public:
   bool HasNonTrivialSyncConfig() const;
 
   /**
-   * \brief Sync-highlight-on-hover. Resolve the cells sharing (group, axis) and
-   *        ring them in the cell map; ClearSyncHighlight removes the highlight.
+   * \brief Sync-highlight-on-hover. Resolve the cells sharing (group, axis),
+   *        mark them in the matrix and hand them to the arrange mode, which
+   *        bumps their frames in the display; ClearSyncHighlight removes the highlight.
    *        HighlightGroupAxis is driven by a group card's glyph hover;
-   *        HighlightCellAxis by a cell tile's glyph hover (it resolves the cell's
+   *        HighlightCellAxis by a window's glyph hover (it resolves the cell's
    *        group for that axis first - the per-dimension link, or the selection
    *        connector for the selection axis - then delegates, clearing when the
    *        cell syncs nothing there). Public so the resolution is testable
@@ -298,9 +297,16 @@ private:
    *         otherwise. */
   void UpdateGridButtons();
 
-  /** \brief Select the tile of the multi widget's active render window, so the
-   *         map mirrors the editor's focus. */
-  void SelectActiveWindowTile();
+  /** \brief Select the multi widget's active render window, so the selection
+   *         follows the editor's focus. */
+  void SelectActiveWindow();
+
+  /** \brief Say where windows are arranged, or why they cannot be while one
+   *         is maximized. */
+  void UpdateArrangeHint();
+
+  /** \brief The arrange mode's window selection; empty without a multi widget. */
+  QStringList SelectedWindowIds() const;
 
   void Rebuild();
 
@@ -344,8 +350,8 @@ private:
 
   /** \brief Mark the matrix cells of 'windowIds' in 'column' as sharing the
    *         hovered synchronization; a negative column clears the marking. Driven
-   *         from HighlightGroupAxis, so the map and the matrix always show the
-   *         same set. */
+   *         from HighlightGroupAxis, so the display's frames and the matrix always
+   *         show the same set. */
   void SetMatrixHighlight(const QStringList& windowIds, int column);
 
   /**
@@ -370,9 +376,9 @@ private:
    *         without travelling to the action bar. */
   void ShowMatrixGroupMenu(const QPoint& globalPos);
 
-  /** \brief Select the rows of 'windowIds' in the matrix, mirroring a map
+  /** \brief Select the rows of 'windowIds' in the matrix, mirroring the window
    *         selection. Guarded against the echo of its own mirroring. */
-  void MirrorMapSelectionToMatrix(const QStringList& windowIds);
+  void MirrorSelectionToMatrix(const QStringList& windowIds);
 
   /** \brief Whether the "Advanced" face is the raised tab. Independent of widget
    *         visibility, which a docked-away view would also report as false. */
@@ -428,7 +434,7 @@ private:
   QPointer<QmitkMxNMultiWidget> m_MultiWidget;
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelection;
-  QmitkMxNCellMapWidget* m_CellMap;
+  QLabel* m_ArrangeHint = nullptr;
   QVBoxLayout* m_GroupsLayout;    // card list inside the scrollable lower pane
   QTableWidget* m_Matrix;         // the advanced link matrix, inside m_MatrixPane
   QTabWidget* m_FacesTab = nullptr;     // hosts the "Sync groups" and "Advanced" faces
@@ -458,7 +464,7 @@ private:
   // a hover move repaints only what changes rather than the whole grid.
   std::vector<std::pair<int, int>> m_MatrixHighlighted;
 
-  // Guards the map <-> matrix selection mirroring against its own echo: each
+  // Guards the window <-> matrix selection mirroring against its own echo: each
   // side emits on change, so an unguarded round trip would widen a column
   // selection in the matrix back to whole rows.
   bool m_MirroringSelection = false;

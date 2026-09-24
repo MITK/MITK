@@ -266,6 +266,15 @@ public:
    *         for verification. */
   QRect PlateCloseButtonRect() const;
 
+  /** \brief The plate's menu button, left of the close button, valid under
+   *         the same condition. Exposed for verification. */
+  QRect PlateMenuButtonRect() const;
+
+  /** \brief Whether this cell's frame is bumped: arrange mode is on and the
+   *         cell shares the pointed-at synchronization, or a group drag hovers
+   *         it. Exposed for verification. */
+  bool IsArrangeFrameBumped() const;
+
 protected:
 
   void paintEvent(QPaintEvent* event) override;
@@ -282,6 +291,11 @@ protected:
 
   /** \brief A resize in arrange mode re-resolves the layout's shared glyph box. */
   void resizeEvent(QResizeEvent* event) override;
+
+  /** \brief The plate's menu and button tooltips while the plate is in the
+   *         mask and the overlay, not the render window, gets the pointer. */
+  void contextMenuEvent(QContextMenuEvent* event) override;
+  bool event(QEvent* event) override;
 
 private:
 
@@ -426,6 +440,27 @@ private:
 
   bool IsArranging() const;
 
+  /** \brief The cell frame, bumped to bold for a cell sharing the pointed-at
+   *         synchronization or targeted by a group drag; painted in clean view
+   *         too. */
+  void PaintArrangeFrame(QPainter& painter);
+
+  /** \brief The colour this theme marks selections with. */
+  QColor SelectionColor() const;
+
+  /** \brief The plate's menu: add the window (or the selection it belongs to)
+   *         to a group, remove it from one of the groups it is on, or clear the
+   *         selection. */
+  void OpenPlateMenu(const QPoint& globalPosition);
+
+  /** \brief A context-menu request at 'position' (overlay coordinates): opens
+   *         the plate menu for a click on the plate. Returns whether the plate
+   *         took the request. */
+  bool HandlePlateContextMenu(const QPoint& position, const QPoint& globalPosition);
+
+  /** \brief Show the tooltip of the plate button at 'position', if any. */
+  bool ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition);
+
   /**
   * \brief Arrange-mode input on the plate, from wherever it arrives: the render
   *        window's event filter while the overlay is mouse-transparent, the
@@ -452,9 +487,6 @@ private:
    *         left to propagate as if the cell accepted none. */
   bool HandleCellDrag(QEvent* event);
 
-  /** \brief The ring around a cell that shares the pointed-at synchronization,
-   *         inside the render window so the stylesheet frame stays visible. */
-  QRect ArrangeRingRect() const;
 
   /** \brief Coalesce VTK render-end notifications into one refresh per cycle. */
   void ScheduleValueRefresh();
@@ -555,6 +587,13 @@ private:
   bool m_PlateHovered = false;
   int m_PlateHoverAxis = -1;
   bool m_DropTarget = false;
+  enum class PlateButton
+  {
+    None,
+    Close,
+    Menu
+  };
+  PlateButton m_PlateHoverButton = PlateButton::None;
 
 };
 

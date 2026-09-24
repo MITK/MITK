@@ -319,7 +319,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("wide short strip shows glyphs", strip.mode == Layout::Mode::Glyphs);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("wide short strip stays a single row", 1, strip.rows);
 
-    // A squarer tile (the cell map) wraps the glyphs into a grid rather than
+    // A squarer host rect wraps the glyphs into a grid rather than
     // collapsing to color slots.
     const auto tile = QmitkMxNSyncBarcodeWidget::ComputeLayout(80, 80, slotCount);
     CPPUNIT_ASSERT_MESSAGE("square tile shows glyphs", tile.mode == Layout::Mode::Glyphs);

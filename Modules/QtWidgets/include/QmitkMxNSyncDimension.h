@@ -73,8 +73,8 @@ inline std::optional<QmitkMxNSyncDimension> QmitkMxNSyncDimensionFromLinkKey(con
 }
 
 /**
- * \brief The axes the MxN synchronization surfaces (barcodes, cell map,
- *        advanced matrix, sync peek) present: the seven synchronization
+ * \brief The axes the MxN synchronization surfaces (barcodes, advanced
+ *        matrix, sync peek plates) present: the seven synchronization
  *        dimensions followed by data selection, in slot order.
  */
 enum class QmitkMxNSyncAxis

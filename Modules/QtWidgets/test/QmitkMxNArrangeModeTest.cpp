@@ -51,6 +51,8 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
 
   MITK_TEST(PlainClick_SelectsOnlyTheClickedCell);
   MITK_TEST(PlainClick_CollapsesMultiSelectionToClickedCell);
+  MITK_TEST(PlainClick_OnTheSoleSelectedCellDeselectsIt);
+  MITK_TEST(ClearSelection_DropsTheAnchor);
   MITK_TEST(PlainPress_OnASelectedCellHoldsTheSelectionForADrag);
   MITK_TEST(CtrlClick_KeepsTheRestOfTheSelection);
   MITK_TEST(ShiftClick_ReplacesSelectionWithTheRange);
@@ -62,6 +64,7 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(ExternalSelection_KeepsTheAnchor);
   MITK_TEST(LayoutChange_PrunesRemovedCellsAndTheirAnchor);
   MITK_TEST(RequestAssign_TargetsTheSelectionOnlyWhenDroppedOnIt);
+  MITK_TEST(RequestRemove_FollowsTheSameTargetRule);
   MITK_TEST(DragPayload_CarriesTheSelectionAndTheAskModeMarker);
   MITK_TEST(Highlight_ASourceClearsOnlyItsOwn);
   MITK_TEST(JoinModeFromModifiers_MapsKeys);
@@ -70,7 +73,8 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(PlateInput_APressOnThePlateSelectsAndIsKeptFromVtk);
   MITK_TEST(PlateInput_APressOffThePlatePassesThrough);
   MITK_TEST(PlateInput_NothingIsTakenOutsideArrangeMode);
-  MITK_TEST(PlateInput_AnUnpaintedPlateTakesNothingInCleanView);
+  MITK_TEST(PlateInput_CleanViewKeepsThePlate);
+  MITK_TEST(PlateInput_TheMenuButtonSitsLeftOfTheCloseButton);
   MITK_TEST(PlateInput_PointingAtAGlyphRingsItsPartners);
   MITK_TEST(PlateInput_TheCloseButtonAsksToHideTheEditor);
   MITK_TEST(Drops_TheCellAcceptsDropsOnlyWhileArranging);
@@ -222,6 +226,33 @@ public:
                                  Ids({ 1 }), SelectionOf());
   }
 
+  void PlainClick_OnTheSoleSelectedCellDeselectsIt()
+  {
+    // Plates cover nothing but their own cell, so there is no empty space to
+    // click for "select nothing"; clicking the one selected plate again is it.
+    this->Click(4);
+    this->Click(4);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A second click on the only selected cell deselects it",
+                                 std::string(), SelectionOf());
+
+    this->Click(4);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("...and a third selects it again", Ids({ 4 }), SelectionOf());
+
+    this->Arrange()->PressCell(CellId(4), Qt::LeftButton, Qt::NoModifier);
+    this->Arrange()->ReleaseCell(true);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Dragging the sole selected cell keeps it selected", Ids({ 4 }), SelectionOf());
+  }
+
+  void ClearSelection_DropsTheAnchor()
+  {
+    this->Click(0);
+    this->Arrange()->ClearSelection();
+    CPPUNIT_ASSERT_EQUAL(std::string(), SelectionOf());
+
+    this->Click(4, Qt::ShiftModifier);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A cleared selection leaves no anchor to span from", Ids({ 4 }), SelectionOf());
+  }
+
   void PlainPress_OnASelectedCellHoldsTheSelectionForADrag()
   {
     this->Arrange()->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1), CellId(2) });
@@ -364,6 +395,21 @@ public:
                                  Ids({ 5 }), assigned[1].join(QLatin1Char(',')).toStdString());
   }
 
+  void RequestRemove_FollowsTheSameTargetRule()
+  {
+    std::vector<QStringList> removed;
+    QObject::connect(this->Arrange(), &QmitkMxNArrangeMode::RemoveRequested,
+                     [&removed](const QString&, const QStringList& windowIds) { removed.push_back(windowIds); });
+
+    this->Arrange()->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
+    this->Arrange()->RequestRemove(QStringLiteral("g"), CellId(0));
+    this->Arrange()->RequestRemove(QStringLiteral("g"), CellId(5));
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), removed.size());
+    CPPUNIT_ASSERT_EQUAL(Ids({ 0, 1 }), removed[0].join(QLatin1Char(',')).toStdString());
+    CPPUNIT_ASSERT_EQUAL(Ids({ 5 }), removed[1].join(QLatin1Char(',')).toStdString());
+  }
+
   void DragPayload_CarriesTheSelectionAndTheAskModeMarker()
   {
     this->Arrange()->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
@@ -480,17 +526,35 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string(), SelectionOf());
   }
 
-  void PlateInput_AnUnpaintedPlateTakesNothingInCleanView()
+  void PlateInput_CleanViewKeepsThePlate()
   {
+    // Clean view hides the furniture, not the arrangement: the plate stays up,
+    // is painted, and takes its clicks.
     this->ShowArranging();
     const QPoint onPlate = this->Overlay(1)->SyncPeekPlateRect().center();
     m_Editor->SetCleanView(true);
+    CPPUNIT_ASSERT(this->Overlay(1)->IsSyncPeekVisible());
 
-    CPPUNIT_ASSERT_MESSAGE("Clean view paints no plate, so its area belongs to VTK",
-                           !this->SendToRenderWindow(1, QEvent::MouseButtonPress, onPlate));
+    CPPUNIT_ASSERT_MESSAGE("A press on the plate is taken in clean view too",
+                           this->SendToRenderWindow(1, QEvent::MouseButtonPress, onPlate));
     this->SendToRenderWindow(1, QEvent::MouseButtonRelease, onPlate);
-    CPPUNIT_ASSERT_EQUAL(std::string(), SelectionOf());
+    CPPUNIT_ASSERT_EQUAL(Ids({ 1 }), SelectionOf());
     m_Editor->SetCleanView(false);
+  }
+
+  void PlateInput_TheMenuButtonSitsLeftOfTheCloseButton()
+  {
+    this->ShowArranging();
+    CPPUNIT_ASSERT(!this->Overlay(1)->PlateMenuButtonRect().isValid());
+    this->SendToRenderWindow(1, QEvent::MouseMove, this->Overlay(1)->SyncPeekPlateRect().center());
+
+    const QRect plate = this->Overlay(1)->SyncPeekPlateRect();
+    const QRect close = this->Overlay(1)->PlateCloseButtonRect();
+    const QRect menu = this->Overlay(1)->PlateMenuButtonRect();
+    CPPUNIT_ASSERT(menu.isValid());
+    CPPUNIT_ASSERT_MESSAGE("Both buttons lie on the plate", plate.contains(menu) && plate.contains(close));
+    CPPUNIT_ASSERT_MESSAGE("The menu button is left of the close button, apart from it",
+                           menu.right() < close.left() && menu.top() == close.top());
   }
 
   void PlateInput_PointingAtAGlyphRingsItsPartners()
@@ -515,6 +579,10 @@ public:
                                  Ids({ 0, 3 }), ringed.join(QLatin1Char(',')).toStdString());
     CPPUNIT_ASSERT_MESSAGE("...and emphasises the axis on every plate",
                            std::optional<QmitkMxNSyncAxis>(QmitkMxNSyncAxis::Slice) == this->Overlay(2)->SyncPeekAxis());
+    CPPUNIT_ASSERT_MESSAGE("The partners' frames are bumped",
+                           this->Overlay(0)->IsArrangeFrameBumped() && this->Overlay(3)->IsArrangeFrameBumped());
+    CPPUNIT_ASSERT_MESSAGE("...and nobody else's",
+                           !this->Overlay(1)->IsArrangeFrameBumped() && !this->Overlay(2)->IsArrangeFrameBumped());
 
     // Off the plate the plate's highlight goes.
     this->SendToRenderWindow(0, QEvent::MouseMove, this->Cell(0)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
@@ -573,6 +641,7 @@ public:
     QDragEnterEvent enter(QPoint(10, 10), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
     CPPUNIT_ASSERT(filter->eventFilter(this->Cell(4), &enter));
     CPPUNIT_ASSERT_MESSAGE("A group drag is accepted anywhere on the cell", enter.isAccepted());
+    CPPUNIT_ASSERT_MESSAGE("...and marks the cell's frame as the target", this->Overlay(4)->IsArrangeFrameBumped());
 
     this->Arrange()->SetSelectedWindowIds(QStringList{ CellId(4), CellId(5) });
     QDropEvent drop(QPointF(10, 10), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);

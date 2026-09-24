@@ -35,7 +35,7 @@
 			layout file, or saves the current layout. A saved layout carries the synchronization
 			groups as well as the window arrangement, so saving is also how a change made purely
 			on the synchronization side is kept.
-		<li> The grid controls below the window map add or remove a trailing row or column in
+		<li> The grid controls in the row below it add or remove a trailing row or column in
 			place, which leaves the existing window views and their settings untouched.
 		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
 			widget layout"), or for an arrangement derived from the loaded data ("Data-based
@@ -127,8 +127,7 @@
 		<li> Clean button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
 		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
 			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
-			linked group's hue and left empty where the window is not synchronized - the same
-			barcode the layout editor's window tiles carry. Pointing at one of its axis
+			linked group's hue and left empty where the window is not synchronized. Pointing at one of its axis
 			glyphs shows the sync peek described below; clicking it opens the MxN Layout
 			Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
 		<li> Maximize button: Give this window the whole editor area, and bring the other
@@ -161,7 +160,9 @@
 	Sliding along the row moves the emphasis as each glyph is reached and holds it over
 	the gaps in between, so the row does not flicker under the pointer. The plates stay
 	up for as long as the pointer is anywhere on the barcode and go away once it leaves
-	- nothing is pinned, and a single click still opens the layout editor.
+	- nothing is pinned, and a single click still opens the layout editor. While the
+	layout editor is open the plates stay up on their own and become the place where
+	windows are arranged (see \ref org_mitk_views_mxnlayouteditor_Arrange).
 
 	Any axis answers, including one the window you are pointing from does not
 	synchronize: that is a legitimate question about the other windows. Two limits are
@@ -284,7 +285,7 @@
 	editor" from a window view's context menu, or via <i>Window &rarr; Show View</i>. As a dockable view it stays
 	open during review sessions and doubles as a live legend of the current coupling.
 
-	Its own manual page describes the window map, the group cards and the advanced
+	Its own manual page describes arranging windows on their plates, the group cards and the advanced
 	link matrix: \ref org_mitk_views_mxnlayouteditor.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_WindowingOverlay Level/window and colormap overlay

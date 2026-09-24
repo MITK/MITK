@@ -86,7 +86,26 @@ public:
   static QString GetAccentColor();
 
   /**
-   * \brief Re-reads the icon colors from the application style sheet.
+   * \brief Returns the color the current theme marks selected items with, as
+   *        declared by its "selectionColor" line.
+   *
+   * A theme may style selections only through item-view rules, which widgets
+   * painting their own selection cannot read back; the declared line gives
+   * them the same color. Empty when the theme declares none, in which case
+   * the palette's highlight color is the one in use.
+   */
+  static QString GetSelectionColor();
+
+  /**
+   * \brief Returns the color of the current theme's warnings, as its
+   *        "font.warning" rule declares it for rich text. Widgets that cannot
+   *        use that rule (a plain label does not inherit it) read it here.
+   *        Empty when the theme declares none.
+   */
+  static QString GetWarningColor();
+
+  /**
+   * \brief Re-reads the theme colors from the application style sheet.
    *
    * If the colors changed, all icons created by GetIcon() re-render in the
    * new colors on their next repaint, and Changed() is emitted. Call this
@@ -96,7 +115,8 @@ public:
 
 Q_SIGNALS:
   /**
-   * \brief Emitted by Refresh() when the icon colors have changed.
+   * \brief Emitted by Refresh() when any of the theme colors (icon, accent,
+   *        selection or warning) has changed.
    */
   void Changed();
 

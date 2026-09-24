@@ -35,8 +35,8 @@ class QmitkMxNMultiWidget;
  *
  * Holds only arrangement state - on/off, the cell selection with its range
  * anchor, and the sync highlight - plus the rule for what a drop targets. The
- * engine mutation stays with whoever handles AssignRequested (the layout
- * editor). Interaction outside the plates is never affected.
+ * engine mutation stays with whoever handles AssignRequested and
+ * RemoveRequested (the layout editor). Interaction outside the plates is never affected.
  *
  * Several surfaces drive the highlight (a plate glyph, a cell's utility-strip
  * barcode, the layout editor's cards and matrix). The latest one to set it owns
@@ -70,10 +70,15 @@ public:
    *         when the selection changes. */
   void SetSelectedWindowIds(const QStringList& windowIds);
 
+  /** \brief Select nothing, as a user action: the range anchor goes too, so
+   *         the next Shift-click cannot span from a cell no longer marked. */
+  void ClearSelection();
+
   /**
    * \brief A press on 'windowId''s plate, with the file-explorer selection
    *        model: plain selects just this cell (a press on an already selected
-   *        cell holds the selection so a drag can carry all of it), Ctrl
+   *        cell holds the selection so a drag can carry all of it, and a click
+   *        on the only selected cell deselects it), Ctrl
    *        toggles it, Shift replaces the selection with the geometric range
    *        from the anchor, Ctrl+Shift adds that range. A right press takes an
    *        unselected cell into the selection and arms a drag that asks for its
@@ -100,8 +105,12 @@ public:
    *         target alone. */
   void RequestAssign(const QString& group, const QString& targetWindowId, QmitkMxNGroupJoinMode mode);
 
-  /** \brief Emphasise 'axis' on every plate and ring 'windowIds' in 'hue'; the
-   *         list may be empty (emphasis without a ring). 'source' becomes the
+  /** \brief Take 'windowId' out of 'group': emits RemoveRequested for the
+   *         whole selection when 'windowId' is selected, else for it alone. */
+  void RequestRemove(const QString& group, const QString& windowId);
+
+  /** \brief Emphasise 'axis' on every plate and bump the frames of 'windowIds'
+   *         in 'hue'; the list may be empty (emphasis alone). 'source' becomes the
    *         highlight's owner. */
   void SetHighlight(HighlightSource source, std::optional<QmitkMxNSyncAxis> axis,
                     const QStringList& windowIds, const QColor& hue);
@@ -119,6 +128,7 @@ Q_SIGNALS:
   void SelectionChanged(const QStringList& windowIds);
   void HighlightChanged();
   void AssignRequested(const QString& group, const QStringList& windowIds, QmitkMxNGroupJoinMode mode);
+  void RemoveRequested(const QString& group, const QStringList& windowIds);
 
 private:
 
@@ -136,6 +146,7 @@ private:
   QStringList m_Selection;
   QString m_Anchor;
   QString m_PressedWindowId;  // a plain press that held a wider selection
+  bool m_PressedSoleSelection = false;  // ...on the one cell already selected
   bool m_DragAsksMode = false;
 
   std::optional<HighlightSource> m_HighlightSource;

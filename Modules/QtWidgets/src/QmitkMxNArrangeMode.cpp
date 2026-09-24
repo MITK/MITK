@@ -47,10 +47,18 @@ void QmitkMxNArrangeMode::SetSelectedWindowIds(const QStringList& windowIds)
   this->SetSelection(windowIds);
 }
 
+void QmitkMxNArrangeMode::ClearSelection()
+{
+  m_Anchor.clear();
+  m_PressedWindowId.clear();
+  this->SetSelection(QStringList());
+}
+
 bool QmitkMxNArrangeMode::PressCell(const QString& windowId, Qt::MouseButton button,
                                     Qt::KeyboardModifiers modifiers)
 {
   m_PressedWindowId.clear();
+  m_PressedSoleSelection = false;
   m_DragAsksMode = false;
 
   if (Qt::RightButton == button)
@@ -115,7 +123,9 @@ bool QmitkMxNArrangeMode::PressCell(const QString& windowId, Qt::MouseButton but
 
   // Pressing a selected cell holds the selection so a drag can carry all of it;
   // without the collapse on release a full selection would have no way back to
-  // a single cell.
+  // a single cell. A plate covers its whole cell, so there is no empty space to
+  // click for "nothing"; releasing on the sole selected cell deselects it.
+  m_PressedSoleSelection = m_Selection == QStringList{ windowId };
   if (!m_Selection.contains(windowId))
   {
     this->SetSelection(QStringList{ windowId });
@@ -129,9 +139,10 @@ void QmitkMxNArrangeMode::ReleaseCell(bool dragged)
 {
   if (!dragged && !m_PressedWindowId.isEmpty())
   {
-    this->SetSelection(QStringList{ m_PressedWindowId });
+    this->SetSelection(m_PressedSoleSelection ? QStringList() : QStringList{ m_PressedWindowId });
   }
   m_PressedWindowId.clear();
+  m_PressedSoleSelection = false;
   m_DragAsksMode = false;
 }
 
@@ -176,6 +187,12 @@ void QmitkMxNArrangeMode::RequestAssign(const QString& group, const QString& tar
   const QStringList targets = m_Selection.contains(targetWindowId) ? m_Selection
                                                                   : QStringList{ targetWindowId };
   emit AssignRequested(group, targets, mode);
+}
+
+void QmitkMxNArrangeMode::RequestRemove(const QString& group, const QString& windowId)
+{
+  const QStringList targets = m_Selection.contains(windowId) ? m_Selection : QStringList{ windowId };
+  emit RemoveRequested(group, targets);
 }
 
 void QmitkMxNArrangeMode::SetHighlight(HighlightSource source, std::optional<QmitkMxNSyncAxis> axis,

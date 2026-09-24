@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNAxisGlyph.h>
+#include <QmitkIconTheme.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
@@ -130,26 +131,11 @@ namespace
   // ---- Arrange mode ----
   constexpr int PlateButtonSize = 16;
   constexpr int PlateButtonInset = 5;   // from the plate's top and right edge
-  constexpr int ArrangeRingInset = 4;   // inside the render window, clear of the frame
-  constexpr int ArrangeRingWidth = 4;   // bold enough to tell at a glance which cells belong together
-
-  /** \brief How a selected cell's plate is marked. Never a white outline: white
-   *         rings already mean "pointed at" on the pumped glyph. */
-  enum class SelectionMarker
-  {
-    TintedFill,
-    Border
-  };
-
-  SelectionMarker PlateSelectionMarker()
-  {
-    static const SelectionMarker marker =
-      qEnvironmentVariable("MITK_MXN_SELECTION_MARKER").compare(QStringLiteral("border"),
-                                                                Qt::CaseInsensitive) == 0
-        ? SelectionMarker::Border
-        : SelectionMarker::TintedFill;
-    return marker;
-  }
+  constexpr int PlateButtonGap = 2;     // between the menu and the close button
+  const QColor PlateButtonHover(255, 255, 255, 56);
+  // Twice the cell frame's stylesheet border, painted over it: the frame that
+  // already names a cell's group is the one that answers "who shares this".
+  constexpr int ArrangeFrameWidth = 4;
 
   int PeekPumpedSide(int box)
   {
@@ -1194,19 +1180,17 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
   // inside the colorbar's reveal margin); leaving the plate out clipped it away
   // in exactly the window the pointer was in. While the mask is up the overlay
   // receives the pointer over the plate, so its own handlers hand plate input to
-  // the same arrange-mode path the render window's filter uses. The partner
-  // ring joins the mask for the same reason, as a thin band.
+  // the same arrange-mode path the render window's filter uses. The bumped
+  // frame joins the mask for the same reason, as a band along the cell edge.
   const QRect peekPlate = this->SyncPeekPlateRect();
   if (peekPlate.isValid())
   {
     mask += peekPlate;
   }
-  const QRect ring = this->ArrangeRingRect();
-  if (ring.isValid())
+  if (this->IsArrangeFrameBumped())
   {
-    const int band = ArrangeRingWidth + 1;
-    mask += QRegion(ring.adjusted(-band, -band, band, band))
-            - QRegion(ring.adjusted(band, band, -band, -band));
+    mask += QRegion(this->rect())
+            - QRegion(this->rect().adjusted(ArrangeFrameWidth, ArrangeFrameWidth, -ArrangeFrameWidth, -ArrangeFrameWidth));
   }
 
   // The active-cell corner brackets sit at the frame corners; keep those small
@@ -1226,6 +1210,15 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
 {
   if (m_CleanView)
   {
+    // Clean view hides the furniture, but while the layout is being arranged
+    // the plates and bumped frames are the arrangement itself, not furniture.
+    if (!this->IsArranging() && !this->IsArrangeFrameBumped())
+    {
+      return;
+    }
+    QPainter painter(this);
+    this->PaintArrangeFrame(painter);
+    this->PaintSyncPeek(painter);
     return;
   }
 
@@ -1518,23 +1511,39 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     painter.fillRect(QRect(0, 0, this->width(), TopStripHeight), QColor(255, 255, 255, 40));
   }
 
-  const QRect ring = this->ArrangeRingRect();
-  if (ring.isValid())
-  {
-    // A cell is ringed in the hue of the synchronization the pointer is on, or
-    // marked as the target of a group drag hovering it.
-    painter.save();
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(Qt::NoBrush);
-    painter.setPen(m_DropTarget
-      ? QPen(this->palette().color(QPalette::Highlight), ArrangeRingWidth, Qt::DashLine)
-      : QPen(m_Editor->GetArrangeMode()->GetHighlightHue(), ArrangeRingWidth));
-    painter.drawRoundedRect(QRectF(ring), 3, 3);
-    painter.restore();
-  }
+  this->PaintArrangeFrame(painter);
 
   // Last, so the plate reads over the furniture as well as over the image.
   this->PaintSyncPeek(painter);
+}
+
+void QmitkMxNCellOverlay::PaintArrangeFrame(QPainter& painter)
+{
+  if (!this->IsArrangeFrameBumped())
+  {
+    return;
+  }
+  // The overlay covers the whole cell, frame included, so it paints the bump
+  // over the stylesheet border instead of restyling it: a stylesheet write
+  // repolishes the cell subtree, far too slow to follow the pointer.
+  const qreal half = 0.5 * ArrangeFrameWidth;
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, false);
+  painter.setBrush(Qt::NoBrush);
+  QPen pen = m_DropTarget ? QPen(this->SelectionColor(), ArrangeFrameWidth, Qt::DashLine)
+                          : QPen(m_Editor->GetArrangeMode()->GetHighlightHue(), ArrangeFrameWidth);
+  pen.setJoinStyle(Qt::MiterJoin);
+  painter.setPen(pen);
+  painter.drawRect(QRectF(this->rect()).adjusted(half, half, -half, -half));
+  painter.restore();
+}
+
+QColor QmitkMxNCellOverlay::SelectionColor() const
+{
+  // The theme may colour selections only through item-view rules, which do not
+  // reach the palette; it names the colour for widgets that paint their own.
+  const QString themed = QmitkIconTheme::GetSelectionColor();
+  return themed.isEmpty() ? this->palette().color(QPalette::Highlight) : QColor(themed);
 }
 
 QRect QmitkMxNCellOverlay::SyncPeekPlateRect() const
@@ -1580,22 +1589,12 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   const bool arranging = this->IsArranging();
   const bool selected =
     arranging && m_Editor->GetArrangeMode()->GetSelectedWindowIds().contains(m_Cell->GetWidgetName());
-  const QColor selectionColor = this->palette().color(QPalette::Highlight);
-
-  QColor plateFill = PeekPlateFill;
-  if (selected && SelectionMarker::TintedFill == PlateSelectionMarker())
-  {
-    constexpr qreal tint = 0.45;
-    plateFill = QColor::fromRgbF(
-      static_cast<float>((1.0 - tint) * PeekPlateFill.redF() + tint * selectionColor.redF()),
-      static_cast<float>((1.0 - tint) * PeekPlateFill.greenF() + tint * selectionColor.greenF()),
-      static_cast<float>((1.0 - tint) * PeekPlateFill.blueF() + tint * selectionColor.blueF()),
-      std::max(PeekPlateFill.alphaF(), 0.75f));
-  }
-  const bool bordered = selected && SelectionMarker::Border == PlateSelectionMarker();
-  painter.setPen(bordered ? QPen(selectionColor, 2) : QPen(PeekPlateBorder, 1));
-  painter.setBrush(plateFill);
-  const qreal edge = bordered ? 1.0 : 0.5;
+  // Selection gets its own channel, a frame in the theme's selection colour -
+  // never a white outline, which the pumped glyph's rings already use for
+  // "pointed at".
+  painter.setPen(selected ? QPen(this->SelectionColor(), 2) : QPen(PeekPlateBorder, 1));
+  painter.setBrush(PeekPlateFill);
+  const qreal edge = selected ? 1.0 : 0.5;
   painter.drawRoundedRect(QRectF(layout.plate).adjusted(edge, edge, -edge, -edge),
                           PeekPlateRadius, PeekPlateRadius);
 
@@ -1656,9 +1655,11 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   // resizes under the pointer.
   if (m_SyncPeekAxis >= 0)
   {
-    // In arrange mode the caption stays clear of the close button's corner,
+    // In arrange mode the caption stays clear of the button corner,
     // symmetrically so it remains centred over the row.
-    const int reserve = arranging ? std::max(0, PlateButtonInset + PlateButtonSize - PeekPlatePadX) : 0;
+    const int reserve = arranging
+      ? std::max(0, PlateButtonInset + 2 * PlateButtonSize + PlateButtonGap - PeekPlatePadX)
+      : 0;
     const QRect caption = layout.caption.adjusted(reserve, 0, -reserve, 0);
     painter.drawText(caption, Qt::AlignHCenter | Qt::AlignVCenter,
                      metrics.elidedText(axisSlots[m_SyncPeekAxis].label, Qt::ElideRight,
@@ -1666,13 +1667,36 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   }
 
   const QRect closeButton = this->PlateCloseButtonRect();
+  const QRect menuButton = this->PlateMenuButtonRect();
   if (closeButton.isValid())
   {
-    const QRectF cross = QRectF(closeButton.translated(-area.topLeft())).adjusted(4.5, 4.5, -4.5, -4.5);
     painter.save();
+    painter.setBrush(PlateButtonHover);
+    painter.setPen(Qt::NoPen);
+    // The disc under the pointer says "this is a button"; without it the glyph
+    // alone reads as decoration.
+    if (PlateButton::Close == m_PlateHoverButton)
+    {
+      painter.drawEllipse(QRectF(closeButton.translated(-area.topLeft())));
+    }
+    if (PlateButton::Menu == m_PlateHoverButton)
+    {
+      painter.drawEllipse(QRectF(menuButton.translated(-area.topLeft())));
+    }
+
+    const QRectF cross = QRectF(closeButton.translated(-area.topLeft())).adjusted(4.5, 4.5, -4.5, -4.5);
     painter.setPen(QPen(ActiveText, 1.5, Qt::SolidLine, Qt::RoundCap));
     painter.drawLine(cross.topLeft(), cross.bottomRight());
     painter.drawLine(cross.topRight(), cross.bottomLeft());
+
+    // A vertical ellipsis: three stacked bars would be the slice glyph.
+    const QPointF dots = QRectF(menuButton.translated(-area.topLeft())).center();
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(ActiveText);
+    for (const qreal dy : { -4.0, 0.0, 4.0 })
+    {
+      painter.drawEllipse(dots + QPointF(0.0, dy), 1.4, 1.4);
+    }
     painter.restore();
   }
 
@@ -2417,19 +2441,19 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
         this->ClearPlateHover();
         break;
       case QEvent::ContextMenu:
-        // The right button on a plate is the ask-mode drag; the cell's context
-        // menu there would pop up under a gesture about the plate.
-        if (this->SyncPeekPlateRect().contains(static_cast<QContextMenuEvent*>(event)->pos() + offset))
+      {
+        auto* contextEvent = static_cast<QContextMenuEvent*>(event);
+        if (this->HandlePlateContextMenu(contextEvent->pos() + offset, contextEvent->globalPos()))
         {
           return true;
         }
         break;
+      }
       case QEvent::ToolTip:
       {
         auto* helpEvent = static_cast<QHelpEvent*>(event);
-        if (this->PlateCloseButtonRect().contains(helpEvent->pos() + offset))
+        if (this->ShowPlateButtonToolTip(helpEvent->pos() + offset, helpEvent->globalPos()))
         {
-          QToolTip::showText(helpEvent->globalPos(), tr("Close the layout editor"), m_Cell->GetRenderWindow());
           return true;
         }
         break;
@@ -2470,8 +2494,7 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
 bool QmitkMxNCellOverlay::IsArranging() const
 {
   const auto* arrangeMode = m_Editor->GetArrangeMode();
-  // Clean view paints no plate, and a plate that is not painted takes no input.
-  return nullptr != arrangeMode && arrangeMode->IsActive() && m_SyncPeekVisible && !m_CleanView;
+  return nullptr != arrangeMode && arrangeMode->IsActive() && m_SyncPeekVisible;
 }
 
 bool QmitkMxNCellOverlay::HandlePlateInput(QEvent::Type type, QMouseEvent* event, const QPoint& position)
@@ -2498,8 +2521,17 @@ bool QmitkMxNCellOverlay::HandlePlateInput(QEvent::Type type, QMouseEvent* event
         m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Hide);
         return true;
       }
+      if (Qt::LeftButton == event->button() && this->PlateMenuButtonRect().contains(position))
+      {
+        this->OpenPlateMenu(this->mapToGlobal(position));
+        return true;
+      }
       m_PlatePressActive = true;
       m_PlatePressPosition = position;
+      if (Qt::RightButton == event->button())
+      {
+        m_RightPressPosition = position - this->RenderWindowRect().topLeft();
+      }
       m_PlateDragArmed = arrangeMode->PressCell(m_Cell->GetWidgetName(), event->button(), event->modifiers());
       return true;
     }
@@ -2578,7 +2610,15 @@ void QmitkMxNCellOverlay::UpdatePlateHover(const QPoint& position)
   if (!m_PlateHovered)
   {
     m_PlateHovered = true;
-    this->update();  // the close button shows on the plate under the pointer
+    this->update();  // the buttons show on the plate under the pointer
+  }
+  const PlateButton button = this->PlateCloseButtonRect().contains(position) ? PlateButton::Close
+                             : this->PlateMenuButtonRect().contains(position) ? PlateButton::Menu
+                                                                             : PlateButton::None;
+  if (button != m_PlateHoverButton)
+  {
+    m_PlateHoverButton = button;
+    this->update();
   }
 
   // The emphasis latches across the gaps between glyphs, as on the strip: it
@@ -2617,6 +2657,7 @@ void QmitkMxNCellOverlay::ClearPlateHover()
   }
   m_PlateHovered = false;
   m_PlateHoverAxis = -1;
+  m_PlateHoverButton = PlateButton::None;
   m_Editor->GetArrangeMode()->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Plate);
   this->update();
 }
@@ -2636,23 +2677,143 @@ QRect QmitkMxNCellOverlay::PlateCloseButtonRect() const
                PlateButtonSize, PlateButtonSize);
 }
 
-QRect QmitkMxNCellOverlay::ArrangeRingRect() const
+bool QmitkMxNCellOverlay::HandlePlateContextMenu(const QPoint& position, const QPoint& globalPosition)
+{
+  if (!this->IsArranging() || !this->SyncPeekPlateRect().contains(position))
+  {
+    return false;
+  }
+  // A right click on a plate is about the arrangement, so it opens the plate's
+  // menu rather than the cell's. A right drag has already become the ask-mode
+  // drag and leaves nothing to open.
+  const QPoint local = position - this->RenderWindowRect().topLeft();
+  if ((local - m_RightPressPosition).manhattanLength() < QApplication::startDragDistance())
+  {
+    this->OpenPlateMenu(globalPosition);
+  }
+  return true;
+}
+
+bool QmitkMxNCellOverlay::ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition)
+{
+  if (this->PlateCloseButtonRect().contains(position))
+  {
+    QToolTip::showText(globalPosition, tr("Close the layout editor"), this);
+    return true;
+  }
+  if (this->PlateMenuButtonRect().contains(position))
+  {
+    QToolTip::showText(globalPosition, tr("Group and selection actions"), this);
+    return true;
+  }
+  return false;
+}
+
+void QmitkMxNCellOverlay::contextMenuEvent(QContextMenuEvent* event)
+{
+  if (this->HandlePlateContextMenu(event->pos(), event->globalPos()))
+  {
+    event->accept();
+    return;
+  }
+  QmitkOverlayWidget::contextMenuEvent(event);
+}
+
+bool QmitkMxNCellOverlay::event(QEvent* event)
+{
+  if (QEvent::ToolTip == event->type())
+  {
+    auto* helpEvent = static_cast<QHelpEvent*>(event);
+    if (this->ShowPlateButtonToolTip(helpEvent->pos(), helpEvent->globalPos()))
+    {
+      return true;
+    }
+  }
+  return QmitkOverlayWidget::event(event);
+}
+
+QRect QmitkMxNCellOverlay::PlateMenuButtonRect() const
+{
+  const QRect close = this->PlateCloseButtonRect();
+  return close.isValid() ? close.translated(-(PlateButtonSize + PlateButtonGap), 0) : QRect();
+}
+
+void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
+{
+  auto* arrangeMode = m_Editor->GetArrangeMode();
+  const QString windowId = m_Cell->GetWidgetName();
+
+  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
+  try
+  {
+    infos = m_Editor->GetSyncGroupInfos();
+  }
+  catch (const mitk::Exception&)
+  {
+    return;  // mid-layout-change; there is nothing stable to offer
+  }
+  const auto swatch = [](const QColor& color)
+  {
+    QPixmap pixmap(12, 12);
+    pixmap.fill(color.isValid() ? color : QColor(Qt::gray));
+    return QIcon(pixmap);
+  };
+
+  QMenu menu(this);
+
+  // Replace is what the group cards' "Add selected windows" does, so the two
+  // ways of adding mean the same.
+  auto* addMenu = menu.addMenu(tr("Add to group"));
+  for (const auto& info : infos)
+  {
+    const auto group = QString::fromStdString(info.id);
+    connect(addMenu->addAction(swatch(info.color), QString::fromStdString(info.displayName)), &QAction::triggered,
+            this, [arrangeMode, group, windowId]()
+            { arrangeMode->RequestAssign(group, windowId, QmitkMxNGroupJoinMode::Replace); });
+  }
+  addMenu->setEnabled(!addMenu->isEmpty());
+
+  // A window can be on different groups on different axes, and removal (like
+  // the cards') is per group, so every group it is on is offered.
+  auto* removeMenu = menu.addMenu(tr("Remove from group"));
+  std::vector<std::string> linked;
+  for (int slot = 0; slot < PeekAxisCount; ++slot)
+  {
+    const auto group = m_Editor->ResolveCellAxisGroup(windowId, *QmitkMxNSyncAxisFromSlot(slot));
+    if (!group.empty() && std::find(linked.begin(), linked.end(), group) == linked.end())
+    {
+      linked.push_back(group);
+    }
+  }
+  for (const auto& group : linked)
+  {
+    const auto info = std::find_if(infos.begin(), infos.end(), [&group](const auto& i) { return i.id == group; });
+    const QString name = QString::fromStdString(info != infos.end() ? info->displayName : group);
+    const QColor color = info != infos.end() ? info->color : QColor();
+    const auto groupId = QString::fromStdString(group);
+    connect(removeMenu->addAction(swatch(color), name), &QAction::triggered, this,
+            [arrangeMode, groupId, windowId]() { arrangeMode->RequestRemove(groupId, windowId); });
+  }
+  removeMenu->setEnabled(!removeMenu->isEmpty());
+
+  menu.addSeparator();
+  auto* clear = menu.addAction(tr("Clear selection"));
+  clear->setEnabled(!arrangeMode->GetSelectedWindowIds().isEmpty());
+  connect(clear, &QAction::triggered, arrangeMode, &QmitkMxNArrangeMode::ClearSelection);
+
+  menu.exec(globalPosition);
+}
+
+bool QmitkMxNCellOverlay::IsArrangeFrameBumped() const
 {
   const auto* arrangeMode = m_Editor->GetArrangeMode();
   if (nullptr == arrangeMode || !arrangeMode->IsActive())
   {
-    return QRect();
+    return false;
   }
-  const bool ringed = m_DropTarget
+  return m_DropTarget
     || (arrangeMode->GetHighlightHue().isValid()
         && arrangeMode->GetHighlightedWindowIds().contains(m_Cell->GetWidgetName()));
-  if (!ringed)
-  {
-    return QRect();
-  }
-  const QRect area = this->RenderWindowRect();
-  return area.isValid() ? area.adjusted(ArrangeRingInset, ArrangeRingInset, -ArrangeRingInset, -ArrangeRingInset)
-                        : QRect();
 }
 
 bool QmitkMxNCellOverlay::HandleCellDrag(QEvent* event)

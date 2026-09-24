@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNArrangeMode.h>
-#include <QmitkMxNCellMapWidget.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
@@ -39,10 +38,12 @@ found in the LICENSE file.
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QScrollBar>
 #include <QToolButton>
 
 #include <algorithm>
 #include <array>
+#include <memory>
 #include <variant>
 
 /**
@@ -102,14 +103,16 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(SyncHighlight_CellsSharingDimensionAxis);
   MITK_TEST(SyncHighlight_CellsSharingSelectionAxis);
   MITK_TEST(ArrangeSelection_ARebindStopsTheOldEditorsMirror);
+  MITK_TEST(ArrangeRequests_AssignAndRemoveTheirWindows);
   MITK_TEST(SyncHighlight_CellAxisResolvesFromHoveredCell);
-  MITK_TEST(SyncHighlight_CellMapSetAndClear);
 
   MITK_TEST(DeleteGroup_RemovesMemberBearingGroup);
   MITK_TEST(DeleteGroup_RemovesEmptyCreatedGroup);
   MITK_TEST(DeleteGroup_MainIsNoOp);
 
   MITK_TEST(Matrix_UnlinkedCellCarriesNoChipOrOffset);
+  MITK_TEST(Matrix_IsOnlyAsTallAsItsRows);
+  MITK_TEST(ArrangeHint_WarnsWhileAWindowIsMaximized);
   MITK_TEST(Matrix_LinkedCellChipNamesGroupAndOffset);
   MITK_TEST(Matrix_AxisAssignAndClearRoundTrip);
   MITK_TEST(Matrix_SelectionAxisClearReturnsToDefault);
@@ -328,7 +331,7 @@ public:
 
   void AssignCells_JoinsEveryGivenCell()
   {
-    // The map's drag-and-drop / assign-selection path.
+    // The drag-and-drop / assign-selection path.
     const auto id = m_Widget->CreateGroup();
 
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
@@ -580,8 +583,8 @@ public:
     CPPUNIT_ASSERT(!group.empty());
     Pump();
 
-    // No map selection (nothing set the active window since attach), so an
-    // axis click on this empty group toggles the intent cache, not the engine.
+    // An axis click on this empty group toggles the intent cache, not the
+    // engine.
     const int sliceAxis = AxisIndexOf(QmitkMxNSyncDimension::Slice);
     const int windowingAxis = AxisIndexOf(QmitkMxNSyncDimension::Windowing);
     m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);
@@ -598,8 +601,7 @@ public:
                                    expectedOn, barcodeSlots[i].color.isValid());
     }
 
-    // The engine is untouched: no cell links or selects the group. (If the map
-    // had a selection, the click would have bootstrapped and this would fail.)
+    // The engine is untouched: no cell links or selects the group.
     for (std::size_t cell = 0; cell < 3; ++cell)
     {
       for (const auto dimension : QmitkMxNAllSyncDimensions)
@@ -654,7 +656,7 @@ public:
     const auto group = m_Widget->CreateGroup();
     Pump();
 
-    // Make widget1 the active window; the editor mirrors that into the map's
+    // Make widget1 the active window; the editor mirrors that into the window
     // selection. Configuring an empty group must still only toggle the intent
     // cache - it must NOT assign the active/selected cell to the group.
     m_Editor->SetActiveRenderWindowWidget(m_Editor->GetRenderWindowWidget(CellId(1)));
@@ -991,18 +993,19 @@ public:
 
   void MultiSelect_SurvivesActiveMirror()
   {
-    // Selecting several tiles makes the first the active render window, which
-    // fires ActiveRenderWindowChanged back into SelectActiveWindowTile. That
-    // mirror must not collapse the multi-selection to the single active cell.
-    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
-    CPPUNIT_ASSERT(nullptr != cellMap);
+    // Selecting several windows makes the first the active render window, which
+    // fires ActiveRenderWindowChanged back into SelectActiveWindow. That mirror
+    // must not collapse the multi-selection to the single active cell.
+    auto* arrangeMode = m_Editor->GetArrangeMode();
     Pump();
 
-    cellMap->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
+    arrangeMode->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
     Pump();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A multi-selection must survive the active-window mirror",
-                                 2, static_cast<int>(cellMap->GetSelectedWindowIds().size()));
+                                 2, static_cast<int>(arrangeMode->GetSelectedWindowIds().size()));
+    CPPUNIT_ASSERT_MESSAGE("The first selected window became the active one",
+                           m_Editor->GetActiveRenderWindowWidget() == m_Editor->GetRenderWindowWidget(CellId(0)));
   }
 
   // --- Destructive-layout-change guard predicate ------------------------------
@@ -1031,25 +1034,22 @@ public:
 
   void MultiTileDrop_AssignsEverySelectedCell()
   {
-    // A multi-tile drag carries the whole selection newline-joined (StartCellDrag);
-    // a drop on a group card must assign every one. Real Qt drag loops cannot run
-    // headlessly, so reproduce the drag's mime payload from the map selection and
-    // deliver it as a synthetic drop onto the card, driving the real encode/decode
-    // seam and the card's AssignCellsToGroup handler.
+    // A plate drag carries the whole selection; a drop on a group card must
+    // assign every one. Real Qt drag loops cannot run headlessly, so build the
+    // drag's payload through the arrange mode and deliver it as a synthetic
+    // drop onto the card, driving the real encode/decode seam and the card's
+    // AssignCellsToGroup handler.
     m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "grp");  // grp syncs Slice
     Pump();
     auto* card = CardFor("grp");
     CPPUNIT_ASSERT(nullptr != card);
 
-    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
-    CPPUNIT_ASSERT(nullptr != cellMap);
-    cellMap->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
+    m_Editor->GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
     Pump();
 
-    const QByteArray payload =
-      cellMap->GetSelectedWindowIds().join(QStringLiteral("\n")).toUtf8();
+    const std::unique_ptr<QMimeData> dragged(m_Editor->GetArrangeMode()->CreateDragMimeData());
     QMimeData mime;
-    mime.setData(QmitkMxNCellsMimeType, payload);
+    mime.setData(QmitkMxNCellsMimeType, dragged->data(QmitkMxNCellsMimeType));
 
     // Dispatch straight to the card's virtual event() (via the public QObject
     // overload; QWidget narrows the override to protected). QApplication::notify
@@ -1144,27 +1144,40 @@ public:
                              QmitkMxNSyncAxis::Slice).isEmpty());
   }
 
+  void ArrangeRequests_AssignAndRemoveTheirWindows()
+  {
+    // The plates only ask; the layout editor performs the change.
+    auto* arrangeMode = m_Editor->GetArrangeMode();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "grp");
+    arrangeMode->RequestAssign(QStringLiteral("grp"), CellId(0), QmitkMxNGroupJoinMode::Replace);
+    CPPUNIT_ASSERT_MESSAGE("An assign request joins the window to the group",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "grp"));
+
+    arrangeMode->RequestRemove(QStringLiteral("grp"), CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("A remove request takes it out again",
+                           !IsLinked(0, QmitkMxNSyncDimension::Slice, "grp"));
+    CPPUNIT_ASSERT_MESSAGE("...and leaves the other member alone",
+                           IsLinked(2, QmitkMxNSyncDimension::Slice, "grp"));
+  }
+
   void ArrangeSelection_ARebindStopsTheOldEditorsMirror()
   {
-    auto* map = m_Widget->findChild<QmitkMxNCellMapWidget*>();
-    CPPUNIT_ASSERT(nullptr != map);
-
-    QmitkMxNMultiWidget other(nullptr, Qt::WindowFlags(), QStringLiteral("other"));
+    // A second editor with the same name has the same cell ids, so a leaking
+    // connection would visibly move its active window.
+    QmitkMxNMultiWidget other;
     other.SetDataStorage(m_DataStorage);
     other.InitializeMultiWidget();
-    other.SetLayout(1, 2);
+    other.SetLayout(1, 3);
+    other.SetActiveRenderWindowWidget(other.GetRenderWindowWidget(CellId(1)));
     m_Widget->SetMultiWidget(&other);
 
-    // The previously bound editor's arrange selection must no longer reach the
-    // map, or switching editors with the view open mixes two editors' cells.
     m_Editor->GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(0) });
-    CPPUNIT_ASSERT_MESSAGE("The old editor's selection stays out of the map",
-                           !map->GetSelectedWindowIds().contains(CellId(0)));
+    CPPUNIT_ASSERT_MESSAGE("The previously bound editor's selection no longer drives the widget",
+                           other.GetActiveRenderWindowWidget() == other.GetRenderWindowWidget(CellId(1)));
 
-    other.GetArrangeMode()->SetSelectedWindowIds(QStringList{ QStringLiteral("other__widget1") });
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The bound editor's selection is mirrored",
-                                 std::string("other__widget1"),
-                                 map->GetSelectedWindowIds().join(QLatin1Char(',')).toStdString());
+    other.GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(2) });
+    CPPUNIT_ASSERT_MESSAGE("The bound editor's selection does",
+                           other.GetActiveRenderWindowWidget() == other.GetRenderWindowWidget(CellId(2)));
     m_Widget->SetMultiWidget(m_Editor.get());
   }
 
@@ -1186,17 +1199,15 @@ public:
 
   void SyncHighlight_CellAxisResolvesFromHoveredCell()
   {
-    // The cell-tile hover source: resolve the hovered cell's group for the axis,
-    // then highlight every cell sharing it. Drives the branch the cell map's
-    // GlyphHovered signal feeds.
-    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
-    CPPUNIT_ASSERT(nullptr != cellMap);
+    // A window's glyph hover: resolve the hovered cell's group for the axis,
+    // then highlight every cell sharing it.
+    auto* arrangeMode = m_Editor->GetArrangeMode();
 
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "g5");
     m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "g5");
 
     m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
-    QStringList highlight = cellMap->GetHighlightedWindowIds();
+    QStringList highlight = arrangeMode->GetHighlightedWindowIds();
     highlight.sort();
     QStringList expected{ CellId(0), CellId(2) };
     expected.sort();
@@ -1206,28 +1217,49 @@ public:
 
     m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Orientation);
     CPPUNIT_ASSERT_MESSAGE("Hovering an axis the cell does not link clears the highlight",
-                           cellMap->GetHighlightedWindowIds().isEmpty());
-  }
-
-  void SyncHighlight_CellMapSetAndClear()
-  {
-    // The render-state plumbing the resolvers drive: the cell map stores and
-    // clears the highlighted set.
-    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
-    CPPUNIT_ASSERT(nullptr != cellMap);
-
-    const QStringList highlight{ CellId(0), CellId(2) };
-    cellMap->SetHighlightedCells(highlight, QmitkMxNSyncAxis::Slice, QColor(Qt::red));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The cell map stores the highlighted set",
-                                 highlight.join(QStringLiteral(",")).toStdString(),
-                                 cellMap->GetHighlightedWindowIds().join(QStringLiteral(",")).toStdString());
-
-    cellMap->SetHighlightedCells(QStringList(), std::nullopt, QColor());
-    CPPUNIT_ASSERT_MESSAGE("Clearing empties the highlight",
-                           cellMap->GetHighlightedWindowIds().isEmpty());
+                           arrangeMode->GetHighlightedWindowIds().isEmpty());
   }
 
   // --- The advanced matrix -----------------------------------------------------
+
+  void ArrangeHint_WarnsWhileAWindowIsMaximized()
+  {
+    auto* hint = m_Widget->findChild<QLabel*>(QStringLiteral("QmitkMxNLayoutEditorArrangeHint"));
+    CPPUNIT_ASSERT(nullptr != hint);
+    CPPUNIT_ASSERT_MESSAGE("The everyday hint is plain", hint->styleSheet().isEmpty());
+    const QString everyday = hint->text();
+
+    m_Editor->SetMaximizedCell(CellId(1));
+    CPPUNIT_ASSERT_MESSAGE("A maximized window changes the hint", hint->text() != everyday);
+    CPPUNIT_ASSERT_MESSAGE("...into a warning", hint->styleSheet().contains(QStringLiteral("bold")));
+
+    m_Editor->SetMaximizedCell(QString());
+    CPPUNIT_ASSERT(hint->styleSheet().isEmpty());
+    CPPUNIT_ASSERT(everyday == hint->text());
+  }
+
+  void Matrix_IsOnlyAsTallAsItsRows()
+  {
+    // A few windows must not stretch the matrix over the whole page: the action
+    // bar belongs right under the rows it edits.
+    m_Widget->resize(600, 1200);
+    m_Widget->show();
+    this->RaiseAdvancedFace();
+    Pump();
+
+    auto* matrix = m_Widget->findChild<QTableWidget*>(QStringLiteral("QmitkMxNLayoutEditorMatrix"));
+    CPPUNIT_ASSERT(nullptr != matrix);
+    int rowsHeight = matrix->horizontalHeader()->height() + 2 * matrix->frameWidth();
+    for (int row = 0; row < matrix->rowCount(); ++row)
+    {
+      rowsHeight += matrix->rowHeight(row);
+    }
+    CPPUNIT_ASSERT_EQUAL(3, matrix->rowCount());
+    CPPUNIT_ASSERT_MESSAGE("Every row is shown without a scroll bar",
+                           !matrix->verticalScrollBar()->isVisible());
+    CPPUNIT_ASSERT_MESSAGE("...and the matrix is no taller than its rows need",
+                           matrix->height() <= rowsHeight + matrix->horizontalScrollBar()->sizeHint().height());
+  }
 
   void Matrix_UnlinkedCellCarriesNoChipOrOffset()
   {
@@ -1555,8 +1587,8 @@ public:
 
   void SyncHighlight_MatrixMarksTheSharedCells()
   {
-    // The map and the matrix are two views of one synchronization, so a hover
-    // resolved on either marks the same set on both.
+    // The display's rings and the matrix are two views of one synchronization,
+    // so a hover resolved on either marks the same set on both.
     this->RaiseAdvancedFace();
     const auto id = m_Widget->CreateGroup();
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
@@ -1573,15 +1605,13 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Only the hovered axis is marked, not the whole row",
                            !m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Pan).highlighted);
 
-    auto* cellMap = m_Widget->findChild<QmitkMxNCellMapWidget*>();
-    CPPUNIT_ASSERT(nullptr != cellMap);
-    QStringList mapHighlight = cellMap->GetHighlightedWindowIds();
-    mapHighlight.sort();
+    QStringList ringed = m_Editor->GetArrangeMode()->GetHighlightedWindowIds();
+    ringed.sort();
     QStringList expected{ CellId(0), CellId(2) };
     expected.sort();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The map marks exactly the same windows",
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The display rings exactly the same windows",
                                  expected.join(QStringLiteral(",")).toStdString(),
-                                 mapHighlight.join(QStringLiteral(",")).toStdString());
+                                 ringed.join(QStringLiteral(",")).toStdString());
   }
 
   void SyncHighlight_MatrixMarkingClearsWithTheMap()

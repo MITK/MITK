@@ -82,10 +82,10 @@ public:
    * \brief What a host will allow the strip to do with the rect it grants.
    *
    * Wrapping trades vertical room for larger glyphs. A strip in a chrome row
-   * must stay one line whatever happens, so it forbids it; a cell-map tile has
-   * room to spare and would rather break the row than shrink the glyphs, so it
-   * allows it and caps their size instead - unbounded, a two-cell layout's
-   * enormous tiles would render glyphs larger than anything else on screen.
+   * must stay one line whatever happens, so it forbids it; a host with room to
+   * spare would rather break the row than shrink the glyphs, so it allows it
+   * and caps their size instead - unbounded, a large host rect would render
+   * glyphs larger than anything else on screen.
    */
   struct BarcodeFit
   {
@@ -123,9 +123,8 @@ public:
   /**
    * \brief Paint the given slots into an arbitrary rect: the wrapping glyph grid
    *        or the collapsed color bar, chosen by ComputeLayout for that rect's
-   *        size. Static so a surface that custom-paints its own tiles (the
-   *        layout editor's cell map) renders the identical barcode without
-   *        embedding a child widget per tile. 'gapColor' fills the unsynced
+   *        size. Static so a surface that custom-paints several barcodes renders
+   *        the identical barcode without embedding a child widget per barcode. 'gapColor' fills the unsynced
    *        hairline; 'hovered' brightens the glyph frames to white.
    */
   static void PaintInto(QPainter& painter, const QRect& target,
@@ -135,8 +134,8 @@ public:
   /**
    * \brief The slot index under 'pos' when 'slotCount' slots are painted into
    *        'target' by PaintInto, or -1. The hit-test counterpart to PaintInto,
-   *        for a surface that custom-paints the barcode into its own rect (the
-   *        cell map's tiles) and needs to know which axis glyph the pointer is
+   *        for a surface that custom-paints the barcode into its own rect and
+   *        needs to know which axis glyph the pointer is
    *        over. Uses the same ComputeLayout geometry as the render, so hit-test
    *        and paint cannot drift.
    */

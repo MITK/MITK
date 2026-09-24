@@ -439,7 +439,7 @@ public:
   *   selection group (default "main"), and a fresh cell also links Windowing and
   *   LUT to "main", so a cell at rest paints three main-hued slots (Windowing,
   *   LUT, selection), not gaps. Shared by the per-cell utility-strip barcode and
-  *   the layout editor's cell map so both surfaces tell the same story. Returns
+  *   the sync peek plates so both surfaces tell the same story. Returns
   *   eight gap slots for an unknown cell.
   */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildBarcodeSlots(const QString& windowId) const;
@@ -1133,7 +1133,7 @@ private:
   * \brief Common tail of the four grid ops: re-derive the grid shape from the
   *        mutated tree, store it via 'SetGridDimensions' (keeping the
   *        rows*columns == cell-count invariant), and emit 'LayoutChanged' so the
-  *        cell map, group cards, and other furniture refresh. Counts are set
+  *        group cards, the plates and other furniture refresh. Counts are set
   *        before the signal so no listener observes a counts-vs-tree mismatch.
   */
   void FinalizeGridSurgery();

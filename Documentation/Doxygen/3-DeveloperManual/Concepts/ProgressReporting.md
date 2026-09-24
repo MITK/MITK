@@ -179,6 +179,14 @@ It does so through `mitk::BaseData::PrebuildVtkRepresentation()`, which every
 data type with a lazily built representation overrides. Call it directly for
 work that does not run through that helper.
 
+Prebuilding covers a worker that only reads the representation. A worker that
+feeds an image into a VTK pipeline of its own changes the shared vtkImageData
+even when it already exists, since connecting it to a pipeline updates it. Such
+code reads the image through `mitk::ImageVtkReadView` instead: the view wraps
+the same pixels, without copying them, in a vtkImageData of its own, so it
+neither builds nor touches anything the mappers use. mitk::ImageToSurfaceFilter
+works this way, which is why it can run on a worker.
+
 ## What a worker may touch
 
 Declaring the data is one half of a contract that has no other enforcement, so
@@ -187,6 +195,8 @@ it is worth stating in full. On a worker, this is allowed:
 - Creating new mitk::BaseData. Nothing can be reading what does not exist yet,
   which is why a reader building a node needs no preparation.
 - Reading data that was declared to `QmitkRunWithInputBlocked()`.
+- Reading an image through `mitk::ImageVtkReadView`. It takes the read lock and
+  leaves the image's own VTK representation alone.
 - `DataStorage::Add()` and `Remove()`, which are handed over.
 - Reading data that is not on display at all.
 

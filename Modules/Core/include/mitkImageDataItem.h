@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 #include <mitkImageDescriptor.h>
 
+#include <vtkSmartPointer.h>
+
 class vtkImageData;
 
 namespace mitk
@@ -219,6 +221,18 @@ namespace mitk
      * \param[in] iP Smart pointer to the owning Image (used for spacing).
      */
     virtual void ConstructVtkImageData(ImageConstPointer iP) const;
+
+    /**
+     * \brief Create a vtkImageData that wraps the pixel buffer of this item without copying it.
+     *
+     * The result has the dimensions, spacing, and origin of the representation that
+     * ConstructVtkImageData() builds, but it is a new object that this item does not keep, so
+     * nobody else sees it. It is valid as long as this item and its buffer exist.
+     *
+     * \param[in] iP Smart pointer to the owning Image (used for spacing).
+     * \return The new vtkImageData, or nullptr if the dimension or pixel type has no VTK equivalent.
+     */
+    vtkSmartPointer<vtkImageData> CreateVtkImageDataView(ImageConstPointer iP) const;
 
     /**
      * \brief Get the total size of this data item in bytes.

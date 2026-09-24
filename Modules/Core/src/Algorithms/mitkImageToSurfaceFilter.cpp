@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkException.h>
 #include <mitkImageToSurfaceFilter.h>
+#include <mitkImageVtkReadView.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
@@ -186,8 +187,10 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   int t;
   for (t = tstart; t < tmax; ++t)
   {
-    vtkImageData *vtkimagedata = image->GetVtkImageData(t);
-    CreateSurface(t, vtkimagedata, surface, m_Threshold);
+    // A view of its own instead of the representation the mappers share, as this filter may
+    // run off the thread that owns the data storage.
+    const ImageVtkReadView view(image, static_cast<TimeStepType>(t));
+    CreateSurface(t, view.GetVtkImageData(), surface, m_Threshold);
 
     if (nullptr != m_ProgressTask)
       m_ProgressTask->Progress();

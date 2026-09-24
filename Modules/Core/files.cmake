@@ -165,6 +165,7 @@ set(CPP_FILES
   DataManagement/mitkImageReadAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
   DataManagement/mitkImageVtkReadAccessor.cpp
+  DataManagement/mitkImageVtkReadView.cpp
   DataManagement/mitkImageVtkWriteAccessor.cpp
   DataManagement/mitkImageWriteAccessor.cpp
   DataManagement/mitkDataStorageReference.cpp

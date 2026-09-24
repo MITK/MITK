@@ -90,6 +90,7 @@ set(MODULE_TESTS
   mitkExtractSliceFilterTest.cpp
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
+  mitkImageVtkReadViewTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkITKThreadingHelperTest.cpp
   mitkUIDGeneratorTest.cpp

@@ -26,10 +26,13 @@ found in the LICENSE file.
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImagePixelReadAccessor.h>
 
-#include <itkLabelImageToShapeLabelMapFilter.h>
 #include <itkCommand.h>
 #include <itkBinaryFunctorImageFilter.h>
+#include <itkMultiThreaderBase.h>
 
+#include <cstdint>
+#include <mutex>
+#include <optional>
 
 namespace mitk
 {
@@ -52,6 +55,86 @@ namespace mitk
     {
       AccessByItk(image, ClearBufferProcessing);
     }
+  }
+}
+
+namespace
+{
+  struct CentroidSums
+  {
+    std::uint64_t Count = 0;
+    std::uint64_t X = 0;
+    std::uint64_t Y = 0;
+    std::uint64_t Z = 0;
+  };
+
+  /** Returns the continuous index of the centroid of all pixels with the given value, or nothing if there are none. */
+  std::optional<mitk::Point3D> ComputeCentroidIndex(const mitk::Image* image, mitk::MultiLabelSegmentation::LabelValueType pixelValue)
+  {
+    mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::LabelValueType, 3> accessor(image);
+    const auto* pixels = accessor.GetData();
+
+    const std::size_t sizeX = image->GetDimension(0);
+    const std::size_t sizeY = image->GetDimension(1);
+
+    itk::ImageRegion<3>::SizeType size;
+    for (unsigned int i = 0; i < 3; ++i)
+      size[i] = image->GetDimension(i);
+
+    CentroidSums sums;
+    std::mutex sumsMutex;
+
+    itk::MultiThreaderBase::New()->ParallelizeImageRegion<3>(itk::ImageRegion<3>(size), [&](const itk::ImageRegion<3>& chunk)
+      {
+        const auto xBegin = static_cast<std::size_t>(chunk.GetIndex(0));
+        const auto xEnd = xBegin + chunk.GetSize(0);
+        const auto yBegin = static_cast<std::size_t>(chunk.GetIndex(1));
+        const auto yEnd = yBegin + chunk.GetSize(1);
+        const auto zBegin = static_cast<std::size_t>(chunk.GetIndex(2));
+        const auto zEnd = zBegin + chunk.GetSize(2);
+
+        CentroidSums chunkSums;
+
+        for (auto z = zBegin; z < zEnd; ++z)
+        {
+          for (auto y = yBegin; y < yEnd; ++y)
+          {
+            const auto* row = pixels + (z * sizeY + y) * sizeX;
+            std::uint64_t rowCount = 0;
+            std::uint64_t rowX = 0;
+
+            for (auto x = xBegin; x < xEnd; ++x)
+            {
+              const std::uint64_t hit = row[x] == pixelValue;
+              rowCount += hit;
+              rowX += hit * x;
+            }
+
+            chunkSums.Count += rowCount;
+            chunkSums.X += rowX;
+            chunkSums.Y += rowCount * y;
+            chunkSums.Z += rowCount * z;
+          }
+        }
+
+        const std::lock_guard<std::mutex> lock(sumsMutex);
+        sums.Count += chunkSums.Count;
+        sums.X += chunkSums.X;
+        sums.Y += chunkSums.Y;
+        sums.Z += chunkSums.Z;
+      }, nullptr);
+
+    if (0 == sums.Count)
+      return std::nullopt;
+
+    const auto count = static_cast<double>(sums.Count);
+
+    mitk::Point3D centroid;
+    centroid[0] = static_cast<double>(sums.X) / count;
+    centroid[1] = static_cast<double>(sums.Y) / count;
+    centroid[2] = static_cast<double>(sums.Z) / count;
+
+    return centroid;
   }
 }
 
@@ -1045,23 +1128,34 @@ const mitk::Label* mitk::MultiLabelSegmentation::GetActiveLabel() const
   return finding == m_LabelMap.end() ? nullptr : finding->second;
 }
 
-void mitk::MultiLabelSegmentation::UpdateCenterOfMass(LabelValueType pixelValue)
+void mitk::MultiLabelSegmentation::UpdateCenterOfMass(LabelValueType pixelValue, TimeStepType timeStep)
 {
   auto label = this->GetLabel(pixelValue);
   if (label.IsNull())
     return;
 
-  if (label->GetCenterOfMassMTime()<this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue))->GetMTime())
-  { //the mtime of the center of mass prop is smaller then the group image -> recalculate to be on the safe side.
-    if (4 == this->GetDimension())
-    {
-      AccessFixedDimensionByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, 4, pixelValue);
-    }
-    else
-    {
-      AccessByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, pixelValue);
-    }
+  if (!this->GetTimeGeometry()->IsValidTimeStep(timeStep))
+    mitkThrow() << "Cannot update center of mass of label " << pixelValue << ". Time step " << timeStep << " is invalid.";
+
+  const auto groupImage = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
+
+  // The stored center of mass does not know its time step, so only static segmentations can reuse it.
+  if (1 == this->GetTimeSteps() && label->GetCenterOfMassMTime() >= groupImage->GetMTime())
+    return;
+
+  const auto image = SelectImageByTimeStep(groupImage, timeStep);
+  const auto centroidIndex = ComputeCentroidIndex(image, pixelValue);
+
+  if (!centroidIndex.has_value())
+  {
+    label->ResetCenterOfMass();
+    return;
   }
+
+  Point3D centroid;
+  this->GetGeometry(timeStep)->IndexToWorld(*centroidIndex, centroid);
+
+  label->UpdateCenterOfMass(*centroidIndex, centroid);
 }
 
 bool mitk::MultiLabelSegmentation::IsEmpty(LabelValueType pixelValue, TimeStepType t) const
@@ -1261,41 +1355,6 @@ itk::ModifiedTimeType mitk::MultiLabelSegmentation::GetMTime() const
   }
 
   return result;
-}
-
-template <typename ImageType>
-void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *itkImage, LabelValueType pixelValue)
-{
-  if (ImageType::GetImageDimension() != 3)
-  {
-    return;
-  }
-
-  auto label = this->GetLabel(pixelValue);
-  if (label.IsNotNull())
-  {
-    using ShapeLabelMapFilterType = itk::LabelImageToShapeLabelMapFilter<ImageType>;
-    auto shapeLabelMapFilter = ShapeLabelMapFilterType::New();
-    shapeLabelMapFilter->SetInput(itkImage);
-    shapeLabelMapFilter->Update();
-    const auto *labelMap = shapeLabelMapFilter->GetOutput();
-
-    if (labelMap->HasLabel(pixelValue))
-    {
-      const auto *labelObject = labelMap->GetLabelObject(pixelValue);
-      const auto &physicalCentroid = labelObject->GetCentroid();
-
-      mitk::Point3D coordinates;
-      coordinates[0] = physicalCentroid[0];
-      coordinates[1] = physicalCentroid[1];
-      coordinates[2] = physicalCentroid[2];
-
-      mitk::Point3D pos;
-      this->GetSlicedGeometry()->WorldToIndex(coordinates, pos);
-
-      label->UpdateCenterOfMass(pos, coordinates);
-    }
-  }
 }
 
 template <typename ImageType>

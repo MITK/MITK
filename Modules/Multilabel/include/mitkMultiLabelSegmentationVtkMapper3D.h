@@ -105,12 +105,18 @@ namespace mitk
        */
       bool m_UseFadedPipeline;
 
-      /** \brief Timestamp of last update of stored data. */
-      itk::TimeStamp m_LastDataUpdateTime;
-      /** \brief Timestamp of last update of a property. */
-      itk::TimeStamp m_LastPropertyUpdateTime;
+      /** \brief Time of the last GenerateDataForRenderer() pass.
+       *
+       * Data or property changes after it make Update() run the next pass. Whether a
+       * group surface is outdated is decided per group, against what it was extracted
+       * from.
+       */
+      itk::TimeStamp m_LastGenerateTime;
 
-      /** \brief The last time step that was updated. */
+      /** \brief Time step of the last GenerateDataForRenderer() pass.
+       *
+       * Navigating in time changes no MTime, so Update() compares against this.
+       */
       mitk::TimeStepType m_LastUpdateTimeStep;
 
       /** \brief Look up table for label colors (cloned from the segmentation). */
@@ -126,14 +132,10 @@ namespace mitk
       /** \brief Whether 3D rendering is preferred. */
       bool m_3DRenderingPreference;
 
-      /** \brief Smoothing state with which the cached polydata was last extracted.
+      /** \brief Smoothing resolved in the last GenerateDataForRenderer() pass.
        *
-       * Tracks the *cached* extraction state, not the user's currently requested state.
-       * Written only after a successful re-extraction inside GenerateDataForRenderer.
-       * Comparing ResolveSmoothed(...) against this value detects when the cached
-       * surfaces no longer match the requested smoothing and forces a re-extraction;
-       * preserving it across early-return paths in Update() (hidden node, 3D rendering
-       * disabled, uninitialised segmentation) keeps that staleness check correct.
+       * It may come from a preference, which carries no MTime, so Update() compares
+       * ResolveSmoothed() against this to notice a change.
        */
       bool m_LastSmoothed;
 
@@ -194,23 +196,29 @@ namespace mitk
     using OutdatedGroupVectorType = std::vector<std::pair<mitk::MultiLabelSegmentation::GroupIndexType, const mitk::Image*>>;
     /** \brief Check if groups are outdated or obsolete.
       *
-      * Obsolete groups will be removed. Outdated groups will be indicated
-      * in the output as such. New groups will be added to the local storage and also
-      * marked as outdated.
+      * Obsolete groups will be removed. A group is outdated when its surface was
+      * extracted from other group image contents, another time step or another
+      * smoothing, or when its position changed. New groups will be added to the local
+      * storage and also marked as outdated.
       *
       * \param ls The local storage to check.
       * \param seg The multi-label segmentation to check against.
       * \param fadedPipelineChanged Whether the faded pipeline state has changed.
+      * \param timeStep The time step to show.
+      * \param smoothed The smoothing to show.
       * \return A vector of outdated group index / image pairs.
       */
     OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
-      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged);
+      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged, TimeStepType timeStep, bool smoothed);
 
     /** \brief Update the surface mapping for the given outdated groups.
       * \param localStorage The local storage to update.
       * \param outdatedData The outdated group data to process.
+      * \param timeStep The time step to extract.
+      * \param smoothed The smoothing to extract with.
       */
-    void UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
+    void UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData,
+      TimeStepType timeStep, bool smoothed);
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;

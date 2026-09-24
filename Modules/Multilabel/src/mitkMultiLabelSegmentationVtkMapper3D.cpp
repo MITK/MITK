@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
+#include <optional>
 
 namespace
 {
@@ -75,6 +76,16 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::ResolveSmoothed(const mitk::DataNo
 
 namespace mitk
 {
+  // What a group surface was extracted from.
+  struct MultiLabelSurfaceStamp
+  {
+    itk::ModifiedTimeType m_DataMTime = 0;
+    TimeStepType m_TimeStep = 0;
+    bool m_Smoothed = true;
+
+    bool operator==(const MultiLabelSurfaceStamp&) const = default;
+  };
+
   class MultiLabelSegmentationGroupMapping
   {
   public:
@@ -86,6 +97,9 @@ namespace mitk
     // The actor index in the group order. Used to detect group reordering.
     MultiLabelSegmentation::GroupIndexType m_ActorOrder = 0;
 
+    // What the surface on display was extracted from. Empty until the first extraction.
+    std::optional<MultiLabelSurfaceStamp> m_Shown;
+
     MultiLabelSegmentationGroupMapping()
       : m_Extractor(std::make_unique<MultiLabelSurfaceNetsExtractor>()),
         m_PolyMapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
@@ -94,6 +108,14 @@ namespace mitk
     {
     }
   };
+}
+
+namespace
+{
+  mitk::MultiLabelSurfaceStamp MakeSurfaceStamp(const mitk::Image* groupImage, mitk::TimeStepType timeStep, bool smoothed)
+  {
+    return { std::max(groupImage->GetMTime(), groupImage->GetPipelineMTime()), timeStep, smoothed };
+  }
 }
 
 mitk::MultiLabelSegmentationVtkMapper3D::MultiLabelSegmentationVtkMapper3D()
@@ -198,7 +220,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
 
 mitk::MultiLabelSegmentationVtkMapper3D::OutdatedGroupVectorType
 mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
-  mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged)
+  mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged, TimeStepType timeStep, bool smoothed)
 {
   assert(seg && seg->IsInitialized());
 
@@ -216,10 +238,9 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
 
     if (finding != ls->m_GroupPipelines.end())
     {
-      const bool imageIsOutdated = groupImage->GetMTime() > ls->m_LastDataUpdateTime
-        || groupImage->GetPipelineMTime() > ls->m_LastDataUpdateTime;
+      const bool surfaceIsOutdated = finding->second->m_Shown != MakeSurfaceStamp(groupImage, timeStep, smoothed);
       const bool groupPositionHasChanged = groupID != finding->second->m_ActorOrder;
-      if (imageIsOutdated || groupPositionHasChanged)
+      if (surfaceIsOutdated || groupPositionHasChanged)
       {
         result.push_back({ groupID, groupImage });
 
@@ -303,17 +324,14 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
   return result;
 }
 
-void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedGroups)
+void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage* localStorage,
+  const OutdatedGroupVectorType& outdatedGroups, TimeStepType timeStep, bool smoothed)
 {
   mitk::DataNode* node = this->GetDataNode();
   auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   assert(segmentation && segmentation->IsInitialized());
 
   segmentation->Update();
-
-  const auto orientationMatrix = MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(segmentation->GetGeometry());
-
-  const auto timeStep = this->GetTimestep();
 
   for (auto& [groupID, groupImage] : outdatedGroups)
   {
@@ -325,23 +343,22 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage*
     }
     auto& pipeline = finding->second;
 
-    pipeline->m_Actor->SetUserMatrix(orientationMatrix);
+    const auto stamp = MakeSurfaceStamp(groupImage, timeStep, smoothed);
 
     // we could also search for the nonConst groupImage in segmentation, but the const cast
     // is faster and legit as we have access to the non const segmentation anyways.
     auto nonConstImage = const_cast<Image*>(groupImage);
     pipeline->m_VtkImage = nonConstImage->GetVtkImageData(timeStep);
 
-    pipeline->m_Extractor->SetSmoothing(localStorage->m_LastSmoothed);
+    pipeline->m_Extractor->SetSmoothing(smoothed);
 
     const auto groupLabels = segmentation->GetLabelValuesByGroup(groupID);
     auto polyData = pipeline->m_Extractor->Extract(pipeline->m_VtkImage, groupLabels);
     pipeline->m_PolyMapper->SetInputData(polyData);
+    pipeline->m_Shown = stamp;
   }
 
   localStorage->m_Actors->Modified();
-  localStorage->m_LastDataUpdateTime.Modified();
-  localStorage->m_LastUpdateTimeStep = timeStep;
 }
 
 void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
@@ -366,38 +383,22 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   }
   const auto fadedPipelineChanged = oldUseFadedPipeline != localStorage->m_UseFadedPipeline;
 
-  auto outdatedGroups = this->CheckForOutdatedGroups(localStorage, image, fadedPipelineChanged);
-
-  const bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
-    (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
-
-  const bool visibilityChanged =
-    PropertyTimeStampIsNewer(node, renderer, "visible", localStorage->m_LastDataUpdateTime) ||
-    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.3D.hide", localStorage->m_LastDataUpdateTime);
-
-  const bool timeStepChanged = this->GetTimestep() != localStorage->m_LastUpdateTimeStep;
-
-  // A change in the resolved smoothing state forces all groups to re-extract
-  // (the smoothing flag is applied to vtkSurfaceNets3D in UpdateSurfaceMapping).
-  const bool currentSmoothed = ResolveSmoothed(node, renderer);
-  const bool smoothedChanged = currentSmoothed != localStorage->m_LastSmoothed;
-  localStorage->m_LastSmoothed = currentSmoothed;
-
   // Lookup-only changes (color, alpha, highlight, per-label visibility via alpha=0) do not
   // require surface re-extraction: the polydata mapper picks up the LUT change automatically.
-  if (isGeometryModified || visibilityChanged || timeStepChanged || smoothedChanged)
-  {
-    outdatedGroups.clear();
-    for (auto& [key, pipeline] : localStorage->m_GroupPipelines)
-    {
-      outdatedGroups.emplace_back(pipeline->m_ActorOrder, key);
-    }
-  }
+  // Nothing about the view enters the extraction either, so plane geometry, camera and
+  // visibility changes need none.
+  const auto timeStep = this->GetTimestep();
+  const bool smoothed = ResolveSmoothed(node, renderer);
+
+  const auto outdatedGroups = this->CheckForOutdatedGroups(localStorage, image, fadedPipelineChanged, timeStep, smoothed);
 
   if (!outdatedGroups.empty())
   {
-    this->UpdateSurfaceMapping(localStorage, outdatedGroups);
+    this->UpdateSurfaceMapping(localStorage, outdatedGroups, timeStep, smoothed);
   }
+
+  localStorage->m_LastUpdateTimeStep = timeStep;
+  localStorage->m_LastSmoothed = smoothed;
 }
 
 void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *renderer)
@@ -426,14 +427,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   // GenerateDataForRenderer forces to run once this flag opens the regeneration gate.
   const auto changedOpacityFactor = GetOpacityFactor(localStorage->m_SegPreferences) != localStorage->m_LastOpacityFactor;
 
-  // Detect a change in the resolved smoothing state so a preference flip
-  // (without any per-node property change) still triggers re-extraction.
-  // m_LastSmoothed reflects the smoothing of the cached polydata, so it is only
-  // updated after a successful re-extraction in GenerateDataForRenderer. Reading
-  // it before the early-return paths below is intentional: comparing the resolved
-  // request against the cache is the correct staleness check, and on the unhide
-  // frame the visibility-property MTime independently triggers GenerateDataForRenderer
-  // (its inner visibilityChanged path forces all groups to refresh).
+  // The smoothing may come from a preference, which carries no MTime, so a flip is
+  // detected against the smoothing of the last pass.
   const auto changedSmoothed = ResolveSmoothed(node, renderer) != localStorage->m_LastSmoothed;
 
   if (!visible
@@ -469,19 +464,26 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
 
   if (localStorage->m_LabelLookupTable.IsNull() ||
       (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
-      (localStorage->m_LastDataUpdateTime < segmentation->GetMTime()) ||
-      (localStorage->m_LastDataUpdateTime < segmentation->GetPipelineMTime()) ||
-      (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
-      (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
-      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
-      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
-      (localStorage->m_LastPropertyUpdateTime < segmentation->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastGenerateTime < segmentation->GetMTime()) ||
+      (localStorage->m_LastGenerateTime < segmentation->GetPipelineMTime()) ||
+      (localStorage->m_LastGenerateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastGenerateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+      (localStorage->m_LastGenerateTime < segmentation->GetPropertyList()->GetMTime()) ||
+      this->GetTimestep() != localStorage->m_LastUpdateTimeStep ||
       changed3DRendering ||
       changedSmoothed ||
       changedOpacityFactor)
   {
     this->GenerateDataForRenderer(renderer);
-    localStorage->m_LastPropertyUpdateTime.Modified();
+    localStorage->m_LastGenerateTime.Modified();
+  }
+
+  // Set on every render: it is cheap, and a geometry-only edit may leave the MTime of the
+  // segmentation unchanged, which would keep the check above closed.
+  const auto imageToWorld = MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(segmentation->GetGeometry());
+  for (auto& [groupImage, pipeline] : localStorage->m_GroupPipelines)
+  {
+    pipeline->m_Actor->SetUserMatrix(imageToWorld);
   }
 }
 

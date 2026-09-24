@@ -294,30 +294,16 @@ const mitk::SegmentationInterpolationController::SliceCountsType &mitk::Segmenta
   return sliceCounts.Counts;
 }
 
-const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::SegmentationInterpolationController::GetEnclosingSlices(
+mitk::SegmentationInterpolationController::EnclosingSlices mitk::SegmentationInterpolationController::CreateEnclosingSlices(
   unsigned int sliceDimension,
   unsigned int lowerIndex,
   unsigned int upperIndex,
-  const PlaneGeometry *currentPlane,
-  unsigned int timeStep)
+  const PlaneGeometry *plane,
+  unsigned int timeStep) const
 {
   const auto *imageGeometry = m_Segmentation->GetGeometry(timeStep);
-  const auto lowerPlane = MovePlaneToSlice(currentPlane, imageGeometry, sliceDimension, lowerIndex);
-
-  if (m_EnclosingSlices.has_value() &&
-      m_EnclosingSlices->TimeStep == timeStep &&
-      m_EnclosingSlices->SliceDimension == sliceDimension &&
-      m_EnclosingSlices->LowerIndex == lowerIndex &&
-      m_EnclosingSlices->UpperIndex == upperIndex &&
-      m_EnclosingSlices->SegmentationMTime == m_Segmentation->GetMTime() &&
-      mitk::Equal(*m_EnclosingSlices->LowerPlane, *lowerPlane, mitk::eps))
-  {
-    return *m_EnclosingSlices;
-  }
-
-  m_EnclosingSlices.reset();
-
-  const auto upperPlane = MovePlaneToSlice(currentPlane, imageGeometry, sliceDimension, upperIndex);
+  const auto lowerPlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, lowerIndex);
+  const auto upperPlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, upperIndex);
   const auto lowerSlice = ExtractSlice(m_Segmentation, lowerPlane, timeStep);
   const auto upperSlice = ExtractSlice(m_Segmentation, upperPlane, timeStep);
 
@@ -358,8 +344,65 @@ const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::Segmenta
       CreateBinaryCrop(upperSlice, m_LabelValue, enclosingSlices.CropBegin, enclosingSlices.CropSize);
   }
 
-  m_EnclosingSlices = std::move(enclosingSlices);
+  return enclosingSlices;
+}
+
+const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::SegmentationInterpolationController::GetEnclosingSlices(
+  unsigned int sliceDimension,
+  unsigned int lowerIndex,
+  unsigned int upperIndex,
+  const PlaneGeometry *currentPlane,
+  unsigned int timeStep)
+{
+  const auto lowerPlane = MovePlaneToSlice(currentPlane, m_Segmentation->GetGeometry(timeStep), sliceDimension, lowerIndex);
+
+  if (m_EnclosingSlices.has_value() &&
+      m_EnclosingSlices->TimeStep == timeStep &&
+      m_EnclosingSlices->SliceDimension == sliceDimension &&
+      m_EnclosingSlices->LowerIndex == lowerIndex &&
+      m_EnclosingSlices->UpperIndex == upperIndex &&
+      m_EnclosingSlices->SegmentationMTime == m_Segmentation->GetMTime() &&
+      mitk::Equal(*m_EnclosingSlices->LowerPlane, *lowerPlane, mitk::eps))
+  {
+    return *m_EnclosingSlices;
+  }
+
+  m_EnclosingSlices.reset();
+  m_EnclosingSlices = this->CreateEnclosingSlices(sliceDimension, lowerIndex, upperIndex, currentPlane, timeStep);
   return *m_EnclosingSlices;
+}
+
+mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateBetween(const EnclosingSlices &enclosingSlices,
+                                                                                   unsigned int sliceIndex,
+                                                                                   const PlaneGeometry *slicePlane,
+                                                                                   unsigned int timeStep) const
+{
+  if (enclosingSlices.LowerCrop.IsNull())
+    return nullptr;
+
+  auto result = CreateEmptySlice(m_Segmentation, slicePlane, timeStep);
+
+  if (result->GetDimension(0) != enclosingSlices.SliceSize[0] || result->GetDimension(1) != enclosingSlices.SliceSize[1])
+  {
+    mitkThrowException(SegmentationInterpolationException)
+      << "The regions of the slices for the 2D interpolation are not equally sized.";
+  }
+
+  auto resultCrop = CreateCropImage(enclosingSlices.CropSize, result->GetGeometry()->GetSpacing());
+  auto resultCropImage = GrabItkImageMemory(resultCrop);
+
+  enclosingSlices.Algorithm->Interpolate(enclosingSlices.LowerCrop,
+                                         enclosingSlices.LowerIndex,
+                                         enclosingSlices.UpperCrop,
+                                         enclosingSlices.UpperIndex,
+                                         sliceIndex,
+                                         enclosingSlices.SliceDimension,
+                                         resultCropImage,
+                                         timeStep,
+                                         nullptr);
+
+  PasteCrop(resultCropImage, enclosingSlices.CropBegin, result);
+  return result;
 }
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
@@ -390,31 +433,46 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   const auto upperIndex = static_cast<unsigned int>(upper - counts.begin());
 
   const auto &enclosingSlices = this->GetEnclosingSlices(sliceDimension, lowerIndex, upperIndex, currentPlane, timeStep);
+  return this->InterpolateBetween(enclosingSlices, sliceIndex, currentPlane, timeStep);
+}
 
-  if (enclosingSlices.LowerCrop.IsNull())
-    return nullptr;
+void mitk::SegmentationInterpolationController::InterpolateAll(
+  unsigned int sliceDimension,
+  const PlaneGeometry *plane,
+  unsigned int timeStep,
+  const std::function<void(unsigned int sliceIndex, const Image *interpolation)> &consumer)
+{
+  if (m_Segmentation.IsNull() || nullptr == plane)
+    return;
 
-  auto result = CreateEmptySlice(m_Segmentation, currentPlane, timeStep);
+  if (timeStep >= m_SliceCounts.size() || sliceDimension > 2)
+    return;
 
-  if (result->GetDimension(0) != enclosingSlices.SliceSize[0] || result->GetDimension(1) != enclosingSlices.SliceSize[1])
+  // Copied, so that the gaps stay those of the segmentation as it was when the call started.
+  const auto counts = this->GetSliceCounts(timeStep)[sliceDimension];
+  const auto *imageGeometry = m_Segmentation->GetGeometry(timeStep);
+
+  std::optional<unsigned int> lowerIndex;
+
+  for (unsigned int upperIndex = 0; upperIndex < counts.size(); ++upperIndex)
   {
-    mitkThrowException(SegmentationInterpolationException)
-      << "The regions of the slices for the 2D interpolation are not equally sized.";
+    if (0 == counts[upperIndex])
+      continue;
+
+    if (lowerIndex.has_value() && upperIndex - *lowerIndex > 1)
+    {
+      const auto enclosingSlices = this->CreateEnclosingSlices(sliceDimension, *lowerIndex, upperIndex, plane, timeStep);
+
+      for (auto sliceIndex = *lowerIndex + 1; sliceIndex < upperIndex; ++sliceIndex)
+      {
+        const auto slicePlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, sliceIndex);
+        const auto interpolation = this->InterpolateBetween(enclosingSlices, sliceIndex, slicePlane, timeStep);
+
+        if (interpolation.IsNotNull())
+          consumer(sliceIndex, interpolation);
+      }
+    }
+
+    lowerIndex = upperIndex;
   }
-
-  auto resultCrop = CreateCropImage(enclosingSlices.CropSize, result->GetGeometry()->GetSpacing());
-  auto resultCropImage = GrabItkImageMemory(resultCrop);
-
-  enclosingSlices.Algorithm->Interpolate(enclosingSlices.LowerCrop,
-                                         lowerIndex,
-                                         enclosingSlices.UpperCrop,
-                                         upperIndex,
-                                         sliceIndex,
-                                         sliceDimension,
-                                         resultCropImage,
-                                         timeStep,
-                                         nullptr);
-
-  PasteCrop(resultCropImage, enclosingSlices.CropBegin, result);
-  return result;
 }

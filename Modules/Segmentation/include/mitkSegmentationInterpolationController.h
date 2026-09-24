@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <cstddef>
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -77,6 +78,25 @@ namespace mitk
                                const PlaneGeometry *currentPlane,
                                unsigned int timeStep);
 
+    /**
+      \brief Interpolates every slice along an image axis that has something to interpolate.
+
+      Gives the results Interpolate() gives for each slice, computed gap by gap from the segmentation as it is when the
+      call starts. The consumer may therefore write each result into its slice of the segmentation, for instance to
+      accept all interpolations.
+
+      \param sliceDimension Number of the dimension which is constant for all pixels of the meant slices.
+      \param plane The plane of any slice along that axis. Each result is sampled on it, moved to its slice.
+      \param timeStep Which time step to use.
+      \param consumer Called in ascending slice order with the index of a slice and its interpolation.
+
+      \throw SegmentationInterpolationException if the enclosing slices of a gap cannot be combined.
+    */
+    void InterpolateAll(unsigned int sliceDimension,
+                        const PlaneGeometry *plane,
+                        unsigned int timeStep,
+                        const std::function<void(unsigned int sliceIndex, const Image *interpolation)> &consumer);
+
   protected:
     SegmentationInterpolationController();
     ~SegmentationInterpolationController() override;
@@ -92,9 +112,8 @@ namespace mitk
     };
 
     /**
-      The two slices enclosing the last interpolated gap, cropped to the bounding box of the label in both and
-      binarized. Scrolling through a gap interpolates between the same two slices, so the crops and the distance
-      maps cached by Algorithm are reused.
+      The two slices enclosing a gap, cropped to the bounding box of the label in both and binarized. Algorithm caches
+      their distance maps for all slices of the gap.
     */
     struct EnclosingSlices
     {
@@ -118,15 +137,29 @@ namespace mitk
 
     const SliceCountsType &GetSliceCounts(unsigned int timeStep);
 
+    EnclosingSlices CreateEnclosingSlices(unsigned int sliceDimension,
+                                          unsigned int lowerIndex,
+                                          unsigned int upperIndex,
+                                          const PlaneGeometry *plane,
+                                          unsigned int timeStep) const;
+
+    /** Like CreateEnclosingSlices(), but reuses the enclosing slices of the previous call while they are still valid. */
     const EnclosingSlices &GetEnclosingSlices(unsigned int sliceDimension,
                                               unsigned int lowerIndex,
                                               unsigned int upperIndex,
                                               const PlaneGeometry *currentPlane,
                                               unsigned int timeStep);
 
+    Image::Pointer InterpolateBetween(const EnclosingSlices &enclosingSlices,
+                                      unsigned int sliceIndex,
+                                      const PlaneGeometry *slicePlane,
+                                      unsigned int timeStep) const;
+
     Image::ConstPointer m_Segmentation;
     Label::PixelType m_LabelValue;
     std::vector<TimeStepSliceCounts> m_SliceCounts;
+
+    /** The enclosing slices of the gap Interpolate() was last called for. */
     std::optional<EnclosingSlices> m_EnclosingSlices;
   };
 

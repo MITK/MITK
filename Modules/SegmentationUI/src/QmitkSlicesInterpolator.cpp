@@ -37,8 +37,6 @@ found in the LICENSE file.
 #include <mitkExtractSliceFilter.h>
 #include <mitkPlanarCircle.h>
 #include <mitkImageReadAccessor.h>
-#include <mitkImageTimeSelector.h>
-#include <mitkImageWriteAccessor.h>
 #include <mitkVtkImageOverwrite.h>
 #include <itkCommand.h>
 
@@ -68,6 +66,7 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 
 #include <array>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -959,12 +958,6 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
 void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationController *slicer)
 {
-  /*
-   * What exactly is done here:
-   * 1. We create an empty diff image for the current segmentation
-   * 2. All interpolated slices are written into the diff image
-   * 3. Then the diffimage is applied to the original segmentation
-   */
   if (m_Segmentation)
   {
     if (!m_Segmentation->ExistLabel(m_CurrentActiveLabelValue))
@@ -980,32 +973,15 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       return;
     }
 
-    const auto relevantGroupImage = m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_CurrentActiveLabelValue));
-    m_Interpolator->SetSegmentationVolume(relevantGroupImage, m_CurrentActiveLabelValue);
+    const auto groupIndex = m_Segmentation->GetGroupIndexOfLabel(m_CurrentActiveLabelValue);
+    auto* groupImage = m_Segmentation->GetGroupImage(groupIndex);
+    m_Interpolator->SetSegmentationVolume(groupImage, m_CurrentActiveLabelValue);
 
-    const auto segmentation3D = mitk::SelectImageByTimePoint(relevantGroupImage, m_TimePoint);
-
-    // Create an empty diff image for the undo operation
-    auto diffImage = mitk::Image::New();
-    diffImage->Initialize(segmentation3D);
-
-    // Create scope for ImageWriteAccessor so that the accessor is destroyed right after use
-    {
-      mitk::ImageWriteAccessor accessor(diffImage);
-
-      // Set all pixels to zero
-      auto pixelType = mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>();
-
-      memset(accessor.GetData(), 0, pixelType.GetSize() * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2));
-    }
-
-    // Since we need to shift the plane it must be clone so that the original plane isn't altered
-    auto slicedGeometry = m_Segmentation->GetSlicedGeometry();
-    auto planeGeometry = slicer->GetCurrentPlaneGeometry()->Clone();
+    const auto* planeGeometry = slicer->GetCurrentPlaneGeometry();
     int sliceDimension = -1;
     int sliceIndex = -1;
 
-    mitk::SegTool2D::DetermineAffectedImageSlice(segmentation3D, planeGeometry, sliceDimension, sliceIndex);
+    mitk::SegTool2D::DetermineAffectedImageSlice(groupImage, planeGeometry, sliceDimension, sliceIndex);
 
     if (sliceIndex == -1 || sliceDimension == -1)
     {
@@ -1013,91 +989,50 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       return;
     }
 
-    const auto numSlices = m_Segmentation->GetDimensions()[sliceDimension];
-    mitk::ProgressTask task("Accepting interpolations", numSlices);
+    const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
+    const auto labels = m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(groupIndex));
+    auto label = m_Segmentation->GetLabel(m_CurrentActiveLabelValue);
+    const auto undoName = "3D-interpolation - " + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, label);
 
-    unsigned int totalChangedSlices = 0;
+    mitk::ProgressTask task("Accepting interpolations", m_Segmentation->GetDimensions()[sliceDimension]);
+
+    // Taken right before the first result is written, as the state to undo to.
+    std::optional<mitk::SegGroupModifyUndoRedoHelper> undoHelper;
 
     try
     {
-      auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
-
-      auto origin = planeGeometry->GetOrigin();
-
-      for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
-      {
-        slicedGeometry->WorldToIndex(origin, origin);
-        origin[sliceDimension] = sliceIndex;
-        slicedGeometry->IndexToWorld(origin, origin);
-        planeGeometry->SetOrigin(origin);
-
-        auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep);
-
-        if (interpolation.IsNotNull())
+      m_Interpolator->InterpolateAll(sliceDimension, planeGeometry, timeStep,
+        [&](unsigned int interpolatedSliceIndex, const mitk::Image* interpolation)
         {
-          // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
-          auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+          if (!undoHelper.has_value())
+          {
+            // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
+            undoHelper.emplace(m_Segmentation, mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType{ groupIndex },
+              false, timeStep, false, false, true);
+          }
 
-          // Set overwrite mode to true to write back to the image volume
-          reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
-          reslicer->SetOverwriteMode(true);
-          reslicer->Modified();
+          mitk::TransferSliceContentAtTimeStep(interpolation, groupImage, labels, timeStep, 1, m_CurrentActiveLabelValue,
+            mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
-          auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
-
-          diffSliceWriter->SetInput(diffImage);
-          diffSliceWriter->SetTimeStep(0);
-          diffSliceWriter->SetWorldGeometry(planeGeometry);
-          diffSliceWriter->SetVtkOutputRequest(true);
-          diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
-          diffSliceWriter->Modified();
-          diffSliceWriter->Update();
-
-          ++totalChangedSlices;
-        }
-
-        task.Progress();
-      }
-
-      if (totalChangedSlices > 0)
-      {
-        const auto activeLabel = m_Segmentation->GetActiveLabel();
-        if (nullptr == activeLabel)
-        {
-          MITK_ERROR << "AcceptAllInterpolations: no active label set.";
-          return;
-        }
-        auto newDestinationLabel = activeLabel->GetValue();
-        auto activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, activeLabel);
-
-        // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
-        mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
-
-        TransferLabelContentAtTimeStep(
-          diffImage,
-          m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()),
-          m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(m_Segmentation->GetActiveLayer())),
-          timeStep,
-          0,
-          0,
-          false,
-          { {1, newDestinationLabel} },
-          mitk::MultiLabelSegmentation::MergeStyle::Merge,
-          mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
-
-        // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
-        activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
-
-        std::string name = "3D-interpolation - " + activeLabelName;
-
-        undoHelper.RegisterUndoRedoOperationEvent(name);
-      }
+          task.SetProgress(interpolatedSliceIndex + 1);
+        });
     }
     catch (...)
     {
+      // Keeps what was written before the failure undoable.
+      if (undoHelper.has_value())
+        undoHelper->RegisterUndoRedoOperationEvent(undoName);
+
       m_FeedbackNode->SetData(nullptr);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       throw;
+    }
+
+    if (undoHelper.has_value())
+    {
+      // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
+      label->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
+      undoHelper->RegisterUndoRedoOperationEvent(undoName);
     }
 
     m_FeedbackNode->SetData(nullptr);

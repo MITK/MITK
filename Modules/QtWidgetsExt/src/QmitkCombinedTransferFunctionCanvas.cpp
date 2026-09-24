@@ -577,6 +577,11 @@ void QmitkCombinedTransferFunctionCanvas::RemoveFunctionPoint(double x)
 {
   if (m_ActiveFunction == ActiveFunction::Color)
   {
+    // Every way of removing a stop leaves nothing selected, and the
+    // announcement below has to say so already: the index would otherwise
+    // name the stop that moved into the removed one's place.
+    m_GrabbedHandle = -1;
+
     m_ColorTransferFunction->RemovePoint(x);
 
     emit PointsChanged();
@@ -777,13 +782,7 @@ void QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop()
   if (index == -1 || this->GetColorStopCount() < 2)
     return;
 
-  const double value = this->GetColorStopValue(index);
-
-  // Dropped before the removal so that the one announcement it makes already
-  // describes the selection as well.
-  m_GrabbedHandle = -1;
-
-  this->RemoveFunctionPoint(value);
+  this->RemoveFunctionPoint(this->GetColorStopValue(index));
 
   this->update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

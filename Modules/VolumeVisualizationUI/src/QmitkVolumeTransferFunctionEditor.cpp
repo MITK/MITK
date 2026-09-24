@@ -826,8 +826,14 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetSelectedColorStop);
   connect(m_Controls->colorStopColorButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnPickColorStopColor);
-  connect(m_Controls->colorStopOffsetSpinBox, &QDoubleSpinBox::valueChanged,
-    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopOffset);
+  // Refreshed whether or not the canvas moved the stop: a refused offset
+  // announces nothing, and the box would keep showing where the stop is not.
+  connect(m_Controls->colorStopOffsetSpinBox, &QDoubleSpinBox::valueChanged, this,
+    [this](double offset)
+    {
+      m_Controls->combinedTfCanvas->SetSelectedColorStopOffset(offset);
+      this->ShowColorStops();
+    });
   connect(m_Controls->removeColorStopButton, &QToolButton::clicked,
     m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop);
   connect(m_Controls->addColorStopButton, &QToolButton::clicked,

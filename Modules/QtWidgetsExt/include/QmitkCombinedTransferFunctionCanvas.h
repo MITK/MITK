@@ -120,8 +120,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     /**
      * \brief Move the selected stop to a fraction of the displayed range.
      *
-     * Clamped between its neighbours, as dragging it is, so that the two ways
-     * of moving a stop cannot disagree.
+     * Refused where it would reach a neighbour, as dragging it is, so that the
+     * two ways of moving a stop cannot disagree.
      */
     void SetSelectedColorStopOffset(double offset);
 

@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <QmitkVolumeLightingWidget.h>
 #include <QmitkVolumeTransferFunctionEditor.h>
 #include <QmitkRenderWindow.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
@@ -138,7 +138,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
 
   m_Controls->enableRenderingButton->setIcon(
-    QmitkStyleManager::ThemeIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
+    QmitkIconTheme::GetIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
 
   m_Controls->binaryHintLabel->setText(
     "Binary image: its appearance is set by the node colour, not by a transfer function.");

@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <mitkTransferFunctionTransform.h>
 
 #include <QmitkCombinedTransferFunctionCanvas.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <QmitkVolumeThumbnailRenderer.h>
 
 #include <ui_QmitkVolumeTransferFunctionEditorControls.h>
@@ -664,7 +664,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // selection behind it, so the preset in force would keep a full-strength
   // highlight while the editor is switched off. Translucent rather than a fixed
   // colour, since it has to lighten a dark background and darken a light one,
-  // and QmitkStyleManager exposes only icon colours to ask the theme for.
+  // and QmitkIconTheme exposes only icon colours to ask the theme for.
   presetList->setStyleSheet(
     "QListWidget::item:selected:disabled { background-color: rgba(127, 127, 127, 90); }");
 
@@ -748,9 +748,9 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
   // Set here rather than in the .ui: the resource is authored with a
-  // placeholder fill that QmitkStyleManager swaps for the theme's icon colour,
+  // placeholder fill that QmitkIconTheme swaps for the theme's icon colour,
   // so a direct reference from the .ui would draw it in that placeholder.
-  m_Controls->resetTfButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
+  m_Controls->resetTfButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
   // A click rather than the current entry changing: the current entry is also
   // set from what a node records, and reacting to that would re-apply the
@@ -946,7 +946,7 @@ void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
   // The icon names the presentation pressing the button brings rather than the
   // one in force, the way the view's rendering button names what pressing it
   // does.
-  m_Controls->presetViewModeButton->setIcon(QmitkStyleManager::ThemeIcon(compact
+  m_Controls->presetViewModeButton->setIcon(QmitkIconTheme::GetIcon(compact
     ? QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")
     : QStringLiteral(":/VolumeVisualizationUI/view-list-details.svg")));
 
@@ -2283,7 +2283,7 @@ void QmitkVolumeTransferFunctionEditor::RefreshPlaceholders()
 {
   auto *presetList = m_Controls->presetListWidget;
 
-  const QColor iconColor(QmitkStyleManager::GetIconColor());
+  const QColor iconColor(QmitkIconTheme::GetColor());
   const QIcon placeholder = PlaceholderPreview(presetList->iconSize(), iconColor);
 
   // Previews are filled in one after another from the front, so the index of

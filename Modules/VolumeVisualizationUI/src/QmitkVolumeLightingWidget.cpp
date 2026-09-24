@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkVolumeRenderingLightingModel.h>
 #include <mitkVolumeRenderingMaterial.h>
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <ui_QmitkVolumeLightingWidgetControls.h>
 
@@ -55,9 +55,9 @@ QmitkVolumeLightingWidget::QmitkVolumeLightingWidget(QWidget *parent, Qt::Window
   ConfigureSlider(m_Controls->specularPowerSlider, 1, 1.0, 128.0, 1.0);
 
   // Set here rather than in the .ui: the resource is authored with a
-  // placeholder fill that QmitkStyleManager swaps for the theme's icon colour,
+  // placeholder fill that QmitkIconTheme swaps for the theme's icon colour,
   // so a direct reference from the .ui would draw it in that placeholder.
-  m_Controls->resetButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/reset.svg")));
+  m_Controls->resetButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
   connect(m_Controls->ambientSlider, &ctkSliderWidget::valueChanged,
     this, &QmitkVolumeLightingWidget::OnMaterialChanged);

@@ -98,11 +98,11 @@ public:
 
 protected:
   /** \brief Re-measure the preset entries when the room they have to fill
-   *         changes, and take the clicks meant for the load entry.
+   *         changes, take the clicks meant for the load entry, and apply the
+   *         entry the keyboard is on when Enter or Space is pressed.
    *
-   * A press on the load entry never reaches the view: the view would make it the
-   * current entry, which is what records the preset in force, and would clear
-   * the selection marking that preset, since the load entry cannot be selected.
+   * A press on the load entry never reaches the view: the entry stands for no
+   * preset, and is not one for the view to select or make current.
    */
   bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -288,6 +288,22 @@ private:
    * Nothing on the panel tells the two apart.
    */
   void ClearPresetSelection();
+
+  /** \brief The entry standing for the preset the bound node records, or
+   *         nullptr.
+   *
+   * The node's record rather than the view's current entry: the view moves its
+   * current entry by itself - under the arrow keys, a typed letter, a right
+   * click - and none of those apply anything.
+   */
+  QListWidgetItem *AppliedPresetItem() const;
+
+  /** \brief Mark the entry AppliedPresetItem names, and no other.
+   *
+   * The current entry is left where it is: it belongs to the keyboard, and
+   * moving it here would undo every arrow key press.
+   */
+  void ShowAppliedPreset();
 
   void SnapshotAppliedTransferFunction();
 

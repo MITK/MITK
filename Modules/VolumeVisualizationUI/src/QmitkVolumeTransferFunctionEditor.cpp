@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QFontMetrics>
 #include <QIcon>
+#include <QKeyEvent>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMenu>
@@ -665,8 +666,14 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // highlight while the editor is switched off. Translucent rather than a fixed
   // colour, since it has to lighten a dark background and darken a light one,
   // and QmitkIconTheme exposes only icon colours to ask the theme for.
+  //
+  // The entry the keyboard is on is marked the same way, only fainter. The
+  // view's own focus rectangle does not survive the application stylesheet,
+  // and without a mark Enter applies an entry nobody could see. It gives way
+  // to the selection on the entry that is both.
   presetList->setStyleSheet(
-    "QListWidget::item:selected:disabled { background-color: rgba(127, 127, 127, 90); }");
+    "QListWidget::item:selected:disabled { background-color: rgba(127, 127, 127, 90); }"
+    "QListWidget::item:focus:!selected { background-color: rgba(127, 127, 127, 50); }");
 
   // Taken before the remembered files are read in, which is what lets the loop
   // below tell the two apart: what the catalogue already held is its own, and
@@ -724,19 +731,17 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   presetList->viewport()->installEventFilter(this);
 
-  // Dragging across the grid, by as little as a pixel, is a selection rectangle
-  // to the view: it covers no entry, so the selection it draws is empty and the
-  // one that was there is cleared. Ctrl-clicking the marked entry drops it just
-  // as directly. Neither says which preset is applied - the current entry is
-  // what records that - so the mark goes back on it.
-  connect(presetList, &QListWidget::itemSelectionChanged, this,
-    [this]
-    {
-      auto *currentPreset = m_Controls->presetListWidget->currentItem();
+  // Keys go to the view itself, which is what holds the focus, rather than to
+  // its viewport.
+  presetList->installEventFilter(this);
 
-      if (currentPreset != nullptr && !currentPreset->isSelected())
-        currentPreset->setSelected(true);
-    });
+  // The view moves the selection by itself: along with the current entry under
+  // the arrow keys, a typed letter or a right-click press, and away from every
+  // entry under a selection rectangle - which dragging by as little as a pixel
+  // draws - or a Ctrl-click on the marked one. None of those applies a preset,
+  // so the mark goes back on the one that is.
+  connect(presetList, &QListWidget::itemSelectionChanged, this,
+    [this] { this->ShowAppliedPreset(); });
 
   // A freshly filled list lands on its first entry, which would name a preset
   // nothing has applied.
@@ -895,6 +900,25 @@ bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *ev
     }
   }
 
+  // What a click is to the mouse, for the entry the keyboard is on. Taken here
+  // rather than from the view's activated signal, which a double click emits
+  // as well - applying the preset a second time, after the click before it -
+  // and a single click too on some desktops.
+  if (watched == presetList && event->type() == QEvent::KeyPress)
+  {
+    const auto key = static_cast<QKeyEvent *>(event)->key();
+
+    if (key == Qt::Key_Return || key == Qt::Key_Enter || key == Qt::Key_Space)
+    {
+      if (auto *focusedItem = presetList->currentItem(); focusedItem == m_LoadPresetItem)
+        this->LoadPreset();
+      else if (focusedItem != nullptr)
+        this->OnPresetSelected(PresetName(focusedItem));
+
+      return true;
+    }
+  }
+
   return QWidget::eventFilter(watched, event);
 }
 
@@ -940,8 +964,8 @@ void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
 
   // The two presentations put the same entry at different heights, and what a
   // reader looks for first after a switch is the one in force.
-  if (auto *currentPreset = presetList->currentItem(); currentPreset != nullptr)
-    presetList->scrollToItem(currentPreset);
+  if (const auto *appliedPreset = this->AppliedPresetItem(); appliedPreset != nullptr)
+    presetList->scrollToItem(appliedPreset);
 
   // The icon names the presentation pressing the button brings rather than the
   // one in force, the way the view's rendering button names what pressing it
@@ -1139,6 +1163,8 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
   // origin by. See TF_PRESET_FILE_PROPERTY.
   if (origin == PresetOrigin::File)
     node->SetStringProperty(TF_PRESET_FILE_PROPERTY, PresetFile(presetItem).toStdString().c_str());
+
+  this->ShowAppliedPreset();
 
   // The mode travels with the curve: a window authored for MIP renders as a
   // white shell under composite, and a tissue classifier projected flat says
@@ -1359,6 +1385,31 @@ void QmitkVolumeTransferFunctionEditor::RecordCustomTransferFunction(mitk::DataN
 void QmitkVolumeTransferFunctionEditor::ClearPresetSelection()
 {
   m_Controls->presetListWidget->setCurrentRow(-1);
+}
+
+QListWidgetItem *QmitkVolumeTransferFunctionEditor::AppliedPresetItem() const
+{
+  return FindRecordedPresetItem(m_Controls->presetListWidget,
+                                ReadRecordedPreset(m_DataNode.Lock().GetPointer()));
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowAppliedPreset()
+{
+  auto *presetList = m_Controls->presetListWidget;
+  const auto *appliedPreset = this->AppliedPresetItem();
+
+  // Selecting what is already selected announces nothing, which is what lets
+  // this run from inside the view's own announcement of a changed selection
+  // without calling itself again.
+  if (appliedPreset != nullptr)
+  {
+    presetList->selectionModel()->select(presetList->model()->index(presetList->row(appliedPreset), 0),
+                                         QItemSelectionModel::ClearAndSelect);
+  }
+  else
+  {
+    presetList->clearSelection();
+  }
 }
 
 void QmitkVolumeTransferFunctionEditor::ApplyCurrentTransferFunction()
@@ -1831,7 +1882,11 @@ void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()
 {
   auto *presetList = m_Controls->presetListWidget;
 
-  const int editedRow = this->DiffersFromPreset() ? presetList->currentRow() : -1;
+  const auto *appliedPreset = this->AppliedPresetItem();
+
+  const int editedRow = appliedPreset != nullptr && this->DiffersFromPreset()
+    ? presetList->row(appliedPreset)
+    : -1;
 
   // Every entry rather than the one row that can wear the marker, so that the
   // entry the selection has just left is not left wearing it too.
@@ -2046,12 +2101,12 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
     return;
 
   auto *presetList = m_Controls->presetListWidget;
-  auto *currentPreset = presetList->currentItem();
+  const auto *appliedPreset = this->AppliedPresetItem();
 
   // The file name becomes the entry's name, so the suggestion starts from the
   // preset the curve was carried away from, beside the last preset saved.
   const QString suggestedName =
-    (currentPreset != nullptr ? PresetName(currentPreset) : QStringLiteral("transfer-function")) +
+    (appliedPreset != nullptr ? PresetName(appliedPreset) : QStringLiteral("transfer-function")) +
     QStringLiteral("-custom.json");
 
   const QStringList rememberedFiles = RememberedPresetFiles();
@@ -2227,7 +2282,7 @@ void QmitkVolumeTransferFunctionEditor::DropPresetEntry(QListWidgetItem *presetI
   // to, not the rendering. But a node naming a preset the catalogue no longer
   // holds has nothing to be rebuilt from, so it is recorded as carrying a curve
   // no preset describes.
-  if (presetRow == presetList->currentRow())
+  if (presetItem == this->AppliedPresetItem())
   {
     auto node = m_DataNode.Lock();
 

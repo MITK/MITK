@@ -96,6 +96,11 @@ rebuilds the preset as its author wrote it. Only a curve that no preset
 describes at all - one whose preset was removed while in use - leaves no entry
 marked.
 
+The grid can also be used from the keyboard once it has been clicked into. The
+arrow keys move a fainter mark from entry to entry without applying anything,
+so you can look around without losing the curve on show; Enter or Space applies
+the entry that mark is on, and on <b>Load preset...</b> opens the file dialog.
+
 Right-clicking the grid offers <b>Save as preset...</b> for the curve you have
 arrived at. It is available exactly while the asterisk is showing and greyed out
 otherwise, since a curve that is still its preset is one the catalogue already

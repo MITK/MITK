@@ -152,7 +152,7 @@ namespace
   }
 }
 
-// Shared with the threads, so that it outlives a scheduler whose worker is still extracting.
+// Shared between the scheduler and its worker.
 struct mitk::MultiLabelSurfaceExtractionScheduler::Shared
 {
   std::mutex m_Mutex;
@@ -164,16 +164,15 @@ struct mitk::MultiLabelSurfaceExtractionScheduler::Shared
   std::deque<QueueEntry> m_Queue;
 
   std::uint64_t m_LastJobId = 0;
-  bool m_Extracting = false;
   bool m_Stop = false;
 
-  static void Work(std::shared_ptr<Shared> shared);
+  static void Work(Shared* shared);
 
   // Removes what is queued for the smoothing, if anything, for the caller to release.
   std::optional<Job> Unqueue(const Image* groupImage, Group& group, bool smoothed);
 };
 
-void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Shared> shared)
+void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(Shared* shared)
 {
   MultiLabelSurfaceNetsExtractor extractor;
 
@@ -181,7 +180,7 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Sh
 
   for (;;)
   {
-    shared->m_Wake.wait(lock, [&shared]() { return shared->m_Stop || !shared->m_Queue.empty(); });
+    shared->m_Wake.wait(lock, [shared]() { return shared->m_Stop || !shared->m_Queue.empty(); });
 
     if (shared->m_Stop)
       return;
@@ -194,15 +193,12 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Shared::Work(std::shared_ptr<Sh
     auto job = std::move(queued->second);
     group.m_Queued.erase(queued);
     group.m_Running = RunningJob{ job.m_Id, job.m_Stamp };
-    shared->m_Extracting = true;
 
     lock.unlock();
 
     const auto surface = Extract(extractor, job);
 
     lock.lock();
-
-    shared->m_Extracting = false;
 
     // Forget(), the destructor and a synchronous extraction in the meantime make this
     // result obsolete.
@@ -245,7 +241,7 @@ mitk::MultiLabelSurfaceExtractionScheduler::Stamp mitk::MultiLabelSurfaceExtract
 }
 
 mitk::MultiLabelSurfaceExtractionScheduler::MultiLabelSurfaceExtractionScheduler()
-  : m_Shared(std::make_shared<Shared>())
+  : m_Shared(std::make_unique<Shared>())
 {
 }
 
@@ -253,29 +249,20 @@ mitk::MultiLabelSurfaceExtractionScheduler::~MultiLabelSurfaceExtractionSchedule
 {
   // Released here, outside the lock, on the thread that owns the data storage.
   std::map<const Image*, Group> groups;
-  bool extracting = false;
 
   {
     std::lock_guard lock(m_Shared->m_Mutex);
     m_Shared->m_Stop = true;
-    extracting = m_Shared->m_Extracting;
     groups.swap(m_Shared->m_Groups);
     m_Shared->m_Queue.clear();
   }
 
   m_Shared->m_Wake.notify_all();
 
+  // Waits for a running extraction, which cannot be interrupted. A detached worker would run
+  // into the teardown of the process when the Workbench is closed right after a stroke.
   if (m_Worker.joinable())
-  {
-    if (extracting)
-    {
-      m_Worker.detach();
-    }
-    else
-    {
-      m_Worker.join();
-    }
-  }
+    m_Worker.join();
 }
 
 void mitk::MultiLabelSurfaceExtractionScheduler::Request(const Image* groupImage, TimeStepType timeStep, bool smoothed,
@@ -329,7 +316,7 @@ void mitk::MultiLabelSurfaceExtractionScheduler::Request(const Image* groupImage
   }
 
   if (!m_Worker.joinable())
-    m_Worker = std::thread(&Shared::Work, m_Shared);
+    m_Worker = std::thread(&Shared::Work, m_Shared.get());
 
   {
     std::lock_guard lock(m_Shared->m_Mutex);

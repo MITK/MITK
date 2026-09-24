@@ -48,8 +48,8 @@ namespace mitk
    * the result is a preview: the stroke has changed the group image MTime, so the result is
    * outdated by its stamp and the next extraction replaces it.
    *
-   * vtkSurfaceNets3D cannot be interrupted, so the destructor does not wait for a running
-   * extraction. It finishes on its own and is discarded.
+   * vtkSurfaceNets3D cannot be interrupted, so the destructor waits for a running extraction
+   * to finish, and discards it.
    *
    * All methods must be called on the thread that owns the data storage.
    */
@@ -128,7 +128,7 @@ namespace mitk
   private:
     struct Shared;
 
-    std::shared_ptr<Shared> m_Shared;
+    std::unique_ptr<Shared> m_Shared;
     std::thread m_Worker;
   };
 }

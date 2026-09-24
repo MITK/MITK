@@ -111,7 +111,7 @@ class mitkMultiLabelSurfaceExtractionSchedulerTestSuite : public mitk::TestFixtu
   MITK_TEST(RequestsOfBothSmoothings_BothGetAResult_Success);
   MITK_TEST(ResultOfTheOtherSmoothing_IsOfferedUntilTheWantedOneArrives_Success);
   MITK_TEST(Forget_DiscardsARunningExtraction_Success);
-  MITK_TEST(DestructionDuringAnExtraction_ReleasesTheImageLater_Success);
+  MITK_TEST(DestructionDuringAnExtraction_WaitsForIt_Success);
   MITK_TEST(InvalidRequest_Throws_Success);
   CPPUNIT_TEST_SUITE_END();
 
@@ -360,7 +360,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A forgotten group must not get a result", !scheduler.GetResult(image, 0, true).has_value());
   }
 
-  void DestructionDuringAnExtraction_ReleasesTheImageLater_Success()
+  void DestructionDuringAnExtraction_WaitsForIt_Success()
   {
     auto image = MakeLargeGroupImage();
     const auto references = image->GetReferenceCount();
@@ -371,10 +371,13 @@ public:
       LetTheWorkerStart();
     }
 
-    // The mapper, and with it the scheduler, goes away with the node, which must not wait
-    // for an extraction that cannot be interrupted. The worker finishes on its own.
-    CPPUNIT_ASSERT_MESSAGE("The image was never released",
-                           this->WaitUntil([&]() { return IsReleased(image, references); }));
+    // A worker left running would run into the teardown of the process. Once the scheduler is
+    // gone, nothing is left but the render request the worker posted, which carries what it
+    // read.
+    m_Dispatcher->Drain();
+
+    CPPUNIT_ASSERT_MESSAGE("The extraction has to be over once the scheduler is destroyed",
+                           IsReleased(image, references));
   }
 
   void InvalidRequest_Throws_Success()

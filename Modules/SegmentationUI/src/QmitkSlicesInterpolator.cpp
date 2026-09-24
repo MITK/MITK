@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkSegTool2D.h>
 #include <mitkSliceNavigationController.h>
-#include <mitkSurfaceToImageFilter.h>
 #include <mitkTimeNavigationController.h>
 #include <mitkToolManager.h>
 #include <mitkUndoController.h>
@@ -1117,31 +1116,20 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   if (interpolatedSurface.IsNull())
     return;
 
-  auto surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
-
-  surfaceToImageFilter->SetImage(referenceImage);
-  surfaceToImageFilter->SetMakeOutputBinary(true);
-  surfaceToImageFilter->SetUShortBinaryPixelType(true);
-  surfaceToImageFilter->SetInput(interpolatedSurface);
-  surfaceToImageFilter->Update();
-
-  mitk::Image::Pointer interpolatedSegmentation = surfaceToImageFilter->GetOutput();
   auto timeStep = segmentationGeometry->TimePointToTimeStep(m_TimePoint);
   const mitk::Label::PixelType newDestinationLabel = activeLabel->GetValue();
 
   // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
   mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
 
-  TransferLabelContentAtTimeStep(
-    interpolatedSegmentation,
+  mitk::TransferSurfaceContentAtTimeStep(
+    interpolatedSurface,
     segmentation->GetGroupImage(segmentation->GetActiveLayer()),
     segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(segmentation->GetActiveLayer())),
     timeStep,
-    0,
-    0,
+    newDestinationLabel,
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE,
     false,
-    {{1, newDestinationLabel}},
-    mitk::MultiLabelSegmentation::MergeStyle::Merge,
     mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
   // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).

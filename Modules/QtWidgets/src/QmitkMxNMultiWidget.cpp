@@ -49,6 +49,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QRegularExpression>
+#include <QShortcut>
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -461,6 +462,16 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
   connect(this, &QmitkMxNMultiWidget::MaximizedCellChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
   connect(this, &QmitkMxNMultiWidget::CleanViewChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+
+  // Scoped to the editor so the key is only taken while the user works in it.
+  // It cannot be gated on the furniture being revealed: clean view hides the
+  // furniture, and the key is the way back.
+  auto* cleanViewShortcut = new QShortcut(CleanViewShortcut(), this);
+  cleanViewShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+  connect(cleanViewShortcut, &QShortcut::activated, this, [this]()
+  {
+    this->SetCleanView(!m_CleanView);
+  });
 
   m_ArrangeMode = new QmitkMxNArrangeMode(this);
   connect(m_ArrangeMode, &QmitkMxNArrangeMode::ActiveChanged, this, [this](bool active)
@@ -3807,6 +3818,13 @@ void QmitkMxNMultiWidget::SetCleanView(bool cleanView)
 bool QmitkMxNMultiWidget::IsCleanView() const
 {
   return m_CleanView;
+}
+
+QKeySequence QmitkMxNMultiWidget::CleanViewShortcut()
+{
+  // F11 is the Workbench's full screen; its shifted sibling is the
+  // distraction-free idiom, and nothing in MITK binds it.
+  return QKeySequence(Qt::SHIFT | Qt::Key_F11);
 }
 
 void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)

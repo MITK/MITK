@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <nlohmann/json.hpp>
 
 #include <QColor>
+#include <QKeySequence>
 #include <QPointer>
 #include <QRectF>
 
@@ -633,6 +634,12 @@ public:
   */
   void SetCleanView(bool cleanView);
   bool IsCleanView() const;
+
+  /**
+  * \brief The key that toggles clean view while focus is inside the editor;
+  *        shared with the menus and tooltips that advertise it.
+  */
+  static QKeySequence CleanViewShortcut();
 
   /**
   * \brief Default visibility of the per-cell level/window corner readout

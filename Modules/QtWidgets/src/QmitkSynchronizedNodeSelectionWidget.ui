@@ -55,10 +55,10 @@
    <item>
     <widget class="QCheckBox" name="selectionModeCheckBox">
      <property name="toolTip">
-      <string>Show all data, including data added later</string>
+      <string>Select all data, including data added later; visibility stays with the eye</string>
      </property>
      <property name="text">
-      <string>Show all data</string>
+      <string>Select all data</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -68,7 +68,7 @@
    <item>
     <widget class="QPushButton" name="changeSelectionButton">
      <property name="toolTip">
-      <string>Pick the data this window shows; turns off "Show all data"</string>
+      <string>Pick the data this window selects; turns off "Select all data"</string>
      </property>
      <property name="text">
       <string>Choose data...</string>

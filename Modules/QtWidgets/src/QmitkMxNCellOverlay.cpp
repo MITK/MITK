@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkAnatomicalPlanes.h>
@@ -28,10 +29,7 @@ found in the LICENSE file.
 #include <mitkInteractionEvent.h>
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
-#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateProperty.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
@@ -51,6 +49,7 @@ found in the LICENSE file.
 #include <QFontMetrics>
 #include <QFormLayout>
 #include <QFrame>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMimeData>
@@ -59,6 +58,7 @@ found in the LICENSE file.
 #include <QPixmap>
 #include <QPolygon>
 #include <QPropertyAnimation>
+#include <QScreen>
 #include <QSpinBox>
 #include <QStyle>
 #include <QTimer>
@@ -2086,7 +2086,54 @@ void QmitkMxNCellOverlay::mouseReleaseEvent(QMouseEvent* event)
   event->ignore();
 }
 
-void QmitkMxNCellOverlay::OpenNumericEntry()
+namespace
+{
+  /** Selects a spin box's whole value when a click gives it focus, as Qt
+   *  already does for Tab: a click otherwise leaves the cursor where it landed,
+   *  usually behind the last decimal, where the box's validator rejects every
+   *  typed digit. Deferred, because the press that focuses the box places the
+   *  cursor only after the focus event. */
+  class SelectAllOnClickFocus : public QObject
+  {
+  public:
+    explicit SelectAllOnClickFocus(QAbstractSpinBox* box)
+      : QObject(box)
+    {
+      box->installEventFilter(this);
+    }
+
+  protected:
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+      if (QEvent::FocusIn == event->type()
+          && Qt::MouseFocusReason == static_cast<QFocusEvent*>(event)->reason())
+      {
+        auto* box = static_cast<QAbstractSpinBox*>(watched);
+        QTimer::singleShot(0, box, [box]() { box->selectAll(); });
+      }
+      return false;
+    }
+  };
+
+  /** Shows an entry popup with its top-left at 'globalPosition', shifted back
+   *  onto the screen: unlike a QMenu, a moved popup frame is not kept visible
+   *  by Qt, and a menu opened near a screen edge would push it off. */
+  void ShowEntryPopupAt(QWidget* popup, const QPoint& globalPosition)
+  {
+    QPoint topLeft = globalPosition;
+    if (const auto* screen = QGuiApplication::screenAt(globalPosition); nullptr != screen)
+    {
+      const QRect available = screen->availableGeometry();
+      const QSize size = popup->sizeHint();
+      topLeft.setX(std::clamp(topLeft.x(), available.left(), std::max(available.left(), available.right() - size.width())));
+      topLeft.setY(std::clamp(topLeft.y(), available.top(), std::max(available.top(), available.bottom() - size.height())));
+    }
+    popup->move(topLeft);
+    popup->show();
+  }
+}
+
+void QmitkMxNCellOverlay::OpenNumericEntry(std::optional<QPoint> globalPosition)
 {
   auto* popup = new QFrame(this, Qt::Popup);
   popup->setAttribute(Qt::WA_DeleteOnClose);
@@ -2107,6 +2154,8 @@ void QmitkMxNCellOverlay::OpenNumericEntry()
 
   layout->addRow(tr("Level"), levelBox);
   layout->addRow(tr("Window"), windowBox);
+  new SelectAllOnClickFocus(levelBox);
+  new SelectAllOnClickFocus(windowBox);
 
   const auto commit = [this, levelBox, windowBox]()
   {
@@ -2127,15 +2176,22 @@ void QmitkMxNCellOverlay::OpenNumericEntry()
   connect(levelBox, &QDoubleSpinBox::editingFinished, this, commit);
   connect(windowBox, &QDoubleSpinBox::editingFinished, this, commit);
 
-  const QRect readout = this->WindowLevelRect();
   popup->adjustSize();
-  popup->move(this->mapToGlobal(QPoint(readout.left(), readout.top() - popup->sizeHint().height() - 4)));
-  popup->show();
+  if (globalPosition.has_value())
+  {
+    ShowEntryPopupAt(popup, *globalPosition);
+  }
+  else
+  {
+    const QRect readout = this->WindowLevelRect();
+    popup->move(this->mapToGlobal(QPoint(readout.left(), readout.top() - popup->sizeHint().height() - 4)));
+    popup->show();
+  }
   levelBox->setFocus();
   levelBox->selectAll();
 }
 
-void QmitkMxNCellOverlay::OpenCoordinateEntry()
+void QmitkMxNCellOverlay::OpenCoordinateEntry(std::optional<QPoint> globalPosition)
 {
   const mitk::Point3D world = this->CrosshairWorld();
   const bool hasIndex = m_TopNode.IsNotNull() && nullptr != m_TopNode->GetData()
@@ -2163,12 +2219,58 @@ void QmitkMxNCellOverlay::OpenCoordinateEntry()
     box->setRange(-1.0e6, 1.0e6);
     box->setDecimals(2);
     box->setValue(world[axis]);
+    new SelectAllOnClickFocus(box);
     worldLayout->addWidget(box);
     worldBoxes[static_cast<std::size_t>(axis)] = box;
   }
   layout->addRow(tr("World (mm)"), worldRow);
 
-  const auto commitWorld = [this, worldBoxes]()
+  std::array<QSpinBox*, 3> indexBoxes{};
+  if (hasIndex)
+  {
+    auto* indexRow = new QWidget(popup);
+    auto* indexLayout = new QHBoxLayout(indexRow);
+    indexLayout->setContentsMargins({});
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      auto* box = new QSpinBox(indexRow);
+      box->setRange(-100000, 100000);
+      box->setValue(static_cast<int>(std::lround(index[axis])));
+      new SelectAllOnClickFocus(box);
+      indexLayout->addWidget(box);
+      indexBoxes[static_cast<std::size_t>(axis)] = box;
+    }
+    layout->addRow(tr("Voxel index"), indexRow);
+  }
+
+  // Both rows show where the crosshair actually landed, not what was typed: the
+  // edited unit and the other one stay in step, and a move the navigation
+  // clamps or snaps shows as such.
+  const auto refreshFromCrosshair = [this, worldBoxes, indexBoxes, hasIndex]()
+  {
+    const mitk::Point3D landed = this->CrosshairWorld();
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      auto* box = worldBoxes[static_cast<std::size_t>(axis)];
+      const QSignalBlocker blocker(box);
+      box->setValue(landed[axis]);
+    }
+    if (!hasIndex || m_TopNode.IsNull() || nullptr == m_TopNode->GetData()
+        || nullptr == m_TopNode->GetData()->GetGeometry())
+    {
+      return;
+    }
+    mitk::Point3D voxel;
+    m_TopNode->GetData()->GetGeometry()->WorldToIndex(landed, voxel);
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      auto* box = indexBoxes[static_cast<std::size_t>(axis)];
+      const QSignalBlocker blocker(box);
+      box->setValue(static_cast<int>(std::lround(voxel[axis])));
+    }
+  };
+
+  const auto commitWorld = [this, worldBoxes, refreshFromCrosshair]()
   {
     mitk::Point3D position;
     for (int axis = 0; axis < 3; ++axis)
@@ -2176,6 +2278,7 @@ void QmitkMxNCellOverlay::OpenCoordinateEntry()
       position[axis] = worldBoxes[static_cast<std::size_t>(axis)]->value();
     }
     this->NavigatorSetCrosshair(position);
+    refreshFromCrosshair();
   };
   for (auto* box : worldBoxes)
   {
@@ -2184,21 +2287,7 @@ void QmitkMxNCellOverlay::OpenCoordinateEntry()
 
   if (hasIndex)
   {
-    auto* indexRow = new QWidget(popup);
-    auto* indexLayout = new QHBoxLayout(indexRow);
-    indexLayout->setContentsMargins({});
-    std::array<QSpinBox*, 3> indexBoxes{};
-    for (int axis = 0; axis < 3; ++axis)
-    {
-      auto* box = new QSpinBox(indexRow);
-      box->setRange(-100000, 100000);
-      box->setValue(static_cast<int>(std::lround(index[axis])));
-      indexLayout->addWidget(box);
-      indexBoxes[static_cast<std::size_t>(axis)] = box;
-    }
-    layout->addRow(tr("Voxel index"), indexRow);
-
-    const auto commitIndex = [this, indexBoxes]()
+    const auto commitIndex = [this, indexBoxes, refreshFromCrosshair]()
     {
       mitk::Point3D voxel;
       for (int axis = 0; axis < 3; ++axis)
@@ -2206,6 +2295,7 @@ void QmitkMxNCellOverlay::OpenCoordinateEntry()
         voxel[axis] = indexBoxes[static_cast<std::size_t>(axis)]->value();
       }
       this->NavigatorSetVoxelIndex(voxel);
+      refreshFromCrosshair();
     };
     for (auto* box : indexBoxes)
     {
@@ -2213,10 +2303,17 @@ void QmitkMxNCellOverlay::OpenCoordinateEntry()
     }
   }
 
-  const QRect coord = this->CoordinateLineRect();
   popup->adjustSize();
-  popup->move(this->mapToGlobal(QPoint(coord.left(), coord.top() - popup->sizeHint().height() - 4)));
-  popup->show();
+  if (globalPosition.has_value())
+  {
+    ShowEntryPopupAt(popup, *globalPosition);
+  }
+  else
+  {
+    const QRect coord = this->CoordinateLineRect();
+    popup->move(this->mapToGlobal(QPoint(coord.left(), coord.top() - popup->sizeHint().height() - 4)));
+    popup->show();
+  }
   worldBoxes[0]->setFocus();
   worldBoxes[0]->selectAll();
 }
@@ -2542,9 +2639,12 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
       // stays available in clean-view: it is transient (right-click only, not
       // passive furniture) and it is the way back - it carries the clean-view
       // toggle, which is otherwise unreachable once the utility strip hides.
+      // A keyboard request (Menu key, Shift+F10) has no press to compare against;
+      // Qt only delivers it to the focused render window, so it is deliberate.
       auto* contextEvent = static_cast<QContextMenuEvent*>(event);
-      if ((contextEvent->pos() - m_RightPressPosition).manhattanLength()
-            < QApplication::startDragDistance())
+      if (QContextMenuEvent::Keyboard == contextEvent->reason()
+          || (contextEvent->pos() - m_RightPressPosition).manhattanLength()
+               < QApplication::startDragDistance())
       {
         this->OpenContextMenu(contextEvent->globalPos());
       }
@@ -2959,39 +3059,6 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
 
   QMenu menu(this);
 
-  // Per-renderer data visibility: toggles affect only this cell.
-  if (auto dataStorage = renderer->GetDataStorage(); dataStorage.IsNotNull())
-  {
-    const auto noHelperObjects = mitk::NodePredicateAnd::New();
-    noHelperObjects->AddPredicate(
-      mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-    noHelperObjects->AddPredicate(
-      mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-
-    auto* visibilityMenu = menu.addMenu(tr("Shown data"));
-    for (const auto& node : *dataStorage->GetSubset(noHelperObjects))
-    {
-      if (node.IsNull())
-      {
-        continue;
-      }
-      auto* action = visibilityMenu->addAction(QString::fromStdString(node->GetName()));
-      action->setCheckable(true);
-      action->setChecked(node->IsVisible(renderer));
-      mitk::DataNode::Pointer heldNode = node;
-      connect(action, &QAction::toggled, this, [this, heldNode](bool visible)
-      {
-        auto* localRenderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
-        if (nullptr != localRenderer)
-        {
-          heldNode->SetVisibility(visible, localRenderer);
-          mitk::RenderingManager::GetInstance()->RequestUpdate(m_VtkRenderWindow);
-        }
-      });
-    }
-    visibilityMenu->setEnabled(!visibilityMenu->isEmpty());
-  }
-
   auto* directionMenu = menu.addMenu(tr("View direction"));
   const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {
     { "Axial", mitk::AnatomicalPlane::Axial },
@@ -3014,6 +3081,37 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
       }
     });
   }
+
+  // The furniture's own entry points - the Data button, the W/L readout, the
+  // navigator's coordinate line - are pointer-only and hidden until revealed;
+  // these make them reachable from a keyboard-opened menu too. Each opens a
+  // popup of its own, so it waits until this menu has closed.
+  menu.addSeparator();
+
+  auto* dataAction = menu.addAction(tr("Data..."));
+  connect(dataAction, &QAction::triggered, this, [this, globalPosition]()
+  {
+    QTimer::singleShot(0, this, [this, globalPosition]()
+    {
+      if (auto* utilityWidget = m_Cell->GetUtilityWidget(); nullptr != utilityWidget)
+      {
+        utilityWidget->ShowDataSelection(globalPosition);
+      }
+    });
+  });
+
+  auto* levelWindowAction = menu.addAction(tr("Set level/window..."));
+  levelWindowAction->setEnabled(m_TopNode.IsNotNull());
+  connect(levelWindowAction, &QAction::triggered, this, [this, globalPosition]()
+  {
+    QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenNumericEntry(globalPosition); });
+  });
+
+  auto* coordinateAction = menu.addAction(tr("Go to coordinate..."));
+  connect(coordinateAction, &QAction::triggered, this, [this, globalPosition]()
+  {
+    QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenCoordinateEntry(globalPosition); });
+  });
 
   menu.addSeparator();
 
@@ -3084,6 +3182,8 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   });
 
   auto* cleanViewAction = menu.addAction(tr("Clean view"));
+  cleanViewAction->setShortcut(QmitkMxNMultiWidget::CleanViewShortcut());
+  cleanViewAction->setShortcutVisibleInContextMenu(true);
   cleanViewAction->setCheckable(true);
   cleanViewAction->setChecked(m_Editor->IsCleanView());
   connect(cleanViewAction, &QAction::toggled, this, [this](bool cleanView)

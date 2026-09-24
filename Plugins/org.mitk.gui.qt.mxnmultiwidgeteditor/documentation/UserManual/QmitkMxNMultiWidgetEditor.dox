@@ -229,10 +229,11 @@
 
 \subsubsection org_mitk_editors_mxnmultiwidget_ContextMenu Context menu
 	A right click into a window view (without dragging - the right-button gestures
-	keep working) opens a context menu with per-window data visibility toggles, the
-	view direction, the sync actions (re-converge, fit group views to visible data), the layout
-	editor, and the clean view toggle. Visibility changes affect only the clicked
-	window.
+	keep working) opens a context menu with the view direction, entries that open the
+	data selection, the level/window entry and the coordinate entry, the sync actions
+	(re-converge, fit group views to visible data), the layout editor, and the clean view
+	toggle. With the keyboard, the Menu key or Shift+F10 opens the same menu for the window
+	you last clicked into. Shift+F11 toggles clean view while you work in the editor.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Data_Selection Data node selection
 	Using the data selection button of a window view you can open a data node selection dialog which shows the currently
@@ -241,7 +242,7 @@
 	or - for a better data node overview - only show an individually selected subset of the available data nodes.
 	You can either remove a node from the selection by clicking the "x" on a data node or use the "Choose data..."
 	button to individually select data nodes.
-	The "Show all data" checkbox denotes which of the selection types is currently used - showing all available data nodes,
+	The "Select all data" checkbox denotes which of the selection types is currently used - showing all available data nodes,
 	including data added later, or showing only a subset of data nodes. Checking the checkbox will reset the selection to
 	all available data nodes.
 	

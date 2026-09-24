@@ -32,9 +32,17 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QApplication>
+#include <QContextMenuEvent>
+#include <QDoubleSpinBox>
 #include <QFile>
+#include <QFrame>
 #include <QKeyEvent>
+#include <QLineEdit>
+#include <QMenu>
+#include <QSpinBox>
 #include <QTableView>
+#include <QTimer>
 
 #include <cmath>
 #include <memory>
@@ -60,6 +68,8 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(SyncBarcode_ReflectsMembership);
   MITK_TEST(DataPopupScope_FollowsSelectionGroup);
   MITK_TEST(DataPopupTable_KeyboardTogglesVisibility);
+  MITK_TEST(ContextMenu_OpensFromKeyboard);
+  MITK_TEST(CoordinateEntry_KeepsBothUnitsInStep);
   MITK_TEST(SyncBarcode_LayoutWrapsToGeometry);
   MITK_TEST(SyncBarcode_SlotAtInHitTest);
   MITK_TEST(LayoutEditorRequest_BarcodeTogglesContextMenuShows);
@@ -402,6 +412,140 @@ public:
                            QmitkMxNMultiWidget::LayoutEditorRequest::Toggle == requests[0]);
     CPPUNIT_ASSERT_MESSAGE("A context-menu request only shows it",
                            QmitkMxNMultiWidget::LayoutEditorRequest::Show == requests[1]);
+  }
+
+  void ContextMenu_OpensFromKeyboard()
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+
+    // The menu runs its own event loop; read it from inside that loop, then
+    // close it so the request returns.
+    QStringList entries;
+    QString cleanViewShortcut;
+    bool opened = false;
+    // Scopes the timer: if no menu loop runs it, it dies with this test.
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+      opened = nullptr != menu;
+      if (!opened)
+      {
+        return;
+      }
+      for (const auto* action : menu->actions())
+      {
+        entries << action->text();
+        if (action->text() == QStringLiteral("Clean view"))
+        {
+          cleanViewShortcut = action->shortcut().toString();
+        }
+      }
+      menu->close();
+    });
+
+    // Not preceded by a right-button press: a keyboard request has none, and
+    // must not be mistaken for the release of a right-button drag.
+    QContextMenuEvent request(QContextMenuEvent::Keyboard, renderWindow->rect().center(),
+                              renderWindow->mapToGlobal(renderWindow->rect().center()));
+    QCoreApplication::sendEvent(renderWindow, &request);
+
+    CPPUNIT_ASSERT_MESSAGE("The Menu key opens the window's context menu", opened);
+    for (const auto* expected : { "Data...", "Set level/window...", "Go to coordinate..." })
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("The menu carries ") + expected,
+                             entries.contains(QString::fromLatin1(expected)));
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The clean-view entry advertises its key",
+      QmitkMxNMultiWidget::CleanViewShortcut().toString().toStdString(), cleanViewShortcut.toStdString());
+  }
+
+  void CoordinateEntry_KeepsBothUnitsInStep()
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+      if (nullptr == menu)
+      {
+        return;
+      }
+      for (auto* action : menu->actions())
+      {
+        if (action->text() == QStringLiteral("Go to coordinate..."))
+        {
+          action->trigger();
+        }
+      }
+      menu->close();
+    });
+    QContextMenuEvent request(QContextMenuEvent::Keyboard, renderWindow->rect().center(),
+                              renderWindow->mapToGlobal(renderWindow->rect().center()));
+    QCoreApplication::sendEvent(renderWindow, &request);
+    QCoreApplication::processEvents();  // the entry opens once the menu has closed
+
+    QFrame* popup = nullptr;
+    for (auto* frame : this->Overlay(0)->findChildren<QFrame*>())
+    {
+      if (frame->isWindow() && frame->isVisible())
+      {
+        popup = frame;
+      }
+    }
+    CPPUNIT_ASSERT_MESSAGE("The coordinate entry opened from the menu", nullptr != popup);
+    const auto worldBoxes = popup->findChildren<QDoubleSpinBox*>();
+    const auto indexBoxes = popup->findChildren<QSpinBox*>();
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(worldBoxes.size()));
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(indexBoxes.size()));
+
+    // Entering world coordinates updates the index row ...
+    mitk::Point3D targetIndex;
+    targetIndex[0] = 5.0;
+    targetIndex[1] = 6.0;
+    targetIndex[2] = 3.0;
+    mitk::Point3D targetWorld;
+    m_Image->GetGeometry()->IndexToWorld(targetIndex, targetWorld);
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      worldBoxes[axis]->setValue(targetWorld[axis]);
+    }
+    emit worldBoxes[0]->editingFinished();
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A world entry refreshes the voxel index",
+        static_cast<int>(targetIndex[axis]), indexBoxes[axis]->value());
+    }
+
+    // ... and entering an index updates the world row.
+    targetIndex[0] = 2.0;
+    targetIndex[1] = 3.0;
+    targetIndex[2] = 1.0;
+    m_Image->GetGeometry()->IndexToWorld(targetIndex, targetWorld);
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      indexBoxes[axis]->setValue(static_cast<int>(targetIndex[axis]));
+    }
+    emit indexBoxes[0]->editingFinished();
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An index entry refreshes the world position",
+        targetWorld[axis], worldBoxes[axis]->value(), 0.01);
+    }
+
+    // Clicking into a field selects its value, so typing replaces it instead of
+    // landing behind the last decimal, where the validator rejects it.
+    auto* clickedEdit = worldBoxes[1]->findChild<QLineEdit*>();
+    CPPUNIT_ASSERT(nullptr != clickedEdit);
+    clickedEdit->deselect();
+    QFocusEvent clickFocus(QEvent::FocusIn, Qt::MouseFocusReason);
+    QCoreApplication::sendEvent(worldBoxes[1], &clickFocus);
+    QCoreApplication::processEvents();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A click into a field selects its whole value",
+      clickedEdit->text().toStdString(), clickedEdit->selectedText().toStdString());
+
+    popup->close();
   }
 
   void SyncBarcode_SlotAtInHitTest()

@@ -35,6 +35,7 @@ namespace mitk
 }
 
 class QmitkRenderWindow;
+class QMenu;
 class QPaintEvent;
 class QToolButton;
 
@@ -72,6 +73,13 @@ public:
   GroupSyncIndexType GetSyncGroup() const;
 
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
+
+  /**
+  * \brief Open the data selection popup at a global position, independent of
+  *        whether the strip is revealed; the path for the keyboard and the
+  *        context menu.
+  */
+  void ShowDataSelection(const QPoint& globalPosition);
 
   /**
   * \brief Apply the cell's view direction to its renderer. The source cell's
@@ -188,6 +196,7 @@ private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
+  QMenu* m_DataMenu;
   QToolButton* m_CleanViewButton;
   QToolButton* m_NavigatorToggleButton;
   QToolButton* m_CrosshairButton;

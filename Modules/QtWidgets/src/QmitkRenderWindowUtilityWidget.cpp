@@ -30,6 +30,7 @@ found in the LICENSE file.
 
 // mitk qt widgets
 #include <QmitkIconTheme.h>
+#include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
 
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
@@ -37,6 +38,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QmitkRenderWindow* renderWindow/* = nullptr */,
   mitk::DataStorage* dataStorage/* = nullptr */)
   : m_NodeSelectionWidget(nullptr)
+  , m_DataMenu(nullptr)
   , m_CleanViewButton(nullptr)
   , m_NavigatorToggleButton(nullptr)
   , m_SyncBarcode(nullptr)
@@ -98,16 +100,16 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataButton->setText("Data");
   dataButton->setToolTip(tr("Select the data shown in this render window"));
   dataButton->setPopupMode(QToolButton::InstantPopup);
-  auto* dataMenu = new QMenu(dataButton);
-  auto* dataAction = new QWidgetAction(dataMenu);
+  m_DataMenu = new QMenu(dataButton);
+  auto* dataAction = new QWidgetAction(m_DataMenu);
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
-  dataMenu->addAction(dataAction);
-  dataButton->setMenu(dataMenu);
+  m_DataMenu->addAction(dataAction);
+  dataButton->setMenu(m_DataMenu);
   // The menu grabs the pointer, which reads to the cell as the pointer leaving
   // and would collapse the strip the user just clicked; report it so the owner
   // can hold the furniture open for as long as the popup lives.
-  connect(dataMenu, &QMenu::aboutToShow, this, [this]() { emit PopupVisibilityChanged(true); });
-  connect(dataMenu, &QMenu::aboutToHide, this, [this]() { emit PopupVisibilityChanged(false); });
+  connect(m_DataMenu, &QMenu::aboutToShow, this, [this]() { emit PopupVisibilityChanged(true); });
+  connect(m_DataMenu, &QMenu::aboutToHide, this, [this]() { emit PopupVisibilityChanged(false); });
   layout->addWidget(dataButton);
 
   // The direction controller applies a reorientation, from the plane label or a
@@ -156,7 +158,8 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_CleanViewButton->setIconSize(QSize(iconExtent, iconExtent));
   m_CleanViewButton->setCheckable(true);
   m_CleanViewButton->setToolTip(tr("Clean view: hide all viewport furniture in every render window "
-                                   "(readouts, ribbons), e.g. for screenshots"));
+                                   "(readouts, ribbons), e.g. for screenshots (%1)")
+                                  .arg(QmitkMxNMultiWidget::CleanViewShortcut().toString(QKeySequence::NativeText)));
   connect(m_CleanViewButton, &QToolButton::toggled, this, [this](bool checked) {
     this->UpdateCleanViewIcon();
     emit CleanViewToggled(checked);
@@ -257,6 +260,11 @@ void QmitkRenderWindowUtilityWidget::SetViewDirectionSelection(mitk::AnatomicalP
 QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSelectionWidget() const
 {
   return m_NodeSelectionWidget;
+}
+
+void QmitkRenderWindowUtilityWidget::ShowDataSelection(const QPoint& globalPosition)
+{
+  m_DataMenu->popup(globalPosition);
 }
 
 void QmitkRenderWindowUtilityWidget::SetCleanViewChecked(bool checked)

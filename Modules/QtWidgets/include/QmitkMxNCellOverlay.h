@@ -406,7 +406,10 @@ private:
   /** \brief The cell's current crosshair world position (via the editor). */
   mitk::Point3D CrosshairWorld() const;
 
-  void OpenCoordinateEntry();
+  /** \brief Opens the coordinate entry above the coordinate line, or at
+   *         'globalPosition' when given (the context menu passes where it
+   *         was opened, which is where the user is looking). */
+  void OpenCoordinateEntry(std::optional<QPoint> globalPosition = std::nullopt);
 
   void OpenContextMenu(const QPoint& globalPosition);
 
@@ -505,7 +508,9 @@ private:
 
   void RebuildLutStrip();
 
-  void OpenNumericEntry();
+  /** \brief Opens the level/window entry above the readout, or at
+   *         'globalPosition' when given (see 'OpenCoordinateEntry'). */
+  void OpenNumericEntry(std::optional<QPoint> globalPosition = std::nullopt);
   void OpenColormapMenu();
 
   /** \brief Axial/Coronal/Sagittal picker opened by clicking the plane label;

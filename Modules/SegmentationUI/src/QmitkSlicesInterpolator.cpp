@@ -586,9 +586,6 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object *sender, const itk::Even
   bool timeChanged = m_TimePoint != timeNavigationController->GetSelectedTimePoint();
   m_TimePoint = timeNavigationController->GetSelectedTimePoint();
 
-  if (m_Watcher.isRunning())
-    m_Watcher.waitForFinished();
-
   if (timeChanged)
   {
     if (m_3DInterpolationEnabled)
@@ -745,6 +742,24 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
+  // Only once no run is left, as the next one may already have started.
+  if (!m_Watcher.isRunning())
+    m_InterpolatingSegmentation = nullptr;
+
+  // A run can outlast switching away from 3D interpolation; its result must not show up again then.
+  if (!m_3DInterpolationEnabled)
+  {
+    m_Rerun3DInterpolation = false;
+    return;
+  }
+
+  // The finished run started before the latest change of the contours, the label, or the time point.
+  if (m_Rerun3DInterpolation)
+  {
+    this->Start3DInterpolation();
+    return;
+  }
+
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
   if (workingNode && workingNode->GetData())
@@ -753,7 +768,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
     if (segmentation == nullptr)
     {
-      MITK_ERROR << "Run3DInterpolation triggered with no MultiLabelSegmentation as working data.";
+      MITK_ERROR << "OnSurfaceInterpolationFinished triggered with no MultiLabelSegmentation as working data.";
       return;
     }
     mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult(segmentation, m_CurrentActiveLabelValue, segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
@@ -1306,13 +1321,13 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   this->UpdateVisibleSuggestion();
 }
 
-void QmitkSlicesInterpolator::Run3DInterpolation()
+void QmitkSlicesInterpolator::Start3DInterpolation()
 {
   auto workingNode = m_ToolManager->GetWorkingData(0);
 
   if (workingNode == nullptr)
   {
-    MITK_ERROR << "Run3DInterpolation triggered with no working data set.";
+    MITK_DEBUG << "3D interpolation requested with no working data set.";
     return;
   }
 
@@ -1320,17 +1335,48 @@ void QmitkSlicesInterpolator::Run3DInterpolation()
 
   if (segmentation == nullptr)
   {
-    MITK_ERROR << "Run3DInterpolation triggered with no MultiLabelSegmentation as working data.";
+    MITK_DEBUG << "3D interpolation requested with no MultiLabelSegmentation as working data.";
     return;
   }
 
   if (!segmentation->ExistLabel(m_CurrentActiveLabelValue))
   {
-    MITK_ERROR << "Run3DInterpolation triggered with no valid label selected. Currently selected invalid label: "<<m_CurrentActiveLabelValue;
+    MITK_DEBUG << "3D interpolation requested with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
     return;
   }
 
-  m_SurfaceInterpolator->Interpolate(segmentation,m_CurrentActiveLabelValue,segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
+  m_InterpolatedSurfaceNode->SetData(nullptr);
+
+  if (m_Watcher.isRunning())
+  {
+    m_Rerun3DInterpolation = true;
+    return;
+  }
+
+  m_Rerun3DInterpolation = false;
+
+  // Resolved here, as the GUI thread keeps changing the label and the time point while the worker runs.
+  const auto labelValue = m_CurrentActiveLabelValue;
+  const auto timeStep = segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
+  const auto surfaceInterpolator = m_SurfaceInterpolator;
+
+  m_InterpolatingSegmentation = segmentation;
+
+  m_Future = QtConcurrent::run([surfaceInterpolator, segmentation, labelValue, timeStep]()
+    {
+      // The label or the segmentation may be gone by the time the worker gets to them. Left in the
+      // future, the exception would be rethrown by whoever waits for it.
+      try
+      {
+        surfaceInterpolator->Interpolate(segmentation, labelValue, timeStep);
+      }
+      catch (const std::exception& e)
+      {
+        MITK_WARN << "3D interpolation aborted: " << e.what();
+      }
+    });
+
+  m_Watcher.setFuture(m_Future);
 }
 
 void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
@@ -1419,37 +1465,8 @@ void QmitkSlicesInterpolator::OnInterpolationAborted(const itk::EventObject& /*e
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject & /*e*/)
 {
-  auto workingNode = m_ToolManager->GetWorkingData(0);
-
-  if (workingNode == nullptr)
-  {
-    MITK_DEBUG << "OnSurfaceInterpolationInfoChanged triggered with no working data set.";
-    return;
-  }
-
-  const auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
-
-  if (segmentation == nullptr)
-  {
-    MITK_DEBUG << "OnSurfaceInterpolationInfoChanged triggered with no MultiLabelSegmentation as working data.";
-    return;
-  }
-
-  if (!segmentation->ExistLabel(m_CurrentActiveLabelValue))
-  {
-    MITK_DEBUG << "OnSurfaceInterpolationInfoChanged triggered with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
-    return;
-  }
-
-  if (m_Watcher.isRunning())
-    m_Watcher.waitForFinished();
-
   if (m_3DInterpolationEnabled)
-  {
-    m_InterpolatedSurfaceNode->SetData(nullptr);
-    m_Future = QtConcurrent::run(&QmitkSlicesInterpolator::Run3DInterpolation, this);
-    m_Watcher.setFuture(m_Future);
-  }
+    this->Start3DInterpolation();
 }
 
 void QmitkSlicesInterpolator::SetCurrentContourListID()
@@ -1495,9 +1512,6 @@ void QmitkSlicesInterpolator::OnActiveLabelChanged(mitk::Label::PixelType)
 {
   m_FeedbackNode->SetData(nullptr);
   m_InterpolatedSurfaceNode->SetData(nullptr);
-
-  if (m_Watcher.isRunning())
-    m_Watcher.waitForFinished();
 
   if (m_3DInterpolationEnabled)
   {
@@ -1548,10 +1562,15 @@ void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Obje
 
 void QmitkSlicesInterpolator::WaitForFutures()
 {
+  // Waiting means the data is about to go away, which makes a pending rerun pointless.
+  m_Rerun3DInterpolation = false;
+
   if (m_Watcher.isRunning())
   {
     m_Watcher.waitForFinished();
   }
+
+  m_InterpolatingSegmentation = nullptr;
 
   if (m_PlaneWatcher.isRunning())
   {

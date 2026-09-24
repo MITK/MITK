@@ -404,80 +404,37 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
   return removedIt;
 }
 
-void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)
+/** Returns the cache of the contours of a label at a time step, or nullptr if there is none. */
+CPICache* FindCPICache(const mitk::MultiLabelSegmentation* segmentationImage, mitk::MultiLabelSegmentation::LabelValueType labelValue, mitk::TimeStepType timeStep)
 {
-  const auto& currentImageContours = cpiMap.at(segmentationImage);
+  auto segFinding = cpiMap.find(segmentationImage);
+  if (segFinding == cpiMap.end())
+    return nullptr;
 
-  auto finding = currentImageContours.find(labelValue);
-  if (finding == currentImageContours.end())
-  {
-    MITK_INFO << "Contours for label don't exist. Label value: " << labelValue;
-    return;
-  }
+  auto labelFinding = segFinding->second.find(labelValue);
+  if (labelFinding == segFinding->second.end())
+    return nullptr;
 
-  const auto& currentLabelContoursMap = finding->second;
+  auto timeStepFinding = labelFinding->second.find(timeStep);
+  if (timeStepFinding == labelFinding->second.end())
+    return nullptr;
 
-  auto tsfinding = currentLabelContoursMap.find(timeStep);
-  if (tsfinding == currentLabelContoursMap.end())
-  {
-    MITK_INFO << "Contours for current time step don't exist.";
-    return;
-  }
-
-  const auto& currentContours = tsfinding->second.cpis;
-
-  unsigned int index = 0;
-  for (const auto&  cpi : currentContours)
-  {
-    if (!cpi.IsPlaceHolder())
-    {
-      reduceFilter->SetInput(index, cpi.Contour);
-      ++index;
-    }
-  }
+  return &timeStepFinding->second;
 }
 
-bool CPICacheIsOutdated(const mitk::MultiLabelSegmentation* segmentationImage, mitk::MultiLabelSegmentation::LabelValueType labelValue, mitk::TimeStepType timeStep)
+bool CPICacheIsOutdated(const CPICache& cache)
 {
-  const auto& currentImageContours = cpiMap.at(segmentationImage);
-
-  auto finding = currentImageContours.find(labelValue);
-  if (finding == currentImageContours.end())
-  {
-    return false;
-  }
-
-  const auto& currentLabelContoursMap = finding->second;
-
-  auto tsfinding = currentLabelContoursMap.find(timeStep);
-  if (tsfinding == currentLabelContoursMap.end())
-  {
-    return false;
-  }
-
-  bool result = tsfinding->second.cachedSurface.IsNull() || tsfinding->second.cachedSurface->GetMTime() < tsfinding->second.cpiTimeStamp.GetMTime();
-  return result;
+  return cache.cachedSurface.IsNull() || cache.cachedSurface->GetMTime() < cache.cpiTimeStamp.GetMTime();
 }
 
-void SetCPICacheSurface(mitk::Surface* surface, const mitk::MultiLabelSegmentation* segmentationImage, mitk::MultiLabelSegmentation::LabelValueType labelValue, mitk::TimeStepType timeStep)
+/** Stores the result of an interpolation, unless the contours it was computed from have changed since. */
+void SetCPICacheSurface(mitk::Surface* surface, const mitk::MultiLabelSegmentation* segmentationImage,
+  mitk::MultiLabelSegmentation::LabelValueType labelValue, mitk::TimeStepType timeStep, itk::ModifiedTimeType contoursTime)
 {
-  const auto& currentImageContours = cpiMap.at(segmentationImage);
+  auto* cache = FindCPICache(segmentationImage, labelValue, timeStep);
 
-  auto finding = currentImageContours.find(labelValue);
-  if (finding == currentImageContours.end())
-  {
-    return;
-  }
-
-  const auto& currentLabelContoursMap = finding->second;
-
-  auto tsfinding = currentLabelContoursMap.find(timeStep);
-  if (tsfinding == currentLabelContoursMap.end())
-  {
-    return;
-  }
-
-  cpiMap[segmentationImage][labelValue][timeStep].cachedSurface = surface;
+  if (nullptr != cache && cache->cpiTimeStamp.GetMTime() == contoursTime)
+    cache->cachedSurface = surface;
 }
 
 void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)
@@ -487,30 +444,45 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
     mitkThrow() << "Cannot interpolate contours. No valid segmentation passed.";
   }
 
-  std::lock_guard<std::shared_mutex> guard(cpiMutex);
-  auto it = cpiMap.find(segmentationImage);
-  if (it == cpiMap.end())
-  {
-    mitkThrow() << "Cannot interpolate contours. Passed segmentation is not registered at controller.";
-  }
+  // The contours are copied under the lock and interpolated without it, so that
+  // drawing the next contour does not have to wait for this interpolation.
+  std::vector<Surface::ConstPointer> contours;
+  itk::ModifiedTimeType contoursTime = 0;
 
-  if (!segmentationImage->ExistLabel(labelValue))
   {
-    mitkThrow() << "Cannot interpolate contours. None existent label request. Invalid label:" << labelValue;
-  }
+    std::shared_lock<std::shared_mutex> guard(cpiMutex);
 
-  if (!segmentationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))
-  {
-    mitkThrow() << "Cannot interpolate contours. No valid time step requested. Invalid time step:" << timeStep;
-  }
+    if (cpiMap.end() == cpiMap.find(segmentationImage))
+    {
+      mitkThrow() << "Cannot interpolate contours. Passed segmentation is not registered at controller.";
+    }
 
-  if (!CPICacheIsOutdated(segmentationImage, labelValue, timeStep)) return;
+    if (!segmentationImage->ExistLabel(labelValue))
+    {
+      mitkThrow() << "Cannot interpolate contours. None existent label request. Invalid label:" << labelValue;
+    }
+
+    if (!segmentationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))
+    {
+      mitkThrow() << "Cannot interpolate contours. No valid time step requested. Invalid time step:" << timeStep;
+    }
+
+    const auto* cache = FindCPICache(segmentationImage, labelValue, timeStep);
+
+    if (nullptr == cache || !CPICacheIsOutdated(*cache))
+      return;
+
+    for (const auto& cpi : cache->cpis)
+    {
+      if (!cpi.IsPlaceHolder())
+        contours.push_back(cpi.Contour);
+    }
+
+    contoursTime = cache->cpiTimeStamp.GetMTime();
+  }
 
   // Created after the early return, so that an up-to-date cache does not
-  // make a notification flash up for an interpolation that never runs. That
-  // puts it under the lock taken above: a progress listener must therefore not
-  // reach back into this controller, and must not mutate the data storage,
-  // either of which would deadlock against a non-recursive lock held here.
+  // make a notification flash up for an interpolation that never runs.
   //
   // Each filter gets a fixed share rather than adding its own steps to the
   // task: they announce themselves one after another as they start, which
@@ -585,7 +557,9 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
 
   try
   {
-    this->AddActiveLabelContoursForInterpolation(reduceFilter, segmentationImage, labelValue, timeStep);
+    for (unsigned int i = 0; i < contours.size(); ++i)
+      reduceFilter->SetInput(i, contours[i]);
+
     reduceFilter->Update();
     auto currentNumberOfReducedContours = reduceFilter->GetNumberOfOutputs();
 
@@ -633,7 +607,8 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
     interpolationResult = nullptr;
   }
 
-  SetCPICacheSurface(interpolationResult, segmentationImage, labelValue, timeStep);
+  std::lock_guard<std::shared_mutex> guard(cpiMutex);
+  SetCPICacheSurface(interpolationResult, segmentationImage, labelValue, timeStep, contoursTime);
 }
 
 mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)

@@ -33,16 +33,18 @@ namespace
 
 const std::vector<mitk::VolumeRenderingLightingModel> &mitk::VolumeRenderingLightingModel::GetAllModels()
 {
+  // The studio row names the state an unconfigured node already renders in, so
+  // it takes its material from the definition of that state rather than a copy.
+  constexpr VolumeRenderingMaterial defaults {};
+
   // Function-local static: built once on first use, and alive for the rest of
   // the program, which is what lets FromId and FromNode return pointers into it.
   static const std::vector<VolumeRenderingLightingModel> models {
     //  id           label                blend  reach  aniso  nFromOp ambient diffuse specular power  rig
     { "headlight", "Headlight",           0.00f, 0.00f, 0.0f,  false,  0.20f,  0.70f,  0.10f,   30.0f, LightingMode::Headlight },
     { "keylight",  "Key light",           0.40f, 0.12f, 0.0f,  false,  0.00f,  0.80f,  0.10f,   30.0f, LightingMode::KeyLight  },
-    // The studio row repeats mitk::VolumeRenderingMaterial's defaults on purpose:
-    // it names the state an unconfigured node already renders in, so the two have
-    // to stay in step.
-    { "studio",    "Default lighting",    0.00f, 0.00f, 0.0f,  false,  0.10f,  0.50f,  0.40f,   16.0f, LightingMode::Studio    },
+    { "studio",    "Default lighting",    0.00f, 0.00f, 0.0f,  false,
+      defaults.ambient, defaults.diffuse, defaults.specular, defaults.specularPower, LightingMode::Studio },
   };
 
   return models;

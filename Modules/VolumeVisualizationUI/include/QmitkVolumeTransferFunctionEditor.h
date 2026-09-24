@@ -258,17 +258,6 @@ private:
   /** \brief Record the adjust sliders' current offsets on the node. */
   void RecordAdjustOffsets();
 
-  /**
-   * \brief Drop the four offsets, leaving the rest of what the node records
-   *        about how its curve was arrived at.
-   *
-   * What lets a curve drawn over by hand keep its preset name. The offsets
-   * describe the preset that was drawn over rather than the drawing, and
-   * nothing records the drawing but the curve itself, so replaying them on the
-   * next selection would put the catalogue's curve back over it.
-   */
-  void ForgetAdjustOffsets(mitk::DataNode *node);
-
   /** \brief Drop everything this widget records about how the node's curve was
    *         arrived at, for a function it cannot reproduce.
    */

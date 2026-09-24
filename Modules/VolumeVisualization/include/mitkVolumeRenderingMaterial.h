@@ -31,8 +31,8 @@ namespace mitk
    *
    * They describe a node nobody configured, which renders under the renderer's
    * default five-light kit. The "studio" mitk::VolumeRenderingLightingModel
-   * repeats them, so that state can be chosen deliberately rather than only
-   * fallen into; the two have to stay in step. The tuned models hold different
+   * takes its material from them, so that state can be chosen deliberately
+   * rather than only fallen into. The tuned models hold different
    * values because ambient cannot cross between them - the shader computes it
    * differently depending on how many lights are switched on.
    */

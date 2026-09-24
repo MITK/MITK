@@ -1349,7 +1349,7 @@ void QmitkVolumeTransferFunctionEditor::RecordAdjustOffsets()
     static_cast<float>(m_Controls->colorWidthSlider->value()));
 }
 
-void QmitkVolumeTransferFunctionEditor::ForgetAdjustOffsets(mitk::DataNode *node)
+void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataNode *node)
 {
   if (node == nullptr)
     return;
@@ -1362,17 +1362,6 @@ void QmitkVolumeTransferFunctionEditor::ForgetAdjustOffsets(mitk::DataNode *node
   properties->DeleteProperty(TF_OPACITY_HEIGHT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_SHIFT_PROPERTY);
   properties->DeleteProperty(TF_COLOR_WIDTH_PROPERTY);
-}
-
-void QmitkVolumeTransferFunctionEditor::ForgetTransferFunctionRecipe(mitk::DataNode *node)
-{
-  if (node == nullptr)
-    return;
-
-  this->ForgetAdjustOffsets(node);
-
-  auto *properties = node->GetPropertyList();
-
   properties->DeleteProperty(TF_PRESET_PROPERTY);
   properties->DeleteProperty(TF_PRESET_FILE_PROPERTY);
   properties->DeleteProperty(TF_CUSTOM_PROPERTY);
@@ -1647,9 +1636,9 @@ void QmitkVolumeTransferFunctionEditor::OnCanvasOpacityChanged()
   if (m_AppliedTransferFunction.IsNull())
     return;
 
-  // Nothing to notify here: the canvas edited the scalar opacity function in
-  // place, and what the ray caster re-uploads against is that function's own
-  // modification time, which the edit already moved.
+  // No Modified() on the transfer function: the canvas edited the scalar opacity
+  // function in place, and what the ray caster re-uploads against is that
+  // function's own modification time, which the edit already moved.
   this->RecordAdjustOffsets();
   this->ShowPresetEdited();
 

@@ -21,10 +21,58 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
+#include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIteratorWithIndex.h>
-#include <itkNeighborhoodIterator.h>
+#include <itkMultiThreaderBase.h>
 
+#include <cmath>
 #include <queue>
+#include <vector>
+
+namespace
+{
+  /** The interpolated distance function: the distances to all centers, weighted by the solved weights and summed up. */
+  class DistanceFunction
+  {
+  public:
+    DistanceFunction(const mitk::CreateDistanceImageFromSurfaceFilter::CenterList& centers, const Eigen::VectorXd& weights)
+    {
+      m_X.reserve(centers.size());
+      m_Y.reserve(centers.size());
+      m_Z.reserve(centers.size());
+      m_Weights.reserve(centers.size());
+
+      for (std::size_t i = 0; i < centers.size(); ++i)
+      {
+        m_X.push_back(centers[i][0]);
+        m_Y.push_back(centers[i][1]);
+        m_Z.push_back(centers[i][2]);
+        m_Weights.push_back(weights[static_cast<Eigen::Index>(i)]);
+      }
+    }
+
+    double operator()(const itk::Point<double, 3>& point) const
+    {
+      double distance = 0.0;
+
+      for (std::size_t i = 0; i < m_Weights.size(); ++i)
+      {
+        const double dx = point[0] - m_X[i];
+        const double dy = point[1] - m_Y[i];
+        const double dz = point[2] - m_Z[i];
+        distance += std::sqrt(dx * dx + dy * dy + dz * dz) * m_Weights[i];
+      }
+
+      return distance;
+    }
+
+  private:
+    std::vector<double> m_X;
+    std::vector<double> m_Y;
+    std::vector<double> m_Z;
+    std::vector<double> m_Weights;
+  };
+}
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
 {
@@ -292,76 +340,81 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
 {
   /*
-  * Now we must calculate the distance for each pixel. But instead of calculating the distance value
-  * for all of the image's pixels we proceed similar to the region growing algorithm:
-  *
-  * 1. Take the first pixel from the narrowband_point_list and calculate the distance for each neighbor (6er)
-  * 2. If the current index's distance value is below a certain threshold push it into the list
-  * 3. Next iteration take the next index from the list and originAsIndex with 1. again
-  *
-  * This is done until the narrowband_point_list is empty.
+  * Only the pixels close to the contours get their distance: a region grows from the pixel of the
+  * first contour point, and a pixel next to the region (6-neighborhood) joins it if its distance is
+  * within twice the spacing. The distances of all pixels are computed up front in parallel, which is
+  * cheaper than computing the ones the growing region reaches one after another.
   */
 
   typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
-  typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
 
-  std::queue<DistanceImageType::IndexType> narrowbandPoints;
-  PointType currentPoint = m_Centers.at(0);
-  double distance = this->CalculateDistanceValue(currentPoint);
+  const DistanceFunction distanceFunction(m_Centers, m_Weights);
 
-  // create itk::Point from vnl_vector
-  DistanceImageType::PointType currentPointAsPoint;
-  currentPointAsPoint[0] = currentPoint[0];
-  currentPointAsPoint[1] = currentPoint[1];
-  currentPointAsPoint[2] = currentPoint[2];
+  const auto region = m_DistanceImageITK->GetLargestPossibleRegion();
+  const std::size_t sizeX = region.GetSize(0);
+  const std::size_t sizeY = region.GetSize(1);
+  const std::size_t sizeZ = region.GetSize(2);
+  const std::size_t sliceSize = sizeX * sizeY;
 
-  // Transform the input point in world-coordinates to index-coordinates
-  auto currentIndex = m_DistanceImageITK->TransformPhysicalPointToIndex(currentPointAsPoint);
+  std::vector<double> distances(sliceSize * sizeZ);
+
+  itk::MultiThreaderBase::New()->ParallelizeImageRegion<3>(region, [&](const DistanceImageType::RegionType& chunk)
+    {
+      DistanceImageType::PointType point;
+
+      for (itk::ImageRegionConstIteratorWithIndex<DistanceImageType> it(m_DistanceImageITK, chunk); !it.IsAtEnd(); ++it)
+      {
+        m_DistanceImageITK->TransformIndexToPhysicalPoint(it.GetIndex(), point);
+        distances[m_DistanceImageITK->ComputeOffset(it.GetIndex())] = distanceFunction(point);
+      }
+    }, nullptr);
+
+  auto* pixels = m_DistanceImageITK->GetBufferPointer();
+
+  DistanceImageType::PointType seedPoint;
+  seedPoint[0] = m_Centers.at(0)[0];
+  seedPoint[1] = m_Centers.at(0)[1];
+  seedPoint[2] = m_Centers.at(0)[2];
+
+  const auto seedIndex = m_DistanceImageITK->TransformPhysicalPointToIndex(seedPoint);
 
   assert(
-    m_DistanceImageITK->GetLargestPossibleRegion().IsInside(currentIndex)); // we are quite certain this should hold
+    m_DistanceImageITK->GetLargestPossibleRegion().IsInside(seedIndex)); // we are quite certain this should hold
 
-  narrowbandPoints.push(currentIndex);
-  m_DistanceImageITK->SetPixel(currentIndex, distance);
+  const auto seedOffset = static_cast<std::size_t>(m_DistanceImageITK->ComputeOffset(seedIndex));
+  pixels[seedOffset] = distanceFunction(seedPoint);
 
-  NeighborhoodImageIterator::RadiusType radius;
-  radius.Fill(1);
-  NeighborhoodImageIterator nIt(radius, m_DistanceImageITK, m_DistanceImageITK->GetLargestPossibleRegion());
-  unsigned int relativeNbIdx[] = {4, 10, 12, 14, 16, 22};
+  std::vector<bool> reached(sliceSize * sizeZ, false);
+  reached[seedOffset] = true;
 
-  bool isInBounds = false;
-  while (!narrowbandPoints.empty())
-  {
-    nIt.SetLocation(narrowbandPoints.front());
-    narrowbandPoints.pop();
+  std::queue<std::size_t> pending;
+  pending.push(seedOffset);
 
-    unsigned int *relativeNb = &relativeNbIdx[0];
-    for (int i = 0; i < 6; i++)
+  const auto visit = [&](std::size_t offset)
     {
-      nIt.GetPixel(*relativeNb, isInBounds);
-      if (isInBounds && nIt.GetPixel(*relativeNb) == m_DistanceImageDefaultBufferValue)
+      if (!reached[offset] && std::fabs(distances[offset]) <= m_DistanceImageSpacing * 2)
       {
-        currentIndex = nIt.GetIndex(*relativeNb);
-
-        // Transform the currently checked point from index-coordinates to
-        // world-coordinates
-        m_DistanceImageITK->TransformIndexToPhysicalPoint(currentIndex, currentPointAsPoint);
-
-        // create a vnl_vector
-        currentPoint[0] = currentPointAsPoint[0];
-        currentPoint[1] = currentPointAsPoint[1];
-        currentPoint[2] = currentPointAsPoint[2];
-
-        // and check the distance
-        distance = this->CalculateDistanceValue(currentPoint);
-        if (std::fabs(distance) <= m_DistanceImageSpacing * 2)
-        {
-          nIt.SetPixel(*relativeNb, distance);
-          narrowbandPoints.push(currentIndex);
-        }
+        reached[offset] = true;
+        pixels[offset] = distances[offset];
+        pending.push(offset);
       }
-      relativeNb++;
-    }
+    };
+
+  while (!pending.empty())
+  {
+    const auto offset = pending.front();
+    pending.pop();
+
+    const auto x = offset % sizeX;
+    const auto y = (offset / sizeX) % sizeY;
+    const auto z = offset / sliceSize;
+
+    if (x > 0) visit(offset - 1);
+    if (x + 1 < sizeX) visit(offset + 1);
+    if (y > 0) visit(offset - sizeX);
+    if (y + 1 < sizeY) visit(offset + sizeX);
+    if (z > 0) visit(offset - sliceSize);
+    if (z + 1 < sizeZ) visit(offset + sliceSize);
   }
 
   ImageIterator imgRegionIterator(m_DistanceImageITK, m_DistanceImageITK->GetLargestPossibleRegion());
@@ -419,27 +472,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
   // Cast the created distance-Image from itk::Image to the mitk::Image
   // that is our output.
   CastToMitkImage(m_DistanceImageITK, resultImage);
-}
-
-double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointType p)
-{
-  double distanceValue(0);
-  PointType p1;
-  PointType p2;
-  double norm;
-
-  CenterList::iterator centerIter;
-
-  unsigned int count(0);
-  for (centerIter = m_Centers.begin(); centerIter != m_Centers.end(); centerIter++)
-  {
-    p1 = *centerIter;
-    p2 = p - p1;
-    norm = p2.two_norm();
-    distanceValue = distanceValue + (norm * m_Weights[count]);
-    ++count;
-  }
-  return distanceValue;
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::GenerateOutputInformation()

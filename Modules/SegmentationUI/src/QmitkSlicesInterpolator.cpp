@@ -40,7 +40,6 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkVtkImageOverwrite.h>
-#include <mitkShapeBasedInterpolationAlgorithm.h>
 #include <itkCommand.h>
 
 #include <mitkImageToContourFilter.h>
@@ -52,7 +51,6 @@ found in the LICENSE file.
 //  Includes for the merge operation
 #include <mitkImageToContourFilter.h>
 #include <mitkLabelSetImage.h>
-#include <mitkLabelSetImageConverter.h>
 
 #include <mitkMultiLabelSegmentationVtkMapper3D.h>
 #include <mitkVectorProperty.h>
@@ -255,10 +253,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
     itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
   command2->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged);
   SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver(itk::ModifiedEvent(), command2);
-
-  auto command3 = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-  command3->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnInterpolationAborted);
-  InterpolationAbortedObserverTag = m_Interpolator->AddObserver(itk::AbortEvent(), command3);
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
@@ -473,7 +467,6 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
   this->UpdateLabelHiddenIn3D();
 
   // remove observer
-  m_Interpolator->RemoveObserver(InterpolationAbortedObserverTag);
   m_Interpolator->RemoveObserver(InterpolationInfoChangedObserverTag);
   m_SurfaceInterpolator->RemoveObserver(SurfaceInterpolationInfoChangedObserverTag);
 
@@ -495,7 +488,6 @@ void QmitkSlicesInterpolator::setEnabled(bool enable)
     if (m_2DInterpolationEnabled)
     {
       this->Show2DInterpolationControls(true);
-      m_Interpolator->Activate2DInterpolation(true);
     }
     else if (m_3DInterpolationEnabled)
     {
@@ -509,12 +501,6 @@ void QmitkSlicesInterpolator::setEnabled(bool enable)
     this->HideAllInterpolationControls();
     this->Show3DInterpolationResult(false);
   }
-}
-
-void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
-{
-  OnInterpolationActivated(status);
-  m_Interpolator->Activate2DInterpolation(status);
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
@@ -562,7 +548,6 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(false);
       this->Show3DInterpolationResult(false);
-      m_Interpolator->Activate2DInterpolation(false);
       break;
 
     case 1: // 2D
@@ -572,7 +557,6 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->OnInterpolationActivated(true);
       this->On3DInterpolationActivated(false);
       this->Show3DInterpolationResult(false);
-      m_Interpolator->Activate2DInterpolation(true);
       break;
 
     case 2: // 3D
@@ -581,7 +565,6 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->Show3DInterpolationControls(true);
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(true);
-      m_Interpolator->Activate2DInterpolation(false);
       break;
 
     default:
@@ -700,11 +683,6 @@ void QmitkSlicesInterpolator::OnSliceChanged(itk::Object *sender, const itk::Eve
     return;
   }
 
-  if(m_2DInterpolationEnabled)
-  {
-    this->On2DInterpolationEnabled(m_2DInterpolationEnabled);
-  }  
-
   if (TranslateAndInterpolateChangedSlice(e, sliceNavigationController))
   {
     sliceNavigationController->GetRenderer()->RequestUpdate();
@@ -785,17 +763,24 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
   }
 
   const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
+  auto* groupImage = m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer());
 
   int clickedSliceDimension = -1;
   int clickedSliceIndex = -1;
 
   // calculate real slice position, i.e. slice of the image
-  mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()), plane, clickedSliceDimension, clickedSliceIndex);
+  mitk::SegTool2D::DetermineAffectedImageSlice(groupImage, plane, clickedSliceDimension, clickedSliceIndex);
 
   mitk::Image::Pointer interpolation;
   try
   {
-    interpolation = m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
+    // Passed on every call instead of observing the segmentation, which is cheap as long as
+    // group image and label stay the same.
+    if (const auto* activeLabel = m_Segmentation->GetActiveLabel(); nullptr != activeLabel)
+    {
+      m_Interpolator->SetSegmentationVolume(groupImage, activeLabel->GetValue());
+      interpolation = m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
+    }
   }
   catch (const std::exception& e)
   {
@@ -995,22 +980,9 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       return;
     }
 
-    mitk::Image::Pointer activeLabelImage;
-    try
-    {
-      activeLabelImage = mitk::CreateLabelMask(m_Segmentation, m_CurrentActiveLabelValue);
-    }
-    catch (...)
-    {
-      // Rethrow unchanged: wrapping would erase the exception type the caller
-      // differentiates on (e.g. std::bad_alloc for the out-of-memory message).
-      MITK_ERROR << "Cannot accept all interpolations. Could not create mask of active label (value: "
-                 << m_CurrentActiveLabelValue << ").";
-      throw;
-    }
-    m_Interpolator->SetSegmentationVolume(activeLabelImage);
-
     const auto relevantGroupImage = m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_CurrentActiveLabelValue));
+    m_Interpolator->SetSegmentationVolume(relevantGroupImage, m_CurrentActiveLabelValue);
+
     const auto segmentation3D = mitk::SelectImageByTimePoint(relevantGroupImage, m_TimePoint);
 
     // Create an empty diff image for the undo operation
@@ -1048,11 +1020,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     try
     {
-      m_Interpolator->EnableSliceImageCache();
-
-      // Reuse interpolation algorithm instance for each slice to cache boundary calculations
-      auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
-
       auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
       auto origin = planeGeometry->GetOrigin();
@@ -1064,7 +1031,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         slicedGeometry->IndexToWorld(origin, origin);
         planeGeometry->SetOrigin(origin);
 
-        auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep, algorithm);
+        auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep);
 
         if (interpolation.IsNotNull())
         {
@@ -1091,8 +1058,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
         task.Progress();
       }
-
-      m_Interpolator->DisableSliceImageCache();
 
       if (totalChangedSlices > 0)
       {
@@ -1130,10 +1095,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     }
     catch (...)
     {
-      // The slice cache must not outlive this method: it is keyed only by slice
-      // index and time step, so a later run would silently reuse stale slices.
-      m_Interpolator->DisableSliceImageCache();
-
       m_FeedbackNode->SetData(nullptr);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       throw;
@@ -1387,6 +1348,12 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 {
   m_2DInterpolationEnabled = on;
 
+  if (!on)
+  {
+    // Otherwise the controller would keep the group image alive, even after its segmentation is removed.
+    m_Interpolator->SetSegmentationVolume(nullptr, mitk::Label::UNLABELED_VALUE);
+  }
+
   try
   {
     if (m_DataStorage.IsNotNull())
@@ -1429,8 +1396,8 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       const auto* activeLabel = labelSetImage->GetActiveLabel();
       if (nullptr != activeLabel)
       {
-        auto activeLabelImage = mitk::CreateLabelMask(labelSetImage, activeLabel->GetValue());
-        m_Interpolator->SetSegmentationVolume(activeLabelImage);
+        const auto labelValue = activeLabel->GetValue();
+        m_Interpolator->SetSegmentationVolume(labelSetImage->GetGroupImage(labelSetImage->GetGroupIndexOfLabel(labelValue)), labelValue);
       }
     }
   }
@@ -1603,12 +1570,6 @@ void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject 
 {
   // something (e.g. undo) changed the interpolation info, we should refresh our display
   this->UpdateVisibleSuggestion();
-}
-
-void QmitkSlicesInterpolator::OnInterpolationAborted(const itk::EventObject& /*e*/)
-{
-  m_CmbInterpolation->setCurrentIndex(0);
-  m_FeedbackNode->SetData(nullptr);
 }
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject & /*e*/)

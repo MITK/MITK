@@ -15,46 +15,32 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkImage.h>
+#include <mitkLabel.h>
+#include <mitkPlaneGeometry.h>
 #include <MitkSegmentationExports.h>
 #include <mitkShapeBasedInterpolationAlgorithm.h>
 
-#include <itkImage.h>
 #include <itkObjectFactory.h>
 
-#include <map>
-#include <mutex>
-#include <utility>
+#include <array>
+#include <cstddef>
+#include <optional>
 #include <vector>
 
 namespace mitk
 {
-  class Image;
-
   /**
     \brief Generates interpolations of 2D slices.
 
     \sa QmitkSlicesInterpolator
-    \sa QmitkInteractiveSegmentation
 
     \ingroup ToolManagerEtAl
 
-    This class keeps track of the contents of a 3D segmentation image.
-    \attention mitk::SegmentationInterpolationController assumes that the image contains pixel values of 0 and 1.
-
-    After you set the segmentation image using SetSegmentationVolume(), the whole image is scanned for pixels other than
-    0. SegmentationInterpolationController registers as an observer to the segmentation image, and repeats the scan
-    whenever the image is modified.
-
-    You can prevent this (time consuming) scan if you do the changes slice-wise and send difference images to
-    SegmentationInterpolationController.
-    For this purpose SetChangedSlice() should be used. mitk::OverwriteImageFilter already does this every time it
-    changes a slice of an image. There is a static method InterpolatorForImage(), which can be used to find out if there
-    already is an interpolator instance for a specified image. OverwriteImageFilter uses this to get to know its
-    interpolator.
-
-    SegmentationInterpolationController needs to maintain some information about the image slices (in every dimension).
-    This information is stored internally in m_SegmentationCountInSlice, which is basically three std::vectors (one for
-    each dimension). Each item describes one image dimension, each vector item holds the count of pixels in "its" slice.
+    Interpolates one label of a segmentation in slices that do not contain it, from the nearest slices below and
+    above that do. To find those slices, the controller counts the voxels of the label in every slice along each
+    image axis. The counts are recomputed on demand when the modification time of the segmentation changed, so the
+    controller needs no notification about edits, but the first interpolation after an edit scans the whole time
+    step.
   */
   class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::Object
   {
@@ -63,170 +49,85 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /**
-        \brief Find interpolator for a given image.
-        \return nullptr if there is no interpolator yet.
-
-        This method is useful if several "clients" modify the same image and want to access the interpolations.
-        Then they can share the same object.
-       */
-      static SegmentationInterpolationController *InterpolatorForImage(const Image *);
-
     /**
-      \brief Block reaction to an images Modified() events.
+      \brief Sets the segmentation to interpolate in and the pixel value of the label to interpolate.
 
-      Blocking the scan of the whole image is especially useful when you are about to change a single slice
-      of the image. Then you would send a difference image of this single slice to SegmentationInterpolationController
-      but call image->Modified() anyway. Before calling image->Modified() you should block
-      SegmentationInterpolationController's reactions to this modified by using this method.
+      The segmentation must be a 3D or 3D+t image with the pixel type of MultiLabelSegmentation group images. All
+      other pixel values count as background. Setting the current segmentation and label again keeps everything
+      computed so far. Pass nullptr to release the segmentation.
+
+      \throw mitk::Exception if the segmentation is neither 3D nor 3D+t or has another pixel type.
     */
-    void BlockModified(bool);
+    void SetSegmentationVolume(const Image *segmentation, Label::PixelType labelValue);
 
     /**
-      \brief Initialize with a whole volume.
-
-      Will scan the volume for segmentation pixels (values other than 0) and fill some internal data structures.
-      You don't have to call this method every time something changes, but only
-      when several slices at once change.
-
-      When you change a single slice, call SetChangedSlice() instead.
-    */
-    void SetSegmentationVolume(const Image *segmentation);
-
-    /**
-      \brief Update after changing a single slice.
-
-      \param sliceDiff is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
-             The difference is (pixel value in the new slice minus pixel value in the old slice).
+      \brief Interpolates the label in a slice from the nearest slices below and above that contain it.
 
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
-
       \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
+      \param currentPlane The plane of the slice. The result is sampled on it.
+      \param timeStep Which time step to use.
+      \return A 2D image with 1 inside the interpolated shape and 0 elsewhere, or nullptr if there is nothing to
+              interpolate, i.e. the slice contains the label or no slice on one of its sides does.
 
-      \param timeStep Which time step is changed
-    */
-    void SetChangedSlice(const Image *sliceDiff,
-                         unsigned int sliceDimension,
-                         unsigned int sliceIndex,
-                         unsigned int timeStep);
-    /** \brief Update after changing an entire volume at a given time step.
-      \param sliceDiff The difference image for the changed volume.
-      \param timeStep Which time step is changed.
-    */
-    void SetChangedVolume(const Image *sliceDiff, unsigned int timeStep);
-
-    /**
-      \brief Generates an interpolated image for the given slice.
-
-      \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
-
-      \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
-
-      \param currentPlane
-
-      \param timeStep Which time step to use
-
-      \param algorithm Optional algorithm instance to potentially benefit from caching for repeated interpolation
+      \throw SegmentationInterpolationException if the enclosing slices cannot be combined.
     */
     Image::Pointer Interpolate(unsigned int sliceDimension,
                                unsigned int sliceIndex,
-                               const mitk::PlaneGeometry *currentPlane,
-                               unsigned int timeStep,
-                               mitk::ShapeBasedInterpolationAlgorithm::Pointer algorithm = nullptr);
-
-    /** \brief Callback invoked when the observed segmentation image is modified.
-      Triggers a full rescan of the segmentation volume unless modifications are blocked.
-    */
-    void OnImageModified(const itk::EventObject &);
-
-    /**
-     * Activate/Deactivate the 2D interpolation.
-    */
-    void Activate2DInterpolation(bool);
-
-    /**
-     * Enable slice extraction cache for upper and lower slices.
-    */
-    void EnableSliceImageCache();
-
-    /**
-     * Disable slice extraction cache for upper and lower slices.
-    */
-    void DisableSliceImageCache();
-
-    /**
-      \brief Get existing instance or create a new one
-    */
-    static SegmentationInterpolationController *GetInstance();
+                               const PlaneGeometry *currentPlane,
+                               unsigned int timeStep);
 
   protected:
-    /**
-      \brief Protected class of mitk::SegmentationInterpolationController. Don't use (you shouldn't be able to do so)!
-    */
-    class MITKSEGMENTATION_EXPORT SetChangedSliceOptions
-    {
-    public:
-      SetChangedSliceOptions(
-        unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, const void *pixels)
-        : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
-      {
-      }
-
-      unsigned int sliceDimension;
-      unsigned int sliceIndex;
-      unsigned int dim0;
-      unsigned int dim1;
-      unsigned int timeStep;
-      const void *pixelData;
-    };
-
-    typedef std::vector<unsigned int> DirtyVectorType;
-    // typedef std::vector< DirtyVectorType[3] > TimeResolvedDirtyVectorType; // cannot work with C++, so next line is
-    // used for implementation
-    typedef std::vector<std::vector<DirtyVectorType>> TimeResolvedDirtyVectorType;
-    typedef std::map<const Image *, SegmentationInterpolationController *> InterpolatorMapType;
-
-    SegmentationInterpolationController(); // purposely hidden
+    SegmentationInterpolationController();
     ~SegmentationInterpolationController() override;
 
-    /// internal scan of a single slice
-    template <typename DATATYPE>
-    void ScanChangedSlice(const itk::Image<DATATYPE, 2> *, const SetChangedSliceOptions &options);
+  private:
+    /** Number of label voxels in each slice, per image axis. */
+    using SliceCountsType = std::array<std::vector<std::size_t>, 3>;
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void ScanChangedVolume(const itk::Image<TPixel, VImageDimension> *, unsigned int timeStep);
-
-    template <typename DATATYPE>
-    void ScanWholeVolume(const itk::Image<DATATYPE, 3> *, const Image *volume, unsigned int timeStep);
-
-    void PrintStatus();
+    struct TimeStepSliceCounts
+    {
+      std::optional<itk::ModifiedTimeType> SegmentationMTime;
+      SliceCountsType Counts;
+    };
 
     /**
-     * Extract a slice and optionally use a caching mechanism if enabled.
+      The two slices enclosing the last interpolated gap, cropped to the bounding box of the label in both and
+      binarized. Scrolling through a gap interpolates between the same two slices, so the crops and the distance
+      maps cached by Algorithm are reused.
     */
-    mitk::Image::Pointer ExtractSlice(const PlaneGeometry* planeGeometry, unsigned int sliceIndex, unsigned int timeStep, bool cache = false);
+    struct EnclosingSlices
+    {
+      unsigned int TimeStep = 0;
+      unsigned int SliceDimension = 0;
+      unsigned int LowerIndex = 0;
+      unsigned int UpperIndex = 0;
+      itk::ModifiedTimeType SegmentationMTime = 0;
+      PlaneGeometry::ConstPointer LowerPlane;
 
-    /**
-      An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
-      has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation
-      algorithm).
+      std::array<std::size_t, 2> SliceSize = {};
+      std::array<std::size_t, 2> CropBegin = {};
+      std::array<std::size_t, 2> CropSize = {};
 
-      E.g. flags for axial slices are stored in m_SegmentationCountInSlice[0][index].
+      /** Both null if neither slice contains the label on the plane. */
+      Image::Pointer LowerCrop;
+      Image::Pointer UpperCrop;
 
-      Enhanced with time steps it is now m_SegmentationCountInSlice[timeStep][0][index]
-    */
-    TimeResolvedDirtyVectorType m_SegmentationCountInSlice;
+      ShapeBasedInterpolationAlgorithm::Pointer Algorithm;
+    };
 
-    static InterpolatorMapType s_InterpolatorForImage;
+    const SliceCountsType &GetSliceCounts(unsigned int timeStep);
+
+    const EnclosingSlices &GetEnclosingSlices(unsigned int sliceDimension,
+                                              unsigned int lowerIndex,
+                                              unsigned int upperIndex,
+                                              const PlaneGeometry *currentPlane,
+                                              unsigned int timeStep);
 
     Image::ConstPointer m_Segmentation;
-    std::pair<unsigned long, bool> m_SegmentationModifiedObserverTag; // first: actual tag, second: tag assigned / valid?
-    bool m_BlockModified;
-    bool m_2DInterpolationActivated;
-
-    bool m_EnableSliceImageCache;
-    std::map<std::pair<unsigned int, unsigned int>, Image::Pointer> m_SliceImageCache;
-    std::mutex m_SliceImageCacheMutex;
+    Label::PixelType m_LabelValue;
+    std::vector<TimeStepSliceCounts> m_SliceCounts;
+    std::optional<EnclosingSlices> m_EnclosingSlices;
   };
 
 } // namespace

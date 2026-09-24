@@ -118,11 +118,6 @@ public:
   /**
     Just public because it is called by itk::Commands. You should not need to call this.
   */
-  void OnInterpolationAborted(const itk::EventObject &);
-
-  /**
-    Just public because it is called by itk::Commands. You should not need to call this.
-  */
   void OnSurfaceInterpolationInfoChanged(const itk::EventObject &);
 
 
@@ -191,8 +186,6 @@ protected slots:
   /** \brief Called when the interpolation method combo box selection changes. */
   void OnInterpolationMethodChanged(int index);
 
-  /** \brief Called when the 2D interpolation radio button is toggled. */
-  void On2DInterpolationEnabled(bool);
   /** \brief Called when the 3D interpolation radio button is toggled. */
   void On3DInterpolationEnabled(bool);
   /** \brief Called when the "no interpolation" radio button is toggled. */
@@ -306,7 +299,6 @@ private:
 
   unsigned int InterpolationInfoChangedObserverTag;
   unsigned int SurfaceInterpolationInfoChangedObserverTag;
-  unsigned int InterpolationAbortedObserverTag;
 
   QGroupBox *m_GroupBoxEnableExclusiveInterpolationMode;
   QComboBox *m_CmbInterpolation;

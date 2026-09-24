@@ -199,6 +199,9 @@ protected:
 
 private:
 
+  /** Shows the lighting button on 3D windows only and fits the menu width to it. */
+  void UpdateLightingModeButton();
+
   mitk::BaseRenderer::Pointer m_Renderer;
 
   QTimer* m_AutoRotationTimer;

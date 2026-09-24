@@ -92,11 +92,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   , m_OldLayoutDesign(LayoutDesign::DEFAULT)
 {
   CreateMenuWidget();
-
-  // Asked of the layout rather than hard-coded: the 3D window carries one button
-  // more than the 2D ones, and every button is capped at the same fixed size, so
-  // what the layout asks for is exactly what they need.
-  this->setFixedWidth(this->sizeHint().width());
+  this->UpdateLightingModeButton();
 
   setAutoFillBackground(true);
 
@@ -249,6 +245,13 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 void QmitkRenderWindowMenu::ShowMenu()
 {
   MITK_DEBUG << "menu showMenu";
+
+  // The window can be switched between 2D and 3D from elsewhere while the menu
+  // is hidden. Its right edge stays in the corner if its width changes.
+  const auto oldWidth = this->width();
+  this->UpdateLightingModeButton();
+  this->move(this->x() + oldWidth - this->width(), this->y());
+
   this->show();
   this->raise();
 }
@@ -257,6 +260,15 @@ void QmitkRenderWindowMenu::HideMenu()
 {
   MITK_DEBUG << "menu hideEvent";
   this->hide();
+}
+
+void QmitkRenderWindowMenu::UpdateLightingModeButton()
+{
+  m_LightingModeButton->setVisible(m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D);
+
+  // Asked of the layout rather than hard-coded: every button is capped at the
+  // same fixed size, so what the layout asks for is exactly what they need.
+  this->setFixedWidth(this->sizeHint().width());
 }
 
 void QmitkRenderWindowMenu::paintEvent(QPaintEvent * /*e*/)
@@ -302,21 +314,18 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_LayoutDesignButton->setAutoRaise(true);
   layout->addWidget(m_LayoutDesignButton);
 
-  if (m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D)
-  {
-    m_LightingMenu = new QMenu(this);
-    connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
+  m_LightingMenu = new QMenu(this);
+  connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
 
-    m_LightingModeButton = new QToolButton(this);
-    m_LightingModeButton->setMaximumSize(15, 15);
-    m_LightingModeButton->setIconSize(size);
-    m_LightingModeButton->setMenu(m_LightingMenu);
-    m_LightingModeButton->setIcon(QIcon(QPixmap(iconLightingMode_xpm)));
-    m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
-    m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
-    m_LightingModeButton->setAutoRaise(true);
-    layout->addWidget(m_LightingModeButton);
-  }
+  m_LightingModeButton = new QToolButton(this);
+  m_LightingModeButton->setMaximumSize(15, 15);
+  m_LightingModeButton->setIconSize(size);
+  m_LightingModeButton->setMenu(m_LightingMenu);
+  m_LightingModeButton->setIcon(QIcon(QPixmap(iconLightingMode_xpm)));
+  m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
+  m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+  m_LightingModeButton->setAutoRaise(true);
+  layout->addWidget(m_LightingModeButton);
 
   connect(m_FullScreenButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnFullScreenButton);
   connect(m_LayoutDesignButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnLayoutDesignButton);

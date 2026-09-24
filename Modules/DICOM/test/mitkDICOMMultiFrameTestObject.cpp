@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "mitkDICOMMultiFrameTestObject.h"
 
+#include <mitkDICOMProperty.h>
+
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
 
@@ -21,29 +23,9 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcuid.h>
 
 #include <algorithm>
-#include <locale>
-#include <sstream>
 
 namespace
 {
-  /** DICOM decimal and integer strings are locale independent, so they are never
-      formatted with the stream's ambient locale. */
-  std::string ToDicomString(double value)
-  {
-    std::ostringstream stream;
-    stream.imbue(std::locale::classic());
-    stream << value;
-    return stream.str();
-  }
-
-  std::string ToDicomString(unsigned int value)
-  {
-    std::ostringstream stream;
-    stream.imbue(std::locale::classic());
-    stream << value;
-    return stream.str();
-  }
-
   std::string GenerateUID()
   {
     char uid[100];
@@ -69,14 +51,14 @@ namespace
   void WritePixelValueTransformation(DcmItem& parent, double slope, double intercept)
   {
     DcmItem& item = AppendItem(parent, DCM_PixelValueTransformationSequence);
-    Require(item.putAndInsertString(DCM_RescaleIntercept, ToDicomString(intercept).c_str()), "Rescale Intercept");
-    Require(item.putAndInsertString(DCM_RescaleSlope, ToDicomString(slope).c_str()), "Rescale Slope");
+    Require(item.putAndInsertString(DCM_RescaleIntercept, mitk::ConvertValueToDICOMStr(intercept).c_str()), "Rescale Intercept");
+    Require(item.putAndInsertString(DCM_RescaleSlope, mitk::ConvertValueToDICOMStr(slope).c_str()), "Rescale Slope");
     Require(item.putAndInsertString(DCM_RescaleType, "BQML"), "Rescale Type");
   }
 
   std::string PositionString(double z)
   {
-    return "0\\0\\" + ToDicomString(z);
+    return "0\\0\\" + mitk::ConvertValueToDICOMStr(z);
   }
 }
 
@@ -123,7 +105,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   Require(dataset.putAndInsertString(DCM_FrameOfReferenceUID, studyUID.c_str()), "Frame of Reference UID");
   Require(dataset.putAndInsertString(DCM_Modality, modality.c_str()), "Modality");
   Require(dataset.putAndInsertString(DCM_SeriesNumber, "1"), "Series Number");
-  Require(dataset.putAndInsertString(DCM_InstanceNumber, ToDicomString(this->instanceNumber).c_str()),
+  Require(dataset.putAndInsertString(DCM_InstanceNumber, mitk::ConvertValueToDICOMStr(this->instanceNumber).c_str()),
           "Instance Number");
   Require(dataset.putAndInsertString(DCM_PatientName, "MULTIFRAME^TEST"), "Patient Name");
   Require(dataset.putAndInsertString(DCM_PatientID, "MULTIFRAME_TEST"), "Patient ID");
@@ -136,7 +118,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   Require(dataset.putAndInsertUint16(DCM_BitsStored, 16), "Bits Stored");
   Require(dataset.putAndInsertUint16(DCM_HighBit, 15), "High Bit");
   Require(dataset.putAndInsertUint16(DCM_PixelRepresentation, 1), "Pixel Representation");
-  Require(dataset.putAndInsertString(DCM_NumberOfFrames, ToDicomString(static_cast<unsigned int>(this->frames.size())).c_str()),
+  Require(dataset.putAndInsertString(DCM_NumberOfFrames, mitk::ConvertValueToDICOMStr(static_cast<unsigned int>(this->frames.size())).c_str()),
           "Number of Frames");
 
   if (this->functionalGroups)
@@ -152,9 +134,9 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
             "Image Orientation (Patient)");
 
     DcmItem& measures = AppendItem(shared, DCM_PixelMeasuresSequence);
-    Require(measures.putAndInsertString(DCM_SliceThickness, ToDicomString(this->sliceSpacing).c_str()),
+    Require(measures.putAndInsertString(DCM_SliceThickness, mitk::ConvertValueToDICOMStr(this->sliceSpacing).c_str()),
             "Slice Thickness");
-    const std::string spacing = ToDicomString(this->sliceSpacing) + "\\" + ToDicomString(this->sliceSpacing);
+    const std::string spacing = mitk::ConvertValueToDICOMStr(this->sliceSpacing) + "\\" + mitk::ConvertValueToDICOMStr(this->sliceSpacing);
     Require(measures.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");
 
     if (RescalePlacement::Shared == this->rescalePlacement)
@@ -221,15 +203,15 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
             "Image Orientation (Patient)");
     Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->zOffset).c_str()),
             "Image Position (Patient)");
-    const std::string spacing = ToDicomString(this->sliceSpacing) + "\\" + ToDicomString(this->sliceSpacing);
+    const std::string spacing = mitk::ConvertValueToDICOMStr(this->sliceSpacing) + "\\" + mitk::ConvertValueToDICOMStr(this->sliceSpacing);
     Require(dataset.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");
-    Require(dataset.putAndInsertString(DCM_SliceThickness, ToDicomString(this->sliceSpacing).c_str()),
+    Require(dataset.putAndInsertString(DCM_SliceThickness, mitk::ConvertValueToDICOMStr(this->sliceSpacing).c_str()),
             "Slice Thickness");
-    Require(dataset.putAndInsertString(DCM_SpacingBetweenSlices, ToDicomString(this->sliceSpacing).c_str()),
+    Require(dataset.putAndInsertString(DCM_SpacingBetweenSlices, mitk::ConvertValueToDICOMStr(this->sliceSpacing).c_str()),
             "Spacing Between Slices");
-    Require(dataset.putAndInsertString(DCM_RescaleIntercept, ToDicomString(this->frames.front().intercept).c_str()),
+    Require(dataset.putAndInsertString(DCM_RescaleIntercept, mitk::ConvertValueToDICOMStr(this->frames.front().intercept).c_str()),
             "Rescale Intercept");
-    Require(dataset.putAndInsertString(DCM_RescaleSlope, ToDicomString(this->frames.front().slope).c_str()),
+    Require(dataset.putAndInsertString(DCM_RescaleSlope, mitk::ConvertValueToDICOMStr(this->frames.front().slope).c_str()),
             "Rescale Slope");
   }
 

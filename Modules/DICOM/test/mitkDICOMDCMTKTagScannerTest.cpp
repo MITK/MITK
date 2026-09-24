@@ -28,11 +28,13 @@ found in the LICENSE file.
 #include <vector>
 
 /**
- * Besides plain scanning, the suite covers the functional-group expansion: a
- * tag of interest is registered as the path inside the functional-group macro,
- * and the scanner of the frame-model reader also searches it under the shared
- * and the per-frame root, but only when asked to, only for a file with a frame
- * model and only for a path with more than one node.
+ * Besides plain scanning, the suite covers what reading the frame model adds:
+ * frame-layout detection, the frame-model warnings, and the functional-group
+ * expansion. A tag of interest is registered as the path inside the
+ * functional-group macro, and the scanner of the frame-model reader also
+ * searches it under the shared and the per-frame root, but only when asked to,
+ * only for a file with a frame model and only for a path with more than one
+ * node.
  */
 class mitkDICOMDCMTKTagScannerTestSuite : public mitk::TestFixture
 {
@@ -122,7 +124,7 @@ private:
 
   static mitk::DICOMDatasetAccessingImageFrameList Scan(const mitk::StringList& files,
                                                         const std::vector<mitk::DICOMTagPath>& paths,
-                                                        bool expand)
+                                                        bool readFrameModel)
   {
     auto aScanner = mitk::DICOMDCMTKTagScanner::New();
     aScanner->SetInputFiles(files);
@@ -130,7 +132,7 @@ private:
     {
       aScanner->AddTagPath(path);
     }
-    aScanner->SetReadFrameModel(expand);
+    aScanner->SetReadFrameModel(readFrameModel);
     aScanner->Scan();
 
     return aScanner->GetFrameInfoList();
@@ -240,8 +242,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing value of instance uid finding of frame 3", findings.front().value == "1.2.276.0.99.1.4.8323329.3795.1303917947.940055");
   }
 
-  /** A file without functional groups gets no rooted search, so switching the
-      expansion on changes nothing it stores. */
+  /** A file without functional groups gets no rooted search, so reading the
+      frame model changes nothing it stores. */
   void ClassicFileStoresTheSameFindingsWithTheSwitch()
   {
     const std::vector<mitk::DICOMTagPath> paths = {

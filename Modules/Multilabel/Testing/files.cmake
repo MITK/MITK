@@ -19,6 +19,7 @@ set(MODULE_TESTS
 )
 
 set(MODULE_RENDERING_TESTS
+    mitkLabelSetImageVtkMapper2DTest.cpp
     mitkMultiLabelSegmentationVtkMapper3DTest.cpp
 )
 

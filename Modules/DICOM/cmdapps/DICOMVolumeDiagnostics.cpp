@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 
 #include <mitkIOUtil.h>
-#include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMEnums.h>
 #include <mitkDICOMFilesHelper.h>
 #include <mitkDICOMFileReaderSelector.h>
@@ -147,21 +146,11 @@ int main(int argc, char* argv[])
         diagnosticsResult["selected_reader"] = readerInfo;
 
         // The selector scans with GDCM, which cannot look into sequences.
-        // BaseDICOMReaderService::DoRead re-scans with DCMTK before loading, so a
+        // BaseDICOMReaderService::DoRead analyzes with the frame model before loading, so a
         // report built on the selection scan alone would show no frame model at
         // all and answer a different question than this tool claims to.
         // AnalyzeInputFiles clears its outputs first, so re-running it is safe.
-        reader->SetInputFiles(relevantFiles);
-
-        auto scanner = mitk::DICOMDCMTKTagScanner::New();
-        scanner->AddTagPaths(reader->GetTagsOfInterest());
-        scanner->SetReadFrameModel(true);
-        scanner->SetInputFiles(relevantFiles);
-        scanner->Scan();
-
-        auto scanCache = scanner->GetScanCache();
-        reader->SetTagCache(scanCache);
-        reader->AnalyzeInputFiles();
+        const auto scanCache = mitk::AnalyzeWithFrameModel(*reader, relevantFiles);
 
         nlohmann::json outputInfos;
         nlohmann::json findings = nlohmann::json::array();
@@ -172,18 +161,8 @@ int main(int argc, char* argv[])
         const auto nrOfOutputs = reader->GetNumberOfOutputs();
         for (std::remove_const_t<decltype(nrOfOutputs)> outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
         {
-          bool isRelevantOutput = true;
-          if (!pathIsDirectory)
-          {
-            const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
-            auto finding = std::find_if(frameList.begin(), frameList.end(), [&](const mitk::DICOMImageFrameInfo::Pointer& frame)
-              {
-                fs::path framePath(frame->Filename);
-                fs::path inputPath(inputFilename);
-                return framePath == inputPath;
-              });
-            isRelevantOutput = finding != frameList.end();
-          }
+          const bool isRelevantOutput = pathIsDirectory
+            || mitk::ContainsFile(reader->GetOutput(outputIndex).GetImageFrameList(), inputFilename);
 
           if (isRelevantOutput)
           {

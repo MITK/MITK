@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMFrameListHelper_h
 #define mitkDICOMFrameListHelper_h
 
+#include <mitkDICOMFileReader.h>
 #include <mitkDICOMImageFrameInfo.h>
 #include <MitkDICOMExports.h>
 
@@ -31,6 +32,29 @@ namespace mitk
    * established.
    */
   MITKDICOM_EXPORT std::vector<std::string> DistinctFilesInOrder(const DICOMImageFrameList& frames);
+
+  /**
+   * \ingroup DICOMModule
+   * \brief Whether one of the passed frames belongs to the passed file.
+   *
+   * The paths are compared as filesystem paths, lexically and without
+   * resolving them, so that separator spelling does not matter.
+   */
+  MITKDICOM_EXPORT bool ContainsFile(const DICOMImageFrameList& frames, const std::string& file);
+
+  /**
+   * \ingroup DICOMModule
+   * \brief Set the passed files as the reader's input and analyze them with
+   *        the frame model.
+   *
+   * The files are scanned by a DICOMDCMTKTagScanner that reads the frame model,
+   * for the tags of interest the reader has at the time of the call, and the
+   * scan is handed to the reader as its tag cache. A reader that scans for
+   * itself reads every file as a single frame.
+   *
+   * \return The tag cache the analysis ran on.
+   */
+  MITKDICOM_EXPORT DICOMTagCache::Pointer AnalyzeWithFrameModel(DICOMFileReader& reader, const StringList& files);
 }
 
 #endif

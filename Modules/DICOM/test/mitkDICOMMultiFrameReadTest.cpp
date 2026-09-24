@@ -148,6 +148,8 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(MoreSpecificOriginWinsWhateverTheOrder);
   MITK_TEST(TwoEnhancedFilesInOneSeriesBecomeTwoCompleteVolumes);
   MITK_TEST(EnhancedFilesWithTopLevelGeometryAreSeparated);
+  MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolume);
+  MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolumeWithAFreshReader);
   MITK_TEST(EnhancedFileIsSeparatedFromSingleFrameFiles);
   MITK_TEST(SingleFrameEnhancedFilesStillStackIntoOneVolume);
   MITK_TEST(FrameModelFilesAreNotCondensedInto3DnT);
@@ -216,9 +218,10 @@ private:
     return path;
   }
 
-  std::vector<mitk::Image::Pointer> LoadAll(const std::string& path)
+  std::vector<mitk::Image::Pointer> LoadAll(const std::string& path,
+                                            const std::string& readerName = "MITK DICOM Reader v2 (autoselect)")
   {
-    mitk::PreferenceListReaderOptionsFunctor readerFunctor({"MITK DICOM Reader v2 (autoselect)"}, {""});
+    mitk::PreferenceListReaderOptionsFunctor readerFunctor({readerName}, {""});
     std::vector<mitk::Image::Pointer> result;
 
     for (const auto& data : mitk::IOUtil::Load(path, &readerFunctor))
@@ -996,6 +999,60 @@ public:
                              !SplitReasonOf(image)->HasReason(
                                mitk::IOVolumeSplitReason::ReasonType::FrameCountMismatch));
     }
+  }
+
+  /** Opening one file of the separated block loads the volume of that file only.
+   *
+   * The selection scan still sees the files as one block, so it is the frame
+   * model that splits them, after the block of the opened file was chosen. The
+   * sibling file must not be reported as read either, or it is skipped when it
+   * is opened together with the first one.
+   */
+  void OpeningOneSeparatedFileLoadsOnlyItsVolume()
+  {
+    const std::string directory = this->WriteSeries(2, [](mitk::DICOMMultiFrameTestObject& object, unsigned int file)
+    {
+      object.topLevelGeometry = true;
+      object.zOffset = file * FRAME_COUNT * object.sliceSpacing;
+      for (auto& frame : object.frames)
+      {
+        frame.slope = 1.0 + file;
+      }
+    });
+
+    const auto image = this->LoadOne(directory + "/file_0.dcm");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The opened file loads as the complete volume it is",
+                                 FRAME_COUNT, image->GetDimension(2));
+
+    const auto property = this->TheOnlyProperty(image, RescaleSlopeRelative(), "DICOM.0028.9145.[0].0028.1053");
+    const auto* dicomProperty = AsDICOMProperty(property);
+    CPPUNIT_ASSERT_MESSAGE("Rescale slope is a temporo-spatial property", nullptr != dicomProperty);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The loaded volume is the one of the opened file",
+                                 mitk::ConvertValueToDICOMStr(1.0),
+                                 Trimmed(dicomProperty->GetValue(0, 0, false, false)));
+
+    mitk::PreferenceListReaderOptionsFunctor readerFunctor({"MITK DICOM Reader v2 (autoselect)"}, {""});
+    const std::vector<std::string> files = {directory + "/file_0.dcm", directory + "/file_1.dcm"};
+    const auto both = mitk::IOUtil::Load(files, &readerFunctor);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Opening both files loads both volumes",
+                                 std::size_t(2), both.size());
+  }
+
+  /** The same holds for a reader service that hands out a reader nobody has
+   * analyzed yet, so no selection scan narrows the files before the frame
+   * model splits them.
+   */
+  void OpeningOneSeparatedFileLoadsOnlyItsVolumeWithAFreshReader()
+  {
+    const std::string directory = this->WriteSeries(2, [](mitk::DICOMMultiFrameTestObject& object, unsigned int file)
+    {
+      object.topLevelGeometry = true;
+      object.zOffset = file * FRAME_COUNT * object.sliceSpacing;
+    });
+
+    const auto images = this->LoadAll(directory + "/file_0.dcm", "MITK Simple 3D Volume Importer");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Only the volume of the opened file is loaded",
+                                 std::size_t(1), images.size());
   }
 
   /**

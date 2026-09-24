@@ -193,12 +193,13 @@ public:
 
   /**
   * \brief Show or hide this cell's sync peek plate at the layout-wide 'glyphBox'
-  *        side, emphasising 'axis' - or none of them without one, which is how
-  *        the plate looks while the pointer rests on the barcode between two
-  *        glyphs. The box is handed in rather than derived here: every plate in
-  *        the layout must share one geometry, or the rows stop being comparable.
+  *        side and glyph arrangement 'rows', emphasising 'axis' - or none of
+  *        them without one, which is how the plate looks while the pointer rests
+  *        on the barcode between two glyphs. The geometry is handed in rather
+  *        than derived here: every plate in the layout must share one, or the
+  *        rows stop being comparable.
   */
-  void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox);
+  void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox, QmitkMxNPeekRows rows);
 
   /** \brief Whether this cell's peek plate is up. Exposed for verification. */
   bool IsSyncPeekVisible() const;
@@ -211,13 +212,17 @@ public:
    *         verification. */
   int SyncPeekGlyphBox() const;
 
+  /** \brief The glyph arrangement this cell's peek was given. Exposed for
+   *         verification. */
+  QmitkMxNPeekRows SyncPeekRows() const;
+
   /** \brief Where a peek plate and its parts land in a cell of 'cellSize'. */
   struct PeekPlateLayout
   {
     QRect plate;                              // invalid when the cell cannot host a plate
     std::array<QRect, PeekAxisCount> glyphs;  // axis order; the pumped one is the large rect
     QRect caption;                            // the pointed-at axis name, above the row
-    QRect values;                             // the per-axis offsets, under the row
+    QRect values;                             // the per-axis offsets, under the first row
     QRect name;                               // the window name, below the values
   };
 
@@ -226,25 +231,26 @@ public:
   *        eight glyph rects for 'glyphBox' with 'pumpedAxis' enlarged around its
   *        own slot, and the text rects. Every other glyph keeps its slot, so
   *        the pumped one may overlap its neighbours. A negative 'pumpedAxis' lays
-  *        the row out with nothing emphasised. Returns an invalid plate when the
-  *        cell cannot host one. Static so the geometry is testable without a
-  *        realized overlay.
+  *        the row out with nothing emphasised. 'rows' lays the glyphs out in one
+  *        row or two. Returns an invalid plate when the cell cannot host one.
+  *        Static so the geometry is testable without a realized overlay.
   *
   *   The plate reserves the pumped glyph's overhang and all three text lines -
   *   axis name, offset values, window name - whatever the pumped axis is and
   *   whatever this window is offset by, so its rect depends only on 'cellSize',
-  *   'glyphBox' and 'textLineHeight': switching axes while the peek is up moves
-  *   and resizes nothing.
+  *   'glyphBox', 'textLineHeight' and 'rows': switching axes while the peek is up
+  *   moves and resizes nothing.
   */
   static PeekPlateLayout ComputePeekPlate(const QSize& cellSize, int glyphBox,
-                                          int pumpedAxis, int textLineHeight);
+                                          int pumpedAxis, int textLineHeight, QmitkMxNPeekRows rows);
 
   /**
   * \brief The largest glyph box a cell of 'cellSize' can host within the plate's
-  *        share of the cell, or 0 below the legible floor. The multi widget
-  *        calls this per cell to derive the one box the whole layout uses.
+  *        share of the cell with the glyphs in 'rows', or 0 below the legible
+  *        floor. The multi widget calls this per cell and arrangement to derive
+  *        the one geometry the whole layout uses.
   */
-  static int MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight);
+  static int MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight, QmitkMxNPeekRows rows);
 
   /**
   * \brief The height of one peek text line for a widget whose font is
@@ -549,6 +555,7 @@ private:
   bool m_SyncPeekVisible = false;
   int m_SyncPeekAxis = -1;
   int m_SyncPeekGlyphBox = 0;
+  QmitkMxNPeekRows m_SyncPeekRows = QmitkMxNPeekRows::One;
   qreal m_PeekProgress = 0.0;
   QPointer<QPropertyAnimation> m_PeekAnimation;
 

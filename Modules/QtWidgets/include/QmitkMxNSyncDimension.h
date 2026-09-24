@@ -137,4 +137,23 @@ inline constexpr QmitkMxNSyncAxis QmitkMxNSyncAxisOf(QmitkMxNSyncDimension dimen
   return static_cast<QmitkMxNSyncAxis>(static_cast<int>(dimension));
 }
 
+/**
+ * \brief How a sync peek plate lays out its eight axis glyphs: one row of
+ *        eight, or two rows of four in reading order (pan, zoom, slice,
+ *        crosshair above orientation, windowing, LUT, selection). One
+ *        arrangement serves every plate of a layout, so an axis sits at the
+ *        same place in every cell.
+ */
+enum class QmitkMxNPeekRows
+{
+  One,
+  Two
+};
+
+/** \brief The glyphs per row of 'rows'. */
+inline constexpr int QmitkMxNPeekColumns(QmitkMxNPeekRows rows)
+{
+  return QmitkMxNPeekRows::One == rows ? QmitkMxNSyncAxisCount : QmitkMxNSyncAxisCount / 2;
+}
+
 #endif

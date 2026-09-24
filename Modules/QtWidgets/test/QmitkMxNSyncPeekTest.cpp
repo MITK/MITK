@@ -86,9 +86,13 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Barcode_HostCeilingBoundsTheGlyph);
   MITK_TEST(Barcode_FrameStaysInsideTheTargetAtEveryPixelRatio);
   MITK_TEST(MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCell);
-  MITK_TEST(ResolvePeekGlyphBox_LegibleAndDrivenByTheDensestGrid);
-  MITK_TEST(ResolvePeekGlyphBox_ZeroWhenNoCellQualifies);
-  MITK_TEST(ResolvePeekGlyphBox_IgnoresHiddenCells);
+  MITK_TEST(ResolvePeekGeometry_LegibleAndDrivenByTheDensestGrid);
+  MITK_TEST(ResolvePeekGeometry_ZeroWhenNoCellQualifies);
+  MITK_TEST(ResolvePeekGeometry_IgnoresHiddenCells);
+  MITK_TEST(ResolvePeekGeometry_TallNarrowCellsGetTwoRows);
+  MITK_TEST(ResolvePeekGeometry_OneRowWinsATie);
+  MITK_TEST(PeekPlate_TwoRowsSplitInReadingOrderAroundTheValueLine);
+  MITK_TEST(PeekPlate_TwoRowsSitCloseAtEveryBox);
   MITK_TEST(Broadcast_EveryVisibleCellSharesOneGeometry);
   MITK_TEST(Broadcast_NegativeAxisClears);
   MITK_TEST(Broadcast_HiddenCellsShowNoPlate);
@@ -122,8 +126,9 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(PaintPath_PlateDoesNotCrash);
   CPPUNIT_TEST_SUITE_END();
 
-  // Wide enough that a single cell, and a 1x3 grid, both host a plate while a
-  // 1x5 grid cannot - the three cases the sizing rule has to tell apart.
+  // Wide enough that a single cell and a 1x3 grid host a row of eight, a 1x5
+  // grid only two rows of four, and a 5x5 grid neither - the cases the sizing
+  // rule has to tell apart.
   static constexpr int EditorWidth = 1024;
   static constexpr int EditorHeight = 768;
 
@@ -255,6 +260,12 @@ public:
 
   void PeekPlate_GlyphsFitThePlateAndEachOther()
   {
+    this->PeekPlate_GlyphsFitThePlateAndEachOtherFor(QmitkMxNPeekRows::One);
+    this->PeekPlate_GlyphsFitThePlateAndEachOtherFor(QmitkMxNPeekRows::Two);
+  }
+
+  void PeekPlate_GlyphsFitThePlateAndEachOtherFor(QmitkMxNPeekRows rows)
+  {
     const QSize cell(900, 700);
     for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin;
          box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
@@ -262,7 +273,7 @@ public:
       // -1 is the state while the pointer rests on the strip between two glyphs.
       for (int pumped = -1; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
       {
-        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight(), rows);
         CPPUNIT_ASSERT_MESSAGE("A cell this size hosts a plate at every legible box",
                                layout.plate.isValid());
 
@@ -297,6 +308,12 @@ public:
 
   void PeekPlate_PumpedGlyphCarriesTheScaledSide()
   {
+    this->PeekPlate_PumpedGlyphCarriesTheScaledSideFor(QmitkMxNPeekRows::One);
+    this->PeekPlate_PumpedGlyphCarriesTheScaledSideFor(QmitkMxNPeekRows::Two);
+  }
+
+  void PeekPlate_PumpedGlyphCarriesTheScaledSideFor(QmitkMxNPeekRows rows)
+  {
     const QSize cell(900, 700);
     for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin;
          box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
@@ -304,7 +321,7 @@ public:
       const int expected = qRound(1.75 * box);
       for (int pumped = 0; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
       {
-        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight(), rows);
         CPPUNIT_ASSERT_EQUAL(expected, layout.glyphs[pumped].width());
         CPPUNIT_ASSERT_EQUAL(expected, layout.glyphs[pumped].height());
         for (int axis = 0; axis < QmitkMxNCellOverlay::PeekAxisCount; ++axis)
@@ -320,14 +337,20 @@ public:
 
   void PeekPlate_PlateIsTheSameWhicheverAxisIsPumped()
   {
+    this->PeekPlate_PlateIsTheSameWhicheverAxisIsPumpedFor(QmitkMxNPeekRows::One);
+    this->PeekPlate_PlateIsTheSameWhicheverAxisIsPumpedFor(QmitkMxNPeekRows::Two);
+  }
+
+  void PeekPlate_PlateIsTheSameWhicheverAxisIsPumpedFor(QmitkMxNPeekRows rows)
+  {
     const QSize cell(900, 700);
     for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin;
          box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
     {
-      const auto reference = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, 0, LineHeight());
+      const auto reference = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, 0, LineHeight(), rows);
       for (int pumped = 1; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
       {
-        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight(), rows);
         CPPUNIT_ASSERT_MESSAGE("Switching the pumped axis moves and resizes nothing",
                                layout.plate == reference.plate);
         CPPUNIT_ASSERT_MESSAGE("The caption keeps its place across a switch",
@@ -340,12 +363,18 @@ public:
 
   void PeekPlate_NoAxisEmphasisedKeepsTheSamePlate()
   {
+    this->PeekPlate_NoAxisEmphasisedKeepsTheSamePlateFor(QmitkMxNPeekRows::One);
+    this->PeekPlate_NoAxisEmphasisedKeepsTheSamePlateFor(QmitkMxNPeekRows::Two);
+  }
+
+  void PeekPlate_NoAxisEmphasisedKeepsTheSamePlateFor(QmitkMxNPeekRows rows)
+  {
     const QSize cell(900, 700);
     for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin;
          box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
     {
-      const auto none = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight());
-      const auto pumped = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, 3, LineHeight());
+      const auto none = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight(), rows);
+      const auto pumped = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, 3, LineHeight(), rows);
       CPPUNIT_ASSERT_MESSAGE("Resting between two glyphs must not resize the plate",
                              none.plate == pumped.plate);
       for (int axis = 0; axis < QmitkMxNCellOverlay::PeekAxisCount; ++axis)
@@ -361,32 +390,38 @@ public:
   void PeekPlate_CellTooSmallHasNoPlate()
   {
     const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(
-      QSize(80, 60), QmitkMxNCellOverlay::PeekGlyphBoxMin, 0, LineHeight());
+      QSize(80, 60), QmitkMxNCellOverlay::PeekGlyphBoxMin, 0, LineHeight(), QmitkMxNPeekRows::One);
     CPPUNIT_ASSERT_MESSAGE("A cell that cannot hold the plate gets an invalid rect",
                            !layout.plate.isValid());
 
     const auto belowFloor = QmitkMxNCellOverlay::ComputePeekPlate(
-      QSize(900, 700), QmitkMxNCellOverlay::PeekGlyphBoxMin - 1, 0, LineHeight());
+      QSize(900, 700), QmitkMxNCellOverlay::PeekGlyphBoxMin - 1, 0, LineHeight(), QmitkMxNPeekRows::One);
     CPPUNIT_ASSERT_MESSAGE("A box below the legible floor gets no plate either",
                            !belowFloor.plate.isValid());
 
     const auto noSuchAxis = QmitkMxNCellOverlay::ComputePeekPlate(
       QSize(900, 700), QmitkMxNCellOverlay::PeekGlyphBoxMin,
-      QmitkMxNCellOverlay::PeekAxisCount, LineHeight());
+      QmitkMxNCellOverlay::PeekAxisCount, LineHeight(), QmitkMxNPeekRows::One);
     CPPUNIT_ASSERT_MESSAGE("An axis past the eight gets no plate",
                            !noSuchAxis.plate.isValid());
   }
 
   void PeekPlate_PumpingLeavesEveryOtherGlyphInPlace()
   {
+    this->PeekPlate_PumpingLeavesEveryOtherGlyphInPlaceFor(QmitkMxNPeekRows::One);
+    this->PeekPlate_PumpingLeavesEveryOtherGlyphInPlaceFor(QmitkMxNPeekRows::Two);
+  }
+
+  void PeekPlate_PumpingLeavesEveryOtherGlyphInPlaceFor(QmitkMxNPeekRows rows)
+  {
     const QSize cell(900, 700);
     for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin;
          box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
     {
-      const auto nominal = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight());
+      const auto nominal = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight(), rows);
       for (int pumped = -1; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
       {
-        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+        const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight(), rows);
         for (int axis = 0; axis < QmitkMxNCellOverlay::PeekAxisCount; ++axis)
         {
           if (axis != pumped)
@@ -591,11 +626,11 @@ public:
     // The offsets are read off the row, so their band belongs between the
     // glyphs and the window name - and inside the plate, like every other part.
     const QSize cell(600, 400);
-    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight());
+    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight(), QmitkMxNPeekRows::One);
     CPPUNIT_ASSERT(box >= QmitkMxNCellOverlay::PeekGlyphBoxMin);
 
     constexpr int pumped = 2;
-    const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+    const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight(), QmitkMxNPeekRows::One);
     CPPUNIT_ASSERT(layout.plate.isValid());
 
     // Each value hugs its own glyph, so the band reaches from just under a
@@ -624,17 +659,23 @@ public:
 
   void PeekPlate_ValueBandIsReservedWhicheverAxisIsPumped()
   {
+    this->PeekPlate_ValueBandIsReservedWhicheverAxisIsPumpedFor(QmitkMxNPeekRows::One);
+    this->PeekPlate_ValueBandIsReservedWhicheverAxisIsPumpedFor(QmitkMxNPeekRows::Two);
+  }
+
+  void PeekPlate_ValueBandIsReservedWhicheverAxisIsPumpedFor(QmitkMxNPeekRows rows)
+  {
     // The band is reserved whether or not this window is offset anywhere, so a
     // plate never resizes as the pointer moves along the row or as offsets are
     // authored.
     const QSize cell(600, 400);
-    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight());
-    const auto reference = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight());
+    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight(), rows);
+    const auto reference = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight(), rows);
     CPPUNIT_ASSERT(reference.plate.isValid());
 
     for (int pumped = 0; pumped < QmitkMxNCellOverlay::PeekAxisCount; ++pumped)
     {
-      const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight());
+      const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, pumped, LineHeight(), rows);
       CPPUNIT_ASSERT_MESSAGE("The plate does not move or resize with the pumped axis",
                              layout.plate == reference.plate);
       CPPUNIT_ASSERT_MESSAGE("nor does the value band",
@@ -644,13 +685,19 @@ public:
 
   void MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCell()
   {
+    this->MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCellFor(QmitkMxNPeekRows::One);
+    this->MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCellFor(QmitkMxNPeekRows::Two);
+  }
+
+  void MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCellFor(QmitkMxNPeekRows rows)
+  {
     const int lineHeight = LineHeight();
-    CPPUNIT_ASSERT_EQUAL(0, QmitkMxNCellOverlay::MaxPeekGlyphBox(QSize(120, 90), lineHeight));
+    CPPUNIT_ASSERT_EQUAL(0, QmitkMxNCellOverlay::MaxPeekGlyphBox(QSize(120, 90), lineHeight, rows));
 
     int previous = 0;
     for (int width = 120; width <= 1600; width += 20)
     {
-      const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(QSize(width, width), lineHeight);
+      const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(QSize(width, width), lineHeight, rows);
       CPPUNIT_ASSERT_MESSAGE("A larger cell never admits a smaller box", box >= previous);
       CPPUNIT_ASSERT_MESSAGE("A hosted box is at or above the legible floor",
                              box == 0 || box >= QmitkMxNCellOverlay::PeekGlyphBoxMin);
@@ -661,17 +708,17 @@ public:
 
   // ---------- The one box the layout shares ----------
 
-  void ResolvePeekGlyphBox_LegibleAndDrivenByTheDensestGrid()
+  void ResolvePeekGeometry_LegibleAndDrivenByTheDensestGrid()
   {
     this->Arrange(1, 1);
-    const int single = m_Editor->ResolvePeekGlyphBox();
+    const int single = m_Editor->ResolvePeekGeometry().glyphBox;
     CPPUNIT_ASSERT_MESSAGE("A full-editor cell hosts a plate", single > 0);
     CPPUNIT_ASSERT_MESSAGE("The box stays in the legible range",
                            single >= QmitkMxNCellOverlay::PeekGlyphBoxMin
                              && single <= QmitkMxNCellOverlay::PeekGlyphBoxMax);
 
     this->Arrange(1, 3);
-    const int thirds = m_Editor->ResolvePeekGlyphBox();
+    const int thirds = m_Editor->ResolvePeekGeometry().glyphBox;
     CPPUNIT_ASSERT_MESSAGE("Three cells across still host a plate", thirds > 0);
     CPPUNIT_ASSERT_MESSAGE("Narrower cells never ask for a larger box", thirds <= single);
     CPPUNIT_ASSERT_MESSAGE("The box stays in the legible range",
@@ -679,23 +726,101 @@ public:
                              && thirds <= QmitkMxNCellOverlay::PeekGlyphBoxMax);
   }
 
-  void ResolvePeekGlyphBox_ZeroWhenNoCellQualifies()
+  void ResolvePeekGeometry_ZeroWhenNoCellQualifies()
   {
-    this->Arrange(1, 5);
-    CPPUNIT_ASSERT_EQUAL(0, m_Editor->ResolvePeekGlyphBox());
+    // Neither too narrow for one row nor too short for two can host a plate.
+    this->Arrange(5, 5);
+    CPPUNIT_ASSERT_EQUAL(0, m_Editor->ResolvePeekGeometry().glyphBox);
   }
 
-  void ResolvePeekGlyphBox_IgnoresHiddenCells()
+  void ResolvePeekGeometry_IgnoresHiddenCells()
   {
-    this->Arrange(1, 5);
-    CPPUNIT_ASSERT_EQUAL(0, m_Editor->ResolvePeekGlyphBox());
+    this->Arrange(5, 5);
+    CPPUNIT_ASSERT_EQUAL(0, m_Editor->ResolvePeekGeometry().glyphBox);
 
     // Maximizing leaves the slivers registered but hidden; sizing from one of
     // them would shrink the only plate the user can see.
     m_Editor->SetMaximizedCell(CellId(0));
     Pump();
     CPPUNIT_ASSERT_MESSAGE("The maximized cell alone decides the box",
-                           m_Editor->ResolvePeekGlyphBox() > 0);
+                           m_Editor->ResolvePeekGeometry().glyphBox > 0);
+  }
+
+  void ResolvePeekGeometry_TallNarrowCellsGetTwoRows()
+  {
+    // Five columns are too narrow for a row of eight but tall enough for two
+    // rows of four.
+    this->Arrange(1, 5);
+    const auto geometry = m_Editor->ResolvePeekGeometry();
+    CPPUNIT_ASSERT_MESSAGE("Cells too narrow for one row host two", geometry.glyphBox > 0);
+    CPPUNIT_ASSERT(QmitkMxNPeekRows::Two == geometry.rows);
+
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
+    for (int index = 0; index < 5; ++index)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Every plate is up", this->Overlay(index)->IsSyncPeekVisible());
+      CPPUNIT_ASSERT_MESSAGE("...in the same arrangement",
+                             QmitkMxNPeekRows::Two == this->Overlay(index)->SyncPeekRows());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("...and the same box", geometry.glyphBox, this->Overlay(index)->SyncPeekGlyphBox());
+    }
+  }
+
+  void ResolvePeekGeometry_OneRowWinsATie()
+  {
+    // A single large cell fits either arrangement at the largest box.
+    this->Arrange(1, 1);
+    const auto geometry = m_Editor->ResolvePeekGeometry();
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNCellOverlay::PeekGlyphBoxMax, geometry.glyphBox);
+    CPPUNIT_ASSERT_MESSAGE("A tie keeps the single row", QmitkMxNPeekRows::One == geometry.rows);
+  }
+
+  void PeekPlate_TwoRowsSitCloseAtEveryBox()
+  {
+    // Between the rows sits one resting value line and a gap that grows with
+    // the box - not the pumped extent, which at small boxes would part the rows
+    // by more than two glyphs.
+    const QSize cell(900, 900);
+    for (int box = QmitkMxNCellOverlay::PeekGlyphBoxMin; box <= QmitkMxNCellOverlay::PeekGlyphBoxMax; ++box)
+    {
+      const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight(), QmitkMxNPeekRows::Two);
+      CPPUNIT_ASSERT(layout.plate.isValid());
+      const int columns = QmitkMxNPeekColumns(QmitkMxNPeekRows::Two);
+      const int between = layout.glyphs[columns].top() - layout.glyphs[0].bottom() - 1;
+      CPPUNIT_ASSERT_MESSAGE("The rows are parted by little more than one text line",
+                             between <= LineHeight() + box / 5 + 2);
+      CPPUNIT_ASSERT_MESSAGE("...but by enough for the resting values", between >= LineHeight());
+    }
+  }
+
+  void PeekPlate_TwoRowsSplitInReadingOrderAroundTheValueLine()
+  {
+    const QSize cell(500, 700);
+    const int box = QmitkMxNCellOverlay::MaxPeekGlyphBox(cell, LineHeight(), QmitkMxNPeekRows::Two);
+    CPPUNIT_ASSERT(box >= QmitkMxNCellOverlay::PeekGlyphBoxMin);
+    const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(cell, box, -1, LineHeight(), QmitkMxNPeekRows::Two);
+    CPPUNIT_ASSERT(layout.plate.isValid());
+
+    constexpr int columns = QmitkMxNPeekColumns(QmitkMxNPeekRows::Two);
+    for (int axis = 0; axis < columns; ++axis)
+    {
+      const QRect top = layout.glyphs[axis];
+      const QRect bottom = layout.glyphs[axis + columns];
+      CPPUNIT_ASSERT_MESSAGE("An axis in the second row sits under its reading-order partner",
+                             top.left() == bottom.left());
+      CPPUNIT_ASSERT_MESSAGE("The first row is above the offset values",
+                             top.bottom() <= layout.values.top());
+      CPPUNIT_ASSERT_MESSAGE("...and the second row below them",
+                             bottom.top() > layout.values.bottom());
+      CPPUNIT_ASSERT_MESSAGE("The name comes last", bottom.bottom() < layout.name.top());
+      if (axis > 0)
+      {
+        CPPUNIT_ASSERT_MESSAGE("Axes run left to right within a row",
+                               layout.glyphs[axis - 1].right() < top.left());
+      }
+    }
+    // Only pan, zoom and slice carry offsets, and the value line serves the
+    // first row alone.
+    CPPUNIT_ASSERT(QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice) < columns);
   }
 
   // ---------- The broadcast ----------
@@ -978,7 +1103,8 @@ public:
     CPPUNIT_ASSERT(wide > 0);
 
     // The view appearing beside the editor narrows it; the plates must follow.
-    m_Editor->resize(EditorWidth * 2 / 3, EditorHeight * 2 / 3);
+    // Half the size is small enough that no arrangement keeps the old box.
+    m_Editor->resize(EditorWidth / 2, EditorHeight / 2);
     Pump();
     Pump();
     const int narrow = this->Overlay(0)->SyncPeekGlyphBox();

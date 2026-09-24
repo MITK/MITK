@@ -3980,39 +3980,57 @@ namespace
   }
 }
 
-int QmitkMxNMultiWidget::ResolvePeekGlyphBox() const
+QmitkMxNMultiWidget::PeekGeometry QmitkMxNMultiWidget::ResolvePeekGeometry() const
 {
   // Every cell inherits this widget's font, which is what lets one line height
   // stand for all of them.
   const int textLineHeight = QmitkMxNCellOverlay::PeekTextLineHeight(this->font());
 
-  int box = 0;
-  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  struct Candidate
   {
-    // A maximized layout keeps the hidden cells registered; sizing from a
-    // hidden sliver would shrink the one plate the user can see.
-    if (!renderWindowWidget->isVisible())
+    PeekGeometry geometry;
+    int hosts = 0;
+  };
+  const auto evaluate = [this, textLineHeight](QmitkMxNPeekRows rows)
+  {
+    Candidate candidate;
+    candidate.geometry.rows = rows;
+    int box = 0;
+    for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
     {
-      continue;
+      // A maximized layout keeps the hidden cells registered; sizing from a
+      // hidden sliver would shrink the one plate the user can see.
+      if (!renderWindowWidget->isVisible())
+      {
+        continue;
+      }
+
+      const QSize cellSize = PeekCellSize(renderWindowWidget.get());
+      const int maxBox = QmitkMxNCellOverlay::MaxPeekGlyphBox(cellSize, textLineHeight, rows);
+      if (maxBox <= 0)
+      {
+        continue;
+      }
+
+      ++candidate.hosts;
+      const int shortEdge = std::min(cellSize.width(), cellSize.height());
+      const int desired = std::min(qRound(PeekDesiredShortEdgeFraction * shortEdge), maxBox);
+      box = box == 0 ? desired : std::min(box, desired);
     }
 
-    const QSize cellSize = PeekCellSize(renderWindowWidget.get());
-    const int maxBox = QmitkMxNCellOverlay::MaxPeekGlyphBox(cellSize, textLineHeight);
-    if (maxBox <= 0)
-    {
-      continue;
-    }
+    // Clamping up to the floor is safe: every cell counted admits at least that
+    // much, so no eligible cell is asked for more than it can host.
+    candidate.geometry.glyphBox = box == 0
+      ? 0
+      : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
+    return candidate;
+  };
 
-    const int shortEdge = std::min(cellSize.width(), cellSize.height());
-    const int desired = std::min(qRound(PeekDesiredShortEdgeFraction * shortEdge), maxBox);
-    box = box == 0 ? desired : std::min(box, desired);
-  }
-
-  // Clamping up to the floor is safe: every cell counted admits at least that
-  // much, so no eligible cell is asked for more than it can host.
-  return box == 0
-    ? 0
-    : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
+  const Candidate one = evaluate(QmitkMxNPeekRows::One);
+  const Candidate two = evaluate(QmitkMxNPeekRows::Two);
+  const bool twoWins = two.hosts > one.hosts
+                       || (two.hosts == one.hosts && two.geometry.glyphBox > one.geometry.glyphBox);
+  return twoWins ? two.geometry : one.geometry;
 }
 
 void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis)
@@ -4080,7 +4098,8 @@ void QmitkMxNMultiWidget::RefreshSyncPeekPlates()
   const bool up = arranging || m_SyncPeekVisible;
   const auto axis = arranging ? m_ArrangeMode->GetHighlightAxis() : m_SyncPeekAxis;
 
-  const int box = up ? this->ResolvePeekGlyphBox() : 0;
+  const PeekGeometry geometry = up ? this->ResolvePeekGeometry() : PeekGeometry();
+  const int box = geometry.glyphBox;
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
     auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
@@ -4093,7 +4112,7 @@ void QmitkMxNMultiWidget::RefreshSyncPeekPlates()
     // reaches every cell, or one hidden while the peek was up would come back
     // still showing it.
     const bool hosts = box > 0 && renderWindowWidget->isVisible();
-    cellOverlay->SetSyncPeek(hosts, axis, hosts ? box : 0);
+    cellOverlay->SetSyncPeek(hosts, axis, hosts ? box : 0, geometry.rows);
   }
 }
 

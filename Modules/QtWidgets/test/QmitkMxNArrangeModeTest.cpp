@@ -568,7 +568,7 @@ public:
     const auto slot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice);
     const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(
       this->Cell(0)->GetRenderWindow()->geometry().size(), this->Overlay(0)->SyncPeekGlyphBox(), -1,
-      QmitkMxNCellOverlay::PeekTextLineHeight(this->Overlay(0)->font()));
+      QmitkMxNCellOverlay::PeekTextLineHeight(this->Overlay(0)->font()), this->Overlay(0)->SyncPeekRows());
     const QPoint onSliceGlyph =
       layout.glyphs[slot].center() + this->Cell(0)->GetRenderWindow()->geometry().topLeft();
 

@@ -146,6 +146,12 @@
 	are on. Windows whose enlarged glyph carries the same hue are synchronized with
 	each other on that axis.
 
+	Where the windows are too narrow for a row of eight glyphs but tall enough, the
+	plates lay the axes out in two rows of four instead - pan, zoom, slice and crosshair
+	above orientation, windowing, LUT and data selection. The layout picks whichever
+	arrangement gives more windows a plate, and all plates use the same one, so an axis
+	is in the same place in every window.
+
 	Where the window sits at an offset from its group - a slice step away, a zoom factor
 	apart, a pan written as a pair of millimetres like <tt>(5|-3)</tt> - the value sits
 	directly beneath that axis's glyph, in the group's own hue, so the pair reads as one

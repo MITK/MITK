@@ -478,17 +478,28 @@ public:
   */
   void SetSyncPeekTimings(int dwellMs, int graceMs);
 
+  /** \brief The one plate geometry every cell of a layout shares. */
+  struct PeekGeometry
+  {
+    int glyphBox = 0;  // 0 when no visible cell can host a plate
+    QmitkMxNPeekRows rows = QmitkMxNPeekRows::One;
+  };
+
   /**
-  * \brief The glyph box side every plate of this layout uses: the smallest
-  *        desirable box across the visible cells that can host a plate, clamped
-  *        to the legible range. Zero when no cell can host one, which is how
-  *        the peek stays down in a layout of slivers.
+  * \brief The plate geometry of this layout. For each glyph arrangement, the
+  *        box is the smallest desirable one across the visible cells that can
+  *        host a plate in it, clamped to the legible range. The arrangement
+  *        that gives more cells a plate wins, then the one with the larger
+  *        box, then the single row. A zero box, when no cell can host a plate
+  *        either way, is how the peek stays down in a layout of slivers.
   *
   *   A cell too small for a plate shows none rather than dragging every other
   *   window down to its size: the comparison survives a missing member better
-  *   than it survives eight different geometries.
+  *   than it survives eight different geometries. But a missing plate is a
+  *   window arrange mode cannot select, so fitting more plates beats a larger
+  *   one.
   */
-  int ResolvePeekGlyphBox() const;
+  PeekGeometry ResolvePeekGeometry() const;
 
   /**
   * \brief Pointer report from one cell's barcode: starts the dwell when the peek

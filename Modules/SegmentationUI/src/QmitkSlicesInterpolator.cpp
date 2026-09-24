@@ -88,6 +88,25 @@ namespace
       : nullptr;
   }
 
+  /**
+    Hands the group image and value of the active label to the controller, or releases the segmentation of the
+    controller if there is no active label, so that it keeps no group image alive that is not interpolated anymore.
+  */
+  void SetSegmentationToInterpolate(mitk::SegmentationInterpolationController* interpolator,
+                                    const mitk::MultiLabelSegmentation* segmentation)
+  {
+    const auto* activeLabel = segmentation->GetActiveLabel();
+
+    if (nullptr == activeLabel)
+    {
+      interpolator->SetSegmentationVolume(nullptr, mitk::Label::UNLABELED_VALUE);
+      return;
+    }
+
+    const auto labelValue = activeLabel->GetValue();
+    interpolator->SetSegmentationVolume(segmentation->GetGroupImage(segmentation->GetGroupIndexOfLabel(labelValue)), labelValue);
+  }
+
   // Provenance op-name stamped on labels when an interpolation result is accepted (Label::AddToolUse).
   // Defined once so the three accept paths cannot drift apart.
   const std::string INTERPOLATION_PROVENANCE_NAME = "Interpolation";
@@ -775,11 +794,8 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
   {
     // Passed on every call instead of observing the segmentation, which is cheap as long as
     // group image and label stay the same.
-    if (const auto* activeLabel = m_Segmentation->GetActiveLabel(); nullptr != activeLabel)
-    {
-      m_Interpolator->SetSegmentationVolume(groupImage, activeLabel->GetValue());
-      interpolation = m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
-    }
+    SetSegmentationToInterpolate(m_Interpolator, m_Segmentation);
+    interpolation = m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
   }
   catch (const std::exception& e)
   {
@@ -992,12 +1008,27 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
     const auto labels = m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(groupIndex));
     auto label = m_Segmentation->GetLabel(m_CurrentActiveLabelValue);
-    const auto undoName = "3D-interpolation - " + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, label);
+    const auto undoName = "2D-interpolation - " + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, label);
 
     mitk::ProgressTask task("Accepting interpolations", m_Segmentation->GetDimensions()[sliceDimension]);
 
+    // However this is left, exceptions included: the preview may show a result that is written now.
+    const ScopeExit clearPreview([this]()
+      {
+        m_FeedbackNode->SetData(nullptr);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      });
+
     // Taken right before the first result is written, as the state to undo to.
     std::optional<mitk::SegGroupModifyUndoRedoHelper> undoHelper;
+    bool written = false;
+
+    const auto registerUndo = [&]()
+      {
+        // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
+        label->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
+        undoHelper->RegisterUndoRedoOperationEvent(undoName);
+      };
 
     try
     {
@@ -1006,36 +1037,40 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         {
           if (!undoHelper.has_value())
           {
-            // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
+            // noLabels=false: include label-property snapshots so the "Interpolation" stamp is captured by undo/redo.
             undoHelper.emplace(m_Segmentation, mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType{ groupIndex },
               false, timeStep, false, false, true);
           }
 
+          // Throws before writing anything, if at all.
           mitk::TransferSliceContentAtTimeStep(interpolation, groupImage, labels, timeStep, 1, m_CurrentActiveLabelValue,
             mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+          written = true;
 
           task.SetProgress(interpolatedSliceIndex + 1);
         });
     }
     catch (...)
     {
-      // Keeps what was written before the failure undoable.
-      if (undoHelper.has_value())
-        undoHelper->RegisterUndoRedoOperationEvent(undoName);
+      if (written)
+      {
+        // Keeps what was written before the failure undoable. Failing at that as well must not replace the
+        // original exception, which is the one to report.
+        try
+        {
+          registerUndo();
+        }
+        catch (...)
+        {
+          MITK_ERROR << "Cannot register the interpolations accepted before the failure for undo.";
+        }
+      }
 
-      m_FeedbackNode->SetData(nullptr);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       throw;
     }
 
-    if (undoHelper.has_value())
-    {
-      // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
-      label->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
-      undoHelper->RegisterUndoRedoOperationEvent(undoName);
-    }
-
-    m_FeedbackNode->SetData(nullptr);
+    if (written)
+      registerUndo();
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1328,11 +1363,15 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
         return;
       }
 
-      const auto* activeLabel = labelSetImage->GetActiveLabel();
-      if (nullptr != activeLabel)
+      try
       {
-        const auto labelValue = activeLabel->GetValue();
-        m_Interpolator->SetSegmentationVolume(labelSetImage->GetGroupImage(labelSetImage->GetGroupIndexOfLabel(labelValue)), labelValue);
+        SetSegmentationToInterpolate(m_Interpolator, labelSetImage);
+      }
+      catch (const std::exception& e)
+      {
+        // Called from slots and tool manager callbacks, which must not throw.
+        MITK_ERROR << "Cannot interpolate the working segmentation: " << e.what();
+        m_Interpolator->SetSegmentationVolume(nullptr, mitk::Label::UNLABELED_VALUE);
       }
     }
   }
@@ -1457,6 +1496,9 @@ void QmitkSlicesInterpolator::OnLabelRemoved(const itk::EventObject& event)
     return;
 
   m_CurrentActiveLabelValue = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
+
+  // Otherwise the controller would keep the group image of the label alive, even after its group is removed.
+  m_Interpolator->SetSegmentationVolume(nullptr, mitk::Label::UNLABELED_VALUE);
 
   m_FeedbackNode->SetData(nullptr);
   m_InterpolatedSurfaceNode->SetData(nullptr);

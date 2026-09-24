@@ -21,13 +21,6 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <vtkImageData.h>
-#include <vtkRenderWindow.h>
-#include <vtkSmartPointer.h>
-#include <vtkWindowToImageFilter.h>
-
-#include <algorithm>
-
 namespace
 {
   /** A 40 x 40 x 40 segmentation with an opaque cube of label 1 in its middle. */
@@ -63,46 +56,6 @@ namespace
 
     return segmentation;
   }
-
-  /** Renders once more without swapping buffers and reads the back buffer, as vtkTesting does. */
-  vtkSmartPointer<vtkImageData> Capture(mitk::RenderingTestHelper& renderingHelper)
-  {
-    auto* renderWindow = renderingHelper.GetVtkRenderWindow();
-
-    const auto swapBuffers = renderWindow->GetSwapBuffers();
-    renderWindow->SwapBuffersOff();
-    renderingHelper.Render();
-
-    auto grabber = vtkSmartPointer<vtkWindowToImageFilter>::New();
-    grabber->SetInput(renderWindow);
-    grabber->ShouldRerenderOff();
-    grabber->ReadFrontBufferOff();
-    grabber->Update();
-
-    renderWindow->SetSwapBuffers(swapBuffers);
-
-    vtkSmartPointer<vtkImageData> capture = grabber->GetOutput();
-    return capture;
-  }
-
-  /** Whether any pixel differs from the one in the corner, which only the background covers. */
-  bool ShowsAnything(vtkImageData* capture)
-  {
-    int dimensions[3];
-    capture->GetDimensions(dimensions);
-
-    const auto components = capture->GetNumberOfScalarComponents();
-    const auto* pixels = static_cast<const unsigned char*>(capture->GetScalarPointer());
-    const auto numberOfPixels = static_cast<vtkIdType>(dimensions[0]) * dimensions[1];
-
-    for (vtkIdType i = 1; i < numberOfPixels; ++i)
-    {
-      if (!std::equal(pixels, pixels + components, pixels + i * components))
-        return true;
-    }
-
-    return false;
-  }
 }
 
 /**
@@ -133,12 +86,12 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    CPPUNIT_ASSERT_MESSAGE("A label hidden in 3D was drawn", !ShowsAnything(Capture(renderingHelper)));
+    CPPUNIT_ASSERT_MESSAGE("A label hidden in 3D was drawn", !renderingHelper.RendersAnything());
 
     // The 3D interpolation empties the list rather than removing it.
     hiddenLabels->SetValue({});
 
-    CPPUNIT_ASSERT_MESSAGE("A label no longer hidden in 3D was not drawn", ShowsAnything(Capture(renderingHelper)));
+    CPPUNIT_ASSERT_MESSAGE("A label no longer hidden in 3D was not drawn", renderingHelper.RendersAnything());
   }
 
   void HiddenLabelsIn3D_AreTransient_Success()
@@ -160,9 +113,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    const auto capture = Capture(renderingHelper);
-
-    CPPUNIT_ASSERT_MESSAGE("The surface of the segmentation was not drawn", ShowsAnything(capture));
+    CPPUNIT_ASSERT_MESSAGE("The surface of the segmentation was not drawn", renderingHelper.RendersAnything());
   }
 };
 

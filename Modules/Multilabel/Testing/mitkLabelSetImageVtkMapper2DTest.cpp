@@ -17,13 +17,6 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <vtkImageData.h>
-#include <vtkRenderWindow.h>
-#include <vtkSmartPointer.h>
-#include <vtkWindowToImageFilter.h>
-
-#include <algorithm>
-
 namespace
 {
   mitk::Label::Pointer MakeLabel(mitk::Label::PixelType value, float red, float green, float blue)
@@ -63,46 +56,6 @@ namespace
 
     return segmentation;
   }
-
-  /** Renders once more without swapping buffers and reads the back buffer, as vtkTesting does. */
-  vtkSmartPointer<vtkImageData> Capture(mitk::RenderingTestHelper& renderingHelper)
-  {
-    auto* renderWindow = renderingHelper.GetVtkRenderWindow();
-
-    const auto swapBuffers = renderWindow->GetSwapBuffers();
-    renderWindow->SwapBuffersOff();
-    renderingHelper.Render();
-
-    auto grabber = vtkSmartPointer<vtkWindowToImageFilter>::New();
-    grabber->SetInput(renderWindow);
-    grabber->ShouldRerenderOff();
-    grabber->ReadFrontBufferOff();
-    grabber->Update();
-
-    renderWindow->SetSwapBuffers(swapBuffers);
-
-    vtkSmartPointer<vtkImageData> capture = grabber->GetOutput();
-    return capture;
-  }
-
-  /** Whether any pixel differs from the one in the corner, which only the background covers. */
-  bool ShowsAnything(vtkImageData* capture)
-  {
-    int dimensions[3];
-    capture->GetDimensions(dimensions);
-
-    const auto components = capture->GetNumberOfScalarComponents();
-    const auto* pixels = static_cast<const unsigned char*>(capture->GetScalarPointer());
-    const auto numberOfPixels = static_cast<vtkIdType>(dimensions[0]) * dimensions[1];
-
-    for (vtkIdType i = 1; i < numberOfPixels; ++i)
-    {
-      if (!std::equal(pixels, pixels + components, pixels + i * components))
-        return true;
-    }
-
-    return false;
-  }
 }
 
 /**
@@ -126,7 +79,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Axial);
 
-    CPPUNIT_ASSERT_MESSAGE("The label was not drawn", ShowsAnything(Capture(renderingHelper)));
+    CPPUNIT_ASSERT_MESSAGE("The label was not drawn", renderingHelper.RendersAnything());
   }
 
   void Render2D_RemovedLabel_IsNotShownForANewLabelOfTheSameValue_Success()
@@ -138,16 +91,16 @@ public:
     mitk::RenderingTestHelper renderingHelper(300, 300);
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Axial);
-    Capture(renderingHelper);
+    renderingHelper.Render();
 
     segmentation->RemoveLabel(1);
-    Capture(renderingHelper);
+    renderingHelper.Render();
 
     // Removing a label frees its value, and the next label added commonly gets it again.
     segmentation->AddLabel(MakeLabel(1, 0.0f, 1.0f, 0.0f), 0, true, false);
 
     CPPUNIT_ASSERT_MESSAGE("The content of the removed label is shown for the new one",
-                           !ShowsAnything(Capture(renderingHelper)));
+                           !renderingHelper.RendersAnything());
   }
 };
 

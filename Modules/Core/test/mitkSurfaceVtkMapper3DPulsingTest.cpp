@@ -15,56 +15,6 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <vtkImageData.h>
-#include <vtkRenderWindow.h>
-#include <vtkSmartPointer.h>
-#include <vtkWindowToImageFilter.h>
-
-#include <algorithm>
-
-namespace
-{
-  /** Renders once more without swapping buffers and reads the back buffer, as vtkTesting does. */
-  vtkSmartPointer<vtkImageData> Capture(mitk::RenderingTestHelper& renderingHelper)
-  {
-    auto* renderWindow = renderingHelper.GetVtkRenderWindow();
-
-    const auto swapBuffers = renderWindow->GetSwapBuffers();
-    renderWindow->SwapBuffersOff();
-    renderingHelper.Render();
-
-    auto grabber = vtkSmartPointer<vtkWindowToImageFilter>::New();
-    grabber->SetInput(renderWindow);
-    grabber->ShouldRerenderOff();
-    grabber->ReadFrontBufferOff();
-    grabber->Update();
-
-    renderWindow->SetSwapBuffers(swapBuffers);
-
-    vtkSmartPointer<vtkImageData> capture = grabber->GetOutput();
-    return capture;
-  }
-
-  /** Whether any pixel differs from the one in the corner, which only the background covers. */
-  bool ShowsAnything(vtkImageData* capture)
-  {
-    int dimensions[3];
-    capture->GetDimensions(dimensions);
-
-    const auto components = capture->GetNumberOfScalarComponents();
-    const auto* pixels = static_cast<const unsigned char*>(capture->GetScalarPointer());
-    const auto numberOfPixels = static_cast<vtkIdType>(dimensions[0]) * dimensions[1];
-
-    for (vtkIdType i = 1; i < numberOfPixels; ++i)
-    {
-      if (!std::equal(pixels, pixels + components, pixels + i * components))
-        return true;
-    }
-
-    return false;
-  }
-}
-
 /**
  * A pulsing surface pulses through a fragment shader replacement, which fails only at render
  * time: then nothing is drawn at all. The replacement stays once added, so the surface has to
@@ -87,12 +37,11 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    CPPUNIT_ASSERT_MESSAGE("The pulsing surface was not drawn", ShowsAnything(Capture(renderingHelper)));
+    CPPUNIT_ASSERT_MESSAGE("The pulsing surface was not drawn", renderingHelper.RendersAnything());
 
     node->SetBoolProperty("pulsing", false);
 
-    CPPUNIT_ASSERT_MESSAGE("The surface was not drawn after it stopped pulsing",
-                           ShowsAnything(Capture(renderingHelper)));
+    CPPUNIT_ASSERT_MESSAGE("The surface was not drawn after it stopped pulsing", renderingHelper.RendersAnything());
   }
 };
 

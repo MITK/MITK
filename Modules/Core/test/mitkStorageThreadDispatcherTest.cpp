@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStorageThreadDispatcherBase.h>
 
+#include <mitkManualStorageThreadDispatcher.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -33,10 +34,8 @@ found in the LICENSE file.
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <deque>
 #include <exception>
 #include <functional>
-#include <future>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -45,106 +44,6 @@ found in the LICENSE file.
 
 namespace
 {
-  /**
-   * Stands in for the dispatcher the workbench installs. The thread that owns
-   * the data is whichever thread constructs this, and it takes what is handed
-   * to it by calling Drain(), the way the Qt implementation lets its event loop
-   * do it.
-   *
-   * Running the tasks anywhere else would not model the real thing at all: a
-   * mutation that is handed over re-enters the very method that handed it over,
-   * and only arriving on the owning thread stops it handing itself over again.
-   */
-  class FakeDispatcher : public mitk::StorageThreadDispatcherBase
-  {
-  public:
-    mitkClassMacro(FakeDispatcher, mitk::StorageThreadDispatcherBase);
-    itkFactorylessNewMacro(Self);
-
-    /** How often anything was handed over to the owning thread. */
-    std::atomic<int> HandedOver{ 0 };
-
-    /** Whether a hand-over can be delivered at all. */
-    std::atomic<bool> Deliverable{ true };
-
-    bool IsDispatchThread() const override
-    {
-      return std::this_thread::get_id() == m_OwningThread;
-    }
-
-    void Post(std::function<void()> task) override
-    {
-      std::lock_guard<std::mutex> locked(m_Mutex);
-      m_Queue.push_back(std::move(task));
-    }
-
-    /** \brief Run whatever has been handed over, as an event loop would. */
-    void Drain()
-    {
-      for (;;)
-      {
-        std::function<void()> task;
-
-        {
-          std::lock_guard<std::mutex> locked(m_Mutex);
-
-          if (m_Queue.empty())
-            return;
-
-          task = std::move(m_Queue.front());
-          m_Queue.pop_front();
-        }
-
-        task();
-      }
-    }
-
-  protected:
-    FakeDispatcher()
-      : m_OwningThread(std::this_thread::get_id())
-    {
-    }
-
-    ~FakeDispatcher() override = default;
-
-    bool ExecuteDispatched(std::function<void()> task) override
-    {
-      ++HandedOver;
-
-      if (!Deliverable)
-        return false;
-
-      std::promise<void> ran;
-      auto done = ran.get_future();
-
-      // Swallowed rather than let out, so that a throwing task cannot leave the
-      // wait below on a promise nobody fulfils. Nothing is lost: whatever hands
-      // work over here has already taken the exception off the task.
-      this->Post([&task, &ran]()
-        {
-          try
-          {
-            task();
-          }
-          catch (...)
-          {
-          }
-
-          ran.set_value();
-        });
-
-      done.wait();
-
-      return true;
-    }
-
-  private:
-    std::thread::id m_OwningThread;
-
-    std::mutex m_Mutex;
-    std::deque<std::function<void()>> m_Queue;
-  };
-
   /** \brief Collects what is logged for as long as it exists. */
   class LogCapture : public mitk::LogBackendBase
   {
@@ -209,7 +108,7 @@ class mitkStorageThreadDispatcherTestSuite : public mitk::TestFixture
 public:
   void setUp() override
   {
-    m_Dispatcher = FakeDispatcher::New();
+    m_Dispatcher = mitk::ManualStorageThreadDispatcher::New();
 
     m_Service = std::make_unique<mitk::DataStorageService>();
     m_Service->SetDispatcher(m_Dispatcher);
@@ -488,7 +387,7 @@ private:
       std::rethrow_exception(thrown);
   }
 
-  FakeDispatcher::Pointer m_Dispatcher;
+  mitk::ManualStorageThreadDispatcher::Pointer m_Dispatcher;
   std::unique_ptr<mitk::DataStorageService> m_Service;
   us::ServiceRegistration<mitk::IDataStorageService> m_Registration;
 };

@@ -14,8 +14,8 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkMultiLabelSurfaceExtractionScheduler.h>
-#include <mitkStorageThreadDispatcherBase.h>
 
+#include <mitkManualStorageThreadDispatcher.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -30,101 +30,12 @@ found in the LICENSE file.
 
 #include <atomic>
 #include <chrono>
-#include <deque>
 #include <functional>
-#include <future>
 #include <memory>
-#include <mutex>
 #include <thread>
 
 namespace
 {
-  /**
-   * Stands in for the dispatcher the workbench installs. The thread that owns the data is
-   * whichever thread constructs this, and it runs what is posted to it by calling Drain(), the
-   * way the Qt implementation lets its event loop do it.
-   */
-  class FakeDispatcher : public mitk::StorageThreadDispatcherBase
-  {
-  public:
-    mitkClassMacro(FakeDispatcher, mitk::StorageThreadDispatcherBase);
-    itkFactorylessNewMacro(Self);
-
-    /** How often anything was posted. */
-    std::atomic<int> Posted{ 0 };
-
-    bool IsDispatchThread() const override
-    {
-      return std::this_thread::get_id() == m_OwningThread;
-    }
-
-    void Post(std::function<void()> task) override
-    {
-      ++Posted;
-
-      std::lock_guard<std::mutex> locked(m_Mutex);
-      m_Queue.push_back(std::move(task));
-    }
-
-    /** \brief Run whatever has been posted, as an event loop would. */
-    void Drain()
-    {
-      for (;;)
-      {
-        std::function<void()> task;
-
-        {
-          std::lock_guard<std::mutex> locked(m_Mutex);
-
-          if (m_Queue.empty())
-            return;
-
-          task = std::move(m_Queue.front());
-          m_Queue.pop_front();
-        }
-
-        task();
-      }
-    }
-
-  protected:
-    FakeDispatcher()
-      : m_OwningThread(std::this_thread::get_id())
-    {
-    }
-
-    ~FakeDispatcher() override = default;
-
-    bool ExecuteDispatched(std::function<void()> task) override
-    {
-      std::promise<void> ran;
-      auto done = ran.get_future();
-
-      this->Post([&task, &ran]()
-        {
-          try
-          {
-            task();
-          }
-          catch (...)
-          {
-          }
-
-          ran.set_value();
-        });
-
-      done.wait();
-
-      return true;
-    }
-
-  private:
-    std::thread::id m_OwningThread;
-
-    std::mutex m_Mutex;
-    std::deque<std::function<void()>> m_Queue;
-  };
-
   using Scheduler = mitk::MultiLabelSurfaceExtractionScheduler;
 
   /** A cubic group image of label 1 inside background, a ball of the given radius. */
@@ -202,7 +113,7 @@ class mitkMultiLabelSurfaceExtractionSchedulerTestSuite : public mitk::TestFixtu
 public:
   void setUp() override
   {
-    m_Dispatcher = FakeDispatcher::New();
+    m_Dispatcher = mitk::ManualStorageThreadDispatcher::New();
 
     m_Service = std::make_unique<mitk::DataStorageService>();
     m_Service->SetDispatcher(m_Dispatcher);
@@ -405,7 +316,7 @@ private:
     return false;
   }
 
-  FakeDispatcher::Pointer m_Dispatcher;
+  mitk::ManualStorageThreadDispatcher::Pointer m_Dispatcher;
   std::unique_ptr<mitk::DataStorageService> m_Service;
   us::ServiceRegistration<mitk::IDataStorageService> m_Registration;
 };

@@ -291,10 +291,11 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
 
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
 
-  // Keeps the 3D windows rendering at about 60 frames per second while the shown surface
-  // pulses, see SetSurfacePending().
+  // Keeps the 3D windows rendering at about 30 frames per second while the shown surface
+  // pulses, see SetSurfacePending(). Enough for the 1.5 Hz pulse, and every frame renders
+  // everything in the 3D windows, volumes included, while the interpolation is running.
   m_PulseTimer = new QTimer(this);
-  m_PulseTimer->setInterval(16);
+  m_PulseTimer->setInterval(33);
   connect(m_PulseTimer, &QTimer::timeout, this, []()
     {
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);

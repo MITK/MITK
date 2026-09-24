@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
+#include <mitkIPropertyTransience.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageVtkMapper2D.h>
 #include <mitkMapperProviderBase.h>
@@ -30,9 +31,10 @@ namespace mitk
   /**
    * \brief Module activator for the Multilabel module.
    *
-   * Registers the mapper providers for mitk::MultiLabelSegmentation and
+   * Registers the mapper providers for mitk::MultiLabelSegmentation,
    * blacklists binary-image properties that do not apply to multi-label
-   * segmentations.
+   * segmentations, and registers runtime display state that must not be
+   * saved with a scene as transient.
    */
   class MultilabelModuleActivator : public us::ModuleActivator
   {
@@ -56,6 +58,9 @@ namespace mitk
       labelSetImageFilter.AddEntry("outline binary shadow color", PropertyFilter::Blacklist);
 
       propertyFilters->AddFilter(labelSetImageFilter, "MultiLabelSegmentation");
+
+      CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
+      transience->AddTransient<MultiLabelSegmentation>(MultiLabelSegmentationVtkMapper3D::PROPERTY_NAME_3D_HIDDEN_LABELS());
     }
 
     void Unload(us::ModuleContext *) override

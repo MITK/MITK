@@ -82,6 +82,8 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 
   prefs->PutBool("warn before converting to segmentation", m_Ui->convertWarningCheckBox->isChecked());
 
+  prefs->PutBool("add 3D interpolation mesh", m_Ui->interpolation3DMeshCheckBox->isChecked());
+
   if (!prefs->IsOverridden("label set preset"))
     prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
 
@@ -133,6 +135,8 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 
   m_Ui->convertWarningCheckBox->setChecked(prefs->GetBool("warn before converting to segmentation", true));
+
+  m_Ui->interpolation3DMeshCheckBox->setChecked(prefs->GetBool("add 3D interpolation mesh", false));
 
   //label presets
   bool isOverridden = prefs->IsOverridden("label set preset");

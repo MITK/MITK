@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkType.h>
 
+#include <memory>
 #include <vector>
 
 class vtkActor;
@@ -39,6 +40,7 @@ class vtkSurfaceNets3D;
 namespace mitk
 {
   class MultiLabelSegmentationGroupMapping;
+  class MultiLabelSurfaceExtractionScheduler;
   class IPreferences;
 
   /** \brief 3D mapper for mitk::MultiLabelSegmentation.
@@ -49,10 +51,16 @@ namespace mitk
    * smoothing filter preserves sharp inter-label boundaries while removing voxel
    * staircasing.
    *
+   * Where a thread owns the data storage, as in the Workbench, the extraction runs on a
+   * worker (see MultiLabelSurfaceExtractionScheduler), so that editing a large segmentation
+   * does not freeze the GUI. Until its new surface arrives, a group keeps showing its
+   * previous one. Without such a thread, the extraction runs during rendering.
+   *
    * Properties consumed:
    *   - "visible" (BoolProperty)
    *   - "opacity" (FloatProperty)
    *   - "org.mitk.multilabel.3D.hide" (BoolProperty)
+   *   - PROPERTY_NAME_3D_HIDDEN_LABELS() (IntVectorProperty)
    *   - "org.mitk.multilabel.3D.smoothed" (BoolProperty)
    *   - "/org.mitk.views.segmentation" -> "activate 3D rendering" preference
    *   - "/org.mitk.views.segmentation" -> "3D rendering smoothed" preference
@@ -105,13 +113,26 @@ namespace mitk
        */
       bool m_UseFadedPipeline;
 
-      /** \brief Timestamp of last update of stored data. */
-      itk::TimeStamp m_LastDataUpdateTime;
-      /** \brief Timestamp of last update of a property. */
-      itk::TimeStamp m_LastPropertyUpdateTime;
+      /** \brief Time of the last GenerateDataForRenderer() pass.
+       *
+       * Data or property changes after it make Update() run the next pass. Whether a
+       * group surface is outdated is decided per group, against what it was extracted
+       * from.
+       */
+      itk::TimeStamp m_LastGenerateTime;
 
-      /** \brief The last time step that was updated. */
+      /** \brief Time step of the last GenerateDataForRenderer() pass.
+       *
+       * Navigating in time changes no MTime, so Update() compares against this.
+       */
       mitk::TimeStepType m_LastUpdateTimeStep;
+
+      /** \brief Whether the last GenerateDataForRenderer() pass left any group waiting for its surface.
+       *
+       * Keeps Update() running passes until every surface has arrived: a result, a smoothing
+       * or a time step change leaves no MTime that would do so.
+       */
+      bool m_HasPendingExtractions = false;
 
       /** \brief Look up table for label colors (cloned from the segmentation). */
       mitk::LookupTable::Pointer m_LabelLookupTable;
@@ -126,14 +147,10 @@ namespace mitk
       /** \brief Whether 3D rendering is preferred. */
       bool m_3DRenderingPreference;
 
-      /** \brief Smoothing state with which the cached polydata was last extracted.
+      /** \brief Smoothing resolved in the last GenerateDataForRenderer() pass.
        *
-       * Tracks the *cached* extraction state, not the user's currently requested state.
-       * Written only after a successful re-extraction inside GenerateDataForRenderer.
-       * Comparing ResolveSmoothed(...) against this value detects when the cached
-       * surfaces no longer match the requested smoothing and forces a re-extraction;
-       * preserving it across early-return paths in Update() (hidden node, 3D rendering
-       * disabled, uninitialised segmentation) keeps that staleness check correct.
+       * It may come from a preference, which carries no MTime, so Update() compares
+       * ResolveSmoothed() against this to notice a change.
        */
       bool m_LastSmoothed;
 
@@ -177,6 +194,18 @@ namespace mitk
      */
     static bool ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer);
 
+    /** \brief Name of the node property listing the label values that are not drawn in 3D.
+     *
+     * Unlike hiding a label, it leaves the 2D views alone, and it takes precedence over
+     * highlighting. The property is transient: a scene does not save it.
+     *
+     * \return The property name string "labels.3D.hidden".
+     */
+    constexpr static const char* PROPERTY_NAME_3D_HIDDEN_LABELS()
+    {
+      return "labels.3D.hidden";
+    }
+
   protected:
     /** \brief Default constructor. */
     MultiLabelSegmentationVtkMapper3D();
@@ -194,26 +223,37 @@ namespace mitk
     using OutdatedGroupVectorType = std::vector<std::pair<mitk::MultiLabelSegmentation::GroupIndexType, const mitk::Image*>>;
     /** \brief Check if groups are outdated or obsolete.
       *
-      * Obsolete groups will be removed. Outdated groups will be indicated
-      * in the output as such. New groups will be added to the local storage and also
-      * marked as outdated.
+      * Obsolete groups will be removed. A group is outdated when its surface was
+      * extracted from other group image contents, another time step or another
+      * smoothing, or when its position changed. New groups will be added to the local
+      * storage and also marked as outdated.
       *
       * \param ls The local storage to check.
       * \param seg The multi-label segmentation to check against.
       * \param fadedPipelineChanged Whether the faded pipeline state has changed.
+      * \param timeStep The time step to show.
+      * \param smoothed The smoothing to show.
       * \return A vector of outdated group index / image pairs.
       */
     OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
-      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged);
+      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged, TimeStepType timeStep, bool smoothed);
 
-    /** \brief Update the surface mapping for the given outdated groups.
+    /** \brief Show the newest surfaces of the given outdated groups, and request extractions
+      * where they are still outdated.
       * \param localStorage The local storage to update.
       * \param outdatedData The outdated group data to process.
+      * \param timeStep The time step to show.
+      * \param smoothed The smoothing to show.
+      * \return Whether any of the groups is still waiting for its surface.
       */
-    void UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
+    bool UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData,
+      TimeStepType timeStep, bool smoothed);
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+    /** \brief Extracts the group surfaces for all renderers of this mapper. */
+    std::unique_ptr<MultiLabelSurfaceExtractionScheduler> m_Scheduler;
   };
 
 } // namespace mitk

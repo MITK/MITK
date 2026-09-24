@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStorageThreadDispatcherBase.h>
 
+#include <mitkManualStorageThreadDispatcher.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -33,10 +34,8 @@ found in the LICENSE file.
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <deque>
 #include <exception>
 #include <functional>
-#include <future>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -45,106 +44,6 @@ found in the LICENSE file.
 
 namespace
 {
-  /**
-   * Stands in for the dispatcher the workbench installs. The thread that owns
-   * the data is whichever thread constructs this, and it takes what is handed
-   * to it by calling Drain(), the way the Qt implementation lets its event loop
-   * do it.
-   *
-   * Running the tasks anywhere else would not model the real thing at all: a
-   * mutation that is handed over re-enters the very method that handed it over,
-   * and only arriving on the owning thread stops it handing itself over again.
-   */
-  class FakeDispatcher : public mitk::StorageThreadDispatcherBase
-  {
-  public:
-    mitkClassMacro(FakeDispatcher, mitk::StorageThreadDispatcherBase);
-    itkFactorylessNewMacro(Self);
-
-    /** How often anything was handed over to the owning thread. */
-    std::atomic<int> HandedOver{ 0 };
-
-    /** Whether a hand-over can be delivered at all. */
-    std::atomic<bool> Deliverable{ true };
-
-    bool IsDispatchThread() const override
-    {
-      return std::this_thread::get_id() == m_OwningThread;
-    }
-
-    void Post(std::function<void()> task) override
-    {
-      std::lock_guard<std::mutex> locked(m_Mutex);
-      m_Queue.push_back(std::move(task));
-    }
-
-    /** \brief Run whatever has been handed over, as an event loop would. */
-    void Drain()
-    {
-      for (;;)
-      {
-        std::function<void()> task;
-
-        {
-          std::lock_guard<std::mutex> locked(m_Mutex);
-
-          if (m_Queue.empty())
-            return;
-
-          task = std::move(m_Queue.front());
-          m_Queue.pop_front();
-        }
-
-        task();
-      }
-    }
-
-  protected:
-    FakeDispatcher()
-      : m_OwningThread(std::this_thread::get_id())
-    {
-    }
-
-    ~FakeDispatcher() override = default;
-
-    bool ExecuteDispatched(std::function<void()> task) override
-    {
-      ++HandedOver;
-
-      if (!Deliverable)
-        return false;
-
-      std::promise<void> ran;
-      auto done = ran.get_future();
-
-      // Swallowed rather than let out, so that a throwing task cannot leave the
-      // wait below on a promise nobody fulfils. Nothing is lost: whatever hands
-      // work over here has already taken the exception off the task.
-      this->Post([&task, &ran]()
-        {
-          try
-          {
-            task();
-          }
-          catch (...)
-          {
-          }
-
-          ran.set_value();
-        });
-
-      done.wait();
-
-      return true;
-    }
-
-  private:
-    std::thread::id m_OwningThread;
-
-    std::mutex m_Mutex;
-    std::deque<std::function<void()>> m_Queue;
-  };
-
   /** \brief Collects what is logged for as long as it exists. */
   class LogCapture : public mitk::LogBackendBase
   {
@@ -200,13 +99,16 @@ class mitkStorageThreadDispatcherTestSuite : public mitk::TestFixture
   MITK_TEST(TouchingDataOnTheOwningThread_IsNotReported_Success);
   MITK_TEST(TouchingDataOffTheOwningThread_IsReported_Success);
   MITK_TEST(WithoutAnOwningThread_NothingIsReported_Success);
+  MITK_TEST(PostOnTheOwningThread_RunsLater_Success);
+  MITK_TEST(PostFromAnotherThread_RunsAndIsReleasedOnTheOwningThread_Success);
+  MITK_TEST(PostWithoutAnOwningThread_IsRefused_Success);
   MITK_TEST(ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
   void setUp() override
   {
-    m_Dispatcher = FakeDispatcher::New();
+    m_Dispatcher = mitk::ManualStorageThreadDispatcher::New();
 
     m_Service = std::make_unique<mitk::DataStorageService>();
     m_Service->SetDispatcher(m_Dispatcher);
@@ -344,6 +246,69 @@ public:
                                  capture.CountContaining("Building something"));
   }
 
+  void PostOnTheOwningThread_RunsLater_Success()
+  {
+    auto ran = false;
+
+    CPPUNIT_ASSERT_MESSAGE("There has to be a thread to queue to",
+                           mitk::PostToStorageThread([&ran]() { ran = true; }));
+
+    // Unlike a hand-over, which runs at once when it already is on the owning
+    // thread. Callers post to get out of whatever they are in first.
+    CPPUNIT_ASSERT_MESSAGE("A posted task must not run inline", !ran);
+
+    m_Dispatcher->Drain();
+
+    CPPUNIT_ASSERT_MESSAGE("A posted task has to run once the owning thread gets to it", ran);
+  }
+
+  void PostFromAnotherThread_RunsAndIsReleasedOnTheOwningThread_Success()
+  {
+    const auto owningThread = std::this_thread::get_id();
+
+    auto queued = false;
+    std::thread::id ranOn;
+    std::thread::id releasedOn;
+
+    std::thread worker([&queued, &ranOn, &releasedOn]()
+      {
+        // Stands in for what a worker hands back because it must not be
+        // released anywhere else, such as an image that observers watch.
+        std::shared_ptr<int> held(new int(0), [&releasedOn](int* value)
+          {
+            releasedOn = std::this_thread::get_id();
+            delete value;
+          });
+
+        queued = mitk::PostToStorageThread([&ranOn, held = std::move(held)]()
+          {
+            ranOn = std::this_thread::get_id();
+          });
+      });
+
+    worker.join();
+    m_Dispatcher->Drain();
+
+    CPPUNIT_ASSERT_MESSAGE("There has to be a thread to queue to", queued);
+    CPPUNIT_ASSERT_MESSAGE("A posted task has to run on the owning thread", ranOn == owningThread);
+    CPPUNIT_ASSERT_MESSAGE("What a posted task holds has to be released on the owning thread",
+                           releasedOn == owningThread);
+  }
+
+  void PostWithoutAnOwningThread_IsRefused_Success()
+  {
+    m_Service->SetDispatcher(nullptr);
+
+    auto ran = false;
+
+    CPPUNIT_ASSERT_MESSAGE("There is nothing to queue to",
+                           !mitk::PostToStorageThread([&ran]() { ran = true; }));
+
+    // Running it here instead would re-enter a caller that relies on having
+    // returned first.
+    CPPUNIT_ASSERT_MESSAGE("A task that could not be queued must not run", !ran);
+  }
+
   void ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success()
   {
     // A cube of ones in a volume of zeros, so that there is a surface to extract.
@@ -422,7 +387,7 @@ private:
       std::rethrow_exception(thrown);
   }
 
-  FakeDispatcher::Pointer m_Dispatcher;
+  mitk::ManualStorageThreadDispatcher::Pointer m_Dispatcher;
   std::unique_ptr<mitk::DataStorageService> m_Service;
   us::ServiceRegistration<mitk::IDataStorageService> m_Registration;
 };

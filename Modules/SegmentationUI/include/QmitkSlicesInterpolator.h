@@ -17,7 +17,9 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkSurfaceInterpolationController.h>
+#include <mitkITKEventObserverGuard.h>
 #include <mitkToolManager.h>
+#include <mitkWeakPointer.h>
 #include <MitkSegmentationUIExports.h>
 
 #include <QWidget>
@@ -206,15 +208,6 @@ protected slots:
    */
   void OnSurfaceInterpolationFinished();
 
-  /** \brief Starts the timer that periodically triggers interpolation updates. */
-  void StartUpdateInterpolationTimer();
-
-  /** \brief Stops the interpolation update timer. */
-  void StopUpdateInterpolationTimer();
-
-  /** \brief Updates the surface color to match the active label color. */
-  void ChangeSurfaceColor();
-
 protected:
 
   typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;
@@ -273,6 +266,34 @@ private:
    */
   void Start3DInterpolation();
 
+  /**
+   * \brief Marks the shown surface as about to be replaced by the running interpolation.
+   *
+   * A pending surface pulses (see the "pulsing" property of mitk::SurfaceVtkMapper3D), for
+   * which the 3D windows are kept rendering until it is no longer pending.
+   */
+  void SetSurfacePending(bool pending);
+
+  /**
+   * \brief Hides the interpolated label in the 3D windows while its interpolated surface is shown.
+   *
+   * The contours drawn for the interpolation would only cut through the surface there. Called
+   * wherever the surface is shown, hidden or cleared; it works out the state on its own. It
+   * requests no render, as it also runs from the destructor; the callers do.
+   */
+  void UpdateLabelHiddenIn3D();
+
+  /** \brief Shows the label hidden by UpdateLabelHiddenIn3D() in 3D again, if any. */
+  void RevealLabelIn3D();
+
+  /**
+   * \brief Forgets the interpolated label when it is removed from the segmentation.
+   *
+   * A label added later may get the same value. It then counts as a new label, which clears
+   * what was shown for the removed one instead of showing it again.
+   */
+  void OnLabelRemoved(const itk::EventObject& event);
+
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -299,6 +320,12 @@ private:
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
 
+  // Where UpdateLabelHiddenIn3D() hid a label last, which need not be the working data any more.
+  mitk::WeakPointer<mitk::DataNode> m_NodeWithLabelHiddenIn3D;
+
+  // Calls OnLabelRemoved() for the working segmentation.
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+
   mitk::MultiLabelSegmentation *m_Segmentation;
 
   mitk::SliceNavigationController *m_LastSNC;
@@ -323,7 +350,7 @@ private:
   QFuture<void> m_ModifyFuture;
   QFutureWatcher<void> m_ModifyWatcher;
 
-  QTimer *m_Timer;
+  QTimer *m_PulseTimer;
 
   QFuture<void> m_PlaneFuture;
   QFutureWatcher<void> m_PlaneWatcher;

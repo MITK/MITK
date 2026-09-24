@@ -77,7 +77,8 @@ namespace mitk
        * \brief Layout of the file the passed frame belongs to.
        * \param[in] frame A frame of the file in question.
        * \return The recorded layout, or the default (one frame, no functional
-       *         groups) for a cache that cannot look into sequences.
+       *         groups) for a cache that cannot look into sequences or whose
+       *         scanner was not asked to read the frame model.
        */
       virtual DICOMFrameLayout GetFrameLayout(const DICOMImageFrameInfo* frame) const;
 

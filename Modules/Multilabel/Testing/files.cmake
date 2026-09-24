@@ -18,6 +18,10 @@ set(MODULE_TESTS
     mitkTransferLabelTest.cpp
 )
 
+set(MODULE_RENDERING_TESTS
+    mitkMultiLabelSegmentationVtkMapper3DTest.cpp
+)
+
 set(MODULE_CUSTOM_TESTS
     mitkDICOMSegmentationIORegressionTest.cpp
     mitkDICOMSegmentationIONonZOrderedTest.cpp

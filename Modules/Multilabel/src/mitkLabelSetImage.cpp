@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <itkBinaryFunctorImageFilter.h>
 #include <itkMultiThreaderBase.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -2274,12 +2275,13 @@ void mitk::TransferSliceContentAtTimeStep(const Image* slice, Image* destination
 
     for (std::size_t j = 0; j < sliceSizeY; ++j)
     {
-      const auto* row = sliceAccessor.GetData() + j * sliceSizeX;
+      const auto* rowBegin = sliceAccessor.GetData() + j * sliceSizeX;
+      const auto* rowEnd = rowBegin + sliceSizeX;
 
-      for (std::size_t i = 0; i < sliceSizeX; ++i)
+      // Usually few pixels are marked, and std::find skips the others vectorized.
+      for (auto* pixel = std::find(rowBegin, rowEnd, sourceLabel); pixel != rowEnd; pixel = std::find(pixel + 1, rowEnd, sourceLabel))
       {
-        if (row[i] != sourceLabel)
-          continue;
+        const auto i = static_cast<std::size_t>(pixel - rowBegin);
 
         VoxelIndex voxel;
         bool inside = true;

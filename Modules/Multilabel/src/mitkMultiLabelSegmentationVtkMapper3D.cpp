@@ -168,6 +168,9 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   const bool highlightingActive = !highlightedLabelValues.empty();
   localStorage->m_UseFadedPipeline = highlightingActive;
 
+  mitk::IntVectorProperty::Pointer hiddenProp = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(PROPERTY_NAME_3D_HIDDEN_LABELS()));
+  const auto hiddenLabelValues = hiddenProp.IsNotNull() ? hiddenProp->GetValue() : std::vector<int>({});
+
   float nodeOpacity = 1.0f;
   node->GetFloatProperty("opacity", nodeOpacity);
 
@@ -217,6 +220,11 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
     else
     {
       rgba[3] = normalOpacity;
+    }
+
+    if (hiddenLabelValues.cend() != std::find(hiddenLabelValues.cbegin(), hiddenLabelValues.cend(), value))
+    {
+      rgba[3] = 0.0;
     }
 
     lut->SetTableValue(value, rgba);
@@ -391,6 +399,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
     (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, LabelHighlightGuard::PROPERTY_NAME_LABELS_HIGHLIGHTED(), localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE(), localStorage->m_LabelLookupTable->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, PROPERTY_NAME_3D_HIDDEN_LABELS(), localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime()) ||
     GetOpacityFactor(localStorage->m_SegPreferences) != localStorage->m_LastOpacityFactor;
 

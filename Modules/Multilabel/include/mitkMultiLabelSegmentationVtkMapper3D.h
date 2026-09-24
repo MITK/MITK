@@ -60,6 +60,7 @@ namespace mitk
    *   - "visible" (BoolProperty)
    *   - "opacity" (FloatProperty)
    *   - "org.mitk.multilabel.3D.hide" (BoolProperty)
+   *   - PROPERTY_NAME_3D_HIDDEN_LABELS() (IntVectorProperty)
    *   - "org.mitk.multilabel.3D.smoothed" (BoolProperty)
    *   - "/org.mitk.views.segmentation" -> "activate 3D rendering" preference
    *   - "/org.mitk.views.segmentation" -> "3D rendering smoothed" preference
@@ -192,6 +193,18 @@ namespace mitk
      * implementations in sync if defaults or preference keys change.
      */
     static bool ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer);
+
+    /** \brief Name of the node property listing the label values that are not drawn in 3D.
+     *
+     * Unlike hiding a label, it leaves the 2D views alone, and it takes precedence over
+     * highlighting. The property is transient: a scene does not save it.
+     *
+     * \return The property name string "labels.3D.hidden".
+     */
+    constexpr static const char* PROPERTY_NAME_3D_HIDDEN_LABELS()
+    {
+      return "labels.3D.hidden";
+    }
 
   protected:
     /** \brief Default constructor. */

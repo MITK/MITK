@@ -10,9 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkCoreServices.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkIPropertyTransience.h>
 #include <mitkLabelSetImage.h>
+#include <mitkMultiLabelSegmentationVtkMapper3D.h>
 #include <mitkRenderingTestHelper.h>
+#include <mitkVectorProperty.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -109,9 +113,44 @@ class mitkMultiLabelSegmentationVtkMapper3DTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkMultiLabelSegmentationVtkMapper3DTestSuite);
   MITK_TEST(Render3D_WithoutAnOwningThread_ShowsTheSurface_Success);
+  MITK_TEST(Render3D_LabelHiddenIn3D_IsNotDrawnUntilShownAgain_Success);
+  MITK_TEST(HiddenLabelsIn3D_AreTransient_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void Render3D_LabelHiddenIn3D_IsNotDrawnUntilShownAgain_Success()
+  {
+    const auto* propertyName = mitk::MultiLabelSegmentationVtkMapper3D::PROPERTY_NAME_3D_HIDDEN_LABELS();
+
+    auto hiddenLabels = mitk::IntVectorProperty::New();
+    hiddenLabels->SetValue({ 1 });
+
+    auto node = mitk::DataNode::New();
+    node->SetData(MakeCubeSegmentation());
+    node->SetProperty(propertyName, hiddenLabels);
+
+    mitk::RenderingTestHelper renderingHelper(300, 300);
+    renderingHelper.AddNodeToStorage(node);
+    renderingHelper.SetMapperIDToRender3D();
+
+    CPPUNIT_ASSERT_MESSAGE("A label hidden in 3D was drawn", !ShowsAnything(Capture(renderingHelper)));
+
+    // The 3D interpolation empties the list rather than removing it.
+    hiddenLabels->SetValue({});
+
+    CPPUNIT_ASSERT_MESSAGE("A label no longer hidden in 3D was not drawn", ShowsAnything(Capture(renderingHelper)));
+  }
+
+  void HiddenLabelsIn3D_AreTransient_Success()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyTransience> transience(mitk::CoreServices::GetPropertyTransience());
+
+    // Set only while a 3D interpolation is on display; a saved scene must not keep the label hidden.
+    CPPUNIT_ASSERT_MESSAGE("Hidden labels in 3D have to be transient for segmentations",
+                           transience->IsTransient(mitk::MultiLabelSegmentation::New(),
+                                                   mitk::MultiLabelSegmentationVtkMapper3D::PROPERTY_NAME_3D_HIDDEN_LABELS()));
+  }
+
   void Render3D_WithoutAnOwningThread_ShowsTheSurface_Success()
   {
     auto node = mitk::DataNode::New();

@@ -32,10 +32,6 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-const char* QmitkMxNCellMapWidget::CellsMimeType = "application/x-mitk-mxn-cells";
-const char* QmitkMxNCellMapWidget::GroupMimeType = "application/x-mitk-mxn-group";
-const char* QmitkMxNCellMapWidget::AskModeMimeType = "application/x-mitk-mxn-askmode";
-
 namespace
 {
   constexpr int TileSpacing = 2;
@@ -584,22 +580,15 @@ void QmitkMxNCellMapWidget::StartCellDrag()
   // treatment; drop out of the highlight before the drag begins.
   this->DiscardHoverHighlight();
 
-  auto* mimeData = new QMimeData();
-  mimeData->setData(CellsMimeType, m_Selection.join(QStringLiteral("\n")).toUtf8());
-  if (m_DragAsksMode)
-  {
-    mimeData->setData(AskModeMimeType, QByteArray());
-  }
-
   auto* drag = new QDrag(this);
-  drag->setMimeData(mimeData);
+  drag->setMimeData(QmitkMxNCreateCellsMimeData(m_Selection, m_DragAsksMode));
   drag->exec(Qt::CopyAction);
   m_DragAsksMode = false;
 }
 
 void QmitkMxNCellMapWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-  if (event->mimeData()->hasFormat(GroupMimeType))
+  if (event->mimeData()->hasFormat(QmitkMxNGroupMimeType))
   {
     // An incoming group drag replaces the hover highlight with the drop-target
     // treatment; drop the highlight so the two never co-paint.
@@ -610,7 +599,7 @@ void QmitkMxNCellMapWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void QmitkMxNCellMapWidget::dragMoveEvent(QDragMoveEvent* event)
 {
-  if (!event->mimeData()->hasFormat(GroupMimeType))
+  if (!event->mimeData()->hasFormat(QmitkMxNGroupMimeType))
   {
     return;
   }
@@ -638,7 +627,7 @@ void QmitkMxNCellMapWidget::dropEvent(QDropEvent* event)
   m_DropTargetTile = -1;
   this->update();
 
-  if (!event->mimeData()->hasFormat(GroupMimeType))
+  if (!event->mimeData()->hasFormat(QmitkMxNGroupMimeType))
   {
     return;
   }
@@ -649,14 +638,14 @@ void QmitkMxNCellMapWidget::dropEvent(QDropEvent* event)
     return;
   }
 
-  const auto mode = ResolveJoinMode(event->mimeData(), event->modifiers(), this,
+  const auto mode = QmitkMxNResolveJoinMode(event->mimeData(), event->modifiers(), this,
                                     this->mapToGlobal(event->position().toPoint()));
   if (!mode.has_value())
   {
     return;
   }
 
-  const auto group = QString::fromUtf8(event->mimeData()->data(GroupMimeType));
+  const auto group = QString::fromUtf8(event->mimeData()->data(QmitkMxNGroupMimeType));
   const auto& windowId = m_Tiles[static_cast<std::size_t>(index)].windowId;
 
   // Dropping onto a selected tile targets the whole selection; onto an
@@ -665,60 +654,6 @@ void QmitkMxNCellMapWidget::dropEvent(QDropEvent* event)
                                                              : QStringList{ windowId };
   emit AssignRequested(group, targets, *mode);
   event->acceptProposedAction();
-}
-
-QmitkMxNGroupJoinMode QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::KeyboardModifiers modifiers)
-{
-  // Alt merges (overwriting collisions), Shift fills only empty axes; a plain
-  // drop replaces. Ctrl is deliberately not used - the map already binds it to
-  // multi-select, so it must keep its selection meaning during a drag.
-  if (modifiers.testFlag(Qt::AltModifier))
-  {
-    return QmitkMxNGroupJoinMode::MergeOverwriteCollisions;
-  }
-  if (modifiers.testFlag(Qt::ShiftModifier))
-  {
-    return QmitkMxNGroupJoinMode::FillEmpty;
-  }
-  return QmitkMxNGroupJoinMode::Replace;
-}
-
-std::vector<QmitkMxNCellMapWidget::JoinModeEntry> QmitkMxNCellMapWidget::JoinModeMenuEntries()
-{
-  return { { QmitkMxNGroupJoinMode::Replace, tr("Replace the cells' synchronization") },
-           { QmitkMxNGroupJoinMode::MergeOverwriteCollisions, tr("Merge, overwriting collisions") },
-           { QmitkMxNGroupJoinMode::FillEmpty, tr("Fill only unsynchronized axes") } };
-}
-
-std::optional<QmitkMxNGroupJoinMode> QmitkMxNCellMapWidget::ResolveJoinMode(
-  const QMimeData* mimeData, Qt::KeyboardModifiers modifiers, QWidget* parent,
-  const QPoint& globalPosition)
-{
-  if (nullptr == mimeData || !mimeData->hasFormat(AskModeMimeType))
-  {
-    return JoinModeFromModifiers(modifiers);
-  }
-
-  QMenu menu(parent);
-  std::vector<QAction*> actions;
-  const auto entries = JoinModeMenuEntries();
-  actions.reserve(entries.size());
-  for (const auto& entry : entries)
-  {
-    actions.push_back(menu.addAction(entry.label));
-  }
-  menu.addSeparator();
-  menu.addAction(tr("Cancel"));
-
-  const QAction* chosen = menu.exec(globalPosition);
-  for (std::size_t i = 0; i < actions.size(); ++i)
-  {
-    if (chosen == actions[i])
-    {
-      return entries[i].mode;
-    }
-  }
-  return std::nullopt;
 }
 
 QStringList QmitkMxNCellMapWidget::TilesBetween(const QString& anchor, const QString& target) const

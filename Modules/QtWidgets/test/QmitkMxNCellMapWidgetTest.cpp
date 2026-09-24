@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNCellMapWidget.h>
-#include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNMultiWidget.h>
 
 #include <mitkStandaloneDataStorage.h>
@@ -21,17 +20,15 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QCoreApplication>
-#include <QMimeData>
 #include <QMouseEvent>
 #include <QPointF>
 
 #include <string>
 
 /**
- * Drives QmitkMxNCellMapWidget directly - its selection gestures and the drop
- * vocabulary it owns for both drop targets. The editor's use of the map (the
- * active-window mirror, group-card drops, sync-highlight resolution) is covered
- * by QmitkMxNLayoutEditorWidgetTest.
+ * Drives QmitkMxNCellMapWidget directly - its selection gestures. The editor's
+ * use of the map (the active-window mirror, group-card drops, sync-highlight
+ * resolution) is covered by QmitkMxNLayoutEditorWidgetTest.
  *
  * The map is sized explicitly so its tiles have real geometry: the gestures go
  * through the widget's own hit-test, and the uniform-grid path derives tile rects
@@ -50,9 +47,6 @@ class QmitkMxNCellMapWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ShiftClick_WithoutAnchor_SelectsOnlyTheClickedTile);
   MITK_TEST(EmptyAreaPress_ClearsSelectionAndAnchor);
   MITK_TEST(RightPress_TakesAnUnselectedTileAndKeepsAMultiSelection);
-  MITK_TEST(JoinModeFromModifiers_MapsKeys);
-  MITK_TEST(JoinModeMenuEntries_OfferEveryMode);
-  MITK_TEST(ResolveJoinMode_WithoutTheMarker_ReadsModifiers);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -269,52 +263,6 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A right press on a selected tile keeps the whole selection",
                                  Ids({ 0, 1, 2 }), SelectionOf());
-  }
-
-  // --- The drop vocabulary both targets share ---------------------------------
-
-  void JoinModeFromModifiers_MapsKeys()
-  {
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::Replace
-                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::NoModifier));
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::MergeOverwriteCollisions
-                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::AltModifier));
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::FillEmpty
-                   == QmitkMxNCellMapWidget::JoinModeFromModifiers(Qt::ShiftModifier));
-  }
-
-  void JoinModeMenuEntries_OfferEveryMode()
-  {
-    // The menu is the discoverable face of the modifiers, so it must offer the
-    // same three modes - a mode reachable only by a hotkey would defeat it.
-    const auto entries = QmitkMxNCellMapWidget::JoinModeMenuEntries();
-
-    CPPUNIT_ASSERT_EQUAL(std::size_t(3), entries.size());
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::Replace == entries[0].mode);
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::MergeOverwriteCollisions == entries[1].mode);
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::FillEmpty == entries[2].mode);
-    for (const auto& entry : entries)
-    {
-      CPPUNIT_ASSERT_MESSAGE("Every offered mode carries a label", !entry.label.isEmpty());
-    }
-  }
-
-  void ResolveJoinMode_WithoutTheMarker_ReadsModifiers()
-  {
-    // A left-button drag carries no marker, so the modifiers still decide and the
-    // resolution never blocks on a menu.
-    QMimeData plain;
-    plain.setData(QmitkMxNCellMapWidget::CellsMimeType, QByteArray("mxn__widget0"));
-
-    const auto replace = QmitkMxNCellMapWidget::ResolveJoinMode(&plain, Qt::NoModifier, nullptr,
-                                                                QPoint(0, 0));
-    CPPUNIT_ASSERT(replace.has_value());
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::Replace == *replace);
-
-    const auto merge = QmitkMxNCellMapWidget::ResolveJoinMode(&plain, Qt::AltModifier, nullptr,
-                                                              QPoint(0, 0));
-    CPPUNIT_ASSERT(merge.has_value());
-    CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::MergeOverwriteCollisions == *merge);
   }
 };
 

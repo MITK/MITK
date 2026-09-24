@@ -229,7 +229,8 @@ void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested(QmitkMxNMultiWidget::Lay
 {
   // A toggle request hides an already-visible layout editor instead of
   // re-activating it, so a second press on the barcode closes what the first
-  // opened; a show request only ever brings the editor up.
+  // opened; a show request only ever brings the editor up, a hide request only
+  // ever takes it down.
   auto page = this->GetSite()->GetPage();
   if (page.IsNull())
   {
@@ -238,6 +239,14 @@ void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested(QmitkMxNMultiWidget::Lay
 
   const QString viewId = QStringLiteral("org.mitk.views.mxnlayouteditor");
   auto view = page->FindView(viewId);
+  if (QmitkMxNMultiWidget::LayoutEditorRequest::Hide == request)
+  {
+    if (view.IsNotNull())
+    {
+      page->HideView(view);
+    }
+    return;
+  }
   if (QmitkMxNMultiWidget::LayoutEditorRequest::Toggle == request && view.IsNotNull()
       && page->IsPartVisible(view))
   {

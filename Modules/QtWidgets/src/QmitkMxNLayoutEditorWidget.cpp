@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 
+#include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellMapWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 
@@ -312,12 +313,12 @@ namespace
           && (event->pos() - m_PressPosition).manhattanLength() >= QApplication::startDragDistance())
       {
         auto* mimeData = new QMimeData();
-        mimeData->setData(QmitkMxNCellMapWidget::GroupMimeType, m_GroupId.toUtf8());
+        mimeData->setData(QmitkMxNGroupMimeType, m_GroupId.toUtf8());
         if (event->buttons().testFlag(Qt::RightButton))
         {
           // Same gesture as on the cell map: the right button defers the join mode
           // to a menu on drop, so the modifiers stay optional.
-          mimeData->setData(QmitkMxNCellMapWidget::AskModeMimeType, QByteArray());
+          mimeData->setData(QmitkMxNAskModeMimeType, QByteArray());
         }
         auto* drag = new QDrag(this);
         drag->setMimeData(mimeData);
@@ -329,7 +330,7 @@ namespace
 
     void dragEnterEvent(QDragEnterEvent* event) override
     {
-      if (event->mimeData()->hasFormat(QmitkMxNCellMapWidget::CellsMimeType))
+      if (event->mimeData()->hasFormat(QmitkMxNCellsMimeType))
       {
         m_DropHighlight = true;
         this->update();
@@ -348,7 +349,7 @@ namespace
       m_DropHighlight = false;
       this->update();
 
-      const auto mode = QmitkMxNCellMapWidget::ResolveJoinMode(
+      const auto mode = QmitkMxNResolveJoinMode(
         event->mimeData(), event->modifiers(), this,
         this->mapToGlobal(event->position().toPoint()));
       if (!mode.has_value())
@@ -357,7 +358,7 @@ namespace
       }
 
       const auto ids = QString::fromUtf8(
-        event->mimeData()->data(QmitkMxNCellMapWidget::CellsMimeType));
+        event->mimeData()->data(QmitkMxNCellsMimeType));
       m_OnCellsDropped(ids.split(QStringLiteral("\n"), Qt::SkipEmptyParts), *mode);
       event->acceptProposedAction();
     }
@@ -490,6 +491,10 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
               }
             }
             this->MirrorMapSelectionToMatrix(windowIds);
+            if (!m_MultiWidget.isNull())
+            {
+              m_MultiWidget->GetArrangeMode()->SetSelectedWindowIds(windowIds);
+            }
             this->ScheduleRebuild();
           });
   // Hovering a tile's axis glyph lights up every cell that shares that
@@ -814,6 +819,8 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
   if (!m_MultiWidget.isNull())
   {
     disconnect(m_MultiWidget, nullptr, this, nullptr);
+    disconnect(m_MultiWidget->GetArrangeMode(), nullptr, this, nullptr);
+    disconnect(m_MultiWidget->GetArrangeMode(), nullptr, m_CellMap, nullptr);
   }
 
   m_MultiWidget = multiWidget;
@@ -841,6 +848,19 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
     // the forward direction.
     connect(m_MultiWidget, &QmitkMxNMultiWidget::ActiveRenderWindowChanged,
             this, &QmitkMxNLayoutEditorWidget::SelectActiveWindowTile);
+
+    // The plates and the map show one selection. The map's own handler does
+    // the rest (active window, matrix mirror), and both setters no-op on an
+    // unchanged selection, so the two directions cannot loop.
+    auto* arrangeMode = m_MultiWidget->GetArrangeMode();
+    connect(arrangeMode, &QmitkMxNArrangeMode::SelectionChanged,
+            m_CellMap, &QmitkMxNCellMapWidget::SetSelectedWindowIds);
+    connect(arrangeMode, &QmitkMxNArrangeMode::AssignRequested, this,
+            [this](const QString& group, const QStringList& windowIds, QmitkMxNGroupJoinMode mode)
+            {
+              this->AssignCellsToGroup(windowIds, group.toStdString(), mode);
+            });
+    arrangeMode->SetSelectedWindowIds(m_CellMap->GetSelectedWindowIds());
   }
 
   this->setEnabled(!m_MultiWidget.isNull());
@@ -1612,54 +1632,6 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   return result;
 }
 
-QStringList QmitkMxNLayoutEditorWidget::CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const
-{
-  QStringList result;
-  if (m_MultiWidget.isNull())
-  {
-    return result;
-  }
-
-  const auto groupId = group.toStdString();
-  const auto dimension = QmitkMxNSyncAxisDimension(axis);
-  try
-  {
-    for (const auto& info : m_MultiWidget->GetSyncGroupInfos())
-    {
-      if (info.id != groupId)
-      {
-        continue;
-      }
-      if (!dimension.has_value())
-      {
-        for (const auto& windowId : info.selectionMembers)
-        {
-          result.append(windowId);
-        }
-      }
-      else
-      {
-        // 'members' is keyed only for dimensions some cell links, so a missing
-        // key is the common "nobody links this axis" case, not an error.
-        const auto it = info.members.find(*dimension);
-        if (it != info.members.end())
-        {
-          for (const auto& windowId : it->second)
-          {
-            result.append(windowId);
-          }
-        }
-      }
-      break;
-    }
-  }
-  catch (const mitk::Exception&)
-  {
-    result.clear();  // transient mid-layout-change state
-  }
-  return result;
-}
-
 void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis)
 {
   if (nullptr == m_CellMap)
@@ -1667,20 +1639,24 @@ void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, QmitkM
     return;
   }
 
-  const QStringList members = this->CellsSharingAxis(group, axis);
-  QColor hue;
-  if (!m_MultiWidget.isNull())
+  if (m_MultiWidget.isNull())
   {
-    try
-    {
-      hue = m_MultiWidget->GetSyncGroupColor(group.toStdString());
-    }
-    catch (const mitk::Exception&)
-    {
-    }
+    return;
+  }
+
+  const QStringList members = m_MultiWidget->CellsSharingAxis(group, axis);
+  QColor hue;
+  try
+  {
+    hue = m_MultiWidget->GetSyncGroupColor(group.toStdString());
+  }
+  catch (const mitk::Exception&)
+  {
   }
   m_CellMap->SetHighlightedCells(members, axis, hue);
   this->SetMatrixHighlight(members, QmitkMxNSyncAxisToSlot(axis));
+  m_MultiWidget->GetArrangeMode()->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Editor, axis,
+                                                members, hue);
 }
 
 void QmitkMxNLayoutEditorWidget::HighlightCellAxis(const QString& windowId, QmitkMxNSyncAxis axis)
@@ -1691,19 +1667,7 @@ void QmitkMxNLayoutEditorWidget::HighlightCellAxis(const QString& windowId, Qmit
     return;
   }
 
-  // Resolve which group the hovered cell is on for this axis, then highlight
-  // that group's members. Selection is single-valued per cell and lives on the
-  // connector, not in the per-dimension links.
-  std::string group;
-  if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
-  {
-    group = m_MultiWidget->GetCellSelectionGroup(windowId);
-  }
-  else if (const auto link = m_MultiWidget->GetSyncLink(windowId, *dimension))
-  {
-    group = link->group;
-  }
-
+  const std::string group = m_MultiWidget->ResolveCellAxisGroup(windowId, axis);
   if (group.empty())
   {
     this->ClearSyncHighlight();  // the cell syncs nothing on this axis
@@ -1719,6 +1683,10 @@ void QmitkMxNLayoutEditorWidget::ClearSyncHighlight()
     m_CellMap->SetHighlightedCells(QStringList(), std::nullopt, QColor());
   }
   this->SetMatrixHighlight(QStringList(), -1);
+  if (!m_MultiWidget.isNull())
+  {
+    m_MultiWidget->GetArrangeMode()->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Editor);
+  }
 }
 
 void QmitkMxNLayoutEditorWidget::SetMatrixHighlight(const QStringList& windowIds, int column)

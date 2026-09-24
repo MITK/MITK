@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellMapWidget.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
@@ -100,6 +101,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
 
   MITK_TEST(SyncHighlight_CellsSharingDimensionAxis);
   MITK_TEST(SyncHighlight_CellsSharingSelectionAxis);
+  MITK_TEST(ArrangeSelection_ARebindStopsTheOldEditorsMirror);
   MITK_TEST(SyncHighlight_CellAxisResolvesFromHoveredCell);
   MITK_TEST(SyncHighlight_CellMapSetAndClear);
 
@@ -1047,7 +1049,7 @@ public:
     const QByteArray payload =
       cellMap->GetSelectedWindowIds().join(QStringLiteral("\n")).toUtf8();
     QMimeData mime;
-    mime.setData(QmitkMxNCellMapWidget::CellsMimeType, payload);
+    mime.setData(QmitkMxNCellsMimeType, payload);
 
     // Dispatch straight to the card's virtual event() (via the public QObject
     // overload; QWidget narrows the override to protected). QApplication::notify
@@ -1126,7 +1128,7 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
 
     QStringList members =
-      m_Widget->CellsSharingAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
+      m_Editor->CellsSharingAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
     members.sort();
     QStringList expected{ CellId(0), CellId(2) };
     expected.sort();
@@ -1135,11 +1137,35 @@ public:
                                  members.join(QStringLiteral(",")).toStdString());
 
     CPPUNIT_ASSERT_MESSAGE("An axis no member links resolves to nothing",
-                           m_Widget->CellsSharingAxis(QString::fromStdString(id),
+                           m_Editor->CellsSharingAxis(QString::fromStdString(id),
                              QmitkMxNSyncAxis::Orientation).isEmpty());
     CPPUNIT_ASSERT_MESSAGE("An unknown group resolves to nothing",
-                           m_Widget->CellsSharingAxis(QStringLiteral("no-such-group"),
+                           m_Editor->CellsSharingAxis(QStringLiteral("no-such-group"),
                              QmitkMxNSyncAxis::Slice).isEmpty());
+  }
+
+  void ArrangeSelection_ARebindStopsTheOldEditorsMirror()
+  {
+    auto* map = m_Widget->findChild<QmitkMxNCellMapWidget*>();
+    CPPUNIT_ASSERT(nullptr != map);
+
+    QmitkMxNMultiWidget other(nullptr, Qt::WindowFlags(), QStringLiteral("other"));
+    other.SetDataStorage(m_DataStorage);
+    other.InitializeMultiWidget();
+    other.SetLayout(1, 2);
+    m_Widget->SetMultiWidget(&other);
+
+    // The previously bound editor's arrange selection must no longer reach the
+    // map, or switching editors with the view open mixes two editors' cells.
+    m_Editor->GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(0) });
+    CPPUNIT_ASSERT_MESSAGE("The old editor's selection stays out of the map",
+                           !map->GetSelectedWindowIds().contains(CellId(0)));
+
+    other.GetArrangeMode()->SetSelectedWindowIds(QStringList{ QStringLiteral("other__widget1") });
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The bound editor's selection is mirrored",
+                                 std::string("other__widget1"),
+                                 map->GetSelectedWindowIds().join(QLatin1Char(',')).toStdString());
+    m_Widget->SetMultiWidget(m_Editor.get());
   }
 
   void SyncHighlight_CellsSharingSelectionAxis()
@@ -1149,7 +1175,7 @@ public:
     m_Editor->SetCellSelectionGroup(CellId(0), "sel");
     m_Editor->SetCellSelectionGroup(CellId(1), "sel");
 
-    QStringList members = m_Widget->CellsSharingAxis(QStringLiteral("sel"), QmitkMxNSyncAxis::Selection);
+    QStringList members = m_Editor->CellsSharingAxis(QStringLiteral("sel"), QmitkMxNSyncAxis::Selection);
     members.sort();
     QStringList expected{ CellId(0), CellId(1) };
     expected.sort();

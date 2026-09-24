@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <variant>
 #include <vector>
 
+class QmitkMxNArrangeMode;
 class QmitkRenderWindowProximity;
 class QDialog;
 class QLabel;
@@ -463,7 +464,8 @@ public:
   */
   void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis);
 
-  /** \brief Whether the sync peek is up. */
+  /** \brief Whether the hover peek is up. Arrange mode keeps the plates up on
+   *         its own and does not count here. */
   bool IsSyncPeekVisible() const;
 
   /** \brief The axis the sync peek emphasises, if any. */
@@ -500,6 +502,35 @@ public:
   *   pointer leaves, never by the gap in between.
   */
   void OnSyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis);
+
+  /**
+  * \brief This editor's arrange mode. While it is on, every visible cell that
+  *        can host a peek plate shows one, whatever the hover peek does: a
+  *        plate is up while arrange mode is on OR the hover peek is up, and
+  *        lowering the hover peek clears only its own term.
+  */
+  QmitkMxNArrangeMode* GetArrangeMode() const;
+
+  /**
+  * \brief Re-resolve the shared glyph box and re-raise the plates on the next
+  *        event-loop pass. Cells call this when they resize; requests within
+  *        one pass coalesce into one refresh.
+  */
+  void RequestSyncPeekRefresh();
+
+  /**
+  * \brief The window ids that share one synchronization: the members of
+  *        'group' on 'axis'. Empty for an unknown group, an axis the group
+  *        links for no cell, or a transient mid-layout-change state.
+  */
+  QStringList CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const;
+
+  /**
+  * \brief The group 'windowId' is on for 'axis' - the per-dimension link, or
+  *        the selection connector for the selection axis; empty when the cell
+  *        synchronizes nothing there.
+  */
+  std::string ResolveCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis) const;
 
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
@@ -658,12 +689,14 @@ public:
   void ShowLayoutLoadFeedback();
   void HideLayoutLoadFeedback();
 
-  /** \brief How a layout-editor request treats an editor that is already
-   *         visible: Toggle hides it, Show leaves it up. */
+  /** \brief How a layout-editor request treats the layout editor: Toggle
+   *         hides a visible one and shows a hidden one, Show only ever brings it
+   *         up, Hide only ever takes it down. */
   enum class LayoutEditorRequest
   {
     Toggle,
-    Show
+    Show,
+    Hide
   };
 
   /**
@@ -1458,6 +1491,9 @@ private:
   std::optional<QmitkMxNSyncAxis> m_SyncPeekAxis;
   std::optional<QmitkMxNSyncAxis> m_SyncPeekPendingAxis;
 
+  /** \brief The cell whose barcode the pointer was last on. */
+  QString m_SyncPeekHoverCell;
+
   /** \brief The pointer rest that raises the peek, and the window a pointer off
    *         the strip must survive before it lowers again. */
   QTimer* m_SyncPeekDwell = nullptr;
@@ -1465,8 +1501,15 @@ private:
   int m_SyncPeekDwellMs = 250;
   int m_SyncPeekGraceMs = 150;
 
-  /** \brief Lower the peek and forget any pending dwell. */
+  /** \brief Lower the hover peek and forget any pending dwell. */
   void LowerSyncPeek();
+
+  /** \brief Push the plate state - up while arrange mode or the hover peek is,
+   *         with the emphasis of whichever drives it - into every cell. */
+  void RefreshSyncPeekPlates();
+
+  QmitkMxNArrangeMode* m_ArrangeMode = nullptr;
+  bool m_SyncPeekRefreshPending = false;
 
   /**
   * \brief The border colour each cell's stylesheet was last set to.

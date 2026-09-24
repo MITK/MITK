@@ -52,6 +52,10 @@ mitkAddCustomModuleTest(QmitkMxNCellMapWidgetTest QmitkMxNCellMapWidgetTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNArrangeModeTest QmitkMxNArrangeModeTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNCellOverlayTest QmitkMxNCellOverlayTest
   -platform minimal
 )

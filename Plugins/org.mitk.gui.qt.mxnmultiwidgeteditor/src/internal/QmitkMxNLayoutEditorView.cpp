@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <QmitkAbstractMultiWidgetEditor.h>
 #include <QmitkButtonOverlayWidget.h>
 #include <QmitkIconTheme.h>
+#include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNMultiWidgetEditor.h>
@@ -36,6 +37,54 @@ found in the LICENSE file.
 #include <QVBoxLayout>
 
 const std::string QmitkMxNLayoutEditorView::VIEW_ID = "org.mitk.views.mxnlayouteditor";
+
+QmitkMxNLayoutEditorView::~QmitkMxNLayoutEditorView()
+{
+  // A view closed without a Hidden() first must not leave its editor arranging.
+  if (!m_ArrangedMultiWidget.isNull())
+  {
+    m_ArrangedMultiWidget->GetArrangeMode()->SetActive(false);
+  }
+}
+
+void QmitkMxNLayoutEditorView::Activated()
+{
+}
+
+void QmitkMxNLayoutEditorView::Deactivated()
+{
+}
+
+void QmitkMxNLayoutEditorView::Visible()
+{
+  m_Visible = true;
+  this->UpdateArrangeMode();
+}
+
+void QmitkMxNLayoutEditorView::Hidden()
+{
+  m_Visible = false;
+  this->UpdateArrangeMode();
+}
+
+void QmitkMxNLayoutEditorView::UpdateArrangeMode()
+{
+  QmitkMxNMultiWidget* target =
+    m_Visible && nullptr != m_LayoutEditorWidget ? m_LayoutEditorWidget->GetMultiWidget() : nullptr;
+  if (m_ArrangedMultiWidget.data() == target)
+  {
+    return;
+  }
+  if (!m_ArrangedMultiWidget.isNull())
+  {
+    m_ArrangedMultiWidget->GetArrangeMode()->SetActive(false);
+  }
+  m_ArrangedMultiWidget = target;
+  if (nullptr != target)
+  {
+    target->GetArrangeMode()->SetActive(true);
+  }
+}
 
 void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
 {
@@ -124,6 +173,7 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
 
   this->DisconnectLayoutControls();
   m_LayoutEditorWidget->SetMultiWidget(multiWidget);
+  this->UpdateArrangeMode();
   if (nullptr != m_NoDisplayOverlay)
   {
     m_NoDisplayOverlay->setVisible(nullptr == multiWidget);
@@ -257,6 +307,7 @@ void QmitkMxNLayoutEditorView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
   {
     this->DisconnectLayoutControls();
     m_LayoutEditorWidget->SetMultiWidget(nullptr);
+    this->UpdateArrangeMode();
   }
 }
 

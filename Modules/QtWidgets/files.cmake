@@ -3,7 +3,6 @@ set(H_FILES
   QmitkCustomVariants.h
   QmitkDataStorageInspectorProviderBase.h
   QmitkEnums.h
-  QmitkMxNGroupJoinMode.h
   QmitkMxNSyncDimension.h
 )
 
@@ -70,8 +69,10 @@ set(CPP_FILES
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
   QmitkMxNCellMapWidget.cpp
+  QmitkMxNArrangeMode.cpp
   QmitkMxNAxisGlyph.cpp
   QmitkMxNCellOverlay.cpp
+  QmitkMxNGroupJoinMode.cpp
   QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNMultiWidget.cpp
   QmitkMxNSyncBarcodeWidget.cpp

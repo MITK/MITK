@@ -241,14 +241,6 @@ public:
   bool HasNonTrivialSyncConfig() const;
 
   /**
-   * \brief The window ids that share one synchronization: the members of 'group'
-   *        on 'axis'. Empty for an unknown group, an axis the group links for no
-   *        cell, or a transient mid-layout-change state. Read-only; public so the
-   *        hover highlight resolution is testable headlessly.
-   */
-  QStringList CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const;
-
-  /**
    * \brief Sync-highlight-on-hover. Resolve the cells sharing (group, axis) and
    *        ring them in the cell map; ClearSyncHighlight removes the highlight.
    *        HighlightGroupAxis is driven by a group card's glyph hover;

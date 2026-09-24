@@ -62,17 +62,6 @@ class MITKQTWIDGETS_EXPORT QmitkMxNCellMapWidget : public QWidget
 
 public:
 
-  static const char* CellsMimeType;
-  static const char* GroupMimeType;
-  static const char* AskModeMimeType;
-
-  /** \brief One entry of the join-mode menu a right-button drop offers. */
-  struct JoinModeEntry
-  {
-    QmitkMxNGroupJoinMode mode;
-    QString label;
-  };
-
   explicit QmitkMxNCellMapWidget(QWidget* parent = nullptr);
   ~QmitkMxNCellMapWidget() override;
 
@@ -107,29 +96,6 @@ public:
 
   /** \brief The currently sync-highlighted window ids (for tests). */
   QStringList GetHighlightedWindowIds() const;
-
-  /** \brief The join mode a drop's keyboard modifiers request: Alt =
-   *         MergeOverwriteCollisions, Shift = FillEmpty, none = Replace (the
-   *         default). Read at drop time (on release), not at drag initiation, so a
-   *         modifier held while starting a drag from a group card has no effect on
-   *         the mode. Shared by both drop targets (this map and the editor's group
-   *         cards) so the modifier meaning is identical everywhere. */
-  static QmitkMxNGroupJoinMode JoinModeFromModifiers(Qt::KeyboardModifiers modifiers);
-
-  /** \brief The join modes a right-button drop offers, in menu order. The single
-   *         source of the offered set, so both drop targets present the same one. */
-  static std::vector<JoinModeEntry> JoinModeMenuEntries();
-
-  /** \brief The join mode a drop asks for: a drag carrying AskModeMimeType (one
-   *         started with the right button) pops the menu at 'globalPosition' and
-   *         yields the chosen mode, or nothing when the user dismisses it; any
-   *         other drag reads its modifiers. The modifier path stays available
-   *         during a right-button drag, so the two never need to agree.
-   *         Shared by both drop targets so the gesture means the same everywhere. */
-  static std::optional<QmitkMxNGroupJoinMode> ResolveJoinMode(const QMimeData* mimeData,
-                                                              Qt::KeyboardModifiers modifiers,
-                                                              QWidget* parent,
-                                                              const QPoint& globalPosition);
 
 Q_SIGNALS:
 

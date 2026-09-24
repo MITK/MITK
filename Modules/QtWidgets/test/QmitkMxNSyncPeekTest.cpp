@@ -12,11 +12,13 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNAxisGlyph.h>
 #include <QmitkMxNCellOverlay.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkImageGenerator.h>
@@ -100,6 +102,14 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Gesture_LayoutChangeLowersThePeek);
   MITK_TEST(Gesture_AddingACellLowersThePeek);
   MITK_TEST(Gesture_CleanViewLowersThePeek);
+  MITK_TEST(Arrange_PlatesAreUpWhileArranging);
+  MITK_TEST(Arrange_StripGraceExpiryKeepsThePlates);
+  MITK_TEST(Arrange_LayoutChangesKeepThePlatesAndReachNewCells);
+  MITK_TEST(Arrange_MaximizeAndCleanViewKeepThePlate);
+  MITK_TEST(Arrange_ResizingTheCellsChangesTheSharedBox);
+  MITK_TEST(Arrange_LeavingLowersEveryPlateAtOnce);
+  MITK_TEST(Arrange_StripLeavingClearsOnlyItsOwnEmphasis);
+  MITK_TEST(Arrange_StripHoverRingsTheCellsSharingItsAxis);
   MITK_TEST(Glyph_LargeRenderIsNotAnUpscaledResource);
   MITK_TEST(Glyph_RepeatedRenderIsServedFromTheCache);
   MITK_TEST(Glyph_StickerRingsTheGlyphWhiteOutsideDarkInside);
@@ -884,6 +894,141 @@ public:
     m_Editor->SetCleanView(true);
     CPPUNIT_ASSERT(!m_Editor->IsSyncPeekVisible());
     m_Editor->SetCleanView(false);
+  }
+
+  // ---------- Arrange mode ----------
+
+  /** Every registered cell's overlay reports its plate up (or down). */
+  bool AllPlates(bool up) const
+  {
+    for (const auto& [windowId, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      auto* overlay = cell->findChild<QmitkMxNCellOverlay*>();
+      if (nullptr == overlay || overlay->IsSyncPeekVisible() != up)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void Arrange_PlatesAreUpWhileArranging()
+  {
+    this->Arrange(1, 2);
+    CPPUNIT_ASSERT_MESSAGE("Without arrange mode or a hover there is no plate", this->AllPlates(false));
+
+    m_Editor->GetArrangeMode()->SetActive(true);
+    CPPUNIT_ASSERT_MESSAGE("Arrange mode raises every plate without any dwell", this->AllPlates(true));
+    CPPUNIT_ASSERT_MESSAGE("Arrange mode is not the hover peek", !m_Editor->IsSyncPeekVisible());
+  }
+
+  void Arrange_StripGraceExpiryKeepsThePlates()
+  {
+    this->Arrange(1, 2);
+    m_Editor->GetArrangeMode()->SetActive(true);
+
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT(PeekAxis(QmitkMxNSyncAxis::Slice) == this->Overlay(1)->SyncPeekAxis());
+
+    m_Editor->OnSyncPeekHovered(false, std::nullopt);
+    Pump();  // the grace is zero here, so its expiry has run
+    CPPUNIT_ASSERT_MESSAGE("Leaving the strip lowers only the hover term", this->AllPlates(true));
+    CPPUNIT_ASSERT_MESSAGE("...and drops the emphasis the strip set",
+                           !this->Overlay(1)->SyncPeekAxis().has_value());
+  }
+
+  void Arrange_LayoutChangesKeepThePlatesAndReachNewCells()
+  {
+    this->Arrange(1, 2);
+    m_Editor->GetArrangeMode()->SetActive(true);
+
+    this->Arrange(1, 3);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("A rebuilt layout comes back with plates", this->AllPlates(true));
+
+    m_Editor->AddGridRow();
+    Pump();
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("A cell added while arranging shows its plate like the others",
+                           this->AllPlates(true));
+  }
+
+  void Arrange_MaximizeAndCleanViewKeepThePlate()
+  {
+    this->Arrange(1, 2);
+    m_Editor->GetArrangeMode()->SetActive(true);
+
+    m_Editor->SetMaximizedCell(CellId(0));
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("The visible cell keeps its plate while maximized",
+                           this->Overlay(0)->IsSyncPeekVisible());
+    m_Editor->SetMaximizedCell(QString());
+    Pump();
+
+    m_Editor->SetCleanView(true);
+    CPPUNIT_ASSERT_MESSAGE("Clean view does not lower an arranging plate", this->AllPlates(true));
+    m_Editor->SetCleanView(false);
+  }
+
+  void Arrange_ResizingTheCellsChangesTheSharedBox()
+  {
+    this->Arrange(1, 2);
+    m_Editor->GetArrangeMode()->SetActive(true);
+    const int wide = this->Overlay(0)->SyncPeekGlyphBox();
+    CPPUNIT_ASSERT(wide > 0);
+
+    // The view appearing beside the editor narrows it; the plates must follow.
+    m_Editor->resize(EditorWidth * 2 / 3, EditorHeight * 2 / 3);
+    Pump();
+    Pump();
+    const int narrow = this->Overlay(0)->SyncPeekGlyphBox();
+    CPPUNIT_ASSERT_MESSAGE("A smaller editor gets a smaller shared box", narrow < wide);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every plate shares the re-resolved box",
+                                 narrow, this->Overlay(1)->SyncPeekGlyphBox());
+  }
+
+  void Arrange_LeavingLowersEveryPlateAtOnce()
+  {
+    this->Arrange(1, 2);
+    m_Editor->GetArrangeMode()->SetActive(true);
+    CPPUNIT_ASSERT(this->AllPlates(true));
+
+    m_Editor->GetArrangeMode()->SetActive(false);
+    CPPUNIT_ASSERT_MESSAGE("Leaving arrange mode lowers every plate synchronously", this->AllPlates(false));
+  }
+
+  void Arrange_StripLeavingClearsOnlyItsOwnEmphasis()
+  {
+    this->Arrange(1, 2);
+    auto* arrangeMode = m_Editor->GetArrangeMode();
+    arrangeMode->SetActive(true);
+
+    m_Editor->OnSyncPeekHovered(true, QmitkMxNSyncAxis::Slice);
+    // Another surface takes over the emphasis before the strip's grace runs out.
+    arrangeMode->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Editor, QmitkMxNSyncAxis::Zoom,
+                              QStringList(), QColor());
+    m_Editor->OnSyncPeekHovered(false, std::nullopt);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("The strip's leave must not clear another surface's emphasis",
+                           PeekAxis(QmitkMxNSyncAxis::Zoom) == this->Overlay(0)->SyncPeekAxis());
+  }
+
+  void Arrange_StripHoverRingsTheCellsSharingItsAxis()
+  {
+    this->Arrange(1, 3);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "sliceGroup");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "sliceGroup");
+    auto* arrangeMode = m_Editor->GetArrangeMode();
+    arrangeMode->SetActive(true);
+
+    auto* strip = m_Editor->GetRenderWindowWidget(CellId(2))->GetUtilityWidget();
+    emit strip->SyncPeekHovered(true, QmitkMxNSyncAxis::Slice);
+
+    QStringList ringed = arrangeMode->GetHighlightedWindowIds();
+    ringed.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The strip rings every cell sharing its cell's synchronization",
+                                 (CellId(0) + QLatin1Char(',') + CellId(2)).toStdString(),
+                                 ringed.join(QLatin1Char(',')).toStdString());
   }
 
   // ---------- The barcode's report ----------

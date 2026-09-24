@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <vtkType.h>
 
 #include <QColor>
+#include <QEvent>
 #include <QImage>
 #include <QPointer>
 #include <QRect>
@@ -256,6 +257,15 @@ public:
   qreal PeekProgress() const;
   void SetPeekProgress(qreal progress);
 
+  /** \brief The peek plate's rect in overlay coordinates, invalid while the
+   *         plate is down. Exposed for verification. */
+  QRect SyncPeekPlateRect() const;
+
+  /** \brief The plate's close button in overlay coordinates: valid only in
+   *         arrange mode while the pointer is on this cell's plate. Exposed
+   *         for verification. */
+  QRect PlateCloseButtonRect() const;
+
 protected:
 
   void paintEvent(QPaintEvent* event) override;
@@ -269,6 +279,9 @@ protected:
 
   /** \brief Clears the hovered element when the pointer leaves the furniture. */
   void leaveEvent(QEvent* event) override;
+
+  /** \brief A resize in arrange mode re-resolves the layout's shared glyph box. */
+  void resizeEvent(QResizeEvent* event) override;
 
 private:
 
@@ -403,17 +416,45 @@ private:
    */
   void UpdateInteractivity();
 
-  /** \brief The peek plate's rect in overlay coordinates, invalid while the
-   *         peek is down. */
-  QRect SyncPeekPlateRect() const;
-
   /**
    * \brief Paint the sync peek plate over the image. Deliberately not routed
    *        through QmitkMxNSyncBarcodeWidget::PaintInto: that renderer lays out
-   *        a uniform grid, while the plate scales and displaces per glyph. The
+   *        a uniform grid, while the plate enlarges one glyph in place. The
    *        artwork stays shared through QmitkMxNRenderAxisGlyph.
    */
   void PaintSyncPeek(QPainter& painter);
+
+  bool IsArranging() const;
+
+  /**
+  * \brief Arrange-mode input on the plate, from wherever it arrives: the render
+  *        window's event filter while the overlay is mouse-transparent, the
+  *        overlay's own handlers while other furniture makes it take input and
+  *        the plate is in its mask. Returns whether the event was consumed.
+  *
+  *   Presses that start on the plate are taken, with the moves and the release
+  *   that follow them; a press anywhere else passes through untouched, and so
+  *   does every button-less move - those only update which glyph is pointed at.
+  */
+  bool HandlePlateInput(QEvent::Type type, QMouseEvent* event, const QPoint& position);
+
+  /** \brief The slot of the plate glyph under 'position' (overlay coordinates):
+   *         the pumped glyph first, as it lies over its neighbours, then the
+   *         resting ones; -1 over no glyph. */
+  int PlateGlyphAt(const QPoint& position) const;
+
+  /** \brief Track the pointer on the plate: which glyph it points at (latched
+   *         across the gaps) and whether it is on the plate at all. */
+  void UpdatePlateHover(const QPoint& position);
+  void ClearPlateHover();
+
+  /** \brief Group drags onto the cell in arrange mode; every other drag is
+   *         left to propagate as if the cell accepted none. */
+  bool HandleCellDrag(QEvent* event);
+
+  /** \brief The ring around a cell that shares the pointed-at synchronization,
+   *         inside the render window so the stylesheet frame stays visible. */
+  QRect ArrangeRingRect() const;
 
   /** \brief Coalesce VTK render-end notifications into one refresh per cycle. */
   void ScheduleValueRefresh();
@@ -504,6 +545,16 @@ private:
   bool m_NavigatorExpanded = false;
   int m_NavDragRow = -1;                    // index into NavigatorRows() while dragging
   QPoint m_RightPressPosition;              // context-menu drag suppression
+
+  // Arrange mode on the plate: a press that started there (and may grow into a
+  // drag), the pointer's stay on the plate with its latched glyph, and a group
+  // drag hovering the cell.
+  bool m_PlatePressActive = false;
+  bool m_PlateDragArmed = false;
+  QPoint m_PlatePressPosition;
+  bool m_PlateHovered = false;
+  int m_PlateHoverAxis = -1;
+  bool m_DropTarget = false;
 
 };
 

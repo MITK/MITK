@@ -15,15 +15,18 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
+#include <mitkILifecycleAwarePart.h>
 #include <mitkIRenderWindowPartListener.h>
 
 #include <QMetaObject>
+#include <QPointer>
 
 #include <vector>
 
 class QCheckBox;
 class QmitkButtonOverlayWidget;
 class QmitkMxNLayoutEditorWidget;
+class QmitkMxNMultiWidget;
 
 /**
  * \brief Dockable Workbench view hosting the MxN layout editor.
@@ -33,8 +36,15 @@ class QmitkMxNLayoutEditorWidget;
  * wires its multi widget into the hosted widget, and connects the embedded
  * layout-shape controls to the editor part (the same wiring the former
  * toolbar popup had), keeping the BlueBerry dependency out of the module.
+ *
+ * While the view is visible, the editor it is bound to is in arrange mode: the
+ * render windows' peek plates stay up for selecting cells and assigning them
+ * to groups. Following the view's visibility rather than a toggle of its own
+ * keeps it one concept - the view is how the user arranges.
  */
-class QmitkMxNLayoutEditorView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
+class QmitkMxNLayoutEditorView : public QmitkAbstractView,
+                                 public mitk::IRenderWindowPartListener,
+                                 public mitk::ILifecycleAwarePart
 {
   Q_OBJECT
 
@@ -42,8 +52,15 @@ public:
 
   static const std::string VIEW_ID;
 
+  ~QmitkMxNLayoutEditorView() override;
+
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
 protected:
 
@@ -56,6 +73,10 @@ private:
   void OpenMxNDisplay();
 
   void DisconnectLayoutControls();
+
+  /** \brief Put the bound editor in arrange mode exactly while the view is
+   *         visible, and take a previously arranged one out of it. */
+  void UpdateArrangeMode();
 
   /** \brief Ask the user before a layout change discards a non-trivial
    *         synchronization configuration; returns true to proceed. No prompt
@@ -76,6 +97,13 @@ private:
   /** \brief Per-attachment connections of the layout-shape controls to the
    *         active editor part; dropped on part deactivation. */
   std::vector<QMetaObject::Connection> m_LayoutConnections;
+
+  /** \brief Tracked here: the view is bound (RenderWindowPartActivated) before
+   *         BlueBerry first reports it visible. */
+  bool m_Visible = false;
+
+  /** \brief The editor currently in arrange mode on this view's behalf. */
+  QPointer<QmitkMxNMultiWidget> m_ArrangedMultiWidget;
 
 };
 

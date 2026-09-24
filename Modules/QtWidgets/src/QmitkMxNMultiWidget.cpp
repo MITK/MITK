@@ -31,6 +31,7 @@ found in the LICENSE file.
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
+#include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellOverlay.h>
 #include <QmitkRenderWindowProximity.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
@@ -460,6 +461,22 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
   connect(this, &QmitkMxNMultiWidget::MaximizedCellChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
   connect(this, &QmitkMxNMultiWidget::CleanViewChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+
+  m_ArrangeMode = new QmitkMxNArrangeMode(this);
+  connect(m_ArrangeMode, &QmitkMxNArrangeMode::ActiveChanged, this, [this](bool active)
+  {
+    if (!active)
+    {
+      m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Plate);
+      m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Strip);
+      m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Editor);
+    }
+    this->RefreshSyncPeekPlates();
+  });
+  connect(m_ArrangeMode, &QmitkMxNArrangeMode::HighlightChanged,
+          this, &QmitkMxNMultiWidget::RefreshSyncPeekPlates);
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged,
+          m_ArrangeMode, &QmitkMxNArrangeMode::PruneToExistingCells);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -1139,8 +1156,17 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   // Pointing at an axis in one cell's barcode asks a question about the whole
   // layout, so the strip only reports and the editor answers in every cell.
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncPeekHovered,
-          this, &QmitkMxNMultiWidget::OnSyncPeekHovered);
+  // The strip also says whose barcode it is, so arrange mode can ring the
+  // cells sharing that cell's synchronization on the pointed-at axis.
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncPeekHovered, this,
+          [this, id](bool overStrip, std::optional<QmitkMxNSyncAxis> axis)
+          {
+            if (overStrip)
+            {
+              m_SyncPeekHoverCell = id;
+            }
+            this->OnSyncPeekHovered(overStrip, axis);
+          });
 
   // The Synchronize macro covers every cell of the editor, including cells
   // created while it is active - not only those present at toggle time.
@@ -3994,7 +4020,67 @@ void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAx
   m_SyncPeekVisible = visible;
   m_SyncPeekAxis = visible ? axis : std::nullopt;
 
-  const int box = visible ? this->ResolvePeekGlyphBox() : 0;
+  // In arrange mode the plates are already up, so the strip only moves the
+  // emphasis - through the arrange mode, which arbitrates between the strip
+  // and the other surfaces that point at an axis.
+  if (m_SyncPeekVisible)
+  {
+    QStringList partners;
+    QColor hue;
+    if (m_SyncPeekAxis.has_value() && !m_SyncPeekHoverCell.isEmpty())
+    {
+      const std::string group = this->ResolveCellAxisGroup(m_SyncPeekHoverCell, *m_SyncPeekAxis);
+      if (!group.empty())
+      {
+        try
+        {
+          hue = this->GetSyncGroupColor(group);
+          partners = this->CellsSharingAxis(QString::fromStdString(group), *m_SyncPeekAxis);
+        }
+        catch (const mitk::Exception&)
+        {
+          hue = QColor();
+        }
+      }
+    }
+    m_ArrangeMode->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Strip, m_SyncPeekAxis,
+                                partners, hue);
+  }
+  else
+  {
+    m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Strip);
+  }
+  this->RefreshSyncPeekPlates();
+}
+
+QmitkMxNArrangeMode* QmitkMxNMultiWidget::GetArrangeMode() const
+{
+  return m_ArrangeMode;
+}
+
+void QmitkMxNMultiWidget::RequestSyncPeekRefresh()
+{
+  // Only arrange mode keeps plates up across a resize; the hover peek is torn
+  // down by the layout changes that resize cells.
+  if (m_SyncPeekRefreshPending || nullptr == m_ArrangeMode || !m_ArrangeMode->IsActive())
+  {
+    return;
+  }
+  m_SyncPeekRefreshPending = true;
+  QTimer::singleShot(0, this, [this]()
+  {
+    m_SyncPeekRefreshPending = false;
+    this->RefreshSyncPeekPlates();
+  });
+}
+
+void QmitkMxNMultiWidget::RefreshSyncPeekPlates()
+{
+  const bool arranging = nullptr != m_ArrangeMode && m_ArrangeMode->IsActive();
+  const bool up = arranging || m_SyncPeekVisible;
+  const auto axis = arranging ? m_ArrangeMode->GetHighlightAxis() : m_SyncPeekAxis;
+
+  const int box = up ? this->ResolvePeekGlyphBox() : 0;
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
     auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
@@ -4007,7 +4093,7 @@ void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAx
     // reaches every cell, or one hidden while the peek was up would come back
     // still showing it.
     const bool hosts = box > 0 && renderWindowWidget->isVisible();
-    cellOverlay->SetSyncPeek(hosts, m_SyncPeekAxis, hosts ? box : 0);
+    cellOverlay->SetSyncPeek(hosts, axis, hosts ? box : 0);
   }
 }
 
@@ -4029,10 +4115,13 @@ void QmitkMxNMultiWidget::SetSyncPeekTimings(int dwellMs, int graceMs)
 
 void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis)
 {
+  // With arrange mode on the plates are up already, so there is nothing for a
+  // dwell to guard: the strip answers at once, like a peek that is up.
+  const bool platesUp = m_SyncPeekVisible || m_ArrangeMode->IsActive();
   if (overStrip)
   {
     m_SyncPeekGrace->stop();
-    if (m_SyncPeekVisible)
+    if (platesUp)
     {
       // Once the peek is up the user is comparing axes; a per-axis delay there
       // would feel sluggish. The dwell guards only the first engagement.
@@ -4064,7 +4153,7 @@ void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, std::optional<QmitkM
   // The pointer left the strip. A short grace covers a clipped corner on the way
   // along it and the crossing from one cell's strip to another's, where Qt sends
   // the leave before the enter.
-  if (m_SyncPeekVisible)
+  if (platesUp)
   {
     m_SyncPeekGrace->start(m_SyncPeekGraceMs);
     return;
@@ -4079,6 +4168,64 @@ void QmitkMxNMultiWidget::LowerSyncPeek()
   m_SyncPeekGrace->stop();
   m_SyncPeekPendingAxis.reset();
   this->SetSyncPeek(false, std::nullopt);
+}
+
+QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const
+{
+  QStringList result;
+  const auto groupId = group.toStdString();
+  const auto dimension = QmitkMxNSyncAxisDimension(axis);
+  try
+  {
+    for (const auto& info : this->GetSyncGroupInfos())
+    {
+      if (info.id != groupId)
+      {
+        continue;
+      }
+      if (!dimension.has_value())
+      {
+        for (const auto& windowId : info.selectionMembers)
+        {
+          result.append(windowId);
+        }
+      }
+      else
+      {
+        // 'members' is keyed only for dimensions some cell links, so a missing
+        // key is the common "nobody links this axis" case, not an error.
+        const auto it = info.members.find(*dimension);
+        if (it != info.members.end())
+        {
+          for (const auto& windowId : it->second)
+          {
+            result.append(windowId);
+          }
+        }
+      }
+      break;
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    result.clear();  // transient mid-layout-change state
+  }
+  return result;
+}
+
+std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis) const
+{
+  // Selection is single-valued per cell and lives on the connector, not in the
+  // per-dimension links.
+  if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
+  {
+    return this->GetCellSelectionGroup(windowId);
+  }
+  else if (const auto link = this->GetSyncLink(windowId, *dimension))
+  {
+    return link->group;
+  }
+  return std::string();
 }
 
 QString QmitkMxNMultiWidget::CellLabel(const QString& windowId) const

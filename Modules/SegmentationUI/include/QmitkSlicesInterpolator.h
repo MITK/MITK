@@ -206,15 +206,6 @@ protected slots:
    */
   void OnSurfaceInterpolationFinished();
 
-  /** \brief Starts the timer that periodically triggers interpolation updates. */
-  void StartUpdateInterpolationTimer();
-
-  /** \brief Stops the interpolation update timer. */
-  void StopUpdateInterpolationTimer();
-
-  /** \brief Updates the surface color to match the active label color. */
-  void ChangeSurfaceColor();
-
 protected:
 
   typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;
@@ -273,6 +264,14 @@ private:
    */
   void Start3DInterpolation();
 
+  /**
+   * \brief Marks the shown surface as about to be replaced by the running interpolation.
+   *
+   * A pending surface pulses (see the "pulsing" property of mitk::SurfaceVtkMapper3D), for
+   * which the 3D windows are kept rendering until it is no longer pending.
+   */
+  void SetSurfacePending(bool pending);
+
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -323,7 +322,7 @@ private:
   QFuture<void> m_ModifyFuture;
   QFutureWatcher<void> m_ModifyWatcher;
 
-  QTimer *m_Timer;
+  QTimer *m_PulseTimer;
 
   QFuture<void> m_PlaneFuture;
   QFutureWatcher<void> m_PlaneWatcher;

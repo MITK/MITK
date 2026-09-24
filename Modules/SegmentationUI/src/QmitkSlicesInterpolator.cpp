@@ -238,11 +238,16 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   // For running 3D Interpolation in background
   // create a QFuture and a QFutureWatcher
 
-  connect(&m_Watcher, SIGNAL(started()), this, SLOT(StartUpdateInterpolationTimer()));
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
-  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
-  m_Timer = new QTimer(this);
-  connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
+
+  // Keeps the 3D windows rendering at about 60 frames per second while the shown surface
+  // pulses, see SetSurfacePending().
+  m_PulseTimer = new QTimer(this);
+  m_PulseTimer->setInterval(16);
+  connect(m_PulseTimer, &QTimer::timeout, this, []()
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+    });
 }
 
 void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
@@ -414,7 +419,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   m_SurfaceInterpolator->SetCurrentInterpolationSession(nullptr);
 
-  delete m_Timer;
+  delete m_PulseTimer;
 }
 
 /**
@@ -750,6 +755,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   if (!m_3DInterpolationEnabled)
   {
     m_Rerun3DInterpolation = false;
+    this->SetSurfacePending(false);
     return;
   }
 
@@ -759,6 +765,8 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     this->Start3DInterpolation();
     return;
   }
+
+  this->SetSurfacePending(false);
 
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
@@ -777,6 +785,12 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     {
       m_BtnApply3D->setEnabled(true);;
 
+      auto activeLabel = segmentation->GetActiveLabel();
+      if (nullptr != activeLabel)
+      {
+        m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(activeLabel->GetColor()));
+      }
+
       m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
       this->Show3DInterpolationResult(true);
 
@@ -788,6 +802,9 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     else
     {
       m_BtnApply3D->setEnabled(false);
+
+      // The surface of the previous run stayed on display while this one ran.
+      m_InterpolatedSurfaceNode->SetData(nullptr);
 
       if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
       {
@@ -1345,7 +1362,13 @@ void QmitkSlicesInterpolator::Start3DInterpolation()
     return;
   }
 
-  m_InterpolatedSurfaceNode->SetData(nullptr);
+  // The surface of the previous run stays on display, pulsing, until this one has finished.
+  // A change of the label or the time point, to which it would not belong, has removed it.
+  if (m_InterpolatedSurfaceNode->GetData() != nullptr)
+    this->SetSurfacePending(true);
+
+  // Accepting now would write the outdated surface.
+  m_BtnApply3D->setEnabled(false);
 
   if (m_Watcher.isRunning())
   {
@@ -1379,42 +1402,22 @@ void QmitkSlicesInterpolator::Start3DInterpolation()
   m_Watcher.setFuture(m_Future);
 }
 
-void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
+void QmitkSlicesInterpolator::SetSurfacePending(bool pending)
 {
-  m_Timer->start(500);
-}
+  m_InterpolatedSurfaceNode->SetBoolProperty("pulsing", pending);
 
-void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
-{
-  if(m_ToolManager)
+  if (pending)
   {
-    const auto* workingNode = m_ToolManager->GetWorkingData(0);
-    if (nullptr != workingNode)
-    {
-      auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
-      if (nullptr != segmentation)
-      {
-        auto activeLabel = segmentation->GetActiveLabel();
-        if (nullptr != activeLabel)
-        {
-          m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(activeLabel->GetColor()));
-        }
-      }
-    }
+    if (!m_PulseTimer->isActive())
+      m_PulseTimer->start();
   }
+  else if (m_PulseTimer->isActive())
+  {
+    m_PulseTimer->stop();
 
-  m_Timer->stop();
-}
-
-void QmitkSlicesInterpolator::ChangeSurfaceColor()
-{
-  float currentColor[3];
-  m_InterpolatedSurfaceNode->GetColor(currentColor);
-
-    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
-  m_InterpolatedSurfaceNode->Update();
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+    // Once more, to show the surface without the pulse.
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+  }
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)

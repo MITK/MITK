@@ -88,6 +88,9 @@ namespace mitk
      * The task's result, if any, is discarded (fire-and-forget). Ordering relative
      * to other posted tasks follows the dispatch thread's own queue semantics.
      *
+     * The task is destroyed on the dispatch thread, so whatever it captures is
+     * released there too.
+     *
      * \pre task must not be empty.
      */
     virtual void Post(std::function<void()> task) = 0;
@@ -164,6 +167,27 @@ namespace mitk
    * \param[in] task The operation to run.
    */
   MITKCORE_EXPORT void RunWhereTheDataLives(const std::function<void()> &task);
+
+  /**
+   * \brief Queue a task to run later on the thread that owns the data storage.
+   *
+   * Returns at once, for work that must not wait for the owning thread, such
+   * as a worker telling it that a result is ready. The task never runs inline,
+   * not even when this is the owning thread.
+   *
+   * What the task captures is released on the owning thread as well, which
+   * lets a worker hand back objects that must not be released anywhere else.
+   * That holds only for the task passed in: pass a temporary or move it in,
+   * since a copy the caller keeps is released wherever the caller drops it.
+   *
+   * The dispatcher is resolved on every call, as in DispatchToStorageThread().
+   *
+   * \param[in] task The operation to run on the owning thread.
+   * \return True if the task was queued. False if there is no thread to queue
+   *         it to, as in a command line tool or a test; the task is then
+   *         discarded here without having run.
+   */
+  MITKCORE_EXPORT bool PostToStorageThread(std::function<void()> task);
 
   /**
    * \brief Warn when data the storage thread reads is built somewhere else.

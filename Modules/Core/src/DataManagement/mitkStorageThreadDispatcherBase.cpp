@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <exception>
+#include <utility>
 
 bool mitk::DispatchToStorageThread(const std::function<void()> &task)
 {
@@ -55,6 +56,22 @@ void mitk::RunWhereTheDataLives(const std::function<void()> &task)
 {
   if (!DispatchToStorageThread(task))
     task();
+}
+
+bool mitk::PostToStorageThread(std::function<void()> task)
+{
+  CoreServicePointer<IDataStorageService> service(CoreServices::GetDataStorageService());
+
+  auto *dispatcher = service
+    ? service->GetDispatcher()
+    : nullptr;
+
+  if (nullptr == dispatcher)
+    return false;
+
+  dispatcher->Post(std::move(task));
+
+  return true;
 }
 
 void mitk::WarnIfOffStorageThread(const char *what)

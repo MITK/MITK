@@ -200,6 +200,9 @@ class mitkStorageThreadDispatcherTestSuite : public mitk::TestFixture
   MITK_TEST(TouchingDataOnTheOwningThread_IsNotReported_Success);
   MITK_TEST(TouchingDataOffTheOwningThread_IsReported_Success);
   MITK_TEST(WithoutAnOwningThread_NothingIsReported_Success);
+  MITK_TEST(PostOnTheOwningThread_RunsLater_Success);
+  MITK_TEST(PostFromAnotherThread_RunsAndIsReleasedOnTheOwningThread_Success);
+  MITK_TEST(PostWithoutAnOwningThread_IsRefused_Success);
   MITK_TEST(ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success);
   CPPUNIT_TEST_SUITE_END();
 
@@ -342,6 +345,69 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Warning without an owning thread would be noise",
                                  0,
                                  capture.CountContaining("Building something"));
+  }
+
+  void PostOnTheOwningThread_RunsLater_Success()
+  {
+    auto ran = false;
+
+    CPPUNIT_ASSERT_MESSAGE("There has to be a thread to queue to",
+                           mitk::PostToStorageThread([&ran]() { ran = true; }));
+
+    // Unlike a hand-over, which runs at once when it already is on the owning
+    // thread. Callers post to get out of whatever they are in first.
+    CPPUNIT_ASSERT_MESSAGE("A posted task must not run inline", !ran);
+
+    m_Dispatcher->Drain();
+
+    CPPUNIT_ASSERT_MESSAGE("A posted task has to run once the owning thread gets to it", ran);
+  }
+
+  void PostFromAnotherThread_RunsAndIsReleasedOnTheOwningThread_Success()
+  {
+    const auto owningThread = std::this_thread::get_id();
+
+    auto queued = false;
+    std::thread::id ranOn;
+    std::thread::id releasedOn;
+
+    std::thread worker([&queued, &ranOn, &releasedOn]()
+      {
+        // Stands in for what a worker hands back because it must not be
+        // released anywhere else, such as an image that observers watch.
+        std::shared_ptr<int> held(new int(0), [&releasedOn](int* value)
+          {
+            releasedOn = std::this_thread::get_id();
+            delete value;
+          });
+
+        queued = mitk::PostToStorageThread([&ranOn, held = std::move(held)]()
+          {
+            ranOn = std::this_thread::get_id();
+          });
+      });
+
+    worker.join();
+    m_Dispatcher->Drain();
+
+    CPPUNIT_ASSERT_MESSAGE("There has to be a thread to queue to", queued);
+    CPPUNIT_ASSERT_MESSAGE("A posted task has to run on the owning thread", ranOn == owningThread);
+    CPPUNIT_ASSERT_MESSAGE("What a posted task holds has to be released on the owning thread",
+                           releasedOn == owningThread);
+  }
+
+  void PostWithoutAnOwningThread_IsRefused_Success()
+  {
+    m_Service->SetDispatcher(nullptr);
+
+    auto ran = false;
+
+    CPPUNIT_ASSERT_MESSAGE("There is nothing to queue to",
+                           !mitk::PostToStorageThread([&ran]() { ran = true; }));
+
+    // Running it here instead would re-enter a caller that relies on having
+    // returned first.
+    CPPUNIT_ASSERT_MESSAGE("A task that could not be queued must not run", !ran);
   }
 
   void ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success()

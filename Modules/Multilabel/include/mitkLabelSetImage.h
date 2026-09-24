@@ -612,8 +612,17 @@ namespace mitk
     itk::ModifiedTimeType GetMTime() const override;
 
     /**
-      * \brief  */
-    void UpdateCenterOfMass(LabelValueType pixelValue);
+     * \brief Computes the center of mass of a label at a time step and stores it in the label.
+     *
+     * The result is available through Label::GetCenterOfMassIndex() and
+     * Label::GetCenterOfMassCoordinates(). If the label has no pixels at the time step, the
+     * stored center of mass is reset. For static segmentations, the computation is skipped
+     * while the stored center of mass is newer than the group image of the label.
+     * \param pixelValue Value of the label. Nothing happens if no such label exists.
+     * \param timeStep Time step whose pixels are considered.
+     * \exception mitk::Exception if the time step is invalid.
+     */
+    void UpdateCenterOfMass(LabelValueType pixelValue, TimeStepType timeStep);
 
     using BaseData::IsEmpty;
 
@@ -682,9 +691,6 @@ namespace mitk
     void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
 
     LabelValueType m_ActiveLabelValue;
-
-    template <typename ImageType>
-    void CalculateCenterOfMassProcessing(ImageType* input, LabelValueType index);
 
     template <typename ImageType>
     void EraseLabelProcessing(ImageType* input, LabelValueType index);

@@ -1880,14 +1880,18 @@ namespace
     mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
   {
     static_assert(sizeof(mitk::Label::PixelType) <= 2, "The lookup table must cover every pixel value.");
-    std::vector<bool> overwritable(std::numeric_limits<mitk::Label::PixelType>::max() + 1);
 
-    for (std::size_t value = 0; value < overwritable.size(); ++value)
-    {
-      overwritable[value] = IsOverwritable(static_cast<mitk::Label::PixelType>(value), destinationLabels,
-        destinationBackground, destinationBackgroundLocked, overwriteStyle);
-    }
+    // Filled like IsOverwritable() decides, without a label lookup per value: values of unknown labels count as
+    // unlocked, and the background takes precedence over a label with the same value.
+    std::vector<bool> overwritable(std::numeric_limits<mitk::Label::PixelType>::max() + 1, true);
 
+    if (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == overwriteStyle)
+      return overwritable;
+
+    for (const auto& [value, label] : destinationLabels)
+      overwritable[value] = !label->GetLocked();
+
+    overwritable[destinationBackground] = !destinationBackgroundLocked;
     return overwritable;
   }
 }

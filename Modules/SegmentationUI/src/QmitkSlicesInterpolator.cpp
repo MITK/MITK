@@ -51,6 +51,9 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
 
+#include <mitkMultiLabelSegmentationVtkMapper3D.h>
+#include <mitkVectorProperty.h>
+
 #include <QCheckBox>
 #include <QCursor>
 #include <QMenu>
@@ -64,6 +67,7 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 
 #include <array>
+#include <utility>
 #include <vector>
 
 namespace
@@ -91,6 +95,45 @@ namespace
     if (!details.isEmpty())
       errorInfo.setInformativeText(details);
     errorInfo.exec();
+  }
+
+  // Runs a function however the scope is left, exceptions included.
+  template <typename Function>
+  class ScopeExit
+  {
+  public:
+    explicit ScopeExit(Function function)
+      : m_Function(std::move(function))
+    {
+    }
+
+    ~ScopeExit()
+    {
+      m_Function();
+    }
+
+    ScopeExit(const ScopeExit&) = delete;
+    ScopeExit& operator=(const ScopeExit&) = delete;
+
+  private:
+    Function m_Function;
+  };
+
+  // Emptied rather than removed, so that the 3D mapper notices the change.
+  void SetLabelsHiddenIn3D(mitk::DataNode* node, const std::vector<int>& labelValues)
+  {
+    const auto* propertyName = mitk::MultiLabelSegmentationVtkMapper3D::PROPERTY_NAME_3D_HIDDEN_LABELS();
+
+    if (auto* property = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName)))
+    {
+      property->SetValue(labelValues);
+    }
+    else if (!labelValues.empty())
+    {
+      auto newProperty = mitk::IntVectorProperty::New();
+      newProperty->SetValue(labelValues);
+      node->SetProperty(propertyName, newProperty);
+    }
   }
 }
 
@@ -412,6 +455,8 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
       m_DataStorage->Remove(m_InterpolatedSurfaceNode);
   }
 
+  this->UpdateLabelHiddenIn3D();
+
   // remove observer
   m_Interpolator->RemoveObserver(InterpolationAbortedObserverTag);
   m_Interpolator->RemoveObserver(InterpolationInfoChangedObserverTag);
@@ -558,6 +603,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_FeedbackNode->SetData(nullptr);
     this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
     m_InterpolatedSurfaceNode->SetData(nullptr);
+    this->UpdateLabelHiddenIn3D();
     m_BtnReinit3DInterpolation->setEnabled(false);
     m_CmbInterpolation->setCurrentIndex(0);
     return;
@@ -596,6 +642,7 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object *sender, const itk::Even
     if (m_3DInterpolationEnabled)
     {
       m_InterpolatedSurfaceNode->SetData(nullptr);
+      this->UpdateLabelHiddenIn3D();
     }
     m_SurfaceInterpolator->Modified();
   }
@@ -747,6 +794,16 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
+  // However this is left, exceptions included: the surface stops pulsing unless a rerun has
+  // started, and its label is hidden in 3D exactly while the surface is shown.
+  const ScopeExit settle([this]()
+    {
+      if (!m_Watcher.isRunning())
+        this->SetSurfacePending(false);
+
+      this->UpdateLabelHiddenIn3D();
+    });
+
   // Only once no run is left, as the next one may already have started.
   if (!m_Watcher.isRunning())
     m_InterpolatingSegmentation = nullptr;
@@ -755,7 +812,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   if (!m_3DInterpolationEnabled)
   {
     m_Rerun3DInterpolation = false;
-    this->SetSurfacePending(false);
     return;
   }
 
@@ -765,8 +821,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     this->Start3DInterpolation();
     return;
   }
-
-  this->SetSurfacePending(false);
 
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
@@ -1420,6 +1474,34 @@ void QmitkSlicesInterpolator::SetSurfacePending(bool pending)
   }
 }
 
+void QmitkSlicesInterpolator::UpdateLabelHiddenIn3D()
+{
+  const bool surfaceShown = m_InterpolatedSurfaceNode->GetData() != nullptr &&
+    m_InterpolatedSurfaceNode->IsVisible(nullptr) &&
+    m_DataStorage.IsNotNull() && m_DataStorage->Exists(m_InterpolatedSurfaceNode);
+
+  auto* workingNode = surfaceShown && m_ToolManager.IsNotNull()
+    ? m_ToolManager->GetWorkingData(0)
+    : nullptr;
+
+  if (m_NodeWithLabelHiddenIn3D != workingNode)
+    this->RevealLabelIn3D();
+
+  if (nullptr != workingNode)
+  {
+    SetLabelsHiddenIn3D(workingNode, { static_cast<int>(m_CurrentActiveLabelValue) });
+    m_NodeWithLabelHiddenIn3D = workingNode;
+  }
+}
+
+void QmitkSlicesInterpolator::RevealLabelIn3D()
+{
+  if (const auto node = m_NodeWithLabelHiddenIn3D.Lock(); node.IsNotNull())
+    SetLabelsHiddenIn3D(node, {});
+
+  m_NodeWithLabelHiddenIn3D = nullptr;
+}
+
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
 {
   m_3DInterpolationEnabled = on;
@@ -1506,7 +1588,10 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
 void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 {
   if (m_InterpolatedSurfaceNode.IsNotNull())
+  {
     m_InterpolatedSurfaceNode->SetVisibility(status);
+    this->UpdateLabelHiddenIn3D();
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -1515,6 +1600,7 @@ void QmitkSlicesInterpolator::OnActiveLabelChanged(mitk::Label::PixelType)
 {
   m_FeedbackNode->SetData(nullptr);
   m_InterpolatedSurfaceNode->SetData(nullptr);
+  this->UpdateLabelHiddenIn3D();
 
   if (m_3DInterpolationEnabled)
   {
@@ -1583,6 +1669,11 @@ void QmitkSlicesInterpolator::WaitForFutures()
 
 void QmitkSlicesInterpolator::NodeRemoved(const mitk::DataNode* node)
 {
+  // Removed from outside, the surface would leave its label hidden in 3D with nothing in its
+  // place, and a removed segmentation could come back with the label hidden.
+  if (node == m_InterpolatedSurfaceNode || m_NodeWithLabelHiddenIn3D == node)
+    this->RevealLabelIn3D();
+
   if ((m_ToolManager && m_ToolManager->GetWorkingData(0) == node) ||
       node == m_FeedbackNode ||
       node == m_InterpolatedSurfaceNode)

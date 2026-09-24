@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkSurfaceInterpolationController.h>
 #include <mitkToolManager.h>
+#include <mitkWeakPointer.h>
 #include <MitkSegmentationUIExports.h>
 
 #include <QWidget>
@@ -272,6 +273,18 @@ private:
    */
   void SetSurfacePending(bool pending);
 
+  /**
+   * \brief Hides the interpolated label in the 3D windows while its interpolated surface is shown.
+   *
+   * The contours drawn for the interpolation would only cut through the surface there. Called
+   * wherever the surface is shown, hidden or cleared; it works out the state on its own. It
+   * requests no render, as it also runs from the destructor; the callers do.
+   */
+  void UpdateLabelHiddenIn3D();
+
+  /** \brief Shows the label hidden by UpdateLabelHiddenIn3D() in 3D again, if any. */
+  void RevealLabelIn3D();
+
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -297,6 +310,9 @@ private:
 
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
+
+  // Where UpdateLabelHiddenIn3D() hid a label last, which need not be the working data any more.
+  mitk::WeakPointer<mitk::DataNode> m_NodeWithLabelHiddenIn3D;
 
   mitk::MultiLabelSegmentation *m_Segmentation;
 

@@ -81,14 +81,15 @@ namespace mitk
     /**
       \brief Interpolates every slice along an image axis that has something to interpolate.
 
-      Gives the results Interpolate() gives for each slice, computed gap by gap from the segmentation as it is when the
-      call starts. The consumer may therefore write each result into its slice of the segmentation, for instance to
-      accept all interpolations.
+      Computes the interpolations gap by gap from the segmentation as it is when the call starts. The consumer may
+      therefore write each result into its slice of the segmentation, for instance to accept all interpolations.
 
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slices.
       \param plane The plane of any slice along that axis. Each result is sampled on it, moved to its slice.
       \param timeStep Which time step to use.
-      \param consumer Called in ascending slice order with the index of a slice and its interpolation.
+      \param consumer Called in ascending slice order with the index of a slice and its interpolation: a 2D image
+             with 1 inside the interpolated shape and 0 elsewhere, which covers only the part of the slice that the
+             shape can reach and is placed there by its geometry.
 
       \throw SegmentationInterpolationException if the enclosing slices of a gap cannot be combined.
     */
@@ -132,6 +133,9 @@ namespace mitk
       Image::Pointer LowerCrop;
       Image::Pointer UpperCrop;
 
+      /** The geometry of a 2D image covering the crop in the lower slice. Null if the crops are. */
+      PlaneGeometry::ConstPointer LowerCropGeometry;
+
       ShapeBasedInterpolationAlgorithm::Pointer Algorithm;
     };
 
@@ -150,10 +154,10 @@ namespace mitk
                                               const PlaneGeometry *currentPlane,
                                               unsigned int timeStep);
 
-    Image::Pointer InterpolateBetween(const EnclosingSlices &enclosingSlices,
-                                      unsigned int sliceIndex,
-                                      const PlaneGeometry *slicePlane,
-                                      unsigned int timeStep) const;
+    /** Interpolates the crop of the enclosing slices in a slice between them. Its geometry places it in that slice. */
+    Image::Pointer InterpolateCrop(const EnclosingSlices &enclosingSlices,
+                                   unsigned int sliceIndex,
+                                   unsigned int timeStep) const;
 
     Image::ConstPointer m_Segmentation;
     Label::PixelType m_LabelValue;

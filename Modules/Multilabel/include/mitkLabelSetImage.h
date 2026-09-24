@@ -918,9 +918,9 @@ namespace mitk
   with a given value, at a specific time step. Voxels are overwritten following the same rules as
   TransferLabelContentAtTimeStep() with MultiLabelSegmentation::MergeStyle::Merge; all other voxels keep their values.
   Only the voxels under the slice are processed, so no image of the size of the destination is needed.
-  \param slice 2D image whose pixels lie on voxel centers of the destination image, one pixel per voxel, like a slice
-  that mitk::ExtractSliceFilter extracts from the destination image along one of its axes. Pixels outside of the
-  destination image are skipped.
+  \param slice 2D image whose pixels lie on voxel centers of the destination image, one pixel per voxel, like a slice,
+  or a region of one, that mitk::ExtractSliceFilter extracts from the destination image along one of its axes. Pixels
+  outside of the destination image are skipped.
   \param destinationImage Pointer to the image that should be used as destination for the transfer.
   \param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unknown pixel
   values in the destinationImage will be assumed to be unlocked.

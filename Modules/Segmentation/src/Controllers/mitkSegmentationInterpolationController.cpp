@@ -232,6 +232,32 @@ namespace
     return mitk::GrabItkImageMemory(crop);
   }
 
+  /** The geometry of a 2D image that covers a region of the slice, with its pixels where they lie in the slice. */
+  mitk::PlaneGeometry::Pointer CreateCropGeometry(const mitk::Image* slice,
+                                                  const std::array<std::size_t, 2>& cropBegin,
+                                                  const std::array<std::size_t, 2>& cropSize)
+  {
+    auto cropGeometry = slice->GetSlicedGeometry()->GetPlaneGeometry(0)->Clone();
+
+    mitk::Point3D cropBeginInSlice;
+    cropBeginInSlice[0] = static_cast<mitk::ScalarType>(cropBegin[0]);
+    cropBeginInSlice[1] = static_cast<mitk::ScalarType>(cropBegin[1]);
+    cropBeginInSlice[2] = 0.0;
+
+    mitk::Point3D origin;
+    slice->GetGeometry()->IndexToWorld(cropBeginInSlice, origin);
+    cropGeometry->SetOrigin(origin);
+
+    mitk::BoundingBox::BoundsArrayType bounds;
+    bounds[0] = bounds[2] = bounds[4] = 0.0;
+    bounds[1] = static_cast<mitk::ScalarType>(cropSize[0]);
+    bounds[3] = static_cast<mitk::ScalarType>(cropSize[1]);
+    bounds[5] = 1.0;
+    cropGeometry->SetBounds(bounds);
+
+    return cropGeometry;
+  }
+
   void PasteCrop(const mitk::Image* crop, const std::array<std::size_t, 2>& cropBegin, mitk::Image* slice)
   {
     mitk::ImagePixelReadAccessor<LabelPixelType, 2> cropAccessor(crop);
@@ -342,6 +368,8 @@ mitk::SegmentationInterpolationController::EnclosingSlices mitk::SegmentationInt
       CreateBinaryCrop(lowerSlice, m_LabelValue, enclosingSlices.CropBegin, enclosingSlices.CropSize);
     enclosingSlices.UpperCrop =
       CreateBinaryCrop(upperSlice, m_LabelValue, enclosingSlices.CropBegin, enclosingSlices.CropSize);
+    enclosingSlices.LowerCropGeometry =
+      CreateCropGeometry(lowerSlice, enclosingSlices.CropBegin, enclosingSlices.CropSize);
   }
 
   return enclosingSlices;
@@ -372,24 +400,21 @@ const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::Segmenta
   return *m_EnclosingSlices;
 }
 
-mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateBetween(const EnclosingSlices &enclosingSlices,
-                                                                                   unsigned int sliceIndex,
-                                                                                   const PlaneGeometry *slicePlane,
-                                                                                   unsigned int timeStep) const
+mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateCrop(const EnclosingSlices &enclosingSlices,
+                                                                                unsigned int sliceIndex,
+                                                                                unsigned int timeStep) const
 {
   if (enclosingSlices.LowerCrop.IsNull())
     return nullptr;
 
-  auto result = CreateEmptySlice(m_Segmentation, slicePlane, timeStep);
+  const auto cropGeometry = MovePlaneToSlice(enclosingSlices.LowerCropGeometry,
+                                             m_Segmentation->GetGeometry(timeStep),
+                                             enclosingSlices.SliceDimension,
+                                             sliceIndex);
 
-  if (result->GetDimension(0) != enclosingSlices.SliceSize[0] || result->GetDimension(1) != enclosingSlices.SliceSize[1])
-  {
-    mitkThrowException(SegmentationInterpolationException)
-      << "The regions of the slices for the 2D interpolation are not equally sized.";
-  }
-
-  auto resultCrop = CreateCropImage(enclosingSlices.CropSize, result->GetGeometry()->GetSpacing());
-  auto resultCropImage = GrabItkImageMemory(resultCrop);
+  // The algorithm writes every pixel, and only the size of the crop matters to it, not its geometry.
+  auto crop = Image::New();
+  crop->Initialize(MakeScalarPixelType<LabelPixelType>(), 1, *cropGeometry);
 
   enclosingSlices.Algorithm->Interpolate(enclosingSlices.LowerCrop,
                                          enclosingSlices.LowerIndex,
@@ -397,12 +422,11 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateBetwe
                                          enclosingSlices.UpperIndex,
                                          sliceIndex,
                                          enclosingSlices.SliceDimension,
-                                         resultCropImage,
+                                         crop,
                                          timeStep,
                                          nullptr);
 
-  PasteCrop(resultCropImage, enclosingSlices.CropBegin, result);
-  return result;
+  return crop;
 }
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
@@ -433,7 +457,21 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   const auto upperIndex = static_cast<unsigned int>(upper - counts.begin());
 
   const auto &enclosingSlices = this->GetEnclosingSlices(sliceDimension, lowerIndex, upperIndex, currentPlane, timeStep);
-  return this->InterpolateBetween(enclosingSlices, sliceIndex, currentPlane, timeStep);
+  const auto crop = this->InterpolateCrop(enclosingSlices, sliceIndex, timeStep);
+
+  if (crop.IsNull())
+    return nullptr;
+
+  auto result = CreateEmptySlice(m_Segmentation, currentPlane, timeStep);
+
+  if (result->GetDimension(0) != enclosingSlices.SliceSize[0] || result->GetDimension(1) != enclosingSlices.SliceSize[1])
+  {
+    mitkThrowException(SegmentationInterpolationException)
+      << "The regions of the slices for the 2D interpolation are not equally sized.";
+  }
+
+  PasteCrop(crop, enclosingSlices.CropBegin, result);
+  return result;
 }
 
 void mitk::SegmentationInterpolationController::InterpolateAll(
@@ -450,7 +488,6 @@ void mitk::SegmentationInterpolationController::InterpolateAll(
 
   // Copied, so that the gaps stay those of the segmentation as it was when the call started.
   const auto counts = this->GetSliceCounts(timeStep)[sliceDimension];
-  const auto *imageGeometry = m_Segmentation->GetGeometry(timeStep);
 
   std::optional<unsigned int> lowerIndex;
 
@@ -465,8 +502,7 @@ void mitk::SegmentationInterpolationController::InterpolateAll(
 
       for (auto sliceIndex = *lowerIndex + 1; sliceIndex < upperIndex; ++sliceIndex)
       {
-        const auto slicePlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, sliceIndex);
-        const auto interpolation = this->InterpolateBetween(enclosingSlices, sliceIndex, slicePlane, timeStep);
+        const auto interpolation = this->InterpolateCrop(enclosingSlices, sliceIndex, timeStep);
 
         if (interpolation.IsNotNull())
           consumer(sliceIndex, interpolation);

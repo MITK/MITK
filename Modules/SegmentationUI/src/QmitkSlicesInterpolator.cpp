@@ -445,6 +445,9 @@ for (auto* slicer : m_ControllerToSliceObserverTag.keys())
 
 QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 {
+  // Before anything below could make the segmentation call back into this widget.
+  m_LabelRemovedObserver.Reset();
+
   if (m_Initialized)
   {
     // remove old observers
@@ -603,9 +606,23 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_ToolManager->GetWorkingData(0)->GetData());
     m_CurrentActiveLabelValue = 0;
     m_BtnReinit3DInterpolation->setEnabled(true);
+
+    if (nullptr != m_Segmentation)
+    {
+      m_LabelRemovedObserver.Reset(m_Segmentation, mitk::LabelRemovedEvent(), [this](const itk::EventObject& event)
+        {
+          this->OnLabelRemoved(event);
+        });
+    }
+    else
+    {
+      m_LabelRemovedObserver.Reset();
+    }
   }
   else
   {
+    m_LabelRemovedObserver.Reset();
+
     // If no workingdata is set, remove the interpolation feedback
     this->GetDataStorage()->Remove(m_FeedbackNode);
     m_FeedbackNode->SetData(nullptr);
@@ -841,7 +858,10 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
       MITK_ERROR << "OnSurfaceInterpolationFinished triggered with no MultiLabelSegmentation as working data.";
       return;
     }
-    mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult(segmentation, m_CurrentActiveLabelValue, segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
+    // The label may have been removed while the run was going on.
+    mitk::Surface::Pointer interpolatedSurface = segmentation->ExistLabel(m_CurrentActiveLabelValue)
+      ? m_SurfaceInterpolator->GetInterpolationResult(segmentation, m_CurrentActiveLabelValue, segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint))
+      : nullptr;
 
     if (interpolatedSurface.IsNotNull())
     {
@@ -1229,6 +1249,10 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
   activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
 
+  // The result is part of the label now. Kept, the surface would be shown again whenever the
+  // interpolation controls are re-enabled.
+  m_InterpolatedSurfaceNode->SetData(nullptr);
+  m_BtnApply3D->setEnabled(false);
   this->Show3DInterpolationResult(false);
 
   std::string name = "3D-interpolation - " + activeLabelName;
@@ -1515,6 +1539,24 @@ void QmitkSlicesInterpolator::RevealLabelIn3D()
     SetLabelsHiddenIn3D(node, {});
 
   m_NodeWithLabelHiddenIn3D = nullptr;
+}
+
+void QmitkSlicesInterpolator::OnLabelRemoved(const itk::EventObject& event)
+{
+  const auto* removedEvent = dynamic_cast<const mitk::LabelRemovedEvent*>(&event);
+
+  if (nullptr == removedEvent || removedEvent->GetLabelValue() != m_CurrentActiveLabelValue)
+    return;
+
+  m_CurrentActiveLabelValue = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
+
+  m_FeedbackNode->SetData(nullptr);
+  m_InterpolatedSurfaceNode->SetData(nullptr);
+  m_BtnApply3D->setEnabled(false);
+  this->SetSurfacePending(false);
+  this->UpdateLabelHiddenIn3D();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)

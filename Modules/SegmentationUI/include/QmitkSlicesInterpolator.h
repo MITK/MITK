@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkSurfaceInterpolationController.h>
+#include <mitkITKEventObserverGuard.h>
 #include <mitkToolManager.h>
 #include <mitkWeakPointer.h>
 #include <MitkSegmentationUIExports.h>
@@ -285,6 +286,14 @@ private:
   /** \brief Shows the label hidden by UpdateLabelHiddenIn3D() in 3D again, if any. */
   void RevealLabelIn3D();
 
+  /**
+   * \brief Forgets the interpolated label when it is removed from the segmentation.
+   *
+   * A label added later may get the same value. It then counts as a new label, which clears
+   * what was shown for the removed one instead of showing it again.
+   */
+  void OnLabelRemoved(const itk::EventObject& event);
+
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -313,6 +322,9 @@ private:
 
   // Where UpdateLabelHiddenIn3D() hid a label last, which need not be the working data any more.
   mitk::WeakPointer<mitk::DataNode> m_NodeWithLabelHiddenIn3D;
+
+  // Calls OnLabelRemoved() for the working segmentation.
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
 
   mitk::MultiLabelSegmentation *m_Segmentation;
 

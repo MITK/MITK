@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
+#include <itkMultiThreaderBase.h>
+
 #include <lz4.h>
 
 #include <algorithm>
@@ -63,37 +65,37 @@ void mitk::CompressedImageContainer::CompressImage(const Image* image)
   const auto numSlices = image->GetDimension(2);
   const auto numSliceBytes = image->GetPixelType().GetSize() * image->GetDimension(0) * image->GetDimension(1);
 
-  m_CompressedImageData.reserve(numTimeSteps);
+  m_CompressedImageData.resize(numTimeSteps);
+
+  auto threader = itk::MultiThreaderBase::New();
 
   for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
   {
-    CompressedTimeStepData slices;
-    slices.reserve(numSlices);
+    auto& slices = m_CompressedImageData[t];
+    slices.resize(numSlices, { 0, nullptr });
 
     ImageReadAccessor accessor(image, image->GetVolumeData(t));
+    const auto* volume = reinterpret_cast<const char*>(accessor.GetData());
 
-    for (std::remove_const_t<decltype(numSlices)> s = 0; s < numSlices; ++s)
-    {
-      const auto* src = reinterpret_cast<const char*>(accessor.GetData()) + numSliceBytes * s;
-      char* dest = new char[numSliceBytes];
-      const auto destSize = LZ4_compress_default(src, dest, static_cast<int>(numSliceBytes), static_cast<int>(numSliceBytes));
-
-      if (0 == destSize)
+    threader->ParallelizeArray(0, numSlices, [&](itk::SizeValueType s)
       {
-        MITK_ERROR << "LZ4 compression failed!";
-        delete[] dest;
-        slices.emplace_back(0, nullptr);
-      }
-      else
-      {
-        char* shrinkedDest = new char[destSize];
-        std::copy(dest, dest + destSize, shrinkedDest);
-        delete[] dest;
-        slices.emplace_back(destSize, shrinkedDest);
-      }
-    }
+        const auto* src = volume + numSliceBytes * s;
+        char* dest = new char[numSliceBytes];
+        const auto destSize = LZ4_compress_default(src, dest, static_cast<int>(numSliceBytes), static_cast<int>(numSliceBytes));
 
-    m_CompressedImageData.push_back(slices);
+        if (0 == destSize)
+        {
+          MITK_ERROR << "LZ4 compression failed!";
+          delete[] dest;
+        }
+        else
+        {
+          char* shrinkedDest = new char[destSize];
+          std::copy(dest, dest + destSize, shrinkedDest);
+          delete[] dest;
+          slices[s] = { destSize, shrinkedDest };
+        }
+      }, nullptr);
   }
 }
 
@@ -115,19 +117,22 @@ mitk::Image::Pointer mitk::CompressedImageContainer::DecompressImage() const
   auto image = Image::New();
   image->Initialize(*m_PixelType, m_Dimension, dimensions.data());
 
+  auto threader = itk::MultiThreaderBase::New();
+
   for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
   {
     ImageWriteAccessor accessor(image, image->GetVolumeData(static_cast<int>(t)));
+    auto* volume = reinterpret_cast<char*>(accessor.GetData());
 
-    for (std::remove_const_t<decltype(numSlices)> s = 0; s < numSlices; ++s)
-    {
-      auto* dest = reinterpret_cast<char*>(accessor.GetData()) + numSliceBytes * s;
-      const auto& slice = m_CompressedImageData[t][s];
-      const auto destSize = LZ4_decompress_safe(slice.second, dest, slice.first, static_cast<int>(numSliceBytes));
+    threader->ParallelizeArray(0, numSlices, [&](itk::SizeValueType s)
+      {
+        auto* dest = volume + numSliceBytes * s;
+        const auto& slice = m_CompressedImageData[t][s];
+        const auto destSize = LZ4_decompress_safe(slice.second, dest, slice.first, static_cast<int>(numSliceBytes));
 
-      if (0 > destSize)
-        MITK_ERROR << "LZ4 decompression failed!";
-    }
+        if (0 > destSize)
+          MITK_ERROR << "LZ4 decompression failed!";
+      }, nullptr);
   }
 
   image->SetTimeGeometry(m_TimeGeometry->Clone());

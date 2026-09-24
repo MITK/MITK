@@ -198,9 +198,6 @@ protected slots:
   /** \brief Called when the "show position markers" checkbox is toggled. */
   void OnShowMarkers(bool);
 
-  /** \brief Triggers 3D surface interpolation in a background thread. */
-  void Run3DInterpolation();
-
   /**
    * \brief Called when the surface interpolation thread completes.
    *
@@ -268,6 +265,14 @@ private:
   void WaitForFutures();
   void NodeRemoved(const mitk::DataNode* node);
 
+  /**
+   * \brief Starts the 3D surface interpolation on a worker thread.
+   *
+   * While an interpolation is running, the request is remembered instead, and the interpolation is started
+   * again once the running one has finished. The GUI thread never waits for it.
+   */
+  void Start3DInterpolation();
+
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -310,6 +315,10 @@ private:
 
   QFuture<void> m_Future;
   QFutureWatcher<void> m_Watcher;
+  bool m_Rerun3DInterpolation = false;
+
+  // Held here rather than by the worker, so that a segmentation removed during a run is destroyed on the GUI thread.
+  mitk::MultiLabelSegmentation::ConstPointer m_InterpolatingSegmentation;
 
   QFuture<void> m_ModifyFuture;
   QFutureWatcher<void> m_ModifyWatcher;

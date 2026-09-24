@@ -25,7 +25,6 @@ namespace mitk
   class ComputeContourSetNormalsFilter;
   class CreateDistanceImageFromSurfaceFilter;
   class MultiLabelSegmentation;
-  class ReduceContourSetFilter;
 
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
   {
@@ -89,6 +88,9 @@ namespace mitk
     /**
      * \brief Performs the interpolation.
      *
+     * Meant to run on a worker thread. The contours are copied when the call starts, so adding or removing
+     * contours meanwhile does not wait for the interpolation to finish. A result computed from contours that
+     * changed in the meantime is discarded, which leaves the next call to compute it again.
      */
     void Interpolate(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep);
 
@@ -230,11 +232,6 @@ namespace mitk
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue) const;
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep) const;
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const mitk::MultiLabelSegmentation* seg) const;
-
-    /**
-     * Adds Contours from the active Label to the interpolation pipeline
-     */
-    void AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * \brief Clears the interpolation data structures. Called from CompleteReinitialization().

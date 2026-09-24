@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkDataStorageService.h>
 #include <mitkExceptionMacro.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkImageWriteAccessor.h>
 #include <mitkLog.h>
 #include <mitkLogBackendBase.h>
 #include <mitkLogMessage.h>
@@ -26,6 +28,9 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceRegistration.h>
 
+#include <vtkPolyData.h>
+
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <deque>
@@ -195,6 +200,7 @@ class mitkStorageThreadDispatcherTestSuite : public mitk::TestFixture
   MITK_TEST(TouchingDataOnTheOwningThread_IsNotReported_Success);
   MITK_TEST(TouchingDataOffTheOwningThread_IsReported_Success);
   MITK_TEST(WithoutAnOwningThread_NothingIsReported_Success);
+  MITK_TEST(ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -336,6 +342,46 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Warning without an owning thread would be noise",
                                  0,
                                  capture.CountContaining("Building something"));
+  }
+
+  void ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success()
+  {
+    // A cube of ones in a volume of zeros, so that there is a surface to extract.
+    auto image = mitk::Image::New();
+    unsigned int dimensions[3] = { 10, 10, 10 };
+    image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, dimensions);
+
+    {
+      mitk::ImageWriteAccessor accessor(image);
+      auto* pixels = static_cast<unsigned char*>(accessor.GetData());
+      std::fill_n(pixels, 1000, static_cast<unsigned char>(0));
+
+      for (int z = 3; z < 7; ++z)
+        for (int y = 3; y < 7; ++y)
+          for (int x = 3; x < 7; ++x)
+            pixels[(z * 10 + y) * 10 + x] = 1;
+    }
+
+    LogCapture capture;
+
+    mitk::Surface::Pointer surface;
+
+    RunOnWorkerWhileDraining([&image, &surface]()
+      {
+        auto filter = mitk::ImageToSurfaceFilter::New();
+        filter->SetInput(image);
+        filter->SetThreshold(0.5);
+        filter->Update();
+
+        surface = filter->GetOutput();
+        surface->DisconnectPipeline();
+      });
+
+    CPPUNIT_ASSERT_MESSAGE("No surface was extracted", surface->GetVtkPolyData()->GetNumberOfPoints() > 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The filter built the representation that the mappers share",
+                                 0,
+                                 capture.CountContaining("Building the VTK representation"));
   }
 
 private:

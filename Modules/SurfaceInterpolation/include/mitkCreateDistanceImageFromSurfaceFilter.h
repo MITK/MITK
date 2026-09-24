@@ -110,7 +110,6 @@ namespace mitk
 
   private:
     void CreateSolutionMatrixAndFunctionValues();
-    double CalculateDistanceValue(PointType p);
 
     void FillDistanceImage();
 

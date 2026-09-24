@@ -11,19 +11,114 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkSurfaceToImageFilter.h>
+#include <mitkExceptionMacro.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkTimeHelper.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
 
-#include <vtkImageData.h>
-#include <vtkImageStencil.h>
-#include <vtkPointData.h>
+#include <itkMultiThreaderBase.h>
+
+#include <vtkImageStencilData.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataNormals.h>
 #include <vtkPolyDataToImageStencil.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
+
+#include <algorithm>
+#include <cmath>
+#include <limits>
+#include <optional>
+
+namespace
+{
+  template <typename TComponent>
+  void FillComponents(const mitk::PixelType&, char* data, std::size_t count, double value)
+  {
+    const auto clampedValue = std::clamp(value,
+      static_cast<double>(std::numeric_limits<TComponent>::lowest()),
+      static_cast<double>(std::numeric_limits<TComponent>::max()));
+
+    std::fill_n(reinterpret_cast<TComponent*>(data), count, static_cast<TComponent>(clampedValue));
+  }
+}
+
+void mitk::ForEachVoxelRunInsideSurface(const Surface* surface, TimeStepType surfaceTimeStep,
+  const Image* image, TimeStepType imageTimeStep, double tolerance,
+  const std::function<void(std::size_t x, std::size_t y, std::size_t z, std::size_t count)>& visitRun)
+{
+  if (nullptr == surface)
+    mitkThrow() << "Cannot rasterize surface. Passed surface is nullptr.";
+
+  if (nullptr == image)
+    mitkThrow() << "Cannot rasterize surface. Passed image is nullptr.";
+
+  if (!image->GetTimeGeometry()->IsValidTimeStep(imageTimeStep))
+    mitkThrow() << "Cannot rasterize surface. The image does not have time step " << imageTimeStep << ".";
+
+  auto* polyData = surface->GetVtkPolyData(static_cast<unsigned int>(surfaceTimeStep));
+
+  if (nullptr == polyData || 0 == polyData->GetNumberOfPoints())
+    return;
+
+  BaseGeometry::Pointer surfaceGeometry = surface->GetTimeGeometry()->GetGeometryForTimeStep(surfaceTimeStep);
+
+  if (surfaceGeometry.IsNull())
+    surfaceGeometry = surface->GetGeometry();
+
+  // Index coordinates put the voxel centers on integers, so a stencil with unit spacing and zero origin
+  // samples exactly the voxels of the image.
+  auto transform = vtkSmartPointer<vtkTransform>::New();
+  transform->PostMultiply();
+  transform->Concatenate(surfaceGeometry->GetVtkTransform()->GetMatrix());
+  transform->Concatenate(image->GetGeometry(static_cast<int>(imageTimeStep))->GetVtkTransform()->GetLinearInverse());
+
+  auto transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
+  transformFilter->SetInputData(polyData);
+  transformFilter->SetTransform(transform);
+  transformFilter->Update();
+
+  double bounds[6];
+  transformFilter->GetOutput()->GetBounds(bounds);
+
+  // One voxel of margin keeps voxels that the stencil tolerance includes just outside the bounds.
+  int extent[6];
+  for (int i = 0; i < 3; ++i)
+  {
+    const double first = std::max(0.0, std::ceil(bounds[2 * i]) - 1.0);
+    const double last = std::min(image->GetDimension(i) - 1.0, std::floor(bounds[2 * i + 1]) + 1.0);
+
+    if (first > last)
+      return;
+
+    extent[2 * i] = static_cast<int>(first);
+    extent[2 * i + 1] = static_cast<int>(last);
+  }
+
+  auto stencilSource = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+  stencilSource->SetInputConnection(transformFilter->GetOutputPort());
+  stencilSource->SetTolerance(tolerance);
+  stencilSource->SetOutputOrigin(0.0, 0.0, 0.0);
+  stencilSource->SetOutputSpacing(1.0, 1.0, 1.0);
+  stencilSource->SetOutputWholeExtent(extent);
+  stencilSource->Update();
+
+  auto* stencil = stencilSource->GetOutput();
+
+  itk::MultiThreaderBase::New()->ParallelizeArray(extent[4], extent[5] + 1, [&](itk::SizeValueType z)
+    {
+      for (int y = extent[2]; y <= extent[3]; ++y)
+      {
+        int iter = 0;
+        int first = 0;
+        int last = 0;
+
+        while (0 != stencil->GetNextExtent(first, last, extent[0], extent[1], y, static_cast<int>(z), iter))
+          visitRun(static_cast<std::size_t>(first), static_cast<std::size_t>(y), z, static_cast<std::size_t>(last - first + 1));
+      }
+    }, nullptr);
+}
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
   : m_MakeOutputBinary(false), m_UShortBinaryPixelType(false), m_BackgroundValue(-10000), m_Tolerance(0.0)
@@ -104,107 +199,45 @@ void mitk::SurfaceToImageFilter::GenerateData()
 
 void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 {
-  mitk::Image::Pointer output = this->GetOutput();
-  mitk::Image::Pointer binaryImage = mitk::Image::New();
+  auto* output = this->GetOutput();
+  const auto* image = this->GetImage();
 
-  unsigned int size = sizeof(unsigned char);
-  if (m_MakeOutputBinary)
-  {
-    if (m_UShortBinaryPixelType)
+  const auto& pixelType = output->GetPixelType();
+  const std::size_t pixelSize = pixelType.GetSize();
+  const std::size_t numComponents = pixelType.GetNumberOfComponents();
+  const std::size_t sizeX = output->GetDimension(0);
+  const std::size_t sizeY = output->GetDimension(1);
+  const std::size_t numPixels = sizeX * sizeY * output->GetDimension(2);
+
+  ImageWriteAccessor outputAccessor(output, output->GetVolumeData(time));
+  auto* outputData = static_cast<char*>(outputAccessor.GetData());
+
+  const double background = m_MakeOutputBinary ? 0.0 : m_BackgroundValue;
+  mitkPixelTypeMultiplex3(FillComponents, pixelType, outputData, numPixels * numComponents, background);
+
+  std::optional<ImageReadAccessor> inputAccessor;
+  if (!m_MakeOutputBinary)
+    inputAccessor.emplace(image, image->GetVolumeData(time));
+
+  const auto* inputData = inputAccessor.has_value() ? static_cast<const char*>(inputAccessor->GetData()) : nullptr;
+
+  const auto timePoint = image->GetTimeGeometry()->TimeStepToTimePoint(time);
+  const auto surfaceTimeStep = this->GetInput()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+  ForEachVoxelRunInsideSurface(this->GetInput(), surfaceTimeStep, output, time, m_Tolerance,
+    [&](std::size_t x, std::size_t y, std::size_t z, std::size_t count)
     {
-      binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned short>(), *this->GetImage()->GetTimeGeometry(), 1, 1);
-      size = sizeof(unsigned short);
-    }
-    else
-    {
-      binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeGeometry(), 1, 1);
-    }
-  }
-  else
-  {
-    binaryImage->Initialize(this->GetImage()->GetPixelType(), *this->GetImage()->GetTimeGeometry(), 1, 1);
-    size = this->GetImage()->GetPixelType().GetSize();
-  }
+      const auto offset = pixelSize * ((z * sizeY + y) * sizeX + x);
 
-  for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i)
-  {
-    size *= binaryImage->GetDimension(i);
-  }
-
-  mitk::ImageWriteAccessor accessor(binaryImage);
-  memset(accessor.GetData(), 1, size);
-
-  const mitk::TimeGeometry *surfaceTimeGeometry = GetInput()->GetTimeGeometry();
-  const mitk::TimeGeometry *imageTimeGeometry = GetImage()->GetTimeGeometry();
-
-  // Convert time step from image time-frame to surface time-frame
-  mitk::TimePointType matchingTimePoint = imageTimeGeometry->TimeStepToTimePoint(time);
-  mitk::TimeStepType surfaceTimeStep = surfaceTimeGeometry->TimePointToTimeStep(matchingTimePoint);
-
-  vtkPolyData *polydata = ((mitk::Surface *)GetInput())->GetVtkPolyData(surfaceTimeStep);
-  if (polydata)
-  {
-    vtkSmartPointer<vtkTransformFilter> move = vtkSmartPointer<vtkTransformFilter>::New();
-    move->SetInputData(polydata);
-    move->ReleaseDataFlagOn();
-
-    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-    BaseGeometry *geometry = surfaceTimeGeometry->GetGeometryForTimeStep(surfaceTimeStep);
-    if (!geometry)
-    {
-      geometry = GetInput()->GetGeometry();
-    }
-    transform->PostMultiply();
-    transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
-    // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
-    BaseGeometry *imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
-    transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
-    move->SetTransform(transform);
-
-    vtkSmartPointer<vtkPolyDataNormals> normalsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
-    normalsFilter->SetFeatureAngle(50);
-    normalsFilter->SetConsistency(1);
-    normalsFilter->SetSplitting(1);
-    normalsFilter->SetFlipNormals(0);
-    normalsFilter->ReleaseDataFlagOn();
-
-    normalsFilter->SetInputConnection(move->GetOutputPort());
-
-    vtkSmartPointer<vtkPolyDataToImageStencil> surfaceConverter = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-    surfaceConverter->SetTolerance(m_Tolerance);
-    surfaceConverter->ReleaseDataFlagOn();
-
-    surfaceConverter->SetInputConnection(normalsFilter->GetOutputPort());
-
-    vtkImageData *image = m_MakeOutputBinary ? binaryImage->GetVtkImageData() :
-                                               const_cast<mitk::Image *>(this->GetImage())->GetVtkImageData(time);
-
-    // fill the image with foreground voxels:
-    unsigned char inval = 1;
-    vtkIdType count = image->GetNumberOfPoints();
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      image->GetPointData()->GetScalars()->SetTuple1(i, inval);
-    }
-
-    // Create stencil and use numerical minimum of pixel type as background value
-    vtkSmartPointer<vtkImageStencil> stencil = vtkSmartPointer<vtkImageStencil>::New();
-    stencil->SetInputData(image);
-    stencil->ReverseStencilOff();
-    stencil->ReleaseDataFlagOn();
-    stencil->SetStencilConnection(surfaceConverter->GetOutputPort());
-
-    stencil->SetBackgroundValue(m_MakeOutputBinary ? 0 : m_BackgroundValue);
-    stencil->Update();
-
-    output->SetVolume(stencil->GetOutput()->GetScalarPointer(), time);
-    MITK_INFO << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
-  }
-  else
-  {
-    memset(accessor.GetData(), 0, size);
-    output->SetVolume(accessor.GetData(), time);
-  }
+      if (m_MakeOutputBinary)
+      {
+        mitkPixelTypeMultiplex3(FillComponents, pixelType, outputData + offset, count * numComponents, 1.0);
+      }
+      else
+      {
+        std::copy_n(inputData + offset, count * pixelSize, outputData + offset);
+      }
+    });
 }
 
 const mitk::Surface *mitk::SurfaceToImageFilter::GetInput(void)

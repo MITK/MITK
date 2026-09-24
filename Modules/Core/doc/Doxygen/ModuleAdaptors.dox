@@ -19,6 +19,11 @@ VTK-based access to MITK images is straightforward: simply ask your mitk::Image 
 \a vtkImageData by calling Image:GetVtkImageData. Similarly, to get a \a vtkPolyData
 from the MITK class for storing surfaces, mitk::Surface,  call Surface::GetVtkPolyData.
 
+The \a vtkImageData that Image::GetVtkImageData() returns is shared: every caller, the
+mappers included, gets the same object. Code that runs off the thread owning the data
+storage, or feeds the image into a VTK pipeline of its own, uses mitk::ImageVtkReadView
+instead, which wraps the same pixels in a \a vtkImageData of its own.
+
 \section MitkToItk MITK to ITK adaptors
 Pixel type and dimension of MITK images can be specified at run time whereas ITK images
 are templated over the pixel type and the dimension, thus in ITK both need to be specified

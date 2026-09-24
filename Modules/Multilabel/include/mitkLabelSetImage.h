@@ -890,6 +890,30 @@ namespace mitk
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
+  class Surface;
+
+  /**Helper function that assigns a label to all voxels of the destination image that lie inside a closed surface at a
+  specific time step. Voxels are overwritten following the same rules as TransferLabelContentAtTimeStep() with
+  MultiLabelSegmentation::MergeStyle::Merge; voxels outside the surface keep their values. Only the part of the image
+  covered by the bounding box of the surface is processed, so no image of the size of the destination is needed.
+  \param surface Closed surface. Its time step that covers the time point of timeStep is used.
+  \param destinationImage Pointer to the image that should be used as destination for the transfer.
+  \param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unknown pixel
+  values in the destinationImage will be assumed to be unlocked.
+  \param timeStep Time step of the destination image that should be altered.
+  \param newDestinationLabel Label that voxels inside the surface should become.
+  \param destinationBackground Value indicating the background in the destination image.
+  \param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
+  \param overwriteStyle indicates if label locks in the destination image should be regarded or not. For more details see
+  documentation of MultiLabelSegmentation::OverwriteStyle.
+  \pre surface, destinationImage and destinationLabelVector must be valid
+  \pre destinationImage must have the pixel type mitk::Label::PixelType and contain the indicated timeStep
+  \pre destinationLabelVector must contain newDestinationLabel.*/
+  MITKMULTILABEL_EXPORT void TransferSurfaceContentAtTimeStep(const Surface* surface, Image* destinationImage,
+    const mitk::ConstLabelVector& destinationLabelVector, const TimeStepType timeStep, Label::PixelType newDestinationLabel,
+    Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+    MultiLabelSegmentation::OverwriteStyle overwriteStyle);
+
 } // namespace mitk
 
 #endif

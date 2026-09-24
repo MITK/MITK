@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkSurfaceToImageFilter.h>
 
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImagePixelReadAccessor.h>
@@ -31,8 +33,10 @@ found in the LICENSE file.
 #include <itkMultiThreaderBase.h>
 
 #include <cstdint>
+#include <limits>
 #include <mutex>
 #include <optional>
+#include <vector>
 
 namespace mitk
 {
@@ -1850,6 +1854,24 @@ ConstLabelMapType ConvertLabelVectorToMap(const mitk::ConstLabelVector& labelV)
   return result;
 }
 
+namespace
+{
+  /** Tells whether a transfer may overwrite a destination pixel value. Values of unknown labels count as unlocked. */
+  bool IsOverwritable(mitk::Label::PixelType destinationValue, const ConstLabelMapType& destinationLabels,
+    mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+    mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+  {
+    if (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == overwriteStyle)
+      return true;
+
+    if (destinationValue == destinationBackground)
+      return !destinationBackgroundLocked;
+
+    const auto finding = destinationLabels.find(destinationValue);
+    return finding == destinationLabels.end() || !finding->second->GetLocked();
+  }
+}
+
 
 /** Functor class that implements the label transfer and is used in conjunction with the itk::BinaryFunctorImageFilter.
 * For details regarding the usage of the filter and the functor patterns, please see info of itk::BinaryFunctorImageFilter.
@@ -1907,27 +1929,10 @@ public:
   {
     if (existingSourceValue == this->m_SourceLabel)
     {
-      if (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == this->m_OverwriteStyle)
+      if (IsOverwritable(existingDestinationValue, this->m_DestinationLabels, this->m_DestinationBackground,
+        this->m_DestinationBackgroundLocked, this->m_OverwriteStyle))
       {
         return this->m_NewDestinationLabel;
-      }
-      else
-      {
-        if (existingDestinationValue == m_DestinationBackground)
-        {
-          if (!m_DestinationBackgroundLocked)
-          {
-            return this->m_NewDestinationLabel;
-          }
-        }
-        else
-        {
-          auto labelFinding = this->m_DestinationLabels.find(existingDestinationValue);
-          if (labelFinding==this->m_DestinationLabels.end() || !labelFinding->second->GetLocked())
-          {
-            return this->m_NewDestinationLabel;
-          }
-        }
       }
     }
     else if (mitk::MultiLabelSegmentation::MergeStyle::Replace == this->m_MergeStyle
@@ -2082,6 +2087,70 @@ void mitk::TransferLabelContent(
     TransferLabelContentAtTimeStep(sourceImage, destinationImage, destinationLabels, i, sourceBackground,
       destinationBackground, destinationBackgroundLocked, labelMapping, mergeStyle, overwriteStlye);
   }
+}
+
+void mitk::TransferSurfaceContentAtTimeStep(const Surface* surface, Image* destinationImage,
+  const mitk::ConstLabelVector& destinationLabelVector, const TimeStepType timeStep, Label::PixelType newDestinationLabel,
+  Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+  MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+{
+  if (nullptr == surface)
+  {
+    mitkThrow() << "Invalid call of TransferSurfaceContentAtTimeStep; surface must not be null.";
+  }
+  if (nullptr == destinationImage)
+  {
+    mitkThrow() << "Invalid call of TransferSurfaceContentAtTimeStep; destinationImage must not be null.";
+  }
+  if (destinationImage->GetPixelType() != MakeScalarPixelType<Label::PixelType>())
+  {
+    mitkThrow() << "Invalid call of TransferSurfaceContentAtTimeStep; destinationImage does not have the pixel type of labels.";
+  }
+  if (!destinationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))
+  {
+    mitkThrow() << "Invalid call of TransferSurfaceContentAtTimeStep; destinationImage does not have the requested time step: " << timeStep;
+  }
+
+  const auto destinationLabels = ConvertLabelVectorToMap(destinationLabelVector);
+
+  if (MultiLabelSegmentation::UNLABELED_VALUE != newDestinationLabel && destinationLabels.end() == destinationLabels.find(newDestinationLabel))
+  {
+    mitkThrow() << "Invalid call of TransferSurfaceContentAtTimeStep. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
+  }
+
+  // Deciding once per pixel value spares a label lookup per voxel.
+  static_assert(sizeof(Label::PixelType) <= 2, "The lookup table must cover every pixel value.");
+  std::vector<bool> overwritable(std::numeric_limits<Label::PixelType>::max() + 1);
+  for (std::size_t value = 0; value < overwritable.size(); ++value)
+  {
+    overwritable[value] = IsOverwritable(static_cast<Label::PixelType>(value), destinationLabels,
+      destinationBackground, destinationBackgroundLocked, overwriteStyle);
+  }
+
+  const auto timePoint = destinationImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+  const auto surfaceTimeStep = surface->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+  {
+    ImageWriteAccessor accessor(destinationImage, destinationImage->GetVolumeData(static_cast<int>(timeStep)));
+    auto* pixels = static_cast<Label::PixelType*>(accessor.GetData());
+
+    const std::size_t sizeX = destinationImage->GetDimension(0);
+    const std::size_t sizeY = destinationImage->GetDimension(1);
+
+    ForEachVoxelRunInsideSurface(surface, surfaceTimeStep, destinationImage, timeStep, 0.0,
+      [&](std::size_t x, std::size_t y, std::size_t z, std::size_t count)
+      {
+        auto* run = pixels + (z * sizeY + y) * sizeX + x;
+
+        for (std::size_t i = 0; i < count; ++i)
+        {
+          if (overwritable[run[i]])
+            run[i] = newDestinationLabel;
+        }
+      });
+  }
+
+  destinationImage->Modified();
 }
 
 void mitk::TransferLabelContentAtTimeStep(

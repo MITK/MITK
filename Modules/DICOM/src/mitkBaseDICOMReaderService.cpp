@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkDICOMTagsOfInterestHelper.h>
 #include <mitkDICOMProperty.h>
 #include "legacy/mitkDicomSeriesReader.h"
-#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkDICOMFrameListHelper.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkIPropertyProvider.h>
 #include <mitkPropertyNameHelper.h>
@@ -357,46 +357,51 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
       else
       {
         if (!pathIsDirectory)
-        { //we ensure that we only load the relevant image block files
+        { //narrow to the block containing the fileName, as far as the selection scan can tell
           const auto nrOfOutputs = reader->GetNumberOfOutputs();
           for (unsigned int outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
           {
             const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
 
-            auto finding = std::find_if(frameList.begin(), frameList.end(), [&](const DICOMImageFrameInfo::Pointer& frame) { return frame->Filename == fileName; });
-
-            if (finding != frameList.end())
-            { //we have the block containing the fileName -> these are the really relevant files.
-              relevantFiles.resize(frameList.size());
-              std::transform(frameList.begin(), frameList.end(), relevantFiles.begin(), [](const DICOMImageFrameInfo::Pointer& frame) { return frame->Filename; });
+            if (mitk::ContainsFile(frameList, fileName))
+            {
+              relevantFiles = mitk::DistinctFilesInOrder(frameList);
               break;
             }
           }
         }
-          const unsigned int ntotalfiles = relevantFiles.size();
-
-          for( unsigned int i=0; i< ntotalfiles; i++)
-          {
-            m_ReadFiles.push_back( relevantFiles.at(i) );
-          }
 
           reader->SetAdditionalTagsOfInterest(mitk::GetCurrentDICOMTagsOfInterest());
           reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
-          reader->SetInputFiles(relevantFiles);
+          mitk::AnalyzeWithFrameModel(*reader, relevantFiles);
 
-          mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-          scanner->AddTagPaths(reader->GetTagsOfInterest());
-          scanner->SetReadFrameModel(true);
-          scanner->SetInputFiles(relevantFiles);
-          scanner->Scan();
+          if (pathIsDirectory)
+          {
+            m_ReadFiles.insert(m_ReadFiles.end(), relevantFiles.begin(), relevantFiles.end());
+          }
+          else
+          { //a reader handed out unanalyzed was not narrowed above, and the frame model can split
+            //a block further, e.g. into one volume per multi-frame file
+            reader->KeepOnlyOutputsContaining(fileName);
 
-          reader->SetTagCache(scanner->GetScanCache());
-          reader->AnalyzeInputFiles();
+            if (0 == reader->GetNumberOfOutputs())
+            {
+              MITK_WARN << "DICOMReader service found no image block containing the opened file after analysis. The file may hold no image data or may not be readable by DCMTK. No data is loaded. File: " << fileName;
+            }
+
+            for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
+            {
+              const auto blockFiles = mitk::DistinctFilesInOrder(reader->GetOutput(i).GetImageFrameList());
+              m_ReadFiles.insert(m_ReadFiles.end(), blockFiles.begin(), blockFiles.end());
+            }
+          }
+
           reader->LoadImages();
 
           for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
           {
             const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
+
             mitk::BaseData::Pointer data = desc.GetMitkImage().GetPointer();
 
             if (data.IsNotNull())

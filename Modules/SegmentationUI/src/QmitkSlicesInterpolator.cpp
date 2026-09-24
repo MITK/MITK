@@ -15,7 +15,10 @@ found in the LICENSE file.
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkColorProperty.h>
+#include <mitkCoreServices.h>
 #include <mitkExceptionMacro.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkInteractionConst.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkOperationEvent.h>
@@ -72,6 +75,11 @@ found in the LICENSE file.
 
 namespace
 {
+  mitk::IPreferences* GetSegmentationPreferences()
+  {
+    return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+  }
+
   template <typename T = mitk::BaseData>
   itk::SmartPointer<T> GetData(const mitk::DataNode* dataNode)
   {
@@ -1224,12 +1232,21 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   this->Show3DInterpolationResult(false);
 
   std::string name = "3D-interpolation - " + activeLabelName;
+
+  if (1 < interpolatedSurface->GetTimeSteps())
+    name += "_t" + std::to_string(timeStep);
+
+  undoHelper.RegisterUndoRedoOperationEvent(name);
+
+  // The 3D rendering of the segmentation shows the result already, so the surface is kept as
+  // a node of its own only on request.
+  if (!GetSegmentationPreferences()->GetBool("add 3D interpolation mesh", false))
+    return;
+
   mitk::TimeBounds timeBounds;
 
   if (1 < interpolatedSurface->GetTimeSteps())
   {
-    name += "_t" + std::to_string(timeStep);
-
     auto* polyData = vtkPolyData::New();
     polyData->DeepCopy(interpolatedSurface->GetVtkPolyData(timeStep));
 
@@ -1243,8 +1260,6 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   {
     timeBounds = segmentationGeometry->GetTimeBounds(0);
   }
-
-  undoHelper.RegisterUndoRedoOperationEvent(name);
 
   name = segmentationDataNode->GetName() + " " + name;
 

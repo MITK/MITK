@@ -260,13 +260,21 @@ turns away from the light, where two structures touch, how deep a recess goes.
 It is always on for a volume rendered here. How the volume is lit is chosen on
 the 3D render window itself, from the lighting button in its top right corner.
 The lights belong to the window rather than to any one volume, so the choice
-applies to every volume drawn there, and it stays as you left it after this view
-is closed. A choice made while this view is closed is kept as well: opening the
-view again moves the volumes onto the lighting you chose. Until then they keep
-the settings tuned for the previous lighting, and may look different or render
-more slowly than they will once the view has caught up. Default lighting is
-the exception - a window on it is taken to be one nobody has set, so the
-volumes bring back the lighting they were last shown with.
+applies to every volume drawn there, including one hidden at the time, and it
+stays as you left it after this view is closed.
+
+Default lighting is where every 3D window starts, so a window on it is taken to
+be one nobody has set: there the first lit volume brings back the lighting it
+was last shown with, which is how a saved scene reopens lit as it was saved. A
+window lit that way returns to the lighting chosen in its menu once no volume in
+it is lit any more - switched off, hidden, or on a projection blend mode.
+
+Volumes only catch up with the window while this view is open. A choice made in
+the menu while it is closed changes the lights straight away, but the volumes
+keep the settings tuned for the previous lighting, and may look different or
+render more slowly, until the view is opened again. Hiding or showing a volume
+in the Data Manager is not noticed by this view either: the lighting follows at
+the next change made here, such as selecting another image.
 
 \imageMacro{QmitkVolumeVisualizationV2_LightingMenu.png,"The lighting menu of the 3D render window.",5.00}
 

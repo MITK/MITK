@@ -54,8 +54,9 @@ private Q_SLOTS:
 
   /** \brief React to a lighting rig picked from the 3D window's own menu.
    *
-   * The window carries one rig for everything drawn in it, so the volumes lit by
-   * it are moved onto the model tuned for that rig. Without this the lights would
+   * The window carries one rig for everything drawn in it, so every lit volume
+   * is moved onto the model tuned for that rig - hidden ones included, as
+   * showing one again does not reach this view. Without this the lights would
    * change while the material and scattering values chosen for the old ones stay
    * on the nodes.
    */
@@ -88,24 +89,41 @@ private:
 
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
+  /** \brief Re-derive the light rig once a removed volume is actually gone.
+   *
+   * The data storage announces a removal before carrying it out, so the node
+   * would still count as lit if the rig were derived right away.
+   */
+  void NodeRemoved(const mitk::DataNode *node) override;
+
   /** \brief The 3D render window of the current part, or nullptr when there is none. */
   QmitkRenderWindow *Get3DRenderWindow() const;
 
   /** \brief The volume-rendered nodes currently drawn in the 3D window.
    *
-   * Not only the selected one: the rig lights everything in that window, so
-   * every volume in it has a say in which rig belongs there.
+   * These are the volumes that may pick a rig for a window still on Default
+   * lighting; a hidden one lights nothing there and so has no say. Moving
+   * volumes onto a model is wider, see MoveVolumesOntoLightingModel.
    */
   std::vector<mitk::DataNode *> GetRenderedVolumes() const;
 
-  /** \brief The lighting model the 3D window is currently lit by.
+  /** \brief The lighting model of the first volume lit in the 3D window.
    *
-   * The window carries one rig, so the first volume naming a model decides it
-   * for all of them.
+   * The window carries one rig, so only one volume can pick it; the window takes
+   * this model's rig only while it is still on Default lighting.
    *
    * \return The model, or nullptr when no volume is lit there.
    */
   const mitk::VolumeRenderingLightingModel *GetRenderedLightingModel() const;
+
+  /** \brief Move every lit volume onto the given model, hidden ones included.
+   *
+   * A volume already on it is left alone, so values tuned there by hand survive.
+   *
+   * \return Whether any volume was moved, which leaves the lighting controls and
+   *         the picture out of date.
+   */
+  bool MoveVolumesOntoLightingModel(const mitk::VolumeRenderingLightingModel &model);
 
   /** \brief Listen to the lighting menu of whichever part is current. */
   void ConnectLightingMode();
@@ -115,29 +133,18 @@ private:
    */
   void ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode);
 
-  /** \brief Bring the 3D window's light rig into line with what is drawn there.
+  /** \brief Bring the 3D window's light rig and the volumes lit by it into line.
    *
-   * The rig belongs to the window, so it follows the volumes rendered in it and
-   * falls back to the rig chosen in that window's own menu when none is.
+   * The rig belongs to the window, so a window on any rig but Default lighting
+   * keeps it and every lit volume is moved onto the model for it. Default
+   * lighting is where every window starts, so a window on it has not been given
+   * a rig yet: there the first lit volume picks one and the others follow. With
+   * nothing lit the window returns to the rig last chosen in its own menu.
+   *
    * Closing this view restores nothing: the rig stays whatever the window and
-   * its volumes last made it. See AdoptWindowLightingMode for what opening the
-   * view does when the two disagree.
+   * its volumes last made it.
    */
   void UpdateLightingRig();
-
-  /** \brief Move the lit volumes onto the model for the 3D window's rig, unless
-   *         the window is on Default lighting.
-   *
-   * The menu can switch the rig while this view is closed, and then nothing
-   * moves the volumes along with it. Without this, reopening the view would let
-   * the volumes put their old rig back and undo the user's choice.
-   *
-   * Only volumes on another model are moved; one already on it keeps the values
-   * tuned for it by hand. Default lighting is left to the volumes to override:
-   * every window starts on it, so it does not tell a choice from an untouched
-   * window, and volumes are steered away from it anyway.
-   */
-  void AdoptWindowLightingMode();
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;

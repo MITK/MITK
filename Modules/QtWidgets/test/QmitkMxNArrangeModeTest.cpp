@@ -71,6 +71,7 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(JoinModeMenuEntries_OfferEveryMode);
   MITK_TEST(ResolveJoinMode_WithoutTheMarker_ReadsModifiers);
   MITK_TEST(PlateInput_APressOnThePlateSelectsAndIsKeptFromVtk);
+  MITK_TEST(Idle_ArrangingLeavesTheOverlayTransparentAndUnmasked);
   MITK_TEST(PlateInput_APressOffThePlatePassesThrough);
   MITK_TEST(PlateInput_NothingIsTakenOutsideArrangeMode);
   MITK_TEST(PlateInput_CleanViewKeepsThePlate);
@@ -485,6 +486,46 @@ public:
   }
 
   // --- Plate input ------------------------------------------------------------
+
+  /** Whether every cell's overlay is in its idle input state: transparent for
+   *  the mouse and without a mask, so the render window gets every event. */
+  bool AllOverlaysIdle() const
+  {
+    for (const auto& [windowId, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      auto* overlay = cell->findChild<QmitkMxNCellOverlay*>();
+      if (nullptr == overlay || !overlay->isTransparentForMouseEvents() || !overlay->mask().isEmpty())
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void Idle_ArrangingLeavesTheOverlayTransparentAndUnmasked()
+  {
+    // Arrange mode takes plate input from the render window's own stream; the
+    // overlay must not start taking input itself, or VTK would lose the pointer
+    // wherever the overlay's mask reaches.
+    this->ShowArranging();
+    this->Arrange()->SetActive(false);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("Without arrange mode the overlays are idle", this->AllOverlaysIdle());
+
+    this->Arrange()->SetActive(true);
+    Pump();
+    CPPUNIT_ASSERT(this->Overlay(0)->IsSyncPeekVisible());
+    CPPUNIT_ASSERT_MESSAGE("Plates up, the overlays are exactly as idle", this->AllOverlaysIdle());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "idleGroup");
+    m_Editor->SetSyncLink(CellId(3), QmitkMxNSyncDimension::Slice, "idleGroup");
+    this->Arrange()->SetSelectedWindowIds(QStringList{ CellId(1) });
+    this->Arrange()->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Editor, QmitkMxNSyncAxis::Slice,
+                                  QStringList{ CellId(0), CellId(3) }, QColor(Qt::red));
+    Pump();
+    CPPUNIT_ASSERT(this->Overlay(0)->IsArrangeFrameBumped());
+    CPPUNIT_ASSERT_MESSAGE("A selection and bumped frames keep them idle too", this->AllOverlaysIdle());
+  }
 
   void PlateInput_APressOnThePlateSelectsAndIsKeptFromVtk()
   {

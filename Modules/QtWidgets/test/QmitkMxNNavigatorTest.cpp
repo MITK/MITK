@@ -33,6 +33,8 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QFile>
+#include <QKeyEvent>
+#include <QTableView>
 
 #include <cmath>
 #include <memory>
@@ -56,6 +58,8 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(NavigatorInPlaneMove_MapsToLocalAxes);
   MITK_TEST(NavigatorVoxelIndex_SetsCrosshair);
   MITK_TEST(SyncBarcode_ReflectsMembership);
+  MITK_TEST(DataPopupScope_FollowsSelectionGroup);
+  MITK_TEST(DataPopupTable_KeyboardTogglesVisibility);
   MITK_TEST(SyncBarcode_LayoutWrapsToGeometry);
   MITK_TEST(SyncBarcode_SlotAtInHitTest);
   MITK_TEST(LayoutEditorRequest_BarcodeTogglesContextMenuShows);
@@ -306,6 +310,52 @@ public:
     CPPUNIT_ASSERT_MESSAGE(
       "The selection slot shows the cell's (default) selection group",
       axisSlots.back().color.isValid());
+  }
+
+  QString DataScopeText(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* utility = cell->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    return utility->GetNodeSelectionWidget()->GetScopeText();
+  }
+
+  void DataPopupScope_FollowsSelectionGroup()
+  {
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every cell starts in the shared default group",
+      std::string("Shared with main (3 windows)"), DataScopeText(0).toStdString());
+
+    m_Editor->SetCellSelectionGroup(CellId(2), "solo");
+    m_Editor->RefreshSyncControls();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The remaining members report the smaller group",
+      std::string("Shared with main (2 windows)"), DataScopeText(0).toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A group of one is not presented as sharing",
+      std::string("Only this window"), DataScopeText(2).toStdString());
+  }
+
+  void DataPopupTable_KeyboardTogglesVisibility()
+  {
+    m_Editor->SetCellSelectionGroup(CellId(2), "solo");
+    m_Editor->RefreshSyncControls();
+
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(0));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* nodeSelection = cell->GetUtilityWidget()->GetNodeSelectionWidget();
+    auto* table = nodeSelection->findChild<QTableView*>();
+    CPPUNIT_ASSERT(nullptr != table);
+    CPPUNIT_ASSERT_EQUAL(1, table->model()->rowCount());
+
+    CPPUNIT_ASSERT(m_ImageNode->IsVisible(Renderer(0)));
+    // The name cell is current, as after arrowing into the list; Space on it
+    // toggles the row's visibility.
+    table->setCurrentIndex(table->model()->index(0, 0));
+    QKeyEvent space(QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, QStringLiteral(" "));
+    QCoreApplication::sendEvent(table, &space);
+
+    CPPUNIT_ASSERT_MESSAGE("Space hides the data in this window", !m_ImageNode->IsVisible(Renderer(0)));
+    CPPUNIT_ASSERT_MESSAGE("A window sharing the selection follows", !m_ImageNode->IsVisible(Renderer(1)));
+    CPPUNIT_ASSERT_MESSAGE("A window with its own selection is unaffected", m_ImageNode->IsVisible(Renderer(2)));
   }
 
   void SyncBarcode_LayoutWrapsToGeometry()

@@ -27,6 +27,19 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QLabel" name="scopeLabel">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="margin">
+      <number>4</number>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTableView" name="tableView">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
@@ -41,8 +54,11 @@
    </item>
    <item>
     <widget class="QCheckBox" name="selectionModeCheckBox">
+     <property name="toolTip">
+      <string>Show all data, including data added later</string>
+     </property>
      <property name="text">
-      <string>Select all nodes</string>
+      <string>Show all data</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -51,11 +67,11 @@
    </item>
    <item>
     <widget class="QPushButton" name="changeSelectionButton">
-     <property name="text">
-      <string>Change selection</string>
+     <property name="toolTip">
+      <string>Pick the data this window shows; turns off "Show all data"</string>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
+     <property name="text">
+      <string>Choose data...</string>
      </property>
     </widget>
    </item>

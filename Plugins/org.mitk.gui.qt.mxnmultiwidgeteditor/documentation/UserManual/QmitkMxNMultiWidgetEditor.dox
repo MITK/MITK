@@ -239,10 +239,11 @@
 	selected data nodes for the window view.
 	"Currently selected" means that you can either decide to show all available data nodes from the data storage
 	or - for a better data node overview - only show an individually selected subset of the available data nodes.
-	You can either remove a node from the selection by clicking the "x" on a data node or use the "Change selection"
+	You can either remove a node from the selection by clicking the "x" on a data node or use the "Choose data..."
 	button to individually select data nodes.
-	The "Select all nodes" checkbox denotes which of the selection types is currently used - showing all available data nodes
-	or showing only a subset of data nodes. Checking the checkbox will reset the selection to all available data nodes.
+	The "Show all data" checkbox denotes which of the selection types is currently used - showing all available data nodes,
+	including data added later, or showing only a subset of data nodes. Checking the checkbox will reset the selection to
+	all available data nodes.
 	
 	Selecting data nodes does not mean that this node always has to be visible in the window view (rendered). If you want to hide
 	a node, e.g. for temporarily inspecting underlying images, you can do so by clicking the "eye" icon for each selected data node.

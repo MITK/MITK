@@ -4348,6 +4348,15 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
 
 void QmitkMxNMultiWidget::RefreshSyncBarcodes()
 {
+  std::map<QmitkRenderWindowUtilityWidget::GroupSyncIndexType, int> selectionGroupSizes;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (const auto* utilityWidget = renderWindowWidget->GetUtilityWidget(); nullptr != utilityWidget)
+    {
+      ++selectionGroupSizes[utilityWidget->GetSyncGroup()];
+    }
+  }
+
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
     auto* utilityWidget = renderWindowWidget->GetUtilityWidget();
@@ -4356,6 +4365,23 @@ void QmitkMxNMultiWidget::RefreshSyncBarcodes()
       continue;
     }
     utilityWidget->SetSyncBarcodeSlots(this->BuildBarcodeSlots(windowId));
+
+    // The Data popup states with whom its selection is shared, from the same
+    // registry the barcode's selection slot reads.
+    const auto index = utilityWidget->GetSyncGroup();
+    const int groupSize = selectionGroupSizes[index];
+    QString scopeText;
+    if (1 == groupSize)
+    {
+      scopeText = tr("Only this window");
+    }
+    else if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
+    {
+      scopeText = tr("Shared with %1 (%2 windows)")
+                    .arg(QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)))
+                    .arg(groupSize);
+    }
+    utilityWidget->GetNodeSelectionWidget()->SetScopeText(scopeText);
   }
 }
 

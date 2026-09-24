@@ -84,6 +84,15 @@ public:
   /** \brief Returns the current synchronization group index. */
   GroupSyncIndexType GetSyncGroup() const;
 
+  /**
+   * \brief Sets the line above the node list that tells the user with whom this
+   *        selection is shared. The widget does not know the group registry, so
+   *        the owner supplies the text; an empty text hides the line.
+   */
+  void SetScopeText(const QString& text);
+  /** \brief Returns the text set by 'SetScopeText'. */
+  QString GetScopeText() const;
+
 Q_SIGNALS:
 
   void SelectionModeChanged(bool selectAll);
@@ -113,6 +122,9 @@ protected:
 
   void SetUpConnections();
   void Initialize();
+
+  /** \brief Gives the node list's cell actions (visibility, fit, remove) a keyboard path. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
   void UpdateInfo() override;
   void OnDataStorageChanged() override;

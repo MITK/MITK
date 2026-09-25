@@ -477,11 +477,7 @@ void QmitkCombinedTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent *mou
 
 void QmitkCombinedTransferFunctionCanvas::keyPressEvent(QKeyEvent *keyEvent)
 {
-  // The base clamps through ValidateCoord, which reads the histogram without
-  // checking that there is one, and this canvas is shown for an image whose
-  // histogram failed to compute too. Dragging clamps against the axis instead,
-  // so only the keyboard has to stand down for such an image.
-  if (!m_Editable || this->GetHistogram() == nullptr)
+  if (!m_Editable)
     return;
 
   // As with a drag, and for the same reason. Only the movement is refused:

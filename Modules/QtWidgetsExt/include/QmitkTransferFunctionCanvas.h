@@ -291,6 +291,18 @@ protected:
   bool m_LineEditAvailable;
   QLineEdit *m_XEdit;
   QLineEdit *m_YEdit;
+
+private:
+  /**
+   * \brief The position the grabbed handle may take when asked to move to x.
+   *
+   * A handle cannot reach its neighbours, since two points at one position are
+   * one point to VTK, and it cannot pass them without changing which index it
+   * has. Such a move stops a pixel short of the neighbour: the least gap that
+   * still shows, where a narrower one would have VTK ask for a lookup texture
+   * wider than the GPU allows. The result is then kept within the data range.
+   */
+  double ClampGrabbedHandleX(double x);
 };
 
 #endif

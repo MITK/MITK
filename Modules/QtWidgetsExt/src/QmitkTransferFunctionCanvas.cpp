@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QPainter>
 
+#include <algorithm>
+
 QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f),
     m_GrabbedHandle(-1),
@@ -99,6 +101,23 @@ void QmitkTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEvent)
   update();
 }
 
+double QmitkTransferFunctionCanvas::ClampGrabbedHandleX(double x)
+{
+  const int index = m_GrabbedHandle;
+  const double current = this->GetFunctionX(index);
+  const double pixel = (m_Upper - m_Lower) / this->contentsRect().width();
+
+  // Bounded by where the handle already is, so that one already closer than a
+  // pixel to a neighbour stays put rather than being pushed away from it.
+  if (index > 0)
+    x = std::max(x, std::min(this->GetFunctionX(index - 1) + pixel, current));
+
+  if (index < this->GetFunctionSize() - 1)
+    x = std::min(x, std::max(this->GetFunctionX(index + 1) - pixel, current));
+
+  return std::clamp(x, m_Min, m_Max);
+}
+
 void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
   if (m_GrabbedHandle != -1)
@@ -106,24 +125,7 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
     const auto pos = mouseEvent->position().toPoint();
     std::pair<double, double> newPos = this->CanvasToFunction(std::make_pair(pos.x(), pos.y()));
 
-    // X Clamping
-    {
-      // Check with predecessor
-      if (m_GrabbedHandle > 0)
-        if (newPos.first <= this->GetFunctionX(m_GrabbedHandle - 1))
-          newPos.first = this->GetFunctionX(m_GrabbedHandle);
-
-      // Check with successor
-      if (m_GrabbedHandle < this->GetFunctionSize() - 1)
-        if (newPos.first >= this->GetFunctionX(m_GrabbedHandle + 1))
-          newPos.first = this->GetFunctionX(m_GrabbedHandle);
-
-      // Clamping to histogramm
-      if (newPos.first < m_Min)
-        newPos.first = m_Min;
-      else if (newPos.first > m_Max)
-        newPos.first = m_Max;
-    }
+    newPos.first = this->ClampGrabbedHandleX(newPos.first);
 
     // Y Clamping
     {
@@ -205,28 +207,28 @@ void QmitkTransferFunctionCanvas::keyPressEvent(QKeyEvent *e)
       break;
 
     case Qt::Key_Left:
-      this->MoveFunctionPoint(
-        m_GrabbedHandle,
-        ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle) - 1, GetFunctionY(m_GrabbedHandle))));
-      break;
-
     case Qt::Key_Right:
+    {
+      // A pixel rather than a fixed amount of intensity, which on CT would not
+      // move the handle visibly and on data normalised to [0, 1] would carry it
+      // across the whole axis.
+      const double step = (m_Upper - m_Lower) / this->contentsRect().width();
+      const double x = this->GetFunctionX(m_GrabbedHandle) + (e->key() == Qt::Key_Left ? -step : step);
+
       this->MoveFunctionPoint(
-        m_GrabbedHandle,
-        ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle) + 1, GetFunctionY(m_GrabbedHandle))));
+        m_GrabbedHandle, std::make_pair(this->ClampGrabbedHandleX(x), this->GetFunctionY(m_GrabbedHandle)));
       break;
+    }
 
     case Qt::Key_Up:
-      this->MoveFunctionPoint(
-        m_GrabbedHandle,
-        ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle), GetFunctionY(m_GrabbedHandle) + 0.001)));
-      break;
-
     case Qt::Key_Down:
+    {
+      const double y = this->GetFunctionY(m_GrabbedHandle) + (e->key() == Qt::Key_Up ? 0.001 : -0.001);
+
       this->MoveFunctionPoint(
-        m_GrabbedHandle,
-        ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle), GetFunctionY(m_GrabbedHandle) - 0.001)));
+        m_GrabbedHandle, std::make_pair(this->GetFunctionX(m_GrabbedHandle), std::clamp(y, 0.0, 1.0)));
       break;
+    }
   }
 
   update();

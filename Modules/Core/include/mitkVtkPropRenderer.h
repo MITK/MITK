@@ -301,8 +301,11 @@ namespace mitk
     /** \brief Propagate vtkInformation object to all VTK-based mappers */
     void PropagateRenderInfoToMappers();
 
-    /** \brief Set parallel projection, remove the interactor and the lights of VTK. */
+    /** \brief Set projection and interactor for the current mapper ID; 2D gets no lights, 3D its rig back. */
     bool Initialize2DvtkCamera();
+
+    /** \brief Replace every light in the renderer with the given rig, even if it is the current one. */
+    void InstallLightingRig(LightingMode mode);
 
     /** \brief Rescale the lights' ambient colours so their weighted sum stays 1.0. */
     void NormalizeLightAmbientColors();

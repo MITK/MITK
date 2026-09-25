@@ -167,20 +167,17 @@ void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
   if (this->GetMapperID() != Standard3D || mode == m_LightingMode)
     return;
 
-  // Uninstall whatever is there before installing the new rig. Each rig owns
-  // the whole renderer: the ray caster picks its shading path from how many
-  // lights are switched on, so one left over from the previous rig would
-  // silently change it. Removing a light that is not installed is a no-op.
-  m_LightKit->RemoveLightsFromRenderer(m_VtkRenderer);
+  this->InstallLightingRig(mode);
+}
 
-  if (m_KeyLight != nullptr)
-    m_VtkRenderer->RemoveLight(m_KeyLight);
-
-  if (m_FillLight != nullptr)
-    m_VtkRenderer->RemoveLight(m_FillLight);
-
-  if (m_Headlight != nullptr)
-    m_VtkRenderer->RemoveLight(m_Headlight);
+void mitk::VtkPropRenderer::InstallLightingRig(LightingMode mode)
+{
+  // Clear the renderer before installing the new rig. Each rig owns the whole
+  // renderer: the ray caster picks its shading path from how many lights are
+  // switched on, so a leftover would silently change it. That includes the
+  // headlight VTK creates by itself whenever it renders without any light, as
+  // it does in 2D.
+  m_VtkRenderer->RemoveAllLights();
 
   if (mode == LightingMode::KeyLight)
   {
@@ -773,6 +770,8 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
       vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
     this->GetRenderWindow()->GetInteractor()->EnableRenderOff();
+    // A 2D phase removed every light, while m_LightingMode kept the rig.
+    this->InstallLightingRig(m_LightingMode);
     m_CameraInitializedForMapperID = Standard3D;
   }
   else if (this->GetMapperID() == Standard2D)

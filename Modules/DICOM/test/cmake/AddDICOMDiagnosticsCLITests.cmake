@@ -39,7 +39,7 @@ if(EXISTS "${_rd_dose}")
             -DJSON=${_report}
             # The report file is dumped compact, without the spaces the
             # pretty-printed stdout copy has.
-            "-DCONTAINS=\"type\":\"no_per_frame_metadata\";\"frame_count\":263;\"frame_model\":false"
+            "-DCONTAINS=\"type\":\"no_per_frame_metadata\";\"number_of_frames\":263;\"frame_model\":false"
             -P "${_assert_script}")
 
   set_property(TEST mitkDICOMVolumeDiagnosticsCLI_RTDose_NoPerFrameMetadata

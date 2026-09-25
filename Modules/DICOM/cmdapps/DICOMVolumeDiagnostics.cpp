@@ -31,7 +31,7 @@ namespace
   {
     nlohmann::json details;
 
-    if (finding.frameCount > 0) details["frame_count"] = finding.frameCount;
+    if (finding.frameCount > 0) details["number_of_frames"] = finding.frameCount;
     if (finding.perFrameItemCount > 0) details["per_frame_item_count"] = finding.perFrameItemCount;
     if (finding.distinctRescalePairs > 0) details["distinct_rescale_pairs"] = finding.distinctRescalePairs;
 
@@ -193,7 +193,6 @@ int main(int argc, char* argv[])
             outputInfo["files"] = outputFiles;
             outputInfo["timesteps"] = output.GetNumberOfTimeSteps();
             outputInfo["frames_per_timesteps"] = output.GetNumberOfFramesPerTimeStep();
-            outputInfo["frames"] = frameList.size();
             outputInfo["distinct_files"] = distinctFiles;
 
             bool anyFrameModel = false;

@@ -17,12 +17,11 @@ found in the LICENSE file.
 #include <QmitkStepperAdapter.h>
 
 #include <mitkPlaneGeometry.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkTimeGeometry.h>
 #include <mitkTimeNavigationController.h>
 
 #include <berryConstants.h>
-
-#include <itkSpatialOrientationAdapter.h>
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
@@ -294,13 +293,6 @@ void QmitkImageNavigatorView::OnRefetch()
       m_AxisUi[i].SpinBox->blockSignals(false);
     }
 
-    /// Calculating 'inverse direction' property.
-
-    auto matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
-    matrix.GetVnlMatrix().normalize_columns();
-
-    auto invMatrix = matrix.GetInverse();
-
     for (int axis = 0; axis < 3; ++axis)
     {
       auto renderWindow = axis == 0 ? m_RenderWindowPart->GetQmitkRenderWindow("sagittal") :
@@ -317,39 +309,12 @@ void QmitkImageNavigatorView::OnRefetch()
         /// See bug T22122. This check can be resolved after T22122 got fixed.
         if (rendererGeometry != nullptr)
         {
-          int dominantAxis = itk::Function::Max3(invMatrix[0][axis], invMatrix[1][axis], invMatrix[2][axis]);
+          const auto viewDirection = axis == 0 ? mitk::AnatomicalPlane::Sagittal :
+                                     axis == 1 ? mitk::AnatomicalPlane::Coronal :
+                                                 mitk::AnatomicalPlane::Axial;
 
-          bool referenceGeometryAxisInverted = invMatrix[dominantAxis][axis] < 0;
-          bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[axis] < 0;
-
-          /// `referenceGeometryAxisInverted` tells if the direction of the corresponding axis
-          /// of the reference geometry is flipped compared to the 'world direction' or not.
-          ///
-          /// `rendererZAxisInverted` tells if direction of the renderer geometry z axis is
-          /// flipped compared to the 'world direction' or not. This is the same as the indexing
-          /// direction in the slice navigation controller and matches the 'top' property when
-          /// initialising the renderer planes. (If 'top' was true then the direction is
-          /// inverted.)
-          ///
-          /// The world direction can be +1 ('up') that means right, anterior or superior, or
-          /// it can be -1 ('down') that means left, posterior or inferior, respectively.
-          ///
-          /// If these two do not match, we have to invert the index between the slice navigation
-          /// controller and the slider navigator widget, so that the user can see and control
-          /// the index according to the reference geometry, rather than the slice navigation
-          /// controller. The index in the slice navigation controller depends on in which way
-          /// the reference geometry has been resliced for the renderer, and it does not necessarily
-          /// match neither the world direction, nor the direction of the corresponding axis of
-          /// the reference geometry. Hence, it is a merely internal information that should not
-          /// be exposed to the GUI.
-          ///
-          /// So that one can navigate in the same world direction by dragging the slider
-          /// right, regardless of the direction of the corresponding axis of the reference
-          /// geometry, we invert the direction of the controls if the reference geometry axis
-          /// is inverted but the direction is not ('inversDirection' is false) or the other
-          /// way around.
-
-          bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
+          const bool inverseDirection =
+            mitk::SliceNavigationHelper::IsSliceIndexInverted(geometry, rendererGeometry, viewDirection);
 
           auto sliceNavigationWidget =
             axis == 0 ? m_Ui->sagittalSliceNavWidget :
@@ -357,10 +322,6 @@ void QmitkImageNavigatorView::OnRefetch()
                         m_Ui->axialSliceNavWidget;
 
           sliceNavigationWidget->SetInverseDirection(inverseDirection);
-
-          // This should be a preference (see T22254)
-          // bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
-          // navigatorWidget->SetInvertedControls(invertedControls);
         }
       }
     }

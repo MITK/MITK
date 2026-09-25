@@ -93,6 +93,34 @@ namespace mitk
     MITKCORE_EXPORT PlaneGeometry* GetCurrentPlaneGeometry(const TimeGeometry* timeGeometry,
                                                            TimePointType timePoint,
                                                            unsigned int slicePosition);
+
+    /**
+    * \brief Tells whether the slice index shown to the user must be flipped relative to the
+    *        slice stepper position of a renderer.
+    *
+    * A slice stepper counts along the normal of the renderer's world geometry, whose direction
+    * is fixed by how the planes were initialized, not by the image. It can therefore run opposite
+    * to the reference geometry's own index axis for that view direction (for an identity-direction
+    * image this is the case for axial and coronal views). A user-facing slice index should follow
+    * the reference geometry, so when this function returns true the displayed index is
+    * <tt>steps - 1 - stepperPosition</tt>.
+    *
+    * \param referenceGeometry      The geometry being sliced (the slice navigation controller's
+    *                               input world geometry at the relevant time step).
+    * \param rendererWorldGeometry  The renderer's current world geometry; its third axis vector
+    *                               is the stepping direction.
+    * \param viewDirection          The anatomical plane the renderer shows; it selects the world
+    *                               axis both geometries are compared along.
+    *
+    * \return True if the stepping direction and the reference geometry's index axis point in
+    *         opposite world directions.
+    *
+    * \throws mitk::Exception if a geometry is a nullptr or if viewDirection is
+    *         AnatomicalPlane::Original, which has no fixed world axis.
+    */
+    MITKCORE_EXPORT bool IsSliceIndexInverted(const BaseGeometry* referenceGeometry,
+                                              const BaseGeometry* rendererWorldGeometry,
+                                              AnatomicalPlane viewDirection);
   } // namespace SliceNavigationHelper
 } // namespace mitk
 

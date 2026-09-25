@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkSlicedGeometry3D.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkArbitraryTimeGeometry.h>
 
 #include <mitkTestFixture.h>
@@ -27,6 +28,9 @@ class mitkSliceNavigationControllerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST(validateAxialViewDirection);
   CPPUNIT_TEST(validateCoronalViewDirection);
   CPPUNIT_TEST(validateSagittalViewDirection);
+  CPPUNIT_TEST(IsSliceIndexInverted_IdentityImage);
+  CPPUNIT_TEST(IsSliceIndexInverted_FlippedZImage_AxialNotInverted);
+  CPPUNIT_TEST(IsSliceIndexInverted_InvalidInput_Throws);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::Geometry3D::Pointer m_Geometry3D;
@@ -144,7 +148,73 @@ public:
     CPPUNIT_ASSERT(this->validateGeometry(sliceNavigationController->GetCurrentGeometry3D(), origin, firstAxisVector, secondAxisVector, thirdAxisVector));
   }
 
+  void IsSliceIndexInverted_IdentityImage()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Axial stepping runs against the identity image's z index",
+      this->isSliceIndexInverted(m_TimeGeometry, mitk::AnatomicalPlane::Axial));
+    CPPUNIT_ASSERT_MESSAGE("Coronal stepping runs against the identity image's y index",
+      this->isSliceIndexInverted(m_TimeGeometry, mitk::AnatomicalPlane::Coronal));
+    CPPUNIT_ASSERT_MESSAGE("Sagittal stepping follows the identity image's x index",
+      !this->isSliceIndexInverted(m_TimeGeometry, mitk::AnatomicalPlane::Sagittal));
+  }
+
+  void IsSliceIndexInverted_FlippedZImage_AxialNotInverted()
+  {
+    auto matrix = m_Geometry3D->GetIndexToWorldTransform()->GetMatrix();
+    for (unsigned int row = 0; row < 3; ++row)
+    {
+      matrix[row][2] = -matrix[row][2];
+    }
+
+    auto flippedTransform = mitk::AffineTransform3D::New();
+    flippedTransform->SetMatrix(matrix);
+    flippedTransform->SetOffset(m_Geometry3D->GetIndexToWorldTransform()->GetOffset());
+
+    auto flippedGeometry = mitk::Geometry3D::New();
+    flippedGeometry->SetBounds(m_Geometry3D->GetBounds());
+    flippedGeometry->SetIndexToWorldTransform(flippedTransform);
+
+    auto flippedTimeGeometry = mitk::ArbitraryTimeGeometry::New();
+    flippedTimeGeometry->AppendNewTimeStepClone(flippedGeometry, 0.5, 10.);
+    flippedTimeGeometry->Update();
+
+    CPPUNIT_ASSERT_MESSAGE("Axial stepping follows a z index that points inferior",
+      !this->isSliceIndexInverted(flippedTimeGeometry, mitk::AnatomicalPlane::Axial));
+  }
+
+  void IsSliceIndexInverted_InvalidInput_Throws()
+  {
+    auto sliceNavigationController = this->createSliceNavigationController(m_TimeGeometry, mitk::AnatomicalPlane::Axial);
+    const auto* rendererGeometry = sliceNavigationController->GetCurrentGeometry3D();
+
+    CPPUNIT_ASSERT_THROW(mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      nullptr, rendererGeometry, mitk::AnatomicalPlane::Axial), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      m_Geometry3D, nullptr, mitk::AnatomicalPlane::Axial), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      m_Geometry3D, rendererGeometry, mitk::AnatomicalPlane::Original), mitk::Exception);
+  }
+
 private:
+  mitk::SliceNavigationController::Pointer createSliceNavigationController(const mitk::TimeGeometry* timeGeometry, mitk::AnatomicalPlane viewDirection)
+  {
+    auto sliceNavigationController = mitk::SliceNavigationController::New();
+    sliceNavigationController->SetInputWorldTimeGeometry(timeGeometry);
+    sliceNavigationController->SetViewDirection(viewDirection);
+    sliceNavigationController->Update();
+    return sliceNavigationController;
+  }
+
+  /** The controller's created geometry is the world geometry it hands to its renderer, so it
+   *  stands in for BaseRenderer::GetCurrentWorldGeometry() without needing a render window. */
+  bool isSliceIndexInverted(const mitk::TimeGeometry* timeGeometry, mitk::AnatomicalPlane viewDirection)
+  {
+    auto sliceNavigationController = this->createSliceNavigationController(timeGeometry, viewDirection);
+    const mitk::BaseGeometry::ConstPointer referenceGeometry = timeGeometry->GetGeometryForTimeStep(0);
+    return mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      referenceGeometry, sliceNavigationController->GetCurrentGeometry3D(), viewDirection);
+  }
+
   bool validateGeometry(mitk::BaseGeometry::ConstPointer geometry, const mitk::Point3D &origin, const mitk::Vector3D &firstAxisVector, const mitk::Vector3D &secondAxisVector, const mitk::Vector3D &thirdAxisVector)
   {
     bool result = true;

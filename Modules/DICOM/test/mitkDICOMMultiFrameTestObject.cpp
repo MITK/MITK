@@ -179,10 +179,10 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
                 "Frame Reference DateTime");
       }
 
+      const double planeZ =
+        this->framesAtOnePosition ? this->zOffset : this->zOffset + k * this->sliceSpacing;
       DcmItem& position = AppendItem(perFrame, DCM_PlanePositionSequence);
-      Require(position.putAndInsertString(
-                DCM_ImagePositionPatient,
-                PositionString(this->zOffset + k * this->sliceSpacing).c_str()),
+      Require(position.putAndInsertString(DCM_ImagePositionPatient, PositionString(planeZ).c_str()),
               "Image Position (Patient)");
 
       if (RescalePlacement::Shared != this->rescalePlacement)

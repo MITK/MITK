@@ -597,18 +597,24 @@ bool mitk::DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(
 
     mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo, layout );
 
-    // Should never fire: a frame-model file with more than one frame gets a
-    // block of its own, so its frame count is its slice count, and a
-    // single-frame one contributes one frame and one slice to a multi-file
-    // block. It is kept because the alternative to an unreachable check here
-    // is a silently wrong image. Gated on the frame model because a plain
+    // A frame-model file with more than one frame gets a block of its own, and
+    // a single-frame one contributes one frame and one slice to a multi-file
+    // block, so the slice count matches the frame count unless the helper
+    // loaded the file as 2D. It does so when GDCM reports a z-spacing of 0, as
+    // it does for a file whose frames all lie at one plane position. A 2D load
+    // would keep only the first frame, so the block is refused rather than
+    // yielding a silently wrong image. Gated on the frame model because a plain
     // multi-frame object (RT dose, NM, SC, US) legitimately has one frame info
     // and N slices.
     if ( mitkImage.IsNotNull() && blockHasFrameModel
          && mitkImage->GetDimension( 2 ) != frames.size() )
     {
       MITK_ERROR << "Loaded " << mitkImage->GetDimension( 2 ) << " slices for a block of " << frames.size()
-                 << " frames (" << filenames.front() << "). Refusing the block.";
+                 << " frames (" << filenames.front() << ")."
+                 << ( 2 == mitkImage->GetDimension()
+                        ? " GDCM reported a z-spacing of 0; the frames probably all lie at one plane position."
+                        : "" )
+                 << " Refusing the block.";
       block.GetSplitReason()->AddReason( IOVolumeSplitReason::ReasonType::FrameCountMismatch,
                                          std::to_string( mitkImage->GetDimension( 2 ) ) + "/"
                                            + std::to_string( frames.size() ) );

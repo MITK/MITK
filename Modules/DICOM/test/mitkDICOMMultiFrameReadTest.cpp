@@ -142,6 +142,7 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(SingleFrameEnhancedGetsFrameRelativeKeys);
   MITK_TEST(TopLevelDuplicateLosesAgainstTheFrame);
   MITK_TEST(RaggedObjectKeepsTheOneFrameModel);
+  MITK_TEST(FramesAtOnePlanePositionAreRefused);
   MITK_TEST(FileLevelInfoDoesNotAnswerAFrameRelativeQuery);
   MITK_TEST(PerFrameGroupWinsOverSharedGroup);
   MITK_TEST(SharedGroupWinsOverTopLevel);
@@ -761,6 +762,22 @@ public:
     const auto frames = image->GetConstProperty(
       mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_FRAMES()));
     CPPUNIT_ASSERT_MESSAGE("No source frame property without a frame model", frames.IsNull());
+  }
+
+  /** Frames that all lie at one plane position are refused rather than loaded
+      as a single 2D frame: GDCM reports a z-spacing of 0 for such a file, so
+      it is read as a 2D image, and the frame-count check then refuses the
+      block. With nothing left to load, the read fails. */
+  void FramesAtOnePlanePositionAreRefused()
+  {
+    auto object = this->MakeEnhanced();
+    object.framesAtOnePosition = true;
+    const std::string file = object.Write(this->CaseDir(), "one_position.dcm");
+
+    mitk::DICOMTestWarningCounter errors("Refusing the block", mitk::LogLevel::Error);
+    CPPUNIT_ASSERT_THROW_MESSAGE("No image is loaded for frames at one plane position",
+                                 this->LoadAll(file), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The refusal is logged once", 1u, errors.GetCount());
   }
 
   /**

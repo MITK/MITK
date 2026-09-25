@@ -121,6 +121,10 @@ remains a consumer concern.
    reports it as an informational finding.
  - Geometry comes from GDCM. An object whose frames are not stored in spatial
    order keeps GDCM's unit-spacing fallback.
+ - A file with a frame model whose frames all lie at one plane position (a
+   single-slice cine or dynamic series) is refused and flagged
+   mitk::IOVolumeSplitReason::ReasonType::FrameCountMismatch. GDCM reports a
+   z-spacing of 0 for it, and a 2D load would keep only the first frame.
  - A file whose frame model describes more than one frame is never combined
    with another file in one block, because ITK's multi-file branch sets the
    moving dimension to the file count and would keep one frame per file. Such a

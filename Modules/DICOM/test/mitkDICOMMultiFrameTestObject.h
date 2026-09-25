@@ -106,6 +106,12 @@ namespace mitk
         rather than overlapping. */
     double zOffset = 0.0;
 
+    /** true: write every per-frame Image Position (Patient) at zOffset instead
+        of the ascending zOffset + k * sliceSpacing, so every frame occupies one
+        plane position. Pixel Spacing and Slice Thickness, which sliceSpacing
+        also drives, are left untouched. */
+    bool framesAtOnePosition = false;
+
     /** Empty: Enhanced PET Image Storage for a functional-group object, Nuclear
         Medicine Image Storage otherwise, with a matching modality. Set both to
         put files of the two kinds into one series, which the sorters would

@@ -21,16 +21,18 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Counts, while it lives, the warnings whose text contains a fragment.
+   * \brief Counts, while it lives, the messages of one level (warnings unless
+   *        another is passed) whose text contains a fragment.
    *
    * Filtering by a fragment such as a property key or a tag path keeps a case
-   * from counting the unrelated warnings a read also emits, without pinning the
+   * from counting the unrelated messages a read also emits, without pinning the
    * rest of the wording.
    */
   class DICOMTestWarningCounter : public LogBackendBase
   {
   public:
-    explicit DICOMTestWarningCounter(const std::string& fragment) : m_Fragment(fragment)
+    explicit DICOMTestWarningCounter(const std::string& fragment, LogLevel level = LogLevel::Warn)
+      : m_Fragment(fragment), m_Level(level)
     {
       RegisterBackend(this);
     }
@@ -45,7 +47,7 @@ namespace mitk
 
     void ProcessMessage(const LogMessage& message) override
     {
-      if (LogLevel::Warn == message.Level && std::string::npos != message.Message.find(m_Fragment))
+      if (m_Level == message.Level && std::string::npos != message.Message.find(m_Fragment))
       {
         ++m_Count;
       }
@@ -63,6 +65,7 @@ namespace mitk
 
   private:
     std::string m_Fragment;
+    LogLevel m_Level;
     unsigned int m_Count = 0;
   };
 }

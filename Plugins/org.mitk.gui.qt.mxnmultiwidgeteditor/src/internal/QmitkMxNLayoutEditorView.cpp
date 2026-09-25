@@ -88,8 +88,9 @@ void QmitkMxNLayoutEditorView::UpdateArrangeMode()
 
 void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
 {
+  // The style's default margins, as the other MITK views use; the editor
+  // widget itself adds none, so this is the view's one border padding.
   auto* layout = new QVBoxLayout(parent);
-  layout->setContentsMargins(0, 0, 0, 0);
 
   // Editor-wide mouse-interaction scheme. It lives here rather than in a
   // toolbar of its own because it is the only editor-wide control left outside

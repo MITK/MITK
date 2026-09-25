@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <QHeaderView>
 #include <QIcon>
 #include <QInputDialog>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
@@ -259,8 +260,11 @@ namespace
                                          "border-top-right-radius: 3px;").arg(hue.name()));
     name->setStyleSheet(QStringLiteral("color: %1; font-weight: bold; background: transparent;").arg(ink));
     count->setStyleSheet(QStringLiteral("color: %1; background: transparent;").arg(ink));
+    // The "..." already says "menu"; the style's popup arrow would only be
+    // drawn over it.
     menuButton->setStyleSheet(
-      QStringLiteral("QToolButton { color: %1; background: transparent; border: none; }").arg(ink));
+      QStringLiteral("QToolButton { color: %1; background: transparent; border: none; }"
+                     "QToolButton::menu-indicator { image: none; }").arg(ink));
   }
 
   void ClearLayout(QLayout* layout)
@@ -386,8 +390,10 @@ namespace
 QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   : QWidget(parent)
 {
+  // The hosting view owns the outer margin; the sections keep the style's own
+  // margins and spacing, so the editor reads like the other MITK views.
   auto* mainLayout = new QVBoxLayout(this);
-  mainLayout->setContentsMargins(4, 4, 4, 4);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   // The grid-shape picker is not an always-on box: it opens on demand in a modal
   // "Edit grid..." dialog (ShowGridDialog). It is created here, hidden, so it can
@@ -412,8 +418,12 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   // load and a save act on the whole document - the arrangement together with
   // its synchronization groups - so none of them is a grid operation, and saving
   // is what a user reaches for after changing only the synchronization.
+  // Document and grid actions share one titled section, the counterpart of the
+  // segmentation view's data-selection box; the synchronization tabs follow it
+  // as the second section.
+  auto* layoutBox = new QGroupBox(tr("Layout"), this);
+  auto* layoutBoxLayout = new QVBoxLayout(layoutBox);
   auto* documentRow = new QHBoxLayout();
-  documentRow->addWidget(new QLabel(tr("Layout:"), this));
 
   // The text stays beside the icons: the row is where the layout document is
   // handled, and naming the actions keeps them findable without a tooltip.
@@ -428,6 +438,12 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   presetButton->setToolTip(tr("Replace the current layout with one of the arrangements that ship "
                               "with MITK"));
   presetButton->setPopupMode(QToolButton::InstantPopup);
+  // An instant-popup button draws its arrow inside the content box, over the
+  // text; room on the right keeps the arrow as a separate mark.
+  presetButton->setStyleSheet(QStringLiteral(
+    "QToolButton { padding-right: 14px; }"
+    "QToolButton::menu-indicator { subcontrol-origin: padding; subcontrol-position: center right; "
+    "right: 2px; }"));
   auto* presetMenu = new QMenu(presetButton);
   const QStringList presetNames = m_LayoutSelection->PresetNames();
   for (int preset = 0; preset < presetNames.size(); ++preset)
@@ -460,7 +476,7 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   connect(saveButton, &QToolButton::clicked, this, [this]() { m_LayoutSelection->RequestSave(); });
   documentRow->addWidget(saveButton);
   documentRow->addStretch();
-  mainLayout->addLayout(documentRow);
+  layoutBoxLayout->addLayout(documentRow);
 
   // Grid controls: quick trailing add/remove of a row or column, plus the full
   // "Edit grid..." picker. The +/- operations edit the splitter tree in place, so
@@ -469,16 +485,24 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   // removed. They require a rectangular grid, which the tree-derived
   // ResolveGridShape decides, so the buttons disable (with an explaining tooltip)
   // for irregular or non-grid layouts.
+  // Icon-only, like a toolbar: the row label names the group, the icons say
+  // which edge changes, and the tooltips (kept current by UpdateGridButtons)
+  // carry the words. The text stays set as the buttons' accessible names.
+  const QSize gridIconSize(20, 20);
+  const auto makeGridButton = [this, gridIconSize](const QString& name, const QString& icon)
+  {
+    auto* button = new QToolButton(this);
+    button->setText(name);
+    button->setIcon(QmitkIconTheme::GetIcon(icon));
+    button->setIconSize(gridIconSize);
+    button->setAutoRaise(true);
+    return button;
+  };
   auto* gridRow = new QHBoxLayout();
-  gridRow->setContentsMargins(0, 0, 0, 0);
-  m_RemoveRowButton = new QToolButton(this);
-  m_RemoveRowButton->setText(QStringLiteral("-"));
-  m_AddRowButton = new QToolButton(this);
-  m_AddRowButton->setText(QStringLiteral("+"));
-  m_RemoveColumnButton = new QToolButton(this);
-  m_RemoveColumnButton->setText(QStringLiteral("-"));
-  m_AddColumnButton = new QToolButton(this);
-  m_AddColumnButton->setText(QStringLiteral("+"));
+  m_RemoveRowButton = makeGridButton(tr("Remove row"), QStringLiteral(":/Qmitk/mxn-grid-row-remove.svg"));
+  m_AddRowButton = makeGridButton(tr("Add row"), QStringLiteral(":/Qmitk/mxn-grid-row-add.svg"));
+  m_RemoveColumnButton = makeGridButton(tr("Remove column"), QStringLiteral(":/Qmitk/mxn-grid-column-remove.svg"));
+  m_AddColumnButton = makeGridButton(tr("Add column"), QStringLiteral(":/Qmitk/mxn-grid-column-add.svg"));
   connect(m_RemoveRowButton, &QToolButton::clicked, this, [this]()
   {
     if (!m_MultiWidget.isNull())
@@ -507,24 +531,22 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
       m_MultiWidget->AddGridColumn();
     }
   });
-  gridRow->addStretch();
-  gridRow->addWidget(new QLabel(tr("Rows:"), this));
+  gridRow->addWidget(new QLabel(tr("Grid:"), this));
   gridRow->addWidget(m_RemoveRowButton);
   gridRow->addWidget(m_AddRowButton);
   gridRow->addSpacing(12);
-  gridRow->addWidget(new QLabel(tr("Columns:"), this));
   gridRow->addWidget(m_RemoveColumnButton);
   gridRow->addWidget(m_AddColumnButton);
   gridRow->addSpacing(12);
-  m_EditGridButton = new QToolButton(this);
-  m_EditGridButton->setText(tr("Edit grid..."));
-  m_EditGridButton->setToolTip(tr("Choose a grid size, or derive an arrangement from the loaded "
-                                  "data. Either replaces the current window arrangement and its "
-                                  "synchronization groups."));
+  m_EditGridButton = makeGridButton(tr("Edit grid..."), QStringLiteral(":/Qmitk/mxn-grid-edit.svg"));
+  m_EditGridButton->setToolTip(tr("Edit grid: choose a grid size, or derive an arrangement from the "
+                                  "loaded data. Either replaces the current window arrangement and "
+                                  "its synchronization groups."));
   connect(m_EditGridButton, &QToolButton::clicked, this, [this]() { this->ShowGridDialog(); });
   gridRow->addWidget(m_EditGridButton);
   gridRow->addStretch();
-  mainLayout->addLayout(gridRow);
+  layoutBoxLayout->addLayout(gridRow);
+  mainLayout->addWidget(layoutBox);
 
   // The windows themselves are arranged on their peek plates in the display,
   // which stay up while this view is visible; this line says so, and says why
@@ -543,7 +565,6 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   auto* groupsPage = new QWidget(m_FacesTab);
   auto* groupsPageLayout = new QVBoxLayout(groupsPage);
-  groupsPageLayout->setContentsMargins(4, 4, 4, 4);
 
   auto* groupsActionRow = new QHBoxLayout();
   m_AddGroupButton = new QToolButton(groupsPage);
@@ -576,7 +597,6 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   // this face to what it is for: association and offset.
   m_MatrixPane = new QWidget(m_FacesTab);
   auto* matrixPaneLayout = new QVBoxLayout(m_MatrixPane);
-  matrixPaneLayout->setContentsMargins(4, 4, 4, 4);
 
   // The same action in the same corner as on the cards page, so the gesture
   // carries over between the two faces.

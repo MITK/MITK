@@ -27,6 +27,11 @@
     <file>mxn-axis-lut.svg</file>
     <file>mxn-axis-selection.svg</file>
     <file>mxn-crosshair.svg</file>
+    <file>mxn-grid-column-add.svg</file>
+    <file>mxn-grid-column-remove.svg</file>
+    <file>mxn-grid-edit.svg</file>
+    <file>mxn-grid-row-add.svg</file>
+    <file>mxn-grid-row-remove.svg</file>
     <file>mxn-maximize.svg</file>
     <file>mxn-restore.svg</file>
     <file>mxn-clean-off.svg</file>

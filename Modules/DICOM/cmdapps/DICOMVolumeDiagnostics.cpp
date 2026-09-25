@@ -101,10 +101,23 @@ int main(int argc, char* argv[])
     else
     {
       bool pathIsDirectory = fs::is_directory(inputFilename);
+      std::string resolvedInputFilename = inputFilename;
+
+      if (!pathIsDirectory)
+      {
+        const auto listedFile = mitk::FindListedFile(inputFilename, relevantFiles);
+
+        if (!listedFile.has_value())
+        {
+          mitkThrow() << "DICOM Volume Diagnostics did not find the input file among the DICOM files of its directory. Input: " << inputFilename;
+        }
+
+        resolvedInputFilename = listedFile.value();
+      }
 
       if (!pathIsDirectory && onlyOwnSeries)
       {
-        relevantFiles = mitk::FilterDICOMFilesForSameSeries(inputFilename, relevantFiles);
+        relevantFiles = mitk::FilterDICOMFilesForSameSeries(resolvedInputFilename, relevantFiles);
       }
 
       diagnosticsResult["analyzed_files"] = relevantFiles;
@@ -162,7 +175,7 @@ int main(int argc, char* argv[])
         for (std::remove_const_t<decltype(nrOfOutputs)> outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
         {
           const bool isRelevantOutput = pathIsDirectory
-            || mitk::ContainsFile(reader->GetOutput(outputIndex).GetImageFrameList(), inputFilename);
+            || mitk::ContainsFile(reader->GetOutput(outputIndex).GetImageFrameList(), resolvedInputFilename);
 
           if (isRelevantOutput)
           {

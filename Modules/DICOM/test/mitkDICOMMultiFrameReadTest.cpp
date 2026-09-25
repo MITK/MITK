@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkDICOMIOMetaInformationPropertyConstants.h>
 #include <mitkDICOMProperty.h>
 #include <mitkDICOMTagPath.h>
+#include <mitkFileSystem.h>
 #include <mitkIDICOMTagsOfInterest.h>
 #include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkIOUtil.h>
@@ -151,6 +152,7 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(EnhancedFilesWithTopLevelGeometryAreSeparated);
   MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolume);
   MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolumeWithAFreshReader);
+  MITK_TEST(OpeningAFileWithDifferentlyCasedNameLoadsIt);
   MITK_TEST(EnhancedFileIsSeparatedFromSingleFrameFiles);
   MITK_TEST(SingleFrameEnhancedFilesStillStackIntoOneVolume);
   MITK_TEST(FrameModelFilesAreNotCondensedInto3DnT);
@@ -1070,6 +1072,33 @@ public:
 
     const auto images = this->LoadAll(directory + "/file_0.dcm", "MITK Simple 3D Volume Importer");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Only the volume of the opened file is loaded",
+                                 std::size_t(1), images.size());
+  }
+
+  /** The opened file is matched to its directory listing regardless of the
+      spelling of its name. This only exercises anything on a case-insensitive
+      filesystem; on a case-sensitive one the altered path does not exist and
+      the test returns early. */
+  void OpeningAFileWithDifferentlyCasedNameLoadsIt()
+  {
+    const std::string directory = this->WriteSeries(2, [](mitk::DICOMMultiFrameTestObject& object, unsigned int file)
+    {
+      object.topLevelGeometry = true;
+      object.zOffset = file * FRAME_COUNT * object.sliceSpacing;
+      for (auto& frame : object.frames)
+      {
+        frame.slope = 1.0 + file;
+      }
+    });
+
+    const std::string altered = directory + "/FILE_0.dcm";
+    if (!fs::exists(altered))
+    {
+      return;
+    }
+
+    const auto images = this->LoadAll(altered);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The opened file is found although its name is spelled in a different case",
                                  std::size_t(1), images.size());
   }
 

@@ -59,8 +59,10 @@ namespace
 
   mitk::IPreferences* GetPreferences()
   {
-    auto preferencesService = mitk::CoreServices::GetPreferencesService();
-    return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+    // Absent in command line tools and tests.
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto* systemPreferences = nullptr != preferencesService ? preferencesService->GetSystemPreferences() : nullptr;
+    return nullptr != systemPreferences ? systemPreferences->Node("org.mitk.views.segmentation") : nullptr;
   }
 }
 
@@ -728,7 +730,7 @@ void mitk::LabelSetImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer *renderer,
 
   float depth = this->CalculateLayerDepth(renderer);
   // Set the origin to (xMin; yMin; depth) of the plane. This is necessary for obtaining the correct
-  // plane size in crosshair rotation and swivel mode.
+  // plane size in crosshair rotation.
   localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depth);
   // These two points define the axes of the plane in combination with the origin.
   // Point 1 is the x-axis and point 2 the y-axis.

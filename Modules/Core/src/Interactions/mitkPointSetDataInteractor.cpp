@@ -39,6 +39,7 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("finishMovement", FinishMove);
   CONNECT_FUNCTION("removePoint", RemovePoint);
   CONNECT_FUNCTION("keyDelete", KeyDelete);
+  CONNECT_FUNCTION("abort", Abort);
 }
 
 void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineAction, InteractionEvent *interactionEvent)

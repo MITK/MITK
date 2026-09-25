@@ -12,11 +12,15 @@ found in the LICENSE file.
 
 // VTK
 #include <vtkCamera.h>
+#include <vtkImageData.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkWindowToImageFilter.h>
+
+#include <algorithm>
 
 // MITK
 #include <mitkNodePredicateDataType.h>
@@ -118,6 +122,40 @@ void mitk::RenderingTestHelper::Render()
   {
     MITK_ERROR << "No images loaded in data storage!";
   }
+}
+
+bool mitk::RenderingTestHelper::RendersAnything()
+{
+  auto* renderWindow = this->GetVtkRenderWindow();
+
+  const auto swapBuffers = renderWindow->GetSwapBuffers();
+  renderWindow->SwapBuffersOff();
+  this->Render();
+
+  auto grabber = vtkSmartPointer<vtkWindowToImageFilter>::New();
+  grabber->SetInput(renderWindow);
+  grabber->ShouldRerenderOff();
+  grabber->ReadFrontBufferOff();
+  grabber->Update();
+
+  renderWindow->SetSwapBuffers(swapBuffers);
+
+  auto* capture = grabber->GetOutput();
+
+  int dimensions[3];
+  capture->GetDimensions(dimensions);
+
+  const auto components = capture->GetNumberOfScalarComponents();
+  const auto* pixels = static_cast<const unsigned char*>(capture->GetScalarPointer());
+  const auto numberOfPixels = static_cast<vtkIdType>(dimensions[0]) * dimensions[1];
+
+  for (vtkIdType i = 1; i < numberOfPixels; ++i)
+  {
+    if (!std::equal(pixels, pixels + components, pixels + i * components))
+      return true;
+  }
+
+  return false;
 }
 
 mitk::DataStorage::Pointer mitk::RenderingTestHelper::GetDataStorage()

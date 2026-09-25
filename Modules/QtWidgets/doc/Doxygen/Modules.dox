@@ -8,7 +8,7 @@
   any MITK application. The main widgets are:
 
   - QmitkLevelWindowWidget
-  - QmitkProgressBar
+  - QmitkProgressNotificationOverlay
   - QmitkRenderWindow
   - QmitkStdMultiWidget
 

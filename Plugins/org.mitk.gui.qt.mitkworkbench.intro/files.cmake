@@ -4,17 +4,22 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkMitkWorkbenchIntroPlugin.cpp
   QmitkMitkWorkbenchIntroPart.cpp
-  QmitkMitkWorkbenchIntroPreferencePage.cpp
+  QmitkWelcomePalette.cpp
+  QmitkWelcomePersonalizationPage.cpp
+  QmitkWelcomeRecentDataPage.cpp
+  QmitkWelcomeText.cpp
+  QmitkWelcomeTipsPage.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkMitkWorkbenchIntroPlugin.h
   src/internal/QmitkMitkWorkbenchIntroPart.h
-  src/internal/QmitkMitkWorkbenchIntroPreferencePage.h
+  src/internal/QmitkWelcomePersonalizationPage.h
+  src/internal/QmitkWelcomeRecentDataPage.h
+  src/internal/QmitkWelcomeTipsPage.h
 )
 
 set(UI_FILES
-  src/internal/QmitkMitkWorkbenchIntroPreferencePage.ui
 )
 
 set(CACHED_RESOURCE_FILES
@@ -36,4 +41,3 @@ endforeach(file ${SRC_CPP_FILES})
 foreach(file ${INTERNAL_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
-

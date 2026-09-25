@@ -90,12 +90,20 @@ public:
   /** \brief Return the number of data columns. */
   int columnCount() const;
 
+  /** \brief Whether a value is rendered for reading or for an export that stays machine readable. */
+  enum class ValueFormat
+  {
+    Display,
+    Raw
+  };
+
   /**
    * \brief Return the data for the given column.
    * \param column The column index.
+   * \param format Whether the value is rendered for reading or for an export.
    * \return The data value as QVariant.
    */
-  QVariant data(int column) const;
+  QVariant data(int column, ValueFormat format) const;
 
   /** \brief Return this item's row index within its parent. */
   int row() const;

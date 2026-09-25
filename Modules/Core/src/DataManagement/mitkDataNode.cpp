@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkSmartPointerProperty.h>
 #include <mitkStringProperty.h>
+#include <mitkStorageThreadDispatcherBase.h>
 //#include "mitkMaterialProperty.h"
 #include <mitkColorProperty.h>
 #include <mitkGenericProperty.h>
@@ -52,6 +53,12 @@ void mitk::DataNode::SetData(mitk::BaseData *baseData)
 {
   if (m_Data != baseData)
   {
+    // Only when there is something to replace. A node that has no data yet is
+    // one nobody can be looking at, which is what a reader building a node on a
+    // worker leaves behind.
+    if (m_Data.IsNotNull())
+      WarnIfOffStorageThread("Replacing the data of a node");
+
     m_Mappers.clear();
     m_Mappers.resize(10);
 

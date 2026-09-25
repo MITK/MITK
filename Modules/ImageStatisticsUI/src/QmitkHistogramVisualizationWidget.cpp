@@ -24,6 +24,8 @@ found in the LICENSE file.
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_samples.h>
+#include <qwt_scale_div.h>
+#include <qwt_scale_widget.h>
 #include <qwt_series_data.h>
 #include <qwt_text.h>
 
@@ -34,16 +36,18 @@ found in the LICENSE file.
 #include <QEvent>
 #include <QMouseEvent>
 #include <QPen>
+#include <QStack>
 #include <QVBoxLayout>
 #include <QVector>
 
 #include <cmath>
+#include <optional>
 
 namespace
 {
   const QColor BAR_COLOR(0x4a, 0x90, 0xd9);
 
-  QVector<QwtIntervalSample> ToIntervalSamples(itk::Statistics::Histogram<double>::ConstPointer histogram)
+  QVector<QwtIntervalSample> ToIntervalSamples(const itk::Statistics::Histogram<double>* histogram)
   {
     QVector<QwtIntervalSample> samples;
     samples.reserve(static_cast<int>(histogram->Size()));
@@ -81,13 +85,75 @@ namespace
     return -1;
   }
 
-  /** Shows the hovered bin's gray-value range and frequency as a tracker tooltip. */
+  struct HoveredBar
+  {
+    const QwtPlotHistogram* item = nullptr;
+    QwtIntervalSample sample;
+  };
+
+  /** Returns the bar under the cursor. Among the series that have a bin at x this is the
+  lowest bar that still reaches up to y, or the tallest bar if the cursor is above all of
+  them. The highlight item is skipped because it duplicates the hovered bar. */
+  std::optional<HoveredBar> FindHoveredBar(const QwtPlot* plot, const QwtPlotItem* highlightItem, const QPointF& pos)
+  {
+    std::optional<HoveredBar> covering;
+    std::optional<HoveredBar> tallest;
+
+    for (const auto* plotItem : plot->itemList(QwtPlotItem::Rtti_PlotHistogram))
+    {
+      if (plotItem == highlightItem)
+        continue;
+
+      const auto* histogram = static_cast<const QwtPlotHistogram*>(plotItem);
+      const int bin = FindBin(histogram->data(), pos.x());
+
+      if (bin < 0)
+        continue;
+
+      const HoveredBar bar{ histogram, histogram->data()->sample(bin) };
+
+      if (bar.sample.value >= pos.y() && (!covering || bar.sample.value < covering->sample.value))
+        covering = bar;
+
+      if (!tallest || bar.sample.value > tallest->sample.value)
+        tallest = bar;
+    }
+
+    return covering ? covering : tallest;
+  }
+
+  /** Number of shown series, i.e. all histogram items except the highlight item. */
+  int CountSeries(const QwtPlot* plot)
+  {
+    return static_cast<int>(plot->itemList(QwtPlotItem::Rtti_PlotHistogram).size()) - 1;
+  }
+
+  /** The value range currently shown by the axes, in the layout of QwtPlotZoomer's rectangles. */
+  QRectF VisibleRect(const QwtPlot* plot)
+  {
+    const QwtScaleDiv& x = plot->axisScaleDiv(QwtPlot::xBottom);
+    const QwtScaleDiv& y = plot->axisScaleDiv(QwtPlot::yLeft);
+    return QRectF(QPointF(x.lowerBound(), y.lowerBound()), QPointF(x.upperBound(), y.upperBound()));
+  }
+
+  bool OverlapsHorizontally(const QRectF& a, const QRectF& b)
+  {
+    return a.left() < b.right() && b.left() < a.right();
+  }
+
+  bool OverlapsVertically(const QRectF& a, const QRectF& b)
+  {
+    return a.top() < b.bottom() && b.top() < a.bottom();
+  }
+
+  /** Shows the hovered bin's series, gray-value range and frequency as a tracker tooltip. */
   class HistogramPicker : public QwtPlotPicker
   {
   public:
-    explicit HistogramPicker(QwtPlot* plot)
+    HistogramPicker(QwtPlot* plot, const QwtPlotItem* highlightItem)
       : QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn, plot->canvas()),
-        m_Plot(plot)
+        m_Plot(plot),
+        m_HighlightItem(highlightItem)
     {
       this->setStateMachine(new QwtPickerTrackerMachine);
     }
@@ -95,24 +161,25 @@ namespace
   protected:
     QwtText trackerTextF(const QPointF& pos) const override
     {
-      const QwtPlotItemList items = m_Plot->itemList(QwtPlotItem::Rtti_PlotHistogram);
-      for (auto* plotItem : items)
-      {
-        const auto* histogram = static_cast<const QwtPlotHistogram*>(plotItem);
-        const QwtSeriesData<QwtIntervalSample>* data = histogram->data();
-        const int bin = FindBin(data, pos.x());
-        if (bin >= 0)
-        {
-          const QwtIntervalSample sample = data->sample(bin);
-          return QmitkImageStatisticsPlot::MakeTooltip(QString("Gray value: [%1, %2]\nFrequency: %3")
-            .arg(sample.interval.minValue()).arg(sample.interval.maxValue()).arg(sample.value));
-        }
-      }
-      return QwtText();
+      const auto hovered = FindHoveredBar(m_Plot, m_HighlightItem, pos);
+
+      if (!hovered)
+        return QwtText();
+
+      QString text;
+
+      if (CountSeries(m_Plot) > 1)
+        text = hovered->item->title().text() + '\n';
+
+      text += QString("Gray value: [%1, %2]\nFrequency: %3")
+        .arg(hovered->sample.interval.minValue()).arg(hovered->sample.interval.maxValue()).arg(hovered->sample.value);
+
+      return QmitkImageStatisticsPlot::MakeTooltip(text);
     }
 
   private:
     QwtPlot* m_Plot;
+    const QwtPlotItem* m_HighlightItem;
   };
 }
 
@@ -143,11 +210,12 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
   m_HighlightItem->setZ(1000);
   m_HighlightItem->attach(m_Plot);
 
-  new HistogramPicker(m_Plot);
+  new HistogramPicker(m_Plot, m_HighlightItem);
   m_Plot->canvas()->installEventFilter(this);
   m_Plot->canvas()->setMouseTracking(true);
 
-  m_Zoomer = QmitkImageStatisticsPlot::SetupNavigation(m_Plot);
+  // Frequencies are never negative, so no navigation needs to reach below zero.
+  m_Zoomer = QmitkImageStatisticsPlot::SetupNavigation(m_Plot, 0.0);
 
   auto* layout = new QVBoxLayout(m_Controls->plotContainer);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -162,56 +230,126 @@ QmitkHistogramVisualizationWidget::~QmitkHistogramVisualizationWidget()
 {
 }
 
-void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<double>::ConstPointer histogram, const std::string& dataLabel)
+void QmitkHistogramVisualizationWidget::SetHistograms(const std::vector<HistogramSeries>& series)
 {
-  if (histogram.IsNull())
-    return;
+  // Panning and wheel zoom change the axes without touching the zoom stack, so
+  // the visible range rather than the zoomer's rectangle is what has to survive.
+  const QRectF previousView = VisibleRect(m_Plot);
+  const bool wasZoomed = m_Zoomer->zoomRectIndex() > 0 || previousView != m_Zoomer->zoomBase();
+  const QStack<QRectF> previousZoomStack = m_Zoomer->zoomStack();
+  const int previousZoomIndex = static_cast<int>(m_Zoomer->zoomRectIndex());
 
-  this->ClearHighlight();
+  this->RemoveSeries();
 
-  const bool histogramWasEmpty = m_Histograms.empty();
-  m_Histograms[dataLabel] = histogram;
+  // Overlapping series stay visible only with translucent fills. A single
+  // series keeps the opaque look.
+  const int alpha = series.size() > 1 ? 150 : 255;
 
-  auto it = m_HistogramItems.find(dataLabel);
-  if (it == m_HistogramItems.end())
+  for (const auto& entry : series)
   {
-    auto* item = new QwtPlotHistogram(QString::fromStdString(dataLabel));
+    if (entry.histogram.IsNull())
+      continue;
+
+    QColor color = entry.color.isValid() ? entry.color : BAR_COLOR;
+    color.setAlpha(alpha);
+    auto* item = new QwtPlotHistogram(entry.name);
     item->setStyle(QwtPlotHistogram::Columns);
-    item->setBrush(BAR_COLOR);
-    item->setPen(QPen(BAR_COLOR));
+    // No outline: adjacent columns of a series touch anyway, and an outline
+    // would stay visible as a grid where translucent series overlap.
+    item->setPen(QPen(Qt::NoPen));
+    item->setBrush(color);
+    item->setSamples(ToIntervalSamples(entry.histogram));
     item->attach(m_Plot);
-    it = m_HistogramItems.emplace(dataLabel, item).first;
+    m_Series.push_back({ entry, item });
   }
 
-  it->second->setSamples(ToIntervalSamples(histogram));
+  if (m_Series.empty())
+  {
+    // Axes and zoom stack are left alone so that the next series appears in
+    // the same view.
+    m_Plot->replot();
+    this->SetGUIElementsEnabled(false);
+    return;
+  }
 
-  // A previous mouse zoom leaves fixed axis scales behind. Re-enable autoscaling
-  // so the replot fits all histograms, then take that view as the zoom base.
+  // A previous zoom leaves fixed axis scales behind. Re-enable autoscaling so
+  // the replot fits all series and take that view as the new zoom base.
   m_Plot->setAxisAutoScale(QwtPlot::xBottom);
   m_Plot->setAxisAutoScale(QwtPlot::yLeft);
   m_Zoomer->setZoomBase(true);
-  this->OnZoomed(m_Zoomer->zoomRect());
 
-  if (m_Histograms.empty() != histogramWasEmpty)
-    this->SetGUIElementsEnabled(!m_Histograms.empty());
+  const QRectF base = m_Zoomer->zoomBase();
+
+  // A zoom is about the gray value range, so a former view survives as long as
+  // it still overlaps the new data horizontally. A frequency range that does
+  // not (e.g. after switching from a large to a small label) would leave the
+  // plot empty and is widened to the new full range instead.
+  const auto fitToData = [&base](QRectF view) -> std::optional<QRectF>
+  {
+    if (!OverlapsHorizontally(view, base))
+      return std::nullopt;
+
+    if (!OverlapsVertically(view, base))
+    {
+      view.setTop(base.top());
+      view.setBottom(base.bottom());
+    }
+
+    return view;
+  };
+
+  std::optional<QRectF> view;
+
+  if (wasZoomed)
+    view = fitToData(previousView);
+
+  if (view)
+  {
+    // The former view replaces the stack entry it was based on, so panning or
+    // the widened y range do not leave a stale rectangle behind. Earlier zoom
+    // steps are kept on the same terms, so zooming out step by step never
+    // passes through an empty view.
+    QStack<QRectF> zoomStack = m_Zoomer->zoomStack();
+
+    for (int i = 1; i < previousZoomIndex; ++i)
+    {
+      if (const auto step = fitToData(previousZoomStack[i]); step && *step != zoomStack.top())
+        zoomStack.push(*step);
+    }
+
+    if (*view != zoomStack.top())
+      zoomStack.push(*view);
+
+    m_Zoomer->setZoomStack(zoomStack, static_cast<int>(zoomStack.size()) - 1);
+  }
+
+  this->OnZoomed(m_Zoomer->zoomRect());
+  this->SetGUIElementsEnabled(true);
 }
 
 void QmitkHistogramVisualizationWidget::Reset()
 {
-  for (const auto& item : m_HistogramItems)
-  {
-    item.second->detach();
-    delete item.second;
-  }
-  m_HistogramItems.clear();
-  m_Histograms.clear();
-  this->ClearHighlight();
+  this->RemoveSeries();
 
   m_Plot->setAxisAutoScale(QwtPlot::xBottom);
   m_Plot->setAxisAutoScale(QwtPlot::yLeft);
-  m_Plot->replot();
+  // Drops the zoom stack too, otherwise the next SetHistograms() would restore
+  // a zoom that belongs to data no longer shown.
+  m_Zoomer->setZoomBase(true);
 
-  SetGUIElementsEnabled(false);
+  this->SetGUIElementsEnabled(false);
+}
+
+void QmitkHistogramVisualizationWidget::RemoveSeries()
+{
+  for (const auto& entry : m_Series)
+  {
+    entry.item->detach();
+    delete entry.item;
+  }
+
+  m_Series.clear();
+  this->ClearHighlight();
 }
 
 int QmitkHistogramVisualizationWidget::GetBins() {
@@ -238,30 +376,16 @@ void QmitkHistogramVisualizationWidget::ApplyTheme()
 
 void QmitkHistogramVisualizationWidget::OnHover(const QPointF& pos)
 {
-  bool found = false;
-  QwtIntervalSample hovered;
-
-  for (const auto& entry : m_HistogramItems)
-  {
-    const QwtSeriesData<QwtIntervalSample>* data = entry.second->data();
-    const int bin = FindBin(data, pos.x());
-    if (bin >= 0)
-    {
-      hovered = data->sample(bin);
-      found = true;
-      break;
-    }
-  }
-
+  const auto hovered = FindHoveredBar(m_Plot, m_HighlightItem, pos);
   const bool hasHighlight = m_HighlightItem->data()->size() > 0;
 
-  if (found)
+  if (hovered)
   {
-    if (hasHighlight && m_HighlightItem->data()->sample(0).interval.minValue() == hovered.interval.minValue())
+    if (hasHighlight && m_HighlightItem->data()->sample(0) == hovered->sample)
       return;
 
     QVector<QwtIntervalSample> single;
-    single.append(hovered);
+    single.append(hovered->sample);
     m_HighlightItem->setSamples(single);
     m_Plot->replot();
   }
@@ -285,7 +409,10 @@ bool QmitkHistogramVisualizationWidget::eventFilter(QObject* watched, QEvent* ev
     if (event->type() == QEvent::MouseMove)
     {
       const auto* mouseEvent = static_cast<QMouseEvent*>(event);
-      this->OnHover(QPointF(m_Plot->invTransform(QwtPlot::xBottom, mouseEvent->position().x()), 0.0));
+      const auto position = mouseEvent->position();
+      this->OnHover(QPointF(
+        m_Plot->invTransform(QwtPlot::xBottom, position.x()),
+        m_Plot->invTransform(QwtPlot::yLeft, position.y())));
     }
     else if (event->type() == QEvent::Leave && m_HighlightItem->data()->size() > 0)
     {
@@ -305,7 +432,12 @@ void QmitkHistogramVisualizationWidget::CreateConnections()
   connect(m_Controls->doubleSpinBoxMinValue, &QDoubleSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnZoomRangeEdited);
   connect(m_Controls->doubleSpinBoxMaxValue, &QDoubleSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnZoomRangeEdited);
   connect(m_Controls->buttonResetZoom, &QPushButton::clicked, this, [this]() { m_Zoomer->zoom(0); });
-  connect(m_Zoomer, &QwtPlotZoomer::zoomed, this, &QmitkHistogramVisualizationWidget::OnZoomed);
+  // The axis rather than the zoomer, so the spin boxes also follow panning and
+  // wheel zoom, which bypass the zoom stack.
+  connect(m_Plot->axisWidget(QwtPlot::xBottom), &QwtScaleWidget::scaleDivChanged, this, [this]()
+  {
+    this->OnZoomed(VisibleRect(m_Plot));
+  });
 }
 
 void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
@@ -318,15 +450,15 @@ void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
 
 void QmitkHistogramVisualizationWidget::OnClipboardButtonClicked()
 {
-  if (!m_Histograms.empty())
+  if (!m_Series.empty())
   {
     QString clipboard;
-    for (const auto& histogram : m_Histograms)
+    for (const auto& entry : m_Series)
     {
-      clipboard.append(QString::fromStdString(histogram.first));
-      clipboard.append("Measurement \t Frequency\n");
-      auto iter = histogram.second->Begin();
-      auto iterEnd = histogram.second->End();
+      clipboard.append(entry.series.name);
+      clipboard.append("\nMeasurement \t Frequency\n");
+      auto iter = entry.series.histogram->Begin();
+      auto iterEnd = entry.series.histogram->End();
       for (; iter != iterEnd; ++iter)
       {
         clipboard = clipboard.append("%L1 \t %L2\n")
@@ -364,12 +496,15 @@ void QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged()
 
 void QmitkHistogramVisualizationWidget::OnZoomRangeEdited()
 {
-  QRectF rect = m_Zoomer->zoomRect();
+  // The visible rather than the zoomer's rectangle: after panning the two
+  // differ in y, and editing the gray value range must not snap the frequency
+  // range back.
+  QRectF rect = VisibleRect(m_Plot);
   rect.setLeft(m_Controls->doubleSpinBoxMinValue->value());
   rect.setRight(m_Controls->doubleSpinBoxMaxValue->value());
 
   // Goes through the zoomer so the rectangle lands on its zoom stack and
-  // mouse navigation continues from there; zoomed() then syncs the spin boxes.
+  // mouse navigation continues from there. The axis then syncs the spin boxes.
   m_Zoomer->zoom(rect);
 }
 
@@ -377,12 +512,13 @@ void QmitkHistogramVisualizationWidget::OnZoomed(const QRectF& rect)
 {
   auto* minBox = m_Controls->doubleSpinBoxMinValue;
   auto* maxBox = m_Controls->doubleSpinBoxMaxValue;
-  const QRectF base = m_Zoomer->zoomBase();
-
-  // Widen both boxes to the full range first so neither value is clamped by a
-  // limit left over from the previous zoom rectangle.
-  minBox->setRange(base.left(), base.right());
-  maxBox->setRange(base.left(), base.right());
+  // Panning and wheel zoom can show more than the data range, so the boxes
+  // accept the whole visible range and not just the zoom base. Widen both
+  // boxes first so neither value is clamped by a limit left over from the
+  // previous zoom rectangle.
+  const QRectF range = m_Zoomer->zoomBase().united(rect);
+  minBox->setRange(range.left(), range.right());
+  maxBox->setRange(range.left(), range.right());
   minBox->setValue(rect.left());
   maxBox->setValue(rect.right());
 

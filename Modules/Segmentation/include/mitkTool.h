@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <itkVersion.h>
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
+#include <mitkDisplayActionEventBroadcast.h>
 #include <mitkEventStateMachine.h>
 #include <mitkInteractionEventObserver.h>
 #include <mitkLabelSetImage.h>
@@ -55,9 +56,7 @@ namespace mitk
 
   Every tool is a mitk::EventStateMachine, which can follow any transition pattern that it likes.
   Every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated,
-  because mitk::Tool resets the interaction configuration in this method.
-  Only if you are very sure that you covered all possible things that might happen to your own tool,
-  you should consider not to reset the configuration.
+  because mitk::Tool releases its block of the display interaction in this method.
 
   To learn about the MITK implementation of state machines in general, have a look at \ref InteractionPage.
 
@@ -228,6 +227,23 @@ namespace mitk
      ToolManager is not set).*/
     mitk::DataStorage* GetDataStorage() const;
 
+    /** \brief True if the image has exactly one scalar component per pixel.
+     *
+     * This is what the ITK access macros can process. RGB, RGBA and vector pixel
+     * types fail there, as do images that are typed as scalar but carry several
+     * components (e.g. imported from VTK).
+     */
+    static bool IsSingleComponentScalarImage(const Image* image);
+
+    /** \brief True if a 2D slice of the image reduces to one meaningful component.
+     *
+     * Single-component images qualify. Vector images qualify because the slice
+     * extraction picks the displayed component. Composite RGB and RGBA images do
+     * not, as they have no displayed component and their first component (red)
+     * does not represent what the user sees.
+     */
+    static bool HasSingleComponentSlices(const Image* image);
+
     void ConnectActionsAndFunctions() override;
 
     /**
@@ -244,10 +260,26 @@ namespace mitk
     */
     virtual void Deactivated();
 
-    /**
-    \brief Let subclasses change their event configuration.
-    */
-    std::string m_EventConfig;
+    /** \brief If true, display actions ignore left mouse button presses while the tool is active.
+     *
+     * Default is false. Tools that react to the left mouse button switch it on,
+     * so that a click does not also trigger a display action like moving the
+     * crosshair. See DisplayActionEventBroadcast::BlockLeftButton().
+     */
+    itkSetMacro(BlocksDisplayLeftButton, bool);
+    itkGetConstMacro(BlocksDisplayLeftButton, bool);
+    itkBooleanMacro(BlocksDisplayLeftButton);
+
+    /** \brief If true, the tool is armed exclusively while it is active.
+     *
+     * Default is false. Tools that take input in the render windows switch it
+     * on. Activating such a tool disarms the armed tools of other views, and
+     * arming a tool in another view deactivates it (see ExclusiveInteraction
+     * and ToolManager::SetDeactivationConfirmation()).
+     */
+    itkSetMacro(ClaimsExclusiveInteraction, bool);
+    itkGetConstMacro(ClaimsExclusiveInteraction, bool);
+    itkBooleanMacro(ClaimsExclusiveInteraction);
 
     Tool(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~Tool() override;
@@ -261,7 +293,10 @@ namespace mitk
 
     std::string m_InteractorType;
 
-    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractionConfigs;
+    bool m_BlocksDisplayLeftButton = false;
+    DisplayActionEventBroadcast::LeftButtonBlock m_DisplayLeftButtonBlock;
+
+    bool m_ClaimsExclusiveInteraction = false;
 
     const us::Module *m_InteractorModule;
   };

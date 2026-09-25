@@ -68,7 +68,8 @@ mitk::SegTool2D::SliceInformation::SliceInformation(const mitk::Image* aSlice, c
 mitk::SegTool2D::SegTool2D(const char *type, const us::Module *interactorModule)
   : Tool(type, interactorModule), m_Contourmarkername("Position")
 {
-  Tool::m_EventConfig = "DisplayConfigBlockLMB.xml";
+  this->BlocksDisplayLeftButtonOn();
+  this->ClaimsExclusiveInteractionOn();
 }
 
 mitk::SegTool2D::~SegTool2D()
@@ -80,7 +81,11 @@ bool mitk::SegTool2D::CanHandle(const BaseData *referenceData, const BaseData *w
   if (!Superclass::CanHandle(referenceData, workingData))
     return false;
 
-  if (dynamic_cast<const Image*>(referenceData) == nullptr)
+  auto* referenceImage = dynamic_cast<const Image*>(referenceData);
+  if (referenceImage == nullptr)
+    return false;
+
+  if (m_RequiresScalarReferenceSlice && !HasSingleComponentSlices(referenceImage))
     return false;
 
   auto* segmentation = dynamic_cast<const MultiLabelSegmentation*>(workingData);

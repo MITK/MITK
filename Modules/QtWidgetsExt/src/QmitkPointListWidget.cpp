@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QSignalBlocker>
 #include <mitkIOUtil.h>
 
 #include <QmitkAbstractMultiWidget.h>
@@ -40,7 +41,8 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
     m_DataInteractor(nullptr),
     m_TimeStep(0),
     m_EditAllowed(true),
-    m_NodeObserverTag(0)
+    m_NodeObserverTag(0),
+    m_InteractorObserverTag(0)
 {
   m_PointListView = new QmitkPointListView();
 
@@ -60,6 +62,12 @@ QmitkPointListWidget::~QmitkPointListWidget()
   {
     m_PointSetNode->RemoveObserver(m_NodeObserverTag);
     m_NodeObserverTag = 0;
+  }
+
+  if (m_PointSetNode && m_InteractorObserverTag)
+  {
+    m_PointSetNode->RemoveObserver(m_InteractorObserverTag);
+    m_InteractorObserverTag = 0;
   }
 
   delete m_PointListView;
@@ -206,9 +214,6 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
-  if (m_DataInteractor.IsNotNull())
-    m_DataInteractor->SetDataNode(newNode);
-
   ObserveNewNode(newNode);
   dynamic_cast<QmitkPointListModel *>(this->m_PointListView->model())->SetPointSetNode(newNode);
 }
@@ -335,10 +340,29 @@ void QmitkPointListWidget::MoveSelectedPointUp()
 
 void QmitkPointListWidget::OnBtnAddPoint(bool checked)
 {
+  if (!checked)
+    m_ExclusiveInteractionClaim.Reset();
+
   if (m_PointSetNode.IsNotNull())
   {
     if (checked)
     {
+      if (!m_ExclusiveInteractionClaim.IsActive())
+      {
+        m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+          m_ToggleAddPoint->setChecked(false);
+          return true;
+        });
+
+        // The armed tool of another view keeps the exclusive interaction.
+        if (!m_ExclusiveInteractionClaim.IsActive())
+        {
+          const QSignalBlocker blocker(m_ToggleAddPoint);
+          m_ToggleAddPoint->setChecked(false);
+          return;
+        }
+      }
+
       m_DataInteractor = m_PointSetNode->GetDataInteractor();
       // If no data Interactor is present create a new one
       if (m_DataInteractor.IsNull())
@@ -409,20 +433,19 @@ void QmitkPointListWidget::EnableEditButton(bool enabled)
 
 void QmitkPointListWidget::ObserveNewNode(mitk::DataNode *node)
 {
-  if (m_DataInteractor.IsNotNull())
-    m_DataInteractor->SetDataNode(node);
+  // Adding points ends with the node it was started on. Unchecking removes the
+  // interactor from the current node, so it has to happen before the switch.
+  m_ToggleAddPoint->setChecked(false);
+  m_DataInteractor = nullptr;
 
   // remove old observer
   if (m_PointSetNode)
   {
-    if (m_DataInteractor)
-    {
-      m_DataInteractor = nullptr;
-      m_ToggleAddPoint->setChecked(false);
-    }
-
     m_PointSetNode->RemoveObserver(m_NodeObserverTag);
     m_NodeObserverTag = 0;
+
+    m_PointSetNode->RemoveObserver(m_InteractorObserverTag);
+    m_InteractorObserverTag = 0;
   }
 
   m_PointSetNode = node;
@@ -433,10 +456,15 @@ void QmitkPointListWidget::ObserveNewNode(mitk::DataNode *node)
       itk::ReceptorMemberCommand<QmitkPointListWidget>::New();
     command->SetCallbackFunction(this, &QmitkPointListWidget::OnNodeDeleted);
     m_NodeObserverTag = m_PointSetNode->AddObserver(itk::DeleteEvent(), command);
+
+    auto interactorCommand = itk::SimpleMemberCommand<QmitkPointListWidget>::New();
+    interactorCommand->SetCallbackFunction(this, &QmitkPointListWidget::OnNodeInteractorChanged);
+    m_InteractorObserverTag = m_PointSetNode->AddObserver(mitk::InteractorChangedEvent(), interactorCommand);
   }
   else
   {
     m_NodeObserverTag = 0;
+    m_InteractorObserverTag = 0;
   }
 
   if (m_EditAllowed == true)
@@ -455,6 +483,7 @@ void QmitkPointListWidget::OnNodeDeleted(const itk::EventObject &)
   if (m_PointSetNode.IsNotNull() && !m_NodeObserverTag)
     m_PointSetNode->RemoveObserver(m_NodeObserverTag);
   m_NodeObserverTag = 0;
+  m_InteractorObserverTag = 0;
   m_PointSetNode = nullptr;
   m_PointListView->SetPointSetNode(nullptr);
   m_ToggleAddPoint->setEnabled(false);
@@ -463,6 +492,14 @@ void QmitkPointListWidget::OnNodeDeleted(const itk::EventObject &)
   m_LoadPointsBtn->setEnabled(false);
   m_SavePointsBtn->setEnabled(false);
   m_AddPoint->setEnabled(false);
+}
+
+void QmitkPointListWidget::OnNodeInteractorChanged()
+{
+  // The interactor can also be detached without the button, e.g. when it
+  // aborts itself on Escape.
+  if (m_ToggleAddPoint->isChecked() && m_PointSetNode->GetDataInteractor() != m_DataInteractor)
+    m_ToggleAddPoint->setChecked(false);
 }
 
 void QmitkPointListWidget::AddSliceNavigationController(mitk::SliceNavigationController *snc)

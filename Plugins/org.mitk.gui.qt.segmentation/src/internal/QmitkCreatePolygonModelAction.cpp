@@ -99,8 +99,7 @@ namespace
   {
     // Normalize the foreground to 1 so masks with arbitrary non-zero foreground values
     // (commonly 0/255 binary masks) extract correctly when we ask vtkSurfaceNets3D for
-    // label 1. Mirrors the threshold(0.5) behavior of the previous mitkShowSegmentationAsSurface
-    // path.
+    // label 1.
     auto thresholdFilter = vtkSmartPointer<vtkImageBinaryThreshold>::New();
     thresholdFilter->SetInputData(mask);
     thresholdFilter->SetThresholdFunction(vtkImageBinaryThreshold::THRESHOLD_UPPER);

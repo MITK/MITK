@@ -57,6 +57,15 @@ public:
    */
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
+public Q_SLOTS:
+
+  /**
+   * \brief Updates the interaction mode button to the given scheme, without
+   *        emitting InteractionSchemeChanged().
+   * \param[in] scheme The interaction scheme that is currently active.
+   */
+  void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+
 Q_SIGNALS:
 
   /**
@@ -104,8 +113,9 @@ protected Q_SLOTS:
 
 private:
 
-  void InitializeToolBar();;
+  void InitializeToolBar();
   void AddButtons();
+  void UpdateInteractionSchemeAction(bool pacs);
 
   QmitkAbstractMultiWidget* m_MultiWidget;
 

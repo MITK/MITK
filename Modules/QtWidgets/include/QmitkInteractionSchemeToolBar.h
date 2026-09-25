@@ -18,14 +18,19 @@ found in the LICENSE file.
 // mitk core
 #include <mitkInteractionSchemeSwitcher.h>
 
-#include <QActionGroup>
 #include <QToolBar>
 
+class QAction;
+class QActionGroup;
+
 /**
-* \brief Toolbar widget that allows switching between different interaction schemes.
+* \brief Toolbar widget to select the action of the left mouse button in PACS mode.
 *
-* Provides buttons to switch the interaction scheme (e.g., MITK default or PACS mode)
-* using the mitk::InteractionSchemeSwitcher.
+* The toolbar only requests a scheme via InteractionSchemeChanged(); applying
+* it is up to the owner of the interaction event handler, which reports the
+* result back through SetInteractionScheme(). This keeps the button states in
+* sync with the scheme that is actually active, including when it is changed
+* somewhere else.
 */
 class MITKQTWIDGETS_EXPORT QmitkInteractionSchemeToolBar : public QToolBar
 {
@@ -38,18 +43,25 @@ public:
   QmitkInteractionSchemeToolBar(QWidget* parent = nullptr);
   ~QmitkInteractionSchemeToolBar() override;
 
-  void SetInteractionEventHandler(mitk::InteractionEventHandler::Pointer interactionEventHandler);
+public Q_SLOTS:
 
-protected Q_SLOTS:
+  /**
+  * \brief Checks the button that belongs to the given scheme, without emitting
+  *        InteractionSchemeChanged(). A scheme that no button represents,
+  *        including any MITK scheme, leaves all buttons unchecked.
+  */
+  void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme interactionScheme);
 
-  void AddButton(InteractionScheme id, const QString& toolName, const QIcon& icon, bool on = false);
-  void OnInteractionSchemeChanged();
+Q_SIGNALS:
+
+  void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme interactionScheme);
 
 private:
 
-  QActionGroup* m_ActionGroup;
+  void AddButton(InteractionScheme interactionScheme, const QString& toolName, const QString& iconResource);
+  void OnActionTriggered(QAction* action);
 
-  mitk::InteractionEventHandler::Pointer m_InteractionEventHandler;
+  QActionGroup* m_ActionGroup;
 
 };
 

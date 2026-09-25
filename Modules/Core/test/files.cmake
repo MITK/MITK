@@ -56,7 +56,7 @@ set(MODULE_TESTS
   mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetPointOperationsTest.cpp
-  mitkProgressBarTest.cpp
+  mitkProgressTaskTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkPropertyPersistenceTest.cpp
@@ -66,6 +66,7 @@ set(MODULE_TESTS
   mitkPropertyTransienceTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
+  mitkStorageThreadDispatcherTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
@@ -89,6 +90,7 @@ set(MODULE_TESTS
   mitkExtractSliceFilterTest.cpp
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
+  mitkImageVtkReadViewTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkITKThreadingHelperTest.cpp
   mitkUIDGeneratorTest.cpp
@@ -132,12 +134,16 @@ set(MODULE_TESTS
   mitkDataStorageServiceTest.cpp
   mitkStringUtilTest.cpp
   mitkBase64Test.cpp
+  mitkInteractionSchemeSwitcherTest.cpp
+  mitkDisplayActionEventBroadcastTest.cpp
+  mitkExclusiveInteractionTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS
   mitkPointSetDataInteractorTest.cpp
   mitkSurfaceVtkMapper2DTest.cpp
   mitkSurfaceVtkMapper2D3DTest.cpp
+  mitkSurfaceVtkMapper3DPulsingTest.cpp
 )
 
 # test with image filename as an extra command line parameter

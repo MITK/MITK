@@ -1,6 +1,7 @@
 <!--
-* - PACS : The original interaction scheme
-*   - left mouse button   : UNUSED
+* - PACS : The alternative interaction scheme, modelled on a PACS workstation
+*   - left mouse button   : UNUSED, defined by the secondary file that
+*                           selects the active PACS tool
 *   - middle mouse button : UNUSED
 *   - right mouse button
 *     with shift modifier : moving
@@ -8,6 +9,8 @@
 *     with ctrl modifier  : zooming
 *   - right mouse button  : adjust level window
 *   - wheel               : scrolling
+*   - up / down arrow     : scrolling
+*   - left / right arrow  : changing the time step
 -->
 <config>
   <!-- Zoom sensitivity -->
@@ -68,6 +71,20 @@
   </event_variant>
   <event_variant class="MouseWheelEvent" name="PlaneDown">
     <attribute name="ScrollDirection" value="down"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="PlaneUP">
+    <attribute name="Key" value="ArrowUp"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="PlaneDown">
+    <attribute name="Key" value="ArrowDown"/>
+  </event_variant>
+
+  <!-- Change TimeSteps -->
+  <event_variant class="InteractionKeyEvent" name="IncreaseTimeStep">
+    <attribute name="Key" value="ArrowRight"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="DecreaseTimeStep">
+    <attribute name="Key" value="ArrowLeft"/>
   </event_variant>
 
   <!-- General -->

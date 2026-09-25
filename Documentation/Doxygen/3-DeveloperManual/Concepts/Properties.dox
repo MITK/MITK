@@ -138,7 +138,7 @@ GetOpacity( opacity, BaseRenderer );
 (The BaseRenderer is usually known inside a mapper).
 
 
-  <li> reslice interpolation - This property takes effect in swivel mode or crosshair rotation only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
+  <li> reslice interpolation - This property takes effect in crosshair rotation only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
   <li> texture interpolation - This property toggles interpolation of the texture. If enabled, edges between image pixels are blurred. If disabled, edges remain sharp.
   <li> visible - toggle node/image/surface being rendered at all
 </ul>

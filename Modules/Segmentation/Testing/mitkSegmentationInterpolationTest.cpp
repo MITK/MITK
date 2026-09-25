@@ -20,10 +20,14 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
+#include <mitkLabelSetImage.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkTool.h>
 #include <mitkVtkImageOverwrite.h>
+
+#include <algorithm>
+#include <vector>
 
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
@@ -31,71 +35,116 @@ class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
   MITK_TEST(Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
   MITK_TEST(Equal_Coronal_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
   MITK_TEST(Equal_Sagittal_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
+  MITK_TEST(InterpolateAll_Axial_WritesInterpolatedSquare);
+  MITK_TEST(InterpolateAll_Coronal_WritesInterpolatedSquare);
+  MITK_TEST(InterpolateAll_Sagittal_WritesInterpolatedSquare);
+  MITK_TEST(Interpolate_SliceSegmentedAfterwards_ReturnsNull);
+  MITK_TEST(Interpolate_OtherLabels_AreIgnored);
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  // The tests all do the same, only in different directions
-  void testRoutine(mitk::AnatomicalPlane viewDirection)
+  mitk::PlaneGeometry::ConstPointer GetCenterPlane(mitk::AnatomicalPlane viewDirection) const
   {
-    int dim;
-    switch (viewDirection)
-    {
-      case (mitk::AnatomicalPlane::Axial):
-        dim = 2;
-        break;
-      case (mitk::AnatomicalPlane::Coronal):
-        dim = 1;
-        break;
-      case (mitk::AnatomicalPlane::Sagittal):
-        dim = 0;
-        break;
-      default: // mitk::AnatomicalPlane::Original
-        dim = -1;
-        break;
-    }
-
-    /* Fill segmentation
-     *
-     * 1st slice: 3x3 square segmentation
-     * 2nd slice: empty
-     * 3rd slice: 1x1 square segmentation in corner
-     * -> 2nd slice should become 2x2 square in corner
-     *
-     * put accessor in scope
-     */
-
-    itk::Index<3> currentPoint;
-    {
-      mitk::ImagePixelWriteAccessor<mitk::Tool::DefaultSegmentationDataType, 3> writeAccessor(m_SegmentationImage);
-
-      // Fill 3x3 slice
-      currentPoint[dim] = m_CenterPoint[dim] - 1;
-      for (int i = -1; i <= 1; ++i)
-      {
-        for (int j = -1; j <= 1; ++j)
-        {
-          currentPoint[(dim + 1) % 3] = m_CenterPoint[(dim + 1) % 3] + i;
-          currentPoint[(dim + 2) % 3] = m_CenterPoint[(dim + 2) % 3] + j;
-          writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
-        }
-      }
-      // Now i=j=1, set point two slices up
-      currentPoint[dim] = m_CenterPoint[dim] + 1;
-      writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
-    }
-
-    //        mitk::IOUtil::Save(m_SegmentationImage, "SOME PATH");
-
-    m_InterpolationController->SetSegmentationVolume(m_SegmentationImage);
-
-    // This could be easier...
-    mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();
+    auto navigationController = mitk::SliceNavigationController::New();
     navigationController->SetInputWorldTimeGeometry(m_SegmentationImage->GetTimeGeometry());
     navigationController->Update(viewDirection);
     mitk::Point3D pointMM;
     m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0)->IndexToWorld(m_CenterPoint, pointMM);
     navigationController->SelectSliceByPoint(pointMM);
-    auto plane = navigationController->GetCurrentPlaneGeometry();
+    return navigationController->GetCurrentPlaneGeometry();
+  }
+
+  void SetPixels(const std::vector<itk::Index<3>>& indices, mitk::Label::PixelType value)
+  {
+    mitk::ImagePixelWriteAccessor<mitk::Label::PixelType, 3> writeAccessor(m_SegmentationImage);
+
+    for (const auto& index : indices)
+      writeAccessor.SetPixelByIndexSafe(index, value);
+  }
+
+  static int SliceDimension(mitk::AnatomicalPlane viewDirection)
+  {
+    switch (viewDirection)
+    {
+      case mitk::AnatomicalPlane::Axial:
+        return 2;
+      case mitk::AnatomicalPlane::Coronal:
+        return 1;
+      case mitk::AnatomicalPlane::Sagittal:
+        return 0;
+      default:
+        return -1;
+    }
+  }
+
+  /** Index of the center point moved by i and j along the two axes in the slices perpendicular to dim, and by k along dim. */
+  itk::Index<3> CenterOffset(int dim, itk::IndexValueType i, itk::IndexValueType j, itk::IndexValueType k) const
+  {
+    auto index = m_CenterPoint;
+    index[(dim + 1) % 3] += i;
+    index[(dim + 2) % 3] += j;
+    index[dim] += k;
+    return index;
+  }
+
+  /**
+   * Fills a 3x3 square in the slice below the center slice along dim and a single pixel above one of its corners in
+   * the slice above, so that the center slice interpolates to a 2x2 square in that corner.
+   */
+  void SetEnclosingSlices(int dim, mitk::Label::PixelType value)
+  {
+    std::vector<itk::Index<3>> indices;
+
+    for (itk::IndexValueType i = -1; i <= 1; ++i)
+    {
+      for (itk::IndexValueType j = -1; j <= 1; ++j)
+        indices.push_back(this->CenterOffset(dim, i, j, -1));
+    }
+
+    indices.push_back(this->CenterOffset(dim, 1, 1, 1));
+    this->SetPixels(indices, value);
+  }
+
+  /** Checks that the 2x2 square interpolated by SetEnclosingSlices() is in the center slice, and nothing around it. */
+  void CheckInterpolatedSquare(int dim) const
+  {
+    mitk::ImagePixelReadAccessor<mitk::Label::PixelType, 3> readAccess(m_SegmentationImage);
+
+    for (itk::IndexValueType i = -1; i <= 2; ++i)
+    {
+      for (itk::IndexValueType j = -1; j <= 2; ++j)
+      {
+        const auto index = this->CenterOffset(dim, i, j, 0);
+
+        if (i == -1 || i == 2 || j == -1 || j == 2)
+        {
+          CPPUNIT_ASSERT_MESSAGE("Have false positive segmentation.", readAccess.GetPixelByIndexSafe(index) == 0);
+        }
+        else
+        {
+          CPPUNIT_ASSERT_MESSAGE("Have false negative segmentation.", readAccess.GetPixelByIndexSafe(index) == 1);
+        }
+      }
+    }
+  }
+
+  static std::size_t CountPixels(const mitk::Image* slice, mitk::Label::PixelType value)
+  {
+    mitk::ImagePixelReadAccessor<mitk::Label::PixelType, 2> readAccessor(slice);
+    const auto* pixels = readAccessor.GetData();
+    const std::size_t numberOfPixels = std::size_t{slice->GetDimension(0)} * slice->GetDimension(1);
+    return static_cast<std::size_t>(std::count(pixels, pixels + numberOfPixels, value));
+  }
+
+  // The tests all do the same, only in different directions
+  void testRoutine(mitk::AnatomicalPlane viewDirection)
+  {
+    const auto dim = SliceDimension(viewDirection);
+    this->SetEnclosingSlices(dim, 1);
+
+    m_InterpolationController->SetSegmentationVolume(m_SegmentationImage, 1);
+
+    const auto plane = this->GetCenterPlane(viewDirection);
     mitk::Image::Pointer interpolationResult =
       m_InterpolationController->Interpolate(dim, m_CenterPoint[dim], plane, 0);
 
@@ -116,31 +165,32 @@ private:
     extractor->Modified();
     extractor->Update();
 
-    //        mitk::IOUtil::Save(m_SegmentationImage, "SOME PATH");
+    this->CheckInterpolatedSquare(dim);
+  }
 
-    // Check a 4x4 square, the center of which needs to be filled
-    mitk::ImagePixelReadAccessor<mitk::Tool::DefaultSegmentationDataType, 3> readAccess(m_SegmentationImage);
-    currentPoint = m_CenterPoint;
+  /** Accepts all interpolations along the view direction by writing each result into the segmentation. */
+  void interpolateAllRoutine(mitk::AnatomicalPlane viewDirection)
+  {
+    const auto dim = SliceDimension(viewDirection);
+    this->SetEnclosingSlices(dim, 1);
 
-    for (int i = -1; i <= 2; ++i)
-    {
-      for (int j = -1; j <= 2; ++j)
+    m_InterpolationController->SetSegmentationVolume(m_SegmentationImage, 1);
+
+    const mitk::ConstLabelVector labels = {mitk::Label::New(1, "Label").GetPointer()};
+    unsigned int numberOfResults = 0;
+
+    m_InterpolationController->InterpolateAll(dim, this->GetCenterPlane(viewDirection), 0,
+      [&](unsigned int sliceIndex, const mitk::Image* interpolation)
       {
-        currentPoint[(dim + 1) % 3] = m_CenterPoint[(dim + 1) % 3] + i;
-        currentPoint[(dim + 2) % 3] = m_CenterPoint[(dim + 2) % 3] + j;
+        ++numberOfResults;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Interpolated another slice.", static_cast<unsigned int>(m_CenterPoint[dim]), sliceIndex);
 
-        if (i == -1 || i == 2 || j == -1 || j == 2)
-        {
-          CPPUNIT_ASSERT_MESSAGE("Have false positive segmentation.",
-                                 readAccess.GetPixelByIndexSafe(currentPoint) == 0);
-        }
-        else
-        {
-          CPPUNIT_ASSERT_MESSAGE("Have false negative segmentation.",
-                                 readAccess.GetPixelByIndexSafe(currentPoint) == 1);
-        }
-      }
-    }
+        mitk::TransferSliceContentAtTimeStep(interpolation, m_SegmentationImage, labels, 0, 1, 1,
+          mitk::Label::UNLABELED_VALUE, false, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+      });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Not exactly the center slice was interpolated.", 1u, numberOfResults);
+    this->CheckInterpolatedSquare(dim);
   }
 
   mitk::Image::Pointer m_ReferenceImage;
@@ -154,7 +204,7 @@ public:
     m_ReferenceImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
 
-    m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
+    m_InterpolationController = mitk::SegmentationInterpolationController::New();
 
     // Create empty segmentation
     // Surely there must be a better way to get an image with all zeros?
@@ -197,6 +247,54 @@ public:
   {
     mitk::AnatomicalPlane viewDirection = mitk::AnatomicalPlane::Sagittal;
     testRoutine(viewDirection);
+  }
+
+  void InterpolateAll_Axial_WritesInterpolatedSquare()
+  {
+    interpolateAllRoutine(mitk::AnatomicalPlane::Axial);
+  }
+
+  void InterpolateAll_Coronal_WritesInterpolatedSquare()
+  {
+    interpolateAllRoutine(mitk::AnatomicalPlane::Coronal);
+  }
+
+  void InterpolateAll_Sagittal_WritesInterpolatedSquare()
+  {
+    interpolateAllRoutine(mitk::AnatomicalPlane::Sagittal);
+  }
+
+  void Interpolate_SliceSegmentedAfterwards_ReturnsNull()
+  {
+    this->SetEnclosingSlices(2, 1);
+    m_InterpolationController->SetSegmentationVolume(m_SegmentationImage, 1);
+
+    const auto plane = this->GetCenterPlane(mitk::AnatomicalPlane::Axial);
+    CPPUNIT_ASSERT(m_InterpolationController->Interpolate(2, m_CenterPoint[2], plane, 0).IsNotNull());
+
+    this->SetPixels({m_CenterPoint}, 1);
+    m_SegmentationImage->Modified();
+
+    CPPUNIT_ASSERT_MESSAGE("Interpolated a slice that contains the label.",
+                           m_InterpolationController->Interpolate(2, m_CenterPoint[2], plane, 0).IsNull());
+  }
+
+  void Interpolate_OtherLabels_AreIgnored()
+  {
+    const mitk::Label::PixelType label = 2;
+    const mitk::Label::PixelType otherLabel = 3;
+
+    // Above and below each other next to the shapes, so that they would be interpolated if they
+    // counted, and in the center slice, which would then not be interpolated at all.
+    this->SetEnclosingSlices(2, label);
+    this->SetPixels({this->CenterOffset(2, 3, -1, -1), this->CenterOffset(2, 3, -1, 1), this->CenterOffset(2, -5, -5, 0)}, otherLabel);
+    m_InterpolationController->SetSegmentationVolume(m_SegmentationImage, label);
+
+    const auto interpolation = m_InterpolationController->Interpolate(
+      2, m_CenterPoint[2], this->GetCenterPlane(mitk::AnatomicalPlane::Axial), 0);
+
+    CPPUNIT_ASSERT_MESSAGE("The other label prevented the interpolation.", interpolation.IsNotNull());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The other label was interpolated.", std::size_t{4}, CountPixels(interpolation, 1));
   }
 };
 

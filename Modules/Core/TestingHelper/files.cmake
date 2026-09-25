@@ -1,4 +1,5 @@
 set(H_FILES
+  mitkManualStorageThreadDispatcher.h
   mitkTestCaller.h
   mitkTestFixture.h
   mitkTestNotRunException.h

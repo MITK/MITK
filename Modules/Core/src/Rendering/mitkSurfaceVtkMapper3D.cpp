@@ -35,8 +35,27 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkProperty.h>
+#include <vtkShaderProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
+#include <vtkUniforms.h>
+
+#include <chrono>
+#include <cmath>
+#include <numbers>
+#include <string>
+
+namespace
+{
+  constexpr const char* PULSE_UNIFORM = "mitkPulse";
+
+  // A cosine at 1.5 Hz between 0.5 and 1.0, the factor on the lit color of a pulsing surface.
+  float GetPulse()
+  {
+    const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
+    return static_cast<float>(0.75 + 0.25 * std::cos(2.0 * std::numbers::pi * 1.5 * now.count()));
+  }
+}
 
 const mitk::Surface *mitk::SurfaceVtkMapper3D::GetInput()
 {
@@ -116,6 +135,36 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
 
   if (visible)
     ls->m_Actor->VisibilityOn();
+}
+
+void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer *renderer)
+{
+  Superclass::Update(renderer);
+
+  bool pulsing = false;
+  this->GetDataNode()->GetBoolProperty("pulsing", pulsing, renderer);
+
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
+  // A surface that never pulsed keeps the standard shader.
+  if (!pulsing && !ls->m_HasPulseShader)
+    return;
+
+  // Nothing on the vtkProperty may animate the pulse: vtkOpenGLPolyDataMapper rebuilds its
+  // buffers whenever the property changes. A custom uniform is declared once and afterwards
+  // only changes its value, which rebuilds neither the buffers nor the shader.
+  auto *shaderProperty = ls->m_Actor->GetShaderProperty();
+
+  if (!ls->m_HasPulseShader)
+  {
+    // After the standard replacements, which write the lit color before this tag.
+    shaderProperty->AddFragmentShaderReplacement("//VTK::Light::Impl", false,
+      std::string("//VTK::Light::Impl\n  gl_FragData[0].rgb *= ") + PULSE_UNIFORM + ";\n", false);
+
+    ls->m_HasPulseShader = true;
+  }
+
+  shaderProperty->GetFragmentCustomUniforms()->SetUniformf(PULSE_UNIFORM, pulsing ? GetPulse() : 1.0f);
 }
 
 void mitk::SurfaceVtkMapper3D::ResetMapper(BaseRenderer *renderer)

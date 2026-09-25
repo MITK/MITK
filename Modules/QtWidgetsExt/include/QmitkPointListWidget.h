@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <mitkDataInteractor.h>
 #include <mitkDataNode.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkPointSet.h>
 
 #include <QPushButton>
@@ -163,6 +164,7 @@ protected slots:
 protected:
   void SetupUi();
   void ObserveNewNode(mitk::DataNode *node);
+  void OnNodeInteractorChanged();
 
   QmitkPointListView *m_PointListView;
 
@@ -184,8 +186,12 @@ protected:
   int m_TimeStep;
   bool m_EditAllowed;
   unsigned long m_NodeObserverTag;
+  unsigned long m_InteractorObserverTag;
 
   QmitkPointListModel *m_PointListModel;
+
+  /** Active while points can be added. */
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
 };
 
 #endif

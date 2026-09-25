@@ -15,4 +15,5 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
+  QmitkRunInputBlockingTest.cpp
 )

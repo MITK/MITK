@@ -21,9 +21,11 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkProgressBar.h>
 #include <mitkProperties.h>
 #include <mitkSceneIO.h>
+
+#include <QmitkIOUtil.h>
+#include <QmitkRun.h>
 
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
@@ -101,14 +103,26 @@ void QmitkExtFileSaveProjectAction::Run()
 
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-
     /* Build list of nodes that should be saved */
     mitk::NodePredicateNot::Pointer isNotHelperObject =
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
 
-    if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
+    std::vector<const mitk::BaseData *> written;
+
+    for (auto it = nodesToBeSaved->Begin(); it != nodesToBeSaved->End(); ++it)
+      written.push_back(it->Value()->GetData());
+
+    // Off the GUI thread, so that the notification appears and keeps
+    // moving while a large scene is written and compressed.
+    auto saved = false;
+    QmitkRunWithInputBlocked([&]()
+      {
+        saved = sceneIO->SaveScene(nodesToBeSaved, storage, fileName.toStdString());
+      },
+      written);
+
+    if (!saved)
     {
       QMessageBox::information(nullptr,
                                "Scene saving",
@@ -116,8 +130,6 @@ void QmitkExtFileSaveProjectAction::Run()
                                QMessageBox::Ok);
 
     }
-    mitk::ProgressBar::GetInstance()->Progress(2);
-
     mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
     if (!failedNodes->empty())
     {

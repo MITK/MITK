@@ -217,6 +217,10 @@ bool DataStorageService::RemoveDataStorage(const std::string& label)
     return false;
   }
 
+  // Destroyed after the lock is released. It may hold the last reference to the storage, and
+  // destroying its nodes may wait for work off the storage thread that asks for the dispatcher.
+  DataStorageReference removed;
+
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   // Cannot remove default storage
@@ -235,6 +239,7 @@ bool DataStorageService::RemoveDataStorage(const std::string& label)
       {
         m_ActiveLabel.clear();
       }
+      removed = std::move(*it);
       m_Storages.erase(it);
       return true;
     }

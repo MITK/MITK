@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <mitkAnisotropicIterativeClosestPointRegistration.h>
 #include <mitkAnisotropicRegistrationCommon.h>
 #include <mitkWeightedPointTransform.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkSurface.h>
 // VTK
 #include <vtkIdList.h>
@@ -37,6 +37,7 @@ struct AICPComperator
 
 mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestPointRegistration()
   : m_MaxIterations(1000),
+    m_ProgressTask(nullptr),
     m_Threshold(0.000001),
     m_FRENormalizationFactor(1.0),
     m_SearchRadius(30.0),
@@ -190,11 +191,6 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   X_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
   Z_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
 
-  // initialize the progress bar
-  unsigned int steps = m_MaxIterations;
-  unsigned int stepSize = m_MaxIterations / 10;
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
-
   do
   {
     // reset innerloop
@@ -281,21 +277,18 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     // update FRE
     m_FRE = FRE_new;
 
-    // update the progressbar. Just use the half every 2nd iteration
-    // to use a simulated endless progress bar since we don't have
-    // a fixed amount of iterations
-    stepSize = (k % 2 == 0) ? stepSize / 2 : stepSize;
-    stepSize = (stepSize == 0) ? 1 : stepSize;
-    mitk::ProgressBar::GetInstance()->Progress(stepSize);
+    // One step per iteration, against no declared total. How many iterations
+    // this needs is not known until it converges, and m_MaxIterations is a
+    // bound rather than an estimate, so counting against it would show a bar
+    // creeping through a fraction of its range and then jumping to the end. On
+    // a task with no total this reports only that the operation is still
+    // running, which is all there is to say about an unknown extent.
+    if (nullptr != m_ProgressTask)
+      m_ProgressTask->Progress();
 
   } while (diff > m_Threshold && k < m_MaxIterations);
 
   m_NumberOfIterations = k;
-
-  // finish the progress bar if there are more steps
-  // left than iterations used
-  if (k < steps)
-    mitk::ProgressBar::GetInstance()->Progress(steps);
 
   // free memory
   Y->Delete();

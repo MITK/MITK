@@ -56,7 +56,7 @@ found in the LICENSE file.
 #include <QmitkRedoAction.h>
 #include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
-#include <QmitkProgressBar.h>
+#include <QmitkProgressNotificationOverlay.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
 #include "QmitkOpenDicomEditorAction.h"
@@ -87,7 +87,6 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
-#include "QmitkStartupDialog.h"
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();
@@ -95,70 +94,6 @@ QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
 static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
-
-namespace
-{
-  void ExecuteStartupDialog()
-  {
-    QmitkStartupDialog startupDialog;
-
-    if (startupDialog.SkipDialog())
-      return;
-
-    try
-    {
-      if (startupDialog.exec() != QDialog::Accepted)
-        return;
-    }
-    catch (const mitk::Exception& e)
-    {
-      MITK_ERROR << e.GetDescription();
-      return;
-    }
-
-    // Create two lists: one for all categories and one subset for visible categories.
-
-    QStringList allCategories = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory().uniqueKeys();
-    QStringList visibleCategories;
-
-    if (startupDialog.UsePreset())
-    {
-      visibleCategories = startupDialog.GetPresetCategories();
-
-      if (visibleCategories.isEmpty()) // "Custom" preset
-      {
-        // Early-out and show the "Tool Bars" preference page instead.
-        QmitkExtWorkbenchWindowAdvisorHack::undohack->onEditPreferences("org.mitk.ToolBarsPreferencePage");
-        return;
-      }
-    }
-    else
-    {
-      visibleCategories = allCategories;
-    }
-
-    // Now set the visibility preferences for all categories and apply them instantly.
-
-    auto prefsService = mitk::CoreServices::GetPreferencesService();
-    auto prefs = prefsService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
-    const auto toolBars = berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().first()->GetToolBars();
-
-    for (const auto& category : allCategories)
-    {
-      bool isVisible = visibleCategories.contains(category);
-      prefs->PutBool(category.toStdString(), isVisible);
-
-      auto toolBarIter = std::find_if(toolBars.cbegin(), toolBars.cend(), [&category](const QToolBar* toolBar) {
-        return toolBar->objectName() == category;
-      });
-
-      if (toolBarIter != toolBars.cend())
-        (*toolBarIter)->setVisible(isVisible);
-    }
-
-    prefs->Flush();
-  }
-}
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -1039,14 +974,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
 
-  auto  progBar = new QmitkProgressBar();
-
-  qStatusBar->addPermanentWidget(progBar, 0);
-  progBar->hide();
-  // progBar->AddStepsToDo(2);
-  // progBar->Progress(1);
-
   mainWindow->setStatusBar(qStatusBar);
+
+  // Owned by mainWindow. Floats above the status bar and reports every
+  // long-running operation separately, so that concurrent operations can no
+  // longer overwrite each other's progress.
+  new QmitkProgressNotificationOverlay(mainWindow);
 
   if (showMemoryIndicator)
   {
@@ -1101,8 +1034,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
   {
     configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
   }
-
-  ExecuteStartupDialog();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

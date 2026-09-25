@@ -40,6 +40,8 @@ namespace mitk
 mitk::PickingTool::PickingTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
+  this->RequiresScalarReferenceOff(); // picks from the segmentation, never reads the reference image
+  this->ClaimsExclusiveInteractionOn();
 }
 
 mitk::PickingTool::~PickingTool()

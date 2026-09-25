@@ -159,6 +159,16 @@ const vtkImageData *mitk::Image::GetVtkImageData(int t, int n) const
   return volume.GetPointer() == nullptr ? nullptr : volume->GetVtkImageAccessor(this)->GetVtkImageData();
 }
 
+void mitk::Image::PrebuildVtkRepresentation() const
+{
+  const auto timeSteps = this->GetTimeSteps();
+  const auto channels = this->GetNumberOfChannels();
+
+  for (unsigned int t = 0; t < timeSteps; ++t)
+    for (unsigned int n = 0; n < channels; ++n)
+      static_cast<void>(this->GetVtkImageData(static_cast<int>(t), static_cast<int>(n)));
+}
+
 mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(
   int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {

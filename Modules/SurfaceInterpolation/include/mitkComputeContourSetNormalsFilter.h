@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef mitkComputeContourSetNormalsFilter_h
 #define mitkComputeContourSetNormalsFilter_h
 
-#include <mitkProgressBar.h>
 #include <mitkSurface.h>
 #include <mitkSurfaceToSurfaceFilter.h>
 #include <MitkSurfaceInterpolationExports.h>
@@ -30,6 +29,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /** \brief Filter that computes surface normals for contour edge points.
    *
    * Takes a set of contour surfaces (represented as vtkPolygon-based mitk::Surface objects)
@@ -71,15 +72,10 @@ namespace mitk
      */
     void SetMaxSpacing(double maxSpacing);
 
-    /** \brief Enable or disable the MITK progress bar during computation.
-     * \param[in] status True to use the progress bar, false to disable it.
+    /** \brief Report progress into the given task, or nowhere if it is nullptr.
+     * \param[in] task The task of the operation this filter contributes to.
      */
-    void SetUseProgressBar(bool status);
-
-    /** \brief Set the step size by which the progress bar advances per contour.
-     * \param[in] stepSize The progress increment per processed contour.
-     */
-    void SetProgressStepSize(unsigned int stepSize);
+    void SetProgressTask(ProgressTask* task);
 
     /** \brief Set the segmentation binary image for normal direction validation.
      *
@@ -103,8 +99,7 @@ namespace mitk
     unsigned int m_NegativeNormalCounter;
     unsigned int m_PositiveNormalCounter;
 
-    bool m_UseProgressBar;
-    unsigned int m_ProgressStepSize;
+    ProgressTask* m_ProgressTask;
 
   }; // class
 

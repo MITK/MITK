@@ -89,7 +89,9 @@ namespace mitk
      *
      * The default implementation calls DoRead() and then annotates each
      * resulting BaseData with meta-information about the reader, MIME type,
-     * input location, and reader options.
+     * input location, and reader options. These annotations describe the read
+     * that just happened and are renewed on every read, so they are runtime
+     * information and are not written into data files.
      *
      * \return A vector of created BaseData objects.
      * \throws mitk::Exception if reading fails.
@@ -149,6 +151,10 @@ namespace mitk
      */
     void RemoveProgressCallback(const ProgressCallback &callback) override;
 
+    void SetProgressTask(ProgressTask *task) override;
+
+    ProgressTask *GetProgressTask() const override;
+
     /**
      * \brief Register this reader as a CppMicroServices service.
      *
@@ -183,6 +189,16 @@ namespace mitk
     void SetProperties(const PropertyList* properties) override;
 
   protected:
+    /**
+     * \brief Report how far reading has got to the registered callbacks.
+     *
+     * Subclasses of AbstractFileIO have a separate set of callbacks for
+     * reading and for writing, so they have to qualify the call.
+     *
+     * \param[in] progress How much of the work is done, from 0 to 1.
+     */
+    void ReportProgress(float progress);
+
     /**
      * \brief An input stream wrapper for reader implementations.
      *

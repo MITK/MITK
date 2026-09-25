@@ -21,6 +21,7 @@ class QmitkMultiLabelTreeModelTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkMultiLabelTreeModelTestSuite);
   MITK_TEST(NullTest);
   MITK_TEST(GetterSetterTest);
+  MITK_TEST(IndexOfGroupTest);
   MITK_TEST(AddingLabelTest);
   MITK_TEST(AddingLayerTest);
   MITK_TEST(RemovingLabelTest);
@@ -199,6 +200,20 @@ public:
     model.SetSegmentation(nullptr);
     CPPUNIT_ASSERT(nullptr == model.GetSegmentation());
     CPPUNIT_ASSERT(false == model.hasChildren(QModelIndex()));
+  }
+
+  /** An unknown group must yield an invalid index instead of dereferencing a null item. */
+  void IndexOfGroupTest()
+  {
+    QmitkMultiLabelTreeModel model(nullptr);
+    model.SetSegmentation(m_Segmentation);
+
+    CPPUNIT_ASSERT(model.indexOfGroup(0) == GetIndex(model, { 0 }));
+    CPPUNIT_ASSERT(model.indexOfGroup(2) == GetIndex(model, { 2 }));
+    CPPUNIT_ASSERT(!model.indexOfGroup(3).isValid());
+
+    model.SetSegmentation(nullptr);
+    CPPUNIT_ASSERT(!model.indexOfGroup(0).isValid());
   }
 
   void AddingLabelTest()

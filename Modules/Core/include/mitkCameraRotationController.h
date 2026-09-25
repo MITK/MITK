@@ -49,6 +49,18 @@ namespace mitk
     void RotateCamera();
 
     /**
+     * \brief Rotate the camera by the given azimuth angle.
+     *
+     * The stepper resolves a full turn into 360 whole degree positions, which
+     * a continuous animation shows as stepping. This applies any angle instead,
+     * and leaves the stepper position untouched, so that position no longer
+     * describes where the camera is looking from.
+     *
+     * \param[in] degrees The azimuth angle to rotate by.
+     */
+    void RotateCameraBy(double degrees);
+
+    /**
      * \brief Acquire the active VTK camera from the render window.
      *
      * Retrieves the vtkCamera from the VtkPropRenderer associated with

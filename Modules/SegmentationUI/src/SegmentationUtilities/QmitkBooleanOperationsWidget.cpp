@@ -20,11 +20,23 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkBooleanOperation.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
 
 #include <QSignalBlocker>
+
+namespace
+{
+  /** Maps the fraction a boolean operation reports onto its task. */
+  std::function<void(float)> MakeProgressCallback(mitk::ProgressTask& task)
+  {
+    return [&task](float progress)
+      {
+        task.SetProgress(static_cast<unsigned int>(progress * task.GetStepsToDo()));
+      };
+  }
+}
 
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
@@ -136,19 +148,11 @@ void QmitkBooleanOperationsWidget::OnClearSelectionButtonClicked()
 void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 {
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(110);
-  unsigned int currentProgress = 0;
 
-  auto progressCallback = [&currentProgress](float filterProgress)
-    {
-      auto delta = (filterProgress * 100) - currentProgress;
-      if (delta > 0)
-      {
-        currentProgress += delta;
-        mitk::ProgressBar::GetInstance()->Progress(delta);
-      }
-    };
+  const std::string opsName = "Difference";
+
+  mitk::ProgressTask task("Boolean " + opsName, 100);
+  auto progressCallback = MakeProgressCallback(task);
 
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
   auto minuend = selectedLabelValues.front();
@@ -158,7 +162,6 @@ void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 
   auto resultMask = mitk::BooleanOperation::GenerateDifference(seg, minuend, subtrahends, progressCallback);
 
-  const std::string opsName = "Difference";
   std::stringstream name;
   name << opsName << " " << seg->GetLabel(minuend)->GetName() << " -";
   for (auto label : subtrahends)
@@ -168,26 +171,17 @@ void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 
   this->SaveResultLabelMask(resultMask, name.str(), "Boolean " + opsName);
 
-  mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
 }
 
 void QmitkBooleanOperationsWidget::OnIntersectionButtonClicked()
 {
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(110);
-  unsigned int currentProgress = 0;
 
-  auto progressCallback = [&currentProgress](float filterProgress)
-    {
-      auto delta = (filterProgress * 100) - currentProgress;
-      if (delta > 0)
-      {
-        currentProgress += delta;
-        mitk::ProgressBar::GetInstance()->Progress(delta);
-      }
-    };
+  const std::string opsName = "Intersection";
+
+  mitk::ProgressTask task("Boolean " + opsName, 100);
+  auto progressCallback = MakeProgressCallback(task);
 
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
 
@@ -195,7 +189,6 @@ void QmitkBooleanOperationsWidget::OnIntersectionButtonClicked()
 
   auto resultMask = mitk::BooleanOperation::GenerateIntersection(seg, selectedLabelValues, progressCallback);
 
-  const std::string opsName = "Intersection";
   std::stringstream name;
   name << opsName;
   for (auto label : selectedLabelValues)
@@ -204,26 +197,17 @@ void QmitkBooleanOperationsWidget::OnIntersectionButtonClicked()
   }
   this->SaveResultLabelMask(resultMask, name.str(), "Boolean " + opsName);
 
-  mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
 }
 
 void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 {
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(110);
-  unsigned int currentProgress = 0;
 
-  auto progressCallback = [&currentProgress](float filterProgress)
-    {
-      auto delta = (filterProgress * 100) - currentProgress;
-      if (delta > 0)
-      {
-        currentProgress += delta;
-        mitk::ProgressBar::GetInstance()->Progress(delta);
-      }
-    };
+  const std::string opsName = "Union";
+
+  mitk::ProgressTask task("Boolean " + opsName, 100);
+  auto progressCallback = MakeProgressCallback(task);
 
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
 
@@ -231,7 +215,6 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 
   auto resultMask = mitk::BooleanOperation::GenerateUnion(seg, selectedLabelValues, progressCallback);
 
-  const std::string opsName = "Union";
   std::stringstream name;
   name << opsName;
   for (auto label : selectedLabelValues)
@@ -241,7 +224,6 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 
   this->SaveResultLabelMask(resultMask, name.str(), "Boolean " + opsName);
 
-  mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
 }
 

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSurfaceStlIO.h"
+#include "mitkVtkFileIOProgressObserver.h"
 
 #include <mitkIOMimeTypes.h>
 #include <mitkLocaleSwitch.h>
@@ -105,6 +106,14 @@ namespace mitk
       // }
       algo = cleanPolyDataFilter;
     }
+    // The reader rather than the tail of the pipeline: reading the file is
+    // the part that grows with the file, and each filter reports only its
+    // own share of the work.
+    VtkFileIOProgressObserver progress(stlReader, [this](float p)
+      {
+        this->AbstractFileReader::ReportProgress(p);
+      });
+
     algo->Update();
 
     if (algo->GetOutput() != nullptr)
@@ -138,6 +147,11 @@ namespace mitk
       // The vtk stl writer cannot write to streams
       LocalFile localFile(this);
       writer->SetFileName(localFile.GetFileName().c_str());
+
+      VtkFileIOProgressObserver progress(writer, [this, t, timesteps](float p)
+        {
+          this->AbstractFileWriter::ReportProgress((t + p) / timesteps);
+        });
 
       if (writer->Write() == 0 || writer->GetErrorCode() != 0)
       {

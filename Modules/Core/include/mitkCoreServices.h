@@ -39,6 +39,7 @@ namespace mitk
   class IPropertyRelations;
   class IPropertyTransience;
   class IPreferencesService;
+  class IProgressService;
 
   /**
    * \brief Provides convenient static access to common MITK core service objects.
@@ -146,6 +147,15 @@ namespace mitk
      * @sa IPreferences
      */
     static IPreferencesService *GetPreferencesService(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
+     * @brief Get an IProgressService instance.
+     * @param context The module context of the module getting the service.
+     * @return An IProgressService instance, or nullptr if the core module is
+     *         not loaded (command-line tools, tests).
+     * @sa ProgressTask
+     */
+    static IProgressService *GetProgressService(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * \brief Release a previously acquired service instance.

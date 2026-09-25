@@ -45,14 +45,27 @@ void mitk::CameraRotationController::RotateCamera()
     this->AcquireCamera();
   }
 
+  // Without a camera the stepper value is deliberately not remembered, so the
+  // whole delta is applied once a camera becomes available.
   if (m_Camera)
   {
-    int newStepperValue = m_Stepper->GetPos();
-    m_Camera->Azimuth(m_LastStepperValue - newStepperValue);
+    const int newStepperValue = m_Stepper->GetPos();
+    this->RotateCameraBy(m_LastStepperValue - newStepperValue);
     m_LastStepperValue = newStepperValue;
-    // const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!
+  }
+}
+
+void mitk::CameraRotationController::RotateCameraBy(double degrees)
+{
+  if (!m_Camera)
+  {
+    this->AcquireCamera();
+  }
+
+  if (m_Camera)
+  {
+    m_Camera->Azimuth(degrees);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow);
-    // m_MultiWidget->RequestUpdate();
   }
 }
 

@@ -34,8 +34,8 @@ class QmitkMxNMultiWidget;
  * Deliberately thin: all editor logic lives in the QtWidgets-module
  * QmitkMxNLayoutEditorWidget; this view only finds the active MxN editor,
  * wires its multi widget into the hosted widget, and connects the embedded
- * layout-shape controls to the editor part (the same wiring the former
- * toolbar popup had), keeping the BlueBerry dependency out of the module.
+ * layout-shape controls to the editor part, keeping the BlueBerry dependency
+ * out of the module.
  *
  * While the view is visible, the editor it is bound to is in arrange mode: the
  * render windows' peek plates stay up for selecting cells and assigning them
@@ -78,9 +78,10 @@ private:
    *         visible, and take a previously arranged one out of it. */
   void UpdateArrangeMode();
 
-  /** \brief Ask the user before a layout change discards a non-trivial
-   *         synchronization configuration; returns true to proceed. No prompt
-   *         (returns true) when the current config is the trivial default. */
+  /** \brief Ask the user before a layout change that rebuilds every window
+   *         discards a non-trivial synchronization configuration; returns true
+   *         to proceed. No prompt (returns true) when the current configuration
+   *         is the trivial default. */
   bool ConfirmDestructiveLayoutChange();
 
   QmitkMxNLayoutEditorWidget* m_LayoutEditorWidget = nullptr;

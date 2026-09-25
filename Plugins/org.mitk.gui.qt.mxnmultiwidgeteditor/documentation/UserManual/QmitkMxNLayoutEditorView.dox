@@ -11,6 +11,7 @@
 	synchronization groups. Open it by clicking the sync barcode in any window's utility
 	menu, with "Open layout editor" from a window view's context menu, or via
 	<i>Window &rarr; Show View</i>.
+	Clicking any window's sync barcode while the editor is visible closes it again.
 	As a dockable view it stays open during review sessions and doubles as a live
 	legend of the current coupling.
 
@@ -34,25 +35,29 @@
 			a change made purely on the synchronization side is kept.
 	</ul>
 
-	Applying a preset or a file replaces the window arrangement and discards the
-	current synchronization groups, so the view asks for confirmation first unless the
-	layout is still the trivial default.
+	Applying a preset, a file or a data-based arrangement replaces the window arrangement
+	and discards the current synchronization groups, so the view asks for confirmation
+	first unless the layout is still the trivial default.
 
 	The grid of the arrangement is edited in the row below: the row and column buttons
 	add or remove a trailing row or column in place, which leaves the existing windows
 	and their settings untouched, while <b>Edit grid...</b> opens the picker for a grid of
 	a chosen size or for an arrangement derived from the loaded data.
 
+	A new grid size keeps the remaining windows and their synchronization; a data-based
+	arrangement replaces all windows and synchronization groups and is confirmed like a
+	preset.
+
 \section org_mitk_views_mxnlayouteditor_Arrange Arranging the windows
 	While the MxN Layout Editor is visible, its MxN display is in <i>arrange mode</i>:
 	every window that has room for one shows its sync plate - the same plate that pointing
 	at a window's sync barcode brings up for a moment (see
 	\ref org_mitk_editors_mxnmultiwidget_Utility) - and keeps it up. Closing the view,
-	hiding it behind another view, or clicking the close button on a plate ends arrange
-	mode and takes the plates away. Each plate shows the window's eight synchronization
-	axes in the fixed order pan, zoom, slice, crosshair, orientation, windowing, LUT and
-	data selection, tinted with the hue of the group the window is linked to, and the
-	window's name.
+	hiding it behind another view, clicking any window's sync barcode, or clicking the
+	close button on a plate ends arrange mode and takes the plates away. Each plate
+	shows the window's eight synchronization axes in the fixed order pan, zoom, slice,
+	crosshair, orientation, windowing, LUT and data selection, tinted with the hue of
+	the group the window is linked to, and the window's name.
 
 	\imageMacroEx{QmitkMxN_ArrangeMode.png, "Arrange mode: the plates while the view is open with two windows selected and the pointer on the zoom axis", 16, 800px}
 

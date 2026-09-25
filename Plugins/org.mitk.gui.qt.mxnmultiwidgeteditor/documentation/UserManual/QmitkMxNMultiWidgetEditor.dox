@@ -39,10 +39,11 @@
 			place, which leaves the existing window views and their settings untouched.
 		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
 			widget layout"), or for an arrangement derived from the loaded data ("Data-based
-			layout"). Depending on the selected number of window views, existing window views will
-			be removed or additional window views will be added. New window views will have a
-			sagittal view direction. Window views that stay untouched will keep their settings and
-			continue displaying their selected data.
+			layout"). A new grid size re-flows the window views into a plain grid: window views
+			beyond the new size are removed, additional ones are added with a sagittal view
+			direction, and the others keep their settings, synchronization and selected data.
+			A data-based layout replaces all window views and synchronization groups, so the
+			view asks for confirmation first unless the layout is still the trivial default.
 	</ul>
 
 	\imageMacroEx{QmitkMxN_LayoutEditor.png, "The MxN Layout Editor view", 8, 360px}
@@ -160,7 +161,8 @@
 			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
 			linked group's hue and left empty where the window is not synchronized. Pointing at one of its axis
 			glyphs shows the sync peek described below; clicking it opens the MxN Layout
-			Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
+			Editor, or closes it if it is already visible (see
+			\ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
 		<li> Maximize button: Give this window the whole editor area, and bring the other
 			windows back
 	</ul>
@@ -359,8 +361,10 @@
 	The MxN Layout Editor is the authoritative view of the whole layout document: the
 	window arrangement, the layout file actions, and all synchronization groups. Open
 	it by clicking the sync barcode in any window's utility menu, with "Open layout
-	editor" from a window view's context menu, or via <i>Window &rarr; Show View</i>. As a dockable view it stays
-	open during review sessions and doubles as a live legend of the current coupling.
+	editor" from a window view's context menu, or via <i>Window &rarr; Show View</i>.
+	Clicking any window's sync barcode while the editor is visible closes it again.
+	As a dockable view it stays open during review sessions and doubles as a live
+	legend of the current coupling.
 
 	Its own manual page describes arranging windows on their plates, the group cards and the advanced
 	link matrix: \ref org_mitk_views_mxnlayouteditor.

@@ -213,20 +213,17 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   }
 
   // The layout editor reports what the user asked for; applying it is this
-  // view's job. The three destructive paths (grid set, preset / file load,
-  // data-based layout) are gated behind a confirmation: applying a new layout
-  // rebuilds the cells and discards the current synchronization groups, so warn
-  // first unless the configuration is still the trivial default
-  // (ConfirmDestructiveLayoutChange). SaveLayout is read-only and stays direct.
+  // view's job. A data-based layout, a preset and a layout file each rebuild
+  // every window and replace the synchronization groups, so they are gated
+  // behind ConfirmDestructiveLayoutChange. A grid-size change is applied
+  // directly, like the +/- grid buttons: the remaining windows keep their
+  // synchronization links. SaveLayout is read-only and stays direct.
   m_LayoutEditorWidget->SetDataStorage(this->GetDataStorage());
   m_LayoutConnections.push_back(connect(
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::LayoutSet,
-    m_LayoutEditorWidget, [this, multiWidgetEditor](int row, int column)
+    m_LayoutEditorWidget, [multiWidgetEditor](int row, int column)
     {
-      if (this->ConfirmDestructiveLayoutChange())
-      {
-        multiWidgetEditor->OnLayoutSet(row, column);
-      }
+      multiWidgetEditor->OnLayoutSet(row, column);
     }));
   m_LayoutConnections.push_back(connect(
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::SetDataBasedLayout,
@@ -289,8 +286,8 @@ bool QmitkMxNLayoutEditorView::ConfirmDestructiveLayoutChange()
 
   const auto answer = QMessageBox::warning(
     m_LayoutEditorWidget, tr("Replace the current layout?"),
-    tr("Applying a new layout replaces the current window arrangement and discards its "
-       "synchronization groups. This cannot be undone.\n\nContinue?"),
+    tr("This rebuilds every window and replaces the current synchronization "
+       "groups. This cannot be undone.\n\nContinue?"),
     QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
   return QMessageBox::Yes == answer;
 }

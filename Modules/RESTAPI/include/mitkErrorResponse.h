@@ -57,6 +57,7 @@ namespace mitk
     static constexpr const char* CODE_TIME_NAVIGATION_NOT_AVAILABLE = "TIME_NAVIGATION_NOT_AVAILABLE";
     static constexpr const char* CODE_TIME_STEPPER_NOT_AVAILABLE = "TIME_STEPPER_NOT_AVAILABLE";
     static constexpr const char* CODE_EDITOR_NOT_ACTIVE = "EDITOR_NOT_ACTIVE";
+    static constexpr const char* CODE_EDITOR_BUSY = "EDITOR_BUSY";
     static constexpr const char* CODE_RENDER_WINDOW_NOT_FOUND = "RENDER_WINDOW_NOT_FOUND";
     static constexpr const char* CODE_UNSUPPORTED_OPERATION = "UNSUPPORTED_OPERATION";
     static constexpr const char* CODE_RENDERER_UNAVAILABLE = "RENDERER_UNAVAILABLE";
@@ -316,6 +317,20 @@ namespace mitk
      * \return JSON error response with status 503
      */
     static Json EditorNotActive(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * \brief Create an "Editor busy" error response.
+     *
+     * Used when the targeted editor is open but temporarily cannot serve
+     * requests, e.g. the MxN editor while it applies a layout. Distinct from
+     * EDITOR_NOT_ACTIVE: the condition is transient and a retry succeeds once
+     * it has cleared.
+     *
+     * \param detail Description of why the editor is busy
+     * \param instance Request path
+     * \return JSON error response with status 503
+     */
+    static Json EditorBusy(const std::string& detail, const std::string& instance = "");
 
     /**
      * \brief Create a "Render window not found" error response.

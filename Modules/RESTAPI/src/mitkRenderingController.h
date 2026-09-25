@@ -375,8 +375,9 @@ namespace mitk
      * \brief Map a bridge exception thrown by a RenderWindowBridge callback to
      *        a matching HTTP status and RFC 9457 error payload.
      *
-     * Recognises the four typed bridge exceptions:
+     * Recognises the five typed bridge exceptions:
      * - RenderWindowBridgeNoEditorException              -> 503 EDITOR_NOT_ACTIVE
+     * - RenderWindowBridgeEditorBusyException            -> 503 EDITOR_BUSY
      * - RenderWindowBridgeUnknownWindowException         -> 404 RENDER_WINDOW_NOT_FOUND
      * - RenderWindowBridgeUnsupportedOperationException  -> 404 UNSUPPORTED_OPERATION
      * - RenderWindowBridgeRendererUnavailableException   -> 500 RENDERER_UNAVAILABLE

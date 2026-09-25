@@ -578,6 +578,7 @@ private:
       mitk::ErrorResponse::CODE_TIME_NAVIGATION_NOT_AVAILABLE,
       mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE,
       mitk::ErrorResponse::CODE_EDITOR_NOT_ACTIVE,
+      mitk::ErrorResponse::CODE_EDITOR_BUSY,
       mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_FOUND,
       mitk::ErrorResponse::CODE_UNSUPPORTED_OPERATION,
       mitk::ErrorResponse::CODE_RENDERER_UNAVAILABLE
@@ -1661,7 +1662,7 @@ public:
     // enumerable container to diff against, so this count is the tripwire: bump
     // it together with the list (and the header) whenever a CODE_* is added or
     // removed. A duplicated or dropped list entry also trips it.
-    constexpr std::size_t expectedErrorCodeCount = 27;
+    constexpr std::size_t expectedErrorCodeCount = 28;
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "GetAllCodeErrorCodes() no longer has the expected number of CODE_* constants; "
       "update the list and this count in lockstep with mitkErrorResponse.h",

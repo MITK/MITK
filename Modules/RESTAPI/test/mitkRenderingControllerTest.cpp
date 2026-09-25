@@ -94,6 +94,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetMxnInfoWithEditorActiveReturns200WithWindows);
   MITK_TEST(GetMxnWindowsWithoutProviderReturns503);
   MITK_TEST(GetMxnWindowsEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetMxnWindowsEditorBusyReturns503EditorBusy);
   MITK_TEST(GetMxnWindowsReturns200WithViewDirectionAndLinks);
   MITK_TEST(GetMxnWindowForMalformedNameReturns400);
   MITK_TEST(GetMxnWindowForUnknownNameReturns404);
@@ -108,6 +109,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutMxnLayoutSchemaViolationReturns400);
   MITK_TEST(PutMxnLayoutWithoutSetterReturns503);
   MITK_TEST(PutMxnLayoutEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(PutMxnLayoutSetterThrowsBusyReturns503EditorBusy);
   MITK_TEST(PutMxnLayoutReturns200WithEchoedBody);
 
   // MxN camera
@@ -1129,6 +1131,27 @@ public:
                          json["error"]["code"].get<std::string>());
   }
 
+  void GetMxnWindowsEditorBusyReturns503EditorBusy()
+  {
+    // Proves MapBridgeException's RenderWindowBridgeEditorBusyException branch:
+    // a typed bridge exception distinct from RenderWindowBridgeNoEditorException
+    // above must land on 503 EDITOR_BUSY, not EDITOR_NOT_ACTIVE.
+    m_RenderWindowBridge->SetMxNWindowListProvider(
+      []() -> std::vector<mitk::MxNWindowInfo> {
+        throw mitk::RenderWindowBridgeEditorBusyException(
+          "mxn editor is applying a layout");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_BUSY"),
+                         json["error"]["code"].get<std::string>());
+  }
+
   void GetMxnWindowsReturns200WithViewDirectionAndLinks()
   {
     m_RenderWindowBridge->SetMxNWindowListProvider([]() { return FakeMxNWindows(); });
@@ -1354,6 +1377,29 @@ public:
     CPPUNIT_ASSERT_EQUAL(503, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnLayoutSetterThrowsBusyReturns503EditorBusy()
+  {
+    // RenderWindowBridgeEditorBusyException is a std::runtime_error, not a
+    // mitk::Exception, so it must pass the schema-violation catch above (see
+    // PutMxnLayoutSchemaViolationReturns400, which maps mitk::Exception to
+    // 400) and reach MapBridgeException instead, landing on 503, not 400.
+    m_RenderWindowBridge->SetMxNLayoutSetter(
+      [](const std::string&) -> std::string {
+        throw mitk::RenderWindowBridgeEditorBusyException(
+          "mxn editor is applying a layout");
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/layout", kFakeMxNLayout);
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_BUSY"),
                          json["error"]["code"].get<std::string>());
   }
 

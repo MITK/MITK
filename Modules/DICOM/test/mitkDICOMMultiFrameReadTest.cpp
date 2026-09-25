@@ -153,6 +153,7 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(EnhancedFileIsSeparatedFromSingleFrameFiles);
   MITK_TEST(SingleFrameEnhancedFilesStillStackIntoOneVolume);
   MITK_TEST(FrameModelFilesAreNotCondensedInto3DnT);
+  MITK_TEST(FrameModelFileIsNotCondensedWithAClassicFile);
   MITK_TEST(MixedDirectoryLoadsEveryKindCompletely);
 
   CPPUNIT_TEST_SUITE_END();
@@ -1161,6 +1162,60 @@ public:
       const auto property = this->TheOnlyProperty(image, RescaleSlopeRelative(), "DICOM.0028.9145.[0].0028.1053");
       CPPUNIT_ASSERT_MESSAGE("The per-frame value is published", property.IsNotNull());
     }
+  }
+
+  /** A frame-model file and a classic file of one series at the same plane
+   *  position must not be condensed into one 3D+t volume, the same guarantee
+   *  FrameModelFilesAreNotCondensedInto3DnT pins for two frame-model files:
+   *  both load as complete, single-time-step volumes of their own.
+   */
+  void FrameModelFileIsNotCondensedWithAClassicFile()
+  {
+    const std::string directory = this->CaseDir();
+    const std::string studyUID = "1.2.826.0.1.3680043.8.498.900071";
+    const std::string seriesUID = "1.2.826.0.1.3680043.8.498.900072";
+
+    auto frameModel = this->MakeEnhanced();
+    frameModel.topLevelGeometry = true;
+    frameModel.studyInstanceUID = studyUID;
+    frameModel.seriesInstanceUID = seriesUID;
+    frameModel.instanceNumber = 1;
+    frameModel.zOffset = 0.0;
+    frameModel.Write(directory, "frame_model.dcm");
+
+    auto classic = this->MakeEnhanced(1);
+    classic.functionalGroups = false;
+    classic.studyInstanceUID = studyUID;
+    classic.seriesInstanceUID = seriesUID;
+    classic.instanceNumber = 2;
+    classic.zOffset = 0.0;
+    // Distinct from the frame-model file's default 4 mm, so "4\4" sorts before
+    // "5\5" in the mandatory tag sorter's group key and the frame-model block
+    // is the one processed first.
+    classic.sliceSpacing = 5.0;
+    classic.Write(directory, "classic.dcm");
+
+    const auto images = this->LoadAll(directory);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The frame-model file and the classic file load as two volumes",
+                                 std::size_t(2), images.size());
+
+    unsigned int totalSlices = 0;
+    unsigned int volumesWithAllFrames = 0;
+    for (const auto& image : images)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("No volume gained a time dimension from condensing",
+                                   std::size_t(1), std::size_t(image->GetTimeSteps()));
+      totalSlices += image->GetDimension(2);
+      if (FRAME_COUNT == image->GetDimension(2))
+      {
+        ++volumesWithAllFrames;
+      }
+    }
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every frame and the classic slice reach a volume",
+                                 FRAME_COUNT + 1, totalSlices);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Exactly one volume carries the frame-model file's frames",
+                                 1u, volumesWithAllFrames);
   }
 
   /** A multi-frame functional-group file among single-frame files of one

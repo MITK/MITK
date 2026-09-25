@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkDisplayActionEventFunctions.h>
+#include <mitkException.h>
 #include <mitkVector.h>
 
 #include <nlohmann/json.hpp>
@@ -58,6 +59,19 @@ namespace mitk
   class LevelWindow;
   class LookupTable;
 }
+
+/**
+* \brief Thrown by 'QmitkMxNMultiWidget::ApplyLayout' when it is called while
+*        another 'ApplyLayout' on the same editor is still in progress.
+*
+*   The condition is transient: the same call succeeds once the running apply
+*   has returned.
+*/
+class MITKQTWIDGETS_EXPORT QmitkMxNLayoutBusyException : public mitk::Exception
+{
+public:
+  mitkExceptionClassMacro(QmitkMxNLayoutBusyException, mitk::Exception);
+};
 
 /**
 * \brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
@@ -192,9 +206,12 @@ public:
   *   any cell whose data selection names it (those cells revert to the default
   *   group) - and drops a leftover registry entry, so a group created empty via
   *   the "+" button (which the per-member reclaim leaves in place) also
-  *   disappears. The default group (engine index 1, "main") is never removable:
-  *   the call is a no-op for it. A no-op as well for an id that names no group.
-  *   Emits SyncLinksChanged once.
+  *   disappears. The group's display name and color are dropped as well, so a
+  *   later group created with the same id starts clean. The default group
+  *   (engine index 1, see GetDefaultSyncGroupName) is never removable: the
+  *   call is a no-op for it.
+  *   A no-op as well for an id that names no group. Emits SyncLinksChanged
+  *   once.
   */
   void RemoveSynchronizationGroup(const std::string& id);
 
@@ -439,9 +456,9 @@ public:
   *
   *   Binary per axis - a cell is linked or not; the heterogeneous group state
   *   is a group-perspective concern, not a cell's. Every cell always carries a
-  *   selection group (default "main"), and a fresh cell also links Windowing and
-  *   LUT to "main", so a cell at rest paints three main-hued slots (Windowing,
-  *   LUT, selection), not gaps. Shared by the per-cell utility-strip barcode and
+  *   selection group (the default group), and a fresh cell also links Windowing
+  *   and LUT to the default group, so a cell at rest paints three slots in its
+  *   hue (Windowing, LUT, selection), not gaps. Shared by the per-cell utility-strip barcode and
   *   the sync peek plates so both surfaces tell the same story. Returns
   *   eight gap slots for an unknown cell.
   */
@@ -569,7 +586,8 @@ public:
   *   hue is that group's color); 'Complex' (gray) when they span more than one;
   *   'None' only when the cell has no group at all (not reachable in normal
   *   operation, since every cell has a selection group). A fresh cell is
-  *   'Mono("main")' - it links Windowing, LUT, and selection to "main". A cell
+  *   'Mono' in the default group - it links Windowing, LUT, and selection to
+  *   it. A cell
   *   whose navigation/intensity axes name one group while its selection stays on
   *   another (or vice versa) is an honest split and reads 'Complex'; there is no
   *   "navigation wins" tiebreak. A group color that throws mid-layout-change
@@ -608,6 +626,21 @@ public:
 
   /** \brief Display name of the selection group with the given engine index. */
   QString GetSyncGroupDisplayName(GroupSyncIndexType index) const;
+
+  /**
+  * \brief The group id of the selection group with the given engine index.
+  *
+  * \throws mitk::Exception on an unregistered index.
+  */
+  std::string GetSyncGroupName(GroupSyncIndexType index) const;
+
+  /**
+  * \brief The id of the default selection group (engine index 1), which
+  *        every fresh cell joins and every unlinked selection reverts to.
+  *
+  * \throws mitk::Exception while no group is registered at index 1.
+  */
+  std::string GetDefaultSyncGroupName() const;
 
   /**
   * \brief Set the group's display name (cosmetic write to `groups.<id>.name`
@@ -705,6 +738,10 @@ public:
   *   thread that pumps no messages gets nothing composited, so anything raised
   *   after the rebuild starts stays invisible until it ends. Nothing is shown
   *   for a hidden editor.
+  *
+  *   The dialog is modal and the pumping excludes user input, but posted
+  *   events and queued cross-thread calls are still delivered while it is up.
+  *   'ApplyLayout' is guarded against being re-entered from there.
   */
   void ShowLayoutLoadFeedback();
   void HideLayoutLoadFeedback();
@@ -881,10 +918,18 @@ public:
   *   names that group; remaining members are normalised to the seed. See
   *   the canonical rule on the schema's `groups` description.
   *
+  *   Not re-entrant. The rebuild pumps the event loop to keep its progress
+  *   dialog moving, so posted events and queued calls can run in the middle of
+  *   it; a call made from there, while this one is still in progress, is
+  *   rejected with 'QmitkMxNLayoutBusyException' and leaves the running apply
+  *   untouched. See 'IsApplyingLayout'.
+  *
   * \param doc  A parsed v2.0 or v3.0 layout document.
   *
   * \pre  Must be called on the UI thread.
   *
+  * \throws QmitkMxNLayoutBusyException if another 'ApplyLayout' on this editor
+  *         is still in progress.
   * \throws mitk::Exception on: version neither "2.0" nor "3.0"; structural
   *         shape violation; id not starting with `<multiWidgetName>__`;
   *         duplicate window ids; unknown view_direction; missing group
@@ -894,6 +939,17 @@ public:
   *         'nlohmann::json::exception' subtypes).
   */
   void ApplyLayout(const nlohmann::json& doc);
+
+  /**
+  * \brief True while an 'ApplyLayout' is in progress, including its rollback on
+  *        failure.
+  *
+  *   The cell tree is torn down and half rebuilt during that time. Code that
+  *   can run from the event loop the rebuild pumps (posted events, queued
+  *   cross-thread calls) must check this and leave the editor alone while it
+  *   is true.
+  */
+  bool IsApplyingLayout() const;
 
   /**
   * \brief True (and 'rows' / 'columns' filled) when the current layout is a
@@ -1479,6 +1535,9 @@ private:
 
   /** \brief Window id of the maximized cell, empty while the grid is shown. */
   QString m_MaximizedCell;
+
+  /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
+  bool m_ApplyingLayout = false;
 
   /**
   * \brief Splitter proportions as they were before maximizing, restored on the

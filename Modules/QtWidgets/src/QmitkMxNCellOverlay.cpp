@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkTimeNavigationController.h>
 
 #include <vtkCallbackCommand.h>
@@ -1034,6 +1035,48 @@ QRect QmitkMxNCellOverlay::CoordinateLineRect() const
   return QRect(band.left(), band.bottom() - NavRowHeight, band.width(), NavRowHeight);
 }
 
+namespace
+{
+  /** Whether the cell's displayed slice index runs opposite to its slice
+   *  stepper. Anything not yet set up (no input geometry, no renderer
+   *  geometry, an 'Original' view) has no image axis to follow, so the
+   *  stepper position is shown as is. */
+  bool IsDisplayedSliceInverted(mitk::BaseRenderer* renderer)
+  {
+    const auto* sliceNavigation = renderer->GetSliceNavigationController();
+    if (nullptr == sliceNavigation)
+    {
+      return false;
+    }
+
+    const auto viewDirection = sliceNavigation->GetViewDirection();
+    if (mitk::AnatomicalPlane::Original == viewDirection)
+    {
+      return false;
+    }
+
+    const auto* inputTimeGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+    const auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    if (nullptr == inputTimeGeometry || nullptr == timeNavigation)
+    {
+      return false;
+    }
+
+    // The same time step fallback CreateWorldGeometry uses to build the
+    // renderer planes.
+    const auto selectedTimeStep = timeNavigation->GetSelectedTimeStep();
+    const mitk::BaseGeometry::ConstPointer referenceGeometry = inputTimeGeometry->GetGeometryForTimeStep(
+      inputTimeGeometry->IsValidTimeStep(selectedTimeStep) ? selectedTimeStep : 0);
+    const auto* rendererGeometry = renderer->GetCurrentWorldGeometry();
+    if (referenceGeometry.IsNull() || nullptr == rendererGeometry)
+    {
+      return false;
+    }
+
+    return mitk::SliceNavigationHelper::IsSliceIndexInverted(referenceGeometry, rendererGeometry, viewDirection);
+  }
+}
+
 void QmitkMxNCellOverlay::NavigatorSetSlice(int position)
 {
   auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
@@ -1046,7 +1089,9 @@ void QmitkMxNCellOverlay::NavigatorSetSlice(int position)
   {
     return;
   }
-  const int delta = position - static_cast<int>(stepper->GetPos());
+  const int steps = static_cast<int>(stepper->GetSteps());
+  const int stepperPosition = IsDisplayedSliceInverted(renderer) ? steps - 1 - position : position;
+  const int delta = stepperPosition - static_cast<int>(stepper->GetPos());
   if (0 == delta)
   {
     return;
@@ -2454,6 +2499,10 @@ void QmitkMxNCellOverlay::RefreshValues()
   {
     slicePosition = sliceStepper->GetPos();
     sliceSteps = sliceStepper->GetSteps();
+    if (sliceSteps > 0 && IsDisplayedSliceInverted(renderer))
+    {
+      slicePosition = sliceSteps - 1 - slicePosition;
+    }
   }
   unsigned int timePosition = 0;
   unsigned int timeSteps = 0;
@@ -3158,9 +3207,9 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
 
   menu.addSeparator();
 
-  // Re-homed from the built-in render-window menu, which the MxN utility strip
-  // covers: the two controls of that menu that still mean something for a cell
-  // whose arrangement the layout editor owns.
+  // The MxN utility strip covers the built-in render-window menu, so the two
+  // controls of that menu that still mean something for a cell whose
+  // arrangement the layout editor owns are offered here instead.
   // No icons on the checkable entries: a style draws the check mark and the icon
   // in the same column, so an icon silently replaces the tick and the state
   // stops being readable. The strip carries the icons; the menu carries state.

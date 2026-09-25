@@ -63,6 +63,7 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(NavigatorMode_TogglesEditorWide);
   MITK_TEST(NavigatorDepthLabel_OmitsRedundantOrientation);
   MITK_TEST(NavigatorSlice_DrivesStepperAndGroup);
+  MITK_TEST(NavigatorSlice_FollowsImageIndexDirection);
   MITK_TEST(NavigatorInPlaneMove_MapsToLocalAxes);
   MITK_TEST(NavigatorVoxelIndex_SetsCrosshair);
   MITK_TEST(SyncBarcode_ReflectsMembership);
@@ -244,6 +245,36 @@ public:
     CPPUNIT_ASSERT_EQUAL(6u, SliceStepper(0)->GetPos());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice-group peer follows the navigator", 6u, SliceStepper(1)->GetPos());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Unlinked cell stays put", 4u, SliceStepper(2)->GetPos());
+  }
+
+  void NavigatorSlice_FollowsImageIndexDirection()
+  {
+    // A fresh MxN cell starts Sagittal (QmitkRenderWindowWidget's own
+    // default, not Axial), so pin the plane explicitly for each case;
+    // SetViewDirection also rebuilds the SNC geometry for the new plane
+    // (through InitializeViewByBoundingObjects), which is what gives the
+    // stepper its slice count below.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Axial slicing steps through the image's 8-voxel z extent",
+      8u, SliceStepper(0)->GetSteps());
+
+    // NavigatorSetSlice takes the displayed (image) index. For this
+    // identity-direction image an axial renderer's slice axis runs opposite
+    // the image's z index, so the displayed index 6 sits at stepper
+    // position 8-1-6 = 1.
+    this->Overlay(0)->NavigatorSetSlice(6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Axial: displayed index 6 is stepper position 1",
+      1u, SliceStepper(0)->GetPos());
+
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Sagittal slicing steps through the image's 16-voxel x extent",
+      16u, SliceStepper(1)->GetSteps());
+
+    // A sagittal renderer's slice axis runs the same direction as the image
+    // index, so the displayed index and the stepper position coincide.
+    this->Overlay(1)->NavigatorSetSlice(6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Sagittal: displayed index 6 is stepper position 6",
+      6u, SliceStepper(1)->GetPos());
   }
 
   void NavigatorInPlaneMove_MapsToLocalAxes()

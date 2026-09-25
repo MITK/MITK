@@ -49,6 +49,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QRegularExpression>
+#include <QScopedValueRollback>
 #include <QShortcut>
 #include <QSplitter>
 #include <QTimer>
@@ -657,11 +658,12 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
   // convergence (unlike SetSyncLink) - the toggle couples views in place.
   //
   // The macro couples navigation only (pan/zoom/slice/crosshair to "sync"), so
-  // members keep their appearance and selection axes on "main" and therefore read
-  // a gray 'Complex' frame while synchronized - an honest split (the cell spans
-  // "sync" and "main"), not a defect. Painting a solid hue instead would require
-  // the macro to also claim windowing/lut/selection, a broader coupling than a
-  // navigation toggle should imply.
+  // members keep their appearance and selection axes on their default group and
+  // therefore read a gray 'Complex' frame while synchronized - an honest split
+  // (the cell spans "sync" and its default group), not a defect. Painting a
+  // solid hue instead would require the macro to also claim
+  // windowing/lut/selection, a broader coupling than a navigation toggle
+  // should imply.
   m_SynchronizeMacroActive = synchronized;
   if (synchronized)
   {
@@ -950,38 +952,34 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     --difference;
   }
 
-  while (0 > difference)
+  if (0 > difference)
   {
-    // Remove the highest 'widget<i>' that is registered. Routing through
-    // the name-keyed overload (rather than the no-arg lex-last variant)
-    // guarantees the right cell is removed once the editor crosses 10 cells:
-    // {widget0..widget11} sorts as widget0 < widget1 < widget10 < widget11
-    // < widget2 < ..., so lex-last would otherwise pick widget9.
-    bool removed = false;
-    for (std::size_t i = this->GetNumberOfRenderWindowWidgets(); i-- > 0; )
+    // A shrink trims from the end in reading order, so the cells the user
+    // sees first survive.
+    const auto readingOrder = this->GetNormalizedCellRects();
+    const auto excess = std::min<std::size_t>(-difference, readingOrder.size());
+    for (auto it = readingOrder.end() - excess; it != readingOrder.end(); ++it)
     {
-      const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER + QStringLiteral("widget") + QString::number(i);
-      if (const auto cell = this->GetRenderWindowWidget(id))
+      const auto cell = this->GetRenderWindowWidget(it->first);
+      if (nullptr == cell)
       {
-        this->DetachAndDestroyCell(cell.get());
-        removed = true;
-        break;
+        MITK_WARN << "SetLayout: reading-order cell '" << it->first.toStdString()
+                  << "' no longer resolves - skipping.";
+        continue;
       }
+      this->DetachAndDestroyCell(cell.get());
+      ++difference;
     }
-    if (!removed)
+
+    if (0 > difference)
     {
-      // No 'widget<i>' cell present - mixed with custom-named layout. Bail
-      // rather than spinning; the caller is expected to ApplyLayout/
-      // RollBackToSingleDefaultCell when entering an inconsistent state.
       MITK_WARN << "SetLayout: cannot shrink to " << requiredRenderWindowWidgets
                 << " cells - " << this->GetNumberOfRenderWindowWidgets()
-                << " custom-named cells remain. Layout dimensions ("
+                << " cells remain. Layout dimensions ("
                 << this->GetRowCount() << "x" << this->GetColumnCount()
                 << ") are now out of sync with the cell count. Use ApplyLayout "
                    "or RollBackToSingleDefaultCell to recover a consistent state.";
-      break;
     }
-    ++difference;
   }
 
   auto firstRenderWindowWidget = this->GetFirstRenderWindowWidget();
@@ -1028,17 +1026,20 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   auto renderWindowWidget = this->CreateRenderWindowWidget(id);
   this->SetSynchronizationGroup(renderWindowWidget->GetUtilityWidget()->GetNodeSelectionWidget(), 1);
 
-  // "main" (selection group 1) synchronizes the appearance axes by default.
-  // Linking Windowing and LUT here keeps a fresh cell's level/window and LUT
-  // changes inside the editor's "main" group (grouped, per-renderer) instead of
-  // writing the node property globally, which would leak to every other renderer
-  // of the node. "main" is registered before the first cell (InitializeMultiWidget
-  // adds group 1 ahead of SetLayout), so the id always resolves. This lives in the
-  // positional overload only: the explicit-id overload stays side-effect-free so
-  // ApplyLayout honors a loaded document's links verbatim.
+  // The default group (engine index 1) synchronizes the appearance axes by
+  // default. Linking Windowing and LUT here keeps a fresh cell's level/window
+  // and LUT changes inside that group (grouped, per-renderer) instead of
+  // writing the node property globally, which would leak to every other
+  // renderer of the node. Index 1 is registered before the first cell
+  // (InitializeMultiWidget adds it ahead of SetLayout, and the
+  // SetSynchronizationGroup call above auto-creates it otherwise), so the
+  // name always resolves. This lives in the positional overload only: the
+  // explicit-id overload stays side-effect-free so ApplyLayout honors a
+  // loaded document's links verbatim.
+  const auto defaultGroup = this->GetDefaultSyncGroupName();
   auto& links = m_CellSyncLinks[id];
-  links.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)] = "main";
-  links.groups[DimensionIndex(QmitkMxNSyncDimension::Lut)] = "main";
+  links.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)] = defaultGroup;
+  links.groups[DimensionIndex(QmitkMxNSyncDimension::Lut)] = defaultGroup;
   return renderWindowWidget;
 }
 
@@ -2318,6 +2319,7 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   m_GroupHueOrder.clear();
   m_GroupDisplayNames.clear();
   m_GroupColors.clear();
+  m_SelectionGroupsAllocatedForLinks.clear();
 
   // Per-cell synchronization links die with their cells; the document (or
   // the user) defines the links of the next cell set. The macro state does
@@ -2403,6 +2405,15 @@ void QmitkMxNMultiWidget::ValidateIdsForThisEditor(const nlohmann::json& doc) co
 
 void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 {
+  if (m_ApplyingLayout)
+  {
+    mitkThrowException(QmitkMxNLayoutBusyException)
+      << "A layout is already being applied to this editor; retry once it has finished.";
+  }
+  // Outside the try so the rollback in the handlers below, which pumps the
+  // event loop as well, still runs with the flag set.
+  const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+
   this->SetMaximizedCell(QString());
 
   // 'didMutate' guards rollback. As long as we are in the validation phase
@@ -2661,7 +2672,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 
     this->EnableCrosshair();
     this->RelaySplitterProportionChanges();
-  emit LayoutChanged();
+    emit LayoutChanged();
   }
   catch (const mitk::Exception&)
   {
@@ -2690,6 +2701,11 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
     mitkThrow() << "Layout document load failed: " << e.what();
   }
+}
+
+bool QmitkMxNMultiWidget::IsApplyingLayout() const
+{
+  return m_ApplyingLayout;
 }
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
@@ -2822,7 +2838,7 @@ void QmitkMxNMultiWidget::RemoveSynchronizationGroup(const std::string& id)
     }
   }
 
-  // The default group (engine index 1, "main") is never removable.
+  // The default group (engine index 1) is never removable.
   if (registeredIndex == 1)
   {
     return;
@@ -2855,6 +2871,13 @@ void QmitkMxNMultiWidget::RemoveSynchronizationGroup(const std::string& id)
     m_SelectionGroupsAllocatedForLinks.erase(registeredIndex);
     m_GroupNameByIndex.erase(registeredIndex);
   }
+
+  // The id can be reused by a later created group, which must start clean;
+  // the hue slot stays so other groups' default hues do not shift. This runs
+  // whether or not the id was registered, so a link-only group (never given
+  // an engine index) also loses its cosmetics.
+  m_GroupDisplayNames.erase(id);
+  m_GroupColors.erase(id);
 
   this->RefreshSyncControls();
 }
@@ -3879,8 +3902,11 @@ void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
 
   auto* dialog = new QDialog(this);
   dialog->setWindowTitle(tr("Loading layout"));
-  // Modal so that whatever the pumping below delivers cannot reach the editor
-  // while its cell tree is half rebuilt.
+  // Modal, and the pumping during the rebuild excludes user input, so the user
+  // cannot reach the half rebuilt cell tree. Posted events and queued
+  // cross-thread calls (such as REST requests) are still delivered:
+  // 'ApplyLayout' refuses to be re-entered, and the REST bindings refuse MxN
+  // requests while 'IsApplyingLayout()' holds.
   dialog->setWindowModality(Qt::ApplicationModal);
 
   auto* label = new QLabel(tr("Reading the layout..."), dialog);
@@ -3938,8 +3964,10 @@ void QmitkMxNMultiWidget::StepLayoutLoadFeedback(int percent, const QString& lab
 
   // The rebuild holds the UI thread, and a thread that pumps no messages gets
   // nothing composited - so without this the bar would not move at all. User
-  // input stays excluded, and the dialog is modal, so nothing delivered here
-  // reaches the editor.
+  // input stays excluded and the dialog is modal, but posted events and queued
+  // cross-thread calls (such as REST requests) are delivered here, in the
+  // middle of the rebuild. 'ApplyLayout' guards against being re-entered, and
+  // the REST bindings refuse MxN requests while it runs.
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
@@ -4446,8 +4474,9 @@ QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
   // Data selection is the 8th axis and counts toward frame identity uniformly.
   // A solid hue means the cell is wholly one group across all eight axes; a cell
   // whose axes (selection included) name more than one group is an honest split
-  // and reads gray. Every cell always has a selection group (default "main"), so
-  // a fresh cell is at least Mono("main") and 'None' is not normally reachable.
+  // and reads gray. Every cell always has a selection group (default group,
+  // engine index 1), so a fresh cell is at least Mono(default group) and
+  // 'None' is not normally reachable.
   const auto selectionGroup = this->GetCellSelectionGroup(windowId);
   if (!selectionGroup.empty() &&
       std::find(distinctGroups.begin(), distinctGroups.end(), selectionGroup) == distinctGroups.end())
@@ -4581,6 +4610,21 @@ QString QmitkMxNMultiWidget::GetSyncGroupDisplayName(GroupSyncIndexType index) c
     mitkThrow() << "GetSyncGroupDisplayName: no group with engine index " << index << ".";
   }
   return QString::fromStdString(this->GetSyncGroupDisplayName(it->second));
+}
+
+std::string QmitkMxNMultiWidget::GetSyncGroupName(GroupSyncIndexType index) const
+{
+  const auto it = m_GroupNameByIndex.find(index);
+  if (it == m_GroupNameByIndex.end())
+  {
+    mitkThrow() << "GetSyncGroupName: no group with engine index " << index << ".";
+  }
+  return it->second;
+}
+
+std::string QmitkMxNMultiWidget::GetDefaultSyncGroupName() const
+{
+  return this->GetSyncGroupName(1);
 }
 
 void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const std::string& displayName)

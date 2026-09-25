@@ -168,6 +168,11 @@ underscore, dot, hyphen). The same group name can be used across multiple
 dimensions in v3 (e.g. `"selection": "main", "zoom": "main"`); group names
 live in a single namespace and dimensions are orthogonal.
 
+One selection group is the *default group*: the one every fresh cell joins
+and an unlinked selection reverts to. A selection group named `main`
+becomes the default when the document declares one; otherwise the
+alphabetically first selection group referenced by any cell takes that role.
+
 Per-group persisted state lives once at the top level:
 
 ```json

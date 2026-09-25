@@ -262,9 +262,12 @@ Q_SIGNALS:
 
   /**
    * \brief The layout actions the user asked for, for the hosting view to apply
-   *        to its editor part. All but SaveLayout replace the whole arrangement
-   *        and discard the current synchronization groups, so a host is expected
-   *        to confirm them; the widget itself never applies them.
+   *        to its editor part; the widget itself never applies them.
+   *        LayoutSet changes the grid size: the windows are re-flowed into a
+   *        plain grid, windows beyond the new size are removed, and the others
+   *        keep their synchronization links. SetDataBasedLayout and LoadLayout
+   *        rebuild every window and replace the synchronization groups, so a
+   *        host is expected to confirm them.
    */
   void LayoutSet(int row, int column);
   void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);

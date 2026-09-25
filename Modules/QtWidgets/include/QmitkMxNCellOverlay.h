@@ -74,20 +74,24 @@ class vtkRenderWindow;
  *
  * Passive readouts are always-on and faint (the level/window readout honors
  * the MxN preference and every readout honors clean-view). The interactive
- * furniture reveals as one coordinated frame while the pointer is in the cell
- * - quiet and translucent at rest, fully opaque and expressive under the
- * pointer - and eases in and collapses together (opacity + offset), rather
+ * furniture reveals as one coordinated frame when the pointer nears any piece
+ * of it or the top edge, so the centre of the image stays uncovered. It is
+ * quiet and translucent at rest, fully opaque and expressive under the
+ * pointer, and eases in and collapses together (opacity + offset) rather
  * than region by region.
  *
  * The overlay is mouse-transparent while idle. While a furniture region is
  * active it takes input only over the visible furniture bounds (widget
  * mask), so VTK interaction is never shadowed elsewhere; it feeds the
  * proximity controller as an event source, keeping reveal state alive while
- * the pointer is over the furniture itself. On proximity to the bottom edge
- * the standard slice-navigation slider is hosted over the image; the top edge
- * shows a thin strip for the auto-hidden utility toolbar and reveals it on
- * approach. A right-click (without drag - the zoom/windowing gestures stay
- * untouched) opens the cell's context menu.
+ * the pointer is over the furniture itself. The navigator is a band of
+ * painted slider rows above the bottom-left readouts (compact: slice, plus
+ * time for time-resolved data; expanded: depth, in-plane horizontal and
+ * vertical, a click-to-edit coordinate line, plus time); it shows while the
+ * frame is revealed. While the frame is collapsed, a thin strip along the top
+ * edge marks the auto-hidden utility toolbar, which reveals and collapses
+ * with the frame. A right-click (without drag - the zoom/windowing gestures
+ * stay untouched) opens the cell's context menu.
  *
  * Values refresh on the cell's VTK render-end events, coalesced to the next
  * event-loop cycle - not on a timer.
@@ -138,13 +142,16 @@ public:
    */
   void SetReadoutVisible(bool visible);
 
-  /** \brief Clean-view mode: while set, the overlay paints nothing at all. */
+  /** \brief Clean-view mode: while set, the overlay paints none of the viewport
+   *         furniture. In arrange mode the sync peek plate and the bumped frame
+   *         still paint: they belong to the arrangement, not the furniture. */
   void SetCleanView(bool cleanView);
 
   /**
-   * \brief Navigator mode for this cell: compact (the slice slider only) or
-   *        expanded (the full 3D crosshair as three axis sliders plus the
-   *        coordinate entry). Mirrored editor-wide by the owning editor.
+   * \brief Navigator mode for this cell: compact (the slice slider, plus
+   *        time for time-resolved data) or expanded (the full 3D crosshair
+   *        as three axis sliders plus the coordinate entry). Mirrored
+   *        editor-wide by the owning editor.
    */
   void SetNavigatorExpanded(bool expanded);
   bool IsNavigatorExpanded() const;
@@ -156,6 +163,11 @@ public:
    *        display-action events an interaction would - so a linked cell
    *        follows its group and an unlinked cell moves alone. Exposed for
    *        headless verification.
+   *
+   *        NavigatorSetSlice takes the displayed slice index, which follows
+   *        the image's own index axis for the view direction; it is converted
+   *        to the stepper position, which can run the opposite way
+   *        (see mitk::SliceNavigationHelper::IsSliceIndexInverted).
    */
   void NavigatorSetSlice(int position);
   void NavigatorSetCrosshair(const mitk::Point3D& worldPosition);
@@ -412,8 +424,9 @@ private:
    *         preference (following the reveal when the preference is off). */
   bool IsPassiveVisible(bool honorReadoutPreference) const;
 
-  /** \brief True while the pointer is anywhere in the cell (any region left
-   *         Idle): the trigger for the one coordinated interactive reveal. */
+  /** \brief True outside clean view while any furniture region or the top
+   *         strip is Active, i.e. the pointer is within its proximity zone:
+   *         the trigger for the one coordinated interactive reveal. */
   bool IsFrameRevealed() const;
 
   /** \brief (Re)drive the reveal animation from the current frame state. */
@@ -575,7 +588,7 @@ private:
   HoverTarget m_Hover = HoverTarget::None;
   int m_HoverNavRow = -1;   // navigator slider row under the pointer, or -1
 
-  unsigned int m_SlicePosition = 0;
+  unsigned int m_SlicePosition = 0;  // displayed index along the image axis, not the stepper position
   unsigned int m_SliceSteps = 0;
   unsigned int m_TimePosition = 0;
   unsigned int m_TimeSteps = 0;

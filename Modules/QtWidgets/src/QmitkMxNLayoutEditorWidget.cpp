@@ -105,14 +105,9 @@ namespace
     QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair
   };
 
-  // Name of the default selection group (engine index 1; see
-  // QmitkMxNMultiWidget::AddSynchronizationGroup). A cell "resting on the default"
-  // is one whose selection has not been placed into a specific group.
-  const std::string DefaultSelectionGroup = "main";
-
   // Mode (a) "replace" primitive: strip a cell's ties to every group other than
   // 'keepGroup'. The seven dimension axes are unlinked; the selection reverts to
-  // the default "main" (there is no unlinked state for selection). Shared by the
+  // the default group (there is no unlinked state for selection). Shared by the
   // SetCellMembership join and the empty-group cache flush so both fully replace.
   void ClearOtherGroupTies(QmitkMxNMultiWidget* multiWidget, const QString& windowId,
                            const std::string& keepGroup)
@@ -540,8 +535,10 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   gridRow->addSpacing(12);
   m_EditGridButton = makeGridButton(tr("Edit grid..."), QStringLiteral(":/Qmitk/mxn-grid-edit.svg"));
   m_EditGridButton->setToolTip(tr("Edit grid: choose a grid size, or derive an arrangement from the "
-                                  "loaded data. Either replaces the current window arrangement and "
-                                  "its synchronization groups."));
+                                  "loaded data. A new grid size re-flows the windows into a plain "
+                                  "grid and removes those beyond it; the others keep their "
+                                  "synchronization. A data-based arrangement replaces all windows "
+                                  "and their synchronization groups."));
   connect(m_EditGridButton, &QToolButton::clicked, this, [this]() { this->ShowGridDialog(); });
   gridRow->addWidget(m_EditGridButton);
   gridRow->addStretch();
@@ -936,7 +933,8 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
   {
     if (mode == QmitkMxNGroupJoinMode::Replace)
     {
-      // Wholly replace: drop every other tie first (selection reverts to "main").
+      // Wholly replace: drop every other tie first (selection reverts to the
+      // default group).
       ClearOtherGroupTies(m_MultiWidget, windowId, group);
     }
     for (const auto dimension : dimensions)
@@ -954,7 +952,7 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
       // FillEmpty adopts the group's selection only for a cell resting on the
       // default group; Replace and Merge move it.
       const bool restingOnDefault =
-        (m_MultiWidget->GetCellSelectionGroup(windowId) == DefaultSelectionGroup);
+        (m_MultiWidget->GetCellSelectionGroup(windowId) == m_MultiWidget->GetDefaultSyncGroupName());
       if (mode != QmitkMxNGroupJoinMode::FillEmpty || restingOnDefault)
       {
         m_MultiWidget->SetCellSelectionGroup(windowId, group);
@@ -1238,7 +1236,7 @@ std::string QmitkMxNLayoutEditorWidget::CreateGroup()
   {
     const auto index = m_MultiWidget->NextFreeSyncGroupIndex();
     m_MultiWidget->AddSynchronizationGroup(index);
-    return m_MultiWidget->GetSyncGroupDisplayName(index).toStdString();
+    return m_MultiWidget->GetSyncGroupName(index);
   }
   catch (const mitk::Exception& e)
   {
@@ -1249,14 +1247,18 @@ std::string QmitkMxNLayoutEditorWidget::CreateGroup()
 
 void QmitkMxNLayoutEditorWidget::DeleteGroup(const std::string& group)
 {
-  // The default group is the appearance/selection home every cell falls back to;
-  // it is never removable.
-  if (m_MultiWidget.isNull() || group == DefaultSelectionGroup)
+  if (m_MultiWidget.isNull())
   {
     return;
   }
   try
   {
+    // The default group is the appearance/selection home every cell falls back to;
+    // it is never removable.
+    if (group == m_MultiWidget->GetDefaultSyncGroupName())
+    {
+      return;
+    }
     m_MultiWidget->RemoveSynchronizationGroup(group);
   }
   catch (const mitk::Exception& e)
@@ -1851,7 +1853,17 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
     // The default group is every cell's fallback and cannot be removed; all other
     // groups can. Removing a populated group unsynchronizes its windows, so
     // confirm that case (an empty group carries no state, so it goes quietly).
-    if (groupId != DefaultSelectionGroup)
+    // While the default group's name cannot be resolved (mid-layout-change),
+    // conservatively omit the action rather than risk offering to delete it.
+    bool canDeleteGroup = false;
+    try
+    {
+      canDeleteGroup = (groupId != m_MultiWidget->GetDefaultSyncGroupName());
+    }
+    catch (const mitk::Exception&)
+    {
+    }
+    if (canDeleteGroup)
     {
       menu->addSeparator();
       auto* deleteGroup = menu->addAction(tr("Delete group"));
@@ -1968,10 +1980,11 @@ void QmitkMxNLayoutEditorWidget::ShowGridDialog()
     dialogLayout->setContentsMargins(6, 6, 6, 6);
     dialogLayout->addWidget(m_LayoutSelection);  // reparents the picker into the dialog
 
-    // The picker applies through the hosting view, which guards the destructive
-    // paths (LayoutSet / preset load / data-based) against silently discarding a
-    // non-trivial configuration. Whatever the guard decides, the picker's own
-    // controls have finished their gesture, so close the modal when one fires.
+    // The picker applies through the hosting view, which guards the paths that
+    // rebuild every window (data-based, preset or file load) against silently
+    // discarding a non-trivial configuration. Whatever the guard decides, the
+    // picker's own controls have finished their gesture, so close the modal
+    // when one fires.
     connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet,
             m_GridDialog, &QDialog::accept);
     connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout,
@@ -3039,10 +3052,12 @@ bool QmitkMxNLayoutEditorWidget::HasNonTrivialSyncConfig() const
 
   std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
   std::vector<QmitkMxNMultiWidget::WindowDescriptor> descriptors;
+  std::string defaultGroup;
   try
   {
     infos = m_MultiWidget->GetSyncGroupInfos();
     descriptors = m_MultiWidget->ListWindowDescriptors();
+    defaultGroup = m_MultiWidget->GetDefaultSyncGroupName();
   }
   catch (const mitk::Exception&)
   {
@@ -3050,26 +3065,27 @@ bool QmitkMxNLayoutEditorWidget::HasNonTrivialSyncConfig() const
     return false;
   }
 
-  // Any group beyond the default "main" is a user-built structure a layout
+  // Any group beyond the default one is a user-built structure a layout
   // replace would discard - including an empty group the user created but has not
   // populated yet.
   for (const auto& info : infos)
   {
-    if (info.id != DefaultSelectionGroup)
+    if (info.id != defaultGroup)
     {
       return true;
     }
   }
 
-  // Otherwise the only groups are "main". The configuration is trivial only when
-  // every cell rests as a clean Mono("main") - the fresh-cell default, where
-  // windowing/LUT/selection are on "main" and nothing else is linked. A cell that
-  // spans groups (Complex) or sits wholly on some non-"main" group means the user
-  // linked synchronization the warning must cover.
-  QColor mainHue;
+  // Otherwise the only group is the default one. The configuration is trivial
+  // only when every cell rests as a clean Mono(default) - the fresh-cell
+  // state, where windowing/LUT/selection are on the default group and nothing
+  // else is linked. A cell that spans groups (Complex) or sits wholly on some
+  // non-default group means the user linked synchronization the warning must
+  // cover.
+  QColor defaultHue;
   try
   {
-    mainHue = m_MultiWidget->GetSyncGroupColor(DefaultSelectionGroup);
+    defaultHue = m_MultiWidget->GetSyncGroupColor(defaultGroup);
   }
   catch (const mitk::Exception&)
   {
@@ -3081,7 +3097,7 @@ bool QmitkMxNLayoutEditorWidget::HasNonTrivialSyncConfig() const
     {
       return true;
     }
-    if (mainHue.isValid() && identity.hue != mainHue)
+    if (defaultHue.isValid() && identity.hue != defaultHue)
     {
       return true;
     }

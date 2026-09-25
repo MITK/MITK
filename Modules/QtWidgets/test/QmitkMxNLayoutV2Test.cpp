@@ -67,6 +67,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(Serialize_EmitsIdsVerbatim);
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
+  MITK_TEST(ApplyLayout_RejectsReentrantApply);
 
   // --- Strict parsing and exception boundary ---
   MITK_TEST(ViewDirection_TypoSagittal_Throws);
@@ -734,6 +735,112 @@ public:
     nlohmann::json nullDoc;
     CPPUNIT_ASSERT(nullDoc.is_null());
     CPPUNIT_ASSERT_THROW(editor->LoadLayout(&nullDoc), mitk::Exception);
+  }
+
+  // ====================================================================
+  // 'AddSynchronizationGroup' emits 'SyncGroupAdded' after 'TearDownAllCells'
+  // has already cleared the old cell tree but before the new one is built.
+  // A slot connected with Qt::DirectConnection therefore runs synchronously
+  // inside that half-torn window. If it calls 'ApplyLayout' again on the
+  // same editor, the nested call must be rejected as reentrant rather than
+  // being allowed to run to completion and clobber the outer call's state.
+  // ====================================================================
+  void ApplyLayout_RejectsReentrantApply()
+  {
+    const auto docA = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__docA_only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    const auto docB = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__docB_0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__docB_1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+
+    // Guards against the *nested* call's own 'AddSynchronizationGroup' also
+    // emitting 'SyncGroupAdded' and re-entering this lambda a second time.
+    bool nestedInvoked = false;
+    bool nestedThrew = false;
+    bool nestedThrewWrongType = false;
+    bool applyingInsideSlot = false;
+    auto conn = QObject::connect(editor.get(), &QmitkMxNMultiWidget::SyncGroupAdded,
+      editor.get(),
+      [&]()
+      {
+        if (nestedInvoked)
+        {
+          return;
+        }
+        nestedInvoked = true;
+        applyingInsideSlot = editor->IsApplyingLayout();
+        // Nothing may unwind through the signal emission, so every exception
+        // is caught here and judged after the outer call has returned.
+        try
+        {
+          editor->ApplyLayout(docB);
+        }
+        catch (const QmitkMxNLayoutBusyException&)
+        {
+          nestedThrew = true;
+        }
+        catch (const mitk::Exception&)
+        {
+          nestedThrewWrongType = true;
+        }
+      }, Qt::DirectConnection);
+
+    CPPUNIT_ASSERT(!editor->IsApplyingLayout());
+    editor->ApplyLayout(docA);
+    QObject::disconnect(conn);
+
+    CPPUNIT_ASSERT_MESSAGE("IsApplyingLayout() must hold while ApplyLayout runs",
+      applyingInsideSlot);
+    CPPUNIT_ASSERT_MESSAGE("IsApplyingLayout() must be cleared once ApplyLayout returns",
+      !editor->IsApplyingLayout());
+    CPPUNIT_ASSERT_MESSAGE(
+      "A nested ApplyLayout must be rejected with QmitkMxNLayoutBusyException, not a generic mitk::Exception",
+      !nestedThrewWrongType);
+    CPPUNIT_ASSERT_MESSAGE(
+      "A nested ApplyLayout invoked from a SyncGroupAdded slot mid-apply must be rejected",
+      nestedThrew);
+
+    const auto doc = editor->SerializeLayout();
+    std::set<std::string> ids;
+    std::function<void(const nlohmann::json&)> collect = [&](const nlohmann::json& n)
+    {
+      const auto type = n.at("type").get<std::string>();
+      if (type == "split")
+      {
+        for (const auto& c : n.at("children")) collect(c);
+      }
+      else
+      {
+        ids.insert(n.at("id").get<std::string>());
+      }
+    };
+    collect(doc.at("root"));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The outer ApplyLayout(docA) must be the layout left standing",
+      std::size_t{1}, ids.size());
+    CPPUNIT_ASSERT_MESSAGE(
+      "docA's window id must be present after both calls return",
+      ids.count("mxn__docA_only") == 1);
   }
 
   // ====================================================================

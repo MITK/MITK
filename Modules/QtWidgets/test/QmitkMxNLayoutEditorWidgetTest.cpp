@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <nlohmann/json.hpp>
+
 #include <QColor>
 #include <QCoreApplication>
 #include <QDropEvent>
@@ -81,7 +83,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Frame_SelectionDivergesFromNav_IsComplex);
   MITK_TEST(Frame_WhollyOneGroup_IsMono);
   MITK_TEST(AssignReplace_ClearsOtherGroupLinks);
-  MITK_TEST(WidenedMembership_SelectionTieCountsAsMember);
+  MITK_TEST(Membership_SelectionTieCountsAsMember);
   MITK_TEST(MainCard_Live_AxisClickHomogenizes);
   MITK_TEST(AssignReplace_ReclaimsEmptiedSelectionGroup);
   MITK_TEST(AssignReplace_MultiCellReclaim_OnlyWhenLastLeaves);
@@ -98,6 +100,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
 
   MITK_TEST(NonTrivialConfig_FalseForFreshDefault);
   MITK_TEST(NonTrivialConfig_TrueOnceASecondGroupExists);
+  MITK_TEST(NonTrivialSyncConfig_FalseForSingleCustomDefaultGroup);
   MITK_TEST(MultiTileDrop_AssignsEverySelectedCell);
 
   MITK_TEST(SyncHighlight_CellsSharingDimensionAxis);
@@ -108,6 +111,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
 
   MITK_TEST(DeleteGroup_RemovesMemberBearingGroup);
   MITK_TEST(DeleteGroup_RemovesEmptyCreatedGroup);
+  MITK_TEST(DeleteGroup_RecreatedGroupStartsClean);
   MITK_TEST(DeleteGroup_MainIsNoOp);
 
   MITK_TEST(Matrix_UnlinkedCellCarriesNoChipOrOffset);
@@ -779,12 +783,12 @@ public:
                            !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing).has_value());
   }
 
-  void WidenedMembership_SelectionTieCountsAsMember()
+  void Membership_SelectionTieCountsAsMember()
   {
     // Membership counts the selection tie (the 8th axis): a cell tied to a group
     // only through data selection is a member, so a group axis toggle reaches it.
     // Driven through the public ApplyDimensionToGroup, whose members come from
-    // the (now widened) GroupMembers.
+    // GroupMembers.
     m_Editor->SetCellSelectionGroup(CellId(0), "S");  // sole tie to S is selection
 
     m_Widget->ApplyDimensionToGroup("S", QmitkMxNSyncDimension::Slice, true);
@@ -1030,6 +1034,38 @@ public:
                            m_Widget->HasNonTrivialSyncConfig());
   }
 
+  void NonTrivialSyncConfig_FalseForSingleCustomDefaultGroup()
+  {
+    // A document whose sole selection group is not literally named "main" (a
+    // custom default label, here "left") is still the fresh/clean
+    // configuration: one group, everyone resting on it, nothing else linked.
+    // The predicate must not warn just because that group's name differs from
+    // the literal "main".
+    const auto doc = nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial",
+            "links": { "selection": "left" } }
+        ]
+      }
+    })json");
+    CPPUNIT_ASSERT_NO_THROW(m_Editor->ApplyLayout(doc));
+
+    // Pin the load itself, so a failure below points at the predicate rather
+    // than at the document not loading as intended.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The window rests on the document's sole group",
+                                 std::string("left"), m_Editor->GetCellSelectionGroup(QStringLiteral("mxn__w0")));
+    const auto infos = m_Editor->GetSyncGroupInfos();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The document registers exactly one group", std::size_t{1}, infos.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("That group is 'left', not 'main'", std::string("left"), infos.front().id);
+    CPPUNIT_ASSERT_EQUAL(std::string("left"), m_Editor->GetDefaultSyncGroupName());
+
+    CPPUNIT_ASSERT_MESSAGE("A single custom-named default group is trivial, like 'main' would be",
+                           !m_Widget->HasNonTrivialSyncConfig());
+  }
+
   // --- Multi-tile drag-and-drop -----------------------------------------------
 
   void MultiTileDrop_AssignsEverySelectedCell()
@@ -1107,6 +1143,76 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Deleting an empty '+ Group' group removes its registry entry",
                            !this->RegistryHasGroup(id));
+  }
+
+  void DeleteGroup_RecreatedGroupStartsClean()
+  {
+    // A group's engine index is recycled by the next CreateGroup() once freed;
+    // its cosmetics (display name, color) must not survive the recycling, or a
+    // brand-new group reappears already renamed and recolored by a stranger's
+    // edits.
+    auto groupIds = [this]()
+    {
+      std::vector<std::string> ids;
+      for (const auto& info : m_Editor->GetSyncGroupInfos())
+      {
+        ids.push_back(info.id);
+      }
+      return ids;
+    };
+    // The one id in 'after' that was not in 'before' - the group a single
+    // CreateGroup() call just added, read from the registry so the id checks
+    // below do not depend on CreateGroup()'s return value, which the final
+    // assertion checks separately.
+    auto newGroupId = [](const std::vector<std::string>& before, const std::vector<std::string>& after)
+    {
+      for (const auto& id : after)
+      {
+        if (std::find(before.begin(), before.end(), id) == before.end())
+        {
+          return id;
+        }
+      }
+      return std::string();
+    };
+
+    const auto beforeA = groupIds();
+    m_Widget->CreateGroup();
+    const auto idA = newGroupId(beforeA, groupIds());
+    CPPUNIT_ASSERT_MESSAGE("Group A registers under a fresh id", !idA.empty());
+
+    const auto beforeB = groupIds();
+    m_Widget->CreateGroup();
+    const auto idB = newGroupId(beforeB, groupIds());
+    CPPUNIT_ASSERT_MESSAGE("Group B registers under a fresh id", !idB.empty());
+
+    const auto colorB = m_Editor->GetSyncGroupColor(idB);
+
+    m_Editor->SetSyncGroupDisplayName(idA, "Tumor");
+    m_Editor->SetSyncGroupColor(idA, QColor(Qt::red));
+
+    m_Widget->DeleteGroup(idA);
+
+    const auto beforeA2 = groupIds();
+    const auto returnedA2 = m_Widget->CreateGroup();
+    const auto idA2 = newGroupId(beforeA2, groupIds());
+    CPPUNIT_ASSERT_MESSAGE("The recreated group registers under a fresh id", !idA2.empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The recreated group reuses A's reclaimed engine id", idA, idA2);
+
+    const auto infos = m_Editor->GetSyncGroupInfos();
+    const auto found = std::find_if(infos.begin(), infos.end(),
+                                    [&idA2](const auto& info) { return info.id == idA2; });
+    CPPUNIT_ASSERT_MESSAGE("The recreated group appears in the registry", infos.end() != found);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A recreated group must not inherit the deleted group's display name",
+                                 idA2, found->displayName);
+    CPPUNIT_ASSERT_MESSAGE("A recreated group must not inherit the deleted group's color",
+                           !found->hasExplicitColor);
+
+    CPPUNIT_ASSERT_MESSAGE("An unrelated group's color is unaffected by another group's delete/recreate",
+                           colorB == m_Editor->GetSyncGroupColor(idB));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("CreateGroup must return the new group's id, not its display name",
+                                 idA2, returnedA2);
   }
 
   void DeleteGroup_MainIsNoOp()

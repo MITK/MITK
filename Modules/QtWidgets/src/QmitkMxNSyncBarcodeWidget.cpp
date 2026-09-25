@@ -64,7 +64,7 @@ QmitkMxNSyncBarcodeWidget::QmitkMxNSyncBarcodeWidget(QWidget* parent)
   // Mouse tracking so hover (and the pointing cursor) can be gated to the glyph
   // area even without a button pressed.
   this->setMouseTracking(true);
-  this->setToolTip(tr("Open the layout editor"));
+  this->setToolTip(tr("Show or hide the layout editor"));
 }
 
 QmitkMxNSyncBarcodeWidget::~QmitkMxNSyncBarcodeWidget()

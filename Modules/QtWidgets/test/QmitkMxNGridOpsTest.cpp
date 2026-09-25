@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QSplitter>
 
+#include <set>
 #include <string>
 
 /**
@@ -48,6 +49,11 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(RemoveGridColumn_DropsRightmost_GuardsAtOneColumn);
   MITK_TEST(RemoveGridColumn_ReclaimsEmptiedSelectionGroup);
   MITK_TEST(SetLayoutShrink_ReclaimsEmptiedSelectionGroup);
+  MITK_TEST(AddGridColumn_AfterLayoutWithoutMain_LinksToDefaultGroup);
+  MITK_TEST(SetLayoutShrink_AfterGridOps_RemovesTrailingCell);
+  MITK_TEST(SetLayoutShrink_KeepsReadingOrderHead);
+  MITK_TEST(ApplyLayout_DocumentGroupSurvivesStaleLinkAllocation);
+  MITK_TEST(SetLayout_KeepsSurvivingCellLinks);
   MITK_TEST(RemoveGridColumn_KeepsActive_WhenNotRemoved);
   MITK_TEST(RemoveGridColumn_RepointsActive_WhenRemoved);
   MITK_TEST(AddGridRow_AppendsBottomRow);
@@ -546,6 +552,139 @@ public:
     CPPUNIT_ASSERT(nullptr == m_Editor->GetRenderWindowWidget(CellId(1)));
     CPPUNIT_ASSERT_MESSAGE("A shrink reclaims an emptied, method-allocated selection group",
                            !HasGroup("solo"));
+  }
+
+  void AddGridColumn_AfterLayoutWithoutMain_LinksToDefaultGroup()
+  {
+    // No 'main' group in this document: 'left' takes engine index 1 (the
+    // alphabetically-first fallback). A cell later placed into index 1 must
+    // be linked to whatever group actually lives there ('left'), not to the
+    // literal string 'main'.
+    const auto doc = nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "vertical",
+        "children": [
+          {
+            "type": "split", "orientation": "horizontal",
+            "children": [
+              { "type": "window", "id": "mxn__left", "view_direction": "axial", "links": { "selection": "left" } },
+              { "type": "window", "id": "mxn__right", "view_direction": "axial", "links": { "selection": "right" } }
+            ]
+          }
+        ]
+      }
+    })json");
+    m_Editor->ApplyLayout(doc);
+
+    std::set<std::string> before;
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      before.insert(descriptor.id.toStdString());
+    }
+
+    m_Editor->AddGridColumn();
+
+    bool foundNewCell = false;
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      if (before.find(descriptor.id.toStdString()) != before.end())
+      {
+        continue;  // pre-existing cell, not what this test is about
+      }
+      foundNewCell = true;
+
+      const auto selectionGroup = m_Editor->GetCellSelectionGroup(descriptor.id);
+
+      const auto windowingLink = m_Editor->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Windowing);
+      CPPUNIT_ASSERT(windowingLink.has_value());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A new cell's windowing link must follow its own selection group",
+                                   selectionGroup, windowingLink.value().group);
+
+      const auto lutLink = m_Editor->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
+      CPPUNIT_ASSERT(lutLink.has_value());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A new cell's LUT link must follow its own selection group",
+                                   selectionGroup, lutLink.value().group);
+    }
+    CPPUNIT_ASSERT_MESSAGE("AddGridColumn on a 1-row grid must add exactly one new cell", foundNewCell);
+
+    CPPUNIT_ASSERT_MESSAGE("No group named 'main' should be conjured up when the document has none",
+                           !HasGroup("main"));
+    const auto serialized = m_Editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("The serialized layout must not declare a phantom 'main' group",
+                           !serialized["groups"].contains("main"));
+  }
+
+  void SetLayoutShrink_AfterGridOps_RemovesTrailingCell()
+  {
+    m_Editor->SetLayout(2, 2);
+    m_Editor->AddGridColumn();  // 2x3: row0 [w0 w1 w4], row1 [w2 w3 w5]
+    m_Editor->RemoveGridRow();  // 1x3: row0 [w0 w1 w4]
+
+    m_Editor->SetLayout(1, 2);  // shrink by one cell
+
+    CPPUNIT_ASSERT_MESSAGE("An original surviving cell must not be dropped by an unrelated shrink",
+                           nullptr != m_Editor->GetRenderWindowWidget(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("The trailing cell added by AddGridColumn is the one a shrink should drop",
+                           nullptr == m_Editor->GetRenderWindowWidget(CellId(4)));
+  }
+
+  void SetLayoutShrink_KeepsReadingOrderHead()
+  {
+    m_Editor->SetLayout(1, 1);
+    m_Editor->AddGridRow();     // 2x1: row0 [w0], row1 [w1]
+    m_Editor->AddGridColumn();  // 2x2: row0 [w0 w2], row1 [w1 w3]
+
+    m_Editor->SetLayout(1, 2);  // shrink to the pre-order (reading-order) head
+
+    CPPUNIT_ASSERT_MESSAGE("The reading-order head must survive a shrink",
+                           nullptr != m_Editor->GetRenderWindowWidget(CellId(2)));
+    CPPUNIT_ASSERT_MESSAGE("The reading-order tail must be dropped by a shrink",
+                           nullptr == m_Editor->GetRenderWindowWidget(CellId(1)));
+  }
+
+  void ApplyLayout_DocumentGroupSurvivesStaleLinkAllocation()
+  {
+    m_Editor->SetLayout(1, 2);
+    m_Editor->SetCellSelectionGroup(CellId(1), "solo");  // fresh connector, sole member
+    CPPUNIT_ASSERT(HasGroup("solo"));
+
+    const auto doc = nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "left" } },
+          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "right" } }
+        ]
+      }
+    })json");
+    m_Editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT(HasGroup("left"));
+    CPPUNIT_ASSERT(!HasGroup("solo"));
+
+    // Empties 'left' (its sole member moves to 'main'), which reclaims the
+    // group only if it was ever method-allocated - 'left' is document-owned.
+    m_Editor->SetCellSelectionGroup(QStringLiteral("mxn__b"), "main");
+
+    CPPUNIT_ASSERT_MESSAGE("An emptied document group must persist after a layout reload",
+                           HasGroup("left"));
+  }
+
+  void SetLayout_KeepsSurvivingCellLinks()
+  {
+    // Pin: SetLayout's grow/shrink addresses cells by id, not by grid
+    // position, so a surviving cell keeps its own sync links.
+    m_Editor->SetLayout(1, 2);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "sg0");
+
+    m_Editor->SetLayout(2, 2);
+    m_Editor->SetLayout(1, 1);
+
+    const auto link = m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice);
+    CPPUNIT_ASSERT(link.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("sg0"), link.value().group);
   }
 
   void RemoveGridColumn_KeepsActive_WhenNotRemoved()

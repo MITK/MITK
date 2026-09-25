@@ -10,11 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkExtractSliceFilter.h>
 #include <mitkGeometry3D.h>
 #include <mitkIOUtil.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
+#include <mitkSliceNavigationController.h>
 #include <mitkSurface.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -25,6 +27,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 #include <array>
+#include <utility>
 
 class mitkTransferLabelTestSuite : public mitk::TestFixture
 {
@@ -44,6 +47,10 @@ class mitkTransferLabelTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransferSurface_IgnoreLocks);
   MITK_TEST(TestTransferSurface_LockedBackground);
   MITK_TEST(TestTransferSurface_AtTimeStep);
+  MITK_TEST(TestTransferSlice_ViewDirections);
+  MITK_TEST(TestTransferSlice_TiltedGeometry);
+  MITK_TEST(TestTransferSlice_Locks);
+  MITK_TEST(TestTransferSlice_Misaligned);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -240,11 +247,25 @@ public:
 
   using Index = std::array<std::size_t, 3>;
 
-  static mitk::MultiLabelSegmentation::Pointer CreateSurfaceTestSegmentation(unsigned int timeSteps)
+  static mitk::MultiLabelSegmentation::Pointer CreateSurfaceTestSegmentation(unsigned int timeSteps, bool tilted = false)
   {
     auto referenceImage = mitk::Image::New();
     unsigned int dimensions[4] = { 40, 40, 40, timeSteps };
     referenceImage->Initialize(mitk::MakeScalarPixelType<char>(), 1 < timeSteps ? 4 : 3, dimensions);
+
+    if (tilted)
+    {
+      // Slightly rotated, like scans that are not aligned with the world axes.
+      mitk::Vector3D axis;
+      axis[0] = 1.0;
+      axis[1] = 2.0;
+      axis[2] = 3.0;
+      axis.Normalize();
+
+      auto indexToWorld = mitk::AffineTransform3D::New();
+      indexToWorld->Rotate3D(axis, 0.1);
+      referenceImage->GetGeometry()->SetIndexToWorldTransform(indexToWorld);
+    }
 
     auto segmentation = mitk::MultiLabelSegmentation::New();
     segmentation->Initialize(referenceImage);
@@ -397,6 +418,148 @@ public:
       mitk::Label::PixelType(3), GetPixel(groupImage, 1, { 39, 39, 39 }));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel of another time step was assigned",
       mitk::Label::PixelType(0), GetPixel(groupImage, 0, { 30, 30, 30 }));
+  }
+
+  /** The slice through the voxel along the view direction, as the render windows extract it. */
+  static mitk::Image::Pointer ExtractSliceThrough(const mitk::Image* image, mitk::AnatomicalPlane viewDirection, const Index& index)
+  {
+    auto navigationController = mitk::SliceNavigationController::New();
+    navigationController->SetInputWorldTimeGeometry(image->GetTimeGeometry());
+    navigationController->Update(viewDirection);
+
+    mitk::Point3D indexPoint;
+    for (unsigned int i = 0; i < 3; ++i)
+      indexPoint[i] = static_cast<mitk::ScalarType>(index[i]);
+
+    mitk::Point3D worldPoint;
+    image->GetGeometry()->IndexToWorld(indexPoint, worldPoint);
+    navigationController->SelectSliceByPoint(worldPoint);
+
+    auto extractor = mitk::ExtractSliceFilter::New();
+    extractor->SetInput(image);
+    extractor->SetWorldGeometry(navigationController->GetCurrentPlaneGeometry());
+    extractor->SetResliceTransformByGeometry(image->GetGeometry());
+    extractor->SetVtkOutputRequest(false);
+    extractor->Update();
+
+    return extractor->GetOutput();
+  }
+
+  /** The index moved by i and j along the two axes within slices perpendicular to dim, and by k along dim. */
+  static Index Offset(const Index& index, unsigned int dim, int i, int j, int k)
+  {
+    auto result = index;
+
+    const auto move = [&result](unsigned int axis, int distance) {
+      result[axis] = static_cast<std::size_t>(static_cast<int>(result[axis]) + distance);
+    };
+
+    move((dim + 1) % 3, i);
+    move((dim + 2) % 3, j);
+    move(dim, k);
+    return result;
+  }
+
+  static void TransferSlice(mitk::MultiLabelSegmentation* segmentation, const mitk::Image* slice,
+    mitk::Label::PixelType sourceLabel, mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+  {
+    mitk::TransferSliceContentAtTimeStep(slice, segmentation->GetGroupImage(0),
+      segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(0)), 0, sourceLabel, 3,
+      mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, overwriteStyle);
+  }
+
+  /**
+   * Marks voxels of the unlocked label in the slice through the center and next to it, and transfers the slice
+   * extracted along each view direction. Only the marked voxels in the slice may change, so any flip or shift in
+   * mapping pixels to voxels makes the checks fail.
+   */
+  static void CheckTransferSliceAlongViewDirections(bool tilted)
+  {
+    const Index center = { 15, 15, 15 };
+    const std::array<std::pair<mitk::AnatomicalPlane, unsigned int>, 3> viewDirections = { {
+      { mitk::AnatomicalPlane::Axial, 2 }, { mitk::AnatomicalPlane::Coronal, 1 }, { mitk::AnatomicalPlane::Sagittal, 0 } } };
+
+    for (const auto& [viewDirection, dim] : viewDirections)
+    {
+      auto segmentation = CreateSurfaceTestSegmentation(1, tilted);
+      auto* groupImage = segmentation->GetGroupImage(0);
+
+      const auto first = Offset(center, dim, 3, -5, 0);
+      const auto second = Offset(center, dim, -7, 2, 0);
+      const auto nextSlice = Offset(center, dim, 3, -5, 1);
+
+      SetPixel(groupImage, 0, first, 2);
+      SetPixel(groupImage, 0, second, 2);
+      SetPixel(groupImage, 0, nextSlice, 2);
+
+      TransferSlice(segmentation, ExtractSliceThrough(groupImage, viewDirection, center), 2,
+        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("First marked voxel in the slice was not assigned",
+        mitk::Label::PixelType(3), GetPixel(groupImage, 0, first));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Second marked voxel in the slice was not assigned",
+        mitk::Label::PixelType(3), GetPixel(groupImage, 0, second));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Marked voxel in the next slice was assigned",
+        mitk::Label::PixelType(2), GetPixel(groupImage, 0, nextSlice));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel mirrored to the first marked one was assigned",
+        mitk::Label::PixelType(0), GetPixel(groupImage, 0, Offset(center, dim, -3, 5, 0)));
+    }
+  }
+
+  void TestTransferSlice_ViewDirections()
+  {
+    CheckTransferSliceAlongViewDirections(false);
+  }
+
+  void TestTransferSlice_TiltedGeometry()
+  {
+    CheckTransferSliceAlongViewDirections(true);
+  }
+
+  void TestTransferSlice_Locks()
+  {
+    const Index center = { 15, 15, 15 };
+    const Index locked = { 12, 15, 15 };
+    const Index unlocked = { 13, 15, 15 };
+
+    for (const auto overwriteStyle : { mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks,
+                                       mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks })
+    {
+      auto segmentation = CreateSurfaceTestSegmentation(1);
+      auto* groupImage = segmentation->GetGroupImage(0);
+
+      SetPixel(groupImage, 0, locked, 2);
+      SetPixel(groupImage, 0, unlocked, 2);
+      const auto slice = ExtractSliceThrough(groupImage, mitk::AnatomicalPlane::Axial, center);
+
+      // Locked only after extracting, so that the slice still marks the voxel.
+      SetPixel(groupImage, 0, locked, 1);
+
+      TransferSlice(segmentation, slice, 2, overwriteStyle);
+
+      const auto expectedLocked = mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks == overwriteStyle
+        ? mitk::Label::PixelType(1)
+        : mitk::Label::PixelType(3);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Locked label was not treated according to the overwrite style",
+        expectedLocked, GetPixel(groupImage, 0, locked));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Unlocked label was not overwritten",
+        mitk::Label::PixelType(3), GetPixel(groupImage, 0, unlocked));
+    }
+  }
+
+  void TestTransferSlice_Misaligned()
+  {
+    auto segmentation = CreateSurfaceTestSegmentation(1);
+    const auto slice = ExtractSliceThrough(segmentation->GetGroupImage(0), mitk::AnatomicalPlane::Axial, { 15, 15, 15 });
+
+    auto* sliceGeometry = slice->GetGeometry();
+    auto origin = sliceGeometry->GetOrigin();
+    origin[0] += 0.5 * sliceGeometry->GetSpacing()[0];
+    sliceGeometry->SetOrigin(origin);
+
+    CPPUNIT_ASSERT_THROW(TransferSlice(segmentation, slice, 2, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks),
+      mitk::Exception);
   }
 };
 

@@ -12,582 +12,503 @@ found in the LICENSE file.
 
 #include <mitkSegmentationInterpolationController.h>
 
-#include <mitkImageCast.h>
-#include <mitkImageReadAccessor.h>
-#include <mitkImageTimeSelector.h>
+#include <mitkExceptionMacro.h>
 #include <mitkExtractSliceFilter.h>
-#include <mitkImageAccessByItk.h>
-//#include <mitkPlaneGeometry.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImagePixelWriteAccessor.h>
+#include <mitkITKImageImport.h>
 
-#include <itkCommand.h>
 #include <itkImage.h>
-#include <itkImageSliceConstIteratorWithIndex.h>
+#include <itkMultiThreaderBase.h>
 
-#include <thread>
+#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <mutex>
 
 namespace
 {
-  // itk::Object provides a const version of AddObserver() (which uses const_cast internally)
-  // but not a const version of RemoveObserver().
-  void RemoveObserverFromConstObject(const itk::Object* constObject, unsigned long observerTag)
+  using LabelPixelType = mitk::Label::PixelType;
+  using SliceCounts = std::array<std::vector<std::size_t>, 3>;
+  using CropImageType = itk::Image<LabelPixelType, 2>;
+
+  // Outside both shapes, both signed distances are positive, so the interpolated shape lies within their common
+  // bounding box. Inside the box, the distances depend on no pixel farther away than the neighborhood the
+  // iso-contour filter reads next to a contour (radius 2), so cropping with this margin leaves the result unchanged.
+  constexpr std::size_t CROP_MARGIN = 3;
+
+  SliceCounts CountLabelVoxels(const mitk::Image* image, unsigned int timeStep, LabelPixelType labelValue)
   {
-    if (nullptr != constObject)
+    mitk::ImagePixelReadAccessor<LabelPixelType, 3> accessor(image, image->GetVolumeData(timeStep));
+    const auto* voxels = accessor.GetData();
+
+    std::array<std::size_t, 3> size;
+    itk::ImageRegion<3>::SizeType regionSize;
+    SliceCounts counts;
+
+    for (unsigned int i = 0; i < 3; ++i)
     {
-      auto* object = const_cast<itk::Object*>(constObject);
-      object->RemoveObserver(observerTag);
+      size[i] = image->GetDimension(i);
+      regionSize[i] = size[i];
+      counts[i].assign(size[i], 0);
+    }
+
+    std::mutex countsMutex;
+
+    itk::MultiThreaderBase::New()->ParallelizeImageRegion<3>(itk::ImageRegion<3>(regionSize), [&](const itk::ImageRegion<3>& chunk)
+      {
+        SliceCounts chunkCounts;
+
+        for (unsigned int i = 0; i < 3; ++i)
+          chunkCounts[i].assign(size[i], 0);
+
+        const auto xBegin = static_cast<std::size_t>(chunk.GetIndex(0));
+        const auto xEnd = xBegin + chunk.GetSize(0);
+        const auto yBegin = static_cast<std::size_t>(chunk.GetIndex(1));
+        const auto yEnd = yBegin + chunk.GetSize(1);
+        const auto zBegin = static_cast<std::size_t>(chunk.GetIndex(2));
+        const auto zEnd = zBegin + chunk.GetSize(2);
+
+        for (auto z = zBegin; z < zEnd; ++z)
+        {
+          for (auto y = yBegin; y < yEnd; ++y)
+          {
+            const auto* row = voxels + (z * size[1] + y) * size[0];
+
+            // Most rows do not contain the label, and std::count is vectorized.
+            const auto rowCount = static_cast<std::size_t>(std::count(row + xBegin, row + xEnd, labelValue));
+
+            if (0 == rowCount)
+              continue;
+
+            for (auto x = xBegin; x < xEnd; ++x)
+              chunkCounts[0][x] += row[x] == labelValue ? 1 : 0;
+
+            chunkCounts[1][y] += rowCount;
+            chunkCounts[2][z] += rowCount;
+          }
+        }
+
+        const std::lock_guard<std::mutex> lock(countsMutex);
+
+        for (unsigned int i = 0; i < 3; ++i)
+          std::transform(counts[i].begin(), counts[i].end(), chunkCounts[i].begin(), counts[i].begin(), std::plus<>());
+      }, nullptr);
+
+    return counts;
+  }
+
+  mitk::PlaneGeometry::Pointer MovePlaneToSlice(const mitk::PlaneGeometry* plane,
+                                                const mitk::BaseGeometry* imageGeometry,
+                                                unsigned int sliceDimension,
+                                                unsigned int sliceIndex)
+  {
+    auto origin = plane->GetOrigin();
+    imageGeometry->WorldToIndex(origin, origin);
+    origin[sliceDimension] = sliceIndex;
+    imageGeometry->IndexToWorld(origin, origin);
+
+    auto movedPlane = plane->Clone();
+    movedPlane->SetOrigin(origin);
+    return movedPlane;
+  }
+
+  mitk::ExtractSliceFilter::Pointer CreateSliceExtractor(const mitk::Image* image,
+                                                         const mitk::PlaneGeometry* plane,
+                                                         unsigned int timeStep)
+  {
+    auto extractor = mitk::ExtractSliceFilter::New();
+    extractor->SetInput(image);
+    extractor->SetTimeStep(timeStep);
+    extractor->SetResliceTransformByGeometry(image->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
+    extractor->SetVtkOutputRequest(false);
+    extractor->SetWorldGeometry(plane);
+    return extractor;
+  }
+
+  mitk::Image::Pointer ExtractSlice(const mitk::Image* image, const mitk::PlaneGeometry* plane, unsigned int timeStep)
+  {
+    auto extractor = CreateSliceExtractor(image, plane, timeStep);
+    extractor->Update();
+    return extractor->GetOutput();
+  }
+
+  /** The slice the extractor would produce, with all pixels 0 instead of resampled from the image. */
+  mitk::Image::Pointer CreateEmptySlice(const mitk::Image* image, const mitk::PlaneGeometry* plane, unsigned int timeStep)
+  {
+    auto extractor = CreateSliceExtractor(image, plane, timeStep);
+    extractor->UpdateOutputInformation();
+
+    // Not the output itself: accessing its data would make the extractor resample the image.
+    auto slice = mitk::Image::New();
+    slice->Initialize(extractor->GetOutput());
+
+    mitk::ImagePixelWriteAccessor<LabelPixelType, 2> accessor(slice);
+    std::fill_n(accessor.GetData(), std::size_t{slice->GetDimension(0)} * slice->GetDimension(1), LabelPixelType{0});
+    return slice;
+  }
+
+  struct LabelBounds
+  {
+    std::array<std::size_t, 2> Min = {std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max()};
+    std::array<std::size_t, 2> Max = {0, 0};
+
+    bool IsEmpty() const
+    {
+      return Min[0] > Max[0];
+    }
+  };
+
+  void ExtendByLabel(LabelBounds& bounds, const mitk::Image* slice, LabelPixelType labelValue)
+  {
+    mitk::ImagePixelReadAccessor<LabelPixelType, 2> accessor(slice);
+    const auto* pixels = accessor.GetData();
+
+    const std::size_t sizeX = slice->GetDimension(0);
+    const std::size_t sizeY = slice->GetDimension(1);
+
+    for (std::size_t y = 0; y < sizeY; ++y)
+    {
+      const auto* rowBegin = pixels + y * sizeX;
+      const auto* rowEnd = rowBegin + sizeX;
+      const auto* first = std::find(rowBegin, rowEnd, labelValue);
+
+      if (first == rowEnd)
+        continue;
+
+      const auto* last = rowEnd - 1;
+
+      while (*last != labelValue)
+        --last;
+
+      bounds.Min[0] = std::min(bounds.Min[0], static_cast<std::size_t>(first - rowBegin));
+      bounds.Max[0] = std::max(bounds.Max[0], static_cast<std::size_t>(last - rowBegin));
+      bounds.Min[1] = std::min(bounds.Min[1], y);
+      bounds.Max[1] = std::max(bounds.Max[1], y);
     }
   }
-}
 
-mitk::SegmentationInterpolationController::InterpolatorMapType
-  mitk::SegmentationInterpolationController::s_InterpolatorForImage; // static member initialization
-
-mitk::SegmentationInterpolationController *mitk::SegmentationInterpolationController::InterpolatorForImage(
-  const Image *image)
-{
-  auto iter = s_InterpolatorForImage.find(image);
-  if (iter != s_InterpolatorForImage.end())
+  CropImageType::Pointer CreateCropImage(const std::array<std::size_t, 2>& size, const mitk::Vector3D& spacing)
   {
-    return iter->second;
+    CropImageType::SizeType cropSize;
+    CropImageType::SpacingType cropSpacing;
+
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+      cropSize[i] = size[i];
+      cropSpacing[i] = spacing[i];
+    }
+
+    auto crop = CropImageType::New();
+    crop->SetRegions(cropSize);
+    crop->SetSpacing(cropSpacing);
+    crop->Allocate();
+    return crop;
   }
-  else
+
+  /** Copies a region of the slice into a new image, with 1 for the label and 0 for everything else. */
+  mitk::Image::Pointer CreateBinaryCrop(const mitk::Image* slice,
+                                        LabelPixelType labelValue,
+                                        const std::array<std::size_t, 2>& cropBegin,
+                                        const std::array<std::size_t, 2>& cropSize)
   {
-    return nullptr;
+    // The iso-contour filter scales distances by the spacing, so the crop keeps the one of the slice.
+    auto crop = CreateCropImage(cropSize, slice->GetGeometry()->GetSpacing());
+    auto* cropPixels = crop->GetBufferPointer();
+
+    mitk::ImagePixelReadAccessor<LabelPixelType, 2> accessor(slice);
+    const std::size_t sliceSizeX = slice->GetDimension(0);
+
+    for (std::size_t y = 0; y < cropSize[1]; ++y)
+    {
+      const auto* row = accessor.GetData() + (cropBegin[1] + y) * sliceSizeX + cropBegin[0];
+
+      std::transform(row, row + cropSize[0], cropPixels + y * cropSize[0], [labelValue](LabelPixelType value) {
+        return static_cast<LabelPixelType>(value == labelValue ? 1 : 0);
+      });
+    }
+
+    return mitk::GrabItkImageMemory(crop);
+  }
+
+  /** The geometry of a 2D image that covers a region of the slice, with its pixels where they lie in the slice. */
+  mitk::PlaneGeometry::Pointer CreateCropGeometry(const mitk::Image* slice,
+                                                  const std::array<std::size_t, 2>& cropBegin,
+                                                  const std::array<std::size_t, 2>& cropSize)
+  {
+    auto cropGeometry = slice->GetSlicedGeometry()->GetPlaneGeometry(0)->Clone();
+
+    mitk::Point3D cropBeginInSlice;
+    cropBeginInSlice[0] = static_cast<mitk::ScalarType>(cropBegin[0]);
+    cropBeginInSlice[1] = static_cast<mitk::ScalarType>(cropBegin[1]);
+    cropBeginInSlice[2] = 0.0;
+
+    mitk::Point3D origin;
+    slice->GetGeometry()->IndexToWorld(cropBeginInSlice, origin);
+    cropGeometry->SetOrigin(origin);
+
+    mitk::BoundingBox::BoundsArrayType bounds;
+    bounds[0] = bounds[2] = bounds[4] = 0.0;
+    bounds[1] = static_cast<mitk::ScalarType>(cropSize[0]);
+    bounds[3] = static_cast<mitk::ScalarType>(cropSize[1]);
+    bounds[5] = 1.0;
+    cropGeometry->SetBounds(bounds);
+
+    return cropGeometry;
+  }
+
+  void PasteCrop(const mitk::Image* crop, const std::array<std::size_t, 2>& cropBegin, mitk::Image* slice)
+  {
+    mitk::ImagePixelReadAccessor<LabelPixelType, 2> cropAccessor(crop);
+    mitk::ImagePixelWriteAccessor<LabelPixelType, 2> sliceAccessor(slice);
+
+    const std::size_t cropSizeX = crop->GetDimension(0);
+    const std::size_t cropSizeY = crop->GetDimension(1);
+    const std::size_t sliceSizeX = slice->GetDimension(0);
+
+    for (std::size_t y = 0; y < cropSizeY; ++y)
+    {
+      std::copy_n(cropAccessor.GetData() + y * cropSizeX,
+                  cropSizeX,
+                  sliceAccessor.GetData() + (cropBegin[1] + y) * sliceSizeX + cropBegin[0]);
+    }
   }
 }
 
 mitk::SegmentationInterpolationController::SegmentationInterpolationController()
-  : m_SegmentationModifiedObserverTag(std::make_pair(0UL, false)),
-    m_BlockModified(false),
-    m_2DInterpolationActivated(false),
-    m_EnableSliceImageCache(false)
+  : m_LabelValue(Label::UNLABELED_VALUE)
 {
 }
 
-void mitk::SegmentationInterpolationController::Activate2DInterpolation(bool status)
+mitk::SegmentationInterpolationController::~SegmentationInterpolationController() = default;
+
+void mitk::SegmentationInterpolationController::SetSegmentationVolume(const Image *segmentation, Label::PixelType labelValue)
 {
-  m_2DInterpolationActivated = status;
-}
-
-mitk::SegmentationInterpolationController *mitk::SegmentationInterpolationController::GetInstance()
-{
-  static mitk::SegmentationInterpolationController::Pointer m_Instance;
-
-  if (m_Instance.IsNull())
-  {
-    m_Instance = SegmentationInterpolationController::New();
-  }
-  return m_Instance;
-}
-
-mitk::SegmentationInterpolationController::~SegmentationInterpolationController()
-{
-  // remove this from the list of interpolators
-  for (auto iter = s_InterpolatorForImage.begin(); iter != s_InterpolatorForImage.end(); ++iter)
-  {
-    if (iter->second == this)
-    {
-      s_InterpolatorForImage.erase(iter);
-      break;
-    }
-  }
-}
-
-void mitk::SegmentationInterpolationController::OnImageModified(const itk::EventObject &)
-{
-  if (!m_BlockModified && m_Segmentation.IsNotNull() && m_2DInterpolationActivated)
-  {
-    SetSegmentationVolume(m_Segmentation);
-  }
-}
-
-void mitk::SegmentationInterpolationController::BlockModified(bool block)
-{
-  m_BlockModified = block;
-}
-
-void mitk::SegmentationInterpolationController::SetSegmentationVolume(const Image *segmentation)
-{
-  // clear old information (remove all time steps
-  m_SegmentationCountInSlice.clear();
-
-  // delete this from the list of interpolators
-  auto iter = s_InterpolatorForImage.find(segmentation);
-  if (iter != s_InterpolatorForImage.end())
-  {
-    s_InterpolatorForImage.erase(iter);
-  }
-
-  if (m_SegmentationModifiedObserverTag.second)
-  {
-    RemoveObserverFromConstObject(m_Segmentation, m_SegmentationModifiedObserverTag.first);
-    m_SegmentationModifiedObserverTag.second = false;
-  }
-
-  if (nullptr == segmentation || !segmentation->IsInitialized())
-  {
-    m_Segmentation = nullptr;
-    this->InvokeEvent(itk::AbortEvent());
+  if (m_Segmentation.GetPointer() == segmentation && m_LabelValue == labelValue)
     return;
-  }
 
-  if (segmentation->GetDimension() > 4 || segmentation->GetDimension() < 3)
+  if (nullptr != segmentation)
   {
-    itkExceptionMacro("SegmentationInterpolationController needs a 3D-segmentation or 3D+t.");
+    if (segmentation->GetDimension() < 3 || segmentation->GetDimension() > 4)
+      mitkThrow() << "2D interpolation needs a 3D or 3D+t segmentation.";
+
+    if (segmentation->GetPixelType() != MakeScalarPixelType<Label::PixelType>())
+      mitkThrow() << "2D interpolation needs a segmentation with label values as pixels.";
   }
 
   m_Segmentation = segmentation;
+  m_LabelValue = labelValue;
+  m_SliceCounts.assign(nullptr != segmentation ? segmentation->GetTimeSteps() : 0, {});
+  m_EnclosingSlices.reset();
 
-  auto command = itk::ReceptorMemberCommand<SegmentationInterpolationController>::New();
-  command->SetCallbackFunction(this, &SegmentationInterpolationController::OnImageModified);
-  m_SegmentationModifiedObserverTag.first = segmentation->AddObserver(itk::ModifiedEvent(), command);
-  m_SegmentationModifiedObserverTag.second = true;
+  this->Modified();
+}
 
-  m_SegmentationCountInSlice.resize(m_Segmentation->GetTimeSteps());
-  for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
+const mitk::SegmentationInterpolationController::SliceCountsType &mitk::SegmentationInterpolationController::GetSliceCounts(
+  unsigned int timeStep)
+{
+  auto &sliceCounts = m_SliceCounts[timeStep];
+  const auto segmentationMTime = m_Segmentation->GetMTime();
+
+  if (sliceCounts.SegmentationMTime != segmentationMTime)
   {
-    m_SegmentationCountInSlice[timeStep].resize(3);
-    for (unsigned int dim = 0; dim < 3; ++dim)
+    sliceCounts.Counts = CountLabelVoxels(m_Segmentation, timeStep, m_LabelValue);
+    sliceCounts.SegmentationMTime = segmentationMTime;
+  }
+
+  return sliceCounts.Counts;
+}
+
+mitk::SegmentationInterpolationController::EnclosingSlices mitk::SegmentationInterpolationController::CreateEnclosingSlices(
+  unsigned int sliceDimension,
+  unsigned int lowerIndex,
+  unsigned int upperIndex,
+  const PlaneGeometry *plane,
+  unsigned int timeStep) const
+{
+  const auto *imageGeometry = m_Segmentation->GetGeometry(timeStep);
+  const auto lowerPlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, lowerIndex);
+  const auto upperPlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, upperIndex);
+  const auto lowerSlice = ExtractSlice(m_Segmentation, lowerPlane, timeStep);
+  const auto upperSlice = ExtractSlice(m_Segmentation, upperPlane, timeStep);
+
+  const std::array<std::size_t, 2> sliceSize = {lowerSlice->GetDimension(0), lowerSlice->GetDimension(1)};
+
+  if (upperSlice->GetDimension(0) != sliceSize[0] || upperSlice->GetDimension(1) != sliceSize[1])
+  {
+    mitkThrowException(SegmentationInterpolationException)
+      << "The regions of the slices for the 2D interpolation are not equally sized.";
+  }
+
+  EnclosingSlices enclosingSlices;
+  enclosingSlices.TimeStep = timeStep;
+  enclosingSlices.SliceDimension = sliceDimension;
+  enclosingSlices.LowerIndex = lowerIndex;
+  enclosingSlices.UpperIndex = upperIndex;
+  enclosingSlices.SegmentationMTime = m_Segmentation->GetMTime();
+  enclosingSlices.LowerPlane = lowerPlane;
+  enclosingSlices.SliceSize = sliceSize;
+  enclosingSlices.Algorithm = ShapeBasedInterpolationAlgorithm::New();
+
+  LabelBounds bounds;
+  ExtendByLabel(bounds, lowerSlice, m_LabelValue);
+  ExtendByLabel(bounds, upperSlice, m_LabelValue);
+
+  if (!bounds.IsEmpty())
+  {
+    for (unsigned int i = 0; i < 2; ++i)
     {
-      m_SegmentationCountInSlice[timeStep][dim].clear();
-      m_SegmentationCountInSlice[timeStep][dim].resize(m_Segmentation->GetDimension(dim));
-      m_SegmentationCountInSlice[timeStep][dim].assign(m_Segmentation->GetDimension(dim), 0);
-    }
-  }
-
-  s_InterpolatorForImage.insert(std::make_pair(m_Segmentation, this));
-
-  // for all timesteps
-  // scan whole image
-  for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
-  {
-    ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-    timeSelector->SetInput(m_Segmentation);
-    timeSelector->SetTimeNr(timeStep);
-    timeSelector->UpdateLargestPossibleRegion();
-    Image::Pointer segmentation3D = timeSelector->GetOutput();
-    AccessFixedDimensionByItk_2(segmentation3D, ScanWholeVolume, 3, m_Segmentation, timeStep);
-  }
-
-  Modified();
-}
-
-void mitk::SegmentationInterpolationController::SetChangedVolume(const Image *sliceDiff, unsigned int timeStep)
-{
-  if (!sliceDiff)
-    return;
-  if (sliceDiff->GetDimension() != 3)
-    return;
-
-  AccessFixedDimensionByItk_1(sliceDiff, ScanChangedVolume, 3, timeStep);
-
-  // PrintStatus();
-  Modified();
-}
-
-void mitk::SegmentationInterpolationController::SetChangedSlice(const Image *sliceDiff,
-                                                                unsigned int sliceDimension,
-                                                                unsigned int sliceIndex,
-                                                                unsigned int timeStep)
-{
-  if (!sliceDiff)
-    return;
-  if (sliceDimension > 2)
-    return;
-  if (timeStep >= m_SegmentationCountInSlice.size())
-    return;
-  if (sliceIndex >= m_SegmentationCountInSlice[timeStep][sliceDimension].size())
-    return;
-
-  unsigned int dim0(0);
-  unsigned int dim1(1);
-
-  // determine the other two dimensions
-  switch (sliceDimension)
-  {
-    default:
-    case 2:
-      dim0 = 0;
-      dim1 = 1;
-      break;
-    case 1:
-      dim0 = 0;
-      dim1 = 2;
-      break;
-    case 0:
-      dim0 = 1;
-      dim1 = 2;
-      break;
-  }
-
-  mitk::ImageReadAccessor readAccess(sliceDiff);
-  auto *rawSlice = (unsigned char *)readAccess.GetData();
-  if (!rawSlice)
-    return;
-
-  AccessFixedDimensionByItk_1(
-    sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice));
-
-  Modified();
-}
-
-template <typename DATATYPE>
-void mitk::SegmentationInterpolationController::ScanChangedSlice(const itk::Image<DATATYPE, 2> *,
-                                                                 const SetChangedSliceOptions &options)
-{
-  auto *pixelData((DATATYPE *)options.pixelData);
-
-  unsigned int timeStep(options.timeStep);
-
-  unsigned int sliceDimension(options.sliceDimension);
-  unsigned int sliceIndex(options.sliceIndex);
-
-  if (sliceDimension > 2)
-    return;
-  if (sliceIndex >= m_SegmentationCountInSlice[timeStep][sliceDimension].size())
-    return;
-
-  unsigned int dim0(options.dim0);
-  unsigned int dim1(options.dim1);
-
-  int numberOfPixels(0); // number of pixels in this slice that are not 0
-
-  unsigned int dim0max = m_SegmentationCountInSlice[timeStep][dim0].size();
-  unsigned int dim1max = m_SegmentationCountInSlice[timeStep][dim1].size();
-
-  // scan the slice from two directions
-  // and set the flags for the two dimensions of the slice
-  for (unsigned int v = 0; v < dim1max; ++v)
-  {
-    for (unsigned int u = 0; u < dim0max; ++u)
-    {
-      DATATYPE value = *(pixelData + u + v * dim0max);
-
-      assert((signed)m_SegmentationCountInSlice[timeStep][dim0][u] + (signed)value >=
-             0); // just for debugging. This must always be true, otherwise some counting is going wrong
-      assert((signed)m_SegmentationCountInSlice[timeStep][dim1][v] + (signed)value >= 0);
-
-      m_SegmentationCountInSlice[timeStep][dim0][u] =
-        static_cast<unsigned int>(m_SegmentationCountInSlice[timeStep][dim0][u] + value);
-      m_SegmentationCountInSlice[timeStep][dim1][v] =
-        static_cast<unsigned int>(m_SegmentationCountInSlice[timeStep][dim1][v] + value);
-      numberOfPixels += static_cast<int>(value);
-    }
-  }
-
-  // flag for the dimension of the slice itself
-  assert((signed)m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] + numberOfPixels >= 0);
-  m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] += numberOfPixels;
-
-  // MITK_INFO << "scan t=" << timeStep << " from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-"
-  // << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" <<
-  // std::endl;
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-void mitk::SegmentationInterpolationController::ScanChangedVolume(const itk::Image<TPixel, VImageDimension> *diffImage,
-                                                                  unsigned int timeStep)
-{
-  typedef itk::ImageSliceConstIteratorWithIndex<itk::Image<TPixel, VImageDimension>> IteratorType;
-
-  IteratorType iter(diffImage, diffImage->GetLargestPossibleRegion());
-  iter.SetFirstDirection(0);
-  iter.SetSecondDirection(1);
-
-  int numberOfPixels(0); // number of pixels in this slice that are not 0
-
-  typename IteratorType::IndexType index;
-  unsigned int x = 0;
-  unsigned int y = 0;
-  unsigned int z = 0;
-
-  iter.GoToBegin();
-  while (!iter.IsAtEnd())
-  {
-    while (!iter.IsAtEndOfSlice())
-    {
-      while (!iter.IsAtEndOfLine())
-      {
-        index = iter.GetIndex();
-
-        x = index[0];
-        y = index[1];
-        z = index[2];
-
-        TPixel value = iter.Get();
-
-        assert((signed)m_SegmentationCountInSlice[timeStep][0][x] + (signed)value >=
-               0); // just for debugging. This must always be true, otherwise some counting is going wrong
-        assert((signed)m_SegmentationCountInSlice[timeStep][1][y] + (signed)value >= 0);
-
-        m_SegmentationCountInSlice[timeStep][0][x] =
-          static_cast<unsigned int>(m_SegmentationCountInSlice[timeStep][0][x] + value);
-        m_SegmentationCountInSlice[timeStep][1][y] =
-          static_cast<unsigned int>(m_SegmentationCountInSlice[timeStep][1][y] + value);
-
-        numberOfPixels += static_cast<int>(value);
-
-        ++iter;
-      }
-      iter.NextLine();
-    }
-    assert((signed)m_SegmentationCountInSlice[timeStep][2][z] + numberOfPixels >= 0);
-    m_SegmentationCountInSlice[timeStep][2][z] += numberOfPixels;
-    numberOfPixels = 0;
-
-    iter.NextSlice();
-  }
-}
-
-template <typename DATATYPE>
-void mitk::SegmentationInterpolationController::ScanWholeVolume(const itk::Image<DATATYPE, 3> *,
-                                                                const Image *volume,
-                                                                unsigned int timeStep)
-{
-  if (!volume)
-    return;
-  if (timeStep >= m_SegmentationCountInSlice.size())
-    return;
-
-  ImageReadAccessor readAccess(volume, volume->GetVolumeData(timeStep));
-
-  for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
-  {
-    const auto *rawVolume =
-      static_cast<const DATATYPE *>(readAccess.GetData()); // we again promise not to change anything, we'll just count
-    const DATATYPE *rawSlice = rawVolume + (volume->GetDimension(0) * volume->GetDimension(1) * slice);
-
-    ScanChangedSlice<DATATYPE>(nullptr, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice));
-  }
-}
-
-void mitk::SegmentationInterpolationController::PrintStatus()
-{
-  unsigned int timeStep(0); // if needed, put a loop over time steps around everything, but beware, output will be long
-
-  MITK_INFO << "Interpolator status (timestep 0): dimensions " << m_SegmentationCountInSlice[timeStep][0].size() << " "
-            << m_SegmentationCountInSlice[timeStep][1].size() << " " << m_SegmentationCountInSlice[timeStep][2].size()
-            << std::endl;
-
-  MITK_INFO << "Slice 0: " << m_SegmentationCountInSlice[timeStep][2][0] << std::endl;
-
-  // row "x"
-  for (unsigned int index = 0; index < m_SegmentationCountInSlice[timeStep][0].size(); ++index)
-  {
-    if (m_SegmentationCountInSlice[timeStep][0][index] > 0)
-      MITK_INFO << "O";
-    else
-      MITK_INFO << ".";
-  }
-  MITK_INFO << std::endl;
-
-  // rows "y" and "z" (diagonal)
-  for (unsigned int index = 1; index < m_SegmentationCountInSlice[timeStep][1].size(); ++index)
-  {
-    if (m_SegmentationCountInSlice[timeStep][1][index] > 0)
-      MITK_INFO << "O";
-    else
-      MITK_INFO << ".";
-
-    if (m_SegmentationCountInSlice[timeStep][2].size() > index) // if we also have a z value here, then print it, too
-    {
-      for (unsigned int indent = 1; indent < index; ++indent)
-        MITK_INFO << " ";
-
-      if (m_SegmentationCountInSlice[timeStep][2][index] > 0)
-        MITK_INFO << m_SegmentationCountInSlice[timeStep][2][index]; //"O";
-      else
-        MITK_INFO << ".";
+      const auto cropEnd = std::min(bounds.Max[i] + CROP_MARGIN + 1, sliceSize[i]);
+      enclosingSlices.CropBegin[i] = bounds.Min[i] - std::min(bounds.Min[i], CROP_MARGIN);
+      enclosingSlices.CropSize[i] = cropEnd - enclosingSlices.CropBegin[i];
     }
 
-    MITK_INFO << std::endl;
+    enclosingSlices.LowerCrop =
+      CreateBinaryCrop(lowerSlice, m_LabelValue, enclosingSlices.CropBegin, enclosingSlices.CropSize);
+    enclosingSlices.UpperCrop =
+      CreateBinaryCrop(upperSlice, m_LabelValue, enclosingSlices.CropBegin, enclosingSlices.CropSize);
+    enclosingSlices.LowerCropGeometry =
+      CreateCropGeometry(lowerSlice, enclosingSlices.CropBegin, enclosingSlices.CropSize);
   }
 
-  // z indices that are larger than the biggest y index
-  for (unsigned int index = m_SegmentationCountInSlice[timeStep][1].size();
-       index < m_SegmentationCountInSlice[timeStep][2].size();
-       ++index)
+  return enclosingSlices;
+}
+
+const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::SegmentationInterpolationController::GetEnclosingSlices(
+  unsigned int sliceDimension,
+  unsigned int lowerIndex,
+  unsigned int upperIndex,
+  const PlaneGeometry *currentPlane,
+  unsigned int timeStep)
+{
+  const auto lowerPlane = MovePlaneToSlice(currentPlane, m_Segmentation->GetGeometry(timeStep), sliceDimension, lowerIndex);
+
+  if (m_EnclosingSlices.has_value() &&
+      m_EnclosingSlices->TimeStep == timeStep &&
+      m_EnclosingSlices->SliceDimension == sliceDimension &&
+      m_EnclosingSlices->LowerIndex == lowerIndex &&
+      m_EnclosingSlices->UpperIndex == upperIndex &&
+      m_EnclosingSlices->SegmentationMTime == m_Segmentation->GetMTime() &&
+      mitk::Equal(*m_EnclosingSlices->LowerPlane, *lowerPlane, mitk::eps))
   {
-    for (unsigned int indent = 0; indent < index; ++indent)
-      MITK_INFO << " ";
-
-    if (m_SegmentationCountInSlice[timeStep][2][index] > 0)
-      MITK_INFO << m_SegmentationCountInSlice[timeStep][2][index]; //"O";
-    else
-      MITK_INFO << ".";
-
-    MITK_INFO << std::endl;
+    return *m_EnclosingSlices;
   }
+
+  m_EnclosingSlices.reset();
+  m_EnclosingSlices = this->CreateEnclosingSlices(sliceDimension, lowerIndex, upperIndex, currentPlane, timeStep);
+  return *m_EnclosingSlices;
+}
+
+mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateCrop(const EnclosingSlices &enclosingSlices,
+                                                                                unsigned int sliceIndex,
+                                                                                unsigned int timeStep) const
+{
+  if (enclosingSlices.LowerCrop.IsNull())
+    return nullptr;
+
+  const auto cropGeometry = MovePlaneToSlice(enclosingSlices.LowerCropGeometry,
+                                             m_Segmentation->GetGeometry(timeStep),
+                                             enclosingSlices.SliceDimension,
+                                             sliceIndex);
+
+  // The algorithm writes every pixel, and only the size of the crop matters to it, not its geometry.
+  auto crop = Image::New();
+  crop->Initialize(MakeScalarPixelType<LabelPixelType>(), 1, *cropGeometry);
+
+  enclosingSlices.Algorithm->Interpolate(enclosingSlices.LowerCrop,
+                                         enclosingSlices.LowerIndex,
+                                         enclosingSlices.UpperCrop,
+                                         enclosingSlices.UpperIndex,
+                                         sliceIndex,
+                                         enclosingSlices.SliceDimension,
+                                         crop,
+                                         timeStep,
+                                         nullptr);
+
+  return crop;
 }
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
                                                                             unsigned int sliceIndex,
-                                                                            const mitk::PlaneGeometry *currentPlane,
-                                                                            unsigned int timeStep,
-                                                                            ShapeBasedInterpolationAlgorithm::Pointer algorithm)
+                                                                            const PlaneGeometry *currentPlane,
+                                                                            unsigned int timeStep)
 {
   if (m_Segmentation.IsNull() || nullptr == currentPlane)
     return nullptr;
 
-  if (timeStep >= m_SegmentationCountInSlice.size())
+  if (timeStep >= m_SliceCounts.size() || sliceDimension > 2)
     return nullptr;
 
-  if (sliceDimension > 2)
+  const auto &counts = this->GetSliceCounts(timeStep)[sliceDimension];
+
+  if (sliceIndex >= counts.size() || counts[sliceIndex] > 0)
     return nullptr;
 
-  if (0 == sliceIndex)
-    return nullptr; // First slice, nothing to interpolate
+  const auto isSegmented = [](std::size_t count) { return count > 0; };
+  const auto slice = counts.begin() + sliceIndex;
+  const auto lower = std::find_if(std::make_reverse_iterator(slice), counts.rend(), isSegmented);
+  const auto upper = std::find_if(slice + 1, counts.end(), isSegmented);
 
-  const unsigned int lastSliceIndex = m_SegmentationCountInSlice[timeStep][sliceDimension].size() - 1;
+  if (lower == counts.rend() || upper == counts.end())
+    return nullptr;
 
-  if (lastSliceIndex <= sliceIndex)
-    return nullptr; // Last slice, nothing to interpolate
+  const auto lowerIndex = static_cast<unsigned int>(lower.base() - counts.begin() - 1);
+  const auto upperIndex = static_cast<unsigned int>(upper - counts.begin());
 
-  if (m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] > 0)
-    return nullptr; // Slice contains segmentation, nothing to interopolate
+  const auto &enclosingSlices = this->GetEnclosingSlices(sliceDimension, lowerIndex, upperIndex, currentPlane, timeStep);
+  const auto crop = this->InterpolateCrop(enclosingSlices, sliceIndex, timeStep);
 
-  unsigned int lowerBound = 0;
-  unsigned int upperBound = 0;
-  bool bounds = false;
+  if (crop.IsNull())
+    return nullptr;
 
-  for (lowerBound = sliceIndex - 1; ; --lowerBound)
+  auto result = CreateEmptySlice(m_Segmentation, currentPlane, timeStep);
+
+  if (result->GetDimension(0) != enclosingSlices.SliceSize[0] || result->GetDimension(1) != enclosingSlices.SliceSize[1])
   {
-    if (m_SegmentationCountInSlice[timeStep][sliceDimension][lowerBound] > 0)
+    mitkThrowException(SegmentationInterpolationException)
+      << "The regions of the slices for the 2D interpolation are not equally sized.";
+  }
+
+  PasteCrop(crop, enclosingSlices.CropBegin, result);
+  return result;
+}
+
+void mitk::SegmentationInterpolationController::InterpolateAll(
+  unsigned int sliceDimension,
+  const PlaneGeometry *plane,
+  unsigned int timeStep,
+  const std::function<void(unsigned int sliceIndex, const Image *interpolation)> &consumer)
+{
+  if (m_Segmentation.IsNull() || nullptr == plane)
+    return;
+
+  if (timeStep >= m_SliceCounts.size() || sliceDimension > 2)
+    return;
+
+  // Copied, so that the gaps stay those of the segmentation as it was when the call started.
+  const auto counts = this->GetSliceCounts(timeStep)[sliceDimension];
+
+  std::optional<unsigned int> lowerIndex;
+
+  for (unsigned int upperIndex = 0; upperIndex < counts.size(); ++upperIndex)
+  {
+    if (0 == counts[upperIndex])
+      continue;
+
+    if (lowerIndex.has_value() && upperIndex - *lowerIndex > 1)
     {
-      bounds = true;
-      break;
+      const auto enclosingSlices = this->CreateEnclosingSlices(sliceDimension, *lowerIndex, upperIndex, plane, timeStep);
+
+      for (auto sliceIndex = *lowerIndex + 1; sliceIndex < upperIndex; ++sliceIndex)
+      {
+        const auto interpolation = this->InterpolateCrop(enclosingSlices, sliceIndex, timeStep);
+
+        if (interpolation.IsNotNull())
+          consumer(sliceIndex, interpolation);
+      }
     }
 
-    if (0 == lowerBound)
-      break;
+    lowerIndex = upperIndex;
   }
-
-  if (!bounds)
-    return nullptr;
-
-  bounds = false;
-
-  for (upperBound = sliceIndex + 1; upperBound <= lastSliceIndex; ++upperBound)
-  {
-    if (m_SegmentationCountInSlice[timeStep][sliceDimension][upperBound] > 0)
-    {
-      bounds = true;
-      break;
-    }
-  }
-
-  if (!bounds)
-    return nullptr;
-
-  // We have found two neighboring slices with segmentations and made sure that the current slice does not contain anything
-
-  mitk::Image::Pointer lowerSlice;
-  mitk::Image::Pointer upperSlice;
-  mitk::Image::Pointer resultImage;
-
-  try
-  {
-    // Extract current slice
-    resultImage = this->ExtractSlice(currentPlane, sliceIndex, timeStep);
-
-    // Creating PlaneGeometry for lower slice
-    auto reslicePlane = currentPlane->Clone();
-
-    // Transforming the current origin so that it matches the lower slice
-    auto origin = currentPlane->GetOrigin();
-    m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
-    origin[sliceDimension] = lowerBound;
-    m_Segmentation->GetSlicedGeometry(timeStep)->IndexToWorld(origin, origin);
-    reslicePlane->SetOrigin(origin);
-
-    // Extract lower slice
-    lowerSlice = this->ExtractSlice(reslicePlane, lowerBound, timeStep, true);
-
-    if (lowerSlice.IsNull())
-      return nullptr;
-
-    // Transforming the current origin so that it matches the upper slice
-    m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
-    origin[sliceDimension] = upperBound;
-    m_Segmentation->GetSlicedGeometry(timeStep)->IndexToWorld(origin, origin);
-    reslicePlane->SetOrigin(origin);
-
-    // Extract the upper slice
-    upperSlice = this->ExtractSlice(reslicePlane, upperBound, timeStep, true);
-
-    if (upperSlice.IsNull())
-      return nullptr;
-  }
-  catch (const std::exception &e)
-  {
-    MITK_ERROR << "Error in 2D interpolation: " << e.what();
-    return nullptr;
-  }
-
-  // Interpolation algorithm inputs:
-  //   - Two segmentations (guaranteed to be of the same data type)
-  //   - Orientation of the segmentations (sliceDimension)
-  //   - Position of the two slices (sliceIndices)
-  //   - Reference image
-  //
-  // The interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
-  // inspect the reference image at appropriate positions.
-
-  if (algorithm.IsNull())
-    algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
-
-  return algorithm->Interpolate(
-    lowerSlice.GetPointer(),
-    lowerBound,
-    upperSlice.GetPointer(),
-    upperBound,
-    sliceIndex,
-    sliceDimension,
-    resultImage,
-    timeStep,
-    nullptr);
-}
-
-mitk::Image::Pointer mitk::SegmentationInterpolationController::ExtractSlice(const PlaneGeometry* planeGeometry, unsigned int sliceIndex, unsigned int timeStep, bool cache)
-{
-  static const auto MAX_CACHE_SIZE = 2 * std::thread::hardware_concurrency();
-  const auto key = std::make_pair(sliceIndex, timeStep);
-
-  if (cache && m_EnableSliceImageCache)
-  {
-    std::lock_guard<std::mutex> lock(m_SliceImageCacheMutex);
-
-    if (0 != m_SliceImageCache.count(key))
-      return m_SliceImageCache[key];
-
-    if (MAX_CACHE_SIZE < m_SliceImageCache.size())
-      m_SliceImageCache.clear();
-  }
-
-  auto extractor = ExtractSliceFilter::New();
-  extractor->SetInput(m_Segmentation);
-  extractor->SetTimeStep(timeStep);
-  extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
-  extractor->SetVtkOutputRequest(false);
-  extractor->SetWorldGeometry(planeGeometry);
-  extractor->Update();
-
-  if (cache && m_EnableSliceImageCache)
-  {
-    std::lock_guard<std::mutex> lock(m_SliceImageCacheMutex);
-    m_SliceImageCache[key] = extractor->GetOutput();
-  }
-
-  return extractor->GetOutput();
-}
-
-void mitk::SegmentationInterpolationController::EnableSliceImageCache()
-{
-  m_EnableSliceImageCache = true;
-}
-
-void mitk::SegmentationInterpolationController::DisableSliceImageCache()
-{
-  m_EnableSliceImageCache = false;
-  m_SliceImageCache.clear();
 }

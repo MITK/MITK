@@ -147,7 +147,7 @@ There is no `error` severity. Nothing the multi-frame analysis detects stops a v
 
 ### Exit code
 
-The app exits with 0 after printing the report, including when the report contains a missing-slice warning or findings of any severity. The app reports; it does not adjudicate. It exits with 1 if no arguments are given (the help text is printed instead), if no DICOM files are found, or if no reader configuration can handle the files.
+The app exits with 0 after printing the report, including when the report contains a missing-slice warning or findings of any severity. The app reports; it does not adjudicate. It exits with 1 if no arguments are given (the help text is printed instead), if no DICOM files are found, if a file input cannot be matched to a file in that directory listing, or if no reader configuration can handle the files.
 
 ## Examples
 

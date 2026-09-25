@@ -12,6 +12,9 @@ found in the LICENSE file.
 
 #include <mitkDICOMFilesHelper.h>
 
+#include <mitkFileSystem.h>
+#include <mitkStringUtil.h>
+
 #include <itkGDCMImageIO.h>
 #include <itksys/SystemTools.hxx>
 #include <gdcmDirectory.h>
@@ -77,4 +80,31 @@ mitk::DICOMFilePathList mitk::FilterDICOMFilesForSameSeries(const std::string& r
   }
 
   return mitk::DICOMFilePathList();
+}
+
+std::optional<std::string> mitk::FindListedFile(const std::string& file, const DICOMFilePathList& listedFiles)
+{
+  const fs::path filePath(file);
+
+  for (const auto& listed : listedFiles)
+  {
+    if (fs::path(listed) == filePath)
+    {
+      return listed;
+    }
+  }
+
+  const auto fileName = filePath.filename().string();
+
+  for (const auto& listed : listedFiles)
+  {
+    std::error_code errorCode;
+    if (EqualsCaseInsensitive(fs::path(listed).filename().string(), fileName)
+        && fs::equivalent(listed, filePath, errorCode))
+    {
+      return listed;
+    }
+  }
+
+  return std::nullopt;
 }

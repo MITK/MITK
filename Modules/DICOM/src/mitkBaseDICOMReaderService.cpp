@@ -342,10 +342,24 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
   else
   {
     bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(fileName);
+    std::string openedFile = fileName;
+
+    if (!pathIsDirectory)
+    {
+      const auto listedFile = mitk::FindListedFile(fileName, relevantFiles);
+
+      if (!listedFile.has_value())
+      {
+        MITK_WARN << "DICOMReader service did not find the opened file among the DICOM files of its directory. No data is loaded. File: " << fileName;
+        return result;
+      }
+
+      openedFile = listedFile.value();
+    }
 
     if (!pathIsDirectory && m_OnlyRegardOwnSeries)
     {
-      relevantFiles = mitk::FilterDICOMFilesForSameSeries(fileName, relevantFiles);
+      relevantFiles = mitk::FilterDICOMFilesForSameSeries(openedFile, relevantFiles);
     }
 
     mitk::DICOMFileReader::Pointer reader = this->GetReader(relevantFiles);
@@ -363,7 +377,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
           {
             const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
 
-            if (mitk::ContainsFile(frameList, fileName))
+            if (mitk::ContainsFile(frameList, openedFile))
             {
               relevantFiles = mitk::DistinctFilesInOrder(frameList);
               break;
@@ -382,7 +396,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
           else
           { //a reader handed out unanalyzed was not narrowed above, and the frame model can split
             //a block further, e.g. into one volume per multi-frame file
-            reader->KeepOnlyOutputsContaining(fileName);
+            reader->KeepOnlyOutputsContaining(openedFile);
 
             if (0 == reader->GetNumberOfOutputs())
             {

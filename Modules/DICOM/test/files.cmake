@@ -1,6 +1,7 @@
 set(MODULE_TESTS
   mitkDICOMReaderConfiguratorTest.cpp
   mitkDICOMDCMTKTagScannerTest.cpp
+  mitkDICOMFilesHelperTest.cpp
   mitkDICOMFrameLayoutTest.cpp
   mitkDICOMMultiFrameReadTest.cpp
   mitkDICOMSimpleVolumeImportTest.cpp

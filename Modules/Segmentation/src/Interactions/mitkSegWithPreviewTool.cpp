@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkSegTool2D.h>
 
+#include <mitkProgressTask.h>
+#include <mitkScopedProgressTask.h>
 #include <mitkSegChangeOperationApplier.h>
 
 #include <algorithm>
@@ -651,8 +653,10 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 {
   const auto inputImage = this->GetSegmentationInput();
   auto previewImage = this->GetPreviewSegmentation();
-  int progress_steps = 200;
   this->EnsureUpToDateUserDefinedActiveLabel();
+
+  mitk::ProgressTask task(this->GetName(), 100, this->IsCancelable());
+  ScopedProgressTask<ToolCommand> scopedTask(m_ProgressCommand, &task);
 
   const auto workingSegmentation = this->GetTargetSegmentation();
   const auto workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
@@ -664,16 +668,22 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
+  bool cancelled = false;
+
   try
   {
     if (nullptr != inputImage && nullptr != previewImage)
     {
-      m_ProgressCommand->AddStepsToDo(progress_steps);
-
       if (previewImage->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
       {
-        for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
+        const auto timeSteps = previewImage->GetTimeSteps();
+
+        for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
         {
+          // One run of the filter per time step, each reporting its own
+          // fraction, so each of them gets its own share of the task.
+          m_ProgressCommand->SetShare(timeStep, timeSteps);
+
           Image::ConstPointer feedBackImage;
           Image::ConstPointer currentSegImage;
 
@@ -723,11 +733,24 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   }
   catch (const itk::ExceptionObject& e)
   {
-    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    // A cancelled preview aborts the filter, which reports the abort as an
+    // exception. Reporting that back as an error would turn the user's own
+    // decision into a failure message.
+    cancelled = task.IsCancelRequested();
 
-    m_ProgressCommand->SetProgress(progress_steps);
-
-    ErrorMessage.Send(e.GetDescription());
+    if (!cancelled)
+    {
+      MITK_ERROR << "Exception caught: " << e.GetDescription();
+      ErrorMessage.Send(e.GetDescription());
+    }
+    else
+    {
+      // Whatever the filter managed to write before it stopped is not a
+      // result. Left on display it offers the user half a segmentation that
+      // m_HasUnconfirmedPreview will not let them confirm.
+      this->ResetPreviewContent();
+      RenderingManager::GetInstance()->RequestUpdateAll();
+    }
   }
   catch (const std::exception& e)
   {
@@ -735,24 +758,32 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     // unsupported pixel type ends up in the error message as well instead of
     // unwinding through the tool activation.
     MITK_ERROR << "Exception caught: " << e.what();
-
-    m_ProgressCommand->SetProgress(progress_steps);
-
     ErrorMessage.Send(e.what());
   }
   catch (...)
   {
-    m_ProgressCommand->SetProgress(progress_steps);
     m_IsUpdating = false;
     CurrentlyBusy.Send(false);
     throw;
   }
 
   this->UpdateCleanUp();
-  m_LastTimePointOfUpdate = timePoint;
-  m_ProgressCommand->SetProgress(progress_steps);
+
+  // A cancelled update leaves the time point unrecorded on purpose: recording
+  // it would tell OnTimePointChanged() that this time point is up to date, so
+  // the discarded preview would never be recomputed for it.
+  if (!cancelled)
+    m_LastTimePointOfUpdate = timePoint;
+
   m_IsUpdating = false;
   CurrentlyBusy.Send(false);
+}
+
+bool mitk::SegWithPreviewTool::IsCancelable() const
+{
+  // No filter that a tool currently hands to ToolCommand reads the abort
+  // flag, so nothing in the tree overrides this yet.
+  return false;
 }
 
 bool mitk::SegWithPreviewTool::IsUpdating() const

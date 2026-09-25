@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <QFileInfo>
 
 #include <mitkSceneIO.h>
-#include <mitkProgressBar.h>
 
 #include <mitkDataStorageEditorInput.h>
 #include <berryIEditorPart.h>

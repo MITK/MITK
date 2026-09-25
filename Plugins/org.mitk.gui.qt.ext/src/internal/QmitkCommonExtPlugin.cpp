@@ -16,18 +16,17 @@ found in the LICENSE file.
 
 #include "QmitkAboutHandler.h"
 #include "QmitkAppInstancesPreferencePage.h"
-#include "QmitkStartupPreferencePage.h"
 
 #include "QmitkModuleView.h"
 
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
-#include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
 #include <mitkIOUtil.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkRecentData.h>
 
 #include <mitkBaseApplication.h>
 
@@ -54,7 +53,6 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAboutHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStartupPreferencePage, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)
 
@@ -88,6 +86,10 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
     {
        mitk::DataStorage::Pointer dataStorage = dsService->GetDefaultDataStorage();
 
+       // Unzipped scenes (.mitksceneindex) are left out since they can only be
+       // loaded from the command line.
+       QStringList recentData;
+
        int argumentsAdded = 0;
        for (int i = 0; i < arguments.size(); ++i)
        {
@@ -96,19 +98,20 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
            bool clearDataStorageFirst(false);
-           mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+           const auto nodeCount = dataStorage->GetAll()->Size();
            dataStorage = sceneIO->LoadScene( arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
-           mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
+
+           // LoadScene only logs its errors, so a scene that adds no nodes failed.
+           if (dataStorage->GetAll()->Size() > nodeCount)
+             recentData.append(arguments[i]);
          }
          else if (arguments[i].right(15) == ".mitksceneindex")
          {
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
            bool clearDataStorageFirst(false);
-           mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
            dataStorage = sceneIO->LoadSceneUnzipped(arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst);
-           mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
          }
          else
@@ -124,6 +127,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
              }
 
              argumentsAdded++;
+             recentData.append(arguments[i]);
            }
            catch(...)
            {
@@ -131,6 +135,8 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            }
          }
        } // end for each command line argument
+
+       mitk::RecentData::Add(recentData);
 
        if (argumentsAdded > 0 && globalReinit)
        {

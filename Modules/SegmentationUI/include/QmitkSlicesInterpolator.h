@@ -17,7 +17,9 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkSurfaceInterpolationController.h>
+#include <mitkITKEventObserverGuard.h>
 #include <mitkToolManager.h>
+#include <mitkWeakPointer.h>
 #include <MitkSegmentationUIExports.h>
 
 #include <QWidget>
@@ -116,11 +118,6 @@ public:
   /**
     Just public because it is called by itk::Commands. You should not need to call this.
   */
-  void OnInterpolationAborted(const itk::EventObject &);
-
-  /**
-    Just public because it is called by itk::Commands. You should not need to call this.
-  */
   void OnSurfaceInterpolationInfoChanged(const itk::EventObject &);
 
 
@@ -189,17 +186,12 @@ protected slots:
   /** \brief Called when the interpolation method combo box selection changes. */
   void OnInterpolationMethodChanged(int index);
 
-  /** \brief Called when the 2D interpolation radio button is toggled. */
-  void On2DInterpolationEnabled(bool);
   /** \brief Called when the 3D interpolation radio button is toggled. */
   void On3DInterpolationEnabled(bool);
   /** \brief Called when the "no interpolation" radio button is toggled. */
   void OnInterpolationDisabled(bool);
   /** \brief Called when the "show position markers" checkbox is toggled. */
   void OnShowMarkers(bool);
-
-  /** \brief Triggers 3D surface interpolation in a background thread. */
-  void Run3DInterpolation();
 
   /**
    * \brief Called when the surface interpolation thread completes.
@@ -208,15 +200,6 @@ protected slots:
    * and stores the surface information in the feedback node.
    */
   void OnSurfaceInterpolationFinished();
-
-  /** \brief Starts the timer that periodically triggers interpolation updates. */
-  void StartUpdateInterpolationTimer();
-
-  /** \brief Stops the interpolation update timer. */
-  void StopUpdateInterpolationTimer();
-
-  /** \brief Updates the surface color to match the active label color. */
-  void ChangeSurfaceColor();
 
 protected:
 
@@ -268,6 +251,42 @@ private:
   void WaitForFutures();
   void NodeRemoved(const mitk::DataNode* node);
 
+  /**
+   * \brief Starts the 3D surface interpolation on a worker thread.
+   *
+   * While an interpolation is running, the request is remembered instead, and the interpolation is started
+   * again once the running one has finished. The GUI thread never waits for it.
+   */
+  void Start3DInterpolation();
+
+  /**
+   * \brief Marks the shown surface as about to be replaced by the running interpolation.
+   *
+   * A pending surface pulses (see the "pulsing" property of mitk::SurfaceVtkMapper3D), for
+   * which the 3D windows are kept rendering until it is no longer pending.
+   */
+  void SetSurfacePending(bool pending);
+
+  /**
+   * \brief Hides the interpolated label in the 3D windows while its interpolated surface is shown.
+   *
+   * The contours drawn for the interpolation would only cut through the surface there. Called
+   * wherever the surface is shown, hidden or cleared; it works out the state on its own. It
+   * requests no render, as it also runs from the destructor; the callers do.
+   */
+  void UpdateLabelHiddenIn3D();
+
+  /** \brief Shows the label hidden by UpdateLabelHiddenIn3D() in 3D again, if any. */
+  void RevealLabelIn3D();
+
+  /**
+   * \brief Forgets the interpolated label when it is removed from the segmentation.
+   *
+   * A label added later may get the same value. It then counts as a new label, which clears
+   * what was shown for the removed one instead of showing it again.
+   */
+  void OnLabelRemoved(const itk::EventObject& event);
+
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -280,7 +299,6 @@ private:
 
   unsigned int InterpolationInfoChangedObserverTag;
   unsigned int SurfaceInterpolationInfoChangedObserverTag;
-  unsigned int InterpolationAbortedObserverTag;
 
   QGroupBox *m_GroupBoxEnableExclusiveInterpolationMode;
   QComboBox *m_CmbInterpolation;
@@ -293,6 +311,12 @@ private:
 
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
+
+  // Where UpdateLabelHiddenIn3D() hid a label last, which need not be the working data any more.
+  mitk::WeakPointer<mitk::DataNode> m_NodeWithLabelHiddenIn3D;
+
+  // Calls OnLabelRemoved() for the working segmentation.
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
 
   mitk::MultiLabelSegmentation *m_Segmentation;
 
@@ -310,11 +334,15 @@ private:
 
   QFuture<void> m_Future;
   QFutureWatcher<void> m_Watcher;
+  bool m_Rerun3DInterpolation = false;
+
+  // Held here rather than by the worker, so that a segmentation removed during a run is destroyed on the GUI thread.
+  mitk::MultiLabelSegmentation::ConstPointer m_InterpolatingSegmentation;
 
   QFuture<void> m_ModifyFuture;
   QFutureWatcher<void> m_ModifyWatcher;
 
-  QTimer *m_Timer;
+  QTimer *m_PulseTimer;
 
   QFuture<void> m_PlaneFuture;
   QFutureWatcher<void> m_PlaneWatcher;

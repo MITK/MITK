@@ -37,15 +37,60 @@ namespace mitk
   class MITKCORE_EXPORT DisplayActionEventBroadcast : public EventStateMachine, public InteractionEventObserver
   {
   public:
+    /**
+     * \brief Keeps left mouse button presses away from all broadcasts while it is active.
+     *
+     * Obtained from BlockLeftButton(). A default-constructed block is inactive,
+     * moving transfers it, and destruction or Reset() releases it.
+     */
+    class MITKCORE_EXPORT LeftButtonBlock
+    {
+    public:
+      LeftButtonBlock() = default;
+      LeftButtonBlock(LeftButtonBlock&& other) noexcept;
+      LeftButtonBlock& operator=(LeftButtonBlock&& other) noexcept;
+      ~LeftButtonBlock();
+
+      LeftButtonBlock(const LeftButtonBlock&) = delete;
+      LeftButtonBlock& operator=(const LeftButtonBlock&) = delete;
+
+      /** \brief Releases the block. Does nothing if it is inactive. */
+      void Reset();
+
+    private:
+      friend class DisplayActionEventBroadcast;
+
+      bool m_IsActive = false;
+    };
+
     mitkClassMacro(DisplayActionEventBroadcast, EventStateMachine);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
     /**
+     * \brief Suppresses display actions triggered by pressing the left mouse button.
+     *
+     * Meant for tools that react to the left mouse button as interaction event
+     * observers. They are notified about the same unhandled events as the
+     * broadcasts, so without a block a single click would also, for example,
+     * move the crosshair.
+     *
+     * The block applies to every broadcast, including broadcasts created while
+     * it is held, and is independent of their event configuration, so switching
+     * the interaction scheme does not lift it. Blocks are counted: presses are
+     * suppressed until the last active block is released, regardless of the
+     * order in which they are released. All other events, including mouse moves
+     * with the left button held, still reach the broadcasts.
+     */
+    [[nodiscard]] static LeftButtonBlock BlockLeftButton();
+
+    /**
      * \brief Called for every InteractionEvent observed through the InteractionEventObserver interface.
      *
      * The interaction event is passed to the state machine in order to use
-     * its infrastructure for action dispatch.
+     * its infrastructure for action dispatch. Events that were already handled
+     * are skipped unless the configuration sets alwaysReact, and left mouse
+     * button presses are skipped while blocked (see BlockLeftButton()).
      *
      * \param interactionEvent The event that was observed and triggered this notification.
      * \param isHandled        Flag indicating whether a DataInteractor has already handled the event.

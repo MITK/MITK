@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkImageDataItem.h>
+#include <mitkStorageThreadDispatcherBase.h>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 
@@ -175,8 +176,19 @@ void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsign
 
 void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 {
-  vtkImageData *inData = vtkImageData::New();
-  vtkDataArray *scalars = nullptr;
+  auto vtkImage = this->CreateVtkImageDataView(iP);
+
+  if (vtkImage == nullptr)
+    return;
+
+  m_VtkImageData = vtkImage;
+  m_VtkImageData->Register(nullptr);
+}
+
+vtkSmartPointer<vtkImageData> mitk::ImageDataItem::CreateVtkImageDataView(ImageConstPointer iP) const
+{
+  auto inData = vtkSmartPointer<vtkImageData>::New();
+  vtkSmartPointer<vtkDataArray> scalars;
 
   const unsigned int *dims = m_Dimensions;
   const unsigned int dim = m_Dimension;
@@ -204,8 +216,7 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
   }
   else
   {
-    inData->Delete();
-    return;
+    return nullptr;
   }
 
   if (m_Timestep >= 0)
@@ -220,58 +231,56 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 
   if (m_PixelType->GetComponentType() == itk::IOComponentEnum::CHAR)
   {
-    scalars = vtkCharArray::New();
+    scalars = vtkSmartPointer<vtkCharArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::UCHAR)
   {
-    scalars = vtkUnsignedCharArray::New();
+    scalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::SHORT)
   {
-    scalars = vtkShortArray::New();
+    scalars = vtkSmartPointer<vtkShortArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::USHORT)
   {
-    scalars = vtkUnsignedShortArray::New();
+    scalars = vtkSmartPointer<vtkUnsignedShortArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::INT)
   {
-    scalars = vtkIntArray::New();
+    scalars = vtkSmartPointer<vtkIntArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::UINT)
   {
-    scalars = vtkUnsignedIntArray::New();
+    scalars = vtkSmartPointer<vtkUnsignedIntArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::LONG)
   {
-    scalars = vtkLongArray::New();
+    scalars = vtkSmartPointer<vtkLongArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::ULONG)
   {
-    scalars = vtkUnsignedLongArray::New();
+    scalars = vtkSmartPointer<vtkUnsignedLongArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::FLOAT)
   {
-    scalars = vtkFloatArray::New();
+    scalars = vtkSmartPointer<vtkFloatArray>::New();
   }
   else if (m_PixelType->GetComponentType() == itk::IOComponentEnum::DOUBLE)
   {
-    scalars = vtkDoubleArray::New();
+    scalars = vtkSmartPointer<vtkDoubleArray>::New();
   }
   else
   {
-    inData->Delete();
-    return;
+    return nullptr;
   }
-
-  m_VtkImageData = inData;
 
   // set mitk imageDataItem void array to vtk scalar values
   scalars->SetNumberOfComponents(m_PixelType->GetNumberOfComponents());
   scalars->SetVoidArray(m_Data, size * m_PixelType->GetNumberOfComponents(), 1);
 
-  m_VtkImageData->GetPointData()->SetScalars(scalars);
-  scalars->Delete();
+  inData->GetPointData()->SetScalars(scalars);
+
+  return inData;
 }
 
 void mitk::ImageDataItem::Modified() const
@@ -282,6 +291,11 @@ void mitk::ImageDataItem::Modified() const
 
 mitk::ImageVtkReadAccessor *mitk::ImageDataItem::GetVtkImageAccessor(mitk::ImageDataItem::ImageConstPointer iP) const
 {
+  // Only where something is about to be written: this is on the path of every
+  // mapper update, and the check below costs a service lookup.
+  if (m_VtkImageData == nullptr || m_VtkImageReadAccessor == nullptr)
+    WarnIfOffStorageThread("Building the VTK representation of an image");
+
   if (m_VtkImageData == nullptr)
   {
     ConstructVtkImageData(iP);
@@ -295,6 +309,9 @@ mitk::ImageVtkReadAccessor *mitk::ImageDataItem::GetVtkImageAccessor(mitk::Image
 
 mitk::ImageVtkWriteAccessor *mitk::ImageDataItem::GetVtkImageAccessor(ImagePointer iP)
 {
+  if (m_VtkImageData == nullptr || m_VtkImageWriteAccessor == nullptr)
+    WarnIfOffStorageThread("Building the VTK representation of an image");
+
   if (m_VtkImageData == nullptr)
   {
     ConstructVtkImageData(iP.GetPointer());

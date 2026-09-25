@@ -265,6 +265,10 @@ The Segmentation Plugin offers a number of preferences which can be set via the 
 - <b>Enforce suggestions:</b> Require label names to be valid suggestions - custom label names are not allowed
 - <b>Suggest once per segmentation:</b> Each suggestion is only offered once per segmentation to avoid duplicate labels. If this is active, occurrence constraints defined by the suggestions are ignored.
 
+\subsection org_mitk_views_segmentationpreferences_interpolation 3D interpolation
+
+- <b>Add the interpolated surface as a mesh on confirmation:</b> Besides writing the result into the active label, confirming a 3D interpolation also adds the interpolated surface as a mesh below the segmentation. Off by default, as the 3D display of the segmentation already shows the result.
+
 \section org_mitk_views_segmentationtooloverview Segmentation tool overview
 
 MITK offers a comprehensive set of slice-based 2D and (semi-)automated 3D segmentation tools.
@@ -435,6 +439,7 @@ oriented planes. The 3D interpolation is not meant to be used for parallel slice
 
 You can accept the interpolation result by clicking the <i>Confirm</i>-button below the tool buttons.
 In this case the 3D interpolation will be deactivated automatically so that the result can be post-processed without any interpolation running in the background.
+Confirming writes the result into the active label. To also keep the interpolated surface as a mesh, see \ref org_mitk_views_segmentationpreferences_interpolation.
 
 Additional to the surface, black contours are shown in the 3D render window, which mark all the drawn contours used for the interpolation.
 You can navigate between the drawn contours by clicking on the corresponding <i>position</i> nodes in the data manager which are stored as sub-nodes of the selected segmentation.

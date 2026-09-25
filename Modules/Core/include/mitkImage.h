@@ -161,6 +161,8 @@ namespace mitk
     /** \copydoc GetVtkImageData(int, int) */
     virtual const vtkImageData *GetVtkImageData(int t = 0, int n = 0) const;
 
+    void PrebuildVtkRepresentation() const override;
+
     /**
      * \brief Check whether slice \a s at time \a t in channel \a n is set.
      *

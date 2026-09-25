@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QClipboard>
 #include <QGridLayout>
 #include <QShortcut>
+#include <QTimer>
 #include <QToolBar>
 #include <QTextBrowser>
 #include <QCheckBox>
@@ -25,6 +26,7 @@ found in the LICENSE file.
 
 #include <mitkCoreServices.h>
 #include <mitkException.h>
+#include <mitkExclusiveInteraction.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkITKEventObserverGuard.h>
@@ -198,6 +200,12 @@ struct QmitkMeasurementViewData
   /** Set while a figure is being placed: the interaction reference geometry to hand
       back afterwards. Holds a null geometry if there was none to begin with. */
   std::optional<mitk::TimeGeometry::ConstPointer> m_RestoreInteractionReferenceGeometry;
+
+  /** Active while a figure is being placed. */
+  mitk::ExclusiveInteraction::Claim m_ExclusiveInteractionClaim;
+
+  /** Observes the figure that is being placed, to cancel the placement once it gets deselected. */
+  mitk::ITKEventObserverGuard m_PlacementSelectionObserver;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -502,7 +510,11 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
   auto isPositionMarker = false;
   node->GetBoolProperty("isContourMarker", isPositionMarker);
 
-  if (planarFigure.IsNotNull() && !isPositionMarker)
+  // Helper objects belong to other components, which interact with them on their own.
+  auto isHelperObject = false;
+  node->GetBoolProperty("helper object", isHelperObject);
+
+  if (planarFigure.IsNotNull() && !isPositionMarker && !isHelperObject)
   {
     auto nonConstNode = const_cast<mitk::DataNode*>(node);
     mitk::PlanarFigureInteractor::Pointer interactor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
@@ -576,10 +588,9 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
       this->PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
 
     d->m_DataNodeToPlanarFigureData.erase( it );
-  }
 
-  if (nonConstNode != nullptr)
     nonConstNode->SetDataInteractor(nullptr);
+  }
 
   auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
   auto nodes = this->GetDataStorage()->GetDerivations(node, isPlanarFigure);
@@ -656,8 +667,10 @@ void QmitkMeasurementView::OnPlanarFigureFinished()
 
 void QmitkMeasurementView::PlanarFigureInitialized()
 {
+  d->m_PlacementSelectionObserver.Reset();
   d->m_UninitializedNode = nullptr;
   d->m_PendingCounter = nullptr;
+  d->m_ExclusiveInteractionClaim.Reset();
 
   d->m_CancelPlacementShortcut->setEnabled(false);
 
@@ -726,6 +739,19 @@ bool QmitkMeasurementView::BeginDrawAction(QAction* action, bool checked)
   }
 
   this->CancelPlacement();
+
+  d->m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+    this->CancelPlacement();
+    return true;
+  });
+
+  // The armed tool of another view keeps the exclusive interaction, e.g. to
+  // keep its unconfirmed results.
+  if (!d->m_ExclusiveInteractionClaim.IsActive())
+  {
+    action->setChecked(false);
+    return false;
+  }
 
   // CancelPlacement() unchecks all draw actions, including the clicked one
   action->setChecked(true);
@@ -1001,6 +1027,20 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   d->m_CancelPlacementShortcut->setEnabled(true);
   d->m_DrawLabel->show();
 
+  // The planar figure interactor ignores points added to a figure that is not
+  // selected, so the placement ends once something else takes the selection,
+  // e.g. the Data Manager when another node gets selected. The cancellation is
+  // deferred to not remove the figure while its deselection is still processed.
+  d->m_PlacementSelectionObserver.Reset(newNode, itk::ModifiedEvent(), [this](const itk::EventObject&) {
+    if (d->m_UninitializedNode.IsNull() || d->m_UninitializedNode->IsSelected())
+      return;
+
+    QTimer::singleShot(0, this, [this]() {
+      if (d->m_UninitializedNode.IsNotNull() && !d->m_UninitializedNode->IsSelected())
+        this->CancelPlacement();
+    });
+  });
+
   // Decoupled render windows compare themselves against this geometry while the
   // figure is being placed and offer a per-window reset (see QmitkRenderWindow).
   // There is only one such geometry per renderer and the Segmentation view claims
@@ -1084,8 +1124,8 @@ void QmitkMeasurementView::AddAllInteractors()
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkMeasurementView::GetAllPlanarFigures() const
 {
   auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
-  auto isNotHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(false));
-  auto isNotHelperButPlanarFigure = mitk::NodePredicateAnd::New( isPlanarFigure, isNotHelperObject );
+  auto isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  auto isNotHelperButPlanarFigure = mitk::NodePredicateAnd::New(isPlanarFigure, mitk::NodePredicateNot::New(isHelperObject));
 
-  return this->GetDataStorage()->GetSubset(isPlanarFigure);
+  return this->GetDataStorage()->GetSubset(isNotHelperButPlanarFigure);
 }

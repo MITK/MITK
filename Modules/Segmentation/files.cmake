@@ -1,6 +1,4 @@
 set(H_FILES
-  itkAdaptiveThresholdIterator.h
-  itkConnectedAdaptiveThresholdImageFilter.h
   itkContourExtractor2DImageFilter.h
   itkImageToPathFilter.h
   mitkSegmentationInterpolationAlgorithm.h
@@ -27,8 +25,6 @@ set(CPP_FILES
   Algorithms/mitkSegLabelPropModifyOperation.cpp
   Algorithms/mitkSegSliceOperation.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
-  Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
-  Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSurfaceStampImageFilter.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
   Controllers/mitkSegmentationInterpolationController.cpp

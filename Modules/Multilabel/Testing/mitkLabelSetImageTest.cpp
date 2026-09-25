@@ -12,12 +12,15 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 #include <mitkImageStatisticsHolder.h>
+#include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 #include <mitkAutoCropImageFilter.h>
+
+#include <array>
 
 namespace CppUnit
 {
@@ -79,6 +82,10 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestEraseLabels);
   MITK_TEST(TestMergeLabels);
   MITK_TEST(TestCreateLabelMask);
+  MITK_TEST(TestUpdateCenterOfMass);
+  MITK_TEST(TestUpdateCenterOfMass_ReusedUntilGroupImageChanges);
+  MITK_TEST(TestUpdateCenterOfMass_EmptyLabel_ResetsCenter);
+  MITK_TEST(TestUpdateCenterOfMass_Dynamic);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -719,6 +726,158 @@ public:
 
     // Count all pixels with value 6 = 507
     CPPUNIT_ASSERT_MESSAGE("Label mask not correctly created", maskImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 507);
+  }
+
+  static mitk::MultiLabelSegmentation::Pointer CreateCenterOfMassTestSegmentation(unsigned int timeSteps)
+  {
+    auto referenceImage = mitk::Image::New();
+    unsigned int dimensions[4] = { 96, 128, 52, timeSteps };
+    referenceImage->Initialize(mitk::MakeScalarPixelType<char>(), 1 < timeSteps ? 4 : 3, dimensions);
+
+    mitk::Vector3D spacing;
+    mitk::FillVector3D(spacing, 0.5, 2.0, 3.0);
+    referenceImage->SetSpacing(spacing);
+
+    mitk::Point3D origin;
+    mitk::FillVector3D(origin, 10.0, -20.0, 30.0);
+    referenceImage->SetOrigin(origin);
+
+    auto segmentation = mitk::MultiLabelSegmentation::New();
+    segmentation->Initialize(referenceImage);
+    segmentation->AddLabel(mitk::Label::New(5, "Target"), 0);
+    segmentation->AddLabel(mitk::Label::New(6, "Other"), 0);
+
+    return segmentation;
+  }
+
+  /** Sets all voxels of the inclusive index box [first, last] at the time step to the value. */
+  static void PaintBox(mitk::Image* groupImage, mitk::TimeStepType timeStep,
+    const std::array<std::size_t, 3>& first, const std::array<std::size_t, 3>& last, mitk::Label::PixelType value)
+  {
+    {
+      mitk::ImageWriteAccessor accessor(groupImage);
+      auto* pixels = static_cast<mitk::Label::PixelType*>(accessor.GetData());
+
+      const std::size_t sizeX = groupImage->GetDimension(0);
+      const std::size_t sizeY = groupImage->GetDimension(1);
+      const std::size_t sizeZ = groupImage->GetDimension(2);
+
+      for (auto z = first[2]; z <= last[2]; ++z)
+      {
+        for (auto y = first[1]; y <= last[1]; ++y)
+        {
+          for (auto x = first[0]; x <= last[0]; ++x)
+            pixels[((timeStep * sizeZ + z) * sizeY + y) * sizeX + x] = value;
+        }
+      }
+    }
+
+    groupImage->Modified();
+  }
+
+  /** Converts without BaseGeometry::IndexToWorld() to check it independently. Assumes no rotation. */
+  static mitk::Point3D IndexToWorld(const mitk::BaseGeometry* geometry, const mitk::Point3D& index)
+  {
+    const auto origin = geometry->GetOrigin();
+    const auto spacing = geometry->GetSpacing();
+
+    mitk::Point3D world;
+    for (unsigned int i = 0; i < 3; ++i)
+      world[i] = origin[i] + spacing[i] * index[i];
+
+    return world;
+  }
+
+  void TestUpdateCenterOfMass()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    // Two boxes of different size far apart in z, so that the sums of several chunks are combined.
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);  // 2000 voxels around (14.5, 24.5, 14.5)
+    PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 5); // 1000 voxels around (64.5, 24.5, 39.5)
+    PaintBox(groupImage, 0, { 80, 100, 0 }, { 95, 127, 51 }, 6);
+
+    segmentation->UpdateCenterOfMass(5, 0);
+
+    mitk::Point3D expectedIndex;
+    mitk::FillVector3D(expectedIndex, (2000 * 14.5 + 1000 * 64.5) / 3000, 24.5, (2000 * 14.5 + 1000 * 39.5) / 3000);
+
+    const auto label = segmentation->GetLabel(5);
+    CPPUNIT_ASSERT_MESSAGE("Wrong center of mass index",
+      mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex, mitk::eps, true));
+    CPPUNIT_ASSERT_MESSAGE("Wrong center of mass coordinates",
+      mitk::Equal(label->GetCenterOfMassCoordinates(), IndexToWorld(segmentation->GetGeometry(), expectedIndex), mitk::eps, true));
+  }
+
+  void TestUpdateCenterOfMass_ReusedUntilGroupImageChanges()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    auto* groupImage = segmentation->GetGroupImage(0);
+    const auto label = segmentation->GetLabel(5);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    segmentation->UpdateCenterOfMass(5, 0);
+    const auto centerOfMassMTime = label->GetCenterOfMassMTime();
+
+    segmentation->UpdateCenterOfMass(5, 0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Center of mass was recomputed although the group image did not change",
+      centerOfMassMTime, label->GetCenterOfMassMTime());
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 0);
+    PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 5);
+    segmentation->UpdateCenterOfMass(5, 0);
+
+    mitk::Point3D expectedIndex;
+    mitk::FillVector3D(expectedIndex, 64.5, 24.5, 39.5);
+    CPPUNIT_ASSERT_MESSAGE("Center of mass was not recomputed after the group image changed",
+      mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex, mitk::eps, true));
+  }
+
+  void TestUpdateCenterOfMass_EmptyLabel_ResetsCenter()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    auto* groupImage = segmentation->GetGroupImage(0);
+    const auto label = segmentation->GetLabel(5);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    segmentation->UpdateCenterOfMass(5, 0);
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 0);
+    segmentation->UpdateCenterOfMass(5, 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Center of mass of an empty label was not reset",
+      itk::ModifiedTimeType(0), label->GetCenterOfMassMTime());
+  }
+
+  void TestUpdateCenterOfMass_Dynamic()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    auto* groupImage = segmentation->GetGroupImage(0);
+    const auto label = segmentation->GetLabel(5);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    PaintBox(groupImage, 1, { 60, 20, 35 }, { 69, 29, 44 }, 5);
+
+    mitk::Point3D expectedIndex0;
+    mitk::FillVector3D(expectedIndex0, 14.5, 24.5, 14.5);
+    mitk::Point3D expectedIndex1;
+    mitk::FillVector3D(expectedIndex1, 64.5, 24.5, 39.5);
+
+    segmentation->UpdateCenterOfMass(5, 0);
+    CPPUNIT_ASSERT_MESSAGE("Wrong center of mass index at time step 0",
+      mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex0, mitk::eps, true));
+
+    segmentation->UpdateCenterOfMass(5, 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong center of mass index at time step 1",
+      mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex1, mitk::eps, true));
+    CPPUNIT_ASSERT_MESSAGE("Wrong center of mass coordinates at time step 1",
+      mitk::Equal(label->GetCenterOfMassCoordinates(), IndexToWorld(segmentation->GetGeometry(1), expectedIndex1), mitk::eps, true));
+
+    segmentation->UpdateCenterOfMass(5, 0);
+    CPPUNIT_ASSERT_MESSAGE("Center of mass of time step 1 was reused for time step 0",
+      mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex0, mitk::eps, true));
+
+    CPPUNIT_ASSERT_THROW(segmentation->UpdateCenterOfMass(5, 2), mitk::Exception);
   }
 };
 

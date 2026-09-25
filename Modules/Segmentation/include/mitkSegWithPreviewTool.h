@@ -174,6 +174,23 @@ namespace mitk
     bool IsUpdating() const;
 
     /**
+     * \brief Indicate whether an update of the preview can be stopped again.
+     *
+     * ToolCommand turns a cancel request into
+     * itk::ProcessObject::SetAbortGenerateData() on the filter it observes, so
+     * only a tool whose filter reads that flag, whether directly or through
+     * itk::ProgressReporter, can honour one. Say so by overriding this, and the
+     * user is offered a cancel button while the preview is being computed.
+     *
+     * Claiming it without being able to act on it is worse than not offering
+     * it: the request is read by nothing, and the notification it belongs to
+     * cannot be dismissed once it has been made.
+     *
+     * \return False, unless a derived tool overrides this.
+     */
+    virtual bool IsCancelable() const;
+
+    /**
      * \brief Returns the name of the currently selected segmentation node.
      * \return The name of the segmentation node or an empty string if none is selected.
      */

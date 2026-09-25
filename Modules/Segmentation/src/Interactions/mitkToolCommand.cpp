@@ -11,77 +11,71 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkToolCommand.h>
-#include <mitkProgressBar.h>
 
-mitk::ToolCommand::ToolCommand() : m_ProgressValue(0), m_StopProcessing(false)
+#include <mitkProgressTask.h>
+
+#include <itkProcessObject.h>
+
+#include <algorithm>
+
+mitk::ToolCommand::ToolCommand()
+  : m_ProgressTask(nullptr),
+    m_ShareIndex(0),
+    m_ShareCount(1)
 {
 }
 
-void mitk::ToolCommand::Execute(itk::Object *, const itk::EventObject &event)
+void mitk::ToolCommand::SetProgressTask(ProgressTask *task)
 {
-  if (typeid(event) == typeid(itk::IterationEvent))
-  {
-    // MITK_INFO << "IterationEvent";
-  }
+  m_ProgressTask = task;
 
-  if (typeid(event) == typeid(itk::ProgressEvent))
-  {
-    // MITK_INFO << "ToolCommand::ProgressEvent";
-  }
-
-  if (typeid(event) == typeid(itk::AnyEvent))
-  {
-    // MITK_INFO << "AnyEvent";
-  }
-
-  if (typeid(event) == typeid(itk::StartEvent))
-  {
-    // MITK_INFO << "StartEvent";
-  }
-
-  if (typeid(event) == typeid(itk::EndEvent))
-  {
-    // MITK_INFO << "EndEvent";
-  }
-
-  if (typeid(event) == typeid(itk::FunctionEvaluationIterationEvent))
-  {
-    // MITK_INFO << "FunctionEvaluationIterationEvent";
-  }
-
-  if (typeid(event) == typeid(itk::GradientEvaluationIterationEvent))
-  {
-    // MITK_INFO << "GradientEvaluationIterationEvent";
-  }
-
-  if (typeid(event) == typeid(itk::FunctionAndGradientEvaluationIterationEvent))
-  {
-    // MITK_INFO << "FunctionAndGradientEvaluationIterationEvent";
-  }
-
-  mitk::ProgressBar::GetInstance()->Progress();
+  // A share belongs to the run it was set for, and a new task means a new
+  // operation. Reset here rather than left to the caller, which would only
+  // ever show up as a bar that stops halfway.
+  m_ShareIndex = 0;
+  m_ShareCount = 1;
 }
 
-void mitk::ToolCommand::Execute(const itk::Object * /*caller*/, const itk::EventObject & /*event*/)
+mitk::ProgressTask *mitk::ToolCommand::GetProgressTask() const
 {
+  return m_ProgressTask;
 }
 
-void mitk::ToolCommand::AddStepsToDo(int steps)
+void mitk::ToolCommand::SetShare(unsigned int index, unsigned int count)
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
+  m_ShareCount = std::max(count, 1u);
+  m_ShareIndex = std::min(index, m_ShareCount - 1);
 }
 
-void mitk::ToolCommand::SetProgress(int steps)
+void mitk::ToolCommand::Execute(itk::Object *caller, const itk::EventObject &event)
 {
-  mitk::ProgressBar::GetInstance()->Progress(steps);
+  const itk::Object *constCaller = caller;
+  this->Execute(constCaller, event);
+
+  if (nullptr != m_ProgressTask && m_ProgressTask->IsCancelRequested())
+  {
+    // Aborting makes the filter throw itk::ProcessAborted once it reaches the
+    // next check, which callers have to tell apart from a genuine failure.
+    if (auto *process = dynamic_cast<itk::ProcessObject *>(caller); nullptr != process)
+      process->SetAbortGenerateData(true);
+  }
 }
 
-double mitk::ToolCommand::GetCurrentProgressValue()
+void mitk::ToolCommand::Execute(const itk::Object *caller, const itk::EventObject &)
 {
-  return m_ProgressValue;
-}
+  if (nullptr == m_ProgressTask)
+    return;
 
-void mitk::ToolCommand::SetStopProcessing(bool value)
-{
-  m_StopProcessing = value;
+  const auto *process = dynamic_cast<const itk::ProcessObject *>(caller);
+
+  if (nullptr == process)
+    return;
+
+  // The filter reports a fraction of its own run, which is mapped onto this
+  // run's share of whatever budget the task was given. Counting one step per
+  // event, as before, made the reported progress depend on how chatty a filter
+  // happens to be.
+  const auto fraction = (m_ShareIndex + std::clamp(process->GetProgress(), 0.0f, 1.0f)) / m_ShareCount;
+
+  m_ProgressTask->SetProgress(static_cast<unsigned int>(fraction * m_ProgressTask->GetStepsToDo()));
 }

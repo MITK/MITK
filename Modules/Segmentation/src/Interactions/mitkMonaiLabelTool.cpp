@@ -29,6 +29,7 @@ mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveRele
 {
   this->ResetsToEmptyPreviewOn();
   this->IsTimePointChangeAwareOff();
+  this->ClaimsExclusiveInteractionOn();
 }
 
 mitk::MonaiLabelTool::~MonaiLabelTool()

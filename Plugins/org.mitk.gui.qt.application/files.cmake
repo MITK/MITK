@@ -28,6 +28,7 @@ set(SRC_CPP_FILES
   QmitkRedoAction.cpp
   QmitkPreferencesDialog.cpp
   QmitkStatusBar.cpp
+  QmitkToolBarPresets.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -85,6 +86,7 @@ set(CACHED_RESOURCE_FILES
 
 set(QRC_FILES
   resources/resources.qrc
+  resources/org_mitk_presets.qrc
 )
 
 foreach(file ${SRC_CPP_FILES})

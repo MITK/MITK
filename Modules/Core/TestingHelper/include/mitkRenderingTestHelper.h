@@ -95,6 +95,15 @@ namespace mitk
       **/
     void Render();
 
+    /**
+     * \brief Whether a render shows anything but the background.
+     *
+     * Renders once more without swapping buffers and reads the back buffer, as vtkTesting
+     * does. Any pixel differing from the one in the corner, which only the background
+     * covers, counts. For tests that check that something is drawn at all, or nothing.
+     */
+    bool RendersAnything();
+
     /** \brief Returns the datastorage, in order to modify the data inside a rendering test.
       **/
     mitk::DataStorage::Pointer GetDataStorage();

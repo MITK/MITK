@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 
@@ -1726,8 +1727,14 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   if (currentLabel.IsNull())
     return;
 
+  const auto* timeGeometry = m_Segmentation->GetTimeGeometry();
+  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  if (!timeGeometry->IsValidTimePoint(timePoint))
+    return;
+
   this->WaitCursorOn();
-  m_Segmentation->UpdateCenterOfMass(labelID);
+  m_Segmentation->UpdateCenterOfMass(labelID, timeGeometry->TimePointToTimeStep(timePoint));
   this->WaitCursorOff();
 
   const auto pos = currentLabel->GetCenterOfMassIndex();

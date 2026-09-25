@@ -53,10 +53,11 @@ set(H_FILES
   mitkPixelTypeTraits.h
   mitkPlaneClipping.h
   mitkPoint.h
-  mitkProgressBarImplementation.h
+  mitkProgressTaskInfo.h
   mitkQuaternion.h
   mitkReferenceCountWatcher.h
   mitkRenderingManagerFactory.h
+  mitkScopedProgressTask.h
   mitkServiceInterface.h
   mitkStatusBarImplementation.h
   mitkStdFunctionCommand.h
@@ -109,10 +110,13 @@ set(CPP_FILES
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
   Controllers/mitkCrosshairManager.cpp
+  Controllers/mitkIProgressListener.cpp
+  Controllers/mitkIProgressService.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
   Controllers/mitkPlanePositionManager.cpp
-  Controllers/mitkProgressBar.cpp
+  Controllers/mitkProgressService.cpp
+  Controllers/mitkProgressTask.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
   Controllers/mitkSliceNavigationHelper.cpp
@@ -161,6 +165,7 @@ set(CPP_FILES
   DataManagement/mitkImageReadAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
   DataManagement/mitkImageVtkReadAccessor.cpp
+  DataManagement/mitkImageVtkReadView.cpp
   DataManagement/mitkImageVtkWriteAccessor.cpp
   DataManagement/mitkImageWriteAccessor.cpp
   DataManagement/mitkDataStorageReference.cpp
@@ -245,6 +250,7 @@ set(CPP_FILES
   DataManagement/mitkSmartPointerProperty.cpp
   DataManagement/mitkSourceImageRelationRule.cpp
   DataManagement/mitkStandaloneDataStorage.cpp
+  DataManagement/mitkStorageThreadDispatcherBase.cpp
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
@@ -276,6 +282,7 @@ set(CPP_FILES
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
   Interactions/mitkEventStateMachine.cpp
+  Interactions/mitkExclusiveInteraction.cpp
   Interactions/mitkInteractionEvent.cpp
   Interactions/mitkInteractionEventConst.cpp
   Interactions/mitkInteractionEventHandler.cpp
@@ -350,6 +357,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkLegacyIO.cpp
   IO/mitkSurfaceVtkXmlIO.cpp
   IO/mitkUtf8Util.cpp
+  IO/mitkVtkFileIOProgressObserver.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkXMLPreferencesStorage.cpp
 
@@ -395,7 +403,6 @@ set(RESOURCE_FILES
   Interactions/DisplayConfigPACSScroll.xml
   Interactions/DisplayConfigPACSZoom.xml
   Interactions/DisplayConfigPACSLevelWindow.xml
-  Interactions/DisplayConfigBlockLMB.xml
   Interactions/PointSet.xml
   Interactions/PointSetConfig.xml
   Interactions/PointSetConfigLMB.xml

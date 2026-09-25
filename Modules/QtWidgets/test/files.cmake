@@ -27,4 +27,5 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNDataBasedLayoutTest.cpp
   QmitkRenderWindowProximityTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
+  QmitkRunInputBlockingTest.cpp
 )

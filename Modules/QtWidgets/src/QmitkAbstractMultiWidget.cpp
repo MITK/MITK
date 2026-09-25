@@ -172,19 +172,16 @@ void QmitkAbstractMultiWidget::SetLayout(int row, int column)
 
 void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  // The configuration is applied even when the scheme is unchanged, because
-  // others temporarily replace it on the same event handler; a tool that
-  // blocks the left mouse button while it is active is the common case.
+  if (scheme == m_Impl->m_InteractionScheme)
+  {
+    return;
+  }
+
   try
   {
     mitk::InteractionSchemeSwitcher::SetInteractionScheme(this->GetInteractionEventHandler(), scheme);
   }
   catch (const mitk::Exception&)
-  {
-    return;
-  }
-
-  if (scheme == m_Impl->m_InteractionScheme)
   {
     return;
   }

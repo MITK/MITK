@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 428 464" width="856" height="928">
+  <defs>
+    <rect id="view" x="1" y="1" width="198" height="198" fill="#202020" stroke="#00b000" stroke-width="2"/>
+    <g id="tiltedImage">
+      <rect x="34" y="46" width="132" height="108" fill="#c7c7c7" fill-opacity="0.2"/>
+      <path fill="none" stroke="#c7c7c7" stroke-opacity="0.45" stroke-width="0.75"
+        d="M46 46V154M58 46V154M70 46V154M82 46V154M94 46V154M106 46V154M118 46V154M130 46V154M142 46V154M154 46V154
+           M34 58H166M34 70H166M34 82H166M34 94H166M34 106H166M34 118H166M34 130H166M34 142H166"/>
+      <rect x="34" y="46" width="132" height="108" fill="none" stroke="#c7c7c7" stroke-width="1.25"/>
+    </g>
+    <g id="fineImage">
+      <rect x="20" y="24" width="96" height="96" fill="#c7c7c7" fill-opacity="0.2"/>
+      <path fill="none" stroke="#c7c7c7" stroke-opacity="0.45" stroke-width="0.75"
+        d="M32 24V120M44 24V120M56 24V120M68 24V120M80 24V120M92 24V120M104 24V120
+           M20 36H116M20 48H116M20 60H116M20 72H116M20 84H116M20 96H116M20 108H116"/>
+      <rect x="20" y="24" width="96" height="96" fill="none" stroke="#c7c7c7" stroke-width="1.25"/>
+    </g>
+    <g id="coarseImage">
+      <rect x="76" y="84" width="100" height="100" fill="#e8b04a" fill-opacity="0.15"/>
+      <path fill="none" stroke="#e8b04a" stroke-opacity="0.6" stroke-width="0.75"
+        d="M96 84V184M116 84V184M136 84V184M156 84V184
+           M76 104H176M76 124H176M76 144H176M76 164H176"/>
+      <rect x="76" y="84" width="100" height="100" fill="none" stroke="#e8b04a" stroke-width="1.25"/>
+    </g>
+  </defs>
+
+  <use xlink:href="#view"/>
+  <g transform="rotate(-20 100 100)">
+    <use xlink:href="#tiltedImage"/>
+    <g fill="#df2121" fill-opacity="0.5">
+      <rect x="34" y="70" width="12" height="12"/>
+      <rect x="46" y="70" width="12" height="12"/>
+      <rect x="46" y="82" width="12" height="12"/>
+      <rect x="58" y="82" width="12" height="12"/>
+      <rect x="70" y="82" width="12" height="12"/>
+      <rect x="82" y="82" width="12" height="12"/>
+      <rect x="82" y="94" width="12" height="12"/>
+      <rect x="94" y="94" width="12" height="12"/>
+      <rect x="106" y="94" width="12" height="12"/>
+      <rect x="106" y="106" width="12" height="12"/>
+      <rect x="118" y="106" width="12" height="12"/>
+      <rect x="130" y="106" width="12" height="12"/>
+      <rect x="142" y="106" width="12" height="12"/>
+      <rect x="142" y="118" width="12" height="12"/>
+      <rect x="154" y="118" width="12" height="12"/>
+    </g>
+  </g>
+  <path d="M2 100H198" stroke="#df2121" stroke-width="2"/>
+  <path d="M100 2V198" stroke="#0080ff" stroke-width="2"/>
+
+  <g transform="translate(228 0)">
+    <use xlink:href="#view"/>
+    <rect x="12" y="28" width="176" height="144" fill="#c7c7c7" fill-opacity="0.2"/>
+    <path fill="none" stroke="#c7c7c7" stroke-opacity="0.45" stroke-width="0.75"
+      d="M28 28V172M44 28V172M60 28V172M76 28V172M92 28V172M108 28V172M124 28V172M140 28V172M156 28V172M172 28V172
+         M12 44H188M12 60H188M12 76H188M12 92H188M12 108H188M12 124H188M12 140H188M12 156H188"/>
+    <rect x="12" y="28" width="176" height="144" fill="none" stroke="#c7c7c7" stroke-width="1.25"/>
+    <rect x="12" y="92" width="176" height="16" fill="#40c040" fill-opacity="0.5"/>
+    <path d="M2 100H198" stroke="#df2121" stroke-width="2"/>
+    <path d="M100 2V198" stroke="#0080ff" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(0 236)">
+    <use xlink:href="#view"/>
+    <use xlink:href="#fineImage"/>
+    <use xlink:href="#coarseImage"/>
+    <g fill="#df2121" fill-opacity="0.5">
+      <rect x="20" y="96" width="96" height="12"/>
+      <rect x="76" y="84" width="100" height="40"/>
+    </g>
+    <path d="M2 104H198" stroke="#df2121" stroke-width="2"/>
+    <path d="M98 2V198" stroke="#0080ff" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(228 236)">
+    <use xlink:href="#view"/>
+    <rect x="2" y="2" width="80" height="72.8" fill="#c7c7c7" fill-opacity="0.1"/>
+    <path fill="none" stroke="#c7c7c7" stroke-opacity="0.25" stroke-width="0.75"
+      d="M17.2 2V74.8M38.8 2V74.8M60.4 2V74.8M2 10H82M2 31.6H82M2 53.2H82"/>
+    <path d="M82 2V74.8H2" fill="none" stroke="#c7c7c7" stroke-opacity="0.5" stroke-width="1.25"/>
+    <rect x="10" y="10" width="180" height="180" fill="#e8b04a" fill-opacity="0.15"/>
+    <path fill="none" stroke="#e8b04a" stroke-opacity="0.6" stroke-width="0.75"
+      d="M46 10V190M82 10V190M118 10V190M154 10V190M10 46H190M10 82H190M10 118H190M10 154H190"/>
+    <rect x="10" y="10" width="180" height="180" fill="none" stroke="#e8b04a" stroke-width="1.25"/>
+    <rect x="10" y="46" width="180" height="36" fill="#40c040" fill-opacity="0.5"/>
+    <path d="M2 64H198" stroke="#df2121" stroke-width="2"/>
+    <path d="M100 2V198" stroke="#0080ff" stroke-width="2"/>
+  </g>
+
+  <g fill="#00ff00" fill-opacity="0.75" font-family="Roboto, Open Sans, sans-serif" font-size="14" text-anchor="middle">
+    <text x="100" y="222">View not fitted to tilted image</text>
+    <text x="328" y="222">View fitted to tilted image</text>
+    <text x="100" y="458">View fitted to all data</text>
+    <text x="328" y="458">View fitted to selected image</text>
+  </g>
+
+  <g fill="#00ff00" fill-opacity="0.5">
+    <path d="M206 97H214V91L222 100L214 109V103H206Z"/>
+    <path d="M206 333H214V327L222 336L214 345V339H206Z"/>
+  </g>
+</svg>

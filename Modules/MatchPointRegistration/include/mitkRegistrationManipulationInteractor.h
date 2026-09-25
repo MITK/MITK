@@ -14,16 +14,11 @@ found in the LICENSE file.
 #define mitkRegistrationManipulationInteractor_h
 
 #include <mitkDataInteractor.h>
-#include <mitkEventConfig.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkPoint.h>
 #include <mitkVector.h>
 
-#include <usServiceReference.h>
-
 #include <MitkMatchPointRegistrationExports.h>
-
-#include <map>
 
 namespace mitk
 {
@@ -91,17 +86,6 @@ namespace mitk
      *  Valid after RegistrationSelectPositionEvent. */
     const Point3D& GetSelectPosition() const;
 
-    /** Disable the default display interactions (pan, zoom, etc.) to avoid conflicts
-     *  with this interactor's modifier+mouse-drag combinations.
-     *  Saves the current DisplayActionEventBroadcast configs for later restoration.
-     *  Safe to call multiple times; double-disabling is a no-op.
-     *  @sa EnableOriginalInteraction */
-    void DisableOriginalInteraction();
-
-    /** Restore the display interactions that were saved by DisableOriginalInteraction().
-     *  @sa DisableOriginalInteraction */
-    void EnableOriginalInteraction();
-
     /** Push the base manipulation cursor onto the application cursor stack.
      *  Call this when the interaction tool is activated.
      *  @sa PopManipulationCursor */
@@ -155,10 +139,6 @@ namespace mitk
     // Hover hint cursor tracking
     enum class HintMode { None, Translate, Rotate };
     HintMode m_CurrentHintMode = HintMode::None;
-
-    // Saved DisplayActionEventBroadcast configs for restore on EnableOriginalInteraction()
-    bool m_OriginalInteractionDisabled = false;
-    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractionConfigs;
   };
 
 } // namespace mitk

@@ -22,10 +22,66 @@ found in the LICENSE file.
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLine.h>
+#include <mitkMousePressEvent.h>
 #include <mitkRotationOperation.h>
 #include <mitkTimeNavigationController.h>
 
 #include <rotate_cursor.xpm>
+
+#include <utility>
+
+namespace
+{
+  unsigned int NumberOfLeftButtonBlocks = 0;
+
+  bool IsBlockedLeftButtonPress(const mitk::InteractionEvent* interactionEvent)
+  {
+    if (NumberOfLeftButtonBlocks == 0)
+      return false;
+
+    const auto* pressEvent = dynamic_cast<const mitk::MousePressEvent*>(interactionEvent);
+    return pressEvent != nullptr && pressEvent->GetEventButton() == mitk::InteractionEvent::LeftMouseButton;
+  }
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock::LeftButtonBlock(LeftButtonBlock&& other) noexcept
+  : m_IsActive(std::exchange(other.m_IsActive, false))
+{
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock& mitk::DisplayActionEventBroadcast::LeftButtonBlock::operator=(LeftButtonBlock&& other) noexcept
+{
+  if (this != &other)
+  {
+    this->Reset();
+    m_IsActive = std::exchange(other.m_IsActive, false);
+  }
+
+  return *this;
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock::~LeftButtonBlock()
+{
+  this->Reset();
+}
+
+void mitk::DisplayActionEventBroadcast::LeftButtonBlock::Reset()
+{
+  if (!m_IsActive)
+    return;
+
+  m_IsActive = false;
+  --NumberOfLeftButtonBlocks;
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock mitk::DisplayActionEventBroadcast::BlockLeftButton()
+{
+  LeftButtonBlock block;
+  block.m_IsActive = true;
+  ++NumberOfLeftButtonBlocks;
+
+  return block;
+}
 
 mitk::DisplayActionEventBroadcast::DisplayActionEventBroadcast()
   : m_AlwaysReact(false)
@@ -55,11 +111,13 @@ mitk::DisplayActionEventBroadcast::~DisplayActionEventBroadcast()
 
 void mitk::DisplayActionEventBroadcast::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
-  // the event is passed to the state machine interface to be handled
-  if (!isHandled || m_AlwaysReact)
-  {
-    HandleEvent(interactionEvent, nullptr);
-  }
+  if (isHandled && !m_AlwaysReact)
+    return;
+
+  if (IsBlockedLeftButtonPress(interactionEvent))
+    return;
+
+  this->HandleEvent(interactionEvent, nullptr);
 }
 
 void mitk::DisplayActionEventBroadcast::ConnectActionsAndFunctions()

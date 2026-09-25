@@ -26,6 +26,8 @@ namespace tinyxml2
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Reads a MITK scene from an XML document and populates a DataStorage.
    *
@@ -45,6 +47,32 @@ namespace mitk
     itkCloneMacro(Self);
 
     /**
+     * \brief Report progress into the given task rather than raising a
+     *        notification of its own.
+     *
+     * Set by a caller that already reports on this operation's behalf, so
+     * that opening a scene shows one notification instead of one for the
+     * file and another for the scene inside it.
+     *
+     * \param[in] task The task to report into, or nullptr for none.
+     */
+    void SetProgressTask(ProgressTask* task);
+
+    /**
+     * \brief Collect the nodes this reader adds in the given list.
+     *
+     * For a caller that has to tell the scene's nodes apart from anything else
+     * that reached the same storage. Comparing the storage before and against
+     * after does not do that: a load runs on a worker thread while the thread
+     * that owns the storage keeps handling events, so a node another handler
+     * adds in the meantime is indistinguishable from one of ours.
+     *
+     * \param[in] loadedNodes The list to append to, or nullptr to collect none.
+     *        Not cleared; the caller owns it and it must outlive the load.
+     */
+    void SetLoadedNodes(DataStorage::SetOfObjects* loadedNodes);
+
+    /**
      * \brief Loads a scene from a parsed XML document into the given DataStorage.
      *
      * Reads the file version from the XML document, instantiates the appropriate
@@ -61,6 +89,13 @@ namespace mitk
      * \pre \p storage must not be null.
      */
     virtual bool LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage);
+
+  protected:
+    /** \brief Null unless a caller reports on this reader's behalf. */
+    ProgressTask* m_ProgressTask = nullptr;
+
+    /** \brief Null unless a caller wants to know which nodes came from here. */
+    DataStorage::SetOfObjects* m_LoadedNodes = nullptr;
   };
 }
 

@@ -33,82 +33,56 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="materialGroupLabel">
-     <property name="textFormat">
-      <enum>Qt::TextFormat::RichText</enum>
+    <widget class="QGroupBox" name="materialGroupBox">
+     <property name="title">
+      <string>Material</string>
      </property>
-     <property name="text">
-      <string>&lt;small&gt;&lt;b&gt;MATERIAL&lt;/b&gt;&lt;/small&gt;</string>
-     </property>
+     <layout class="QFormLayout" name="materialLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="ambientLabel">
+        <property name="text">
+         <string>Ambient</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="diffuseLabel">
+        <property name="text">
+         <string>Diffuse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="specularLabel">
+        <property name="text">
+         <string>Specular</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="specularPowerLabel">
+        <property name="text">
+         <string>Specular power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
+      </item>
+     </layout>
     </widget>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="ambientRow">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="ambientLabel">
-       <property name="text">
-        <string>Ambient</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="diffuseRow">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="diffuseLabel">
-       <property name="text">
-        <string>Diffuse</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="specularRow">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="specularLabel">
-       <property name="text">
-        <string>Specular</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="specularPowerRow">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="specularPowerLabel">
-       <property name="text">
-        <string>Specular power</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
-     </item>
-    </layout>
    </item>
    <item>
     <spacer name="resetSpacerAbove">

@@ -405,108 +405,68 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="opacityGroupLabel">
-           <property name="textFormat">
-            <enum>Qt::TextFormat::RichText</enum>
+          <widget class="QGroupBox" name="opacityGroupBox">
+           <property name="title">
+            <string>Opacity curve</string>
            </property>
-           <property name="text">
-            <string>&lt;small&gt;&lt;b&gt;OPACITY CURVE&lt;/b&gt;&lt;/small&gt;</string>
-           </property>
+           <layout class="QFormLayout" name="opacityLayout">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="opacityShiftLabel">
+              <property name="text">
+               <string>Position</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="ctkDoubleSlider" name="opacityShiftSlider" native="true"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="opacityHeightLabel">
+              <property name="text">
+               <string>Height</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="ctkDoubleSlider" name="opacityHeightSlider" native="true"/>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="opacityShiftRow">
-           <property name="spacing">
-            <number>2</number>
+          <widget class="QGroupBox" name="colorGroupBox">
+           <property name="title">
+            <string>Color</string>
            </property>
-           <item>
-            <widget class="QLabel" name="opacityShiftLabel">
-             <property name="text">
-              <string>Position</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="ctkDoubleSlider" name="opacityShiftSlider" native="true"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="opacityHeightRow">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="opacityHeightLabel">
-             <property name="text">
-              <string>Height</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="ctkDoubleSlider" name="opacityHeightSlider" native="true"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="colorGroupSpacerAbove">
-           <property name="orientation">
-            <enum>Qt::Orientation::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Policy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>12</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="colorGroupLabel">
-           <property name="textFormat">
-            <enum>Qt::TextFormat::RichText</enum>
-           </property>
-           <property name="text">
-            <string>&lt;small&gt;&lt;b&gt;COLOR&lt;/b&gt;&lt;/small&gt;</string>
-           </property>
+           <layout class="QFormLayout" name="colorLayout">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="colorShiftLabel">
+              <property name="text">
+               <string>Position</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="ctkDoubleSlider" name="colorShiftSlider" native="true"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="colorWidthLabel">
+              <property name="text">
+               <string>Width</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="ctkDoubleSlider" name="colorWidthSlider" native="true"/>
+            </item>
+           </layout>
           </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="colorShiftRow">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="colorShiftLabel">
-             <property name="text">
-              <string>Position</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="ctkDoubleSlider" name="colorShiftSlider" native="true"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="colorWidthRow">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="colorWidthLabel">
-             <property name="text">
-              <string>Width</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="ctkDoubleSlider" name="colorWidthSlider" native="true"/>
-           </item>
-          </layout>
          </item>
          <item>
           <spacer name="resetSpacerAbove">

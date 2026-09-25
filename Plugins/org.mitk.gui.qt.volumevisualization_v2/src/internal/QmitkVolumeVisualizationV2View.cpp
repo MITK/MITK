@@ -515,12 +515,15 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   // too. The lighting panel follows its header rather than being remembered, so
   // a section left expanded comes back expanded.
   //
-  // Everything below the image section acts on a node, so with none selected it
-  // is put away rather than greyed out: the panel then asks for the one thing it
-  // needs instead of showing a page of controls none of which can be used.
-  m_Controls->transferFunctionEditor->setVisible(hasNode);
-  m_Controls->lightingExpandButton->setVisible(hasNode);
-  m_Controls->lightingWidget->setVisible(hasNode && m_Controls->lightingExpandButton->isChecked());
+  // Everything below the image section configures a rendered volume, so with no
+  // node, or with rendering off on it, it is put away rather than greyed out: the
+  // panel then asks for the one thing it needs instead of showing a page of
+  // controls none of which can be used.
+  const bool showVolumeSections = IsVolumeRenderingOn(selectedNode.GetPointer());
+
+  m_Controls->transferFunctionEditor->setVisible(showVolumeSections);
+  m_Controls->lightingExpandButton->setVisible(showVolumeSections);
+  m_Controls->lightingWidget->setVisible(showVolumeSections && m_Controls->lightingExpandButton->isChecked());
 
   // The rig is 3D-render-window state rather than widget state, and no longer
   // follows the selection. A refresh is still where a volume switched on or off

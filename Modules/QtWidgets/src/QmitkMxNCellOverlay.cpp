@@ -343,10 +343,9 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
   connect(proximity, &QmitkRenderWindowProximity::StateChanged,
           this, &QmitkMxNCellOverlay::OnProximityStateChanged);
 
-  // The group-identity dot (and the colorbar's level-marker hue) are resolved
-  // live from the group state at paint time, but a grouping change in the
-  // layout editor need not trigger a render - so repaint on the editor's
-  // link-change signal to keep them current.
+  // The colorbar's level-marker hue is resolved live from the group state at
+  // paint time, but a grouping change in the layout editor need not trigger a
+  // render - so repaint on the editor's link-change signal to keep it current.
   connect(m_Editor, &QmitkMxNMultiWidget::SyncLinksChanged, this, [this]()
   {
     this->UpdateInteractivity();
@@ -1415,7 +1414,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
                                                      FormatValue(m_LevelWindow.GetLevel())));
   }
 
-  // ---- Bottom-left: navigation (plane label, slice + dot + time) ----
+  // ---- Bottom-left: navigation (plane label, slice + time) ----
   if (this->IsPassiveVisible(false))
   {
     const QString planeLabel = this->ResolvePlaneLabel();

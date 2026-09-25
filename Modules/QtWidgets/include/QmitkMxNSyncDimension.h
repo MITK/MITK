@@ -23,8 +23,14 @@ found in the LICENSE file.
  *        per-group via the layout document's `links.<dim>` keys.
  *
  * The `selection` dimension is not part of this enum: it predates the
- * per-dimension model, has its own engine (QmitkSynchronizedWidgetConnector)
- * and its own per-cell control, and is handled by dedicated code paths.
+ * per-dimension model, has its own engine (QmitkSynchronizedWidgetConnector),
+ * and is handled by dedicated code paths.
+ *
+ * Geometry is not a dimension either. A slice step or a plane name only means
+ * the same physical location within one reference geometry, so which cells
+ * share a geometry follows from their slice and orientation links (see
+ * QmitkMxNMultiWidget::ReinitSyncGroupGeometry); linking it independently
+ * would allow slice-linked cells whose steps mean different places.
  */
 enum class QmitkMxNSyncDimension
 {

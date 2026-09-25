@@ -58,8 +58,8 @@ class vtkRenderWindow;
  *   - Navigation lives bottom-left: line 1 is the view-plane label (drawn
  *     here, in the same layer as the slice readout, so the two align; the
  *     VTK corner annotation is blanked at the cell), tracking the cell's
- *     current view direction; line 2 is `slice N/max` plus the group-identity
- *     dot, and, for time-resolved data, a clock glyph and `t n/m`.
+ *     current view direction; line 2 is `slice N/max` and, for time-resolved
+ *     data, a clock glyph and `t n/m`.
  *   - Intensity lives on the right edge and bottom-right: the colorbar (the
  *     cell's actual LUT) is a 2 px passive strip that widens into a legend +
  *     control on reveal (a value tick scale with the level marked in hue, an
@@ -67,16 +67,10 @@ class vtkRenderWindow;
  *     bottom-right beside it. Dragging the colorbar body shifts the level and
  *     dragging its ends moves the window bounds, routed through the editor's
  *     synchronized per-renderer level-window path so group members follow;
- *     double-clicking the readout opens numeric entry (the by-value setter).
+ *     clicking the readout opens numeric entry (the by-value setter).
  *   - The bottom hairline carries the slice-position tick (a solid bar); for
  *     time-resolved data the time-step position rides the same hairline as a
  *     distinct triangle marker.
- *
- * The group-identity dot is a solid hue only when every dimension the cell is
- * synchronized on names one group (mono-group); a cell spanning more than one
- * group shows a distinct complex marker instead of a single hue that would
- * misrepresent the state - the per-dimension truth lives in the sync barcode,
- * the seams, and the layout editor.
  *
  * Passive readouts are always-on and faint (the level/window readout honors
  * the MxN preference and every readout honors clean-view). The interactive

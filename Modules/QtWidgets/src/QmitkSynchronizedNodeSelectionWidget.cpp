@@ -584,10 +584,9 @@ void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType
                 << "'. Group index must be >= 1.";
   }
 
-  // No-op when the value is unchanged. Suppressing the signal emission here is
-  // load-bearing: it terminates the model->view feedback loop in which the
-  // owning utility widget mirrors this index back into its combobox via
-  // 'SetSyncGroup'.
+  // No-op when the value is unchanged, so 'SyncGroupIndexChanged' only ever
+  // reports a real change and a listener that writes the index back cannot
+  // start a feedback loop.
   if (m_SyncGroupIndex == index)
   {
     return;

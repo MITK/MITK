@@ -998,7 +998,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   // each rebuild re-arms it.
   this->ActivateMenuWidget(false);
 
-  // Layout-tracking furniture (layout editor, seams) follows this signal;
+  // Layout-tracking furniture (layout editor, sync plates) follows this signal;
   // without it a shrink leaves them rendering removed cells.
   this->RelaySplitterProportionChanges();
   emit LayoutChanged();
@@ -2714,7 +2714,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   {
     rowCounter++;
     // Pre-create the row's synchronization group via the canonical API so that
-    // every utility widget's combobox has the entry before SetSyncGroup() runs.
+    // its connector and hue exist before SetSyncGroup() binds cells to it.
     this->AddSynchronizationGroup(rowCounter);
 
     auto hSplit = new QSplitter(Qt::Horizontal);

@@ -273,12 +273,12 @@ namespace
   }
 
   /**
-   * The group card as one coherent object: dragging its background assigns the
-   * group to the map's selected cells (the whole card is the drag source, not a
-   * tiny swatch), and it accepts cell drops from the map, highlighting in the
-   * group hue while a drag hovers. Interactive children (name field, glyph
-   * strip, buttons) receive their own events first, so the drag starts only from
-   * the card's own surface.
+   * The group card as one coherent object: dragging its background onto a
+   * window assigns the group (the whole card is the drag source, not a tiny
+   * swatch), and it accepts window drops from the plates, highlighting in the
+   * group hue while a drag hovers. Interactive children (glyph strip, menu
+   * button) receive their own events first, so the drag starts only from the
+   * card's own surface.
    */
   class GroupCardFrame : public QFrame
   {
@@ -1732,7 +1732,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   card->setFrameShape(QFrame::Box);
   card->setLineWidth(1);
   card->setToolTip(tr("Drop windows here to add them to this group, or drag the card onto a "
-                      "window in the map"));
+                      "window"));
   auto* cardLayout = new QVBoxLayout(card);
   cardLayout->setContentsMargins(0, 0, 6, 6);
   cardLayout->setSpacing(4);
@@ -2524,7 +2524,7 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
     {
       axes.push_back(axis);
     }
-    // The row header already carries the label the map uses for the window.
+    // The row header already carries the label the plates use for the window.
     const auto row = std::find(m_MatrixCellIds.begin(), m_MatrixCellIds.end(), windowId);
     const auto* header = row == m_MatrixCellIds.end()
                            ? nullptr

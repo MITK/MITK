@@ -236,8 +236,7 @@ void QmitkRenderWindowUtilityWidget::paintEvent(QPaintEvent*)
 QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSyncGroup() const
 {
   // The node selection widget is the authoritative store of the cell's data-
-  // selection group (written by MxN::SetSynchronizationGroup); read it directly
-  // now that the mirroring combobox is gone. Serialization
+  // selection group (written by MxN::SetSynchronizationGroup). Serialization
   // (MakeWindowDescriptor) and the sync barcode both read through here.
   return m_NodeSelectionWidget->GetSyncGroup();
 }

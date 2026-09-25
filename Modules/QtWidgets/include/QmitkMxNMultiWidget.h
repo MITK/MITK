@@ -103,9 +103,9 @@ public:
   *   dimensions. The macro rewrites the per-cell links only - unlike
   *   'SetSyncLink' it never converges cell states, preserving the classic
   *   toggle behavior of coupling views in place. Render windows of other
-  *   editors are unaffected in both directions. Level-window stays
-  *   node-global (couples every cell showing the node, across editors) and
-  *   time stays application-global.
+  *   editors are unaffected in both directions. Windowing and LUT links are
+  *   left as they are (a new cell links both to the default group), and time
+  *   stays application-global.
   */
   void Synchronize(bool synchronized) override;
 
@@ -280,7 +280,9 @@ public:
   *   itself is never converged. Convergence is skipped while the involved
   *   render windows have no world geometry yet; use 'ReconvergeSyncGroup'
   *   once they do. `Crosshair` links carry no convergence bookkeeping
-  *   (propagation is absolute). An `Orientation` join aligns the cell to the
+  *   (propagation is absolute: the crosshair is one world point that every
+  *   member resolves into its own slice, so an offset has nothing to be
+  *   relative to). An `Orientation` join aligns the cell to the
   *   group's plane. `Windowing` / `Lut` joins do not converge: the cell keeps
   *   its own value until the group's next change propagates.
   *
@@ -734,7 +736,10 @@ public:
   *   bounding geometry of the data storage's nodes as visible in the
   *   triggering cell ("last reinit wins") - via per-window initialization;
   *   cells outside the component (and other editors) are untouched, unlike
-  *   the application-global Data Manager reinit. Afterwards the component's
+  *   the application-global Data Manager reinit. That reinit is left global:
+  *   it is the rendering manager's path shared by every editor, so scoping it
+  *   would change all of them; this call is the MxN-local way back to
+  *   per-group geometry after it. Afterwards the component's
   *   geometry-relative offsets (`Slice` / `Zoom` / `Pan` groups touching
   *   the component) are re-converged.
   *
@@ -1030,8 +1035,8 @@ Q_SIGNALS:
 
   /**
   * \brief Something about the per-dimension links or the group cosmetics
-  *        changed; structural furniture (sync editor, seams) re-reads the
-  *        engine state.
+  *        changed; structural furniture (layout editor, barcodes, frames,
+  *        plates) re-reads the engine state.
   */
   void SyncLinksChanged();
 

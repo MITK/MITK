@@ -367,7 +367,7 @@ signals:
    * The rotation modes are one of the ways to look at the interaction scheme,
    * so they are reported from where the scheme is owned rather than from
    * SetWidgetPlaneMode(). Switching to a PACS scheme, which binds no rotation
-   * at all, therefore no longer leaves the crosshair menus claiming one.
+   * at all, therefore leaves no crosshair menu claiming one.
    */
   void NotifyCrosshairRotationModeChanged(QmitkCrosshairRotationMode mode);
 

@@ -72,8 +72,11 @@ namespace mitk
 
     j = nlohmann::json{
       {"ScalarOpacity", scalarOpacity},
+      {"ScalarOpacityClamping", tf->GetScalarOpacityFunction()->GetClamping() != 0},
       {"GradientOpacity", gradientOpacity},
-      {"Color", color}};
+      {"GradientOpacityClamping", tf->GetGradientOpacityFunction()->GetClamping() != 0},
+      {"Color", color},
+      {"ColorSpace", TransferFunctionColorSpaceToString(tf->GetColorSpace())}};
 
     return true;
   }
@@ -83,7 +86,12 @@ namespace mitk
     auto tf = TransferFunction::New();
     TransferFunction::ControlPoints::value_type point; 
 
+    // Clamping and color space are absent from JSON written before they were serialized.
+    // Those transfer functions were rendered with the VTK clamping default and the HSV
+    // constructor default, so that is what they must read as.
+
     tf->ClearScalarOpacityPoints();
+    tf->GetScalarOpacityFunction()->SetClamping(j.value("ScalarOpacityClamping", true));
 
     for (const auto& opacity : j["ScalarOpacity"])
     {
@@ -92,6 +100,7 @@ namespace mitk
     }
 
     tf->ClearGradientOpacityPoints();
+    tf->GetGradientOpacityFunction()->SetClamping(j.value("GradientOpacityClamping", true));
 
     for (const auto& opacity : j["GradientOpacity"])
     {
@@ -101,6 +110,24 @@ namespace mitk
 
     auto* ctf = tf->GetColorTransferFunction();
     ctf->RemoveAllPoints();
+
+    auto colorSpace = TransferFunctionColorSpace::HSV;
+
+    if (j.contains("ColorSpace"))
+    {
+      const auto colorSpaceName = j.at("ColorSpace").get<std::string>();
+
+      if (const auto parsedColorSpace = TransferFunctionColorSpaceFromString(colorSpaceName))
+      {
+        colorSpace = *parsedColorSpace;
+      }
+      else
+      {
+        MITK_WARN << "Unknown transfer function color space \"" << colorSpaceName << "\"; falling back to HSV.";
+      }
+    }
+
+    tf->SetColorSpace(colorSpace);
 
     std::array<double, 6> value;
 

@@ -132,6 +132,9 @@ remains a consumer concern.
    (Patient) in the Plane Position macro and nothing at the top level, so the
    sorters already give it a block of its own; the separation matters for
    non-conformant files that carry top-level geometry as well.
+ - A file with a frame model, single-frame ones included, is never condensed
+   into a 3D+t image: it loads as its own volume, or stacks with other
+   single-frame files into a 3D volume.
  - Frame-aware sorting or splitting (Dimension Index Values, In-Stack Position,
    Temporal Position Index), 3D+t decomposition of one file, and Segmentation
    and Parametric Map objects are not covered. FrameNo is the hook for the

@@ -729,8 +729,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   // Cells are measured from the names they have to hold, so the entries come
   // first, and the stand-in previews after them, since their size is what the
-  // measurement settles. The grid of previews is what it opens in, and asking
-  // for it is also what puts the first icon on the button offering the other.
+  // measurement settles. The pressed view mode button decides the first layout:
+  // its signal only reports changes, and there has been none yet.
   //
   // The panel is only ever as wide as the workbench window makes it, so the
   // cells are measured from it rather than fixed, and measured again whenever
@@ -738,7 +738,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // resizeEvent: the layout has not necessarily handed the list its new
   // geometry by the time that event arrives, and a stale width would be
   // measured.
-  this->SetCompactPresetList(false);
+  this->SetCompactPresetList(m_Controls->presetListButton->isChecked());
   this->InvalidateThumbnails();
 
   presetList->viewport()->installEventFilter(this);
@@ -768,6 +768,10 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // placeholder fill that QmitkIconTheme swaps for the theme's icon colour,
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
+  m_Controls->presetGridButton->setIcon(
+    QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")));
+  m_Controls->presetListButton->setIcon(
+    QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/view-list-details.svg")));
 
   // A click rather than the current entry changing: the current entry is also
   // set from what a node records, and reacting to that would re-apply the
@@ -786,8 +790,10 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->presetListWidget, &QListWidget::customContextMenuRequested,
     this, &QmitkVolumeTransferFunctionEditor::OnPresetContextMenu);
 
-  connect(m_Controls->presetViewModeButton, &QToolButton::clicked, this,
-    [this] { this->SetCompactPresetList(!m_CompactPresetList); });
+  // The list button alone: the group is exclusive, so pressing either button
+  // toggles this one.
+  connect(m_Controls->presetListButton, &QToolButton::toggled,
+    this, &QmitkVolumeTransferFunctionEditor::SetCompactPresetList);
 
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::OpacityChanged,
     this, &QmitkVolumeTransferFunctionEditor::OnCanvasOpacityChanged);
@@ -963,8 +969,6 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
 
 void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
 {
-  m_CompactPresetList = compact;
-
   auto *presetList = m_Controls->presetListWidget;
 
   presetList->setViewMode(compact ? QListView::ListMode : QListView::IconMode);
@@ -984,17 +988,6 @@ void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
   // reader looks for first after a switch is the one in force.
   if (const auto *appliedPreset = this->AppliedPresetItem(); appliedPreset != nullptr)
     presetList->scrollToItem(appliedPreset);
-
-  // The icon names the presentation pressing the button brings rather than the
-  // one in force, the way the view's rendering button names what pressing it
-  // does.
-  m_Controls->presetViewModeButton->setIcon(QmitkIconTheme::GetIcon(compact
-    ? QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")
-    : QStringLiteral(":/VolumeVisualizationUI/view-list-details.svg")));
-
-  m_Controls->presetViewModeButton->setToolTip(compact
-    ? "Show the presets as a grid of previews."
-    : "Show the presets as a list, with a smaller preview beside each name.");
 }
 
 void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
@@ -1019,7 +1012,7 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
   QSize previewSize;
   QSize cellSize;
 
-  if (m_CompactPresetList)
+  if (m_Controls->presetListButton->isChecked())
   {
     previewSize = PreviewSize(COMPACT_PREVIEW_WIDTH);
 
@@ -1085,7 +1078,7 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
 
   // An invalid size is how a view is told it has no grid, which is what a
   // single column of entries sized to the panel already is.
-  presetList->setGridSize(m_CompactPresetList ? QSize() : cellSize);
+  presetList->setGridSize(m_Controls->presetListButton->isChecked() ? QSize() : cellSize);
 
   // The size just settled on is the one the stand-ins were built for, and on
   // the first pass they were built for a viewport no layout had sized yet.
@@ -1518,7 +1511,8 @@ void QmitkVolumeTransferFunctionEditor::UpdateControlAvailability()
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
-  m_Controls->presetViewModeButton->setEnabled(hasNode);
+  m_Controls->presetGridButton->setEnabled(hasNode);
+  m_Controls->presetListButton->setEnabled(hasNode);
   m_Controls->presetListWidget->setEnabled(hasNode && !m_EditModeActive);
   m_Controls->editModeButton->setEnabled(adjustable);
   m_Controls->adjustPresetPanel->setEnabled(adjustable && !m_EditModeActive);

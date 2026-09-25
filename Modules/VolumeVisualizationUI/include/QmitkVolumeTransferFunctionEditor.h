@@ -517,16 +517,6 @@ private:
    */
   bool m_ColorHandlesRestored = false;
 
-  /** \brief Whether the presets are listed as names beside small previews
-   *         rather than laid out as a grid of large ones.
-   *
-   * The only record of the choice. The button that makes it is not checkable,
-   * since its icon names the presentation pressing it brings rather than the
-   * one in force, and a second copy of the state is a second thing to keep in
-   * step with this one.
-   */
-  bool m_CompactPresetList = false;
-
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };
 

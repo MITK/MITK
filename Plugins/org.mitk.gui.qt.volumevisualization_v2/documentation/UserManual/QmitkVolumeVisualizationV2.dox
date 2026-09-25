@@ -62,12 +62,13 @@ appear progressively.
 
 \imageMacro{QmitkVolumeVisualizationV2_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
 
-The button above the grid, at its right, lays the same presets out as a list
-instead: one row each, the name beside a preview too small to study but
-large enough to say which colours a preset brings. More of the catalogue is on
-screen that way, and the names line up in one column, which is the quicker way
-in once they are familiar. Pressing it again brings the grid back; nothing is
-drawn a second time either way. The view starts in the grid every time it is
+The two buttons above the grid, at its right, choose how the presets are laid
+out; the pressed one is the layout in force. The first is the grid. The second
+lays the same presets out as a list: one row each, the name beside a preview
+too small to study but large enough to say which colours a preset brings. More
+of the catalogue is on screen that way, and the names line up in one column,
+which is the quicker way in once they are familiar. Nothing is drawn a second
+time on a switch either way. The view starts in the grid every time it is
 opened.
 
 The catalogue is the Hounsfield-based preset library shared across medical

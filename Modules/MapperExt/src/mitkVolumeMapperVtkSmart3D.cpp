@@ -82,6 +82,15 @@ vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
+  bool volumeRendering = false;
+  this->GetDataNode()->GetBoolProperty("volumerendering", volumeRendering, renderer);
+
+  // Hidden while this is off, so there is nothing to place, and reaching the
+  // image for its spacing would take the image lock on every frame and build a
+  // VTK representation for each time step visited.
+  if (!volumeRendering)
+    return;
+
   auto *imageData = this->GetInputImage();
 
   if (nullptr == imageData)
@@ -168,7 +177,7 @@ vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
   auto input = dynamic_cast<mitk::Image*>(this->GetDataNode()->GetData());
 
   // UpdateVtkTransform calls this before anything has established that the node
-  // still holds an image, and it runs whether or not rendering is switched on.
+  // still holds an image.
   if (nullptr == input)
     return nullptr;
 

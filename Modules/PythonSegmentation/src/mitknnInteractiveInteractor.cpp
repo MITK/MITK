@@ -52,36 +52,12 @@ namespace mitk::nnInteractive
 
     void BlockLMBDisplayInteraction()
     {
-      if (!m_EventConfigBackup.empty())
-        return;
-
-      for (const auto& eventObserverReference : us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>())
-      {
-        auto eventObserver = us::GetModuleContext()->GetService(eventObserverReference);
-        auto eventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(eventObserver);
-
-        if (eventBroadcast == nullptr)
-          continue;
-
-        m_EventConfigBackup.emplace_back(eventObserverReference, eventBroadcast->GetEventConfig());
-        eventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
-      }
+      m_DisplayLeftButtonBlock = DisplayActionEventBroadcast::BlockLeftButton();
     }
 
     void UnblockLMBDisplayInteraction()
     {
-      for (const auto& [eventObserverReference, eventConfig] : m_EventConfigBackup)
-      {
-        if (eventObserverReference)
-        {
-          auto eventObserver = us::GetModuleContext()->GetService<InteractionEventObserver>(eventObserverReference);
-
-          if (eventObserver != nullptr)
-            static_cast<DisplayActionEventBroadcast*>(eventObserver)->SetEventConfig(eventConfig);
-        }
-      }
-
-      m_EventConfigBackup.clear();
+      m_DisplayLeftButtonBlock.Reset();
     }
 
     ToolManager* GetToolManager() const
@@ -99,7 +75,7 @@ namespace mitk::nnInteractive
     bool IsEnabled;
 
   private:
-    std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
+    DisplayActionEventBroadcast::LeftButtonBlock m_DisplayLeftButtonBlock;
     // Raw, like Tool::m_ToolManager: the manager owns the tool which owns the
     // interactors, so it always outlives them. A smart pointer would cycle.
     ToolManager* m_ToolManager = nullptr;

@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/org_mitk_presets">
+    <file alias="Classic">presets/classic.json</file>
+    <file alias="Segmentation only">presets/segmentation_only.json</file>
+    <file alias="ModelFit">presets/modelfit.json</file>
+  </qresource>
+</RCC>

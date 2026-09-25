@@ -18,6 +18,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage MITKSegmentationStackFormatPage
  -# \subpage MITKROIPage
  -# \subpage PropertiesPage
+ -# \subpage ProgressReportingPage
  -# \subpage GeometryOverviewPage
  -# \subpage PipelineingConceptPage
  -# \subpage AnnotationPage

@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
+#include <mitkImageStatisticsContainer.h>
 
 #include <QWidget>
 #include <memory>
@@ -101,12 +102,33 @@ public:
    */
   unsigned int GetHistogramNBins() const;
 
+  /**
+   * \brief Offers or hides check boxes on the label rows of the statistics tree.
+   * \sa QmitkImageStatisticsTreeModel::SetLabelsCheckable
+   */
+  void SetLabelsCheckable(bool checkable);
+
+  /**
+   * \brief Returns whether the given label is checked in the statistics tree.
+   * \sa QmitkImageStatisticsTreeModel::IsLabelChecked
+   */
+  bool IsLabelChecked(mitk::ImageStatisticsContainer::LabelValueType labelValue) const;
+
 signals:
   /**
    * \brief Emitted when the user toggles the "ignore zero-valued voxels" checkbox.
    * \param[in] status The new checkbox state.
    */
   void IgnoreZeroValuedVoxelStateChanged(Qt::CheckState status);
+
+  /** \brief Emitted when the user changed the check state of a label row. */
+  void LabelCheckStateChanged();
+
+  /**
+   * \brief Emitted after the tree was rebuilt because an input was renamed or a label was
+   * renamed or recolored. The statistics themselves are unchanged.
+   */
+  void InputDisplayChanged();
 
 private:
   void CreateConnections();

@@ -39,7 +39,7 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
   // calculate where the current slice is in comparison to the lower and upper neighboring slices
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
-  AccessFixedDimensionByItk_3(resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
+  AccessFixedDimensionByItk_3(resultImage, InterpolateIntermediateSlice, 2, lowerDistanceImage, upperDistanceImage, ratio);
 
   return resultImage;
 }
@@ -128,13 +128,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
   CastToItkImage(lower, lowerITK);
   CastToItkImage(upper, upperITK);
 
-  itk::ImageRegionConstIteratorWithIndex<DistanceFilterImageType> lowerIter(lowerITK,
-                                                                            lowerITK->GetLargestPossibleRegion());
-
-  lowerIter.GoToBegin();
-
-  // The loop below iterates the full lower region and accesses upper and result
-  // at the same indices, so all three regions must match exactly.
+  // The loop below walks the three buffers in parallel, so all three regions must match exactly.
   if (lowerITK->GetLargestPossibleRegion() != upperITK->GetLargestPossibleRegion() ||
       lowerITK->GetLargestPossibleRegion() != result->GetLargestPossibleRegion())
   {
@@ -142,16 +136,18 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
       << "The regions of the slices for the 2D interpolation are not equally sized.";
   }
 
-  float weight[2] = {1.0f - ratio, ratio};
-  while (!lowerIter.IsAtEnd())
+  const auto* lowerDistances = lowerITK->GetBufferPointer();
+  const auto* upperDistances = upperITK->GetBufferPointer();
+  auto* resultPixels = result->GetBufferPointer();
+  const auto numberOfPixels = result->GetLargestPossibleRegion().GetNumberOfPixels();
+
+  const float lowerWeight = 1.0f - ratio;
+  const float upperWeight = ratio;
+
+  for (itk::SizeValueType i = 0; i < numberOfPixels; ++i)
   {
-    typename DistanceFilterImageType::PixelType lowerPixelVal = lowerIter.Get();
-    typename DistanceFilterImageType::PixelType upperPixelVal = upperITK->GetPixel(lowerIter.GetIndex());
-    typename DistanceFilterImageType::PixelType intermediatePixelVal =
-      (weight[0] * upperPixelVal + weight[1] * lowerPixelVal > 0 ? 0 : 1);
-
-    result->SetPixel(lowerIter.GetIndex(), static_cast<TPixel>(intermediatePixelVal));
-
-    ++lowerIter;
+    resultPixels[i] = lowerWeight * lowerDistances[i] + upperWeight * upperDistances[i] > 0
+      ? static_cast<TPixel>(0)
+      : static_cast<TPixel>(1);
   }
 }

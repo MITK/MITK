@@ -2357,7 +2357,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "List StdMultiWidget render windows",
-        "description": "Returns the StdMultiWidget editor's render windows. Each item carries the window id (URL segment for sub-resources), its kind (2D or 3D), and (for 2D windows) the persisted `view_direction`. No `plane` field is reported -- under swivel mode the live plane is not guaranteed to match an anatomical one; read orientation from the window's /camera if needed.",
+        "description": "Returns the StdMultiWidget editor's render windows. Each item carries the window id (URL segment for sub-resources), its kind (2D or 3D), and (for 2D windows) the persisted `view_direction`. No `plane` field is reported -- under crosshair rotation the live plane is not guaranteed to match an anatomical one; read orientation from the window's /camera if needed.",
         "operationId": "getRenderingStdmultiWindows",
         "responses": {
           "200": {
@@ -2546,7 +2546,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get selected slice of a StdMultiWidget 2D window",
-        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported -- under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
+        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported -- under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
         "operationId": "getRenderingStdmultiSelectedSlice",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowId" }

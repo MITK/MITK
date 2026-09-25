@@ -194,6 +194,12 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
   {
     if (visible)
     {
+      // Drawn in a slice, the contour belongs to the 2D windows. The 3D windows would render
+      // it as a tube whenever something else makes them render mid-stroke. Set here rather
+      // than once, so that 3D windows opened since are covered as well.
+      for (const auto& [renderWindow, renderer] : BaseRenderer::GetAll3DRenderWindows())
+        m_FeedbackContourNode->SetVisibility(false, renderer);
+
       // Add the feedback contour node as a derived node of the first working data.
       // If there is no working data, the node is added at the top level.
       storage->Add(m_FeedbackContourNode, this->GetWorkingDataNode());

@@ -56,6 +56,9 @@ namespace mitk
   *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
   *   - \b "Surface.TransferFunction (TransferFunctionProperty) Set a transferfunction for coloring the surface
   *   - \b "LookupTable (LookupTableProperty) LookupTable
+  *   - \b "pulsing": (BoolProperty) While true, the lit color of the surface pulses, for example
+  *        to show that it is about to be replaced. The pulse advances only when the 3D windows
+  *        render, so whoever sets the property keeps them rendering until it resets it.
 
   * Properties to look for are:
   *
@@ -102,6 +105,9 @@ namespace mitk
      * \return Pointer to the vtkProp (vtkActor) used for 3D rendering.
      */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+
+    /** \brief Also advances the pulse of a "pulsing" surface, on every render. */
+    void Update(mitk::BaseRenderer *renderer) override;
 
     /**
      * \brief Apply all material, color, opacity, and scalar visibility properties to the given actor.
@@ -156,6 +162,8 @@ namespace mitk
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
       /** \brief Timestamp tracking the last shader update. */
       itk::TimeStamp m_ShaderTimestampUpdate;
+      /** \brief Whether the actor carries the shader code of the "pulsing" property. */
+      bool m_HasPulseShader = false;
 
       LocalStorage()
       {

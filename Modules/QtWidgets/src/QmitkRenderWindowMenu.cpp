@@ -44,6 +44,14 @@ found in the LICENSE file.
 
 namespace
 {
+  /* One turn per 27 seconds is the speed the auto rotation had when it
+   * advanced the 360 position camera stepper every 75 ms. The interval is now
+   * only how often the angle is recomputed, so it can be picked for smooth
+   * motion rather than for speed.
+   */
+  constexpr double AUTO_ROTATION_SECONDS_PER_TURN = 27.0;
+  constexpr int AUTO_ROTATION_INTERVAL = 16;
+
   mitk::IPreferences* GetPreferences()
   {
     auto preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -64,7 +72,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   , m_FullScreenMode(false)
   , m_Renderer(baseRenderer)
   , m_Parent(parent)
-  , m_CrosshairRotationMode(0)
+  , m_CrosshairRotationMode(QmitkCrosshairRotationMode::None)
   , m_CrosshairVisibility(true)
   , m_Crosshair3DVisibility(true)
   , m_Layout(LayoutIndex::Axial)
@@ -79,9 +87,10 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   this->hide();
 
   m_AutoRotationTimer = new QTimer(this);
-  m_AutoRotationTimer->setInterval(75);
+  m_AutoRotationTimer->setTimerType(Qt::PreciseTimer);
+  m_AutoRotationTimer->setInterval(AUTO_ROTATION_INTERVAL);
 
-  connect(m_AutoRotationTimer, &QTimer::timeout, this, &QmitkRenderWindowMenu::AutoRotateNextStep);
+  connect(m_AutoRotationTimer, &QTimer::timeout, this, &QmitkRenderWindowMenu::AutoRotateNextFrame);
   connect(m_Parent, &QObject::destroyed, this, &QmitkRenderWindowMenu::deleteLater);
 }
 
@@ -193,7 +202,7 @@ void QmitkRenderWindowMenu::UpdateCrosshair3DVisibility(bool visible)
   m_Crosshair3DVisibility = visible;
 }
 
-void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(int mode)
+void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode)
 {
   m_CrosshairRotationMode = mode;
 }
@@ -345,12 +354,20 @@ void QmitkRenderWindowMenu::ChangeFullScreenIcon()
   m_FullScreenButton->setIcon(m_FullScreenMode ? QPixmap(iconLeaveFullScreen_xpm) : QPixmap(iconFullScreen_xpm));
 }
 
-void QmitkRenderWindowMenu::AutoRotateNextStep()
+void QmitkRenderWindowMenu::AutoRotateNextFrame()
 {
-  if (m_Renderer->GetCameraRotationController())
+  auto* cameraRotationController = m_Renderer->GetCameraRotationController();
+  if (nullptr == cameraRotationController)
   {
-    m_Renderer->GetCameraRotationController()->GetStepper()->Next();
+    return;
   }
+
+  // Deriving the angle from the elapsed time keeps the rotation at the same
+  // angular speed when a frame takes longer than the timer interval. The scene
+  // then simply gets fewer frames instead of rotating more slowly.
+  const auto elapsed = m_AutoRotationElapsed.restart();
+
+  cameraRotationController->RotateCameraBy(-360.0 * elapsed / (1000.0 * AUTO_ROTATION_SECONDS_PER_TURN));
 }
 
 void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
@@ -358,11 +375,10 @@ void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
   if (m_AutoRotationTimer->isActive())
   {
     m_AutoRotationTimer->stop();
-    m_Renderer->GetCameraRotationController()->GetStepper()->PingPongOff();
   }
   else
   {
-    m_Renderer->GetCameraRotationController()->GetStepper()->PingPongOn();
+    m_AutoRotationElapsed.start();
     m_AutoRotationTimer->start();
   }
 }
@@ -454,33 +470,25 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
     noCrosshairRotation->setActionGroup(rotationModeActionGroup);
     noCrosshairRotation->setText("No crosshair rotation");
     noCrosshairRotation->setCheckable(true);
-    noCrosshairRotation->setChecked(m_CrosshairRotationMode == 0);
-    noCrosshairRotation->setData(0);
+    noCrosshairRotation->setChecked(m_CrosshairRotationMode == QmitkCrosshairRotationMode::None);
+    noCrosshairRotation->setData(QVariant::fromValue(QmitkCrosshairRotationMode::None));
     crosshairModesMenu->addAction(noCrosshairRotation);
 
     QAction *singleCrosshairRotation = new QAction(crosshairModesMenu);
     singleCrosshairRotation->setActionGroup(rotationModeActionGroup);
     singleCrosshairRotation->setText("Crosshair rotation");
     singleCrosshairRotation->setCheckable(true);
-    singleCrosshairRotation->setChecked(m_CrosshairRotationMode == 1);
-    singleCrosshairRotation->setData(1);
+    singleCrosshairRotation->setChecked(m_CrosshairRotationMode == QmitkCrosshairRotationMode::Single);
+    singleCrosshairRotation->setData(QVariant::fromValue(QmitkCrosshairRotationMode::Single));
     crosshairModesMenu->addAction(singleCrosshairRotation);
 
     QAction *coupledCrosshairRotation = new QAction(crosshairModesMenu);
     coupledCrosshairRotation->setActionGroup(rotationModeActionGroup);
     coupledCrosshairRotation->setText("Coupled crosshair rotation");
     coupledCrosshairRotation->setCheckable(true);
-    coupledCrosshairRotation->setChecked(m_CrosshairRotationMode == 2);
-    coupledCrosshairRotation->setData(2);
+    coupledCrosshairRotation->setChecked(m_CrosshairRotationMode == QmitkCrosshairRotationMode::Coupled);
+    coupledCrosshairRotation->setData(QVariant::fromValue(QmitkCrosshairRotationMode::Coupled));
     crosshairModesMenu->addAction(coupledCrosshairRotation);
-
-    QAction *swivelMode = new QAction(crosshairModesMenu);
-    swivelMode->setActionGroup(rotationModeActionGroup);
-    swivelMode->setText("Swivel mode");
-    swivelMode->setCheckable(true);
-    swivelMode->setChecked(m_CrosshairRotationMode == 3);
-    swivelMode->setData(3);
-    crosshairModesMenu->addAction(swivelMode);
 
     connect(rotationModeActionGroup, &QActionGroup::triggered, this, &QmitkRenderWindowMenu::OnCrosshairRotationModeSelected);
   }
@@ -574,7 +582,7 @@ void QmitkRenderWindowMenu::OnCrosshair3DVisibilityChanged(bool visible)
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction *action)
 {
-  UpdateCrosshairRotationMode(action->data().toInt());
+  UpdateCrosshairRotationMode(action->data().value<QmitkCrosshairRotationMode>());
   emit CrosshairRotationModeChanged(m_CrosshairRotationMode);
 }
 

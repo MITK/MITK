@@ -87,13 +87,22 @@ namespace mitk
       **/
     void SetViewDirection(mitk::AnatomicalPlane viewDirection);
 
-    /** \brief Reorient the slice (e.g. rotation and translation like the swivel mode).
+    /** \brief Reorient the slice (e.g. rotation and translation like the crosshair rotation).
       **/
     void ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation);
 
     /** \brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
       **/
     void Render();
+
+    /**
+     * \brief Whether a render shows anything but the background.
+     *
+     * Renders once more without swapping buffers and reads the back buffer, as vtkTesting
+     * does. Any pixel differing from the one in the corner, which only the background
+     * covers, counts. For tests that check that something is drawn at all, or nothing.
+     */
+    bool RendersAnything();
 
     /** \brief Returns the datastorage, in order to modify the data inside a rendering test.
       **/

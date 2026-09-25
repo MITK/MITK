@@ -32,6 +32,10 @@ mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWi
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkRunInputBlockingTest QmitkRunInputBlockingTest
+  -platform minimal
+)
+
 # Schema validation of the MxN v2 layout (schema examples, in-tree preset,
 # MITK-Data fixtures) is exercised by the pytest suite in
 # Modules/Python/test/pytest/test_layout/test_schema_round_trip.py. That

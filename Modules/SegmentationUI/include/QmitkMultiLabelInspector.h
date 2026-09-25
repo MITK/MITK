@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QWidget>
 #include <QItemSelectionModel>
 #include <memory>
+#include <optional>
 
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
@@ -100,6 +101,14 @@ public:
    */
   LabelValueVectorType GetCurrentlyAffactedLabelInstances() const;
 
+  /** \brief Returns the group that RemoveGroup() would delete, or std::nullopt if there is none.
+   *
+   * It is the group of the first selected label. Only if no label is selected, which can only be
+   * the case if the segmentation contains no labels at all, the group of the item that currently
+   * has the focus in the tree view is used.
+   */
+  std::optional<mitk::MultiLabelSegmentation::GroupIndexType> GetGroupIDForRemoval() const;
+
   /** \brief Returns the values of all label instances that are of the same label (class) like the first selected label instance.
    *
    * If no label is selected an empty vector will be returned.
@@ -140,6 +149,13 @@ Q_SIGNALS:
 
   /** \brief Signal is emitted, if the segmentation is changed that is observed by the inspector.*/
   void SegmentationChanged() const;
+
+  /** \brief Signal that is emitted, if the item that has the focus in the tree view changed.
+  *
+  * In contrast to CurrentSelectionChanged, this also covers items that cannot be selected at
+  * all, like groups (see GetCurrentLabel() for the notion of focus).
+  */
+  void CurrentItemChanged() const;
 
 public Q_SLOTS:
 
@@ -342,6 +358,14 @@ private Q_SLOTS:
   QWidgetAction* CreateOpacityAction();
 
 private:
+  /** \brief Returns the group of the item that currently has the focus in the tree view
+   * (see GetCurrentLabel()), or std::nullopt if no item has the focus.
+   */
+  std::optional<mitk::MultiLabelSegmentation::GroupIndexType> GetCurrentGroupID() const;
+
+  /** \brief Asks the user for confirmation and removes the passed group on approval.*/
+  void RemoveGroupWithConfirmation(mitk::MultiLabelSegmentation::GroupIndexType groupID);
+
   bool m_ShowVisibility = true;
   bool m_ShowLock = true;
   bool m_ShowOther = false;

@@ -267,6 +267,11 @@ namespace mitk
     d->RemoveProgressCallback(callback);
   }
 
+  void AbstractFileWriter::ReportProgress(float progress) { d->ReportProgress(progress); }
+
+  void AbstractFileWriter::SetProgressTask(ProgressTask *task) { d->SetProgressTask(task); }
+  ProgressTask *AbstractFileWriter::GetProgressTask() const { return d->GetProgressTask(); }
+
   ////////////////// µS related Getters //////////////////
 
   int AbstractFileWriter::GetRanking() const { return d->GetRanking(); }

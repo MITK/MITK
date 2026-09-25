@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSurfaceVtkLegacyIO.h"
+#include "mitkVtkFileIOProgressObserver.h"
 
 #include <mitkIOMimeTypes.h>
 #include <mitkSurface.h>
@@ -41,6 +42,11 @@ namespace mitk
     const std::string fileName = this->GetLocalFileName();
     vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
     reader->SetFileName(fileName.c_str());
+    VtkFileIOProgressObserver progress(reader, [this](float p)
+      {
+        this->AbstractFileReader::ReportProgress(p);
+      });
+
     reader->Update();
 
     if (reader->GetOutput() != nullptr)
@@ -95,6 +101,11 @@ namespace mitk
       // The legacy vtk poly data writer cannot write to streams
       LocalFile localFile(this);
       writer->SetFileName(localFile.GetFileName().c_str());
+
+      VtkFileIOProgressObserver progress(writer, [this, t, timesteps](float p)
+        {
+          this->AbstractFileWriter::ReportProgress((t + p) / timesteps);
+        });
 
       if (writer->Write() == 0 || writer->GetErrorCode() != 0)
       {

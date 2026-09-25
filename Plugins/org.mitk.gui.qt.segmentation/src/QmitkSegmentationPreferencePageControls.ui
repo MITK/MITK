@@ -250,7 +250,7 @@
      </property>
     </widget>
    </item>
-   <item row="17" column="1">
+   <item row="19" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -353,6 +353,30 @@
      </property>
      <property name="checked">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="17" column="1">
+    <widget class="Line" name="line_7">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="0">
+    <widget class="QLabel" name="interpolation3DLabel">
+     <property name="text">
+      <string>3D interpolation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="1">
+    <widget class="QCheckBox" name="interpolation3DMeshCheckBox">
+     <property name="toolTip">
+      <string>If checked, confirming a 3D interpolation also adds the interpolated surface as a mesh below the segmentation.</string>
+     </property>
+     <property name="text">
+      <string>Add the interpolated surface as a mesh on confirmation</string>
      </property>
     </widget>
    </item>

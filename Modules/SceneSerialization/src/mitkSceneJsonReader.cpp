@@ -20,8 +20,10 @@ found in the LICENSE file.
 #include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
 #include <mitkPropertyList.h>
+#include <mitkStorageThreadDispatcherBase.h>
 #include <mitkUIDGenerator.h>
 #include <mitkUIDManipulator.h>
 
@@ -31,6 +33,7 @@ found in the LICENSE file.
 #include <fstream>
 #include <list>
 #include <map>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
@@ -685,6 +688,29 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
   // BaseData with the same UID), so a collision here is logged only.
   std::set<std::string> seenDataUids;
 
+  // Reports through the caller when there is one, so that opening a scene file
+  // raises a single notification rather than one for the file and another for
+  // the scene inside it. The two passes below visit every node once, which is
+  // where the budget comes from.
+  const auto steps = static_cast<unsigned int>(entries.size() * 2);
+
+  std::optional<ProgressTask> ownTask;
+
+  if (nullptr == m_ProgressTask)
+    ownTask.emplace(std::string("Loading scene"), steps);
+
+  auto &task = ownTask.has_value()
+    ? ownTask.value()
+    : *m_ProgressTask;
+
+  if (nullptr != m_ProgressTask)
+    m_ProgressTask->AddStepsToDo(steps);
+
+  // Each node's data is read through IOUtil, which would otherwise both raise
+  // a notification per node and, by adding its own steps here, keep moving
+  // this bar backwards as it discovers them.
+  IOUtil::QuietProgress quietProgress;
+
   // ---- 4. Pass 1: create nodes, load data, apply data-level properties.
   //
   // Data-level properties are applied here because they live on the loaded
@@ -738,6 +764,8 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
                   << "': 'data_properties' is ignored because the node carries no 'transfer' block.";
         nonFatalError = true;
       }
+
+      task.Progress();
       continue;
     }
 
@@ -882,6 +910,8 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     }
 
     mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(entry.dataNode->GetData());
+
+    task.Progress();
   }
 
   // ---- 5. Pass 2: topological add + apply property maps ------------------
@@ -928,74 +958,86 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
         parents->push_back(entries[uidIndex.find(entry.parentUid)->second].dataNode);
       }
 
-      storage->Add(entry.dataNode, parents);
+      // Handed over as one operation: Add() publishes the node, so the thread
+      // that owns the storage is free to build mappers for it and render it
+      // from that moment on, and the property work below writes into the very
+      // lists those mappers read. It also has to run after Add() rather than
+      // before it, because mapper defaults are in place by then; `replace`
+      // clears them and `modify` merges on top of them. In headless contexts
+      // the property lists are still empty at this point and the two styles
+      // coincide (see the Pass-1 note).
+      RunWhereTheDataLives([&]()
+        {
+          storage->Add(entry.dataNode, parents);
+
+          const json &nodeJson = *entry.nodeJson;
+
+          // Property-map application can still throw on semantic errors that
+          // aren't checkable without I/O (bad `_file` target, nested `_file`,
+          // invalid `_loadstyle`). We downgrade these to non-fatal per-node
+          // errors so that storage is never left partially populated after a
+          // node has already been added.
+          const auto propsIt = nodeJson.find(FIELD_PROPERTIES);
+          if (propsIt != nodeJson.end() && !propsIt->is_null())
+          {
+            const std::string ctx = "node '" + entry.uid + "'.properties";
+            try
+            {
+              // GetPropertyList() returns the always-present default list constructed
+              // by DataNode; null check intentionally omitted (the named-context call
+              // below may legitimately be null and is checked there).
+              PropertyList *defaultList = entry.dataNode->GetPropertyList();
+              ApplyPropertyMap(*defaultList, *propsIt, basePath, ctx);
+
+              // Drop transient properties (e.g. the "selected" UI flag) that may be
+              // present in older scene files, so reloading does not resurrect
+              // runtime or UI state. Mirrors SceneReaderV1 (XML).
+              mitk::SceneReaderHelpers::StripTransientProperties(*defaultList, entry.dataNode->GetData());
+            }
+            catch (const mitk::Exception &e)
+            {
+              MITK_ERROR << "Failed to apply " << ctx << ": " << e.what();
+              nonFatalError = true;
+            }
+          }
+
+          const auto ctxIt = nodeJson.find(FIELD_CONTEXT_PROPERTIES);
+          if (ctxIt != nodeJson.end() && !ctxIt->is_null())
+          {
+            // Structural shape of `context_properties` was validated in step 3b
+            // so Pass 2 never throws structurally after storage->Add.
+            for (auto cit = ctxIt->begin(); cit != ctxIt->end(); ++cit)
+            {
+              const std::string contextName = cit.key();
+              PropertyList *ctxList = entry.dataNode->GetPropertyList(contextName);
+              if (ctxList == nullptr)
+              {
+                MITK_WARN << "Could not obtain property list for context '" << contextName << "' on node '"
+                          << entry.uid << "'. Skipping.";
+                nonFatalError = true;
+                continue;
+              }
+              const std::string ctx = "node '" + entry.uid + "'.context_properties['" + contextName + "']";
+              try
+              {
+                ApplyPropertyMap(*ctxList, cit.value(), basePath, ctx);
+                mitk::SceneReaderHelpers::StripTransientProperties(*ctxList, entry.dataNode->GetData());
+              }
+              catch (const mitk::Exception &e)
+              {
+                MITK_ERROR << "Failed to apply " << ctx << ": " << e.what();
+                nonFatalError = true;
+              }
+            }
+          }
+        });
+
+      if (nullptr != m_LoadedNodes)
+        m_LoadedNodes->push_back(entry.dataNode);
       added[i] = true;
       ++addedCount;
 
-      // If a RenderingManager observes `storage`, mapper defaults are now in
-      // place on the node; `replace` clears them and `modify` merges on top
-      // of them. In headless contexts the property lists are still empty at
-      // this point and the two styles coincide (see the Pass-1 note).
-      const json &nodeJson = *entry.nodeJson;
-
-      // Property-map application can still throw on semantic errors that
-      // aren't checkable without I/O (bad `_file` target, nested `_file`,
-      // invalid `_loadstyle`). We downgrade these to non-fatal per-node
-      // errors so that storage is never left partially populated after a
-      // node has already been added.
-      const auto propsIt = nodeJson.find(FIELD_PROPERTIES);
-      if (propsIt != nodeJson.end() && !propsIt->is_null())
-      {
-        const std::string ctx = "node '" + entry.uid + "'.properties";
-        try
-        {
-          // GetPropertyList() returns the always-present default list constructed
-          // by DataNode; null check intentionally omitted (the named-context call
-          // below may legitimately be null and is checked there).
-          PropertyList *defaultList = entry.dataNode->GetPropertyList();
-          ApplyPropertyMap(*defaultList, *propsIt, basePath, ctx);
-
-          // Drop transient properties (e.g. the "selected" UI flag) that may be
-          // present in older scene files, so reloading does not resurrect
-          // runtime or UI state. Mirrors SceneReaderV1 (XML).
-          mitk::SceneReaderHelpers::StripTransientProperties(*defaultList, entry.dataNode->GetData());
-        }
-        catch (const mitk::Exception &e)
-        {
-          MITK_ERROR << "Failed to apply " << ctx << ": " << e.what();
-          nonFatalError = true;
-        }
-      }
-
-      const auto ctxIt = nodeJson.find(FIELD_CONTEXT_PROPERTIES);
-      if (ctxIt != nodeJson.end() && !ctxIt->is_null())
-      {
-        // Structural shape of `context_properties` was validated in step 3b
-        // so Pass 2 never throws structurally after storage->Add.
-        for (auto cit = ctxIt->begin(); cit != ctxIt->end(); ++cit)
-        {
-          const std::string contextName = cit.key();
-          PropertyList *ctxList = entry.dataNode->GetPropertyList(contextName);
-          if (ctxList == nullptr)
-          {
-            MITK_WARN << "Could not obtain property list for context '" << contextName << "' on node '"
-                      << entry.uid << "'. Skipping.";
-            nonFatalError = true;
-            continue;
-          }
-          const std::string ctx = "node '" + entry.uid + "'.context_properties['" + contextName + "']";
-          try
-          {
-            ApplyPropertyMap(*ctxList, cit.value(), basePath, ctx);
-            mitk::SceneReaderHelpers::StripTransientProperties(*ctxList, entry.dataNode->GetData());
-          }
-          catch (const mitk::Exception &e)
-          {
-            MITK_ERROR << "Failed to apply " << ctx << ": " << e.what();
-            nonFatalError = true;
-          }
-        }
-      }
+      task.Progress();
     }
   }
 

@@ -17,8 +17,6 @@ found in the LICENSE file.
 #include <mitkSceneIO.h>
 #include <mitkStandaloneDataStorage.h>
 
-#include <algorithm>
-
 namespace mitk
 {
   SceneFileReader::SceneFileReader() : AbstractFileReader()
@@ -36,28 +34,24 @@ namespace mitk
 
   DataStorage::SetOfObjects::Pointer SceneFileReader::Read(DataStorage &ds)
   {
-    DataStorage::SetOfObjects::ConstPointer oldNodes = ds.GetAll();
     SceneIO::Pointer sceneIO = SceneIO::New();
+
+    // The scene reports into this reader's task, so that reading the file
+    // and reading the scene inside it share one notification.
+    sceneIO->SetProgressTask(this->GetProgressTask());
+
     sceneIO->LoadScene(this->GetLocalFileName(), &ds, false);
-    DataStorage::SetOfObjects::ConstPointer newNodes = ds.GetAll();
 
-    // Compute the difference: nodes present after load but not before.
-    DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
+    // Taken from the reader that added them rather than worked out by comparing
+    // the storage before and after. Reading runs on a worker thread while the
+    // thread that owns the storage keeps handling events, so anything another
+    // handler adds meanwhile would land in such a difference and be reported
+    // as part of the scene.
+    auto loadedNodes = sceneIO->GetLoadedNodes();
+    auto result = DataStorage::SetOfObjects::New();
 
-    unsigned int index = 0;
-    for (DataStorage::SetOfObjects::ConstIterator iter = newNodes->Begin(), iterEnd = newNodes->End(); iter != iterEnd;
-         ++iter)
-    {
-      if (!oldNodes->empty())
-      {
-        if (std::find(oldNodes->begin(), oldNodes->end(), iter.Value()) == oldNodes->end())
-          result->InsertElement(index++, iter.Value());
-      }
-      else
-      {
-        result->InsertElement(index++, iter.Value());
-      }
-    }
+    for (const auto &node : *loadedNodes)
+      result->push_back(node);
 
     return result;
   }

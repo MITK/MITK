@@ -49,6 +49,7 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QErrorMessage>
+#include <QSignalBlocker>
 #include <QTimer>
 #include <QThreadPool>
 
@@ -649,6 +650,19 @@ void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
   if (nullptr == regModule)
     return;
 
+  m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+    m_Controls->pbInteractionTool->setChecked(false);
+    return true;
+  });
+
+  // The armed tool of another view keeps the exclusive interaction.
+  if (!m_ExclusiveInteractionClaim.IsActive())
+  {
+    const QSignalBlocker blocker(m_Controls->pbInteractionTool);
+    m_Controls->pbInteractionTool->setChecked(false);
+    return;
+  }
+
   // Create and configure the interactor, attached to the moving data node
   m_Interactor = mitk::RegistrationManipulationInteractor::New();
   m_Interactor->LoadStateMachine("RegistrationManipulationStates.xml", regModule);
@@ -671,10 +685,6 @@ void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
   selectPosCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition);
   m_SelectPositionObserverTag = m_Interactor->AddObserver(mitk::RegistrationSelectPositionEvent(), selectPosCmd);
 
-  // Block LMB display interactions (via DisplayConfigBlockLMB.xml) to prevent
-  // conflict with our modifier+drag and plain-click gestures
-  m_Interactor->DisableOriginalInteraction();
-
   m_InteractionToolActive = true;
 
   // Push the base manipulation cursor
@@ -689,14 +699,13 @@ void QmitkMatchPointRegistrationManipulator::DeactivateInteractionTool()
   if (!m_InteractionToolActive)
     return;
 
-  // Disconnect observers and restore display interactions
+  // Disconnect observers and release the interactor
   if (m_Interactor.IsNotNull())
   {
     m_Interactor->PopManipulationCursor();
     m_Interactor->RemoveObserver(m_TranslationObserverTag);
     m_Interactor->RemoveObserver(m_RotationObserverTag);
     m_Interactor->RemoveObserver(m_SelectPositionObserverTag);
-    m_Interactor->EnableOriginalInteraction();
     m_Interactor->SetDataNode(nullptr);
   }
   m_Interactor = nullptr;
@@ -709,6 +718,7 @@ void QmitkMatchPointRegistrationManipulator::DeactivateInteractionTool()
   m_CenterOfRotationIndicatorNode = nullptr;
 
   m_InteractionToolActive = false;
+  m_ExclusiveInteractionClaim.Reset();
 }
 
 void QmitkMatchPointRegistrationManipulator::UpdateCenterOfRotationIndicator()

@@ -12,6 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkImageStatisticsTreeItem.h"
 
+#include <QStringList>
+
+#include <sstream>
 #include <variant>
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
@@ -64,6 +67,8 @@ int QmitkImageStatisticsTreeItem::columnCount() const
 
 struct StatValueVisitor
 {
+  QmitkImageStatisticsTreeItem::ValueFormat format;
+
   QVariant operator()(const mitk::ImageStatisticsContainer::RealType& val) const
   {
     return QVariant(val);
@@ -76,14 +81,25 @@ struct StatValueVisitor
 
   QVariant operator()(const mitk::ImageStatisticsContainer::IndexType& val) const
   {
-    std::stringstream ss;
-    ss << val;
-    return QVariant(QString::fromStdString(ss.str()));
+    if (QmitkImageStatisticsTreeItem::ValueFormat::Raw == format)
+    {
+      std::stringstream stream;
+      stream << val;
+
+      return QVariant(QString::fromStdString(stream.str()));
+    }
+
+    QStringList components;
+
+    for (unsigned int i = 0; i < val.size(); ++i)
+      components.append(QString::number(val[i]));
+
+    return QVariant(QStringLiteral("[") + components.join(QStringLiteral(", ")) + QStringLiteral("]"));
   }
 
 };
 
-QVariant QmitkImageStatisticsTreeItem::data(int column) const
+QVariant QmitkImageStatisticsTreeItem::data(int column, ValueFormat format) const
 {
   QVariant result;
   if (column > 0 && !m_statisticNames.empty())
@@ -103,7 +119,7 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
         auto statisticKey = m_statisticNames.at(column - 1);
         if (m_statistics.HasStatistic(statisticKey))
         {
-          return std::visit(StatValueVisitor(), m_statistics.GetValueNonConverted(statisticKey));
+          return std::visit(StatValueVisitor{ format }, m_statistics.GetValueNonConverted(statisticKey));
         }
         else
         {

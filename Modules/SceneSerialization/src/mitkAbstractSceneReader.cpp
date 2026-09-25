@@ -15,3 +15,13 @@ found in the LICENSE file.
 mitk::AbstractSceneReader::AbstractSceneReader() = default;
 
 mitk::AbstractSceneReader::~AbstractSceneReader() = default;
+
+void mitk::AbstractSceneReader::SetProgressTask(ProgressTask *task)
+{
+  m_ProgressTask = task;
+}
+
+void mitk::AbstractSceneReader::SetLoadedNodes(DataStorage::SetOfObjects *loadedNodes)
+{
+  m_LoadedNodes = loadedNodes;
+}

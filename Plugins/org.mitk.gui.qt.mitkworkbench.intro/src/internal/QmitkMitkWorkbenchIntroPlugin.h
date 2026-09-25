@@ -18,6 +18,11 @@ found in the LICENSE file.
 
 #include <QString>
 
+namespace berry
+{
+  struct IQtStyleManager;
+}
+
 class QmitkMitkWorkbenchIntroPlugin : public berry::AbstractUICTKPlugin
 {
   Q_OBJECT
@@ -33,6 +38,19 @@ public:
 
   ctkPluginContext* GetPluginContext() const;
 
+  /**
+   * \brief Returns the workbench style manager, or nullptr if it is not available.
+   */
+  berry::IQtStyleManager* GetStyleManager() const;
+
+  /**
+   * \brief Returns how often the plugin was started, including this time.
+   *
+   * The count only grows in sessions that show the welcome screen, which is
+   * when this plugin is activated.
+   */
+  int GetStartCount() const;
+
   void start(ctkPluginContext*) override;
 
   QString GetQtHelpCollectionFile() const;
@@ -42,6 +60,7 @@ private:
   static QmitkMitkWorkbenchIntroPlugin* inst;
 
   ctkPluginContext* context;
+  int m_StartCount;
 };
 
 #endif

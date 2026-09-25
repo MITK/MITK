@@ -145,21 +145,19 @@ mitk::ThreeDnTDICOMSeriesReader
   while (!remainingBlocks.empty())
   {
     // new block to fill up
-    const DICOMDatasetAccessingImageFrameList& firstBlock = remainingBlocks.front().first;
-    DICOMDatasetAccessingImageFrameList current3DnTBlock = firstBlock;
+    DICOMDatasetAccessingImageFrameList current3DnTBlock = std::move( remainingBlocks.front().first );
     auto currentSplitReason = remainingBlocks.front().second;
 
     int current3DnTBlockNumberOfTimeSteps = 1;
 
     // get block characteristics of first block
-    const unsigned int currentBlockNumberOfSlices = firstBlock.size();
-    const auto currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
-    const auto currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
-    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
+    const unsigned int currentBlockNumberOfSlices = current3DnTBlock.size();
+    const auto currentBlockFirstOrigin = current3DnTBlock.front()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockLastOrigin  =  current3DnTBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockSeriesInstanceUID = current3DnTBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
+    const bool currentBlockHasFrameModel = blockHasFrameModel( current3DnTBlock );
 
     remainingBlocks.erase( remainingBlocks.begin() );
-
-    const bool currentBlockHasFrameModel = blockHasFrameModel( firstBlock );
 
     // compare all other blocks against the first one
     for (auto otherBlockIter = remainingBlocks.begin();

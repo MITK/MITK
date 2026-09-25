@@ -61,6 +61,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <optional>
 
@@ -191,6 +192,17 @@ namespace
       "preset files from one another. Please choose a file whose path has none.");
 
     return false;
+  }
+
+  /** \brief A preset file's path in the form the standard streams open.
+   *
+   * Handed over as UTF-16 rather than as the UTF-8 of toStdString(): Windows
+   * reads a narrow path in the ANSI code page, which turns every non-ASCII
+   * character into another and so misses the file.
+   */
+  std::filesystem::path PresetFilePath(const QString &presetFile)
+  {
+    return std::filesystem::path(presetFile.toStdU16String());
   }
 
   /** \brief Where an entry keeps the name of the preset it stands for.
@@ -853,7 +865,7 @@ QStringList QmitkVolumeTransferFunctionEditor::LoadRememberedPresets()
 
   for (const auto &presetFile : rememberedFiles)
   {
-    std::ifstream stream(presetFile.toStdString());
+    std::ifstream stream(PresetFilePath(presetFile));
 
     if (!stream.is_open())
     {
@@ -2141,7 +2153,7 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
   {
     // Scoped, because a stream closes with its destructor and the file has to be
     // closed before it is read back below.
-    std::ofstream stream(fileName.toStdString());
+    std::ofstream stream(PresetFilePath(fileName));
 
     if (!stream.is_open() ||
         !mitk::TransferFunctionPresets::SaveTransferFunction(stream, presetName.toStdString(),
@@ -2175,7 +2187,7 @@ bool QmitkVolumeTransferFunctionEditor::AddPresetFromFile(const QString &presetF
 
   // Read from the file rather than added from memory, so that a preset added
   // now and one found at the next start arrive by the same route.
-  std::ifstream stream(presetFile.toStdString());
+  std::ifstream stream(PresetFilePath(presetFile));
 
   const auto addedName = stream.is_open()
     ? QString::fromStdString(m_Presets.AddPreset(stream))

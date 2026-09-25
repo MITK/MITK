@@ -22,31 +22,32 @@ if(MITK_USE_sentry)
 
     #[[ The handler is renamed from upstream's generic "crashpad_handler" to
         "MitkCrashHandler" so it is recognizable as MITK's in a task manager.
-        The name is defined here once and handed to the facility as a compile
-        definition, so the file the build tree/installer places and the file
-        the facility asks the sentry backend to spawn (handler_path) cannot
-        drift apart. ]]
-    set(_handler_name MitkCrashHandler${CMAKE_EXECUTABLE_SUFFIX})
-    target_compile_definitions(${MODULE_TARGET} PRIVATE MITK_CRASH_HANDLER_FILENAME="${_handler_name}")
+        Handing the name defined by the top-level CMakeLists to the facility as
+        a compile definition keeps the file the build tree/installer places and
+        the file the facility asks the sentry backend to spawn (handler_path)
+        from drifting apart. ]]
+    target_compile_definitions(${MODULE_TARGET} PRIVATE
+      MITK_CRASH_HANDLER_FILENAME="${MITK_CRASH_HANDLER_NAME}")
 
-    if(MITK_EXTERNAL_PROJECT_PREFIX)
+    if(MITK_CRASH_HANDLER_EXECUTABLE)
       #[[ The handler is spawned, not linked, so it has to sit in the runtime
-          output directory for apps and tests launched from the build tree.
-          Modeled as a file-level dependency so an external-project version
-          bump propagates without a reconfigure. ]]
-      set(_handler_source "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}")
-
+          output directory for the plain binaries launched from the build tree.
+          Application bundles are served by
+          mitkFunctionCreateBlueBerryApplication, whose executables live inside
+          the bundle rather than here. Modeled as a file-level dependency so an
+          external-project version bump propagates without a reconfigure. ]]
       get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
       if(_is_multi_config)
-        set(_handler_copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/${_handler_name}")
+        set(_handler_copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/${MITK_CRASH_HANDLER_NAME}")
       else()
-        set(_handler_copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_handler_name}")
+        set(_handler_copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MITK_CRASH_HANDLER_NAME}")
       endif()
 
       add_custom_command(OUTPUT "${_handler_copy}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_handler_source}" "${_handler_copy}"
-        DEPENDS "${_handler_source}"
-        COMMENT "Copying ${_handler_name} next to the application binaries")
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          "${MITK_CRASH_HANDLER_EXECUTABLE}" "${_handler_copy}"
+        DEPENDS "${MITK_CRASH_HANDLER_EXECUTABLE}"
+        COMMENT "Copying ${MITK_CRASH_HANDLER_NAME} next to the application binaries")
       add_custom_target(MitkCopyCrashpadHandler ALL DEPENDS "${_handler_copy}")
     endif()
   endif()

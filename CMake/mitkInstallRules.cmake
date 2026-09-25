@@ -80,9 +80,9 @@ endforeach()
 if(MITK_USE_sentry AND MITK_EXTERNAL_PROJECT_PREFIX)
   # Renamed to match the handler_path the facility sets (see Modules/CrashHandling).
   foreach(_bindir IN LISTS MITK_INSTALL_BINDIR)
-    install(PROGRAMS "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}"
+    install(PROGRAMS "${MITK_CRASH_HANDLER_EXECUTABLE}"
       DESTINATION ${_bindir}
-      RENAME MitkCrashHandler${CMAKE_EXECUTABLE_SUFFIX})
+      RENAME ${MITK_CRASH_HANDLER_NAME})
   endforeach()
 
   install(FILES "${MITK_EXTERNAL_PROJECT_PREFIX}/src/sentry/LICENSE"

@@ -937,6 +937,26 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
+# Crash-handler executable
+#
+# The out-of-process Crashpad handler is spawned, not linked, and the facility
+# resolves it next to the running executable (see Modules/CrashHandling). Which
+# directory that is differs per platform, so the handler is placed by three
+# rules that have to agree on the name and on the file: the CrashHandling
+# module (which also hands the name to the facility as a compile definition),
+# mitkFunctionCreateBlueBerryApplication for macOS application bundles, and the
+# install rules. Both are defined here so they cannot drift apart.
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_sentry)
+  set(MITK_CRASH_HANDLER_NAME "MitkCrashHandler${CMAKE_EXECUTABLE_SUFFIX}")
+  if(MITK_EXTERNAL_PROJECT_PREFIX)
+    set(MITK_CRASH_HANDLER_EXECUTABLE
+        "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Set coverage Flags
 #-----------------------------------------------------------------------------
 

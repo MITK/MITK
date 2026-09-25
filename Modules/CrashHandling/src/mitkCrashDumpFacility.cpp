@@ -62,9 +62,10 @@ namespace
   // the watchdog thread and the UI thread concurrently.
   std::mutex s_SnapshotMutex;
 
-  // Provided by the module CMake (single source of truth, including the
-  // platform executable suffix). The fallback only matters in a build that
-  // does not place a handler at all, in which case arming fails regardless.
+  // Provided by the build system, which is the single source of truth for the
+  // name (including the platform executable suffix) and for every rule that
+  // places the file. The fallback only matters in a build that does not place
+  // a handler at all, in which case arming fails regardless.
 #ifndef MITK_CRASH_HANDLER_FILENAME
 #define MITK_CRASH_HANDLER_FILENAME "MitkCrashHandler"
 #endif
@@ -213,8 +214,8 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
 
     if (sentry_init(options) != 0)
     {
-      MITK_WARN << "Crash-dump facility failed to arm; is '" << kHandlerFileName.string()
-                << "' located next to the application executable?";
+      MITK_WARN << "Crash-dump facility failed to arm; is the out-of-process handler present at '"
+                << handlerPath.string() << "'?";
       return false;
     }
 

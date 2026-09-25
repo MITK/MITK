@@ -149,13 +149,19 @@ during the Qt/CTK startup window are a common and important crash class.
 
 The handler executable is shipped as \c MitkCrashHandler (renamed from
 upstream's generic \c crashpad_handler so it is recognizable as MITK's in a
-task manager). The build tree copies it beside the binaries and the installer
-ships it in the application bin directory. Because the name differs from what
-the sentry backend would auto-resolve, the facility sets \c handler_path
-explicitly to <tt>&lt;directory of the current executable&gt;/MitkCrashHandler</tt>.
-The filename is defined once in the module CMake and passed to the facility as
-a compile definition, so the file that is shipped and the file the facility
-spawns cannot drift apart.
+task manager). Because the name differs from what the sentry backend would
+auto-resolve, the facility sets \c handler_path explicitly to
+<tt>&lt;directory of the current executable&gt;/MitkCrashHandler</tt>.
+
+Which directory that is depends on the platform, so three rules place the
+handler and all three have to agree: the \c MitkCrashHandling module copies it
+into the runtime output directory, where the plain binaries are started from;
+mitkFunctionCreateBlueBerryApplication copies it into <tt>Contents/MacOS</tt>
+of every macOS application bundle, where the bundled executable is started
+from instead; and the install rules ship one copy per installed bin directory.
+Handler name and source file are defined once in the top-level
+\c CMakeLists.txt, and the name reaches the facility as a compile definition,
+so what is placed and what the facility spawns cannot drift apart.
 
 Because arming happens before option parsing, the facility can only be
 disabled through the raw command line or the environment:
@@ -232,6 +238,13 @@ acknowledge, delete - i.e. the operations the next-start dialog drives without
 any UI. Because these tests only pass when arming succeeds, they also pin the
 handler filename: a mismatch between the shipped file and the \c handler_path
 the facility sets would make them fail.
+
+Those tests spawn a plain helper executable, so what they pin is the runtime
+output directory. Each application additionally gets a
+<tt>mitkCrashHandlerLayout_&lt;app&gt;</tt> test that runs the handler with
+\c --version at the location that application will look for it - the one
+requirement that differs per platform, and the only one an application bundle
+exercises.
 
 On platforms where the handler cannot arm (e.g. ptrace restrictions in
 containers), the tests fail hard unless the environment explicitly allows

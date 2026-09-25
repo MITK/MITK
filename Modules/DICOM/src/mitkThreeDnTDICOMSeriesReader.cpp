@@ -119,10 +119,13 @@ mitk::ThreeDnTDICOMSeriesReader
 
   SortingBlockList remainingBlocks = resultOf3DGrouping;
 
-  // A file with a frame model must reach the base class unmerged: only there is
-  // it expanded into its frames and given its per-frame Pixel Value
-  // Transformation. Condensing it here would read it as one slice per file and
-  // silently drop every other frame.
+  // Condensing works directly from each block's file-level frame infos, so a
+  // file with a frame model must not be merged this way: it would bypass the
+  // expansion into frame-scoped infos, which publishes functional-group values
+  // under their frame-relative keys. A multi-frame file would in addition be
+  // read as one slice per file, dropping every frame but the first, and lose
+  // its per-frame Pixel Value Transformation. The base class does both the
+  // expansion and that transformation.
   const auto tagCache = this->GetTagCache();
   const bool anyFrameModel = tagCache.IsNotNull() && tagCache->HasAnyFrameModel();
   const auto blockHasFrameModel = [&](const DICOMDatasetAccessingImageFrameList& block)

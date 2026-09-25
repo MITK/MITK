@@ -54,7 +54,7 @@
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Optional human-readable display name, shown identically on every surface (sync editor, group selectors, seams). Free text, distinct from the URL-segment-safe group id used as the dict key. When absent, surfaces display the group id."
+          "description": "Optional human-readable display name, shown identically on every surface (layout editor, window plates, sync barcode tooltips). Free text, distinct from the URL-segment-safe group id used as the dict key. When absent, surfaces display the group id."
         }
       }
     },

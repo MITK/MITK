@@ -21,6 +21,8 @@
 	group cards used for everyday work, and <b>Advanced</b>, the per-window link matrix.
 	Only one is up at a time.
 
+	\imageMacroEx{QmitkMxN_LayoutEditor.png, "The MxN Layout Editor view", 8, 360px}
+
 \section org_mitk_views_mxnlayouteditor_Layout The layout row
 	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
 	<ul>
@@ -51,6 +53,8 @@
 	axes in the fixed order pan, zoom, slice, crosshair, orientation, windowing, LUT and
 	data selection, tinted with the hue of the group the window is linked to, and the
 	window's name.
+
+	\imageMacroEx{QmitkMxN_ArrangeMode.png, "Arrange mode: the plates while the view is open with two windows selected and the pointer on the zoom axis", 16, 800px}
 
 	Nothing else about the display changes. Only the plates themselves take the mouse:
 	scrolling, the crosshair, zoom and pan work everywhere else in the window exactly as
@@ -115,25 +119,37 @@
 	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Groups Group cards
-	Each group card offers:
+	Each group has a card on the <b>Sync groups</b> tab; <b>+ Group</b> creates a new one.
+	A card is one object: it can be dragged onto a window, and windows can be dropped onto it
+	(see \ref org_mitk_views_mxnlayouteditor_Assign).
 	<ul>
-		<li> The color swatch sets the group's hue - the color that identifies the group
-			on all synchronization surfaces. It is saved with the layout.
-		<li> The name field sets the group's display name, shown identically everywhere.
-		<li> The card's own sync barcode shows which dimensions the group synchronizes.
+		<li> The header bar is drawn in the group's hue - the color that identifies the group
+			on every synchronization surface - and carries the group's display name and how
+			many windows it has.
+		<li> The axis strip below shows which of the eight axes the group synchronizes.
 			Clicking an axis links or unlinks it for every window in the group; an axis
 			drawn dashed is linked for only some of them, and one with a filled upper
 			corner has at least one member sitting at an offset - the card speaks for
 			several windows, so it marks that a shift exists without saying whose. For
 			a group that has no windows yet, clicking an axis only prepares which
 			dimensions the first windows assigned to it will get.
-		<li> The dimension checkboxes control the same links for all member windows;
-			"Link navigation" applies the pan, zoom, slice and crosshair bundle explicitly.
+	</ul>
+	The "..." button in the header opens the less frequent actions:
+	<ul>
+		<li> "Rename..." and "Change color..." set the display name and the hue. Both are
+			saved with the layout.
+		<li> "Add selected windows" and "Remove selected windows" act on the windows
+			selected on the plates.
+		<li> "Link navigation" links the pan, zoom, slice and crosshair bundle for every
+			member at once.
 		<li> "Re-converge" re-establishes reference + offset for the group's
-			slice/zoom/pan members after drift (e.g. from boundary clamping).
+			slice/zoom/pan members after drift (e.g. from boundary clamping or zooming).
 		<li> "Fit views to visible data" frames the group's slice/orientation
 			neighborhood around the data visible in its first window; only these windows
 			are affected, unlike the application-wide "Fit views to ..." actions.
+		<li> "Delete group" unsynchronizes the group's windows and removes the group, after
+			asking when it still has windows. The default group "main" cannot be deleted,
+			because it is where every window's data selection falls back to.
 	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Advanced The advanced matrix

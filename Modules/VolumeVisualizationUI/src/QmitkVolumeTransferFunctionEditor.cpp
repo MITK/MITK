@@ -1546,15 +1546,17 @@ double QmitkVolumeTransferFunctionEditor::NeutralColorWidth() const
 {
   // The width at which the colour window reproduces the baseline unchanged, and
   // so the value the width slider resets to. Falls back to the image's range for
-  // a baseline that names none of its own.
+  // a baseline that names none of its own - no stops, or all of them on one
+  // intensity.
   const double dataWidth = std::max(1.0, m_DataRange[1] - m_DataRange[0]);
 
   if (m_BaseColorFn == nullptr || m_BaseColorFn->GetSize() == 0)
     return dataWidth;
 
   const double *colorRange = m_BaseColorFn->GetRange();
+  const double colorSpan = colorRange[1] - colorRange[0];
 
-  return std::max(1.0, colorRange[1] - colorRange[0]);
+  return colorSpan > 0.0 ? colorSpan : dataWidth;
 }
 
 void QmitkVolumeTransferFunctionEditor::ResetAdjustSliders()
@@ -1605,12 +1607,16 @@ void QmitkVolumeTransferFunctionEditor::ResetAdjustSliders()
   // values and have to keep them - so half of any widening falls outside the
   // data, and the shift is what carries it back.
   const double colorWidthReach = 2.0 * std::max(colorSpan, dataWidth);
+  const double colorWidthStep = colorWidthReach / 1000.0;
 
   // Stepped, because ctkDoubleSlider defaults to a step of 1.0, which leaves a
   // preset whose span is small - DTI-FA-Brain's is 0.995 - two usable positions.
-  m_Controls->colorWidthSlider->setMinimum(1.0);
+  // The floor scales the same way rather than sitting at a fixed width, so that a
+  // window on normalized data narrows as far as one on Hounsfield units, and
+  // never above the preset's own span, which the slider has to be able to show.
+  m_Controls->colorWidthSlider->setMinimum(std::min(colorWidthStep, colorSpan));
   m_Controls->colorWidthSlider->setMaximum(colorWidthReach);
-  m_Controls->colorWidthSlider->setSingleStep(colorWidthReach / 1000.0);
+  m_Controls->colorWidthSlider->setSingleStep(colorWidthStep);
   m_Controls->colorWidthSlider->setValue(colorSpan);
 }
 

@@ -808,8 +808,10 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnResetAdjustments);
 
+  // Through a slot of its own rather than SetEditModeActive, which a selection
+  // change and switching rendering off call as well, and neither should ask.
   connect(m_Controls->editModeButton, &QToolButton::toggled,
-    this, &QmitkVolumeTransferFunctionEditor::SetEditModeActive);
+    this, &QmitkVolumeTransferFunctionEditor::OnEditModeToggled);
 
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::PointsChanged,
     this, [this]
@@ -1677,6 +1679,42 @@ void QmitkVolumeTransferFunctionEditor::OnResetAdjustments()
   m_Controls->colorWidthSlider->setValue(this->NeutralColorWidth());
 }
 
+void QmitkVolumeTransferFunctionEditor::OnEditModeToggled(bool checked)
+{
+  if (checked || !m_EditModeActive || !m_CurveEdited)
+  {
+    this->SetEditModeActive(checked);
+    return;
+  }
+
+  QMessageBox question(QMessageBox::Question, "Edit transfer function",
+    "Save the edited curve as a preset?", QMessageBox::NoButton, this);
+  question.setInformativeText("An unsaved drawing is lost once another image is selected. "
+    "Until then, it can still be saved by right-clicking the preset list.");
+
+  auto *saveButton = question.addButton("Save as preset...", QMessageBox::AcceptRole);
+  auto *keepButton = question.addButton("Keep", QMessageBox::RejectRole);
+  auto *discardButton = question.addButton("Discard", QMessageBox::DestructiveRole);
+
+  question.setDefaultButton(saveButton);
+  question.setEscapeButton(keepButton);
+  question.exec();
+
+  const auto *answer = question.clickedButton();
+
+  // Before leaving, which makes the drawing the baseline and so leaves nothing
+  // to go back to.
+  if (answer == discardButton)
+    this->DiscardEdit();
+
+  this->SetEditModeActive(false);
+
+  // After leaving, for the same reason: the colours are saved from the
+  // baseline, and until then that is still the curve from before the edit.
+  if (answer == saveButton)
+    this->SaveCustomPreset();
+}
+
 void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 {
   // SetDataNode ends editing on every selection change, whether or not any was
@@ -1701,6 +1739,14 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
   {
     m_CurveEdited = false;
     m_ColorHandlesRestored = false;
+
+    // Before ShowEditMode puts the colour handles back, so that discarding
+    // returns the very function that stood here rather than its equivalent.
+    m_PreEditColorFn = vtkSmartPointer<vtkColorTransferFunction>::New();
+    m_PreEditColorFn->DeepCopy(m_AppliedTransferFunction->GetColorTransferFunction());
+    m_PreEditOpacityFn = vtkSmartPointer<vtkPiecewiseFunction>::New();
+    m_PreEditOpacityFn->DeepCopy(m_AppliedTransferFunction->GetScalarOpacityFunction());
+    m_PreEditBlendMode = mitk::GetVolumeBlendMode(node.GetPointer());
 
     // Nothing about the function changed, only what may now be done to it -
     // which is why this is not ShowAppliedTransferFunction: re-seeding here
@@ -1731,6 +1777,35 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
   // out as. Both are derived from their baseline rather than nudged, so without
   // this the first shift would rebuild the preset over the drawing.
   this->ApplyCurrentTransferFunction();
+}
+
+void QmitkVolumeTransferFunctionEditor::DiscardEdit()
+{
+  if (!m_EditModeActive || m_AppliedTransferFunction.IsNull() ||
+      m_PreEditColorFn == nullptr || m_PreEditOpacityFn == nullptr)
+  {
+    return;
+  }
+
+  // Copied into the functions the node already carries rather than put in their
+  // place: the canvas holds them by pointer, and so does the node's property.
+  m_AppliedTransferFunction->GetColorTransferFunction()->DeepCopy(m_PreEditColorFn);
+  m_AppliedTransferFunction->GetScalarOpacityFunction()->DeepCopy(m_PreEditOpacityFn);
+
+  if (m_PreEditBlendMode.has_value())
+    this->ApplyBlendMode(*m_PreEditBlendMode);
+
+  // The colours are back in the form the window baked them into.
+  m_ColorHandlesRestored = false;
+
+  // So that leaving takes this for an untouched curve and keeps the baseline it
+  // was measured against, rather than re-seeding from it as from a drawing.
+  m_CurveEdited = false;
+
+  this->ShowPresetEdited();
+  m_Controls->combinedTfCanvas->update();
+
+  emit TransferFunctionChanged();
 }
 
 void QmitkVolumeTransferFunctionEditor::ShowEditMode()

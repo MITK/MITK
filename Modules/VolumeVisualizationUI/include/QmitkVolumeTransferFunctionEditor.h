@@ -28,11 +28,13 @@ found in the LICENSE file.
 
 #include <array>
 #include <memory>
+#include <optional>
 #include <string>
 
 class QListWidgetItem;
 class QmitkVolumeThumbnailRenderer;
 class vtkColorTransferFunction;
+class vtkPiecewiseFunction;
 
 namespace Ui
 {
@@ -128,6 +130,7 @@ private slots:
   void OnAddColorStop();
   void OnPickColorStopColor();
   void OnBlendModeChanged(int index);
+  void OnEditModeToggled(bool checked);
 
 private:
   /**
@@ -304,15 +307,25 @@ private:
   /**
    * \brief Hand the canvas over to point-by-point editing, or take it back.
    *
-   * Leaving keeps whatever was drawn - there is no way back to the curve that
-   * stood before it - so leaving is also where a curve that was really edited
-   * is recorded as answering to no preset.
+   * Leaving keeps whatever was drawn - the way back to the curve that stood
+   * before it is DiscardEdit, first - so leaving is also where a curve that was
+   * really edited is recorded as answering to no preset.
    *
    * A request for the mode already in force does nothing. SetDataNode ends
    * editing on every selection change, whether any was in progress or not, and
    * relies on that call being inert.
    */
   void SetEditModeActive(bool active);
+
+  /**
+   * \brief Put back the curve and the blend mode that were in force when the
+   *        edit began.
+   *
+   * Only while editing, and before leaving: leaving makes the drawing the
+   * baseline the sliders measure from. That baseline needs nothing put back
+   * itself, since the sliders stand still for as long as editing lasts.
+   */
+  void DiscardEdit();
 
   /**
    * \brief Give the canvas its handles, or take them away, and show which of the
@@ -516,6 +529,17 @@ private:
    * would copy over the colours just edited.
    */
   bool m_ColorHandlesRestored = false;
+
+  /** \brief The curve and the blend mode as they stood when the edit in
+   *         progress began, for DiscardEdit to put back.
+   *
+   * Copies rather than references: the canvas edits the node's own functions
+   * in place. The blend mode is empty where the node named one outside the set
+   * MITK offers, which is then left as it is found.
+   */
+  vtkSmartPointer<vtkColorTransferFunction> m_PreEditColorFn;
+  vtkSmartPointer<vtkPiecewiseFunction> m_PreEditOpacityFn;
+  std::optional<mitk::VolumeBlendMode> m_PreEditBlendMode;
 
   std::array<double, 2> m_DataRange { 0.0, 0.0 };
 };

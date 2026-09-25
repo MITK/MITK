@@ -237,17 +237,25 @@ and the choice lasts as long as the drawing does, so <b>Save as preset...</b>
 is how to keep it. Only <b>Composite</b> builds a three-dimensional image and
 takes lighting; the others flatten each ray to a single value.
 
-Ending the edit keeps whatever you drew; there is no way back to the curve that
-stood before it other than clicking the preset's entry, which rebuilds the
-preset. If you changed nothing, the preset and the slider positions are left as
-they were. If you did, the preset's entry is starred, and the drawing becomes
-what the sliders are measured from: they return to neutral and from then on move
-the drawing rather than the preset.
+If you changed nothing, ending the edit asks nothing, and the preset and the
+slider positions are left as they were. If you did, it asks whether to save the
+curve as a preset:
 
-To keep a curve you have drawn beyond the session, right-click the preset grid
-and choose <b>Save as preset...</b>: it writes a JSON file in the same format
-the built-in catalogue uses, so your own functions can be kept and shared and
-added back with the <b>Load preset...</b> entry.
+<ul>
+<li> <b>Save as preset...</b> writes the curve to a JSON file in the same format
+the built-in catalogue uses, adds it to the grid and applies it, so your own
+functions can be kept and shared and added back with the <b>Load preset...</b>
+entry.
+<li> <b>Keep</b> leaves the drawing on show without saving it. ESC answers the
+same.
+<li> <b>Discard</b> puts back the curve and the blend mode from before the edit.
+</ul>
+
+A drawing you keep is starred on the preset's entry, and becomes what the
+sliders are measured from: they return to neutral and from then on move the
+drawing rather than the preset. Clicking the entry rebuilds the preset instead.
+To save a kept drawing later, right-click the preset grid and choose
+<b>Save as preset...</b>.
 
 \note A curve edited point by point is not kept. What the view records is the
 preset it was drawn over together with the slider positions, so selecting

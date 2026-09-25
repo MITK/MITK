@@ -98,10 +98,11 @@ namespace mitk
       std::set<DICOMTagPath> m_ScannedTags;
       StringList m_InputFilenames;
       DICOMGenericTagCache::Pointer m_Cache;
-      bool m_ReadFrameModel = false;
 
     private:
       DICOMDCMTKTagScanner(const DICOMDCMTKTagScanner&);
+
+      bool m_ReadFrameModel = false;
   };
 }
 

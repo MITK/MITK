@@ -281,7 +281,7 @@ int QmitkMxNSyncBarcodeWidget::SlotAtIn(const QRect& target, int slotCount, cons
 
 int QmitkMxNSyncBarcodeWidget::SlotAt(const QPoint& pos) const
 {
-  return SlotAtIn(this->rect(), static_cast<int>(m_Slots.size()), pos);
+  return SlotAtIn(this->rect(), static_cast<int>(m_Slots.size()), pos, StripFit());
 }
 
 void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target,

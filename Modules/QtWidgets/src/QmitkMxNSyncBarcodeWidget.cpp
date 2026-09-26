@@ -135,6 +135,8 @@ QSize QmitkMxNSyncBarcodeWidget::minimumSizeHint() const
   return QSize(slotCount * ColorSlotWidth + (slotCount - 1) * SlotGap, BarcodeHeight);
 }
 
+const QmitkMxNSyncBarcodeWidget::BarcodeFit QmitkMxNSyncBarcodeWidget::DefaultFit = {};
+
 QmitkMxNSyncBarcodeWidget::BarcodeLayout
 QmitkMxNSyncBarcodeWidget::ComputeLayout(int width, int height, int slotCount,
                                          const BarcodeFit& fit)

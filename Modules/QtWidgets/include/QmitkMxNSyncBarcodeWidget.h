@@ -94,6 +94,16 @@ public:
   };
 
   /**
+   * \brief The fit a caller gets when it grants a rect and says nothing about
+   *        it: wrapping allowed, glyph size bounded only by that rect.
+   *
+   * Named rather than spelled '= {}' at each default argument below: a nested
+   * class's default member initializers are not available inside the enclosing
+   * class, so a braced default argument there is ill-formed and GCC rejects it.
+   */
+  static const BarcodeFit DefaultFit;
+
+  /**
    * \brief How the strip renders its slots for a given geometry.
    *
    * Glyphs: self-describing axis glyphs in a grid (a single row when the strip
@@ -118,7 +128,7 @@ public:
    *        widget.
    */
   static BarcodeLayout ComputeLayout(int width, int height, int slotCount,
-                                     const BarcodeFit& fit = {});
+                                     const BarcodeFit& fit = DefaultFit);
 
   /**
    * \brief Paint the given slots into an arbitrary rect: the wrapping glyph grid
@@ -129,7 +139,7 @@ public:
    */
   static void PaintInto(QPainter& painter, const QRect& target,
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,
-                        int hoveredSlot = -1, const BarcodeFit& fit = {});
+                        int hoveredSlot = -1, const BarcodeFit& fit = DefaultFit);
 
   /**
    * \brief The slot index under 'pos' when 'slotCount' slots are painted into
@@ -140,7 +150,7 @@ public:
    *        and paint cannot drift.
    */
   static int SlotAtIn(const QRect& target, int slotCount, const QPoint& pos,
-                      const BarcodeFit& fit = {});
+                      const BarcodeFit& fit = DefaultFit);
 
   explicit QmitkMxNSyncBarcodeWidget(QWidget* parent = nullptr);
   ~QmitkMxNSyncBarcodeWidget() override;

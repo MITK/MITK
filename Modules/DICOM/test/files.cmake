@@ -1,6 +1,9 @@
 set(MODULE_TESTS
   mitkDICOMReaderConfiguratorTest.cpp
   mitkDICOMDCMTKTagScannerTest.cpp
+  mitkDICOMFilesHelperTest.cpp
+  mitkDICOMFrameLayoutTest.cpp
+  mitkDICOMMultiFrameReadTest.cpp
   mitkDICOMSimpleVolumeImportTest.cpp
   mitkDICOMSourceImageRelationTest.cpp
   mitkDICOMTagPathTest.cpp
@@ -15,6 +18,7 @@ set(MODULE_CUSTOM_TESTS
 )
 
 set(CPP_FILES
+  mitkDICOMMultiFrameTestObject.cpp
   mitkDICOMNullFileReader.cpp
   mitkDICOMFilenameSorter.cpp
 )

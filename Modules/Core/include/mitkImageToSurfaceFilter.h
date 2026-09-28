@@ -27,6 +27,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Converts pixel data to surface data by using a threshold.
    *
@@ -185,6 +187,15 @@ namespace mitk
       out[2] = z;
     }
 
+    /**
+     * \brief Report progress into the given task, or nowhere if it is nullptr.
+     *
+     * The filter contributes four steps per time step of its input.
+     *
+     * \param[in] task The task of the operation this filter contributes to.
+     */
+    void SetProgressTask(ProgressTask *task);
+
   protected:
     ImageToSurfaceFilter();
 
@@ -220,6 +231,9 @@ namespace mitk
 
     /** \brief The relaxation factor for the smoothing filter. Default is 0.1. */
     float m_SmoothRelaxation;
+
+    /** \brief Task to report progress into, or nullptr to report none. */
+    ProgressTask *m_ProgressTask;
   };
 
 } // namespace mitk

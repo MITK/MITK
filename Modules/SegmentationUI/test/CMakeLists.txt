@@ -7,3 +7,7 @@ mitkAddCustomModuleTest(QmitkMultiLabelTreeModelTest QmitkMultiLabelTreeModelTes
 mitkAddCustomModuleTest(QmitkMultiLabelSelectionLabelTest QmitkMultiLabelSelectionLabelTest
   -platform minimal
 )
+
+mitkAddCustomModuleTest(QmitkMultiLabelInspectorTest QmitkMultiLabelInspectorTest
+  -platform minimal
+)

@@ -71,7 +71,11 @@ public:
   */
   void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
-  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
+  /**
+  * @brief Syncs the interaction scheme tool bar with the scheme the multi widget
+  *        has actually applied, wherever the change came from.
+  */
+  void OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   void ShowLevelWindowWidget(bool show);
 

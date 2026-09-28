@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
-#include <mitkProgressBar.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
 #include <mitkSurfaceToImageFilter.h>
 #include <mitkSurface.h>
@@ -42,6 +42,15 @@ found in the LICENSE file.
 
 namespace
 {
+  /**
+   * Steps a node accounts for in the task of a conversion. A non-image node
+   * carries a share for the conversion itself on top of the two steps every
+   * node takes, because that is where the time goes for a contour set.
+   */
+  constexpr unsigned int CONVERSION_SHARE = 10;
+  constexpr unsigned int STEPS_PER_IMAGE_NODE = 4;
+  constexpr unsigned int STEPS_PER_NONIMAGE_NODE = 2 + CONVERSION_SHARE;
+
   mitk::NodePredicateBase::Pointer GetInputPredicate()
   {
     auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -284,19 +293,25 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
   m_LastResultNodes.clear();
 
   auto nodes = m_Controls->inputNodesSelector->GetSelectedNodes();
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(3 * nodes.size() + 1);
+
+  // One task for the whole conversion, even when the inputs are converted one
+  // by one below. The whole budget is declared here rather than grown inside
+  // ConvertNodes(), which the loop below calls once per node: growing it there
+  // moves the bar backwards on every call after the first.
+  mitk::ProgressTask task("Converting to segmentation", static_cast<unsigned int>(
+    STEPS_PER_IMAGE_NODE * GetImageNodes(nodes).size()
+    + STEPS_PER_NONIMAGE_NODE * GetNonimageNodes(nodes).size()));
 
   if (m_Controls->radioNewSeg->isChecked() && m_Controls->checkMultipleOutputs->isChecked())
   {
     for (auto& node : nodes)
     {
-      this->ConvertNodes({ node });
+      this->ConvertNodes({ node }, task);
     }
   }
   else
   {
-    this->ConvertNodes(nodes);
+    this->ConvertNodes(nodes, task);
   }
 
   QList<mitk::DataNode::Pointer> resultNodes;
@@ -316,11 +331,12 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
 void CheckForLabelCollision(const QmitkNodeSelectionDialog::NodeList& nodes,
   const std::map<const mitk::DataNode*, mitk::MultiLabelSegmentation::LabelValueVectorType>& foundLabelsMap,
   mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues,
-  std::map<const mitk::DataNode*, mitk::LabelValueMappingVector>& labelsMappingMap)
+  std::map<const mitk::DataNode*, mitk::LabelValueMappingVector>& labelsMappingMap,
+  mitk::ProgressTask& task)
 {
   for (const auto& node : nodes)
   {
-    mitk::ProgressBar::GetInstance()->Progress();
+    task.Progress();
 
     const auto& foundLabels = foundLabelsMap.at(node);
     mitk::MultiLabelSegmentation::LabelValueVectorType correctedLabelValues;
@@ -333,7 +349,7 @@ void CheckForLabelCollision(const QmitkNodeSelectionDialog::NodeList& nodes,
   }
 }
 
-void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes)
+void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes, mitk::ProgressTask& task)
 {
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
 
@@ -395,8 +411,12 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   std::map<const mitk::DataNode*, mitk::MultiLabelSegmentation::LabelValueVectorType> foundLabelsMap;
   for (const auto& node : nonimageNodes)
   {
-    mitk::ProgressBar::GetInstance()->Progress();
     mitk::Image::Pointer convertedImage;
+
+    // Filling a contour set is the one part of this worth watching go by, so
+    // the conversion reports into a share of the budget above rather than
+    // crediting a single step once it is over.
+    auto conversionTask = mitk::MakeProgressShare(&task, CONVERSION_SHARE);
 
     auto surface = dynamic_cast<mitk::Surface*>(node->GetData());
     auto contourModel = dynamic_cast<mitk::ContourModel*>(node->GetData());
@@ -407,11 +427,11 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     }
     else if (nullptr != contourModelSet)
     {
-      convertedImage = mitk::ConvertContourModelSetToLabelMask(refImage, contourModelSet);
+      convertedImage = mitk::ConvertContourModelSetToLabelMask(refImage, contourModelSet, &conversionTask);
     }
     else if (nullptr != contourModel)
     {
-      convertedImage = mitk::ConvertContourModelToLabelMask(refImage, contourModel);
+      convertedImage = mitk::ConvertContourModelToLabelMask(refImage, contourModel, &conversionTask);
     }
     else
     {
@@ -433,10 +453,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   //prepare image nodes and get contained labels
   for (const auto& node : imageNodes)
   {
-    mitk::ProgressBar::GetInstance()->Progress();
+    task.Progress();
     mitk::MultiLabelSegmentation::LabelValueVectorType foundLabels;
 
-    mitk::ProgressBar::GetInstance()->Progress();
+    task.Progress();
     mitk::Image::Pointer convertedImage = mitk::ConvertImageToGroupImage(dynamic_cast<mitk::Image*>(node->GetData()), foundLabels);
     preparedImageMap.emplace(node, convertedImage);
     foundLabelsMap.emplace(node, foundLabels);
@@ -448,15 +468,14 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   try
   {
-    CheckForLabelCollision(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
-    CheckForLabelCollision(nonimageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+    CheckForLabelCollision(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap, task);
+    CheckForLabelCollision(nonimageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap, task);
   }
   catch (const mitk::Exception& e)
   {
     QMessageBox::warning(nullptr, "Conversion error", "Cannot convert selected data into segmentations due to unresolved label collisions. "
       "The inputs contain at least one equal label value that could not be resolved by remapping as not enough unused destination label values are available.\n\n"
       "One can often mitigate this problem by checking the \"Convert inputs separately\" option." );
-    mitk::ProgressBar::GetInstance()->Reset();
     QApplication::restoreOverrideCursor();
     return;
   }
@@ -472,7 +491,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   //Transfer content and add labels
   for (const auto& node : imageNodes)
   {
-    mitk::ProgressBar::GetInstance()->Progress();
+    task.Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && node != imageNodes.front())
     {
@@ -502,7 +521,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   for (const auto& node : nonimageNodes)
   {
-    mitk::ProgressBar::GetInstance()->Progress();
+    task.Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && (node != nonimageNodes.front() || !imageNodes.empty()))
     {
@@ -562,7 +581,6 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
     m_LastResultNodes.emplace_back(outNode.GetPointer());
   }
-  mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
 }
 

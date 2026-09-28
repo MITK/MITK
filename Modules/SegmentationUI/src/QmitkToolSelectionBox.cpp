@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 //#define MBILOG_ENABLE_DEBUG 1
 
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <QmitkToolSelectionBox.h>
 #include <QmitkToolGUI.h>
 #include <mitkBaseRenderer.h>
@@ -32,6 +32,28 @@ found in the LICENSE file.
 
 #include <mitkToolManagerProvider.h>
 
+namespace
+{
+  // The box is registered as a client of its tool manager while it is enabled
+  // by itself. QWidget::isEnabled() does not tell, as it is also false while a
+  // parent is disabled.
+  bool IsEnabledByItself(const QWidget* widget)
+  {
+    return !widget->testAttribute(Qt::WA_ForceDisabled);
+  }
+
+  bool ConfirmDiscardingResults(const mitk::Tool& tool)
+  {
+    return QMessageBox::Yes == QMessageBox::question(nullptr,
+                                                     tool.GetName(),
+                                                     QStringLiteral("The %1 tool currently has unconfirmed results. "
+                                                                    "Do you really want to discard the results by "
+                                                                    "exiting the tool now?").arg(tool.GetName()),
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No);
+  }
+}
+
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage *)
   : QWidget(parent),
     m_SelfCall(false),
@@ -49,6 +71,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
   QWidget::setFont(currentFont);
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  m_ToolManager->SetDeactivationConfirmation(&ConfirmDiscardingResults);
 
   // QButtonGroup
   m_ToolButtonGroup = new QButtonGroup(this);
@@ -89,6 +112,11 @@ QmitkToolSelectionBox::~QmitkToolSelectionBox()
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
+
+  if (IsEnabledByItself(this))
+  {
+    m_ToolManager->UnregisterClient();
+  }
 }
 
 mitk::ToolManager *QmitkToolSelectionBox::GetToolManager()
@@ -107,12 +135,13 @@ void QmitkToolSelectionBox::SetToolManager(
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
-  if (QWidget::isEnabled())
+  if (IsEnabledByItself(this))
   {
     m_ToolManager->UnregisterClient();
   }
 
   m_ToolManager = &newManager;
+  m_ToolManager->SetDeactivationConfirmation(&ConfirmDiscardingResults);
   RecreateButtons();
 
   // greet the new one
@@ -123,7 +152,7 @@ void QmitkToolSelectionBox::SetToolManager(
   m_ToolManager->WorkingDataChanged +=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
-  if (QWidget::isEnabled())
+  if (IsEnabledByItself(this))
   {
     m_ToolManager->RegisterClient();
   }
@@ -141,14 +170,7 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
 
   QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
   mitk::Tool *tool = m_ToolManager->GetActiveTool();
-  if (tool && tool->ConfirmBeforeDeactivation() &&
-      QMessageBox::No == QMessageBox::question(nullptr,
-                                               tool->GetName(),
-                                               QStringLiteral("The %1 tool currently has unconfirmed results. "
-                                                              "Do you really want to discard the results by "
-                                                              "exiting the tool now?").arg(tool->GetName()),
-                                               QMessageBox::Yes | QMessageBox::No,
-                                               QMessageBox::No))
+  if (tool && tool->ConfirmBeforeDeactivation() && !ConfirmDiscardingResults(*tool))
   {
     // The tool stays active, but Qt already toggled the clicked button. Restore
     // the state the still-active tool implies: checked if the declined click was
@@ -175,9 +197,13 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
       // enable the corresponding tool
       m_SelfCall = true;
 
-      m_ToolManager->ActivateTool(m_ToolIDForButtonID[id]);
+      const bool isActivated = m_ToolManager->ActivateTool(m_ToolIDForButtonID[id]);
 
       m_SelfCall = false;
+
+      // Refused when the armed tool of another view keeps the exclusive interaction.
+      if (!isActivated)
+        toolButton->setChecked(false);
     }
   }
 }
@@ -311,7 +337,7 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 
 void QmitkToolSelectionBox::setEnabled(bool enable)
 {
-  if (QWidget::isEnabled() == enable)
+  if (IsEnabledByItself(this) == enable)
     return;
 
   QWidget::setEnabled(enable);
@@ -356,7 +382,13 @@ void QmitkToolSelectionBox::UpdateButtonsEnabledState()
     const auto toolID = m_ToolIDForButtonID[buttonID];
     const auto tool = m_ToolManager->GetToolById(toolID);
 
-    button->setEnabled(tool->CanHandle(refData, workingData));
+    const bool canHandle = tool->CanHandle(refData, workingData);
+    button->setEnabled(canHandle);
+
+    QString tooltip = tool->GetName();
+    if (!canHandle)
+      tooltip += "\n" + tr("Not available for the selected image or segmentation");
+    button->setToolTip(tooltip);
   }
 }
 
@@ -480,14 +512,11 @@ void QmitkToolSelectionBox::RecreateButtons()
       label += "&";
     }
     label += tool->GetName();
-    QString tooltip = tool->GetName();
-    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '"
-               << tooltip.toLocal8Bit().constData();
+    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData();
 
     if (m_ShowNames)
     {
       button->setText(label); // a label
-      button->setToolTip(tooltip);
 
       QFont currentFont = button->font();
       currentFont.setBold(false);
@@ -511,7 +540,7 @@ void QmitkToolSelectionBox::RecreateButtons()
 
       if (isSVG)
       {
-        button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray::fromRawData(data, length)));
+        button->setIcon(QmitkIconTheme::GetIcon(QByteArray::fromRawData(data, length)));
       }
       else
       {
@@ -535,7 +564,6 @@ void QmitkToolSelectionBox::RecreateButtons()
       {
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setIconSize(QSize(32, 32));
-        button->setToolTip(tooltip);
       }
     }
 

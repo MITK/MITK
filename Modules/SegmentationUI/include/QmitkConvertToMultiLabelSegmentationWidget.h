@@ -33,6 +33,7 @@ namespace mitk
   class Surface;
   class Image;
   class MultiLabelSegmentation;
+  class ProgressTask;
 }
 
 /**
@@ -81,7 +82,7 @@ private slots:
   void OnRemoveResultPressed();
 
 private:
-  void ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes);
+  void ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes, mitk::ProgressTask& task);
 
   bool m_InternalEvent = false;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;

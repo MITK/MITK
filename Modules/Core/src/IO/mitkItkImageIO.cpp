@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkCoreServices.h>
 #include <mitkCustomMimeType.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkImage.h>
@@ -779,5 +780,20 @@ namespace mitk
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
     this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
+
+    // Files written by older MITK versions still carry the reader annotations of
+    // AbstractFileReader::Read(). They are read like any other meta data, but one
+    // such file must not re-register them for writing for the rest of the session.
+    // The option root covers the whole option family as the keys are matched by
+    // prefix.
+    for (const auto &annotation : {IOMetaInformationPropertyConstants::READER_DESCRIPTION(),
+                                   IOMetaInformationPropertyConstants::READER_VERSION(),
+                                   IOMetaInformationPropertyConstants::READER_MIME_NAME(),
+                                   IOMetaInformationPropertyConstants::READER_MIME_CATEGORY(),
+                                   IOMetaInformationPropertyConstants::READER_INPUTLOCATION(),
+                                   IOMetaInformationPropertyConstants::READER_OPTION_ROOT()})
+    {
+      this->m_DefaultMetaDataKeys.push_back(PropertyKeyPathToPropertyName(annotation));
+    }
   }
 }

@@ -30,7 +30,7 @@ found in the LICENSE file.
 #include <QmitknnInteractiveInstallModeDialog.h>
 #include <QmitkPipInstallDialog.h>
 #include <mitkPipPackageInfo.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <QApplication>
 #include <QBoxLayout>
@@ -46,9 +46,11 @@ found in the LICENSE file.
 #include <QPointer>
 #include <QScopeGuard>
 #include <QShortcut>
+#include <QSignalBlocker>
 #include <QTimer>
 #include <QWidget>
 
+#include <algorithm>
 #include <string>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
@@ -101,7 +103,7 @@ namespace
 
   void SetIcon(QAbstractButton* button, const char* icon)
   {
-    button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
+    button->setIcon(QmitkIconTheme::GetIcon(QString(":/nnInteractive/%1").arg(icon)));
   }
 
   QCursor CreateCursor(const std::string& svg)
@@ -387,7 +389,7 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
     auto icon = interactor->GetIcon();
 
     if (!icon.empty())
-      button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray(icon.data(), icon.size())));
+      button->setIcon(QmitkIconTheme::GetIcon(QByteArray(icon.data(), icon.size())));
 
     connect(button, &QPushButton::toggled, [this, interactionType](bool checked) {
       this->OnInteractorToggled(interactionType, checked);
@@ -913,6 +915,22 @@ void QmitknnInteractiveToolGUI::OnInteractorToggled(InteractionType interactionT
 {
   if (checked)
   {
+    if (!m_ExclusiveInteractionClaim.IsActive())
+    {
+      m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
+        this->UncheckOtherInteractorButtons(nullptr);
+        return true;
+      });
+
+      // The armed tool of another view keeps the exclusive interaction.
+      if (!m_ExclusiveInteractionClaim.IsActive())
+      {
+        const QSignalBlocker blocker(m_InteractorButtons[interactionType]);
+        m_InteractorButtons[interactionType]->setChecked(false);
+        return;
+      }
+    }
+
     // Ensure that only a single interactor is enabled at any time.
     this->UncheckOtherInteractorButtons(m_InteractorButtons[interactionType]);
     this->GetTool()->EnableInteractor(interactionType, m_PromptType);
@@ -929,6 +947,12 @@ void QmitknnInteractiveToolGUI::OnInteractorToggled(InteractionType interactionT
     // Disable the currently enabled interactor and restore the cursor.
     QApplication::restoreOverrideCursor();
     this->GetTool()->DisableInteractor(interactionType);
+
+    const bool isAnyInteractorChecked = std::any_of(m_InteractorButtons.begin(), m_InteractorButtons.end(),
+      [](const auto& entry) { return entry.second->isChecked(); });
+
+    if (!isAnyInteractorChecked)
+      m_ExclusiveInteractionClaim.Reset();
   }
 }
 

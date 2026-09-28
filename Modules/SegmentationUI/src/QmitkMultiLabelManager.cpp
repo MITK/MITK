@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 
 // Qmitk
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 #include <QmitkMultiLabelPresetHelper.h>
 
 // Qt
@@ -52,14 +52,14 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
   m_Controls->labelInspector->SetAllowLabelModification(true);
 
-  m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
-  m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
-  m_Controls->btnAddLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")));
-  m_Controls->btnAddInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")));
-  m_Controls->btnAddGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_add.svg")));
-  m_Controls->btnRemoveLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")));
-  m_Controls->btnRemoveInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")));
-  m_Controls->btnRemoveGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
+  m_Controls->btnSavePreset->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  m_Controls->btnLoadPreset->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
+  m_Controls->btnAddLabel->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")));
+  m_Controls->btnAddInstance->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")));
+  m_Controls->btnAddGroup->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_group_add.svg")));
+  m_Controls->btnRemoveLabel->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")));
+  m_Controls->btnRemoveInstance->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")));
+  m_Controls->btnRemoveGroup->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
 
   connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector,
     [inspector = this->m_Controls->labelInspector]() { inspector->AddNewLabel(); });
@@ -74,6 +74,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::LabelRenameRequested, this, &QmitkMultiLabelManager::OnLabelRenameRequested);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::OnSelectedLabelChanged);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentItemChanged, this, &QmitkMultiLabelManager::UpdateControls);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::ModelUpdated, this, &QmitkMultiLabelManager::OnModelUpdated);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::SegmentationChanged, this, &QmitkMultiLabelManager::OnSegmentationChanged);
 
@@ -238,7 +239,8 @@ void QmitkMultiLabelManager::UpdateControls()
   if (nullptr != m_AddLabelInstanceShortcut)
     m_AddLabelInstanceShortcut->setEnabled(hasWorkingData && labels.size() == 1 && instanceAllowed);
 
-  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
+  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && segmentation->GetNumberOfGroups() > 1
+    && this->m_Controls->labelInspector->GetGroupIDForRemoval().has_value());
   m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
   m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
 

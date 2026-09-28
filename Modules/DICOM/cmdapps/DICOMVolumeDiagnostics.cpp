@@ -17,10 +17,27 @@ found in the LICENSE file.
 #include <mitkDICOMEnums.h>
 #include <mitkDICOMFilesHelper.h>
 #include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMFrameLayout.h>
+#include <mitkDICOMFrameListHelper.h>
 
 #include <mitkFileSystem.h>
 
 #include <nlohmann/json.hpp>
+
+namespace
+{
+  /** The counts a finding carries, omitting the ones it left at zero. */
+  nlohmann::json Details(const mitk::DICOMFrameModelFinding& finding)
+  {
+    nlohmann::json details;
+
+    if (finding.frameCount > 0) details["number_of_frames"] = finding.frameCount;
+    if (finding.perFrameItemCount > 0) details["per_frame_item_count"] = finding.perFrameItemCount;
+    if (finding.distinctRescalePairs > 0) details["distinct_rescale_pairs"] = finding.distinctRescalePairs;
+
+    return details;
+  }
+}
 
 void InitializeCommandLineParser(mitkCommandLineParser& parser)
 {
@@ -84,10 +101,23 @@ int main(int argc, char* argv[])
     else
     {
       bool pathIsDirectory = fs::is_directory(inputFilename);
+      std::string resolvedInputFilename = inputFilename;
+
+      if (!pathIsDirectory)
+      {
+        const auto listedFile = mitk::FindListedFile(inputFilename, relevantFiles);
+
+        if (!listedFile.has_value())
+        {
+          mitkThrow() << "DICOM Volume Diagnostics did not find the input file among the DICOM files of its directory. Input: " << inputFilename;
+        }
+
+        resolvedInputFilename = listedFile.value();
+      }
 
       if (!pathIsDirectory && onlyOwnSeries)
       {
-        relevantFiles = mitk::FilterDICOMFilesForSameSeries(inputFilename, relevantFiles);
+        relevantFiles = mitk::FilterDICOMFilesForSameSeries(resolvedInputFilename, relevantFiles);
       }
 
       diagnosticsResult["analyzed_files"] = relevantFiles;
@@ -128,24 +158,24 @@ int main(int argc, char* argv[])
 
         diagnosticsResult["selected_reader"] = readerInfo;
 
+        // The selector scans with GDCM, which cannot look into sequences.
+        // BaseDICOMReaderService::DoRead analyzes with the frame model before loading, so a
+        // report built on the selection scan alone would show no frame model at
+        // all and answer a different question than this tool claims to.
+        // AnalyzeInputFiles clears its outputs first, so re-running it is safe.
+        const auto scanCache = mitk::AnalyzeWithFrameModel(*reader, relevantFiles);
+
         nlohmann::json outputInfos;
+        nlohmann::json findings = nlohmann::json::array();
+        unsigned int warningFindings = 0;
+        unsigned int infoFindings = 0;
 
         unsigned int relevantOutputCount = 0;
         const auto nrOfOutputs = reader->GetNumberOfOutputs();
         for (std::remove_const_t<decltype(nrOfOutputs)> outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
         {
-          bool isRelevantOutput = true;
-          if (!pathIsDirectory)
-          {
-            const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
-            auto finding = std::find_if(frameList.begin(), frameList.end(), [&](const mitk::DICOMImageFrameInfo::Pointer& frame)
-              {
-                fs::path framePath(frame->Filename);
-                fs::path inputPath(inputFilename);
-                return framePath == inputPath;
-              });
-            isRelevantOutput = finding != frameList.end();
-          }
+          const bool isRelevantOutput = pathIsDirectory
+            || mitk::ContainsFile(reader->GetOutput(outputIndex).GetImageFrameList(), resolvedInputFilename);
 
           if (isRelevantOutput)
           {
@@ -158,9 +188,49 @@ int main(int argc, char* argv[])
             outputFiles.resize(frameList.size());
             std::transform(frameList.begin(), frameList.end(), outputFiles.begin(), [](const mitk::DICOMImageFrameInfo::Pointer& frame) { return frame->Filename; });
 
+            const auto distinctFiles = mitk::DistinctFilesInOrder(frameList);
+
             outputInfo["files"] = outputFiles;
             outputInfo["timesteps"] = output.GetNumberOfTimeSteps();
             outputInfo["frames_per_timesteps"] = output.GetNumberOfFramesPerTimeStep();
+            outputInfo["distinct_files"] = distinctFiles;
+
+            bool anyFrameModel = false;
+
+            for (const auto& distinctFile : distinctFiles)
+            {
+              const auto frameOfFile = std::find_if(frameList.begin(), frameList.end(), [&distinctFile](const mitk::DICOMImageFrameInfo::Pointer& frame)
+                {
+                  return frame->Filename == distinctFile;
+                });
+
+              const auto layout = scanCache->GetFrameLayout(*frameOfFile);
+              anyFrameModel = anyFrameModel || layout.HasFrameModel();
+
+              for (const auto& finding : mitk::CollectFrameModelFindings(layout, distinctFile))
+              {
+                nlohmann::json entry;
+                entry["type"] = mitk::DICOMFrameModelIssueToKey(finding.issue);
+                entry["severity"] = mitk::DICOMFrameModelSeverityToKey(finding.severity);
+                entry["message"] = mitk::DICOMFrameModelIssueToString(finding.issue);
+                entry["volume_index"] = relevantOutputCount - 1;
+                entry["files"] = finding.files;
+                entry["details"] = Details(finding);
+                findings.push_back(entry);
+
+                if (mitk::DICOMFrameModelSeverity::Warning == finding.severity)
+                {
+                  ++warningFindings;
+                }
+                else
+                {
+                  ++infoFindings;
+                }
+              }
+            }
+
+            outputInfo["frame_model"] = anyFrameModel;
+
             if (output.GetSplitReason()!=nullptr && output.GetSplitReason()->HasReasons())
             {
               outputInfo["volume_split_reason"] = mitk::IOVolumeSplitReason::ToJSON(output.GetSplitReason());
@@ -187,6 +257,8 @@ int main(int argc, char* argv[])
         }
         diagnosticsResult["volume_count"] = relevantOutputCount;
         diagnosticsResult["volumes"] = outputInfos;
+        diagnosticsResult["findings"] = findings;
+        diagnosticsResult["findings_summary"] = { { "warning", warningFindings }, { "info", infoFindings } };
       }
     }
     std::cout << "\n### DIAGNOSTICS REPORT ###\n" << std::endl;

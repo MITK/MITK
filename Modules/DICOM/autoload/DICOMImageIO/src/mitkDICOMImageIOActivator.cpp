@@ -78,6 +78,7 @@ namespace mitk {
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES(), true);
+    AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_FRAMES(), true);
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_GANTRY_TILT_CORRECTED());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL());

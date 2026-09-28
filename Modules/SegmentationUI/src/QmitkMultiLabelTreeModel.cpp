@@ -17,11 +17,6 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
 
-#include <mitkSegChangeOperationApplier.h>
-
-#include <QmitkStyleManager.h>
-
-
 class QmitkMultiLabelSegTreeItem
 {
 public:
@@ -613,7 +608,8 @@ QModelIndex QmitkMultiLabelTreeModel::indexOfGroup(mitk::MultiLabelSegmentation:
 {
   auto relevantItem = GetGroupItem(groupIndex, this->m_RootItem.get());
 
-  if (nullptr == relevantItem) QModelIndex();
+  if (nullptr == relevantItem)
+    return QModelIndex();
 
   return GetIndexByItem(relevantItem, this);
 }

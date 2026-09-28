@@ -33,6 +33,8 @@ class mitkMultiLabelSurfaceNetsExtractorTestSuite : public mitk::TestFixture
   MITK_TEST(Extract_TwoLabels_BoundaryLabelsCarryForegroundValue);
   MITK_TEST(ExtractPerLabel_ReturnsOnePolyDataPerPresentLabel);
   MITK_TEST(ExtractPerLabel_OmitsLabelsWithNoBoundary);
+  MITK_TEST(Extract_SingleSliceImage_ProducesClosedSlab);
+  MITK_TEST(ExtractPerLabel_SingleSliceImage_ReturnsLabel);
   MITK_TEST(SmoothingToggle_ChangesPointPositions);
   MITK_TEST(GetImageToWorldMatrix_NullGeometry_ReturnsIdentity);
   MITK_TEST(GetImageToWorldMatrix_StripsSpacingAndKeepsOrigin);
@@ -74,6 +76,26 @@ private:
           for (int x = 10; x < 12; ++x)
             setVoxel(x, y, z, 2);
     }
+
+    return image;
+  }
+
+  /** Build a 16x16x1 uint16 image with one 4x4 square of label 1, as a segmentation
+   *  of a 2D reference image yields. */
+  static vtkSmartPointer<vtkImageData> MakeSingleSliceImage()
+  {
+    auto image = vtkSmartPointer<vtkImageData>::New();
+    image->SetDimensions(16, 16, 1);
+    image->SetSpacing(1.0, 1.0, 1.0);
+    image->SetOrigin(0.0, 0.0, 0.0);
+    image->AllocateScalars(VTK_UNSIGNED_SHORT, 1);
+
+    auto* scalars = static_cast<unsigned short*>(image->GetScalarPointer());
+    std::fill(scalars, scalars + 16 * 16, static_cast<unsigned short>(0));
+
+    for (int y = 4; y < 8; ++y)
+      for (int x = 4; x < 8; ++x)
+        scalars[y * 16 + x] = 1;
 
     return image;
   }
@@ -152,6 +174,44 @@ public:
     CPPUNIT_ASSERT(results.find(1) != results.end());
     CPPUNIT_ASSERT_MESSAGE("Labels with no boundary must be absent from the result map",
                            results.find(99) == results.end());
+  }
+
+  void Extract_SingleSliceImage_ProducesClosedSlab()
+  {
+    auto image = MakeSingleSliceImage();
+
+    mitk::MultiLabelSurfaceNetsExtractor extractor;
+    extractor.SetSmoothing(false);
+    auto result = extractor.Extract(image, {1});
+
+    CPPUNIT_ASSERT(result != nullptr);
+    CPPUNIT_ASSERT_MESSAGE("A single-slice image must still yield boundary cells", result->GetNumberOfCells() > 0);
+
+    // Exact-mode vertices sit on the dual grid half a voxel off the voxel centers, so a
+    // closed slab around slice 0 spans z = -0.5 .. 0.5 and the 4x4 square spans 3.5 .. 7.5.
+    double bounds[6];
+    result->GetBounds(bounds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.5, bounds[0], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(7.5, bounds[1], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.5, bounds[2], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(7.5, bounds[3], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-0.5, bounds[4], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, bounds[5], 1e-6);
+
+    mitk::MultiLabelSurfaceNetsExtractor smoothExtractor;
+    smoothExtractor.SetSmoothing(true);
+    auto smoothResult = smoothExtractor.Extract(image, {1});
+    CPPUNIT_ASSERT_MESSAGE("Smoothing must also work on a single-slice image", smoothResult->GetNumberOfCells() > 0);
+  }
+
+  void ExtractPerLabel_SingleSliceImage_ReturnsLabel()
+  {
+    auto image = MakeSingleSliceImage();
+    mitk::MultiLabelSurfaceNetsExtractor extractor;
+    auto results = extractor.ExtractPerLabel(image, {1});
+
+    CPPUNIT_ASSERT(results.find(1) != results.end());
+    CPPUNIT_ASSERT(results.at(1)->GetNumberOfCells() > 0);
   }
 
   void SmoothingToggle_ChangesPointPositions()

@@ -1462,11 +1462,11 @@ namespace mitk
       "dicomseriesreader.ReaderImplementationLevelString",
       StringProperty::New(ReaderImplementationLevelToString(blockInfo.GetReaderImplementationLevel())));
     image->SetProperty("dicomseriesreader.ReaderImplementationLevel",
-                       GenericProperty<ReaderImplementationLevel>::New(blockInfo.GetReaderImplementationLevel()));
+                       IntProperty::New(static_cast<int>(blockInfo.GetReaderImplementationLevel())));
     image->SetProperty("dicomseriesreader.PixelSpacingInterpretationString",
                        StringProperty::New(PixelSpacingInterpretationToString(blockInfo.GetPixelSpacingType())));
     image->SetProperty("dicomseriesreader.PixelSpacingInterpretation",
-                       GenericProperty<PixelSpacingInterpretation>::New(blockInfo.GetPixelSpacingType()));
+                       IntProperty::New(static_cast<int>(blockInfo.GetPixelSpacingType())));
     image->SetProperty("dicomseriesreader.MultiFrameImage", BoolProperty::New(blockInfo.IsMultiFrameImage()));
     image->SetProperty("dicomseriesreader.GantyTiltCorrected", BoolProperty::New(blockInfo.HasGantryTiltCorrected()));
     image->SetProperty("dicomseriesreader.3D+t", BoolProperty::New(blockInfo.HasMultipleTimePoints()));

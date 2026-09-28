@@ -12,16 +12,16 @@
     <file>SegmentationIcon_48.png</file>
     <file>list-solid.svg</file>
     <file>lock.svg</file>
-    <file>mm_contrast.png</file>
-    <file>mm_pan.png</file>
-    <file>mm_pointer.png</file>
-    <file>mm_scroll.png</file>
-    <file>mm_zoom.png</file>
-    <file>mwDesynchronized.png</file>
-    <file>mwLayout.png</file>
-    <file>mwMITK.png</file>
-    <file>mwPACS.png</file>
-    <file>mwSynchronized.png</file>
+    <file>mm_contrast.svg</file>
+    <file>mm_pan.svg</file>
+    <file>mm_pointer.svg</file>
+    <file>mm_scroll.svg</file>
+    <file>mm_zoom.svg</file>
+    <file>mwDesynchronized.svg</file>
+    <file>mwLayout.svg</file>
+    <file>mwMITK.svg</file>
+    <file>mwPACS.svg</file>
+    <file>mwSynchronized.svg</file>
     <file>PlanarAngle_48.png</file>
     <file>PlanarBezierCurve_48.png</file>
     <file>PlanarCircle_48.png</file>

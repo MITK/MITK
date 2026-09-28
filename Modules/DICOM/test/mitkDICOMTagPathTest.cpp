@@ -30,6 +30,8 @@ class mitkDICOMTagPathTestSuite : public mitk::TestFixture
   MITK_TEST(DICOMTagPathToPropertyName);
   MITK_TEST(ExecutePropertyRegEx);
   MITK_TEST(AnySelectionIndexSurvivesTemplateRoundTrip);
+  MITK_TEST(IsFunctionalGroupRooted);
+  MITK_TEST(FunctionalGroupRelativePath);
 
   MITK_TEST(TestOperatorPlusWithTwoPaths);
   MITK_TEST(TestOperatorPlusWithString);
@@ -287,6 +289,76 @@ public:
       "round trip and not be overwritten by the element-id capture.",
       std::string("DICOM.0040.A170.[7].0008.0104"),
       substituted);
+  }
+
+  /** The root a functional-group finding is published relative to. Both
+      sequences count, because the same macro may sit in either. */
+  void IsFunctionalGroupRooted()
+  {
+    mitk::DICOMTagPath perFrame;
+    perFrame.AddAnySelection(0x5200, 0x9230).AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+    CPPUNIT_ASSERT_MESSAGE("Per-frame functional groups are a functional-group root",
+                           mitk::IsFunctionalGroupRooted(perFrame));
+
+    mitk::DICOMTagPath shared;
+    shared.AddAnySelection(0x5200, 0x9229).AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+    CPPUNIT_ASSERT_MESSAGE("Shared functional groups are a functional-group root",
+                           mitk::IsFunctionalGroupRooted(shared));
+
+    mitk::DICOMTagPath explicitItem;
+    explicitItem.AddSelection(0x5200, 0x9230, 7).AddSelection(0x0028, 0x9145, 0).AddElement(0x0028, 0x1053);
+    CPPUNIT_ASSERT_MESSAGE("An explicit item index is still a functional-group root",
+                           mitk::IsFunctionalGroupRooted(explicitItem));
+
+    mitk::DICOMTagPath sourceImage;
+    sourceImage.AddAnySelection(0x0008, 0x2112).AddElement(0x0008, 0x1155);
+    CPPUNIT_ASSERT_MESSAGE("Another sequence is not a functional-group root",
+                           !mitk::IsFunctionalGroupRooted(sourceImage));
+
+    // A bare (5200,9230) names the sequence itself, not an attribute inside a
+    // frame, so there is nothing to make relative.
+    mitk::DICOMTagPath rootOnly;
+    rootOnly.AddAnySelection(0x5200, 0x9230);
+    CPPUNIT_ASSERT_MESSAGE("The bare sequence is not a rooted path",
+                           !mitk::IsFunctionalGroupRooted(rootOnly));
+
+    CPPUNIT_ASSERT_MESSAGE("A top-level tag is not a functional-group root",
+                           !mitk::IsFunctionalGroupRooted(simplePath));
+  }
+
+  /** Both placements of one macro derive to the same path. That is what lets
+      the reader publish one key whichever group the encoder used. */
+  void FunctionalGroupRelativePath()
+  {
+    mitk::DICOMTagPath expected;
+    expected.AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+
+    mitk::DICOMTagPath perFrame;
+    perFrame.AddAnySelection(0x5200, 0x9230).AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+    mitk::DICOMTagPath shared;
+    shared.AddAnySelection(0x5200, 0x9229).AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The per-frame root is dropped",
+                                 expected.ToStr(), mitk::FunctionalGroupRelativePath(perFrame).ToStr());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The shared root is dropped",
+                                 expected.ToStr(), mitk::FunctionalGroupRelativePath(shared).ToStr());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Both placements derive to one path",
+                                 mitk::FunctionalGroupRelativePath(shared).ToStr(),
+                                 mitk::FunctionalGroupRelativePath(perFrame).ToStr());
+
+    // The inner item index survives: a macro sequence may hold several items
+    // for one frame, and a path entering a sequence without naming an item is
+    // not addressable.
+    mitk::DICOMTagPath explicitItems;
+    explicitItems.AddSelection(0x5200, 0x9230, 7).AddSelection(0x0040, 0x9096, 1).AddElement(0x0040, 0x9225);
+    mitk::DICOMTagPath expectedExplicit;
+    expectedExplicit.AddSelection(0x0040, 0x9096, 1).AddElement(0x0040, 0x9225);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The macro item index is kept",
+                                 expectedExplicit.ToStr(),
+                                 mitk::FunctionalGroupRelativePath(explicitItems).ToStr());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("An unrelated path is returned unchanged",
+                                 deepPath.ToStr(), mitk::FunctionalGroupRelativePath(deepPath).ToStr());
   }
 
   void TestOperatorPlusWithTwoPaths()

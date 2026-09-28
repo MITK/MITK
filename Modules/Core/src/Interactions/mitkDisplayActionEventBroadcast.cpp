@@ -22,10 +22,66 @@ found in the LICENSE file.
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLine.h>
+#include <mitkMousePressEvent.h>
 #include <mitkRotationOperation.h>
 #include <mitkTimeNavigationController.h>
 
 #include <rotate_cursor.xpm>
+
+#include <utility>
+
+namespace
+{
+  unsigned int NumberOfLeftButtonBlocks = 0;
+
+  bool IsBlockedLeftButtonPress(const mitk::InteractionEvent* interactionEvent)
+  {
+    if (NumberOfLeftButtonBlocks == 0)
+      return false;
+
+    const auto* pressEvent = dynamic_cast<const mitk::MousePressEvent*>(interactionEvent);
+    return pressEvent != nullptr && pressEvent->GetEventButton() == mitk::InteractionEvent::LeftMouseButton;
+  }
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock::LeftButtonBlock(LeftButtonBlock&& other) noexcept
+  : m_IsActive(std::exchange(other.m_IsActive, false))
+{
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock& mitk::DisplayActionEventBroadcast::LeftButtonBlock::operator=(LeftButtonBlock&& other) noexcept
+{
+  if (this != &other)
+  {
+    this->Reset();
+    m_IsActive = std::exchange(other.m_IsActive, false);
+  }
+
+  return *this;
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock::~LeftButtonBlock()
+{
+  this->Reset();
+}
+
+void mitk::DisplayActionEventBroadcast::LeftButtonBlock::Reset()
+{
+  if (!m_IsActive)
+    return;
+
+  m_IsActive = false;
+  --NumberOfLeftButtonBlocks;
+}
+
+mitk::DisplayActionEventBroadcast::LeftButtonBlock mitk::DisplayActionEventBroadcast::BlockLeftButton()
+{
+  LeftButtonBlock block;
+  block.m_IsActive = true;
+  ++NumberOfLeftButtonBlocks;
+
+  return block;
+}
 
 mitk::DisplayActionEventBroadcast::DisplayActionEventBroadcast()
   : m_AlwaysReact(false)
@@ -55,18 +111,19 @@ mitk::DisplayActionEventBroadcast::~DisplayActionEventBroadcast()
 
 void mitk::DisplayActionEventBroadcast::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
-  // the event is passed to the state machine interface to be handled
-  if (!isHandled || m_AlwaysReact)
-  {
-    HandleEvent(interactionEvent, nullptr);
-  }
+  if (isHandled && !m_AlwaysReact)
+    return;
+
+  if (IsBlockedLeftButtonPress(interactionEvent))
+    return;
+
+  this->HandleEvent(interactionEvent, nullptr);
 }
 
 void mitk::DisplayActionEventBroadcast::ConnectActionsAndFunctions()
 {
   CONNECT_CONDITION("check_position_event", CheckPositionEvent);
   CONNECT_CONDITION("check_can_rotate", CheckRotationPossible);
-  CONNECT_CONDITION("check_can_swivel", CheckSwivelPossible);
 
   CONNECT_FUNCTION("init", Init);
   CONNECT_FUNCTION("move", Move);
@@ -80,8 +137,6 @@ void mitk::DisplayActionEventBroadcast::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("startRotation", StartRotation);
   CONNECT_FUNCTION("endRotation", EndRotation);
   CONNECT_FUNCTION("rotate", Rotate);
-
-  CONNECT_FUNCTION("swivel", Swivel);
 
   CONNECT_FUNCTION("IncreaseTimeStep", IncreaseTimeStep);
   CONNECT_FUNCTION("DecreaseTimeStep", DecreaseTimeStep);
@@ -336,113 +391,6 @@ bool mitk::DisplayActionEventBroadcast::CheckRotationPossible(const InteractionE
     {
       return false;
     }
-  }
-  return false;
-}
-
-bool mitk::DisplayActionEventBroadcast::CheckSwivelPossible(const InteractionEvent *interactionEvent)
-{
-  // Decide between moving and rotation: if we're close to the crossing
-  // point of the planes, moving mode is entered, otherwise
-  // rotation/swivel mode
-  const auto* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
-  if (nullptr == positionEvent)
-  {
-    return false;
-  }
-
-  BaseRenderer* renderer = positionEvent->GetSender();
-  if (nullptr == renderer)
-  {
-    return false;
-  }
-
-  const Point3D& position = positionEvent->GetPositionInWorld();
-
-  m_SNCsToBeRotated.clear();
-
-  const PlaneGeometry* clickedGeometry(nullptr);
-  const PlaneGeometry* otherGeometry1(nullptr);
-  const PlaneGeometry* otherGeometry2(nullptr);
-
-  const ScalarType threshholdDistancePixels = 6.0;
-
-  auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  for (auto renderWindow : allRenderWindows)
-  {
-    SliceNavigationController* snc = BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController();
-
-    // If the mouse cursor is in 3D Renderwindow, do not check for intersecting planes.
-    if (BaseRenderer::Standard3D == BaseRenderer::GetInstance(renderWindow)->GetMapperID())
-    {
-      continue;
-    }
-
-    const PlaneGeometry* rendererPlaneGeometry = snc->GetCurrentPlaneGeometry();
-    if (nullptr == rendererPlaneGeometry)
-    {
-      continue; // ignore, we don't see a plane
-    }
-
-    if (snc == renderer->GetSliceNavigationController())
-    {
-      clickedGeometry = rendererPlaneGeometry;
-      m_SNCsToBeRotated.push_back(snc);
-    }
-    else
-    {
-      if (nullptr == otherGeometry1)
-      {
-        otherGeometry1 = rendererPlaneGeometry;
-      }
-      else
-      {
-        otherGeometry2 = rendererPlaneGeometry;
-      }
-      if (m_LinkPlanes)
-      {
-        // if planes are linked, apply rotation to all planes
-        m_SNCsToBeRotated.push_back(snc);
-      }
-    }
-  }
-
-  Line3D line;
-  Point3D point;
-  if ((nullptr != clickedGeometry) && (nullptr != otherGeometry1) && (nullptr != otherGeometry2)
-   && clickedGeometry->IntersectionLine(otherGeometry1, line) && otherGeometry2->IntersectionPoint(line, point))
-  {
-    m_CenterOfRotation = point;
-    if (m_CenterOfRotation.EuclideanDistanceTo(position) < threshholdDistancePixels)
-    {
-      return false;
-    }
-    else
-    {
-      m_ReferenceCursor = positionEvent->GetPointerPositionOnScreen();
-
-      // Get main axes of rotation plane and store it for rotation step
-      m_RotationPlaneNormal = clickedGeometry->GetNormal();
-
-      ScalarType xVector[] = { 1.0, 0.0, 0.0 };
-      ScalarType yVector[] = { 0.0, 1.0, 0.0 };
-      clickedGeometry->BaseGeometry::IndexToWorld(Vector3D(xVector), m_RotationPlaneXVector);
-      clickedGeometry->BaseGeometry::IndexToWorld(Vector3D(yVector), m_RotationPlaneYVector);
-
-      m_RotationPlaneNormal.Normalize();
-      m_RotationPlaneXVector.Normalize();
-      m_RotationPlaneYVector.Normalize();
-
-      m_PreviousRotationAxis.Fill(0.0);
-      m_PreviousRotationAxis[2] = 1.0;
-      m_PreviousRotationAngle = 0.0;
-
-      return true;
-    }
-  }
-  else
-  {
-    return false;
   }
   return false;
 }
@@ -702,73 +650,6 @@ void mitk::DisplayActionEventBroadcast::Rotate(StateMachineAction* /*stateMachin
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
-{
-  const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (nullptr == positionEvent)
-  {
-    return;
-  }
-
-  // Determine relative mouse movement projected onto world space
-  Point2D position = positionEvent->GetPointerPositionOnScreen();
-
-  Vector2D relativeCursor = position - m_ReferenceCursor;
-  Vector3D relativeCursorAxis = m_RotationPlaneXVector * relativeCursor[0] + m_RotationPlaneYVector * relativeCursor[1];
-
-  // Determine rotation axis (perpendicular to rotation plane and cursor movement)
-  Vector3D rotationAxis = itk::CrossProduct(m_RotationPlaneNormal, relativeCursorAxis);
-
-  ScalarType rotationAngle = relativeCursor.GetNorm() / 2.0;
-
-  // Restore the initial plane pose by undoing the previous rotation operation
-  RotationOperation op(OpROTATE, m_CenterOfRotation, m_PreviousRotationAxis, -m_PreviousRotationAngle);
-
-  SNCVector::iterator iter;
-  for (iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
-  {
-    if (!(*iter)->GetSliceRotationLocked())
-    {
-      TimeGeometry* timeGeometry = (*iter)->GetCreatedWorldGeometry();
-      if (nullptr == timeGeometry)
-      {
-        continue;
-      }
-
-      timeGeometry->ExecuteOperation(&op);
-      (*iter)->SendCreatedWorldGeometryUpdate();
-    }
-  }
-
-  // Apply new rotation operation to all relevant SNCs
-  RotationOperation op2(OpROTATE, m_CenterOfRotation, rotationAxis, rotationAngle);
-
-  for (iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
-  {
-    if (!(*iter)->GetSliceRotationLocked())
-    {
-      // Retrieve the TimeGeometry of this SliceNavigationController
-      TimeGeometry *timeGeometry = (*iter)->GetCreatedWorldGeometry();
-      if (nullptr == timeGeometry)
-      {
-        continue;
-      }
-
-      // Execute the new rotation
-      timeGeometry->ExecuteOperation(&op2);
-
-      // Notify listeners
-      (*iter)->SendCreatedWorldGeometryUpdate();
-    }
-  }
-
-  m_PreviousRotationAxis = rotationAxis;
-  m_PreviousRotationAngle = rotationAngle;
-
-  RenderingManager::GetInstance()->RequestUpdateAll();
-  return;
 }
 
 void mitk::DisplayActionEventBroadcast::IncreaseTimeStep(StateMachineAction*, InteractionEvent*)

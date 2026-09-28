@@ -49,8 +49,8 @@ void QmitkGeneralPreferencePage::CreateQtControl(QWidget* parent)
   m_GlobalReinitOnNodeVisibilityChanged = new QCheckBox;
 
   auto formLayout = new QFormLayout;
-  formLayout->addRow("&Call global reinit if node is deleted", m_GlobalReinitOnNodeDelete);
-  formLayout->addRow("&Call global reinit if node visibility is changed", m_GlobalReinitOnNodeVisibilityChanged);
+  formLayout->addRow("&Fit views to all data when a node is deleted", m_GlobalReinitOnNodeDelete);
+  formLayout->addRow("Fit &views to all data when node visibility changes", m_GlobalReinitOnNodeVisibilityChanged);
 
   m_MainControl->setLayout(formLayout);
   Update();

@@ -102,6 +102,19 @@ public:
                                                        mitk::DataStorage &storage,
                                                        QWidget *parent = nullptr);
 
+  /**
+   * \brief Loads the files described by \p loadInfos into \p storage.
+   *
+   * Behaves like Load(const QStringList&, mitk::DataStorage&, QWidget*), but
+   * leaves the data read from each path in its LoadInfo::m_Output, so that
+   * callers can tell which paths were loaded. The output stays empty for paths
+   * that failed and for paths that another path's reader already read, like
+   * the other files of a DICOM series.
+   */
+  static mitk::DataStorage::SetOfObjects::Pointer Load(std::vector<LoadInfo> &loadInfos,
+                                                       mitk::DataStorage &storage,
+                                                       QWidget *parent = nullptr);
+
   static QList<mitk::BaseData::Pointer> Load(const QString &path, QWidget *parent = nullptr);
 
   static mitk::DataStorage::SetOfObjects::Pointer Load(const QString &path,

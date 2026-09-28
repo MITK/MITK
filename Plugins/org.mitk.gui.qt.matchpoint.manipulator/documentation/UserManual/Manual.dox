@@ -30,7 +30,7 @@ for the manipulation, which will be "on top" of the existing registration.
 (5) <b>Target image slot</b>: To allow for visual inspection of the manipulation a target image must be specified. This image is used to compare against the mapped moving image to illustrate the effects of the manipulation. Click to change the image.\n\n
 
 (6) <b>Start manual registration</b>: If all settings are valid, you can start the manipulation. The render windows will automatically
-switch to the visual inspection mode and will be reinitialized once to the field of view of the target image.\n\n\n
+switch to the visual inspection mode and will be fitted once to the field of view of the target image.\n\n\n
 
 \imageMacro{map_view_manipulator_started.png, "Controls after the manipulation session is started.", 14}
 

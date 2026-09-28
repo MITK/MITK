@@ -8,6 +8,10 @@ mitkAddCustomModuleTest(QmitkAbstractNodeSelectionWidgetTest QmitkAbstractNodeSe
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkIconThemeTest QmitkIconThemeTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNExplicitNameTest QmitkMxNExplicitNameTest
   -platform minimal
 )
@@ -25,6 +29,10 @@ mitkAddCustomModuleTest(QmitkMxNDataBasedLayoutTest QmitkMxNDataBasedLayoutTest
 )
 
 mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWidgetConnectorTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkRunInputBlockingTest QmitkRunInputBlockingTest
   -platform minimal
 )
 

@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 
@@ -25,7 +26,7 @@ found in the LICENSE file.
 #include "QmitkFlatLabelInstanceProxyModel.h"
 #include <QmitkLabelColorItemDelegate.h>
 #include <QmitkLabelToggleItemDelegate.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 // Qt
 #include <QMenu>
@@ -51,12 +52,12 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
 
   m_ColorItemDelegate = new QmitkLabelColorItemDelegate(this);
 
-  auto visibleIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg"));
-  auto invisibleIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg"));
+  auto visibleIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg"));
+  auto invisibleIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/invisible.svg"));
   m_VisibilityItemDelegate = new QmitkLabelToggleItemDelegate(visibleIcon, invisibleIcon, this);
 
-  auto lockIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg"));
-  auto unlockIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg"));
+  auto lockIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/lock.svg"));
+  auto unlockIcon = QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/unlock.svg"));
   m_LockItemDelegate = new QmitkLabelToggleItemDelegate(lockIcon, unlockIcon, this);
 
   auto* view = this->m_Controls->view;
@@ -81,6 +82,7 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
   connect(m_Model, &QmitkMultiLabelTreeModel::modelChanged, this, &QmitkMultiLabelInspector::OnModelChanged);
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
+  connect(view->selectionModel(), &QItemSelectionModel::currentChanged, this, &QmitkMultiLabelInspector::CurrentItemChanged);
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
   connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
@@ -146,6 +148,15 @@ void QmitkMultiLabelInspector::Initialize()
       this->SetSelectedLabel(labelVariant.value<LabelValueType>());
       m_Controls->view->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::NoUpdate);
     }
+  }
+  else if (m_Segmentation.IsNotNull() && m_Segmentation->GetTotalNumberOfLabels() == 0)
+  {
+    //Without labels nothing can be selected, as groups are not selectable. Focussing the first
+    //group still gives group wide operations (e.g. removing a group) a defined target.
+    auto firstIndex = m_Model->indexOfGroup(0);
+
+    if (firstIndex.isValid())
+      m_Controls->view->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::NoUpdate);
   }
 
   this->RefreshCompleter();
@@ -502,6 +513,29 @@ QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetCurr
   return m_Model->GetLabelsInSubTree(currentIndex);
 }
 
+std::optional<mitk::MultiLabelSegmentation::GroupIndexType> QmitkMultiLabelInspector::GetCurrentGroupID() const
+{
+  const auto groupIDVariant = m_Controls->view->currentIndex().data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+
+  if (!groupIDVariant.isValid())
+    return std::nullopt;
+
+  return groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
+}
+
+std::optional<mitk::MultiLabelSegmentation::GroupIndexType> QmitkMultiLabelInspector::GetGroupIDForRemoval() const
+{
+  if (m_Segmentation.IsNull())
+    return std::nullopt;
+
+  const auto* selectedLabel = this->GetFirstSelectedLabelObject();
+
+  if (nullptr != selectedLabel)
+    return m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+
+  return this->GetCurrentGroupID();
+}
+
 QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetLabelInstancesOfSelectedFirstLabel() const
 {
   if (m_Segmentation.IsNull())
@@ -638,7 +672,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabel(bool skipNamingPrompt)
   auto currentLabel = this->GetFirstSelectedLabelObject();
   mitk::MultiLabelSegmentation::GroupIndexType groupID = nullptr != currentLabel
     ? m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue())
-    : 0;
+    : this->GetCurrentGroupID().value_or(0);
 
   auto result = AddNewLabelInternal(groupID, skipNamingPrompt);
 
@@ -897,6 +931,28 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkMultiLabelInspector::RemoveGroupWithConfirmation(mitk::MultiLabelSegmentation::GroupIndexType groupID)
+{
+  auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
+
+  auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
+  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+  if (answer != QMessageBox::Yes)
+    return;
+
+  this->RemoveGroupInternal(groupID);
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+  }
+}
+
 void QmitkMultiLabelInspector::RemoveGroup()
 {
   if (!m_AllowLabelModification)
@@ -911,21 +967,12 @@ void QmitkMultiLabelInspector::RemoveGroup()
     return;
   }
 
-  const auto* selectedLabel = this->GetFirstSelectedLabelObject();
+  const auto groupID = this->GetGroupIDForRemoval();
 
-  if (selectedLabel == nullptr)
+  if (!groupID.has_value())
     return;
 
-  const auto groupID = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
-  auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
-
-  auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
-  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-  if (answer != QMessageBox::Yes)
-    return;
-
-  this->RemoveGroupInternal(groupID);
+  this->RemoveGroupWithConfirmation(groupID.value());
 }
 
 void QmitkMultiLabelInspector::OnDeleteGroup()
@@ -936,31 +983,11 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
   if (m_Segmentation.IsNull())
     return;
 
-  auto currentIndex = this->m_Controls->view->currentIndex();
-  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+  const auto groupID = this->GetCurrentGroupID();
 
-  if (groupIDVariant.isValid())
-  {
-    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
-    auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
-    auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
-    auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-    if (answer != QMessageBox::Yes)
-      return;
-
-    this->RemoveGroupInternal(groupID);
-
-    // this is needed as workaround for (T27307). It circumvents the fact that modifications
-    // of data (here the segmentation) does not directly trigger the modification of the
-    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
-    // listens to the datastorage for modification would not get notified.
-    if (m_SegmentationNode.IsNotNull())
-    {
-      m_SegmentationNode->Modified();
-    }
-  }
-};
+  if (groupID.has_value())
+    this->RemoveGroupWithConfirmation(groupID.value());
+}
 
 
 void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
@@ -982,7 +1009,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
   {
     if (m_AllowLabelModification)
     {
-      QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")), "&Add label", this);
+      QAction* addInstanceAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")), "&Add label", this);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabel);
       menu->addAction(addInstanceAction);
 
@@ -992,7 +1019,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
       if (m_Segmentation->GetNumberOfGroups() > 1)
       {
-        QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")), "Delete group", this);
+        QAction* removeAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")), "Delete group", this);
         QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);
         menu->addAction(removeAction);
       }
@@ -1001,11 +1028,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     if (m_AllowLockModification)
     {
       menu->addSeparator();
-      QAction* lockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg")), "Lock group", this);
+      QAction* lockAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/lock.svg")), "Lock group", this);
       QObject::connect(lockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnLockAffectedLabels);
       menu->addAction(lockAllAction);
 
-      QAction* unlockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg")), "Unlock group", this);
+      QAction* unlockAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/unlock.svg")), "Unlock group", this);
       QObject::connect(unlockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnUnlockAffectedLabels);
       menu->addAction(unlockAllAction);
     }
@@ -1014,11 +1041,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       menu->addSeparator();
 
-      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Show group", this);
+      QAction* viewAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg")), "Show group", this);
       QObject::connect(viewAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsVisible);
       menu->addAction(viewAllAction);
 
-      QAction* hideAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide group", this);
+      QAction* hideAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide group", this);
       QObject::connect(hideAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsInvisible);
       menu->addAction(hideAllAction);
 
@@ -1041,7 +1068,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
       }
 
-      QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
+      QAction* addInstanceAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
       addInstanceAction->setEnabled(instanceIsAllowed);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
       menu->addAction(addInstanceAction);
@@ -1050,7 +1077,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
       menu->addAction(renameAction);
 
-      QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "&Delete label", this);
+      QAction* removeAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "&Delete label", this);
       QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteAffectedLabel);
       menu->addAction(removeAction);
     }
@@ -1058,11 +1085,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     if (m_AllowLockModification)
     {
       menu->addSeparator();
-      QAction* lockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg")), "Lock label instances", this);
+      QAction* lockAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/lock.svg")), "Lock label instances", this);
       QObject::connect(lockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnLockAffectedLabels);
       menu->addAction(lockAllAction);
 
-      QAction* unlockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg")), "Unlock label instances", this);
+      QAction* unlockAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/unlock.svg")), "Unlock label instances", this);
       QObject::connect(unlockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnUnlockAffectedLabels);
       menu->addAction(unlockAllAction);
     }
@@ -1071,11 +1098,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       menu->addSeparator();
 
-      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Show label instances", this);
+      QAction* viewAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg")), "Show label instances", this);
       QObject::connect(viewAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsVisible);
       menu->addAction(viewAllAction);
 
-      QAction* hideAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide label instances", this);
+      QAction* hideAllAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide label instances", this);
       QObject::connect(hideAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsInvisible);
       menu->addAction(hideAllAction);
 
@@ -1100,7 +1127,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         QObject::connect(mergeAction, SIGNAL(triggered(bool)), this, SLOT(OnMergeLabels(bool)));
         menu->addAction(mergeAction);
 
-        QAction* removeLabelsAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete selected labels", this);
+        QAction* removeLabelsAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete selected labels", this);
         QObject::connect(removeLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnDeleteLabels(bool)));
         menu->addAction(removeLabelsAction);
 
@@ -1113,7 +1140,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       {
         if (m_AllowLabelModification) menu->addSeparator();
 
-        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
+        QAction* viewOnlyAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
         QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
         menu->addAction(viewOnlyAction);
 
@@ -1136,7 +1163,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
           instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
         }
 
-        QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance", this);
+        QAction* addInstanceAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance", this);
         addInstanceAction->setEnabled(instanceIsAllowed);
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
@@ -1149,7 +1176,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
           QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
           menu->addAction(renameAction);
 
-          QAction* removeInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete label instance", this);
+          QAction* removeInstanceAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete label instance", this);
           QObject::connect(removeInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabelInstance);
           menu->addAction(removeInstanceAction);
         }
@@ -1160,7 +1187,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
           menu->addAction(renameAction);
         }
 
-        QAction* removeLabelAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "Delete &label", this);
+        QAction* removeLabelAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "Delete &label", this);
         QObject::connect(removeLabelAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabel);
         menu->addAction(removeLabelAction);
 
@@ -1177,7 +1204,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       {
         if (m_AllowLabelModification) menu->addSeparator();
 
-        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
+        QAction* viewOnlyAction = new QAction(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
         QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
         menu->addAction(viewOnlyAction);
 
@@ -1444,13 +1471,11 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnAddLabel()
 {
-  auto currentIndex = this->m_Controls->view->currentIndex();
-  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+  const auto groupID = this->GetCurrentGroupID();
 
-  if (groupIDVariant.isValid())
+  if (groupID.has_value())
   {
-    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
-    this->AddNewLabelInternal(groupID);
+    this->AddNewLabelInternal(groupID.value());
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
     // of data (here the segmentation) does not directly trigger the modification of the
@@ -1522,12 +1547,11 @@ void QmitkMultiLabelInspector::OnRenameGroup()
   if (m_Segmentation.IsNull())
     return;
 
-  auto currentIndex = this->m_Controls->view->currentIndex();
-  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+  const auto currentGroupID = this->GetCurrentGroupID();
 
-  if (groupIDVariant.isValid())
+  if (currentGroupID.has_value())
   {
-    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
+    const auto groupID = currentGroupID.value();
 
     bool dlgOK;
     auto groupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
@@ -1703,8 +1727,14 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   if (currentLabel.IsNull())
     return;
 
+  const auto* timeGeometry = m_Segmentation->GetTimeGeometry();
+  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  if (!timeGeometry->IsValidTimePoint(timePoint))
+    return;
+
   this->WaitCursorOn();
-  m_Segmentation->UpdateCenterOfMass(labelID);
+  m_Segmentation->UpdateCenterOfMass(labelID, timeGeometry->TimePointToTimeStep(timePoint));
   this->WaitCursorOff();
 
   const auto pos = currentLabel->GetCenterOfMassIndex();
@@ -1719,8 +1749,6 @@ void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index)
 {
   if (m_SegmentationNode.IsNotNull())
   {
-    auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-
     auto highlightedValues = m_Model->GetLabelsInSubTree(index);
 
     m_LabelHighlightGuard.SetHighlightedLabels(highlightedValues);
@@ -1757,7 +1785,7 @@ void QmitkMultiLabelInspector::keyReleaseEvent(QKeyEvent* event)
     m_LabelHighlightGuard.SetHighlightInvisibleLabels(false);
   }
 
-  QWidget::keyPressEvent(event);
+  QWidget::keyReleaseEvent(event);
 }
 
 void QmitkMultiLabelInspector::OnSearchLabel()

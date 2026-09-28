@@ -29,7 +29,7 @@ mitk_create_plugin(
     internal/berryTweaklets.h
     berryIWorkbenchWindow.h
     berryWeakPointer.h
-  MODULE_DEPENDS PUBLIC MitkCore
+  MODULE_DEPENDS PUBLIC MitkCore MitkQtIconTheme
   PACKAGE_DEPENDS ${PLUGIN_package_depends}
 )
 

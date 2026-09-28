@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkThreeDnTDICOMSeriesReader.h>
 #include <mitkITKDICOMSeriesReaderHelper.h>
 
+#include <algorithm>
+
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)
 :DICOMITKSeriesGDCMReader(decimalPlacesForOrientation)
@@ -117,6 +119,23 @@ mitk::ThreeDnTDICOMSeriesReader
 
   SortingBlockList remainingBlocks = resultOf3DGrouping;
 
+  // Condensing works directly from each block's file-level frame infos, so a
+  // file with a frame model must not be merged this way: it would bypass the
+  // expansion into frame-scoped infos, which publishes functional-group values
+  // under their frame-relative keys. A multi-frame file would in addition be
+  // read as one slice per file, dropping every frame but the first, and lose
+  // its per-frame Pixel Value Transformation. The base class does both the
+  // expansion and that transformation.
+  const auto tagCache = this->GetTagCache();
+  const bool anyFrameModel = tagCache.IsNotNull() && tagCache->HasAnyFrameModel();
+  const auto blockHasFrameModel = [&](const DICOMDatasetAccessingImageFrameList& block)
+  {
+    return anyFrameModel
+        && std::any_of(block.cbegin(), block.cend(),
+                       [&](const DICOMDatasetAccessingImageFrameInfo::Pointer& frame)
+                       { return tagCache->GetFrameLayout(frame).HasFrameModel(); });
+  };
+
   SortingBlockList non3DnTBlocks;
   SortingBlockList true3DnTBlocks;
   std::vector<unsigned int> true3DnTBlocksTimeStepCount;
@@ -129,23 +148,23 @@ mitk::ThreeDnTDICOMSeriesReader
   while (!remainingBlocks.empty())
   {
     // new block to fill up
-    const DICOMDatasetAccessingImageFrameList& firstBlock = remainingBlocks.front().first;
-    DICOMDatasetAccessingImageFrameList current3DnTBlock = firstBlock;
+    DICOMDatasetAccessingImageFrameList current3DnTBlock = std::move( remainingBlocks.front().first );
     auto currentSplitReason = remainingBlocks.front().second;
 
     int current3DnTBlockNumberOfTimeSteps = 1;
 
     // get block characteristics of first block
-    const unsigned int currentBlockNumberOfSlices = firstBlock.size();
-    const auto currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
-    const auto currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
-    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
+    const unsigned int currentBlockNumberOfSlices = current3DnTBlock.size();
+    const auto currentBlockFirstOrigin = current3DnTBlock.front()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockLastOrigin  =  current3DnTBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockSeriesInstanceUID = current3DnTBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
+    const bool currentBlockHasFrameModel = blockHasFrameModel( current3DnTBlock );
 
     remainingBlocks.erase( remainingBlocks.begin() );
 
     // compare all other blocks against the first one
     for (auto otherBlockIter = remainingBlocks.begin();
-         otherBlockIter != remainingBlocks.cend();
+         otherBlockIter != remainingBlocks.cend() && !currentBlockHasFrameModel;
          /*++otherBlockIter*/) // <-- inside loop
     {
       // get block characteristics from first block
@@ -158,7 +177,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
-      if ( BlockShouldBeCondensed(m_OnlyCondenseSameSeries, currentBlockNumberOfSlices, otherBlockNumberOfSlices,
+      if ( !blockHasFrameModel(otherBlock)
+        && BlockShouldBeCondensed(m_OnlyCondenseSameSeries, currentBlockNumberOfSlices, otherBlockNumberOfSlices,
         currentBlockFirstOrigin, currentBlockLastOrigin,
         otherBlockFirstOrigin, otherBlockLastOrigin,
         currentBlockSeriesInstanceUID, otherBlockSeriesInstanceUID))

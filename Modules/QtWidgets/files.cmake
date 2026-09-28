@@ -1,4 +1,5 @@
 set(H_FILES
+  QmitkCrosshairRotationMode.h
   QmitkCustomVariants.h
   QmitkDataStorageInspectorProviderBase.h
   QmitkEnums.h
@@ -43,9 +44,9 @@ set(CPP_FILES
   QmitkNodeSelectionListItemWidget.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkColoredNodeDescriptor.cpp
-  QmitkThemedNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
-  QmitkProgressBar.cpp
+  QmitkProgressNotification.cpp
+  QmitkProgressNotificationOverlay.cpp
   QmitkPropertiesTableEditor.cpp
   QmitkPropertiesTableModel.cpp
   QmitkPropertyDelegate.cpp
@@ -73,7 +74,6 @@ set(CPP_FILES
   QmitkPropertyItem.cpp
   QmitkPropertyItemDelegate.cpp
   QmitkPropertyItemModel.cpp
-  QmitkStyleManager.cpp
   QmitkAbstractDataStorageInspector.cpp
   QmitkDataStorageFavoriteNodesInspector.cpp
   QmitkDataStorageListInspector.cpp
@@ -105,6 +105,7 @@ set(UI_FILES
   QmitkMultiWidgetLayoutSelectionWidget.ui
   QmitkNodeSelectionDialog.ui
   QmitkNodeSelectionListItemWidget.ui
+  QmitkProgressNotification.ui
   QmitkRenderWindowContextDataStorageInspector.ui
   QmitkServiceListWidgetControls.ui
   QmitkSingleNodeSelectionWidget.ui

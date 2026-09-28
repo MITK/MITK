@@ -40,7 +40,7 @@ The REST API serves as the **primary control interface** (control plane) as defi
 
 ### Scope
 
-This specification covers the **Data Storage API** (nodes, data, properties) and the **Rendering API** (render window update and reinit). Future specifications will cover:
+This specification covers the **Data Storage API** (nodes, data, properties) and the **Rendering API** (render window update and fitting the views to data). Future specifications will cover:
 
 - Project Management API
 - Task/Async Operations API
@@ -1585,12 +1585,12 @@ Content-Type: application/json
 
 #### POST /api/v1/rendering/reinit
 
-Fit all render windows to the bounding box of all currently visible data (global reinit), or to the bounding geometry of one or more specific nodes when UIDs are supplied. Equivalent to clicking the global reinit button in the Workbench toolbar.
+Fit all render windows to the bounding box of all currently visible data, or to the bounding geometry of one or more specific nodes when UIDs are supplied. Equivalent to *Fit views to all data* (no body) and *Fit views to selection* (with UIDs) in the Data Manager context menu of the Workbench.
 
 Three operating modes:
-- **No body**: global reinit — fits all render windows to the bounding box of all visible data.
-- **`{"uids": ["node-001"]}`**: single-node reinit — fits render windows to that node's geometry.
-- **`{"uids": ["node-001", "node-002"]}`**: multi-node reinit — fits render windows to the combined bounding geometry of all listed nodes.
+- **No body**: fits all render windows to the bounding box of all visible data.
+- **`{"uids": ["node-001"]}`**: fits render windows to that node's geometry.
+- **`{"uids": ["node-001", "node-002"]}`**: fits render windows to the combined bounding geometry of all listed nodes.
 
 Every UID in the `uids` array must identify an existing node with data and a valid time geometry; the first failure returns an error.
 
@@ -1600,12 +1600,12 @@ Every UID in the `uids` array must identify an existing node with data and a val
 |-------|------|---------|-------------|
 | `uids` | array of string (minItems: 1) | (none) | When provided, fit views to the bounding geometry of the specified nodes |
 
-**Example (global reinit — fit all views to all visible data):**
+**Example (fit all views to all visible data):**
 ```http
 POST /api/v1/rendering/reinit
 ```
 
-**Example (single-node reinit — fit views to a specific node):**
+**Example (fit views to a specific node):**
 ```http
 POST /api/v1/rendering/reinit
 Content-Type: application/json
@@ -1613,7 +1613,7 @@ Content-Type: application/json
 {"uids": ["node-001"]}
 ```
 
-**Example (multi-node reinit — fit views to the combined bounding box of several nodes):**
+**Example (fit views to the combined bounding box of several nodes):**
 ```http
 POST /api/v1/rendering/reinit
 Content-Type: application/json
@@ -1636,7 +1636,7 @@ Content-Type: application/json
 
 #### GET /api/v1/rendering/selected-position
 
-Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) from the reinit geometry (TimeNavigationController input world time geometry).
+Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) of the geometry the views are currently fitted to (TimeNavigationController input world time geometry).
 
 Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise). If no input geometry is available, `bounds.min_position` and `bounds.max_position` are `null`.
 
@@ -1874,7 +1874,7 @@ Query parameters, request body, response content-types and shared error shapes a
 
 #### GET /api/v1/rendering/editors/stdmulti/windows
 
-Lists the StdMultiWidget render windows. `view_direction` is the persisted slot mapping (axial / sagittal / coronal); it is omitted for the 3D window and is *not* a live-orientation read. Under swivel mode or node-initialised geometry the live plane is not guaranteed to match `view_direction` — live orientation, when needed, is derivable from the window's `/camera`.
+Lists the StdMultiWidget render windows. `view_direction` is the persisted slot mapping (axial / sagittal / coronal); it is omitted for the 3D window and is *not* a live-orientation read. Under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match `view_direction` — live orientation, when needed, is derivable from the window's `/camera`.
 
 **Response 200 (`application/json`):**
 
@@ -2045,7 +2045,7 @@ Returns the currently selected step, the world position of the slice center, and
 }
 ```
 
-When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window id identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under swivel mode; read orientation from the window's `/camera` if needed.
+When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window id identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under crosshair rotation; read orientation from the window's `/camera` if needed.
 
 **Error responses:**
 
@@ -2167,7 +2167,7 @@ Returns the MxN editor's cells in pre-order traversal of the current layout. Eac
 | `view_direction` | string | One of `"axial"`, `"sagittal"`, `"coronal"`, `"original"`. Persisted state from the layout document — *authoring intent*, not live orientation. Read live orientation from `/camera` if needed. |
 | `links` | object | Per-cell synchronisation links from the layout document. v2 has only the `selection` dimension; v3 will add more dimension keys here additively without breaking v2 clients. |
 
-Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under swivel mode) and intentionally not asserted by `view_direction`.
+Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under crosshair rotation) and intentionally not asserted by `view_direction`.
 
 **Error responses:**
 
@@ -2922,7 +2922,7 @@ All endpoints are relative to the base URL `/api/v1`.
 | `/datastorage/nodes/{uid}/properties` | ✓ Read | — | ✓ Replace all | ✓ Update | — |
 | `/datastorage/nodes/{uid}/properties/{name}` | ✓ Read | — | ✓ Set | — | ✓ Delete |
 | `/rendering/update` | — | ✓ Update | — | — | — |
-| `/rendering/reinit` | — | ✓ Reinit (global or node-scoped) | — | — | — |
+| `/rendering/reinit` | — | ✓ Fit views (all data or node-scoped) | — | — | — |
 | `/rendering/selected-position` | ✓ Read | — | ✓ Set | — | — |
 | `/rendering/selected-time` | ✓ Read | — | ✓ Set | — | — |
 | `/rendering/screenshot` | ✓ Active editor | — | — | — | — |

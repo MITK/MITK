@@ -35,7 +35,7 @@ found in the LICENSE file.
 
 #include "QmitkFindSegmentationTaskDialog.h"
 #include <QmitkStaticDynamicSegmentationDialog.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 #include <ui_QmitkSegmentationTaskListWidget.h>
 
@@ -206,10 +206,16 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 
   m_Ui->selectionWidget->SetNodePredicate(mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New());
 
-  m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkStyleManager::GetIconAccentColor()));
+  const auto updateProgressBarStyle = [this]
+  {
+    m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkIconTheme::GetAccentColor()));
+  };
 
-  m_Ui->findButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_find.svg")));
-  m_Ui->storeButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  updateProgressBarStyle();
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, updateProgressBarStyle);
+
+  m_Ui->findButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_find.svg")));
+  m_Ui->storeButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
 
   using Self = QmitkSegmentationTaskListWidget;
 
@@ -334,7 +340,7 @@ void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* rem
     }
   }
 
-  m_Ui->label->setText("<span style=\"color: " + QmitkStyleManager::GetIconAccentColor() + "\">" + warning + "</span>");
+  m_Ui->label->setText("<span style=\"color: " + QmitkIconTheme::GetAccentColor() + "\">" + warning + "</span>");
   m_Ui->label->setVisible(!warning.isEmpty());
   m_Ui->widget->setVisible(warning.isEmpty());
 }

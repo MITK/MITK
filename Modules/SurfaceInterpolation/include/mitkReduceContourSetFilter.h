@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef mitkReduceContourSetFilter_h
 #define mitkReduceContourSetFilter_h
 
-#include <mitkProgressBar.h>
 #include <mitkSurface.h>
 #include <mitkSurfaceToSurfaceFilter.h>
 #include <MitkSurfaceInterpolationExports.h>
@@ -78,23 +77,9 @@ namespace mitk
     // Resets the filter, i.e. removes all inputs and outputs
     void Reset();
 
-    /**
-      \brief Set whether the mitkProgressBar should be used
-
-      \a Parameter true for using the progress bar, false otherwise
-    */
-    void SetUseProgressBar(bool);
-
     using itk::ProcessObject::SetInput;
     void SetInput(const mitk::Surface *surface) override;
     void SetInput(unsigned int idx, const mitk::Surface *surface) override;
-
-    /**
-      \brief Set the stepsize which the progress bar should proceed
-
-      \a Parameter The stepsize for progressing
-    */
-    void SetProgressStepSize(unsigned int stepSize);
 
   protected:
     ReduceContourSetFilter();
@@ -122,9 +107,6 @@ namespace mitk
     unsigned int m_StepSize;
     double m_Tolerance;
     unsigned int m_MaxSegmentLenght;
-
-    bool m_UseProgressBar;
-    unsigned int m_ProgressStepSize;
 
     unsigned int m_NumberOfPointsAfterReduction;
 

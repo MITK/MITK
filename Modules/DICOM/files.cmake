@@ -30,6 +30,8 @@ set(CPP_FILES
   mitkDICOMCodeSequenceWithModifiers.cpp
   mitkDICOMTag.cpp
   mitkDICOMTagsOfInterestHelper.cpp
+  mitkDICOMFrameLayout.cpp
+  mitkDICOMFrameListHelper.cpp
   mitkDICOMTagCache.cpp
   mitkDICOMGDCMTagCache.cpp
   mitkDICOMGenericTagCache.cpp

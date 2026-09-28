@@ -1,6 +1,4 @@
 set(H_FILES
-  itkAdaptiveThresholdIterator.h
-  itkConnectedAdaptiveThresholdImageFilter.h
   itkContourExtractor2DImageFilter.h
   itkImageToPathFilter.h
   mitkSegmentationInterpolationAlgorithm.h
@@ -27,8 +25,6 @@ set(CPP_FILES
   Algorithms/mitkSegLabelPropModifyOperation.cpp
   Algorithms/mitkSegSliceOperation.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
-  Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
-  Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSurfaceStampImageFilter.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
@@ -37,7 +33,6 @@ set(CPP_FILES
   Controllers/mitkToolManagerProvider.cpp
   DataManagement/mitkSegmentationTaskList.cpp
   Interactions/mitkAddContourTool.cpp
-  Interactions/mitkAutoCropTool.cpp
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
@@ -61,13 +56,11 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSegWithPreviewTool.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
-  Interactions/mitkLabelSelectionTool.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )

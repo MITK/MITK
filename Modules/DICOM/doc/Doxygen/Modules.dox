@@ -28,11 +28,129 @@ file readers are required to implement loading in two separate steps:
 
 A very simple implementation is mitk::DICOMFileReaderSelector which selects the reader with the least possible number of mitk::Images (least confusing for the user?).
 
+\section DICOMModule_multiframe Multi-frame objects
+
+A multi-frame file holds several pixel frames in one instance. MITK treats two
+kinds differently, and the difference is whether the file carries a Per-Frame
+Functional Groups Sequence (5200,9230) with one item per frame.
+
+\subsection DICOMModule_multiframe_model The frame model
+
+For a file that has one per-frame functional-group item per frame (Enhanced PET,
+Enhanced CT, Enhanced MR, Legacy Converted Enhanced, and any other SOP class
+built the same way; single-frame instances of them included), the reader creates
+one mitk::DICOMImageFrameInfo per frame, with FrameNo the stored frame index.
+Files remain the unit of sorting and frames are never reordered.
+
+All of this section presumes that the reader analyzes with a tag cache that
+holds the frame model: one from a mitk::DICOMDCMTKTagScanner with
+SetReadFrameModel(true), handed over via SetTagCache, as
+mitk::AnalyzeWithFrameModel does. A reader that scans for itself reads every
+file with the one-frame model of a classic object.
+
+An attribute inside a functional group appears as one
+mitk::TemporoSpatialStringProperty per attribute, named by the path of the
+attribute relative to the functional-group item, with one value per (t, z)
+slot, once it has been registered as a tag of interest
+(mitk::IDICOMTagsOfInterest::AddTagOfInterest). It is registered by that same
+path, the one inside the macro, e.g. (0028,9145)[*].(0028,1053); the reader
+searches it at the top level of every file and, for a file with a frame model,
+also in the shared (5200,9229) and the per-frame (5200,9230) group. So one
+registration covers every placement, and the registered path is the pattern of
+the published key, which is what lets the property survive a save:
+
+\code
+DICOM.0028.9145.[0].0028.1053     Pixel Value Transformation, Rescale Slope
+DICOM.0020.9111.[0].0018.9151     Frame Content, Frame Reference DateTime
+\endcode
+
+A path rooted in (5200,9229) or (5200,9230) is not supported: it yields no
+property for a file with a frame model, and the reader warns once per scan.
+Only paths of more than one element are searched inside the groups, because a
+functional-group item holds only macro sequences. The search covers every such
+registered path, not only the functional-group macros: a sequence registered
+with classic objects in mind that also occurs directly in a functional-group
+item becomes per-frame for an object with a frame model.
+
+When a non-conformant file carries one attribute at several placements, the most
+specific one wins at each slot: the per-frame group, then the shared group, then
+the top level. The reader warns once per block and attribute.
+
+This registration governs only the per-attribute properties; frame expansion
+into per-frame mitk::DICOMImageFrameInfo, the per-slot frame record described
+below, the per-frame Pixel Value Transformation, and giving a multi-frame file
+a volume of its own all happen regardless of what, if anything, is registered.
+
+The (5200,9229) or (5200,9230) root is not part of the key. Whether the encoder
+put a macro in the shared or in the per-frame group is an encoding choice a
+consumer should not have to know: both placements yield the same key, a shared
+value simply repeating at every slot. The item index of the macro sequence is
+kept, because a macro may carry several items for one frame (Real World Value
+Mapping routinely does) and a path entering a sequence without naming an item is
+not addressable.
+
+The value at a slot and the pixels at that slot always come from the same frame.
+Today every frame k occupies slot (0, k), because GDCM stacks all frames of a
+file along z whatever the Dimension Index attributes say. The stored frame index
+of each slot is recorded in MITK.IO.reader.DICOM.frames, so the mapping stays
+recoverable from the loaded image; the files property repeats one filename for
+all slots of a multi-frame file and cannot express it.
+
+\subsection DICOMModule_multiframe_pixels Pixel values
+
+The Pixel Value Transformation is applied per frame. GDCM's gdcm::Image can hold
+only one slope and intercept and applies the pair of the first per-frame item to
+the whole buffer, so the reader corrects the frames whose own pair differs. The
+component type follows GDCM's own rule applied over all frames' pairs, so a file
+with a uniform transformation and one with a varying transformation load with the
+same type.
+
+Real World Value Mapping is not applied. GDCM does not apply it either, and it
+remains a consumer concern.
+
+\subsection DICOMModule_multiframe_limits What is not covered
+
+ - A file whose per-frame item count does not match its frame count cannot be
+   mapped to slots. It keeps the one-frame model and publishes no
+   functional-group value at all, and the reader says so once per scan. A key
+   whose shape depended on the conformance of the input would be worse than an
+   absent one.
+ - A file without functional groups (RT Dose, multi-frame NM, SC, US) keeps the
+   one-frame model as well. Its frames load as slices and no per-frame value is
+   available, which is normal rather than an error; mitkDICOMVolumeDiagnostics
+   reports it as an informational finding.
+ - Geometry comes from GDCM. An object whose frames are not stored in spatial
+   order keeps GDCM's unit-spacing fallback.
+ - A file with a frame model whose frames all lie at one plane position (a
+   single-slice cine or dynamic series) is refused and flagged
+   mitk::IOVolumeSplitReason::ReasonType::FrameCountMismatch. GDCM reports a
+   z-spacing of 0 for it, and a 2D load would keep only the first frame.
+ - A file whose frame model describes more than one frame is never combined
+   with another file in one block, because ITK's multi-file branch sets the
+   moving dimension to the file count and would keep one frame per file. Such a
+   block is separated into one volume per such file plus one for the remaining
+   files, each flagged mitk::IOVolumeSplitReason::ReasonType::MultiFrameFileSeparated.
+   A single-frame file with a frame model is not separated, since one frame per
+   file is all it has; it stacks with the other files of its series.
+   Note that a conformant functional-group object carries Image Position
+   (Patient) in the Plane Position macro and nothing at the top level, so the
+   sorters already give it a block of its own; the separation matters for
+   non-conformant files that carry top-level geometry as well.
+ - A file with a frame model, single-frame ones included, is never condensed
+   into a 3D+t image: it loads as its own volume, or stacks with other
+   single-frame files into a 3D volume.
+ - Frame-aware sorting or splitting (Dimension Index Values, In-Stack Position,
+   Temporal Position Index), 3D+t decomposition of one file, and Segmentation
+   and Parametric Map objects are not covered. FrameNo is the hook for the
+   first of these.
+
 \section DICOMModule_tasks Tasks for future development
 
 Unstructured development tasks and ideas for future extensions
 
- - a multi-frame image reader based on DCMTK
+ - frame-aware sorting and splitting, so that the frames of one file can form
+   several volumes or a 3D+t image
+ - per-frame geometry for objects whose frames are not stored in spatial order
  - perspective: slice-by-slice loading
 
 */

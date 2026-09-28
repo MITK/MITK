@@ -148,16 +148,6 @@ namespace mitk
     bool InitMembers(InteractionEvent *interactionEvent);
 
   private:
-    /**
-    * @brief Enables default crosshair properties
-    */
-    void EnableOriginalInteraction();
-
-    /**
-    * @brief Sets limited crosshair properties (disable crosshair movement)
-    */
-    void DisableOriginalInteraction();
-
     class Impl;
     Impl *m_Impl;
   };

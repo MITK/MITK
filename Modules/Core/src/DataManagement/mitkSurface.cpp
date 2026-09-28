@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkSurface.h>
 #include <mitkInteractionConst.h>
 #include <mitkSurfaceOperation.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <algorithm>
 #include <vtkPolyData.h>
@@ -143,6 +144,8 @@ vtkPolyData *mitk::Surface::GetVtkPolyData(unsigned int t) const
   {
     if (m_PolyDatas[t] == nullptr && this->GetSource().IsNotNull())
     {
+      WarnIfOffStorageThread("Building the polygonal representation of a surface");
+
       RegionType requestedRegion;
       requestedRegion.SetIndex(3, t);
       requestedRegion.SetSize(3, 1);
@@ -154,6 +157,14 @@ vtkPolyData *mitk::Surface::GetVtkPolyData(unsigned int t) const
   }
 
   return nullptr;
+}
+
+void mitk::Surface::PrebuildVtkRepresentation() const
+{
+  const auto timeSteps = this->GetTimeSteps();
+
+  for (unsigned int t = 0; t < timeSteps; ++t)
+    static_cast<void>(this->GetVtkPolyData(t));
 }
 
 void mitk::Surface::UpdateOutputInformation()

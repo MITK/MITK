@@ -18,7 +18,6 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkBaseApplication.h>
-#include <mitkBaseRendererHelper.h>
 #include <mitkCameraController.h>
 #include <mitkCoreServices.h>
 #include <mitkINodeSelectionService.h>
@@ -28,6 +27,7 @@ found in the LICENSE file.
 #include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkRenderWindowPartHelper.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>
 #include <mitkToolManagerProvider.h>
@@ -42,7 +42,7 @@ found in the LICENSE file.
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include "QmitkNewSegmentationDialog.h"
 #include <QmitkMultiLabelManager.h>
-#include <QmitkStyleManager.h>
+#include <QmitkIconTheme.h>
 
 // us
 #include <usModuleResource.h>
@@ -90,7 +90,7 @@ namespace
     if (hiddenCount > 0)
     {
       hint += QStringLiteral("<p style=\"color:%1;\">%2 segmentation%3 hidden: geometry does not match the selected image.</p>")
-        .arg(QmitkStyleManager::GetIconAccentColor())
+        .arg(QmitkIconTheme::GetAccentColor())
         .arg(hiddenCount)
         .arg(hiddenCount == 1 ? QString() : QStringLiteral("s"));
     }
@@ -618,7 +618,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      "</p>"));
    m_GeometryViolationOverlay->SetButtonText(" Align views");
    m_GeometryViolationOverlay->setOpacity(200);
-   m_GeometryViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+   m_GeometryViolationOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg")));
 
    m_VisibleSegViolationOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
    m_VisibleSegViolationOverlay->setVisible(false);
@@ -629,7 +629,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      "</p>"));
    m_VisibleSegViolationOverlay->SetButtonText(" Show segmentation");
    m_VisibleSegViolationOverlay->setOpacity(200);
-   m_VisibleSegViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")));
+   m_VisibleSegViolationOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/visible.svg")));
 
    // *------------------------
    // * SHORTCUTS
@@ -840,6 +840,9 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     return;
   }
 
+  // Re-enables the tool boxes that RenderWindowPartDeactivated() disabled.
+  this->UpdateControlsOnLabelChanges();
+
   if (nullptr != m_RenderWindowPart)
   {
     auto all2DWindows = Get2DWindows(m_RenderWindowPart->GetQmitkRenderWindows().values());
@@ -863,6 +866,11 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   {
     m_Parent->setEnabled(false);
   }
+
+  // Disabling the parent does not reach the tool boxes, as QWidget::setEnabled()
+  // is not virtual. Disabled boxes deactivate the active tool.
+  m_Controls->toolSelectionBox2D->setEnabled(false);
+  m_Controls->toolSelectionBox3D->setEnabled(false);
 
   // remove message-connection to make sure no message is processed if no render window part is available
   m_ToolManager->ActiveToolChanged -=
@@ -1187,29 +1195,11 @@ void QmitkSegmentationView::CheckForToolViolations() const
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
-  bool hasGeometryViolation = false;
-
-  // Here we need to check whether the geometry of the selected segmentation image (working image geometry)
-  // is aligned with the geometry of the 3D render window.
-  // It is not allowed to use a geometry different from the working image geometry for segmenting.
-  // We only need to this if the tool selection box would be enabled without this check.
-  // Additionally this check only has to be performed for render window parts with coupled render windows.
-  // For different render window parts the user is given the option to reinitialize each render window individually
-  // (see QmitkRenderWindow::ShowOverlayMessage).
-  if (referenceNode.IsNotNull() && workingNode.IsNotNull() && nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows())
-  {
-    const mitk::BaseGeometry* workingNodeGeometry = workingNode->GetData()->GetGeometry();
-    const mitk::BaseGeometry* renderWindowGeometry =
-      m_RenderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
-    if (nullptr != workingNodeGeometry && nullptr != renderWindowGeometry)
-    {
-      if (!mitk::Equal(*workingNodeGeometry->GetBoundingBox(), *renderWindowGeometry->GetBoundingBox(), mitk::eps, true))
-      {
-        hasGeometryViolation = true;
-      }
-
-    }
-  }
+  // Segmenting requires the views to use the working image geometry. Only parts with
+  // coupled render windows are checked here; with decoupled render windows the user
+  // reinitializes each render window individually (see QmitkRenderWindow::ShowOverlayMessage).
+  const bool hasGeometryViolation = referenceNode.IsNotNull() && workingNode.IsNotNull()
+    && !mitk::RenderWindowPartHelper::IsRenderWindowPartAlignedWithGeometry(m_RenderWindowPart, workingNode->GetData()->GetGeometry());
 
   const bool hasVisibilitViolation = workingNode.IsNotNull()
     && nullptr != m_RenderWindowPart

@@ -20,12 +20,15 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <vtkPolyData.h>
 
+#include <algorithm>
+
 class mitkSurfaceToImageFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSurfaceToImageFilterTestSuite);
   MITK_TEST(test3DSurfaceValidOutput);
   MITK_TEST(test3DSurfaceCorrect);
   MITK_TEST(test3DSurfaceIn4DImage);
+  MITK_TEST(test3DSurfaceKeepsInputValues);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -248,6 +251,39 @@ public:
     valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
 
     CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_BallSurfaceAsInput_Output4DCorrect", valuesCorrect == true);
+  }
+
+  void test3DSurfaceKeepsInputValues()
+  {
+    auto inputImage = mitk::Image::New();
+    unsigned int dims[3] = { 32, 32, 32 };
+    inputImage->Initialize(mitk::MakeScalarPixelType<short>(), 3, dims);
+    inputImage->SetOrigin(m_Surface->GetGeometry()->GetOrigin());
+    inputImage->GetGeometry()->SetIndexToWorldTransform(m_Surface->GetGeometry()->GetIndexToWorldTransform());
+
+    {
+      mitk::ImageWriteAccessor accessor(inputImage);
+      std::fill_n(static_cast<short*>(accessor.GetData()), 32 * 32 * 32, static_cast<short>(7));
+    }
+
+    auto surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
+    surfaceToImageFilter->SetInput(m_Surface);
+    surfaceToImageFilter->SetImage(inputImage);
+    surfaceToImageFilter->SetBackgroundValue(-3);
+    surfaceToImageFilter->Update();
+
+    const itk::Index<3> inside = { { 15, 15, 15 } };
+    const itk::Index<3> outside = { { 0, 0, 0 } };
+
+    mitk::ImagePixelReadAccessor<short, 3> outputReader(surfaceToImageFilter->GetOutput());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel inside the surface lost its input value",
+      static_cast<short>(7), outputReader.GetPixelByIndex(inside));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel outside the surface was not set to the background value",
+      static_cast<short>(-3), outputReader.GetPixelByIndex(outside));
+
+    mitk::ImagePixelReadAccessor<short, 3> inputReader(inputImage);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Input image was modified",
+      static_cast<short>(7), inputReader.GetPixelByIndex(inside));
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkSurfaceToImageFilter)

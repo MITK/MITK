@@ -56,7 +56,10 @@ Questionable
 
 Nice-to-have
 
-[ ] Multi-Frame images (DCMTK)
+[x] Multi-Frame images: per-frame functional groups are read per frame and the
+    Pixel Value Transformation is applied per frame (see the Multi-frame objects
+    section of the module documentation). Frame-aware sorting and splitting and
+    3D+t decomposition of a single file are still open.
 [ ] ...
 [x] Add the tags used by DICOMImageBlockDescriptor dynamically instead of hard-coded
     (look for ToDo around m_GDCMScanner.AddTag() in mitkDICOMITKSeriesGDCMReader.cpp)

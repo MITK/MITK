@@ -511,6 +511,8 @@ namespace mitk
      *\pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
+    void PrebuildVtkRepresentation() const override;
+
     /** Updates a group image by copying a given source image content.
     * \remark the pixel content of the sourceImage will be simply copied. It won't
     * be checked if the source only contains valid label values for the group.
@@ -610,8 +612,17 @@ namespace mitk
     itk::ModifiedTimeType GetMTime() const override;
 
     /**
-      * \brief  */
-    void UpdateCenterOfMass(LabelValueType pixelValue);
+     * \brief Computes the center of mass of a label at a time step and stores it in the label.
+     *
+     * The result is available through Label::GetCenterOfMassIndex() and
+     * Label::GetCenterOfMassCoordinates(). If the label has no pixels at the time step, the
+     * stored center of mass is reset. For static segmentations, the computation is skipped
+     * while the stored center of mass is newer than the group image of the label.
+     * \param pixelValue Value of the label. Nothing happens if no such label exists.
+     * \param timeStep Time step whose pixels are considered.
+     * \exception mitk::Exception if the time step is invalid.
+     */
+    void UpdateCenterOfMass(LabelValueType pixelValue, TimeStepType timeStep);
 
     using BaseData::IsEmpty;
 
@@ -680,9 +691,6 @@ namespace mitk
     void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
 
     LabelValueType m_ActiveLabelValue;
-
-    template <typename ImageType>
-    void CalculateCenterOfMassProcessing(ImageType* input, LabelValueType index);
 
     template <typename ImageType>
     void EraseLabelProcessing(ImageType* input, LabelValueType index);
@@ -881,6 +889,57 @@ namespace mitk
     LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+  class Surface;
+
+  /**Helper function that assigns a label to all voxels of the destination image that lie inside a closed surface at a
+  specific time step. Voxels are overwritten following the same rules as TransferLabelContentAtTimeStep() with
+  MultiLabelSegmentation::MergeStyle::Merge; voxels outside the surface keep their values. Only the part of the image
+  covered by the bounding box of the surface is processed, so no image of the size of the destination is needed.
+  \param surface Closed surface. Its time step that covers the time point of timeStep is used.
+  \param destinationImage Pointer to the image that should be used as destination for the transfer.
+  \param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unknown pixel
+  values in the destinationImage will be assumed to be unlocked.
+  \param timeStep Time step of the destination image that should be altered.
+  \param newDestinationLabel Label that voxels inside the surface should become.
+  \param destinationBackground Value indicating the background in the destination image.
+  \param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
+  \param overwriteStyle indicates if label locks in the destination image should be regarded or not. For more details see
+  documentation of MultiLabelSegmentation::OverwriteStyle.
+  \pre surface, destinationImage and destinationLabelVector must be valid
+  \pre destinationImage must have the pixel type mitk::Label::PixelType and contain the indicated timeStep
+  \pre destinationLabelVector must contain newDestinationLabel.*/
+  MITKMULTILABEL_EXPORT void TransferSurfaceContentAtTimeStep(const Surface* surface, Image* destinationImage,
+    const mitk::ConstLabelVector& destinationLabelVector, const TimeStepType timeStep, Label::PixelType newDestinationLabel,
+    Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+    MultiLabelSegmentation::OverwriteStyle overwriteStyle);
+
+  /**Helper function that assigns a label to the voxels of the destination image that lie under the pixels of a 2D slice
+  with a given value, at a specific time step. Voxels are overwritten following the same rules as
+  TransferLabelContentAtTimeStep() with MultiLabelSegmentation::MergeStyle::Merge; all other voxels keep their values.
+  Only the voxels under the slice are processed, so no image of the size of the destination is needed.
+  \param slice 2D image whose pixels lie on voxel centers of the destination image, one pixel per voxel, like a slice,
+  or a region of one, that mitk::ExtractSliceFilter extracts from the destination image along one of its axes. Pixels
+  outside of the destination image are skipped.
+  \param destinationImage Pointer to the image that should be used as destination for the transfer.
+  \param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unknown pixel
+  values in the destinationImage will be assumed to be unlocked.
+  \param timeStep Time step of the destination image that should be altered.
+  \param sourceLabel Pixel value of the slice that marks the voxels to assign.
+  \param newDestinationLabel Label that the marked voxels should become.
+  \param destinationBackground Value indicating the background in the destination image.
+  \param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
+  \param overwriteStyle indicates if label locks in the destination image should be regarded or not. For more details see
+  documentation of MultiLabelSegmentation::OverwriteStyle.
+  \pre slice, destinationImage and destinationLabelVector must be valid
+  \pre slice and destinationImage must have the pixel type mitk::Label::PixelType, and destinationImage must contain the
+  indicated timeStep
+  \pre destinationLabelVector must contain newDestinationLabel.
+  \throw mitk::Exception if the pixels of the slice do not map one to one onto voxel centers of the destination image.*/
+  MITKMULTILABEL_EXPORT void TransferSliceContentAtTimeStep(const Image* slice, Image* destinationImage,
+    const mitk::ConstLabelVector& destinationLabelVector, const TimeStepType timeStep, Label::PixelType sourceLabel,
+    Label::PixelType newDestinationLabel, Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+    MultiLabelSegmentation::OverwriteStyle overwriteStyle);
 
 } // namespace mitk
 

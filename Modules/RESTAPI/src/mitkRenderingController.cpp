@@ -178,7 +178,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
     return;
   }
 
-  // Parse optional body for node-scoped reinit.
+  // Parse optional body for node-scoped fitting.
   std::vector<std::string> uids;
 
   if (!req.body.empty())
@@ -219,7 +219,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
 
   if (!uids.empty())
   {
-    // Node-scoped reinit: fit views to the bounding geometry of the specified nodes.
+    // Node-scoped: fit views to the bounding geometry of the specified nodes.
     // Pre-dispatch: validate all UIDs and capture node pointers (no cloning).
     std::vector<DataNode::ConstPointer> nodes;
     nodes.reserve(uids.size());
@@ -295,7 +295,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
   }
   else
   {
-    // Global reinit: fit all views to the bounding box of all visible data.
+    // Fit all views to the bounding box of all visible data.
     const auto dataStorage = m_Bridge.GetDataStorage();
 
     try

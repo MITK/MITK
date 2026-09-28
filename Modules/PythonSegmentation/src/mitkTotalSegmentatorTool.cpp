@@ -66,6 +66,7 @@ mitk::TotalSegmentatorTool::TotalSegmentatorTool()
   // task without having to reselect the tool.
   this->KeepActiveAfterAcceptOn();
   this->RequiresExistingLabelsOff();
+  this->RequiresVolumetricReferenceOn();
 }
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()

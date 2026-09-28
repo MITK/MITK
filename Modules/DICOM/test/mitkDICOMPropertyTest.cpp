@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkDICOMProperty.h>
 
 #include <mitkImage.h>
+#include <mitkStringProperty.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -27,6 +28,10 @@ class mitkDICOMPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(GetFirstDICOMValueAsString_StringProperty);
   MITK_TEST(GetFirstDICOMValueAsString_NoMatch);
   MITK_TEST(GetFirstDICOMValueAsString_NullProvider);
+  MITK_TEST(GetDICOMValueAtSlot_ReadsTheSlotItIsAsked);
+  MITK_TEST(GetDICOMValueAtSlot_HasNoCloseMatchFallback);
+  MITK_TEST(GetDICOMValueAtSlot_UniformPropertyAnswersEverySlot);
+  MITK_TEST(GetDICOMValueAtSlot_NoMatchAndNullProvider);
   MITK_TEST(ConvertDICOMStrToValue);
   MITK_TEST(ConvertValueToDICOMStr);
 
@@ -194,6 +199,70 @@ public:
   {
     CPPUNIT_ASSERT_EQUAL(std::string(),
                          mitk::GetFirstDICOMValueAsString(nullptr, simplePath));
+  }
+
+  /** The per-slot values a frame-model image carries. */
+  mitk::Image::Pointer MakePerSliceImage() const
+  {
+    auto image = mitk::Image::New();
+    auto property = mitk::TemporoSpatialStringProperty::New();
+    property->SetValue(0, 0, "first");
+    property->SetValue(0, 2, "third");
+    image->SetProperty(mitk::DICOMTagPathToPropertyName(simplePath).c_str(), property);
+    return image;
+  }
+
+  void GetDICOMValueAtSlot_ReadsTheSlotItIsAsked()
+  {
+    const auto image = this->MakePerSliceImage();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The value at the first slot", std::string("first"),
+                                 mitk::GetDICOMValueAtSlot(image, simplePath, 0, 0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The value at a later slot", std::string("third"),
+                                 mitk::GetDICOMValueAtSlot(image, simplePath, 0, 2));
+  }
+
+  /** The whole reason this accessor exists next to GetFirstDICOMValueAsString:
+      a consumer iterating slots must never receive a neighbouring frame's
+      value for a slot that has none. */
+  void GetDICOMValueAtSlot_HasNoCloseMatchFallback()
+  {
+    const auto image = this->MakePerSliceImage();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("An unpopulated slot yields nothing", std::string(),
+                                 mitk::GetDICOMValueAtSlot(image, simplePath, 0, 1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("An unpopulated time step yields nothing", std::string(),
+                                 mitk::GetDICOMValueAtSlot(image, simplePath, 1, 0));
+
+    // Contrast: the close-match accessor does fall back, which is correct for
+    // its own purpose and wrong for this one.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("GetFirstDICOMValueAsString still falls back", std::string("first"),
+                                 mitk::GetFirstDICOMValueAsString(image, simplePath));
+  }
+
+  /** A tag whose value is constant over the image is stored as a plain
+      StringProperty by the default block functor, and every slot legitimately
+      answers with it. */
+  void GetDICOMValueAtSlot_UniformPropertyAnswersEverySlot()
+  {
+    auto image = mitk::Image::New();
+    image->SetProperty(mitk::DICOMTagPathToPropertyName(simplePath).c_str(),
+                       mitk::StringProperty::New("uniform"));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Slot zero", std::string("uniform"),
+                                 mitk::GetDICOMValueAtSlot(image, simplePath, 0, 0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Any other slot", std::string("uniform"),
+                                 mitk::GetDICOMValueAtSlot(image, simplePath, 3, 17));
+  }
+
+  void GetDICOMValueAtSlot_NoMatchAndNullProvider()
+  {
+    const auto image = this->MakePerSliceImage();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("An unmatched path yields nothing", std::string(),
+                                 mitk::GetDICOMValueAtSlot(image, deepPath, 0, 0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A null provider yields nothing", std::string(),
+                                 mitk::GetDICOMValueAtSlot(nullptr, simplePath, 0, 0));
   }
 
   void ConvertDICOMStrToValue()

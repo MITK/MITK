@@ -126,6 +126,8 @@ protected:
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
+  // overloaded hide handler
+  void hideEvent(QHideEvent *event) override;
   // overloaded enter handler
   void enterEvent(QEnterEvent *) override;
   // overloaded leave handler

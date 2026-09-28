@@ -116,6 +116,13 @@ public:
   * \brief Hide the current render window.
   */
   void RemoveOneLayout();
+  /**
+  * \brief Delete the current layout with its splitters and hide all render window widgets.
+  *
+  *    Layout functions call this first and show only the render window widgets they place.
+  *    The render window widgets survive as hidden children of the multi widget.
+  */
+  void ClearLayout();
 
 private:
 

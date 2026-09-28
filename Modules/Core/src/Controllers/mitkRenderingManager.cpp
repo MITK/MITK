@@ -162,6 +162,8 @@ namespace mitk
   {
     if (m_RenderWindowList.erase(renderWindow))
     {
+      m_SuspendedRenderWindows.erase(renderWindow);
+
       auto callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
       if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
@@ -204,10 +206,33 @@ namespace mitk
 
     m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
+    if (m_SuspendedRenderWindows.contains(renderWindow))
+    {
+      return;
+    }
+
     if (!m_UpdatePending)
     {
       m_UpdatePending = true;
       this->GenerateRenderingRequestEvent();
+    }
+  }
+
+  void RenderingManager::SetRenderingSuspended(vtkRenderWindow *renderWindow, bool suspended)
+  {
+    const auto it = m_RenderWindowList.find(renderWindow);
+    if (it == m_RenderWindowList.cend())
+    {
+      return;
+    }
+
+    if (suspended)
+    {
+      m_SuspendedRenderWindows.insert(renderWindow);
+    }
+    else if (0 != m_SuspendedRenderWindows.erase(renderWindow) && RENDERING_REQUESTED == it->second)
+    {
+      this->RequestUpdate(renderWindow);
     }
   }
 
@@ -548,7 +573,7 @@ namespace mitk
     int i = 0;
     for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it, ++i)
     {
-      if (it->second == RENDERING_REQUESTED)
+      if (it->second == RENDERING_REQUESTED && !m_SuspendedRenderWindows.contains(it->first))
       {
         this->ForceImmediateUpdate(it->first);
       }

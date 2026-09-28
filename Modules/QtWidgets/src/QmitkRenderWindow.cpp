@@ -271,9 +271,18 @@ void QmitkRenderWindow::showEvent(QShowEvent *event)
 {
   QVTKOpenGLNativeWidget::showEvent(event);
 
+  mitk::RenderingManager::GetInstance()->SetRenderingSuspended(this->GetVtkRenderWindow(), false);
+
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of moved() is no use here!!
   QTimer::singleShot(0, this, SIGNAL(moved()));
+}
+
+void QmitkRenderWindow::hideEvent(QHideEvent *event)
+{
+  QVTKOpenGLNativeWidget::hideEvent(event);
+
+  mitk::RenderingManager::GetInstance()->SetRenderingSuspended(this->GetVtkRenderWindow(), true);
 }
 
 bool QmitkRenderWindow::event(QEvent* e)

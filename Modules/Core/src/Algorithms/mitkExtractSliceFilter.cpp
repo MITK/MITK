@@ -410,9 +410,11 @@ void mitk::ExtractSliceFilter::GenerateData()
   /*========== BEGIN setup extent of the slice ==========*/
   // Set the output extents! First included pixel index and last included pixel index
   // xMax and yMax are one after the last pixel. so they have to be decremented by 1.
-  // In case we have a 2D image, xMax or yMax might be 0. in this case, do not decrement, but take 0.
+  // In case we have a 2D image, xMax or yMax might equal xMin or yMin. in this case, keep a single pixel.
+  // Plane coordinates, and thus the extent, may be negative for rotated planes.
 
-  m_Reslicer->SetOutputExtent(m_XMin, std::max(0, m_XMax - 1), m_YMin, std::max(0, m_YMax - 1), m_ZMin, m_ZMax);
+  m_Reslicer->SetOutputExtent(
+    m_XMin, std::max(m_XMin, m_XMax - 1), m_YMin, std::max(m_YMin, m_YMax - 1), m_ZMin, m_ZMax);
   /*========== END setup extent of the slice ==========*/
 
   m_Reslicer->SetOutputOrigin(0.0, 0.0, 0.0);

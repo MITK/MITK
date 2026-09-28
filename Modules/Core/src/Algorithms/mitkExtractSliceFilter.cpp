@@ -39,7 +39,8 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice *reslicer): m_XMin(
   m_InterpolationMode = ExtractSliceFilter::RESLICE_NEAREST;
   m_ResliceTransform = nullptr;
   m_InPlaneResampleExtentByGeometry = false;
-  m_OutPutSpacing = new mitk::ScalarType[2];
+  m_ClipToInputGeometry = false;
+  m_OutPutSpacing = new mitk::ScalarType[2]();
   m_OutputDimension = 2;
   m_ZSpacing = 1.0;
   m_ZMin = 0;
@@ -169,6 +170,38 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
     } // ELSE we use the default values
   }
 
+  const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+
+  if (m_ClipToInputGeometry && nullptr == abstractGeometry && nullptr != inputTimeGeometry &&
+      inputTimeGeometry->IsValidTimeStep(m_TimeStep))
+  {
+    double inputBounds[6];
+
+    if (this->GetClippedPlaneBounds(inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep), m_WorldGeometry, inputBounds))
+    {
+      // Pixels whose centers lie outside of the input would only show the background level.
+      const int inputXMin = PlaneClipping::RoundToPixelIndex(inputBounds[0], m_OutPutSpacing[0]);
+      const int inputXMax = PlaneClipping::RoundToPixelIndex(inputBounds[1], m_OutPutSpacing[0]);
+      const int inputYMin = PlaneClipping::RoundToPixelIndex(inputBounds[2], m_OutPutSpacing[1]);
+      const int inputYMax = PlaneClipping::RoundToPixelIndex(inputBounds[3], m_OutPutSpacing[1]);
+
+      if (std::max(xMin, inputXMin) < std::min(xMax, inputXMax) &&
+          std::max(yMin, inputYMin) < std::min(yMax, inputYMax))
+      {
+        xMin = std::max(xMin, inputXMin);
+        xMax = std::min(xMax, inputXMax);
+        yMin = std::max(yMin, inputYMin);
+        yMax = std::min(yMax, inputYMax);
+      }
+      else
+      {
+        // An input beside the reference geometry is not sampled at all. An empty extent is no valid
+        // output, so keep a single background pixel instead of the whole reference geometry.
+        xMax = xMin + 1;
+        yMax = yMin + 1;
+      }
+    }
+  }
 
   sliceOrigin += right * (m_OutPutSpacing[0] * 0.5);
   sliceOrigin += bottom * (m_OutPutSpacing[1] * 0.5);
@@ -494,6 +527,18 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6])
 {
   if (!m_WorldGeometry || !this->GetInput())
     return false;
+
+  // Textures of the output must span exactly its pixels, which the input bounds do not end on.
+  if (m_ClipToInputGeometry && nullptr == dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry.GetPointer()))
+  {
+    bounds[0] = m_XMin * m_OutPutSpacing[0];
+    bounds[1] = m_XMax * m_OutPutSpacing[0];
+    bounds[2] = m_YMin * m_OutPutSpacing[1];
+    bounds[3] = m_YMax * m_OutPutSpacing[1];
+    bounds[4] = 0.0;
+    bounds[5] = 0.0;
+    return true;
+  }
 
   return this->GetClippedPlaneBounds(
     m_WorldGeometry->GetReferenceGeometry(), m_WorldGeometry, bounds);

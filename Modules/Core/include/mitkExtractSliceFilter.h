@@ -125,6 +125,27 @@ namespace mitk
     }
 
     /**
+     * \brief Set whether the output is restricted to the part of the plane covered by the input image.
+     *
+     * By default, the output covers the part of the plane within the reference geometry of the world
+     * geometry, e.g. the whole scene, sampled at the spacing of the input. For a small input with a
+     * fine spacing in a large scene, most of these pixels lie outside of the input. When enabled, the
+     * output is additionally clipped to the input, in whole output pixels. The pixel grid itself does
+     * not change, so the remaining pixels keep their values. An input on the plane but beside the
+     * reference geometry yields a single background pixel. Only applies to planar world geometries.
+     *
+     * \param clipToInputGeometry If \c true, the output only covers the intersection with the input.
+     */
+    void SetClipToInputGeometry(bool clipToInputGeometry)
+    {
+      if (clipToInputGeometry != m_ClipToInputGeometry)
+      {
+        this->m_ClipToInputGeometry = clipToInputGeometry;
+        this->Modified();
+      }
+    }
+
+    /**
      * \brief Set the output dimensionality of the slice.
      *
      * \param dimension The output dimension (typically 2 for a slice).
@@ -161,6 +182,9 @@ namespace mitk
      * It is recommended to use
      * GetClippedPlaneBounds(const BaseGeometry*, const PlaneGeometry*, double*)
      * if you are not sure about the input.
+     *
+     * If the output is clipped to the input (see SetClipToInputGeometry()), the bounds are those of
+     * the output of the last update, in mm relative to the plane origin, so call it after updating.
      *
      * \param bounds Output array of six doubles: [xMin, xMax, yMin, yMax, zMin, zMax].
      * \return \c true if bounds were successfully computed, \c false otherwise.
@@ -280,6 +304,8 @@ namespace mitk
     ResliceInterpolation m_InterpolationMode;
 
     bool m_InPlaneResampleExtentByGeometry; // Resampling grid corresponds to:  false->image    true->worldgeometry
+
+    bool m_ClipToInputGeometry;
 
     mitk::ScalarType *m_OutPutSpacing;
 

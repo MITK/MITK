@@ -20,9 +20,11 @@ found in the LICENSE file.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkInteractionConst.h>
 #include <mitkNumericTypes.h>
+#include <mitkPlaneClipping.h>
 #include <mitkRotationOperation.h>
 #include <mitkTestingMacros.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
@@ -621,6 +623,205 @@ public:
 #endif // EXTRACTOR_DEBUG
   }
 
+  /*
+   * A 5 x 10 x 5 mm image of 0.5 mm voxels with corners at x = [xMin, xMin + 5], y = [5, 15] and
+   * z = [47.75, 52.75] mm. Its values are non-zero, so that a background level of zero marks samples
+   * outside of the input.
+   */
+  static mitk::Image::Pointer CreateFineSpacedImage(double xMin)
+  {
+    typedef itk::Image<unsigned short, 3> ImageType;
+
+    ImageType::SizeType size;
+    size[0] = 10;
+    size[1] = 20;
+    size[2] = 10;
+
+    ImageType::RegionType region;
+    region.SetSize(size);
+
+    ImageType::SpacingType spacing;
+    spacing.Fill(0.5);
+
+    ImageType::PointType origin;
+    origin[0] = xMin + 0.25;
+    origin[1] = 5.25;
+    origin[2] = 48.0;
+
+    ImageType::Pointer itkImage = ImageType::New();
+    itkImage->SetRegions(region);
+    itkImage->SetSpacing(spacing);
+    itkImage->SetOrigin(origin);
+    itkImage->Allocate();
+
+    unsigned short pixelValue = 1;
+
+    for (itk::ImageRegionIterator<ImageType> it(itkImage, region); !it.IsAtEnd(); ++it)
+      it.Set(pixelValue++);
+
+    mitk::Image::Pointer image;
+    mitk::CastToMitkImage(itkImage, image);
+
+    return image;
+  }
+
+  /*
+   * A small image with a fine spacing in a corner of a large scene. Clipping the slice to the input
+   * must only drop pixels outside of the input, and keep the position and value of all others.
+   */
+  static void ClipToInputGeometryTest()
+  {
+    auto scene = mitk::Geometry3D::New();
+    mitk::BoundingBox::BoundsArrayType sceneBounds;
+    sceneBounds[0] = sceneBounds[2] = sceneBounds[4] = 0.0;
+    sceneBounds[1] = sceneBounds[3] = sceneBounds[5] = 100.0;
+    scene->SetBounds(sceneBounds);
+
+    auto image = CreateFineSpacedImage(5.0);
+
+    auto axialPlane = mitk::PlaneGeometry::New();
+    axialPlane->InitializeStandardPlane(scene, mitk::AnatomicalPlane::Axial, 50.0);
+
+    ClipToInputGeometryTestByPlane(image, axialPlane, "axial plane");
+
+    auto axialSlicer = CreateVtkSlicer(image, axialPlane, true);
+    const int *axialDimensions = axialSlicer->GetVtkOutput()->GetDimensions();
+    MITK_TEST_CONDITION(axialDimensions[0] == 10 && axialDimensions[1] == 20,
+                        "axial plane: output covers the 5 x 10 mm of the input at 0.5 mm");
+
+    // An input on the plane but beside the scene is not sampled at all, so the output must not span
+    // the scene either.
+    auto imageBesideScene = CreateFineSpacedImage(150.0);
+    auto besideSceneSlicer = CreateVtkSlicer(imageBesideScene, axialPlane, true);
+    vtkImageData *besideSceneOutput = besideSceneSlicer->GetVtkOutput();
+    const int *besideSceneExtent = besideSceneOutput->GetExtent();
+    MITK_TEST_CONDITION(besideSceneOutput->GetNumberOfPoints() == 1,
+                        "input beside the scene: output is a single pixel");
+    MITK_TEST_CONDITION(besideSceneOutput->GetScalarComponentAsDouble(besideSceneExtent[0], besideSceneExtent[2], 0, 0) == 0.0,
+                        "input beside the scene: the pixel shows the background level");
+
+    // Rotating within the plane about the scene center moves the input to negative plane coordinates.
+    auto rotatedPlane = mitk::PlaneGeometry::New();
+    rotatedPlane->InitializeStandardPlane(scene, mitk::AnatomicalPlane::Axial, 50.0);
+    mitk::RotationOperation inPlaneRotation(mitk::OpROTATE, scene->GetCenter(), rotatedPlane->GetNormal(), 37.0);
+    rotatedPlane->ExecuteOperation(&inPlaneRotation);
+
+    double inputBounds[6];
+    mitk::PlaneClipping::CalculateClippedPlaneBounds(image->GetGeometry(), rotatedPlane, inputBounds);
+    MITK_TEST_CONDITION_REQUIRED(inputBounds[0] < 0.0 || inputBounds[2] < 0.0,
+                                 "rotated plane: input lies at negative plane coordinates");
+
+    ClipToInputGeometryTestByPlane(image, rotatedPlane, "rotated plane");
+
+    // Tilting about an axis through the input keeps it on the plane.
+    auto tiltedPlane = mitk::PlaneGeometry::New();
+    tiltedPlane->InitializeStandardPlane(scene, mitk::AnatomicalPlane::Axial, 50.0);
+
+    mitk::Point3D pivot = image->GetGeometry()->GetCenter();
+    pivot[2] = tiltedPlane->GetOrigin()[2];
+
+    mitk::Vector3D tiltAxis;
+    tiltAxis[0] = 1.0;
+    tiltAxis[1] = 1.0;
+    tiltAxis[2] = 0.0;
+
+    mitk::RotationOperation tilt(mitk::OpROTATE, pivot, tiltAxis, 30.0);
+    tiltedPlane->ExecuteOperation(&tilt);
+
+    ClipToInputGeometryTestByPlane(image, tiltedPlane, "tilted plane");
+  }
+
+  static mitk::ExtractSliceFilter::Pointer CreateVtkSlicer(mitk::Image *image,
+                                                           const mitk::PlaneGeometry *plane,
+                                                           bool clipToInputGeometry)
+  {
+    auto slicer = mitk::ExtractSliceFilter::New();
+    slicer->SetInput(image);
+    slicer->SetWorldGeometry(plane);
+    slicer->SetResliceTransformByGeometry(image->GetGeometry());
+    slicer->SetBackgroundLevel(0.0);
+    slicer->SetClipToInputGeometry(clipToInputGeometry);
+    slicer->SetVtkOutputRequest(true);
+    slicer->Update();
+
+    return slicer;
+  }
+
+  static void ClipToInputGeometryTestByPlane(mitk::Image *image, const mitk::PlaneGeometry *plane, const std::string &name)
+  {
+    auto unclippedSlicer = CreateVtkSlicer(image, plane, false);
+    auto clippedSlicer = CreateVtkSlicer(image, plane, true);
+
+    vtkImageData *unclipped = unclippedSlicer->GetVtkOutput();
+    vtkImageData *clipped = clippedSlicer->GetVtkOutput();
+
+    const int *unclippedExtent = unclipped->GetExtent();
+    const int *clippedExtent = clipped->GetExtent();
+
+    auto isInClippedExtent = [clippedExtent](int x, int y) {
+      return x >= clippedExtent[0] && x <= clippedExtent[1] && y >= clippedExtent[2] && y <= clippedExtent[3];
+    };
+
+    MITK_TEST_CONDITION_REQUIRED(clippedExtent[0] >= unclippedExtent[0] && clippedExtent[1] <= unclippedExtent[1] &&
+                                   clippedExtent[2] >= unclippedExtent[2] && clippedExtent[3] <= unclippedExtent[3],
+                                 name + ": clipped output lies within the unclipped output");
+
+    int numberOfInputPixels = 0;
+    bool isInputKept = true;
+
+    for (int y = unclippedExtent[2]; y <= unclippedExtent[3]; ++y)
+    {
+      for (int x = unclippedExtent[0]; x <= unclippedExtent[1]; ++x)
+      {
+        if (unclipped->GetScalarComponentAsDouble(x, y, 0, 0) != 0.0)
+        {
+          ++numberOfInputPixels;
+          isInputKept = isInputKept && isInClippedExtent(x, y);
+        }
+      }
+    }
+
+    MITK_TEST_CONDITION_REQUIRED(numberOfInputPixels > 0, name + ": plane intersects the input");
+    MITK_TEST_CONDITION(isInputKept, name + ": clipping drops only pixels outside of the input");
+
+    bool areValuesKept = true;
+
+    for (int y = clippedExtent[2]; y <= clippedExtent[3]; ++y)
+    {
+      for (int x = clippedExtent[0]; x <= clippedExtent[1]; ++x)
+      {
+        areValuesKept = areValuesKept &&
+                        clipped->GetScalarComponentAsDouble(x, y, 0, 0) == unclipped->GetScalarComponentAsDouble(x, y, 0, 0);
+      }
+    }
+
+    MITK_TEST_CONDITION(areValuesKept, name + ": clipping keeps position and value of the remaining pixels");
+
+    // The expected extent: the input bounds rounded to whole pixels, within the unclipped extent.
+    const mitk::ScalarType *outputSpacing = clippedSlicer->GetOutputSpacing();
+    double inputBounds[6];
+    mitk::PlaneClipping::CalculateClippedPlaneBounds(image->GetGeometry(), plane, inputBounds);
+
+    const int expectedExtent[4] = {
+      std::max(unclippedExtent[0], mitk::PlaneClipping::RoundToPixelIndex(inputBounds[0], outputSpacing[0])),
+      std::min(unclippedExtent[1], mitk::PlaneClipping::RoundToPixelIndex(inputBounds[1], outputSpacing[0]) - 1),
+      std::max(unclippedExtent[2], mitk::PlaneClipping::RoundToPixelIndex(inputBounds[2], outputSpacing[1])),
+      std::min(unclippedExtent[3], mitk::PlaneClipping::RoundToPixelIndex(inputBounds[3], outputSpacing[1]) - 1)};
+
+    MITK_TEST_CONDITION(clippedExtent[0] == expectedExtent[0] && clippedExtent[1] == expectedExtent[1] &&
+                          clippedExtent[2] == expectedExtent[2] && clippedExtent[3] == expectedExtent[3],
+                        name + ": clipped extent is the input bounds in whole pixels");
+
+    double bounds[6];
+    clippedSlicer->GetClippedPlaneBounds(bounds);
+
+    MITK_TEST_CONDITION(mitk::Equal(bounds[0], clippedExtent[0] * outputSpacing[0]) &&
+                          mitk::Equal(bounds[1], (clippedExtent[1] + 1) * outputSpacing[0]) &&
+                          mitk::Equal(bounds[2], clippedExtent[2] * outputSpacing[1]) &&
+                          mitk::Equal(bounds[3], (clippedExtent[3] + 1) * outputSpacing[1]),
+                        name + ": clipped plane bounds span the output pixels");
+  }
+
   /* random a float value */
   static float randFloat()
   {
@@ -786,6 +987,9 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   // pixelvalue based testing
   mitkExtractSliceFilterTestClass::PixelvalueBasedTest();
+
+  // clipping to the input in a larger scene
+  mitkExtractSliceFilterTestClass::ClipToInputGeometryTest();
 
   // initialize sphere test volume
   mitkExtractSliceFilterTestClass::InitializeTestVolume();

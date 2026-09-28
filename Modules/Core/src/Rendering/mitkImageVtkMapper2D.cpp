@@ -1122,6 +1122,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_EmptyActors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
+  m_Reslicer->SetClipToInputGeometry(true);
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();

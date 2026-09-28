@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <vtkImageExtractComponents.h>
 #include <vtkLinearTransform.h>
 
+#include <algorithm>
+
 mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice *reslicer): m_XMin(0), m_XMax(0), m_YMin(0), m_YMax(0)
 {
   if (reslicer == nullptr)
@@ -160,10 +162,10 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
     if (this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), m_WorldGeometry, sliceBounds))
     {
       // Calculate output extent (integer values)
-      xMin = static_cast<int>(sliceBounds[0] / m_OutPutSpacing[0] + 0.5);
-      xMax = static_cast<int>(sliceBounds[1] / m_OutPutSpacing[0] + 0.5);
-      yMin = static_cast<int>(sliceBounds[2] / m_OutPutSpacing[1] + 0.5);
-      yMax = static_cast<int>(sliceBounds[3] / m_OutPutSpacing[1] + 0.5);
+      xMin = PlaneClipping::RoundToPixelIndex(sliceBounds[0], m_OutPutSpacing[0]);
+      xMax = PlaneClipping::RoundToPixelIndex(sliceBounds[1], m_OutPutSpacing[0]);
+      yMin = PlaneClipping::RoundToPixelIndex(sliceBounds[2], m_OutPutSpacing[1]);
+      yMax = PlaneClipping::RoundToPixelIndex(sliceBounds[3], m_OutPutSpacing[1]);
     } // ELSE we use the default values
   }
 

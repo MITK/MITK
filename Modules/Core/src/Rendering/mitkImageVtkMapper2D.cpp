@@ -348,10 +348,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     // correct position during 3D mapping.
     mitk::PlaneClipping::CalculateClippedPlaneBounds(image->GetGeometry(), planeGeometry, textureClippingBounds);
 
-    textureClippingBounds[0] = static_cast<int>(textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5);
-    textureClippingBounds[1] = static_cast<int>(textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5);
-    textureClippingBounds[2] = static_cast<int>(textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5);
-    textureClippingBounds[3] = static_cast<int>(textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5);
+    textureClippingBounds[0] = mitk::PlaneClipping::RoundToPixelIndex(textureClippingBounds[0], localStorage->m_mmPerPixel[0]);
+    textureClippingBounds[1] = mitk::PlaneClipping::RoundToPixelIndex(textureClippingBounds[1], localStorage->m_mmPerPixel[0]);
+    textureClippingBounds[2] = mitk::PlaneClipping::RoundToPixelIndex(textureClippingBounds[2], localStorage->m_mmPerPixel[1]);
+    textureClippingBounds[3] = mitk::PlaneClipping::RoundToPixelIndex(textureClippingBounds[3], localStorage->m_mmPerPixel[1]);
 
     // clipping bounds for cutting the image
     localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);

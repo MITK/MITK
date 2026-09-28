@@ -808,8 +808,9 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnResetAdjustments);
 
-  // Through a slot of its own rather than SetEditModeActive, which a selection
-  // change and switching rendering off call as well, and neither should ask.
+  // Through a slot of its own rather than SetEditModeActive: leaving is for
+  // ConcludeEdit, which asks first, and only the button may have its request
+  // taken back.
   connect(m_Controls->editModeButton, &QToolButton::toggled,
     this, &QmitkVolumeTransferFunctionEditor::OnEditModeToggled);
 
@@ -957,16 +958,12 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
 
   // Nothing else announces that the previews became worth drawing: switching
   // volume rendering on deliberately does not re-bind the node.
+  //
+  // Being disabled ends nothing. Switching volume rendering off is what greys
+  // the editor out, and an edit in progress then waits, untouchable, for
+  // rendering to come back - or for a selection change to ask about it.
   if (this->isEnabled())
-  {
     this->StartThumbnailGeneration();
-    return;
-  }
-
-  // Switching volume rendering off is what greys the editor out, and an edit
-  // cannot outlive the thing it was being made to. What was drawn stays on the
-  // node: it was written into the function as it was drawn.
-  this->SetEditModeActive(false);
 }
 
 void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
@@ -1089,11 +1086,11 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
 
 void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
 {
-  // An edit belongs to the node that was current when it started, and leaving
-  // is what records the curve on that node. This has to happen before the
-  // function is dropped below, or the record is written against the wrong node
-  // - or against none at all.
-  this->SetEditModeActive(false);
+  // An edit belongs to the node that was current when it started, and saving it
+  // is what records it on that node, as a preset of its own. So it is concluded
+  // while m_DataNode is still that node: once it is replaced below, a saved
+  // curve would be recorded against the wrong node - or against none at all.
+  this->ConcludeEdit(false);
 
   m_DataNode = node;
   m_AppliedTransferFunction = nullptr;
@@ -1681,38 +1678,87 @@ void QmitkVolumeTransferFunctionEditor::OnResetAdjustments()
 
 void QmitkVolumeTransferFunctionEditor::OnEditModeToggled(bool checked)
 {
-  if (checked || !m_EditModeActive || !m_CurveEdited)
+  if (checked)
+    this->SetEditModeActive(true);
+  else
+    this->ConcludeEdit(true);
+}
+
+void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
+{
+  if (!m_EditModeActive || !m_CurveEdited)
   {
-    this->SetEditModeActive(checked);
+    this->SetEditModeActive(false);
     return;
   }
 
+  // Named, because a selection change asks after another image was clicked.
+  const auto node = m_DataNode.Lock();
+  const auto imageName = node.IsNotNull() ? QString::fromStdString(node->GetName()) : QString();
+
   QMessageBox question(QMessageBox::Question, "Edit transfer function",
-    "Save the edited curve as a preset?", QMessageBox::NoButton, this);
-  question.setInformativeText("An unsaved drawing is lost once another image is selected. "
-    "Until then, it can still be saved by right-clicking the preset list.");
+    imageName.isEmpty()
+      ? QString("Save the edited curve as a preset?")
+      : QString("Save the curve edited for \"%1\" as a preset?").arg(imageName),
+    QMessageBox::NoButton, this);
+  question.setInformativeText("A curve that is not saved is discarded: the image remembers only the "
+    "preset it was drawn over, not the drawing.");
 
   auto *saveButton = question.addButton("Save as preset...", QMessageBox::AcceptRole);
-  auto *keepButton = question.addButton("Keep", QMessageBox::RejectRole);
   auto *discardButton = question.addButton("Discard", QMessageBox::DestructiveRole);
+  auto *continueButton = mayContinueEditing
+    ? question.addButton("Continue editing", QMessageBox::RejectRole)
+    : nullptr;
 
   question.setDefaultButton(saveButton);
-  question.setEscapeButton(keepButton);
-  question.exec();
 
-  const auto *answer = question.clickedButton();
+  // Without one, Esc and the title bar's close button do nothing, so a
+  // selection change waits for one of the two answers that leave the node as
+  // its next selection will rebuild it.
+  question.setEscapeButton(continueButton);
 
-  // Before leaving, which makes the drawing the baseline and so leaves nothing
-  // to go back to.
-  if (answer == discardButton)
-    this->DiscardEdit();
+  while (true)
+  {
+    question.exec();
 
-  this->SetEditModeActive(false);
+    const auto *answer = question.clickedButton();
 
-  // After leaving, for the same reason: the colours are saved from the
-  // baseline, and until then that is still the curve from before the edit.
-  if (answer == saveButton)
-    this->SaveCustomPreset();
+    if (answer == discardButton)
+    {
+      // Before leaving, which makes the drawing the baseline and so leaves
+      // nothing to go back to.
+      this->DiscardEdit();
+      this->SetEditModeActive(false);
+      return;
+    }
+
+    if (answer == saveButton)
+    {
+      // Asked while the edit still runs, so that cancelling comes back to the
+      // question rather than leaving a drawing nobody saved.
+      const auto fileName = this->AskPresetFileName();
+
+      if (fileName.isEmpty())
+        continue;
+
+      this->SetEditModeActive(false);
+
+      // After leaving, for the same reason as discarding before it: the colours
+      // are saved from the baseline, and until then that is still the curve from
+      // before the edit.
+      this->SaveCustomPreset(fileName);
+      return;
+    }
+
+    if (mayContinueEditing)
+    {
+      // The button that asked has already come up. Only it is put back, since
+      // ShowEditMode would also reset the axis the user may have widened.
+      const QSignalBlocker blocker(m_Controls->editModeButton);
+      m_Controls->editModeButton->setChecked(true);
+      return;
+    }
+  }
 }
 
 void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
@@ -1766,10 +1812,10 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 
   // Nothing about the drawing is recorded on the node: it goes on naming the
   // preset that was drawn over and the offsets in force, and rebuilding those is
-  // what the next selection does - a drawing does not outlive it, and keeping
-  // one means saving it as a preset of its own. Carried here instead, so that
-  // the panel can go on saying the curve is not the preset after the re-seed
-  // below has cleared m_CurveEdited.
+  // what the next selection does. Carried here instead, so that the panel can go
+  // on saying the curve is not the preset after the re-seed below has cleared
+  // m_CurveEdited - until ConcludeEdit applies the preset the drawing was saved
+  // as, or for as long as the drawing is on show if that save failed.
   m_CurveDrawnOver = true;
 
   // Re-seeds the canvas and re-snapshots both baselines, so the sliders now
@@ -2170,19 +2216,16 @@ void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
   auto *chosenAction = menu.exec(m_Controls->presetListWidget->viewport()->mapToGlobal(pos));
 
   if (chosenAction == saveAction)
-    this->SaveCustomPreset();
+  {
+    if (const auto fileName = this->AskPresetFileName(); !fileName.isEmpty())
+      this->SaveCustomPreset(fileName);
+  }
   else if (chosenAction == removeAction)
     this->RemoveCustomPreset(presetItem);
 }
 
-void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
+QString QmitkVolumeTransferFunctionEditor::AskPresetFileName()
 {
-  auto node = m_DataNode.Lock();
-
-  if (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
-    return;
-
-  auto *presetList = m_Controls->presetListWidget;
   const auto *appliedPreset = this->AppliedPresetItem();
 
   // The file name becomes the entry's name, so the suggestion starts from the
@@ -2201,13 +2244,25 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset()
     "Transfer function (*.json)");
 
   if (fileName.isEmpty())
-    return;
+    return {};
 
   if (!fileName.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive))
     fileName += QStringLiteral(".json");
 
   if (!ValidatePresetFilePath(this, "Save transfer function", fileName))
+    return {};
+
+  return fileName;
+}
+
+void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName)
+{
+  auto node = m_DataNode.Lock();
+
+  if (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
     return;
+
+  auto *presetList = m_Controls->presetListWidget;
 
   // A copy, so that saving cannot alter the curve it is saving, and with the
   // colours as handles: a windowed function holds 256 evenly spaced samples, and

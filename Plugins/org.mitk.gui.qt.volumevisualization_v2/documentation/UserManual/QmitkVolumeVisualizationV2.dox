@@ -242,29 +242,27 @@ slider positions are left as they were. If you did, it asks whether to save the
 curve as a preset:
 
 <ul>
-<li> <b>Save as preset...</b> writes the curve to a JSON file in the same format
-the built-in catalogue uses, adds it to the grid and applies it, so your own
-functions can be kept and shared and added back with the <b>Load preset...</b>
-entry.
-<li> <b>Keep</b> leaves the drawing on show without saving it. ESC answers the
-same.
+<li> <b>Save as preset...</b> asks where to write the curve, as a JSON file in
+the same format the built-in catalogue uses, then adds it to the grid and
+applies it, so your own functions can be kept and shared and added back with the
+<b>Load preset...</b> entry. Cancelling the file dialog brings the question back.
 <li> <b>Discard</b> puts back the curve and the blend mode from before the edit.
+<li> <b>Continue editing</b> takes back the click on <b>Edit</b> and leaves you
+editing. ESC answers the same.
 </ul>
 
-A drawing you keep is starred on the preset's entry, and becomes what the
-sliders are measured from: they return to neutral and from then on move the
-drawing rather than the preset. Clicking the entry rebuilds the preset instead.
-To save a kept drawing later, right-click the preset grid and choose
-<b>Save as preset...</b>.
+Selecting another image while editing, or removing the one being edited, asks
+the same question, only without <b>Continue editing</b>: the selection has
+already moved on. Switching volume rendering off does not end the edit. It
+waits, and carries on when rendering is switched back on.
 
-\note A curve edited point by point is not kept. What the view records is the
-preset it was drawn over together with the slider positions, so selecting
-another image and coming back rebuilds those and the drawing is gone; the
-asterisk says the curve is no longer the preset while it is still on screen, and
-<b>Save as preset...</b> is how to keep one. Slider positions are kept, since
-they are part of that record rather than a departure from it. A saved file
-records the blend mode the curve was authored for alongside it, and loading it
-restores both.
+\note There is no keeping an edited curve without saving it. What the view
+records is the preset a curve was drawn over together with the slider
+positions, so selecting another image and coming back rebuilds those, and a
+drawing left unsaved would be gone. Slider positions are kept, since they are
+part of that record rather than a departure from it. A saved file records the
+blend mode the curve was authored for alongside it, and loading it restores
+both.
 
 \section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
 

@@ -47,16 +47,17 @@ namespace Ui
  *        point on the canvas that shows it.
  *
  * Editing happens on that canvas rather than on a page of its own, so a host
- * sees one widget throughout and has no mode to lay out around. What is drawn
- * is kept; the curve that stood before it is not held on to.
+ * sees one widget throughout and has no mode to lay out around.
  *
  * What the widget records on the node is a recipe rather than only a result -
  * the preset it started from plus the four window offsets - so that returning
  * to a node restores the controls as they were left. The recipe is also all that
  * outlives the selection: a curve drawn over a preset point by point is recorded
- * nowhere, so coming back to the node rebuilds the preset and the offsets and
- * the drawing is gone. The panel marks such a curve as edited while it is on
- * show, and keeping one means saving it as a preset of its own. A curve whose
+ * nowhere, so coming back to the node would rebuild the preset and the offsets
+ * over the drawing. Ending an edit that changed the curve therefore asks
+ * whether to save it as a preset of its own or to discard it, which puts back
+ * the curve from before the edit - on a selection change as well, before the
+ * node is let go. A curve whose
  * preset has been removed answers to no catalogue entry at all, and what is
  * recorded for it is only that it was chosen here. See the
  * volumerendering.transferfunction.* entries in the property documentation.
@@ -148,14 +149,28 @@ private:
   QStringList LoadRememberedPresets();
 
   /**
-   * \brief Write the curve on show to a file of the user's choosing, and offer
-   *        it from then on as a preset of its own.
+   * \brief Ask the user where to save the curve on show as a preset.
+   *
+   * Only asks: nothing is written, so this can come before the edit whose curve
+   * is to be saved has ended.
+   *
+   * \return A path ending in .json that a preset file may be written to, or an
+   *         empty string if the user cancelled or chose a path that cannot hold
+   *         one.
+   */
+  QString AskPresetFileName();
+
+  /**
+   * \brief Write the curve on show to a file, and offer it from then on as a
+   *        preset of its own.
    *
    * The file is what the preset is: it is read straight back in, remembered, and
    * looked for again at every later start. Nothing is written for a curve that
    * is still the preset it came from - see DiffersFromPreset.
+   *
+   * \param[in] fileName A path as AskPresetFileName returns it.
    */
-  void SaveCustomPreset();
+  void SaveCustomPreset(const QString &fileName);
 
   /**
    * \brief Offer a preset file of the user's choosing from now on, and apply
@@ -307,13 +322,15 @@ private:
   /**
    * \brief Hand the canvas over to point-by-point editing, or take it back.
    *
-   * Leaving keeps whatever was drawn - the way back to the curve that stood
-   * before it is DiscardEdit, first - so leaving is also where a curve that was
-   * really edited is recorded as answering to no preset.
+   * Only the mode: whether what was drawn is saved or discarded is for
+   * ConcludeEdit to ask, which is the way to end an edit. Leaving makes the
+   * curve on show the baseline the sliders measure from - so DiscardEdit, if
+   * wanted, has to come first - and is where a curve that was really edited is
+   * marked as drawn over its preset.
    *
-   * A request for the mode already in force does nothing. SetDataNode ends
-   * editing on every selection change, whether any was in progress or not, and
-   * relies on that call being inert.
+   * A request for the mode already in force does nothing. ConcludeEdit ends
+   * editing this way on every selection change, whether any was in progress or
+   * not, and relies on that call being inert.
    */
   void SetEditModeActive(bool active);
 
@@ -326,6 +343,22 @@ private:
    * itself, since the sliders stand still for as long as editing lasts.
    */
   void DiscardEdit();
+
+  /**
+   * \brief End the edit in progress, asking first whether to save the curve as
+   *        a preset or discard it.
+   *
+   * There is no keeping a drawing unsaved: the node records the preset it was
+   * drawn over and the slider offsets, not the drawing, so the next selection
+   * would rebuild the preset over it. An edit that changed nothing ends
+   * without asking, and there being no edit in progress makes this inert.
+   *
+   * \param[in] mayContinueEditing Whether the user may also take back the
+   *            request to end the edit, which then continues as if it had not
+   *            been made. Not for a selection change, which has already
+   *            happened by the time it asks.
+   */
+  void ConcludeEdit(bool mayContinueEditing);
 
   /**
    * \brief Give the canvas its handles, or take them away, and show which of the
@@ -512,11 +545,14 @@ private:
    *
    * What m_CurveEdited says while an edit is under way, kept on after it is
    * over: leaving makes the drawing the baseline, and that clears the other
-   * flag. Held here rather than on the node because a drawing is recorded
-   * nowhere - the node goes on describing the preset and the offsets, and
-   * rebuilding those is what the next selection does - so this lasts exactly as
-   * long as the drawing does, which is as long as this node is on show. It is
-   * also what keeps the entry marked, and so the curve saveable, in between.
+   * flag. Normally only for a moment, since an edit that changed the curve ends
+   * discarded, which sets nothing, or saved, and the preset read back from the
+   * file then takes the drawing's place. A save that fails - a file that cannot
+   * be written or read back - leaves it set, and then it is what keeps the
+   * entry marked, and so the curve saveable. Held here rather than on the node
+   * because a drawing is recorded nowhere: the node goes on describing the
+   * preset and the offsets, and rebuilding those is what the next selection
+   * does.
    */
   bool m_CurveDrawnOver = false;
 

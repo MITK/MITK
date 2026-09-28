@@ -380,8 +380,8 @@ private:
     Kind kind = Kind::Slice;
     QString label;
     double normalized = 0.0;  // current knob position, 0..1
-    QRect track;
-    QRect labelRect;          // the row's label column, left of its track
+    QRect track{};
+    QRect labelRect{};        // the row's label column, left of its track
   };
 
   /** \brief The navigator rows for the current mode and data (compact = slice

@@ -920,15 +920,15 @@ std::vector<QmitkMxNCellOverlay::NavRow> QmitkMxNCellOverlay::NavigatorRows() co
     return rows;
   }
 
-  rows.push_back({ NavRow::Kind::Slice, this->NavigatorDepthLabel(), 0.0, {} });
+  rows.push_back({ NavRow::Kind::Slice, this->NavigatorDepthLabel(), 0.0 });
   if (m_NavigatorExpanded)
   {
-    rows.push_back({ NavRow::Kind::InPlaneRight, tr("Horiz."), 0.0, {} });
-    rows.push_back({ NavRow::Kind::InPlaneUp, tr("Vert."), 0.0, {} });
+    rows.push_back({ NavRow::Kind::InPlaneRight, tr("Horiz."), 0.0 });
+    rows.push_back({ NavRow::Kind::InPlaneUp, tr("Vert."), 0.0 });
   }
   if (m_TimeSteps > 1)
   {
-    rows.push_back({ NavRow::Kind::Time, tr("Time"), 0.0, {} });
+    rows.push_back({ NavRow::Kind::Time, tr("Time"), 0.0 });
   }
 
   // In-plane state is only needed when there is an in-plane row.

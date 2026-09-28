@@ -39,7 +39,7 @@ namespace mitk
    * A transfer function stores color only at its control points; everything in
    * between is interpolated, and the space that interpolation happens in decides
    * what those in-between colors look like. Red to blue passes through a dull
-   * grey-purple in RGB and through saturated magenta in HSV. The control points
+   * gray-purple in RGB and through saturated magenta in HSV. The control points
    * alone therefore do not determine the rendered result, which is why the color
    * space belongs to a transfer function's data rather than to the renderer.
    *
@@ -67,7 +67,7 @@ namespace mitk
    * \brief Parse a color space name as written by TransferFunctionColorSpaceToString().
    * \param[in] name The name to parse. Case-sensitive.
    * \return The color space, or no value if the name names none. Callers decide
-   *         what an unrecognised name means; this function does not substitute a
+   *         what an unrecognized name means; this function does not substitute a
    *         default of its own.
    */
   MITKCORE_EXPORT std::optional<TransferFunctionColorSpace> TransferFunctionColorSpaceFromString(

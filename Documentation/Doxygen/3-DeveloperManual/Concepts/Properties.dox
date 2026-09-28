@@ -189,8 +189,8 @@ combined into one pixel, as a vtkVolumeMapper::BlendModes value. Defaults to 0
 (composite), the only mode that composites front to back and so the only one
 the shading and scattering properties affect; 1 (maximum intensity), 2 (minimum
 intensity), 3 (average intensity) and 4 (additive) each flatten the ray to a
-single value instead, and 3 and 4 also ignore the colour transfer function and
-emit greyscale. VTK further defines 5 (isosurface) and 6 (slice), which MITK
+single value instead, and 3 and 4 also ignore the color transfer function and
+emit grayscale. VTK further defines 5 (isosurface) and 6 (slice), which MITK
 cannot render: they need iso-values or a slice plane set on the
 vtkVolumeProperty, which no mapper here supplies, and without that input the
 ray caster draws nothing rather than falling back. The Volume
@@ -216,7 +216,7 @@ name. One from a file is found by volumerendering.transferfunction.presetfile
 instead, since another file can carry the same name. Where the view offers no
 matching preset - the file is not among those it offers, or the node records no
 file - the stored TransferFunction is shown as it stands. Recorded because the
-view's adjust sliders resample the colour function, after which the curve
+view's adjust sliders resample the color function, after which the curve
 matches no preset and the choice can no longer be recovered from it; the mapper
 does not read it. Together with the four offsets below it is the whole of what
 the view restores: a curve drawn point by point over the preset is recorded
@@ -237,7 +237,7 @@ volumerendering.transferfunction.colorshift,
 volumerendering.transferfunction.colorwidth - The four offsets the view's adjust
 sliders applied on top of the preset named above, which is the baseline they are
 measured from; meaningless without it, and written only as a complete set of
-four, since the neutral colour width is the preset's own span rather than zero.
+four, since the neutral color width is the preset's own span rather than zero.
 Together with the preset name they form a recipe the view re-executes when the
 node is selected again, which is what lets the sliders show their previous
 positions instead of resetting. Where the recipe and the stored TransferFunction

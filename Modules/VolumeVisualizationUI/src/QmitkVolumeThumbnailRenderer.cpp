@@ -111,7 +111,7 @@ void QmitkVolumeThumbnailRenderer::CreatePipeline()
   m_RenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
 
   // The pair SetOffScreenRendering() sets. vtkWindow marks the combined getter
-  // deprecated in favour of asking about the two separately.
+  // deprecated in favor of asking about the two separately.
   m_RenderWindow->SetShowWindow(false);
   m_RenderWindow->SetUseOffScreenBuffers(true);
   m_RenderWindow->SetSize(m_Size.width(), m_Size.height());
@@ -126,11 +126,11 @@ void QmitkVolumeThumbnailRenderer::CreatePipeline()
 
   // One headlight at intensity 1.0 and nothing else: that exact rig is what
   // selects the ray caster's default lighting path, where ambient is tinted by
-  // the sample's own colour rather than laid over the picture as flat grey. It
+  // the sample's own color rather than laid over the picture as flat gray. It
   // is also the rig mitk::VtkPropRenderer installs for the headlight model, so
   // a preview is lit the way the 3D window will light the node.
   //
-  // Ambient colour 1.0 is what VtkPropRenderer's normalisation works out to for
+  // Ambient color 1.0 is what VtkPropRenderer's normalization works out to for
   // that rig. This lighting path never reads it, but the volumetric scattering
   // path does, so setting it keeps the two rigs identical and the preview right
   // if scattering is ever switched on here.
@@ -145,7 +145,7 @@ void QmitkVolumeThumbnailRenderer::CreatePipeline()
 
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
 
-  // VTK defaults to nearest neighbour, which at preview size reads as blocky.
+  // VTK defaults to nearest neighbor, which at preview size reads as blocky.
   m_VolumeProperty->SetInterpolationTypeToLinear();
   m_VolumeProperty->ShadeOn();
 

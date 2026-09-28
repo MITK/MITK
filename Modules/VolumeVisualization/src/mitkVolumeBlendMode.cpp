@@ -59,9 +59,9 @@ const std::vector<mitk::VolumeBlendModeDescription> &mitk::VolumeBlendModeDescri
     {VolumeBlendMode::MinimumIntensity, "MinimumIntensity", "Minimum intensity (MinIP)",
      "Shows the darkest value along each ray, for example airways."},
     {VolumeBlendMode::AverageIntensity, "AverageIntensity", "Average intensity",
-     "Shows the average along each ray, like an X-ray image. Greyscale only."},
+     "Shows the average along each ray, like an X-ray image. Grayscale only."},
     {VolumeBlendMode::Additive, "Additive", "Additive intensity",
-     "Adds up the values along each ray. Greyscale only."}
+     "Adds up the values along each ray. Grayscale only."}
   };
 
   return descriptions;

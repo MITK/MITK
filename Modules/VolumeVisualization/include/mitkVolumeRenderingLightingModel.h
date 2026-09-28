@@ -36,7 +36,7 @@ namespace mitk
    * Headlight is the only rig for which the ray caster compiles its default
    * lighting path, which requires exactly one switched-on light, at intensity
    * exactly 1.0, of headlight type. That path is the one where ambient is
-   * multiplied by the sample colour. The cost is that a light at the camera
+   * multiplied by the sample color. The cost is that a light at the camera
    * illuminates precisely what the camera sees, so it casts no visible shadow
    * and scattering would have nothing to darken - hence no scattering here.
    *
@@ -68,22 +68,22 @@ namespace mitk
    *
    * Ambient is the single field the models disagree on, and not by preference -
    * the shader computes it differently for each. Under the headlight it carries
-   * the sample colour and works as a fill. Under any rig with more than one
-   * light it does not, so it lays a flat grey over the whole image and
+   * the sample color and works as a fill. Under any rig with more than one
+   * light it does not, so it lays a flat gray over the whole image and
    * desaturates the render long before it rescues an occluded voxel. The key
    * rig therefore holds it at zero and fills from its fill light instead, whose
-   * contribution does carry the sample colour and does get its own shadow ray.
+   * contribution does carry the sample color and does get its own shadow ray.
    *
    * Diffuse rises to make up for that zero, which the key rig can afford
    * because its key and fill together exceed a single light's intensity.
    *
    * Specular is written by every model rather than inherited. The shader adds
-   * it without the sample colour, so it is white light laid over the render,
+   * it without the sample color, so it is white light laid over the render,
    * and a light near the camera puts its lobe across everything visible at
    * once; high values clip bright tissue to white.
    *
    * Anisotropy stays at 0. VTK's Henyey-Greenstein phase function carries no
-   * 1/4pi normalisation, so it is exactly 1.0 at zero but swings either side
+   * 1/4pi normalization, so it is exactly 1.0 at zero but swings either side
    * of that with the light and view geometry - a brightness change, not a
    * shape cue.
    */

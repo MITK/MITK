@@ -23,7 +23,7 @@ mitk::VolumeRenderingMaterial mitk::VolumeRenderingMaterial::FromNode(const Data
     return material;
 
   // These leave their target untouched for a key the node does not carry, so
-  // each field simply keeps its default initialiser. No presence checks needed.
+  // each field simply keeps its default initializer. No presence checks needed.
   node->GetBoolProperty(SHADE_PROPERTY, material.shade);
   node->GetFloatProperty(AMBIENT_PROPERTY, material.ambient);
   node->GetFloatProperty(DIFFUSE_PROPERTY, material.diffuse);

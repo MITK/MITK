@@ -9,12 +9,12 @@
 
 Volume visualization draws a 3D image as a solid body in the 3D render window.
 Instead of showing one slice at a time, it sends a ray through the volume for
-every pixel and accumulates colour and opacity from every voxel that ray meets.
+every pixel and accumulates color and opacity from every voxel that ray meets.
 Bone, vessels or skin can therefore be seen at once, in depth, without cutting
 the data into planes first.
 
 What decides whether you see bone, skin or fog is the <b>transfer function</b>:
-curves that map each grey value to a colour and to an opacity. Almost everything
+curves that map each gray value to a color and to an opacity. Almost everything
 in this view is either a way of choosing a transfer function or a rendering
 option applied on top of one.
 
@@ -35,7 +35,7 @@ once the volume is on. The sections below it are not shown while it is off,
 because there is no volume to configure yet.
 
 Switching it on does more than show the volume: a node that carries no transfer
-function is given one from the preset catalogue, and one that names no lighting
+function is given one from the preset catalog, and one that names no lighting
 model is given the one the 3D window is lit for, as described in
 \ref org_mitk_views_volumevisualization_v2_lighting. Switching on therefore
 produces a visible volume rather than an empty 3D window, and you adjust from
@@ -65,17 +65,17 @@ appear progressively.
 The two buttons above the grid, at its right, choose how the presets are laid
 out; the pressed one is the layout in force. The first is the grid. The second
 lays the same presets out as a list: one row each, the name beside a preview
-too small to study but large enough to say which colours a preset brings. More
-of the catalogue is on screen that way, and the names line up in one column,
+too small to study but large enough to say which colors a preset brings. More
+of the catalog is on screen that way, and the names line up in one column,
 which is the quicker way in once they are familiar. Nothing is drawn a second
 time on a switch either way. The view starts in the grid every time it is
 opened.
 
-The catalogue is the Hounsfield-based preset library shared across medical
-viewers, plus a few general-purpose colour maps. The <tt>CT-</tt> presets assume
+The catalog is the Hounsfield-based preset library shared across medical
+viewers, plus a few general-purpose color maps. The <tt>CT-</tt> presets assume
 Hounsfield units, so which tissue a preset picks out transfers between CT images
 unchanged. How solid that tissue looks does not: opacity accumulates over the
-distance a ray travels in millimetres, so the same preset comes out denser on a
+distance a ray travels in millimeters, so the same preset comes out denser on a
 coarsely sampled image than on a finely sampled one. <b>Height</b>, under
 <b>Opacity curve</b>, is the slider that compensates. The <tt>MR-</tt> presets
 cannot assume even the units, because MR intensities are not calibrated to a
@@ -103,8 +103,8 @@ so you can look around without losing the curve on show; Enter or Space applies
 the entry that mark is on, and on <b>Load preset...</b> opens the file dialog.
 
 Right-clicking the grid offers <b>Save as preset...</b> for the curve you have
-arrived at. It is available exactly while the asterisk is showing and greyed out
-otherwise, since a curve that is still its preset is one the catalogue already
+arrived at. It is available exactly while the asterisk is showing and grayed out
+otherwise, since a curve that is still its preset is one the catalog already
 holds. Choose where to write it and it joins the end of the grid as an entry of
 its own, with its own preview, marked and no longer starred: it is a preset now
 rather than a departure from one.
@@ -125,7 +125,7 @@ Right-clicking a preset of your own offers <b>Remove preset</b> for the entry
 under the cursor, after asking. That entry leaves the grid and is not looked for
 again at the next start, while the file it was saved to stays where you put it -
 a preset is that file rather than a copy of it, and the <b>Load preset...</b>
-entry brings it back. The menu entry is greyed out over the catalogue's own presets,
+entry brings it back. The menu entry is grayed out over the catalog's own presets,
 which are read afresh at every start and would be offered again regardless.
 
 Removing the preset a volume is currently rendered with leaves the rendering
@@ -135,9 +135,9 @@ preset, so no entry is marked for it any more.
 \subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
 
 Below the preset grid, one canvas shows three things at once: the histogram of
-the image as a backdrop, the opacity curve drawn over it, and the colours the
-transfer function assigns as a gradient beneath. Together they say which grey
-values the current function makes visible and in what colour, against how much
+the image as a backdrop, the opacity curve drawn over it, and the colors the
+transfer function assigns as a gradient beneath. Together they say which gray
+values the current function makes visible and in what color, against how much
 of that value actually occurs in the image.
 
 Until you ask to edit it, the canvas is a display. Clicking it does nothing; the
@@ -152,20 +152,20 @@ wants it. Below the canvas, four sliders move it without redrawing it. Two of
 them, under <b>Opacity curve</b>, act on how much is visible:
 
 <ul>
-<li> <b>Position</b> slides the opacity curve along the grey-value axis, which
+<li> <b>Position</b> slides the opacity curve along the gray-value axis, which
 is what you reach for when a preset shows too much or too little tissue. It
 travels half the image's value range in either direction.
 <li> <b>Height</b> raises or lowers the whole curve, making the volume more or
 less solid without changing which values are visible at all.
 </ul>
 
-The other two, under <b>Color</b>, act on the range those colours are spread
+The other two, under <b>Color</b>, act on the range those colors are spread
 over:
 
 <ul>
-<li> <b>Position</b> moves the centre of that range.
-<li> <b>Width</b> sets how wide it is. Narrowing it concentrates the colours
-into a smaller band of grey values; widening it spreads them out.
+<li> <b>Position</b> moves the center of that range.
+<li> <b>Width</b> sets how wide it is. Narrowing it concentrates the colors
+into a smaller band of gray values; widening it spreads them out.
 </ul>
 
 <b>Reset</b> returns all four to neutral. That restores the curve they are
@@ -181,7 +181,7 @@ back to the positions you left them in.
 
 <b>Edit</b>, above the canvas, hands that canvas over to editing the curve on
 show point by point; pressing it again ends the edit. The preset grid and the
-four sliders are greyed out in the meantime, since either would replace what you
+four sliders are grayed out in the meantime, since either would replace what you
 are drawing.
 
 \imageMacro{QmitkVolumeVisualizationV2_EditMode.png,"The canvas while editing.",10.00}
@@ -190,7 +190,7 @@ are drawing.
 <li> <b>Edit</b> starts and ends the edit.
 <li> <b>Show whole curve</b> decides how far the axis reaches, as described below.
 <li> The handles of the opacity curve.
-<li> The colour stops, as markers along the bottom edge. A faded one standing on
+<li> The color stops, as markers along the bottom edge. A faded one standing on
 an edge lies beyond the axis.
 <li> The <b>Color stops</b> row, for the stop selected on the canvas.
 </ol>
@@ -201,12 +201,12 @@ The canvas edits both curves at once, each in a region of its own:
 <li> In the plot, the handles are the points of the opacity curve.
 Double-clicking empty space adds a point, dragging moves one, and right-click
 removes it. The arrow keys move the selected point and DELETE removes it.
-<li> Along the bottom edge, below the plot, the markers are the colour stops,
-each pointing at the grey value its colour applies to. Click one to select it,
-drag it to move it, double-click it to pick its colour, and right-click it to
+<li> Along the bottom edge, below the plot, the markers are the color stops,
+each pointing at the gray value its color applies to. Click one to select it,
+drag it to move it, double-click it to pick its color, and right-click it to
 remove it. Double-clicking the strip between markers adds a stop there, taking
-the colour the gradient already has at that point, so that adding one changes
-nothing until you recolour it.
+the color the gradient already has at that point, so that adding one changes
+nothing until you recolor it.
 <li> A single click on empty space only clears the selection, so that it
 cannot add anything by accident.
 <li> Between points the curves are interpolated linearly.
@@ -214,16 +214,16 @@ cannot add anything by accident.
 
 A row under the canvas, <b>Color stops</b>, reaches the same stops without
 aiming at a marker. Its list shows each stop as a swatch, in the order the
-markers stand in. The colour field beside it is the selected stop's colour and
-opens a colour picker. The number gives the stop's position as a fraction of the
+markers stand in. The color field beside it is the selected stop's color and
+opens a color picker. The number gives the stop's position as a fraction of the
 axis, 0 at its left end and 1 at its right; typing a value moves the stop. A
 gradient keeps at least one stop, and the curve at least one point.
 
-The axis covers the band of grey values the image occupies, while the presets
+The axis covers the band of gray values the image occupies, while the presets
 are authored on their modality's full scale, so a preset's outermost stops
 often lie beyond either end of the axis. The one nearest each end is then drawn
 faded on that end, to say it exists rather than where it is. It can be selected
-and recoloured there, but not dragged, since there is no place on the axis to
+and recolored there, but not dragged, since there is no place on the axis to
 drag it from; pointing at it says so. Ticking <b>Show whole curve</b>, beside
 <b>Edit</b>, widens the axis to take in every point of both curves, so that each
 stop stands at its own value and can be dragged like any other. The image's band
@@ -247,11 +247,11 @@ out against tissue - airways, emphysema, bowel gas. It needs the same kind of
 ramp, and a volume cropped to the region of interest: across a whole scan, the
 darkest value on almost every ray is the air around the patient.
 <li> <b>Average intensity</b> averages the values along each ray and reads
-like an X-ray image. The opacity curve weights the values; the colours are
-ignored and the result is greyscale.
+like an X-ray image. The opacity curve weights the values; the colors are
+ignored and the result is grayscale.
 <li> <b>Additive intensity</b> adds the values up. Unlike the average it has no
 upper bound, so it turns white where the volume is deep unless the opacity
-curve is kept low. It is greyscale too.
+curve is kept low. It is grayscale too.
 </ul>
 
 If you changed nothing, ending the edit asks nothing, and the preset and the
@@ -260,9 +260,9 @@ curve as a preset:
 
 <ul>
 <li> <b>Save as preset...</b> asks where to write the curve, as a JSON file in
-the same format the built-in catalogue uses, then adds it to the grid and
+the same format the built-in catalog uses, then adds it to the grid and
 applies it, so your own functions can be kept and shared and added back with the
-<b>Load preset...</b> entry. Cancelling the file dialog brings the question back.
+<b>Load preset...</b> entry. Canceling the file dialog brings the question back.
 <li> <b>Discard</b> puts back the curve and the blend mode from before the edit.
 <li> <b>Continue editing</b> takes back the click on <b>Edit</b> and leaves you
 editing. ESC answers the same.
@@ -283,7 +283,7 @@ both.
 
 \section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
 
-Shading gives the volume the shape cues a flat colour cannot: where a surface
+Shading gives the volume the shape cues a flat color cannot: where a surface
 turns away from the light, where two structures touch, how deep a recess goes.
 
 It is always on for a volume rendered here. How the volume is lit is chosen on
@@ -318,7 +318,7 @@ window can be put back the way it was.
 <li> <b>Headlight</b> puts a single light at the camera. Nothing casts a
 visible shadow, because the light reaches exactly what you can see. In exchange
 it is the only model in which the <b>Ambient</b> slider carries the tissue's own
-colour, so ambient light fills the dark areas instead of laying flat grey over
+color, so ambient light fills the dark areas instead of laying flat gray over
 the picture. A volume switched on in a window still on Default lighting starts
 here; one switched on in a window already set to another model takes that model
 instead.
@@ -337,7 +337,7 @@ panel because they are per volume rather than per window. Choosing a model sets
 all four to a sensible starting point; moving them afterwards does not leave the
 model, and <b>Reset</b> puts them back to the values the current model
 prescribes. Ambient is deliberately zero under Key light: with more than one
-light in the scene the renderer adds ambient as a flat grey wash, so the fill
+light in the scene the renderer adds ambient as a flat gray wash, so the fill
 light does that job instead.
 
 \note This whole section applies to the Composite blend mode only. With
@@ -345,7 +345,7 @@ light does that job instead.
 header: a maximum intensity projection reduces each ray to a single value and
 lights nothing, so lighting there is inert rather than merely subtle.
 
-\section org_mitk_views_volumevisualization_v2_appearance Colour and opacity from the Data Manager
+\section org_mitk_views_volumevisualization_v2_appearance Color and opacity from the Data Manager
 
 A volume's appearance comes from its transfer function, not from the node's
 generic appearance properties.
@@ -354,8 +354,8 @@ The Data Manager's Opacity slider fades the image in the 2D windows, and in the
 3D window it fades the slice planes the image is textured onto - but not the
 volume itself. Use the opacity part of the transfer function for that.
 
-The Color action likewise has no effect on a grey image, whose colour the
+The Color action likewise has no effect on a gray image, whose color the
 transfer function supplies. On a binary image it does apply: there the volume is
-drawn in that single colour, and the transfer function controls are disabled,
+drawn in that single color, and the transfer function controls are disabled,
 as the view says when you select such an image.
 */

@@ -287,7 +287,7 @@
          <item>
           <widget class="QComboBox" name="colorStopComboBox">
            <property name="toolTip">
-            <string>The colour stop the controls beside it act on.</string>
+            <string>The color stop the controls beside it act on.</string>
            </property>
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
@@ -309,7 +309,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Change this stop's colour.</string>
+            <string>Change this stop's color.</string>
            </property>
            <property name="text">
             <string/>

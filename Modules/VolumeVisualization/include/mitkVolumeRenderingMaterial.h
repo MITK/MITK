@@ -23,7 +23,7 @@ namespace mitk
    * \brief The shading and Phong material properties of a volume-rendering
    *        node, as one value.
    *
-   * The field initialisers are the one definition of MITK's volume material
+   * The field initializers are the one definition of MITK's volume material
    * defaults. mitk::VolumeMapperVtkSmart3D registers them from here, and FromNode
    * falls back to them for a node carrying none of the properties - a lasting
    * state, since SetDefaultProperties runs only from DataNode::SetData, only via

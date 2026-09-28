@@ -36,7 +36,7 @@ namespace mitk
   /** \brief VTK-based mapper for volume rendering of 3D image data.
    *
    * Uses vtkSmartVolumeMapper, requesting its GPU ray caster explicitly. The
-   * sampling and shading options this mapper sets are honoured by that back end
+   * sampling and shading options this mapper sets are honored by that back end
    * alone, so the CPU ray caster is not a usable fallback and rendering
    * requires hardware support. Transfer functions for color and opacity are
    * configured from the DataNode's TransferFunction property.

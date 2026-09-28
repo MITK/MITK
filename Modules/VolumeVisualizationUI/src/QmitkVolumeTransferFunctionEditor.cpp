@@ -72,7 +72,7 @@ namespace
    *
    * Together they are a recipe this widget can re-execute, which is what lets
    * the sliders come back showing where they were left. The curve alone cannot
-   * serve that purpose - the colour window is baked into 256 evenly spaced
+   * serve that purpose - the color window is baked into 256 evenly spaced
    * points, and an offset is only meaningful next to the baseline it was
    * measured from. Same reasoning as
    * mitk::VolumeRenderingLightingModel::MODEL_PROPERTY: record the choice, do
@@ -92,7 +92,7 @@ namespace
    * happen to be read. So a scene opened where a different file carries the
    * same name - on a colleague's machine, or here after the files offered have
    * changed - would otherwise have that file's curve replayed over its own.
-   * Absent for a preset from the embedded catalogue, which is the same wherever
+   * Absent for a preset from the embedded catalog, which is the same wherever
    * it is read.
    */
   constexpr const char *TF_PRESET_FILE_PROPERTY = "volumerendering.transferfunction.presetfile";
@@ -208,20 +208,20 @@ namespace
   /** \brief Where an entry keeps the name of the preset it stands for.
    *
    * Not the text it shows: that gains a marker once the curve has been moved
-   * away from the preset, and then matches no name in the catalogue.
+   * away from the preset, and then matches no name in the catalog.
    */
   constexpr int PRESET_NAME_ROLE = Qt::UserRole;
 
   /** \brief Where a preset in the grid came from.
    *
-   * The catalogue holds both kinds side by side and answers to a name whichever
+   * The catalog holds both kinds side by side and answers to a name whichever
    * it is, so a name alone no longer says which was meant. What a node records
    * carries this beside the name, to be read in the Properties view or in a
    * scene opened where none of these files are.
    */
   enum class PresetOrigin
   {
-    Internal, /**< From the catalogue embedded in MitkVolumeVisualization. */
+    Internal, /**< From the catalog embedded in MitkVolumeVisualization. */
     File      /**< From a file saved here, and remembered since. */
   };
 
@@ -231,10 +231,10 @@ namespace
   /** \brief Where an entry of file origin keeps the file it was read from.
    *
    * Removing such an entry means forgetting that file, and the name will not
-   * say which it is: AddPreset numbers a name the catalogue already holds, and
+   * say which it is: AddPreset numbers a name the catalog already holds, and
    * the numbered one answers to no file's own name.
    *
-   * Empty on an entry from the embedded catalogue, which stands for no file.
+   * Empty on an entry from the embedded catalog, which stands for no file.
    */
   constexpr int PRESET_FILE_ROLE = Qt::UserRole + 2;
 
@@ -278,7 +278,7 @@ namespace
    *
    * Small enough that a row stays close to the height of a line of text, which
    * is the point of that presentation: a preview large enough to study is what
-   * the grid is for, and one this size only says which colours a preset brings.
+   * the grid is for, and one this size only says which colors a preset brings.
    */
   constexpr int COMPACT_PREVIEW_WIDTH = 32;
 
@@ -326,7 +326,7 @@ namespace
    * first case, and Qt fades a disabled item's icon of its own accord.
    *
    * \param[in] size  The pixel size the cells reserve for a preview.
-   * \param[in] color The theme's icon colour. Drawn at part opacity, since the
+   * \param[in] color The theme's icon color. Drawn at part opacity, since the
    *                  mark stands in for content rather than being content.
    */
   QIcon PlaceholderPreview(const QSize &size, const QColor &color)
@@ -356,7 +356,7 @@ namespace
    * whoever clicks it.
    *
    * \param[in] size  The pixel size the cells reserve for a preview.
-   * \param[in] color The theme's icon colour.
+   * \param[in] color The theme's icon color.
    */
   QIcon LoadPresetIcon(const QSize &size, const QColor &color)
   {
@@ -375,21 +375,21 @@ namespace
     // Sized from the shorter side, so that the list's small previews still get
     // a plus rather than a smudge.
     const double arm = 0.2 * std::min(frame.width(), frame.height());
-    const QPointF centre = frame.center();
+    const QPointF center = frame.center();
 
     // At full strength, unlike the frame: the frame says the cell is empty, the
     // plus that clicking it does something, and a faded one reads as disabled.
     painter.setOpacity(1.0);
     painter.setPen(QPen(color, 2.0));
-    painter.drawLine(centre - QPointF(arm, 0.0), centre + QPointF(arm, 0.0));
-    painter.drawLine(centre - QPointF(0.0, arm), centre + QPointF(0.0, arm));
+    painter.drawLine(center - QPointF(arm, 0.0), center + QPointF(arm, 0.0));
+    painter.drawLine(center - QPointF(0.0, arm), center + QPointF(0.0, arm));
 
     return QIcon(icon);
   }
 
-  /** \brief A colour stop as one entry of a list can show it.
+  /** \brief A color stop as one entry of a list can show it.
    *
-   * Outlined, because a stop whose colour is near the list's own background
+   * Outlined, because a stop whose color is near the list's own background
    * would otherwise be an entry with nothing in front of its name.
    */
   QIcon ColorSwatch(const QColor &color)
@@ -417,7 +417,7 @@ namespace
   }
 
   /** \brief The file an entry was read from, empty for one of the embedded
-   *         catalogue's.
+   *         catalog's.
    */
   QString PresetFile(const QListWidgetItem *item)
   {
@@ -449,7 +449,7 @@ namespace
   /** \brief What a node records about the preset its curve was built from.
    *
    * A value carrying no origin was written before origins were recorded, when a
-   * preset from the embedded catalogue was the only kind there was.
+   * preset from the embedded catalog was the only kind there was.
    *
    * \param[in] node The node to read; nullptr, like a node recording nothing,
    *            yields an empty name.
@@ -673,11 +673,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-  // The application stylesheet greys a disabled item's text but not the
+  // The application stylesheet grays a disabled item's text but not the
   // selection behind it, so the preset in force would keep a full-strength
   // highlight while the editor is switched off. Translucent rather than a fixed
-  // colour, since it has to lighten a dark background and darken a light one,
-  // and QmitkIconTheme exposes only icon colours to ask the theme for.
+  // color, since it has to lighten a dark background and darken a light one,
+  // and QmitkIconTheme exposes only icon colors to ask the theme for.
   //
   // The entry the keyboard is on is marked the same way, only fainter. The
   // view's own focus rectangle does not survive the application stylesheet,
@@ -688,12 +688,12 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     "QListWidget::item:focus:!selected { background-color: rgba(127, 127, 127, 50); }");
 
   // Taken before the remembered files are read in, which is what lets the loop
-  // below tell the two apart: what the catalogue already held is its own, and
+  // below tell the two apart: what the catalog already held is its own, and
   // everything standing after it came from a file.
   const auto builtInPresetCount = m_Presets.GetPresetNames().size();
 
   // Before the grid is filled rather than after, so that what was saved in
-  // earlier sessions is in the catalogue by the time the loop below reads it
+  // earlier sessions is in the catalog by the time the loop below reads it
   // and needs no entry of its own making.
   const QStringList presetFiles = this->LoadRememberedPresets();
 
@@ -711,7 +711,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     presetItem->setData(PRESET_ORIGIN_ROLE, static_cast<int>(
       builtIn ? PresetOrigin::Internal : PresetOrigin::File));
 
-    // The files were read in the order the catalogue took them, and it appends,
+    // The files were read in the order the catalog took them, and it appends,
     // so the entries standing after the built-in ones are those files in order.
     if (!builtIn)
       presetItem->setData(PRESET_FILE_ROLE,
@@ -723,7 +723,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   m_LoadPresetItem = new QListWidgetItem(QStringLiteral("Load preset..."), presetList);
   m_LoadPresetItem->setToolTip("Add a preset that was saved to a file.");
 
-  // Enabled, so that it is not drawn greyed out, but never selected: the
+  // Enabled, so that it is not drawn grayed out, but never selected: the
   // selection marks the preset in force, and this is none.
   m_LoadPresetItem->setFlags(Qt::ItemIsEnabled);
 
@@ -765,7 +765,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   m_Controls->colorWidthSlider->setOrientation(Qt::Horizontal);
 
   // Set here rather than in the .ui: the resource is authored with a
-  // placeholder fill that QmitkIconTheme swaps for the theme's icon colour,
+  // placeholder fill that QmitkIconTheme swaps for the theme's icon color,
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
   m_Controls->presetGridButton->setIcon(
@@ -958,7 +958,7 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
   // Nothing else announces that the previews became worth drawing: switching
   // volume rendering on deliberately does not re-bind the node.
   //
-  // Being disabled ends nothing. Switching volume rendering off is what greys
+  // Being disabled ends nothing. Switching volume rendering off is what grays
   // the editor out, and an edit in progress then waits, untouchable, for
   // rendering to come back - or for a selection change to ask about it.
   if (this->isEnabled())
@@ -1033,7 +1033,7 @@ void QmitkVolumeTransferFunctionEditor::UpdatePresetLayout()
 
     previewSize = PreviewSize(cellWidth - 2 * CELL_PADDING);
 
-    // How many lines a name takes is not something to assume: the catalogued
+    // How many lines a name takes is not something to assume: the cataloged
     // ones are hyphenated and Qt breaks a line at a hyphen, so the count
     // follows from the width a cell has and from how wide the platform's
     // interface font draws the characters. The rect overload constrains
@@ -1155,9 +1155,9 @@ void QmitkVolumeTransferFunctionEditor::OnPresetSelected(const QString &presetNa
   // The preset stands in place of whatever was drawn over it.
   m_CurveDrawnOver = false;
 
-  // Recorded with where it came from, since the catalogue answers to a name
+  // Recorded with where it came from, since the catalog answers to a name
   // whichever kind it holds and the name alone would not say. Looked up rather
-  // than handed in: AddPreset keeps names unique across the catalogue, so the
+  // than handed in: AddPreset keeps names unique across the catalog, so the
   // entry wearing this one is the only entry it could mean.
   const int presetRow = FindPresetRow(m_Controls->presetListWidget, presetName);
   const auto *presetItem = presetRow >= 0 ? m_Controls->presetListWidget->item(presetRow) : nullptr;
@@ -1266,7 +1266,7 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
   else
     m_Controls->presetListWidget->setCurrentItem(presetItem);
 
-  // A node naming a preset the catalogue still offers is described by its
+  // A node naming a preset the catalog still offers is described by its
   // recipe, and the recipe is what comes back. Only a curve no preset describes
   // - one whose preset was removed, whose file is not offered here, or that came
   // from outside this view - is shown as it stands.
@@ -1291,7 +1291,7 @@ bool QmitkVolumeTransferFunctionEditor::ReplayRecipe(const QString &presetName)
   float colorShift = 0.0f;
   float colorWidth = 0.0f;
 
-  // All four or none. The neutral colour width is the preset's own span rather
+  // All four or none. The neutral color width is the preset's own span rather
   // than zero, so a missing value cannot be told apart from a deliberate one and
   // a partial recipe cannot be completed with defaults. Read before the preset
   // is applied, which is what clears them.
@@ -1536,7 +1536,7 @@ void QmitkVolumeTransferFunctionEditor::SnapshotAppliedTransferFunction()
 
 double QmitkVolumeTransferFunctionEditor::NeutralColorWidth() const
 {
-  // The width at which the colour window reproduces the baseline unchanged, and
+  // The width at which the color window reproduces the baseline unchanged, and
   // so the value the width slider resets to. Falls back to the image's range for
   // a baseline that names none of its own - no stops, or all of them on one
   // intensity.
@@ -1666,7 +1666,7 @@ void QmitkVolumeTransferFunctionEditor::OnResetAdjustments()
   // restores that baseline either way and needs no preset to be named.
   //
   // Driven through the sliders rather than by rebuilding the function, so that
-  // the canvas and the colour window follow and the handles end up where the
+  // the canvas and the color window follow and the handles end up where the
   // curve says they are. ResetAdjustSliders suppresses exactly these signals, by
   // design, which is why it cannot stand in here.
   m_Controls->opacityShiftSlider->setValue(0.0);
@@ -1733,7 +1733,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
 
     if (answer == saveButton)
     {
-      // Asked while the edit still runs, so that cancelling comes back to the
+      // Asked while the edit still runs, so that canceling comes back to the
       // question rather than leaving a drawing nobody saved.
       const auto fileName = this->AskPresetFileName();
 
@@ -1742,7 +1742,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
 
       this->SetEditModeActive(false);
 
-      // After leaving, for the same reason as discarding before it: the colours
+      // After leaving, for the same reason as discarding before it: the colors
       // are saved from the baseline, and until then that is still the curve from
       // before the edit.
       this->SaveCustomPreset(fileName);
@@ -1785,7 +1785,7 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
     m_CurveEdited = false;
     m_ColorHandlesRestored = false;
 
-    // Before ShowEditMode puts the colour handles back, so that discarding
+    // Before ShowEditMode puts the color handles back, so that discarding
     // returns the very function that stood here rather than its equivalent.
     m_PreEditColorFn = vtkSmartPointer<vtkColorTransferFunction>::New();
     m_PreEditColorFn->DeepCopy(m_AppliedTransferFunction->GetColorTransferFunction());
@@ -1795,7 +1795,7 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
 
     // Nothing about the function changed, only what may now be done to it -
     // which is why this is not ShowAppliedTransferFunction: re-seeding here
-    // would take the colour baseline from an already windowed function and
+    // would take the color baseline from an already windowed function and
     // snap all four sliders to neutral for an edit not yet made.
     this->ShowEditMode();
 
@@ -1840,7 +1840,7 @@ void QmitkVolumeTransferFunctionEditor::DiscardEdit()
   if (m_PreEditBlendMode.has_value())
     this->ApplyBlendMode(*m_PreEditBlendMode);
 
-  // The colours are back in the form the window baked them into.
+  // The colors are back in the form the window baked them into.
   m_ColorHandlesRestored = false;
 
   // So that leaving takes this for an untouched curve and keeps the baseline it
@@ -1855,9 +1855,9 @@ void QmitkVolumeTransferFunctionEditor::DiscardEdit()
 
 void QmitkVolumeTransferFunctionEditor::ShowEditMode()
 {
-  // A colour window bakes the function into hundreds of evenly spaced points,
+  // A color window bakes the function into hundreds of evenly spaced points,
   // which no one can take hold of. The stops are on show for as long as editing
-  // is, rather than only while the colours are being asked for, so bringing them
+  // is, rather than only while the colors are being asked for, so bringing them
   // back is part of entering it.
   if (m_EditModeActive)
     this->RestoreColorHandles();
@@ -1877,7 +1877,7 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   m_Controls->blendModeComboBox->setVisible(m_EditModeActive);
 
   // Only on show while editing, and the preset grid that would change the mode
-  // behind its back is greyed out for as long, so entering is the one moment it
+  // behind its back is grayed out for as long, so entering is the one moment it
   // has to catch up with what a preset or another node left behind.
   if (m_EditModeActive)
     this->ShowNodeBlendMode();
@@ -1898,8 +1898,8 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   // mentions is one nobody finds. Both functions answer at once now, so what has
   // to be said is which part of the canvas belongs to which.
   m_Controls->canvasHintLabel->setText(
-    "<small>Double-click empty space on the curve or the colour strip to add a point there. "
-    "Drag to move it, right-click to remove it, double-click a colour marker to recolour it.</small>");
+    "<small>Double-click empty space on the curve or the color strip to add a point there. "
+    "Drag to move it, right-click to remove it, double-click a color marker to recolor it.</small>");
 
   this->ShowColorStops();
 
@@ -1990,7 +1990,7 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
   m_Controls->colorStopColorButton->setEnabled(hasSelection);
   m_Controls->colorStopOffsetSpinBox->setEnabled(hasSelection);
 
-  // The button is the colour rather than a control that names one, so with
+  // The button is the color rather than a control that names one, so with
   // nothing selected it has nothing to show and goes back to being a button.
   m_Controls->colorStopColorButton->setStyleSheet(hasSelection
     ? "background-color:" + canvas->GetColorStopColor(selected).name()
@@ -2070,7 +2070,7 @@ vtkSmartPointer<vtkColorTransferFunction> QmitkVolumeTransferFunctionEditor::Win
 {
   auto handles = vtkSmartPointer<vtkColorTransferFunction>::New();
 
-  // Brings the colour space and the clamping over along with the points, which
+  // Brings the color space and the clamping over along with the points, which
   // the window has to stay faithful to.
   handles->DeepCopy(m_BaseColorFn);
 
@@ -2085,8 +2085,8 @@ void QmitkVolumeTransferFunctionEditor::RestoreColorHandles()
   if (m_ColorHandlesRestored || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
     return;
 
-  // A colour window bakes itself into 256 evenly spaced RGB points, which no
-  // one can take hold of. Laying the handles over them puts the same colours
+  // A color window bakes itself into 256 evenly spaced RGB points, which no
+  // one can take hold of. Laying the handles over them puts the same colors
   // back on the baseline's own nodes, so they become editable without moving.
   // Copied into the function the node already carries rather than put in its
   // place, so that nothing holding a pointer to it has to be told.
@@ -2120,7 +2120,7 @@ void QmitkVolumeTransferFunctionEditor::LoadPreset()
     return;
 
   // Absolute, as the remembered files are, so that a file already offered is
-  // recognised however the dialog spelled it.
+  // recognized however the dialog spelled it.
   const QString presetFile = QFileInfo(fileName).absoluteFilePath();
 
   auto *presetList = m_Controls->presetListWidget;
@@ -2144,7 +2144,7 @@ void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
 {
   QMenu menu;
 
-  // A greyed entry says only that it is greyed, and what it would take to reach
+  // A grayed entry says only that it is grayed, and what it would take to reach
   // it is the whole of what there is to explain.
   menu.setToolTipsVisible(true);
 
@@ -2161,7 +2161,7 @@ void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
   // saving asks about: what is removed is a preset, not the curve on show.
   auto *presetItem = m_Controls->presetListWidget->itemAt(pos);
 
-  // Stands for no preset, and would otherwise read as one of the catalogue's.
+  // Stands for no preset, and would otherwise read as one of the catalog's.
   if (presetItem == m_LoadPresetItem)
     presetItem = nullptr;
 
@@ -2169,7 +2169,7 @@ void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
 
   removeAction->setEnabled(presetItem != nullptr &&
                            PresetOriginOf(presetItem) == PresetOrigin::File);
-  removeAction->setToolTip("Right-click a preset saved from here. The catalogue's own cannot be removed.");
+  removeAction->setToolTip("Right-click a preset saved from here. The catalog's own cannot be removed.");
 
   // The position arrives relative to the viewport rather than to the widget.
   auto *chosenAction = menu.exec(m_Controls->presetListWidget->viewport()->mapToGlobal(pos));
@@ -2223,7 +2223,7 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName
   auto *presetList = m_Controls->presetListWidget;
 
   // A copy, so that saving cannot alter the curve it is saving, and with the
-  // colours as handles: a windowed function holds 256 evenly spaced samples, and
+  // colors as handles: a windowed function holds 256 evenly spaced samples, and
   // a preset made of those is one nobody could take hold of again. The opacity
   // curve needs no such care - nothing bakes that one into a table.
   auto savedFunction = mitk::TransferFunction::New();
@@ -2318,7 +2318,7 @@ bool QmitkVolumeTransferFunctionEditor::AddPresetFromFile(const QString &presetF
 
   RememberPresetFiles(presetFiles);
 
-  // The curve now answers to a catalogue entry, so that entry is marked, and
+  // The curve now answers to a catalog entry, so that entry is marked, and
   // for a curve saved from here the edited marker goes.
   presetList->setCurrentItem(presetItem);
 
@@ -2374,7 +2374,7 @@ void QmitkVolumeTransferFunctionEditor::DropPresetEntry(QListWidgetItem *presetI
   const int presetRow = presetList->row(presetItem);
 
   // The curve on show is left as it stands - what goes is the entry it answers
-  // to, not the rendering. But a node naming a preset the catalogue no longer
+  // to, not the rendering. But a node naming a preset the catalog no longer
   // holds has nothing to be rebuilt from, so it is recorded as carrying a curve
   // no preset describes.
   if (presetItem == this->AppliedPresetItem())

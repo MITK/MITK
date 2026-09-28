@@ -121,7 +121,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     /**
      * \brief Move the selected stop to a fraction of the displayed range.
      *
-     * Refused where it would reach a neighbour, as dragging it is, so that the
+     * Refused where it would reach a neighbor, as dragging it is, so that the
      * two ways of moving a stop cannot disagree.
      */
     void SetSelectedColorStopOffset(double offset);
@@ -148,9 +148,9 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      *        whichever function the gesture in progress concerns.
      *
      * The base drives every gesture through these, so overriding them is what
-     * lets one canvas edit two functions. The colour function is not a
+     * lets one canvas edit two functions. The color function is not a
      * QmitkColorTransferFunctionCanvas here - a widget has one base class, and
-     * this one's is the opacity canvas - so the colour half is spelled out.
+     * this one's is the opacity canvas - so the color half is spelled out.
      */
     int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 100) override;
     int AddFunctionPoint(double x, double val) override;
@@ -169,7 +169,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     void OpacityChanged();
 
     /**
-     * \brief Emitted after a point was added, moved, removed or recoloured.
+     * \brief Emitted after a point was added, moved, removed or recolored.
      *
      * The function is already updated and the render already requested; this
      * says that the curve on show is no longer the one the owner handed over.

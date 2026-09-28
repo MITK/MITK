@@ -652,7 +652,7 @@ void QmitkRenderWindowMenu::OnLightingMenuAboutToShow()
     const char *label;
   };
 
-  // Labelled as the volume lighting models are, so that the two controls
+  // Labeled as the volume lighting models are, so that the two controls
   // offering them read as one choice rather than two similar ones.
   constexpr Entry entries[] = {
     { mitk::VtkPropRenderer::LightingMode::Studio,    "Default lighting" },

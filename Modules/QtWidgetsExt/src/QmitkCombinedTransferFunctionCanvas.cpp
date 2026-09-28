@@ -27,7 +27,7 @@ found in the LICENSE file.
 
 namespace
 {
-  /** \brief Room below the plot for the colour stop markers. */
+  /** \brief Room below the plot for the color stop markers. */
   constexpr int RAIL_HEIGHT = 15;
 
   /** \brief How far a marker's roof reaches up past the frame.
@@ -48,17 +48,17 @@ namespace
    */
   constexpr int SIDE_MARGIN = 1 + MARKER_WIDTH / 2;
 
-  /** \brief The grey below which a stop's own colour is too dark for a black
+  /** \brief The gray below which a stop's own color is too dark for a black
    *         dot to show on it.
    */
-  constexpr int DARK_MARKER_GREY = 128;
+  constexpr int DARK_MARKER_GRAY = 128;
 
   /** \brief Opacity of the light ring just outside a marker's outline. */
   constexpr int MARKER_HALO_ALPHA = 120;
 
   /** \brief Opacity of a marker standing for a stop the axis does not reach.
    *
-   * Faded rather than shaped differently, so that it still carries the colour it
+   * Faded rather than shaped differently, so that it still carries the color it
    * is there to give hold of, and still reads as one of the markers.
    */
   constexpr int OFF_AXIS_ALPHA = 110;
@@ -325,7 +325,7 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
       addPoint(m_Upper, 0.0);
 
     // Control points can lie beyond either end of the axis, and the line to them
-    // would run on into the margins that belong to the colour markers. Clipped at
+    // would run on into the margins that belong to the color markers. Clipped at
     // the sides only: zero opacity maps onto the frame's bottom edge, so a clip
     // to the contents would shave off the baseline.
     painter.save();
@@ -406,8 +406,8 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
   const int baseY = rail.bottom() - 1;
 
   // Half a pixel in: a one-pixel pen straddles the path it is given, so an
-  // outline on whole coordinates lands half on each neighbouring pixel and comes
-  // out grey instead of black.
+  // outline on whole coordinates lands half on each neighboring pixel and comes
+  // out gray instead of black.
   QPolygonF marker;
   marker << QPointF(x + 0.5, apexY + 0.5)
          << QPointF(x + halfWidth + 0.5, eavesY + 0.5)
@@ -447,12 +447,12 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
     ? (x < contents.left() ? x + 0.5 * halfWidth : x - 0.5 * halfWidth)
     : x + 0.5;
 
-  // The dot sits on the stop's own colour, so which of black and white shows up
-  // is the colour's to decide rather than something that can be fixed here.
-  // Weighted grey rather than HSL lightness, which calls a saturated orange dark
+  // The dot sits on the stop's own color, so which of black and white shows up
+  // is the color's to decide rather than something that can be fixed here.
+  // Weighted gray rather than HSL lightness, which calls a saturated orange dark
   // and would put a white dot on it.
   painter.setPen(Qt::NoPen);
-  painter.setBrush(qGray(color.rgb()) < DARK_MARKER_GREY ? Qt::white : Qt::black);
+  painter.setBrush(qGray(color.rgb()) < DARK_MARKER_GRAY ? Qt::white : Qt::black);
   painter.drawEllipse(QPointF(dotX, 0.5 * (eavesY + baseY)), 2.5, 2.5);
 }
 
@@ -575,7 +575,7 @@ int QmitkCombinedTransferFunctionCanvas::GetNearHandle(int x, int y, unsigned in
 
 int QmitkCombinedTransferFunctionCanvas::ColorStopNear(int x, unsigned int maxSquaredDistance)
 {
-  // A colour stop has no height, so only the distance along the axis decides
+  // A color stop has no height, so only the distance along the axis decides
   // which one a click means. The nearest rather than the first within reach:
   // markers are wide enough to stand side by side and still overlap.
   int nearest = -1;
@@ -624,8 +624,8 @@ int QmitkCombinedTransferFunctionCanvas::AddFunctionPoint(double x, double val)
 
   if (m_ActiveFunction == ActiveFunction::Color)
   {
-    // The new stop takes the colour the gradient already has where it lands, so
-    // adding one marks a place to recolour rather than changing anything.
+    // The new stop takes the color the gradient already has where it lands, so
+    // adding one marks a place to recolor rather than changing anything.
     double rgb[3];
     m_ColorTransferFunction->GetColor(x, rgb);
     index = m_ColorTransferFunction->AddRGBPoint(x, rgb[0], rgb[1], rgb[2]);
@@ -674,7 +674,7 @@ void QmitkCombinedTransferFunctionCanvas::MoveFunctionPoint(int index, std::pair
 {
   if (m_ActiveFunction == ActiveFunction::Color)
   {
-    // There is no height to move to, and the stop carries its colour along:
+    // There is no height to move to, and the stop carries its color along:
     // read it, drop the stop, put it back where the drag asks for it.
     const double from = this->GetFunctionX(index);
     const QColor color = this->GetColorStopColor(index);
@@ -703,7 +703,7 @@ double QmitkCombinedTransferFunctionCanvas::GetFunctionX(int index)
 
 double QmitkCombinedTransferFunctionCanvas::GetFunctionY(int index)
 {
-  // A colour stop sits on the axis, which is what puts its marker at the bottom
+  // A color stop sits on the axis, which is what puts its marker at the bottom
   // edge without the drawing or the hit test having to say so.
   if (m_ActiveFunction == ActiveFunction::Color)
     return 0.0;
@@ -743,7 +743,7 @@ int QmitkCombinedTransferFunctionCanvas::GetColorStopCount() const
 
 double QmitkCombinedTransferFunctionCanvas::GetColorStopValue(int index) const
 {
-  // Four doubles per colour stop - position, red, green, blue - against the two
+  // Four doubles per color stop - position, red, green, blue - against the two
   // of an opacity point.
   return m_ColorTransferFunction->GetDataPointer()[index * 4];
 }
@@ -751,8 +751,8 @@ double QmitkCombinedTransferFunctionCanvas::GetColorStopValue(int index) const
 QColor QmitkCombinedTransferFunctionCanvas::GetColorStopColor(int index) const
 {
   // Read off the node rather than asked of the function: GetColor interpolates,
-  // and what it interpolates in is the function's colour space, so a stop's own
-  // colour is the one place that answer must not be arrived at that way.
+  // and what it interpolates in is the function's color space, so a stop's own
+  // color is the one place that answer must not be arrived at that way.
   const double *stop = m_ColorTransferFunction->GetDataPointer() + index * 4;
 
   return QColor::fromRgbF(stop[1], stop[2], stop[3]);
@@ -817,7 +817,7 @@ void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopOffset(double offs
 
   const double value = m_Min + std::clamp(offset, 0.0, 1.0) * (m_Max - m_Min);
 
-  // The bounds a drag observes: a stop cannot reach its neighbours, since two
+  // The bounds a drag observes: a stop cannot reach its neighbors, since two
   // at one position are one stop as far as VTK is concerned. Refused rather
   // than nudged, so that what the stop did and what the control asked for do
   // not quietly differ.

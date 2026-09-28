@@ -128,23 +128,23 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
 
 void mitk::VtkPropRenderer::NormalizeLightAmbientColors()
 {
-  // vtkLight's ambient colour defaults to black and vtkLightKit never sets
-  // it, so the GPU volume ray caster - which sums each light's ambient colour
+  // vtkLight's ambient color defaults to black and vtkLightKit never sets
+  // it, so the GPU volume ray caster - which sums each light's ambient color
   // scaled by that light's intensity - would render vtkVolumeProperty's
-  // ambient coefficient inert. Normalising the sum to 1.0 keeps the
+  // ambient coefficient inert. Normalizing the sum to 1.0 keeps the
   // coefficient on the same scale whichever rig is installed.
   //
   // A lone headlight at intensity 1.0 is the near-exception: it takes the ray
   // caster's default lighting path, which tints ambient with the sample's own
-  // colour and reads the light's ambient colour only once volumetric scattering
-  // is switched on. Normalising it too costs nothing and keeps that case right.
+  // color and reads the light's ambient color only once volumetric scattering
+  // is switched on. Normalizing it too costs nothing and keeps that case right.
   auto *lights = m_VtkRenderer->GetLights();
   double totalIntensity = 0.0;
 
   for (auto *light : vtk::Range(lights))
   {
     // Only switched-on lights reach the shader, so only they may contribute
-    // to the sum the normalisation has to cancel.
+    // to the sum the normalization has to cancel.
     if (light->GetSwitch() > 0)
       totalIntensity += light->GetIntensity();
   }
@@ -162,7 +162,7 @@ void mitk::VtkPropRenderer::NormalizeLightAmbientColors()
 
 void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
 {
-  // 2D renderers have their lights removed on purpose, to keep grey values
+  // 2D renderers have their lights removed on purpose, to keep gray values
   // faithful to the data; installing any rig would undo that.
   if (this->GetMapperID() != Standard3D || mode == m_LightingMode)
     return;
@@ -198,11 +198,11 @@ void mitk::VtkPropRenderer::InstallLightingRig(LightingMode mode)
       m_FillLight = vtkLight::New();
       // The shader's shadow term is plain transmittance, so where the key is
       // occluded it contributes nothing and the only light left is the ambient
-      // constant - which the shader does not tint by the sample's colour.
-      // Raising ambient therefore greys a shadow out rather than filling it; a
-      // second, dimmer source is the only way to put coloured, still
+      // constant - which the shader does not tint by the sample's color.
+      // Raising ambient therefore grays a shadow out rather than filling it; a
+      // second, dimmer source is the only way to put colored, still
       // occlusion-aware light into one. Mirrored azimuth and below camera
-      // height, so it opens the key's shadow without cancelling the modelling
+      // height, so it opens the key's shadow without canceling the modeling
       // that carved it.
       m_FillLight->SetLightTypeToCameraLight();
       m_FillLight->SetDirectionAngle(-10.0, -48.0);
@@ -221,7 +221,7 @@ void mitk::VtkPropRenderer::InstallLightingRig(LightingMode mode)
       // switched-on light, at intensity exactly 1.0, of headlight type. Any
       // deviation - a second light, a different intensity, a camera light at an
       // angle - drops it to the multi-light path, where ambient stops being
-      // tinted by the sample colour.
+      // tinted by the sample color.
       m_Headlight->SetLightTypeToHeadlight();
       m_Headlight->SetIntensity(1.0);
     }

@@ -144,8 +144,8 @@ namespace mitk
      * Headlight is not simply a dimmer rig: a single switched-on headlight at
      * full intensity is the one configuration for which the ray caster compiles
      * its default lighting path, where ambient is multiplied by the sample
-     * colour and the shading normal is used as computed. Every other rig takes
-     * the multi-light path, where ambient is an untinted grey added to every
+     * color and the shading normal is used as computed. Every other rig takes
+     * the multi-light path, where ambient is an untinted gray added to every
      * sample and the normal is pushed through the prop matrix. The cost is that
      * a light at the camera lights exactly what the camera sees, so it casts no
      * visible shadow and volumetric scattering has nothing to darken.
@@ -307,7 +307,7 @@ namespace mitk
     /** \brief Replace every light in the renderer with the given rig, even if it is the current one. */
     void InstallLightingRig(LightingMode mode);
 
-    /** \brief Rescale the lights' ambient colours so their weighted sum stays 1.0. */
+    /** \brief Rescale the lights' ambient colors so their weighted sum stays 1.0. */
     void NormalizeLightAmbientColors();
 
     bool m_InitNeeded;

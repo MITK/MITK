@@ -100,8 +100,8 @@ namespace
   }
 
   /** mitk::VolumeMapperVtkSmart3D branches on this property before it reads
-   * "TransferFunction", and for a mask it builds a flat colour from the node
-   * colour instead. Every transfer function control is inert on such a node,
+   * "TransferFunction", and for a mask it builds a flat color from the node
+   * color instead. Every transfer function control is inert on such a node,
    * so the view has to ask the same question the mapper asks.
    */
   bool IsBinaryImage(const mitk::DataNode *node)
@@ -140,7 +140,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->enableRenderingButton->setIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
 
-  m_Controls->binaryHintLabel->setText("Binary image: its colour is set in the Data Manager.");
+  m_Controls->binaryHintLabel->setText("Binary image: its color is set in the Data Manager.");
   m_Controls->binaryHintLabel->setVisible(false);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
@@ -158,9 +158,9 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
 
   // The application stylesheet gives a checked button an accent border without
   // guarding it on enabled, so a section left folded out stays fully marked
-  // while it is greyed out. Translucent grey rather than a fixed colour: it has
+  // while it is grayed out. Translucent gray rather than a fixed color: it has
   // to hold over a dark and a light background alike, and the theme exposes
-  // nothing but its icon colours to ask for.
+  // nothing but its icon colors to ask for.
   m_Controls->lightingExpandButton->setStyleSheet(
     "QToolButton:checked:disabled { border: 1px solid rgba(127, 127, 127, 90); }");
 
@@ -233,7 +233,7 @@ void QmitkVolumeVisualizationV2View::OnToggleRendering()
 
       // The lighting the window is already on, which is how a second volume
       // joins the first rather than relighting it, and how a rig chosen with
-      // nothing rendered yet is honoured rather than overridden.
+      // nothing rendered yet is honored rather than overridden.
       auto mode = renderer != nullptr
         ? renderer->GetLightingMode()
         : mitk::VtkPropRenderer::LightingMode::Studio;
@@ -485,7 +485,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingSection()
   const bool gatedByBlendMode =
     volumeRenderingOn && mitk::GetVolumeBlendMode(selectedNode.GetPointer()) != mitk::VolumeBlendMode::Composite;
 
-  // Named on the header rather than left to a tooltip: a greyed-out section
+  // Named on the header rather than left to a tooltip: a grayed-out section
   // whose precondition is written on it teaches the constraint, while a mute
   // one just looks broken.
   m_Controls->lightingExpandButton->setText(
@@ -515,7 +515,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   // a section left expanded comes back expanded.
   //
   // Everything below the image section configures a rendered volume, so with no
-  // node, or with rendering off on it, it is put away rather than greyed out: the
+  // node, or with rendering off on it, it is put away rather than grayed out: the
   // panel then asks for the one thing it needs instead of showing a page of
   // controls none of which can be used.
   const bool showVolumeSections = IsVolumeRenderingOn(selectedNode.GetPointer());
@@ -539,7 +539,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
     // Disabled as well as hidden: the editor draws its preset previews when it
     // is enabled again, which is how a hidden one is kept from rendering a
-    // catalogue nobody is looking at.
+    // catalog nobody is looking at.
     m_Controls->transferFunctionEditor->setEnabled(false);
 
     return;
@@ -553,7 +553,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
 
   m_Controls->enableRenderingButton->setEnabled(true);
 
-  // Disabling the whole editor rather than its individual controls is what greys
+  // Disabling the whole editor rather than its individual controls is what grays
   // its headers and row labels too, so an inactive section reads as inactive.
   // Which of its own controls apply within that is the editor's own business.
   m_Controls->transferFunctionEditor->setEnabled(volumeRenderingOn && !isBinary);
@@ -561,7 +561,7 @@ void QmitkVolumeVisualizationV2View::UpdateInterface()
   const auto blendMode = mitk::GetVolumeBlendMode(selectedNode.GetPointer());
 
   // Shown only away from the default, so the panel carries no weight for the
-  // common case while a greyed-out lighting section always has a visible cause.
+  // common case while a grayed-out lighting section always has a visible cause.
   // A readout rather than a control: the mode comes with the transfer function,
   // from the preset applied, and is changed only while editing that curve.
   const bool showBlendModeHint = volumeRenderingOn && blendMode != mitk::VolumeBlendMode::Composite;

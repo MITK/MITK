@@ -341,12 +341,12 @@ mitk::VolumeMapperVtkSmart3D::LocalStorage::LocalStorage()
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   // Requested explicitly rather than left to VTK's own selection: the jittering
   // below, and the scattering and normals-from-opacity in UpdateRenderMode, are
-  // honoured only by the GPU ray caster. Letting VTK settle on the CPU mapper
+  // honored only by the GPU ray caster. Letting VTK settle on the CPU mapper
   // would drop them silently rather than degrade.
   m_SmartVolumeMapper->SetRequestedRenderModeToGPU();
   m_SmartVolumeMapper->SetBlendModeToComposite();
   // Sampling the ray at regular offsets makes the step boundaries line up
-  // across neighbouring pixels, which reads as concentric banding. Jittering
+  // across neighboring pixels, which reads as concentric banding. Jittering
   // the offsets trades that for unstructured noise. VTK defaults it off.
   m_SmartVolumeMapper->SetUseJittering(1);
 

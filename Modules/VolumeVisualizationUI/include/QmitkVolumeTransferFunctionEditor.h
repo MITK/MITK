@@ -42,8 +42,8 @@ namespace Ui
 }
 
 /**
- * \brief The transfer function of one volume-rendered node: a catalogued preset
- *        adjusted by colour and opacity windows, or a curve edited point by
+ * \brief The transfer function of one volume-rendered node: a cataloged preset
+ *        adjusted by color and opacity windows, or a curve edited point by
  *        point on the canvas that shows it.
  *
  * Editing happens on that canvas rather than on a page of its own, so a host
@@ -58,7 +58,7 @@ namespace Ui
  * whether to save it as a preset of its own or to discard it, which puts back
  * the curve from before the edit - on a selection change as well, before the
  * node is let go. A curve whose
- * preset has been removed answers to no catalogue entry at all, and what is
+ * preset has been removed answers to no catalog entry at all, and what is
  * recorded for it is only that it was chosen here. See the
  * volumerendering.transferfunction.* entries in the property documentation.
  *
@@ -93,7 +93,7 @@ public:
    *
    * For the moment volume rendering is switched on: the node has a transfer
    * function by then, but it is the mapper's registered default, which no
-   * preset names and which the catalogue is meant to supersede. Which preset
+   * preset names and which the catalog is meant to supersede. Which preset
    * that is follows from the image's DICOM metadata where it has any - see
    * mitk::TransferFunctionPresets::GetDefaultPresetName.
    */
@@ -135,13 +135,13 @@ private slots:
 private:
   /**
    * \brief Take the presets saved from here in earlier sessions into the
-   *        catalogue, and forget the files that are no longer there.
+   *        catalog, and forget the files that are no longer there.
    *
    * Runs before the grid is filled, so that they reach it as any other entry
-   * does - at its end, which is where the catalogue keeps what is added to it.
+   * does - at its end, which is where the catalog keeps what is added to it.
    *
-   * \return The files whose presets reached the catalogue, in the order they
-   *         were added: the nth of these is the file the nth catalogue entry
+   * \return The files whose presets reached the catalog, in the order they
+   *         were added: the nth of these is the file the nth catalog entry
    *         after the built-in ones stands for. What the entries are stamped
    *         with, so that removing one can forget the right file.
    */
@@ -154,7 +154,7 @@ private:
    * is to be saved has ended.
    *
    * \return A path ending in .json that a preset file may be written to, or an
-   *         empty string if the user cancelled or chose a path that cannot hold
+   *         empty string if the user canceled or chose a path that cannot hold
    *         one.
    */
   QString AskPresetFileName();
@@ -182,7 +182,7 @@ private:
   void LoadPreset();
 
   /**
-   * \brief Take the preset a file holds into the catalogue and the grid,
+   * \brief Take the preset a file holds into the catalog and the grid,
    *        remember the file, and apply the preset.
    *
    * Where saving and loading meet, so that a preset saved now, one loaded now
@@ -203,13 +203,13 @@ private:
    * file rather than a copy of it, and it may be one shared with others.
    *
    * \param[in] presetItem The entry to remove. Ignored unless it stands for a
-   *            preset of file origin: the embedded catalogue is read afresh at
+   *            preset of file origin: the embedded catalog is read afresh at
    *            every start and would offer a built-in one again regardless.
    */
   void RemoveCustomPreset(QListWidgetItem *presetItem);
 
   /**
-   * \brief Take an entry out of the grid and its preset out of the catalogue,
+   * \brief Take an entry out of the grid and its preset out of the catalog,
    *        leaving the remembered files alone.
    *
    * The curve on show is not touched, whichever entry this is. What a node
@@ -313,7 +313,7 @@ private:
 
   void SnapshotAppliedTransferFunction();
 
-  /** \brief The colour window width that reproduces the baseline unchanged. */
+  /** \brief The color window width that reproduces the baseline unchanged. */
   double NeutralColorWidth() const;
 
   void ResetAdjustSliders();
@@ -378,18 +378,18 @@ private:
    * points can sit off the axis. Widening brings them on, at the price of the
    * band - where the image actually is - shrinking into part of the plot.
    *
-   * The band remains the range the sliders and the colour window are measured
+   * The band remains the range the sliders and the color window are measured
    * against either way: this is what the canvas shows, not what the panel means
    * by the data.
    */
   void ApplyAxisRange();
 
   /**
-   * \brief Point the colour stop controls at what the canvas currently holds and
+   * \brief Point the color stop controls at what the canvas currently holds and
    *        has selected.
    *
    * Driven by the canvas rather than kept alongside it: a stop can be added,
-   * moved, recoloured or selected on the canvas just as well as here, and one
+   * moved, recolored or selected on the canvas just as well as here, and one
    * copy of that state is one thing to keep right.
    */
   void ShowColorStops();
@@ -408,12 +408,12 @@ private:
   bool DiffersFromPreset() const;
 
   /**
-   * \brief The colours on show, carried by points that can be taken hold of.
+   * \brief The colors on show, carried by points that can be taken hold of.
    *
-   * A colour window bakes itself into hundreds of evenly spaced samples, which
-   * name no colour in particular: there is one per pixel column and no way to
+   * A color window bakes itself into hundreds of evenly spaced samples, which
+   * name no color in particular: there is one per pixel column and no way to
    * tell which of them was meant. The same window laid over the baseline's own
-   * nodes instead carries the same colours at the points the curve actually
+   * nodes instead carries the same colors at the points the curve actually
    * names them, which is the form to edit in and the form to save in.
    *
    * The window is measured from the baseline's own range, so a baseline must be
@@ -422,11 +422,11 @@ private:
   vtkSmartPointer<vtkColorTransferFunction> WindowedColorHandles() const;
 
   /**
-   * \brief Give the colour function back the handful of points it can be taken
-   *        hold of by, without changing the colours it shows.
+   * \brief Give the color function back the handful of points it can be taken
+   *        hold of by, without changing the colors it shows.
    *
    * Once per edit: the window bakes itself into hundreds of evenly spaced
-   * points, and doing this a second time would copy over the colours just
+   * points, and doing this a second time would copy over the colors just
    * edited. Does nothing where there is nothing to restore.
    */
   void RestoreColorHandles();
@@ -457,7 +457,7 @@ private:
    *
    * A request rather than an order: whether previews are worth drawing at all
    * is settled one turn of the event loop later, in GenerateNextThumbnail.
-   * Binding a node and greying the editor out for it are two steps of the same
+   * Binding a node and graying the editor out for it are two steps of the same
    * selection change, and the second has not run yet when the first asks.
    */
   void StartThumbnailGeneration();
@@ -481,7 +481,7 @@ private:
    * A preview is drawn once at a width no cell exceeds and scaled down from
    * there, so it survives a re-measure. A stand-in is built at the exact cell
    * size instead, and a QIcon holding a single pixmap is never scaled up, so a
-   * grid that has grown since would draw it small and centred.
+   * grid that has grown since would draw it small and centered.
    */
   void RefreshPlaceholders();
 
@@ -491,7 +491,7 @@ private:
   /** \brief The entry after the last preset that loads another one.
    *
    * Owned by the grid. Kept last: presets are inserted in front of it, so the
-   * entries before it are the catalogue's in the order it holds them.
+   * entries before it are the catalog's in the order it holds them.
    */
   QListWidgetItem *m_LoadPresetItem = nullptr;
 
@@ -531,7 +531,7 @@ private:
    */
   bool m_EditModeActive = false;
 
-  /** \brief Whether any point was added, moved, removed or recoloured since
+  /** \brief Whether any point was added, moved, removed or recolored since
    *         editing began.
    *
    * What separates leaving an edit from never having made one: an untouched
@@ -555,13 +555,13 @@ private:
    */
   bool m_CurveDrawnOver = false;
 
-  /** \brief Whether the colour function has been reduced to countable handles
+  /** \brief Whether the color function has been reduced to countable handles
    *         for the edit in progress.
    *
-   * A colour window bakes itself into hundreds of evenly spaced points, which
-   * no one can edit by hand, so editing colours starts by putting the same
-   * colours back on the baseline's own nodes. Once per edit: a second reduction
-   * would copy over the colours just edited.
+   * A color window bakes itself into hundreds of evenly spaced points, which
+   * no one can edit by hand, so editing colors starts by putting the same
+   * colors back on the baseline's own nodes. Once per edit: a second reduction
+   * would copy over the colors just edited.
    */
   bool m_ColorHandlesRestored = false;
 

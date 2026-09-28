@@ -105,7 +105,7 @@ public:
   /**
    * \brief Draw the bound volume with one transfer function.
    *
-   * \param[in] transferFunction The colour and opacity to draw with.
+   * \param[in] transferFunction The color and opacity to draw with.
    * \param[in] blendMode The mode that transfer function was authored for.
    *            Taken alongside the function rather than set once, because the
    *            two only mean anything together.

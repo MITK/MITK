@@ -122,7 +122,7 @@ std::vector<mitk::TransferFunctionPresets::Preset> mitk::TransferFunctionPresets
       preset.color = DecodeColor(entry["RGBPoints"]);
       preset.scalarOpacity = DecodeScalarOpacity(entry["OpacityPoints"]);
 
-      // Left to Preset::colorSpace's own initialiser when absent, for the same
+      // Left to Preset::colorSpace's own initializer when absent, for the same
       // reason as the blend mode below: one place asserts the fallback, and a
       // missing key can never be reported as an unknown space.
       if (entry.contains("ColorSpace"))
@@ -141,7 +141,7 @@ std::vector<mitk::TransferFunctionPresets::Preset> mitk::TransferFunctionPresets
       }
 
       // Absent for a colormap taken from elsewhere, which was authored without
-      // the question in mind. Left to Preset::blendMode's own initialiser
+      // the question in mind. Left to Preset::blendMode's own initializer
       // rather than defaulted to an id here, so that composite is asserted in
       // one place only and a missing key can never be reported as an unknown
       // mode.
@@ -243,7 +243,7 @@ std::string mitk::TransferFunctionPresets::GetDefaultPresetName(const Image *ima
   // Only reachable through an edited or replaced catalog file. Falling back to
   // the first entry keeps the promise the return value makes - that the name is
   // one this catalog holds - and it is what this view did before any modality
-  // was consulted, so the failure mode is the old behaviour.
+  // was consulted, so the failure mode is the old behavior.
   MITK_WARN << "The catalog holds no preset \"" << name << "\" to default to.";
 
   return m_Presets.empty() ? std::string() : m_Presets.front().name;

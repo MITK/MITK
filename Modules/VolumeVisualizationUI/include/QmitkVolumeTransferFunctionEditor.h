@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <optional>
 #include <string>
 
+class QAction;
 class QListWidgetItem;
 class QmitkVolumeThumbnailRenderer;
 class vtkColorTransferFunction;
@@ -385,12 +386,14 @@ private:
   void ApplyAxisRange();
 
   /**
-   * \brief Point the color stop controls at what the canvas currently holds and
+   * \brief Fill the color stop table from what the canvas currently holds and
    *        has selected.
    *
    * Driven by the canvas rather than kept alongside it: a stop can be added,
-   * moved, recolored or selected on the canvas just as well as here, and one
-   * copy of that state is one thing to keep right.
+   * moved, recolored, removed or selected on the canvas just as well as in the
+   * table, and one copy of that state is one thing to keep right. A stop the
+   * axis does not reach is listed without a position, since a fraction of the
+   * axis cannot say where it is.
    */
   void ShowColorStops();
 
@@ -494,6 +497,14 @@ private:
    * entries before it are the catalog's in the order it holds them.
    */
   QListWidgetItem *m_LoadPresetItem = nullptr;
+
+  /** \brief What the color stop table offers for the selected stop.
+   *
+   * Owned by the table. Kept to be enabled with the selection, and the removal
+   * only while more than one stop is left.
+   */
+  QAction *m_PickColorStopColorAction = nullptr;
+  QAction *m_RemoveColorStopAction = nullptr;
 
   std::unique_ptr<QmitkVolumeThumbnailRenderer> m_ThumbnailRenderer;
 

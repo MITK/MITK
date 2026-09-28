@@ -180,9 +180,9 @@ back to the positions you left them in.
 \subsection org_mitk_views_volumevisualization_v2_tf_custom Editing the curve point by point
 
 <b>Edit</b>, above the canvas, hands that canvas over to editing the curve on
-show point by point; pressing it again ends the edit. The preset grid and the
-four sliders are grayed out in the meantime, since either would replace what you
-are drawing.
+show point by point; pressing it again ends the edit. Either the preset grid or
+the four sliders would replace what you are drawing, so in the meantime the grid
+is grayed out and the sliders make way for the list of color stops.
 
 \imageMacro{QmitkVolumeVisualizationV2_EditMode.png,"The canvas while editing.",10.00}
 
@@ -192,7 +192,7 @@ are drawing.
 <li> The handles of the opacity curve.
 <li> The color stops, as markers along the bottom edge. A faded one standing on
 an edge lies beyond the axis.
-<li> The <b>Color stops</b> row, for the stop selected on the canvas.
+<li> The list of color stops, one row per stop.
 </ol>
 
 The canvas edits both curves at once, each in a region of its own:
@@ -212,11 +212,16 @@ cannot add anything by accident.
 <li> Between points the curves are interpolated linearly.
 </ul>
 
-A row under the canvas, <b>Color stops</b>, reaches the same stops without
-aiming at a marker. Its list shows each stop as a swatch, in the order the
-markers stand in. The color field beside it is the selected stop's color and
-opens a color picker. The number gives the stop's position as a fraction of the
-axis, 0 at its left end and 1 at its right; typing a value moves the stop. A
+The list of color stops under the canvas, in the place of the sliders,
+reaches the same stops without aiming at a marker. It has one row per stop, in
+the order the markers stand in, and selecting a row selects that stop on the
+canvas and the other way round. Double-click a row's color to pick another one.
+Its position is a fraction of the axis, 0 at its left end and 1 at its right;
+double-click it to type a value, which moves the stop there, or as far toward
+it as it can go: like a dragged one, a stop halts just short of its neighbors.
+DELETE, or
+<b>Remove</b> on the right-click menu, removes the selected stop. A stop that
+lies beyond the axis is listed as <b>Off axis</b>, without a position. A
 gradient keeps at least one stop, and the curve at least one point.
 
 The axis covers the band of gray values the image occupies, while the presets

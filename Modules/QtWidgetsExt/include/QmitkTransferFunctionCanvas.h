@@ -285,14 +285,6 @@ public:
   }
 
 protected:
-  bool m_ImmediateUpdate;
-  float m_Range;
-
-  bool m_LineEditAvailable;
-  QLineEdit *m_XEdit;
-  QLineEdit *m_YEdit;
-
-private:
   /**
    * \brief The position the grabbed handle may take when asked to move to x.
    *
@@ -303,6 +295,13 @@ private:
    * wider than the GPU allows. The result is then kept within the data range.
    */
   double ClampGrabbedHandleX(double x);
+
+  bool m_ImmediateUpdate;
+  float m_Range;
+
+  bool m_LineEditAvailable;
+  QLineEdit *m_XEdit;
+  QLineEdit *m_YEdit;
 };
 
 #endif

@@ -98,6 +98,26 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     double GetColorStopValue(int index) const;
     QColor GetColorStopColor(int index) const;
 
+    /**
+     * \brief Where a stop sits in the displayed range, 0 at its start and 1 at
+     *        its end.
+     *
+     * A fraction rather than the value itself, because the canvas carries no
+     * scale for a value to be read against.
+     *
+     * \return The offset, or -1 where the range is empty.
+     */
+    double GetColorStopOffset(int index) const;
+
+    /**
+     * \brief Whether a stop names a value the axis does not reach.
+     *
+     * The presets are authored on the scale their modality is measured in, while
+     * the axis covers the band the image occupies, so the outermost stops of a
+     * preset routinely sit outside it.
+     */
+    bool IsColorStopOffAxis(int index) const;
+
     /** \brief The selected color stop, or -1 when the selection is an opacity
      *         point or there is none.
      */
@@ -108,23 +128,15 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     void SetSelectedColorStopColor(const QColor &color);
 
     /**
-     * \brief Where the selected stop sits in the displayed range, 0 at its
-     *        start and 1 at its end.
-     *
-     * A fraction rather than the value itself, because the canvas carries no
-     * scale for a value to be read against.
-     *
-     * \return The offset, or -1 where no stop is selected.
-     */
-    double GetSelectedColorStopOffset() const;
-
-    /**
      * \brief Move the selected stop to a fraction of the displayed range.
      *
-     * Refused where it would reach a neighbor, as dragging it is, so that the
-     * two ways of moving a stop cannot disagree.
+     * Where it would reach or pass a neighbor it stops a pixel short, as a
+     * dragged one does, so that the two ways of moving a stop cannot disagree.
      */
     void SetSelectedColorStopOffset(double offset);
+
+    /** \brief Remove the selected stop, unless it is the only one left. */
+    void RemoveSelectedColorStop();
 
     /**
      * \brief The tooltip shown over the marker of a stop the axis does not
@@ -218,15 +230,6 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      * point at low opacity is drawn over the markers.
      */
     bool PressGrabsColorStop(const QPoint &pos);
-
-    /**
-     * \brief Whether a stop names a value the axis does not reach.
-     *
-     * The presets are authored on the scale their modality is measured in, while
-     * the axis covers the band the image occupies, so the outermost stops of a
-     * preset routinely sit outside it.
-     */
-    bool IsColorStopOffAxis(int index) const;
 
     /**
      * \brief The stop standing for everything beyond one end of the axis.

@@ -813,11 +813,9 @@ void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopColor(const QColor
   emit ColorStopsChanged();
 }
 
-double QmitkCombinedTransferFunctionCanvas::GetSelectedColorStopOffset() const
+double QmitkCombinedTransferFunctionCanvas::GetColorStopOffset(int index) const
 {
-  const int index = this->GetSelectedColorStop();
-
-  if (index == -1 || m_Max <= m_Min)
+  if (m_Max <= m_Min)
     return -1.0;
 
   return (this->GetColorStopValue(index) - m_Min) / (m_Max - m_Min);
@@ -830,19 +828,34 @@ void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopOffset(double offs
   if (index == -1 || m_Max <= m_Min)
     return;
 
-  const double value = m_Min + std::clamp(offset, 0.0, 1.0) * (m_Max - m_Min);
+  const double requested = m_Min + std::clamp(offset, 0.0, 1.0) * (m_Max - m_Min);
 
-  // The bounds a drag observes: a stop cannot reach its neighbors, since two
-  // at one position are one stop as far as VTK is concerned. Refused rather
-  // than nudged, so that what the stop did and what the control asked for do
-  // not quietly differ.
-  const double lower = index > 0 ? this->GetColorStopValue(index - 1) : m_Min;
-  const double upper = index < this->GetColorStopCount() - 1 ? this->GetColorStopValue(index + 1) : m_Max;
+  // Where a drag toward that value would leave the stop, so that the two ways of
+  // moving one cannot disagree. A selected stop is the grabbed handle of the
+  // color function, which is what the clamp measures from.
+  const double value = this->ClampGrabbedHandleX(requested);
 
-  if (value <= lower || value >= upper)
+  // Typically a stop already pressed against a neighbor: moving it onto itself
+  // would still count as an edit of the curve.
+  if (value == this->GetColorStopValue(index))
     return;
 
   this->MoveFunctionPoint(index, std::make_pair(value, 0.0));
+
+  this->update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop()
+{
+  const int index = this->GetSelectedColorStop();
+
+  // A gradient has to keep a color to be a gradient at all - the same guard the
+  // right-click path observes, in QmitkTransferFunctionCanvas::mousePressEvent.
+  if (index == -1 || this->GetColorStopCount() < 2)
+    return;
+
+  this->RemoveFunctionPoint(this->GetColorStopValue(index));
 
   this->update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

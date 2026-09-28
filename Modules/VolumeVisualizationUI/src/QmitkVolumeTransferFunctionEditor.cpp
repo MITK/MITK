@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
+#include <QAction>
 #include <QCheckBox>
 #include <QColor>
 #include <QColorDialog>
@@ -42,6 +43,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFontMetrics>
+#include <QHeaderView>
 #include <QIcon>
 #include <QKeyEvent>
 #include <QListWidget>
@@ -55,6 +57,8 @@ found in the LICENSE file.
 #include <QRect>
 #include <QSignalBlocker>
 #include <QStringList>
+#include <QStyledItemDelegate>
+#include <QTableWidget>
 #include <QTimer>
 #include <QToolButton>
 
@@ -643,6 +647,60 @@ namespace
 
     return std::nullopt;
   }
+
+  constexpr int COLOR_STOP_COLOR_COLUMN = 0;
+  constexpr int COLOR_STOP_POSITION_COLUMN = 1;
+
+  /** \brief How many decimals a color stop's position is shown and typed with. */
+  constexpr int COLOR_STOP_DECIMALS = 3;
+
+  /**
+   * \brief Shows and edits a color stop's position as a fraction of the axis.
+   *
+   * The editor Qt picks for a number steps by whole units, which here would
+   * cross the axis in a single step.
+   */
+  class ColorStopPositionDelegate : public QStyledItemDelegate
+  {
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    QString displayText(const QVariant &value, const QLocale &locale) const override
+    {
+      // A stop off the axis has no position to show, and says so in words.
+      if (value.typeId() != QMetaType::Double)
+        return QStyledItemDelegate::displayText(value, locale);
+
+      return locale.toString(value.toDouble(), 'f', COLOR_STOP_DECIMALS);
+    }
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const override
+    {
+      auto *spinBox = new QDoubleSpinBox(parent);
+      spinBox->setFrame(false);
+      spinBox->setRange(0.0, 1.0);
+      spinBox->setDecimals(COLOR_STOP_DECIMALS);
+      spinBox->setSingleStep(0.01);
+
+      return spinBox;
+    }
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
+    {
+      auto *spinBox = static_cast<QDoubleSpinBox *>(editor);
+      spinBox->interpretText();
+
+      // The box holds what it was handed rounded to its decimals, so closing it
+      // untouched would otherwise move the stop by the rounding - and count as
+      // an edit of the curve. Rounded the way QDoubleSpinBox rounds, so that the
+      // two compare exactly.
+      const double shown =
+        QString::number(index.data(Qt::EditRole).toDouble(), 'f', COLOR_STOP_DECIMALS).toDouble();
+
+      if (spinBox->value() != shown)
+        model->setData(index, spinBox->value(), Qt::EditRole);
+    }
+  };
 }
 
 QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *parent, Qt::WindowFlags f)
@@ -843,19 +901,52 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->blendModeComboBox, &QComboBox::currentIndexChanged,
     this, &QmitkVolumeTransferFunctionEditor::OnBlendModeChanged);
 
+  auto *stopTable = m_Controls->colorStopTable;
+
+  stopTable->setItemDelegateForColumn(COLOR_STOP_POSITION_COLUMN, new ColorStopPositionDelegate(stopTable));
+  stopTable->horizontalHeader()->setSectionResizeMode(COLOR_STOP_COLOR_COLUMN, QHeaderView::ResizeToContents);
+
+  m_PickColorStopColorAction = new QAction("Change color...", stopTable);
+  m_RemoveColorStopAction = new QAction("Remove", stopTable);
+
+  // Only while the table has focus: by default a shortcut answers anywhere in the
+  // window, and Delete is what every other view there removes its own things by.
+  m_RemoveColorStopAction->setShortcut(QKeySequence::Delete);
+  m_RemoveColorStopAction->setShortcutContext(Qt::WidgetShortcut);
+
+  stopTable->addAction(m_PickColorStopColorAction);
+  stopTable->addAction(m_RemoveColorStopAction);
+
   // Each of these hands the request straight to the canvas, which is where the
-  // rules about what may happen to a stop live, so that a stop moved from here
-  // and one dragged on the canvas cannot come out differently.
-  connect(m_Controls->colorStopComboBox, &QComboBox::currentIndexChanged,
+  // rules about what may happen to a stop live, so that a stop changed from the
+  // table and one dragged on the canvas cannot come out differently.
+  connect(stopTable, &QTableWidget::currentCellChanged,
     m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::SetSelectedColorStop);
-  connect(m_Controls->colorStopColorButton, &QPushButton::clicked,
+  connect(m_PickColorStopColorAction, &QAction::triggered,
     this, &QmitkVolumeTransferFunctionEditor::OnPickColorStopColor);
-  // Refreshed whether or not the canvas moved the stop: a refused offset
-  // announces nothing, and the box would keep showing where the stop is not.
-  connect(m_Controls->colorStopOffsetSpinBox, &QDoubleSpinBox::valueChanged, this,
-    [this](double offset)
+  connect(m_RemoveColorStopAction, &QAction::triggered,
+    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop);
+
+  // The position cell opens its own editor on a double-click, so only the color
+  // one is left to answer it here.
+  connect(stopTable, &QTableWidget::cellDoubleClicked, this,
+    [this](int, int column)
     {
-      m_Controls->combinedTfCanvas->SetSelectedColorStopOffset(offset);
+      if (column == COLOR_STOP_COLOR_COLUMN)
+        this->OnPickColorStopColor();
+    });
+
+  // Refreshed whether or not the canvas moved the stop: the cell holds what was
+  // typed, which a neighbor may have stopped short of, and a stop already
+  // pressed against that neighbor does not move or announce anything at all.
+  connect(stopTable, &QTableWidget::itemChanged, this,
+    [this](QTableWidgetItem *item)
+    {
+      auto *canvas = m_Controls->combinedTfCanvas;
+
+      canvas->SetSelectedColorStop(item->row());
+      canvas->SetSelectedColorStopOffset(item->data(Qt::EditRole).toDouble());
+
       this->ShowColorStops();
     });
 
@@ -1503,9 +1594,10 @@ void QmitkVolumeTransferFunctionEditor::UpdateControlAvailability()
   // on, and neither does editing, which starts from the applied curve. Picking
   // or loading a preset gets by with a node alone.
   //
-  // While a curve is being edited the two that would replace it stand down:
-  // the sliders replay a baseline snapshotted before the edits began, and a
-  // preset, picked or loaded, would overwrite the curve outright.
+  // While a curve is being edited the preset grid stands down, since a preset,
+  // picked or loaded, would overwrite the curve outright. The sliders, which
+  // would replay a baseline snapshotted before the edits began, are not on show
+  // at all then - see ShowEditMode.
   const bool hasNode = node.IsNotNull();
   const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
 
@@ -1513,7 +1605,7 @@ void QmitkVolumeTransferFunctionEditor::UpdateControlAvailability()
   m_Controls->presetListButton->setEnabled(hasNode);
   m_Controls->presetListWidget->setEnabled(hasNode && !m_EditModeActive);
   m_Controls->editModeButton->setEnabled(adjustable);
-  m_Controls->adjustPresetPanel->setEnabled(adjustable && !m_EditModeActive);
+  m_Controls->adjustPresetPanel->setEnabled(adjustable);
   m_Controls->combinedTfCanvas->setEnabled(adjustable);
 }
 
@@ -1871,8 +1963,15 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
     m_Controls->editModeButton->setChecked(m_EditModeActive);
   }
 
-  m_Controls->canvasHintLabel->setVisible(m_EditModeActive);
-  m_Controls->colorStopPanel->setVisible(m_EditModeActive);
+  // The edit controls take the sliders' place at the sliders' height, so that
+  // nothing below the canvas moves when editing begins or ends. Measured on
+  // every entry rather than once, since the height is only final once the
+  // application's style sheet has reached the panel.
+  if (m_EditModeActive)
+    m_Controls->editControlsPanel->setFixedHeight(m_Controls->adjustPresetPanel->sizeHint().height());
+
+  m_Controls->editControlsPanel->setVisible(m_EditModeActive);
+  m_Controls->adjustPresetPanel->setVisible(!m_EditModeActive);
   m_Controls->wholeCurveCheckBox->setVisible(m_EditModeActive);
   m_Controls->blendModeComboBox->setVisible(m_EditModeActive);
 
@@ -1957,47 +2056,77 @@ void QmitkVolumeTransferFunctionEditor::ApplyAxisRange()
 void QmitkVolumeTransferFunctionEditor::ShowColorStops()
 {
   auto *canvas = m_Controls->combinedTfCanvas;
+  auto *stopTable = m_Controls->colorStopTable;
 
   const int count = canvas->GetColorStopCount();
   const int selected = canvas->GetSelectedColorStop();
 
-  // Both of these are what ask for a change as well as what report one, so
-  // filling them in from the canvas would come straight back as a request to
-  // change the canvas.
-  const QSignalBlocker stopBlocker(m_Controls->colorStopComboBox);
-  const QSignalBlocker offsetBlocker(m_Controls->colorStopOffsetSpinBox);
+  // The table is what asks for a change as well as what reports one, so filling
+  // it in from the canvas would come straight back as a request to change the
+  // canvas.
+  const QSignalBlocker blocker(stopTable);
 
-  // Rebuilt only when stops came or went: dragging one would otherwise empty and
-  // refill the list on every mouse move. Entries carry a swatch and nothing
-  // else, and stand in the order the stops do, which is what says which marker
-  // each one is.
-  if (m_Controls->colorStopComboBox->count() != count)
-  {
-    m_Controls->colorStopComboBox->clear();
-
-    for (int i = 0; i < count; ++i)
-      m_Controls->colorStopComboBox->addItem(QString());
-  }
+  // Resized rather than rebuilt: dragging a stop would otherwise replace every
+  // row on every mouse move. Rows stand in the order the stops do, which is what
+  // says which marker each one is.
+  stopTable->setRowCount(count);
 
   for (int i = 0; i < count; ++i)
-    m_Controls->colorStopComboBox->setItemIcon(i, ColorSwatch(canvas->GetColorStopColor(i)));
+  {
+    if (stopTable->item(i, COLOR_STOP_COLOR_COLUMN) == nullptr)
+    {
+      // The color is changed through a picker rather than typed.
+      auto *colorItem = new QTableWidgetItem;
+      colorItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-  m_Controls->colorStopComboBox->setCurrentIndex(selected);
+      stopTable->setItem(i, COLOR_STOP_COLOR_COLUMN, colorItem);
+      stopTable->setItem(i, COLOR_STOP_POSITION_COLUMN, new QTableWidgetItem);
+    }
+
+    auto *colorItem = stopTable->item(i, COLOR_STOP_COLOR_COLUMN);
+    auto *positionItem = stopTable->item(i, COLOR_STOP_POSITION_COLUMN);
+
+    colorItem->setIcon(ColorSwatch(canvas->GetColorStopColor(i)));
+
+    // Off the axis, a fraction of it would only say which side the stop lies
+    // on, not where - and typing one would pull the stop onto the axis.
+    const bool offAxis = canvas->IsColorStopOffAxis(i);
+
+    if (offAxis)
+    {
+      positionItem->setData(Qt::DisplayRole, QStringLiteral("Off axis"));
+      positionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    }
+    else
+    {
+      positionItem->setData(Qt::DisplayRole, canvas->GetColorStopOffset(i));
+      positionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
+
+    const QString toolTip = offAxis
+      ? "This color stop lies off the axis. Tick Show whole curve to give it a position."
+      : QString();
+
+    colorItem->setToolTip(toolTip);
+    positionItem->setToolTip(toolTip);
+  }
+
+  // With no stop selected on the canvas no row may stay current either, or
+  // clicking that row again would change nothing.
+  if (selected != -1)
+  {
+    stopTable->setCurrentCell(selected, std::max(stopTable->currentColumn(), 0));
+  }
+  else
+  {
+    stopTable->clearSelection();
+    stopTable->setCurrentItem(nullptr);
+  }
 
   const bool hasSelection = selected != -1;
 
-  m_Controls->colorStopComboBox->setEnabled(count > 0);
-  m_Controls->colorStopColorButton->setEnabled(hasSelection);
-  m_Controls->colorStopOffsetSpinBox->setEnabled(hasSelection);
-
-  // The button is the color rather than a control that names one, so with
-  // nothing selected it has nothing to show and goes back to being a button.
-  m_Controls->colorStopColorButton->setStyleSheet(hasSelection
-    ? "background-color:" + canvas->GetColorStopColor(selected).name()
-    : QString());
-
-  m_Controls->colorStopOffsetSpinBox->setValue(
-    hasSelection ? canvas->GetSelectedColorStopOffset() : 0.0);
+  m_PickColorStopColorAction->setEnabled(hasSelection);
+  m_RemoveColorStopAction->setEnabled(hasSelection && count > 1);
 }
 
 void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()

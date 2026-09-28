@@ -133,6 +133,11 @@ private slots:
   void OnBlendModeChanged(int index);
   void OnEditModeToggled(bool checked);
 
+  /** \brief Put back the curve and the blend mode from when the edit began, and
+   *         go on editing.
+   */
+  void OnRevertEdit();
+
 private:
   /**
    * \brief Take the presets saved from here in earlier sessions into the
@@ -397,7 +402,9 @@ private:
    */
   void ShowColorStops();
 
-  /** \brief Mark the preset in force as edited, or take the mark away. */
+  /** \brief Mark the preset in force as edited, or take the mark away, and
+   *         offer to revert only an edit in progress that changed something.
+   */
   void ShowPresetEdited();
 
   /**

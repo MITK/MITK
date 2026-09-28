@@ -60,6 +60,15 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     void SetEditable(bool editable);
 
+    /**
+     * \brief Select nothing, neither an opacity point nor a color stop.
+     *
+     * The selection is an index into one of the two functions, so an owner that
+     * replaces a function's points behind the canvas's back has to call this: the
+     * index may name a point the new function does not have.
+     */
+    void ClearSelection();
+
     /** \brief Capture the current opacity curve as the baseline the shift/height
      *         offsets apply to, and reset both offsets to 0.
      */

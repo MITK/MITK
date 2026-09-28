@@ -94,6 +94,11 @@ void QmitkCombinedTransferFunctionCanvas::SetEditable(bool editable)
   // The selection is an index into one of the two functions, so it means nothing
   // once nothing is being edited - and one left over from a previous edit would
   // name a stop this one never selected.
+  this->ClearSelection();
+}
+
+void QmitkCombinedTransferFunctionCanvas::ClearSelection()
+{
   m_GrabbedHandle = -1;
   m_ActiveFunction = ActiveFunction::Opacity;
 

@@ -187,8 +187,9 @@ is grayed out and the sliders make way for the list of color stops.
 \imageMacro{QmitkVolumeVisualizationV2_EditMode.png,"The canvas while editing.",10.00}
 
 <ol>
-<li> <b>Edit</b> starts and ends the edit.
 <li> <b>Show whole curve</b> decides how far the axis reaches, as described below.
+<li> The blend mode the curve is rendered in, as described below.
+<li> <b>Edit</b> starts and ends the edit.
 <li> The handles of the opacity curve.
 <li> The color stops, as markers along the bottom edge. A faded one standing on
 an edge lies beyond the axis.
@@ -223,6 +224,11 @@ DELETE, or
 <b>Remove</b> on the right-click menu, removes the selected stop. A stop that
 lies beyond the axis is listed as <b>Off axis</b>, without a position. A
 gradient keeps at least one stop, and the curve at least one point.
+
+<b>Revert changes</b>, below the list, puts back the curve and the blend mode
+from when you pressed <b>Edit</b>, as <b>Discard</b> does when the edit ends,
+but leaves you editing so that you can start over. It is grayed out until
+something has changed.
 
 The axis covers the band of gray values the image occupies, while the presets
 are authored on their modality's full scale, so a preset's outermost stops

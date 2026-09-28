@@ -826,6 +826,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // placeholder fill that QmitkIconTheme swaps for the theme's icon color,
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
+  m_Controls->revertEditButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
   m_Controls->presetGridButton->setIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")));
   m_Controls->presetListButton->setIcon(
@@ -865,6 +866,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     this, &QmitkVolumeTransferFunctionEditor::OnColorWindowChanged);
   connect(m_Controls->resetTfButton, &QPushButton::clicked,
     this, &QmitkVolumeTransferFunctionEditor::OnResetAdjustments);
+  connect(m_Controls->revertEditButton, &QPushButton::clicked,
+    this, &QmitkVolumeTransferFunctionEditor::OnRevertEdit);
 
   // Through a slot of its own rather than SetEditModeActive: leaving is for
   // ConcludeEdit, which asks first, and only the button may have its request
@@ -1775,6 +1778,26 @@ void QmitkVolumeTransferFunctionEditor::OnEditModeToggled(bool checked)
     this->ConcludeEdit(true);
 }
 
+void QmitkVolumeTransferFunctionEditor::OnRevertEdit()
+{
+  // Before the functions are overwritten: the selection is an index into them,
+  // and the curve put back may have fewer points than the one being edited.
+  m_Controls->combinedTfCanvas->ClearSelection();
+
+  this->DiscardEdit();
+
+  // Discarding puts the colors back in the form the window baked them into, and
+  // editing goes on, so they need their handles again as on entering. Rebuilt
+  // from the same baseline and sliders, they come back as the edit found them.
+  this->RestoreColorHandles();
+
+  this->ShowNodeBlendMode();
+
+  // Widened to the curve being edited, the axis need not fit the one put back.
+  this->ApplyAxisRange();
+  this->ShowColorStops();
+}
+
 void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
 {
   if (!m_EditModeActive || !m_CurveEdited)
@@ -1875,6 +1898,8 @@ void QmitkVolumeTransferFunctionEditor::SetEditModeActive(bool active)
   if (active)
   {
     m_CurveEdited = false;
+    this->ShowPresetEdited();
+
     m_ColorHandlesRestored = false;
 
     // Before ShowEditMode puts the color handles back, so that discarding
@@ -2161,6 +2186,10 @@ void QmitkVolumeTransferFunctionEditor::ShowPresetEdited()
       ? "Moved away from this preset. Click it to go back to it."
       : QString());
   }
+
+  // Here rather than beside each change to m_CurveEdited, since every one of
+  // them is followed by a call to this.
+  m_Controls->revertEditButton->setEnabled(m_CurveEdited);
 }
 
 bool QmitkVolumeTransferFunctionEditor::DiffersFromPreset() const

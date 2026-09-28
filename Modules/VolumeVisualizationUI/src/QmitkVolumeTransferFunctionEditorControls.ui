@@ -161,15 +161,12 @@
       <item>
        <layout class="QHBoxLayout" name="canvasToolsLayout">
         <item>
-         <widget class="QCheckBox" name="fitAxisCheckBox">
+         <widget class="QCheckBox" name="wholeCurveCheckBox">
           <property name="toolTip">
-           <string>Keep the axis on the image's intensity band, which is where the image is and what the 2D views show. Clear it to let the axis out to the whole range the curve covers, so that the stops beyond that band are on it and can be dragged.</string>
+           <string>Let the axis out to the whole range the curve covers, so that the stops beyond the image's intensity band are on it and can be dragged. Cleared, the axis keeps to that band, which is where the image is and what the 2D views show.</string>
           </property>
           <property name="text">
-           <string>Fit to curve</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>Show whole curve</string>
           </property>
          </widget>
         </item>

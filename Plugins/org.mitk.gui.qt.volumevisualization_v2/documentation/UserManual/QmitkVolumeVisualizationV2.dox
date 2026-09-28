@@ -188,7 +188,7 @@ are drawing.
 
 <ol>
 <li> <b>Edit</b> starts and ends the edit.
-<li> <b>Fit to curve</b> decides how far the axis reaches, as described below.
+<li> <b>Show whole curve</b> decides how far the axis reaches, as described below.
 <li> The handles of the opacity curve.
 <li> The colour stops, as markers along the bottom edge. A faded one standing on
 an edge lies beyond the axis.
@@ -224,11 +224,11 @@ are authored on their modality's full scale, so a preset's outermost stops
 often lie beyond either end of the axis. The one nearest each end is then drawn
 faded on that end, to say it exists rather than where it is. It can be selected
 and recoloured there, but not dragged, since there is no place on the axis to
-drag it from. Clearing <b>Fit to curve</b>, beside <b>Edit</b>, widens the axis
-to take in every point of both curves, so that each stop stands at its own value
-and can be dragged like any other. The image's band then takes up only part of
-the plot. Every edit starts with the box ticked, and the axis returns to the
-band when the edit ends.
+drag it from. Ticking <b>Show whole curve</b>, beside <b>Edit</b>, widens the
+axis to take in every point of both curves, so that each stop stands at its own
+value and can be dragged like any other. The image's band then takes up only
+part of the plot. Every edit starts with the box cleared, and the axis returns
+to the band when the edit ends.
 
 The list beside <b>Edit</b>, shown only while editing, is the blend mode the
 curve is rendered in. It starts on the mode the preset brought. Changing it

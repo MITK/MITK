@@ -824,7 +824,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::ColorStopsChanged,
     this, &QmitkVolumeTransferFunctionEditor::ShowColorStops);
 
-  connect(m_Controls->fitAxisCheckBox, &QCheckBox::toggled,
+  connect(m_Controls->wholeCurveCheckBox, &QCheckBox::toggled,
     this, &QmitkVolumeTransferFunctionEditor::ApplyAxisRange);
 
   // Identified by their stable ids rather than by row, so that reordering the
@@ -1870,7 +1870,7 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
 
   m_Controls->canvasHintLabel->setVisible(m_EditModeActive);
   m_Controls->colorStopPanel->setVisible(m_EditModeActive);
-  m_Controls->fitAxisCheckBox->setVisible(m_EditModeActive);
+  m_Controls->wholeCurveCheckBox->setVisible(m_EditModeActive);
   m_Controls->blendModeComboBox->setVisible(m_EditModeActive);
 
   // Only on show while editing, and the preset grid that would change the mode
@@ -1883,8 +1883,8 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
     // Each visit starts on the band however the last one was left: the axis
     // returns to it on the way out, so a box that remembered otherwise would
     // describe a view that is not there.
-    const QSignalBlocker blocker(m_Controls->fitAxisCheckBox);
-    m_Controls->fitAxisCheckBox->setChecked(true);
+    const QSignalBlocker blocker(m_Controls->wholeCurveCheckBox);
+    m_Controls->wholeCurveCheckBox->setChecked(false);
   }
 
   // The wider axis is an aid to editing, so it comes and goes with editing
@@ -1916,12 +1916,12 @@ void QmitkVolumeTransferFunctionEditor::ApplyAxisRange()
   double lower = m_DataRange[0];
   double upper = m_DataRange[1];
 
-  // Cleared, so the axis is let out to wherever the curve reaches; ticked, it
+  // Ticked, so the axis is let out to wherever the curve reaches; cleared, it
   // keeps to the band. Only while the curve is being edited: off the axis is
   // only a problem for what has to be taken hold of, and the band is the more
   // honest picture of where the image is.
   const bool wholeRange = m_EditModeActive &&
-                          !m_Controls->fitAxisCheckBox->isChecked() &&
+                          m_Controls->wholeCurveCheckBox->isChecked() &&
                           m_AppliedTransferFunction.IsNotNull();
 
   if (wholeRange)

@@ -1188,20 +1188,15 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
 
 void QmitkMxNMultiWidget::TearDownAllCells()
 {
-  // ORDER MATTERS — every shared_ptr<QmitkRenderWindowWidget> that outlives
-  // the splitter delete causes a double-delete: Qt's deleteChildren on the
-  // splitter frees the QObject memory while the dangling shared_ptr later
-  // calls 'delete' again. Drop every strong ref we hold BEFORE deleting the
-  // splitter:
+  // Drop every strong ref we hold before the layout goes, so that the cells
+  // are destroyed here rather than surviving as parked children:
   //   1. Drop the active-widget pointer (also a shared_ptr).
   //   2. Snapshot only the *keys* of the cell map (a value-copy of the map
   //      itself would copy the shared_ptrs along with it and keep cells
   //      alive past the loop).
   //   3. Remove cells one-by-one through the public name-keyed path. Each
   //      removal disconnects signals and drops the map's shared_ptr; with
-  //      no other strong refs left, the cell self-destructs (Qt removes it
-  //      from its parent splitter's child list during ~QObject).
-  // Only then is the splitter empty and safe to delete.
+  //      no other strong refs left, the cell self-destructs.
   this->SetActiveRenderWindowWidget(nullptr);
 
   std::vector<QString> names;
@@ -1223,19 +1218,7 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   // The rolled-back single-default-cell state has no preset name to claim.
   m_LayoutName.clear();
 
-  // Delete the splitter and the layout that held it. The render-window widgets
-  // are already gone; the splitter (and any sub-splitters) have no
-  // QmitkRenderWindowWidget children left.
-  if (auto* oldLayout = this->layout())
-  {
-    if (oldLayout->count() > 0)
-    {
-      auto* item = oldLayout->itemAt(0);
-      auto* w = (item == nullptr) ? nullptr : item->widget();
-      delete w;
-    }
-    delete oldLayout;
-  }
+  this->GetMultiWidgetLayoutManager()->ClearLayout();
 }
 
 void QmitkMxNMultiWidget::RollBackToSingleDefaultCell()

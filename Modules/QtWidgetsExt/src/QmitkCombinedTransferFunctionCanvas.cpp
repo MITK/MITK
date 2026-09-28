@@ -284,8 +284,17 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
     if (m_Upper > lastX)
       addPoint(m_Upper, 0.0);
 
+    // Control points can lie beyond either end of the axis, and the line to them
+    // would run on into the margins that belong to the colour markers. Clipped at
+    // the sides only: zero opacity maps onto the frame's bottom edge, so a clip
+    // to the contents would shave off the baseline.
+    painter.save();
+    painter.setClipRect(QRect(contents.left() - 1, 0, contents.width() + 2, this->height()));
+
     painter.setPen(QPen(Qt::black, 2));
     painter.drawPolyline(curve);
+
+    painter.restore();
   }
 
   this->PaintHandles(painter);

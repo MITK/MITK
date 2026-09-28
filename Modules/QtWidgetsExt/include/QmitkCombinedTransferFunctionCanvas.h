@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <vtkColorTransferFunction.h>
 
 #include <QColor>
+#include <QString>
 
 #include <utility>
 #include <vector>
@@ -125,6 +126,16 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     void SetSelectedColorStopOffset(double offset);
 
+    /**
+     * \brief The tooltip shown over the marker of a stop the axis does not
+     *        reach, while editing.
+     *
+     * Left to the owner, since how to bring such a stop onto the axis is the
+     * owner's to offer. Empty, the default, shows none.
+     */
+    void SetOffAxisColorStopToolTip(const QString &toolTip);
+
+    bool event(QEvent *e) override;
     void paintEvent(QPaintEvent *e) override;
     void mousePressEvent(QMouseEvent *mouseEvent) override;
     void mouseMoveEvent(QMouseEvent *mouseEvent) override;
@@ -224,6 +235,14 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     int EdgeColorStop(AxisEdge edge) const;
 
+    /**
+     * \brief The stop a gesture on the rail at this x means, or -1.
+     *
+     * Apart from GetNearHandle, which answers for whichever function the last
+     * press chose, so that a tooltip can ask without choosing one.
+     */
+    int ColorStopNear(int x, unsigned int maxSquaredDistance);
+
     /** \brief Where a stop's marker is drawn: on the value it names, or pressed
      *         against the edge it lies beyond.
      */
@@ -255,6 +274,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
 
     bool m_Editable { false };
     ActiveFunction m_ActiveFunction { ActiveFunction::Opacity };
+
+    QString m_OffAxisColorStopToolTip;
 
     std::vector<std::pair<double,double>> m_OpacityBasePoints;
     double m_OpacityShift;

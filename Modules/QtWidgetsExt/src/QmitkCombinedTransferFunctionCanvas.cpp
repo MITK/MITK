@@ -16,10 +16,12 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 
 #include <QColorDialog>
+#include <QHelpEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPolygon>
+#include <QToolTip>
 
 #include <algorithm>
 
@@ -224,6 +226,44 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorGradient(QPainter &painter)
   }
 
   painter.restore();
+}
+
+void QmitkCombinedTransferFunctionCanvas::SetOffAxisColorStopToolTip(const QString &toolTip)
+{
+  m_OffAxisColorStopToolTip = toolTip;
+}
+
+bool QmitkCombinedTransferFunctionCanvas::event(QEvent *e)
+{
+  if (e->type() == QEvent::ToolTip && m_Editable && !m_OffAxisColorStopToolTip.isEmpty())
+  {
+    const auto *helpEvent = static_cast<QHelpEvent *>(e);
+    const QPoint pos = helpEvent->pos();
+
+    // Asked as a press asks, with the reach GetNearHandle is given by default,
+    // so that the text shows over exactly the markers a click would take as the
+    // stops beyond the axis rather than over one that sits on its very end.
+    const int stop = this->IsOnColorStopRail(pos.y())
+      ? this->ColorStopNear(pos.x(), 100)
+      : -1;
+
+    if (stop != -1 && this->IsColorStopOffAxis(stop))
+    {
+      const QRect contents = this->contentsRect();
+      const QRect rail = this->ColorStopRail();
+
+      // The margin the marker is drawn in, so that the text goes as soon as the
+      // cursor moves on to anything else.
+      const QRect margin = pos.x() < contents.left()
+        ? QRect(0, rail.top(), contents.left(), rail.height())
+        : QRect(contents.right() + 1, rail.top(), this->width() - contents.right() - 1, rail.height());
+
+      QToolTip::showText(helpEvent->globalPos(), m_OffAxisColorStopToolTip, this, margin);
+      return true;
+    }
+  }
+
+  return QmitkPiecewiseFunctionCanvas::event(e);
 }
 
 void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
@@ -505,13 +545,18 @@ int QmitkCombinedTransferFunctionCanvas::GetNearHandle(int x, int y, unsigned in
   if (m_ActiveFunction != ActiveFunction::Color)
     return QmitkPiecewiseFunctionCanvas::GetNearHandle(x, y, maxSquaredDistance);
 
+  return this->ColorStopNear(x, maxSquaredDistance);
+}
+
+int QmitkCombinedTransferFunctionCanvas::ColorStopNear(int x, unsigned int maxSquaredDistance)
+{
   // A colour stop has no height, so only the distance along the axis decides
   // which one a click means. The nearest rather than the first within reach:
   // markers are wide enough to stand side by side and still overlap.
   int nearest = -1;
   unsigned int nearestDistance = maxSquaredDistance;
 
-  for (int i = 0; i < this->GetFunctionSize(); ++i)
+  for (int i = 0; i < this->GetColorStopCount(); ++i)
   {
     // Passed over rather than measured: a stop beyond the axis is drawn on the
     // edge instead of where it sits, so its own position says nothing about
@@ -519,7 +564,7 @@ int QmitkCombinedTransferFunctionCanvas::GetNearHandle(int x, int y, unsigned in
     if (this->IsColorStopOffAxis(i))
       continue;
 
-    const auto handle = this->FunctionToCanvas(std::make_pair(this->GetFunctionX(i), 0.0));
+    const auto handle = this->FunctionToCanvas(std::make_pair(this->GetColorStopValue(i), 0.0));
     const int distance = handle.first - x;
     const auto squaredDistance = static_cast<unsigned int>(distance * distance);
 

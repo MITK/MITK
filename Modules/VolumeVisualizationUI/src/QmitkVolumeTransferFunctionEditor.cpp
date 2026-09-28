@@ -827,6 +827,9 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   connect(m_Controls->wholeCurveCheckBox, &QCheckBox::toggled,
     this, &QmitkVolumeTransferFunctionEditor::ApplyAxisRange);
 
+  m_Controls->combinedTfCanvas->SetOffAxisColorStopToolTip(
+    "This color stop lies off the axis. Tick Show whole curve to drag it.");
+
   // Identified by their stable ids rather than by row, so that reordering the
   // modes cannot silently change what a row selects.
   for (const auto &description : mitk::VolumeBlendModeDescription::GetAll())

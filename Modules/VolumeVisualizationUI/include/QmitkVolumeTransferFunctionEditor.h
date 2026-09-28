@@ -128,7 +128,6 @@ private slots:
   void OnCanvasOpacityChanged();
   void OnResetAdjustments();
   void OnPresetContextMenu(const QPoint &pos);
-  void OnAddColorStop();
   void OnPickColorStopColor();
   void OnBlendModeChanged(int index);
   void OnEditModeToggled(bool checked);

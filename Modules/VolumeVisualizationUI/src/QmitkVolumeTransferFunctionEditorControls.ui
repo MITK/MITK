@@ -351,32 +351,6 @@
            </property>
           </spacer>
          </item>
-         <item>
-          <widget class="QToolButton" name="addColorStopButton">
-           <property name="toolTip">
-            <string>Add a colour stop at the middle of the widest gap.</string>
-           </property>
-           <property name="text">
-            <string>+</string>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="removeColorStopButton">
-           <property name="toolTip">
-            <string>Remove the selected colour stop.</string>
-           </property>
-           <property name="text">
-            <string>-</string>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>

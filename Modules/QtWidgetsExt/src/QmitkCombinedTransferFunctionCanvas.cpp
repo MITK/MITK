@@ -763,36 +763,6 @@ void QmitkCombinedTransferFunctionCanvas::SetSelectedColorStopOffset(double offs
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-int QmitkCombinedTransferFunctionCanvas::AddColorStop(double value)
-{
-  if (m_ColorTransferFunction == nullptr)
-    return -1;
-
-  m_ActiveFunction = ActiveFunction::Color;
-
-  const int index = this->AddFunctionPoint(value, 0.0);
-
-  this->update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  return index;
-}
-
-void QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop()
-{
-  const int index = this->GetSelectedColorStop();
-
-  // A gradient has to keep a colour to be a gradient at all - the same guard the
-  // right-click path observes, in QmitkTransferFunctionCanvas::mousePressEvent.
-  if (index == -1 || this->GetColorStopCount() < 2)
-    return;
-
-  this->RemoveFunctionPoint(this->GetColorStopValue(index));
-
-  this->update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
 void QmitkCombinedTransferFunctionCanvas::SnapshotOpacityBaseline()
 {
   m_OpacityShift = 0.0;

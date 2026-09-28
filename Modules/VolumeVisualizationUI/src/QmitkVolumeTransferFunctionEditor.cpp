@@ -855,10 +855,6 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
       m_Controls->combinedTfCanvas->SetSelectedColorStopOffset(offset);
       this->ShowColorStops();
     });
-  connect(m_Controls->removeColorStopButton, &QToolButton::clicked,
-    m_Controls->combinedTfCanvas, &QmitkCombinedTransferFunctionCanvas::RemoveSelectedColorStop);
-  connect(m_Controls->addColorStopButton, &QToolButton::clicked,
-    this, &QmitkVolumeTransferFunctionEditor::OnAddColorStop);
 
   // Editing starts off.
   this->ShowEditMode();
@@ -1991,10 +1987,6 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
   m_Controls->colorStopComboBox->setEnabled(count > 0);
   m_Controls->colorStopColorButton->setEnabled(hasSelection);
   m_Controls->colorStopOffsetSpinBox->setEnabled(hasSelection);
-  m_Controls->addColorStopButton->setEnabled(count > 0);
-
-  // A gradient has to keep a colour to be a gradient at all.
-  m_Controls->removeColorStopButton->setEnabled(hasSelection && count > 1);
 
   // The button is the colour rather than a control that names one, so with
   // nothing selected it has nothing to show and goes back to being a button.
@@ -2070,41 +2062,6 @@ void QmitkVolumeTransferFunctionEditor::OnPickColorStopColor()
 
   if (picked.isValid())
     canvas->SetSelectedColorStopColor(picked);
-}
-
-void QmitkVolumeTransferFunctionEditor::OnAddColorStop()
-{
-  auto *canvas = m_Controls->combinedTfCanvas;
-
-  const int count = canvas->GetColorStopCount();
-
-  if (count == 0)
-    return;
-
-  // The middle of the widest gap: where a stop is most use, and the one place it
-  // cannot land on top of one that is already there. The stretches between the
-  // outermost stops and the ends of the range count as gaps too, so that the
-  // flat ends of the gradient can be reached as well.
-  double where = 0.0;
-  double widest = -1.0;
-
-  const auto consider = [&where, &widest](double from, double to)
-  {
-    if (to - from > widest)
-    {
-      widest = to - from;
-      where = 0.5 * (from + to);
-    }
-  };
-
-  consider(m_DataRange[0], canvas->GetColorStopValue(0));
-
-  for (int i = 0; i < count - 1; ++i)
-    consider(canvas->GetColorStopValue(i), canvas->GetColorStopValue(i + 1));
-
-  consider(canvas->GetColorStopValue(count - 1), m_DataRange[1]);
-
-  canvas->AddColorStop(where);
 }
 
 vtkSmartPointer<vtkColorTransferFunction> QmitkVolumeTransferFunctionEditor::WindowedColorHandles() const

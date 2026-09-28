@@ -125,15 +125,6 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      */
     void SetSelectedColorStopOffset(double offset);
 
-    /**
-     * \brief Add a stop, in the color the gradient already has at that value.
-     * \return The index of the new stop, which is also left selected.
-     */
-    int AddColorStop(double value);
-
-    /** \brief Remove the selected stop, unless it is the only one left. */
-    void RemoveSelectedColorStop();
-
     void paintEvent(QPaintEvent *e) override;
     void mousePressEvent(QMouseEvent *mouseEvent) override;
     void mouseMoveEvent(QMouseEvent *mouseEvent) override;

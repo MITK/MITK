@@ -210,10 +210,14 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
     /** \brief The strip along the bottom edge that the color stops sit in. */
     QRect ColorStopRail() const;
 
-    /** \brief Whether a point at this position belongs to the rail rather than
-     *         to the plot.
+    /**
+     * \brief Whether a press at this position is meant for the color stops
+     *        rather than the opacity points.
+     *
+     * The rail belongs to the stops and the plot to the points, except where a
+     * point at low opacity is drawn over the markers.
      */
-    bool IsOnColorStopRail(int y) const;
+    bool PressGrabsColorStop(const QPoint &pos);
 
     /**
      * \brief Whether a stop names a value the axis does not reach.

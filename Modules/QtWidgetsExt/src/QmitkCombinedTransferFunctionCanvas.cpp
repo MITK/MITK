@@ -28,18 +28,18 @@ found in the LICENSE file.
 namespace
 {
   /** \brief Room below the plot for the color stop markers. */
-  constexpr int RAIL_HEIGHT = 15;
-
-  /** \brief How far a marker's roof reaches up past the frame.
-   *
-   * What makes it read as pointing at a value on the gradient rather than
-   * sitting somewhere underneath it. One short of the roof's own height, so that
-   * what overlaps the plot is the roof and what fills the rail is the body.
-   */
-  constexpr int ROOF_OVERLAP = 4;
+  constexpr int RAIL_HEIGHT = 20;
 
   constexpr int ROOF_HEIGHT = 5;
   constexpr int MARKER_WIDTH = 15;
+
+  /** \brief Radius of an opacity handle as drawn.
+   *
+   * Also how close a press on the rail has to come to one to grab it: handles
+   * are drawn over the markers, so a press there grabs whichever it looks to
+   * land on.
+   */
+  constexpr int HANDLE_RADIUS = 4;
 
   /** \brief Room beside the plot for the outer half of a marker, plus the frame.
    *
@@ -130,9 +130,15 @@ QRect QmitkCombinedTransferFunctionCanvas::ColorStopRail() const
   return QRect(contents.x(), contents.bottom() + 1, contents.width(), RAIL_HEIGHT);
 }
 
-bool QmitkCombinedTransferFunctionCanvas::IsOnColorStopRail(int y) const
+bool QmitkCombinedTransferFunctionCanvas::PressGrabsColorStop(const QPoint &pos)
 {
-  return y > this->contentsRect().bottom();
+  if (pos.y() <= this->contentsRect().bottom())
+    return false;
+
+  const bool onOpacityHandle = m_PiecewiseFunction != nullptr &&
+    QmitkPiecewiseFunctionCanvas::GetNearHandle(pos.x(), pos.y(), HANDLE_RADIUS * HANDLE_RADIUS) != -1;
+
+  return !onOpacityHandle;
 }
 
 bool QmitkCombinedTransferFunctionCanvas::IsColorStopOffAxis(int index) const
@@ -243,7 +249,7 @@ bool QmitkCombinedTransferFunctionCanvas::event(QEvent *e)
     // Asked as a press asks, with the reach GetNearHandle is given by default,
     // so that the text shows over exactly the markers a click would take as the
     // stops beyond the axis rather than over one that sits on its very end.
-    const int stop = this->IsOnColorStopRail(pos.y())
+    const int stop = this->PressGrabsColorStop(pos)
       ? this->ColorStopNear(pos.x(), 100)
       : -1;
 
@@ -345,24 +351,9 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
   if (!m_Editable)
     return;
 
-  painter.save();
-
   // Both functions carry handles at once: which one a gesture means follows from
   // where it lands, so hiding either would only hide what can be done.
-  if (m_PiecewiseFunction != nullptr)
-  {
-    double *dp = m_PiecewiseFunction->GetDataPointer();
-
-    for (int i = 0; i < m_PiecewiseFunction->GetSize(); ++i)
-    {
-      const bool grabbed = m_ActiveFunction == ActiveFunction::Opacity && i == m_GrabbedHandle;
-      const auto handle = this->FunctionToCanvas(std::make_pair(dp[i * 2], dp[i * 2 + 1]));
-
-      painter.setPen(Qt::black);
-      painter.setBrush(grabbed ? Qt::red : Qt::white);
-      painter.drawEllipse(handle.first - 4, handle.second - 4, 8, 8);
-    }
-  }
+  painter.save();
 
   const int selected = this->GetSelectedColorStop();
   const int lowerEdge = this->EdgeColorStop(AxisEdge::Lower);
@@ -378,6 +369,10 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
            !this->IsColorStopOffAxis(index);
   };
 
+  // Kept to the markers: the antialiasing they need would blur the one-pixel
+  // outlines of the handles.
+  painter.save();
+
   // The selected one last, since markers are wide enough that two close stops
   // overlap and the one being worked on is the one that has to stay whole.
   for (int i = 0; i < this->GetColorStopCount(); ++i)
@@ -388,6 +383,26 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
 
   if (selected != -1)
     this->PaintColorStop(painter, selected, true);
+
+  painter.restore();
+
+  // Over the markers, since a point at low opacity reaches down onto the rail
+  // and is the one a press there grabs.
+  if (m_PiecewiseFunction != nullptr)
+  {
+    double *dp = m_PiecewiseFunction->GetDataPointer();
+
+    for (int i = 0; i < m_PiecewiseFunction->GetSize(); ++i)
+    {
+      const bool grabbed = m_ActiveFunction == ActiveFunction::Opacity && i == m_GrabbedHandle;
+      const auto handle = this->FunctionToCanvas(std::make_pair(dp[i * 2], dp[i * 2 + 1]));
+
+      painter.setPen(Qt::black);
+      painter.setBrush(grabbed ? Qt::red : Qt::white);
+      painter.drawEllipse(handle.first - HANDLE_RADIUS, handle.second - HANDLE_RADIUS,
+                          2 * HANDLE_RADIUS, 2 * HANDLE_RADIUS);
+    }
+  }
 
   painter.restore();
 }
@@ -401,7 +416,7 @@ void QmitkCombinedTransferFunctionCanvas::PaintColorStop(QPainter &painter, int 
   const bool offAxis = this->IsColorStopOffAxis(index);
 
   const int halfWidth = MARKER_WIDTH / 2;
-  const int apexY = contents.bottom() - ROOF_OVERLAP;
+  const int apexY = rail.top();
   const int eavesY = apexY + ROOF_HEIGHT;
   const int baseY = rail.bottom() - 1;
 
@@ -467,7 +482,7 @@ void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEven
   const int previous = this->GetSelectedColorStop();
   const QPoint pos = mouseEvent->position().toPoint();
 
-  m_ActiveFunction = this->IsOnColorStopRail(pos.y())
+  m_ActiveFunction = this->PressGrabsColorStop(pos)
     ? ActiveFunction::Color
     : ActiveFunction::Opacity;
 
@@ -520,7 +535,7 @@ void QmitkCombinedTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent *mou
 
   const QPoint pos = mouseEvent->position().toPoint();
 
-  m_ActiveFunction = this->IsOnColorStopRail(pos.y())
+  m_ActiveFunction = this->PressGrabsColorStop(pos)
     ? ActiveFunction::Color
     : ActiveFunction::Opacity;
 

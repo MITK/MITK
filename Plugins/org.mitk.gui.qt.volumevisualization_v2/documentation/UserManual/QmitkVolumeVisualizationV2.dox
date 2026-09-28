@@ -198,15 +198,17 @@ an edge lies beyond the axis.
 The canvas edits both curves at once, each in a region of its own:
 
 <ul>
-<li> In the plot, the handles are the points of the opacity curve. Left-click
-adds a point, dragging moves one, and right-click removes it. The arrow keys
-move the selected point and DELETE removes it.
+<li> In the plot, the handles are the points of the opacity curve.
+Double-clicking empty space adds a point, dragging moves one, and right-click
+removes it. The arrow keys move the selected point and DELETE removes it.
 <li> Along the bottom edge, below the plot, the markers are the colour stops,
 each pointing at the grey value its colour applies to. Click one to select it,
 drag it to move it, double-click it to pick its colour, and right-click it to
-remove it. Clicking the strip between markers adds a stop there, taking the
-colour the gradient already has at that point, so that adding one changes
+remove it. Double-clicking the strip between markers adds a stop there, taking
+the colour the gradient already has at that point, so that adding one changes
 nothing until you recolour it.
+<li> A single click on empty space only clears the selection, so that it
+cannot add anything by accident.
 <li> Between points the curves are interpolated linearly.
 </ul>
 
@@ -214,10 +216,8 @@ A row under the canvas, <b>Color stops</b>, reaches the same stops without
 aiming at a marker. Its list shows each stop as a swatch, in the order the
 markers stand in. The colour field beside it is the selected stop's colour and
 opens a colour picker. The number gives the stop's position as a fraction of the
-axis, 0 at its left end and 1 at its right; typing a value moves the stop. The
-<b>+</b> button adds a stop in the middle of the widest gap, and <b>-</b>
-removes the selected one. A gradient keeps at least one stop, and the curve at
-least one point.
+axis, 0 at its left end and 1 at its right; typing a value moves the stop. A
+gradient keeps at least one stop, and the curve at least one point.
 
 The axis covers the band of grey values the image occupies, while the presets
 are authored on their modality's full scale, so a preset's outermost stops
@@ -235,7 +235,24 @@ curve is rendered in. It starts on the mode the preset brought. Changing it
 counts as an edit like any drawn on the canvas: the preset's entry is starred,
 and the choice lasts as long as the drawing does, so <b>Save as preset...</b>
 is how to keep it. Only <b>Composite</b> builds a three-dimensional image and
-takes lighting; the others flatten each ray to a single value.
+takes lighting; the others flatten each ray to a single value:
+
+<ul>
+<li> <b>Maximum intensity (MIP)</b> keeps the brightest value along each ray,
+so dense structures such as contrast-filled vessels stay visible however much
+tissue surrounds them. It needs a curve that ramps up across the whole value
+range rather than one drawn to pick out a single tissue.
+<li> <b>Minimum intensity (MinIP)</b> keeps the darkest value, so air stands
+out against tissue - airways, emphysema, bowel gas. It needs the same kind of
+ramp, and a volume cropped to the region of interest: across a whole scan, the
+darkest value on almost every ray is the air around the patient.
+<li> <b>Average intensity</b> averages the values along each ray and reads
+like an X-ray image. The opacity curve weights the values; the colours are
+ignored and the result is greyscale.
+<li> <b>Additive intensity</b> adds the values up. Unlike the average it has no
+upper bound, so it turns white where the volume is deep unless the opacity
+curve is kept low. It is greyscale too.
+</ul>
 
 If you changed nothing, ending the edit asks nothing, and the preset and the
 slider positions are left as they were. If you did, it asks whether to save the

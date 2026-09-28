@@ -74,9 +74,7 @@ namespace mitk
     /** \brief Name for a control that selects the mode. */
     std::string label;
 
-    /** \brief What the mode does, and what a transfer function for it looks
-     *         like; long enough to serve as a tooltip.
-     */
+    /** \brief One sentence on what the mode shows, short enough for a tooltip. */
     std::string description;
 
     /** \brief The modes on offer, in the order they should be presented. */

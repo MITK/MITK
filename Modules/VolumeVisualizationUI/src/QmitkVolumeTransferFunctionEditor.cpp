@@ -721,7 +721,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // Before the cells are measured below, so that it is measured and given its
   // icon along with them.
   m_LoadPresetItem = new QListWidgetItem(QStringLiteral("Load preset..."), presetList);
-  m_LoadPresetItem->setToolTip("Add a preset from a transfer function saved to a JSON file.");
+  m_LoadPresetItem->setToolTip("Add a preset that was saved to a file.");
 
   // Enabled, so that it is not drawn greyed out, but never selected: the
   // selection marks the preset in force, and this is none.
@@ -1695,7 +1695,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
   const auto node = m_DataNode.Lock();
   const auto imageName = node.IsNotNull() ? QString::fromStdString(node->GetName()) : QString();
 
-  QMessageBox question(QMessageBox::Question, "Edit transfer function",
+  QMessageBox question(QMessageBox::Question, "Edit curve",
     imageName.isEmpty()
       ? QString("Save the edited curve as a preset?")
       : QString("Save the curve edited for \"%1\" as a preset?").arg(imageName),
@@ -1898,9 +1898,8 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   // mentions is one nobody finds. Both functions answer at once now, so what has
   // to be said is which part of the canvas belongs to which.
   m_Controls->canvasHintLabel->setText(
-    "<small>On the curve: left-click adds a point, drag moves it, right-click removes it. "
-    "The markers along the bottom carry the colours: click one to select it, "
-    "double-click to recolour it.</small>");
+    "<small>Double-click empty space on the curve or the colour strip to add a point there. "
+    "Drag to move it, right-click to remove it, double-click a colour marker to recolour it.</small>");
 
   this->ShowColorStops();
 
@@ -2115,7 +2114,7 @@ void QmitkVolumeTransferFunctionEditor::LoadPreset()
     ? QString()
     : QFileInfo(rememberedFiles.last()).absolutePath();
 
-  const auto fileName = QFileDialog::getOpenFileName(this, title, directory, "Transfer function (*.json)");
+  const auto fileName = QFileDialog::getOpenFileName(this, title, directory, "Preset (*.json)");
 
   if (fileName.isEmpty() || !ValidatePresetFilePath(this, title, fileName))
     return;
@@ -2138,7 +2137,7 @@ void QmitkVolumeTransferFunctionEditor::LoadPreset()
   }
 
   if (!this->AddPresetFromFile(presetFile))
-    QMessageBox::warning(this, title, "The file could not be read, or holds no transfer function preset.");
+    QMessageBox::warning(this, title, "The file could not be read, or is not a preset.");
 }
 
 void QmitkVolumeTransferFunctionEditor::OnPresetContextMenu(const QPoint &pos)
@@ -2191,7 +2190,7 @@ QString QmitkVolumeTransferFunctionEditor::AskPresetFileName()
   // The file name becomes the entry's name, so the suggestion starts from the
   // preset the curve was carried away from, beside the last preset saved.
   const QString suggestedName =
-    (appliedPreset != nullptr ? PresetName(appliedPreset) : QStringLiteral("transfer-function")) +
+    (appliedPreset != nullptr ? PresetName(appliedPreset) : QStringLiteral("preset")) +
     QStringLiteral("-custom.json");
 
   const QStringList rememberedFiles = RememberedPresetFiles();
@@ -2200,8 +2199,7 @@ QString QmitkVolumeTransferFunctionEditor::AskPresetFileName()
     ? suggestedName
     : QFileInfo(rememberedFiles.last()).absolutePath() + QLatin1Char('/') + suggestedName;
 
-  auto fileName = QFileDialog::getSaveFileName(this, "Save transfer function", suggestion,
-    "Transfer function (*.json)");
+  auto fileName = QFileDialog::getSaveFileName(this, "Save as preset", suggestion, "Preset (*.json)");
 
   if (fileName.isEmpty())
     return {};
@@ -2209,7 +2207,7 @@ QString QmitkVolumeTransferFunctionEditor::AskPresetFileName()
   if (!fileName.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive))
     fileName += QStringLiteral(".json");
 
-  if (!ValidatePresetFilePath(this, "Save transfer function", fileName))
+  if (!ValidatePresetFilePath(this, "Save as preset", fileName))
     return {};
 
   return fileName;
@@ -2249,7 +2247,7 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName
         !mitk::TransferFunctionPresets::SaveTransferFunction(stream, presetName.toStdString(),
           savedFunction.GetPointer(), blendMode))
     {
-      QMessageBox::warning(this, "Save transfer function", "Could not write the file.");
+      QMessageBox::warning(this, "Save as preset", "Could not write the file.");
       return;
     }
   }
@@ -2266,7 +2264,7 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName
 
   if (!this->AddPresetFromFile(presetFile))
   {
-    QMessageBox::warning(this, "Save transfer function",
+    QMessageBox::warning(this, "Save as preset",
       "The file was written, but could not be read back as a preset.");
   }
 }

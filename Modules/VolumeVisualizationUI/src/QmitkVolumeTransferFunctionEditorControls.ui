@@ -163,7 +163,7 @@
         <item>
          <widget class="QCheckBox" name="wholeCurveCheckBox">
           <property name="toolTip">
-           <string>Let the axis out to the whole range the curve covers, so that the stops beyond the image's intensity band are on it and can be dragged. Cleared, the axis keeps to that band, which is where the image is and what the 2D views show.</string>
+           <string>Widen the axis to show every point of the curve, including those beyond the image's value range.</string>
           </property>
           <property name="text">
            <string>Show whole curve</string>
@@ -186,7 +186,7 @@
         <item>
          <widget class="QComboBox" name="blendModeComboBox">
           <property name="toolTip">
-           <string>How the samples along each viewing ray are combined into one pixel. Composite is the only one that builds up a three-dimensional image, and the only one any lighting applies to; the rest flatten each ray to a single value and read as a projection radiograph.</string>
+           <string>How the volume is drawn. Only Composite gives a 3D image with lighting.</string>
           </property>
           <property name="sizeAdjustPolicy">
            <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
@@ -196,7 +196,7 @@
         <item>
          <widget class="QToolButton" name="editModeButton">
           <property name="toolTip">
-           <string>Edit the transfer function point by point.</string>
+           <string>Edit the curve point by point.</string>
           </property>
           <property name="text">
            <string>Edit</string>
@@ -252,7 +252,7 @@
          <enum>Qt::TextFormat::RichText</enum>
         </property>
         <property name="text">
-         <string>&lt;small&gt;Left-click adds a point, drag moves it, right-click removes it.&lt;/small&gt;</string>
+         <string/>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -319,7 +319,7 @@
          <item>
           <widget class="QDoubleSpinBox" name="colorStopOffsetSpinBox">
            <property name="toolTip">
-            <string>Where this stop sits in the displayed value range, from 0 at its start to 1 at its end. Outside 0 to 1 the stop lies beyond the axis, and its marker stands on the edge it lies beyond.</string>
+            <string>Position of this stop along the axis, from 0 at the left end to 1 at the right. Outside that range the stop lies beyond the axis.</string>
            </property>
            <property name="keyboardTracking">
             <bool>false</bool>

@@ -53,24 +53,15 @@ const std::vector<mitk::VolumeBlendModeDescription> &mitk::VolumeBlendModeDescri
 {
   static const std::vector<VolumeBlendModeDescription> descriptions {
     {VolumeBlendMode::Composite, "Composite", "Composite (3D)",
-     "Accumulates colour and opacity front to back, so nearer tissue hides what is behind it. The only"
-     " mode that produces a three-dimensional image, and the only one lighting and shading reach."},
+     "Builds a 3D image in which nearer tissue hides what is behind it."},
     {VolumeBlendMode::MaximumIntensity, "MaximumIntensity", "Maximum intensity (MIP)",
-     "Keeps the brightest sample along each ray. Depth is lost, but anything dense stays visible however"
-     " much tissue surrounds it, which is what makes contrast-filled vessels and tracer uptake readable."
-     " Needs a transfer function that ramps across the whole value range rather than one drawn to isolate"
-     " a tissue."},
+     "Shows the brightest value along each ray, for example contrast-filled vessels."},
     {VolumeBlendMode::MinimumIntensity, "MinimumIntensity", "Minimum intensity (MinIP)",
-     "Keeps the darkest sample along each ray, so air stands out against tissue - airways, emphysema,"
-     " bowel gas. Wants the same kind of ramp as MIP, and a volume cropped to the region of interest:"
-     " across a whole scan the darkest sample on almost every ray is the air around the patient."},
+     "Shows the darkest value along each ray, for example airways."},
     {VolumeBlendMode::AverageIntensity, "AverageIntensity", "Average intensity",
-     "Averages the samples along each ray, which reads like a projection radiograph. The opacity curve"
-     " weights the samples, but the colour curve is ignored and the result is greyscale."},
+     "Shows the average along each ray, like an X-ray image. Greyscale only."},
     {VolumeBlendMode::Additive, "Additive", "Additive intensity",
-     "Sums the samples along each ray. Like the average but unbounded, so it saturates towards white"
-     " where the volume is deep, and needs a correspondingly low opacity curve. The colour curve is"
-     " ignored and the result is greyscale."}
+     "Adds up the values along each ray. Greyscale only."}
   };
 
   return descriptions;

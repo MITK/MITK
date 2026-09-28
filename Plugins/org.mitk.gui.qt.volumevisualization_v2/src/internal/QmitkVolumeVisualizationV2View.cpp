@@ -140,8 +140,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->enableRenderingButton->setIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
 
-  m_Controls->binaryHintLabel->setText(
-    "Binary image: its appearance is set by the node colour, not by a transfer function.");
+  m_Controls->binaryHintLabel->setText("Binary image: its colour is set in the Data Manager.");
   m_Controls->binaryHintLabel->setVisible(false);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,

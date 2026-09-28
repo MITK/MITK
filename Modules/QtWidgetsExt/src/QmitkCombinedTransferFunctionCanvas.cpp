@@ -471,17 +471,18 @@ void QmitkCombinedTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEven
     ? ActiveFunction::Color
     : ActiveFunction::Opacity;
 
-  // The margins beside the plot are the markers' room rather than part of the
-  // axis, so a press there names no value: left to the base class it would add a
-  // point just off the end of the axis. What it can still mean is one of the
-  // handles reaching into the margin, so only a press on nothing is dropped.
-  const QRect contents = this->contentsRect();
-
-  if ((pos.x() < contents.left() || pos.x() > contents.right()) &&
-      this->GetNearHandle(pos.x(), pos.y()) == -1)
-    return;
-
-  QmitkPiecewiseFunctionCanvas::mousePressEvent(mouseEvent);
+  // A press on nothing only lets go of the selection. Left to the base class it
+  // would add a point, which a click meant to deselect did far too easily;
+  // adding is the double click's.
+  if (this->GetNearHandle(pos.x(), pos.y()) == -1)
+  {
+    m_GrabbedHandle = -1;
+    this->update();
+  }
+  else
+  {
+    QmitkPiecewiseFunctionCanvas::mousePressEvent(mouseEvent);
+  }
 
   // Adding and removing announce themselves; this is for a press that only moved
   // the selection, including one that moved it off the stops altogether.
@@ -517,11 +518,35 @@ void QmitkCombinedTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent *mou
   if (!m_Editable)
     return;
 
-  m_ActiveFunction = this->IsOnColorStopRail(mouseEvent->position().toPoint().y())
+  const QPoint pos = mouseEvent->position().toPoint();
+
+  m_ActiveFunction = this->IsOnColorStopRail(pos.y())
     ? ActiveFunction::Color
     : ActiveFunction::Opacity;
 
-  QmitkPiecewiseFunctionCanvas::mouseDoubleClickEvent(mouseEvent);
+  const int handle = this->GetNearHandle(pos.x(), pos.y());
+
+  if (handle != -1)
+  {
+    this->DoubleClickOnHandle(handle);
+    return;
+  }
+
+  // The margins beside the plot are the markers' room rather than part of the
+  // axis, so a double click there names no value to add a point at.
+  const QRect contents = this->contentsRect();
+
+  if (mouseEvent->button() != Qt::LeftButton || pos.x() < contents.left() || pos.x() > contents.right())
+    return;
+
+  const auto [x, value] = this->CanvasToFunction(std::make_pair(pos.x(), pos.y()));
+
+  // Grabbed as a press on a handle would be, so that holding the second click
+  // drags the new point into place.
+  m_GrabbedHandle = this->AddFunctionPoint(x, std::clamp(value, 0.0, 1.0));
+
+  this->update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkCombinedTransferFunctionCanvas::keyPressEvent(QKeyEvent *keyEvent)

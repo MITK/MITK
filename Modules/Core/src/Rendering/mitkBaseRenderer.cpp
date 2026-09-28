@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkResliceMethodProperty.h>
 
 // Geometries
+#include <mitkAbstractTransformGeometry.h>
 #include <mitkSlicedGeometry3D.h>
 
 #include <mitkVtkLayerController.h>
@@ -36,6 +37,21 @@ found in the LICENSE file.
 namespace mitk
 {
   itkEventMacroDefinition(RendererResetEvent, itk::AnyEvent);
+}
+
+namespace
+{
+  bool IsSamePlane(const mitk::PlaneGeometry& lhs, const mitk::PlaneGeometry& rhs)
+  {
+    // The value comparison does not cover the transform of curved planes.
+    if (nullptr != dynamic_cast<const mitk::AbstractTransformGeometry*>(&lhs) ||
+        nullptr != dynamic_cast<const mitk::AbstractTransformGeometry*>(&rhs))
+    {
+      return false;
+    }
+
+    return lhs.GetReferenceGeometry() == rhs.GetReferenceGeometry() && mitk::Equal(lhs, rhs, mitk::eps, false);
+  }
 }
 
 mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
@@ -419,7 +435,14 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject& geometryUpdateEv
   {
     PlaneGeometry* geometry2D = slicedWorldGeometry->GetPlaneGeometry(m_Slice);
 
-    SetCurrentWorldPlaneGeometry(geometry2D); // calls Modified()
+    // Slice selections send geometry updates that usually leave the planes
+    // unchanged; treating those as updates makes every 2D mapper regenerate.
+    // SetCurrentWorldPlaneGeometry itself keeps marking equal planes as
+    // updated: most 2D mappers rely on that to follow time step changes.
+    if (!IsSamePlane(*m_CurrentWorldPlaneGeometry, *geometry2D))
+    {
+      this->SetCurrentWorldPlaneGeometry(geometry2D); // calls Modified()
+    }
   }
 }
 

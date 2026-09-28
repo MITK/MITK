@@ -41,6 +41,7 @@ set(MODULE_TESTS
   mitkIOUtilTest.cpp
   mitkITKEventObserverGuardTest.cpp
   mitkBaseDataTest.cpp
+  mitkBaseRendererTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp

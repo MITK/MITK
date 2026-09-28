@@ -586,9 +586,9 @@ public:
     // left to right at the vertical center and assert the glyphs map to slot
     // indices that increase and cover the whole set, without hardcoding the
     // private box/gap geometry.
-    const int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
+    static constexpr int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
 
-    const auto sweep = [slotCount](const QRect& target)
+    const auto sweep = [](const QRect& target)
     {
       int maxSlot = -1;
       int prev = -1;

@@ -50,17 +50,10 @@ they are pinned here alongside a Strict case that must still compute --
 without the latter, a bug that refused everything under Strict would
 read as success.
 
-The manifest now covers all 58 upstream DROs. It stays strict-red with
-no xfail machinery: a case may only enter once the implementation
-satisfies it, and DRO_7_1_0 and DRO_7_3_1 are here as expected
-refusals rather than expected values.
-
-That distinction matters when reading a green run. Under the
-benchmark's own scoring those two are failures -- it expects
-0.20 / 1.00 / 4.00 from both -- so "58 under test" is not
-"58 conformant". The conformance figure is 56/58; this suite asserts
-that nothing regressed, including that the two MITK cannot compute
-still refuse rather than quietly returning numbers.
+The manifest covers all 58 upstream DROs, each value DRO as an expected
+value and each DRO_error object as an expected refusal. It stays
+strict-red with no xfail machinery: a case may only enter once the
+implementation satisfies it.
 
 ROI statistics are computed by direct masked iteration over the SUV
 output and the mask image, *not* via mitk::ImageStatisticsCalculator.
@@ -295,12 +288,18 @@ namespace
     // Sequence inside the functional groups, and (0018,9758) replaces
     // (0054,1102).
     {"DRO_7_0_0", "Enhanced PET, Bq/ml, DecayCorrected=YES", kTriple},
+    // Rescale Slope is 4.0 on sixteen frames and 3.0 on four; the reader
+    // applies each frame's own Pixel Value Transformation.
+    {"DRO_7_1_0", "Enhanced PET, per-frame Rescale Slope varies", kTriple},
     {"DRO_7_2_0", "Enhanced PET, g/ml{SUVbw}", kTriple},
-    // Frame times vary here too, exactly as in DRO_7_3_1 below, but
-    // DecayCorrected=YES means the reference instant is the uniform
-    // top-level (0018,9701) and the frame times do not enter the result.
-    // This pair is the reason the frame-time guard is conditional.
+    // Frame times vary here exactly as in DRO_7_3_1, but DecayCorrected=YES
+    // means the reference instant is the uniform top-level (0018,9701) and
+    // the frame times do not enter the result. This pair pins that only
+    // (0018,9758) decides whether they do.
     {"DRO_7_3_0", "Enhanced PET, reference from (0018,9701)", kTriple},
+    // DecayCorrected=NO with (0018,9151) in two groups 300 s apart: the
+    // reference instant is resolved per slice.
+    {"DRO_7_3_1", "Enhanced PET, per-frame Frame Reference DateTime varies", kTriple},
 
     // Error DROs: SUV must not be computed. The expected exception type
     // is pinned wherever it discriminates -- notably absent tag
@@ -351,24 +350,6 @@ namespace
      kRefusal, "41400", "UnrecoverableAdministrationDateException"},
     {"DRO_error_5_0", "Radionuclide Half Life absent",
      kRefusal, "(0018,1075)", "MissingDICOMPropertyException"},
-
-    // The two Enhanced PET objects MITK cannot yet compute. They are
-    // carried as expected *refusals* rather than omitted, so all 58 DROs
-    // are under test and the gap is stated in code rather than inferred
-    // from an absence.
-    //
-    // Both need per-frame values that MITK's one-frame-per-file read model
-    // cannot represent -- not a defect in the data. When the reader gains a
-    // per-frame model these two will start failing here, which is the
-    // intended signal: promote them to CanonicalTriple, do not delete them.
-    //
-    // Note that a green suite is therefore not a 58/58 conformance claim.
-    // The benchmark expects 0.20 / 1.00 / 4.00 from both, so under its own
-    // scoring a refusal is a failure and the conformance figure is 56/58.
-    {"DRO_7_1_0", "Enhanced PET, per-frame Rescale Slope varies",
-     kRefusal, "(0028,1053)", "EnhancedPETPerFrameVariationException"},
-    {"DRO_7_3_1", "Enhanced PET, per-frame Frame Reference DateTime varies",
-     kRefusal, "(0018,9151)", "EnhancedPETPerFrameVariationException"},
 
     // ---- Strict policy -------------------------------------------------
     //

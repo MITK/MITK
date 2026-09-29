@@ -299,24 +299,44 @@ namespace mitk
     mitkExceptionClassMacro(UnrecoverableAdministrationDateException, AmbiguousDecayTimingException);
   };
   /**
-   * \brief An Enhanced PET object carries per-frame values that differ
-   *        between frames, which MITK's read model cannot represent.
+   * \brief The per-frame values of an Enhanced PET object could not be
+   *        resolved per slice.
    *
-   * The DICOM reader attaches one property set per *file*, so a
-   * multi-frame object collapses each attribute to a single value. Where
-   * the per-frame values agree that is harmless. Where they differ -- and
-   * where the varying attribute actually feeds the computation -- an SUV
-   * would silently be built from one frame's value applied to the whole
-   * volume, so the input is refused under both policies.
+   * Two inputs raise it. A multi-frame object whose functional groups the
+   * DICOM reader could not map to frames -- its Per-Frame Functional Groups
+   * Sequence does not carry one item per frame -- reaches the pipeline
+   * without any of its per-frame values. And an object whose frames name
+   * different units: the pipeline carries one unit per image, so a
+   * per-frame unit has no representation. Both are refused under both
+   * policies, because computing from one frame's value would be silently
+   * wrong for the others.
    *
    * This is a MITK limitation rather than a defect in the input, and the
-   * message says so: the data is correct and a reader with a per-frame
-   * model would handle it.
+   * message says so.
    */
   class MITKPET_EXPORT EnhancedPETPerFrameVariationException : public SUVHelperException
   {
   public:
     mitkExceptionClassMacro(EnhancedPETPerFrameVariationException, SUVHelperException);
+  };
+
+  /**
+   * \brief No Real World Value Mapping of an Enhanced PET object describes
+   *        the pixel values as loaded.
+   *
+   * The reader applies the Pixel Value Transformation per frame and leaves
+   * the Real World Value Mapping to the consumer. The SUV pipeline does not
+   * apply it either: it names the unit of the loaded values by the mapping
+   * whose slope and intercept equal the applied transformation. When no
+   * mapping does, the loaded values are in no unit the object declares, and
+   * the input is refused rather than scaled by a guess. This is a MITK
+   * limitation on a conformant object, not a defect in the input, and the
+   * message says so.
+   */
+  class MITKPET_EXPORT EnhancedPETMappingNotAppliedException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(EnhancedPETMappingNotAppliedException, SUVHelperException);
   };
 
   /**
@@ -636,6 +656,26 @@ namespace mitk
    * \return true when (0008,0016) equals the Enhanced PET SOP Class UID.
    */
   bool MITKPET_EXPORT IsEnhancedPETInput(const mitk::IPropertyProvider* provider);
+
+  /**
+   * \brief Refuse a multi-frame Enhanced PET object that reached MITK
+   *        without its functional-group values.
+   *
+   * The DICOM reader publishes the functional-group attributes of a
+   * multi-frame object with one value per slice, or -- for a file whose
+   * per-frame item count does not match its frame count -- not at all.
+   * This detects the latter: (0028,0008) Number of Frames exceeds one and
+   * none of the functional-group attributes the SUV pipeline consumes is
+   * present. Such an object carries per-frame values MITK could not map to
+   * slices, which every consumer must report as that rather than as absent
+   * attributes.
+   *
+   * \param[in] provider Source of DICOM properties.
+   *
+   * \throw EnhancedPETPerFrameVariationException if the object is
+   *        multi-frame and publishes no functional-group value.
+   */
+  void MITKPET_EXPORT RequireEnhancedPETFramesResolved(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Findings about a Rescale Slope or Intercept the IBSI-SUV

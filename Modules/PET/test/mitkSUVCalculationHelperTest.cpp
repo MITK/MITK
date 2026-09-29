@@ -199,6 +199,13 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_None_MissingAcqTime_Throws_MissingDICOMPropertyException);
 
+  // Enhanced PET: the reference instant per slice
+  MITK_TEST(Enhanced_DecayCorrectedNO_UsesFrameReferencePerSlice);
+  MITK_TEST(Enhanced_DecayCorrectedYES_IgnoresFrameTimes);
+  MITK_TEST(Enhanced_DecayCorrectedNO_FallsBackToAcquisitionPlusTAvePerSlice);
+  MITK_TEST(Enhanced_DecayCorrectedNO_DatetimeMissingOnOneSlice_Throws);
+  MITK_TEST(Enhanced_FramesUnresolvedByReader_Refuses);
+
   // DC=START rule gating and the adaptation record
   MITK_TEST(Start_Step2_UnrecognizedVendor_Computes);
   MITK_TEST(Start_Step3_UnrecognizedVendor_ComputesAndRecordsBothRules);
@@ -1762,6 +1769,107 @@ public:
 
     CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
                          mitk::MissingDICOMPropertyException);
+  }
+
+  // ---- Enhanced PET: the reference instant per slice ----
+  //
+  // (0018,9758) Decay Corrected replaces (0054,1102). YES means the pixels
+  // are corrected to the single (0018,9701); NO means each frame's own
+  // measurement instant is the reference, and the reader publishes those
+  // with one value per slice.
+
+  // An Enhanced object with the given number of frames and the given
+  // (0018,9758), administered at 10:00:00 on the frames' date.
+  mitk::Image::Pointer MakeEnhancedDecayImage(unsigned int nSlices, const std::string& decayCorrected)
+  {
+    auto image = MakeSyntheticImage(nSlices, 1);
+    SetDicomProperty(image, PropName(0x0008, 0x0016), "1.2.840.10008.5.1.4.1.1.130");
+    SetDicomProperty(image, PropName(0x0028, 0x0008), std::to_string(nSlices));
+    SetDicomProperty(image, PropName(0x0018, 0x9758), decayCorrected);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078), "20260430100000");
+    return image;
+  }
+
+  void Enhanced_DecayCorrectedNO_UsesFrameReferencePerSlice()
+  {
+    auto image = MakeEnhancedDecayImage(4, "NO");
+    const std::string frameReference = SeqPropName(0x0020, 0x9111, 0x0018, 0x9151);
+    SetDicomProperty(image, frameReference, "20260430111500", 0, 0);
+    SetDicomProperty(image, frameReference, "20260430111500", 0, 1);
+    SetDicomProperty(image, frameReference, "20260430111000", 0, 2);
+    SetDicomProperty(image, frameReference, "20260430111000", 0, 3);
+
+    const auto info = mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2);
+    CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::Start, info.strategy);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4500.0, info.decayTimes.at(0).at(0), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4500.0, info.decayTimes.at(0).at(1), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4200.0, info.decayTimes.at(0).at(2), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4200.0, info.decayTimes.at(0).at(3), 1e-3);
+  }
+
+  void Enhanced_DecayCorrectedYES_IgnoresFrameTimes()
+  {
+    // DRO_7_3_0 against DRO_7_3_1: identical per-frame frame times, and only
+    // (0018,9758) decides whether they enter the result.
+    auto image = MakeEnhancedDecayImage(4, "YES");
+    SetDicomProperty(image, PropName(0x0018, 0x9701), "20260430110000");
+    const std::string frameReference = SeqPropName(0x0020, 0x9111, 0x0018, 0x9151);
+    SetDicomProperty(image, frameReference, "20260430111500", 0, 0);
+    SetDicomProperty(image, frameReference, "20260430111500", 0, 1);
+    SetDicomProperty(image, frameReference, "20260430111000", 0, 2);
+    SetDicomProperty(image, frameReference, "20260430111000", 0, 3);
+
+    const auto info = mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2);
+    CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::Start, info.strategy);
+    for (unsigned int s = 0; s < 4; ++s)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(3600.0, info.decayTimes.at(0).at(s), 1e-3);
+    }
+  }
+
+  void Enhanced_DecayCorrectedNO_FallsBackToAcquisitionPlusTAvePerSlice()
+  {
+    // Frames without a Frame Reference DateTime use their acquisition instant
+    // plus T_ave, beside frames that have one: the precedence is per frame.
+    // A 1 ms frame duration keeps T_ave far below the assertion tolerance.
+    auto image = MakeEnhancedDecayImage(3, "NO");
+    SetDicomProperty(image, SeqPropName(0x0020, 0x9111, 0x0018, 0x9151), "20260430111500", 0, 0);
+    const std::string acquisition = SeqPropName(0x0020, 0x9111, 0x0018, 0x9074);
+    const std::string duration = SeqPropName(0x0020, 0x9111, 0x0018, 0x9220);
+    SetDicomProperty(image, acquisition, "20260430111000", 0, 1);
+    SetDicomProperty(image, duration, "1", 0, 1);
+    SetDicomProperty(image, acquisition, "20260430110500", 0, 2);
+    SetDicomProperty(image, duration, "1", 0, 2);
+
+    const auto info = mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4500.0, info.decayTimes.at(0).at(0), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4200.0, info.decayTimes.at(0).at(1), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3900.0, info.decayTimes.at(0).at(2), 1e-3);
+  }
+
+  void Enhanced_DecayCorrectedNO_DatetimeMissingOnOneSlice_Throws()
+  {
+    // The reader publishes functional-group values all or nothing per file,
+    // so a frame without any measurement instant is the input's doing.
+    auto image = MakeEnhancedDecayImage(4, "NO");
+    const std::string frameReference = SeqPropName(0x0020, 0x9111, 0x0018, 0x9151);
+    for (unsigned int s = 0; s < 3; ++s)
+    {
+      SetDicomProperty(image, frameReference, "20260430111500", 0, s);
+    }
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  void Enhanced_FramesUnresolvedByReader_Refuses()
+  {
+    // A multi-frame object none of whose functional-group values reached
+    // MITK: per-frame values exist and cannot be resolved per slice.
+    auto image = MakeEnhancedDecayImage(4, "NO");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2),
+                         mitk::EnhancedPETPerFrameVariationException);
   }
 };
 

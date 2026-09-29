@@ -213,49 +213,43 @@ mitk::GetDefaultDICOMTagsOfInterest()
     //above. Units, rescale and frame timing live inside the functional
     //groups instead, so the SUV pipeline reads them from there.
     //
-    //Every path below is registered with the single-argument MakeEntry, so
-    //the property name comes from the resolved path and keeps the sequence
-    //item index: DICOM.5200.9230.[7].0040.9096.[0].0040.08EA.[0].0008.0100.
-    //A non-empty name would collapse all items onto one key, last write
-    //wins, and per-frame variation -- which the SUV pipeline must refuse
-    //rather than average over -- would become invisible.
+    //Each path is registered relative to the functional-group item, the way
+    //it is written inside its macro. The reader searches such a path at the
+    //top level and, for a file with a frame model, in the shared and the
+    //per-frame group, and publishes one property per attribute with a value
+    //per slice, e.g. DICOM.0028.9145.[0].0028.1053. The registered path is
+    //also the pattern the persistence regex is derived from, so it must stay
+    //macro-relative; a path rooted in (5200,9229) or (5200,9230) publishes
+    //nothing for a frame-model file.
     result.insert(MakeEntry(DICOMTag(0x0018, 0x9758))); //dicom.pet.DecayCorrected
     result.insert(MakeEntry(DICOMTag(0x0018, 0x9701))); //dicom.pet.DecayCorrectionDateTime
 
-    DICOMTagPath sharedGroupsRootTag;
-    sharedGroupsRootTag.AddAnySelection(0x5200, 0x9229);
-    DICOMTagPath perFrameGroupsRootTag;
-    perFrameGroupsRootTag.AddAnySelection(0x5200, 0x9230);
+    DICOMTagPath realWorldValueMappingTag;
+    realWorldValueMappingTag.AddAnySelection(0x0040, 0x9096);
+    DICOMTagPath measurementUnitsCodeTag(realWorldValueMappingTag);
+    measurementUnitsCodeTag.AddAnySelection(0x0040, 0x08EA);
 
-    for (const auto& groupsRootTag : { sharedGroupsRootTag, perFrameGroupsRootTag })
-    {
-      DICOMTagPath realWorldValueMappingTag(groupsRootTag);
-      realWorldValueMappingTag.AddAnySelection(0x0040, 0x9096);
-      DICOMTagPath measurementUnitsCodeTag(realWorldValueMappingTag);
-      measurementUnitsCodeTag.AddAnySelection(0x0040, 0x08EA);
+    //The IBSI-SUV manual allows the unit code in Code Value, Long Code
+    //Value or URN Code Value, so all three are read.
+    result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0100))); //dicom.pet.MeasurementUnits.CodeValue
+    result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0119))); //dicom.pet.MeasurementUnits.LongCodeValue
+    result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0120))); //dicom.pet.MeasurementUnits.URNCodeValue
+    result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0102))); //dicom.pet.MeasurementUnits.CodingSchemeDesignator
 
-      //The IBSI-SUV manual allows the unit code in Code Value, Long Code
-      //Value or URN Code Value, so all three are read.
-      result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0100))); //dicom.pet.MeasurementUnits.CodeValue
-      result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0119))); //dicom.pet.MeasurementUnits.LongCodeValue
-      result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0120))); //dicom.pet.MeasurementUnits.URNCodeValue
-      result.insert(MakeEntry(DICOMTagPath(measurementUnitsCodeTag).AddElement(0x0008, 0x0102))); //dicom.pet.MeasurementUnits.CodingSchemeDesignator
+    result.insert(MakeEntry(DICOMTagPath(realWorldValueMappingTag).AddElement(0x0040, 0x9225))); //dicom.pet.RealWorldValueSlope
+    result.insert(MakeEntry(DICOMTagPath(realWorldValueMappingTag).AddElement(0x0040, 0x9224))); //dicom.pet.RealWorldValueIntercept
 
-      result.insert(MakeEntry(DICOMTagPath(realWorldValueMappingTag).AddElement(0x0040, 0x9225))); //dicom.pet.RealWorldValueSlope
-      result.insert(MakeEntry(DICOMTagPath(realWorldValueMappingTag).AddElement(0x0040, 0x9224))); //dicom.pet.RealWorldValueIntercept
+    DICOMTagPath pixelValueTransformationTag;
+    pixelValueTransformationTag.AddAnySelection(0x0028, 0x9145);
+    result.insert(MakeEntry(DICOMTagPath(pixelValueTransformationTag).AddElement(0x0028, 0x1053))); //dicom.pet.PVT.RescaleSlope
+    result.insert(MakeEntry(DICOMTagPath(pixelValueTransformationTag).AddElement(0x0028, 0x1052))); //dicom.pet.PVT.RescaleIntercept
+    result.insert(MakeEntry(DICOMTagPath(pixelValueTransformationTag).AddElement(0x0028, 0x1054))); //dicom.pet.PVT.RescaleType
 
-      DICOMTagPath pixelValueTransformationTag(groupsRootTag);
-      pixelValueTransformationTag.AddAnySelection(0x0028, 0x9145);
-      result.insert(MakeEntry(DICOMTagPath(pixelValueTransformationTag).AddElement(0x0028, 0x1053))); //dicom.pet.PVT.RescaleSlope
-      result.insert(MakeEntry(DICOMTagPath(pixelValueTransformationTag).AddElement(0x0028, 0x1052))); //dicom.pet.PVT.RescaleIntercept
-      result.insert(MakeEntry(DICOMTagPath(pixelValueTransformationTag).AddElement(0x0028, 0x1054))); //dicom.pet.PVT.RescaleType
-
-      DICOMTagPath frameContentTag(groupsRootTag);
-      frameContentTag.AddAnySelection(0x0020, 0x9111);
-      result.insert(MakeEntry(DICOMTagPath(frameContentTag).AddElement(0x0018, 0x9151))); //dicom.pet.FrameReferenceDateTime
-      result.insert(MakeEntry(DICOMTagPath(frameContentTag).AddElement(0x0018, 0x9074))); //dicom.pet.FrameAcquisitionDateTime
-      result.insert(MakeEntry(DICOMTagPath(frameContentTag).AddElement(0x0018, 0x9220))); //dicom.pet.FrameAcquisitionDuration
-    }
+    DICOMTagPath frameContentTag;
+    frameContentTag.AddAnySelection(0x0020, 0x9111);
+    result.insert(MakeEntry(DICOMTagPath(frameContentTag).AddElement(0x0018, 0x9151))); //dicom.pet.FrameReferenceDateTime
+    result.insert(MakeEntry(DICOMTagPath(frameContentTag).AddElement(0x0018, 0x9074))); //dicom.pet.FrameAcquisitionDateTime
+    result.insert(MakeEntry(DICOMTagPath(frameContentTag).AddElement(0x0018, 0x9220))); //dicom.pet.FrameAcquisitionDuration
 
     result.insert(MakeEntry(DICOMTag(0x0028, 0x0008))); //dicom.NumberOfFrames
 

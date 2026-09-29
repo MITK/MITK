@@ -53,30 +53,87 @@ namespace
     image->SetProperty(key.c_str(), prop);
   }
 
-  // Property name for a functional-group path with concrete item indices,
-  // matching what the DICOM reader produces for an Enhanced PET object:
-  // DICOM.5200.9230.[frame].GGGG.EEEE.[item].GGGG.EEEE
-  std::string PerFrameName(unsigned int frame,
-                           unsigned int innerGroup, unsigned int innerElement, unsigned int item,
-                           unsigned int leafGroup, unsigned int leafElement)
+  // Property name of a functional-group attribute as the DICOM reader
+  // publishes it for an Enhanced object: relative to the functional-group
+  // item, with the macro item index kept: DICOM.GGGG.EEEE.[item].GGGG.EEEE
+  std::string MacroName(unsigned int macroGroup, unsigned int macroElement, unsigned int item,
+                        unsigned int leafGroup, unsigned int leafElement)
   {
     mitk::DICOMTagPath path;
-    path.AddSelection(0x5200, 0x9230, static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(frame));
-    path.AddSelection(innerGroup, innerElement,
-                      static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(item));
+    path.AddSelection(macroGroup, macroElement, static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(item));
     path.AddElement(leafGroup, leafElement);
     return mitk::DICOMTagPathToPropertyName(path);
   }
 
-  void SetProperty(mitk::Image* image, const std::string& name, const std::string& value)
+  // The Code Value of the Measurement Units Code Sequence of one Real World
+  // Value Mapping item.
+  std::string UnitCodeName(unsigned int item)
   {
-    auto prop = mitk::DICOMProperty::New();
-    prop->SetValue(0, 0, value);
-    image->SetProperty(name.c_str(), prop);
+    mitk::DICOMTagPath path;
+    path.AddSelection(0x0040, 0x9096, static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(item));
+    path.AddSelection(0x0040, 0x08EA, 0);
+    path.AddElement(0x0008, 0x0100);
+    return mitk::DICOMTagPathToPropertyName(path);
   }
 
-  // A minimal Enhanced PET object: the SOP Class UID that selects the code
-  // path, a frame count, and per-frame unit codes and rescale values.
+  // Set one slice's value of a per-slice property, creating it on first use.
+  void SetSliceValue(mitk::Image* image, const std::string& name, unsigned int slice,
+                     const std::string& value)
+  {
+    auto existing = image->GetProperty(name.c_str());
+    auto* prop = dynamic_cast<mitk::DICOMProperty*>(existing.GetPointer());
+    if (nullptr == prop)
+    {
+      auto fresh = mitk::DICOMProperty::New();
+      fresh->SetValue(0, slice, value);
+      image->SetProperty(name.c_str(), fresh);
+      return;
+    }
+    prop->SetValue(0, slice, value);
+  }
+
+  // One Real World Value Mapping item on one frame. An empty field leaves the
+  // attribute unset on that frame.
+  struct Mapping
+  {
+    std::string code;
+    std::string slope;
+    std::string intercept;
+  };
+
+  void SetMapping(mitk::Image* image, unsigned int frame, unsigned int item, const Mapping& mapping)
+  {
+    if (!mapping.code.empty())
+    {
+      SetSliceValue(image, UnitCodeName(item), frame, mapping.code);
+    }
+    if (!mapping.slope.empty())
+    {
+      SetSliceValue(image, MacroName(0x0040, 0x9096, item, 0x0040, 0x9225), frame, mapping.slope);
+    }
+    if (!mapping.intercept.empty())
+    {
+      SetSliceValue(image, MacroName(0x0040, 0x9096, item, 0x0040, 0x9224), frame, mapping.intercept);
+    }
+  }
+
+  void SetPixelValueTransformation(mitk::Image* image, unsigned int frame,
+                                   const std::string& slope, const std::string& intercept = "0")
+  {
+    SetSliceValue(image, MacroName(0x0028, 0x9145, 0, 0x0028, 0x1053), frame, slope);
+    SetSliceValue(image, MacroName(0x0028, 0x9145, 0, 0x0028, 0x1052), frame, intercept);
+  }
+
+  void SetRescaleType(mitk::Image* image, unsigned int frame, const std::string& rescaleType)
+  {
+    SetSliceValue(image, MacroName(0x0028, 0x9145, 0, 0x0028, 0x1054), frame, rescaleType);
+  }
+
+  // A minimal Enhanced PET object with the given number of frames: the SOP
+  // Class UID that selects the code path, the frame count, and per frame one
+  // Pixel Value Transformation plus one Real World Value Mapping whose pair
+  // equals it -- the layout of every Enhanced benchmark object. An empty unit
+  // code leaves the mapping out.
   mitk::Image::Pointer MakeEnhancedImage(unsigned int frames, const std::string& unitCode,
                                          const std::vector<std::string>& perFrameSlopes)
   {
@@ -85,24 +142,19 @@ namespace
     SetDicomTag(image, 0x0028, 0x0008, std::to_string(frames));
     for (unsigned int f = 0; f < frames; ++f)
     {
+      const std::string slope = (f < perFrameSlopes.size()) ? perFrameSlopes[f] : "1.0";
+      SetPixelValueTransformation(image, f, slope);
       if (!unitCode.empty())
       {
-        SetProperty(image, PerFrameName(f, 0x0040, 0x9096, 0, 0x0040, 0x08EA), "");
-        SetProperty(image,
-                    mitk::DICOMTagPathToPropertyName(
-                      mitk::DICOMTagPath()
-                        .AddSelection(0x5200, 0x9230, static_cast<mitk::DICOMTagPath::ItemSelectionIndex>(f))
-                        .AddSelection(0x0040, 0x9096, 0)
-                        .AddSelection(0x0040, 0x08EA, 0)
-                        .AddElement(0x0008, 0x0100)),
-                    unitCode);
-      }
-      if (f < perFrameSlopes.size())
-      {
-        SetProperty(image, PerFrameName(f, 0x0028, 0x9145, 0, 0x0028, 0x1053), perFrameSlopes[f]);
+        SetMapping(image, f, 0, {unitCode, slope, "0"});
       }
     }
     return image;
+  }
+
+  mitk::SUVInputModel ClassifyEnhanced(const mitk::Image* image)
+  {
+    return mitk::ClassifyEnhancedPETInput(image, mitk::DICOMReadPolicy::Lenient);
   }
 
   // Set a lifted private-tag property (the names BaseDICOMReaderService
@@ -161,11 +213,19 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   MITK_TEST(EnhancedPET_GmlSUVbw_ClassifiesAsPrenormalizedBW);
   MITK_TEST(EnhancedPET_UniformPerFrameRescale_Accepted);
   MITK_TEST(EnhancedPET_RescaleWrittenTwoWays_Accepted);
-  MITK_TEST(EnhancedPET_VaryingPerFrameRescale_Refuses);
-  MITK_TEST(EnhancedPET_FewerRescaleValuesThanFrames_Refuses);
+  MITK_TEST(EnhancedPET_VaryingPerFrameRescale_Accepted);
+  MITK_TEST(EnhancedPET_FramesUnresolvedByReader_Refuses);
+  MITK_TEST(EnhancedPET_SingleFrameObject_Accepted);
+  MITK_TEST(EnhancedPET_UnitMissingOnOneFrame_Throws);
+  MITK_TEST(EnhancedPET_UnmappedUnitOnOneFrame_Throws);
   MITK_TEST(EnhancedPET_UnitDiffersBetweenFrames_Refuses);
+  MITK_TEST(EnhancedPET_SeveralMappings_RanksAmongConsistentItems);
+  MITK_TEST(EnhancedPET_SeveralMappings_ConsistentSUVbwItemWins);
+  MITK_TEST(EnhancedPET_NoMappingDescribesLoadedPixels_Refuses);
+  MITK_TEST(EnhancedPET_LutMappingIsNoCandidate_Refuses);
   MITK_TEST(EnhancedPET_NoUsableUnit_Throws);
   MITK_TEST(EnhancedPET_RescaleTypeFallback_Accepted);
+  MITK_TEST(EnhancedPET_RescaleTypeMissingOnOneFrame_Throws);
   MITK_TEST(IsEnhancedPETInput_OnlyForTheEnhancedSOPClass);
 
   MITK_TEST(NullProvider_Throws);
@@ -528,17 +588,17 @@ public:
   // ---- Enhanced PET Image Storage ----
   //
   // These objects carry none of the classic attributes, so the classifier
-  // reads the unit out of the functional groups instead. The guards below
-  // matter as much as the mapping: MITK models one frame per file, so a
-  // per-frame value that differs between frames would silently be applied
-  // to the whole volume.
+  // reads the unit out of the functional groups, which the reader publishes
+  // with one value per slice. The pipeline never applies a Real World Value
+  // Mapping: it names the unit of the loaded values by the mapping whose
+  // slope and intercept equal the Pixel Value Transformation the reader
+  // applied, so the cases below vary that relation as much as the codes.
 
   void EnhancedPET_BqMl_ClassifiesAsActivityConcentration()
   {
     auto img = MakeEnhancedImage(4, "Bq/ml", {"1.0", "1.0", "1.0", "1.0"});
 
-    const auto m = mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                  mitk::DICOMReadPolicy::Lenient);
+    const auto m = ClassifyEnhanced(img);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
   }
 
@@ -546,81 +606,161 @@ public:
   {
     auto img = MakeEnhancedImage(4, "g/ml{SUVbw}", {"1.0", "1.0", "1.0", "1.0"});
 
-    const auto m = mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                  mitk::DICOMReadPolicy::Lenient);
+    const auto m = ClassifyEnhanced(img);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
     CPPUNIT_ASSERT(mitk::SUVVariant::BW == m.sourceVariant);
   }
 
   void EnhancedPET_UniformPerFrameRescale_Accepted()
   {
-    // The guard must detect variation, not the mere existence of per-frame
-    // values -- otherwise it degenerates into "refuse all Enhanced PET".
     auto img = MakeEnhancedImage(4, "Bq/ml", {"4.0", "4.0", "4.0", "4.0"});
 
-    CPPUNIT_ASSERT_NO_THROW(mitk::ClassifyEnhancedPETInput(
-      img.GetPointer(), mitk::DICOMReadPolicy::Lenient));
+    CPPUNIT_ASSERT_NO_THROW(ClassifyEnhanced(img));
   }
 
   void EnhancedPET_RescaleWrittenTwoWays_Accepted()
   {
     // "4" and "4.0" are the same slope written in two VRs -- DS through the
     // Pixel Value Transformation Sequence, FD through the Real World Value
-    // Mapping Sequence. Comparing the strings would report variation on a
-    // perfectly uniform object.
-    auto img = MakeEnhancedImage(3, "Bq/ml", {"4", "4.0", "4.00"});
+    // Mapping Sequence. Comparing the strings would find no mapping that
+    // equals the applied transformation.
+    auto img = MakeEnhancedImage(2, "", {"4.0", "4.00"});
+    SetMapping(img, 0, 0, {"Bq/ml", "4", "0"});
+    SetMapping(img, 1, 0, {"Bq/ml", "4", "0.0"});
 
-    CPPUNIT_ASSERT_NO_THROW(mitk::ClassifyEnhancedPETInput(
-      img.GetPointer(), mitk::DICOMReadPolicy::Lenient));
+    CPPUNIT_ASSERT_NO_THROW(ClassifyEnhanced(img));
   }
 
-  void EnhancedPET_VaryingPerFrameRescale_Refuses()
+  void EnhancedPET_VaryingPerFrameRescale_Accepted()
   {
+    // The reader applies each frame's own transformation, so a slope that
+    // differs between frames is an ordinary input (DRO_7_1_0).
     auto img = MakeEnhancedImage(4, "Bq/ml", {"4.0", "4.0", "3.0", "4.0"});
 
-    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                        mitk::DICOMReadPolicy::Lenient),
-                         mitk::EnhancedPETPerFrameVariationException);
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
   }
 
-  void EnhancedPET_FewerRescaleValuesThanFrames_Refuses()
+  void EnhancedPET_FramesUnresolvedByReader_Refuses()
   {
-    // A path that resolves to fewer values than the object has frames has
-    // not observed the per-frame values; concluding "uniform" would be an
-    // accident. This is the failure mode a mis-specified or unregistered
-    // tag path produces, and it must not read as success.
-    auto img = MakeEnhancedImage(4, "Bq/ml", {"4.0", "4.0"});
+    // A multi-frame object whose functional groups the reader could not map
+    // to frames publishes none of their attributes. That is the one case
+    // where the per-frame values exist and MITK cannot resolve them per
+    // slice, and it must not read as "the unit is absent".
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    SetDicomTag(img, 0x0028, 0x0008, "4");
 
-    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                        mitk::DICOMReadPolicy::Lenient),
-                         mitk::EnhancedPETPerFrameVariationException);
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::EnhancedPETPerFrameVariationException);
+  }
+
+  void EnhancedPET_SingleFrameObject_Accepted()
+  {
+    auto img = MakeImage();
+    SetDicomTag(img, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    SetPixelValueTransformation(img, 0, "2.5");
+    SetMapping(img, 0, 0, {"Bq/ml", "2.5", "0"});
+
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+  }
+
+  void EnhancedPET_UnitMissingOnOneFrame_Throws()
+  {
+    // The reader publishes functional-group values all or nothing per file,
+    // so a frame without a mapping while others carry one is the input's
+    // doing: an absent attribute, named by slice.
+    auto img = MakeEnhancedImage(4, "", {"1.0", "1.0", "1.0", "1.0"});
+    for (unsigned int f = 0; f < 3; ++f)
+    {
+      SetMapping(img, f, 0, {"Bq/ml", "1.0", "0"});
+    }
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::MissingDICOMPropertyException);
+  }
+
+  void EnhancedPET_UnmappedUnitOnOneFrame_Throws()
+  {
+    auto img = MakeEnhancedImage(4, "Bq/ml", {"1.0", "1.0", "1.0", "1.0"});
+    SetMapping(img, 3, 0, {"counts", "", ""});
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::UnsupportedPETUnitsException);
   }
 
   void EnhancedPET_UnitDiffersBetweenFrames_Refuses()
   {
     auto img = MakeEnhancedImage(2, "Bq/ml", {"1.0", "1.0"});
-    // Overwrite the second frame's unit so the two disagree.
-    SetProperty(img.GetPointer(),
-                mitk::DICOMTagPathToPropertyName(
-                  mitk::DICOMTagPath()
-                    .AddSelection(0x5200, 0x9230, 1)
-                    .AddSelection(0x0040, 0x9096, 0)
-                    .AddSelection(0x0040, 0x08EA, 0)
-                    .AddElement(0x0008, 0x0100)),
-                "g/ml{SUVbw}");
+    // The second frame's mapping equals the transformation too, so it is
+    // usable; it just names another unit.
+    SetMapping(img, 1, 0, {"g/ml{SUVbw}", "", ""});
 
-    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                        mitk::DICOMReadPolicy::Lenient),
-                         mitk::EnhancedPETPerFrameVariationException);
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::EnhancedPETPerFrameVariationException);
+  }
+
+  void EnhancedPET_SeveralMappings_RanksAmongConsistentItems()
+  {
+    // Two mappings of the same stored values: Bq/ml equal to the applied
+    // transformation, and SUVbw with the pair the mapping to SUV would need.
+    // The manual ranks SUVbw first, but only the Bq/ml mapping describes
+    // the loaded buffer, so ranking must apply among the consistent items.
+    auto img = MakeEnhancedImage(2, "Bq/ml", {"1.0", "1.0"});
+    for (unsigned int f = 0; f < 2; ++f)
+    {
+      SetMapping(img, f, 1, {"g/ml{SUVbw}", "0.1", "0"});
+    }
+
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+  }
+
+  void EnhancedPET_SeveralMappings_ConsistentSUVbwItemWins()
+  {
+    // The mirror image: the SUVbw mapping equals the applied transformation
+    // and the Bq/ml one does not, so the loaded values are SUVbw.
+    auto img = MakeEnhancedImage(2, "", {"0.1", "0.1"});
+    for (unsigned int f = 0; f < 2; ++f)
+    {
+      SetMapping(img, f, 0, {"Bq/ml", "1.0", "0"});
+      SetMapping(img, f, 1, {"g/ml{SUVbw}", "0.1", "0"});
+    }
+
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
+    CPPUNIT_ASSERT(mitk::SUVVariant::BW == m.sourceVariant);
+  }
+
+  void EnhancedPET_NoMappingDescribesLoadedPixels_Refuses()
+  {
+    // The standard-conformant layout: an identity transformation and the
+    // real mapping in the Real World Value Mapping. MITK does not apply the
+    // mapping, so the loaded values are in no unit the object declares.
+    auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
+    for (unsigned int f = 0; f < 2; ++f)
+    {
+      SetMapping(img, f, 0, {"Bq/ml", "4.0", "0"});
+    }
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::EnhancedPETMappingNotAppliedException);
+  }
+
+  void EnhancedPET_LutMappingIsNoCandidate_Refuses()
+  {
+    // A mapping without slope and intercept carries a Real World Value LUT,
+    // which nothing here applies.
+    auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
+    for (unsigned int f = 0; f < 2; ++f)
+    {
+      SetMapping(img, f, 0, {"Bq/ml", "", ""});
+    }
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::EnhancedPETMappingNotAppliedException);
   }
 
   void EnhancedPET_NoUsableUnit_Throws()
   {
     auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
 
-    CPPUNIT_ASSERT_THROW(mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                        mitk::DICOMReadPolicy::Lenient),
-                         mitk::MissingDICOMPropertyException);
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::MissingDICOMPropertyException);
   }
 
   void EnhancedPET_RescaleTypeFallback_Accepted()
@@ -629,11 +769,19 @@ public:
     // pipeline converts. The manual marks this a fallback because Rescale
     // Type is supposed to be "US" for PET.
     auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
-    SetProperty(img.GetPointer(), PerFrameName(0, 0x0028, 0x9145, 0, 0x0028, 0x1054), "BQML");
+    SetRescaleType(img, 0, "BQML");
+    SetRescaleType(img, 1, "BQML");
 
-    const auto m = mitk::ClassifyEnhancedPETInput(img.GetPointer(),
-                                                  mitk::DICOMReadPolicy::Lenient);
+    const auto m = ClassifyEnhanced(img);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+  }
+
+  void EnhancedPET_RescaleTypeMissingOnOneFrame_Throws()
+  {
+    auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
+    SetRescaleType(img, 0, "BQML");
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::MissingDICOMPropertyException);
   }
 
   void IsEnhancedPETInput_OnlyForTheEnhancedSOPClass()

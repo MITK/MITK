@@ -172,12 +172,18 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit12_MissingPhilipsScale
                                  DRO_error_2_6 12)
 
-  # 13 says "this file needs per-frame support MITK does not have", which a
-  # caller must be able to tell from "this file is broken". Both Enhanced PET
-  # cases are pinned because they refuse through different attributes: the
-  # per-frame rescale and the per-frame frame reference datetime.
-  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit13_PerFrameRescale
-                                 DRO_7_1_0 13)
-  _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit13_PerFrameFrameTime
-                                 DRO_7_3_1 13)
+  # The two Enhanced PET objects whose per-frame values vary, computed end
+  # to end. A refusal would mean the reader's frame model is not reaching
+  # the pipeline; a "rooted in a functional-group sequence" warning would
+  # mean the PET tags of interest are registered in a shape the reader no
+  # longer resolves. The values themselves are pinned in-process by
+  # mitkPETIBSIBenchmarkTest. Exit codes 13 and 14 have no DRO and are
+  # pinned by exception type in the unit tests.
+  foreach(_dro DRO_7_1_0 DRO_7_3_1)
+    if(EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/${_dro}/PT")
+      _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_EnhancedPerFrame_${_dro} 0
+        "--input;${MITK_PET_IBSI_DATA_DIR}/DRO/${_dro}/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_${_dro}_out.nrrd;--variant;bw"
+        REJECT_OUTPUT "rooted in a functional-group sequence")
+    endif()
+  endforeach()
 endif()

@@ -16,7 +16,9 @@ found in the LICENSE file.
 #include <cstdlib>
 #include <map>
 #include <optional>
+#include <set>
 #include <string>
+#include <utility>
 #include <vector>
 #include <mitkBaseProperty.h>
 #include <mitkDICOMProperty.h>
@@ -178,56 +180,6 @@ namespace
 
 namespace
 {
-  // Values of every property matching a wildcard tag path, in item order.
-  // An Enhanced PET per-frame path yields one entry per frame, because each
-  // finding keeps its sequence item index in the property name.
-  std::vector<std::string> CollectPathValues(const mitk::IPropertyProvider* provider,
-                                             const mitk::DICOMTagPath& path)
-  {
-    std::vector<std::string> values;
-    for (const auto& match : mitk::GetPropertyByDICOMTagPath(provider, path))
-    {
-      if (match.second.IsNotNull())
-      {
-        values.push_back(match.second->GetValueAsString());
-      }
-    }
-    return values;
-  }
-
-  unsigned int ReadNumberOfFrames(const mitk::IPropertyProvider* provider)
-  {
-    const std::string raw = TrimAndUpper(ReadDICOMString(provider, mitk::DICOMTagPath(0x0028, 0x0008)));
-    if (raw.empty())
-    {
-      return 1u;
-    }
-    try
-    {
-      const int frames = std::stoi(raw);
-      return (frames > 0) ? static_cast<unsigned int>(frames) : 1u;
-    }
-    catch (const std::exception&)
-    {
-      return 1u;
-    }
-  }
-
-  // A per-frame numeric attribute reduced to the single value the whole
-  // volume can be given, or a refusal.
-  //
-  // Two failure modes, and the second is the subtle one. The values may
-  // genuinely differ between frames, which MITK cannot represent. Or the
-  // path may resolve to fewer values than there are frames -- an
-  // unregistered or mis-specified path yields none at all -- in which case
-  // concluding "uniform" would be an accident rather than an observation.
-  // Both refuse.
-  //
-  // Comparison is numeric on purpose: the same slope reads as "4.0" through
-  // the Pixel Value Transformation Sequence (a DS) and "4" through the Real
-  // World Value Mapping Sequence (an FD), so comparing strings would report
-  // variation on a perfectly uniform object.
-
   // One RWVM item's unit, resolved onto the (semantics, variant) model the
   // rest of the pipeline speaks.
   struct EnhancedUnit
@@ -273,10 +225,10 @@ namespace
     return std::nullopt;
   }
 
-  // Outer sequence item index of a resolved property path, i.e. which
-  // functional-group item a finding came from. -1 when the path carries no
-  // item selection (the shared group read as a plain path).
-  int FunctionalGroupItemIndex(const std::string& propertyName)
+  // Index of the first sequence item a property name selects: for a Real
+  // World Value Mapping attribute, which mapping item it belongs to. -1 when
+  // the name selects no item.
+  int MappingItemIndex(const std::string& propertyName)
   {
     const auto path = mitk::PropertyNameToDICOMTagPath(propertyName);
     for (mitk::DICOMTagPath::PathIndexType i = 0; i < path.Size(); ++i)
@@ -290,94 +242,266 @@ namespace
     return -1;
   }
 
-  // The unit each frame resolves to, keyed by functional-group item index.
-  // Within one frame several Real World Value Mappings may be offered, and
-  // the manual ranks them; across frames they must agree, because MITK
-  // cannot carry a per-frame unit.
-  std::map<int, EnhancedUnit> CollectPerFrameUnits(const mitk::IPropertyProvider* provider,
-                                                   const mitk::DICOMTagPath& groupsRoot)
+  using Slot = std::pair<mitk::TimeStepType, mitk::DICOMProperty::IndexValueType>;
+
+  // The reader publishes a functional-group attribute with one value per
+  // slice. A property that is not slice-resolved carries one value for the
+  // whole image and answers with it at every slot.
+  std::string ValueAt(const mitk::BaseProperty* property, const Slot& slot)
   {
-    std::map<int, EnhancedUnit> byFrame;
-
-    mitk::DICOMTagPath unitsCode(groupsRoot);
-    unitsCode.AddAnySelection(0x0040, 0x9096);
-    unitsCode.AddAnySelection(0x0040, 0x08EA);
-
-    // The manual allows the code in Code Value, Long Code Value or URN Code
-    // Value; whichever is present carries the same meaning.
-    for (const auto element : { 0x0100u, 0x0119u, 0x0120u })
+    const auto* sliced = dynamic_cast<const mitk::DICOMProperty*>(property);
+    if (nullptr != sliced)
     {
-      const auto matches =
-        mitk::GetPropertyByDICOMTagPath(provider, mitk::DICOMTagPath(unitsCode).AddElement(0x0008, element));
-      for (const auto& match : matches)
-      {
-        if (match.second.IsNull())
-        {
-          continue;
-        }
-        const auto unit = MapUcumUnitCode(match.second->GetValueAsString());
-        if (!unit.has_value())
-        {
-          continue;
-        }
-        const int frame = FunctionalGroupItemIndex(match.first);
-        const auto existing = byFrame.find(frame);
-        if (existing == byFrame.end() || unit->priority < existing->second.priority)
-        {
-          byFrame[frame] = unit.value();
-        }
-      }
+      return sliced->GetValue(slot.first, slot.second, false, false);
     }
-
-    return byFrame;
+    return property->GetValueAsString();
   }
 
-  std::optional<double> UniformPerFrameNumber(const mitk::IPropertyProvider* provider,
-                                              const mitk::DICOMTagPath& path,
-                                              const std::string& label,
-                                              unsigned int frameCount)
+  void AddSlotsOf(const mitk::BaseProperty* property, std::set<Slot>& slots)
   {
-    const auto raw = CollectPathValues(provider, path);
-    if (raw.empty())
+    const auto* sliced = dynamic_cast<const mitk::DICOMProperty*>(property);
+    if (nullptr == sliced)
     {
-      return std::nullopt;
+      slots.insert(Slot(0, 0));
+      return;
     }
-
-    if (frameCount > 1u && raw.size() < frameCount)
+    for (const auto t : sliced->GetAvailableTimeSteps())
     {
-      mitkThrowException(mitk::EnhancedPETPerFrameVariationException)
-        << "Only " << raw.size() << " value(s) of " << label << " are visible "
-           "for an object with " << frameCount << " frames, so the per-frame "
-           "values cannot be checked for agreement. Refusing rather than "
-           "assuming they agree.";
+      for (const auto z : sliced->GetAvailableSlices(t))
+      {
+        slots.insert(Slot(t, z));
+      }
     }
+  }
 
-    double common = 0.0;
-    bool haveCommon = false;
-    for (const auto& value : raw)
+  mitk::BaseProperty::ConstPointer FirstMatch(const mitk::IPropertyProvider* provider,
+                                              const mitk::DICOMTagPath& path)
+  {
+    const auto matches = mitk::GetPropertyByDICOMTagPath(provider, path);
+    return matches.empty() ? mitk::BaseProperty::ConstPointer() : matches.begin()->second;
+  }
+
+  // Attribute of a single-item functional-group macro, with the macro's one
+  // item named explicitly: the reader publishes the item index, and a lookup
+  // answers from its first match, so a wildcard would only be safe by luck.
+  mitk::DICOMTagPath MacroAttribute(unsigned int macroGroup, unsigned int macroElement,
+                                    unsigned int group, unsigned int element)
+  {
+    mitk::DICOMTagPath path;
+    path.AddSelection(macroGroup, macroElement, 0);
+    return path.AddElement(group, element);
+  }
+
+  // The same slope reads as "4.0" through the Pixel Value Transformation
+  // Sequence (a DS) and "4" through the Real World Value Mapping Sequence
+  // (an FD), so the pairs are compared as numbers.
+  bool NearlyEqual(double a, double b)
+  {
+    return std::fabs(a - b) <= 1e-9 * std::max(std::fabs(a), std::fabs(b));
+  }
+
+  std::string Describe(const Slot& slot)
+  {
+    return "timestep " + std::to_string(slot.first) + " slice " + std::to_string(slot.second);
+  }
+
+  // One Real World Value Mapping item's unit-code property.
+  struct MappingCode
+  {
+    int                              item = -1;
+    mitk::BaseProperty::ConstPointer property;
+  };
+
+  // What one slot's mappings say about the unit of the loaded pixel values.
+  struct SlotUnit
+  {
+    Slot                        slot;
+    bool                        anyMapping = false;
+    // The best-ranked unit among the mappings whose slope and intercept
+    // equal the Pixel Value Transformation the reader applied at this slot.
+    std::optional<EnhancedUnit> unit;
+    std::vector<std::string>    unknownCodes;
+    std::vector<std::string>    unusableMappings;
+    std::string                 appliedPair;
+  };
+
+  // Resolve one slot. The pipeline never applies a Real World Value Mapping;
+  // the loaded values are the stored ones through the Pixel Value
+  // Transformation, so a mapping describes them only when its pair equals
+  // that transformation. Consistency therefore gates the manual's ranking
+  // rather than following it: a Bq/ml mapping equal to the transformation
+  // beside a g/ml{SUVbw} mapping that is not are two descriptions of the
+  // same stored values, and only the first describes the loaded buffer.
+  SlotUnit ResolveSlotUnit(const Slot& slot,
+                           const std::vector<MappingCode>& codes,
+                           const std::map<int, mitk::BaseProperty::ConstPointer>& mappingSlopes,
+                           const std::map<int, mitk::BaseProperty::ConstPointer>& mappingIntercepts,
+                           const mitk::BaseProperty* appliedSlope,
+                           const mitk::BaseProperty* appliedIntercept)
+  {
+    SlotUnit result;
+    result.slot = slot;
+
+    // The reader applies the Pixel Value Transformation of the frame; where
+    // the macro is absent it applied nothing, i.e. slope 1 and intercept 0.
+    double pvtSlope = 1.0;
+    double pvtIntercept = 0.0;
+    const std::string rawSlope = (nullptr != appliedSlope) ? TrimAscii(ValueAt(appliedSlope, slot)) : "";
+    const std::string rawIntercept =
+      (nullptr != appliedIntercept) ? TrimAscii(ValueAt(appliedIntercept, slot)) : "";
+    if (!rawSlope.empty() && !ParseFiniteDouble(rawSlope, pvtSlope))
     {
-      double parsed = 0.0;
-      if (!ParseFiniteDouble(value, parsed))
+      mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+        << "(0028,1053) Rescale Slope '" << rawSlope << "' at " << Describe(slot)
+        << " is not a finite number.";
+    }
+    if (!rawIntercept.empty() && !ParseFiniteDouble(rawIntercept, pvtIntercept))
+    {
+      mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+        << "(0028,1052) Rescale Intercept '" << rawIntercept << "' at " << Describe(slot)
+        << " is not a finite number.";
+    }
+    result.appliedPair = (rawSlope.empty() ? "1" : rawSlope) + "/" + (rawIntercept.empty() ? "0" : rawIntercept);
+
+    for (const auto& code : codes)
+    {
+      const std::string rawCode = TrimAscii(ValueAt(code.property, slot));
+      if (rawCode.empty())
       {
         continue;
       }
-      if (!haveCommon)
+      result.anyMapping = true;
+
+      const auto unit = MapUcumUnitCode(rawCode);
+      if (!unit.has_value())
       {
-        common = parsed;
-        haveCommon = true;
+        result.unknownCodes.push_back(rawCode);
+        continue;
       }
-      else if (std::fabs(parsed - common) > 1e-9 * std::max(std::fabs(parsed), std::fabs(common)))
+
+      // A mapping without slope and intercept carries a Real World Value LUT
+      // instead, which nothing here applies.
+      const auto slopeIt = mappingSlopes.find(code.item);
+      const auto interceptIt = mappingIntercepts.find(code.item);
+      const std::string mappingSlope =
+        (slopeIt != mappingSlopes.end()) ? TrimAscii(ValueAt(slopeIt->second, slot)) : "";
+      const std::string mappingIntercept =
+        (interceptIt != mappingIntercepts.end()) ? TrimAscii(ValueAt(interceptIt->second, slot)) : "";
+      double slope = 0.0;
+      double intercept = 0.0;
+      if (mappingSlope.empty() || mappingIntercept.empty() ||
+          !ParseFiniteDouble(mappingSlope, slope) || !ParseFiniteDouble(mappingIntercept, intercept))
+      {
+        result.unusableMappings.push_back(rawCode + " (no slope/intercept)");
+        continue;
+      }
+      if (!NearlyEqual(slope, pvtSlope) || !NearlyEqual(intercept, pvtIntercept))
+      {
+        result.unusableMappings.push_back(rawCode + " (" + mappingSlope + "/" + mappingIntercept + ")");
+        continue;
+      }
+
+      if (!result.unit.has_value() || unit->priority < result.unit->priority)
+      {
+        result.unit = unit;
+      }
+    }
+    return result;
+  }
+
+  mitk::SUVInputModel ModelForUnit(const EnhancedUnit& unit)
+  {
+    mitk::SUVInputModel model;
+    model.semantics = unit.semantics;
+    if (mitk::SUVPixelSemantics::PrenormalizedSUV == unit.semantics)
+    {
+      model.sourceVariant = unit.variant;
+      model.prenormScale = 1.0;
+    }
+    else
+    {
+      model.activityScale = 1.0;
+    }
+    return model;
+  }
+
+  std::string Join(const std::vector<std::string>& parts)
+  {
+    std::string joined;
+    for (const auto& part : parts)
+    {
+      joined += (joined.empty() ? "" : ", ") + part;
+    }
+    return joined;
+  }
+
+  // The manual marks Rescale Type a fallback because it is supposed to be
+  // "US" for PET, so a unit hiding there is a departure from the standard
+  // rather than the intended place to look.
+  mitk::SUVInputModel ClassifyByRescaleType(const mitk::IPropertyProvider* provider,
+                                            const mitk::BaseProperty* rescaleType,
+                                            const std::set<Slot>& slots)
+  {
+    if (nullptr == rescaleType)
+    {
+      mitkThrowException(mitk::MissingDICOMPropertyException)
+        << "Enhanced PET: the pixel unit could not be determined. Neither the "
+           "Measurement Units Code Sequence (0040,08EA) inside the Real World "
+           "Value Mapping Sequence nor (0028,1054) Rescale Type yielded a unit "
+           "the SUV pipeline converts.";
+    }
+
+    std::string common;
+    for (const auto& slot : slots)
+    {
+      const std::string units = TrimAndUpper(ValueAt(rescaleType, slot));
+      if (units.empty())
+      {
+        mitkThrowException(mitk::MissingDICOMPropertyException)
+          << "Enhanced PET: (0028,1054) Rescale Type is absent at " << Describe(slot)
+          << " while other frames carry it.";
+      }
+      if (common.empty())
+      {
+        common = units;
+      }
+      else if (units != common)
       {
         mitkThrowException(mitk::EnhancedPETPerFrameVariationException)
-          << label << " differs between frames (" << common << " vs " << parsed
-          << "). MITK's DICOM reader models one frame per file, so a "
-             "multi-frame object collapses to a single value per attribute "
-             "and this one would be applied to the whole volume. The input is "
-             "correct; MITK cannot represent it yet.";
+          << "(0028,1054) Rescale Type names different units for different "
+             "frames (" << common << " vs " << units << " at " << Describe(slot)
+          << "). MITK carries one unit per image, so the input cannot be "
+             "represented; it is not malformed.";
       }
     }
 
-    return haveCommon ? std::optional<double>(common) : std::nullopt;
+    mitk::SUVInputModel model;
+    if ("BQML" == common)
+    {
+      model.semantics = mitk::SUVPixelSemantics::ActivityConcentration;
+      model.activityScale = 1.0;
+      return model;
+    }
+    if ("GML" == common)
+    {
+      const auto suvType = ParseSUVTypeProperty(provider);
+      model.semantics = mitk::SUVPixelSemantics::PrenormalizedSUV;
+      model.sourceVariant = suvType.value_or(mitk::SUVVariant::BW);
+      model.prenormScale = 1.0;
+      return model;
+    }
+    if ("CM2ML" == common)
+    {
+      model.semantics = mitk::SUVPixelSemantics::PrenormalizedSUV;
+      model.sourceVariant = mitk::SUVVariant::BSA;
+      model.prenormScale = 1.0;
+      return model;
+    }
+
+    mitkThrowException(mitk::UnsupportedPETUnitsException)
+      << "Enhanced PET: no usable Measurement Units Code Sequence, and "
+         "(0028,1054) Rescale Type = '" << common << "' is not one of "
+         "BQML, GML, CM2ML.";
   }
 }
 
@@ -520,130 +644,125 @@ mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const IPropertyProvider *prov
     mitkThrow() << "ClassifyEnhancedPETInput: provider is null.";
   }
 
-  const unsigned int frameCount = ReadNumberOfFrames(provider);
+  RequireEnhancedPETFramesResolved(provider);
 
-  DICOMTagPath sharedGroups;
-  sharedGroups.AddAnySelection(0x5200, 0x9229);
-  DICOMTagPath perFrameGroups;
-  perFrameGroups.AddAnySelection(0x5200, 0x9230);
-
-  // ---- The rescale must be the same for every frame ----------------------
+  // ---- The mappings and the transformation, as the reader published them --
   //
-  // Not because the pipeline uses it -- GDCM has already applied it to the
-  // pixel buffer by the time the filter sees the image -- but because GDCM
-  // applies exactly one slope to the whole buffer. Where the frames disagree,
-  // the loaded values are wrong for every frame but one, and nothing
-  // downstream can tell. Checking here is the only place the disagreement is
-  // still visible.
-  const auto requireUniform = [&](unsigned int innerGroup, unsigned int innerElement,
-                                  unsigned int leafGroup, unsigned int leafElement,
-                                  const std::string &label)
+  // One property per Real World Value Mapping item and code element, each
+  // with a value per slice. The manual allows the code in Code Value, Long
+  // Code Value or URN Code Value; whichever is present carries the same
+  // meaning.
+  std::vector<MappingCode> codes;
+  DICOMTagPath unitsCode;
+  unitsCode.AddAnySelection(0x0040, 0x9096).AddAnySelection(0x0040, 0x08EA);
+  for (const auto element : { 0x0100u, 0x0119u, 0x0120u })
   {
-    DICOMTagPath perFrame(perFrameGroups);
-    perFrame.AddAnySelection(innerGroup, innerElement);
-    perFrame.AddElement(leafGroup, leafElement);
-    if (UniformPerFrameNumber(provider, perFrame, label, frameCount).has_value())
+    for (const auto& match :
+         GetPropertyByDICOMTagPath(provider, DICOMTagPath(unitsCode).AddElement(0x0008, element)))
     {
-      return;
-    }
-    // Absent per frame: a value in the shared group applies to every frame
-    // by definition and cannot disagree with itself.
-    DICOMTagPath shared(sharedGroups);
-    shared.AddAnySelection(innerGroup, innerElement);
-    shared.AddElement(leafGroup, leafElement);
-    (void)UniformPerFrameNumber(provider, shared, label, 1u);
-  };
-
-  requireUniform(0x0028, 0x9145, 0x0028, 0x1053, "(0028,1053) Rescale Slope");
-  requireUniform(0x0028, 0x9145, 0x0028, 0x1052, "(0028,1052) Rescale Intercept");
-  requireUniform(0x0040, 0x9096, 0x0040, 0x9225, "(0040,9225) Real World Value Slope");
-  requireUniform(0x0040, 0x9096, 0x0040, 0x9224, "(0040,9224) Real World Value Intercept");
-
-  SUVInputModel model;
-
-  // ---- Unit, from the Measurement Units Code Sequence --------------------
-  auto unitsByFrame = CollectPerFrameUnits(provider, perFrameGroups);
-  if (unitsByFrame.empty())
-  {
-    unitsByFrame = CollectPerFrameUnits(provider, sharedGroups);
-  }
-
-  if (!unitsByFrame.empty())
-  {
-    const EnhancedUnit chosen = unitsByFrame.begin()->second;
-    for (const auto &entry : unitsByFrame)
-    {
-      if (!(entry.second == chosen))
+      if (match.second.IsNotNull())
       {
-        mitkThrowException(EnhancedPETPerFrameVariationException)
-          << "The Measurement Units Code Sequence names different units for "
-             "different frames. MITK carries one unit per image, so the input "
-             "cannot be represented; it is not malformed.";
+        codes.push_back({MappingItemIndex(match.first), match.second});
       }
     }
+  }
 
-    model.semantics = chosen.semantics;
-    if (SUVPixelSemantics::PrenormalizedSUV == chosen.semantics)
+  std::map<int, BaseProperty::ConstPointer> mappingSlopes;
+  std::map<int, BaseProperty::ConstPointer> mappingIntercepts;
+  DICOMTagPath mapping;
+  mapping.AddAnySelection(0x0040, 0x9096);
+  for (const auto& match : GetPropertyByDICOMTagPath(provider, DICOMTagPath(mapping).AddElement(0x0040, 0x9225)))
+  {
+    mappingSlopes[MappingItemIndex(match.first)] = match.second;
+  }
+  for (const auto& match : GetPropertyByDICOMTagPath(provider, DICOMTagPath(mapping).AddElement(0x0040, 0x9224)))
+  {
+    mappingIntercepts[MappingItemIndex(match.first)] = match.second;
+  }
+
+  const auto appliedSlope     = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1053));
+  const auto appliedIntercept = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1052));
+  const auto rescaleType      = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1054));
+
+  // The slots the object has are wherever any of its functional-group
+  // attributes carries a value. Number of Frames is not consulted: several
+  // single-frame Enhanced files stacked into one volume have one slot per
+  // file and no frame count that describes the volume.
+  std::set<Slot> slots;
+  for (const auto& code : codes)
+  {
+    AddSlotsOf(code.property, slots);
+  }
+  for (const auto& entry : mappingSlopes)
+  {
+    AddSlotsOf(entry.second, slots);
+  }
+  for (const auto& entry : mappingIntercepts)
+  {
+    AddSlotsOf(entry.second, slots);
+  }
+  for (const auto* property : { appliedSlope.GetPointer(), appliedIntercept.GetPointer(), rescaleType.GetPointer() })
+  {
+    if (nullptr != property)
     {
-      model.sourceVariant = chosen.variant;
-      model.prenormScale = 1.0;
+      AddSlotsOf(property, slots);
     }
-    else
+  }
+
+  // ---- Per slot, then across slots ----------------------------------------
+  std::vector<SlotUnit> resolved;
+  for (const auto& slot : slots)
+  {
+    resolved.push_back(ResolveSlotUnit(slot, codes, mappingSlopes, mappingIntercepts,
+                                       appliedSlope.GetPointer(), appliedIntercept.GetPointer()));
+  }
+
+  const bool anyMapping =
+    std::any_of(resolved.cbegin(), resolved.cend(), [](const SlotUnit& s) { return s.anyMapping; });
+  if (!anyMapping)
+  {
+    return ClassifyByRescaleType(provider, rescaleType.GetPointer(), slots);
+  }
+
+  for (const auto& slotUnit : resolved)
+  {
+    if (!slotUnit.anyMapping)
     {
-      model.activityScale = 1.0;
+      mitkThrowException(MissingDICOMPropertyException)
+        << "Enhanced PET: no Real World Value Mapping at " << Describe(slotUnit.slot)
+        << ", while other frames carry one.";
     }
-    return model;
+    if (slotUnit.unit.has_value())
+    {
+      continue;
+    }
+    if (slotUnit.unusableMappings.empty())
+    {
+      mitkThrowException(UnsupportedPETUnitsException)
+        << "Enhanced PET: the Measurement Units Code Sequence at " << Describe(slotUnit.slot)
+        << " names only units the SUV pipeline cannot convert: " << Join(slotUnit.unknownCodes)
+        << ". Supported: Bq/ml, g/ml{SUVbw}, g/ml{SUVlbm}, g/ml{SUVlbm(janma)}, "
+           "g/ml{SUVlbm(james128)}, g/ml{SUVibw}, cm2/ml{SUVbsa}.";
+    }
+    mitkThrowException(EnhancedPETMappingNotAppliedException)
+      << "Enhanced PET: no Real World Value Mapping describes the pixel values "
+         "as loaded at " << Describe(slotUnit.slot) << ". The reader applied the "
+         "Pixel Value Transformation " << slotUnit.appliedPair << " (slope/intercept) "
+         "and MITK does not apply the mapping, so a mapping is usable only when "
+         "its slope and intercept equal that pair. Offered: "
+      << Join(slotUnit.unusableMappings) << ".";
   }
 
-  // ---- Fallback: Rescale Type from the Pixel Value Transformation --------
-  //
-  // The manual marks this a fallback because Rescale Type is supposed to be
-  // "US" for PET, so a unit hiding there is a departure from the standard
-  // rather than the intended place to look.
-  DICOMTagPath rescaleType(perFrameGroups);
-  rescaleType.AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1054);
-  std::string rawRescaleType = ReadDICOMString(provider, rescaleType);
-  if (rawRescaleType.empty())
+  const EnhancedUnit chosen = resolved.front().unit.value();
+  for (const auto& slotUnit : resolved)
   {
-    DICOMTagPath sharedRescaleType(sharedGroups);
-    sharedRescaleType.AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1054);
-    rawRescaleType = ReadDICOMString(provider, sharedRescaleType);
+    if (!(slotUnit.unit.value() == chosen))
+    {
+      mitkThrowException(EnhancedPETPerFrameVariationException)
+        << "The Measurement Units Code Sequence names different units for "
+           "different frames. MITK carries one unit per image, so the input "
+           "cannot be represented; it is not malformed.";
+    }
   }
-
-  const std::string units = TrimAndUpper(rawRescaleType);
-  if ("BQML" == units)
-  {
-    model.semantics = SUVPixelSemantics::ActivityConcentration;
-    model.activityScale = 1.0;
-    return model;
-  }
-  if ("GML" == units)
-  {
-    const auto suvType = ParseSUVTypeProperty(provider);
-    model.semantics = SUVPixelSemantics::PrenormalizedSUV;
-    model.sourceVariant = suvType.value_or(SUVVariant::BW);
-    model.prenormScale = 1.0;
-    return model;
-  }
-  if ("CM2ML" == units)
-  {
-    model.semantics = SUVPixelSemantics::PrenormalizedSUV;
-    model.sourceVariant = SUVVariant::BSA;
-    model.prenormScale = 1.0;
-    return model;
-  }
-
-  if (!units.empty())
-  {
-    mitkThrowException(UnsupportedPETUnitsException)
-      << "Enhanced PET: no usable Measurement Units Code Sequence, and "
-         "(0028,1054) Rescale Type = '" << rawRescaleType << "' is not one of "
-         "BQML, GML, CM2ML.";
-  }
-
-  mitkThrowException(MissingDICOMPropertyException)
-    << "Enhanced PET: the pixel unit could not be determined. Neither the "
-       "Measurement Units Code Sequence (0040,08EA) inside the Real World "
-       "Value Mapping Sequence nor (0028,1054) Rescale Type yielded a unit "
-       "the SUV pipeline converts.";
+  return ModelForUnit(chosen);
 }

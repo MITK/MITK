@@ -113,21 +113,18 @@ namespace mitk
    * attributes: no (0054,1001) Units, no (0028,1052/1053) Rescale. The unit
    * lives in the Measurement Units Code Sequence inside the Real World
    * Value Mapping Sequence inside the functional groups, and the rescale in
-   * the Pixel Value Transformation Sequence beside it. This reads those and
-   * produces the same \c SUVInputModel the classic classifier does, so the
-   * rest of the pipeline is unchanged.
+   * the Pixel Value Transformation Sequence beside it. The DICOM reader
+   * publishes both with one value per slice. This reads them and produces
+   * the same \c SUVInputModel the classic classifier does, so the rest of
+   * the pipeline is unchanged.
    *
-   * Pixel values arrive already rescaled -- GDCM applies the slope and
-   * intercept at read time, exactly as for classic PET -- so this names the
-   * unit and never re-applies a scale.
-   *
-   * \warning MITK's DICOM reader attaches one property set per file, so a
-   *          multi-frame object collapses each attribute to a single value.
-   *          Where the per-frame rescale differs between frames, the
-   *          collapsed value would be applied to the whole volume; this
-   *          refuses instead. It also refuses when it can see fewer values
-   *          than the object has frames, since a path that resolves to
-   *          nothing would otherwise read as uniform.
+   * Pixel values arrive with each frame's Pixel Value Transformation
+   * applied by the reader, and the Real World Value Mapping is not applied
+   * by anyone. So this names the unit of the loaded values by the mapping
+   * whose slope and intercept equal the applied transformation at every
+   * slice -- the manual's ranking (SUVbw, then any other SUV type, then
+   * activity concentration) applies among those mappings -- and never
+   * re-applies a scale.
    *
    * \param[in] provider Source of DICOM properties.
    * \param[in] policy   Currently informational, as for ClassifyPETInput.
@@ -136,12 +133,15 @@ namespace mitk
    * \pre \p provider is not null and is an Enhanced PET object
    *      (\c IsEnhancedPETInput).
    *
-   * \throw MissingDICOMPropertyException if no usable unit can be found.
-   * \throw UnsupportedPETUnitsException if the unit code is outside the
-   *        set the pipeline converts.
-   * \throw EnhancedPETPerFrameVariationException if the per-frame rescale
-   *        varies, or if fewer per-frame values are visible than the object
-   *        has frames.
+   * \throw MissingDICOMPropertyException if no usable unit can be found, or
+   *        if a slice lacks a mapping other slices carry.
+   * \throw UnsupportedPETUnitsException if a slice offers only unit codes
+   *        outside the set the pipeline converts.
+   * \throw EnhancedPETMappingNotAppliedException if no mapping of a slice
+   *        equals the transformation the reader applied there.
+   * \throw EnhancedPETPerFrameVariationException if the frames name
+   *        different units, or if the object is multi-frame and none of
+   *        its functional-group values reached MITK.
    */
   SUVInputModel MITKPET_EXPORT ClassifyEnhancedPETInput(const IPropertyProvider* provider,
                                                         DICOMReadPolicy          policy);

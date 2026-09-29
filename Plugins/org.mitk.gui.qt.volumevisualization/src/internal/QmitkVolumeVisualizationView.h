@@ -96,6 +96,16 @@ private:
    */
   void NodeRemoved(const mitk::DataNode *node) override;
 
+  /** \brief Follow the selected node's rendering flag when it is switched
+   *         elsewhere, such as in the Properties view.
+   *
+   * Only a flip of that flag refreshes the panel. This view's own controls
+   * write the node continuously while dragged, and a full refresh can write
+   * lighting values back to it, so reacting to every change would be both
+   * wasteful and self-triggering.
+   */
+  void NodeChanged(const mitk::DataNode *node) override;
+
   /** \brief The 3D render window of the current part, or nullptr when there is none. */
   QmitkRenderWindow *Get3DRenderWindow() const;
 
@@ -125,6 +135,14 @@ private:
    */
   bool MoveVolumesOntoLightingModel(const mitk::VolumeRenderingLightingModel &model);
 
+  /** \brief Give a node that records no lighting model the one for the rig the
+   *         3D window is on.
+   *
+   * A no-op for a node already on a model, so values tuned there by hand
+   * survive.
+   */
+  void EnsureLightingModel(mitk::DataNode *node);
+
   /** \brief Listen to the lighting menu of whichever part is current. */
   void ConnectLightingMode();
 
@@ -148,6 +166,12 @@ private:
 
   std::unique_ptr<Ui::QmitkVolumeVisualizationView> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+
+  /** The rendering state the panel was last built for, which is what
+   * NodeChanged compares the node against. The button carries no checked state
+   * to ask instead.
+   */
+  bool m_RenderingShownOn = false;
 
   /** Kept so that a part change can drop the old window's menu before taking up
    * the new one, rather than leaving this view listening to both.

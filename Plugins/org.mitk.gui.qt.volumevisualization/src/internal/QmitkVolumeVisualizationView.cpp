@@ -228,32 +228,36 @@ void QmitkVolumeVisualizationView::OnToggleRendering()
     // the mapper registers for every plugin. Each is a no-op if the node
     // already carries a choice made here.
     m_Controls->transferFunctionEditor->EnsureTransferFunction();
-
-    if (mitk::VolumeRenderingLightingModel::FromNode(selectedNode) == nullptr)
-    {
-      auto *renderWindow = this->Get3DRenderWindow();
-      auto *renderer = renderWindow != nullptr ? renderWindow->GetRenderer() : nullptr;
-
-      // The lighting the window is already on, which is how a second volume
-      // joins the first rather than relighting it, and how a rig chosen with
-      // nothing rendered yet is honored rather than overridden.
-      auto mode = renderer != nullptr
-        ? renderer->GetLightingMode()
-        : mitk::VtkPropRenderer::LightingMode::Studio;
-
-      // Except the renderer's default five-light kit: it is the flattest rig and
-      // the most expensive to shade a volume with, so a volume never starts
-      // there however long the window has been sitting on it.
-      if (mode == mitk::VtkPropRenderer::LightingMode::Studio)
-        mode = mitk::VtkPropRenderer::LightingMode::Headlight;
-
-      if (const auto *model = mitk::VolumeRenderingLightingModel::FromLightingMode(mode); model != nullptr)
-        model->ApplyTo(selectedNode);
-    }
+    this->EnsureLightingModel(selectedNode);
   }
 
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
+}
+
+void QmitkVolumeVisualizationView::EnsureLightingModel(mitk::DataNode *node)
+{
+  if (mitk::VolumeRenderingLightingModel::FromNode(node) != nullptr)
+    return;
+
+  auto *renderWindow = this->Get3DRenderWindow();
+  auto *renderer = renderWindow != nullptr ? renderWindow->GetRenderer() : nullptr;
+
+  // The lighting the window is already on, which is how a second volume
+  // joins the first rather than relighting it, and how a rig chosen with
+  // nothing rendered yet is honored rather than overridden.
+  auto mode = renderer != nullptr
+    ? renderer->GetLightingMode()
+    : mitk::VtkPropRenderer::LightingMode::Studio;
+
+  // Except the renderer's default five-light kit: it is the flattest rig and
+  // the most expensive to shade a volume with, so a volume never starts
+  // there however long the window has been sitting on it.
+  if (mode == mitk::VtkPropRenderer::LightingMode::Studio)
+    mode = mitk::VtkPropRenderer::LightingMode::Headlight;
+
+  if (const auto *model = mitk::VolumeRenderingLightingModel::FromLightingMode(mode); model != nullptr)
+    model->ApplyTo(node);
 }
 
 QmitkRenderWindow *QmitkVolumeVisualizationView::Get3DRenderWindow() const
@@ -441,8 +445,26 @@ void QmitkVolumeVisualizationView::NodeRemoved(const mitk::DataNode *node)
   QTimer::singleShot(0, this, [this]() { this->UpdateLightingRig(); });
 }
 
+void QmitkVolumeVisualizationView::NodeChanged(const mitk::DataNode *node)
+{
+  if (node != m_SelectedNode.Lock().GetPointer())
+    return;
+
+  if (IsVolumeRenderingOn(node) == m_RenderingShownOn)
+    return;
+
+  this->UpdateInterface();
+}
+
 void QmitkVolumeVisualizationView::OnTransferFunctionChanged()
 {
+  // A node switched on outside this view, such as in the Properties view, has
+  // skipped the setup OnToggleRendering does, and a function chosen here is the
+  // first deliberate step it takes in this view. Before the refresh, so that the
+  // rig is derived with the model already on the node.
+  if (auto selectedNode = m_SelectedNode.Lock(); IsVolumeRenderingOn(selectedNode.GetPointer()))
+    this->EnsureLightingModel(selectedNode);
+
   // A full refresh rather than a repaint: a preset brings the blend mode it was
   // authored for, and the lighting section is gated on that mode.
   this->UpdateInterface();
@@ -522,6 +544,7 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   // panel then asks for the one thing it needs instead of showing a page of
   // controls none of which can be used.
   const bool showVolumeSections = IsVolumeRenderingOn(selectedNode.GetPointer());
+  m_RenderingShownOn = showVolumeSections;
 
   m_Controls->transferFunctionEditor->setVisible(showVolumeSections);
   m_Controls->lightingExpandButton->setVisible(showVolumeSections);

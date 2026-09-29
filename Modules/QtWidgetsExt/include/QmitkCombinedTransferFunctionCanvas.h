@@ -43,7 +43,7 @@ found in the LICENSE file.
  * curve, the rail below it to the colors. A caller therefore has no mode to
  * offer and no mode to keep in step.
  *
- * \sa QmitkPiecewiseFunctionCanvas, QmitkColorTransferFunctionCanvas
+ * \sa QmitkPiecewiseFunctionCanvas
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public QmitkPiecewiseFunctionCanvas
 {
@@ -169,9 +169,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCombinedTransferFunctionCanvas : public Qmitk
      *        whichever function the gesture in progress concerns.
      *
      * The base drives every gesture through these, so overriding them is what
-     * lets one canvas edit two functions. The color function is not a
-     * QmitkColorTransferFunctionCanvas here - a widget has one base class, and
-     * this one's is the opacity canvas - so the color half is spelled out.
+     * lets one canvas edit two functions. The base class knows only the opacity
+     * function, so the color half is spelled out here.
      */
     int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 100) override;
     int AddFunctionPoint(double x, double val) override;

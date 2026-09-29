@@ -7,9 +7,7 @@ set(CPP_FILES
   QmitkCallbackFromGUIThread.cpp
   QmitkColorPropertyEditor.cpp
   QmitkColorPropertyView.cpp
-  QmitkColorTransferFunctionCanvas.cpp
   QmitkCombinedTransferFunctionCanvas.cpp
-  QmitkCrossWidget.cpp
   QmitkEditPointDialog.cpp
   QmitkEnumerationPropertyWidget.cpp
   QmitkFileChooser.cpp
@@ -33,8 +31,6 @@ set(CPP_FILES
   QmitkStringPropertyOnDemandEdit.cpp
   QmitkStringPropertyView.cpp
   QmitkTransferFunctionCanvas.cpp
-  QmitkTransferFunctionGeneratorWidget.cpp
-  QmitkTransferFunctionWidget.cpp
   QmitkUGCombinedRepresentationPropertyWidget.cpp
   QmitkVideoBackground.cpp
   QtWidgetsExtRegisterClasses.cpp
@@ -44,8 +40,6 @@ set(UI_FILES
   QmitkAboutDialogGUI.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
   QmitkSliceWidget.ui
-  QmitkTransferFunctionGeneratorWidget.ui
-  QmitkTransferFunctionWidget.ui
 )
 
 set(QRC_FILES

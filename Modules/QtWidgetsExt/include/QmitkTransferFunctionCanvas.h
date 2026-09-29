@@ -32,7 +32,7 @@ found in the LICENSE file.
  * Subclasses must implement the pure virtual methods that define the specific
  * transfer function type (color vs. piecewise).
  *
- * \sa QmitkColorTransferFunctionCanvas, QmitkPiecewiseFunctionCanvas, QmitkTransferFunctionWidget
+ * \sa QmitkPiecewiseFunctionCanvas
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {

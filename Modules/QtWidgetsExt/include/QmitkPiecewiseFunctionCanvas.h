@@ -25,7 +25,7 @@ found in the LICENSE file.
  * control point handles. Supports adding, removing, and moving function points
  * interactively. A histogram is drawn in the background if one is set.
  *
- * \sa QmitkTransferFunctionCanvas, QmitkColorTransferFunctionCanvas, QmitkTransferFunctionWidget
+ * \sa QmitkTransferFunctionCanvas
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas
 {

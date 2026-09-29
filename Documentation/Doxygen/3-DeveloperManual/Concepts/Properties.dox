@@ -241,9 +241,9 @@ four, since the neutral color width is the preset's own span rather than zero.
 Together with the preset name they form a recipe the view re-executes when the
 node is selected again, which is what lets the sliders show their previous
 positions instead of resetting. Where the recipe and the stored TransferFunction
-disagree - the curve having been drawn over in the view, or edited elsewhere
-through the Properties view or the v1 view - the recipe wins and the stored
-curve is discarded. The mapper does not read any of them.
+disagree - the curve having been drawn over in the view, or edited elsewhere,
+such as in the Properties view - the recipe wins and the stored curve is
+discarded. The mapper does not read any of them.
   <li> volumerendering.transferfunction.custom - Set where the preset the Volume
 Visualization view built this node's TransferFunction from was removed from the
 view while in use, and removed again when a preset is chosen instead. Scenes

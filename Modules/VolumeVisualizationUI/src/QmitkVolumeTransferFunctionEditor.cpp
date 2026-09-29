@@ -1336,10 +1336,11 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     // node was set up here, and both survive the rendering flag being switched
     // off. Between them they cover every curve this widget applies. The flag
     // covers what predates them: nodes configured before the recipe existed, or
-    // by the v1 view. What cannot serve as evidence is the TransferFunction
-    // property itself - see IsVolumeRenderingOn. Adopting the mapper's default
-    // would show a curve nobody chose and would also suppress
-    // EnsureTransferFunction, which fires only while no function is held.
+    // by the volume visualization view of earlier MITK versions. What cannot
+    // serve as evidence is the TransferFunction property itself - see
+    // IsVolumeRenderingOn. Adopting the mapper's default would show a curve
+    // nobody chose and would also suppress EnsureTransferFunction, which fires
+    // only while no function is held.
     if (!recorded.name.isEmpty() || IsCustomTransferFunction(node.GetPointer()) ||
         IsVolumeRenderingOn(node.GetPointer()))
     {
@@ -1398,10 +1399,10 @@ bool QmitkVolumeTransferFunctionEditor::ReplayRecipe(const QString &presetName)
   // baseline would make the next drag apply the whole offset a second time.
   //
   // The recipe therefore wins over the stored curve, whether the two came apart
-  // here - a curve drawn point by point over the preset - or elsewhere, through
-  // the Properties view or the v1 view. Either way the curve is what gets
-  // discarded. That is the price of being able to keep adjusting a preset, and
-  // the same trade the lighting model's recorded id already makes.
+  // here - a curve drawn point by point over the preset - or elsewhere, such as
+  // in the Properties view. Either way the curve is what gets discarded. That is
+  // the price of being able to keep adjusting a preset, and the same trade the
+  // lighting model's recorded id already makes.
   this->OnPresetSelected(presetName);
 
   if (!hasOffsets)

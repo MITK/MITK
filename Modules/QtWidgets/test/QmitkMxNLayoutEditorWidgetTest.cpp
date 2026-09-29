@@ -121,6 +121,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Matrix_AxisAssignAndClearRoundTrip);
   MITK_TEST(Matrix_SelectionAxisClearReturnsToDefault);
   MITK_TEST(Matrix_RegroupKeepsTheAuthoredOffset);
+  MITK_TEST(Group_LinkActionsKeepAuthoredOffsets);
   MITK_TEST(Matrix_OffsetOnUnlinkedCellIsIgnored);
   MITK_TEST(Matrix_SliceRampSpreadsOverCellsInOrder);
   MITK_TEST(Matrix_TracksAnEditMadeOnTheCards);
@@ -1452,6 +1453,44 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The slice offset survives the move",
                            std::holds_alternative<int>(link->offset)
                              && -3 == std::get<int>(link->offset));
+  }
+
+  void Group_LinkActionsKeepAuthoredOffsets()
+  {
+    // A group-level link action touches only the cells it actually links; a
+    // cell already on the group keeps the offset the user authored.
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Slice, -2);
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Zoom, 2.0);
+    // A third member on another axis only, so the group's slice slot is partial.
+    m_Widget->SetCellAxisGroup(CellId(2), QmitkMxNSyncAxis::Pan, id);
+
+    auto assertOffsetsKept = [this, &id](const char* after)
+    {
+      const auto slice = m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Slice offset survives ") + after,
+                             slice.has_value() && slice->group == id
+                               && std::holds_alternative<int>(slice->offset)
+                               && -2 == std::get<int>(slice->offset));
+      const auto zoom = m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Zoom offset survives ") + after,
+                             zoom.has_value() && zoom->group == id
+                               && std::holds_alternative<double>(zoom->offset)
+                               && 2.0 == std::get<double>(zoom->offset));
+    };
+
+    m_Widget->ToggleGroupAxis(id, QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT_MESSAGE("Linking a partial axis links the missing member",
+                           IsLinked(2, QmitkMxNSyncDimension::Slice, id));
+    assertOffsetsKept("linking a partial axis");
+
+    m_Widget->LinkNavigationBundle(id);
+    assertOffsetsKept("\"Link navigation\"");
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id,
+                                 QmitkMxNGroupJoinMode::MergeOverwriteCollisions);
+    assertOffsetsKept("a merge join onto the same group");
   }
 
   void Matrix_OffsetOnUnlinkedCellIsIgnored()

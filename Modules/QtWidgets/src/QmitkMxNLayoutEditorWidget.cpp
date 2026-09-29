@@ -126,6 +126,15 @@ namespace
     }
   }
 
+  // A group-level link action must leave a cell already linked to the group on
+  // that dimension alone: re-linking it would reset its authored offset.
+  bool IsLinkedTo(const QmitkMxNMultiWidget* multiWidget, const QString& windowId,
+                  QmitkMxNSyncDimension dimension, const std::string& group)
+  {
+    const auto link = multiWidget->GetSyncLink(windowId, dimension);
+    return link.has_value() && link->group == group;
+  }
+
   const QString NotLinkedEntry = QStringLiteral("(not linked)");
 
   /** Readable ink on a filled group hue, shared by every surface that fills with one. */
@@ -945,6 +954,10 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
       {
         continue;
       }
+      if (IsLinkedTo(m_MultiWidget, windowId, dimension, group))
+      {
+        continue;
+      }
       m_MultiWidget->SetSyncLink(windowId, dimension, group);
     }
     if (includeSelection)
@@ -978,17 +991,14 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
   {
     try
     {
-      if (enabled)
+      const bool linked = IsLinkedTo(m_MultiWidget, windowId, dimension, group);
+      if (enabled && !linked)
       {
         m_MultiWidget->SetSyncLink(windowId, dimension, group);
       }
-      else
+      else if (!enabled && linked)
       {
-        const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
-        if (link.has_value() && link->group == group)
-        {
-          m_MultiWidget->ClearSyncLink(windowId, dimension);
-        }
+        m_MultiWidget->ClearSyncLink(windowId, dimension);
       }
     }
     catch (const mitk::Exception& e)
@@ -1165,7 +1175,10 @@ void QmitkMxNLayoutEditorWidget::LinkNavigationBundle(const std::string& group)
     {
       try
       {
-        m_MultiWidget->SetSyncLink(windowId, dimension, group);
+        if (!IsLinkedTo(m_MultiWidget, windowId, dimension, group))
+        {
+          m_MultiWidget->SetSyncLink(windowId, dimension, group);
+        }
       }
       catch (const mitk::Exception& e)
       {

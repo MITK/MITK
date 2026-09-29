@@ -176,8 +176,14 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
     if (renderWindowWidget)
     {
       windowName = renderWindowWidget->GetCornerAnnotationText();
+      // An editor may leave the corner annotation blank (the MxN cells label
+      // themselves elsewhere); an empty action label is indistinguishable.
+      if (windowName.empty())
+      {
+        windowName = renderWindowWidget->GetDisplayName().toStdString();
+      }
     }
-    else
+    if (windowName.empty())
     {
       windowName = window->GetRenderer()->GetName();
     }

@@ -23,27 +23,33 @@ found in the LICENSE file.
 
 namespace
 {
-  // The panel is factorized on one thread, so it is kept narrow. The tiles of the trailing
-  // update, nearly all of the work, are wide enough for an efficient matrix product each.
-  constexpr Eigen::Index PanelWidth = 128;
-  constexpr Eigen::Index TileWidth = 256;
+  // The panel is factorized on one thread, so it is kept narrow. Narrow tiles keep all threads
+  // busy until the trailing matrix gets small. Narrower still would be faster in theory, but
+  // every panel costs a round trip through the thread pool.
+  constexpr Eigen::Index PanelWidth = 64;
+  constexpr Eigen::Index TileWidth = 64;
 
   constexpr int MaxRefinementSteps = 10;
+
+  itk::SizeValueType TilesOf(Eigen::Index columns)
+  {
+    return static_cast<itk::SizeValueType>((columns + TileWidth - 1) / TileWidth);
+  }
 
   /** Right-looking blocked LU decomposition with partial pivoting in place, as LAPACK's getrf does it.
    *  Row j was swapped with row pivots[j] in step j.
    */
-  void FactorizeLU(Eigen::MatrixXf& A, std::vector<Eigen::Index>& pivots)
+  void FactorizeLU(Eigen::MatrixXf& A, std::vector<Eigen::Index>& pivots, itk::MultiThreaderBase* threader)
   {
     const Eigen::Index n = A.rows();
     pivots.resize(n);
-
-    auto threader = itk::MultiThreaderBase::New();
 
     for (Eigen::Index k = 0; k < n; k += PanelWidth)
     {
       const Eigen::Index width = std::min(PanelWidth, n - k);
 
+      // Rows are swapped within the panel only: in a column-major matrix, a whole row is spread
+      // over all columns. The other columns get the swaps of the panel below, column by column.
       for (Eigen::Index j = k; j < k + width; ++j)
       {
         Eigen::Index pivot = 0;
@@ -52,7 +58,7 @@ namespace
         pivots[j] = pivot;
 
         if (pivot != j)
-          A.row(j).swap(A.row(pivot));
+          A.block(j, k, 1, width).swap(A.block(pivot, k, 1, width));
 
         A.col(j).tail(n - j - 1) /= A(j, j);
         const Eigen::Index rest = k + width - j - 1;
@@ -61,17 +67,39 @@ namespace
           A.block(j + 1, j + 1, n - j - 1, rest).noalias() -= A.col(j).tail(n - j - 1) * A.row(j).segment(j + 1, rest);
       }
 
-      const Eigen::Index trailing = n - k - width;
+      const auto swapRows = [&](Eigen::Index firstColumn, Eigen::Index columns)
+        {
+          for (Eigen::Index c = firstColumn; c < firstColumn + columns; ++c)
+          {
+            auto column = A.col(c);
 
-      if (0 == trailing)
+            for (Eigen::Index j = k; j < k + width; ++j)
+            {
+              if (pivots[j] != j)
+                std::swap(column[j], column[pivots[j]]);
+            }
+          }
+        };
+
+      const Eigen::Index trailing = n - k - width;
+      const auto leftTiles = TilesOf(k);
+      const auto trailingTiles = TilesOf(trailing);
+
+      if (0 == leftTiles + trailingTiles)
         break;
 
-      const auto tiles = static_cast<itk::SizeValueType>((trailing + TileWidth - 1) / TileWidth);
-
-      threader->ParallelizeArray(0, tiles, [&](itk::SizeValueType tile)
+      threader->ParallelizeArray(0, leftTiles + trailingTiles, [&](itk::SizeValueType tile)
         {
-          const Eigen::Index firstColumn = k + width + static_cast<Eigen::Index>(tile) * TileWidth;
+          if (tile < leftTiles)
+          {
+            const Eigen::Index firstColumn = static_cast<Eigen::Index>(tile) * TileWidth;
+            swapRows(firstColumn, std::min(TileWidth, k - firstColumn));
+            return;
+          }
+
+          const Eigen::Index firstColumn = k + width + static_cast<Eigen::Index>(tile - leftTiles) * TileWidth;
           const Eigen::Index columns = std::min(TileWidth, n - firstColumn);
+          swapRows(firstColumn, columns);
 
           auto upper = A.block(k, firstColumn, width, columns);
           A.block(k, k, width, width).triangularView<Eigen::UnitLower>().solveInPlace(upper);
@@ -99,15 +127,29 @@ Eigen::VectorXd mitk::SolveDenseLinearSystem(const Eigen::MatrixXd& A, const Eig
                 << " matrix and a right-hand side of size " << b.size() << ".";
   }
 
-  if (0 == A.rows())
+  const Eigen::Index n = A.rows();
+
+  if (0 == n)
     return Eigen::VectorXd();
 
   // A is factorized in single precision and the solution is refined in double precision. If A is
   // too ill-conditioned for the refinement to reach the backward error of a double precision
   // solver, partialPivLu solves the system instead.
-  Eigen::MatrixXf lu = A.cast<float>();
+  auto threader = itk::MultiThreaderBase::New();
+
+  // One pass over A: the copy to factorize, and the column sums for its norm.
+  Eigen::MatrixXf lu(n, n);
+  Eigen::VectorXd columnSums(n);
+
+  threader->ParallelizeArray(0, static_cast<itk::SizeValueType>(n), [&](itk::SizeValueType column)
+    {
+      const auto j = static_cast<Eigen::Index>(column);
+      lu.col(j) = A.col(j).cast<float>();
+      columnSums[j] = A.col(j).cwiseAbs().sum();
+    }, nullptr);
+
   std::vector<Eigen::Index> pivots;
-  FactorizeLU(lu, pivots);
+  FactorizeLU(lu, pivots, threader);
 
   const auto solve = [&](const Eigen::VectorXd& rhs)
     {
@@ -142,8 +184,8 @@ Eigen::VectorXd mitk::SolveDenseLinearSystem(const Eigen::MatrixXd& A, const Eig
 
   // Normwise backward error: the relative change of A and b that would make x exact. For a
   // backward stable double precision solver it stays below about n times the machine epsilon.
-  const double normA = A.cwiseAbs().colwise().sum().maxCoeff();
-  const double tolerance = static_cast<double>(A.rows()) * std::numeric_limits<double>::epsilon();
+  const double normA = columnSums.maxCoeff();
+  const double tolerance = static_cast<double>(n) * std::numeric_limits<double>::epsilon();
 
   if (residualNorm <= tolerance * (normA * x.lpNorm<1>() + b.lpNorm<1>()))
     return x;

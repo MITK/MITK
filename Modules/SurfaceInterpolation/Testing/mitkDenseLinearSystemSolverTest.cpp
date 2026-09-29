@@ -81,12 +81,12 @@ class mitkDenseLinearSystemSolverTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  /** Sizes around the panel width (128) and the tile width (256) of the factorization. */
+  /** Sizes around multiples of the panel and tile width (64) of the factorization. */
   void TestRandomSystems()
   {
     std::mt19937 random(42);
 
-    for (const Eigen::Index n : { 1, 2, 127, 128, 129, 385, 1000 })
+    for (const Eigen::Index n : { 1, 2, 63, 64, 65, 127, 128, 129, 385, 1000 })
     {
       const Eigen::MatrixXd A = RandomMatrix(n, n, random);
       const Eigen::VectorXd b = RandomMatrix(n, 1, random);

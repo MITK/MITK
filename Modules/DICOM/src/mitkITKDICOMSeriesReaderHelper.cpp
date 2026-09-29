@@ -26,9 +26,14 @@ found in the LICENSE file.
 
 #include <dcmtk/dcmdata/dcvrda.h>
 
+#include <itkMetaDataObject.h>
+
 #include <gdcmRescaler.h>
 
 #include <algorithm>
+#include <cmath>
+#include <sstream>
+#include <type_traits>
 #include <vector>
 
 
@@ -73,18 +78,69 @@ namespace
     }
   }
 
-  /**
-   * GDCM's own output-type rule for one pair.
-   *
-   * The stored format is rebuilt from the IO's internal component type, which
-   * does not carry Bits Stored, so a file storing 12 bits in 16 is treated as a
-   * full 16-bit range. That can only widen the result, never narrow it, so no
-   * value is lost.
-   */
-  gdcm::PixelFormat::ScalarType RescaledType(gdcm::PixelFormat::ScalarType stored, const Rescale& rescale)
+  /** A Pixel Module attribute as ITK's GDCM IO records it in its dictionary. */
+  bool ReadPixelModuleAttribute(const itk::MetaDataDictionary& dictionary, const char* key, unsigned short& value)
   {
+    std::string text;
+    if (!itk::ExposeMetaData<std::string>(dictionary, key, text))
+    {
+      return false;
+    }
+
+    std::istringstream stream(text);
+    return static_cast<bool>(stream >> value);
+  }
+
+  /**
+   * The stored format as the Pixel Module declares it.
+   *
+   * GDCM sizes its rescale output by Bits Stored, so the same declaration has
+   * to go into the per-frame rule, or a file storing 12 bits in 16 would get a
+   * wider type here than GDCM gives it for a uniform transformation. Float
+   * stored data and a dictionary without a usable declaration fall back to the
+   * IO's component type.
+   */
+  gdcm::PixelFormat StoredPixelFormat(const itk::GDCMImageIO& io)
+  {
+    const auto component = io.GetInternalComponentType();
+    const gdcm::PixelFormat fallback(ToGDCMScalarType(component));
+
+    if (itk::IOComponentEnum::FLOAT == component || itk::IOComponentEnum::DOUBLE == component)
+    {
+      return fallback;
+    }
+
+    const auto& dictionary = io.GetMetaDataDictionary();
+    unsigned short bitsAllocated = 0;
+    unsigned short bitsStored = 0;
+    unsigned short highBit = 0;
+    unsigned short pixelRepresentation = 0;
+    if (!ReadPixelModuleAttribute(dictionary, "0028|0100", bitsAllocated)
+        || !ReadPixelModuleAttribute(dictionary, "0028|0101", bitsStored)
+        || !ReadPixelModuleAttribute(dictionary, "0028|0102", highBit)
+        || !ReadPixelModuleAttribute(dictionary, "0028|0103", pixelRepresentation)
+        || 0 == bitsStored || bitsStored > bitsAllocated || bitsAllocated > 32 || pixelRepresentation > 1)
+    {
+      return fallback;
+    }
+
+    return gdcm::PixelFormat(1, bitsAllocated, bitsStored, highBit, pixelRepresentation);
+  }
+
+  /** GDCM's own output-type rule for one pair. */
+  gdcm::PixelFormat::ScalarType RescaledType(const gdcm::PixelFormat& stored, const Rescale& rescale)
+  {
+    // GDCM's rule sizes an integer output by the stored range, and a float
+    // format has none; asking for it asserts inside GDCM.
+    const auto storedType = stored.GetScalarType();
+    if (gdcm::PixelFormat::FLOAT16 == storedType || gdcm::PixelFormat::FLOAT32 == storedType
+        || gdcm::PixelFormat::FLOAT64 == storedType)
+    {
+      return gdcm::PixelFormat::FLOAT64;
+    }
+
     gdcm::Rescaler rescaler;
-    rescaler.SetPixelFormat(gdcm::PixelFormat(stored));
+    rescaler.SetPixelFormat(stored);
     rescaler.SetSlope(rescale.slope);
     rescaler.SetIntercept(rescale.intercept);
 
@@ -132,13 +188,25 @@ namespace
     }
   }
 
+  /**
+   * The recovery can leave an integral target a few ULPs below the whole
+   * value that the frame's own pair yields; truncating that would cost one
+   * slope step.
+   */
   template <typename TPixel>
   void FromDouble(const double* source, void* target, std::size_t count)
   {
     auto* typed = static_cast<TPixel*>(target);
     for (std::size_t i = 0; i < count; ++i)
     {
-      typed[i] = static_cast<TPixel>(source[i]);
+      if constexpr (std::is_integral_v<TPixel>)
+      {
+        typed[i] = static_cast<TPixel>(std::round(source[i]));
+      }
+      else
+      {
+        typed[i] = static_cast<TPixel>(source[i]);
+      }
     }
   }
 
@@ -160,10 +228,13 @@ namespace
   /**
    * Replaces GDCM's single Pixel Value Transformation by each frame's own.
    *
-   * gdcm::Image holds one slope and one intercept, so GDCM applies the pair of
-   * the first functional-group item to the whole buffer. Undoing it and applying
-   * the frame's pair is exact when GDCM's output type is integral, because GDCM
-   * chose a type that holds stored * m + b exactly, and within double rounding
+   * gdcm::Image holds one slope and one intercept for the whole buffer. For the
+   * enhanced SOP classes GDCM knows, that pair comes from the shared functional
+   * group, or else from the first per-frame item; for any other class it is the
+   * top-level pair. Which one GDCM chose does not matter here, because the
+   * applied pair is read back from the IO. Undoing it and applying the frame's
+   * pair is exact when GDCM's output type is integral, because GDCM chose a
+   * type that holds stored * m + b exactly, and within double rounding
    * otherwise. Real World Value Mapping is deliberately not applied; GDCM does
    * not apply it either and it stays a consumer concern.
    */
@@ -210,11 +281,11 @@ namespace
       return loaded;
     }
 
-    const auto storedType = ToGDCMScalarType(io.GetInternalComponentType());
-    auto targetType = RescaledType(storedType, effective.front());
+    const auto storedFormat = StoredPixelFormat(io);
+    auto targetType = RescaledType(storedFormat, effective.front());
     for (const auto& rescale : effective)
     {
-      targetType = Widest(targetType, RescaledType(storedType, rescale));
+      targetType = Widest(targetType, RescaledType(storedFormat, rescale));
     }
 
     const mitk::PixelType targetPixelType = ToMitkPixelType(targetType);

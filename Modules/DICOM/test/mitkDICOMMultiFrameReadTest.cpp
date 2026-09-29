@@ -135,6 +135,8 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(ValuesFollowPixelsWhenInStackPositionDescends);
   MITK_TEST(SourceFramePropertyNamesTheFrameOfEverySlot);
   MITK_TEST(PixelsUsePerFrameRescale);
+  MITK_TEST(NarrowBitsStoredLoadsWithGDCMsType);
+  MITK_TEST(RecoveredIntegersAreRoundedNotTruncated);
   MITK_TEST(NonIntegralInterceptLoadsAsDouble);
   MITK_TEST(TopLevelValuesAreUniformAcrossSlices);
   MITK_TEST(PerFrameValuesSurviveSaveAndReload);
@@ -559,6 +561,71 @@ public:
       const double expected = object.frames[z].constant * object.frames[z].slope + object.frames[z].intercept;
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice " + std::to_string(z) + " uses its own frame's rescale",
                                    static_cast<int>(expected), this->PixelAt<int>(image, z));
+    }
+  }
+
+  /** GDCM sizes its output by Bits Stored. The per-frame rule has to see the
+      same declaration, or a varying file would load wider than its uniform
+      twin. */
+  void NarrowBitsStoredLoadsWithGDCMsType()
+  {
+    auto varying = this->MakeEnhanced();
+    varying.bitsStored = 12;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      varying.frames[k].slope = (k % 2 == 0) ? 1.0 : 2.0;
+      varying.frames[k].intercept = -1024.0;
+    }
+
+    auto uniform = varying;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      uniform.frames[k].slope = 2.0;
+    }
+
+    const auto varyingImage = this->LoadOne(varying.Write(this->CaseDir(), "varying.dcm"));
+    const auto uniformImage = this->LoadOne(uniform.Write(this->CaseDir(), "uniform.dcm"));
+
+    // 12 bits signed span -2048..2047; times 2 minus 1024 still fits int16,
+    // which is what GDCM picks for the uniform file.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The uniform file keeps GDCM's type",
+                                 std::string("short"), uniformImage->GetPixelType().GetComponentTypeAsString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The varying file loads with the same type as its uniform twin",
+                                 std::string("short"), varyingImage->GetPixelType().GetComponentTypeAsString());
+
+    for (unsigned int z = 0; z < FRAME_COUNT; ++z)
+    {
+      const double expected = varying.frames[z].constant * varying.frames[z].slope + varying.frames[z].intercept;
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice " + std::to_string(z) + " uses its own frame's rescale",
+                                   static_cast<short>(expected), this->PixelAt<short>(varyingImage, z));
+    }
+  }
+
+  /** GDCM applies the shared pair, here a fractional one, so undoing it leaves
+      each recovered value a few ULPs off the whole number that the frame's own
+      integral pair yields. The integral target has to round, not truncate. */
+  void RecoveredIntegersAreRoundedNotTruncated()
+  {
+    auto object = this->MakeEnhanced();
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::SharedAndPerFrame;
+    object.sharedSlopeAlongsidePerFrame = 0.3;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      // 31 * 0.3 / 0.3 lands below 31 in double arithmetic.
+      object.frames[k].constant = 31;
+      object.frames[k].slope = (k % 2 == 0) ? 2.0 : 3.0;
+    }
+
+    const auto image = this->LoadOne(object.Write(this->CaseDir(), "shared_fractional.dcm"));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Whole per-frame pairs give an integral type",
+                                 std::string("int"), image->GetPixelType().GetComponentTypeAsString());
+
+    for (unsigned int z = 0; z < FRAME_COUNT; ++z)
+    {
+      const int expected = static_cast<int>(object.frames[z].constant * object.frames[z].slope);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice " + std::to_string(z) + " recovers the exact integer",
+                                   expected, this->PixelAt<int>(image, z));
     }
   }
 

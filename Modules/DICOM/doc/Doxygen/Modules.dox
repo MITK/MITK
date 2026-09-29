@@ -99,11 +99,12 @@ all slots of a multi-frame file and cannot express it.
 \subsection DICOMModule_multiframe_pixels Pixel values
 
 The Pixel Value Transformation is applied per frame. GDCM's gdcm::Image can hold
-only one slope and intercept and applies the pair of the first per-frame item to
-the whole buffer, so the reader corrects the frames whose own pair differs. The
-component type follows GDCM's own rule applied over all frames' pairs, so a file
-with a uniform transformation and one with a varying transformation load with the
-same type.
+only one slope and intercept for the whole buffer: for the enhanced SOP classes
+it knows, the pair of the shared functional group, or else of the first per-frame
+item; for other classes the top-level pair. The reader corrects every frame
+whose own pair differs from the one GDCM applied. The component type follows
+GDCM's own rule applied over all frames' pairs, so a file with a uniform
+transformation and one with a varying transformation load with the same type.
 
 Real World Value Mapping is not applied. GDCM does not apply it either, and it
 remains a consumer concern.

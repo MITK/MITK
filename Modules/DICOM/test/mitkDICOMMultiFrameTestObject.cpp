@@ -86,6 +86,11 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
     mitkThrow() << "Cannot build DICOM test object without frames.";
   }
 
+  if (this->bitsStored < 1 || this->bitsStored > 16)
+  {
+    mitkThrow() << "Cannot build DICOM test object with Bits Stored outside the allocated 16 bits.";
+  }
+
   DcmFileFormat fileFormat;
   DcmDataset& dataset = *fileFormat.getDataset();
 
@@ -115,8 +120,8 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   Require(dataset.putAndInsertUint16(DCM_Rows, static_cast<Uint16>(this->rows)), "Rows");
   Require(dataset.putAndInsertUint16(DCM_Columns, static_cast<Uint16>(this->columns)), "Columns");
   Require(dataset.putAndInsertUint16(DCM_BitsAllocated, 16), "Bits Allocated");
-  Require(dataset.putAndInsertUint16(DCM_BitsStored, 16), "Bits Stored");
-  Require(dataset.putAndInsertUint16(DCM_HighBit, 15), "High Bit");
+  Require(dataset.putAndInsertUint16(DCM_BitsStored, static_cast<Uint16>(this->bitsStored)), "Bits Stored");
+  Require(dataset.putAndInsertUint16(DCM_HighBit, static_cast<Uint16>(this->bitsStored - 1)), "High Bit");
   Require(dataset.putAndInsertUint16(DCM_PixelRepresentation, 1), "Pixel Representation");
   Require(dataset.putAndInsertString(DCM_NumberOfFrames, mitk::ConvertValueToDICOMStr(static_cast<unsigned int>(this->frames.size())).c_str()),
           "Number of Frames");

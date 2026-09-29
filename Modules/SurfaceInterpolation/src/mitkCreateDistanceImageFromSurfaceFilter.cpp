@@ -314,28 +314,30 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
   }
 
   // Now we have created all centers and all function values. Next step is to create the solution matrix
-  numberOfCenters = m_Centers.size();
+  const auto n = static_cast<Eigen::Index>(m_Centers.size());
 
-  m_SolutionMatrix.resize(numberOfCenters, numberOfCenters);
+  m_SolutionMatrix.resize(n, n);
 
-  m_Weights.resize(numberOfCenters);
+  m_Weights.resize(n);
 
-  PointType p1;
-  PointType p2;
-  double norm;
+  Eigen::ArrayXd x(n);
+  Eigen::ArrayXd y(n);
+  Eigen::ArrayXd z(n);
 
-  for (unsigned int i = 0; i < numberOfCenters; i++)
+  for (Eigen::Index i = 0; i < n; ++i)
   {
-    for (unsigned int j = 0; j < numberOfCenters; j++)
-    {
-      // Calculate the RBF value. Currently using Phi(r) = r with r is the euclidean distance between two points
-      p1 = m_Centers.at(i);
-      p2 = m_Centers.at(j);
-      p1 = p1 - p2;
-      norm = p1.two_norm();
-      m_SolutionMatrix(i, j) = norm;
-    }
+    x[i] = m_Centers[i][0];
+    y[i] = m_Centers[i][1];
+    z[i] = m_Centers[i][2];
   }
+
+  // Phi(r) = r, with r the euclidean distance between two centers. Column by column, as the
+  // matrix is stored that way.
+  itk::MultiThreaderBase::New()->ParallelizeArray(0, static_cast<itk::SizeValueType>(n), [&](itk::SizeValueType column)
+    {
+      const auto j = static_cast<Eigen::Index>(column);
+      m_SolutionMatrix.col(j) = ((x - x[j]).square() + (y - y[j]).square() + (z - z[j]).square()).sqrt().matrix();
+    }, nullptr);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()

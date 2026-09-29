@@ -29,10 +29,30 @@ class mitkHeartbeatMonitorTestSuite : public mitk::TestFixture
   MITK_TEST(CapturesAreBoundedPerEpisode);
   CPPUNIT_TEST_SUITE_END();
 
+  using Clock = std::chrono::steady_clock;
+
   std::atomic<int> m_StallCount{ 0 };
   std::atomic<int> m_RecoveryCount{ 0 };
 
   mitk::HeartbeatMonitor::Config m_Config;
+
+  /** Polls the condition until it holds. The deadline lies far beyond any
+   *  expected wait, so that a broken monitor still fails quickly. */
+  template <typename Condition>
+  static bool WaitUntil(Condition condition)
+  {
+    const auto deadline = Clock::now() + std::chrono::seconds(5);
+
+    while (!condition())
+    {
+      if (Clock::now() >= deadline)
+        return false;
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    return true;
+  }
 
 public:
   void setUp() override
@@ -40,7 +60,7 @@ public:
     m_StallCount = 0;
     m_RecoveryCount = 0;
 
-    // Short, test-friendly timings. Deliberately well above scheduler jitter.
+    // Short, test-friendly timings.
     m_Config = mitk::HeartbeatMonitor::Config{};
     m_Config.Timeout = std::chrono::milliseconds(150);
     m_Config.CaptureInterval = std::chrono::milliseconds(80);
@@ -67,8 +87,11 @@ public:
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // 75 * 20 ms = 1.5 s of beating, longer than the timeout window.
-    for (int i = 0; i < 75; ++i)
+    // Bounded by the clock rather than by a number of beats, as a loaded CI
+    // stretches every sleep.
+    const auto end = Clock::now() + std::chrono::milliseconds(1200);
+
+    while (Clock::now() < end)
     {
       monitor.Beat();
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -87,8 +110,8 @@ public:
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Several timeout windows without a single beat.
-    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    // Two timeout windows without a single beat.
+    std::this_thread::sleep_for(2 * m_Config.Timeout);
     monitor.Stop();
 
     CPPUNIT_ASSERT_EQUAL(0, m_StallCount.load());
@@ -100,13 +123,12 @@ public:
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Report in once to arm stall detection, then go silent: wait past the
-    // timeout and let a capture or two happen.
+    // Report in once to arm stall detection, then go silent until the stall
+    // fires.
     monitor.Beat();
-    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    CPPUNIT_ASSERT(WaitUntil([this] { return m_StallCount.load() >= 1; }));
     monitor.Stop();
 
-    CPPUNIT_ASSERT(m_StallCount.load() >= 1);
     CPPUNIT_ASSERT_EQUAL(0, m_RecoveryCount.load());
   }
 
@@ -117,15 +139,19 @@ public:
 
     // Arm, then stall...
     monitor.Beat();
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    CPPUNIT_ASSERT(m_StallCount.load() >= 1);
+    CPPUNIT_ASSERT(WaitUntil([this] { return m_StallCount.load() >= 1; }));
 
-    // ...then resume beating and let the recovery fire.
-    for (int i = 0; i < 10; ++i)
-    {
-      monitor.Beat();
-      std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    }
+    // ...then beat only until the recovery fires. Beating on would leave room
+    // for a second stall episode, and its recovery, whenever a loaded CI
+    // starves this thread for longer than the timeout between two beats.
+    CPPUNIT_ASSERT(WaitUntil([&]
+      {
+        if (m_RecoveryCount.load() >= 1)
+          return true;
+
+        monitor.Beat();
+        return false;
+      }));
     monitor.Stop();
 
     CPPUNIT_ASSERT_EQUAL(1, m_RecoveryCount.load());
@@ -136,14 +162,15 @@ public:
     auto monitor = this->MakeMonitor();
     monitor.Start();
 
-    // Arm, then stall for far longer than
-    // MaxCapturesPerEpisode * CaptureInterval.
+    // Arm, then stall until the episode has taken all its captures...
     monitor.Beat();
-    std::this_thread::sleep_for(std::chrono::milliseconds(900));
+    CPPUNIT_ASSERT(WaitUntil([this] { return m_StallCount.load() >= m_Config.MaxCapturesPerEpisode; }));
+
+    // ...and on for two capture intervals, in which another one would be due.
+    std::this_thread::sleep_for(2 * m_Config.CaptureInterval);
     monitor.Stop();
 
-    CPPUNIT_ASSERT(m_StallCount.load() >= 1);
-    CPPUNIT_ASSERT(m_StallCount.load() <= m_Config.MaxCapturesPerEpisode);
+    CPPUNIT_ASSERT_EQUAL(m_Config.MaxCapturesPerEpisode, m_StallCount.load());
   }
 };
 

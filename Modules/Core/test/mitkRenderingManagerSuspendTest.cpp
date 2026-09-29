@@ -50,6 +50,7 @@ namespace
 class mitkRenderingManagerSuspendTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkRenderingManagerSuspendTestSuite);
+  MITK_TEST(IsRenderingSuspended_SuspendAndResume_Reported);
   MITK_TEST(RequestUpdate_Suspended_NoRequestEvent);
   MITK_TEST(ExecutePendingRequests_Suspended_RequestKept);
   MITK_TEST(Resume_PendingRequest_RequestExecuted);
@@ -74,6 +75,19 @@ public:
     m_RenderingManager->RemoveRenderWindow(m_RenderWindow);
     m_RenderingManager = nullptr;
     m_RenderWindow = nullptr;
+  }
+
+  void IsRenderingSuspended_SuspendAndResume_Reported()
+  {
+    CPPUNIT_ASSERT(!m_RenderingManager->IsRenderingSuspended(m_RenderWindow));
+
+    m_RenderingManager->SetRenderingSuspended(m_RenderWindow, true);
+
+    CPPUNIT_ASSERT(m_RenderingManager->IsRenderingSuspended(m_RenderWindow));
+
+    m_RenderingManager->SetRenderingSuspended(m_RenderWindow, false);
+
+    CPPUNIT_ASSERT(!m_RenderingManager->IsRenderingSuspended(m_RenderWindow));
   }
 
   void RequestUpdate_Suspended_NoRequestEvent()

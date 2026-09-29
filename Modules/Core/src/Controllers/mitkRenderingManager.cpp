@@ -236,6 +236,11 @@ namespace mitk
     }
   }
 
+  bool RenderingManager::IsRenderingSuspended(vtkRenderWindow *renderWindow) const
+  {
+    return m_SuspendedRenderWindows.contains(renderWindow);
+  }
+
   void RenderingManager::ForceImmediateUpdate(vtkRenderWindow *renderWindow)
   {
     // If the renderWindow is not valid, we do not want to inadvertently create

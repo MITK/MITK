@@ -24,6 +24,9 @@ found in the LICENSE file.
 
 #include <QWidget>
 #include <map>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -260,7 +263,8 @@ private:
   void Start3DInterpolation();
 
   /**
-   * \brief Marks the shown surface as about to be replaced by the running interpolation.
+   * \brief Marks the shown surface as about to be replaced by the running interpolation or, once
+   * confirmed, by the segmentation (see KeepConfirmedSurface()).
    *
    * A pending surface pulses (see the "pulsing" property of mitk::SurfaceVtkMapper3D), for
    * which the 3D windows are kept rendering until it is no longer pending.
@@ -278,6 +282,27 @@ private:
 
   /** \brief Shows the label hidden by UpdateLabelHiddenIn3D() in 3D again, if any. */
   void RevealLabelIn3D();
+
+  /**
+   * \brief Keeps a confirmed surface on display, pulsing, until the 3D windows show the label with it.
+   *
+   * The 3D windows extract the segmentation surface anew in the background, which may take seconds.
+   * Until then, they would show the label as it was before. The 2D windows show the result at once,
+   * so the surface is hidden there. The pulse timer drops the surface once the 3D windows have
+   * caught up.
+   */
+  void KeepConfirmedSurface(const mitk::DataNode* segmentationNode, const mitk::Image* groupImage);
+
+  /** \brief Whether a 3D window still shows the group of the kept confirmed surface from before it was written. */
+  bool IsSegmentationBehindConfirmedSurface() const;
+
+  /**
+   * \brief Clears a kept confirmed surface, if any.
+   *
+   * Called wherever the shown surface is replaced, cleared or hidden, as it would otherwise pulse on,
+   * or be shown again as a result to confirm.
+   */
+  void DropConfirmedSurface();
 
   /**
    * \brief Forgets the interpolated label when it is removed from the segmentation.
@@ -314,6 +339,21 @@ private:
 
   // Where UpdateLabelHiddenIn3D() hid a label last, which need not be the working data any more.
   mitk::WeakPointer<mitk::DataNode> m_NodeWithLabelHiddenIn3D;
+
+  // See KeepConfirmedSurface().
+  struct ConfirmedSurface
+  {
+    mitk::WeakPointer<const mitk::DataNode> m_SegmentationNode;
+    mitk::WeakPointer<const mitk::Image> m_GroupImage;
+
+    // Of the group image, once the surface was written to it.
+    itk::ModifiedTimeType m_GroupImageMTime = 0;
+
+    // The render windows the surface is hidden in, by name.
+    std::vector<std::string> m_HiddenIn;
+  };
+
+  std::optional<ConfirmedSurface> m_ConfirmedSurface;
 
   // Calls OnLabelRemoved() for the working segmentation.
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;

@@ -119,13 +119,11 @@ namespace
 
   /** \brief Where the files presets were saved to are remembered.
    *
-   * This widget belongs to a module rather than to a view, so it has no site to
-   * ask for a preference node of its own and has to name one. This is the id the
-   * volume visualization v2 view declares in its plugin.xml, and it has to
-   * follow that file should the view ever be renamed. mitk::VideoRecorder names
-   * the movie maker view's node from a module in the same way.
+   * Named after this module rather than after a view hosting the widget: the
+   * editor alone reads and writes these, so no view's id - which a rename
+   * would change - decides where they are found.
    */
-  constexpr const char *PRESET_PREFERENCE_NODE = "/org.mitk.views.volumevisualization_v2";
+  constexpr const char *PRESET_PREFERENCE_NODE = "/org.mitk.volumevisualizationui";
 
   /** \brief The key the remembered paths stand under, as one joined string.
    *

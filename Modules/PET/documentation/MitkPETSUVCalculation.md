@@ -247,7 +247,7 @@ substitute for the per-slice handling of `START` and `NONE`.
 | SOP class | Support |
 |-----------|---------|
 | PET Image Storage `1.2.840.10008.5.1.4.1.1.128` | Full. |
-| Enhanced PET Image Storage `1.2.840.10008.5.1.4.1.1.130` | Supported where the per-frame attributes agree across frames; see below. |
+| Enhanced PET Image Storage `1.2.840.10008.5.1.4.1.1.130` | Supported, including a rescale and frame timing that vary per frame. MITK does not apply the Real World Value Mapping; see below. |
 | Legacy Converted Enhanced PET `1.2.840.10008.5.1.4.1.1.128.1` | Not supported. |
 
 An Enhanced PET object carries none of the classic PET attributes. The unit
@@ -255,32 +255,41 @@ comes from the Measurement Units Code Sequence `(0040,08EA)` inside the Real
 World Value Mapping Sequence `(0040,9096)` inside the functional groups,
 falling back to `(0028,1054)` Rescale Type; the decay state comes from
 `(0018,9758)` Decay Corrected instead of `(0054,1102)`, with the reference
-instant taken from `(0018,9701)` when it is `YES` and from the per-frame
-`(0018,9151)` Frame Reference DateTime when it is `NO`. Administration time
-is resolved exactly as for classic PET.
+instant taken from `(0018,9701)` when it is `YES` and, per frame, from
+`(0018,9151)` Frame Reference DateTime (or `(0018,9074)` Frame Acquisition
+DateTime plus the average count-rate time) when it is `NO`. Administration
+time is resolved exactly as for classic PET.
+
+The DICOM reader applies each frame's Pixel Value Transformation when it
+loads the object and publishes every functional-group attribute with one
+value per slice, so a rescale slope, intercept or frame time that differs
+between frames is an ordinary input. When `(0018,9758)` is `YES` the
+reference instant is the single top-level `(0018,9701)` and the per-frame
+frame times play no part in the result.
+
+The Real World Value Mapping is applied by nobody. The loaded values are the
+stored values through the Pixel Value Transformation, so MITK names their
+unit by the mapping whose slope and intercept equal that transformation --
+which is the case whenever the object was written with the two in
+agreement, as every reference object is. Where several mappings qualify,
+the one yielding SUVbw is preferred, then any other SUV type, then activity
+concentration.
 
 #### What is not supported, and why it refuses
 
-MITK's DICOM reader models one frame per file, so a multi-frame object
-collapses each attribute to a single value. Where the per-frame values agree
-that is harmless. Where they differ, the collapsed value would be applied to
-the whole volume and the result would be wrong without anything indicating
-it, so the run stops with exit code 13 instead. This affects:
-
-- a per-frame rescale slope or intercept that differs between frames;
-- a per-frame Frame Reference DateTime (or Frame Acquisition DateTime) that
-  differs between frames, when `(0018,9758)` is `NO` and those times are
-  therefore what the correction is computed from;
-- a unit that differs between frames.
-
-The refusal says the input is correct and MITK cannot yet represent it,
-because that is the case: these files are valid DICOM and a reader with a
-per-frame model would handle them.
-
-Note the condition on the second item. When `(0018,9758)` is `YES` the
-reference instant is the single top-level `(0018,9701)`, and per-frame
-acquisition times play no part in the result -- so varying frame times are
-accepted there and refused only when they actually feed the computation.
+- A unit that differs between frames. MITK carries one unit per image, so
+  the input cannot be represented; the run stops with exit code 13.
+- A multi-frame object whose Per-Frame Functional Groups Sequence does not
+  carry one item per frame. The reader cannot map its functional groups to
+  frames and publishes none of their values; the run stops with exit
+  code 13 rather than reporting the unit as absent.
+- An object none of whose mappings equals the applied Pixel Value
+  Transformation, a mapping through a Real World Value LUT included. The
+  loaded values are then in no unit the object declares, and the run stops
+  with exit code 14 rather than scaling by a guess. This is the
+  standard-conformant layout -- Rescale Type `US`, an arbitrary
+  transformation, the real mapping in the Real World Value Mapping -- so it
+  is a MITK limitation, not a defect in the input, and the message says so.
 
 ### Modality check
 
@@ -464,7 +473,8 @@ The modality and units checks are bypassed because NRRD carries no DICOM tags.
 | `10` | The output image could not be written. |
 | `11` | `(0054,1001)` Units holds a value the pipeline cannot convert. |
 | `12` | `Units = CNTS` on Philips data without either private scale factor. |
-| `13` | An Enhanced PET object carries per-frame values that differ between frames. |
+| `13` | The per-frame values of an Enhanced PET object could not be resolved per slice: its frames name different units, or its functional groups could not be mapped to frames. |
+| `14` | No Real World Value Mapping of an Enhanced PET object describes the loaded pixel values; MITK does not apply the mapping. |
 
 Codes 11 and 12 previously fell into the catch-all `1`, so a calling script
 could not tell "this input is not convertible" from "MITK broke". The table

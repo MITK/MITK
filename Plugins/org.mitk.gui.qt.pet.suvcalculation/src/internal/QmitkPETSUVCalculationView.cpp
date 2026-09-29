@@ -228,10 +228,20 @@ namespace
     if (dynamic_cast<const EnhancedPETPerFrameVariationException*>(&e))
     {
       return QObject::tr(
-        "This Enhanced PET object stores a value per frame that differs "
-        "between frames, and MITK's DICOM reader models one frame per file, "
-        "so the variation cannot be honoured. Computing from a single frame's "
-        "value would be silently wrong for the others.\n\nDetails: %1").arg(raw);
+        "The per-frame values of this Enhanced PET object could not be "
+        "resolved per slice: either its frames name different units, or the "
+        "DICOM reader could not map its functional groups to frames. Computing "
+        "from a single frame's value would be silently wrong for the others."
+        "\n\nDetails: %1").arg(raw);
+    }
+    if (dynamic_cast<const EnhancedPETMappingNotAppliedException*>(&e))
+    {
+      return QObject::tr(
+        "None of this Enhanced PET object's Real World Value Mappings describes "
+        "the pixel values as loaded. MITK applies the Pixel Value Transformation "
+        "per frame but does not apply the Real World Value Mapping, so the "
+        "loaded values are only in a known unit when a mapping's slope and "
+        "intercept equal that transformation.\n\nDetails: %1").arg(raw);
     }
     if (dynamic_cast<const ImplausiblePatientWeightException*>(&e))
     {

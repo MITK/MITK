@@ -85,12 +85,14 @@ with the reason for each. The manifest grows as each fix lands. Without
 that rule, adding a DRO ahead of its fix would turn the MITK build red
 for everyone.
 
-One consequence to keep in mind when the manifest later covers all 58:
-**"58 under test" would not mean "58 conformant".** A `Refusal` entry
-asserts MITK's honest-failure contract, and for a DRO whose upstream
-expected values are `0.20 / 1.00 / 4.00` a refusal still scores as a
-failure against the benchmark itself. A green suite means "nothing
-regressed", not "MITK passes the benchmark".
+A `Refusal` entry asserts MITK's honest-failure contract. Only the
+`DRO_error_*` objects are carried that way: every value DRO is a
+`CanonicalTriple`, so a green suite is the benchmark's own 58 of 58.
+Until the DICOM reader gained its per-frame model, the two Enhanced PET
+objects with varying per-frame values were carried as expected refusals,
+and "58 under test" did not mean "58 conformant"; if a value DRO ever has
+to be demoted to a `Refusal` again, keep those two figures apart in every
+report.
 
 ### Skip behavior
 

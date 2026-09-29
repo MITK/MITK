@@ -56,9 +56,9 @@ namespace
     Require(item.putAndInsertString(DCM_RescaleType, "BQML"), "Rescale Type");
   }
 
-  std::string PositionString(double z)
+  std::string PositionString(double y, double z)
   {
-    return "0\\0\\" + mitk::ConvertValueToDICOMStr(z);
+    return "0\\" + mitk::ConvertValueToDICOMStr(y) + "\\" + mitk::ConvertValueToDICOMStr(z);
   }
 }
 
@@ -157,7 +157,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
     {
       Require(dataset.putAndInsertString(DCM_ImageOrientationPatient, "1\\0\\0\\0\\1\\0"),
               "Image Orientation (Patient)");
-      Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->zOffset).c_str()),
+      Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->yOffset, this->zOffset).c_str()),
               "Image Position (Patient)");
       Require(dataset.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");
     }
@@ -187,7 +187,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
       const double planeZ =
         this->framesAtOnePosition ? this->zOffset : this->zOffset + k * this->sliceSpacing;
       DcmItem& position = AppendItem(perFrame, DCM_PlanePositionSequence);
-      Require(position.putAndInsertString(DCM_ImagePositionPatient, PositionString(planeZ).c_str()),
+      Require(position.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->yOffset, planeZ).c_str()),
               "Image Position (Patient)");
 
       if (RescalePlacement::Shared != this->rescalePlacement)
@@ -206,7 +206,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   {
     Require(dataset.putAndInsertString(DCM_ImageOrientationPatient, "1\\0\\0\\0\\1\\0"),
             "Image Orientation (Patient)");
-    Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->zOffset).c_str()),
+    Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->yOffset, this->zOffset).c_str()),
             "Image Position (Patient)");
     const std::string spacing = mitk::ConvertValueToDICOMStr(this->sliceSpacing) + "\\" + mitk::ConvertValueToDICOMStr(this->sliceSpacing);
     Require(dataset.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");

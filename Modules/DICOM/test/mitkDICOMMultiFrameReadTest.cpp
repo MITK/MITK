@@ -152,6 +152,7 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(MoreSpecificOriginWinsWhateverTheOrder);
   MITK_TEST(TwoEnhancedFilesInOneSeriesBecomeTwoCompleteVolumes);
   MITK_TEST(EnhancedFilesWithTopLevelGeometryAreSeparated);
+  MITK_TEST(SeparatedFilesAreNotShearedByTheTiltAcrossFiles);
   MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolume);
   MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolumeWithAFreshReader);
   MITK_TEST(OpeningAFileWithDifferentlyCasedNameLoadsIt);
@@ -1088,6 +1089,33 @@ public:
     }
   }
 
+  /** The tilt the sorters see across the files of a series belongs to the
+      block of those files. A separated file is a block of its own, and a
+      single file has no tilt, so its frames are not sheared and its slice
+      spacing stays its own. */
+  void SeparatedFilesAreNotShearedByTheTiltAcrossFiles()
+  {
+    const auto reference = this->MakeEnhanced();
+    const std::string directory = this->WriteSeries(3, [](mitk::DICOMMultiFrameTestObject& object, unsigned int file)
+    {
+      object.topLevelGeometry = true;
+      object.zOffset = file * FRAME_COUNT * object.sliceSpacing;
+      object.yOffset = file * 2.0;
+    });
+
+    const auto images = this->LoadAll(directory);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The block is separated into one volume per file",
+                                 std::size_t(3), images.size());
+
+    for (const auto& image : images)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A separated file keeps its own extent",
+                                   reference.rows, image->GetDimension(1));
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A separated file keeps its own slice spacing",
+                                           reference.sliceSpacing, image->GetGeometry()->GetSpacing()[2], 1e-6);
+    }
+  }
+
   /** Opening one file of the separated block loads the volume of that file only.
    *
    * The selection scan still sees the files as one block, so it is the frame
@@ -1339,8 +1367,8 @@ public:
    * Class UID, Modality and top-level geometry. So this pins the outcome rather
    * than the mechanism: the multi-frame file still loads as the complete volume
    * it is, exactly one volume carries the frame model, and no frame is lost.
-   * `ExpandAndSeparate`'s remainder branch stays a net for a block the sorters
-   * do hand over mixed.
+   * The retained group of the file-level separation stays a net for a block the
+   * sorters do hand over mixed.
    */
   void EnhancedFileIsSeparatedFromSingleFrameFiles()
   {

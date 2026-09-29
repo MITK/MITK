@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCreateDistanceImageFromSurfaceFilter.h>
+#include <mitkDenseLinearSystemSolver.h>
 
 #include <mitkImageCast.h>
 #include <mitkProgressTask.h>
@@ -181,7 +182,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
   if (nullptr != m_ProgressTask)
     m_ProgressTask->Progress(1);
 
-  m_Weights = m_SolutionMatrix.partialPivLu().solve(m_FunctionValues);
+  m_Weights = SolveDenseLinearSystem(m_SolutionMatrix, m_FunctionValues);
 
   if (nullptr != m_ProgressTask)
     m_ProgressTask->Progress(2);

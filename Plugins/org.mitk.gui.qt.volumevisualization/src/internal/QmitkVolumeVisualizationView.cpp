@@ -196,8 +196,10 @@ void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNod
 
   // Only here, and deliberately not from UpdateInterface: binding is where the
   // editor decides whether the node's existing function is one to adopt, and
-  // re-deciding that right after rendering is switched on would take over the
-  // mapper's registered default instead of leaving room for a preset.
+  // re-deciding that right after rendering is switched on would take over
+  // whatever function the node already carries, such as the default a scene
+  // saved by an earlier MITK version gives every image, instead of leaving room
+  // for a preset.
   m_Controls->transferFunctionEditor->SetDataNode(m_SelectedNode.Lock().GetPointer());
 
   this->UpdateInterface();
@@ -219,11 +221,12 @@ void QmitkVolumeVisualizationView::OnToggleRendering()
 
   if (state)
   {
-    // The mapper's registered defaults predate this view: its transfer function
-    // is one no preset names, and its material values describe no lighting
-    // model. Both are taken over the moment rendering is switched on, rather
-    // than by changing what the mapper registers for every plugin. Each is a
-    // no-op if the node already carries a choice made here.
+    // A node switched on here may carry no transfer function, or one no preset
+    // names left by a scene saved by an earlier MITK version, and the mapper's
+    // registered material values describe no lighting model. Both are taken
+    // over the moment rendering is switched on, rather than by changing what
+    // the mapper registers for every plugin. Each is a no-op if the node
+    // already carries a choice made here.
     m_Controls->transferFunctionEditor->EnsureTransferFunction();
 
     if (mitk::VolumeRenderingLightingModel::FromNode(selectedNode) == nullptr)

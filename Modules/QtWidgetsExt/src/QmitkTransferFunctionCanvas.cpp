@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <QmitkTransferFunctionCanvas.h>
 
+#include <mitkRenderingManager.h>
+
 #include <itkObject.h>
 
 #include <QColorDialog>

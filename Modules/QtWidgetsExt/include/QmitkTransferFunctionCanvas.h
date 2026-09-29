@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExtExports.h>
 
-#include <mitkRenderingManager.h>
 #include <mitkSimpleHistogram.h>
 
 #include <QWidget>

@@ -1779,10 +1779,31 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
   };
   walk(rootSplitter);
 
-  // Emit the strict-mode 'groups' dict for every group referenced by a cell.
-  nlohmann::json groupsJson = nlohmann::json::object();
-  for (const auto& [idx, name] : groupNames)
+  // Emit the strict-mode 'groups' dict for every registered group, not only
+  // those a cell references: an empty group is still a card in the editor.
+  // A registered group only navigation links name is left to the loop below,
+  // which declares it the way the loader reads it back - as a group without
+  // selection state - so that save and load stay a fixpoint.
+  std::set<std::string> navGroupNames;
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
+    for (auto& navGroup : this->GetSyncGroupNames(dimension))
+    {
+      navGroupNames.insert(std::move(navGroup));
+    }
+  }
+  const auto isSelectionReferenced = [&groupNames](const std::string& name)
+  {
+    return std::any_of(groupNames.begin(), groupNames.end(),
+                       [&name](const auto& entry) { return entry.second == name; });
+  };
+  nlohmann::json groupsJson = nlohmann::json::object();
+  for (const auto& [idx, name] : m_GroupNameByIndex)
+  {
+    if (!isSelectionReferenced(name) && navGroupNames.count(name) > 0)
+    {
+      continue;
+    }
     bool selectAll = true;
     if (auto* connector = this->GetSyncGroupConnector(idx))
     {
@@ -2482,6 +2503,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     std::map<std::string, bool> groupSelectAll;
     std::map<std::string, std::string> groupColors;
     std::map<std::string, std::string> groupDisplayNames;
+    std::map<std::string, bool> unreferencedGroupSelectAll;
     if (strictMode)
     {
       const auto& groupsDict = doc.at("groups");
@@ -2561,6 +2583,15 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
           mitkThrow() << "Layout 'groups." << g << "' entry must be a JSON object.";
         }
       }
+      for (auto it = groupsDict.begin(); it != groupsDict.end(); ++it)
+      {
+        if (groupSelectAll.find(it.key()) == groupSelectAll.end()
+            && prewalk.navGroups.find(it.key()) == prewalk.navGroups.end())
+        {
+          unreferencedGroupSelectAll[it.key()] =
+            it.value().is_object() ? it.value().value("select_all", true) : true;
+        }
+      }
     }
     else
     {
@@ -2597,7 +2628,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     didMutate = true;
 
     // ----- Allocate engine-internal sync groups -----
-    // 'main' (if referenced) pins to engine index 1 to preserve the editor's
+    // 'main' (if declared) pins to engine index 1 to preserve the editor's
     // default-group convention; other names get the next free index in
     // ascending allocation order. Group properties (select_all) are written
     // to each connector before any cell is wired up.
@@ -2607,6 +2638,14 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       this->AddSynchronizationGroup(1, "main");
       this->GetSyncGroupConnector(1)->ChangeSelectionMode(groupSelectAll.at("main"));
       nameToInt["main"] = 1;
+    }
+    else if (const auto emptyMain = unreferencedGroupSelectAll.find("main");
+             emptyMain != unreferencedGroupSelectAll.end())
+    {
+      // A declared "main" is the default group even while no cell is in it.
+      this->AddSynchronizationGroup(1, "main");
+      this->GetSyncGroupConnector(1)->ChangeSelectionMode(emptyMain->second);
+      unreferencedGroupSelectAll.erase(emptyMain);
     }
     else if (!groupSelectAll.empty())
     {
@@ -2629,6 +2668,17 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       this->AddSynchronizationGroup(idx, groupName);
       this->GetSyncGroupConnector(idx)->ChangeSelectionMode(selectAll);
       nameToInt[groupName] = idx;
+    }
+    // A declared group no cell references is an empty group, which the editor
+    // keeps and shows. Registering it keeps it across a save, and keeps its
+    // cosmetics bound to it rather than to whichever new group would later be
+    // given its name. After the referenced groups, so that without a declared
+    // 'main' the default group stays a referenced one.
+    for (const auto& [groupName, selectAll] : unreferencedGroupSelectAll)
+    {
+      const auto idx = this->NextFreeSyncGroupIndex();
+      this->AddSynchronizationGroup(idx, groupName);
+      this->GetSyncGroupConnector(idx)->ChangeSelectionMode(selectAll);
     }
 
     // ----- Construct the new cell tree -----
@@ -2818,9 +2868,41 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   connector->ChangeSelection(currentSelection);
   m_SynchronizedWidgetConnectors[index] = std::move(connector);
 
-  m_GroupNameByIndex[index] = name.empty()
-    ? ((index == 1) ? std::string("main") : ("g_" + std::to_string(index)))
-    : name;
+  std::string resolvedName = name;
+  if (resolvedName.empty() && 1 == index)
+  {
+    resolvedName = "main";
+  }
+  else if (resolvedName.empty())
+  {
+    // Derived from the index, but a loaded layout names its groups freely and
+    // may already use "g_<index>" for a group at another index.
+    const auto isTaken = [this](const std::string& candidate)
+    {
+      for (const auto& [otherIndex, otherName] : m_GroupNameByIndex)
+      {
+        if (otherName == candidate)
+        {
+          return true;
+        }
+      }
+      for (const auto dimension : QmitkMxNAllSyncDimensions)
+      {
+        const auto navGroups = this->GetSyncGroupNames(dimension);
+        if (std::find(navGroups.begin(), navGroups.end(), candidate) != navGroups.end())
+        {
+          return true;
+        }
+      }
+      return false;
+    };
+    auto suffix = index;
+    do
+    {
+      resolvedName = "g_" + std::to_string(suffix++);
+    } while (isTaken(resolvedName));
+  }
+  m_GroupNameByIndex[index] = resolvedName;
   this->RegisterGroupForHue(m_GroupNameByIndex[index]);
 
   emit SyncGroupAdded(index, QString::fromStdString(this->GetSyncGroupDisplayName(m_GroupNameByIndex[index])));

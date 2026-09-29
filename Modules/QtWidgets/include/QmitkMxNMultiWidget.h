@@ -188,7 +188,8 @@ public:
   * \param name    Optional bare group label to record in the engine's group-
   *                name registry. When empty (the default), the registry
   *                receives the conventional auto-generated label: 'main' for
-  *                index 1, otherwise 'g_<index>'. Idempotent calls (the group
+  *                index 1, otherwise 'g_<index>' - or, if a group already uses
+  *                that name, 'g_<n>' with the next unused n. Idempotent calls (the group
   *                already exists) leave the previously recorded name in
   *                place.
   *
@@ -819,17 +820,19 @@ public:
   * \brief Serialize the current layout tree to a v3.0 JSON document
   *        (always strict mode).
   *
-  *   Group naming convention: engine-internal sync-group index 1 maps to the
-  *   bare label "main"; other indices map to `g_<i>` where `<i>` is a counter
-  *   assigned by pre-order encounter order over the cell list. Same engine
-  *   state in produces the same group names out (round-trip stable).
+  *   Groups are emitted under their registered names: the name a loaded
+  *   document gave them, or for a group created without one "main" at engine
+  *   index 1 and otherwise `g_<n>`, where `<n>` is the engine index unless a
+  *   loaded group already uses that name. Same engine state in produces the
+  *   same group names out (round-trip stable).
   *
   *   Per-cell synchronization links are emitted for every linked dimension;
   *   `slice` / `zoom` / `pan` links carrying a non-identity offset use the
   *   object form (`{"target": ..., "offset": ...}`), all other links the
-  *   string shorthand. Every referenced group is declared in the top-level
-  *   `groups` dict (groups referenced only by navigation dimensions as empty
-  *   entries - they carry no persisted per-group state).
+  *   string shorthand. Every registered group is declared in the top-level
+  *   `groups` dict, including one no cell references yet; groups referenced
+  *   only by navigation dimensions are declared as empty entries - they carry
+  *   no persisted per-group state.
   *
   *   See 'mxn-layout-v3.schema.json' for the document shape this method emits.
   *

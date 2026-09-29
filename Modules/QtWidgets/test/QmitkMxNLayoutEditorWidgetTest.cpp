@@ -122,6 +122,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Matrix_SelectionAxisClearReturnsToDefault);
   MITK_TEST(Matrix_RegroupKeepsTheAuthoredOffset);
   MITK_TEST(Group_LinkActionsKeepAuthoredOffsets);
+  MITK_TEST(Save_NavigationOnlyGroupRoundTripsToItself);
   MITK_TEST(Matrix_OffsetOnUnlinkedCellIsIgnored);
   MITK_TEST(Matrix_SliceRampSpreadsOverCellsInOrder);
   MITK_TEST(Matrix_TracksAnEditMadeOnTheCards);
@@ -1491,6 +1492,21 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id,
                                  QmitkMxNGroupJoinMode::MergeOverwriteCollisions);
     assertOffsetsKept("a merge join onto the same group");
+  }
+
+  void Save_NavigationOnlyGroupRoundTripsToItself()
+  {
+    // A group created on the cards and joined on the navigation axes only has
+    // no selection state; save and load must agree on how it is declared.
+    m_Editor->ApplyLayout(m_Editor->SerializeLayout());
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+    CPPUNIT_ASSERT_MESSAGE("The group joins on navigation, not selection",
+                           m_Editor->GetCellSelectionGroup(CellId(0)) != id);
+
+    const auto saved = m_Editor->SerializeLayout();
+    m_Editor->ApplyLayout(saved);
+    CPPUNIT_ASSERT_MESSAGE("Save and load are a fixpoint", saved == m_Editor->SerializeLayout());
   }
 
   void Matrix_OffsetOnUnlinkedCellIsIgnored()

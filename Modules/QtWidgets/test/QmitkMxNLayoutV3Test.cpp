@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 #include <QColor>
 
+#include <algorithm>
+
 /**
  * Tests the v3 layout format on QmitkMxNMultiWidget:
  *   - The loader accepts "2.0" and "3.0" in one code path; a v2 document
@@ -53,6 +55,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(GroupCosmetics_MalformedColorIgnored);
   MITK_TEST(GroupCosmetics_UnknownEntryKeyTolerated);
   MITK_TEST(GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone);
+  MITK_TEST(EmptyGroup_SurvivesSaveAndLoad);
+  MITK_TEST(DeclaredEmptyGroup_KeepsItsCosmeticsToItself);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -386,6 +390,66 @@ public:
     CPPUNIT_ASSERT_THROW(editor->SetSyncGroupDisplayName("no-such-group", "x"), mitk::Exception);
     CPPUNIT_ASSERT_THROW(editor->SetSyncGroupColor("no-such-group", QColor("#000000")), mitk::Exception);
     CPPUNIT_ASSERT_THROW(editor->SetSyncGroupColor("nav", QColor()), mitk::Exception);
+  }
+
+  static const QmitkMxNMultiWidget::SyncGroupInfo* FindGroup(
+    const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos, const std::string& id)
+  {
+    const auto it = std::find_if(infos.begin(), infos.end(), [&id](const auto& info) { return info.id == id; });
+    return it != infos.end() ? &*it : nullptr;
+  }
+
+  void EmptyGroup_SurvivesSaveAndLoad()
+  {
+    // A group no window is in yet is still a card in the editor, so Save keeps it.
+    auto editor = MakeEditor();
+    editor->ApplyLayout(SingleWindowDoc());
+    const auto index = editor->NextFreeSyncGroupIndex();
+    editor->AddSynchronizationGroup(index);
+    const auto id = editor->GetSyncGroupName(index);
+    editor->SetSyncGroupDisplayName(id, "Tumor");
+    editor->SetSyncGroupColor(id, QColor("#ff0000"));
+
+    const auto saved = editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("Save declares the empty group", saved.at("groups").contains(id));
+
+    auto reloaded = MakeEditor();
+    reloaded->ApplyLayout(saved);
+    const auto infos = reloaded->GetSyncGroupInfos();
+    const auto* group = FindGroup(infos, id);
+    CPPUNIT_ASSERT_MESSAGE("The empty group is a card again after loading", nullptr != group);
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor"), group->displayName);
+    CPPUNIT_ASSERT(QColor("#ff0000") == group->color);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The default group stays the referenced one",
+                                 std::string("main"), reloaded->GetDefaultSyncGroupName());
+  }
+
+  void DeclaredEmptyGroup_KeepsItsCosmeticsToItself()
+  {
+    // A declared group whose name a new group would derive from its index must
+    // not lend that new group its color and name.
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true } } },
+      { "g_3", { { "color", "#ff0000" }, { "name", "Tumor" } } }
+    };
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+
+    const auto infos = editor->GetSyncGroupInfos();
+    const auto* declared = FindGroup(infos, "g_3");
+    CPPUNIT_ASSERT_MESSAGE("The declared group is registered", nullptr != declared);
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor"), declared->displayName);
+
+    for (int created = 0; created < 2; ++created)
+    {
+      const auto index = editor->NextFreeSyncGroupIndex();
+      editor->AddSynchronizationGroup(index);
+      const auto id = editor->GetSyncGroupName(index);
+      CPPUNIT_ASSERT_MESSAGE("A new group does not alias the declared one", "g_3" != id);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A new group carries no borrowed display name",
+                                   id, editor->GetSyncGroupDisplayName(id));
+    }
   }
 };
 

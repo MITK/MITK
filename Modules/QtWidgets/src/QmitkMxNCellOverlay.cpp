@@ -57,6 +57,7 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
+#include <QPointer>
 #include <QPolygon>
 #include <QPropertyAnimation>
 #include <QScreen>
@@ -2327,7 +2328,11 @@ void QmitkMxNCellOverlay::OpenColormapMenu()
     return;
   }
 
-  QMenu menu(this);
+  // No parent, like every menu of this overlay: the menu's event loop also
+  // delivers queued cross-thread calls, and a layout applied by one (a REST
+  // request) destroys this overlay, which would delete the menu from under
+  // its own stack frame.
+  QMenu menu;
   const auto& names = mitk::LookupTable::typenameList;
   for (std::size_t i = 0; i < names.size(); ++i)
   {
@@ -2335,8 +2340,9 @@ void QmitkMxNCellOverlay::OpenColormapMenu()
     action->setData(static_cast<int>(i));
   }
 
+  const QPointer<QmitkMxNCellOverlay> self(this);
   auto* chosen = menu.exec(this->mapToGlobal(this->ColormapChipRect().bottomLeft()));
-  if (nullptr == chosen)
+  if (nullptr == chosen || self.isNull())
   {
     return;
   }
@@ -2358,7 +2364,7 @@ void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
 {
   const auto windowId = m_Cell->GetWidgetName();
 
-  QMenu menu(this);
+  QMenu menu;  // No parent, see OpenColormapMenu.
   const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {
     { "Axial", mitk::AnatomicalPlane::Axial },
     { "Coronal", mitk::AnatomicalPlane::Coronal },
@@ -2722,7 +2728,9 @@ bool QmitkMxNCellOverlay::HandlePlateInput(QEvent::Type type, QMouseEvent* event
       {
         m_PlatePressActive = false;
         m_PlateDragArmed = false;
-        auto* drag = new QDrag(this);
+        // Owned by the editor, not this overlay: the drag's event loop can
+        // deliver a layout apply that destroys the overlay mid-drag.
+        auto* drag = new QDrag(m_Editor);
         drag->setMimeData(arrangeMode->CreateDragMimeData());
         arrangeMode->ReleaseCell(true);
         drag->exec(Qt::CopyAction);
@@ -2929,7 +2937,7 @@ void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
     return QIcon(pixmap);
   };
 
-  QMenu menu(this);
+  QMenu menu;  // No parent, see OpenColormapMenu.
 
   // Replace is what the group cards' "Add selected windows" does, so the two
   // ways of adding mean the same.
@@ -3033,8 +3041,15 @@ bool QmitkMxNCellOverlay::HandleCellDrag(QEvent* event)
       {
         return false;
       }
-      const auto mode = QmitkMxNResolveJoinMode(dropEvent->mimeData(), dropEvent->modifiers(), this,
+      // The ask-mode menu gets no parent and the overlay is re-checked after
+      // it, for the reason given in OpenColormapMenu.
+      const QPointer<QmitkMxNCellOverlay> self(this);
+      const auto mode = QmitkMxNResolveJoinMode(dropEvent->mimeData(), dropEvent->modifiers(), nullptr,
                                                 m_Cell->mapToGlobal(dropEvent->position().toPoint()));
+      if (self.isNull())
+      {
+        return true;
+      }
       if (mode.has_value())
       {
         m_Editor->GetArrangeMode()->RequestAssign(
@@ -3063,7 +3078,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   }
   const auto windowId = m_Cell->GetWidgetName();
 
-  QMenu menu(this);
+  QMenu menu;  // No parent, see OpenColormapMenu.
 
   auto* directionMenu = menu.addMenu(tr("View direction"));
   const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {

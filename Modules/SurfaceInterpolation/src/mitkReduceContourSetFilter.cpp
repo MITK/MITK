@@ -321,7 +321,10 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(
         unsigned int divisions = abs(segmentLenght) / newLenght;
         //          MITK_INFO<<"Divisions: "<<divisions;
 
-        for (unsigned int i = 1; i <= divisions; ++i)
+        // Only the inner cut points: divisions * newLenght reaches the segment end or stops
+        // a few points short of it, so a last cut point would duplicate or crowd the end
+        // point inserted below.
+        for (unsigned int i = 1; i < divisions; ++i)
         {
           //                MITK_INFO<<"Inserting MIDDLE: "<<(currentSegment.StartIndex + newLenght*i);
           pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + newLenght * i));

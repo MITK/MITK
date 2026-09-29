@@ -95,6 +95,7 @@ namespace mitk
   /**
    * \brief Record the blend mode on the node, for the mapper to pick up.
    * \param[in] node The node to configure.
+   * \param[in] mode The blend mode to record.
    * \throws mitk::Exception if \p node is nullptr.
    */
   MITKVOLUMEVISUALIZATION_EXPORT void SetVolumeBlendMode(DataNode *node, VolumeBlendMode mode);

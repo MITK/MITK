@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCreateDistanceImageFromSurfaceFilter.h>
+#include <mitkDenseLinearSystemSolver.h>
 
 #include <mitkImageCast.h>
 #include <mitkProgressTask.h>
@@ -36,41 +37,32 @@ namespace
   {
   public:
     DistanceFunction(const mitk::CreateDistanceImageFromSurfaceFilter::CenterList& centers, const Eigen::VectorXd& weights)
+      : m_X(static_cast<Eigen::Index>(centers.size())),
+        m_Y(static_cast<Eigen::Index>(centers.size())),
+        m_Z(static_cast<Eigen::Index>(centers.size())),
+        m_Weights(weights.array())
     {
-      m_X.reserve(centers.size());
-      m_Y.reserve(centers.size());
-      m_Z.reserve(centers.size());
-      m_Weights.reserve(centers.size());
-
-      for (std::size_t i = 0; i < centers.size(); ++i)
+      for (Eigen::Index i = 0; i < m_X.size(); ++i)
       {
-        m_X.push_back(centers[i][0]);
-        m_Y.push_back(centers[i][1]);
-        m_Z.push_back(centers[i][2]);
-        m_Weights.push_back(weights[static_cast<Eigen::Index>(i)]);
+        const auto& center = centers[static_cast<std::size_t>(i)];
+        m_X[i] = center[0];
+        m_Y[i] = center[1];
+        m_Z[i] = center[2];
       }
     }
 
+    // As one array expression, the sum is vectorized: a plain loop would not be, as the compiler
+    // must not reorder a floating-point sum.
     double operator()(const itk::Point<double, 3>& point) const
     {
-      double distance = 0.0;
-
-      for (std::size_t i = 0; i < m_Weights.size(); ++i)
-      {
-        const double dx = point[0] - m_X[i];
-        const double dy = point[1] - m_Y[i];
-        const double dz = point[2] - m_Z[i];
-        distance += std::sqrt(dx * dx + dy * dy + dz * dz) * m_Weights[i];
-      }
-
-      return distance;
+      return (((m_X - point[0]).square() + (m_Y - point[1]).square() + (m_Z - point[2]).square()).sqrt() * m_Weights).sum();
     }
 
   private:
-    std::vector<double> m_X;
-    std::vector<double> m_Y;
-    std::vector<double> m_Z;
-    std::vector<double> m_Weights;
+    Eigen::ArrayXd m_X;
+    Eigen::ArrayXd m_Y;
+    Eigen::ArrayXd m_Z;
+    Eigen::ArrayXd m_Weights;
   };
 }
 
@@ -181,7 +173,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
   if (nullptr != m_ProgressTask)
     m_ProgressTask->Progress(1);
 
-  m_Weights = m_SolutionMatrix.partialPivLu().solve(m_FunctionValues);
+  m_Weights = SolveDenseLinearSystem(m_SolutionMatrix, m_FunctionValues);
 
   if (nullptr != m_ProgressTask)
     m_ProgressTask->Progress(2);
@@ -313,28 +305,30 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
   }
 
   // Now we have created all centers and all function values. Next step is to create the solution matrix
-  numberOfCenters = m_Centers.size();
+  const auto n = static_cast<Eigen::Index>(m_Centers.size());
 
-  m_SolutionMatrix.resize(numberOfCenters, numberOfCenters);
+  m_SolutionMatrix.resize(n, n);
 
-  m_Weights.resize(numberOfCenters);
+  m_Weights.resize(n);
 
-  PointType p1;
-  PointType p2;
-  double norm;
+  Eigen::ArrayXd x(n);
+  Eigen::ArrayXd y(n);
+  Eigen::ArrayXd z(n);
 
-  for (unsigned int i = 0; i < numberOfCenters; i++)
+  for (Eigen::Index i = 0; i < n; ++i)
   {
-    for (unsigned int j = 0; j < numberOfCenters; j++)
-    {
-      // Calculate the RBF value. Currently using Phi(r) = r with r is the euclidean distance between two points
-      p1 = m_Centers.at(i);
-      p2 = m_Centers.at(j);
-      p1 = p1 - p2;
-      norm = p1.two_norm();
-      m_SolutionMatrix(i, j) = norm;
-    }
+    x[i] = m_Centers[i][0];
+    y[i] = m_Centers[i][1];
+    z[i] = m_Centers[i][2];
   }
+
+  // Phi(r) = r, with r the euclidean distance between two centers. Column by column, as the
+  // matrix is stored that way.
+  itk::MultiThreaderBase::New()->ParallelizeArray(0, static_cast<itk::SizeValueType>(n), [&](itk::SizeValueType column)
+    {
+      const auto j = static_cast<Eigen::Index>(column);
+      m_SolutionMatrix.col(j) = ((x - x[j]).square() + (y - y[j]).square() + (z - z[j]).square()).sqrt().matrix();
+    }, nullptr);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()

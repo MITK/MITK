@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <vtkImageMarchingCubes.h>
 #include <vtkImageBinaryThreshold.h>
 #include <vtkLinearTransform.h>
+#include <vtkMarchingCubes.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPolyData.h>
 #include <vtkSmoothPolyDataFilter.h>

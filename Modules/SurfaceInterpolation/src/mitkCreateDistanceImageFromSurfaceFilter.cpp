@@ -96,10 +96,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
 
   /*
   * Now create an empty distance image. The created image will always have the same number of pixels, independent from
-  * the original image (e.g. always consists of 500000 pixels) and will have an isotropic spacing.
+  * the original image (m_DistanceImageVolume pixels, 50000 by default) and will have an isotropic spacing.
   * The spacing is calculated like the following:
-  * The image's volume = 500000 Pixels = extentX*spacing*extentY*spacing*extentZ*spacing
-  * So the spacing is: spacing = ( extentX*extentY*extentZ / 500000 )^(1/3)
+  * The image's volume = m_DistanceImageVolume = extentX*spacing*extentY*spacing*extentZ*spacing
+  * So the spacing is: spacing = ( extentX*extentY*extentZ / m_DistanceImageVolume )^(1/3)
   */
   double basis = (extentMM[0] * extentMM[1] * extentMM[2]) / m_DistanceImageVolume;
   double exponent = 1.0 / 3.0;

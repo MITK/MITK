@@ -68,6 +68,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
   MITK_TEST(ApplyLayout_RejectsReentrantApply);
+  MITK_TEST(LoadFeedback_CountsAsBusyUntilHidden);
 
   // --- Strict parsing and exception boundary ---
   MITK_TEST(ViewDirection_TypoSagittal_Throws);
@@ -735,6 +736,22 @@ public:
     nlohmann::json nullDoc;
     CPPUNIT_ASSERT(nullDoc.is_null());
     CPPUNIT_ASSERT_THROW(editor->LoadLayout(&nullDoc), mitk::Exception);
+  }
+
+  void LoadFeedback_CountsAsBusyUntilHidden()
+  {
+    // The GUI load raises its feedback and applies from a timer; a REST layout
+    // request accepted in that gap would run into the pending apply.
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT(!editor->IsApplyingLayout());
+
+    editor->ShowLayoutLoadFeedback();
+    CPPUNIT_ASSERT_MESSAGE("A load announced but not yet applied counts as busy",
+      editor->IsApplyingLayout());
+
+    editor->HideLayoutLoadFeedback();
+    CPPUNIT_ASSERT_MESSAGE("Hiding the feedback ends the busy state",
+      !editor->IsApplyingLayout());
   }
 
   // ====================================================================

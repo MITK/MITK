@@ -744,6 +744,10 @@ public:
   *   The dialog is modal and the pumping excludes user input, but posted
   *   events and queued cross-thread calls are still delivered while it is up.
   *   'ApplyLayout' is guarded against being re-entered from there.
+  *
+  *   From Show until Hide the editor counts as busy ('IsApplyingLayout'),
+  *   including the gap before the deferred apply starts, so the caller must
+  *   always pair the two.
   */
   void ShowLayoutLoadFeedback();
   void HideLayoutLoadFeedback();
@@ -946,7 +950,9 @@ public:
 
   /**
   * \brief True while an 'ApplyLayout' is in progress, including its rollback on
-  *        failure.
+  *        failure, and while a layout load announced by
+  *        'ShowLayoutLoadFeedback' has not yet been closed by
+  *        'HideLayoutLoadFeedback'.
   *
   *   The cell tree is torn down and half rebuilt during that time. Code that
   *   can run from the event loop the rebuild pumps (posted events, queued
@@ -1542,6 +1548,9 @@ private:
 
   /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
   bool m_ApplyingLayout = false;
+  /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
+  *          see 'IsApplyingLayout'. */
+  bool m_LayoutLoadPending = false;
 
   /**
   * \brief Splitter proportions as they were before maximizing, restored on the

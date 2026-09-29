@@ -30,9 +30,11 @@ found in the LICENSE file.
 
 #include <QCheckBox>
 #include <QMessageBox>
+#include <QPointer>
 #include <QTimer>
 
 #include <memory>
+#include <optional>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
@@ -256,23 +258,33 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
       // The document must be copied: 'jsonData' points at a local in the
       // emitter and dies with this emit. The sender's try/catch frame dies with
       // it too, so failures are reported here instead.
-      multiWidget->ShowLayoutLoadFeedback();
       auto document = std::make_shared<nlohmann::json>(*jsonData);
+      multiWidget->ShowLayoutLoadFeedback();
 
       // One display frame is ~16 ms; this leaves the compositor room to present
       // the overlay before the thread stops answering.
-      QTimer::singleShot(50, multiWidget, [this, multiWidget, document]()
+      // Timed on the editor, which the apply needs; the view may close before
+      // the timer fires, so its widget is only used through a guard.
+      const QPointer<QWidget> dialogParent = m_LayoutEditorWidget;
+      QTimer::singleShot(50, multiWidget, [dialogParent, multiWidget, document]()
       {
+        std::optional<QString> failure;
         try
         {
           multiWidget->ApplyLayout(*document);
         }
         catch (const std::exception& e)
         {
-          QMessageBox::warning(m_LayoutEditorWidget, tr("Layout load failed"),
-                               QString::fromUtf8(e.what()));
+          failure = QString::fromUtf8(e.what());
         }
+        // Before any warning: the editor counts as busy until the feedback is
+        // hidden, and a modal box would hold that for as long as it is open.
         multiWidget->HideLayoutLoadFeedback();
+        if (failure.has_value())
+        {
+          QMessageBox::warning(dialogParent.isNull() ? static_cast<QWidget*>(multiWidget) : dialogParent.data(),
+                               QmitkMxNLayoutEditorView::tr("Layout load failed"), *failure);
+        }
       });
     }));
 }

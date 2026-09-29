@@ -687,7 +687,10 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
 {
   if ("axial" == widgetName || "sagittal" == widgetName || "coronal" == widgetName || "3d" == widgetName)
   {
-    return GetActiveRenderWindowWidget()->GetRenderWindow();
+    // No active cell while a layout is being rebuilt; its event pump can still
+    // deliver a caller that asks.
+    const auto activeWidget = this->GetActiveRenderWindowWidget();
+    return nullptr != activeWidget ? activeWidget->GetRenderWindow() : nullptr;
   }
 
   return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
@@ -696,8 +699,10 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::AnatomicalPlane& /*orientation*/) const
 {
   // currently no mapping between plane orientation and render windows
-  // simply return the currently active render window
-  return GetActiveRenderWindowWidget()->GetRenderWindow();
+  // simply return the currently active render window, if there is one (see
+  // the name-based overload)
+  const auto activeWidget = this->GetActiveRenderWindowWidget();
+  return nullptr != activeWidget ? activeWidget->GetRenderWindow() : nullptr;
 }
 
 void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
@@ -718,6 +723,14 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
 
 void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera)
 {
+  // A layout rebuild in progress has no active cell yet; it initializes the
+  // cells it creates itself.
+  const auto activeWidget = this->GetActiveRenderWindowWidget();
+  if (nullptr == activeWidget)
+  {
+    return;
+  }
+
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   mitk::Point3D currentPosition = mitk::Point3D();
   unsigned int imageTimeStep = 0;
@@ -735,8 +748,7 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   }
 
   // initialize active render window
-  renderingManager->InitializeView(
-    this->GetActiveRenderWindowWidget()->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
+  renderingManager->InitializeView(activeWidget->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
 
   if (!resetCamera)
   {
@@ -2756,7 +2768,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 
 bool QmitkMxNMultiWidget::IsApplyingLayout() const
 {
-  return m_ApplyingLayout;
+  return m_ApplyingLayout || m_LayoutLoadPending;
 }
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
@@ -3984,6 +3996,10 @@ void QmitkMxNMultiWidget::RequestLayoutEditor(LayoutEditorRequest request)
 
 void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
 {
+  // Busy from here on, dialog or not: the caller defers the apply, and a REST
+  // layout request accepted in between would collide with it.
+  m_LayoutLoadPending = true;
+
   if (!this->isVisible() || !m_LoadDialog.isNull())
   {
     return;
@@ -3992,10 +4008,12 @@ void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
   auto* dialog = new QDialog(this);
   dialog->setWindowTitle(tr("Loading layout"));
   // Modal, and the pumping during the rebuild excludes user input, so the user
-  // cannot reach the half rebuilt cell tree. Posted events and queued
+  // cannot reach the half rebuilt cell tree. Posted events, timers and queued
   // cross-thread calls (such as REST requests) are still delivered:
-  // 'ApplyLayout' refuses to be re-entered, and the REST bindings refuse MxN
-  // requests while 'IsApplyingLayout()' holds.
+  // 'ApplyLayout' refuses to be re-entered and the REST bindings refuse MxN
+  // requests while 'IsApplyingLayout()' holds, but other callers - a view's
+  // timer, a non-MxN REST endpoint, a DataStorage change - do reach the editor
+  // mid-rebuild. The accessors they use tolerate the missing active cell.
   dialog->setWindowModality(Qt::ApplicationModal);
 
   auto* label = new QLabel(tr("Reading the layout..."), dialog);
@@ -4053,10 +4071,9 @@ void QmitkMxNMultiWidget::StepLayoutLoadFeedback(int percent, const QString& lab
 
   // The rebuild holds the UI thread, and a thread that pumps no messages gets
   // nothing composited - so without this the bar would not move at all. User
-  // input stays excluded and the dialog is modal, but posted events and queued
-  // cross-thread calls (such as REST requests) are delivered here, in the
-  // middle of the rebuild. 'ApplyLayout' guards against being re-entered, and
-  // the REST bindings refuse MxN requests while it runs.
+  // input stays excluded and the dialog is modal, but posted events, timers
+  // and queued cross-thread calls are delivered here, in the middle of the
+  // rebuild (see ShowLayoutLoadFeedback for who is kept out and who is not).
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
@@ -4077,6 +4094,7 @@ void QmitkMxNMultiWidget::TickLayoutLoadFeedbackCell()
 
 void QmitkMxNMultiWidget::HideLayoutLoadFeedback()
 {
+  m_LayoutLoadPending = false;
   m_LoadCellTarget = 0;
   m_LoadCellsDone = 0;
   if (m_LoadDialog.isNull())

@@ -587,6 +587,7 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
       imageToSurfaceFilter->SetThreshold(0);
       imageToSurfaceFilter->SetSmooth(true);
       imageToSurfaceFilter->SetSmoothIteration(1);
+      imageToSurfaceFilter->SetMergeCoincidentPoints(false);
       imageToSurfaceFilter->Update();
 
       interpolationResult = mitk::Surface::New();

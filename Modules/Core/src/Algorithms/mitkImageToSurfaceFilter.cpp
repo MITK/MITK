@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkImageToSurfaceFilter.h>
 #include <mitkImageVtkReadView.h>
 #include <vtkDecimatePro.h>
+#include <vtkFlyingEdges3D.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
 #include <vtkLinearTransform.h>
@@ -21,9 +22,9 @@ found in the LICENSE file.
 #include <vtkMatrix4x4.h>
 #include <vtkQuadricDecimation.h>
 
-#include <vtkCleanPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
+#include <vtkStaticCleanPolyData.h>
 
 #include <mitkProgressTask.h>
 
@@ -34,6 +35,7 @@ mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
     m_TargetReduction(0.95f),
     m_SmoothIteration(50),
     m_SmoothRelaxation(0.1),
+    m_MergeCoincidentPoints(true),
     m_ProgressTask(nullptr)
 {
 }
@@ -51,9 +53,11 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
   indexCoordinatesImageFilter->SetInputData(vtkimage);
   indexCoordinatesImageFilter->SetOutputOrigin(0.0, 0.0, 0.0);
 
-  // MarchingCube -->create Surface
-  vtkSmartPointer<vtkMarchingCubes> skinExtractor = vtkSmartPointer<vtkMarchingCubes>::New();
+  // The normals are computed at the end, after smoothing and decimation have moved the points.
+  vtkSmartPointer<vtkFlyingEdges3D> skinExtractor = vtkSmartPointer<vtkFlyingEdges3D>::New();
   skinExtractor->ComputeScalarsOff();
+  skinExtractor->ComputeNormalsOff();
+  skinExtractor->ComputeGradientsOff();
   skinExtractor->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort()); // RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);
@@ -63,11 +67,25 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
   polydata = skinExtractor->GetOutput();
   polydata->Register(nullptr); // RC++
 
+  // Flying edges creates one point per crossed edge. Where the image takes exactly the threshold
+  // value, the points of all edges at a voxel coincide, so merge them before smoothing, decimation
+  // and normals work on the mesh.
+  if (m_MergeCoincidentPoints)
+  {
+    vtkSmartPointer<vtkStaticCleanPolyData> merger = vtkSmartPointer<vtkStaticCleanPolyData>::New();
+    merger->SetInputData(polydata);
+    merger->Update();
+
+    polydata->Delete(); // RC--
+    polydata = merger->GetOutput();
+    polydata->Register(nullptr); // RC++
+  }
+
   if (m_Smooth && polydata->GetNumberOfPoints() > 0 && polydata->GetNumberOfCells() > 0)
   {
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     // read poly1 (poly1 can be the original polygon, or the decimated polygon)
-    smoother->SetInputConnection(skinExtractor->GetOutputPort()); // RC++
+    smoother->SetInputData(polydata); // RC++
     smoother->SetNumberOfIterations(m_SmoothIteration);
     smoother->SetRelaxationFactor(m_SmoothRelaxation);
     smoother->SetFeatureAngle(60);
@@ -153,17 +171,12 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
   vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
   normalsGenerator->SetInputData(polydata);
   normalsGenerator->FlipNormalsOn();
+  // Splitting would duplicate the points along sharp edges and leave the surface unwelded there.
+  normalsGenerator->SplittingOff();
+  normalsGenerator->Update();
 
-  vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-  cleanPolyDataFilter->SetInputConnection(normalsGenerator->GetOutputPort());
-  cleanPolyDataFilter->PieceInvariantOff();
-  cleanPolyDataFilter->ConvertLinesToPointsOff();
-  cleanPolyDataFilter->ConvertPolysToLinesOff();
-  cleanPolyDataFilter->ConvertStripsToPolysOff();
-  cleanPolyDataFilter->PointMergingOn();
-  cleanPolyDataFilter->Update();
+  surface->SetVtkPolyData(normalsGenerator->GetOutput(), time);
 
-  surface->SetVtkPolyData(cleanPolyDataFilter->GetOutput(), time);
   polydata->UnRegister(nullptr);
 }
 

@@ -49,8 +49,8 @@ namespace
    *
    * Nothing outside this view writes the property, so it doubles as the marker
    * that someone deliberately configured this node here. "TransferFunction"
-   * cannot serve that purpose: mitk::VolumeMapperVtkSmart3D registers a default
-   * one on every image node, so its presence says nothing.
+   * cannot serve that purpose: scenes saved by earlier MITK versions carry one
+   * on every image node, so its presence says nothing.
    */
   bool IsVolumeRenderingOn(const mitk::DataNode *node)
   {

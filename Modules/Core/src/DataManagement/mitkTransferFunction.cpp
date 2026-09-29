@@ -137,9 +137,9 @@ namespace mitk
 
     m_ColorTransferFunction->RemoveAllPoints();
 
-    // VTK defaults to RGB. MITK diverges deliberately: the TransferFunctionInitializer
-    // presets and every scene written before the color space was serialized were
-    // authored under HSV, and both rely on this default to still look the way they did.
+    // VTK defaults to RGB. MITK diverges deliberately: every scene written before
+    // the color space was serialized was authored under HSV and relies on this
+    // default to still look the way it did.
     m_ColorTransferFunction->SetColorSpaceToHSV();
 
     m_ColorTransferFunction->AddRGBPoint(0, 1, 1, 1);

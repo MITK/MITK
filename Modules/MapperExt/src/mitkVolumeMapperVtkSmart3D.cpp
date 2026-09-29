@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include <mitkVolumeMapperVtkSmart3D.h>
 #include <mitkTransferFunctionProperty.h>
-#include <mitkTransferFunctionInitializer.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkVolumeRenderingMaterial.h>
 #include <vtkObjectFactory.h>
@@ -159,15 +158,6 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   node->AddProperty("volumerendering.normalsFromOpacity", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("binary", mitk::BoolProperty::New(false), renderer, overwrite);
-
-  if ((overwrite) || (node->GetProperty("TransferFunction", renderer) == nullptr))
-  {
-    // add a default transfer function
-    mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-    mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(tf);
-    tfInit->SetTransferFunctionMode(0);
-    node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
-  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

@@ -568,8 +568,8 @@ namespace
    *
    * Nothing outside the volume visualization controls writes the property, so it
    * doubles as the marker that someone deliberately configured this node there.
-   * "TransferFunction" cannot serve that purpose: mitk::VolumeMapperVtkSmart3D
-   * registers a default one on every image node, so its presence says nothing.
+   * "TransferFunction" cannot serve that purpose: scenes saved by earlier MITK
+   * versions carry one on every image node, so its presence says nothing.
    */
   bool IsVolumeRenderingOn(const mitk::DataNode *node)
   {
@@ -1338,9 +1338,9 @@ void QmitkVolumeTransferFunctionEditor::AdoptTransferFunctionFromNode()
     // covers what predates them: nodes configured before the recipe existed, or
     // by the volume visualization view of earlier MITK versions. What cannot
     // serve as evidence is the TransferFunction property itself - see
-    // IsVolumeRenderingOn. Adopting the mapper's default would show a curve
-    // nobody chose and would also suppress EnsureTransferFunction, which fires
-    // only while no function is held.
+    // IsVolumeRenderingOn. Adopting the default curve an earlier version's scene
+    // carries would show a curve nobody chose and would also suppress
+    // EnsureTransferFunction, which fires only while no function is held.
     if (!recorded.name.isEmpty() || IsCustomTransferFunction(node.GetPointer()) ||
         IsVolumeRenderingOn(node.GetPointer()))
     {

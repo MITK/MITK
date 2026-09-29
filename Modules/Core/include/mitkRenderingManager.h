@@ -184,6 +184,12 @@ namespace mitk
     void SetRenderingSuspended(vtkRenderWindow *renderWindow, bool suspended);
 
     /**
+     * \brief Whether the execution of update requests is suspended for the specified render window.
+     * \sa SetRenderingSuspended()
+     */
+    bool IsRenderingSuspended(vtkRenderWindow *renderWindow) const;
+
+    /**
      * \brief Request a deferred update for all registered render windows.
      * \param[in] type Filter to update only specific window types (default: all).
      */

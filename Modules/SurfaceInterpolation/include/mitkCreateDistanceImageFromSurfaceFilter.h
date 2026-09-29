@@ -43,7 +43,7 @@ namespace mitk
    * surface, which can be extracted using e.g. marching cubes.
    *
    * The distance image always has isotropic spacing. Its total number of pixels can
-   * be adjusted via SetDistanceImageVolume() (default: 500000).
+   * be adjusted via SetDistanceImageVolume() (default: 50000).
    *
    * \pre Each input surface must contain contour edge points with normals stored
    *      in the cell data.
@@ -84,7 +84,7 @@ namespace mitk
     /**
     \brief Set the size of the output distance image. The size is specified by the image's volume
            (i.e. in this case how many pixels are enclosed by the image)
-           If non is set, the volume will be 500000 pixels.
+           If none is set, the volume will be 50000 pixels.
     */
     itkSetMacro(DistanceImageVolume, unsigned int);
 

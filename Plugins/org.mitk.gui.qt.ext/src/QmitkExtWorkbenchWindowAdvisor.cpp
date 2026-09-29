@@ -88,6 +88,10 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QmitkAboutDialog.h>
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include <QmitkCrashDumpDialog.h>
+#endif
+
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();
 
@@ -1034,6 +1038,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
   {
     configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
   }
+
+#ifdef MITK_HAS_CRASHHANDLING
+  QmitkCrashDumpDialog::ShowIfCrashedLastRun();
+#endif
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

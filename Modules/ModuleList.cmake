@@ -9,6 +9,7 @@ set(MITK_MODULES
   FormsUI
   CommandLine
   CoreCmdApps
+  CrashHandling
   AppUtil
   SceneSerializationBase
   DataTypesExt

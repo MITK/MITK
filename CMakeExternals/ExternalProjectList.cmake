@@ -17,6 +17,7 @@ mitkFunctionAddExternalProject(NAME CTK ON DEPENDS Qt6 DCMTK DOC "Use CTK in MIT
 mitkFunctionAddExternalProject(NAME DCMQI ON DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint OFF ADVANCED DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 mitkFunctionAddExternalProject(NAME httplib ON DEPENDS ZLIB)
+mitkFunctionAddExternalProject(NAME sentry ON DEPENDS ZLIB DOC "Use sentry-native/Crashpad for crash dumps")
 mitkFunctionAddExternalProject(NAME pybind11 OFF ADVANCED)
 
 if(MITK_USE_Qt6)

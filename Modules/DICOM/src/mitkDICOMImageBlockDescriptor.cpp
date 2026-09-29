@@ -939,7 +939,10 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
               continue;
             }
 
-            WarnAboutDuplicate(propKey, filename, written->second, finding.origin);
+            if (written->second != finding.origin)
+            {
+              WarnAboutDuplicate(propKey, filename, written->second, finding.origin);
+            }
             if (finding.origin > written->second)
             {
               written->second = finding.origin;

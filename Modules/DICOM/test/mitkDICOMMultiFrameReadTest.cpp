@@ -33,7 +33,9 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <algorithm>
 #include <set>
+#include <vector>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -82,6 +84,47 @@ namespace
 
   private:
     mitk::DICOMTagPath m_Path;
+  };
+
+  /** Answers every registered path it was given with the same per-frame
+      finding, the way a frame info answers a wildcard and an explicit-index
+      registration that name one item. */
+  class OverlappingFindingsFrameInfo : public mitk::DICOMDatasetAccessingImageFrameInfo
+  {
+  public:
+    mitkClassMacro(OverlappingFindingsFrameInfo, mitk::DICOMDatasetAccessingImageFrameInfo);
+    mitkNewMacro2Param(OverlappingFindingsFrameInfo, const std::string&, const std::vector<mitk::DICOMTagPath>&);
+
+    mitk::DICOMDatasetFinding GetTagValueAsString(const mitk::DICOMTag&) const override
+    {
+      return mitk::DICOMDatasetFinding();
+    }
+
+    FindingsListType GetTagValueAsString(const mitk::DICOMTagPath& path) const override
+    {
+      const bool registered = std::any_of(m_Paths.cbegin(), m_Paths.cend(),
+                                          [&path](const mitk::DICOMTagPath& known) { return path.Equals(known); });
+      if (!registered)
+      {
+        return {};
+      }
+
+      return { mitk::DICOMDatasetFinding(true, "per-frame", m_Paths.back(), mitk::DICOMFindingOrigin::PerFrameFunctionalGroup) };
+    }
+
+    std::string GetFilenameIfAvailable() const override
+    {
+      return this->Filename;
+    }
+
+  protected:
+    OverlappingFindingsFrameInfo(const std::string& filename, const std::vector<mitk::DICOMTagPath>& paths)
+      : mitk::DICOMDatasetAccessingImageFrameInfo(filename, 0), m_Paths(paths)
+    {
+    }
+
+  private:
+    std::vector<mitk::DICOMTagPath> m_Paths;
   };
 }
 
@@ -150,6 +193,7 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(PerFrameGroupWinsOverSharedGroup);
   MITK_TEST(SharedGroupWinsOverTopLevel);
   MITK_TEST(MoreSpecificOriginWinsWhateverTheOrder);
+  MITK_TEST(OverlappingRegistrationsDoNotWarn);
   MITK_TEST(TwoEnhancedFilesInOneSeriesBecomeTwoCompleteVolumes);
   MITK_TEST(EnhancedFilesWithTopLevelGeometryAreSeparated);
   MITK_TEST(SeparatedFilesAreNotShearedByTheTiltAcrossFiles);
@@ -980,6 +1024,39 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The per-frame value survives the shared one arriving after it",
                                  std::string("per-frame"), property->GetValue(0, 0, false, false));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning for the block", 1u, warnings.GetCount());
+  }
+
+  /** A wildcard and an explicit-index registration that name the same item
+      yield one finding twice, from one placement. That is not an attribute
+      present at two placements, so it is not reported. */
+  void OverlappingRegistrationsDoNotWarn()
+  {
+    const std::string filename = "overlapping.dcm";
+
+    mitk::DICOMFrameLayout layout;
+    layout.perFrameItemCount = 1;
+
+    auto file = mitk::DICOMGenericImageFrameInfo::New(filename);
+    file->SetFrameLayout(layout);
+    auto cache = mitk::DICOMGenericTagCache::New();
+    cache->AddFrameInfo(file);
+
+    mitk::DICOMTagPath explicitPath;
+    explicitPath.AddSelection(0x0028, 0x9145, 0).AddElement(0x0028, 0x1053);
+    auto frame = OverlappingFindingsFrameInfo::New(filename, { RescaleSlopeRelative(), explicitPath });
+
+    mitk::DICOMImageBlockDescriptor block;
+    block.SetTagCache(cache);
+    block.SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
+    block.SetAdditionalTagsOfInterest({ { RescaleSlopeRelative(), "" }, { explicitPath, "" } });
+    block.SetImageFrameList({ frame.GetPointer() });
+
+    mitk::DICOMTestWarningCounter warnings("DICOM.0028.9145.[0].0028.1053");
+    const auto* property = AsDICOMProperty(block.GetProperty("DICOM.0028.9145.[0].0028.1053"));
+    CPPUNIT_ASSERT_MESSAGE("The block publishes the attribute", nullptr != property);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The one finding reaches the slot",
+                                 std::string("per-frame"), property->GetValue(0, 0, false, false));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One placement is not a duplicate", 0u, warnings.GetCount());
   }
 
   /** Writes \p count objects of one series into one directory, applying

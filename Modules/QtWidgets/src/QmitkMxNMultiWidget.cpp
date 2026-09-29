@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkMxNMultiWidget.h>
+#include "QmitkMxNSliceIndex.h"
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -3396,12 +3397,18 @@ void QmitkMxNMultiWidget::ConvergeMemberToSeed(QmitkMxNSyncDimension dimension,
       {
         return;
       }
-      // Signed arithmetic: the steppers count unsigned, so a negative offset
-      // on a seed at slice 0 would wrap and clamp to the last slice instead
-      // of the first.
-      const long lastStep = static_cast<long>(memberStepper->GetSteps()) - 1;
-      const long target = std::clamp(
-        static_cast<long>(seedStepper->GetPos()) + memberLinks.sliceOffset, 0L, lastStep);
+      // The offset counts displayed slices - the index the navigator shows,
+      // which can run opposite to the stepper. Signed arithmetic: the
+      // steppers count unsigned, so a negative offset on a seed at slice 0
+      // would wrap and clamp to the last slice instead of the first.
+      const long seedLast = static_cast<long>(seedStepper->GetSteps()) - 1;
+      const long seedPos = static_cast<long>(seedStepper->GetPos());
+      const long seedShown =
+        QmitkMxNSliceIndex::IsDisplayedSliceInverted(seedRenderer) ? seedLast - seedPos : seedPos;
+      const long memberLast = static_cast<long>(memberStepper->GetSteps()) - 1;
+      const long memberShown = std::clamp(seedShown + memberLinks.sliceOffset, 0L, memberLast);
+      const long target =
+        QmitkMxNSliceIndex::IsDisplayedSliceInverted(memberRenderer) ? memberLast - memberShown : memberShown;
       memberStepper->SetPos(static_cast<unsigned int>(target));
       break;
     }

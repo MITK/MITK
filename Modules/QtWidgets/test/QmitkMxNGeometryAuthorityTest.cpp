@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <cstdlib>
+
 /**
  * Tests orientation synchronization and the geometry-authority model:
  *   - A plane change on an orientation-linked cell is relayed to its group
@@ -199,12 +201,19 @@ public:
     Snc(0)->GetStepper()->SetPos(4);
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
     m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "s", 1);
-    CPPUNIT_ASSERT_EQUAL(Snc(0)->GetStepper()->GetPos() + 1, Snc(1)->GetStepper()->GetPos());
+    // The offset counts displayed slices, so its stepper sign depends on the
+    // view's inversion; what must hold is that the reinit keeps it.
+    auto stepperDelta = [this]()
+    {
+      return static_cast<int>(Snc(1)->GetStepper()->GetPos()) - static_cast<int>(Snc(0)->GetStepper()->GetPos());
+    };
+    const int linkedDelta = stepperDelta();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The member sits one slice from the seed", 1, std::abs(linkedDelta));
 
     m_Editor->ReinitSyncGroupGeometry(CellId(0));
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The declared offset survives a component reinit",
-      Snc(0)->GetStepper()->GetPos() + 1, Snc(1)->GetStepper()->GetPos());
+      linkedDelta, stepperDelta());
   }
 
   void GlobalReinit_StillResetsAllCells()

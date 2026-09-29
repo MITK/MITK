@@ -274,8 +274,9 @@ public:
 
   /**
   * \brief Offset modifier of a synchronization link, typed per dimension:
-  *        `int` slice steps for `Slice`, a multiplicative factor (`double`,
-  *        > 0) for `Zoom`, an in-plane world-mm vector for `Pan`.
+  *        `int` displayed slices for `Slice` (the index the navigator shows,
+  *        which can run opposite to the stepper), a multiplicative factor
+  *        (`double`, > 0) for `Zoom`, an in-plane world-mm vector for `Pan`.
   *        `std::monostate` means "no offset" (the dimension's identity).
   */
   using SyncOffset = std::variant<std::monostate, int, double, mitk::Vector2D>;

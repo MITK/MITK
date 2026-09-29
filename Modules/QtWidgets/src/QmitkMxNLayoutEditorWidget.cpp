@@ -2396,7 +2396,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   m_SliceOffsetEdit->setObjectName(QStringLiteral("mxnMatrixSliceOffset"));
   m_SliceOffsetEdit->setRange(MixedSliceOffset, 9999);
   m_SliceOffsetEdit->setSpecialValueText(tr("multiple"));
-  m_SliceOffsetEdit->setToolTip(tr("Slice offset in steps, relative to the group's seed"));
+  m_SliceOffsetEdit->setToolTip(tr("Slice offset in shown slices, relative to the group's seed"));
   connect(m_SliceOffsetEdit, &QAbstractSpinBox::editingFinished, this, [this]()
   {
     // Detaching the editor disables it, which moves focus out of whichever spin

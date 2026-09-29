@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkLookupTableProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
 #include <mitkTestFixture.h>
@@ -154,6 +155,27 @@ public:
     return SliceStepper(index)->GetPos();
   }
 
+  bool SliceInverted(std::size_t index) const
+  {
+    auto* renderer = Renderer(index);
+    return mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      m_Image->GetGeometry(), renderer->GetCurrentWorldGeometry(),
+      renderer->GetSliceNavigationController()->GetViewDirection());
+  }
+
+  /** The displayed slice index: the one the navigator shows and slice offsets count. */
+  unsigned int ShownSlice(std::size_t index) const
+  {
+    const unsigned int last = SliceStepper(index)->GetSteps() - 1;
+    return SliceInverted(index) ? last - SlicePos(index) : SlicePos(index);
+  }
+
+  void SetShownSlice(std::size_t index, unsigned int shown) const
+  {
+    const unsigned int last = SliceStepper(index)->GetSteps() - 1;
+    SetSlicePos(index, SliceInverted(index) ? last - shown : shown);
+  }
+
   vtkCamera* Camera(std::size_t index) const
   {
     return Renderer(index)->GetVtkRenderer()->GetActiveCamera();
@@ -269,22 +291,33 @@ public:
 
   void Converge_Slice_MovieFrameOffsets()
   {
+    // Offsets count displayed slices. Axial cells step against the identity
+    // image's z index, so stepper arithmetic would show the ramp reversed.
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetViewDirection(CellId(i), mitk::AnatomicalPlane::Axial);
+      SetSlicePos(i, 4);
+    }
+    CPPUNIT_ASSERT_MESSAGE("The fixture exercises an inverted view", SliceInverted(0));
+
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav"); // seed at 4
     m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", -1);
     m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav", 1);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Member converges to seed + offset", 3u, SlicePos(1));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Member converges to seed + offset", 5u, SlicePos(2));
+    const unsigned int seedShown = ShownSlice(0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Member shows seed - 1", seedShown - 1, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Member shows seed + 1", seedShown + 1, ShownSlice(2));
 
     FireScroll(0, 1);
     CPPUNIT_ASSERT_EQUAL(5u, SlicePos(0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Offset preserved while scrolling in range", 4u, SlicePos(1));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Offset preserved while scrolling in range", 6u, SlicePos(2));
+    const unsigned int scrolledShown = ShownSlice(0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Offset preserved while scrolling in range", scrolledShown - 1, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Offset preserved while scrolling in range", scrolledShown + 1, ShownSlice(2));
   }
 
   void Converge_Slice_SeedAtZero_SignedClamp()
   {
-    SetSlicePos(0, 0);
+    SetShownSlice(0, 0);
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", -1);
 
@@ -292,7 +325,7 @@ public:
     // clamps to the first.
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Negative offset from a seed at slice 0 must clamp to 0, not wrap to the last slice",
-      0u, SlicePos(1));
+      0u, ShownSlice(1));
   }
 
   void Converge_Zoom_FactorOffset()
@@ -343,20 +376,22 @@ public:
     // puts it exactly on the boundary (independent of the cells' default
     // view direction, which determines the step count).
     const unsigned int last = SliceStepper(0)->GetSteps() - 1;
-    SetSlicePos(0, last - 1);
+    SetShownSlice(0, last - 1);
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", 1);
-    CPPUNIT_ASSERT_EQUAL(last, SlicePos(1));
+    CPPUNIT_ASSERT_EQUAL(last, ShownSlice(1));
 
-    // Scrolling forward clamps the member at the last slice; scrolling back
-    // moves both, so the offset is now lost.
-    FireScroll(0, 1);
-    FireScroll(0, -1);
-    CPPUNIT_ASSERT_EQUAL(last - 1, SlicePos(0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Boundary clamping destroys the offset", last - 1, SlicePos(1));
+    // Scrolling toward the last shown slice clamps the member there; scrolling
+    // back moves both, so the offset is now lost. A scroll counts stepper
+    // steps, which can run opposite to the shown index.
+    const int forward = SliceInverted(0) ? -1 : 1;
+    FireScroll(0, forward);
+    FireScroll(0, -forward);
+    CPPUNIT_ASSERT_EQUAL(last - 1, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Boundary clamping destroys the offset", last - 1, ShownSlice(1));
 
     m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Re-converge restores seed + offset", last, SlicePos(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Re-converge restores seed + offset", last, ShownSlice(1));
   }
 
   void PanOffset_DriftsUnderZoom_ReconvergeRestores()

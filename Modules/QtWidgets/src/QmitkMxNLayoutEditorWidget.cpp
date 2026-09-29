@@ -105,7 +105,7 @@ namespace
     QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair
   };
 
-  // Mode (a) "replace" primitive: strip a cell's ties to every group other than
+  // Replace-mode primitive: strip a cell's ties to every group other than
   // 'keepGroup'. The seven dimension axes are unlinked; the selection reverts to
   // the default group (there is no unlinked state for selection). Shared by the
   // SetCellMembership join and the empty-group cache flush so both fully replace.
@@ -1100,7 +1100,7 @@ bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group)
     return false;
   }
   // Computed directly over all cells, not via GroupMembers: since GroupMembers
-  // now counts the selection tie, routing through it would make this tautological
+  // counts the selection tie, routing through it would make this tautological
   // (every selection member trivially matches) and let selection follow joins
   // more eagerly than intended. "The group synchronizes selection" means at least
   // one cell's selection names it, independent of membership.
@@ -1126,8 +1126,9 @@ void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
   {
     // Adding a cell wholly replaces its membership (mode Replace): it joins the
     // group's currently synchronized dimensions, or the navigation bundle when
-    // the group synchronizes nothing yet. The (b)/(c) merge variants are reachable
-    // only through the drop selector (AssignCellsToGroup).
+    // the group synchronizes nothing yet. The FillEmpty and
+    // MergeOverwriteCollisions variants are reachable only through the drop
+    // selector (AssignCellsToGroup).
     auto dimensions = this->GroupDimensions(group);
     if (dimensions.empty())
     {

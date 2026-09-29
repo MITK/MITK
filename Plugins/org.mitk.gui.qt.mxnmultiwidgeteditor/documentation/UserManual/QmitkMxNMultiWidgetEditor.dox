@@ -89,7 +89,8 @@
 			it was made in, which shifts each member's pan differently. Re-converge after zooming
 			a group whose members sit at a pan offset.
 		<li> <b>Windowing and LUT are per window.</b> New windows share level/window and colormap
-			through the default group "main". A window taken out of it keeps its own values; its
+			through the default group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group). A window
+			taken out of it keeps its own values; its
 			controls then act on that window alone.
 	</ul>
 
@@ -239,7 +240,7 @@
 	</ul>
 	The window's frame tells its group at a glance. It takes a group's hue when every axis
 	the window is linked on - the data selection included, which is always linked - names
-	that one group; a fresh window therefore reads in the hue of the default group "main".
+	that one group; a fresh window therefore reads in the hue of the default group.
 	A window whose linked axes name more than one group has a neutral gray frame, and the exact per-dimension coupling is read
 	from the sync barcode and the layout editor. The active window is marked by white
 	brackets in its corners, so it keeps its group hue.
@@ -309,8 +310,9 @@
 	seven dimensions (see \ref org_mitk_editors_mxnmultiwidget_DimSync), and it is assigned
 	the same way: in the MxN Layout Editor, on the window plates, the group cards or the
 	advanced matrix (see \ref org_mitk_views_mxnlayouteditor). Unlike the other axes, a
-	window is always in exactly one selection group. By default that is "main", so all
-	windows start out showing the same data.
+	window is always in exactly one selection group. A new window joins the default group,
+	so all windows start out showing the same data. The default group is named "main" unless
+	a loaded layout names it otherwise.
 
 	Windows in the same selection group share their selection, its drawing order and each
 	node's visibility. Putting windows in different groups shows different data side by side,
@@ -384,7 +386,7 @@
 			Drag the bar's body to shift the level and its ends to move the window bounds.
 	</ul>
 	For a window in a windowing or LUT group - which every new window is, through the default
-	group "main" - these controls drive every group member (each keeping its relative
+	group - these controls drive every group member (each keeping its relative
 	difference during drags) and leave other windows and the node-global values untouched;
 	the global level/window slider intentionally does not affect grouped windows. Only a
 	window taken out of windowing or LUT synchronization altogether behaves like the classic

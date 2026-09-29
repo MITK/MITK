@@ -697,7 +697,7 @@ public:
                            m_Editor->GetCellSelectionGroup(CellId(0)) != "G");
   }
 
-  // --- Selection as the 8th axis, "main" default, (a)-replace join ------------
+  // --- Selection as the 8th axis, "main" default, Replace join -----------------
 
   void NewCell_DefaultLinksWindowingAndLutToMain()
   {
@@ -768,7 +768,7 @@ public:
 
   void AssignReplace_ClearsOtherGroupLinks()
   {
-    // Default join is mode (a) "replace": assigning a cell to a group clears its
+    // The default join mode is Replace: assigning a cell to a group clears its
     // links to every other group, so it ends synchronized only on the target.
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "X");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "Y");
@@ -815,7 +815,7 @@ public:
 
   void AssignReplace_ReclaimsEmptiedSelectionGroup()
   {
-    // A drop under (a) reverts the cell's selection to "main"; when that was the
+    // A Replace drop reverts the cell's selection to "main"; when that was the
     // last tie to a method-allocated group, the group is reclaimed and drops out
     // of the registry. Pins the intended reclaim (not a leak).
     m_Editor->SetCellSelectionGroup(CellId(0), "H");  // allocates selection group H
@@ -826,7 +826,7 @@ public:
     };
     CPPUNIT_ASSERT_MESSAGE("H exists once a cell selects it", hasH());
 
-    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G");  // (a): reverts selection to main
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, "G");  // Replace: reverts selection to main
 
     CPPUNIT_ASSERT_MESSAGE("H is reclaimed when its last selection tie leaves", !hasH());
   }
@@ -926,7 +926,7 @@ public:
                            loaded == m_Editor->SerializeLayout());
   }
 
-  // --- Stage 2: the (b)/(c) join-mode overrides -------------------------------
+  // --- The FillEmpty and MergeOverwriteCollisions join modes -------------------
 
   void Assign_ReplaceMode_ClearsOthers()
   {

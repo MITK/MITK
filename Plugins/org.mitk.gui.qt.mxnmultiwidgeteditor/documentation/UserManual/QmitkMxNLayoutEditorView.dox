@@ -153,7 +153,7 @@
 			neighborhood around the data visible in its first window; only these windows
 			are affected, unlike the application-wide "Fit views to ..." actions.
 		<li> "Delete group" unsynchronizes the group's windows and removes the group, after
-			asking when it still has windows. The default group "main" cannot be deleted,
+			asking when it still has windows. The default group cannot be deleted,
 			because it is where every window's data selection falls back to.
 	</ul>
 

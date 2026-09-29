@@ -188,6 +188,7 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(SingleFrameEnhancedGetsFrameRelativeKeys);
   MITK_TEST(TopLevelDuplicateLosesAgainstTheFrame);
   MITK_TEST(RaggedObjectKeepsTheOneFrameModel);
+  MITK_TEST(RootedRegistrationYieldsNothingOnARaggedFile);
   MITK_TEST(FramesAtOnePlanePositionAreRefused);
   MITK_TEST(FileLevelInfoDoesNotAnswerAFrameRelativeQuery);
   MITK_TEST(PerFrameGroupWinsOverSharedGroup);
@@ -878,6 +879,23 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No source frame property without a frame model", frames.IsNull());
   }
 
+  /** The rule for a rooted registration is the reader's, not the file's: a
+      ragged file keeps the one-frame model, and still must not publish under
+      the root a key a conformant file never gets. */
+  void RootedRegistrationYieldsNothingOnARaggedFile()
+  {
+    this->Register(Rooted(0x5200, 0x9230, 0x0020, 0x9111, 0x0020, 0x9057));
+
+    auto object = this->MakeEnhanced();
+    object.perFrameItemCountOverride = FRAME_COUNT - 1;
+
+    mitk::DICOMTestWarningCounter warnings("rooted in a functional-group sequence");
+    const auto image = this->LoadOne(object.Write(this->CaseDir(), "ragged.dcm"));
+
+    this->AssertNoRootedKeys(image);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The registrant is told once per scan", 1u, warnings.GetCount());
+  }
+
   /** Frames that all lie at one plane position are refused rather than loaded
       as a single 2D frame: GDCM reports a z-spacing of 0 for such a file, so
       it is read as a 2D image, and the frame-count check then refuses the
@@ -900,10 +918,10 @@ public:
    * GetFrameInfoList() would see functional-group findings under paths it did
    * not register; a frame-scoped info answers exactly that query.
    *
-   * The scan registers the rooted path, which is searched as registered and
-   * never rooted again, so the entries are the same for both views and the
-   * case is about the store alone. The frame model is read only so that the
-   * cache resolves frame-scoped infos.
+   * The scan registers the frame-relative path, whose expansion under the
+   * group roots stores the functional-group entries, so the entries are the
+   * same for both views and the case is about the store alone. The frame
+   * model is read so that the cache resolves frame-scoped infos.
    */
   void FileLevelInfoDoesNotAnswerAFrameRelativeQuery()
   {
@@ -916,7 +934,7 @@ public:
 
     auto scanner = mitk::DICOMDCMTKTagScanner::New();
     scanner->SetInputFiles({ file });
-    scanner->AddTagPath(Rooted(0x5200, 0x9230, 0x0028, 0x9145, 0x0028, 0x1053));
+    scanner->AddTagPath(RescaleSlopeRelative());
     scanner->SetReadFrameModel(true);
     scanner->Scan();
 

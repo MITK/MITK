@@ -268,9 +268,9 @@ namespace
     return mitk::DICOMTagPath().AddAnySelection(root.getGroup(), root.getElement()) + path;
   }
 
-  /** A path rooted in a functional group is searched as registered and never
-      expanded, so for a frame-model file its findings reach no property: the
-      frame-scoped info compares a rooted query with nothing. Silent otherwise. */
+  /** A frame-model scan never searches a path rooted in a functional group,
+      so its registrant is told, or it would wait for a property that never
+      comes. */
   void WarnAboutRootedRegistrations(const std::set<mitk::DICOMTagPath>& paths)
   {
     for (const auto& path : paths)
@@ -278,7 +278,7 @@ namespace
       if (mitk::IsFunctionalGroupRooted(path))
       {
         MITK_WARN << "Tag of interest " << path.ToStr() << " is rooted in a functional-group sequence. It yields "
-                     "no property for an object with per-frame functional groups; register the path inside the "
+                     "no property from a reader that reads the frame model; register the path inside the "
                      "functional-group macro instead.";
       }
     }
@@ -323,12 +323,20 @@ void mitk::DICOMDCMTKTagScanner::Scan()
 
         for (const auto& path : this->m_ScannedTags)
         {
+          // A frame-model reader publishes functional-group values under
+          // frame-relative keys only. Searching a path that names the group
+          // root would give a ragged or classic file a key a conformant file
+          // never gets, so such a path is not searched at all.
+          if (m_ReadFrameModel && IsFunctionalGroupRooted(path))
+          {
+            continue;
+          }
+
           SearchAndStore(processor, dataset, path, *info);
 
           // A functional-group item holds only macro sequences (PS3.3
-          // C.7.6.16), so a single-element path cannot resolve inside one; a
-          // path that already names a group is not rooted twice.
-          if (expand && path.Size() > 1 && !IsFunctionalGroupRooted(path))
+          // C.7.6.16), so a single-element path cannot resolve inside one.
+          if (expand && path.Size() > 1)
           {
             SearchAndStore(processor, dataset, RootedIn(DCM_SharedFunctionalGroupsSequence, path), *info);
             SearchAndStore(processor, dataset, RootedIn(DCM_PerFrameFunctionalGroupsSequence, path), *info);
@@ -344,10 +352,10 @@ void mitk::DICOMDCMTKTagScanner::Scan()
 
     ReportWarnings(warningsThisScan);
 
-    // A rooted registration loses its property only for a frame-model file,
-    // so warning on a classic series would repeat a message that does not
-    // apply to it.
-    if (newCache->HasAnyFrameModel())
+    // The rule is the reader's, not the file's: with the frame model read, a
+    // rooted registration reaches no property whatever was scanned, so the
+    // registrant hears it once per scan.
+    if (m_ReadFrameModel)
     {
       WarnAboutRootedRegistrations(this->m_ScannedTags);
     }

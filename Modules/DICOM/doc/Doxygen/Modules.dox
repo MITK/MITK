@@ -65,8 +65,10 @@ DICOM.0020.9111.[0].0018.9151     Frame Content, Frame Reference DateTime
 \endcode
 
 A path rooted in (5200,9229) or (5200,9230) is not supported: it yields no
-property for a file with a frame model, and the reader warns once per scan.
-Only paths of more than one element are searched inside the groups, because a
+property for any file the image reader loads, and the reader warns once per
+scan. A scanner that does not read the frame model, such as the ones of the
+SEG and RT readers, treats such a path as any other nested path. Only paths
+of more than one element are searched inside the groups, because a
 functional-group item holds only macro sequences. The search covers every such
 registered path, not only the functional-group macros: a sequence registered
 with classic objects in mind that also occurs directly in a functional-group

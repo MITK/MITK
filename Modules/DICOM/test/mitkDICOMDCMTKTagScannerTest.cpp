@@ -47,8 +47,8 @@ class mitkDICOMDCMTKTagScannerTestSuite : public mitk::TestFixture
   MITK_TEST(NoRootedFindingWithoutTheSwitch);
   MITK_TEST(RaggedFileIsNotExpanded);
   MITK_TEST(SingleElementPathIsNotExpanded);
-  MITK_TEST(RootedRegistrationIsNotExpandedAndWarnsOncePerScan);
-  MITK_TEST(RootedRegistrationDoesNotWarnWithoutFrameModel);
+  MITK_TEST(RootedRegistrationIsInertAndWarnsOncePerScan);
+  MITK_TEST(RootedRegistrationWarnsForAClassicSeriesToo);
   MITK_TEST(NoFrameModelWithoutTheSwitch);
 
   CPPUNIT_TEST_SUITE_END();
@@ -348,10 +348,10 @@ public:
                            frames.front()->GetTagValueAsString(rootedImageComments).empty());
   }
 
-  /** A path already rooted in a functional group is searched as registered,
-      not rooted a second time, and its registrant is told once per scan that
-      it reaches no property for a frame-model object. */
-  void RootedRegistrationIsNotExpandedAndWarnsOncePerScan()
+  /** A path already rooted in a functional group is not searched at all when
+      the frame model is read, and its registrant is told once per scan,
+      however many files. */
+  void RootedRegistrationIsInertAndWarnsOncePerScan()
   {
     const auto rooted = Rooted(0x9230, RescaleSlope());
     const mitk::StringList files = { this->Write(this->MakeEnhanced()), this->Write(this->MakeEnhanced()) };
@@ -362,21 +362,20 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per scan however many files", 1u, warnings.GetCount());
     for (const auto& frame : frames)
     {
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("The registered path is found as registered, once per frame",
-                                   std::size_t(FRAME_COUNT), frame->GetTagValueAsString(rooted).size());
+      CPPUNIT_ASSERT_MESSAGE("The rooted path yields nothing", frame->GetTagValueAsString(rooted).empty());
     }
   }
 
-  /** The warning concerns frame-model files only; a classic series with such
-      a registrant stays quiet. */
-  void RootedRegistrationDoesNotWarnWithoutFrameModel()
+  /** The rule is the scanner's, not the file's: a classic series scanned with
+      the frame model read hears it as well. */
+  void RootedRegistrationWarnsForAClassicSeriesToo()
   {
     const auto rooted = Rooted(0x9230, RescaleSlope());
 
     mitk::DICOMTestWarningCounter warnings(rooted.ToStr());
     Scan(ctFiles, { rooted }, true);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("No warning without a frame-model file", 0u, warnings.GetCount());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning although no file has a frame model", 1u, warnings.GetCount());
   }
 
   /** A scanner that does not feed a frame-model reader, such as the RT, SEG or

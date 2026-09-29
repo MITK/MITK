@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.volumevisualization"
+          name="Volume Visualization"
+          class="QmitkVolumeVisualizationView"
+          icon="resources/volume_visualization.svg"
+          category="General">
+      <description>Render images as volumes in 3D, with presets, transfer function editing and lighting.</description>
+      <keywordReference id="org.mitk.views.volumevisualization.ViewKeyword"/>
+    </view>
+  </extension>
+
+  <!--One keyword element rather than one per word: berry::KeywordRegistry maps
+  each id to a single label, and the view dialog splits that label on spaces.-->
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"
+             label="volume rendering raycasting 3D transfer function preset opacity color lighting shading cinematic MIP MinIP projection blendmode visualization look-up-table lut"/>
+  </extension>
+</plugin>

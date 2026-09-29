@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkVolumeVisualizationV2View</class>
- <widget class="QWidget" name="QmitkVolumeVisualizationV2View">
+ <class>QmitkVolumeVisualizationView</class>
+ <widget class="QWidget" name="QmitkVolumeVisualizationView">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -26,18 +26,6 @@
    <property name="bottomMargin">
     <number>6</number>
    </property>
-   <item>
-    <widget class="QLabel" name="headline">
-     <property name="font">
-      <font>
-       <fontweight>Black</fontweight>
-      </font>
-     </property>
-     <property name="text">
-      <string>V2 Prototype</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <widget class="QGroupBox" name="imageGroupBox">
      <property name="sizePolicy">

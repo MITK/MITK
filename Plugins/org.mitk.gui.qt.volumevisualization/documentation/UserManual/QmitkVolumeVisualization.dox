@@ -1,11 +1,11 @@
 /**
-\page org_mitk_views_volumevisualization_v2 The Volume Visualization v2 View
+\page org_mitk_views_volumevisualization The Volume Visualization View
 
-\imageMacro{volume_visualization_v2-dox.svg,"Icon of the Volume Visualization v2 View.",2.00}
+\imageMacro{volume_visualization-dox.svg,"Icon of the Volume Visualization View.",2.00}
 
 \tableofcontents
 
-\section org_mitk_views_volumevisualization_v2_overview Overview
+\section org_mitk_views_volumevisualization_overview Overview
 
 Volume visualization draws a 3D image as a solid body in the 3D render window.
 Instead of showing one slice at a time, it sends a ray through the volume for
@@ -18,14 +18,14 @@ curves that map each gray value to a color and to an opacity. Almost everything
 in this view is either a way of choosing a transfer function or a rendering
 option applied on top of one.
 
-\imageMacro{QmitkVolumeVisualizationV2_Overview.png,"An abdominal CT rendered as a volume with the CT-AAA preset.",7.00}
+\imageMacro{QmitkVolumeVisualization_Overview.png,"An abdominal CT rendered as a volume with the CT-AAA preset.",7.00}
 
 \note Volume rendering is done on the graphics card and has no software
 fallback. On a machine whose GPU cannot run the ray caster, the 3D window stays
 empty and the preset previews described below are not drawn either. Volume
 rendering also needs a large amount of memory; very large images may not fit.
 
-\section org_mitk_views_volumevisualization_v2_image Image
+\section org_mitk_views_volumevisualization_image Image
 
 The selector at the top lists the 3D and 4D images in the Data Manager. Until
 one is picked the rest of the view is not shown at all, since every control in
@@ -37,7 +37,7 @@ because there is no volume to configure yet.
 Switching it on does more than show the volume: a node that carries no transfer
 function is given one from the preset catalog, and one that names no lighting
 model is given the one the 3D window is lit for, as described in
-\ref org_mitk_views_volumevisualization_v2_lighting. Switching on therefore
+\ref org_mitk_views_volumevisualization_lighting. Switching on therefore
 produces a visible volume rather than an empty 3D window, and you adjust from
 there.
 
@@ -50,9 +50,9 @@ formats is therefore expected; pick an <tt>MR-</tt> preset from the grid.
 For a 4D image the volume follows the current time step, so stepping through
 time in the image navigator steps the volume with it.
 
-\section org_mitk_views_volumevisualization_v2_tf Transfer function
+\section org_mitk_views_volumevisualization_tf Transfer function
 
-\subsection org_mitk_views_volumevisualization_v2_tf_presets Presets
+\subsection org_mitk_views_volumevisualization_tf_presets Presets
 
 The presets are laid out as a grid, each one shown as a small rendering of the
 image you currently have selected. The preview is what applying that preset will
@@ -60,7 +60,7 @@ look like on your data, not a generic illustration, which is why the presets are
 chosen by picture rather than by name. They are drawn one after another, so they
 appear progressively.
 
-\imageMacro{QmitkVolumeVisualizationV2_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
+\imageMacro{QmitkVolumeVisualization_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
 
 The two buttons above the grid, at its right, choose how the presets are laid
 out; the pressed one is the layout in force. The first is the grid. The second
@@ -132,7 +132,7 @@ Removing the preset a volume is currently rendered with leaves the rendering
 untouched. Its curve stays exactly as it is and becomes one that answers to no
 preset, so no entry is marked for it any more.
 
-\subsection org_mitk_views_volumevisualization_v2_tf_canvas Reading the curve
+\subsection org_mitk_views_volumevisualization_tf_canvas Reading the curve
 
 Below the preset grid, one canvas shows three things at once: the histogram of
 the image as a backdrop, the opacity curve drawn over it, and the colors the
@@ -143,9 +143,9 @@ of that value actually occurs in the image.
 Until you ask to edit it, the canvas is a display. Clicking it does nothing; the
 curve is moved as a whole with the sliders described next. The <b>Edit</b>
 button above it, at its right, turns the same canvas into a point-by-point
-editor, described in \ref org_mitk_views_volumevisualization_v2_tf_custom.
+editor, described in \ref org_mitk_views_volumevisualization_tf_custom.
 
-\subsection org_mitk_views_volumevisualization_v2_tf_adjust Adjusting a preset
+\subsection org_mitk_views_volumevisualization_tf_adjust Adjusting a preset
 
 A preset lands where its author put it, which is rarely exactly where your image
 wants it. Below the canvas, four sliders move it without redrawing it. Two of
@@ -177,14 +177,14 @@ What is remembered is the preset together with the four offsets, rather than
 only the resulting curve, so selecting the image again later brings the sliders
 back to the positions you left them in.
 
-\subsection org_mitk_views_volumevisualization_v2_tf_custom Editing the curve point by point
+\subsection org_mitk_views_volumevisualization_tf_custom Editing the curve point by point
 
 <b>Edit</b>, above the canvas, hands that canvas over to editing the curve on
 show point by point; pressing it again ends the edit. Either the preset grid or
 the four sliders would replace what you are drawing, so in the meantime the grid
 is grayed out and the sliders make way for the list of color stops.
 
-\imageMacro{QmitkVolumeVisualizationV2_EditMode.png,"The canvas while editing.",10.00}
+\imageMacro{QmitkVolumeVisualization_EditMode.png,"The canvas while editing.",10.00}
 
 <ol>
 <li> <b>Show whole curve</b> decides how far the axis reaches, as described below.
@@ -292,7 +292,7 @@ part of that record rather than a departure from it. A saved file records the
 blend mode the curve was authored for alongside it, and loading it restores
 both.
 
-\section org_mitk_views_volumevisualization_v2_lighting Lighting and shading
+\section org_mitk_views_volumevisualization_lighting Lighting and shading
 
 Shading gives the volume the shape cues a flat color cannot: where a surface
 turns away from the light, where two structures touch, how deep a recess goes.
@@ -316,7 +316,7 @@ render more slowly, until the view is opened again. Hiding or showing a volume
 in the Data Manager is not noticed by this view either: the lighting follows at
 the next change made here, such as selecting another image.
 
-\imageMacro{QmitkVolumeVisualizationV2_LightingMenu.png,"The lighting menu of the 3D render window.",5.00}
+\imageMacro{QmitkVolumeVisualization_LightingMenu.png,"The lighting menu of the 3D render window.",5.00}
 
 The three models are not weaker and stronger versions of the same effect - they
 take different paths through the renderer:
@@ -356,7 +356,7 @@ light does that job instead.
 header: a maximum intensity projection reduces each ray to a single value and
 lights nothing, so lighting there is inert rather than merely subtle.
 
-\section org_mitk_views_volumevisualization_v2_appearance Color and opacity from the Data Manager
+\section org_mitk_views_volumevisualization_appearance Color and opacity from the Data Manager
 
 A volume's appearance comes from its transfer function, not from the node's
 generic appearance properties.

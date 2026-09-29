@@ -11,13 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPluginActivator.h"
-#include "QmitkVolumeVisualizationV2View.h"
+#include "QmitkVolumeVisualizationView.h"
 
 namespace mitk
 {
   void PluginActivator::start(ctkPluginContext* context)
   {
-    BERRY_REGISTER_EXTENSION_CLASS(QmitkVolumeVisualizationV2View, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkVolumeVisualizationView, context)
   }
 
   void PluginActivator::stop(ctkPluginContext* context)

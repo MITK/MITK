@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkVolumeVisualizationV2View_h
-#define QmitkVolumeVisualizationV2View_h
+#ifndef QmitkVolumeVisualizationView_h
+#define QmitkVolumeVisualizationView_h
 
 // mitk core
 #include <mitkDataStorage.h>
@@ -30,10 +30,10 @@ class QmitkRenderWindow;
 
 namespace Ui
 {
-  class QmitkVolumeVisualizationV2View;
+  class QmitkVolumeVisualizationView;
 }
 
-class QmitkVolumeVisualizationV2View : public QmitkAbstractView,
+class QmitkVolumeVisualizationView : public QmitkAbstractView,
                                        public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
@@ -41,8 +41,8 @@ class QmitkVolumeVisualizationV2View : public QmitkAbstractView,
 public:
   static const std::string VIEW_ID;
 
-  QmitkVolumeVisualizationV2View();
-  ~QmitkVolumeVisualizationV2View() override;
+  QmitkVolumeVisualizationView();
+  ~QmitkVolumeVisualizationView() override;
 
   void SetFocus() override;
 
@@ -146,7 +146,7 @@ private:
    */
   void UpdateLightingRig();
 
-  std::unique_ptr<Ui::QmitkVolumeVisualizationV2View> m_Controls;
+  std::unique_ptr<Ui::QmitkVolumeVisualizationView> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
 
   /** Kept so that a part change can drop the old window's menu before taking up

@@ -1,15 +1,15 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkVolumeVisualizationV2View.cpp
+  QmitkVolumeVisualizationView.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkVolumeVisualizationV2View.ui
+  src/internal/QmitkVolumeVisualizationView.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkVolumeVisualizationV2View.h
+  src/internal/QmitkVolumeVisualizationView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -18,7 +18,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resources/volumevisualization_v2.qrc
+  resources/volumevisualization.qrc
 )
 
 foreach(file ${INTERNAL_CPP_FILES})

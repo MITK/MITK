@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkVolumeVisualizationV2View.h"
+#include "QmitkVolumeVisualizationView.h"
 
 #include <mitkImage.h>
 
@@ -31,7 +31,7 @@ found in the LICENSE file.
 
 #include <mitkProperties.h>
 
-#include <ui_QmitkVolumeVisualizationV2View.h>
+#include <ui_QmitkVolumeVisualizationView.h>
 
 #include <QPushButton>
 #include <QScrollArea>
@@ -41,7 +41,7 @@ found in the LICENSE file.
 
 #include <optional>
 
-const std::string QmitkVolumeVisualizationV2View::VIEW_ID = "org.mitk.views.volumevisualization_v2";
+const std::string QmitkVolumeVisualizationView::VIEW_ID = "org.mitk.views.volumevisualization";
 
 namespace
 {
@@ -114,18 +114,18 @@ namespace
 
 }
 
-QmitkVolumeVisualizationV2View::QmitkVolumeVisualizationV2View()
+QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 {
-  m_Controls = std::make_unique<Ui::QmitkVolumeVisualizationV2View>();
+  m_Controls = std::make_unique<Ui::QmitkVolumeVisualizationView>();
 }
 
-QmitkVolumeVisualizationV2View::~QmitkVolumeVisualizationV2View() = default;
+QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView() = default;
 
-void QmitkVolumeVisualizationV2View::SetFocus()
+void QmitkVolumeVisualizationView::SetFocus()
 {
 }
 
-void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
+void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls->setupUi(parent);
   m_Controls->volumeSelectionWidget->SetDataStorage(this->GetDataStorage());
@@ -138,21 +138,21 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
 
   m_Controls->enableRenderingButton->setIcon(
-    QmitkIconTheme::GetIcon(QStringLiteral(":/volumevisualization_v2/volume_visualization.svg")));
+    QmitkIconTheme::GetIcon(QStringLiteral(":/volumevisualization/volume_visualization.svg")));
 
   m_Controls->binaryHintLabel->setText("Binary image: its color is set in the Data Manager.");
   m_Controls->binaryHintLabel->setVisible(false);
 
   connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
-      this, &QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged);
+      this, &QmitkVolumeVisualizationView::OnCurrentSelectionChanged);
 
   connect(m_Controls->enableRenderingButton, &QPushButton::clicked,
-    this, &QmitkVolumeVisualizationV2View::OnToggleRendering);
+    this, &QmitkVolumeVisualizationView::OnToggleRendering);
 
   // The editor writes the node itself, including switching rendering on when a
   // function is loaded, so the view has to re-read rather than only re-render.
   connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::TransferFunctionChanged,
-    this, &QmitkVolumeVisualizationV2View::OnTransferFunctionChanged);
+    this, &QmitkVolumeVisualizationView::OnTransferFunctionChanged);
 
   // Lighting Option Controls
 
@@ -173,7 +173,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   // The widget writes the node itself; what it cannot do is reach a renderer, so
   // re-deriving the light rig is what the view contributes here.
   connect(m_Controls->lightingWidget, &QmitkVolumeLightingWidget::LightingChanged,
-    this, &QmitkVolumeVisualizationV2View::OnLightingChanged);
+    this, &QmitkVolumeVisualizationView::OnLightingChanged);
 
   // The part open at this point gets no RenderWindowPartActivated of its own, so
   // its menu has to be picked up here.
@@ -187,7 +187,7 @@ void QmitkVolumeVisualizationV2View::CreateQtPartControl(QWidget *parent)
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
 
-void QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   m_SelectedNode = nullptr;
 
@@ -203,7 +203,7 @@ void QmitkVolumeVisualizationV2View::OnCurrentSelectionChanged(QList<mitk::DataN
   this->UpdateInterface();
 }
 
-void QmitkVolumeVisualizationV2View::OnToggleRendering()
+void QmitkVolumeVisualizationView::OnToggleRendering()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
@@ -253,7 +253,7 @@ void QmitkVolumeVisualizationV2View::OnToggleRendering()
   this->RequestRenderWindowUpdate();
 }
 
-QmitkRenderWindow *QmitkVolumeVisualizationV2View::Get3DRenderWindow() const
+QmitkRenderWindow *QmitkVolumeVisualizationView::Get3DRenderWindow() const
 {
   auto *renderWindowPart = this->GetRenderWindowPart();
 
@@ -262,7 +262,7 @@ QmitkRenderWindow *QmitkVolumeVisualizationV2View::Get3DRenderWindow() const
     : nullptr;
 }
 
-std::vector<mitk::DataNode *> QmitkVolumeVisualizationV2View::GetRenderedVolumes() const
+std::vector<mitk::DataNode *> QmitkVolumeVisualizationView::GetRenderedVolumes() const
 {
   std::vector<mitk::DataNode *> volumes;
 
@@ -287,7 +287,7 @@ std::vector<mitk::DataNode *> QmitkVolumeVisualizationV2View::GetRenderedVolumes
   return volumes;
 }
 
-void QmitkVolumeVisualizationV2View::ConnectLightingMode()
+void QmitkVolumeVisualizationView::ConnectLightingMode()
 {
   QObject::disconnect(m_LightingModeConnection);
 
@@ -297,10 +297,10 @@ void QmitkVolumeVisualizationV2View::ConnectLightingMode()
     return;
 
   m_LightingModeConnection = connect(renderWindow, &QmitkRenderWindow::LightingModeChanged,
-    this, &QmitkVolumeVisualizationV2View::OnRenderWindowLightingModeChanged);
+    this, &QmitkVolumeVisualizationView::OnRenderWindowLightingModeChanged);
 }
 
-void QmitkVolumeVisualizationV2View::ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode)
+void QmitkVolumeVisualizationView::ApplyLightingMode(mitk::VtkPropRenderer::LightingMode mode)
 {
   auto *renderWindow = this->Get3DRenderWindow();
 
@@ -325,7 +325,7 @@ void QmitkVolumeVisualizationV2View::ApplyLightingMode(mitk::VtkPropRenderer::Li
     this->RequestRenderWindowUpdate();
 }
 
-const mitk::VolumeRenderingLightingModel *QmitkVolumeVisualizationV2View::GetRenderedLightingModel() const
+const mitk::VolumeRenderingLightingModel *QmitkVolumeVisualizationView::GetRenderedLightingModel() const
 {
   for (const auto *volume : this->GetRenderedVolumes())
   {
@@ -341,7 +341,7 @@ const mitk::VolumeRenderingLightingModel *QmitkVolumeVisualizationV2View::GetRen
   return nullptr;
 }
 
-bool QmitkVolumeVisualizationV2View::MoveVolumesOntoLightingModel(const mitk::VolumeRenderingLightingModel &model)
+bool QmitkVolumeVisualizationView::MoveVolumesOntoLightingModel(const mitk::VolumeRenderingLightingModel &model)
 {
   // Hidden volumes too, unlike the ones that decide the rig: this view is not
   // told when a volume is shown again, so one left behind now would come back
@@ -366,7 +366,7 @@ bool QmitkVolumeVisualizationV2View::MoveVolumesOntoLightingModel(const mitk::Vo
   return moved;
 }
 
-void QmitkVolumeVisualizationV2View::UpdateLightingRig()
+void QmitkVolumeVisualizationView::UpdateLightingRig()
 {
   auto *renderWindow = this->Get3DRenderWindow();
   auto *renderer = renderWindow != nullptr ? renderWindow->GetRenderer() : nullptr;
@@ -409,7 +409,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingRig()
   }
 }
 
-void QmitkVolumeVisualizationV2View::RenderWindowPartActivated(mitk::IRenderWindowPart *)
+void QmitkVolumeVisualizationView::RenderWindowPartActivated(mitk::IRenderWindowPart *)
 {
   // The incoming part brings a renderer in its default rig and a menu this view
   // is not listening to yet. The rig matters beyond the lights: the mapper keeps
@@ -421,14 +421,14 @@ void QmitkVolumeVisualizationV2View::RenderWindowPartActivated(mitk::IRenderWind
   this->UpdateLightingRig();
 }
 
-void QmitkVolumeVisualizationV2View::RenderWindowPartDeactivated(mitk::IRenderWindowPart *)
+void QmitkVolumeVisualizationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart *)
 {
   // Required by the interface, and deliberately empty: a part that is closing
   // takes its renderer and rig with it, and one that is merely superseded is
   // replaced by a part configured in RenderWindowPartActivated.
 }
 
-void QmitkVolumeVisualizationV2View::NodeRemoved(const mitk::DataNode *node)
+void QmitkVolumeVisualizationView::NodeRemoved(const mitk::DataNode *node)
 {
   // Only a volume can have lit the window, so removing anything else leaves
   // the rig as it is.
@@ -438,7 +438,7 @@ void QmitkVolumeVisualizationV2View::NodeRemoved(const mitk::DataNode *node)
   QTimer::singleShot(0, this, [this]() { this->UpdateLightingRig(); });
 }
 
-void QmitkVolumeVisualizationV2View::OnTransferFunctionChanged()
+void QmitkVolumeVisualizationView::OnTransferFunctionChanged()
 {
   // A full refresh rather than a repaint: a preset brings the blend mode it was
   // authored for, and the lighting section is gated on that mode.
@@ -446,7 +446,7 @@ void QmitkVolumeVisualizationV2View::OnTransferFunctionChanged()
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkVolumeVisualizationV2View::OnLightingChanged()
+void QmitkVolumeVisualizationView::OnLightingChanged()
 {
   // The widget has already written to the node, so the rig it now asks for can
   // simply be re-derived.
@@ -454,7 +454,7 @@ void QmitkVolumeVisualizationV2View::OnLightingChanged()
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkVolumeVisualizationV2View::OnRenderWindowLightingModeChanged(mitk::VtkPropRenderer::LightingMode mode)
+void QmitkVolumeVisualizationView::OnRenderWindowLightingModeChanged(mitk::VtkPropRenderer::LightingMode mode)
 {
   const auto *model = mitk::VolumeRenderingLightingModel::FromLightingMode(mode);
 
@@ -473,7 +473,7 @@ void QmitkVolumeVisualizationV2View::OnRenderWindowLightingModeChanged(mitk::Vtk
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkVolumeVisualizationV2View::UpdateLightingSection()
+void QmitkVolumeVisualizationView::UpdateLightingSection()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
@@ -505,7 +505,7 @@ void QmitkVolumeVisualizationV2View::UpdateLightingSection()
   m_Controls->lightingWidget->SetDataNode(selectedNode.GetPointer());
 }
 
-void QmitkVolumeVisualizationV2View::UpdateInterface()
+void QmitkVolumeVisualizationView::UpdateInterface()
 {
   auto selectedNode = m_SelectedNode.Lock();
   const bool hasNode = selectedNode.IsNotNull();

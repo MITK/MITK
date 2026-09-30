@@ -168,7 +168,7 @@ over:
 into a smaller band of gray values; widening it spreads them out.
 </ul>
 
-<b>Reset</b> returns all four to neutral. That restores the curve they are
+<b>Reset opacity and color</b> returns all four to neutral. That restores the curve they are
 measured from, which is the untouched preset, the curve as you left it after
 editing it point by point, or the curve on show when its preset was removed. It
 does not reload a preset; clicking the preset's entry does.
@@ -342,19 +342,21 @@ shadows off while you rotate, and also relights any surface sharing the 3D
 window.
 </ul>
 
-<b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>
-control how one volume's material responds to that light, and stay in this
-panel because they are per volume rather than per window. Choosing a model sets
-all four to a sensible starting point; moving them afterwards does not leave the
-model, and <b>Reset</b> puts them back to the values the current model
+<b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>,
+under <b>Material</b> below the transfer function, control how one volume's
+material responds to that light, and stay in this view because they are per
+volume rather than per window. Choosing a model sets all four to a sensible
+starting point; moving them afterwards does not leave the model, and
+<b>Reset material</b> puts them back to the values the current model
 prescribes. Ambient is deliberately zero under Key light: with more than one
 light in the scene the renderer adds ambient as a flat gray wash, so the fill
 light does that job instead.
 
-\note This whole section applies to the Composite blend mode only. With
-<tt>CT-MIP</tt> or <tt>MR-MIP</tt> it is disabled, with the reason on its
-header: a maximum intensity projection reduces each ray to a single value and
-lights nothing, so lighting there is inert rather than merely subtle.
+\note The material sliders apply to the Composite blend mode only. With
+<tt>CT-MIP</tt> or <tt>MR-MIP</tt> they are grayed out and their title reads
+<b>Material - Composite only</b>: a maximum intensity projection reduces each
+ray to a single value and lights nothing, so lighting there is inert rather
+than merely subtle.
 
 \section org_mitk_views_volumevisualization_appearance Color and opacity from the Data Manager
 

@@ -55,6 +55,7 @@ found in the LICENSE file.
 #include <QPixmap>
 #include <QPushButton>
 #include <QRect>
+#include <QResizeEvent>
 #include <QSignalBlocker>
 #include <QStringList>
 #include <QStyledItemDelegate>
@@ -729,6 +730,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+  // Always on, since the list is as tall as the panel allows and so can come to
+  // hold every entry: a bar leaving then would widen the cells, the entries
+  // would no longer fit, and the bar would come back, over and over.
+  presetList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
   // The application stylesheet grays a disabled item's text but not the
   // selection behind it, so the preset in force would keep a full-strength
   // highlight while the editor is switched off. Translucent rather than a fixed
@@ -998,8 +1004,16 @@ bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *ev
 
   if (watched == presetList->viewport())
   {
+    // Only a change of width: the cells are measured from it alone, while the
+    // height follows whatever the panel has to spare, so a window resized
+    // vertically would have them measured again on every step for nothing.
     if (event->type() == QEvent::Resize)
-      this->UpdatePresetLayout();
+    {
+      const auto *resizeEvent = static_cast<QResizeEvent *>(event);
+
+      if (resizeEvent->size().width() != resizeEvent->oldSize().width())
+        this->UpdatePresetLayout();
+    }
 
     // A double click as well as a press, since the view takes a double click on
     // an entry it did not see pressed as a press of its own. The release is left
@@ -1320,7 +1334,7 @@ void QmitkVolumeTransferFunctionEditor::OnBlendModeChanged(int index)
   this->ShowPresetEdited();
 
   // The curve did not change, but what the render window makes of it did, and
-  // the host gates its lighting section on the mode.
+  // the host gates its material controls on the mode.
   emit TransferFunctionChanged();
 }
 

@@ -29,7 +29,7 @@
    <item>
     <widget class="QWidget" name="transferFunctionPanel" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -131,13 +131,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>480</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>640</height>
+          <height>336</height>
          </size>
         </property>
        </widget>
@@ -502,7 +496,7 @@
            <item>
             <widget class="QPushButton" name="resetTfButton">
              <property name="text">
-              <string>Reset</string>
+              <string>Reset opacity and color</string>
              </property>
             </widget>
            </item>

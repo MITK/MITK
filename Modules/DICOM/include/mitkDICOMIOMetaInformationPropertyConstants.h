@@ -35,6 +35,13 @@ namespace mitk
     static PropertyKeyPath READER_CONFIGURATION();
     /** \brief Path to the property containing the files the DICOM reader used, stored as a TemporoSpatialProperty. */
     static PropertyKeyPath READER_FILES();
+    /** \brief Path to the property naming, per (t, z) slot, the stored frame of its file whose pixels fill that slot.
+     *
+     * Only written for a block containing a file with a frame model, i.e. with one per-frame functional-group item
+     * per frame, a single-frame file included. The files property repeats one filename for all slots of a
+     * multi-frame file, so without this the frame-to-slot mapping would not be recoverable from the loaded image.
+     */
+    static PropertyKeyPath READER_FRAMES();
     /** \brief Path to the property containing the PixelSpacingInterpretation as a human-readable string. */
     static PropertyKeyPath READER_PIXEL_SPACING_INTERPRETATION_STRING();
     /** \brief Path to the property containing the numeric PixelSpacingInterpretation enum value as an IntProperty. */

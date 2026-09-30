@@ -49,7 +49,14 @@ mitk::DICOMFileReader::Pointer mitk::ManualSelectingDICOMReaderService::GetReade
     }
   }
 
-  return selectedReader;
+  if (selectedReader.IsNull())
+  {
+    return nullptr;
+  }
+
+  //every clone of this service shares m_Selector, and the caller analyzes and loads with the
+  //returned reader, so it gets a copy of the configured one that nobody else holds
+  return dynamic_cast<DICOMFileReader*>(selectedReader->Clone().GetPointer());
 }
 
 mitk::ManualSelectingDICOMReaderService* mitk::ManualSelectingDICOMReaderService::Clone() const

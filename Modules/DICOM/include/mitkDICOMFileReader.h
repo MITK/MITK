@@ -75,6 +75,15 @@ public:
   /// Individual outputs, only meaningful after calling AnalyzeInputFiles(). \throws std::invalid_argument
   const DICOMImageBlockDescriptor& GetOutput( unsigned int index ) const;
 
+  /**
+   * \brief Discard every output that holds no frame of the passed file.
+   *
+   * Meant to be called between AnalyzeInputFiles() and LoadImages(), so that
+   * only the volumes of one file are loaded. The outputs then no longer cover
+   * all input files, until the next AnalyzeInputFiles().
+   */
+  void KeepOnlyOutputsContaining( const std::string& filename );
+
   // void AllocateOutputImages(); TODO for later implementation of slice-by-slice loading
 
   /// Load the mitk::Image%s in our outputs, the DICOMImageBlockDescriptor. To be called only after

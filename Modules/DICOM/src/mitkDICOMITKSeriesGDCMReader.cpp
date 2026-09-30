@@ -16,10 +16,13 @@ found in the LICENSE file.
 #include <itkTimeProbesCollectorBase.h>
 #include <gdcmUIDs.h>
 #include <mitkDICOMITKSeriesGDCMReader.h>
+#include <mitkDICOMFrameListHelper.h>
 #include <mitkITKDICOMSeriesReaderHelper.h>
 #include <mitkGantryTiltInformation.h>
 #include <mitkDICOMTagBasedSorter.h>
 #include <mitkDICOMGDCMTagScanner.h>
+
+#include <algorithm>
 
 std::mutex mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex;
 
@@ -211,6 +214,104 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList
 #define timeStop( part )
 #endif
 
+namespace
+{
+  /**
+   * The sorted files of one block, regrouped so that a file whose frame model
+   * describes more than one frame stands alone: ITK's multi-file branch sets
+   * the moving dimension to the file count, so all but one frame of each file
+   * would be silently lost. A single-frame file is not separated, because one
+   * frame per file is what the multi-file branch produces anyway.
+   *
+   * The files are grouped before the normal-direction sorter runs, so that
+   * every block's order and tilt come from its own first and last file.
+   *
+   * Separating them asserts only that MITK cannot merge them, not that they are
+   * independent stacks. Deciding what they really are means reading Stack ID and
+   * Dimension Index Values, which is frame-aware splitting and not done here.
+   */
+  std::vector<mitk::DICOMDatasetAccessingImageFrameList>
+  SeparateMultiFrameFiles(const mitk::DICOMDatasetAccessingImageFrameList& sortedFiles,
+                          const mitk::DICOMTagCache& cache)
+  {
+    if (!cache.HasAnyFrameModel())
+    {
+      return { sortedFiles };
+    }
+
+    std::vector<mitk::DICOMDatasetAccessingImageFrameList> groups;
+    mitk::DICOMDatasetAccessingImageFrameList retained;
+
+    for (const auto& file : sortedFiles)
+    {
+      const auto layout = cache.GetFrameLayout(file);
+      if (layout.HasFrameModel() && layout.frameCount > 1)
+      {
+        groups.push_back({ file });
+      }
+      else
+      {
+        retained.push_back(file);
+      }
+    }
+
+    if (!retained.empty())
+    {
+      groups.push_back(std::move(retained));
+    }
+
+    return groups;
+  }
+
+  /** One entry per frame the frame model of each file describes; a file
+      without a frame model stays one entry. */
+  mitk::DICOMImageFrameList ExpandFrames(const mitk::DICOMDatasetAccessingImageFrameList& files,
+                                         const mitk::DICOMTagCache& cache)
+  {
+    if (!cache.HasAnyFrameModel())
+    {
+      return mitk::ConvertToDICOMImageFrameList(files);
+    }
+
+    mitk::DICOMImageFrameList result;
+    for (const auto& file : files)
+    {
+      const auto layout = cache.GetFrameLayout(file);
+      if (!layout.HasFrameModel())
+      {
+        result.push_back(file.GetPointer());
+        continue;
+      }
+
+      mitk::DICOMImageFrameList frames;
+      frames.reserve(layout.frameCount);
+      for (unsigned int k = 0; k < layout.frameCount; ++k)
+      {
+        auto frame = cache.GetFrameInfo(file->Filename, k);
+        if (frame.IsNull())
+        {
+          MITK_ERROR << "Cannot resolve frame " << k << " of " << file->Filename
+                     << ". Reading the file as a single frame.";
+          frames.clear();
+          break;
+        }
+        frames.push_back(frame.GetPointer());
+      }
+
+      if (frames.empty())
+      {
+        result.push_back(file.GetPointer());
+      }
+      else
+      {
+        result.insert(result.end(), frames.begin(), frames.end());
+      }
+    }
+
+    return result;
+  }
+}
+
 void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 {
   itk::TimeProbesCollectorBase timer;
@@ -291,43 +392,71 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   // provide final result as output
 
   timeStart( "Output" );
-  unsigned int o = this->GetNumberOfOutputs();
-  this->SetNumberOfOutputs(
-    o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
+
+  // The number of outputs is only known after expansion, because a sorted block
+  // that holds a multi-frame functional-group file becomes one block per file.
+  struct PendingBlock
+  {
+    DICOMImageFrameList frames;
+    IOVolumeSplitReason::Pointer splitReason;
+    GantryTiltInformation tiltInfo;
+  };
+  std::vector<PendingBlock> pendingBlocks;
+
   for ( auto blockIter = m_SortingResultInProgress.cbegin(); blockIter != m_SortingResultInProgress.cend();
-        ++o, ++blockIter )
+        ++blockIter )
   {
     const auto& gdcmFrameInfoList = blockIter->first;
-    auto& splitReason = blockIter->second;
+    const auto& splitReason = blockIter->second;
 
     assert( !gdcmFrameInfoList.empty() );
 
-    // reverse frames if necessary
-    // update tilt information from absolute last sorting
-    const DICOMDatasetList datasetList = ConvertToDICOMDatasetList( gdcmFrameInfoList );
-    m_NormalDirectionConsistencySorter->SetInput( datasetList );
-    m_NormalDirectionConsistencySorter->Sort();
-    const DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList =
-      ConvertToDICOMDatasetAccessingImageFrameList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
-    const GantryTiltInformation& tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
+    const auto groups = SeparateMultiFrameFiles( gdcmFrameInfoList, *this->GetTagCache() );
+    assert( !groups.empty() );
 
-    // set frame list for current block
-    const DICOMImageFrameList frameList = ConvertToDICOMImageFrameList( sortedGdcmInfoFrameList );
-    assert( !frameList.empty() );
+    for ( const auto& group : groups )
+    {
+      // reverse frames if necessary
+      // update tilt information from absolute last sorting
+      const DICOMDatasetList datasetList = ConvertToDICOMDatasetList( group );
+      m_NormalDirectionConsistencySorter->SetInput( datasetList );
+      m_NormalDirectionConsistencySorter->Sort();
+      const DICOMDatasetAccessingImageFrameList sortedGroup =
+        ConvertToDICOMDatasetAccessingImageFrameList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
+      const GantryTiltInformation tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
 
+      auto frameList = ExpandFrames( sortedGroup, *this->GetTagCache() );
+      assert( !frameList.empty() );
+
+      auto reason = groups.size() > 1 ? splitReason->Clone() : splitReason;
+      if ( groups.size() > 1 )
+      {
+        reason->AddReason( IOVolumeSplitReason::ReasonType::MultiFrameFileSeparated,
+                           std::to_string( groups.size() ) );
+      }
+
+      pendingBlocks.push_back( { std::move( frameList ), reason, tiltInfo } );
+    }
+  }
+
+  unsigned int o = this->GetNumberOfOutputs();
+  this->SetNumberOfOutputs( o + pendingBlocks.size() ); // Condense3DBlocks may already have added outputs!
+  for ( auto& pending : pendingBlocks )
+  {
     DICOMImageBlockDescriptor block;
     block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because
                                               // SetImageFrameList will trigger reading of lots of interesting
                                               // tags!
     block.SetAdditionalTagsOfInterest( GetAdditionalTagsOfInterest() );
     block.SetTagLookupTableToPropertyFunctor( GetTagLookupTableToPropertyFunctor() );
-    block.SetImageFrameList( frameList );
-    block.SetTiltInformation( tiltInfo );
-    block.SetSplitReason(splitReason);
+    block.SetImageFrameList( pending.frames );
+    block.SetTiltInformation( pending.tiltInfo );
+    block.SetSplitReason( pending.splitReason );
 
     block.SetReaderImplementationLevel( this->GetReaderImplementationLevel( block.GetSOPClassUID() ) );
 
     this->SetOutput( o, block );
+    ++o;
   }
   timeStop( "Output" );
 
@@ -454,19 +583,69 @@ bool mitk::DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
   bool hasTilt                         = tiltInfo.IsRegularGantryTilt();
 
+  // One boolean per block is what a classic series pays here. Without a frame
+  // model anywhere in the cache no block can hold duplicate consecutive
+  // filenames, so the deduplication has nothing to do.
+  const bool anyFrameModel = this->GetTagCache().IsNotNull() && this->GetTagCache()->HasAnyFrameModel();
+
   ITKDICOMSeriesReaderHelper::StringContainer filenames;
-  filenames.reserve( frames.size() );
-  for ( auto frameIter = frames.cbegin(); frameIter != frames.cend(); ++frameIter )
+  if ( anyFrameModel )
   {
-    filenames.push_back( ( *frameIter )->Filename );
+    filenames = DistinctFilesInOrder( frames );
   }
+  else
+  {
+    filenames.reserve( frames.size() );
+    for ( auto frameIter = frames.cbegin(); frameIter != frames.cend(); ++frameIter )
+    {
+      filenames.push_back( ( *frameIter )->Filename );
+    }
+  }
+
+  const bool blockHasFrameModel =
+    anyFrameModel
+    && std::any_of( frames.cbegin(), frames.cend(), [this]( const DICOMImageFrameInfo::Pointer& frame )
+                    { return this->GetTagCache()->GetFrameLayout( frame ).HasFrameModel(); } );
 
   mitk::ITKDICOMSeriesReaderHelper helper;
   bool success( true );
   try
   {
-    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo );
-    block.SetMitkImage( mitkImage );
+    // The layout is only meaningful for a single-file volume; a multi-file block
+    // must not have a per-frame correction applied to it.
+    const DICOMFrameLayout layout = blockHasFrameModel && 1 == filenames.size()
+                                      ? this->GetTagCache()->GetFrameLayout( frames.front() )
+                                      : DICOMFrameLayout();
+
+    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo, layout );
+
+    // A frame-model file with more than one frame gets a block of its own, and
+    // a single-frame one contributes one frame and one slice to a multi-file
+    // block, so the slice count matches the frame count unless the helper
+    // loaded the file as 2D. It does so when GDCM reports a z-spacing of 0, as
+    // it does for a file whose frames all lie at one plane position. A 2D load
+    // would keep only the first frame, so the block is refused rather than
+    // yielding a silently wrong image. Gated on the frame model because a plain
+    // multi-frame object (RT dose, NM, SC, US) legitimately has one frame info
+    // and N slices.
+    if ( mitkImage.IsNotNull() && blockHasFrameModel
+         && mitkImage->GetDimension( 2 ) != frames.size() )
+    {
+      MITK_ERROR << "Loaded " << mitkImage->GetDimension( 2 ) << " slices for a block of " << frames.size()
+                 << " frames (" << filenames.front() << ")."
+                 << ( 2 == mitkImage->GetDimension()
+                        ? " GDCM reported a z-spacing of 0; the frames probably all lie at one plane position."
+                        : "" )
+                 << " Refusing the block.";
+      block.GetSplitReason()->AddReason( IOVolumeSplitReason::ReasonType::FrameCountMismatch,
+                                         std::to_string( mitkImage->GetDimension( 2 ) ) + "/"
+                                           + std::to_string( frames.size() ) );
+      success = false;
+    }
+    else
+    {
+      block.SetMitkImage( mitkImage );
+    }
   }
   catch ( const std::exception& e )
   {

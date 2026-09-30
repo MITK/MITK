@@ -21,8 +21,20 @@ found in the LICENSE file.
 #include <mitkDICOMGDCMTagScanner.h>
 #include <mitkDICOMTimeUtil.h>
 #include <mitkArbitraryTimeGeometry.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <dcmtk/dcmdata/dcvrda.h>
+
+#include <itkMetaDataObject.h>
+
+#include <gdcmRescaler.h>
+
+#include <algorithm>
+#include <cmath>
+#include <sstream>
+#include <type_traits>
+#include <vector>
 
 
 const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionDateTag = mitk::DICOMTag( 0x0008, 0x0022 );
@@ -32,6 +44,317 @@ const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::TriggerTimeTag = mitk::DI
 #define switchTypeCase(Dim, IOType, T) \
   case IOType:                    \
     return LoadDICOMByITK<T, Dim>( filenames, correctTilt, tiltInfo, io );
+
+namespace
+{
+  using Rescale = mitk::DICOMFrameLayout::Rescale;
+
+  gdcm::PixelFormat::ScalarType ToGDCMScalarType(itk::IOComponentEnum component)
+  {
+    switch (component)
+    {
+      case itk::IOComponentEnum::UCHAR:  return gdcm::PixelFormat::UINT8;
+      case itk::IOComponentEnum::CHAR:   return gdcm::PixelFormat::INT8;
+      case itk::IOComponentEnum::USHORT: return gdcm::PixelFormat::UINT16;
+      case itk::IOComponentEnum::SHORT:  return gdcm::PixelFormat::INT16;
+      case itk::IOComponentEnum::UINT:   return gdcm::PixelFormat::UINT32;
+      case itk::IOComponentEnum::INT:    return gdcm::PixelFormat::INT32;
+      default:                           return gdcm::PixelFormat::FLOAT64;
+    }
+  }
+
+  mitk::PixelType ToMitkPixelType(gdcm::PixelFormat::ScalarType type)
+  {
+    switch (type)
+    {
+      case gdcm::PixelFormat::UINT8:  return mitk::MakeScalarPixelType<unsigned char>();
+      case gdcm::PixelFormat::INT8:   return mitk::MakeScalarPixelType<signed char>();
+      case gdcm::PixelFormat::UINT16: return mitk::MakeScalarPixelType<unsigned short>();
+      case gdcm::PixelFormat::INT16:  return mitk::MakeScalarPixelType<short>();
+      case gdcm::PixelFormat::UINT32: return mitk::MakeScalarPixelType<unsigned int>();
+      case gdcm::PixelFormat::INT32:  return mitk::MakeScalarPixelType<int>();
+      case gdcm::PixelFormat::FLOAT32: return mitk::MakeScalarPixelType<float>();
+      default:                        return mitk::MakeScalarPixelType<double>();
+    }
+  }
+
+  /** A Pixel Module attribute as ITK's GDCM IO records it in its dictionary. */
+  bool ReadPixelModuleAttribute(const itk::MetaDataDictionary& dictionary, const char* key, unsigned short& value)
+  {
+    std::string text;
+    if (!itk::ExposeMetaData<std::string>(dictionary, key, text))
+    {
+      return false;
+    }
+
+    std::istringstream stream(text);
+    return static_cast<bool>(stream >> value);
+  }
+
+  /**
+   * The stored format as the Pixel Module declares it.
+   *
+   * GDCM sizes its rescale output by Bits Stored, so the same declaration has
+   * to go into the per-frame rule, or a file storing 12 bits in 16 would get a
+   * wider type here than GDCM gives it for a uniform transformation. Float
+   * stored data and a dictionary without a usable declaration fall back to the
+   * IO's component type.
+   */
+  gdcm::PixelFormat StoredPixelFormat(const itk::GDCMImageIO& io)
+  {
+    const auto component = io.GetInternalComponentType();
+    const gdcm::PixelFormat fallback(ToGDCMScalarType(component));
+
+    if (itk::IOComponentEnum::FLOAT == component || itk::IOComponentEnum::DOUBLE == component)
+    {
+      return fallback;
+    }
+
+    const auto& dictionary = io.GetMetaDataDictionary();
+    unsigned short bitsAllocated = 0;
+    unsigned short bitsStored = 0;
+    unsigned short highBit = 0;
+    unsigned short pixelRepresentation = 0;
+    if (!ReadPixelModuleAttribute(dictionary, "0028|0100", bitsAllocated)
+        || !ReadPixelModuleAttribute(dictionary, "0028|0101", bitsStored)
+        || !ReadPixelModuleAttribute(dictionary, "0028|0102", highBit)
+        || !ReadPixelModuleAttribute(dictionary, "0028|0103", pixelRepresentation)
+        || 0 == bitsStored || bitsStored > bitsAllocated || bitsAllocated > 32 || pixelRepresentation > 1)
+    {
+      return fallback;
+    }
+
+    return gdcm::PixelFormat(1, bitsAllocated, bitsStored, highBit, pixelRepresentation);
+  }
+
+  /** GDCM's own output-type rule for one pair. */
+  gdcm::PixelFormat::ScalarType RescaledType(const gdcm::PixelFormat& stored, const Rescale& rescale)
+  {
+    // GDCM's rule sizes an integer output by the stored range, and a float
+    // format has none; asking for it asserts inside GDCM.
+    const auto storedType = stored.GetScalarType();
+    if (gdcm::PixelFormat::FLOAT16 == storedType || gdcm::PixelFormat::FLOAT32 == storedType
+        || gdcm::PixelFormat::FLOAT64 == storedType)
+    {
+      return gdcm::PixelFormat::FLOAT64;
+    }
+
+    gdcm::Rescaler rescaler;
+    rescaler.SetPixelFormat(stored);
+    rescaler.SetSlope(rescale.slope);
+    rescaler.SetIntercept(rescale.intercept);
+
+    return rescaler.ComputeInterceptSlopePixelType();
+  }
+
+  /** The narrowest of GDCM's types that holds both, so that a uniform and a
+      varying file of the same kind load with the same type. */
+  gdcm::PixelFormat::ScalarType Widest(gdcm::PixelFormat::ScalarType left, gdcm::PixelFormat::ScalarType right)
+  {
+    if (left == right)
+    {
+      return left;
+    }
+
+    if (gdcm::PixelFormat::FLOAT64 == left || gdcm::PixelFormat::FLOAT64 == right
+        || gdcm::PixelFormat::FLOAT32 == left || gdcm::PixelFormat::FLOAT32 == right)
+    {
+      return gdcm::PixelFormat::FLOAT64;
+    }
+
+    const double lowest = std::min(gdcm::PixelFormat(left).GetMin(), gdcm::PixelFormat(right).GetMin());
+    const double highest = std::max(gdcm::PixelFormat(left).GetMax(), gdcm::PixelFormat(right).GetMax());
+
+    for (const auto candidate : { gdcm::PixelFormat::UINT8, gdcm::PixelFormat::INT8,
+                                  gdcm::PixelFormat::UINT16, gdcm::PixelFormat::INT16,
+                                  gdcm::PixelFormat::UINT32, gdcm::PixelFormat::INT32 })
+    {
+      if (gdcm::PixelFormat(candidate).GetMin() <= lowest && highest <= gdcm::PixelFormat(candidate).GetMax())
+      {
+        return candidate;
+      }
+    }
+
+    return gdcm::PixelFormat::FLOAT64;
+  }
+
+  template <typename TPixel>
+  void ToDouble(const void* source, double* target, std::size_t count)
+  {
+    const auto* typed = static_cast<const TPixel*>(source);
+    for (std::size_t i = 0; i < count; ++i)
+    {
+      target[i] = static_cast<double>(typed[i]);
+    }
+  }
+
+  /**
+   * The recovery can leave an integral target a few ULPs below the whole
+   * value that the frame's own pair yields; truncating that would cost one
+   * slope step.
+   */
+  template <typename TPixel>
+  void FromDouble(const double* source, void* target, std::size_t count)
+  {
+    auto* typed = static_cast<TPixel*>(target);
+    for (std::size_t i = 0; i < count; ++i)
+    {
+      if constexpr (std::is_integral_v<TPixel>)
+      {
+        typed[i] = static_cast<TPixel>(std::round(source[i]));
+      }
+      else
+      {
+        typed[i] = static_cast<TPixel>(source[i]);
+      }
+    }
+  }
+
+#define mitkDicomRescaleDispatch(function, componentType, first, second, count)      \
+  switch (componentType)                                                             \
+  {                                                                                  \
+    case itk::IOComponentEnum::UCHAR:  function<unsigned char>(first, second, count); break;  \
+    case itk::IOComponentEnum::CHAR:   function<signed char>(first, second, count); break;    \
+    case itk::IOComponentEnum::USHORT: function<unsigned short>(first, second, count); break; \
+    case itk::IOComponentEnum::SHORT:  function<short>(first, second, count); break;          \
+    case itk::IOComponentEnum::UINT:   function<unsigned int>(first, second, count); break;   \
+    case itk::IOComponentEnum::INT:    function<int>(first, second, count); break;            \
+    case itk::IOComponentEnum::ULONG:  function<unsigned long>(first, second, count); break;  \
+    case itk::IOComponentEnum::LONG:   function<long>(first, second, count); break;           \
+    case itk::IOComponentEnum::FLOAT:  function<float>(first, second, count); break;          \
+    default:                           function<double>(first, second, count); break;         \
+  }
+
+  /**
+   * Replaces GDCM's single Pixel Value Transformation by each frame's own.
+   *
+   * gdcm::Image holds one slope and one intercept for the whole buffer. For the
+   * enhanced SOP classes GDCM knows, that pair comes from the shared functional
+   * group, or else from the first per-frame item; for any other class it is the
+   * top-level pair. Which one GDCM chose does not matter here, because the
+   * applied pair is read back from the IO. Undoing it and applying the frame's
+   * pair is exact when GDCM's output type is integral, because GDCM chose a
+   * type that holds stored * m + b exactly, and within double rounding
+   * otherwise. Real World Value Mapping is deliberately not applied; GDCM does
+   * not apply it either and it stays a consumer concern.
+   */
+  mitk::Image::Pointer ApplyPerFrameRescale(mitk::Image* loaded,
+                                            const itk::GDCMImageIO& io,
+                                            const mitk::DICOMFrameLayout& layout)
+  {
+    if (nullptr == loaded || layout.perFrameRescale.empty() || loaded->GetDimension() < 3)
+    {
+      return loaded;
+    }
+
+    const unsigned int sliceCount = loaded->GetDimension(2);
+    if (sliceCount < 2)
+    {
+      return loaded;
+    }
+
+    const auto effective = mitk::EffectivePerFrameRescale(layout);
+    if (effective.size() != sliceCount)
+    {
+      MITK_WARN << "The frame layout describes " << effective.size() << " frames but the image has "
+                << sliceCount << " slices. Leaving the Pixel Value Transformation as GDCM applied it.";
+      return loaded;
+    }
+
+    const Rescale applied{ io.GetRescaleSlope(), io.GetRescaleIntercept() };
+    if (0.0 == applied.slope)
+    {
+      MITK_WARN << "GDCM reports a rescale slope of zero; the applied transformation cannot be undone.";
+      return loaded;
+    }
+
+    if (std::all_of(effective.cbegin(), effective.cend(),
+                    [&applied](const Rescale& rescale) { return mitk::SameRescale(rescale, applied); }))
+    {
+      return loaded;
+    }
+
+    if (loaded->GetPixelType().GetNumberOfComponents() > 1)
+    {
+      MITK_WARN << "The per-frame Pixel Value Transformation is not applied to multi-component "
+                << "(for example colour) images.";
+      return loaded;
+    }
+
+    const auto storedFormat = StoredPixelFormat(io);
+    auto targetType = RescaledType(storedFormat, effective.front());
+    for (const auto& rescale : effective)
+    {
+      targetType = Widest(targetType, RescaledType(storedFormat, rescale));
+    }
+
+    const mitk::PixelType targetPixelType = ToMitkPixelType(targetType);
+    const auto sourceComponent = loaded->GetPixelType().GetComponentType();
+    const auto targetComponent = targetPixelType.GetComponentType();
+
+    const std::size_t pixelsPerSlice =
+      static_cast<std::size_t>(loaded->GetDimension(0)) * loaded->GetDimension(1);
+    const std::size_t sourceStride = pixelsPerSlice * loaded->GetPixelType().GetSize();
+    const std::size_t targetStride = pixelsPerSlice * targetPixelType.GetSize();
+
+    // One slice of doubles rather than the whole volume: an Enhanced CT of 500
+    // frames at 512 squared would otherwise need a gigabyte of them.
+    std::vector<double> values(pixelsPerSlice);
+    unsigned int corrected = 0;
+
+    const auto RescaleSlice = [&](const void* source, void* target, unsigned int z)
+    {
+      mitkDicomRescaleDispatch(ToDouble, sourceComponent, source, values.data(), pixelsPerSlice);
+
+      if (!mitk::SameRescale(effective[z], applied))
+      {
+        for (std::size_t i = 0; i < pixelsPerSlice; ++i)
+        {
+          values[i] =
+            (values[i] - applied.intercept) / applied.slope * effective[z].slope + effective[z].intercept;
+        }
+        ++corrected;
+      }
+
+      mitkDicomRescaleDispatch(FromDouble, targetComponent, values.data(), target, pixelsPerSlice);
+    };
+
+    mitk::Image::Pointer result = loaded;
+
+    if (targetComponent == sourceComponent)
+    {
+      // Same width in and out, so the correction is written back over the pixels
+      // it read. A write accessor serves both directions; taking a read and a
+      // write accessor on one image at the same time would block.
+      mitk::ImageWriteAccessor writer(loaded, loaded->GetVolumeData(0));
+      auto* volume = static_cast<unsigned char*>(writer.GetData());
+      for (unsigned int z = 0; z < sliceCount; ++z)
+      {
+        RescaleSlice(volume + z * sourceStride, volume + z * targetStride, z);
+      }
+    }
+    else
+    {
+      result = mitk::Image::New();
+      result->Initialize(targetPixelType, *loaded->GetTimeGeometry(), 1, 1);
+
+      mitk::ImageWriteAccessor writer(result, result->GetVolumeData(0));
+      auto* target = static_cast<unsigned char*>(writer.GetData());
+      mitk::ImageReadAccessor reader(loaded, loaded->GetVolumeData(0));
+      const auto* volume = static_cast<const unsigned char*>(reader.GetData());
+      for (unsigned int z = 0; z < sliceCount; ++z)
+      {
+        RescaleSlice(volume + z * sourceStride, target + z * targetStride, z);
+      }
+      result->Modified();
+    }
+
+    MITK_INFO << "Applied the per-frame Pixel Value Transformation to " << corrected << " of "
+              << effective.size() << " frames.";
+
+    return result;
+  }
+}
 
 bool mitk::ITKDICOMSeriesReaderHelper::CanHandleFile( const std::string& filename )
 {
@@ -91,7 +414,8 @@ mitk::ITKDICOMSeriesReaderHelper::LoadByTypeDispatch(const StringContainer& file
 
 mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load( const StringContainer& filenames,
                                                              bool correctTilt,
-                                                             const GantryTiltInformation& tiltInfo )
+                                                             const GantryTiltInformation& tiltInfo,
+                                                             const DICOMFrameLayout& layout )
 {
   if ( filenames.empty() )
   {
@@ -122,7 +446,11 @@ mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load( const StringContain
       }
       else
       {
-        return LoadByTypeDispatch<3>(filenames, correctTilt, tiltInfo, io);
+        mitk::Image::Pointer loaded = LoadByTypeDispatch<3>(filenames, correctTilt, tiltInfo, io);
+
+        // Only a single file can carry a frame layout, and io now reports what
+        // GDCM actually applied to the buffer it just read.
+        return 1 == filenames.size() ? ApplyPerFrameRescale(loaded, *io, layout) : loaded;
       }
     }
   }

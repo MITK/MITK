@@ -10,20 +10,46 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "mitkDICOMMultiFrameTestObject.h"
+#include "mitkDICOMTestWarningCounter.h"
+
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderTestHelper.h>
+#include <mitkIOUtil.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 #include <mitkStringProperty.h>
 
+#include <itksys/SystemTools.hxx>
+
+#include <utility>
+#include <vector>
+
+/**
+ * Besides plain scanning, the suite covers what reading the frame model adds:
+ * frame-layout detection, the frame-model warnings, and the functional-group
+ * expansion. A tag of interest is registered as the path inside the
+ * functional-group macro, and the scanner of the frame-model reader also
+ * searches it under the shared and the per-frame root, but only when asked to,
+ * only for a file with a frame model and only for a path with more than one
+ * node.
+ */
 class mitkDICOMDCMTKTagScannerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkDICOMDCMTKTagScannerTestSuite);
 
   MITK_TEST(DeepScanning);
   MITK_TEST(MultiFileScanning);
+  MITK_TEST(ClassicFileStoresTheSameFindingsWithTheSwitch);
+  MITK_TEST(FrameModelFileIsSearchedInBothGroups);
+  MITK_TEST(NoRootedFindingWithoutTheSwitch);
+  MITK_TEST(RaggedFileIsNotExpanded);
+  MITK_TEST(SingleElementPathIsNotExpanded);
+  MITK_TEST(RootedRegistrationIsInertAndWarnsOncePerScan);
+  MITK_TEST(RootedRegistrationWarnsForAClassicSeriesToo);
+  MITK_TEST(NoFrameModelWithoutTheSwitch);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -33,6 +59,96 @@ private:
 
   mitk::StringList doseFiles;
   mitk::StringList ctFiles;
+
+  std::string m_TempDir;
+  unsigned int m_FileCounter = 0;
+
+  static constexpr unsigned int FRAME_COUNT = 4;
+
+  static mitk::DICOMTagPath MacroRelative(unsigned int macroGroup,
+                                          unsigned int macroElement,
+                                          unsigned int leafGroup,
+                                          unsigned int leafElement)
+  {
+    mitk::DICOMTagPath path;
+    path.AddAnySelection(macroGroup, macroElement);
+    path.AddElement(leafGroup, leafElement);
+    return path;
+  }
+
+  static mitk::DICOMTagPath RescaleSlope() { return MacroRelative(0x0028, 0x9145, 0x0028, 0x1053); }
+  static mitk::DICOMTagPath FrameReferenceDateTime() { return MacroRelative(0x0020, 0x9111, 0x0018, 0x9151); }
+
+  static mitk::DICOMTagPath Rooted(unsigned int rootElement, const mitk::DICOMTagPath& path)
+  {
+    return mitk::DICOMTagPath().AddAnySelection(0x5200, rootElement) + path;
+  }
+
+  static mitk::DICOMTagPath Explicit(unsigned int rootElement, unsigned int item,
+                                     unsigned int macroGroup, unsigned int macroElement,
+                                     unsigned int leafGroup, unsigned int leafElement)
+  {
+    mitk::DICOMTagPath path;
+    path.AddSelection(0x5200, rootElement, item);
+    path.AddSelection(macroGroup, macroElement, 0);
+    path.AddElement(leafGroup, leafElement);
+    return path;
+  }
+
+  static std::string FrameTime(unsigned int k)
+  {
+    return "2025010111" + std::string(k < 10 ? "0" : "") + std::to_string(k) + "00.000000+0100";
+  }
+
+  static std::string Trimmed(const std::string& value)
+  {
+    const auto end = value.find_last_not_of(" \0");
+    return std::string::npos == end ? std::string() : value.substr(0, end + 1);
+  }
+
+  mitk::DICOMMultiFrameTestObject MakeEnhanced() const
+  {
+    auto object = mitk::DICOMMultiFrameTestObject::EnhancedPET(FRAME_COUNT);
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      object.frames[k].slope = 1.0 + k;
+      object.frames[k].frameReferenceDateTime = FrameTime(k);
+    }
+    return object;
+  }
+
+  std::string Write(const mitk::DICOMMultiFrameTestObject& object)
+  {
+    return object.Write(m_TempDir, "object" + std::to_string(m_FileCounter++) + ".dcm");
+  }
+
+  static mitk::DICOMDatasetAccessingImageFrameList Scan(const mitk::StringList& files,
+                                                        const std::vector<mitk::DICOMTagPath>& paths,
+                                                        bool readFrameModel)
+  {
+    auto aScanner = mitk::DICOMDCMTKTagScanner::New();
+    aScanner->SetInputFiles(files);
+    for (const auto& path : paths)
+    {
+      aScanner->AddTagPath(path);
+    }
+    aScanner->SetReadFrameModel(readFrameModel);
+    aScanner->Scan();
+
+    return aScanner->GetFrameInfoList();
+  }
+
+  /** Path and value of every finding, so two scans can be compared as a whole. */
+  static std::vector<std::pair<std::string, std::string>> Rendered(
+    const mitk::DICOMDatasetAccess::FindingsListType& findings)
+  {
+    std::vector<std::pair<std::string, std::string>> result;
+    for (const auto& finding : findings)
+    {
+      result.emplace_back(finding.path.ToStr(), finding.value);
+    }
+    return result;
+  }
 
 public:
 
@@ -45,10 +161,17 @@ public:
     ctFiles.push_back(GetTestDataFilePath("TinyCTAbdomen/104"));
 
     scanner = mitk::DICOMDCMTKTagScanner::New();
+
+    m_TempDir = mitk::IOUtil::CreateTemporaryDirectory("mitkDICOMDCMTKTagScannerTestXXXXXX");
   }
 
   void tearDown() override
   {
+    if (!m_TempDir.empty())
+    {
+      itksys::SystemTools::RemoveADirectory(m_TempDir);
+      m_TempDir.clear();
+    }
   }
 
   void DeepScanning()
@@ -119,6 +242,161 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing value of instance uid finding of frame 3", findings.front().value == "1.2.276.0.99.1.4.8323329.3795.1303917947.940055");
   }
 
+  /** A file without functional groups gets no rooted search, so reading the
+      frame model changes nothing it stores. */
+  void ClassicFileStoresTheSameFindingsWithTheSwitch()
+  {
+    const std::vector<mitk::DICOMTagPath> paths = {
+      RescaleSlope(), FrameReferenceDateTime(), mitk::DICOMTagPath(0x0008, 0x0018), mitk::DICOMTagPath(0x0020, 0x0032)
+    };
+
+    const auto withoutSwitch = Scan(ctFiles, paths, false);
+    const auto withSwitch = Scan(ctFiles, paths, true);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One file-level info per file either way", withoutSwitch.size(), withSwitch.size());
+
+    for (std::size_t file = 0; file < withSwitch.size(); ++file)
+    {
+      for (const auto& path : paths)
+      {
+        const auto expected = Rendered(withoutSwitch[file]->GetTagValueAsString(path));
+        const auto actual = Rendered(withSwitch[file]->GetTagValueAsString(path));
+        CPPUNIT_ASSERT_MESSAGE("Same findings for " + path.ToStr() + " in file " + std::to_string(file),
+                               expected == actual);
+      }
+    }
+  }
+
+  /** A per-frame attribute is stored once per frame under (5200,9230)[k], a
+      shared one once under (5200,9229)[0]. */
+  void FrameModelFileIsSearchedInBothGroups()
+  {
+    auto object = this->MakeEnhanced();
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::Shared;
+    object.frames.front().slope = 7.0;
+
+    const auto frames = Scan({ this->Write(object) }, { RescaleSlope(), FrameReferenceDateTime() }, true);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One file-level info for the file", std::size_t(1), frames.size());
+
+    const auto times = frames.front()->GetTagValueAsString(Rooted(0x9230, FrameReferenceDateTime()));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One per-frame finding per frame", std::size_t(FRAME_COUNT), times.size());
+    unsigned int k = 0;
+    for (const auto& finding : times)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Finding " + std::to_string(k) + " under its explicit per-frame root",
+                             finding.path == Explicit(0x9230, k, 0x0020, 0x9111, 0x0018, 0x9151));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Frame " + std::to_string(k) + "'s value", FrameTime(k), Trimmed(finding.value));
+      ++k;
+    }
+
+    const auto shared = frames.front()->GetTagValueAsString(Rooted(0x9229, RescaleSlope()));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One shared finding", std::size_t(1), shared.size());
+    CPPUNIT_ASSERT_MESSAGE("The shared finding under its explicit shared root",
+                           shared.front().path == Explicit(0x9229, 0, 0x0028, 0x9145, 0x0028, 0x1053));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The shared slope", 7.0, std::stod(shared.front().value), 1e-9);
+
+    CPPUNIT_ASSERT_MESSAGE("No per-frame finding for an attribute that is only shared",
+                           frames.front()->GetTagValueAsString(Rooted(0x9230, RescaleSlope())).empty());
+  }
+
+  void NoRootedFindingWithoutTheSwitch()
+  {
+    auto object = this->MakeEnhanced();
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::Shared;
+
+    const auto frames = Scan({ this->Write(object) }, { RescaleSlope(), FrameReferenceDateTime() }, false);
+
+    CPPUNIT_ASSERT_MESSAGE("No per-frame finding without the switch",
+                           frames.front()->GetTagValueAsString(Rooted(0x9230, FrameReferenceDateTime())).empty());
+    CPPUNIT_ASSERT_MESSAGE("No shared finding without the switch",
+                           frames.front()->GetTagValueAsString(Rooted(0x9229, RescaleSlope())).empty());
+  }
+
+  /** A ragged file keeps file-level infos, so expanding it would store
+      findings nothing reads. */
+  void RaggedFileIsNotExpanded()
+  {
+    auto object = this->MakeEnhanced();
+    object.perFrameItemCountOverride = FRAME_COUNT - 1;
+
+    const auto frames = Scan({ this->Write(object) }, { RescaleSlope(), FrameReferenceDateTime() }, true);
+
+    CPPUNIT_ASSERT_MESSAGE("No per-frame finding for a ragged file",
+                           frames.front()->GetTagValueAsString(Rooted(0x9230, FrameReferenceDateTime())).empty());
+    CPPUNIT_ASSERT_MESSAGE("No per-frame rescale finding for a ragged file",
+                           frames.front()->GetTagValueAsString(Rooted(0x9230, RescaleSlope())).empty());
+  }
+
+  /** The nested-only boundary: a single element that sits directly in each
+      per-frame item is not found through a single-element registration. */
+  void SingleElementPathIsNotExpanded()
+  {
+    auto object = this->MakeEnhanced();
+    object.imageCommentsInPerFrameItems = true;
+    const std::string file = this->Write(object);
+
+    const mitk::DICOMTagPath imageComments(0x0020, 0x4000);
+    mitk::DICOMTagPath rootedImageComments;
+    rootedImageComments.AddAnySelection(0x5200, 0x9230).AddElement(0x0020, 0x4000);
+
+    const auto registeredRooted = Scan({ file }, { rootedImageComments }, false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Test precondition: the element is in every per-frame item",
+                                 std::size_t(FRAME_COUNT),
+                                 registeredRooted.front()->GetTagValueAsString(rootedImageComments).size());
+
+    const auto frames = Scan({ file }, { imageComments }, true);
+    CPPUNIT_ASSERT_MESSAGE("A single-element registration is not searched under the roots",
+                           frames.front()->GetTagValueAsString(rootedImageComments).empty());
+  }
+
+  /** A path already rooted in a functional group is not searched at all when
+      the frame model is read, and its registrant is told once per scan,
+      however many files. */
+  void RootedRegistrationIsInertAndWarnsOncePerScan()
+  {
+    const auto rooted = Rooted(0x9230, RescaleSlope());
+    const mitk::StringList files = { this->Write(this->MakeEnhanced()), this->Write(this->MakeEnhanced()) };
+
+    mitk::DICOMTestWarningCounter warnings(rooted.ToStr());
+    const auto frames = Scan(files, { rooted }, true);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per scan however many files", 1u, warnings.GetCount());
+    for (const auto& frame : frames)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The rooted path yields nothing", frame->GetTagValueAsString(rooted).empty());
+    }
+  }
+
+  /** The rule is the scanner's, not the file's: a classic series scanned with
+      the frame model read hears it as well. */
+  void RootedRegistrationWarnsForAClassicSeriesToo()
+  {
+    const auto rooted = Rooted(0x9230, RescaleSlope());
+
+    mitk::DICOMTestWarningCounter warnings(rooted.ToStr());
+    Scan(ctFiles, { rooted }, true);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning although no file has a frame model", 1u, warnings.GetCount());
+  }
+
+  /** A scanner that does not feed a frame-model reader, such as the RT, SEG or
+      CEST ones, neither detects a frame model nor warns about one, however
+      the file is laid out. */
+  void NoFrameModelWithoutTheSwitch()
+  {
+    auto ragged = this->MakeEnhanced();
+    ragged.perFrameItemCountOverride = FRAME_COUNT - 1;
+    const std::string raggedFile = this->Write(ragged);
+
+    auto aScanner = mitk::DICOMDCMTKTagScanner::New();
+    aScanner->SetInputFiles({ this->Write(this->MakeEnhanced()), raggedFile });
+    aScanner->AddTagPath(RescaleSlope());
+
+    mitk::DICOMTestWarningCounter warnings(raggedFile);
+    aScanner->Scan();
+
+    CPPUNIT_ASSERT_MESSAGE("No frame model without the switch", !aScanner->GetScanCache()->HasAnyFrameModel());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("No frame-model warning without the switch", 0u, warnings.GetCount());
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkDICOMDCMTKTagScanner)

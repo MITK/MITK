@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cctype>
 #include <cmath>
 #include <functional>
+#include <map>
 
 #include <dcmtk/dcmdata/dcvrdt.h>
 
@@ -1311,206 +1312,212 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         }
       }
 
-      // ---- Per-slice acquisition-time tags (Steps 2/3/4) ----
+      // ---- Steps 2/3/4, evaluated per (timestep, slice) ----
+      // The scanner corrected the whole series to one instant, so every
+      // slot has to arrive at that same instant. Step 2 identifies it only
+      // on the slots that start at SeriesTime -- typically the first bed of
+      // a whole-body scan or the first frame of a dynamic one -- while every
+      // other slot has to reach it through its own frame timing. A
+      // series-level decision would correct a later bed to its own start and
+      // count the inter-bed decay twice, and would tie the outcome to
+      // slice order, which need not follow acquisition order.
+      //
+      // The first pass only classifies, so that an unresolvable slot and
+      // the Strict refusal are both reported before these steps record or
+      // refuse any adaptation of the administration time.
       const auto* acqDateProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0022));
       const auto* acqTimeProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0032));
-      const bool haveAcqTags = (nullptr != acqDateProp) && (nullptr != acqTimeProp);
-
-      // ---- Step 2: AcquisitionTime equals SeriesTime in seconds ----
-      // Spec preconditions: per-slice AcqTime non-negative, AcqTime equals
-      // SeriesTime in seconds. There is no manufacturer condition: an
-      // AcquisitionTime that already equals the SeriesTime identifies the
-      // reference instant directly, whoever built the scanner. The
-      // condition is evaluated at slice 0 (single-bed scans, or first bed
-      // of multi-bed scans, per the spec).
-      if (haveAcqTags)
-      {
-        const std::string firstAcqDate = acqDateProp->GetValue(0, 0, true, true);
-        const std::string firstAcqTime = acqTimeProp->GetValue(0, 0, true, true);
-        OFDateTime firstAcq;
-        if (ConvertDICOMDateTimeString(firstAcqDate, firstAcqTime, firstAcq)
-            && EqualAtSecondResolution(firstAcq, ofSeriesTime))
-        {
-          const auto timeSteps = data->GetTimeSteps();
-          for (TimeStepType t = 0; t < timeSteps; ++t)
-          {
-            const auto* sliced = data->GetSlicedGeometry(t);
-            const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-            auto& sliceMap = info.decayTimes[t];
-            for (unsigned int s = 0; s < slices; ++s)
-            {
-              const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
-              const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
-              OFDateTime ofAcq;
-              if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
-              {
-                mitkThrowException(InvalidDICOMPropertyValueException)
-                  << "Cannot parse acquisition Date+Time '" << acqDate << acqTime
-                  << "' at timestep " << t << " slice " << s << ".";
-              }
-              sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-                ResolveDecayDurationSeconds(admin, ofAcq, 0.0, halfLife,
-                                            policy, info.adaptations);
-            }
-          }
-          return info;
-        }
-      }
-
-      // ---- Steps 3/4: general T_ave formula, or the GE offset, per slice ----
-      // Both require per-slice (0008,0032) AcqTime and (0054,0x1300)
-      // FrameReferenceTime. Step 3 additionally needs (0018,0x1242)
-      // ActualFrameDuration and a half-life, because its T_ave term is
-      // computed from them; Step 4 is a pure shift and needs neither.
-      // We require the preconditions across all slices; if any slice is
-      // incomplete we fall through rather than mix per-slice formulas with
-      // a partial result.
       const auto* frameRefProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0054, 0x1300));
       const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
 
       // Only the GE rule is manufacturer-specific. Siemens, Philips and any
       // manufacturer we cannot classify share the general T_ave form, so the
       // split is "GE versus everything else" rather than an allow-list.
-      const bool isStep4 = (ManufacturerFamily::GE == manuf);
-      const bool isStep3 = !isStep4;
+      const bool isGE = (ManufacturerFamily::GE == manuf);
       const bool halfLifeOK = std::isfinite(halfLife) && halfLife > 0.0;
-      const bool step3Possible = isStep3 && halfLifeOK && nullptr != frameDurProp;
-      const bool step4Possible = isStep4;
+      const char* const formulaName = isGE
+        ? "Step 4 (AcquisitionTime - FrameReferenceTime)"
+        : "Step 3 (AcquisitionTime + T_ave - FrameReferenceTime)";
+
+      struct SlotReference
+      {
+        OFDateTime base;
+        double offsetSeconds = 0.0;
+      };
+      std::map<TimeStepType, std::map<SlicedData::IndexValueType, SlotReference>> references;
+      unsigned int seriesTimeSlots = 0;
+      unsigned int formulaSlots = 0;
+
+      const auto timeSteps = data->GetTimeSteps();
+      for (TimeStepType t = 0; t < timeSteps; ++t)
+      {
+        const auto* sliced = data->GetSlicedGeometry(t);
+        const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+        for (unsigned int s = 0; s < slices; ++s)
+        {
+          const auto z = static_cast<SlicedData::IndexValueType>(s);
+          auto& reference = references[t][z];
+
+          const std::string acqDate =
+            (nullptr != acqDateProp) ? acqDateProp->GetValue(t, s, true, true) : std::string();
+          const std::string acqTime =
+            (nullptr != acqTimeProp) ? acqTimeProp->GetValue(t, s, true, true) : std::string();
+
+          bool resolved = false;
+          if (!acqDate.empty() && !acqTime.empty())
+          {
+            if (!ConvertDICOMDateTimeString(acqDate, acqTime, reference.base))
+            {
+              mitkThrowException(InvalidDICOMPropertyValueException)
+                << "Cannot parse acquisition Date+Time '" << acqDate << acqTime
+                << "' at timestep " << t << " slice " << s << ".";
+            }
+
+            // ---- Step 2: AcquisitionTime equals SeriesTime in seconds ----
+            // No manufacturer condition: an AcquisitionTime that already
+            // equals the SeriesTime identifies the reference instant
+            // directly, whoever built the scanner. Such a slot needs no
+            // frame timing, so its absence must not refuse it.
+            if (EqualAtSecondResolution(reference.base, ofSeriesTime))
+            {
+              ++seriesTimeSlots;
+              resolved = true;
+            }
+            else
+            {
+              // ---- Steps 3/4: general T_ave formula, or the GE offset ----
+              // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
+              // ActualFrameDuration are stored in milliseconds per DICOM.
+              // Spec precondition: FrameReferenceTime non-negative.
+              //
+              // Step 3 (general): t_ref = AcqTime + T_ave - FrameReferenceTime
+              // Step 4 (GE):      t_ref = AcqTime - FrameReferenceTime
+              // The -FrameReferenceTime term undoes the scanner-applied
+              // offset from the per-frame midpoint back to the start of
+              // acquisition; T_ave additionally compensates for the average
+              // count-rate time inside the frame. Without the
+              // FrameReferenceTime term, Step 3 diverges from IBSI-SUV
+              // expectations by exactly that offset (verified against
+              // DRO_3_2_0 / DRO_3_2_2).
+              //
+              // ActualFrameDuration is read only on the Step 3 branch: it
+              // feeds T_ave and nothing else, so requiring it on the GE path
+              // would refuse inputs that the GE rule resolves perfectly well.
+              const double frameRefMs = ReadNumericTagAt(frameRefProp, t, s);
+              if (std::isfinite(frameRefMs) && frameRefMs >= 0.0)
+              {
+                const double frameRefSec = frameRefMs / 1000.0;
+                if (isGE)
+                {
+                  reference.offsetSeconds = -frameRefSec;
+                  resolved = true;
+                }
+                else
+                {
+                  const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
+                  // Spec precondition: ActualFrameDuration strictly positive.
+                  if (halfLifeOK && std::isfinite(frameDurMs) && frameDurMs > 0.0)
+                  {
+                    reference.offsetSeconds =
+                      ComputeTAveSeconds(frameDurMs / 1000.0, halfLife) - frameRefSec;
+                    resolved = true;
+                  }
+                }
+              }
+              if (resolved)
+              {
+                ++formulaSlots;
+              }
+            }
+          }
+
+          if (!resolved)
+          {
+            // ---- Step 5: spec is silent. Refuse to extend a vendor formula
+            //              to an unclassifiable input or to silently fall
+            //              back to SeriesTime. One such slot refuses the
+            //              series: resolving the others says nothing about
+            //              when this one was corrected to.
+            mitkThrowException(AmbiguousDecayTimingException)
+              << "DC=START fallback chain exhausted at timestep " << t << " slice " << s
+              << ": manufacturer '"
+              << mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070))
+              << "' / available DICOM input does not match any of the "
+                 "IBSI-SUV-recommended reference-time paths. Required tags for "
+                 "the vendor-aware paths: Siemens (0071,0x22) / GE (0009,0x0D) "
+                 "private datetime, or per-slice (0008,0032) AcquisitionTime "
+                 "equal to (0008,0031) SeriesTime, or per-slice (0008,0032) + "
+                 "(0054,0x1300) + (0018,0x1242) (GE: (0008,0032) + "
+                 "(0054,0x1300)). Supply --decay-time / a manual decay-time "
+                 "override at the consuming layer to bypass DICOM-derived "
+                 "computation.";
+          }
+        }
+      }
 
       // Steps 3 and 4 are vendor-specific empirical formulas (not derivable
-      // from the DICOM spec alone). Under Strict policy we refuse them and
-      // surface the input ambiguity so the caller can supply timing
-      // out-of-band; under Lenient policy we apply them with the
-      // benchmark-recommended formula.
-      const bool stepPossible = haveAcqTags && nullptr != frameRefProp
-                             && (step3Possible || step4Possible);
-
-      if (stepPossible && DICOMReadPolicy::Strict == policy)
+      // from the DICOM spec alone). Under Strict policy we refuse them as
+      // soon as one slot actually needs them, and surface the input
+      // ambiguity so the caller can supply timing out-of-band; under Lenient
+      // policy we apply them with the benchmark-recommended formula.
+      if (formulaSlots > 0 && DICOMReadPolicy::Strict == policy)
       {
         mitkThrowException(VendorEmpiricalDecayFallbackRefusedException)
-          << "DC=START Steps 1 and 2 do not apply to this input "
+          << "DC=START Steps 1 and 2 do not resolve " << formulaSlots << " of "
+          << (formulaSlots + seriesTimeSlots) << " slices of this input "
              "(no vendor private decay datetime, AcquisitionTime != "
-             "SeriesTime). Steps 3 / 4 would resolve the reference time "
-             "via a vendor-specific empirical formula, but "
+             "SeriesTime). " << formulaName << " would resolve their "
+             "reference time via a vendor-specific empirical formula, but "
              "DICOMReadPolicy::Strict is active. Re-export the data with "
              "an unambiguous reference (vendor private datetime, or "
              "AcquisitionTime aligned with SeriesTime), or supply timing "
              "via --decay-time / a manual decay-time override.";
       }
 
-      if (stepPossible)
+      for (const auto& [t, sliceReferences] : references)
       {
-        const auto timeSteps = data->GetTimeSteps();
-        DecayTimeMapType candidateMap;
-        bool allSlicesValid = true;
-
-        for (TimeStepType t = 0; t < timeSteps && allSlicesValid; ++t)
+        auto& sliceMap = info.decayTimes[t];
+        for (const auto& [z, reference] : sliceReferences)
         {
-          const auto* sliced = data->GetSlicedGeometry(t);
-          const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-          auto& sliceMap = candidateMap[t];
-
-          for (unsigned int s = 0; s < slices && allSlicesValid; ++s)
-          {
-            const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
-            const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
-            OFDateTime ofAcq;
-            if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
-            {
-              allSlicesValid = false;
-              break;
-            }
-
-            // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
-            // ActualFrameDuration are stored in milliseconds per DICOM.
-            // Spec precondition: FrameReferenceTime non-negative.
-            const double frameRefMs = ReadNumericTagAt(frameRefProp, t, s);
-            if (!std::isfinite(frameRefMs) || frameRefMs < 0.0)
-            {
-              allSlicesValid = false;
-              break;
-            }
-            const double frameRefSec = frameRefMs / 1000.0;
-
-            // Step 3 (general): t_ref = AcqTime + T_ave - FrameReferenceTime
-            // Step 4 (GE):      t_ref = AcqTime - FrameReferenceTime
-            // The -FrameReferenceTime term undoes the scanner-applied offset
-            // from the per-frame midpoint back to the start of acquisition;
-            // T_ave additionally compensates for the average count-rate time
-            // inside the frame. Without the FrameReferenceTime term, Step 3
-            // diverges from IBSI-SUV expectations by exactly that offset
-            // (verified against DRO_3_2_0 / DRO_3_2_2).
-            //
-            // ActualFrameDuration is read only on the Step 3 branch: it
-            // feeds T_ave and nothing else, so requiring it on the GE path
-            // would refuse inputs that the GE rule resolves perfectly well.
-            double offset = -frameRefSec;
-            if (step3Possible)
-            {
-              const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
-              // Spec precondition: ActualFrameDuration strictly positive.
-              if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0)
-              {
-                allSlicesValid = false;
-                break;
-              }
-              offset = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife) - frameRefSec;
-            }
-
-            sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-              ResolveDecayDurationSeconds(admin, ofAcq, offset, halfLife,
-                                          policy, info.adaptations);
-          }
-        }
-
-        if (allSlicesValid)
-        {
-          // Announce the adaptation only once it has actually been applied.
-          // Warning earlier would cry wolf on inputs that fall through to
-          // the exhaustion refusal below.
-          const char* const stepName = step3Possible
-            ? "Step 3 (AcquisitionTime + T_ave - FrameReferenceTime)"
-            : "Step 4 (AcquisitionTime - FrameReferenceTime)";
-          MITK_WARN << "DC=START reference time resolved via " << stepName
-                    << ". This formula is derived from observed scanner "
-                       "behaviour, not from the DICOM specification; the "
-                       "strict DICOM read policy refuses it.";
-          RecordAdaptation(&info.adaptations, policy,
-                           SUVAdaptationRule::VendorEmpiricalDecayFallback,
-                           "", "", stepName);
-
-          if (ManufacturerFamily::Other == manuf)
-          {
-            const std::string rawManufacturer =
-              mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070));
-            MITK_WARN << "(0008,0070) Manufacturer '" << rawManufacturer
-                      << "' is not one of the manufacturers this formula was "
-                         "validated against. The general rule was applied; "
-                         "treat the resulting decay timing with caution.";
-            RecordAdaptation(&info.adaptations, policy,
-                             SUVAdaptationRule::UnrecognizedManufacturer,
-                             "(0008,0070)", rawManufacturer, stepName);
-          }
-
-          info.decayTimes = std::move(candidateMap);
-          return info;
+          sliceMap[z] = ResolveDecayDurationSeconds(admin, reference.base, reference.offsetSeconds,
+                                                    halfLife, policy, info.adaptations);
         }
       }
 
-      // ---- Step 5: spec is silent. Refuse to extend a vendor formula to
-      //              an unclassifiable input or to silently fall back to
-      //              SeriesTime.
-      mitkThrowException(AmbiguousDecayTimingException)
-        << "DC=START fallback chain exhausted: manufacturer '"
-        << mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070))
-        << "' / available DICOM input does not match any of the "
-           "IBSI-SUV-recommended reference-time paths. Required tags for "
-           "the vendor-aware paths: Siemens (0071,0x22) / GE (0009,0x0D) "
-           "private datetime, or per-slice (0008,0032) AcquisitionTime "
-           "equal to (0008,0031) SeriesTime, or per-slice (0008,0032) + "
-           "(0054,0x1300) + (0018,0x1242). Supply --decay-time / a "
-           "manual decay-time override at the consuming layer to bypass "
-           "DICOM-derived computation.";
+      if (formulaSlots > 0)
+      {
+        // Announce the adaptation only once it has actually been applied.
+        // Warning earlier would cry wolf on inputs whose administration
+        // time is refused above.
+        std::ostringstream split;
+        split << " for " << formulaSlots << " of " << (formulaSlots + seriesTimeSlots) << " slices";
+        if (seriesTimeSlots > 0)
+        {
+          split << "; the remaining " << seriesTimeSlots << " use AcquisitionTime == SeriesTime";
+        }
+        MITK_WARN << "DC=START reference time resolved via " << formulaName << split.str()
+                  << ". This formula is derived from observed scanner behaviour, "
+                     "not from the DICOM specification; the strict DICOM read "
+                     "policy refuses it.";
+        RecordAdaptation(&info.adaptations, policy,
+                         SUVAdaptationRule::VendorEmpiricalDecayFallback,
+                         "", "", formulaName);
+
+        if (ManufacturerFamily::Other == manuf)
+        {
+          const std::string rawManufacturer =
+            mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070));
+          MITK_WARN << "(0008,0070) Manufacturer '" << rawManufacturer
+                    << "' is not one of the manufacturers this formula was "
+                       "validated against. The general rule was applied; "
+                       "treat the resulting decay timing with caution.";
+          RecordAdaptation(&info.adaptations, policy,
+                           SUVAdaptationRule::UnrecognizedManufacturer,
+                           "(0008,0070)", rawManufacturer, formulaName);
+        }
+      }
+
+      return info;
     }
 
     case DecayCorrectionStrategy::None:

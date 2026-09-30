@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <set>
 #include <string>
 #include <vector>
@@ -213,6 +214,14 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Start_Step4_GE_DoesNotApplyTAve);
   MITK_TEST(Start_Step3_NonGE_ActualFrameDurationAbsent_Refuses);
   MITK_TEST(Start_Step3_NonGE_ActualFrameDurationEmpty_Refuses);
+  MITK_TEST(Start_MultiBed_GeneralRule_LaterBedsShareSeriesReference);
+  MITK_TEST(Start_MultiBed_GE_LaterBedsShareSeriesReference);
+  MITK_TEST(Start_MultiBed_LaterBedUnresolvable_Throws_AmbiguousDecayTimingException);
+  MITK_TEST(Start_MultiBed_StrictPolicy_Refused);
+  MITK_TEST(Start_Step2_Uniform_StrictPolicy_Computes);
+  MITK_TEST(Start_MultiBed_SeriesMatchingBedIsNotSliceZero);
+  MITK_TEST(Start_Dynamic_LaterFramesShareSeriesReference);
+  MITK_TEST(Start_UnparseableAcquisitionTime_Throws_InvalidDICOMPropertyValueException);
   MITK_TEST(Radiopharm_DoseBelowThreshold_RecordsAdaptation);
   MITK_TEST(Radiopharm_DoseAboveThreshold_RecordsNothing);
 
@@ -300,6 +309,66 @@ private:
                      "20260430110000");                                     // RP Start DT
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075),
                      "6586.26");                                            // Half-life [s]
+  }
+
+  // Closed-form average count-rate time of a frame, mirroring the
+  // production formula so the multi-bed cases can place a later bed's
+  // FrameReferenceTime exactly on the series reference.
+  static double TAveSeconds(double frameDurationSeconds, double halfLifeSeconds)
+  {
+    const double lambda = std::log(2.0) / halfLifeSeconds;
+    const double lambdaT = lambda * frameDurationSeconds;
+    return std::log(lambdaT / -std::expm1(-lambdaT)) / lambda;
+  }
+
+  static constexpr double kBedDurationSeconds = 300.0;
+
+  // One bed of a DC=START whole-body series, as a scanner that corrects
+  // every bed to the series start writes it: the bed starts lagSeconds
+  // after SeriesTime (12:15:30) and its FrameReferenceTime reaches from
+  // SeriesTime to the bed's decay-equivalent midpoint. The general rule then
+  // lands every bed on SeriesTime, i.e. on kStartExpectedDecaySeconds. The
+  // GE rule carries no T_ave term, so GE beds pass withTAve = false.
+  void SetBed(mitk::Image* image, mitk::TimeStepType t, unsigned int s,
+              int lagSeconds, bool withTAve)
+  {
+    const int acqSecondsOfDay = 12 * 3600 + 15 * 60 + 30 + lagSeconds;
+    char acqTime[16];
+    std::snprintf(acqTime, sizeof(acqTime), "%02d%02d%02d", acqSecondsOfDay / 3600,
+                  (acqSecondsOfDay / 60) % 60, acqSecondsOfDay % 60);
+    const double frameRefSeconds =
+      lagSeconds + (withTAve ? TAveSeconds(kBedDurationSeconds, kF18HalfLifeSeconds) : 0.0);
+
+    SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", t, s);
+    SetDicomProperty(image, PropName(0x0008, 0x0032), acqTime, t, s);
+    SetDicomProperty(image, PropName(0x0054, 0x1300),
+                     std::to_string(frameRefSeconds * 1000.0), t, s);
+  }
+
+  void SetBedDuration(mitk::Image* image, mitk::TimeStepType t, unsigned int s)
+  {
+    SetDicomProperty(image, PropName(0x0018, 0x1242),
+                     std::to_string(kBedDurationSeconds * 1000.0), t, s);
+  }
+
+  // Three-bed SIEMENS series whose first bed starts at SeriesTime.
+  mitk::Image::Pointer MakeThreeBedGeneralRuleImage()
+  {
+    auto image = MakeSyntheticImage(/*nSlices=*/3, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    for (unsigned int s = 0; s < 3; ++s)
+    {
+      SetBed(image, 0, s, static_cast<int>(s) * 300, /*withTAve=*/true);
+      SetBedDuration(image, 0, s);
+    }
+    return image;
+  }
+
+  static std::size_t CountRule(const mitk::DecayCorrectionInfo& info, mitk::SUVAdaptationRule rule)
+  {
+    return static_cast<std::size_t>(
+      std::count_if(info.adaptations.cbegin(), info.adaptations.cend(),
+                    [rule](const mitk::SUVAdaptation& a) { return rule == a.rule; }));
   }
 
 public:
@@ -1350,6 +1419,135 @@ public:
 
     CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image),
                          mitk::AmbiguousDecayTimingException);
+  }
+
+  // ---- DC=START on multi-bed and dynamic series ----
+  //
+  // The scanner corrects the whole series to one instant, so every bed or
+  // frame must be decay-corrected to that same instant. The AcquisitionTime
+  // == SeriesTime rule identifies it only on the bed or frame that starts at
+  // SeriesTime; the others have to reach it through the frame-timing
+  // formulas. Correcting a later bed to its own start counts the inter-bed
+  // decay twice. No benchmark DRO has this shape, so these cases are its
+  // only guard.
+
+  void Start_MultiBed_GeneralRule_LaterBedsShareSeriesReference()
+  {
+    auto image = MakeThreeBedGeneralRuleImage();
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    for (unsigned int s = 0; s < 3; ++s)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(s), 1e-3);
+    }
+    // Two beds used the empirical formula; the record states once that it
+    // fired.
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1),
+                         CountRule(info, mitk::SUVAdaptationRule::VendorEmpiricalDecayFallback));
+  }
+
+  void Start_MultiBed_GE_LaterBedsShareSeriesReference()
+  {
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    SetDicomProperty(image, PropName(0x0008, 0x0070), "GE MEDICAL SYSTEMS");
+    SetBed(image, 0, 0, 0, /*withTAve=*/false);
+    SetBed(image, 0, 1, 182, /*withTAve=*/false);
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(0), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(1), 1e-3);
+  }
+
+  void Start_MultiBed_LaterBedUnresolvable_Throws_AmbiguousDecayTimingException()
+  {
+    // Not GE and no ActualFrameDuration: the first bed matches SeriesTime,
+    // the second has no rule that places it. Resolving the first must not
+    // license a guess for the second.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    SetBed(image, 0, 0, 0, /*withTAve=*/true);
+    SetBed(image, 0, 1, 300, /*withTAve=*/true);
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds),
+                         mitk::AmbiguousDecayTimingException);
+  }
+
+  void Start_MultiBed_StrictPolicy_Refused()
+  {
+    auto image = MakeThreeBedGeneralRuleImage();
+
+    CPPUNIT_ASSERT_THROW(
+      mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds, mitk::DICOMReadPolicy::Strict),
+      mitk::VendorEmpiricalDecayFallbackRefusedException);
+  }
+
+  void Start_Step2_Uniform_StrictPolicy_Computes()
+  {
+    // Frame-timing tags are present, but no slot needs them: Strict refuses
+    // a formula that is actually applied, not one that merely could be.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    for (unsigned int s = 0; s < 2; ++s)
+    {
+      SetBed(image, 0, s, 0, /*withTAve=*/true);
+      SetBedDuration(image, 0, s);
+    }
+
+    const auto info =
+      mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds, mitk::DICOMReadPolicy::Strict);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(1), 1e-6);
+    CPPUNIT_ASSERT(info.adaptations.empty());
+  }
+
+  void Start_MultiBed_SeriesMatchingBedIsNotSliceZero()
+  {
+    // Slice order need not follow bed order. The bed starting at SeriesTime
+    // is slice 1 here, and it carries no frame timing at all: a slot the
+    // AcquisitionTime == SeriesTime rule resolves must not be held to the
+    // formulas' preconditions.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    SetBed(image, 0, 0, 300, /*withTAve=*/true);
+    SetBedDuration(image, 0, 0);
+    SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", 0, 1);
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "121530", 0, 1);
+    SetDicomProperty(image, PropName(0x0054, 0x1300), "", 0, 1);
+    SetDicomProperty(image, PropName(0x0018, 0x1242), "", 0, 1);
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(0), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(1), 1e-6);
+  }
+
+  void Start_Dynamic_LaterFramesShareSeriesReference()
+  {
+    // The same holds across time: a dynamic DC=START series is corrected to
+    // one instant too, so a later frame must not be corrected to its own
+    // start just because frame 0 starts at SeriesTime.
+    auto image = MakeSyntheticImage(/*nSlices=*/1, /*nTimeSteps=*/2);
+    SetupCommonStartCase(image);
+    for (mitk::TimeStepType t = 0; t < 2; ++t)
+    {
+      SetBed(image, t, 0, static_cast<int>(t) * 300, /*withTAve=*/true);
+      SetBedDuration(image, t, 0);
+    }
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(0), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(1).at(0), 1e-3);
+  }
+
+  void Start_UnparseableAcquisitionTime_Throws_InvalidDICOMPropertyValueException()
+  {
+    // A malformed value is reported as such rather than as a timing
+    // ambiguity, whichever rule the slot would otherwise have taken.
+    auto image = MakeThreeBedGeneralRuleImage();
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "12xx30", 0, 1);
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds),
+                         mitk::InvalidDICOMPropertyValueException);
   }
 
   void Radiopharm_DoseBelowThreshold_RecordsAdaptation()

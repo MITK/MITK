@@ -915,11 +915,17 @@ namespace mitk
    * decay term collapses to 2^0 = 1.
    *
    * \par DC = START
-   * Pixel data is decay-corrected to a vendor-specific reference time. The
-   * helper applies the IBSI-SUV-recommended fallback chain in priority order;
-   * the first condition whose preconditions are met determines the result.
-   * The numbered steps below define the chain; "Step N" anywhere in the PET
-   * sources, tests, or commit messages refers back to this list.
+   * Pixel data is decay-corrected to a single, vendor-specific reference
+   * time shared by every bed and frame of the series. The helper applies the
+   * IBSI-SUV-recommended fallback chain in priority order. Step 1 decides for
+   * the whole series: it applies only if every (timestep, slice) carries the
+   * private datetime. Steps 2 to 4 are evaluated per (timestep, slice), and
+   * the first step whose preconditions that slot meets determines its
+   * reference time. A multi-bed or dynamic series therefore typically
+   * resolves its first bed or frame through Step 2 and the others through
+   * Step 3 or 4, all landing on the same instant. The numbered steps below
+   * define the chain; "Step N" anywhere in the PET sources, tests, or commit
+   * messages refers back to this list.
    *
    * \anchor DCStartFallbackChain
    *  -# <b>Vendor private datetime tag.</b> Siemens: (0071,0x22) "SIEMENS
@@ -928,10 +934,10 @@ namespace mitk
    *     GE: (0009,0x0D) "GEMS_PETD_01" scan datetime (lifted to
    *     \c mitk.pet.GEScanDateTime). Used as the uniform reference time
    *     when present and yielding a non-negative decay.
-   *  -# <b>AcquisitionTime equals SeriesTime.</b> (0008,0032)
-   *     AcquisitionTime equals (0008,0031) SeriesTime in seconds at
-   *     slice 0: use per-slice AcquisitionTime as the reference. Applies
-   *     to every manufacturer.
+   *  -# <b>AcquisitionTime equals SeriesTime.</b> The slot's (0008,0032)
+   *     AcquisitionTime equals (0008,0031) SeriesTime in seconds: use it as
+   *     the slot's reference. Applies to every manufacturer and needs no
+   *     frame timing.
    *  -# <b>General T_ave formula.</b> Any manufacturer other than GE,
    *     with per-slice (0008,0032) AcquisitionTime, (0054,0x1300)
    *     FrameReferenceTime and (0018,0x1242) ActualFrameDuration
@@ -948,17 +954,20 @@ namespace mitk
    * Steps 3 and 4 are empirical formulas derived from observed scanner
    * behaviour rather than from the DICOM specification; they fire only
    * under \c DICOMReadPolicy::Lenient. Under \c DICOMReadPolicy::Strict
-   * they are refused and the helper raises
-   * \c VendorEmpiricalDecayFallbackRefusedException. Applying either one
-   * is recorded as \c SUVAdaptationRule::VendorEmpiricalDecayFallback, and
-   * applying it to an input whose manufacturer could not be classified is
-   * additionally recorded as
+   * a series is refused with
+   * \c VendorEmpiricalDecayFallbackRefusedException as soon as one slot
+   * needs either of them, so a multi-bed or dynamic series passes Strict
+   * only if every slot is resolved by Step 1 or Step 2. Applying either
+   * formula is recorded once as
+   * \c SUVAdaptationRule::VendorEmpiricalDecayFallback, however many slots
+   * used it, and applying it to an input whose manufacturer could not be
+   * classified is additionally recorded as
    * \c SUVAdaptationRule::UnrecognizedManufacturer.
    *
-   * If none of these applies -- typically no private datetime tag and no
-   * per-slice frame timing -- the helper raises
+   * If none of these applies to some slot -- typically no private datetime
+   * tag and no frame timing -- the helper raises
    * \c AmbiguousDecayTimingException rather than inventing a reference
-   * time.
+   * time. Resolving the other slots does not license a guess for that one.
    *
    * \par DC = NONE
    * Pixel data is not decay-corrected. The voxel value is the count rate
@@ -1023,16 +1032,17 @@ namespace mitk
    * \throw InvalidDICOMPropertyValueException if (0054,1102) holds an
    *        unsupported value, or if a tag value cannot be parsed.
    * \throw AmbiguousDecayTimingException if none of the DC=START fallback
-   *        conditions applies.
+   *        conditions applies to some (timestep, slice).
    * \throw UnrecoverableAdministrationDateException if the administration
    *        date would have to be reconstructed but the half-life is at or
    *        above 41400 s.
    * \throw AdministrationDateSubstitutionRefusedException if \p policy is
    *        \c Strict and that reconstruction would have been applied.
    * \throw VendorEmpiricalDecayFallbackRefusedException if \p policy is
-   *        \c Strict and DC=START would have been resolved through
-   *        Step 3 or Step 4 of the \ref DCStartFallbackChain "DC=START
-   *        fallback chain" (vendor-specific empirical formula).
+   *        \c Strict and at least one (timestep, slice) would have been
+   *        resolved through Step 3 or Step 4 of the
+   *        \ref DCStartFallbackChain "DC=START fallback chain"
+   *        (vendor-specific empirical formula).
    *
    * \sa GetDecayCorrectionStrategy, GetManufacturerFamily,
    *     computeSUVbwScaleFactor

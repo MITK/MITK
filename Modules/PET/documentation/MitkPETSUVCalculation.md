@@ -206,16 +206,27 @@ Datetimes carrying a UTC offset are normalized by it; a datetime without one
 is read as local to itself. The reference and administration instants are
 always compared on the same basis.
 
+`START` means the scanner corrected every bed and frame of the series to one
+reference instant, so every slice has to be decay-corrected to that same
+instant. Step 1 below decides for the whole series and applies only if every
+slice carries the private datetime. Steps 2 to 4 are evaluated slice by slice
+(for dynamic data, per frame too), and the first step that slice satisfies
+wins. A whole-body or dynamic scan therefore typically resolves its first bed
+or frame through step 2 and the others through step 3 or 4, all landing on
+the same instant. Correcting a later bed to its own start instead would count
+the decay between beds twice.
+
 The `START` fallback chain is (first applicable step wins):
 
 1. Vendor private datetime tag: Siemens `(0071,xx22)` in private block
    "SIEMENS MED PT", GE `(0009,xx0D)` in private block "GEMS_PETD_01". The
    DICOM reader attaches them as `mitk.pet.SiemensDecayDateTime` and
    `mitk.pet.GEScanDateTime`. Used as uniform reference time for all slices.
-2. `(0008,0032)` Acquisition Time equals `(0008,0031)` Series Time (second
-   resolution) at slice 0: the per-slice Acquisition Time is the reference.
-   Applies to every manufacturer -- an acquisition time that already equals
-   the series time identifies the reference instant on its own.
+2. The slice's `(0008,0032)` Acquisition Time equals `(0008,0031)` Series
+   Time (second resolution): that Acquisition Time is the reference. Applies
+   to every manufacturer and needs no frame timing -- an acquisition time
+   that already equals the series time identifies the reference instant on
+   its own.
 3. Any manufacturer except GE: per-slice reference
    `AcquisitionTime + T_ave - FrameReferenceTime`, requiring per-slice
    `(0008,0032)`, `(0054,1300)` Frame Reference Time (non-negative),
@@ -228,12 +239,15 @@ The `START` fallback chain is (first applicable step wins):
 Steps 3 and 4 are empirical formulas -- derived from observed scanner
 behaviour rather than from the DICOM specification -- and count as benchmark
 adaptations: they are applied with a warning by default and refused with
-`--strict-dicom` (exit code 8). Applying either one to input whose
+`--strict-dicom` (exit code 8) as soon as one slice needs them. A whole-body
+or dynamic series therefore passes `--strict-dicom` only if every slice is
+resolved by step 1 or 2. The warning is emitted once and states how many
+slices used the formula. Applying either one to input whose
 `(0008,0070)` Manufacturer is absent, empty or unrecognized emits a second
 warning, because the formula cannot be verified against the scanner that
 produced the data; the general rules are still applied. If no step applies
-(typically no private tag and no per-slice frame timing) the run stops with
-exit code 3.
+to some slice (typically no private tag and no per-slice frame timing) the
+run stops with exit code 3, even if every other slice could be resolved.
 
 `--decay-time` bypasses all of the above and applies the given duration to
 every voxel. `0` reproduces `ADMIN` behaviour. Values below `-3600` s and

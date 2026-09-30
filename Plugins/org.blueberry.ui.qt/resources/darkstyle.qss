@@ -653,3 +653,12 @@ QSplitter#QmitkSegmentationViewSplitter::handle {
     border-bottom: 1px dotted #9e9e9e;
     background-color: transparent;
 }
+
+QmitkRenderWindowMenuBar QToolButton {
+  background-color: transparent;
+  padding: 0;
+}
+
+QmitkRenderWindowMenuBar QToolButton:hover, QmitkRenderWindowMenuBar QToolButton:pressed {
+  border-radius: 4px;
+}

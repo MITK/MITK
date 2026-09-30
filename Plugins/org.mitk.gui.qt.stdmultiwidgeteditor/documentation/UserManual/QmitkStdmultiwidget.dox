@@ -42,7 +42,9 @@ The crosshair rotation modes described below are realized by the MITK interactio
 
 \subsection org_mitk_editors_stdmultiwidget_FourWindowView_Customizing Customizing
 
-By moving the cursor to the upper right corner of any window you can activate the window menu. It consists of three buttons.
+While the mouse cursor is over a window, the window menu appears in its upper corners. Every window has three buttons in the upper right corner. The 3D window additionally has a lighting button in the upper left corner, which selects how the scene is lit.
+
+The menus stay smaller and translucent until the mouse cursor gets close to them. Their size and whether they are subdued like this can be set in the <i>Editors</i> preference page (<i>Render window menus</i>).
 
 \imageMacro{org_mitk_editors_stdmultiwidget_CrosshairModes.png,"Crosshair",8.72}
 

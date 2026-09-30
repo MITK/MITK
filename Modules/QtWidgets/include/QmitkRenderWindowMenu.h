@@ -33,24 +33,34 @@ found in the LICENSE file.
 #include <QToolButton>
 #include <QWidget>
 
+class QmitkRenderWindowMenuBar;
+
+namespace mitk
+{
+  class IPreferences;
+}
+
 /**
  * \ingroup QmitkModule
- * \brief The QmitkRenderWindowMenu is a popup Widget which shows
- * up when the mouse cursor enter a QmitkRenderWindow.
- * The Menu Widget is located in the right top corner of each
- * RenderWindow. It includes different settings. For example
- * the layout design can be changed with the setting button. Switching
- * between full-screen mode and layout design can be done
- * with the full-screen button.
- * The popup Widget can be deactivated with ActivateMenuWidget(false) in
+ * \brief The menu of a QmitkRenderWindow, shown while the mouse cursor is
+ * over the window.
+ *
+ * Its buttons are grouped into bars docked to the top corners of the
+ * window: the lighting button of 3D windows to the upper left, the
+ * crosshair, full-screen and layout buttons to the upper right. Each bar
+ * rests smaller and translucent until the mouse cursor gets close to it.
+ * The menu can be deactivated with ActivateMenuWidget(false) in
  * QmitkRenderWindow.
- * \remark the max TS can be configured using the preference "max TS" at
- *  the "org.mitk.editors" preference node.
+ *
+ * The menu follows these preferences of the "org.mitk.editors" node:
+ * - "render window menu size": "smaller", "default" or "larger"
+ * - "subdue render window menus": whether the bars rest subdued
+ * - "max TS": the upper limit of the thick slices slider
  *
  * \sa QmitkRenderWindow
  *
  */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QObject
 {
   Q_OBJECT
 
@@ -59,9 +69,14 @@ public:
   using LayoutIndex = mitk::AnatomicalPlane;
   using LayoutDesign = QmitkMultiWidgetLayoutManager::LayoutDesign;
 
-  QmitkRenderWindowMenu(QWidget *parent = nullptr,
-                        Qt::WindowFlags f = {},
-                        mitk::BaseRenderer *b = nullptr);
+  /**
+   * \param[in] parent The render window the menu belongs to. Its bars are
+   *            child widgets of it.
+   * \param[in] renderer The renderer of that window.
+   *
+   * \throws mitk::Exception if \p parent is nullptr.
+   */
+  QmitkRenderWindowMenu(QWidget *parent, mitk::BaseRenderer *renderer);
   ~QmitkRenderWindowMenu() override;
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes
@@ -100,8 +115,11 @@ public:
    */
   mitk::VtkPropRenderer::LightingMode GetPreferredLightingMode() const;
 
-/*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
-is activated.*/
+  /**
+   * \brief Docks the bars to their corners after the window was resized, and
+   * shows or hides them depending on whether the mouse cursor is over the
+   * window now.
+   */
   void MoveWidgetToCorrectPos();
 
   void ShowMenu();
@@ -109,8 +127,11 @@ is activated.*/
 
 protected:
 
-  /*! Reimplemented from QWidget. The paint event is a request to repaint all or part of a widget.*/
-  void paintEvent(QPaintEvent *event) override;
+  /**
+   * \brief Follows the mouse moves over the window, bringing the bars close
+   * to the cursor to their full appearance.
+   */
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
   void CreateMenuWidget();
 
@@ -161,11 +182,6 @@ protected Q_SLOTS:
   menu, the full-Screen mode is automatically switched to false. */
   void OnFullScreenButton(bool checked);
 
-  /*! Slot for opening setting menu. The slot is connected to the clicked() event of m_SettingsButton.
-  The settings menu includes different layout directions (axial, coronal, sagittal and 3D) as well all layout design
-  (standard layout, 2D images top, 3D bottom ..)*/
-  void OnLayoutDesignButton(bool checked);
-
   void OnSetLayout(LayoutDesign layoutDesign);
 
 protected:
@@ -199,8 +215,22 @@ protected:
 
 private:
 
-  /** Shows the lighting button on 3D windows only and fits the menu width to it. */
+  /** Shows the lighting button on 3D windows only. */
   void UpdateLightingModeButton();
+
+  /** Shows the bars that have buttons to show, leaving out the upper left one if both do not fit. */
+  void UpdateBarVisibility();
+
+  void UpdateProximity(const QPoint &cursor);
+
+  void ApplyPreferences();
+  void OnPreferencesChanged(const mitk::IPreferences *preferences);
+
+  QmitkRenderWindowMenuBar *m_TopLeftBar;
+  QmitkRenderWindowMenuBar *m_TopRightBar;
+
+  /** Whether one of the popup menus is open. */
+  bool m_PopupOpen;
 
   mitk::BaseRenderer::Pointer m_Renderer;
 

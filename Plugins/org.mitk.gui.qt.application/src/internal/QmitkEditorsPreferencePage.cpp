@@ -24,6 +24,9 @@ namespace
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.editors");
   }
+
+  const std::string MENU_SIZE_PREFERENCE = "render window menu size";
+  const std::string SUBDUE_MENUS_PREFERENCE = "subdue render window menus";
 }
 
 QmitkEditorsPreferencePage::QmitkEditorsPreferencePage()
@@ -59,6 +62,21 @@ bool QmitkEditorsPreferencePage::PerformOk()
   prefs->PutBool("Use constrained zooming and panning", constrainZoomingAndPanning);
 
   prefs->PutInt("max TS", m_Ui->m_MaxTSSpinBox->value());
+
+  std::string menuSize = "default";
+
+  if (m_Ui->m_SmallerMenusRadioButton->isChecked())
+  {
+    menuSize = "smaller";
+  }
+  else if (m_Ui->m_LargerMenusRadioButton->isChecked())
+  {
+    menuSize = "larger";
+  }
+
+  prefs->Put(MENU_SIZE_PREFERENCE, menuSize);
+  prefs->PutBool(SUBDUE_MENUS_PREFERENCE, m_Ui->m_SubdueMenusCheckBox->isChecked());
+
   return true;
 }
 
@@ -75,4 +93,22 @@ void QmitkEditorsPreferencePage::Update()
 
   const auto maxTS = prefs->GetInt("max TS", 50);
   m_Ui->m_MaxTSSpinBox->setValue(maxTS);
+
+  // Anything unknown falls back to the default size, as the menus do.
+  const auto menuSize = prefs->Get(MENU_SIZE_PREFERENCE, "default");
+
+  if ("smaller" == menuSize)
+  {
+    m_Ui->m_SmallerMenusRadioButton->setChecked(true);
+  }
+  else if ("larger" == menuSize)
+  {
+    m_Ui->m_LargerMenusRadioButton->setChecked(true);
+  }
+  else
+  {
+    m_Ui->m_DefaultMenusRadioButton->setChecked(true);
+  }
+
+  m_Ui->m_SubdueMenusCheckBox->setChecked(prefs->GetBool(SUBDUE_MENUS_PREFERENCE, true));
 }

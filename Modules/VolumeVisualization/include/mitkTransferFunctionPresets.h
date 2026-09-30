@@ -32,8 +32,10 @@ namespace mitk
    *
    * Parses the embedded module resource MedicalColorPresets.json once on
    * construction and builds mitk::TransferFunction instances on demand. The
-   * presets use the ParaView / 3D-Slicer colormap format: flat OpacityPoints
-   * and RGBPoints arrays plus a ColorSpace, extended by a BlendMode.
+   * presets come from Kitware VolView (Apache-2.0, see
+   * resource/MedicalColorPresets-license.txt) and use the ParaView / 3D-Slicer
+   * colormap format: flat OpacityPoints and RGBPoints arrays plus a
+   * ColorSpace, extended by a BlendMode.
    *
    * The blend mode is part of a preset rather than an independent setting
    * because the projection modes reduce each ray to one scalar before running

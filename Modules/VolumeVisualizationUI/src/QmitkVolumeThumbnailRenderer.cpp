@@ -32,7 +32,7 @@ found in the LICENSE file.
 
 #include <QImage>
 
-#include <cmath>
+#include <algorithm>
 
 namespace
 {
@@ -217,31 +217,34 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   m_Mapper->SetInputData(imageData);
   m_Volume->SetUserTransform(CreateDataToWorldTransform(image, imageData));
 
+  // Parallel rather than perspective, since only then does the volume's box
+  // project to exactly its width and height, which is what the view is sized
+  // to below. At preview size the perspective of the 3D window is too slight
+  // to be missed.
   auto *camera = m_Renderer->GetActiveCamera();
+  camera->ParallelProjectionOn();
   camera->SetPosition(0.0, -1.0, 0.0);
   camera->SetFocalPoint(0.0, 0.0, 0.0);
   camera->SetViewUp(0.0, 0.0, 1.0);
   m_Renderer->ResetCamera();
 
-  // ResetCamera fits the sphere around the volume's box, taking its radius
-  // from the box's full diagonal. The camera looks along +Y, so the Y extent
-  // is depth: it never widens or heightens the picture, but it does inflate
-  // that radius and push the camera back, which is what leaves a preview
-  // mostly background. Zooming by the ratio between the sphere fitted and the
-  // circle the projection actually needs takes that back. That circle still
-  // encloses the projected box, so no volume can be cropped, whatever its
-  // proportions. Zoom rather than Dolly because it narrows the view angle
-  // without moving the camera, leaving the clipping range ResetCamera just
-  // computed valid.
+  // ResetCamera sizes the view to the sphere around the volume's box, whose
+  // radius is half the box's full diagonal, depth included, and that leaves the
+  // box filling well under half of a preview. Sized to the box's own width and
+  // height instead, it touches the preview's edges in whichever direction runs
+  // out first, and still nothing of it can be cropped. The camera looks along
+  // +Y, so X runs across the picture and Z up it. The clipping range
+  // ResetCamera computed stays valid, since the camera does not move.
   double bounds[6];
   m_Volume->GetBounds(bounds);
 
-  const double width = bounds[1] - bounds[0];
-  const double depth = bounds[3] - bounds[2];
-  const double height = bounds[5] - bounds[4];
+  const double halfWidth = 0.5 * (bounds[1] - bounds[0]);
+  const double halfHeight = 0.5 * (bounds[5] - bounds[4]);
+  const double aspect = static_cast<double>(m_Size.width()) / m_Size.height();
 
-  if (const double inPlane = width * width + height * height; inPlane > 0.0)
-    camera->Zoom(std::sqrt((inPlane + depth * depth) / inPlane));
+  // The parallel scale is half the height of the view.
+  if (const double scale = std::max(halfHeight, halfWidth / aspect); scale > 0.0)
+    camera->SetParallelScale(scale);
 
   // Uploads the volume, and is the only expensive call here. Whether the ray
   // caster can draw at all depends on the hardware and on this volume's own

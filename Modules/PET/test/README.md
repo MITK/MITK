@@ -88,11 +88,8 @@ for everyone.
 A `Refusal` entry asserts MITK's honest-failure contract. Only the
 `DRO_error_*` objects are carried that way: every value DRO is a
 `CanonicalTriple`, so a green suite is the benchmark's own 58 of 58.
-Until the DICOM reader gained its per-frame model, the two Enhanced PET
-objects with varying per-frame values were carried as expected refusals,
-and "58 under test" did not mean "58 conformant"; if a value DRO ever has
-to be demoted to a `Refusal` again, keep those two figures apart in every
-report.
+If a value DRO ever has to be carried as a `Refusal`, "under test" no
+longer means "conformant"; keep those two figures apart in every report.
 
 ### Skip behavior
 

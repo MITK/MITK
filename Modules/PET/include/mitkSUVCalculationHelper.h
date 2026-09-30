@@ -670,6 +670,11 @@ namespace mitk
    * slices, which every consumer must report as that rather than as absent
    * attributes.
    *
+   * The refusal also protects consumers that read no functional-group
+   * value: without the frame mapping the reader cannot apply each frame's
+   * Pixel Value Transformation either, so the loaded pixels carry the first
+   * frame's rescale throughout and are not trustworthy on any path.
+   *
    * \param[in] provider Source of DICOM properties.
    *
    * \throw EnhancedPETPerFrameVariationException if the object is
@@ -979,6 +984,17 @@ namespace mitk
    * is the documented escape hatch for inputs whose timing must be supplied
    * out-of-band.
    *
+   * \par Enhanced PET
+   * An Enhanced PET object carries no (0054,1102); (0018,9758) Decay
+   * Corrected decides instead, and the result is reported as
+   * \c DecayCorrectionStrategy::Start. YES: the pixels are corrected to
+   * (0018,9701) Decay Correction DateTime, used for every slice. NO: each
+   * slice's reference is its frame's (0018,9151) Frame Reference DateTime,
+   * or (0018,9074) Frame Acquisition DateTime plus T_ave from (0018,9220)
+   * where a frame carries no reference instant. A multi-frame object whose
+   * functional groups the reader did not map to frames is refused on both
+   * branches; see \c RequireEnhancedPETFramesResolved.
+   *
    * \par Administration time
    * Whichever rule above supplies the reference time, the decay duration
    * is measured from the radiopharmaceutical administration instant, which
@@ -1043,6 +1059,9 @@ namespace mitk
    *        resolved through Step 3 or Step 4 of the
    *        \ref DCStartFallbackChain "DC=START fallback chain"
    *        (vendor-specific empirical formula).
+   * \throw EnhancedPETPerFrameVariationException if \p data is a
+   *        multi-frame Enhanced PET object whose functional groups the reader
+   *        did not map to frames, whichever (0018,9758) says.
    *
    * \sa GetDecayCorrectionStrategy, GetManufacturerFamily,
    *     computeSUVbwScaleFactor

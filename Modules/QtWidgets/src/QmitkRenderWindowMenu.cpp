@@ -34,6 +34,7 @@ found in the LICENSE file.
 //#include"iconClose.xpm"
 #include <iconCrosshairMode.xpm>
 #include <iconFullScreen.xpm>
+#include <iconLightingMode.xpm>
 //#include"iconHoriSplit.xpm"
 #include <iconSettings.xpm>
 //#include"iconVertiSplit.xpm"
@@ -52,6 +53,14 @@ namespace
   constexpr double AUTO_ROTATION_SECONDS_PER_TURN = 27.0;
   constexpr int AUTO_ROTATION_INTERVAL = 16;
 
+  /** The menu stores its renderer as the base type, but the lighting rig is
+   * declared on mitk::VtkPropRenderer. nullptr if this renderer is not one.
+   */
+  mitk::VtkPropRenderer *GetPropRenderer(mitk::BaseRenderer *renderer)
+  {
+    return dynamic_cast<mitk::VtkPropRenderer *>(renderer);
+  }
+
   mitk::IPreferences* GetPreferences()
   {
     auto preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -67,21 +76,24 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
                                              Qt::WindowFlags flags,
                                              mitk::BaseRenderer* baseRenderer)
   : QWidget(parent, flags)
+  , m_LightingModeButton(nullptr)
   , m_LayoutActionsMenu(nullptr)
   , m_CrosshairMenu(nullptr)
+  , m_LightingMenu(nullptr)
   , m_FullScreenMode(false)
   , m_Renderer(baseRenderer)
   , m_Parent(parent)
   , m_CrosshairRotationMode(QmitkCrosshairRotationMode::None)
   , m_CrosshairVisibility(true)
   , m_Crosshair3DVisibility(true)
+  , m_PreferredLightingMode(mitk::VtkPropRenderer::LightingMode::Studio)
   , m_Layout(LayoutIndex::Axial)
   , m_LayoutDesign(LayoutDesign::DEFAULT)
   , m_OldLayoutDesign(LayoutDesign::DEFAULT)
 {
   CreateMenuWidget();
-  setMinimumWidth(61); // DIRTY.. If you add or remove a button, you need to change the size.
-  setMaximumWidth(61);
+  this->UpdateLightingModeButton();
+
   setAutoFillBackground(true);
 
   this->hide();
@@ -207,6 +219,11 @@ void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(QmitkCrosshairRotationMo
   m_CrosshairRotationMode = mode;
 }
 
+mitk::VtkPropRenderer::LightingMode QmitkRenderWindowMenu::GetPreferredLightingMode() const
+{
+  return m_PreferredLightingMode;
+}
+
 void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 {
   int moveX = floor(static_cast<double>(this->m_Parent->width()) - static_cast<double>(this->width()) - 4.0);
@@ -228,6 +245,13 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 void QmitkRenderWindowMenu::ShowMenu()
 {
   MITK_DEBUG << "menu showMenu";
+
+  // The window can be switched between 2D and 3D from elsewhere while the menu
+  // is hidden. Its right edge stays in the corner if its width changes.
+  const auto oldWidth = this->width();
+  this->UpdateLightingModeButton();
+  this->move(this->x() + oldWidth - this->width(), this->y());
+
   this->show();
   this->raise();
 }
@@ -236,6 +260,15 @@ void QmitkRenderWindowMenu::HideMenu()
 {
   MITK_DEBUG << "menu hideEvent";
   this->hide();
+}
+
+void QmitkRenderWindowMenu::UpdateLightingModeButton()
+{
+  m_LightingModeButton->setVisible(m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D);
+
+  // Asked of the layout rather than hard-coded: every button is capped at the
+  // same fixed size, so what the layout asks for is exactly what they need.
+  this->setFixedWidth(this->sizeHint().width());
 }
 
 void QmitkRenderWindowMenu::paintEvent(QPaintEvent * /*e*/)
@@ -280,6 +313,19 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_LayoutDesignButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
   m_LayoutDesignButton->setAutoRaise(true);
   layout->addWidget(m_LayoutDesignButton);
+
+  m_LightingMenu = new QMenu(this);
+  connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
+
+  m_LightingModeButton = new QToolButton(this);
+  m_LightingModeButton->setMaximumSize(15, 15);
+  m_LightingModeButton->setIconSize(size);
+  m_LightingModeButton->setMenu(m_LightingMenu);
+  m_LightingModeButton->setIcon(QIcon(QPixmap(iconLightingMode_xpm)));
+  m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
+  m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+  m_LightingModeButton->setAutoRaise(true);
+  layout->addWidget(m_LightingModeButton);
 
   connect(m_FullScreenButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnFullScreenButton);
   connect(m_LayoutDesignButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnLayoutDesignButton);
@@ -584,6 +630,72 @@ void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction *action)
 {
   UpdateCrosshairRotationMode(action->data().value<QmitkCrosshairRotationMode>());
   emit CrosshairRotationModeChanged(m_CrosshairRotationMode);
+}
+
+void QmitkRenderWindowMenu::OnLightingMenuAboutToShow()
+{
+  m_LightingMenu->clear();
+
+  auto *renderer = GetPropRenderer(m_Renderer);
+
+  if (nullptr == renderer)
+    return;
+
+  // Read from the renderer rather than from a remembered value: a volume being
+  // rendered installs its own rig without coming through this menu, so anything
+  // cached here would tick a rig the window is not on.
+  const auto currentMode = renderer->GetLightingMode();
+
+  struct Entry
+  {
+    mitk::VtkPropRenderer::LightingMode mode;
+    const char *label;
+  };
+
+  // Labeled as the volume lighting models are, so that the two controls
+  // offering them read as one choice rather than two similar ones.
+  constexpr Entry entries[] = {
+    { mitk::VtkPropRenderer::LightingMode::Studio,    "Default lighting" },
+    { mitk::VtkPropRenderer::LightingMode::Headlight, "Headlight"        },
+    { mitk::VtkPropRenderer::LightingMode::KeyLight,  "Key light"        }
+  };
+
+  QActionGroup *lightingModeActionGroup = new QActionGroup(m_LightingMenu);
+  lightingModeActionGroup->setExclusive(true);
+
+  for (const auto &[mode, label] : entries)
+  {
+    QAction *action = new QAction(label, m_LightingMenu);
+    action->setActionGroup(lightingModeActionGroup);
+    action->setCheckable(true);
+    action->setChecked(mode == currentMode);
+    action->setData(static_cast<int>(mode));
+    m_LightingMenu->addAction(action);
+  }
+
+  connect(lightingModeActionGroup, &QActionGroup::triggered, this, &QmitkRenderWindowMenu::OnLightingModeSelected);
+}
+
+void QmitkRenderWindowMenu::OnLightingModeSelected(QAction *action)
+{
+  auto *renderer = GetPropRenderer(m_Renderer);
+
+  if (nullptr == renderer)
+    return;
+
+  const auto mode = static_cast<mitk::VtkPropRenderer::LightingMode>(action->data().toInt());
+
+  // Remembered as well as installed: a volume switched on afterwards puts its
+  // own rig over this one, and this is what the window returns to once nothing
+  // overrides it any more.
+  m_PreferredLightingMode = mode;
+
+  renderer->SetLightingMode(mode);
+
+  // Swapping the lights marks the renderer modified but schedules nothing.
+  mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+
+  emit LightingModeChanged(mode);
 }
 
 void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)

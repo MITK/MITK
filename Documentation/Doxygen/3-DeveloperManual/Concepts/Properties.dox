@@ -182,6 +182,98 @@ surface construction
   <li> volumerendering.diffuse - same as cpu with gpu
   <li> volumerendering.specular - same as cpu with gpu
   <li> volumerendering.specular.power - same as cpu with gpu
+  <li> volumerendering.shade - Enables the shading model. The scattering
+properties below are ignored entirely while this is off.
+  <li> volumerendering.blendmode - How the samples along a viewing ray are
+combined into one pixel, as a vtkVolumeMapper::BlendModes value. Defaults to 0
+(composite), the only mode that composites front to back and so the only one
+the shading and scattering properties affect; 1 (maximum intensity), 2 (minimum
+intensity), 3 (average intensity) and 4 (additive) each flatten the ray to a
+single value instead, and 3 and 4 also ignore the color transfer function and
+emit grayscale. VTK further defines 5 (isosurface) and 6 (slice), which MITK
+cannot render: they need iso-values or a slice plane set on the
+vtkVolumeProperty, which no mapper here supplies, and without that input the
+ray caster draws nothing rather than falling back. The Volume
+Visualization view writes it as part of applying a transfer function rather
+than as a setting of its own, since the projection modes flatten each ray
+before the transfer function sees it and a curve authored for one of them is
+not interchangeable with one authored for compositing. mitk::VolumeBlendMode
+holds the modes MITK offers and the conversions to and from this value.
+  <li> volumerendering.lightingmodel - Identifier of the lighting model the
+Volume Visualization view applied to this node ("headlight", "keylight", or
+"studio" for the renderer's default five-light kit, chosen from the 3D render
+window's lighting menu). It records which light rig was asked for, which the
+mapper properties alone cannot express; the mapper itself does not read it.
+Absent means no model was applied, and the node has no say in the 3D window's
+light rig.
+  <li> volumerendering.transferfunction.preset - The preset the Volume
+Visualization view built this node's TransferFunction from, as its origin and
+its name: "internal:CT-AAA" for one of the presets embedded in
+MitkVolumeVisualization, "file:my-curve" for one saved from the view to a file
+and remembered since. A value carrying no origin was written before origins were
+recorded and names an embedded one. An embedded preset is found again by its
+name. One from a file is found by volumerendering.transferfunction.presetfile
+instead, since another file can carry the same name. Where the view offers no
+matching preset - the file is not among those it offers, or the node records no
+file - the stored TransferFunction is shown as it stands. Recorded because the
+view's adjust sliders resample the color function, after which the curve
+matches no preset and the choice can no longer be recovered from it; the mapper
+does not read it. Together with the four offsets below it is the whole of what
+the view restores: a curve drawn point by point over the preset is recorded
+nowhere, so selecting the node again rebuilds the preset and the offsets and
+discards the drawing. Absent means no preset is named in the view: for a curve
+whose preset was removed from the view, volumerendering.transferfunction.custom
+says so; for one that came from outside the view, nothing does.
+  <li> volumerendering.transferfunction.presetfile - Absolute path of the file
+the preset named above was read from, for a preset of file origin only. The
+name cannot stand in for it: it is derived from the file name, the view suggests
+the same "-custom" name for every preset saved from a given one, and a name
+already taken is numbered in whatever order the files are read. It is the path
+that is matched, not the contents, so a file at the same path that has been
+written over since is taken to be the same preset. The mapper does not read it.
+  <li> volumerendering.transferfunction.opacityshift,
+volumerendering.transferfunction.opacityheight,
+volumerendering.transferfunction.colorshift,
+volumerendering.transferfunction.colorwidth - The four offsets the view's adjust
+sliders applied on top of the preset named above, which is the baseline they are
+measured from; meaningless without it, and written only as a complete set of
+four, since the neutral color width is the preset's own span rather than zero.
+Together with the preset name they form a recipe the view re-executes when the
+node is selected again, which is what lets the sliders show their previous
+positions instead of resetting. Where the recipe and the stored TransferFunction
+disagree - the curve having been drawn over in the view, or edited elsewhere,
+such as in the Properties view - the recipe wins and the stored curve is
+discarded. The mapper does not read any of them.
+  <li> volumerendering.transferfunction.custom - Set where the preset the Volume
+Visualization view built this node's TransferFunction from was removed from the
+view while in use, and removed again when a preset is chosen instead. Scenes
+written by earlier versions of the view carry it for a curve loaded from a file
+as well, and are read the same way. No recipe describes such a curve - that
+is what makes it custom - so what is recorded is only that the curve was chosen
+in the view at all, which is what the view reads to take it back over on the
+next selection rather than let it be replaced. A curve drawn point by point over
+a preset is not custom in this sense: it keeps that preset's recipe, which is
+what the next selection rebuilds, and the drawing itself is discarded. Written
+true or removed, never false; the mapper does not read it.
+  <li> volumerendering.normalsFromOpacity - Derive the shading gradient from the
+opacity rather than the raw scalars, so lighting follows the transfer function
+instead of the data's noise. The scattering blend reads the same gradient's
+magnitude, so this also shifts where scattering gives way to surface shading.
+  <li> volumerendering.scattering.blend - Mix between surface shading and
+volumetric scattering: 0 casts no secondary rays, 1 blends the two per sample
+by gradient and opacity, 2 uses the volumetric model alone. Both 0 and 1 are
+thresholds the ray caster compiles against - below the first it leaves the
+secondary rays out of the shader altogether, and at the second it switches
+blending formula - so crossing either rebuilds the shader once. Moving within
+either band is free; what the scattering costs while it is on is set by
+volumerendering.scattering.reach.
+  <li> volumerendering.scattering.reach - Length of the secondary rays, and the
+dominant cost of scattering: 0 shortens each to a single step (ambient
+occlusion), 1 lets them cross the whole volume. Inert while
+volumerendering.scattering.blend is zero.
+  <li> volumerendering.scattering.anisotropy - Henyey-Greenstein scattering
+direction, -1 (back) to 1 (forward). Only feeds the phase function, so it is
+inert while volumerendering.scattering.blend is zero.
 </ul>
 
 \subsection PointSetProperties Point Set Properties

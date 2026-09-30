@@ -4,7 +4,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  src/internal/QmitkVolumeVisualizationViewControls.ui
+  src/internal/QmitkVolumeVisualizationView.ui
 )
 
 set(MOC_H_FILES
@@ -15,6 +15,10 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/volume_visualization.svg
+)
+
+set(QRC_FILES
+  resources/volumevisualization.qrc
 )
 
 foreach(file ${INTERNAL_CPP_FILES})

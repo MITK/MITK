@@ -21,11 +21,11 @@ found in the LICENSE file.
 /**
  * \brief Canvas widget for editing a vtkPiecewiseFunction (opacity transfer function).
  *
- * Renders a piecewise linear function as connected line segments with draggable
- * control point handles. Supports adding, removing, and moving function points
- * interactively. A histogram is drawn in the background if one is set.
+ * Holds the function and edits its control points through the base class's
+ * mouse and keyboard handling. It draws nothing itself; drawing is left to
+ * subclasses such as QmitkCombinedTransferFunctionCanvas.
  *
- * \sa QmitkTransferFunctionCanvas, QmitkColorTransferFunctionCanvas, QmitkTransferFunctionWidget
+ * \sa QmitkTransferFunctionCanvas
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas
 {
@@ -38,15 +38,6 @@ public:
    * \param[in] f Window flags.
    */
   QmitkPiecewiseFunctionCanvas(QWidget *parent = nullptr, Qt::WindowFlags f = {});
-
-  /** \brief Paint the histogram, function lines, handles, title, and range labels. */
-  void paintEvent(QPaintEvent *e) override;
-
-  /**
-   * \brief Set the title text displayed on the canvas.
-   * \param[in] title The title string.
-   */
-  void SetTitle(const QString &title);
 
   /**
    * \brief Find a handle near the given canvas position.
@@ -176,7 +167,6 @@ public:
 
 protected:
   vtkPiecewiseFunction *m_PiecewiseFunction;
-  QString m_Title;
 };
 
 #endif

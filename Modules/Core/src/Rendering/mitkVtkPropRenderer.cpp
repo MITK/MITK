@@ -35,9 +35,11 @@ found in the LICENSE file.
 #include <vtkAssemblyPath.h>
 #include <vtkCamera.h>
 #include <vtkCellPicker.h>
+#include <vtkCollectionRange.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInformation.h>
 #include <vtkLight.h>
+#include <vtkLightCollection.h>
 #include <vtkLightKit.h>
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
@@ -71,6 +73,14 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin
 
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+
+  m_KeyLight = nullptr;
+  m_FillLight = nullptr;
+  m_Headlight = nullptr;
+  m_LightingMode = LightingMode::Studio;
+
+  this->NormalizeLightAmbientColors();
+
   m_PickingMode = WorldPointPicking;
 }
 
@@ -87,6 +97,15 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
 
   if (m_LightKit != nullptr)
     m_LightKit->Delete();
+
+  if (m_KeyLight != nullptr)
+    m_KeyLight->Delete();
+
+  if (m_FillLight != nullptr)
+    m_FillLight->Delete();
+
+  if (m_Headlight != nullptr)
+    m_Headlight->Delete();
 
   if (m_VtkRenderer != nullptr)
   {
@@ -105,6 +124,123 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_PointPicker->Delete();
   if (m_CellPicker != nullptr)
     m_CellPicker->Delete();
+}
+
+void mitk::VtkPropRenderer::NormalizeLightAmbientColors()
+{
+  // vtkLight's ambient color defaults to black and vtkLightKit never sets
+  // it, so the GPU volume ray caster - which sums each light's ambient color
+  // scaled by that light's intensity - would render vtkVolumeProperty's
+  // ambient coefficient inert. Normalizing the sum to 1.0 keeps the
+  // coefficient on the same scale whichever rig is installed.
+  //
+  // A lone headlight at intensity 1.0 is the near-exception: it takes the ray
+  // caster's default lighting path, which tints ambient with the sample's own
+  // color and reads the light's ambient color only once volumetric scattering
+  // is switched on. Normalizing it too costs nothing and keeps that case right.
+  auto *lights = m_VtkRenderer->GetLights();
+  double totalIntensity = 0.0;
+
+  for (auto *light : vtk::Range(lights))
+  {
+    // Only switched-on lights reach the shader, so only they may contribute
+    // to the sum the normalization has to cancel.
+    if (light->GetSwitch() > 0)
+      totalIntensity += light->GetIntensity();
+  }
+
+  if (totalIntensity <= 0.0)
+    return;
+
+  const double ambient = 1.0 / totalIntensity;
+
+  for (auto *light : vtk::Range(lights))
+  {
+    light->SetAmbientColor(ambient, ambient, ambient);
+  }
+}
+
+void mitk::VtkPropRenderer::SetLightingMode(LightingMode mode)
+{
+  // 2D renderers have their lights removed on purpose, to keep gray values
+  // faithful to the data; installing any rig would undo that.
+  if (this->GetMapperID() != Standard3D || mode == m_LightingMode)
+    return;
+
+  this->InstallLightingRig(mode);
+}
+
+void mitk::VtkPropRenderer::InstallLightingRig(LightingMode mode)
+{
+  // Clear the renderer before installing the new rig. Each rig owns the whole
+  // renderer: the ray caster picks its shading path from how many lights are
+  // switched on, so a leftover would silently change it. That includes the
+  // headlight VTK creates by itself whenever it renders without any light, as
+  // it does in 2D.
+  m_VtkRenderer->RemoveAllLights();
+
+  if (mode == LightingMode::KeyLight)
+  {
+    if (m_KeyLight == nullptr)
+    {
+      m_KeyLight = vtkLight::New();
+      // Camera-relative, so orbiting never leaves the subject unlit. Sitting
+      // off-axis is the point: a headlight casts no visible shadow at all,
+      // because everything it lights is what the camera already sees.
+      // SetLightType clears the transform, so it has to precede the angle.
+      m_KeyLight->SetLightTypeToCameraLight();
+      m_KeyLight->SetDirectionAngle(25.0, 48.0);
+      m_KeyLight->SetIntensity(1.0);
+    }
+
+    if (m_FillLight == nullptr)
+    {
+      m_FillLight = vtkLight::New();
+      // The shader's shadow term is plain transmittance, so where the key is
+      // occluded it contributes nothing and the only light left is the ambient
+      // constant - which the shader does not tint by the sample's color.
+      // Raising ambient therefore grays a shadow out rather than filling it; a
+      // second, dimmer source is the only way to put colored, still
+      // occlusion-aware light into one. Mirrored azimuth and below camera
+      // height, so it opens the key's shadow without canceling the modeling
+      // that carved it.
+      m_FillLight->SetLightTypeToCameraLight();
+      m_FillLight->SetDirectionAngle(-10.0, -48.0);
+      m_FillLight->SetIntensity(0.35);
+    }
+
+    m_VtkRenderer->AddLight(m_KeyLight);
+    m_VtkRenderer->AddLight(m_FillLight);
+  }
+  else if (mode == LightingMode::Headlight)
+  {
+    if (m_Headlight == nullptr)
+    {
+      m_Headlight = vtkLight::New();
+      // The ray caster compiles its default lighting path only for a single
+      // switched-on light, at intensity exactly 1.0, of headlight type. Any
+      // deviation - a second light, a different intensity, a camera light at an
+      // angle - drops it to the multi-light path, where ambient stops being
+      // tinted by the sample color.
+      m_Headlight->SetLightTypeToHeadlight();
+      m_Headlight->SetIntensity(1.0);
+    }
+
+    m_VtkRenderer->AddLight(m_Headlight);
+  }
+  else
+  {
+    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+  }
+
+  m_LightingMode = mode;
+
+  this->NormalizeLightAmbientColors();
+}
+
+mitk::VtkPropRenderer::LightingMode mitk::VtkPropRenderer::GetLightingMode() const
+{
+  return m_LightingMode;
 }
 
 void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage *storage)
@@ -634,6 +770,8 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
       vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
     this->GetRenderWindow()->GetInteractor()->EnableRenderOff();
+    // A 2D phase removed every light, while m_LightingMode kept the rig.
+    this->InstallLightingRig(m_LightingMode);
     m_CameraInitializedForMapperID = Standard3D;
   }
   else if (this->GetMapperID() == Standard2D)

@@ -34,6 +34,8 @@ namespace mitk
 
       // serialize scalar opacity function
       auto *scalarOpacityPointlist = doc.NewElement("ScalarOpacity");
+      scalarOpacityPointlist->SetAttribute("clamping",
+                                           transferfunction->GetScalarOpacityFunction()->GetClamping() != 0);
 
       TransferFunction::ControlPoints scalarOpacityPoints = transferfunction->GetScalarOpacityPoints();
       for (auto iter = scalarOpacityPoints.begin(); iter != scalarOpacityPoints.end(); ++iter)
@@ -46,6 +48,9 @@ namespace mitk
       element->InsertEndChild(scalarOpacityPointlist);
       // serialize gradient opacity function
       auto *gradientOpacityPointlist = doc.NewElement("GradientOpacity");
+      gradientOpacityPointlist->SetAttribute("clamping",
+                                             transferfunction->GetGradientOpacityFunction()->GetClamping() != 0);
+
       TransferFunction::ControlPoints gradientOpacityPoints = transferfunction->GetGradientOpacityPoints();
       for (auto iter = gradientOpacityPoints.begin(); iter != gradientOpacityPoints.end(); ++iter)
       {
@@ -61,6 +66,8 @@ namespace mitk
       if (ctf == nullptr)
         return nullptr;
       auto *pointlist = doc.NewElement("Color");
+      pointlist->SetAttribute("colorSpace", TransferFunctionColorSpaceToString(transferfunction->GetColorSpace()));
+
       for (int i = 0; i < ctf->GetSize(); i++)
       {
         double myVal[6];
@@ -132,6 +139,12 @@ namespace mitk
 
     tf->ClearScalarOpacityPoints();
 
+    // Absent from scenes written before this flag was serialized. VTK's own default
+    // is on, which is what those scenes were rendered with.
+    bool scalarOpacityClamping = true;
+    scalarOpacityPointlist->QueryBoolAttribute("clamping", &scalarOpacityClamping);
+    tf->GetScalarOpacityFunction()->SetClamping(scalarOpacityClamping);
+
     try
     {
       for (auto *pointElement = scalarOpacityPointlist->FirstChildElement("point"); pointElement != nullptr;
@@ -151,6 +164,10 @@ namespace mitk
       }
 
       tf->ClearGradientOpacityPoints();
+
+      bool gradientOpacityClamping = true;
+      gradientOpacityPointlist->QueryBoolAttribute("clamping", &gradientOpacityClamping);
+      tf->GetGradientOpacityFunction()->SetClamping(gradientOpacityClamping);
 
       for (auto *pointElement = gradientOpacityPointlist->FirstChildElement("point"); pointElement != nullptr;
            pointElement = pointElement->NextSiblingElement("point"))
@@ -174,6 +191,24 @@ namespace mitk
       }
 
       ctf->RemoveAllPoints();
+
+      // Absent from scenes written before the color space was serialized. Those were
+      // all authored under the constructor default, so that is what they must read as.
+      auto colorSpace = TransferFunctionColorSpace::HSV;
+
+      if (const char *colorSpaceName = rgbPointlist->Attribute("colorSpace"))
+      {
+        if (const auto parsedColorSpace = TransferFunctionColorSpaceFromString(colorSpaceName))
+        {
+          colorSpace = *parsedColorSpace;
+        }
+        else
+        {
+          MITK_WARN << "Unknown transfer function color space \"" << colorSpaceName << "\"; falling back to HSV.";
+        }
+      }
+
+      tf->SetColorSpace(colorSpace);
 
       for (auto *pointElement = rgbPointlist->FirstChildElement("point"); pointElement != nullptr;
            pointElement = pointElement->NextSiblingElement("point"))

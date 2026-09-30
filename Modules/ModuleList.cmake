@@ -15,6 +15,7 @@ set(MITK_MODULES
   DataTypesExt
   Annotation
   AlgorithmsExt
+  VolumeVisualization
   MapperExt
   DICOM
   DICOMQI
@@ -34,6 +35,7 @@ set(MITK_MODULES
   QtIconTheme
   QtWidgets
   QtWidgetsExt
+  VolumeVisualizationUI
   ImageStatisticsUI
   SegmentationUI
   MatchPointRegistration

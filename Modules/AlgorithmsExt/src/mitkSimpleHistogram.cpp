@@ -47,7 +47,7 @@ namespace mitk
     valid = true;
   }
 
-  bool SimpleImageHistogram::GetValid() { return valid; }
+  bool SimpleImageHistogram::GetValid() const { return valid; }
   float SimpleImageHistogram::GetRelativeBin(double left, double right) const
   {
     if (!valid)

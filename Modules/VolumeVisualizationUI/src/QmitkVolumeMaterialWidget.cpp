@@ -84,6 +84,9 @@ QmitkVolumeMaterialWidget::QmitkVolumeMaterialWidget(QWidget *parent, Qt::Window
   // Set here rather than in the .ui: the resource is authored with a
   // placeholder fill that QmitkIconTheme swaps for the theme's icon color,
   // so a direct reference from the .ui would draw it in that placeholder.
+  //
+  // Its label in the .ui starts with a space, which widens the gap to the icon:
+  // Qt draws a label four pixels from its icon and offers no way to ask for more.
   m_Controls->resetButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
 
   connect(m_Controls->ambientSlider, &QSlider::valueChanged, this, [this](int position)

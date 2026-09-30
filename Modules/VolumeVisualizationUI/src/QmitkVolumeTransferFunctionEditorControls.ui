@@ -195,8 +195,14 @@
           <property name="text">
            <string>Edit</string>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>12</width>
+            <height>12</height>
+           </size>
+          </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextOnly</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -368,7 +374,7 @@
               <string>Put back the curve and blend mode from when editing began, and keep editing.</string>
              </property>
              <property name="text">
-              <string>Revert changes</string>
+              <string> Revert changes</string>
              </property>
             </widget>
            </item>
@@ -499,7 +505,7 @@
            <item>
             <widget class="QPushButton" name="resetTfButton">
              <property name="text">
-              <string>Reset opacity and color</string>
+              <string> Reset opacity and color</string>
              </property>
             </widget>
            </item>

@@ -866,6 +866,16 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
   m_Controls->revertEditButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
+  m_Controls->editModeButton->setIcon(
+    QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/pencil.svg")));
+
+  // The reset and revert labels in the .ui start with a space, as do the edit
+  // button's,
+  // which widens the gap to the icon: Qt draws a label four pixels from its
+  // icon and offers no way to ask for more. The edit button is labeled from
+  // here on rather than by the .ui, so that both of its labels live in one
+  // place.
+  this->ShowEditModeButton(false);
   m_Controls->presetGridButton->setIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")));
   m_Controls->presetListButton->setIcon(
@@ -1917,8 +1927,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
     {
       // The button that asked has already come up. Only it is put back, since
       // ShowEditMode would also reset the axis the user may have widened.
-      const QSignalBlocker blocker(m_Controls->editModeButton);
-      m_Controls->editModeButton->setChecked(true);
+      this->ShowEditModeButton(true);
       return;
     }
   }
@@ -2030,12 +2039,7 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
 
   m_Controls->combinedTfCanvas->SetEditable(m_EditModeActive);
 
-  {
-    // The button is both what asks for the mode and what reports it, so letting
-    // this through would come straight back as a request to change it.
-    const QSignalBlocker blocker(m_Controls->editModeButton);
-    m_Controls->editModeButton->setChecked(m_EditModeActive);
-  }
+  this->ShowEditModeButton(m_EditModeActive);
 
   // The edit controls take the sliders' place at the sliders' height, so that
   // nothing below the canvas moves when editing begins or ends. Measured on
@@ -2079,6 +2083,21 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   // Which controls would replace the curve being edited depends on the mode
   // this just changed.
   this->UpdateControlAvailability();
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowEditModeButton(bool checked)
+{
+  auto *button = m_Controls->editModeButton;
+
+  const QSignalBlocker blocker(button);
+  button->setChecked(checked);
+
+  // The pressed look alone reads as a state rather than as a way out, so the
+  // label says what pressing the button now does.
+  button->setText(checked ? QStringLiteral(" Stop editing") : QStringLiteral(" Edit"));
+  button->setToolTip(checked
+    ? QStringLiteral("Stop editing the curve. A changed curve can then be saved as a preset or discarded.")
+    : QStringLiteral("Edit the curve point by point."));
 }
 
 void QmitkVolumeTransferFunctionEditor::ApplyAxisRange()

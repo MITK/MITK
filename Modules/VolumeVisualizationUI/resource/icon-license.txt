@@ -1,3 +1,4 @@
 See [Font Awesome 4] in Licenses/ICONS.md for:
+- pencil.svg
 - view-list-details.svg
 - view-list-icons.svg

@@ -134,7 +134,7 @@
      <item>
       <widget class="QPushButton" name="resetButton">
        <property name="text">
-        <string>Reset material</string>
+        <string> Reset material</string>
        </property>
       </widget>
      </item>

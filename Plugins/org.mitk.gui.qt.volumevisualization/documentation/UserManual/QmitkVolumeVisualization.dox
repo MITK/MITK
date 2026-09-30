@@ -180,7 +180,8 @@ back to the positions you left them in.
 \subsection org_mitk_views_volumevisualization_tf_custom Editing the curve point by point
 
 <b>Edit</b>, above the canvas, hands that canvas over to editing the curve on
-show point by point; pressing it again ends the edit. Either the preset grid or
+show point by point. While the edit runs the button reads <b>Stop editing</b>,
+and pressing it ends the edit. Either the preset grid or
 the four sliders would replace what you are drawing, so in the meantime the grid
 is grayed out and the sliders make way for the list of color stops.
 
@@ -189,7 +190,8 @@ is grayed out and the sliders make way for the list of color stops.
 <ol>
 <li> <b>Show whole curve</b> decides how far the axis reaches, as described below.
 <li> The blend mode the curve is rendered in, as described below.
-<li> <b>Edit</b> starts and ends the edit.
+<li> <b>Stop editing</b> ends the edit; outside of one, the same button reads
+<b>Edit</b> and starts it.
 <li> The handles of the opacity curve.
 <li> The color stops, as markers along the bottom edge. A faded one standing on
 an edge lies beyond the axis.
@@ -237,14 +239,14 @@ are authored on their modality's full scale, so a preset's outermost stops
 often lie beyond either end of the axis. The one nearest each end is then drawn
 faded on that end, to say it exists rather than where it is. It can be selected
 and recolored there, but not dragged, since there is no place on the axis to
-drag it from; pointing at it says so. Ticking <b>Show whole curve</b>, beside
-<b>Edit</b>, widens the axis to take in every point of both curves, so that each
+drag it from; pointing at it says so. Ticking <b>Show whole curve</b>, above
+the canvas, widens the axis to take in every point of both curves, so that each
 stop stands at its own value and can be dragged like any other. The image's band
 then takes up only part of the plot. Every edit starts with the box cleared, and
 the axis returns to the band when the edit ends.
 
-The list beside <b>Edit</b>, shown only while editing, is the blend mode the
-curve is rendered in. It starts on the mode the preset brought. Changing it
+The list beside <b>Stop editing</b>, shown only while editing, is the blend mode
+the curve is rendered in. It starts on the mode the preset brought. Changing it
 counts as an edit like any drawn on the canvas: the preset's entry is starred,
 and the choice lasts as long as the drawing does, so <b>Save as preset...</b>
 is how to keep it. Only <b>Composite</b> builds a three-dimensional image and
@@ -277,8 +279,8 @@ the same format the built-in catalog uses, then adds it to the grid and
 applies it, so your own functions can be kept and shared and added back with the
 <b>Load preset...</b> entry. Canceling the file dialog brings the question back.
 <li> <b>Discard</b> puts back the curve and the blend mode from before the edit.
-<li> <b>Continue editing</b> takes back the click on <b>Edit</b> and leaves you
-editing. ESC answers the same.
+<li> <b>Continue editing</b> takes back the click on <b>Stop editing</b> and
+leaves you editing. ESC answers the same.
 </ul>
 
 Selecting another image while editing, or removing the one being edited, asks

@@ -18,4 +18,5 @@ if(NOT TARGET package-symbols)
     VERBATIM
     USES_TERMINAL
     COMMENT "Archiving MITK debug symbols")
+  set_property(TARGET package-symbols PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Packaging")
 endif()

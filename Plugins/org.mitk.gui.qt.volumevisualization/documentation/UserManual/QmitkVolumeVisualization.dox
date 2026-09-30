@@ -222,8 +222,10 @@ double-click it to type a value, which moves the stop there, or as far toward
 it as it can go: like a dragged one, a stop halts just short of its neighbors.
 DELETE, or
 <b>Remove</b> on the right-click menu, removes the selected stop. A stop that
-lies beyond the axis is listed as <b>Off axis</b>, without a position. A
-gradient keeps at least one stop, and the curve at least one point.
+lies beyond the axis is listed grayed out, with a position below 0 or above 1
+followed by <b>(off axis)</b>. That position says how far beyond the axis the
+stop lies, but cannot be typed; the row's tooltip says how to move the stop.
+A gradient keeps at least one stop, and the curve at least one point.
 
 <b>Revert changes</b>, below the list, puts back the curve and the blend mode
 from when you pressed <b>Edit</b>, as <b>Discard</b> does when the edit ends,

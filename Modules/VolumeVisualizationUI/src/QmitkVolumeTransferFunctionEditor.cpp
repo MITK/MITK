@@ -653,23 +653,46 @@ namespace
   /** \brief How many decimals a color stop's position is shown and typed with. */
   constexpr int COLOR_STOP_DECIMALS = 3;
 
+  /** \brief Whether a row of the color stop list is a stop beyond the axis. */
+  constexpr int COLOR_STOP_OFF_AXIS_ROLE = Qt::UserRole;
+
+  /**
+   * \brief Draws the rows of stops beyond the axis grayed out, as the canvas
+   *        fades their markers.
+   *
+   * Drawn as disabled rather than made so: a disabled item cannot be selected,
+   * and selecting such a stop is how it is recolored.
+   */
+  class ColorStopDelegate : public QStyledItemDelegate
+  {
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+  protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override
+    {
+      QStyledItemDelegate::initStyleOption(option, index);
+
+      // Not while selected: the highlight would then be drawn in its disabled
+      // colors too, and the row would no longer read as the selected one.
+      if (index.data(COLOR_STOP_OFF_AXIS_ROLE).toBool() && !(option->state & QStyle::State_Selected))
+        option->state &= ~QStyle::State_Enabled;
+    }
+  };
+
   /**
    * \brief Shows and edits a color stop's position as a fraction of the axis.
    *
    * The editor Qt picks for a number steps by whole units, which here would
    * cross the axis in a single step.
    */
-  class ColorStopPositionDelegate : public QStyledItemDelegate
+  class ColorStopPositionDelegate : public ColorStopDelegate
   {
   public:
-    using QStyledItemDelegate::QStyledItemDelegate;
+    using ColorStopDelegate::ColorStopDelegate;
 
     QString displayText(const QVariant &value, const QLocale &locale) const override
     {
-      // A stop off the axis has no position to show, and says so in words.
-      if (value.typeId() != QMetaType::Double)
-        return QStyledItemDelegate::displayText(value, locale);
-
       return locale.toString(value.toDouble(), 'f', COLOR_STOP_DECIMALS);
     }
 
@@ -698,6 +721,18 @@ namespace
 
       if (spinBox->value() != shown)
         model->setData(index, spinBox->value(), Qt::EditRole);
+    }
+
+  protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override
+    {
+      ColorStopDelegate::initStyleOption(option, index);
+
+      // Beyond the axis the fraction falls below 0 or above 1, which would
+      // otherwise read as a mistake, and the gray alone does not say why the
+      // cell takes no typing.
+      if (index.data(COLOR_STOP_OFF_AXIS_ROLE).toBool())
+        option->text += QStringLiteral(" (off axis)");
     }
   };
 }
@@ -910,6 +945,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   auto *stopTable = m_Controls->colorStopTable;
 
+  stopTable->setItemDelegate(new ColorStopDelegate(stopTable));
   stopTable->setItemDelegateForColumn(COLOR_STOP_POSITION_COLUMN, new ColorStopPositionDelegate(stopTable));
   stopTable->horizontalHeader()->setSectionResizeMode(COLOR_STOP_COLOR_COLUMN, QHeaderView::ResizeToContents);
 
@@ -2126,27 +2162,28 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
 
     colorItem->setIcon(ColorSwatch(canvas->GetColorStopColor(i)));
 
-    // Off the axis, a fraction of it would only say which side the stop lies
-    // on, not where - and typing one would pull the stop onto the axis.
+    // Off the axis the position is still shown, since it says how far beyond the
+    // axis the stop lies, but it cannot be typed: the spin box only reaches
+    // across the axis, so typing would pull the stop onto it.
     const bool offAxis = canvas->IsColorStopOffAxis(i);
 
-    if (offAxis)
-    {
-      positionItem->setData(Qt::DisplayRole, QStringLiteral("Off axis"));
-      positionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    }
-    else
-    {
-      positionItem->setData(Qt::DisplayRole, canvas->GetColorStopOffset(i));
-      positionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-    }
+    Qt::ItemFlags positionFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+
+    if (!offAxis)
+      positionFlags |= Qt::ItemIsEditable;
+
+    positionItem->setData(Qt::DisplayRole, canvas->GetColorStopOffset(i));
+    positionItem->setFlags(positionFlags);
 
     const QString toolTip = offAxis
-      ? "This color stop lies off the axis. Tick Show whole curve to give it a position."
+      ? "This color stop lies off the axis. Tick Show whole curve to move it."
       : QString();
 
-    colorItem->setToolTip(toolTip);
-    positionItem->setToolTip(toolTip);
+    for (auto *item : { colorItem, positionItem })
+    {
+      item->setData(COLOR_STOP_OFF_AXIS_ROLE, offAxis);
+      item->setToolTip(toolTip);
+    }
   }
 
   // With no stop selected on the canvas no row may stay current either, or

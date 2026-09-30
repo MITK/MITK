@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/VolumeVisualizationUI">
+    <file>view-list-details.svg</file>
+    <file>view-list-icons.svg</file>
+  </qresource>
+</RCC>

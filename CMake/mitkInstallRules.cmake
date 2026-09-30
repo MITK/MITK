@@ -70,6 +70,29 @@ foreach(_bindir _fwdir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_INSTALL_FRA
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Install the Crashpad handler.
+#
+# The handler is spawned at runtime, not linked, so RUNTIME_DEPENDENCY_SET
+# cannot discover it. The sentry backend resolves it next to the application
+# executable, hence one copy per bundle bin directory.
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_sentry AND MITK_EXTERNAL_PROJECT_PREFIX)
+  # Renamed to match the handler_path the facility sets (see Modules/CrashHandling).
+  foreach(_bindir IN LISTS MITK_INSTALL_BINDIR)
+    install(PROGRAMS "${MITK_CRASH_HANDLER_EXECUTABLE}"
+      DESTINATION ${_bindir}
+      RENAME ${MITK_CRASH_HANDLER_NAME})
+  endforeach()
+
+  install(FILES "${MITK_EXTERNAL_PROJECT_PREFIX}/src/sentry/LICENSE"
+    DESTINATION share/licenses/sentry-native)
+  install(FILES "${MITK_EXTERNAL_PROJECT_PREFIX}/src/sentry/external/crashpad/LICENSE"
+    DESTINATION share/licenses/sentry-native
+    RENAME LICENSE.crashpad)
+endif()
+
+#-----------------------------------------------------------------------------
 # Deploy Qt runtime dependencies (plugins, qt.conf).
 #
 # This runs AFTER install(RUNTIME_DEPENDENCY_SET) so that windeployqt can see

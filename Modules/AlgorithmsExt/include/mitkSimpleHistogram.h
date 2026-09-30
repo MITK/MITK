@@ -41,6 +41,17 @@ namespace mitk
   {
   public:
     /**
+     * \brief Whether the histogram holds computed values.
+     *
+     * GetMin and GetMax answer with placeholders where it does not rather than
+     * reporting the failure, so this has to be asked before either of them is
+     * taken for a data range.
+     *
+     * \return True if the histogram was computed successfully.
+     */
+    virtual bool GetValid() const = 0;
+
+    /**
      * \brief Returns the minimum value of the histogram.
      * \return The minimum histogram value.
      */
@@ -91,11 +102,7 @@ namespace mitk
     {
     }
 
-    /**
-     * \brief Check whether the histogram has been computed successfully.
-     * \return True if the histogram is valid, false otherwise.
-     */
-    bool GetValid();
+    bool GetValid() const override;
 
     typedef itk::Image<short, 3> CTImage;
     typedef itk::ImageRegionIterator<CTImage> CTIteratorType;

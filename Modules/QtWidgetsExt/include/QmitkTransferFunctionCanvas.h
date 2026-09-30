@@ -15,10 +15,8 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExtExports.h>
 
-#include <mitkRenderingManager.h>
 #include <mitkSimpleHistogram.h>
 
-#include <QLineEdit>
 #include <QWidget>
 
 /**
@@ -26,13 +24,13 @@ found in the LICENSE file.
  *
  * Provides common infrastructure for interactive editing of transfer function
  * control points: mouse-based adding, removing, and dragging of handles,
- * histogram background rendering, coordinate conversion, keyboard navigation,
- * and optional QLineEdit binding for precise coordinate input.
+ * histogram background rendering, coordinate conversion, and keyboard
+ * navigation.
  *
  * Subclasses must implement the pure virtual methods that define the specific
- * transfer function type (color vs. piecewise).
+ * transfer function type (such as a piecewise opacity function).
  *
- * \sa QmitkColorTransferFunctionCanvas, QmitkPiecewiseFunctionCanvas, QmitkTransferFunctionWidget
+ * \sa QmitkPiecewiseFunctionCanvas
  */
 class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {
@@ -224,73 +222,20 @@ public:
    */
   void SetImmediateUpdate(bool state);
 
-  /**
-   * \brief Clamp coordinates to valid histogram range and [0, 1] for y.
-   * \param[in] x The (x, y) coordinates to validate.
-   * \return The clamped coordinates.
-   */
-  std::pair<double, double> ValidateCoord(std::pair<double, double> x)
-  {
-    double max = m_Histogram->GetMax();
-    double min = m_Histogram->GetMin();
-    if (x.first < min)
-      x.first = min;
-    if (x.first > max)
-      x.first = max;
-    if (x.second < 0)
-      x.second = 0;
-    if (x.second > 1)
-      x.second = 1;
-    return x;
-  }
-
-  /**
-   * \brief Set the x coordinate of the currently grabbed handle.
-   * \param[in] x The new x value.
-   */
-  void SetX(float x)
-  {
-    if (m_GrabbedHandle != -1)
-    {
-      this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(x, GetFunctionY(m_GrabbedHandle))));
-      update();
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-
-  /**
-   * \brief Set the y coordinate of the currently grabbed handle.
-   * \param[in] y The new y value.
-   */
-  void SetY(float y)
-  {
-    if (m_GrabbedHandle != -1)
-    {
-      this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle), y)));
-      update();
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-
-  /**
-   * \brief Connect QLineEdit widgets for displaying/editing the selected handle coordinates.
-   * \param[in] xEdit The line edit for the x coordinate.
-   * \param[in] yEdit The line edit for the y coordinate. May be nullptr.
-   */
-  void SetQLineEdits(QLineEdit *xEdit, QLineEdit *yEdit)
-  {
-    m_XEdit = xEdit;
-    m_YEdit = yEdit;
-    m_LineEditAvailable = true;
-  }
-
 protected:
+  /**
+   * \brief The position the grabbed handle may take when asked to move to x.
+   *
+   * A handle cannot reach its neighbors, since two points at one position are
+   * one point to VTK, and it cannot pass them without changing which index it
+   * has. Such a move stops a pixel short of the neighbor: the least gap that
+   * still shows, where a narrower one would have VTK ask for a lookup texture
+   * wider than the GPU allows. The result is then kept within the data range.
+   */
+  double ClampGrabbedHandleX(double x);
+
   bool m_ImmediateUpdate;
   float m_Range;
-
-  bool m_LineEditAvailable;
-  QLineEdit *m_XEdit;
-  QLineEdit *m_YEdit;
 };
 
 #endif

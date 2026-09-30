@@ -42,6 +42,7 @@ set(MODULE_TESTS
   mitkIOUtilTest.cpp
   mitkITKEventObserverGuardTest.cpp
   mitkBaseDataTest.cpp
+  mitkBaseRendererTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
@@ -80,6 +81,7 @@ set(MODULE_TESTS
   mitkTransferFunctionTest.cpp
   mitkStepperTest.cpp
   mitkRenderingManagerTest.cpp
+  mitkRenderingManagerSuspendTest.cpp
   mitkCompositePixelValueToStringTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   vtkMitkLevelWindowFilterTest.cpp

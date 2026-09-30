@@ -258,7 +258,6 @@ set(CPP_FILES
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
-  DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkUIDManipulator.cpp
   DataManagement/mitkVectorProperty.cpp

@@ -15,6 +15,38 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <mitkIOUtil.h>
+#include <mitkITKImageImport.h>
+
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
+
+namespace
+{
+  // A 4x4x4 block of ones in a zero image. At the default threshold 1, its surface runs through the
+  // centers of the block's boundary voxels: the 3x3x3 box with 4x4 points and 18 triangles per face.
+  mitk::Image::Pointer CreateBinaryBlockImage()
+  {
+    using ImageType = itk::Image<unsigned char, 3>;
+
+    ImageType::SizeType imageSize;
+    imageSize.Fill(8);
+    auto itkImage = ImageType::New();
+    itkImage->SetRegions(ImageType::RegionType(imageSize));
+    itkImage->Allocate();
+    itkImage->FillBuffer(0);
+
+    ImageType::IndexType blockIndex;
+    blockIndex.Fill(2);
+    ImageType::SizeType blockSize;
+    blockSize.Fill(4);
+
+    itk::ImageRegionIterator<ImageType> it(itkImage, ImageType::RegionType(blockIndex, blockSize));
+    for (; !it.IsAtEnd(); ++it)
+      it.Set(1);
+
+    return mitk::GrabItkImageMemory(itkImage);
+  }
+}
 
 bool CompareSurfacePointPositions(mitk::Surface::Pointer s1, mitk::Surface::Pointer s2)
 {
@@ -44,6 +76,8 @@ class mitkImageToSurfaceFilterTestSuite : public mitk::TestFixture
   MITK_TEST(testDecimatePromeshDecimation);
   MITK_TEST(testQuadricDecimation);
   MITK_TEST(testSmoothingOfSurface);
+  MITK_TEST(testCoincidentPointsAreMerged);
+  MITK_TEST(testCoincidentPointsAreMergedBeforeSmoothing);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -144,6 +178,30 @@ public:
     mitk::Surface::Pointer testSurface4 = testObject->GetOutput()->Clone();
     CPPUNIT_ASSERT_MESSAGE("Testing smoothing of surface changes point data!",
                            CompareSurfacePointPositions(testSurface1, testSurface4));
+  }
+
+  void testCoincidentPointsAreMerged()
+  {
+    auto testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(CreateBinaryBlockImage());
+    testObject->Update();
+
+    auto *polyData = testObject->GetOutput()->GetVtkPolyData();
+    CPPUNIT_ASSERT_EQUAL(vtkIdType(56), polyData->GetNumberOfPoints());
+    CPPUNIT_ASSERT_EQUAL(vtkIdType(108), polyData->GetNumberOfPolys());
+  }
+
+  void testCoincidentPointsAreMergedBeforeSmoothing()
+  {
+    auto testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(CreateBinaryBlockImage());
+    testObject->SetSmooth(true);
+    testObject->Update();
+
+    // Coincident copies that are not merged before smoothing drift apart and stay separate points.
+    auto *polyData = testObject->GetOutput()->GetVtkPolyData();
+    CPPUNIT_ASSERT_EQUAL(vtkIdType(56), polyData->GetNumberOfPoints());
+    CPPUNIT_ASSERT_EQUAL(vtkIdType(108), polyData->GetNumberOfPolys());
   }
 };
 

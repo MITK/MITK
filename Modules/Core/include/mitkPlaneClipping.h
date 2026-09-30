@@ -19,11 +19,28 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 
+#include <cmath>
+
 namespace mitk
 {
   /** \brief Utility functions for plane clipping calculations. */
   namespace PlaneClipping
   {
+    /** \brief Round a bound on the plane to the nearest pixel edge, given as pixel index.
+     *
+     * The extent of a resliced image and the clipping bounds the image mappers apply to it
+     * must agree, so all bounds from CalculateClippedPlaneBounds() must round alike, also
+     * below zero, where a static_cast would truncate towards zero instead.
+     *
+     * \param[in] bound Bound in mm relative to the plane origin.
+     * \param[in] spacing Pixel spacing in mm along the same axis.
+     * \return Index of the pixel starting at the nearest pixel edge.
+     */
+    inline int RoundToPixelIndex(double bound, double spacing)
+    {
+      return static_cast<int>(std::floor(bound / spacing + 0.5));
+    }
+
     /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds().
      *
      * Tests whether the line segment between two points crosses the z=0 plane,

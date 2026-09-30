@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkMultiLabelSurfaceExtractionScheduler.h>
 #include <mitkMultiLabelSurfaceNetsExtractor.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <mitkVectorProperty.h>
 
 #include <mitkCoreServices.h>
@@ -32,6 +33,7 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkPropAssembly.h>
+#include <vtkPropCollection.h>
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
@@ -146,6 +148,34 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage *mitk::MultiLabelSegmentat
   mitk::BaseRenderer *renderer)
 {
   return m_LSH.GetLocalStorage(renderer);
+}
+
+bool mitk::MultiLabelSegmentationVtkMapper3D::ShowsSurfaceOlderThan(const Image* groupImage, itk::ModifiedTimeType mTime)
+{
+  const auto* renderingManager = RenderingManager::GetInstance();
+
+  for (auto* renderer : m_LSH.GetRegisteredBaseRenderer())
+  {
+    // The RenderingManager does not render windows without a size, e.g. collapsed by a splitter.
+    if (renderingManager->IsRenderingSuspended(renderer->GetRenderWindow()) ||
+        0 == renderer->GetSizeX() || 0 == renderer->GetSizeY())
+      continue;
+
+    const auto* localStorage = m_LSH.GetLocalStorage(renderer);
+    const auto pipeline = localStorage->m_GroupPipelines.find(groupImage);
+
+    // Update() empties the assembly where the segmentation is not shown.
+    if (pipeline == localStorage->m_GroupPipelines.end() ||
+        0 == localStorage->m_Actors->GetParts()->IsItemPresent(pipeline->second->m_Actor))
+      continue;
+
+    const auto& shown = pipeline->second->m_Shown;
+
+    if (!shown.has_value() || shown->m_DataMTime < mTime)
+      return true;
+  }
+
+  return false;
 }
 
 void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* localStorage)

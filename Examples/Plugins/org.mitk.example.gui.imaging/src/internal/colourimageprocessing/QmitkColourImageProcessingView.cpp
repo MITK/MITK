@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 
-#include <QmitkColorTransferFunctionCanvas.h>
 #include <QmitkPiecewiseFunctionCanvas.h>
 
 #include <berryISelectionProvider.h>

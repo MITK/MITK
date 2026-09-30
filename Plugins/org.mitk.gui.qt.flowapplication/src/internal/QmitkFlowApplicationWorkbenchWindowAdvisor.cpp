@@ -56,6 +56,11 @@ found in the LICENSE file.
 #include <QmitkApplicationConstants.h>
 #include "QmitkExtFileSaveProjectAction.h"
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include <QmitkCrashDumpDialog.h>
+#endif
+
+#include <itkConfigure.h>
 #include <mitkVersion.h>
 #include <mitkBaseApplication.h>
 #include <mitkCoreServices.h>
@@ -727,6 +732,10 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowOpen()
     mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
     mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(), dsInput);
   }
+
+#ifdef MITK_HAS_CRASHHANDLING
+  QmitkCrashDumpDialog::ShowIfCrashedLastRun();
+#endif
 }
 
 void QmitkFlowApplicationWorkbenchWindowAdvisor::onIntro()

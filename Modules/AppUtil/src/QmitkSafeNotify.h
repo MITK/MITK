@@ -17,6 +17,14 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <QMessageBox>
+#include <QPushButton>
+
+#ifdef MITK_HAS_CRASHHANDLING
+#include <mitkCrashDumpFacility.h>
+
+#include <QDesktopServices>
+#include <QUrl>
+#endif
 
 #include <cstdlib>
 
@@ -62,21 +70,54 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   msgBox.setText("An error occurred. You should save all data and quit the program to prevent possible data loss.");
   msgBox.setDetailedText(msg);
   msgBox.setIcon(QMessageBox::Critical);
-  msgBox.addButton("Exit immediately", QMessageBox::YesRole);
-  msgBox.addButton("Ignore", QMessageBox::NoRole);
+  auto *exitButton = msgBox.addButton("Exit immediately", QMessageBox::YesRole);
+  auto *ignoreButton = msgBox.addButton("Ignore", QMessageBox::NoRole);
+#ifdef MITK_HAS_CRASHHANDLING
+  auto *captureButton = msgBox.addButton("Capture diagnostics", QMessageBox::ActionRole);
+#endif
 
-  int ret = msgBox.exec();
+  msgBox.exec();
+  auto *clicked = msgBox.clickedButton();
 
-  switch (ret)
+  if (clicked == exitButton)
   {
-    case 0:
-      MITK_ERROR << "The program was closed.";
-      std::exit(EXIT_FAILURE);
-    case 1:
-      MITK_ERROR
-        << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";
-      break;
+    MITK_ERROR << "The program was closed.";
+    std::exit(EXIT_FAILURE);
   }
+  else if (clicked == ignoreButton)
+  {
+    MITK_ERROR
+      << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";
+  }
+#ifdef MITK_HAS_CRASHHANDLING
+  else if (clicked == captureButton)
+  {
+    const auto snapshot = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::OnDemand);
+
+    QMessageBox resultBox;
+    if (snapshot.has_value())
+    {
+      resultBox.setIcon(QMessageBox::Information);
+      resultBox.setText(
+        "A diagnostic snapshot was saved. Like a crash dump, it may contain patient data from this "
+        "session, and there is no way to verify it does not. MITK never uploads it; it stays on this "
+        "computer. Share it only through your usual process for handling patient data.");
+      resultBox.setDetailedText(QString::fromStdWString(snapshot->wstring()));
+      auto *showButton = resultBox.addButton("Show in folder", QMessageBox::ActionRole);
+      resultBox.addButton(QMessageBox::Ok);
+      resultBox.exec();
+
+      if (resultBox.clickedButton() == showButton)
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(snapshot->parent_path().wstring())));
+    }
+    else
+    {
+      resultBox.setIcon(QMessageBox::Warning);
+      resultBox.setText("Could not capture a diagnostic snapshot.");
+      resultBox.exec();
+    }
+  }
+#endif
 
   return false;
 }

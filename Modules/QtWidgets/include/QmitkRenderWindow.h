@@ -106,6 +106,9 @@ public:
   /** \brief Returns whether the menu widget is activated. */
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
 
+  /** \brief Returns the lighting rig last selected from this window's menu. */
+  mitk::VtkPropRenderer::LightingMode GetPreferredLightingMode() const;
+
   /**
    * \brief Shows or hides the geometry violation warning overlay.
    * \param[in] show True to show, false to hide.
@@ -126,6 +129,8 @@ protected:
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
+  // overloaded hide handler
+  void hideEvent(QHideEvent *event) override;
   // overloaded enter handler
   void enterEvent(QEnterEvent *) override;
   // overloaded leave handler
@@ -155,6 +160,8 @@ Q_SIGNALS:
   void CrosshairVisibilityChanged(bool);
 
   void Crosshair3DVisibilityChanged(bool);
+
+  void LightingModeChanged(mitk::VtkPropRenderer::LightingMode);
 
   void moved();
 

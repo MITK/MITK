@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkPlaneGeometryDataVtkMapper3D.h>
 
+#include <mitkAbstractTransformGeometry.h>
 #include <mitkImageVtkMapper2D.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
@@ -32,9 +33,53 @@ found in the LICENSE file.
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
 #include <vtkShaderProperty.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTubeFilter.h>
 #include <vtkUniforms.h>
+
+namespace
+{
+  // The texture coordinates of the plane surface span its bounds, given in index coordinates of
+  // the plane, whereas the resliced image may cover only part of the plane. Sets the transform
+  // that maps the former onto the latter, so that the image is drawn where it lies and the texture
+  // border shows around it.
+  void MapTextureOntoReslicedImage(vtkTransform *textureTransform,
+                                   const double *surfaceBounds,
+                                   const mitk::Vector3D &planeSpacing,
+                                   const int *resliceExtent,
+                                   const mitk::ScalarType *resliceSpacing)
+  {
+    textureTransform->Identity();
+
+    double scale[2];
+    double offset[2];
+
+    for (int i = 0; i < 2; ++i)
+    {
+      const int numberOfPixels = resliceExtent[2 * i + 1] + 1 - resliceExtent[2 * i];
+
+      // Nothing has been resliced yet.
+      if (numberOfPixels <= 0)
+        return;
+
+      const double imageMin = resliceExtent[2 * i] * resliceSpacing[i];
+      const double imageSize = numberOfPixels * resliceSpacing[i];
+      const double surfaceMin = surfaceBounds[2 * i] * planeSpacing[i];
+      const double surfaceSize = (surfaceBounds[2 * i + 1] - surfaceBounds[2 * i]) * planeSpacing[i];
+
+      if (imageSize <= 0.0 || surfaceSize <= 0.0)
+        return;
+
+      scale[i] = surfaceSize / imageSize;
+      offset[i] = (surfaceMin - imageMin) / imageSize;
+    }
+
+    textureTransform->Translate(offset[0], offset[1], 0.0);
+    textureTransform->Scale(scale[0], scale[1], 1.0);
+  }
+}
 
 namespace mitk
 {
@@ -497,7 +542,9 @@ namespace mitk
               polyDataMapper = vtkPolyDataMapper::New();
 
               texture = vtkTexture::New();
-              texture->RepeatOff();
+              texture->SetWrap(vtkTexture::ClampToBorder);
+              texture->SetBorderColor(0.0f, 0.0f, 0.0f, 0.0f);
+              texture->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
               imageActor = vtkActor::New();
               imageActor->SetMapper(polyDataMapper);
@@ -547,6 +594,22 @@ namespace mitk
 
               // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
               texture->SetColorModeToDirectScalars();
+
+              const auto *planeGeometry = this->GetInput()->GetPlaneGeometry();
+
+              // Texture coordinates of deformed planes do not follow the plane axes.
+              if (nullptr == dynamic_cast<const AbstractTransformGeometry *>(planeGeometry))
+              {
+                MapTextureOntoReslicedImage(texture->GetTransform(),
+                                            surface->GetVtkPolyData()->GetBounds(),
+                                            planeGeometry->GetSpacing(),
+                                            localStorage->m_ReslicedImage->GetExtent(),
+                                            localStorage->m_Reslicer->GetOutputSpacing());
+              }
+              else
+              {
+                texture->GetTransform()->Identity();
+              }
 
               auto* property3d = imageActor->GetProperty();
               property3d->LightingOff();

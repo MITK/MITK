@@ -22,6 +22,15 @@ found in the LICENSE file.
 #include <QmitkSafeApplication.h>
 #include <QmitkSingleApplication.h>
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include <mitkCrashDumpFacility.h>
+#include <mitkVersion.h>
+
+#include <QmitkUiFreezeWatchdog.h>
+
+#include <chrono>
+#endif
+
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/OptionException.h>
 
@@ -215,6 +224,8 @@ namespace mitk
   const QString BaseApplication::ARG_FULL_SCREEN_MODE = "MITK.fullscreen";
   const QString BaseApplication::ARG_PREFERENCES_OVERRIDE = "MITK.preferences-override";
   const QString BaseApplication::ARG_PREFERENCES_PATCH = "MITK.preferences-patch";
+  const QString BaseApplication::ARG_NO_CRASH_DUMPS = "MITK.no-crash-dumps";
+  const QString BaseApplication::ARG_UI_WATCHDOG = "MITK.ui-watchdog";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -263,6 +274,10 @@ namespace mitk
 
     QSplashScreen *m_Splashscreen;
     SplashCloserCallback *m_SplashscreenClosingCallback;
+
+#ifdef MITK_HAS_CRASHHANDLING
+    QmitkUiFreezeWatchdog *m_UiWatchdog = nullptr;
+#endif
 
     bool m_LogQtMessages;
     bool m_FullScreenMode;
@@ -805,6 +820,14 @@ namespace mitk
 
   void BaseApplication::uninitialize()
   {
+#ifdef MITK_HAS_CRASHHANDLING
+    // The UI thread stopped beating when the event loop ended, so from here on
+    // the monitor would read an ordinary teardown as a freeze. Retire it before
+    // the framework shutdown below, which on its own may take ten seconds.
+    delete d->m_UiWatchdog;
+    d->m_UiWatchdog = nullptr;
+#endif
+
     auto pfw = this->getFramework();
 
     if (pfw)
@@ -815,6 +838,10 @@ namespace mitk
     }
 
     Poco::Util::Application::uninitialize();
+
+#ifdef MITK_HAS_CRASHHANDLING
+    CrashDumpFacility::Shutdown();
+#endif
   }
 
   int BaseApplication::getArgc() const
@@ -888,6 +915,40 @@ namespace mitk
       d->m_QApp = this->getSingleMode()
         ? static_cast<QCoreApplication*>(new QmitkSingleApplication(d->m_Argc, d->m_Argv, this->getSafeMode()))
         : static_cast<QCoreApplication*>(new QmitkSafeApplication(d->m_Argc, d->m_Argv, this->getSafeMode()));
+
+#ifdef MITK_HAS_CRASHHANDLING
+      // Opt-in UI-freeze watchdog. Options are already parsed at this point.
+      // An explicitly passed option wins over the environment variable: whoever
+      // types it is the one debugging this session.
+      const auto watchdogArgValue =
+        QString::fromStdString(this->config().getString(ARG_UI_WATCHDOG.toStdString(), ""));
+      const bool watchdogFromEnvironment = watchdogArgValue.isEmpty();
+
+      const auto watchdogSeconds = watchdogFromEnvironment
+        ? qEnvironmentVariable("MITK_UI_WATCHDOG").toInt()
+        : watchdogArgValue.toInt();
+
+      if (watchdogSeconds > 0)
+      {
+        if (CrashDumpFacility::IsActive())
+        {
+          // An armed watchdog is otherwise silent until it fires, which makes
+          // "did it even arm?" unanswerable from a session's output.
+          MITK_INFO << "UI-freeze watchdog armed with a timeout of " << watchdogSeconds
+                    << " s (from " << (watchdogFromEnvironment ? "MITK_UI_WATCHDOG" : "--MITK.ui-watchdog")
+                    << ").";
+
+          // Parented to the application: it lives for the session and its
+          // QTimer runs on the UI thread once the event loop starts.
+          d->m_UiWatchdog = new QmitkUiFreezeWatchdog(std::chrono::seconds(watchdogSeconds), d->m_QApp);
+        }
+        else
+        {
+          MITK_WARN << "UI-freeze watchdog not armed: the crash-dump facility is inactive, "
+                       "so a freeze could not be captured anyway.";
+        }
+      }
+#endif
     }
 
     return qApp;
@@ -1036,6 +1097,18 @@ namespace mitk
       .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreferencesPatchOption));
     options.addOption(preferencesPatchOption);
 
+    Poco::Util::Option noCrashDumpsOption(ARG_NO_CRASH_DUMPS.toStdString(), "",
+      "disable the crash-dump facility for this session");
+    noCrashDumpsOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
+    options.addOption(noCrashDumpsOption);
+
+    // Registered unconditionally, like the option above: a build without crash
+    // handling ignores it rather than refusing to start on an unknown option.
+    Poco::Util::Option uiWatchdogOption(ARG_UI_WATCHDOG.toStdString(), "",
+      "enable the UI-freeze watchdog with the given timeout in seconds (opt-in)");
+    uiWatchdogOption.argument("<seconds>").binding(ARG_UI_WATCHDOG.toStdString());
+    options.addOption(uiWatchdogOption);
+
     // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
     // Qt. Otherwise, Poco would throw exceptions for unknown options.
     defineQtOptions(options);
@@ -1083,8 +1156,69 @@ namespace mitk
     return d->m_FWProps;
   }
 
+#ifdef MITK_HAS_CRASHHANDLING
+  namespace
+  {
+    bool crashDumpsDisabled(int argc, char** argv)
+    {
+      if (qEnvironmentVariableIsSet("MITK_NO_CRASH_DUMPS"))
+        return true;
+
+      // Poco parses options later, during init(); the raw argv is all that
+      // is available this early. Consequently, an application .ini file
+      // cannot disable the facility.
+      const auto flag = "--" + BaseApplication::ARG_NO_CRASH_DUMPS;
+
+      for (int i = 1; i < argc; ++i)
+      {
+        if (flag == QLatin1String(argv[i]))
+          return true;
+      }
+
+      return false;
+    }
+
+    void initializeCrashDumpFacility(const QString& organizationName, const QString& applicationName)
+    {
+      if (organizationName.isEmpty() || applicationName.isEmpty())
+      {
+        MITK_WARN << "Crash-dump facility not armed: organization and application name must be set.";
+        return;
+      }
+
+      const auto dataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+
+      if (dataLocation.isEmpty())
+      {
+        MITK_WARN << "Crash-dump facility not armed: no writable generic data location.";
+        return;
+      }
+
+      // Follows the getCTKFrameworkStorageDir() convention, minus its
+      // per-install hash: the hash needs QCoreApplication, which must not
+      // exist yet - arming before Qt is what covers startup crashes.
+      const auto databaseDirectory = dataLocation + "/" + organizationName + "/" + applicationName + "/CrashDumps";
+
+      CrashDumpFacility::Config config;
+      config.DatabaseDirectory = std::filesystem::path(databaseDirectory.toStdWString());
+      config.ApplicationName = applicationName.toStdString();
+      config.ApplicationVersion = MITK_REVISION_DESC;
+
+      if (config.ApplicationVersion.empty())
+        config.ApplicationVersion = MITK_VERSION_STRING;
+
+      CrashDumpFacility::Initialize(config);
+    }
+  }
+#endif
+
   int BaseApplication::run()
   {
+#ifdef MITK_HAS_CRASHHANDLING
+    if (!crashDumpsDisabled(d->m_Argc, d->m_Argv))
+      initializeCrashDumpFacility(this->getOrganizationName(), this->getApplicationName());
+#endif
+
     try
     {
       this->setUnixOptions(true);

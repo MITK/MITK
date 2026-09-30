@@ -131,6 +131,53 @@ namespace mitk
      */
     void Resize(int w, int h) override;
 
+    /**
+     * \brief Lighting rig for the 3D scene.
+     *
+     * The GPU volume ray caster casts one shadow ray per light per sample when
+     * volumetric scattering is enabled, so the rig decides both the cost and
+     * how much of its own shadowing survives. The studio rig's five lights
+     * refill each other's shadows from five directions, which is both the most
+     * expensive option and the flattest. KeyLight keeps two deliberately
+     * unequal sources instead: enough to carve form, few enough to stay cheap.
+     *
+     * Headlight is not simply a dimmer rig: a single switched-on headlight at
+     * full intensity is the one configuration for which the ray caster compiles
+     * its default lighting path, where ambient is multiplied by the sample
+     * color and the shading normal is used as computed. Every other rig takes
+     * the multi-light path, where ambient is an untinted gray added to every
+     * sample and the normal is pushed through the prop matrix. The cost is that
+     * a light at the camera lights exactly what the camera sees, so it casts no
+     * visible shadow and volumetric scattering has nothing to darken.
+     */
+    enum class LightingMode
+    {
+      /** vtkLightKit: key, fill, head and two back lights. The default. */
+      Studio,
+      /** An off-axis directional key light with a dimmer, opposing fill. */
+      KeyLight,
+      /** A single headlight at full intensity, for the ray caster's default
+       * lighting path. Shadowless: pointless to combine with scattering. */
+      Headlight
+    };
+
+    /**
+     * \brief Select the lighting rig for this renderer.
+     *
+     * Lights belong to the renderer, so this affects every lit prop in the
+     * scene rather than any single one. Has no effect on 2D renderers, which
+     * deliberately carry no lights.
+     *
+     * \param[in] mode The rig to install.
+     */
+    void SetLightingMode(LightingMode mode);
+
+    /**
+     * \brief Return the active lighting rig.
+     * \return The currently installed lighting mode.
+     */
+    LightingMode GetLightingMode() const;
+
     // Picking
     enum PickingMode
     {
@@ -254,8 +301,14 @@ namespace mitk
     /** \brief Propagate vtkInformation object to all VTK-based mappers */
     void PropagateRenderInfoToMappers();
 
-    /** \brief Set parallel projection, remove the interactor and the lights of VTK. */
+    /** \brief Set projection and interactor for the current mapper ID; 2D gets no lights, 3D its rig back. */
     bool Initialize2DvtkCamera();
+
+    /** \brief Replace every light in the renderer with the given rig, even if it is the current one. */
+    void InstallLightingRig(LightingMode mode);
+
+    /** \brief Rescale the lights' ambient colors so their weighted sum stays 1.0. */
+    void NormalizeLightAmbientColors();
 
     bool m_InitNeeded;
     bool m_ResizeNeeded;
@@ -272,6 +325,10 @@ namespace mitk
     itk::SmartPointer<mitk::Mapper> m_CurrentWorldPlaneGeometryMapper;
 
     vtkLightKit *m_LightKit;
+    vtkLight *m_KeyLight;
+    vtkLight *m_FillLight;
+    vtkLight *m_Headlight;
+    LightingMode m_LightingMode;
 
     // sorted list of mappers
     MappersMapType m_MappersMap;

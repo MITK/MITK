@@ -1,0 +1,26 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef mitkCrashHandlingTestConfig_h
+#define mitkCrashHandlingTestConfig_h
+
+/* On multi-config generators the binaries live in a per-config
+   subdirectory that is only known at compile time (CMAKE_INTDIR). */
+#ifdef CMAKE_INTDIR
+#define MITK_CRASHDUMP_TEST_HELPER_DIR "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/" CMAKE_INTDIR
+#else
+#define MITK_CRASHDUMP_TEST_HELPER_DIR "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
+#endif
+
+#define MITK_CRASHDUMP_TEST_HELPER_EXECUTABLE "MitkCrashDumpTestHelper@CMAKE_EXECUTABLE_SUFFIX@"
+
+#endif

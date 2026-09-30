@@ -174,6 +174,22 @@ namespace mitk
     /** \brief Get the LocalStorage corresponding to the current renderer. */
     LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
+    /** \brief Whether a render window shows a surface of a group that was extracted before the
+     * group image reached the given MTime.
+     *
+     * As surfaces may be extracted in the background, a change of a group image may show up in
+     * the 3D windows only later. This tells when it has, e.g. to show a stand-in until then.
+     *
+     * Only render windows count that showed the segmentation when they last rendered, that have
+     * a size, and whose rendering is not suspended (see RenderingManager::SetRenderingSuspended()).
+     * A render window still waiting for the first surface of the group counts as showing an older
+     * one.
+     *
+     * \param groupImage A group image of the segmentation.
+     * \param mTime An MTime of the group image.
+     */
+    bool ShowsSurfaceOlderThan(const Image* groupImage, itk::ModifiedTimeType mTime);
+
     /** \brief Set the default properties for multilabel segmentation rendering.
      * \param node The data node to set the properties on.
      * \param renderer The renderer for renderer-specific properties, or nullptr for global properties.

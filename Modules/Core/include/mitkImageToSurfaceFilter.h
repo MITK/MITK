@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <vtkImageData.h>
 
-#include <vtkMarchingCubes.h>
 #include <vtkSmoothPolyDataFilter.h>
 
 namespace mitk
@@ -33,7 +32,8 @@ namespace mitk
    * \brief Converts pixel data to surface data by using a threshold.
    *
    * The mitkImageToSurfaceFilter is used to create a new surface out of an MITK image. The filter
-   * uses a threshold to define the surface. It is based on the vtkMarchingCubes algorithm. By default
+   * uses a threshold to define the surface. It is based on vtkFlyingEdges3D, a parallel variant of
+   * marching cubes. By default
    * a vtkPolyData surface based on an input threshold for the input image will be created. Optionally
    * it is possible to reduce the number of triangles/polygons [SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro) and
    * SetTargetReduction(float)]
@@ -116,7 +116,7 @@ namespace mitk
     void SetSmoothRelaxation(float smoothRelaxation);
 
     /**
-     * \brief Set the threshold used for surface extraction via vtkMarchingCubes.
+     * \brief Set the threshold used for surface extraction.
      *
      * All pixels in the input image with values higher than this threshold
      * will be considered in the surface. Default value is 1.
@@ -124,9 +124,25 @@ namespace mitk
     itkSetMacro(Threshold, ScalarType);
 
     /**
-     * \brief Get the threshold used for vtkMarchingCubes surface extraction.
+     * \brief Get the threshold used for surface extraction.
      */
     itkGetConstMacro(Threshold, ScalarType);
+
+    /**
+     * \brief Merge coincident points of the extracted surface, and drop the cells that degenerate by it.
+     *
+     * The surface extraction creates coincident points only where the image takes exactly the
+     * threshold value, which is common for integer images such as binary masks. Callers whose input
+     * practically never hits the threshold exactly, such as distance maps, can skip the merge.
+     * Default is true.
+     */
+    itkSetMacro(MergeCoincidentPoints, bool);
+
+    /** \brief Toggle merging coincident points on/off. */
+    itkBooleanMacro(MergeCoincidentPoints);
+
+    /** \brief Get whether coincident points are merged. */
+    itkGetConstMacro(MergeCoincidentPoints, bool);
 
     /**
      * \brief Enable vtkSmoothPolyDataFilter for Laplacian smoothing.
@@ -203,7 +219,7 @@ namespace mitk
     ~ImageToSurfaceFilter() override;
 
     /**
-     * \brief Create the surface for a single time step using vtkMarchingCubes.
+     * \brief Create the surface for a single time step using vtkFlyingEdges3D.
      *
      * Optionally applies smoothing and decimation based on the current filter settings.
      *
@@ -231,6 +247,9 @@ namespace mitk
 
     /** \brief The relaxation factor for the smoothing filter. Default is 0.1. */
     float m_SmoothRelaxation;
+
+    /** \brief Flag whether coincident points are merged (default is true). */
+    bool m_MergeCoincidentPoints;
 
     /** \brief Task to report progress into, or nullptr to report none. */
     ProgressTask *m_ProgressTask;

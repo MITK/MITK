@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <mitkTimeGeometry.h>
 #include <mitkAntiAliasing.h>
 
+#include <set>
+
 class vtkRenderWindow;
 class vtkObject;
 
@@ -168,6 +170,24 @@ namespace mitk
      * \param[in] renderWindow The render window to update.
      */
     void ForceImmediateUpdate(vtkRenderWindow *renderWindow);
+
+    /**
+     * \brief Suspend or resume the execution of update requests for the specified render window.
+     *
+     * Meant for render windows that cannot be seen, e.g. while hidden. Requests for a suspended
+     * render window stay pending and are executed once it is resumed. ForceImmediateUpdate()
+     * and ForceImmediateUpdateAll() still render a suspended render window.
+     *
+     * \param[in] renderWindow The render window to suspend or resume.
+     * \param[in] suspended Whether to suspend the execution of update requests.
+     */
+    void SetRenderingSuspended(vtkRenderWindow *renderWindow, bool suspended);
+
+    /**
+     * \brief Whether the execution of update requests is suspended for the specified render window.
+     * \sa SetRenderingSuspended()
+     */
+    bool IsRenderingSuspended(vtkRenderWindow *renderWindow) const;
 
     /**
      * \brief Request a deferred update for all registered render windows.
@@ -517,6 +537,7 @@ namespace mitk
 
     RenderWindowList m_RenderWindowList;
     RenderWindowVector m_AllRenderWindows;
+    std::set<vtkRenderWindow *> m_SuspendedRenderWindows;
 
     struct RenderWindowCallbacks
     {

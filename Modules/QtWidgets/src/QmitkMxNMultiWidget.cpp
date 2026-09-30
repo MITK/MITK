@@ -1248,6 +1248,14 @@ void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
   auto* root = this->RootSplitter();
   if (nullptr == root)
   {
+    // Without a tree there is nothing to maximize, and a captured state would
+    // describe splitters that are gone.
+    m_PreMaximizeSizes.clear();
+    if (!m_MaximizedCell.isEmpty())
+    {
+      m_MaximizedCell.clear();
+      emit MaximizedCellChanged(m_MaximizedCell);
+    }
     return;
   }
 
@@ -1299,9 +1307,14 @@ void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
 
   if (nullptr == maximized && !m_PreMaximizeSizes.empty())
   {
+    // The layout manager deletes the splitter tree on every layout change, so
+    // a caller that reaches it while maximized leaves stale entries behind.
     for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
     {
-      splitter->setSizes(sizes);
+      if (nullptr != splitter)
+      {
+        splitter->setSizes(sizes);
+      }
     }
     m_PreMaximizeSizes.clear();
   }

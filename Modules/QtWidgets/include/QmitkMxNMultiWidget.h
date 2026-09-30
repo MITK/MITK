@@ -1557,7 +1557,7 @@ private:
   *        way out and serialized in place of the live ones while maximized.
   *        Empty exactly when no cell is maximized.
   */
-  std::vector<std::pair<QSplitter*, QList<int>>> m_PreMaximizeSizes;
+  std::vector<std::pair<QPointer<QSplitter>, QList<int>>> m_PreMaximizeSizes;
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;

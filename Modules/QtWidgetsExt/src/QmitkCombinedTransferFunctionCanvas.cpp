@@ -342,6 +342,10 @@ void QmitkCombinedTransferFunctionCanvas::paintEvent(QPaintEvent * /*e*/)
     painter.save();
     painter.setClipRect(QRect(contents.left() - 1, 0, contents.width() + 2, this->height()));
 
+    // The vertices stay on whole pixels: the two-pixel pen then covers exactly two
+    // rows along the flat stretches, which stay sharp, and the line bends right at
+    // the centers of the handles, which are placed the same way.
+    painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(Qt::black, 2));
     painter.drawPolyline(curve);
 
@@ -359,6 +363,7 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
   // Both functions carry handles at once: which one a gesture means follows from
   // where it lands, so hiding either would only hide what can be done.
   painter.save();
+  painter.setRenderHint(QPainter::Antialiasing);
 
   const int selected = this->GetSelectedColorStop();
   const int lowerEdge = this->EdgeColorStop(AxisEdge::Lower);
@@ -374,10 +379,6 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
            !this->IsColorStopOffAxis(index);
   };
 
-  // Kept to the markers: the antialiasing they need would blur the one-pixel
-  // outlines of the handles.
-  painter.save();
-
   // The selected one last, since markers are wide enough that two close stops
   // overlap and the one being worked on is the one that has to stay whole.
   for (int i = 0; i < this->GetColorStopCount(); ++i)
@@ -388,8 +389,6 @@ void QmitkCombinedTransferFunctionCanvas::PaintHandles(QPainter &painter)
 
   if (selected != -1)
     this->PaintColorStop(painter, selected, true);
-
-  painter.restore();
 
   // Over the markers, since a point at low opacity reaches down onto the rail
   // and is the one a press there grabs.

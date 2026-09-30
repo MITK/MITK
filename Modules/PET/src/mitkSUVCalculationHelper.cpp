@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSlicedGeometry3D.h>
 #include <nlohmann/json.hpp>
 
+#include "mitkSUVFunctionalGroupAccess.h"
+
 #include <chrono>
 namespace
 {
@@ -1041,17 +1043,6 @@ namespace
     return infos[0].halfLifeSeconds;
   }
 
-  // Attribute of a single-item functional-group macro, addressed the way the
-  // reader publishes it: relative to the functional-group item, with the
-  // macro's one item named explicitly.
-  mitk::DICOMTagPath MacroAttribute(unsigned int macroGroup, unsigned int macroElement,
-                                    unsigned int group, unsigned int element)
-  {
-    mitk::DICOMTagPath path;
-    path.AddSelection(macroGroup, macroElement, 0);
-    return path.AddElement(group, element);
-  }
-
   // Fill the decay map of an Enhanced PET object whose pixels are not decay
   // corrected: the reference is the moment each frame was measured, so every
   // slice resolves its own instant from (0018,9151) Frame Reference DateTime,
@@ -1064,9 +1055,12 @@ namespace
                             mitk::DICOMReadPolicy policy,
                             mitk::DecayCorrectionInfo& info)
   {
-    const auto frameReferencePath = MacroAttribute(0x0020, 0x9111, 0x0018, 0x9151);
-    const auto acquisitionPath    = MacroAttribute(0x0020, 0x9111, 0x0018, 0x9074);
-    const auto durationPath       = MacroAttribute(0x0020, 0x9111, 0x0018, 0x9220);
+    using mitk::SUVFunctionalGroupAccess::FirstMatch;
+    using mitk::SUVFunctionalGroupAccess::MacroAttribute;
+    using mitk::SUVFunctionalGroupAccess::ValueAt;
+    const auto frameReferenceProp = FirstMatch(data, MacroAttribute(0x0020, 0x9111, 0x0018, 0x9151));
+    const auto acquisitionProp    = FirstMatch(data, MacroAttribute(0x0020, 0x9111, 0x0018, 0x9074));
+    const auto durationProp       = FirstMatch(data, MacroAttribute(0x0020, 0x9111, 0x0018, 0x9220));
 
     const auto timeSteps = data->GetTimeSteps();
     for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
@@ -1079,7 +1073,7 @@ namespace
         const auto z = static_cast<mitk::SlicedData::IndexValueType>(s);
 
         const std::string frameReference =
-          TrimAsciiWhitespace(mitk::GetDICOMValueAtSlot(data, frameReferencePath, t, z));
+          TrimAsciiWhitespace(ValueAt(frameReferenceProp, t, z));
         if (!frameReference.empty())
         {
           OFDateTime reference;
@@ -1095,7 +1089,7 @@ namespace
         }
 
         const std::string acquisition =
-          TrimAsciiWhitespace(mitk::GetDICOMValueAtSlot(data, acquisitionPath, t, z));
+          TrimAsciiWhitespace(ValueAt(acquisitionProp, t, z));
         if (acquisition.empty())
         {
           mitkThrowException(mitk::MissingDICOMPropertyException)
@@ -1113,7 +1107,7 @@ namespace
         }
 
         const std::string duration =
-          TrimAsciiWhitespace(mitk::GetDICOMValueAtSlot(data, durationPath, t, z));
+          TrimAsciiWhitespace(ValueAt(durationProp, t, z));
         if (duration.empty())
         {
           mitkThrowException(mitk::MissingDICOMPropertyException)
@@ -1164,6 +1158,8 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
   // administration time. Only how the reference is found differs.
   if (IsEnhancedPETInput(data))
   {
+    // Ahead of the (0018,9758) branch: unmapped frames also mean the reader
+    // could not apply the per-frame rescale, which no decay path repairs.
     RequireEnhancedPETFramesResolved(data);
 
     const auto admin = ResolveAdministrationTimeTags(data);

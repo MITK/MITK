@@ -213,6 +213,8 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   MITK_TEST(EnhancedPET_GmlSUVbw_ClassifiesAsPrenormalizedBW);
   MITK_TEST(EnhancedPET_UniformPerFrameRescale_Accepted);
   MITK_TEST(EnhancedPET_RescaleWrittenTwoWays_Accepted);
+  MITK_TEST(EnhancedPET_MappingAtHigherPrecision_Accepted);
+  MITK_TEST(EnhancedPET_MappingDiffersFromTransformation_Refuses);
   MITK_TEST(EnhancedPET_VaryingPerFrameRescale_Accepted);
   MITK_TEST(EnhancedPET_FramesUnresolvedByReader_Refuses);
   MITK_TEST(EnhancedPET_SingleFrameObject_Accepted);
@@ -629,6 +631,32 @@ public:
     SetMapping(img, 1, 0, {"Bq/ml", "4", "0.0"});
 
     CPPUNIT_ASSERT_NO_THROW(ClassifyEnhanced(img));
+  }
+
+  void EnhancedPET_MappingAtHigherPrecision_Accepted()
+  {
+    // A DS often carries fewer significant digits than the FD of the mapping
+    // that describes the same values, and an intercept of zero may come back
+    // from a double computation as a residue.
+    auto img = MakeEnhancedImage(2, "", {"3.2856e-05", "3.2856e-05"});
+    SetMapping(img, 0, 0, {"Bq/ml", "3.28563917e-05", "0"});
+    SetMapping(img, 1, 0, {"Bq/ml", "3.28563917e-05", "1e-15"});
+
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::ActivityConcentration == m.semantics);
+  }
+
+  void EnhancedPET_MappingDiffersFromTransformation_Refuses()
+  {
+    auto slopeDiffers = MakeEnhancedImage(2, "", {"4", "4"});
+    SetMapping(slopeDiffers, 0, 0, {"Bq/ml", "4.3", "0"});
+    SetMapping(slopeDiffers, 1, 0, {"Bq/ml", "4.3", "0"});
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(slopeDiffers), mitk::EnhancedPETMappingNotAppliedException);
+
+    auto interceptDiffers = MakeEnhancedImage(2, "", {"4", "4"});
+    SetMapping(interceptDiffers, 0, 0, {"Bq/ml", "4", "0.3"});
+    SetMapping(interceptDiffers, 1, 0, {"Bq/ml", "4", "0.3"});
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(interceptDiffers), mitk::EnhancedPETMappingNotAppliedException);
   }
 
   void EnhancedPET_VaryingPerFrameRescale_Accepted()

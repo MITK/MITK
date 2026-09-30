@@ -27,6 +27,8 @@ found in the LICENSE file.
 #include <mitkIPropertyProvider.h>
 #include <mitkSUVInputModel.h>
 
+#include "mitkSUVFunctionalGroupAccess.h"
+
 namespace
 {
   std::string TrimAndUpper(const std::string &s)
@@ -244,17 +246,9 @@ namespace
 
   using Slot = std::pair<mitk::TimeStepType, mitk::DICOMProperty::IndexValueType>;
 
-  // The reader publishes a functional-group attribute with one value per
-  // slice. A property that is not slice-resolved carries one value for the
-  // whole image and answers with it at every slot.
   std::string ValueAt(const mitk::BaseProperty* property, const Slot& slot)
   {
-    const auto* sliced = dynamic_cast<const mitk::DICOMProperty*>(property);
-    if (nullptr != sliced)
-    {
-      return sliced->GetValue(slot.first, slot.second, false, false);
-    }
-    return property->GetValueAsString();
+    return mitk::SUVFunctionalGroupAccess::ValueAt(property, slot.first, slot.second);
   }
 
   void AddSlotsOf(const mitk::BaseProperty* property, std::set<Slot>& slots)
@@ -274,30 +268,16 @@ namespace
     }
   }
 
-  mitk::BaseProperty::ConstPointer FirstMatch(const mitk::IPropertyProvider* provider,
-                                              const mitk::DICOMTagPath& path)
-  {
-    const auto matches = mitk::GetPropertyByDICOMTagPath(provider, path);
-    return matches.empty() ? mitk::BaseProperty::ConstPointer() : matches.begin()->second;
-  }
-
-  // Attribute of a single-item functional-group macro, with the macro's one
-  // item named explicitly: the reader publishes the item index, and a lookup
-  // answers from its first match, so a wildcard would only be safe by luck.
-  mitk::DICOMTagPath MacroAttribute(unsigned int macroGroup, unsigned int macroElement,
-                                    unsigned int group, unsigned int element)
-  {
-    mitk::DICOMTagPath path;
-    path.AddSelection(macroGroup, macroElement, 0);
-    return path.AddElement(group, element);
-  }
-
   // The same slope reads as "4.0" through the Pixel Value Transformation
   // Sequence (a DS) and "4" through the Real World Value Mapping Sequence
-  // (an FD), so the pairs are compared as numbers.
+  // (an FD), so the pairs are compared as numbers. A DS often carries only a
+  // few significant digits of the FD it was written from, hence the relative
+  // term; the absolute one lets a zero intercept equal a double residue. Both
+  // stay far below the factor that separates a Bq/ml from an SUV mapping.
   bool NearlyEqual(double a, double b)
   {
-    return std::fabs(a - b) <= 1e-9 * std::max(std::fabs(a), std::fabs(b));
+    const double difference = std::fabs(a - b);
+    return difference <= 1e-12 || difference <= 1e-4 * std::max(std::fabs(a), std::fabs(b));
   }
 
   std::string Describe(const Slot& slot)
@@ -680,6 +660,8 @@ mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const IPropertyProvider *prov
     mappingIntercepts[MappingItemIndex(match.first)] = match.second;
   }
 
+  using SUVFunctionalGroupAccess::FirstMatch;
+  using SUVFunctionalGroupAccess::MacroAttribute;
   const auto appliedSlope     = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1053));
   const auto appliedIntercept = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1052));
   const auto rescaleType      = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1054));

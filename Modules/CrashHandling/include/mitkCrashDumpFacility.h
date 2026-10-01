@@ -37,7 +37,9 @@ namespace mitk
     /** e.g. "MITK Workbench <version>". */
     std::string Release;
     std::filesystem::path InstallDirectory;
-    /** Empty if the dump was taken before the session's log was opened. */
+    /** Where the session's log was written; empty if the dump was taken
+     *  before the log was opened. Log rotation renames that file on the next
+     *  start of the same install, so read CrashDumpInfo::SessionLog instead. */
     std::filesystem::path LogFile;
   };
 
@@ -50,6 +52,9 @@ namespace mitk
     DumpKind Kind = DumpKind::Crash;
     /** Empty when the dump carries no run info (older dumps, unsupported platform). */
     std::optional<CrashRunInfo> RunInfo;
+    /** Copy of the session's log kept next to the dump, deleted with it;
+     *  empty when there is none. */
+    std::filesystem::path SessionLog;
   };
 
   /**
@@ -64,8 +69,6 @@ namespace mitk
   struct MITKCRASHHANDLING_EXPORT CrashDumpSettings
   {
     static constexpr int MinRetention = 1;
-    /** Matches the number of session logs mitk::LogBackend retains, so that a
-     *  kept dump's log can still exist. Change both together. */
     static constexpr int MaxRetention = 10;
     static constexpr int MinWatchdogTimeoutSeconds = 10;
     static constexpr int MaxWatchdogTimeoutSeconds = 3600;

@@ -197,15 +197,23 @@ namespace
     return dumps;
   }
 
-  /** Crash dumps get their sidecar lazily, from the report's attachment:
-   *  the handler writes it after this process is gone, and another instance
-   *  sharing the database can crash at any time. */
+  /** Crash dumps get their run info and log copy lazily: the handler writes
+   *  the dump after the crashed process is gone, and another instance sharing
+   *  the database can crash at any time. The first chance is usually the
+   *  next Initialize() of the crashed install, which runs before its logs are
+   *  rotated; KeepSessionLog() refuses a log written after the dump. */
   std::vector<mitk::CrashDumpInfo> WithRunInfo(std::vector<mitk::CrashDumpInfo> dumps)
   {
     for (auto& dump : dumps)
     {
       if (mitk::DumpKind::Crash == dump.Kind)
+      {
         mitk::AdoptRunInfoAttachment(s_State.DatabaseDirectory, dump.Path.stem(), dump.Path);
+
+        const auto runInfo = mitk::ReadRunInfo(mitk::GetRunInfoSidecarPath(dump.Path));
+        if (runInfo.has_value())
+          mitk::KeepSessionLog(dump.Path, runInfo->LogFile, dump.LastWriteTime);
+      }
 
       mitk::LoadRunInfo(dump);
     }
@@ -257,6 +265,9 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
       { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir });
     PruneCrashDumps(s_State.DatabaseDirectory / kSnapshotsSubdir, maxDumps);
     PruneCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir, maxDumps);
+
+    WithRunInfo(ScanCrashDumps(s_State.DatabaseDirectory,
+      { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir }));
 
     if (!config.Arm)
     {
@@ -466,6 +477,7 @@ bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
   const bool removed = std::filesystem::remove(dumpPath, error) && !error;
 
   std::filesystem::remove(GetRunInfoSidecarPath(dumpPath), error);
+  std::filesystem::remove(GetSessionLogCopyPath(dumpPath), error);
   RemoveCrashReportResidue(s_State.DatabaseDirectory, dumpPath);
 
   return removed;
@@ -575,6 +587,16 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
     // The run info lives in the report's attachments, which go with the
     // report below.
     AdoptRunInfoAttachment(database, newDump.stem(), destination);
+
+    std::filesystem::path logFile;
+    {
+      std::lock_guard<std::mutex> runInfoLock(s_RunInfoMutex);
+      logFile = s_State.RunInfo.LogFile;
+    }
+
+    // The log as written so far; the running session keeps the name until
+    // its install starts again.
+    KeepSessionLog(destination, logFile, std::nullopt);
   }
 
   // Either way the dump is no longer Crashpad's to hold - filed under its
@@ -604,6 +626,7 @@ void mitk::CrashDumpFacility::PurgeProvisionalSnapshots()
     std::error_code error;
     std::filesystem::remove(snapshot, error);
     std::filesystem::remove(GetRunInfoSidecarPath(snapshot), error);
+    std::filesystem::remove(GetSessionLogCopyPath(snapshot), error);
   }
 
   s_State.ProvisionalSnapshots.clear();

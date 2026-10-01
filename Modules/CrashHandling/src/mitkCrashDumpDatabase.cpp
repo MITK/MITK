@@ -106,10 +106,11 @@ namespace
     return true;
   }
 
-  void RemoveSidecar(const std::filesystem::path& dumpPath)
+  void RemoveSidecars(const std::filesystem::path& dumpPath)
   {
     std::error_code error;
     std::filesystem::remove(mitk::GetRunInfoSidecarPath(dumpPath), error);
+    std::filesystem::remove(mitk::GetSessionLogCopyPath(dumpPath), error);
   }
 
   /** Reads \p key into \p value if present with the right type; a present
@@ -223,7 +224,7 @@ std::size_t mitk::PruneCrashDumps(const std::filesystem::path& databaseDirectory
     std::error_code error;
     if (std::filesystem::remove(dumps[i].Path, error) && !error)
     {
-      RemoveSidecar(dumps[i].Path);
+      RemoveSidecars(dumps[i].Path);
       ++deleted;
     }
   }
@@ -421,4 +422,35 @@ bool mitk::AdoptRunInfoAttachment(const std::filesystem::path& databaseDirectory
 void mitk::LoadRunInfo(CrashDumpInfo& dump)
 {
   dump.RunInfo = ReadRunInfo(GetRunInfoSidecarPath(dump.Path));
+
+  const auto logCopy = GetSessionLogCopyPath(dump.Path);
+  std::error_code error;
+  dump.SessionLog = std::filesystem::exists(logCopy, error) ? logCopy : std::filesystem::path();
+}
+
+std::filesystem::path mitk::GetSessionLogCopyPath(const std::filesystem::path& dumpPath)
+{
+  return std::filesystem::path(dumpPath) += ".log";
+}
+
+bool mitk::KeepSessionLog(const std::filesystem::path& dumpPath, const std::filesystem::path& logFile,
+  std::optional<std::filesystem::file_time_type> notAfter)
+{
+  const auto copy = GetSessionLogCopyPath(dumpPath);
+
+  std::error_code error;
+  if (std::filesystem::exists(copy, error))
+    return true;
+
+  if (logFile.empty() || !std::filesystem::is_regular_file(logFile, error))
+    return false;
+
+  if (notAfter.has_value())
+  {
+    const auto logTime = std::filesystem::last_write_time(logFile, error);
+    if (error || logTime > *notAfter)
+      return false;
+  }
+
+  return std::filesystem::copy_file(logFile, copy, error) && !error;
 }

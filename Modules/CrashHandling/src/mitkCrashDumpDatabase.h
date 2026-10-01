@@ -66,8 +66,8 @@ namespace mitk
     const std::filesystem::path& databaseDirectory,
     const std::vector<std::filesystem::path>& excludedSubdirs = {});
 
-  /** \brief Delete the oldest dumps, with their run-info sidecars, so that at
-   *  most \p maxCount remain. Returns the number of dumps actually deleted. */
+  /** \brief Delete the oldest dumps, with their run info and log copies, so
+   *  that at most \p maxCount remain. Returns the number of dumps actually deleted. */
   MITKCRASHHANDLING_EXPORT std::size_t PruneCrashDumps(
     const std::filesystem::path& databaseDirectory, std::size_t maxCount,
     const std::vector<std::filesystem::path>& excludedSubdirs = {});
@@ -153,7 +153,24 @@ namespace mitk
   MITKCRASHHANDLING_EXPORT bool AdoptRunInfoAttachment(const std::filesystem::path& databaseDirectory,
     const std::filesystem::path& reportId, const std::filesystem::path& dumpPath);
 
-  /** \brief Fill \p dump's RunInfo from its sidecar, if there is one. */
+  /** \brief Where the copy of a dump's session log is kept: next to it, as
+   *  "<dump file name>.log". */
+  MITKCRASHHANDLING_EXPORT std::filesystem::path GetSessionLogCopyPath(
+    const std::filesystem::path& dumpPath);
+
+  /** \brief Keep a copy of \p logFile with the dump \p dumpPath, unless it
+   *  already has one. Returns whether a copy exists afterwards.
+   *
+   *  Log rotation hands the session's log name to the next session of the
+   *  same install, so the file found under that name is the dump's own log
+   *  only until then. With \p notAfter, a log written later than that is
+   *  taken to be such a later session's and not copied. An existing copy is
+   *  never replaced. */
+  MITKCRASHHANDLING_EXPORT bool KeepSessionLog(const std::filesystem::path& dumpPath,
+    const std::filesystem::path& logFile, std::optional<std::filesystem::file_time_type> notAfter);
+
+  /** \brief Fill \p dump's RunInfo and SessionLog from the files kept next
+   *  to it, if there are any. */
   MITKCRASHHANDLING_EXPORT void LoadRunInfo(CrashDumpInfo& dump);
 }
 

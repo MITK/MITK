@@ -27,13 +27,10 @@ namespace
 {
   QString LogLabel(const mitk::CrashDumpInfo& dump)
   {
-    if (!dump.RunInfo.has_value() || dump.RunInfo->LogFile.empty())
-      return "unknown";
+    if (!dump.SessionLog.empty())
+      return "available";
 
-    // A log is rotated away after ten later sessions of the same install,
-    // which can happen while the dump is still kept.
-    std::error_code error;
-    return std::filesystem::exists(dump.RunInfo->LogFile, error) ? "available" : "no longer available";
+    return dump.RunInfo.has_value() ? "not available" : "unknown";
   }
 
   QString VersionLabel(const mitk::CrashDumpInfo& dump)
@@ -102,8 +99,8 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
     for (int column = 0; column < m_Tree->columnCount(); ++column)
       item->setToolTip(column, path);
 
-    if (dump.RunInfo.has_value() && !dump.RunInfo->LogFile.empty())
-      item->setToolTip(LogColumn, QmitkCrashDumpUi::ToQString(dump.RunInfo->LogFile));
+    if (!dump.SessionLog.empty())
+      item->setToolTip(LogColumn, QmitkCrashDumpUi::ToQString(dump.SessionLog));
   }
 
   for (int column = 0; column < m_Tree->columnCount(); ++column)

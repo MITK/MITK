@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
   // Set after arming, as the applications do, so that the tests can tell
   // that the handler reads the run info at capture time.
-  mitk::CrashDumpFacility::SetSessionLogFile(config.DatabaseDirectory.parent_path() / "helper-session.log");
+  mitk::CrashDumpFacility::SetSessionLogFile(config.DatabaseDirectory / "helper-session.log");
 
   if (mode == "noop")
   {

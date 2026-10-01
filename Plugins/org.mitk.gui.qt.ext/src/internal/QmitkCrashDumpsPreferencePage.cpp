@@ -111,12 +111,6 @@ void QmitkCrashDumpsPreferencePage::CreateQtControl(QWidget* parent)
   m_MaxDumpsSpinBox->setRange(Settings::MinRetention, Settings::MaxRetention);
   form->addRow("Dumps kept per kind:", m_MaxDumpsSpinBox);
 
-  auto* retentionNote = new QLabel(QString(
-    "At most %1, because MITK keeps the logs of only the last %1 sessions and a dump is most useful "
-    "together with the log of its session.").arg(Settings::MaxRetention));
-  retentionNote->setWordWrap(true);
-  form->addRow(retentionNote);
-
   if (mitk::CrashDumpFacility::SupportsSnapshots())
   {
     m_WatchdogCheckBox = new QCheckBox("Watchdog for unresponsive sessions");

@@ -16,11 +16,14 @@ found in the LICENSE file.
 
 #include <QmitkCrashDumpListWidget.h>
 
+#include <algorithm>
+
 #include <mitkICrashReportService.h>
 #include <mitkLog.h>
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -28,6 +31,7 @@ found in the LICENSE file.
 #include <QPointer>
 #include <QPushButton>
 #include <QStringList>
+#include <QUrl>
 #include <QVBoxLayout>
 
 namespace
@@ -160,17 +164,8 @@ void QmitkCrashDumpManagerDialog::OnSelectionChanged()
   const auto selected = m_List->GetSelectedDumps();
   const bool hasSelection = !selected.empty();
 
-  bool anyLogAvailable = false;
-  for (const auto& dump : selected)
-  {
-    std::error_code error;
-    if (dump.RunInfo.has_value() && !dump.RunInfo->LogFile.empty() &&
-        std::filesystem::exists(dump.RunInfo->LogFile, error))
-    {
-      anyLogAvailable = true;
-      break;
-    }
-  }
+  const bool anyLogAvailable = std::any_of(selected.begin(), selected.end(),
+    [](const mitk::CrashDumpInfo& dump) { return !dump.SessionLog.empty(); });
 
   m_FileReportButton->setEnabled(hasSelection);
   m_ShowInFolderButton->setEnabled(hasSelection);
@@ -195,15 +190,12 @@ void QmitkCrashDumpManagerDialog::OnShowInFolder()
 
 void QmitkCrashDumpManagerDialog::OnShowLog()
 {
-  std::vector<std::filesystem::path> logs;
   for (const auto& dump : m_List->GetSelectedDumps())
   {
     std::error_code error;
-    if (dump.RunInfo.has_value() && std::filesystem::exists(dump.RunInfo->LogFile, error))
-      logs.push_back(dump.RunInfo->LogFile);
+    if (!dump.SessionLog.empty() && std::filesystem::exists(dump.SessionLog, error))
+      QDesktopServices::openUrl(QUrl::fromLocalFile(QmitkCrashDumpUi::ToQString(dump.SessionLog)));
   }
-
-  QmitkCrashDumpUi::ShowInFolders(logs);
 }
 
 void QmitkCrashDumpManagerDialog::OnCopyPath()

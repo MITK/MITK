@@ -143,6 +143,7 @@ public:
     m_FreezeDump = this->CreateDump("mitk-pending-freeze/freeze.dmp", 10);
 
     WriteSidecar(m_CrashDump, "MITK Test 1.0", log);
+    std::ofstream(std::filesystem::path(m_CrashDump) += ".log") << "kept log";
     WriteSidecar(m_OnDemandDump, "", m_DatabaseDirectory / "rotated-away.log");
 
     mitk::CrashDumpFacility::Config config;
@@ -188,7 +189,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("MITK Test 1.0"), text(2, Column::VersionColumn));
 
     CPPUNIT_ASSERT_EQUAL(std::string("unknown"), text(0, Column::LogColumn));
-    CPPUNIT_ASSERT_EQUAL(std::string("no longer available"), text(1, Column::LogColumn));
+    CPPUNIT_ASSERT_EQUAL(std::string("not available"), text(1, Column::LogColumn));
     CPPUNIT_ASSERT_EQUAL(std::string("available"), text(2, Column::LogColumn));
 
     CPPUNIT_ASSERT_EQUAL(std::string("new"), text(0, Column::StatusColumn));

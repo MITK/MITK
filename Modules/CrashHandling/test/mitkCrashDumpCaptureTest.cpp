@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <string>
 #include <thread>
 #include <vector>
@@ -149,6 +150,7 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   // Run-info attachments are verified on Windows only so far; Linux shares
   // the code path and is expected to pass, macOS is unexplored.
   MITK_TEST(CrashDumpCarriesRunInfo);
+  MITK_TEST(CrashDumpDoesNotKeepALaterSessionsLog);
   MITK_TEST(SnapshotCarriesRunInfo);
 #endif
   CPPUNIT_TEST_SUITE_END();
@@ -562,33 +564,77 @@ public:
     CPPUNIT_ASSERT(!std::filesystem::exists(*snapshot));
   }
 
+  std::filesystem::path HelperLog() const
+  {
+    return m_DatabaseDirectory / "helper-session.log";
+  }
+
+  static std::string ReadFile(const std::filesystem::path& file)
+  {
+    std::ifstream stream(file);
+    return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+  }
+
   void CheckHelperRunInfo(const mitk::CrashDumpInfo& dump)
   {
     CPPUNIT_ASSERT_MESSAGE("the dump must carry run info", dump.RunInfo.has_value());
     CPPUNIT_ASSERT_EQUAL(std::string("MitkCrashDumpTestHelper 1.0"), dump.RunInfo->Release);
     CPPUNIT_ASSERT(std::filesystem::equivalent(MITK_CRASHDUMP_TEST_HELPER_DIR, dump.RunInfo->InstallDirectory));
     CPPUNIT_ASSERT_MESSAGE("the log path set after arming must be captured",
-      m_DatabaseDirectory.parent_path() / "helper-session.log" == dump.RunInfo->LogFile);
+      this->HelperLog() == dump.RunInfo->LogFile);
   }
 
   void CrashDumpCarriesRunInfo()
   {
+    std::ofstream(this->HelperLog()) << "crashed session";
     this->RunCrashModeAndExpectOneDump("segv");
+
+    // The next start of the crashed install initializes before the log is
+    // rotated, which is when the log under the recorded name is still the
+    // crashed session's.
+    mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
+
+    // Rotation then hands the name to the new session.
+    std::ofstream(this->HelperLog()) << "next session";
+
+    const auto dumps = mitk::CrashDumpFacility::ListAllDumps();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), dumps.size());
+    this->CheckHelperRunInfo(dumps.front());
+    CPPUNIT_ASSERT_MESSAGE("the dump must keep its own session's log",
+      !dumps.front().SessionLog.empty());
+    CPPUNIT_ASSERT_EQUAL(std::string("crashed session"), ReadFile(dumps.front().SessionLog));
+
+    const auto sidecar = mitk::GetRunInfoSidecarPath(dumps.front().Path);
+    const auto logCopy = dumps.front().SessionLog;
+    CPPUNIT_ASSERT(std::filesystem::exists(sidecar));
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(dumps.front().Path));
+    CPPUNIT_ASSERT_MESSAGE("deleting a dump must take its run info along", !std::filesystem::exists(sidecar));
+    CPPUNIT_ASSERT_MESSAGE("deleting a dump must take its log along", !std::filesystem::exists(logCopy));
+  }
+
+  /** If the log under the recorded name was written after the dump, the
+   *  crashed install has started again and rotated its logs before the dump
+   *  was first seen; that log is another session's and must not be kept. */
+  void CrashDumpDoesNotKeepALaterSessionsLog()
+  {
+    this->RunCrashModeAndExpectOneDump("segv");
+
+    const auto dumpTime = mitk::ScanCrashDumps(m_DatabaseDirectory).front().LastWriteTime;
+    std::ofstream(this->HelperLog()) << "later session";
+    std::filesystem::last_write_time(this->HelperLog(), dumpTime + std::chrono::minutes(5));
 
     mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
     const auto dumps = mitk::CrashDumpFacility::ListAllDumps();
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), dumps.size());
-    this->CheckHelperRunInfo(dumps.front());
-
-    const auto sidecar = mitk::GetRunInfoSidecarPath(dumps.front().Path);
-    CPPUNIT_ASSERT(std::filesystem::exists(sidecar));
-    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(dumps.front().Path));
-    CPPUNIT_ASSERT_MESSAGE("deleting a dump must take its run info along", !std::filesystem::exists(sidecar));
+    CPPUNIT_ASSERT(dumps.front().RunInfo.has_value());
+    CPPUNIT_ASSERT(dumps.front().SessionLog.empty());
   }
 
   void SnapshotCarriesRunInfo()
   {
+    std::ofstream(this->HelperLog()) << "snapshot session";
     this->RunHelperExpectingCleanExit("snapshot");
 
     mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
@@ -598,6 +644,8 @@ public:
     CPPUNIT_ASSERT(mitk::DumpKind::OnDemand == dumps.front().Kind);
     this->CheckHelperRunInfo(dumps.front());
     CPPUNIT_ASSERT(!AnyReportResidueExists(m_DatabaseDirectory));
+    CPPUNIT_ASSERT_MESSAGE("a snapshot must keep the log as it was at capture", !dumps.front().SessionLog.empty());
+    CPPUNIT_ASSERT_EQUAL(std::string("snapshot session"), ReadFile(dumps.front().SessionLog));
   }
 #endif
 };

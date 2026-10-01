@@ -74,7 +74,7 @@ A crash dump contains parts of the application's memory from the crashed session
 
 \subsection MITKWorkbenchManualPage_CrashDumpDialog_Manager Diagnostic Data
 
-<i>Help > Diagnostic Data...</i> lists all saved dumps: crash dumps, dumps of terminated unresponsive sessions, and snapshots captured with "Capture diagnostics" from an error message. For each dump it shows when it was written, its size, the MITK version, whether the log file of that session still exists, and whether it is new or was already shown. You can show a dump or its log in the file manager, copy its path, and delete selected or all dumps. Deleting cannot be undone.
+<i>Help > Diagnostic Data...</i> lists all saved dumps: crash dumps, dumps of terminated unresponsive sessions, and snapshots captured with "Capture diagnostics" from an error message. For each dump it shows when it was written, its size, the MITK version, whether a copy of that session's log file was kept with it, and whether it is new or was already shown. You can show a dump in the file manager, open its log, copy its path, and delete selected or all dumps. Deleting cannot be undone.
 
 \subsection MITKWorkbenchManualPage_CrashDumpDialog_Preferences Preferences
 
@@ -82,7 +82,7 @@ The page <i>Reports and Diagnostics > Crash Dumps</i> in the preferences control
 
 <ul>
   <li><b>Record crash dumps</b> - whether dumps are written at all.</li>
-  <li><b>Dumps kept per kind</b> - how many of the most recent dumps of each kind are kept (1 to 10). The limit is 10 because MITK keeps the log files of only the last 10 sessions.</li>
+  <li><b>Dumps kept per kind</b> - how many of the most recent dumps of each kind are kept (1 to 10). A dump's copy of its session log is deleted together with it.</li>
   <li><b>Watchdog for unresponsive sessions</b> - takes a snapshot when the user interface stops responding for the given time. The snapshot is deleted again if MITK recovers and is kept only if MITK has to be terminated. Not available on macOS.</li>
 </ul>
 

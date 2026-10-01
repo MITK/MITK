@@ -49,6 +49,8 @@ class mitkCrashDumpDatabaseTestSuite : public mitk::TestFixture
   MITK_TEST(RunInfoRoundTripsNonAsciiPaths);
   MITK_TEST(MalformedRunInfoIsAbsent);
   MITK_TEST(AdoptRunInfoAttachmentCopiesItOnce);
+  MITK_TEST(KeepSessionLogCopiesItOnce);
+  MITK_TEST(KeepSessionLogRefusesALaterSessionsLog);
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_DatabaseDirectory;
@@ -278,11 +280,57 @@ public:
     const auto pruned = this->CreateDump("pruned.dmp", 20);
     std::ofstream(mitk::GetRunInfoSidecarPath(kept)) << "{}";
     std::ofstream(mitk::GetRunInfoSidecarPath(pruned)) << "{}";
+    std::ofstream(mitk::GetSessionLogCopyPath(kept)) << "log";
+    std::ofstream(mitk::GetSessionLogCopyPath(pruned)) << "log";
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::PruneCrashDumps(m_DatabaseDirectory, 1));
 
     CPPUNIT_ASSERT(std::filesystem::exists(mitk::GetRunInfoSidecarPath(kept)));
     CPPUNIT_ASSERT(!std::filesystem::exists(mitk::GetRunInfoSidecarPath(pruned)));
+    CPPUNIT_ASSERT(std::filesystem::exists(mitk::GetSessionLogCopyPath(kept)));
+    CPPUNIT_ASSERT(!std::filesystem::exists(mitk::GetSessionLogCopyPath(pruned)));
+  }
+
+  static std::string ReadFile(const std::filesystem::path& file)
+  {
+    std::ifstream stream(file);
+    return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+  }
+
+  void KeepSessionLogCopiesItOnce()
+  {
+    const auto dump = this->CreateDump("reports/report.dmp", 10);
+    const auto log = m_DatabaseDirectory / "mitk-0.log";
+    std::ofstream(log) << "crashed session";
+    std::filesystem::last_write_time(log, std::filesystem::last_write_time(dump) - std::chrono::seconds(5));
+
+    CPPUNIT_ASSERT(mitk::KeepSessionLog(dump, log, std::filesystem::last_write_time(dump)));
+    CPPUNIT_ASSERT_EQUAL(std::string("crashed session"), ReadFile(mitk::GetSessionLogCopyPath(dump)));
+
+    mitk::CrashDumpInfo info{ dump };
+    mitk::LoadRunInfo(info);
+    CPPUNIT_ASSERT(mitk::GetSessionLogCopyPath(dump) == info.SessionLog);
+
+    // A kept copy is final: what the file name holds later is another session.
+    std::ofstream(log) << "next session";
+    CPPUNIT_ASSERT(mitk::KeepSessionLog(dump, log, std::nullopt));
+    CPPUNIT_ASSERT_EQUAL(std::string("crashed session"), ReadFile(mitk::GetSessionLogCopyPath(dump)));
+  }
+
+  /** Log rotation reuses the name: a log written after the dump belongs to a
+   *  later session of the same install and must not be kept as the dump's. */
+  void KeepSessionLogRefusesALaterSessionsLog()
+  {
+    const auto dump = this->CreateDump("reports/report.dmp", 60);
+    const auto log = m_DatabaseDirectory / "mitk-0.log";
+    std::ofstream(log) << "later session";
+
+    CPPUNIT_ASSERT(!mitk::KeepSessionLog(dump, log, std::filesystem::last_write_time(dump)));
+    CPPUNIT_ASSERT(!std::filesystem::exists(mitk::GetSessionLogCopyPath(dump)));
+
+    mitk::CrashDumpInfo info{ dump };
+    mitk::LoadRunInfo(info);
+    CPPUNIT_ASSERT(info.SessionLog.empty());
   }
 
   void SettingsMissingFileYieldsDefaults()

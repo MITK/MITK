@@ -127,14 +127,6 @@ The Workbench and FlowBench edit the file through the
 <i>Reports and Diagnostics > Crash Dumps</i> preference page
 (mitk::CrashDumpFacility::WriteSettings()).
 
-The retention cap of 10 matches the number of session logs
-mitk::LogBackend keeps per install (<tt>mitk-0.log</tt> .. <tt>mitk-9.log</tt>).
-Each dump records its session's log (see \ref CrashDumpFacilityPage_RunInfo),
-and allowing more dumps than log generations would keep dumps whose logs are
-certainly gone. Even within the cap a log can be rotated away by later
-sessions, so the diagnostic data manager shows whether it still exists. If log
-rotation changes, the cap has to follow.
-
 Precedence at start-up is command line, then environment variable, then
 settings file: \c --MITK.no-crash-dumps and \c MITK_NO_CRASH_DUMPS disable
 crash dumps even when <tt>enabled</tt> is true, and \c --MITK.ui-watchdog
@@ -264,10 +256,21 @@ that QmitkCrashDumpDialog::ShowIfCrashedLastRun() adds once the log is open
 (mitk::CrashDumpFacility::SetSessionLogFile()) reaches every later dump.
 A dump taken before that point carries an empty log path.
 
+The recorded path alone would not do: mitk::LogBackend rotates
+<tt>mitk-0.log</tt> .. <tt>mitk-9.log</tt> on every start, so on the next
+start of the same install the name already belongs to the new session. The
+facility therefore keeps a copy of the log next to the dump
+(mitk::CrashDumpInfo::SessionLog). A snapshot copies the log as written so far
+at capture time. A crash dump gets its copy when it is first seen, normally in
+the next Initialize() of the crashed install, which runs before the logs are
+rotated; a log written after the dump is taken to be a later session's and is
+not copied, so such a dump simply has no log.
+
 The facility then keeps the run info next to the dump as
-<tt>&lt;dump file name&gt;.json</tt>: snapshots copy it from their report
-before the report is released, crash dumps when they are listed.
-Deleting or pruning a dump removes it as well. The sidecar layout is internal;
+<tt>&lt;dump file name&gt;.json</tt> and the log copy as
+<tt>&lt;dump file name&gt;.log</tt>: snapshots take both at capture, before
+their report is released, crash dumps when they are first seen. Deleting or
+pruning a dump removes both. The sidecar layout is internal;
 the contract is mitk::CrashDumpInfo::RunInfo, which stays empty for dumps from
 before this mechanism, and on platforms where the attachment does not arrive
 (verified on Windows; Linux shares the code path; macOS is unexplored).

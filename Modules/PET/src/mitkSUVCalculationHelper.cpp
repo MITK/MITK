@@ -984,7 +984,8 @@ mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IProp
 
 namespace
 {
-  // For ADMIN and START, every (timestep, slice) entry holds the same value.
+  // One value for every (timestep, slice), for an object whose pixels share a
+  // single decay reference.
   // The iteration source is purely the SlicedData time geometry; no DICOM
   // acquisition tag is required for the iteration.
   void FillUniformDecayMap(const mitk::SlicedData* data,
@@ -1155,9 +1156,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
   // answers the same question and the reference instant follows from it, after
   // which the administration-time rule is the classic one, unchanged.
   //
-  // Reported as DecayCorrectionStrategy::Start because that is what it is: the
-  // pixels are corrected to a scanner-chosen reference rather than to the
-  // administration time. Only how the reference is found differs.
+  // YES reports Start: the pixels are corrected to the scanner-chosen
+  // (0018,9701). NO reports None: the pixels are not corrected, and each
+  // frame's own measurement instant is the reference.
   if (IsEnhancedPETInput(data))
   {
     // Ahead of the (0018,9758) branch: unmapped frames also mean the reader
@@ -1166,7 +1167,6 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
 
     const auto admin = ResolveAdministrationTimeTags(data);
     const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
-    info.strategy = DecayCorrectionStrategy::Start;
 
     const std::string decayCorrected =
       ToUpperAscii(TrimAsciiWhitespace(
@@ -1174,6 +1174,7 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
 
     if ("YES" == decayCorrected)
     {
+      info.strategy = DecayCorrectionStrategy::Start;
       // The pixels are corrected to one scanner-chosen instant, (0018,9701),
       // and the per-frame acquisition times say nothing about that
       // correction. DRO_7_3_0 and DRO_7_3_1 carry identical, non-uniform
@@ -1197,6 +1198,7 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
 
     if ("NO" == decayCorrected)
     {
+      info.strategy = DecayCorrectionStrategy::None;
       FillPerFrameDecayMap(data, admin, halfLife, policy, info);
       return info;
     }

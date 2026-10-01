@@ -706,10 +706,11 @@ namespace mitk
     /** Pixel data is already decay-corrected to the radiopharmaceutical
      *  administration time. No further correction is needed. */
     Admin,
-    /** Pixel data is decay-corrected to a vendor-specific reference time, resolved by the DC=START fallback chain described above. */
+    /** Pixel data is decay-corrected to a scanner-chosen reference time,
+     *  resolved as \c DeduceDecayCorrection documents. */
     Start,
-    /** Pixel data is not decay-corrected. The residual correction uses the
-     *  per-slice acquisition date and time. */
+    /** Pixel data is not decay-corrected. The residual correction uses each
+     *  slice's measurement instant. */
     None,
     /** Decay time supplied manually (e.g., CLI override); not derived from DICOM. */
     Manual
@@ -735,11 +736,17 @@ namespace mitk
    * Bundles the detected DICOM decay-correction strategy together with the
    * decay-time map that the SUV functor should consume per (timestep, slice).
    *
-   * The semantics of \c decayTimes depend on \c strategy:
-   *   - Admin: every entry is 0.0; the SUV decay term reduces to 1 (2^0).
-   *   - Start: every (timestep, slice) entry holds the same value
-   *            (SeriesTime - InjectionDateTime in seconds).
-   *   - None:  per-slice values (AcquisitionDateTime - InjectionDateTime).
+   * The semantics of \c decayTimes depend on \c strategy; every entry is in
+   * seconds, measured from the administration instant:
+   *   - Admin:  every entry is 0.0; the SUV decay term reduces to 1 (2^0).
+   *   - Start:  per (timestep, slice), up to the reference instant the slot's
+   *             pixels are corrected to, as \c DeduceDecayCorrection resolves
+   *             it. Slots may resolve to different instants.
+   *   - None:   per (timestep, slice), up to the instant the slot's frame was
+   *             measured (AcquisitionDateTime + T_ave, or an Enhanced PET
+   *             frame's own reference instant).
+   *   - Manual: every entry holds the supplied decay time, uniform or
+   *             per (timestep, slice).
    */
   struct MITKPET_EXPORT DecayCorrectionInfo
   {
@@ -971,8 +978,9 @@ namespace mitk
    *
    * \par Enhanced PET
    * An Enhanced PET object carries no (0054,1102); (0018,9758) Decay
-   * Corrected decides instead, and the result is reported as
-   * \c DecayCorrectionStrategy::Start. YES: the pixels are corrected to
+   * Corrected decides instead: YES is reported as
+   * \c DecayCorrectionStrategy::Start, NO as
+   * \c DecayCorrectionStrategy::None. YES: the pixels are corrected to
    * (0018,9701) Decay Correction DateTime, used for every slice. NO: each
    * slice's reference is its frame's (0018,9151) Frame Reference DateTime,
    * or (0018,9074) Frame Acquisition DateTime plus T_ave from (0018,9220)

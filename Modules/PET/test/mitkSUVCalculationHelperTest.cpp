@@ -2082,7 +2082,9 @@ public:
     SetDicomProperty(image, frameReference, "20260430111000", 0, 3);
 
     const auto info = mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2);
-    CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::Start, info.strategy);
+    // NO means the pixels are not decay corrected, whatever the reference
+    // instant used to compute the correction.
+    CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::None, info.strategy);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4500.0, info.decayTimes.at(0).at(0), 1e-3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4500.0, info.decayTimes.at(0).at(1), 1e-3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4200.0, info.decayTimes.at(0).at(2), 1e-3);

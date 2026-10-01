@@ -81,6 +81,7 @@ set(MODULE_TESTS
   mitkStepperTest.cpp
   mitkRenderingManagerTest.cpp
   mitkRenderingManagerSuspendTest.cpp
+  mitkRenderingManagerAnimationTest.cpp
   mitkCompositePixelValueToStringTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   vtkMitkLevelWindowFilterTest.cpp

@@ -20,8 +20,12 @@ found in the LICENSE file.
 #include <QTimer>
 
 QmitkRenderingManager::QmitkRenderingManager()
+  : m_AnimationTimer(new QTimer(this))
 {
   pendingTimerCallbacks = 0;
+
+  m_AnimationTimer->setTimerType(Qt::PreciseTimer);
+  connect(m_AnimationTimer, &QTimer::timeout, this, [this]() { this->ExecuteAnimationFrame(); });
 }
 
 void QmitkRenderingManager::DoMonitorRendering()
@@ -51,6 +55,16 @@ void QmitkRenderingManager::TimerCallback()
 {
   if (!--pendingTimerCallbacks)
     this->ExecutePendingHighResRenderingRequest();
+}
+
+void QmitkRenderingManager::StartAnimationTimer(std::chrono::milliseconds interval)
+{
+  m_AnimationTimer->start(interval);
+}
+
+void QmitkRenderingManager::StopAnimationTimer()
+{
+  m_AnimationTimer->stop();
 }
 
 bool QmitkRenderingManager::event(QEvent *event)

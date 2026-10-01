@@ -135,8 +135,10 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # mitkPETIBSIBenchmarkTest drives the filter in-process and can assert
   # exception types, but the mapping from exception type to process exit
   # code exists only in the CLI and is what calling scripts branch on.
-  # These cases pin that mapping; two per code is enough, because the
-  # pipeline itself is covered elsewhere.
+  # The cases below pin that mapping for every code a DRO provokes, one
+  # input per code, because the pipeline itself is covered elsewhere.
+  # Codes 13, 14 and 15 have no DRO: the unit tests pin their exception
+  # types, and their exit-code mapping is not verified here.
   #
   # The codes are append-only. A script that learned "2 means a tag is
   # missing" must keep being right, so a code is never reassigned even
@@ -158,15 +160,14 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
                                  DRO_error_2_1 6)
 
   # 3 = AmbiguousDecayTiming, here via the half-life gate on the
-  # administration date. This is the one input the benchmark once
-  # computed silently and wrongly, so its refusal is worth pinning at the
-  # process boundary too.
+  # administration date: computed, this input yields a plausible but
+  # wrong SUV, so its refusal is worth pinning at the process boundary
+  # too.
   _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit3_UnrecoverableAdminDate
                                  DRO_error_4_1 3)
 
-  # 11 and 12 replace the catch-all these two used to share with genuine
-  # internal errors; a caller could not previously tell "this input is
-  # not convertible" from "MITK broke".
+  # 11 and 12 give "this input is not convertible" its own codes, apart
+  # from the catch-all 1 a caller reads as "MITK broke".
   _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit11_UnsupportedUnits
                                  DRO_error_2_7 11)
   _add_petsuv_cli_exit_code_case(MitkPETSUVCalculationCLI_Exit12_MissingPhilipsScale
@@ -175,10 +176,10 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # The two Enhanced PET objects whose per-frame values vary, computed end
   # to end. A refusal would mean the reader's frame model is not reaching
   # the pipeline; a "rooted in a functional-group sequence" warning would
-  # mean the PET tags of interest are registered in a shape the reader no
-  # longer resolves. The values themselves are pinned in-process by
-  # mitkPETIBSIBenchmarkTest. Exit codes 13 and 14 have no DRO and are
-  # pinned by exception type in the unit tests.
+  # mean a tag of interest is registered relative to (5200,9229) or
+  # (5200,9230), a shape that yields no property for a per-frame object.
+  # The values themselves are pinned in-process by
+  # mitkPETIBSIBenchmarkTest.
   foreach(_dro DRO_7_1_0 DRO_7_3_1)
     if(EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/${_dro}/PT")
       _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_EnhancedPerFrame_${_dro} 0

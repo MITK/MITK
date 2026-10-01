@@ -405,13 +405,14 @@ namespace
   }
 
   // Read a numeric DICOM tag at (timestep, slice). Returns NaN if the tag
-  // is absent at that slot or cannot be parsed.
+  // is absent at that slot or cannot be parsed. The lookup is exact: a slot
+  // that lacks the tag must not answer with a neighbouring slot's value.
   double ReadNumericTagAt(const mitk::DICOMProperty* prop,
                           mitk::TimeStepType t,
                           mitk::SlicedData::IndexValueType s)
   {
     if (nullptr == prop) return std::numeric_limits<double>::quiet_NaN();
-    const std::string raw = prop->GetValue(t, s, true, true);
+    const std::string raw = mitk::SUVFunctionalGroupAccess::ValueAt(prop, t, s);
     if (raw.empty()) return std::numeric_limits<double>::quiet_NaN();
     return mitk::ConvertDICOMStrToValue<double>(raw);
   }
@@ -1355,10 +1356,8 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
           const auto z = static_cast<SlicedData::IndexValueType>(s);
           auto& reference = references[t][z];
 
-          const std::string acqDate =
-            (nullptr != acqDateProp) ? acqDateProp->GetValue(t, s, true, true) : std::string();
-          const std::string acqTime =
-            (nullptr != acqTimeProp) ? acqTimeProp->GetValue(t, s, true, true) : std::string();
+          const std::string acqDate = SUVFunctionalGroupAccess::ValueAt(acqDateProp, t, z);
+          const std::string acqTime = SUVFunctionalGroupAccess::ValueAt(acqTimeProp, t, z);
 
           bool resolved = false;
           if (!acqDate.empty() && !acqTime.empty())

@@ -220,6 +220,8 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Start_MultiBed_StrictPolicy_Refused);
   MITK_TEST(Start_Step2_Uniform_StrictPolicy_Computes);
   MITK_TEST(Start_MultiBed_SeriesMatchingBedIsNotSliceZero);
+  MITK_TEST(Start_MultiBed_SlotMissingAcquisitionTime_DoesNotBorrowNeighbour);
+  MITK_TEST(Start_SlotMissingAcquisitionTime_NotClassifiedAsSeriesTime);
   MITK_TEST(Start_Dynamic_LaterFramesShareSeriesReference);
   MITK_TEST(Start_UnparseableAcquisitionTime_Throws_InvalidDICOMPropertyValueException);
   MITK_TEST(Radiopharm_DoseBelowThreshold_RecordsAdaptation);
@@ -1092,6 +1094,14 @@ public:
     // because AcqTime == SeriesTime here.
     auto image = MakeSyntheticImage(/*nSlices=*/3, /*nTimeSteps=*/1);
     SetupCommonStartCase(image);
+    // SetupCommonStartCase populates (0,0) only. The per-slot reads are
+    // exact, as the reader publishes a value at every slot, so every slot
+    // carries its own AcqDate/AcqTime.
+    for (unsigned int s = 0; s < 3; ++s)
+    {
+      SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", 0, s);
+      SetDicomProperty(image, PropName(0x0008, 0x0032), "121530", 0, s);
+    }
 
     const auto info = mitk::DeduceDecayCorrection(image);
     CPPUNIT_ASSERT_EQUAL(mitk::DecayCorrectionStrategy::Start, info.strategy);
@@ -1107,9 +1117,8 @@ public:
     auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/3);
     SetupCommonStartCase(image);
     // SetupCommonStartCase populates (0,0) only. The DC=START Step 2 path
-    // reads AcqDate/AcqTime per (t, s); explicitly populate every slot
-    // rather than rely on default-context fallback semantics that aren't
-    // exercised elsewhere in the test suite.
+    // reads AcqDate/AcqTime per (t, s) without close-match fallback, so
+    // every slot carries its own value, as the reader publishes it.
     for (mitk::TimeStepType t = 0; t < 3; ++t)
     {
       for (unsigned int s = 0; s < 2; ++s)
@@ -1519,6 +1528,42 @@ public:
     const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(0), 1e-3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds, info.decayTimes.at(0).at(1), 1e-6);
+  }
+
+  void Start_MultiBed_SlotMissingAcquisitionTime_DoesNotBorrowNeighbour()
+  {
+    // Slice 1 is the bed that starts at SeriesTime, but it has no
+    // AcquisitionDate/Time of its own. Reading slice 0's instead would place
+    // it 300 s off and still produce a plausible number, so the missing slot
+    // has to be refused.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    SetBed(image, 0, 0, 300, /*withTAve=*/true);
+    SetBedDuration(image, 0, 0);
+    SetDicomProperty(image, PropName(0x0054, 0x1300),
+                     std::to_string(TAveSeconds(kBedDurationSeconds, kF18HalfLifeSeconds) * 1000.0), 0, 1);
+    SetBedDuration(image, 0, 1);
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds),
+                         mitk::AmbiguousDecayTimingException);
+  }
+
+  void Start_SlotMissingAcquisitionTime_NotClassifiedAsSeriesTime()
+  {
+    // Slice 0 starts at SeriesTime. Slice 1 starts 300 s later by its frame
+    // timing but has no AcquisitionDate/Time, so it must not inherit slice
+    // 0's value and be taken for a bed that needs no frame-timing formula.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetupCommonStartCase(image);
+    SetBed(image, 0, 0, 0, /*withTAve=*/true);
+    SetBedDuration(image, 0, 0);
+    SetDicomProperty(image, PropName(0x0054, 0x1300),
+                     std::to_string((300.0 + TAveSeconds(kBedDurationSeconds, kF18HalfLifeSeconds)) * 1000.0),
+                     0, 1);
+    SetBedDuration(image, 0, 1);
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds),
+                         mitk::AmbiguousDecayTimingException);
   }
 
   void Start_Dynamic_LaterFramesShareSeriesReference()

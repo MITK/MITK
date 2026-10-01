@@ -59,6 +59,9 @@ namespace mitk
   *   - \b "pulsing": (BoolProperty) While true, the lit color of the surface pulses, for example
   *        to show that it is about to be replaced. The pulse advances only when the 3D windows
   *        render, so whoever sets the property keeps them rendering until it resets it.
+  *   - \b "color-cycling": (BoolProperty) While true, the lit color of the surface is tinted with
+  *        a color that runs around a hue wheel of constant luminance every three seconds. Like
+  *        the pulse, it advances only when the 3D windows render.
 
   * Properties to look for are:
   *
@@ -106,7 +109,7 @@ namespace mitk
      */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** \brief Also advances the pulse of a "pulsing" surface, on every render. */
+    /** \brief Also advances the animation of a "pulsing" or "color-cycling" surface, on every render. */
     void Update(mitk::BaseRenderer *renderer) override;
 
     /**
@@ -162,8 +165,8 @@ namespace mitk
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
       /** \brief Timestamp tracking the last shader update. */
       itk::TimeStamp m_ShaderTimestampUpdate;
-      /** \brief Whether the actor carries the shader code of the "pulsing" property. */
-      bool m_HasPulseShader = false;
+      /** \brief Whether the actor carries the shader code of the "pulsing" and "color-cycling" properties. */
+      bool m_HasAnimationShader = false;
 
       LocalStorage()
       {

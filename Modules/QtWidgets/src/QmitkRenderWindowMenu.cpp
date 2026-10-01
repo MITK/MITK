@@ -11,40 +11,74 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkRenderWindowMenu.h>
+#include "QmitkRenderWindowMenuBar.h"
 
 // mitk core
+#include <mitkExceptionMacro.h>
 #include <mitkProperties.h>
 #include <mitkResliceMethodProperty.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 #include <mitkCoreServices.h>
 
+// mitk qt
+#include <QmitkIconTheme.h>
+
 // qt
 #include <QActionGroup>
+#include <QCursor>
 #include <QHBoxLayout>
-#include <QPainter>
-#include <QSize>
-#include <QSpacerItem>
+#include <QMouseEvent>
 #include <QSlider>
-#include <QGroupBox>
-#include <QLine>
-#include <QRadioButton>
 #include <QWidgetAction>
-
-//#include"iconClose.xpm"
-#include <iconCrosshairMode.xpm>
-#include <iconFullScreen.xpm>
-#include <iconLightingMode.xpm>
-//#include"iconHoriSplit.xpm"
-#include <iconSettings.xpm>
-//#include"iconVertiSplit.xpm"
-#include <iconLeaveFullScreen.xpm>
-
-// c++
-#include <cmath>
 
 namespace
 {
+  const std::string MENU_SIZE_PREFERENCE = "render window menu size";
+  const std::string SUBDUE_MENUS_PREFERENCE = "subdue render window menus";
+
+  /** Relative to the full appearance of the bars. */
+  constexpr double RESTING_SCALE = 0.75;
+  constexpr double RESTING_OPACITY = 0.6;
+
+  enum class MenuSize
+  {
+    Smaller,
+    Default,
+    Larger
+  };
+
+  MenuSize ReadMenuSize(const mitk::IPreferences *preferences)
+  {
+    const auto value = preferences->Get(MENU_SIZE_PREFERENCE, "default");
+
+    if ("smaller" == value)
+      return MenuSize::Smaller;
+
+    if ("larger" == value)
+      return MenuSize::Larger;
+
+    if ("default" != value)
+      MITK_WARN << "Unknown render window menu size \"" << value << "\" in the preferences. Using the default size.";
+
+    return MenuSize::Default;
+  }
+
+  double GetScale(MenuSize size)
+  {
+    switch (size)
+    {
+      case MenuSize::Smaller:
+        return 0.75;
+      case MenuSize::Larger:
+        return 1.25;
+      case MenuSize::Default:
+        break;
+    }
+
+    return 1.0;
+  }
+
   /* One turn per 27 seconds is the speed the auto rotation had when it
    * advanced the 360 position camera stepper every 75 ms. The interval is now
    * only how often the angle is recomputed, so it can be picked for smooth
@@ -72,15 +106,16 @@ namespace
 
 unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
 
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
-                                             Qt::WindowFlags flags,
-                                             mitk::BaseRenderer* baseRenderer)
-  : QWidget(parent, flags)
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent, mitk::BaseRenderer* baseRenderer)
+  : QObject(parent)
   , m_LightingModeButton(nullptr)
   , m_LayoutActionsMenu(nullptr)
   , m_CrosshairMenu(nullptr)
   , m_LightingMenu(nullptr)
   , m_FullScreenMode(false)
+  , m_TopLeftBar(nullptr)
+  , m_TopRightBar(nullptr)
+  , m_PopupOpen(false)
   , m_Renderer(baseRenderer)
   , m_Parent(parent)
   , m_CrosshairRotationMode(QmitkCrosshairRotationMode::None)
@@ -91,27 +126,38 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   , m_LayoutDesign(LayoutDesign::DEFAULT)
   , m_OldLayoutDesign(LayoutDesign::DEFAULT)
 {
+  if (nullptr == m_Parent)
+    mitkThrow() << "The render window menu needs the render window it belongs to as its parent.";
+
   CreateMenuWidget();
   this->UpdateLightingModeButton();
+  this->ApplyPreferences();
 
-  setAutoFillBackground(true);
+  if (auto* preferences = GetPreferences(); nullptr != preferences)
+    preferences->OnChanged.AddListener(mitk::MessageDelegate1<QmitkRenderWindowMenu, const mitk::IPreferences*>(this, &QmitkRenderWindowMenu::OnPreferencesChanged));
 
-  this->hide();
+  m_Parent->installEventFilter(this);
 
   m_AutoRotationTimer = new QTimer(this);
   m_AutoRotationTimer->setTimerType(Qt::PreciseTimer);
   m_AutoRotationTimer->setInterval(AUTO_ROTATION_INTERVAL);
 
   connect(m_AutoRotationTimer, &QTimer::timeout, this, &QmitkRenderWindowMenu::AutoRotateNextFrame);
-  connect(m_Parent, &QObject::destroyed, this, &QmitkRenderWindowMenu::deleteLater);
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
 {
+  if (auto* preferences = GetPreferences(); nullptr != preferences)
+    preferences->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowMenu, const mitk::IPreferences*>(this, &QmitkRenderWindowMenu::OnPreferencesChanged));
+
   if (m_AutoRotationTimer->isActive())
   {
     m_AutoRotationTimer->stop();
   }
+
+  // Children of the window rather than of the menu, since they are widgets on it.
+  delete m_TopLeftBar;
+  delete m_TopRightBar;
 }
 
 void QmitkRenderWindowMenu::SetLayoutIndex(LayoutIndex layoutIndex)
@@ -122,11 +168,6 @@ void QmitkRenderWindowMenu::SetLayoutIndex(LayoutIndex layoutIndex)
 void QmitkRenderWindowMenu::UpdateLayoutDesignList(LayoutDesign layoutDesign)
 {
   m_LayoutDesign = layoutDesign;
-
-  if (nullptr == m_LayoutActionsMenu)
-  {
-    CreateSettingsWidget();
-  }
 
   m_DefaultLayoutAction->setEnabled(true);
   m_All2DTop3DBottomLayoutAction->setEnabled(true);
@@ -226,19 +267,18 @@ mitk::VtkPropRenderer::LightingMode QmitkRenderWindowMenu::GetPreferredLightingM
 
 void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 {
-  int moveX = floor(static_cast<double>(this->m_Parent->width()) - static_cast<double>(this->width()) - 4.0);
-  this->move(moveX, 3);
+  m_TopLeftBar->Dock();
+  m_TopRightBar->Dock();
 
-  auto cursorPos = this->mapFromGlobal(QCursor::pos());
-
-  if (cursorPos.x() < 0 || cursorPos.x() >= this->width() ||
-      cursorPos.y() < 0 || cursorPos.y() >= this->height())
+  // Layout changes resize the windows under a cursor that does not move, so
+  // the cursor position decides rather than the enter and leave events.
+  if (m_Parent->rect().contains(m_Parent->mapFromGlobal(QCursor::pos())))
   {
-    this->HideMenu();
+    this->ShowMenu();
   }
   else
   {
-    this->ShowMenu();
+    this->HideMenu();
   }
 }
 
@@ -247,95 +287,144 @@ void QmitkRenderWindowMenu::ShowMenu()
   MITK_DEBUG << "menu showMenu";
 
   // The window can be switched between 2D and 3D from elsewhere while the menu
-  // is hidden. Its right edge stays in the corner if its width changes.
-  const auto oldWidth = this->width();
+  // is hidden.
   this->UpdateLightingModeButton();
-  this->move(this->x() + oldWidth - this->width(), this->y());
-
-  this->show();
-  this->raise();
+  this->UpdateBarVisibility();
+  this->UpdateProximity(m_Parent->mapFromGlobal(QCursor::pos()));
 }
 
 void QmitkRenderWindowMenu::HideMenu()
 {
   MITK_DEBUG << "menu hideEvent";
-  this->hide();
+
+  // The window reports the cursor as gone once it moves into one of the popup
+  // menus. Closing the popup decides anew.
+  if (m_PopupOpen)
+    return;
+
+  m_TopLeftBar->Conceal();
+  m_TopRightBar->Conceal();
 }
 
 void QmitkRenderWindowMenu::UpdateLightingModeButton()
 {
   m_LightingModeButton->setVisible(m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D);
-
-  // Asked of the layout rather than hard-coded: every button is capped at the
-  // same fixed size, so what the layout asks for is exactly what they need.
-  this->setFixedWidth(this->sizeHint().width());
 }
 
-void QmitkRenderWindowMenu::paintEvent(QPaintEvent * /*e*/)
+void QmitkRenderWindowMenu::UpdateBarVisibility()
 {
-  QPainter painter(this);
-  QColor semiTransparentColor = Qt::black;
-  semiTransparentColor.setAlpha(255);
-  painter.fillRect(rect(), semiTransparentColor);
+  if (m_TopRightBar->HasShownButtons())
+  {
+    m_TopRightBar->Reveal();
+  }
+  else
+  {
+    m_TopRightBar->Conceal();
+  }
+
+  // Judged by the full sizes, so that a bar growing towards the cursor never
+  // pushes the other one out. The upper right bar gives way last since it
+  // holds what every window has.
+  const bool bothFit = m_TopLeftBar->GetFullSize().width() + m_TopRightBar->GetFullSize().width() <= m_Parent->width();
+
+  if (m_TopLeftBar->HasShownButtons() && bothFit)
+  {
+    m_TopLeftBar->Reveal();
+  }
+  else
+  {
+    m_TopLeftBar->Conceal();
+  }
+}
+
+void QmitkRenderWindowMenu::UpdateProximity(const QPoint& cursor)
+{
+  m_TopLeftBar->UpdateProximity(cursor);
+  m_TopRightBar->UpdateProximity(cursor);
+}
+
+void QmitkRenderWindowMenu::ApplyPreferences()
+{
+  const auto* preferences = GetPreferences();
+
+  const auto size = nullptr != preferences
+    ? ReadMenuSize(preferences)
+    : MenuSize::Default;
+
+  const bool subdue = nullptr != preferences
+    ? preferences->GetBool(SUBDUE_MENUS_PREFERENCE, true)
+    : true;
+
+  // The smaller bars are small enough already, so they only fade at rest.
+  const double restingScale = subdue && MenuSize::Smaller != size ? RESTING_SCALE : 1.0;
+  const double restingOpacity = subdue ? RESTING_OPACITY : 1.0;
+
+  for (auto* bar : { m_TopLeftBar, m_TopRightBar })
+  {
+    bar->SetScale(GetScale(size));
+    bar->SetRestingAppearance(restingScale, restingOpacity);
+  }
+
+  // A different size can make both bars fit next to each other, or no longer.
+  if (!m_TopRightBar->isHidden())
+    this->ShowMenu();
+}
+
+void QmitkRenderWindowMenu::OnPreferencesChanged(const mitk::IPreferences* /*preferences*/)
+{
+  this->ApplyPreferences();
+}
+
+bool QmitkRenderWindowMenu::eventFilter(QObject* watched, QEvent* event)
+{
+  if (watched == m_Parent && QEvent::MouseMove == event->type())
+  {
+    const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+
+    // A held button means the mouse interacts with the scene. Bars growing
+    // along the way of a drag would only distract.
+    if (Qt::NoButton == mouseEvent->buttons())
+      this->UpdateProximity(mouseEvent->position().toPoint());
+  }
+
+  return QObject::eventFilter(watched, event);
 }
 
 void QmitkRenderWindowMenu::CreateMenuWidget()
 {
-  QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setAlignment(Qt::AlignRight);
-  layout->setContentsMargins(1, 1, 1, 1);
+  m_TopLeftBar = new QmitkRenderWindowMenuBar(QmitkRenderWindowMenuBar::Corner::TopLeft, m_Parent);
+  m_TopRightBar = new QmitkRenderWindowMenuBar(QmitkRenderWindowMenuBar::Corner::TopRight, m_Parent);
 
-  QSize size(13, 13);
-
-  // First, since the menu hangs from the window's right corner: a button only the
-  // 3D window shows would otherwise push the ones every window has out of place.
-  m_LightingMenu = new QMenu(this);
+  m_LightingMenu = new QMenu(m_TopLeftBar);
   connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
+  m_LightingModeButton = m_TopLeftBar->AddMenuButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/lighting.svg")), m_LightingMenu);
 
-  m_LightingModeButton = new QToolButton(this);
-  m_LightingModeButton->setMaximumSize(15, 15);
-  m_LightingModeButton->setIconSize(size);
-  m_LightingModeButton->setMenu(m_LightingMenu);
-  m_LightingModeButton->setIcon(QIcon(QPixmap(iconLightingMode_xpm)));
-  m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
-  m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
-  m_LightingModeButton->setAutoRaise(true);
-  layout->addWidget(m_LightingModeButton);
-
-  m_CrosshairMenu = new QMenu(this);
+  m_CrosshairMenu = new QMenu(m_TopRightBar);
   connect(m_CrosshairMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow);
+  m_CrosshairModeButton = m_TopRightBar->AddMenuButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/crosshair.svg")), m_CrosshairMenu);
 
-  m_CrosshairModeButton = new QToolButton(this);
-  m_CrosshairModeButton->setMaximumSize(15, 15);
-  m_CrosshairModeButton->setIconSize(size);
-  m_CrosshairModeButton->setMenu(m_CrosshairMenu);
-  m_CrosshairModeButton->setIcon(QIcon(QPixmap(iconCrosshairMode_xpm)));
-  m_CrosshairModeButton->setPopupMode(QToolButton::InstantPopup);
-  m_CrosshairModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
-  m_CrosshairModeButton->setAutoRaise(true);
-  layout->addWidget(m_CrosshairModeButton);
-
-  m_FullScreenButton = new QToolButton(this);
-  m_FullScreenButton->setMaximumSize(15, 15);
-  m_FullScreenButton->setIconSize(size);
-  m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
-  m_FullScreenButton->setAutoRaise(true);
-  layout->addWidget(m_FullScreenButton);
-
-  m_LayoutDesignButton = new QToolButton(this);
-  m_LayoutDesignButton->setMaximumSize(15, 15);
-  m_LayoutDesignButton->setIconSize(size);
-  m_LayoutDesignButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
-  m_LayoutDesignButton->setAutoRaise(true);
-  layout->addWidget(m_LayoutDesignButton);
-
+  m_FullScreenButton = m_TopRightBar->AddButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/fullscreen.svg")));
   connect(m_FullScreenButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnFullScreenButton);
-  connect(m_LayoutDesignButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnLayoutDesignButton);
+
+  this->CreateSettingsWidget();
+  m_LayoutDesignButton = m_TopRightBar->AddMenuButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/layout.svg")), m_LayoutActionsMenu);
+
+  for (auto* menu : { m_LightingMenu, m_CrosshairMenu, m_LayoutActionsMenu })
+  {
+    connect(menu, &QMenu::aboutToShow, this, [this]() {
+      m_PopupOpen = true;
+    });
+
+    connect(menu, &QMenu::aboutToHide, this, [this]() {
+      m_PopupOpen = false;
+      this->MoveWidgetToCorrectPos();
+    });
+  }
 }
 
 void QmitkRenderWindowMenu::CreateSettingsWidget()
 {
-  m_LayoutActionsMenu = new QMenu(this);
+  m_LayoutActionsMenu = new QMenu(m_TopRightBar);
 
   m_DefaultLayoutAction = new QAction("Standard layout", m_LayoutActionsMenu);
   m_DefaultLayoutAction->setDisabled(true);
@@ -399,7 +488,9 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
 
 void QmitkRenderWindowMenu::ChangeFullScreenIcon()
 {
-  m_FullScreenButton->setIcon(m_FullScreenMode ? QPixmap(iconLeaveFullScreen_xpm) : QPixmap(iconFullScreen_xpm));
+  m_FullScreenButton->setIcon(QmitkIconTheme::GetIcon(m_FullScreenMode
+    ? QStringLiteral(":/Qmitk/fullscreen_exit.svg")
+    : QStringLiteral(":/Qmitk/fullscreen.svg")));
 }
 
 void QmitkRenderWindowMenu::AutoRotateNextFrame()
@@ -418,17 +509,25 @@ void QmitkRenderWindowMenu::AutoRotateNextFrame()
   cameraRotationController->RotateCameraBy(-360.0 * elapsed / (1000.0 * AUTO_ROTATION_SECONDS_PER_TURN));
 }
 
-void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
+void QmitkRenderWindowMenu::SetAutoRotation(bool enabled)
 {
-  if (m_AutoRotationTimer->isActive())
-  {
-    m_AutoRotationTimer->stop();
-  }
-  else
+  if (enabled == m_AutoRotationTimer->isActive())
+    return;
+
+  if (enabled)
   {
     m_AutoRotationElapsed.start();
     m_AutoRotationTimer->start();
   }
+  else
+  {
+    m_AutoRotationTimer->stop();
+  }
+}
+
+void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
+{
+  this->SetAutoRotation(!m_AutoRotationTimer->isActive());
 }
 
 void QmitkRenderWindowMenu::OnTSNumChanged(int num)
@@ -605,7 +704,7 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
     tsLayout->setContentsMargins(4, 4, 4, 4);
     tsLayout->addWidget(new QLabel("TS: "));
     tsLayout->addWidget(m_TSSlider);
-    tsLayout->addWidget(m_TSLabel = new QLabel(QString::number(currentNum * 2 + 1), this));
+    tsLayout->addWidget(m_TSLabel = new QLabel(QString::number(currentNum * 2 + 1)));
 
     QWidget *tsWidget = new QWidget;
     tsWidget->setLayout(tsLayout);
@@ -676,6 +775,8 @@ void QmitkRenderWindowMenu::OnLightingMenuAboutToShow()
   }
 
   connect(lightingModeActionGroup, &QActionGroup::triggered, this, &QmitkRenderWindowMenu::OnLightingModeSelected);
+
+  emit LightingMenuAboutToShow(m_LightingMenu);
 }
 
 void QmitkRenderWindowMenu::OnLightingModeSelected(QAction *action)
@@ -718,18 +819,6 @@ void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
   MoveWidgetToCorrectPos();
   ChangeFullScreenIcon();
   ShowMenu();
-}
-
-void QmitkRenderWindowMenu::OnLayoutDesignButton(bool /*checked*/)
-{
-  if (nullptr == m_LayoutActionsMenu)
-  {
-    CreateSettingsWidget();
-  }
-
-  QPoint point = mapToGlobal(m_LayoutDesignButton->geometry().topLeft());
-  m_LayoutActionsMenu->setVisible(true);
-  m_LayoutActionsMenu->exec(point);
 }
 
 void QmitkRenderWindowMenu::OnSetLayout(LayoutDesign layoutDesign)

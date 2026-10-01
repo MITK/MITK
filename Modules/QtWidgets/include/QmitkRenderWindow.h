@@ -29,6 +29,7 @@ found in the LICENSE file.
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
+class QMenu;
 class QMouseEvent;
 
 /**
@@ -98,6 +99,11 @@ public:
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
   /**
+   * \brief Starts or stops the auto rotation of the camera that the menu widget offers.
+   */
+  void SetAutoRotation(bool enabled);
+
+  /**
    * \brief Activates or deactivates the render window menu widget.
    * \param[in] state True to activate the menu, false to deactivate.
    */
@@ -162,6 +168,8 @@ Q_SIGNALS:
   void Crosshair3DVisibilityChanged(bool);
 
   void LightingModeChanged(mitk::VtkPropRenderer::LightingMode);
+
+  void LightingMenuAboutToShow(QMenu* menu);
 
   void moved();
 

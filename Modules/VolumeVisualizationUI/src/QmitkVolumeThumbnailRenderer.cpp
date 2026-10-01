@@ -44,6 +44,15 @@ namespace
    */
   constexpr const char *THUMBNAIL_LIGHTING_MODEL = "headlight";
 
+  /** \brief How much wider than the volume's box the view is, where it fits tightest.
+   *
+   * A scan that starts and ends mid-body, as most CTs do, is bounded by flat
+   * cross sections. Fitted exactly, they coincide with the preview's edges and
+   * read as the preview cropping the body. A little background between them
+   * and the edge is what lets them read as the ends of the data instead.
+   */
+  constexpr double PREVIEW_MARGIN = 0.05;
+
   /** \brief Place the volume without counting its spacing twice.
    *
    * The vtkImageData MITK hands out carries the geometry's spacing, and
@@ -231,10 +240,11 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
   // ResetCamera sizes the view to the sphere around the volume's box, whose
   // radius is half the box's full diagonal, depth included, and that leaves the
   // box filling well under half of a preview. Sized to the box's own width and
-  // height instead, it touches the preview's edges in whichever direction runs
-  // out first, and still nothing of it can be cropped. The camera looks along
-  // +Y, so X runs across the picture and Z up it. The clipping range
-  // ResetCamera computed stays valid, since the camera does not move.
+  // height instead, it stops just short of the preview's edges in whichever
+  // direction runs out first, and still nothing of it can be cropped. The
+  // camera looks along +Y, so X runs across the picture and Z up it. The
+  // clipping range ResetCamera computed stays valid, since the camera does not
+  // move.
   double bounds[6];
   m_Volume->GetBounds(bounds);
 
@@ -244,7 +254,7 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
 
   // The parallel scale is half the height of the view.
   if (const double scale = std::max(halfHeight, halfWidth / aspect); scale > 0.0)
-    camera->SetParallelScale(scale);
+    camera->SetParallelScale(scale * (1.0 + PREVIEW_MARGIN));
 
   // Uploads the volume, and is the only expensive call here. Whether the ray
   // caster can draw at all depends on the hardware and on this volume's own

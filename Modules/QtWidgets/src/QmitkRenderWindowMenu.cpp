@@ -509,17 +509,25 @@ void QmitkRenderWindowMenu::AutoRotateNextFrame()
   cameraRotationController->RotateCameraBy(-360.0 * elapsed / (1000.0 * AUTO_ROTATION_SECONDS_PER_TURN));
 }
 
-void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
+void QmitkRenderWindowMenu::SetAutoRotation(bool enabled)
 {
-  if (m_AutoRotationTimer->isActive())
-  {
-    m_AutoRotationTimer->stop();
-  }
-  else
+  if (enabled == m_AutoRotationTimer->isActive())
+    return;
+
+  if (enabled)
   {
     m_AutoRotationElapsed.start();
     m_AutoRotationTimer->start();
   }
+  else
+  {
+    m_AutoRotationTimer->stop();
+  }
+}
+
+void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
+{
+  this->SetAutoRotation(!m_AutoRotationTimer->isActive());
 }
 
 void QmitkRenderWindowMenu::OnTSNumChanged(int num)
@@ -767,6 +775,8 @@ void QmitkRenderWindowMenu::OnLightingMenuAboutToShow()
   }
 
   connect(lightingModeActionGroup, &QActionGroup::triggered, this, &QmitkRenderWindowMenu::OnLightingModeSelected);
+
+  emit LightingMenuAboutToShow(m_LightingMenu);
 }
 
 void QmitkRenderWindowMenu::OnLightingModeSelected(QAction *action)

@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <QToolButton>
 #include <QWidget>
 
+class QMenu;
 class QmitkRenderWindowMenuBar;
 
 namespace mitk
@@ -105,6 +106,9 @@ public:
 
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
+  /** Starts or stops the auto rotation of the camera, as the menu action does. */
+  void SetAutoRotation(bool enabled);
+
   /**
    * \brief The lighting rig last selected from this menu.
    *
@@ -152,6 +156,10 @@ Q_SIGNALS:
   void CrosshairRotationModeChanged(QmitkCrosshairRotationMode);
 
   void LightingModeChanged(mitk::VtkPropRenderer::LightingMode);
+
+  /*! Emitted once the lighting menu has been rebuilt for an opening and before
+      it pops up, so that receivers can add entries for this one opening. */
+  void LightingMenuAboutToShow(QMenu* menu);
 
   /*! emit signal, when layout design changed by the setting menu.*/
   void LayoutDesignChanged(LayoutDesign layoutDesign);

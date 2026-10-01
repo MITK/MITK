@@ -269,9 +269,10 @@ namespace mitk
     // visibility of each part is checked, and not only for the
     // whole assembly.
     m_ImageAssembly->VisibilityOn();
-    bool drawEdges = true;
-    this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
-    m_EdgeActor->SetVisibility(drawEdges);
+
+    // Shown only once it frames the plane computed below. Every way out before that would show
+    // the frame of an earlier plane, or one that lacks its transform.
+    m_EdgeActor->VisibilityOff();
 
     PlaneGeometryData::ConstPointer input = this->GetInput();
 
@@ -481,6 +482,10 @@ namespace mitk
       {
         m_EdgeActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
       }
+
+      bool drawEdges = true;
+      this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
+      m_EdgeActor->SetVisibility(drawEdges);
 
       m_ImageAssembly->SetUserTransform(this->GetDataNode()->GetVtkTransform(this->GetTimestep()));
     }

@@ -147,6 +147,7 @@ set(MODULE_RENDERING_TESTS
   mitkSurfaceVtkMapper2DTest.cpp
   mitkSurfaceVtkMapper2D3DTest.cpp
   mitkSurfaceVtkMapper3DAnimationTest.cpp
+  mitkPlaneGeometryDataVtkMapper3DTest.cpp
 )
 
 # test with image filename as an extra command line parameter

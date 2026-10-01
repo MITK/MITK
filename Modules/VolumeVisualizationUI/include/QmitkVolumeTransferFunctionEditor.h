@@ -376,6 +376,16 @@ private:
   void ShowEditMode();
 
   /**
+   * \brief Put the edit button in the given state, labeled with what pressing
+   *        it next does.
+   *
+   * Without announcing the change: the button is both what asks for the mode
+   * and what reports it, so letting it through would come straight back as a
+   * request to change the mode.
+   */
+  void ShowEditModeButton(bool checked);
+
+  /**
    * \brief Scale the canvas axis, to the image's intensity band or to the whole
    *        curve.
    *
@@ -397,8 +407,8 @@ private:
    * Driven by the canvas rather than kept alongside it: a stop can be added,
    * moved, recolored, removed or selected on the canvas just as well as in the
    * table, and one copy of that state is one thing to keep right. A stop the
-   * axis does not reach is listed without a position, since a fraction of the
-   * axis cannot say where it is.
+   * axis does not reach is listed grayed out, with a position that cannot be
+   * typed, since typing one would pull the stop onto the axis.
    */
   void ShowColorStops();
 

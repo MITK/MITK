@@ -1,11 +1,11 @@
 set(CPP_FILES
-  QmitkVolumeLightingWidget.cpp
+  QmitkVolumeMaterialWidget.cpp
   QmitkVolumeThumbnailRenderer.cpp
   QmitkVolumeTransferFunctionEditor.cpp
 )
 
 set(UI_FILES
-  QmitkVolumeLightingWidgetControls.ui
+  QmitkVolumeMaterialWidgetControls.ui
   QmitkVolumeTransferFunctionEditorControls.ui
 )
 

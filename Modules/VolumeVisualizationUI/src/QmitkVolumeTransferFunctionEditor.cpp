@@ -55,6 +55,7 @@ found in the LICENSE file.
 #include <QPixmap>
 #include <QPushButton>
 #include <QRect>
+#include <QResizeEvent>
 #include <QSignalBlocker>
 #include <QStringList>
 #include <QStyledItemDelegate>
@@ -652,23 +653,46 @@ namespace
   /** \brief How many decimals a color stop's position is shown and typed with. */
   constexpr int COLOR_STOP_DECIMALS = 3;
 
+  /** \brief Whether a row of the color stop list is a stop beyond the axis. */
+  constexpr int COLOR_STOP_OFF_AXIS_ROLE = Qt::UserRole;
+
+  /**
+   * \brief Draws the rows of stops beyond the axis grayed out, as the canvas
+   *        fades their markers.
+   *
+   * Drawn as disabled rather than made so: a disabled item cannot be selected,
+   * and selecting such a stop is how it is recolored.
+   */
+  class ColorStopDelegate : public QStyledItemDelegate
+  {
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+  protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override
+    {
+      QStyledItemDelegate::initStyleOption(option, index);
+
+      // Not while selected: the highlight would then be drawn in its disabled
+      // colors too, and the row would no longer read as the selected one.
+      if (index.data(COLOR_STOP_OFF_AXIS_ROLE).toBool() && !(option->state & QStyle::State_Selected))
+        option->state &= ~QStyle::State_Enabled;
+    }
+  };
+
   /**
    * \brief Shows and edits a color stop's position as a fraction of the axis.
    *
    * The editor Qt picks for a number steps by whole units, which here would
    * cross the axis in a single step.
    */
-  class ColorStopPositionDelegate : public QStyledItemDelegate
+  class ColorStopPositionDelegate : public ColorStopDelegate
   {
   public:
-    using QStyledItemDelegate::QStyledItemDelegate;
+    using ColorStopDelegate::ColorStopDelegate;
 
     QString displayText(const QVariant &value, const QLocale &locale) const override
     {
-      // A stop off the axis has no position to show, and says so in words.
-      if (value.typeId() != QMetaType::Double)
-        return QStyledItemDelegate::displayText(value, locale);
-
       return locale.toString(value.toDouble(), 'f', COLOR_STOP_DECIMALS);
     }
 
@@ -697,6 +721,18 @@ namespace
 
       if (spinBox->value() != shown)
         model->setData(index, spinBox->value(), Qt::EditRole);
+    }
+
+  protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override
+    {
+      ColorStopDelegate::initStyleOption(option, index);
+
+      // Beyond the axis the fraction falls below 0 or above 1, which would
+      // otherwise read as a mistake, and the gray alone does not say why the
+      // cell takes no typing.
+      if (index.data(COLOR_STOP_OFF_AXIS_ROLE).toBool())
+        option->text += QStringLiteral(" (off axis)");
     }
   };
 }
@@ -728,6 +764,11 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   presetList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   presetList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+  // Always on, since the list is as tall as the panel allows and so can come to
+  // hold every entry: a bar leaving then would widen the cells, the entries
+  // would no longer fit, and the bar would come back, over and over.
+  presetList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   // The application stylesheet grays a disabled item's text but not the
   // selection behind it, so the preset in force would keep a full-strength
@@ -825,6 +866,16 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
   // so a direct reference from the .ui would draw it in that placeholder.
   m_Controls->resetTfButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
   m_Controls->revertEditButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/reset.svg")));
+  m_Controls->editModeButton->setIcon(
+    QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/pencil.svg")));
+
+  // The reset and revert labels in the .ui start with a space, as do the edit
+  // button's,
+  // which widens the gap to the icon: Qt draws a label four pixels from its
+  // icon and offers no way to ask for more. The edit button is labeled from
+  // here on rather than by the .ui, so that both of its labels live in one
+  // place.
+  this->ShowEditModeButton(false);
   m_Controls->presetGridButton->setIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/VolumeVisualizationUI/view-list-icons.svg")));
   m_Controls->presetListButton->setIcon(
@@ -904,6 +955,7 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
 
   auto *stopTable = m_Controls->colorStopTable;
 
+  stopTable->setItemDelegate(new ColorStopDelegate(stopTable));
   stopTable->setItemDelegateForColumn(COLOR_STOP_POSITION_COLUMN, new ColorStopPositionDelegate(stopTable));
   stopTable->horizontalHeader()->setSectionResizeMode(COLOR_STOP_COLOR_COLUMN, QHeaderView::ResizeToContents);
 
@@ -998,8 +1050,16 @@ bool QmitkVolumeTransferFunctionEditor::eventFilter(QObject *watched, QEvent *ev
 
   if (watched == presetList->viewport())
   {
+    // Only a change of width: the cells are measured from it alone, while the
+    // height follows whatever the panel has to spare, so a window resized
+    // vertically would have them measured again on every step for nothing.
     if (event->type() == QEvent::Resize)
-      this->UpdatePresetLayout();
+    {
+      const auto *resizeEvent = static_cast<QResizeEvent *>(event);
+
+      if (resizeEvent->size().width() != resizeEvent->oldSize().width())
+        this->UpdatePresetLayout();
+    }
 
     // A double click as well as a press, since the view takes a double click on
     // an entry it did not see pressed as a press of its own. The release is left
@@ -1320,7 +1380,7 @@ void QmitkVolumeTransferFunctionEditor::OnBlendModeChanged(int index)
   this->ShowPresetEdited();
 
   // The curve did not change, but what the render window makes of it did, and
-  // the host gates its lighting section on the mode.
+  // the host gates its material controls on the mode.
   emit TransferFunctionChanged();
 }
 
@@ -1867,8 +1927,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
     {
       // The button that asked has already come up. Only it is put back, since
       // ShowEditMode would also reset the axis the user may have widened.
-      const QSignalBlocker blocker(m_Controls->editModeButton);
-      m_Controls->editModeButton->setChecked(true);
+      this->ShowEditModeButton(true);
       return;
     }
   }
@@ -1980,12 +2039,7 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
 
   m_Controls->combinedTfCanvas->SetEditable(m_EditModeActive);
 
-  {
-    // The button is both what asks for the mode and what reports it, so letting
-    // this through would come straight back as a request to change it.
-    const QSignalBlocker blocker(m_Controls->editModeButton);
-    m_Controls->editModeButton->setChecked(m_EditModeActive);
-  }
+  this->ShowEditModeButton(m_EditModeActive);
 
   // The edit controls take the sliders' place at the sliders' height, so that
   // nothing below the canvas moves when editing begins or ends. Measured on
@@ -2029,6 +2083,21 @@ void QmitkVolumeTransferFunctionEditor::ShowEditMode()
   // Which controls would replace the curve being edited depends on the mode
   // this just changed.
   this->UpdateControlAvailability();
+}
+
+void QmitkVolumeTransferFunctionEditor::ShowEditModeButton(bool checked)
+{
+  auto *button = m_Controls->editModeButton;
+
+  const QSignalBlocker blocker(button);
+  button->setChecked(checked);
+
+  // The pressed look alone reads as a state rather than as a way out, so the
+  // label says what pressing the button now does.
+  button->setText(checked ? QStringLiteral(" Stop editing") : QStringLiteral(" Edit"));
+  button->setToolTip(checked
+    ? QStringLiteral("Stop editing the curve. A changed curve can then be saved as a preset or discarded.")
+    : QStringLiteral("Edit the curve point by point."));
 }
 
 void QmitkVolumeTransferFunctionEditor::ApplyAxisRange()
@@ -2112,27 +2181,28 @@ void QmitkVolumeTransferFunctionEditor::ShowColorStops()
 
     colorItem->setIcon(ColorSwatch(canvas->GetColorStopColor(i)));
 
-    // Off the axis, a fraction of it would only say which side the stop lies
-    // on, not where - and typing one would pull the stop onto the axis.
+    // Off the axis the position is still shown, since it says how far beyond the
+    // axis the stop lies, but it cannot be typed: the spin box only reaches
+    // across the axis, so typing would pull the stop onto it.
     const bool offAxis = canvas->IsColorStopOffAxis(i);
 
-    if (offAxis)
-    {
-      positionItem->setData(Qt::DisplayRole, QStringLiteral("Off axis"));
-      positionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    }
-    else
-    {
-      positionItem->setData(Qt::DisplayRole, canvas->GetColorStopOffset(i));
-      positionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-    }
+    Qt::ItemFlags positionFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+
+    if (!offAxis)
+      positionFlags |= Qt::ItemIsEditable;
+
+    positionItem->setData(Qt::DisplayRole, canvas->GetColorStopOffset(i));
+    positionItem->setFlags(positionFlags);
 
     const QString toolTip = offAxis
-      ? "This color stop lies off the axis. Tick Show whole curve to give it a position."
+      ? "This color stop lies off the axis. Tick Show whole curve to move it."
       : QString();
 
-    colorItem->setToolTip(toolTip);
-    positionItem->setToolTip(toolTip);
+    for (auto *item : { colorItem, positionItem })
+    {
+      item->setData(COLOR_STOP_OFF_AXIS_ROLE, offAxis);
+      item->setToolTip(toolTip);
+    }
   }
 
   // With no stop selected on the canvas no row may stay current either, or

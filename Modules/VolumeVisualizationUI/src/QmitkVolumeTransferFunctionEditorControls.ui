@@ -29,7 +29,7 @@
    <item>
     <widget class="QWidget" name="transferFunctionPanel" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -131,13 +131,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>480</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>640</height>
+          <height>336</height>
          </size>
         </property>
        </widget>
@@ -201,8 +195,14 @@
           <property name="text">
            <string>Edit</string>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>12</width>
+            <height>12</height>
+           </size>
+          </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextOnly</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -316,6 +316,9 @@
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
            </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
            </attribute>
@@ -371,7 +374,7 @@
               <string>Put back the curve and blend mode from when editing began, and keep editing.</string>
              </property>
              <property name="text">
-              <string>Revert changes</string>
+              <string> Revert changes</string>
              </property>
             </widget>
            </item>
@@ -502,7 +505,7 @@
            <item>
             <widget class="QPushButton" name="resetTfButton">
              <property name="text">
-              <string>Reset</string>
+              <string> Reset opacity and color</string>
              </property>
             </widget>
            </item>

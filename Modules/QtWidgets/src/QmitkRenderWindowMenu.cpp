@@ -287,6 +287,21 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
 
   QSize size(13, 13);
 
+  // First, since the menu hangs from the window's right corner: a button only the
+  // 3D window shows would otherwise push the ones every window has out of place.
+  m_LightingMenu = new QMenu(this);
+  connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
+
+  m_LightingModeButton = new QToolButton(this);
+  m_LightingModeButton->setMaximumSize(15, 15);
+  m_LightingModeButton->setIconSize(size);
+  m_LightingModeButton->setMenu(m_LightingMenu);
+  m_LightingModeButton->setIcon(QIcon(QPixmap(iconLightingMode_xpm)));
+  m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
+  m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+  m_LightingModeButton->setAutoRaise(true);
+  layout->addWidget(m_LightingModeButton);
+
   m_CrosshairMenu = new QMenu(this);
   connect(m_CrosshairMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow);
 
@@ -313,19 +328,6 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_LayoutDesignButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
   m_LayoutDesignButton->setAutoRaise(true);
   layout->addWidget(m_LayoutDesignButton);
-
-  m_LightingMenu = new QMenu(this);
-  connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
-
-  m_LightingModeButton = new QToolButton(this);
-  m_LightingModeButton->setMaximumSize(15, 15);
-  m_LightingModeButton->setIconSize(size);
-  m_LightingModeButton->setMenu(m_LightingMenu);
-  m_LightingModeButton->setIcon(QIcon(QPixmap(iconLightingMode_xpm)));
-  m_LightingModeButton->setPopupMode(QToolButton::InstantPopup);
-  m_LightingModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
-  m_LightingModeButton->setAutoRaise(true);
-  layout->addWidget(m_LightingModeButton);
 
   connect(m_FullScreenButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnFullScreenButton);
   connect(m_LayoutDesignButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnLayoutDesignButton);

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkVolumeBlendMode.h>
 #include <mitkVolumeRenderingLightingModel.h>
 #include <mitkVtkPropRenderer.h>
-#include <QmitkVolumeLightingWidget.h>
+#include <QmitkVolumeMaterialWidget.h>
 #include <QmitkVolumeTransferFunctionEditor.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkIconTheme.h>
@@ -37,7 +37,6 @@ found in the LICENSE file.
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QTimer>
-#include <QToolButton>
 
 #include <optional>
 
@@ -74,17 +73,6 @@ namespace
   bool LightingApplies(const mitk::DataNode *node)
   {
     return IsVolumeRenderingOn(node) && mitk::GetVolumeBlendMode(node) == mitk::VolumeBlendMode::Composite;
-  }
-
-  /** The arrow is the only cue that a section folds away, so it is drawn by
-   * the style from arrowType rather than taken from a pixmap: the toolbar
-   * extension chevron the collapsible widgets reach for is deliberately tight
-   * and reads as decoration rather than as a control.
-   */
-  void SetSectionExpanded(QToolButton *header, QWidget *panel, bool expanded)
-  {
-    header->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
-    panel->setVisible(expanded);
   }
 
   /** \brief Labels the rendering toggle with what pressing it does.
@@ -154,25 +142,9 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->transferFunctionEditor, &QmitkVolumeTransferFunctionEditor::TransferFunctionChanged,
     this, &QmitkVolumeVisualizationView::OnTransferFunctionChanged);
 
-  // Lighting Option Controls
-
-  // The application stylesheet gives a checked button an accent border without
-  // guarding it on enabled, so a section left folded out stays fully marked
-  // while it is grayed out. Translucent gray rather than a fixed color: it has
-  // to hold over a dark and a light background alike, and the theme exposes
-  // nothing but its icon colors to ask for.
-  m_Controls->lightingExpandButton->setStyleSheet(
-    "QToolButton:checked:disabled { border: 1px solid rgba(127, 127, 127, 90); }");
-
-  connect(m_Controls->lightingExpandButton, &QToolButton::toggled, this,
-    [this](bool expanded)
-    {
-      SetSectionExpanded(m_Controls->lightingExpandButton, m_Controls->lightingWidget, expanded);
-    });
-
   // The widget writes the node itself; what it cannot do is reach a renderer, so
   // re-deriving the light rig is what the view contributes here.
-  connect(m_Controls->lightingWidget, &QmitkVolumeLightingWidget::LightingChanged,
+  connect(m_Controls->materialWidget, &QmitkVolumeMaterialWidget::LightingChanged,
     this, &QmitkVolumeVisualizationView::OnLightingChanged);
 
   // The part open at this point gets no RenderWindowPartActivated of its own, so
@@ -411,7 +383,7 @@ void QmitkVolumeVisualizationView::UpdateLightingRig()
   if (model != nullptr && this->MoveVolumesOntoLightingModel(*model))
   {
     // The sliders show the selected node's values, which this may have rewritten.
-    this->UpdateLightingSection();
+    this->UpdateMaterialSection();
     this->RequestRenderWindowUpdate();
   }
 }
@@ -466,7 +438,7 @@ void QmitkVolumeVisualizationView::OnTransferFunctionChanged()
     this->EnsureLightingModel(selectedNode);
 
   // A full refresh rather than a repaint: a preset brings the blend mode it was
-  // authored for, and the lighting section is gated on that mode.
+  // authored for, and the material controls are gated on that mode.
   this->UpdateInterface();
   this->RequestRenderWindowUpdate();
 }
@@ -494,40 +466,38 @@ void QmitkVolumeVisualizationView::OnRenderWindowLightingModeChanged(mitk::VtkPr
   this->MoveVolumesOntoLightingModel(*model);
 
   // The sliders show the selected node's values, which this may have rewritten.
-  this->UpdateLightingSection();
+  this->UpdateMaterialSection();
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkVolumeVisualizationView::UpdateLightingSection()
+void QmitkVolumeVisualizationView::UpdateMaterialSection()
 {
   auto selectedNode = m_SelectedNode.Lock();
 
   const bool volumeRenderingOn = IsVolumeRenderingOn(selectedNode.GetPointer());
 
   // Narrower than !LightingApplies: specifically "rendering, but the blend mode
-  // lights nothing", which is the only case the header can explain and offer a
-  // way out of. With nothing selected both are false, and the header stays plain.
+  // lights nothing", which is the only case the title can explain and offer a
+  // way out of. With nothing selected both are false, and the title stays plain.
   const bool gatedByBlendMode =
     volumeRenderingOn && mitk::GetVolumeBlendMode(selectedNode.GetPointer()) != mitk::VolumeBlendMode::Composite;
 
-  // Named on the header rather than left to a tooltip: a grayed-out section
-  // whose precondition is written on it teaches the constraint, while a mute
-  // one just looks broken.
-  m_Controls->lightingExpandButton->setText(
-    gatedByBlendMode ? "Lighting / shading - Composite only" : "Lighting / shading");
-  m_Controls->lightingExpandButton->setToolTip(gatedByBlendMode
+  // Named on the title rather than left to a tooltip: grayed-out controls whose
+  // precondition is written on them teach the constraint, while mute ones just
+  // look broken.
+  auto *materialWidget = m_Controls->materialWidget;
+
+  materialWidget->SetTitleSuffix(gatedByBlendMode ? QStringLiteral("Composite only") : QString());
+  materialWidget->setToolTip(gatedByBlendMode
     ? QString("The projection modes flatten each ray to one value and light nothing. Apply a preset authored for"
               " composite to shade the volume.")
     : QString());
 
-  const bool lightingApplies = LightingApplies(selectedNode.GetPointer());
-
-  m_Controls->lightingExpandButton->setEnabled(lightingApplies);
-  m_Controls->lightingWidget->setEnabled(lightingApplies);
+  materialWidget->setEnabled(LightingApplies(selectedNode.GetPointer()));
 
   // Rebinding rather than a separate refresh call: SetDataNode re-reads, so one
   // entry point cannot fall out of step with a changed selection.
-  m_Controls->lightingWidget->SetDataNode(selectedNode.GetPointer());
+  materialWidget->SetDataNode(selectedNode.GetPointer());
 }
 
 void QmitkVolumeVisualizationView::UpdateInterface()
@@ -536,8 +506,7 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   const bool hasNode = selectedNode.IsNotNull();
 
   // Above the early return below, so that the sections come back on that path
-  // too. The lighting panel follows its header rather than being remembered, so
-  // a section left expanded comes back expanded.
+  // too.
   //
   // Everything below the image section configures a rendered volume, so with no
   // node, or with rendering off on it, it is put away rather than grayed out: the
@@ -547,13 +516,12 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   m_RenderingShownOn = showVolumeSections;
 
   m_Controls->transferFunctionEditor->setVisible(showVolumeSections);
-  m_Controls->lightingExpandButton->setVisible(showVolumeSections);
-  m_Controls->lightingWidget->setVisible(showVolumeSections && m_Controls->lightingExpandButton->isChecked());
+  m_Controls->materialWidget->setVisible(showVolumeSections);
 
   // The rig is 3D-render-window state rather than widget state, and no longer
   // follows the selection. A refresh is still where a volume switched on or off
   // shows up, though, which is what it does follow.
-  this->UpdateLightingSection();
+  this->UpdateMaterialSection();
   this->UpdateLightingRig();
 
   if (!hasNode)
@@ -587,7 +555,7 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   const auto blendMode = mitk::GetVolumeBlendMode(selectedNode.GetPointer());
 
   // Shown only away from the default, so the panel carries no weight for the
-  // common case while a grayed-out lighting section always has a visible cause.
+  // common case while grayed-out material controls always have a visible cause.
   // A readout rather than a control: the mode comes with the transfer function,
   // from the preset applied, and is changed only while editing that curve.
   const bool showBlendModeHint = volumeRenderingOn && blendMode != mitk::VolumeBlendMode::Composite;

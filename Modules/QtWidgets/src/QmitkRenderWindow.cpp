@@ -218,12 +218,6 @@ void QmitkRenderWindow::UpdateCrosshairRotationMode(QmitkCrosshairRotationMode m
   m_MenuWidget->UpdateCrosshairRotationMode(mode);
 }
 
-void QmitkRenderWindow::SetAutoRotation(bool enabled)
-{
-  if (nullptr != m_MenuWidget)
-    m_MenuWidget->SetAutoRotation(enabled);
-}
-
 mitk::VtkPropRenderer::LightingMode QmitkRenderWindow::GetPreferredLightingMode() const
 {
   // The menu is built on demand, so a window whose menu was never activated has

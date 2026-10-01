@@ -99,11 +99,6 @@ public:
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
   /**
-   * \brief Starts or stops the auto rotation of the camera that the menu widget offers.
-   */
-  void SetAutoRotation(bool enabled);
-
-  /**
    * \brief Activates or deactivates the render window menu widget.
    * \param[in] state True to activate the menu, false to deactivate.
    */

@@ -104,9 +104,6 @@ public:
 
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
-  /** Starts or stops the auto rotation of the camera, as the menu action does. */
-  void SetAutoRotation(bool enabled);
-
   /**
    * \brief The lighting rig last selected from this menu.
    *
@@ -227,6 +224,8 @@ private:
 
   void ApplyPreferences();
   void OnPreferencesChanged(const mitk::IPreferences *preferences);
+
+  void SetAutoRotation(bool enabled);
 
   /** Rotates the camera as far as the auto rotation turns in the given time. */
   void AutoRotate(double seconds);

@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
 namespace mitk
 {
@@ -63,6 +64,22 @@ namespace mitk
   *        a color that runs around a hue wheel of constant luminance.
   *   - \b "animated.color.frequency": (FloatProperty) Turns around the hue wheel per second, 2
   *        by default.
+  *   - \b "animated.spin": (BoolProperty) While true, the surface spins around an axis through
+  *        the center of its bounding box.
+  *   - \b "animated.spin.frequency": (FloatProperty) Turns per second, 0.25 by default.
+  *   - \b "animated.spin.axis": (IntProperty) The axis of the surface's geometry to spin around,
+  *        0 for x, 1 for y, or 2 for z, the default. Any other value stops the spin.
+  *   - \b "animated.bounce": (BoolProperty) While true, the surface bounces like a ball thrown
+  *        up from where it is.
+  *   - \b "animated.bounce.frequency": (FloatProperty) Bounces per second, 1 by default.
+  *   - \b "animated.bounce.height": (FloatProperty) Relative to the extent of the geometry's
+  *        bounding box along the axis, 0.5 by default.
+  *   - \b "animated.bounce.axis": (IntProperty) The axis of the surface's geometry to bounce
+  *        along, 0 for x, 1 for y, or 2 for z, the default. Any other value stops the bounce.
+  *
+  * Spin and bounce follow the orientation of the geometry, so a surface whose geometry points its
+  * z axis along a normal bounces along that normal. They move only what the 3D windows show, not
+  * the data or its geometry.
   *
   * Animations advance on their own, see mitk::RenderingManager::RequestAnimationFrame(). Whoever
   * starts or stops one requests an update, as for any other property.
@@ -115,6 +132,9 @@ namespace mitk
 
     /** \brief Also advances the animations of the surface, on every render. */
     void Update(mitk::BaseRenderer *renderer) override;
+
+    /** \brief Also applies the spin and the bounce of the surface. */
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     /**
      * \brief Apply all material, color, opacity, and scalar visibility properties to the given actor.
@@ -171,9 +191,12 @@ namespace mitk
       itk::TimeStamp m_ShaderTimestampUpdate;
       /** \brief Whether the actor carries the shader code of the animations. */
       bool m_HasAnimationShader = false;
+      /** \brief The geometry transform followed by the spin and the bounce. */
+      vtkSmartPointer<vtkTransform> m_AnimationTransform;
 
       LocalStorage()
       {
+        m_AnimationTransform = vtkSmartPointer<vtkTransform>::New();
         m_VtkPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         m_VtkPolyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
         m_Actor = vtkSmartPointer<vtkActor>::New();

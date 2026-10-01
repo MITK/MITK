@@ -170,6 +170,9 @@ void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc, char **argv)
 
 void mitk::LogBackend::RotateLogFiles(const std::string &prefixPath)
 {
+  // mitk::CrashDumpSettings::MaxRetention (MitkCrashHandling) caps crash-dump
+  // retention at this count, so that a kept dump's session log can still
+  // exist. Change both together.
   static const int numLogFiles = 10;
   std::string newEmptyLogFileName;
 

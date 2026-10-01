@@ -61,6 +61,10 @@ int main(int argc, char* argv[])
     return 77; // the launching test decides whether skipping is allowed
   }
 
+  // Set after arming, as the applications do, so that the tests can tell
+  // that the handler reads the run info at capture time.
+  mitk::CrashDumpFacility::SetSessionLogFile(config.DatabaseDirectory.parent_path() / "helper-session.log");
+
   if (mode == "noop")
   {
     mitk::CrashDumpFacility::Shutdown();
@@ -123,7 +127,7 @@ int main(int argc, char* argv[])
     for (int i = 0; i < 100 && !captured; ++i)
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      captured = !mitk::CrashDumpFacility::ListDumps().empty();
+      captured = !mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession().empty();
     }
 
     if (!captured)
@@ -146,7 +150,7 @@ int main(int argc, char* argv[])
     {
       monitor.Beat();
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
-      recovered = mitk::CrashDumpFacility::ListDumps().empty();
+      recovered = mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession().empty();
     }
     monitor.Stop();
     mitk::CrashDumpFacility::Shutdown();

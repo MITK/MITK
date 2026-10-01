@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
+#include <string>
 
 class mitkCrashDumpDatabaseTestSuite : public mitk::TestFixture
 {
@@ -35,6 +37,18 @@ class mitkCrashDumpDatabaseTestSuite : public mitk::TestFixture
   MITK_TEST(RemoveCrashReportResidueRemovesMetaAndAttachments);
   MITK_TEST(RemoveCrashReportResidueNeedsAnAbsoluteDatabase);
   MITK_TEST(RemoveCrashReportResidueIgnoresDotNamedReports);
+  MITK_TEST(ScanClassifiesDumpsByArea);
+  MITK_TEST(PruneRemovesSidecars);
+  MITK_TEST(SettingsMissingFileYieldsDefaults);
+  MITK_TEST(SettingsRoundTrip);
+  MITK_TEST(SettingsMalformedFileYieldsDefaults);
+  MITK_TEST(SettingsWrongTypeKeepsDefaultForThatKey);
+  MITK_TEST(SettingsAreClampedOnRead);
+  MITK_TEST(SettingsAreClampedOnWrite);
+  MITK_TEST(SettingsWithoutDatabaseCannotBeWritten);
+  MITK_TEST(RunInfoRoundTripsNonAsciiPaths);
+  MITK_TEST(MalformedRunInfoIsAbsent);
+  MITK_TEST(AdoptRunInfoAttachmentCopiesItOnce);
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_DatabaseDirectory;
@@ -232,6 +246,190 @@ public:
       std::filesystem::exists(attachments));
     CPPUNIT_ASSERT(std::filesystem::exists(m_DatabaseDirectory / "attachments"));
     CPPUNIT_ASSERT(std::filesystem::exists(dump));
+  }
+
+  void WriteSettingsFile(const std::string& content)
+  {
+    std::ofstream(mitk::GetSettingsFilePath(m_DatabaseDirectory)) << content;
+  }
+
+  void ScanClassifiesDumpsByArea()
+  {
+    this->CreateDump("reports/crash.dmp", 10);
+    this->CreateDump("mitk-snapshots/ondemand.dmp", 20);
+    this->CreateDump("mitk-pending-freeze/freeze.dmp", 30);
+
+    const auto dumps = mitk::ScanCrashDumps(m_DatabaseDirectory);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), dumps.size());
+    CPPUNIT_ASSERT(mitk::DumpKind::Crash == dumps[0].Kind);
+    CPPUNIT_ASSERT(mitk::DumpKind::OnDemand == dumps[1].Kind);
+    CPPUNIT_ASSERT(mitk::DumpKind::UnresponsiveTerminated == dumps[2].Kind);
+
+    // A scan rooted in an area must classify the same way.
+    const auto snapshots = mitk::ScanCrashDumps(m_DatabaseDirectory / "mitk-snapshots");
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), snapshots.size());
+    CPPUNIT_ASSERT(mitk::DumpKind::OnDemand == snapshots[0].Kind);
+  }
+
+  void PruneRemovesSidecars()
+  {
+    const auto kept = this->CreateDump("kept.dmp", 10);
+    const auto pruned = this->CreateDump("pruned.dmp", 20);
+    std::ofstream(mitk::GetRunInfoSidecarPath(kept)) << "{}";
+    std::ofstream(mitk::GetRunInfoSidecarPath(pruned)) << "{}";
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::PruneCrashDumps(m_DatabaseDirectory, 1));
+
+    CPPUNIT_ASSERT(std::filesystem::exists(mitk::GetRunInfoSidecarPath(kept)));
+    CPPUNIT_ASSERT(!std::filesystem::exists(mitk::GetRunInfoSidecarPath(pruned)));
+  }
+
+  void SettingsMissingFileYieldsDefaults()
+  {
+    const auto settings = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+
+    CPPUNIT_ASSERT(settings.Enabled);
+    CPPUNIT_ASSERT_EQUAL(10, settings.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(0, settings.WatchdogTimeoutSeconds);
+  }
+
+  void SettingsRoundTrip()
+  {
+    mitk::CrashDumpSettings settings;
+    settings.Enabled = false;
+    settings.MaxDumpsPerKind = 3;
+    settings.WatchdogTimeoutSeconds = 45;
+
+    CPPUNIT_ASSERT(mitk::WriteCrashDumpSettings(m_DatabaseDirectory, settings));
+
+    const auto read = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+    CPPUNIT_ASSERT(!read.Enabled);
+    CPPUNIT_ASSERT_EQUAL(3, read.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(45, read.WatchdogTimeoutSeconds);
+  }
+
+  void SettingsMalformedFileYieldsDefaults()
+  {
+    this->WriteSettingsFile("{ \"enabled\": false, ");
+
+    const auto settings = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+
+    CPPUNIT_ASSERT(settings.Enabled);
+    CPPUNIT_ASSERT_EQUAL(10, settings.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(0, settings.WatchdogTimeoutSeconds);
+  }
+
+  void SettingsWrongTypeKeepsDefaultForThatKey()
+  {
+    this->WriteSettingsFile(R"({ "enabled": "no", "maxDumpsPerKind": 4, "watchdogTimeoutSeconds": 2.5 })");
+
+    const auto settings = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+
+    CPPUNIT_ASSERT(settings.Enabled);
+    CPPUNIT_ASSERT_EQUAL(4, settings.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(0, settings.WatchdogTimeoutSeconds);
+  }
+
+  void SettingsAreClampedOnRead()
+  {
+    this->WriteSettingsFile(R"({ "maxDumpsPerKind": 0, "watchdogTimeoutSeconds": 5 })");
+    auto settings = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+    CPPUNIT_ASSERT_EQUAL(1, settings.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(10, settings.WatchdogTimeoutSeconds);
+
+    this->WriteSettingsFile(R"({ "maxDumpsPerKind": 42, "watchdogTimeoutSeconds": 99999 })");
+    settings = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+    CPPUNIT_ASSERT_EQUAL(10, settings.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(3600, settings.WatchdogTimeoutSeconds);
+
+    this->WriteSettingsFile(R"({ "watchdogTimeoutSeconds": -3 })");
+    settings = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+    CPPUNIT_ASSERT_EQUAL(0, settings.WatchdogTimeoutSeconds);
+  }
+
+  void SettingsAreClampedOnWrite()
+  {
+    mitk::CrashDumpSettings settings;
+    settings.MaxDumpsPerKind = 11;
+    settings.WatchdogTimeoutSeconds = 1;
+
+    CPPUNIT_ASSERT(mitk::WriteCrashDumpSettings(m_DatabaseDirectory, settings));
+
+    std::ifstream file(mitk::GetSettingsFilePath(m_DatabaseDirectory));
+    const std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    CPPUNIT_ASSERT(content.find("11") == std::string::npos);
+
+    const auto read = mitk::ReadCrashDumpSettings(m_DatabaseDirectory);
+    CPPUNIT_ASSERT_EQUAL(10, read.MaxDumpsPerKind);
+    CPPUNIT_ASSERT_EQUAL(10, read.WatchdogTimeoutSeconds);
+  }
+
+  void SettingsWithoutDatabaseCannotBeWritten()
+  {
+    CPPUNIT_ASSERT(!mitk::WriteCrashDumpSettings({}, mitk::CrashDumpSettings()));
+  }
+
+  void RunInfoRoundTripsNonAsciiPaths()
+  {
+    mitk::CrashRunInfo runInfo;
+    runInfo.Release = "MITK Workbench 2026.10";
+    runInfo.InstallDirectory = std::filesystem::path(u8"C:/Programme/M\u00fcller/MITK");
+    runInfo.LogFile = std::filesystem::path(u8"C:/Users/J\u00fcrgen/mitk-0.log");
+
+    const auto file = m_DatabaseDirectory / "run-info.json";
+    CPPUNIT_ASSERT(mitk::WriteRunInfo(file, runInfo));
+    CPPUNIT_ASSERT_MESSAGE("the atomic replace must not leave its temporary behind",
+      !std::filesystem::exists(m_DatabaseDirectory / "run-info.json.tmp"));
+
+    const auto read = mitk::ReadRunInfo(file);
+    CPPUNIT_ASSERT(read.has_value());
+    CPPUNIT_ASSERT_EQUAL(runInfo.Release, read->Release);
+    CPPUNIT_ASSERT(runInfo.InstallDirectory == read->InstallDirectory);
+    CPPUNIT_ASSERT(runInfo.LogFile == read->LogFile);
+
+    // Rewriting replaces the content.
+    runInfo.LogFile.clear();
+    CPPUNIT_ASSERT(mitk::WriteRunInfo(file, runInfo));
+    CPPUNIT_ASSERT(mitk::ReadRunInfo(file)->LogFile.empty());
+  }
+
+  void MalformedRunInfoIsAbsent()
+  {
+    const auto file = m_DatabaseDirectory / "run-info.json";
+    std::ofstream(file) << "not json";
+
+    CPPUNIT_ASSERT(!mitk::ReadRunInfo(file).has_value());
+    CPPUNIT_ASSERT(!mitk::ReadRunInfo(m_DatabaseDirectory / "missing.json").has_value());
+  }
+
+  void AdoptRunInfoAttachmentCopiesItOnce()
+  {
+    const auto dump = this->CreateDump("reports/report.dmp", 10);
+    const auto attachment = m_DatabaseDirectory / "attachments" / "report" / mitk::RunInfoAttachmentFileName;
+
+    CPPUNIT_ASSERT_MESSAGE("no attachment, no sidecar",
+      !mitk::AdoptRunInfoAttachment(m_DatabaseDirectory, "report", dump));
+
+    std::filesystem::create_directories(attachment.parent_path());
+    mitk::CrashRunInfo runInfo;
+    runInfo.Release = "first";
+    CPPUNIT_ASSERT(mitk::WriteRunInfo(attachment, runInfo));
+
+    CPPUNIT_ASSERT(mitk::AdoptRunInfoAttachment(m_DatabaseDirectory, "report", dump));
+
+    mitk::CrashDumpInfo info{ dump };
+    mitk::LoadRunInfo(info);
+    CPPUNIT_ASSERT(info.RunInfo.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("first"), info.RunInfo->Release);
+
+    // An existing sidecar is never overwritten, so the run info stays
+    // attached to the dump once the report residue is gone.
+    runInfo.Release = "second";
+    CPPUNIT_ASSERT(mitk::WriteRunInfo(attachment, runInfo));
+    CPPUNIT_ASSERT(mitk::AdoptRunInfoAttachment(m_DatabaseDirectory, "report", dump));
+    mitk::LoadRunInfo(info);
+    CPPUNIT_ASSERT_EQUAL(std::string("first"), info.RunInfo->Release);
   }
 };
 

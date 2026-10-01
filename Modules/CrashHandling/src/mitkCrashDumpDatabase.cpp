@@ -12,16 +12,22 @@ found in the LICENSE file.
 
 #include "mitkCrashDumpDatabase.h"
 
+#include <mitkLog.h>
+
+#include <nlohmann/json.hpp>
+
 #include <algorithm>
 #include <cctype>
 #include <fstream>
 #include <string>
+#include <type_traits>
 
 namespace
 {
-  // Lives in the database directory next to Crashpad's own bookkeeping;
+  // Live in the database directory next to Crashpad's own bookkeeping;
   // Crashpad ignores files it does not know.
   const std::filesystem::path kAcknowledgedMarkerFileName = "mitk-last-acknowledged";
+  const std::filesystem::path kSettingsFileName = "mitk-settings.json";
 
   // Crashpad's POSIX database layout: one <report-uuid>.meta next to the dump
   // and one attachments/<report-uuid>/ directory under the database root. The
@@ -58,6 +64,86 @@ namespace
 
     return false;
   }
+
+  // Paths are stored as UTF-8 so that a profile directory with non-ASCII
+  // characters survives the round trip regardless of the local code page.
+  std::string ToUtf8(const std::filesystem::path& path)
+  {
+    const auto utf8 = path.u8string();
+    return std::string(utf8.begin(), utf8.end());
+  }
+
+  std::filesystem::path FromUtf8(const std::string& utf8)
+  {
+    return std::filesystem::path(std::u8string(utf8.begin(), utf8.end()));
+  }
+
+  /** Replaces \p file via a temporary and a rename, so that a concurrent
+   *  reader (another instance, or the handler copying an attachment) never
+   *  sees a partial file. */
+  bool WriteFileAtomically(const std::filesystem::path& file, const std::string& content)
+  {
+    auto temporary = file;
+    temporary += ".tmp";
+
+    {
+      std::ofstream stream(temporary, std::ios::trunc);
+      stream << content;
+
+      if (!stream.good())
+        return false;
+    }
+
+    std::error_code error;
+    std::filesystem::rename(temporary, file, error);
+
+    if (error)
+    {
+      std::filesystem::remove(temporary, error);
+      return false;
+    }
+
+    return true;
+  }
+
+  void RemoveSidecar(const std::filesystem::path& dumpPath)
+  {
+    std::error_code error;
+    std::filesystem::remove(mitk::GetRunInfoSidecarPath(dumpPath), error);
+  }
+
+  /** Reads \p key into \p value if present with the right type; a present
+   *  key of the wrong type keeps the default and warns. */
+  template <typename T>
+  void ReadSetting(const nlohmann::json& json, const char* key, T& value)
+  {
+    const auto it = json.find(key);
+    if (it == json.end())
+      return;
+
+    const bool typeMatches = std::is_same_v<T, bool> ? it->is_boolean() : it->is_number_integer();
+    if (!typeMatches)
+    {
+      MITK_WARN << "Crash-dump settings: ignoring '" << key << "', which has the wrong type; using "
+                << value << ".";
+      return;
+    }
+
+    value = it->get<T>();
+  }
+}
+
+mitk::DumpKind mitk::ClassifyDump(const std::filesystem::path& dumpPath)
+{
+  const auto area = dumpPath.parent_path().filename();
+
+  if (area == OnDemandSnapshotsSubdir)
+    return DumpKind::OnDemand;
+
+  if (area == PendingFreezeSubdir)
+    return DumpKind::UnresponsiveTerminated;
+
+  return DumpKind::Crash;
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::path& databaseDirectory,
@@ -94,7 +180,7 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
       if (error)
         continue;
 
-      dumps.push_back({ entry.path(), lastWriteTime, size });
+      dumps.push_back({ entry.path(), lastWriteTime, size, ClassifyDump(entry.path()), std::nullopt });
     }
   }
   catch (const std::filesystem::filesystem_error&)
@@ -136,7 +222,10 @@ std::size_t mitk::PruneCrashDumps(const std::filesystem::path& databaseDirectory
   {
     std::error_code error;
     if (std::filesystem::remove(dumps[i].Path, error) && !error)
+    {
+      RemoveSidecar(dumps[i].Path);
       ++deleted;
+    }
   }
 
   return deleted;
@@ -189,4 +278,147 @@ bool mitk::WriteLastAcknowledgedTime(const std::filesystem::path& databaseDirect
   file << static_cast<long long>(time.time_since_epoch().count());
 
   return file.good();
+}
+
+std::filesystem::path mitk::GetSettingsFilePath(const std::filesystem::path& databaseDirectory)
+{
+  return databaseDirectory / kSettingsFileName;
+}
+
+mitk::CrashDumpSettings mitk::ClampCrashDumpSettings(const CrashDumpSettings& settings, bool warn)
+{
+  auto clamped = settings;
+
+  clamped.MaxDumpsPerKind = std::clamp(settings.MaxDumpsPerKind,
+    CrashDumpSettings::MinRetention, CrashDumpSettings::MaxRetention);
+
+  if (settings.WatchdogTimeoutSeconds <= 0)
+  {
+    clamped.WatchdogTimeoutSeconds = 0;
+  }
+  else
+  {
+    clamped.WatchdogTimeoutSeconds = std::clamp(settings.WatchdogTimeoutSeconds,
+      CrashDumpSettings::MinWatchdogTimeoutSeconds, CrashDumpSettings::MaxWatchdogTimeoutSeconds);
+  }
+
+  if (warn && clamped.MaxDumpsPerKind != settings.MaxDumpsPerKind)
+  {
+    MITK_WARN << "Crash-dump settings: maxDumpsPerKind " << settings.MaxDumpsPerKind
+              << " is out of range, using " << clamped.MaxDumpsPerKind << ".";
+  }
+
+  if (warn && clamped.WatchdogTimeoutSeconds != settings.WatchdogTimeoutSeconds)
+  {
+    MITK_WARN << "Crash-dump settings: watchdogTimeoutSeconds " << settings.WatchdogTimeoutSeconds
+              << " is out of range, using " << clamped.WatchdogTimeoutSeconds << ".";
+  }
+
+  return clamped;
+}
+
+mitk::CrashDumpSettings mitk::ReadCrashDumpSettings(const std::filesystem::path& databaseDirectory)
+{
+  CrashDumpSettings settings;
+
+  const auto path = GetSettingsFilePath(databaseDirectory);
+
+  std::error_code error;
+  if (databaseDirectory.empty() || !std::filesystem::exists(path, error))
+    return settings;
+
+  std::ifstream file(path);
+  const auto json = nlohmann::json::parse(file, nullptr, false);
+
+  if (json.is_discarded() || !json.is_object())
+  {
+    MITK_WARN << "Crash-dump settings file '" << path.string() << "' is unreadable or malformed; using defaults.";
+    return settings;
+  }
+
+  ReadSetting(json, "enabled", settings.Enabled);
+  ReadSetting(json, "maxDumpsPerKind", settings.MaxDumpsPerKind);
+  ReadSetting(json, "watchdogTimeoutSeconds", settings.WatchdogTimeoutSeconds);
+
+  return ClampCrashDumpSettings(settings, true);
+}
+
+bool mitk::WriteCrashDumpSettings(const std::filesystem::path& databaseDirectory,
+  const CrashDumpSettings& settings)
+{
+  if (databaseDirectory.empty())
+    return false;
+
+  const auto clamped = ClampCrashDumpSettings(settings, false);
+
+  const nlohmann::json json = {
+    { "enabled", clamped.Enabled },
+    { "maxDumpsPerKind", clamped.MaxDumpsPerKind },
+    { "watchdogTimeoutSeconds", clamped.WatchdogTimeoutSeconds }
+  };
+
+  std::error_code error;
+  std::filesystem::create_directories(databaseDirectory, error);
+
+  // A start reading a half-written file would fall back to the defaults and
+  // could record dumps the user has just switched off.
+  return WriteFileAtomically(GetSettingsFilePath(databaseDirectory), json.dump(2) + '\n');
+}
+
+std::filesystem::path mitk::GetRunInfoSidecarPath(const std::filesystem::path& dumpPath)
+{
+  return std::filesystem::path(dumpPath) += ".json";
+}
+
+std::optional<mitk::CrashRunInfo> mitk::ReadRunInfo(const std::filesystem::path& file)
+{
+  std::ifstream stream(file);
+  if (!stream)
+    return std::nullopt;
+
+  const auto json = nlohmann::json::parse(stream, nullptr, false);
+  if (json.is_discarded() || !json.is_object())
+    return std::nullopt;
+
+  CrashRunInfo runInfo;
+  runInfo.Release = json.value("release", std::string());
+  runInfo.InstallDirectory = FromUtf8(json.value("installDirectory", std::string()));
+  runInfo.LogFile = FromUtf8(json.value("logFile", std::string()));
+
+  return runInfo;
+}
+
+bool mitk::WriteRunInfo(const std::filesystem::path& file, const CrashRunInfo& runInfo)
+{
+  const nlohmann::json json = {
+    { "release", runInfo.Release },
+    { "installDirectory", ToUtf8(runInfo.InstallDirectory) },
+    { "logFile", ToUtf8(runInfo.LogFile) }
+  };
+
+  return WriteFileAtomically(file, json.dump(2) + '\n');
+}
+
+bool mitk::AdoptRunInfoAttachment(const std::filesystem::path& databaseDirectory,
+  const std::filesystem::path& reportId, const std::filesystem::path& dumpPath)
+{
+  const auto sidecar = GetRunInfoSidecarPath(dumpPath);
+
+  std::error_code error;
+  if (std::filesystem::exists(sidecar, error))
+    return true;
+
+  if (databaseDirectory.empty() || reportId.empty())
+    return false;
+
+  const auto attachment = databaseDirectory / kAttachmentsSubdir / reportId / RunInfoAttachmentFileName;
+  if (!std::filesystem::exists(attachment, error))
+    return false;
+
+  return std::filesystem::copy_file(attachment, sidecar, error) && !error;
+}
+
+void mitk::LoadRunInfo(CrashDumpInfo& dump)
+{
+  dump.RunInfo = ReadRunInfo(GetRunInfoSidecarPath(dump.Path));
 }

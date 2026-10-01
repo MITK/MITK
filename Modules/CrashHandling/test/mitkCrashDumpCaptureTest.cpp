@@ -25,8 +25,10 @@ found in the LICENSE file.
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace
 {
@@ -131,6 +133,9 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(CrashByStackOverflowLeavesDump);
   MITK_TEST(DumpsSurviveReinitialization);
   MITK_TEST(FacilityQueryAcknowledgeDeleteCycle);
+  MITK_TEST(UnarmedFacilityStillListsAndDeletes);
+  MITK_TEST(SettingsDisableArming);
+  MITK_TEST(RetentionFollowsSettings);
   // On-demand and watchdog snapshots rely on Crashpad's DumpWithoutCrash,
   // which its macOS client does not provide.
 #ifndef __APPLE__
@@ -139,6 +144,12 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteDumpLeavesNoReportResidue);
   MITK_TEST(HardKilledFreezeLeavesProvisionalDump);
   MITK_TEST(RecoveredFreezeLeavesNoDump);
+  MITK_TEST(ListAllDumpsClassifiesEveryKind);
+  MITK_TEST(ProvisionalSnapshotsOfThisSessionAreNotListed);
+  // Run-info attachments are verified on Windows only so far; Linux shares
+  // the code path and is expected to pass, macOS is unexplored.
+  MITK_TEST(CrashDumpCarriesRunInfo);
+  MITK_TEST(SnapshotCarriesRunInfo);
 #endif
   CPPUNIT_TEST_SUITE_END();
 
@@ -174,6 +185,28 @@ public:
     CPPUNIT_FAIL("Crash-dump facility failed to arm in the helper process "
                  "(and MITK_CRASHTEST_ALLOW_SKIP is not set).");
     std::abort(); // unreachable; CPPUNIT_FAIL throws
+  }
+
+  mitk::CrashDumpFacility::Config MakeConfig(bool arm = true) const
+  {
+    mitk::CrashDumpFacility::Config config;
+    config.DatabaseDirectory = m_DatabaseDirectory;
+    config.ApplicationName = "mitkCrashDumpCaptureTest";
+    config.ApplicationVersion = "1.0";
+    config.Arm = arm;
+    return config;
+  }
+
+  std::filesystem::path CreateFakeDump(const std::string& relativePath, int ageInSeconds) const
+  {
+    const auto path = m_DatabaseDirectory / relativePath;
+
+    std::filesystem::create_directories(path.parent_path());
+    std::ofstream(path) << "minidump placeholder";
+    std::filesystem::last_write_time(path,
+      std::filesystem::file_time_type::clock::now() - std::chrono::seconds(ageInSeconds));
+
+    return path;
   }
 
   void RunCrashModeAndExpectOneDump(const std::string& mode)
@@ -287,6 +320,64 @@ public:
 
     mitk::CrashDumpFacility::Shutdown();
     CPPUNIT_ASSERT(!mitk::CrashDumpFacility::IsActive());
+  }
+
+  /** Crash dumps disabled for a session (environment variable or
+   *  command-line flag) must not take the dumps already on disk out of the
+   *  user's reach. */
+  void UnarmedFacilityStillListsAndDeletes()
+  {
+    const auto dump = this->CreateFakeDump("reports/earlier.dmp", 60);
+
+    CPPUNIT_ASSERT_MESSAGE("Config::Arm=false must not arm",
+      !mitk::CrashDumpFacility::Initialize(this->MakeConfig(false)));
+    CPPUNIT_ASSERT(!mitk::CrashDumpFacility::IsActive());
+    CPPUNIT_ASSERT(m_DatabaseDirectory == mitk::CrashDumpFacility::GetDatabaseDirectory());
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::CrashDumpFacility::ListAllDumps().size());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::CrashDumpFacility::ListUnacknowledgedDumps().size());
+
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(dump));
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListAllDumps().empty());
+  }
+
+  void SettingsDisableArming()
+  {
+    mitk::CrashDumpSettings settings;
+    settings.Enabled = false;
+    CPPUNIT_ASSERT(mitk::WriteCrashDumpSettings(m_DatabaseDirectory, settings));
+
+    CPPUNIT_ASSERT_MESSAGE("enabled=false in the settings file must not arm",
+      !mitk::CrashDumpFacility::Initialize(this->MakeConfig()));
+    CPPUNIT_ASSERT(!mitk::CrashDumpFacility::IsActive());
+    CPPUNIT_ASSERT(!mitk::CrashDumpFacility::GetSettings().Enabled);
+    CPPUNIT_ASSERT(m_DatabaseDirectory == mitk::CrashDumpFacility::GetDatabaseDirectory());
+  }
+
+  void RetentionFollowsSettings()
+  {
+    const std::vector<std::string> areas = { "reports", "mitk-snapshots", "mitk-pending-freeze" };
+
+    for (const auto& area : areas)
+    {
+      for (int i = 0; i < 5; ++i)
+        this->CreateFakeDump(area + "/dump" + std::to_string(i) + ".dmp", 10 * (i + 1));
+    }
+
+    mitk::CrashDumpSettings settings;
+    settings.MaxDumpsPerKind = 3;
+    CPPUNIT_ASSERT(mitk::WriteCrashDumpSettings(m_DatabaseDirectory, settings));
+
+    mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
+    CPPUNIT_ASSERT_EQUAL(3, mitk::CrashDumpFacility::GetSettings().MaxDumpsPerKind);
+
+    for (const auto& area : areas)
+    {
+      const auto dumps = mitk::ScanCrashDumps(m_DatabaseDirectory / area);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("dumps left in " + area, std::size_t(3), dumps.size());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("the newest survive in " + area,
+        std::string("dump0.dmp"), dumps.front().Path.filename().string());
+    }
   }
 
 #ifndef __APPLE__
@@ -417,6 +508,96 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("a recovered freeze must leave no dump",
       mitk::ScanCrashDumps(m_DatabaseDirectory).empty());
+  }
+
+  void RunHelperExpectingCleanExit(const std::string& mode)
+  {
+    const auto result = RunHelper(mode, m_DatabaseDirectory);
+
+    if (result.Exited && result.ExitValue == 77)
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_MESSAGE(mode + " helper must exit cleanly",
+      result.Exited && result.ExitValue == EXIT_SUCCESS);
+  }
+
+  void ListAllDumpsClassifiesEveryKind()
+  {
+    this->RunCrashModeAndExpectOneDump("segv");
+    this->RunHelperExpectingCleanExit("snapshot");
+    this->RunHelperExpectingCleanExit("freeze");
+
+    mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
+    const auto dumps = mitk::CrashDumpFacility::ListAllDumps();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), dumps.size());
+    CPPUNIT_ASSERT(mitk::DumpKind::UnresponsiveTerminated == dumps[0].Kind);
+    CPPUNIT_ASSERT(mitk::DumpKind::OnDemand == dumps[1].Kind);
+    CPPUNIT_ASSERT(mitk::DumpKind::Crash == dumps[2].Kind);
+    CPPUNIT_ASSERT(dumps[0].LastWriteTime >= dumps[1].LastWriteTime);
+    CPPUNIT_ASSERT(dumps[1].LastWriteTime >= dumps[2].LastWriteTime);
+  }
+
+  /** A provisional snapshot of the running session is deleted again when
+   *  the freeze recovers; it must not be offered for handling, surface on the
+   *  next start through the watermark, or count as already shown. */
+  void ProvisionalSnapshotsOfThisSessionAreNotListed()
+  {
+    if (!mitk::CrashDumpFacility::Initialize(this->MakeConfig()))
+      this->FailOrSkipUnarmedHelper();
+
+    const auto snapshot = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::WatchdogProvisional);
+    CPPUNIT_ASSERT(snapshot.has_value());
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession().size());
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListAllDumps().empty());
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListDumps().empty());
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListUnacknowledgedDumps().empty());
+
+    mitk::CrashDumpFacility::ClearCrashedLastRun();
+    CPPUNIT_ASSERT_MESSAGE("a provisional snapshot must not move the watermark",
+      !mitk::ReadLastAcknowledgedTime(m_DatabaseDirectory).has_value());
+
+    mitk::CrashDumpFacility::PurgeProvisionalSnapshots();
+    CPPUNIT_ASSERT(!std::filesystem::exists(*snapshot));
+  }
+
+  void CheckHelperRunInfo(const mitk::CrashDumpInfo& dump)
+  {
+    CPPUNIT_ASSERT_MESSAGE("the dump must carry run info", dump.RunInfo.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("MitkCrashDumpTestHelper 1.0"), dump.RunInfo->Release);
+    CPPUNIT_ASSERT(std::filesystem::equivalent(MITK_CRASHDUMP_TEST_HELPER_DIR, dump.RunInfo->InstallDirectory));
+    CPPUNIT_ASSERT_MESSAGE("the log path set after arming must be captured",
+      m_DatabaseDirectory.parent_path() / "helper-session.log" == dump.RunInfo->LogFile);
+  }
+
+  void CrashDumpCarriesRunInfo()
+  {
+    this->RunCrashModeAndExpectOneDump("segv");
+
+    mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
+    const auto dumps = mitk::CrashDumpFacility::ListAllDumps();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), dumps.size());
+    this->CheckHelperRunInfo(dumps.front());
+
+    const auto sidecar = mitk::GetRunInfoSidecarPath(dumps.front().Path);
+    CPPUNIT_ASSERT(std::filesystem::exists(sidecar));
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(dumps.front().Path));
+    CPPUNIT_ASSERT_MESSAGE("deleting a dump must take its run info along", !std::filesystem::exists(sidecar));
+  }
+
+  void SnapshotCarriesRunInfo()
+  {
+    this->RunHelperExpectingCleanExit("snapshot");
+
+    mitk::CrashDumpFacility::Initialize(this->MakeConfig(false));
+    const auto dumps = mitk::CrashDumpFacility::ListAllDumps();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), dumps.size());
+    CPPUNIT_ASSERT(mitk::DumpKind::OnDemand == dumps.front().Kind);
+    this->CheckHelperRunInfo(dumps.front());
+    CPPUNIT_ASSERT(!AnyReportResidueExists(m_DatabaseDirectory));
   }
 #endif
 };

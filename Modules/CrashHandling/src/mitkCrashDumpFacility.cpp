@@ -23,10 +23,14 @@ found in the LICENSE file.
 
 #if defined(_WIN32)
 #include <windows.h>
-#elif defined(__APPLE__)
+#else
+#include <unistd.h>
+#if defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif
+#endif
 
+#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -37,15 +41,11 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr std::size_t kMaxRetainedDumps = 10;
-
-  // Facility-owned subdirectories of the database. Snapshots taken via
-  // CaptureSnapshot are moved out of Crashpad's report area into one of these
-  // so their kind is a filesystem fact that survives a hard kill: on-demand
-  // snapshots are never surfaced, and provisional (watchdog) snapshots are
-  // purged unless the process is hard-killed mid-freeze.
-  const std::filesystem::path kSnapshotsSubdir = "mitk-snapshots";
-  const std::filesystem::path kPendingFreezeSubdir = "mitk-pending-freeze";
+  // On-demand snapshots are never surfaced by the next-start dialog, and
+  // provisional (watchdog) snapshots are purged unless the process is
+  // hard-killed mid-freeze (see mitkCrashDumpDatabase.h for the areas).
+  const std::filesystem::path& kSnapshotsSubdir = mitk::OnDemandSnapshotsSubdir;
+  const std::filesystem::path& kPendingFreezeSubdir = mitk::PendingFreezeSubdir;
 
   // Crashpad's POSIX database stages a dump here and moves it into the report
   // area only once it is complete. Taking one out from under the handler
@@ -59,8 +59,12 @@ namespace
   }
 
   // Serializes CaptureSnapshot / PurgeProvisionalSnapshots, which may run on
-  // the watchdog thread and the UI thread concurrently.
+  // the watchdog thread and the UI thread concurrently, and guards the
+  // provisional-snapshot list the listing calls read.
   std::mutex s_SnapshotMutex;
+
+  // Serializes rewrites of the run-info file.
+  std::mutex s_RunInfoMutex;
 
   // Provided by the build system, which is the single source of truth for the
   // name (including the platform executable suffix) and for every rule that
@@ -81,6 +85,13 @@ namespace
     std::filesystem::path DatabaseDirectory;
     bool Active = false;
     bool CrashedLastRun = false;
+    mitk::CrashDumpSettings Settings;
+    // The handler copies this file into every report it writes, reading it at
+    // capture time, so rewriting it later (SetSessionLogFile) still reaches
+    // dumps taken afterwards. It is per process because the database is
+    // shared by every running instance.
+    std::filesystem::path RunInfoFile;
+    mitk::CrashRunInfo RunInfo;
     // Provisional (watchdog) snapshots this process produced. Tracked in
     // memory so a recovery or clean shutdown purges exactly this session's
     // provisional dumps and never a previous hard-kill survivor the user may
@@ -149,6 +160,58 @@ namespace
     return error ? std::filesystem::path{} : path;
 #endif
   }
+
+  /** Outside the database, which every instance shares; a crashed session's
+   *  leftover is harmless and a reused process ID merely overwrites it. */
+  std::filesystem::path RunInfoFileForThisProcess()
+  {
+    std::error_code error;
+    const auto temporaryDirectory = std::filesystem::temp_directory_path(error);
+    if (error)
+      return {};
+
+#if defined(_WIN32)
+    const auto processId = static_cast<unsigned long>(GetCurrentProcessId());
+#else
+    const auto processId = static_cast<unsigned long>(getpid());
+#endif
+
+    return temporaryDirectory / ("mitk-crash-run-info-" + std::to_string(processId)) /
+      mitk::RunInfoAttachmentFileName;
+  }
+
+  std::set<std::filesystem::path> ProvisionalSnapshotsOfThisSession()
+  {
+    std::lock_guard<std::mutex> lock(s_SnapshotMutex);
+    return { s_State.ProvisionalSnapshots.begin(), s_State.ProvisionalSnapshots.end() };
+  }
+
+  std::vector<mitk::CrashDumpInfo> WithoutProvisionalSnapshotsOfThisSession(std::vector<mitk::CrashDumpInfo> dumps)
+  {
+    const auto provisional = ProvisionalSnapshotsOfThisSession();
+
+    std::erase_if(dumps, [&provisional](const mitk::CrashDumpInfo& dump) {
+      return provisional.find(dump.Path) != provisional.end();
+    });
+
+    return dumps;
+  }
+
+  /** Crash dumps get their sidecar lazily, from the report's attachment:
+   *  the handler writes it after this process is gone, and another instance
+   *  sharing the database can crash at any time. */
+  std::vector<mitk::CrashDumpInfo> WithRunInfo(std::vector<mitk::CrashDumpInfo> dumps)
+  {
+    for (auto& dump : dumps)
+    {
+      if (mitk::DumpKind::Crash == dump.Kind)
+        mitk::AdoptRunInfoAttachment(s_State.DatabaseDirectory, dump.Path.stem(), dump.Path);
+
+      mitk::LoadRunInfo(dump);
+    }
+
+    return dumps;
+  }
 }
 
 bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
@@ -161,20 +224,50 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
       return true;
     }
 
+    // Tests initialize repeatedly in one process; nothing of an earlier
+    // session may leak into this one.
+    s_State = FacilityState();
+
     if (config.DatabaseDirectory.empty())
     {
       MITK_WARN << "Crash-dump facility not armed: no database directory configured.";
       return false;
     }
 
-    s_State.DatabaseDirectory = config.DatabaseDirectory;
-
     std::error_code error;
-    std::filesystem::create_directories(s_State.DatabaseDirectory, error);
+    std::filesystem::create_directories(config.DatabaseDirectory, error);
     if (error)
     {
       MITK_WARN << "Crash-dump facility not armed: cannot create database directory '"
-                << s_State.DatabaseDirectory.string() << "': " << error.message();
+                << config.DatabaseDirectory.string() << "': " << error.message();
+      return false;
+    }
+
+    // Recorded before any decision not to arm, so that dumps already on disk
+    // stay listable and deletable in a session that records no new ones.
+    s_State.DatabaseDirectory = config.DatabaseDirectory;
+    s_State.Settings = ReadCrashDumpSettings(s_State.DatabaseDirectory);
+
+    const auto maxDumps = static_cast<std::size_t>(s_State.Settings.MaxDumpsPerKind);
+
+    // Bounding the pending-freeze area here cannot hide a hard-killed freeze
+    // from the next-start dialog: only the oldest go, and they go only when
+    // MaxDumpsPerKind newer ones remain to be shown.
+    PruneCrashDumps(s_State.DatabaseDirectory, maxDumps,
+      { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir });
+    PruneCrashDumps(s_State.DatabaseDirectory / kSnapshotsSubdir, maxDumps);
+    PruneCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir, maxDumps);
+
+    if (!config.Arm)
+    {
+      MITK_INFO << "Crash-dump facility not armed: disabled for this session.";
+      return false;
+    }
+
+    if (!s_State.Settings.Enabled)
+    {
+      MITK_INFO << "Crash-dump facility not armed: disabled in '"
+                << GetSettingsFilePath(s_State.DatabaseDirectory).string() << "'.";
       return false;
     }
 
@@ -212,21 +305,39 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
     sentry_options_set_handler_path(options, handlerPath.c_str());
 #endif
 
+    // Missing run info costs the dump its context, not its capture, so a
+    // failure here does not stop arming.
+    s_State.RunInfo.Release = release;
+    s_State.RunInfo.InstallDirectory = executableDirectory;
+    const auto runInfoFile = RunInfoFileForThisProcess();
+    std::filesystem::create_directories(runInfoFile.parent_path(), error);
+
+    if (!runInfoFile.empty() && WriteRunInfo(runInfoFile, s_State.RunInfo))
+    {
+      s_State.RunInfoFile = runInfoFile;
+#if defined(_WIN32)
+      sentry_options_add_attachmentw(options, runInfoFile.c_str());
+#else
+      sentry_options_add_attachment(options, runInfoFile.c_str());
+#endif
+    }
+    else
+    {
+      MITK_WARN << "Crash-dump facility: cannot write the run-info file '" << runInfoFile.string()
+                << "'; dumps of this session will carry no version or log information.";
+    }
+
     if (sentry_init(options) != 0)
     {
       MITK_WARN << "Crash-dump facility failed to arm; is the out-of-process handler present at '"
                 << handlerPath.string() << "'?";
+      std::filesystem::remove_all(runInfoFile.parent_path(), error);
+      s_State.RunInfoFile.clear();
       return false;
     }
 
     s_State.Active = true;
     s_State.CrashedLastRun = sentry_get_crashed_last_run() == 1;
-
-    // Bound only the crash-report area; the snapshot subdirectories keep their
-    // own retention (see CaptureSnapshot) and pending-freeze survivors must
-    // not be evicted here before the next-start dialog can surface them.
-    PruneCrashDumps(s_State.DatabaseDirectory, kMaxRetainedDumps,
-      { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir });
 
     return true;
   }
@@ -246,7 +357,38 @@ void mitk::CrashDumpFacility::Shutdown() noexcept
 
     sentry_close();
     s_State.Active = false;
+
+    if (!s_State.RunInfoFile.empty())
+    {
+      std::error_code error;
+      std::filesystem::remove_all(s_State.RunInfoFile.parent_path(), error);
+      s_State.RunInfoFile.clear();
+    }
   }
+}
+
+mitk::CrashDumpSettings mitk::CrashDumpFacility::GetSettings() noexcept
+{
+  return s_State.Settings;
+}
+
+mitk::CrashDumpSettings mitk::CrashDumpFacility::ReadSettings()
+{
+  return ReadCrashDumpSettings(s_State.DatabaseDirectory);
+}
+
+bool mitk::CrashDumpFacility::WriteSettings(const CrashDumpSettings& settings)
+{
+  return WriteCrashDumpSettings(s_State.DatabaseDirectory, settings);
+}
+
+bool mitk::CrashDumpFacility::SupportsSnapshots() noexcept
+{
+#if defined(__APPLE__)
+  return false; // see CaptureSnapshot()
+#else
+  return true;
+#endif
 }
 
 bool mitk::CrashDumpFacility::IsActive() noexcept
@@ -267,22 +409,45 @@ void mitk::CrashDumpFacility::ClearCrashedLastRun()
     sentry_clear_crashed_last_run();
 
   // Watermark from the newest surfacable dump, so an on-demand snapshot
-  // (excluded from the surfacable set) can never mask a real crash dump.
-  const auto dumps = ScanCrashDumps(s_State.DatabaseDirectory,
-    { kSnapshotsSubdir, kCrashpadStagingSubdir });
+  // (excluded from the surfacable set) can never mask a real crash dump, nor
+  // a provisional snapshot of this session mask a hard kill that follows it.
+  const auto dumps = WithoutProvisionalSnapshotsOfThisSession(ScanCrashDumps(
+    s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir }));
   if (!dumps.empty())
     WriteLastAcknowledgedTime(s_State.DatabaseDirectory, dumps.front().LastWriteTime);
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListDumps()
 {
-  return ScanCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir });
+  return WithRunInfo(WithoutProvisionalSnapshotsOfThisSession(ScanCrashDumps(
+    s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir })));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListUnacknowledgedDumps()
 {
-  return ScanUnacknowledgedCrashDumps(s_State.DatabaseDirectory,
-    { kSnapshotsSubdir, kCrashpadStagingSubdir });
+  return WithRunInfo(WithoutProvisionalSnapshotsOfThisSession(ScanUnacknowledgedCrashDumps(
+    s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir })));
+}
+
+std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListAllDumps()
+{
+  return WithRunInfo(WithoutProvisionalSnapshotsOfThisSession(ScanCrashDumps(
+    s_State.DatabaseDirectory, { kCrashpadStagingSubdir })));
+}
+
+std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession()
+{
+  if (s_State.DatabaseDirectory.empty())
+    return {};
+
+  const auto provisional = ProvisionalSnapshotsOfThisSession();
+  auto dumps = ScanCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir);
+
+  std::erase_if(dumps, [&provisional](const CrashDumpInfo& dump) {
+    return provisional.find(dump.Path) == provisional.end();
+  });
+
+  return WithRunInfo(dumps);
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListSnapshots(SnapshotKind kind)
@@ -300,6 +465,7 @@ bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
   std::error_code error;
   const bool removed = std::filesystem::remove(dumpPath, error) && !error;
 
+  std::filesystem::remove(GetRunInfoSidecarPath(dumpPath), error);
   RemoveCrashReportResidue(s_State.DatabaseDirectory, dumpPath);
 
   return removed;
@@ -308,6 +474,19 @@ bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
 std::filesystem::path mitk::CrashDumpFacility::GetDatabaseDirectory()
 {
   return s_State.DatabaseDirectory;
+}
+
+void mitk::CrashDumpFacility::SetSessionLogFile(const std::filesystem::path& logFile)
+{
+  std::lock_guard<std::mutex> lock(s_RunInfoMutex);
+
+  if (!s_State.Active || s_State.RunInfoFile.empty())
+    return;
+
+  s_State.RunInfo.LogFile = logFile;
+
+  if (!WriteRunInfo(s_State.RunInfoFile, s_State.RunInfo))
+    MITK_WARN << "Crash-dump facility: cannot record the session log in '" << s_State.RunInfoFile.string() << "'.";
 }
 
 std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
@@ -391,6 +570,12 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
               << "': " << renameError.message();
     std::filesystem::remove(newDump, error); // avoid a stray dump surfacing as a crash
   }
+  else
+  {
+    // The run info lives in the report's attachments, which go with the
+    // report below.
+    AdoptRunInfoAttachment(database, newDump.stem(), destination);
+  }
 
   // Either way the dump is no longer Crashpad's to hold - filed under its
   // kind, or discarded above - so the report has to be released here, after
@@ -404,7 +589,7 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
   if (SnapshotKind::WatchdogProvisional == kind)
     s_State.ProvisionalSnapshots.push_back(destination);
 
-  PruneCrashDumps(destinationDir, kMaxRetainedDumps);
+  PruneCrashDumps(destinationDir, static_cast<std::size_t>(s_State.Settings.MaxDumpsPerKind));
 
   return destination;
 #endif
@@ -418,6 +603,7 @@ void mitk::CrashDumpFacility::PurgeProvisionalSnapshots()
   {
     std::error_code error;
     std::filesystem::remove(snapshot, error);
+    std::filesystem::remove(GetRunInfoSidecarPath(snapshot), error);
   }
 
   s_State.ProvisionalSnapshots.clear();

@@ -103,10 +103,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
     if (snapshot.has_value())
     {
       resultBox.setIcon(QMessageBox::Information);
-      resultBox.setText(
-        "A diagnostic snapshot was saved. Like a crash dump, it may contain patient data from this "
-        "session, and there is no way to verify it does not. MITK never uploads it; it stays on this "
-        "computer. Share it only through your usual process for handling patient data.");
+      resultBox.setText("A diagnostic snapshot was saved.\n\n" + QmitkCrashDumpUi::PrivacyNote());
       resultBox.setDetailedText(QString::fromStdWString(snapshot->wstring()));
       auto *managerButton = resultBox.addButton("Open Diagnostic Data...", QMessageBox::ActionRole);
       QPushButton *reportButton = nullptr;

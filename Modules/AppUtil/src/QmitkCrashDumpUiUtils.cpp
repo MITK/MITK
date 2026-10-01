@@ -40,10 +40,13 @@ QString QmitkCrashDumpUi::KindLabel(mitk::DumpKind kind)
 
 QString QmitkCrashDumpUi::PrivacyNote()
 {
-  return "A crash dump contains parts of the application's memory and may therefore include "
-         "patient data, and there is no way to verify that it does not. MITK never uploads it; "
-         "it stays on this computer. Share it only through your usual process for handling "
-         "patient data.";
+  return "A crash dump or diagnostic snapshot contains parts of the application's memory from the "
+         "session it was taken in. If at any time during that session you opened, browsed or queried "
+         "data about real people that was not fully anonymized (including in the DICOM browser or a "
+         "PACS query), it may contain such data and must be handled through your usual process for "
+         "patient or study-participant data. Other rules of your organisation may also restrict "
+         "sharing it, for example for confidential or unpublished data. Please check before you pass "
+         "a dump on. MITK never uploads crash dumps; they stay on this computer.";
 }
 
 void QmitkCrashDumpUi::ShowInFolders(const std::vector<std::filesystem::path>& files)

@@ -64,11 +64,16 @@ stack or in a register at capture time - not on whether it was loaded:
 | `QString` contents in general | heap; only a pointer on the stack | Usually not |
 
 A dump must be assumed to possibly contain fragments of whatever the
-application was handling at the moment of capture. It will not hold the bulk
-of loaded patient data, but it cannot be assumed free of personal data, and
-there is no way to verify that it is. Every kept dump should be treated as
-potentially containing patient data and shared only through the institution's
-process for handling such data.
+application was handling during the session, not only at the moment of
+capture: stack slots and registers can still hold values left over from
+earlier work, and memory they point to is captured too. It will not hold the
+bulk of loaded data, and there is no way to verify what it does hold. The
+user-facing texts therefore make the rule conditional on the session: if it
+ever touched non-anonymized data about real people (including DICOM browser
+listings and PACS queries), the dump has to be handled like that data. Even
+otherwise, the organisation's own rules (confidential or unpublished data) may
+restrict sharing it, so the decision to pass a dump on is left explicitly with
+the user.
 
 \section CrashDumpFacilityPage_LocalOnly Local-only by construction
 

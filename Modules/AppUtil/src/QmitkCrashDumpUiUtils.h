@@ -29,7 +29,7 @@ namespace QmitkCrashDumpUi
 
   QString KindLabel(mitk::DumpKind kind);
 
-  /** Why dumps must be handled like patient data. */
+  /** What to consider before passing a dump on. */
   QString PrivacyNote();
 
   /** Opens each distinct folder containing one of \p files. */

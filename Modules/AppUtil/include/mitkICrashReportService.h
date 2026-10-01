@@ -32,6 +32,12 @@ namespace mitk
    * "File report..." only while an implementation is registered. The dumps
    * stay where they are; what the report flow copies, sends or deletes is its
    * own decision and must be visible to the user.
+   *
+   * Before a dump leaves the computer, the flow must have the user confirm
+   * explicitly that they are permitted to share it, i.e. that sharing complies
+   * with the data-protection and other rules that apply to the data handled
+   * in that session. The local crash-dump UI only advises; that confirmation
+   * is what puts the decision on record with the sender.
    */
   class MITKAPPUTIL_EXPORT ICrashReportService
   {

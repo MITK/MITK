@@ -14,10 +14,76 @@ found in the LICENSE file.
 
 #include <mitkICrashReportService.h>
 
+#include <QApplication>
 #include <QDesktopServices>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QLabel>
+#include <QPainter>
+#include <QPalette>
+#include <QRegularExpression>
 #include <QUrl>
+#include <QVBoxLayout>
 
 #include <set>
+
+namespace
+{
+  constexpr int kIconSize = 48;
+  // The badge reaches this far past the icon's lower-right edge, so it can
+  // be clearly visible while covering only a corner of the icon.
+  constexpr int kBadgeOverhang = 8;
+  constexpr int kBadgedIconSize = kIconSize + kBadgeOverhang;
+
+  /** The color of the stylesheet class "font.<name>", which the MITK light
+   *  and dark stylesheets define for rich text; invalid if there is none. */
+  QColor StyleSheetColor(const QString& name)
+  {
+    const QRegularExpression pattern(
+      QString(R"(font\.%1\s*\{[^}]*?\bcolor\s*:\s*([^;}]+))").arg(QRegularExpression::escape(name)));
+
+    const auto match = pattern.match(qApp->styleSheet());
+    return match.hasMatch() ? QColor(match.captured(1).trimmed()) : QColor();
+  }
+
+  bool IsDarkTheme()
+  {
+    return QApplication::palette().color(QPalette::Window).lightness() < 128;
+  }
+
+  /** The application icon with a badge on its lower-right corner. */
+  QPixmap BadgedApplicationIcon(const QColor& badgeColor, const QColor& background, qreal devicePixelRatio)
+  {
+    QPixmap pixmap(QSize(kBadgedIconSize, kBadgedIconSize) * devicePixelRatio);
+    pixmap.setDevicePixelRatio(devicePixelRatio);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QApplication::windowIcon().paint(&painter, QRect(0, 0, kIconSize, kIconSize));
+
+    const qreal diameter = kIconSize * 0.42;
+    const QRectF badge(kBadgedIconSize - diameter, kBadgedIconSize - diameter, diameter, diameter);
+
+    // The ring in the band's colour sets the badge off from the icon below it.
+    const qreal ring = kIconSize * 0.045;
+    painter.setPen(QPen(background, ring));
+    painter.setBrush(badgeColor);
+    painter.drawEllipse(badge.adjusted(ring / 2, ring / 2, -ring / 2, -ring / 2));
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(background);
+    const qreal barWidth = diameter * 0.14;
+    const QPointF center = badge.center();
+    painter.drawRoundedRect(QRectF(center.x() - barWidth / 2, badge.top() + diameter * 0.2, barWidth, diameter * 0.38),
+      barWidth / 2, barWidth / 2);
+    painter.drawEllipse(QPointF(center.x(), badge.top() + diameter * 0.74), barWidth * 0.62, barWidth * 0.62);
+
+    return pixmap;
+  }
+}
 
 QString QmitkCrashDumpUi::ToQString(const std::filesystem::path& path)
 {
@@ -38,15 +104,81 @@ QString QmitkCrashDumpUi::KindLabel(mitk::DumpKind kind)
   }
 }
 
+QColor QmitkCrashDumpUi::WarningColor()
+{
+  const auto color = StyleSheetColor("warning");
+  if (color.isValid())
+    return color;
+
+  return IsDarkTheme() ? QColor(0xff, 0x5c, 0x33) : QColor(Qt::red);
+}
+
+QColor QmitkCrashDumpUi::AccentColor()
+{
+  const auto color = StyleSheetColor("highlight");
+  return color.isValid() ? color : QApplication::palette().color(QPalette::Highlight);
+}
+
+QString QmitkCrashDumpUi::Warning(const QString& text)
+{
+  return QString("<span style=\"color: %1; font-weight: bold;\">%2</span>").arg(WarningColor().name(), text);
+}
+
 QString QmitkCrashDumpUi::PrivacyNote()
 {
-  return "A crash dump or diagnostic snapshot contains parts of the application's memory from the "
-         "session it was taken in. If at any time during that session you opened, browsed or queried "
-         "data about real people that was not fully anonymized (including in the DICOM browser or a "
-         "PACS query), it may contain such data and must be handled through your usual process for "
-         "patient or study-participant data. Other rules of your organisation may also restrict "
-         "sharing it, for example for confidential or unpublished data. Please check before you pass "
-         "a dump on. MITK never uploads crash dumps; they stay on this computer.";
+  return Warning("Before you share a dump:") +
+    " a crash dump or diagnostic snapshot contains parts of the application's memory from the "
+    "session it was taken in. If at any time during that session you opened, browsed or queried "
+    "data about real people that was not fully anonymized (including in the DICOM browser or a "
+    "PACS query), it may contain such data and must be handled through your usual process for "
+    "patient or study-participant data. Other rules of your organisation may also restrict "
+    "sharing it, for example for confidential or unpublished data. Please check before you pass "
+    "a dump on. MITK never uploads crash dumps; they stay on this computer.";
+}
+
+QWidget* QmitkCrashDumpUi::CreateHeader(const QString& title, const QString& subtitle)
+{
+  const auto palette = QApplication::palette();
+  const auto background = palette.color(QPalette::Base);
+  const auto accent = AccentColor();
+
+  auto* header = new QFrame;
+  header->setObjectName("crashDumpHeader");
+  header->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  header->setStyleSheet(QString(
+    "QFrame#crashDumpHeader { background-color: %1; border: none; border-left: 4px solid %2; "
+    "border-bottom: 1px solid %3; }").arg(background.name(), accent.name(), palette.color(QPalette::Mid).name()));
+
+  auto* iconLabel = new QLabel;
+  iconLabel->setPixmap(BadgedApplicationIcon(accent, background, header->devicePixelRatioF()));
+  iconLabel->setFixedSize(kBadgedIconSize, kBadgedIconSize);
+
+  auto* titleLabel = new QLabel(title);
+  titleLabel->setObjectName("crashDumpHeaderTitle");
+  auto titleFont = titleLabel->font();
+  titleFont.setPointSizeF(titleFont.pointSizeF() * 1.35);
+  titleFont.setWeight(QFont::DemiBold);
+  titleLabel->setFont(titleFont);
+  titleLabel->setWordWrap(true);
+
+  auto* subtitleLabel = new QLabel(subtitle);
+  subtitleLabel->setObjectName("crashDumpHeaderSubtitle");
+  subtitleLabel->setWordWrap(true);
+
+  auto* textLayout = new QVBoxLayout;
+  textLayout->setSpacing(2);
+  textLayout->addStretch();
+  textLayout->addWidget(titleLabel);
+  textLayout->addWidget(subtitleLabel);
+  textLayout->addStretch();
+
+  auto* layout = new QHBoxLayout(header);
+  layout->setContentsMargins(14, 14, 16, 14);
+  layout->setSpacing(14);
+  layout->addWidget(iconLabel, 0, Qt::AlignVCenter);
+  layout->addLayout(textLayout, 1);
+
+  return header;
 }
 
 void QmitkCrashDumpUi::ShowInFolders(const std::vector<std::filesystem::path>& files)

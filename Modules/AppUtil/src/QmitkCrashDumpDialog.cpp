@@ -27,28 +27,51 @@ found in the LICENSE file.
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent)
   : QDialog(parent)
 {
   this->setObjectName("QmitkCrashDumpDialog");
   this->setWindowTitle("Diagnostic Data From Previous Session");
 
-  auto* messageLabel = new QLabel(
-    "<b>We are sorry that MITK closed unexpectedly or became unresponsive during your "
-    "previous session, and for any inconvenience this may have caused.</b><br/><br/>"
-    "A diagnostic snapshot (crash dump) of that session was saved. If possible, please "
-    "keep it and hand it in with a problem report. It helps us find the cause and make "
-    "MITK more robust and reliable.");
+  const bool crashed = std::any_of(dumps.begin(), dumps.end(),
+    [](const mitk::CrashDumpInfo& dump) { return mitk::DumpKind::Crash == dump.Kind; });
+  const bool terminated = std::any_of(dumps.begin(), dumps.end(),
+    [](const mitk::CrashDumpInfo& dump) { return mitk::DumpKind::UnresponsiveTerminated == dump.Kind; });
+
+  QString whatHappened = "MITK closed unexpectedly or stopped responding.";
+  if (crashed && !terminated)
+    whatHappened = "MITK closed unexpectedly.";
+  else if (terminated && !crashed)
+    whatHappened = "MITK stopped responding and had to be closed.";
+
+  auto* header = QmitkCrashDumpUi::CreateHeader("Your previous MITK session ended unexpectedly",
+    whatHappened + " We are sorry for the interruption and for any work it may have cost you.");
+
+  const bool single = dumps.size() == 1;
+
+  auto* messageLabel = new QLabel(QString(single
+    ? "A diagnostic snapshot of that session was saved. Handed in with a problem report, it helps us "
+      "find the cause and make MITK more reliable."
+    : "Diagnostic snapshots of that session were saved. Handed in with a problem report, they help us "
+      "find the cause and make MITK more reliable."));
   messageLabel->setWordWrap(true);
 
   auto* dumpList = new QmitkCrashDumpListWidget;
   dumpList->SetSelectionEnabled(false);
   dumpList->SetDumps(dumps);
+  dumpList->FitHeightToRows();
 
-  auto* privacyLabel = new QLabel(QmitkCrashDumpUi::PrivacyNote() +
-    " Kept dumps can be found later under <i>Help &gt; Diagnostic Data...</i>"
-    "<br/><br/><b>Unless you keep it, it is deleted now.</b>");
+  auto* privacyLabel = new QLabel(QmitkCrashDumpUi::PrivacyNote());
   privacyLabel->setWordWrap(true);
+
+  auto* deletionLabel = new QLabel(QmitkCrashDumpUi::Warning(single
+    ? "Unless you keep it, this dump is deleted now."
+    : "Unless you keep them, these dumps are deleted now.") +
+    " Kept dumps can be found later under <i>Help&nbsp;&gt; Diagnostic&nbsp;Data...</i>");
+  deletionLabel->setObjectName("deletionLabel");
+  deletionLabel->setWordWrap(true);
 
   auto* buttonBox = new QDialogButtonBox;
   auto* removeButton = buttonBox->addButton("Remove", QDialogButtonBox::RejectRole);
@@ -69,13 +92,34 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
     connect(reportButton, &QPushButton::clicked, this, [this] { m_Choice = FileReport; this->accept(); });
   }
 
+  auto* content = new QVBoxLayout;
+  content->setContentsMargins(16, 12, 16, 14);
+  content->addWidget(messageLabel);
+  content->addSpacing(4);
+  content->addWidget(dumpList);
+  content->addSpacing(4);
+  content->addWidget(privacyLabel);
+  content->addSpacing(6);
+  content->addWidget(deletionLabel);
+  content->addSpacing(4);
+  content->addStretch();
+  content->addWidget(buttonBox);
+
+  // The header band runs edge to edge; only the content below it is inset.
   auto* layout = new QVBoxLayout(this);
-  layout->addWidget(messageLabel);
-  layout->addWidget(dumpList);
-  layout->addWidget(privacyLabel);
-  layout->addWidget(buttonBox);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(header);
+  layout->addLayout(content);
 
   this->setMinimumWidth(560);
+
+  // The size hint of word-wrapped labels assumes a narrower width than they
+  // get, which would leave the dialog with empty space at the bottom.
+  const int width = std::max(this->minimumWidth(), this->sizeHint().width());
+  const int height = this->heightForWidth(width);
+  if (height > 0)
+    this->resize(width, height);
 }
 
 void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)

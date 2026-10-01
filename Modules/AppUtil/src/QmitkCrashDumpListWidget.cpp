@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QLocale>
+#include <QScrollBar>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -127,6 +128,20 @@ std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetSelectedDumps() co
   }
 
   return selected;
+}
+
+void QmitkCrashDumpListWidget::FitHeightToRows()
+{
+  int height = m_Tree->header()->sizeHint().height() + 2 * m_Tree->frameWidth();
+
+  for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
+    height += m_Tree->sizeHintForRow(row);
+
+  // Room for a horizontal scroll bar, should the columns not fit.
+  height += m_Tree->horizontalScrollBar()->sizeHint().height();
+
+  m_Tree->setFixedHeight(height);
+  this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 
 void QmitkCrashDumpListWidget::SetSelectionEnabled(bool enabled)

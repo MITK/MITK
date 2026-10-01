@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceRegistration.h>
 
+#include <QLabel>
 #include <QPushButton>
 #include <QTimer>
 #include <QTreeWidget>
@@ -247,8 +248,12 @@ public:
   void NextStartDialogKeepAcknowledges()
   {
     bool hadReportButton = true;
-    auto* timer = WhenModalDialogShows([&hadReportButton](QWidget* dialog) {
+    QString subtitle;
+    QString deletion;
+    auto* timer = WhenModalDialogShows([&](QWidget* dialog) {
       hadReportButton = dialog->findChild<QPushButton*>("fileReportButton") != nullptr;
+      subtitle = dialog->findChild<QLabel*>("crashDumpHeaderSubtitle")->text();
+      deletion = dialog->findChild<QLabel*>("deletionLabel")->text();
       dialog->findChild<QPushButton*>("keepButton")->click();
     });
 
@@ -256,6 +261,9 @@ public:
     delete timer;
 
     CPPUNIT_ASSERT(!hadReportButton);
+    CPPUNIT_ASSERT_MESSAGE("a crash and a terminated freeze are both named",
+      subtitle.startsWith("MITK closed unexpectedly or stopped responding."));
+    CPPUNIT_ASSERT(deletion.contains("these dumps are deleted now"));
     CPPUNIT_ASSERT(std::filesystem::exists(m_CrashDump));
     CPPUNIT_ASSERT(std::filesystem::exists(m_FreezeDump));
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListUnacknowledgedDumps().empty());

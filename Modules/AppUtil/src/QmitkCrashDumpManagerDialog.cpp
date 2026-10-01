@@ -89,6 +89,9 @@ QmitkCrashDumpManagerDialog::QmitkCrashDumpManagerDialog(QWidget* parent)
   m_DeleteButton->setObjectName("deleteButton");
   m_DeleteAllButton->setObjectName("deleteAllButton");
 
+  auto* header = QmitkCrashDumpUi::CreateHeader("Diagnostic data",
+    "Crash dumps and diagnostic snapshots saved on this computer.");
+
   auto* introLabel = new QLabel(
     "Crash dumps are written when MITK closes unexpectedly or is terminated while unresponsive; "
     "snapshots are captured on request. Hand them in with a problem report to help us find the "
@@ -122,12 +125,21 @@ QmitkCrashDumpManagerDialog::QmitkCrashDumpManagerDialog(QWidget* parent)
   connect(refreshButton, &QPushButton::clicked, this, &QmitkCrashDumpManagerDialog::Refresh);
   connect(closeButtonBox, &QDialogButtonBox::rejected, this, &QDialog::close);
 
+  auto* content = new QVBoxLayout;
+  content->setContentsMargins(16, 12, 16, 14);
+  content->addWidget(introLabel);
+  content->addSpacing(4);
+  content->addWidget(m_StateLabel);
+  content->addWidget(m_List);
+  content->addLayout(actionLayout);
+  content->addWidget(closeButtonBox);
+
+  // The header band runs edge to edge; only the content below it is inset.
   auto* layout = new QVBoxLayout(this);
-  layout->addWidget(introLabel);
-  layout->addWidget(m_StateLabel);
-  layout->addWidget(m_List);
-  layout->addLayout(actionLayout);
-  layout->addWidget(closeButtonBox);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(header);
+  layout->addLayout(content);
 
   this->resize(760, 420);
   this->Refresh();
@@ -140,14 +152,15 @@ void QmitkCrashDumpManagerDialog::Refresh()
 
   if (mitk::CrashDumpFacility::GetDatabaseDirectory().empty())
   {
-    m_StateLabel->setText("<b>Crash dumps are not available: the folder for diagnostic data could not be "
-                          "determined.</b>");
+    m_StateLabel->setText(QmitkCrashDumpUi::Warning(
+      "Crash dumps are not available: the folder for diagnostic data could not be determined."));
     m_StateLabel->setVisible(true);
   }
   else if (!mitk::CrashDumpFacility::IsActive())
   {
-    m_StateLabel->setText("<b>No new crash dumps are being recorded in this session.</b> Existing ones "
-                          "can still be handled here.");
+    m_StateLabel->setText(QString("<span style=\"color: %1; font-weight: bold;\">No new crash dumps are being "
+      "recorded in this session.</span> Existing ones can still be handled here.")
+      .arg(QmitkCrashDumpUi::AccentColor().name()));
     m_StateLabel->setVisible(true);
   }
   else

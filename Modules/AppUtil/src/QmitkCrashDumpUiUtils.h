@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkCrashDumpFacility.h>
 
+#include <QColor>
 #include <QString>
 
 #include <filesystem>
@@ -29,8 +30,23 @@ namespace QmitkCrashDumpUi
 
   QString KindLabel(mitk::DumpKind kind);
 
-  /** What to consider before passing a dump on. */
+  /** Colours of the stylesheet's "font.warning" and "font.highlight" classes,
+   *  so the dialogs follow the light and dark theme; palette-based fallbacks
+   *  when no MITK stylesheet is active. */
+  QColor WarningColor();
+  QColor AccentColor();
+
+  /** \p text as rich text in the warning colour, bold. */
+  QString Warning(const QString& text);
+
+  /** What to consider before passing a dump on, as rich text with a
+   *  warning-coloured lead-in. */
   QString PrivacyNote();
+
+  /** The band at the top of the crash-dump dialogs: the application icon
+   *  with an accent-coloured badge marking an exceptional state, a title and
+   *  a subtitle. */
+  QWidget* CreateHeader(const QString& title, const QString& subtitle);
 
   /** Opens each distinct folder containing one of \p files. */
   void ShowInFolders(const std::vector<std::filesystem::path>& files);

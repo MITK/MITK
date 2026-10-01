@@ -25,9 +25,10 @@ class QMenu;
  *
  * Counts how often the lighting menu of the 3D render window is opened. On
  * the tenth opening, once per session, the menu gets an extra entry for
- * that one opening. Choosing it adds the
- * cat from the plugin resources to the data storage, fits the views to the
- * scene, and sets the 3D camera rotating around her while her colors cycle.
+ * that one opening. Choosing it adds the cat from the plugin resources to
+ * the data storage, visible in the 3D windows only, and fits the views to
+ * the scene. After a few calm seconds she starts to spin, bounce and cycle
+ * her colors.
  */
 class QmitkEthel : public QObject
 {

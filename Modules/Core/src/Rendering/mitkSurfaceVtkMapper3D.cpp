@@ -16,11 +16,15 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkDataNode.h>
 #include <mitkExtractSliceFilter.h>
+#include <mitkFloatPropertyExtension.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyExtensions.h>
+#include <mitkIntPropertyExtension.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <mitkSmartPointerProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkInterpolationProperty.h>
@@ -42,35 +46,51 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
-#include <chrono>
 #include <cmath>
 #include <numbers>
+#include <optional>
 #include <string>
 
 namespace
 {
+  constexpr const char* PULSE_PROPERTY = "animated.pulse";
+  constexpr const char* PULSE_FREQUENCY_PROPERTY = "animated.pulse.frequency";
+  constexpr const char* COLOR_PROPERTY = "animated.color";
+  constexpr const char* COLOR_FREQUENCY_PROPERTY = "animated.color.frequency";
+  constexpr const char* SPIN_PROPERTY = "animated.spin";
+  constexpr const char* SPIN_FREQUENCY_PROPERTY = "animated.spin.frequency";
+  constexpr const char* SPIN_AXIS_PROPERTY = "animated.spin.axis";
+  constexpr const char* BOUNCE_PROPERTY = "animated.bounce";
+  constexpr const char* BOUNCE_FREQUENCY_PROPERTY = "animated.bounce.frequency";
+  constexpr const char* BOUNCE_HEIGHT_PROPERTY = "animated.bounce.height";
+  constexpr const char* BOUNCE_AXIS_PROPERTY = "animated.bounce.axis";
+
+  constexpr float DEFAULT_PULSE_FREQUENCY = 1.5f;
+  constexpr float DEFAULT_COLOR_FREQUENCY = 2.0f;
+  constexpr float DEFAULT_SPIN_FREQUENCY = 0.25f;
+  constexpr float DEFAULT_BOUNCE_FREQUENCY = 1.0f;
+  constexpr float DEFAULT_BOUNCE_HEIGHT = 0.5f;
+  constexpr int DEFAULT_AXIS = 2;
+
   constexpr const char* PULSE_UNIFORM = "mitkPulse";
   constexpr const char* TINT_UNIFORM = "mitkTint";
 
-  // A cosine at 1.5 Hz between 0.5 and 1.0, the factor on the lit color of a pulsing surface.
-  float GetPulse()
+  // A cosine between 0.5 and 1.0, the factor on the lit color of a pulsing surface.
+  float GetPulse(double time, double frequency)
   {
-    const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
-    return static_cast<float>(0.75 + 0.25 * std::cos(2.0 * std::numbers::pi * 1.5 * now.count()));
+    return static_cast<float>(0.75 + 0.25 * std::cos(2.0 * std::numbers::pi * frequency * time));
   }
 
   // The tint on the lit color of a color-cycling surface: a point that runs around a hue
-  // wheel of constant luminance every three seconds. Pure hues would not do, since blue is
-  // only a tenth as bright as yellow and turns the surface nearly black. Offsets along the
-  // Cb and Cr axes of BT.709 YCbCr carry no luminance, so every tint on the wheel darkens
-  // the surface by the same amount, and each is as colorful as the gamut allows.
-  std::array<float, 3> GetCycledTint()
+  // wheel of constant luminance. Pure hues would not do, since blue is only a tenth as
+  // bright as yellow and turns the surface nearly black. Offsets along the Cb and Cr axes
+  // of BT.709 YCbCr carry no luminance, so every tint on the wheel darkens the surface by
+  // the same amount, and each is as colorful as the gamut allows.
+  std::array<float, 3> GetCycledTint(double time, double frequency)
   {
-    constexpr double secondsPerCycle = 3.0;
     constexpr double luminance = 0.75;
 
-    const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
-    const double angle = 2.0 * std::numbers::pi * std::fmod(now.count(), secondsPerCycle) / secondsPerCycle;
+    const double angle = 2.0 * std::numbers::pi * frequency * time;
     const double cr = std::cos(angle);
     const double cb = std::sin(angle);
 
@@ -94,6 +114,42 @@ namespace
       tint[i] = static_cast<float>(luminance + amplitude * direction[i]);
 
     return tint;
+  }
+
+  // The fraction of the current cycle, in [0, 1) for any sign of time and frequency.
+  double GetCyclePhase(double time, double frequency)
+  {
+    const double cycles = frequency * time;
+    return cycles - std::floor(cycles);
+  }
+
+  // The parabolic arc of a ball thrown up from its rest position, which it returns to at the end of each cycle.
+  double GetBounceOffset(double time, double frequency, double height)
+  {
+    const double phase = GetCyclePhase(time, frequency);
+    return 4.0 * height * phase * (1.0 - phase);
+  }
+
+  // The geometry axis an IntProperty selects: 0 for x, 1 for y, 2 for z. None for any other value.
+  std::optional<unsigned int> GetAxis(const mitk::DataNode *node, const char *propertyKey, const mitk::BaseRenderer *renderer)
+  {
+    int axis = DEFAULT_AXIS;
+    node->GetIntProperty(propertyKey, axis, renderer);
+
+    if (axis < 0 || 2 < axis)
+      return std::nullopt;
+
+    return static_cast<unsigned int>(axis);
+  }
+
+  // The world direction of a geometry axis.
+  std::array<double, 3> GetAxisDirection(const mitk::BaseGeometry *geometry, unsigned int axis)
+  {
+    // The column is as long as the spacing along the axis.
+    auto direction = geometry->GetMatrixColumn(axis);
+    direction.normalize();
+
+    return { direction[0], direction[1], direction[2] };
   }
 }
 
@@ -158,6 +214,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
     {
       ls->m_DepthSort->SetInputData(polydata);
       ls->m_DepthSort->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
+      ls->m_DepthSort->SetProp3D(ls->m_Actor);
       ls->m_DepthSort->SetDirectionToBackToFront();
       ls->m_DepthSort->Update();
       ls->m_VtkPolyDataMapper->SetInputConnection(ls->m_DepthSort->GetOutputPort());
@@ -181,15 +238,26 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer *renderer)
 {
   Superclass::Update(renderer);
 
-  bool pulsing = false;
-  bool colorCycling = false;
-  this->GetDataNode()->GetBoolProperty("pulsing", pulsing, renderer);
-  this->GetDataNode()->GetBoolProperty("color-cycling", colorCycling, renderer);
+  const auto *node = this->GetDataNode();
+
+  bool pulse = false;
+  bool colorCycle = false;
+  bool spin = false;
+  bool bounce = false;
+  node->GetBoolProperty(PULSE_PROPERTY, pulse, renderer);
+  node->GetBoolProperty(COLOR_PROPERTY, colorCycle, renderer);
+  node->GetBoolProperty(SPIN_PROPERTY, spin, renderer);
+  node->GetBoolProperty(BOUNCE_PROPERTY, bounce, renderer);
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  auto *renderingManager = RenderingManager::GetInstance();
 
-  // A surface that never animated keeps the standard shader.
-  if (!pulsing && !colorCycling && !ls->m_HasAnimationShader)
+  // The actor is invisible whenever there is nothing to draw, see GenerateDataForRenderer().
+  if ((pulse || colorCycle || spin || bounce) && ls->m_Actor->GetVisibility())
+    renderingManager->RequestAnimationFrame(renderer->GetRenderWindow());
+
+  // A surface that never pulsed or cycled its color keeps the standard shader.
+  if (!pulse && !colorCycle && !ls->m_HasAnimationShader)
     return;
 
   // Nothing on the vtkProperty may animate: vtkOpenGLPolyDataMapper rebuilds its buffers
@@ -206,11 +274,83 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer *renderer)
     ls->m_HasAnimationShader = true;
   }
 
-  auto *uniforms = shaderProperty->GetFragmentCustomUniforms();
-  uniforms->SetUniformf(PULSE_UNIFORM, pulsing ? GetPulse() : 1.0f);
+  const double time = renderingManager->GetAnimationTime();
 
-  const auto tint = colorCycling ? GetCycledTint() : std::array<float, 3>{ 1.0f, 1.0f, 1.0f };
+  float pulseFrequency = DEFAULT_PULSE_FREQUENCY;
+  float colorFrequency = DEFAULT_COLOR_FREQUENCY;
+  node->GetFloatProperty(PULSE_FREQUENCY_PROPERTY, pulseFrequency, renderer);
+  node->GetFloatProperty(COLOR_FREQUENCY_PROPERTY, colorFrequency, renderer);
+
+  auto *uniforms = shaderProperty->GetFragmentCustomUniforms();
+  uniforms->SetUniformf(PULSE_UNIFORM, pulse ? GetPulse(time, pulseFrequency) : 1.0f);
+
+  const auto tint = colorCycle ? GetCycledTint(time, colorFrequency) : std::array<float, 3>{ 1.0f, 1.0f, 1.0f };
   uniforms->SetUniform3f(TINT_UNIFORM, tint.data());
+}
+
+void mitk::SurfaceVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+{
+  const auto *node = this->GetDataNode();
+
+  bool spin = false;
+  bool bounce = false;
+  node->GetBoolProperty(SPIN_PROPERTY, spin, renderer);
+  node->GetBoolProperty(BOUNCE_PROPERTY, bounce, renderer);
+
+  // Nothing moves along an axis out of range.
+  const auto spinAxis = GetAxis(node, SPIN_AXIS_PROPERTY, renderer);
+  const auto bounceAxis = GetAxis(node, BOUNCE_AXIS_PROPERTY, renderer);
+  spin = spin && spinAxis.has_value();
+  bounce = bounce && bounceAxis.has_value();
+
+  // None at a time step the surface does not have.
+  const auto *geometry = this->GetInput()->GetGeometry(this->GetTimestep());
+
+  if ((!spin && !bounce) || nullptr == geometry)
+  {
+    Superclass::UpdateVtkTransform(renderer);
+    return;
+  }
+
+  float spinFrequency = DEFAULT_SPIN_FREQUENCY;
+  float bounceFrequency = DEFAULT_BOUNCE_FREQUENCY;
+  float bounceHeight = DEFAULT_BOUNCE_HEIGHT;
+  node->GetFloatProperty(SPIN_FREQUENCY_PROPERTY, spinFrequency, renderer);
+  node->GetFloatProperty(BOUNCE_FREQUENCY_PROPERTY, bounceFrequency, renderer);
+  node->GetFloatProperty(BOUNCE_HEIGHT_PROPERTY, bounceHeight, renderer);
+
+  const double time = RenderingManager::GetInstance()->GetAnimationTime();
+
+  // Both happen along the axes of the geometry, but in world coordinates, after the geometry placed
+  // the surface. The spin turns around an axis through the center at rest, the bounce starts there.
+  const auto center = geometry->GetCenter();
+
+  // A matrix of its own: the geometry's transform is shared with every other user of the data.
+  auto *transform = m_LSH.GetLocalStorage(renderer)->m_AnimationTransform.GetPointer();
+  transform->Identity();
+  transform->PostMultiply();
+  transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
+
+  if (spin)
+  {
+    const auto direction = GetAxisDirection(geometry, *spinAxis);
+
+    transform->Translate(-center[0], -center[1], -center[2]);
+    transform->RotateWXYZ(360.0 * GetCyclePhase(time, spinFrequency), direction.data());
+    transform->Translate(center[0], center[1], center[2]);
+  }
+
+  if (bounce)
+  {
+    const auto direction = GetAxisDirection(geometry, *bounceAxis);
+
+    // The height is relative to the extent of the bounding box along the axis.
+    const double offset = GetBounceOffset(time, bounceFrequency, bounceHeight * geometry->GetExtentInMM(*bounceAxis));
+
+    transform->Translate(offset * direction[0], offset * direction[1], offset * direction[2]);
+  }
+
+  m_LSH.GetLocalStorage(renderer)->m_Actor->SetUserTransform(transform);
 }
 
 void mitk::SurfaceVtkMapper3D::ResetMapper(BaseRenderer *renderer)
@@ -621,5 +761,38 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::
     "Enables correct rendering for transparent objects by ordering polygons according to the distance "
     "to the camera. It is not recommended to enable this property for large surfaces (rendering might "
     "be slow).");
+
+  node->AddProperty(PULSE_PROPERTY, mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(PULSE_FREQUENCY_PROPERTY, mitk::FloatProperty::New(DEFAULT_PULSE_FREQUENCY), renderer, overwrite);
+  node->AddProperty(COLOR_PROPERTY, mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(COLOR_FREQUENCY_PROPERTY, mitk::FloatProperty::New(DEFAULT_COLOR_FREQUENCY), renderer, overwrite);
+  node->AddProperty(SPIN_PROPERTY, mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(SPIN_FREQUENCY_PROPERTY, mitk::FloatProperty::New(DEFAULT_SPIN_FREQUENCY), renderer, overwrite);
+  node->AddProperty(SPIN_AXIS_PROPERTY, mitk::IntProperty::New(DEFAULT_AXIS), renderer, overwrite);
+  node->AddProperty(BOUNCE_PROPERTY, mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(BOUNCE_FREQUENCY_PROPERTY, mitk::FloatProperty::New(DEFAULT_BOUNCE_FREQUENCY), renderer, overwrite);
+  node->AddProperty(BOUNCE_HEIGHT_PROPERTY, mitk::FloatProperty::New(DEFAULT_BOUNCE_HEIGHT), renderer, overwrite);
+  node->AddProperty(BOUNCE_AXIS_PROPERTY, mitk::IntProperty::New(DEFAULT_AXIS), renderer, overwrite);
+
+  // The editors of the Properties view, which otherwise start at 0 and end at 100.
+  mitk::CoreServicePointer<mitk::IPropertyExtensions> propExtService(mitk::CoreServices::GetPropertyExtensions());
+  propExtService->AddExtension(SPIN_FREQUENCY_PROPERTY, mitk::FloatPropertyExtension::New(-10.0f, 10.0f, 0.05f));
+  propExtService->AddExtension(SPIN_AXIS_PROPERTY, mitk::IntPropertyExtension::New(0, 2));
+  propExtService->AddExtension(BOUNCE_HEIGHT_PROPERTY, mitk::FloatPropertyExtension::New(-10.0f, 10.0f, 0.05f));
+  propExtService->AddExtension(BOUNCE_AXIS_PROPERTY, mitk::IntPropertyExtension::New(0, 2));
+
+  propDescService->AddDescription(PULSE_PROPERTY, "Lets the surface pulse in 3D.");
+  propDescService->AddDescription(PULSE_FREQUENCY_PROPERTY, "Pulses per second.");
+  propDescService->AddDescription(COLOR_PROPERTY, "Tints the surface in 3D with a color that runs around a hue wheel.");
+  propDescService->AddDescription(COLOR_FREQUENCY_PROPERTY, "Turns around the hue wheel per second.");
+  propDescService->AddDescription(SPIN_PROPERTY, "Spins the surface in 3D around an axis through its center.");
+  propDescService->AddDescription(SPIN_FREQUENCY_PROPERTY, "Turns per second. Negative values spin the other way.");
+  propDescService->AddDescription(SPIN_AXIS_PROPERTY, "The axis of the surface's geometry it spins around: 0 for x, 1 for y, 2 for z.");
+  propDescService->AddDescription(BOUNCE_PROPERTY, "Lets the surface bounce in 3D like a ball, from where it is.");
+  propDescService->AddDescription(BOUNCE_FREQUENCY_PROPERTY, "Bounces per second.");
+  propDescService->AddDescription(BOUNCE_HEIGHT_PROPERTY,
+    "How far the surface bounces, relative to its extent along the axis. Negative values bounce the other way.");
+  propDescService->AddDescription(BOUNCE_AXIS_PROPERTY, "The axis of the surface's geometry it bounces along: 0 for x, 1 for y, 2 for z.");
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

@@ -305,20 +305,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   // create a QFuture and a QFutureWatcher
 
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
-
-  // Keeps the 3D windows rendering at about 30 frames per second while the shown surface
-  // pulses, see SetSurfacePending(). Enough for the 1.5 Hz pulse, and every frame renders
-  // everything in the 3D windows, volumes included, while the interpolation is running or
-  // the 3D windows catch up with a confirmed surface.
-  m_PulseTimer = new QTimer(this);
-  m_PulseTimer->setInterval(33);
-  connect(m_PulseTimer, &QTimer::timeout, this, [this]()
-    {
-      if (m_ConfirmedSurface.has_value() && !this->IsSegmentationBehindConfirmedSurface())
-        this->DropConfirmedSurface();
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-    });
 }
 
 void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
@@ -494,7 +480,8 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   m_SurfaceInterpolator->SetCurrentInterpolationSession(nullptr);
 
-  delete m_PulseTimer;
+  if (0 != m_ConfirmedSurfaceObserverTag)
+    mitk::RenderingManager::GetInstance()->RemoveAnimationFrameObserver(m_ConfirmedSurfaceObserverTag);
 }
 
 /**
@@ -1468,20 +1455,16 @@ void QmitkSlicesInterpolator::Start3DInterpolation()
 
 void QmitkSlicesInterpolator::SetSurfacePending(bool pending)
 {
-  m_InterpolatedSurfaceNode->SetBoolProperty("pulsing", pending);
+  bool wasPending = false;
+  m_InterpolatedSurfaceNode->GetBoolProperty("animated.pulse", wasPending);
 
-  if (pending)
-  {
-    if (!m_PulseTimer->isActive())
-      m_PulseTimer->start();
-  }
-  else if (m_PulseTimer->isActive())
-  {
-    m_PulseTimer->stop();
+  if (pending == wasPending)
+    return;
 
-    // Once more, to show the surface without the pulse.
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-  }
+  m_InterpolatedSurfaceNode->SetBoolProperty("animated.pulse", pending);
+
+  // The first frame of the pulse, or the surface without it.
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
 void QmitkSlicesInterpolator::UpdateLabelHiddenIn3D()
@@ -1524,6 +1507,15 @@ void QmitkSlicesInterpolator::KeepConfirmedSurface(const mitk::DataNode* segment
 
   m_ConfirmedSurface = std::move(confirmedSurface);
 
+  if (0 == m_ConfirmedSurfaceObserverTag)
+  {
+    m_ConfirmedSurfaceObserverTag = mitk::RenderingManager::GetInstance()->AddAnimationFrameObserver([this](double)
+      {
+        if (!this->IsSegmentationBehindConfirmedSurface())
+          this->DropConfirmedSurface();
+      });
+  }
+
   this->SetSurfacePending(true);
 }
 
@@ -1548,6 +1540,9 @@ void QmitkSlicesInterpolator::DropConfirmedSurface()
 {
   if (!m_ConfirmedSurface.has_value())
     return;
+
+  mitk::RenderingManager::GetInstance()->RemoveAnimationFrameObserver(m_ConfirmedSurfaceObserverTag);
+  m_ConfirmedSurfaceObserverTag = 0;
 
   for (const auto& rendererName : m_ConfirmedSurface->m_HiddenIn)
     m_InterpolatedSurfaceNode->RemoveProperty("visible", rendererName);

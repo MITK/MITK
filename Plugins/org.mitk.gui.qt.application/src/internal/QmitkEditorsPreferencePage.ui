@@ -71,6 +71,40 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="m_AnimationFrameRateLabel">
+       <property name="text">
+        <string>Maximum animation frame rate:</string>
+       </property>
+       <property name="buddy">
+        <cstring>m_AnimationFrameRateComboBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="m_AnimationFrameRateComboBox">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How often per second at most the render windows render while they show an animation, like a pulsing surface or the auto rotation of a 3D window.&lt;/p&gt;&lt;p&gt;Lower rates leave more processing time for everything else.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_RenderWindowMenusGroupBox">
      <property name="title">
       <string>Render window menus</string>

@@ -16,6 +16,7 @@ found in the LICENSE file.
 // mitk core
 #include <mitkExceptionMacro.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <mitkResliceMethodProperty.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -80,12 +81,9 @@ namespace
   }
 
   /* One turn per 27 seconds is the speed the auto rotation had when it
-   * advanced the 360 position camera stepper every 75 ms. The interval is now
-   * only how often the angle is recomputed, so it can be picked for smooth
-   * motion rather than for speed.
+   * advanced the 360 position camera stepper every 75 ms.
    */
   constexpr double AUTO_ROTATION_SECONDS_PER_TURN = 27.0;
-  constexpr int AUTO_ROTATION_INTERVAL = 16;
 
   /** The menu stores its renderer as the base type, but the lighting rig is
    * declared on mitk::VtkPropRenderer. nullptr if this renderer is not one.
@@ -117,6 +115,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent, mitk::BaseRenderer
   , m_TopRightBar(nullptr)
   , m_PopupOpen(false)
   , m_Renderer(baseRenderer)
+  , m_AutoRotationObserverTag(0)
   , m_Parent(parent)
   , m_CrosshairRotationMode(QmitkCrosshairRotationMode::None)
   , m_CrosshairVisibility(true)
@@ -137,12 +136,6 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent, mitk::BaseRenderer
     preferences->OnChanged.AddListener(mitk::MessageDelegate1<QmitkRenderWindowMenu, const mitk::IPreferences*>(this, &QmitkRenderWindowMenu::OnPreferencesChanged));
 
   m_Parent->installEventFilter(this);
-
-  m_AutoRotationTimer = new QTimer(this);
-  m_AutoRotationTimer->setTimerType(Qt::PreciseTimer);
-  m_AutoRotationTimer->setInterval(AUTO_ROTATION_INTERVAL);
-
-  connect(m_AutoRotationTimer, &QTimer::timeout, this, &QmitkRenderWindowMenu::AutoRotateNextFrame);
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
@@ -150,10 +143,7 @@ QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
   if (auto* preferences = GetPreferences(); nullptr != preferences)
     preferences->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowMenu, const mitk::IPreferences*>(this, &QmitkRenderWindowMenu::OnPreferencesChanged));
 
-  if (m_AutoRotationTimer->isActive())
-  {
-    m_AutoRotationTimer->stop();
-  }
+  this->SetAutoRotation(false);
 
   // Children of the window rather than of the menu, since they are widgets on it.
   delete m_TopLeftBar;
@@ -493,7 +483,7 @@ void QmitkRenderWindowMenu::ChangeFullScreenIcon()
     : QStringLiteral(":/Qmitk/fullscreen.svg")));
 }
 
-void QmitkRenderWindowMenu::AutoRotateNextFrame()
+void QmitkRenderWindowMenu::AutoRotate(double seconds)
 {
   auto* cameraRotationController = m_Renderer->GetCameraRotationController();
   if (nullptr == cameraRotationController)
@@ -502,32 +492,32 @@ void QmitkRenderWindowMenu::AutoRotateNextFrame()
   }
 
   // Deriving the angle from the elapsed time keeps the rotation at the same
-  // angular speed when a frame takes longer than the timer interval. The scene
+  // angular speed when a frame takes longer than the frame interval. The scene
   // then simply gets fewer frames instead of rotating more slowly.
-  const auto elapsed = m_AutoRotationElapsed.restart();
-
-  cameraRotationController->RotateCameraBy(-360.0 * elapsed / (1000.0 * AUTO_ROTATION_SECONDS_PER_TURN));
+  cameraRotationController->RotateCameraBy(-360.0 * seconds / AUTO_ROTATION_SECONDS_PER_TURN);
 }
 
 void QmitkRenderWindowMenu::SetAutoRotation(bool enabled)
 {
-  if (enabled == m_AutoRotationTimer->isActive())
+  if (enabled == (0 != m_AutoRotationObserverTag))
     return;
+
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
 
   if (enabled)
   {
-    m_AutoRotationElapsed.start();
-    m_AutoRotationTimer->start();
+    m_AutoRotationObserverTag = renderingManager->AddAnimationFrameObserver([this](double seconds) { this->AutoRotate(seconds); });
   }
   else
   {
-    m_AutoRotationTimer->stop();
+    renderingManager->RemoveAnimationFrameObserver(m_AutoRotationObserverTag);
+    m_AutoRotationObserverTag = 0;
   }
 }
 
 void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
 {
-  this->SetAutoRotation(!m_AutoRotationTimer->isActive());
+  this->SetAutoRotation(0 == m_AutoRotationObserverTag);
 }
 
 void QmitkRenderWindowMenu::OnTSNumChanged(int num)
@@ -649,7 +639,7 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
 
     QAction *autoRotationAction = crosshairModesMenu->addAction("Auto Rotation");
     autoRotationAction->setCheckable(true);
-    autoRotationAction->setChecked(m_AutoRotationTimer->isActive());
+    autoRotationAction->setChecked(0 != m_AutoRotationObserverTag);
     connect(autoRotationAction, &QAction::triggered, this, &QmitkRenderWindowMenu::OnAutoRotationActionTriggered);
   }
 

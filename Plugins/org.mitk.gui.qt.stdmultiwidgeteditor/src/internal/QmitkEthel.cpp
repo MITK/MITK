@@ -29,12 +29,22 @@ found in the LICENSE file.
 
 #include <QFile>
 #include <QMenu>
+#include <QTimer>
 
+#include <chrono>
 #include <sstream>
 
 namespace
 {
   constexpr int TriggerCount = 10;
+  constexpr std::chrono::seconds CalmDuration{ 4 };
+
+  void SetAnimated(mitk::DataNode* node, bool animated)
+  {
+    node->SetBoolProperty("animated.color", animated);
+    node->SetBoolProperty("animated.spin", animated);
+    node->SetBoolProperty("animated.bounce", animated);
+  }
 
   // Shared by all editors so that the count survives closing and reopening one.
   int lightingMenuCount = 0;
@@ -146,10 +156,27 @@ void QmitkEthel::Show()
     dataStorage->Add(m_EthelNode);
   }
 
-  m_EthelNode->SetBoolProperty("color-cycling", true);
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+  const auto renderWindows3D = m_MultiWidget->Get3DRenderWindowWidgets();
 
-  // The rotation keeps the 3D window rendering, which is what advances the colors.
-  for (const auto& [name, widget] : m_MultiWidget->Get3DRenderWindowWidgets())
-    widget->GetRenderWindow()->SetAutoRotation(true);
+  // The 3D windows are where she animates.
+  m_EthelNode->SetVisibility(false);
+
+  for (const auto& [name, widget] : renderWindows3D)
+    m_EthelNode->SetVisibility(true, widget->GetRenderWindow()->GetRenderer());
+
+  // She shows up calm before she starts to move.
+  SetAnimated(m_EthelNode, false);
+
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  renderingManager->InitializeViewsByBoundingObjects(dataStorage);
+
+  // The views above leave her out, as she is not visible everywhere.
+  for (const auto& [name, widget] : renderWindows3D)
+    renderingManager->InitializeViewByBoundingObjects(widget->GetRenderWindow()->GetVtkRenderWindow(), dataStorage);
+
+  QTimer::singleShot(CalmDuration, this, [node = m_EthelNode]()
+    {
+      SetAnimated(node, true);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+    });
 }

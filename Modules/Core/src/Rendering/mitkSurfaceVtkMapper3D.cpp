@@ -40,6 +40,8 @@ found in the LICENSE file.
 #include <vtkTexture.h>
 #include <vtkUniforms.h>
 
+#include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <numbers>
@@ -48,12 +50,50 @@ found in the LICENSE file.
 namespace
 {
   constexpr const char* PULSE_UNIFORM = "mitkPulse";
+  constexpr const char* TINT_UNIFORM = "mitkTint";
 
   // A cosine at 1.5 Hz between 0.5 and 1.0, the factor on the lit color of a pulsing surface.
   float GetPulse()
   {
     const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
     return static_cast<float>(0.75 + 0.25 * std::cos(2.0 * std::numbers::pi * 1.5 * now.count()));
+  }
+
+  // The tint on the lit color of a color-cycling surface: a point that runs around a hue
+  // wheel of constant luminance every three seconds. Pure hues would not do, since blue is
+  // only a tenth as bright as yellow and turns the surface nearly black. Offsets along the
+  // Cb and Cr axes of BT.709 YCbCr carry no luminance, so every tint on the wheel darkens
+  // the surface by the same amount, and each is as colorful as the gamut allows.
+  std::array<float, 3> GetCycledTint()
+  {
+    constexpr double secondsPerCycle = 3.0;
+    constexpr double luminance = 0.75;
+
+    const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
+    const double angle = 2.0 * std::numbers::pi * std::fmod(now.count(), secondsPerCycle) / secondsPerCycle;
+    const double cr = std::cos(angle);
+    const double cb = std::sin(angle);
+
+    // The RGB direction of the offset, from the YCbCr to RGB conversion without its Y term.
+    const double direction[3] = { 1.5748 * cr, -0.1873 * cb - 0.4681 * cr, 1.8556 * cb };
+
+    // The largest step along it that keeps every channel within [0, 1].
+    double amplitude = 1.0;
+
+    for (const double d : direction)
+    {
+      if (d > 0.0)
+        amplitude = std::min(amplitude, (1.0 - luminance) / d);
+      else if (d < 0.0)
+        amplitude = std::min(amplitude, luminance / -d);
+    }
+
+    std::array<float, 3> tint;
+
+    for (int i = 0; i < 3; ++i)
+      tint[i] = static_cast<float>(luminance + amplitude * direction[i]);
+
+    return tint;
   }
 }
 
@@ -142,29 +182,35 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer *renderer)
   Superclass::Update(renderer);
 
   bool pulsing = false;
+  bool colorCycling = false;
   this->GetDataNode()->GetBoolProperty("pulsing", pulsing, renderer);
+  this->GetDataNode()->GetBoolProperty("color-cycling", colorCycling, renderer);
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // A surface that never pulsed keeps the standard shader.
-  if (!pulsing && !ls->m_HasPulseShader)
+  // A surface that never animated keeps the standard shader.
+  if (!pulsing && !colorCycling && !ls->m_HasAnimationShader)
     return;
 
-  // Nothing on the vtkProperty may animate the pulse: vtkOpenGLPolyDataMapper rebuilds its
-  // buffers whenever the property changes. A custom uniform is declared once and afterwards
-  // only changes its value, which rebuilds neither the buffers nor the shader.
+  // Nothing on the vtkProperty may animate: vtkOpenGLPolyDataMapper rebuilds its buffers
+  // whenever the property changes. A custom uniform is declared once and afterwards only
+  // changes its value, which rebuilds neither the buffers nor the shader.
   auto *shaderProperty = ls->m_Actor->GetShaderProperty();
 
-  if (!ls->m_HasPulseShader)
+  if (!ls->m_HasAnimationShader)
   {
     // After the standard replacements, which write the lit color before this tag.
     shaderProperty->AddFragmentShaderReplacement("//VTK::Light::Impl", false,
-      std::string("//VTK::Light::Impl\n  gl_FragData[0].rgb *= ") + PULSE_UNIFORM + ";\n", false);
+      std::string("//VTK::Light::Impl\n  gl_FragData[0].rgb *= ") + PULSE_UNIFORM + " * " + TINT_UNIFORM + ";\n", false);
 
-    ls->m_HasPulseShader = true;
+    ls->m_HasAnimationShader = true;
   }
 
-  shaderProperty->GetFragmentCustomUniforms()->SetUniformf(PULSE_UNIFORM, pulsing ? GetPulse() : 1.0f);
+  auto *uniforms = shaderProperty->GetFragmentCustomUniforms();
+  uniforms->SetUniformf(PULSE_UNIFORM, pulsing ? GetPulse() : 1.0f);
+
+  const auto tint = colorCycling ? GetCycledTint() : std::array<float, 3>{ 1.0f, 1.0f, 1.0f };
+  uniforms->SetUniform3f(TINT_UNIFORM, tint.data());
 }
 
 void mitk::SurfaceVtkMapper3D::ResetMapper(BaseRenderer *renderer)

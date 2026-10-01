@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkIPropertyProvider.h>
 #include <mitkSUVInputModel.h>
 
+#include "mitkSUVEnhancedPETGuards.h"
 #include "mitkSUVFunctionalGroupAccess.h"
 
 namespace

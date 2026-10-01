@@ -91,6 +91,10 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(DecayMap_OutOfRangeSlice_Throws);
   MITK_TEST(DecayMap_OutOfRangeTimestep_Throws);
 
+  // Enhanced PET frame refusal is independent of the overrides
+  MITK_TEST(EnhancedPET_FramesUnresolved_OverridesDoNotBypassRefusal);
+  MITK_TEST(EnhancedPET_FramesUnresolved_PrenormalizedOverrideDoesNotBypassRefusal);
+
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -872,6 +876,56 @@ public:
     f->SetDecayTimeOverrideMap(map);
     CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
                          mitk::InvalidDecayTimeMapException);
+  }
+
+  // ---- Enhanced PET frame refusal vs. overrides ----
+  //
+  // An Enhanced PET image whose functional groups the reader could not map
+  // to frames carries one frame's rescale in every frame's pixels.
+  // Overrides replace individual inputs but cannot repair that, so the
+  // refusal must apply no matter which overrides are set.
+
+private:
+  static mitk::Image::Pointer MakeUnresolvedEnhancedPETImage()
+  {
+    auto img = MakeMultiSliceImage(4);
+    const auto set = [&img](unsigned group, unsigned element, const char* value) {
+      const std::string key =
+        mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(group, element));
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, value);
+      img->SetProperty(key.c_str(), prop);
+    };
+    set(0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    set(0x0028, 0x0008, "4");
+    return img;
+  }
+
+public:
+
+  void EnhancedPET_FramesUnresolved_OverridesDoNotBypassRefusal()
+  {
+    auto img = MakeUnresolvedEnhancedPETImage();
+    auto f   = MakeFilterWithActivityOverrides(img);
+    f->SetDecayTimeOverrideInSec(3600.0);
+
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::EnhancedPETFramesUnresolvedException);
+    CPPUNIT_ASSERT_THROW(f->GetEffectiveInputModel(), mitk::Exception);
+  }
+
+  void EnhancedPET_FramesUnresolved_PrenormalizedOverrideDoesNotBypassRefusal()
+  {
+    auto img = MakeUnresolvedEnhancedPETImage();
+    auto f   = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::EnhancedPETFramesUnresolvedException);
+    CPPUNIT_ASSERT_THROW(f->GetEffectiveInputModel(), mitk::Exception);
   }
 };
 

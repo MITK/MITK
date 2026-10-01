@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkSUVImageFilter.h>
 
+#include "mitkSUVEnhancedPETGuards.h"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -591,6 +593,15 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   try
   {
     // ---- Input pixel semantics ------------------------------------------
+
+    // An Enhanced PET object whose functional groups the reader could not map
+    // to frames carries one frame's rescale in every frame's pixels. No input
+    // model or decay override repairs that, so it is refused before any
+    // override is consulted.
+    if (IsEnhancedPETInput(props))
+    {
+      RequireEnhancedPETFramesResolved(props);
+    }
 
     m_EffectiveInputModel = m_InputModelOverride.has_value()
       ? m_InputModelOverride.value()

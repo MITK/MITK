@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSlicedGeometry3D.h>
 #include <nlohmann/json.hpp>
 
+#include "mitkSUVEnhancedPETGuards.h"
 #include "mitkSUVFunctionalGroupAccess.h"
 
 #include <chrono>

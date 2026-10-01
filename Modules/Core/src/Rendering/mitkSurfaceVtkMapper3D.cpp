@@ -214,6 +214,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
     {
       ls->m_DepthSort->SetInputData(polydata);
       ls->m_DepthSort->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
+      ls->m_DepthSort->SetProp3D(ls->m_Actor);
       ls->m_DepthSort->SetDirectionToBackToFront();
       ls->m_DepthSort->Update();
       ls->m_VtkPolyDataMapper->SetInputConnection(ls->m_DepthSort->GetOutputPort());

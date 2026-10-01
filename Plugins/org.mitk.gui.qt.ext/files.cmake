@@ -11,7 +11,9 @@ set(INTERNAL_CPP_FILES
   QmitkAboutHandler.cpp
   QmitkAppInstancesPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
+  QmitkCrashDumpsPreferencePage.cpp
   QmitkModuleView.cpp
+  QmitkReportsAndDiagnosticsPreferencePage.cpp
   QmitkThemedStyle.cpp
 )
 
@@ -26,8 +28,10 @@ set(MOC_H_FILES
   src/internal/QmitkAboutHandler.h
   src/internal/QmitkAppInstancesPreferencePage.h
   src/internal/QmitkCommonExtPlugin.h
+  src/internal/QmitkCrashDumpsPreferencePage.h
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
   src/internal/QmitkModuleView.h
+  src/internal/QmitkReportsAndDiagnosticsPreferencePage.h
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenMxNMultiWidgetEditorAction.h
   src/QmitkOpenStdMultiWidgetEditorAction.h

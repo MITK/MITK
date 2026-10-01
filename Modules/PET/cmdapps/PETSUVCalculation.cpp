@@ -56,6 +56,7 @@ namespace
     MissingPhilipsPETScale     = 12,
     EnhancedPETPerFrameVariation = 13,
     EnhancedPETMappingNotApplied = 14,
+    EnhancedPETFramesUnresolved  = 15,
   };
 
   int AsInt(ExitCode c) { return static_cast<int>(c); }
@@ -492,6 +493,11 @@ int main(int argc, char* argv[])
   {
     MITK_ERROR << "Enhanced PET mapping not applied: " << e.GetDescription();
     return AsInt(ExitCode::EnhancedPETMappingNotApplied);
+  }
+  catch (const mitk::EnhancedPETFramesUnresolvedException& e)
+  {
+    MITK_ERROR << "Enhanced PET frames unresolved: " << e.GetDescription();
+    return AsInt(ExitCode::EnhancedPETFramesUnresolved);
   }
   catch (const mitk::UnsupportedPETUnitsException& e)
   {

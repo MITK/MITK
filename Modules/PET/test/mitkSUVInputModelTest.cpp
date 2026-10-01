@@ -672,14 +672,13 @@ public:
   void EnhancedPET_FramesUnresolvedByReader_Refuses()
   {
     // A multi-frame object whose functional groups the reader could not map
-    // to frames publishes none of their attributes. That is the one case
-    // where the per-frame values exist and MITK cannot resolve them per
-    // slice, and it must not read as "the unit is absent".
+    // to frames publishes none of their attributes. The refusal must name
+    // that cause and not read as "the unit is absent".
     auto img = MakeImage();
     SetDicomTag(img, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
     SetDicomTag(img, 0x0028, 0x0008, "4");
 
-    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::EnhancedPETPerFrameVariationException);
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::EnhancedPETFramesUnresolvedException);
   }
 
   void EnhancedPET_SingleFrameObject_Accepted()

@@ -2063,11 +2063,11 @@ public:
   void Enhanced_FramesUnresolvedByReader_Refuses()
   {
     // A multi-frame object none of whose functional-group values reached
-    // MITK: per-frame values exist and cannot be resolved per slice.
+    // MITK: the reader could not map the functional groups to frames.
     auto image = MakeEnhancedDecayImage(4, "NO");
 
     CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.2),
-                         mitk::EnhancedPETPerFrameVariationException);
+                         mitk::EnhancedPETFramesUnresolvedException);
   }
 };
 

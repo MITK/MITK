@@ -299,17 +299,11 @@ namespace mitk
     mitkExceptionClassMacro(UnrecoverableAdministrationDateException, AmbiguousDecayTimingException);
   };
   /**
-   * \brief The per-frame values of an Enhanced PET object could not be
-   *        resolved per slice.
+   * \brief The frames of an Enhanced PET object name different units.
    *
-   * Two inputs raise it. A multi-frame object whose functional groups the
-   * DICOM reader could not map to frames -- its Per-Frame Functional Groups
-   * Sequence does not carry one item per frame -- reaches the pipeline
-   * without any of its per-frame values. And an object whose frames name
-   * different units: the pipeline carries one unit per image, so a
-   * per-frame unit has no representation. Both are refused under both
-   * policies, because computing from one frame's value would be silently
-   * wrong for the others.
+   * The pipeline carries one unit per image, so a per-frame unit has no
+   * representation. The object is refused under both policies, because
+   * computing from one frame's unit would be silently wrong for the others.
    *
    * This is a MITK limitation rather than a defect in the input, and the
    * message says so.
@@ -318,6 +312,22 @@ namespace mitk
   {
   public:
     mitkExceptionClassMacro(EnhancedPETPerFrameVariationException, SUVHelperException);
+  };
+
+  /**
+   * \brief The DICOM reader could not map the functional groups of a
+   *        multi-frame Enhanced PET object to frames.
+   *
+   * No per-frame value (rescale, units, frame timing) reached MITK, and the
+   * loaded pixels carry one frame's rescale throughout. The known causes
+   * are a Per-Frame Functional Groups Sequence that does not carry one item
+   * per frame, or none at all; the DICOM reader reports it in a warning for
+   * the file.
+   */
+  class MITKPET_EXPORT EnhancedPETFramesUnresolvedException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(EnhancedPETFramesUnresolvedException, SUVHelperException);
   };
 
   /**
@@ -677,7 +687,7 @@ namespace mitk
    *
    * \param[in] provider Source of DICOM properties.
    *
-   * \throw EnhancedPETPerFrameVariationException if the object is
+   * \throw EnhancedPETFramesUnresolvedException if the object is
    *        multi-frame and publishes no functional-group value.
    */
   void MITKPET_EXPORT RequireEnhancedPETFramesResolved(const mitk::IPropertyProvider* provider);
@@ -1059,7 +1069,7 @@ namespace mitk
    *        resolved through Step 3 or Step 4 of the
    *        \ref DCStartFallbackChain "DC=START fallback chain"
    *        (vendor-specific empirical formula).
-   * \throw EnhancedPETPerFrameVariationException if \p data is a
+   * \throw EnhancedPETFramesUnresolvedException if \p data is a
    *        multi-frame Enhanced PET object whose functional groups the reader
    *        did not map to frames, whichever (0018,9758) says.
    *

@@ -896,7 +896,7 @@ void mitk::RequireEnhancedPETFramesResolved(const mitk::IPropertyProvider* provi
     }
   }
 
-  mitkThrowException(EnhancedPETPerFrameVariationException)
+  mitkThrowException(EnhancedPETFramesUnresolvedException)
     << "This Enhanced PET object has " << frames << " frames but none of its "
        "functional-group values reached MITK, so its per-frame values cannot "
        "be resolved per slice. The DICOM reader maps functional groups to "

@@ -140,8 +140,10 @@ namespace mitk
    * \throw EnhancedPETMappingNotAppliedException if no mapping of a slice
    *        equals the transformation the reader applied there.
    * \throw EnhancedPETPerFrameVariationException if the frames name
-   *        different units, or if the object is multi-frame and none of
-   *        its functional-group values reached MITK.
+   *        different units.
+   * \throw EnhancedPETFramesUnresolvedException if the object is
+   *        multi-frame and none of its functional-group values reached
+   *        MITK.
    */
   SUVInputModel MITKPET_EXPORT ClassifyEnhancedPETInput(const IPropertyProvider* provider,
                                                         DICOMReadPolicy          policy);

@@ -228,11 +228,17 @@ namespace
     if (dynamic_cast<const EnhancedPETPerFrameVariationException*>(&e))
     {
       return QObject::tr(
-        "The per-frame values of this Enhanced PET object could not be "
-        "resolved per slice: either its frames name different units, or the "
-        "DICOM reader could not map its functional groups to frames. Computing "
-        "from a single frame's value would be silently wrong for the others."
-        "\n\nDetails: %1").arg(raw);
+        "The frames of this Enhanced PET object name different units. MITK "
+        "carries one unit per image, so computing from a single frame's unit "
+        "would be silently wrong for the others.\n\nDetails: %1").arg(raw);
+    }
+    if (dynamic_cast<const EnhancedPETFramesUnresolvedException*>(&e))
+    {
+      return QObject::tr(
+        "The DICOM reader could not map this Enhanced PET object's functional "
+        "groups to frames, so its per-frame values cannot be resolved per "
+        "slice. See the reader's warning in the log about the Per-Frame "
+        "Functional Groups Sequence item count.\n\nDetails: %1").arg(raw);
     }
     if (dynamic_cast<const EnhancedPETMappingNotAppliedException*>(&e))
     {

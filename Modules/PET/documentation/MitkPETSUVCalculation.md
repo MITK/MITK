@@ -296,7 +296,7 @@ concentration.
 - A multi-frame object whose Per-Frame Functional Groups Sequence does not
   carry one item per frame. The reader cannot map its functional groups to
   frames and publishes none of their values; the run stops with exit
-  code 13 rather than reporting the unit as absent.
+  code 15 rather than reporting the unit as absent.
 - An object none of whose mappings equals the applied Pixel Value
   Transformation, a mapping through a Real World Value LUT included. The
   loaded values are then in no unit the object declares, and the run stops
@@ -487,8 +487,9 @@ The modality and units checks are bypassed because NRRD carries no DICOM tags.
 | `10` | The output image could not be written. |
 | `11` | `(0054,1001)` Units holds a value the pipeline cannot convert. |
 | `12` | `Units = CNTS` on Philips data without either private scale factor. |
-| `13` | The per-frame values of an Enhanced PET object could not be resolved per slice: its frames name different units, or its functional groups could not be mapped to frames. |
+| `13` | The frames of an Enhanced PET object name different units; MITK carries one unit per image. |
 | `14` | No Real World Value Mapping of an Enhanced PET object describes the loaded pixel values; MITK does not apply the mapping. |
+| `15` | The DICOM reader could not map the functional groups of a multi-frame Enhanced PET object to frames, so none of its per-frame values reached MITK. |
 
 Codes 11 and 12 previously fell into the catch-all `1`, so a calling script
 could not tell "this input is not convertible" from "MITK broke". The table

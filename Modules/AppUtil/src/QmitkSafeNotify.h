@@ -21,9 +21,11 @@ found in the LICENSE file.
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <mitkCrashDumpFacility.h>
+#include <mitkICrashReportService.h>
 
-#include <QDesktopServices>
-#include <QUrl>
+#include <QmitkCrashDumpManagerDialog.h>
+
+#include "QmitkCrashDumpUiUtils.h"
 #endif
 
 #include <cstdlib>
@@ -73,7 +75,10 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   auto *exitButton = msgBox.addButton("Exit immediately", QMessageBox::YesRole);
   auto *ignoreButton = msgBox.addButton("Ignore", QMessageBox::NoRole);
 #ifdef MITK_HAS_CRASHHANDLING
-  auto *captureButton = msgBox.addButton("Capture diagnostics", QMessageBox::ActionRole);
+  // Offered only where a capture can succeed.
+  QPushButton *captureButton = nullptr;
+  if (mitk::CrashDumpFacility::IsActive() && mitk::CrashDumpFacility::SupportsSnapshots())
+    captureButton = msgBox.addButton("Capture diagnostics", QMessageBox::ActionRole);
 #endif
 
   msgBox.exec();
@@ -90,7 +95,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
       << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";
   }
 #ifdef MITK_HAS_CRASHHANDLING
-  else if (clicked == captureButton)
+  else if (captureButton != nullptr && clicked == captureButton)
   {
     const auto snapshot = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::OnDemand);
 
@@ -103,12 +108,28 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
         "session, and there is no way to verify it does not. MITK never uploads it; it stays on this "
         "computer. Share it only through your usual process for handling patient data.");
       resultBox.setDetailedText(QString::fromStdWString(snapshot->wstring()));
-      auto *showButton = resultBox.addButton("Show in folder", QMessageBox::ActionRole);
+      auto *managerButton = resultBox.addButton("Open Diagnostic Data...", QMessageBox::ActionRole);
+      QPushButton *reportButton = nullptr;
+      if (mitk::GetCrashReportService() != nullptr)
+        reportButton = resultBox.addButton("File report...", QMessageBox::ActionRole);
       resultBox.addButton(QMessageBox::Ok);
       resultBox.exec();
 
-      if (resultBox.clickedButton() == showButton)
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(snapshot->parent_path().wstring())));
+      if (resultBox.clickedButton() == managerButton)
+      {
+        QmitkCrashDumpManagerDialog::ShowManager();
+      }
+      else if (reportButton != nullptr && resultBox.clickedButton() == reportButton)
+      {
+        for (const auto &dump : mitk::CrashDumpFacility::ListAllDumps())
+        {
+          if (dump.Path == *snapshot)
+          {
+            QmitkCrashDumpUi::FileReport({ dump }, nullptr);
+            break;
+          }
+        }
+      }
     }
     else
     {

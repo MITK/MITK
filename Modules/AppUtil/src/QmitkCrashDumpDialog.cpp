@@ -12,38 +12,25 @@ found in the LICENSE file.
 
 #include <QmitkCrashDumpDialog.h>
 
+#include "QmitkCrashDumpUiUtils.h"
+
+#include <QmitkCrashDumpListWidget.h>
+
 #include <mitkCrashDumpFacility.h>
+#include <mitkICrashReportService.h>
 #include <mitkLog.h>
+#include <mitkLogBackend.h>
 
-#include <QDateTime>
-#include <QDesktopServices>
 #include <QDialogButtonBox>
-#include <QFileInfo>
 #include <QLabel>
-#include <QListWidget>
-#include <QLocale>
 #include <QPushButton>
-#include <QUrl>
+#include <QTimer>
 #include <QVBoxLayout>
-
-#include <set>
-
-namespace
-{
-  QString FormatDump(const mitk::CrashDumpInfo& dump)
-  {
-    const auto dateTime = QFileInfo(QString::fromStdWString(dump.Path.wstring())).lastModified();
-
-    return QString("%1  (%2, %3)")
-      .arg(QString::fromStdWString(dump.Path.filename().wstring()))
-      .arg(QLocale().toString(dateTime, QLocale::ShortFormat))
-      .arg(QLocale().formattedDataSize(static_cast<qint64>(dump.SizeInBytes)));
-  }
-}
 
 QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent)
   : QDialog(parent)
 {
+  this->setObjectName("QmitkCrashDumpDialog");
   this->setWindowTitle("Diagnostic Data From Previous Session");
 
   auto* messageLabel = new QLabel(
@@ -54,29 +41,33 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
     "MITK more robust and reliable.");
   messageLabel->setWordWrap(true);
 
-  auto* dumpList = new QListWidget;
-  dumpList->setSelectionMode(QAbstractItemView::NoSelection);
-  dumpList->setFocusPolicy(Qt::NoFocus);
+  auto* dumpList = new QmitkCrashDumpListWidget;
+  dumpList->SetSelectionEnabled(false);
+  dumpList->SetDumps(dumps);
 
-  for (const auto& dump : dumps)
-    dumpList->addItem(FormatDump(dump));
-
-  auto* privacyLabel = new QLabel(
-    "A crash dump contains parts of the application's memory from that session and "
-    "may therefore include patient data, and there is no way to verify that it does "
-    "not. MITK never uploads it; it stays on this computer. If you keep it, share it "
-    "only through your usual process for handling patient data. "
-    "<b>Unless you keep it, it is deleted now.</b>");
+  auto* privacyLabel = new QLabel(QmitkCrashDumpUi::PrivacyNote() +
+    " Kept dumps can be found later under <i>Help &gt; Diagnostic Data...</i>"
+    "<br/><br/><b>Unless you keep it, it is deleted now.</b>");
   privacyLabel->setWordWrap(true);
 
   auto* buttonBox = new QDialogButtonBox;
-  auto* keepButton = buttonBox->addButton("Keep / Show in Folder", QDialogButtonBox::AcceptRole);
-  auto* discardButton = buttonBox->addButton("Discard", QDialogButtonBox::RejectRole);
-  discardButton->setDefault(true);
+  auto* removeButton = buttonBox->addButton("Remove", QDialogButtonBox::RejectRole);
+  auto* keepButton = buttonBox->addButton("Keep for later", QDialogButtonBox::AcceptRole);
+  removeButton->setObjectName("removeButton");
+  keepButton->setObjectName("keepButton");
+  removeButton->setDefault(true);
   keepButton->setAutoDefault(false);
 
-  connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+  connect(keepButton, &QPushButton::clicked, this, [this] { m_Choice = Keep; this->accept(); });
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+  if (mitk::GetCrashReportService() != nullptr)
+  {
+    auto* reportButton = buttonBox->addButton("File report...", QDialogButtonBox::ActionRole);
+    reportButton->setObjectName("fileReportButton");
+    reportButton->setAutoDefault(false);
+    connect(reportButton, &QPushButton::clicked, this, [this] { m_Choice = FileReport; this->accept(); });
+  }
 
   auto* layout = new QVBoxLayout(this);
   layout->addWidget(messageLabel);
@@ -84,13 +75,18 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   layout->addWidget(privacyLabel);
   layout->addWidget(buttonBox);
 
-  this->setMinimumWidth(480);
+  this->setMinimumWidth(560);
 }
 
 void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)
 {
+  // Before the dialog can block, so that a crash while it is open still
+  // records the log. The log is opened by org.mitk.core.services, which has
+  // started by the time a window opens.
+  mitk::CrashDumpFacility::SetSessionLogFile(mitk::LogBackend::GetLogFile());
+
   if (mitk::CrashDumpFacility::GetDatabaseDirectory().empty())
-    return; // facility disabled or never initialized
+    return; // facility never initialized
 
   const auto dumps = mitk::CrashDumpFacility::ListUnacknowledgedDumps();
 
@@ -106,30 +102,39 @@ void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)
   }
 
   QmitkCrashDumpDialog dialog(dumps, parent);
-  const bool keep = dialog.exec() == QDialog::Accepted;
+
+  // From inside exec(): showing the dialog before exec() would keep it from
+  // becoming modal. The main window of this process is already in front, so
+  // where the platform refuses to hand over focus this merely flashes the
+  // taskbar.
+  QTimer::singleShot(0, &dialog, [&dialog] {
+    dialog.raise();
+    dialog.activateWindow();
+  });
+  dialog.exec();
 
   // Acknowledge before acting on the choice: surfaced dumps must never
-  // surface again, kept or not.
+  // surface again, whatever happens to them.
   mitk::CrashDumpFacility::ClearCrashedLastRun();
 
-  if (keep)
+  switch (dialog.m_Choice)
   {
-    // Crash dumps and hard-killed freeze survivors are filed in different
-    // subdirectories, so a single folder need not cover the whole list.
-    std::set<std::filesystem::path> folders;
+    case Keep:
+      break;
 
-    for (const auto& dump : dumps)
-      folders.insert(dump.Path.parent_path());
+    case FileReport:
+      // After the dialog has closed: the report flow may outlive this call,
+      // the stack-allocated dialog does not.
+      QmitkCrashDumpUi::FileReport(dumps, parent);
+      break;
 
-    for (const auto& folder : folders)
-      QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folder.wstring())));
-  }
-  else
-  {
-    for (const auto& dump : dumps)
-    {
-      if (!mitk::CrashDumpFacility::DeleteDump(dump.Path))
-        MITK_WARN << "Could not delete crash dump '" << dump.Path.string() << "'.";
-    }
+    case Remove:
+    default:
+      for (const auto& dump : dumps)
+      {
+        if (!mitk::CrashDumpFacility::DeleteDump(dump.Path))
+          MITK_WARN << "Could not delete crash dump '" << dump.Path.string() << "'.";
+      }
+      break;
   }
 }

@@ -18,19 +18,16 @@ found in the LICENSE file.
 #ifdef MITK_HAS_CRASHHANDLING
 #include <mitkCrashDumpFacility.h>
 
-#include <QDateTime>
+#include <QmitkCrashDumpListWidget.h>
+
 #include <QDesktopServices>
-#include <QFileInfo>
-#include <QLocale>
 #include <QTimer>
-#include <QTreeWidgetItem>
 #include <QUrl>
 
 #include <algorithm>
 #include <filesystem>
 #include <set>
 #include <tuple>
-#include <utility>
 #include <vector>
 #endif
 
@@ -56,6 +53,9 @@ void QmitkCrashTestView::CreateQtPartControl(QWidget* parent)
           this, &QmitkCrashTestView::OnFreezeUiThread);
 
 #ifdef MITK_HAS_CRASHHANDLING
+  m_DumpList = new QmitkCrashDumpListWidget(m_Controls->dumpsGroupBox);
+  m_Controls->dumpsLayout->insertWidget(0, m_DumpList);
+
   connect(m_Controls->refreshButton, &QPushButton::clicked,
           this, &QmitkCrashTestView::OnRefreshDumpList);
   connect(m_Controls->openFolderButton, &QPushButton::clicked,
@@ -101,50 +101,24 @@ void QmitkCrashTestView::OnFreezeUiThread()
 void QmitkCrashTestView::OnRefreshDumpList()
 {
 #ifdef MITK_HAS_CRASHHANDLING
-  std::vector<std::pair<mitk::CrashDumpInfo, QString>> rows;
-  std::set<std::filesystem::path> snapshotPaths;
+  // Unlike the manager, also show this session's provisional snapshots:
+  // watching them appear during a freeze and vanish on recovery is part of
+  // what this view is for.
+  auto dumps = mitk::CrashDumpFacility::ListAllDumps();
+  const auto provisional = mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession();
 
-  for (const auto& dump : mitk::CrashDumpFacility::ListSnapshots(mitk::SnapshotKind::OnDemand))
+  std::set<std::filesystem::path> provisionalPaths;
+  for (const auto& dump : provisional)
   {
-    snapshotPaths.insert(dump.Path);
-    rows.emplace_back(dump, QStringLiteral("On-demand snapshot"));
+    provisionalPaths.insert(dump.Path);
+    dumps.push_back(dump);
   }
 
-  for (const auto& dump : mitk::CrashDumpFacility::ListSnapshots(mitk::SnapshotKind::WatchdogProvisional))
-  {
-    snapshotPaths.insert(dump.Path);
-    rows.emplace_back(dump, QStringLiteral("Freeze snapshot (provisional)"));
-  }
-
-  // ListDumps() also reports provisional freeze snapshots (they are
-  // surfacable); those are already listed with their more specific kind.
-  for (const auto& dump : mitk::CrashDumpFacility::ListDumps())
-  {
-    if (snapshotPaths.find(dump.Path) == snapshotPaths.end())
-      rows.emplace_back(dump, QStringLiteral("Crash dump"));
-  }
-
-  std::sort(rows.begin(), rows.end(), [](const auto& lhs, const auto& rhs) {
-    return std::tie(rhs.first.LastWriteTime, rhs.first.Path) <
-           std::tie(lhs.first.LastWriteTime, lhs.first.Path);
+  std::sort(dumps.begin(), dumps.end(), [](const auto& lhs, const auto& rhs) {
+    return std::tie(rhs.LastWriteTime, rhs.Path) < std::tie(lhs.LastWriteTime, lhs.Path);
   });
 
-  m_Controls->dumpTreeWidget->clear();
-
-  for (const auto& [dump, kind] : rows)
-  {
-    const auto dateTime = QFileInfo(QString::fromStdWString(dump.Path.wstring())).lastModified();
-
-    auto* item = new QTreeWidgetItem(m_Controls->dumpTreeWidget);
-    item->setText(0, kind);
-    item->setText(1, QString::fromStdWString(dump.Path.filename().wstring()));
-    item->setText(2, QLocale().toString(dateTime, QLocale::ShortFormat));
-    item->setText(3, QLocale().formattedDataSize(static_cast<qint64>(dump.SizeInBytes)));
-    item->setToolTip(1, QString::fromStdWString(dump.Path.wstring()));
-  }
-
-  for (int column = 0; column < m_Controls->dumpTreeWidget->columnCount(); ++column)
-    m_Controls->dumpTreeWidget->resizeColumnToContents(column);
+  m_DumpList->SetDumps(dumps, provisionalPaths);
 #endif
 }
 

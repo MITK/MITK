@@ -24,7 +24,10 @@ found in the LICENSE file.
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <mitkCrashDumpFacility.h>
+#include <mitkCrashDumpSessionOptions.h>
 #include <mitkVersion.h>
+
+#include "mitkCrashDumpSessionOptionsRecord.h"
 
 #include <QmitkUiFreezeWatchdog.h>
 
@@ -277,6 +280,7 @@ namespace mitk
 
 #ifdef MITK_HAS_CRASHHANDLING
     QmitkUiFreezeWatchdog *m_UiWatchdog = nullptr;
+    CrashDumpOptionOverrides m_CrashDumpOverrides;
 #endif
 
     bool m_LogQtMessages;
@@ -917,33 +921,47 @@ namespace mitk
         : static_cast<QCoreApplication*>(new QmitkSafeApplication(d->m_Argc, d->m_Argv, this->getSafeMode()));
 
 #ifdef MITK_HAS_CRASHHANDLING
-      // Opt-in UI-freeze watchdog. Options are already parsed at this point.
-      // An explicitly passed option wins over the environment variable: whoever
-      // types it is the one debugging this session.
+      // UI-freeze watchdog. Options are already parsed at this point. It is
+      // created here rather than once preferences exist, which is why its
+      // persistent setting lives in the crash-dump settings file.
       const auto watchdogArgValue =
         QString::fromStdString(this->config().getString(ARG_UI_WATCHDOG.toStdString(), ""));
-      const bool watchdogFromEnvironment = watchdogArgValue.isEmpty();
 
-      const auto watchdogSeconds = watchdogFromEnvironment
-        ? qEnvironmentVariable("MITK_UI_WATCHDOG").toInt()
-        : watchdogArgValue.toInt();
+      if (!watchdogArgValue.isEmpty())
+        d->m_CrashDumpOverrides.WatchdogFlagSeconds = watchdogArgValue.toInt();
+
+      if (!qEnvironmentVariableIsEmpty("MITK_UI_WATCHDOG"))
+        d->m_CrashDumpOverrides.WatchdogEnvironmentSeconds = qEnvironmentVariable("MITK_UI_WATCHDOG").toInt();
+
+      const auto crashDumpOptions =
+        ResolveCrashDumpSessionOptions(d->m_CrashDumpOverrides, CrashDumpFacility::GetSettings());
+      RecordCrashDumpSessionOptions(crashDumpOptions);
+
+      const auto watchdogSeconds = crashDumpOptions.WatchdogTimeoutSeconds;
 
       if (watchdogSeconds > 0)
       {
         if (CrashDumpFacility::IsActive())
         {
+          const char* watchdogSource = "crash-dump settings";
+          if (CrashDumpOptionSource::CommandLine == crashDumpOptions.WatchdogSource)
+            watchdogSource = "--MITK.ui-watchdog";
+          else if (CrashDumpOptionSource::EnvironmentVariable == crashDumpOptions.WatchdogSource)
+            watchdogSource = "MITK_UI_WATCHDOG";
+
           // An armed watchdog is otherwise silent until it fires, which makes
           // "did it even arm?" unanswerable from a session's output.
           MITK_INFO << "UI-freeze watchdog armed with a timeout of " << watchdogSeconds
-                    << " s (from " << (watchdogFromEnvironment ? "MITK_UI_WATCHDOG" : "--MITK.ui-watchdog")
-                    << ").";
+                    << " s (from " << watchdogSource << ").";
 
           // Parented to the application: it lives for the session and its
           // QTimer runs on the UI thread once the event loop starts.
           d->m_UiWatchdog = new QmitkUiFreezeWatchdog(std::chrono::seconds(watchdogSeconds), d->m_QApp);
         }
-        else
+        else if (crashDumpOptions.Arm || CrashDumpOptionSource::Settings != crashDumpOptions.WatchdogSource)
         {
+          // Not worth a warning when the settings disable crash dumps and the
+          // watchdog alike merely stays configured.
           MITK_WARN << "UI-freeze watchdog not armed: the crash-dump facility is inactive, "
                        "so a freeze could not be captured anyway.";
         }
@@ -1159,11 +1177,8 @@ namespace mitk
 #ifdef MITK_HAS_CRASHHANDLING
   namespace
   {
-    bool crashDumpsDisabled(int argc, char** argv)
+    bool hasNoCrashDumpsFlag(int argc, char** argv)
     {
-      if (qEnvironmentVariableIsSet("MITK_NO_CRASH_DUMPS"))
-        return true;
-
       // Poco parses options later, during init(); the raw argv is all that
       // is available this early. Consequently, an application .ini file
       // cannot disable the facility.
@@ -1178,7 +1193,7 @@ namespace mitk
       return false;
     }
 
-    void initializeCrashDumpFacility(const QString& organizationName, const QString& applicationName)
+    void initializeCrashDumpFacility(const QString& organizationName, const QString& applicationName, bool arm)
     {
       if (organizationName.isEmpty() || applicationName.isEmpty())
       {
@@ -1207,6 +1222,10 @@ namespace mitk
       if (config.ApplicationVersion.empty())
         config.ApplicationVersion = MITK_VERSION_STRING;
 
+      // Initialized even when disabled for this session, so that the dumps
+      // already on disk stay manageable.
+      config.Arm = arm;
+
       CrashDumpFacility::Initialize(config);
     }
   }
@@ -1215,8 +1234,14 @@ namespace mitk
   int BaseApplication::run()
   {
 #ifdef MITK_HAS_CRASHHANDLING
-    if (!crashDumpsDisabled(d->m_Argc, d->m_Argv))
-      initializeCrashDumpFacility(this->getOrganizationName(), this->getApplicationName());
+    d->m_CrashDumpOverrides.NoCrashDumpsFlag = hasNoCrashDumpsFlag(d->m_Argc, d->m_Argv);
+    d->m_CrashDumpOverrides.NoCrashDumpsEnvironment = qEnvironmentVariableIsSet("MITK_NO_CRASH_DUMPS");
+
+    initializeCrashDumpFacility(this->getOrganizationName(), this->getApplicationName(),
+      !d->m_CrashDumpOverrides.NoCrashDumpsFlag && !d->m_CrashDumpOverrides.NoCrashDumpsEnvironment);
+
+    RecordCrashDumpSessionOptions(
+      ResolveCrashDumpSessionOptions(d->m_CrashDumpOverrides, CrashDumpFacility::GetSettings()));
 #endif
 
     try

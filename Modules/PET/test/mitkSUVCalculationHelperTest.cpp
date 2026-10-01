@@ -199,6 +199,8 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Start_Step1_NegativeOffset_DoesNotFallThroughToStep2);
   MITK_TEST(Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_None_MissingAcqTime_Throws_MissingDICOMPropertyException);
+  MITK_TEST(None_SlotMissingAcquisitionTime_Throws);
+  MITK_TEST(None_SlotMissingFrameDuration_Throws);
 
   // Enhanced PET: the reference instant per slice
   MITK_TEST(Enhanced_DecayCorrectedNO_UsesFrameReferencePerSlice);
@@ -1748,6 +1750,43 @@ public:
                      "20260430110000");
 
     CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, 6586.26),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  void None_SlotMissingAcquisitionTime_Throws()
+  {
+    // Each slice is corrected to its own acquisition instant, so a slice
+    // without one has no reference; borrowing a neighbour's would be a silent
+    // guess.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetDicomProperty(image, PropName(0x0054, 0x1102), "NONE");
+    SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", 0, 0);
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "121000", 0, 0);
+    SetDicomProperty(image, PropName(0x0018, 0x1242), "1", 0, 0);
+    SetDicomProperty(image, PropName(0x0018, 0x1242), "1", 0, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
+                     "20260430110000");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.26),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  void None_SlotMissingFrameDuration_Throws()
+  {
+    // T_ave needs each slice's own frame duration; a slice without one is
+    // reported as missing it, not as carrying an unparseable value.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    SetDicomProperty(image, PropName(0x0054, 0x1102), "NONE");
+    for (unsigned int s = 0; s < 2; ++s)
+    {
+      SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", 0, s);
+      SetDicomProperty(image, PropName(0x0008, 0x0032), "121000", 0, s);
+    }
+    SetDicomProperty(image, PropName(0x0018, 0x1242), "1", 0, 0);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
+                     "20260430110000");
+
+    CPPUNIT_ASSERT_THROW(mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.26),
                          mitk::MissingDICOMPropertyException);
   }
 

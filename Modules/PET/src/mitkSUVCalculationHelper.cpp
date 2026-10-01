@@ -1571,8 +1571,18 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         auto& sliceMap = info.decayTimes[t];
         for (unsigned int s = 0; s < slices; ++s)
         {
-          const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
-          const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
+          const auto z = static_cast<SlicedData::IndexValueType>(s);
+          const std::string acqDate = SUVFunctionalGroupAccess::ValueAt(acqDateProp, t, z);
+          const std::string acqTime = SUVFunctionalGroupAccess::ValueAt(acqTimeProp, t, z);
+          if (acqDate.empty() || acqTime.empty())
+          {
+            mitkThrowException(MissingDICOMPropertyException)
+              << "Strategy NONE requires (0008,0022) Acquisition Date and "
+                 "(0008,0032) Acquisition Time at every slice. Missing:"
+              << (acqDate.empty() ? " (0008,0022)" : "")
+              << (acqTime.empty() ? " (0008,0032)" : "")
+              << " at timestep " << t << " slice " << s << ".";
+          }
 
           OFDateTime ofAcq;
           if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
@@ -1582,6 +1592,14 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
               << "' at timestep " << t << " slice " << s << ".";
           }
 
+          if (SUVFunctionalGroupAccess::ValueAt(frameDurProp, t, z).empty())
+          {
+            mitkThrowException(MissingDICOMPropertyException)
+              << "Strategy NONE requires (0018,0x1242) Actual Frame Duration "
+                 "at every slice. Missing at timestep " << t << " slice " << s
+              << ".";
+          }
+
           // (0018,0x1242) ActualFrameDuration is stored in milliseconds.
           const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
           if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0)
@@ -1589,7 +1607,7 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
             mitkThrowException(InvalidDICOMPropertyValueException)
               << "Strategy NONE: (0018,0x1242) Actual Frame Duration at "
                  "timestep " << t << " slice " << s
-              << " is missing or non-positive (got " << frameDurMs << " ms).";
+              << " is unparseable or non-positive (got " << frameDurMs << " ms).";
           }
           const double tAveSec = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife);
 

@@ -56,12 +56,16 @@ namespace mitk
   *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
   *   - \b "Surface.TransferFunction (TransferFunctionProperty) Set a transferfunction for coloring the surface
   *   - \b "LookupTable (LookupTableProperty) LookupTable
-  *   - \b "pulsing": (BoolProperty) While true, the lit color of the surface pulses, for example
-  *        to show that it is about to be replaced. The pulse advances only when the 3D windows
-  *        render, so whoever sets the property keeps them rendering until it resets it.
-  *   - \b "color-cycling": (BoolProperty) While true, the lit color of the surface is tinted with
-  *        a color that runs around a hue wheel of constant luminance every three seconds. Like
-  *        the pulse, it advances only when the 3D windows render.
+  *   - \b "animated.pulse": (BoolProperty) While true, the lit color of the surface pulses, for
+  *        example to show that it is about to be replaced.
+  *   - \b "animated.pulse.frequency": (FloatProperty) Pulses per second, 1.5 by default.
+  *   - \b "animated.color": (BoolProperty) While true, the lit color of the surface is tinted with
+  *        a color that runs around a hue wheel of constant luminance.
+  *   - \b "animated.color.frequency": (FloatProperty) Turns around the hue wheel per second, 2
+  *        by default.
+  *
+  * Animations advance on their own, see mitk::RenderingManager::RequestAnimationFrame(). Whoever
+  * starts or stops one requests an update, as for any other property.
 
   * Properties to look for are:
   *
@@ -109,7 +113,7 @@ namespace mitk
      */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** \brief Also advances the animation of a "pulsing" or "color-cycling" surface, on every render. */
+    /** \brief Also advances the animations of the surface, on every render. */
     void Update(mitk::BaseRenderer *renderer) override;
 
     /**
@@ -165,7 +169,7 @@ namespace mitk
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
       /** \brief Timestamp tracking the last shader update. */
       itk::TimeStamp m_ShaderTimestampUpdate;
-      /** \brief Whether the actor carries the shader code of the "pulsing" and "color-cycling" properties. */
+      /** \brief Whether the actor carries the shader code of the animations. */
       bool m_HasAnimationShader = false;
 
       LocalStorage()

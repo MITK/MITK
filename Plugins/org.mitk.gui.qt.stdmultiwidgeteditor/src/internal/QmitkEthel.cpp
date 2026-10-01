@@ -146,10 +146,9 @@ void QmitkEthel::Show()
     dataStorage->Add(m_EthelNode);
   }
 
-  m_EthelNode->SetBoolProperty("color-cycling", true);
+  m_EthelNode->SetBoolProperty("animated.color", true);
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 
-  // The rotation keeps the 3D window rendering, which is what advances the colors.
   for (const auto& [name, widget] : m_MultiWidget->Get3DRenderWindowWidgets())
     widget->GetRenderWindow()->SetAutoRotation(true);
 }

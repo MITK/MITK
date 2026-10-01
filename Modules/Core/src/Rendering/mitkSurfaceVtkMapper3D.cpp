@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkImageSliceSelector.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <mitkSmartPointerProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkInterpolationProperty.h>
@@ -42,35 +43,39 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
-#include <chrono>
 #include <cmath>
 #include <numbers>
 #include <string>
 
 namespace
 {
+  constexpr const char* PULSE_PROPERTY = "animated.pulse";
+  constexpr const char* PULSE_FREQUENCY_PROPERTY = "animated.pulse.frequency";
+  constexpr const char* COLOR_PROPERTY = "animated.color";
+  constexpr const char* COLOR_FREQUENCY_PROPERTY = "animated.color.frequency";
+
+  constexpr float DEFAULT_PULSE_FREQUENCY = 1.5f;
+  constexpr float DEFAULT_COLOR_FREQUENCY = 2.0f;
+
   constexpr const char* PULSE_UNIFORM = "mitkPulse";
   constexpr const char* TINT_UNIFORM = "mitkTint";
 
-  // A cosine at 1.5 Hz between 0.5 and 1.0, the factor on the lit color of a pulsing surface.
-  float GetPulse()
+  // A cosine between 0.5 and 1.0, the factor on the lit color of a pulsing surface.
+  float GetPulse(double time, double frequency)
   {
-    const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
-    return static_cast<float>(0.75 + 0.25 * std::cos(2.0 * std::numbers::pi * 1.5 * now.count()));
+    return static_cast<float>(0.75 + 0.25 * std::cos(2.0 * std::numbers::pi * frequency * time));
   }
 
   // The tint on the lit color of a color-cycling surface: a point that runs around a hue
-  // wheel of constant luminance every three seconds. Pure hues would not do, since blue is
-  // only a tenth as bright as yellow and turns the surface nearly black. Offsets along the
-  // Cb and Cr axes of BT.709 YCbCr carry no luminance, so every tint on the wheel darkens
-  // the surface by the same amount, and each is as colorful as the gamut allows.
-  std::array<float, 3> GetCycledTint()
+  // wheel of constant luminance. Pure hues would not do, since blue is only a tenth as
+  // bright as yellow and turns the surface nearly black. Offsets along the Cb and Cr axes
+  // of BT.709 YCbCr carry no luminance, so every tint on the wheel darkens the surface by
+  // the same amount, and each is as colorful as the gamut allows.
+  std::array<float, 3> GetCycledTint(double time, double frequency)
   {
-    constexpr double secondsPerCycle = 3.0;
     constexpr double luminance = 0.75;
 
-    const std::chrono::duration<double> now = std::chrono::steady_clock::now().time_since_epoch();
-    const double angle = 2.0 * std::numbers::pi * std::fmod(now.count(), secondsPerCycle) / secondsPerCycle;
+    const double angle = 2.0 * std::numbers::pi * frequency * time;
     const double cr = std::cos(angle);
     const double cb = std::sin(angle);
 
@@ -181,15 +186,17 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer *renderer)
 {
   Superclass::Update(renderer);
 
-  bool pulsing = false;
-  bool colorCycling = false;
-  this->GetDataNode()->GetBoolProperty("pulsing", pulsing, renderer);
-  this->GetDataNode()->GetBoolProperty("color-cycling", colorCycling, renderer);
+  const auto *node = this->GetDataNode();
+
+  bool pulse = false;
+  bool colorCycle = false;
+  node->GetBoolProperty(PULSE_PROPERTY, pulse, renderer);
+  node->GetBoolProperty(COLOR_PROPERTY, colorCycle, renderer);
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
   // A surface that never animated keeps the standard shader.
-  if (!pulsing && !colorCycling && !ls->m_HasAnimationShader)
+  if (!pulse && !colorCycle && !ls->m_HasAnimationShader)
     return;
 
   // Nothing on the vtkProperty may animate: vtkOpenGLPolyDataMapper rebuilds its buffers
@@ -206,11 +213,23 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer *renderer)
     ls->m_HasAnimationShader = true;
   }
 
-  auto *uniforms = shaderProperty->GetFragmentCustomUniforms();
-  uniforms->SetUniformf(PULSE_UNIFORM, pulsing ? GetPulse() : 1.0f);
+  auto *renderingManager = RenderingManager::GetInstance();
+  const double time = renderingManager->GetAnimationTime();
 
-  const auto tint = colorCycling ? GetCycledTint() : std::array<float, 3>{ 1.0f, 1.0f, 1.0f };
+  float pulseFrequency = DEFAULT_PULSE_FREQUENCY;
+  float colorFrequency = DEFAULT_COLOR_FREQUENCY;
+  node->GetFloatProperty(PULSE_FREQUENCY_PROPERTY, pulseFrequency, renderer);
+  node->GetFloatProperty(COLOR_FREQUENCY_PROPERTY, colorFrequency, renderer);
+
+  auto *uniforms = shaderProperty->GetFragmentCustomUniforms();
+  uniforms->SetUniformf(PULSE_UNIFORM, pulse ? GetPulse(time, pulseFrequency) : 1.0f);
+
+  const auto tint = colorCycle ? GetCycledTint(time, colorFrequency) : std::array<float, 3>{ 1.0f, 1.0f, 1.0f };
   uniforms->SetUniform3f(TINT_UNIFORM, tint.data());
+
+  // The actor is invisible whenever there is nothing to draw, see GenerateDataForRenderer().
+  if ((pulse || colorCycle) && ls->m_Actor->GetVisibility())
+    renderingManager->RequestAnimationFrame(renderer->GetRenderWindow());
 }
 
 void mitk::SurfaceVtkMapper3D::ResetMapper(BaseRenderer *renderer)
@@ -621,5 +640,16 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::
     "Enables correct rendering for transparent objects by ordering polygons according to the distance "
     "to the camera. It is not recommended to enable this property for large surfaces (rendering might "
     "be slow).");
+
+  node->AddProperty(PULSE_PROPERTY, mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(PULSE_FREQUENCY_PROPERTY, mitk::FloatProperty::New(DEFAULT_PULSE_FREQUENCY), renderer, overwrite);
+  node->AddProperty(COLOR_PROPERTY, mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty(COLOR_FREQUENCY_PROPERTY, mitk::FloatProperty::New(DEFAULT_COLOR_FREQUENCY), renderer, overwrite);
+
+  propDescService->AddDescription(PULSE_PROPERTY, "Lets the surface pulse in 3D.");
+  propDescService->AddDescription(PULSE_FREQUENCY_PROPERTY, "Pulses per second.");
+  propDescService->AddDescription(COLOR_PROPERTY, "Tints the surface in 3D with a color that runs around a hue wheel.");
+  propDescService->AddDescription(COLOR_FREQUENCY_PROPERTY, "Turns around the hue wheel per second.");
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

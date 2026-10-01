@@ -126,15 +126,17 @@ namespace mitk
    * activity concentration) applies among those mappings -- and never
    * re-applies a scale.
    *
-   * \param[in] provider Source of DICOM properties.
-   * \param[in] policy   Currently informational, as for ClassifyPETInput.
+   * \param[in] data   Source of the DICOM properties and of the timesteps x
+   *                   slices whose units are classified.
+   * \param[in] policy Currently informational, as for ClassifyPETInput.
    * \return The classification result.
    *
-   * \pre \p provider is not null and is an Enhanced PET object
+   * \pre \p data is not null and is an Enhanced PET object
    *      (\c IsEnhancedPETInput).
    *
    * \throw MissingDICOMPropertyException if no usable unit can be found, or
-   *        if a slice lacks a mapping other slices carry.
+   *        if any slice of the image geometry lacks a mapping other slices
+   *        carry.
    * \throw UnsupportedPETUnitsException if a slice offers only unit codes
    *        outside the set the pipeline converts.
    * \throw EnhancedPETMappingNotAppliedException if no mapping of a slice
@@ -145,8 +147,8 @@ namespace mitk
    *        multi-frame and none of its functional-group values reached
    *        MITK.
    */
-  SUVInputModel MITKPET_EXPORT ClassifyEnhancedPETInput(const IPropertyProvider* provider,
-                                                        DICOMReadPolicy          policy);
+  SUVInputModel MITKPET_EXPORT ClassifyEnhancedPETInput(const SlicedData* data,
+                                                        DICOMReadPolicy   policy);
 }
 
 #endif

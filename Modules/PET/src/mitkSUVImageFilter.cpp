@@ -605,7 +605,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
 
     m_EffectiveInputModel = m_InputModelOverride.has_value()
       ? m_InputModelOverride.value()
-      : (IsEnhancedPETInput(props) ? ClassifyEnhancedPETInput(props, m_DICOMReadPolicy)
+      : (IsEnhancedPETInput(props) ? ClassifyEnhancedPETInput(image, m_DICOMReadPolicy)
                                    : ClassifyPETInput(props, m_DICOMReadPolicy));
 
     // Diagnostic only, and deliberately after classification so it runs

@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkIPropertyProvider.h>
 #include <mitkSUVInputModel.h>
+#include <mitkSlicedGeometry3D.h>
 
 #include "mitkSUVEnhancedPETGuards.h"
 #include "mitkSUVFunctionalGroupAccess.h"
@@ -250,23 +251,6 @@ namespace
   std::string ValueAt(const mitk::BaseProperty* property, const Slot& slot)
   {
     return mitk::SUVFunctionalGroupAccess::ValueAt(property, slot.first, slot.second);
-  }
-
-  void AddSlotsOf(const mitk::BaseProperty* property, std::set<Slot>& slots)
-  {
-    const auto* sliced = dynamic_cast<const mitk::DICOMProperty*>(property);
-    if (nullptr == sliced)
-    {
-      slots.insert(Slot(0, 0));
-      return;
-    }
-    for (const auto t : sliced->GetAvailableTimeSteps())
-    {
-      for (const auto z : sliced->GetAvailableSlices(t))
-      {
-        slots.insert(Slot(t, z));
-      }
-    }
   }
 
   // The same slope reads as "4.0" through the Pixel Value Transformation
@@ -617,15 +601,15 @@ mitk::SUVInputModel mitk::ClassifyPETInput(const IPropertyProvider *provider, DI
                                                       "BQML, GML, CM2ML, CNTS (Philips with private scale factor).";
 }
 
-mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const IPropertyProvider *provider,
+mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const SlicedData *data,
                                                    DICOMReadPolicy /*policy*/)
 {
-  if (nullptr == provider)
+  if (nullptr == data)
   {
-    mitkThrow() << "ClassifyEnhancedPETInput: provider is null.";
+    mitkThrow() << "ClassifyEnhancedPETInput: data is null.";
   }
 
-  RequireEnhancedPETFramesResolved(provider);
+  RequireEnhancedPETFramesResolved(data);
 
   // ---- The mappings and the transformation, as the reader published them --
   //
@@ -639,7 +623,7 @@ mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const IPropertyProvider *prov
   for (const auto element : { 0x0100u, 0x0119u, 0x0120u })
   {
     for (const auto& match :
-         GetPropertyByDICOMTagPath(provider, DICOMTagPath(unitsCode).AddElement(0x0008, element)))
+         GetPropertyByDICOMTagPath(data, DICOMTagPath(unitsCode).AddElement(0x0008, element)))
     {
       if (match.second.IsNotNull())
       {
@@ -652,43 +636,34 @@ mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const IPropertyProvider *prov
   std::map<int, BaseProperty::ConstPointer> mappingIntercepts;
   DICOMTagPath mapping;
   mapping.AddAnySelection(0x0040, 0x9096);
-  for (const auto& match : GetPropertyByDICOMTagPath(provider, DICOMTagPath(mapping).AddElement(0x0040, 0x9225)))
+  for (const auto& match : GetPropertyByDICOMTagPath(data, DICOMTagPath(mapping).AddElement(0x0040, 0x9225)))
   {
     mappingSlopes[MappingItemIndex(match.first)] = match.second;
   }
-  for (const auto& match : GetPropertyByDICOMTagPath(provider, DICOMTagPath(mapping).AddElement(0x0040, 0x9224)))
+  for (const auto& match : GetPropertyByDICOMTagPath(data, DICOMTagPath(mapping).AddElement(0x0040, 0x9224)))
   {
     mappingIntercepts[MappingItemIndex(match.first)] = match.second;
   }
 
   using SUVFunctionalGroupAccess::FirstMatch;
   using SUVFunctionalGroupAccess::MacroAttribute;
-  const auto appliedSlope     = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1053));
-  const auto appliedIntercept = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1052));
-  const auto rescaleType      = FirstMatch(provider, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1054));
+  const auto appliedSlope     = FirstMatch(data, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1053));
+  const auto appliedIntercept = FirstMatch(data, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1052));
+  const auto rescaleType      = FirstMatch(data, MacroAttribute(0x0028, 0x9145, 0x0028, 0x1054));
 
-  // The slots the object has are wherever any of its functional-group
-  // attributes carries a value. Number of Frames is not consulted: several
-  // single-frame Enhanced files stacked into one volume have one slot per
-  // file and no frame count that describes the volume.
+  // The slots come from the image geometry because the classifier must vouch
+  // for exactly the slots the filter scales. A slice that no functional-group
+  // property covers (an unexpanded file in a mixed stack, or a per-frame item
+  // without either macro) is then refused by the per-slot checks below rather
+  // than silently given the series unit.
   std::set<Slot> slots;
-  for (const auto& code : codes)
+  for (TimeStepType t = 0; t < data->GetTimeSteps(); ++t)
   {
-    AddSlotsOf(code.property, slots);
-  }
-  for (const auto& entry : mappingSlopes)
-  {
-    AddSlotsOf(entry.second, slots);
-  }
-  for (const auto& entry : mappingIntercepts)
-  {
-    AddSlotsOf(entry.second, slots);
-  }
-  for (const auto* property : { appliedSlope.GetPointer(), appliedIntercept.GetPointer(), rescaleType.GetPointer() })
-  {
-    if (nullptr != property)
+    const auto* sliced = data->GetSlicedGeometry(t);
+    const unsigned int sliceCount = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+    for (unsigned int s = 0; s < sliceCount; ++s)
     {
-      AddSlotsOf(property, slots);
+      slots.insert(Slot(t, static_cast<SlicedData::IndexValueType>(s)));
     }
   }
 
@@ -704,7 +679,7 @@ mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const IPropertyProvider *prov
     std::any_of(resolved.cbegin(), resolved.cend(), [](const SlotUnit& s) { return s.anyMapping; });
   if (!anyMapping)
   {
-    return ClassifyByRescaleType(provider, rescaleType.GetPointer(), slots);
+    return ClassifyByRescaleType(data, rescaleType.GetPointer(), slots);
   }
 
   for (const auto& slotUnit : resolved)

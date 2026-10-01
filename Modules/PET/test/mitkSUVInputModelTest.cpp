@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 #include <mitkProperties.h>
+#include <mitkSlicedData.h>
 #include <mitkStringProperty.h>
 #include <mitkTemporoSpatialStringProperty.h>
 
@@ -31,13 +32,14 @@ found in the LICENSE file.
 namespace
 {
   // Minimal mitk::Image acting as an IPropertyProvider for the
-  // classifier. The pixel data is irrelevant; only the property list
-  // matters.
-  mitk::Image::Pointer MakeImage()
+  // classifier. The pixel data is irrelevant; the property list and the
+  // slice count matter, the latter because the Enhanced PET classifier
+  // walks the slices of the geometry.
+  mitk::Image::Pointer MakeImage(unsigned int slices = 1)
   {
     mitk::Image::Pointer image = mitk::Image::New();
     const auto pixelType = mitk::MakeScalarPixelType<float>();
-    const unsigned int dims[3] = { 1u, 1u, 1u };
+    const unsigned int dims[3] = { 1u, 1u, slices };
     image->Initialize(pixelType, 3, dims);
     return image;
   }
@@ -137,7 +139,7 @@ namespace
   mitk::Image::Pointer MakeEnhancedImage(unsigned int frames, const std::string& unitCode,
                                          const std::vector<std::string>& perFrameSlopes)
   {
-    auto image = MakeImage();
+    auto image = MakeImage(frames);
     SetDicomTag(image, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
     SetDicomTag(image, 0x0028, 0x0008, std::to_string(frames));
     for (unsigned int f = 0; f < frames; ++f)
@@ -152,9 +154,9 @@ namespace
     return image;
   }
 
-  mitk::SUVInputModel ClassifyEnhanced(const mitk::Image* image)
+  mitk::SUVInputModel ClassifyEnhanced(const mitk::SlicedData* data)
   {
-    return mitk::ClassifyEnhancedPETInput(image, mitk::DICOMReadPolicy::Lenient);
+    return mitk::ClassifyEnhancedPETInput(data, mitk::DICOMReadPolicy::Lenient);
   }
 
   // Set a lifted private-tag property (the names BaseDICOMReaderService
@@ -228,6 +230,8 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   MITK_TEST(EnhancedPET_NoUsableUnit_Throws);
   MITK_TEST(EnhancedPET_RescaleTypeFallback_Accepted);
   MITK_TEST(EnhancedPET_RescaleTypeMissingOnOneFrame_Throws);
+  MITK_TEST(EnhancedPET_SliceWithoutAnyFunctionalGroup_Throws);
+  MITK_TEST(EnhancedPET_RescaleTypeFallback_SliceWithoutAny_Throws);
   MITK_TEST(IsEnhancedPETInput_OnlyForTheEnhancedSOPClass);
 
   MITK_TEST(NullProvider_Throws);
@@ -807,6 +811,40 @@ public:
   {
     auto img = MakeEnhancedImage(2, "", {"1.0", "1.0"});
     SetRescaleType(img, 0, "BQML");
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::MissingDICOMPropertyException);
+  }
+
+  void EnhancedPET_SliceWithoutAnyFunctionalGroup_Throws()
+  {
+    // A slice with no functional-group value at all (an unexpanded file in a
+    // mixed stack, or a per-frame item without either macro) must be refused,
+    // not silently given the series unit.
+    auto img = MakeImage(4);
+    SetDicomTag(img, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    SetDicomTag(img, 0x0028, 0x0008, "4");
+    for (unsigned int f = 0; f < 3; ++f)
+    {
+      SetPixelValueTransformation(img, f, "1.0");
+      SetMapping(img, f, 0, {"Bq/ml", "1.0", "0"});
+    }
+    // Slice 3 gets no entry in any functional-group property.
+
+    CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::MissingDICOMPropertyException);
+  }
+
+  void EnhancedPET_RescaleTypeFallback_SliceWithoutAny_Throws()
+  {
+    // The Rescale Type fallback has to refuse a slice with no functional-group
+    // value at all just as the mapping path does.
+    auto img = MakeImage(4);
+    SetDicomTag(img, 0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    SetDicomTag(img, 0x0028, 0x0008, "4");
+    for (unsigned int f = 0; f < 3; ++f)
+    {
+      SetPixelValueTransformation(img, f, "1.0");
+      SetRescaleType(img, f, "BQML");
+    }
 
     CPPUNIT_ASSERT_THROW(ClassifyEnhanced(img), mitk::MissingDICOMPropertyException);
   }

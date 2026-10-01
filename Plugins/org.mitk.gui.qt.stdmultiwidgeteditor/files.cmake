@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_stdmultiwidgeteditor_Activator.cpp
+  QmitkEthel.cpp
   QmitkRenderWindowColorWidget.cpp
   QmitkStdMultiWidgetEditorPreferencePage.cpp
 )
@@ -12,6 +13,7 @@ set(MOC_H_FILES
   src/QmitkStdMultiWidgetEditor.h
 
   src/internal/org_mitk_gui_qt_stdmultiwidgeteditor_Activator.h
+  src/internal/QmitkEthel.h
   src/internal/QmitkRenderWindowColorWidget.h
   src/internal/QmitkStdMultiWidgetEditorPreferencePage.h
 )

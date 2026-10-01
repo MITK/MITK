@@ -1,5 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
   <qresource prefix="/org.mitk.gui.qt.stdmultiwidgeteditor">
     <file>defaultWatermark.png</file>
+    <file>ethel.jpg</file>
+    <file>ethel.svg</file>
+    <file>ethel.vtp</file>
   </qresource>
 </RCC>

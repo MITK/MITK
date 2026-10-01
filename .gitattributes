@@ -25,6 +25,7 @@
 *.pptx          -crlf
 *.raw           -crlf
 *.vtk           -crlf
+*.vtp           -crlf
 *.xcf           -crlf
 *.xpm           -crlf -diff
 *.sh             crlf=input

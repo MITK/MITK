@@ -186,8 +186,6 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
         }
       }
 
-      connect(spinBox, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxEditingFinished()));
-
       return spinBox;
     }
 
@@ -223,8 +221,6 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
         spinBox->setMaximum(1.0);
       }
 
-      connect(spinBox, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxEditingFinished()));
-
       return spinBox;
     }
 
@@ -235,7 +231,8 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
 
       comboBox->addItems(data.toStringList());
 
-      connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxCurrentIndexChanged(int)));
+      // Not currentIndexChanged: setEditorData() changes the index before the view registers the editor.
+      connect(comboBox, SIGNAL(activated(int)), this, SLOT(OnComboBoxActivated(int)));
 
       return comboBox;
     }
@@ -273,20 +270,12 @@ std::string QmitkPropertyItemDelegate::GetPropertyName(const QModelIndex &index)
   return "";
 }
 
-void QmitkPropertyItemDelegate::OnComboBoxCurrentIndexChanged(int)
+void QmitkPropertyItemDelegate::OnComboBoxActivated(int)
 {
   QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
 
   emit commitData(comboBox);
   emit closeEditor(comboBox);
-}
-
-void QmitkPropertyItemDelegate::OnSpinBoxEditingFinished()
-{
-  QAbstractSpinBox *spinBox = qobject_cast<QAbstractSpinBox *>(sender());
-
-  emit commitData(spinBox);
-  emit closeEditor(spinBox);
 }
 
 void QmitkPropertyItemDelegate::OnColorPicked()

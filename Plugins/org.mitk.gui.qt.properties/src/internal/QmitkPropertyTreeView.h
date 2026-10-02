@@ -23,6 +23,7 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 #include <QmitkSelectionServiceConnector.h>
+#include <QSet>
 #include <memory>
 
 namespace Ui
@@ -75,10 +76,13 @@ private:
 
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void HideAllIcons();
+  void RestoreExpansionState();
 
 private Q_SLOTS:
 
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+  void OnItemCollapsed(const QModelIndex& index);
+  void OnItemExpanded(const QModelIndex& index);
   void OnPropertyListChanged(int index);
   void OnAddNewProperty();
   void OnFilterTextChanged(const QString& filter);
@@ -97,6 +101,7 @@ private:
   QmitkPropertyItemDelegate* m_Delegate;
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::BaseRenderer* m_Renderer;
+  QSet<QString> m_CollapsedPaths;
 
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 };

@@ -5,7 +5,7 @@
           name="Volume Visualization"
           class="QmitkVolumeVisualizationView"
           icon="resources/volume_visualization.svg"
-          category="General">
+          category="Visualization">
       <description>Render images as volumes in 3D, with presets, transfer function editing and lighting.</description>
       <keywordReference id="org.mitk.views.volumevisualization.ViewKeyword"/>
     </view>

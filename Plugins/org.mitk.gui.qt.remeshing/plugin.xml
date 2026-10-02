@@ -5,6 +5,6 @@
           name="Remeshing"
           class="QmitkRemeshingView"
           icon="resources/RemeshingIcon.svg"
-          category="General" />
+          category="Processing" />
   </extension>
 </plugin>

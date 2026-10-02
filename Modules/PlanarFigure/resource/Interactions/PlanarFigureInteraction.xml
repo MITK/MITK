@@ -55,6 +55,14 @@
     </transition>
 
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="EditFigure" >
+      <!-- released away from the figure, e.g. outside the render window -->
+      <condition name="hovering_above_point" inverted="true" />
+      <condition name="hovering_above_figure" inverted="true" />
+      <action name="deselect_point" />
+      <action name="end_hovering" />
+    </transition>
+
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="EditFigure" >
       <action name="deselect_point" ID="76" /> <!-- AcDESELECTPOINT -->
     </transition>
 

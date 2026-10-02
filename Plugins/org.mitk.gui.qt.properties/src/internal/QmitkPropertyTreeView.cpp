@@ -25,32 +25,6 @@ found in the LICENSE file.
 #include <QPainter>
 #include <memory>
 
-namespace
-{
-  QmitkAbstractNodeSelectionWidget::NodeList GetInitialSelection(berry::ISelection::ConstPointer selection)
-  {
-    if (selection.IsNotNull() && !selection->IsEmpty())
-    {
-      auto* dataNodeSelection = dynamic_cast<const mitk::DataNodeSelection*>(selection.GetPointer());
-
-      if (nullptr != dataNodeSelection)
-      {
-        auto firstSelectedDataNode = dataNodeSelection->GetSelectedDataNodes().front();
-
-        if (firstSelectedDataNode.IsNotNull())
-        {
-          QmitkAbstractNodeSelectionWidget::NodeList initialSelection;
-          initialSelection.push_back(firstSelectedDataNode);
-
-          return initialSelection;
-        }
-      }
-    }
-
-    return QmitkAbstractNodeSelectionWidget::NodeList();
-  }
-}
-
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
@@ -188,11 +162,9 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   connect(m_Model, &QmitkPropertyItemModel::modelReset,
     this, &QmitkPropertyTreeView::OnModelReset);
 
-  auto selection = this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  auto currentSelection = GetInitialSelection(selection);
-
-  if (!currentSelection.isEmpty())
-    m_Controls->singleSlot->SetCurrentSelection(currentSelection);
+  // The selection service only reports the active part's selection, which is no longer
+  // the Data Manager's once the user has clicked into a render window or another view.
+  m_Controls->singleSlot->SetCurrentSelection(this->GetDataManagerSelection());
 }
 
 void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)

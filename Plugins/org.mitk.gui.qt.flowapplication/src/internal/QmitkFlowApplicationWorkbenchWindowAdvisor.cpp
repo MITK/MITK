@@ -546,11 +546,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   auto   mainActionsToolBar = new QmitkCategoryToolBar(QString());
   mainActionsToolBar->setObjectName("mainActionsToolBar");
   mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-#ifdef __APPLE__
-  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
-#else
-  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
-#endif
+  mainActionsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
   imageNavigatorAction = new QAction(QmitkIconTheme::GetIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);

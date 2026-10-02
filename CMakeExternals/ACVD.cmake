@@ -28,7 +28,6 @@ if(MITK_USE_ACVD)
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_args}
-        -DUSE_MULTITHREADING:BOOL=ON
         -DBUILD_EXAMPLES:BOOL=OFF
         -DVTK_DIR:PATH=${VTK_DIR}
       CMAKE_CACHE_ARGS

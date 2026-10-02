@@ -30,7 +30,8 @@ namespace mitk
 /**
  * \brief Welcome screen page for the most common application settings.
  *
- * Offers the plugin preset, the theme, and the mouse interaction scheme.
+ * Offers the plugin preset, the theme, the tool bar style, and the mouse
+ * interaction scheme.
  * Choices take effect immediately and are stored in the same preferences as
  * the corresponding preference pages, so changes made in either place are
  * reflected in the other.
@@ -46,10 +47,12 @@ public:
 private:
   QWidget* CreatePresetCard();
   QWidget* CreateThemeCard();
+  QWidget* CreateToolBarStyleCard();
   QWidget* CreateMouseInteractionCard();
 
   void OnPresetClicked(int id);
   void OnThemeClicked(int id);
+  void OnToolBarStyleClicked(int id);
   void OnMouseInteractionClicked(int id);
 
   void OnToolBarPreferencesChanged(const mitk::IPreferences*);
@@ -59,12 +62,14 @@ private:
 
   void UpdatePreset();
   void UpdateTheme();
+  void UpdateToolBarStyle();
   void UpdateMouseInteraction();
 
   std::vector<QmitkToolBarPreset> m_Presets;
   QButtonGroup* m_PresetGroup;
   QLabel* m_PresetInfo;
   QButtonGroup* m_ThemeGroup;
+  QButtonGroup* m_ToolBarStyleGroup;
   QButtonGroup* m_MouseInteractionGroup;
   bool m_IsApplyingPreset;
   bool m_IsCustomPresetChosen;

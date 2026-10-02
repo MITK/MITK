@@ -51,6 +51,8 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Add_ThrowsWithoutDataStorage);
   MITK_TEST(Add_EmitsSignalOnFirstCall);
   MITK_TEST(Add_IsIdempotent);
+  MITK_TEST(Add_ExplicitNameTakenByOtherIndex_Throws);
+  MITK_TEST(Add_InvalidExplicitName_Throws);
   MITK_TEST(Set_RejectsNullWidget);
   MITK_TEST(Set_AutoCreatesMissingGroup);
   MITK_TEST(Set_AssignsWidgetToTargetGroup);
@@ -201,6 +203,33 @@ public:
                                  firstConnector, ConnectorOf(widget, 1));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Connector state must be preserved",
                                  false, firstConnector->GetSelectionMode());
+  }
+
+  void Add_ExplicitNameTakenByOtherIndex_Throws()
+  {
+    TestableQmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.AddSynchronizationGroup(1, "main");
+    AddedRecorder rec(widget);
+
+    CPPUNIT_ASSERT_THROW(widget.AddSynchronizationGroup(3, "main"), mitk::Exception);
+
+    CPPUNIT_ASSERT_MESSAGE("A rejected name must not leave a connector behind",
+                           nullptr == ConnectorOf(widget, 3));
+    CPPUNIT_ASSERT_EQUAL(std::size_t{1}, ConnectorCount(widget));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A rejected name must not announce a group", 0, rec.count);
+  }
+
+  void Add_InvalidExplicitName_Throws()
+  {
+    TestableQmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    AddedRecorder rec(widget);
+
+    CPPUNIT_ASSERT_THROW(widget.AddSynchronizationGroup(2, "not/url safe"), mitk::Exception);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t{0}, ConnectorCount(widget));
+    CPPUNIT_ASSERT_EQUAL(0, rec.count);
   }
 
   // ---------- Set ----------

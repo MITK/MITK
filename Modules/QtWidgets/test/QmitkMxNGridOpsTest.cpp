@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncDimension.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowMenu.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkException.h>
@@ -27,6 +29,7 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QSplitter>
 
+#include <functional>
 #include <set>
 #include <string>
 
@@ -68,6 +71,9 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(Maximize_AddGridRowRestoresTheGrid);
   MITK_TEST(Maximize_RemoveGridRowRestoresTheGrid);
   MITK_TEST(Maximize_DataBasedLayoutRestoresTheGrid);
+  MITK_TEST(Maximize_RejectedDocumentKeepsTheMaximize);
+  MITK_TEST(Maximize_LegacyLayoutDesignSignalCannotRebuildTheTree);
+  MITK_TEST(Collapse_CollapsedCellRoundTrips);
   MITK_TEST(Crosshair_NewCellsJoinTheEnabledCrosshair);
   MITK_TEST(Crosshair_NewCellsFollowVisibilityAndGap);
   MITK_TEST(NormalizedRects_MirrorTheGrid);
@@ -409,6 +415,76 @@ public:
                            m_Editor->GetMaximizedCell().isEmpty());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("One image, three view directions -> three visible windows",
                                  3, this->VisibleCellCount());
+  }
+
+  void Maximize_RejectedDocumentKeepsTheMaximize()
+  {
+    this->SizedEditor(2, 2);
+    m_Editor->SetMaximizedCell(CellId(1));
+
+    auto doc = m_Editor->SerializeLayout();
+    doc["version"] = "9.9";
+    CPPUNIT_ASSERT_THROW(m_Editor->ApplyLayout(doc), mitk::Exception);
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A document rejected before any change leaves the maximize in place",
+                                 CellId(1).toStdString(), m_Editor->GetMaximizedCell().toStdString());
+    CPPUNIT_ASSERT_EQUAL(1, this->VisibleCellCount());
+  }
+
+  void Maximize_LegacyLayoutDesignSignalCannotRebuildTheTree()
+  {
+    this->SizedEditor(2, 2);
+    m_Editor->SetMaximizedCell(CellId(2));
+
+    // The generic render-window menu is switched off in this editor, but its
+    // signal still exists on every cell's render window.
+    auto* const renderWindow = m_Editor->GetRenderWindowWidgets().at(CellId(2))->GetRenderWindow();
+    emit renderWindow->LayoutDesignChanged(QmitkRenderWindowMenu::LayoutDesign::ONE_BIG);
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The splitter tree keeps every cell",
+                                 std::size_t(4), m_Editor->ListWindowDescriptors().size());
+    CPPUNIT_ASSERT_EQUAL(CellId(2).toStdString(), m_Editor->GetMaximizedCell().toStdString());
+    CPPUNIT_ASSERT_EQUAL(1, this->VisibleCellCount());
+  }
+
+  // ---------- Collapsed panes ----------
+
+  void Collapse_CollapsedCellRoundTrips()
+  {
+    this->SizedEditor(2, 2);
+    auto* const row = qobject_cast<QSplitter*>(
+      m_Editor->GetRenderWindowWidgets().at(CellId(1))->parentWidget());
+    CPPUNIT_ASSERT(nullptr != row);
+    auto* const root = qobject_cast<QSplitter*>(row->parentWidget());
+    CPPUNIT_ASSERT(nullptr != root);
+
+    // A size of 0 is what dragging a divider fully to one edge produces on a
+    // collapsible child, in both orientations.
+    row->setSizes({ 1200, 0 });
+    root->setSizes({ 800, 0 });
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_MESSAGE("A window cannot be collapsed horizontally", row->sizes().at(1) > 0);
+    CPPUNIT_ASSERT_MESSAGE("A row cannot be collapsed vertically", root->sizes().at(1) > 0);
+
+    const auto doc = m_Editor->SerializeLayout();
+    std::function<void(const nlohmann::json&)> assertSizes = [&assertSizes](const nlohmann::json& node)
+    {
+      for (const auto& child : node.at("children"))
+      {
+        CPPUNIT_ASSERT_MESSAGE("Every serialized size is loadable", child.at("size").get<int>() >= 1);
+        if (child.contains("children"))
+        {
+          assertSizes(child);
+        }
+      }
+    };
+    assertSizes(doc.at("root"));
+
+    CPPUNIT_ASSERT_NO_THROW(m_Editor->ApplyLayout(doc));
+    CPPUNIT_ASSERT_EQUAL(4u, m_Editor->GetNumberOfRenderWindowWidgets());
   }
 
   // ---------- AddGridColumn ----------

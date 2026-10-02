@@ -59,7 +59,9 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <functional>
+#include <limits>
 #include <numeric>
 #include <fstream>
 #include <vector>
@@ -305,6 +307,18 @@ namespace
       }
       for (const auto& child : node["children"])
       {
+        // 'size' is the weight the parent assigns, so it is checked here; a
+        // size on the root has no parent to apply it and stays ignored.
+        if (child.is_object() && child.contains("size"))
+        {
+          const auto& size = child["size"];
+          if (!size.is_number_integer() || size.get<std::int64_t>() < 1
+              || size.get<std::int64_t>() > std::numeric_limits<int>::max())
+          {
+            mitkThrow() << "Layout child has invalid 'size' " << size.dump()
+                        << "; size must be an integer >= 1.";
+          }
+        }
         PrewalkValidate(child, isV3, result);
       }
     }
@@ -351,6 +365,7 @@ namespace
         mitkThrow() << "Layout window '" << id
                     << "' is missing the 'view_direction' string field.";
       }
+      ParseViewDirection(node["view_direction"].get<std::string>());
       if (!node.contains("links") || !node["links"].is_object())
       {
         mitkThrow() << "Layout window '" << id << "' is missing the 'links' object.";
@@ -1011,7 +1026,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
 
   // Layout-tracking furniture (layout editor, sync plates) follows this signal;
   // without it a shrink leaves them rendering removed cells.
-  this->RelaySplitterProportionChanges();
+  this->ConfigureLayoutSplitters();
   emit LayoutChanged();
 }
 
@@ -1167,8 +1182,9 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // phantom group 1 for documents that never reference it.
   utilityWidget->GetNodeSelectionWidget()->SelectAll();
 
-  auto layoutManager = this->GetMultiWidgetLayoutManager();
-  connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
+  // LayoutDesignChanged stays unconnected: the layout manager's generic
+  // designs rebuild the splitter tree behind this editor's grid, maximize and
+  // layout-document state.
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
@@ -1248,14 +1264,8 @@ void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
   auto* root = this->RootSplitter();
   if (nullptr == root)
   {
-    // Without a tree there is nothing to maximize, and a captured state would
-    // describe splitters that are gone.
-    m_PreMaximizeSizes.clear();
-    if (!m_MaximizedCell.isEmpty())
-    {
-      m_MaximizedCell.clear();
-      emit MaximizedCellChanged(m_MaximizedCell);
-    }
+    // Nothing to maximize without a tree. No maximize state can be pending
+    // here: every path that replaces the tree resets the maximize first.
     return;
   }
 
@@ -1307,8 +1317,9 @@ void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
 
   if (nullptr == maximized && !m_PreMaximizeSizes.empty())
   {
-    // The layout manager deletes the splitter tree on every layout change, so
-    // a caller that reaches it while maximized leaves stale entries behind.
+    // Every tree rebuild resets the maximize first, so the captured splitters
+    // are alive here; the guarded pointers only keep a broken invariant from
+    // turning into a use-after-free.
     for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
     {
       if (nullptr != splitter)
@@ -1334,7 +1345,7 @@ QString QmitkMxNMultiWidget::GetMaximizedCell() const
   return m_MaximizedCell;
 }
 
-void QmitkMxNMultiWidget::RelaySplitterProportionChanges()
+void QmitkMxNMultiWidget::ConfigureLayoutSplitters()
 {
   auto* root = this->RootSplitter();
   if (nullptr == root)
@@ -1352,6 +1363,7 @@ void QmitkMxNMultiWidget::RelaySplitterProportionChanges()
     // trailing arguments.
     connect(split, &QSplitter::splitterMoved,
             this, &QmitkMxNMultiWidget::LayoutProportionsChanged, Qt::UniqueConnection);
+    split->setChildrenCollapsible(false);
 
     for (int i = 0; i < split->count(); ++i)
     {
@@ -1564,7 +1576,7 @@ void QmitkMxNMultiWidget::FinalizeGridSurgery()
   {
     this->SetGridDimensions(rows, columns);
   }
-  this->RelaySplitterProportionChanges();
+  this->ConfigureLayoutSplitters();
   emit LayoutChanged();
 }
 
@@ -1987,7 +1999,9 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
     {
       mitkThrow() << "SerializeLayout: unknown child widget type at splitter index " << i << ".";
     }
-    childJson["size"] = sizes[i];
+    // A child Qt reports at 0 (collapsed, hidden, or not yet realized) would
+    // make the document unloadable: the loader and both schemas require >= 1.
+    childJson["size"] = std::max(1, sizes[i]);
     children.push_back(childJson);
   }
   node["children"] = children;
@@ -2091,16 +2105,9 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
       const auto type = child["type"].get<std::string>();
       // 'size' is optional; default weight 1 matches the schema default.
       // Only the ratio between siblings matters at runtime - QSplitter
-      // redistributes weights proportionally on resize. Reject size < 1
-      // (the schema also requires this): size 0 would collapse the pane
-      // in Qt, but the format has no documented 'hide this cell' semantics.
-      const int childSize = child.value("size", 1);
-      if (childSize < 1)
-      {
-        mitkThrow() << "Layout child has invalid 'size' " << childSize
-                    << "; size must be >= 1.";
-      }
-      sizes.append(childSize);
+      // redistributes weights proportionally on resize. PrewalkValidate has
+      // rejected anything but an integer >= 1.
+      sizes.append(child.value("size", 1));
 
       if (type == "split")
       {
@@ -2109,8 +2116,8 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
       }
       else  // "window"
       {
-        // Id passes through verbatim - validation already happened upstream
-        // (PrewalkValidate + ValidateIdsForThisEditor).
+        // Id and view direction pass through verbatim - validation already
+        // happened upstream (PrewalkValidate + ValidateIdsForThisEditor).
         const auto id = QString::fromStdString(child["id"].get<std::string>());
         const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
         const auto groupName = LinkTarget(child["links"]["selection"]);
@@ -2139,8 +2146,9 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
     // canonical shared_ptr-drop path. Cells were 'make_shared'-allocated;
     // letting the unique_ptr's destructor cascade-delete them via Qt's
     // 'deleteChildren' would call 'operator delete' on memory that isn't a
-    // standalone heap allocation - undefined behaviour, observed as the
-    // heap corruption in 'Apply_Failure_RollsBackToDefault'.
+    // standalone heap allocation - undefined behaviour that shows up as heap
+    // corruption. Document errors never get here (PrewalkValidate rejects
+    // them before teardown); this path guards engine-side failures.
     //
     // After the drain, every cell has been destroyed via '~QmitkRenderWindow
     // Widget' (which removes the cell from its splitter's child list); the
@@ -2340,6 +2348,9 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   //   3. Remove cells one-by-one through the public name-keyed path. Each
   //      removal disconnects signals and drops the map's shared_ptr; with
   //      no other strong refs left, the cell self-destructs.
+  // The maximize is a view state over the cells about to go, and its captured
+  // sizes describe splitters that go with them.
+  this->SetMaximizedCell(QString());
   this->SetActiveRenderWindowWidget(nullptr);
   m_CellBorderColors.clear();
 
@@ -2444,8 +2455,6 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
   // event loop as well, still runs with the flag set.
   const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
 
-  this->SetMaximizedCell(QString());
-
   // 'didMutate' guards rollback. As long as we are in the validation phase
   // (no engine state touched yet) a throw must rethrow without rolling back,
   // so a malformed document does not destroy the user's existing layout.
@@ -2530,38 +2539,39 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
                       << GROUP_NAME_PATTERN.pattern().toStdString()
                       << "' (URL-segment-safe).";
         }
+        if (!it.value().is_object())
+        {
+          mitkThrow() << "Layout 'groups." << it.key() << "' entry must be a JSON object.";
+        }
         // Cosmetic per-group fields. Purely presentational, so malformed
         // values are ignored with a warning - a color must never make a
         // layout unloadable.
-        if (it.value().is_object())
+        const auto& entry = it.value();
+        if (entry.contains("color"))
         {
-          const auto& entry = it.value();
-          if (entry.contains("color"))
+          const auto& color = entry.at("color");
+          if (color.is_string()
+              && GROUP_COLOR_PATTERN.match(QString::fromStdString(color.get<std::string>())).hasMatch())
           {
-            const auto& color = entry.at("color");
-            if (color.is_string()
-                && GROUP_COLOR_PATTERN.match(QString::fromStdString(color.get<std::string>())).hasMatch())
-            {
-              groupColors[it.key()] = color.get<std::string>();
-            }
-            else
-            {
-              MITK_WARN << "Ignoring malformed 'groups." << it.key()
-                        << ".color' (expected '#RRGGBB'); using the default hue.";
-            }
+            groupColors[it.key()] = color.get<std::string>();
           }
-          if (entry.contains("name"))
+          else
           {
-            const auto& displayName = entry.at("name");
-            if (displayName.is_string() && !displayName.get<std::string>().empty())
-            {
-              groupDisplayNames[it.key()] = displayName.get<std::string>();
-            }
-            else
-            {
-              MITK_WARN << "Ignoring malformed 'groups." << it.key()
-                        << ".name' (expected a non-empty string); using the group id.";
-            }
+            MITK_WARN << "Ignoring malformed 'groups." << it.key()
+                      << ".color' (expected '#RRGGBB'); using the default hue.";
+          }
+        }
+        if (entry.contains("name"))
+        {
+          const auto& displayName = entry.at("name");
+          if (displayName.is_string() && !displayName.get<std::string>().empty())
+          {
+            groupDisplayNames[it.key()] = displayName.get<std::string>();
+          }
+          else
+          {
+            MITK_WARN << "Ignoring malformed 'groups." << it.key()
+                      << ".name' (expected a non-empty string); using the group id.";
           }
         }
       }
@@ -2572,12 +2582,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
           mitkThrow() << "Layout references group '" << g
                       << "' which is not declared in the 'groups' dict.";
         }
-        const auto& entry = groupsDict.at(g);
-        if (!entry.is_object())
-        {
-          mitkThrow() << "Layout 'groups." << g << "' entry must be a JSON object.";
-        }
-        groupSelectAll[g] = entry.value("select_all", true);
+        groupSelectAll[g] = groupsDict.at(g).value("select_all", true);
       }
       for (const auto& g : prewalk.navGroups)
       {
@@ -2586,18 +2591,13 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
           mitkThrow() << "Layout references group '" << g
                       << "' which is not declared in the 'groups' dict.";
         }
-        if (!groupsDict.at(g).is_object())
-        {
-          mitkThrow() << "Layout 'groups." << g << "' entry must be a JSON object.";
-        }
       }
       for (auto it = groupsDict.begin(); it != groupsDict.end(); ++it)
       {
         if (groupSelectAll.find(it.key()) == groupSelectAll.end()
             && prewalk.navGroups.find(it.key()) == prewalk.navGroups.end())
         {
-          unreferencedGroupSelectAll[it.key()] =
-            it.value().is_object() ? it.value().value("select_all", true) : true;
+          unreferencedGroupSelectAll[it.key()] = it.value().value("select_all", true);
         }
       }
     }
@@ -2730,7 +2730,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
 
     this->EnableCrosshair();
-    this->RelaySplitterProportionChanges();
+    this->ConfigureLayoutSplitters();
     emit LayoutChanged();
   }
   catch (const mitk::Exception&)
@@ -2769,8 +2769,6 @@ bool QmitkMxNMultiWidget::IsApplyingLayout() const
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
 {
-  this->SetMaximizedCell(QString());
-
   // Tear the existing cell tree down first. The previous implementation
   // tried to recycle existing 'widget<i>' cells by positional index, which
   // misses entirely after a v2 layout with custom names is loaded
@@ -2835,7 +2833,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   }
 
   this->EnableCrosshair();
-  this->RelaySplitterProportionChanges();
+  this->ConfigureLayoutSplitters();
   emit LayoutChanged();
 }
 
@@ -2852,6 +2850,28 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   if (m_SynchronizedWidgetConnectors.find(index) != m_SynchronizedWidgetConnectors.end())
   {
     return;
+  }
+
+  // Ids resolve to the first matching index, so a second group under the same
+  // name would be unreachable. Only the selection registry counts: a name that
+  // so far only navigation links use is the same group in the shared
+  // namespace, and registering it here is how it gains a selection bundle.
+  if (!name.empty())
+  {
+    if (!GROUP_NAME_PATTERN.match(QString::fromStdString(name)).hasMatch())
+    {
+      mitkThrow() << "Cannot create synchronization group " << index << ": name '" << name
+                  << "' does not match the required pattern '"
+                  << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
+    }
+    for (const auto& [otherIndex, otherName] : m_GroupNameByIndex)
+    {
+      if (otherName == name)
+      {
+        mitkThrow() << "Cannot create synchronization group " << index << ": name '" << name
+                    << "' is already registered under index " << otherIndex << ".";
+      }
+    }
   }
 
   const auto dataStorage = this->GetDataStorage();

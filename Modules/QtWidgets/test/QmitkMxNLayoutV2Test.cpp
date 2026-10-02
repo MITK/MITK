@@ -50,7 +50,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(MultiGroup_RoundTrip_PreservesSelectAll);
   MITK_TEST(LayoutName_PreservedAcrossRoundTrip);
   MITK_TEST(LayoutName_AbsentStaysAbsentAcrossRoundTrip);
-  MITK_TEST(LayoutName_ClearedAfterRollback);
+  MITK_TEST(LayoutName_SurvivesRejectedApply);
 
   // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
@@ -62,7 +62,9 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
 
   // --- Engine-state semantics ---
   MITK_TEST(TearDown_DestroysAllOldCells);
-  MITK_TEST(Apply_Failure_RollsBackToDefault);
+  MITK_TEST(Apply_ShapeError_KeepsPreviousLayout);
+  MITK_TEST(Apply_ShapeErrors_KeepPreviousLayout);
+  MITK_TEST(Groups_NonObjectUnreferencedEntry_Throws);
   MITK_TEST(Serialize_GroupNaming_Deterministic);
   MITK_TEST(Serialize_EmitsIdsVerbatim);
   MITK_TEST(Apply_NestedSplits_RoundTrip);
@@ -80,7 +82,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(SetLayout_PopulatesRowAndColumn);
   MITK_TEST(ApplyLayout_InvalidatesRowAndColumn);
   MITK_TEST(ApplyLayout_AssignsActiveWidgetFromNewMap);
-  MITK_TEST(ApplyLayout_RollbackKeepsActiveWidget);
+  MITK_TEST(ApplyLayout_ShapeError_KeepsActiveWidget);
 
   // --- Group seeding rule + post-apply consistency ---
   MITK_TEST(ApplyLayout_GroupMembersAgreeOnVisibility);
@@ -601,9 +603,9 @@ public:
   }
 
   // ====================================================================
-  // Construction failure rolls back to single default cell
+  // A document-shape error is rejected before the current layout is touched
   // ====================================================================
-  void Apply_Failure_RollsBackToDefault()
+  void Apply_ShapeError_KeepsPreviousLayout()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -619,14 +621,68 @@ public:
 
     auto editor = MakeEditor();
     editor->SetLayout(2, 2);
+    const auto before = editor->SerializeLayout();
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
-      "After a failed apply the editor must be left with exactly one default cell",
-      1u, editor->GetNumberOfRenderWindowWidgets());
-    CPPUNIT_ASSERT_MESSAGE(
-      "After rollback the editor must expose a usable active cell, "
-      "not just a dangling single-cell placeholder",
-      nullptr != editor->GetActiveRenderWindowWidget());
+      "A rejected document must leave every existing cell in place",
+      4u, editor->GetNumberOfRenderWindowWidgets());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "A rejected document must leave the previous layout unchanged",
+      before.dump(), editor->SerializeLayout().dump());
+  }
+
+  // ====================================================================
+  // Every malformed 'size' is rejected before the current layout is touched
+  // ====================================================================
+  void Apply_ShapeErrors_KeepPreviousLayout()
+  {
+    for (const auto* size : { "0", "\"2\"", "1.5", "true", "2147483648" })
+    {
+      const auto fixture = nlohmann::json::parse(std::string(R"json({
+        "version": "2.0",
+        "groups": { "main": { "select_all": true } },
+        "root": {
+          "type": "split", "orientation": "horizontal",
+          "children": [
+            { "type": "window", "id": "mxn__ok",  "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__bad", "view_direction": "axial", "links": { "selection": "main" }, "size": )json")
+        + size + R"json( }
+          ]
+        }
+      })json");
+
+      auto editor = MakeEditor();
+      editor->SetLayout(2, 2);
+      const auto before = editor->SerializeLayout();
+      const std::string label = std::string("size ") + size;
+      CPPUNIT_ASSERT_THROW_MESSAGE(label, editor->ApplyLayout(fixture), mitk::Exception);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(label + ": every existing cell stays",
+                                   4u, editor->GetNumberOfRenderWindowWidgets());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(label + ": the previous layout stays",
+                                   before.dump(), editor->SerializeLayout().dump());
+    }
+  }
+
+  // ====================================================================
+  // A group entry must be an object even when no cell references it
+  // ====================================================================
+  void Groups_NonObjectUnreferencedEntry_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true }, "g": 5 },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->SetLayout(1, 2);
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL(2u, editor->GetNumberOfRenderWindowWidgets());
   }
 
   // ====================================================================
@@ -1071,9 +1127,8 @@ public:
     }
   }
 
-  void ApplyLayout_RollbackKeepsActiveWidget()
+  void ApplyLayout_ShapeError_KeepsActiveWidget()
   {
-    // Forces rollback via the unknown-view-direction path (strictness).
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
       "groups": { "main": { "select_all": true } },
@@ -1087,10 +1142,15 @@ public:
     })json");
 
     auto editor = MakeEditor();
+    editor->SetLayout(2, 2);
+    const auto active = editor->GetRenderWindowWidget(QStringLiteral("mxn__widget3"));
+    CPPUNIT_ASSERT(nullptr != active);
+    editor->SetActiveRenderWindowWidget(active);
+
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
     CPPUNIT_ASSERT_MESSAGE(
-      "After rollback the editor must expose a usable active cell",
-      nullptr != editor->GetActiveRenderWindowWidget());
+      "A rejected document must leave the active cell as it was",
+      active == editor->GetActiveRenderWindowWidget());
   }
 
   // ====================================================================
@@ -1585,9 +1645,9 @@ public:
   }
 
   // ====================================================================
-  // After a failed apply the rolled-back state emits no 'name'.
+  // A rejected document leaves the previous layout's 'name' in place.
   // ====================================================================
-  void LayoutName_ClearedAfterRollback()
+  void LayoutName_SurvivesRejectedApply()
   {
     // First, install a named layout so m_LayoutName is non-empty.
     const auto named = nlohmann::json::parse(R"json({
@@ -1602,7 +1662,6 @@ public:
       }
     })json");
 
-    // A schema-valid-but-engine-rejected fixture that fails mid-construction.
     const auto bad = nlohmann::json::parse(R"json({
       "version": "2.0",
       "name": "Should Not Stick",
@@ -1623,9 +1682,9 @@ public:
 
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(bad), mitk::Exception);
 
-    const auto afterRollback = editor->SerializeLayout();
-    CPPUNIT_ASSERT_MESSAGE("Rollback must clear m_LayoutName so no 'name' field is emitted",
-                           !afterRollback.contains("name"));
+    const auto afterReject = editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("The previous name must still be emitted", afterReject.contains("name"));
+    CPPUNIT_ASSERT_EQUAL(std::string("Stashed Name"), afterReject.at("name").get<std::string>());
   }
 
   void Construct_BadMultiWidgetName_Throws()

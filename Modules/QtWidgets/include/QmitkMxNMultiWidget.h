@@ -191,9 +191,13 @@ public:
   *                index 1, otherwise 'g_<index>' - or, if a group already uses
   *                that name, 'g_<n>' with the next unused n. Idempotent calls (the group
   *                already exists) leave the previously recorded name in
-  *                place.
+  *                place and skip the name preconditions below.
   *
   * \pre  index >= 1                       (otherwise mitk::Exception)
+  * \pre  A non-empty 'name' matches the layout format's group-name pattern
+  *       '^[A-Za-z0-9_.-]+$'               (otherwise mitk::Exception)
+  * \pre  A non-empty 'name' is not registered under another index
+  *                                        (otherwise mitk::Exception)
   * \pre  GetDataStorage() != nullptr      (otherwise mitk::Exception)
   *
   * \throws mitk::Exception on precondition violation.
@@ -1185,8 +1189,8 @@ private:
   QSplitter* RootSplitter() const;
 
   /**
-  * \brief Relay every layout splitter's 'splitterMoved' to
-  *        'LayoutProportionsChanged'.
+  * \brief Configure every layout splitter: relay its 'splitterMoved' to
+  *        'LayoutProportionsChanged' and make its children non-collapsible.
   *
   *        Splitters are created in a dozen places, several of them in the
   *        shared layout manager, so the tree is walked after a structural
@@ -1194,8 +1198,13 @@ private:
   *        unique, which makes re-walking idempotent, and the walk is by
   *        child index rather than findChildren so splitters that belong to a
   *        render window rather than the layout stay out of it.
+  *
+  *        A collapsed window looks like a missing one and the layout format
+  *        cannot express it, so a divider stops at the window's minimum size.
+  *        The shared layout manager keeps Qt's default for the other
+  *        multi-widget editors.
   */
-  void RelaySplitterProportionChanges();
+  void ConfigureLayoutSplitters();
 
   /**
   * \brief Tear down a single cell during grid surgery: capture its selection

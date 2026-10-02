@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
+#include <QMainWindow>
 #include <QPainter>
 #include <QPalette>
 #include <QRegularExpression>
@@ -52,8 +53,24 @@ namespace
     return QApplication::palette().color(QPalette::Window).lightness() < 128;
   }
 
+  /** The application's icon. BlueBerry applications set it on the main
+   *  window only, not application-wide. */
+  QIcon ApplicationIcon()
+  {
+    if (!QApplication::windowIcon().isNull())
+      return QApplication::windowIcon();
+
+    for (auto* widget : QApplication::topLevelWidgets())
+    {
+      if (qobject_cast<QMainWindow*>(widget) != nullptr && !widget->windowIcon().isNull())
+        return widget->windowIcon();
+    }
+
+    return {};
+  }
+
   /** The application icon with a badge on its lower-right corner. */
-  QPixmap BadgedApplicationIcon(const QColor& badgeColor, const QColor& background, qreal devicePixelRatio)
+  QPixmap BadgedApplicationIcon(const QColor& badgeColor, qreal devicePixelRatio)
   {
     QPixmap pixmap(QSize(kBadgedIconSize, kBadgedIconSize) * devicePixelRatio);
     pixmap.setDevicePixelRatio(devicePixelRatio);
@@ -62,19 +79,24 @@ namespace
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    QApplication::windowIcon().paint(&painter, QRect(0, 0, kIconSize, kIconSize));
+    ApplicationIcon().paint(&painter, QRect(0, 0, kIconSize, kIconSize));
 
     const qreal diameter = kIconSize * 0.42;
     const QRectF badge(kBadgedIconSize - diameter, kBadgedIconSize - diameter, diameter, diameter);
 
-    // The ring in the band's colour sets the badge off from the icon below it.
+    // A transparent ring sets the badge off from the icon below it on any
+    // background.
     const qreal ring = kIconSize * 0.045;
-    painter.setPen(QPen(background, ring));
-    painter.setBrush(badgeColor);
-    painter.drawEllipse(badge.adjusted(ring / 2, ring / 2, -ring / 2, -ring / 2));
-
+    painter.setCompositionMode(QPainter::CompositionMode_Clear);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(background);
+    painter.setBrush(Qt::black);
+    painter.drawEllipse(badge);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+    painter.setBrush(badgeColor);
+    painter.drawEllipse(badge.adjusted(ring, ring, -ring, -ring));
+
+    painter.setBrush(Qt::white);
     const qreal barWidth = diameter * 0.14;
     const QPointF center = badge.center();
     painter.drawRoundedRect(QRectF(center.x() - barWidth / 2, badge.top() + diameter * 0.2, barWidth, diameter * 0.38),
@@ -138,19 +160,20 @@ QString QmitkCrashDumpUi::PrivacyNote()
 
 QWidget* QmitkCrashDumpUi::CreateHeader(const QString& title, const QString& subtitle)
 {
-  const auto palette = QApplication::palette();
-  const auto background = palette.color(QPalette::Base);
   const auto accent = AccentColor();
 
   auto* header = new QFrame;
   header->setObjectName("crashDumpHeader");
   header->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  // Translucent grey instead of a palette colour: BlueBerry themes through
+  // the stylesheet alone, so the palette does not tell light from dark, and a
+  // tint reads as a band on either.
   header->setStyleSheet(QString(
-    "QFrame#crashDumpHeader { background-color: %1; border: none; border-left: 4px solid %2; "
-    "border-bottom: 1px solid %3; }").arg(background.name(), accent.name(), palette.color(QPalette::Mid).name()));
+    "QFrame#crashDumpHeader { background-color: rgba(128, 128, 128, 28); border: none; "
+    "border-left: 4px solid %1; border-bottom: 1px solid rgba(128, 128, 128, 90); }").arg(accent.name()));
 
   auto* iconLabel = new QLabel;
-  iconLabel->setPixmap(BadgedApplicationIcon(accent, background, header->devicePixelRatioF()));
+  iconLabel->setPixmap(BadgedApplicationIcon(accent, header->devicePixelRatioF()));
   iconLabel->setFixedSize(kBadgedIconSize, kBadgedIconSize);
 
   auto* titleLabel = new QLabel(title);

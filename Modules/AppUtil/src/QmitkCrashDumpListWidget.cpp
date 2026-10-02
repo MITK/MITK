@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QLocale>
-#include <QScrollBar>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -52,6 +51,7 @@ QmitkCrashDumpListWidget::QmitkCrashDumpListWidget(QWidget* parent)
   m_Tree->setUniformRowHeights(true);
   m_Tree->setItemsExpandable(false);
   m_Tree->setAllColumnsShowFocus(true);
+  m_Tree->setTextElideMode(Qt::ElideMiddle);
   m_Tree->setHeaderLabels({ "Kind", "Time", "Size", "Version", "Log", "Status" });
   m_Tree->header()->setStretchLastSection(false);
 
@@ -102,10 +102,19 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
 
     if (!dump.SessionLog.empty())
       item->setToolTip(LogColumn, QmitkCrashDumpUi::ToQString(dump.SessionLog));
+
+    item->setToolTip(VersionColumn, item->text(VersionColumn));
   }
 
   for (int column = 0; column < m_Tree->columnCount(); ++column)
     m_Tree->resizeColumnToContents(column);
+
+  // Development builds carry long version strings (with commit and local
+  // changes); capped, they are elided instead of pushing the columns after
+  // them out of view.
+  const int maxVersionWidth = m_Tree->fontMetrics().horizontalAdvance("MITK Workbench v2026.06-000-g0000");
+  if (m_Tree->columnWidth(VersionColumn) > maxVersionWidth)
+    m_Tree->setColumnWidth(VersionColumn, maxVersionWidth);
 
   emit SelectionChanged();
 }
@@ -130,16 +139,17 @@ std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetSelectedDumps() co
   return selected;
 }
 
-void QmitkCrashDumpListWidget::FitHeightToRows()
+void QmitkCrashDumpListWidget::FitToContents()
 {
-  int height = m_Tree->header()->sizeHint().height() + 2 * m_Tree->frameWidth();
+  const int frame = 2 * m_Tree->frameWidth();
 
+  int height = m_Tree->header()->sizeHint().height() + frame;
   for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
     height += m_Tree->sizeHintForRow(row);
 
-  // Room for a horizontal scroll bar, should the columns not fit.
-  height += m_Tree->horizontalScrollBar()->sizeHint().height();
-
+  m_Tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_Tree->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_Tree->setMinimumWidth(m_Tree->header()->length() + frame);
   m_Tree->setFixedHeight(height);
   this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }

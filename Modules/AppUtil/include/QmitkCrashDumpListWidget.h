@@ -67,9 +67,10 @@ public:
   /** \brief Multi-selection (default) or a read-only list. */
   void SetSelectionEnabled(bool enabled);
 
-  /** \brief Fix the height to the rows currently shown, for a short list
-   *  that should not take up space it does not need. */
-  void FitHeightToRows();
+  /** \brief Size the list to the rows and columns currently shown, without
+   *  scroll bars, for a short list that should neither take up space it does
+   *  not need nor hide columns. */
+  void FitToContents();
 
 signals:
   void SelectionChanged();

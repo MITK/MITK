@@ -61,7 +61,7 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   auto* dumpList = new QmitkCrashDumpListWidget;
   dumpList->SetSelectionEnabled(false);
   dumpList->SetDumps(dumps);
-  dumpList->FitHeightToRows();
+  dumpList->FitToContents();
 
   auto* privacyLabel = new QLabel(QmitkCrashDumpUi::PrivacyNote());
   privacyLabel->setWordWrap(true);

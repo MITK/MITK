@@ -313,7 +313,7 @@ void QmitkPropertyItemDelegate::setEditorData(QWidget *editor, const QModelIndex
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     comboBox->setCurrentIndex(comboBox->findText(index.data().toString()));
   }
-  if (data.typeId() == QMetaType::QColor)
+  else if (data.typeId() == QMetaType::QColor)
   {
     QmitkColorWidget *colorWidget = qobject_cast<QmitkColorWidget *>(editor);
     colorWidget->SetColor(data.value<QColor>());

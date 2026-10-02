@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
 #include <mitkCoreServices.h>
+#include <utility>
+#include <vector>
 
 class QmitkPropertyItem;
 
@@ -152,6 +154,7 @@ private:
   void OnPropertyListModified();
   void OnPropertyListDeleted();
   void OnPropertyModified(const itk::Object *property, const itk::EventObject &event);
+  void RemovePropertyObservers();
   void SetNewPropertyList(mitk::PropertyList *newPropertyList);
 
   mitk::CoreServicePointer<mitk::IPropertyAliases> m_PropertyAliases;
@@ -160,8 +163,7 @@ private:
   QString m_ClassName;
   std::unique_ptr<QmitkPropertyItem> m_RootItem;
   mitk::PropertyList::PropertyMap m_BuiltPropertyMap;
-  std::map<std::string, unsigned long> m_PropertyDeletedTags;
-  std::map<std::string, unsigned long> m_PropertyModifiedTags;
+  std::vector<std::pair<mitk::BaseProperty::Pointer, unsigned long>> m_PropertyObserverTags;
   unsigned long m_PropertyListDeletedTag;
   unsigned long m_PropertyListModifiedTag;
 };

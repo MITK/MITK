@@ -233,6 +233,7 @@ void QmitkPropertyItemModel::OnPropertyListDeleted()
 {
   this->beginResetModel();
   this->CreateRootItem();
+  this->RemovePropertyObservers();
   m_BuiltPropertyMap.clear();
   this->endResetModel();
 }
@@ -256,6 +257,16 @@ QModelIndex QmitkPropertyItemModel::parent(const QModelIndex &child) const
     return QModelIndex();
 
   return this->createIndex(parentItem->GetRow(), 0, parentItem);
+}
+
+void QmitkPropertyItemModel::RemovePropertyObservers()
+{
+  // Removed from the object it was added to, since the list may have dropped or replaced it
+  // meanwhile and observer tags are only unique per object.
+  for (const auto &[property, tag] : m_PropertyObserverTags)
+    property->RemoveObserver(tag);
+
+  m_PropertyObserverTags.clear();
 }
 
 int QmitkPropertyItemModel::rowCount(const QModelIndex &parent) const
@@ -322,8 +333,6 @@ bool QmitkPropertyItemModel::setData(const QModelIndex &index, const QVariant &v
 
 void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyList)
 {
-  typedef mitk::PropertyList::PropertyMap PropertyMap;
-
   this->beginResetModel();
 
   auto propertyList = m_PropertyList.Lock();
@@ -332,25 +341,9 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
   {
     propertyList->RemoveObserver(m_PropertyListDeletedTag);
     propertyList->RemoveObserver(m_PropertyListModifiedTag);
-
-    const PropertyMap *propertyMap = propertyList->GetMap();
-
-    for (PropertyMap::const_iterator propertyIt = propertyMap->begin(); propertyIt != propertyMap->end(); ++propertyIt)
-    {
-      std::map<std::string, unsigned long>::const_iterator tagIt = m_PropertyModifiedTags.find(propertyIt->first);
-
-      if (tagIt != m_PropertyModifiedTags.end())
-        propertyIt->second->RemoveObserver(tagIt->second);
-
-      tagIt = m_PropertyDeletedTags.find(propertyIt->first);
-
-      if (tagIt != m_PropertyDeletedTags.end())
-        propertyIt->second->RemoveObserver(tagIt->second);
-    }
-
-    m_PropertyModifiedTags.clear();
-    m_PropertyDeletedTags.clear();
   }
+
+  this->RemovePropertyObservers();
 
   m_PropertyList = newPropertyList;
   propertyList = m_PropertyList.Lock();
@@ -372,11 +365,8 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
     auto modifiedCommand = itk::MemberCommand<QmitkPropertyItemModel>::New();
     modifiedCommand->SetCallbackFunction(this, &QmitkPropertyItemModel::OnPropertyModified);
 
-    const PropertyMap *propertyMap = m_PropertyList.Lock()->GetMap();
-
-    for (PropertyMap::const_iterator it = propertyMap->begin(); it != propertyMap->end(); ++it)
-      m_PropertyModifiedTags.insert(
-        std::make_pair(it->first, it->second->AddObserver(itk::ModifiedEvent(), modifiedCommand)));
+    for (const auto &[name, property] : m_BuiltPropertyMap)
+      m_PropertyObserverTags.emplace_back(property, property->AddObserver(itk::ModifiedEvent(), modifiedCommand));
   }
 
   this->CreateRootItem();

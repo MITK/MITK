@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <sys/sysinfo.h>
 #include <unistd.h>
 #include <fstream>
+#include <string>
 #endif
 
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
@@ -92,6 +93,50 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 
   if (!sysinfo(&info))
     return info.totalram * info.mem_unit;
+#endif
+
+  return 0;
+}
+
+size_t mitk::MemoryUtilities::GetAvailableSizeOfPhysicalRam()
+{
+#if _MSC_VER
+  MEMORYSTATUSEX statex;
+  statex.dwLength = sizeof(statex);
+
+  if (GlobalMemoryStatusEx(&statex) != 0)
+    return statex.ullAvailPhys;
+#elif defined(__APPLE__)
+  vm_statistics64_data_t statistics;
+  mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
+  vm_size_t pageSize = 0;
+
+  // Every call of mach_host_self() hands out a port right that has to be given back.
+  const mach_port_t host = mach_host_self();
+
+  const bool success =
+    host_statistics64(host, HOST_VM_INFO64, reinterpret_cast<host_info64_t>(&statistics), &count) == KERN_SUCCESS &&
+    host_page_size(host, &pageSize) == KERN_SUCCESS;
+
+  mach_port_deallocate(mach_task_self(), host);
+
+  if (success)
+    return (static_cast<size_t>(statistics.free_count) + statistics.inactive_count) * pageSize;
+#else
+  // Unlike sysinfo()'s freeram, MemAvailable counts the page cache the kernel
+  // can reclaim, which on a machine that has been running for a while is most
+  // of what is actually available.
+  std::ifstream meminfo("/proc/meminfo");
+  std::string key;
+  size_t kiloBytes = 0;
+
+  while (meminfo >> key >> kiloBytes)
+  {
+    if (key == "MemAvailable:")
+      return kiloBytes * 1024;
+
+    meminfo.ignore(256, '\n');
+  }
 #endif
 
   return 0;

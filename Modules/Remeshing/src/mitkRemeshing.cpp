@@ -12,6 +12,9 @@ found in the LICENSE file.
 
 #include <mitkRemeshing.h>
 #include <mitkExceptionMacro.h>
+#include <mitkProgressTask.h>
+
+#include <itkMacro.h>
 
 #include <vtkIdList.h>
 #include <vtkIntArray.h>
@@ -37,7 +40,7 @@ namespace
   constexpr double MinimumMovedItemsRatio = 1e-4;
 
   /** \brief ACVD's isotropic remeshing, ending its clustering early once it
-   * has practically converged.
+   * has practically converged or a cancel has been requested.
    */
   class Remesher : public vtkIsotropicDiscreteRemeshing
   {
@@ -49,9 +52,20 @@ namespace
       return remesher;
     }
 
+    void SetProgressTask(const mitk::ProgressTask* task)
+    {
+      m_ProgressTask = task;
+    }
+
+    bool IsCancelRequested() const
+    {
+      return nullptr != m_ProgressTask && m_ProgressTask->IsCancelRequested();
+    }
+
   protected:
     Remesher()
-      : m_LoopBudget(this->MaxNumberOfLoops)
+      : m_ProgressTask(nullptr),
+        m_LoopBudget(this->MaxNumberOfLoops)
     {
     }
 
@@ -62,7 +76,8 @@ namespace
       // A manifold output makes ACVD minimize again after each round of
       // topology fixes. ProcessOneLoop() ends a run by exhausting its loop
       // budget, so every run starts with a full one.
-      this->MaxNumberOfLoops = this->NumberOfLoops + m_LoopBudget;
+      if (!this->IsCancelRequested())
+        this->MaxNumberOfLoops = this->NumberOfLoops + m_LoopBudget;
 
       vtkIsotropicDiscreteRemeshing::MinimizeEnergy();
     }
@@ -77,13 +92,14 @@ namespace
       // Exhausting the loop budget ends the clustering through its own exit,
       // which still reconnects split clusters. Throwing from here instead would
       // leave the clustering half done and leak what ACVD allocated.
-      if (converged)
+      if (converged || this->IsCancelRequested())
         this->MaxNumberOfLoops = this->NumberOfLoops;
 
       return movedItems;
     }
 
   private:
+    const mitk::ProgressTask* m_ProgressTask;
     int m_LoopBudget;
   };
 
@@ -186,7 +202,8 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
                                     double edgeSplitting,
                                     int optimizationLevel,
                                     bool forceManifold,
-                                    bool boundaryFixing)
+                                    bool boundaryFixing,
+                                    ProgressTask* progressTask)
 {
   ValidateSurface(surface, t);
 
@@ -213,8 +230,12 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
   remesher->SetInput(mesh);
   remesher->SetNumberOfClusters(numVertices);
   remesher->SetSubsamplingThreshold(subsampling);
+  remesher->SetProgressTask(progressTask);
 
   remesher->Remesh();
+
+  if (remesher->IsCancelRequested())
+    throw itk::ProcessAborted(__FILE__, __LINE__);
 
   // Optimization: Minimize distance between input surface and remeshed surface
   if (optimizationLevel != 0)
@@ -247,7 +268,8 @@ mitk::RemeshFilter::RemeshFilter()
     m_EdgeSplitting(0.0),
     m_OptimizationLevel(1),
     m_ForceManifold(false),
-    m_BoundaryFixing(false)
+    m_BoundaryFixing(false),
+    m_ProgressTask(nullptr)
 {
   Surface::Pointer output = Surface::New();
   this->SetNthOutput(0, output);
@@ -255,6 +277,16 @@ mitk::RemeshFilter::RemeshFilter()
 
 mitk::RemeshFilter::~RemeshFilter()
 {
+}
+
+void mitk::RemeshFilter::SetProgressTask(ProgressTask* task)
+{
+  m_ProgressTask = task;
+}
+
+mitk::ProgressTask* mitk::RemeshFilter::GetProgressTask() const
+{
+  return m_ProgressTask;
 }
 
 void mitk::RemeshFilter::GenerateData()
@@ -267,7 +299,8 @@ void mitk::RemeshFilter::GenerateData()
                        m_EdgeSplitting,
                        m_OptimizationLevel,
                        m_ForceManifold,
-                       m_BoundaryFixing);
+                       m_BoundaryFixing,
+                       m_ProgressTask);
 
   this->SetNthOutput(0, output);
 }

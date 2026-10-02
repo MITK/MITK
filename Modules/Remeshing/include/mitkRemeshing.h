@@ -20,6 +20,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /** \brief Remesh a surface and store the result in a new surface.
    *
    * The %ACVD library is used for remeshing which is based on the paper "Approximated Centroidal Voronoi Diagrams for
@@ -50,7 +52,11 @@ namespace mitk
    * \param[in] optimizationLevel Minimize distance between input surface and remeshed surface.
    * \param[in] forceManifold
    * \param[in] boundaryFixing Keep original surface boundaries by adding additional polygons.
-   * \return Returns the remeshed surface or nullptr if input surface is invalid.
+   * \param[in] progressTask Polled for a cancel request, or nullptr. Remeshing reports no steps of its own, so an
+   * indeterminate task is the one to pass.
+   * \return The remeshed surface.
+   * \throw mitk::Exception The input surface is missing or has no polygons at time step \p t.
+   * \throw itk::ProcessAborted A cancel was requested through \p progressTask.
    */
   MITKREMESHING_EXPORT Surface::Pointer Remesh(const Surface* surface,
                                                TimeStepType t,
@@ -60,7 +66,8 @@ namespace mitk
                                                double edgeSplitting = 0.0,
                                                int optimizationLevel = 1,
                                                bool forceManifold = false,
-                                               bool boundaryFixing = false);
+                                               bool boundaryFixing = false,
+                                               ProgressTask* progressTask = nullptr);
 
   /**
    * \brief ITK/VTK-style filter that encapsulates the mitk::Remesh() function.
@@ -107,6 +114,16 @@ namespace mitk
     /** \brief Set whether to fix boundaries by adding extra polygons. */
     itkSetMacro(BoundaryFixing, bool);
 
+    /**
+     * \brief Poll the given task for a cancel request, or nothing if it is nullptr.
+     *
+     * A requested cancel makes Update() throw itk::ProcessAborted.
+     *
+     * \sa Remesh()
+     */
+    void SetProgressTask(ProgressTask* task);
+    ProgressTask* GetProgressTask() const;
+
   protected:
     void GenerateData() override;
 
@@ -122,6 +139,7 @@ namespace mitk
     int m_OptimizationLevel;
     bool m_ForceManifold;
     bool m_BoundaryFixing;
+    ProgressTask* m_ProgressTask;
   };
 }
 

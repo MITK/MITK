@@ -16,9 +16,11 @@ found in the LICENSE file.
 #include <vtkIdList.h>
 #include <vtkIntArray.h>
 #include <vtkIsotropicDiscreteRemeshing.h>
-#include <vtkMultiThreader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkQuadricTools.h>
+#include <vtkSMPThreadLocalObject.h>
+#include <vtkSMPTools.h>
 #include <vtkSmartPointer.h>
 #include <vtkSurface.h>
 
@@ -27,23 +29,62 @@ found in the LICENSE file.
 
 namespace
 {
-  struct ClustersQuadrics final
+  // ACVD runs its connectivity-constrained clustering phase until not a single
+  // item changes its cluster anymore. Its last loops move a handful of items
+  // each, at the cost of a full loop, and can take most of the clustering time
+  // without changing the triangle quality or the distance to the input. The
+  // phase ends once a loop moves no more than this fraction of the items.
+  constexpr double MinimumMovedItemsRatio = 1e-4;
+
+  /** \brief ACVD's isotropic remeshing, ending its clustering early once it
+   * has practically converged.
+   */
+  class Remesher : public vtkIsotropicDiscreteRemeshing
   {
-    explicit ClustersQuadrics(size_t size)
-      : Elements(size),
-        Size(size)
+  public:
+    static Remesher* New()
     {
-      for (auto& array : Elements)
-        array.fill(0.0);
+      auto* remesher = new Remesher;
+      remesher->InitializeObjectBase();
+      return remesher;
     }
 
-    ~ClustersQuadrics() = default;
+  protected:
+    Remesher()
+      : m_LoopBudget(this->MaxNumberOfLoops)
+    {
+    }
 
-    ClustersQuadrics(const ClustersQuadrics&) = delete;
-    ClustersQuadrics& operator=(const ClustersQuadrics&) = delete;
+    ~Remesher() override = default;
 
-    std::vector<std::array<double, 9>> Elements;
-    size_t Size;
+    void MinimizeEnergy() override
+    {
+      // A manifold output makes ACVD minimize again after each round of
+      // topology fixes. ProcessOneLoop() ends a run by exhausting its loop
+      // budget, so every run starts with a full one.
+      this->MaxNumberOfLoops = this->NumberOfLoops + m_LoopBudget;
+
+      vtkIsotropicDiscreteRemeshing::MinimizeEnergy();
+    }
+
+    int ProcessOneLoop() override
+    {
+      const int movedItems = vtkIsotropicDiscreteRemeshing::ProcessOneLoop();
+
+      const bool converged = this->ConnexityConstraint &&
+        movedItems <= MinimumMovedItemsRatio * this->GetNumberOfItems();
+
+      // Exhausting the loop budget ends the clustering through its own exit,
+      // which still reconnects split clusters. Throwing from here instead would
+      // leave the clustering half done and leak what ACVD allocated.
+      if (converged)
+        this->MaxNumberOfLoops = this->NumberOfLoops;
+
+      return movedItems;
+    }
+
+  private:
+    int m_LoopBudget;
   };
 
   void ValidateSurface(const mitk::Surface* surface, mitk::TimeStepType t)
@@ -54,13 +95,86 @@ namespace
     if (t >= surface->GetSizeOfPolyDataSeries())
       mitkThrow() << "Input surface doesn't have data at time step " << t << "!";
 
-    auto* polyData = const_cast<mitk::Surface *>(surface)->GetVtkPolyData(t);
+    auto* polyData = surface->GetVtkPolyData(t);
 
     if (polyData == nullptr)
       mitkThrow() << "PolyData of input surface at time step " << t << " is nullptr!";
 
     if (polyData->GetNumberOfPolys() == 0)
       mitkThrow() << "Input surface has no polygons at time step " << t << "!";
+  }
+
+  /** \brief Moves every vertex of the remeshed surface to the minimum of the
+   * quadric of the input triangles around its cluster.
+   */
+  void OptimizeVertexPositions(Remesher* remesher, int optimizationLevel)
+  {
+    vtkIntArray* clustering = remesher->GetClustering();
+    vtkSurface* input = remesher->GetInput();
+    vtkSurface* output = remesher->GetOutput();
+    const vtkIdType numItems = remesher->GetNumberOfItems();
+    const int numClusters = remesher->GetNumberOfClusters();
+
+    // Items grouped by cluster, so that every quadric is summed up by a single
+    // thread: items of cluster c are clusterItems[clusterBegin[c]] up to
+    // clusterItems[clusterBegin[c + 1]].
+    std::vector<vtkIdType> clusterBegin(numClusters + 1, 0);
+    vtkIdType numUnclusteredItems = 0;
+
+    for (vtkIdType i = 0; i < numItems; ++i)
+    {
+      const int cluster = clustering->GetValue(i);
+
+      if (cluster >= 0 && cluster < numClusters)
+        ++clusterBegin[cluster + 1];
+      else
+        ++numUnclusteredItems;
+    }
+
+    if (numUnclusteredItems != 0)
+      MITK_WARN << numUnclusteredItems << " items of the input surface do not belong to any cluster";
+
+    for (int cluster = 0; cluster < numClusters; ++cluster)
+      clusterBegin[cluster + 1] += clusterBegin[cluster];
+
+    std::vector<vtkIdType> clusterItems(clusterBegin.back());
+    std::vector<vtkIdType> nextSlot(clusterBegin.begin(), clusterBegin.end() - 1);
+
+    for (vtkIdType i = 0; i < numItems; ++i)
+    {
+      const int cluster = clustering->GetValue(i);
+
+      if (cluster >= 0 && cluster < numClusters)
+        clusterItems[nextSlot[cluster]++] = i;
+    }
+
+    std::vector<std::array<double, 3>> points(numClusters);
+    vtkSMPThreadLocalObject<vtkIdList> faceLists;
+
+    vtkSMPTools::For(0, numClusters, [&](vtkIdType begin, vtkIdType end) {
+      vtkIdList* faceList = faceLists.Local();
+
+      for (vtkIdType cluster = begin; cluster < end; ++cluster)
+      {
+        std::array<double, 9> quadric{};
+
+        for (vtkIdType i = clusterBegin[cluster]; i < clusterBegin[cluster + 1]; ++i)
+        {
+          input->GetVertexNeighbourFaces(clusterItems[i], faceList);
+          const vtkIdType numFaces = faceList->GetNumberOfIds();
+
+          for (vtkIdType j = 0; j < numFaces; ++j)
+            vtkQuadricTools::AddTriangleQuadric(quadric.data(), input, faceList->GetId(j), false);
+        }
+
+        auto& point = points[cluster];
+        output->GetPoint(cluster, point.data());
+        vtkQuadricTools::ComputeRepresentativePoint(quadric.data(), point.data(), optimizationLevel);
+      }
+    });
+
+    for (int cluster = 0; cluster < numClusters; ++cluster)
+      output->SetPointCoordinates(cluster, points[cluster].data());
   }
 }
 
@@ -76,10 +190,8 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
 {
   ValidateSurface(surface, t);
 
-  MITK_INFO << "Start remeshing...";
-
   auto surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
-  surfacePolyData->DeepCopy(const_cast<Surface *>(surface)->GetVtkPolyData(t));
+  surfacePolyData->DeepCopy(surface->GetVtkPolyData(t));
 
   auto mesh = vtkSmartPointer<vtkSurface>::New();
 
@@ -87,19 +199,16 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
   mesh->GetCellData()->Initialize();
   mesh->GetPointData()->Initialize();
 
-  mesh->DisplayMeshProperties();
-
   if (numVertices == 0)
     numVertices = surfacePolyData->GetNumberOfPoints();
 
   if (edgeSplitting != 0.0)
     mesh->SplitLongEdges(edgeSplitting);
 
-  auto remesher = vtkSmartPointer<vtkIsotropicDiscreteRemeshing>::New();
+  auto remesher = vtkSmartPointer<Remesher>::New();
 
   remesher->GetMetric()->SetGradation(gradation);
   remesher->SetBoundaryFixing(boundaryFixing);
-  remesher->SetConsoleOutput(1);
   remesher->SetForceManifold(forceManifold);
   remesher->SetInput(mesh);
   remesher->SetNumberOfClusters(numVertices);
@@ -109,57 +218,7 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
 
   // Optimization: Minimize distance between input surface and remeshed surface
   if (optimizationLevel != 0)
-  {
-    ClustersQuadrics clustersQuadrics(numVertices);
-
-    auto faceList = vtkSmartPointer<vtkIdList>::New();
-    vtkSmartPointer<vtkIntArray> clustering = remesher->GetClustering();
-    vtkSmartPointer<vtkSurface> remesherInput = remesher->GetInput();
-    int clusteringType = remesher->GetClusteringType();
-    int numItems = remesher->GetNumberOfItems();
-    int numMisclassifiedItems = 0;
-
-    for (int i = 0; i < numItems; ++i)
-    {
-      int cluster = clustering->GetValue(i);
-
-      if (cluster >= 0 && cluster < numVertices)
-      {
-        if (clusteringType != 0)
-        {
-          remesherInput->GetVertexNeighbourFaces(i, faceList);
-          int numIds = static_cast<int>(faceList->GetNumberOfIds());
-
-          for (int j = 0; j < numIds; ++j)
-            vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster].data(), remesherInput, faceList->GetId(j), false);
-        }
-        else
-        {
-          vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster].data(), remesherInput, i, false);
-        }
-      }
-      else
-      {
-        ++numMisclassifiedItems;
-      }
-    }
-
-    if (numMisclassifiedItems != 0)
-      MITK_INFO << numMisclassifiedItems << " items with wrong cluster association" << std::endl;
-
-    vtkSmartPointer<vtkSurface> remesherOutput = remesher->GetOutput();
-    double point[3];
-
-    for (int i = 0; i < numVertices; ++i)
-    {
-      remesherOutput->GetPoint(i, point);
-      vtkQuadricTools::ComputeRepresentativePoint(clustersQuadrics.Elements[i].data(), point, optimizationLevel);
-      remesherOutput->SetPointCoordinates(i, point);
-    }
-
-    MITK_INFO << "After quadrics post-processing:" << std::endl;
-    remesherOutput->DisplayMeshProperties();
-  }
+    OptimizeVertexPositions(remesher, optimizationLevel);
 
   auto normals = vtkSmartPointer<vtkPolyDataNormals>::New();
 
@@ -176,8 +235,6 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
 
   auto remeshedSurface = Surface::New();
   remeshedSurface->SetVtkPolyData(normals->GetOutput());
-
-  MITK_INFO << "Finished remeshing";
 
   return remeshedSurface;
 }

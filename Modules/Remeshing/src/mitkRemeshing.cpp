@@ -301,7 +301,7 @@ size_t mitk::EstimateRemeshingMemory(const Surface* surface, TimeStepType t, int
 mitk::RemeshFilter::RemeshFilter()
   : m_TimeStep(0),
     m_NumVertices(0),
-    m_Gradation(1.0),
+    m_Gradation(0.5),
     m_Subsampling(10),
     m_EdgeSplitting(0.0),
     m_OptimizationLevel(1),

@@ -32,7 +32,7 @@ namespace mitk
    *  <li> numVertices is exact, however, if boundaryFixing is enabled, additional vertices are generated at
    * boundaries
    *  <li> %Set gradation to zero in case you want polygons of roughly the same size all over the remeshed surface;
-   * start with 1 otherwise
+   * start with 0.5 otherwise, as greater values turn a growing share of the polygons into slivers
    *  <li> subsampling has direct influence on the quality of the remeshed surface (higher values take more time)
    *  <li> edgeSplitting is useful for surfaces that contain long and thin triangles but takes a long time
    *  <li> Leave optimizationLevel set to 1 as greater values result in degenerated polygons
@@ -102,7 +102,7 @@ namespace mitk
    * Default parameter values:
    * - TimeStep: 0
    * - NumVertices: 0 (keep original vertex count)
-   * - Gradation: 1.0
+   * - Gradation: 0.5
    * - Subsampling: 10
    * - EdgeSplitting: 0.0 (disabled)
    * - OptimizationLevel: 1

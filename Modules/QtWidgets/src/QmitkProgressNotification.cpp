@@ -31,11 +31,7 @@ namespace
 
   QString CardStyleSheet()
   {
-    // The dark theme replaces widget colors wholesale in its style sheet and
-    // leaves the palette untouched, so palette() is a reliable source of
-    // colors in the light theme only. The theme is identified by the icon
-    // color it publishes, which is light in the dark theme and vice versa.
-    const auto darkTheme = QColor(QmitkIconTheme::GetColor()).lightness() > 127;
+    const auto darkTheme = QmitkIconTheme::IsDarkTheme();
 
     const auto surface = darkTheme ? QStringLiteral("#3f3f46") : QStringLiteral("palette(base)");
     const auto border = darkTheme ? QStringLiteral("#54545a") : QStringLiteral("palette(mid)");

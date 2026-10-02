@@ -4,6 +4,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.gui.qt.dosevisualization"
           name="RT Dose Visualization"
+          category="Visualization"
           class="RTDoseVisualizer"
           icon="resources/iso.png" />
   </extension>

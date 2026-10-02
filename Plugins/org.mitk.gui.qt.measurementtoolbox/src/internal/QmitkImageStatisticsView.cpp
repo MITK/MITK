@@ -15,10 +15,6 @@ found in the LICENSE file.
 
 #include <utility>
 
-// berry includes
-#include <berryIQtStyleManager.h>
-#include <berryWorkbenchPlugin.h>
-
 #include <mitkImageStatisticsContainerNodeHelper.h>
 #include <mitkImageStatisticsPredicateHelper.h>
 #include <mitkImageTimeSelector.h>
@@ -304,21 +300,9 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
 
 QmitkPlotStyle QmitkImageStatisticsView::GetColorTheme() const
 {
-  ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
-  if (styleManagerRef)
-  {
-    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    if (styleManager->GetStyle().name == "Dark")
-    {
-      return QmitkPlotStyle::Dark;
-    }
-    else
-    {
-      return QmitkPlotStyle::Light;
-    }
-  }
-  return QmitkPlotStyle::Dark;
+  return QmitkIconTheme::IsDarkTheme()
+    ? QmitkPlotStyle::Dark
+    : QmitkPlotStyle::Light;
 }
 
 void QmitkImageStatisticsView::ResetGUI()

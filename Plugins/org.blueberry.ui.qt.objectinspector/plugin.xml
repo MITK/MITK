@@ -5,6 +5,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.blueberry.ui.views.objectbrowser"
           name="Object Browser"
+          category="Utilities"
           class="berry::ObjectBrowserView"
       icon="resources/ObjectBrowser.png" />
   </extension>

@@ -49,6 +49,7 @@ found in the LICENSE file.
 #include <QmitkCategoryToolBar.h>
 #include <QmitkToolBarPresets.h>
 #include "QmitkExtFileSaveProjectAction.h"
+#include "QmitkThemedStyle.h"
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <QmitkCrashDumpDialog.h>
@@ -390,6 +391,9 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   // Load icon theme
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
+
+  // Style Qt's standard icons, e.g. of message boxes and tool bar extension buttons
+  QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
   // Enable full screen support
   if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())

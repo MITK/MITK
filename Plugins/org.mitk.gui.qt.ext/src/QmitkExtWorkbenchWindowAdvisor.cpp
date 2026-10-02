@@ -63,6 +63,7 @@ found in the LICENSE file.
 #include "QmitkOpenDicomEditorAction.h"
 #include "QmitkOpenMxNMultiWidgetEditorAction.h"
 #include "QmitkOpenStdMultiWidgetEditorAction.h"
+#include "QmitkThemedStyle.h"
 #include <QmitkCategoryToolBar.h>
 #include <QmitkToolBarPresets.h>
 
@@ -78,7 +79,6 @@ found in the LICENSE file.
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
 #include "internal/QmitkCommonExtPlugin.h"
-#include "internal/QmitkThemedStyle.h"
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
 #include <QMessageBox>
@@ -576,7 +576,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
 
-  // Style icons of Qt's standard message boxes
+  // Style Qt's standard icons, e.g. of message boxes and tool bar extension buttons
   QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
   // Start in full-screen (kiosk) mode when requested on the command line.

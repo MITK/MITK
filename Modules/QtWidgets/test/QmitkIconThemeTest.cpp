@@ -82,6 +82,7 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   MITK_TEST(ThemedSvgMatchesAllNotations);
   MITK_TEST(RefreshEmitsChanged);
   MITK_TEST(ColorsFollowRefresh);
+  MITK_TEST(DarkThemeHasLightIcons);
   MITK_TEST(RendersAtTheRequestedSize);
   MITK_TEST(RendersInDevicePixels);
   MITK_TEST(KeepsTheAspectRatio);
@@ -180,6 +181,15 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::string("#123456"), QmitkIconTheme::GetColor().toStdString());
     CPPUNIT_ASSERT_EQUAL(std::string("#abcdef"), QmitkIconTheme::GetAccentColor().toStdString());
+  }
+
+  void DarkThemeHasLightIcons()
+  {
+    ApplyTheme("#f1f1f1", "#ffffff");
+    CPPUNIT_ASSERT(QmitkIconTheme::IsDarkTheme());
+
+    ApplyTheme("#1e1e1e", "#ffffff");
+    CPPUNIT_ASSERT(!QmitkIconTheme::IsDarkTheme());
   }
 
   void RendersAtTheRequestedSize()

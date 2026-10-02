@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <QApplication>
+#include <QColor>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QIconEngine>
@@ -272,6 +273,12 @@ QString QmitkIconTheme::GetAccentColor()
 {
   EnsureParsed();
   return s_AccentColor;
+}
+
+bool QmitkIconTheme::IsDarkTheme()
+{
+  // Icons are light in the dark theme and vice versa.
+  return QColor(GetColor()).lightness() > 127;
 }
 
 void QmitkIconTheme::Refresh()

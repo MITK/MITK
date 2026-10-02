@@ -260,6 +260,44 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
   return remeshedSurface;
 }
 
+size_t mitk::EstimateRemeshingMemory(const Surface* surface, TimeStepType t, int numVertices, int subsampling)
+{
+  ValidateSurface(surface, t);
+
+  auto* polyData = surface->GetVtkPolyData(t);
+  const auto numInputVertices = static_cast<double>(polyData->GetNumberOfPoints());
+
+  const double numOutputVertices = numVertices != 0
+    ? numVertices
+    : numInputVertices;
+
+  // ACVD triangulates the input and subdivides it until there are enough
+  // vertices to cluster. A subdivision adds a vertex on every edge and splits
+  // every triangle into four.
+  auto* polys = polyData->GetPolys();
+  double numTriangles = static_cast<double>(polys->GetNumberOfConnectivityIds() - 2 * polys->GetNumberOfCells());
+  double numEdges = 1.5 * numTriangles; // Exact for a closed surface
+  double numItems = numInputVertices;
+
+  while (numItems < subsampling * numOutputVertices && numEdges > 0.0)
+  {
+    numItems += numEdges;
+    numEdges = 2.0 * numEdges + 3.0 * numTriangles;
+    numTriangles *= 4.0;
+  }
+
+  // Fitted to the peak memory of 200 remeshings of surfaces with 10k to 4M
+  // vertices, on 64-bit Windows. Above 300 MB the estimate was 2% off on
+  // average and at most 8% too low.
+  constexpr double BytesPerItem = 450.0;
+  constexpr double BytesPerInputVertex = 340.0;
+  constexpr double BytesPerOutputVertex = 1000.0;
+
+  return static_cast<size_t>(BytesPerItem * numItems +
+                             BytesPerInputVertex * numInputVertices +
+                             BytesPerOutputVertex * numOutputVertices);
+}
+
 mitk::RemeshFilter::RemeshFilter()
   : m_TimeStep(0),
     m_NumVertices(0),

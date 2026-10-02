@@ -69,6 +69,28 @@ namespace mitk
                                                bool boundaryFixing = false,
                                                ProgressTask* progressTask = nullptr);
 
+  /** \brief Estimate how much memory Remesh() needs at its peak.
+   *
+   * The memory grows with the number of vertices ACVD clusters, which is the number of input vertices after
+   * subdividing the input until it has at least \p subsampling times \p numVertices of them. A high subsampling
+   * at a high density therefore needs a multiple of what the input itself takes.
+   *
+   * The estimate includes one copy of the input surface at time step \p t, so it is what remeshing needs on top of a
+   * surface that is already in memory when Remesh() gets a copy of it, as it should if the original stays on display
+   * while Remesh() runs on another thread. It leaves out the vertices added by edge splitting and boundary fixing.
+   *
+   * \param[in] surface Input surface.
+   * \param[in] t Time step of a four-dimensional input surface, zero otherwise.
+   * \param[in] numVertices Desired number of vertices in the remeshed surface, zero for the original vertex count.
+   * \param[in] subsampling Subsampling as passed to Remesh().
+   * \return The estimated peak memory in bytes.
+   * \throw mitk::Exception The input surface is missing or has no polygons at time step \p t.
+   */
+  MITKREMESHING_EXPORT size_t EstimateRemeshingMemory(const Surface* surface,
+                                                      TimeStepType t,
+                                                      int numVertices,
+                                                      int subsampling = 10);
+
   /**
    * \brief ITK/VTK-style filter that encapsulates the mitk::Remesh() function.
    *

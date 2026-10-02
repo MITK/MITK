@@ -1,25 +1,108 @@
 /**
 \page org_mitk_views_remeshing The Remeshing View
 
-\imageMacro{RemeshingIcon.png,"Icon of the Remeshing Plugin.",2.00}
+\imageMacro{RemeshingIcon.png,"Icon of the Remeshing View",2.00}
 
 \tableofcontents
 
-\section org_mitk_views_remeshingDecimate Decimate surfaces
+\section org_mitk_views_remeshingOverview Overview
 
-Decimating surfaces effectively reduces their number of vertices and hence their number of polygons.
-In other words, decimating surfaces coarsens their meshes.
+The Remeshing view rebuilds a surface from a new set of evenly shaped triangles that stays close to the original shape.
+Its most common use is to reduce surfaces that are far denser than they need to be, such as surfaces created from segmentations, to a fraction of their vertices.
+At the same time, it replaces long and thin triangles by nearly equilateral ones, which suits further processing like simulations.
 
-Vertices are successively eliminated until the desired relative number of vertices remain.
-During this process, the decimation algorithm tries to keep the spatial difference between original meshes and decimated meshes to a minimum.
+Remeshing is based on <a href="https://github.com/valette/ACVD">ACVD</a>, which groups the vertices of the input into evenly sized patches and places one vertex of the result in each patch.
+See S. Valette and J.-M. Chassery, "Approximated Centroidal Voronoi Diagrams for Uniform Polygonal Mesh Coarsening", Computer Graphics Forum 23(3), 2004.
 
-A surface may consist of multiple meshes in different time steps.
-The decimation is applied to all time steps.
+\section org_mitk_views_remeshingUsage Remeshing a surface
 
-Before the actual decimation, meshes are triangulated, i. e., polygons with more than three edges like quadrilaterals are converted to triangles.
-Lines and points are ignored.
-Resulting meshes are guaranteed to consist of triangles only.
+<ol>
+  <li> Select the surface to remesh.
+  <li> Choose between \ref org_mitk_views_remeshingMode "Adaptive and Regular" remeshing.
+  <li> Choose a \ref org_mitk_views_remeshingQuality "quality" and a \ref org_mitk_views_remeshingDensity "density", and check that the memory it needs is available.
+  <li> Adjust the \ref org_mitk_views_remeshingAdvanced "advanced options" if the defaults do not fit.
+  <li> Click <b>Remesh</b>.
+</ol>
 
-Vertex normals can be optionally (re-)calculated for decimated meshes.
-To decide if you should flip normals, enable the Backface Culling property of the decimated surface in the Properties View - otherwise it is impossible to tell, as by default, both sides of polygons are shaded in MITK.
+Hovering over a setting shows a short explanation of it below the <b>Remesh</b> button.
+
+\section org_mitk_views_remeshingSettings Settings
+
+\subsection org_mitk_views_remeshingMode Adaptive and Regular remeshing
+
+<b>Adaptive</b> remeshing places more vertices where the surface bends and fewer where it is flat.
+It keeps fine details even at a low density, at the cost of somewhat less uniform triangles around strong bends.
+
+<b>Regular</b> remeshing spreads the vertices evenly regardless of the shape.
+It gives the most uniform triangles and is the better choice for smooth surfaces and for results that are processed further.
+
+\subsection org_mitk_views_remeshingQuality Quality
+
+To place its vertices well, remeshing needs many more vertices in the input than it produces.
+When the input has too few, it is refined first, and the higher quality settings refine it further.
+This makes the triangles of the result a little more uniform, but multiplies computation time and memory.
+
+<b>High</b> suits nearly every surface.
+<b>Very high</b> and <b>Maximum</b> are for the rare cases in which the last bit of uniformity matters.
+
+\subsection org_mitk_views_remeshingDensity Density
+
+The density sets the number of vertices of the result relative to the input: 50% halves it, and surfaces that are much denser than necessary often do well with 1-10%.
+The result has at least 100 vertices.
+
+The bar below the slider shows how much memory remeshing needs at each density, compared to the memory currently available:
+
+<ul>
+  <li> <b>Green:</b> up to half of the available memory.
+  <li> <b>Orange:</b> up to 85% of it.
+  <li> <b>Red:</b> more than that. Remeshing may fail or slow down the whole system.
+</ul>
+
+The text below the bar gives the estimated share for the current density, and turns red as well.
+
+Memory grows in steps rather than with every percent of density, because refining the input quadruples its number of vertices each time.
+The steps lie at about 10% and 40% for High, 2%, 8% and 32% for Very high, and 3.2%, 12.8% and 51.2% for Maximum.
+A density just above a step therefore needs two and a half to four times the memory of a density just below it.
+
+\subsection org_mitk_views_remeshingAdvanced Advanced options
+
+<ul>
+  <li> <b>Replace original surface:</b> the remeshed surface takes the place of the original in its node, which keeps its name, color, opacity, all other properties and its place in the Data Manager.
+       The original surface is gone afterwards.
+  <li> <b>Hide original surface:</b> once the remeshed surface is added, the original is hidden so that it does not cover the result.
+       This option does not apply when the original is replaced.
+  <li> <b>Show remeshed surface as wireframe:</b> shows the edges of the triangles of the result instead of a closed surface.
+</ul>
+
+By default, the result is added as a new node, shown as wireframe, and the original is hidden.
+
+\section org_mitk_views_remeshingRunning While remeshing runs
+
+Remeshing runs in the background, so MITK stays usable meanwhile.
+The settings of the view are locked until it is done.
+
+<ul>
+  <li> A notification in the bottom right corner of the window shows that remeshing is running.
+       It has no percentage, since how long remeshing takes depends too much on the shape of the surface to be predicted.
+       Its <b>cancel</b> button stops the remeshing.
+  <li> The original surface pulses in the 3D view until the result is ready.
+  <li> Closing the view cancels the remeshing.
+</ul>
+
+Unless the original is replaced, the result is added as a child of the original surface, in the color of the original.
+It is named after the original with "-remeshed" appended, followed by "-2", "-3" and so on if the original already has a child of that name.
+If the original was removed while remeshing ran, the result is added at the top level of the Data Manager.
+
+\section org_mitk_views_remeshingNotes Notes
+
+<ul>
+  <li> Surfaces made of polygons other than triangles are triangulated first.
+       Triangle strips, lines and single points are ignored.
+  <li> Of a surface with several time steps, only the first one is remeshed.
+       Replacing such a surface leaves it with that single time step.
+  <li> Open surfaces may shrink slightly and unevenly along their borders.
+  <li> Remeshing the same surface twice gives slightly different, equally good results.
+  <li> Remeshing with more memory than is available can fail, usually with a message, and in the worst case end MITK.
+       Keep the memory bar out of the red, choose a lower density or quality, or close other applications.
+</ul>
 */

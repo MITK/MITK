@@ -65,7 +65,7 @@ namespace
   constexpr const char* BOUNCE_HEIGHT_PROPERTY = "animated.bounce.height";
   constexpr const char* BOUNCE_AXIS_PROPERTY = "animated.bounce.axis";
 
-  constexpr float DEFAULT_PULSE_FREQUENCY = 1.5f;
+  constexpr float DEFAULT_PULSE_FREQUENCY = 0.5f;
   constexpr float DEFAULT_COLOR_FREQUENCY = 2.0f;
   constexpr float DEFAULT_SPIN_FREQUENCY = 0.25f;
   constexpr float DEFAULT_BOUNCE_FREQUENCY = 1.0f;

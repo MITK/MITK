@@ -44,6 +44,11 @@ namespace mitk
  * filters properties based on the configured class name via mitk::IPropertyFilters,
  * and resolves property aliases via mitk::IPropertyAliases.
  *
+ * Apart from SetPropertyList(), Update(), and deletion of the list, the model is
+ * only reset when properties are added to, removed from, or replaced in the
+ * list. Value changes update the affected rows in place, so attached views keep
+ * their expansion state, current item, and open editors.
+ *
  * \sa QmitkPropertyItemDelegate
  * \sa QmitkPropertyItem
  * \sa QmitkPropertiesTableEditor
@@ -143,7 +148,7 @@ public:
 
 private:
   void CreateRootItem();
-  QModelIndex FindProperty(const mitk::BaseProperty *property);
+  QModelIndexList FindProperty(const mitk::BaseProperty *property) const;
   void OnPropertyListModified();
   void OnPropertyListDeleted();
   void OnPropertyModified(const itk::Object *property, const itk::EventObject &event);
@@ -154,6 +159,7 @@ private:
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
   QString m_ClassName;
   std::unique_ptr<QmitkPropertyItem> m_RootItem;
+  mitk::PropertyList::PropertyMap m_BuiltPropertyMap;
   std::map<std::string, unsigned long> m_PropertyDeletedTags;
   std::map<std::string, unsigned long> m_PropertyModifiedTags;
   unsigned long m_PropertyListDeletedTag;

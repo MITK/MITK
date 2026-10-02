@@ -47,6 +47,7 @@ void QmitkViewNavigatorView::CreateQtPartControl(QWidget* parent)
 
   m_ProxyModel = new QmitkViewProxyModel(parent);
   m_ProxyModel->setSourceModel(m_Model);
+  m_ProxyModel->sort(0);
 
   m_Ui->viewTreeView->setModel(m_ProxyModel);
 

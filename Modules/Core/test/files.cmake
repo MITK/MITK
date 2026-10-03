@@ -142,6 +142,7 @@ set(MODULE_TESTS
   mitkInteractionSchemeSwitcherTest.cpp
   mitkDisplayActionEventBroadcastTest.cpp
   mitkExclusiveInteractionTest.cpp
+  mitkRotatedSlice4DTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS
@@ -202,7 +203,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageSliceSelectorTest.cpp
     mitkPointSetReaderTest.cpp
     mitkImageEqualTest.cpp
-    mitkRotatedSlice4DTest.cpp
     mitkPlaneGeometryDataMapper2DTest.cpp
 )
 

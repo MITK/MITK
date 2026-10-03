@@ -254,7 +254,7 @@ void QmitkRemeshingView::SetUpHoverInfo(QWidget* parent)
     { m_Controls->adaptiveButton, remeshing },
     { m_Controls->regularButton, remeshing },
     { m_Controls->remeshPushButton, QString() },
-    { m_Controls->advancedGroupBox, QString() },
+    { m_Controls->optionsGroupBox, QString() },
     { m_Controls->replaceCheckBox, replace },
     { m_Controls->hideCheckBox, hide },
     { m_Controls->wireframeCheckBox, wireframe }
@@ -429,7 +429,7 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   remesher->SetEdgeSplitting(0.0);
   remesher->SetOptimizationLevel(1.0);
   remesher->SetForceManifold(false);
-  remesher->SetBoundaryFixing(false);
+  remesher->SetBoundaryFixing(true);
 
   // What the result takes from the original, in case the original is gone
   // by the time the result is ready.

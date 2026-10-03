@@ -64,7 +64,7 @@ private:
   /** \brief What the view and the worker of a running remeshing share. */
   struct RemeshingRun;
 
-  /** \brief The advanced options as they were when remeshing started. */
+  /** \brief The options as they were when remeshing started. */
   struct ResultOptions
   {
     bool ReplaceOriginal = false;

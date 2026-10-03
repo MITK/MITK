@@ -20,7 +20,7 @@ See S. Valette and J.-M. Chassery, "Approximated Centroidal Voronoi Diagrams for
   <li> Select the surface to remesh.
   <li> Choose between \ref org_mitk_views_remeshingMode "Adaptive and Regular" remeshing.
   <li> Choose a \ref org_mitk_views_remeshingQuality "quality" and a \ref org_mitk_views_remeshingDensity "density", and check that the memory it needs is available.
-  <li> Adjust the \ref org_mitk_views_remeshingAdvanced "advanced options" if the defaults do not fit.
+  <li> Adjust the \ref org_mitk_views_remeshingOptions "options" if the defaults do not fit.
   <li> Click <b>Remesh</b>.
 </ol>
 
@@ -64,7 +64,7 @@ Memory grows in steps rather than with every percent of density, because refinin
 The steps lie at about 10% and 40% for High, 2%, 8% and 32% for Very high, and 3.2%, 12.8% and 51.2% for Maximum.
 A density just above a step therefore needs two and a half to four times the memory of a density just below it.
 
-\subsection org_mitk_views_remeshingAdvanced Advanced options
+\subsection org_mitk_views_remeshingOptions Options
 
 <ul>
   <li> <b>Replace original surface:</b> the remeshed surface takes the place of the original in its node, which keeps its name, color, opacity, all other properties and its place in the Data Manager.
@@ -100,7 +100,8 @@ If the original was removed while remeshing ran, the result is added at the top 
        Triangle strips, lines and single points are ignored.
   <li> Of a surface with several time steps, only the first one is remeshed.
        Replacing such a surface leaves it with that single time step.
-  <li> Open surfaces may shrink slightly and unevenly along their borders.
+  <li> Open surfaces keep their borders.
+       For this, remeshing adds vertices along the borders, so the result has somewhat more vertices than the density sets, and its triangles along the borders are less evenly shaped than elsewhere.
   <li> Remeshing the same surface twice gives slightly different, equally good results.
   <li> Remeshing with more memory than is available can fail, usually with a message, and in the worst case end MITK.
        Keep the memory bar out of the red, choose a lower density or quality, or close other applications.

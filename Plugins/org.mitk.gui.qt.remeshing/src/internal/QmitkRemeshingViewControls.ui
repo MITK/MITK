@@ -195,11 +195,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="advancedGroupBox">
+    <widget class="QGroupBox" name="optionsGroupBox">
      <property name="title">
-      <string>Advanced options</string>
+      <string>Options</string>
      </property>
-     <layout class="QVBoxLayout" name="advancedLayout">
+     <layout class="QVBoxLayout" name="optionsLayout">
       <item>
        <widget class="QCheckBox" name="replaceCheckBox">
         <property name="text">

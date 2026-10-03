@@ -27,6 +27,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Abstract base class for simple histograms with double values.
    *
@@ -136,6 +138,19 @@ namespace mitk
      * \param[in] source The BaseData (must be a mitk::Image) to compute the histogram from.
      */
     void ComputeFromBaseData(BaseData *source) override;
+
+    /**
+     * \brief Compute the histogram from an image, reporting into a task.
+     *
+     * As ComputeFromBaseData(BaseData*), which is safe to run on a worker for an
+     * image without a pipeline source - see mitk::HistogramGenerator.
+     *
+     * \param[in] source The BaseData (must be a mitk::Image) to compute the histogram from.
+     * \param[in] task The task to report into and to poll for a cancel, or nullptr.
+     * \throw itk::ProcessAborted A cancel was requested of the task. The
+     *        histogram is left invalid.
+     */
+    void ComputeFromBaseData(BaseData *source, ProgressTask *task);
 
     /** \copydoc SimpleHistogram::GetRelativeBin */
     float GetRelativeBin(double start, double end) const override;

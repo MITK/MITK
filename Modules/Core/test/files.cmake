@@ -95,6 +95,7 @@ set(MODULE_TESTS
   mitkImageDimensionConverterTest.cpp
   mitkImageVtkReadViewTest.cpp
   mitkImageStatisticsHolderTest.cpp
+  mitkHistogramGeneratorTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkITKThreadingHelperTest.cpp
   mitkUIDGeneratorTest.cpp

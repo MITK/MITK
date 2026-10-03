@@ -18,14 +18,13 @@ found in the LICENSE file.
 #include <mitkVolumeBlendMode.h>
 #include <mitkVolumeRenderingScalarRange.h>
 
-#include <itkSmartPointer.h>
-
 #include <vtkSmartPointer.h>
 
 #include <QPixmap>
 #include <QSize>
 
 class vtkImageData;
+class vtkMatrix4x4;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSmartVolumeMapper;
@@ -42,9 +41,16 @@ namespace mitk
 /**
  * \brief Draws small previews of one volume under changing transfer functions.
  *
- * Bind an image once with SetImage, then call Render for each transfer
- * function to preview. Binding is what costs - it uploads the volume to the
- * graphics card - so the pipeline is built once and kept.
+ * Reduce an image to a preview volume with CreateVolume, bind that once with
+ * SetVolume, then call Render for each transfer function to preview. Binding
+ * is what costs - it uploads the volume to the graphics card - so the pipeline
+ * is built once and kept.
+ *
+ * A preview is a few hundred pixels across, so the volume it is drawn from
+ * needs no more voxels than that along any axis. Reducing the image to that
+ * keeps both the upload and the graphics memory it takes small, however large
+ * the image, and it is the one step that reads every voxel, which is why it is
+ * kept apart from binding: it may run on a worker thread.
  *
  * A render afterwards is a fraction of that, except where the transfer
  * function is authored over a different intensity range than the one before
@@ -67,18 +73,43 @@ namespace mitk
  * renders as a white shell under composite and says nothing about itself.
  *
  * The volume ray caster requires a GPU, and refuses volumes it cannot take,
- * RGB ones among them. Where a bind is refused, SetImage returns false and
+ * RGB ones among them. Where a bind is refused, SetVolume returns false and
  * Render yields null pixmaps rather than failing; callers are expected to fall
- * back to naming the transfer functions instead. A refusal describes the image
- * that drew it, so the next image is still bound on its own merits.
+ * back to naming the transfer functions instead. A refusal describes the
+ * volume that drew it, so the next one is still bound on its own merits.
  */
 class MITKVOLUMEVISUALIZATIONUI_EXPORT QmitkVolumeThumbnailRenderer
 {
 public:
+  /** \brief An image reduced to what its previews need. */
+  struct Volume
+  {
+    /** \brief The voxels, owned here, with their own spacing and the origin
+     *         at zero.
+     */
+    vtkSmartPointer<vtkImageData> ImageData;
+
+    /** \brief Maps the indices of ImageData's voxels to world coordinates. */
+    vtkSmartPointer<vtkMatrix4x4> IndexToWorld;
+  };
+
+  /**
+   * \brief Reduce the first time step of an image to a preview volume.
+   *
+   * Each block of voxels that one preview voxel stands for is averaged. Safe
+   * to call on any thread: the image is only read, through a view of its own.
+   *
+   * \param[in] image The image to reduce.
+   * \return A volume owning its voxels, so it outlives the image.
+   * \throw mitk::Exception The image is nullptr, uninitialized, or has a pixel
+   *        type without VTK equivalent.
+   */
+  static Volume CreateVolume(const mitk::Image *image);
+
   /**
    * \brief Create a renderer drawing previews of the given pixel size.
    *
-   * No graphics resources are claimed until the first SetImage call.
+   * No graphics resources are claimed until the first SetVolume call.
    *
    * \param[in] size The pixel size of every pixmap Render returns. Callers
    *            showing previews smaller than this let Qt scale them down,
@@ -95,12 +126,13 @@ public:
    * \brief Bind the volume that every later Render call draws.
    *
    * Uploads the volume and proves the graphics card can draw it, so this is
-   * the expensive call. Re-binding the same image is free.
+   * the expensive call. Must be called on the thread that renders.
    *
-   * \param[in] image The image to draw; nullptr releases the bound volume.
+   * \param[in] volume The volume to draw, as CreateVolume returns it; one
+   *            without image data releases the bound volume.
    * \return True if the volume can be drawn.
    */
-  bool SetImage(const mitk::Image *image);
+  bool SetVolume(const Volume &volume);
 
   /**
    * \brief Draw the bound volume with one transfer function.
@@ -118,10 +150,10 @@ public:
    *
    * False once a bind was refused, which the ray caster does for a volume it
    * cannot take as readily as on a machine that can take none. It describes
-   * that one image, so it must not be used to decide whether to bind the next:
-   * SetImage answers that question per image and reports the answer itself.
-   * Meaningful only after the first SetImage call, since nothing is known
-   * before one.
+   * that one volume, so it must not be used to decide whether to bind the
+   * next: SetVolume answers that question per volume and reports the answer
+   * itself. Meaningful only after the first SetVolume call, since nothing is
+   * known before one.
    */
   bool IsUsable() const;
 
@@ -139,15 +171,9 @@ private:
    */
   bool m_ReportedUnusable = false;
 
-  /** \brief The image bound last.
-   *
-   * Held for its voxels: the representation below does not own them, and
-   * previews are drawn across turns of the event loop, so the image has to
-   * outlive the last of them rather than the call that bound it.
+  /** \brief The voxels of the volume bound last, which every preview is a
+   *         view of.
    */
-  itk::SmartPointer<const mitk::Image> m_Image;
-
-  /** \brief Its VTK representation, which every preview is a view of. */
   vtkSmartPointer<vtkImageData> m_ImageData;
 
   /** \brief The view of it the last preview was drawn through. */

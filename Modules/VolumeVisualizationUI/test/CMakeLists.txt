@@ -1,0 +1,5 @@
+MITK_CREATE_MODULE_TESTS()
+
+mitkAddCustomModuleTest(QmitkVolumeTransferFunctionEditorTest QmitkVolumeTransferFunctionEditorTest
+  -platform minimal
+)

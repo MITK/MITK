@@ -142,6 +142,7 @@ set(MODULE_TESTS
   mitkInteractionSchemeSwitcherTest.cpp
   mitkDisplayActionEventBroadcastTest.cpp
   mitkExclusiveInteractionTest.cpp
+  mitkRotatedSlice4DTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS
@@ -192,7 +193,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest.cpp
     mitkVolumeCalculatorTest.cpp
-    mitkLevelWindowManagerTest.cpp
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
@@ -203,7 +203,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageSliceSelectorTest.cpp
     mitkPointSetReaderTest.cpp
     mitkImageEqualTest.cpp
-    mitkRotatedSlice4DTest.cpp
     mitkPlaneGeometryDataMapper2DTest.cpp
 )
 

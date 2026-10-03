@@ -20,6 +20,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /** \brief Remesh a surface and store the result in a new surface.
    *
    * The %ACVD library is used for remeshing which is based on the paper "Approximated Centroidal Voronoi Diagrams for
@@ -30,7 +32,7 @@ namespace mitk
    *  <li> numVertices is exact, however, if boundaryFixing is enabled, additional vertices are generated at
    * boundaries
    *  <li> %Set gradation to zero in case you want polygons of roughly the same size all over the remeshed surface;
-   * start with 1 otherwise
+   * start with 0.5 otherwise, as greater values turn a growing share of the polygons into slivers
    *  <li> subsampling has direct influence on the quality of the remeshed surface (higher values take more time)
    *  <li> edgeSplitting is useful for surfaces that contain long and thin triangles but takes a long time
    *  <li> Leave optimizationLevel set to 1 as greater values result in degenerated polygons
@@ -50,7 +52,11 @@ namespace mitk
    * \param[in] optimizationLevel Minimize distance between input surface and remeshed surface.
    * \param[in] forceManifold
    * \param[in] boundaryFixing Keep original surface boundaries by adding additional polygons.
-   * \return Returns the remeshed surface or nullptr if input surface is invalid.
+   * \param[in] progressTask Polled for a cancel request, or nullptr. Remeshing reports no steps of its own, so an
+   * indeterminate task is the one to pass.
+   * \return The remeshed surface.
+   * \throw mitk::Exception The input surface is missing or has no polygons at time step \p t.
+   * \throw itk::ProcessAborted A cancel was requested through \p progressTask.
    */
   MITKREMESHING_EXPORT Surface::Pointer Remesh(const Surface* surface,
                                                TimeStepType t,
@@ -60,7 +66,30 @@ namespace mitk
                                                double edgeSplitting = 0.0,
                                                int optimizationLevel = 1,
                                                bool forceManifold = false,
-                                               bool boundaryFixing = false);
+                                               bool boundaryFixing = false,
+                                               ProgressTask* progressTask = nullptr);
+
+  /** \brief Estimate how much memory Remesh() needs at its peak.
+   *
+   * The memory grows with the number of vertices ACVD clusters, which is the number of input vertices after
+   * subdividing the input until it has at least \p subsampling times \p numVertices of them. A high subsampling
+   * at a high density therefore needs a multiple of what the input itself takes.
+   *
+   * The estimate includes one copy of the input surface at time step \p t, so it is what remeshing needs on top of a
+   * surface that is already in memory when Remesh() gets a copy of it, as it should if the original stays on display
+   * while Remesh() runs on another thread. It leaves out the vertices added by edge splitting and boundary fixing.
+   *
+   * \param[in] surface Input surface.
+   * \param[in] t Time step of a four-dimensional input surface, zero otherwise.
+   * \param[in] numVertices Desired number of vertices in the remeshed surface, zero for the original vertex count.
+   * \param[in] subsampling Subsampling as passed to Remesh().
+   * \return The estimated peak memory in bytes.
+   * \throw mitk::Exception The input surface is missing or has no polygons at time step \p t.
+   */
+  MITKREMESHING_EXPORT size_t EstimateRemeshingMemory(const Surface* surface,
+                                                      TimeStepType t,
+                                                      int numVertices,
+                                                      int subsampling = 10);
 
   /**
    * \brief ITK/VTK-style filter that encapsulates the mitk::Remesh() function.
@@ -73,7 +102,7 @@ namespace mitk
    * Default parameter values:
    * - TimeStep: 0
    * - NumVertices: 0 (keep original vertex count)
-   * - Gradation: 1.0
+   * - Gradation: 0.5
    * - Subsampling: 10
    * - EdgeSplitting: 0.0 (disabled)
    * - OptimizationLevel: 1
@@ -107,6 +136,16 @@ namespace mitk
     /** \brief Set whether to fix boundaries by adding extra polygons. */
     itkSetMacro(BoundaryFixing, bool);
 
+    /**
+     * \brief Poll the given task for a cancel request, or nothing if it is nullptr.
+     *
+     * A requested cancel makes Update() throw itk::ProcessAborted.
+     *
+     * \sa Remesh()
+     */
+    void SetProgressTask(ProgressTask* task);
+    ProgressTask* GetProgressTask() const;
+
   protected:
     void GenerateData() override;
 
@@ -122,6 +161,7 @@ namespace mitk
     int m_OptimizationLevel;
     bool m_ForceManifold;
     bool m_BoundaryFixing;
+    ProgressTask* m_ProgressTask;
   };
 }
 

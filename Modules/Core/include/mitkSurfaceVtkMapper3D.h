@@ -59,7 +59,7 @@ namespace mitk
   *   - \b "LookupTable (LookupTableProperty) LookupTable
   *   - \b "animated.pulse": (BoolProperty) While true, the lit color of the surface pulses, for
   *        example to show that it is about to be replaced.
-  *   - \b "animated.pulse.frequency": (FloatProperty) Pulses per second, 1.5 by default.
+  *   - \b "animated.pulse.frequency": (FloatProperty) Pulses per second, 0.5 by default.
   *   - \b "animated.color": (BoolProperty) While true, the lit color of the surface is tinted with
   *        a color that runs around a hue wheel of constant luminance.
   *   - \b "animated.color.frequency": (FloatProperty) Turns around the hue wheel per second, 2

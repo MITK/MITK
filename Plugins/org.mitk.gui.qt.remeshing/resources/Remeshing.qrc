@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/Remeshing">
     <file>RemeshingIcon.svg</file>
+    <file>info.svg</file>
   </qresource>
 </RCC>

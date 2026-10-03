@@ -42,6 +42,8 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT SimpleHistogram
   {
   public:
+    virtual ~SimpleHistogram() = default;
+
     /**
      * \brief Whether the histogram holds computed values.
      *
@@ -98,10 +100,6 @@ namespace mitk
     SimpleImageHistogram()
     {
       valid = false;
-    }
-
-    ~SimpleImageHistogram()
-    {
     }
 
     bool GetValid() const override;

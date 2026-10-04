@@ -607,6 +607,7 @@ void QmitkVoxTellToolGUI::OnModelLoaded()
   m_UnknownPromptsConfirmed = false;
 
   this->UpdateInitializeButtonText();
+  this->UpdatePromptCompletions();
   this->EnableWidgets(true);
   this->SetStatus("VoxTell is ready. Enter one prompt per line and click Segment.");
 
@@ -638,6 +639,7 @@ void QmitkVoxTellToolGUI::OnModelLoaded()
 void QmitkVoxTellToolGUI::OnModelUnloaded()
 {
   this->UncheckInitializeButton();
+  this->UpdatePromptCompletions();
   this->EnableWidgets(true);
 }
 
@@ -668,6 +670,26 @@ std::vector<std::string> QmitkVoxTellToolGUI::ReadPrompts() const
   }
 
   return prompts;
+}
+
+void QmitkVoxTellToolGUI::UpdatePromptCompletions()
+{
+  QStringList completions;
+
+  if (const auto* tool = this->GetTool(); tool != nullptr)
+  {
+    try
+    {
+      for (const auto& prompt : tool->GetKnownPrompts())
+        completions << QString::fromStdString(prompt);
+    }
+    catch (const mitk::Exception&)
+    {
+      // The tool logged it. Prompts can still be typed, only without suggestions.
+    }
+  }
+
+  m_Ui->promptsTextEdit->SetCompletions(completions);
 }
 
 void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
@@ -833,7 +855,9 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     this->SetStatus(message, true);
   }
 
-  this->UnloadIfSettingsChanged();
+  // Prompts that the text encoder processed for this run are known now.
+  if (!this->UnloadIfSettingsChanged())
+    this->UpdatePromptCompletions();
 
   if (!promptsWithoutResult.empty())
     ShowPromptsWithoutResult(this->window(), m_Preferences, promptsWithoutResult);

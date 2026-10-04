@@ -239,6 +239,16 @@ namespace mitk
      */
     std::vector<std::string> GetPromptsWithoutPrecomputedEmbedding(const std::vector<std::string>& prompts) const;
 
+    /** \brief Returns the prompts that VoxTell knows, in alphabetical order.
+     *
+     * These are the prompts of its prompt bank, which are in lower case, and
+     * the prompts it learned in this session. None of them needs the text
+     * encoder. Returns an empty list while no model is loaded.
+     *
+     * \throw mitk::Exception with a message for the user if Python fails.
+     */
+    std::vector<std::string> GetKnownPrompts() const;
+
     /** \brief Returns the files of the text encoder on the Hugging Face Hub.
      *
      * EmbedPrompts() downloads what is not cached yet, without telling how far

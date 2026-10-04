@@ -59,7 +59,7 @@
        </widget>
       </item>
       <item row="1" column="0" colspan="2">
-       <widget class="QPlainTextEdit" name="promptsTextEdit">
+       <widget class="QmitkLineCompletionTextEdit" name="promptsTextEdit">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -70,7 +70,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Describe the structures to segment in free text, one prompt per line.</string>
+         <string>Describe the structures to segment in free text, one prompt per line. While you type, the prompts that VoxTell knows are suggested.</string>
         </property>
         <property name="placeholderText">
          <string>One prompt per line, e.g. liver</string>
@@ -105,6 +105,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkLineCompletionTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header location="global">QmitkLineCompletionTextEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

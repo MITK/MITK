@@ -131,6 +131,9 @@ private:
    *         without empty lines and without repetitions. */
   std::vector<std::string> ReadPrompts() const;
 
+  /** \brief Offers the prompts that VoxTell knows as suggestions in the text field. */
+  void UpdatePromptCompletions();
+
   /** \brief Reverts the toggle of the Initialize button without starting or
    *         ending anything, then updates its label. */
   void UncheckInitializeButton();

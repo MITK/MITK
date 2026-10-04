@@ -604,6 +604,27 @@ std::vector<std::string> mitk::VoxTellTool::GetPromptsWithoutPrecomputedEmbeddin
   return unknown;
 }
 
+std::vector<std::string> mitk::VoxTellTool::GetKnownPrompts() const
+{
+  std::vector<std::string> prompts;
+
+  if (!this->IsModelLoaded())
+    return prompts;
+
+  auto* context = m_Impl->Context.get();
+  ExecuteWithReadableError(*context, "voxtell_known_prompt_rows = '\\n'.join(sorted(voxtell_known_prompts))\n");
+
+  std::istringstream rows(context->GetVariableAsString("voxtell_known_prompt_rows").value_or(""));
+
+  for (std::string row; std::getline(rows, row);)
+  {
+    if (!row.empty())
+      prompts.push_back(row);
+  }
+
+  return prompts;
+}
+
 std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetTextModelFiles()
 {
   if (!this->IsModelLoaded())

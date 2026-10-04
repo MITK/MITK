@@ -252,17 +252,20 @@ mitk::VoxTellTool* QmitkVoxTellToolGUI::GetTool()
 
 void QmitkVoxTellToolGUI::EnableWidgets(bool enabled)
 {
-  Superclass::EnableWidgets(enabled);
+  const auto* tool = this->GetTool();
+
+  // The label list of the preview asks for the controls to be enabled while
+  // the run replaces its labels, and the base class while a model loads. The
+  // Confirm button of the base class has to stay disabled then as well, so the
+  // user cannot transfer labels that have no content yet.
+  const bool idle = enabled && !m_IsBusy && (tool == nullptr || !tool->IsUpdating());
+
+  Superclass::EnableWidgets(idle);
 
   // Called by the base class before the controls of this class exist.
   if (m_Ui->initializeButton == nullptr)
     return;
 
-  const auto* tool = this->GetTool();
-
-  // The label list of the preview asks for the controls to be enabled while the
-  // run clears its labels.
-  const bool idle = enabled && !m_IsBusy && (tool == nullptr || !tool->IsUpdating());
   const bool loaded = tool != nullptr && tool->IsModelLoaded();
 
   m_Ui->initializeButton->setEnabled(idle);

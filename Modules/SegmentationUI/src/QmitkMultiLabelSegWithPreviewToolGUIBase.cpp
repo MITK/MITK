@@ -75,7 +75,11 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::OnLabelSelectionChanged(const Qmi
 
     tool->SetSelectedLabels(labelIDs);
     this->ActualizePreviewLabelVisibility();
-    this->EnableWidgets(true); //used to actualize the ConfirmSeg btn via the delegate;
+
+    // Re-evaluates the Confirm button through its delegate. The selection also
+    // changes while a tool that processes events during its update replaces
+    // the labels of the preview; the controls must stay disabled then.
+    this->EnableWidgets(!tool->IsUpdating());
   }
 }
 

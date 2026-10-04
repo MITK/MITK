@@ -107,6 +107,12 @@
 	A window that joins a group which does not synchronize anything yet gets the
 	navigation bundle (pan, zoom, slice, crosshair) as the common-case default.
 
+	Joining by a drop is a fresh start: a dimension the window newly links to the
+	group carries no offset, even if the window sat at one in its previous group.
+	Only a dimension it already shared with that group keeps its offset. To move a
+	single link to another group and keep its offset, change it in the
+	<b>Advanced</b> matrix.
+
 \subsection org_mitk_views_mxnlayouteditor_PlateButtons The plate buttons
 	The plate under the pointer carries two buttons in its top-right corner: the menu
 	button (three dots) opens the plate menu, which a right-click on the plate opens as

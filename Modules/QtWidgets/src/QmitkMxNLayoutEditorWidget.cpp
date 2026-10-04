@@ -105,22 +105,23 @@ namespace
     QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair
   };
 
-  // Replace-mode primitive: strip a cell's ties to every group other than
-  // 'keepGroup'. The seven dimension axes are unlinked; the selection reverts to
-  // the default group (there is no unlinked state for selection). Shared by the
-  // SetCellMembership join and the empty-group cache flush so both fully replace.
-  void ClearOtherGroupTies(QmitkMxNMultiWidget* multiWidget, const QString& windowId,
-                           const std::string& keepGroup)
+  // Strip a cell's ties to every group 'drop' accepts: each such dimension link
+  // is unlinked, and a selection on such a group reverts to the default group
+  // (there is no unlinked state for selection). A Replace join drops every
+  // group but the target; leaving a group drops only that one.
+  template <typename GroupPredicate>
+  void ClearGroupTies(QmitkMxNMultiWidget* multiWidget, const QString& windowId,
+                      const GroupPredicate& drop)
   {
     for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
       const auto link = multiWidget->GetSyncLink(windowId, dimension);
-      if (link.has_value() && link->group != keepGroup)
+      if (link.has_value() && drop(link->group))
       {
         multiWidget->ClearSyncLink(windowId, dimension);
       }
     }
-    if (multiWidget->GetCellSelectionGroup(windowId) != keepGroup)
+    if (drop(multiWidget->GetCellSelectionGroup(windowId)))
     {
       multiWidget->ClearCellSelectionGroup(windowId);
     }
@@ -869,10 +870,7 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
     connect(arrangeMode, &QmitkMxNArrangeMode::RemoveRequested, this,
             [this](const QString& group, const QStringList& windowIds)
             {
-              for (const auto& windowId : windowIds)
-              {
-                this->SetCellMembership(windowId, group.toStdString(), false);
-              }
+              this->RemoveCellsFromGroup(windowIds, group.toStdString());
             });
   }
 
@@ -956,7 +954,8 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
     {
       // Wholly replace: drop every other tie first (selection reverts to the
       // default group).
-      ClearOtherGroupTies(m_MultiWidget, windowId, group);
+      ClearGroupTies(m_MultiWidget, windowId,
+                     [&group](const std::string& other) { return other != group; });
     }
     for (const auto dimension : dimensions)
     {
@@ -1126,50 +1125,25 @@ bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group)
   return false;
 }
 
-void QmitkMxNLayoutEditorWidget::SetCellMembership(const QString& windowId,
-                                                   const std::string& group, bool member)
+void QmitkMxNLayoutEditorWidget::RemoveCellsFromGroup(const QStringList& windowIds,
+                                                      const std::string& group)
 {
   if (m_MultiWidget.isNull())
   {
     return;
   }
 
-  if (member)
-  {
-    // Adding a cell wholly replaces its membership (mode Replace): it joins the
-    // group's currently synchronized dimensions, or the navigation bundle when
-    // the group synchronizes nothing yet. The FillEmpty and
-    // MergeOverwriteCollisions variants are reachable only through the drop
-    // selector (AssignCellsToGroup).
-    auto dimensions = this->GroupDimensions(group);
-    if (dimensions.empty())
-    {
-      dimensions.assign(NavigationBundle.begin(), NavigationBundle.end());
-    }
-    this->ApplyGroupAxesToCell(windowId, group, dimensions, this->GroupSelectionEnabled(group),
-                               QmitkMxNGroupJoinMode::Replace);
-  }
-  else
+  for (const auto& windowId : windowIds)
   {
     try
     {
-      for (const auto dimension : QmitkMxNAllSyncDimensions)
-      {
-        const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
-        if (link.has_value() && link->group == group)
-        {
-          m_MultiWidget->ClearSyncLink(windowId, dimension);
-        }
-      }
-      if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
-      {
-        m_MultiWidget->ClearCellSelectionGroup(windowId);
-      }
+      ClearGroupTies(m_MultiWidget, windowId,
+                     [&group](const std::string& other) { return other == group; });
     }
     catch (const mitk::Exception& e)
     {
-      MITK_WARN << "Layout editor: membership change for '" << windowId.toStdString()
-                << "' ignored: " << e.GetDescription();
+      MITK_WARN << "Layout editor: removal of '" << windowId.toStdString()
+                << "' from its group ignored: " << e.GetDescription();
     }
   }
   m_MultiWidget->RefreshSyncControls();
@@ -1306,18 +1280,29 @@ void QmitkMxNLayoutEditorWidget::ScheduleRebuild()
   // this widget's own controls; acting immediately could delete a control out
   // from under its own slot. The deferral also coalesces a burst of signals.
   m_RebuildPending = true;
-  QTimer::singleShot(0, this, [this]()
+  QTimer::singleShot(0, this, [this]() { this->RunPendingRebuild(); });
+}
+
+void QmitkMxNLayoutEditorWidget::RunPendingRebuild()
+{
+  // A layout load pumps the event loop while the cell tree is half built, so
+  // the refresh waits it out. Polled rather than skipped: a load that fails
+  // before it changes anything emits nothing a skipped refresh could wait for.
+  if (!m_MultiWidget.isNull() && m_MultiWidget->IsApplyingLayout())
   {
-    m_RebuildPending = false;
-    this->RefreshOrRebuild();
-  });
+    constexpr int retryMs = 50;
+    QTimer::singleShot(retryMs, this, [this]() { this->RunPendingRebuild(); });
+    return;
+  }
+  m_RebuildPending = false;
+  this->RefreshOrRebuild();
 }
 
 void QmitkMxNLayoutEditorWidget::RefreshOrRebuild()
 {
   if (m_MultiWidget.isNull())
   {
-    this->Rebuild();
+    this->ClearCardsAndMatrix();
     return;
   }
 
@@ -1331,6 +1316,17 @@ void QmitkMxNLayoutEditorWidget::RefreshOrRebuild()
     // Mid-layout-change states are transient; the next engine signal retries.
     MITK_DEBUG << "Layout editor: skipped refresh: " << e.GetDescription();
     return;
+  }
+
+  // An empty group's intent is for its first members. Once the group has
+  // members, by whatever route, the intent is spent: it must neither show nor
+  // apply when the group empties again.
+  for (const auto& info : infos)
+  {
+    if (!info.members.empty() || !info.selectionMembers.empty())
+    {
+      m_EmptyGroupAxisCache.erase(info.id);
+    }
   }
 
   std::vector<std::string> currentIds;
@@ -1460,7 +1456,7 @@ void QmitkMxNLayoutEditorWidget::UpdateGridButtons()
   }
 }
 
-void QmitkMxNLayoutEditorWidget::Rebuild()
+void QmitkMxNLayoutEditorWidget::ClearCardsAndMatrix()
 {
   ClearLayout(m_GroupsLayout);
   m_CardRefreshers.clear();
@@ -1471,39 +1467,11 @@ void QmitkMxNLayoutEditorWidget::Rebuild()
     m_Matrix->clear();
     m_Matrix->setRowCount(0);
     m_Matrix->setColumnCount(0);
-    // Invalidate the reflected-structure signature so the trailing refresh forces
-    // a fresh matrix build when the advanced face is up.
+    // Invalidate the reflected-structure signature so the next attached editor
+    // gets a fresh matrix build when the advanced face is up.
     m_MatrixCellIds.clear();
     m_MatrixGroupIds.clear();
   }
-
-  if (m_MultiWidget.isNull())
-  {
-    this->UpdateGridButtons();
-    return;
-  }
-
-  std::vector<QmitkMxNMultiWidget::SyncGroupInfo> infos;
-  try
-  {
-    infos = m_MultiWidget->GetSyncGroupInfos();
-  }
-  catch (const mitk::Exception& e)
-  {
-    // Mid-layout-change states (no top-level splitter yet) are transient;
-    // the next engine signal rebuilds again.
-    MITK_DEBUG << "Layout editor: skipped rebuild: " << e.GetDescription();
-    return;
-  }
-
-  for (const auto& info : infos)
-  {
-    m_GroupsLayout->addWidget(this->BuildGroupCard(info));
-    m_DisplayedGroupIds.push_back(info.id);
-  }
-  m_GroupsLayout->addStretch();
-
-  this->RefreshAdvancedMatrixIfVisible();
   this->UpdateGridButtons();
 }
 
@@ -1859,10 +1827,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
     removeSelected->setEnabled(hasSelection);
     connect(removeSelected, &QAction::triggered, this, [this, groupId]()
     {
-      for (const auto& windowId : this->SelectedWindowIds())
-      {
-        this->SetCellMembership(windowId, groupId, false);
-      }
+      this->RemoveCellsFromGroup(this->SelectedWindowIds(), groupId);
     });
 
     menu->addSeparator();
@@ -2108,6 +2073,12 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrixNow()
   if (!restored.isEmpty())
   {
     m_Matrix->selectionModel()->select(restored, QItemSelectionModel::ClearAndSelect);
+  }
+  else
+  {
+    // Nothing of the matrix's own selection survived, which includes its first
+    // build: plate selections made while it had no rows went nowhere.
+    this->MirrorSelectionToMatrix(this->SelectedWindowIds());
   }
   this->UpdateMatrixActionBar();
 }
@@ -2421,10 +2392,11 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   {
     // Detaching the editor disables it, which moves focus out of whichever spin
     // box holds it and so arrives here with nothing left to write to.
-    if (m_MultiWidget.isNull() || MixedSliceOffset == m_SliceOffsetEdit->value())
+    if (m_MultiWidget.isNull() || !m_OffsetEdited || MixedSliceOffset == m_SliceOffsetEdit->value())
     {
       return;
     }
+    m_OffsetEdited = false;
     for (const auto& [windowId, axis] : this->MatrixSelection())
     {
       this->WriteCellDimensionOffset(windowId, QmitkMxNSyncDimension::Slice,
@@ -2436,16 +2408,18 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
 
   m_ZoomOffsetEdit = new QDoubleSpinBox(m_MatrixOffsetRow);
   m_ZoomOffsetEdit->setObjectName(QStringLiteral("mxnMatrixZoomOffset"));
+  m_ZoomOffsetEdit->setDecimals(3);
   m_ZoomOffsetEdit->setRange(MixedZoomOffset, 100.0);
   m_ZoomOffsetEdit->setSingleStep(0.1);
   m_ZoomOffsetEdit->setSpecialValueText(tr("multiple"));
   m_ZoomOffsetEdit->setToolTip(tr("Zoom factor relative to the group's reference"));
   connect(m_ZoomOffsetEdit, &QAbstractSpinBox::editingFinished, this, [this]()
   {
-    if (m_MultiWidget.isNull() || m_ZoomOffsetEdit->value() <= MixedZoomOffset)
+    if (m_MultiWidget.isNull() || !m_OffsetEdited || m_ZoomOffsetEdit->value() <= MixedZoomOffset)
     {
       return;
     }
+    m_OffsetEdited = false;
     for (const auto& [windowId, axis] : this->MatrixSelection())
     {
       this->WriteCellDimensionOffset(windowId, QmitkMxNSyncDimension::Zoom,
@@ -2461,16 +2435,18 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   m_PanOffsetYEdit = new QDoubleSpinBox(m_MatrixOffsetRow);
   for (auto* box : { m_PanOffsetXEdit, m_PanOffsetYEdit })
   {
+    box->setDecimals(3);
     box->setRange(MixedPanOffset, 1.0e5);
     box->setSpecialValueText(tr("multiple"));
     box->setToolTip(tr("Pan offset in world mm, relative to the group's reference"));
     connect(box, &QAbstractSpinBox::editingFinished, this, [this]()
     {
-      if (m_MultiWidget.isNull() || m_PanOffsetXEdit->value() <= MixedPanOffset
+      if (m_MultiWidget.isNull() || !m_OffsetEdited || m_PanOffsetXEdit->value() <= MixedPanOffset
           || m_PanOffsetYEdit->value() <= MixedPanOffset)
       {
         return;
       }
+      m_OffsetEdited = false;
       mitk::Vector2D pan;
       pan[0] = m_PanOffsetXEdit->value();
       pan[1] = m_PanOffsetYEdit->value();
@@ -2484,6 +2460,16 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   offsetLayout->addWidget(m_PanOffsetXEdit);
   offsetLayout->addWidget(m_PanOffsetLabel);
   offsetLayout->addWidget(m_PanOffsetYEdit);
+
+  // A spin box commits on every focus loss, so a commit alone is no edit; only
+  // a value the user changed is written. Seeding runs under signal blockers and
+  // never counts.
+  const auto markEdited = [this]() { m_OffsetEdited = true; };
+  connect(m_SliceOffsetEdit, &QSpinBox::valueChanged, this, markEdited);
+  for (auto* box : { m_ZoomOffsetEdit, m_PanOffsetXEdit, m_PanOffsetYEdit })
+  {
+    connect(box, &QDoubleSpinBox::valueChanged, this, markEdited);
+  }
 
   m_RampLabel = new QLabel(tr("Ramp from"), m_MatrixOffsetRow);
   m_RampFromEdit = new QSpinBox(m_MatrixOffsetRow);
@@ -2564,6 +2550,8 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
     return;
   }
 
+  // The editors are re-seeded below, so whatever they held is no longer an edit.
+  m_OffsetEdited = false;
   const auto selection = this->MatrixSelection();
 
   if (selection.empty() || m_MultiWidget.isNull())
@@ -3042,8 +3030,7 @@ std::vector<QString> QmitkMxNLayoutEditorWidget::GroupMembers(const std::string&
     bool member = (m_MultiWidget->GetCellSelectionGroup(descriptor.id) == group);
     for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
-      const auto link = m_MultiWidget->GetSyncLink(descriptor.id, dimension);
-      if (link.has_value() && link->group == group)
+      if (IsLinkedTo(m_MultiWidget, descriptor.id, dimension, group))
       {
         member = true;
         break;

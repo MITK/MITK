@@ -112,6 +112,11 @@ public:
    *        target; FillEmpty sets only its currently-unlinked axes;
    *        MergeOverwriteCollisions overwrites the group's axes but keeps the
    *        cell's links on axes the group does not cover.
+   *
+   *        Joining is a fresh start: an axis the cell newly links to 'group'
+   *        carries no offset, whatever offset it had in its previous group. An
+   *        axis already linked to 'group' keeps its offset. Moving a single link
+   *        while keeping its offset is SetCellAxisGroup.
    */
   void AssignCellsToGroup(const QStringList& windowIds, const std::string& group,
                           QmitkMxNGroupJoinMode mode = QmitkMxNGroupJoinMode::Replace);
@@ -143,11 +148,12 @@ public:
   void ToggleGroupAxis(const std::string& groupId, QmitkMxNSyncAxis axis);
 
   /**
-   * \brief Add a cell to / remove a cell from a group (see
-   *        AssignCellsToGroup for the join semantics; leaving clears the
-   *        cell's links to the group on every dimension).
+   * \brief Take every given cell out of 'group': its links to the group are
+   *        cleared on every dimension, and a selection on the group returns to
+   *        the default group. Links to other groups are kept. The sync
+   *        furniture is notified once for the whole batch.
    */
-  void SetCellMembership(const QString& windowId, const std::string& group, bool member);
+  void RemoveCellsFromGroup(const QStringList& windowIds, const std::string& group);
 
   /** \brief Link pan+zoom+slice+crosshair for every member cell of 'group'. */
   void LinkNavigationBundle(const std::string& group);
@@ -295,6 +301,10 @@ private:
    */
   void RefreshOrRebuild();
 
+  /** \brief Run the refresh ScheduleRebuild deferred, or, while the multi
+   *         widget is applying a layout, try again a little later. */
+  void RunPendingRebuild();
+
   /** \brief Update every existing card's contents from the current engine state
    *         (glyph strip, member count, name, hue) without recreating widgets. */
   void RefreshCards();
@@ -317,7 +327,9 @@ private:
   /** \brief The arrange mode's window selection; empty without a multi widget. */
   QStringList SelectedWindowIds() const;
 
-  void Rebuild();
+  /** \brief Drop every card and the matrix's contents: the state without an
+   *         attached multi widget. */
+  void ClearCardsAndMatrix();
 
   /** \brief Open the grid-shape picker (grid size, presets, save/load) in an
    *         on-demand modal dialog, re-parenting the shared picker into it and
@@ -416,7 +428,7 @@ private:
 
   /** \brief Whether the group has a cache entry with at least one axis toggled
    *         on, so assigning windows should apply exactly the cache rather than
-   *         SetCellMembership's nav-bundle default. */
+   *         the navigation-bundle default. */
   bool HasCachedGroupIntent(const std::string& group) const;
 
   /** \brief All member cells of the group over every dimension, pre-order. */
@@ -433,7 +445,7 @@ private:
    *         FillEmpty sets only currently-unlinked axes (and adopts the group's
    *         selection only for a cell resting on the default), Merge overwrites
    *         the given axes and keeps the rest. Does not refresh - the batch
-   *         caller (AssignCellsToGroup / SetCellMembership) refreshes once. */
+   *         caller (AssignCellsToGroup) refreshes once. */
   void ApplyGroupAxesToCell(const QString& windowId, const std::string& group,
                             const std::vector<QmitkMxNSyncDimension>& dimensions,
                             bool includeSelection, QmitkMxNGroupJoinMode mode);
@@ -477,6 +489,10 @@ private:
   // side emits on change, so an unguarded round trip would widen a column
   // selection in the matrix back to whole rows.
   bool m_MirroringSelection = false;
+
+  // Whether the user changed an offset editor since it was last seeded; a commit
+  // without a change writes nothing.
+  bool m_OffsetEdited = false;
   QDialog* m_GridDialog = nullptr;      // on-demand modal grid-shape picker host
   QToolButton* m_AddGroupButton;
   QToolButton* m_MatrixAddGroupButton = nullptr;
@@ -505,10 +521,11 @@ private:
 
   // Per-group, empty-group-only intent buffer: which of the eight axes (the
   // seven QmitkMxNAllSyncDimensions, then data selection) the user toggled on
-  // while the group had no members. Applied to the first windows assigned, then
-  // erased. Editor-held (not card-bound) so the const BuildGroupBarcodeSlots can
-  // render from it and it survives the card reconcile; cleared on a whole-layout
-  // reload / SetMultiWidget swap and when the group leaves the set.
+  // while the group had no members. Applied to the first windows assigned.
+  // Editor-held (not card-bound) so the const BuildGroupBarcodeSlots can render
+  // from it and it survives the card reconcile. Erased once the group has a
+  // member by any route, when the group leaves the set or is deleted, and on a
+  // SetMultiWidget swap.
   using AxisIntent = std::array<bool, QmitkMxNAllSyncDimensions.size() + 1>;
   std::map<std::string, AxisIntent> m_EmptyGroupAxisCache;
 

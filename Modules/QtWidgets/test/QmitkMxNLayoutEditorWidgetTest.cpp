@@ -51,6 +51,7 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QMouseEvent>
 #include <QDoubleSpinBox>
+#include <QElapsedTimer>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QTableWidget>
@@ -74,10 +75,10 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkMxNLayoutEditorWidgetTestSuite);
 
   MITK_TEST(CreateGroup_RegistersEngineGroup);
-  MITK_TEST(Join_EmptyGroup_LinksNavigationBundleByDefault);
-  MITK_TEST(Join_GroupWithDimensions_LinksThoseDimensions);
+  MITK_TEST(Assign_EmptyGroup_LinksNavigationBundleByDefault);
+  MITK_TEST(Assign_GroupWithDimensions_LinksThoseDimensions);
   MITK_TEST(AssignCells_JoinsEveryGivenCell);
-  MITK_TEST(Leave_ClearsEveryDimension);
+  MITK_TEST(Remove_ClearsEveryDimension);
   MITK_TEST(ApplyDimension_TogglesForAllMembers);
   MITK_TEST(GroupBarcode_TriStateAllNoneSome);
   MITK_TEST(EditorChange_RefreshesCellBarcode);
@@ -161,6 +162,14 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Offset_WordingIsTheSameOnEverySurface);
   MITK_TEST(ActionBar_NamesTheAxisWithItsGlyph);
   MITK_TEST(ActionBar_OffsetCommitAfterDetachIsHarmless);
+  MITK_TEST(Arrange_BatchRemoveNotifiesOnce);
+  MITK_TEST(Matrix_OffsetFocusPassWritesNothing);
+  MITK_TEST(Matrix_OffsetFocusPassKeepsPrecision);
+  MITK_TEST(Matrix_OffsetRealEditWrites);
+  MITK_TEST(EmptyGroupCache_DroppedOnceTheGroupGainsAMember);
+  MITK_TEST(Matrix_FirstBuildMirrorsThePlateSelection);
+  MITK_TEST(Assign_ReplaceDropStartsTheOffsetFresh);
+  MITK_TEST(Refresh_DeferredWhileApplyingLayout);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -321,12 +330,11 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A created group must appear in the group registry", found);
   }
 
-  void Join_EmptyGroup_LinksNavigationBundleByDefault()
+  void Assign_EmptyGroup_LinksNavigationBundleByDefault()
   {
     const auto id = m_Widget->CreateGroup();
 
-    m_Widget->SetCellMembership(CellId(0), id, true);
-    m_Widget->SetCellMembership(CellId(1), id, true);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
 
     for (std::size_t cell : { std::size_t(0), std::size_t(1) })
     {
@@ -343,12 +351,12 @@ public:
                            !m_Editor->GetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice).has_value());
   }
 
-  void Join_GroupWithDimensions_LinksThoseDimensions()
+  void Assign_GroupWithDimensions_LinksThoseDimensions()
   {
     // Group already synchronizes windowing only (established via cell 0).
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
 
-    m_Widget->SetCellMembership(CellId(1), "wl", true);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, "wl");
 
     CPPUNIT_ASSERT(IsLinked(1, QmitkMxNSyncDimension::Windowing, "wl"));
     CPPUNIT_ASSERT_MESSAGE("Joining follows the group's existing dimension set, not the bundle",
@@ -368,13 +376,13 @@ public:
                            !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice).has_value());
   }
 
-  void Leave_ClearsEveryDimension()
+  void Remove_ClearsEveryDimension()
   {
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "nav");
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "other");
 
-    m_Widget->SetCellMembership(CellId(0), "nav", false);
+    m_Widget->RemoveCellsFromGroup(QStringList{ CellId(0) }, "nav");
 
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice).has_value());
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing).has_value());
@@ -584,7 +592,7 @@ public:
     CPPUNIT_ASSERT(nullptr != betaCard);
 
     // Unlinking alpha's only member drops it from the group set.
-    m_Widget->SetCellMembership(CellId(0), "alpha", false);
+    m_Widget->RemoveCellsFromGroup(QStringList{ CellId(0) }, "alpha");
     Pump();
     CPPUNIT_ASSERT_MESSAGE("The removed group's card must be gone", nullptr == CardFor("alpha"));
     CPPUNIT_ASSERT_MESSAGE("Other cards survive a remove (moved, not recreated)",
@@ -662,7 +670,7 @@ public:
 
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
 
-    // Exactly the cached axis lands - not SetCellMembership's nav-bundle default.
+    // Exactly the cached axis lands - not the navigation-bundle default.
     CPPUNIT_ASSERT_MESSAGE("The cached Slice axis is applied to the assigned window",
                            IsLinked(0, QmitkMxNSyncDimension::Slice, group));
     for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
@@ -674,7 +682,7 @@ public:
 
     // The cache was cleared: emptying the group again shows an all-gap barcode
     // rather than the flushed intent re-appearing.
-    m_Widget->SetCellMembership(CellId(0), group, false);
+    m_Widget->RemoveCellsFromGroup(QStringList{ CellId(0) }, group);
     for (const auto& slot : m_Widget->BuildGroupBarcodeSlots(group))
     {
       CPPUNIT_ASSERT_MESSAGE("A flushed cache must not re-appear when the group empties",
@@ -1804,7 +1812,7 @@ public:
       "The chip follows an edit made on the other face", id,
       m_Widget->AdvancedMatrixCell(CellId(2), QmitkMxNSyncAxis::Slice).group);
 
-    m_Widget->SetCellMembership(CellId(2), id, false);
+    m_Widget->RemoveCellsFromGroup(QStringList{ CellId(2) }, id);
     Pump();
 
     CPPUNIT_ASSERT_MESSAGE(
@@ -2216,6 +2224,187 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A three-cell ramp notifies once, not three times", 1,
                                  counter.Count());
+  }
+
+  void Arrange_BatchRemoveNotifiesOnce()
+  {
+    // Removing a plate selection from a group is one gesture: the furniture
+    // must not repaint once per window, half way through the batch.
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      m_Editor->SetSyncLink(CellId(cell), QmitkMxNSyncDimension::Slice, "grp");
+    }
+    auto* arrangeMode = m_Editor->GetArrangeMode();
+    arrangeMode->SetSelectedWindowIds(QStringList{ CellId(0), CellId(1) });
+    Pump();
+
+    SyncNotificationCounter counter(m_Editor.get());
+    arrangeMode->RequestRemove(QStringLiteral("grp"), CellId(0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A two-window removal notifies once", 1, counter.Count());
+    CPPUNIT_ASSERT_MESSAGE("Both selected windows leave the group",
+                           !IsLinked(0, QmitkMxNSyncDimension::Slice, "grp")
+                             && !IsLinked(1, QmitkMxNSyncDimension::Slice, "grp"));
+    CPPUNIT_ASSERT_MESSAGE("The unselected member stays",
+                           IsLinked(2, QmitkMxNSyncDimension::Slice, "grp"));
+  }
+
+  void Matrix_OffsetFocusPassWritesNothing()
+  {
+    // Focus passing through an offset editor commits it. Without an edit that
+    // must not write, or it silently re-converges a member that drifted.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 2);
+    Pump();
+    SelectMatrixCells({ { 1, AxisIndexOf(QmitkMxNSyncDimension::Slice) } });
+
+    auto* sliceOffset = m_Widget->findChild<QSpinBox*>(QStringLiteral("mxnMatrixSliceOffset"));
+    CPPUNIT_ASSERT(nullptr != sliceOffset);
+
+    SyncNotificationCounter counter(m_Editor.get());
+    emit sliceOffset->editingFinished();
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A commit without an edit writes nothing", 0, counter.Count());
+  }
+
+  void Matrix_OffsetFocusPassKeepsPrecision()
+  {
+    // An offset loaded with more precision than the editor shows must survive
+    // the editor being focused and left.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    mitk::Vector2D pan;
+    pan[0] = 12.3456;
+    pan[1] = 0.0;
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Pan, pan);
+    Pump();
+    SelectMatrixCells({ { 1, AxisIndexOf(QmitkMxNSyncDimension::Pan) } });
+
+    auto* panOffset = m_Widget->findChild<QDoubleSpinBox*>(QStringLiteral("mxnMatrixPanOffsetX"));
+    CPPUNIT_ASSERT(nullptr != panOffset);
+    emit panOffset->editingFinished();
+    Pump();
+
+    const auto link = m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan);
+    CPPUNIT_ASSERT(link.has_value() && std::holds_alternative<mitk::Vector2D>(link->offset));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The stored pan offset keeps its precision", 12.3456,
+                                 std::get<mitk::Vector2D>(link->offset)[0]);
+  }
+
+  void Matrix_OffsetRealEditWrites()
+  {
+    // The positive control of the focus-pass tests: a value the user dials is
+    // written.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    Pump();
+    SelectMatrixCells({ { 1, AxisIndexOf(QmitkMxNSyncDimension::Slice) } });
+
+    auto* sliceOffset = m_Widget->findChild<QSpinBox*>(QStringLiteral("mxnMatrixSliceOffset"));
+    CPPUNIT_ASSERT(nullptr != sliceOffset);
+    sliceOffset->setValue(3);
+    emit sliceOffset->editingFinished();
+    Pump();
+
+    const auto link = m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice);
+    CPPUNIT_ASSERT_MESSAGE("A dialed offset is written",
+                           link.has_value() && std::holds_alternative<int>(link->offset)
+                             && 3 == std::get<int>(link->offset));
+  }
+
+  void EmptyGroupCache_DroppedOnceTheGroupGainsAMember()
+  {
+    // The intent prepared on an empty group is for its first members. Once the
+    // group has members by any route it is spent, and must not come back when
+    // the group empties again.
+    const auto group = m_Widget->CreateGroup();
+    Pump();
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);
+
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Pan, group);
+    Pump();
+    m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Pan);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE("The spent intent does not re-appear on the emptied group",
+                           !m_Widget->BuildGroupBarcodeSlots(group)
+                              [AxisIndexOf(QmitkMxNSyncDimension::Slice)].color.isValid());
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, group);
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
+    {
+      CPPUNIT_ASSERT_MESSAGE("The next join gets the navigation bundle, not the spent intent",
+                             IsLinked(1, dimension, group));
+    }
+  }
+
+  void Matrix_FirstBuildMirrorsThePlateSelection()
+  {
+    // Windows selected on the plates before the matrix was ever shown are
+    // selected in it once it is.
+    Pump();
+    m_Editor->GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(0), CellId(2) });
+    Pump();
+
+    this->RaiseAdvancedFace();
+
+    const auto rows = Matrix()->selectionModel()->selectedRows();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Both plate-selected windows are selected rows", 2,
+                                 static_cast<int>(rows.size()));
+    for (const auto& row : rows)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Only the rows of the plate-selected windows",
+                             0 == row.row() || 2 == row.row());
+    }
+  }
+
+  void Assign_ReplaceDropStartsTheOffsetFresh()
+  {
+    // A drop onto a group is a fresh join, measured anew from the target group.
+    // Only the matrix, which edits one link, carries an offset over.
+    const auto first = m_Widget->CreateGroup();
+    const auto second = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, first);
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 2);
+
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, second);
+
+    const auto link = m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice);
+    CPPUNIT_ASSERT_MESSAGE("The window joined the second group",
+                           link.has_value() && link->group == second);
+    CPPUNIT_ASSERT_MESSAGE("A replacing drop starts without an offset",
+                           std::holds_alternative<int>(link->offset)
+                             && 0 == std::get<int>(link->offset));
+  }
+
+  void Refresh_DeferredWhileApplyingLayout()
+  {
+    // While a layout is applied the cell tree is half built, and the load
+    // pumps the event loop. The editor's deferred refresh must wait it out,
+    // and still run once the load is over.
+    Pump();
+    m_Editor->ShowLayoutLoadFeedback();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "x");
+    m_Editor->RefreshSyncControls();
+    Pump();
+    const bool cardWhileBusy = nullptr != CardFor("x");
+    m_Editor->HideLayoutLoadFeedback();
+
+    QElapsedTimer clock;
+    clock.start();
+    while (nullptr == CardFor("x") && clock.elapsed() < 2000)
+    {
+      QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+    }
+
+    CPPUNIT_ASSERT_MESSAGE("No refresh while a layout is being applied", !cardWhileBusy);
+    CPPUNIT_ASSERT_MESSAGE("The refresh runs once the load is over", nullptr != CardFor("x"));
   }
 };
 

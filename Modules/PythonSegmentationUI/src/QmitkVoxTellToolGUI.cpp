@@ -55,19 +55,6 @@ namespace
   // Also offered on the preference page, so that the message can be turned on again.
   constexpr auto SHOW_PROMPTS_WITHOUT_RESULT = "VoxTell/showPromptsWithoutResult";
 
-  // True for the preferences baked into a loaded model (the single source of
-  // truth lives in VoxTellTool). Changing any of them makes the model stale.
-  bool IsSessionDefiningPreference(const std::string& key)
-  {
-    for (const auto& entry : mitk::VoxTellTool::GetSessionDefiningPreferences())
-    {
-      if (entry.first == key)
-        return true;
-    }
-
-    return false;
-  }
-
   // The dialogs of this GUI are parented to the window rather than the GUI:
   // their event loop can delete the GUI, which then must not take a dialog
   // that lives on the stack with it.
@@ -861,11 +848,17 @@ void QmitkVoxTellToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::Cha
 {
   auto* tool = this->GetTool();
 
+  if (tool == nullptr || !tool->IsModelLoaded())
+    return;
+
   // A change to a setting baked into the loaded model (backend, model source)
   // makes it stale, so unload it; the user then initializes again with the new
   // settings. SetProperty fires this only on an actual value change, so clicking
   // OK without edits is a no-op.
-  if (!IsSessionDefiningPreference(event.GetProperty()) || tool == nullptr || !tool->IsModelLoaded())
+  const auto& key = event.GetProperty();
+  const auto& sessionDefiningKeys = mitk::VoxTellTool::GetSessionDefiningPreferences();
+
+  if (std::none_of(sessionDefiningKeys.begin(), sessionDefiningKeys.end(), [&key](const auto& entry) { return entry.first == key; }))
     return;
 
   m_SettingsChanged = true;

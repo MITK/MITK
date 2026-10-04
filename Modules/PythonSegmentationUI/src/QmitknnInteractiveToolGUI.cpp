@@ -142,21 +142,6 @@ namespace
 
     return geometry->TimePointToTimeStep(timePoint);
   }
-
-  // True for the preferences baked into a session at initialization (the single
-  // source of truth lives in nnInteractiveTool). Changing any of them while a
-  // session runs makes it stale, so the GUI ends the session (see
-  // OnPreferenceChangedEvent).
-  bool IsSessionDefiningPreference(const std::string& key)
-  {
-    for (const auto& entry : mitk::nnInteractiveTool::GetSessionDefiningPreferences())
-    {
-      if (entry.first == key)
-        return true;
-    }
-
-    return false;
-  }
 }
 
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
@@ -1312,7 +1297,9 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
   // this only on an actual value change, so clicking OK without edits is a no-op.
   // It is idempotent when several such keys change in one OK: the first
   // AbortSession() tears the session down, the rest see no running session.
-  if (IsSessionDefiningPreference(property))
+  const auto& sessionDefiningKeys = mitk::nnInteractiveTool::GetSessionDefiningPreferences();
+
+  if (std::any_of(sessionDefiningKeys.begin(), sessionDefiningKeys.end(), [&property](const auto& entry) { return entry.first == property; }))
   {
     if (auto* tool = this->GetTool(); tool != nullptr && tool->IsSessionRunning())
       tool->AbortSession();

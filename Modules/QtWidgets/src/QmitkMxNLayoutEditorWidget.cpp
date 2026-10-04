@@ -293,13 +293,21 @@ namespace
   public:
     GroupCardFrame(QString groupId, QColor hue,
                    std::function<void(const QStringList&, QmitkMxNGroupJoinMode)> onCellsDropped,
-                   QWidget* parent = nullptr)
-      : QFrame(parent)
+                   QWidget* editor)
+      : QFrame(editor)
       , m_GroupId(std::move(groupId))
       , m_Hue(std::move(hue))
       , m_OnCellsDropped(std::move(onCellsDropped))
+      , m_DragOwner(editor)
     {
       this->setAcceptDrops(true);
+    }
+
+    /** Follow a recolor of the group, so a drop hover tints in its current hue. */
+    void SetHue(const QColor& hue)
+    {
+      m_Hue = hue;
+      this->update();
     }
 
   protected:
@@ -327,7 +335,9 @@ namespace
           // to a menu on drop, so the modifiers stay optional.
           mimeData->setData(QmitkMxNAskModeMimeType, QByteArray());
         }
-        auto* drag = new QDrag(this);
+        // Owned by the editor, not this card: the drag's event loop can deliver
+        // a layout apply that deletes the card, and with it a drag it owned.
+        auto* drag = new QDrag(m_DragOwner);
         drag->setMimeData(mimeData);
         drag->exec(Qt::CopyAction);
         return;
@@ -356,10 +366,11 @@ namespace
       m_DropHighlight = false;
       this->update();
 
+      const QPointer<GroupCardFrame> self(this);
       const auto mode = QmitkMxNResolveJoinMode(
-        event->mimeData(), event->modifiers(), this,
+        event->mimeData(), event->modifiers(),
         this->mapToGlobal(event->position().toPoint()));
-      if (!mode.has_value())
+      if (self.isNull() || !mode.has_value())
       {
         return;
       }
@@ -386,6 +397,8 @@ namespace
     QString m_GroupId;
     QColor m_Hue;
     std::function<void(const QStringList&, QmitkMxNGroupJoinMode)> m_OnCellsDropped;
+    // The editor, captured here because the card layout reparents the card.
+    QWidget* const m_DragOwner;
     QPoint m_PressPosition;
     bool m_DropHighlight = false;
   };
@@ -847,7 +860,6 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
                 }
               }
               this->MirrorSelectionToMatrix(windowIds);
-              this->ScheduleRebuild();
             });
     connect(arrangeMode, &QmitkMxNArrangeMode::AssignRequested, this,
             [this](const QString& group, const QStringList& windowIds, QmitkMxNGroupJoinMode mode)
@@ -1948,8 +1960,9 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   QPointer<QLabel> countPtr = countLabel;
   QPointer<QFrame> headerPtr = header;
   QPointer<QToolButton> menuPtr = menuButton;
+  QPointer<GroupCardFrame> cardPtr = card;
   m_CardsById[groupId] = card;
-  m_CardRefreshers[groupId] = [this, groupId, stripPtr, namePtr, countPtr, headerPtr, menuPtr]()
+  m_CardRefreshers[groupId] = [this, groupId, stripPtr, namePtr, countPtr, headerPtr, menuPtr, cardPtr]()
   {
     if (m_MultiWidget.isNull())
     {
@@ -1973,6 +1986,10 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
       if (headerPtr && namePtr && countPtr && menuPtr && refreshedHue.isValid())
       {
         StyleGroupHeader(headerPtr, namePtr, countPtr, menuPtr, refreshedHue);
+      }
+      if (cardPtr && refreshedHue.isValid())
+      {
+        cardPtr->SetHue(refreshedHue);
       }
     }
     catch (const mitk::Exception&)
@@ -2003,8 +2020,10 @@ void QmitkMxNLayoutEditorWidget::ShowGridDialog()
             m_GridDialog, &QDialog::accept);
     connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout,
             m_GridDialog, &QDialog::accept);
-    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout,
-            m_GridDialog, &QDialog::accept);
+    // The data-based chooser takes over from the dialog as its own popup; were
+    // the dialog left open, dismissing the chooser would strand it empty.
+    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::DataBasedLayoutStarted,
+            m_GridDialog, &QDialog::reject);
   }
 
   // Open fresh each time: the picker is a forward chooser, so a stale prior pick
@@ -3090,30 +3109,26 @@ bool QmitkMxNLayoutEditorWidget::HasNonTrivialSyncConfig() const
     }
   }
 
-  // Otherwise the only group is the default one. The configuration is trivial
-  // only when every cell rests as a clean Mono(default) - the fresh-cell
-  // state, where windowing/LUT/selection are on the default group and nothing
-  // else is linked. A cell that spans groups (Complex) or sits wholly on some
-  // non-default group means the user linked synchronization the warning must
-  // cover.
-  QColor defaultHue;
-  try
-  {
-    defaultHue = m_MultiWidget->GetSyncGroupColor(defaultGroup);
-  }
-  catch (const mitk::Exception&)
-  {
-  }
+  // Otherwise every link names the default group, so a cell's group identity
+  // cannot tell a fresh window from a configured one; its links can. A fresh
+  // window links windowing and LUT to the default group and nothing else, and
+  // offsets only exist on the navigation axes, so comparing link presence
+  // covers authored offsets as well.
   for (const auto& descriptor : descriptors)
   {
-    const auto identity = m_MultiWidget->ResolveCellGroupIdentity(descriptor.id);
-    if (identity.kind != QmitkMxNMultiWidget::CellGroupIdentityKind::Mono)
+    if (descriptor.selectionGroup.toStdString() != defaultGroup)
     {
       return true;
     }
-    if (defaultHue.isValid() && identity.hue != defaultHue)
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
-      return true;
+      const auto link = m_MultiWidget->GetSyncLink(descriptor.id, dimension);
+      const bool appearance = QmitkMxNSyncDimension::Windowing == dimension
+                              || QmitkMxNSyncDimension::Lut == dimension;
+      if (appearance ? (!link.has_value() || link->group != defaultGroup) : link.has_value())
+      {
+        return true;
+      }
     }
   }
   return false;

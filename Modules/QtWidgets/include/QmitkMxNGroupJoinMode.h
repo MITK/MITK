@@ -24,7 +24,6 @@ found in the LICENSE file.
 
 class QMimeData;
 class QPoint;
-class QWidget;
 
 /**
  * \brief How a cell's existing links are treated when it joins a group - the
@@ -86,10 +85,14 @@ MITKQTWIDGETS_EXPORT std::vector<QmitkMxNJoinModeEntry> QmitkMxNJoinModeMenuEntr
  *        nothing when the user dismisses it; any other drag reads its
  *        modifiers. Shared by every drop target so the gesture means the same
  *        everywhere.
+ *
+ * The menu runs a nested event loop, which also delivers queued work such as a
+ * layout applied through REST, and that work can destroy the drop target. The
+ * menu therefore has no parent, and a caller that may have shown it must check
+ * that it still exists before touching itself after the call.
  */
 MITKQTWIDGETS_EXPORT std::optional<QmitkMxNGroupJoinMode> QmitkMxNResolveJoinMode(const QMimeData* mimeData,
                                                                                 Qt::KeyboardModifiers modifiers,
-                                                                                QWidget* parent,
                                                                                 const QPoint& globalPosition);
 
 #endif

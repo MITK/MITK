@@ -476,11 +476,11 @@ public:
     QMimeData plain;
     plain.setData(QmitkMxNCellsMimeType, QByteArray("mxn__widget0"));
 
-    const auto replace = QmitkMxNResolveJoinMode(&plain, Qt::NoModifier, nullptr, QPoint(0, 0));
+    const auto replace = QmitkMxNResolveJoinMode(&plain, Qt::NoModifier, QPoint(0, 0));
     CPPUNIT_ASSERT(replace.has_value());
     CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::Replace == *replace);
 
-    const auto merge = QmitkMxNResolveJoinMode(&plain, Qt::AltModifier, nullptr, QPoint(0, 0));
+    const auto merge = QmitkMxNResolveJoinMode(&plain, Qt::AltModifier, QPoint(0, 0));
     CPPUNIT_ASSERT(merge.has_value());
     CPPUNIT_ASSERT(QmitkMxNGroupJoinMode::MergeOverwriteCollisions == *merge);
   }

@@ -44,7 +44,10 @@
 			end with a sagittal view direction, and the others keep their settings,
 			synchronization and selected data.
 			A data-based layout replaces all window views and synchronization groups, so the
-			view asks for confirmation first unless the layout is still the trivial default.
+			view asks for confirmation first when synchronization goes beyond the default: a
+			second group, any link other than the default group's windowing, LUT and data
+			selection, or a window view detached from windowing or LUT. The window arrangement
+			itself is not protected; save it first if you want to keep it.
 	</ul>
 
 	\imageMacroEx{QmitkMxN_LayoutEditor.png, "The MxN Layout Editor view", 8, 360px}

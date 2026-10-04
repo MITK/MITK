@@ -3041,10 +3041,10 @@ bool QmitkMxNCellOverlay::HandleCellDrag(QEvent* event)
       {
         return false;
       }
-      // The ask-mode menu gets no parent and the overlay is re-checked after
-      // it, for the reason given in OpenColormapMenu.
+      // The overlay is re-checked after the ask-mode menu, for the reason
+      // given in OpenColormapMenu.
       const QPointer<QmitkMxNCellOverlay> self(this);
-      const auto mode = QmitkMxNResolveJoinMode(dropEvent->mimeData(), dropEvent->modifiers(), nullptr,
+      const auto mode = QmitkMxNResolveJoinMode(dropEvent->mimeData(), dropEvent->modifiers(),
                                                 m_Cell->mapToGlobal(dropEvent->position().toPoint()));
       if (self.isNull())
       {

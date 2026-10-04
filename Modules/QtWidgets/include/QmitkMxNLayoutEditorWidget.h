@@ -229,12 +229,17 @@ public:
 
   /**
    * \brief Whether the current sync configuration is more than the trivial
-   *        default. False only when the sole group is "main" and every cell
-   *        resolves to Mono("main") - the fresh-cell state where windowing, LUT,
-   *        and selection sit on "main" and nothing else is linked. True once a
-   *        second group exists or any cell links other synchronization. The
-   *        hosting view uses this to warn before a layout replace discards a
-   *        configuration the user built; public so it is testable headlessly.
+   *        default. False only in the fresh-window state: the default group
+   *        is the only group, and every window links windowing and LUT to it,
+   *        rests its data selection on it, and links nothing else. True once a
+   *        second group exists (an empty one included), any window links a
+   *        navigation axis (pan, zoom, slice, crosshair, orientation; also on
+   *        the default group, and with any offset), or a window is detached
+   *        from the default group's windowing or LUT. A loaded document that
+   *        declares no windowing or LUT links therefore counts as non-trivial.
+   *        The window arrangement itself is not considered. The hosting view
+   *        uses this to warn before a layout replace discards a configuration
+   *        the user built; public so it is testable headlessly.
    */
   bool HasNonTrivialSyncConfig() const;
 
@@ -267,7 +272,8 @@ Q_SIGNALS:
    *        plain grid, windows beyond the new size are removed, and the others
    *        keep their synchronization links. SetDataBasedLayout and LoadLayout
    *        rebuild every window and replace the synchronization groups, so a
-   *        host is expected to confirm them.
+   *        host is expected to confirm them. A handler reports its own
+   *        failures and must not throw through the emit.
    */
   void LayoutSet(int row, int column);
   void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);

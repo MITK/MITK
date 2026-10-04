@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkAutomatedLayoutWidget.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
@@ -33,9 +34,16 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <QApplication>
 #include <QColor>
 #include <QCoreApplication>
+#include <QDialog>
 #include <QDropEvent>
+#include <QKeyEvent>
+#include <QMenu>
+#include <QPointer>
+#include <QPushButton>
+#include <QTimer>
 #include <QLayout>
 #include <QMimeData>
 #include <QPointF>
@@ -107,7 +115,12 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(NonTrivialConfig_FalseForFreshDefault);
   MITK_TEST(NonTrivialConfig_TrueOnceASecondGroupExists);
   MITK_TEST(NonTrivialSyncConfig_FalseForSingleCustomDefaultGroup);
+  MITK_TEST(NonTrivialConfig_TrueForNavigationLinksOnDefaultGroup);
+  MITK_TEST(NonTrivialConfig_TrueForDetachedWindowing);
   MITK_TEST(MultiTileDrop_AssignsEverySelectedCell);
+  MITK_TEST(CardDrop_AskMenuIsParentless);
+  MITK_TEST(CardDrop_AskMenuSurvivesCardRemoval);
+  MITK_TEST(GridDialog_DataBasedLayoutClosesDialogAndAnchorsPopup);
 
   MITK_TEST(SyncHighlight_CellsSharingDimensionAxis);
   MITK_TEST(SyncHighlight_CellsSharingSelectionAxis);
@@ -432,11 +445,11 @@ public:
 
   void EditorChange_RefreshesCellBarcode()
   {
-    // Regression: an edit made in the layout editor must refresh the per-cell
-    // utility-strip barcode, not just the editor's own view. The editor's
-    // mutators route through RefreshSyncControls (SyncLinksChanged) for that;
-    // before the fix they called only the editor-local rebuild, leaving the
-    // barcode stale.
+    // An edit made in the layout editor must refresh the per-cell utility-strip
+    // barcode, not just the editor's own view; the editor's mutators route
+    // through RefreshSyncControls (SyncLinksChanged) for that. A fresh cell
+    // already links Windowing to "main", so only the slot's colour tells the
+    // refreshed barcode from the stale one.
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Widget->ApplyDimensionToGroup("nav", QmitkMxNSyncDimension::Windowing, true);
 
@@ -458,10 +471,13 @@ public:
     }
     CPPUNIT_ASSERT(windowingSlot >= 0);
 
+    const QColor navHue = m_Editor->GetSyncGroupColor("nav");
+    CPPUNIT_ASSERT_MESSAGE("The two groups must be told apart by hue",
+                           navHue != m_Editor->GetSyncGroupColor("main"));
     const auto axisSlots = barcode->Slots();
-    CPPUNIT_ASSERT_MESSAGE(
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "An editor dimension toggle must refresh the cell's barcode without a manual refresh",
-      axisSlots[windowingSlot].color.isValid());
+      navHue.name().toStdString(), axisSlots[windowingSlot].color.name().toStdString());
   }
 
   void Selection_TogglesViaEditorAndRoundTrips()
@@ -517,6 +533,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A rebuild must not mutate engine state",
                            IsLinked(0, QmitkMxNSyncDimension::Slice, "nav")
                              && IsLinked(1, QmitkMxNSyncDimension::Slice, "nav"));
+    CPPUNIT_ASSERT_MESSAGE("The rebuild shows the default group's card", nullptr != CardFor("main"));
+    CPPUNIT_ASSERT_MESSAGE("The rebuild shows the new group's card", nullptr != CardFor("nav"));
   }
 
   void LayoutShrink_EmitsLayoutChanged()
@@ -1045,18 +1063,18 @@ public:
 
   void NonTrivialSyncConfig_FalseForSingleCustomDefaultGroup()
   {
-    // A document whose sole selection group is not literally named "main" (a
-    // custom default label, here "left") is still the fresh/clean
-    // configuration: one group, everyone resting on it, nothing else linked.
-    // The predicate must not warn just because that group's name differs from
-    // the literal "main".
+    // A document whose sole group is not literally named "main" (a custom
+    // default label, here "left") is still the fresh/clean configuration when
+    // its windows link exactly what a fresh window links: windowing, LUT and
+    // selection on that group, nothing else. The predicate must not warn just
+    // because that group's name differs from the literal "main".
     const auto doc = nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial",
-            "links": { "selection": "left" } }
+            "links": { "windowing": "left", "lut": "left", "selection": "left" } }
         ]
       }
     })json");
@@ -1073,6 +1091,40 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("A single custom-named default group is trivial, like 'main' would be",
                            !m_Widget->HasNonTrivialSyncConfig());
+  }
+
+  void NonTrivialConfig_TrueForNavigationLinksOnDefaultGroup()
+  {
+    // Navigation links on the default group (the main card's "Link navigation",
+    // an axis click, authored offsets) are user-built synchronization even
+    // though no second group exists; a layout replace would discard them.
+    const auto defaultGroup = m_Editor->GetDefaultSyncGroupName();
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair,
+                                  QmitkMxNSyncDimension::Orientation })
+    {
+      m_Editor->SetSyncLink(CellId(0), dimension, defaultGroup);
+      CPPUNIT_ASSERT_MESSAGE(std::string("A '") + QmitkMxNSyncDimensionToLinkKey(dimension)
+                               + "' link on the default group makes the configuration non-trivial",
+                             m_Widget->HasNonTrivialSyncConfig());
+      m_Editor->ClearSyncLink(CellId(0), dimension);
+      CPPUNIT_ASSERT_MESSAGE("Clearing the link restores the trivial default",
+                             !m_Widget->HasNonTrivialSyncConfig());
+    }
+  }
+
+  void NonTrivialConfig_TrueForDetachedWindowing()
+  {
+    // A window detached from the default group's windowing or LUT no longer
+    // matches a fresh window, so replacing the layout would discard that choice.
+    m_Editor->ClearSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing);
+    CPPUNIT_ASSERT_MESSAGE("A window detached from windowing makes the configuration non-trivial",
+                           m_Widget->HasNonTrivialSyncConfig());
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, m_Editor->GetDefaultSyncGroupName());
+    m_Editor->ClearSyncLink(CellId(2), QmitkMxNSyncDimension::Lut);
+    CPPUNIT_ASSERT_MESSAGE("A window detached from the LUT makes the configuration non-trivial",
+                           m_Widget->HasNonTrivialSyncConfig());
   }
 
   // --- Multi-tile drag-and-drop -----------------------------------------------
@@ -1110,6 +1162,155 @@ public:
                            IsLinked(1, QmitkMxNSyncDimension::Slice, "grp"));
     CPPUNIT_ASSERT_MESSAGE("The pre-existing member keeps its link",
                            IsLinked(2, QmitkMxNSyncDimension::Slice, "grp"));
+  }
+
+  // --- Nested event loops on a group card ------------------------------------
+
+  void CardDrop_AskMenuIsParentless()
+  {
+    // A right-button drop asks for its join mode through a menu whose event
+    // loop can deliver a layout apply that deletes the card. Owned by the card,
+    // the stack-local menu would be deleted from under its own frame.
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "grp");
+    Pump();
+    auto* card = CardFor("grp");
+    CPPUNIT_ASSERT(nullptr != card);
+
+    const std::unique_ptr<QMimeData> mime(QmitkMxNCreateCellsMimeData(QStringList{ CellId(0) }, true));
+
+    bool opened = false;
+    bool parentless = false;
+    // Scopes the timer: if no menu loop runs it, it dies with this test.
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+      opened = nullptr != menu;
+      if (!opened)
+      {
+        return;
+      }
+      parentless = nullptr == menu->parentWidget();
+      menu->close();
+    });
+
+    // Dispatched to the card's event() for the reason given in
+    // MultiTileDrop_AssignsEverySelectedCell.
+    QDropEvent drop(QPointF(5, 5), Qt::CopyAction, mime.get(), Qt::RightButton, Qt::NoModifier);
+    static_cast<QObject*>(card)->event(&drop);
+
+    CPPUNIT_ASSERT_MESSAGE("An ask-mode drop on a card opens the join-mode menu", opened);
+    CPPUNIT_ASSERT_MESSAGE("The join-mode menu has no parent the card's teardown could delete", parentless);
+    CPPUNIT_ASSERT_MESSAGE("A dismissed menu assigns nothing", !IsLinked(0, QmitkMxNSyncDimension::Slice, "grp"));
+  }
+
+  void CardDrop_AskMenuSurvivesCardRemoval()
+  {
+    // A layout applied while the join-mode menu is open (a REST request does
+    // that) removes the card's group and so the card. The drop must not touch
+    // the deleted card afterwards, even when the user picks a mode.
+    const auto baseline = m_Editor->SerializeLayout();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "grp");
+    Pump();
+    const QPointer<QWidget> card = CardFor("grp");
+    CPPUNIT_ASSERT(!card.isNull());
+
+    const std::unique_ptr<QMimeData> mime(QmitkMxNCreateCellsMimeData(QStringList{ CellId(0) }, true));
+
+    bool opened = false;
+    bool cardGone = false;
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      const QPointer<QMenu> menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+      opened = !menu.isNull();
+      if (!opened)
+      {
+        return;
+      }
+      m_Editor->ApplyLayout(baseline);
+      Pump();  // runs the deferred card reconcile inside the menu's loop
+      cardGone = card.isNull();
+      if (menu.isNull())
+      {
+        return;
+      }
+      // Pick "Replace" the way a user does, so the menu returns a mode.
+      menu->setActiveAction(menu->actions().front());
+      QKeyEvent press(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier);
+      QCoreApplication::sendEvent(menu, &press);
+    });
+
+    QDropEvent drop(QPointF(5, 5), Qt::CopyAction, mime.get(), Qt::RightButton, Qt::NoModifier);
+    static_cast<QObject*>(card.data())->event(&drop);
+
+    CPPUNIT_ASSERT_MESSAGE("An ask-mode drop on a card opens the join-mode menu", opened);
+    CPPUNIT_ASSERT_MESSAGE("The applied layout removed the card while its menu was open", cardGone);
+    CPPUNIT_ASSERT_MESSAGE("A drop whose card is gone recreates no group", !this->RegistryHasGroup("grp"));
+    CPPUNIT_ASSERT_MESSAGE("A drop whose card is gone assigns nothing",
+                           !IsLinked(0, QmitkMxNSyncDimension::Slice, "grp"));
+  }
+
+  // --- Grid dialog -------------------------------------------------------------
+
+  void GridDialog_DataBasedLayoutClosesDialogAndAnchorsPopup()
+  {
+    QToolButton* editGrid = nullptr;
+    for (auto* button : m_Widget->findChildren<QToolButton*>())
+    {
+      if (button->text() == QStringLiteral("Edit grid..."))
+      {
+        editGrid = button;
+      }
+    }
+    CPPUNIT_ASSERT(nullptr != editGrid);
+
+    bool dialogFound = false;
+    bool dialogClosed = false;
+    bool popupShown = false;
+    QPoint expectedTopRight;
+    QPoint popupTopRight;
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      auto* dialog = qobject_cast<QDialog*>(QApplication::activeModalWidget());
+      dialogFound = nullptr != dialog;
+      if (!dialogFound)
+      {
+        return;
+      }
+      // Away from the screen origin, so a position taken relative to the dialog
+      // cannot land on the global anchor by accident.
+      dialog->move(300, 200);
+      auto* dataBased = dialog->findChild<QPushButton*>(QStringLiteral("dataBasedLayoutButton"));
+      if (nullptr != dataBased)
+      {
+        auto* picker = dataBased->parentWidget();
+        expectedTopRight = picker->mapToGlobal(QPoint(picker->width(), 0));
+        dataBased->click();
+        dialogClosed = !dialog->isVisible();
+        if (auto* popup = dialog->findChild<QmitkAutomatedLayoutWidget*>())
+        {
+          popupShown = popup->isVisible();
+          popupTopRight = popup->pos() + QPoint(popup->width(), 0);
+          popup->close();
+        }
+      }
+      if (dialog->isVisible())
+      {
+        dialog->reject();
+      }
+    });
+    editGrid->click();
+
+    CPPUNIT_ASSERT_MESSAGE("Edit grid opens the modal grid dialog", dialogFound);
+    CPPUNIT_ASSERT_MESSAGE("Data-based layout opens the image chooser", popupShown);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chooser's top-right corner sits on the picker's (x)",
+                                 expectedTopRight.x(), popupTopRight.x());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chooser's top-right corner sits on the picker's (y)",
+                                 expectedTopRight.y(), popupTopRight.y());
+    CPPUNIT_ASSERT_MESSAGE("Data-based layout closes the grid dialog, so a dismissed chooser leaves nothing behind",
+                           dialogClosed);
   }
 
   // --- Group removal -----------------------------------------------------------

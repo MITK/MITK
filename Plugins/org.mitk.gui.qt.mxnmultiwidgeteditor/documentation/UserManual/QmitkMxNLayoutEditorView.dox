@@ -37,7 +37,10 @@
 
 	Applying a preset, a file or a data-based arrangement replaces the window arrangement
 	and discards the current synchronization groups, so the view asks for confirmation
-	first unless the layout is still the trivial default.
+	first when synchronization goes beyond the default: a second group, any link other
+	than the default group's windowing, LUT and data selection, or a window detached from
+	windowing or LUT. The window arrangement itself is not protected; save it first if
+	you want to keep it.
 
 	The grid of the arrangement is edited in the row below: the row and column buttons
 	add or remove a trailing row or column in place, which leaves the existing windows

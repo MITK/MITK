@@ -82,6 +82,12 @@ Q_SIGNALS:
   void LayoutSet(int row, int column);
   void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
+  /** \brief The data-based chooser is about to open as a popup of its own; a
+   *         host that shows this picker in a dialog closes the dialog, so a
+   *         dismissed chooser leaves nothing behind. The picker survives the
+   *         host's reaction. */
+  void DataBasedLayoutStarted();
+
   // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
   void SaveLayout(std::ostream* outStream);
 

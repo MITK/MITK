@@ -58,7 +58,6 @@ std::vector<QmitkMxNJoinModeEntry> QmitkMxNJoinModeMenuEntries()
 
 std::optional<QmitkMxNGroupJoinMode> QmitkMxNResolveJoinMode(const QMimeData* mimeData,
                                                              Qt::KeyboardModifiers modifiers,
-                                                             QWidget* parent,
                                                              const QPoint& globalPosition)
 {
   if (nullptr == mimeData || !mimeData->hasFormat(QmitkMxNAskModeMimeType))
@@ -66,7 +65,7 @@ std::optional<QmitkMxNGroupJoinMode> QmitkMxNResolveJoinMode(const QMimeData* mi
     return QmitkMxNJoinModeFromModifiers(modifiers);
   }
 
-  QMenu menu(parent);
+  QMenu menu;
   std::vector<QAction*> actions;
   const auto entries = QmitkMxNJoinModeMenuEntries();
   actions.reserve(entries.size());

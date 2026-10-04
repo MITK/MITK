@@ -533,6 +533,10 @@ void QmitkVoxTellToolGUI::OnModelLoaded()
   this->EnableWidgets(true);
   this->SetStatus("Ready. Enter one prompt per line and click Segment.");
 
+  // Typing the prompts is all there is to do next. A warning shown below hands
+  // the focus back when it closes.
+  m_Ui->promptsTextEdit->setFocus(Qt::OtherFocusReason);
+
   const auto backend = this->GetTool()->GetBackend();
 
   // Somebody who chose the CPU knows what to expect.

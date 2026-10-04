@@ -6,4 +6,8 @@ if(MITK_USE_Python3)
       PUBLIC nlohmann_json
     AUTOMOC
   )
+
+  if(TARGET ${MODULE_TARGET} AND BUILD_TESTING)
+    add_subdirectory(test)
+  endif()
 endif()

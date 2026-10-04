@@ -88,6 +88,7 @@ private slots:
   void OnResolveStarted();
   void OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
   void OnPostInstallStepStarted(const QString& displayName);
+  void OnPostInstallStepProgressChanged(quint64 done, quint64 total);
   void OnInstallFinished(bool success);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);
@@ -109,6 +110,7 @@ private:
   mitk::PipInstallSpec m_Spec;
   Mode m_Mode = Mode::Install;
   QTimer* m_DotTimer = nullptr;
+  QString m_PackageProgressFormat;
   QString m_PackageLabelBaseText;
   int m_DotCount = 0;
   int m_CurrentStep = 0;

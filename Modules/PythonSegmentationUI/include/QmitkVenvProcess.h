@@ -21,6 +21,13 @@ found in the LICENSE file.
 #include <QString>
 #include <QStringList>
 
+#include <string>
+
+namespace mitk
+{
+  struct PostInstallStep;
+}
+
 /**
   \brief Helpers for running an executable from a MITK-managed Python virtual
          environment as a subprocess.
@@ -68,6 +75,31 @@ namespace QmitkVenvProcess
    *        killed and Result::success stays false.
    */
   MITKPYTHONSEGMENTATIONUI_EXPORT Result Run(const QString& executable, const QStringList& args, int finishedTimeoutMs = -1);
+
+  /** \brief Outcome of RunStep(). */
+  enum class StepResult
+  {
+    Succeeded,
+    Failed,
+    Cancelled
+  };
+
+  /** \brief Runs a post-install step of a virtual environment on its own.
+   *
+   * Runs the Python code of the step with the interpreter of the environment
+   * and keeps the application responsive meanwhile. Once the step reports its
+   * progress (see mitk::PostInstallStepProgress), a progress notification named
+   * after the step shows it and offers to cancel, which stops the step. A step
+   * that reports nothing, because it has nothing to do, ends without one.
+   *
+   * Runs a local event loop, during which the caller can be deleted.
+   *
+   * \param[in] venvName The virtual environment to run the step in.
+   * \param[in] step The step. Whether it is optional does not matter here.
+   * \param[out] output Receives what the step printed apart from its progress,
+   *             for an error report. May be \c nullptr.
+   */
+  MITKPYTHONSEGMENTATIONUI_EXPORT StepResult RunStep(const std::string& venvName, const mitk::PostInstallStep& step, QString* output = nullptr);
 }
 
 #endif

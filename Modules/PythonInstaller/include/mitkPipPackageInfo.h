@@ -73,7 +73,9 @@ namespace mitk
   /// installed successfully. Each step runs as `python -c "<pythonCode>"` in the
   /// activated virtual environment, so any imports it needs must be satisfied by
   /// packages installed in the groups (directly or transitively). Raw stdout and
-  /// stderr (including tqdm progress) is forwarded to the installer's output signal.
+  /// stderr (including tqdm progress) is forwarded to the installer's output signal,
+  /// except for the lines that report the progress of the step
+  /// (see PostInstallStepProgress).
   ///
   /// \code
   /// PostInstallStep step;

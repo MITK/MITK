@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <QShowEvent>
 #include <QTextCursor>
 
+#include <algorithm>
+
 QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent, Mode mode)
   : QDialog(parent),
     m_Ui(std::make_unique<Ui::QmitkPipInstallDialog>()),
@@ -33,6 +35,10 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
     m_Mode(mode)
 {
   m_Ui->setupUi(this);
+
+  // Post-install steps report their progress in units of their own, so the bar
+  // only shows packages while packages are installed.
+  m_PackageProgressFormat = m_Ui->progressBar->format();
 
   auto name = QString::fromStdString(spec.name);
 
@@ -83,6 +89,7 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &QmitkPipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
   connect(m_Installer, &QmitkPipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
   connect(m_Installer, &QmitkPipInstaller::PostInstallStepStarted, this, &QmitkPipInstallDialog::OnPostInstallStepStarted);
+  connect(m_Installer, &QmitkPipInstaller::PostInstallStepProgressChanged, this, &QmitkPipInstallDialog::OnPostInstallStepProgressChanged);
   connect(m_Installer, &QmitkPipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
   connect(m_Installer, &QmitkPipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
   connect(m_Installer, &QmitkPipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
@@ -226,12 +233,26 @@ void QmitkPipInstallDialog::OnPostInstallStepStarted(const QString& displayName)
   ++m_CurrentStep;
   this->SetStatus(displayName);
 
-  // Indeterminate while the step runs: the busy progress bar conveys liveness;
-  // detailed progress (e.g. download tqdm output) shows up in the details view
-  // via OutputReceived.
+  // Indeterminate until the step reports how far it is, if it does at all.
   m_Ui->progressBar->setRange(0, 0);
   m_Ui->progressBar->show();
   m_Ui->packageLabel->hide();
+}
+
+void QmitkPipInstallDialog::OnPostInstallStepProgressChanged(quint64 done, quint64 total)
+{
+  if (total == 0)
+  {
+    m_Ui->progressBar->setRange(0, 0);
+    return;
+  }
+
+  // The amounts can exceed the int range of the bar, bytes of a download for example.
+  constexpr quint64 RESOLUTION = 1000;
+
+  m_Ui->progressBar->setFormat(QStringLiteral("%p%"));
+  m_Ui->progressBar->setRange(0, static_cast<int>(RESOLUTION));
+  m_Ui->progressBar->setValue(static_cast<int>(std::min(done, total) * RESOLUTION / total));
 }
 
 void QmitkPipInstallDialog::OnInstallFinished(bool success)
@@ -278,6 +299,7 @@ void QmitkPipInstallDialog::OnInstallFinished(bool success)
 
 void QmitkPipInstallDialog::OnProgressChanged(int current, int total)
 {
+  m_Ui->progressBar->setFormat(m_PackageProgressFormat);
   m_Ui->progressBar->setRange(0, total);
   m_Ui->progressBar->setValue(current);
 }

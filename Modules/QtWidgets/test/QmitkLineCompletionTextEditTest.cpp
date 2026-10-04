@@ -42,6 +42,7 @@ class QmitkLineCompletionTextEditTestSuite : public mitk::TestFixture
   MITK_TEST(TestTabChoosesSuggestionAndKeepsFocus);
   MITK_TEST(TestMovingAwayFromLineEndHidesSuggestions);
   MITK_TEST(TestEscapeHidesSuggestions);
+  MITK_TEST(TestSuggestionsUseFontSizeOfText);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -204,6 +205,19 @@ public:
 
     CPPUNIT_ASSERT(!this->Popup()->isVisible());
     CPPUNIT_ASSERT_EQUAL(std::string("liv"), m_Edit->toPlainText().toStdString());
+  }
+
+  // Set in a style sheet, the way the application sets its font size.
+  void TestSuggestionsUseFontSizeOfText()
+  {
+    m_Edit->setStyleSheet("QPlainTextEdit { font-size: 17pt; }");
+    m_Edit->ensurePolished();
+
+    this->Type("liv");
+    CPPUNIT_ASSERT(this->Popup()->isVisible());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The suggestions should be in the font size of the text",
+                                 17.0, this->Popup()->font().pointSizeF());
   }
 
 private:

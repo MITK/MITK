@@ -31,7 +31,8 @@ class QStringListModel;
  * that start with it. A single character only lists those that start with it.
  * Choosing one with Enter, Tab, or a click replaces the line with it and
  * starts the next line. Tab moves the focus on while no suggestions are shown,
- * as a tab character is no entry.
+ * as a tab character is no entry. The suggestions are in the font size of the
+ * text.
  */
 class MITKQTWIDGETS_EXPORT QmitkLineCompletionTextEdit : public QPlainTextEdit
 {

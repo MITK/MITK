@@ -136,6 +136,17 @@ void QmitkLineCompletionTextEdit::UpdateCompletionPopup()
 
   m_Model->setStringList(completions);
 
+  // In the size of the text they complete. In a style sheet, as the application
+  // can set its font size in one, which a font set on the popup would not
+  // override.
+  if (const auto fontSize = this->font().pointSizeF(); fontSize > 0)
+  {
+    const auto styleSheet = QString("QAbstractItemView { font-size: %1pt; }").arg(fontSize);
+
+    if (popup->styleSheet() != styleSheet)
+      popup->setStyleSheet(styleSheet);
+  }
+
   // Below the line and as wide as the edit, since a completion replaces the
   // whole line.
   auto lineStart = cursor;

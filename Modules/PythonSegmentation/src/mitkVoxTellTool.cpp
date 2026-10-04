@@ -746,6 +746,12 @@ void mitk::VoxTellTool::UpdateCleanUp()
   this->RemoveLabelsWithoutResult();
 }
 
+void mitk::VoxTellTool::ConfirmCleanUp()
+{
+  this->RemoveAllPreviewLabels();
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void mitk::VoxTellTool::RemoveLabelsWithoutResult()
 {
   auto* preview = this->GetPreviewSegmentation();

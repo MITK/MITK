@@ -325,6 +325,14 @@ namespace mitk
      */
     void UpdateCleanUp() override;
 
+    /** \brief Empties the preview, so a confirmed result cannot be confirmed again.
+     *
+     * The tool stays active after a confirmation (see KeepActiveAfterAccept),
+     * and in AddLabel transfer mode a second confirmation would add the same
+     * labels once more.
+     */
+    void ConfirmCleanUp() override;
+
     /** \brief Segments the prompts in the reference image and writes the result into the preview.
      *
      * The input of the base class is not used. A region of interest is not

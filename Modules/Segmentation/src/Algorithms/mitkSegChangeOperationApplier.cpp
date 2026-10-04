@@ -79,9 +79,12 @@ namespace
 
   void ApplyGroupRemove(mitk::SegGroupRemoveOperation* removeOperation, mitk::MultiLabelSegmentation* segmentation)
   {
-    for (auto groupID : removeOperation->GetGroupIDs())
+    // Highest index first: removing a group moves the groups behind it forward.
+    const auto groupIDs = removeOperation->GetGroupIDs();
+
+    for (auto groupID = groupIDs.rbegin(); groupID != groupIDs.rend(); ++groupID)
     {
-      segmentation->RemoveGroup(groupID);
+      segmentation->RemoveGroup(*groupID);
     }
   }
 

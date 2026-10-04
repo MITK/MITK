@@ -229,6 +229,12 @@ namespace mitk
      */
     std::optional<Torch::Backend> GetBackend() const;
 
+    /** \brief Returns where the model was loaded from.
+     *
+     * \return The model source, or \c std::nullopt if no model is loaded.
+     */
+    std::optional<VoxTell::ModelSource> GetModelSource() const;
+
     /** \brief Sets the prompts that UpdatePreview() segments.
      *
      * The prompt at position i becomes the label with value i + 1. An empty set

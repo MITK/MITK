@@ -861,6 +861,10 @@ void QmitkVoxTellToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::Cha
   if (std::none_of(sessionDefiningKeys.begin(), sessionDefiningKeys.end(), [&key](const auto& entry) { return entry.first == key; }))
     return;
 
+  // The model folder is baked in only while the model is loaded from it.
+  if (key == "VoxTell/localModelPath" && tool->GetModelSource() != mitk::VoxTell::ModelSource::Local)
+    return;
+
   m_SettingsChanged = true;
 
   // The settings can be changed while a run or its preparation process events.

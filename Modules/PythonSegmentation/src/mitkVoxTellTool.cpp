@@ -223,6 +223,7 @@ namespace mitk
 
     std::unique_ptr<PythonContext> Context;
     std::optional<Torch::Backend> Backend;
+    std::optional<VoxTell::ModelSource> ModelSource;
     std::string Device;
     std::vector<std::string> Prompts;
     Image::Pointer TargetBuffer;
@@ -448,6 +449,7 @@ void mitk::VoxTellTool::LoadModel()
     this->ReleaseModel();
 
   m_Impl->Backend.reset();
+  m_Impl->ModelSource.reset();
   m_Impl->Device.clear();
   m_Impl->CachedRun.reset();
 
@@ -511,6 +513,7 @@ void mitk::VoxTellTool::LoadModel()
     }
 
     m_Impl->Backend = selection.SelectedBackend;
+    m_Impl->ModelSource = modelSource;
     m_Impl->Device = selection.Device;
   }
   catch (...)
@@ -561,6 +564,7 @@ void mitk::VoxTellTool::UnloadModel()
 
   m_Impl->Context.reset();
   m_Impl->Backend.reset();
+  m_Impl->ModelSource.reset();
   m_Impl->Device.clear();
   m_Impl->CachedRun.reset();
 
@@ -578,6 +582,11 @@ bool mitk::VoxTellTool::IsModelLoaded() const
 std::optional<mitk::Torch::Backend> mitk::VoxTellTool::GetBackend() const
 {
   return m_Impl->Backend;
+}
+
+std::optional<mitk::VoxTell::ModelSource> mitk::VoxTellTool::GetModelSource() const
+{
+  return m_Impl->ModelSource;
 }
 
 void mitk::VoxTellTool::SetPrompts(const std::vector<std::string>& prompts)

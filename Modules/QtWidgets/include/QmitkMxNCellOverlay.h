@@ -41,6 +41,7 @@ found in the LICENSE file.
 class QmitkMxNMultiWidget;
 class QmitkRenderWindowWidget;
 class QFont;
+class QMenu;
 class QPropertyAnimation;
 class vtkRenderWindow;
 
@@ -124,7 +125,8 @@ public:
    *                   Must not be null and must outlive the cell.
    * \param proximity  The cell's proximity controller; the overlay registers
    *                   its furniture regions and follows the emitted states.
-   *                   Must not be null and must outlive the overlay.
+   *                   Must not be null. If it outlives the overlay, the
+   *                   overlay's regions are removed from it on destruction.
    *
    * \throws mitk::Exception on a null argument or a cell without a render
    *         window.
@@ -174,8 +176,8 @@ public:
   void NavigatorSetVoxelIndex(const mitk::Point3D& voxelIndex);
   void NavigatorMoveInPlane(double rightMm, double upMm);
 
-  /** \brief The depth (slice) row label: "Slice - <plane>" for an orthogonal
-   *         view, a generic "Slice" otherwise. Exposed for verification. */
+  /** \brief The depth (slice) row label, "Slice": the bottom-left plane label
+   *         already names the orientation. Exposed for verification. */
   QString NavigatorDepthLabel() const;
 
   /**
@@ -269,8 +271,9 @@ public:
   qreal PeekProgress() const;
   void SetPeekProgress(qreal progress);
 
-  /** \brief The peek plate's rect in overlay coordinates, invalid while the
-   *         plate is down. Exposed for verification. */
+  /** \brief The peek plate's rect in overlay coordinates, invalid once the
+   *         plate is down and its fade-out has finished. Exposed for
+   *         verification. */
   QRect SyncPeekPlateRect() const;
 
   /** \brief The plate's close button in overlay coordinates: valid only in
@@ -287,15 +290,25 @@ public:
    *         it. Exposed for verification. */
   bool IsArrangeFrameBumped() const;
 
+  /** \brief The view-plane label, bottom-left line 1 (navigation); a click on
+   *         it opens the direction picker. Exposed for verification. */
+  QRect PlaneLabelRect() const;
+
 protected:
 
   void paintEvent(QPaintEvent* event) override;
+  /** \brief A press the furniture and the plate do not take is forwarded to
+   *         the render window, with the moves and the release that follow. */
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
 
-  /** \brief Adds render-window context-menu handling to the base's
-   *         parent-resize tracking. */
+  /** \brief Forwarded to the render window: no furniture scrolls. */
+  void wheelEvent(QWheelEvent* event) override;
+
+  /** \brief Adds render-window context-menu handling (the menu opens from a
+   *         right release without drag, never from Qt's mouse-reason request)
+   *         to the base's parent-resize tracking. */
   bool eventFilter(QObject* watched, QEvent* event) override;
 
   /** \brief Clears the hovered element when the pointer leaves the furniture. */
@@ -304,9 +317,12 @@ protected:
   /** \brief A resize in arrange mode re-resolves the layout's shared glyph box. */
   void resizeEvent(QResizeEvent* event) override;
 
-  /** \brief The plate's menu and button tooltips while the plate is in the
-   *         mask and the overlay, not the render window, gets the pointer. */
+  /** \brief Consumes mouse-reason requests: the menus open from the release
+   *         of a right click instead. */
   void contextMenuEvent(QContextMenuEvent* event) override;
+
+  /** \brief The plate button tooltips while the plate is in the mask and the
+   *         overlay, not the render window, gets the pointer. */
   bool event(QEvent* event) override;
 
 private:
@@ -345,9 +361,6 @@ private:
   /** \brief The interactive (revealed, inset) colorbar rect used for the drag,
    *         tick scale, and colormap-chip anchor. */
   QRect RibbonRect() const;
-
-  /** \brief The view-plane label, bottom-left line 1 (navigation). */
-  QRect PlaneLabelRect() const;
 
   /** \brief The `slice N/max` readout plus group dot, bottom-left line 2. */
   QRect SliceReadoutRect() const;
@@ -449,12 +462,15 @@ private:
   /**
    * \brief Paint the sync peek plate over the image. Deliberately not routed
    *        through QmitkMxNSyncBarcodeWidget::PaintInto: that renderer lays out
-   *        a uniform grid, while the plate enlarges one glyph in place. The
+   *        a uniform row, while the plate enlarges one glyph in place. The
    *        artwork stays shared through QmitkMxNRenderAxisGlyph.
    */
   void PaintSyncPeek(QPainter& painter);
 
   bool IsArranging() const;
+
+  /** \brief Drop the plate's paint geometry once nothing of it shows. */
+  void ClearPeekPaintGeometry();
 
   /** \brief The cell frame, bumped to bold for a cell sharing the pointed-at
    *         synchronization or targeted by a group drag; painted in clean view
@@ -469,10 +485,9 @@ private:
    *         selection. */
   void OpenPlateMenu(const QPoint& globalPosition);
 
-  /** \brief A context-menu request at 'position' (overlay coordinates): opens
-   *         the plate menu for a click on the plate. Returns whether the plate
-   *         took the request. */
-  bool HandlePlateContextMenu(const QPoint& position, const QPoint& globalPosition);
+  /** \brief Send a copy of the mouse or wheel 'event' (overlay coordinates)
+   *         to the render window, mapped into its coordinates. */
+  void ForwardToRenderWindow(QEvent* event);
 
   /** \brief Show the tooltip of the plate button at 'position', if any. */
   bool ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition);
@@ -520,9 +535,17 @@ private:
   void OpenNumericEntry(std::optional<QPoint> globalPosition = std::nullopt);
   void OpenColormapMenu();
 
+  /** \brief Hold the furniture revealed until the non-modal 'popup', opened
+   *         from the furniture, is destroyed (it deletes itself on close). */
+  void PinWhileOpen(QWidget* popup);
+
   /** \brief Axial/Coronal/Sagittal picker opened by clicking the plane label;
    *         sets the cell's view direction (and propagates to its group). */
   void OpenDirectionPicker(const QPoint& globalPosition);
+
+  /** \brief Add the Axial/Coronal/Sagittal entries to 'menu'; shared by the
+   *         picker and the context menu. */
+  void PopulateDirectionMenu(QMenu* menu);
 
   /** \brief World value per dragged pixel, from the drag-start window. */
   double DragScale() const;
@@ -569,6 +592,11 @@ private:
   int m_SyncPeekGlyphBox = 0;
   QmitkMxNPeekRows m_SyncPeekRows = QmitkMxNPeekRows::One;
   qreal m_PeekProgress = 0.0;
+  // The geometry the plate is painted at: the request's while it is up, kept
+  // through the fade-out after it is lowered.
+  int m_PeekPaintAxis = -1;
+  int m_PeekPaintBox = 0;
+  QmitkMxNPeekRows m_PeekPaintRows = QmitkMxNPeekRows::One;
   QPointer<QPropertyAnimation> m_PeekAnimation;
 
   bool m_ReadoutVisible = true;
@@ -595,7 +623,11 @@ private:
 
   bool m_NavigatorExpanded = false;
   int m_NavDragRow = -1;                    // index into NavigatorRows() while dragging
-  QPoint m_RightPressPosition;              // context-menu drag suppression
+  // A right press on the render window: where it started, and whether its
+  // release is still to come (the release decides whether it was a click).
+  QPoint m_RightPressPosition;
+  bool m_RightPressArmed = false;
+  bool m_ForwardingGesture = false;         // a press went to the render window, its stream follows
 
   // Arrange mode on the plate: a press that started there (and may grow into a
   // drag), the pointer's stay on the plate with its latched glyph, and a group
@@ -603,6 +635,7 @@ private:
   bool m_PlatePressActive = false;
   bool m_PlateDragArmed = false;
   QPoint m_PlatePressPosition;
+  Qt::MouseButton m_PlatePressButton = Qt::NoButton;
   bool m_PlateHovered = false;
   int m_PlateHoverAxis = -1;
   bool m_DropTarget = false;

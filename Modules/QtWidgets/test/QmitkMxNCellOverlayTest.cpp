@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestPopupProbe.h"
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNCellOverlay.h>
@@ -17,10 +18,12 @@ found in the LICENSE file.
 #include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkMxNSyncDimension.h>
 #include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowProximity.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkAnatomicalPlanes.h>
+#include <mitkException.h>
 #include <mitkImageGenerator.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
@@ -28,9 +31,14 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QApplication>
+#include <QContextMenuEvent>
 #include <QCoreApplication>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 /**
  * Headless behavior tests for the MxN cell overlay's information
@@ -52,6 +60,13 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(PaintPath_DoesNotCrash);
   MITK_TEST(GroupState_ShownOnEveryCellAfterGridGrows);
   MITK_TEST(GroupState_ShownOnEveryCellAfterAddGridRow);
+  MITK_TEST(RightClick_OnMaskedFurnitureOpensTheMenuAndReachesVtk);
+  MITK_TEST(Wheel_OverMaskedFurnitureReachesTheRenderWindow);
+  MITK_TEST(CleanView_LeavingNearFurnitureRevealsTheFrame);
+  MITK_TEST(Resize_RebuildsTheMask);
+  MITK_TEST(Destruction_UnregistersRegions);
+  MITK_TEST(Popup_FromTheFurnitureKeepsTheFrameUp);
+  MITK_TEST(Popup_ContextMenuDoesNotRevealTheFrame);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -105,6 +120,220 @@ public:
     auto* overlay = cell->findChild<QmitkMxNCellOverlay*>();
     CPPUNIT_ASSERT_MESSAGE("Every cell carries a composite overlay", nullptr != overlay);
     return overlay;
+  }
+
+  /** Records the mouse and wheel events a watched widget receives. */
+  class EventRecorder : public QObject
+  {
+  public:
+    std::vector<std::pair<QEvent::Type, Qt::MouseButton>> events;
+
+    bool Saw(QEvent::Type type, Qt::MouseButton button = Qt::NoButton) const
+    {
+      for (const auto& [seenType, seenButton] : events)
+      {
+        if (seenType == type && seenButton == button)
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+
+  protected:
+    bool eventFilter(QObject* /*watched*/, QEvent* event) override
+    {
+      switch (event->type())
+      {
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+          events.emplace_back(event->type(), static_cast<QMouseEvent*>(event)->button());
+          break;
+        case QEvent::Wheel:
+          events.emplace_back(event->type(), Qt::NoButton);
+          break;
+        default:
+          break;
+      }
+      return false;
+    }
+  };
+
+  /** Give the editor real geometry; -platform minimal makes show() work
+   *  without a display. */
+  void ShowEditor()
+  {
+    m_Editor->resize(640, 480);
+    m_Editor->show();
+    // Long enough for the first render and the value refresh it triggers, so
+    // a test sees only what its own action causes.
+    QmitkTestPopupProbe::Pump(200);
+  }
+
+  QmitkRenderWindowProximity* Proximity(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    auto* proximity = cell->findChild<QmitkRenderWindowProximity*>();
+    CPPUNIT_ASSERT(nullptr != proximity);
+    return proximity;
+  }
+
+  /** A point on the bottom furniture of cell 'index', in cell coordinates. */
+  QPoint BottomFurniturePoint(std::size_t index) const
+  {
+    const QRect area = m_Editor->GetRenderWindowWidget(CellId(index))->GetRenderWindow()->geometry();
+    return QPoint(area.center().x(), area.bottom() - 1);
+  }
+
+  /** Rest the pointer on the bottom furniture of cell 'index' so its overlay
+   *  takes input there. */
+  QmitkMxNCellOverlay* MaskOverlay(std::size_t index) const
+  {
+    this->Proximity(index)->HandlePointerMoved(this->BottomFurniturePoint(index));
+    auto* overlay = this->Overlay(index);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the overlay takes input over the furniture",
+                           !overlay->testAttribute(Qt::WA_TransparentForMouseEvents));
+    return overlay;
+  }
+
+  static void SendMouse(QWidget* target, QEvent::Type type, const QPoint& position, Qt::MouseButton button)
+  {
+    const Qt::MouseButtons buttons =
+      QEvent::MouseButtonRelease == type ? Qt::MouseButtons(Qt::NoButton) : Qt::MouseButtons(button);
+    QMouseEvent event(type, QPointF(position), QPointF(position), QPointF(target->mapToGlobal(position)), button,
+                      buttons, Qt::NoModifier);
+    QCoreApplication::sendEvent(target, &event);
+  }
+
+  void RightClick_OnMaskedFurnitureOpensTheMenuAndReachesVtk()
+  {
+    this->ShowEditor();
+    auto* overlay = this->MaskOverlay(0);
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    EventRecorder recorder;
+    renderWindow->installEventFilter(&recorder);
+
+    QmitkTestPopupProbe probe;
+    const QPoint at = this->BottomFurniturePoint(0);
+    SendMouse(overlay, QEvent::MouseButtonPress, at, Qt::RightButton);
+    SendMouse(overlay, QEvent::MouseButtonRelease, at, Qt::RightButton);
+    QmitkTestPopupProbe::Pump();
+    renderWindow->removeEventFilter(&recorder);
+
+    CPPUNIT_ASSERT_MESSAGE("The right-button gesture reaches the render window",
+                           recorder.Saw(QEvent::MouseButtonPress, Qt::RightButton)
+                             && recorder.Saw(QEvent::MouseButtonRelease, Qt::RightButton));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A right click on the furniture opens the context menu", 1, probe.Count());
+  }
+
+  void Wheel_OverMaskedFurnitureReachesTheRenderWindow()
+  {
+    this->ShowEditor();
+    auto* overlay = this->MaskOverlay(0);
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    EventRecorder recorder;
+    renderWindow->installEventFilter(&recorder);
+
+    const QPointF at(this->BottomFurniturePoint(0));
+    QWheelEvent wheel(at, QPointF(overlay->mapToGlobal(at.toPoint())), QPoint(), QPoint(0, 120), Qt::NoButton,
+                      Qt::NoModifier, Qt::NoScrollPhase, false);
+    QCoreApplication::sendEvent(overlay, &wheel);
+    renderWindow->removeEventFilter(&recorder);
+
+    CPPUNIT_ASSERT_MESSAGE("A wheel over the furniture scrolls the render window", recorder.Saw(QEvent::Wheel));
+  }
+
+  void CleanView_LeavingNearFurnitureRevealsTheFrame()
+  {
+    // The pointer rests on the furniture through the whole round trip, so no
+    // region changes state when clean view ends; the frame must still come back.
+    this->ShowEditor();
+    auto* overlay = this->MaskOverlay(0);
+    auto* utility = m_Editor->GetRenderWindowWidget(CellId(0))->GetUtilityWidget();
+
+    m_Editor->SetCleanView(true);
+    QmitkTestPopupProbe::Pump(400);
+    m_Editor->SetCleanView(false);
+    QmitkTestPopupProbe::Pump(400);
+
+    CPPUNIT_ASSERT_MESSAGE("The furniture is revealed again", overlay->RevealProgress() > 0.99);
+    CPPUNIT_ASSERT_MESSAGE("...and so is the utility strip", utility->isVisible());
+  }
+
+  void Resize_RebuildsTheMask()
+  {
+    this->ShowEditor();
+    auto* overlay = this->MaskOverlay(0);
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    const QRect before = renderWindow->geometry();
+
+    // Let the reveal animation settle: each of its frames rebuilds the mask.
+    QmitkTestPopupProbe::Pump(300);
+
+    // Wider only, so the pointer stays on the bottom furniture.
+    m_Editor->resize(900, 480);
+    QmitkTestPopupProbe::Pump(50);
+    const QRect after = renderWindow->geometry();
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the cell grew", after.right() > before.right() + 20);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the overlay still takes input",
+                           !overlay->testAttribute(Qt::WA_TransparentForMouseEvents));
+
+    // The active-cell corner squares are part of the mask.
+    CPPUNIT_ASSERT_MESSAGE("The mask follows the new geometry",
+                           overlay->mask().contains(after.bottomRight() - QPoint(2, 2)));
+  }
+
+  void Destruction_UnregistersRegions()
+  {
+    auto* proximity = this->Proximity(0);
+    // The overlay is the cell's only registrant, and ids start at 0.
+    CPPUNIT_ASSERT_NO_THROW(proximity->GetRegionState(0));
+
+    delete this->Overlay(0);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("A destroyed overlay leaves no region behind that calls into it",
+                                 proximity->GetRegionState(0), mitk::Exception);
+  }
+
+  void Popup_FromTheFurnitureKeepsTheFrameUp()
+  {
+    // A popup takes a pointer grab, and the cell reads that as the pointer
+    // leaving; the furniture it was opened from must stay up beneath it.
+    this->ShowEditor();
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    auto* overlay = this->MaskOverlay(0);
+    auto* proximity = this->Proximity(0);
+    const QRect planeLabel = overlay->PlaneLabelRect();
+    CPPUNIT_ASSERT(planeLabel.isValid());
+
+    bool pinnedWhileOpen = false;
+    QmitkTestPopupProbe probe;
+    probe.inspect = [&](QWidget*) { pinnedWhileOpen = proximity->IsPinned(); };
+    SendMouse(overlay, QEvent::MouseButtonPress, planeLabel.center(), Qt::LeftButton);
+    SendMouse(overlay, QEvent::MouseButtonRelease, planeLabel.center(), Qt::LeftButton);
+    QmitkTestPopupProbe::Pump();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The plane label opens the direction picker", 1, probe.Count());
+    CPPUNIT_ASSERT_MESSAGE("The frame is pinned while the picker is open", pinnedWhileOpen);
+    CPPUNIT_ASSERT_MESSAGE("...and released once it closes", !proximity->IsPinned());
+  }
+
+  void Popup_ContextMenuDoesNotRevealTheFrame()
+  {
+    // The context menu opens over the image, not from the furniture; pinning
+    // would pop the whole frame in under it.
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    auto* proximity = this->Proximity(0);
+    bool pinnedWhileOpen = false;
+    QmitkTestPopupProbe probe;
+    probe.inspect = [&](QWidget*) { pinnedWhileOpen = proximity->IsPinned(); };
+    QContextMenuEvent request(QContextMenuEvent::Keyboard, renderWindow->rect().center(),
+                              renderWindow->mapToGlobal(renderWindow->rect().center()));
+    QCoreApplication::sendEvent(renderWindow, &request);
+    QmitkTestPopupProbe::Pump();
+
+    CPPUNIT_ASSERT_EQUAL(1, probe.Count());
+    CPPUNIT_ASSERT_MESSAGE("The context menu leaves the frame as it was", !pinnedWhileOpen);
   }
 
   void CellIdAnnotation_IsBlank()

@@ -40,7 +40,7 @@ class QPainter;
  * it.
  *
  * The whole strip doubles as a button: it emits Clicked so the owner can open
- * the layout editor, and it hints "not synchronized" when nothing is linked.
+ * the layout editor.
  */
 class MITKQTWIDGETS_EXPORT QmitkMxNSyncBarcodeWidget : public QWidget
 {
@@ -56,7 +56,7 @@ public:
   {
     QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;  // which axis icon to draw
     QColor color;     // invalid == this cell is unsynced on the axis (a gap)
-    QString tooltip;  // per-slot hover text
+    QString tooltip;  // per-slot hover text, shown in axis-clickable mode
     QString label;    // the axis's display name, for a surface that names it in words
 
     // Heterogeneous state for the group perspective: the color is the group hue
@@ -79,78 +79,38 @@ public:
   };
 
   /**
-   * \brief What a host will allow the strip to do with the rect it grants.
-   *
-   * Wrapping trades vertical room for larger glyphs. A strip in a chrome row
-   * must stay one line whatever happens, so it forbids it; a host with room to
-   * spare would rather break the row than shrink the glyphs, so it allows it
-   * and caps their size instead - unbounded, a large host rect would render
-   * glyphs larger than anything else on screen.
-   */
-  struct BarcodeFit
-  {
-    bool allowWrap = true;  // may the row wrap into a grid
-    int maxBox = 0;         // glyph box ceiling; 0 = bounded only by the rect
-  };
-
-  /**
-   * \brief The fit a caller gets when it grants a rect and says nothing about
-   *        it: wrapping allowed, glyph size bounded only by that rect.
-   *
-   * Named rather than spelled '= {}' at each default argument below: a nested
-   * class's default member initializers are not available inside the enclosing
-   * class, so a braced default argument there is ill-formed and GCC rejects it.
-   */
-  static const BarcodeFit DefaultFit;
-
-  /**
    * \brief How the strip renders its slots for a given geometry.
    *
-   * Glyphs: self-describing axis glyphs in a grid (a single row when the strip
-   * is wide and short, wrapping to more rows when it is squarer, e.g. a cell-map
-   * tile). ColorBar: the compact positional color slots, used when even a
-   * wrapped grid cannot show legible glyphs.
+   * Glyphs: self-describing axis glyphs in one row; the strip lives in a chrome
+   * row or a group card header, where a second line would push the whole row
+   * taller. ColorBar: the compact positional color slots, used when the row
+   * cannot show legible glyphs.
    */
   struct BarcodeLayout
   {
     enum class Mode { Glyphs, ColorBar };
     Mode mode = Mode::ColorBar;
-    int columns = 0;  // glyph grid columns (Glyphs mode)
-    int rows = 0;     // glyph grid rows (Glyphs mode)
     int box = 0;      // glyph box side in px (Glyphs mode)
   };
 
   /**
    * \brief Decide the render mode purely from the granted geometry and slot
-   *        count: prefer the largest legible glyph box across all row/column
-   *        wrappings, else collapse to color slots. Static and side-effect-free
-   *        so the wrap/collapse decision is unit-testable without a realized
-   *        widget.
+   *        count: the largest legible glyph box one row allows, else the color
+   *        slots. Static and side-effect-free so the decision is unit-testable
+   *        without a realized widget.
    */
-  static BarcodeLayout ComputeLayout(int width, int height, int slotCount,
-                                     const BarcodeFit& fit = DefaultFit);
+  static BarcodeLayout ComputeLayout(int width, int height, int slotCount);
 
   /**
-   * \brief Paint the given slots into an arbitrary rect: the wrapping glyph grid
+   * \brief Paint the given slots into 'target' as the strip does: the glyph row
    *        or the collapsed color bar, chosen by ComputeLayout for that rect's
-   *        size. Static so a surface that custom-paints several barcodes renders
-   *        the identical barcode without embedding a child widget per barcode. 'gapColor' fills the unsynced
-   *        hairline; 'hovered' brightens the glyph frames to white.
+   *        size. 'gapColor' fills the unsynced hairline; 'hovered' brightens the
+   *        glyph frames to white. Static so the rendering can be checked on a
+   *        QImage at any device pixel ratio.
    */
   static void PaintInto(QPainter& painter, const QRect& target,
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,
-                        int hoveredSlot = -1, const BarcodeFit& fit = DefaultFit);
-
-  /**
-   * \brief The slot index under 'pos' when 'slotCount' slots are painted into
-   *        'target' by PaintInto, or -1. The hit-test counterpart to PaintInto,
-   *        for a surface that custom-paints the barcode into its own rect and
-   *        needs to know which axis glyph the pointer is
-   *        over. Uses the same ComputeLayout geometry as the render, so hit-test
-   *        and paint cannot drift.
-   */
-  static int SlotAtIn(const QRect& target, int slotCount, const QPoint& pos,
-                      const BarcodeFit& fit = DefaultFit);
+                        int hoveredSlot = -1);
 
   explicit QmitkMxNSyncBarcodeWidget(QWidget* parent = nullptr);
   ~QmitkMxNSyncBarcodeWidget() override;
@@ -181,13 +141,6 @@ public:
    *        either way, so a narrow host still collapses to it.
    */
   void SetPreferGlyphWidth(bool prefer);
-
-  /**
-   * \brief True when no slot is synchronized (the list is empty or every color
-   *        is invalid); the widget then paints the "not synchronized" hint
-   *        instead of a row of gaps.
-   */
-  bool IsEmptyState() const;
 
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
@@ -248,7 +201,7 @@ private:
    *         vertically and left-aligned; the surrounding padding stays inert. */
   static QRect ContentRectIn(const QRect& target, const BarcodeLayout& layout, int slotCount);
 
-  /** \brief The box rect of one glyph-grid slot within a content rect. */
+  /** \brief The box rect of one glyph slot within a content rect. */
   static QRect GlyphBoxRectIn(const QRect& contentRect, const BarcodeLayout& layout, int index);
 
   /** \brief This widget's content rect (hit-testing hover/click/tooltips). */

@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkMxNSyncDimension.h>
-#include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
 
 #include <QColor>
@@ -27,7 +26,6 @@ found in the LICENSE file.
 
 // qt
 #include <QWidget>
-#include <QHBoxLayout>
 
 namespace mitk
 {
@@ -55,10 +53,13 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 
 public:
 
+  /**
+  * \throws mitk::Exception if 'renderWindow' or 'dataStorage' is null.
+  */
   QmitkRenderWindowUtilityWidget(
-    QWidget* parent = nullptr,
-    QmitkRenderWindow* renderWindow = nullptr,
-    mitk::DataStorage* dataStorage = nullptr
+    QWidget* parent,
+    QmitkRenderWindow* renderWindow,
+    mitk::DataStorage* dataStorage
   );
 
   ~QmitkRenderWindowUtilityWidget() override;
@@ -123,9 +124,10 @@ public Q_SLOTS:
   */
   void SetSyncBarcodeSlots(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots);
 
-Q_SIGNALS:
+  /** \brief The slots the sync barcode currently shows. */
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> GetSyncBarcodeSlots() const;
 
-  void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
+Q_SIGNALS:
 
   /**
   * \brief Emitted when the user toggles clean-view mode in this cell. The
@@ -201,7 +203,6 @@ private:
   QToolButton* m_CrosshairButton;
   QToolButton* m_MaximizeButton;
   QmitkMxNSyncBarcodeWidget* m_SyncBarcode;
-  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 
 };

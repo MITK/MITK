@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindowUtilityWidget.h>
 
 #include <QFontMetrics>
+#include <QHBoxLayout>
 #include <QIcon>
 #include <QMenu>
 #include <QPaintEvent>
@@ -24,6 +25,7 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkDataStorage.h>
+#include <mitkExceptionMacro.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
@@ -34,15 +36,24 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
-  QWidget* parent/* = nullptr */,
-  QmitkRenderWindow* renderWindow/* = nullptr */,
-  mitk::DataStorage* dataStorage/* = nullptr */)
+  QWidget* parent,
+  QmitkRenderWindow* renderWindow,
+  mitk::DataStorage* dataStorage)
   : m_NodeSelectionWidget(nullptr)
   , m_DataMenu(nullptr)
   , m_CleanViewButton(nullptr)
   , m_NavigatorToggleButton(nullptr)
   , m_SyncBarcode(nullptr)
 {
+  if (nullptr == renderWindow)
+  {
+    mitkThrow() << "QmitkRenderWindowUtilityWidget: render window must not be null.";
+  }
+  if (nullptr == dataStorage)
+  {
+    mitkThrow() << "QmitkRenderWindowUtilityWidget: data storage must not be null.";
+  }
+
   this->setParent(parent);
 
   // A quiet translucent backing so the strip reads as one panel floating over
@@ -66,7 +77,6 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_NodeSelectionWidget->SetBaseRenderer(m_BaseRenderer);
   m_NodeSelectionWidget->SetDataStorage(dataStorage);
   m_NodeSelectionWidget->SetNodePredicate(noHelperObjects);
-  connect(this, &QmitkRenderWindowUtilityWidget::SetDataSelection, m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelection);
 
   // A plain tool button, not a QMenuBar entry: a menu bar collapses its
   // entries behind an extension popup once the utility row gets narrow,
@@ -158,7 +168,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_CleanViewButton->setIconSize(QSize(iconExtent, iconExtent));
   m_CleanViewButton->setCheckable(true);
   m_CleanViewButton->setToolTip(tr("Clean view: hide all viewport furniture in every render window "
-                                   "(readouts, ribbons), e.g. for screenshots (%1)")
+                                   "(readouts, colorbars, navigator and this strip), e.g. for screenshots (%1)")
                                   .arg(QmitkMxNMultiWidget::CleanViewShortcut().toString(QKeySequence::NativeText)));
   connect(m_CleanViewButton, &QToolButton::toggled, this, [this](bool checked) {
     this->UpdateCleanViewIcon();
@@ -299,4 +309,9 @@ void QmitkRenderWindowUtilityWidget::SetMaximizeChecked(bool maximized)
 void QmitkRenderWindowUtilityWidget::SetSyncBarcodeSlots(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots)
 {
   m_SyncBarcode->SetSlots(axisSlots);
+}
+
+QList<QmitkMxNSyncBarcodeWidget::AxisSlot> QmitkRenderWindowUtilityWidget::GetSyncBarcodeSlots() const
+{
+  return m_SyncBarcode->Slots();
 }

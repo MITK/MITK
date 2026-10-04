@@ -94,8 +94,10 @@ QmitkRenderWindowProximity::RegionId QmitkRenderWindowProximity::RegisterRegion(
   region.collapseTimer->setInterval(CollapseDelayMs);
   connect(region.collapseTimer, &QTimer::timeout, this, [this, id]() { this->OnCollapseTimeout(id); });
 
-  auto [it, inserted] = m_Regions.emplace(id, std::move(region));
-  this->EvaluateRegion(id, it->second);
+  // Applied silently: the caller cannot have connected to an id it has not
+  // received yet, so it reads the initial state with GetRegionState.
+  region.state = this->ComputeState(region);
+  m_Regions.emplace(id, std::move(region));
 
   return id;
 }
@@ -222,6 +224,9 @@ bool QmitkRenderWindowProximity::eventFilter(QObject* watched, QEvent* event)
 
     case QEvent::MouseMove:
     case QEvent::Enter:
+    // A release ends the withholding of a held button, even where the pointer
+    // then rests without moving; buttons() no longer holds the released one.
+    case QEvent::MouseButtonRelease:
     {
       const auto* pointerEvent = static_cast<QSinglePointEvent*>(event);
       const auto globalPosition = pointerEvent->globalPosition().toPoint();

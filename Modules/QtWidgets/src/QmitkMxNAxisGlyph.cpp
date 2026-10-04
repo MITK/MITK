@@ -155,13 +155,16 @@ namespace
   }
 }
 
-QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx)
+QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx,
+                                qreal devicePixelRatio)
 {
-  // The recolor drops alpha, so the RGB alone identifies the artwork.
-  const QString key = QStringLiteral("QmitkMxNAxisGlyph/%1/%2/%3")
+  // The recolor drops alpha, so the RGB alone identifies the artwork. The ratio
+  // is part of the key: setting it on a shared copy would detach it per paint.
+  const QString key = QStringLiteral("QmitkMxNAxisGlyph/%1/%2/%3/%4")
                         .arg(static_cast<int>(glyph))
                         .arg(color.name(QColor::HexRgb))
-                        .arg(sizePx);
+                        .arg(sizePx)
+                        .arg(devicePixelRatio);
   QPixmap cached;
   if (QPixmapCache::find(key, &cached))
   {
@@ -174,7 +177,8 @@ QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, in
     return QPixmap();
   }
 
-  const QPixmap pixmap = QPixmap::fromImage(image);
+  QPixmap pixmap = QPixmap::fromImage(image);
+  pixmap.setDevicePixelRatio(devicePixelRatio);
   QPixmapCache::insert(key, pixmap);
   return pixmap;
 }

@@ -133,7 +133,12 @@ void QmitkRenderWindowWidget::SetUtilityWidgetAutoHide(bool autoHide)
   }
   else
   {
-    // Back to a docked row: the fade must not leave it dimmed in the layout.
+    // Back to a docked row: the fade must not leave it dimmed in the layout,
+    // nor a collapse in flight hide it once it finishes.
+    if (nullptr != m_UtilityWidgetReveal)
+    {
+      m_UtilityWidgetReveal->stop();
+    }
     if (nullptr != m_UtilityWidgetOpacity)
     {
       m_UtilityWidgetOpacity->setOpacity(1.0);
@@ -187,7 +192,9 @@ void QmitkRenderWindowWidget::UpdateUtilityWidgetGeometry()
 {
   if (nullptr != m_UtilityWidget && m_UtilityWidgetAutoHide)
   {
-    m_UtilityWidget->setGeometry(0, 0, this->width(), m_UtilityWidget->sizeHint().height());
+    // Inside the frame, so the group-hue border is not dimmed under the strip.
+    const QRect area = this->contentsRect();
+    m_UtilityWidget->setGeometry(area.left(), area.top(), area.width(), m_UtilityWidget->sizeHint().height());
   }
 }
 

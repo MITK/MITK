@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestPopupProbe.h"
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNCellOverlay.h>
@@ -40,6 +41,7 @@ found in the LICENSE file.
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QSpinBox>
 #include <QTableView>
 #include <QTimer>
@@ -70,9 +72,11 @@ class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
   MITK_TEST(DataPopupScope_FollowsSelectionGroup);
   MITK_TEST(DataPopupTable_KeyboardTogglesVisibility);
   MITK_TEST(ContextMenu_OpensFromKeyboard);
+  MITK_TEST(ContextMenu_PressTriggerOrderOpensOnlyOnRelease);
+  MITK_TEST(ContextMenu_ReleaseTriggerOrderOpensOnce);
+  MITK_TEST(ContextMenu_RightDragOpensNothing);
   MITK_TEST(CoordinateEntry_KeepsBothUnitsInStep);
-  MITK_TEST(SyncBarcode_LayoutWrapsToGeometry);
-  MITK_TEST(SyncBarcode_SlotAtInHitTest);
+  MITK_TEST(SyncBarcode_LayoutFollowsGeometry);
   MITK_TEST(LayoutEditorRequest_BarcodeTogglesContextMenuShows);
   MITK_TEST(AxisGlyphResources_PresentAndThemeable);
   CPPUNIT_TEST_SUITE_END();
@@ -399,25 +403,21 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A window with its own selection is unaffected", m_ImageNode->IsVisible(Renderer(2)));
   }
 
-  void SyncBarcode_LayoutWrapsToGeometry()
+  void SyncBarcode_LayoutFollowsGeometry()
   {
     using Layout = QmitkMxNSyncBarcodeWidget::BarcodeLayout;
     // 'slotCount', not 'slots': the latter is the Qt macro and expands to nothing.
     const int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
 
-    // A wide, short strip (the per-cell utility row) draws a single glyph row.
+    // A wide, short strip (the per-cell utility row) draws a glyph row.
     const auto strip = QmitkMxNSyncBarcodeWidget::ComputeLayout(200, 18, slotCount);
     CPPUNIT_ASSERT_MESSAGE("wide short strip shows glyphs", strip.mode == Layout::Mode::Glyphs);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("wide short strip stays a single row", 1, strip.rows);
 
-    // A squarer host rect wraps the glyphs into a grid rather than
-    // collapsing to color slots.
-    const auto tile = QmitkMxNSyncBarcodeWidget::ComputeLayout(80, 80, slotCount);
-    CPPUNIT_ASSERT_MESSAGE("square tile shows glyphs", tile.mode == Layout::Mode::Glyphs);
-    CPPUNIT_ASSERT_MESSAGE("square tile wraps to more than one row", tile.rows > 1);
-    CPPUNIT_ASSERT_MESSAGE("the grid holds every slot", tile.columns * tile.rows >= slotCount);
+    // A narrow rect never wraps, however tall: one row has no legible box.
+    const auto narrow = QmitkMxNSyncBarcodeWidget::ComputeLayout(80, 80, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("a narrow rect collapses to the color bar", narrow.mode == Layout::Mode::ColorBar);
 
-    // Too small for a legible glyph even when wrapped: collapse to color slots.
+    // Too small for a legible glyph: collapse to color slots.
     const auto tiny = QmitkMxNSyncBarcodeWidget::ComputeLayout(40, 14, slotCount);
     CPPUNIT_ASSERT_MESSAGE("a cramped strip collapses to the color bar",
                            tiny.mode == Layout::Mode::ColorBar);
@@ -489,6 +489,76 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The clean-view entry advertises its key",
       QmitkMxNMultiWidget::CleanViewShortcut().toString().toStdString(), cleanViewShortcut.toStdString());
+  }
+
+  /** Deliver 'event' to cell 0's overlay as the render window's own stream
+   *  does. Returns whether the overlay kept it from the render window. */
+  bool FilterRenderWindowEvent(QEvent* event) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    return static_cast<QObject*>(this->Overlay(0))->eventFilter(renderWindow, event);
+  }
+
+  bool SendRightButton(QEvent::Type type, const QPoint& local) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    const Qt::MouseButton button = QEvent::MouseMove == type ? Qt::NoButton : Qt::RightButton;
+    const Qt::MouseButtons buttons = QEvent::MouseButtonRelease == type ? Qt::MouseButtons(Qt::NoButton)
+                                                                        : Qt::MouseButtons(Qt::RightButton);
+    QMouseEvent event(type, QPointF(local), QPointF(local), QPointF(renderWindow->mapToGlobal(local)), button,
+                      buttons, Qt::NoModifier);
+    return this->FilterRenderWindowEvent(&event);
+  }
+
+  bool SendMouseContextMenu(const QPoint& local) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    QContextMenuEvent request(QContextMenuEvent::Mouse, local, renderWindow->mapToGlobal(local));
+    return this->FilterRenderWindowEvent(&request);
+  }
+
+  void ContextMenu_PressTriggerOrderOpensOnlyOnRelease()
+  {
+    // Where the platform synthesizes the context-menu request on the press
+    // (UNIX), it arrives before the press could have become a drag. Opening
+    // there would swallow every right-button gesture.
+    const QPoint at(20, 20);
+    QmitkTestPopupProbe probe;
+    this->SendRightButton(QEvent::MouseButtonPress, at);
+    CPPUNIT_ASSERT_MESSAGE("A mouse context-menu request is always consumed", this->SendMouseContextMenu(at));
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("No menu opens on the press", 0, probe.Count());
+
+    CPPUNIT_ASSERT_MESSAGE("The release still reaches the render window",
+                           !this->SendRightButton(QEvent::MouseButtonRelease, at));
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The click opens the menu on its release", 1, probe.Count());
+  }
+
+  void ContextMenu_ReleaseTriggerOrderOpensOnce()
+  {
+    // Windows synthesizes the request after the release.
+    const QPoint at(20, 20);
+    QmitkTestPopupProbe probe;
+    this->SendRightButton(QEvent::MouseButtonPress, at);
+    this->SendRightButton(QEvent::MouseButtonRelease, at);
+    this->SendMouseContextMenu(at);
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A right click opens exactly one menu", 1, probe.Count());
+  }
+
+  void ContextMenu_RightDragOpensNothing()
+  {
+    const QPoint from(20, 20);
+    const QPoint to = from + QPoint(4 * QApplication::startDragDistance(), 0);
+    QmitkTestPopupProbe probe;
+    this->SendRightButton(QEvent::MouseButtonPress, from);
+    this->SendMouseContextMenu(from);
+    this->SendRightButton(QEvent::MouseMove, to);
+    this->SendRightButton(QEvent::MouseButtonRelease, to);
+    this->SendMouseContextMenu(to);
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A right drag is a gesture, not a menu request", 0, probe.Count());
   }
 
   void CoordinateEntry_KeepsBothUnitsInStep()
@@ -577,49 +647,6 @@ public:
       clickedEdit->text().toStdString(), clickedEdit->selectedText().toStdString());
 
     popup->close();
-  }
-
-  void SyncBarcode_SlotAtInHitTest()
-  {
-    // The static hit-test lets a surface that custom-paints the barcode (the
-    // cell map's tiles) learn which axis glyph the pointer is over. Sweep it
-    // left to right at the vertical center and assert the glyphs map to slot
-    // indices that increase and cover the whole set, without hardcoding the
-    // private box/gap geometry.
-    static constexpr int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
-
-    const auto sweep = [](const QRect& target)
-    {
-      int maxSlot = -1;
-      int prev = -1;
-      bool sawZero = false;
-      const int y = target.center().y();
-      for (int x = target.left(); x <= target.right(); ++x)
-      {
-        const int slot = QmitkMxNSyncBarcodeWidget::SlotAtIn(target, slotCount, QPoint(x, y));
-        if (slot < 0)
-        {
-          continue;
-        }
-        CPPUNIT_ASSERT_MESSAGE("a hit slot is always in range", slot < slotCount);
-        CPPUNIT_ASSERT_MESSAGE("glyph slots increase left to right", slot >= prev);
-        prev = slot;
-        maxSlot = std::max(maxSlot, slot);
-        sawZero = sawZero || slot == 0;
-      }
-      CPPUNIT_ASSERT_MESSAGE("the first slot is reachable", sawZero);
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("every slot up to the last is reachable", slotCount - 1, maxSlot);
-    };
-
-    sweep(QRect(0, 0, 200, 18));  // wide short strip: glyphs in one row
-    sweep(QRect(0, 0, 80, 14));   // too small for glyphs: the color-slot collapse
-
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("a point off the strip hits no slot", -1,
-                                 QmitkMxNSyncBarcodeWidget::SlotAtIn(QRect(0, 0, 200, 18), slotCount,
-                                                                     QPoint(100, -20)));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("a degenerate slot count hits no slot", -1,
-                                 QmitkMxNSyncBarcodeWidget::SlotAtIn(QRect(0, 0, 200, 18), 0,
-                                                                     QPoint(10, 9)));
   }
 
   void AxisGlyphResources_PresentAndThemeable()

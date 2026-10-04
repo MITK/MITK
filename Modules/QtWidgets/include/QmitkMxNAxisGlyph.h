@@ -48,14 +48,15 @@ enum class QmitkMxNAxisGlyph
 
 /**
  * \brief Render an axis glyph, recolored to 'color', as a 'sizePx' square
- *        pixmap.
+ *        pixmap (device pixels) carrying 'devicePixelRatio'.
  *
  * The glyphs are embedded SVG resources whose placeholder color (`#00ff00`,
  * the same convention QmitkIconTheme uses) is swapped for 'color' at load,
  * so a glyph can take any foreground (a group hue, a grayed decoupled state)
  * and stay crisp at any size. Returns a null pixmap if the resource is missing.
  */
-MITKQTWIDGETS_EXPORT QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx);
+MITKQTWIDGETS_EXPORT QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx,
+                                                     qreal devicePixelRatio = 1.0);
 
 /**
  * \brief Render an axis glyph as a sticker: the glyph in 'color' at 'sizePx'

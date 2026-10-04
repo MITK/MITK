@@ -223,12 +223,10 @@
 	windows are arranged (see \ref org_mitk_views_mxnlayouteditor_Arrange).
 
 	Any axis answers, including one the window you are pointing from does not
-	synchronize: that is a legitimate question about the other windows. Two limits are
-	worth knowing. A window that synchronizes nothing shows the "not synchronized"
-	hint instead of glyphs, so it offers no axis to point at - reach the peek from
-	another window's barcode instead. And a window too small to hold a legible plate
-	shows none, rather than shrinking the plates in every other window down to its
-	size and making them harder to read against each other.
+	synchronize: that is a legitimate question about the other windows. One limit is
+	worth knowing: a window too small to hold a legible plate shows none, rather than
+	shrinking the plates in every other window down to its size and making them harder
+	to read against each other.
 
 	A barcode squeezed too narrow for glyphs collapses to plain colour slots. Pointing
 	at it still brings the plates up - the answer is about the whole window, not only

@@ -65,6 +65,7 @@ found in the LICENSE file.
 #include <QStyle>
 #include <QTimer>
 #include <QToolTip>
+#include <QWheelEvent>
 
 #include <array>
 #include <algorithm>
@@ -284,6 +285,36 @@ namespace
     painter.drawLine(center, center + QPointF(0, -ring.height() * 0.30));
     painter.drawLine(center, center + QPointF(ring.width() * 0.24, 0));
   }
+
+  /** Holds the cell's furniture revealed while a modal popup opened from it
+   *  runs: the popup's grab reads to the cell as the pointer leaving. */
+  class ScopedProximityPin
+  {
+  public:
+    explicit ScopedProximityPin(QmitkRenderWindowProximity* proximity)
+      : m_Proximity(proximity)
+    {
+      if (!m_Proximity.isNull())
+      {
+        m_Proximity->SetPinned(true);
+      }
+    }
+
+    ~ScopedProximityPin()
+    {
+      // The popup's event loop can destroy the cell, and the controller with it.
+      if (!m_Proximity.isNull())
+      {
+        m_Proximity->SetPinned(false);
+      }
+    }
+
+    ScopedProximityPin(const ScopedProximityPin&) = delete;
+    ScopedProximityPin& operator=(const ScopedProximityPin&) = delete;
+
+  private:
+    QPointer<QmitkRenderWindowProximity> m_Proximity;
+  };
 }
 
 QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
@@ -405,6 +436,15 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
   callback->SetCallback(&QmitkMxNCellOverlay::OnVtkRenderEnd);
   m_VtkObserverTag = m_VtkRenderWindow->AddObserver(vtkCommand::EndEvent, callback);
 
+  // The controller applies a region's initial state without emitting it.
+  m_RibbonState = proximity->GetRegionState(m_RibbonRegion);
+  m_WindowLevelState = proximity->GetRegionState(m_WindowLevelRegion);
+  m_PlaneLabelState = proximity->GetRegionState(m_PlaneLabelRegion);
+  m_BottomState = proximity->GetRegionState(m_BottomRegion);
+  m_TopState = proximity->GetRegionState(m_TopRegion);
+  this->UpdateReveal();
+  this->UpdateInteractivity();
+
   this->ScheduleValueRefresh();
 }
 
@@ -413,6 +453,19 @@ QmitkMxNCellOverlay::~QmitkMxNCellOverlay()
   if (nullptr != m_VtkRenderWindow)
   {
     m_VtkRenderWindow->RemoveObserver(m_VtkObserverTag);
+  }
+
+  // The region callbacks capture this overlay; a controller that outlives it
+  // must not call them again.
+  if (!m_Proximity.isNull())
+  {
+    for (const auto region : { m_RibbonRegion, m_WindowLevelRegion, m_PlaneLabelRegion, m_BottomRegion, m_TopRegion })
+    {
+      if (region >= 0)
+      {
+        m_Proximity->UnregisterRegion(region);
+      }
+    }
   }
 }
 
@@ -436,6 +489,9 @@ void QmitkMxNCellOverlay::SetCleanView(bool cleanView)
   }
 
   m_CleanView = cleanView;
+  // The proximity may already have settled while clean view still held the
+  // frame down, and then emits nothing more for the pointer resting where it is.
+  this->UpdateReveal();
   this->UpdateInteractivity();
   this->update();
 }
@@ -749,6 +805,18 @@ void QmitkMxNCellOverlay::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAx
   m_SyncPeekVisible = up;
   m_SyncPeekAxis = slot;
   m_SyncPeekGlyphBox = box;
+  // A lowered plate fades out where it stood, so the geometry it is painted at
+  // outlives the request until the fade has finished.
+  if (up)
+  {
+    m_PeekPaintAxis = slot;
+    m_PeekPaintBox = box;
+    m_PeekPaintRows = rows;
+  }
+  else if (m_PeekProgress <= 0.0)
+  {
+    this->ClearPeekPaintGeometry();
+  }
   this->UpdateInteractivity();
 
   // Changing which axis is emphasised while the peek is up only repaints: the
@@ -809,6 +877,10 @@ void QmitkMxNCellOverlay::SetPeekProgress(qreal progress)
   }
   const bool wasPainting = m_PeekProgress > 0.0;
   m_PeekProgress = progress;
+  if (m_PeekProgress <= 0.0 && !m_SyncPeekVisible)
+  {
+    this->ClearPeekPaintGeometry();
+  }
   if (wasPainting != (m_PeekProgress > 0.0))
   {
     // The mask doubles as the paint clip, so it has to gain and lose the plate
@@ -816,6 +888,12 @@ void QmitkMxNCellOverlay::SetPeekProgress(qreal progress)
     this->UpdateInteractivity();
   }
   this->update();
+}
+
+void QmitkMxNCellOverlay::ClearPeekPaintGeometry()
+{
+  m_PeekPaintAxis = -1;
+  m_PeekPaintBox = 0;
 }
 
 QString QmitkMxNCellOverlay::PlaneLabel() const
@@ -1607,7 +1685,7 @@ QRect QmitkMxNCellOverlay::SyncPeekPlateRect() const
   }
   const QRect area = this->RenderWindowRect();
   const PeekPlateLayout layout = ComputePeekPlate(
-    area.size(), m_SyncPeekGlyphBox, m_SyncPeekAxis, PeekTextLineHeight(this->font()), m_SyncPeekRows);
+    area.size(), m_PeekPaintBox, m_PeekPaintAxis, PeekTextLineHeight(this->font()), m_PeekPaintRows);
   return layout.plate.isValid() ? layout.plate.translated(area.topLeft()) : QRect();
 }
 
@@ -1620,15 +1698,21 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
 
   const QRect area = this->RenderWindowRect();
   const PeekPlateLayout layout = ComputePeekPlate(
-    area.size(), m_SyncPeekGlyphBox, m_SyncPeekAxis, PeekTextLineHeight(this->font()), m_SyncPeekRows);
+    area.size(), m_PeekPaintBox, m_PeekPaintAxis, PeekTextLineHeight(this->font()), m_PeekPaintRows);
   if (!layout.plate.isValid())
   {
     return;
   }
 
-  // Each window answers for itself: no partner set is computed anywhere, so an
-  // axis reads on the plate exactly as it reads in this cell's own strip.
-  const auto axisSlots = m_Editor->BuildBarcodeSlots(m_Cell->GetWidgetName());
+  // Each window answers for itself: no partner set is computed anywhere, and the
+  // plate reads the slots this cell's own strip was given, so an axis reads on
+  // the plate exactly as it reads in the strip.
+  const auto* utilityWidget = m_Cell->GetUtilityWidget();
+  if (nullptr == utilityWidget)
+  {
+    return;
+  }
+  const auto axisSlots = utilityWidget->GetSyncBarcodeSlots();
   if (axisSlots.size() != PeekAxisCount)
   {
     return;
@@ -1670,7 +1754,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     const QColor color = synced ? axisSlot.color : PeekAbsentGlyph;
     const int sizePx = qRound(box.width() * dpr);
     painter.setOpacity(m_PeekProgress * weight);
-    if (axis == m_SyncPeekAxis)
+    if (axis == m_PeekPaintAxis)
     {
       const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(axisSlot.glyph, color, sizePx, dpr);
       if (!sticker.isNull())
@@ -1681,17 +1765,16 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
       }
       return;
     }
-    QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, color, sizePx);
+    const QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, color, sizePx, dpr);
     if (glyph.isNull())
     {
       return;
     }
-    glyph.setDevicePixelRatio(dpr);
     painter.drawPixmap(box.topLeft(), glyph);
   };
   for (int axis = 0; axis < PeekAxisCount; ++axis)
   {
-    if (axis != m_SyncPeekAxis)
+    if (axis != m_PeekPaintAxis)
     {
       paintGlyph(axis);
     }
@@ -1706,7 +1789,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   // The caption names the emphasised axis. Reaching the strip between two glyphs
   // emphasises none; the line stays reserved but empty so the plate never
   // resizes under the pointer.
-  if (m_SyncPeekAxis >= 0)
+  if (m_PeekPaintAxis >= 0)
   {
     // In arrange mode the caption stays clear of the button corner,
     // symmetrically so it remains centred over the row.
@@ -1715,7 +1798,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
       : 0;
     const QRect caption = layout.caption.adjusted(reserve, 0, -reserve, 0);
     painter.drawText(caption, Qt::AlignHCenter | Qt::AlignVCenter,
-                     metrics.elidedText(axisSlots[m_SyncPeekAxis].label, Qt::ElideRight,
+                     metrics.elidedText(axisSlots[m_PeekPaintAxis].label, Qt::ElideRight,
                                         caption.width()));
   }
 
@@ -1772,7 +1855,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     {
       return;
     }
-    const bool pumped = axis == m_SyncPeekAxis;
+    const bool pumped = axis == m_PeekPaintAxis;
     const QFont& font = pumped ? pumpedValueFont : valueFont;
     const QFontMetrics valueMetrics(font);
     const QRect glyphRect = layout.glyphs[axis];
@@ -1798,20 +1881,19 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   };
   for (int axis = 0; axis < PeekAxisCount; ++axis)
   {
-    if (axis != m_SyncPeekAxis)
+    if (axis != m_PeekPaintAxis)
     {
       paintValue(axis);
     }
   }
-  if (m_SyncPeekAxis >= 0)
+  if (m_PeekPaintAxis >= 0)
   {
-    paintGlyph(m_SyncPeekAxis);
+    paintGlyph(m_PeekPaintAxis);
     painter.setOpacity(m_PeekProgress);
-    paintValue(m_SyncPeekAxis);
+    paintValue(m_PeekPaintAxis);
   }
   painter.setOpacity(m_PeekProgress);
   painter.setFont(valueFont);
-  painter.setPen(ActiveText);
   painter.setPen(IdleText);
   painter.drawText(layout.name, Qt::AlignHCenter | Qt::AlignVCenter,
                    metrics.elidedText(m_Editor->CellLabel(m_Cell->GetWidgetName()), Qt::ElideRight,
@@ -1899,7 +1981,12 @@ void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
     }
   }
 
-  event->ignore();
+  // The mask covers passive furniture too (hairline, corners, top strip); a
+  // press there is meant for the image underneath, and so are the moves and
+  // the release that follow it.
+  m_ForwardingGesture = true;
+  this->ForwardToRenderWindow(event);
+  event->accept();
 }
 
 QmitkMxNCellOverlay::HoverTarget QmitkMxNCellOverlay::HoverAt(const QPoint& pos) const
@@ -1944,6 +2031,13 @@ void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
 {
   if (this->HandlePlateInput(QEvent::MouseMove, event, event->pos()))
   {
+    event->accept();
+    return;
+  }
+
+  if (m_ForwardingGesture)
+  {
+    this->ForwardToRenderWindow(event);
     event->accept();
     return;
   }
@@ -2086,7 +2180,60 @@ void QmitkMxNCellOverlay::mouseReleaseEvent(QMouseEvent* event)
     return;
   }
 
+  if (m_ForwardingGesture)
+  {
+    m_ForwardingGesture = Qt::NoButton != event->buttons();
+    this->ForwardToRenderWindow(event);
+    event->accept();
+    return;
+  }
+
   event->ignore();
+}
+
+void QmitkMxNCellOverlay::wheelEvent(QWheelEvent* event)
+{
+  // No furniture scrolls; the wheel belongs to the image under it.
+  this->ForwardToRenderWindow(event);
+  event->accept();
+}
+
+void QmitkMxNCellOverlay::ForwardToRenderWindow(QEvent* event)
+{
+  auto* renderWindow = m_Cell->GetRenderWindow();
+  if (nullptr == renderWindow)
+  {
+    return;
+  }
+  const QPointF offset(this->RenderWindowRect().topLeft());
+
+  switch (event->type())
+  {
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::MouseMove:
+    case QEvent::MouseButtonRelease:
+    {
+      const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+      QMouseEvent forwarded(mouseEvent->type(), mouseEvent->position() - offset, mouseEvent->scenePosition(),
+                            mouseEvent->globalPosition(), mouseEvent->button(), mouseEvent->buttons(),
+                            mouseEvent->modifiers(), mouseEvent->pointingDevice());
+      QCoreApplication::sendEvent(renderWindow, &forwarded);
+      break;
+    }
+    case QEvent::Wheel:
+    {
+      const auto* wheelEvent = static_cast<const QWheelEvent*>(event);
+      QWheelEvent forwarded(wheelEvent->position() - offset, wheelEvent->globalPosition(), wheelEvent->pixelDelta(),
+                            wheelEvent->angleDelta(), wheelEvent->buttons(), wheelEvent->modifiers(),
+                            wheelEvent->phase(), wheelEvent->inverted(), Qt::MouseEventNotSynthesized,
+                            wheelEvent->pointingDevice());
+      QCoreApplication::sendEvent(renderWindow, &forwarded);
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 namespace
@@ -2189,6 +2336,7 @@ void QmitkMxNCellOverlay::OpenNumericEntry(std::optional<QPoint> globalPosition)
     const QRect readout = this->WindowLevelRect();
     popup->move(this->mapToGlobal(QPoint(readout.left(), readout.top() - popup->sizeHint().height() - 4)));
     popup->show();
+    this->PinWhileOpen(popup);
   }
   levelBox->setFocus();
   levelBox->selectAll();
@@ -2316,9 +2464,22 @@ void QmitkMxNCellOverlay::OpenCoordinateEntry(std::optional<QPoint> globalPositi
     const QRect coord = this->CoordinateLineRect();
     popup->move(this->mapToGlobal(QPoint(coord.left(), coord.top() - popup->sizeHint().height() - 4)));
     popup->show();
+    this->PinWhileOpen(popup);
   }
   worldBoxes[0]->setFocus();
   worldBoxes[0]->selectAll();
+}
+
+void QmitkMxNCellOverlay::PinWhileOpen(QWidget* popup)
+{
+  if (m_Proximity.isNull())
+  {
+    return;
+  }
+  m_Proximity->SetPinned(true);
+  // The controller is the receiver, so the unpin is dropped if it dies first.
+  connect(popup, &QObject::destroyed, m_Proximity.data(),
+          [proximity = m_Proximity.data()]() { proximity->SetPinned(false); });
 }
 
 void QmitkMxNCellOverlay::OpenColormapMenu()
@@ -2341,6 +2502,7 @@ void QmitkMxNCellOverlay::OpenColormapMenu()
   }
 
   const QPointer<QmitkMxNCellOverlay> self(this);
+  const ScopedProximityPin pin(m_Proximity);
   auto* chosen = menu.exec(this->mapToGlobal(this->ColormapChipRect().bottomLeft()));
   if (nullptr == chosen || self.isNull())
   {
@@ -2360,11 +2522,9 @@ void QmitkMxNCellOverlay::OpenColormapMenu()
   }
 }
 
-void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
+void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
 {
   const auto windowId = m_Cell->GetWidgetName();
-
-  QMenu menu;  // No parent, see OpenColormapMenu.
   const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {
     { "Axial", mitk::AnatomicalPlane::Axial },
     { "Coronal", mitk::AnatomicalPlane::Coronal },
@@ -2372,7 +2532,7 @@ void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
   };
   for (const auto& [label, plane] : planes)
   {
-    auto* action = menu.addAction(tr(label));
+    auto* action = menu->addAction(tr(label));
     const auto planeValue = plane;
     connect(action, &QAction::triggered, this, [this, windowId, planeValue]()
     {
@@ -2386,6 +2546,13 @@ void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
       }
     });
   }
+}
+
+void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
+{
+  QMenu menu;  // No parent, see OpenColormapMenu.
+  this->PopulateDirectionMenu(&menu);
+  const ScopedProximityPin pin(m_Proximity);
   menu.exec(globalPosition);
 }
 
@@ -2613,15 +2780,6 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
       case QEvent::Leave:
         this->ClearPlateHover();
         break;
-      case QEvent::ContextMenu:
-      {
-        auto* contextEvent = static_cast<QContextMenuEvent*>(event);
-        if (this->HandlePlateContextMenu(contextEvent->pos() + offset, contextEvent->globalPos()))
-        {
-          return true;
-        }
-        break;
-      }
       case QEvent::ToolTip:
       {
         auto* helpEvent = static_cast<QHelpEvent*>(event);
@@ -2638,29 +2796,62 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
 
   if (watched == m_Cell->GetRenderWindow())
   {
-    if (event->type() == QEvent::MouseButtonPress
-        && static_cast<QMouseEvent*>(event)->button() == Qt::RightButton)
+    // The right button doubles as the zoom / windowing gesture, so only a
+    // click without drag is a context-menu request, and that is known only at
+    // the release. Qt's own request cannot tell: on UNIX it arrives with the
+    // press (QStyleHints::contextMenuTrigger) and would swallow every gesture.
+    // So every mouse-reason request is consumed and the menu opens from the
+    // release instead, deferred so that VTK still sees the release. The menu
+    // stays available in clean view: it is transient (right-click only, not
+    // passive furniture) and it is the way back - it carries the clean-view
+    // toggle, which is otherwise unreachable once the utility strip hides.
+    switch (event->type())
     {
-      m_RightPressPosition = static_cast<QMouseEvent*>(event)->pos();
-    }
-    else if (event->type() == QEvent::ContextMenu)
-    {
-      // The right button doubles as the zoom / windowing gesture; only a
-      // click without drag is a context-menu request. Consuming the event in
-      // both cases keeps a gesture's release from popping the menu. The menu
-      // stays available in clean-view: it is transient (right-click only, not
-      // passive furniture) and it is the way back - it carries the clean-view
-      // toggle, which is otherwise unreachable once the utility strip hides.
-      // A keyboard request (Menu key, Shift+F10) has no press to compare against;
-      // Qt only delivers it to the focused render window, so it is deliberate.
-      auto* contextEvent = static_cast<QContextMenuEvent*>(event);
-      if (QContextMenuEvent::Keyboard == contextEvent->reason()
-          || (contextEvent->pos() - m_RightPressPosition).manhattanLength()
-               < QApplication::startDragDistance())
+      case QEvent::Resize:
+      case QEvent::Move:
+        // The mask is built from the render window's rect, which can change
+        // without the cell resizing (a docked utility row shown or hidden).
+        this->UpdateInteractivity();
+        this->update();
+        break;
+      case QEvent::MouseButtonPress:
       {
-        this->OpenContextMenu(contextEvent->globalPos());
+        const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+        if (Qt::RightButton == mouseEvent->button())
+        {
+          m_RightPressPosition = mouseEvent->position().toPoint();
+          m_RightPressArmed = true;
+        }
+        break;
       }
-      return true;
+      case QEvent::MouseButtonRelease:
+      {
+        const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+        if (Qt::RightButton == mouseEvent->button() && m_RightPressArmed)
+        {
+          m_RightPressArmed = false;
+          if ((mouseEvent->position().toPoint() - m_RightPressPosition).manhattanLength()
+              < QApplication::startDragDistance())
+          {
+            const QPoint globalPosition = mouseEvent->globalPosition().toPoint();
+            QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenContextMenu(globalPosition); });
+          }
+        }
+        break;
+      }
+      case QEvent::ContextMenu:
+      {
+        // A keyboard request (Menu key, Shift+F10) has no press to wait for;
+        // Qt only delivers it to the focused render window, so it is deliberate.
+        const auto* contextEvent = static_cast<const QContextMenuEvent*>(event);
+        if (QContextMenuEvent::Keyboard == contextEvent->reason())
+        {
+          this->OpenContextMenu(contextEvent->globalPos());
+        }
+        return true;
+      }
+      default:
+        break;
     }
   }
 
@@ -2704,10 +2895,7 @@ bool QmitkMxNCellOverlay::HandlePlateInput(QEvent::Type type, QMouseEvent* event
       }
       m_PlatePressActive = true;
       m_PlatePressPosition = position;
-      if (Qt::RightButton == event->button())
-      {
-        m_RightPressPosition = position - this->RenderWindowRect().topLeft();
-      }
+      m_PlatePressButton = event->button();
       m_PlateDragArmed = arrangeMode->PressCell(m_Cell->GetWidgetName(), event->button(), event->modifiers());
       return true;
     }
@@ -2743,9 +2931,20 @@ bool QmitkMxNCellOverlay::HandlePlateInput(QEvent::Type type, QMouseEvent* event
       {
         return false;
       }
+      // A right click on a plate is about the arrangement, so it opens the
+      // plate's menu rather than the cell's, from the release for the reason
+      // given in eventFilter. A right drag has already become the ask-mode
+      // drag and leaves nothing to open.
+      const bool rightClick = Qt::RightButton == m_PlatePressButton && Qt::RightButton == event->button()
+        && (position - m_PlatePressPosition).manhattanLength() < QApplication::startDragDistance();
       m_PlatePressActive = false;
       m_PlateDragArmed = false;
       arrangeMode->ReleaseCell(false);
+      if (rightClick)
+      {
+        const QPoint globalPosition = this->mapToGlobal(position);
+        QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenPlateMenu(globalPosition); });
+      }
       return true;
     }
     default:
@@ -2757,15 +2956,15 @@ int QmitkMxNCellOverlay::PlateGlyphAt(const QPoint& position) const
 {
   const QRect area = this->RenderWindowRect();
   const PeekPlateLayout layout = ComputePeekPlate(
-    area.size(), m_SyncPeekGlyphBox, m_SyncPeekAxis, PeekTextLineHeight(this->font()), m_SyncPeekRows);
+    area.size(), m_PeekPaintBox, m_PeekPaintAxis, PeekTextLineHeight(this->font()), m_PeekPaintRows);
   if (!layout.plate.isValid())
   {
     return -1;
   }
   const QPoint local = position - area.topLeft();
-  if (m_SyncPeekAxis >= 0 && layout.glyphs[m_SyncPeekAxis].contains(local))
+  if (m_PeekPaintAxis >= 0 && layout.glyphs[m_PeekPaintAxis].contains(local))
   {
-    return m_SyncPeekAxis;
+    return m_PeekPaintAxis;
   }
   for (int axis = 0; axis < PeekAxisCount; ++axis)
   {
@@ -2855,23 +3054,6 @@ QRect QmitkMxNCellOverlay::PlateCloseButtonRect() const
                PlateButtonSize, PlateButtonSize);
 }
 
-bool QmitkMxNCellOverlay::HandlePlateContextMenu(const QPoint& position, const QPoint& globalPosition)
-{
-  if (!this->IsArranging() || !this->SyncPeekPlateRect().contains(position))
-  {
-    return false;
-  }
-  // A right click on a plate is about the arrangement, so it opens the plate's
-  // menu rather than the cell's. A right drag has already become the ask-mode
-  // drag and leaves nothing to open.
-  const QPoint local = position - this->RenderWindowRect().topLeft();
-  if ((local - m_RightPressPosition).manhattanLength() < QApplication::startDragDistance())
-  {
-    this->OpenPlateMenu(globalPosition);
-  }
-  return true;
-}
-
 bool QmitkMxNCellOverlay::ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition)
 {
   if (this->PlateCloseButtonRect().contains(position))
@@ -2889,7 +3071,10 @@ bool QmitkMxNCellOverlay::ShowPlateButtonToolTip(const QPoint& position, const Q
 
 void QmitkMxNCellOverlay::contextMenuEvent(QContextMenuEvent* event)
 {
-  if (this->HandlePlateContextMenu(event->pos(), event->globalPos()))
+  // The press under a mouse request was forwarded to the render window or
+  // taken by the plate, and either opens its menu from the release. The
+  // overlay never has focus, so no keyboard request arrives here.
+  if (QContextMenuEvent::Mouse == event->reason())
   {
     event->accept();
     return;
@@ -3066,6 +3251,9 @@ bool QmitkMxNCellOverlay::HandleCellDrag(QEvent* event)
 void QmitkMxNCellOverlay::resizeEvent(QResizeEvent* event)
 {
   QmitkOverlayWidget::resizeEvent(event);
+  // The mask is geometry: nothing else rebuilds it while the pointer rests.
+  this->UpdateInteractivity();
+  this->update();
   m_Editor->RequestSyncPeekRefresh();
 }
 
@@ -3080,28 +3268,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
 
   QMenu menu;  // No parent, see OpenColormapMenu.
 
-  auto* directionMenu = menu.addMenu(tr("View direction"));
-  const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {
-    { "Axial", mitk::AnatomicalPlane::Axial },
-    { "Coronal", mitk::AnatomicalPlane::Coronal },
-    { "Sagittal", mitk::AnatomicalPlane::Sagittal },
-  };
-  for (const auto& [label, plane] : planes)
-  {
-    auto* action = directionMenu->addAction(tr(label));
-    const auto planeValue = plane;
-    connect(action, &QAction::triggered, this, [this, windowId, planeValue]()
-    {
-      try
-      {
-        m_Editor->SetViewDirection(windowId, planeValue);
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Context menu: view direction ignored: " << e.GetDescription();
-      }
-    });
-  }
+  this->PopulateDirectionMenu(menu.addMenu(tr("View direction")));
 
   // The furniture's own entry points - the Data button, the W/L readout, the
   // navigator's coordinate line - are pointer-only and hidden until revealed;

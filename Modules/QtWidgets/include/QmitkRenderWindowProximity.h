@@ -132,7 +132,8 @@ public:
    *
    * \return  Id used in the StateChanged signal and the query/unregister
    *          calls. The region starts in the state matching the current
-   *          pointer; a change away from Idle is emitted immediately.
+   *          pointer; that initial state is not emitted, read it with
+   *          GetRegionState.
    *
    * \throws mitk::Exception if the callback is null or the distance is not
    *         positive.
@@ -179,12 +180,13 @@ public:
 
   /**
    * \brief Hold every region revealed regardless of where the pointer is, for
-   *        as long as a popup the furniture itself owns is open.
+   *        as long as a popup opened from the revealed furniture is open.
    *
    *        A Qt popup takes a pointer grab, so the cell sees a leave the moment
-   *        one opens and would otherwise collapse the very strip the user just
-   *        clicked. Suppression still wins over a pin, so clean view stays
-   *        absolute.
+   *        one opens and would otherwise collapse the very furniture the user
+   *        just clicked. A popup opened elsewhere (a context menu over the
+   *        image) must not pin: a pin reveals every region. Suppression still
+   *        wins over a pin, so clean view stays absolute.
    */
   void SetPinned(bool pinned);
   bool IsPinned() const;

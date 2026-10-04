@@ -18,7 +18,11 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QEnterEvent>
+#include <QMouseEvent>
+#include <QResizeEvent>
 #include <QWidget>
 
 #include <memory>
@@ -28,8 +32,8 @@ found in the LICENSE file.
 /**
  * Tests the idle -> hint -> active state machine of the proximity controller
  * headlessly by feeding synthetic pointer positions through the public
- * HandlePointerMoved / HandlePointerLeft seam (no real mouse events, no
- * rendering):
+ * HandlePointerMoved / HandlePointerLeft seam, and through the event filter
+ * with synthetic Qt events sent to the cell and to a source (no rendering):
  *   - upward transitions (reveal) are immediate
  *   - downward transitions (collapse) wait for the collapse delay and are
  *     cancelled when the pointer returns in time
@@ -69,6 +73,12 @@ class QmitkRenderWindowProximityTestSuite : public mitk::TestFixture
   MITK_TEST(Pin_LosesToSuppression);
   MITK_TEST(MultiRegion_IndependentStates);
   MITK_TEST(Unregister_StopsEmissions);
+  MITK_TEST(EventFilter_ReleaseNearRegionReveals);
+  MITK_TEST(EventFilter_SourceMoveMapsToCell);
+  MITK_TEST(EventFilter_LeaveOnSourceIsIgnoredLeaveOnCellCollapses);
+  MITK_TEST(EventFilter_EnterNearRegionReveals);
+  MITK_TEST(EventFilter_ResizeReevaluates);
+  MITK_TEST(EventFilter_DragOutOfTheCellLeaves);
   CPPUNIT_TEST_SUITE_END();
 
   using Proximity = QmitkRenderWindowProximity;
@@ -393,6 +403,102 @@ public:
 
     CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(rightEdge));
     CPPUNIT_ASSERT(State::Hint == m_Proximity->GetRegionState(bottomLeft));
+  }
+
+  /** Send a mouse event to 'target' at the cell position 'positionInCell'. */
+  void SendMouse(QWidget* target, QEvent::Type type, const QPoint& positionInCell, Qt::MouseButton button,
+                 Qt::MouseButtons buttons) const
+  {
+    const QPoint global = m_Cell->mapToGlobal(positionInCell);
+    const QPointF local(target->mapFromGlobal(global));
+    QMouseEvent event(type, local, local, QPointF(global), button, buttons, Qt::NoModifier);
+    QCoreApplication::sendEvent(target, &event);
+  }
+
+  void EventFilter_ReleaseNearRegionReveals()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    this->SendMouse(m_Cell.get(), QEvent::MouseMove, m_NearPoint, Qt::NoButton, Qt::LeftButton);
+    CPPUNIT_ASSERT_MESSAGE("A held button withholds the reveal", State::Hint == m_Proximity->GetRegionState(id));
+
+    this->SendMouse(m_Cell.get(), QEvent::MouseButtonRelease, m_NearPoint, Qt::LeftButton, Qt::NoButton);
+    CPPUNIT_ASSERT_MESSAGE("The release ends the withholding where the pointer rests",
+                           State::Active == m_Proximity->GetRegionState(id));
+  }
+
+  void EventFilter_SourceMoveMapsToCell()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    QWidget source(m_Cell.get());
+    source.setGeometry(100, 50, 290, 200);
+    m_Proximity->AddEventSource(&source);
+
+    this->SendMouse(&source, QEvent::MouseMove, m_FarPoint, Qt::NoButton, Qt::NoButton);
+    CPPUNIT_ASSERT(State::Hint == m_Proximity->GetRegionState(id));
+    this->SendMouse(&source, QEvent::MouseMove, m_NearPoint, Qt::NoButton, Qt::NoButton);
+    CPPUNIT_ASSERT_MESSAGE("A source's move is resolved in cell coordinates",
+                           State::Active == m_Proximity->GetRegionState(id));
+  }
+
+  void EventFilter_LeaveOnSourceIsIgnoredLeaveOnCellCollapses()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    QWidget source(m_Cell.get());
+    source.setGeometry(100, 50, 290, 200);
+    m_Proximity->AddEventSource(&source);
+    this->SendMouse(&source, QEvent::MouseMove, m_NearPoint, Qt::NoButton, Qt::NoButton);
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+
+    QEvent leave(QEvent::Leave);
+    QCoreApplication::sendEvent(&source, &leave);
+    ProcessEventsFor(WaitPastCollapse);
+    CPPUNIT_ASSERT_MESSAGE("Leaving a source may only mean crossing into a sibling",
+                           State::Active == m_Proximity->GetRegionState(id));
+
+    QCoreApplication::sendEvent(m_Cell.get(), &leave);
+    ProcessEventsFor(WaitPastCollapse);
+    CPPUNIT_ASSERT_MESSAGE("Leaving the cell collapses", State::Idle == m_Proximity->GetRegionState(id));
+  }
+
+  void EventFilter_EnterNearRegionReveals()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    const QPointF global(m_Cell->mapToGlobal(m_NearPoint));
+    QEnterEvent enter(QPointF(m_NearPoint), QPointF(m_NearPoint), global);
+    QCoreApplication::sendEvent(m_Cell.get(), &enter);
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+  }
+
+  void EventFilter_ResizeReevaluates()
+  {
+    QRect region(0, 0, 10, 10);
+    const auto id = m_Proximity->RegisterRegion([&region]() { return region; });
+    this->SendMouse(m_Cell.get(), QEvent::MouseMove, m_NearPoint, Qt::NoButton, Qt::NoButton);
+    CPPUNIT_ASSERT(State::Hint == m_Proximity->GetRegionState(id));
+
+    // A resize moves the region under the resting pointer.
+    region = m_RightEdgeRegion;
+    QResizeEvent resize(QSize(400, 300), QSize(380, 280));
+    QCoreApplication::sendEvent(m_Cell.get(), &resize);
+    CPPUNIT_ASSERT_MESSAGE("A resize re-evaluates against the resting pointer",
+                           State::Active == m_Proximity->GetRegionState(id));
+    m_Proximity->UnregisterRegion(id);
+  }
+
+  void EventFilter_DragOutOfTheCellLeaves()
+  {
+    const auto id = this->RegisterRightEdgeRegion();
+    QWidget source(m_Cell.get());
+    source.setGeometry(100, 50, 290, 200);
+    m_Proximity->AddEventSource(&source);
+    this->SendMouse(&source, QEvent::MouseMove, m_NearPoint, Qt::NoButton, Qt::NoButton);
+    CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
+
+    // The implicit grab keeps the source's moves coming outside the cell.
+    this->SendMouse(&source, QEvent::MouseMove, QPoint(600, 150), Qt::NoButton, Qt::LeftButton);
+    ProcessEventsFor(WaitPastCollapse);
+    CPPUNIT_ASSERT_MESSAGE("A drag out of the cell counts as leaving it",
+                           State::Idle == m_Proximity->GetRegionState(id));
   }
 
   void Unregister_StopsEmissions()

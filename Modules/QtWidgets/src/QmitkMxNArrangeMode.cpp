@@ -139,6 +139,12 @@ void QmitkMxNArrangeMode::ReleaseCell(bool dragged)
 {
   if (!dragged && !m_PressedWindowId.isEmpty())
   {
+    // Deselecting the sole cell is how nothing is selected on the plates, so
+    // it drops the anchor like ClearSelection does.
+    if (m_PressedSoleSelection)
+    {
+      m_Anchor.clear();
+    }
     this->SetSelection(m_PressedSoleSelection ? QStringList() : QStringList{ m_PressedWindowId });
   }
   m_PressedWindowId.clear();

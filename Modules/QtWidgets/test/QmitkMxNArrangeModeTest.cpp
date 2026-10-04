@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestPopupProbe.h"
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNArrangeMode.h>
@@ -25,6 +26,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QContextMenuEvent>
 #include <QCoreApplication>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -53,6 +55,7 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(PlainClick_CollapsesMultiSelectionToClickedCell);
   MITK_TEST(PlainClick_OnTheSoleSelectedCellDeselectsIt);
   MITK_TEST(ClearSelection_DropsTheAnchor);
+  MITK_TEST(ClickDeselect_DropsTheAnchor);
   MITK_TEST(PlainPress_OnASelectedCellHoldsTheSelectionForADrag);
   MITK_TEST(CtrlClick_KeepsTheRestOfTheSelection);
   MITK_TEST(ShiftClick_ReplacesSelectionWithTheRange);
@@ -73,6 +76,7 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(PlateInput_APressOnThePlateSelectsAndIsKeptFromVtk);
   MITK_TEST(Idle_ArrangingLeavesTheOverlayTransparentAndUnmasked);
   MITK_TEST(PlateInput_APressOffThePlatePassesThrough);
+  MITK_TEST(PlateInput_RightPressTriggerDoesNotOpenTheMenuOnPress);
   MITK_TEST(PlateInput_NothingIsTakenOutsideArrangeMode);
   MITK_TEST(PlateInput_CleanViewKeepsThePlate);
   MITK_TEST(PlateInput_TheMenuButtonSitsLeftOfTheCloseButton);
@@ -242,6 +246,18 @@ public:
     this->Arrange()->PressCell(CellId(4), Qt::LeftButton, Qt::NoModifier);
     this->Arrange()->ReleaseCell(true);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Dragging the sole selected cell keeps it selected", Ids({ 4 }), SelectionOf());
+  }
+
+  void ClickDeselect_DropsTheAnchor()
+  {
+    // Clicking the sole selected plate is how "select nothing" is done on the
+    // plates, so it must leave no anchor behind, like "Clear selection".
+    this->Click(4);
+    this->Click(4);
+    CPPUNIT_ASSERT_EQUAL(std::string(), SelectionOf());
+
+    this->Click(8, Qt::ShiftModifier);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A deselected cell is no anchor to span from", Ids({ 8 }), SelectionOf());
   }
 
   void ClearSelection_DropsTheAnchor()
@@ -553,6 +569,37 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A free move over the plate is never taken",
                            !this->SendToRenderWindow(1, QEvent::MouseMove, plate.center()));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("No selection came of it", std::string(), SelectionOf());
+  }
+
+  /** Deliver a mouse context-menu request to cell 'index''s overlay filter as
+   *  the render window's stream does. Returns whether the filter consumed it. */
+  bool SendContextMenuToRenderWindow(int index, const QPoint& overlayPosition) const
+  {
+    auto* renderWindow = this->Cell(index)->GetRenderWindow();
+    const QPoint local = overlayPosition - renderWindow->geometry().topLeft();
+    QContextMenuEvent request(QContextMenuEvent::Mouse, local, renderWindow->mapToGlobal(local));
+    return static_cast<QObject*>(this->Overlay(index))->eventFilter(renderWindow, &request);
+  }
+
+  void PlateInput_RightPressTriggerDoesNotOpenTheMenuOnPress()
+  {
+    // A right press on a plate may still become the ask-mode drag; a request
+    // synthesized on the press (UNIX) must not open the menu over it.
+    this->ShowArranging();
+    const QPoint onPlate = this->Overlay(1)->SyncPeekPlateRect().center();
+    QmitkTestPopupProbe probe;
+
+    CPPUNIT_ASSERT(this->SendToRenderWindow(1, QEvent::MouseButtonPress, onPlate, Qt::RightButton));
+    CPPUNIT_ASSERT_MESSAGE("The request is consumed", this->SendContextMenuToRenderWindow(1, onPlate));
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("No plate menu opens on the press", 0, probe.Count());
+
+    CPPUNIT_ASSERT_MESSAGE("The release on the plate is taken",
+                           this->SendToRenderWindow(1, QEvent::MouseButtonRelease, onPlate, Qt::RightButton));
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The click opens the plate menu on its release", 1, probe.Count());
+    CPPUNIT_ASSERT_MESSAGE("The press is over: a free move over the plate is not taken",
+                           !this->SendToRenderWindow(1, QEvent::MouseMove, onPlate));
   }
 
   void PlateInput_NothingIsTakenOutsideArrangeMode()

@@ -81,9 +81,6 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(PeekPlate_ValueBandIsReservedWhicheverAxisIsPumped);
   MITK_TEST(Barcode_GlyphBoxFillsTheHeightItIsGranted);
   MITK_TEST(Barcode_WidthAskedForFollowsTheGrantedHeight);
-  MITK_TEST(Barcode_WrapsRatherThanShrinksWhenTheHostAllowsIt);
-  MITK_TEST(Barcode_WrapsEvenlyAndNeverWhenForbidden);
-  MITK_TEST(Barcode_HostCeilingBoundsTheGlyph);
   MITK_TEST(Barcode_FrameStaysInsideTheTargetAtEveryPixelRatio);
   MITK_TEST(MaxPeekGlyphBox_ZeroBelowTheFloorAndNeverShrinksWithTheCell);
   MITK_TEST(ResolvePeekGeometry_LegibleAndDrivenByTheDensestGrid);
@@ -124,6 +121,7 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Barcode_PassiveStripStillOpensTheLayoutEditor);
   MITK_TEST(Barcode_ClickableStripReportsInBothRenderModes);
   MITK_TEST(PaintPath_PlateDoesNotCrash);
+  MITK_TEST(Peek_FadeOutKeepsThePlateGeometry);
   CPPUNIT_TEST_SUITE_END();
 
   // Wide enough that a single cell and a 1x3 grid host a row of eight, a 1x5
@@ -452,46 +450,6 @@ public:
     }
   }
 
-  void Barcode_WrapsRatherThanShrinksWhenTheHostAllowsIt()
-  {
-    // A cell-map tile has vertical room to spare, and a legible glyph matters
-    // more there than a shallow band: breaking the row buys a far larger box
-    // than squeezing eight of them into the width.
-    constexpr int slotCount = 8;
-    const QSize band(120, 56);
-
-    const auto wrapped = QmitkMxNSyncBarcodeWidget::ComputeLayout(
-      band.width(), band.height(), slotCount, { true, 0 });
-    const auto flat = QmitkMxNSyncBarcodeWidget::ComputeLayout(
-      band.width(), band.height(), slotCount, { false, 0 });
-
-    CPPUNIT_ASSERT_MESSAGE("Allowed to wrap, it does", wrapped.rows > 1);
-    CPPUNIT_ASSERT_MESSAGE("and comes out with a larger glyph than one row allows",
-                           wrapped.box > flat.box);
-  }
-
-  void Barcode_WrapsEvenlyAndNeverWhenForbidden()
-  {
-    // An even split reads calmer than a ragged last row, and costs the same.
-    constexpr int slotCount = 8;
-    for (const QSize band : { QSize(120, 56), QSize(90, 80), QSize(70, 90) })
-    {
-      const auto layout = QmitkMxNSyncBarcodeWidget::ComputeLayout(
-        band.width(), band.height(), slotCount, { true, 0 });
-      if (layout.mode != QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs)
-      {
-        continue;
-      }
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Every row holds the same number of glyphs", 0,
-                                   slotCount % layout.columns);
-    }
-
-    // A chrome row must stay one line whatever the rect would allow.
-    const auto forbidden = QmitkMxNSyncBarcodeWidget::ComputeLayout(120, 90, slotCount,
-                                                                   { false, 0 });
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Forbidden to wrap, it stays one line", 1, forbidden.rows);
-  }
-
   /** The ink in one device row of a painted strip, summed over the row. */
   static int RowInk(const QImage& canvas, int row)
   {
@@ -530,12 +488,11 @@ public:
         QPainter painter(&canvas);
         // hovered: every frame lit, which is the state the top line vanished in
         QmitkMxNSyncBarcodeWidget::PaintInto(painter, QRect(QPoint(0, 0), logical), axisSlots,
-                                             true, QColor(Qt::gray), -1, { false, 0 });
+                                             true, QColor(Qt::gray), -1);
       }
 
       const auto layout =
-        QmitkMxNSyncBarcodeWidget::ComputeLayout(logical.width(), logical.height(), slotCount,
-                                                 { false, 0 });
+        QmitkMxNSyncBarcodeWidget::ComputeLayout(logical.width(), logical.height(), slotCount);
       const QRect content = QRect(QPoint(0, 0), logical);
 
       // Every edge of every box lands inside the target, whatever the ratio, so
@@ -548,19 +505,6 @@ public:
       CPPUNIT_ASSERT_MESSAGE("and the canvas edge above it is untouched",
                              0 == RowInk(canvas, 0));
     }
-  }
-
-  void Barcode_HostCeilingBoundsTheGlyph()
-  {
-    // Unbounded, a two-cell layout's enormous tiles would render glyphs larger
-    // than anything else in the editor.
-    constexpr int slotCount = 8;
-    const auto capped = QmitkMxNSyncBarcodeWidget::ComputeLayout(400, 200, slotCount,
-                                                                 { true, 24 });
-    const auto free = QmitkMxNSyncBarcodeWidget::ComputeLayout(400, 200, slotCount,
-                                                               { true, 0 });
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The ceiling binds", 24, capped.box);
-    CPPUNIT_ASSERT_MESSAGE("and without one the rect alone does", free.box > 24);
   }
 
   void Barcode_WidthAskedForFollowsTheGrantedHeight()
@@ -608,7 +552,6 @@ public:
       const auto layout = QmitkMxNSyncBarcodeWidget::ComputeLayout(wide, height, slotCount);
       CPPUNIT_ASSERT_MESSAGE("A wide strip renders glyphs",
                              layout.mode == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs);
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("One row, so the box takes the height", 1, layout.rows);
       // All of it but the pixel each frame needs above and below itself, which
       // is what keeps a box's own edges inside the canvas.
       CPPUNIT_ASSERT_EQUAL_MESSAGE("and nothing beyond the frames' own room is left over",
@@ -1397,6 +1340,27 @@ public:
       peak = std::max(peak, qAlpha(image.pixel(x, y)));
     }
     CPPUNIT_ASSERT_MESSAGE("The outer ring is opaque at the faded end", peak > 240);
+  }
+
+  void Peek_FadeOutKeepsThePlateGeometry()
+  {
+    this->Arrange(1, 2);
+    m_Editor->SetSyncPeek(true, QmitkMxNSyncAxis::Slice);
+    auto* overlay = this->Overlay(0);
+    overlay->SetPeekProgress(1.0);  // faded in, whether or not the style animates
+    const QRect raised = overlay->SyncPeekPlateRect();
+    CPPUNIT_ASSERT(raised.isValid());
+
+    // A frame of the fade-out, whether or not the style animates it.
+    m_Editor->SetSyncPeek(false, std::nullopt);
+    overlay->SetPeekProgress(0.5);
+    CPPUNIT_ASSERT_MESSAGE("The peek reports itself down at once", !overlay->IsSyncPeekVisible());
+    CPPUNIT_ASSERT_EQUAL(0, overlay->SyncPeekGlyphBox());
+    CPPUNIT_ASSERT_MESSAGE("...but the fading plate keeps the geometry it is painted at",
+                           raised == overlay->SyncPeekPlateRect());
+
+    overlay->SetPeekProgress(0.0);
+    CPPUNIT_ASSERT_MESSAGE("A finished fade leaves no plate", !overlay->SyncPeekPlateRect().isValid());
   }
 
   void PaintPath_PlateDoesNotCrash()

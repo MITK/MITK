@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkTimeNavigationController.h>
 
 namespace
@@ -434,6 +435,25 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
         return;
       }
 
+      // A scroll on a single-slice sender steps the application-global time
+      // instead, the classic single-slice behavior. That changes no slice, so
+      // there is nothing to relay to the sender's slice group.
+      auto* senderNavigation = sendingRenderer->GetSliceNavigationController();
+      if (sendingRenderer->GetMapperID() == BaseRenderer::Standard2D
+          && isTarget(sendingRenderer, sendingRenderer) && nullptr != senderNavigation
+          && !senderNavigation->GetSliceLocked() && nullptr != senderNavigation->GetStepper()
+          && senderNavigation->GetStepper()->GetSteps() <= 1)
+      {
+        auto* timeStepper = RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
+        timeStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
+        timeStepper->MoveSlice(displayActionEvent->GetSliceDelta());
+        return;
+      }
+
+      // Relayed in displayed slices: a target whose displayed index runs the
+      // other way round than the sender's steps its stepper the other way, so
+      // every member shows the same displayed direction.
+      const bool senderInverted = SliceNavigationHelper::IsDisplayedSliceInverted(sendingRenderer);
       auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {
@@ -457,23 +477,17 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
           {
             continue;
           }
-
+          // Group propagation must never leak into application-global time,
+          // so a single-slice member is simply not scrolled.
           if (stepper->GetSteps() <= 1)
           {
-            // Group propagation must never leak into application-global time,
-            // so a single-slice member is simply not scrolled. Only the
-            // sender's own gesture keeps the classic single-slice behavior of
-            // scrolling the time steps instead.
-            if (targetRenderer != sendingRenderer)
-            {
-              continue;
-            }
-            auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-            stepper = timeNavigationController->GetStepper();
+            continue;
           }
 
+          const bool flip = targetRenderer != sendingRenderer
+            && SliceNavigationHelper::IsDisplayedSliceInverted(targetRenderer) != senderInverted;
           stepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
-          stepper->MoveSlice(displayActionEvent->GetSliceDelta());
+          stepper->MoveSlice(flip ? -displayActionEvent->GetSliceDelta() : displayActionEvent->GetSliceDelta());
         }
       }
     }

@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMxNCellOverlay.h"
-#include "QmitkMxNSliceIndex.h"
 
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNAxisGlyph.h>
@@ -34,6 +33,7 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkTimeNavigationController.h>
 
 #include <vtkCallbackCommand.h>
@@ -1049,7 +1049,7 @@ void QmitkMxNCellOverlay::NavigatorSetSlice(int position)
     return;
   }
   const int steps = static_cast<int>(stepper->GetSteps());
-  const int stepperPosition = QmitkMxNSliceIndex::IsDisplayedSliceInverted(renderer) ? steps - 1 - position : position;
+  const int stepperPosition = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? steps - 1 - position : position;
   const int delta = stepperPosition - static_cast<int>(stepper->GetPos());
   if (0 == delta)
   {
@@ -2463,7 +2463,7 @@ void QmitkMxNCellOverlay::RefreshValues()
   {
     slicePosition = sliceStepper->GetPos();
     sliceSteps = sliceStepper->GetSteps();
-    if (sliceSteps > 0 && QmitkMxNSliceIndex::IsDisplayedSliceInverted(renderer))
+    if (sliceSteps > 0 && mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer))
     {
       slicePosition = sliceSteps - 1 - slicePosition;
     }

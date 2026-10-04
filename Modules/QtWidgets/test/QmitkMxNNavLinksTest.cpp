@@ -56,6 +56,7 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkMxNNavLinksTestSuite);
 
   MITK_TEST(SliceLink_PropagatesToGroupOnly);
+  MITK_TEST(Scroll_CrossPlaneSliceGroup_KeepsDisplayedRelation);
   MITK_TEST(Converge_Slice_MovieFrameOffsets);
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
   MITK_TEST(Converge_Zoom_FactorOffset);
@@ -302,6 +303,28 @@ public:
     FireZoom(0, 2.0f);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Zoom must not propagate over a slice-only link",
       cell1Scale, Camera(1)->GetParallelScale(), 1e-6);
+  }
+
+  void Scroll_CrossPlaneSliceGroup_KeepsDisplayedRelation()
+  {
+    // A slice group across planes whose slice index runs opposite to the
+    // stepper in one cell only: joining and scrolling must agree on the
+    // displayed slices.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    SetSlicePos(0, 4);
+    SetSlicePos(1, 6);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the two cells have opposite inversion",
+                           SliceInverted(0) != SliceInverted(1));
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Joining converges the displayed slice", ShownSlice(0), ShownSlice(1));
+
+    FireScroll(0, 1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A scroll keeps the displayed slices together", ShownSlice(0), ShownSlice(1));
+    FireScroll(1, -1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A scroll from the other cell keeps them together", ShownSlice(0), ShownSlice(1));
   }
 
   void Converge_Slice_MovieFrameOffsets()

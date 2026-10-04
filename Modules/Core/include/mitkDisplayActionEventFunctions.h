@@ -184,6 +184,15 @@ namespace mitk
      * Reacts to DisplayScrollEvent. The target set is decided per event by the
      * given predicate.
      *
+     * The scroll is relayed in displayed slices (see
+     * SliceNavigationHelper::IsDisplayedSliceInverted): a target whose displayed
+     * slice index runs the other way round than the sender's moves its stepper
+     * by the negated delta, so every target moves the same displayed direction.
+     * Single-slice targets are not scrolled, so group propagation never changes
+     * the application-global time. A single-slice sender scrolls the global time
+     * steps instead, the classic single-slice behavior; as no slice changes, no
+     * target is scrolled then.
+     *
      * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
      * \throws mitk::Exception if isTarget is null.

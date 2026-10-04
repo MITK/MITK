@@ -12,6 +12,9 @@ found in the LICENSE file.
 
 #include <mitkSliceNavigationHelper.h>
 
+#include <mitkBaseRenderer.h>
+#include <mitkSliceNavigationController.h>
+
 #include <mitkExceptionMacro.h>
 
 #include <mitkArbitraryTimeGeometry.h>
@@ -183,4 +186,44 @@ bool mitk::SliceNavigationHelper::IsSliceIndexInverted(const BaseGeometry* refer
   const bool rendererAxisInverted = rendererWorldGeometry->GetAxisVector(2)[worldAxis] < 0;
 
   return referenceAxisInverted != rendererAxisInverted;
+}
+
+bool mitk::SliceNavigationHelper::IsDisplayedSliceInverted(BaseRenderer* renderer)
+{
+  if (nullptr == renderer)
+  {
+    mitkThrow() << "Cannot determine the displayed slice direction without a renderer.";
+  }
+
+  const auto* sliceNavigation = renderer->GetSliceNavigationController();
+  if (nullptr == sliceNavigation)
+  {
+    return false;
+  }
+
+  const auto viewDirection = sliceNavigation->GetViewDirection();
+  if (AnatomicalPlane::Original == viewDirection)
+  {
+    return false;
+  }
+
+  const auto* inputTimeGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  const auto* timeNavigation = RenderingManager::GetInstance()->GetTimeNavigationController();
+  if (nullptr == inputTimeGeometry || nullptr == timeNavigation)
+  {
+    return false;
+  }
+
+  // The same time step fallback CreateWorldGeometry uses to build the
+  // renderer planes.
+  const auto selectedTimeStep = timeNavigation->GetSelectedTimeStep();
+  const BaseGeometry::ConstPointer referenceGeometry = inputTimeGeometry->GetGeometryForTimeStep(
+    inputTimeGeometry->IsValidTimeStep(selectedTimeStep) ? selectedTimeStep : 0);
+  const auto* rendererGeometry = renderer->GetCurrentWorldGeometry();
+  if (referenceGeometry.IsNull() || nullptr == rendererGeometry)
+  {
+    return false;
+  }
+
+  return IsSliceIndexInverted(referenceGeometry, rendererGeometry, viewDirection);
 }

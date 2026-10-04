@@ -167,7 +167,7 @@ public:
    *        NavigatorSetSlice takes the displayed slice index, which follows
    *        the image's own index axis for the view direction; it is converted
    *        to the stepper position, which can run the opposite way
-   *        (see mitk::SliceNavigationHelper::IsSliceIndexInverted).
+   *        (see mitk::SliceNavigationHelper::IsDisplayedSliceInverted).
    */
   void NavigatorSetSlice(int position);
   void NavigatorSetCrosshair(const mitk::Point3D& worldPosition);

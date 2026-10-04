@@ -70,7 +70,9 @@
 	Navigation such as zooming, moving the image, setting the point of interest or scrolling through slices
 	affects the window view you interact with and every window view that shares a synchronization group with
 	it for that dimension (see \ref org_mitk_editors_mxnmultiwidget_DimSync). A window view without a group for
-	a dimension is navigated on its own.
+	a dimension is navigated on its own. Scrolling in a window that shows a single slice steps through the
+	time steps for the whole application instead; it does not move the slice of the window's slice-linked
+	peers.
 
 	What a group keeps in step differs per dimension, and a few consequences are worth knowing:
 	<ul>

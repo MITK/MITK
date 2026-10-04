@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkLevelWindowProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
@@ -32,6 +33,8 @@ found in the LICENSE file.
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+
+#include <cstdlib>
 
 /**
  * Headless behavior tests for the predicate-scoped synchronized display
@@ -55,6 +58,7 @@ class mitkDisplayActionEventFunctionsTestSuite : public mitk::TestFixture
   MITK_TEST(Scroll_UnadmittedSender_NoOp);
   MITK_TEST(Scroll_GroupedSingleSliceMember_DoesNotMoveTime);
   MITK_TEST(Scroll_DirectGestureOnSingleSliceWindow_MovesTime);
+  MITK_TEST(Scroll_TargetWithOppositeInversion_MovesSameDisplayedDirection);
   MITK_TEST(Pan_PredicateScopesTargets);
   MITK_TEST(Zoom_PredicateScopesTargets);
   MITK_TEST(Crosshair_PredicateScopesTargets);
@@ -331,8 +335,46 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "A direct gesture on a single-slice window keeps its wheel-drives-time behavior",
       3u, timeStepper.stepper->GetPos());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Multi-slice members still receive the scroll", 3u, SlicePos(m_A0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Multi-slice members still receive the scroll", 3u, SlicePos(m_A1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A time step moves no peer's slice", 2u, SlicePos(m_A0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A time step moves no peer's slice", 2u, SlicePos(m_A1));
+  }
+
+  static bool SliceInverted(const Window& window, const mitk::Image* image)
+  {
+    return mitk::SliceNavigationHelper::IsSliceIndexInverted(image->GetGeometry(),
+      window.renderer->GetCurrentWorldGeometry(),
+      window.renderer->GetSliceNavigationController()->GetViewDirection());
+  }
+
+  static int ShownSlice(const Window& window, const mitk::Image* image)
+  {
+    const auto* stepper = window.renderer->GetSliceNavigationController()->GetStepper();
+    const int position = static_cast<int>(stepper->GetPos());
+    return SliceInverted(window, image) ? static_cast<int>(stepper->GetSteps()) - 1 - position : position;
+  }
+
+  void Scroll_TargetWithOppositeInversion_MovesSameDisplayedDirection()
+  {
+    // Sagittal steps along the identity image's x index, axial against its z
+    // index: one scroll must still move both the same displayed direction.
+    m_A1.renderer->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
+    mitk::RenderingManager::GetInstance()->InitializeView(m_A1.vtkWindow, m_Image->GetTimeGeometry());
+    SetSlicePos(m_A1, 5);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: sender and target have opposite inversion",
+                           SliceInverted(m_A0, m_Image) != SliceInverted(m_A1, m_Image));
+
+    const int senderBefore = ShownSlice(m_A0, m_Image);
+    const int targetBefore = ShownSlice(m_A1, m_Image);
+
+    auto action = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(
+      SameEditorPredicate("editorA__"));
+    auto interactionEvent = mitk::InteractionEvent::New(m_A0.renderer);
+    action(mitk::DisplayScrollEvent(interactionEvent, 1, false));
+
+    const int senderDelta = ShownSlice(m_A0, m_Image) - senderBefore;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the sender moved one slice", 1, std::abs(senderDelta));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The target moves the same displayed direction as the sender",
+                                 senderDelta, ShownSlice(m_A1, m_Image) - targetBefore);
   }
 
   void Pan_PredicateScopesTargets()

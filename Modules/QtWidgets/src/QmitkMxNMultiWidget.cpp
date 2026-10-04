@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkMxNMultiWidget.h>
-#include "QmitkMxNSliceIndex.h"
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -25,6 +24,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <mitkSliceNavigationHelper.h>
 
 // vtk
 #include <vtkCamera.h>
@@ -3570,12 +3570,12 @@ void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension
       const long anchorLast = static_cast<long>(anchorStepper->GetSteps()) - 1;
       const long anchorPos = static_cast<long>(anchorStepper->GetPos());
       const long anchorShown =
-        QmitkMxNSliceIndex::IsDisplayedSliceInverted(anchorRenderer) ? anchorLast - anchorPos : anchorPos;
+        mitk::SliceNavigationHelper::IsDisplayedSliceInverted(anchorRenderer) ? anchorLast - anchorPos : anchorPos;
       const long reference = anchorShown - std::get<int>(anchorOffset);
       const long memberLast = static_cast<long>(memberStepper->GetSteps()) - 1;
       const long memberShown = std::clamp(reference + memberLinks.sliceOffset, 0L, memberLast);
       const long target =
-        QmitkMxNSliceIndex::IsDisplayedSliceInverted(memberRenderer) ? memberLast - memberShown : memberShown;
+        mitk::SliceNavigationHelper::IsDisplayedSliceInverted(memberRenderer) ? memberLast - memberShown : memberShown;
       memberStepper->SetPos(static_cast<unsigned int>(target));
       break;
     }

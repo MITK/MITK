@@ -348,6 +348,12 @@ namespace mitk
     time step does not exist, nothing happens.*/
     void ResetPreviewContentAtTimeStep(unsigned int timeStep);
 
+    /** Removes all labels of the preview image together with their pixel content.
+    * For a tool that replaces the labels of the preview on every update, as
+    * opposed to writing into the labels it inherits from the segmentation.
+    * Nothing happens without a preview image.*/
+    void RemoveAllPreviewLabels();
+
     TimePointType GetLastTimePointOfUpdate() const;
 
     MultiLabelSegmentation::LabelValueType GetActiveLabelValueOfPreview() const;

@@ -687,10 +687,7 @@ const std::string& mitk::VoxTellTool::GetLastErrorMessage() const
 
 void mitk::VoxTellTool::InitiateToolByInput()
 {
-  auto* preview = this->GetPreviewSegmentation();
-
-  if (preview != nullptr)
-    preview->RemoveLabels(preview->GetAllLabelValues());
+  this->RemoveAllPreviewLabels();
 }
 
 void mitk::VoxTellTool::UpdatePrepare()
@@ -705,8 +702,8 @@ void mitk::VoxTellTool::UpdatePrepare()
 
   // The labels are created here and not as the result arrives, so an update
   // that covers several time steps adds each of them only once.
+  this->RemoveAllPreviewLabels();
   auto* preview = this->GetPreviewSegmentation();
-  preview->RemoveLabels(preview->GetAllLabelValues());
 
   // Confirming copies the labels with their colors into the segmentation, so
   // the colors are chosen to be distinct from its labels as well as from each
@@ -759,23 +756,29 @@ void mitk::VoxTellTool::RemoveLabelsWithoutResult()
 
   // Only now that every time step of the update is done: a label can be
   // empty in one of them and not in another.
-  MultiLabelSegmentation::LabelValueVectorType labelsWithoutResult;
+  const auto group = preview->GetActiveLayer();
+  MultiLabelSegmentation::ConstLabelVectorType labelsWithResult;
+  bool anyWithoutResult = false;
 
-  for (const auto value : preview->GetAllLabelValues())
+  for (const auto& label : preview->GetConstLabelsByValue(preview->GetLabelValuesByGroup(group)))
   {
-    if (m_Impl->LabelValuesWithResult.count(value) != 0)
-      continue;
-
-    labelsWithoutResult.push_back(value);
-
-    if (const auto label = preview->GetLabel(value); label.IsNotNull())
+    if (m_Impl->LabelValuesWithResult.count(label->GetValue()) != 0)
+    {
+      labelsWithResult.push_back(label);
+    }
+    else
+    {
       m_Impl->PromptsWithoutResult.push_back(label->GetName());
+      anyWithoutResult = true;
+    }
   }
 
-  if (labelsWithoutResult.empty())
+  if (!anyWithoutResult)
     return;
 
-  preview->RemoveLabels(labelsWithoutResult);
+  // The labels without result have no pixels, which RemoveLabels() would still
+  // erase in a pass over the whole preview for each of them.
+  preview->ReplaceGroupLabels(group, labelsWithResult);
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -907,7 +910,7 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
   {
     // Labels without content would let the user confirm nothing, and the
     // buffer may be half written.
-    previewImage->RemoveLabels(previewImage->GetAllLabelValues());
+    this->RemoveAllPreviewLabels();
     m_Impl->CachedRun.reset();
     m_Impl->RunFailed = true;
 
@@ -925,7 +928,7 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
   }
   catch (...)
   {
-    previewImage->RemoveLabels(previewImage->GetAllLabelValues());
+    this->RemoveAllPreviewLabels();
     m_Impl->CachedRun.reset();
     m_Impl->RunFailed = true;
 

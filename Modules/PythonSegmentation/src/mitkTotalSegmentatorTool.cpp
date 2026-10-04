@@ -147,8 +147,7 @@ std::vector<std::string> mitk::TotalSegmentatorTool::BuildArguments(const std::s
 void mitk::TotalSegmentatorTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
-  auto preview = this->GetPreviewSegmentation();
-  preview->RemoveLabels(preview->GetAllLabelValues());
+  this->RemoveAllPreviewLabels();
 }
 
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
@@ -214,12 +213,12 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   {
     // Leave no half-populated preview behind: an empty preview is how the GUI
     // tells a failure apart from a successful run.
-    previewImage->RemoveLabels(previewImage->GetAllLabelValues());
+    this->RemoveAllPreviewLabels();
     m_LastErrorMessage = e.GetDescription();
   }
   catch (const std::exception& e)
   {
-    previewImage->RemoveLabels(previewImage->GetAllLabelValues());
+    this->RemoveAllPreviewLabels();
     m_LastErrorMessage = e.what();
   }
 }

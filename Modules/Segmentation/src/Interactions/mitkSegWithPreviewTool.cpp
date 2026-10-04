@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <mitkSegChangeOperationApplier.h>
 
 #include <algorithm>
+#include <map>
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -300,6 +301,25 @@ void mitk::SegWithPreviewTool::ResetPreviewContent()
   {
     previewImage->ClearGroupImages();
   }
+}
+
+void mitk::SegWithPreviewTool::RemoveAllPreviewLabels()
+{
+  auto* previewImage = this->GetPreviewSegmentation();
+
+  if (nullptr == previewImage)
+    return;
+
+  // RemoveLabels() erases the pixels of each label in a pass of its own over
+  // the whole preview. Dropping the labels first and clearing the group images
+  // afterwards takes a single pass, whatever the number of labels.
+  std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType> emptyGroups;
+
+  for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < previewImage->GetNumberOfGroups(); ++groupID)
+    emptyGroups[groupID] = {};
+
+  previewImage->ReplaceGroupLabels(emptyGroups);
+  previewImage->ClearGroupImages();
 }
 
 mitk::Color mitk::SegWithPreviewTool::GetSpecialPreviewColor() const

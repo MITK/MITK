@@ -71,11 +71,19 @@ void mitk::ToolCommand::Execute(const itk::Object *caller, const itk::EventObjec
   if (nullptr == process)
     return;
 
-  // The filter reports a fraction of its own run, which is mapped onto this
-  // run's share of whatever budget the task was given. Counting one step per
-  // event, as before, made the reported progress depend on how chatty a filter
-  // happens to be.
-  const auto fraction = (m_ShareIndex + std::clamp(process->GetProgress(), 0.0f, 1.0f)) / m_ShareCount;
+  this->ReportFraction(process->GetProgress());
+}
 
-  m_ProgressTask->SetProgress(static_cast<unsigned int>(fraction * m_ProgressTask->GetStepsToDo()));
+void mitk::ToolCommand::ReportFraction(float fraction)
+{
+  if (nullptr == m_ProgressTask)
+    return;
+
+  // The reported fraction belongs to one run and is mapped onto this run's
+  // share of whatever budget the task was given. Counting one step per event,
+  // as before, made the reported progress depend on how chatty a filter
+  // happens to be.
+  const auto share = (m_ShareIndex + std::clamp(fraction, 0.0f, 1.0f)) / m_ShareCount;
+
+  m_ProgressTask->SetProgress(static_cast<unsigned int>(share * m_ProgressTask->GetStepsToDo()));
 }

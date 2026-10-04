@@ -10,18 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitknnInteractiveUpdatePrompt_h
-#define mitknnInteractiveUpdatePrompt_h
+#ifndef mitkPythonPackageUpdatePrompt_h
+#define mitkPythonPackageUpdatePrompt_h
 
 #include <MitkPythonSegmentationUIExports.h>
 
-#include <mitknnInteractiveVersion.h>
+#include <mitkPythonPackageVersion.h>
+
+#include <string>
 
 class QWidget;
 
 namespace mitk
 {
-  namespace nnInteractive
+  namespace PythonPackage
   {
     /** \brief The user's response to the version-update prompt. */
     enum class UpdatePromptChoice
@@ -31,14 +33,14 @@ namespace mitk
       Cancel             /**< \brief Do nothing / abort the surrounding flow. */
     };
 
-    /** \brief Shows the standard nnInteractive version-status dialog and returns
+    /** \brief Shows the version-status dialog of a Python package and returns
      *         the user's choice.
      *
      * Handles the BelowMinimum and UpdateAvailable verdicts (read from
      * \p result.Status); passing any other status is a usage error. The wording
      * and the available buttons adapt to two flags:
      *
-     * - \p modulesLoaded: nnInteractive is already imported into this process, so
+     * - \p modulesLoaded: the package is already imported into this process, so
      *   an in-place update would fail on Windows (locked files). The dialog then
      *   offers no "Update now" and asks the user to restart first.
      * - \p inInitFlow: shown during initialization, where declining still proceeds
@@ -49,13 +51,15 @@ namespace mitk
      * The application name used in the restart hint is read from QCoreApplication.
      *
      * \param[in] parent Dialog parent (may be \c nullptr).
+     * \param[in] packageName The name of the package as the user knows it, e.g. "nnInteractive".
+     * \param[in] supportedVersions The versions this MITK build supports.
      * \param[in] result Version check verdict; only BelowMinimum / UpdateAvailable.
-     * \param[in] modulesLoaded Whether nnInteractive modules are loaded in-process.
+     * \param[in] modulesLoaded Whether modules of the package are loaded in-process.
      * \param[in] inInitFlow Whether the prompt is shown during initialization.
      *
      * \return The user's choice. BelowMinimum never yields ContinueInstalled.
      */
-    MITKPYTHONSEGMENTATIONUI_EXPORT UpdatePromptChoice ShowUpdatePrompt(QWidget* parent, const VersionCheckResult& result, bool modulesLoaded, bool inInitFlow);
+    MITKPYTHONSEGMENTATIONUI_EXPORT UpdatePromptChoice ShowUpdatePrompt(QWidget* parent, const std::string& packageName, const VersionRange& supportedVersions, const VersionCheckResult& result, bool modulesLoaded, bool inInitFlow);
   }
 }
 

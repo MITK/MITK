@@ -1,8 +1,8 @@
 set(CPP_FILES
+  mitkPythonPackageUpdatePrompt.cpp
   mitkPythonSegmentationUI.cpp
   mitknnInteractiveInstall.cpp
   mitknnInteractiveModel.cpp
-  mitknnInteractiveUpdatePrompt.cpp
   mitkTorchInstall.cpp
   mitkTotalSegmentatorInstall.cpp
   QmitknnInteractiveInstallModeDialog.cpp

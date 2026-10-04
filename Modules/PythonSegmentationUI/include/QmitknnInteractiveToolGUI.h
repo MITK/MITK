@@ -32,7 +32,7 @@ class QButtonGroup;
 class QPushButton;
 class QTimer;
 
-namespace mitk::nnInteractive
+namespace mitk::PythonPackage
 {
   struct VersionCheckResult;
 }
@@ -402,7 +402,7 @@ private:
    * \return \c true if initialization should proceed (updated successfully, or the
    *         user chose to continue with the installed version), \c false to abort.
    */
-  bool OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly);
+  bool OfferInPlaceUpdate(const mitk::PythonPackage::VersionCheckResult& versionCheck, bool clientOnly);
 
   /** \brief Runs the pip upgrade dialog and recreates the Python context.
    *

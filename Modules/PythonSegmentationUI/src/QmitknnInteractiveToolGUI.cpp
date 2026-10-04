@@ -20,10 +20,10 @@ found in the LICENSE file.
 #include <mitknnInteractiveInstall.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitknnInteractiveModel.h>
-#include <mitknnInteractiveUpdatePrompt.h>
 #include <mitknnInteractiveVersion.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
+#include <mitkPythonPackageUpdatePrompt.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkTorchDevice.h>
 
@@ -441,8 +441,8 @@ bool QmitknnInteractiveToolGUI::Install()
       if (checkForUpdate)
         onlineUpdateCheckDone = true;
 
-      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum ||
-          versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
+      if (versionCheck.Status == mitk::PythonPackage::VersionStatus::BelowMinimum ||
+          versionCheck.Status == mitk::PythonPackage::VersionStatus::UpdateAvailable)
       {
         if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable))
           return false;
@@ -525,19 +525,19 @@ bool QmitknnInteractiveToolGUI::RunUpdate(bool clientOnly)
   return this->GetTool()->CreatePythonContext();
 }
 
-bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly)
+bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::PythonPackage::VersionCheckResult& versionCheck, bool clientOnly)
 {
   const auto venvName = this->GetTool()->GetVirtualEnvName();
   const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(venvName);
 
-  const auto choice = mitk::nnInteractive::ShowUpdatePrompt(nullptr, versionCheck, modulesLoaded, true);
+  const auto choice = mitk::PythonPackage::ShowUpdatePrompt(nullptr, "nnInteractive", mitk::nnInteractive::SupportedVersions(), versionCheck, modulesLoaded, true);
 
-  if (choice == mitk::nnInteractive::UpdatePromptChoice::Update)
+  if (choice == mitk::PythonPackage::UpdatePromptChoice::Update)
     return this->RunUpdate(clientOnly);
 
   // ContinueInstalled keeps initialization going with the working version; Cancel
   // (and a below-minimum prompt the user dismissed) aborts it.
-  return choice == mitk::nnInteractive::UpdatePromptChoice::ContinueInstalled;
+  return choice == mitk::PythonPackage::UpdatePromptChoice::ContinueInstalled;
 }
 
 void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)

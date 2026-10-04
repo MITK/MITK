@@ -21,12 +21,6 @@ found in the LICENSE file.
 
 namespace
 {
-  std::string VersionRange()
-  {
-    return std::string(">=") + mitk::nnInteractive::MINIMUM_VERSION
-      + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE;
-  }
-
   // The install groups shared by a fresh install and an in-place upgrade. Client
   // only installs the lightweight, torch-free nninteractive-client; full mode
   // installs PyTorch (from the CUDA wheel index on Windows) and nnInteractive.
@@ -34,7 +28,7 @@ namespace
   // so the client-only group must request it explicitly.
   std::vector<mitk::PipInstallGroup> BuildGroups(bool clientOnly)
   {
-    const auto versionRange = VersionRange();
+    const auto versionRange = mitk::nnInteractive::SupportedVersions().ToPipSpecifier();
 
     std::vector<mitk::PipInstallGroup> groups;
 

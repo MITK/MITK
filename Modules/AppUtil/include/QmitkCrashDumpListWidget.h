@@ -23,8 +23,6 @@ found in the LICENSE file.
 
 class QTreeWidget;
 
-// Forward-declared only: AUTOMOC processes this header in every build,
-// including those without MitkCrashHandling.
 namespace mitk
 {
   struct CrashDumpInfo;

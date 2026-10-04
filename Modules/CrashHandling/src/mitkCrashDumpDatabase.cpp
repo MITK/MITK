@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <cctype>
 #include <fstream>
 #include <string>
+#include <tuple>
 #include <type_traits>
 
 namespace

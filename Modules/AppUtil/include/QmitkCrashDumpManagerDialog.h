@@ -23,8 +23,6 @@ class QLabel;
 class QPushButton;
 class QmitkCrashDumpListWidget;
 
-// Forward-declared only: AUTOMOC processes this header in every build,
-// including those without MitkCrashHandling.
 namespace mitk
 {
   struct CrashDumpInfo;

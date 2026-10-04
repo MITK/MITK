@@ -60,7 +60,10 @@ namespace
 
   // Serializes CaptureSnapshot / PurgeProvisionalSnapshots, which may run on
   // the watchdog thread and the UI thread concurrently, and guards the
-  // provisional-snapshot list the listing calls read.
+  // provisional-snapshot list. Listings scan under it as well: until a capture
+  // has filed its dump, the dump lies in the report area, where a scan would
+  // take it for a crash dump. A listing during a capture therefore waits for
+  // it to finish, at most the few seconds the capture polls for its dump.
   std::mutex s_SnapshotMutex;
 
   // Serializes rewrites of the run-info file.
@@ -180,14 +183,21 @@ namespace
       mitk::RunInfoAttachmentFileName;
   }
 
+  /** Caller holds s_SnapshotMutex. */
   std::set<std::filesystem::path> ProvisionalSnapshotsOfThisSession()
   {
-    std::lock_guard<std::mutex> lock(s_SnapshotMutex);
     return { s_State.ProvisionalSnapshots.begin(), s_State.ProvisionalSnapshots.end() };
   }
 
-  std::vector<mitk::CrashDumpInfo> WithoutProvisionalSnapshotsOfThisSession(std::vector<mitk::CrashDumpInfo> dumps)
+  /** The dumps \p scan finds in the database, without this session's
+   *  provisional snapshots. Scanned under s_SnapshotMutex, so no dump a
+   *  capture has not filed yet is among them. */
+  std::vector<mitk::CrashDumpInfo> ScanWithoutProvisionalSnapshotsOfThisSession(
+    decltype(&mitk::ScanCrashDumps) scan, const std::vector<std::filesystem::path>& excludedSubdirs)
   {
+    std::lock_guard<std::mutex> lock(s_SnapshotMutex);
+
+    auto dumps = scan(s_State.DatabaseDirectory, excludedSubdirs);
     const auto provisional = ProvisionalSnapshotsOfThisSession();
 
     std::erase_if(dumps, [&provisional](const mitk::CrashDumpInfo& dump) {
@@ -422,28 +432,28 @@ void mitk::CrashDumpFacility::ClearCrashedLastRun()
   // Watermark from the newest surfacable dump, so an on-demand snapshot
   // (excluded from the surfacable set) can never mask a real crash dump, nor
   // a provisional snapshot of this session mask a hard kill that follows it.
-  const auto dumps = WithoutProvisionalSnapshotsOfThisSession(ScanCrashDumps(
-    s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir }));
+  const auto dumps = ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir });
   if (!dumps.empty())
     WriteLastAcknowledgedTime(s_State.DatabaseDirectory, dumps.front().LastWriteTime);
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListDumps()
 {
-  return WithRunInfo(WithoutProvisionalSnapshotsOfThisSession(ScanCrashDumps(
-    s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir })));
+  return WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir }));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListUnacknowledgedDumps()
 {
-  return WithRunInfo(WithoutProvisionalSnapshotsOfThisSession(ScanUnacknowledgedCrashDumps(
-    s_State.DatabaseDirectory, { kSnapshotsSubdir, kCrashpadStagingSubdir })));
+  return WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanUnacknowledgedCrashDumps,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir }));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListAllDumps()
 {
-  return WithRunInfo(WithoutProvisionalSnapshotsOfThisSession(ScanCrashDumps(
-    s_State.DatabaseDirectory, { kCrashpadStagingSubdir })));
+  return WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
+    { kCrashpadStagingSubdir }));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession()
@@ -451,12 +461,17 @@ std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListProvisionalSnapsho
   if (s_State.DatabaseDirectory.empty())
     return {};
 
-  const auto provisional = ProvisionalSnapshotsOfThisSession();
-  auto dumps = ScanCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir);
+  std::vector<CrashDumpInfo> dumps;
+  {
+    std::lock_guard<std::mutex> lock(s_SnapshotMutex);
 
-  std::erase_if(dumps, [&provisional](const CrashDumpInfo& dump) {
-    return provisional.find(dump.Path) == provisional.end();
-  });
+    const auto provisional = ProvisionalSnapshotsOfThisSession();
+    dumps = ScanCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir);
+
+    std::erase_if(dumps, [&provisional](const CrashDumpInfo& dump) {
+      return provisional.find(dump.Path) == provisional.end();
+    });
+  }
 
   return WithRunInfo(dumps);
 }

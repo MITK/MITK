@@ -56,6 +56,7 @@ namespace
   constexpr auto SHOW_PROMPTS_WITHOUT_RESULT = "VoxTell/showPromptsWithoutResult";
 
   constexpr auto AUTO_CONFIRM = "VoxTell/autoConfirm";
+  constexpr auto CREATE_GROUPS_AS_NEEDED = "VoxTell/createGroupsAsNeeded";
 
   // The dialogs of this GUI are parented to the window rather than the GUI:
   // their event loop can delete the GUI, which then must not take a dialog
@@ -227,6 +228,13 @@ void QmitkVoxTellToolGUI::InitializeUI(QBoxLayout* mainLayout)
     m_Preferences->PutBool(AUTO_CONFIRM, checked);
   });
 
+  m_Ui->createGroupsCheckBox->setChecked(m_Preferences->GetBool(CREATE_GROUPS_AS_NEEDED, true));
+
+  connect(m_Ui->createGroupsCheckBox, &QCheckBox::toggled, this, [this](bool checked)
+  {
+    m_Preferences->PutBool(CREATE_GROUPS_AS_NEEDED, checked);
+  });
+
   this->UpdateInitializeButtonText();
   this->SetStatus("VoxTell is not initialized.");
 
@@ -259,6 +267,7 @@ void QmitkVoxTellToolGUI::EnableWidgets(bool enabled)
   m_Ui->initializeButton->setEnabled(idle);
   m_Ui->settingsButton->setEnabled(idle);
   m_Ui->autoConfirmCheckBox->setEnabled(idle);
+  m_Ui->createGroupsCheckBox->setEnabled(idle);
   m_Ui->promptsTextEdit->setEnabled(idle && loaded);
   m_Ui->segmentButton->setEnabled(idle && loaded);
 }
@@ -726,6 +735,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     return;
 
   tool->SetPrompts(prompts);
+  tool->SetCreateGroupsAsNeeded(m_Ui->createGroupsCheckBox->isChecked());
 
   this->SetStatus("Segmenting. This can take a while...");
 

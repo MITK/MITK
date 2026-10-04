@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
+#include <mitkLabelGroupPlacer.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkProgressTask.h>
 #include <mitkPythonContext.h>
@@ -29,6 +30,7 @@ found in the LICENSE file.
 #include <usModuleResourceStream.h>
 
 #include <functional>
+#include <map>
 #include <set>
 #include <sstream>
 
@@ -149,35 +151,37 @@ namespace
     return list.str();
   }
 
-  // The callable that VoxTell polls for cancellation lives in the context for
-  // the duration of a run. Unbinding it afterwards keeps the tool that it
+  // Whatever a run leaves behind in the context is not kept: the arrays are as
+  // large as the image, and the embeddings live on the device. Unbinding the
+  // callable that VoxTell polls for cancellation keeps the tool that it
   // captured from being reachable once the run is over, and the images from
   // being kept alive by the context.
-  class ScopedBindings
+  class ScopedRun
   {
   public:
-    explicit ScopedBindings(mitk::PythonContext& context)
+    explicit ScopedRun(mitk::PythonContext& context)
       : m_Context(context)
     {
     }
 
-    ~ScopedBindings()
+    ~ScopedRun()
     {
       try
       {
+        m_Context.Execute("voxtell_input = voxtell_embeddings = voxtell_masks = None\n");
         m_Context.BindFunction("progress_callback", {});
         m_Context.BindImage(nullptr, "mitk_image");
-        m_Context.BindImage(nullptr, "mitk_target_buffer");
+        m_Context.BindImage(nullptr, "mitk_mask_buffer");
       }
       catch (...)
       {
-        // The run has ended already. Not being able to unbind is not worth an
-        // exception from a destructor.
+        // The run has ended already. Not being able to clean up is not worth
+        // an exception from a destructor.
       }
     }
 
-    ScopedBindings(const ScopedBindings&) = delete;
-    ScopedBindings& operator=(const ScopedBindings&) = delete;
+    ScopedRun(const ScopedRun&) = delete;
+    ScopedRun& operator=(const ScopedRun&) = delete;
 
   private:
     mitk::PythonContext& m_Context;
@@ -205,12 +209,7 @@ namespace mitk
   class VoxTellTool::Impl
   {
   public:
-    Impl()
-      : TargetBuffer(Image::New())
-    {
-    }
-
-    /** What the target buffer holds the result of. */
+    /** What the cached masks are the result of. */
     struct Run
     {
       std::vector<std::string> Prompts;
@@ -226,11 +225,17 @@ namespace mitk
     std::optional<VoxTell::ModelSource> ModelSource;
     std::string Device;
     std::vector<std::string> Prompts;
-    Image::Pointer TargetBuffer;
+    bool CreateGroupsAsNeeded = true;
     std::optional<Run> CachedRun;
 
-    /** The labels that are in the target buffer. */
-    MultiLabelSegmentation::LabelValueVectorType CachedLabelValues;
+    /** The result of the cached run, one mask per prompt. */
+    std::vector<MaskRuns> CachedMasks;
+
+    /** One label per prompt, in their order, made for the current update. */
+    std::vector<Label::Pointer> PreviewLabels;
+
+    /** The groups of the preview that its labels went into in the current update. */
+    std::map<MultiLabelSegmentation::LabelValueType, MultiLabelSegmentation::GroupIndexType> LabelGroups;
 
     /** The labels with a result in any time step of the current update. */
     std::set<MultiLabelSegmentation::LabelValueType> LabelValuesWithResult;
@@ -257,6 +262,9 @@ mitk::VoxTellTool::VoxTellTool()
   this->KeepActiveAfterAcceptOn();
   this->RequiresExistingLabelsOff();
   this->RequiresVolumetricReferenceOn();
+
+  // Results that overlap go into groups of their own (see SetCreateGroupsAsNeeded()).
+  this->TransfersAllPreviewGroupsOn();
 }
 
 mitk::VoxTellTool::~VoxTellTool() = default;
@@ -567,9 +575,7 @@ void mitk::VoxTellTool::UnloadModel()
   m_Impl->ModelSource.reset();
   m_Impl->Device.clear();
   m_Impl->CachedRun.reset();
-
-  // The buffer is as large as the image.
-  m_Impl->TargetBuffer = Image::New();
+  m_Impl->CachedMasks.clear();
 }
 
 bool mitk::VoxTellTool::IsModelLoaded() const
@@ -597,6 +603,16 @@ void mitk::VoxTellTool::SetPrompts(const std::vector<std::string>& prompts)
 const std::vector<std::string>& mitk::VoxTellTool::GetPrompts() const
 {
   return m_Impl->Prompts;
+}
+
+void mitk::VoxTellTool::SetCreateGroupsAsNeeded(bool createGroupsAsNeeded)
+{
+  m_Impl->CreateGroupsAsNeeded = createGroupsAsNeeded;
+}
+
+bool mitk::VoxTellTool::GetCreateGroupsAsNeeded() const
+{
+  return m_Impl->CreateGroupsAsNeeded;
 }
 
 std::vector<std::string> mitk::VoxTellTool::GetPromptsWithoutPrecomputedEmbedding(const std::vector<std::string>& prompts) const
@@ -716,15 +732,17 @@ void mitk::VoxTellTool::UpdatePrepare()
   Superclass::UpdatePrepare();
 
   m_Impl->LastErrorMessage.clear();
+  m_Impl->PreviewLabels.clear();
+  m_Impl->LabelGroups.clear();
   m_Impl->LabelValuesWithResult.clear();
   m_Impl->PromptsWithoutResult.clear();
   m_Impl->RunFailed = false;
   m_Impl->AbortRequested = false;
 
-  // The labels are created here and not as the result arrives, so an update
-  // that covers several time steps adds each of them only once.
+  // The labels are made here and not as the result arrives, so an update that
+  // covers several time steps makes each of them only once. They are added to
+  // the preview once it is known which group they go into.
   this->RemoveAllPreviewLabels();
-  auto* preview = this->GetPreviewSegmentation();
 
   // Confirming copies the labels with their colors into the segmentation, so
   // the colors are chosen to be distinct from its labels as well as from each
@@ -747,7 +765,7 @@ void mitk::VoxTellTool::UpdatePrepare()
     auto label = Label::New(value, prompt);
     label->SetColor(color);
 
-    preview->AddLabel(label, preview->GetActiveLayer(), false, false);
+    m_Impl->PreviewLabels.push_back(label);
 
     ++value;
   }
@@ -783,29 +801,42 @@ void mitk::VoxTellTool::RemoveLabelsWithoutResult()
 
   // Only now that every time step of the update is done: a label can be
   // empty in one of them and not in another.
-  const auto group = preview->GetActiveLayer();
-  MultiLabelSegmentation::ConstLabelVectorType labelsWithResult;
-  bool anyWithoutResult = false;
-
-  for (const auto& label : preview->GetConstLabelsByValue(preview->GetLabelValuesByGroup(group)))
+  const auto hasResult = [this](MultiLabelSegmentation::LabelValueType value)
   {
-    if (m_Impl->LabelValuesWithResult.count(label->GetValue()) != 0)
-    {
-      labelsWithResult.push_back(label);
-    }
-    else
-    {
+    return m_Impl->LabelValuesWithResult.count(value) != 0;
+  };
+
+  for (const auto& label : m_Impl->PreviewLabels)
+  {
+    if (!hasResult(label->GetValue()))
       m_Impl->PromptsWithoutResult.push_back(label->GetName());
-      anyWithoutResult = true;
+  }
+
+  // A prompt that VoxTell found nothing for has no label in the preview. One
+  // whose voxels other labels took has.
+  std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType> changedGroups;
+
+  for (const auto& [value, group] : m_Impl->LabelGroups)
+  {
+    if (!hasResult(value))
+      changedGroups[group];
+  }
+
+  if (changedGroups.empty())
+    return;
+
+  for (auto& [group, labelsWithResult] : changedGroups)
+  {
+    for (const auto& label : preview->GetConstLabelsByValue(preview->GetLabelValuesByGroup(group)))
+    {
+      if (hasResult(label->GetValue()))
+        labelsWithResult.push_back(label);
     }
   }
 
-  if (!anyWithoutResult)
-    return;
-
   // The labels without result have no pixels, which RemoveLabels() would still
   // erase in a pass over the whole preview for each of them.
-  preview->ReplaceGroupLabels(group, labelsWithResult);
+  preview->ReplaceGroupLabels(changedGroups);
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -851,10 +882,12 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     // changed. That is the case when the base class asks for an update only to
     // have a preview for all time steps, or because the active label of the
     // segmentation changed, which makes no difference to VoxTell. Running the
-    // model again would take just as long as the first time.
+    // model again would take just as long as the first time. Where the results
+    // go is decided anew, as the segmentation may have changed.
     if (m_Impl->CachedRun != run)
     {
       m_Impl->CachedRun.reset();
+      m_Impl->CachedMasks.clear();
 
       const auto timePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
       const auto referenceTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
@@ -864,14 +897,15 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       // bound to Python without const.
       auto imageAtTimeStep = this->GetImageByTimeStep(referenceImage, referenceTimeStep);
 
-      m_Impl->TargetBuffer->Initialize(MultiLabelSegmentation::GetPixelType(), *(imageAtTimeStep->GetTimeGeometry()));
-      m_Impl->TargetBuffer->AllocateZeroedVolume();
+      auto maskBuffer = Image::New();
+      maskBuffer->Initialize(MakeScalarPixelType<unsigned char>(), *(imageAtTimeStep->GetTimeGeometry()));
+      maskBuffer->AllocateZeroedVolume();
 
       auto* context = m_Impl->Context.get();
-      const ScopedBindings bindings(*context);
+      const ScopedRun scopedRun(*context);
 
       context->BindImage(imageAtTimeStep, "mitk_image");
-      context->BindImage(m_Impl->TargetBuffer, "mitk_target_buffer");
+      context->BindImage(maskBuffer, "mitk_mask_buffer");
 
       // Called by VoxTell after every patch of its sliding window. It is what
       // keeps the application responsive during the run, and the only chance to
@@ -908,37 +942,39 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       if (task != nullptr)
         task->SetName("VoxTell: segmenting");
 
-      // Whatever the run leaves behind in the context, it is not kept: the
-      // arrays are as large as the image, and the embeddings live on the device.
       context->Execute(
-        "try:\n"
-        "    voxtell_input, voxtell_ornt = voxtell_prepare_input(mitk_image)\n"
-        "    voxtell_masks = voxtell_predictor.predict_single_image(\n"
-        "        voxtell_input, text_embeddings=voxtell_embeddings, progress_callback=progress_callback)\n"
-        "    voxtell_written = voxtell_write_masks(voxtell_masks, voxtell_ornt, mitk_target_buffer.as_numpy(writeable=True))\n"
-        "    voxtell_written_labels = ' '.join(str(_v) for _v in voxtell_written)\n"
-        "    voxtell_known_prompts.update(_p.lower() for _p in voxtell_prompts)\n"
-        "finally:\n"
-        "    voxtell_input = voxtell_embeddings = voxtell_masks = None\n");
+        "voxtell_input, voxtell_ornt = voxtell_prepare_input(mitk_image)\n"
+        "voxtell_masks = voxtell_predictor.predict_single_image(\n"
+        "    voxtell_input, text_embeddings=voxtell_embeddings, progress_callback=progress_callback)\n"
+        "voxtell_input = None\n"
+        "voxtell_known_prompts.update(_p.lower() for _p in voxtell_prompts)\n");
 
-      m_Impl->CachedLabelValues.clear();
-      std::istringstream writtenLabels(context->GetVariableAsString("voxtell_written_labels").value_or(""));
+      // Masks can overlap, so they cannot share a label image. Each of them is
+      // kept as the runs of its voxels, which take far less memory than a
+      // buffer per prompt.
+      std::vector<MaskRuns> masks;
 
-      for (MultiLabelSegmentation::LabelValueType value; writtenLabels >> value;)
-        m_Impl->CachedLabelValues.push_back(value);
+      for (std::size_t index = 0; index < m_Impl->Prompts.size(); ++index)
+      {
+        context->Execute("voxtell_write_mask(voxtell_masks, " + std::to_string(index) +
+          ", voxtell_ornt, mitk_mask_buffer.as_numpy(writeable=True))\n");
 
+        masks.push_back(ExtractMaskRuns(maskBuffer));
+      }
+
+      m_Impl->CachedMasks = std::move(masks);
       m_Impl->CachedRun = run;
     }
 
-    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
-    m_Impl->LabelValuesWithResult.insert(m_Impl->CachedLabelValues.begin(), m_Impl->CachedLabelValues.end());
+    this->PlaceMasks(previewImage, timeStep);
   }
   catch (const Exception& e)
   {
     // Labels without content would let the user confirm nothing, and the
-    // buffer may be half written.
+    // preview may be half written.
     this->RemoveAllPreviewLabels();
     m_Impl->CachedRun.reset();
+    m_Impl->CachedMasks.clear();
     m_Impl->RunFailed = true;
 
     // The tool was deactivated while it computed. There is nobody left to tell.
@@ -957,8 +993,62 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
   {
     this->RemoveAllPreviewLabels();
     m_Impl->CachedRun.reset();
+    m_Impl->CachedMasks.clear();
     m_Impl->RunFailed = true;
 
     throw;
+  }
+}
+
+void mitk::VoxTellTool::PlaceMasks(MultiLabelSegmentation* preview, TimeStepType timeStep)
+{
+  const auto* segmentation = this->GetTargetSegmentation();
+
+  if (segmentation == nullptr)
+    mitkThrow() << "VoxTell needs a segmentation to add its results to.";
+
+  // The groups of the preview stand for those of the segmentation, which the
+  // user can add to while VoxTell computes.
+  while (preview->GetNumberOfGroups() < segmentation->GetNumberOfGroups())
+    preview->AddGroup();
+
+  LabelGroupPlacer placer(segmentation, preview, timeStep);
+
+  const auto writeMode = m_Impl->CreateGroupsAsNeeded
+    ? LabelGroupPlacer::WriteMode::KeepOccupiedVoxels
+    : LabelGroupPlacer::WriteMode::OverwriteVoxels;
+
+  for (std::size_t index = 0; index < m_Impl->CachedMasks.size(); ++index)
+  {
+    const auto& mask = m_Impl->CachedMasks[index];
+
+    if (mask.VoxelCount == 0)
+      continue;
+
+    const auto& label = m_Impl->PreviewLabels[index];
+    auto labelGroup = m_Impl->LabelGroups.find(label->GetValue());
+
+    // Decided once per update, so that a label lies in the same group in every
+    // time step.
+    if (labelGroup == m_Impl->LabelGroups.end())
+    {
+      const auto group = m_Impl->CreateGroupsAsNeeded
+        ? placer.FindGroup(mask)
+        : segmentation->GetActiveLayer();
+
+      if (group == preview->GetNumberOfGroups())
+        preview->AddGroup();
+
+      preview->AddLabel(label, group, false, false);
+      labelGroup = m_Impl->LabelGroups.emplace(label->GetValue(), group).first;
+    }
+
+    placer.Write(mask, labelGroup->second, label->GetValue(), writeMode);
+  }
+
+  for (const auto& [value, group] : m_Impl->LabelGroups)
+  {
+    if (placer.GetVoxelCount(value) != 0)
+      m_Impl->LabelValuesWithResult.insert(value);
   }
 }

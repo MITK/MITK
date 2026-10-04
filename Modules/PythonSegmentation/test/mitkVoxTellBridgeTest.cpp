@@ -20,7 +20,6 @@ class mitkVoxTellBridgeTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkVoxTellBridgeTestSuite);
   MITK_TEST(TestOrientationRoundTrip);
-  MITK_TEST(TestWrittenLabels);
   MITK_TEST(TestRasAffineFollowsGeometry);
   CPPUNIT_TEST_SUITE_END();
 
@@ -60,34 +59,16 @@ public:
       "        masks = np.stack([\n"
       "            voxtell_apply_orientation((labels == value).transpose(2, 1, 0), ornt).transpose(2, 1, 0).astype(np.uint8)\n"
       "            for value in (1, 2)])\n"
-      "        target = np.full(volume.shape, 9, dtype=np.uint16)\n" // stale content must not survive
-      "        voxtell_write_masks(masks, ornt, target)\n"
-      "        round_trip_ok = round_trip_ok and np.array_equal(target, labels)\n"
+      "        for index, value in enumerate((1, 2)):\n"
+      "            target = np.full(volume.shape, 9, dtype=np.uint8)\n" // stale content must not survive
+      "            voxtell_write_mask(masks, index, ornt, target)\n"
+      "            round_trip_ok = round_trip_ok and np.array_equal(target, (labels == value).astype(np.uint8))\n"
       "        case_count += 1\n");
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("All 48 orientations should have been checked", 48,
                                  m_Context->GetVariableAsInt("case_count").value_or(0));
     CPPUNIT_ASSERT_MESSAGE("An orientation was not undone exactly",
                            m_Context->GetVariableAsBool("round_trip_ok").value_or(false));
-  }
-
-  // A label is only reported if it ended up in the image, which a prompt
-  // without result does not, and neither does one that later prompts covered.
-  void TestWrittenLabels()
-  {
-    m_Context->Execute(
-      "identity = np.array([[0, 1], [1, 1], [2, 1]], dtype=np.float64)\n"
-      "empty = np.zeros((2, 3, 4), dtype=np.uint8)\n"
-      "full = np.ones_like(empty)\n"
-      "part = empty.copy()\n"
-      "part[0, 0, 0] = 1\n"
-      "target = np.zeros(empty.shape, dtype=np.uint16)\n"
-      "covered = voxtell_write_masks(np.stack([part, empty, full]), identity, target)\n"
-      "kept = voxtell_write_masks(np.stack([full, part]), identity, target)\n"
-      "written_ok = covered == [3] and kept == [1, 2]\n");
-
-    CPPUNIT_ASSERT_MESSAGE("Only the labels that ended up in the image should be reported",
-                           m_Context->GetVariableAsBool("written_ok").value_or(false));
   }
 
   // The affine handed to nibabel has to agree with the index-to-world transform

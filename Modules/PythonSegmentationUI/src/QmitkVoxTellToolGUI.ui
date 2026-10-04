@@ -107,6 +107,16 @@
        </widget>
       </item>
       <item row="4" column="0" colspan="2">
+       <widget class="QCheckBox" name="createGroupsCheckBox">
+        <property name="toolTip">
+         <string>Put each result into a group where it overlaps neither an existing label nor another result, and add a group if there is none. Existing labels stay unchanged. Otherwise all results go into the active group, where later results take the voxels of earlier ones and of existing labels.</string>
+        </property>
+        <property name="text">
+         <string>Create groups as needed</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
        <widget class="QLabel" name="statusLabel">
         <property name="text">
          <string/>

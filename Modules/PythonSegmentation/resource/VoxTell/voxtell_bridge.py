@@ -83,23 +83,12 @@ def voxtell_prepare_input(image, time_step=0):
     return data[np.newaxis], ornt
 
 
-def voxtell_write_masks(masks, ornt, target):
-    """Writes the masks of VoxTell into the (Z, Y, X) buffer of the image.
+def voxtell_write_mask(masks, index, ornt, target):
+    """Writes one of the masks of VoxTell into a (Z, Y, X) buffer of the image, as 1 and 0.
 
-    The mask of prompt i becomes label i + 1. Where masks overlap, the later one
-    wins, as a single label image cannot hold both.
-
-    Returns the labels that ended up in the buffer. A label is missing if
-    VoxTell found nothing for its prompt, or if later masks covered all of it.
+    The masks are in the space of the array that voxtell_prepare_input returned
+    along with the orientation. Masks can overlap, so each gets a buffer of its
+    own rather than a label in a shared one.
     """
-    inverse = voxtell_inverse_orientation(ornt)
-
-    target[...] = 0
-
-    for index, mask in enumerate(masks):
-        in_image_space = voxtell_apply_orientation(mask.transpose(2, 1, 0), inverse).transpose(2, 1, 0)
-        target[in_image_space != 0] = index + 1
-
-    counts = np.bincount(target.ravel(), minlength=len(masks) + 1)
-
-    return [value for value in range(1, len(masks) + 1) if counts[value] > 0]
+    mask = masks[index].transpose(2, 1, 0)
+    target[...] = voxtell_apply_orientation(mask, voxtell_inverse_orientation(ornt)).transpose(2, 1, 0) != 0

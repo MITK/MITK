@@ -87,7 +87,9 @@ namespace mitk
    * VoxTell segments anatomical structures in a 3D image from free-text
    * prompts, for example "liver" or "left kidney". The tool runs it in-process
    * through a PythonContext on the virtual environment of VoxTell. Each prompt
-   * becomes one label of the preview, named after the prompt.
+   * becomes one label of the preview, named after the prompt. The results of
+   * different prompts can overlap, a structure and a part of it for example,
+   * and are kept apart in groups (see SetCreateGroupsAsNeeded()).
    *
    * VoxTell expects its input in the RAS orientation of the nnU-Net NIfTI
    * reader and does not know about geometry. The tool derives the orientation
@@ -245,6 +247,25 @@ namespace mitk
     /** \brief Returns the prompts that UpdatePreview() segments. */
     const std::vector<std::string>& GetPrompts() const;
 
+    /** \brief Sets whether results go into groups where they do not overlap.
+     *
+     * If true, which is the default, each result goes into the first group in
+     * which it overlaps neither a label of the segmentation nor an earlier
+     * result: the active group, another group, or a group that confirming
+     * adds to the segmentation. Where it shares just a few border voxels with
+     * a label (see LabelGroupPlacer::OVERLAP_TOLERANCE), those voxels stay with
+     * the label. Labels of the segmentation are never changed.
+     *
+     * If false, all results go into the active group. A later prompt takes the
+     * voxels of an earlier one, and confirming overwrites the labels of the
+     * segmentation that are not locked.
+     *
+     * Takes effect with the next UpdatePreview(), without running VoxTell
+     * again for prompts it has just segmented.
+     */
+    void SetCreateGroupsAsNeeded(bool createGroupsAsNeeded);
+    bool GetCreateGroupsAsNeeded() const;
+
     /** \brief Returns the prompts that VoxTell cannot look up, in their given order.
      *
      * VoxTell ships embeddings of a large set of anatomical terms. Any other
@@ -322,8 +343,8 @@ namespace mitk
     /** \brief Returns the prompts that the last update found nothing for.
      *
      * Their labels are not part of the preview, so they cannot be confirmed as
-     * empty labels. A prompt also counts if later prompts covered all of its
-     * result, as a voxel holds a single label.
+     * empty labels. A prompt also counts if other labels took all voxels of
+     * its result (see SetCreateGroupsAsNeeded()).
      */
     const std::vector<std::string>& GetPromptsWithoutResult() const;
 
@@ -337,7 +358,7 @@ namespace mitk
      */
     void InitiateToolByInput() override;
 
-    /** \brief Replaces the labels of the preview by one label per prompt. */
+    /** \brief Empties the preview and makes one label per prompt for it. */
     void UpdatePrepare() override;
 
     /** \brief Removes the labels without result from the preview.
@@ -375,6 +396,12 @@ namespace mitk
 
     /** \brief Removes the labels that got no voxel in any time step of the update. */
     void RemoveLabelsWithoutResult();
+
+    /** \brief Writes the masks of the cached run into the preview as one label per prompt.
+     *
+     * The first time step of an update decides which group a label goes into.
+     */
+    void PlaceMasks(MultiLabelSegmentation* preview, TimeStepType timeStep);
 
     class Impl;
     std::unique_ptr<Impl> m_Impl;

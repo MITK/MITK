@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkLookupTable.h>
 #include <mitkFileSystem.h>
+#include <mitkProgressTask.h>
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -87,6 +88,20 @@ void mitk::TotalSegmentatorTool::Activated()
   this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
+void mitk::TotalSegmentatorTool::Deactivated()
+{
+  // The command runner polls this while the process runs.
+  if (this->IsUpdating())
+    m_AbortRequested = true;
+
+  Superclass::Deactivated();
+}
+
+bool mitk::TotalSegmentatorTool::IsCancelable() const
+{
+  return true;
+}
+
 us::ModuleResource mitk::TotalSegmentatorTool::GetIconResource() const
 {
   // The shared segmentation icon lives in MitkSegmentation, not in this module.
@@ -147,6 +162,7 @@ std::vector<std::string> mitk::TotalSegmentatorTool::BuildArguments(const std::s
 void mitk::TotalSegmentatorTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
+  m_AbortRequested = false;
   this->RemoveAllPreviewLabels();
 }
 
@@ -191,7 +207,18 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     IOUtil::Save(inputAtTimeStep, inputImagePath);
 
     const auto args = this->BuildArguments(inputImagePath, outputImagePath);
-    const bool success = m_CommandRunner(m_ExecutablePath, args);
+    auto* task = m_ProgressCommand->GetProgressTask();
+
+    const RunControl control{
+      [this, task]() { return m_AbortRequested || (task != nullptr && task->IsCancelRequested()); },
+      [task](const std::string& phase)
+      {
+        if (task != nullptr)
+          task->SetName(phase);
+      }
+    };
+
+    const bool success = m_CommandRunner(m_ExecutablePath, args, control);
 
     if (!success)
       return; // Cancelled by the user or the process failed: leave the preview empty.

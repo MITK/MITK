@@ -125,7 +125,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-  void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
   /**

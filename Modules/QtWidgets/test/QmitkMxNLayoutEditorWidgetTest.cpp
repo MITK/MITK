@@ -17,10 +17,16 @@ found in the LICENSE file.
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
+#include <mitkBaseRenderer.h>
 #include <mitkException.h>
+#include <mitkImageGenerator.h>
+#include <mitkRenderingManager.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -125,6 +131,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Save_NavigationOnlyGroupRoundTripsToItself);
   MITK_TEST(Matrix_OffsetOnUnlinkedCellIsIgnored);
   MITK_TEST(Matrix_SliceRampSpreadsOverCellsInOrder);
+  MITK_TEST(Matrix_SliceRampShowsAMovieFrame);
   MITK_TEST(Matrix_TracksAnEditMadeOnTheCards);
   MITK_TEST(Matrix_DetachLeavesNoChipsBehind);
   MITK_TEST(Matrix_CtrlClickOnRowHeaderAddsTheRow);
@@ -1511,7 +1518,7 @@ public:
 
   void Matrix_OffsetOnUnlinkedCellIsIgnored()
   {
-    // An offset is relative to a group's seed, so a cell with no group has
+    // An offset is relative to a group's reference, so a cell with no group has
     // nothing for it to be relative to.
     m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Slice, 5);
 
@@ -1536,6 +1543,50 @@ public:
       CPPUNIT_ASSERT_EQUAL_MESSAGE("The ramp steps once per cell in the given order",
                                    expected[cell], std::get<int>(link->offset));
     }
+  }
+
+  void Matrix_SliceRampShowsAMovieFrame()
+  {
+    // The ramp's offsets are what the windows show, the group's first window
+    // included.
+    const auto image = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f);
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        m_Editor->GetRenderWindowWidget(CellId(cell))->GetRenderWindow()->GetVtkRenderWindow(),
+        image->GetTimeGeometry());
+      SliceNavigation(cell)->GetStepper()->SetPos(4);
+    }
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1), CellId(2) }, id);
+
+    m_Widget->ApplySliceOffsetRamp(QStringList{ CellId(0), CellId(1), CellId(2) }, -1, 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first and the middle window are one slice apart",
+                                 ShownSlice(0) + 1, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The middle and the last window are one slice apart",
+                                 ShownSlice(1) + 1, ShownSlice(2));
+  }
+
+  mitk::SliceNavigationController* SliceNavigation(std::size_t cell) const
+  {
+    const auto widget = m_Editor->GetRenderWindowWidget(CellId(cell));
+    CPPUNIT_ASSERT(nullptr != widget);
+    return widget->GetSliceNavigationController();
+  }
+
+  /** The displayed slice index: the one the navigator shows and slice offsets count. */
+  unsigned int ShownSlice(std::size_t cell) const
+  {
+    auto* navigation = SliceNavigation(cell);
+    const auto* renderer = mitk::BaseRenderer::GetInstance(
+      m_Editor->GetRenderWindowWidget(CellId(cell))->GetRenderWindow()->GetVtkRenderWindow());
+    const auto* stepper = navigation->GetStepper();
+    const unsigned int last = stepper->GetSteps() - 1;
+    const bool inverted = mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      navigation->GetInputWorldTimeGeometry()->GetGeometryForTimeStep(0),
+      renderer->GetCurrentWorldGeometry(), navigation->GetViewDirection());
+    return inverted ? last - stepper->GetPos() : stepper->GetPos();
   }
 
   void Matrix_TracksAnEditMadeOnTheCards()
@@ -1676,7 +1727,7 @@ public:
   void Matrix_RampHiddenForCellsInDifferentGroups()
   {
     // A ramp lays out positions within one series; offsets in different groups
-    // are measured from different seeds, so spreading across them means nothing.
+    // are measured from different references, so spreading across them means nothing.
     this->RaiseAdvancedFace();
     const auto first = m_Widget->CreateGroup();
     const auto second = m_Widget->CreateGroup();

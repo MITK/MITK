@@ -210,9 +210,9 @@ public:
   *   Clears every cell's ties to the group - each dimension link naming it and
   *   any cell whose data selection names it (those cells revert to the default
   *   group) - and drops a leftover registry entry, so a group created empty via
-  *   the "+" button (which the per-member reclaim leaves in place) also
-  *   disappears. The group's display name and color are dropped as well, so a
-  *   later group created with the same id starts clean. The default group
+  *   the layout editor's "+ Group" button (which the per-member reclaim leaves
+  *   in place) also disappears. The group's display name and color are
+  *   dropped as well, so a later group created with the same id starts clean. The default group
   *   (engine index 1, see GetDefaultSyncGroupName) is never removable: the
   *   call is a no-op for it.
   *   A no-op as well for an id that names no group. Emits SyncLinksChanged
@@ -272,8 +272,8 @@ public:
   *        synchronization group.
   *
   *   Useful for callers that want to allocate a fresh group without colliding
-  *   with the set of existing groups (e.g. the "+" button in the per-cell
-  *   utility widget, or external automation).
+  *   with the set of existing groups (e.g. the layout editor's "+ Group"
+  *   button, or external automation).
   */
   GroupSyncIndexType NextFreeSyncGroupIndex() const;
 
@@ -283,6 +283,9 @@ public:
   *        which can run opposite to the stepper), a multiplicative factor
   *        (`double`, > 0) for `Zoom`, an in-plane world-mm vector for `Pan`.
   *        `std::monostate` means "no offset" (the dimension's identity).
+  *        Pan offsets and pan moves are in the axes of each cell's own plane,
+  *        so they mean the same direction only across cells showing the same
+  *        plane; across planes the in-plane vector is applied as is.
   */
   using SyncOffset = std::variant<std::monostate, int, double, mitk::Vector2D>;
 
@@ -297,10 +300,12 @@ public:
   * \brief Link a cell to a named synchronization group for one dimension.
   *
   *   Cells linked to the same group for the same dimension are synchronized
-  *   on that dimension only. On joining, the cell is converged to the
-  *   group's reference - the live state of the group's seed cell (the
-  *   pre-order first member) - combined with the given offset; the seed
-  *   itself is never converged. Convergence is skipped while the involved
+  *   on that dimension only. Every member's offset is relative to one group
+  *   reference, which any member's live state minus its own offset recovers.
+  *   A call moves only 'windowId': on joining, or on an offset change, the
+  *   cell is converged to the group's reference (taken from the group's
+  *   pre-order first member before the call) combined with the given offset;
+  *   the other members stay put. Convergence is skipped while the involved
   *   render windows have no world geometry yet; use 'ReconvergeSyncGroup'
   *   once they do. `Crosshair` links carry no convergence bookkeeping
   *   (propagation is absolute: the crosshair is one world point that every
@@ -362,8 +367,9 @@ public:
 
   /**
   * \brief Re-establish `reference + offset` for every member of the group on
-  *        the given dimension, where the reference is the live state of the
-  *        group's pre-order first member (the seed).
+  *        the given dimension. The group's pre-order first member (the seed)
+  *        stays put and defines the reference: its live state minus its own
+  *        offset.
   *
   *   The safety net for delta drift: boundary clamping, missed events, and
   *   the pan-offset perturbation under zoom all desync members from their
@@ -392,15 +398,17 @@ public:
   void SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection);
 
   /**
-  * \brief Set a node's lookup table as a renderer-specific property on the
-  *        cell and on every member of the cell's `Lut` group.
+  * \brief Set a node's lookup table on the cell and on every member of the
+  *        cell's `Lut` group.
   *
   *   Members share the given lookup table instance as their
   *   renderer-specific "LookupTable" property; renderers outside the group
   *   (and the node-global property) stay untouched. The mapper prefers the
   *   renderer-specific property, so grouped cells detach from node-global
-  *   colormap changes by design. An unlinked cell gets only its own
-  *   renderer's property set.
+  *   colormap changes by design. An unlinked cell falls back to the classic
+  *   node-global write, keeping it coupled to the global colormap controls;
+  *   unlinking a cell from its `Lut` group removes its renderer-specific
+  *   lookup table for the same reason.
   *
   * \throws mitk::Exception on an unknown window, a null node, or a null
   *         lookup table.
@@ -1080,13 +1088,6 @@ public Q_SLOTS:
   */
   void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
-  /**
-  * \brief Create a new data-selection group and assign the given node selection
-  *        widget to it: allocates the next free group index via
-  *        'NextFreeSyncGroupIndex', creates the group, and assigns the widget.
-  */
-  void OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
-
 Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
@@ -1435,9 +1436,11 @@ private:
 
   /**
   * \brief The group's seed cell for a dimension: the pre-order first cell
-  *        linking the group. Empty string if no cell links it.
+  *        linking the group, skipping the cells in 'excluded'. Empty string
+  *        if no other cell links it.
   */
-  QString FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const;
+  QString FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group,
+                            const std::set<QString>& excluded = {}) const;
 
   /**
   * \brief Record 'group' in the hue-assignment order if it is new
@@ -1481,10 +1484,14 @@ private:
   std::vector<QString> ComputeGeometryComponent(const QString& windowId) const;
 
   /**
-  * \brief Align every component member's reference geometry to the
-  *        component seed's (pre-order first member). Members whose geometry
-  *        already matches are left alone; without a realized seed geometry
-  *        nothing happens (deferred to the next reinit / re-converge).
+  * \brief Align every member of the geometry-authority component of
+  *        'windowId' to the reference geometry of the component's pre-order
+  *        first member other than 'windowId': the cell that changed adapts to
+  *        the rest. Members whose geometry already matches are left alone;
+  *        without a realized reference geometry nothing happens (deferred to
+  *        the next reinit / re-converge). A re-initialized member keeps its
+  *        camera, slice position and time step; only a member that had no
+  *        geometry yet is fitted.
   *
   * \return The ids of the members that were re-initialized; the caller
   *         re-converges the groups these touch.
@@ -1494,18 +1501,35 @@ private:
   /**
   * \brief Re-converge every `Slice` / `Zoom` / `Pan` group that has at least
   *        one member among 'windowIds' (after their geometry changed).
+  *
+  *   Each group is anchored on its pre-order first member outside
+  *   'windowIds', so the changed cells adapt to the rest of the group; only
+  *   a group whose members all changed is anchored on its seed.
   */
   void ReconvergeGeometryRelativeGroups(const std::vector<QString>& windowIds);
 
   /**
-  * \brief Absolute-set one member to the seed's live state combined with the
+  * \brief Converge every other member of 'group' to the reference recovered
+  *        from 'anchorId' (see ConvergeMemberToAnchor). The anchor stays put.
+  *
+  * \throws mitk::Exception if 'anchorId' does not link 'group' for the
+  *         dimension.
+  */
+  void ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension dimension, const std::string& group,
+                                 const QString& anchorId);
+
+  /**
+  * \brief Absolute-set one member to the group reference combined with the
   *        member's declared offset (dimension-typed, see SetSyncLink).
   *
-  *   Skips silently while an involved render window has no world geometry
-  *   yet (unrealized); re-converge covers the deferred case. The seed
-  *   itself is never converged - its live state is the reference.
+  *   The reference is the anchor's live state with 'anchorOffset' (the
+  *   anchor's offset, typed for the dimension) taken out. The anchor may be
+  *   the member itself; passing its previous offset then applies an offset
+  *   change to it. Skips silently while an involved render window has no
+  *   world geometry yet (unrealized); re-converge covers the deferred case.
   */
-  void ConvergeMemberToSeed(QmitkMxNSyncDimension dimension, const QString& seedId, const QString& memberId);
+  void ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension, const QString& anchorId,
+                              const SyncOffset& anchorOffset, const QString& memberId);
 
   /**
   * \brief Per-cell synchronization links (all dimensions except selection,

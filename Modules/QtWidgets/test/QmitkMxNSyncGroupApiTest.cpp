@@ -27,7 +27,7 @@ found in the LICENSE file.
  *   - AddSynchronizationGroup is idempotent
  *   - SetSynchronizationGroup auto-creates, moves between groups, and is
  *     edge-idempotent on the same group
- *   - NextFreeSyncGroupIndex / OnCreateNewSyncGroupRequested pick gaps
+ *   - NextFreeSyncGroupIndex picks gaps
  *
  * The test surfaces the protected 'GetSyncGroupConnector' / 'GetSyncGroupCount'
  * accessors via a thin subclass to inspect connector identity and registered
@@ -59,7 +59,6 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Set_MovesWidgetBetweenGroups);
   MITK_TEST(Set_IsIdempotentOnSameGroup);
   MITK_TEST(NextFreeSyncGroupIndex_PicksLowestUnused);
-  MITK_TEST(OnCreateNewSyncGroupRequested_AssignsNextFree);
   MITK_TEST(SetSelectedPosition_UnknownWindowIsIgnored);
   CPPUNIT_TEST_SUITE_END();
 
@@ -334,7 +333,7 @@ public:
       true, connector->GetSelectionMode());
   }
 
-  // ---------- NextFreeSyncGroupIndex / OnCreateNewSyncGroupRequested ----------
+  // ---------- NextFreeSyncGroupIndex ----------
 
   void NextFreeSyncGroupIndex_PicksLowestUnused()
   {
@@ -352,24 +351,6 @@ public:
 
     widget.AddSynchronizationGroup(2);
     CPPUNIT_ASSERT_EQUAL(4, widget.NextFreeSyncGroupIndex());
-  }
-
-  void OnCreateNewSyncGroupRequested_AssignsNextFree()
-  {
-    TestableQmitkMxNMultiWidget widget;
-    widget.SetDataStorage(m_DataStorage);
-
-    widget.AddSynchronizationGroup(1);
-    widget.AddSynchronizationGroup(3);
-
-    QmitkSynchronizedNodeSelectionWidget nodeWidget(nullptr);
-    nodeWidget.SetDataStorage(m_DataStorage);
-
-    widget.OnCreateNewSyncGroupRequested(&nodeWidget);
-
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should pick gap index 2, not 4",
-                                 2, nodeWidget.GetSyncGroup());
-    CPPUNIT_ASSERT(nullptr != ConnectorOf(widget, 2));
   }
 
   void SetSelectedPosition_UnknownWindowIsIgnored()

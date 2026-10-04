@@ -75,15 +75,20 @@
 	What a group keeps in step differs per dimension, and a few consequences are worth knowing:
 	<ul>
 		<li> <b>Pan is locked in world millimetres.</b> One gesture moves every member the same
-			distance in the patient, so a more zoomed-in window moves further on screen.
+			distance in the patient, so a more zoomed-in window moves further on screen. The move
+			is applied along each window's own plane axes, so it points the same way in the patient
+			only for windows showing the same plane; across planes the in-plane vector is applied
+			as is.
 		<li> <b>Zoom is locked as a factor.</b> Members keep their zoom ratio to each other, not a
 			shared anatomical centre.
 		<li> <b>Crosshair is absolute.</b> Setting the point of interest moves every member onto the
 			same world point, which also changes their slices. A crosshair link therefore
 			cannot carry an offset.
 		<li> <b>Offsets are applied once and then kept.</b> A slice, zoom or pan offset is established
-			when a window joins its group, measured from the group's first window, and is kept
-			because every later change moves all members by the same amount. At the end of the
+			when a window joins its group or its offset is changed, and is kept because every later
+			change moves all members by the same amount. All offsets of a group, the first window's
+			included, count from one common reference, so setting an offset moves only that window;
+			the others stay where they are. At the end of the
 			slice range, or where the camera stops, a member can lose its offset; "Re-converge"
 			(context menu or group card) restores it.
 		<li> <b>A pan offset does not survive zooming.</b> A zoom centres on the point of the window
@@ -91,8 +96,9 @@
 			a group whose members sit at a pan offset.
 		<li> <b>Windowing and LUT are per window.</b> New windows share level/window and colormap
 			through the default group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group). A window
-			taken out of it keeps its own values; its
-			controls then act on that window alone. The windows of a data-based layout are the
+			taken out of windowing or LUT synchronization drops its own value and shows the image's
+			global level/window or colormap again; its controls then behave like the classic global
+			controls. The windows of a data-based layout are the
 			exception: they start without windowing and LUT synchronization.
 	</ul>
 

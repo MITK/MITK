@@ -179,10 +179,10 @@ public:
   void ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis);
 
   /**
-   * \brief Set one cell's offset relative to its group's seed on an
+   * \brief Set one cell's offset relative to its group's reference on an
    *        offset-bearing dimension, keeping its group. A no-op for a cell that
-   *        is not linked on the dimension: an offset needs a seed to be relative
-   *        to.
+   *        is not linked on the dimension: an offset needs a group to be
+   *        relative to.
    */
   void SetCellDimensionOffset(const QString& windowId, QmitkMxNSyncDimension dimension,
                               const QmitkMxNMultiWidget::SyncOffset& offset);

@@ -215,7 +215,7 @@ group independently of the others:
 | --- | --- | --- |
 | `slice` | the slice position | integer, in displayed slices |
 | `zoom` | the zoom factor | number > 0, a multiplicative factor |
-| `pan` | the in-plane position | `[x, y]`, in world mm |
+| `pan` | the in-plane position | `[x, y]`, in world mm along the window's own plane axes |
 | `crosshair` | the selected world position | none |
 | `orientation` | the view direction | none |
 | `windowing` | level/window | none |
@@ -232,17 +232,27 @@ accept an object form carrying an offset:
 }
 ```
 
-The group's *seed* is its first member in document order. When the layout
-is applied, every other member converges to the seed's live state combined
-with its own offset, and from then on the group moves together, which keeps
-the offsets. A member clamped at the end of its slice range or camera bounds
-can lose its offset; the editor's re-converge action restores it.
+Every member's offset, the first member's included, is relative to one
+common group reference, so only the differences between the offsets carry
+meaning: offsets of `-1`, `0` and `+1` and offsets of `0`, `+1` and `+2`
+describe the same layout. The group's *seed* is its first member in document
+order. When the layout is applied, the seed stays where it is and defines
+the reference (its live state minus its own offset); every other member
+converges to the reference combined with its own offset. From then on the
+group moves together, which keeps the offsets. A member clamped at the end of
+its slice range or camera bounds can lose its offset; the editor's
+re-converge action restores it.
 
 A slice offset counts displayed slices: the index the navigator shows, which
 follows the image's own index axis for the view direction and can run
 opposite to the slice stepper. Offsets of `-1`, `0` and `+1` on three members
 therefore show the previous, the same and the next slice, whatever the
 view's stepping direction.
+
+A pan offset and every shared pan move are applied in the axes of each
+window's own plane. They therefore point the same way in the patient only
+across windows that show the same plane; across planes the in-plane vector is
+applied as is.
 
 `orientation` aligns a joining window to its group's view direction.
 `windowing` and `lut` relay changes to every member but do not converge a
@@ -324,8 +334,8 @@ for per-renderer node properties (per-node `visible` and `layer`) is seeded
 from the cell that appears first in document order whose `links.selection`
 names that group. After seeding, every other group member is normalised to
 the seed cell's values for those keys. The navigation dimensions use the
-same seed rule for their convergence (see "Navigation and appearance links"
-above).
+same seed rule to decide which window stays put while the others converge
+(see "Navigation and appearance links" above).
 
 - **Document order** = pre-order traversal of the splitter tree (splits'
   `children` arrays in array order).

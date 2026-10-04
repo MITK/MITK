@@ -20,10 +20,14 @@ found in the LICENSE file.
 #include <mitkImageGenerator.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
 
 #include <cstdlib>
 
@@ -33,7 +37,10 @@ found in the LICENSE file.
  *     exactly once per member (no re-entrant propagation) and leaves
  *     unlinked cells alone.
  *   - Joining an orientation group aligns the joining cell's plane to the
- *     group's seed.
+ *     group's, wherever the joining cell sits in the layout.
+ *   - A plane change re-converges the cell's slice / zoom / pan offsets even
+ *     without an orientation link, and the changed cell adapts to its group.
+ *   - Aligning a cell's geometry keeps its camera and slice position.
  *   - The MxN group reinit re-initializes the connected component of the
  *     slice/orientation link graph (the A-slice-B, B-orientation-C chain
  *     converges as one) to a shared geometry, leaves singletons untouched,
@@ -48,6 +55,10 @@ class QmitkMxNGeometryAuthorityTestSuite : public mitk::TestFixture
   MITK_TEST(Orientation_PropagatesToGroup_ExactlyOncePerMember);
   MITK_TEST(Orientation_UnlinkedCellDoesNotPropagate);
   MITK_TEST(OrientationLink_AlignsJoiningCellToSeedPlane);
+  MITK_TEST(OrientationLink_JoinFromEarlierCell_AdoptsGroupPlane);
+  MITK_TEST(PlaneChange_UnlinkedOrientation_ReconvergesSliceOffset);
+  MITK_TEST(PlaneChange_UnlinkedOrientationOnSeed_KeepsGroup);
+  MITK_TEST(SliceLink_GeometryAlignment_KeepsMemberZoom);
   MITK_TEST(GroupReinit_ChainConvergesComponentOnly);
   MITK_TEST(GroupReinit_ReconvergesSliceOffsets);
   MITK_TEST(GlobalReinit_StillResetsAllCells);
@@ -120,6 +131,25 @@ public:
     return Snc(index)->GetDefaultViewDirection();
   }
 
+  mitk::BaseRenderer* Renderer(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    CPPUNIT_ASSERT(nullptr != cell);
+    return mitk::BaseRenderer::GetInstance(cell->GetRenderWindow()->GetVtkRenderWindow());
+  }
+
+  /** The displayed slice index: the one the navigator shows and slice offsets count. */
+  unsigned int ShownSlice(std::size_t index) const
+  {
+    auto* renderer = Renderer(index);
+    const auto* stepper = Snc(index)->GetStepper();
+    const unsigned int last = stepper->GetSteps() - 1;
+    const bool inverted = mitk::SliceNavigationHelper::IsSliceIndexInverted(
+      Snc(index)->GetInputWorldTimeGeometry()->GetGeometryForTimeStep(0),
+      renderer->GetCurrentWorldGeometry(), Snc(index)->GetViewDirection());
+    return inverted ? last - stepper->GetPos() : stepper->GetPos();
+  }
+
   /** A plane different from every cell's current default, so a change is observable. */
   mitk::AnatomicalPlane OtherPlane() const
   {
@@ -169,6 +199,88 @@ public:
     m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Joining an orientation group adopts the seed's plane",
                                  target, Plane(1));
+  }
+
+  void OrientationLink_JoinFromEarlierCell_AdoptsGroupPlane()
+  {
+    const auto target = OtherPlane();
+    m_Editor->SetViewDirection(CellId(2), target); // unlinked: local only
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "planes");
+
+    CPPUNIT_ASSERT(target != Plane(0));
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A joiner earlier in the layout adopts the group's plane",
+                                 target, Plane(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group keeps its plane", target, Plane(2));
+  }
+
+  void PlaneChange_UnlinkedOrientation_ReconvergesSliceOffset()
+  {
+    // Off the middle slice, so a plane change's reset is told apart.
+    Snc(0)->GetStepper()->SetPos(5);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "s", 1);
+    const unsigned int anchorPos = Snc(0)->GetStepper()->GetPos();
+
+    m_Editor->SetViewDirection(CellId(1), OtherPlane());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group does not move for a member's plane change",
+                                 anchorPos, Snc(0)->GetStepper()->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The member is re-converged to its offset after the plane change",
+                                 ShownSlice(0) + 1, ShownSlice(1));
+  }
+
+  void PlaneChange_UnlinkedOrientationOnSeed_KeepsGroup()
+  {
+    // Off the middle slice, so a plane change's reset is told apart.
+    Snc(0)->GetStepper()->SetPos(5);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "s", 1);
+    const unsigned int memberPos = Snc(1)->GetStepper()->GetPos();
+
+    m_Editor->SetViewDirection(CellId(0), OtherPlane());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group is not pulled to the first window's reset state",
+                                 memberPos, Snc(1)->GetStepper()->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first window adapts to the group after its plane change",
+                                 ShownSlice(1) - 1, ShownSlice(0));
+  }
+
+  void SliceLink_GeometryAlignment_KeepsMemberZoom()
+  {
+    // Cells 2 and 3 show a larger image; 3 is coupled to 2 by orientation only.
+    // Linking 2 into the slice group of cell 0 aligns the whole component to
+    // cell 0's geometry, which must not cost 2 its zoom or 3 its slice.
+    const auto larger = mitk::ImageGenerator::GenerateGradientImage<short>(32, 32, 8, 1.0f, 1.0f, 1.0f);
+    for (const std::size_t i : { std::size_t(2), std::size_t(3) })
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        m_Editor->GetRenderWindowWidget(CellId(i))->GetRenderWindow()->GetVtkRenderWindow(),
+        larger->GetTimeGeometry());
+    }
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "o");
+    m_Editor->SetSyncLink(CellId(3), QmitkMxNSyncDimension::Orientation, "o");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
+
+    auto* camera = Renderer(2)->GetVtkRenderer()->GetActiveCamera();
+    const double zoomedScale = camera->GetParallelScale() / 4.0;
+    camera->SetParallelScale(zoomedScale);
+    Snc(3)->GetStepper()->SetPos(1);
+    const auto* slicePlane = Snc(3)->GetCurrentPlaneGeometry();
+    mitk::Point3D slicePoint;
+    slicePlane->Project(slicePlane->GetCenter(), slicePoint);
+
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "s");
+
+    const auto* reference = Snc(0)->GetInputWorldTimeGeometry();
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the linked member is aligned to the group geometry",
+                           mitk::Equal(*reference, *Snc(2)->GetInputWorldTimeGeometry(), mitk::eps, false));
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the orientation-coupled cell is aligned as well",
+                           mitk::Equal(*reference, *Snc(3)->GetInputWorldTimeGeometry(), mitk::eps, false));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A slice-only member keeps its zoom through the alignment",
+      zoomedScale, Renderer(2)->GetVtkRenderer()->GetActiveCamera()->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An orientation-only member keeps its slice world position",
+      0.0, Snc(3)->GetCurrentPlaneGeometry()->DistanceFromPlane(slicePoint), 1e-3);
   }
 
   void GroupReinit_ChainConvergesComponentOnly()

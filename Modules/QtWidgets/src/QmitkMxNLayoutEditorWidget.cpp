@@ -2397,7 +2397,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   m_SliceOffsetEdit->setObjectName(QStringLiteral("mxnMatrixSliceOffset"));
   m_SliceOffsetEdit->setRange(MixedSliceOffset, 9999);
   m_SliceOffsetEdit->setSpecialValueText(tr("multiple"));
-  m_SliceOffsetEdit->setToolTip(tr("Slice offset in shown slices, relative to the group's seed"));
+  m_SliceOffsetEdit->setToolTip(tr("Slice offset in shown slices, relative to the group's reference"));
   connect(m_SliceOffsetEdit, &QAbstractSpinBox::editingFinished, this, [this]()
   {
     // Detaching the editor disables it, which moves focus out of whichever spin
@@ -2420,7 +2420,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   m_ZoomOffsetEdit->setRange(MixedZoomOffset, 100.0);
   m_ZoomOffsetEdit->setSingleStep(0.1);
   m_ZoomOffsetEdit->setSpecialValueText(tr("multiple"));
-  m_ZoomOffsetEdit->setToolTip(tr("Zoom factor relative to the group's seed"));
+  m_ZoomOffsetEdit->setToolTip(tr("Zoom factor relative to the group's reference"));
   connect(m_ZoomOffsetEdit, &QAbstractSpinBox::editingFinished, this, [this]()
   {
     if (m_MultiWidget.isNull() || m_ZoomOffsetEdit->value() <= MixedZoomOffset)
@@ -2444,7 +2444,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   {
     box->setRange(MixedPanOffset, 1.0e5);
     box->setSpecialValueText(tr("multiple"));
-    box->setToolTip(tr("Pan offset in world mm, relative to the group's seed"));
+    box->setToolTip(tr("Pan offset in world mm, relative to the group's reference"));
     connect(box, &QAbstractSpinBox::editingFinished, this, [this]()
     {
       if (m_MultiWidget.isNull() || m_PanOffsetXEdit->value() <= MixedPanOffset
@@ -2670,7 +2670,7 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
       : (common ? 0 : -1);
   m_MatrixGroupPicker->setCurrentIndex(currentIndex);
 
-  // Offsets are per dimension and relative to a group seed, so they apply only
+  // Offsets are per dimension and relative to a group reference, so they apply only
   // to a selection wholly on one offset-bearing dimension whose cells are all
   // linked - an offset on an unlinked cell would have nothing to be relative to.
   std::optional<QmitkMxNSyncDimension> dimension;
@@ -2692,7 +2692,7 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
   // Slice only: zoom composes multiplicatively and a pan ramp has no
   // unambiguous direction in two dimensions. One group only: a ramp lays out
   // positions within a single series, and offsets in different groups are
-  // measured from different seeds, so spreading across them means nothing.
+  // measured from different references, so spreading across them means nothing.
   const bool ramp = slice && selection.size() > 1 && common && !commonGroup.empty();
   m_RampLabel->setVisible(ramp);
   m_RampFromEdit->setVisible(ramp);

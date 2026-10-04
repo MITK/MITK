@@ -39,11 +39,14 @@ found in the LICENSE file.
 
 #include <QColor>
 
+#include <array>
+
 /**
  * Behavior tests for the MxN per-dimension navigation links: predicate
- * scoping through the editor's group map, converge-on-link with the
- * pre-order seed as reference, the slice / zoom / pan init-offsets,
- * re-converge after drift, and the Synchronize macro semantics.
+ * scoping through the editor's group map, converge-on-link and offset
+ * changes that move only the written cell (offsets relative to one group
+ * reference, whichever member joined first), the slice / zoom / pan
+ * init-offsets, re-converge after drift, and the Synchronize macro semantics.
  *
  * Events are driven synthetically through the editor's display-action
  * broadcast, exactly as in QmitkMxNSynchronizeScopeTest.
@@ -57,6 +60,11 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
   MITK_TEST(Converge_Zoom_FactorOffset);
   MITK_TEST(Converge_Pan_WorldOffset);
+  MITK_TEST(Converge_JoinFromEarlierCell_ConvergesJoiner);
+  MITK_TEST(Converge_Slice_OffsetOnSeed_ShiftsSeed);
+  MITK_TEST(Converge_Zoom_OffsetOnSeed_ShiftsSeed);
+  MITK_TEST(Converge_SeedLeaves_KeepsMemberRelation);
+  MITK_TEST(Converge_SaveLoadRoundTrip_KeepsMemberRelations);
   MITK_TEST(Reconverge_RestoresOffsetAfterBoundaryClamp);
   MITK_TEST(PanOffset_DriftsUnderZoom_ReconvergeRestores);
   MITK_TEST(Macro_LinksAllCellsWithoutConverge);
@@ -66,6 +74,8 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Windowing_GroupedGesture_WritesPerRendererToMembers);
   MITK_TEST(Windowing_UnlinkedGesture_KeepsNodeGlobalWrite);
   MITK_TEST(Lut_SetLookupTable_PropagatesToMembersOnly);
+  MITK_TEST(Lut_UnlinkReturnsTheCellToNodeGlobal);
+  MITK_TEST(Lut_SetLookupTable_Unlinked_WritesNodeGlobal);
   MITK_TEST(SetLevelWindow_Grouped_SetsMembersByValue);
   MITK_TEST(SetLevelWindow_Unlinked_WritesNodeGlobal);
   MITK_TEST(AdjustLevelWindow_Grouped_PreservesMemberDifferences);
@@ -107,14 +117,19 @@ public:
     m_Editor->InitializeMultiWidget();
     m_Editor->SetLayout(1, 3); // cells: mxn__widget0 .. mxn__widget2
 
+    RealiseViews();
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      SetSlicePos(i, 4); // mid-stack baseline, both scroll directions in range
+    }
+  }
+
+  void RealiseViews() const
+  {
     for (const auto& [name, cell] : m_Editor->GetRenderWindowWidgets())
     {
       mitk::RenderingManager::GetInstance()->InitializeView(
         cell->GetRenderWindow()->GetVtkRenderWindow(), m_Image->GetTimeGeometry());
-    }
-    for (std::size_t i = 0; i < 3; ++i)
-    {
-      SetSlicePos(i, 4); // mid-stack baseline, both scroll directions in range
     }
   }
 
@@ -370,6 +385,101 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(seedAfter[1] + 5.0, memberAfter[1], 1e-3);
   }
 
+  void Converge_JoinFromEarlierCell_ConvergesJoiner()
+  {
+    // The joining cell adapts to the group, wherever it sits in the layout.
+    SetShownSlice(2, 6);
+    SetShownSlice(0, 2);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group does not move for a joiner", 6u, ShownSlice(2));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A joiner earlier in the layout converges to the group",
+                                 6u, ShownSlice(0));
+  }
+
+  void Converge_Slice_OffsetOnSeed_ShiftsSeed()
+  {
+    // The movie frame authored on a group whose first window carries -1:
+    // every offset counts from one common reference, the first window's
+    // included.
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Slice, "nav");
+    }
+    const unsigned int reference = ShownSlice(1);
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav", -1);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", 0);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav", 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first window shows reference - 1", reference - 1, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The middle window shows the reference", reference, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The last window shows reference + 1", reference + 1, ShownSlice(2));
+
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Re-converge keeps a converged group in place", reference - 1, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL(reference, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL(reference + 1, ShownSlice(2));
+  }
+
+  void Converge_Zoom_OffsetOnSeed_ShiftsSeed()
+  {
+    const double scale = Camera(1)->GetParallelScale();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "z");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "z");
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "z", 2.0);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A factor on the first window zooms that window",
+      scale / 2.0, Camera(0)->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The written window alone moves",
+      scale, Camera(1)->GetParallelScale(), 1e-6);
+
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Zoom, "z");
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Re-converge keeps the member at the reference",
+      scale, Camera(1)->GetParallelScale(), 1e-6);
+  }
+
+  void Converge_SeedLeaves_KeepsMemberRelation()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", -1);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav", 1);
+    const unsigned int shown1 = ShownSlice(1);
+    const unsigned int shown2 = ShownSlice(2);
+    CPPUNIT_ASSERT_EQUAL(shown1 + 2, shown2);
+
+    m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Slice);
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The new first member stays put", shown1, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The remaining offsets keep their relation", shown2, ShownSlice(2));
+  }
+
+  void Converge_SaveLoadRoundTrip_KeepsMemberRelations()
+  {
+    // Joined out of layout order: after a save and load the document's first
+    // window anchors the group, and every member must land where it was.
+    SetShownSlice(2, 6);
+    SetShownSlice(0, 2);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav", -1);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", 1);
+    const std::array<unsigned int, 3> before{ ShownSlice(0), ShownSlice(1), ShownSlice(2) };
+
+    m_Editor->ApplyLayout(m_Editor->SerializeLayout());
+    RealiseViews();
+    SetShownSlice(0, before[0]);
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
+
+    for (std::size_t i = 0; i < before.size(); ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A save/load round trip keeps every member's slice",
+                                   before[i], ShownSlice(i));
+    }
+  }
+
   void Reconverge_RestoresOffsetAfterBoundaryClamp()
   {
     // Park the seed one step below the last slice so the member's +1 offset
@@ -614,6 +724,47 @@ public:
       nullptr == m_ImageNode->GetPropertyList(Renderer(2))->GetProperty("LookupTable"));
     CPPUNIT_ASSERT_MESSAGE("The node-global LookupTable stays untouched",
       nodeGlobalBefore == m_ImageNode->GetPropertyList(nullptr)->GetProperty("LookupTable"));
+  }
+
+  mitk::LookupTableProperty* RendererLookupTable(std::size_t index) const
+  {
+    return dynamic_cast<mitk::LookupTableProperty*>(
+      m_ImageNode->GetPropertyList(Renderer(index))->GetProperty("LookupTable"));
+  }
+
+  void Lut_UnlinkReturnsTheCellToNodeGlobal()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Lut, "luts");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Lut, "luts");
+    m_Editor->SetLookupTable(CellId(0), m_ImageNode, mitk::LookupTable::New());
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the grouped write is renderer-specific",
+                           nullptr != RendererLookupTable(0));
+
+    m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Lut);
+
+    CPPUNIT_ASSERT_MESSAGE("An unlinked cell falls back to the node-global lookup table",
+                           nullptr == RendererLookupTable(0));
+    CPPUNIT_ASSERT_MESSAGE("The remaining group member keeps its lookup table",
+                           nullptr != RendererLookupTable(1));
+  }
+
+  void Lut_SetLookupTable_Unlinked_WritesNodeGlobal()
+  {
+    m_Editor->ClearSyncLink(CellId(0), QmitkMxNSyncDimension::Lut);
+
+    // Identified by type, not instance: the node already carries a
+    // node-global lookup table property, which takes the value as a copy.
+    auto lookupTable = mitk::LookupTable::New();
+    lookupTable->SetType(mitk::LookupTable::JET);
+    m_Editor->SetLookupTable(CellId(0), m_ImageNode, lookupTable);
+
+    auto* nodeGlobal = dynamic_cast<mitk::LookupTableProperty*>(
+      m_ImageNode->GetPropertyList(nullptr)->GetProperty("LookupTable"));
+    CPPUNIT_ASSERT(nullptr != nodeGlobal);
+    CPPUNIT_ASSERT_MESSAGE("An unlinked cell writes the node-global lookup table",
+                           mitk::LookupTable::JET == nodeGlobal->GetLookupTable()->GetActiveType());
+    CPPUNIT_ASSERT_MESSAGE("No renderer-specific property appears for an unlinked cell",
+                           nullptr == RendererLookupTable(0));
   }
 
   void SetLevelWindow_Grouped_SetsMembersByValue()

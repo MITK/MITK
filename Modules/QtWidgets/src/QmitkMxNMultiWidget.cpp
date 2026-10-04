@@ -3014,9 +3014,10 @@ void QmitkMxNMultiWidget::RemoveSynchronizationGroup(const std::string& id)
     }
   }
 
-  // A group registered with no members (created empty via the "+" button) is not
-  // reclaimed by the per-member selection reclaim, so drop its registry entry
-  // here. The index-1 guard above keeps this off the default group.
+  // A group registered with no members (created empty via the layout editor's
+  // "+ Group" button) is not reclaimed by the per-member selection reclaim, so
+  // drop its registry entry here. The index-1 guard above keeps this off the
+  // default group.
   if (registeredIndex != 0)
   {
     m_SynchronizedWidgetConnectors.erase(registeredIndex);
@@ -3100,29 +3101,12 @@ QmitkMxNMultiWidget::GroupSyncIndexType QmitkMxNMultiWidget::NextFreeSyncGroupIn
   return candidate;
 }
 
-void QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
-{
-  // Guard against the slot firing before the editor has a data storage attached
-  // (e.g. during teardown, or if SetDataStorage(nullptr) was called after init).
-  // AddSynchronizationGroup would otherwise throw, and Qt slots must not let
-  // exceptions escape into the event dispatcher.
-  if (nullptr == this->GetDataStorage())
-  {
-    MITK_WARN << "Ignoring 'create new synchronization group' request: no data storage set on the multi widget.";
-    return;
-  }
-
-  // 'SetSynchronizationGroup' auto-creates the group via 'AddSynchronizationGroup'
-  // on first reference, so a separate Add call here would be redundant.
-  const auto next = this->NextFreeSyncGroupIndex();
-  this->SetSynchronizationGroup(synchronizedWidget, next);
-}
-
 QmitkMxNMultiWidget::GroupSyncIndexType
 QmitkMxNMultiWidget::EnsureSelectionGroupIndex(const std::string& group)
 {
   // Reuse the existing selection connector for this string id if there is one
-  // (a "+"/document group, or one this method allocated earlier).
+  // (a group created with the layout editor's "+ Group" button, a document
+  // group, or one this method allocated earlier).
   for (const auto& [index, name] : m_GroupNameByIndex)
   {
     if (name == group)
@@ -3236,6 +3220,14 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
                 << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
   }
 
+  // A write moves only the written cell, so the group's reference is taken
+  // before the write: from the group's pre-order first member, which is the
+  // written cell itself (with its previous offset) only when it already leads
+  // the group.
+  const auto anchorId = this->FindSyncGroupSeed(dimension, group);
+  const auto anchorLink = anchorId.isEmpty() ? std::nullopt : this->GetSyncLink(anchorId, dimension);
+  const auto anchorOffset = anchorLink.has_value() ? anchorLink->offset : SyncOffset{};
+
   auto& links = m_CellSyncLinks[windowId];
   switch (dimension)
   {
@@ -3296,48 +3288,39 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
   links.groups[DimensionIndex(dimension)] = group;
   this->RegisterGroupForHue(group);
 
-  // An orientation link aligns the joining cell's plane to the seed's
+  // An orientation link aligns the joining cell's plane to the group's
   // (absolute state; joining means adopting the group's plane).
-  if (QmitkMxNSyncDimension::Orientation == dimension)
+  if (QmitkMxNSyncDimension::Orientation == dimension && !anchorId.isEmpty() && anchorId != windowId)
   {
-    const auto seedId = this->FindSyncGroupSeed(dimension, group);
-    if (!seedId.isEmpty() && seedId != windowId)
+    const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
+    const auto memberWidget = this->GetRenderWindowWidget(windowId);
+    if (nullptr != anchorWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
     {
-      const auto seedWidget = this->GetRenderWindowWidget(seedId);
-      const auto memberWidget = this->GetRenderWindowWidget(windowId);
-      if (nullptr != seedWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
-      {
-        // Silent path: adopting the group plane is a relayed change, not a
-        // new orientation gesture.
-        memberWidget->GetUtilityWidget()->SetViewDirectionSelection(
-          seedWidget->GetSliceNavigationController()->GetDefaultViewDirection());
-      }
+      // Silent path: adopting the group plane is a relayed change, not a
+      // new orientation gesture.
+      memberWidget->GetUtilityWidget()->SetViewDirectionSelection(
+        anchorWidget->GetSliceNavigationController()->GetDefaultViewDirection());
     }
   }
 
   // Slice and orientation need a shared reference geometry (a step index or
   // a plane name means different physical locations across divergent
-  // geometries); align the cell's geometry-authority component to its seed
-  // and restore offsets that the alignment reset.
+  // geometries); align the cell to its geometry-authority component and
+  // restore offsets that the alignment reset.
   if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Orientation == dimension)
   {
     const auto reinitialized = this->EnforceComponentGeometry(windowId);
     this->ReconvergeGeometryRelativeGroups(reinitialized);
   }
 
-  // Converge the joining cell to the group's reference. The pre-order first
-  // member is the seed and defines the reference, so it is never converged
-  // itself. Crosshair propagation is absolute (no state to converge); a
-  // windowing / lut member keeps its own value and only later changes
-  // propagate.
-  if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Zoom == dimension
-      || QmitkMxNSyncDimension::Pan == dimension)
+  // Converge the written cell to the group's reference. Crosshair propagation
+  // is absolute (no state to converge); a windowing / lut member keeps its
+  // own value and only later changes propagate.
+  if (!anchorId.isEmpty()
+      && (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Zoom == dimension
+          || QmitkMxNSyncDimension::Pan == dimension))
   {
-    const auto seedId = this->FindSyncGroupSeed(dimension, group);
-    if (!seedId.isEmpty() && seedId != windowId)
-    {
-      this->ConvergeMemberToSeed(dimension, seedId, windowId);
-    }
+    this->ConvergeMemberToAnchor(dimension, anchorId, anchorOffset, windowId);
   }
 }
 
@@ -3364,6 +3347,14 @@ void QmitkMxNMultiWidget::ClearSyncLink(const QString& windowId, QmitkMxNSyncDim
       // An unlinked cell renders the node-global level/window again, which is
       // what keeps it coupled to the global level/window controls.
       this->RemoveCellRendererProperties(windowId, { "levelwindow" });
+      const auto widget = this->GetRenderWindowWidget(windowId);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
+      break;
+    }
+    case QmitkMxNSyncDimension::Lut:
+    {
+      // Same coupling as windowing: back to the node-global colormap.
+      this->RemoveCellRendererProperties(windowId, { "LookupTable" });
       const auto widget = this->GetRenderWindowWidget(windowId);
       mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
       break;
@@ -3434,17 +3425,31 @@ void QmitkMxNMultiWidget::ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, c
     mitkThrow() << "ReconvergeSyncGroup: no cell links group '" << group
                 << "' for dimension '" << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
   }
+  this->ConvergeSyncGroupToAnchor(dimension, group, seedId);
+}
+
+void QmitkMxNMultiWidget::ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension dimension,
+                                                    const std::string& group,
+                                                    const QString& anchorId)
+{
+  const auto anchorLink = this->GetSyncLink(anchorId, dimension);
+  if (!anchorLink.has_value() || anchorLink->group != group)
+  {
+    mitkThrow() << "ConvergeSyncGroupToAnchor: cell '" << anchorId.toStdString()
+                << "' does not link group '" << group << "' for dimension '"
+                << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
+  }
 
   for (const auto& descriptor : this->ListWindowDescriptors())
   {
-    if (descriptor.id == seedId)
+    if (descriptor.id == anchorId)
     {
       continue;
     }
     const auto it = m_CellSyncLinks.find(descriptor.id);
     if (it != m_CellSyncLinks.end() && it->second.groups[DimensionIndex(dimension)] == group)
     {
-      this->ConvergeMemberToSeed(dimension, seedId, descriptor.id);
+      this->ConvergeMemberToAnchor(dimension, anchorId, anchorLink->offset, descriptor.id);
     }
   }
 }
@@ -3492,10 +3497,16 @@ QString QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension dimension,
   return {};
 }
 
-QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const
+QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension,
+                                               const std::string& group,
+                                               const std::set<QString>& excluded) const
 {
   for (const auto& descriptor : this->ListWindowDescriptors())
   {
+    if (excluded.count(descriptor.id) > 0)
+    {
+      continue;
+    }
     const auto it = m_CellSyncLinks.find(descriptor.id);
     if (it != m_CellSyncLinks.end() && it->second.groups[DimensionIndex(dimension)] == group)
     {
@@ -3505,26 +3516,27 @@ QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension, 
   return {};
 }
 
-void QmitkMxNMultiWidget::ConvergeMemberToSeed(QmitkMxNSyncDimension dimension,
-                                               const QString& seedId,
-                                               const QString& memberId)
+void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension,
+                                                 const QString& anchorId,
+                                                 const SyncOffset& anchorOffset,
+                                                 const QString& memberId)
 {
-  const auto seedWidget = this->GetRenderWindowWidget(seedId);
+  const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
   const auto memberWidget = this->GetRenderWindowWidget(memberId);
-  if (nullptr == seedWidget || nullptr == memberWidget || seedId == memberId)
+  if (nullptr == anchorWidget || nullptr == memberWidget)
   {
     return;
   }
-  auto* seedRenderer = mitk::BaseRenderer::GetInstance(seedWidget->GetRenderWindow()->GetVtkRenderWindow());
+  auto* anchorRenderer = mitk::BaseRenderer::GetInstance(anchorWidget->GetRenderWindow()->GetVtkRenderWindow());
   auto* memberRenderer = mitk::BaseRenderer::GetInstance(memberWidget->GetRenderWindow()->GetVtkRenderWindow());
-  if (nullptr == seedRenderer || nullptr == memberRenderer)
+  if (nullptr == anchorRenderer || nullptr == memberRenderer)
   {
     return;
   }
   // Unrealized windows (no world geometry yet) carry default camera/stepper
   // state that must not be propagated as a reference; the deferred converge
   // is covered by 'ReconvergeSyncGroup'.
-  if (nullptr == seedRenderer->GetCurrentWorldGeometry()
+  if (nullptr == anchorRenderer->GetCurrentWorldGeometry()
       || nullptr == memberRenderer->GetCurrentWorldGeometry())
   {
     return;
@@ -3537,27 +3549,31 @@ void QmitkMxNMultiWidget::ConvergeMemberToSeed(QmitkMxNSyncDimension dimension,
   }
   const auto& memberLinks = memberLinksIt->second;
 
+  // Every member's offset is relative to one group reference; the anchor's
+  // live state minus the anchor's own offset recovers it, so any member can
+  // serve as the anchor.
   switch (dimension)
   {
     case QmitkMxNSyncDimension::Slice:
     {
-      auto* seedStepper = seedRenderer->GetSliceNavigationController()->GetStepper();
+      auto* anchorStepper = anchorRenderer->GetSliceNavigationController()->GetStepper();
       auto* memberStepper = memberRenderer->GetSliceNavigationController()->GetStepper();
-      if (nullptr == seedStepper || nullptr == memberStepper
-          || 0 == seedStepper->GetSteps() || 0 == memberStepper->GetSteps())
+      if (nullptr == anchorStepper || nullptr == memberStepper
+          || 0 == anchorStepper->GetSteps() || 0 == memberStepper->GetSteps())
       {
         return;
       }
       // The offset counts displayed slices - the index the navigator shows,
       // which can run opposite to the stepper. Signed arithmetic: the
-      // steppers count unsigned, so a negative offset on a seed at slice 0
-      // would wrap and clamp to the last slice instead of the first.
-      const long seedLast = static_cast<long>(seedStepper->GetSteps()) - 1;
-      const long seedPos = static_cast<long>(seedStepper->GetPos());
-      const long seedShown =
-        QmitkMxNSliceIndex::IsDisplayedSliceInverted(seedRenderer) ? seedLast - seedPos : seedPos;
+      // steppers count unsigned, so a negative offset near slice 0 would
+      // wrap and clamp to the last slice instead of the first.
+      const long anchorLast = static_cast<long>(anchorStepper->GetSteps()) - 1;
+      const long anchorPos = static_cast<long>(anchorStepper->GetPos());
+      const long anchorShown =
+        QmitkMxNSliceIndex::IsDisplayedSliceInverted(anchorRenderer) ? anchorLast - anchorPos : anchorPos;
+      const long reference = anchorShown - std::get<int>(anchorOffset);
       const long memberLast = static_cast<long>(memberStepper->GetSteps()) - 1;
-      const long memberShown = std::clamp(seedShown + memberLinks.sliceOffset, 0L, memberLast);
+      const long memberShown = std::clamp(reference + memberLinks.sliceOffset, 0L, memberLast);
       const long target =
         QmitkMxNSliceIndex::IsDisplayedSliceInverted(memberRenderer) ? memberLast - memberShown : memberShown;
       memberStepper->SetPos(static_cast<unsigned int>(target));
@@ -3565,29 +3581,30 @@ void QmitkMxNMultiWidget::ConvergeMemberToSeed(QmitkMxNSyncDimension dimension,
     }
     case QmitkMxNSyncDimension::Zoom:
     {
-      auto* seedCamera = seedRenderer->GetVtkRenderer()->GetActiveCamera();
+      auto* anchorCamera = anchorRenderer->GetVtkRenderer()->GetActiveCamera();
       auto* memberCamera = memberRenderer->GetVtkRenderer()->GetActiveCamera();
-      if (nullptr == seedCamera || nullptr == memberCamera)
+      if (nullptr == anchorCamera || nullptr == memberCamera)
       {
         return;
       }
-      // Offset factor > 1 keeps the member zoomed in relative to the seed;
+      // A factor > 1 keeps a cell zoomed in relative to the reference;
       // parallel scale is the inverse zoom measure, hence the division.
-      memberCamera->SetParallelScale(seedCamera->GetParallelScale() / memberLinks.zoomOffset);
+      const double referenceScale = anchorCamera->GetParallelScale() * std::get<double>(anchorOffset);
+      memberCamera->SetParallelScale(referenceScale / memberLinks.zoomOffset);
       mitk::RenderingManager::GetInstance()->RequestUpdate(
         memberWidget->GetRenderWindow()->GetVtkRenderWindow());
       break;
     }
     case QmitkMxNSyncDimension::Pan:
     {
-      auto* seedController = seedRenderer->GetCameraController();
+      auto* anchorController = anchorRenderer->GetCameraController();
       auto* memberController = memberRenderer->GetCameraController();
-      if (nullptr == seedController || nullptr == memberController)
+      if (nullptr == anchorController || nullptr == memberController)
       {
         return;
       }
-      memberController->MoveCameraToPoint(
-        seedController->GetCameraPositionOnPlane() + memberLinks.panOffset);
+      const auto reference = anchorController->GetCameraPositionOnPlane() - std::get<mitk::Vector2D>(anchorOffset);
+      memberController->MoveCameraToPoint(reference + memberLinks.panOffset);
       mitk::RenderingManager::GetInstance()->RequestUpdate(
         memberWidget->GetRenderWindow()->GetVtkRenderWindow());
       break;
@@ -3634,11 +3651,6 @@ void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::An
   {
     return;
   }
-  const auto sourceLink = this->GetSyncLink(sourceId, QmitkMxNSyncDimension::Orientation);
-  if (!sourceLink.has_value())
-  {
-    return;
-  }
 
   struct DepthGuard
   {
@@ -3648,30 +3660,35 @@ void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::An
   } guard(m_OrientationPropagationDepth);
 
   std::vector<QString> affected{ sourceId };
-  for (const auto& descriptor : this->ListWindowDescriptors())
+  const auto sourceLink = this->GetSyncLink(sourceId, QmitkMxNSyncDimension::Orientation);
+  if (sourceLink.has_value())
   {
-    if (descriptor.id == sourceId)
+    for (const auto& descriptor : this->ListWindowDescriptors())
     {
-      continue;
+      if (descriptor.id == sourceId)
+      {
+        continue;
+      }
+      const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Orientation);
+      if (!memberLink.has_value() || memberLink->group != sourceLink->group)
+      {
+        continue;
+      }
+      const auto memberWidget = this->GetRenderWindowWidget(descriptor.id);
+      auto* memberUtility = (nullptr != memberWidget) ? memberWidget->GetUtilityWidget() : nullptr;
+      if (nullptr == memberUtility)
+      {
+        continue;
+      }
+      memberUtility->SetViewDirectionSelection(viewDirection);
+      ++m_OrientationApplyCount;
+      affected.push_back(descriptor.id);
     }
-    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Orientation);
-    if (!memberLink.has_value() || memberLink->group != sourceLink->group)
-    {
-      continue;
-    }
-    const auto memberWidget = this->GetRenderWindowWidget(descriptor.id);
-    auto* memberUtility = (nullptr != memberWidget) ? memberWidget->GetUtilityWidget() : nullptr;
-    if (nullptr == memberUtility)
-    {
-      continue;
-    }
-    memberUtility->SetViewDirectionSelection(viewDirection);
-    ++m_OrientationApplyCount;
-    affected.push_back(descriptor.id);
   }
 
-  // A plane flip re-initializes each member's stepper and camera; restore
-  // the component's shared geometry and the declared offsets.
+  // A plane flip re-initializes the stepper and camera of the source (linked
+  // on orientation or not) and of each relayed member; restore the
+  // component's shared geometry and the declared offsets.
   auto reinitialized = this->EnforceComponentGeometry(sourceId);
   affected.insert(affected.end(), reinitialized.begin(), reinitialized.end());
   this->ReconvergeGeometryRelativeGroups(affected);
@@ -3738,32 +3755,61 @@ std::vector<QString> QmitkMxNMultiWidget::EnforceComponentGeometry(const QString
     return reinitialized;
   }
 
-  const auto seedWidget = this->GetRenderWindowWidget(component.front());
-  if (nullptr == seedWidget)
+  // The cell that changed adapts to the rest of its component.
+  const auto authorityIt = std::find_if(component.begin(), component.end(),
+    [&windowId](const QString& id) { return id != windowId; });
+  const auto authorityWidget = this->GetRenderWindowWidget(*authorityIt);
+  if (nullptr == authorityWidget)
   {
     return reinitialized;
   }
-  const auto* referenceGeometry = seedWidget->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+  const auto* referenceGeometry = authorityWidget->GetSliceNavigationController()->GetInputWorldTimeGeometry();
   if (nullptr == referenceGeometry)
   {
     return reinitialized;
   }
 
-  for (std::size_t i = 1; i < component.size(); ++i)
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  for (const auto& memberId : component)
   {
-    const auto memberWidget = this->GetRenderWindowWidget(component[i]);
+    const auto memberWidget = this->GetRenderWindowWidget(memberId);
     if (nullptr == memberWidget)
     {
       continue;
     }
-    const auto* memberGeometry = memberWidget->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+    auto* sliceNavigation = memberWidget->GetSliceNavigationController();
+    const auto* memberGeometry = sliceNavigation->GetInputWorldTimeGeometry();
     if (nullptr != memberGeometry && mitk::Equal(*memberGeometry, *referenceGeometry, mitk::eps, false))
     {
       continue;
     }
-    mitk::RenderingManager::GetInstance()->InitializeView(
-      memberWidget->GetRenderWindow()->GetVtkRenderWindow(), referenceGeometry);
-    reinitialized.push_back(component[i]);
+    auto* renderWindow = memberWidget->GetRenderWindow()->GetVtkRenderWindow();
+    const auto* currentPlane = sliceNavigation->GetCurrentPlaneGeometry();
+    if (nullptr == memberGeometry || nullptr == currentPlane)
+    {
+      // Nothing to keep yet: a first initialization fits the camera.
+      renderingManager->InitializeView(renderWindow, referenceGeometry);
+    }
+    else
+    {
+      // Only the reference geometry changes; zoom, pan, the slice position
+      // and the time step stay what the user set (re-initializing resets the
+      // slice stepper and the time navigation). The slice is kept by a point
+      // on its plane: the plane's bounding box is one slice thick, so its
+      // center lies half a slice off the plane and would select the next one.
+      mitk::Point3D slicePoint;
+      currentPlane->Project(currentPlane->GetCenter(), slicePoint);
+      mitk::TimeStepType timeStep = 0;
+      const auto timePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+      if (referenceGeometry->IsValidTimePoint(timePoint))
+      {
+        timeStep = referenceGeometry->TimePointToTimeStep(timePoint);
+      }
+      renderingManager->InitializeView(renderWindow, referenceGeometry, false);
+      sliceNavigation->SelectSliceByPoint(slicePoint);
+      renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(timeStep);
+    }
+    reinitialized.push_back(memberId);
   }
   return reinitialized;
 }
@@ -3783,9 +3829,18 @@ void QmitkMxNMultiWidget::ReconvergeGeometryRelativeGroups(const std::vector<QSt
       }
     }
   }
+
+  // The changed cells adapt to the members that kept their state; only a
+  // group that changed as a whole falls back to its pre-order first member.
+  const std::set<QString> changed(windowIds.begin(), windowIds.end());
   for (const auto& [dimension, group] : groups)
   {
-    this->ReconvergeSyncGroup(dimension, group);
+    auto anchorId = this->FindSyncGroupSeed(dimension, group, changed);
+    if (anchorId.isEmpty())
+    {
+      anchorId = this->FindSyncGroupSeed(dimension, group);
+    }
+    this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
   }
 }
 
@@ -3849,21 +3904,27 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
     mitkThrow() << "SetLookupTable: lookupTable must not be null.";
   }
 
-  std::vector<QString> targets{ windowId };
   const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Lut);
-  if (link.has_value())
+  if (!link.has_value())
   {
-    for (const auto& descriptor : this->ListWindowDescriptors())
+    // Unlinked cells keep the classic node-global write, staying coupled to
+    // the global colormap controls like an unlinked cell's level/window.
+    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
+  }
+
+  std::vector<QString> targets{ windowId };
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (descriptor.id == windowId)
     {
-      if (descriptor.id == windowId)
-      {
-        continue;
-      }
-      const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
-      if (memberLink.has_value() && memberLink->group == link->group)
-      {
-        targets.push_back(descriptor.id);
-      }
+      continue;
+    }
+    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
+    if (memberLink.has_value() && memberLink->group == link->group)
+    {
+      targets.push_back(descriptor.id);
     }
   }
 
@@ -4713,9 +4774,9 @@ void QmitkMxNMultiWidget::RefreshFrameColors()
 
 std::vector<QmitkMxNMultiWidget::SyncGroupInfo> QmitkMxNMultiWidget::GetSyncGroupInfos() const
 {
-  // Registered selection groups appear even while empty (a freshly created
-  // "+" group must be assignable from the editor); link groups exist exactly
-  // as long as a live cell links them.
+  // Registered selection groups appear even while empty (a group freshly
+  // created with the layout editor's "+ Group" button must be assignable);
+  // link groups exist exactly as long as a live cell links them.
   std::set<std::string> selectionGroupIds;
   for (const auto& [index, name] : m_GroupNameByIndex)
   {

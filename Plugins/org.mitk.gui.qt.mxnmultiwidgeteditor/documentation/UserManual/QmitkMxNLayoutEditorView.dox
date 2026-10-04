@@ -196,7 +196,7 @@
 			same list opens as a popup on right-click or double-click for a single
 			quick edit, and <i>Del</i> unlinks the selection.
 		<li> <b>Offset</b> appears for a selection that sits wholly on slice, zoom or pan
-			and whose cells are all linked - an offset is relative to the group's seed,
+			and whose cells are all linked - an offset is relative to the group's reference,
 			so an unlinked cell has nothing for it to be relative to. This is how a
 			detail view is kept twice as zoomed, or a window parked a fixed distance
 			from its group. Where the selected cells carry different offsets the editor
@@ -207,7 +207,7 @@
 			showing slices -1 / 0 / +1 in one step. The offsets it would write are
 			previewed beside it, so the effect reads against that window list before it
 			is applied. It needs a selection wholly in one group: offsets in different
-			groups are measured from different seeds, so a series spread across them
+			groups are measured from different references, so a series spread across them
 			would mean nothing. Slice only, for the same reason in a different form -
 			zoom composes multiplicatively rather than by steps, and a pan ramp has no
 			unambiguous direction in two dimensions.

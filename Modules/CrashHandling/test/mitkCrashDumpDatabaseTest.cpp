@@ -307,7 +307,8 @@ public:
     CPPUNIT_ASSERT(mitk::KeepSessionLog(dump, log, std::filesystem::last_write_time(dump)));
     CPPUNIT_ASSERT_EQUAL(std::string("crashed session"), ReadFile(mitk::GetSessionLogCopyPath(dump)));
 
-    mitk::CrashDumpInfo info{ dump };
+    mitk::CrashDumpInfo info;
+    info.Path = dump;
     mitk::LoadRunInfo(info);
     CPPUNIT_ASSERT(mitk::GetSessionLogCopyPath(dump) == info.SessionLog);
 
@@ -328,7 +329,8 @@ public:
     CPPUNIT_ASSERT(!mitk::KeepSessionLog(dump, log, std::filesystem::last_write_time(dump)));
     CPPUNIT_ASSERT(!std::filesystem::exists(mitk::GetSessionLogCopyPath(dump)));
 
-    mitk::CrashDumpInfo info{ dump };
+    mitk::CrashDumpInfo info;
+    info.Path = dump;
     mitk::LoadRunInfo(info);
     CPPUNIT_ASSERT(info.SessionLog.empty());
   }
@@ -466,7 +468,8 @@ public:
 
     CPPUNIT_ASSERT(mitk::AdoptRunInfoAttachment(m_DatabaseDirectory, "report", dump));
 
-    mitk::CrashDumpInfo info{ dump };
+    mitk::CrashDumpInfo info;
+    info.Path = dump;
     mitk::LoadRunInfo(info);
     CPPUNIT_ASSERT(info.RunInfo.has_value());
     CPPUNIT_ASSERT_EQUAL(std::string("first"), info.RunInfo->Release);

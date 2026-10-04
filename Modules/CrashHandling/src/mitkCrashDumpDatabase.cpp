@@ -181,7 +181,7 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
       if (error)
         continue;
 
-      dumps.push_back({ entry.path(), lastWriteTime, size, ClassifyDump(entry.path()), std::nullopt });
+      dumps.push_back({ entry.path(), lastWriteTime, size, ClassifyDump(entry.path()), std::nullopt, {} });
     }
   }
   catch (const std::filesystem::filesystem_error&)

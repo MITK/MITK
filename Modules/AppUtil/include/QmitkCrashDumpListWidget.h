@@ -33,9 +33,12 @@ namespace mitk
 /**
  * \brief Table of crash dumps with kind, time, size, version, log and status.
  *
- * Status is "new" for a dump that has not triggered the next-start dialog
- * yet and "kept" otherwise. The log column says whether the session log
- * recorded with the dump still exists; it is evaluated by SetDumps().
+ * Status is "provisional (this session)" for the dumps passed to SetDumps()
+ * in provisionalPaths, "new" for a dump that has not triggered the
+ * next-start dialog yet, and "kept" otherwise. The log column reflects
+ * mitk::CrashDumpInfo::SessionLog as the facility's listings filled it in:
+ * "available" when a log copy is kept with the dump, "not available" when the
+ * dump has run info but no log copy, and "unknown" when it has no run info.
  */
 class MITKAPPUTIL_EXPORT QmitkCrashDumpListWidget : public QWidget
 {

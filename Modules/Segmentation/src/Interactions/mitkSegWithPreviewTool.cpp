@@ -673,6 +673,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   bool cancelled = false;
+  bool computed = false;
 
   try
   {
@@ -729,10 +730,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
         this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
-      if (!previewImage->GetAllLabelValues().empty())
-      { // check if labels exits for the preview
-        m_HasUnconfirmedPreview = true;
-      }
+      computed = true;
     }
   }
   catch (const itk::ExceptionObject& e)
@@ -772,6 +770,11 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   }
 
   this->UpdateCleanUp();
+
+  // Decided only now, as UpdateCleanUp() can still change the labels of the
+  // preview, removing the ones that turned out empty for example.
+  if (computed && !previewImage->GetAllLabelValues().empty())
+    m_HasUnconfirmedPreview = true;
 
   // A cancelled update leaves the time point unrecorded on purpose: recording
   // it would tell OnTimePointChanged() that this time point is up to date, so

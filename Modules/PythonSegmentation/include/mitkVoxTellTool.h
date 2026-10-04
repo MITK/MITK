@@ -47,6 +47,21 @@ namespace mitk
       return { "0.1.2", "0.2.0" };
     }
 
+    /** \brief Where the model is loaded from. */
+    enum class ModelSource
+    {
+      HuggingFace, /**< The Hugging Face Hub, through the cache of VoxTell. */
+      Local        /**< A folder on this machine, configured in the preferences. */
+    };
+
+    /** \brief Reads a model source as the preference page stores it.
+     *
+     * \param[in] value "huggingface" or "local".
+     *
+     * \throw mitk::Exception if \p value is neither.
+     */
+    MITKPYTHONSEGMENTATION_EXPORT ModelSource ParseModelSource(const std::string& value);
+
     /** \brief Files of a repository on the Hugging Face Hub. */
     struct RepoFiles
     {

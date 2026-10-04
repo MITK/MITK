@@ -353,12 +353,24 @@ bool QmitkVoxTellToolGUI::Install()
     }
   }
 
+  std::optional<mitk::VoxTell::ModelSource> modelSource;
+
+  try
+  {
+    modelSource = mitk::VoxTell::ParseModelSource(m_Preferences->Get("VoxTell/modelSource", "huggingface"));
+  }
+  catch (const mitk::Exception& e)
+  {
+    this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), true);
+    return false;
+  }
+
   const auto includeTextModel = AskToInstall(this->window());
 
   if (self.isNull() || !includeTextModel.has_value())
     return false;
 
-  QmitkPipInstallDialog dialog(mitk::VoxTell::BuildInstallSpec(m_Preferences, venvName, includeTextModel.value()), this->window());
+  QmitkPipInstallDialog dialog(mitk::VoxTell::BuildInstallSpec(modelSource.value(), venvName, includeTextModel.value()), this->window());
 
   if (dialog.exec() != QDialog::Accepted)
     return false;

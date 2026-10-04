@@ -184,6 +184,17 @@ namespace
   };
 }
 
+mitk::VoxTell::ModelSource mitk::VoxTell::ParseModelSource(const std::string& value)
+{
+  if (value == "huggingface")
+    return ModelSource::HuggingFace;
+
+  if (value == "local")
+    return ModelSource::Local;
+
+  mitkThrow() << "Unknown model source \"" << value << "\". Expected \"huggingface\" or \"local\".";
+}
+
 std::string mitk::VoxTell::ReadHubFilesCode()
 {
   return ReadPythonResource("VoxTell/voxtell_hub_files.py");
@@ -404,7 +415,7 @@ std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetModelFiles()
   // VoxTell loads the embeddings of the prompts it knows with a local model as well.
   std::vector<std::string> functions = { "voxtell_prompt_list_files" };
 
-  if (GetPreferences()->Get("VoxTell/modelSource", "huggingface") != "local")
+  if (VoxTell::ParseModelSource(GetPreferences()->Get("VoxTell/modelSource", "huggingface")) == VoxTell::ModelSource::HuggingFace)
     functions.push_back("voxtell_model_files");
 
   std::vector<VoxTell::RepoFiles> files;
@@ -451,7 +462,8 @@ void mitk::VoxTellTool::LoadModel()
   for (const auto& [key, defaultValue] : GetSessionDefiningPreferences())
     prefs->Put(key, prefs->Get(key, defaultValue));
 
-  const bool useLocalModel = prefs->Get("VoxTell/modelSource", "huggingface") == "local";
+  const auto modelSource = VoxTell::ParseModelSource(prefs->Get("VoxTell/modelSource", "huggingface"));
+  const bool useLocalModel = modelSource == VoxTell::ModelSource::Local;
   const auto localModelPath = prefs->Get("VoxTell/localModelPath", "");
 
   if (useLocalModel && localModelPath.empty())

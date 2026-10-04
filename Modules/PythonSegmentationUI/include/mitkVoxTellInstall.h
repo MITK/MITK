@@ -23,8 +23,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class IPreferences;
-
   namespace VoxTell
   {
     /** \brief Builds the pip install spec for a fresh VoxTell install.
@@ -37,13 +35,13 @@ namespace mitk
      * with a download of gigabytes. They are optional, since whatever is missing
      * is downloaded again when it is needed.
      *
-     * \param[in] prefs Preferences used to resolve the model source. If
-     *                  \c nullptr, the model is downloaded.
+     * \param[in] modelSource Where the model is loaded from. The model is only
+     *                  downloaded for ModelSource::HuggingFace.
      * \param[in] venvName Virtual environment to create and install into.
      * \param[in] includeTextModel Whether to download the text encoder, which is
      *                  only needed for prompts that VoxTell does not know.
      */
-    MITKPYTHONSEGMENTATIONUI_EXPORT PipInstallSpec BuildInstallSpec(IPreferences* prefs, const std::string& venvName, bool includeTextModel);
+    MITKPYTHONSEGMENTATIONUI_EXPORT PipInstallSpec BuildInstallSpec(ModelSource modelSource, const std::string& venvName, bool includeTextModel);
 
     /** \brief Builds the pip spec for an in-place update of an existing install.
      *

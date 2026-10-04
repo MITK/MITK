@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitkVoxTellInstall.h>
 
 #include <mitkExceptionMacro.h>
-#include <mitkIPreferences.h>
 #include <mitkPythonUtil.h>
 #include <mitkTorchInstall.h>
 
@@ -63,7 +62,7 @@ namespace
   }
 }
 
-mitk::PipInstallSpec mitk::VoxTell::BuildInstallSpec(mitk::IPreferences* prefs, const std::string& venvName, bool includeTextModel)
+mitk::PipInstallSpec mitk::VoxTell::BuildInstallSpec(ModelSource modelSource, const std::string& venvName, bool includeTextModel)
 {
   mitk::PipInstallSpec spec;
   spec.name = "VoxTell";
@@ -74,7 +73,7 @@ mitk::PipInstallSpec mitk::VoxTell::BuildInstallSpec(mitk::IPreferences* prefs, 
   // VoxTell loads the embeddings of the prompts it knows with a local model as well.
   spec.postInstallSteps.push_back(BuildInstallDownloadStep("Download known prompts", "voxtell_prompt_list_files"));
 
-  if (prefs == nullptr || prefs->Get("VoxTell/modelSource", "huggingface") != "local")
+  if (modelSource == ModelSource::HuggingFace)
     spec.postInstallSteps.push_back(BuildInstallDownloadStep("Download model", "voxtell_model_files"));
 
   if (includeTextModel)

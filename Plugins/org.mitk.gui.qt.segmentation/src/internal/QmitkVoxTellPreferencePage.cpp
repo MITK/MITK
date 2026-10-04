@@ -117,8 +117,6 @@ bool QmitkVoxTellPreferencePage::PerformOk()
   prefs->Put("VoxTell/modelSource", m_Ui->localRadioButton->isChecked() ? "local" : "huggingface");
   prefs->Put("VoxTell/localModelPath", m_Ui->localPathLineEdit->text().trimmed().toStdString());
 
-  prefs->PutBool("VoxTell/showPromptsWithoutResult", m_Ui->promptsWithoutResultCheckBox->isChecked());
-
   return true;
 }
 
@@ -152,8 +150,6 @@ void QmitkVoxTellPreferencePage::Update()
   m_Ui->localRadioButton->setChecked(useLocalModel);
   m_Ui->huggingFaceRadioButton->setChecked(!useLocalModel);
   m_Ui->localPathLineEdit->setText(QString::fromStdString(prefs->Get("VoxTell/localModelPath", "")));
-
-  m_Ui->promptsWithoutResultCheckBox->setChecked(prefs->GetBool("VoxTell/showPromptsWithoutResult", true));
 
   this->OnModelSourceChanged();
   this->RefreshState();
@@ -190,7 +186,6 @@ void QmitkVoxTellPreferencePage::RefreshState()
 #else
   m_Ui->computationGroupBox->setVisible(false);
   m_Ui->modelGroupBox->setVisible(false);
-  m_Ui->messagesGroupBox->setVisible(false);
   m_Ui->maintenanceGroupBox->setVisible(false);
   m_Ui->statusLabel->setText("VoxTell requires a Python-enabled build of MITK.");
 #endif

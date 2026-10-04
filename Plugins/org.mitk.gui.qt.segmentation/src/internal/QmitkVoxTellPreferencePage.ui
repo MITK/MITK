@@ -98,25 +98,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="messagesGroupBox">
-     <property name="title">
-      <string>Messages</string>
-     </property>
-     <layout class="QVBoxLayout" name="messagesLayout">
-      <item>
-       <widget class="QCheckBox" name="promptsWithoutResultCheckBox">
-        <property name="toolTip">
-         <string>After a run, list the prompts that VoxTell found nothing for.</string>
-        </property>
-        <property name="text">
-         <string>Tell me about prompts without result</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="maintenanceGroupBox">
      <property name="title">
       <string>Maintenance</string>

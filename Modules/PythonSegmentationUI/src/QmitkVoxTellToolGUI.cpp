@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkVoxTellTool.h>
 
 #include <QmitkIconTheme.h>
+#include <QmitkInfoCard.h>
 #include <QmitkPipInstallDialog.h>
 
 #include <QApplication>
@@ -51,9 +52,6 @@ namespace
 
   const QString PREFERENCES_NODE = "org.mitk.views.segmentation";
   const QString PREFERENCE_PAGE_ID = "org.mitk.gui.qt.application.VoxTellPreferencePage";
-
-  // Also offered on the preference page, so that the message can be turned on again.
-  constexpr auto SHOW_PROMPTS_WITHOUT_RESULT = "VoxTell/showPromptsWithoutResult";
 
   constexpr auto AUTO_CONFIRM = "VoxTell/autoConfirm";
   constexpr auto CREATE_GROUPS_AS_NEEDED = "VoxTell/createGroupsAsNeeded";
@@ -120,33 +118,6 @@ namespace
       list << QString::fromStdString(prompt);
 
     return list.join(", ");
-  }
-
-  // Lists the prompts that VoxTell found nothing for, unless the user asked
-  // not to be told again.
-  void ShowPromptsWithoutResult(QWidget* window, mitk::IPreferences* preferences, const std::vector<std::string>& prompts)
-  {
-    if (!preferences->GetBool(SHOW_PROMPTS_WITHOUT_RESULT, true))
-      return;
-
-    QString promptList;
-
-    for (const auto& prompt : prompts)
-      promptList += QString("<li>%1</li>").arg(QString::fromStdString(prompt).toHtmlEscaped());
-
-    QMessageBox messageBox(QMessageBox::Information, "VoxTell", QString(
-      "<p %1>VoxTell found nothing for these prompts:</p>"
-      "<ul %1>%2</ul>"
-      "<p %1>The image may not show these structures. If it does, try a different wording.</p>")
-      .arg(LINE_HEIGHT_STYLE).arg(promptList), QMessageBox::Ok, window);
-
-    // The message box takes ownership.
-    auto* doNotShowAgainCheckBox = new QCheckBox("Do not show this again");
-    messageBox.setCheckBox(doNotShowAgainCheckBox);
-    messageBox.exec();
-
-    if (doNotShowAgainCheckBox->isChecked())
-      preferences->PutBool(SHOW_PROMPTS_WITHOUT_RESULT, false);
   }
 
   // Tells the user that a download failed, with what it printed as details.
@@ -546,7 +517,7 @@ void QmitkVoxTellToolGUI::OnModelLoaded()
   this->UpdateInitializeButtonText();
   this->UpdatePromptCompletions();
   this->EnableWidgets(true);
-  this->SetStatus("VoxTell is ready. Enter one prompt per line and click Segment.");
+  this->SetStatus("Ready. Enter one prompt per line and click Segment.");
 
   const auto backend = this->GetTool()->GetBackend();
 
@@ -821,9 +792,6 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
   // Prompts that the text encoder processed for this run are known now.
   if (!this->UnloadIfSettingsChanged())
     this->UpdatePromptCompletions();
-
-  if (!promptsWithoutResult.empty())
-    ShowPromptsWithoutResult(this->window(), m_Preferences, promptsWithoutResult);
 }
 
 bool QmitkVoxTellToolGUI::UnloadIfSettingsChanged()
@@ -885,8 +853,8 @@ void QmitkVoxTellToolGUI::UpdateInitializeButtonText()
 
 void QmitkVoxTellToolGUI::SetStatus(const QString& message, bool isError)
 {
-  m_Ui->statusLabel->setText(message);
-  m_Ui->statusLabel->setStyleSheet(isError ? "color: red;" : QString());
+  // Prompts and errors from Python can contain angle brackets.
+  m_Ui->statusCard->SetMessage(message.toHtmlEscaped(), isError ? QmitkInfoCard::Severity::Error : QmitkInfoCard::Severity::Info);
 }
 
 void QmitkVoxTellToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)

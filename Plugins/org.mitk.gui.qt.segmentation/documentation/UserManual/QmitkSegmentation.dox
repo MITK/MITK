@@ -586,7 +586,7 @@ The model that VoxTell downloads by default is licensed for non-commercial use o
 -# Type the structures you want to segment into the text field, one prompt per line, and click "Segment" (or press Ctrl+Enter). All prompts are computed in one run. A progress notification shows how far it has come and offers to cancel it.
 -# The result has one label per prompt, named like the prompt. With "Auto-confirm on success" checked, as it is by default, the labels are added to your segmentation as soon as the run succeeds; Undo (Ctrl+Z) removes them again. Otherwise the result is shown as a preview: choose whether to transfer all labels or only selected ones, then confirm the preview to add the labels to your segmentation. With "Transfer selected labels", the preview waits for your selection even if auto-confirm is checked. The tool stays active, so you can continue with other prompts.
 
-Prompts that VoxTell finds nothing for get no label in the preview, so they cannot end up in your segmentation as empty labels. A message lists them after the run. You can turn it off there and turn it on again in the settings (see below).
+Prompts that VoxTell finds nothing for get no label in the preview, so they cannot end up in your segmentation as empty labels. The info card below the Segment button lists them after the run. The image may not show these structures; if it does, try a different wording.
 
 Results can overlap, for example <i>heart</i> and <i>left ventricle</i>, or <i>lung</i> and <i>left lung</i>. With "Create groups as needed" checked, as it is by default, each result goes into the first group in which it overlaps neither an existing label nor another result: the active group, another group of your segmentation, or a new group. Neighboring structures that share just a few voxels at their border do not count as overlapping; those voxels stay with the label that has them. Existing labels are never changed. Without the option, all results go into the active group, where a later prompt takes the voxels of an earlier one, and confirming overwrites existing labels that are not locked.
 
@@ -605,7 +605,7 @@ The text model is downloaded during the installation if you ask for it there, or
 
 \subsubsection org_mitk_views_segmentationVoxTellSettings Settings
 
-Click "Settings" in the tool (or open Preferences (Ctrl+P) > Segmentation > VoxTell) to choose the compute device (automatic, a specific GPU, or the CPU), to use a model folder on your computer instead of the download, to choose whether you are told about prompts without result, to check for a newer version of VoxTell, or to uninstall the managed environment. The device and the model are part of what is loaded, so changing one of them unloads the model; initialize it again to apply the change. The downloaded model stays in the cache of Hugging Face when you uninstall VoxTell.
+Click "Settings" in the tool (or open Preferences (Ctrl+P) > Segmentation > VoxTell) to choose the compute device (automatic, a specific GPU, or the CPU), to use a model folder on your computer instead of the download, to check for a newer version of VoxTell, or to uninstall the managed environment. The device and the model are part of what is loaded, so changing one of them unloads the model; initialize it again to apply the change. The downloaded model stays in the cache of Hugging Face when you uninstall VoxTell.
 
 \subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
 

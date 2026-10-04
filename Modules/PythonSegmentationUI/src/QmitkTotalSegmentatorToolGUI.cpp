@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <QmitkPipInstallDialog.h>
 #include <QmitkIconTheme.h>
+#include <QmitkInfoCard.h>
 #include <QmitkVenvProcess.h>
 
 #include <QApplication>
@@ -204,6 +205,9 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   m_Ui->runButton->setIcon(QmitkIconTheme::GetIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg")));
+
+  // Hidden until the install state below sets the first message.
+  this->SetStatus(QString());
 
   connect(m_Ui->installButton, &QPushButton::clicked, this, &Self::OnInstallButtonClicked);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
@@ -544,8 +548,9 @@ bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, con
 
 void QmitkTotalSegmentatorToolGUI::SetStatus(const QString& message, bool isError)
 {
-  m_Ui->statusLabel->setText(message);
-  m_Ui->statusLabel->setStyleSheet(isError ? "color: red;" : QString());
+  // Errors of TotalSegmentator can contain angle brackets.
+  m_Ui->statusCard->SetMessage(message.toHtmlEscaped(), isError ? QmitkInfoCard::Severity::Error : QmitkInfoCard::Severity::Info);
+  m_Ui->statusCard->setVisible(!message.isEmpty());
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)

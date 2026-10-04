@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/HuggingFace">
+    <file>hub_download.py</file>
+  </qresource>
+</RCC>

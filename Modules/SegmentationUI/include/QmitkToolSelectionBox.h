@@ -161,6 +161,15 @@ protected:
   // store buttons in this group
   QButtonGroup *m_ToolButtonGroup;
   QGridLayout *m_ButtonLayout;
+
+private:
+  /** Tracks whether a tool of the manager is computing, to keep it from being switched away. */
+  void OnToolBusyStateChanged(bool isBusy);
+
+  /** Starts or stops listening to the busy state of all tools of the manager. */
+  void ObserveToolBusyState(bool observe);
+
+  bool m_IsToolBusy = false;
 };
 
 #endif

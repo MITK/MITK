@@ -651,15 +651,19 @@ bool mitk::SegWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
 
 void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 {
-  const auto inputImage = this->GetSegmentationInput();
-  auto previewImage = this->GetPreviewSegmentation();
+  // Held, not just referenced: a tool that pumps the event loop while it
+  // computes can be deactivated mid-run, and Deactivated() releases the input
+  // and the data of the preview node. The user can also remove the images
+  // from the data storage meanwhile.
+  const Image::ConstPointer inputImage = this->GetSegmentationInput();
+  const MultiLabelSegmentation::Pointer previewImage = this->GetPreviewSegmentation();
   this->EnsureUpToDateUserDefinedActiveLabel();
 
   mitk::ProgressTask task(this->GetName(), 100, this->IsCancelable());
   ScopedProgressTask<ToolCommand> scopedTask(m_ProgressCommand, &task);
 
   const auto workingSegmentation = this->GetTargetSegmentation();
-  const auto workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
+  const Image::Pointer workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;

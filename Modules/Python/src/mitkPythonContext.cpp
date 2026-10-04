@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
+#include <mitkPythonUtil.h>
 #include <mitkIOUtil.h>
 
 #include <pybind11/embed.h>
@@ -75,6 +76,12 @@ namespace
 
 struct mitk::PythonContext::Impl
 {
+  // Python copies the process environment once, when the interpreter starts.
+  // A venv that is activated through the environment afterwards, e.g. a second
+  // one in the same run, would never show up in os.environ. The context keeps
+  // the path itself instead of reading it back from there.
+  std::string VirtualEnvPath;
+
   py::object GetVariable(const std::string& varName)
   {
     py::gil_scoped_acquire gil;
@@ -115,6 +122,7 @@ mitk::PythonContext::PythonContext(const std::string& venvName)
     py::initialize_interpreter();
 
   m_Impl = std::make_unique<Impl>();
+  m_Impl->VirtualEnvPath = mitk::PythonHelper::GetVirtualEnvPath(venvName).string();
 }
 
 void mitk::PythonContext::Activate(bool importBindings)
@@ -151,10 +159,8 @@ void mitk::PythonContext::Activate(bool importBindings)
       << "import mitk\n";
   }
 
-  pyCommands
-    << "venv = os.environ.get('VIRTUAL_ENV')\n"
-    << "if venv:\n"
-    << "    add_site_packages(venv)\n";
+  if (!m_Impl->VirtualEnvPath.empty())
+    pyCommands << "add_site_packages(" << PyQuote(m_Impl->VirtualEnvPath) << ")\n";
 
   this->Execute(pyCommands.str());
 }

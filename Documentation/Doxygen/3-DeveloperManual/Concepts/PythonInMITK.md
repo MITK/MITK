@@ -183,6 +183,23 @@ Virtual environments created by `mitk::PythonContext` (or the corresponding func
 
 The `mitkPythonBindingsTest` described above relies on this mechanism and creates a dedicated `mitk_pytest` virtual environment the first time it runs.
 
+### Several environments in one interpreter (temporary)
+
+**This is a temporary construct that will soon be obsolete.** MITK is going to host Python virtual environments in separate processes that the application talks to via inter-process communication (IPC). Every environment will then have its own interpreter. Once that is in place, the behavior described in this section and the way `mitk::PythonContext` activates environments will change. New code should not depend on the sharing described here.
+
+Until then, a process hosts one interpreter, however many `mitk::PythonContext` instances exist. Every context has its own global variables, but the module search path and the loaded modules in `sys.modules` are shared.
+
+Activating a context adds the `site-packages` folder of its virtual environment to `sys.path` and never removes it again. The environments of all tools used in an application run therefore end up on the path in the order of their activation. A context passes the path of its environment to Python explicitly. Python takes over the process environment only once, when the interpreter starts, so an environment that is activated later through environment variables alone would stay invisible.
+
+This has consequences for tools that use different environments in the same application run:
+
+- A package that several environments provide resolves to the one activated first.
+- Modules that are already imported stay imported. Once a tool has imported `torch` or `nnunetv2`, another tool keeps working with those modules, not with its own.
+- A tool that needs a different version of such a library does not get it until the application is restarted.
+- The check that refuses to update or uninstall an environment (`mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded()`) looks at the native libraries that are actually loaded. If a tool uses libraries of another tool's environment, that other environment is the one that stays locked until the application is restarted.
+
+All of this is benign as long as the environments that share packages request the same versions. The PyTorch based tools do so for `torch` (see `mitk::Torch::Requirements()`). Tools that run in a subprocess, like TotalSegmentator, are not affected.
+
 ## Python Wheel
 
 The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk_python-*.whl`).

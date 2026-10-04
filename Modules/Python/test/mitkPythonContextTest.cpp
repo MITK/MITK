@@ -14,13 +14,58 @@ found in the LICENSE file.
 #include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkPythonContext.h>
+#include <mitkPythonHelper.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 #include <fstream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
+
+namespace
+{
+  // Stands in for a managed virtual environment. A context needs nothing but
+  // pyvenv.cfg and the site-packages folder, so no Python has to run to create
+  // one. The folder is removed again on destruction.
+  class ScopedFakeVirtualEnv
+  {
+  public:
+    ScopedFakeVirtualEnv(const std::string& name, const std::string& packageName)
+      : m_Name(name)
+    {
+      const auto venvPath = mitk::PythonHelper::GetVirtualEnvPath(name);
+      CPPUNIT_ASSERT_MESSAGE("The folder for virtual environments should be known", !venvPath.empty());
+
+      // Left over from an aborted run.
+      mitk::PythonHelper::RemoveVirtualEnv(venvPath);
+
+#if defined(_WIN32)
+      const auto sitePackages = venvPath / "Lib" / "site-packages";
+#else
+      const auto sitePackages = venvPath / "lib" /
+        ("python" + std::to_string(mitk::PythonHelper::VERSION_MAJOR) + "." + std::to_string(mitk::PythonHelper::VERSION_MINOR)) /
+        "site-packages";
+#endif
+
+      fs::create_directories(sitePackages / packageName);
+      std::ofstream(venvPath / "pyvenv.cfg") << "home = unused\n";
+      std::ofstream(sitePackages / packageName / "__init__.py") << "\n";
+    }
+
+    ~ScopedFakeVirtualEnv()
+    {
+      mitk::PythonHelper::RemoveVirtualEnv(m_Name);
+    }
+
+    ScopedFakeVirtualEnv(const ScopedFakeVirtualEnv&) = delete;
+    ScopedFakeVirtualEnv& operator=(const ScopedFakeVirtualEnv&) = delete;
+
+  private:
+    std::string m_Name;
+  };
+}
 
 class mitkPythonContextTestSuite : public mitk::TestFixture
 {
@@ -30,6 +75,7 @@ class mitkPythonContextTestSuite : public mitk::TestFixture
   MITK_TEST(TestBindImageToPython);
   MITK_TEST(TestBindFunctionToPython);
   MITK_TEST(TestPythonContextExclusivity);
+  MITK_TEST(TestSeveralVirtualEnvs);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -202,6 +248,41 @@ public:
                            pythonContext_2.HasVariable("test_var_context_2"));
     CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should not be found in context 2",
                            !pythonContext_2.HasVariable("test_var_context_1"));
+  }
+
+  void TestSeveralVirtualEnvs()
+  {
+    // The interpreter takes over the environment variables once, when it
+    // starts. Start it before any virtual environment is activated, so that
+    // every environment of this test is one that comes after the start.
+    mitk::PythonContext interpreterStarter;
+
+    const std::string venvNameA = "mitk_pythoncontext_test_a";
+    const std::string venvNameB = "mitk_pythoncontext_test_b";
+    const std::string packageNameA = "mitk_pythoncontext_test_package_a";
+    const std::string packageNameB = "mitk_pythoncontext_test_package_b";
+
+    const ScopedFakeVirtualEnv venvA(venvNameA, packageNameA);
+    const ScopedFakeVirtualEnv venvB(venvNameB, packageNameB);
+
+    mitk::PythonContext pythonContextA(venvNameA);
+    pythonContextA.Activate(false);
+
+    mitk::PythonContext pythonContextB(venvNameB);
+    pythonContextB.Activate(false);
+
+    pythonContextB.Execute(
+      "import importlib.util\n"
+      "found_a = importlib.util.find_spec('" + packageNameA + "') is not None\n"
+      "found_b = importlib.util.find_spec('" + packageNameB + "') is not None\n");
+
+    const auto foundA = pythonContextB.GetVariableAsBool("found_a");
+    const auto foundB = pythonContextB.GetVariableAsBool("found_b");
+
+    CPPUNIT_ASSERT_MESSAGE("Result 'found_a' should exist", foundA.has_value());
+    CPPUNIT_ASSERT_MESSAGE("Result 'found_b' should exist", foundB.has_value());
+    CPPUNIT_ASSERT_MESSAGE("The package of the environment that was activated first should be importable", foundA.value());
+    CPPUNIT_ASSERT_MESSAGE("The package of the environment that was activated second should be importable", foundB.value());
   }
 
 };

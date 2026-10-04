@@ -74,11 +74,20 @@ namespace mitk
      * \brief Initializes the Python interpreter context and sets up module
      *        paths.
      *
-     * Always adds the base interpreter's and the active virtual environment's
-     * site-packages to sys.path, so a distribution installed in the venv is
-     * importable and its metadata is readable. With \p importBindings (the
-     * default) it additionally imports NumPy and the MITK Python module for
-     * data exchange.
+     * Always adds the base interpreter's and the context's virtual
+     * environment's site-packages to sys.path, so a distribution installed in
+     * the venv is importable and its metadata is readable. With
+     * \p importBindings (the default) it additionally imports NumPy and the
+     * MITK Python module for data exchange.
+     *
+     * The interpreter is shared by all contexts of the process. Contexts of
+     * several virtual environments add their site-packages one after the
+     * other and never remove them again. A package that several of these
+     * environments provide resolves to the one activated first, and a module
+     * that is already imported stays imported. Environments that share such
+     * packages should therefore pin the same versions. This sharing is a
+     * temporary construct. It ends once Python environments are hosted in
+     * separate processes.
      *
      * Pass \c false to keep the context free of any venv native library. On
      * Linux the activated venv becomes sys.prefix, so its site-packages

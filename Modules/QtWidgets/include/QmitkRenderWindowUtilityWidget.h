@@ -49,7 +49,7 @@ class QToolButton;
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
 

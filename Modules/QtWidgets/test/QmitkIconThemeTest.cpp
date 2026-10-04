@@ -208,6 +208,21 @@ public:
                                        "font.warning {\n  color: #ff5c33;\n  font-weight: bold;\n}\n"));
     QmitkIconTheme::Refresh();
     CPPUNIT_ASSERT_EQUAL(std::string("#ff5c33"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    // The light theme names its warning colour.
+    qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: red;\n  font-weight: bold;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A named colour is read and normalized",
+                                 std::string("#ff0000"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    qApp->setStyleSheet(QStringLiteral("font.warning {\n  background-color: #000000;\n  color: #ff5c33;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("background-color is not the text colour",
+                                 std::string("#ff5c33"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: nonsense;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_MESSAGE("An invalid colour reads as none", QmitkIconTheme::GetWarningColor().isEmpty());
   }
 
   void RendersAtTheRequestedSize()

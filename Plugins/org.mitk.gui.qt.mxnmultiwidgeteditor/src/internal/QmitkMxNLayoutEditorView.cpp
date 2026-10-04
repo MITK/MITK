@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkDataStorageEditorInput.h>
 #include <mitkDataStorageReference.h>
+#include <mitkException.h>
 #include <mitkIDataStorageService.h>
 
 #include <QCheckBox>
@@ -117,8 +118,9 @@ void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
   // equally inert without a display.
   m_NoDisplayOverlay = new QmitkButtonOverlayWidget(parent);
   m_NoDisplayOverlay->SetOverlayText(tr(
-    "<b>No MxN display is open.</b><br/>This view configures the window "
-    "arrangement and the synchronization of an MxN display."));
+    "<b>No MxN display is active.</b><br/>This view configures the window "
+    "arrangement and the synchronization of an MxN display. Bring one to the "
+    "front, or open one."));
   m_NoDisplayOverlay->SetButtonText(tr(" Open MxN display"));
   m_NoDisplayOverlay->SetButtonIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwLayout.svg")));
@@ -223,17 +225,34 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   m_LayoutEditorWidget->SetDataStorage(this->GetDataStorage());
   m_LayoutConnections.push_back(connect(
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::LayoutSet,
-    m_LayoutEditorWidget, [multiWidgetEditor](int row, int column)
+    m_LayoutEditorWidget, [this, multiWidgetEditor](int row, int column)
     {
-      multiWidgetEditor->OnLayoutSet(row, column);
+      try
+      {
+        multiWidgetEditor->OnLayoutSet(row, column);
+      }
+      catch (const mitk::Exception& e)
+      {
+        QMessageBox::warning(m_LayoutEditorWidget, tr("Grid change failed"),
+                             QString::fromStdString(e.GetDescription()));
+      }
     }));
   m_LayoutConnections.push_back(connect(
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::SetDataBasedLayout,
     m_LayoutEditorWidget, [this, multiWidget](const QList<mitk::DataNode::Pointer>& nodes)
     {
-      if (this->ConfirmDestructiveLayoutChange())
+      if (!this->ConfirmDestructiveLayoutChange())
+      {
+        return;
+      }
+      try
       {
         multiWidget->SetDataBasedLayout(nodes);
+      }
+      catch (const mitk::Exception& e)
+      {
+        QMessageBox::warning(m_LayoutEditorWidget, tr("Data-based layout failed"),
+                             QString::fromStdString(e.GetDescription()));
       }
     }));
   // Direct connection: the stream pointer is only valid during the emit.

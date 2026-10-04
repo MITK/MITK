@@ -107,7 +107,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 
   auto* dataButton = new QToolButton(this);
   dataButton->setAutoRaise(true);
-  dataButton->setText("Data");
+  dataButton->setText(tr("Data"));
   dataButton->setToolTip(tr("Select the data shown in this render window"));
   dataButton->setPopupMode(QToolButton::InstantPopup);
   m_DataMenu = new QMenu(dataButton);

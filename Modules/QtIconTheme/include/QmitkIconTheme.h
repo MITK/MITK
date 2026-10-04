@@ -114,8 +114,9 @@ public:
   /**
    * \brief Returns the color of the current theme's warnings, as its
    *        "font.warning" rule declares it for rich text. Widgets that cannot
-   *        use that rule (a plain label does not inherit it) read it here.
-   *        Empty when the theme declares none.
+   *        use that rule (a plain label does not inherit it) read it here,
+   *        as "#rrggbb" whatever notation the rule uses. Empty when the theme
+   *        declares none or the declared value is not a valid color.
    */
   static QString GetWarningColor();
 

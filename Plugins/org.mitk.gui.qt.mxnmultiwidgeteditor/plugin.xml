@@ -26,11 +26,9 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="zooming panning constraint"/>
-    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="level window readout"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="expanded navigator"/>
     <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
-    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard multisampling enable antialiasing depth peeling"/>
-    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>
-    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="level window readout overlay ribbon colormap clean view"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size"/>
   </extension>
 </plugin>

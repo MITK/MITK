@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <QApplication>
+#include <QColor>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QIconEngine>
@@ -69,12 +70,16 @@ namespace
     s_SelectionColor = ParseColor(styleSheet, QStringLiteral("selectionColor"), QString());
 
     // Warnings already have a rule of their own, for rich text; reading it
-    // keeps the theme from stating the colour twice.
+    // keeps the theme from stating the colour twice. The rule may use any CSS
+    // colour notation, so the value is normalized to the "#rrggbb" form the
+    // other theme colours have; the lookbehind keeps properties such as
+    // background-color from being taken for the text colour.
     static const QRegularExpression warningRule(
-      QStringLiteral("font\\.warning\\s*\\{[^}]*?color\\s*:\\s*(#[0-9a-f]{6})"),
+      QStringLiteral("font\\.warning\\s*\\{[^}]*?(?<![-\\w])color\\s*:\\s*([^;}\\s]+)"),
       QRegularExpression::CaseInsensitiveOption);
     const auto warning = warningRule.match(styleSheet);
-    s_WarningColor = warning.hasMatch() ? warning.captured(1) : QString();
+    const auto warningColor = warning.hasMatch() ? QColor::fromString(warning.captured(1)) : QColor();
+    s_WarningColor = warningColor.isValid() ? warningColor.name() : QString();
     s_Parsed = true;
   }
 

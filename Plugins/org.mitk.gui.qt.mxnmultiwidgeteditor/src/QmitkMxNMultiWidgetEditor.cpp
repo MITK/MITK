@@ -21,9 +21,6 @@ found in the LICENSE file.
 #include <berryIWorkbenchPartConstants.h>
 #include <berryUIException.h>
 
-// mxn multi widget editor plugin
-#include <QmitkMultiWidgetDecorationManager.h>
-
 // mitk qt widgets module
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkInteractionSchemeToolBar.h>
@@ -188,9 +185,6 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   {
     return;
   }
-
-  // update decoration preferences
-  //m_Impl->m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
 
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);

@@ -147,6 +147,7 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(RecoveredFreezeLeavesNoDump);
   MITK_TEST(ListAllDumpsClassifiesEveryKind);
   MITK_TEST(ProvisionalSnapshotsOfThisSessionAreNotListed);
+  MITK_TEST(ProvisionalCapturesDoNotEvictSurvivors);
   // Run-info attachments are verified on Windows only so far; Linux shares
   // the code path and is expected to pass, macOS is unexplored.
   MITK_TEST(CrashDumpCarriesRunInfo);
@@ -562,6 +563,33 @@ public:
 
     mitk::CrashDumpFacility::PurgeProvisionalSnapshots();
     CPPUNIT_ASSERT(!std::filesystem::exists(*snapshot));
+  }
+
+  /** At the lowest retention, a freeze episode's captures must neither evict
+   *  an earlier hard-killed freeze nor each other; after recovery the
+   *  survivor has to be there for the next-start dialog. */
+  void ProvisionalCapturesDoNotEvictSurvivors()
+  {
+    mitk::CrashDumpSettings settings;
+    settings.MaxDumpsPerKind = mitk::CrashDumpSettings::MinRetention;
+    CPPUNIT_ASSERT(mitk::WriteCrashDumpSettings(m_DatabaseDirectory, settings));
+
+    const auto survivor = this->CreateFakeDump("mitk-pending-freeze/survivor.dmp", 60);
+
+    if (!mitk::CrashDumpFacility::Initialize(this->MakeConfig()))
+      this->FailOrSkipUnarmedHelper();
+
+    const auto first = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::WatchdogProvisional);
+    const auto second = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::WatchdogProvisional);
+    CPPUNIT_ASSERT(first.has_value() && second.has_value());
+
+    CPPUNIT_ASSERT_MESSAGE("a capture must not evict the survivor", std::filesystem::exists(survivor));
+    CPPUNIT_ASSERT_MESSAGE("a capture must not evict the episode's earlier one", std::filesystem::exists(*first));
+
+    mitk::CrashDumpFacility::PurgeProvisionalSnapshots();
+    CPPUNIT_ASSERT(std::filesystem::exists(survivor));
+    CPPUNIT_ASSERT(!std::filesystem::exists(*first));
+    CPPUNIT_ASSERT(!std::filesystem::exists(*second));
   }
 
   std::filesystem::path HelperLog() const

@@ -609,9 +609,17 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
     return std::nullopt;
 
   if (SnapshotKind::WatchdogProvisional == kind)
+  {
+    // Not pruned here: counting this session's provisional snapshots, which a
+    // recovery purges, would evict older hard-kill survivors or the episode's
+    // own earlier captures. The area stays bounded regardless - Initialize()
+    // prunes it, and a session holds at most one episode's captures at a time.
     s_State.ProvisionalSnapshots.push_back(destination);
-
-  PruneCrashDumps(destinationDir, static_cast<std::size_t>(s_State.Settings.MaxDumpsPerKind));
+  }
+  else
+  {
+    PruneCrashDumps(destinationDir, static_cast<std::size_t>(s_State.Settings.MaxDumpsPerKind));
+  }
 
   return destination;
 #endif

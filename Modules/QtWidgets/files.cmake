@@ -24,6 +24,7 @@ set(CPP_FILES
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
   QmitkFloatingTextPopup.cpp
+  QmitkInfoCard.cpp
   QmitkInteractionSchemeToolBar.cpp
   QmitkIOUtil.cpp
   QmitkLevelWindowPresetDefinitionDialog.cpp

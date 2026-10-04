@@ -8,6 +8,13 @@ set(CPP_FILES
   mitkPythonPackageVersion.cpp
   mitkTorchDevice.cpp
   mitkTotalSegmentatorTool.cpp
+  mitkVoxTellTool.cpp
+)
+
+set(RESOURCE_FILES
+  VoxTell/VoxTell.svg
+  VoxTell/voxtell_bridge.py
+  VoxTell/voxtell_hub_files.py
 )
 
 set(NNINTERACTIVE_INTERACTION_TYPES

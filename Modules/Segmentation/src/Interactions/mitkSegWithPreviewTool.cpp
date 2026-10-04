@@ -36,6 +36,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <map>
+#include <optional>
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -438,7 +439,11 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
       break;
     case LabelTransferScope::AllLabels:
       {
-        const auto labelValues = this->GetPreviewSegmentation()->GetLabelValuesByGroup(this->GetPreviewSegmentation()->GetActiveLayer());
+        const auto* preview = this->GetPreviewSegmentation();
+        const auto labelValues = m_TransfersAllPreviewGroups
+          ? preview->GetAllLabelValues()
+          : preview->GetLabelValuesByGroup(preview->GetActiveLayer());
+
         for (auto labelValue : labelValues)
         {
         labelMapping.push_back({ labelValue, labelValue + offset});
@@ -550,16 +555,42 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       auto labelMapping = this->GetLabelMapping();
 
       const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+      const auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
 
-      SegGroupModifyUndoRedoHelper undoRedoGenerator(resultSegmentation, { resultSegmentation->GetActiveLayer() },
-        m_CreateAllTimeSteps, timeStep, false, false, true);
+      // The existing groups that receive labels. Groups that the transfer adds
+      // are covered by an undo operation of their own.
+      SegGroupModifyUndoRedoHelper::GroupIndexSetType modifiedGroups;
 
-      auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
+      if (m_TransfersAllPreviewGroups)
+      {
+        for (const auto& [sourceLabel, targetLabel] : labelMapping)
+        {
+          if (previewImage->ExistLabel(sourceLabel))
+          {
+            const auto group = previewImage->GetGroupIndexOfLabel(sourceLabel);
+
+            if (group < oldGroupCount)
+              modifiedGroups.insert(group);
+          }
+        }
+      }
+      else
+      {
+        modifiedGroups.insert(resultSegmentation->GetActiveLayer());
+      }
+
+      std::optional<SegGroupModifyUndoRedoHelper> undoRedoGenerator;
+
+      if (!modifiedGroups.empty())
+        undoRedoGenerator.emplace(resultSegmentation, modifiedGroups, m_CreateAllTimeSteps, timeStep, false, false, true);
+
       this->PreparePreviewToResultTransfer(labelMapping);
 
-      // REMARK: the following code in this scope assumes that PreparePreviewToResultTransfer does not change
-      // the number of groups. Currently all changes are only expected in the active group.
-      if (oldGroupCount != resultSegmentation->GetNumberOfGroups())
+      const auto newGroupCount = resultSegmentation->GetNumberOfGroups();
+
+      // REMARK: the following code in this scope assumes that PreparePreviewToResultTransfer only adds
+      // groups if the labels of all preview groups are transferred.
+      if (newGroupCount < oldGroupCount || (newGroupCount > oldGroupCount && !m_TransfersAllPreviewGroups))
       {
         mitkThrow() << "Cannot confirm/transfer segmentation. Internal tool state is invalid."
           << " Tool has changed the number of groups. Current base implementation expects that"
@@ -589,7 +620,21 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
           label->AddToolUse(this->GetAlgorithmType(), this->GetName());
       }
 
-      undoRedoGenerator.RegisterUndoRedoOperationEvent("Segmentation " + std::string(this->GetName()));
+      const auto undoDescription = "Segmentation " + std::string(this->GetName());
+
+      if (undoRedoGenerator.has_value())
+        undoRedoGenerator->RegisterUndoRedoOperationEvent(undoDescription);
+
+      if (newGroupCount > oldGroupCount)
+      {
+        SegGroupInsertUndoRedoHelper::GroupIndexSetType insertedGroups;
+
+        for (auto group = oldGroupCount; group < newGroupCount; ++group)
+          insertedGroups.insert(group);
+
+        SegGroupInsertUndoRedoHelper insertUndoRedoGenerator(resultSegmentation, insertedGroups);
+        insertUndoRedoGenerator.RegisterUndoRedoOperationEvent(undoDescription, undoRedoGenerator.has_value());
+      }
 
       // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())
@@ -837,7 +882,7 @@ void mitk::SegWithPreviewTool::ConfirmCleanUp()
 }
 
 void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& labelMapping,
-  const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target)
+  const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target, bool intoSourceGroups)
 {
   if (nullptr == source)
   {
@@ -850,19 +895,27 @@ void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& 
 
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
   {
-    if (MultiLabelSegmentation::UNLABELED_VALUE != sourceLabel &&
-        MultiLabelSegmentation::UNLABELED_VALUE != targetLabel &&
-        !target->ExistLabel(targetLabel, target->GetActiveLayer()))
-    {
-      if (!source->ExistLabel(sourceLabel))
-      {
-        mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
-      }
+    if (MultiLabelSegmentation::UNLABELED_VALUE == sourceLabel || MultiLabelSegmentation::UNLABELED_VALUE == targetLabel)
+      continue;
 
-      auto clonedLabel = source->GetLabel(sourceLabel)->Clone();
-      clonedLabel->SetValue(targetLabel);
-      target->AddLabel(clonedLabel,target->GetActiveLayer(), false, false);
+    const auto targetGroup = intoSourceGroups && source->ExistLabel(sourceLabel)
+      ? source->GetGroupIndexOfLabel(sourceLabel)
+      : target->GetActiveLayer();
+
+    if (target->ExistLabel(targetLabel, targetGroup))
+      continue;
+
+    if (!source->ExistLabel(sourceLabel))
+    {
+      mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
     }
+
+    while (target->GetNumberOfGroups() <= targetGroup)
+      target->AddGroup();
+
+    auto clonedLabel = source->GetLabel(sourceLabel)->Clone();
+    clonedLabel->SetValue(targetLabel);
+    target->AddLabel(clonedLabel, targetGroup, false, false);
   }
 }
 
@@ -880,7 +933,7 @@ void mitk::SegWithPreviewTool::PreparePreviewToResultTransfer(const LabelMapping
     }
 
     auto preview = this->GetPreviewSegmentation();
-    TransferLabelInformation(labelMapping, preview, resultSegmentation);
+    TransferLabelInformation(labelMapping, preview, resultSegmentation, m_TransfersAllPreviewGroups);
   }
 }
 

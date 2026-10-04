@@ -157,6 +157,16 @@ namespace mitk
     void SetLabelTransferMode(LabelTransferMode labelTransferMode);
     itkGetMacro(LabelTransferMode, LabelTransferMode);
 
+    /**
+     * \brief Whether the labels of all groups of the preview are transferred, or only those of its active group.
+     *
+     * If true, a label of the preview goes into the group of the segmentation
+     * that has the index of its group in the preview, and groups that the
+     * segmentation lacks are added to it. Otherwise the labels of the active
+     * group of the preview go into the active group of the segmentation.
+     */
+    itkGetConstMacro(TransfersAllPreviewGroups, bool);
+
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     /**
@@ -262,6 +272,14 @@ namespace mitk
     itkGetConstMacro(RequiresVolumetricReference, bool);
     itkBooleanMacro(RequiresVolumetricReference);
 
+    /** \brief See GetTransfersAllPreviewGroups(). False by default.
+     *
+     * Only for tools whose preview holds nothing but their results, as the
+     * preview starts as a clone of the segmentation with all its labels.
+     */
+    itkSetMacro(TransfersAllPreviewGroups, bool);
+    itkBooleanMacro(TransfersAllPreviewGroups);
+
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimeStep(const Image* image, TimeStepType timestep);
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
@@ -299,7 +317,8 @@ namespace mitk
      * \brief Called before the preview content is transferred to the segmentation on confirmation.
      *
      * Default implementation ensures that all labels to be transferred exist in the segmentation.
-     * Missing labels are added by cloning label information from the preview.
+     * Missing labels are added by cloning label information from the preview, into the groups
+     * that GetTransfersAllPreviewGroups() describes.
      *
      * \param[in] labelMapping The mapping used for transferring labels from preview to result.
      */
@@ -311,9 +330,12 @@ namespace mitk
      * \param[in] labelMapping Indicates which labels to copy and optional label value remapping.
      * \param[in] source The source segmentation containing the label information.
      * \param[in,out] target The target segmentation that receives the label information.
+     * \param[in] intoSourceGroups If true, a label goes into the group of the target that has the
+     *            index of its group in the source, and missing groups are added to the target.
+     *            Otherwise all labels go into the active group of the target.
      */
     static void TransferLabelInformation(const LabelMappingType& labelMapping,
-      const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target);
+      const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target, bool intoSourceGroups = false);
 
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
@@ -473,6 +495,7 @@ namespace mitk
     bool m_RequiresExistingLabels = true;
     bool m_RequiresScalarReference = true;
     bool m_RequiresVolumetricReference = false;
+    bool m_TransfersAllPreviewGroups = false;
   };
 
 } // namespace

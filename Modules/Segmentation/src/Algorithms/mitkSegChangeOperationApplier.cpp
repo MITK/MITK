@@ -195,13 +195,17 @@ mitk::SegGroupInsertUndoRedoHelper::~SegGroupInsertUndoRedoHelper()
   delete m_UndoOperation;
 };
 
-void mitk::SegGroupInsertUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
+void mitk::SegGroupInsertUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description, bool joinPreviousStep)
 {
   if (nullptr == m_UndoOperation)
     mitkThrow() << "Invalid usage of SegGroupInsertUndoRedoHelper. You can only call RegisterUndoRedoOperationEvent once.";
 
-  UndoStackItem::IncCurrGroupEventId();
-  UndoStackItem::IncCurrObjectEventId();
+  // The undo stack undoes all operations of an event ID in one step.
+  if (!joinPreviousStep)
+  {
+    UndoStackItem::IncCurrGroupEventId();
+    UndoStackItem::IncCurrObjectEventId();
+  }
 
   auto redoOperation =
     SegGroupInsertOperation::CreateFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_NoLabels, m_NoGroupImages);

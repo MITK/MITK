@@ -59,6 +59,17 @@ const mitk::MultiLabelSegmentation* QmitkSimpleLabelSetListWidget::GetLabelSetIm
   return m_LabelSetImage;
 }
 
+void QmitkSimpleLabelSetListWidget::SetShowsAllLayers(bool showsAllLayers)
+{
+  if (showsAllLayers == m_ShowsAllLayers)
+    return;
+
+  m_ShowsAllLayers = showsAllLayers;
+
+  if (m_LabelSetImage.IsNotNull())
+    this->ResetList();
+}
+
 void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::MultiLabelSegmentation* image)
 {
   if (image != m_LabelSetImage)
@@ -112,7 +123,7 @@ void QmitkSimpleLabelSetListWidget::OnLayerChanged()
 void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::MultiLabelSegmentation::LabelValueType lv)
 {
   if (!this->m_Emmiting
-    && (!m_LabelSetImage->ExistLabel(lv) || m_LabelSetImage->GetGroupIndexOfLabel(lv)==m_LabelSetImage->GetActiveLayer()))
+    && (m_ShowsAllLayers || !m_LabelSetImage->ExistLabel(lv) || m_LabelSetImage->GetGroupIndexOfLabel(lv)==m_LabelSetImage->GetActiveLayer()))
   {
     this->ResetList();
 
@@ -138,7 +149,9 @@ void QmitkSimpleLabelSetListWidget::ResetList()
   m_LabelList->clear();
   
   auto activeLayerID = m_LabelSetImage->GetActiveLayer();
-  auto labels = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(activeLayerID));
+  auto labels = m_ShowsAllLayers
+    ? m_LabelSetImage->GetLabels()
+    : m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(activeLayerID));
 
   for (auto& label : labels)
   {

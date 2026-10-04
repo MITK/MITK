@@ -91,7 +91,9 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
     auto preview = tool->GetPreviewSegmentation();
     if (nullptr != preview)
     {
-      auto labels = preview->GetLabelsByValue(preview->GetLabelValuesByGroup(preview->GetActiveLayer()));
+      auto labels = tool->GetTransfersAllPreviewGroups()
+        ? preview->GetLabels()
+        : preview->GetLabelsByValue(preview->GetLabelValuesByGroup(preview->GetActiveLayer()));
       auto selectedLabels = tool->GetSelectedLabels();
 
       for (auto label : labels)
@@ -149,6 +151,9 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::Mu
 {
   if (nullptr != m_LabelSelectionList)
   {
+    // Offers exactly the labels that "Transfer all labels" would transfer.
+    auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
+    m_LabelSelectionList->SetShowsAllLayers(nullptr != tool && tool->GetTransfersAllPreviewGroups());
     m_LabelSelectionList->SetLabelSetImage(preview);
   }
 }

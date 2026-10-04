@@ -67,6 +67,8 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Converge_SeedLeaves_KeepsMemberRelation);
   MITK_TEST(Converge_SaveLoadRoundTrip_KeepsMemberRelations);
   MITK_TEST(Reconverge_RestoresOffsetAfterBoundaryClamp);
+  MITK_TEST(Reconverge_ClampedAnchor_KeepsGroupReference);
+  MITK_TEST(Join_ClampedFirstMember_ConvergesJoinerToGroupReference);
   MITK_TEST(PanOffset_DriftsUnderZoom_ReconvergeRestores);
   MITK_TEST(Macro_LinksAllCellsWithoutConverge);
   MITK_TEST(Macro_Off_RestoresIndependence);
@@ -525,6 +527,66 @@ public:
 
     m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Re-converge restores seed + offset", last, ShownSlice(1));
+  }
+
+  void Reconverge_ClampedAnchor_KeepsGroupReference()
+  {
+    // The group's first window carries -1 and is pushed against slice 0 by a
+    // group scroll; its live slice no longer tells the group reference.
+    SetShownSlice(0, 2);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav", -1);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", 0);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav", 1);
+    CPPUNIT_ASSERT_EQUAL(3u, ShownSlice(1));
+
+    // A scroll counts stepper steps, which can run opposite to the shown index.
+    const int up = SliceInverted(1) ? -1 : 1;
+    for (int i = 0; i < 3; ++i)
+    {
+      FireScroll(1, -up);
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the first window is clamped at slice 0", 0u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL(0u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL(1u, ShownSlice(2));
+
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The clamped window stays clamped", 0u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group does not shift to the clamped window", 0u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group does not shift to the clamped window", 1u, ShownSlice(2));
+
+    // Scrolling back carries the clamped window off the boundary by the same
+    // delta, one slice from where its offset puts it; re-converge restores it
+    // from the windows that agree on the reference.
+    FireScroll(1, up);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the clamped window lost its offset", 1u, ShownSlice(0));
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The window returns to reference + offset", 0u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The windows that kept their offset stay put", 1u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The windows that kept their offset stay put", 2u, ShownSlice(2));
+  }
+
+  void Join_ClampedFirstMember_ConvergesJoinerToGroupReference()
+  {
+    // The group's first window (-1) is clamped at slice 0 while the second
+    // (+2) still shows the reference; a joiner must follow the latter.
+    SetShownSlice(0, 2);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav", -1);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav", 2);
+    CPPUNIT_ASSERT_EQUAL(5u, ShownSlice(1));
+
+    const int up = SliceInverted(1) ? -1 : 1;
+    for (int i = 0; i < 3; ++i)
+    {
+      FireScroll(1, -up);
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the first window is clamped at slice 0", 0u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the reference is 0", 2u, ShownSlice(1));
+
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "nav", 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The joiner lands on reference + its offset", 1u, ShownSlice(2));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group does not move for a joiner", 0u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group does not move for a joiner", 2u, ShownSlice(1));
   }
 
   void PanOffset_DriftsUnderZoom_ReconvergeRestores()

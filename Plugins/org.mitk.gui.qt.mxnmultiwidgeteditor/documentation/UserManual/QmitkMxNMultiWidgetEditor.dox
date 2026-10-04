@@ -92,7 +92,10 @@
 			included, count from one common reference, so setting an offset moves only that window;
 			the others stay where they are. At the end of the
 			slice range, or where the camera stops, a member can lose its offset; "Re-converge"
-			(context menu or group card) restores it.
+			(context menu or group card) restores it. For slices it goes by the windows that are not
+			on the first or last slice, so the group stays where most of them are and only the
+			window that lost its offset moves; only when every window of the group is on an end of
+			its slice range does the group's first window decide.
 		<li> <b>A pan offset does not survive zooming.</b> A zoom centres on the point of the window
 			it was made in, which shifts each member's pan differently. Re-converge after zooming
 			a group whose members sit at a pan offset.

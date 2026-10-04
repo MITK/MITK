@@ -14,7 +14,10 @@ found in the LICENSE file.
 
 #include <QmitkMxNCellOverlay.h>
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkMxNSyncDimension.h>
 #include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkAnatomicalPlanes.h>
@@ -25,6 +28,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QApplication>
+#include <QCoreApplication>
 
 #include <memory>
 
@@ -46,6 +50,8 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(FrameIdentity_ComplexAcrossGroups);
   MITK_TEST(FrameIdentity_SelectionParticipates);
   MITK_TEST(PaintPath_DoesNotCrash);
+  MITK_TEST(GroupState_ShownOnEveryCellAfterGridGrows);
+  MITK_TEST(GroupState_ShownOnEveryCellAfterAddGridRow);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -185,6 +191,51 @@ public:
       QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
     CPPUNIT_ASSERT_MESSAGE("The frame hue is the selection group's color",
       identity.hue == m_Editor->GetSyncGroupColor("sel"));
+  }
+
+  /** Every cell's furniture shows its group state: the barcode slots of the
+   *  appearance axes carry the "main" hue, and the frame is drawn in it. */
+  void AssertEveryCellShowsMainGroup(const std::string& when) const
+  {
+    const auto mainHue = m_Editor->GetSyncGroupColor("main");
+    for (const auto& [windowId, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      const auto where = when + ", cell " + windowId.toStdString();
+      auto* utility = cell->GetUtilityWidget();
+      CPPUNIT_ASSERT(nullptr != utility);
+      auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
+      CPPUNIT_ASSERT(nullptr != barcode);
+      const auto axisSlots = barcode->Slots();
+      // One slot per dimension in dimension order, then the data selection.
+      CPPUNIT_ASSERT(axisSlots.size() > static_cast<int>(QmitkMxNAllSyncDimensions.size()));
+      for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+      {
+        const auto dimension = QmitkMxNAllSyncDimensions[i];
+        if (QmitkMxNSyncDimension::Windowing == dimension || QmitkMxNSyncDimension::Lut == dimension)
+        {
+          CPPUNIT_ASSERT_MESSAGE("The barcode shows the appearance link: " + where,
+                                 axisSlots[static_cast<int>(i)].color == mainHue);
+        }
+      }
+      CPPUNIT_ASSERT_MESSAGE("The frame carries the group hue: " + where,
+                             cell->styleSheet().contains(mainHue.name(QColor::HexRgb)));
+    }
+  }
+
+  void GroupState_ShownOnEveryCellAfterGridGrows()
+  {
+    m_Editor->SetLayout(2, 3);
+    QCoreApplication::processEvents();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(6), m_Editor->GetRenderWindowWidgets().size());
+    this->AssertEveryCellShowsMainGroup("after SetLayout grows the grid");
+  }
+
+  void GroupState_ShownOnEveryCellAfterAddGridRow()
+  {
+    m_Editor->AddGridRow();
+    QCoreApplication::processEvents();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(6), m_Editor->GetRenderWindowWidgets().size());
+    this->AssertEveryCellShowsMainGroup("after AddGridRow");
   }
 
   void PaintPath_DoesNotCrash()

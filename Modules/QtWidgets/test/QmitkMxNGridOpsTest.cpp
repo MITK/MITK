@@ -89,6 +89,8 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(Maximize_NestedTreeShowsOnlyTheTarget);
   MITK_TEST(Maximize_HorizontalRootShowsOnlyTheTarget);
   MITK_TEST(Maximize_NestedTreeIsInvisibleToSerialization);
+  MITK_TEST(Maximize_TargetNotInTreeRestoresGrid);
+  MITK_TEST(Maximize_SwitchingCellsShowsOnlyTheNewTarget);
   MITK_TEST(SetLayout_FreshGridsPlaceCellsInReadingOrder);
   MITK_TEST(GridSurgery_KeepsReadingOrderAfterEachStep);
   MITK_TEST(SetLayout_SameShapeAfterAddGridColumnMovesNothing);
@@ -637,6 +639,63 @@ public:
 
     m_Editor->SetMaximizedCell(QString());
     CPPUNIT_ASSERT_EQUAL(3, this->VisibleCellCount());
+  }
+
+  void Maximize_TargetNotInTreeRestoresGrid()
+  {
+    // A registered cell parked outside the layout tree, in a splitter of its
+    // own next to a sibling: the walk up from it hides that sibling before it
+    // finds no path to the root, and must undo that and restore the grid.
+    this->SizedApply(NestedDoc());
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__a"));
+
+    auto* parkedCell = m_Editor->GetRenderWindowWidgets().at(QStringLiteral("mxn__b")).get();
+    auto* home = qobject_cast<QSplitter*>(parkedCell->parentWidget());
+    CPPUNIT_ASSERT(nullptr != home);
+    const int homeIndex = home->indexOf(parkedCell);
+    QSplitter parking;
+    parking.addWidget(parkedCell);
+    auto* sibling = new QWidget(&parking);
+    parking.addWidget(sibling);
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__b"));
+
+    const auto maximized = m_Editor->GetMaximizedCell();
+    const bool siblingHidden = sibling->isHidden();
+    home->insertWidget(homeIndex, parkedCell);
+    QCoreApplication::processEvents();
+
+    CPPUNIT_ASSERT_MESSAGE("A cell outside the tree is not maximized", maximized.isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("The partial walk leaves nothing hidden", !siblingHidden);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The previous maximize is undone: every cell is shown",
+                                 4, this->VisibleCellCount());
+  }
+
+  void Maximize_SwitchingCellsShowsOnlyTheNewTarget()
+  {
+    this->SizedApply(NestedDoc());
+    const auto& cells = m_Editor->GetRenderWindowWidgets();
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__b"));
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__d"));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__d"), m_Editor->GetMaximizedCell().toStdString());
+    CPPUNIT_ASSERT_MESSAGE("The new target is shown", cells.at(QStringLiteral("mxn__d"))->isVisible());
+    for (const auto* id : { "mxn__a", "mxn__b", "mxn__c" })
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("No other cell is shown: ") + id,
+                             !cells.at(QString::fromLatin1(id))->isVisible());
+    }
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__c"));
+    CPPUNIT_ASSERT_MESSAGE("Switching into a nested split shows that cell",
+                           cells.at(QStringLiteral("mxn__c"))->isVisible());
+    CPPUNIT_ASSERT_MESSAGE("Its split sibling is hidden", !cells.at(QStringLiteral("mxn__b"))->isVisible());
+    CPPUNIT_ASSERT_MESSAGE("The previous target is hidden", !cells.at(QStringLiteral("mxn__d"))->isVisible());
+    CPPUNIT_ASSERT_EQUAL(1, this->VisibleCellCount());
+
+    m_Editor->SetMaximizedCell(QString());
+    CPPUNIT_ASSERT_EQUAL(4, this->VisibleCellCount());
   }
 
   void Maximize_NestedTreeIsInvisibleToSerialization()

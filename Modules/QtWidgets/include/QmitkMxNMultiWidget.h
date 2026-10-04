@@ -303,9 +303,9 @@ public:
   *   on that dimension only. Every member's offset is relative to one group
   *   reference, which any member's live state minus its own offset recovers.
   *   A call moves only 'windowId': on joining, or on an offset change, the
-  *   cell is converged to the group's reference (taken from the group's
-  *   pre-order first member before the call) combined with the given offset;
-  *   the other members stay put. Convergence is skipped while the involved
+  *   cell is converged to the group's reference (taken before the call from
+  *   the member a re-converge would anchor on, see ReconvergeSyncGroup)
+  *   combined with the given offset; the other members stay put. Convergence is skipped while the involved
   *   render windows have no world geometry yet; use 'ReconvergeSyncGroup'
   *   once they do. `Crosshair` links carry no convergence bookkeeping
   *   (propagation is absolute: the crosshair is one world point that every
@@ -367,9 +367,14 @@ public:
 
   /**
   * \brief Re-establish `reference + offset` for every member of the group on
-  *        the given dimension. The group's pre-order first member (the seed)
-  *        stays put and defines the reference: its live state minus its own
-  *        offset.
+  *        the given dimension. One member, the anchor, stays put and
+  *        defines the reference: its live state minus its own offset. The
+  *        anchor is the group's pre-order first member (the seed), except
+  *        for `Slice`: there a member sitting on the first or last slice may
+  *        be clamped and does not show the reference, so the anchor is the
+  *        first member strictly inside its slice range whose reference most
+  *        such members agree on. Only when every member sits on a range end
+  *        does the seed anchor the group, clamped or not.
   *
   *   The safety net for delta drift: boundary clamping, missed events, and
   *   the pan-offset perturbation under zoom all desync members from their
@@ -1443,6 +1448,20 @@ private:
                             const std::set<QString>& excluded = {}) const;
 
   /**
+  * \brief The member a re-converge takes the group reference from, skipping
+  *        the cells in 'excluded'.
+  *
+  *   For `Slice`, a member clamped at the end of its range does not show the
+  *   reference, so only members strictly inside their slice range qualify;
+  *   among them the reference most of them agree on wins, anchored by its
+  *   pre-order first member. Without such a member, and for `Zoom` / `Pan`
+  *   (no hard bounds), this is the seed (see FindSyncGroupSeed). Empty
+  *   string if no other cell links the group.
+  */
+  QString FindSyncGroupAnchor(QmitkMxNSyncDimension dimension, const std::string& group,
+                              const std::set<QString>& excluded = {}) const;
+
+  /**
   * \brief Record 'group' in the hue-assignment order if it is new
   *        (see GetSyncGroupColor).
   */
@@ -1502,9 +1521,9 @@ private:
   * \brief Re-converge every `Slice` / `Zoom` / `Pan` group that has at least
   *        one member among 'windowIds' (after their geometry changed).
   *
-  *   Each group is anchored on its pre-order first member outside
-  *   'windowIds', so the changed cells adapt to the rest of the group; only
-  *   a group whose members all changed is anchored on its seed.
+  *   Each group is anchored outside 'windowIds' (see FindSyncGroupAnchor),
+  *   so the changed cells adapt to the rest of the group; only a group whose
+  *   members all changed is anchored on its seed.
   */
   void ReconvergeGeometryRelativeGroups(const std::vector<QString>& windowIds);
 

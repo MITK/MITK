@@ -3221,10 +3221,11 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
   }
 
   // A write moves only the written cell, so the group's reference is taken
-  // before the write: from the group's pre-order first member, which is the
-  // written cell itself (with its previous offset) only when it already leads
-  // the group.
-  const auto anchorId = this->FindSyncGroupSeed(dimension, group);
+  // before the write, from the members as they are (see FindSyncGroupAnchor).
+  // A cell already in the group takes part as one of those members, with its
+  // previous offset; when it is the anchor, the convergence applies its
+  // offset change to it.
+  const auto anchorId = this->FindSyncGroupAnchor(dimension, group);
   const auto anchorLink = anchorId.isEmpty() ? std::nullopt : this->GetSyncLink(anchorId, dimension);
   const auto anchorOffset = anchorLink.has_value() ? anchorLink->offset : SyncOffset{};
 
@@ -3419,13 +3420,13 @@ void QmitkMxNMultiWidget::ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, c
                 << "' carries no convergence bookkeeping (only slice, zoom, and pan do).";
   }
 
-  const auto seedId = this->FindSyncGroupSeed(dimension, group);
-  if (seedId.isEmpty())
+  const auto anchorId = this->FindSyncGroupAnchor(dimension, group);
+  if (anchorId.isEmpty())
   {
     mitkThrow() << "ReconvergeSyncGroup: no cell links group '" << group
                 << "' for dimension '" << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
   }
-  this->ConvergeSyncGroupToAnchor(dimension, group, seedId);
+  this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
 }
 
 void QmitkMxNMultiWidget::ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension dimension,
@@ -3514,6 +3515,72 @@ QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension,
     }
   }
   return {};
+}
+
+QString QmitkMxNMultiWidget::FindSyncGroupAnchor(QmitkMxNSyncDimension dimension,
+                                                 const std::string& group,
+                                                 const std::set<QString>& excluded) const
+{
+  if (QmitkMxNSyncDimension::Slice != dimension)
+  {
+    return this->FindSyncGroupSeed(dimension, group, excluded);
+  }
+
+  // A member's displayed slice is the group reference plus its offset,
+  // clamped to the member's range, and a clamp can only leave a member on the
+  // first or last slice. So only a member strictly inside its range shows
+  // where the reference is; a boundary member tells only a bound. An interior
+  // member can still be off: one that was clamped and then carried back off
+  // the boundary by the group's next scroll moved by the full delta, the
+  // others did not. Hence the reference most interior members agree on wins,
+  // and its first member in pre-order anchors the group.
+  std::vector<std::pair<QString, long>> candidates;
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (excluded.count(descriptor.id) > 0)
+    {
+      continue;
+    }
+    const auto linksIt = m_CellSyncLinks.find(descriptor.id);
+    if (linksIt == m_CellSyncLinks.end() || linksIt->second.groups[DimensionIndex(dimension)] != group)
+    {
+      continue;
+    }
+    const auto widget = this->GetRenderWindowWidget(descriptor.id);
+    auto* renderer = nullptr != widget
+      ? mitk::BaseRenderer::GetInstance(widget->GetRenderWindow()->GetVtkRenderWindow())
+      : nullptr;
+    if (nullptr == renderer || nullptr == renderer->GetCurrentWorldGeometry())
+    {
+      continue;
+    }
+    const auto* stepper = renderer->GetSliceNavigationController()->GetStepper();
+    if (nullptr == stepper || stepper->GetSteps() < 3)
+    {
+      continue;
+    }
+    const long last = static_cast<long>(stepper->GetSteps()) - 1;
+    const long position = static_cast<long>(stepper->GetPos());
+    const long shown = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? last - position : position;
+    if (shown > 0 && shown < last)
+    {
+      candidates.emplace_back(descriptor.id, shown - linksIt->second.sliceOffset);
+    }
+  }
+
+  QString anchorId;
+  std::ptrdiff_t bestSupport = 0;
+  for (const auto& [id, reference] : candidates)
+  {
+    const auto support = std::count_if(candidates.begin(), candidates.end(),
+      [reference = reference](const auto& candidate) { return candidate.second == reference; });
+    if (support > bestSupport)
+    {
+      bestSupport = support;
+      anchorId = id;
+    }
+  }
+  return anchorId.isEmpty() ? this->FindSyncGroupSeed(dimension, group, excluded) : anchorId;
 }
 
 void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension,
@@ -3799,15 +3866,15 @@ std::vector<QString> QmitkMxNMultiWidget::EnforceComponentGeometry(const QString
       // center lies half a slice off the plane and would select the next one.
       mitk::Point3D slicePoint;
       currentPlane->Project(currentPlane->GetCenter(), slicePoint);
-      mitk::TimeStepType timeStep = 0;
       const auto timePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
-      if (referenceGeometry->IsValidTimePoint(timePoint))
-      {
-        timeStep = referenceGeometry->TimePointToTimeStep(timePoint);
-      }
       renderingManager->InitializeView(renderWindow, referenceGeometry, false);
       sliceNavigation->SelectSliceByPoint(slicePoint);
-      renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(timeStep);
+      // A time point outside the reference has no step to return to.
+      if (referenceGeometry->IsValidTimePoint(timePoint))
+      {
+        renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(
+          referenceGeometry->TimePointToTimeStep(timePoint));
+      }
     }
     reinitialized.push_back(memberId);
   }
@@ -3835,7 +3902,7 @@ void QmitkMxNMultiWidget::ReconvergeGeometryRelativeGroups(const std::vector<QSt
   const std::set<QString> changed(windowIds.begin(), windowIds.end());
   for (const auto& [dimension, group] : groups)
   {
-    auto anchorId = this->FindSyncGroupSeed(dimension, group, changed);
+    auto anchorId = this->FindSyncGroupAnchor(dimension, group, changed);
     if (anchorId.isEmpty())
     {
       anchorId = this->FindSyncGroupSeed(dimension, group);

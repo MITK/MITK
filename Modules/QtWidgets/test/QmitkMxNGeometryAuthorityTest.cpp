@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -59,6 +60,8 @@ class QmitkMxNGeometryAuthorityTestSuite : public mitk::TestFixture
   MITK_TEST(PlaneChange_UnlinkedOrientation_ReconvergesSliceOffset);
   MITK_TEST(PlaneChange_UnlinkedOrientationOnSeed_KeepsGroup);
   MITK_TEST(SliceLink_GeometryAlignment_KeepsMemberZoom);
+  MITK_TEST(SliceLink_GeometryAlignment_KeepsTimeStep);
+  MITK_TEST(SliceLink_GeometryAlignment_TimeOutsideReference);
   MITK_TEST(GroupReinit_ChainConvergesComponentOnly);
   MITK_TEST(GroupReinit_ReconvergesSliceOffsets);
   MITK_TEST(GlobalReinit_StillResetsAllCells);
@@ -281,6 +284,44 @@ public:
       zoomedScale, Renderer(2)->GetVtkRenderer()->GetActiveCamera()->GetParallelScale(), 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An orientation-only member keeps its slice world position",
       0.0, Snc(3)->GetCurrentPlaneGeometry()->DistanceFromPlane(slicePoint), 1e-3);
+  }
+
+  /** Global time step after linking cell 1 (a 3-step image) into the slice
+   *  group of cell 0 (showing 'reference'), with time step 2 selected. */
+  mitk::TimeStepType TimeStepAfterAlignment(const mitk::Image* reference)
+  {
+    const auto member = mitk::ImageGenerator::GenerateRandomImage<short>(32, 32, 8, 3);
+    mitk::RenderingManager::GetInstance()->InitializeView(
+      m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow()->GetVtkRenderWindow(),
+      reference->GetTimeGeometry());
+    mitk::RenderingManager::GetInstance()->InitializeView(
+      m_Editor->GetRenderWindowWidget(CellId(1))->GetRenderWindow()->GetVtkRenderWindow(),
+      member->GetTimeGeometry());
+    auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    timeNavigation->GetStepper()->SetPos(2);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: time step 2 is selected", mitk::TimeStepType(2),
+                                 timeNavigation->GetSelectedTimeStep());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "s");
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the member was aligned to the reference geometry",
+      mitk::Equal(*Snc(0)->GetInputWorldTimeGeometry(), *Snc(1)->GetInputWorldTimeGeometry(), mitk::eps, false));
+    return timeNavigation->GetSelectedTimeStep();
+  }
+
+  void SliceLink_GeometryAlignment_KeepsTimeStep()
+  {
+    const auto reference = mitk::ImageGenerator::GenerateRandomImage<short>(16, 16, 8, 3);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Aligning a member keeps the selected time step",
+                                 mitk::TimeStepType(2), this->TimeStepAfterAlignment(reference));
+  }
+
+  void SliceLink_GeometryAlignment_TimeOutsideReference()
+  {
+    // The reference covers no time point beyond its single step, so there is
+    // no step to restore; the time stays where the re-initialization left it.
+    const auto reference = mitk::ImageGenerator::GenerateRandomImage<short>(16, 16, 8, 1);
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(0), this->TimeStepAfterAlignment(reference));
   }
 
   void GroupReinit_ChainConvergesComponentOnly()

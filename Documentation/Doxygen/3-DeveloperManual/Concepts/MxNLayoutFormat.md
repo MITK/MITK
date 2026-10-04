@@ -241,7 +241,11 @@ the reference (its live state minus its own offset); every other member
 converges to the reference combined with its own offset. From then on the
 group moves together, which keeps the offsets. A member clamped at the end of
 its slice range or camera bounds can lose its offset; the editor's
-re-converge action restores it.
+re-converge action restores it. For slices, re-converge takes the reference
+from the members that sit strictly inside their slice range, following the
+reference most of them agree on, so a clamped member is moved back rather
+than the group shifted to it. Only when every member sits on the first or
+last slice of its range does the seed define the reference, clamped or not.
 
 A slice offset counts displayed slices: the index the navigator shows, which
 follows the image's own index axis for the view direction and can run

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 
+#include <charconv>
 #include <regex>
 #include <sstream>
 
@@ -36,10 +37,17 @@ std::optional<int> mitk::Torch::ParseCUDADeviceIndex(const std::string& deviceSt
   const std::regex regex(R"(^\s*cuda:(\d+)\s*$)");
   std::smatch match;
 
-  if (std::regex_match(deviceString, match, regex))
-    return std::stoi(match[1].str());
+  if (!std::regex_match(deviceString, match, regex))
+    return std::nullopt;
 
-  return std::nullopt;
+  const auto digits = match[1].str();
+  int index = 0;
+
+  // The digits can be more than an int holds; that names no device either.
+  if (std::from_chars(digits.data(), digits.data() + digits.size(), index).ec != std::errc())
+    return std::nullopt;
+
+  return index;
 }
 
 std::optional<mitk::Torch::CUDADeviceInfo> mitk::Torch::QueryCUDADevice(PythonContext& context, int deviceIndex)

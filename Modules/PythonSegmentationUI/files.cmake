@@ -8,6 +8,7 @@ set(CPP_FILES
   mitkVoxTellInstall.cpp
   QmitknnInteractiveInstallModeDialog.cpp
   QmitknnInteractiveToolGUI.cpp
+  QmitkSpeechBubbleFrame.cpp
   QmitkTotalSegmentatorToolGUI.cpp
   QmitkVenvProcess.cpp
   QmitkVoxTellToolGUI.cpp

@@ -53,6 +53,8 @@ namespace
   const QString PREFERENCES_NODE = "org.mitk.views.segmentation";
   const QString PREFERENCE_PAGE_ID = "org.mitk.gui.qt.application.VoxTellPreferencePage";
 
+  constexpr qreal PROMPT_FONT_SCALE = 1.2;
+
   constexpr auto AUTO_CONFIRM = "VoxTell/autoConfirm";
   constexpr auto CREATE_GROUPS_AS_NEEDED = "VoxTell/createGroupsAsNeeded";
 
@@ -173,6 +175,18 @@ void QmitkVoxTellToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   m_Ui->segmentButton->setIcon(QmitkIconTheme::GetIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg")));
+
+  // The speech bubble around the prompts shows through, and the prompts are set
+  // larger than the rest. In a style sheet, as the application sets its font
+  // size in one, which a font set on the widget would not override.
+  m_Ui->promptsTextEdit->ensurePolished();
+
+  QString promptsStyleSheet = "QPlainTextEdit { background: transparent; }";
+
+  if (const auto fontSize = m_Ui->promptsTextEdit->font().pointSizeF(); fontSize > 0)
+    promptsStyleSheet += QString("QPlainTextEdit { font-size: %1pt; }").arg(fontSize * PROMPT_FONT_SCALE);
+
+  m_Ui->promptsTextEdit->setStyleSheet(promptsStyleSheet);
 
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);

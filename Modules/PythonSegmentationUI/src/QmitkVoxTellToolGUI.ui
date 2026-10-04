@@ -59,28 +59,49 @@
        </widget>
       </item>
       <item row="1" column="0" colspan="2">
-       <widget class="QmitkLineCompletionTextEdit" name="promptsTextEdit">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>72</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>144</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Describe the structures to segment in free text, one prompt per line. While you type, the prompts that VoxTell knows are suggested.</string>
-        </property>
-        <property name="placeholderText">
-         <string>One prompt per line, e.g. liver</string>
-        </property>
+       <widget class="QmitkSpeechBubbleFrame" name="promptsBubble" native="true">
+        <layout class="QVBoxLayout" name="promptsBubbleLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QmitkLineCompletionTextEdit" name="promptsTextEdit">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>72</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>118</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Describe the structures to segment in free text, one prompt per line. While you type, the prompts that VoxTell knows are suggested.</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <property name="placeholderText">
+            <string>One prompt per line, e.g. liver</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item row="2" column="0" colspan="2">
@@ -134,6 +155,12 @@
    <class>QmitkInfoCard</class>
    <extends>QFrame</extends>
    <header location="global">QmitkInfoCard.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSpeechBubbleFrame</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSpeechBubbleFrame.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

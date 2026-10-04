@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitknnInteractiveEnums_h
 
 #include <mitkColorProperty.h>
+#include <mitkTorchDevice.h>
 #include <MitkPythonSegmentationExports.h>
 
 namespace mitk::nnInteractive
@@ -92,21 +93,17 @@ namespace mitk::nnInteractive
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::array<PromptType, 2>& GetAllPromptTypes();
 
-  /** \brief Specifies the computation backends available for %nnInteractive.
+  /** \brief The computation backends available for %nnInteractive.
    *
    * Backends define the computational resources used, such as GPU (CUDA) or
    * CPU for processing.
    *
-   * \note Whenever modifying this enum class, make sure to also adapt its
+   * \note Whenever modifying Torch::Backend, make sure to also adapt the
    *       utility functions GetBackendAsString() and GetAllBackends().
    *
-   * \see GetBackendAsString(), GetAllBackends()
+   * \see Torch::Backend, GetBackendAsString(), GetAllBackends()
    */
-  enum class Backend
-  {
-    CUDA, /**< CUDA backend for GPU computation (fast) */
-    CPU   /**< Backend for CPU computation (slow) */
-  };
+  using Backend = Torch::Backend;
 
   /** \brief Converts a Backend type to a corresponding string representation.
    *

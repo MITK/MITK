@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkTorchDevice.h>
 
 #include <QmitkMultiLabelInspector.h>
 #include <QmitknnInteractiveInstallModeDialog.h>
@@ -785,9 +786,9 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   #else
     // The architectures follow the PyTorch build we install: torch 2.8 still
     // runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
-    // Turing. Keep in sync with TorchRequirements() in mitknnInteractiveInstall.cpp.
+    // Turing. The floor is the one the device selection applies.
     const QString gpuArchitectures = QString(
-      mitk::PythonHelper::VERSION_MINOR >= 14
+      mitk::Torch::MinimumComputeCapability().Major >= 7
         ? "<li %1>Minimum: Turing architecture (e.g., GeForce RTX 2060)</li>"
           "<li %1>Better: Ampere architecture (e.g., GeForce RTX 3070)</li>"
           "<li %1>Best: Ada Lovelace or newer (e.g., GeForce RTX 4080)</li>"

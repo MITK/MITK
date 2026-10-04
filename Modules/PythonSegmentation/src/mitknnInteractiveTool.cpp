@@ -23,32 +23,21 @@ found in the LICENSE file.
 #include <mitknnInteractiveScribbleInteractor.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPythonContext.h>
-#include <mitkPythonHelper.h>
 #include <mitkPythonUtil.h>
 #include <mitkRenderingManager.h>
 #include <mitkToolManager.h>
+#include <mitkTorchDevice.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 
 #include <algorithm>
-#include <regex>
+#include <sstream>
 
 using namespace mitk::nnInteractive;
 
 namespace
 {
-  std::optional<int> parseCUDADevice(const std::string& gpuBackend)
-  {
-    const std::regex regex(R"(^\s*cuda:(\d+)\s*$)");
-    std::smatch match;
-
-    if (std::regex_match(gpuBackend, match, regex))
-      return std::stoi(match[1].str());
-
-    return std::nullopt;
-  }
-
   mitk::IPreferences* GetPreferences()
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -763,50 +752,6 @@ const std::vector<std::pair<std::string, std::string>>& mitk::nnInteractiveTool:
   return keys;
 }
 
-bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
-{
-  auto prefs = GetPreferences();
-  const auto gpuBackend = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
-  auto cudaDevice = parseCUDADevice(gpuBackend);
-
-  if (!cudaDevice.has_value())
-    return false;
-
-  std::ostringstream pyCommands; pyCommands
-    << "import torch\n"
-    << "is_cuda_available = False\n"
-    << "try:\n"
-    << "    if torch.cuda.is_available():\n"
-    << "        name = torch.cuda.get_device_name(" << cudaDevice.value() << ")\n"
-    << "        props = torch.cuda.get_device_properties(" << cudaDevice.value() << ")\n"
-    << "        total_memory_mb = props.total_memory // (1024 ** 2)\n"
-    << "        major = props.major\n"
-    << "        minor = props.minor\n"
-    << "        is_cuda_available = True\n"
-    << "except Exception:\n"
-    << "    pass\n";
-
-  try
-  {
-    auto pythonContext = m_Impl->GetPythonContext();
-    pythonContext->Execute(pyCommands.str());
-
-    if (!pythonContext->GetVariableAsBool("is_cuda_available").value_or(false))
-      return false;
-
-    info.Name = pythonContext->GetVariableAsString("name").value_or("");
-    info.TotalMemoryMB = pythonContext->GetVariableAsInt("total_memory_mb").value_or(0);
-    info.Major = pythonContext->GetVariableAsInt("major").value_or(0);
-    info.Minor = pythonContext->GetVariableAsInt("minor").value_or(0);
-
-    return true;
-  }
-  catch (...)
-  {
-    return false;
-  }
-}
-
 void mitk::nnInteractiveTool::StartSession()
 {
   if (this->IsSessionRunning())
@@ -1018,63 +963,12 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
                    "sessions only. Select Remote in Preferences -> Segmentation -> nnInteractive, "
                    "or uninstall and reinitialize in Full mode to enable local inference.";
 
-  bool useCUDADevice = false;
-
   auto prefs = GetPreferences();
-  const auto backendPref = prefs->Get("nnInteractive/backend", "auto");
+  const auto backend = Torch::ParseBackendPreference(prefs->Get("nnInteractive/backend", "auto"));
   const auto gpuBackendPref = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
 
-  if (backendPref != "cpu")
-  {
-    CUDADeviceInfo deviceInfo;
-
-    if (this->GetCUDADeviceInfo(deviceInfo))
-    {
-      MITK_INFO << "Found CUDA device: " << deviceInfo.Name;
-      MITK_INFO << "  Compute capability: " << deviceInfo.Major << "." << deviceInfo.Minor;
-      MITK_INFO << "  Total memory: " << deviceInfo.TotalMemoryMB << " MB";
-
-      bool switchToCUDADevice = true;
-
-      // Lowest compute capability the PyTorch build we install has kernels for.
-      // torch 2.8 covers Pascal (sm_61); the 2.10 required from CPython 3.14 on
-      // starts at Turing. Keep in sync with TorchRequirements() in
-      // mitknnInteractiveInstall.cpp.
-      constexpr bool requiresTuring = mitk::PythonHelper::VERSION_MINOR >= 14;
-      constexpr int minComputeMajor = requiresTuring ? 7 : 6;
-      constexpr int minComputeMinor = requiresTuring ? 5 : 1;
-
-      if (deviceInfo.Major < minComputeMajor ||
-          (deviceInfo.Major == minComputeMajor && deviceInfo.Minor < minComputeMinor))
-      {
-        MITK_WARN << "Minimum required compute capability is "
-                  << minComputeMajor << '.' << minComputeMinor;
-        switchToCUDADevice = false;
-      }
-
-      if (deviceInfo.TotalMemoryMB < 6000)
-      {
-        MITK_WARN << "Minimum required total memory is 6 GB";
-        switchToCUDADevice = false;
-      }
-
-      useCUDADevice = switchToCUDADevice;
-    }
-
-    if (!useCUDADevice)
-    {
-      if (backendPref == "auto")
-      {
-        MITK_WARN << "No compatible CUDA device detected. Falling back to CPU processing.";
-      }
-      else
-      {
-        MITK_WARN << "CPU backend would have been auto-selected, but the CUDA backend has been manually enforced. "
-                  << "Continue at your own risk.";
-        useCUDADevice = true;
-      }
-    }
-  }
+  const auto deviceSelection = Torch::SelectDevice(*pythonContext, backend, gpuBackendPref, 6000);
+  const bool useCUDADevice = deviceSelection.SelectedBackend == Torch::Backend::CUDA;
 
   {
     const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
@@ -1208,7 +1102,7 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
   {
     std::ostringstream pyCommands; pyCommands
       << "session = inference_class(\n"
-      << "    device=torch.device('" << (useCUDADevice ? gpuBackendPref : "cpu") << "'),\n"
+      << "    device=torch.device('" << deviceSelection.Device << "'),\n"
       << "    use_torch_compile=" << (useTorchCompile ? "True" : "False") << ",\n"
       << "    torch_n_threads=os.cpu_count(),\n"
       << "    verbose=False,\n"
@@ -1219,9 +1113,7 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
     pythonContext->Execute(pyCommands.str());
   }
 
-  m_Impl->SetBackend(useCUDADevice
-    ? Backend::CUDA
-    : Backend::CPU);
+  m_Impl->SetBackend(deviceSelection.SelectedBackend);
 
   this->BindSessionImageAndTargetBuffer();
 }

@@ -3,6 +3,7 @@ set(CPP_FILES
   mitknnInteractiveInstall.cpp
   mitknnInteractiveModel.cpp
   mitknnInteractiveUpdatePrompt.cpp
+  mitkTorchInstall.cpp
   mitkTotalSegmentatorInstall.cpp
   QmitknnInteractiveInstallModeDialog.cpp
   QmitknnInteractiveToolGUI.cpp

@@ -135,7 +135,7 @@ namespace mitk
     std::string pluginId;
     bool active = false;
     // Window identifiers exposed by the editor. For MxN, this is the
-    // canonical fully-qualified `id` field of each window leaf in the v2
+    // canonical fully-qualified `id` field of each window leaf in the MxN
     // layout document (e.g. `mxn__widget0`): the same string used as the
     // URL path segment for sub-resources. For StdMulti, the engine-fixed
     // names (axial / sagittal / coronal / 3d). Empty when !active or busy.

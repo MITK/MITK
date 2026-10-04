@@ -12,11 +12,11 @@
 
 """Fixtures for the `mitk.mxn.layout` test suite.
 
-The fixtures resolve the schema and in-tree preset paths from the source
-tree by walking up from this file. They fail soft when running in a
-wheel-test environment where the source tree is not on disk: the fixture
-returns ``None`` and the depending test should skip itself with a clear
-reason.
+The schema fixture resolves its path from the source tree by walking up
+from this file; the preset fixture reads the 2.0 form of the two-rows
+preset kept beside this file. Both fail soft when their file is not on
+disk (a wheel-test environment, for example): the fixture returns
+``None`` and the depending test should skip itself with a clear reason.
 
 Source-tree CI runs cover the schema integration; wheel-test CI runs
 cover everything else. Snapshotting the schema into ``Wrapping/Python``
@@ -54,13 +54,12 @@ def schema_path() -> Path | None:
 
 @pytest.fixture(scope="session")
 def two_rows_preset_path() -> Path | None:
-    """Path to the in-tree preset emitted by the C++ engine, or None."""
-    root = _find_repo_root()
-    if root is None:
-        return None
-    candidate = (
-        root / "Modules" / "QtWidgets" / "resource" / "mxnLayout_twoRowsEachDirection.json"
-    )
+    """Path to the v2.0 form of the two-rows preset, or None.
+
+    The in-tree preset is written as 3.0 by the C++ engine; the DSL targets
+    2.0, so the suite keeps the 2.0 form of the same document beside it.
+    """
+    candidate = Path(__file__).resolve().parent / "mxnLayout_twoRowsEachDirection_v2.json"
     return candidate if candidate.is_file() else None
 
 

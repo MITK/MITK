@@ -92,6 +92,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetMxnInfoWithoutProviderReturns503);
   MITK_TEST(GetMxnInfoWhenEditorInactiveReturns503EditorNotActive);
   MITK_TEST(GetMxnInfoWithEditorActiveReturns200WithWindows);
+  MITK_TEST(GetMxnInfoWhenEditorBusyReturns503EditorBusy);
   MITK_TEST(GetMxnWindowsWithoutProviderReturns503);
   MITK_TEST(GetMxnWindowsEditorNotOpenReturns503EditorNotActive);
   MITK_TEST(GetMxnWindowsEditorBusyReturns503EditorBusy);
@@ -809,7 +810,8 @@ public:
   // ===== Editor discovery =====
 
   static std::vector<mitk::EditorInfo> FakeEditors(bool stdmultiActive,
-                                                   bool mxnActive = false)
+                                                   bool mxnActive = false,
+                                                   bool mxnBusy = false)
   {
     mitk::EditorInfo stdmulti;
     stdmulti.alias = "stdmulti";
@@ -821,8 +823,11 @@ public:
     mitk::EditorInfo mxn;
     mxn.alias = "mxn";
     mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
-    mxn.active = mxnActive;
-    if (mxnActive)
+    // A busy editor is open, so it is active, but lists no windows while its
+    // cell tree is rebuilt.
+    mxn.active = mxnActive || mxnBusy;
+    mxn.busy = mxnBusy;
+    if (mxnActive && !mxnBusy)
       mxn.windowIds = {"mxn__widget0", "mxn__widget1"};
 
     return {stdmulti, mxn};
@@ -1100,6 +1105,21 @@ public:
     CPPUNIT_ASSERT(json["windows"].is_array());
     // FakeEditors mxnActive populates two canonical qualified ids.
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), json["windows"].size());
+  }
+
+  void GetMxnInfoWhenEditorBusyReturns503EditorBusy()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/false, /*mxnActive=*/true, /*mxnBusy=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_BUSY"),
+                         json["error"]["code"].get<std::string>());
   }
 
   void GetMxnWindowsWithoutProviderReturns503()

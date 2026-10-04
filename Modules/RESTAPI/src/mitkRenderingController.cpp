@@ -1811,7 +1811,7 @@ void RenderingController::HandlePUT_mxnLayout(const httplib::Request& req, httpl
   if (req.body.empty())
   {
     const auto error = ErrorResponse::InvalidRequest(
-      "Request body must be a v2.0 layout document.", req.path);
+      "Request body must be an MxN layout document (version 2.0 or 3.0).", req.path);
     this->SendErrorResponse(res, 400, error);
     return;
   }

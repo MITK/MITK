@@ -2864,7 +2864,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get MxN multi-widget editor info",
-        "description": "Returns metadata about the MxN multi-widget editor, including its current cell ids when the editor is open. Cell ids are in the canonical fully-qualified form `<editor_name>__<bare>` (e.g. `mxn__widget0`), match the `id` field of each `window` leaf in the v2 layout document, and are used verbatim as the URL segment for sub-resources; no prefix translation happens at any boundary.",
+        "description": "Returns metadata about the MxN multi-widget editor, including its current cell ids when the editor is open. Cell ids are in the canonical fully-qualified form `<editor_name>__<bare>` (e.g. `mxn__widget0`), match the `id` field of each `window` leaf in the layout document, and are used verbatim as the URL segment for sub-resources; no prefix translation happens at any boundary.",
         "operationId": "getRenderingMxnInfo",
         "responses": {
           "200": {
@@ -2899,7 +2899,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "List MxN render windows",
-        "description": "Returns the MxN editor's cells in pre-order traversal of the current layout. Each entry carries the cell `id` in the canonical fully-qualified form `<editor_name>__<bare>` (the same string used as the URL segment for sub-resources and as the layout document's `id` field), an optional human-readable `name` (display label, omitted when the cell has no display name set), the kind (always `2d` under v2; `3d` reserved for forward-compat), the persisted `view_direction` from the layout document, and the cell's `links` object. v2 has one link dimension (`selection`); v3 will add more dimension keys here additively without breaking v2 clients.",
+        "description": "Returns the MxN editor's cells in pre-order traversal of the current layout. Each entry carries the cell `id` in the canonical fully-qualified form `<editor_name>__<bare>` (the same string used as the URL segment for sub-resources and as the layout document's `id` field), an optional human-readable `name` (display label, omitted when the cell has no display name set), the kind (always `2d` today; `3d` reserved for forward-compat), the persisted `view_direction` from the layout document, and the cell's `links` object. `links` carries only the data-selection link (`selection`); the per-dimension synchronization links are in the layout document (`GET /rendering/editors/mxn/layout`).",
         "operationId": "getRenderingMxnWindows",
         "responses": {
           "200": {
@@ -2994,29 +2994,32 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get the current MxN layout document",
-        "description": "Returns the v2.0 layout document the editor would persist if asked to save right now. Always strict-mode: every group referenced by a cell appears in the top-level `groups` dict. The response body is byte-equivalent (modulo whitespace) to an in-tree `mxnLayout_*.json` preset file -- same schema, same shape (see `mxn-layout-v2.schema.json`).",
+        "description": "Returns the version 3.0 layout document the editor would persist if asked to save right now, of the same shape as a layout file the editor saves (see `mxn-layout-v3.schema.json`). Always strict-mode: every group referenced by a cell appears in the top-level `groups` dict.",
         "operationId": "getRenderingMxnLayout",
         "responses": {
           "200": {
-            "description": "MxN layout document (v2.0).",
+            "description": "MxN layout document (version 3.0).",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "v2.0 layout document. Validated against `mxn-layout-v2.schema.json` (https://mitk.org/schemas/mxn-layout-2.0.json) -- see that file for the full field-level spec.",
+                  "description": "Version 3.0 layout document. Validated by `mxn-layout-v3.schema.json` (https://mitk.org/schemas/mxn-layout-3.0.json) -- see that file for the full field-level spec.",
                   "type": "object",
                   "required": ["version", "root"]
                 },
                 "example": {
-                  "version": "2.0",
+                  "version": "3.0",
                   "name": "Three Views",
-                  "groups": { "main": { "select_all": true } },
+                  "groups": { "main": { "select_all": true }, "nav": {} },
                   "root": {
                     "type": "split",
                     "orientation": "horizontal",
                     "children": [
-                      { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-                      { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 },
-                      { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 }
+                      { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",
+                        "links": { "selection": "main", "slice": "nav", "windowing": "main", "lut": "main" }, "size": 210 },
+                      { "type": "window", "id": "mxn__widget1", "view_direction": "axial",
+                        "links": { "selection": "main", "slice": { "target": "nav", "offset": 1 }, "windowing": "main", "lut": "main" }, "size": 210 },
+                      { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",
+                        "links": { "selection": "main", "windowing": "main", "lut": "main" }, "size": 210 }
                     ]
                   }
                 }
@@ -3038,15 +3041,15 @@
       },
       "put": {
         "tags": ["Rendering"],
-        "summary": "Apply a v2.0 layout document to the MxN editor",
-        "description": "Applies the supplied v2.0 layout document. **All existing cells are torn down and rebuilt from the document** (no positional reuse) -- any cell id a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout (same shape as GET), so callers can refresh their cell list from the response without a follow-up GET. Schema and structural failures (version != 2.0, duplicate window ids, unknown view direction, missing group reference, type errors, ...) surface as `400 INVALID_REQUEST` with a precise `detail` message. The body is validated against `mxn-layout-v2.schema.json`.",
+        "summary": "Apply a layout document (version 3.0 or 2.0) to the MxN editor",
+        "description": "Applies the supplied layout document of version 3.0 or 2.0. **All existing cells are torn down and rebuilt from the document** (no positional reuse) -- any cell id a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout (same shape as GET, version 3.0 whatever version the request had), so callers can refresh their cell list from the response without a follow-up GET. Schema and structural failures (version other than 2.0 or 3.0, duplicate window ids, unknown view direction, missing group reference, type errors, ...) surface as `400 INVALID_REQUEST` with a precise `detail` message. The body is described by `mxn-layout-v3.schema.json`, or by `mxn-layout-v2.schema.json` for a version 2.0 document.",
         "operationId": "putRenderingMxnLayout",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "description": "v2.0 layout document. Validated against `mxn-layout-v2.schema.json` (https://mitk.org/schemas/mxn-layout-2.0.json).",
+                "description": "Layout document of version 3.0 (`mxn-layout-v3.schema.json`, https://mitk.org/schemas/mxn-layout-3.0.json) or 2.0 (`mxn-layout-v2.schema.json`, https://mitk.org/schemas/mxn-layout-2.0.json). The example is a 2.0 document.",
                 "type": "object",
                 "required": ["version", "root"]
               },
@@ -3095,7 +3098,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get camera state of an MxN cell",
-        "description": "Returns the camera state of the addressed MxN cell. Under v2 every MxN cell is 2D, so the response carries `parallel_scale` and omits `perspective_angle` (mirrors the StdMulti 2D-window shape). When v3 introduces a 3D MxN cell type the response will switch to the 3D shape (`perspective_angle`); the schema is unchanged.",
+        "description": "Returns the camera state of the addressed MxN cell. Every MxN cell is 2D, so the response carries `parallel_scale` and omits `perspective_angle` (mirrors the StdMulti 2D-window shape). If a future version introduces a 3D MxN cell type the response will switch to the 3D shape (`perspective_angle`); the schema is unchanged.",
         "operationId": "getRenderingMxnCamera",
         "parameters": [
           { "$ref": "#/components/parameters/MxNWindowName" }
@@ -3132,7 +3135,7 @@
       "put": {
         "tags": ["Rendering"],
         "summary": "Update camera state of an MxN cell",
-        "description": "Partial update -- at least one camera field must be present. `standard_view` is applied first; explicit pose fields override its effect (cannot combine `standard_view` with `position`/`focal_point`/`view_up`). Under v2 every MxN cell is 2D, so `perspective_angle` is rejected with 400; `parallel_scale` is accepted. Field validation, unknown-field rejection, and the rest of the contract mirror the StdMulti camera PUT.",
+        "description": "Partial update -- at least one camera field must be present. `standard_view` is applied first; explicit pose fields override its effect (cannot combine `standard_view` with `position`/`focal_point`/`view_up`). Every MxN cell is 2D, so `perspective_angle` is rejected with 400; `parallel_scale` is accepted. Field validation, unknown-field rejection, and the rest of the contract mirror the StdMulti camera PUT.",
         "operationId": "putRenderingMxnCamera",
         "parameters": [
           { "$ref": "#/components/parameters/MxNWindowName" }
@@ -3334,7 +3337,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get MxN window summary",
-        "description": "Per-cell summary. `view_direction` and `links` come from the layout document (persisted state, not live orientation). The optional `name` mirrors the layout document's display label and is omitted when the cell has no display name. Sub-resources: `/camera`, `/selected-slice` (2D cells), `/selected-position`, `/screenshot`. v2 has no 3D MxN cell type, so `has_selected_slice` is always `true`; the field is kept for forward-compat with future v3 cell types.",
+        "description": "Per-cell summary. `view_direction` and `links` come from the layout document (persisted state, not live orientation). The optional `name` mirrors the layout document's display label and is omitted when the cell has no display name. Sub-resources: `/camera`, `/selected-slice` (2D cells), `/selected-position`, `/screenshot`. There is no 3D MxN cell type, so `has_selected_slice` is always `true`; the field is kept for forward-compat with future 3D cell types.",
         "operationId": "getRenderingMxnWindow",
         "parameters": [
           { "$ref": "#/components/parameters/MxNWindowName" }
@@ -3837,7 +3840,7 @@
           "alias":     { "type": "string", "example": "stdmulti" },
           "plugin_id": { "type": "string", "example": "org.mitk.editors.stdmultiwidget" },
           "active":    { "type": "boolean" },
-          "windows":   { "type": "array", "items": { "type": "string" }, "description": "Current window identifiers (URL segments for sub-resources). For the MxN editor each entry matches the `id` field of the corresponding `window` leaf in the v2 layout document verbatim, i.e. the canonical fully-qualified form `<editor_name>__<bare>`. For StdMulti, the engine-fixed names (`axial`, `sagittal`, `coronal`, `3d`)." }
+          "windows":   { "type": "array", "items": { "type": "string" }, "description": "Current window identifiers (URL segments for sub-resources). For the MxN editor each entry matches the `id` field of the corresponding `window` leaf in the layout document verbatim, i.e. the canonical fully-qualified form `<editor_name>__<bare>`. For StdMulti, the engine-fixed names (`axial`, `sagittal`, `coronal`, `3d`)." }
         }
       },
       "WindowListItem": {
@@ -3864,7 +3867,7 @@
       },
       "MxNLinks": {
         "type": "object",
-        "description": "Per-cell synchronisation links from the layout document. v2.0 knows only the `selection` dimension; v3 will add more dimensions here additively (zoom, time, crosshair, ...). Tooling that reads the v2 shape continues to work in v3 unchanged.",
+        "description": "The cell's data-selection link from the layout document. Carries only the `selection` key; the per-dimension synchronization links (pan, zoom, slice, crosshair, orientation, windowing, LUT) are in the layout document (`GET /rendering/editors/mxn/layout`).",
         "required": ["selection"],
         "properties": {
           "selection": {
@@ -3875,19 +3878,19 @@
       },
       "MxNWindowListItem": {
         "type": "object",
-        "description": "Window list entry returned by GET /rendering/editors/mxn/windows. Carries the per-cell layout-document fields so REST clients don't need to fetch the full layout to know which cells exist. Convention: `view_direction` is present iff `kind == \"2d\"`. Under v2 only 2D cells exist, so `view_direction` is required; v3 will relax this when 3D cells are introduced.",
+        "description": "Window list entry returned by GET /rendering/editors/mxn/windows. Carries the per-cell layout-document fields so REST clients don't need to fetch the full layout to know which cells exist. Convention: `view_direction` is present iff `kind == \"2d\"`. Only 2D cells exist, so `view_direction` is required; a future version may relax this when 3D cells are introduced.",
         "required": ["id", "kind", "view_direction", "links"],
         "properties": {
           "id":             { "type": "string", "description": "Canonical fully-qualified MxN cell id (URL segment for sub-resources). Matches the `id` field of the corresponding `window` leaf in the layout document. URL-segment-safe and unique within the layout." },
           "name":           { "type": "string", "minLength": 1, "description": "Optional human-readable display label. Mirrors the optional `name` field of the corresponding `window` leaf in the layout document. Free-form, not unique. Omitted when the cell has no display name set." },
-          "kind":           { "type": "string", "enum": ["2d", "3d"], "description": "Cell kind; always `2d` under v2 (the schema's `view_direction` enum has no `3d` value). `3d` is reserved for v3 forward-compat." },
+          "kind":           { "type": "string", "enum": ["2d", "3d"], "description": "Cell kind; always `2d` today (the layout schema's `view_direction` enum has no `3d` value). `3d` is reserved for forward-compat." },
           "view_direction": { "type": "string", "enum": ["axial", "sagittal", "coronal", "original"], "description": "Persisted view direction from the layout document. Authoring intent, not live orientation -- read live orientation from /camera if needed." },
           "links":          { "$ref": "#/components/schemas/MxNLinks" }
         }
       },
       "MxNWindowInfo": {
         "type": "object",
-        "description": "Per-cell summary returned by GET /rendering/editors/mxn/windows/{id}. Adds capability flags (`has_camera`, `has_selected_slice`, `has_selected_position`) on top of the list-entry fields. Convention: `view_direction` is present iff `kind == \"2d\"`. Under v2 only 2D cells exist, so `view_direction` is required; v3 will relax this when 3D cells are introduced.",
+        "description": "Per-cell summary returned by GET /rendering/editors/mxn/windows/{id}. Adds capability flags (`has_camera`, `has_selected_slice`, `has_selected_position`) on top of the list-entry fields. Convention: `view_direction` is present iff `kind == \"2d\"`. Only 2D cells exist, so `view_direction` is required; a future version may relax this when 3D cells are introduced.",
         "required": ["id", "kind", "view_direction", "links", "has_camera", "has_selected_slice", "has_selected_position"],
         "properties": {
           "id":             { "type": "string", "description": "Canonical fully-qualified MxN cell id. Matches the `id` field of the corresponding `window` leaf in the layout document." },
@@ -3896,8 +3899,8 @@
           "view_direction": { "type": "string", "enum": ["axial", "sagittal", "coronal", "original"] },
           "links":          { "$ref": "#/components/schemas/MxNLinks" },
           "has_camera":            { "type": "boolean" },
-          "has_selected_slice":    { "type": "boolean", "description": "True for 2D cells; reserved for v3 3D cells." },
-          "has_selected_position": { "type": "boolean", "description": "True for every MxN cell -- per-cell selected position is a v2 capability (distinct from the global /rendering/selected-position resource)." }
+          "has_selected_slice":    { "type": "boolean", "description": "True for 2D cells; reserved for future 3D cells." },
+          "has_selected_position": { "type": "boolean", "description": "True for every MxN cell -- per-cell selected position is available on every MxN cell (distinct from the global /rendering/selected-position resource)." }
         }
       },
       "CameraState": {
@@ -4389,7 +4392,7 @@
         }
       },
       "EditorOrBridgeUnavailable": {
-        "description": "The addressed editor surface is unavailable. Returned in four cases: (1) RENDER_WINDOW_NOT_AVAILABLE — no bridge callback is registered (headless / Qt plugin not loaded); (2) RENDER_WINDOW_NOT_AVAILABLE — the editor list provider is registered but does not expose the addressed editor alias (e.g. `mxn`) in this workbench build; (3) EDITOR_NOT_ACTIVE — the editor is known but not currently open; (4) EDITOR_BUSY — the editor is open but temporarily cannot serve requests. Every `/rendering/editors/mxn` endpoint returns it while the MxN editor applies a layout (a GUI preset or file load, or a `PUT /rendering/editors/mxn/layout`); the condition is transient, typically 1-2 s, and a retry after it has cleared succeeds.",
+        "description": "The addressed editor surface is unavailable. Returned in four cases: (1) RENDER_WINDOW_NOT_AVAILABLE — no bridge callback is registered (headless / Qt plugin not loaded); (2) RENDER_WINDOW_NOT_AVAILABLE — the editor list provider is registered but does not expose the addressed editor alias (e.g. `mxn`) in this workbench build; (3) EDITOR_NOT_ACTIVE — the editor is known but not currently open; (4) EDITOR_BUSY — the editor is open but temporarily cannot serve requests. Every `/rendering/editors/mxn` endpoint, `PUT /rendering/editors/mxn/layout` included, returns it while the workbench GUI applies a layout (a preset, a file or a data-based layout); the condition is transient, typically 1-2 s, and a retry after it has cleared succeeds. Requests that arrive while a REST layout PUT is being applied are not rejected: they wait and are served once it has finished.",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/Error" },

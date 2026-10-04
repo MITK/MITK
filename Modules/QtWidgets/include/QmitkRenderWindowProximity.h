@@ -187,6 +187,9 @@ public:
    *        just clicked. A popup opened elsewhere (a context menu over the
    *        image) must not pin: a pin reveals every region. Suppression still
    *        wins over a pin, so clean view stays absolute.
+   *
+   *        The pin is a single flag, not a count: pinned popups never overlap,
+   *        because Qt closes an open popup before another one opens.
    */
   void SetPinned(bool pinned);
   bool IsPinned() const;

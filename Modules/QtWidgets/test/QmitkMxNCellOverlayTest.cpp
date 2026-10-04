@@ -23,8 +23,10 @@ found in the LICENSE file.
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkAnatomicalPlanes.h>
+#include <mitkBaseRenderer.h>
 #include <mitkException.h>
 #include <mitkImageGenerator.h>
+#include <mitkLevelWindow.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
@@ -67,6 +69,7 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(Destruction_UnregistersRegions);
   MITK_TEST(Popup_FromTheFurnitureKeepsTheFrameUp);
   MITK_TEST(Popup_ContextMenuDoesNotRevealTheFrame);
+  MITK_TEST(LostGrab_LeavesTheColorbarDragWorking);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -293,6 +296,41 @@ public:
 
     CPPUNIT_ASSERT_THROW_MESSAGE("A destroyed overlay leaves no region behind that calls into it",
                                  proximity->GetRegionState(0), mitk::Exception);
+  }
+
+  double LevelIn(std::size_t index) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(index))->GetRenderWindow();
+    mitk::LevelWindow levelWindow;
+    CPPUNIT_ASSERT(m_ImageNode->GetLevelWindow(
+      levelWindow, mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow())));
+    return levelWindow.GetLevel();
+  }
+
+  void LostGrab_LeavesTheColorbarDragWorking()
+  {
+    this->ShowEditor();
+    auto* overlay = this->MaskOverlay(0);
+    const QPoint furniture = this->BottomFurniturePoint(0);
+
+    // A gesture forwarded to the render window whose release never arrives:
+    // the grab went elsewhere (a window switch, a popup), and the pointer comes
+    // back with no button held.
+    SendMouse(overlay, QEvent::MouseButtonPress, furniture, Qt::RightButton);
+    SendMouse(overlay, QEvent::MouseMove, furniture + QPoint(0, -1), Qt::NoButton);
+
+    // The colorbar body drags the level.
+    const QRect area = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow()->geometry();
+    const QPoint onColorbar(area.right() - 2, area.center().y());
+    const double before = this->LevelIn(0);
+    SendMouse(overlay, QEvent::MouseButtonPress, onColorbar, Qt::LeftButton);
+    QMouseEvent drag(QEvent::MouseMove, QPointF(onColorbar - QPoint(0, 40)), QPointF(onColorbar - QPoint(0, 40)),
+                     QPointF(overlay->mapToGlobal(onColorbar - QPoint(0, 40))), Qt::NoButton, Qt::LeftButton,
+                     Qt::NoModifier);
+    QCoreApplication::sendEvent(overlay, &drag);
+    SendMouse(overlay, QEvent::MouseButtonRelease, onColorbar - QPoint(0, 40), Qt::LeftButton);
+
+    CPPUNIT_ASSERT_MESSAGE("A colorbar drag works after a gesture lost its release", this->LevelIn(0) > before);
   }
 
   void Popup_FromTheFurnitureKeepsTheFrameUp()

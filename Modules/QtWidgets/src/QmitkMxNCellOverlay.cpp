@@ -1903,6 +1903,10 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
 
 void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
 {
+  // A gesture whose release went elsewhere (a lost grab) ends here at the latest.
+  m_ForwardingGesture = false;
+  m_RightPressArmed = false;
+
   const QPoint position = event->pos();
 
   if (this->HandlePlateInput(QEvent::MouseButtonPress, event, position))
@@ -2029,6 +2033,13 @@ void QmitkMxNCellOverlay::leaveEvent(QEvent* event)
 
 void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
 {
+  // No button held means no gesture, whatever release was lost on the way.
+  if (Qt::NoButton == event->buttons())
+  {
+    m_ForwardingGesture = false;
+    m_RightPressArmed = false;
+  }
+
   if (this->HandlePlateInput(QEvent::MouseMove, event, event->pos()))
   {
     event->accept();
@@ -2816,14 +2827,19 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
         break;
       case QEvent::MouseButtonPress:
       {
+        // Every press starts over: a right press whose release was lost to
+        // another grab must not turn a later release into a menu request.
         const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
-        if (Qt::RightButton == mouseEvent->button())
-        {
-          m_RightPressPosition = mouseEvent->position().toPoint();
-          m_RightPressArmed = true;
-        }
+        m_RightPressArmed = Qt::RightButton == mouseEvent->button();
+        m_RightPressPosition = mouseEvent->position().toPoint();
         break;
       }
+      case QEvent::MouseMove:
+        if (Qt::NoButton == static_cast<const QMouseEvent*>(event)->buttons())
+        {
+          m_RightPressArmed = false;
+        }
+        break;
       case QEvent::MouseButtonRelease:
       {
         const auto* mouseEvent = static_cast<const QMouseEvent*>(event);

@@ -12,9 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkWelcomePalette.h"
 
-#include "QmitkMitkWorkbenchIntroPlugin.h"
-
-#include <berryIQtStyleManager.h>
+#include <QmitkIconTheme.h>
 
 namespace
 {
@@ -32,9 +30,7 @@ namespace
 
 QmitkWelcomePalette QmitkWelcomePalette::GetCurrent()
 {
-  const auto* styleManager = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetStyleManager();
-
-  return styleManager != nullptr && styleManager->GetStyle().name == "Dark"
+  return QmitkIconTheme::IsDarkTheme()
     ? DARK_PALETTE
     : LIGHT_PALETTE;
 }

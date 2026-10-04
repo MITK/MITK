@@ -38,8 +38,9 @@ QmitkViewModel::QmitkViewModel(QObject* parent)
 
   for (const auto& view : views)
   {
-    // Ignore internal views and self (View Navigator).
-    if (view->IsInternal() || view->GetId() == "org.mitk.views.viewnavigator")
+    // Ignore internal views, self (View Navigator), and the Image Navigator,
+    // which has a button of its own in the main tool bar.
+    if (view->IsInternal() || view->GetId() == "org.mitk.views.viewnavigator" || view->GetId() == "org.mitk.views.imagenavigator")
       continue;
 
     auto category = GetCategory(view.GetPointer());

@@ -81,6 +81,7 @@ set(MODULE_TESTS
   mitkStepperTest.cpp
   mitkRenderingManagerTest.cpp
   mitkRenderingManagerSuspendTest.cpp
+  mitkRenderingManagerAnimationTest.cpp
   mitkCompositePixelValueToStringTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   vtkMitkLevelWindowFilterTest.cpp
@@ -93,6 +94,8 @@ set(MODULE_TESTS
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
   mitkImageVtkReadViewTest.cpp
+  mitkImageStatisticsHolderTest.cpp
+  mitkHistogramGeneratorTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkITKThreadingHelperTest.cpp
   mitkUIDGeneratorTest.cpp
@@ -139,13 +142,15 @@ set(MODULE_TESTS
   mitkInteractionSchemeSwitcherTest.cpp
   mitkDisplayActionEventBroadcastTest.cpp
   mitkExclusiveInteractionTest.cpp
+  mitkRotatedSlice4DTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS
   mitkPointSetDataInteractorTest.cpp
   mitkSurfaceVtkMapper2DTest.cpp
   mitkSurfaceVtkMapper2D3DTest.cpp
-  mitkSurfaceVtkMapper3DPulsingTest.cpp
+  mitkSurfaceVtkMapper3DAnimationTest.cpp
+  mitkPlaneGeometryDataVtkMapper3DTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -188,7 +193,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest.cpp
     mitkVolumeCalculatorTest.cpp
-    mitkLevelWindowManagerTest.cpp
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
@@ -199,7 +203,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageSliceSelectorTest.cpp
     mitkPointSetReaderTest.cpp
     mitkImageEqualTest.cpp
-    mitkRotatedSlice4DTest.cpp
     mitkPlaneGeometryDataMapper2DTest.cpp
 )
 

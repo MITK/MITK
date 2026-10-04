@@ -135,6 +135,7 @@ QmitkWelcomePersonalizationPage::QmitkWelcomePersonalizationPage(QWidget* parent
     m_PresetGroup(nullptr),
     m_PresetInfo(nullptr),
     m_ThemeGroup(nullptr),
+    m_ToolBarStyleGroup(nullptr),
     m_MouseInteractionGroup(nullptr),
     m_IsApplyingPreset(false),
     m_IsCustomPresetChosen(false)
@@ -151,6 +152,7 @@ QmitkWelcomePersonalizationPage::QmitkWelcomePersonalizationPage(QWidget* parent
   auto* rightColumn = new QVBoxLayout;
   rightColumn->setSpacing(16);
   rightColumn->addWidget(this->CreateThemeCard());
+  rightColumn->addWidget(this->CreateToolBarStyleCard());
   rightColumn->addWidget(this->CreateMouseInteractionCard());
   rightColumn->addStretch(1);
 
@@ -167,6 +169,7 @@ QmitkWelcomePersonalizationPage::QmitkWelcomePersonalizationPage(QWidget* parent
 
   this->UpdatePreset();
   this->UpdateTheme();
+  this->UpdateToolBarStyle();
   this->UpdateMouseInteraction();
 
   GetPreferences(QmitkApplicationConstants::TOOL_BARS_PREFERENCES)->OnChanged.AddListener(
@@ -248,6 +251,44 @@ QWidget* QmitkWelcomePersonalizationPage::CreateThemeCard()
   optionLayout->addLayout(row);
 
   connect(m_ThemeGroup, &QButtonGroup::idClicked, this, &QmitkWelcomePersonalizationPage::OnThemeClicked);
+
+  return card;
+}
+
+QWidget* QmitkWelcomePersonalizationPage::CreateToolBarStyleCard()
+{
+  using CategoryLabel = QmitkCategoryToolBar::CategoryLabel;
+
+  auto [card, layout] = CreateCard("Tool bar style");
+
+  auto* optionLayout = AddOptionList(layout);
+
+  m_ToolBarStyleGroup = new QButtonGroup(this);
+
+  auto addOption = [this, optionLayout](const QString& text, const QString& description, CategoryLabel categoryLabel)
+  {
+    auto* radioButton = new QRadioButton(text);
+    m_ToolBarStyleGroup->addButton(radioButton, static_cast<int>(categoryLabel));
+    optionLayout->addWidget(radioButton);
+
+    auto* descriptionLabel = CreateDetailText(description);
+    descriptionLabel->setContentsMargins(24, 0, 0, 0);
+    optionLayout->addWidget(descriptionLabel);
+  };
+
+  addOption("Category names above buttons",
+    "Always visible, taking a little more space.",
+    CategoryLabel::AboveButtons);
+
+  addOption("Category names on hover",
+    "Visible while the mouse is over a tool bar.",
+    CategoryLabel::OnHover);
+
+  addOption("Buttons only",
+    "No category names at all.",
+    CategoryLabel::Hidden);
+
+  connect(m_ToolBarStyleGroup, &QButtonGroup::idClicked, this, &QmitkWelcomePersonalizationPage::OnToolBarStyleClicked);
 
   return card;
 }
@@ -344,6 +385,12 @@ void QmitkWelcomePersonalizationPage::OnThemeClicked(int id)
   prefs->Flush();
 }
 
+void QmitkWelcomePersonalizationPage::OnToolBarStyleClicked(int id)
+{
+  QmitkToolBarPresets::SetCategoryLabel(static_cast<QmitkCategoryToolBar::CategoryLabel>(id));
+  QmitkToolBarPresets::ApplyToWorkbench();
+}
+
 void QmitkWelcomePersonalizationPage::OnMouseInteractionClicked(int id)
 {
   const bool pacsInteraction = id == PACS_INTERACTION_ID;
@@ -360,6 +407,8 @@ void QmitkWelcomePersonalizationPage::OnToolBarPreferencesChanged(const mitk::IP
 {
   if (!m_IsApplyingPreset)
     this->UpdatePreset();
+
+  this->UpdateToolBarStyle();
 }
 
 void QmitkWelcomePersonalizationPage::OnEditorPreferencesChanged(const mitk::IPreferences*)
@@ -446,6 +495,11 @@ void QmitkWelcomePersonalizationPage::UpdateTheme()
   {
     UncheckAll(m_ThemeGroup);
   }
+}
+
+void QmitkWelcomePersonalizationPage::UpdateToolBarStyle()
+{
+  m_ToolBarStyleGroup->button(static_cast<int>(QmitkToolBarPresets::GetCategoryLabel()))->setChecked(true);
 }
 
 void QmitkWelcomePersonalizationPage::UpdateMouseInteraction()

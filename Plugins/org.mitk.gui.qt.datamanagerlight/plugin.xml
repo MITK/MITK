@@ -5,7 +5,7 @@
     <view
       id="org.mitk.views.datamanagerlight"
       name="Data  Manager Light"
-      category="General"
+      category="Data"
       icon="resources/DataManagerLight.png"
       class="QmitkDataManagerLightView" />
   </extension>

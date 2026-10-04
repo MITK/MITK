@@ -3,7 +3,9 @@
   "info": "Display only essential plugins necessary for segmentation.",
   "categories": [
     "Data",
-    "General",
-    "Segmentation"
+    "Processing",
+    "Segmentation",
+    "Utilities",
+    "Visualization"
   ]
 }

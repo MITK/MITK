@@ -18,7 +18,9 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkLevelWindow.h>
 #include <mitkLog.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
+#include <mitkSimpleHistogram.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunctionTransform.h>
 
@@ -43,6 +45,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFontMetrics>
+#include <QFutureWatcher>
 #include <QHeaderView>
 #include <QIcon>
 #include <QKeyEvent>
@@ -62,13 +65,18 @@ found in the LICENSE file.
 #include <QTableWidget>
 #include <QTimer>
 #include <QToolButton>
+#include <QtConcurrentRun>
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace
 {
@@ -735,7 +743,44 @@ namespace
         option->text += QStringLiteral(" (off axis)");
     }
   };
+
+  /** \brief What reducing the image for the previews counts for in the
+   *         analysis, next to the histogram's own steps.
+   *
+   * Sized against the steps mitk::HistogramGenerator reports for its two
+   * passes over the voxels, which together take about six times as long.
+   */
+  constexpr unsigned int PREVIEW_VOLUME_STEPS = 24;
 }
+
+struct QmitkVolumeTransferFunctionEditor::ImageAnalysis
+{
+  /** \brief The histogram behind the canvas, or nullptr where none could be
+   *         computed.
+   */
+  std::shared_ptr<mitk::SimpleImageHistogram> Histogram;
+
+  /** \brief What the previews are drawn from, without image data where it
+   *         could not be created.
+   */
+  QmitkVolumeThumbnailRenderer::Volume PreviewVolume;
+
+  /** \brief Why a part is missing, logged once the result is taken over
+   *         rather than from the worker.
+   */
+  std::vector<std::string> Problems;
+};
+
+struct QmitkVolumeTransferFunctionEditor::AnalysisRun
+{
+  /** \brief Which image, and which version of it, this analyzes.
+   *
+   * For telling whether it is still the one wanted, and nothing else: the image
+   * is kept alive elsewhere for as long as the run needs it.
+   */
+  const mitk::Image *Image = nullptr;
+  itk::ModifiedTimeType ImageTime = 0;
+};
 
 QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f),
@@ -1107,14 +1152,17 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
   if (event->type() != QEvent::EnabledChange)
     return;
 
-  // Nothing else announces that the previews became worth drawing: switching
-  // volume rendering on deliberately does not re-bind the node.
+  // Nothing else announces that the analysis and the previews it leads to
+  // became worth having: switching volume rendering on deliberately does not
+  // re-bind the node.
   //
   // Being disabled ends nothing. Switching volume rendering off is what grays
   // the editor out, and an edit in progress then waits, untouchable, for
-  // rendering to come back - or for a selection change to ask about it.
+  // rendering to come back - or for a selection change to ask about it. An
+  // analysis under way runs on, so that switching back on finds it done rather
+  // than starting it over.
   if (this->isEnabled())
-    this->StartThumbnailGeneration();
+    this->RequestAnalysis();
 }
 
 void QmitkVolumeTransferFunctionEditor::SetCompactPresetList(bool compact)
@@ -1249,14 +1297,20 @@ void QmitkVolumeTransferFunctionEditor::SetDataNode(mitk::DataNode *node)
   // A drawing belongs to the node it was made on, and nothing recorded it there.
   m_CurveDrawnOver = false;
 
+  auto *image = node != nullptr ? node->GetDataAs<mitk::Image>() : nullptr;
+
   // Previews belong to the image they were drawn from, so a different one
   // leaves them describing nothing that is on screen.
-  if (m_ThumbnailImage != (node != nullptr ? node->GetDataAs<mitk::Image>() : nullptr))
+  if (m_ThumbnailImage != image)
     this->InvalidateThumbnails();
+
+  // The same goes for an analysis under way, which would only be thrown away.
+  if (m_AnalysisRun != nullptr && m_AnalysisRun->Image != image)
+    this->AbandonAnalysis();
 
   this->AdoptTransferFunctionFromNode();
 
-  this->StartThumbnailGeneration();
+  this->RequestAnalysis();
 }
 
 void QmitkVolumeTransferFunctionEditor::EnsureTransferFunction()
@@ -1602,7 +1656,9 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
   else
   {
     auto *image = node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr;
-    mitk::SimpleHistogram *histogram = (image != nullptr) ? m_HistogramCache[image] : nullptr;
+    const bool analyzed = this->IsAnalysisCurrent();
+
+    mitk::SimpleHistogram *histogram = analyzed ? m_Analysis->Histogram.get() : nullptr;
 
     // One that failed to compute answers 0 and 1 for its bounds rather than
     // reporting the failure, and those would pass for a data range and collapse
@@ -1615,7 +1671,10 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
     m_Controls->combinedTfCanvas->SetColorTransferFunction(m_AppliedTransferFunction->GetColorTransferFunction());
     m_Controls->combinedTfCanvas->SetPiecewiseFunction(m_AppliedTransferFunction->GetScalarOpacityFunction());
 
-    if (const auto range = WorkingRange(image, histogram); range.has_value())
+    // The band rests on statistics of the whole image, which the analysis
+    // computes off this thread. Until it has, the axis stays on the curve, and
+    // the controls measured against the band stay off.
+    if (const auto range = analyzed ? WorkingRange(image, histogram) : std::nullopt; range.has_value())
     {
       m_DataRange = *range;
     }
@@ -1634,6 +1693,10 @@ void QmitkVolumeTransferFunctionEditor::ShowAppliedTransferFunction()
     this->ApplyAxisRange();
 
     m_Controls->combinedTfCanvas->SnapshotOpacityBaseline();
+
+    // An image changed since its analysis needs another.
+    if (!analyzed)
+      this->RequestAnalysis();
   }
 
   this->SnapshotAppliedTransferFunction();
@@ -1660,8 +1723,12 @@ void QmitkVolumeTransferFunctionEditor::UpdateControlAvailability()
   // picked or loaded, would overwrite the curve outright. The sliders, which
   // would replay a baseline snapshotted before the edits began, are not on show
   // at all then - see ShowEditMode.
+  //
+  // Until the image is analyzed, neither the band the sliders are measured
+  // against nor the histogram on the canvas is known. A preset can still be
+  // picked: the analysis replays whatever the node then records.
   const bool hasNode = node.IsNotNull();
-  const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull();
+  const bool adjustable = hasNode && m_AppliedTransferFunction.IsNotNull() && !this->IsAwaitingAnalysis();
 
   m_Controls->presetGridButton->setEnabled(hasNode);
   m_Controls->presetListButton->setEnabled(hasNode);
@@ -2649,7 +2716,7 @@ void QmitkVolumeTransferFunctionEditor::InvalidateThumbnails()
   // The renderer keeps the volume it has bound alive, and nothing here applies
   // to it any more - including the case where the node it came with has just
   // been removed, which nothing else would free it on.
-  m_ThumbnailRenderer->SetImage(nullptr);
+  m_ThumbnailRenderer->SetVolume({});
 
   // Back to the stand-in rather than to nothing, so that clearing the previews
   // does not resize every entry and scatter the grid.
@@ -2677,7 +2744,9 @@ void QmitkVolumeTransferFunctionEditor::StartThumbnailGeneration()
   auto node = m_DataNode.Lock();
   auto *image = node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr;
 
-  if (image == nullptr)
+  // The previews are drawn from the reduced volume the analysis creates, which
+  // is why taking an analysis over is what starts them.
+  if (image == nullptr || !this->IsAnalysisCurrent())
     return;
 
   // Either the previews already describe this image or they are being drawn
@@ -2688,7 +2757,7 @@ void QmitkVolumeTransferFunctionEditor::StartThumbnailGeneration()
   // Whether previews can be drawn is asked of every image rather than once of
   // the machine: the ray caster refuses some volumes it is handed, RGB ones
   // among them, and one such refusal must not write off the images after it.
-  // SetImage reports its own refusal, and GenerateNextThumbnail acts on it.
+  // SetVolume reports its own refusal, and GenerateNextThumbnail acts on it.
   this->InvalidateThumbnails();
   m_ThumbnailImage = image;
 
@@ -2716,8 +2785,9 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
   {
     // Uploading the volume costs far more than drawing from it, so it gets a
     // turn of the event loop to itself rather than holding up the selection
-    // change that asked for it.
-    if (!m_ThumbnailRenderer->SetImage(m_ThumbnailImage.Lock().GetPointer()))
+    // change that asked for it. An analysis taken over since the run began
+    // invalidated it, so the one held is the one the run is for.
+    if (!this->IsAnalysisCurrent() || !m_ThumbnailRenderer->SetVolume(m_Analysis->PreviewVolume))
     {
       // Clearing the bound image matters: it is what lets a later attempt
       // start, rather than reading as a generation already finished.
@@ -2755,4 +2825,168 @@ void QmitkVolumeTransferFunctionEditor::GenerateNextThumbnail(int run)
   // Queued rather than looped: returning to the event loop between previews is
   // what keeps the panel responsive and lets the grid fill in while it is open.
   QTimer::singleShot(0, this, [this, run] { this->GenerateNextThumbnail(run); });
+}
+
+bool QmitkVolumeTransferFunctionEditor::IsAnalysisCurrent() const
+{
+  auto node = m_DataNode.Lock();
+  const auto *image = node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr;
+
+  return image != nullptr &&
+         m_Analysis != nullptr &&
+         m_AnalyzedImage == image &&
+         m_AnalyzedImageTime == image->GetMTime();
+}
+
+bool QmitkVolumeTransferFunctionEditor::IsAwaitingAnalysis() const
+{
+  auto node = m_DataNode.Lock();
+
+  return node.IsNotNull() && node->GetDataAs<mitk::Image>() != nullptr && !this->IsAnalysisCurrent();
+}
+
+void QmitkVolumeTransferFunctionEditor::RequestAnalysis()
+{
+  QTimer::singleShot(0, this, &QmitkVolumeTransferFunctionEditor::StartAnalysis);
+}
+
+void QmitkVolumeTransferFunctionEditor::StartAnalysis()
+{
+  auto node = m_DataNode.Lock();
+  auto *image = node.IsNotNull() ? node->GetDataAs<mitk::Image>() : nullptr;
+
+  // Grayed out, the editor applies to nothing: volume rendering is off, or the
+  // node is binary and its transfer function goes unused.
+  if (image == nullptr || !this->isEnabled())
+    return;
+
+  if (this->IsAnalysisCurrent())
+  {
+    this->StartThumbnailGeneration();
+    return;
+  }
+
+  const auto imageTime = image->GetMTime();
+
+  if (m_AnalysisRun != nullptr && m_AnalysisRun->Image == image && m_AnalysisRun->ImageTime == imageTime)
+    return;
+
+  this->AbandonAnalysis();
+
+  // Reading a pipeline output brings it up to date, which writes into its
+  // pipeline and into the images feeding it while the mappers on this thread
+  // read them. Only an image without a source is left to a worker.
+  if (image->GetSource().IsNotNull())
+  {
+    auto analysis = AnalyzeImage(image);
+
+    // Taken afterwards: bringing the image up to date may have modified it, and
+    // nothing else could have in the meantime.
+    this->OnAnalysisFinished(image, image->GetMTime(), std::move(analysis));
+    return;
+  }
+
+  auto run = std::make_shared<AnalysisRun>();
+  run->Image = image;
+  run->ImageTime = imageTime;
+
+  m_AnalysisRun = run;
+
+  using Watcher = QFutureWatcher<std::shared_ptr<const ImageAnalysis>>;
+  auto *watcher = new Watcher(this);
+
+  // The image is held here as well as by the worker, which lets go of it as
+  // soon as it is done. Removed from the data storage in the meantime, it is
+  // then still released on this thread, where its observers expect it.
+  connect(watcher, &Watcher::finished, this,
+    [this, watcher, run, image = mitk::Image::Pointer(image), imageTime]()
+    {
+      watcher->deleteLater();
+
+      // An abandoned analysis is no longer waited for.
+      if (run == m_AnalysisRun)
+        this->OnAnalysisFinished(image, imageTime, watcher->result());
+    });
+
+  watcher->setFuture(QtConcurrent::run([image = mitk::Image::Pointer(image)]() mutable
+    {
+      auto analysis = AnalyzeImage(image);
+      image = nullptr;
+
+      return analysis;
+    }));
+}
+
+std::shared_ptr<const QmitkVolumeTransferFunctionEditor::ImageAnalysis> QmitkVolumeTransferFunctionEditor::AnalyzeImage(
+  mitk::Image *image)
+{
+  auto analysis = std::make_shared<ImageAnalysis>();
+
+  mitk::ProgressTask task("Preparing volume rendering");
+
+  // Before the histogram adds its own steps, so that the total is settled
+  // before anything is reported and the bar never falls back.
+  task.AddStepsToDo(PREVIEW_VOLUME_STEPS);
+
+  try
+  {
+    auto histogram = std::make_shared<mitk::SimpleImageHistogram>();
+    histogram->ComputeFromBaseData(image, &task);
+    analysis->Histogram = histogram;
+  }
+  catch (const std::exception &e)
+  {
+    analysis->Problems.push_back(std::string("No histogram of the image could be computed: ") + e.what());
+  }
+
+  try
+  {
+    analysis->PreviewVolume = QmitkVolumeThumbnailRenderer::CreateVolume(image);
+  }
+  catch (const std::exception &e)
+  {
+    analysis->Problems.push_back(std::string("No preset previews of the image can be drawn: ") + e.what());
+  }
+
+  task.Progress(PREVIEW_VOLUME_STEPS);
+
+  return analysis;
+}
+
+void QmitkVolumeTransferFunctionEditor::AbandonAnalysis()
+{
+  // The worker runs to the end regardless; its result is dropped on arrival.
+  m_AnalysisRun = nullptr;
+}
+
+void QmitkVolumeTransferFunctionEditor::OnAnalysisFinished(mitk::Image *image,
+                                                           itk::ModifiedTimeType imageTime,
+                                                           std::shared_ptr<const ImageAnalysis> analysis)
+{
+  m_AnalysisRun = nullptr;
+
+  for (const auto &problem : analysis->Problems)
+    MITK_WARN << problem;
+
+  m_Analysis = std::move(analysis);
+  m_AnalyzedImage = image;
+  m_AnalyzedImageTime = imageTime;
+
+  // The image changed while it was analyzed, and needs another analysis.
+  if (!this->IsAnalysisCurrent())
+  {
+    this->RequestAnalysis();
+    return;
+  }
+
+  // The band the sliders are measured against is known only now, so the node
+  // is bound once more, as a selection binds it: its recipe is replayed over
+  // the band rather than over the curve's own range.
+  m_AppliedTransferFunction = nullptr;
+  this->AdoptTransferFunctionFromNode();
+
+  // Previews on show predate this analysis, of an earlier version of the image
+  // if of this one at all, so they are drawn afresh from its volume.
+  this->InvalidateThumbnails();
+  this->StartThumbnailGeneration();
 }

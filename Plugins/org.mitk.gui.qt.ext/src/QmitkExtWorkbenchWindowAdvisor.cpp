@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QMenu>
 #include <QMenuBar>
 #include <QMainWindow>
+#include <QScreen>
 #include <QStatusBar>
 #include <QString>
 #include <QFile>
@@ -62,7 +63,9 @@ found in the LICENSE file.
 #include "QmitkOpenDicomEditorAction.h"
 #include "QmitkOpenMxNMultiWidgetEditorAction.h"
 #include "QmitkOpenStdMultiWidgetEditorAction.h"
-#include <QmitkApplicationConstants.h>
+#include "QmitkThemedStyle.h"
+#include <QmitkCategoryToolBar.h>
+#include <QmitkToolBarPresets.h>
 
 #include <mitkBaseApplication.h>
 #include <mitkVersion.h>
@@ -72,19 +75,13 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
 #include "internal/QmitkCommonExtPlugin.h"
-#include "internal/QmitkThemedStyle.h"
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
-#include <QToolBar>
-#include <QToolButton>
 #include <QMessageBox>
-#include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
 
@@ -580,7 +577,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
 
-  // Style icons of Qt's standard message boxes
+  // Style Qt's standard icons, e.g. of message boxes and tool bar extension buttons
   QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
   // Start in full-screen (kiosk) mode when requested on the command line.
@@ -793,14 +790,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
 
   // toolbar for showing file open, undo, redo and other main actions
-  auto   mainActionsToolBar = new QToolBar;
+  auto   mainActionsToolBar = new QmitkCategoryToolBar(QString());
   mainActionsToolBar->setObjectName("mainActionsToolBar");
   mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-#ifdef __APPLE__
-  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
-#else
-  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
-#endif
+  mainActionsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
   imageNavigatorAction = new QAction(QmitkIconTheme::GetIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
@@ -898,7 +891,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // ==== Perspective Toolbar ==================================
   if (showPerspectiveToolbar && hasMultiplePerspectives)
   {
-    auto perspectiveToolbar = new QToolBar;
+    auto perspectiveToolbar = new QmitkCategoryToolBar(QString());
     perspectiveToolbar->setObjectName("perspectiveToolBar");
     perspectiveToolbar->addActions(perspGroup->actions());
     mainWindow->addToolBar(perspectiveToolbar);
@@ -906,73 +899,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   if (showViewToolbar)
   {
-    auto* prefService = mitk::CoreServices::GetPreferencesService();
-    auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
-    bool showCategories = toolBarsPrefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true);
-
-    // Order view descriptors by category
-
-    QMultiMap<QString, berry::IViewDescriptor::Pointer> categoryViewDescriptorMap;
+    QList<berry::IViewDescriptor::Pointer> views;
 
     for (const auto &labelViewDescriptorPair : VDMap)
-    {
-      auto viewDescriptor = labelViewDescriptorPair.second;
-      auto category = !viewDescriptor->GetCategoryPath().isEmpty()
-        ? viewDescriptor->GetCategoryPath().back()
-        : QString();
+      views.push_back(labelViewDescriptorPair.second);
 
-      categoryViewDescriptorMap.insert(category, viewDescriptor);
-    }
-
-    // Create a separate toolbar for each category
-
-    for (const auto &category : categoryViewDescriptorMap.uniqueKeys())
-    {
-      auto viewDescriptorsInCurrentCategory = categoryViewDescriptorMap.values(category);
-
-      if (!viewDescriptorsInCurrentCategory.isEmpty())
-      {
-        auto toolbar = new QToolBar;
-        toolbar->setObjectName(category);
-        mainWindow->addToolBar(toolbar);
-
-        toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
-
-        if (!category.isEmpty())
-        {
-          auto categoryButton = new QToolButton;
-          categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-          categoryButton->setText(category);
-          categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
-
-          auto action = toolbar->addWidget(categoryButton);
-          action->setObjectName("category");
-          action->setVisible(showCategories);
-
-          connect(categoryButton, &QToolButton::clicked, [toolbar]()
-          {
-            for (QWidget* widget : toolbar->findChildren<QWidget*>())
-            {
-              if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
-              {
-                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), QCursor::pos(), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), QCursor::pos(), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QApplication::sendEvent(widget, &pressEvent);
-                QApplication::sendEvent(widget, &releaseEvent);
-              }
-            }
-          });
-        }
-
-        for (const auto &viewDescriptor : std::as_const(viewDescriptorsInCurrentCategory))
-        {
-          auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
-          toolbar->addAction(viewAction);
-        }
-
-
-      }
-    }
+    QmitkToolBarPresets::CreateToolBars(window.GetPointer(), mainWindow, views);
   }
 
   QSettings settings(GetQSettingsFile(), QSettings::IniFormat);

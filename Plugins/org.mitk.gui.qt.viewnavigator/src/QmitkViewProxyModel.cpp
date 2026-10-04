@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include "QmitkCategoryItem.h"
 #include "QmitkViewItem.h"
 
+#include <QmitkToolBarPresets.h>
+
 #include <QStandardItemModel>
 
 QmitkViewProxyModel::QmitkViewProxyModel(QObject* parent)
@@ -66,12 +68,14 @@ bool QmitkViewProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sou
 
 bool QmitkViewProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-  // Sort by item text in ascending order.
+  // Categories follow the order of their tool bars, views are sorted by name.
 
   auto model = this->sourceModel();
   auto leftText = model->data(left).toString();
   auto rightText = model->data(right).toString();
-  auto caseSensitivity = this->sortCaseSensitivity();
 
-  return leftText.compare(rightText, caseSensitivity) > 0;
+  if (!left.parent().isValid() && !right.parent().isValid())
+    return QmitkToolBarPresets::IsCategoryBefore(leftText, rightText);
+
+  return leftText.compare(rightText, this->sortCaseSensitivity()) < 0;
 }

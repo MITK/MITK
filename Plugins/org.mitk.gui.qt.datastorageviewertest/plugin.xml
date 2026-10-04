@@ -4,6 +4,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.datastorageviewertest"
           name="Data Storage Viewer Test"
+          category="Utilities"
           class="QmitkDataStorageViewerTestView"
 		  icon="resources/DataStorageViewer_48.png" />
   </extension>

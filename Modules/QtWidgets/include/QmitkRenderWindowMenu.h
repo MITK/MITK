@@ -24,12 +24,10 @@ found in the LICENSE file.
 
 // qt
 #include <QAction>
-#include <QElapsedTimer>
 #include <QEvent>
 #include <QLabel>
 #include <QMenuBar>
 #include <QPushButton>
-#include <QTimer>
 #include <QToolButton>
 #include <QWidget>
 
@@ -106,9 +104,6 @@ public:
 
   void UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode);
 
-  /** Starts or stops the auto rotation of the camera, as the menu action does. */
-  void SetAutoRotation(bool enabled);
-
   /**
    * \brief The lighting rig last selected from this menu.
    *
@@ -165,10 +160,6 @@ Q_SIGNALS:
   void LayoutDesignChanged(LayoutDesign layoutDesign);
 
 protected Q_SLOTS:
-
-  /// this function is continuously called by a timer
-  /// to do the auto rotation
-  void AutoRotateNextFrame();
 
   /// this function is invoked when the auto-rotate action
   /// is clicked
@@ -234,6 +225,11 @@ private:
   void ApplyPreferences();
   void OnPreferencesChanged(const mitk::IPreferences *preferences);
 
+  void SetAutoRotation(bool enabled);
+
+  /** Rotates the camera as far as the auto rotation turns in the given time. */
+  void AutoRotate(double seconds);
+
   QmitkRenderWindowMenuBar *m_TopLeftBar;
   QmitkRenderWindowMenuBar *m_TopRightBar;
 
@@ -242,9 +238,8 @@ private:
 
   mitk::BaseRenderer::Pointer m_Renderer;
 
-  QTimer* m_AutoRotationTimer;
-  /** Measures how far the camera has to be rotated on the next timer tick. */
-  QElapsedTimer m_AutoRotationElapsed;
+  /** Of the animation frame observer that rotates the camera, 0 while the auto rotation is off. */
+  unsigned long m_AutoRotationObserverTag;
 
   QWidget *m_Parent;
 

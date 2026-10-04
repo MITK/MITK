@@ -71,6 +71,12 @@ berry--QCTabBar QToolButton#TabCloseButton
     background: none;
 }
 
+QToolButton#qt_toolbar_ext_button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
 QWidget#TabTopRightControls {
     border: 1px solid palette(mid);
     border-left: 0px;

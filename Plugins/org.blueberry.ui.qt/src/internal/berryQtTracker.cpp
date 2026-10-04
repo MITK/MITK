@@ -173,6 +173,8 @@ QtTracker::QtTracker() :
   rubberBand(nullptr), dragManager(nullptr), cursorOverride(0)
 {
   rubberBand = new QRubberBand(QRubberBand::Rectangle);
+  // Since Qt 6.11, a QRubberBand without parent is a decorated top-level window.
+  rubberBand->setWindowFlags(Qt::ToolTip);
   QPalette rubberPalette(rubberBand->palette());
   //rubberPalette.setColor(QPalette::Button, QColor(Qt::darkRed));
   rubberPalette.setBrush(QPalette::WindowText, QBrush(Qt::darkRed));

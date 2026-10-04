@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenMxNMultiWidgetEditorAction.cpp
   QmitkOpenStdMultiWidgetEditorAction.cpp
+  QmitkThemedStyle.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -14,7 +15,6 @@ set(INTERNAL_CPP_FILES
   QmitkCrashDumpsPreferencePage.cpp
   QmitkModuleView.cpp
   QmitkReportsAndDiagnosticsPreferencePage.cpp
-  QmitkThemedStyle.cpp
 )
 
 set(UI_FILES

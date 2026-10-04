@@ -13,4 +13,5 @@ found in the LICENSE file.
 #include "QmitkApplicationConstants.h"
 
 const std::string QmitkApplicationConstants::TOOL_BARS_PREFERENCES = "org.mitk.gui.qt.application/toolbars";
+const std::string QmitkApplicationConstants::TOOL_BARS_CATEGORY_LABEL = "category label";
 const std::string QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES = "show categories";

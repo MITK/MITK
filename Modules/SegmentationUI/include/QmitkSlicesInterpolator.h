@@ -40,7 +40,6 @@ found in the LICENSE file.
 // For running 3D interpolation in background
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QTimer>
 #include <QtConcurrentRun>
 
 namespace mitk
@@ -266,8 +265,7 @@ private:
    * \brief Marks the shown surface as about to be replaced by the running interpolation or, once
    * confirmed, by the segmentation (see KeepConfirmedSurface()).
    *
-   * A pending surface pulses (see the "pulsing" property of mitk::SurfaceVtkMapper3D), for
-   * which the 3D windows are kept rendering until it is no longer pending.
+   * A pending surface pulses, see the "animated.pulse" property of mitk::SurfaceVtkMapper3D.
    */
   void SetSurfacePending(bool pending);
 
@@ -288,8 +286,8 @@ private:
    *
    * The 3D windows extract the segmentation surface anew in the background, which may take seconds.
    * Until then, they would show the label as it was before. The 2D windows show the result at once,
-   * so the surface is hidden there. The pulse timer drops the surface once the 3D windows have
-   * caught up.
+   * so the surface is hidden there. It is dropped on the first animation frame on which the 3D
+   * windows have caught up.
    */
   void KeepConfirmedSurface(const mitk::DataNode* segmentationNode, const mitk::Image* groupImage);
 
@@ -382,7 +380,8 @@ private:
   QFuture<void> m_ModifyFuture;
   QFutureWatcher<void> m_ModifyWatcher;
 
-  QTimer *m_PulseTimer;
+  // Of the animation frame observer that drops a kept confirmed surface, 0 while there is none.
+  unsigned long m_ConfirmedSurfaceObserverTag = 0;
 
   QFuture<void> m_PlaneFuture;
   QFutureWatcher<void> m_PlaneWatcher;

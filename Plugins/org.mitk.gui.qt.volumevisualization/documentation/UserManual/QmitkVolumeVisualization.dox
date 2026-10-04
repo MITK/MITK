@@ -47,6 +47,13 @@ including an image carrying no such metadata - a NIfTI or an NRRD from outside
 MITK usually carries none. Seeing a CT preset on an MR loaded from one of those
 formats is therefore expected; pick an <tt>MR-</tt> preset from the grid.
 
+Adjusting needs to know the image first: its value range, which the curve and
+the sliders are measured against, and its histogram, which the canvas shows.
+Working these out reads every voxel, so it happens in the background while the
+volume already renders. Until it is done the canvas and the sliders are grayed
+out, while presets can still be picked. On a very large image a progress
+notification shows how far it has got.
+
 For a 4D image the volume follows the current time step, so stepping through
 time in the image navigator steps the volume with it.
 
@@ -58,7 +65,9 @@ The presets are laid out as a grid, each one shown as a small rendering of the
 image you currently have selected. The preview is what applying that preset will
 look like on your data, not a generic illustration, which is why the presets are
 chosen by picture rather than by name. They are drawn one after another, so they
-appear progressively.
+appear progressively. They are drawn from a copy of the image reduced to the
+detail their size can show, so a very thin structure may look fainter in a
+preview than in the 3D window.
 
 \imageMacro{QmitkVolumeVisualization_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
 

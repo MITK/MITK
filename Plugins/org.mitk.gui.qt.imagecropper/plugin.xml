@@ -7,7 +7,7 @@
     <view
       id="org.mitk.views.imagecropper"
       name="Image Cropper"
-      category="General"
+      category="Processing"
       icon="resources/crop.svg"
       class="QmitkImageCropperView" >
       <description>Crop images to a given size</description>

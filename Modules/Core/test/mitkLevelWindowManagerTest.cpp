@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <mitkIOUtil.h>
+#include <mitkImageGenerator.h>
 #include <mitkLevelWindowManager.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkStandaloneDataStorage.h>
@@ -50,10 +50,6 @@ private:
 
   mitk::LevelWindowManager::Pointer m_LevelWindowManager;
   mitk::StandaloneDataStorage::Pointer m_DataManager;
-
-  std::string m_ImagePath1;
-  std::string m_ImagePath2;
-  std::string m_ImagePath3;
 
   mitk::DataNode::Pointer m_DataNode1;
   mitk::DataNode::Pointer m_DataNode2;
@@ -99,10 +95,12 @@ private:
     return dynamic_cast<mitk::LevelWindowProperty *>(node->GetProperty("levelwindow"));
   }
 
-  mitk::DataNode::Pointer LoadAdditionalNode(int layer)
+  mitk::DataNode::Pointer AddImageNode(int layer)
   {
-    auto node = mitk::IOUtil::Load(m_ImagePath1, *m_DataManager)->GetElement(0);
+    auto node = mitk::DataNode::New();
+    node->SetData(mitk::ImageGenerator::GenerateGradientImage<unsigned char>(8, 8, 8));
     node->SetIntProperty("layer", layer);
+    m_DataManager->Add(node);
     return node;
   }
 
@@ -116,20 +114,13 @@ public:
     CPPUNIT_ASSERT_NO_THROW_MESSAGE("DataStorage could not be set for the new level window manager", m_LevelWindowManager->SetDataStorage(m_DataManager));
     CPPUNIT_ASSERT_MESSAGE("DataStorage could not be retrieved from the new level window manager", m_DataManager == m_LevelWindowManager->GetDataStorage());
 
-    m_ImagePath1 = GetTestDataFilePath("Pic3D.nrrd");
-    m_ImagePath2 = GetTestDataFilePath("UltrasoundImages/4D_TEE_Data_MV.dcm");
-    m_ImagePath3 = GetTestDataFilePath("RenderingTestData/defaultWatermark.png");
-
     // add multiple objects to the data storage => property observers will be created
-    m_DataNode1 = mitk::IOUtil::Load(m_ImagePath1, *m_DataManager)->GetElement(0);
-    m_DataNode2 = mitk::IOUtil::Load(m_ImagePath2, *m_DataManager)->GetElement(0);
+    m_DataNode1 = this->AddImageNode(1);
+    m_DataNode2 = this->AddImageNode(2);
     CPPUNIT_ASSERT_MESSAGE("Not two relevant nodes found in the data storage",
       m_LevelWindowManager->GetRelevantNodes()->size() == 2);
     CPPUNIT_ASSERT_MESSAGE("Not two observers created for the relevant nodes",
       m_LevelWindowManager->GetNumberOfObservers() == 2);
-
-    m_DataNode1->SetIntProperty("layer", 1);
-    m_DataNode2->SetIntProperty("layer", 2);
 
     bool isImageForLevelWindow1, isImageForLevelWindow2;
     m_DataNode1->GetBoolProperty("imageForLevelWindow", isImageForLevelWindow1);
@@ -137,13 +128,12 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Initial \"imageForLevelWindow\" property not exclusively set for node 2",
       !isImageForLevelWindow1 && isImageForLevelWindow2);
 
-    m_DataNode3 = mitk::IOUtil::Load(m_ImagePath3, *m_DataManager)->GetElement(0);
+    m_DataNode3 = this->AddImageNode(3);
     CPPUNIT_ASSERT_MESSAGE("Not three relevant nodes found in the data storage",
       m_LevelWindowManager->GetRelevantNodes()->size() == 3);
     CPPUNIT_ASSERT_MESSAGE("Not three observers created for the relevant nodes",
       m_LevelWindowManager->GetNumberOfObservers() == 3);
 
-    m_DataNode3->SetIntProperty("layer", 3);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
     CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode3));
   }
@@ -424,13 +414,13 @@ public:
     m_DataNode1->SetSelected(true);
     CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", AssertCurrentNode(m_DataNode1));
 
-    auto dataNode4 = this->LoadAdditionalNode(4);
+    auto dataNode4 = this->AddImageNode(4);
     CPPUNIT_ASSERT_MESSAGE("Not four observers created for the relevant nodes", m_LevelWindowManager->GetNumberOfObservers() == 4);
     CPPUNIT_ASSERT_MESSAGE("Mode was reset by adding a node", Mode::SelectedImage == m_LevelWindowManager->GetMode());
     CPPUNIT_ASSERT_MESSAGE("Selected node is not the current node", AssertCurrentNode(m_DataNode1));
 
     m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(m_DataNode2));
-    auto dataNode5 = this->LoadAdditionalNode(5);
+    auto dataNode5 = this->AddImageNode(5);
     CPPUNIT_ASSERT_MESSAGE("Mode was reset by adding a node", Mode::ExplicitImage == m_LevelWindowManager->GetMode());
     CPPUNIT_ASSERT_MESSAGE("Pinned node is not the current node", AssertCurrentNode(m_DataNode2));
 
@@ -522,7 +512,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Topmost node is not the current node", AssertCurrentNode(m_DataNode2));
 
     // A pick made in SelectedImage mode returns to SelectedImage mode
-    auto dataNode4 = this->LoadAdditionalNode(4);
+    auto dataNode4 = this->AddImageNode(4);
     m_LevelWindowManager->SetMode(Mode::SelectedImage);
     m_DataNode2->SetSelected(true);
     m_LevelWindowManager->SetLevelWindowProperty(GetLevelWindowProperty(dataNode4));

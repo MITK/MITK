@@ -48,6 +48,7 @@ public:
     , m_Parent(nullptr)
     , m_DataNodeItemModel(new QmitkDataNodeItemModel)
     , m_DataNodeSelectionModel(new QItemSelectionModel(m_DataNodeItemModel))
+    , m_Preferences(nullptr)
     , m_InDataStorageChanged(false)
   {
   }
@@ -163,6 +164,12 @@ public:
   QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
 
   /**
+   * The preferences the preferences listener is registered on. The destructor
+   * must not ask GetPreferences() again, as overrides are no longer called there.
+   */
+  mitk::IPreferences* m_Preferences;
+
+  /**
    * Saves if this class is currently working on DataStorage changes.
    * This is a protector variable to avoid recursive calls on event listener functions.
    */
@@ -224,10 +231,10 @@ void QmitkAbstractView::AfterCreateQtPartControl()
                                                        ( d.data(), &QmitkAbstractViewPrivate::NodeRemovedProxy ) );
 
   // REGISTER PREFERENCES LISTENER
-  auto* prefs = this->GetPreferences();
+  d->m_Preferences = this->GetPreferences();
 
-  if (prefs != nullptr)
-    prefs->OnChanged.AddListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
+  if (d->m_Preferences != nullptr)
+    d->m_Preferences->OnChanged.AddListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
 
   // REGISTER FOR WORKBENCH SELECTION EVENTS
   d->m_BlueBerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(
@@ -258,10 +265,8 @@ QmitkAbstractView::~QmitkAbstractView()
   this->GetDataStorage()->ChangedNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkAbstractViewPrivate, const mitk::DataNode*>
                                                            ( d.data(), &QmitkAbstractViewPrivate::NodeChangedProxy ) );
 
-  auto* prefs = this->GetPreferences();
-
-  if(prefs != nullptr)
-    prefs->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
+  if (d->m_Preferences != nullptr)
+    d->m_Preferences->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
 
   // REMOVE SELECTION PROVIDER
   this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(nullptr));

@@ -3,11 +3,12 @@
   "info": "Display commonly used plugins, filtering out those that are less relevant to the majority of users.",
   "categories": [
     "Data",
-    "General",
     "Help",
-    "Other",
+    "Processing",
     "Quantification",
     "Registration",
-    "Segmentation"
+    "Segmentation",
+    "Utilities",
+    "Visualization"
   ]
 }

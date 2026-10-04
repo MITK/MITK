@@ -1859,29 +1859,12 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
 
   // Emit the strict-mode 'groups' dict for every registered group, not only
   // those a cell references: an empty group is still a card in the editor.
-  // A registered group only navigation links name is left to the loop below,
-  // which declares it the way the loader reads it back - as a group without
-  // selection state - so that save and load stay a fixpoint.
-  std::set<std::string> navGroupNames;
-  for (const auto dimension : QmitkMxNAllSyncDimensions)
-  {
-    for (auto& navGroup : this->GetSyncGroupNames(dimension))
-    {
-      navGroupNames.insert(std::move(navGroup));
-    }
-  }
-  const auto isSelectionReferenced = [&groupNames](const std::string& name)
-  {
-    return std::any_of(groupNames.begin(), groupNames.end(),
-                       [&name](const auto& entry) { return entry.second == name; });
-  };
+  // Every registered group carries its select_all, whether or not a cell is
+  // in its selection: the loader registers a declared group whose entry has
+  // select_all, so a registered group stays registered across save and load.
   nlohmann::json groupsJson = nlohmann::json::object();
   for (const auto& [idx, name] : m_GroupNameByIndex)
   {
-    if (!isSelectionReferenced(name) && navGroupNames.count(name) > 0)
-    {
-      continue;
-    }
     bool selectAll = true;
     if (auto* connector = this->GetSyncGroupConnector(idx))
     {
@@ -1890,10 +1873,9 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
     groupsJson[name] = nlohmann::json{ { "select_all", selectAll } };
   }
   // Strict mode requires every referenced group declared, across all
-  // dimensions (shared namespace). Groups referenced only by navigation
-  // links carry no persisted per-group state and are declared as empty
-  // entries; a name that also serves as a selection group already has its
-  // entry (with select_all) from the loop above.
+  // dimensions (shared namespace). A group only navigation links name and
+  // that is not registered has no selection state; it is declared with an
+  // empty entry, which the loader reads back as such a group.
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
     for (const auto& navGroup : this->GetSyncGroupNames(dimension))
@@ -2555,13 +2537,14 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // Group resolution. Strict mode = top-level 'groups' present; lazy mode
     // (no 'groups' block) defaults every referenced label to select_all=true.
     // The declaration requirement of strict mode covers every dimension
-    // (shared group namespace); 'select_all' only matters for groups that a
-    // cell references via links.selection - it is dormant otherwise.
+    // (shared group namespace). Every declared group is registered with its
+    // select_all, except one that only navigation links reference and whose
+    // entry has no select_all: that group exists only while a cell links it.
     const bool strictMode = doc.contains("groups");
     std::map<std::string, bool> groupSelectAll;
     std::map<std::string, std::string> groupColors;
     std::map<std::string, std::string> groupDisplayNames;
-    std::map<std::string, bool> unreferencedGroupSelectAll;
+    std::map<std::string, bool> memberlessGroupSelectAll;
     if (strictMode)
     {
       const auto& groupsDict = doc.at("groups");
@@ -2635,10 +2618,11 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       }
       for (auto it = groupsDict.begin(); it != groupsDict.end(); ++it)
       {
-        if (groupSelectAll.find(it.key()) == groupSelectAll.end()
-            && prewalk.navGroups.find(it.key()) == prewalk.navGroups.end())
+        const bool linkOnly = prewalk.navGroups.find(it.key()) != prewalk.navGroups.end()
+                              && !it.value().contains("select_all");
+        if (groupSelectAll.find(it.key()) == groupSelectAll.end() && !linkOnly)
         {
-          unreferencedGroupSelectAll[it.key()] = it.value().value("select_all", true);
+          memberlessGroupSelectAll[it.key()] = it.value().value("select_all", true);
         }
       }
     }
@@ -2688,13 +2672,13 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       this->GetSyncGroupConnector(1)->ChangeSelectionMode(groupSelectAll.at("main"));
       nameToInt["main"] = 1;
     }
-    else if (const auto emptyMain = unreferencedGroupSelectAll.find("main");
-             emptyMain != unreferencedGroupSelectAll.end())
+    else if (const auto emptyMain = memberlessGroupSelectAll.find("main");
+             emptyMain != memberlessGroupSelectAll.end())
     {
       // A declared "main" is the default group even while no cell is in it.
       this->AddSynchronizationGroup(1, "main");
       this->GetSyncGroupConnector(1)->ChangeSelectionMode(emptyMain->second);
-      unreferencedGroupSelectAll.erase(emptyMain);
+      memberlessGroupSelectAll.erase(emptyMain);
     }
     else if (!groupSelectAll.empty())
     {
@@ -2719,11 +2703,13 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       nameToInt[groupName] = idx;
     }
     // A declared group no cell references is an empty group, which the editor
-    // keeps and shows. Registering it keeps it across a save, and keeps its
-    // cosmetics bound to it rather than to whichever new group would later be
-    // given its name. After the referenced groups, so that without a declared
-    // 'main' the default group stays a referenced one.
-    for (const auto& [groupName, selectAll] : unreferencedGroupSelectAll)
+    // keeps and shows. So is a group that only navigation links reach but
+    // whose entry carries select_all: it was registered when it was saved.
+    // Registering it keeps it across a save, and keeps its cosmetics bound to
+    // it rather than to whichever new group would later be given its name.
+    // After the referenced groups, so that without a declared 'main' the
+    // default group stays a referenced one.
+    for (const auto& [groupName, selectAll] : memberlessGroupSelectAll)
     {
       const auto idx = this->NextFreeSyncGroupIndex();
       this->AddSynchronizationGroup(idx, groupName);
@@ -2946,30 +2932,15 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   {
     // Derived from the index, but a loaded layout names its groups freely and
     // may already use "g_<index>" for a group at another index.
-    const auto isTaken = [this](const std::string& candidate)
-    {
-      for (const auto& [otherIndex, otherName] : m_GroupNameByIndex)
-      {
-        if (otherName == candidate)
-        {
-          return true;
-        }
-      }
-      for (const auto dimension : QmitkMxNAllSyncDimensions)
-      {
-        const auto navGroups = this->GetSyncGroupNames(dimension);
-        if (std::find(navGroups.begin(), navGroups.end(), candidate) != navGroups.end())
-        {
-          return true;
-        }
-      }
-      return false;
-    };
     auto suffix = index;
     do
     {
       resolvedName = "g_" + std::to_string(suffix++);
-    } while (isTaken(resolvedName));
+    } while (this->SyncGroupExists(resolvedName));
+    // A free name can still carry the cosmetics of a group that ceased to
+    // exist; a new group starts clean.
+    m_GroupDisplayNames.erase(resolvedName);
+    m_GroupColors.erase(resolvedName);
   }
   m_GroupNameByIndex[index] = resolvedName;
   this->RegisterGroupForHue(m_GroupNameByIndex[index]);
@@ -4921,7 +4892,7 @@ std::string QmitkMxNMultiWidget::GetDefaultSyncGroupName() const
 
 void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const std::string& displayName)
 {
-  if (std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), id) == m_GroupHueOrder.end())
+  if (!this->SyncGroupExists(id))
   {
     mitkThrow() << "SetSyncGroupDisplayName: unknown group '" << id << "'.";
   }
@@ -4948,7 +4919,7 @@ void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const s
 
 void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor& color)
 {
-  if (std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), id) == m_GroupHueOrder.end())
+  if (!this->SyncGroupExists(id))
   {
     mitkThrow() << "SetSyncGroupColor: unknown group '" << id << "'.";
   }
@@ -4967,4 +4938,24 @@ void QmitkMxNMultiWidget::RegisterGroupForHue(const std::string& group)
   {
     m_GroupHueOrder.push_back(group);
   }
+}
+
+bool QmitkMxNMultiWidget::SyncGroupExists(const std::string& id) const
+{
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == id)
+    {
+      return true;
+    }
+  }
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    const auto linkedGroups = this->GetSyncGroupNames(dimension);
+    if (std::find(linkedGroups.begin(), linkedGroups.end(), id) != linkedGroups.end())
+    {
+      return true;
+    }
+  }
+  return false;
 }

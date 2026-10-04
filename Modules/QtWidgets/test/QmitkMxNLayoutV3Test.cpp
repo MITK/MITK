@@ -59,6 +59,11 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone);
   MITK_TEST(EmptyGroup_SurvivesSaveAndLoad);
   MITK_TEST(DeclaredEmptyGroup_KeepsItsCosmeticsToItself);
+  MITK_TEST(LinkOnlyGroup_ClearedLastLink_NewGroupStartsClean);
+  MITK_TEST(LinkOnlyGroup_Regrouped_NewGroupStartsClean);
+  MITK_TEST(RemovedGroup_CosmeticSettersThrow);
+  MITK_TEST(NavGroupWithSelectAll_IsRegistered);
+  MITK_TEST(EmptyNavEntry_GroupGoesWithItsLastLink);
   MITK_TEST(Apply_NotifiesSyncLinksOncePerLoad);
   MITK_TEST(Apply_ActiveCellIsFirstInDocumentOrder);
 
@@ -454,6 +459,122 @@ public:
       CPPUNIT_ASSERT_EQUAL_MESSAGE("A new group carries no borrowed display name",
                                    id, editor->GetSyncGroupDisplayName(id));
     }
+  }
+
+  /** One window in "main", linked on slice to a link-only "g_2" that carries cosmetics. */
+  static nlohmann::json LinkOnlyCosmeticsDoc()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true } } },
+      { "g_2", { { "color", "#ff0000" }, { "name", "Tumor" } } }
+    };
+    WindowLinks(doc)["slice"] = "g_2";
+    return doc;
+  }
+
+  /** Creates a group under a derived name and asserts it shows nothing of a former "g_2". */
+  static void AssertNewGroupStartsClean(QmitkMxNMultiWidget& editor)
+  {
+    const auto index = editor.NextFreeSyncGroupIndex();
+    editor.AddSynchronizationGroup(index);
+    const auto id = editor.GetSyncGroupName(index);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The new group takes the name the vanished group had",
+                                 std::string("g_2"), id);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A new group carries no display name of a vanished group",
+                                 id, editor.GetSyncGroupDisplayName(id));
+    const auto infos = editor.GetSyncGroupInfos();
+    const auto* group = FindGroup(infos, id);
+    CPPUNIT_ASSERT(nullptr != group);
+    CPPUNIT_ASSERT_MESSAGE("A new group carries no color of a vanished group", !group->hasExplicitColor);
+  }
+
+  void LinkOnlyGroup_ClearedLastLink_NewGroupStartsClean()
+  {
+    auto editor = MakeEditor();
+    editor->ApplyLayout(LinkOnlyCosmeticsDoc());
+    editor->ClearSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
+
+    AssertNewGroupStartsClean(*editor);
+  }
+
+  void LinkOnlyGroup_Regrouped_NewGroupStartsClean()
+  {
+    auto editor = MakeEditor();
+    editor->ApplyLayout(LinkOnlyCosmeticsDoc());
+    editor->SetSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice, "main");
+
+    AssertNewGroupStartsClean(*editor);
+  }
+
+  void RemovedGroup_CosmeticSettersThrow()
+  {
+    auto editor = MakeEditor();
+    editor->ApplyLayout(SingleWindowDoc());
+    const auto index = editor->NextFreeSyncGroupIndex();
+    editor->AddSynchronizationGroup(index);
+    const auto removed = editor->GetSyncGroupName(index);
+    editor->RemoveSynchronizationGroup(removed);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("A removed group cannot be renamed",
+      editor->SetSyncGroupDisplayName(removed, "Tumor"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("A removed group cannot be recolored",
+      editor->SetSyncGroupColor(removed, QColor("#ff0000")), mitk::Exception);
+
+    auto linkOnly = MakeEditor();
+    linkOnly->ApplyLayout(LinkOnlyCosmeticsDoc());
+    linkOnly->ClearSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("A link-only group without links cannot be renamed",
+      linkOnly->SetSyncGroupDisplayName("g_2", "Lesion"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("A link-only group without links cannot be recolored",
+      linkOnly->SetSyncGroupColor("g_2", QColor("#00ff00")), mitk::Exception);
+  }
+
+  void NavGroupWithSelectAll_IsRegistered()
+  {
+    // An entry with select_all describes a group of its own, as SerializeLayout
+    // writes it for a registered group that only navigation links reach.
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true } } },
+      { "nav", { { "select_all", false } } }
+    };
+    WindowLinks(doc)["slice"] = "nav";
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    editor->ClearSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
+
+    const auto infos = editor->GetSyncGroupInfos();
+    CPPUNIT_ASSERT_MESSAGE("The group outlives its last link", nullptr != FindGroup(infos, "nav"));
+    const auto saved = editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("Save keeps the group", saved.at("groups").contains("nav"));
+    CPPUNIT_ASSERT_MESSAGE("Save keeps its select_all",
+      saved.at("groups").at("nav").contains("select_all")
+        && false == saved.at("groups").at("nav").at("select_all").get<bool>());
+  }
+
+  void EmptyNavEntry_GroupGoesWithItsLastLink()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true } } },
+      { "nav", nlohmann::json::object() }
+    };
+    WindowLinks(doc)["slice"] = "nav";
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    const auto linked = editor->GetSyncGroupInfos();
+    CPPUNIT_ASSERT(nullptr != FindGroup(linked, "nav"));
+
+    editor->ClearSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
+    const auto unlinked = editor->GetSyncGroupInfos();
+    CPPUNIT_ASSERT_MESSAGE("A link-only group goes with its last link",
+                           nullptr == FindGroup(unlinked, "nav"));
+    CPPUNIT_ASSERT_MESSAGE("Save does not declare a group that is gone",
+                           !editor->SerializeLayout().at("groups").contains("nav"));
   }
 
   /** A grid document of 'rows' x 'columns' windows, all in the 'main' group. */

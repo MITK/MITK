@@ -44,7 +44,7 @@
         "select_all": {
           "type": "boolean",
           "default": true,
-          "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode. Cells linked to this group via `links.selection` share this setting at runtime. Optional; defaults to true. Has no effect if no cell references this group via `links.selection` (in which case the property is dormant)."
+          "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode. Cells linked to this group via `links.selection` share this setting at runtime. Optional; defaults to true. A declared group that no cell references is kept as an empty group with this setting, which applies to cells that join it later."
         }
       }
     },

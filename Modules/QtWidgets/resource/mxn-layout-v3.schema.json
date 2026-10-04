@@ -44,7 +44,7 @@
         "select_all": {
           "type": "boolean",
           "default": true,
-          "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode. Optional; defaults to true. Dormant unless a cell references this group via `links.selection`."
+          "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode, shared by every cell whose `links.selection` names this group. Optional; defaults to true. On a group that only navigation links reference, its presence keeps the group after its last link is removed; writers emit it for every group the editor holds as its own."
         },
         "color": {
           "type": "string",

@@ -189,7 +189,10 @@ public:
   *                name registry. When empty (the default), the registry
   *                receives the conventional auto-generated label: 'main' for
   *                index 1, otherwise 'g_<index>' - or, if a group already uses
-  *                that name, 'g_<n>' with the next unused n. Idempotent calls (the group
+  *                that name, 'g_<n>' with the next unused n. A group created
+  *                under such a derived name starts without display name and
+  *                color, whatever an earlier group of that name left behind.
+  *                Idempotent calls (the group
   *                already exists) leave the previously recorded name in
   *                place and skip the name preconditions below.
   *
@@ -666,7 +669,8 @@ public:
   *        only; links, engine indices, and the id itself stay untouched).
   *        An empty name reverts the display name to the id.
   *
-  * \throws mitk::Exception on a group that was never registered.
+  * \throws mitk::Exception on a group that does not exist (neither
+  *         registered nor linked by a live cell).
   */
   void SetSyncGroupDisplayName(const std::string& id, const std::string& displayName);
 
@@ -674,8 +678,8 @@ public:
   * \brief Set the group's hue (cosmetic write to `groups.<id>.color` only).
   *        The color is persisted with the layout and honored verbatim.
   *
-  * \throws mitk::Exception on a group that was never registered or an
-  *         invalid color.
+  * \throws mitk::Exception on a group that does not exist (neither
+  *         registered nor linked by a live cell) or an invalid color.
   */
   void SetSyncGroupColor(const std::string& id, const QColor& color);
 
@@ -855,9 +859,9 @@ public:
   *   `slice` / `zoom` / `pan` links carrying a non-identity offset use the
   *   object form (`{"target": ..., "offset": ...}`), all other links the
   *   string shorthand. Every registered group is declared in the top-level
-  *   `groups` dict, including one no cell references yet; groups referenced
-  *   only by navigation dimensions are declared as empty entries - they carry
-  *   no persisted per-group state.
+  *   `groups` dict with its `select_all`, including one no cell references
+  *   yet; a group that is not registered and only navigation links name is
+  *   declared as an empty entry.
   *
   *   See 'mxn-layout-v3.schema.json' for the document shape this method emits.
   *
@@ -1468,6 +1472,12 @@ private:
   void RegisterGroupForHue(const std::string& group);
 
   /**
+  * \brief Whether the group exists: it is registered, or a live cell links it
+  *        on any dimension.
+  */
+  bool SyncGroupExists(const std::string& id) const;
+
+  /**
   * \brief Remove the renderer-specific 'propertyKeys' of cell 'windowId' from
   *        every node. Cell ids are reused and a renderer-specific value
   *        outranks the node-global one, so a leftover would restyle whichever
@@ -1604,7 +1614,9 @@ private:
   /**
   * \brief Group names in first-registration order; positions index the
   *        default hue palette (see GetSyncGroupColor). Cleared by
-  *        'TearDownAllCells' together with the group registry.
+  *        'TearDownAllCells' together with the group registry. Palette order
+  *        only, not a record of which groups exist (see SyncGroupExists): an
+  *        entry outlives its group so that other groups' hues do not shift.
   */
   std::vector<std::string> m_GroupHueOrder;
 
@@ -1615,6 +1627,13 @@ private:
   *        the set-display-name / set-color writes; cleared by
   *        'TearDownAllCells'. Only groups present here emit the fields on
   *        serialization, so documents stay minimal.
+  *
+  *        An entry can outlive its group: a group that only links define goes
+  *        with its last link. Only existing groups are written, and a group
+  *        created under a derived name drops the entry. A group that comes
+  *        back under its explicit name (re-linked by a caller, or the
+  *        'Synchronize' macro group switched on again) finds its cosmetics
+  *        as they were.
   */
   std::map<std::string, std::string> m_GroupDisplayNames;
   std::map<std::string, std::string> m_GroupColors;

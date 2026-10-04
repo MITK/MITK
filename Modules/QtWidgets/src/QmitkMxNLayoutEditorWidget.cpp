@@ -1809,10 +1809,19 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
       {
         return;
       }
-      const auto color = QColorDialog::getColor(m_MultiWidget->GetSyncGroupColor(groupId), this);
-      if (color.isValid())
+      // The group can be gone by the time the menu or the modal dialog returns:
+      // both run an event loop in which a layout load or an unlink is served.
+      try
       {
-        m_MultiWidget->SetSyncGroupColor(groupId, color);
+        const auto color = QColorDialog::getColor(m_MultiWidget->GetSyncGroupColor(groupId), this);
+        if (color.isValid() && !m_MultiWidget.isNull())
+        {
+          m_MultiWidget->SetSyncGroupColor(groupId, color);
+        }
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Layout editor: color change ignored: " << e.GetDescription();
       }
     });
 

@@ -143,6 +143,8 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Matrix_RegroupKeepsTheAuthoredOffset);
   MITK_TEST(Group_LinkActionsKeepAuthoredOffsets);
   MITK_TEST(Save_NavigationOnlyGroupRoundTripsToItself);
+  MITK_TEST(Save_NavigationOnlyGroupStaysRegistered);
+  MITK_TEST(DefaultGroup_SurvivesRoundTripWithoutSelectionMembers);
   MITK_TEST(Matrix_OffsetOnUnlinkedCellIsIgnored);
   MITK_TEST(Matrix_SliceRampSpreadsOverCellsInOrder);
   MITK_TEST(Matrix_SliceRampShowsAMovieFrame);
@@ -1723,6 +1725,41 @@ public:
     const auto saved = m_Editor->SerializeLayout();
     m_Editor->ApplyLayout(saved);
     CPPUNIT_ASSERT_MESSAGE("Save and load are a fixpoint", saved == m_Editor->SerializeLayout());
+  }
+
+  void Save_NavigationOnlyGroupStaysRegistered()
+  {
+    // A group created on the cards stays a card after its last member leaves,
+    // and a save and load must not turn it into a group that goes with its
+    // last link.
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+
+    const auto saved = m_Editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("Save writes the group's select_all",
+                           saved.at("groups").at(id).contains("select_all"));
+
+    m_Editor->ApplyLayout(saved);
+    m_Widget->RemoveCellsFromGroup(QStringList{ CellId(0) }, id);
+    const auto infos = m_Editor->GetSyncGroupInfos();
+    CPPUNIT_ASSERT_MESSAGE("The group is still a card without members",
+                           std::any_of(infos.begin(), infos.end(),
+                                       [&id](const auto& info) { return info.id == id; }));
+  }
+
+  void DefaultGroup_SurvivesRoundTripWithoutSelectionMembers()
+  {
+    // Every window's selection moves to another group; the windows stay linked
+    // to the default group on windowing and LUT.
+    const auto id = m_Widget->CreateGroup();
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      m_Editor->SetCellSelectionGroup(CellId(cell), id);
+    }
+
+    m_Editor->ApplyLayout(m_Editor->SerializeLayout());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The default group stays the default group",
+                                 std::string("main"), m_Editor->GetDefaultSyncGroupName());
   }
 
   void Matrix_OffsetOnUnlinkedCellIsIgnored()

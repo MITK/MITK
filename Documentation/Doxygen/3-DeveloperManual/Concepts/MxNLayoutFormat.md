@@ -189,19 +189,22 @@ Per-group persisted state lives once at the top level:
 
 The properties of a group entry:
 
-- `select_all` (the selection bundle's UX mode — whether the group displays
-  every data node or a curated subset). Optional, defaults to `true`, and
-  dormant unless a cell references the group via `links.selection`.
+- `select_all` (the selection bundle's UX mode: whether the group displays
+  every data node or a curated subset). Optional, defaults to `true`. It
+  applies to every window whose `links.selection` names the group, including
+  windows that join it later.
 - `color` (v3.0): optional hue as `"#RRGGBB"`, shown verbatim by the sync
   furniture. Without it the editor assigns a default hue by group creation
   order. A malformed value is ignored with a warning, never rejected.
 - `name` (v3.0): optional display name, shown instead of the group id on
   every surface. The id (the dict key) stays the URL-safe identity.
 
-Groups referenced only by navigation dimensions carry no per-group state and
-may use an empty entry `{}`. A declared group that no cell references is
-kept as an empty group: the layout editor shows it, and `SerializeLayout`
-writes it back.
+Groups referenced only by navigation dimensions may use an empty entry `{}`;
+such a group exists while some window links it and goes with its last link.
+A declared group is kept as a group of its own (shown by the layout editor
+even while empty and written back by `SerializeLayout` with its
+`select_all`) when no window references it or when its entry carries
+`select_all`.
 
 There is no per-cell `select_all`. The setting belongs to the group, not to
 any one of its members.

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkFileSystem.h>
 #include <MitkPythonExports.h>
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -158,6 +159,30 @@ namespace mitk
      * \throw mitk::Exception if the image cannot be bound to the variable.
      */
     void BindImage(mitk::Image* image, const std::string& varName);
+
+    /**
+     * \brief Binds a C++ callable to a Python variable that Python code can
+     *        call as <tt>varName(done, total)</tt> and that returns a bool.
+     *
+     * The callable is copied into a Python function object stored in the
+     * context's dictionary and stays callable for as long as the dictionary
+     * holds it. Bind it right before the Execute() call that uses it and unbind
+     * it afterwards by passing an empty function, so that nothing the callable
+     * captured can be reached once it went out of scope.
+     *
+     * The callable runs on the thread that executes the Python code, with the
+     * GIL held, so other Python threads wait until it returns. It may call
+     * into a PythonContext, this one included, as these take the GIL again. An
+     * exception escaping it is raised in Python as RuntimeError and surfaces
+     * from Execute() as mitk::Exception.
+     *
+     * \param[in] varName Name of the Python variable.
+     * \param[in] function The callable to bind. If empty, the variable is set
+     *                     to Python's \c None.
+     *
+     * \throw mitk::Exception if the function cannot be bound to the variable.
+     */
+    void BindFunction(const std::string& varName, std::function<bool(int, int)> function);
 
     /**
      * \brief Executes arbitrary Python code within this context.

@@ -243,6 +243,26 @@ void mitk::PythonContext::BindImage(Image* image, const std::string& varName)
   }
 }
 
+void mitk::PythonContext::BindFunction(const std::string& varName, std::function<bool(int, int)> function)
+{
+  py::gil_scoped_acquire gil;
+
+  if (!function)
+  {
+    m_Impl->Dictionary[py::str(varName)] = py::none();
+    return;
+  }
+
+  try
+  {
+    m_Impl->Dictionary[py::str(varName)] = py::cpp_function(std::move(function), py::name(varName.c_str()));
+  }
+  catch (const py::error_already_set& e)
+  {
+    mitkThrow() << "Could not bind function to Python variable \"" << varName << "\": " << e.what();
+  }
+}
+
 bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   py::gil_scoped_acquire gil;

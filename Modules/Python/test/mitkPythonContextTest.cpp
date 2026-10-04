@@ -18,6 +18,9 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <fstream>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
 class mitkPythonContextTestSuite : public mitk::TestFixture
 {
@@ -25,6 +28,7 @@ class mitkPythonContextTestSuite : public mitk::TestFixture
   MITK_TEST(TestExecuteAndGetVariable);
   MITK_TEST(TestExecuteFile);
   MITK_TEST(TestBindImageToPython);
+  MITK_TEST(TestBindFunctionToPython);
   MITK_TEST(TestPythonContextExclusivity);
   CPPUNIT_TEST_SUITE_END();
 
@@ -113,6 +117,65 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Variable 'dims' should exist", dims.has_value());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image should have 3 dimensions", 3, dims.value());
+  }
+
+  void TestBindFunctionToPython()
+  {
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+
+    std::vector<std::pair<int, int>> calls;
+
+    pythonContext.BindFunction("progress_callback", [&calls](int done, int total)
+    {
+      calls.emplace_back(done, total);
+      return done < total;
+    });
+
+    pythonContext.Execute("a = progress_callback(1, 4)\n"
+                          "b = progress_callback(4, 4)\n");
+
+    auto a = pythonContext.GetVariableAsBool("a");
+    auto b = pythonContext.GetVariableAsBool("b");
+
+    CPPUNIT_ASSERT_MESSAGE("Result 'a' should exist", a.has_value());
+    CPPUNIT_ASSERT_MESSAGE("Result 'b' should exist", b.has_value());
+    CPPUNIT_ASSERT_MESSAGE("The callable's result should reach Python (true)", a.value());
+    CPPUNIT_ASSERT_MESSAGE("The callable's result should reach Python (false)", !b.value());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The callable should have been called twice", std::size_t(2), calls.size());
+    CPPUNIT_ASSERT_EQUAL(1, calls[0].first);
+    CPPUNIT_ASSERT_EQUAL(4, calls[0].second);
+    CPPUNIT_ASSERT_EQUAL(4, calls[1].first);
+    CPPUNIT_ASSERT_EQUAL(4, calls[1].second);
+
+    pythonContext.BindFunction("progress_callback", [](int, int) -> bool
+    {
+      throw std::runtime_error("boom");
+    });
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("An exception escaping the callable should surface from Execute()",
+                                 pythonContext.Execute("progress_callback(0, 1)\n"),
+                                 mitk::Exception);
+
+    pythonContext.BindFunction("progress_callback", [&pythonContext](int done, int)
+    {
+      pythonContext.Execute("called_back = " + std::to_string(done) + "\n");
+      return true;
+    });
+
+    pythonContext.Execute("progress_callback(3, 4)\n");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The callable should be able to call back into the context",
+                                 3, pythonContext.GetVariableAsInt("called_back").value_or(0));
+
+    pythonContext.BindFunction("progress_callback", {});
+    pythonContext.Execute("is_none = progress_callback is None\n");
+
+    auto isNone = pythonContext.GetVariableAsBool("is_none");
+
+    CPPUNIT_ASSERT_MESSAGE("Result 'is_none' should exist", isNone.has_value());
+    CPPUNIT_ASSERT_MESSAGE("Binding an empty function should unbind the variable", isNone.value());
   }
 
   void TestPythonContextExclusivity()

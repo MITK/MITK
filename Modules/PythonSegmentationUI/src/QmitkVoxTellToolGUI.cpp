@@ -418,35 +418,7 @@ void QmitkVoxTellToolGUI::LoadModel()
   catch (const mitk::Exception& e)
   {
     notice.reset();
-
-    const QString description = QString::fromLocal8Bit(e.GetDescription());
-
-    // Errors thrown directly from C++ (a model that could not be obtained or a
-    // missing configuration) carry a clean, user-facing message and are shown
-    // as-is. Errors bubbling up from the embedded Python interpreter carry a
-    // traceback, so we keep a generic headline and tuck the traceback into the
-    // (collapsed) details.
-    const bool isPythonError = description.contains("An error occurred while executing Python code:");
-
-    const QString headline = isPythonError
-      ? QStringLiteral("VoxTell reported an error during initialization (see details).")
-      : description;
-
-    MITK_ERROR << "VoxTell initialization failed:\n" << e.GetDescription();
-
-    // Escape the headline: for a non-Python error it is the raw exception
-    // description, which can embed characters that would otherwise be
-    // interpreted as HTML by the message box.
-    auto errorMessageBox = new QMessageBox(QMessageBox::Critical, "VoxTell",
-      QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline.toHtmlEscaped()), QMessageBox::Ok, window);
-
-    if (isPythonError)
-      errorMessageBox->setDetailedText(description);
-
-    errorMessageBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    errorMessageBox->setAttribute(Qt::WA_DeleteOnClose, true);
-    errorMessageBox->setModal(true);
-    errorMessageBox->exec();
+    mitk::PythonPackage::ShowInitializationError(window, "VoxTell", e);
 
     if (self.isNull())
       return;

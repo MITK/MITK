@@ -633,35 +633,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     catch (const mitk::Exception& e)
     {
       messageBox->accept();
-
-      const QString description = QString::fromLocal8Bit(e.GetDescription());
-
-      // Errors thrown directly from C++ (a mapped remote connection failure or
-      // a missing configuration) carry a clean, user-facing message and are
-      // shown as-is. Errors bubbling up from the embedded Python interpreter
-      // carry a traceback, so we keep a generic headline and tuck the traceback
-      // into the (collapsed) details.
-      const bool isPythonError = description.contains("An error occurred while executing Python code:");
-
-      const QString headline = isPythonError
-        ? QStringLiteral("nnInteractive reported an error during initialization (see details).")
-        : description;
-
-      MITK_ERROR << "nnInteractive initialization failed:\n" << e.GetDescription();
-
-      // Escape the headline: for a non-Python error it is the raw exception
-      // description, which can embed the server URL or other characters that
-      // would otherwise be interpreted as HTML by the message box.
-      auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr,
-        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline.toHtmlEscaped()));
-
-      if (isPythonError)
-        errorMsgBox->setDetailedText(description);
-
-      errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
-      errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
-      errorMsgBox->setModal(true);
-      errorMsgBox->exec();
+      mitk::PythonPackage::ShowInitializationError(nullptr, "nnInteractive", e);
 
       this->EnableInitializeButtons(true);
       this->UncheckInitializeButton();

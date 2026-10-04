@@ -24,6 +24,7 @@ class QWidget;
 
 namespace mitk
 {
+  class Exception;
   class PythonContext;
 
   namespace PythonPackage
@@ -92,6 +93,19 @@ namespace mitk
      * \param[in] upgradeSpec What to install for the update. Names the virtual environment.
      */
     MITKPYTHONSEGMENTATIONUI_EXPORT VersionCheckOutcome CheckVersionAndOfferUpdate(QWidget* parent, PythonContext& context, const std::string& packageName, const std::string& distributionName, const VersionRange& supportedVersions, const PipInstallSpec& upgradeSpec);
+
+    /** \brief Reports that the initialization of a package failed.
+     *
+     * An error from the embedded Python interpreter carries a traceback, which
+     * is put into the details of the dialog behind a generic headline. Any
+     * other error is a message for the user and is shown as it is. The error
+     * is logged either way.
+     *
+     * \param[in] parent Parent of the dialog.
+     * \param[in] packageName The name of the package as the user knows it, e.g. "VoxTell".
+     * \param[in] e The error.
+     */
+    MITKPYTHONSEGMENTATIONUI_EXPORT void ShowInitializationError(QWidget* parent, const std::string& packageName, const Exception& e);
   }
 }
 

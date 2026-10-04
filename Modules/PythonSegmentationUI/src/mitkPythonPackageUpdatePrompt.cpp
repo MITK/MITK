@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkPythonPackageUpdatePrompt.h>
 
+#include <mitkException.h>
+#include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
 #include <QmitkPipInstallDialog.h>
@@ -180,4 +182,35 @@ mitk::PythonPackage::VersionCheckOutcome mitk::PythonPackage::CheckVersionAndOff
   }
 
   return VersionCheckOutcome::Aborted;
+}
+
+void mitk::PythonPackage::ShowInitializationError(QWidget* parent, const std::string& packageName, const Exception& e)
+{
+  const auto name = QString::fromStdString(packageName);
+
+  // mitk::Exception::GetDescription() may return nullptr.
+  const char* rawDescription = e.GetDescription();
+  const auto description = QString::fromLocal8Bit(rawDescription != nullptr ? rawDescription : "");
+
+  MITK_ERROR << packageName << " initialization failed:\n" << description.toStdString();
+
+  // An error thrown from C++ carries a message for the user. An error from the
+  // embedded Python interpreter carries a traceback, which goes behind a
+  // generic headline into the details.
+  const bool isPythonError = description.contains("An error occurred while executing Python code:");
+
+  const auto headline = isPythonError
+    ? QString("%1 reported an error during initialization (see details).").arg(name)
+    : description;
+
+  // Escaped, since the description of a C++ error can embed characters that
+  // the message box would read as HTML.
+  QMessageBox messageBox(QMessageBox::Critical, name,
+    QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline.toHtmlEscaped()), QMessageBox::Ok, parent);
+
+  if (isPythonError)
+    messageBox.setDetailedText(description);
+
+  messageBox.setTextInteractionFlags(Qt::TextSelectableByMouse);
+  messageBox.exec();
 }

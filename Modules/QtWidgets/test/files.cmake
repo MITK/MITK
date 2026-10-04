@@ -10,6 +10,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkDataStorageTreeModelTest.cpp
   QmitkAbstractNodeSelectionWidgetTest.cpp
   QmitkIconThemeTest.cpp
+  QmitkLineCompletionTextEditTest.cpp
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNLayoutV2Test.cpp
   QmitkMxNSyncGroupApiTest.cpp

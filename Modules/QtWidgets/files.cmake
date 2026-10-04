@@ -30,6 +30,7 @@ set(CPP_FILES
   QmitkLevelWindowRangeChangeDialog.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
   QmitkLevelWindowWidget.cpp
+  QmitkLineCompletionTextEdit.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp

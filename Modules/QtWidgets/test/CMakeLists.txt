@@ -12,6 +12,10 @@ mitkAddCustomModuleTest(QmitkIconThemeTest QmitkIconThemeTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkLineCompletionTextEditTest QmitkLineCompletionTextEditTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNExplicitNameTest QmitkMxNExplicitNameTest
   -platform minimal
 )

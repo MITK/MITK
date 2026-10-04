@@ -18,12 +18,10 @@ found in the LICENSE file.
 #include <QStringListModel>
 #include <QTextBlock>
 
-#include <algorithm>
-
 namespace
 {
-  // A single character matches too much to be of help.
-  constexpr qsizetype MIN_LINE_LENGTH = 2;
+  // A single character is contained in too many completions to be of help.
+  constexpr qsizetype MIN_CONTAINED_LENGTH = 2;
 
   constexpr qsizetype MAX_COMPLETIONS = 100;
 }
@@ -128,14 +126,9 @@ void QmitkLineCompletionTextEdit::UpdateCompletionPopup()
   const auto line = cursor.block().text().trimmed();
   const auto completions = this->FindCompletions(line);
 
-  // A line that is a completion already is done: with the list still open,
-  // Enter would choose the same text again instead of starting the next line.
-  const bool isCompletion = std::any_of(completions.begin(), completions.end(), [&line](const QString& completion)
-  {
-    return completion.compare(line, Qt::CaseInsensitive) == 0;
-  });
+  const bool onlyLine = completions.size() == 1 && completions.front().compare(line, Qt::CaseInsensitive) == 0;
 
-  if (completions.isEmpty() || isCompletion)
+  if (completions.isEmpty() || onlyLine)
   {
     popup->hide();
     return;
@@ -158,11 +151,15 @@ void QmitkLineCompletionTextEdit::UpdateCompletionPopup()
 
 QStringList QmitkLineCompletionTextEdit::FindCompletions(const QString& line) const
 {
-  if (line.size() < MIN_LINE_LENGTH)
+  if (line.isEmpty())
     return {};
 
   const auto needle = line.toLower();
+  const bool matchContained = needle.size() >= MIN_CONTAINED_LENGTH;
 
+  // A completion that equals the line comes first, so that Enter keeps the
+  // line while the list stays open for the longer completions.
+  QStringList equal;
   QStringList startingWith;
   QStringList containing;
 
@@ -170,26 +167,31 @@ QStringList QmitkLineCompletionTextEdit::FindCompletions(const QString& line) co
   {
     const auto& lowerCaseCompletion = m_LowerCaseCompletions[i];
 
-    if (lowerCaseCompletion.startsWith(needle))
+    if (lowerCaseCompletion == needle)
+      equal << m_Completions[i];
+    else if (lowerCaseCompletion.startsWith(needle))
       startingWith << m_Completions[i];
-    else if (lowerCaseCompletion.contains(needle))
+    else if (matchContained && lowerCaseCompletion.contains(needle))
       containing << m_Completions[i];
   }
 
-  startingWith << containing;
+  equal << startingWith << containing;
 
-  if (startingWith.size() > MAX_COMPLETIONS)
-    startingWith.resize(MAX_COMPLETIONS);
+  if (equal.size() > MAX_COMPLETIONS)
+    equal.resize(MAX_COMPLETIONS);
 
-  return startingWith;
+  return equal;
 }
 
 void QmitkLineCompletionTextEdit::InsertCompletion(const QString& completion)
 {
   auto cursor = this->textCursor();
+  cursor.beginEditBlock();
   cursor.movePosition(QTextCursor::StartOfBlock);
   cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
   cursor.insertText(completion);
+  cursor.insertBlock();
+  cursor.endEditBlock();
 
   this->setTextCursor(cursor);
 }

@@ -31,9 +31,13 @@ class QmitkLineCompletionTextEditTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkLineCompletionTextEditTestSuite);
   MITK_TEST(TestSuggestionsStartingWithLineComeFirst);
+  MITK_TEST(TestSuggestionEqualToLineComesFirst);
+  MITK_TEST(TestSuggestionsStayBetweenWords);
   MITK_TEST(TestSuggestionsIgnoreCase);
-  MITK_TEST(TestNoSuggestionsForShortOrUnknownLines);
-  MITK_TEST(TestNoSuggestionsForLineThatIsCompletion);
+  MITK_TEST(TestSingleCharacterSuggestsOnlyCompletionsStartingWithIt);
+  MITK_TEST(TestNoSuggestionsForUnknownLines);
+  MITK_TEST(TestNoSuggestionsForLineThatIsOnlyCompletion);
+  MITK_TEST(TestEnterKeepsLineThatIsCompletion);
   MITK_TEST(TestChoosingSuggestionReplacesOnlyCurrentLine);
   MITK_TEST(TestTabChoosesSuggestionAndKeepsFocus);
   MITK_TEST(TestMovingAwayFromLineEndHidesSuggestions);
@@ -51,7 +55,7 @@ public:
     auto* layout = new QVBoxLayout(m_Window.get());
 
     m_Edit = new QmitkLineCompletionTextEdit(m_Window.get());
-    m_Edit->SetCompletions({ "left kidney", "liver", "right kidney", "caudate lobe of liver" });
+    m_Edit->SetCompletions({ "left kidney", "liver lesion", "liver", "right kidney", "caudate lobe of liver" });
     layout->addWidget(m_Edit);
 
     m_OtherEdit = new QLineEdit(m_Window.get());
@@ -70,9 +74,32 @@ public:
   {
     this->Type("liv");
 
-    const QStringList expected = { "liver", "caudate lobe of liver" };
+    const QStringList expected = { "liver lesion", "liver", "caudate lobe of liver" };
     CPPUNIT_ASSERT_MESSAGE("Completions that start with the line should precede those that contain it",
                            this->Suggestions() == expected);
+  }
+
+  void TestSuggestionEqualToLineComesFirst()
+  {
+    this->Type("Liver");
+
+    const QStringList expected = { "liver", "liver lesion", "caudate lobe of liver" };
+    CPPUNIT_ASSERT_MESSAGE("A completion that equals the line should precede the others",
+                           this->Suggestions() == expected);
+  }
+
+  void TestSuggestionsStayBetweenWords()
+  {
+    this->Type("liver ");
+
+    const QStringList expected = { "liver", "liver lesion", "caudate lobe of liver" };
+    CPPUNIT_ASSERT_MESSAGE("A space after a completed word should keep the suggestions",
+                           this->Suggestions() == expected);
+
+    this->Type("l");
+
+    CPPUNIT_ASSERT_MESSAGE("The next word should narrow the suggestions down",
+                           this->Suggestions() == QStringList{ "liver lesion" });
   }
 
   void TestSuggestionsIgnoreCase()
@@ -83,40 +110,63 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Matching should ignore case", this->Suggestions() == expected);
   }
 
-  void TestNoSuggestionsForShortOrUnknownLines()
+  void TestSingleCharacterSuggestsOnlyCompletionsStartingWithIt()
   {
-    this->Type("l");
-    CPPUNIT_ASSERT_MESSAGE("A single character should not be completed", !this->Popup()->isVisible());
+    this->Type("L");
 
+    const QStringList expected = { "left kidney", "liver lesion", "liver" };
+    CPPUNIT_ASSERT_MESSAGE("A single character should suggest the completions that start with it",
+                           this->Suggestions() == expected);
+
+    this->Press(m_Edit, Qt::Key_Backspace);
+    this->Type("e");
+
+    CPPUNIT_ASSERT_MESSAGE("A single character should not suggest completions that only contain it",
+                           !this->Popup()->isVisible());
+  }
+
+  void TestNoSuggestionsForUnknownLines()
+  {
     this->Type("x");
     CPPUNIT_ASSERT_MESSAGE("A line without completions should show no suggestions", !this->Popup()->isVisible());
   }
 
-  void TestNoSuggestionsForLineThatIsCompletion()
+  void TestNoSuggestionsForLineThatIsOnlyCompletion()
   {
-    this->Type("Liver");
+    this->Type("Right kidney");
 
-    CPPUNIT_ASSERT_MESSAGE("A line that is a completion should show no suggestions, even if others contain it",
+    CPPUNIT_ASSERT_MESSAGE("A line that is its only completion should show no suggestions",
                            !this->Popup()->isVisible());
 
     this->Press(m_Edit, Qt::Key_Return);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Enter should start the next line instead of choosing a suggestion",
-                                 std::string("Liver\n"), m_Edit->toPlainText().toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Enter should start the next line",
+                                 std::string("Right kidney\n"), m_Edit->toPlainText().toStdString());
+  }
+
+  void TestEnterKeepsLineThatIsCompletion()
+  {
+    this->Type("Liver");
+    CPPUNIT_ASSERT(this->Popup()->isVisible());
+
+    // Keys reach the popup first while it is shown, as they do for the user.
+    this->Press(this->Popup(), Qt::Key_Return);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Enter should keep the completion that equals the line and start the next line",
+                                 std::string("liver\n"), m_Edit->toPlainText().toStdString());
   }
 
   void TestChoosingSuggestionReplacesOnlyCurrentLine()
   {
-    this->Type("liver");
+    this->Type("right kidney");
     this->Press(m_Edit, Qt::Key_Return);
     this->Type("cau");
 
     CPPUNIT_ASSERT_MESSAGE("A matching line should show suggestions", this->Popup()->isVisible());
 
-    // Keys reach the popup first while it is shown, as they do for the user.
     this->Press(this->Popup(), Qt::Key_Return);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("liver\ncaudate lobe of liver"), m_Edit->toPlainText().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("right kidney\ncaudate lobe of liver\n"), m_Edit->toPlainText().toStdString());
     CPPUNIT_ASSERT_MESSAGE("Choosing a suggestion should close the list", !this->Popup()->isVisible());
   }
 
@@ -127,7 +177,7 @@ public:
 
     this->Press(this->Popup(), Qt::Key_Tab);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("caudate lobe of liver"), m_Edit->toPlainText().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("caudate lobe of liver\n"), m_Edit->toPlainText().toStdString());
     CPPUNIT_ASSERT_MESSAGE("Choosing a suggestion should close the list", !this->Popup()->isVisible());
     CPPUNIT_ASSERT_MESSAGE("Tab should not move the focus while it chooses a suggestion",
                            m_Window->focusWidget() == m_Edit);

@@ -26,11 +26,12 @@ class QStringListModel;
  * \brief A plain text edit for one entry per line that suggests entries while
  *        the user types.
  *
- * While the user types at the end of a line of at least two characters, a
- * popup lists the completions that contain the line, those that start with it
- * first, ignoring case. Choosing one with Enter, Tab, or a click replaces the
- * line with it. Tab moves the focus on while no suggestions are shown, as a
- * tab character is no entry.
+ * While the user types at the end of a line, a popup lists the completions
+ * that contain the line, ignoring case: one that equals it first, then those
+ * that start with it. A single character only lists those that start with it.
+ * Choosing one with Enter, Tab, or a click replaces the line with it and
+ * starts the next line. Tab moves the focus on while no suggestions are shown,
+ * as a tab character is no entry.
  */
 class MITKQTWIDGETS_EXPORT QmitkLineCompletionTextEdit : public QPlainTextEdit
 {
@@ -57,10 +58,10 @@ private:
   /** \brief Lists the completions of the line at the cursor, or hides the list. */
   void UpdateCompletionPopup();
 
-  /** \brief Returns the completions of a line, those that start with it first. */
+  /** \brief Returns the completions of a line in the order they are listed in. */
   QStringList FindCompletions(const QString& line) const;
 
-  /** \brief Replaces the line at the cursor by the given completion. */
+  /** \brief Replaces the line at the cursor by the given completion and starts the next line. */
   void InsertCompletion(const QString& completion);
 
   QCompleter* m_Completer;

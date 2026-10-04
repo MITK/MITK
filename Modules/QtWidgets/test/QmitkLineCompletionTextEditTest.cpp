@@ -33,6 +33,7 @@ class QmitkLineCompletionTextEditTestSuite : public mitk::TestFixture
   MITK_TEST(TestSuggestionsStartingWithLineComeFirst);
   MITK_TEST(TestSuggestionsIgnoreCase);
   MITK_TEST(TestNoSuggestionsForShortOrUnknownLines);
+  MITK_TEST(TestNoSuggestionsForLineThatIsCompletion);
   MITK_TEST(TestChoosingSuggestionReplacesOnlyCurrentLine);
   MITK_TEST(TestTabChoosesSuggestionAndKeepsFocus);
   MITK_TEST(TestMovingAwayFromLineEndHidesSuggestions);
@@ -91,10 +92,22 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A line without completions should show no suggestions", !this->Popup()->isVisible());
   }
 
+  void TestNoSuggestionsForLineThatIsCompletion()
+  {
+    this->Type("Liver");
+
+    CPPUNIT_ASSERT_MESSAGE("A line that is a completion should show no suggestions, even if others contain it",
+                           !this->Popup()->isVisible());
+
+    this->Press(m_Edit, Qt::Key_Return);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Enter should start the next line instead of choosing a suggestion",
+                                 std::string("Liver\n"), m_Edit->toPlainText().toStdString());
+  }
+
   void TestChoosingSuggestionReplacesOnlyCurrentLine()
   {
     this->Type("liver");
-    this->Press(this->Popup(), Qt::Key_Escape);
     this->Press(m_Edit, Qt::Key_Return);
     this->Type("cau");
 

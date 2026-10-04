@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <QStringListModel>
 #include <QTextBlock>
 
+#include <algorithm>
+
 namespace
 {
   // A single character matches too much to be of help.
@@ -126,7 +128,14 @@ void QmitkLineCompletionTextEdit::UpdateCompletionPopup()
   const auto line = cursor.block().text().trimmed();
   const auto completions = this->FindCompletions(line);
 
-  if (completions.isEmpty() || (completions.size() == 1 && completions.front().compare(line, Qt::CaseInsensitive) == 0))
+  // A line that is a completion already is done: with the list still open,
+  // Enter would choose the same text again instead of starting the next line.
+  const bool isCompletion = std::any_of(completions.begin(), completions.end(), [&line](const QString& completion)
+  {
+    return completion.compare(line, Qt::CaseInsensitive) == 0;
+  });
+
+  if (completions.isEmpty() || isCompletion)
   {
     popup->hide();
     return;

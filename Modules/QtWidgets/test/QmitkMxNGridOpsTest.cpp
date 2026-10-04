@@ -29,9 +29,15 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QSplitter>
 
+#include <algorithm>
+#include <cmath>
 #include <functional>
+#include <initializer_list>
+#include <map>
 #include <set>
 #include <string>
+#include <utility>
+#include <vector>
 
 /**
  * Tests the interactive grid ops on QmitkMxNMultiWidget: AddGridColumn /
@@ -41,8 +47,9 @@ found in the LICENSE file.
  * The ops mutate the splitter tree in place, so existing windows keep their
  * ids, sync links, and positions; only the trailing edge changes. "Position"
  * throughout is the cell's index in ListWindowDescriptors() pre-order (the tree
- * walk); every grid here stays under ten cells and asserts via id-keyed
- * accessors, so the lexicographic GetNameFromIndex hazard never bites.
+ * walk). SetLayout rebuilds the tree in that reading order, so the reading
+ * order tests deliberately use grids of ten and more cells, where the sorted
+ * order of the window ids differs from the order on screen.
  */
 class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
 {
@@ -79,6 +86,13 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(NormalizedRects_MirrorTheGrid);
   MITK_TEST(NormalizedRects_FollowLoadedProportions);
   MITK_TEST(NormalizedRects_DescribeTheGridWhileMaximized);
+  MITK_TEST(Maximize_NestedTreeShowsOnlyTheTarget);
+  MITK_TEST(Maximize_HorizontalRootShowsOnlyTheTarget);
+  MITK_TEST(Maximize_NestedTreeIsInvisibleToSerialization);
+  MITK_TEST(SetLayout_FreshGridsPlaceCellsInReadingOrder);
+  MITK_TEST(GridSurgery_KeepsReadingOrderAfterEachStep);
+  MITK_TEST(SetLayout_SameShapeAfterAddGridColumnMovesNothing);
+  MITK_TEST(SetLayout_AfterCustomIdLayoutKeepsDocumentOrder);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -182,6 +196,140 @@ public:
       }
     }
     return QRectF();
+  }
+
+  /** Canonical ids for a list of SetLayout cell indices. */
+  static std::vector<QString> Ids(std::initializer_list<int> indices)
+  {
+    std::vector<QString> ids;
+    for (const int i : indices)
+    {
+      ids.push_back(CellId(i));
+    }
+    return ids;
+  }
+
+  /** Ids joined into one string, so a mismatch prints the whole order. */
+  static std::string Join(const std::vector<QString>& ids)
+  {
+    std::string joined;
+    for (const auto& id : ids)
+    {
+      joined += (joined.empty() ? "" : " ") + id.toStdString();
+    }
+    return joined;
+  }
+
+  /** Window ids in tree order, the order SerializeLayout writes. */
+  std::vector<QString> TreeOrder() const
+  {
+    std::vector<QString> ids;
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      ids.push_back(descriptor.id);
+    }
+    return ids;
+  }
+
+  /** Window ids as the user reads the editor: top to bottom, then left to right. */
+  std::vector<QString> ScreenOrder() const
+  {
+    auto rects = m_Editor->GetNormalizedCellRects();
+    std::stable_sort(rects.begin(), rects.end(), [](const auto& lhs, const auto& rhs)
+    {
+      constexpr double sameRow = 1e-3;
+      if (std::abs(lhs.second.top() - rhs.second.top()) > sameRow)
+      {
+        return lhs.second.top() < rhs.second.top();
+      }
+      return lhs.second.left() < rhs.second.left();
+    });
+
+    std::vector<QString> ids;
+    for (const auto& [id, rect] : rects)
+    {
+      ids.push_back(id);
+    }
+    return ids;
+  }
+
+  /** The grid holds exactly 'expected', in reading order, both in the tree and
+   *  on screen, and the active cell is the first of them. */
+  void AssertReadingOrder(const std::string& step, const std::vector<QString>& expected,
+                          int expectedRows, int expectedColumns) const
+  {
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(step + ": tree order", Join(expected), Join(this->TreeOrder()));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(step + ": on-screen order", Join(expected), Join(this->ScreenOrder()));
+
+    int rows = 0;
+    int columns = 0;
+    CPPUNIT_ASSERT_MESSAGE(step + ": the tree is a grid", m_Editor->ResolveGridShape(rows, columns));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(step + ": rows", expectedRows, rows);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(step + ": columns", expectedColumns, columns);
+
+    const auto active = m_Editor->GetActiveRenderWindowWidget();
+    CPPUNIT_ASSERT_MESSAGE(step + ": a cell is active", nullptr != active);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(step + ": the active cell is the first in reading order",
+                                 expected.front().toStdString(), active->GetWidgetName().toStdString());
+  }
+
+  using CellIdentity = std::map<QString, const QmitkRenderWindowWidget*>;
+
+  CellIdentity Snapshot() const
+  {
+    CellIdentity identity;
+    for (const auto& [id, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      identity[id] = cell.get();
+    }
+    return identity;
+  }
+
+  /** Every cell that existed before 'step' and still exists is the same widget. */
+  void AssertSurvivorsKeepIdentity(const std::string& step, const CellIdentity& before) const
+  {
+    for (const auto& [id, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      const auto previous = before.find(id);
+      if (previous != before.end())
+      {
+        CPPUNIT_ASSERT_MESSAGE(step + ": " + id.toStdString() + " is the same widget",
+                               previous->second == cell.get());
+      }
+    }
+  }
+
+  /** Root vertical; row one holds 'a' and a vertical split of 'b' over 'c';
+   *  row two holds 'd'. */
+  static nlohmann::json NestedDoc()
+  {
+    return nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "vertical",
+        "children": [
+          { "type": "split", "orientation": "horizontal", "children": [
+            { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
+            { "type": "split", "orientation": "vertical", "children": [
+              { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main" } },
+              { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "main" } }
+            ]}
+          ]},
+          { "type": "split", "orientation": "horizontal", "children": [
+            { "type": "window", "id": "mxn__d", "view_direction": "axial", "links": { "selection": "main" } }
+          ]}
+        ]
+      }
+    })json");
+  }
+
+  /** Load 'doc' into a shown editor with a real extent, settled. */
+  void SizedApply(const nlohmann::json& doc) const
+  {
+    m_Editor->resize(1200, 800);
+    m_Editor->show();
+    m_Editor->ApplyLayout(doc);
+    QCoreApplication::processEvents();
   }
 
   // ---------- Normalized cell rects (the layout map's geometry source) -------
@@ -447,6 +595,198 @@ public:
                                  std::size_t(4), m_Editor->ListWindowDescriptors().size());
     CPPUNIT_ASSERT_EQUAL(CellId(2).toStdString(), m_Editor->GetMaximizedCell().toStdString());
     CPPUNIT_ASSERT_EQUAL(1, this->VisibleCellCount());
+  }
+
+  // ---------- Maximize on trees that are not a row/column grid ----------
+
+  void Maximize_NestedTreeShowsOnlyTheTarget()
+  {
+    this->SizedApply(NestedDoc());
+    CPPUNIT_ASSERT_EQUAL(4, this->VisibleCellCount());
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__b"));
+
+    CPPUNIT_ASSERT_MESSAGE("A cell inside a nested split can be maximized",
+                           m_Editor->GetRenderWindowWidgets().at(QStringLiteral("mxn__b"))->isVisible());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Only the maximized cell stays visible", 1, this->VisibleCellCount());
+
+    m_Editor->SetMaximizedCell(QString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Restoring brings every cell back", 4, this->VisibleCellCount());
+  }
+
+  void Maximize_HorizontalRootShowsOnlyTheTarget()
+  {
+    this->SizedApply(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "main" } }
+        ]
+      }
+    })json"));
+    CPPUNIT_ASSERT_EQUAL(3, this->VisibleCellCount());
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__b"));
+
+    CPPUNIT_ASSERT(m_Editor->GetRenderWindowWidgets().at(QStringLiteral("mxn__b"))->isVisible());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Windows directly under the root are hidden as well",
+                                 1, this->VisibleCellCount());
+
+    m_Editor->SetMaximizedCell(QString());
+    CPPUNIT_ASSERT_EQUAL(3, this->VisibleCellCount());
+  }
+
+  void Maximize_NestedTreeIsInvisibleToSerialization()
+  {
+    this->SizedApply(NestedDoc());
+    const auto before = m_Editor->SerializeLayout().dump();
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__b"));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Maximizing a nested cell does not change the document",
+                                 before, m_Editor->SerializeLayout().dump());
+
+    m_Editor->SetMaximizedCell(QStringLiteral("mxn__d"));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Switching the maximized cell does not change the document",
+                                 before, m_Editor->SerializeLayout().dump());
+
+    m_Editor->SetMaximizedCell(QString());
+    QCoreApplication::processEvents();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Restoring returns the proportions the tree had",
+                                 before, m_Editor->SerializeLayout().dump());
+  }
+
+  // ---------- Reading order across SetLayout and the grid ops ----------
+
+  void SetLayout_FreshGridsPlaceCellsInReadingOrder()
+  {
+    for (const auto& [rows, columns] : { std::pair{ 1, 11 }, std::pair{ 3, 4 }, std::pair{ 5, 5 } })
+    {
+      // Back to the single first cell, so every shape is built from fresh cells.
+      this->SizedEditor(1, 1);
+      this->SizedEditor(rows, columns);
+
+      std::vector<QString> expected;
+      for (int i = 0; i < rows * columns; ++i)
+      {
+        expected.push_back(CellId(i));
+      }
+      this->AssertReadingOrder(std::to_string(rows) + "x" + std::to_string(columns),
+                               expected, rows, columns);
+    }
+  }
+
+  void GridSurgery_KeepsReadingOrderAfterEachStep()
+  {
+    this->SizedEditor(3, 4);
+    this->AssertReadingOrder("3x4", Ids({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }), 3, 4);
+    auto identity = this->Snapshot();
+
+    m_Editor->AddGridColumn();
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("AddGridColumn",
+      Ids({ 0, 1, 2, 3, 12, 4, 5, 6, 7, 13, 8, 9, 10, 11, 14 }), 3, 5);
+    this->AssertSurvivorsKeepIdentity("AddGridColumn", identity);
+    identity = this->Snapshot();
+
+    m_Editor->AddGridRow();
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("AddGridRow",
+      Ids({ 0, 1, 2, 3, 12, 4, 5, 6, 7, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19 }), 4, 5);
+    this->AssertSurvivorsKeepIdentity("AddGridRow", identity);
+    identity = this->Snapshot();
+
+    // RemoveGridColumn always drops the rightmost column: first the one the
+    // grid op appended, then one of the original grid.
+    m_Editor->RemoveGridColumn();
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("RemoveGridColumn (appended column)",
+      Ids({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18 }), 4, 4);
+    this->AssertSurvivorsKeepIdentity("RemoveGridColumn (appended column)", identity);
+    identity = this->Snapshot();
+
+    m_Editor->RemoveGridColumn();
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("RemoveGridColumn (original column)",
+      Ids({ 0, 1, 2, 4, 5, 6, 8, 9, 10, 15, 16, 17 }), 4, 3);
+    this->AssertSurvivorsKeepIdentity("RemoveGridColumn (original column)", identity);
+    identity = this->Snapshot();
+
+    m_Editor->RemoveGridRow();
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("RemoveGridRow", Ids({ 0, 1, 2, 4, 5, 6, 8, 9, 10 }), 3, 3);
+    this->AssertSurvivorsKeepIdentity("RemoveGridRow", identity);
+    identity = this->Snapshot();
+
+    // Growing keeps the survivors in reading order and appends the new cells,
+    // which take the lowest free ids.
+    m_Editor->SetLayout(3, 6);
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("SetLayout 3x6",
+      Ids({ 0, 1, 2, 4, 5, 6, 8, 9, 10, 3, 7, 11, 12, 13, 14, 15, 16, 17 }), 3, 6);
+    this->AssertSurvivorsKeepIdentity("SetLayout 3x6", identity);
+    identity = this->Snapshot();
+
+    // Shrinking keeps the head of the reading order.
+    m_Editor->SetLayout(2, 3);
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("SetLayout 2x3", Ids({ 0, 1, 2, 4, 5, 6 }), 2, 3);
+    this->AssertSurvivorsKeepIdentity("SetLayout 2x3", identity);
+  }
+
+  void SetLayout_SameShapeAfterAddGridColumnMovesNothing()
+  {
+    this->SizedEditor(2, 5);
+    m_Editor->AddGridColumn();
+    QCoreApplication::processEvents();
+    const auto expected = Ids({ 0, 1, 2, 3, 4, 10, 5, 6, 7, 8, 9, 11 });
+    this->AssertReadingOrder("AddGridColumn", expected, 2, 6);
+    const auto identity = this->Snapshot();
+
+    m_Editor->SetLayout(2, 6);
+    QCoreApplication::processEvents();
+
+    this->AssertReadingOrder("SetLayout to the same shape", expected, 2, 6);
+    this->AssertSurvivorsKeepIdentity("SetLayout to the same shape", identity);
+  }
+
+  void SetLayout_AfterCustomIdLayoutKeepsDocumentOrder()
+  {
+    this->SizedApply(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "vertical",
+        "children": [
+          { "type": "split", "orientation": "horizontal", "children": [
+            { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main" } },
+            { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" } }
+          ]},
+          { "type": "split", "orientation": "horizontal", "children": [
+            { "type": "window", "id": "mxn__mid",  "view_direction": "axial", "links": { "selection": "main" } },
+            { "type": "window", "id": "mxn__beta", "view_direction": "axial", "links": { "selection": "main" } }
+          ]}
+        ]
+      }
+    })json"));
+    const std::vector<QString> documentOrder = { QStringLiteral("mxn__zeta"), QStringLiteral("mxn__alpha"),
+                                                 QStringLiteral("mxn__mid"), QStringLiteral("mxn__beta") };
+    this->AssertReadingOrder("loaded", documentOrder, 2, 2);
+    const auto identity = this->Snapshot();
+
+    m_Editor->SetLayout(2, 2);
+    QCoreApplication::processEvents();
+    this->AssertReadingOrder("SetLayout to the loaded shape", documentOrder, 2, 2);
+    this->AssertSurvivorsKeepIdentity("SetLayout to the loaded shape", identity);
+
+    m_Editor->SetLayout(2, 3);
+    QCoreApplication::processEvents();
+    auto grown = documentOrder;
+    grown.push_back(CellId(0));
+    grown.push_back(CellId(1));
+    this->AssertReadingOrder("SetLayout grown", grown, 2, 3);
+    this->AssertSurvivorsKeepIdentity("SetLayout grown", identity);
   }
 
   // ---------- Collapsed panes ----------

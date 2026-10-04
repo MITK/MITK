@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkRenderWindowWidget.h>
 
 #include <mitkException.h>
 #include <mitkStandaloneDataStorage.h>
@@ -24,6 +25,7 @@ found in the LICENSE file.
 #include <QColor>
 
 #include <algorithm>
+#include <string>
 
 /**
  * Tests the v3 layout format on QmitkMxNMultiWidget:
@@ -57,6 +59,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone);
   MITK_TEST(EmptyGroup_SurvivesSaveAndLoad);
   MITK_TEST(DeclaredEmptyGroup_KeepsItsCosmeticsToItself);
+  MITK_TEST(Apply_NotifiesSyncLinksOncePerLoad);
+  MITK_TEST(Apply_ActiveCellIsFirstInDocumentOrder);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -450,6 +454,70 @@ public:
       CPPUNIT_ASSERT_EQUAL_MESSAGE("A new group carries no borrowed display name",
                                    id, editor->GetSyncGroupDisplayName(id));
     }
+  }
+
+  /** A grid document of 'rows' x 'columns' windows, all in the 'main' group. */
+  static nlohmann::json GridDoc(int rows, int columns)
+  {
+    auto rowNodes = nlohmann::json::array();
+    for (int r = 0; r < rows; ++r)
+    {
+      auto windows = nlohmann::json::array();
+      for (int c = 0; c < columns; ++c)
+      {
+        windows.push_back({ { "type", "window" },
+                            { "id", "mxn__r" + std::to_string(r) + "c" + std::to_string(c) },
+                            { "view_direction", "axial" },
+                            { "links", { { "selection", "main" } } } });
+      }
+      rowNodes.push_back({ { "type", "split" }, { "orientation", "horizontal" }, { "children", windows } });
+    }
+    return { { "version", "3.0" },
+             { "root", { { "type", "split" }, { "orientation", "vertical" }, { "children", rowNodes } } } };
+  }
+
+  /** How often SyncLinksChanged fires while 'editor' loads 'doc'. */
+  static int SyncNotificationsDuringLoad(QmitkMxNMultiWidget& editor, const nlohmann::json& doc)
+  {
+    int count = 0;
+    const auto connection = QObject::connect(&editor, &QmitkMxNMultiWidget::SyncLinksChanged,
+                                             [&count]() { ++count; });
+    editor.ApplyLayout(doc);
+    QObject::disconnect(connection);
+    return count;
+  }
+
+  void Apply_NotifiesSyncLinksOncePerLoad()
+  {
+    // Every listener repaints every cell per notification, so a per-cell
+    // notification would make a load quadratic in the number of cells.
+    auto editor = MakeEditor();
+    const int single = SyncNotificationsDuringLoad(*editor, GridDoc(1, 1));
+    const int grid = SyncNotificationsDuringLoad(*editor, GridDoc(4, 4));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A 4x4 load notifies as often as a 1x1 load", single, grid);
+  }
+
+  void Apply_ActiveCellIsFirstInDocumentOrder()
+  {
+    const auto doc = nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" } }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+
+    const auto active = editor->GetActiveRenderWindowWidget();
+    CPPUNIT_ASSERT(nullptr != active);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first window of the document is active, not the first id in sort order",
+                                 std::string("mxn__zeta"), active->GetWidgetName().toStdString());
   }
 };
 

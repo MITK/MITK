@@ -809,6 +809,10 @@ public:
   *   creation (used by 'SetLayout(r, c)') uses a private nullary overload that
   *   delegates here with a collision-free `<multiWidgetName>__widget<i>` id.
   *
+  *   The new cell is not placed in the splitter tree, and no 'SyncLinksChanged'
+  *   is emitted for it: a caller placing cells refreshes the furniture once,
+  *   when the cell set is complete ('LayoutChanged' or 'RefreshSyncControls').
+  *
   * \param id  The fully-qualified window id (e.g. "mxn__widget0",
   *            "mxn__alpha"). Must be non-empty, must start with
   *            `<multiWidgetName>__`, and must not collide with an existing
@@ -1065,6 +1069,15 @@ public Q_SLOTS:
   */
   void SaveLayout(std::ostream* outStream);
 
+  /**
+  * \brief Replace the layout with one row per node, each row holding an axial,
+  *        a coronal and a sagittal window that show only that node.
+  *
+  *   Each row gets a selection group of its own. Unlike the cells of
+  *   'SetLayout' and the grid operations, the cells built here carry no
+  *   Windowing or LUT link, so a level/window or LUT change in one of them
+  *   writes the node's properties for every renderer.
+  */
   void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
   /**
@@ -1166,8 +1179,8 @@ private:
   void ValidateIdsForThisEditor(const nlohmann::json& doc) const;
 
   /**
-  * \brief Positional convenience overload used by 'SetLayout(r, c)',
-  *        'InitializeMultiWidget', and 'SetDataBasedLayout'.
+  * \brief Positional convenience overload used by 'SetLayout(r, c)' (and so by
+  *        'InitializeMultiWidget') and by the grid operations.
   *
   *   Picks the smallest non-negative `i` such that
   *   `<multiWidgetName>__widget<i>` is not already used as an id in this
@@ -1189,15 +1202,29 @@ private:
   QSplitter* RootSplitter() const;
 
   /**
+  * \brief Replace the splitter tree with a GetRowCount() x GetColumnCount()
+  *        grid filled row by row from 'readingOrder'.
+  *
+  * \throws mitk::Exception if an id in 'readingOrder' names no cell of this
+  *         editor.
+  */
+  void BuildGridTree(const std::vector<QString>& readingOrder);
+
+  /** \brief The top-left cell of the tree (first in reading order), or nullptr
+  *          without a tree. */
+  QmitkAbstractMultiWidget::RenderWindowWidgetPointer FirstCellInReadingOrder() const;
+
+  /**
   * \brief Configure every layout splitter: relay its 'splitterMoved' to
   *        'LayoutProportionsChanged' and make its children non-collapsible.
   *
-  *        Splitters are created in a dozen places, several of them in the
-  *        shared layout manager, so the tree is walked after a structural
-  *        change instead of wiring each construction site. The connection is
-  *        unique, which makes re-walking idempotent, and the walk is by
-  *        child index rather than findChildren so splitters that belong to a
-  *        render window rather than the layout stay out of it.
+  *        Splitters are created in several places (grid builder, layout
+  *        loader, data-based layout, grid operations), so the tree is walked
+  *        after a structural change instead of wiring each construction
+  *        site. The connection is unique, which makes re-walking idempotent,
+  *        and the walk is by child index rather than findChildren so
+  *        splitters that belong to a render window rather than the layout
+  *        stay out of it.
   *
   *        A collapsed window looks like a missing one and the layout format
   *        cannot express it, so a divider stops at the window's minimum size.

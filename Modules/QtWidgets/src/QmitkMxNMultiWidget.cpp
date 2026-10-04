@@ -800,12 +800,19 @@ void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, 
   }
   else
   {
-    renderWindowWidgets = { GetRenderWindowWidget(widgetName) };
+    auto renderWindowWidget = this->GetRenderWindowWidget(widgetName);
+    if (nullptr == renderWindowWidget)
+    {
+      MITK_ERROR << "Position can not be set for the unknown render window '"
+                 << widgetName.toStdString() << "'.";
+      return;
+    }
+    renderWindowWidgets.insert(renderWindowWidget);
   }
 
   if (renderWindowWidgets.isEmpty())
   {
-    MITK_ERROR << "Position can not be set for an unknown render window widget.";
+    MITK_ERROR << "Position can not be set: the editor has no render windows.";
     return;
   }
 
@@ -969,14 +976,23 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   // to change underneath it, so drop it rather than leave siblings hidden.
   this->SetMaximizedCell(QString());
 
-  int requiredRenderWindowWidgets = this->GetRowCount() * this->GetColumnCount();
-  int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
+  // The grid is rebuilt in the order the user reads the current tree, with new
+  // cells appended. The window ids cannot stand in for that order: grid
+  // operations and loaded documents leave ids that do not sort the way the
+  // cells sit on screen.
+  std::vector<QString> readingOrder;
+  for (const auto& [id, rect] : this->GetNormalizedCellRects())
+  {
+    readingOrder.push_back(id);
+  }
+
+  const int requiredRenderWindowWidgets = this->GetRowCount() * this->GetColumnCount();
+  const int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
 
   int difference = requiredRenderWindowWidgets - existingRenderWindowWidgets;
   while (0 < difference)
   {
-    // more render window widgets needed
-    this->CreateRenderWindowWidget();
+    readingOrder.push_back(this->CreateRenderWindowWidget()->GetWidgetName());
     --difference;
   }
 
@@ -984,20 +1000,20 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   {
     // A shrink trims from the end in reading order, so the cells the user
     // sees first survive.
-    const auto readingOrder = this->GetNormalizedCellRects();
     const auto excess = std::min<std::size_t>(-difference, readingOrder.size());
     for (auto it = readingOrder.end() - excess; it != readingOrder.end(); ++it)
     {
-      const auto cell = this->GetRenderWindowWidget(it->first);
+      const auto cell = this->GetRenderWindowWidget(*it);
       if (nullptr == cell)
       {
-        MITK_WARN << "SetLayout: reading-order cell '" << it->first.toStdString()
+        MITK_WARN << "SetLayout: reading-order cell '" << it->toStdString()
                   << "' no longer resolves - skipping.";
         continue;
       }
       this->DetachAndDestroyCell(cell.get());
       ++difference;
     }
+    readingOrder.resize(readingOrder.size() - excess);
 
     if (0 > difference)
     {
@@ -1010,19 +1026,12 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     }
   }
 
-  auto firstRenderWindowWidget = this->GetFirstRenderWindowWidget();
-  if (nullptr != firstRenderWindowWidget)
+  this->BuildGridTree(readingOrder);
+
+  if (auto firstCell = this->FirstCellInReadingOrder())
   {
-    this->SetActiveRenderWindowWidget(firstRenderWindowWidget);
+    this->SetActiveRenderWindowWidget(firstCell);
   }
-
-  this->GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
-
-  // The shared default-layout routine switches the built-in render-window menu
-  // back on for every cell, and it is what covers this editor's utility strip.
-  // Undo it here, after the layout pass rather than at cell creation, because
-  // each rebuild re-arms it.
-  this->ActivateMenuWidget(false);
 
   // Layout-tracking furniture (layout editor, sync plates) follows this signal;
   // without it a shrink leaves them rendering removed cells.
@@ -1220,17 +1229,15 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
       links.groups[DimensionIndex(dimension)] = SYNCHRONIZE_MACRO_GROUP;
     }
   }
-  this->RefreshSyncControls();
 
   return renderWindowWidget;
 }
 
 namespace
 {
-  // Even distribution for a freshly built splitter whose children are all new
-  // (the new bottom row's cells). The stretch value mirrors
-  // QmitkMultiWidgetLayoutManager::SetDefaultLayout, so a grid op and a fresh
-  // SetLayout size cells identically.
+  // Even distribution for a freshly built splitter: every splitter of a
+  // SetLayout grid and the new bottom row of AddGridRow, so a grid op and a
+  // fresh SetLayout size cells identically.
   void DistributeSplitterEvenly(QSplitter* splitter)
   {
     QList<int> sizes;
@@ -1259,6 +1266,43 @@ namespace
   }
 }
 
+void QmitkMxNMultiWidget::BuildGridTree(const std::vector<QString>& readingOrder)
+{
+  this->GetMultiWidgetLayoutManager()->ClearLayout();
+
+  auto* hBoxLayout = new QHBoxLayout(this);
+  hBoxLayout->setContentsMargins({});
+  auto* rootSplitter = new QSplitter(Qt::Vertical);
+  hBoxLayout->addWidget(rootSplitter);
+
+  const int rows = this->GetRowCount();
+  const int columns = this->GetColumnCount();
+  auto next = readingOrder.begin();
+  for (int row = 0; row < rows && next != readingOrder.end(); ++row)
+  {
+    auto* rowSplitter = new QSplitter(Qt::Horizontal);
+    for (int column = 0; column < columns && next != readingOrder.end(); ++column, ++next)
+    {
+      const auto cell = this->GetRenderWindowWidget(*next);
+      if (nullptr == cell)
+      {
+        mitkThrow() << "BuildGridTree: no render window '" << next->toStdString() << "' in this editor.";
+      }
+      rowSplitter->addWidget(cell.get());
+      cell->show();
+    }
+    DistributeSplitterEvenly(rowSplitter);
+    rootSplitter->addWidget(rowSplitter);
+  }
+  DistributeSplitterEvenly(rootSplitter);
+}
+
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::FirstCellInReadingOrder() const
+{
+  const auto rects = this->GetNormalizedCellRects();
+  return rects.empty() ? nullptr : this->GetRenderWindowWidget(rects.front().first);
+}
+
 void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
 {
   auto* root = this->RootSplitter();
@@ -1269,65 +1313,62 @@ void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
     return;
   }
 
+  // Leave any current maximize first, so switching cells never stacks two.
+  // Every tree rebuild resets the maximize first, so the captured splitters
+  // are alive here; the guarded pointers only keep a broken invariant from
+  // turning into a use-after-free.
+  auto restoreGrid = [this]()
+  {
+    for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
+    {
+      if (nullptr == splitter)
+      {
+        continue;
+      }
+      for (int i = 0; i < splitter->count(); ++i)
+      {
+        splitter->widget(i)->show();
+      }
+      splitter->setSizes(sizes);
+    }
+    m_PreMaximizeSizes.clear();
+  };
+  restoreGrid();
+
   const auto cells = this->GetRenderWindowWidgets();
   const auto target = cells.find(windowId);
   QmitkRenderWindowWidget* maximized = windowId.isEmpty() || target == cells.end()
     ? nullptr
     : target->second.get();
 
-  // Hiding a child zeroes its splitter size, which would otherwise both lose the
-  // user's divider positions and put an unloadable size 0 into a saved layout.
-  if (nullptr != maximized && m_PreMaximizeSizes.empty())
+  // Only the siblings along the target's ancestor chain are hidden, so only
+  // the splitters on that chain change their sizes; a hidden sibling subtree
+  // keeps its inner proportions. Hiding a child zeroes its splitter size,
+  // which would otherwise both lose the user's divider positions and put an
+  // unloadable size 0 into a saved layout, so each chain splitter's sizes are
+  // captured first.
+  for (QWidget* onPath = maximized; nullptr != onPath && onPath != root;)
   {
-    m_PreMaximizeSizes.emplace_back(root, root->sizes());
-    for (int row = 0; row < root->count(); ++row)
+    auto* splitter = qobject_cast<QSplitter*>(onPath->parentWidget());
+    if (nullptr == splitter)
     {
-      if (auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(row)))
+      MITK_WARN << "SetMaximizedCell: window '" << windowId.toStdString()
+                << "' is not part of the layout tree; restoring the grid.";
+      restoreGrid();
+      maximized = nullptr;
+      break;
+    }
+
+    m_PreMaximizeSizes.emplace_back(splitter, splitter->sizes());
+    for (int i = 0; i < splitter->count(); ++i)
+    {
+      auto* child = splitter->widget(i);
+      if (child != onPath)
       {
-        m_PreMaximizeSizes.emplace_back(rowSplit, rowSplit->sizes());
+        child->hide();
       }
     }
-  }
-
-  for (int row = 0; row < root->count(); ++row)
-  {
-    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(row));
-    if (nullptr == rowSplit)
-    {
-      continue;
-    }
-
-    bool rowHoldsTarget = false;
-    for (int column = 0; column < rowSplit->count(); ++column)
-    {
-      auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(rowSplit->widget(column));
-      if (nullptr == cell)
-      {
-        continue;
-      }
-
-      const bool isTarget = cell == maximized;
-      rowHoldsTarget = rowHoldsTarget || isTarget;
-      cell->setVisible(nullptr == maximized || isTarget);
-    }
-
-    // A row with nothing visible in it would still claim splitter space.
-    rowSplit->setVisible(nullptr == maximized || rowHoldsTarget);
-  }
-
-  if (nullptr == maximized && !m_PreMaximizeSizes.empty())
-  {
-    // Every tree rebuild resets the maximize first, so the captured splitters
-    // are alive here; the guarded pointers only keep a broken invariant from
-    // turning into a use-after-free.
-    for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
-    {
-      if (nullptr != splitter)
-      {
-        splitter->setSizes(sizes);
-      }
-    }
-    m_PreMaximizeSizes.clear();
+    onPath = splitter;
   }
 
   const QString resolved = nullptr != maximized ? windowId : QString();
@@ -1595,8 +1636,8 @@ void QmitkMxNMultiWidget::AddGridColumn()
   auto* root = this->RootSplitter();
   // The tree is transiently non-rectangular during this loop (already-grown rows
   // have columns+1 cells, later rows still columns). Nothing reads
-  // ResolveGridShape mid-loop; the SyncLinksChanged fan-out that
-  // CreateRenderWindowWidget emits per cell only reads the cell registry.
+  // ResolveGridShape mid-loop; the furniture refreshes once, on the
+  // LayoutChanged that FinalizeGridSurgery emits.
   for (int r = 0; r < rows; ++r)
   {
     auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
@@ -2723,7 +2764,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 
     // Point at the first cell so downstream code that dereferences
     // GetActive... has a sane target after a fresh load.
-    auto firstCell = this->GetFirstRenderWindowWidget();
+    auto firstCell = this->FirstCellInReadingOrder();
     if (nullptr != firstCell)
     {
       this->SetActiveRenderWindowWidget(firstCell);
@@ -2827,7 +2868,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   // Deterministic active-cell assignment after rebuild. ResetGridState()
   // nulled out the previous active pointer; without this the editor would
   // be left with a null active cell until the user clicks one.
-  if (auto firstCell = this->GetFirstRenderWindowWidget())
+  if (auto firstCell = this->FirstCellInReadingOrder())
   {
     this->SetActiveRenderWindowWidget(firstCell);
   }
@@ -4651,9 +4692,9 @@ void QmitkMxNMultiWidget::RefreshFrameColors()
     const QColor border = (CellGroupIdentityKind::Mono == identity.kind) ? identity.hue : QColor(0x60, 0x60, 0x60);
 
     // Writing the sheet repolishes the whole cell subtree, which costs
-    // milliseconds; building a layout refreshes every cell once per cell it
-    // creates, so almost every write here would re-set a border to the colour
-    // it already has.
+    // milliseconds; every refresh walks all cells while a change usually
+    // touches few of them, so almost every write here would re-set a border to
+    // the colour it already has.
     QColor& lastBorder = m_CellBorderColors[windowId];
     if (lastBorder != border)
     {

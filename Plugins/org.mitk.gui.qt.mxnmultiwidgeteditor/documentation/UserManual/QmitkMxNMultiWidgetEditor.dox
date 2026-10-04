@@ -39,9 +39,10 @@
 			place, which leaves the existing window views and their settings untouched.
 		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
 			widget layout"), or for an arrangement derived from the loaded data ("Data-based
-			layout"). A new grid size re-flows the window views into a plain grid: window views
-			beyond the new size are removed, additional ones are added with a sagittal view
-			direction, and the others keep their settings, synchronization and selected data.
+			layout"). A new grid size re-flows the window views, in reading order, into a plain
+			grid: window views beyond the new size are removed, additional ones are added at the
+			end with a sagittal view direction, and the others keep their settings,
+			synchronization and selected data.
 			A data-based layout replaces all window views and synchronization groups, so the
 			view asks for confirmation first unless the layout is still the trivial default.
 	</ul>
@@ -91,7 +92,8 @@
 		<li> <b>Windowing and LUT are per window.</b> New windows share level/window and colormap
 			through the default group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group). A window
 			taken out of it keeps its own values; its
-			controls then act on that window alone.
+			controls then act on that window alone. The windows of a data-based layout are the
+			exception: they start without windowing and LUT synchronization.
 	</ul>
 
 	Slice and orientation links also decide which windows share a reference geometry: every
@@ -386,7 +388,7 @@
 			Drag the bar's body to shift the level and its ends to move the window bounds.
 	</ul>
 	For a window in a windowing or LUT group - which every new window is, through the default
-	group - these controls drive every group member (each keeping its relative
+	group, except the windows of a data-based layout - these controls drive every group member (each keeping its relative
 	difference during drags) and leave other windows and the node-global values untouched;
 	the global level/window slider intentionally does not affect grouped windows. Only a
 	window taken out of windowing or LUT synchronization altogether behaves like the classic

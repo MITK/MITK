@@ -60,6 +60,7 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Set_IsIdempotentOnSameGroup);
   MITK_TEST(NextFreeSyncGroupIndex_PicksLowestUnused);
   MITK_TEST(OnCreateNewSyncGroupRequested_AssignsNextFree);
+  MITK_TEST(SetSelectedPosition_UnknownWindowIsIgnored);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -369,6 +370,18 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Should pick gap index 2, not 4",
                                  2, nodeWidget.GetSyncGroup());
     CPPUNIT_ASSERT(nullptr != ConnectorOf(widget, 2));
+  }
+
+  void SetSelectedPosition_UnknownWindowIsIgnored()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    mitk::Point3D position;
+    position.Fill(0.0);
+    CPPUNIT_ASSERT_NO_THROW(widget.SetSelectedPosition(position, QStringLiteral("mxn__nosuchwindow")));
+    CPPUNIT_ASSERT_EQUAL(1u, widget.GetNumberOfRenderWindowWidgets());
   }
 };
 

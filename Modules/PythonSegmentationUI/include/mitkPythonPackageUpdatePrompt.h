@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkPythonSegmentationUIExports.h>
 
+#include <mitkPipPackageInfo.h>
 #include <mitkPythonPackageVersion.h>
 
 #include <string>
@@ -23,6 +24,8 @@ class QWidget;
 
 namespace mitk
 {
+  class PythonContext;
+
   namespace PythonPackage
   {
     /** \brief The user's response to the version-update prompt. */
@@ -60,6 +63,35 @@ namespace mitk
      * \return The user's choice. BelowMinimum never yields ContinueInstalled.
      */
     MITKPYTHONSEGMENTATIONUI_EXPORT UpdatePromptChoice ShowUpdatePrompt(QWidget* parent, const std::string& packageName, const VersionRange& supportedVersions, const VersionCheckResult& result, bool modulesLoaded, bool inInitFlow);
+
+    /** \brief The outcome of CheckVersionAndOfferUpdate(). */
+    enum class VersionCheckOutcome
+    {
+      KeptInstalled, /**< \brief The installed version is supported, or the user keeps it. */
+      Updated,       /**< \brief The package was updated in place. A Python context has to be recreated to see it. */
+      Aborted        /**< \brief The installed version is not supported and was not updated, or the user cancelled. */
+    };
+
+    /** \brief Checks the installed version of a package during initialization
+     *         and offers an in-place update if it is outdated.
+     *
+     * The installed version is compared against \p supportedVersions on every
+     * call, so a package that predates this build is caught. Whether a newer
+     * release exists is asked online at most once per application run and
+     * distribution, so a user without network waits for the timeout only once.
+     *
+     * An update runs through QmitkPipInstallDialog in update mode. It is not
+     * offered while modules of the virtual environment are loaded, as pip
+     * cannot replace mapped files on Windows; the prompt asks to restart then.
+     *
+     * \param[in] parent Parent of the dialogs.
+     * \param[in] context An activated Python context of the virtual environment.
+     * \param[in] packageName The name of the package as the user knows it, e.g. "VoxTell".
+     * \param[in] distributionName The pip distribution to look up, e.g. "voxtell".
+     * \param[in] supportedVersions The versions this build supports.
+     * \param[in] upgradeSpec What to install for the update. Names the virtual environment.
+     */
+    MITKPYTHONSEGMENTATIONUI_EXPORT VersionCheckOutcome CheckVersionAndOfferUpdate(QWidget* parent, PythonContext& context, const std::string& packageName, const std::string& distributionName, const VersionRange& supportedVersions, const PipInstallSpec& upgradeSpec);
   }
 }
 

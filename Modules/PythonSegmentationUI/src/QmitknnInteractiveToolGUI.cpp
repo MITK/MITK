@@ -60,15 +60,12 @@ namespace
 {
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
 
-  // Once-per-application-run guards for the network-backed checks in Install():
-  // the online "newer release available" version check and the model-switch
-  // prompt. Set after the first attempt, successful or not, so a permanently
-  // offline machine pays the failed network attempts only once per run; a
-  // temporarily offline user gets the checks again on the next application
-  // start. Process-static on purpose: the tool GUI is recreated on every tool
-  // activation, the answers do not change within one run, and once venv modules
-  // are loaded an in-place update is blocked until restart anyway.
-  bool onlineUpdateCheckDone = false;
+  // Once-per-application-run guard for the network-backed model-switch prompt
+  // in Install(). Set after the first attempt, successful or not, so a
+  // permanently offline machine pays the failed network attempt only once per
+  // run; a temporarily offline user gets the check again on the next
+  // application start. Process-static on purpose: the tool GUI is recreated on
+  // every tool activation and the answer does not change within one run.
   bool modelSwitchCheckDone = false;
 
   // Qt::Key_A..Qt::Key_Z are 0x41..0x5a and coincide with the ASCII codes
@@ -428,25 +425,18 @@ bool QmitknnInteractiveToolGUI::Install()
       const std::string distributionName = localAvailable ? "nnInteractive" : "nninteractive-client";
 
       // A reused virtual environment can hold an nnInteractive that predates this
-      // MITK build (the venv survives MITK upgrades). The offline minimum check
-      // runs on every initialize; the online "newer release available" check runs
-      // at most once per application run so an offline user never waits on the
-      // PyPI timeout repeatedly.
-      const bool checkForUpdate = !onlineUpdateCheckDone;
-      const auto versionCheck = mitk::nnInteractive::CheckInstalledVersion(
-        *this->GetTool()->GetPythonContext(), checkForUpdate, distributionName);
+      // MITK build (the venv survives MITK upgrades).
+      const auto outcome = mitk::PythonPackage::CheckVersionAndOfferUpdate(this, *this->GetTool()->GetPythonContext(),
+        "nnInteractive", distributionName, mitk::nnInteractive::SupportedVersions(), mitk::nnInteractive::BuildUpgradeSpec(venvName, !localAvailable));
 
-      // Attempt-based: the PyPI query blocks the GUI for up to its 5 s timeout,
-      // so even a failed (offline) attempt counts and is not repeated this run.
-      if (checkForUpdate)
-        onlineUpdateCheckDone = true;
+      if (outcome == mitk::PythonPackage::VersionCheckOutcome::Aborted)
+        return false;
 
-      if (versionCheck.Status == mitk::PythonPackage::VersionStatus::BelowMinimum ||
-          versionCheck.Status == mitk::PythonPackage::VersionStatus::UpdateAvailable)
-      {
-        if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable))
-          return false;
-      }
+      // After an update the interpreter sees the upgraded packages only in a
+      // fresh context. Safe, as an update is only offered while no nnInteractive
+      // modules are loaded.
+      if (outcome == mitk::PythonPackage::VersionCheckOutcome::Updated && !this->GetTool()->CreatePythonContext())
+        return false;
 
       // Offer to adopt a newer recommended model checkpoint (full + local only).
       this->MaybePromptModelSwitch(localAvailable);
@@ -507,37 +497,6 @@ bool QmitknnInteractiveToolGUI::Install()
   // PythonContext checks Py_IsInitialized internally, so calling this a second
   // time after the early-return path above is safe.
   return this->GetTool()->CreatePythonContext();
-}
-
-bool QmitknnInteractiveToolGUI::RunUpdate(bool clientOnly)
-{
-  const auto venvName = this->GetTool()->GetVirtualEnvName();
-  auto spec = mitk::nnInteractive::BuildUpgradeSpec(venvName, clientOnly);
-
-  QmitkPipInstallDialog dialog(spec, this, QmitkPipInstallDialog::Mode::Update);
-
-  if (dialog.exec() != QDialog::Accepted)
-    return false;
-
-  // Recreate the context so the interpreter sees the upgraded packages. Safe
-  // because an in-place update is only reached when no nnInteractive modules are
-  // loaded (see OfferInPlaceUpdate).
-  return this->GetTool()->CreatePythonContext();
-}
-
-bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::PythonPackage::VersionCheckResult& versionCheck, bool clientOnly)
-{
-  const auto venvName = this->GetTool()->GetVirtualEnvName();
-  const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(venvName);
-
-  const auto choice = mitk::PythonPackage::ShowUpdatePrompt(nullptr, "nnInteractive", mitk::nnInteractive::SupportedVersions(), versionCheck, modulesLoaded, true);
-
-  if (choice == mitk::PythonPackage::UpdatePromptChoice::Update)
-    return this->RunUpdate(clientOnly);
-
-  // ContinueInstalled keeps initialization going with the working version; Cancel
-  // (and a below-minimum prompt the user dismissed) aborts it.
-  return choice == mitk::PythonPackage::UpdatePromptChoice::ContinueInstalled;
 }
 
 void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)

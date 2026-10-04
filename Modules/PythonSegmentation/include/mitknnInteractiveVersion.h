@@ -21,8 +21,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PythonContext;
-
   namespace nnInteractive
   {
     /** \brief Minimum nnInteractive version this MITK build supports.
@@ -45,10 +43,13 @@ namespace mitk
     }
 
     /** \brief Compares the installed nnInteractive package against the
-     *         supported version range, using the given Python context.
+     *         supported version range.
      *
-     * \param[in] context An activated Python context bound to the nnInteractive
-     *                    virtual environment.
+     * Creates and activates a transient Python context for the nnInteractive
+     * virtual environment. If the context cannot be created (e.g. the virtual
+     * environment is missing or the interpreter fails to initialize), the
+     * result Status is Unknown.
+     *
      * \param[in] checkForUpdate Whether to query PyPI for a newer release.
      * \param[in] distributionName The installed pip distribution to query. The full
      *                    install registers the distribution "nnInteractive"; a
@@ -63,24 +64,6 @@ namespace mitk
      *         block or nag).
      *
      * \sa PythonPackage::CheckInstalledVersion()
-     */
-    MITKPYTHONSEGMENTATION_EXPORT PythonPackage::VersionCheckResult CheckInstalledVersion(PythonContext& context, bool checkForUpdate = true, const std::string& distributionName = "nnInteractive");
-
-    /** \brief Convenience overload for callers without a Python context.
-     *
-     * Creates and activates a transient Python context for the nnInteractive
-     * virtual environment, then forwards to the context-taking overload. If the
-     * context cannot be created (e.g. the virtual environment is missing or the
-     * interpreter fails to initialize), the result Status is Unknown.
-     *
-     * \param[in] checkForUpdate Whether to query PyPI for a newer release.
-     * \param[in] distributionName The installed pip distribution to query
-     *                    ("nnInteractive" for a full install, "nninteractive-client"
-     *                    for a client-only install).
-     *
-     * \return A PythonPackage::VersionCheckResult (see the context-taking overload).
-     *
-     * \sa CheckInstalledVersion(PythonContext&, bool, const std::string&)
      */
     MITKPYTHONSEGMENTATION_EXPORT PythonPackage::VersionCheckResult CheckInstalledVersion(bool checkForUpdate = true, const std::string& distributionName = "nnInteractive");
   }

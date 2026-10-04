@@ -55,14 +55,6 @@ namespace
   // Also offered on the preference page, so that the message can be turned on again.
   constexpr auto SHOW_PROMPTS_WITHOUT_RESULT = "VoxTell/showPromptsWithoutResult";
 
-  // Once-per-application-run guard for the online "newer release available"
-  // check. Set after the first attempt, successful or not, so a permanently
-  // offline machine pays the failed network attempt only once per run.
-  // Process-static on purpose: the tool GUI is recreated on every tool
-  // activation, and once venv modules are loaded an in-place update is blocked
-  // until restart anyway.
-  bool onlineUpdateCheckDone = false;
-
   // True for the preferences baked into a loaded model (the single source of
   // truth lives in VoxTellTool). Changing any of them makes the model stale.
   bool IsSessionDefiningPreference(const std::string& key)
@@ -332,24 +324,17 @@ bool QmitkVoxTellToolGUI::Install()
     if (isInstalled)
     {
       // A reused virtual environment can hold a VoxTell that predates this MITK
-      // build (the venv survives MITK upgrades). The offline minimum check runs
-      // on every initialize; the online check for a newer release at most once
-      // per application run, so an offline user does not wait for the timeout of
-      // the network request again and again.
-      const bool checkForUpdate = !onlineUpdateCheckDone;
-      const auto versionCheck = mitk::PythonPackage::CheckInstalledVersion(
-        *tool->GetPythonContext(), mitk::VoxTell::DISTRIBUTION_NAME, mitk::VoxTell::SupportedVersions(), checkForUpdate);
+      // build (the venv survives MITK upgrades).
+      const auto outcome = mitk::PythonPackage::CheckVersionAndOfferUpdate(this->window(), *tool->GetPythonContext(),
+        "VoxTell", mitk::VoxTell::DISTRIBUTION_NAME, mitk::VoxTell::SupportedVersions(), mitk::VoxTell::BuildUpgradeSpec(venvName));
 
-      if (checkForUpdate)
-        onlineUpdateCheckDone = true;
+      if (self.isNull() || outcome == mitk::PythonPackage::VersionCheckOutcome::Aborted)
+        return false;
 
-      if (versionCheck.Status == mitk::PythonPackage::VersionStatus::BelowMinimum ||
-          versionCheck.Status == mitk::PythonPackage::VersionStatus::UpdateAvailable)
-      {
-        return this->OfferInPlaceUpdate(versionCheck);
-      }
-
-      return true;
+      // After an update the interpreter sees the upgraded packages only in a
+      // fresh context. Safe, as an update is only offered while no VoxTell
+      // modules are loaded.
+      return outcome == mitk::PythonPackage::VersionCheckOutcome::KeptInstalled || tool->CreatePythonContext();
     }
   }
 
@@ -377,47 +362,6 @@ bool QmitkVoxTellToolGUI::Install()
 
   // The dialog populated the venv (and possibly created it). Create a fresh
   // context so the embedded interpreter picks up the newly installed packages.
-  return tool->CreatePythonContext();
-}
-
-bool QmitkVoxTellToolGUI::OfferInPlaceUpdate(const mitk::PythonPackage::VersionCheckResult& versionCheck)
-{
-  const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(this->GetTool()->GetVirtualEnvName());
-
-  QPointer<QmitkVoxTellToolGUI> self(this);
-  const auto choice = mitk::PythonPackage::ShowUpdatePrompt(
-    this->window(), "VoxTell", mitk::VoxTell::SupportedVersions(), versionCheck, modulesLoaded, true);
-
-  if (self.isNull())
-    return false;
-
-  switch (choice)
-  {
-    case mitk::PythonPackage::UpdatePromptChoice::Update:
-      return this->RunUpdate();
-
-    case mitk::PythonPackage::UpdatePromptChoice::ContinueInstalled:
-      return true;
-
-    case mitk::PythonPackage::UpdatePromptChoice::Cancel:
-      break;
-  }
-
-  return false;
-}
-
-bool QmitkVoxTellToolGUI::RunUpdate()
-{
-  auto* tool = this->GetTool();
-
-  QmitkPipInstallDialog dialog(mitk::VoxTell::BuildUpgradeSpec(tool->GetVirtualEnvName()), this->window(), QmitkPipInstallDialog::Mode::Update);
-
-  if (dialog.exec() != QDialog::Accepted)
-    return false;
-
-  // Recreate the context so the interpreter sees the upgraded packages. Safe
-  // because an in-place update is only reached when no VoxTell modules are
-  // loaded (see OfferInPlaceUpdate).
   return tool->CreatePythonContext();
 }
 

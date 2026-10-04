@@ -83,16 +83,6 @@ private:
    */
   bool Install();
 
-  /** \brief Offers an in-place update of the installed package.
-   *
-   * \return \c true if initialization should proceed (updated successfully, or
-   *         the user chose to continue with the installed version), \c false to abort.
-   */
-  bool OfferInPlaceUpdate(const mitk::PythonPackage::VersionCheckResult& versionCheck);
-
-  /** \brief Runs the pip upgrade dialog and recreates the Python context. */
-  bool RunUpdate();
-
   /** \brief Downloads the files the model needs, then loads the model.
    *
    * The download shows a progress notification. Loading blocks the

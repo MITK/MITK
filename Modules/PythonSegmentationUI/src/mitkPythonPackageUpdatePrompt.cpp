@@ -12,10 +12,16 @@ found in the LICENSE file.
 
 #include <mitkPythonPackageUpdatePrompt.h>
 
+#include <mitkPythonHelper.h>
+
+#include <QmitkPipInstallDialog.h>
+
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QString>
+
+#include <set>
 
 namespace
 {
@@ -136,4 +142,42 @@ mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QW
   return messageBox.clickedButton() == updateButton
     ? UpdatePromptChoice::Update
     : UpdatePromptChoice::Cancel;
+}
+
+mitk::PythonPackage::VersionCheckOutcome mitk::PythonPackage::CheckVersionAndOfferUpdate(QWidget* parent, PythonContext& context, const std::string& packageName, const std::string& distributionName, const VersionRange& supportedVersions, const PipInstallSpec& upgradeSpec)
+{
+  // The distributions that were looked up online in this run, whether the
+  // lookup succeeded or not. Process-wide on purpose: the tool GUIs that call
+  // this are created anew with every activation of their tool, and once the
+  // modules of a virtual environment are loaded, an in-place update is blocked
+  // until the application restarts anyway.
+  static std::set<std::string> onlineChecksDone;
+
+  const bool checkForUpdate = onlineChecksDone.insert(distributionName).second;
+  const auto versionCheck = CheckInstalledVersion(context, distributionName, supportedVersions, checkForUpdate);
+
+  if (versionCheck.Status != VersionStatus::BelowMinimum && versionCheck.Status != VersionStatus::UpdateAvailable)
+    return VersionCheckOutcome::KeptInstalled;
+
+  const bool modulesLoaded = PythonHelper::IsAnyVirtualEnvModuleLoaded(upgradeSpec.venvName);
+
+  switch (ShowUpdatePrompt(parent, packageName, supportedVersions, versionCheck, modulesLoaded, true))
+  {
+    case UpdatePromptChoice::Update:
+    {
+      QmitkPipInstallDialog dialog(upgradeSpec, parent, QmitkPipInstallDialog::Mode::Update);
+
+      return dialog.exec() == QDialog::Accepted
+        ? VersionCheckOutcome::Updated
+        : VersionCheckOutcome::Aborted;
+    }
+
+    case UpdatePromptChoice::ContinueInstalled:
+      return VersionCheckOutcome::KeptInstalled;
+
+    case UpdatePromptChoice::Cancel:
+      break;
+  }
+
+  return VersionCheckOutcome::Aborted;
 }

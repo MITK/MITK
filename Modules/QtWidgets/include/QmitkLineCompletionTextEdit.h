@@ -44,6 +44,13 @@ public:
   void SetCompletions(const QStringList& completions);
 
 protected:
+  /** \brief Keeps Tab for the suggestions while they are shown.
+   *
+   * QWidget::event() moves the focus on Tab before keyPressEvent() gets to see
+   * the key, so a Tab that is meant for the list has to be caught here.
+   */
+  bool event(QEvent* event) override;
+
   void keyPressEvent(QKeyEvent* event) override;
 
 private:

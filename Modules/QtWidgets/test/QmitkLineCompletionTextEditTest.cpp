@@ -21,6 +21,9 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QCompleter>
 #include <QKeyEvent>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #include <memory>
 
@@ -31,6 +34,7 @@ class QmitkLineCompletionTextEditTestSuite : public mitk::TestFixture
   MITK_TEST(TestSuggestionsIgnoreCase);
   MITK_TEST(TestNoSuggestionsForShortOrUnknownLines);
   MITK_TEST(TestChoosingSuggestionReplacesOnlyCurrentLine);
+  MITK_TEST(TestTabChoosesSuggestionAndKeepsFocus);
   MITK_TEST(TestMovingAwayFromLineEndHidesSuggestions);
   MITK_TEST(TestEscapeHidesSuggestions);
   CPPUNIT_TEST_SUITE_END();
@@ -40,14 +44,25 @@ public:
   {
     EnsureQApplication();
 
-    m_Edit = std::make_unique<QmitkLineCompletionTextEdit>();
+    // A second widget that Tab can move the focus to. A text control, since
+    // whether buttons take the focus by Tab depends on the platform.
+    m_Window = std::make_unique<QWidget>();
+    auto* layout = new QVBoxLayout(m_Window.get());
+
+    m_Edit = new QmitkLineCompletionTextEdit(m_Window.get());
     m_Edit->SetCompletions({ "left kidney", "liver", "right kidney", "caudate lobe of liver" });
-    m_Edit->show();
+    layout->addWidget(m_Edit);
+
+    m_OtherEdit = new QLineEdit(m_Window.get());
+    layout->addWidget(m_OtherEdit);
+
+    m_Window->show();
+    m_Edit->setFocus();
   }
 
   void tearDown() override
   {
-    m_Edit.reset();
+    m_Window.reset();
   }
 
   void TestSuggestionsStartingWithLineComeFirst()
@@ -80,7 +95,7 @@ public:
   {
     this->Type("liver");
     this->Press(this->Popup(), Qt::Key_Escape);
-    this->Press(m_Edit.get(), Qt::Key_Return);
+    this->Press(m_Edit, Qt::Key_Return);
     this->Type("cau");
 
     CPPUNIT_ASSERT_MESSAGE("A matching line should show suggestions", this->Popup()->isVisible());
@@ -92,12 +107,30 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Choosing a suggestion should close the list", !this->Popup()->isVisible());
   }
 
+  void TestTabChoosesSuggestionAndKeepsFocus()
+  {
+    this->Type("cau");
+    CPPUNIT_ASSERT(this->Popup()->isVisible());
+
+    this->Press(this->Popup(), Qt::Key_Tab);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("caudate lobe of liver"), m_Edit->toPlainText().toStdString());
+    CPPUNIT_ASSERT_MESSAGE("Choosing a suggestion should close the list", !this->Popup()->isVisible());
+    CPPUNIT_ASSERT_MESSAGE("Tab should not move the focus while it chooses a suggestion",
+                           m_Window->focusWidget() == m_Edit);
+
+    this->Press(m_Edit, Qt::Key_Tab);
+
+    CPPUNIT_ASSERT_MESSAGE("Tab should move the focus while no suggestions are shown",
+                           m_Window->focusWidget() == m_OtherEdit);
+  }
+
   void TestMovingAwayFromLineEndHidesSuggestions()
   {
     this->Type("liv");
     CPPUNIT_ASSERT(this->Popup()->isVisible());
 
-    this->Press(m_Edit.get(), Qt::Key_Left);
+    this->Press(m_Edit, Qt::Key_Left);
     CPPUNIT_ASSERT_MESSAGE("Suggestions should only be shown at the end of a line", !this->Popup()->isVisible());
   }
 
@@ -116,7 +149,7 @@ private:
     for (const auto character : text)
     {
       QKeyEvent press(QEvent::KeyPress, character.toUpper().unicode(), Qt::NoModifier, QString(character));
-      QApplication::sendEvent(m_Edit.get(), &press);
+      QApplication::sendEvent(m_Edit, &press);
     }
   }
 
@@ -146,7 +179,9 @@ private:
     return suggestions;
   }
 
-  std::unique_ptr<QmitkLineCompletionTextEdit> m_Edit;
+  std::unique_ptr<QWidget> m_Window;
+  QmitkLineCompletionTextEdit* m_Edit = nullptr;
+  QLineEdit* m_OtherEdit = nullptr;
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkLineCompletionTextEdit)

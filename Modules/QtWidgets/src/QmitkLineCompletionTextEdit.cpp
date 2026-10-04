@@ -56,6 +56,24 @@ void QmitkLineCompletionTextEdit::SetCompletions(const QStringList& completions)
   m_Completer->popup()->hide();
 }
 
+bool QmitkLineCompletionTextEdit::event(QEvent* event)
+{
+  if (event->type() == QEvent::KeyPress && m_Completer->popup()->isVisible())
+  {
+    // The completer sends the key to this edit first and chooses the current
+    // suggestion only if the edit leaves the key alone.
+    const auto key = static_cast<const QKeyEvent*>(event)->key();
+
+    if (key == Qt::Key_Tab || key == Qt::Key_Backtab)
+    {
+      event->ignore();
+      return false;
+    }
+  }
+
+  return QPlainTextEdit::event(event);
+}
+
 void QmitkLineCompletionTextEdit::keyPressEvent(QKeyEvent* event)
 {
   auto* popup = m_Completer->popup();
@@ -69,8 +87,6 @@ void QmitkLineCompletionTextEdit::keyPressEvent(QKeyEvent* event)
       case Qt::Key_Enter:
       case Qt::Key_Return:
       case Qt::Key_Escape:
-      case Qt::Key_Tab:
-      case Qt::Key_Backtab:
         event->ignore();
         return;
 

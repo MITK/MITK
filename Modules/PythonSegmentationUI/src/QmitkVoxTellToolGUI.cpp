@@ -55,6 +55,8 @@ namespace
   // Also offered on the preference page, so that the message can be turned on again.
   constexpr auto SHOW_PROMPTS_WITHOUT_RESULT = "VoxTell/showPromptsWithoutResult";
 
+  constexpr auto AUTO_CONFIRM = "VoxTell/autoConfirm";
+
   // The dialogs of this GUI are parented to the window rather than the GUI:
   // their event loop can delete the GUI, which then must not take a dialog
   // that lives on the stack with it.
@@ -218,6 +220,13 @@ void QmitkVoxTellToolGUI::InitializeUI(QBoxLayout* mainLayout)
     mitk::MessageDelegate1<QmitkVoxTellToolGUI, const mitk::IPreferences::ChangeEvent&>(
       this, &QmitkVoxTellToolGUI::OnPreferenceChangedEvent);
 
+  m_Ui->autoConfirmCheckBox->setChecked(m_Preferences->GetBool(AUTO_CONFIRM, true));
+
+  connect(m_Ui->autoConfirmCheckBox, &QCheckBox::toggled, this, [this](bool checked)
+  {
+    m_Preferences->PutBool(AUTO_CONFIRM, checked);
+  });
+
   this->UpdateInitializeButtonText();
   this->SetStatus("VoxTell is not initialized.");
 
@@ -249,6 +258,7 @@ void QmitkVoxTellToolGUI::EnableWidgets(bool enabled)
 
   m_Ui->initializeButton->setEnabled(idle);
   m_Ui->settingsButton->setEnabled(idle);
+  m_Ui->autoConfirmCheckBox->setEnabled(idle);
   m_Ui->promptsTextEdit->setEnabled(idle && loaded);
   m_Ui->segmentButton->setEnabled(idle && loaded);
 }
@@ -750,9 +760,34 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     this->SetLabelSetPreview(preview);
     this->ActualizePreviewLabelVisibility();
 
-    this->SetStatus(promptsWithoutResult.empty()
-      ? QStringLiteral("Segmentation finished.")
-      : QString("Segmentation finished. Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult)));
+    QString status = "Segmentation finished.";
+    bool confirmFailed = false;
+
+    // Only what the Confirm button would transfer: with "Transfer selected
+    // labels", the user picks the labels first.
+    if (m_Ui->autoConfirmCheckBox->isChecked() && m_EnableConfirmSegBtnFnc(true))
+    {
+      try
+      {
+        this->OnAcceptPreview();
+        status = "Segmentation finished and confirmed.";
+      }
+      catch (const std::exception& e)
+      {
+        status = QString("The result could not be confirmed: %1").arg(e.what());
+        confirmFailed = true;
+      }
+
+      // Confirming computes the preview of further time steps if needed, which
+      // processes events.
+      if (self.isNull())
+        return;
+    }
+
+    if (!confirmFailed && !promptsWithoutResult.empty())
+      status += QString(" Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult));
+
+    this->SetStatus(status, confirmFailed);
   }
   else if (!promptsWithoutResult.empty())
   {

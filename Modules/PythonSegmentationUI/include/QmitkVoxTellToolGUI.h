@@ -38,7 +38,8 @@ namespace Ui
  * its model, a Settings button that opens the preference page, a text field for
  * the prompts, one per line, and a Segment button. The result of a run is
  * shown as a preview with one label per prompt, which the controls of
- * QmitkMultiLabelSegWithPreviewToolGUIBase confirm into the segmentation.
+ * QmitkMultiLabelSegWithPreviewToolGUIBase confirm into the segmentation, or
+ * which is confirmed right away if the user checked auto-confirm.
  *
  * \sa mitk::VoxTellTool, QmitkPipInstallDialog
  */

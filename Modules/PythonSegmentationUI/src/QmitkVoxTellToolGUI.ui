@@ -69,6 +69,12 @@
           <height>72</height>
          </size>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>144</height>
+         </size>
+        </property>
         <property name="toolTip">
          <string>Describe the structures to segment in free text, one prompt per line. While you type, the prompts that VoxTell knows are suggested.</string>
         </property>
@@ -91,6 +97,16 @@
        </widget>
       </item>
       <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="autoConfirmCheckBox">
+        <property name="toolTip">
+         <string>Add the result to the segmentation as soon as a run succeeds, as Confirm Segmentation does. Undo removes it again.</string>
+        </property>
+        <property name="text">
+         <string>Auto-confirm on success</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
        <widget class="QLabel" name="statusLabel">
         <property name="text">
          <string/>

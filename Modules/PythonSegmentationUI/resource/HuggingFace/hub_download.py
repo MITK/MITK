@@ -59,8 +59,9 @@ def mitk_download_from_hub(targets):
     snapshot_download() of huggingface_hub takes them.
     """
     from huggingface_hub import hf_hub_download, snapshot_download
-    from huggingface_hub.utils import disable_progress_bars
-    from tqdm import tqdm
+    # The tqdm of huggingface_hub, not the plain one: some releases pass their
+    # progress bars a name, which only their own class takes.
+    from huggingface_hub.utils import disable_progress_bars, tqdm
 
     # Its own progress bars would only clutter the log.
     disable_progress_bars()

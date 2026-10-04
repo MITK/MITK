@@ -75,6 +75,12 @@ otherwise, the organisation's own rules (confidential or unpublished data) may
 restrict sharing it, so the decision to pass a dump on is left explicitly with
 the user.
 
+The copy of the session log kept with a dump (see
+\ref CrashDumpFacilityPage_RunInfo) needs the same care, and more directly: it
+is plain text and records, among other things, the paths of the files the
+session opened, which often embed a name or an ID. Unlike the dump, it can be
+read and checked, so the user-facing texts point to it explicitly.
+
 \section CrashDumpFacilityPage_LocalOnly Local-only by construction
 
 Nothing is ever uploaded: no DSN is compiled in and no configuration surface

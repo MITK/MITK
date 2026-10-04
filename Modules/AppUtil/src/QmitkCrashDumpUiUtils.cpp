@@ -155,7 +155,10 @@ QString QmitkCrashDumpUi::PrivacyNote()
     "PACS query), it may contain such data and must be handled through your usual process for "
     "patient or study-participant data. Other rules of your organisation may also restrict "
     "sharing it, for example for confidential or unpublished data. Please check before you pass "
-    "a dump on. MITK never uploads crash dumps; they stay on this computer.";
+    "a dump on. A copy of the session's log is usually kept with a dump. It is plain text and "
+    "lists, for example, the paths of opened files, which often contain a patient name or ID; "
+    "read it before you pass it on with the dump. MITK never uploads crash dumps; they stay on "
+    "this computer.";
 }
 
 QWidget* QmitkCrashDumpUi::CreateHeader(const QString& title, const QString& subtitle)

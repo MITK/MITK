@@ -56,10 +56,6 @@ namespace QmitkCrashDumpUi
 
   /** Opens each distinct folder containing one of \p files. */
   void ShowInFolders(const std::vector<std::filesystem::path>& files);
-
-  /** Hands \p dumps to the registered report service, if there is one.
-   *  Returns whether a service took them. */
-  bool FileReport(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent);
 }
 
 #endif

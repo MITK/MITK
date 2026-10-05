@@ -133,6 +133,21 @@ namespace
 
     value = it->get<T>();
   }
+
+  /** Reads \p key into \p value if present as a string; an absent key leaves
+   *  \p value empty. Returns false if the key is present with another type. */
+  bool ReadString(const nlohmann::json& json, const char* key, std::string& value)
+  {
+    const auto it = json.find(key);
+    if (it == json.end())
+      return true;
+
+    if (!it->is_string())
+      return false;
+
+    value = it->get<std::string>();
+    return true;
+  }
 }
 
 mitk::DumpKind mitk::ClassifyDump(const std::filesystem::path& dumpPath)
@@ -182,7 +197,7 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
       if (error)
         continue;
 
-      dumps.push_back({ entry.path(), lastWriteTime, size, ClassifyDump(entry.path()), std::nullopt, {} });
+      dumps.push_back({ entry.path(), lastWriteTime, size, ClassifyDump(entry.path()), std::nullopt, {}, false });
     }
   }
   catch (const std::filesystem::filesystem_error&)
@@ -382,10 +397,26 @@ std::optional<mitk::CrashRunInfo> mitk::ReadRunInfo(const std::filesystem::path&
   if (json.is_discarded() || !json.is_object())
     return std::nullopt;
 
+  std::string release;
+  std::string installDirectory;
+  std::string logFile;
+
+  for (const auto& [key, value] : { std::pair{ "release", &release },
+                                    std::pair{ "installDirectory", &installDirectory },
+                                    std::pair{ "logFile", &logFile } })
+  {
+    if (!ReadString(json, key, *value))
+    {
+      MITK_WARN << "Crash-dump run info '" << file.string() << "': ignoring it, '" << key
+                << "' has the wrong type.";
+      return std::nullopt;
+    }
+  }
+
   CrashRunInfo runInfo;
-  runInfo.Release = json.value("release", std::string());
-  runInfo.InstallDirectory = FromUtf8(json.value("installDirectory", std::string()));
-  runInfo.LogFile = FromUtf8(json.value("logFile", std::string()));
+  runInfo.Release = release;
+  runInfo.InstallDirectory = FromUtf8(installDirectory);
+  runInfo.LogFile = FromUtf8(logFile);
 
   return runInfo;
 }

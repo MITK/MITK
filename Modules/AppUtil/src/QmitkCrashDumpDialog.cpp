@@ -58,8 +58,8 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   const bool single = dumps.size() == 1;
 
   auto* messageLabel = new QLabel(QmitkCrashDumpUi::Paragraph(single
-    ? "A crash dump of that session was saved. Attached to a problem report, it helps us find the cause."
-    : "Crash dumps of that session were saved. Attached to a problem report, they help us find the cause."));
+    ? "A crash dump was saved. Attached to a problem report, it helps us find the cause."
+    : "Crash dumps were saved. Attached to a problem report, they help us find the cause."));
   messageLabel->setWordWrap(true);
 
   auto* dumpList = new QmitkCrashDumpListWidget;
@@ -95,7 +95,7 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   connect(keepButton, &QPushButton::clicked, this, [this] { m_Choice = Keep; this->accept(); });
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-  if (mitk::GetCrashReportService() != nullptr)
+  if (mitk::IsCrashReportServiceAvailable())
   {
     auto* reportButton = buttonBox->addButton("File report...", QDialogButtonBox::ActionRole);
     reportButton->setObjectName("fileReportButton");
@@ -158,7 +158,7 @@ void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)
     if (mitk::CrashDumpFacility::CrashedLastRun())
     {
       MITK_WARN << "The previous run ended in a crash, but no new crash dump was found.";
-      mitk::CrashDumpFacility::ClearCrashedLastRun();
+      mitk::CrashDumpFacility::ClearCrashedLastRun({});
     }
 
     return;
@@ -178,7 +178,7 @@ void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)
 
   // Acknowledge before acting on the choice: surfaced dumps must never
   // surface again, whatever happens to them.
-  mitk::CrashDumpFacility::ClearCrashedLastRun();
+  mitk::CrashDumpFacility::ClearCrashedLastRun(dumps);
 
   switch (dialog.m_Choice)
   {
@@ -188,7 +188,7 @@ void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)
     case FileReport:
       // After the dialog has closed: the report flow may outlive this call,
       // the stack-allocated dialog does not.
-      QmitkCrashDumpUi::FileReport(dumps, parent);
+      mitk::FileCrashReport(dumps, parent);
       break;
 
     case Remove:

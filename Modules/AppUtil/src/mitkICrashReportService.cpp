@@ -17,15 +17,36 @@ found in the LICENSE file.
 
 mitk::ICrashReportService::~ICrashReportService() = default;
 
-mitk::ICrashReportService* mitk::GetCrashReportService()
+bool mitk::IsCrashReportServiceAvailable()
 {
   auto* context = us::GetModuleContext();
-  if (context == nullptr)
-    return nullptr;
+  return context != nullptr && static_cast<bool>(context->GetServiceReference<ICrashReportService>());
+}
+
+bool mitk::FileCrashReport(const std::vector<CrashDumpInfo>& dumps, QWidget* parent)
+{
+  auto* context = us::GetModuleContext();
+  if (dumps.empty() || context == nullptr)
+    return false;
 
   const auto reference = context->GetServiceReference<ICrashReportService>();
   if (!reference)
-    return nullptr;
+    return false;
 
-  return context->GetService(reference);
+  auto* service = context->GetService(reference);
+  if (service == nullptr)
+    return false;
+
+  try
+  {
+    service->FileReport(dumps, parent);
+  }
+  catch (...)
+  {
+    context->UngetService(reference);
+    throw;
+  }
+
+  context->UngetService(reference);
+  return true;
 }

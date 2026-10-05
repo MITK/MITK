@@ -135,6 +135,7 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(DumpsSurviveReinitialization);
   MITK_TEST(FacilityQueryAcknowledgeDeleteCycle);
   MITK_TEST(UnarmedFacilityStillListsAndDeletes);
+  MITK_TEST(AcknowledgingLeavesDumpsWrittenMeanwhile);
   MITK_TEST(SettingsDisableArming);
   MITK_TEST(RetentionFollowsSettings);
   // On-demand and watchdog snapshots rely on Crashpad's DumpWithoutCrash,
@@ -148,11 +149,12 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(ListAllDumpsClassifiesEveryKind);
   MITK_TEST(ProvisionalSnapshotsOfThisSessionAreNotListed);
   MITK_TEST(ProvisionalCapturesDoNotEvictSurvivors);
-  // Run-info attachments are verified on Windows only so far; Linux shares
-  // the code path and is expected to pass, macOS is unexplored.
+  MITK_TEST(SnapshotCarriesRunInfo);
+  // Run-info attachments, which crash dumps rely on, are verified on Windows
+  // only so far; Linux shares the code path and is expected to pass, macOS
+  // is unexplored.
   MITK_TEST(CrashDumpCarriesRunInfo);
   MITK_TEST(CrashDumpDoesNotKeepALaterSessionsLog);
-  MITK_TEST(SnapshotCarriesRunInfo);
 #endif
   CPPUNIT_TEST_SUITE_END();
 
@@ -312,7 +314,7 @@ public:
 
     // Acknowledge (what the dialog does once the user has seen the dump):
     // it stays on disk but is no longer offered on the next start.
-    mitk::CrashDumpFacility::ClearCrashedLastRun();
+    mitk::CrashDumpFacility::ClearCrashedLastRun(mitk::CrashDumpFacility::ListUnacknowledgedDumps());
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListUnacknowledgedDumps().empty());
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::CrashDumpFacility::ListDumps().size());
 
@@ -342,6 +344,32 @@ public:
 
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(dump));
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListAllDumps().empty());
+  }
+
+  /** The dialog may stay open while another instance crashes: acknowledging
+   *  what was shown must leave that newer dump to surface on the next start. */
+  void AcknowledgingLeavesDumpsWrittenMeanwhile()
+  {
+    const auto dumpA = this->CreateFakeDump("reports/shown.dmp", 120);
+
+    CPPUNIT_ASSERT(!mitk::CrashDumpFacility::Initialize(this->MakeConfig(false)));
+
+    const auto shown = mitk::CrashDumpFacility::ListUnacknowledgedDumps();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), shown.size());
+    CPPUNIT_ASSERT(dumpA == shown.front().Path);
+    CPPUNIT_ASSERT(shown.front().Unacknowledged);
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListAllDumps().front().Unacknowledged);
+
+    const auto dumpB = this->CreateFakeDump("reports/written-meanwhile.dmp", 30);
+
+    mitk::CrashDumpFacility::ClearCrashedLastRun(shown);
+
+    const auto remaining = mitk::CrashDumpFacility::ListUnacknowledgedDumps();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), remaining.size());
+    CPPUNIT_ASSERT(dumpB == remaining.front().Path);
+
+    for (const auto& dump : mitk::CrashDumpFacility::ListAllDumps())
+      CPPUNIT_ASSERT_EQUAL(dumpB == dump.Path, dump.Unacknowledged);
   }
 
   void SettingsDisableArming()
@@ -557,7 +585,7 @@ public:
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListDumps().empty());
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListUnacknowledgedDumps().empty());
 
-    mitk::CrashDumpFacility::ClearCrashedLastRun();
+    mitk::CrashDumpFacility::ClearCrashedLastRun(mitk::CrashDumpFacility::ListUnacknowledgedDumps());
     CPPUNIT_ASSERT_MESSAGE("a provisional snapshot must not move the watermark",
       !mitk::ReadLastAcknowledgedTime(m_DatabaseDirectory).has_value());
 

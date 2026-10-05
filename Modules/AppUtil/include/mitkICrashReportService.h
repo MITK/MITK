@@ -53,8 +53,15 @@ namespace mitk
     virtual void FileReport(const std::vector<CrashDumpInfo>& dumps, QWidget* parent) = 0;
   };
 
-  /** \brief The registered report service, or nullptr when none is registered. */
-  MITKAPPUTIL_EXPORT ICrashReportService* GetCrashReportService();
+  /** \brief Whether a report service is registered. */
+  MITKAPPUTIL_EXPORT bool IsCrashReportServiceAvailable();
+
+  /** \brief Start the registered service's report flow for \p dumps.
+   *
+   *  Returns false, doing nothing, if \p dumps is empty or no service is
+   *  registered. The service is held only for the duration of the call; a
+   *  flow that outlives it is the service's own business. */
+  MITKAPPUTIL_EXPORT bool FileCrashReport(const std::vector<CrashDumpInfo>& dumps, QWidget* parent);
 }
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::ICrashReportService, "org.mitk.ICrashReportService")

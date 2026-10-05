@@ -32,8 +32,9 @@ namespace mitk
  * \brief Table of crash dumps with kind, time, size, version, log and status.
  *
  * Status is "provisional (this session)" for the dumps passed to SetDumps()
- * in provisionalPaths, "new" for a dump that has not triggered the
- * next-start dialog yet, and "kept" otherwise. The log column reflects
+ * in provisionalPaths, "new" for a dump whose
+ * mitk::CrashDumpInfo::Unacknowledged is set (it has not triggered the
+ * next-start dialog yet), and "kept" otherwise. The log column reflects
  * mitk::CrashDumpInfo::SessionLog as the facility's listings filled it in:
  * "available" when a log copy is kept with the dump, "not available" when the
  * dump has run info but no log copy, and "unknown" when it has no run info.

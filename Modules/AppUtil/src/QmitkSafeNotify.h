@@ -109,7 +109,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
       resultBox.setDetailedText(QString::fromStdWString(snapshot->wstring()));
       auto *managerButton = resultBox.addButton("Open Diagnostic Data...", QMessageBox::ActionRole);
       QPushButton *reportButton = nullptr;
-      if (mitk::GetCrashReportService() != nullptr)
+      if (mitk::IsCrashReportServiceAvailable())
         reportButton = resultBox.addButton("File report...", QMessageBox::ActionRole);
       resultBox.addButton(QMessageBox::Ok);
       resultBox.exec();
@@ -124,7 +124,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
         {
           if (dump.Path == *snapshot)
           {
-            QmitkCrashDumpUi::FileReport({ dump }, nullptr);
+            mitk::FileCrashReport({ dump }, nullptr);
             break;
           }
         }

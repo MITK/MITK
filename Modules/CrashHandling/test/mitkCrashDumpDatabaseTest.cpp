@@ -451,6 +451,9 @@ public:
 
     CPPUNIT_ASSERT(!mitk::ReadRunInfo(file).has_value());
     CPPUNIT_ASSERT(!mitk::ReadRunInfo(m_DatabaseDirectory / "missing.json").has_value());
+
+    std::ofstream(file) << R"({"release": 3, "installDirectory": "x", "logFile": null})";
+    CPPUNIT_ASSERT_MESSAGE("wrong value types", !mitk::ReadRunInfo(file).has_value());
   }
 
   void AdoptRunInfoAttachmentCopiesItOnce()

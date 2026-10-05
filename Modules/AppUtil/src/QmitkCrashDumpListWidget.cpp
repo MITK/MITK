@@ -71,10 +71,6 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
 {
   m_Dumps = dumps;
 
-  std::set<std::filesystem::path> unacknowledged;
-  for (const auto& dump : mitk::CrashDumpFacility::ListUnacknowledgedDumps())
-    unacknowledged.insert(dump.Path);
-
   m_Tree->clear();
 
   for (std::size_t i = 0; i < m_Dumps.size(); ++i)
@@ -85,7 +81,7 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
     QString status = "kept";
     if (provisionalPaths.find(dump.Path) != provisionalPaths.end())
       status = "provisional (this session)";
-    else if (unacknowledged.find(dump.Path) != unacknowledged.end())
+    else if (dump.Unacknowledged)
       status = "new";
 
     auto* item = new QTreeWidgetItem(m_Tree);

@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkCrashDumpUiUtils.h"
 
-#include <mitkICrashReportService.h>
-
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFrame>
@@ -232,15 +230,4 @@ void QmitkCrashDumpUi::ShowInFolders(const std::vector<std::filesystem::path>& f
     if (std::filesystem::is_directory(folder, error))
       QDesktopServices::openUrl(QUrl::fromLocalFile(ToQString(folder)));
   }
-}
-
-bool QmitkCrashDumpUi::FileReport(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent)
-{
-  auto* service = mitk::GetCrashReportService();
-
-  if (service == nullptr || dumps.empty())
-    return false;
-
-  service->FileReport(dumps, parent);
-  return true;
 }

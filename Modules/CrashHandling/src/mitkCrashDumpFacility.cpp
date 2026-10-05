@@ -24,6 +24,7 @@ found in the LICENSE file.
 #if defined(_WIN32)
 #include <windows.h>
 #else
+#include <signal.h>
 #include <unistd.h>
 #if defined(__APPLE__)
 #include <mach-o/dyld.h>
@@ -31,6 +32,8 @@ found in the LICENSE file.
 #endif
 
 #include <algorithm>
+#include <cerrno>
+#include <charconv>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -52,6 +55,9 @@ namespace
   // yields a truncated dump and breaks the handler's move. The Windows backend
   // has no staging directory, so there excluding this name matches nothing.
   const std::filesystem::path kCrashpadStagingSubdir = "new";
+
+  // Holds one folder per running process with the run-info attachment.
+  const std::filesystem::path kRunInfoSubdir = "mitk-run-info";
 
   std::filesystem::path SubdirForKind(mitk::SnapshotKind kind)
   {
@@ -164,23 +170,72 @@ namespace
 #endif
   }
 
-  /** Outside the database, which every instance shares; a crashed session's
-   *  leftover is harmless and a reused process ID merely overwrites it. */
-  std::filesystem::path RunInfoFileForThisProcess()
+  unsigned long CurrentProcessId()
   {
-    std::error_code error;
-    const auto temporaryDirectory = std::filesystem::temp_directory_path(error);
-    if (error)
-      return {};
-
 #if defined(_WIN32)
-    const auto processId = static_cast<unsigned long>(GetCurrentProcessId());
+    return static_cast<unsigned long>(GetCurrentProcessId());
 #else
-    const auto processId = static_cast<unsigned long>(getpid());
+    return static_cast<unsigned long>(getpid());
 #endif
+  }
 
-    return temporaryDirectory / ("mitk-crash-run-info-" + std::to_string(processId)) /
+  bool IsProcessRunning(unsigned long processId)
+  {
+#if defined(_WIN32)
+    const HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, static_cast<DWORD>(processId));
+    if (process == nullptr)
+      return GetLastError() == ERROR_ACCESS_DENIED; // exists, but is not ours to query
+
+    DWORD exitCode = 0;
+    const bool running = GetExitCodeProcess(process, &exitCode) && exitCode == STILL_ACTIVE;
+    CloseHandle(process);
+    return running;
+#else
+    return kill(static_cast<pid_t>(processId), 0) == 0 || errno == EPERM;
+#endif
+  }
+
+  /** Under the per-user database rather than the shared temp folder, so no
+   *  other user can claim the path and leftovers of a crashed session can be
+   *  found again. Per process because all of the user's instances share the
+   *  database; Initialize() removes the entries of processes that are gone. */
+  std::filesystem::path RunInfoFileForThisProcess(const std::filesystem::path& databaseDirectory)
+  {
+    return databaseDirectory / kRunInfoSubdir / std::to_string(CurrentProcessId()) /
       mitk::RunInfoAttachmentFileName;
+  }
+
+  // The handler reads the attachment while writing a dump, so the entry of a
+  // dead process is never read again; a reused process ID merely keeps an
+  // entry a little longer.
+  void RemoveStaleRunInfo(const std::filesystem::path& databaseDirectory)
+  {
+    std::vector<std::filesystem::path> stale;
+
+    std::error_code error;
+    std::filesystem::directory_iterator iterator(databaseDirectory / kRunInfoSubdir, error);
+    const std::filesystem::directory_iterator end;
+
+    for (; !error && iterator != end; iterator.increment(error))
+    {
+      if (!iterator->is_directory(error))
+      {
+        error.clear();
+        continue;
+      }
+
+      const auto name = iterator->path().filename().string();
+      unsigned long processId = 0;
+      const auto [last, parseError] = std::from_chars(name.data(), name.data() + name.size(), processId);
+      if (parseError != std::errc() || last != name.data() + name.size())
+        continue;
+
+      if (processId != CurrentProcessId() && !IsProcessRunning(processId))
+        stale.push_back(iterator->path());
+    }
+
+    for (const auto& entry : stale)
+      std::filesystem::remove_all(entry, error);
   }
 
   /** Caller holds s_SnapshotMutex. */
@@ -230,6 +285,22 @@ namespace
 
     return dumps;
   }
+
+  /** Reads the acknowledgment watermark once for the whole listing. On-demand
+   *  snapshots are never surfaced by the next-start dialog, so they are never
+   *  unacknowledged. */
+  std::vector<mitk::CrashDumpInfo> WithAcknowledgment(std::vector<mitk::CrashDumpInfo> dumps)
+  {
+    const auto acknowledged = mitk::ReadLastAcknowledgedTime(s_State.DatabaseDirectory);
+
+    for (auto& dump : dumps)
+    {
+      dump.Unacknowledged = mitk::DumpKind::OnDemand != dump.Kind &&
+                            (!acknowledged.has_value() || dump.LastWriteTime > *acknowledged);
+    }
+
+    return dumps;
+  }
 }
 
 bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
@@ -266,18 +337,33 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
     s_State.DatabaseDirectory = config.DatabaseDirectory;
     s_State.Settings = ReadCrashDumpSettings(s_State.DatabaseDirectory);
 
-    const auto maxDumps = static_cast<std::size_t>(s_State.Settings.MaxDumpsPerKind);
+    // Housekeeping must never cost crash coverage, so a failure here only
+    // warns and arming continues.
+    try
+    {
+      const auto maxDumps = static_cast<std::size_t>(s_State.Settings.MaxDumpsPerKind);
 
-    // Bounding the pending-freeze area here cannot hide a hard-killed freeze
-    // from the next-start dialog: only the oldest go, and they go only when
-    // MaxDumpsPerKind newer ones remain to be shown.
-    PruneCrashDumps(s_State.DatabaseDirectory, maxDumps,
-      { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir });
-    PruneCrashDumps(s_State.DatabaseDirectory / kSnapshotsSubdir, maxDumps);
-    PruneCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir, maxDumps);
+      // Bounding the pending-freeze area here cannot hide a hard-killed freeze
+      // from the next-start dialog: only the oldest go, and they go only when
+      // MaxDumpsPerKind newer ones remain to be shown.
+      PruneCrashDumps(s_State.DatabaseDirectory, maxDumps,
+        { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir });
+      PruneCrashDumps(s_State.DatabaseDirectory / kSnapshotsSubdir, maxDumps);
+      PruneCrashDumps(s_State.DatabaseDirectory / kPendingFreezeSubdir, maxDumps);
 
-    WithRunInfo(ScanCrashDumps(s_State.DatabaseDirectory,
-      { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir }));
+      RemoveStaleRunInfo(s_State.DatabaseDirectory);
+
+      WithRunInfo(ScanCrashDumps(s_State.DatabaseDirectory,
+        { kSnapshotsSubdir, kPendingFreezeSubdir, kCrashpadStagingSubdir }));
+    }
+    catch (const std::exception& e)
+    {
+      MITK_WARN << "Crash-dump facility: housekeeping of the database failed: " << e.what();
+    }
+    catch (...)
+    {
+      MITK_WARN << "Crash-dump facility: housekeeping of the database failed.";
+    }
 
     if (!config.Arm)
     {
@@ -330,10 +416,10 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
     // failure here does not stop arming.
     s_State.RunInfo.Release = release;
     s_State.RunInfo.InstallDirectory = executableDirectory;
-    const auto runInfoFile = RunInfoFileForThisProcess();
+    const auto runInfoFile = RunInfoFileForThisProcess(s_State.DatabaseDirectory);
     std::filesystem::create_directories(runInfoFile.parent_path(), error);
 
-    if (!runInfoFile.empty() && WriteRunInfo(runInfoFile, s_State.RunInfo))
+    if (WriteRunInfo(runInfoFile, s_State.RunInfo))
     {
       s_State.RunInfoFile = runInfoFile;
 #if defined(_WIN32)
@@ -362,8 +448,14 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
 
     return true;
   }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Crash-dump facility failed to initialize: " << e.what();
+    return false;
+  }
   catch (...)
   {
+    MITK_ERROR << "Crash-dump facility failed to initialize.";
     return false;
   }
 }
@@ -422,38 +514,43 @@ bool mitk::CrashDumpFacility::CrashedLastRun() noexcept
   return s_State.CrashedLastRun;
 }
 
-void mitk::CrashDumpFacility::ClearCrashedLastRun()
+void mitk::CrashDumpFacility::ClearCrashedLastRun(const std::vector<CrashDumpInfo>& shownDumps)
 {
   s_State.CrashedLastRun = false;
 
   if (s_State.Active)
     sentry_clear_crashed_last_run();
 
-  // Watermark from the newest surfacable dump, so an on-demand snapshot
-  // (excluded from the surfacable set) can never mask a real crash dump, nor
-  // a provisional snapshot of this session mask a hard kill that follows it.
-  const auto dumps = ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
-    { kSnapshotsSubdir, kCrashpadStagingSubdir });
-  if (!dumps.empty())
-    WriteLastAcknowledgedTime(s_State.DatabaseDirectory, dumps.front().LastWriteTime);
+  if (shownDumps.empty())
+    return;
+
+  // From the shown dumps, not a fresh scan: a dump written while the dialog
+  // was open must still surface next time.
+  auto newest = shownDumps.front().LastWriteTime;
+  for (const auto& dump : shownDumps)
+    newest = std::max(newest, dump.LastWriteTime);
+
+  const auto acknowledged = ReadLastAcknowledgedTime(s_State.DatabaseDirectory);
+  if (!acknowledged.has_value() || *acknowledged < newest)
+    WriteLastAcknowledgedTime(s_State.DatabaseDirectory, newest);
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListDumps()
 {
-  return WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
-    { kSnapshotsSubdir, kCrashpadStagingSubdir }));
+  return WithAcknowledgment(WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir })));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListUnacknowledgedDumps()
 {
-  return WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanUnacknowledgedCrashDumps,
-    { kSnapshotsSubdir, kCrashpadStagingSubdir }));
+  return WithAcknowledgment(WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanUnacknowledgedCrashDumps,
+    { kSnapshotsSubdir, kCrashpadStagingSubdir })));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListAllDumps()
 {
-  return WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
-    { kCrashpadStagingSubdir }));
+  return WithAcknowledgment(WithRunInfo(ScanWithoutProvisionalSnapshotsOfThisSession(&ScanCrashDumps,
+    { kCrashpadStagingSubdir })));
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListProvisionalSnapshotsOfThisSession()
@@ -599,19 +696,23 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
   }
   else
   {
-    // The run info lives in the report's attachments, which go with the
-    // report below.
-    AdoptRunInfoAttachment(database, newDump.stem(), destination);
-
-    std::filesystem::path logFile;
+    // The live session writes its own run info, so snapshots do not depend on
+    // the handler copying attachments (which crash dumps still need).
+    CrashRunInfo runInfo;
     {
       std::lock_guard<std::mutex> runInfoLock(s_RunInfoMutex);
-      logFile = s_State.RunInfo.LogFile;
+      runInfo = s_State.RunInfo;
+    }
+
+    if (!WriteRunInfo(GetRunInfoSidecarPath(destination), runInfo))
+    {
+      MITK_WARN << "Crash-dump facility: cannot write the run info for the snapshot '"
+                << GetRunInfoSidecarPath(destination).string() << "'.";
     }
 
     // The log as written so far; the running session keeps the name until
     // its install starts again.
-    KeepSessionLog(destination, logFile, std::nullopt);
+    KeepSessionLog(destination, runInfo.LogFile, std::nullopt);
   }
 
   // Either way the dump is no longer Crashpad's to hold - filed under its

@@ -56,7 +56,29 @@ void QmitkCrashDumpManagerDialog::ShowManager(QWidget* parent)
   else
   {
     if (modal != nullptr && s_Instance->parentWidget() != modal)
+    {
+      const QPointer<QWidget> previousParent = s_Instance->parentWidget();
       s_Instance->setParent(modal, s_Instance->windowFlags());
+
+      // Otherwise the modal dialog would destroy the manager with its
+      // children when it is deleted. QDialog::finished is emitted before that.
+      if (auto* modalDialog = qobject_cast<QDialog*>(modal))
+      {
+        QObject::connect(modalDialog, &QDialog::finished, s_Instance.data(),
+          [modal, previousParent] {
+            if (s_Instance.isNull() || s_Instance->parentWidget() != modal)
+              return;
+
+            const bool wasVisible = s_Instance->isVisible();
+            s_Instance->setParent(previousParent.data(), s_Instance->windowFlags());
+
+            // setParent hides the widget
+            if (wasVisible)
+              s_Instance->show();
+          },
+          Qt::SingleShotConnection);
+      }
+    }
 
     s_Instance->Refresh();
   }
@@ -148,7 +170,7 @@ QmitkCrashDumpManagerDialog::QmitkCrashDumpManagerDialog(QWidget* parent)
 void QmitkCrashDumpManagerDialog::Refresh()
 {
   // The service may be registered or unregistered while the manager is open.
-  m_FileReportButton->setVisible(mitk::GetCrashReportService() != nullptr);
+  m_FileReportButton->setVisible(mitk::IsCrashReportServiceAvailable());
 
   if (mitk::CrashDumpFacility::GetDatabaseDirectory().empty())
   {
@@ -189,7 +211,7 @@ void QmitkCrashDumpManagerDialog::OnSelectionChanged()
 
 void QmitkCrashDumpManagerDialog::OnFileReport()
 {
-  QmitkCrashDumpUi::FileReport(m_List->GetSelectedDumps(), this);
+  mitk::FileCrashReport(m_List->GetSelectedDumps(), this);
 }
 
 void QmitkCrashDumpManagerDialog::OnShowInFolder()

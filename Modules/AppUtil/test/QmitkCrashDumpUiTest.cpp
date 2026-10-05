@@ -26,7 +26,9 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceRegistration.h>
 
+#include <QDialog>
 #include <QLabel>
+#include <QPointer>
 #include <QPushButton>
 #include <QTimer>
 #include <QTreeWidget>
@@ -89,6 +91,7 @@ class QmitkCrashDumpUiTestSuite : public mitk::TestFixture
   MITK_TEST(ListWidgetShowsColumnsAndSelection);
   MITK_TEST(NoReportServiceMeansNoReportButton);
   MITK_TEST(ManagerIsSingleInstanceAndReportsTheSelection);
+  MITK_TEST(ManagerReturnsToItsParentWhenTheModalFinishes);
   MITK_TEST(NextStartDialogKeepAcknowledges);
   MITK_TEST(NextStartDialogCloseRemoves);
   MITK_TEST(NextStartDialogFileReportKeepsTheDumps);
@@ -210,7 +213,7 @@ public:
 
   void NoReportServiceMeansNoReportButton()
   {
-    CPPUNIT_ASSERT(mitk::GetCrashReportService() == nullptr);
+    CPPUNIT_ASSERT(!mitk::IsCrashReportServiceAvailable());
 
     QmitkCrashDumpManagerDialog::ShowManager();
     const auto managers = VisibleManagers();
@@ -224,7 +227,7 @@ public:
   void ManagerIsSingleInstanceAndReportsTheSelection()
   {
     this->RegisterService();
-    CPPUNIT_ASSERT(mitk::GetCrashReportService() == &m_Service);
+    CPPUNIT_ASSERT(mitk::IsCrashReportServiceAvailable());
 
     QmitkCrashDumpManagerDialog::ShowManager();
     QmitkCrashDumpManagerDialog::ShowManager();
@@ -243,6 +246,37 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), m_Service.Received.size());
     CPPUNIT_ASSERT(m_OnDemandDump == m_Service.Received.front().Path);
     CPPUNIT_ASSERT_MESSAGE("filing a report must not delete the dump", std::filesystem::exists(m_OnDemandDump));
+  }
+
+  void ManagerReturnsToItsParentWhenTheModalFinishes()
+  {
+    QWidget mainWindow;
+    mainWindow.show();
+
+    QmitkCrashDumpManagerDialog::ShowManager(&mainWindow);
+    auto managers = VisibleManagers();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), managers.size());
+    const QPointer<QWidget> manager = managers.front();
+    CPPUNIT_ASSERT(manager->parentWidget() == &mainWindow);
+
+    QDialog modal;
+    modal.setModal(true);
+    modal.show();
+    QCoreApplication::processEvents();
+    CPPUNIT_ASSERT(QApplication::activeModalWidget() == &modal);
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    CPPUNIT_ASSERT_MESSAGE("the same instance serves the modal dialog", manager == VisibleManagers().front());
+    CPPUNIT_ASSERT(manager->parentWidget() == &modal);
+
+    modal.done(0);
+
+    CPPUNIT_ASSERT_MESSAGE("the manager outlives the modal dialog", !manager.isNull());
+    CPPUNIT_ASSERT(manager->parentWidget() == &mainWindow);
+    CPPUNIT_ASSERT(manager->isVisible());
+
+    manager->close();
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
   }
 
   void NextStartDialogKeepAcknowledges()

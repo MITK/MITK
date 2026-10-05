@@ -44,7 +44,8 @@ public:
   /** \brief Show the application-wide instance, creating it on first use and
    *  raising it otherwise. \p parent is used only when no modal dialog is
    *  active; otherwise the manager is parented to the modal dialog, so that
-   *  it can be used from it (e.g. from the preferences). */
+   *  it can be used from it (e.g. from the preferences). An already open
+   *  manager returns to its previous parent when that modal dialog finishes. */
   static void ShowManager(QWidget* parent = nullptr);
 
   /** \brief Re-read the dumps from disk. */

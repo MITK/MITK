@@ -254,9 +254,10 @@ cannot be undone by the preference dialog's Cancel.
 Every dump records the session it came from in mitk::CrashRunInfo: the
 release string, the installation directory and the session's log file. At
 arming time the facility writes a per-process file
-(<tt>&lt;temp&gt;/mitk-crash-run-info-&lt;pid&gt;/mitk-run-info.json</tt>; per
-process because the database is shared by all running instances) and
-registers it as a Crashpad attachment. The handler copies attachments into a
+(<tt>mitk-run-info/&lt;pid&gt;/mitk-run-info.json</tt> in the database; per
+process because all of the user's running instances share the database) and
+registers it as a Crashpad attachment. Initialize() removes the entries of
+processes that no longer run. The handler copies attachments into a
 report when it writes the dump, reading them at that moment, so the log path
 that QmitkCrashDumpDialog::ShowIfCrashedLastRun() adds once the log is open
 (mitk::CrashDumpFacility::SetSessionLogFile()) reaches every later dump.
@@ -276,10 +277,12 @@ The facility then keeps the run info next to the dump as
 <tt>&lt;dump file name&gt;.json</tt> and the log copy as
 <tt>&lt;dump file name&gt;.log</tt>: snapshots take both at capture, before
 their report is released, crash dumps when they are first seen. Deleting or
-pruning a dump removes both. The sidecar layout is internal;
-the contract is mitk::CrashDumpInfo::RunInfo, which stays empty for dumps from
-before this mechanism, and on platforms where the attachment does not arrive
-(verified on Windows; Linux shares the code path; macOS is unexplored).
+pruning a dump removes both. Snapshots do not depend on the attachment: the
+live session writes the snapshot's run info itself at capture. Only crash
+dumps do. The sidecar layout is internal; the contract is
+mitk::CrashDumpInfo::RunInfo, which stays empty for dumps from before this
+mechanism, and for crash dumps on platforms where the attachment does not
+arrive (verified on Windows; Linux shares the code path; macOS is unexplored).
 
 \section CrashDumpFacilityPage_ReportService Filing a report
 

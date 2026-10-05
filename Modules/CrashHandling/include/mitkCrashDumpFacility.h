@@ -55,6 +55,9 @@ namespace mitk
     /** Copy of the session's log kept next to the dump, deleted with it;
      *  empty when there is none. */
     std::filesystem::path SessionLog;
+    /** Newer than the last acknowledgment (see ClearCrashedLastRun()) and of a
+     *  kind the next-start dialog surfaces; set by the List functions. */
+    bool Unacknowledged = false;
   };
 
   /**
@@ -179,10 +182,12 @@ namespace mitk
      *  ListUnacknowledgedDumps(). */
     static bool CrashedLastRun() noexcept;
 
-    /** \brief Acknowledge the currently present dumps (dialog "seen"): dumps
-     *  present now will not be reported by ListUnacknowledgedDumps() again,
-     *  and the crashed-last-run marker is cleared. */
-    static void ClearCrashedLastRun();
+    /** \brief Acknowledge exactly \p shownDumps (dialog "seen"): they will not
+     *  be reported by ListUnacknowledgedDumps() again, while dumps newer than
+     *  the newest of them still are. The acknowledgment never moves
+     *  backwards. The crashed-last-run marker is cleared; an empty list
+     *  clears only that marker. */
+    static void ClearCrashedLastRun(const std::vector<CrashDumpInfo>& shownDumps);
 
     /** \brief The surfacable dumps the next-start dialog shows, newest
      *  first: crash dumps plus hard-killed UI-freeze survivors. This

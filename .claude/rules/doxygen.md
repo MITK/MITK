@@ -35,7 +35,7 @@ description is `3-DeveloperManual/Starting/GettingToKnow/DocumentationGuide.dox`
   image at native size.
 - For screenshots use `\imageMacroEx{file, "caption", cm, px}`: the
   fourth argument is the HTML width. Size by what the image shows: a
-  single view, menu or popup at 8-10 cm and 320-560 px, a whole display
+  single view, menu or popup at 8-12 cm and 320-560 px, a whole display
   at 16 cm (the maximum) and 720-800 px. Keep px at or below the native
   width (about half of it for a capture at 200 % scaling) so the HTML
   image is never upscaled.

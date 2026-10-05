@@ -13,10 +13,9 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 
 #include <mitkImageAccessByItk.h>
-#include <mitkImageCast.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
-#include <mitkPadImageFilter.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
 #include <mitkNodePredicateGeometry.h>
@@ -29,7 +28,6 @@ found in the LICENSE file.
 #include <mitkImagePixelReadAccessor.h>
 
 #include <itkCommand.h>
-#include <itkBinaryFunctorImageFilter.h>
 #include <itkMultiThreaderBase.h>
 
 #include <algorithm>
@@ -1859,30 +1857,15 @@ ConstLabelMapType ConvertLabelVectorToMap(const mitk::ConstLabelVector& labelV)
 
 namespace
 {
-  /** Tells whether a transfer may overwrite a destination pixel value. Values of unknown labels count as unlocked. */
-  bool IsOverwritable(mitk::Label::PixelType destinationValue, const ConstLabelMapType& destinationLabels,
-    mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
-    mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
-  {
-    if (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == overwriteStyle)
-      return true;
-
-    if (destinationValue == destinationBackground)
-      return !destinationBackgroundLocked;
-
-    const auto finding = destinationLabels.find(destinationValue);
-    return finding == destinationLabels.end() || !finding->second->GetLocked();
-  }
-
-  /** IsOverwritable() for every pixel value, which spares a label lookup per voxel. */
+  /** Tells for every pixel value whether a transfer may overwrite it in the destination, which spares a label lookup
+   * per voxel. Values of unknown labels count as unlocked, and the background takes precedence over a label with the
+   * same value. */
   std::vector<bool> CreateOverwritableLookupTable(const ConstLabelMapType& destinationLabels,
     mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
     mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
   {
     static_assert(sizeof(mitk::Label::PixelType) <= 2, "The lookup table must cover every pixel value.");
 
-    // Filled like IsOverwritable() decides, without a label lookup per value: values of unknown labels count as
-    // unlocked, and the background takes precedence over a label with the same value.
     std::vector<bool> overwritable(std::numeric_limits<mitk::Label::PixelType>::max() + 1, true);
 
     if (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == overwriteStyle)
@@ -1894,128 +1877,76 @@ namespace
     overwritable[destinationBackground] = !destinationBackgroundLocked;
     return overwritable;
   }
-}
 
-
-/** Functor class that implements the label transfer and is used in conjunction with the itk::BinaryFunctorImageFilter.
-* For details regarding the usage of the filter and the functor patterns, please see info of itk::BinaryFunctorImageFilter.
-*/
-template <class TDestinationPixel, class TSourcePixel, class TOutputpixel>
-class LabelTransferFunctor
-{
-
-public:
-  LabelTransferFunctor() {};
-
-  LabelTransferFunctor(const ConstLabelMapType& destinationLabels, mitk::Label::PixelType sourceBackground,
-    mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
-    mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, mitk::MultiLabelSegmentation::MergeStyle mergeStyle,
-    mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle) :
-    m_DestinationLabels(destinationLabels), m_SourceBackground(sourceBackground),
-    m_DestinationBackground(destinationBackground), m_DestinationBackgroundLocked(destinationBackgroundLocked),
-    m_SourceLabel(sourceLabel), m_NewDestinationLabel(newDestinationLabel), m_MergeStyle(mergeStyle), m_OverwriteStyle(overwriteStyle)
+  /** The rules of a label transfer resolved into lookup tables, so that the voxel loops do no label lookups and
+   * all mappings are applied in one pass: a mapped source value assigns its target wherever the destination is
+   * overwritable; with MergeStyle::Replace, the source background clears the target labels where the destination
+   * background is not locked. */
+  struct LabelTransferRules
   {
-  };
+    static constexpr int NoTarget = -1;
+    static constexpr std::size_t TableSize = std::numeric_limits<mitk::Label::PixelType>::max() + 1;
 
-  ~LabelTransferFunctor() {};
+    std::vector<int> Target = std::vector<int>(TableSize, NoTarget); // by source value
+    std::vector<bool> Overwritable; // by destination value
+    std::vector<bool> Clear = std::vector<bool>(TableSize, false); // by destination value
+    mitk::Label::PixelType SourceBackground = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
+    mitk::Label::PixelType DestinationBackground = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
 
-  bool operator!=(const LabelTransferFunctor& other)const
-  {
-    return !(*this == other);
-  }
-  bool operator==(const LabelTransferFunctor& other) const
-  {
-    return this->m_SourceBackground == other.m_SourceBackground &&
-      this->m_DestinationBackground == other.m_DestinationBackground &&
-      this->m_DestinationBackgroundLocked == other.m_DestinationBackgroundLocked &&
-      this->m_SourceLabel == other.m_SourceLabel &&
-      this->m_NewDestinationLabel == other.m_NewDestinationLabel &&
-      this->m_MergeStyle == other.m_MergeStyle &&
-      this->m_OverwriteStyle == other.m_OverwriteStyle &&
-      this->m_DestinationLabels == other.m_DestinationLabels;
-  }
-
-  LabelTransferFunctor& operator=(const LabelTransferFunctor& other)
-  {
-    this->m_DestinationLabels = other.m_DestinationLabels;
-    this->m_SourceBackground = other.m_SourceBackground;
-    this->m_DestinationBackground = other.m_DestinationBackground;
-    this->m_DestinationBackgroundLocked = other.m_DestinationBackgroundLocked;
-    this->m_SourceLabel = other.m_SourceLabel;
-    this->m_NewDestinationLabel = other.m_NewDestinationLabel;
-    this->m_MergeStyle = other.m_MergeStyle;
-    this->m_OverwriteStyle = other.m_OverwriteStyle;
-
-    return *this;
-  }
-
-  inline TOutputpixel operator()(const TDestinationPixel& existingDestinationValue, const TSourcePixel& existingSourceValue)
-  {
-    if (existingSourceValue == this->m_SourceLabel)
+    void Apply(const mitk::Label::PixelType* source, mitk::Label::PixelType* destination, std::size_t count) const
     {
-      if (IsOverwritable(existingDestinationValue, this->m_DestinationLabels, this->m_DestinationBackground,
-        this->m_DestinationBackgroundLocked, this->m_OverwriteStyle))
+      for (std::size_t i = 0; i < count; ++i)
       {
-        return this->m_NewDestinationLabel;
+        const auto sourceValue = source[i];
+        auto& value = destination[i];
+        const auto target = Target[sourceValue];
+
+        if (NoTarget != target)
+        {
+          if (Overwritable[value])
+            value = static_cast<mitk::Label::PixelType>(target);
+        }
+        else if (sourceValue == SourceBackground && Clear[value])
+        {
+          value = DestinationBackground;
+        }
       }
     }
-    else if (mitk::MultiLabelSegmentation::MergeStyle::Replace == this->m_MergeStyle
-      && existingSourceValue == this->m_SourceBackground
-      && existingDestinationValue == this->m_NewDestinationLabel
-      && (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == this->m_OverwriteStyle
-          || !this->m_DestinationBackgroundLocked))
+
+    /** Apply() for destination voxels that the source does not cover. They count as unlabeled in the source, as if
+     * the source had been padded to the size of the destination. */
+    void ApplyOutside(mitk::Label::PixelType* destination, std::size_t count) const
     {
-      return this->m_DestinationBackground;
+      const auto target = Target[mitk::MultiLabelSegmentation::UNLABELED_VALUE];
+
+      if (NoTarget != target)
+      {
+        for (std::size_t i = 0; i < count; ++i)
+        {
+          if (Overwritable[destination[i]])
+            destination[i] = static_cast<mitk::Label::PixelType>(target);
+        }
+      }
+      else if (mitk::MultiLabelSegmentation::UNLABELED_VALUE == SourceBackground)
+      {
+        for (std::size_t i = 0; i < count; ++i)
+        {
+          if (Clear[destination[i]])
+            destination[i] = DestinationBackground;
+        }
+      }
     }
 
-    return existingDestinationValue;
-  }
+    /** Whether ApplyOutside() can change anything, i.e. whether the destination beyond the source needs a pass. */
+    bool ChangesOutside() const
+    {
+      if (NoTarget != Target[mitk::MultiLabelSegmentation::UNLABELED_VALUE])
+        return true;
 
-private:
-  ConstLabelMapType m_DestinationLabels;
-  mitk::Label::PixelType m_SourceBackground = 0;
-  mitk::Label::PixelType m_DestinationBackground = 0;
-  bool m_DestinationBackgroundLocked = false;
-  mitk::Label::PixelType m_SourceLabel = 1;
-  mitk::Label::PixelType m_NewDestinationLabel = 1;
-  mitk::MultiLabelSegmentation::MergeStyle m_MergeStyle = mitk::MultiLabelSegmentation::MergeStyle::Replace;
-  mitk::MultiLabelSegmentation::OverwriteStyle m_OverwriteStyle = mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks;
-};
-
-/**Helper function used by TransferLabelContentAtTimeStep to allow the templating over different image dimensions in conjunction of AccessFixedPixelTypeByItk_n.*/
-template<unsigned int VImageDimension>
-void TransferLabelContentAtTimeStepHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage,
-  const mitk::ConstLabelVector& destinationLabels, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground,
-  bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, mitk::MultiLabelSegmentation::MergeStyle mergeStyle, mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
-{
-  typedef itk::Image<mitk::Label::PixelType, VImageDimension> ContentImageType;
-  typename ContentImageType::Pointer itkDestinationImage;
-  mitk::CastToItkImage(destinationImage, itkDestinationImage);
-
-  auto sourceRegion = itkSourceImage->GetLargestPossibleRegion();
-  auto relevantRegion = itkDestinationImage->GetLargestPossibleRegion();
-  bool overlapping = relevantRegion.Crop(sourceRegion);
-
-  if (!overlapping)
-  {
-    mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage and destinationImage seem to have no overlapping image region.";
-  }
-
-  typedef LabelTransferFunctor <mitk::Label::PixelType, mitk::Label::PixelType, mitk::Label::PixelType> LabelTransferFunctorType;
-  typedef itk::BinaryFunctorImageFilter<ContentImageType, ContentImageType, ContentImageType, LabelTransferFunctorType> FilterType;
-
-  LabelTransferFunctorType transferFunctor(ConvertLabelVectorToMap(destinationLabels), sourceBackground, destinationBackground,
-    destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStyle);
-
-  auto transferFilter = FilterType::New();
-
-  transferFilter->SetFunctor(transferFunctor);
-  transferFilter->InPlaceOn();
-  transferFilter->SetInput1(itkDestinationImage);
-  transferFilter->SetInput2(itkSourceImage);
-  transferFilter->GetOutput()->SetRequestedRegion(relevantRegion);
-
-  transferFilter->Update();
+      return mitk::MultiLabelSegmentation::UNLABELED_VALUE == SourceBackground &&
+        std::find(Clear.begin(), Clear.end(), true) != Clear.end();
+    }
+  };
 }
 
 void mitk::TransferLabelContentAtTimeStep(
@@ -2032,57 +1963,163 @@ void mitk::TransferLabelContentAtTimeStep(
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage must not be null.";
   }
 
-  if (sourceImage == destinationImage && labelMapping.size() > 1)
+  if (sourceImage->GetPixelType() != MakeScalarPixelType<Label::PixelType>())
   {
-    MITK_DEBUG << "Warning. Using TransferLabelContentAtTimeStep or TransferLabelContent with equal source and destination and more then on label to transfer, can lead to wrong results. Please see documentation and verify that the usage is OK.";
+    mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage does not have the pixel type of labels.";
+  }
+  if (destinationImage->GetPixelType() != MakeScalarPixelType<Label::PixelType>())
+  {
+    mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage does not have the pixel type of labels.";
   }
 
-  Image::ConstPointer sourceImageAtTimeStep = SelectImageByTimeStep(sourceImage, timeStep);
-  Image::Pointer destinationImageAtTimeStep = SelectImageByTimeStep(destinationImage, timeStep);
+  // An image with a single time step, like a slice, serves every time step.
+  const auto volumeTimeStep = [timeStep](const Image* image) { return 1 == image->GetTimeSteps() ? TimeStepType(0) : timeStep; };
+  const auto sourceTimeStep = volumeTimeStep(sourceImage);
+  const auto destinationTimeStep = volumeTimeStep(destinationImage);
 
-  if (nullptr == sourceImageAtTimeStep)
+  if (!sourceImage->GetTimeGeometry()->IsValidTimeStep(sourceTimeStep))
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage does not have the requested time step: " << timeStep;
   }
-
-  if (nullptr == destinationImageAtTimeStep)
+  if (!destinationImage->GetTimeGeometry()->IsValidTimeStep(destinationTimeStep))
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage does not have the requested time step: " << timeStep;
   }
 
-  if (!Equal(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+  const auto* sourceGeometry = sourceImage->GetGeometry(static_cast<int>(sourceTimeStep));
+  const auto* destinationGeometry = destinationImage->GetGeometry(static_cast<int>(destinationTimeStep));
+
+  using VoxelIndex = std::array<long long, 3>;
+
+  // The destination index of the first source voxel; zero unless the source is a sub geometry.
+  VoxelIndex offset = { 0, 0, 0 };
+
+  if (!Equal(*sourceGeometry, *destinationGeometry, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
   {
-    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true))
-    {
-      //we have to pad the source image
-      //because ImageToImageFilters always check for origin matching even if
-      //the requested output region is fitting :(
-      auto padFilter = mitk::PadImageFilter::New();
-      padFilter->SetInput(0, sourceImageAtTimeStep);
-      padFilter->SetInput(1, destinationImageAtTimeStep);
-      padFilter->SetPadConstant(Label::UNLABELED_VALUE);
-      padFilter->SetBinaryFilter(false);
-
-      padFilter->Update();
-
-      sourceImageAtTimeStep = padFilter->GetOutput();
-    }
-    else
+    if (!IsSubGeometry(*sourceGeometry, *destinationGeometry, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; source image has neither the same geometry than destination image nor has the source image a sub geometry.";
     }
+
+    Point3D sourceFirstIndex;
+    sourceFirstIndex.Fill(0.0);
+    Point3D world;
+    sourceGeometry->IndexToWorld(sourceFirstIndex, world);
+    Point3D destinationIndex;
+    destinationGeometry->WorldToIndex(world, destinationIndex);
+
+    for (unsigned int d = 0; d < 3; ++d)
+      offset[d] = std::llround(destinationIndex[d]);
   }
 
-  auto destLabelMap = ConvertLabelVectorToMap(destinationLabels);
+  const auto destinationLabelMap = ConvertLabelVectorToMap(destinationLabels);
+  const bool backgroundWritable = MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == overwriteStlye || !destinationBackgroundLocked;
+
+  LabelTransferRules rules;
+  rules.Overwritable = CreateOverwritableLookupTable(destinationLabelMap, destinationBackground, destinationBackgroundLocked, overwriteStlye);
+  rules.SourceBackground = sourceBackground;
+  rules.DestinationBackground = destinationBackground;
+
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
   {
-    if (MultiLabelSegmentation::UNLABELED_VALUE!=newDestinationLabel && destLabelMap.end() == destLabelMap.find(newDestinationLabel))
+    if (MultiLabelSegmentation::UNLABELED_VALUE != newDestinationLabel && destinationLabelMap.end() == destinationLabelMap.find(newDestinationLabel))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
     }
+    if (LabelTransferRules::NoTarget != rules.Target[sourceLabel])
+    {
+      mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; labelMapping maps the source label more than once: " << sourceLabel;
+    }
 
-    AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentAtTimeStepHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabels, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStlye));
+    rules.Target[sourceLabel] = newDestinationLabel;
+
+    if (MultiLabelSegmentation::MergeStyle::Replace == mergeStyle && backgroundWritable)
+      rules.Clear[newDestinationLabel] = true;
   }
+
+  const auto sizeOf = [](const Image* image) {
+    return VoxelIndex{ image->GetDimension(0), image->GetDimension(1), image->GetDimension(2) };
+  };
+  const auto sourceSize = sizeOf(sourceImage);
+  const auto destinationSize = sizeOf(destinationImage);
+
+  // The part of the destination that the source covers, in destination indices.
+  VoxelIndex coveredBegin;
+  VoxelIndex coveredEnd;
+
+  for (unsigned int d = 0; d < 3; ++d)
+  {
+    coveredBegin[d] = std::max(0LL, offset[d]);
+    coveredEnd[d] = std::min(destinationSize[d], offset[d] + sourceSize[d]);
+
+    if (coveredEnd[d] <= coveredBegin[d])
+    {
+      mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage and destinationImage seem to have no overlapping image region.";
+    }
+  }
+
+  // Merging touches only the covered part. Replacing has to clear the target labels everywhere else, too.
+  const bool changesOutside = rules.ChangesOutside();
+  const VoxelIndex processBegin = changesOutside ? VoxelIndex{ 0, 0, 0 } : coveredBegin;
+  const VoxelIndex processEnd = changesOutside ? destinationSize : coveredEnd;
+
+  {
+    ImageWriteAccessor destinationAccessor(destinationImage, destinationImage->GetVolumeData(static_cast<int>(destinationTimeStep)));
+    auto* destination = static_cast<Label::PixelType*>(destinationAccessor.GetData());
+
+    // A read accessor on the destination itself would wait for the write accessor forever.
+    std::optional<ImageReadAccessor> sourceAccessor;
+    const Label::PixelType* source = destination;
+
+    if (sourceImage != destinationImage)
+    {
+      sourceAccessor.emplace(sourceImage, sourceImage->GetVolumeData(static_cast<int>(sourceTimeStep)));
+      source = static_cast<const Label::PixelType*>(sourceAccessor->GetData());
+    }
+
+    itk::ImageRegion<3> region;
+
+    for (unsigned int d = 0; d < 3; ++d)
+    {
+      region.SetIndex(d, processBegin[d]);
+      region.SetSize(d, processEnd[d] - processBegin[d]);
+    }
+
+    itk::MultiThreaderBase::New()->ParallelizeImageRegion<3>(region, [&](const itk::ImageRegion<3>& chunk)
+      {
+        const auto xBegin = static_cast<long long>(chunk.GetIndex(0));
+        const auto xEnd = xBegin + static_cast<long long>(chunk.GetSize(0));
+        const auto yBegin = static_cast<long long>(chunk.GetIndex(1));
+        const auto yEnd = yBegin + static_cast<long long>(chunk.GetSize(1));
+        const auto zBegin = static_cast<long long>(chunk.GetIndex(2));
+        const auto zEnd = zBegin + static_cast<long long>(chunk.GetSize(2));
+
+        for (auto z = zBegin; z < zEnd; ++z)
+        {
+          for (auto y = yBegin; y < yEnd; ++y)
+          {
+            auto* row = destination + (z * destinationSize[1] + y) * destinationSize[0];
+
+            const bool covered = coveredBegin[1] <= y && y < coveredEnd[1] && coveredBegin[2] <= z && z < coveredEnd[2];
+
+            if (!covered)
+            {
+              rules.ApplyOutside(row + xBegin, static_cast<std::size_t>(xEnd - xBegin));
+              continue;
+            }
+
+            const auto insideBegin = std::clamp(coveredBegin[0], xBegin, xEnd);
+            const auto insideEnd = std::clamp(coveredEnd[0], xBegin, xEnd);
+            const auto* sourceRow = source + ((z - offset[2]) * sourceSize[1] + (y - offset[1])) * sourceSize[0] + (insideBegin - offset[0]);
+
+            rules.ApplyOutside(row + xBegin, static_cast<std::size_t>(insideBegin - xBegin));
+            rules.Apply(sourceRow, row + insideBegin, static_cast<std::size_t>(insideEnd - insideBegin));
+            rules.ApplyOutside(row + insideEnd, static_cast<std::size_t>(xEnd - insideEnd));
+          }
+        }
+      }, nullptr);
+  }
+
   destinationImage->Modified();
 }
 

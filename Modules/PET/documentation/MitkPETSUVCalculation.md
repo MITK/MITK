@@ -319,12 +319,18 @@ input usable. By default they are applied and logged as warnings. With
 
 | Adaptation | Trigger | Default | Strict |
 |------------|---------|---------|--------|
-| Radionuclide Total Dose `(0018,1074)` given in MBq | value strictly between `0` and `1e4` | multiplied by `1e6` | `ImplausibleRadionuclideDoseException` |
+| Radionuclide Total Dose `(0018,1074)` given in MBq | value strictly between `0` and `1e4`, in the selected Radiopharmaceutical Information Sequence item and only if `--injected-activity` does not replace it | multiplied by `1e6` | `ImplausibleRadionuclideDoseException` |
 | Empirical decay-timing fallback for `START` | steps 3 or 4 of the fallback chain | applied | `VendorEmpiricalDecayFallbackRefusedException` |
 | Unverified manufacturer for that fallback | `(0008,0070)` absent, empty or unrecognized *and* step 3 or 4 fires | general rule applied | covered by the row above |
 | Patient sex `O` for a sex-specific variant | `(0010,0040)` or `--patient-sex` is `O` | mean of male and female numerators | `AmbiguousPatientSexAdaptationRefusedException` |
 | Administration date rebuilt from the reference datetime | duration outside `[-3600 s, 2 * T)`, or only `(0018,1072)` present | stored time of day kept, date taken from the reference | `AdministrationDateSubstitutionRefusedException` |
 | Patient's Weight `(0010,1030)` given in grams | value `>= 1000` | divided by 1000 | `ImplausiblePatientWeightException` |
+
+Only the dose the computation actually uses is subject to the policy and
+recorded: another item of a multi-tracer sequence, or a dose that
+`--injected-activity` replaces, is neither refused under `--strict-dicom` nor
+reported. For a tag inside a sequence the record's `dicomTag` names the full
+path, for example `(0054,0016)[1].(0018,1074)`.
 
 Every adaptation that fires is also recorded, so it can be audited without
 parsing the log. The record holds one entry per applied recommendation,
@@ -397,22 +403,24 @@ carries its own provenance:
 | `mitk.pet.suv.adaptations` | The record as a JSON array; `[]` when nothing was adapted. Each entry has `rule`, `dicomTag`, `originalValue` and `usedValue`. |
 | `(0008,2111)` Derivation Description | `MITK SUV`, followed by the number of adaptations when there were any. The tag is `LO` and holds the count, not the record. |
 
-Where an adaptation reinterpreted a tag, the output carries the value the
+Where an adaptation rescaled a scalar tag, the output carries the value the
 computation actually used rather than the input's original: the corrected
 `(0010,1030)` Patient's Weight in kilograms, and the corrected
-`(0054,0016)[0].(0018,1074)` Radionuclide Total Dose in becquerel. Without
+`(0018,1074)` Radionuclide Total Dose in becquerel, written into the selected
+Radiopharmaceutical Information Sequence item, for example
+`(0054,0016)[1].(0018,1074)` when the second item was used. Without
 this the output would inherit the misleading original, and a reader taking
 `(0010,1030)` at face value would conclude the SUV came from a one-tonne
 patient.
 
 The reconstructed administration datetime is deliberately *not* mirrored onto
-`(0018,1078)`. The record holds what the substitution consumed -- the
-implausible duration, or the tag that drove it -- but never the resolved
-datetime itself, because the computation needs only the decay duration and
-never forms one. Writing the tag would mean deriving a value that does not
-otherwise exist, per slice for a `START` correction, purely to restate what
-the record already says. The record names the substitution, the tag that
-triggered it and the original value, which is what a reader needs.
+`(0018,1078)`. The record holds the stored `(0018,1078)` or `(0018,1072)`
+value as `originalValue` and names the substitution in `usedValue`, but never
+the resolved datetime itself, because the computation needs only the decay
+duration and never forms one. Writing the tag would mean deriving a value
+that does not otherwise exist, per slice for a `START` correction, purely to
+restate what the record already says. The record names the substitution, the tag that
+triggered it and the stored value, which is what a reader needs.
 
 DICOM defines a distinct SUV Type for each lean-body-mass formula, and the
 written tag names the one actually used. An SUV image is therefore readable

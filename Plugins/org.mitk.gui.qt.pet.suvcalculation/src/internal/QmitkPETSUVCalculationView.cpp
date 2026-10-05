@@ -523,11 +523,7 @@ void QmitkPETSUVCalculationView::DetectAndPopulateTracers()
 
   try
   {
-    // The view only inspects tracer identity here; the SUV filter owns the
-    // adaptation record for the run, so this probe discards its own.
-    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
-    const auto rpis = mitk::GetRadiopharmaceuticalInfos(
-      image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
+    const auto rpis = mitk::GetRadiopharmaceuticalInfos(image);
     if (rpis.size() > 1U)
     {
       m_MultiTracerDetected = true;
@@ -545,8 +541,8 @@ void QmitkPETSUVCalculationView::DetectAndPopulateTracers()
   }
   catch (const mitk::Exception&)
   {
-    // Best-effort: if even reading the RPI throws (e.g. strict-DICOM dose
-    // refusal at this stage), let ConfigureFromProperties surface it.
+    // Best-effort: if reading the RPI throws (e.g. an unparseable value),
+    // let ConfigureFromProperties surface it.
   }
 }
 
@@ -563,11 +559,7 @@ void QmitkPETSUVCalculationView::RefreshNuclideComboFromImage()
 
   try
   {
-    // The view only inspects tracer identity here; the SUV filter owns the
-    // adaptation record for the run, so this probe discards its own.
-    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
-    const auto rpis = mitk::GetRadiopharmaceuticalInfos(
-      image, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
+    const auto rpis = mitk::GetRadiopharmaceuticalInfos(image);
     if (!rpis.empty())
     {
       const int idx = m_Controls->nuclideCombo->findText(QString::fromStdString(rpis.front().name));
@@ -967,9 +959,9 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
   }
 
   // Activity + half-life: only meaningful on the activity-to-SUV path.
-  // When Configure failed but the input is activity-typed, try the
-  // helpers under Lenient policy so the displayed autodetect is not
-  // re-blocked by the same Strict refusal that broke Configure.
+  // When Configure failed but the input is activity-typed, read the
+  // sequence directly: the reader applies no policy, so the displayed
+  // autodetect is not re-blocked by the Strict refusal that broke Configure.
   auto populateActivityAndHalfLife = [&]() {
     if (m_Configured && needsActivity)
     {
@@ -993,9 +985,7 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     {
       try
       {
-        std::vector<mitk::SUVAdaptation> ignoredAdaptations;
-        const auto rpis = mitk::GetRadiopharmaceuticalInfos(
-          image, this->CurrentReadPolicy(), ignoredAdaptations);
+        const auto rpis = mitk::GetRadiopharmaceuticalInfos(image);
         const int idx   = m_Filter->GetTracerIndex().value_or(0);
         if (idx >= 0 && static_cast<std::size_t>(idx) < rpis.size())
         {

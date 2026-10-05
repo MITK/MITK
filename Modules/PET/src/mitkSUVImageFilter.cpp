@@ -568,6 +568,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   const auto prevHalfLife   = m_EffectiveHalfLifeInSec;
   const auto prevDecay      = m_EffectiveDecayCorrection;
   const auto prevInputModel = m_EffectiveInputModel;
+  const auto prevTracerIndex = m_EffectiveTracerIndex;
   const auto prevAdaptations = m_Adaptations;
   const auto prevRescaleFindings = m_RescaleFindings;
   const auto prevConf       = m_Configured;
@@ -580,6 +581,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   m_EffectiveHalfLifeInSec.reset();
   m_EffectiveDecayCorrection.reset();
   m_EffectiveInputModel.reset();
+  m_EffectiveTracerIndex.reset();
   // Cleared on entry so a reconfigure reports this input's
   // adaptations rather than accumulating across calls.
   m_Adaptations.clear();
@@ -598,15 +600,16 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     // to frames carries one frame's rescale in every frame's pixels. No input
     // model or decay override repairs that, so it is refused before any
     // override is consulted.
-    if (IsEnhancedPETInput(props))
+    const bool isEnhancedPET = IsEnhancedPETInput(props);
+    if (isEnhancedPET)
     {
       RequireEnhancedPETFramesResolved(props);
     }
 
     m_EffectiveInputModel = m_InputModelOverride.has_value()
       ? m_InputModelOverride.value()
-      : (IsEnhancedPETInput(props) ? ClassifyEnhancedPETInput(image, m_DICOMReadPolicy)
-                                   : ClassifyPETInput(props, m_DICOMReadPolicy));
+      : (isEnhancedPET ? ClassifyEnhancedPETInput(image, m_DICOMReadPolicy)
+                       : ClassifyPETInput(props, m_DICOMReadPolicy));
 
     // Diagnostic only, and deliberately after classification so it runs
     // once per configure on an input the pipeline has accepted. Kept as
@@ -634,9 +637,19 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
 
     if (needsRadioPharma)
     {
-      auto rpiInfos      = GetRadiopharmaceuticalInfos(props, m_DICOMReadPolicy,
-                                                       m_Adaptations);
-      const int tracerIx = SelectTracerIndex(rpiInfos, m_TracerIndex);
+      const auto rpiInfos = GetRadiopharmaceuticalInfos(props);
+      const int tracerIx  = SelectTracerIndex(rpiInfos, m_TracerIndex);
+
+      // Only the dose the computation consumes is subject to the read policy
+      // and recorded: other items' doses and a dose that an explicit
+      // activity replaces never reach the result. Applied before the
+      // activity is used so Strict refuses ahead of any computation.
+      if (tracerIx >= 0 && !m_InjectedActivityInBq.has_value())
+      {
+        ApplyDosePlausibilityPolicy(rpiInfos[tracerIx], tracerIx, m_DICOMReadPolicy, m_Adaptations);
+        m_EffectiveTracerIndex = tracerIx;
+      }
+
       const RadiopharmaceuticalInfo tracer = (tracerIx >= 0) ? rpiInfos[tracerIx]
                                                              : RadiopharmaceuticalInfo{};
 
@@ -802,6 +815,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     m_EffectiveHalfLifeInSec        = prevHalfLife;
     m_EffectiveDecayCorrection      = prevDecay;
     m_EffectiveInputModel           = prevInputModel;
+    m_EffectiveTracerIndex          = prevTracerIndex;
     m_Adaptations                   = prevAdaptations;
     m_RescaleFindings               = prevRescaleFindings;
     m_Configured                    = prevConf;
@@ -981,7 +995,8 @@ namespace
   // RescaleIntercept and RescaleSlope are reset because SUV is already
   // in physical units; the filter applies no further rescale.
   void ApplyOutputTagPolicy(mitk::Image* output, mitk::SUVVariant target,
-                            const std::vector<mitk::SUVAdaptation>& adaptations)
+                            const std::vector<mitk::SUVAdaptation>& adaptations,
+                            const std::optional<int> tracerIndex)
   {
     auto setStr = [output](const mitk::DICOMTagPath& path, const char* value) {
       if (nullptr == value) return;
@@ -995,15 +1010,17 @@ namespace
     setStr(mitk::DICOMTagPath(0x0028, 0x1052), "0.0");
     setStr(mitk::DICOMTagPath(0x0028, 0x1053), "1.0");
 
-    // Where an adaptation reinterpreted a tag, the output carries the value
+    // Where an adaptation rescaled a scalar tag, the output carries the value
     // the computation used. Without this the output inherits the input's
     // misleading original -- a reader taking (0010,1030) at face value would
-    // conclude the SUV was computed from a one-tonne patient.
-    if (const auto* dose = FindAdaptation(adaptations, mitk::SUVAdaptationRule::DoseReinterpretedAsMBq))
+    // conclude the SUV was computed from a one-tonne patient. An
+    // administration-date substitution is not mirrored onto (0018,1078): the
+    // computation never forms that datetime and its date may differ per
+    // slice, so the adaptation record is the only faithful place for it.
+    const auto* dose = FindAdaptation(adaptations, mitk::SUVAdaptationRule::DoseReinterpretedAsMBq);
+    if (nullptr != dose && tracerIndex.has_value())
     {
-      mitk::DICOMTagPath dosePath;
-      dosePath.AddSelection(0x0054, 0x0016, 0).AddElement(0x0018, 0x1074);
-      setStr(dosePath, dose->usedValue.c_str());
+      setStr(mitk::RadiopharmaceuticalDoseTagPath(tracerIndex.value()), dose->usedValue.c_str());
     }
     if (const auto* weight = FindAdaptation(adaptations, mitk::SUVAdaptationRule::WeightReinterpretedAsGrams))
     {
@@ -1137,5 +1154,5 @@ void mitk::SUVImageFilter::GenerateData()
     }
   }
 
-  ApplyOutputTagPolicy(outputImage, m_TargetVariant, m_Adaptations);
+  ApplyOutputTagPolicy(outputImage, m_TargetVariant, m_Adaptations, m_EffectiveTracerIndex);
 }

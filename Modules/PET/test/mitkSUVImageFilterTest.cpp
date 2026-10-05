@@ -24,6 +24,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <algorithm>
+#include <cstddef>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -62,6 +64,7 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   // Ambiguous-sex policy gate (Sex::Other)
   MITK_TEST(SexPolicyGate_StrictWithSexOther_Throws);
   MITK_TEST(SexPolicyGate_LenientWithSexOther_Succeeds);
+  MITK_TEST(SexPolicyGate_LenientSexOther_BothLegsSexSpecific_RecordsOnce);
 
   // Reconfigure-on-change (M1): a target-variant change after configure
   // re-resolves at Update instead of reusing stale resolved state.
@@ -90,6 +93,11 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(DecayMap_MissingSliceEntry_Throws);
   MITK_TEST(DecayMap_OutOfRangeSlice_Throws);
   MITK_TEST(DecayMap_OutOfRangeTimestep_Throws);
+
+  // Dose reinterpretation follows the selected tracer
+  MITK_TEST(DoseAdaptation_SelectedSecondItem_RewritesThatItem);
+  MITK_TEST(DoseAdaptation_UnselectedImplausibleItem_NotRecordedNorRewritten);
+  MITK_TEST(DoseAdaptation_StrictUnselectedImplausibleItem_Computes);
 
   // Enhanced PET frame refusal is independent of the overrides
   MITK_TEST(EnhancedPET_FramesUnresolved_OverridesDoNotBypassRefusal);
@@ -423,6 +431,34 @@ public:
     CPPUNIT_ASSERT_NO_THROW(f->Update());
   }
 
+  void SexPolicyGate_LenientSexOther_BothLegsSexSpecific_RecordsOnce()
+  {
+    // Target and source are both sex-specific, so the gate fires on both
+    // legs. It is one ambiguity in one tag, so the record carries one entry.
+    auto f   = mitk::SUVImageFilter::New();
+    auto img = MakeMinimalImage();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::LBM_Janmahasatian);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetPatientHeightInCm(170.0);
+    f->SetPatientSex(mitk::Sex::Other);
+
+    mitk::SUVInputModel model = MakePrenormalizedBwInputModel();
+    model.sourceVariant = mitk::SUVVariant::LBM_James128;
+    f->SetInputModelOverride(model);
+
+    f->ConfigureFromProperties(img.GetPointer());
+    f->Update();
+
+    const auto& adaptations = f->GetAdaptations();
+    const auto count = std::count_if(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale == a.rule;
+      });
+    CPPUNIT_ASSERT_EQUAL(std::ptrdiff_t{1}, count);
+  }
+
   void TargetVariantChange_AfterConfigure_RequiresSex()
   {
     // M1: a target-variant change after ConfigureFromProperties must not be
@@ -605,8 +641,7 @@ public:
     // a one-tonne patient.
     const std::string weight = ReadStringProperty(
       output, mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030)));
-    CPPUNIT_ASSERT(weight.find("70") != std::string::npos);
-    CPPUNIT_ASSERT(weight.find("70000") == std::string::npos);
+    CPPUNIT_ASSERT_EQUAL(std::string("70"), weight);
   }
 
   void AdaptationRecord_SurvivesSaveAndReload()
@@ -758,6 +793,43 @@ private:
     return m;
   }
 
+  static std::string DoseKey(unsigned int item)
+  {
+    mitk::DICOMTagPath path;
+    path.AddSelection(0x0054, 0x0016, item).AddElement(0x0018, 0x1074);
+    return mitk::DICOMTagPathToPropertyName(path);
+  }
+
+  static mitk::Image::Pointer MakeTwoTracerDoseImage(const char* dose0, const char* dose1)
+  {
+    auto img = MakeMinimalImage();
+    const char* const doses[] = { dose0, dose1 };
+    for (unsigned int item = 0; item < 2; ++item)
+    {
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, doses[item]);
+      img->SetProperty(DoseKey(item).c_str(), prop);
+    }
+    return img;
+  }
+
+  // Activity comes from the image's dose items; the other inputs are
+  // overridden so the dose path is the only thing under test.
+  static mitk::SUVImageFilter::Pointer MakeDoseFilterSelectingSecondTracer(
+    const mitk::Image::Pointer& img, mitk::DICOMReadPolicy policy)
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetDICOMReadPolicy(policy);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetHalfLifeInSec(6586.2);
+    f->SetDecayTimeOverrideInSec(3600.0);
+    f->SetTracerIndex(1);
+    f->SetInputModelOverride(MakeActivityInputModel());
+    return f;
+  }
+
 public:
 
   void SetClear_DecayTimeOverrideMap()
@@ -876,6 +948,69 @@ public:
     f->SetDecayTimeOverrideMap(map);
     CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
                          mitk::InvalidDecayTimeMapException);
+  }
+
+  // ---- Dose reinterpretation follows the selected tracer ----
+  //
+  // Only the item the computation consumes may be reinterpreted, recorded
+  // and written back to the output; the other items are left as they came.
+
+  void DoseAdaptation_SelectedSecondItem_RewritesThatItem()
+  {
+    auto img = MakeTwoTracerDoseImage("1.85e8", "368.08");
+    auto f   = MakeDoseFilterSelectingSecondTracer(img, mitk::DICOMReadPolicy::Lenient);
+    f->Update();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, f->GetEffectiveInjectedActivityInBq(),
+                                 3.6808e8 * 1e-6);
+
+    const auto& adaptations = f->GetAdaptations();
+    const auto doseEntries = std::count_if(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == a.rule;
+      });
+    CPPUNIT_ASSERT_EQUAL(std::ptrdiff_t{1}, doseEntries);
+    const auto entry = std::find_if(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == a.rule;
+      });
+    CPPUNIT_ASSERT_EQUAL(std::string("(0054,0016)[1].(0018,1074)"), entry->dicomTag);
+
+    const auto output = f->GetOutput();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(
+      3.6808e8, std::stod(ReadStringProperty(output, DoseKey(1))), 3.6808e8 * 1e-6);
+    CPPUNIT_ASSERT_EQUAL(ReadStringProperty(img, DoseKey(0)),
+                         ReadStringProperty(output, DoseKey(0)));
+  }
+
+  void DoseAdaptation_UnselectedImplausibleItem_NotRecordedNorRewritten()
+  {
+    auto img = MakeTwoTracerDoseImage("368.08", "1.85e8");
+    auto f   = MakeDoseFilterSelectingSecondTracer(img, mitk::DICOMReadPolicy::Lenient);
+    f->Update();
+
+    const auto& adaptations = f->GetAdaptations();
+    const bool recorded = std::any_of(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == a.rule;
+      });
+    CPPUNIT_ASSERT(!recorded);
+
+    const auto output = f->GetOutput();
+    CPPUNIT_ASSERT_EQUAL(ReadStringProperty(img, DoseKey(0)),
+                         ReadStringProperty(output, DoseKey(0)));
+    CPPUNIT_ASSERT_EQUAL(ReadStringProperty(img, DoseKey(1)),
+                         ReadStringProperty(output, DoseKey(1)));
+  }
+
+  void DoseAdaptation_StrictUnselectedImplausibleItem_Computes()
+  {
+    auto img = MakeTwoTracerDoseImage("368.08", "1.85e8");
+    auto f   = MakeDoseFilterSelectingSecondTracer(img, mitk::DICOMReadPolicy::Strict);
+
+    CPPUNIT_ASSERT_NO_THROW(f->Update());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8, f->GetEffectiveInjectedActivityInBq(),
+                                 1.85e8 * 1e-6);
   }
 
   // ---- Enhanced PET frame refusal vs. overrides ----

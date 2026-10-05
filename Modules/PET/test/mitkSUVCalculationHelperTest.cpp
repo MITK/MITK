@@ -35,10 +35,14 @@ namespace
                        [rule](const mitk::SUVAdaptation& a) { return rule == a.rule; });
   }
 
-  // Most cases here only care about the parsed sequence, not about which
-  // IBSI-SUV recommendations fired, so they funnel through this wrapper
-  // rather than declaring an adaptation vector each time. The cases that do
-  // care pass their own vector to mitk::GetRadiopharmaceuticalInfos.
+  const mitk::SUVAdaptation* FindRule(const std::vector<mitk::SUVAdaptation>& adaptations,
+                                      mitk::SUVAdaptationRule rule)
+  {
+    const auto it = std::find_if(adaptations.cbegin(), adaptations.cend(),
+                                 [rule](const mitk::SUVAdaptation& a) { return rule == a.rule; });
+    return adaptations.cend() == it ? nullptr : &*it;
+  }
+
   // Most weight cases do not care which recommendations fired, so they
   // funnel through this wrapper rather than declaring a record each time.
   double ReadWeight(const mitk::IPropertyProvider* provider,
@@ -48,12 +52,9 @@ namespace
     return mitk::GetPatientsWeight(provider, policy, ignoredAdaptations);
   }
 
-  std::vector<mitk::RadiopharmaceuticalInfo> ReadRPI(
-    const mitk::IPropertyProvider* provider,
-    mitk::DICOMReadPolicy policy = mitk::DICOMReadPolicy::Lenient)
+  std::vector<mitk::RadiopharmaceuticalInfo> ReadRPI(const mitk::IPropertyProvider* provider)
   {
-    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
-    return mitk::GetRadiopharmaceuticalInfos(provider, policy, ignoredAdaptations);
+    return mitk::GetRadiopharmaceuticalInfos(provider);
   }
 
   // Build a 1x1xnSlicesxnTimeSteps mitk::Image with float pixels. The data
@@ -197,6 +198,10 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(AdminTime_UtcOffsetHonoured);
   MITK_TEST(AdminTime_UnparseableStartDateTime_Throws);
   MITK_TEST(Start_Step1_NegativeOffset_DoesNotFallThroughToStep2);
+  MITK_TEST(Start_Step1_AbandonedOnLaterSlice_RecordsNoAdaptation);
+  MITK_TEST(Start_Step1_AbandonedOnLaterSlice_StrictPolicy_Computes);
+  MITK_TEST(Start_Step1_PrivateDateTimeOnFirstSlotOnly_FallsThroughToStep2);
+  MITK_TEST(AdminWindow_Reconstructed_WithinFloor_NotShifted);
   MITK_TEST(Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_None_MissingAcqTime_Throws_MissingDICOMPropertyException);
   MITK_TEST(None_SlotMissingAcquisitionTime_Throws);
@@ -228,6 +233,9 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Start_UnparseableAcquisitionTime_Throws_InvalidDICOMPropertyValueException);
   MITK_TEST(Radiopharm_DoseBelowThreshold_RecordsAdaptation);
   MITK_TEST(Radiopharm_DoseAboveThreshold_RecordsNothing);
+  MITK_TEST(ApplyDosePlausibilityPolicy_SecondItem_RecordsFullPath);
+  MITK_TEST(Radiopharm_DoseNearThreshold_UsedValueFitsDS);
+  MITK_TEST(Radiopharm_DoseSevenSignificantDigits_UsedValueKeepsPrecision);
 
   // Patient's Weight gram encoding
   MITK_TEST(PatientWeight_BelowThreshold_TakenAsKilograms);
@@ -235,6 +243,7 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(PatientWeight_AtThreshold_TakenAsGrams);
   MITK_TEST(PatientWeight_GramEncoded_TakenAsGrams);
   MITK_TEST(PatientWeight_GramEncoded_RecordsAdaptation);
+  MITK_TEST(PatientWeight_GramEncoded_UsedValueIsCompactDS);
   MITK_TEST(PatientWeight_PlausibleWeight_RecordsNothing);
   MITK_TEST(PatientWeight_GramEncoded_StrictPolicy_Throws);
   MITK_TEST(PatientWeight_PlausibleWeight_StrictPolicy_PassesThrough);
@@ -252,6 +261,7 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(FormatDerivationDescription_NeverExceedsTheLOLimit);
   MITK_TEST(RecordAdaptation_StrictPolicy_RefusesEvenWithoutARecord);
   MITK_TEST(RecordAdaptation_LenientPolicy_AppendsAndToleratesNullRecord);
+  MITK_TEST(RecordAdaptation_IdenticalEntry_RecordedOnce);
 
   // Rescale plausibility diagnostics
   MITK_TEST(Rescale_PlausibleValues_NoFindings);
@@ -365,6 +375,25 @@ private:
       SetBed(image, 0, s, static_cast<int>(s) * 300, /*withTAve=*/true);
       SetBedDuration(image, 0, s);
     }
+    return image;
+  }
+
+  // Three slices, the private datetime usable on the first two only, so
+  // Step 1 is rejected and Step 2 resolves the series. Against the private
+  // datetime the administration stamp is a day off (90000 s, outside
+  // 2 * T_half); against AcquisitionTime it is plausible (3600 s).
+  mitk::Image::Pointer MakeStep1AbandonedOnLaterSliceImage()
+  {
+    auto image = MakeSyntheticImage(/*nSlices=*/3, /*nTimeSteps=*/1);
+    this->SetupAdminWindowCase(image, "20260430110000");
+    for (unsigned int s = 0; s < 3; ++s)
+    {
+      SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", 0, s);
+      SetDicomProperty(image, PropName(0x0008, 0x0032), "120000", 0, s);
+    }
+    SetDicomProperty(image, "mitk.pet.SiemensDecayDateTime", "20260501120000", 0, 0);
+    SetDicomProperty(image, "mitk.pet.SiemensDecayDateTime", "20260501120000", 0, 1);
+    SetDicomProperty(image, "mitk.pet.SiemensDecayDateTime", "not-a-datetime", 0, 2);
     return image;
   }
 
@@ -548,6 +577,8 @@ public:
     const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
+    CPPUNIT_ASSERT(infos[0].totalDoseReinterpretedAsMBq);
+    CPPUNIT_ASSERT_EQUAL(std::string("368.08"), infos[0].totalDoseStored);
   }
 
   void RadionuclideTotalDose_AboveThreshold_PassesThrough()
@@ -559,6 +590,8 @@ public:
     const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
+    CPPUNIT_ASSERT(!infos[0].totalDoseReinterpretedAsMBq);
+    CPPUNIT_ASSERT_EQUAL(std::string("3.6808e8"), infos[0].totalDoseStored);
   }
 
   void RadionuclideTotalDose_AtThresholdExactly_PassesThrough()
@@ -573,6 +606,7 @@ public:
     const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0e4, infos[0].totalDoseBq, 0.0);
+    CPPUNIT_ASSERT(!infos[0].totalDoseReinterpretedAsMBq);
   }
 
   void RadionuclideTotalDose_ZeroOrNegative_PassesThrough()
@@ -611,9 +645,11 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
 
+    std::vector<mitk::SUVAdaptation> adaptations;
     CPPUNIT_ASSERT_THROW(
-      ReadRPI(image, mitk::DICOMReadPolicy::Strict),
+      mitk::ApplyDosePlausibilityPolicy(ReadRPI(image).at(0), 0, mitk::DICOMReadPolicy::Strict, adaptations),
       mitk::ImplausibleRadionuclideDoseException);
+    CPPUNIT_ASSERT(adaptations.empty());
   }
 
   void RadionuclideTotalDose_BelowThreshold_StrictPolicy_CatchableAsBaseException()
@@ -621,8 +657,9 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
 
+    std::vector<mitk::SUVAdaptation> adaptations;
     CPPUNIT_ASSERT_THROW(
-      ReadRPI(image, mitk::DICOMReadPolicy::Strict),
+      mitk::ApplyDosePlausibilityPolicy(ReadRPI(image).at(0), 0, mitk::DICOMReadPolicy::Strict, adaptations),
       mitk::BenchmarkAdaptationRequiredException);
   }
 
@@ -632,9 +669,13 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
 
-    const auto infos = ReadRPI(image, mitk::DICOMReadPolicy::Strict);
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
+    std::vector<mitk::SUVAdaptation> adaptations;
+    CPPUNIT_ASSERT_NO_THROW(
+      mitk::ApplyDosePlausibilityPolicy(infos[0], 0, mitk::DICOMReadPolicy::Strict, adaptations));
+    CPPUNIT_ASSERT(adaptations.empty());
   }
 
   void PatientWeight_Found()
@@ -709,6 +750,20 @@ public:
     CPPUNIT_ASSERT(mitk::SUVAdaptationRule::WeightReinterpretedAsGrams == adaptations[0].rule);
     CPPUNIT_ASSERT_EQUAL(std::string("(0010,1030)"), adaptations[0].dicomTag);
     CPPUNIT_ASSERT_EQUAL(std::string("70000"), adaptations[0].originalValue);
+  }
+
+  void PatientWeight_GramEncoded_UsedValueIsCompactDS()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1030), "70500");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    (void)mitk::GetPatientsWeight(image, mitk::DICOMReadPolicy::Lenient, adaptations);
+
+    const auto* const reinterpretation =
+      FindRule(adaptations, mitk::SUVAdaptationRule::WeightReinterpretedAsGrams);
+    CPPUNIT_ASSERT(nullptr != reinterpretation);
+    CPPUNIT_ASSERT_EQUAL(std::string("70.5"), reinterpretation->usedValue);
   }
 
   void PatientWeight_PlausibleWeight_RecordsNothing()
@@ -908,6 +963,24 @@ public:
     CPPUNIT_ASSERT_NO_THROW(
       mitk::RecordAdaptation(nullptr, mitk::DICOMReadPolicy::Lenient,
                              mitk::SUVAdaptationRule::DoseReinterpretedAsMBq, "", "", ""));
+  }
+
+  void RecordAdaptation_IdenticalEntry_RecordedOnce()
+  {
+    std::vector<mitk::SUVAdaptation> adaptations;
+    for (int i = 0; i < 2; ++i)
+    {
+      mitk::RecordAdaptation(&adaptations, mitk::DICOMReadPolicy::Lenient,
+                             mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
+                             "(0010,0040)", "O", "mean of male- and female-specific scale numerators");
+    }
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+
+    // Same rule, different value: a distinct fact, kept.
+    mitk::RecordAdaptation(&adaptations, mitk::DICOMReadPolicy::Lenient,
+                           mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
+                           "(0010,0040)", "", "mean of male- and female-specific scale numerators");
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), adaptations.size());
   }
 
   // ---- Rescale plausibility ----
@@ -1602,14 +1675,16 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
 
-    std::vector<mitk::SUVAdaptation> adaptations;
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(
-      image, mitk::DICOMReadPolicy::Lenient, adaptations);
-
+    const auto infos = ReadRPI(image);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT(infos[0].totalDoseReinterpretedAsMBq);
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    mitk::ApplyDosePlausibilityPolicy(infos[0], 0, mitk::DICOMReadPolicy::Lenient, adaptations);
+
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
     CPPUNIT_ASSERT(mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == adaptations[0].rule);
-    CPPUNIT_ASSERT_EQUAL(std::string("(0018,1074)"), adaptations[0].dicomTag);
+    CPPUNIT_ASSERT_EQUAL(std::string("(0054,0016)[0].(0018,1074)"), adaptations[0].dicomTag);
     // The stored value is kept verbatim so an auditor can see what was read,
     // not only what was used.
     CPPUNIT_ASSERT_EQUAL(std::string("368.08"), adaptations[0].originalValue);
@@ -1620,10 +1695,62 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
 
+    const auto infos = ReadRPI(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT(!infos[0].totalDoseReinterpretedAsMBq);
+
     std::vector<mitk::SUVAdaptation> adaptations;
-    (void)mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Lenient,
-                                            adaptations);
+    mitk::ApplyDosePlausibilityPolicy(infos[0], 0, mitk::DICOMReadPolicy::Lenient, adaptations);
     CPPUNIT_ASSERT(adaptations.empty());
+  }
+
+  void ApplyDosePlausibilityPolicy_SecondItem_RecordsFullPath()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "1.85e8");
+    {
+      mitk::DICOMTagPath path;
+      path.AddSelection(0x0054, 0x0016, 1).AddElement(0x0018, 0x1074);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path), "368.08");
+    }
+
+    const auto infos = ReadRPI(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), infos.size());
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    mitk::ApplyDosePlausibilityPolicy(infos[1], 1, mitk::DICOMReadPolicy::Lenient, adaptations);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("(0054,0016)[1].(0018,1074)"), adaptations[0].dicomTag);
+    CPPUNIT_ASSERT_EQUAL(std::string("368.08"), adaptations[0].originalValue);
+    CPPUNIT_ASSERT_EQUAL(std::string("368080000"), adaptations[0].usedValue);
+  }
+
+  void Radiopharm_DoseNearThreshold_UsedValueFitsDS()
+  {
+    // The Bq value written into a DS tag must stay within 16 characters;
+    // six fixed decimals would make this one 17.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "9999.5");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    mitk::ApplyDosePlausibilityPolicy(ReadRPI(image).at(0), 0, mitk::DICOMReadPolicy::Lenient, adaptations);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("9999500000"), adaptations[0].usedValue);
+    CPPUNIT_ASSERT(adaptations[0].usedValue.size() <= 16U);
+  }
+
+  void Radiopharm_DoseSevenSignificantDigits_UsedValueKeepsPrecision()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.0812");
+
+    std::vector<mitk::SUVAdaptation> adaptations;
+    mitk::ApplyDosePlausibilityPolicy(ReadRPI(image).at(0), 0, mitk::DICOMReadPolicy::Lenient, adaptations);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), adaptations.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("368081200"), adaptations[0].usedValue);
   }
 
   // ---- GetManufacturerFamily ----
@@ -1837,6 +1964,12 @@ public:
 
     const auto info = mitk::DeduceDecayCorrection(image, /*halfLife=*/6586.26);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0 * 3600.0, info.decayTimes.at(0).at(0), 1e-3);
+
+    const auto* const reconstruction = FindRule(
+      info.adaptations, mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime);
+    CPPUNIT_ASSERT(nullptr != reconstruction);
+    CPPUNIT_ASSERT_EQUAL(std::string("230000"), reconstruction->originalValue);
+    CPPUNIT_ASSERT(!reconstruction->usedValue.empty());
   }
 
   // ---- Administration-time resolution, IBSI-SUV v3.0.1 ----
@@ -1888,6 +2021,12 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(86400.0 - 3601.0, info.decayTimes.at(0).at(0), 1e-6);
     CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime));
     CPPUNIT_ASSERT(HasRule(info, mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay));
+
+    const auto* const substitution = FindRule(
+      info.adaptations, mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime);
+    CPPUNIT_ASSERT(nullptr != substitution);
+    CPPUNIT_ASSERT_EQUAL(std::string("20260430130001"), substitution->originalValue);
+    CPPUNIT_ASSERT(!substitution->usedValue.empty());
   }
 
   void AdminWindow_JustBelowTwoHalfLives_Accepted()
@@ -2025,6 +2164,65 @@ public:
 
     const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-1800.0, info.decayTimes.at(0).at(0), 1e-6);
+  }
+
+  void Start_Step1_AbandonedOnLaterSlice_RecordsNoAdaptation()
+  {
+    const auto image = this->MakeStep1AbandonedOnLaterSliceImage();
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    for (unsigned int s = 0; s < 3; ++s)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(3600.0, info.decayTimes.at(0).at(s), 1e-6);
+    }
+    CPPUNIT_ASSERT(info.adaptations.empty());
+  }
+
+  void Start_Step1_AbandonedOnLaterSlice_StrictPolicy_Computes()
+  {
+    const auto image = this->MakeStep1AbandonedOnLaterSliceImage();
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds,
+                                                  mitk::DICOMReadPolicy::Strict);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3600.0, info.decayTimes.at(0).at(0), 1e-6);
+  }
+
+  void Start_Step1_PrivateDateTimeOnFirstSlotOnly_FallsThroughToStep2()
+  {
+    // Step 1 applies to the whole series or not at all: a slot without its
+    // own private datetime must not borrow a neighbour's. Step 1 would answer
+    // 1800 s, Step 2 answers 3600 s.
+    auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
+    this->SetupAdminWindowCase(image, "20260430110000");
+    for (unsigned int s = 0; s < 2; ++s)
+    {
+      SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430", 0, s);
+      SetDicomProperty(image, PropName(0x0008, 0x0032), "120000", 0, s);
+    }
+    SetDicomProperty(image, "mitk.pet.SiemensDecayDateTime", "20260430113000", 0, 0);
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3600.0, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3600.0, info.decayTimes.at(0).at(1), 1e-6);
+  }
+
+  void AdminWindow_Reconstructed_WithinFloor_NotShifted()
+  {
+    // Only the time-only (0018,1072) is present, so the administration
+    // instant is reconstructed on the reference day. 30 minutes after the
+    // reference is inside the floor and needs no day shift.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0054, 0x1102), "START");
+    SetDicomProperty(image, PropName(0x0008, 0x0021), "20260430");
+    SetDicomProperty(image, PropName(0x0008, 0x0031), "120000");
+    SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS");
+    SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430");
+    SetDicomProperty(image, PropName(0x0008, 0x0032), "120000");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1072), "123000");
+
+    const auto info = mitk::DeduceDecayCorrection(image, kF18HalfLifeSeconds);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-1800.0, info.decayTimes.at(0).at(0), 1e-6);
+    CPPUNIT_ASSERT(!HasRule(info, mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay));
   }
 
   void Strategy_Start_MissingSeriesTime_Throws_MissingDICOMPropertyException()

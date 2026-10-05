@@ -20,7 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cctype>
 #include <cmath>
 #include <functional>
+#include <iomanip>
+#include <locale>
 #include <map>
+#include <sstream>
 
 #include <dcmtk/dcmdata/dcvrdt.h>
 
@@ -40,6 +43,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <chrono>
 namespace
 {
+  // DS (Decimal String) allows at most 16 characters. Ten significant digits
+  // in general format stay within that for every positive finite double
+  // ("1.234567891e-100" is 16) while keeping the value to ~5e-11 relative,
+  // far below the float32 precision of the SUV output. The classic locale
+  // keeps the decimal separator a '.' regardless of the process locale.
+  std::string FormatDecimalString(const double value)
+  {
+    std::ostringstream oss;
+    oss.imbue(std::locale::classic());
+    oss << std::setprecision(10) << value;
+    return oss.str();
+  }
+
   // String helpers used for the (0054,1102) value comparison.
   std::string TrimAsciiWhitespace(const std::string& s)
   {
@@ -150,6 +166,10 @@ namespace
     OFDateTime startDateTime;
     bool       haveStartTime = false;       // (0018,1072) present and parsed
     double     startTimeOfDaySeconds = 0.0; // valid only if haveStartTime
+
+    // Stored strings, kept for the adaptation record.
+    std::string startDateTimeStored;
+    std::string startTimeStored;
   };
 
   AdministrationTimeTags ResolveAdministrationTimeTags(const mitk::IPropertyProvider* provider)
@@ -168,6 +188,7 @@ namespace
           << "Cannot parse Radiopharmaceutical Start DateTime (0018,1078) value '"
           << raw << "'.";
       }
+      tags.startDateTimeStored = raw;
       tags.haveStartDateTime = true;
     }
 
@@ -186,6 +207,7 @@ namespace
           << raw << "'.";
       }
       tags.startTimeOfDaySeconds = SecondsOfDayUTC(parsed);
+      tags.startTimeStored = raw;
       tags.haveStartTime = true;
     }
 
@@ -196,6 +218,12 @@ namespace
   // day still produces a plausible SUV, so the substitution below is not
   // permitted and the input has to be refused outright.
   constexpr double kDateSubstitutionHalfLifeLimitSeconds = 41400.0;
+
+  // The substitution never forms a datetime -- it works on time of day only
+  // (see SubstituteAdministrationDate) -- and the date it implies may differ
+  // per slice, so the record states the rule applied rather than a value.
+  constexpr const char* kAdministrationDateSubstitutionUsedValue =
+    "stored time of day, date from the decay-correction reference datetime";
 
   // Announce an adaptation once per deduction rather than once per slice.
   // ResolveDecayDurationSeconds runs for every (timestep, slice), so without
@@ -247,7 +275,7 @@ namespace
       duration += kSecondsPerDay;
       if (RecordAdaptationOnce(adaptations, policy,
                                mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
-                               "", "", std::to_string(duration)))
+                               "", "", FormatDecimalString(duration)))
       {
         MITK_WARN << "Reconstructed administration datetime falls after the "
                      "decay-correction reference time; moving it back one day "
@@ -323,7 +351,8 @@ namespace
 
       if (RecordAdaptationOnce(adaptations, policy,
                                mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
-                               "(0018,1078)", std::to_string(offset), ""))
+                               "(0018,1078)", admin.startDateTimeStored,
+                               kAdministrationDateSubstitutionUsedValue))
       {
         MITK_WARN << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
                      "implausible decay duration of " << offset
@@ -365,7 +394,8 @@ namespace
 
       if (RecordAdaptationOnce(adaptations, policy,
                                mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
-                               "(0018,1072)", "", ""))
+                               "(0018,1072)", admin.startTimeStored,
+                               kAdministrationDateSubstitutionUsedValue))
       {
         MITK_WARN << "Only (0018,1072) Radiopharmaceutical Start Time is "
                      "available; taking the administration date from the "
@@ -532,7 +562,11 @@ void mitk::RecordAdaptation(std::vector<mitk::SUVAdaptation>* adaptations,
     return;
   }
 
-  adaptations->push_back({rule, dicomTag, originalValue, usedValue});
+  const SUVAdaptation entry{rule, dicomTag, originalValue, usedValue};
+  if (std::find(adaptations->cbegin(), adaptations->cend(), entry) == adaptations->cend())
+  {
+    adaptations->push_back(entry);
+  }
 }
 
 std::string mitk::FormatAdaptationSummary(const std::vector<mitk::SUVAdaptation>& adaptations)
@@ -608,9 +642,7 @@ std::string mitk::FormatDerivationDescription(const std::vector<mitk::SUVAdaptat
 }
 
 std::vector<mitk::RadiopharmaceuticalInfo>
-mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
-                                  mitk::DICOMReadPolicy policy,
-                                  std::vector<mitk::SUVAdaptation>& adaptations)
+mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider)
 {
   using IndexedMap = std::map<DICOMTagPath::ItemSelectionIndex, RadiopharmaceuticalInfo>;
   IndexedMap byIndex;
@@ -649,38 +681,14 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
   // cluster around 4e2 (MBq) and 4e8 (Bq), with no plausible value in
   // between. Per the IBSI-SUV recommendation, values strictly below the
   // 1e4 threshold are interpreted as MBq and converted to Bq.
-  // DICOMReadPolicy controls the response: Lenient applies the
-  // conversion with a WARN; Strict refuses it and raises a dedicated
-  // exception so callers can surface the input issue.
   DICOMTagPath dosePath;
   dosePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1074);
-  enumerate(dosePath, [policy, &adaptations](RadiopharmaceuticalInfo& info, const std::string& v)
+  enumerate(dosePath, [](RadiopharmaceuticalInfo& info, const std::string& v)
   {
     const double raw = ConvertDICOMStrToValue<double>(v);
-    if (raw > 0.0 && raw < 1.0e4)
-    {
-      if (policy == DICOMReadPolicy::Strict)
-      {
-        mitkThrowException(ImplausibleRadionuclideDoseException)
-          << "Radionuclide Total Dose (0018,1074) value " << raw
-          << " is below the 1e4 plausibility threshold and would be "
-             "reinterpreted as MBq under the IBSI-SUV recommendation, "
-             "but DICOMReadPolicy::Strict is active. Re-export the "
-             "input with a Bq-magnitude value or rerun in lenient mode.";
-      }
-      const double converted = raw * 1.0e6;
-      MITK_WARN << "Radionuclide Total Dose (0018,1074) value " << raw
-                << " is below the 1e4 plausibility threshold; "
-                   "interpreting as MBq and converting to Bq (= "
-                << converted << " Bq) per IBSI-SUV recommendation.";
-      RecordAdaptation(&adaptations, policy, SUVAdaptationRule::DoseReinterpretedAsMBq,
-                       "(0018,1074)", v, std::to_string(converted));
-      info.totalDoseBq = converted;
-    }
-    else
-    {
-      info.totalDoseBq = raw;
-    }
+    info.totalDoseStored = v;
+    info.totalDoseReinterpretedAsMBq = (raw > 0.0 && raw < 1.0e4);
+    info.totalDoseBq = info.totalDoseReinterpretedAsMBq ? raw * 1.0e6 : raw;
   });
 
   // Radionuclide code meaning, nested in (0054,0300). The outer index we
@@ -709,6 +717,47 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
     result.push_back(entry.second);
   }
   return result;
+}
+
+mitk::DICOMTagPath mitk::RadiopharmaceuticalDoseTagPath(const int item)
+{
+  DICOMTagPath path;
+  path.AddSelection(0x0054, 0x0016, item).AddElement(0x0018, 0x1074);
+  return path;
+}
+
+void mitk::ApplyDosePlausibilityPolicy(const mitk::RadiopharmaceuticalInfo& info,
+                                       const int item,
+                                       const mitk::DICOMReadPolicy policy,
+                                       std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  if (!info.totalDoseReinterpretedAsMBq)
+  {
+    return;
+  }
+
+  // DICOMReadPolicy controls the response: Lenient applies the conversion
+  // with a WARN; Strict refuses it and raises a dedicated exception so
+  // callers can surface the input issue. The dedicated exception has to be
+  // thrown here, because RecordAdaptation would refuse under Strict with a
+  // generic one.
+  const std::string tagPath = RadiopharmaceuticalDoseTagPath(item).ToStr();
+  if (DICOMReadPolicy::Strict == policy)
+  {
+    mitkThrowException(ImplausibleRadionuclideDoseException)
+      << "Radionuclide Total Dose " << tagPath << " value " << info.totalDoseStored
+      << " is below the 1e4 plausibility threshold and would be "
+         "reinterpreted as MBq under the IBSI-SUV recommendation, "
+         "but DICOMReadPolicy::Strict is active. Re-export the "
+         "input with a Bq-magnitude value or rerun in lenient mode.";
+  }
+
+  MITK_WARN << "Radionuclide Total Dose " << tagPath << " value " << info.totalDoseStored
+            << " is below the 1e4 plausibility threshold; "
+               "interpreting as MBq and converting to Bq (= "
+            << info.totalDoseBq << " Bq) per IBSI-SUV recommendation.";
+  RecordAdaptation(&adaptations, policy, SUVAdaptationRule::DoseReinterpretedAsMBq,
+                   tagPath, info.totalDoseStored, FormatDecimalString(info.totalDoseBq));
 }
 
 double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider,
@@ -759,7 +808,7 @@ double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider,
                "a plausible weight in kilograms; interpreting it as grams ("
             << weightKg << " kg) per the IBSI-SUV recommendation.";
   RecordAdaptation(&adaptations, policy, SUVAdaptationRule::WeightReinterpretedAsGrams,
-                   "(0010,1030)", raw, std::to_string(weightKg));
+                   "(0010,1030)", raw, FormatDecimalString(weightKg));
 
   return weightKg;
 }
@@ -1031,14 +1080,7 @@ namespace
     {
       return providedHalfLifeSeconds;
     }
-    // Only the half-life is wanted here, so the dose-plausibility policy is
-    // irrelevant and the resulting record is discarded: the filter reads the
-    // sequence itself and is the one call that owns the dose adaptation.
-    // Reading leniently also keeps this lookup from throwing on an
-    // implausible dose that the caller may never consult.
-    std::vector<mitk::SUVAdaptation> ignoredAdaptations;
-    const auto infos = mitk::GetRadiopharmaceuticalInfos(
-      provider, mitk::DICOMReadPolicy::Lenient, ignoredAdaptations);
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(provider);
     if (infos.empty())
     {
       return std::numeric_limits<double>::quiet_NaN();
@@ -1261,9 +1303,10 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       // as a TemporoSpatialStringProperty keyed by (timestep, slice). See
       // issue #783 for the design discussion. We read per-(t, s) so that
       // multi-bed acquisitions whose private datetime varies per file are
-      // handled correctly; uniform-across-files data degenerates to the
-      // same value for every slot via the property's default-context
-      // fallback, yielding a uniform decay map without special-casing.
+      // handled correctly. The reader lifts the value from every file or
+      // from none, so each slot is read exactly; a property missing a slot
+      // does not lend another slot's datetime and the series falls through
+      // to Step 2.
       if (ManufacturerFamily::Siemens == manuf || ManufacturerFamily::GE == manuf)
       {
         const auto* privateProp = FindNamedDICOMProperty(data,
@@ -1273,38 +1316,53 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         if (nullptr != privateProp)
         {
           const auto timeSteps = data->GetTimeSteps();
-          DecayTimeMapType candidateMap;
+          std::map<TimeStepType, std::map<SlicedData::IndexValueType, OFDateTime>> privateDateTimes;
           bool allSlicesValid = true;
 
+          // Step 1 applies only if every slot carries a usable private
+          // datetime, so all of them are parsed before any is resolved.
+          // Resolving can record an administration-time adaptation or refuse
+          // one; doing either for a series that Step 1 then rejects would
+          // leave a record, or an exception, for a rule the returned decay
+          // times never used.
           for (TimeStepType t = 0; t < timeSteps && allSlicesValid; ++t)
           {
             const auto* sliced = data->GetSlicedGeometry(t);
             const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-            auto& sliceMap = candidateMap[t];
+            auto& slotDateTimes = privateDateTimes[t];
 
-            for (unsigned int s = 0; s < slices && allSlicesValid; ++s)
+            for (unsigned int s = 0; s < slices; ++s)
             {
-              const std::string privateDt = privateProp->GetValue(t, s, true, true);
+              const std::string privateDt =
+                TrimAsciiWhitespace(SUVFunctionalGroupAccess::ValueAt(privateProp, t, s));
               OFDateTime ofPrivate;
               if (privateDt.empty() || !ParseDICOMDateTime(privateDt, ofPrivate))
               {
                 allSlicesValid = false;
                 break;
               }
-              // The vendor private datetime carries no plausibility
-              // precondition in the recommendation: "the dose should be
-              // corrected to the datetime stored in the private scan start
-              // datetime if it is present". Once this rule applies we commit
-              // to it; tolerance for a slightly negative offset now lives in
-              // the administration-time window, where it belongs.
-              sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-                ResolveDecayDurationSeconds(admin, ofPrivate, 0.0, halfLife,
-                                            policy, info.adaptations);
+              slotDateTimes[static_cast<SlicedData::IndexValueType>(s)] = ofPrivate;
             }
           }
 
           if (allSlicesValid)
           {
+            DecayTimeMapType candidateMap;
+            for (const auto& [t, slotDateTimes] : privateDateTimes)
+            {
+              auto& sliceMap = candidateMap[t];
+              for (const auto& [s, ofPrivate] : slotDateTimes)
+              {
+                // The vendor private datetime carries no plausibility
+                // precondition in the recommendation: "the dose should be
+                // corrected to the datetime stored in the private scan start
+                // datetime if it is present". Once this rule applies we commit
+                // to it; tolerance for a slightly negative offset lives in
+                // the administration-time window, where it belongs.
+                sliceMap[s] = ResolveDecayDurationSeconds(admin, ofPrivate, 0.0, halfLife,
+                                                          policy, info.adaptations);
+              }
+            }
             info.decayTimes = std::move(candidateMap);
             return info;
           }

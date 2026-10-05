@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <vector>
 
+#include <mitkDICOMTagPath.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
 #include <mitkSlicedData.h>
@@ -522,12 +523,18 @@ namespace mitk
   {
     /** Which recommendation fired. */
     SUVAdaptationRule rule = SUVAdaptationRule::DoseReinterpretedAsMBq;
-    /** The DICOM tag concerned, e.g. "(0018,1074)". Empty when there is none. */
+    /**
+     * The DICOM tag concerned, e.g. "(0018,1074)". A tag nested in a sequence
+     * is named by its full path, e.g. "(0054,0016)[1].(0018,1074)". Empty
+     * when there is none. */
     std::string dicomTag;
     /** The value as stored in the input. */
     std::string originalValue;
-    /** The value the computation actually used. */
+    /** The value the computation actually used or, where the computation
+     * used no single value, a description of the rule applied. */
     std::string usedValue;
+
+    bool operator==(const SUVAdaptation&) const = default;
   };
 
   /**
@@ -558,12 +565,17 @@ namespace mitk
    * The policy is checked before \p adaptations is, so a missing gate is
    * caught even when the caller is not collecting the record.
    *
+   * The record holds distinct adaptations: an entry identical in every
+   * field to one already recorded is not appended again, so a tag that
+   * several computation steps consume in the same way counts once.
+   *
    * \param[in,out] adaptations Record to append to; may be null.
    * \param[in] policy Active read policy.
    * \param[in] rule The rule that fired.
    * \param[in] dicomTag The tag concerned, or empty when there is none.
    * \param[in] originalValue The value as stored in the input.
-   * \param[in] usedValue The value the computation used.
+   * \param[in] usedValue The value the computation used or, where it used no
+   *            single value, a description of the rule applied.
    * \throws BenchmarkAdaptationRequiredException under Strict.
    */
   void MITKPET_EXPORT RecordAdaptation(std::vector<SUVAdaptation>* adaptations,
@@ -773,8 +785,18 @@ namespace mitk
   {
     /** Radionuclide half-life in [s]. NaN if (0018,1075) was not present. */
     double      halfLifeSeconds = std::numeric_limits<double>::quiet_NaN();
-    /** Radionuclide total (injected) dose in [Bq]. NaN if (0018,1074) was not present. */
+    /**
+     * Radionuclide total (injected) dose in [Bq], as the IBSI-SUV
+     * recommendation interprets (0018,1074): the stored value times 1e6 when
+     * \c totalDoseReinterpretedAsMBq, else the stored value. NaN if
+     * (0018,1074) was not present. */
     double      totalDoseBq     = std::numeric_limits<double>::quiet_NaN();
+    /** (0018,1074) as stored. Empty if absent. */
+    std::string totalDoseStored;
+    /**
+     * Whether \c totalDoseBq is the stored value read as MBq per the
+     * IBSI-SUV recommendation (stored value strictly between 0 and 1e4). */
+    bool        totalDoseReinterpretedAsMBq = false;
     /** Radionuclide name (code meaning). Empty if (0054,0300)/(0008,0104) was not present. */
     std::string name;
   };
@@ -792,40 +814,71 @@ namespace mitk
    * corresponds to the i-th item of the source sequence; fields missing from
    * an item come back as NaN / empty without affecting other items.
    *
-   * Radionuclide Total Dose values strictly between 0 and 1e4 are
-   * interpreted as the IBSI-SUV benchmark recommends: in
-   * \c DICOMReadPolicy::Lenient the value is reinterpreted as MBq and
-   * converted to Bq (factor 1e6) with a \c MITK_WARN announcing the
-   * conversion. In \c DICOMReadPolicy::Strict the conversion is refused
-   * and an \c ImplausibleRadionuclideDoseException is raised. Other
-   * fields (half-life, name) are read verbatim regardless of policy.
+   * The total dose is reported as the IBSI-SUV benchmark interprets it: a
+   * stored value strictly between 0 and 1e4 is read as MBq, so
+   * \c totalDoseBq holds it converted to Bq (factor 1e6) and
+   * \c totalDoseReinterpretedAsMBq is set; \c totalDoseStored keeps the
+   * stored string. The reader only reports. Applying the read policy and
+   * recording the adaptation is the job of ApplyDosePlausibilityPolicy, for
+   * the item the computation actually uses.
    *
-   * \param[in]     provider Source of DICOM properties; typically the BaseData
-   *                of a PET image.
-   * \param[in]     policy   Policy for handling values that the IBSI-SUV
-   *                         benchmark recommends adapting. Defaults to
-   *                         \c DICOMReadPolicy::Lenient (apply with WARN).
-   * \param[in,out] adaptations Appended to when the MBq reinterpretation is
-   *                         applied; never cleared, so a caller can thread one
-   *                         list through several helpers. The parameter is
-   *                         mandatory rather than defaulted precisely so that
-   *                         discarding the record has to be a deliberate act
-   *                         at the call site.
+   * \param[in] provider Source of DICOM properties; typically the BaseData
+   *                     of a PET image.
    * \return A vector of RadiopharmaceuticalInfo, ordered by sequence-item
    *         index. Empty if no Radiopharmaceutical Information Sequence is
    *         present or if \p provider is \c nullptr.
-   * \throw ImplausibleRadionuclideDoseException if \p policy is
-   *        \c DICOMReadPolicy::Strict and an item's (0018,1074) value is
-   *        strictly between 0 and 1e4.
    *
    * \remark Multi-tracer datasets are surfaced honestly (more than one entry).
    *         Callers that only support one tracer should check
    *         \c result.size() and react accordingly.
+   *
+   * \sa ApplyDosePlausibilityPolicy
    */
   std::vector<RadiopharmaceuticalInfo> MITKPET_EXPORT
-  GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
-                              DICOMReadPolicy policy,
-                              std::vector<SUVAdaptation>& adaptations);
+  GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider);
+
+  /**
+   * \brief Apply the read policy to the dose of the Radiopharmaceutical
+   *        Information Sequence item the computation uses.
+   *
+   * If \p info reports its dose as reinterpreted from MBq
+   * (\c totalDoseReinterpretedAsMBq): under \c DICOMReadPolicy::Strict an
+   * \c ImplausibleRadionuclideDoseException is thrown; under
+   * \c DICOMReadPolicy::Lenient a \c MITK_WARN is logged and one
+   * \c SUVAdaptationRule::DoseReinterpretedAsMBq entry is appended to
+   * \p adaptations. Its \c dicomTag names the item's full path, e.g.
+   * "(0054,0016)[1].(0018,1074)", \c originalValue is the stored string and
+   * \c usedValue the Bq value as a Decimal String. Otherwise nothing happens.
+   *
+   * Only the item that feeds the computation should be passed: the doses of
+   * other items, or a dose that an explicit activity overrides, leave the
+   * result untouched.
+   *
+   * \param[in]     info        The item's info as read by GetRadiopharmaceuticalInfos.
+   * \param[in]     item        Index of the item in the Radiopharmaceutical
+   *                            Information Sequence; names the tag path in
+   *                            the record and the messages.
+   * \param[in]     policy      Active read policy.
+   * \param[in,out] adaptations Appended to; never cleared.
+   * \throw ImplausibleRadionuclideDoseException if \p policy is
+   *        \c DICOMReadPolicy::Strict and the dose was reinterpreted.
+   */
+  void MITKPET_EXPORT ApplyDosePlausibilityPolicy(const RadiopharmaceuticalInfo& info,
+                                                  int item,
+                                                  DICOMReadPolicy policy,
+                                                  std::vector<SUVAdaptation>& adaptations);
+
+  /**
+   * \brief Full path of (0018,1074) Radionuclide Total Dose inside item
+   *        \p item of the Radiopharmaceutical Information Sequence.
+   *
+   * The path the adaptation record names and the SUV output writes the
+   * reinterpreted dose to.
+   *
+   * \param[in] item Index of the item in (0054,0016).
+   * \return The path, "(0054,0016)[item].(0018,1074)" in string form.
+   */
+  DICOMTagPath MITKPET_EXPORT RadiopharmaceuticalDoseTagPath(int item);
 
   /**
    * \brief Get the patient's weight from DICOM properties.
@@ -929,8 +982,10 @@ namespace mitk
    *     MED PT" decay-correction datetime (lifted to property
    *     \c mitk.pet.SiemensDecayDateTime by \c BaseDICOMReaderService);
    *     GE: (0009,0x0D) "GEMS_PETD_01" scan datetime (lifted to
-   *     \c mitk.pet.GEScanDateTime). Used as the uniform reference time
-   *     when present and yielding a non-negative decay.
+   *     \c mitk.pet.GEScanDateTime). Applies when every slot carries a
+   *     parseable private datetime; the resulting decay duration is then
+   *     subject to the administration-time window like every other
+   *     reference.
    *  -# <b>AcquisitionTime equals SeriesTime.</b> The slot's (0008,0032)
    *     AcquisitionTime equals (0008,0031) SeriesTime in seconds: use it as
    *     the slot's reference. Applies to every manufacturer and needs no
@@ -1002,8 +1057,9 @@ namespace mitk
    *   -# Only (0054,0016)[*](0018,1072) Radiopharmaceutical Start Time is
    *      present, which carries no date: same reconstruction.
    *
-   * In branches 2 and 3 an administration instant that still falls after
-   * the reference is moved back one day. Both branches are permitted only
+   * In branches 2 and 3 an administration instant that falls more than one
+   * hour after the reference -- a duration below the same -3600 s floor as
+   * branch 1 -- is moved back one day. Both branches are permitted only
    * while T is below 41400 s -- above it a date wrong by whole days still
    * yields a plausible SUV, so the input is refused instead. They are
    * benchmark adaptations: recorded and warned about under

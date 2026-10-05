@@ -345,6 +345,8 @@ namespace mitk
     std::optional<double> m_EffectiveHalfLifeInSec;
     std::optional<DecayCorrectionInfo> m_EffectiveDecayCorrection;
     std::optional<SUVInputModel> m_EffectiveInputModel;
+    /** Radiopharmaceutical Information Sequence item whose dose the computation used; empty when no item's dose was consulted. */
+    std::optional<int> m_EffectiveTracerIndex;
     std::vector<SUVAdaptation> m_Adaptations;
     std::vector<std::string>   m_RescaleFindings;
 

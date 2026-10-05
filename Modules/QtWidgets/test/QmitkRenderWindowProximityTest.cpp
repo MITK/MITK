@@ -463,8 +463,9 @@ public:
   void EventFilter_EnterNearRegionReveals()
   {
     const auto id = this->RegisterRightEdgeRegion();
+    const QPointF local(m_NearPoint);
     const QPointF global(m_Cell->mapToGlobal(m_NearPoint));
-    QEnterEvent enter(QPointF(m_NearPoint), QPointF(m_NearPoint), global);
+    QEnterEvent enter(local, local, global);
     QCoreApplication::sendEvent(m_Cell.get(), &enter);
     CPPUNIT_ASSERT(State::Active == m_Proximity->GetRegionState(id));
   }

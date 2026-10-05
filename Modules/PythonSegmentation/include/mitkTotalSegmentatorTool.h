@@ -99,11 +99,10 @@ namespace mitk
     /** \brief Human-readable reason the last run produced no result, or empty if
      *         it succeeded or was cancelled by the user.
      *
-     * The SegWithPreviewTool base catches itk::ExceptionObject (which mitkThrow
-     * produces) and only forwards it to ErrorMessage, so such a throw never
-     * reaches the GUI's handler. DoUpdatePreview therefore catches its failures
-     * internally and records them here, letting the GUI tell a genuine failure
-     * from a user cancellation and show a meaningful message.
+     * The SegWithPreviewTool base forwards an exception to ErrorMessage, whose
+     * listeners present it in a message box apart from the tool. The tool
+     * therefore records the failure of a run here instead, letting the GUI
+     * tell a genuine failure from a user cancellation and present the reason.
      */
     const std::string& GetLastErrorMessage() const;
 

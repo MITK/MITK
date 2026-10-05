@@ -38,24 +38,24 @@ found in the LICENSE file.
 #include <QColor>
 #include <QCoreApplication>
 #include <QDialog>
-#include <QDropEvent>
-#include <QKeyEvent>
-#include <QMenu>
-#include <QPointer>
-#include <QPushButton>
-#include <QTimer>
-#include <QLayout>
-#include <QMimeData>
-#include <QPointF>
-#include <QHeaderView>
-#include <QLabel>
-#include <QMouseEvent>
 #include <QDoubleSpinBox>
+#include <QDropEvent>
 #include <QElapsedTimer>
-#include <QSpinBox>
-#include <QTabWidget>
-#include <QTableWidget>
+#include <QHeaderView>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QLayout>
+#include <QMenu>
+#include <QMimeData>
+#include <QMouseEvent>
+#include <QPointer>
+#include <QPointF>
+#include <QPushButton>
 #include <QScrollBar>
+#include <QSpinBox>
+#include <QTableWidget>
+#include <QTabWidget>
+#include <QTimer>
 #include <QToolButton>
 
 #include <algorithm>
@@ -66,8 +66,7 @@ found in the LICENSE file.
 /**
  * Drives the layout editor widget's mutation API against a real
  * QmitkMxNMultiWidget (no delegate, no mocks) and asserts the resulting
- * engine link state - the widget-level guarantee that survives the interim
- * sync popup's removal. The underlying engine behavior itself is covered by
+ * engine link state. The underlying engine behavior itself is covered by
  * QmitkMxNSyncGroupApiTest / QmitkMxNNavLinksTest.
  */
 class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
@@ -168,6 +167,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Matrix_OffsetFocusPassWritesNothing);
   MITK_TEST(Matrix_OffsetFocusPassKeepsPrecision);
   MITK_TEST(Matrix_OffsetRealEditWrites);
+  MITK_TEST(Matrix_PanOffsetEditKeepsMillimetreFractions);
   MITK_TEST(EmptyGroupCache_DroppedOnceTheGroupGainsAMember);
   MITK_TEST(Matrix_FirstBuildMirrorsThePlateSelection);
   MITK_TEST(Assign_ReplaceDropStartsTheOffsetFresh);
@@ -892,7 +892,7 @@ public:
   {
     // "main" is a live members-bearing group (every cell, via the appearance
     // axes), so its "Link navigation" action links the navigation bundle across
-    // every cell - the editor-wide reach the live main card now has.
+    // every cell, so the main card's actions reach the whole editor.
     m_Widget->LinkNavigationBundle("main");
 
     for (std::size_t cell = 0; cell < 3; ++cell)
@@ -1882,10 +1882,12 @@ public:
 
   void Matrix_CtrlClickOnRowHeaderAddsTheRow()
   {
-    // A header click selects the whole line through QTableView's own
-    // sectionPressed wiring, which honours the modifiers. A second handler on
-    // sectionClicked used to re-run the selection on release and toggle a
-    // Ctrl-added row straight back off.
+    // A plain header press selects the whole line through QTableView's own
+    // handling. Qt resolves that selection without the press's modifiers, so
+    // Ctrl would replace the selection; the editor's event filter takes
+    // modifier-held presses and adds the line instead. The release must not
+    // re-run the selection, or the Ctrl-added row would toggle straight back
+    // off.
     this->RaiseAdvancedFace();
     auto* matrix = Matrix();
     auto* header = matrix->verticalHeader();
@@ -2352,6 +2354,28 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A dialed offset is written",
                            link.has_value() && std::holds_alternative<int>(link->offset)
                              && 3 == std::get<int>(link->offset));
+  }
+
+  void Matrix_PanOffsetEditKeepsMillimetreFractions()
+  {
+    // A pan offset is world mm; a sub-millimetre part the user dials must be
+    // written as dialed, not rounded by the editor's display precision.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    Pump();
+    SelectMatrixCells({ { 1, AxisIndexOf(QmitkMxNSyncDimension::Pan) } });
+
+    auto* panX = m_Widget->findChild<QDoubleSpinBox*>(QStringLiteral("mxnMatrixPanOffsetX"));
+    CPPUNIT_ASSERT(nullptr != panX);
+    panX->setValue(12.345);
+    emit panX->editingFinished();
+    Pump();
+
+    const auto link = m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan);
+    CPPUNIT_ASSERT(link.has_value() && std::holds_alternative<mitk::Vector2D>(link->offset));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The dialed millimetre fraction is stored",
+                                         12.345, std::get<mitk::Vector2D>(link->offset)[0], 1e-9);
   }
 
   void EmptyGroupCache_DroppedOnceTheGroupGainsAMember()

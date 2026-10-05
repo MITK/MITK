@@ -91,9 +91,8 @@ QSize QmitkMxNSyncBarcodeWidget::sizeHint() const
   {
     // What the glyph rendering needs: one row of square boxes. The box is
     // the height the host has actually granted, not the text's - a width asked
-    // for font-sized boxes caps the glyphs at that size however tall the row
-    // is, which is why the strip's glyphs stayed smaller than its chrome. The
-    // height hint stays the color bar's: the host row sets the height, and
+    // for font-sized boxes would cap the glyphs at that size however tall the
+    // row is. The height hint stays the color bar's: the host row sets the height, and
     // asking for more here would only make the row taller.
     const QFontMetrics metrics(this->font());
     const int box =

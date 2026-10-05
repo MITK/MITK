@@ -72,8 +72,8 @@ QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 
 berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes() const
 {
-  // Only OPENED: the other three existed solely to switch the built-in
-  // render-window menu on and off, and this editor never shows it.
+  // Only OPENED: the other part events serve the built-in render-window
+  // menu, which this editor never shows.
   return Events::OPENED;
 }
 
@@ -165,11 +165,8 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
   layout->addWidget(multiWidget);
 
-  // No configuration toolbar on the right: the layout editor is summoned from
-  // the per-cell sync barcode and owns the layout and synchronization controls,
-  // which left that toolbar holding the interaction-scheme switch alone - a
-  // full-height column for one button. The switch lives in the layout editor
-  // with the rest of the editor-wide configuration.
+  // No configuration toolbar: the editor-wide controls, the interaction-scheme
+  // switch included, live in the MxN Layout Editor view.
 
   GetSite()->GetPage()->AddPartListener(this);
 

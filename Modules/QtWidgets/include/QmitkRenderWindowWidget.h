@@ -79,7 +79,7 @@ public:
   * \brief Optional human-readable display label.
   *
   *   Persisted as the optional `name` field of the corresponding window leaf
-  *   in the v2 layout document; empty when the layout omits that field. Pure
+  *   in the layout document (version 2.0 or 3.0); empty when the layout omits that field. Pure
   *   metadata: not used for routing, addressing, persisted-state keying, or
   *   REST URL construction (those all use the bare widget id, derivable from
   *   `GetWidgetName` via the editor-prefix strip).

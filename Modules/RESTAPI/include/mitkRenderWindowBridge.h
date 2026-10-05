@@ -772,7 +772,7 @@ namespace mitk
     std::string GetMxNLayout() const;
 
     /**
-     * \brief Apply a v2.0 layout document; returns the freshly serialized layout.
+     * \brief Apply a layout document (2.0 or 3.0); returns the freshly serialized layout.
      *
      * The string boundary keeps the bridge header free of nlohmann/json.hpp.
      * Schema / structural failures escape as \c mitk::Exception (the engine's

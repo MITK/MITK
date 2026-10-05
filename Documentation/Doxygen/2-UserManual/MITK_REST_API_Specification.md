@@ -2195,7 +2195,7 @@ Ids must match `^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$` and be unique within 
 
 - A user can dump the current layout, save the response to disk, and drop it into the preset directory unchanged.
 - Hand-authored presets are first-class REST citizens: PUT a preset directly, no translation needed.
-- Per-cell `view_direction` and `links` are part of the layout document — they are *persisted authoring intent*, not live state. The MxN windows list (`GET .../windows`) reports them so REST clients don't need to fetch the full layout for a quick overview.
+- Per-cell `view_direction` and `links` are part of the layout document: they are *persisted authoring intent*, not live state. The MxN windows list (`GET .../windows`) reports them so REST clients don't need to fetch the full layout for a quick overview.
 
 **No `/sync` endpoint.** The MxN editor's "Synchronize" toolbar bool (a workbench UX setting that controls how interactive mouse/keyboard input on one cell propagates to others) is intentionally **not** exposed via REST. REST clients always operate on per-cell primitives. The Python `mitk-workbench-remote` client adds ergonomic helpers (e.g. iterate cells to apply a change to all) on top of these primitives. The per-cell synchronization links of every dimension are part of the layout document, which is the only REST surface for synchronization state.
 
@@ -2212,7 +2212,7 @@ Their values may legitimately diverge — an unsynced MxN cell can have a differ
 
 **Layout PUT tears down all cells.** Applying a layout via PUT destroys the existing cell tree and rebuilds from the document. Any cached cell `id` a client held before the PUT is invalid afterwards. The PUT response body is the freshly serialized layout (same shape as GET), so clients can refresh their cell list from the response without an additional GET round-trip. While the workbench GUI applies a layout (a preset, a file or a data-based layout), every MxN endpoint, this PUT included, returns 503 `EDITOR_BUSY`; the rebuild typically takes 1-2 s, and a request repeated after it succeeds. Requests that arrive while a REST PUT is being applied are not rejected: they wait and are served once it has finished.
 
-**Camera is always 2D for MxN cells.** The layout schema's `view_direction` enum has no `3d` value. The camera GET response carries `parallel_scale`; PUT rejects `perspective_angle`. A 3D cell type may arrive in a future version — at that point the per-window summary's `kind` flips to `"3d"` for those cells and the camera shape switches accordingly. The per-window summary already reports `kind` so clients can be forwards-compatible today.
+**Camera is always 2D for MxN cells.** The layout schema's `view_direction` enum has no `3d` value. The camera GET response carries `parallel_scale`; PUT rejects `perspective_angle`. A 3D cell type may arrive in a future version, at which point the per-window summary's `kind` flips to `"3d"` for those cells and the camera shape switches accordingly. The per-window summary already reports `kind` so clients can be forwards-compatible today.
 
 **Concept-level errors that can surface on every MxN endpoint:**
 
@@ -2301,7 +2301,7 @@ Returns the current MxN layout as a version 3.0 document, of the same shape as a
 
 #### PUT /api/v1/rendering/editors/mxn/layout
 
-Applies a layout document of version 3.0 or 2.0. **All existing cells are torn down and rebuilt from the document** (no positional reuse) — any cell `id` a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout, so callers can refresh their cell list from the response without an extra GET.
+Applies a layout document of version 3.0 or 2.0. **All existing cells are torn down and rebuilt from the document** (no positional reuse): any cell `id` a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout, so callers can refresh their cell list from the response without an extra GET.
 
 **Request body (required, `application/json`):** layout document of version 3.0 (`mxn-layout-v3.schema.json`) or 2.0 (`mxn-layout-v2.schema.json`). The example is a 2.0 document.
 
@@ -2549,7 +2549,7 @@ Per-cell summary plus capability flags.
 | `links` | object | The cell's data-selection link from the layout document (only the `selection` key; see the windows list) |
 | `has_camera` | boolean | Always `true` today |
 | `has_selected_slice` | boolean | `true` for 2D cells; reserved `false` for future 3D cells |
-| `has_selected_position` | boolean | Always `true` — per-cell selected position is available on every MxN cell, distinct from the global `/rendering/selected-position` resource |
+| `has_selected_position` | boolean | Always `true`: per-cell selected position is available on every MxN cell, distinct from the global `/rendering/selected-position` resource |
 
 **Error responses:**
 

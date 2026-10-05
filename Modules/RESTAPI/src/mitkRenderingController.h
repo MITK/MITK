@@ -265,7 +265,7 @@ namespace mitk
     /**
      * \brief Handle PUT /rendering/editors/mxn/layout.
      *
-     * Applies a v2.0 layout document. Response 200 echoes the freshly
+     * Applies a layout document (2.0 or 3.0). Response 200 echoes the freshly
      * serialized layout (so callers don't need a follow-up GET to refresh
      * cached cell ids after a tear-down).
      *

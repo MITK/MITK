@@ -128,14 +128,15 @@ namespace mitk
     * \brief Tells whether a renderer's displayed slice index runs opposite to its slice stepper.
     *
     * The displayed slice index is the one a user-facing slice navigator shows. It follows the
-    * image's own index axis for the renderer's view direction (see IsSliceIndexInverted), so
-    * when this function returns true the displayed index is <tt>steps - 1 - stepperPosition</tt>.
+    * slice axis of the renderer's reference geometry (described below) for the renderer's view
+    * direction (see IsSliceIndexInverted), so when this function returns true the displayed
+    * index is <tt>steps - 1 - stepperPosition</tt>.
     * Code that relates slice positions across renderers (slice offsets, relayed slice steps)
     * must use this one definition so that every renderer agrees on which way is "next".
     *
     * The reference geometry is the renderer's slice navigation input geometry at the selected
     * time step (falling back to the first one, as the renderer planes do). A renderer that is
-    * not set up yet (no input or world geometry) or shows an 'Original' view has no image axis
+    * not set up yet (no input or world geometry) or shows an 'Original' view has no slice axis
     * to follow; its displayed index is the stepper position, and the function returns false.
     *
     * \param renderer The renderer to query.

@@ -24,7 +24,7 @@ Related runtime concepts are not duplicated here; see the @ref MxNConceptPage
 which together implement the runtime side of the synchronization the layout
 document describes.
 
-## What the format describes — and what it does not
+## What the format describes, and what it does not
 
 A layout document captures:
 
@@ -69,11 +69,11 @@ data nodes simply applies the new geometry; the data stays.
 - `version`: the exact string `"3.0"` or `"2.0"`. The C++ loader rejects any
   other value, and `SerializeLayout` always writes `"3.0"`. A v2.0 document is
   a v3.0 document that only uses the selection dimension and loads unchanged
-  (see "Versions and closure" below). v1.x files are upgraded out-of-band —
-  see "Migrating from v1.x" below.
+  (see "Versions and closure" below). v1.x files are upgraded out-of-band
+  (see "Migrating from v1.x" below).
 - `name`: optional human-readable preset name. Pure metadata; ignored by the
   loader and not used for routing. (The window leaves carry an optional
-  `name` of their own, used the same way — see "Window identity and display
+  `name` of their own, used the same way; see "Window identity and display
   label" below.)
 - `groups`: optional. When present, authoritative. See "Lazy vs. strict mode"
   below.
@@ -137,7 +137,7 @@ A window may additionally declare:
   constraint, not required to be unique within the document). Pure metadata;
   the loader does not use it for routing, addressing, persisted-state
   keying, or REST URL construction (those all use `id`). Omit the field
-  entirely if the cell has no display name — empty strings are rejected.
+  entirely if the cell has no display name: empty strings are rejected.
 
 ### `size` is a ratio, not pixels
 
@@ -247,12 +247,15 @@ its slice range or camera bounds can lose its offset; the editor's
 re-converge action restores it. For slices, re-converge takes the reference
 from the members that sit strictly inside their slice range, following the
 reference most of them agree on, so a clamped member is moved back rather
-than the group shifted to it. Only when every member sits on the first or
-last slice of its range does the seed define the reference, clamped or not.
+than the group shifted to it. Members that cannot show the reference this
+way (fewer than three slices, or not set up yet) are left out; on a tie, the
+reference whose first member comes first in document order wins. Only when no
+member sits strictly inside its range does the seed define the reference,
+clamped or not.
 
 A slice offset counts displayed slices: the index the navigator shows, which
-follows the image's own index axis for the view direction and can run
-opposite to the slice stepper. Offsets of `-1`, `0` and `+1` on three members
+follows the slice axis of the window's reference (slice navigation input)
+geometry and can run opposite to the slice stepper. Offsets of `-1`, `0` and `+1` on three members
 therefore show the previous, the same and the next slice, whatever the
 view's stepping direction.
 
@@ -278,7 +281,7 @@ The top-level `groups` dict is optional:
   becomes an implicit group with property defaults (`select_all: true`).
   Cells still declare `links.selection` explicitly.
 
-Per-cell `links` is **always** required — laziness applies only to the
+Per-cell `links` is **always** required: laziness applies only to the
 group-properties block at the top, never to per-cell linking.
 
 `QmitkMxNMultiWidget::SerializeLayout` always emits strict mode (full
@@ -347,7 +350,7 @@ same seed rule to decide which window stays put while the others converge
 - **Document order** = pre-order traversal of the splitter tree (splits'
   `children` arrays in array order).
 - **Group-scoped persisted properties** stored in the top-level `groups`
-  dict (e.g. `select_all`) are not seeded from cells — the value declared
+  dict (e.g. `select_all`) are not seeded from cells: the value declared
   there wins outright.
 - **Selection-list membership** is a runtime concept not encoded in the
   layout. It is seeded from the data storage's non-helper, non-hidden
@@ -390,10 +393,12 @@ rejected up-front with a message naming the offending id. Editor-name
 constructor inputs that contain `_` or otherwise violate the editor-name
 regex are rejected at editor construction time, not at load time.
 
-The recommended default for tool-generated layouts is `mxn__widget<i>`
-where `<i>` is the leaf's pre-order traversal index (0-based, contiguous).
-`SerializeLayout` writes this form. Hand-authored presets may use any
-unique bare-id segment (e.g. `mxn__alpha`, `mxn__upper_left`) as long as
+`SerializeLayout` writes each window's id verbatim. `SetLayout` and the grid
+operations name new windows `mxn__widget<i>`, but `<i>` carries no
+positional meaning: after a row or column is added, the ids are no longer in
+reading order. Tools that generate layouts may use `mxn__widget<i>` with
+`<i>` the leaf's pre-order index (0-based, contiguous) as a readable default.
+Hand-authored presets may use any unique bare-id segment (e.g. `mxn__alpha`, `mxn__upper_left`) as long as
 the qualified id is URL-segment-safe and unique within the document.
 
 Renaming an id breaks every cached reference to it (persisted sessions,
@@ -401,7 +406,7 @@ REST clients holding URLs, scene-file context keys); treat it as
 permanent.
 
 **`name` (display label).** Optional, free-form, not required to be unique.
-Holds whatever string a user-facing surface should show for the cell —
+Holds whatever string a user-facing surface should show for the cell, such as
 "Tumor axial", "Reference T1", "Comparison view 2". Pure metadata: the
 loader does not use it for routing, addressing, persisted-state keying, or
 REST URL construction. The schema rejects an empty `name`; tools should omit
@@ -436,7 +441,7 @@ pure stdlib Python 3 script with no required external dependencies; if
 validates its own output against the v2 schema before writing.
 
 The migration is intentionally one-shot. There is no in-memory v1.x
-translation in the C++ loader — the rationale is that custom MxN presets
+translation in the C++ loader: the rationale is that custom MxN presets
 are rare and an out-of-band script is cheaper to maintain than a permanent
 in-process compatibility shim.
 

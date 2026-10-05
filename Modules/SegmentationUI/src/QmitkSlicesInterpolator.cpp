@@ -175,7 +175,7 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
   for (auto* window : windows)
   {
     std::string label;
-    auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget());
+    const auto* renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget());
     if (renderWindowWidget)
     {
       label = renderWindowWidget->GetCornerAnnotationText();
@@ -196,7 +196,7 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
   std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
   for (int i = 0; i < windows.size(); ++i)
   {
-    auto* window = windows[i];
+    auto* const window = windows[i];
     auto label = labels[i];
     // Display names are free text and need not be unique; the renderer name
     // tells two equally labelled windows apart.
@@ -204,7 +204,7 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
     {
       label += " (" + std::string(window->GetRenderer()->GetName()) + ")";
     }
-    auto slicer = window->GetSliceNavigationController();
+    auto* const slicer = window->GetSliceNavigationController();
     actionToSliceDimension[new QAction(QString::fromStdString(label), nullptr)] = slicer;
   }
 

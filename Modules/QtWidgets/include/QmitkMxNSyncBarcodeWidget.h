@@ -66,10 +66,10 @@ public:
     // from "all" (solid) and "none" (gap).
     bool partial = false;
 
-    // The axis carries an offset relative to its group's seed. Marked by filling
-    // the box's upper-right corner, because an offset is otherwise invisible
-    // outside the layout editor's matrix, and a window parked at slice -1 looks
-    // exactly like one sitting on the group.
+    // The axis carries an offset relative to its group's reference. Marked by
+    // filling the box's upper-right corner, because an offset is otherwise
+    // invisible outside the layout editor's matrix, and a window parked at
+    // slice -1 looks exactly like one sitting on the group.
     bool hasOffset = false;
 
     // That offset in words, where a single window's is meant. Empty on the group

@@ -144,7 +144,7 @@ public:
   *        interaction reference geometry.
   *        This will update the alignment status of the reference geometry for each base renderer.
   *        For more details, see 'BaseRenderer::SetInteractionReferenceGeometry'.
-  *        Overridem from 'QmitkAbstractMultiWidget'.
+  *        Overridden from 'QmitkAbstractMultiWidget'.
   */
   void SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry) override;
 
@@ -192,9 +192,9 @@ public:
   *                that name, 'g_<n>' with the next unused n. A group created
   *                under such a derived name starts without display name and
   *                color, whatever an earlier group of that name left behind.
-  *                Idempotent calls (the group
-  *                already exists) leave the previously recorded name in
-  *                place and skip the name preconditions below.
+  *                Idempotent calls (the group already exists) leave the
+  *                previously recorded name in place and skip the name
+  *                preconditions below.
   *
   * \pre  index >= 1                       (otherwise mitk::Exception)
   * \pre  A non-empty 'name' matches the layout format's group-name pattern
@@ -308,14 +308,14 @@ public:
   *   A call moves only 'windowId': on joining, or on an offset change, the
   *   cell is converged to the group's reference (taken before the call from
   *   the member a re-converge would anchor on, see ReconvergeSyncGroup)
-  *   combined with the given offset; the other members stay put. Convergence is skipped while the involved
-  *   render windows have no world geometry yet; use 'ReconvergeSyncGroup'
-  *   once they do. `Crosshair` links carry no convergence bookkeeping
-  *   (propagation is absolute: the crosshair is one world point that every
-  *   member resolves into its own slice, so an offset has nothing to be
-  *   relative to). An `Orientation` join aligns the cell to the
-  *   group's plane. `Windowing` / `Lut` joins do not converge: the cell keeps
-  *   its own value until the group's next change propagates.
+  *   combined with the given offset; the other members stay put. Convergence
+  *   is skipped while the involved render windows have no world geometry
+  *   yet; use 'ReconvergeSyncGroup' once they do. `Crosshair` links carry no
+  *   convergence bookkeeping (propagation is absolute: the crosshair is one
+  *   world point that every member resolves into its own slice, so an offset
+  *   has nothing to be relative to). An `Orientation` join aligns the cell to
+  *   the group's plane. `Windowing` / `Lut` joins do not converge: the cell
+  *   keeps its own value until the group's next change propagates.
   *
   * \param windowId   Canonical window id of the cell. Must name an existing cell.
   * \param dimension  The synchronization dimension to link.
@@ -356,12 +356,13 @@ public:
   void RefreshSyncControls();
 
   /**
-  * \brief One cell's offset on one dimension in words: slice in signed steps,
-  *        zoom as a factor, pan as whole millimetres. Empty for the neutral
-  *        offset and for a dimension that carries none, so a surface shows an
-  *        offset only where one was actually authored. Static and public so
-  *        every surface that shows offsets - the barcodes, the sync peek, the
-  *        layout editor's matrix - words them identically.
+  * \brief One cell's offset on one dimension in words: slice in signed
+  *        displayed slices, zoom as a factor, pan as whole millimetres. Empty
+  *        for the neutral offset and for a dimension that carries none, so a
+  *        surface shows an offset only where one was actually authored.
+  *        Static and public so every surface that shows offsets - the
+  *        barcodes, the sync peek, the layout editor's matrix - words them
+  *        identically.
   */
   static QString FormatSyncOffset(QmitkMxNSyncDimension dimension, const SyncOffset& offset);
 
@@ -738,10 +739,10 @@ public:
   * \brief Each cell's rectangle within the editor, as a fraction of the whole,
   *        keyed by window id.
   *
-  *        Derived from the splitter proportions rather than from on-screen
-  *        geometry: the sizes are set as the tree is built, so these are right
-  *        before Qt's layout pass has run, where widget geometry would still be
-  *        stale. While a cell is maximized the proportions captured on the way
+  *        Read from the splitter proportions rather than from on-screen
+  *        widget geometry. They are faithful once each splitter has a real
+  *        extent; before that, Qt reports roughly even sizes whatever was
+  *        set. While a cell is maximized the proportions captured on the way
   *        in are used, so the map describes the grid rather than the one
   *        visible cell - the same source 'SerializeLayout' reports.
   */
@@ -817,7 +818,7 @@ public:
   *   The id is the canonical, fully-qualified window name in the form
   *   `<multiWidgetName>__<bareSegment>`. It is registered with
   *   `RenderingManager` verbatim and is the same string that appears in the
-  *   v2 layout document's per-window 'id' field, in REST URLs, and in
+  *   layout document's per-window 'id' field, in REST URLs, and in
   *   per-renderer DataNode property context keys. The editor neither
   *   prepends nor strips a prefix.
   *
@@ -876,13 +877,13 @@ public:
   /**
   * \brief Plain-data summary of one cell leaf in the layout tree.
   *
-  *   Holds the per-cell fields that the v2 layout document persists for a
-  *   window -- identity (id), optional display label, view direction enum
-  *   value, and selection-group label -- without dragging the JSON or
-  *   QSplitter shape across the API boundary. Future v3 dimensions add
-  *   fields here additively.
+  *   Holds the per-cell fields that the layout document persists for a
+  *   window besides its links -- identity (id), optional display label, view
+  *   direction enum value, and selection-group label -- without dragging the
+  *   JSON or QSplitter shape across the API boundary. The other dimensions'
+  *   links are read through GetSyncLink.
   *
-  *   Identity vs. display label: 'id' is the v2 schema's required `id`
+  *   Identity vs. display label: 'id' is the layout schema's required `id`
   *   field -- the fully-qualified, URL-segment-safe canonical window name
   *   (`<multiWidgetName>__<bareSegment>`), unique within the document, used
   *   verbatim as the engine-side render-window name and as the URL path
@@ -1455,12 +1456,14 @@ private:
   * \brief The member a re-converge takes the group reference from, skipping
   *        the cells in 'excluded'.
   *
-  *   For `Slice`, a member clamped at the end of its range does not show the
-  *   reference, so only members strictly inside their slice range qualify;
-  *   among them the reference most of them agree on wins, anchored by its
-  *   pre-order first member. Without such a member, and for `Zoom` / `Pan`
-  *   (no hard bounds), this is the seed (see FindSyncGroupSeed). Empty
-  *   string if no other cell links the group.
+  *   For `Slice`, only members strictly inside their slice range qualify: a
+  *   member clamped at the end of its range does not show the reference, and
+  *   a member with fewer than three slices or without a world geometry yet
+  *   has no inside. Among the qualifying members the reference most of them
+  *   agree on wins; on a tie, the one whose first member comes first in
+  *   pre-order. That first member anchors the group. Without a qualifying
+  *   member, and for `Zoom` / `Pan` (no hard bounds), this is the seed (see
+  *   FindSyncGroupSeed). Empty string if no other cell links the group.
   */
   QString FindSyncGroupAnchor(QmitkMxNSyncDimension dimension, const std::string& group,
                               const std::set<QString>& excluded = {}) const;

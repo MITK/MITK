@@ -1127,7 +1127,8 @@ void QmitkMxNCellOverlay::NavigatorSetSlice(int position)
     return;
   }
   const int steps = static_cast<int>(stepper->GetSteps());
-  const int stepperPosition = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? steps - 1 - position : position;
+  const int stepperPosition =
+    mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? steps - 1 - position : position;
   const int delta = stepperPosition - static_cast<int>(stepper->GetPos());
   if (0 == delta)
   {

@@ -1985,14 +1985,9 @@ void QmitkMxNLayoutEditorWidget::ShowGridDialog()
     dialogLayout->setContentsMargins(6, 6, 6, 6);
     dialogLayout->addWidget(m_LayoutSelection);  // reparents the picker into the dialog
 
-    // The picker applies through the hosting view, which guards the paths that
-    // rebuild every window (data-based, preset or file load) against silently
-    // discarding a non-trivial configuration. Whatever the guard decides, the
-    // picker's own controls have finished their gesture, so close the modal
-    // when one fires.
+    // A chosen grid size has finished the picker's gesture, so it closes the
+    // modal; the hosting view applies it.
     connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet,
-            m_GridDialog, &QDialog::accept);
-    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout,
             m_GridDialog, &QDialog::accept);
     // The data-based chooser takes over from the dialog as its own popup; were
     // the dialog left open, dismissing the chooser would strand it empty.
@@ -2001,8 +1996,8 @@ void QmitkMxNLayoutEditorWidget::ShowGridDialog()
   }
 
   // Open fresh each time: the picker is a forward chooser, so a stale prior pick
-  // would misread as the current grid. It may also have hidden itself after a
-  // previous apply, so re-show it.
+  // would misread as the current grid. The picker starts hidden while it is
+  // parked in this widget, so show it inside the dialog.
   m_LayoutSelection->ResetSelection();
   m_LayoutSelection->show();
   m_GridDialog->exec();

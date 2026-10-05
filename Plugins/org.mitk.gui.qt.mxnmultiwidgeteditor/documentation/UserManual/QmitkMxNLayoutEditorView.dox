@@ -24,6 +24,11 @@
 
 	\imageMacroEx{QmitkMxN_LayoutEditor.png, "The MxN Layout Editor view", 8, 360px}
 
+\section org_mitk_views_mxnlayouteditor_Interaction Mouse interaction
+	The first control in the view, <b>PACS-like mouse interaction</b>, switches the mouse
+	interaction of the whole MxN display between the MITK and the PACS mode (see
+	\ref org_mitk_editors_mxnmultiwidget_Interaction_Mode).
+
 \section org_mitk_views_mxnlayouteditor_Layout The layout row
 	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
 	<ul>
@@ -49,7 +54,9 @@
 
 	A new grid size keeps the remaining windows and their synchronization; a data-based
 	arrangement replaces all windows and synchronization groups and is confirmed like a
-	preset.
+	preset. Its windows are not linked on windowing or LUT, so a fresh data-based
+	arrangement already counts as synchronization beyond the default, and applying a
+	preset or a file over it asks for confirmation as well.
 
 \section org_mitk_views_mxnlayouteditor_Arrange Arranging the windows
 	While the MxN Layout Editor is visible, its MxN display is in <i>arrange mode</i>:
@@ -203,7 +210,8 @@
 			<b>Sync groups</b> tab. Choosing "(not linked)" unlinks the selection, and
 			on the data-selection axis returns the windows to the default group. The
 			same list opens as a popup on right-click or double-click for a single
-			quick edit, and <i>Del</i> unlinks the selection.
+			quick edit, and <i>Del</i> or the <b>Clear</b> button beside the list unlinks
+			the selection.
 		<li> <b>Offset</b> appears for a selection that sits wholly on slice, zoom or pan
 			and whose cells are all linked - an offset is relative to the group's reference,
 			so an unlinked cell has nothing for it to be relative to. This is how a

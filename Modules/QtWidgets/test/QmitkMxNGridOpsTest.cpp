@@ -338,12 +338,11 @@ public:
 
   void NormalizedRects_MirrorTheGrid()
   {
-    // These drive the arrange mode's Shift ranges. They come from the splitter
-    // proportions rather than on-screen geometry precisely so they are right
-    // without a layout pass - which is what this test relies on too.
-    // A splitter has to have an extent before it can distribute one, so the
-    // editor is sized and shown; on an unrealized widget the sizes come back
-    // roughly even whatever was asked for.
+    // These drive the arrange mode's Shift ranges. They are read from the
+    // splitter proportions rather than widget geometry. A splitter has to
+    // have an extent before it can distribute one, so the editor is sized and
+    // shown; on an unrealized widget the sizes come back roughly even whatever
+    // was asked for.
     SizedEditor(2, 2);
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(4), m_Editor->GetNormalizedCellRects().size());

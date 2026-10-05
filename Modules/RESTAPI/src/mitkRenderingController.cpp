@@ -1562,8 +1562,8 @@ namespace
         // carries one.
         wj["view_direction"] = AnatomicalPlaneToV2String(*w.viewDirection);
       }
-      // links is always emitted; v2 has just one dimension (selection), v3
-      // will add more keys here additively without breaking v2 clients.
+      // links is always emitted. The window resources carry only the
+      // selection link; the layout document holds the other dimensions.
       wj["links"] = { { "selection", w.selectionGroup } };
       arr.push_back(wj);
     }

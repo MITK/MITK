@@ -34,10 +34,14 @@ description is `3-DeveloperManual/Starting/GettingToKnow/DocumentationGuide.dox`
 - `\imageMacro{file, "caption", cm}` sizes only the pdf; HTML shows the
   image at native size.
 - For screenshots use `\imageMacroEx{file, "caption", cm, px}`: the
-  fourth argument is the HTML width (e.g. `360px`). Existing pages use
-  `10` cm with 320-640 px.
-- Arguments are comma-separated: escape a comma in the caption as `\,`,
-  or the macro silently breaks ("unknown command" warning).
+  fourth argument is the HTML width. Size by what the image shows: a
+  single view, menu or popup at 8-10 cm and 320-560 px, a whole display
+  at 16 cm (the maximum) and 720-800 px. Keep px at or below the native
+  width (about half of it for a capture at 200 % scaling) so the HTML
+  image is never upscaled.
+- Arguments are comma-separated: escape a comma in the caption as `\,`.
+  An unescaped comma shifts the arguments, and Doxygen reports it only
+  as an "unknown command" warning.
 - Doxygen resolves image names globally: prefix them with the plugin or
   view name (`QmitkMyView_Overview.png`), never a generic name.
 - After editing, build the `doc` target and compare the warning count

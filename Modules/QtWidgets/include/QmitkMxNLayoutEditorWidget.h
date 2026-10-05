@@ -43,8 +43,9 @@ class QVBoxLayout;
  * \brief The MxN editor's authoritative layout and synchronization editor.
  *
  * One structural surface for both jobs the layout document describes: the
- * cell arrangement (grid size, presets, save/load - the embedded layout
- * selection controls) and the per-dimension synchronization groups.
+ * cell arrangement (presets, load and save in the header row; grid size and
+ * the data-based arrangement behind "Edit grid...") and the per-dimension
+ * synchronization groups.
  *
  * The windows themselves are arranged in the display: while the hosting view
  * is visible, the editor is in arrange mode (QmitkMxNArrangeMode) and every
@@ -52,10 +53,11 @@ class QVBoxLayout;
  * follows that selection. Two mutually exclusive configuration faces share a
  * tab widget, so only one is up at a time.
  *
- * "Sync groups" is the default face: one card per group (hue, editable
- * display name, dimension checkboxes, re-converge, geometry reinit). Cells
- * join a group by selecting them on their plates and using the card's menu, or
- * by drag and drop in either direction. Joining a group that synchronizes
+ * "Sync groups" is the default face: one card per group (hue, display name,
+ * a strip of axis glyphs that toggle the group's dimensions, and a menu with
+ * rename, color, membership, link navigation, re-converge, fit views and
+ * delete). Cells join a group by selecting them on their plates and using the
+ * card's menu, or by drag and drop in either direction. Joining a group that synchronizes
  * nothing yet links the navigation bundle (pan/zoom/slice/crosshair) as the
  * common-case default.
  *
@@ -331,9 +333,10 @@ private:
    *         attached multi widget. */
   void ClearCardsAndMatrix();
 
-  /** \brief Open the grid-shape picker (grid size, presets, save/load) in an
-   *         on-demand modal dialog, re-parenting the shared picker into it and
-   *         resetting its transient state so it opens fresh. */
+  /** \brief Open the grid-shape picker (grid size or a data-based
+   *         arrangement) in an on-demand modal dialog, re-parenting the shared
+   *         picker into it and resetting its transient state so it opens
+   *         fresh. */
   void ShowGridDialog();
 
   /** \brief Rebuild the advanced matrix from the current engine state: headers,

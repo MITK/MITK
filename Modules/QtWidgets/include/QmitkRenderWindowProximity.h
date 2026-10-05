@@ -189,7 +189,8 @@ public:
    *        wins over a pin, so clean view stays absolute.
    *
    *        The pin is a single flag, not a count: pinned popups never overlap,
-   *        because Qt closes an open popup before another one opens.
+   *        because they are not opened while another one is up; the open
+   *        popup holds the pointer grab.
    */
   void SetPinned(bool pinned);
   bool IsPinned() const;

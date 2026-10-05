@@ -79,7 +79,8 @@ namespace
 
   const QString NAMESPACE_DELIMITER = QStringLiteral("__");
 
-  // Window-id and group-name patterns mirror mxn-layout-v2.schema.json.
+  // Window-id and group-name patterns mirror the layout schemas (identical
+  // in v2 and v3).
   // Enforced by PrewalkValidate so callers that do not run a JSON-schema
   // validator still fail loudly at load rather than letting unsafe
   // characters reach REST URLs or property-context keys downstream.
@@ -94,8 +95,8 @@ namespace
     QStringLiteral("^#[0-9A-Fa-f]{6}$"));
 
 
-  // Translation helpers for the v2 layout's `view_direction` enum. Closed
-  // mapping (axial/sagittal/coronal/original); throws on anything else.
+  // Translation helpers for the layout document's `view_direction` enum.
+  // Closed mapping (axial/sagittal/coronal/original); throws on anything else.
 
   mitk::AnatomicalPlane ParseViewDirection(const std::string& s)
   {
@@ -107,7 +108,7 @@ namespace
                 << "' (expected 'axial', 'sagittal', 'coronal', or 'original').";
   }
 
-  std::string ViewDirectionToV2String(mitk::AnatomicalPlane plane)
+  std::string ViewDirectionToString(mitk::AnatomicalPlane plane)
   {
     switch (plane)
     {
@@ -116,7 +117,7 @@ namespace
       case mitk::AnatomicalPlane::Coronal:  return "coronal";
       case mitk::AnatomicalPlane::Original: return "original";
     }
-    mitkThrow() << "ViewDirectionToV2String: unsupported AnatomicalPlane enum value.";
+    mitkThrow() << "ViewDirectionToString: unsupported AnatomicalPlane enum value.";
   }
 
   // Group name each Synchronize(true) macro link uses. An ordinary group in
@@ -238,7 +239,7 @@ namespace
           if (!it->is_number_integer())
           {
             mitkThrow() << "Layout window '" << windowId
-                        << "': 'links.slice' offset must be an integer (slice steps).";
+                        << "': 'links.slice' offset must be an integer (displayed slices).";
           }
           offset = it->get<int>();
           break;
@@ -1057,7 +1058,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // The positional convenience overload owns the editor's "default group 1"
   // convention: the cell is placed into engine sync-group 1 right after
   // construction. The explicit-id overload stays free of side effects so
-  // v2-layout callers can move the cell to its document-declared group
+  // ApplyLayout can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
   const auto id = prefix + QString::number(i);
   auto renderWindowWidget = this->CreateRenderWindowWidget(id);
@@ -1185,15 +1186,15 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   // Initialize the node selection widget with all nodes. The cell is left
   // unattached to any sync group; placement into a group is the caller's
-  // responsibility (the positional overload assigns group 1; the v2 layout
-  // applier assigns the document-declared target group). This keeps the
+  // responsibility (the positional overload assigns group 1; ApplyLayout
+  // assigns the document-declared target group). This keeps the
   // explicit-name path free of side-effects so it does not auto-create a
   // phantom group 1 for documents that never reference it.
   utilityWidget->GetNodeSelectionWidget()->SelectAll();
 
-  // LayoutDesignChanged stays unconnected: the layout manager's generic
-  // designs rebuild the splitter tree behind this editor's grid, maximize and
-  // layout-document state.
+  // LayoutDesignChanged is deliberately not connected: the layout manager's
+  // generic designs rebuild the splitter tree behind this editor's grid,
+  // maximize and layout-document state.
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
@@ -1314,13 +1315,13 @@ void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
   }
 
   // Leave any current maximize first, so switching cells never stacks two.
-  // Every tree rebuild resets the maximize first, so the captured splitters
-  // are alive here; the guarded pointers only keep a broken invariant from
-  // turning into a use-after-free.
   auto restoreGrid = [this]()
   {
     for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
     {
+      // Every tree rebuild resets the maximize first, so the captured
+      // splitters are alive here; the guarded pointer only keeps a broken
+      // invariant from turning into a use-after-free.
       if (nullptr == splitter)
       {
         continue;
@@ -2047,7 +2048,7 @@ QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) c
   descriptor.id = cell->GetWidgetName();
   descriptor.displayName = cell->GetDisplayName();
   descriptor.viewDirection = QString::fromStdString(
-    ViewDirectionToV2String(
+    ViewDirectionToString(
       cell->GetSliceNavigationController()->GetDefaultViewDirection()));
 
   const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
@@ -2235,10 +2236,9 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
   constexpr int kWarnCap = 16;
   int warnCount = 0;
   bool warnCapHit = false;
-  // The divergence path here is uncovered by CI today by design: fresh
-  // layouts have no divergence to detect. Once scene-after-layout reseeding
-  // is implemented, an integration test should exercise this lambda with
-  // a scene that injects per-renderer divergence after the layout was applied.
+  // The divergence path is not covered by CI: a fresh layout has no
+  // divergence to detect, so exercising it takes a scene applied after the
+  // layout that injects per-renderer divergence.
   auto emitDivergence = [&](const std::string& groupName,
                             const std::string& dim,
                             const std::string& nodeLabel,
@@ -2796,13 +2796,12 @@ bool QmitkMxNMultiWidget::IsApplyingLayout() const
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
 {
-  // Tear the existing cell tree down first. The previous implementation
-  // tried to recycle existing 'widget<i>' cells by positional index, which
-  // misses entirely after a v2 layout with custom names is loaded
-  // (lookups return null, new cells are appended while the old custom-named
-  // ones stay in the map and are then double-deleted by 'delete this->layout()').
-  // Mirroring 'ApplyLayout's structure (tear down, allocate groups, build
-  // fresh) avoids that hazard regardless of the prior naming scheme.
+  // Tear the existing cell tree down first rather than recycling 'widget<i>'
+  // cells by positional index: after a layout with custom ids is loaded,
+  // those lookups return null, new cells are appended while the custom-named
+  // ones stay in the map, and both are then deleted twice by
+  // 'delete this->layout()'. Mirroring 'ApplyLayout's structure (tear down,
+  // allocate groups, build fresh) works whatever the prior naming scheme.
   this->ResetGridState();
   this->TearDownAllCells();
 
@@ -3214,7 +3213,7 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
       }
       else
       {
-        mitkThrow() << "SetSyncLink: the 'Slice' offset must be an integer (slice steps).";
+        mitkThrow() << "SetSyncLink: the 'Slice' offset must be an integer (displayed slices).";
       }
       break;
     case QmitkMxNSyncDimension::Zoom:
@@ -3532,7 +3531,8 @@ QString QmitkMxNMultiWidget::FindSyncGroupAnchor(QmitkMxNSyncDimension dimension
     }
     const long last = static_cast<long>(stepper->GetSteps()) - 1;
     const long position = static_cast<long>(stepper->GetPos());
-    const long shown = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? last - position : position;
+    const long shown =
+      mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? last - position : position;
     if (shown > 0 && shown < last)
     {
       candidates.emplace_back(descriptor.id, shown - linksIt->second.sliceOffset);
@@ -3607,13 +3607,15 @@ void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension
       // wrap and clamp to the last slice instead of the first.
       const long anchorLast = static_cast<long>(anchorStepper->GetSteps()) - 1;
       const long anchorPos = static_cast<long>(anchorStepper->GetPos());
-      const long anchorShown =
-        mitk::SliceNavigationHelper::IsDisplayedSliceInverted(anchorRenderer) ? anchorLast - anchorPos : anchorPos;
+      const long anchorShown = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(anchorRenderer)
+        ? anchorLast - anchorPos
+        : anchorPos;
       const long reference = anchorShown - std::get<int>(anchorOffset);
       const long memberLast = static_cast<long>(memberStepper->GetSteps()) - 1;
       const long memberShown = std::clamp(reference + memberLinks.sliceOffset, 0L, memberLast);
-      const long target =
-        mitk::SliceNavigationHelper::IsDisplayedSliceInverted(memberRenderer) ? memberLast - memberShown : memberShown;
+      const long target = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(memberRenderer)
+        ? memberLast - memberShown
+        : memberShown;
       memberStepper->SetPos(static_cast<unsigned int>(target));
       break;
     }

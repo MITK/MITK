@@ -158,10 +158,10 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 {
   m_LastErrorMessage.clear();
 
-  // The base UpdatePreview catches itk::ExceptionObject (what mitkThrow produces)
-  // and only forwards it to ErrorMessage, which no GUI here listens to. So catch
-  // every failure locally and record it in m_LastErrorMessage; the GUI shows that
-  // instead of the generic "cancelled or produced no result".
+  // The base UpdatePreview would forward a failure to ErrorMessage, whose
+  // listeners present it in a message box apart from the tool. So catch every
+  // failure locally and record it in m_LastErrorMessage; the GUI shows that in
+  // its status instead of the generic "cancelled or produced no result".
   try
   {
     // Programmer-guarantee guards: the GUI always injects both before running.

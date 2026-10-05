@@ -44,9 +44,12 @@ namespace mitk::SUVFunctionalGroupAccess
 
   /** The value of \p property at one slot, without a close-match fallback, so
    *  an absent slot yields an empty string rather than a neighbouring frame's
-   *  value. A property that is not slice-resolved carries one value for the
-   *  whole image and answers with it at every slot. A null property yields an
-   *  empty string. */
+   *  value. A DICOMProperty answers only at the slots it holds: the reader
+   *  publishes one entry per slot whose file carries the attribute, so one
+   *  holding only (0,0) on a multi-slot image means the other files lack it,
+   *  and those slots answer empty. A property of any other kind (e.g. a
+   *  StringProperty) carries one value for the whole image and answers with
+   *  it at every slot. A null property yields an empty string. */
   inline std::string ValueAt(const BaseProperty* property, TimeStepType t, DICOMProperty::IndexValueType z)
   {
     if (nullptr == property)

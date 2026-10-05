@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 
+#include <mitkExceptionMacro.h>
+
 #include <QFile>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -23,7 +25,9 @@ namespace
   QByteArray ReadResource(const QString& path)
   {
     QFile file(path);
-    file.open(QIODevice::ReadOnly);
+    if (!file.open(QIODevice::ReadOnly))
+      mitkThrow() << "Could not open resource \"" << path.toStdString() << "\"!";
+
     return file.readAll();
   }
 }

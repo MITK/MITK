@@ -114,7 +114,7 @@ void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -158,7 +158,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -211,7 +211,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -264,7 +264,7 @@ void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -291,7 +291,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DHorizontalLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -326,7 +326,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -361,7 +361,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -406,7 +406,7 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -451,7 +451,7 @@ void QmitkMultiWidgetLayoutManager::SetAllHorizontalLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -491,7 +491,7 @@ void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
 
   m_MultiWidget->ActivateMenuWidget(false);
 
-  delete m_MultiWidget->layout();
+  this->ClearLayout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -520,6 +520,39 @@ void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
   {
     renderWindow->UpdateLayoutDesignList(LayoutDesign::ALL_VERTICAL);
   }
+}
+
+void QmitkMultiWidgetLayoutManager::ClearLayout()
+{
+  auto* oldLayout = m_MultiWidget->layout();
+
+  if (nullptr == oldLayout)
+  {
+    return;
+  }
+
+  while (auto* item = oldLayout->takeAt(0))
+  {
+    if (auto* widget = item->widget())
+    {
+      // Render window widgets are owned through shared pointers, also the
+      // ones that already left the multi widget's map, so none of them may
+      // be deleted along with the splitters. Parking them in the multi
+      // widget instead of making them top-level keeps them in the same
+      // window, which keeps their OpenGL contexts.
+      for (auto* renderWindowWidget : widget->findChildren<QmitkRenderWindowWidget*>())
+      {
+        renderWindowWidget->hide();
+        renderWindowWidget->setParent(m_MultiWidget);
+      }
+
+      delete widget;
+    }
+
+    delete item;
+  }
+
+  delete oldLayout;
 }
 
 void QmitkMultiWidgetLayoutManager::RemoveOneLayout()

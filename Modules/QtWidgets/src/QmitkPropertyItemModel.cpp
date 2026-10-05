@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkStringProperty.h>
+#include <vector>
 
 namespace
 {
@@ -44,19 +45,6 @@ namespace
     return mitkColor;
   }
 }
-
-class PropertyEqualTo
-{
-public:
-  PropertyEqualTo(const mitk::BaseProperty *property) : m_Property(property) {}
-  bool operator()(const mitk::PropertyList::PropertyMapElementType &pair) const
-  {
-    return pair.second.GetPointer() == m_Property;
-  }
-
-private:
-  const mitk::BaseProperty *m_Property;
-};
 
 QmitkPropertyItemModel::QmitkPropertyItemModel(QObject *parent)
   : QAbstractItemModel(parent),
@@ -158,62 +146,33 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
   return QVariant();
 }
 
-QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *property)
+QModelIndexList QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *property) const
 {
+  QModelIndexList indices;
+
   if (property == nullptr)
-    return QModelIndex();
+    return indices;
 
-  auto propertyList = m_PropertyList.Lock();
+  // Matched by object rather than by name, since a property is shown under each of its aliases.
+  std::vector<QmitkPropertyItem *> pendingItems = { m_RootItem.get() };
 
-  if (propertyList.IsNull())
-    return QModelIndex();
-
-  auto propertyMap = propertyList->GetMap();
-  auto it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
-
-  if (it == propertyMap->end())
-    return QModelIndex();
-
-  QString name = QString::fromStdString(it->first);
-
-  if (!name.contains('.'))
+  while (!pendingItems.empty())
   {
-    QModelIndexList item = this->match(index(0, 0), Qt::DisplayRole, name, 1, Qt::MatchExactly);
+    auto *item = pendingItems.back();
+    pendingItems.pop_back();
 
-    if (!item.empty())
-      return item[0];
-  }
-  else
-  {
-    QStringList names = name.split('.');
-    QModelIndexList items =
-      this->match(index(0, 0), Qt::DisplayRole, names.last(), -1, Qt::MatchRecursive | Qt::MatchExactly);
-
-    for (auto item : std::as_const(items))
+    for (int row = 0; row < item->GetChildCount(); ++row)
     {
-      QModelIndex candidate = item;
+      auto *child = item->GetChild(row);
 
-      for (int i = names.length() - 1; i != 0; --i)
-      {
-        QModelIndex parent = item.parent();
+      if (GetBaseProperty(child->GetData(1)) == property)
+        indices.append(this->createIndex(row, 1, child));
 
-        if (parent.parent() == QModelIndex())
-        {
-          if (parent.data() != names.first())
-            break;
-
-          return candidate;
-        }
-
-        if (parent.data() != names[i - 1])
-          break;
-
-        item = parent;
-      }
+      pendingItems.push_back(child);
     }
   }
 
-  return QModelIndex();
+  return indices;
 }
 
 Qt::ItemFlags QmitkPropertyItemModel::flags(const QModelIndex &index) const
@@ -260,21 +219,30 @@ QModelIndex QmitkPropertyItemModel::index(int row, int column, const QModelIndex
 
 void QmitkPropertyItemModel::OnPropertyListModified()
 {
-  this->SetNewPropertyList(m_PropertyList.Lock());
+  auto propertyList = m_PropertyList.Lock();
+
+  // Value changes already update their rows in OnPropertyModified(). Rebuilding for them
+  // would reset the attached views, closing open editors and discarding expansion state.
+  if (propertyList.IsNotNull() && *propertyList->GetMap() == m_BuiltPropertyMap)
+    return;
+
+  this->SetNewPropertyList(propertyList);
 }
 
 void QmitkPropertyItemModel::OnPropertyListDeleted()
 {
   this->beginResetModel();
   this->CreateRootItem();
+  this->RemovePropertyObservers();
+  m_BuiltPropertyMap.clear();
   this->endResetModel();
 }
 
 void QmitkPropertyItemModel::OnPropertyModified(const itk::Object *property, const itk::EventObject &)
 {
-  QModelIndex index = this->FindProperty(static_cast<const mitk::BaseProperty *>(property));
+  const auto indices = this->FindProperty(static_cast<const mitk::BaseProperty *>(property));
 
-  if (index != QModelIndex())
+  for (const auto &index : indices)
     emit dataChanged(index, index);
 }
 
@@ -289,6 +257,16 @@ QModelIndex QmitkPropertyItemModel::parent(const QModelIndex &child) const
     return QModelIndex();
 
   return this->createIndex(parentItem->GetRow(), 0, parentItem);
+}
+
+void QmitkPropertyItemModel::RemovePropertyObservers()
+{
+  // Removed from the object it was added to, since the list may have dropped or replaced it
+  // meanwhile and observer tags are only unique per object.
+  for (const auto &[property, tag] : m_PropertyObserverTags)
+    property->RemoveObserver(tag);
+
+  m_PropertyObserverTags.clear();
 }
 
 int QmitkPropertyItemModel::rowCount(const QModelIndex &parent) const
@@ -355,8 +333,6 @@ bool QmitkPropertyItemModel::setData(const QModelIndex &index, const QVariant &v
 
 void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyList)
 {
-  typedef mitk::PropertyList::PropertyMap PropertyMap;
-
   this->beginResetModel();
 
   auto propertyList = m_PropertyList.Lock();
@@ -365,28 +341,16 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
   {
     propertyList->RemoveObserver(m_PropertyListDeletedTag);
     propertyList->RemoveObserver(m_PropertyListModifiedTag);
-
-    const PropertyMap *propertyMap = propertyList->GetMap();
-
-    for (PropertyMap::const_iterator propertyIt = propertyMap->begin(); propertyIt != propertyMap->end(); ++propertyIt)
-    {
-      std::map<std::string, unsigned long>::const_iterator tagIt = m_PropertyModifiedTags.find(propertyIt->first);
-
-      if (tagIt != m_PropertyModifiedTags.end())
-        propertyIt->second->RemoveObserver(tagIt->second);
-
-      tagIt = m_PropertyDeletedTags.find(propertyIt->first);
-
-      if (tagIt != m_PropertyDeletedTags.end())
-        propertyIt->second->RemoveObserver(tagIt->second);
-    }
-
-    m_PropertyModifiedTags.clear();
-    m_PropertyDeletedTags.clear();
   }
+
+  this->RemovePropertyObservers();
 
   m_PropertyList = newPropertyList;
   propertyList = m_PropertyList.Lock();
+
+  m_BuiltPropertyMap = propertyList.IsNotNull()
+    ? *propertyList->GetMap()
+    : mitk::PropertyList::PropertyMap();
 
   if (propertyList.IsNotNull())
   {
@@ -401,29 +365,25 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
     auto modifiedCommand = itk::MemberCommand<QmitkPropertyItemModel>::New();
     modifiedCommand->SetCallbackFunction(this, &QmitkPropertyItemModel::OnPropertyModified);
 
-    const PropertyMap *propertyMap = m_PropertyList.Lock()->GetMap();
-
-    for (PropertyMap::const_iterator it = propertyMap->begin(); it != propertyMap->end(); ++it)
-      m_PropertyModifiedTags.insert(
-        std::make_pair(it->first, it->second->AddObserver(itk::ModifiedEvent(), modifiedCommand)));
+    for (const auto &[name, property] : m_BuiltPropertyMap)
+      m_PropertyObserverTags.emplace_back(property, property->AddObserver(itk::ModifiedEvent(), modifiedCommand));
   }
 
   this->CreateRootItem();
-  propertyList = m_PropertyList.Lock();
 
-  if (propertyList.IsNotNull() && !propertyList->IsEmpty())
+  if (!m_BuiltPropertyMap.empty())
   {
     mitk::PropertyList::PropertyMap filteredProperties;
     bool filterProperties = false;
 
     if (m_PropertyFilters->HasFilter() || m_PropertyFilters->HasFilter(m_ClassName.toStdString()))
     {
-      filteredProperties = m_PropertyFilters->ApplyFilter(*propertyList->GetMap(), m_ClassName.toStdString());
+      filteredProperties = m_PropertyFilters->ApplyFilter(m_BuiltPropertyMap, m_ClassName.toStdString());
       filterProperties = true;
     }
 
     const mitk::PropertyList::PropertyMap *propertyMap =
-      !filterProperties ? propertyList->GetMap() : &filteredProperties;
+      !filterProperties ? &m_BuiltPropertyMap : &filteredProperties;
 
     mitk::PropertyList::PropertyMap::const_iterator end = propertyMap->end();
 

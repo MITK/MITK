@@ -30,7 +30,7 @@ class mitkManualSegmentationToSurfaceFilterTestSuite : public mitk::TestFixture
                             "BallBinary30x30x30Reference.vtp");
   MITK_PARAMETERIZED_TEST_2(Update_BallBinaryAndSmooth_OutputEqualsReference,
                             "BallBinary30x30x30.nrrd",
-                            "BallBinary30x30x30SmoothReference.vtp");
+                            "BallBinary30x30x30SmoothReferenceFlyingEdges.vtp");
   CPPUNIT_TEST_SUITE_END();
 
 private:

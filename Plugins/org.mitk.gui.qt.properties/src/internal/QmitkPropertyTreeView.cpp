@@ -23,31 +23,31 @@ found in the LICENSE file.
 #include <mitkIPropertyTransience.h>
 #include <QmitkRenderWindow.h>
 #include <QPainter>
+#include <QSignalBlocker>
 #include <memory>
 
 namespace
 {
-  QmitkAbstractNodeSelectionWidget::NodeList GetInitialSelection(berry::ISelection::ConstPointer selection)
+  /* Walks the dot-separated path returned by GetPropertyNameOrAlias() down from the root. */
+  QModelIndex FindIndex(const QAbstractItemModel* model, const QString& path)
   {
-    if (selection.IsNotNull() && !selection->IsEmpty())
+    QModelIndex index;
+
+    for (const auto& name : path.split('.'))
     {
-      auto* dataNodeSelection = dynamic_cast<const mitk::DataNodeSelection*>(selection.GetPointer());
+      const int rowCount = model->rowCount(index);
+      int row = 0;
 
-      if (nullptr != dataNodeSelection)
-      {
-        auto firstSelectedDataNode = dataNodeSelection->GetSelectedDataNodes().front();
+      while (row < rowCount && model->index(row, 0, index).data().toString() != name)
+        ++row;
 
-        if (firstSelectedDataNode.IsNotNull())
-        {
-          QmitkAbstractNodeSelectionWidget::NodeList initialSelection;
-          initialSelection.push_back(firstSelectedDataNode);
+      if (row == rowCount)
+        return QModelIndex();
 
-          return initialSelection;
-        }
-      }
+      index = model->index(row, 0, index);
     }
 
-    return QmitkAbstractNodeSelectionWidget::NodeList();
+    return index;
   }
 }
 
@@ -185,14 +185,16 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
     this, &QmitkPropertyTreeView::OnAddNewProperty);
   connect(m_Controls->treeView->selectionModel(), &QItemSelectionModel::currentRowChanged,
     this, &QmitkPropertyTreeView::OnCurrentRowChanged);
+  connect(m_Controls->treeView, &QTreeView::collapsed,
+    this, &QmitkPropertyTreeView::OnItemCollapsed);
+  connect(m_Controls->treeView, &QTreeView::expanded,
+    this, &QmitkPropertyTreeView::OnItemExpanded);
   connect(m_Model, &QmitkPropertyItemModel::modelReset,
     this, &QmitkPropertyTreeView::OnModelReset);
 
-  auto selection = this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  auto currentSelection = GetInitialSelection(selection);
-
-  if (!currentSelection.isEmpty())
-    m_Controls->singleSlot->SetCurrentSelection(currentSelection);
+  // The selection service only reports the active part's selection, which is no longer
+  // the Data Manager's once the user has clicked into a render window or another view.
+  m_Controls->singleSlot->SetCurrentSelection(this->GetDataManagerSelection());
 }
 
 void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)
@@ -237,6 +239,7 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
   if (nodes.empty() || nodes.front().IsNull())
   {
     m_SelectedNode = nullptr;
+    m_CollapsedPaths.clear();
 
     this->SetPartName("Properties");
     m_Model->SetPropertyList(nullptr);
@@ -246,6 +249,10 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
 
     return;
   }
+
+  // Collapsed items are remembered per node, so a newly selected node starts fully expanded.
+  if (nodes.front() != m_SelectedNode)
+    m_CollapsedPaths.clear();
 
   // node is selected, create tree with node properties
   m_SelectedNode = nodes.front();
@@ -271,7 +278,6 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
   m_Delegate->SetPropertyList(propertyList);
 
   m_Controls->newButton->setEnabled(true);
-  m_Controls->treeView->expandAll();
 }
 
 void QmitkPropertyTreeView::HideAllIcons()
@@ -280,6 +286,36 @@ void QmitkPropertyTreeView::HideAllIcons()
   m_Controls->tagsLabel->hide();
   m_Controls->saveLabel->hide();
   m_Controls->transientLabel->hide();
+}
+
+void QmitkPropertyTreeView::RestoreExpansionState()
+{
+  // Expanding everything emits expanded() per item, which must not count as the user's choice.
+  const QSignalBlocker blocker(m_Controls->treeView);
+
+  m_Controls->treeView->expandAll();
+
+  // A filter shows all of its results, including those in collapsed items.
+  if (!m_Controls->filterLineEdit->text().isEmpty())
+    return;
+
+  for (const auto& path : std::as_const(m_CollapsedPaths))
+  {
+    const auto index = FindIndex(m_ProxyModel, path);
+
+    if (index.isValid())
+      m_Controls->treeView->collapse(index);
+  }
+}
+
+void QmitkPropertyTreeView::OnItemCollapsed(const QModelIndex& index)
+{
+  m_CollapsedPaths.insert(this->GetPropertyNameOrAlias(index));
+}
+
+void QmitkPropertyTreeView::OnItemExpanded(const QModelIndex& index)
+{
+  m_CollapsedPaths.remove(this->GetPropertyNameOrAlias(index));
 }
 
 void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
@@ -410,12 +446,12 @@ void QmitkPropertyTreeView::OnAddNewProperty()
 void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
 {
   m_ProxyModel->setFilterWildcard(filter);
-  m_Controls->treeView->expandAll();
+  this->RestoreExpansionState();
 }
 
 void QmitkPropertyTreeView::OnModelReset()
 {
-  m_Controls->treeView->expandAll();
+  this->RestoreExpansionState();
   m_Controls->descriptionLabel->hide();
   this->HideAllIcons();
 }

@@ -14,3 +14,7 @@ mitk_create_plugin(
   PRIVATE MitkQtWidgetsExt MitkSceneSerialization MitkAppUtil
   PACKAGE_DEPENDS ${additional_dependencies}
 )
+
+if(MITK_USE_sentry)
+  target_compile_definitions(${PLUGIN_TARGET} PRIVATE MITK_HAS_CRASHHANDLING)
+endif()

@@ -25,6 +25,11 @@ found in the LICENSE file.
 #include <mitkTimeGeometry.h>
 #include <mitkAntiAliasing.h>
 
+#include <chrono>
+#include <functional>
+#include <map>
+#include <set>
+
 class vtkRenderWindow;
 class vtkObject;
 
@@ -61,6 +66,12 @@ namespace mitk
    * The methods #ForceImmediateUpdate() and #ForceImmediateUpdateAll() can
    * be used to force the RenderWindow update execution without any delay,
    * bypassing the request functionality.
+   *
+   * Animations are driven by an animation clock that ticks at most at the
+   * animation frame rate, and only while anything animates: a render window
+   * that asked for an animation frame, see #RequestAnimationFrame(), or an
+   * animation frame observer, see #AddAnimationFrameObserver(). Otherwise it
+   * is stopped and costs nothing.
    *
    * The interface of RenderingManager is platform independent. Platform
    * specific subclasses have to be implemented, though, to supply an
@@ -170,6 +181,24 @@ namespace mitk
     void ForceImmediateUpdate(vtkRenderWindow *renderWindow);
 
     /**
+     * \brief Suspend or resume the execution of update requests for the specified render window.
+     *
+     * Meant for render windows that cannot be seen, e.g. while hidden. Requests for a suspended
+     * render window stay pending and are executed once it is resumed. ForceImmediateUpdate()
+     * and ForceImmediateUpdateAll() still render a suspended render window.
+     *
+     * \param[in] renderWindow The render window to suspend or resume.
+     * \param[in] suspended Whether to suspend the execution of update requests.
+     */
+    void SetRenderingSuspended(vtkRenderWindow *renderWindow, bool suspended);
+
+    /**
+     * \brief Whether the execution of update requests is suspended for the specified render window.
+     * \sa SetRenderingSuspended()
+     */
+    bool IsRenderingSuspended(vtkRenderWindow *renderWindow) const;
+
+    /**
      * \brief Request a deferred update for all registered render windows.
      * \param[in] type Filter to update only specific window types (default: all).
      */
@@ -180,6 +209,63 @@ namespace mitk
      * \param[in] type Filter to update only specific window types (default: all).
      */
     void ForceImmediateUpdateAll(RequestType type = REQUEST_UPDATE_ALL);
+
+    /**
+     * \brief Called on every animation frame with the seconds since the previous one.
+     */
+    using AnimationFrameObserver = std::function<void(double)>;
+
+    /**
+     * \brief Request that the specified render window renders again on the next animation frame.
+     *
+     * Meant for mappers, which call it in every render in which they animate. The request is
+     * used up by the frame it schedules, so an animation ends one frame after its mapper stops
+     * asking. A render window that rendered for another reason since its last animation frame
+     * skips the next one and keeps the request.
+     *
+     * The animation shown is derived from GetAnimationTime(), never from properties or data
+     * changed on every frame.
+     *
+     * Requests for render windows that are not registered are ignored.
+     */
+    void RequestAnimationFrame(vtkRenderWindow *renderWindow);
+
+    /**
+     * \brief Seconds on a steady clock, the time from which all animations are derived.
+     */
+    double GetAnimationTime() const;
+
+    /**
+     * \brief Register an observer that is called on every animation frame, before the frame renders.
+     *
+     * Meant for animations that are not drawn by mappers, like an orbiting camera. The animation
+     * clock keeps ticking while any observer is registered, regardless of whether a render window
+     * asked for an animation frame. An observer may remove itself while it is called.
+     *
+     * \return The tag for RemoveAnimationFrameObserver(), never 0.
+     */
+    unsigned long AddAnimationFrameObserver(AnimationFrameObserver observer);
+
+    /**
+     * \brief Unregister an animation frame observer. Unknown tags are ignored.
+     */
+    void RemoveAnimationFrameObserver(unsigned long tag);
+
+    /**
+     * \brief Set the maximum number of animation frames per second.
+     *
+     * Throws if the frame rate is 0.
+     */
+    void SetAnimationFrameRate(unsigned int framesPerSecond);
+    itkGetConstMacro(AnimationFrameRate, unsigned int);
+
+    /**
+     * \brief Execute one animation frame: call the observers, then request updates for the render
+     * windows that asked for an animation frame.
+     *
+     * Must be called by the platform specific animation timer, see StartAnimationTimer().
+     */
+    void ExecuteAnimationFrame();
 
     /**
     * @brief Initialize the render windows by the aggregated geometry of all objects that are held in
@@ -486,6 +572,15 @@ namespace mitk
      * request. This method is called whenever an update is requested */
     virtual void GenerateRenderingRequestEvent() = 0;
 
+    /** Starts the platform specific timer that calls ExecuteAnimationFrame() at the given interval,
+     * or changes the interval of the running timer. */
+    virtual void StartAnimationTimer([[maybe_unused]] std::chrono::milliseconds interval) {}
+
+    virtual void StopAnimationTimer() {}
+
+    /** Called whenever a registered render window finished rendering. */
+    void OnRenderWindowRendered(vtkRenderWindow *renderWindow);
+
     virtual void InitializePropertyList();
 
     bool m_UpdatePending;
@@ -517,6 +612,7 @@ namespace mitk
 
     RenderWindowList m_RenderWindowList;
     RenderWindowVector m_AllRenderWindows;
+    std::set<vtkRenderWindow *> m_SuspendedRenderWindows;
 
     struct RenderWindowCallbacks
     {
@@ -573,8 +669,29 @@ namespace mitk
     */
     bool ExtendGeometryForBoundingBox(const TimeGeometry* originalGeometry, TimeGeometry::Pointer& modifiedGeometry);
 
+    void StartAnimationClock();
+
+    std::chrono::milliseconds GetAnimationFrameInterval() const;
+
     vtkRenderWindow *m_FocusedRenderWindow;
     AntiAliasing m_AntiAliasing;
+
+    const std::chrono::steady_clock::time_point m_AnimationEpoch;
+    std::chrono::steady_clock::time_point m_LastAnimationFrame;
+    unsigned int m_AnimationFrameRate;
+    bool m_AnimationClockRunning;
+
+    std::set<vtkRenderWindow *> m_AnimationFrameRequests;
+
+    /** Render windows whose animation frame is requested but not rendered yet. Their next render
+     * is that frame and must not count as a render for another reason. */
+    std::set<vtkRenderWindow *> m_ScheduledAnimationFrames;
+
+    /** Render windows that rendered for another reason since the previous animation frame. */
+    std::set<vtkRenderWindow *> m_RenderedBetweenAnimationFrames;
+
+    std::map<unsigned long, AnimationFrameObserver> m_AnimationFrameObservers;
+    unsigned long m_LastAnimationFrameObserverTag;
   };
 
 #ifdef __GNUC__

@@ -55,6 +55,11 @@ namespace mitk
         spacing in both in-plane directions. */
     double sliceSpacing = 4.0;
 
+    /** (0028,0101) Bits Stored, at most the 16 bits allocated. A file storing
+        fewer bits than it allocates is what makes GDCM's output-type rule and
+        the reader's per-frame rule observably agree or disagree. */
+    unsigned int bitsStored = 16;
+
     /** false: a plain multi-frame object (Nuclear Medicine Image Storage) with
         top-level geometry and rescale and no (5200,92xx) sequence at all. */
     bool functionalGroups = true;
@@ -105,6 +110,11 @@ namespace mitk
     /** Position of the first frame's plane along z. Lets two objects be stacked
         rather than overlapping. */
     double zOffset = 0.0;
+
+    /** Position of every plane along y. A shift along y that grows from file
+        to file within one series is what the sorters read as a regular gantry
+        tilt across those files. */
+    double yOffset = 0.0;
 
     /** true: write every per-frame Image Position (Patient) at zOffset instead
         of the ascending zOffset + k * sliceSpacing, so every frame occupies one

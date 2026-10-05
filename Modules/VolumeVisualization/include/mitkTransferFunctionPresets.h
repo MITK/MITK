@@ -1,0 +1,190 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef mitkTransferFunctionPresets_h
+#define mitkTransferFunctionPresets_h
+
+#include <MitkVolumeVisualizationExports.h>
+
+#include <mitkTransferFunction.h>
+#include <mitkVolumeBlendMode.h>
+
+#include <iosfwd>
+#include <string>
+#include <vector>
+#include <array>
+
+namespace mitk
+{
+  class Image;
+
+  /**
+   * \brief Catalog of volume-rendering transfer function presets.
+   *
+   * Parses the embedded module resource MedicalColorPresets.json once on
+   * construction and builds mitk::TransferFunction instances on demand. The
+   * presets come from Kitware VolView (Apache-2.0, see
+   * resource/MedicalColorPresets-license.txt) and use the ParaView / 3D-Slicer
+   * colormap format: flat OpacityPoints and RGBPoints arrays plus a
+   * ColorSpace, extended by a BlendMode.
+   *
+   * The blend mode is part of a preset rather than an independent setting
+   * because the projection modes reduce each ray to one scalar before running
+   * it through the transfer function: a curve authored to classify tissue and
+   * one authored as a window are not interchangeable between them. A file that
+   * names no BlendMode - a colormap taken from elsewhere - is read as
+   * composite, which is what every curve authored without the question in mind
+   * assumes.
+   *
+   * The same format is used to save and load individual user-created transfer
+   * functions (see SaveTransferFunction / LoadTransferFunction), so a saved
+   * file is structurally identical to one MedicalColorPresets.json entry - and
+   * AddPreset takes such an entry back into the catalog, where it is reachable
+   * by name like any built-in one.
+   */
+  class MITKVOLUMEVISUALIZATION_EXPORT TransferFunctionPresets
+  {
+  public:
+    TransferFunctionPresets();
+
+    /** \brief Names of the available presets, in file order. */
+    std::vector<std::string> GetPresetNames() const;
+
+    /**
+     * \brief The preset to start this image from.
+     *
+     * A first choice rather than a recommendation: what a view applies when
+     * nothing on the node says what to show, before the user picks from the
+     * grid. Worth making at all because the families are not interchangeable -
+     * the CT presets are authored against Hounsfield units, which every CT
+     * shares, and the MR ones against intensities calibrated to no scale, so a
+     * CT curve lands its whole opacity ramp below an MR's data and renders one
+     * flat shell.
+     *
+     * \param[in] image The image to be shown; nullptr is allowed. Anything
+     *            other than an MR - including an image whose metadata names no
+     *            modality at all - is served the CT default: most volume
+     *            rendering is CT, and Hounsfield units are the one scale a
+     *            preset can assume and be right about across scanners.
+     * \return The name of a preset this catalog holds, so that a caller can
+     *         apply it without a fallback of its own. Empty only for an empty
+     *         catalog.
+     */
+    std::string GetDefaultPresetName(const Image *image) const;
+
+    /**
+     * \brief Build a transfer function for the named preset, and report the
+     *        blend mode it was authored for.
+     * \param[in] presetName One of the names returned by GetPresetNames().
+     * \param[out] blendMode The mode to render the returned curve in. Required
+     *             rather than defaulted, for the same reason
+     *             SaveTransferFunction requires it: the two only mean anything
+     *             together, and a projection curve rendered as composite is
+     *             silently wrong rather than visibly so. Left untouched when
+     *             the name is unknown.
+     * \return A newly created transfer function, or nullptr if the name is unknown.
+     */
+    mitk::TransferFunction::Pointer CreateTransferFunction(const std::string &presetName,
+      VolumeBlendMode &blendMode) const;
+
+    /**
+     * \brief Take a preset read from a stream into this catalog, so that it can
+     *        be built by name like a built-in one.
+     *
+     * A stream rather than a path, as in LoadTransferFunction: where a preset is
+     * read from - a file the user chose, the embedded resource, a buffer in a
+     * test - is the caller's business, and leaving it there is what spares this
+     * class a file it could fail to open and an error it would have to report.
+     *
+     * \param[in] stream The stream to read, in the format SaveTransferFunction
+     *            writes. Only its first valid entry is taken.
+     * \return The name the preset was added under: the one the stream gives it,
+     *         unless another preset already holds that name. Names are how
+     *         CreateTransferFunction finds a preset, so a second CT-Bone could
+     *         never be reached, and is added as "CT-Bone (2)" instead. Empty for
+     *         a stream holding no valid entry, in which case the catalog is left
+     *         as it was.
+     */
+    std::string AddPreset(std::istream &stream);
+
+    /**
+     * \brief Take a preset back out of this catalog.
+     *
+     * The counterpart to AddPreset, for a preset a caller offered and no longer
+     * does. Names are unique across the catalog, so the name AddPreset returned
+     * is all it takes to name the entry it added.
+     *
+     * A built-in preset can be removed just as well - nothing here tells the two
+     * apart - but only until the next construction, which reads the embedded
+     * resource afresh.
+     *
+     * \param[in] presetName The preset to remove.
+     * \return True if the catalog held that name and no longer does.
+     */
+    bool RemovePreset(const std::string &presetName);
+
+    /**
+     * \brief Load a transfer function stored in the preset JSON format from
+     * any stream (a file, the embedded resource, an in-memory buffer).
+     * \param[in] stream The input stream to read from.
+     * \param[out] blendMode The mode the loaded function was authored for;
+     *             composite for a file that names none. Required for the same
+     *             reason as in CreateTransferFunction. Left untouched when the
+     *             stream holds no valid entry.
+     * \return The transfer function, or nullptr if the stream holds no valid
+     * preset entry.
+     */
+    static mitk::TransferFunction::Pointer LoadTransferFunction(std::istream &stream,
+      VolumeBlendMode &blendMode);
+
+    /**
+     * \brief Write a transfer function to a stream in the preset JSON format:
+     * a one-element array identical to a MedicalColorPresets.json entry
+     * (Name, ColorSpace, BlendMode, OpacityPoints, RGBPoints, EffectiveRange).
+     * The gradient opacity component is not stored.
+     * \param[in] stream The output stream to write to.
+     * \param[in] name The preset name to store.
+     * \param[in] transferFunction The transfer function to serialize.
+     * \param[in] blendMode The mode the function is meant to be rendered with.
+     *            Required rather than defaulted: a curve saved out of a
+     *            projection mode and read back as composite is silently wrong,
+     *            and the caller is the only one who knows which it was.
+     * \return True on success.
+     */
+    static bool SaveTransferFunction(std::ostream &stream, const std::string &name,
+      mitk::TransferFunction *transferFunction, VolumeBlendMode blendMode);
+
+  private:
+    struct Preset
+    {
+      std::string name;
+      TransferFunctionColorSpace colorSpace {TransferFunctionColorSpace::RGB};
+      VolumeBlendMode blendMode {VolumeBlendMode::Composite};
+      TransferFunction::ControlPoints scalarOpacity;
+      TransferFunction::RGBControlPoints color;
+      std::array<double, 2> effectiveRange {0.0, 0.0};
+    };
+
+    /**
+     * \brief Parse presets from a stream in the MedicalColorPresets.json
+     * format. Accepts either a catalog array or a single entry object.
+     */
+    static std::vector<Preset> ReadPresets(std::istream &stream);
+
+    /** \brief Build a transfer function from a decoded preset. */
+    static mitk::TransferFunction::Pointer BuildTransferFunction(const Preset &preset);
+
+    std::vector<Preset> m_Presets;
+  };
+}
+
+#endif

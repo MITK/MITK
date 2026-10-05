@@ -32,6 +32,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage InteractionPage
 -# \subpage LoggingPage
 -# \subpage ExceptionPage
+-# \subpage CrashDumpFacilityPage
 -# \subpage ModularizationPage "Modularization Concept"
  -# \ref ModularizationPageOverview
 -# \subpage PythonInMITKPage

@@ -231,6 +231,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenMP
+  MITK_RELEASE_DEBUG_SYMBOLS
   )
 
 #-----------------------------------------------------------------------------
@@ -412,7 +413,6 @@ ExternalProject_Add(${proj}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
     -DMITK_PCH:BOOL=${MITK_PCH}
-    -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
     -DMITK_XVFB_TESTING:BOOL=${MITK_XVFB_TESTING}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}

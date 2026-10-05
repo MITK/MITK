@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkPluginActivator.cpp
   QmitkRemeshingView.cpp
+  QmitkSliderColorBar.cpp
 )
 
 set(UI_FILES

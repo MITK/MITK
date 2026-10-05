@@ -21,21 +21,11 @@ found in the LICENSE file.
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
 
+#include <iterator>
+#include <string>
+
 namespace mitk
 {
-  class VtkXMLPolyDataReader : public ::vtkXMLPolyDataReader
-  {
-  public:
-    static VtkXMLPolyDataReader *New() { return new VtkXMLPolyDataReader(); }
-    vtkTypeMacro(VtkXMLPolyDataReader, vtkXMLPolyDataReader)
-
-      void SetStream(std::istream *is)
-    {
-      this->Stream = is;
-    }
-    std::istream *GetStream() const { return this->Stream; }
-  };
-
   class VtkXMLPolyDataWriter : public ::vtkXMLPolyDataWriter
   {
   public:
@@ -59,10 +49,16 @@ namespace mitk
   {
     mitk::Surface::Pointer output = mitk::Surface::New();
 
-    vtkSmartPointer<VtkXMLPolyDataReader> reader = vtkSmartPointer<VtkXMLPolyDataReader>::New();
-    if (this->GetInputStream())
+    auto reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+
+    if (auto *stream = this->GetInputStream(); stream != nullptr)
     {
-      reader->SetStream(this->GetInputStream());
+      // vtkXMLReader drops a stream handed to it as soon as its information
+      // pass closes the stream, so the data pass would find nothing to read.
+      // An input string stays with the reader for both passes.
+      const std::string content((std::istreambuf_iterator<char>(*stream)), std::istreambuf_iterator<char>());
+      reader->SetBinaryInputString(content.data(), static_cast<int>(content.size()));
+      reader->ReadFromInputStringOn();
     }
     else
     {
@@ -96,7 +92,7 @@ namespace mitk
     if (this->GetInputStream() == nullptr)
     {
       // check if the xml vtk reader can handle the file
-      vtkSmartPointer<VtkXMLPolyDataReader> xmlReader = vtkSmartPointer<VtkXMLPolyDataReader>::New();
+      auto xmlReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
       if (xmlReader->CanReadFile(this->GetInputLocation().c_str()) != 0)
       {
         return Supported;

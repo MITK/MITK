@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 class QmitkRenderingManagerInternal;
 class QmitkRenderingManagerFactory;
+class QTimer;
 
 /**
  * \ingroup QmitkModule
@@ -57,6 +58,9 @@ protected:
 
   void StartOrResetTimer() override;
 
+  void StartAnimationTimer(std::chrono::milliseconds interval) override;
+  void StopAnimationTimer() override;
+
   int pendingTimerCallbacks;
 
 protected slots:
@@ -65,6 +69,8 @@ protected slots:
 
 private:
   friend class QmitkRenderingManagerFactory;
+
+  QTimer* m_AnimationTimer;
 };
 
 class QmitkRenderingRequestEvent : public QEvent

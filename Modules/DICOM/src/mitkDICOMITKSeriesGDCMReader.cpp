@@ -217,38 +217,69 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList
 namespace
 {
   /**
-   * The blocks to emit for one sorted file list. Normally one.
+   * The sorted files of one block, regrouped so that a file whose frame model
+   * describes more than one frame stands alone: ITK's multi-file branch sets
+   * the moving dimension to the file count, so all but one frame of each file
+   * would be silently lost. A single-frame file is not separated, because one
+   * frame per file is what the multi-file branch produces anyway.
    *
-   * A file whose frame model describes more than one frame is never combined
-   * with another file: ITK's multi-file branch sets the moving dimension to the
-   * file count, so all but one frame of each file would be silently lost. Such a
-   * file therefore gets a block of its own and the remaining files keep one
-   * block. A single-frame file is not separated, because one frame per file is
-   * what the multi-file branch produces anyway; it is still expanded, so that it
-   * reports its functional-group values under the frame-relative keys.
+   * The files are grouped before the normal-direction sorter runs, so that
+   * every block's order and tilt come from its own first and last file.
    *
    * Separating them asserts only that MITK cannot merge them, not that they are
    * independent stacks. Deciding what they really are means reading Stack ID and
    * Dimension Index Values, which is frame-aware splitting and not done here.
    */
-  std::vector<mitk::DICOMImageFrameList>
-  ExpandAndSeparate(const mitk::DICOMDatasetAccessingImageFrameList& sortedFiles,
-                    const mitk::DICOMTagCache& cache)
+  std::vector<mitk::DICOMDatasetAccessingImageFrameList>
+  SeparateMultiFrameFiles(const mitk::DICOMDatasetAccessingImageFrameList& sortedFiles,
+                          const mitk::DICOMTagCache& cache)
   {
     if (!cache.HasAnyFrameModel())
     {
-      return { mitk::ConvertToDICOMImageFrameList(sortedFiles) };
+      return { sortedFiles };
     }
 
-    std::vector<mitk::DICOMImageFrameList> blocks;
-    mitk::DICOMImageFrameList retained;
+    std::vector<mitk::DICOMDatasetAccessingImageFrameList> groups;
+    mitk::DICOMDatasetAccessingImageFrameList retained;
 
     for (const auto& file : sortedFiles)
     {
       const auto layout = cache.GetFrameLayout(file);
+      if (layout.HasFrameModel() && layout.frameCount > 1)
+      {
+        groups.push_back({ file });
+      }
+      else
+      {
+        retained.push_back(file);
+      }
+    }
+
+    if (!retained.empty())
+    {
+      groups.push_back(std::move(retained));
+    }
+
+    return groups;
+  }
+
+  /** One entry per frame the frame model of each file describes; a file
+      without a frame model stays one entry. */
+  mitk::DICOMImageFrameList ExpandFrames(const mitk::DICOMDatasetAccessingImageFrameList& files,
+                                         const mitk::DICOMTagCache& cache)
+  {
+    if (!cache.HasAnyFrameModel())
+    {
+      return mitk::ConvertToDICOMImageFrameList(files);
+    }
+
+    mitk::DICOMImageFrameList result;
+    for (const auto& file : files)
+    {
+      const auto layout = cache.GetFrameLayout(file);
       if (!layout.HasFrameModel())
       {
-        retained.push_back(file.GetPointer());
+        result.push_back(file.GetPointer());
         continue;
       }
 
@@ -269,25 +300,15 @@ namespace
 
       if (frames.empty())
       {
-        retained.push_back(file.GetPointer());
-        continue;
+        result.push_back(file.GetPointer());
       }
-
-      if (1 == layout.frameCount)
+      else
       {
-        retained.push_back(frames.front());
-        continue;
+        result.insert(result.end(), frames.begin(), frames.end());
       }
-
-      blocks.push_back(std::move(frames));
     }
 
-    if (!retained.empty())
-    {
-      blocks.push_back(std::move(retained));
-    }
-
-    return blocks;
+    return result;
   }
 }
 
@@ -390,27 +411,28 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 
     assert( !gdcmFrameInfoList.empty() );
 
-    // reverse frames if necessary
-    // update tilt information from absolute last sorting
-    const DICOMDatasetList datasetList = ConvertToDICOMDatasetList( gdcmFrameInfoList );
-    m_NormalDirectionConsistencySorter->SetInput( datasetList );
-    m_NormalDirectionConsistencySorter->Sort();
-    const DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList =
-      ConvertToDICOMDatasetAccessingImageFrameList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
-    const GantryTiltInformation& tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
+    const auto groups = SeparateMultiFrameFiles( gdcmFrameInfoList, *this->GetTagCache() );
+    assert( !groups.empty() );
 
-    auto frameLists = ExpandAndSeparate( sortedGdcmInfoFrameList, *this->GetTagCache() );
-    assert( !frameLists.empty() );
-
-    for ( auto& frameList : frameLists )
+    for ( const auto& group : groups )
     {
+      // reverse frames if necessary
+      // update tilt information from absolute last sorting
+      const DICOMDatasetList datasetList = ConvertToDICOMDatasetList( group );
+      m_NormalDirectionConsistencySorter->SetInput( datasetList );
+      m_NormalDirectionConsistencySorter->Sort();
+      const DICOMDatasetAccessingImageFrameList sortedGroup =
+        ConvertToDICOMDatasetAccessingImageFrameList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
+      const GantryTiltInformation tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
+
+      auto frameList = ExpandFrames( sortedGroup, *this->GetTagCache() );
       assert( !frameList.empty() );
 
-      auto reason = frameLists.size() > 1 ? splitReason->Clone() : splitReason;
-      if ( frameLists.size() > 1 )
+      auto reason = groups.size() > 1 ? splitReason->Clone() : splitReason;
+      if ( groups.size() > 1 )
       {
         reason->AddReason( IOVolumeSplitReason::ReasonType::MultiFrameFileSeparated,
-                           std::to_string( frameLists.size() ) );
+                           std::to_string( groups.size() ) );
       }
 
       pendingBlocks.push_back( { std::move( frameList ), reason, tiltInfo } );

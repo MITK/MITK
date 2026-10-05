@@ -160,8 +160,7 @@ public:
   void SetPropertyList(mitk::PropertyList *propertyList);
 
 private slots:
-  void OnComboBoxCurrentIndexChanged(int index);
-  void OnSpinBoxEditingFinished();
+  void OnComboBoxActivated(int index);
   void OnColorPicked();
 
 private:

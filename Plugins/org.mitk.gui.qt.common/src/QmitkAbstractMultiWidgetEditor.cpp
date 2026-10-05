@@ -26,6 +26,8 @@ found in the LICENSE file.
 // berry
 #include <berryIWorkbenchPartConstants.h>
 
+#include <algorithm>
+
 namespace
 {
   mitk::IPreferences* GetPreferences()
@@ -39,6 +41,16 @@ namespace
     const auto* prefs = ::GetPreferences();
     const bool constrain = prefs->GetBool("Use constrained zooming and panning", true);
     mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrain);
+  }
+
+  void ApplyAnimationFrameRate()
+  {
+    const auto* prefs = ::GetPreferences();
+    // Only a hand-edited preference can be out of range: the preference page offers at most 60.
+    const int framesPerSecond = std::min(prefs->GetInt("animation frame rate", 60), 60);
+
+    if (0 < framesPerSecond)
+      mitk::RenderingManager::GetInstance()->SetAnimationFrameRate(static_cast<unsigned int>(framesPerSecond));
   }
 }
 
@@ -64,6 +76,7 @@ QmitkAbstractMultiWidgetEditor::Impl::Impl()
   {
     prefs->OnChanged.AddListener(mitk::MessageDelegate1<Impl, const mitk::IPreferences*>(this, &Impl::OnPreferencesChanged));
     ApplyConstrainedPanningZooming();
+    ApplyAnimationFrameRate();
   }
 }
 
@@ -78,6 +91,7 @@ QmitkAbstractMultiWidgetEditor::Impl::~Impl()
 void QmitkAbstractMultiWidgetEditor::Impl::OnPreferencesChanged(const mitk::IPreferences* /*preferences*/)
 {
   ApplyConstrainedPanningZooming();
+  ApplyAnimationFrameRate();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 

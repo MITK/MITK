@@ -20,8 +20,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Provides an easy way to calculate an itk::Histogram for a mitk::Image.
+   *
+   * The histogram covers the first time step, binned evenly from its smallest
+   * value to just above its largest, as itk::Statistics::ImageToHistogramFilter
+   * bins it with an automatic range. The voxels are binned in parallel, and an
+   * image without a pipeline source is only read, so the computation may run
+   * on a worker thread.
    *
    * \sa mitk::Image
    */
@@ -51,8 +59,27 @@ namespace mitk
      *
      * The histogram is recomputed only if the image has been modified since
      * the last computation.
+     *
+     * \throw mitk::Exception No image is set, the bin count is not positive, or
+     *        the image has more than one component per pixel or a pixel type
+     *        without a scalar equivalent.
+     * \throw itk::ProcessAborted A cancel was requested of the progress task.
      */
     void ComputeHistogram();
+
+    /**
+     * \brief Report the progress of ComputeHistogram into the given task.
+     *
+     * The steps are added to the task when the computation starts, and a
+     * cancel requested of it ends the computation early. The task is not owned.
+     * mitk::ScopedProgressTask hands one over for the duration of a call.
+     *
+     * \param[in] task The task, or nullptr for none.
+     */
+    void SetProgressTask(ProgressTask *task);
+
+    /** \brief The task ComputeHistogram reports into, or nullptr. */
+    ProgressTask *GetProgressTask() const;
 
     /**
      * \brief Get the maximum frequency in the computed histogram.
@@ -77,6 +104,7 @@ namespace mitk
     mitk::Image::ConstPointer m_Image;
     int m_Size;
     HistogramType::ConstPointer m_Histogram;
+    ProgressTask *m_ProgressTask;
   };
 
 } // namespace mitk

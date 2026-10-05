@@ -33,7 +33,9 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <algorithm>
 #include <set>
+#include <vector>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -82,6 +84,47 @@ namespace
 
   private:
     mitk::DICOMTagPath m_Path;
+  };
+
+  /** Answers every registered path it was given with the same per-frame
+      finding, the way a frame info answers a wildcard and an explicit-index
+      registration that name one item. */
+  class OverlappingFindingsFrameInfo : public mitk::DICOMDatasetAccessingImageFrameInfo
+  {
+  public:
+    mitkClassMacro(OverlappingFindingsFrameInfo, mitk::DICOMDatasetAccessingImageFrameInfo);
+    mitkNewMacro2Param(OverlappingFindingsFrameInfo, const std::string&, const std::vector<mitk::DICOMTagPath>&);
+
+    mitk::DICOMDatasetFinding GetTagValueAsString(const mitk::DICOMTag&) const override
+    {
+      return mitk::DICOMDatasetFinding();
+    }
+
+    FindingsListType GetTagValueAsString(const mitk::DICOMTagPath& path) const override
+    {
+      const bool registered = std::any_of(m_Paths.cbegin(), m_Paths.cend(),
+                                          [&path](const mitk::DICOMTagPath& known) { return path.Equals(known); });
+      if (!registered)
+      {
+        return {};
+      }
+
+      return { mitk::DICOMDatasetFinding(true, "per-frame", m_Paths.back(), mitk::DICOMFindingOrigin::PerFrameFunctionalGroup) };
+    }
+
+    std::string GetFilenameIfAvailable() const override
+    {
+      return this->Filename;
+    }
+
+  protected:
+    OverlappingFindingsFrameInfo(const std::string& filename, const std::vector<mitk::DICOMTagPath>& paths)
+      : mitk::DICOMDatasetAccessingImageFrameInfo(filename, 0), m_Paths(paths)
+    {
+    }
+
+  private:
+    std::vector<mitk::DICOMTagPath> m_Paths;
   };
 }
 
@@ -135,6 +178,8 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(ValuesFollowPixelsWhenInStackPositionDescends);
   MITK_TEST(SourceFramePropertyNamesTheFrameOfEverySlot);
   MITK_TEST(PixelsUsePerFrameRescale);
+  MITK_TEST(NarrowBitsStoredLoadsWithGDCMsType);
+  MITK_TEST(RecoveredIntegersAreRoundedNotTruncated);
   MITK_TEST(NonIntegralInterceptLoadsAsDouble);
   MITK_TEST(TopLevelValuesAreUniformAcrossSlices);
   MITK_TEST(PerFrameValuesSurviveSaveAndReload);
@@ -143,13 +188,16 @@ class mitkDICOMMultiFrameReadTestSuite : public mitk::TestFixture
   MITK_TEST(SingleFrameEnhancedGetsFrameRelativeKeys);
   MITK_TEST(TopLevelDuplicateLosesAgainstTheFrame);
   MITK_TEST(RaggedObjectKeepsTheOneFrameModel);
+  MITK_TEST(RootedRegistrationYieldsNothingOnARaggedFile);
   MITK_TEST(FramesAtOnePlanePositionAreRefused);
   MITK_TEST(FileLevelInfoDoesNotAnswerAFrameRelativeQuery);
   MITK_TEST(PerFrameGroupWinsOverSharedGroup);
   MITK_TEST(SharedGroupWinsOverTopLevel);
   MITK_TEST(MoreSpecificOriginWinsWhateverTheOrder);
+  MITK_TEST(OverlappingRegistrationsDoNotWarn);
   MITK_TEST(TwoEnhancedFilesInOneSeriesBecomeTwoCompleteVolumes);
   MITK_TEST(EnhancedFilesWithTopLevelGeometryAreSeparated);
+  MITK_TEST(SeparatedFilesAreNotShearedByTheTiltAcrossFiles);
   MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolume);
   MITK_TEST(OpeningOneSeparatedFileLoadsOnlyItsVolumeWithAFreshReader);
   MITK_TEST(OpeningAFileWithDifferentlyCasedNameLoadsIt);
@@ -562,6 +610,71 @@ public:
     }
   }
 
+  /** GDCM sizes its output by Bits Stored. The per-frame rule has to see the
+      same declaration, or a varying file would load wider than its uniform
+      twin. */
+  void NarrowBitsStoredLoadsWithGDCMsType()
+  {
+    auto varying = this->MakeEnhanced();
+    varying.bitsStored = 12;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      varying.frames[k].slope = (k % 2 == 0) ? 1.0 : 2.0;
+      varying.frames[k].intercept = -1024.0;
+    }
+
+    auto uniform = varying;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      uniform.frames[k].slope = 2.0;
+    }
+
+    const auto varyingImage = this->LoadOne(varying.Write(this->CaseDir(), "varying.dcm"));
+    const auto uniformImage = this->LoadOne(uniform.Write(this->CaseDir(), "uniform.dcm"));
+
+    // 12 bits signed span -2048..2047; times 2 minus 1024 still fits int16,
+    // which is what GDCM picks for the uniform file.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The uniform file keeps GDCM's type",
+                                 std::string("short"), uniformImage->GetPixelType().GetComponentTypeAsString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The varying file loads with the same type as its uniform twin",
+                                 std::string("short"), varyingImage->GetPixelType().GetComponentTypeAsString());
+
+    for (unsigned int z = 0; z < FRAME_COUNT; ++z)
+    {
+      const double expected = varying.frames[z].constant * varying.frames[z].slope + varying.frames[z].intercept;
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice " + std::to_string(z) + " uses its own frame's rescale",
+                                   static_cast<short>(expected), this->PixelAt<short>(varyingImage, z));
+    }
+  }
+
+  /** GDCM applies the shared pair, here a fractional one, so undoing it leaves
+      each recovered value a few ULPs off the whole number that the frame's own
+      integral pair yields. The integral target has to round, not truncate. */
+  void RecoveredIntegersAreRoundedNotTruncated()
+  {
+    auto object = this->MakeEnhanced();
+    object.rescalePlacement = mitk::DICOMMultiFrameTestObject::RescalePlacement::SharedAndPerFrame;
+    object.sharedSlopeAlongsidePerFrame = 0.3;
+    for (unsigned int k = 0; k < FRAME_COUNT; ++k)
+    {
+      // 31 * 0.3 / 0.3 lands below 31 in double arithmetic.
+      object.frames[k].constant = 31;
+      object.frames[k].slope = (k % 2 == 0) ? 2.0 : 3.0;
+    }
+
+    const auto image = this->LoadOne(object.Write(this->CaseDir(), "shared_fractional.dcm"));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Whole per-frame pairs give an integral type",
+                                 std::string("int"), image->GetPixelType().GetComponentTypeAsString());
+
+    for (unsigned int z = 0; z < FRAME_COUNT; ++z)
+    {
+      const int expected = static_cast<int>(object.frames[z].constant * object.frames[z].slope);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice " + std::to_string(z) + " recovers the exact integer",
+                                   expected, this->PixelAt<int>(image, z));
+    }
+  }
+
   /** A non-integral pair makes GDCM's rule pick double, and the
       correction must not narrow it. */
   void NonIntegralInterceptLoadsAsDouble()
@@ -766,6 +879,23 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No source frame property without a frame model", frames.IsNull());
   }
 
+  /** The rule for a rooted registration is the reader's, not the file's: a
+      ragged file keeps the one-frame model, and still must not publish under
+      the root a key a conformant file never gets. */
+  void RootedRegistrationYieldsNothingOnARaggedFile()
+  {
+    this->Register(Rooted(0x5200, 0x9230, 0x0020, 0x9111, 0x0020, 0x9057));
+
+    auto object = this->MakeEnhanced();
+    object.perFrameItemCountOverride = FRAME_COUNT - 1;
+
+    mitk::DICOMTestWarningCounter warnings("rooted in a functional-group sequence");
+    const auto image = this->LoadOne(object.Write(this->CaseDir(), "ragged.dcm"));
+
+    this->AssertNoRootedKeys(image);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The registrant is told once per scan", 1u, warnings.GetCount());
+  }
+
   /** Frames that all lie at one plane position are refused rather than loaded
       as a single 2D frame: GDCM reports a z-spacing of 0 for such a file, so
       it is read as a 2D image, and the frame-count check then refuses the
@@ -788,10 +918,10 @@ public:
    * GetFrameInfoList() would see functional-group findings under paths it did
    * not register; a frame-scoped info answers exactly that query.
    *
-   * The scan registers the rooted path, which is searched as registered and
-   * never rooted again, so the entries are the same for both views and the
-   * case is about the store alone. The frame model is read only so that the
-   * cache resolves frame-scoped infos.
+   * The scan registers the frame-relative path, whose expansion under the
+   * group roots stores the functional-group entries, so the entries are the
+   * same for both views and the case is about the store alone. The frame
+   * model is read so that the cache resolves frame-scoped infos.
    */
   void FileLevelInfoDoesNotAnswerAFrameRelativeQuery()
   {
@@ -804,7 +934,7 @@ public:
 
     auto scanner = mitk::DICOMDCMTKTagScanner::New();
     scanner->SetInputFiles({ file });
-    scanner->AddTagPath(Rooted(0x5200, 0x9230, 0x0028, 0x9145, 0x0028, 0x1053));
+    scanner->AddTagPath(RescaleSlopeRelative());
     scanner->SetReadFrameModel(true);
     scanner->Scan();
 
@@ -914,6 +1044,39 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning for the block", 1u, warnings.GetCount());
   }
 
+  /** A wildcard and an explicit-index registration that name the same item
+      yield one finding twice, from one placement. That is not an attribute
+      present at two placements, so it is not reported. */
+  void OverlappingRegistrationsDoNotWarn()
+  {
+    const std::string filename = "overlapping.dcm";
+
+    mitk::DICOMFrameLayout layout;
+    layout.perFrameItemCount = 1;
+
+    auto file = mitk::DICOMGenericImageFrameInfo::New(filename);
+    file->SetFrameLayout(layout);
+    auto cache = mitk::DICOMGenericTagCache::New();
+    cache->AddFrameInfo(file);
+
+    mitk::DICOMTagPath explicitPath;
+    explicitPath.AddSelection(0x0028, 0x9145, 0).AddElement(0x0028, 0x1053);
+    auto frame = OverlappingFindingsFrameInfo::New(filename, { RescaleSlopeRelative(), explicitPath });
+
+    mitk::DICOMImageBlockDescriptor block;
+    block.SetTagCache(cache);
+    block.SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
+    block.SetAdditionalTagsOfInterest({ { RescaleSlopeRelative(), "" }, { explicitPath, "" } });
+    block.SetImageFrameList({ frame.GetPointer() });
+
+    mitk::DICOMTestWarningCounter warnings("DICOM.0028.9145.[0].0028.1053");
+    const auto* property = AsDICOMProperty(block.GetProperty("DICOM.0028.9145.[0].0028.1053"));
+    CPPUNIT_ASSERT_MESSAGE("The block publishes the attribute", nullptr != property);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The one finding reaches the slot",
+                                 std::string("per-frame"), property->GetValue(0, 0, false, false));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One placement is not a duplicate", 0u, warnings.GetCount());
+  }
+
   /** Writes \p count objects of one series into one directory, applying
       \p configure to each before it is written. */
   template <typename TConfigure>
@@ -1018,6 +1181,33 @@ public:
       CPPUNIT_ASSERT_MESSAGE("The slice-count net did not have to fire",
                              !SplitReasonOf(image)->HasReason(
                                mitk::IOVolumeSplitReason::ReasonType::FrameCountMismatch));
+    }
+  }
+
+  /** The tilt the sorters see across the files of a series belongs to the
+      block of those files. A separated file is a block of its own, and a
+      single file has no tilt, so its frames are not sheared and its slice
+      spacing stays its own. */
+  void SeparatedFilesAreNotShearedByTheTiltAcrossFiles()
+  {
+    const auto reference = this->MakeEnhanced();
+    const std::string directory = this->WriteSeries(3, [](mitk::DICOMMultiFrameTestObject& object, unsigned int file)
+    {
+      object.topLevelGeometry = true;
+      object.zOffset = file * FRAME_COUNT * object.sliceSpacing;
+      object.yOffset = file * 2.0;
+    });
+
+    const auto images = this->LoadAll(directory);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The block is separated into one volume per file",
+                                 std::size_t(3), images.size());
+
+    for (const auto& image : images)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A separated file keeps its own extent",
+                                   reference.rows, image->GetDimension(1));
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A separated file keeps its own slice spacing",
+                                           reference.sliceSpacing, image->GetGeometry()->GetSpacing()[2], 1e-6);
     }
   }
 
@@ -1272,8 +1462,8 @@ public:
    * Class UID, Modality and top-level geometry. So this pins the outcome rather
    * than the mechanism: the multi-frame file still loads as the complete volume
    * it is, exactly one volume carries the frame model, and no frame is lost.
-   * `ExpandAndSeparate`'s remainder branch stays a net for a block the sorters
-   * do hand over mixed.
+   * The retained group of the file-level separation stays a net for a block the
+   * sorters do hand over mixed.
    */
   void EnhancedFileIsSeparatedFromSingleFrameFiles()
   {

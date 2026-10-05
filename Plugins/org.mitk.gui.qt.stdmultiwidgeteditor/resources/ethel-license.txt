@@ -1,0 +1,13 @@
+ethel.vtp and ethel.jpg are derived from the following work:
+
+This work is based on "Oiiaioooooiai Cat"
+(https://sketchfab.com/3d-models/oiiaioooooiai-cat-30d27bf7fb224849b76e208a6eccdb36)
+by Zhuier (https://sketchfab.com/Zhuier) licensed under CC-BY-4.0
+(http://creativecommons.org/licenses/by/4.0/).
+
+See Licenses/CC-BY-4.0.txt.
+
+Modified for MITK: the mesh was decimated to 3943 triangles, scaled to half
+size in millimetres and centered above the origin, the base color texture
+was reduced to 1024 x 1024 pixels and is stored vertically flipped so that
+it renders upright on an MITK surface.

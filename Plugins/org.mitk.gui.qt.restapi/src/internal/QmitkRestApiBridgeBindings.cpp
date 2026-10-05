@@ -414,6 +414,9 @@ namespace mitk
         if (w == nullptr)
           throw std::runtime_error("No workbench window widget available for screenshot");
 
+        // Render windows that are hidden, e.g. in a minimized window, have
+        // their updates suspended and would be captured outdated.
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
         return EncodePixmap(w->grab(), size, format);
       });
 
@@ -459,6 +462,9 @@ namespace mitk
           throw mitk::RenderWindowBridgeUnsupportedOperationException(
             "Active editor does not expose a QmitkAbstractMultiWidget canvas");
 
+        // The render windows of an editor in a background tab have their
+        // updates suspended and would be captured outdated.
+        canvas->ForceImmediateUpdateAll();
         return EncodePixmap(canvas->grab(), size, format);
       });
 
@@ -479,7 +485,9 @@ namespace mitk
         // QmitkRenderWindow is a QVTKOpenGLNativeWidget (QOpenGLWidget). Capturing
         // via grabFramebuffer() reads the current OpenGL framebuffer without
         // resizing the live render window; we scale the resulting image
-        // afterwards if a different size was requested.
+        // afterwards if a different size was requested. Rendering first
+        // matters for a hidden window, whose updates are suspended.
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(qrw->GetVtkRenderWindow());
         QImage img = qrw->grabFramebuffer();
         return EncodePixmap(QPixmap::fromImage(std::move(img)), size, format);
       });
@@ -749,6 +757,7 @@ namespace mitk
         // root that hosts the cells IS the multi-widget itself, so a direct
         // QWidget::grab on the multi-widget pointer yields the editor canvas.
         auto* const widget = GetMxNMultiWidget();
+        widget->ForceImmediateUpdateAll();
         return EncodePixmap(widget->grab(), size, format);
       });
 
@@ -762,6 +771,7 @@ namespace mitk
         // the live OpenGL framebuffer without resizing the surface. Scaling,
         // if requested, is applied to the captured image afterwards.
         const auto snap = ResolveMxNRenderWindow(id);
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(snap.renderWindow->GetVtkRenderWindow());
         QImage img = snap.renderWindow->grabFramebuffer();
         return EncodePixmap(QPixmap::fromImage(std::move(img)), size, format);
       });

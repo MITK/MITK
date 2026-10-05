@@ -27,6 +27,8 @@ found in the LICENSE file.
 #include <itkCommand.h>
 #include <mitkVtkPropRenderer.h>
 
+#include <cmath>
+
 namespace mitk
 {
   itkEventMacroDefinition(RenderingManagerEvent, itk::AnyEvent);
@@ -46,7 +48,11 @@ namespace mitk
       m_DataStorage(nullptr),
       m_ConstrainedPanningZooming(true),
       m_FocusedRenderWindow(nullptr),
-      m_AntiAliasing(AntiAliasing::FastApproximate)
+      m_AntiAliasing(AntiAliasing::FastApproximate),
+      m_AnimationEpoch(std::chrono::steady_clock::now()),
+      m_AnimationFrameRate(60),
+      m_AnimationClockRunning(false),
+      m_LastAnimationFrameObserverTag(0)
   {
     m_ShadingEnabled.assign(3, false);
     m_ShadingValues.assign(4, 0.0);
@@ -162,6 +168,11 @@ namespace mitk
   {
     if (m_RenderWindowList.erase(renderWindow))
     {
+      m_SuspendedRenderWindows.erase(renderWindow);
+      m_AnimationFrameRequests.erase(renderWindow);
+      m_ScheduledAnimationFrames.erase(renderWindow);
+      m_RenderedBetweenAnimationFrames.erase(renderWindow);
+
       auto callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
       if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
@@ -204,11 +215,39 @@ namespace mitk
 
     m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
+    if (m_SuspendedRenderWindows.contains(renderWindow))
+    {
+      return;
+    }
+
     if (!m_UpdatePending)
     {
       m_UpdatePending = true;
       this->GenerateRenderingRequestEvent();
     }
+  }
+
+  void RenderingManager::SetRenderingSuspended(vtkRenderWindow *renderWindow, bool suspended)
+  {
+    const auto it = m_RenderWindowList.find(renderWindow);
+    if (it == m_RenderWindowList.cend())
+    {
+      return;
+    }
+
+    if (suspended)
+    {
+      m_SuspendedRenderWindows.insert(renderWindow);
+    }
+    else if (0 != m_SuspendedRenderWindows.erase(renderWindow) && RENDERING_REQUESTED == it->second)
+    {
+      this->RequestUpdate(renderWindow);
+    }
+  }
+
+  bool RenderingManager::IsRenderingSuspended(vtkRenderWindow *renderWindow) const
+  {
+    return m_SuspendedRenderWindows.contains(renderWindow);
   }
 
   void RenderingManager::ForceImmediateUpdate(vtkRenderWindow *renderWindow)
@@ -274,6 +313,120 @@ namespace mitk
         this->ForceImmediateUpdate(it->first);
       }
     }
+  }
+
+  void RenderingManager::RequestAnimationFrame(vtkRenderWindow *renderWindow)
+  {
+    if (!m_RenderWindowList.contains(renderWindow))
+      return;
+
+    m_AnimationFrameRequests.insert(renderWindow);
+    this->StartAnimationClock();
+  }
+
+  double RenderingManager::GetAnimationTime() const
+  {
+    return std::chrono::duration<double>(std::chrono::steady_clock::now() - m_AnimationEpoch).count();
+  }
+
+  unsigned long RenderingManager::AddAnimationFrameObserver(AnimationFrameObserver observer)
+  {
+    const auto tag = ++m_LastAnimationFrameObserverTag;
+    m_AnimationFrameObservers.emplace(tag, std::move(observer));
+    this->StartAnimationClock();
+
+    return tag;
+  }
+
+  void RenderingManager::RemoveAnimationFrameObserver(unsigned long tag)
+  {
+    m_AnimationFrameObservers.erase(tag);
+  }
+
+  void RenderingManager::SetAnimationFrameRate(unsigned int framesPerSecond)
+  {
+    if (0 == framesPerSecond)
+      mitkThrow() << "The animation frame rate must be positive.";
+
+    if (framesPerSecond == m_AnimationFrameRate)
+      return;
+
+    m_AnimationFrameRate = framesPerSecond;
+
+    if (m_AnimationClockRunning)
+      this->StartAnimationTimer(this->GetAnimationFrameInterval());
+  }
+
+  void RenderingManager::ExecuteAnimationFrame()
+  {
+    if (!m_AnimationClockRunning)
+      return;
+
+    const auto now = std::chrono::steady_clock::now();
+    const double secondsSincePreviousFrame = std::chrono::duration<double>(now - m_LastAnimationFrame).count();
+    m_LastAnimationFrame = now;
+
+    // A copy keeps each observer alive while it is called, even if it removes itself.
+    const auto observers = m_AnimationFrameObservers;
+
+    for (const auto& [tag, observer] : observers)
+    {
+      if (m_AnimationFrameObservers.contains(tag))
+        observer(secondsSincePreviousFrame);
+    }
+
+    // The renders requested below renew the requests of the animations that go on. Stopping
+    // right after them would restart the clock with each render, at the pace of the renders
+    // instead of the timer. So the clock stops on the first frame without anything to do.
+    if (m_AnimationFrameRequests.empty() && m_AnimationFrameObservers.empty())
+    {
+      m_AnimationClockRunning = false;
+      this->StopAnimationTimer();
+      return;
+    }
+
+    for (auto it = m_AnimationFrameRequests.begin(); it != m_AnimationFrameRequests.end();)
+    {
+      // Its last render already showed the animation at a time within this frame.
+      if (m_RenderedBetweenAnimationFrames.contains(*it))
+      {
+        ++it;
+        continue;
+      }
+
+      m_ScheduledAnimationFrames.insert(*it);
+      this->RequestUpdate(*it);
+      it = m_AnimationFrameRequests.erase(it);
+    }
+
+    m_RenderedBetweenAnimationFrames.clear();
+  }
+
+  void RenderingManager::OnRenderWindowRendered(vtkRenderWindow *renderWindow)
+  {
+    if (0 == m_ScheduledAnimationFrames.erase(renderWindow))
+      m_RenderedBetweenAnimationFrames.insert(renderWindow);
+  }
+
+  void RenderingManager::StartAnimationClock()
+  {
+    if (m_AnimationClockRunning)
+      return;
+
+    m_AnimationClockRunning = true;
+
+    // The first frame then measures from now rather than from the end of the previous animation.
+    m_LastAnimationFrame = std::chrono::steady_clock::now();
+
+    // Renders before the clock ran do not belong to any of its frames.
+    m_RenderedBetweenAnimationFrames.clear();
+
+    this->StartAnimationTimer(this->GetAnimationFrameInterval());
+  }
+
+  std::chrono::milliseconds RenderingManager::GetAnimationFrameInterval() const
+  {
+    return std::chrono::milliseconds(std::lround(1000.0 / m_AnimationFrameRate));
   }
 
   void RenderingManager::InitializeViewsByBoundingObjects(const DataStorage* dataStorage)
@@ -548,7 +701,7 @@ namespace mitk
     int i = 0;
     for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it, ++i)
     {
-      if (it->second == RENDERING_REQUESTED)
+      if (it->second == RENDERING_REQUESTED && !m_SuspendedRenderWindows.contains(it->first))
       {
         this->ForceImmediateUpdate(it->first);
       }
@@ -592,13 +745,15 @@ namespace mitk
       return;
     }
 
+    auto renderingManager = RenderingManager::GetInstance();
+    renderingManager->OnRenderWindowRendered(renderWindow);
+
     auto renderer = BaseRenderer::GetInstance(renderWindow);
     if (nullptr == renderer)
     {
       return;
     }
 
-    auto renderingManager = RenderingManager::GetInstance();
     renderingManager->m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
 
     if (0 < renderer->GetNumberOfVisibleLODEnabledMappers())

@@ -59,7 +59,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // If the image has a single slice, pad it with an empty slice to explicitly make it
-    // recognizable as 3-d by VTK. Otherwise, the vtkMarchingCubes filter will
+    // recognizable as 3-d by VTK. Otherwise, the surface extraction will
     // complain about dimensionality and won't produce any output.
     if (2 == vtkimage->GetDataDimension())
     {

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkExtractSliceFilter.h>
-#include <mitkIOUtil.h>
+#include <mitkImageGenerator.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkInteractionConst.h>
@@ -20,24 +20,14 @@ found in the LICENSE file.
 #include <ctime>
 
 /*
-* The mitkRotatedSlice4DTest loads a 4D image and extracts a specifically rotated slice in each time step's volume.
+* The mitkRotatedSlice4DTest extracts a specifically rotated slice in each time step's volume of a 4D image.
 */
-int mitkRotatedSlice4DTest(int, char *argv[])
+int mitkRotatedSlice4DTest(int, char *[])
 {
   MITK_TEST_BEGIN("mitkRotatedSlice4DTest");
 
-  std::string filename = argv[1];
-
-  // load 4D image
-  mitk::Image::Pointer image4D = mitk::IOUtil::Load<mitk::Image>(filename);
-  // check inputs
-  if (image4D.IsNull())
-  {
-    MITK_INFO << "Could not load the file";
-    return false;
-  }
-
-  auto numTimeSteps = std::min(2, static_cast<int>(image4D->GetTimeSteps()));
+  mitk::Image::Pointer image4D = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(16, 16, 16, 2);
+  const auto numTimeSteps = static_cast<int>(image4D->GetTimeSteps());
 
   for (int ts = 0; ts < numTimeSteps; ++ts)
   {

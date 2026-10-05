@@ -56,9 +56,9 @@ namespace
     Require(item.putAndInsertString(DCM_RescaleType, "BQML"), "Rescale Type");
   }
 
-  std::string PositionString(double z)
+  std::string PositionString(double y, double z)
   {
-    return "0\\0\\" + mitk::ConvertValueToDICOMStr(z);
+    return "0\\" + mitk::ConvertValueToDICOMStr(y) + "\\" + mitk::ConvertValueToDICOMStr(z);
   }
 }
 
@@ -84,6 +84,11 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   if (this->frames.empty())
   {
     mitkThrow() << "Cannot build DICOM test object without frames.";
+  }
+
+  if (this->bitsStored < 1 || this->bitsStored > 16)
+  {
+    mitkThrow() << "Cannot build DICOM test object with Bits Stored outside the allocated 16 bits.";
   }
 
   DcmFileFormat fileFormat;
@@ -115,8 +120,8 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   Require(dataset.putAndInsertUint16(DCM_Rows, static_cast<Uint16>(this->rows)), "Rows");
   Require(dataset.putAndInsertUint16(DCM_Columns, static_cast<Uint16>(this->columns)), "Columns");
   Require(dataset.putAndInsertUint16(DCM_BitsAllocated, 16), "Bits Allocated");
-  Require(dataset.putAndInsertUint16(DCM_BitsStored, 16), "Bits Stored");
-  Require(dataset.putAndInsertUint16(DCM_HighBit, 15), "High Bit");
+  Require(dataset.putAndInsertUint16(DCM_BitsStored, static_cast<Uint16>(this->bitsStored)), "Bits Stored");
+  Require(dataset.putAndInsertUint16(DCM_HighBit, static_cast<Uint16>(this->bitsStored - 1)), "High Bit");
   Require(dataset.putAndInsertUint16(DCM_PixelRepresentation, 1), "Pixel Representation");
   Require(dataset.putAndInsertString(DCM_NumberOfFrames, mitk::ConvertValueToDICOMStr(static_cast<unsigned int>(this->frames.size())).c_str()),
           "Number of Frames");
@@ -152,7 +157,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
     {
       Require(dataset.putAndInsertString(DCM_ImageOrientationPatient, "1\\0\\0\\0\\1\\0"),
               "Image Orientation (Patient)");
-      Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->zOffset).c_str()),
+      Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->yOffset, this->zOffset).c_str()),
               "Image Position (Patient)");
       Require(dataset.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");
     }
@@ -182,7 +187,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
       const double planeZ =
         this->framesAtOnePosition ? this->zOffset : this->zOffset + k * this->sliceSpacing;
       DcmItem& position = AppendItem(perFrame, DCM_PlanePositionSequence);
-      Require(position.putAndInsertString(DCM_ImagePositionPatient, PositionString(planeZ).c_str()),
+      Require(position.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->yOffset, planeZ).c_str()),
               "Image Position (Patient)");
 
       if (RescalePlacement::Shared != this->rescalePlacement)
@@ -201,7 +206,7 @@ std::string mitk::DICOMMultiFrameTestObject::Write(const std::string& directory,
   {
     Require(dataset.putAndInsertString(DCM_ImageOrientationPatient, "1\\0\\0\\0\\1\\0"),
             "Image Orientation (Patient)");
-    Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->zOffset).c_str()),
+    Require(dataset.putAndInsertString(DCM_ImagePositionPatient, PositionString(this->yOffset, this->zOffset).c_str()),
             "Image Position (Patient)");
     const std::string spacing = mitk::ConvertValueToDICOMStr(this->sliceSpacing) + "\\" + mitk::ConvertValueToDICOMStr(this->sliceSpacing);
     Require(dataset.putAndInsertString(DCM_PixelSpacing, spacing.c_str()), "Pixel Spacing");

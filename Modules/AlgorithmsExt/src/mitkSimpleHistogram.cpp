@@ -14,10 +14,16 @@ found in the LICENSE file.
 
 #include <mitkImageReadAccessor.h>
 #include <mitkHistogramGenerator.h>
+#include <mitkScopedProgressTask.h>
 
 namespace mitk
 {
   void SimpleImageHistogram::ComputeFromBaseData(BaseData *src)
+  {
+    this->ComputeFromBaseData(src, nullptr);
+  }
+
+  void SimpleImageHistogram::ComputeFromBaseData(BaseData *src, ProgressTask *task)
   {
     valid = false;
 
@@ -33,7 +39,12 @@ namespace mitk
     auto generator = mitk::HistogramGenerator::New();
     generator->SetImage(source);
     generator->SetSize(nBins);
-    generator->ComputeHistogram();
+
+    {
+      const ScopedProgressTask<HistogramGenerator> scopedTask(generator.GetPointer(), task);
+      generator->ComputeHistogram();
+    }
+
     histogram = static_cast<mitk::SimpleImageHistogram::HistogramType::ConstPointer> (generator->GetHistogram());
 
     CountType highest = 0;
@@ -47,7 +58,7 @@ namespace mitk
     valid = true;
   }
 
-  bool SimpleImageHistogram::GetValid() { return valid; }
+  bool SimpleImageHistogram::GetValid() const { return valid; }
   float SimpleImageHistogram::GetRelativeBin(double left, double right) const
   {
     if (!valid)

@@ -163,6 +163,38 @@ if(_APP_PLUGINS)
 endif()
 
 # -----------------------------------------------------------------------
+# Crash handler
+# -----------------------------------------------------------------------
+
+if(MITK_CRASH_HANDLER_EXECUTABLE)
+
+  # The crash-dump facility resolves the handler next to the running
+  # executable. Inside a macOS bundle that is Contents/MacOS, not the runtime
+  # output directory the CrashHandling module copies to, so the bundle needs
+  # its own copy - as the packaged application already gets from the install
+  # rules.
+  if(APPLE)
+    add_custom_command(TARGET ${_APP_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${MITK_CRASH_HANDLER_EXECUTABLE}"
+        "$<TARGET_FILE_DIR:${_APP_NAME}>/${MITK_CRASH_HANDLER_NAME}"
+      COMMENT "Copying ${MITK_CRASH_HANDLER_NAME} into the ${_APP_NAME} bundle")
+  endif()
+
+  # Pins what the facility depends on and what no other test covers: a handler
+  # that is present and runnable in the very directory the application
+  # executable is started from. Where that directory is differs per platform
+  # and is filled by different rules, which is what makes it easy to break for
+  # one platform only. "--version" exits successfully without touching a crash
+  # database, so the check stays a pure layout check.
+  if(BUILD_TESTING)
+    add_test(NAME mitkCrashHandlerLayout_${_APP_NAME}
+             COMMAND "$<TARGET_FILE_DIR:${_APP_NAME}>/${MITK_CRASH_HANDLER_NAME}" --version)
+  endif()
+
+endif()
+
+# -----------------------------------------------------------------------
 # Additional files needed for the executable
 # -----------------------------------------------------------------------
 

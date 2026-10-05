@@ -1,0 +1,8 @@
+MedicalColorPresets.json is taken from Kitware VolView
+(https://github.com/Kitware/VolView), file src/vtk/MedicalColorPresets.json.
+
+It is licensed under the Apache License, Version 2.0.
+See Licenses/Apache-2.0.txt.
+
+Modified for MITK: a "BlendMode" key was added to every preset that has
+opacity points (all except "2hot" and "Blue to Red Rainbow").

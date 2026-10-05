@@ -234,16 +234,22 @@ endif()
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
-option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
 option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 option(MITK_PCH "Enable precompiled headers" ON)
+
+# Emit debug symbols for MITK's own code in Release builds (PDBs on MSVC,
+# split DWARF on GCC/Clang) so release crash dumps are decodable, with no
+# execution-speed cost (optimization and inlining are preserved; the MSVC
+# binary ends up marginally larger).
+# Declared here, before the superbuild include, so it can be forwarded to
+# the inner build via mitk_cmake_boolean_args in SuperBuild.cmake.
+option(MITK_RELEASE_DEBUG_SYMBOLS "Emit debug symbols for MITK code in Release builds" ON)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
 
 mark_as_advanced(
   MITK_XVFB_TESTING
-  MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
   MITK_PCH
 )
@@ -929,6 +935,26 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
+# Crash-handler executable
+#
+# The out-of-process Crashpad handler is spawned, not linked, and the facility
+# resolves it next to the running executable (see Modules/CrashHandling). Which
+# directory that is differs per platform, so the handler is placed by three
+# rules that have to agree on the name and on the file: the CrashHandling
+# module (which also hands the name to the facility as a compile definition),
+# mitkFunctionCreateBlueBerryApplication for macOS application bundles, and the
+# install rules. Both are defined here so they cannot drift apart.
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_sentry)
+  set(MITK_CRASH_HANDLER_NAME "MitkCrashHandler${CMAKE_EXECUTABLE_SUFFIX}")
+  if(MITK_EXTERNAL_PROJECT_PREFIX)
+    set(MITK_CRASH_HANDLER_EXECUTABLE
+        "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Set coverage Flags
 #-----------------------------------------------------------------------------
 
@@ -1195,9 +1221,6 @@ if(BUILD_TESTING)
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
   endif()
-
-  # Test the package target
-  include(mitkPackageTest)
 endif()
 
 configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)
@@ -1218,9 +1241,40 @@ endif()
 
 add_library(MitkCompilerFlags INTERFACE)
 
+# Release debug symbols for MITK code only (see MITK_RELEASE_DEBUG_SYMBOLS).
+# The flags ride MitkCompilerFlags, which only MITK modules/plugins/apps link,
+# so third-party and bundled code stay symbol-free. Optimization and inlining
+# are preserved, so there is no execution-speed cost:
+#  - MSVC: /Z7 embeds CodeView in each .obj (no shared compiler PDB, so it is
+#    parallel-build safe, unlike /Zi) and is codegen-identical to no debug
+#    info; the linker still emits the per-DLL .pdb we archive. /O2 /Ob2 are
+#    untouched (full inlining, unlike RelWithDebInfo's /Ob1).
+#  - GCC/Clang: -gsplit-dwarf keeps debug info in .dwo files beside the
+#    objects, is codegen-neutral, and needs no link-side flag.
+#  - macOS: -g (not -gsplit-dwarf: dsymutil consumes plain DWARF, split
+#    DWARF is a Linux convention) is codegen-neutral; the .dSYM is produced
+#    at archive time.
+# The MSVC binary ends up marginally larger (~0.5%): /DEBUG makes /OPT:ICF
+# fold slightly fewer identical functions to keep them individually
+# debuggable. This is a code-size, not a runtime-speed, difference.
+# Applied to both C++ and C so MITK's occasional C sources are covered too.
+if(MITK_RELEASE_DEBUG_SYMBOLS)
+  if(MSVC)
+    set(_mitk_debug_symbol_flag "/Z7")
+  elseif(APPLE)
+    set(_mitk_debug_symbol_flag "-g")
+  else()
+    set(_mitk_debug_symbol_flag "-gsplit-dwarf")
+  endif()
+  string(APPEND MITK_CXX_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
+  string(APPEND MITK_C_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
+endif()
+
 # C++ and C flags (populated by mitkFunctionCheckCompilerFlags probes above)
-foreach(_var MITK_CXX_FLAGS MITK_C_FLAGS MITK_CXX_FLAGS_RELEASE)
+foreach(_var MITK_CXX_FLAGS MITK_C_FLAGS MITK_CXX_FLAGS_RELEASE MITK_C_FLAGS_RELEASE)
   string(STRIP "${${_var}}" ${_var})
+  # Collapse repeated spaces so the " "->";" split below emits no empty elements.
+  string(REGEX REPLACE " +" " " ${_var} "${${_var}}")
 endforeach()
 
 if(MITK_CXX_FLAGS)
@@ -1241,6 +1295,12 @@ if(MITK_CXX_FLAGS_RELEASE)
     $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Release>>:${_mitk_cxx_flags_release}>)
 endif()
 
+if(MITK_C_FLAGS_RELEASE)
+  string(REPLACE " " ";" _mitk_c_flags_release "${MITK_C_FLAGS_RELEASE}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<CONFIG:Release>>:${_mitk_c_flags_release}>)
+endif()
+
 # Platform compile definitions
 if(WIN32)
   target_compile_definitions(MitkCompilerFlags INTERFACE
@@ -1259,6 +1319,20 @@ if(MSVC)
   # dedicated hardening pass.
   target_compile_definitions(MitkCompilerFlags INTERFACE
     _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS _SCL_SECURE_NO_WARNINGS)
+endif()
+
+# MSVC link flags for Release debug symbols. Kept on MitkCompilerFlags (MITK
+# targets only) rather than the global CMAKE_*_LINKER_FLAGS_RELEASE, so the
+# bundled and third-party inner-build targets are unaffected. /DEBUG:FULL
+# produces a self-contained, archivable/shippable PDB (unlike /DEBUG:FASTLINK,
+# which references the build's .obj files). /DEBUG silently flips the linker's
+# /OPT defaults to /OPT:NOREF,NOICF, which would disable dead-code elimination
+# and COMDAT folding and bloat the binary versus a plain Release; /OPT:REF
+# /OPT:ICF restore them. Codegen is unchanged, though /DEBUG keeps ICF
+# slightly more conservative, leaving the binary marginally larger.
+if(MITK_RELEASE_DEBUG_SYMBOLS AND MSVC)
+  target_link_options(MitkCompilerFlags INTERFACE
+    $<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF>)
 endif()
 
 # Linker flags remain global

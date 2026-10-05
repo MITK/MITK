@@ -403,11 +403,19 @@ void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
     localStorage->m_ReslicerVector[groupID]->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
     localStorage->m_ReslicerVector[groupID]->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
     localStorage->m_ReslicerVector[groupID]->SetVtkOutputRequest(true);
+    localStorage->m_ReslicerVector[groupID]->SetClipToInputGeometry(true);
 
     // this is needed when thick mode was enabled before. These variables have to be reset to default values
     localStorage->m_ReslicerVector[groupID]->SetOutputDimensionality(2);
     localStorage->m_ReslicerVector[groupID]->SetOutputSpacingZDirection(1.0);
     localStorage->m_ReslicerVector[groupID]->SetOutputExtentZDirection(0, 0);
+
+    // get the spacing of the slice
+    localStorage->m_mmPerPixel = localStorage->m_ReslicerVector[groupID]->GetOutputSpacing();
+    localStorage->m_ReslicerVector[groupID]->Modified();
+    // start the pipeline with updating the largest possible, needed if the geometry of the image has changed
+    localStorage->m_ReslicerVector[groupID]->UpdateLargestPossibleRegion();
+    localStorage->m_ReslicedImageVector[groupID] = localStorage->m_ReslicerVector[groupID]->GetVtkOutput();
 
     // Bounds information for reslicing (only required if reference geometry is present)
     // this used for generating a vtkPLaneSource with the right size
@@ -419,17 +427,11 @@ void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
     sliceBounds[4] = 0.0;
     sliceBounds[5] = 0.0;
 
+    // The bounds of the clipped output are known after the update only.
     localStorage->m_ReslicerVector[groupID]->GetClippedPlaneBounds(sliceBounds);
 
     // setup the textured plane
     this->GeneratePlane(renderer, sliceBounds);
-
-    // get the spacing of the slice
-    localStorage->m_mmPerPixel = localStorage->m_ReslicerVector[groupID]->GetOutputSpacing();
-    localStorage->m_ReslicerVector[groupID]->Modified();
-    // start the pipeline with updating the largest possible, needed if the geometry of the image has changed
-    localStorage->m_ReslicerVector[groupID]->UpdateLargestPossibleRegion();
-    localStorage->m_ReslicedImageVector[groupID] = localStorage->m_ReslicerVector[groupID]->GetVtkOutput();
   }
   localStorage->m_LastDataUpdateTime.Modified();
 }

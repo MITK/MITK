@@ -5,7 +5,7 @@
           name="Undo/Redo Inspector"
           class="QmitkUndoRedoView"
           icon="resources/undo_redo_view.svg"
-		  category="General">
+		  category="Utilities">
           <description>View the undo redo stack of the application.</description>
 	</view>
   </extension>

@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/VolumeVisualizationUI">
+    <file>pencil.svg</file>
+    <file>view-list-details.svg</file>
+    <file>view-list-icons.svg</file>
+  </qresource>
+</RCC>

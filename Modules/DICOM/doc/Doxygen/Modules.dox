@@ -65,8 +65,10 @@ DICOM.0020.9111.[0].0018.9151     Frame Content, Frame Reference DateTime
 \endcode
 
 A path rooted in (5200,9229) or (5200,9230) is not supported: it yields no
-property for a file with a frame model, and the reader warns once per scan.
-Only paths of more than one element are searched inside the groups, because a
+property for any file the image reader loads, and the reader warns once per
+scan. A scanner that does not read the frame model, such as the ones of the
+SEG and RT readers, treats such a path as any other nested path. Only paths
+of more than one element are searched inside the groups, because a
 functional-group item holds only macro sequences. The search covers every such
 registered path, not only the functional-group macros: a sequence registered
 with classic objects in mind that also occurs directly in a functional-group
@@ -99,11 +101,12 @@ all slots of a multi-frame file and cannot express it.
 \subsection DICOMModule_multiframe_pixels Pixel values
 
 The Pixel Value Transformation is applied per frame. GDCM's gdcm::Image can hold
-only one slope and intercept and applies the pair of the first per-frame item to
-the whole buffer, so the reader corrects the frames whose own pair differs. The
-component type follows GDCM's own rule applied over all frames' pairs, so a file
-with a uniform transformation and one with a varying transformation load with the
-same type.
+only one slope and intercept for the whole buffer: for the enhanced SOP classes
+it knows, the pair of the shared functional group, or else of the first per-frame
+item; for other classes the top-level pair. The reader corrects every frame
+whose own pair differs from the one GDCM applied. The component type follows
+GDCM's own rule applied over all frames' pairs, so a file with a uniform
+transformation and one with a varying transformation load with the same type.
 
 Real World Value Mapping is not applied. GDCM does not apply it either, and it
 remains a consumer concern.

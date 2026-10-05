@@ -9,11 +9,13 @@ set(MITK_MODULES
   FormsUI
   CommandLine
   CoreCmdApps
+  CrashHandling
   AppUtil
   SceneSerializationBase
   DataTypesExt
   Annotation
   AlgorithmsExt
+  VolumeVisualization
   MapperExt
   DICOM
   DICOMQI
@@ -33,6 +35,7 @@ set(MITK_MODULES
   QtIconTheme
   QtWidgets
   QtWidgetsExt
+  VolumeVisualizationUI
   ImageStatisticsUI
   SegmentationUI
   MatchPointRegistration

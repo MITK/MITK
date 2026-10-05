@@ -4,6 +4,8 @@
         <file>Editor.svg</file>
         <file>image_navigator.svg</file>
         <file>index.html</file>
+        <file>toolbar_extension_horizontal.svg</file>
+        <file>toolbar_extension_vertical.svg</file>
         <file>xnat-icon.png</file>
         <file>view-manager.svg</file>
     </qresource>

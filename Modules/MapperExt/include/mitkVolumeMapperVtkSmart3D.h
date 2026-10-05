@@ -18,25 +18,27 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>
 #include <mitkImage.h>
+#include <mitkLocalStorageHandler.h>
+#include <mitkVolumeRenderingScalarRange.h>
 #include <mitkVtkMapper.h>
 
 // VTK
-#include <vtkImageChangeInformation.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 #include <vtkVersionMacros.h>
 #include <vtkVolumeProperty.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkImageData.h>
-#include <vtkImageChangeInformation.h>
 
 namespace mitk
 {
 
   /** \brief VTK-based mapper for volume rendering of 3D image data.
    *
-   * Uses vtkSmartVolumeMapper which automatically selects the best volume
-   * rendering method (GPU ray casting, software ray casting, etc.) based on
-   * hardware capabilities. Transfer functions for color and opacity are
+   * Uses vtkSmartVolumeMapper, requesting its GPU ray caster explicitly. The
+   * sampling and shading options this mapper sets are honored by that back end
+   * alone, so the CPU ray caster is not a usable fallback and rendering
+   * requires hardware support. Transfer functions for color and opacity are
    * configured from the DataNode's TransferFunction property.
    *
    * \sa ImageVtkMapper2D, VtkMapper
@@ -66,24 +68,68 @@ namespace mitk
      */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
+    /** \brief Place the volume, without applying its spacing a second time.
+     *
+     * The ray caster derives the shading gradient, the sample distance and the
+     * extinction per unit length from the input image's spacing, so this mapper
+     * leaves the real spacing on the image rather than resetting it. IndexToWorld
+     * carries that same spacing, so the base class transform would scale the
+     * volume by it twice; this override divides it back out.
+     *
+     * \param[in] renderer The renderer context.
+     */
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+
+    /** \brief The VTK objects one 3D render window renders this volume with.
+     *
+     * A single mapper instance serves every renderer that shows the node, and
+     * every property it reads is renderer-scoped. Holding the objects it writes
+     * those reads into per renderer is what keeps two 3D windows from
+     * overwriting each other's visibility, placement and shading.
+     */
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+      /** \brief The prop handed to the renderer. */
+      vtkSmartPointer<vtkVolume> m_Volume;
+      /** \brief Places the volume, with the image spacing divided back out. */
+      vtkSmartPointer<vtkTransform> m_DataToWorld;
+      /** \brief The ray caster. */
+      vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
+      /** \brief Transfer functions and shading coefficients. */
+      vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+
+      /** \brief The view of the image the ray caster is being fed through.
+       *
+       * Held per renderer because it stands for what that renderer last drew:
+       * the transfer function is a renderer-scoped property, and the view is
+       * built to fit it.
+       */
+      mitk::ScalarRangeViewCache m_ViewCache;
+
+      /** \brief The last unrenderable blend mode already warned about.
+       *
+       * UpdateRenderMode runs on every render pass, so without remembering this
+       * a single bad value would fill the log while the camera moves.
+       */
+      int m_ReportedBlendMode = -1;
+
+      LocalStorage();
+      ~LocalStorage() override;
+    };
+
   protected:
     VolumeMapperVtkSmart3D();
     ~VolumeMapperVtkSmart3D() override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    void createMapper(vtkImageData*);
-    void createVolume();
-    void createVolumeProperty();
     vtkImageData* GetInputImage();
 
-    vtkSmartPointer<vtkVolume> m_Volume;
-    vtkSmartPointer<vtkImageChangeInformation> m_ImageChangeInformation;
-    vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
-    vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+    void UpdateTransferFunctions(mitk::BaseRenderer *renderer, LocalStorage *localStorage);
+    void UpdateRenderMode(mitk::BaseRenderer *renderer, LocalStorage *localStorage);
 
-    void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
-    void UpdateRenderMode(mitk::BaseRenderer *renderer);
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
   };
 
 } // namespace mitk

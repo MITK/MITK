@@ -10,7 +10,6 @@ set(H_FILES
   Colortables/Turbo.h
   Colortables/Viridis.h
   itkImportMitkImageContainer.h
-  itkMITKScalarImageToHistogramGenerator.h
   itkVtkAbstractTransform.h
   mitkAnatomicalPlanes.h
   mitkAntiAliasing.h
@@ -258,7 +257,6 @@ set(CPP_FILES
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
-  DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkUIDManipulator.cpp
   DataManagement/mitkVectorProperty.cpp

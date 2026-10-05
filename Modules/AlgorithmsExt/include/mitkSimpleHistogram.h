@@ -27,6 +27,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ProgressTask;
+
   /**
    * \brief Abstract base class for simple histograms with double values.
    *
@@ -40,6 +42,19 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT SimpleHistogram
   {
   public:
+    virtual ~SimpleHistogram() = default;
+
+    /**
+     * \brief Whether the histogram holds computed values.
+     *
+     * GetMin and GetMax answer with placeholders where it does not rather than
+     * reporting the failure, so this has to be asked before either of them is
+     * taken for a data range.
+     *
+     * \return True if the histogram was computed successfully.
+     */
+    virtual bool GetValid() const = 0;
+
     /**
      * \brief Returns the minimum value of the histogram.
      * \return The minimum histogram value.
@@ -87,15 +102,7 @@ namespace mitk
       valid = false;
     }
 
-    ~SimpleImageHistogram()
-    {
-    }
-
-    /**
-     * \brief Check whether the histogram has been computed successfully.
-     * \return True if the histogram is valid, false otherwise.
-     */
-    bool GetValid();
+    bool GetValid() const override;
 
     typedef itk::Image<short, 3> CTImage;
     typedef itk::ImageRegionIterator<CTImage> CTIteratorType;
@@ -129,6 +136,19 @@ namespace mitk
      * \param[in] source The BaseData (must be a mitk::Image) to compute the histogram from.
      */
     void ComputeFromBaseData(BaseData *source) override;
+
+    /**
+     * \brief Compute the histogram from an image, reporting into a task.
+     *
+     * As ComputeFromBaseData(BaseData*), which is safe to run on a worker for an
+     * image without a pipeline source - see mitk::HistogramGenerator.
+     *
+     * \param[in] source The BaseData (must be a mitk::Image) to compute the histogram from.
+     * \param[in] task The task to report into and to poll for a cancel, or nullptr.
+     * \throw itk::ProcessAborted A cancel was requested of the task. The
+     *        histogram is left invalid.
+     */
+    void ComputeFromBaseData(BaseData *source, ProgressTask *task);
 
     /** \copydoc SimpleHistogram::GetRelativeBin */
     float GetRelativeBin(double start, double end) const override;

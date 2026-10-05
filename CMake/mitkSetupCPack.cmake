@@ -129,3 +129,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_ARCH}")
+
+# Reuses CPACK_PACKAGE_FILE_NAME for the versioned symbol-archive name.
+if(MITK_RELEASE_DEBUG_SYMBOLS)
+  include(mitkFunctionSymbolArchive)
+endif()

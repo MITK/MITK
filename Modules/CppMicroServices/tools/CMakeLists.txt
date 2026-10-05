@@ -20,4 +20,4 @@ if(WIN32)
 endif()
 
 set_property(TARGET usResourceCompiler PROPERTY
-  FOLDER "${MITK_ROOT_FOLDER}/Modules/CppMicroServices")
+  FOLDER "${MITK_ROOT_FOLDER}/Modules/Auxiliary")

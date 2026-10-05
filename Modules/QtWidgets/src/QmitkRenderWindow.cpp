@@ -218,11 +218,20 @@ void QmitkRenderWindow::UpdateCrosshairRotationMode(QmitkCrosshairRotationMode m
   m_MenuWidget->UpdateCrosshairRotationMode(mode);
 }
 
+mitk::VtkPropRenderer::LightingMode QmitkRenderWindow::GetPreferredLightingMode() const
+{
+  // The menu is built on demand, so a window whose menu was never activated has
+  // no selection to report and the renderer's own default is the answer.
+  return nullptr != m_MenuWidget
+    ? m_MenuWidget->GetPreferredLightingMode()
+    : mitk::VtkPropRenderer::LightingMode::Studio;
+}
+
 void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)
   {
-    m_MenuWidget = new QmitkRenderWindowMenu(this, {}, m_Renderer);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, m_Renderer);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
   }
 
@@ -241,6 +250,8 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::LightingModeChanged, this, &QmitkRenderWindow::LightingModeChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::LightingMenuAboutToShow, this, &QmitkRenderWindow::LightingMenuAboutToShow);
   }
   else
   {
@@ -249,8 +260,10 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LightingModeChanged, this, &QmitkRenderWindow::LightingModeChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LightingMenuAboutToShow, this, &QmitkRenderWindow::LightingMenuAboutToShow);
 
-    m_MenuWidget->hide();
+    m_MenuWidget->HideMenu();
   }
 }
 
@@ -271,9 +284,18 @@ void QmitkRenderWindow::showEvent(QShowEvent *event)
 {
   QVTKOpenGLNativeWidget::showEvent(event);
 
+  mitk::RenderingManager::GetInstance()->SetRenderingSuspended(this->GetVtkRenderWindow(), false);
+
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of moved() is no use here!!
   QTimer::singleShot(0, this, SIGNAL(moved()));
+}
+
+void QmitkRenderWindow::hideEvent(QHideEvent *event)
+{
+  QVTKOpenGLNativeWidget::hideEvent(event);
+
+  mitk::RenderingManager::GetInstance()->SetRenderingSuspended(this->GetVtkRenderWindow(), true);
 }
 
 bool QmitkRenderWindow::event(QEvent* e)

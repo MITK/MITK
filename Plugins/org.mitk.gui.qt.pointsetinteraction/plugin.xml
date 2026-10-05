@@ -5,6 +5,6 @@
           name="Point Set Interaction"
           class="QmitkPointSetInteractionView"
           icon="resources/pointset_interaction.svg"
-          category="General" />
+          category="Quantification" />
   </extension>
 </plugin>

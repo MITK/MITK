@@ -1,0 +1,29 @@
+set(SRC_CPP_FILES
+)
+
+set(INTERNAL_CPP_FILES
+  mitkPluginActivator.cpp
+  QmitkCrashTestView.cpp
+)
+
+set(UI_FILES
+  src/internal/QmitkCrashTestViewControls.ui
+)
+
+set(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
+  src/internal/QmitkCrashTestView.h
+)
+
+set(CACHED_RESOURCE_FILES
+  resources/dialog-warning.svg
+  plugin.xml
+)
+
+foreach(file ${SRC_CPP_FILES})
+  set(CPP_FILES ${CPP_FILES} src/${file})
+endforeach(file ${SRC_CPP_FILES})
+
+foreach(file ${INTERNAL_CPP_FILES})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
+endforeach(file ${INTERNAL_CPP_FILES})

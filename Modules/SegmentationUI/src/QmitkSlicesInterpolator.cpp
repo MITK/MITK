@@ -305,16 +305,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   // create a QFuture and a QFutureWatcher
 
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
-
-  // Keeps the 3D windows rendering at about 30 frames per second while the shown surface
-  // pulses, see SetSurfacePending(). Enough for the 1.5 Hz pulse, and every frame renders
-  // everything in the 3D windows, volumes included, while the interpolation is running.
-  m_PulseTimer = new QTimer(this);
-  m_PulseTimer->setInterval(33);
-  connect(m_PulseTimer, &QTimer::timeout, this, []()
-    {
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-    });
 }
 
 void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
@@ -490,7 +480,8 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   m_SurfaceInterpolator->SetCurrentInterpolationSession(nullptr);
 
-  delete m_PulseTimer;
+  if (0 != m_ConfirmedSurfaceObserverTag)
+    mitk::RenderingManager::GetInstance()->RemoveAnimationFrameObserver(m_ConfirmedSurfaceObserverTag);
 }
 
 /**
@@ -629,6 +620,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_LabelRemovedObserver.Reset();
 
     // If no workingdata is set, remove the interpolation feedback
+    this->DropConfirmedSurface();
     this->GetDataStorage()->Remove(m_FeedbackNode);
     m_FeedbackNode->SetData(nullptr);
     this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
@@ -669,6 +661,8 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object *sender, const itk::Even
 
   if (timeChanged)
   {
+    this->DropConfirmedSurface();
+
     if (m_3DInterpolationEnabled)
     {
       m_InterpolatedSurfaceNode->SetData(nullptr);
@@ -824,10 +818,11 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
 void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
   // However this is left, exceptions included: the surface stops pulsing unless a rerun has
-  // started, and its label is hidden in 3D exactly while the surface is shown.
+  // started or it is a kept confirmed surface, and its label is hidden in 3D exactly while the
+  // surface is shown.
   const ScopeExit settle([this]()
     {
-      if (!m_Watcher.isRunning())
+      if (!m_Watcher.isRunning() && !m_ConfirmedSurface.has_value())
         this->SetSurfacePending(false);
 
       this->UpdateLabelHiddenIn3D();
@@ -850,6 +845,9 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     this->Start3DInterpolation();
     return;
   }
+
+  // The result takes its place.
+  this->DropConfirmedSurface();
 
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
@@ -1167,13 +1165,14 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   auto timeStep = segmentationGeometry->TimePointToTimeStep(m_TimePoint);
   const mitk::Label::PixelType newDestinationLabel = activeLabel->GetValue();
+  auto* groupImage = segmentation->GetGroupImage(segmentation->GetActiveLayer());
 
   // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
   mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
 
   mitk::TransferSurfaceContentAtTimeStep(
     interpolatedSurface,
-    segmentation->GetGroupImage(segmentation->GetActiveLayer()),
+    groupImage,
     segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(segmentation->GetActiveLayer())),
     timeStep,
     newDestinationLabel,
@@ -1184,11 +1183,27 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
   activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
 
-  // The result is part of the label now. Kept, the surface would be shown again whenever the
-  // interpolation controls are re-enabled.
-  m_InterpolatedSurfaceNode->SetData(nullptr);
+  // The 3D rendering of the segmentation shows the result as well, so the surface is kept as
+  // a node of its own only on request.
+  const auto* preferences = GetSegmentationPreferences();
+  const bool addMesh = nullptr != preferences && preferences->GetBool("add 3D interpolation mesh", false);
+
   m_BtnApply3D->setEnabled(false);
-  this->Show3DInterpolationResult(false);
+
+  if (addMesh)
+  {
+    // The mesh node shows the result in 3D right away. Kept, the surface would be shown again
+    // whenever the interpolation controls are re-enabled.
+    m_InterpolatedSurfaceNode->SetData(nullptr);
+    this->Show3DInterpolationResult(false);
+  }
+  else
+  {
+    // The result is part of the label now, but the 3D windows show that only once they have
+    // extracted the label anew.
+    this->KeepConfirmedSurface(segmentationDataNode, groupImage);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 
   std::string name = "3D-interpolation - " + activeLabelName;
 
@@ -1197,11 +1212,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   undoHelper.RegisterUndoRedoOperationEvent(name);
 
-  // The 3D rendering of the segmentation shows the result already, so the surface is kept as
-  // a node of its own only on request.
-  const auto* preferences = GetSegmentationPreferences();
-
-  if (nullptr == preferences || !preferences->GetBool("add 3D interpolation mesh", false))
+  if (!addMesh)
     return;
 
   mitk::TimeBounds timeBounds;
@@ -1444,20 +1455,16 @@ void QmitkSlicesInterpolator::Start3DInterpolation()
 
 void QmitkSlicesInterpolator::SetSurfacePending(bool pending)
 {
-  m_InterpolatedSurfaceNode->SetBoolProperty("pulsing", pending);
+  bool wasPending = false;
+  m_InterpolatedSurfaceNode->GetBoolProperty("animated.pulse", wasPending);
 
-  if (pending)
-  {
-    if (!m_PulseTimer->isActive())
-      m_PulseTimer->start();
-  }
-  else if (m_PulseTimer->isActive())
-  {
-    m_PulseTimer->stop();
+  if (pending == wasPending)
+    return;
 
-    // Once more, to show the surface without the pulse.
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-  }
+  m_InterpolatedSurfaceNode->SetBoolProperty("animated.pulse", pending);
+
+  // The first frame of the pulse, or the surface without it.
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
 void QmitkSlicesInterpolator::UpdateLabelHiddenIn3D()
@@ -1488,6 +1495,68 @@ void QmitkSlicesInterpolator::RevealLabelIn3D()
   m_NodeWithLabelHiddenIn3D = nullptr;
 }
 
+void QmitkSlicesInterpolator::KeepConfirmedSurface(const mitk::DataNode* segmentationNode, const mitk::Image* groupImage)
+{
+  ConfirmedSurface confirmedSurface{ segmentationNode, groupImage, groupImage->GetMTime(), {} };
+
+  for (const auto& [renderWindow, renderer] : mitk::BaseRenderer::GetAll2DRenderWindows())
+  {
+    m_InterpolatedSurfaceNode->SetVisibility(false, renderer);
+    confirmedSurface.m_HiddenIn.emplace_back(renderer->GetName());
+  }
+
+  m_ConfirmedSurface = std::move(confirmedSurface);
+
+  if (0 == m_ConfirmedSurfaceObserverTag)
+  {
+    m_ConfirmedSurfaceObserverTag = mitk::RenderingManager::GetInstance()->AddAnimationFrameObserver([this](double)
+      {
+        if (!this->IsSegmentationBehindConfirmedSurface())
+          this->DropConfirmedSurface();
+      });
+  }
+
+  this->SetSurfacePending(true);
+}
+
+bool QmitkSlicesInterpolator::IsSegmentationBehindConfirmedSurface() const
+{
+  if (!m_ConfirmedSurface.has_value())
+    return false;
+
+  const auto segmentationNode = m_ConfirmedSurface->m_SegmentationNode.Lock();
+  const auto groupImage = m_ConfirmedSurface->m_GroupImage.Lock();
+
+  // Nothing renders a segmentation or a group that is gone.
+  if (segmentationNode.IsNull() || groupImage.IsNull() || m_DataStorage.IsNull() || !m_DataStorage->Exists(segmentationNode))
+    return false;
+
+  auto* mapper = dynamic_cast<mitk::MultiLabelSegmentationVtkMapper3D*>(segmentationNode->GetMapper(mitk::BaseRenderer::Standard3D));
+
+  return nullptr != mapper && mapper->ShowsSurfaceOlderThan(groupImage, m_ConfirmedSurface->m_GroupImageMTime);
+}
+
+void QmitkSlicesInterpolator::DropConfirmedSurface()
+{
+  if (!m_ConfirmedSurface.has_value())
+    return;
+
+  mitk::RenderingManager::GetInstance()->RemoveAnimationFrameObserver(m_ConfirmedSurfaceObserverTag);
+  m_ConfirmedSurfaceObserverTag = 0;
+
+  for (const auto& rendererName : m_ConfirmedSurface->m_HiddenIn)
+    m_InterpolatedSurfaceNode->RemoveProperty("visible", rendererName);
+
+  m_ConfirmedSurface.reset();
+  m_InterpolatedSurfaceNode->SetData(nullptr);
+
+  // A running interpolation ends the pulse once it has finished.
+  if (!m_Watcher.isRunning())
+    this->SetSurfacePending(false);
+
+  this->UpdateLabelHiddenIn3D();
+}
+
 void QmitkSlicesInterpolator::OnLabelRemoved(const itk::EventObject& event)
 {
   const auto* removedEvent = dynamic_cast<const mitk::LabelRemovedEvent*>(&event);
@@ -1500,6 +1569,7 @@ void QmitkSlicesInterpolator::OnLabelRemoved(const itk::EventObject& event)
   // Otherwise the controller would keep the group image of the label alive, even after its group is removed.
   m_Interpolator->SetSegmentationVolume(nullptr, mitk::Label::UNLABELED_VALUE);
 
+  this->DropConfirmedSurface();
   m_FeedbackNode->SetData(nullptr);
   m_InterpolatedSurfaceNode->SetData(nullptr);
   m_BtnApply3D->setEnabled(false);
@@ -1588,6 +1658,9 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
 
 void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 {
+  if (!status)
+    this->DropConfirmedSurface();
+
   if (m_InterpolatedSurfaceNode.IsNotNull())
   {
     m_InterpolatedSurfaceNode->SetVisibility(status);
@@ -1599,6 +1672,7 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
 void QmitkSlicesInterpolator::OnActiveLabelChanged(mitk::Label::PixelType)
 {
+  this->DropConfirmedSurface();
   m_FeedbackNode->SetData(nullptr);
   m_InterpolatedSurfaceNode->SetData(nullptr);
   this->UpdateLabelHiddenIn3D();

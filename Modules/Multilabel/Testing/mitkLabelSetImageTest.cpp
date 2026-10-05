@@ -80,6 +80,8 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestGetActiveLayer_StaleActiveDuringLabelRemovedEvent_FallsBack);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestEraseLabels);
+  MITK_TEST(TestEraseLabel_Dynamic);
+  MITK_TEST(TestIsEmpty);
   MITK_TEST(TestMergeLabels);
   MITK_TEST(TestCreateLabelMask);
   MITK_TEST(TestUpdateCenterOfMass);
@@ -878,6 +880,39 @@ public:
       mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex0, mitk::eps, true));
 
     CPPUNIT_ASSERT_THROW(segmentation->UpdateCenterOfMass(5, 2), mitk::Exception);
+  }
+
+  void TestEraseLabel_Dynamic()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    PaintBox(groupImage, 1, { 60, 20, 35 }, { 69, 29, 44 }, 5);
+    PaintBox(groupImage, 1, { 1, 1, 1 }, { 1, 1, 1 }, 6);
+
+    segmentation->EraseLabel(5);
+
+    CPPUNIT_ASSERT_MESSAGE("Label was not erased at time step 0", segmentation->IsEmpty(5, 0));
+    CPPUNIT_ASSERT_MESSAGE("Label was not erased at time step 1", segmentation->IsEmpty(5, 1));
+    CPPUNIT_ASSERT_MESSAGE("Another label was erased", !segmentation->IsEmpty(6, 1));
+  }
+
+  void TestIsEmpty()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    CPPUNIT_ASSERT_MESSAGE("Label without pixels is not empty", segmentation->IsEmpty(5, 0));
+    CPPUNIT_ASSERT_MESSAGE("Label without pixels is not empty at time step 1", segmentation->IsEmpty(5, 1));
+
+    // The last voxel of the time step, so that a scan that stops early misses it.
+    PaintBox(groupImage, 1, { 95, 127, 51 }, { 95, 127, 51 }, 5);
+
+    CPPUNIT_ASSERT_MESSAGE("Label is not empty at time step 0 although only time step 1 was painted", segmentation->IsEmpty(5, 0));
+    CPPUNIT_ASSERT_MESSAGE("Label with a pixel is empty", !segmentation->IsEmpty(5, 1));
+    CPPUNIT_ASSERT_MESSAGE("Label overload disagrees with the value overload", !segmentation->IsEmpty(segmentation->GetLabel(5), 1));
+    CPPUNIT_ASSERT_THROW(segmentation->IsEmpty(5, 2), mitk::Exception);
   }
 };
 

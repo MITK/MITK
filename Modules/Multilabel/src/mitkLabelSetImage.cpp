@@ -32,6 +32,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -65,6 +66,21 @@ namespace mitk
 
 namespace
 {
+  /** Calls action(begin, end) for consecutive blocks of [0, count) in parallel. For scans and replacements over a
+   * whole buffer, which need no image indices. */
+  template <typename TAction>
+  void ParallelizeBlocks(std::size_t count, TAction action)
+  {
+    constexpr std::size_t blockSize = std::size_t(1) << 20;
+    const auto blockCount = (count + blockSize - 1) / blockSize;
+
+    itk::MultiThreaderBase::New()->ParallelizeArray(0, blockCount, [&](itk::SizeValueType block)
+      {
+        const auto begin = static_cast<std::size_t>(block) * blockSize;
+        action(begin, std::min(count, begin + blockSize));
+      }, nullptr);
+  }
+
   struct CentroidSums
   {
     std::uint64_t Count = 0;
@@ -990,14 +1006,21 @@ void mitk::MultiLabelSegmentation::EraseLabel(LabelValueType pixelValue)
 
     mitk::Image* groupImage = this->GetGroupImage(groupID);
 
-    if (4 == this->GetDimension())
+    std::size_t numPixels = 1;
+
+    for (int i = 0; i < 4; ++i)
+      numPixels *= static_cast<std::size_t>(groupImage->GetDimension(i));
+
     {
-      AccessFixedDimensionByItk_1(groupImage, EraseLabelProcessing, 4, pixelValue);
+      ImageWriteAccessor accessor(groupImage);
+      auto* pixels = static_cast<LabelValueType*>(accessor.GetData());
+
+      ParallelizeBlocks(numPixels, [&](std::size_t begin, std::size_t end)
+        {
+          std::replace(pixels + begin, pixels + end, pixelValue, UNLABELED_VALUE);
+        });
     }
-    else
-    {
-      AccessByItk_1(groupImage, EraseLabelProcessing, pixelValue);
-    }
+
     groupImage->Modified();
   }
   catch (const itk::ExceptionObject& e)
@@ -1165,24 +1188,31 @@ void mitk::MultiLabelSegmentation::UpdateCenterOfMass(LabelValueType pixelValue,
 
 bool mitk::MultiLabelSegmentation::IsEmpty(LabelValueType pixelValue, TimeStepType t) const
 {
-  Image::ConstPointer image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
-  image = SelectImageByTimeStep(image, t);
+  if (!this->GetTimeGeometry()->IsValidTimeStep(t))
+    mitkThrow() << "Cannot check if label is empty. Invalid time step: " << t;
 
-  size_t numPixels = 1;
+  const auto* image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
+
+  std::size_t numPixels = 1;
 
   for (int i = 0; i < 3; ++i)
-    numPixels *= static_cast<size_t>(image->GetDimension(i));
+    numPixels *= static_cast<std::size_t>(image->GetDimension(i));
 
-  ImagePixelReadAccessor<LabelValueType, 3> accessor(image);
-  auto pixels = accessor.GetData();
+  ImageReadAccessor accessor(image, image->GetVolumeData(static_cast<int>(t)));
+  const auto* pixels = static_cast<const LabelValueType*>(accessor.GetData());
 
-  for (size_t i = 0; i < numPixels; ++i)
-  {
-    if (pixels[i] == pixelValue)
-      return false;
-  }
+  std::atomic<bool> found = false;
 
-  return true;
+  ParallelizeBlocks(numPixels, [&](std::size_t begin, std::size_t end)
+    {
+      if (found.load(std::memory_order_relaxed))
+        return;
+
+      if (std::find(pixels + begin, pixels + end, pixelValue) != pixels + end)
+        found = true;
+    });
+
+  return !found;
 }
 
 bool mitk::MultiLabelSegmentation::IsEmpty(const Label* label, TimeStepType t) const
@@ -1360,26 +1390,6 @@ itk::ModifiedTimeType mitk::MultiLabelSegmentation::GetMTime() const
   }
 
   return result;
-}
-
-template <typename ImageType>
-void mitk::MultiLabelSegmentation::EraseLabelProcessing(ImageType *itkImage, LabelValueType pixelValue)
-{
-  typedef itk::ImageRegionIterator<ImageType> IteratorType;
-
-  IteratorType iter(itkImage, itkImage->GetLargestPossibleRegion());
-  iter.GoToBegin();
-
-  while (!iter.IsAtEnd())
-  {
-    LabelValueType value = iter.Get();
-
-    if (value == pixelValue)
-    {
-      iter.Set(0);
-    }
-    ++iter;
-  }
 }
 
 void mitk::MultiLabelSegmentation::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, GroupIndexType groupID)

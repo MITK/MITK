@@ -627,6 +627,7 @@ namespace mitk
     using BaseData::IsEmpty;
 
     /** \brief Checks if a label is empty at a given time step (does not contain any pixels).
+      * \exception mitk::Exception if the time step is invalid.
       */
     bool IsEmpty(const Label* label, TimeStepType t = 0) const;
     bool IsEmpty(LabelValueType pixelValue, TimeStepType t = 0) const;
@@ -691,9 +692,6 @@ namespace mitk
     void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
 
     LabelValueType m_ActiveLabelValue;
-
-    template <typename ImageType>
-    void EraseLabelProcessing(ImageType* input, LabelValueType index);
 
     template <typename MultiLabelSegmentationType, typename ImageType>
     void InitializeByLabeledImageProcessing(MultiLabelSegmentationType* input, const ImageType* other);

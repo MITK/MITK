@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkThemedStyle_h
 #define QmitkThemedStyle_h
 
+#include <org_mitk_gui_qt_ext_Export.h>
+
 #include <QProxyStyle>
 
 /**
@@ -28,7 +30,7 @@ found in the LICENSE file.
  * theme colors before returning them, ensuring Qt's built-in icons match the
  * application's theme.
  */
-class QmitkThemedStyle : public QProxyStyle
+class MITK_QT_COMMON_EXT_EXPORT QmitkThemedStyle : public QProxyStyle
 {
 public:
   using QProxyStyle::QProxyStyle;

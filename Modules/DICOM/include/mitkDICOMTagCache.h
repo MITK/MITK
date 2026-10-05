@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkDICOMEnums.h>
 
 #include <mitkDICOMDatasetAccessingImageFrameInfo.h>
+#include <mitkDICOMFrameLayout.h>
 #include <MitkDICOMExports.h>
 
 namespace mitk
@@ -71,6 +72,34 @@ namespace mitk
        * \return A list of DICOMDatasetAccessingImageFrameInfo instances, one per scanned file.
        */
       virtual DICOMDatasetAccessingImageFrameList GetFrameInfoList() const = 0;
+
+      /**
+       * \brief Layout of the file the passed frame belongs to.
+       * \param[in] frame A frame of the file in question.
+       * \return The recorded layout, or the default (one frame, no functional
+       *         groups) for a cache that cannot look into sequences or whose
+       *         scanner was not asked to read the frame model.
+       */
+      virtual DICOMFrameLayout GetFrameLayout(const DICOMImageFrameInfo* frame) const;
+
+      /**
+       * \brief Whether at least one scanned file has a frame model.
+       *
+       * The gate every frame-aware step tests first, so that an input without
+       * per-frame functional groups skips all of them.
+       */
+      virtual bool HasAnyFrameModel() const;
+
+      /**
+       * \brief The cache-owned frame-scoped info for one frame of one file.
+       * \param[in] filename The file the frame belongs to.
+       * \param[in] frameNo The stored frame index.
+       * \return The info, or nullptr when the cache has no frame model for that
+       *         file. Owned by the cache, so that repeated resolution of the
+       *         same frame yields the same object.
+       */
+      virtual DICOMDatasetAccessingImageFrameInfo::Pointer GetFrameInfo(const std::string& filename,
+                                                                        unsigned int frameNo) const;
 
     protected:
 

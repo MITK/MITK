@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <MitkVolumeVisualizationUIExports.h>
 
 #include <mitkDataNode.h>
-#include <mitkSimpleHistogram.h>
+#include <mitkImage.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionPresets.h>
 #include <mitkWeakPointer.h>
@@ -62,6 +62,13 @@ namespace Ui
  * preset has been removed answers to no catalog entry at all, and what is
  * recorded for it is only that it was chosen here. See the
  * volumerendering.transferfunction.* entries in the property documentation.
+ *
+ * The canvas and the sliders are measured against the image's intensity band,
+ * and the previews are drawn from a reduced copy of it. Both take a pass over
+ * every voxel, which for a large image takes long enough to be worth a worker
+ * thread and a progress notification of their own. Until that analysis is done
+ * a preset can be picked, and the volume renders with it, but the curve cannot
+ * be adjusted yet.
  *
  * \sa mitk::TransferFunctionPresets, QmitkCombinedTransferFunctionCanvas
  */
@@ -376,6 +383,16 @@ private:
   void ShowEditMode();
 
   /**
+   * \brief Put the edit button in the given state, labeled with what pressing
+   *        it next does.
+   *
+   * Without announcing the change: the button is both what asks for the mode
+   * and what reports it, so letting it through would come straight back as a
+   * request to change the mode.
+   */
+  void ShowEditModeButton(bool checked);
+
+  /**
    * \brief Scale the canvas axis, to the image's intensity band or to the whole
    *        curve.
    *
@@ -397,8 +414,8 @@ private:
    * Driven by the canvas rather than kept alongside it: a stop can be added,
    * moved, recolored, removed or selected on the canvas just as well as in the
    * table, and one copy of that state is one thing to keep right. A stop the
-   * axis does not reach is listed without a position, since a fraction of the
-   * axis cannot say where it is.
+   * axis does not reach is listed grayed out, with a position that cannot be
+   * typed, since typing one would pull the stop onto the axis.
    */
   void ShowColorStops();
 
@@ -483,6 +500,51 @@ private:
   /** \brief Drop every preview, and abandon a generation in progress. */
   void InvalidateThumbnails();
 
+  /** \brief What an analysis learns about an image. */
+  struct ImageAnalysis;
+
+  /** \brief The analysis the editor is waiting for. */
+  struct AnalysisRun;
+
+  /**
+   * \brief Ask for the bound image to be analyzed, unless it is already, or
+   *        is being.
+   *
+   * A request for the reason StartThumbnailGeneration is one: whether the
+   * editor applies to the node at all is settled one turn of the event loop
+   * later, in StartAnalysis.
+   */
+  void RequestAnalysis();
+
+  /**
+   * \brief Analyze the bound image on a worker, if the editor applies to it
+   *        and nothing current is known about it.
+   *
+   * Once the analysis is in, the node is bound once more and the previews are
+   * drawn. A pipeline output is analyzed on this thread instead, since reading
+   * it updates its pipeline.
+   */
+  void StartAnalysis();
+
+  /** \brief Stop waiting for the analysis under way, for an image the editor
+   *         no longer shows.
+   */
+  void AbandonAnalysis();
+
+  /** \brief Take over the result of the analysis the editor was waiting for. */
+  void OnAnalysisFinished(mitk::Image *image,
+                          itk::ModifiedTimeType imageTime,
+                          std::shared_ptr<const ImageAnalysis> analysis);
+
+  /** \brief The work of one analysis, on the worker that runs it. */
+  static std::shared_ptr<const ImageAnalysis> AnalyzeImage(mitk::Image *image);
+
+  /** \brief Whether the analysis held describes the bound image as it is now. */
+  bool IsAnalysisCurrent() const;
+
+  /** \brief Whether an image is bound that no current analysis describes. */
+  bool IsAwaitingAnalysis() const;
+
   /**
    * \brief Give every entry still waiting for a preview a stand-in built for
    *        the cell size the grid currently uses, and the load entry its icon
@@ -535,8 +597,17 @@ private:
    */
   int m_ThumbnailRun = 0;
 
+  /** \brief The analysis under way, or nullptr. */
+  std::shared_ptr<AnalysisRun> m_AnalysisRun;
+
+  /** \brief The last analysis taken over, the image it describes, and that
+   *         image's modification time when it began.
+   */
+  std::shared_ptr<const ImageAnalysis> m_Analysis;
+  mitk::WeakPointer<mitk::Image> m_AnalyzedImage;
+  itk::ModifiedTimeType m_AnalyzedImageTime = 0;
+
   mitk::TransferFunctionPresets m_Presets;
-  mitk::SimpleHistogramCache m_HistogramCache;
 
   mitk::TransferFunction::Pointer m_AppliedTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BaseColorFn;

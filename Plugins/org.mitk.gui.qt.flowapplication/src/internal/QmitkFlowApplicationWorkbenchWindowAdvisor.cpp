@@ -16,11 +16,9 @@ found in the LICENSE file.
 #include <QMenu>
 #include <QMenuBar>
 #include <QMainWindow>
+#include <QScreen>
 #include <QStatusBar>
-#include <QString>
 #include <QFile>
-#include <QRegularExpression>
-#include <QTextStream>
 #include <QSettings>
 #include <QLayout>
 #include <QApplication>
@@ -30,14 +28,12 @@ found in the LICENSE file.
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
-#include <berryIActionBarConfigurer.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPerspectiveRegistry.h>
 #include <berryIPerspectiveDescriptor.h>
 #include <berryIProduct.h>
 #include <berryIWorkbenchPartConstants.h>
-#include <berryQtPreferences.h>
 #include <QmitkIconTheme.h>
 #include <berryWorkbenchPlugin.h>
 
@@ -45,22 +41,20 @@ found in the LICENSE file.
 #include <internal/berryQtOpenPerspectiveAction.h>
 
 #include <QmitkFileExitAction.h>
-#include <QmitkCloseProjectAction.h>
-#include <QmitkUndoAction.h>
-#include <QmitkRedoAction.h>
 #include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressNotificationOverlay.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
-#include <QmitkApplicationConstants.h>
+#include <QmitkCategoryToolBar.h>
+#include <QmitkToolBarPresets.h>
 #include "QmitkExtFileSaveProjectAction.h"
+#include "QmitkThemedStyle.h"
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <QmitkCrashDumpDialog.h>
 #endif
 
-#include <itkConfigure.h>
 #include <mitkVersion.h>
 #include <mitkBaseApplication.h>
 #include <mitkCoreServices.h>
@@ -68,18 +62,13 @@ found in the LICENSE file.
 #include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkWorkbenchUtil.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
 // UGLYYY
 #include "QmitkFlowApplicationWorkbenchWindowAdvisorHack.h"
 #include "QmitkFlowApplicationPlugin.h"
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
-#include <QToolBar>
-#include <QToolButton>
 #include <QMessageBox>
-#include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
 
@@ -403,6 +392,9 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
 
+  // Style Qt's standard icons, e.g. of message boxes and tool bar extension buttons
+  QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
+
   // Enable full screen support
   if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
   {
@@ -551,14 +543,10 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
 
   // toolbar for showing file open, undo, redo and other main actions
-  auto   mainActionsToolBar = new QToolBar;
+  auto   mainActionsToolBar = new QmitkCategoryToolBar(QString());
   mainActionsToolBar->setObjectName("mainActionsToolBar");
   mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-#ifdef __APPLE__
-  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
-#else
-  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
-#endif
+  mainActionsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
   imageNavigatorAction = new QAction(QmitkIconTheme::GetIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
@@ -605,81 +593,20 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   if (showViewToolbar)
   {
-    auto* prefService = mitk::CoreServices::GetPreferencesService();
-    auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
-    bool showCategories = toolBarsPrefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true);
+    QList<berry::IViewDescriptor::Pointer> views;
 
-    // Order view descriptors by category
-
-    QMultiMap<QString, berry::IViewDescriptor::Pointer> categoryViewDescriptorMap;
-
-    for (auto labelViewDescriptorPair : VDMap)
+    for (const auto& labelViewDescriptorPair : VDMap)
     {
-      auto viewDescriptor = labelViewDescriptorPair.second;
-      auto category = !viewDescriptor->GetCategoryPath().isEmpty()
-        ? viewDescriptor->GetCategoryPath().back()
-        : QString();
+      const auto& viewDescriptor = labelViewDescriptorPair.second;
 
-      categoryViewDescriptorMap.insert(category, viewDescriptor);
-    }
-
-    // Create a separate toolbar for each category
-
-    for (auto category : categoryViewDescriptorMap.uniqueKeys())
-    {
-      auto viewDescriptorsInCurrentCategory = categoryViewDescriptorMap.values(category);
-      QList<berry::SmartPointer<berry::IViewDescriptor> > relevantViewDescriptors;
-
-      for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
+      if (viewDescriptor->GetId() != "org.mitk.views.flow.control" &&
+          viewDescriptor->GetId() != "org.mitk.views.segmentationtasklist")
       {
-        if (viewDescriptor->GetId() != "org.mitk.views.flow.control" &&
-            viewDescriptor->GetId() != "org.mitk.views.segmentationtasklist")
-        {
-          relevantViewDescriptors.push_back(viewDescriptor);
-        }
-      }
-
-      if (!relevantViewDescriptors.isEmpty())
-      {
-        auto toolbar = new QToolBar;
-        toolbar->setObjectName(category);
-        mainWindow->addToolBar(toolbar);
-
-        toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
-
-        if (!category.isEmpty())
-        {
-          auto categoryButton = new QToolButton;
-          categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-          categoryButton->setText(category);
-          categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
-
-          auto action = toolbar->addWidget(categoryButton);
-          action->setObjectName("category");
-          action->setVisible(showCategories);
-
-          connect(categoryButton, &QToolButton::clicked, [toolbar]()
-          {
-            for (QWidget* widget : toolbar->findChildren<QWidget*>())
-            {
-              if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
-              {
-                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0, 0.0), QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0, 0.0), QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QApplication::sendEvent(widget, &pressEvent);
-                QApplication::sendEvent(widget, &releaseEvent);
-              }
-            }
-          });
-        }
-
-        for (auto viewDescriptor : relevantViewDescriptors)
-        {
-          auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
-          toolbar->addAction(viewAction);
-        }
+        views.push_back(viewDescriptor);
       }
     }
+
+    QmitkToolBarPresets::CreateToolBars(window.GetPointer(), mainWindow, views);
   }
 
   QSettings settings(GetQSettingsFile(), QSettings::IniFormat);

@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkTestingConfig.h>
 
 #include <mitkCoreServices.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkIMimeTypeProvider.h>
 #include <mitkIOUtil.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkPropertyPersistenceInfo.h>
@@ -27,6 +29,8 @@ found in the LICENSE file.
 #include <itkNrrdImageIO.h>
 #include <itksys/SystemTools.hxx>
 
+#include <vtkPolyData.h>
+
 class mitkIOUtilTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
@@ -37,6 +41,7 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   MITK_TEST(TestNullSave);
   MITK_TEST(TestLoadAndSavePointSet);
   MITK_TEST(TestLoadAndSaveSurface);
+  MITK_TEST(TestLoadSurfaceFromStream);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestIOMetaInformation);
@@ -236,6 +241,38 @@ public:
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(surface, "testSurface.xXx"), mitk::Exception);
 
     // delete the files after the test is done
+    std::remove(surfacePath.c_str());
+  }
+
+  void TestLoadSurfaceFromStream()
+  {
+    auto surface = mitk::IOUtil::Load<mitk::Surface>(m_SurfacePath);
+    CPPUNIT_ASSERT(surface.IsNotNull());
+
+    std::ofstream tmpStream;
+    const auto surfacePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "streamsurface-XXXXXX.vtp");
+    tmpStream.close();
+    mitk::IOUtil::Save(surface, surfacePath);
+
+    // Readers see the stream only, as they do for module resources.
+    mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+    const auto mimeTypes = mimeTypeProvider->GetMimeTypesForFile(surfacePath);
+    CPPUNIT_ASSERT(!mimeTypes.empty());
+
+    mitk::FileReaderRegistry readerRegistry;
+    const auto readerReferences = readerRegistry.GetReferences(mimeTypes[0]);
+    CPPUNIT_ASSERT(!readerReferences.empty());
+
+    std::ifstream stream(surfacePath, std::ios::binary);
+    auto* reader = readerRegistry.GetReader(readerReferences[0]);
+    reader->SetInput(surfacePath, &stream);
+    const auto data = reader->Read();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), data.size());
+    const auto* loaded = dynamic_cast<const mitk::Surface*>(data[0].GetPointer());
+    CPPUNIT_ASSERT(loaded != nullptr);
+    CPPUNIT_ASSERT_EQUAL(surface->GetVtkPolyData()->GetNumberOfPoints(), loaded->GetVtkPolyData()->GetNumberOfPoints());
+
     std::remove(surfacePath.c_str());
   }
 

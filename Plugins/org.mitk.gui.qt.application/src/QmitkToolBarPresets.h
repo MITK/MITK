@@ -15,10 +15,17 @@ found in the LICENSE file.
 
 #include <org_mitk_gui_qt_application_Export.h>
 
+#include <QmitkCategoryToolBar.h>
+
+#include <berryIViewDescriptor.h>
+#include <berryIWorkbenchWindow.h>
+
 #include <QString>
 #include <QStringList>
 
 #include <vector>
+
+class QMainWindow;
 
 /**
  * \brief A named set of view categories whose tool bars are shown together.
@@ -56,9 +63,36 @@ public:
   static std::vector<QmitkToolBarPreset> Load();
 
   /**
-   * \brief Returns all view categories, each of which has a tool bar.
+   * \brief Adds a tool bar for each category of the given views to the main window.
+   *
+   * The tool bars are ordered by IsCategoryBefore(). Views without a
+   * category share a tool bar without a name. The stored visibility and
+   * category label are applied.
+   */
+  static void CreateToolBars(berry::IWorkbenchWindow* window, QMainWindow* mainWindow, const QList<berry::IViewDescriptor::Pointer>& views);
+
+  /**
+   * \brief Returns all view categories, each of which has a tool bar, in tool bar order.
    */
   static QStringList GetCategories();
+
+  /**
+   * \brief Returns whether the tool bar of category \p lhs comes before the one of \p rhs.
+   *
+   * The categories of the views shipped with MITK come first, roughly by how
+   * commonly they are used, while utilities and help come last. Other
+   * categories are sorted by name and placed in front of utilities and help.
+   */
+  static bool IsCategoryBefore(const QString& lhs, const QString& rhs);
+
+  static QmitkCategoryToolBar::CategoryLabel GetCategoryLabel();
+
+  /**
+   * \brief Stores how category tool bars show their category name.
+   *
+   * Call ApplyToWorkbench() to apply it to the open workbench windows.
+   */
+  static void SetCategoryLabel(QmitkCategoryToolBar::CategoryLabel categoryLabel);
 
   static QStringList GetVisibleCategories();
 
@@ -71,7 +105,7 @@ public:
   static void SetVisibleCategories(const QStringList& categories);
 
   /**
-   * \brief Applies the stored tool bar preferences to all open workbench windows.
+   * \brief Applies the stored visibility and category label to all open workbench windows.
    */
   static void ApplyToWorkbench();
 };

@@ -40,6 +40,18 @@ namespace mitk
      * \return The total physical memory in bytes, or 0 if the value could not be determined.
      */
     MITKCORE_EXPORT size_t GetTotalSizeOfPhysicalRam();
+
+    /**
+     * \brief Return how much physical RAM is available for new allocations, in bytes.
+     *
+     * Includes memory the system can reclaim without swapping, like file caches.
+     * On Linux, this is MemAvailable from /proc/meminfo.
+     * On Windows, this is the available physical memory (the "Available" value in the task manager).
+     * On macOS, this is the sum of free and inactive pages.
+     *
+     * \return The available physical memory in bytes, or 0 if the value could not be determined.
+     */
+    MITKCORE_EXPORT size_t GetAvailableSizeOfPhysicalRam();
   }
 }
 

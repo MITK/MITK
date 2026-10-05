@@ -12,13 +12,16 @@ found in the LICENSE file.
 
 #include "QmitkVolumeThumbnailRenderer.h"
 
+#include <mitkExceptionMacro.h>
 #include <mitkImage.h>
+#include <mitkImageVtkReadView.h>
 #include <mitkLog.h>
 #include <mitkTransferFunction.h>
 #include <mitkVolumeRenderingLightingModel.h>
 
 #include <vtkCamera.h>
 #include <vtkImageData.h>
+#include <vtkImageShrink3D.h>
 #include <vtkLight.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObject.h>
@@ -32,7 +35,7 @@ found in the LICENSE file.
 
 #include <QImage>
 
-#include <cmath>
+#include <algorithm>
 
 namespace
 {
@@ -44,20 +47,36 @@ namespace
    */
   constexpr const char *THUMBNAIL_LIGHTING_MODEL = "headlight";
 
+  /** \brief How much wider than the volume's box the view is, where it fits tightest.
+   *
+   * A scan that starts and ends mid-body, as most CTs do, is bounded by flat
+   * cross sections. Fitted exactly, they coincide with the preview's edges and
+   * read as the preview cropping the body. A little background between them
+   * and the edge is what lets them read as the ends of the data instead.
+   */
+  constexpr double PREVIEW_MARGIN = 0.05;
+
+  /** \brief The most voxels a preview volume has along any axis.
+   *
+   * Above the widest preview drawn, so that no axis is resolved more coarsely
+   * than the pixels it is drawn onto.
+   */
+  constexpr int MAX_PREVIEW_VOXELS = 256;
+
   /** \brief Place the volume without counting its spacing twice.
    *
-   * The vtkImageData MITK hands out carries the geometry's spacing, and
-   * IndexToWorld carries it again, so the transform has to divide it back out.
+   * The voxels carry the geometry's spacing, and IndexToWorld carries it
+   * again, so the transform has to divide it back out.
    * mitk::VolumeMapperVtkSmart3D::UpdateVtkTransform does the same for the
    * mapper that draws into the real render windows.
    */
-  vtkSmartPointer<vtkTransform> CreateDataToWorldTransform(const mitk::Image *image, vtkImageData *imageData)
+  vtkSmartPointer<vtkTransform> CreateDataToWorldTransform(vtkMatrix4x4 *indexToWorld, vtkImageData *imageData)
   {
     double spacing[3];
     imageData->GetSpacing(spacing);
 
     auto dataToWorld = vtkSmartPointer<vtkTransform>::New();
-    dataToWorld->SetMatrix(image->GetGeometry()->GetVtkTransform()->GetMatrix());
+    dataToWorld->SetMatrix(indexToWorld);
     dataToWorld->Scale(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
 
     return dataToWorld;
@@ -92,6 +111,63 @@ namespace
     // from VTK's buffer, which the next capture overwrites.
     return QPixmap::fromImage(frameImage.flipped(Qt::Vertical));
   }
+}
+
+QmitkVolumeThumbnailRenderer::Volume QmitkVolumeThumbnailRenderer::CreateVolume(const mitk::Image *image)
+{
+  if (image == nullptr || !image->IsInitialized())
+    mitkThrow() << "Cannot create a preview volume without an initialized image.";
+
+  // A view of its own rather than Image::GetVtkImageData(), which the mappers
+  // share and which feeding into the filter below would modify.
+  const mitk::ImageVtkReadView view(image, 0);
+  auto *imageData = view.GetVtkImageData();
+
+  int dimensions[3];
+  imageData->GetDimensions(dimensions);
+
+  int factors[3];
+
+  for (int i = 0; i < 3; ++i)
+    factors[i] = std::max(1, (dimensions[i] + MAX_PREVIEW_VOXELS - 1) / MAX_PREVIEW_VOXELS);
+
+  auto shrink = vtkSmartPointer<vtkImageShrink3D>::New();
+  shrink->SetInputData(imageData);
+  shrink->SetShrinkFactors(factors);
+  shrink->AveragingOn();
+  shrink->Update();
+
+  // Detached from the filter, so that binding it does not drag the filter's
+  // pipeline, and the view it reads, along.
+  Volume volume;
+  volume.ImageData = vtkSmartPointer<vtkImageData>::New();
+  volume.ImageData->ShallowCopy(shrink->GetOutput());
+  volume.ImageData->SetOrigin(0.0, 0.0, 0.0);
+
+  // A preview voxel averages a block of the image's voxels, so it stands at
+  // that block's center: index j of the preview is index f * j + (f - 1) / 2
+  // of the image along an axis shrunk by f.
+  auto *imageIndexToWorld = image->GetGeometry()->GetVtkTransform()->GetMatrix();
+
+  volume.IndexToWorld = vtkSmartPointer<vtkMatrix4x4>::New();
+  volume.IndexToWorld->DeepCopy(imageIndexToWorld);
+
+  for (int row = 0; row < 3; ++row)
+  {
+    double offset = imageIndexToWorld->GetElement(row, 3);
+
+    for (int column = 0; column < 3; ++column)
+    {
+      const double element = imageIndexToWorld->GetElement(row, column);
+
+      volume.IndexToWorld->SetElement(row, column, element * factors[column]);
+      offset += element * 0.5 * (factors[column] - 1);
+    }
+
+    volume.IndexToWorld->SetElement(row, 3, offset);
+  }
+
+  return volume;
 }
 
 QmitkVolumeThumbnailRenderer::QmitkVolumeThumbnailRenderer(const QSize &size)
@@ -172,11 +248,10 @@ void QmitkVolumeThumbnailRenderer::CreatePipeline()
   m_Capture->ShouldRerenderOff();
 }
 
-bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
+bool QmitkVolumeThumbnailRenderer::SetVolume(const Volume &volume)
 {
-  if (image == nullptr || !image->IsInitialized())
+  if (volume.ImageData == nullptr || volume.IndexToWorld == nullptr)
   {
-    m_Image = nullptr;
     m_ImageData = nullptr;
 
     // Its view shares the voxels just released, so it has to go with them.
@@ -188,60 +263,52 @@ bool QmitkVolumeThumbnailRenderer::SetImage(const mitk::Image *image)
     return false;
   }
 
-  // The const overload registers a read accessor rather than a write one, which
-  // is what a consumer that only draws should leave behind. VTK's setter takes
-  // a mutable pointer, hence the cast.
-  auto *imageData = const_cast<vtkImageData *>(image->GetVtkImageData());
-
-  if (imageData == nullptr)
-    return false;
-
   // Deferred to here so that a session in which nobody asks for a preview never
   // claims a graphics context.
   if (m_RenderWindow == nullptr)
     this->CreatePipeline();
 
-  // The cached view belongs to the image this bind is about to release.
-  if (m_Image.GetPointer() != image)
+  // The cached view belongs to the voxels this bind is about to release.
+  if (m_ImageData != volume.ImageData)
     m_ViewCache.Reset();
 
   // Kept for Render to build its views of, which is what the previews are
-  // drawn through. The image is kept alongside because it owns the voxels the
-  // representation only wraps: mitk::ImageDataItem hands them to VTK with
-  // save = 1, so they are freed with the image while the wrapper lives on.
-  // This bind carries no transfer function yet, so the volume itself is what
-  // proves the ray caster can draw it.
-  m_Image = image;
-  m_ImageData = imageData;
+  // drawn through. This bind carries no transfer function yet, so the volume
+  // itself is what proves the ray caster can draw it.
+  m_ImageData = volume.ImageData;
 
-  m_Mapper->SetInputData(imageData);
-  m_Volume->SetUserTransform(CreateDataToWorldTransform(image, imageData));
+  m_Mapper->SetInputData(m_ImageData);
+  m_Volume->SetUserTransform(CreateDataToWorldTransform(volume.IndexToWorld, m_ImageData));
 
+  // Parallel rather than perspective, since only then does the volume's box
+  // project to exactly its width and height, which is what the view is sized
+  // to below. At preview size the perspective of the 3D window is too slight
+  // to be missed.
   auto *camera = m_Renderer->GetActiveCamera();
+  camera->ParallelProjectionOn();
   camera->SetPosition(0.0, -1.0, 0.0);
   camera->SetFocalPoint(0.0, 0.0, 0.0);
   camera->SetViewUp(0.0, 0.0, 1.0);
   m_Renderer->ResetCamera();
 
-  // ResetCamera fits the sphere around the volume's box, taking its radius
-  // from the box's full diagonal. The camera looks along +Y, so the Y extent
-  // is depth: it never widens or heightens the picture, but it does inflate
-  // that radius and push the camera back, which is what leaves a preview
-  // mostly background. Zooming by the ratio between the sphere fitted and the
-  // circle the projection actually needs takes that back. That circle still
-  // encloses the projected box, so no volume can be cropped, whatever its
-  // proportions. Zoom rather than Dolly because it narrows the view angle
-  // without moving the camera, leaving the clipping range ResetCamera just
-  // computed valid.
+  // ResetCamera sizes the view to the sphere around the volume's box, whose
+  // radius is half the box's full diagonal, depth included, and that leaves the
+  // box filling well under half of a preview. Sized to the box's own width and
+  // height instead, it stops just short of the preview's edges in whichever
+  // direction runs out first, and still nothing of it can be cropped. The
+  // camera looks along +Y, so X runs across the picture and Z up it. The
+  // clipping range ResetCamera computed stays valid, since the camera does not
+  // move.
   double bounds[6];
   m_Volume->GetBounds(bounds);
 
-  const double width = bounds[1] - bounds[0];
-  const double depth = bounds[3] - bounds[2];
-  const double height = bounds[5] - bounds[4];
+  const double halfWidth = 0.5 * (bounds[1] - bounds[0]);
+  const double halfHeight = 0.5 * (bounds[5] - bounds[4]);
+  const double aspect = static_cast<double>(m_Size.width()) / m_Size.height();
 
-  if (const double inPlane = width * width + height * height; inPlane > 0.0)
-    camera->Zoom(std::sqrt((inPlane + depth * depth) / inPlane));
+  // The parallel scale is half the height of the view.
+  if (const double scale = std::max(halfHeight, halfWidth / aspect); scale > 0.0)
+    camera->SetParallelScale(scale * (1.0 + PREVIEW_MARGIN));
 
   // Uploads the volume, and is the only expensive call here. Whether the ray
   // caster can draw at all depends on the hardware and on this volume's own

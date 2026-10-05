@@ -51,9 +51,15 @@ void QmitkToolBarsPreferencePage::CreateQtControl(QWidget* parent)
 
   m_Ui->setupUi(m_Control);
 
+  using CategoryLabel = QmitkCategoryToolBar::CategoryLabel;
+
+  m_Ui->categoryLabelComboBox->addItem("Above the buttons", static_cast<int>(CategoryLabel::AboveButtons));
+  m_Ui->categoryLabelComboBox->addItem("On hover", static_cast<int>(CategoryLabel::OnHover));
+  m_Ui->categoryLabelComboBox->addItem("Hidden", static_cast<int>(CategoryLabel::Hidden));
+
   const auto views = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory();
 
-  for(const auto& category : views.uniqueKeys())
+  for(const auto& category : QmitkToolBarPresets::GetCategories())
   {
     auto categoryItem = new QTreeWidgetItem;
     categoryItem->setText(0, category);
@@ -85,9 +91,8 @@ QWidget* QmitkToolBarsPreferencePage::GetQtControl() const
 bool QmitkToolBarsPreferencePage::PerformOk()
 {
   auto prefs = GetPreferences();
-  bool showCategories = m_Ui->showCategoriesCheckBox->isChecked();
 
-  prefs->PutBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, showCategories);
+  QmitkToolBarPresets::SetCategoryLabel(static_cast<QmitkCategoryToolBar::CategoryLabel>(m_Ui->categoryLabelComboBox->currentData().toInt()));
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {
@@ -111,7 +116,7 @@ void QmitkToolBarsPreferencePage::Update()
 {
   const auto prefs = GetPreferences();
 
-  m_Ui->showCategoriesCheckBox->setChecked(prefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true));
+  m_Ui->categoryLabelComboBox->setCurrentIndex(m_Ui->categoryLabelComboBox->findData(static_cast<int>(QmitkToolBarPresets::GetCategoryLabel())));
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {

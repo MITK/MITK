@@ -47,6 +47,13 @@ including an image carrying no such metadata - a NIfTI or an NRRD from outside
 MITK usually carries none. Seeing a CT preset on an MR loaded from one of those
 formats is therefore expected; pick an <tt>MR-</tt> preset from the grid.
 
+Adjusting needs to know the image first: its value range, which the curve and
+the sliders are measured against, and its histogram, which the canvas shows.
+Working these out reads every voxel, so it happens in the background while the
+volume already renders. Until it is done the canvas and the sliders are grayed
+out, while presets can still be picked. On a very large image a progress
+notification shows how far it has got.
+
 For a 4D image the volume follows the current time step, so stepping through
 time in the image navigator steps the volume with it.
 
@@ -58,7 +65,9 @@ The presets are laid out as a grid, each one shown as a small rendering of the
 image you currently have selected. The preview is what applying that preset will
 look like on your data, not a generic illustration, which is why the presets are
 chosen by picture rather than by name. They are drawn one after another, so they
-appear progressively.
+appear progressively. They are drawn from a copy of the image reduced to the
+detail their size can show, so a very thin structure may look fainter in a
+preview than in the 3D window.
 
 \imageMacro{QmitkVolumeVisualization_Presets.png,"Each preset is shown as a rendering of the selected image.",12.00}
 
@@ -168,7 +177,7 @@ over:
 into a smaller band of gray values; widening it spreads them out.
 </ul>
 
-<b>Reset</b> returns all four to neutral. That restores the curve they are
+<b>Reset opacity and color</b> returns all four to neutral. That restores the curve they are
 measured from, which is the untouched preset, the curve as you left it after
 editing it point by point, or the curve on show when its preset was removed. It
 does not reload a preset; clicking the preset's entry does.
@@ -180,7 +189,8 @@ back to the positions you left them in.
 \subsection org_mitk_views_volumevisualization_tf_custom Editing the curve point by point
 
 <b>Edit</b>, above the canvas, hands that canvas over to editing the curve on
-show point by point; pressing it again ends the edit. Either the preset grid or
+show point by point. While the edit runs the button reads <b>Stop editing</b>,
+and pressing it ends the edit. Either the preset grid or
 the four sliders would replace what you are drawing, so in the meantime the grid
 is grayed out and the sliders make way for the list of color stops.
 
@@ -189,7 +199,8 @@ is grayed out and the sliders make way for the list of color stops.
 <ol>
 <li> <b>Show whole curve</b> decides how far the axis reaches, as described below.
 <li> The blend mode the curve is rendered in, as described below.
-<li> <b>Edit</b> starts and ends the edit.
+<li> <b>Stop editing</b> ends the edit; outside of one, the same button reads
+<b>Edit</b> and starts it.
 <li> The handles of the opacity curve.
 <li> The color stops, as markers along the bottom edge. A faded one standing on
 an edge lies beyond the axis.
@@ -222,8 +233,10 @@ double-click it to type a value, which moves the stop there, or as far toward
 it as it can go: like a dragged one, a stop halts just short of its neighbors.
 DELETE, or
 <b>Remove</b> on the right-click menu, removes the selected stop. A stop that
-lies beyond the axis is listed as <b>Off axis</b>, without a position. A
-gradient keeps at least one stop, and the curve at least one point.
+lies beyond the axis is listed grayed out, with a position below 0 or above 1
+followed by <b>(off axis)</b>. That position says how far beyond the axis the
+stop lies, but cannot be typed; the row's tooltip says how to move the stop.
+A gradient keeps at least one stop, and the curve at least one point.
 
 <b>Revert changes</b>, below the list, puts back the curve and the blend mode
 from when you pressed <b>Edit</b>, as <b>Discard</b> does when the edit ends,
@@ -235,14 +248,14 @@ are authored on their modality's full scale, so a preset's outermost stops
 often lie beyond either end of the axis. The one nearest each end is then drawn
 faded on that end, to say it exists rather than where it is. It can be selected
 and recolored there, but not dragged, since there is no place on the axis to
-drag it from; pointing at it says so. Ticking <b>Show whole curve</b>, beside
-<b>Edit</b>, widens the axis to take in every point of both curves, so that each
+drag it from; pointing at it says so. Ticking <b>Show whole curve</b>, above
+the canvas, widens the axis to take in every point of both curves, so that each
 stop stands at its own value and can be dragged like any other. The image's band
 then takes up only part of the plot. Every edit starts with the box cleared, and
 the axis returns to the band when the edit ends.
 
-The list beside <b>Edit</b>, shown only while editing, is the blend mode the
-curve is rendered in. It starts on the mode the preset brought. Changing it
+The list beside <b>Stop editing</b>, shown only while editing, is the blend mode
+the curve is rendered in. It starts on the mode the preset brought. Changing it
 counts as an edit like any drawn on the canvas: the preset's entry is starred,
 and the choice lasts as long as the drawing does, so <b>Save as preset...</b>
 is how to keep it. Only <b>Composite</b> builds a three-dimensional image and
@@ -275,8 +288,8 @@ the same format the built-in catalog uses, then adds it to the grid and
 applies it, so your own functions can be kept and shared and added back with the
 <b>Load preset...</b> entry. Canceling the file dialog brings the question back.
 <li> <b>Discard</b> puts back the curve and the blend mode from before the edit.
-<li> <b>Continue editing</b> takes back the click on <b>Edit</b> and leaves you
-editing. ESC answers the same.
+<li> <b>Continue editing</b> takes back the click on <b>Stop editing</b> and
+leaves you editing. ESC answers the same.
 </ul>
 
 Selecting another image while editing, or removing the one being edited, asks
@@ -342,19 +355,21 @@ shadows off while you rotate, and also relights any surface sharing the 3D
 window.
 </ul>
 
-<b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>
-control how one volume's material responds to that light, and stay in this
-panel because they are per volume rather than per window. Choosing a model sets
-all four to a sensible starting point; moving them afterwards does not leave the
-model, and <b>Reset</b> puts them back to the values the current model
+<b>Ambient</b>, <b>Diffuse</b>, <b>Specular</b> and <b>Specular power</b>,
+under <b>Material</b> below the transfer function, control how one volume's
+material responds to that light, and stay in this view because they are per
+volume rather than per window. Choosing a model sets all four to a sensible
+starting point; moving them afterwards does not leave the model, and
+<b>Reset material</b> puts them back to the values the current model
 prescribes. Ambient is deliberately zero under Key light: with more than one
 light in the scene the renderer adds ambient as a flat gray wash, so the fill
 light does that job instead.
 
-\note This whole section applies to the Composite blend mode only. With
-<tt>CT-MIP</tt> or <tt>MR-MIP</tt> it is disabled, with the reason on its
-header: a maximum intensity projection reduces each ray to a single value and
-lights nothing, so lighting there is inert rather than merely subtle.
+\note The material sliders apply to the Composite blend mode only. With
+<tt>CT-MIP</tt> or <tt>MR-MIP</tt> they are grayed out and their title reads
+<b>Material - Composite only</b>: a maximum intensity projection reduces each
+ray to a single value and lights nothing, so lighting there is inert rather
+than merely subtle.
 
 \section org_mitk_views_volumevisualization_appearance Color and opacity from the Data Manager
 

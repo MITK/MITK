@@ -2,14 +2,19 @@
   <qresource prefix="/Qmitk">
     <file>Binaerbilder_48.png</file>
     <file>clipboard.svg</file>
+    <file>crosshair.svg</file>
     <file>favorite_add.svg</file>
     <file>favorite_remove.svg</file>
+    <file>fullscreen.svg</file>
+    <file>fullscreen_exit.svg</file>
     <file>GeometryDataIcon.svg</file>
     <file>history-solid.svg</file>
     <file>hourglass-half-solid.svg</file>
     <file>Images_48.png</file>
     <file>invisible.svg</file>
     <file>SegmentationIcon_48.png</file>
+    <file>layout.svg</file>
+    <file>lighting.svg</file>
     <file>list-solid.svg</file>
     <file>lock.svg</file>
     <file>mm_contrast.svg</file>

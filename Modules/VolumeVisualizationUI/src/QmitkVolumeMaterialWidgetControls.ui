@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkVolumeLightingWidget</class>
- <widget class="QWidget" name="QmitkVolumeLightingWidget">
+ <class>QmitkVolumeMaterialWidget</class>
+ <widget class="QWidget" name="QmitkVolumeMaterialWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,7 +16,7 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <layout class="QVBoxLayout" name="lightingLayout">
+  <layout class="QVBoxLayout" name="materialWidgetLayout">
    <property name="spacing">
     <number>6</number>
    </property>
@@ -24,7 +24,7 @@
     <number>0</number>
    </property>
    <property name="topMargin">
-    <number>8</number>
+    <number>16</number>
    </property>
    <property name="rightMargin">
     <number>0</number>
@@ -49,7 +49,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="ctkSliderWidget" name="ambientSlider" native="true"/>
+       <widget class="QSlider" name="ambientSlider">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="diffuseLabel">
@@ -59,7 +63,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="ctkSliderWidget" name="diffuseSlider" native="true"/>
+       <widget class="QSlider" name="diffuseSlider">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="specularLabel">
@@ -69,7 +77,11 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="ctkSliderWidget" name="specularSlider" native="true"/>
+       <widget class="QSlider" name="specularSlider">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="specularPowerLabel">
@@ -79,7 +91,11 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="ctkSliderWidget" name="specularPowerSlider" native="true"/>
+       <widget class="QSlider" name="specularPowerSlider">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -118,7 +134,7 @@
      <item>
       <widget class="QPushButton" name="resetButton">
        <property name="text">
-        <string>Reset</string>
+        <string> Reset material</string>
        </property>
       </widget>
      </item>
@@ -126,13 +142,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ctkSliderWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ctkSliderWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

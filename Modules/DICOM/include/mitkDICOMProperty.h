@@ -85,6 +85,31 @@ namespace mitk
   GetFirstDICOMValueAsString(const IPropertyProvider* provider, const DICOMTagPath& path);
 
   /**
+   * \brief Value of a DICOM attribute at exactly one (t, z) slot.
+   *
+   * Unlike GetFirstDICOMValueAsString, without a close-match fallback: an
+   * absent slot yields an empty string, so a consumer iterating slots never
+   * receives a neighbouring frame's value. For a functional-group attribute
+   * pass the path relative to the functional-group item, e.g.
+   * (0028,9145)[0].(0028,1053), which is the form the reader publishes for
+   * both the shared and the per-frame placement of a macro.
+   *
+   * \param[in] provider The property provider to search. \c nullptr yields an empty string.
+   * \param[in] path     The DICOMTagPath to look up.
+   * \param[in] t        The time step.
+   * \param[in] z        The slice within the time step.
+   * \return The value at that slot, or an empty string when there is none. A
+   *         match that is not a \c DICOMProperty carries one value for the
+   *         whole image, so its plain string value is returned for every slot.
+   * \sa GetFirstDICOMValueAsString, GetPropertyByDICOMTagPath
+   */
+  MITKDICOM_EXPORT std::string
+  GetDICOMValueAtSlot(const IPropertyProvider* provider,
+                      const DICOMTagPath& path,
+                      TimeStepType t,
+                      SlicedData::IndexValueType z);
+
+  /**
    * \brief Convert a DICOM property string to a numeric value.
    *
    * Helper function that converts the content of a DICOM property string

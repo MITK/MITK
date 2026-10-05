@@ -289,6 +289,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   // io dicom meta information
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_FRAMES(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_GANTRY_TILT_CORRECTED(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL_STRING(), image, result);
@@ -496,6 +497,11 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
         MITK_DEBUG << refKey << ": '" << gdcm::Version::GetVersion() << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
       }
       else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES()))
+      {
+        bool thisTestResult = CompareJSON(refValue, testValue);
+        testResult &= thisTestResult;
+      }
+      else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_FRAMES()))
       {
         bool thisTestResult = CompareJSON(refValue, testValue);
         testResult &= thisTestResult;

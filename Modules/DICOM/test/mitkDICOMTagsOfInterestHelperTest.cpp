@@ -13,6 +13,12 @@ found in the LICENSE file.
 #include <mitkDICOMTag.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMTagsOfInterestHelper.h>
+#include <mitkIDICOMTagsOfInterest.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyPersistence.h>
+
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -39,6 +45,8 @@ class mitkDICOMTagsOfInterestHelperTestSuite : public mitk::TestFixture
   MITK_TEST(SOPTags);
   MITK_TEST(SourceImageReferenceTags);
 
+  MITK_TEST(TagOfInterestRegistersOnlyItsOwnPath);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -59,6 +67,53 @@ private:
       m_Tags.find(path) != m_Tags.end());
   }
 
+  mitk::IDICOMTagsOfInterest* m_TagsOfInterest = nullptr;
+  mitk::IPropertyPersistence* m_Persistence = nullptr;
+  mitk::IPropertyDescriptions* m_Descriptions = nullptr;
+  std::vector<mitk::DICOMTagPath> m_Registered;
+
+  void Register(const mitk::DICOMTagPath& path)
+  {
+    m_TagsOfInterest->AddTagOfInterest(path);
+    m_Registered.push_back(path);
+  }
+
+  /** Asserted rather than skipped: a case that quietly returns when a service
+      is missing would pass without testing anything. */
+  void ResolveServices()
+  {
+    auto* context = us::GetModuleContext();
+
+    const auto toiRefs = context->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+    CPPUNIT_ASSERT_MESSAGE("Test precondition: the DICOM tags-of-interest service is registered",
+                           !toiRefs.empty());
+    const auto persistenceRefs = context->GetServiceReferences<mitk::IPropertyPersistence>();
+    CPPUNIT_ASSERT_MESSAGE("Test precondition: the property persistence service is registered",
+                           !persistenceRefs.empty());
+    const auto descriptionRefs = context->GetServiceReferences<mitk::IPropertyDescriptions>();
+    CPPUNIT_ASSERT_MESSAGE("Test precondition: the property descriptions service is registered",
+                           !descriptionRefs.empty());
+
+    m_TagsOfInterest = context->GetService<mitk::IDICOMTagsOfInterest>(toiRefs.front());
+    m_Persistence = context->GetService<mitk::IPropertyPersistence>(persistenceRefs.front());
+    m_Descriptions = context->GetService<mitk::IPropertyDescriptions>(descriptionRefs.front());
+
+    CPPUNIT_ASSERT_MESSAGE("Test precondition: all three services resolve",
+                           nullptr != m_TagsOfInterest && nullptr != m_Persistence && nullptr != m_Descriptions);
+  }
+
+  void ReleaseRegistrations()
+  {
+    if (nullptr != m_TagsOfInterest)
+    {
+      for (const auto& path : m_Registered)
+      {
+        m_TagsOfInterest->RemoveTag(path);
+      }
+    }
+    m_Registered.clear();
+  }
+
 public:
   void setUp() override
   {
@@ -70,6 +125,10 @@ public:
 
   void tearDown() override
   {
+    this->ReleaseRegistrations();
+    m_TagsOfInterest = nullptr;
+    m_Persistence = nullptr;
+    m_Descriptions = nullptr;
     m_Tags.clear();
   }
 
@@ -304,6 +363,40 @@ public:
                 "SourceImage Purpose/(0008,0100) CodeValue");
     RequirePath(mitk::DICOMTagPath(sourceImageRefPurposeRoot).AddElement(0x0008, 0x0102),
                 "SourceImage Purpose/(0008,0102) CodeSchemeDesignator");
+  }
+
+  /**
+   * The service registers exactly the path it is given, whatever its shape.
+   *
+   * A functional-group-rooted path is the input that discriminates: it is the
+   * one shape for which a second registration under the frame-relative key
+   * could look useful, and that key must stay unregistered. The reader, not the
+   * service, decides where in a file an attribute is searched.
+   */
+  void TagOfInterestRegistersOnlyItsOwnPath()
+  {
+    this->ResolveServices();
+
+    const std::string ownName = "DICOM.5200.9230.[0].0028.9145.[0].0028.1053";
+    const std::string frameRelativeName = "DICOM.0028.9145.[0].0028.1053";
+
+    CPPUNIT_ASSERT_MESSAGE("Test precondition: the frame-relative key is not registered yet",
+                           !m_Persistence->HasInfo(frameRelativeName, true)
+                             && !m_Descriptions->HasDescription(frameRelativeName));
+
+    mitk::DICOMTagPath rooted;
+    rooted.AddAnySelection(0x5200, 0x9230).AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+    this->Register(rooted);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One persistence info for the registered path",
+                                 std::size_t(1), m_Persistence->GetInfo(ownName, true).size());
+    CPPUNIT_ASSERT_MESSAGE("A description for the registered path",
+                           m_Descriptions->HasDescription(ownName));
+
+    CPPUNIT_ASSERT_MESSAGE("No persistence info under a derived key",
+                           !m_Persistence->HasInfo(frameRelativeName, true));
+    CPPUNIT_ASSERT_MESSAGE("No description under a derived key",
+                           !m_Descriptions->HasDescription(frameRelativeName));
   }
 };
 

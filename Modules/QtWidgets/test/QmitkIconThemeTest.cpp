@@ -84,6 +84,7 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   MITK_TEST(ColorsFollowRefresh);
   MITK_TEST(SelectionColorIsEmptyUnlessTheThemeDefinesOne);
   MITK_TEST(WarningColorIsReadFromTheWarningRule);
+  MITK_TEST(DarkThemeHasLightIcons);
   MITK_TEST(RendersAtTheRequestedSize);
   MITK_TEST(RendersInDevicePixels);
   MITK_TEST(KeepsTheAspectRatio);
@@ -223,6 +224,15 @@ public:
     qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: nonsense;\n}\n"));
     QmitkIconTheme::Refresh();
     CPPUNIT_ASSERT_MESSAGE("An invalid colour reads as none", QmitkIconTheme::GetWarningColor().isEmpty());
+  }
+
+  void DarkThemeHasLightIcons()
+  {
+    ApplyTheme("#f1f1f1", "#ffffff");
+    CPPUNIT_ASSERT(QmitkIconTheme::IsDarkTheme());
+
+    ApplyTheme("#1e1e1e", "#ffffff");
+    CPPUNIT_ASSERT(!QmitkIconTheme::IsDarkTheme());
   }
 
   void RendersAtTheRequestedSize()

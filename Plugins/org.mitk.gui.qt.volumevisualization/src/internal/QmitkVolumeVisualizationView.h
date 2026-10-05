@@ -67,14 +67,14 @@ private:
 
   void UpdateInterface();
 
-  /** \brief Refresh the collapsible lighting section: its header, whether it
-   *         applies at all, and the node the controls inside it act on.
+  /** \brief Refresh the material controls: their title, whether they apply at
+   *         all, and the node they act on.
    *
-   * The controls themselves belong to QmitkVolumeLightingWidget. What stays here
+   * The controls themselves belong to QmitkVolumeMaterialWidget. What stays here
    * is the part that depends on the blend mode - which arrives with the transfer
    * function - and so cannot be the widget's to decide.
    */
-  void UpdateLightingSection();
+  void UpdateMaterialSection();
 
   /** \brief Take over the 3D window of a render window part that has just become
    * available.

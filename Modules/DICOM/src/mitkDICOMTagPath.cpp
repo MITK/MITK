@@ -451,6 +451,36 @@ namespace mitk
     return (leftPos == leftEnd && rightPos == rightEnd);
   }
 
+  bool IsFunctionalGroupRooted(const DICOMTagPath& tagPath)
+  {
+    if (tagPath.Size() < 2)
+    {
+      return false;
+    }
+
+    const auto& root = tagPath.GetFirstNode();
+
+    return 0x5200 == root.tag.GetGroup()
+        && (0x9229 == root.tag.GetElement() || 0x9230 == root.tag.GetElement());
+  }
+
+  DICOMTagPath FunctionalGroupRelativePath(const DICOMTagPath& tagPath)
+  {
+    if (!IsFunctionalGroupRooted(tagPath))
+    {
+      return tagPath;
+    }
+
+    DICOMTagPath result;
+    const auto& nodes = tagPath.GetNodes();
+    for (auto node = nodes.cbegin() + 1; node != nodes.cend(); ++node)
+    {
+      result.AddNode(*node);
+    }
+
+    return result;
+  }
+
   std::ostream & operator<<(std::ostream &os, const DICOMTagPath &value)
   {
     os << value.ToStr();

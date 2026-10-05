@@ -234,7 +234,6 @@ endif()
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
-option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
 option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 option(MITK_PCH "Enable precompiled headers" ON)
 
@@ -251,7 +250,6 @@ option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
 
 mark_as_advanced(
   MITK_XVFB_TESTING
-  MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
   MITK_PCH
 )
@@ -1223,9 +1221,6 @@ if(BUILD_TESTING)
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
   endif()
-
-  # Test the package target
-  include(mitkPackageTest)
 endif()
 
 configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)

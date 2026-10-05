@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkGantryTiltInformation.h>
 #include <mitkDICOMTag.h>
+#include <mitkDICOMFrameLayout.h>
 
 #include <itkGDCMImageIO.h>
 
@@ -53,9 +54,15 @@ class ITKDICOMSeriesReaderHelper
      * \param[in] filenames The list of DICOM file paths constituting one 3D volume.
      * \param[in] correctTilt Whether to apply gantry tilt correction via shearing.
      * \param[in] tiltInfo The gantry tilt information describing the tilt geometry.
+     * \param[in] layout The frame layout of the file, for a single-file volume.
+     *            When it carries per-frame Pixel Value Transformations that differ
+     *            from the one GDCM applied to the whole buffer, each frame's own
+     *            pair is applied instead and the component type follows GDCM's rule
+     *            over all of them. The default leaves the pixels as GDCM read them.
      * \return A smart pointer to the loaded mitk::Image.
      */
-    Image::Pointer Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo );
+    Image::Pointer Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo,
+                         const DICOMFrameLayout& layout = DICOMFrameLayout() );
 
     /**
      * \brief Load a 3D+t DICOM image from multiple time step file lists.

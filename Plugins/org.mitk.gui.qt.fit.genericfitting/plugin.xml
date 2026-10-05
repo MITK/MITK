@@ -4,7 +4,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fit.genericfitting"
           name="Modelfit Generic Data Fitting"
-		  category="Fitting"
+		  category="Model Fitting"
           class="GenericDataFittingView"
           icon="resources/icon.svg" />
   </extension>

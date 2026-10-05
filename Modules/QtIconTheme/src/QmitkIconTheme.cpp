@@ -302,6 +302,12 @@ QString QmitkIconTheme::GetWarningColor()
   return s_WarningColor;
 }
 
+bool QmitkIconTheme::IsDarkTheme()
+{
+  // Icons are light in the dark theme and vice versa.
+  return QColor(GetColor()).lightness() > 127;
+}
+
 void QmitkIconTheme::Refresh()
 {
   const auto color = s_Color;

@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkStdMultiWidgetEditor.h"
 
+#include "internal/QmitkEthel.h"
+
 #include <berryUIException.h>
 #include <berryIWorkbenchPage.h>
 
@@ -224,6 +226,8 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
       this, &QmitkStdMultiWidgetEditor::OnInteractionSchemeApplied);
+
+    new QmitkEthel(multiWidget);
   }
 
   layout->addWidget(multiWidget);

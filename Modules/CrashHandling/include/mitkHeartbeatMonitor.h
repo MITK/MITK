@@ -55,8 +55,12 @@ namespace mitk
 
     using Callback = std::function<void()>;
 
-    /** \param onStall invoked (possibly repeatedly) while the monitored
-     *  thread is stalled; \param onRecovery invoked once when it resumes.
+    /** \param config stall timeout, capture pacing and the per-episode and
+     *  per-session capture caps.
+     *  \param onStall invoked (possibly repeatedly) while the monitored
+     *  thread is stalled.
+     *  \param onRecovery invoked once when it resumes.
+     *
      *  Callbacks run on the monitor's worker thread. */
     HeartbeatMonitor(const Config& config, Callback onStall, Callback onRecovery);
 

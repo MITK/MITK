@@ -60,4 +60,7 @@ function(mitkFunctionCreateCommandLineApp)
   CPP_FILES ${CMDAPP_CPP_FILES}
   ${_CMDAPP_OPTIONS}
   )
+  if(TARGET ${EXECUTABLE_TARGET})
+    set_property(TARGET ${EXECUTABLE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/CmdApps")
+  endif()
 endfunction()

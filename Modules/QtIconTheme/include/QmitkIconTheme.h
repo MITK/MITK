@@ -121,6 +121,15 @@ public:
   static QString GetWarningColor();
 
   /**
+   * \brief Returns whether the current theme is dark, judged by its icon color.
+   *
+   * The dark theme sets widget colors in its style sheet and leaves the
+   * palette untouched, so palette() colors reflect the theme only in the
+   * light theme. Code that styles widgets itself can pick colors with this.
+   */
+  static bool IsDarkTheme();
+
+  /**
    * \brief Re-reads the theme colors from the application style sheet.
    *
    * If the colors changed, all icons created by GetIcon() re-render in the

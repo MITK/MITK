@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <itkHistogram.h>
 #endif
 
+#include <mutex>
+
 namespace mitk
 {
   /**
@@ -95,6 +97,8 @@ namespace mitk
      */
     virtual mitk::ScalarType GetScalarValueMinNoRecompute(unsigned int t = 0) const
     {
+      const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
       if (t < m_ScalarMin.size())
         return m_ScalarMin[t];
       else
@@ -110,6 +114,8 @@ namespace mitk
      */
     virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute(unsigned int t = 0) const
     {
+      const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
       if (t < m_Scalar2ndMin.size())
         return m_Scalar2ndMin[t];
       else
@@ -135,6 +141,8 @@ namespace mitk
      */
     virtual mitk::ScalarType GetScalarValueMaxNoRecompute(unsigned int t = 0)
     {
+      const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
       if (t < m_ScalarMax.size())
         return m_ScalarMax[t];
       else
@@ -149,6 +157,8 @@ namespace mitk
      */
     virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute(unsigned int t = 0)
     {
+      const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
       if (t < m_Scalar2ndMax.size())
         return m_Scalar2ndMax[t];
       else
@@ -181,6 +191,8 @@ namespace mitk
      */
     virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute(unsigned int t = 0)
     {
+      const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
       if (t < m_CountOfMaxValuedVoxels.size())
         return m_CountOfMaxValuedVoxels[t];
       else
@@ -195,6 +207,8 @@ namespace mitk
      */
     virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute(unsigned int t = 0) const
     {
+      const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
       if (t < m_CountOfMinValuedVoxels.size())
         return m_CountOfMinValuedVoxels[t];
       else
@@ -208,11 +222,6 @@ namespace mitk
      * \return True if the time step is valid.
      */
     bool IsValidTimeStep(int t) const;
-
-    template <typename ItkImageType>
-    friend void _ComputeExtremaInItkImage(const ItkImageType *itkImage,
-                                          mitk::ImageStatisticsHolder *statisticsHolder,
-                                          int t);
 
     template <typename ItkImageType>
     friend void _ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
@@ -229,8 +238,17 @@ namespace mitk
      *
      * \param t The time step. Defaults to 0.
      * \param component The component index for vector images. Defaults to 0.
+     * \pre The caller holds m_StatisticsMutex, and keeps holding it while it
+     *      reads the statistics computed.
      */
     virtual void ComputeImageStatistics(int t = 0, unsigned int component = 0);
+
+    /**
+     * \brief Compute the extrema of a scalar image's time step, in parallel.
+     *
+     * \param t The time step, which must be valid and already expanded to.
+     */
+    void ComputeScalarExtrema(int t);
 
     /**
      * \brief Expand internal statistics storage to accommodate the given number of time steps.
@@ -259,6 +277,15 @@ namespace mitk
     mutable std::vector<ScalarType> m_Scalar2ndMax;
 
     itk::TimeStamp m_LastRecomputeTimeStamp;
+
+    /** \brief Guards the statistics, both computing and reading them.
+     *
+     * Statistics of a large image are worth computing on a worker, while the
+     * GUI thread may ask for the same ones at any moment. The second caller then
+     * waits for the result instead of computing it again into the same members,
+     * and no read meets the members resized for another time step.
+     */
+    mutable std::mutex m_StatisticsMutex;
   };
 
 } // end namespace

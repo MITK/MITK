@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkDICOMFileReader.h>
+#include <mitkDICOMFrameListHelper.h>
 
 #include <itkGDCMImageIO.h>
 
@@ -101,6 +102,16 @@ mitk::DICOMFileReader
 ::GetNumberOfOutputs() const
 {
   return m_Outputs.size();
+}
+
+void
+mitk::DICOMFileReader
+::KeepOnlyOutputsContaining(const std::string& filename)
+{
+  std::erase_if(m_Outputs, [&filename](const DICOMImageBlockDescriptor& output)
+    {
+      return !ContainsFile(output.GetImageFrameList(), filename);
+    });
 }
 
 void

@@ -15,6 +15,7 @@ mitk_create_executable(CrashDumpTestHelper
 
 if(TARGET ${TESTDRIVER} AND TARGET ${EXECUTABLE_TARGET})
   add_dependencies(${TESTDRIVER} ${EXECUTABLE_TARGET})
+  set_property(TARGET ${EXECUTABLE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Tests")
   if(TARGET MitkCopyCrashpadHandler)
     add_dependencies(${TESTDRIVER} MitkCopyCrashpadHandler)
   endif()

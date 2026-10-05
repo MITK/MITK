@@ -250,7 +250,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
       return;
     }
 
-    m_MenuWidget = new QmitkRenderWindowMenu(this, {}, m_Renderer);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, m_Renderer);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
   }
 
@@ -270,6 +270,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     connect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::LightingModeChanged, this, &QmitkRenderWindow::LightingModeChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::LightingMenuAboutToShow, this, &QmitkRenderWindow::LightingMenuAboutToShow);
   }
   else
   {
@@ -279,8 +280,9 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LightingModeChanged, this, &QmitkRenderWindow::LightingModeChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LightingMenuAboutToShow, this, &QmitkRenderWindow::LightingMenuAboutToShow);
 
-    m_MenuWidget->hide();
+    m_MenuWidget->HideMenu();
   }
 }
 

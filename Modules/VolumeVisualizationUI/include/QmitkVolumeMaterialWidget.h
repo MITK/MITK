@@ -10,12 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkVolumeLightingWidget_h
-#define QmitkVolumeLightingWidget_h
+#ifndef QmitkVolumeMaterialWidget_h
+#define QmitkVolumeMaterialWidget_h
 
 #include <MitkVolumeVisualizationUIExports.h>
 
 #include <mitkDataNode.h>
+#include <mitkVolumeRenderingMaterial.h>
 #include <mitkWeakPointer.h>
 
 #include <QWidget>
@@ -24,7 +25,7 @@ found in the LICENSE file.
 
 namespace Ui
 {
-  class QmitkVolumeLightingWidget;
+  class QmitkVolumeMaterialWidget;
 }
 
 /**
@@ -48,17 +49,17 @@ namespace Ui
  * The host also decides whether these controls apply at all. Every property here
  * reaches the ray caster through the compositing loop that only the composite
  * blend mode runs, and the blend mode is not this widget's to know, so gating is
- * plain QWidget::setEnabled from outside.
+ * plain QWidget::setEnabled from outside, with SetTitleSuffix to say why.
  *
  * \sa mitk::VolumeRenderingLightingModel, mitk::VolumeRenderingMaterial
  */
-class MITKVOLUMEVISUALIZATIONUI_EXPORT QmitkVolumeLightingWidget : public QWidget
+class MITKVOLUMEVISUALIZATIONUI_EXPORT QmitkVolumeMaterialWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  QmitkVolumeLightingWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
-  ~QmitkVolumeLightingWidget() override;
+  QmitkVolumeMaterialWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
+  ~QmitkVolumeMaterialWidget() override;
 
   /**
    * \brief Show and edit the lighting properties of this node.
@@ -66,6 +67,13 @@ public:
    *            defaults and makes every edit a no-op.
    */
   void SetDataNode(mitk::DataNode *node);
+
+  /**
+   * \brief Append a note to the title of the controls.
+   * \param[in] suffix Shown after the title, separated from it; empty shows the
+   *            plain title.
+   */
+  void SetTitleSuffix(const QString &suffix);
 
 public slots:
   /**
@@ -87,11 +95,13 @@ signals:
   void LightingChanged();
 
 private slots:
-  void OnMaterialChanged();
   void OnReset();
 
 private:
-  std::unique_ptr<Ui::QmitkVolumeLightingWidget> m_Controls;
+  /** Write one material value to the bound node, leaving the others as the node has them. */
+  void SetMaterialValue(float mitk::VolumeRenderingMaterial::*field, float value);
+
+  std::unique_ptr<Ui::QmitkVolumeMaterialWidget> m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_DataNode;
 };
 

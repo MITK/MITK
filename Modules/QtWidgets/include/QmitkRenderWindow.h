@@ -29,6 +29,7 @@ found in the LICENSE file.
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
+class QMenu;
 class QMouseEvent;
 
 /**
@@ -162,6 +163,8 @@ Q_SIGNALS:
   void Crosshair3DVisibilityChanged(bool);
 
   void LightingModeChanged(mitk::VtkPropRenderer::LightingMode);
+
+  void LightingMenuAboutToShow(QMenu* menu);
 
   void moved();
 

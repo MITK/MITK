@@ -49,6 +49,7 @@ if(MITK_USE_sentry)
         DEPENDS "${MITK_CRASH_HANDLER_EXECUTABLE}"
         COMMENT "Copying ${MITK_CRASH_HANDLER_NAME} next to the application binaries")
       add_custom_target(MitkCopyCrashpadHandler ALL DEPENDS "${_handler_copy}")
+      set_property(TARGET MitkCopyCrashpadHandler PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Auxiliary")
     endif()
   endif()
 

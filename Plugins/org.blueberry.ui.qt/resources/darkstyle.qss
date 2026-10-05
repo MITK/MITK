@@ -88,10 +88,7 @@ QToolBar QToolButton {
 QToolButton#qt_toolbar_ext_button {
   background-color: transparent;
   border: none;
-  min-width: 12px;
-  max-width: 12px;
   padding: 0;
-  qproperty-icon: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-textcolor.svg);
 }
 
 QToolBox::tab {
@@ -664,4 +661,13 @@ QSplitter#QmitkSegmentationViewSplitter::handle {
     border-top: 1px dotted #9e9e9e;
     border-bottom: 1px dotted #9e9e9e;
     background-color: transparent;
+}
+
+QmitkRenderWindowMenuBar QToolButton {
+  background-color: transparent;
+  padding: 0;
+}
+
+QmitkRenderWindowMenuBar QToolButton:hover, QmitkRenderWindowMenuBar QToolButton:pressed {
+  border-radius: 4px;
 }

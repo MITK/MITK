@@ -217,9 +217,9 @@ namespace
       return EnhancedUnit{mitk::SUVPixelSemantics::PrenormalizedSUV, mitk::SUVVariant::BW, 0};
     if ("g/ml{SUVlbm}" == code)
       return EnhancedUnit{mitk::SUVPixelSemantics::PrenormalizedSUV, mitk::SUVVariant::LBM_Morgan, 1};
-    if ("g/ml{SUVlbm(janma)}" == code)
+    if ("g/ml{SUVlbm(Janma)}" == code)
       return EnhancedUnit{mitk::SUVPixelSemantics::PrenormalizedSUV, mitk::SUVVariant::LBM_Janmahasatian, 1};
-    if ("g/ml{SUVlbm(james128)}" == code)
+    if ("g/ml{SUVlbm(James128)}" == code)
       return EnhancedUnit{mitk::SUVPixelSemantics::PrenormalizedSUV, mitk::SUVVariant::LBM_James128, 1};
     if ("g/ml{SUVibw}" == code)
       return EnhancedUnit{mitk::SUVPixelSemantics::PrenormalizedSUV, mitk::SUVVariant::IBW, 1};
@@ -699,8 +699,8 @@ mitk::SUVInputModel mitk::ClassifyEnhancedPETInput(const SlicedData *data,
       mitkThrowException(UnsupportedPETUnitsException)
         << "Enhanced PET: the Measurement Units Code Sequence at " << Describe(slotUnit.slot)
         << " names only units the SUV pipeline cannot convert: " << Join(slotUnit.unknownCodes)
-        << ". Supported: Bq/ml, g/ml{SUVbw}, g/ml{SUVlbm}, g/ml{SUVlbm(janma)}, "
-           "g/ml{SUVlbm(james128)}, g/ml{SUVibw}, cm2/ml{SUVbsa}.";
+        << ". Supported: Bq/ml, g/ml{SUVbw}, g/ml{SUVlbm}, g/ml{SUVlbm(Janma)}, "
+           "g/ml{SUVlbm(James128)}, g/ml{SUVibw}, cm2/ml{SUVbsa}.";
     }
     mitkThrowException(EnhancedPETMappingNotAppliedException)
       << "Enhanced PET: no Real World Value Mapping describes the pixel values "

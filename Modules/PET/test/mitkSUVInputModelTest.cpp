@@ -213,6 +213,8 @@ class mitkSUVInputModelTestSuite : public mitk::TestFixture
   // Enhanced PET
   MITK_TEST(EnhancedPET_BqMl_ClassifiesAsActivityConcentration);
   MITK_TEST(EnhancedPET_GmlSUVbw_ClassifiesAsPrenormalizedBW);
+  MITK_TEST(EnhancedPET_GmlSUVlbmJanma_ClassifiesAsPrenormalizedLBMJanmahasatian);
+  MITK_TEST(EnhancedPET_GmlSUVlbmJames128_ClassifiesAsPrenormalizedLBMJames128);
   MITK_TEST(EnhancedPET_UniformPerFrameRescale_Accepted);
   MITK_TEST(EnhancedPET_RescaleWrittenTwoWays_Accepted);
   MITK_TEST(EnhancedPET_MappingAtHigherPrecision_Accepted);
@@ -615,6 +617,24 @@ public:
     const auto m = ClassifyEnhanced(img);
     CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
     CPPUNIT_ASSERT(mitk::SUVVariant::BW == m.sourceVariant);
+  }
+
+  void EnhancedPET_GmlSUVlbmJanma_ClassifiesAsPrenormalizedLBMJanmahasatian()
+  {
+    auto img = MakeEnhancedImage(4, "g/ml{SUVlbm(Janma)}", {"1.0", "1.0", "1.0", "1.0"});
+
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
+    CPPUNIT_ASSERT(mitk::SUVVariant::LBM_Janmahasatian == m.sourceVariant);
+  }
+
+  void EnhancedPET_GmlSUVlbmJames128_ClassifiesAsPrenormalizedLBMJames128()
+  {
+    auto img = MakeEnhancedImage(4, "g/ml{SUVlbm(James128)}", {"1.0", "1.0", "1.0", "1.0"});
+
+    const auto m = ClassifyEnhanced(img);
+    CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == m.semantics);
+    CPPUNIT_ASSERT(mitk::SUVVariant::LBM_James128 == m.sourceVariant);
   }
 
   void EnhancedPET_UniformPerFrameRescale_Accepted()

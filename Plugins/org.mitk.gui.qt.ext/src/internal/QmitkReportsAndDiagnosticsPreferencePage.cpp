@@ -26,8 +26,8 @@ void QmitkReportsAndDiagnosticsPreferencePage::CreateQtControl(QWidget* parent)
   auto* label = new QLabel(
     "When MITK closes unexpectedly or stops responding, it can save diagnostic data (crash dumps) "
     "on this computer. Handed in with a problem report, they help us find and fix the cause.<br/><br/>"
-    "MITK never uploads diagnostic data. The pages below this one control what is recorded and how "
-    "long it is kept.");
+    "MITK never uploads diagnostic data on its own. The pages below this one control what is recorded "
+    "and how long it is kept.");
   label->setWordWrap(true);
 
   auto* layout = new QVBoxLayout(m_Control);

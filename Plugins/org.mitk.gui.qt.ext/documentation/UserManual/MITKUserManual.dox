@@ -70,7 +70,7 @@ If MITK closed unexpectedly, or had to be terminated while it was not responding
 
 Either way, the dialog does not show these dumps again.
 
-A crash dump contains parts of the application's memory from the crashed session. If at any time during that session you opened, browsed or queried data about real people that was not fully anonymized (including in the DICOM browser or a PACS query), the dump may contain such data and must be handled through your usual process for patient or study-participant data. Other rules of your organisation may also restrict sharing a dump, for example for confidential or unpublished data. Please check before you pass a dump on, and send one to the MITK developers only if you are permitted to share it. MITK never uploads crash dumps; they stay on your computer until you delete them or pass them on yourself.
+A crash dump contains parts of the application's memory from the crashed session. If at any time during that session you opened, browsed or queried data about real people that was not fully anonymized (including in the DICOM browser or a PACS query), the dump may contain such data and must be handled through your usual process for patient or study-participant data. Other rules of your organisation may also restrict sharing a dump, for example for confidential or unpublished data. Please check before you pass a dump on, and send one to the MITK developers only if you are permitted to share it. MITK never uploads crash dumps on its own; they stay on your computer until you delete them or pass them on yourself, for example with a problem report.
 
 \subsection MITKWorkbenchManualPage_CrashDumpDialog_Manager Diagnostic Data
 

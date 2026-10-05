@@ -262,8 +262,8 @@ public:
 
     CPPUNIT_ASSERT(!hadReportButton);
     CPPUNIT_ASSERT_MESSAGE("a crash and a terminated freeze are both named",
-      subtitle.startsWith("MITK closed unexpectedly or stopped responding."));
-    CPPUNIT_ASSERT(deletion.contains("these dumps are deleted now"));
+      subtitle.contains("MITK closed unexpectedly or stopped responding."));
+    CPPUNIT_ASSERT(deletion.contains("these crash dumps are deleted now"));
     CPPUNIT_ASSERT(std::filesystem::exists(m_CrashDump));
     CPPUNIT_ASSERT(std::filesystem::exists(m_FreezeDump));
     CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListUnacknowledgedDumps().empty());

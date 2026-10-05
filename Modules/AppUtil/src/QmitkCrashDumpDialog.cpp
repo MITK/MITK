@@ -22,12 +22,18 @@ found in the LICENSE file.
 #include <mitkLogBackend.h>
 
 #include <QDialogButtonBox>
+#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
 
 #include <algorithm>
+
+namespace
+{
+  constexpr int kMinimumWidth = 480;
+}
 
 QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent)
   : QDialog(parent)
@@ -51,25 +57,30 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
 
   const bool single = dumps.size() == 1;
 
-  auto* messageLabel = new QLabel(QString(single
-    ? "A diagnostic snapshot of that session was saved. Handed in with a problem report, it helps us "
-      "find the cause and make MITK more reliable."
-    : "Diagnostic snapshots of that session were saved. Handed in with a problem report, they help us "
-      "find the cause and make MITK more reliable."));
+  auto* messageLabel = new QLabel(QmitkCrashDumpUi::Paragraph(single
+    ? "A crash dump of that session was saved. Attached to a problem report, it helps us find the cause."
+    : "Crash dumps of that session were saved. Attached to a problem report, they help us find the cause."));
   messageLabel->setWordWrap(true);
 
   auto* dumpList = new QmitkCrashDumpListWidget;
   dumpList->SetSelectionEnabled(false);
   dumpList->SetDumps(dumps);
+  // Every dump this dialog shows is new.
+  dumpList->SetColumnHidden(QmitkCrashDumpListWidget::StatusColumn, true);
   dumpList->FitToContents();
+
+  // Sets the list off from the text around it, on a surface of its own in
+  // the dark theme.
+  auto* dumpGroupBox = new QGroupBox;
+  auto* dumpGroupLayout = new QVBoxLayout(dumpGroupBox);
+  dumpGroupLayout->addWidget(dumpList);
 
   auto* privacyLabel = new QLabel(QmitkCrashDumpUi::PrivacyNote());
   privacyLabel->setWordWrap(true);
 
-  auto* deletionLabel = new QLabel(QmitkCrashDumpUi::Warning(single
-    ? "Unless you keep it, this dump is deleted now."
-    : "Unless you keep them, these dumps are deleted now.") +
-    " Kept dumps can be found later under <i>Help&nbsp;&gt; Diagnostic&nbsp;Data...</i>");
+  auto* deletionLabel = new QLabel(QmitkCrashDumpUi::Paragraph(QmitkCrashDumpUi::Warning(single
+    ? "Unless you keep it, this crash dump is deleted now."
+    : "Unless you keep them, these crash dumps are deleted now.")));
   deletionLabel->setObjectName("deletionLabel");
   deletionLabel->setWordWrap(true);
 
@@ -96,12 +107,12 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   content->setContentsMargins(16, 12, 16, 14);
   content->addWidget(messageLabel);
   content->addSpacing(4);
-  content->addWidget(dumpList);
-  content->addSpacing(4);
+  content->addWidget(dumpGroupBox);
+  content->addSpacing(14);
   content->addWidget(privacyLabel);
-  content->addSpacing(6);
+  content->addSpacing(14);
   content->addWidget(deletionLabel);
-  content->addSpacing(4);
+  content->addSpacing(12);
   content->addStretch();
   content->addWidget(buttonBox);
 
@@ -112,14 +123,22 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   layout->addWidget(header);
   layout->addLayout(content);
 
-  this->setMinimumWidth(560);
-
-  // The size hint of word-wrapped labels assumes a narrower width than they
-  // get, which would leave the dialog with empty space at the bottom.
-  const int width = std::max(this->minimumWidth(), this->sizeHint().width());
+  // The table decides the width and the text wraps to it; the floor keeps
+  // the text readable next to a narrow table. Sized via heightForWidth()
+  // because the size hint of word-wrapped labels assumes another width than
+  // they get, which would leave the dialog with empty space at the bottom.
+  // Both measured in the fonts of the style sheet, which only polishing
+  // applies before the dialog is shown. Set as the minimum, too, because the
+  // one the layout derives takes every word-wrapped label at its narrowest
+  // and would add empty space all the same.
+  this->ensurePolished();
+  const int width = std::max(kMinimumWidth, this->minimumSizeHint().width());
   const int height = this->heightForWidth(width);
   if (height > 0)
+  {
+    this->setMinimumSize(width, height);
     this->resize(width, height);
+  }
 }
 
 void QmitkCrashDumpDialog::ShowIfCrashedLastRun(QWidget* parent)

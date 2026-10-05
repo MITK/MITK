@@ -39,13 +39,19 @@ namespace QmitkCrashDumpUi
   /** \p text as rich text in the warning colour, bold. */
   QString Warning(const QString& text);
 
-  /** What to consider before passing a dump on, as rich text with a
-   *  warning-coloured lead-in. */
-  QString PrivacyNote();
+  /** \p text as a rich-text heading or paragraph, with the line spacing of
+   *  MITK's other message boxes. */
+  QString Heading(const QString& text);
+  QString Paragraph(const QString& text);
+
+  /** What to consider before passing a dump on, as a heading and
+   *  paragraphs of rich text. With \p pointToManager, it says where kept
+   *  dumps can be found, which the manager itself has no need for. */
+  QString PrivacyNote(bool pointToManager = true);
 
   /** The band at the top of the crash-dump dialogs: the application icon
-   *  with an accent-coloured badge marking an exceptional state, a title and
-   *  a subtitle. */
+   *  with an accent-coloured badge marking an exceptional state, a title as
+   *  a heading, and a subtitle, which is rich text. */
   QWidget* CreateHeader(const QString& title, const QString& subtitle);
 
   /** Opens each distinct folder containing one of \p files. */

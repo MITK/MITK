@@ -104,7 +104,8 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
     {
       resultBox.setIcon(QMessageBox::Information);
       resultBox.setTextFormat(Qt::RichText);
-      resultBox.setText("A diagnostic snapshot was saved.<br/><br/>" + QmitkCrashDumpUi::PrivacyNote());
+      resultBox.setText(QmitkCrashDumpUi::Paragraph("A diagnostic snapshot was saved.") +
+        QmitkCrashDumpUi::PrivacyNote());
       resultBox.setDetailedText(QString::fromStdWString(snapshot->wstring()));
       auto *managerButton = resultBox.addButton("Open Diagnostic Data...", QMessageBox::ActionRole);
       QPushButton *reportButton = nullptr;

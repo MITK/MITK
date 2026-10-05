@@ -92,10 +92,10 @@ QmitkCrashDumpManagerDialog::QmitkCrashDumpManagerDialog(QWidget* parent)
   auto* header = QmitkCrashDumpUi::CreateHeader("Diagnostic data",
     "Crash dumps and diagnostic snapshots saved on this computer.");
 
-  auto* introLabel = new QLabel(
+  auto* introLabel = new QLabel(QmitkCrashDumpUi::Paragraph(
     "Crash dumps are written when MITK closes unexpectedly or is terminated while unresponsive; "
     "snapshots are captured on request. Hand them in with a problem report to help us find the "
-    "cause.<br/><br/>" + QmitkCrashDumpUi::PrivacyNote());
+    "cause.") + QmitkCrashDumpUi::PrivacyNote(false));
   introLabel->setWordWrap(true);
 
   m_StateLabel->setWordWrap(true);

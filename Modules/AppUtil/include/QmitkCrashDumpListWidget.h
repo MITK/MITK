@@ -68,9 +68,13 @@ public:
   /** \brief Multi-selection (default) or a read-only list. */
   void SetSelectionEnabled(bool enabled);
 
+  /** \brief Hide or show \p column, e.g. one that says the same in every row. */
+  void SetColumnHidden(Column column, bool hidden);
+
   /** \brief Size the list to the rows and columns currently shown, without
-   *  scroll bars, for a short list that should neither take up space it does
-   *  not need nor hide columns. */
+   *  scroll bars or elided text, for a short list that should neither take up
+   *  space it does not need nor hide anything. Width beyond that goes to the
+   *  version column. */
   void FitToContents();
 
 signals:

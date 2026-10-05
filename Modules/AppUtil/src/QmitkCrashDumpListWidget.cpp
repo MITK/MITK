@@ -139,18 +139,40 @@ std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetSelectedDumps() co
   return selected;
 }
 
+void QmitkCrashDumpListWidget::SetColumnHidden(Column column, bool hidden)
+{
+  m_Tree->setColumnHidden(column, hidden);
+}
+
 void QmitkCrashDumpListWidget::FitToContents()
 {
+  // Measured in the font and with the item margins of the style sheet,
+  // which a list that has not been shown yet does not have otherwise.
+  m_Tree->ensurePolished();
+
+  // Left-aligned columns fitted exactly would nearly touch.
+  const int gap = 3 * m_Tree->fontMetrics().averageCharWidth();
+
+  // Also lifts the cap SetDumps() puts on the version column: a list that
+  // takes all the width it needs pushes no column out of view.
+  for (int column = 0; column < m_Tree->columnCount(); ++column)
+  {
+    m_Tree->resizeColumnToContents(column);
+    m_Tree->setColumnWidth(column, m_Tree->columnWidth(column) + gap);
+  }
+
+  auto* header = m_Tree->header();
   const int frame = 2 * m_Tree->frameWidth();
 
-  int height = m_Tree->header()->sizeHint().height() + frame;
+  int height = header->sizeHint().height() + frame;
   for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
     height += m_Tree->sizeHintForRow(row);
 
   m_Tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_Tree->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_Tree->setMinimumWidth(m_Tree->header()->length() + frame);
+  m_Tree->setMinimumWidth(header->length() + frame);
   m_Tree->setFixedHeight(height);
+  header->setSectionResizeMode(VersionColumn, QHeaderView::Stretch);
   this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 

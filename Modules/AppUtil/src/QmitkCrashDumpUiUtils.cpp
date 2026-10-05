@@ -37,6 +37,8 @@ namespace
   constexpr int kBadgeOverhang = 8;
   constexpr int kBadgedIconSize = kIconSize + kBadgeOverhang;
 
+  constexpr auto kLineHeightStyle = "style='line-height: 1.25'";
+
   /** The color of the stylesheet class "font.<name>", which the MITK light
    *  and dark stylesheets define for rich text; invalid if there is none. */
   QColor StyleSheetColor(const QString& name)
@@ -146,19 +148,29 @@ QString QmitkCrashDumpUi::Warning(const QString& text)
   return QString("<span style=\"color: %1; font-weight: bold;\">%2</span>").arg(WarningColor().name(), text);
 }
 
-QString QmitkCrashDumpUi::PrivacyNote()
+QString QmitkCrashDumpUi::Heading(const QString& text)
 {
-  return Warning("Before you share a dump:") +
-    " a crash dump or diagnostic snapshot contains parts of the application's memory from the "
-    "session it was taken in. If at any time during that session you opened, browsed or queried "
-    "data about real people that was not fully anonymized (including in the DICOM browser or a "
-    "PACS query), it may contain such data and must be handled through your usual process for "
-    "patient or study-participant data. Other rules of your organisation may also restrict "
-    "sharing it, for example for confidential or unpublished data. Please check before you pass "
-    "a dump on. A copy of the session's log is usually kept with a dump. It is plain text and "
-    "lists, for example, the paths of opened files, which often contain a patient name or ID; "
-    "read it before you pass it on with the dump. MITK never uploads crash dumps; they stay on "
-    "this computer.";
+  return QString("<h3 %1>%2</h3>").arg(kLineHeightStyle, text);
+}
+
+QString QmitkCrashDumpUi::Paragraph(const QString& text)
+{
+  return QString("<p %1>%2</p>").arg(kLineHeightStyle, text);
+}
+
+QString QmitkCrashDumpUi::PrivacyNote(bool pointToManager)
+{
+  QString check = "Please check before you send a crash dump. A copy of the session's log is kept with the "
+    "dump and is plain text.";
+
+  if (pointToManager)
+    check += " Kept dumps can be found under <i>Help&nbsp;&gt; Diagnostic&nbsp;Data</i>.";
+
+  return Heading("Before you share a crash dump") +
+    Paragraph("A crash dump contains parts of the application's memory. If you worked with or queried "
+      "non-anonymized patient data, it may contain such data. Data protection laws apply.") +
+    Paragraph(check) +
+    Paragraph("MITK never uploads crash dumps on its own.");
 }
 
 QWidget* QmitkCrashDumpUi::CreateHeader(const QString& title, const QString& subtitle)
@@ -179,15 +191,13 @@ QWidget* QmitkCrashDumpUi::CreateHeader(const QString& title, const QString& sub
   iconLabel->setPixmap(BadgedApplicationIcon(accent, header->devicePixelRatioF()));
   iconLabel->setFixedSize(kBadgedIconSize, kBadgedIconSize);
 
-  auto* titleLabel = new QLabel(title);
+  // A heading in the text rather than a larger widget font, which the
+  // application's style sheet would override.
+  auto* titleLabel = new QLabel(Heading(title));
   titleLabel->setObjectName("crashDumpHeaderTitle");
-  auto titleFont = titleLabel->font();
-  titleFont.setPointSizeF(titleFont.pointSizeF() * 1.35);
-  titleFont.setWeight(QFont::DemiBold);
-  titleLabel->setFont(titleFont);
   titleLabel->setWordWrap(true);
 
-  auto* subtitleLabel = new QLabel(subtitle);
+  auto* subtitleLabel = new QLabel(Paragraph(subtitle));
   subtitleLabel->setObjectName("crashDumpHeaderSubtitle");
   subtitleLabel->setWordWrap(true);
 

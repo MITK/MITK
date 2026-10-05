@@ -43,13 +43,17 @@ is one -- so rewording a message does not churn the manifest.
 ### Where the data comes from
 
 `cmake/PETIBSIData.cmake` resolves the DRO tree at MITK-build configure
-time. Three CMake cache variables control it:
+time. Two CMake cache variables control it:
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `MITK_PET_DOWNLOAD_IBSI_DATA` | `ON` | Master switch. When `ON`, the configure step `FetchContent`-clones the upstream repo into `${CMAKE_BINARY_DIR}/PETIBSIData-src/` and sets `MITK_PET_IBSI_DATA_DIR` accordingly. |
-| `MITK_PET_IBSI_DATA_DIR` | empty | Pre-existing checkout. When set, the configure step skips the download and validates the directory; useful for offline / proxied builds and for development against a local fork. |
-| `MITK_PET_IBSI_DATA_GIT_TAG` | pinned commit SHA | Pinned upstream commit. Bumping invalidates the in-source `BenchmarkCase` manifest in `mitkPETIBSIBenchmarkTest.cpp`; re-validate after every bump. |
+| `MITK_PET_DOWNLOAD_IBSI_DATA` | `ON` | Master switch. When `ON` and no checkout is supplied, the configure step `FetchContent`-clones the upstream repo at the pinned commit into `${CMAKE_BINARY_DIR}/PETIBSIData-src/`. |
+| `MITK_PET_IBSI_DATA_DIR` | empty | Pre-existing checkout. When set, the configure step skips the download and validates the directory; useful for offline / proxied builds and for development against a local fork. The script never writes this variable. |
+
+The pinned upstream commit, `MITK_PET_IBSI_DATA_GIT_TAG`, is a plain
+variable in `cmake/PETIBSIData.cmake`, not a cache option: the
+`BenchmarkCase` manifest in `mitkPETIBSIBenchmarkTest.cpp` is only valid
+for that commit.
 
 The data is licensed CC BY 4.0 by the IBSI / Image Biomarker
 Standardisation Initiative (Vácha, Zwanenburg et al.) and is fetched
@@ -93,21 +97,19 @@ longer means "conformant"; keep those two figures apart in every report.
 
 ### Skip behavior
 
-When `MITK_PET_IBSI_DATA_DIR` is empty (offline / network-restricted
-developer build), the test exits with code 77 at runtime and ctest
-reports it as Skipped -- mirroring MITK's existing missing-data
-convention. Primary CI must always have the data.
+When no DRO tree is resolved (download switched off and
+`MITK_PET_IBSI_DATA_DIR` empty, e.g. an offline developer build), the
+test exits with code 77 at runtime and ctest reports it as Skipped --
+mirroring MITK's existing missing-data convention. Primary CI must
+always have the data.
 
 ### Bumping the upstream commit SHA
 
 1. Fetch the new HEAD: `git ls-remote https://github.com/oncoray/suv_computation.git HEAD`.
 2. Set `MITK_PET_IBSI_DATA_GIT_TAG` in `cmake/PETIBSIData.cmake` to the new SHA.
-3. Reconfigure. Note that the bump only takes effect where
-   `MITK_PET_IBSI_DATA_DIR` is *unset* in the cache: the download branch
-   writes that variable with `FORCE`, so in a build tree that has already
-   fetched once the user-supplied branch wins and the new SHA is ignored.
-   Clear the cache entry to re-fetch, or point it at a checkout of the
-   new revision yourself.
+3. Reconfigure. Every build tree that downloads the data moves its
+   checkout to the new SHA; trees with `MITK_PET_IBSI_DATA_DIR` set keep
+   using that checkout and must update it themselves.
 4. Walk the new `DRO/` tree and `docs/DRO_list.csv`. If the case set or
    directory layout has changed, update `kBenchmarkCases` in
    `mitkPETIBSIBenchmarkTest.cpp`. The expected `(0.20, 1.00, 4.00)`
@@ -144,4 +146,4 @@ ctest -L PETSUVCLI -V
 
 All cases under the `PETSUVCLI` label run unconditionally except the
 end-to-end baseline case, which is registered only when
-`MITK_PET_IBSI_DATA_DIR` resolves to a populated tree.
+a DRO tree is resolved.

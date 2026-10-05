@@ -9,7 +9,7 @@
 # so we can pin a *specific* non-zero exit code (CTest's WILL_FAIL only
 # distinguishes zero / non-zero).
 #
-# Cases that need IBSI DRO inputs are gated on MITK_PET_IBSI_DATA_DIR
+# Cases that need IBSI DRO inputs are gated on MITK_PET_IBSI_RESOLVED_DATA_DIR
 # and skipped quietly when it is empty. Argument-parsing cases run
 # unconditionally.
 
@@ -106,8 +106,8 @@ _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_UnknownSex       4
 # These prove the CLI's strict / variant / multi-tracer wiring against
 # real DICOM input.
 
-if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
-  set(_dro_pt   "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
+if(MITK_PET_IBSI_RESOLVED_DATA_DIR AND EXISTS "${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/DRO_0_0/PT")
+  set(_dro_pt   "${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/DRO_0_0/PT")
   set(_dro_out  "${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_DRO_0_0_out.nrrd")
 
   # Successful end-to-end invocation on the canonical baseline DRO.
@@ -124,9 +124,9 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # and no exit code can express it -- the run legitimately succeeds.
   # The baseline case above holds the other half: silence when the input
   # needed nothing, so that "always warns" cannot pass both.
-  if(EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_3_2_3/PT")
+  if(EXISTS "${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/DRO_3_2_3/PT")
     _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_ReportsAdaptations_DRO_3_2_3 0
-      "--input;${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_3_2_3/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_DRO_3_2_3_out.nrrd;--variant;bw"
+      "--input;${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/DRO_3_2_3/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_DRO_3_2_3_out.nrrd;--variant;bw"
       EXPECT_OUTPUT "VendorEmpiricalDecayFallback")
   endif()
 
@@ -144,11 +144,11 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # missing" must keep being right, so a code is never reassigned even
   # when the exception hierarchy is reorganized.
   function(_add_petsuv_cli_exit_code_case name dro expected_exit)
-    if(NOT EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/${dro}/PT")
+    if(NOT EXISTS "${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/${dro}/PT")
       return()
     endif()
     _add_petsuv_cli_smoke(${name} ${expected_exit}
-      "--input;${MITK_PET_IBSI_DATA_DIR}/DRO/${dro}/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/${name}_out.nrrd")
+      "--input;${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/${dro}/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/${name}_out.nrrd")
   endfunction()
 
   # 2 = MissingDICOMProperty against 6 = InvalidDICOMPropertyValue: the
@@ -181,9 +181,9 @@ if(MITK_PET_IBSI_DATA_DIR AND EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/DRO_0_0/PT")
   # The values themselves are pinned in-process by
   # mitkPETIBSIBenchmarkTest.
   foreach(_dro DRO_7_1_0 DRO_7_3_1)
-    if(EXISTS "${MITK_PET_IBSI_DATA_DIR}/DRO/${_dro}/PT")
+    if(EXISTS "${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/${_dro}/PT")
       _add_petsuv_cli_smoke(MitkPETSUVCalculationCLI_EnhancedPerFrame_${_dro} 0
-        "--input;${MITK_PET_IBSI_DATA_DIR}/DRO/${_dro}/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_${_dro}_out.nrrd;--variant;bw"
+        "--input;${MITK_PET_IBSI_RESOLVED_DATA_DIR}/DRO/${_dro}/PT;--output;${CMAKE_CURRENT_BINARY_DIR}/MitkPETSUVCalculationCLI_${_dro}_out.nrrd;--variant;bw"
         REJECT_OUTPUT "rooted in a functional-group sequence")
     endif()
   endforeach()

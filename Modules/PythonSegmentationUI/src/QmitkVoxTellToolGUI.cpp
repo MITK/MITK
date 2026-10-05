@@ -263,6 +263,7 @@ void QmitkVoxTellToolGUI::OnInitializeButtonToggled(bool checked)
   {
     this->GetTool()->UnloadModel();
     this->OnModelUnloaded();
+    m_Ui->promptsTextEdit->clear();
     this->SetStatus("VoxTell is not initialized.");
     return;
   }
@@ -807,9 +808,16 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     this->SetStatus(message, true);
   }
 
+  if (this->UnloadIfSettingsChanged())
+    return;
+
   // Prompts that the text encoder processed for this run are known now.
-  if (!this->UnloadIfSettingsChanged())
-    this->UpdatePromptCompletions();
+  this->UpdatePromptCompletions();
+
+  // The next run usually builds on these prompts: typing replaces them, End or
+  // Ctrl+End keeps them to extend.
+  m_Ui->promptsTextEdit->setFocus(Qt::OtherFocusReason);
+  m_Ui->promptsTextEdit->selectAll();
 }
 
 bool QmitkVoxTellToolGUI::UnloadIfSettingsChanged()

@@ -90,6 +90,8 @@ found in the LICENSE file.
 #include <QmitkCrashDumpManagerDialog.h>
 #endif
 
+#include "QmitkFeedback.h"
+
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();
 
@@ -788,6 +790,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QmitkCrashDumpManagerDialog::ShowManager(mainWindow);
     });
 #endif
+
+    helpMenu->addAction("&Report a Problem / Send Feedback...", mainWindow, [mainWindow] {
+      QmitkFeedback::OpenDialog(mainWindow);
+    });
 
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================

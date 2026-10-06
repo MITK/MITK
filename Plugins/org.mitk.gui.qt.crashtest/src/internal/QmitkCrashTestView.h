@@ -22,6 +22,8 @@ namespace Ui
   class QmitkCrashTestViewControls;
 }
 
+class QmitkCrashDumpListWidget;
+
 /**
  * \brief Deliberately crashes, throws, or freezes the application to
  *        exercise the crash-dump facility end to end.
@@ -59,6 +61,7 @@ private Q_SLOTS:
 
 private:
   std::unique_ptr<Ui::QmitkCrashTestViewControls> m_Controls;
+  QmitkCrashDumpListWidget* m_DumpList = nullptr;
 };
 
 #endif

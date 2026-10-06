@@ -64,11 +64,22 @@ stack or in a register at capture time - not on whether it was loaded:
 | `QString` contents in general | heap; only a pointer on the stack | Usually not |
 
 A dump must be assumed to possibly contain fragments of whatever the
-application was handling at the moment of capture. It will not hold the bulk
-of loaded patient data, but it cannot be assumed free of personal data, and
-there is no way to verify that it is. Every kept dump should be treated as
-potentially containing patient data and shared only through the institution's
-process for handling such data.
+application was handling during the session, not only at the moment of
+capture: stack slots and registers can still hold values left over from
+earlier work, and memory they point to is captured too. It will not hold the
+bulk of loaded data, and there is no way to verify what it does hold. The
+user-facing texts therefore make the rule conditional on the session: if it
+ever touched non-anonymized data about real people (including DICOM browser
+listings and PACS queries), the dump has to be handled like that data. Even
+otherwise, the organisation's own rules (confidential or unpublished data) may
+restrict sharing it, so the decision to pass a dump on is left explicitly with
+the user.
+
+The copy of the session log kept with a dump (see
+\ref CrashDumpFacilityPage_RunInfo) needs the same care, and more directly: it
+is plain text and records, among other things, the paths of the files the
+session opened, which often embed a name or an ID. Unlike the dump, it can be
+read and checked, so the user-facing texts point to it explicitly.
 
 \section CrashDumpFacilityPage_LocalOnly Local-only by construction
 
@@ -91,18 +102,54 @@ facility arms (see below). All builds and installs of the same application
 therefore share one database; the module list inside a dump still identifies
 the exact binaries.
 
-The facility keeps the newest 10 dumps per area; older ones are pruned, and
+The facility keeps the newest <tt>maxDumpsPerKind</tt> dumps per area (crash
+reports, on-demand snapshots, hard-killed freezes; at most 10, see
+\ref CrashDumpFacilityPage_Settings); older ones are pruned at start-up, and
 Crashpad prunes its own report area on its age/size schedule as well. The
 primary cleanup, however, is the next-start dialog: dumps the user does not
 explicitly keep are deleted immediately.
+
+\section CrashDumpFacilityPage_Settings Settings
+
+The persistent settings (mitk::CrashDumpSettings) live in
+<tt>mitk-settings.json</tt> in the database directory, not in the MITK
+preferences:
+
+<table>
+<tr><th>Key</th><th>Range</th><th>Default</th><th>Effect</th></tr>
+<tr><td><tt>enabled</tt></td><td>bool</td><td>true</td><td>Arm the handler.</td></tr>
+<tr><td><tt>maxDumpsPerKind</tt></td><td>1-10</td><td>10</td><td>Retention per dump area.</td></tr>
+<tr><td><tt>watchdogTimeoutSeconds</tt></td><td>0, or 10-3600</td><td>0 (off)</td><td>UI-freeze watchdog timeout.</td></tr>
+</table>
+
+They are read by mitk::CrashDumpFacility::Initialize() and take effect at the
+next start. Preferences would not do: arming happens before Qt and the
+preference service exist, and a preference is per install (and temporary in
+\c --BlueBerry.newInstance sessions) while the file has the scope of the
+dumps it governs. A missing file means the defaults; an unreadable file, a key
+of the wrong type or an out-of-range value falls back to the default or is
+clamped, with a warning - the facility never fails start-up over its settings.
+The Workbench and FlowBench edit the file through the
+<i>Reports and Diagnostics > Crash Dumps</i> preference page
+(mitk::CrashDumpFacility::WriteSettings()).
+
+Precedence at start-up is command line, then environment variable, then
+settings file: \c --MITK.no-crash-dumps and \c MITK_NO_CRASH_DUMPS disable
+crash dumps even when <tt>enabled</tt> is true, and \c --MITK.ui-watchdog
+and \c MITK_UI_WATCHDOG replace the stored watchdog timeout (with any value,
+including 0, and without clamping, so that a debugging session can use a short
+timeout). mitk::ResolveCrashDumpSessionOptions() implements this rule;
+mitk::GetCrashDumpSessionOptions() tells the preference page which override is
+active.
 
 \section CrashDumpFacilityPage_Snapshots Non-fatal snapshots and dump kinds
 
 Besides the crash dumps the handler writes automatically, the facility can
 capture a minidump of the running process without crashing it, via
 mitk::CrashDumpFacility::CaptureSnapshot (Crashpad's DumpWithoutCrash - a
-full, all-thread dump). Three kinds of dump are tracked so the next-start
-dialog surfaces only the right ones:
+full, all-thread dump). Not available on macOS, whose Crashpad client has no
+DumpWithoutCrash (mitk::CrashDumpFacility::SupportsSnapshots()). Three kinds
+of dump are tracked so the next-start dialog surfaces only the right ones:
 
 - <b>Crash dumps</b> - written by the handler on a hard crash. Surfaced.
 - <b>On-demand snapshots</b> - the "Capture diagnostics" button on the
@@ -121,6 +168,14 @@ is therefore crash dumps plus <tt>mitk-pending-freeze</tt> survivors;
 enumerable per kind via mitk::CrashDumpFacility::ListSnapshots, so diagnostic
 tooling can inspect them without knowing the directory layout.
 
+mitk::CrashDumpFacility::ListAllDumps() lists every dump the user can handle,
+each with its mitk::DumpKind (Crash, UnresponsiveTerminated, OnDemand, derived
+from the area it is filed in) and its run info. The provisional snapshots of
+the running session are left out there, as well as from the surfacable set and
+from the acknowledgment watermark: they are deleted automatically when the
+freeze recovers, and a slow start-up that briefly trips the watchdog must not
+show up as a terminated session.
+
 \subsection CrashDumpFacilityPage_Snapshots_Watchdog UI-freeze watchdog
 
 The watchdog is opt-in and silent. A Qt-free mitk::HeartbeatMonitor runs a
@@ -137,9 +192,12 @@ behind and never prompts on the next start. Only a freeze that ends in a hard
 kill (the out-of-process handler already wrote the dumps) survives.
 
 It is off by default - legitimate long UI-thread operations exist, and false
-positives would erode trust. Enable it with a timeout in seconds via the
+positives would erode trust. Enable it with a timeout in seconds in the
+settings file (the Crash Dumps preference page), or for one session via the
 environment variable \c MITK_UI_WATCHDOG or the command-line option
-\c --MITK.ui-watchdog (the command-line option takes precedence).
+\c --MITK.ui-watchdog (see \ref CrashDumpFacilityPage_Settings for the
+precedence). Modal dialogs run a nested event loop and keep the heartbeat
+going, so a dialog left open is not a freeze.
 
 \section CrashDumpFacilityPage_Wiring Application wiring
 
@@ -164,13 +222,17 @@ Handler name and source file are defined once in the top-level
 so what is placed and what the facility spawns cannot drift apart.
 
 Because arming happens before option parsing, the facility can only be
-disabled through the raw command line or the environment:
+disabled through the settings file, the raw command line or the environment:
 
+- <tt>"enabled": false</tt> in <tt>mitk-settings.json</tt>
 - command-line flag \c --MITK.no-crash-dumps
 - environment variable \c MITK_NO_CRASH_DUMPS
 
 An application <tt>.ini</tt> file cannot gate the facility; its options are
 parsed only after the facility is armed. This is a documented limitation.
+Disabled or not, the facility is initialized (the flag and the variable pass
+mitk::CrashDumpFacility::Config::Arm = false), so that the dumps already on
+disk stay listable and deletable in a session that records no new ones.
 
 If a run crashed, the next start shows QmitkCrashDumpDialog (hooked into the
 workbench window advisors of the Workbench and FlowBench). The trigger is a
@@ -178,7 +240,59 @@ scan for dumps newer than the last acknowledged one - not sentry's
 crashed-last-run marker, which is experimental API and unreliable under the
 single-instance argument forwarding of \c setSingleMode(true); the marker is
 only used as a corroborating signal. Dumps are surfaced exactly once:
-keeping and discarding both acknowledge them.
+<i>Keep for later</i>, <i>Remove</i> (also on closing the dialog) and
+<i>File report...</i> all acknowledge them.
+
+All dumps, kept or new, are handled in QmitkCrashDumpManagerDialog, a
+non-modal dialog opened from <i>Help > Diagnostic Data...</i>, from the
+preference page and from the "Capture diagnostics" result. It is a dialog of
+its own rather than a preference page because deleting is immediate and
+cannot be undone by the preference dialog's Cancel.
+
+\section CrashDumpFacilityPage_RunInfo Run info per dump
+
+Every dump records the session it came from in mitk::CrashRunInfo: the
+release string, the installation directory and the session's log file. At
+arming time the facility writes a per-process file
+(<tt>mitk-run-info/&lt;pid&gt;/mitk-run-info.json</tt> in the database; per
+process because all of the user's running instances share the database) and
+registers it as a Crashpad attachment. Initialize() removes the entries of
+processes that no longer run. The handler copies attachments into a
+report when it writes the dump, reading them at that moment, so the log path
+that QmitkCrashDumpDialog::ShowIfCrashedLastRun() adds once the log is open
+(mitk::CrashDumpFacility::SetSessionLogFile()) reaches every later dump.
+A dump taken before that point carries an empty log path.
+
+The recorded path alone would not do: mitk::LogBackend rotates
+<tt>mitk-0.log</tt> .. <tt>mitk-9.log</tt> on every start, so on the next
+start of the same install the name already belongs to the new session. The
+facility therefore keeps a copy of the log next to the dump
+(mitk::CrashDumpInfo::SessionLog). A snapshot copies the log as written so far
+at capture time. A crash dump gets its copy when it is first seen, normally in
+the next Initialize() of the crashed install, which runs before the logs are
+rotated; a log written after the dump is taken to be a later session's and is
+not copied, so such a dump simply has no log.
+
+The facility then keeps the run info next to the dump as
+<tt>&lt;dump file name&gt;.json</tt> and the log copy as
+<tt>&lt;dump file name&gt;.log</tt>: snapshots take both at capture, before
+their report is released, crash dumps when they are first seen. Deleting or
+pruning a dump removes both. Snapshots do not depend on the attachment: the
+live session writes the snapshot's run info itself at capture. Only crash
+dumps do. The sidecar layout is internal; the contract is
+mitk::CrashDumpInfo::RunInfo, which stays empty for dumps from before this
+mechanism, and for crash dumps on platforms where the attachment does not
+arrive (verified on Windows; Linux shares the code path; macOS is unexplored).
+
+\section CrashDumpFacilityPage_ReportService Filing a report
+
+The crash-dump UI does not send anything itself. A report feature registers an
+mitk::ICrashReportService micro service; while one is registered, the
+next-start dialog, the diagnostic data manager and the "Capture diagnostics"
+result offer <i>File report...</i>, which hands the chosen dumps to the
+service and leaves them on disk. Without a registered service the button is
+not shown anywhere. The interface lives in \c MitkAppUtil rather than in the
+Qt-free \c MitkCrashHandling because it takes a parent widget.
 
 \section CrashDumpFacilityPage_Processes The handler process and multiple instances
 
@@ -237,7 +351,16 @@ also walks the full facility cycle headlessly after a real crash - arm, list,
 acknowledge, delete - i.e. the operations the next-start dialog drives without
 any UI. Because these tests only pass when arming succeeds, they also pin the
 handler filename: a mismatch between the shipped file and the \c handler_path
-the facility sets would make them fail.
+the facility sets would make them fail. Further cases cover the settings
+(an unarmed facility still lists and deletes, <tt>enabled=false</tt> blocks
+arming, retention follows <tt>maxDumpsPerKind</tt>), the dump kinds, the
+exclusion of the running session's provisional snapshots, and the run info a
+real crash dump and a snapshot carry.
+
+\c MitkAppUtil adds \c mitkCrashDumpSessionOptionsTest for the start-up
+precedence and \c QmitkCrashDumpUiTest for the list widget, the manager and
+the next-start dialog, including the <i>File report...</i> button with and
+without a registered mitk::ICrashReportService.
 
 Those tests spawn a plain helper executable, so what they pin is the runtime
 output directory. Each application additionally gets a

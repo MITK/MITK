@@ -87,6 +87,7 @@ found in the LICENSE file.
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <QmitkCrashDumpDialog.h>
+#include <QmitkCrashDumpManagerDialog.h>
 #endif
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
@@ -770,6 +771,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
       helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
     }
+
+#ifdef MITK_HAS_CRASHHANDLING
+    helpMenu->addAction("&Diagnostic Data...", mainWindow, [mainWindow] {
+      QmitkCrashDumpManagerDialog::ShowManager(mainWindow);
+    });
+#endif
 
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================

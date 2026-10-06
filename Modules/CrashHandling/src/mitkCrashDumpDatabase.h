@@ -37,8 +37,25 @@ found in the LICENSE file.
  */
 namespace mitk
 {
+  /** Facility-owned subdirectories of the database. Snapshots are moved out
+   *  of Crashpad's report area into one of these so their kind is a
+   *  filesystem fact that survives a hard kill. */
+  inline const std::filesystem::path OnDemandSnapshotsSubdir = "mitk-snapshots";
+  inline const std::filesystem::path PendingFreezeSubdir = "mitk-pending-freeze";
+
+  /** Base name of the run-info file the handler attaches to every report.
+   *  Crashpad keeps an attachment's base name, which is how it is found
+   *  again under attachments/<report-uuid>/. */
+  inline const std::filesystem::path RunInfoAttachmentFileName = "mitk-run-info.json";
+
+  /** \brief Kind of the dump at \p dumpPath, from the area it is filed in.
+   *  Snapshot areas are flat, so the immediate parent decides; everything
+   *  else belongs to Crashpad's report area. */
+  MITKCRASHHANDLING_EXPORT DumpKind ClassifyDump(const std::filesystem::path& dumpPath);
+
   /** \brief All *.dmp files under \p databaseDirectory (recursive), newest
-   *  first; ties broken by path for deterministic order. */
+   *  first; ties broken by path for deterministic order. Kind is set, RunInfo
+   *  is not (see LoadRunInfo()). */
   MITKCRASHHANDLING_EXPORT std::vector<CrashDumpInfo> ScanCrashDumps(
     const std::filesystem::path& databaseDirectory,
     const std::vector<std::filesystem::path>& excludedSubdirs = {});
@@ -49,8 +66,8 @@ namespace mitk
     const std::filesystem::path& databaseDirectory,
     const std::vector<std::filesystem::path>& excludedSubdirs = {});
 
-  /** \brief Delete the oldest dumps so that at most \p maxCount remain.
-   *  Returns the number of dumps actually deleted. */
+  /** \brief Delete the oldest dumps, with their run info and log copies, so
+   *  that at most \p maxCount remain. Returns the number of dumps actually deleted. */
   MITKCRASHHANDLING_EXPORT std::size_t PruneCrashDumps(
     const std::filesystem::path& databaseDirectory, std::size_t maxCount,
     const std::vector<std::filesystem::path>& excludedSubdirs = {});
@@ -96,6 +113,65 @@ namespace mitk
   /** \brief Location of the watermark marker file inside the database. */
   MITKCRASHHANDLING_EXPORT std::filesystem::path GetAcknowledgedMarkerFilePath(
     const std::filesystem::path& databaseDirectory);
+
+  /** \brief Location of the settings file inside the database. */
+  MITKCRASHHANDLING_EXPORT std::filesystem::path GetSettingsFilePath(
+    const std::filesystem::path& databaseDirectory);
+
+  /** \brief \p settings with every value moved into its documented range.
+   *  With \p warn, each corrected value is reported via MITK_WARN. */
+  MITKCRASHHANDLING_EXPORT CrashDumpSettings ClampCrashDumpSettings(
+    const CrashDumpSettings& settings, bool warn);
+
+  /** \brief The stored settings, clamped. A missing file yields the defaults
+   *  silently; an unreadable or malformed file, or a key of the wrong type,
+   *  yields the defaults for what could not be read, with MITK_WARN. */
+  MITKCRASHHANDLING_EXPORT CrashDumpSettings ReadCrashDumpSettings(
+    const std::filesystem::path& databaseDirectory);
+
+  /** \brief Store \p settings (clamped). False if the file could not be
+   *  written. */
+  MITKCRASHHANDLING_EXPORT bool WriteCrashDumpSettings(
+    const std::filesystem::path& databaseDirectory, const CrashDumpSettings& settings);
+
+  /** \brief Where the run info of \p dumpPath is kept: next to it, as
+   *  "<dump file name>.json". */
+  MITKCRASHHANDLING_EXPORT std::filesystem::path GetRunInfoSidecarPath(
+    const std::filesystem::path& dumpPath);
+
+  /** \brief The run info stored in \p file; nullopt if it is missing or
+   *  malformed. */
+  MITKCRASHHANDLING_EXPORT std::optional<CrashRunInfo> ReadRunInfo(const std::filesystem::path& file);
+
+  /** \brief Store \p runInfo in \p file, replacing it atomically so that a
+   *  handler copying the file at capture time never reads a partial one. */
+  MITKCRASHHANDLING_EXPORT bool WriteRunInfo(const std::filesystem::path& file, const CrashRunInfo& runInfo);
+
+  /** \brief Give the dump \p dumpPath its sidecar from the run-info
+   *  attachment of report \p reportId, unless it already has one. Returns
+   *  whether a sidecar exists afterwards. */
+  MITKCRASHHANDLING_EXPORT bool AdoptRunInfoAttachment(const std::filesystem::path& databaseDirectory,
+    const std::filesystem::path& reportId, const std::filesystem::path& dumpPath);
+
+  /** \brief Where the copy of a dump's session log is kept: next to it, as
+   *  "<dump file name>.log". */
+  MITKCRASHHANDLING_EXPORT std::filesystem::path GetSessionLogCopyPath(
+    const std::filesystem::path& dumpPath);
+
+  /** \brief Keep a copy of \p logFile with the dump \p dumpPath, unless it
+   *  already has one. Returns whether a copy exists afterwards.
+   *
+   *  Log rotation hands the session's log name to the next session of the
+   *  same install, so the file found under that name is the dump's own log
+   *  only until then. With \p notAfter, a log written later than that is
+   *  taken to be such a later session's and not copied. An existing copy is
+   *  never replaced. */
+  MITKCRASHHANDLING_EXPORT bool KeepSessionLog(const std::filesystem::path& dumpPath,
+    const std::filesystem::path& logFile, std::optional<std::filesystem::file_time_type> notAfter);
+
+  /** \brief Fill \p dump's RunInfo and SessionLog from the files kept next
+   *  to it, if there are any. */
+  MITKCRASHHANDLING_EXPORT void LoadRunInfo(CrashDumpInfo& dump);
 }
 
 #endif

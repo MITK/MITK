@@ -2,7 +2,7 @@ project(org_mitk_gui_qt_crashtest)
 
 set(crashhandling_dep )
 if(MITK_USE_sentry)
-  set(crashhandling_dep MitkCrashHandling)
+  set(crashhandling_dep MitkCrashHandling MitkAppUtil)
 endif()
 
 mitk_create_plugin(

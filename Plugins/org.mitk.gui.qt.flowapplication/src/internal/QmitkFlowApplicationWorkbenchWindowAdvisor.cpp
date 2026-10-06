@@ -53,6 +53,7 @@ found in the LICENSE file.
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <QmitkCrashDumpDialog.h>
+#include <QmitkCrashDumpManagerDialog.h>
 #endif
 
 #include <mitkVersion.h>
@@ -538,6 +539,11 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
   helpMenu->addAction("&User Manuals", this, SLOT(onHelpOpenHelpView()));
   helpMenu->addAction("&Context Help", QKeySequence("F1"), this, &QmitkFlowApplicationWorkbenchWindowAdvisor::onHelp);
+#ifdef MITK_HAS_CRASHHANDLING
+  helpMenu->addAction("&Diagnostic Data...", mainWindow, [mainWindow] {
+    QmitkCrashDumpManagerDialog::ShowManager(mainWindow);
+  });
+#endif
   helpMenu->addAction("&About",this, SLOT(onAbout()));
   // =====================================================
 

@@ -6,11 +6,21 @@
           class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
       <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
     </page>
+    <page id="org.mitk.ReportsAndDiagnosticsPreferencePage" name="Reports and Diagnostics"
+          class="QmitkReportsAndDiagnosticsPreferencePage">
+      <keywordreference id="org.mitk.CrashDumpsPreferencePageKeywords"/>
+    </page>
+    <page id="org.mitk.CrashDumpsPreferencePage" name="Crash Dumps"
+          class="QmitkCrashDumpsPreferencePage" category="org.mitk.ReportsAndDiagnosticsPreferencePage">
+      <keywordreference id="org.mitk.CrashDumpsPreferencePageKeywords"/>
+    </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances running multiple behavior repeated invocations mitk"/>
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene file .mitk"/>
+    <keyword id="org.mitk.CrashDumpsPreferencePageKeywords" label="crash dump minidump diagnostic data report problem"/>
+    <keyword id="org.mitk.CrashDumpsPreferencePageKeywords" label="watchdog unresponsive freeze hang"/>
   </extension>
 
   <extension point="org.blueberry.ui.views">

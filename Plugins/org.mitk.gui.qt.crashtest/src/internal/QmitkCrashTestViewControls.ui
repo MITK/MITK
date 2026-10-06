@@ -101,42 +101,6 @@
      </property>
      <layout class="QVBoxLayout" name="dumpsLayout">
       <item>
-       <widget class="QTreeWidget" name="dumpTreeWidget">
-        <property name="rootIsDecorated">
-         <bool>false</bool>
-        </property>
-        <property name="uniformRowHeights">
-         <bool>true</bool>
-        </property>
-        <property name="itemsExpandable">
-         <bool>false</bool>
-        </property>
-        <property name="allColumnsShowFocus">
-         <bool>true</bool>
-        </property>
-        <column>
-         <property name="text">
-          <string>Kind</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>File</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Captured</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Size</string>
-         </property>
-        </column>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="dumpButtonsLayout">
         <item>
          <widget class="QPushButton" name="refreshButton">

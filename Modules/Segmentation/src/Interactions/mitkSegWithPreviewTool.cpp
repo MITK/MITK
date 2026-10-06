@@ -37,6 +37,33 @@ found in the LICENSE file.
 #include <algorithm>
 #include <map>
 #include <optional>
+#include <utility>
+
+namespace
+{
+  // Calls a function when it goes out of scope, whether by return or by an
+  // exception.
+  template <typename TFunction>
+  class ScopeExit
+  {
+  public:
+    explicit ScopeExit(TFunction function)
+      : m_Function(std::move(function))
+    {
+    }
+
+    ~ScopeExit()
+    {
+      m_Function();
+    }
+
+    ScopeExit(const ScopeExit&) = delete;
+    ScopeExit& operator=(const ScopeExit&) = delete;
+
+  private:
+    TFunction m_Function;
+  };
+}
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -740,6 +767,15 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;
+
+  // However the update ends, the tool is not busy afterwards. A tool left busy
+  // keeps the tools of the host disabled.
+  const ScopeExit endBusy([this]
+    {
+      m_IsUpdating = false;
+      this->CurrentlyBusy.Send(false);
+    });
+
   m_HasUnconfirmedPreview = false;
   this->UpdatePrepare();
 
@@ -835,12 +871,6 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     MITK_ERROR << "Exception caught: " << e.what();
     ErrorMessage.Send(e.what());
   }
-  catch (...)
-  {
-    m_IsUpdating = false;
-    CurrentlyBusy.Send(false);
-    throw;
-  }
 
   this->UpdateCleanUp();
 
@@ -854,9 +884,6 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   // the discarded preview would never be recomputed for it.
   if (!cancelled)
     m_LastTimePointOfUpdate = timePoint;
-
-  m_IsUpdating = false;
-  CurrentlyBusy.Send(false);
 }
 
 bool mitk::SegWithPreviewTool::IsCancelable() const

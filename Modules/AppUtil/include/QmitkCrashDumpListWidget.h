@@ -26,6 +26,7 @@ class QTreeWidget;
 namespace mitk
 {
   struct CrashDumpInfo;
+  enum class DumpKind;
 }
 
 /**
@@ -69,6 +70,16 @@ public:
   /** \brief Multi-selection (default) or a read-only list. */
   void SetSelectionEnabled(bool enabled);
 
+  /** \brief Show a check box per dump, for a list that picks the dumps an
+   *  action applies to. Off by default; SetDumps() checks every dump. */
+  void SetCheckable(bool checkable);
+
+  /** \brief The checked dumps in table order; empty unless checkable. */
+  std::vector<mitk::CrashDumpInfo> GetCheckedDumps() const;
+
+  /** \brief How the kind column names \p kind. */
+  static QString KindLabel(mitk::DumpKind kind);
+
   /** \brief Hide or show \p column, e.g. one that says the same in every row. */
   void SetColumnHidden(Column column, bool hidden);
 
@@ -80,10 +91,14 @@ public:
 
 signals:
   void SelectionChanged();
+  void CheckedChanged();
 
 private:
+  void ApplyCheckable();
+
   QTreeWidget* m_Tree;
   std::vector<mitk::CrashDumpInfo> m_Dumps;
+  bool m_Checkable;
 };
 
 #endif

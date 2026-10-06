@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QLocale>
+#include <QSignalBlocker>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -44,7 +45,8 @@ namespace
 
 QmitkCrashDumpListWidget::QmitkCrashDumpListWidget(QWidget* parent)
   : QWidget(parent),
-    m_Tree(new QTreeWidget(this))
+    m_Tree(new QTreeWidget(this)),
+    m_Checkable(false)
 {
   m_Tree->setObjectName("crashDumpTree");
   m_Tree->setRootIsDecorated(false);
@@ -58,6 +60,10 @@ QmitkCrashDumpListWidget::QmitkCrashDumpListWidget(QWidget* parent)
   this->SetSelectionEnabled(true);
 
   connect(m_Tree, &QTreeWidget::itemSelectionChanged, this, &QmitkCrashDumpListWidget::SelectionChanged);
+  connect(m_Tree, &QTreeWidget::itemChanged, this, [this](QTreeWidgetItem*, int column) {
+    if (column == KindColumn)
+      emit CheckedChanged();
+  });
 
   auto* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -71,6 +77,8 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
 {
   m_Dumps = dumps;
 
+  // Populating changes items; the signals are emitted once at the end.
+  const QSignalBlocker blocker(m_Tree);
   m_Tree->clear();
 
   for (std::size_t i = 0; i < m_Dumps.size(); ++i)
@@ -112,7 +120,10 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
   if (m_Tree->columnWidth(VersionColumn) > maxVersionWidth)
     m_Tree->setColumnWidth(VersionColumn, maxVersionWidth);
 
+  this->ApplyCheckable();
+
   emit SelectionChanged();
+  emit CheckedChanged();
 }
 
 std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetDumps() const
@@ -133,6 +144,59 @@ std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetSelectedDumps() co
   }
 
   return selected;
+}
+
+void QmitkCrashDumpListWidget::SetCheckable(bool checkable)
+{
+  m_Checkable = checkable;
+
+  {
+    const QSignalBlocker blocker(m_Tree);
+    this->ApplyCheckable();
+  }
+
+  emit CheckedChanged();
+}
+
+void QmitkCrashDumpListWidget::ApplyCheckable()
+{
+  for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
+  {
+    auto* item = m_Tree->topLevelItem(row);
+
+    if (m_Checkable)
+    {
+      item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+      item->setCheckState(KindColumn, Qt::Checked);
+    }
+    else
+    {
+      item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);
+      item->setData(KindColumn, Qt::CheckStateRole, QVariant());
+    }
+  }
+}
+
+std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetCheckedDumps() const
+{
+  std::vector<mitk::CrashDumpInfo> checked;
+
+  if (!m_Checkable)
+    return checked;
+
+  for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
+  {
+    const auto* item = m_Tree->topLevelItem(row);
+    if (item->checkState(KindColumn) == Qt::Checked)
+      checked.push_back(m_Dumps[item->data(KindColumn, Qt::UserRole).toULongLong()]);
+  }
+
+  return checked;
+}
+
+QString QmitkCrashDumpListWidget::KindLabel(mitk::DumpKind kind)
+{
+  return QmitkCrashDumpUi::KindLabel(kind);
 }
 
 void QmitkCrashDumpListWidget::SetColumnHidden(Column column, bool hidden)

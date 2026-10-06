@@ -98,6 +98,7 @@ class QmitkCrashDumpUiTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkCrashDumpUiTestSuite);
   MITK_TEST(ListWidgetShowsColumnsAndSelection);
+  MITK_TEST(ListWidgetCheckableMode);
   MITK_TEST(NoReportServiceMeansNoReportButton);
   MITK_TEST(ManagerIsSingleInstanceAndReportsTheSelection);
   MITK_TEST(ManagerReturnsToItsParentWhenTheModalFinishes);
@@ -219,6 +220,34 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), selected.size());
     CPPUNIT_ASSERT(m_FreezeDump == selected[0].Path);
     CPPUNIT_ASSERT(m_CrashDump == selected[1].Path);
+  }
+
+  void ListWidgetCheckableMode()
+  {
+    QmitkCrashDumpListWidget widget;
+    widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
+    CPPUNIT_ASSERT_MESSAGE("not checkable by default", widget.GetCheckedDumps().empty());
+
+    int checkedChanges = 0;
+    QObject::connect(&widget, &QmitkCrashDumpListWidget::CheckedChanged, [&checkedChanges] { ++checkedChanges; });
+
+    widget.SetCheckable(true);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), widget.GetCheckedDumps().size());
+
+    auto* tree = widget.findChild<QTreeWidget*>("crashDumpTree");
+    checkedChanges = 0;
+    tree->topLevelItem(1)->setCheckState(QmitkCrashDumpListWidget::KindColumn, Qt::Unchecked);
+    CPPUNIT_ASSERT_EQUAL(1, checkedChanges);
+
+    const auto checked = widget.GetCheckedDumps();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), checked.size());
+    CPPUNIT_ASSERT(m_FreezeDump == checked[0].Path);
+    CPPUNIT_ASSERT(m_CrashDump == checked[1].Path);
+
+    widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("new dumps start checked", std::size_t(3), widget.GetCheckedDumps().size());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Crash"), QmitkCrashDumpListWidget::KindLabel(mitk::DumpKind::Crash).toStdString());
   }
 
   void NoReportServiceMeansNoReportButton()

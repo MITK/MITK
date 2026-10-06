@@ -30,6 +30,11 @@ found in the LICENSE file.
  * fires inside that nested loop as well as in the test's own pumping, so it
  * must be created before the first event that could open a popup: a menu
  * opened synchronously by that event is then still closed and counted.
+ *
+ * Popups are found through QApplication::activePopupWidget() and, failing
+ * that, among the visible top-level popup windows: on macOS under
+ * -platform minimal, a menu can run its event loop without Qt reporting it
+ * as the active popup.
  */
 class QmitkTestPopupProbe
 {
@@ -42,7 +47,7 @@ public:
     m_Timer.setInterval(5);
     QObject::connect(&m_Timer, &QTimer::timeout, &m_Timer, [this]()
     {
-      auto* popup = QApplication::activePopupWidget();
+      auto* popup = FindOpenPopup();
       if (nullptr == popup)
       {
         return;
@@ -60,6 +65,23 @@ public:
   ~QmitkTestPopupProbe()
   {
     m_Timer.stop();
+  }
+
+  /** The open popup a test has to close, or nullptr. */
+  static QWidget* FindOpenPopup()
+  {
+    if (auto* popup = QApplication::activePopupWidget())
+    {
+      return popup;
+    }
+    for (auto* widget : QApplication::topLevelWidgets())
+    {
+      if (widget->isVisible() && Qt::Popup == widget->windowType())
+      {
+        return widget;
+      }
+    }
+    return nullptr;
   }
 
   /** The number of popups that opened so far. */

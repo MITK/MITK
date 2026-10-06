@@ -82,6 +82,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestEraseLabels);
   MITK_TEST(TestEraseLabel_Dynamic);
   MITK_TEST(TestIsEmpty);
+  MITK_TEST(TestIsEmpty_Static);
   MITK_TEST(TestMergeLabels);
   MITK_TEST(TestCreateLabelMask);
   MITK_TEST(TestUpdateCenterOfMass);
@@ -913,6 +914,14 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Label with a pixel is empty", !segmentation->IsEmpty(5, 1));
     CPPUNIT_ASSERT_MESSAGE("Label overload disagrees with the value overload", !segmentation->IsEmpty(segmentation->GetLabel(5), 1));
     CPPUNIT_ASSERT_THROW(segmentation->IsEmpty(5, 2), mitk::Exception);
+  }
+
+  void TestIsEmpty_Static()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    PaintBox(segmentation->GetGroupImage(0), 0, { 1, 1, 1 }, { 1, 1, 1 }, 5);
+
+    CPPUNIT_ASSERT_MESSAGE("Static segmentation was not checked for a later time step", !segmentation->IsEmpty(5, 3));
   }
 };
 

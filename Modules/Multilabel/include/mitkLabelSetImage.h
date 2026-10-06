@@ -627,6 +627,7 @@ namespace mitk
     using BaseData::IsEmpty;
 
     /** \brief Checks if a label is empty at a given time step (does not contain any pixels).
+      * A segmentation with a single time step is checked for any time step.
       * \exception mitk::Exception if the time step is invalid.
       */
     bool IsEmpty(const Label* label, TimeStepType t = 0) const;

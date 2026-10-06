@@ -1188,7 +1188,10 @@ void mitk::MultiLabelSegmentation::UpdateCenterOfMass(LabelValueType pixelValue,
 
 bool mitk::MultiLabelSegmentation::IsEmpty(LabelValueType pixelValue, TimeStepType t) const
 {
-  if (!this->GetTimeGeometry()->IsValidTimeStep(t))
+  // A static segmentation serves every time step, like in TransferLabelContentAtTimeStep().
+  const auto timeStep = 1 == this->GetTimeSteps() ? TimeStepType(0) : t;
+
+  if (!this->GetTimeGeometry()->IsValidTimeStep(timeStep))
     mitkThrow() << "Cannot check if label is empty. Invalid time step: " << t;
 
   const auto* image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
@@ -1198,7 +1201,7 @@ bool mitk::MultiLabelSegmentation::IsEmpty(LabelValueType pixelValue, TimeStepTy
   for (int i = 0; i < 3; ++i)
     numPixels *= static_cast<std::size_t>(image->GetDimension(i));
 
-  ImageReadAccessor accessor(image, image->GetVolumeData(static_cast<int>(t)));
+  ImageReadAccessor accessor(image, image->GetVolumeData(static_cast<int>(timeStep)));
   const auto* pixels = static_cast<const LabelValueType*>(accessor.GetData());
 
   std::atomic<bool> found = false;

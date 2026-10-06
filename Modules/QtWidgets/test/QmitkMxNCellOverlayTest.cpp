@@ -35,7 +35,11 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
+#include <QMenu>
 #include <QMouseEvent>
+#include <QPointer>
+#include <QStringList>
+#include <QTimer>
 #include <QWheelEvent>
 
 #include <memory>
@@ -77,10 +81,63 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   mitk::DataNode::Pointer m_ImageNode;
   std::unique_ptr<QmitkMxNMultiWidget> m_Editor;
 
+  /** Closes a popup no QmitkTestPopupProbe claimed, so an unexpected menu
+   *  fails the test instead of blocking it in the menu's event loop. A probe
+   *  closes its popups within milliseconds; one still open on two consecutive
+   *  ticks is stray. */
+  class StrayPopupWatchdog
+  {
+  public:
+    StrayPopupWatchdog()
+    {
+      m_Timer.setInterval(500);
+      QObject::connect(&m_Timer, &QTimer::timeout, &m_Timer, [this]()
+      {
+        QWidget* popup = QmitkTestPopupProbe::FindOpenPopup();
+        if (nullptr != popup && popup == m_Seen)
+        {
+          m_Stray.append(Describe(popup));
+          popup->close();
+          popup = nullptr;
+        }
+        m_Seen = popup;
+      });
+      m_Timer.start();
+    }
+
+    const QStringList& Stray() const
+    {
+      return m_Stray;
+    }
+
+  private:
+    static QString Describe(const QWidget* popup)
+    {
+      QString description = QString::fromLatin1(popup->metaObject()->className());
+      if (const auto* menu = qobject_cast<const QMenu*>(popup))
+      {
+        QStringList entries;
+        for (const auto* action : menu->actions())
+        {
+          entries.append(action->text());
+        }
+        description += QStringLiteral(" [") + entries.join(QStringLiteral(", ")) + QStringLiteral("]");
+      }
+      return description;
+    }
+
+    QTimer m_Timer;
+    QPointer<QWidget> m_Seen;
+    QStringList m_Stray;
+  };
+
+  std::unique_ptr<StrayPopupWatchdog> m_Watchdog;
+
 public:
   void setUp() override
   {
     EnsureQApplication();
+    m_Watchdog = std::make_unique<StrayPopupWatchdog>();
 
     m_DataStorage = mitk::StandaloneDataStorage::New();
     m_Image = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f);
@@ -105,10 +162,16 @@ public:
 
   void tearDown() override
   {
+    const QStringList stray = m_Watchdog->Stray();
+    m_Watchdog.reset();
     m_Editor.reset();
     m_ImageNode = nullptr;
     m_Image = nullptr;
     m_DataStorage = nullptr;
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "No popup opens that the test did not expect: " + stray.join(QStringLiteral("; ")).toStdString(),
+      stray.isEmpty());
   }
 
   static QString CellId(std::size_t index)

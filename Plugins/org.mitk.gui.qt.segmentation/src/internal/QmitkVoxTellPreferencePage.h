@@ -26,7 +26,7 @@ namespace Ui
  *
  * The environment is fully managed by MITK (installed from the tool GUI), so this
  * page only exposes what the user actually decides: the compute device, where
- * the model comes from, which messages to see, updating, and uninstalling.
+ * the model comes from, updating, and uninstalling.
  */
 class QmitkVoxTellPreferencePage : public QObject, public berry::IQtPreferencePage
 {

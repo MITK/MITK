@@ -330,7 +330,8 @@ bool mitk::VoxTellTool::CreatePythonContext()
     // after creation must not map any venv native library (on Linux the venv is
     // sys.prefix, so importing NumPy would load it from there and make the
     // "loaded?" guard block the very update it is checking for). The bindings
-    // are imported later, in LoadModel(), once the model needs them.
+    // are imported later, in PrepareContext(), once the model or its files are
+    // needed.
     m_Impl->Context->Activate(false);
   }
   catch (const Exception& e)

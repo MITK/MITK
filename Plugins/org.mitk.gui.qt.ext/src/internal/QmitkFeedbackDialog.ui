@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>720</height>
+    <width>1100</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,6 +31,19 @@
       </property>
       <widget class="QWidget" name="form">
        <layout class="QVBoxLayout" name="formLayout">
+        <item>
+         <widget class="QLabel" name="privacyLabel">
+          <property name="textFormat">
+           <enum>Qt::RichText</enum>
+          </property>
+          <property name="text">
+           <string>This report is assembled on your computer. Nothing is sent automatically. When you choose a hand-off, MITK saves a .zip on your machine and opens your browser, mail program, or file manager so &lt;b&gt;you&lt;/b&gt; can send it. Review every item below before sharing. Logs, screenshots, and crash dumps can contain patient-related information (file paths, names, images, parts of the application's memory); include them only after checking that you may share them.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <layout class="QHBoxLayout" name="categoryLayout">
           <item>
@@ -81,6 +94,140 @@
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="logGroup">
+          <property name="title">
+           <string>Log</string>
+          </property>
+          <layout class="QVBoxLayout" name="logLayout">
+           <item>
+            <widget class="QToolButton" name="logToggleButton">
+             <property name="text">
+              <string>Show log excerpts</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextBesideIcon</enum>
+             </property>
+             <property name="arrowType">
+              <enum>Qt::RightArrow</enum>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTabWidget" name="logTabs">
+             <property name="visible">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="screenshotGroup">
+          <property name="title">
+           <string>Screenshot</string>
+          </property>
+          <layout class="QVBoxLayout" name="screenshotLayout">
+           <item>
+            <layout class="QHBoxLayout" name="screenshotChoiceLayout">
+             <item>
+              <widget class="QCheckBox" name="screenshotCheckBox">
+               <property name="text">
+                <string>Include a screenshot of the</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="screenshotTargetComboBox"/>
+             </item>
+             <item>
+              <spacer name="screenshotSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="screenshotPreviewLabel">
+             <property name="visible">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="sharingConfirmationWidget" native="true">
+          <layout class="QHBoxLayout" name="sharingConfirmationLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item alignment="Qt::AlignTop">
+            <widget class="QCheckBox" name="sharingConfirmationCheckBox"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="sharingConfirmationLabel">
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="buddy">
+              <cstring>sharingConfirmationCheckBox</cstring>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="publicSharingConfirmationWidget" native="true">
+          <layout class="QHBoxLayout" name="publicSharingConfirmationLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item alignment="Qt::AlignTop">
+            <widget class="QCheckBox" name="publicSharingConfirmationCheckBox"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="publicSharingConfirmationLabel">
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="buddy">
+              <cstring>publicSharingConfirmationCheckBox</cstring>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <spacer name="formSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -104,9 +251,6 @@
          <property name="readOnly">
           <bool>true</bool>
          </property>
-         <property name="lineWrapMode">
-          <enum>QPlainTextEdit::WidgetWidth</enum>
-         </property>
         </widget>
        </item>
       </layout>
@@ -114,11 +258,91 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="bundleStatusLayout">
+     <item>
+      <widget class="QProgressBar" name="bundleProgressBar">
+       <property name="maximum">
+        <number>0</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
+       </property>
+       <property name="maximumWidth">
+        <number>120</number>
+       </property>
+       <property name="visible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="bundleStatusLabel">
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <item>
+      <widget class="QLabel" name="gitHubReasonLabel">
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="openEmailButton">
+       <property name="text">
+        <string>Open email</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="openIssueButton">
+       <property name="text">
+        <string>Open GitHub issue</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="revealBundleButton">
+       <property name="text">
+        <string>Reveal bundle</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -12,7 +12,7 @@ mitk_create_plugin(
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS
   PRIVATE MitkQtWidgetsExt MitkSceneSerialization MitkAppUtil MitkUserFeedback
-  PACKAGE_DEPENDS ${additional_dependencies}
+  PACKAGE_DEPENDS PRIVATE Qt6|Concurrent ${additional_dependencies}
 )
 
 if(MITK_USE_sentry)

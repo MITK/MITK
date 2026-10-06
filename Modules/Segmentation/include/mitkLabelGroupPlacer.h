@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkLabelGroupPlacer_h
 
 #include <mitkLabelSetImage.h>
-#include <MitkPythonSegmentationExports.h>
+#include <MitkSegmentationExports.h>
 
 #include <map>
 #include <vector>
@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /** \brief The voxels of a binary mask, as runs of consecutive voxels in memory order. */
-  struct MITKPYTHONSEGMENTATION_EXPORT MaskRuns
+  struct MITKSEGMENTATION_EXPORT MaskRuns
   {
     struct Run
     {
@@ -43,7 +43,7 @@ namespace mitk
    *
    * \throw mitk::Exception if the mask is not such an image.
    */
-  MITKPYTHONSEGMENTATION_EXPORT MaskRuns ExtractMaskRuns(const Image* mask);
+  MITKSEGMENTATION_EXPORT MaskRuns ExtractMaskRuns(const Image* mask);
 
   /** \brief Writes masks as labels into the groups of a preview, so that a
    *         label overlaps neither the labels of a segmentation nor the other
@@ -56,21 +56,13 @@ namespace mitk
    *
    * Masks of neighboring structures touch, and as the masks are computed
    * independently of each other, they share a few voxels at the border. That
-   * is not an overlap: see OVERLAP_TOLERANCE.
+   * is not an overlap as long as it stays within the overlap tolerance.
    */
-  class MITKPYTHONSEGMENTATION_EXPORT LabelGroupPlacer
+  class MITKSEGMENTATION_EXPORT LabelGroupPlacer
   {
   public:
     using GroupIndexType = MultiLabelSegmentation::GroupIndexType;
     using LabelValueType = MultiLabelSegmentation::LabelValueType;
-
-    /** \brief Share of the voxels of the smaller of two labels that they may have in common without overlapping.
-     *
-     * Measured on a chest CT with 20 prompts of VoxTell: the border of two
-     * neighbors took at most 0.96% of the smaller one, while structures that
-     * contain one another or genuinely overlap shared 4.9% to 100%.
-     */
-    static constexpr double OVERLAP_TOLERANCE = 0.02;
 
     enum class WriteMode
     {
@@ -83,8 +75,14 @@ namespace mitk
      * \param preview Receives the masks. Has at least the groups of the segmentation, and no
      *        pixels at the time step but those that Write() puts there.
      * \param timeStep The time step of both that the masks are for.
+     * \param overlapTolerance Share of the voxels of the smaller of two labels that they may
+     *        have in common without overlapping, between 0 and 1. It depends on how precisely
+     *        the masks follow the borders of the structures.
+     *
+     * \throw mitk::Exception if the segmentation or the preview is missing, the preview has
+     *        fewer groups than the segmentation, or the tolerance is out of range.
      */
-    LabelGroupPlacer(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation* preview, TimeStepType timeStep);
+    LabelGroupPlacer(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation* preview, TimeStepType timeStep, double overlapTolerance);
 
     /** \brief Returns the first group of the preview in which the mask overlaps no label.
      *
@@ -115,6 +113,7 @@ namespace mitk
     const MultiLabelSegmentation* m_Segmentation;
     MultiLabelSegmentation* m_Preview;
     TimeStepType m_TimeStep;
+    double m_OverlapTolerance;
 
     /** \brief Pixels above it belong to no label of the segmentation and do not count as an overlap. */
     LabelValueType m_MaxSegmentationLabelValue = 0;

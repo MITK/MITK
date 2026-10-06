@@ -29,6 +29,8 @@ class mitkLabelGroupPlacerTestSuite : public mitk::TestFixture
   MITK_TEST(TestMaskInsideLabelNeedsNewGroup);
   MITK_TEST(TestLabelInsideMaskNeedsNewGroup);
   MITK_TEST(TestBorderContactIsNoOverlap);
+  MITK_TEST(TestBorderContactIsOverlapWithoutTolerance);
+  MITK_TEST(TestToleranceOutOfRangeIsRejected);
   MITK_TEST(TestEarlierMasksCount);
   MITK_TEST(TestOverwriteTakesVoxels);
   MITK_TEST(TestMaskOfOtherSizeIsRejected);
@@ -37,6 +39,7 @@ class mitkLabelGroupPlacerTestSuite : public mitk::TestFixture
   using Predicate = std::function<bool(unsigned int x, unsigned int y, unsigned int z)>;
 
   static constexpr unsigned int SIZE = 10;
+  static constexpr double TOLERANCE = 0.02;
 
   mitk::MultiLabelSegmentation::Pointer m_Segmentation;
   mitk::MultiLabelSegmentation::Pointer m_Preview;
@@ -84,7 +87,7 @@ public:
     this->AddSegmentationLabel(1, 0, [](unsigned int x, unsigned int, unsigned int) { return x < 5; });
     this->MakePreview();
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
     const auto mask = this->MakeMaskRuns([](unsigned int x, unsigned int, unsigned int) { return x >= 5; });
 
     CPPUNIT_ASSERT_EQUAL(mitk::MultiLabelSegmentation::GroupIndexType(0), placer.FindGroup(mask));
@@ -97,7 +100,7 @@ public:
     m_Segmentation->SetActiveLabel(1);
     this->MakePreview();
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A mask that fits into the active group should go there",
       mitk::MultiLabelSegmentation::GroupIndexType(1),
@@ -113,7 +116,7 @@ public:
     this->AddSegmentationLabel(1, 0, [](unsigned int x, unsigned int, unsigned int) { return x < 5; });
     this->MakePreview();
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
     const auto mask = this->MakeMaskRuns([](unsigned int x, unsigned int y, unsigned int) { return x < 2 && y < 2; });
     const auto group = placer.FindGroup(mask);
 
@@ -136,7 +139,7 @@ public:
     this->AddSegmentationLabel(1, 0, [](unsigned int x, unsigned int y, unsigned int z) { return x == 0 && y == 0 && z < 5; });
     this->MakePreview();
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
     const auto mask = this->MakeMaskRuns([](unsigned int, unsigned int, unsigned int) { return true; });
 
     CPPUNIT_ASSERT_EQUAL(mitk::MultiLabelSegmentation::GroupIndexType(1), placer.FindGroup(mask));
@@ -147,7 +150,7 @@ public:
     this->AddSegmentationLabel(1, 0, [](unsigned int x, unsigned int, unsigned int) { return x < 5; });
     this->MakePreview();
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
 
     // Shares one voxel with the label, 0.2% of the 500 voxels of the label.
     const auto mask = this->MakeMaskRuns([](unsigned int x, unsigned int y, unsigned int z) { return x >= 5 || (x == 4 && y == 0 && z == 0); });
@@ -163,11 +166,30 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(500), this->CountPreviewVoxels(0, 2));
   }
 
+  void TestBorderContactIsOverlapWithoutTolerance()
+  {
+    this->AddSegmentationLabel(1, 0, [](unsigned int x, unsigned int, unsigned int) { return x < 5; });
+    this->MakePreview();
+
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, 0.0);
+    const auto mask = this->MakeMaskRuns([](unsigned int x, unsigned int y, unsigned int z) { return x >= 5 || (x == 4 && y == 0 && z == 0); });
+
+    CPPUNIT_ASSERT_EQUAL(mitk::MultiLabelSegmentation::GroupIndexType(1), placer.FindGroup(mask));
+  }
+
+  void TestToleranceOutOfRangeIsRejected()
+  {
+    this->MakePreview();
+
+    CPPUNIT_ASSERT_THROW(mitk::LabelGroupPlacer(m_Segmentation, m_Preview, 0, -0.01), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::LabelGroupPlacer(m_Segmentation, m_Preview, 0, 1.01), mitk::Exception);
+  }
+
   void TestEarlierMasksCount()
   {
     this->MakePreview();
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
 
     const auto part = this->MakeMaskRuns([](unsigned int x, unsigned int, unsigned int) { return x < 3; });
     m_Preview->AddLabel(mitk::Label::New(1, "part"), 0, false, false);
@@ -188,7 +210,7 @@ public:
     m_Preview->AddLabel(mitk::Label::New(1, "first"), 0, false, false);
     m_Preview->AddLabel(mitk::Label::New(2, "second"), 0, false, false);
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
 
     const auto first = this->MakeMaskRuns([](unsigned int x, unsigned int, unsigned int) { return x < 5; });
     const auto second = this->MakeMaskRuns([](unsigned int x, unsigned int, unsigned int) { return x >= 3; });
@@ -210,7 +232,7 @@ public:
     auto mask = mitk::Image::New();
     mask->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, dimensions);
 
-    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0);
+    mitk::LabelGroupPlacer placer(m_Segmentation, m_Preview, 0, TOLERANCE);
 
     CPPUNIT_ASSERT_THROW(placer.FindGroup(mitk::ExtractMaskRuns(mask)), mitk::Exception);
   }

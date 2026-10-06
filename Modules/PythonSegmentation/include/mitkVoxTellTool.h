@@ -253,8 +253,8 @@ namespace mitk
      * which it overlaps neither a label of the segmentation nor an earlier
      * result: the active group, another group, or a group that confirming
      * adds to the segmentation. Where it shares just a few border voxels with
-     * a label (see LabelGroupPlacer::OVERLAP_TOLERANCE), those voxels stay with
-     * the label. Labels of the segmentation are never changed.
+     * a label (up to 2% of the smaller of the two), those voxels stay with the
+     * label. Labels of the segmentation are never changed.
      *
      * If false, all results go into the active group. A later prompt takes the
      * voxels of an earlier one, and confirming overwrites the labels of the

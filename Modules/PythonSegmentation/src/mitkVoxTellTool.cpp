@@ -46,6 +46,12 @@ namespace
   // short is replaced by the CPU, unless the GPU backend is enforced.
   constexpr int MIN_GPU_MEMORY_MB = 6000;
 
+  // The overlap tolerance of the LabelGroupPlacer for the results of VoxTell.
+  // Measured on a chest CT with 20 prompts: the border of two neighbors took at
+  // most 0.96% of the smaller one, while structures that contain one another or
+  // genuinely overlap shared 4.9% to 100%.
+  constexpr double OVERLAP_TOLERANCE = 0.02;
+
   mitk::IPreferences* GetPreferences()
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -1013,7 +1019,7 @@ void mitk::VoxTellTool::PlaceMasks(MultiLabelSegmentation* preview, TimeStepType
   while (preview->GetNumberOfGroups() < segmentation->GetNumberOfGroups())
     preview->AddGroup();
 
-  LabelGroupPlacer placer(segmentation, preview, timeStep);
+  LabelGroupPlacer placer(segmentation, preview, timeStep, OVERLAP_TOLERANCE);
 
   const auto writeMode = m_Impl->CreateGroupsAsNeeded
     ? LabelGroupPlacer::WriteMode::KeepOccupiedVoxels

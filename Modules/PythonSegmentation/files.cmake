@@ -1,5 +1,4 @@
 set(CPP_FILES
-  mitkLabelGroupPlacer.cpp
   mitknnInteractiveEnums.cpp
   mitknnInteractiveInteractor.cpp
   mitknnInteractiveTool.cpp

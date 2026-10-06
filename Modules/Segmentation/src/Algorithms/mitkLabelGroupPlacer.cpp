@@ -136,16 +136,20 @@ mitk::MaskRuns mitk::ExtractMaskRuns(const Image* mask)
   return result;
 }
 
-mitk::LabelGroupPlacer::LabelGroupPlacer(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation* preview, TimeStepType timeStep)
+mitk::LabelGroupPlacer::LabelGroupPlacer(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation* preview, TimeStepType timeStep, double overlapTolerance)
   : m_Segmentation(segmentation),
     m_Preview(preview),
-    m_TimeStep(timeStep)
+    m_TimeStep(timeStep),
+    m_OverlapTolerance(overlapTolerance)
 {
   if (nullptr == segmentation || nullptr == preview)
     mitkThrow() << "Cannot place labels without a segmentation and a preview.";
 
   if (preview->GetNumberOfGroups() < segmentation->GetNumberOfGroups())
     mitkThrow() << "Cannot place labels into a preview that has fewer groups than the segmentation.";
+
+  if (!(overlapTolerance >= 0.0 && overlapTolerance <= 1.0))
+    mitkThrow() << "Cannot place labels with an overlap tolerance of " << overlapTolerance << ". It must be between 0 and 1.";
 
   for (const auto value : segmentation->GetAllLabelValues())
     m_MaxSegmentationLabelValue = std::max(m_MaxSegmentationLabelValue, value);
@@ -238,9 +242,9 @@ bool mitk::LabelGroupPlacer::Fits(const MaskRuns& mask, GroupIndexType group)
     Accumulate(shared.Preview, chunkShared.Preview);
   }
 
-  const auto overlaps = [&mask](std::size_t sharedVoxels, std::size_t otherVoxels)
+  const auto overlaps = [this, &mask](std::size_t sharedVoxels, std::size_t otherVoxels)
   {
-    return static_cast<double>(sharedVoxels) > OVERLAP_TOLERANCE * static_cast<double>(std::min(mask.VoxelCount, otherVoxels));
+    return static_cast<double>(sharedVoxels) > m_OverlapTolerance * static_cast<double>(std::min(mask.VoxelCount, otherVoxels));
   };
 
   for (std::size_t value = 1; value < shared.Segmentation.size(); ++value)

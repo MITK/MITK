@@ -2060,7 +2060,8 @@ void mitk::TransferLabelContentAtTimeStep(
 
     rules.Target[sourceLabel] = newDestinationLabel;
 
-    if (MultiLabelSegmentation::MergeStyle::Replace == mergeStyle && backgroundWritable)
+    // Clearing the background would change nothing, but would force a pass over the destination beyond the source.
+    if (MultiLabelSegmentation::MergeStyle::Replace == mergeStyle && backgroundWritable && destinationBackground != newDestinationLabel)
       rules.Clear[newDestinationLabel] = true;
   }
 

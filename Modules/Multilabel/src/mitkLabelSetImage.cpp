@@ -1911,6 +1911,8 @@ namespace
    * the destination background is not locked. */
   struct LabelTransferRules
   {
+    static_assert(sizeof(mitk::Label::PixelType) <= 2, "The lookup tables must cover every pixel value.");
+
     static constexpr int NoTarget = -1;
     static constexpr std::size_t TableSize = std::numeric_limits<mitk::Label::PixelType>::max() + 1;
 

@@ -260,8 +260,11 @@ mitk::DICOMGenericImageFrameInfo::GetTagValueAsString(const DICOMTagPath& path) 
 {
   FindingsListType result;
 
-  const auto onlyFrameItem = m_FrameScoped ? std::optional<unsigned int>(this->FrameNo)
-                                           : std::nullopt;
+  std::optional<unsigned int> onlyFrameItem;
+  if (m_FrameScoped)
+  {
+    onlyFrameItem = this->FrameNo;
+  }
 
   for (const auto* entry : m_Store->Matching(path, onlyFrameItem))
   {

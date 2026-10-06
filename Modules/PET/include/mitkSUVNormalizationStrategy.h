@@ -69,6 +69,7 @@ namespace mitk
     BW,
     LBM_Janmahasatian,
     LBM_James128,
+    LBM_Morgan,
     IBW,
     BSA
   };
@@ -82,6 +83,7 @@ namespace mitk
    * \li BodyWeightStrategy:                 \c bodyWeightKg.
    * \li LeanBodyMassJanmahasatianStrategy:  \c bodyWeightKg, \c heightM, \c sex.
    * \li LeanBodyMassJames128Strategy:       \c bodyWeightKg, \c heightM, \c sex.
+   * \li LeanBodyMassMorganStrategy:         \c bodyWeightKg, \c heightM, \c sex.
    * \li IdealBodyWeightStrategy:            \c heightM, \c sex.
    * \li BodySurfaceAreaStrategy:            \c bodyWeightKg, \c heightM.
    *
@@ -221,6 +223,49 @@ namespace mitk
   public:
     double ComputeScaleNumerator(const SUVNormalizationInputs& inputs) const override;
     SUVVariant Variant() const override { return SUVVariant::LBM_James128; }
+  };
+  /**
+   * \brief Lean-body-mass-normalized SUV strategy using the Morgan
+   *        variant of the James formula (DICOM SUV Type "LBM").
+   *
+   * \code
+   * LBM_male   [kg] = 1.10 * W - 0.0120 * W^2 / H^2
+   * LBM_female [kg] = 1.07 * W - 0.0148 * W^2 / H^2
+   * \endcode
+   *
+   * with \c W = body weight in [kg] and \c H = height in [m]. The IBSI-SUV
+   * manual writes both coefficients against H in cm; 120 (W/H_cm)^2 is
+   * 0.0120 W^2 / H_m^2, which is the form used here so the whole module
+   * keeps working in metres.
+   *
+   * \warning This differs from \c LeanBodyMassJames128Strategy in exactly
+   *          one number: 0.0120 against 0.0128, and only for male
+   *          patients. The female formulas are identical. Two things
+   *          follow. A female case cannot tell the two strategies apart
+   *          at all, so anything meant to discriminate them has to be
+   *          male. And confusing them costs about 2 % of lean body mass
+   *          at typical adult measurements -- too small to look wrong,
+   *          too large to be acceptable.
+   *
+   * Returns LBM expressed in grams (\c LBM_kg * 1000). Combined with a
+   * [Bq/mL] PET image and a [Bq] dose, the resulting SUV has units
+   * [g/mL].
+   *
+   * Reference: Morgan DJ, Bray KM. "Lean body mass as a predictor of
+   *            drug dosage." Clin Pharmacokinet 1994; 26(4):292-307.
+   *
+   * \remark The IBSI-SUV manual calls the formula obsolete but lists
+   *         it among the SUV Types that must be convertible: data
+   *         carrying SUV Type "LBM" exists and has to be readable.
+   *
+   * \pre \c inputs.sex is \c Sex::Male or \c Sex::Female. \c Sex::Other
+   *      throws \c MissingSUVInputException; resolve it upstream.
+   */
+  class MITKPET_EXPORT LeanBodyMassMorganStrategy : public SUVNormalizationStrategy
+  {
+  public:
+    double ComputeScaleNumerator(const SUVNormalizationInputs& inputs) const override;
+    SUVVariant Variant() const override { return SUVVariant::LBM_Morgan; }
   };
 
   /**

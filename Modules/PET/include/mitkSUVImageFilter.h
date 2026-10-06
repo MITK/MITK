@@ -187,6 +187,37 @@ namespace mitk
     const DecayCorrectionInfo& GetEffectiveDecayCorrection() const;
 
     /**
+     * \brief The IBSI-SUV recommendations that were applied to this input.
+     *
+     * Each entry names one reinterpretation of a borderline DICOM value,
+     * the attribute it concerns, the stored value and the value used. The
+     * same events are logged with \c MITK_WARN, but a log is not reachable
+     * from a plugin, a pipeline, or a Python caller; this accessor is.
+     *
+     * Populated during configuration, so it is meaningful after a Configure
+     * pass or an \c Update(). Empty under \c DICOMReadPolicy::Strict, where
+     * the first adaptation throws rather than being applied -- an empty list
+     * under Strict is the guarantee that mode exists to give.
+     *
+     * \return The adaptations applied, in the order they were detected.
+     */
+    const std::vector<SUVAdaptation>& GetAdaptations() const;
+
+    /**
+     * \brief Objections to the input's Rescale Slope and Intercept.
+     *
+     * Populated by ConfigureFromProperties and empty until it has run.
+     * Purely diagnostic -- the values never enter the computation -- but
+     * worth putting in front of an operator, so a front end can render
+     * these alongside \c GetAdaptations().
+     *
+     * Unlike the adaptation record this does not depend on the read
+     * policy: nothing is reinterpreted, so Strict has nothing to refuse
+     * and the findings are the same either way.
+     */
+    const std::vector<std::string>& GetRescaleFindings() const;
+
+    /**
      * \brief Optional explicit selection for multi-item Radiopharmaceutical
      *        Information Sequence (0054,0016).
      *
@@ -314,6 +345,10 @@ namespace mitk
     std::optional<double> m_EffectiveHalfLifeInSec;
     std::optional<DecayCorrectionInfo> m_EffectiveDecayCorrection;
     std::optional<SUVInputModel> m_EffectiveInputModel;
+    /** Radiopharmaceutical Information Sequence item whose dose the computation used; empty when no item's dose was consulted. */
+    std::optional<int> m_EffectiveTracerIndex;
+    std::vector<SUVAdaptation> m_Adaptations;
+    std::vector<std::string>   m_RescaleFindings;
 
     // Detected input model: sticky across rollbacks (does not need to
     // round-trip the failure case because classification is a pure

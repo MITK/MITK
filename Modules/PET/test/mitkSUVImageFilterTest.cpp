@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkDICOMProperty.h>
+#include <mitkDICOMTagPath.h>
+#include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 
@@ -21,6 +24,10 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdio>
+#include <string>
 #include <vector>
 
 class mitkSUVImageFilterTestSuite : public mitk::TestFixture
@@ -57,10 +64,24 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   // Ambiguous-sex policy gate (Sex::Other)
   MITK_TEST(SexPolicyGate_StrictWithSexOther_Throws);
   MITK_TEST(SexPolicyGate_LenientWithSexOther_Succeeds);
+  MITK_TEST(SexPolicyGate_LenientSexOther_BothLegsSexSpecific_RecordsOnce);
 
   // Reconfigure-on-change (M1): a target-variant change after configure
   // re-resolves at Update instead of reusing stale resolved state.
   MITK_TEST(TargetVariantChange_AfterConfigure_RequiresSex);
+
+  // Output DICOM tags
+  MITK_TEST(OutputTags_EachVariantWritesItsOwnSUVType);
+  MITK_TEST(OutputTags_RoundTripThroughClassifier);
+  MITK_TEST(GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms);
+
+  // Adaptation record on the output, and across a save
+  MITK_TEST(RescaleFindings_ImplausibleIntercept_ReachTheFilter);
+  MITK_TEST(RescaleFindings_PlausibleValues_AreEmpty);
+  MITK_TEST(RescaleFindings_NoRescaleTagsAtAll_ReportsBothAbsent);
+  MITK_TEST(AdaptationRecord_IsWrittenToTheOutput);
+  MITK_TEST(AdaptationRecord_SurvivesSaveAndReload);
+  MITK_TEST(AdaptationRecord_UnadaptedInput_RecordsEmptyAndStillDescribesTheDerivation);
 
   // Per-(timestep, slice) decay-time override map
   MITK_TEST(SetClear_DecayTimeOverrideMap);
@@ -72,6 +93,15 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(DecayMap_MissingSliceEntry_Throws);
   MITK_TEST(DecayMap_OutOfRangeSlice_Throws);
   MITK_TEST(DecayMap_OutOfRangeTimestep_Throws);
+
+  // Dose reinterpretation follows the selected tracer
+  MITK_TEST(DoseAdaptation_SelectedSecondItem_RewritesThatItem);
+  MITK_TEST(DoseAdaptation_UnselectedImplausibleItem_NotRecordedNorRewritten);
+  MITK_TEST(DoseAdaptation_StrictUnselectedImplausibleItem_Computes);
+
+  // Enhanced PET frame refusal is independent of the overrides
+  MITK_TEST(EnhancedPET_FramesUnresolved_OverridesDoNotBypassRefusal);
+  MITK_TEST(EnhancedPET_FramesUnresolved_PrenormalizedOverrideDoesNotBypassRefusal);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -274,6 +304,55 @@ private:
     return img;
   }
 
+  // A filter over a one-voxel image whose Patient's Weight is gram-encoded,
+  // which is the cheapest input that makes the pipeline record an adaptation
+  // without needing a DRO.
+  static mitk::SUVImageFilter::Pointer MakeFilterWithGramEncodedWeight()
+  {
+    auto img = MakeMinimalImage();
+    const std::string key =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030));
+    auto prop = mitk::DICOMProperty::New();
+    prop->SetValue(0, 0, "70000");
+    img->SetProperty(key.c_str(), prop);
+
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    return f;
+  }
+
+  static void SetRescaleTags(mitk::Image* image, const char* slope, const char* intercept)
+  {
+    const auto set = [image](unsigned group, unsigned element, const char* value) {
+      const std::string key =
+        mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(group, element));
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, value);
+      image->SetProperty(key.c_str(), prop);
+    };
+    set(0x0010, 0x1030, "70");
+    set(0x0028, 0x1053, slope);
+    set(0x0028, 0x1052, intercept);
+  }
+
+  static mitk::SUVImageFilter::Pointer MakeBwFilterFor(mitk::Image* image)
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(image);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    return f;
+  }
+
+  static std::string ReadStringProperty(const mitk::Image* image, const std::string& name)
+  {
+    auto prop = image->GetProperty(name.c_str());
+    return prop.IsNull() ? std::string() : prop->GetValueAsString();
+  }
+
   static mitk::SUVInputModel MakePrenormalizedBwInputModel()
   {
     mitk::SUVInputModel m;
@@ -352,6 +431,34 @@ public:
     CPPUNIT_ASSERT_NO_THROW(f->Update());
   }
 
+  void SexPolicyGate_LenientSexOther_BothLegsSexSpecific_RecordsOnce()
+  {
+    // Target and source are both sex-specific, so the gate fires on both
+    // legs. It is one ambiguity in one tag, so the record carries one entry.
+    auto f   = mitk::SUVImageFilter::New();
+    auto img = MakeMinimalImage();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::LBM_Janmahasatian);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetPatientHeightInCm(170.0);
+    f->SetPatientSex(mitk::Sex::Other);
+
+    mitk::SUVInputModel model = MakePrenormalizedBwInputModel();
+    model.sourceVariant = mitk::SUVVariant::LBM_James128;
+    f->SetInputModelOverride(model);
+
+    f->ConfigureFromProperties(img.GetPointer());
+    f->Update();
+
+    const auto& adaptations = f->GetAdaptations();
+    const auto count = std::count_if(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale == a.rule;
+      });
+    CPPUNIT_ASSERT_EQUAL(std::ptrdiff_t{1}, count);
+  }
+
   void TargetVariantChange_AfterConfigure_RequiresSex()
   {
     // M1: a target-variant change after ConfigureFromProperties must not be
@@ -368,6 +475,262 @@ public:
       auto f = MakeFilterSwitchedToSexSpecificTarget(mitk::DICOMReadPolicy::Lenient);
       CPPUNIT_ASSERT_THROW(f->Update(), mitk::MissingDICOMPropertyException);
     }
+  }
+
+  // ---- Output DICOM tags ----
+  //
+  // ApplyOutputTagPolicy stamps (0054,1001) Units and (0054,1006) SUV Type
+  // on every image the filter produces, so the output describes itself
+  // rather than inheriting the input's now-stale tags. Nothing covered
+  // those tags before, which is how they came to be written lossily: all
+  // three lean-body-mass variants collapsed onto the generic "LBM".
+  //
+  // That matters because an SUV image is a legitimate input. Units = GML
+  // plus a SUV Type is exactly the pre-normalized case DRO_2_1_x and
+  // DRO_2_6_x exercise, so the classifier must be able to read back what
+  // the filter wrote. These cases assert the full round trip: compute with
+  // a variant, then classify the output and get the same variant.
+
+  static std::string ReadOutputTag(const mitk::Image* image,
+                                   unsigned int group, unsigned int element)
+  {
+    const std::string key = mitk::DICOMTagPathToPropertyName(
+      mitk::DICOMTagPath(group, element));
+    const auto prop = image->GetConstProperty(key.c_str());
+    const auto* dicomProp = dynamic_cast<const mitk::DICOMProperty*>(prop.GetPointer());
+    return (nullptr != dicomProp) ? dicomProp->GetValue(0, 0, true, true) : std::string();
+  }
+
+  static mitk::Image::Pointer ComputeWithTarget(mitk::SUVVariant target)
+  {
+    auto f   = mitk::SUVImageFilter::New();
+    auto img = MakeMinimalImage();
+    f->SetInput(img);
+    f->SetTargetVariant(target);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetPatientHeightInCm(170.0);
+    f->SetPatientSex(mitk::Sex::Male);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    f->Update();
+    return f->GetOutput();
+  }
+
+  void OutputTags_EachVariantWritesItsOwnSUVType()
+  {
+    // The three lean-body-mass codes must stay distinct. DICOM defines one
+    // per formula, and Morgan differs from James-128 by about 2 % of lean
+    // body mass in males -- small enough that a collapsed code would be
+    // read back as the wrong formula without anything looking wrong.
+    const struct
+    {
+      mitk::SUVVariant variant;
+      const char*      units;
+      const char*      suvType;
+    } expectations[] = {
+      { mitk::SUVVariant::BW,                "GML",   "BW"          },
+      { mitk::SUVVariant::LBM_Janmahasatian, "GML",   "LBMJANMA"    },
+      { mitk::SUVVariant::LBM_James128,      "GML",   "LBMJAMES128" },
+      { mitk::SUVVariant::LBM_Morgan,        "GML",   "LBM"         },
+      { mitk::SUVVariant::IBW,               "GML",   "IBW"         },
+      { mitk::SUVVariant::BSA,               "CM2ML", "BSA"         },
+    };
+
+    for (const auto& e : expectations)
+    {
+      const auto output = ComputeWithTarget(e.variant);
+      CPPUNIT_ASSERT(output.IsNotNull());
+      CPPUNIT_ASSERT_EQUAL(std::string(e.units),
+                           ReadOutputTag(output, 0x0054, 0x1001));
+      CPPUNIT_ASSERT_EQUAL(std::string(e.suvType),
+                           ReadOutputTag(output, 0x0054, 0x1006));
+    }
+  }
+
+  void OutputTags_RoundTripThroughClassifier()
+  {
+    // The assertion that actually matters: feed each output back through
+    // the classifier and recover the variant it was computed with. A
+    // missing enumerator in OutputSUVTypeValue would write no tag at all
+    // (it returns nullptr and the setter skips), and a collapsed code
+    // would resolve to the wrong formula; both fail here.
+    const mitk::SUVVariant variants[] = {
+      mitk::SUVVariant::BW,
+      mitk::SUVVariant::LBM_Janmahasatian,
+      mitk::SUVVariant::LBM_James128,
+      mitk::SUVVariant::LBM_Morgan,
+      mitk::SUVVariant::IBW,
+      mitk::SUVVariant::BSA,
+    };
+
+    for (const auto variant : variants)
+    {
+      const auto output = ComputeWithTarget(variant);
+      const auto model  = mitk::ClassifyPETInput(output.GetPointer(),
+                                                 mitk::DICOMReadPolicy::Lenient);
+      CPPUNIT_ASSERT(mitk::SUVPixelSemantics::PrenormalizedSUV == model.semantics);
+      CPPUNIT_ASSERT(variant == model.sourceVariant);
+    }
+  }
+
+  // ---- Patient's Weight reaching the computation ----
+
+  // ---- Rescale findings reach the filter ----
+
+  void RescaleFindings_ImplausibleIntercept_ReachTheFilter()
+  {
+    // No benchmark DRO carries an objectionable rescale, so this is the only
+    // coverage of the path from the helper through ConfigureFromProperties.
+    auto img = MakeMinimalImage();
+    SetRescaleTags(img, "1.0", "-1024");
+
+    auto f = MakeBwFilterFor(img);
+    f->ConfigureFromProperties(img.GetPointer());
+
+    const auto& findings = f->GetRescaleFindings();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), findings.size());
+    CPPUNIT_ASSERT(findings[0].find("(0028,1052)") != std::string::npos);
+
+    // Diagnostics, never adaptations: recording them would populate the
+    // record that Strict guarantees to be empty.
+    CPPUNIT_ASSERT(f->GetAdaptations().empty());
+  }
+
+  void RescaleFindings_PlausibleValues_AreEmpty()
+  {
+    auto img = MakeMinimalImage();
+    SetRescaleTags(img, "1.0", "0.0");
+
+    auto f = MakeBwFilterFor(img);
+    f->ConfigureFromProperties(img.GetPointer());
+
+    CPPUNIT_ASSERT(f->GetRescaleFindings().empty());
+  }
+
+  void RescaleFindings_NoRescaleTagsAtAll_ReportsBothAbsent()
+  {
+    // An image carrying no rescale tags -- a plain NRRD, or any non-DICOM
+    // input -- reports both as absent. Pinned because it is the common case
+    // for the override-driven workflow, and the volume of the diagnostic is
+    // a deliberate choice rather than an oversight.
+    auto f = MakeFilterWithGramEncodedWeight();
+    f->ConfigureFromProperties(f->GetInput());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), f->GetRescaleFindings().size());
+  }
+
+  // ---- The adaptation record survives a save ----
+
+  void AdaptationRecord_IsWrittenToTheOutput()
+  {
+    auto f = MakeFilterWithGramEncodedWeight();
+    f->Update();
+    auto output = f->GetOutput();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), f->GetAdaptations().size());
+
+    CPPUNIT_ASSERT_EQUAL(
+      mitk::SerializeAdaptations(f->GetAdaptations()),
+      ReadStringProperty(output, mitk::SUV_ADAPTATIONS_PROPERTY_NAME));
+
+    const std::string derivation = ReadStringProperty(
+      output, mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0008, 0x2111)));
+    CPPUNIT_ASSERT(derivation.find("1 IBSI-SUV input adaptation applied") != std::string::npos);
+
+    // The corrected weight, not the input's gram-encoded original: a reader
+    // taking (0010,1030) at face value must not conclude the SUV came from
+    // a one-tonne patient.
+    const std::string weight = ReadStringProperty(
+      output, mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030)));
+    CPPUNIT_ASSERT_EQUAL(std::string("70"), weight);
+  }
+
+  void AdaptationRecord_SurvivesSaveAndReload()
+  {
+    // The stage's real assertion. mitk::ItkImageIO drops a property whose
+    // name has no registered persistence info without an error, a warning
+    // or a log line, so an unregistered record would pass every in-memory
+    // test above and vanish on disk. Only a round-trip catches that.
+    auto f = MakeFilterWithGramEncodedWeight();
+    f->Update();
+
+    const std::string expectedRecord =
+      ReadStringProperty(f->GetOutput(), mitk::SUV_ADAPTATIONS_PROPERTY_NAME);
+    const std::string derivationName =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0008, 0x2111));
+    const std::string expectedDerivation = ReadStringProperty(f->GetOutput(), derivationName);
+    CPPUNIT_ASSERT(!expectedRecord.empty());
+    CPPUNIT_ASSERT(!expectedDerivation.empty());
+
+    const std::string path =
+      mitk::IOUtil::CreateTemporaryFile("mitkSUVAdaptationsXXXXXX.nrrd");
+    mitk::IOUtil::Save(f->GetOutput(), path);
+    auto reloaded = mitk::IOUtil::Load<mitk::Image>(path);
+    CPPUNIT_ASSERT(reloaded.IsNotNull());
+
+    // Asserted first and separately because this one is registered by the
+    // PET module's own activator, which linking the module guarantees has
+    // run. If it survives and a DICOM-homed property does not, the fault is
+    // in the test binary's module context, not in the filter.
+    CPPUNIT_ASSERT_EQUAL(expectedRecord,
+                         ReadStringProperty(reloaded, mitk::SUV_ADAPTATIONS_PROPERTY_NAME));
+    CPPUNIT_ASSERT_EQUAL(expectedDerivation, ReadStringProperty(reloaded, derivationName));
+
+    std::remove(path.c_str());
+  }
+
+  void AdaptationRecord_UnadaptedInput_RecordsEmptyAndStillDescribesTheDerivation()
+  {
+    auto img = MakeMinimalImage();
+    const std::string key =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010, 0x1030));
+    auto prop = mitk::DICOMProperty::New();
+    prop->SetValue(0, 0, "70");
+    img->SetProperty(key.c_str(), prop);
+
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    f->Update();
+
+    CPPUNIT_ASSERT(f->GetAdaptations().empty());
+    CPPUNIT_ASSERT_EQUAL(std::string("[]"),
+                         ReadStringProperty(f->GetOutput(), mitk::SUV_ADAPTATIONS_PROPERTY_NAME));
+    // Derived either way, so the description is written either way -- its
+    // absence must not be the signal that nothing was adapted.
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("MITK SUV"),
+      ReadStringProperty(f->GetOutput(),
+                         mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0008, 0x2111))));
+  }
+
+  void GramEncodedWeight_YieldsSameEffectiveWeightAsKilograms()
+  {
+    // The helper returns kilograms and the filter multiplies by 1000, so a
+    // gram-encoded export and its kilogram equivalent have to arrive at the
+    // same effective weight. Asserting at the filter rather than the helper
+    // is what shows the reinterpretation actually reaches the SUV -- the
+    // 1000x error it prevents lives in this multiplication.
+    const auto effectiveFor = [](const char* storedWeight) {
+      auto img = MakeMinimalImage();
+      const std::string key = mitk::DICOMTagPathToPropertyName(
+        mitk::DICOMTagPath(0x0010, 0x1030));
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, storedWeight);
+      img->SetProperty(key.c_str(), prop);
+
+      auto f = mitk::SUVImageFilter::New();
+      f->SetInput(img);
+      f->SetTargetVariant(mitk::SUVVariant::BW);
+      f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Lenient);
+      f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+      f->ConfigureFromProperties(img.GetPointer());
+      return f->GetEffectivePatientWeightInGram();
+    };
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70000.0, effectiveFor("70"), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(70000.0, effectiveFor("70000"), 1e-6);
   }
 
   // ---- Per-(timestep, slice) decay-time override map ----
@@ -428,6 +791,43 @@ private:
       m[0][z] = value;
     }
     return m;
+  }
+
+  static std::string DoseKey(unsigned int item)
+  {
+    mitk::DICOMTagPath path;
+    path.AddSelection(0x0054, 0x0016, item).AddElement(0x0018, 0x1074);
+    return mitk::DICOMTagPathToPropertyName(path);
+  }
+
+  static mitk::Image::Pointer MakeTwoTracerDoseImage(const char* dose0, const char* dose1)
+  {
+    auto img = MakeMinimalImage();
+    const char* const doses[] = { dose0, dose1 };
+    for (unsigned int item = 0; item < 2; ++item)
+    {
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, doses[item]);
+      img->SetProperty(DoseKey(item).c_str(), prop);
+    }
+    return img;
+  }
+
+  // Activity comes from the image's dose items; the other inputs are
+  // overridden so the dose path is the only thing under test.
+  static mitk::SUVImageFilter::Pointer MakeDoseFilterSelectingSecondTracer(
+    const mitk::Image::Pointer& img, mitk::DICOMReadPolicy policy)
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetDICOMReadPolicy(policy);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetHalfLifeInSec(6586.2);
+    f->SetDecayTimeOverrideInSec(3600.0);
+    f->SetTracerIndex(1);
+    f->SetInputModelOverride(MakeActivityInputModel());
+    return f;
   }
 
 public:
@@ -548,6 +948,119 @@ public:
     f->SetDecayTimeOverrideMap(map);
     CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
                          mitk::InvalidDecayTimeMapException);
+  }
+
+  // ---- Dose reinterpretation follows the selected tracer ----
+  //
+  // Only the item the computation consumes may be reinterpreted, recorded
+  // and written back to the output; the other items are left as they came.
+
+  void DoseAdaptation_SelectedSecondItem_RewritesThatItem()
+  {
+    auto img = MakeTwoTracerDoseImage("1.85e8", "368.08");
+    auto f   = MakeDoseFilterSelectingSecondTracer(img, mitk::DICOMReadPolicy::Lenient);
+    f->Update();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, f->GetEffectiveInjectedActivityInBq(),
+                                 3.6808e8 * 1e-6);
+
+    const auto& adaptations = f->GetAdaptations();
+    const auto doseEntries = std::count_if(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == a.rule;
+      });
+    CPPUNIT_ASSERT_EQUAL(std::ptrdiff_t{1}, doseEntries);
+    const auto entry = std::find_if(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == a.rule;
+      });
+    CPPUNIT_ASSERT_EQUAL(std::string("(0054,0016)[1].(0018,1074)"), entry->dicomTag);
+
+    const auto output = f->GetOutput();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(
+      3.6808e8, std::stod(ReadStringProperty(output, DoseKey(1))), 3.6808e8 * 1e-6);
+    CPPUNIT_ASSERT_EQUAL(ReadStringProperty(img, DoseKey(0)),
+                         ReadStringProperty(output, DoseKey(0)));
+  }
+
+  void DoseAdaptation_UnselectedImplausibleItem_NotRecordedNorRewritten()
+  {
+    auto img = MakeTwoTracerDoseImage("368.08", "1.85e8");
+    auto f   = MakeDoseFilterSelectingSecondTracer(img, mitk::DICOMReadPolicy::Lenient);
+    f->Update();
+
+    const auto& adaptations = f->GetAdaptations();
+    const bool recorded = std::any_of(
+      adaptations.cbegin(), adaptations.cend(), [](const mitk::SUVAdaptation& a) {
+        return mitk::SUVAdaptationRule::DoseReinterpretedAsMBq == a.rule;
+      });
+    CPPUNIT_ASSERT(!recorded);
+
+    const auto output = f->GetOutput();
+    CPPUNIT_ASSERT_EQUAL(ReadStringProperty(img, DoseKey(0)),
+                         ReadStringProperty(output, DoseKey(0)));
+    CPPUNIT_ASSERT_EQUAL(ReadStringProperty(img, DoseKey(1)),
+                         ReadStringProperty(output, DoseKey(1)));
+  }
+
+  void DoseAdaptation_StrictUnselectedImplausibleItem_Computes()
+  {
+    auto img = MakeTwoTracerDoseImage("368.08", "1.85e8");
+    auto f   = MakeDoseFilterSelectingSecondTracer(img, mitk::DICOMReadPolicy::Strict);
+
+    CPPUNIT_ASSERT_NO_THROW(f->Update());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8, f->GetEffectiveInjectedActivityInBq(),
+                                 1.85e8 * 1e-6);
+  }
+
+  // ---- Enhanced PET frame refusal vs. overrides ----
+  //
+  // An Enhanced PET image whose functional groups the reader could not map
+  // to frames carries one frame's rescale in every frame's pixels.
+  // Overrides replace individual inputs but cannot repair that, so the
+  // refusal must apply no matter which overrides are set.
+
+private:
+  static mitk::Image::Pointer MakeUnresolvedEnhancedPETImage()
+  {
+    auto img = MakeMultiSliceImage(4);
+    const auto set = [&img](unsigned group, unsigned element, const char* value) {
+      const std::string key =
+        mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(group, element));
+      auto prop = mitk::DICOMProperty::New();
+      prop->SetValue(0, 0, value);
+      img->SetProperty(key.c_str(), prop);
+    };
+    set(0x0008, 0x0016, "1.2.840.10008.5.1.4.1.1.130");
+    set(0x0028, 0x0008, "4");
+    return img;
+  }
+
+public:
+
+  void EnhancedPET_FramesUnresolved_OverridesDoNotBypassRefusal()
+  {
+    auto img = MakeUnresolvedEnhancedPETImage();
+    auto f   = MakeFilterWithActivityOverrides(img);
+    f->SetDecayTimeOverrideInSec(3600.0);
+
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::EnhancedPETFramesUnresolvedException);
+    CPPUNIT_ASSERT_THROW(f->GetEffectiveInputModel(), mitk::Exception);
+  }
+
+  void EnhancedPET_FramesUnresolved_PrenormalizedOverrideDoesNotBypassRefusal()
+  {
+    auto img = MakeUnresolvedEnhancedPETImage();
+    auto f   = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::EnhancedPETFramesUnresolvedException);
+    CPPUNIT_ASSERT_THROW(f->GetEffectiveInputModel(), mitk::Exception);
   }
 };
 

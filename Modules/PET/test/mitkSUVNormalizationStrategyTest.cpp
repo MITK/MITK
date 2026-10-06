@@ -42,6 +42,12 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
   MITK_TEST(LBMJames128_Female_KnownInputs);
   MITK_TEST(LBMJames128_Other_Throws);
   MITK_TEST(LBMJames128_VariantId);
+  MITK_TEST(LBMMorgan_Male_KnownInputs);
+  MITK_TEST(LBMMorgan_Female_KnownInputs);
+  MITK_TEST(LBMMorgan_DiffersFromJames128_ForMalesOnly);
+  MITK_TEST(LBMMorgan_Other_Throws);
+  MITK_TEST(LBMMorgan_VariantId);
+  MITK_TEST(LBMMorgan_RequiresHeightAndSex);
 
   // Ideal body weight (Sugawara)
   MITK_TEST(IBW_Male_KnownInputs);
@@ -60,6 +66,7 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
   MITK_TEST(Factory_BW_ReturnsBodyWeightStrategy);
   MITK_TEST(Factory_LBMJanma_ReturnsCorrectStrategy);
   MITK_TEST(Factory_LBMJames128_ReturnsCorrectStrategy);
+  MITK_TEST(Factory_LBMMorgan_ReturnsCorrectStrategy);
   MITK_TEST(Factory_IBW_ReturnsCorrectStrategy);
   MITK_TEST(Factory_BSA_ReturnsBodySurfaceAreaStrategy);
 
@@ -265,6 +272,118 @@ public:
   {
     mitk::LeanBodyMassJames128Strategy strategy;
     CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_James128, strategy.Variant());
+  }
+
+  // ---- Lean body mass, Morgan (DICOM SUV Type "LBM") ----
+  //
+  // Morgan and James-128 differ in one coefficient, for males only
+  // (0.0120 against 0.0128); their female formulas are identical. So the
+  // male cases below are the only ones that can tell the two apart, and
+  // the female case is deliberately written to assert that they agree --
+  // an equality that would otherwise look like a copy-paste error to the
+  // next reader.
+
+  void LBMMorgan_Male_KnownInputs()
+  {
+    constexpr double w  = 75.0;
+    constexpr double h  = 1.78;
+    const double w2     = w * w;
+    const double h2     = h * h;
+    const double expectedKg = 1.10 * w - 0.0120 * w2 / h2;
+    const double expected   = expectedKg * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = w;
+    inputs.heightM      = h;
+    inputs.sex          = mitk::Sex::Male;
+
+    mitk::LeanBodyMassMorganStrategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+    // Independent hard-coded anchor (see LBMJanma_Male_KnownInputs).
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(61195.87, strategy.ComputeScaleNumerator(inputs), 0.1);
+  }
+
+  void LBMMorgan_Female_KnownInputs()
+  {
+    constexpr double w  = 60.0;
+    constexpr double h  = 1.65;
+    const double w2     = w * w;
+    const double h2     = h * h;
+    const double expectedKg = 1.07 * w - 0.0148 * w2 / h2;
+    const double expected   = expectedKg * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = w;
+    inputs.heightM      = h;
+    inputs.sex          = mitk::Sex::Female;
+
+    mitk::LeanBodyMassMorganStrategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(44629.75, strategy.ComputeScaleNumerator(inputs), 0.1);
+  }
+
+  void LBMMorgan_DiffersFromJames128_ForMalesOnly()
+  {
+    // The whole risk in adding Morgan is that it gets confused with
+    // James-128. Pin the difference where it exists and the equality where
+    // it does not, so a future edit to either formula cannot quietly turn
+    // one into the other.
+    mitk::LeanBodyMassMorganStrategy   morgan;
+    mitk::LeanBodyMassJames128Strategy james;
+
+    mitk::SUVNormalizationInputs male;
+    male.bodyWeightKg = 75.0;
+    male.heightM      = 1.78;
+    male.sex          = mitk::Sex::Male;
+
+    const double morganMale = morgan.ComputeScaleNumerator(male);
+    const double jamesMale  = james.ComputeScaleNumerator(male);
+    CPPUNIT_ASSERT_MESSAGE("Morgan and James-128 must differ for male patients.",
+                           std::abs(morganMale - jamesMale) > 1.0);
+    // 0.0128 - 0.0120 = 0.0008, times W^2 / H^2, times 1000 g/kg.
+    const double expectedDelta = 0.0008 * (75.0 * 75.0) / (1.78 * 1.78) * 1000.0;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expectedDelta, morganMale - jamesMale, 1e-6);
+
+    mitk::SUVNormalizationInputs female;
+    female.bodyWeightKg = 60.0;
+    female.heightM      = 1.65;
+    female.sex          = mitk::Sex::Female;
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(james.ComputeScaleNumerator(female),
+                                 morgan.ComputeScaleNumerator(female), 1e-9);
+  }
+
+  void LBMMorgan_Other_Throws()
+  {
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = 70.0;
+    inputs.heightM      = 1.70;
+    inputs.sex          = mitk::Sex::Other;
+
+    mitk::LeanBodyMassMorganStrategy strategy;
+    CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
+                         mitk::MissingSUVInputException);
+  }
+
+  void LBMMorgan_VariantId()
+  {
+    mitk::LeanBodyMassMorganStrategy strategy;
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_Morgan, strategy.Variant());
+  }
+
+  void Factory_LBMMorgan_ReturnsCorrectStrategy()
+  {
+    const auto strategy = mitk::MakeSUVNormalizationStrategy(mitk::SUVVariant::LBM_Morgan);
+    CPPUNIT_ASSERT(nullptr != strategy);
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_Morgan, strategy->Variant());
+  }
+
+  void LBMMorgan_RequiresHeightAndSex()
+  {
+    CPPUNIT_ASSERT(mitk::VariantRequiresPatientHeight(mitk::SUVVariant::LBM_Morgan));
+    CPPUNIT_ASSERT(mitk::VariantRequiresPatientSex(mitk::SUVVariant::LBM_Morgan));
   }
 
   // ---- Ideal body weight (IBSI-SUV) ----

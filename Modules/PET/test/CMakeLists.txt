@@ -16,14 +16,14 @@ endforeach()
 
 # Bake the resolved IBSI data dir into the test driver as a string
 # literal. Compile-time injection keeps a single source of truth: the
-# binary always reflects the cache value at build time, whether ctest
+# binary always reflects the resolved dir at build time, whether ctest
 # or a developer launches it directly (e.g. via the VS debugger). When
-# the cache variable is empty the macro expands to "" and the test
+# the resolved dir is empty the macro expands to "" and the test
 # exits 77 (skip).
 if(TARGET MitkPETTestDriver)
   set(_pet_ibsi_data_dir_baked "")
-  if(MITK_PET_IBSI_DATA_DIR)
-    file(TO_CMAKE_PATH "${MITK_PET_IBSI_DATA_DIR}" _pet_ibsi_data_dir_baked)
+  if(MITK_PET_IBSI_RESOLVED_DATA_DIR)
+    file(TO_CMAKE_PATH "${MITK_PET_IBSI_RESOLVED_DATA_DIR}" _pet_ibsi_data_dir_baked)
   endif()
   target_compile_definitions(MitkPETTestDriver PRIVATE
     MITK_PET_IBSI_DATA_DIR="${_pet_ibsi_data_dir_baked}")

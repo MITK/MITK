@@ -11,10 +11,16 @@
 #         -DCMD=<absolute path to executable>
 #         -DARGS="<arg1>;<arg2>;..."        # CMake list (semicolons)
 #         [-DWORKING_DIRECTORY=<dir>]
+#         [-DEXPECT_OUTPUT=<regex>]         # must match stdout or stderr
+#         [-DREJECT_OUTPUT=<regex>]         # must match neither
 #         -P AssertExitCode.cmake
 #
-# Exit 0 iff the wrapped command's exit code equals EXPECTED. Otherwise
-# exits with a small non-zero code so ctest reports failure.
+# Exit 0 iff the wrapped command's exit code equals EXPECTED and the
+# optional output assertions hold. Otherwise exits with a small non-zero
+# code so ctest reports failure.
+#
+# The output assertions exist for contracts that are not expressible as an
+# exit code: a run can succeed and still owe the operator a diagnostic.
 
 if(NOT DEFINED EXPECTED)
   message(FATAL_ERROR "AssertExitCode.cmake: EXPECTED not set.")
@@ -41,11 +47,30 @@ else()
     ERROR_VARIABLE  captured_stderr)
 endif()
 
-if(NOT actual_exit STREQUAL EXPECTED)
+set(_captured "${captured_stdout}${captured_stderr}")
+
+function(_assert_exit_code_dump)
   message("---- captured stdout ----")
   message("${captured_stdout}")
   message("---- captured stderr ----")
   message("${captured_stderr}")
+endfunction()
+
+if(NOT actual_exit STREQUAL EXPECTED)
+  _assert_exit_code_dump()
   message(FATAL_ERROR
     "AssertExitCode: '${CMD}' exited ${actual_exit}, expected ${EXPECTED}.")
+endif()
+
+if(DEFINED EXPECT_OUTPUT AND NOT _captured MATCHES "${EXPECT_OUTPUT}")
+  _assert_exit_code_dump()
+  message(FATAL_ERROR
+    "AssertExitCode: '${CMD}' produced no output matching '${EXPECT_OUTPUT}'.")
+endif()
+
+if(DEFINED REJECT_OUTPUT AND _captured MATCHES "${REJECT_OUTPUT}")
+  _assert_exit_code_dump()
+  message(FATAL_ERROR
+    "AssertExitCode: '${CMD}' produced output matching '${REJECT_OUTPUT}', "
+    "which this case forbids.")
 endif()

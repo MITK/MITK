@@ -40,6 +40,7 @@ class mitkDICOMTagsOfInterestHelperTestSuite : public mitk::TestFixture
   MITK_TEST(RTDoseSequenceTags);
   MITK_TEST(PETSequenceTags);
   MITK_TEST(PETTopLevelTags);
+  MITK_TEST(PETFunctionalGroupMacroTags);
   MITK_TEST(PatientPhysicalTags);
   MITK_TEST(AcquisitionInformationTags);
   MITK_TEST(SOPTags);
@@ -317,6 +318,58 @@ public:
     RequireTopLevel(0x0018, 0x1242, "(0018,1242) ActualFrameDuration");
   }
 
+  /** The Enhanced PET attributes are registered relative to the
+      functional-group item, never rooted in (5200,9229) or (5200,9230): the
+      reader searches such a path in both groups from the one registration,
+      and a rooted one publishes nothing for a frame-model file. */
+  void PETFunctionalGroupMacroTags()
+  {
+    RequireTopLevel(0x0018, 0x9758, "(0018,9758) DecayCorrected");
+    RequireTopLevel(0x0018, 0x9701, "(0018,9701) DecayCorrectionDateTime");
+    RequireTopLevel(0x0028, 0x0008, "(0028,0008) NumberOfFrames");
+
+    mitk::DICOMTagPath mapping;
+    mapping.AddAnySelection(0x0040, 0x9096);
+    mitk::DICOMTagPath unitsCode(mapping);
+    unitsCode.AddAnySelection(0x0040, 0x08EA);
+    RequirePath(mitk::DICOMTagPath(unitsCode).AddElement(0x0008, 0x0100),
+                "RealWorldValueMapping/MeasurementUnitsCode/(0008,0100) CodeValue");
+    RequirePath(mitk::DICOMTagPath(unitsCode).AddElement(0x0008, 0x0119),
+                "RealWorldValueMapping/MeasurementUnitsCode/(0008,0119) LongCodeValue");
+    RequirePath(mitk::DICOMTagPath(unitsCode).AddElement(0x0008, 0x0120),
+                "RealWorldValueMapping/MeasurementUnitsCode/(0008,0120) URNCodeValue");
+    RequirePath(mitk::DICOMTagPath(unitsCode).AddElement(0x0008, 0x0102),
+                "RealWorldValueMapping/MeasurementUnitsCode/(0008,0102) CodingSchemeDesignator");
+    RequirePath(mitk::DICOMTagPath(mapping).AddElement(0x0040, 0x9225),
+                "RealWorldValueMapping/(0040,9225) RealWorldValueSlope");
+    RequirePath(mitk::DICOMTagPath(mapping).AddElement(0x0040, 0x9224),
+                "RealWorldValueMapping/(0040,9224) RealWorldValueIntercept");
+
+    mitk::DICOMTagPath transformation;
+    transformation.AddAnySelection(0x0028, 0x9145);
+    RequirePath(mitk::DICOMTagPath(transformation).AddElement(0x0028, 0x1053),
+                "PixelValueTransformation/(0028,1053) RescaleSlope");
+    RequirePath(mitk::DICOMTagPath(transformation).AddElement(0x0028, 0x1052),
+                "PixelValueTransformation/(0028,1052) RescaleIntercept");
+    RequirePath(mitk::DICOMTagPath(transformation).AddElement(0x0028, 0x1054),
+                "PixelValueTransformation/(0028,1054) RescaleType");
+
+    mitk::DICOMTagPath frameContent;
+    frameContent.AddAnySelection(0x0020, 0x9111);
+    RequirePath(mitk::DICOMTagPath(frameContent).AddElement(0x0018, 0x9151),
+                "FrameContent/(0018,9151) FrameReferenceDateTime");
+    RequirePath(mitk::DICOMTagPath(frameContent).AddElement(0x0018, 0x9074),
+                "FrameContent/(0018,9074) FrameAcquisitionDateTime");
+    RequirePath(mitk::DICOMTagPath(frameContent).AddElement(0x0018, 0x9220),
+                "FrameContent/(0018,9220) FrameAcquisitionDuration");
+
+    for (const auto& entry : m_Tags)
+    {
+      CPPUNIT_ASSERT_MESSAGE("No default tag of interest is rooted in a functional group: " + entry.first.ToStr(),
+                             !mitk::IsFunctionalGroupRooted(entry.first));
+    }
+  }
+
   void PatientPhysicalTags()
   {
     RequireTopLevel(0x0010, 0x1030, "(0010,1030) PatientWeight");
@@ -377,15 +430,17 @@ public:
   {
     this->ResolveServices();
 
-    const std::string ownName = "DICOM.5200.9230.[0].0028.9145.[0].0028.1053";
-    const std::string frameRelativeName = "DICOM.0028.9145.[0].0028.1053";
+    // In-Stack Position Number: a Frame Content attribute no default
+    // registration covers, so the frame-relative key is provably free.
+    const std::string ownName = "DICOM.5200.9230.[0].0020.9111.[0].0020.9057";
+    const std::string frameRelativeName = "DICOM.0020.9111.[0].0020.9057";
 
     CPPUNIT_ASSERT_MESSAGE("Test precondition: the frame-relative key is not registered yet",
                            !m_Persistence->HasInfo(frameRelativeName, true)
                              && !m_Descriptions->HasDescription(frameRelativeName));
 
     mitk::DICOMTagPath rooted;
-    rooted.AddAnySelection(0x5200, 0x9230).AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053);
+    rooted.AddAnySelection(0x5200, 0x9230).AddAnySelection(0x0020, 0x9111).AddElement(0x0020, 0x9057);
     this->Register(rooted);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("One persistence info for the registered path",

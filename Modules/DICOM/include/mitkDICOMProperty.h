@@ -33,8 +33,8 @@ namespace mitk
    * \brief Functor to convert collected DICOM tag values into DICOMProperty instances.
    *
    * Generation functor for DICOMFileReader classes. Given a lookup table of per-slice tag values,
-   * creates a single property: either a StringProperty (if all values are identical) or a
-   * TemporoSpatialStringProperty.
+   * creates a single DICOMProperty holding one entry per (time point, slice) of the table, even
+   * when all values are identical. A slot whose file lacks the tag has no entry.
    *
    * \param[in] cacheLookupTable The lookup table mapping slice indices to cached DICOM values.
    * \return A smart pointer to the created BaseProperty.

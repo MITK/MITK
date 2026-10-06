@@ -52,6 +52,11 @@ namespace
     BenchmarkAdaptationRefused = 8,
     InputReadError             = 9,
     OutputWriteError           = 10,
+    UnsupportedPETUnits        = 11,
+    MissingPhilipsPETScale     = 12,
+    EnhancedPETPerFrameVariation = 13,
+    EnhancedPETMappingNotApplied = 14,
+    EnhancedPETFramesUnresolved  = 15,
   };
 
   int AsInt(ExitCode c) { return static_cast<int>(c); }
@@ -154,8 +159,10 @@ namespace
       "SUV variant",
       "One of: bw (body weight, default), lbm-janma (lean body mass, "
       "Janmahasatian 2005, IBSI-SUV recommended), lbm-james128 (lean body "
-      "mass, James 1976), ibw (ideal body weight, Sugawara 1999), "
-      "bsa (body surface area, DuBois).",
+      "mass, James 1976), ibw (ideal body weight, Sugawara 1999), bsa "
+      "(body surface area, DuBois). Morgan 1994, which DICOM labels SUV "
+      "Type LBM, is read as an input variant but cannot be produced: the "
+      "IBSI-SUV manual calls it obsolete.",
       us::Any(std::string("bw")));
     parser.endGroup();
 
@@ -203,13 +210,16 @@ namespace
       "Strict DICOM input policy",
       "Refuse IBSI-SUV-recommended empirical adaptations of borderline / "
       "ambiguous DICOM input. Currently affects: (a) reinterpreting "
-      "Radionuclide Total Dose (0018,1074) below 1e4 as MBq, and "
-      "(b) DC=START vendor-specific decay-timing fallbacks (Siemens / "
-      "Philips T_ave - FrameReferenceTime, GE -FrameReferenceTime). "
-      "Without this flag the tool applies the recommendations and emits "
-      "a WARN log entry. With this flag, supply unambiguous timing "
-      "(vendor private datetime, AcquisitionTime == SeriesTime) or use "
-      "--decay-time.");
+      "Radionuclide Total Dose (0018,1074) below 1e4 as MBq; "
+      "(b) the DC=START empirical decay-timing fallbacks, i.e. "
+      "AcquisitionTime + T_ave - FrameReferenceTime for any manufacturer "
+      "other than GE, and AcquisitionTime - FrameReferenceTime for GE; "
+      "and (c) resolving an absent or ambiguous Patient Sex (0010,0040) "
+      "as the mean of the male- and female-specific normalizations. "
+      "Without this flag the tool applies the recommendations, emits a "
+      "WARN log entry, and records each one on the output image. With "
+      "this flag, supply unambiguous timing (vendor private datetime, "
+      "AcquisitionTime == SeriesTime) or use --decay-time.");
     parser.addArgument("tracer-index", "", mitkCommandLineParser::Int,
       "Radiopharmaceutical sequence item index",
       "Explicit selection for multi-item Radiopharmaceutical Information "
@@ -243,7 +253,8 @@ namespace
       if (!v.has_value())
       {
         MITK_ERROR << "Invalid --variant value '" << raw
-                   << "'. Expected one of bw, lbm-janma, lbm-james128, ibw, bsa.";
+                   << "'. Expected one of bw, lbm-janma, lbm-james128, "
+                      "ibw, bsa.";
         return false;
       }
       s.variant = v.value();
@@ -393,6 +404,35 @@ int main(int argc, char* argv[])
 
     auto output = filter->GetOutput();
 
+    // Consolidated, after the per-rule warnings the pipeline emitted while
+    // it worked. Those are interleaved with everything else the run logs;
+    // this is the block an operator can actually read, and the one place
+    // the whole set of reinterpretations appears together. Not gated on
+    // --verbose: an input that had to be reinterpreted to be usable is not
+    // a detail the caller opts in to.
+    const std::string adaptationSummary =
+      mitk::FormatAdaptationSummary(filter->GetAdaptations());
+    if (!adaptationSummary.empty())
+    {
+      MITK_WARN << adaptationSummary
+                << "\nRerun with --strict-dicom to refuse these instead.";
+    }
+
+    // Reported next to the adaptations because an operator reads them the
+    // same way -- something about this input is worth a second look -- even
+    // though these changed nothing and --strict-dicom does not refuse them.
+    const auto& rescaleFindings = filter->GetRescaleFindings();
+    if (!rescaleFindings.empty())
+    {
+      std::string rescaleSummary = "Rescale values worth checking ("
+                                 + std::to_string(rescaleFindings.size()) + "):";
+      for (const auto& finding : rescaleFindings)
+      {
+        rescaleSummary += "\n  - " + finding;
+      }
+      MITK_WARN << rescaleSummary;
+    }
+
     // ---- Save -----------------------------------------------------------
     //
     // Wrapped separately so an output-write failure is distinguishable
@@ -443,6 +483,31 @@ int main(int argc, char* argv[])
   {
     MITK_ERROR << "Missing SUV input: " << e.GetDescription();
     return AsInt(ExitCode::MissingSUVInput);
+  }
+  catch (const mitk::EnhancedPETPerFrameVariationException& e)
+  {
+    MITK_ERROR << "Enhanced PET per-frame variation: " << e.GetDescription();
+    return AsInt(ExitCode::EnhancedPETPerFrameVariation);
+  }
+  catch (const mitk::EnhancedPETMappingNotAppliedException& e)
+  {
+    MITK_ERROR << "Enhanced PET mapping not applied: " << e.GetDescription();
+    return AsInt(ExitCode::EnhancedPETMappingNotApplied);
+  }
+  catch (const mitk::EnhancedPETFramesUnresolvedException& e)
+  {
+    MITK_ERROR << "Enhanced PET frames unresolved: " << e.GetDescription();
+    return AsInt(ExitCode::EnhancedPETFramesUnresolved);
+  }
+  catch (const mitk::UnsupportedPETUnitsException& e)
+  {
+    MITK_ERROR << "Unsupported PET units: " << e.GetDescription();
+    return AsInt(ExitCode::UnsupportedPETUnits);
+  }
+  catch (const mitk::MissingPhilipsPETScaleException& e)
+  {
+    MITK_ERROR << "Missing Philips PET scale factor: " << e.GetDescription();
+    return AsInt(ExitCode::MissingPhilipsPETScale);
   }
   catch (const mitk::SUVHelperException& e)
   {

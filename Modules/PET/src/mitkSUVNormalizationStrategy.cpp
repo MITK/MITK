@@ -105,6 +105,37 @@ double mitk::LeanBodyMassJames128Strategy::ComputeScaleNumerator(
   return lbmKg * 1000.0;
 }
 
+double mitk::LeanBodyMassMorganStrategy::ComputeScaleNumerator(
+  const SUVNormalizationInputs& inputs) const
+{
+  RequirePositive(inputs.bodyWeightKg, "bodyWeightKg");
+  RequirePositive(inputs.heightM,      "heightM");
+  RequireConcreteSex(inputs.sex, "SUVlbm (Morgan)");
+
+  // Morgan / James, the variant DICOM labels SUV Type "LBM":
+  //   LBM_male   [kg] = 1.10 * W - 0.0120 * W^2 / H^2
+  //   LBM_female [kg] = 1.07 * W - 0.0148 * W^2 / H^2
+  //
+  // The IBSI-SUV manual writes these as 120 (W/H)^2 and 148 (W/H)^2 with H
+  // in cm; dividing by 100^2 gives the coefficients above for H in metres.
+  //
+  // Only the male coefficient separates this from James-128 (0.0120 against
+  // 0.0128); the female formula is character-for-character the same. The two
+  // are deliberately written out separately rather than shared, because a
+  // helper parameterised on one number is exactly how they would drift into
+  // each other.
+  const double w  = inputs.bodyWeightKg;
+  const double h  = inputs.heightM;
+  const double w2 = w * w;
+  const double h2 = h * h;
+
+  const double lbmKg = (Sex::Male == inputs.sex.value())
+    ? 1.10 * w - 0.0120 * w2 / h2
+    : 1.07 * w - 0.0148 * w2 / h2;
+
+  return lbmKg * 1000.0;
+}
+
 double mitk::IdealBodyWeightStrategy::ComputeScaleNumerator(
   const SUVNormalizationInputs& inputs) const
 {
@@ -148,6 +179,7 @@ bool mitk::VariantRequiresPatientHeight(SUVVariant variant)
   {
     case SUVVariant::LBM_Janmahasatian:
     case SUVVariant::LBM_James128:
+    case SUVVariant::LBM_Morgan:
     case SUVVariant::IBW:
     case SUVVariant::BSA:
       return true;
@@ -165,6 +197,7 @@ bool mitk::VariantRequiresPatientSex(SUVVariant variant)
   {
     case SUVVariant::LBM_Janmahasatian:
     case SUVVariant::LBM_James128:
+    case SUVVariant::LBM_Morgan:
     case SUVVariant::IBW:
       return true;
     case SUVVariant::BW:
@@ -184,6 +217,7 @@ mitk::MakeSUVNormalizationStrategy(SUVVariant variant)
     case SUVVariant::BW:                return std::make_unique<BodyWeightStrategy>();
     case SUVVariant::LBM_Janmahasatian: return std::make_unique<LeanBodyMassJanmahasatianStrategy>();
     case SUVVariant::LBM_James128:      return std::make_unique<LeanBodyMassJames128Strategy>();
+    case SUVVariant::LBM_Morgan:        return std::make_unique<LeanBodyMassMorganStrategy>();
     case SUVVariant::IBW:               return std::make_unique<IdealBodyWeightStrategy>();
     case SUVVariant::BSA:               return std::make_unique<BodySurfaceAreaStrategy>();
   }

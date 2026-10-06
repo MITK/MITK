@@ -1906,9 +1906,9 @@ namespace
   }
 
   /** The rules of a label transfer resolved into lookup tables, so that the voxel loops do no label lookups and
-   * all mappings are applied in one pass: a mapped source value assigns its target wherever the destination is
-   * overwritable; with MergeStyle::Replace, the source background clears the target labels where the destination
-   * background is not locked. */
+   * all mappings are applied in one pass: a mapped source value assigns its target wherever the original destination
+   * value is overwritable; otherwise, with MergeStyle::Replace, the source background clears the target labels where
+   * the destination background is not locked. */
   struct LabelTransferRules
   {
     static constexpr int NoTarget = -1;

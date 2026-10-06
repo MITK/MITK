@@ -192,11 +192,14 @@ void mitk::SegWithPreviewTool::Deactivated()
 void mitk::SegWithPreviewTool::ConfirmSegmentation()
 {
   bool labelChanged = this->EnsureUpToDateUserDefinedActiveLabel();
-  if ((m_LazyDynamicPreviews && m_CreateAllTimeSteps) || labelChanged)
-  { // The tool should create all time steps but is currently in lazy mode,
-    // thus ensure that a preview for all time steps is available.
-    this->UpdatePreview(true);
-  }
+
+  // A lazy tool has computed the current time step only, which is all that is
+  // transferred unless all time steps are to be created. A changed active label
+  // needs what is transferred to be computed again, but not more than that.
+  const bool updateAllTimeSteps = m_LazyDynamicPreviews && m_CreateAllTimeSteps;
+
+  if (updateAllTimeSteps || labelChanged)
+    this->UpdatePreview(updateAllTimeSteps);
 
   CreateResultSegmentationFromPreview();
 

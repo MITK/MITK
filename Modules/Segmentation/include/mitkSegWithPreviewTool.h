@@ -433,8 +433,8 @@ namespace mitk
     /** Relevant if the working data / preview image has multiple time steps (dynamic segmentations).
      * This flag has to be set by derived classes accordingly to there way to generate dynamic previews.
      * If LazyDynamicPreview is true, the tool generates only the preview for the current time step.
-     * Therefore it always has to update the preview if current time point has changed and it has to (re)compute
-     * all timeframes if ConfirmSegmentation() is called.*/
+     * Therefore it always has to update the preview if current time point has changed and it has to compute
+     * all timeframes if ConfirmSegmentation() is called while all time steps are to be created.*/
     bool m_LazyDynamicPreviews = false;
 
     bool m_IsTimePointChangeAware = true;

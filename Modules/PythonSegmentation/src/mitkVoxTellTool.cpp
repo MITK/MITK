@@ -886,11 +886,12 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     };
 
     // The result of the last run is still around if nothing it depends on has
-    // changed. That is the case when the base class asks for an update only to
-    // have a preview for all time steps, or because the active label of the
-    // segmentation changed, which makes no difference to VoxTell. Running the
-    // model again would take just as long as the first time. Where the results
-    // go is decided anew, as the segmentation may have changed.
+    // changed. That is the case when the base class asks for an update of the
+    // same time step because the active label of the segmentation changed,
+    // which makes no difference to VoxTell. Running the model again would take
+    // just as long as the first time. Where the results go is decided anew, as
+    // the segmentation may have changed. Only the last run is kept, so every
+    // other time step of a dynamic image is a run of its own.
     if (m_Impl->CachedRun != run)
     {
       m_Impl->CachedRun.reset();

@@ -268,6 +268,7 @@ mitk::VoxTellTool::VoxTellTool()
   this->KeepActiveAfterAcceptOn();
   this->RequiresExistingLabelsOff();
   this->RequiresVolumetricReferenceOn();
+  this->RequiresReferenceGeometryOn();
 
   // Results that overlap go into groups of their own (see SetCreateGroupsAsNeeded()).
   this->TransfersAllPreviewGroupsOn();

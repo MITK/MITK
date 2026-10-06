@@ -68,6 +68,7 @@ mitk::TotalSegmentatorTool::TotalSegmentatorTool()
   this->KeepActiveAfterAcceptOn();
   this->RequiresExistingLabelsOff();
   this->RequiresVolumetricReferenceOn();
+  this->RequiresReferenceGeometryOn();
 }
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()

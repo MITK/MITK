@@ -137,6 +137,12 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
   if (m_RequiresExistingLabels && labelSet->GetTotalNumberOfLabels() == 0)
     return false;
 
+  // The same tolerances as MultiLabelSegmentation::UpdateGroupImage(), which
+  // rejects a result of another geometry.
+  if (m_RequiresReferenceGeometry && !Equal(*referenceImage->GetGeometry(), *labelSet->GetGeometry(),
+        NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    return false;
+
   return true;
 }
 

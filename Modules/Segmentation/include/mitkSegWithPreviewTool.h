@@ -276,6 +276,15 @@ namespace mitk
     itkGetConstMacro(RequiresVolumetricReference, bool);
     itkBooleanMacro(RequiresVolumetricReference);
 
+    /** \brief If true, CanHandle() rejects segmentations whose geometry differs from that
+     * of the reference image, such as a segmentation of a part of the image.
+     *
+     * For tools that compute their result on the grid of the reference image.
+     */
+    itkSetMacro(RequiresReferenceGeometry, bool);
+    itkGetConstMacro(RequiresReferenceGeometry, bool);
+    itkBooleanMacro(RequiresReferenceGeometry);
+
     /** \brief See GetTransfersAllPreviewGroups(). False by default.
      *
      * Only for tools whose preview holds nothing but their results, as the
@@ -499,6 +508,7 @@ namespace mitk
     bool m_RequiresExistingLabels = true;
     bool m_RequiresScalarReference = true;
     bool m_RequiresVolumetricReference = false;
+    bool m_RequiresReferenceGeometry = false;
     bool m_TransfersAllPreviewGroups = false;
   };
 

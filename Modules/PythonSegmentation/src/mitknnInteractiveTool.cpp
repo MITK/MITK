@@ -243,6 +243,7 @@ mitk::nnInteractiveTool::nnInteractiveTool()
   this->ResetsToEmptyPreviewOn();
   this->RequestDeactivationConfirmationOn();
   this->RequiresVolumetricReferenceOn(); // the session image is handed to Python as a volume
+  this->RequiresReferenceGeometryOn();
   this->SetSelectedLabels({1});
 
   for (const auto& [interactionType, interactor] : m_Impl->Interactors)

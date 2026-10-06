@@ -37,6 +37,7 @@ mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(true, "PressMoveReleaseAnd
   this->ResetsToEmptyPreviewOn();
   this->UseSpecialPreviewColorOff();
   this->RequiresVolumetricReferenceOn(); // GrowCutSegmentationFilter is fixed to 3D
+  this->RequiresReferenceGeometryOn();
 }
 
 mitk::GrowCutTool::~GrowCutTool() {}

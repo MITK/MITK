@@ -1888,6 +1888,20 @@ namespace
     return overwritable;
   }
 
+  /** Throws if labelMapping maps a source label to more than one target. Repeating a mapping is harmless. */
+  void CheckForConflictingMappings(const mitk::LabelValueMappingVector& labelMapping)
+  {
+    std::map<mitk::Label::PixelType, mitk::Label::PixelType> targets;
+
+    for (const auto& [sourceLabel, targetLabel] : labelMapping)
+    {
+      const auto [position, inserted] = targets.emplace(sourceLabel, targetLabel);
+
+      if (!inserted && position->second != targetLabel)
+        mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; labelMapping maps the source label " << sourceLabel << " to more than one target.";
+    }
+  }
+
   /** The rules of a label transfer resolved into lookup tables, so that the voxel loops do no label lookups and
    * all mappings are applied in one pass: a mapped source value assigns its target wherever the destination is
    * overwritable; with MergeStyle::Replace, the source background clears the target labels where the destination
@@ -2022,6 +2036,8 @@ void mitk::TransferLabelContentAtTimeStep(
       offset[d] = std::llround(destinationIndex[d]);
   }
 
+  CheckForConflictingMappings(labelMapping);
+
   const auto destinationLabelMap = ConvertLabelVectorToMap(destinationLabels);
   const bool backgroundWritable = MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == overwriteStlye || !destinationBackgroundLocked;
 
@@ -2035,10 +2051,6 @@ void mitk::TransferLabelContentAtTimeStep(
     if (MultiLabelSegmentation::UNLABELED_VALUE != newDestinationLabel && destinationLabelMap.end() == destinationLabelMap.find(newDestinationLabel))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
-    }
-    if (LabelTransferRules::NoTarget != rules.Target[sourceLabel])
-    {
-      mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; labelMapping maps the source label more than once: " << sourceLabel;
     }
 
     rules.Target[sourceLabel] = newDestinationLabel;
@@ -2373,6 +2385,13 @@ void mitk::TransferLabelContentAtTimeStep(
 
   //split all label mappings by source group id
   auto groupLabelValueMappingSplits = LabelSetImageHelper::SplitLabelValueMappingBySourceAndTargetGroup(sourceImage, destinationImage, labelMapping);
+
+  // Each pair of groups is transferred separately, so reject an invalid mapping before the first one is written.
+  for (const auto& [sourceGroupID, destGroupLabelMapping] : groupLabelValueMappingSplits)
+  {
+    for (const auto& [destGroupID, relevantLabelMapping] : destGroupLabelMapping)
+      CheckForConflictingMappings(relevantLabelMapping);
+  }
 
   //start transfer by iterating over relevant source groups
   for (const auto& [sourceGroupID, destGroupLabelMapping] : groupLabelValueMappingSplits)

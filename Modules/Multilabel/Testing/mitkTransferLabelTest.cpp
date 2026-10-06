@@ -48,6 +48,8 @@ class mitkTransferLabelTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransfer_SubGeometry_Replace);
   MITK_TEST(TestTransfer_SubGeometry_Replace_LockedBackground);
   MITK_TEST(TestTransfer_SameImage_NoChaining);
+  MITK_TEST(TestTransfer_RepeatedMapping);
+  MITK_TEST(TestTransfer_ConflictInLaterGroupPair);
   MITK_TEST(TestTransfer_StaticSource_AtTimeStep);
   MITK_TEST(TestTransfer_InvalidInput);
   MITK_TEST(TestTransferSurface_RegardLocks);
@@ -729,6 +731,38 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel was not mapped", mitk::Label::PixelType(3), GetPixel(groupImage, 0, second));
   }
 
+  void TestTransfer_RepeatedMapping()
+  {
+    auto segmentation = CreateSurfaceTestSegmentation(1);
+    const auto* groupImage = segmentation->GetGroupImage(0);
+    const Index marked = { 20, 20, 20 };
+
+    mitk::TransferLabelContentAtTimeStep(CreateLabelImage(40, marked, marked, 2), segmentation->GetGroupImage(0),
+      segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(0)), 0,
+      mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, { {2, 3}, {2, 3} });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Marked voxel was not assigned", mitk::Label::PixelType(3), GetPixel(groupImage, 0, marked));
+  }
+
+  void TestTransfer_ConflictInLaterGroupPair()
+  {
+    auto segmentation = CreateSurfaceTestSegmentation(1);
+    const auto group = segmentation->AddGroup();
+    segmentation->AddLabel(mitk::Label::New(4, "Second group 1"), group);
+    segmentation->AddLabel(mitk::Label::New(5, "Second group 2"), group);
+
+    auto* groupImage = segmentation->GetGroupImage(0);
+    const Index marked = { 20, 20, 20 };
+    SetPixel(groupImage, 0, marked, 2);
+
+    // The pair of the first group is valid and comes first, the conflict lies in the pair of the second group.
+    CPPUNIT_ASSERT_THROW_MESSAGE("A source label mapped to two targets in one group was accepted",
+      mitk::TransferLabelContentAtTimeStep(segmentation, segmentation, 0, { {2, 3}, {1, 4}, {1, 5} }), mitk::Exception);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The valid pair of groups was transferred although the mapping was rejected",
+      mitk::Label::PixelType(2), GetPixel(groupImage, 0, marked));
+  }
+
   void TestTransfer_StaticSource_AtTimeStep()
   {
     auto segmentation = CreateSurfaceTestSegmentation(2);
@@ -752,7 +786,7 @@ public:
     const auto labels = segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(0));
     const auto source = CreateLabelImage(40, { 20, 20, 20 }, { 20, 20, 20 }, 1);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("A source label mapped twice was accepted",
+    CPPUNIT_ASSERT_THROW_MESSAGE("A source label mapped to two targets was accepted",
       mitk::TransferLabelContentAtTimeStep(source, groupImage, labels, 0, 0, 0, false, { {1, 2}, {1, 3} }), mitk::Exception);
 
     auto misaligned = CreateSubSource();

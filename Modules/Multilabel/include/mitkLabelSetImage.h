@@ -866,7 +866,7 @@ namespace mitk
   \pre sourceImage and destinationImage must have the pixel type of labels (mitk::Label::PixelType)
   \pre sourceImage and destinationImage must contain the indicated timeStep
   \pre destinationLabelVector must contain all indicated destinationLabels for mapping
-  \pre labelMapping must not contain a source label more than once.*/
+  \pre labelMapping must not map a source label to more than one target.*/
   MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const Image* sourceImage, Image* destinationImage, const mitk::ConstLabelVector& destinationLabelVector,
     const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = MultiLabelSegmentation::UNLABELED_VALUE,
     mitk::Label::PixelType destinationBackground = MultiLabelSegmentation::UNLABELED_VALUE,

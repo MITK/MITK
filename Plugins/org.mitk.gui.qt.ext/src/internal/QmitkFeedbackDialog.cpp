@@ -12,7 +12,13 @@ found in the LICENSE file.
 
 #include "QmitkFeedbackDialog.h"
 
+#include "QmitkFeedbackInput.h"
+
 #include <ui_QmitkFeedbackDialog.h>
+
+#ifdef MITK_HAS_CRASHHANDLING
+#include <QmitkCrashDumpListWidget.h>
+#endif
 
 #include <mitkException.h>
 #include <mitkFeedbackBundle.h>
@@ -98,6 +104,7 @@ QmitkFeedbackDialog::QmitkFeedbackDialog(const Input& input, QWidget* parent)
   this->AddEnvironmentItems(m_Input.environment);
   this->AddLogSources();
   this->SetUpScreenshot();
+  this->SetUpDumps();
 
   connect(m_Controls->categoryComboBox, &QComboBox::currentIndexChanged, this, &QmitkFeedbackDialog::OnReportChanged);
   connect(m_Controls->descriptionEdit, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnReportChanged);
@@ -128,6 +135,14 @@ void QmitkFeedbackDialog::done(int result)
     return;
 
   QDialog::done(result);
+}
+
+std::vector<std::filesystem::path> QmitkFeedbackDialog::GetDumpsToDelete() const
+{
+  if (m_DeleteDumpsCheckBox == nullptr || !m_DeleteDumpsCheckBox->isChecked())
+    return {};
+
+  return m_BundleAttachments;
 }
 
 void QmitkFeedbackDialog::AddEnvironmentItems(const mitk::EnvironmentInfo& environment)
@@ -223,6 +238,36 @@ void QmitkFeedbackDialog::SetUpScreenshot()
     &QmitkFeedbackDialog::OnPublicItemChanged);
 }
 
+void QmitkFeedbackDialog::SetUpDumps()
+{
+#ifdef MITK_HAS_CRASHHANDLING
+  if (m_Input.dumps.empty())
+    return;
+
+  m_DumpList = new QmitkCrashDumpListWidget;
+  m_DumpList->SetDumps(m_Input.dumps);
+  m_DumpList->SetCheckable(true);
+  m_DumpList->SetSelectionEnabled(false);
+  m_DumpList->SetColumnHidden(QmitkCrashDumpListWidget::StatusColumn, true);
+  m_DumpList->FitToContents();
+  m_IncludedDumpCount = m_Input.dumps.size();
+
+  m_DeleteDumpsCheckBox = new QCheckBox("Delete the included crash dumps from this computer when I close this dialog");
+  m_DeleteDumpsCheckBox->setToolTip("Only dumps that are in a saved report bundle are deleted. "
+    "The bundle in the temporary folder is then their only copy.");
+
+  auto* note = new QLabel("They can also be deleted later under Help > Diagnostic Data.");
+  note->setWordWrap(true);
+
+  m_Controls->dumpsLayout->addWidget(m_DumpList);
+  m_Controls->dumpsLayout->addWidget(m_DeleteDumpsCheckBox);
+  m_Controls->dumpsLayout->addWidget(note);
+  m_Controls->dumpsGroup->setVisible(true);
+
+  connect(m_DumpList, &QmitkCrashDumpListWidget::CheckedChanged, this, &QmitkFeedbackDialog::OnDumpsChanged);
+#endif
+}
+
 mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
 {
   mitk::FeedbackReport report;
@@ -279,6 +324,35 @@ mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
     }
   }
 
+#ifdef MITK_HAS_CRASHHANDLING
+  if (m_DumpList != nullptr)
+  {
+    const auto checked = m_DumpList->GetCheckedDumps();
+
+    for (const auto& dump : m_Input.dumps)
+    {
+      const auto release = dump.RunInfo.has_value() && !dump.RunInfo->Release.empty()
+        ? QString::fromStdString(dump.RunInfo->Release)
+        : QString("unknown");
+
+      // Neither the path nor the install directory of the run info: both
+      // can contain the OS user name.
+      const auto description = QString("%1, %2, %3, release of that session: %4")
+        .arg(QmitkCrashDumpListWidget::KindLabel(dump.Kind), QmitkFeedbackDumpTime(dump),
+          QLocale::c().formattedDataSize(static_cast<qint64>(dump.SizeInBytes)), release);
+
+      mitk::FeedbackAttachment attachment;
+      attachment.sourcePath = dump.Path;
+      attachment.archiveName = "dumps/" + QString::fromStdU16String(dump.Path.filename().u16string()).toStdString();
+      attachment.description = description.toStdString();
+      attachment.included = std::any_of(checked.begin(), checked.end(),
+        [&dump](const auto& checkedDump) { return checkedDump.Path == dump.Path; });
+
+      report.attachments.push_back(attachment);
+    }
+  }
+#endif
+
   report.sharingConfirmed = m_Controls->sharingConfirmationCheckBox->isChecked();
   report.publicSharingConfirmed = m_Controls->publicSharingConfirmationCheckBox->isChecked();
 
@@ -316,6 +390,19 @@ void QmitkFeedbackDialog::OnPublicItemChanged()
 {
   m_Controls->publicSharingConfirmationCheckBox->setChecked(false);
   this->OnReportChanged();
+}
+
+void QmitkFeedbackDialog::OnDumpsChanged()
+{
+#ifdef MITK_HAS_CRASHHANDLING
+  const auto includedDumpCount = m_DumpList->GetCheckedDumps().size();
+
+  if (includedDumpCount > m_IncludedDumpCount)
+    m_Controls->sharingConfirmationCheckBox->setChecked(false);
+
+  m_IncludedDumpCount = includedDumpCount;
+  this->OnReportChanged();
+#endif
 }
 
 void QmitkFeedbackDialog::UpdateConfirmations(const mitk::FeedbackReport& report)
@@ -424,6 +511,13 @@ void QmitkFeedbackDialog::OnBundleWritten()
 
   m_BundlePath = m_PendingZipPath;
   m_BundleGeneration = m_PendingGeneration;
+  m_BundleAttachments.clear();
+
+  for (const auto& attachment : m_PendingReport.attachments)
+  {
+    if (attachment.included)
+      m_BundleAttachments.push_back(attachment.sourcePath);
+  }
 
   const auto size = QFileInfo(m_BundlePath).size();
   auto status = QString("Saved <b>%1</b> (%2).")

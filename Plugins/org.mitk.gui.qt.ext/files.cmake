@@ -15,9 +15,14 @@ set(INTERNAL_CPP_FILES
   QmitkCommonExtPlugin.cpp
   QmitkCrashDumpsPreferencePage.cpp
   QmitkFeedbackDialog.cpp
+  QmitkFeedbackInput.cpp
   QmitkModuleView.cpp
   QmitkReportsAndDiagnosticsPreferencePage.cpp
 )
+
+if(MITK_USE_sentry)
+  list(APPEND INTERNAL_CPP_FILES QmitkCrashReportService.cpp)
+endif()
 
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui

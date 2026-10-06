@@ -16,15 +16,21 @@ found in the LICENSE file.
 #include <mitkEnvironmentInfo.h>
 #include <mitkFeedbackReport.h>
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include <mitkCrashDumpFacility.h>
+#endif
+
 #include <QDialog>
 #include <QFutureWatcher>
 #include <QPixmap>
 
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <vector>
 
 class QCheckBox;
+class QmitkCrashDumpListWidget;
 class QLabel;
 class QPlainTextEdit;
 
@@ -68,12 +74,24 @@ public:
 
     /** Null when no multi-widget editor is active. */
     QPixmap editorShot;
+
+#ifdef MITK_HAS_CRASHHANDLING
+    /** Offered for inclusion, all included initially; their session logs
+     *  are among the log sources. */
+    std::vector<mitk::CrashDumpInfo> dumps;
+#endif
   };
 
   explicit QmitkFeedbackDialog(const Input& input, QWidget* parent = nullptr);
   ~QmitkFeedbackDialog() override;
 
   void done(int result) override;
+
+  /** \brief The crash dumps in the last successfully written bundle if the
+   *  user asked to delete them, else none. Deleting is left to the caller
+   *  after the dialog has closed, because later hand-offs from the same
+   *  dialog may write the bundle again from the same dumps. */
+  std::vector<std::filesystem::path> GetDumpsToDelete() const;
 
 private:
   struct LogSourceWidgets
@@ -87,6 +105,7 @@ private:
   void AddEnvironmentItems(const mitk::EnvironmentInfo& environment);
   void AddLogSources();
   void SetUpScreenshot();
+  void SetUpDumps();
 
   /** Exactly what the preview shows and a hand-off emits. */
   mitk::FeedbackReport AssembleReport() const;
@@ -94,6 +113,7 @@ private:
   void OnReportChanged();
   void OnPhiItemIncluded(bool included);
   void OnPublicItemChanged();
+  void OnDumpsChanged();
 
   void UpdatePreview();
   void UpdateConfirmations(const mitk::FeedbackReport& report);
@@ -129,12 +149,17 @@ private:
   unsigned int m_Generation = 0;
   unsigned int m_BundleGeneration = 0;
   QString m_BundlePath;
+  std::vector<std::filesystem::path> m_BundleAttachments;
 
   QFutureWatcher<QString> m_BundleWatcher;
   QString m_PendingZipPath;
   unsigned int m_PendingGeneration = 0;
   mitk::FeedbackReport m_PendingReport;
   Handoff m_PendingHandoff;
+
+  QmitkCrashDumpListWidget* m_DumpList = nullptr;
+  QCheckBox* m_DeleteDumpsCheckBox = nullptr;
+  std::size_t m_IncludedDumpCount = 0;
 };
 
 #endif

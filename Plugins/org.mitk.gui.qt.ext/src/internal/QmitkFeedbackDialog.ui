@@ -94,6 +94,17 @@
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="dumpsGroup">
+          <property name="title">
+           <string>Crash dumps</string>
+          </property>
+          <property name="visible">
+           <bool>false</bool>
+          </property>
+          <layout class="QVBoxLayout" name="dumpsLayout"/>
+         </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="logGroup">
           <property name="title">
            <string>Log</string>

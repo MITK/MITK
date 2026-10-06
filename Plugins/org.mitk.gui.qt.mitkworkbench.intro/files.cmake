@@ -4,6 +4,8 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkMitkWorkbenchIntroPlugin.cpp
   QmitkMitkWorkbenchIntroPart.cpp
+  QmitkWelcomeCard.cpp
+  QmitkWelcomeContributePage.cpp
   QmitkWelcomePalette.cpp
   QmitkWelcomePersonalizationPage.cpp
   QmitkWelcomeRecentDataPage.cpp
@@ -14,6 +16,7 @@ set(INTERNAL_CPP_FILES
 set(MOC_H_FILES
   src/internal/QmitkMitkWorkbenchIntroPlugin.h
   src/internal/QmitkMitkWorkbenchIntroPart.h
+  src/internal/QmitkWelcomeContributePage.h
   src/internal/QmitkWelcomePersonalizationPage.h
   src/internal/QmitkWelcomeRecentDataPage.h
   src/internal/QmitkWelcomeTipsPage.h

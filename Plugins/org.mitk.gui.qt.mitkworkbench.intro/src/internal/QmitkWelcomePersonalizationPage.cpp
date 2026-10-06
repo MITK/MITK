@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkWelcomePersonalizationPage.h"
 
 #include "QmitkMitkWorkbenchIntroPlugin.h"
+#include "QmitkWelcomeCard.h"
 #include "QmitkWelcomeText.h"
 
 #include <QmitkApplicationConstants.h>
@@ -68,23 +69,6 @@ namespace
     return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(node);
   }
 
-  std::pair<QWidget*, QVBoxLayout*> CreateCard(const QString& title)
-  {
-    auto* card = new QWidget;
-    card->setObjectName("welcomeCard");
-    card->setAttribute(Qt::WA_StyledBackground, true);
-
-    auto* layout = new QVBoxLayout(card);
-    layout->setContentsMargins(16, 12, 16, 16);
-    layout->setSpacing(8);
-
-    auto* titleLabel = new QLabel(title);
-    titleLabel->setObjectName("cardTitle");
-    layout->addWidget(titleLabel);
-
-    return { card, layout };
-  }
-
   // The dark theme draws radio buttons for its default widget background,
   // on which the hovered indicators would vanish into the lighter cards.
   QVBoxLayout* AddOptionList(QVBoxLayout* cardLayout)
@@ -100,23 +84,6 @@ namespace
     cardLayout->addWidget(optionList);
 
     return layout;
-  }
-
-  QLabel* CreateText(const QString& html = QString())
-  {
-    auto* label = new QLabel(QmitkWelcomeTextWithLineHeight(html));
-    label->setTextFormat(Qt::RichText);
-    label->setWordWrap(true);
-
-    return label;
-  }
-
-  QLabel* CreateDetailText(const QString& html = QString())
-  {
-    auto* label = CreateText(html);
-    label->setObjectName("mutedLabel");
-
-    return label;
   }
 
   void UncheckAll(QButtonGroup* group)
@@ -192,8 +159,8 @@ QmitkWelcomePersonalizationPage::~QmitkWelcomePersonalizationPage()
 
 QWidget* QmitkWelcomePersonalizationPage::CreatePresetCard()
 {
-  auto [card, layout] = CreateCard("Plugin preset");
-  layout->addWidget(CreateText("Choose which plugins are offered in the tool bars and in the View Navigator."));
+  auto [card, layout] = QmitkWelcomeCreateCard("Plugin preset");
+  layout->addWidget(QmitkWelcomeCreateText("Choose which plugins are offered in the tool bars and in the View Navigator."));
 
   auto* optionLayout = AddOptionList(layout);
 
@@ -213,7 +180,7 @@ QWidget* QmitkWelcomePersonalizationPage::CreatePresetCard()
 
   addOption(CUSTOM_PRESET_NAME + "...", CUSTOM_PRESET_ID);
 
-  m_PresetInfo = CreateDetailText();
+  m_PresetInfo = QmitkWelcomeCreateDetailText();
   layout->addSpacing(8);
   layout->addWidget(m_PresetInfo);
   layout->addStretch(1);
@@ -225,7 +192,7 @@ QWidget* QmitkWelcomePersonalizationPage::CreatePresetCard()
 
 QWidget* QmitkWelcomePersonalizationPage::CreateThemeCard()
 {
-  auto [card, layout] = CreateCard("Theme");
+  auto [card, layout] = QmitkWelcomeCreateCard("Theme");
 
   m_ThemeGroup = new QButtonGroup(this);
 
@@ -259,7 +226,7 @@ QWidget* QmitkWelcomePersonalizationPage::CreateToolBarStyleCard()
 {
   using CategoryLabel = QmitkCategoryToolBar::CategoryLabel;
 
-  auto [card, layout] = CreateCard("Tool bar style");
+  auto [card, layout] = QmitkWelcomeCreateCard("Tool bar style");
 
   auto* optionLayout = AddOptionList(layout);
 
@@ -271,7 +238,7 @@ QWidget* QmitkWelcomePersonalizationPage::CreateToolBarStyleCard()
     m_ToolBarStyleGroup->addButton(radioButton, static_cast<int>(categoryLabel));
     optionLayout->addWidget(radioButton);
 
-    auto* descriptionLabel = CreateDetailText(description);
+    auto* descriptionLabel = QmitkWelcomeCreateDetailText(description);
     descriptionLabel->setContentsMargins(24, 0, 0, 0);
     optionLayout->addWidget(descriptionLabel);
   };
@@ -295,7 +262,7 @@ QWidget* QmitkWelcomePersonalizationPage::CreateToolBarStyleCard()
 
 QWidget* QmitkWelcomePersonalizationPage::CreateMouseInteractionCard()
 {
-  auto [card, layout] = CreateCard("Mouse interaction");
+  auto [card, layout] = QmitkWelcomeCreateCard("Mouse interaction");
 
   auto* optionLayout = AddOptionList(layout);
 
@@ -307,7 +274,7 @@ QWidget* QmitkWelcomePersonalizationPage::CreateMouseInteractionCard()
     m_MouseInteractionGroup->addButton(radioButton, id);
     optionLayout->addWidget(radioButton);
 
-    auto* descriptionLabel = CreateDetailText(description);
+    auto* descriptionLabel = QmitkWelcomeCreateDetailText(description);
     descriptionLabel->setContentsMargins(24, 0, 0, 0);
     optionLayout->addWidget(descriptionLabel);
   };

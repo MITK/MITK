@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.welcomescreen">
+        <file>img/contribute/cite.svg</file>
+        <file>img/contribute/code.svg</file>
+        <file>img/contribute/diagnostics.svg</file>
+        <file>img/contribute/feedback.svg</file>
         <file>img/levelwindow/standarddisplay.svg</file>
         <file>img/mousenavigation/click.svg</file>
         <file>img/mousenavigation/crosshair.svg</file>

@@ -66,7 +66,11 @@ namespace mitk
     itkGetMacro(KeepActiveAfterAccept, bool);
     itkBooleanMacro(KeepActiveAfterAccept);
 
-    /** \brief If true, the tool reacts to time point changes and updates the preview. */
+    /** \brief If true, the tool reacts to time point changes and updates the preview.
+     *
+     * If false, the preview of a tool with lazy dynamic previews stays at the time point of
+     * its last update, and ConfirmSegmentation() transfers that time point.
+     */
     itkSetMacro(IsTimePointChangeAware, bool);
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);

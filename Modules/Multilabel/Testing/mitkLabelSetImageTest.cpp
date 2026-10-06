@@ -80,6 +80,9 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestGetActiveLayer_StaleActiveDuringLabelRemovedEvent_FallsBack);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestEraseLabels);
+  MITK_TEST(TestEraseLabel_Dynamic);
+  MITK_TEST(TestIsEmpty);
+  MITK_TEST(TestIsEmpty_Static);
   MITK_TEST(TestMergeLabels);
   MITK_TEST(TestCreateLabelMask);
   MITK_TEST(TestUpdateCenterOfMass);
@@ -878,6 +881,62 @@ public:
       mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex0, mitk::eps, true));
 
     CPPUNIT_ASSERT_THROW(segmentation->UpdateCenterOfMass(5, 2), mitk::Exception);
+  }
+
+  void TestEraseLabel_Dynamic()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    PaintBox(groupImage, 1, { 60, 20, 35 }, { 69, 29, 44 }, 5);
+    PaintBox(groupImage, 1, { 1, 1, 1 }, { 1, 1, 1 }, 6);
+
+    segmentation->EraseLabel(5);
+
+    CPPUNIT_ASSERT_MESSAGE("Label was not erased at time step 0", segmentation->IsEmpty(5, 0));
+    CPPUNIT_ASSERT_MESSAGE("Label was not erased at time step 1", segmentation->IsEmpty(5, 1));
+    CPPUNIT_ASSERT_MESSAGE("Another label was erased", !segmentation->IsEmpty(6, 1));
+  }
+
+  void TestIsEmpty()
+  {
+    // 128 * 128 * 100 voxels per time step, so that the scan is split into a block of 2^20 voxels and a shorter one.
+    auto referenceImage = mitk::Image::New();
+    unsigned int dimensions[4] = { 128, 128, 100, 2 };
+    referenceImage->Initialize(mitk::MakeScalarPixelType<char>(), 4, dimensions);
+
+    auto segmentation = mitk::MultiLabelSegmentation::New();
+    segmentation->Initialize(referenceImage);
+    segmentation->AddLabel(mitk::Label::New(5, "Target"), 0);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    CPPUNIT_ASSERT_MESSAGE("Label without pixels is not empty", segmentation->IsEmpty(5, 0));
+    CPPUNIT_ASSERT_MESSAGE("Label without pixels is not empty at time step 1", segmentation->IsEmpty(5, 1));
+
+    // The last voxel of the first block, the first voxel of the second block, and the last voxel of the time step.
+    const std::array<std::array<std::size_t, 3>, 3> voxels = { { { 127, 127, 63 }, { 0, 0, 64 }, { 127, 127, 99 } } };
+
+    for (const auto& voxel : voxels)
+    {
+      PaintBox(groupImage, 1, voxel, voxel, 5);
+
+      CPPUNIT_ASSERT_MESSAGE("Label is not empty at time step 0 although only time step 1 was painted", segmentation->IsEmpty(5, 0));
+      CPPUNIT_ASSERT_MESSAGE("Label with a pixel is empty", !segmentation->IsEmpty(5, 1));
+      CPPUNIT_ASSERT_MESSAGE("Label overload disagrees with the value overload", !segmentation->IsEmpty(segmentation->GetLabel(5), 1));
+
+      PaintBox(groupImage, 1, voxel, voxel, mitk::MultiLabelSegmentation::UNLABELED_VALUE);
+    }
+
+    CPPUNIT_ASSERT_THROW(segmentation->IsEmpty(5, 2), mitk::Exception);
+  }
+
+  void TestIsEmpty_Static()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    PaintBox(segmentation->GetGroupImage(0), 0, { 1, 1, 1 }, { 1, 1, 1 }, 5);
+
+    CPPUNIT_ASSERT_MESSAGE("Static segmentation was not checked for a later time step", !segmentation->IsEmpty(5, 3));
   }
 };
 

@@ -627,6 +627,8 @@ namespace mitk
     using BaseData::IsEmpty;
 
     /** \brief Checks if a label is empty at a given time step (does not contain any pixels).
+      * A segmentation with a single time step is checked for any time step.
+      * \exception mitk::Exception if the time step is invalid.
       */
     bool IsEmpty(const Label* label, TimeStepType t = 0) const;
     bool IsEmpty(LabelValueType pixelValue, TimeStepType t = 0) const;
@@ -691,9 +693,6 @@ namespace mitk
     void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
 
     LabelValueType m_ActiveLabelValue;
-
-    template <typename ImageType>
-    void EraseLabelProcessing(ImageType* input, LabelValueType index);
 
     template <typename MultiLabelSegmentationType, typename ImageType>
     void InitializeByLabeledImageProcessing(MultiLabelSegmentationType* input, const ImageType* other);
@@ -804,18 +803,19 @@ namespace mitk
 
   using LabelValueMappingVector = std::vector < std::pair<Label::PixelType, Label::PixelType> >;
 
-  /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
-  a specified destination label for a specific time step. Function processes the whole image volume of the specified time step.
-  \remark the function assumes that it is only called with source and destination image of same geometry.
-  \remark CAUTION: The function is not save if sourceImage and destinationImage are the same instance and more than one label is transferred,
-  because the changes are made in-place for performance reasons in multiple passes. If a mapped value A equals an "old value"
-  that occurs later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then later again, because
-  it is also an "old" value in the mapping table.
+  /**Helper function that transfers pixels of the specified source labels from the source segmentation to the destination
+  segmentation by using specified destination labels for a specific time step. Function processes the whole image volume of
+  the specified time step. The mapping is split into pairs of source and destination groups. The mappings of one pair are
+  applied simultaneously, as described for the overload for images, and a source label may be mapped into several
+  destination groups.
+  \remark CAUTION: The pairs of groups are transferred one after another. If source and destination are the same
+  segmentation, a pair reads the values that an earlier pair wrote. E.g. with the labels 1 and 2 in group 0 and the label
+  7 in group 1, the mapping {(1,2), (2,7)} also assigns 7 to the former voxels of label 1. Transfer from a copy if that
+  matters.
   \param sourceImage Pointer to the MultiLabelSegmentation that should be used as source for the transfer.
   \param destinationImage Pointer to the MultiLabelSegmentation that should be used as destination for the transfer.
   \param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
-  The order in which the labels will be transferred is the same order of elements in the labelMapping.
   If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
@@ -825,9 +825,12 @@ namespace mitk
   documentation of MultiLabelSegmentation::OverwriteStyle.
   \param timeStep indicate the time step that should be transferred.
   \pre sourceImage and destinationImage must be valid
-  \pre sourceImage and destinationImage must contain the indicated timeStep
+  \pre sourceImage and destinationImage must contain the indicated timeStep or have a single time step
   \pre sourceImage must contain all indicated sourceLabels.
-  \pre destinationImage must contain all indicated destinationLabels.*/
+  \pre destinationImage must contain all indicated destinationLabels.
+  \pre labelMapping must not map a source label to more than one target in the same destination group.
+  \exception mitk::Exception if a precondition is violated. A labelMapping that violates it is rejected before
+  anything is transferred.*/
   MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const MultiLabelSegmentation* sourceImage, MultiLabelSegmentation* destinationImage,
     const TimeStepType timeStep, LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
@@ -842,13 +845,21 @@ namespace mitk
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
 
-  /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
-  a specified destination label for a specific time step. Function processes the whole image volume of the specified time step.
-  \remark the function assumes that it is only called with source and destination image of same geometry.
-  \remark CAUTION: The function is not save, if sourceImage and destinationImage are the same instance and you transfer more then one
-  label, because the changes are made in-place for performance reasons but not in one pass. If a mapped value A equals a "old value"
-  that is later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then latter again, because
-  it is also an "old" value in the mapping table.
+  /**Helper function that transfers pixels of the specified source labels from the source image to the destination image by using
+  specified destination labels for a specific time step.
+  All mappings are applied simultaneously to the original voxel values, so their order does not matter and no voxel is
+  mapped twice, even if source and destination are the same image. For each voxel:
+  - If its source value is mapped, it becomes the target label if its original destination value may be overwritten
+    (see overwriteStlye), and keeps its value if not.
+  - Otherwise, with MultiLabelSegmentation::MergeStyle::Replace, a voxel whose source value is sourceBackground and whose
+    destination value is the target of any mapping becomes destinationBackground, unless the destination background is
+    locked and locks are regarded. The lock of the target label itself does not prevent this.
+  - All other voxels are left unchanged.
+
+  The source must have the geometry of the destination or be a sub geometry of it (same spacing and axes, on the grid of the
+  destination, see IsSubGeometry()). Destination voxels beyond the source are treated as if the source was padded with
+  MultiLabelSegmentation::UNLABELED_VALUE, so they only change if that value is mapped, or with Replace if it is
+  sourceBackground. A source or destination with a single time step, e.g. a slice, is used for any requested time step.
   \param sourceImage Pointer to the image that should be used as source for the transfer.
   \param destinationImage Pointer to the image that should be used as destination for the transfer.
   \param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unknown pixel
@@ -858,7 +869,6 @@ namespace mitk
   \param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
   \param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
-  The order in which the labels will be transferred is the same order of elements in the labelMapping.
   If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
@@ -868,8 +878,12 @@ namespace mitk
   documentation of MultiLabelSegmentation::OverwriteStyle.
   \param timeStep indicate the time step that should be transferred.
   \pre sourceImage, destinationImage and destinationLabelVector must be valid
-  \pre sourceImage and destinationImage must contain the indicated timeStep
-  \pre destinationLabelVector must contain all indicated destinationLabels for mapping.*/
+  \pre sourceImage and destinationImage must have the pixel type of labels (mitk::Label::PixelType)
+  \pre sourceImage and destinationImage must contain the indicated timeStep or have a single time step
+  \pre destinationLabelVector must contain all indicated destinationLabels for mapping
+  \pre labelMapping must not map a source label to more than one target.
+  \exception mitk::Exception if a precondition is violated, e.g. for a time step that an image with several time steps
+  does not contain, or if the geometry of the source does not fit the destination.*/
   MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const Image* sourceImage, Image* destinationImage, const mitk::ConstLabelVector& destinationLabelVector,
     const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = MultiLabelSegmentation::UNLABELED_VALUE,
     mitk::Label::PixelType destinationBackground = MultiLabelSegmentation::UNLABELED_VALUE,

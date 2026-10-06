@@ -47,10 +47,19 @@ namespace
     {
       Received = dumps;
       ++Calls;
+
+      if (DeleteReceived)
+      {
+        for (const auto& dump : dumps)
+          mitk::CrashDumpFacility::DeleteDump(dump.Path);
+      }
     }
 
     std::vector<mitk::CrashDumpInfo> Received;
     int Calls = 0;
+
+    /** Like a report flow whose user asked to delete the reported dumps. */
+    bool DeleteReceived = false;
   };
 
   std::vector<QWidget*> VisibleManagers()
@@ -92,6 +101,7 @@ class QmitkCrashDumpUiTestSuite : public mitk::TestFixture
   MITK_TEST(NoReportServiceMeansNoReportButton);
   MITK_TEST(ManagerIsSingleInstanceAndReportsTheSelection);
   MITK_TEST(ManagerReturnsToItsParentWhenTheModalFinishes);
+  MITK_TEST(ManagerRefreshesAfterTheReportFlow);
   MITK_TEST(NextStartDialogKeepAcknowledges);
   MITK_TEST(NextStartDialogCloseRemoves);
   MITK_TEST(NextStartDialogFileReportKeepsTheDumps);
@@ -277,6 +287,24 @@ public:
 
     manager->close();
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+  }
+
+  void ManagerRefreshesAfterTheReportFlow()
+  {
+    m_Service.DeleteReceived = true;
+    this->RegisterService();
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    auto* manager = VisibleManagers().front();
+
+    auto* tree = manager->findChild<QTreeWidget*>("crashDumpTree");
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+    tree->topLevelItem(1)->setSelected(true);
+
+    manager->findChild<QPushButton*>("fileReportButton")->click();
+
+    CPPUNIT_ASSERT(!std::filesystem::exists(m_OnDemandDump));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("dumps the report flow deleted leave the open manager", 2, tree->topLevelItemCount());
   }
 
   void NextStartDialogKeepAcknowledges()

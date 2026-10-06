@@ -212,6 +212,9 @@ void QmitkCrashDumpManagerDialog::OnSelectionChanged()
 void QmitkCrashDumpManagerDialog::OnFileReport()
 {
   mitk::FileCrashReport(m_List->GetSelectedDumps(), this);
+
+  // The report flow may have deleted dumps.
+  this->Refresh();
 }
 
 void QmitkCrashDumpManagerDialog::OnShowInFolder()

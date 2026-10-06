@@ -23,9 +23,10 @@ class QLabel;
  * \ingroup QmitkModule
  * \brief A card that shows a message next to an icon.
  *
- * An info message has the colors of the progress notification cards, an error
- * message an error icon and error colors. The message is rich text and wraps.
- * The card follows switches between the light and the dark theme.
+ * An info message has the colors of the progress notification cards. A warning
+ * and an error message have the error icon, in amber and in red colors. The
+ * message is rich text and wraps. The card follows switches between the light
+ * and the dark theme.
  */
 class MITKQTWIDGETS_EXPORT QmitkInfoCard : public QFrame
 {
@@ -35,6 +36,7 @@ public:
   enum class Severity
   {
     Info,
+    Warning,
     Error
   };
 

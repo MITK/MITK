@@ -95,6 +95,13 @@ void QmitkInfoCard::UpdateStyle()
     icon = QmitkIconTheme::GetIcon(ReadResource(QStringLiteral(":/Qmitk/error.svg")),
       darkTheme ? QStringLiteral("#ff6b6b") : QStringLiteral("#c62828"));
   }
+  else if (m_Severity == Severity::Warning)
+  {
+    surface = darkTheme ? QStringLiteral("#4a3d24") : QStringLiteral("#fff4e0");
+    border = darkTheme ? QStringLiteral("#8c6d2e") : QStringLiteral("#f0c36d");
+    icon = QmitkIconTheme::GetIcon(ReadResource(QStringLiteral(":/Qmitk/error.svg")),
+      darkTheme ? QStringLiteral("#ffb74d") : QStringLiteral("#b26a00"));
+  }
   else
   {
     // In the colors of the progress notification cards.

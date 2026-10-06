@@ -35,6 +35,35 @@ found in the LICENSE file.
 #include <mitkSegChangeOperationApplier.h>
 
 #include <algorithm>
+#include <map>
+#include <optional>
+#include <utility>
+
+namespace
+{
+  // Calls a function when it goes out of scope, whether by return or by an
+  // exception.
+  template <typename TFunction>
+  class ScopeExit
+  {
+  public:
+    explicit ScopeExit(TFunction function)
+      : m_Function(std::move(function))
+    {
+    }
+
+    ~ScopeExit()
+    {
+      m_Function();
+    }
+
+    ScopeExit(const ScopeExit&) = delete;
+    ScopeExit& operator=(const ScopeExit&) = delete;
+
+  private:
+    TFunction m_Function;
+  };
+}
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -106,6 +135,12 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
     return false;
 
   if (m_RequiresExistingLabels && labelSet->GetTotalNumberOfLabels() == 0)
+    return false;
+
+  // The same tolerances as MultiLabelSegmentation::UpdateGroupImage(), which
+  // rejects a result of another geometry.
+  if (m_RequiresReferenceGeometry && !Equal(*referenceImage->GetGeometry(), *labelSet->GetGeometry(),
+        NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
     return false;
 
   return true;
@@ -190,11 +225,14 @@ void mitk::SegWithPreviewTool::Deactivated()
 void mitk::SegWithPreviewTool::ConfirmSegmentation()
 {
   bool labelChanged = this->EnsureUpToDateUserDefinedActiveLabel();
-  if ((m_LazyDynamicPreviews && m_CreateAllTimeSteps) || labelChanged)
-  { // The tool should create all time steps but is currently in lazy mode,
-    // thus ensure that a preview for all time steps is available.
-    this->UpdatePreview(true);
-  }
+
+  // A lazy tool has computed the current time step only, which is all that is
+  // transferred unless all time steps are to be created. A changed active label
+  // needs what is transferred to be computed again, but not more than that.
+  const bool updateAllTimeSteps = m_LazyDynamicPreviews && m_CreateAllTimeSteps;
+
+  if (updateAllTimeSteps || labelChanged)
+    this->UpdatePreview(updateAllTimeSteps);
 
   CreateResultSegmentationFromPreview();
 
@@ -300,6 +338,25 @@ void mitk::SegWithPreviewTool::ResetPreviewContent()
   {
     previewImage->ClearGroupImages();
   }
+}
+
+void mitk::SegWithPreviewTool::RemoveAllPreviewLabels()
+{
+  auto* previewImage = this->GetPreviewSegmentation();
+
+  if (nullptr == previewImage)
+    return;
+
+  // RemoveLabels() erases the pixels of each label in a pass of its own over
+  // the whole preview. Dropping the labels first and clearing the group images
+  // afterwards takes a single pass, whatever the number of labels.
+  std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType> emptyGroups;
+
+  for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < previewImage->GetNumberOfGroups(); ++groupID)
+    emptyGroups[groupID] = {};
+
+  previewImage->ReplaceGroupLabels(emptyGroups);
+  previewImage->ClearGroupImages();
 }
 
 mitk::Color mitk::SegWithPreviewTool::GetSpecialPreviewColor() const
@@ -418,7 +475,11 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
       break;
     case LabelTransferScope::AllLabels:
       {
-        const auto labelValues = this->GetPreviewSegmentation()->GetLabelValuesByGroup(this->GetPreviewSegmentation()->GetActiveLayer());
+        const auto* preview = this->GetPreviewSegmentation();
+        const auto labelValues = m_TransfersAllPreviewGroups
+          ? preview->GetAllLabelValues()
+          : preview->GetLabelValuesByGroup(preview->GetActiveLayer());
+
         for (auto labelValue : labelValues)
         {
         labelMapping.push_back({ labelValue, labelValue + offset});
@@ -510,7 +571,12 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
 
     if (resultSegmentationNode.IsNotNull())
     {
-      const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      // A lazy tool that ignores time point changes holds the preview of the
+      // time point of its last update only, wherever the user has gone since.
+      const TimePointType timePoint = m_LazyDynamicPreviews && !m_IsTimePointChangeAware
+        ? m_LastTimePointOfUpdate
+        : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
       auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
       if (nullptr == resultSegmentation)
       {
@@ -530,16 +596,42 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       auto labelMapping = this->GetLabelMapping();
 
       const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+      const auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
 
-      SegGroupModifyUndoRedoHelper undoRedoGenerator(resultSegmentation, { resultSegmentation->GetActiveLayer() },
-        m_CreateAllTimeSteps, timeStep, false, false, true);
+      // The existing groups that receive labels. Groups that the transfer adds
+      // are covered by an undo operation of their own.
+      SegGroupModifyUndoRedoHelper::GroupIndexSetType modifiedGroups;
 
-      auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
+      if (m_TransfersAllPreviewGroups)
+      {
+        for (const auto& [sourceLabel, targetLabel] : labelMapping)
+        {
+          if (previewImage->ExistLabel(sourceLabel))
+          {
+            const auto group = previewImage->GetGroupIndexOfLabel(sourceLabel);
+
+            if (group < oldGroupCount)
+              modifiedGroups.insert(group);
+          }
+        }
+      }
+      else
+      {
+        modifiedGroups.insert(resultSegmentation->GetActiveLayer());
+      }
+
+      std::optional<SegGroupModifyUndoRedoHelper> undoRedoGenerator;
+
+      if (!modifiedGroups.empty())
+        undoRedoGenerator.emplace(resultSegmentation, modifiedGroups, m_CreateAllTimeSteps, timeStep, false, false, true);
+
       this->PreparePreviewToResultTransfer(labelMapping);
 
-      // REMARK: the following code in this scope assumes that PreparePreviewToResultTransfer does not change
-      // the number of groups. Currently all changes are only expected in the active group.
-      if (oldGroupCount != resultSegmentation->GetNumberOfGroups())
+      const auto newGroupCount = resultSegmentation->GetNumberOfGroups();
+
+      // REMARK: the following code in this scope assumes that PreparePreviewToResultTransfer only adds
+      // groups if the labels of all preview groups are transferred.
+      if (newGroupCount < oldGroupCount || (newGroupCount > oldGroupCount && !m_TransfersAllPreviewGroups))
       {
         mitkThrow() << "Cannot confirm/transfer segmentation. Internal tool state is invalid."
           << " Tool has changed the number of groups. Current base implementation expects that"
@@ -569,7 +661,21 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
           label->AddToolUse(this->GetAlgorithmType(), this->GetName());
       }
 
-      undoRedoGenerator.RegisterUndoRedoOperationEvent("Segmentation " + std::string(this->GetName()));
+      const auto undoDescription = "Segmentation " + std::string(this->GetName());
+
+      if (undoRedoGenerator.has_value())
+        undoRedoGenerator->RegisterUndoRedoOperationEvent(undoDescription);
+
+      if (newGroupCount > oldGroupCount)
+      {
+        SegGroupInsertUndoRedoHelper::GroupIndexSetType insertedGroups;
+
+        for (auto group = oldGroupCount; group < newGroupCount; ++group)
+          insertedGroups.insert(group);
+
+        SegGroupInsertUndoRedoHelper insertUndoRedoGenerator(resultSegmentation, insertedGroups);
+        insertUndoRedoGenerator.RegisterUndoRedoOperationEvent(undoDescription, undoRedoGenerator.has_value());
+      }
 
       // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())
@@ -651,24 +757,38 @@ bool mitk::SegWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
 
 void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 {
-  const auto inputImage = this->GetSegmentationInput();
-  auto previewImage = this->GetPreviewSegmentation();
+  // Held, not just referenced: a tool that pumps the event loop while it
+  // computes can be deactivated mid-run, and Deactivated() releases the input
+  // and the data of the preview node. The user can also remove the images
+  // from the data storage meanwhile.
+  const Image::ConstPointer inputImage = this->GetSegmentationInput();
+  const MultiLabelSegmentation::Pointer previewImage = this->GetPreviewSegmentation();
   this->EnsureUpToDateUserDefinedActiveLabel();
 
   mitk::ProgressTask task(this->GetName(), 100, this->IsCancelable());
   ScopedProgressTask<ToolCommand> scopedTask(m_ProgressCommand, &task);
 
   const auto workingSegmentation = this->GetTargetSegmentation();
-  const auto workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
+  const Image::Pointer workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;
+
+  // However the update ends, the tool is not busy afterwards. A tool left busy
+  // keeps the tools of the host disabled.
+  const ScopeExit endBusy([this]
+    {
+      m_IsUpdating = false;
+      this->CurrentlyBusy.Send(false);
+    });
+
   m_HasUnconfirmedPreview = false;
   this->UpdatePrepare();
 
   const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   bool cancelled = false;
+  bool computed = false;
 
   try
   {
@@ -725,10 +845,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
         this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
-      if (!previewImage->GetAllLabelValues().empty())
-      { // check if labels exits for the preview
-        m_HasUnconfirmedPreview = true;
-      }
+      computed = true;
     }
   }
   catch (const itk::ExceptionObject& e)
@@ -760,23 +877,19 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     MITK_ERROR << "Exception caught: " << e.what();
     ErrorMessage.Send(e.what());
   }
-  catch (...)
-  {
-    m_IsUpdating = false;
-    CurrentlyBusy.Send(false);
-    throw;
-  }
 
   this->UpdateCleanUp();
+
+  // Decided only now, as UpdateCleanUp() can still change the labels of the
+  // preview, removing the ones that turned out empty for example.
+  if (computed && !previewImage->GetAllLabelValues().empty())
+    m_HasUnconfirmedPreview = true;
 
   // A cancelled update leaves the time point unrecorded on purpose: recording
   // it would tell OnTimePointChanged() that this time point is up to date, so
   // the discarded preview would never be recomputed for it.
   if (!cancelled)
     m_LastTimePointOfUpdate = timePoint;
-
-  m_IsUpdating = false;
-  CurrentlyBusy.Send(false);
 }
 
 bool mitk::SegWithPreviewTool::IsCancelable() const
@@ -810,7 +923,7 @@ void mitk::SegWithPreviewTool::ConfirmCleanUp()
 }
 
 void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& labelMapping,
-  const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target)
+  const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target, bool intoSourceGroups)
 {
   if (nullptr == source)
   {
@@ -823,19 +936,27 @@ void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& 
 
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
   {
-    if (MultiLabelSegmentation::UNLABELED_VALUE != sourceLabel &&
-        MultiLabelSegmentation::UNLABELED_VALUE != targetLabel &&
-        !target->ExistLabel(targetLabel, target->GetActiveLayer()))
-    {
-      if (!source->ExistLabel(sourceLabel))
-      {
-        mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
-      }
+    if (MultiLabelSegmentation::UNLABELED_VALUE == sourceLabel || MultiLabelSegmentation::UNLABELED_VALUE == targetLabel)
+      continue;
 
-      auto clonedLabel = source->GetLabel(sourceLabel)->Clone();
-      clonedLabel->SetValue(targetLabel);
-      target->AddLabel(clonedLabel,target->GetActiveLayer(), false, false);
+    const auto targetGroup = intoSourceGroups && source->ExistLabel(sourceLabel)
+      ? source->GetGroupIndexOfLabel(sourceLabel)
+      : target->GetActiveLayer();
+
+    if (target->ExistLabel(targetLabel, targetGroup))
+      continue;
+
+    if (!source->ExistLabel(sourceLabel))
+    {
+      mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
     }
+
+    while (target->GetNumberOfGroups() <= targetGroup)
+      target->AddGroup();
+
+    auto clonedLabel = source->GetLabel(sourceLabel)->Clone();
+    clonedLabel->SetValue(targetLabel);
+    target->AddLabel(clonedLabel, targetGroup, false, false);
   }
 }
 
@@ -853,7 +974,7 @@ void mitk::SegWithPreviewTool::PreparePreviewToResultTransfer(const LabelMapping
     }
 
     auto preview = this->GetPreviewSegmentation();
-    TransferLabelInformation(labelMapping, preview, resultSegmentation);
+    TransferLabelInformation(labelMapping, preview, resultSegmentation, m_TransfersAllPreviewGroups);
   }
 }
 

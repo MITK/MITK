@@ -75,7 +75,11 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::OnLabelSelectionChanged(const Qmi
 
     tool->SetSelectedLabels(labelIDs);
     this->ActualizePreviewLabelVisibility();
-    this->EnableWidgets(true); //used to actualize the ConfirmSeg btn via the delegate;
+
+    // Re-evaluates the Confirm button through its delegate. The selection also
+    // changes while a tool that processes events during its update replaces
+    // the labels of the preview; the controls must stay disabled then.
+    this->EnableWidgets(!tool->IsUpdating());
   }
 }
 
@@ -87,7 +91,9 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
     auto preview = tool->GetPreviewSegmentation();
     if (nullptr != preview)
     {
-      auto labels = preview->GetLabelsByValue(preview->GetLabelValuesByGroup(preview->GetActiveLayer()));
+      auto labels = tool->GetTransfersAllPreviewGroups()
+        ? preview->GetLabels()
+        : preview->GetLabelsByValue(preview->GetLabelValuesByGroup(preview->GetActiveLayer()));
       auto selectedLabels = tool->GetSelectedLabels();
 
       for (auto label : labels)
@@ -145,6 +151,9 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::Mu
 {
   if (nullptr != m_LabelSelectionList)
   {
+    // Offers exactly the labels that "Transfer all labels" would transfer.
+    auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
+    m_LabelSelectionList->SetShowsAllLayers(nullptr != tool && tool->GetTransfersAllPreviewGroups());
     m_LabelSelectionList->SetLabelSetImage(preview);
   }
 }

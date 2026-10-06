@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
 
 #include <mitkIPreferences.h>
+#include <mitkTotalSegmentatorTool.h>
 
 #include <MitkPythonSegmentationUIExports.h>
 
@@ -28,11 +29,6 @@ namespace Ui
   class QmitkTotalSegmentatorToolGUI;
 }
 
-namespace mitk
-{
-  class TotalSegmentatorTool;
-}
-
 /**
   \brief GUI for mitk::TotalSegmentatorTool.
 
@@ -40,8 +36,8 @@ namespace mitk
   exists, a Settings button opening the preference page, a task combo box (with
   fast / fastest variants for the whole-body tasks and disabled-but-visible
   licensed tasks) and a Run button. The long-running segmentation is executed by
-  a subprocess through RunProcess() so the application stays responsive and the
-  run can be cancelled.
+  a subprocess through RunProcess() so the application stays responsive. The
+  progress notification of the tool shows the run and offers to cancel it.
 
   \sa mitk::TotalSegmentatorTool
 */
@@ -81,9 +77,10 @@ private:
   void UpdateRunButtonState();
 
   /** \brief Runs the TotalSegmentator CLI as a subprocess, keeping the GUI
-   *         responsive and offering cancellation. Injected into the tool as its
-   *         CommandRunner. Returns true on success (exit 0). */
-  bool RunProcess(const std::string& executable, const std::vector<std::string>& args);
+   *         responsive, until it ends or the tool asks to stop it. Injected into
+   *         the tool as its CommandRunner. Returns true on success (exit 0). */
+  bool RunProcess(const std::string& executable, const std::vector<std::string>& args,
+    const mitk::TotalSegmentatorTool::RunControl& control);
 
   void SetStatus(const QString& message, bool isError = false);
 

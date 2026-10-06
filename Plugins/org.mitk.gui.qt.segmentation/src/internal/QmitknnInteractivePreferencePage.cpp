@@ -21,10 +21,10 @@ found in the LICENSE file.
 #if MITK_HAS_PYTHON
 #include <mitknnInteractiveInstall.h>
 #include <mitknnInteractiveModel.h>
-#include <mitknnInteractiveUpdatePrompt.h>
 #include <mitknnInteractiveVersion.h>
 #include <mitkPipPackageInfo.h>
 #include <mitkPythonHelper.h>
+#include <mitkPythonPackageUpdatePrompt.h>
 #include <QmitkPipInstallDialog.h>
 #endif
 
@@ -543,7 +543,7 @@ void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
   const auto result = mitk::nnInteractive::CheckInstalledVersion(true, distributionName);
   QApplication::restoreOverrideCursor();
 
-  using mitk::nnInteractive::VersionStatus;
+  using mitk::PythonPackage::VersionStatus;
 
   const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded("nnInteractive");
 
@@ -562,8 +562,8 @@ void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
     case VersionStatus::UpdateAvailable:
       // Shared version-status dialog. Not in the init flow, so declining just
       // closes; only an explicit "Update now" triggers the in-place update.
-      if (mitk::nnInteractive::ShowUpdatePrompt(m_Control, result, modulesLoaded, false)
-            == mitk::nnInteractive::UpdatePromptChoice::Update)
+      if (mitk::PythonPackage::ShowUpdatePrompt(m_Control, "nnInteractive", mitk::nnInteractive::SupportedVersions(), result, modulesLoaded, false)
+            == mitk::PythonPackage::UpdatePromptChoice::Update)
         runUpdateAndReport(clientOnly);
       break;
 

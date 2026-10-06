@@ -38,6 +38,7 @@ class mitkToolCanHandleTestSuite : public mitk::TestFixture
   MITK_TEST(SegWithPreviewToolOptOutAcceptsAnyPixelType);
   MITK_TEST(SegWithPreviewToolAcceptsAnyDimensionByDefault);
   MITK_TEST(SegWithPreviewToolOptInRequiresVolumetricReference);
+  MITK_TEST(SegWithPreviewToolOptInRequiresReferenceGeometry);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::Image::Pointer m_ReferenceImage;
@@ -210,6 +211,33 @@ public:
     CPPUNIT_ASSERT(!tool->CanHandle(m_Image2D, m_WithLabel2D));
     CPPUNIT_ASSERT(tool->CanHandle(m_Image2DPlusT, m_WithLabel2DPlusT));
     CPPUNIT_ASSERT(tool->CanHandle(m_ReferenceImage, m_WithLabel));
+  }
+
+  void SegWithPreviewToolOptInRequiresReferenceGeometry()
+  {
+    // A segmentation of a part of the image, which the Segmentation view offers as well.
+    unsigned int croppedDimensions[] = { 2, 2, 2 };
+    auto croppedImage = mitk::Image::New();
+    croppedImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, croppedDimensions);
+    const auto cropped = CreateSegmentationWithLabel(croppedImage);
+
+    // A static segmentation of a dynamic image has the geometry of its time steps.
+    unsigned int dynamicDimensions[] = { 4, 4, 4, 2 };
+    auto dynamicImage = mitk::Image::New();
+    dynamicImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 4, dynamicDimensions);
+
+    // Computes its result on the grid of the reference image.
+    auto tool = mitk::OtsuTool3D::New();
+
+    CPPUNIT_ASSERT(!tool->CanHandle(m_ReferenceImage, cropped));
+    CPPUNIT_ASSERT(tool->CanHandle(m_ReferenceImage, m_WithLabel));
+    CPPUNIT_ASSERT(tool->CanHandle(dynamicImage, m_WithLabel));
+
+    CPPUNIT_ASSERT(!mitk::BinaryThresholdTool::New()->CanHandle(m_ReferenceImage, cropped));
+    CPPUNIT_ASSERT(!mitk::GrowCutTool::New()->CanHandle(m_ReferenceImage, cropped));
+
+    // Grows its result on the segmentation itself.
+    CPPUNIT_ASSERT(mitk::PickingTool::New()->CanHandle(m_ReferenceImage, cropped));
   }
 };
 

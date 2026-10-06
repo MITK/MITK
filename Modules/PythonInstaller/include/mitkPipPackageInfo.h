@@ -67,24 +67,26 @@ namespace mitk
     std::vector<std::string> extraPipArgs; /**< Additional pip arguments, e.g. {"--no-cache-dir"}. */
   };
 
-  /// \brief A Python command to run in the activated venv after pip install.
-  ///
-  /// Processed by PipInstaller as a terminal phase once all pip groups have been
-  /// installed successfully. Each step runs as `python -c "<pythonCode>"` in the
-  /// activated virtual environment, so any imports it needs must be satisfied by
-  /// packages installed in the groups (directly or transitively). Raw stdout and
-  /// stderr (including tqdm progress) is forwarded to the installer's output signal.
-  ///
-  /// \code
-  /// PostInstallStep step;
-  /// step.displayName = "Download model weights";
-  /// step.pythonCode =
-  ///   "from nnInteractive.model_management import ensure_model_available, get_default_model_id\n"
-  ///   "ensure_model_available(get_default_model_id())\n";
-  /// step.optional = true;
-  /// spec.postInstallSteps.push_back(std::move(step));
-  /// \endcode
-  ///
+  /** \brief A Python command to run in the activated venv after pip install.
+   *
+   * Processed by PipInstaller as a terminal phase once all pip groups have been
+   * installed successfully. Each step runs as `python -c "<pythonCode>"` in the
+   * activated virtual environment, so any imports it needs must be satisfied by
+   * packages installed in the groups (directly or transitively). Raw stdout and
+   * stderr (including tqdm progress) is forwarded to the installer's output signal,
+   * except for the lines that report the progress of the step
+   * (see PostInstallStepProgress).
+   *
+   * \code
+   * PostInstallStep step;
+   * step.displayName = "Download model weights";
+   * step.pythonCode =
+   *   "from nnInteractive.model_management import ensure_model_available, get_default_model_id\n"
+   *   "ensure_model_available(get_default_model_id())\n";
+   * step.optional = true;
+   * spec.postInstallSteps.push_back(std::move(step));
+   * \endcode
+   */
   struct MITKPYTHONINSTALLER_EXPORT PostInstallStep
   {
     std::string displayName; /**< Label for the installer UI. */

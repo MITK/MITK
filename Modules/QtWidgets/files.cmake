@@ -24,12 +24,14 @@ set(CPP_FILES
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
   QmitkFloatingTextPopup.cpp
+  QmitkInfoCard.cpp
   QmitkInteractionSchemeToolBar.cpp
   QmitkIOUtil.cpp
   QmitkLevelWindowPresetDefinitionDialog.cpp
   QmitkLevelWindowRangeChangeDialog.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
   QmitkLevelWindowWidget.cpp
+  QmitkLineCompletionTextEdit.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp

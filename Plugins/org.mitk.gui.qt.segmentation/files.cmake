@@ -20,6 +20,7 @@ set(INTERNAL_CPP_FILES
   QmitkCreateMultiLabelSegmentationAction.cpp
   QmitknnInteractivePreferencePage.cpp
   QmitkTotalSegmentatorPreferencePage.cpp
+  QmitkVoxTellPreferencePage.cpp
 )
 
 set(UI_FILES
@@ -30,6 +31,7 @@ set(UI_FILES
   src/internal/QmitkSegmentationTaskListView.ui
   src/internal/QmitknnInteractivePreferencePage.ui
   src/internal/QmitkTotalSegmentatorPreferencePage.ui
+  src/internal/QmitkVoxTellPreferencePage.ui
 )
 
 set(MOC_H_FILES
@@ -51,6 +53,7 @@ set(MOC_H_FILES
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
   src/internal/QmitknnInteractivePreferencePage.h
   src/internal/QmitkTotalSegmentatorPreferencePage.h
+  src/internal/QmitkVoxTellPreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES

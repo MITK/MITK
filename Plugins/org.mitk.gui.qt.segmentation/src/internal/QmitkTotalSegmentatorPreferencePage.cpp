@@ -29,7 +29,9 @@ found in the LICENSE file.
 #include <QPushButton>
 
 #if MITK_HAS_PYTHON
+#include <mitkToolManagerProvider.h>
 #include <mitkTotalSegmentatorInstall.h>
+#include <mitkTotalSegmentatorTool.h>
 #include <mitkPythonHelper.h>
 
 #include <QmitkVenvProcess.h>
@@ -140,6 +142,23 @@ namespace
       return { false, QStringLiteral("TotalSegmentator environment not found.") };
 
     return RunVenvExecutable(QmitkVenvProcess::ToQString(python), QStringList() << "-c" << CLEAR_WEIGHTS_CODE);
+  }
+
+  // A run uses the environment and the model weights from a process of its
+  // own, which no check for loaded modules can see. Tells the user and returns
+  // true while one is in progress.
+  bool RefuseDuringRun(QWidget* parent)
+  {
+    const auto* tool = dynamic_cast<const mitk::TotalSegmentatorTool*>(
+      mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetActiveTool());
+
+    if (tool == nullptr || !tool->IsUpdating())
+      return false;
+
+    QMessageBox::information(parent, "TotalSegmentator",
+      "TotalSegmentator is running. Wait until it has finished or cancel it, then try again.");
+
+    return true;
   }
 #endif
 }
@@ -346,6 +365,9 @@ void QmitkTotalSegmentatorPreferencePage::OnRemoveLicenseClicked()
 void QmitkTotalSegmentatorPreferencePage::OnClearModelWeightsClicked()
 {
 #if MITK_HAS_PYTHON
+  if (RefuseDuringRun(m_Control))
+    return;
+
   const auto answer = QMessageBox::question(
     m_Control, "TotalSegmentator",
     "Delete all downloaded TotalSegmentator model weights? They are re-downloaded automatically "
@@ -369,6 +391,9 @@ void QmitkTotalSegmentatorPreferencePage::OnClearModelWeightsClicked()
 void QmitkTotalSegmentatorPreferencePage::OnUninstallButtonClicked()
 {
 #if MITK_HAS_PYTHON
+  if (RefuseDuringRun(m_Control))
+    return;
+
   const auto answer = QMessageBox::warning(
     m_Control, "Uninstall TotalSegmentator",
     "Are you sure you want to remove the TotalSegmentator virtual environment?", QMessageBox::Yes | QMessageBox::No,

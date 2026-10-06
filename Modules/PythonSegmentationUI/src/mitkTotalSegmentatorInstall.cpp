@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkTotalSegmentatorInstall.h>
 
-#include <mitkPythonHelper.h>
+#include <mitkTorchInstall.h>
 
 #include <utility>
 
@@ -21,30 +21,6 @@ namespace
   // nnunetv2 version validated against REQUIRED_VERSION. See BuildGroups() for why
   // it is pinned; bump it together with mitk::TotalSegmentator::REQUIRED_VERSION.
   constexpr const char* NNUNETV2_VERSION = "2.8.1";
-
-  // PyTorch needs a CUDA-specific index URL on Windows; other platforms use the
-  // default PyPI index. Kept identical to the nnInteractive install (cu128: with
-  // CUDA 12.9 our lowest supported GPU arch, Pascal / GeForce 10-series, hits
-  // "no kernel image is available"), so both tools pull a Pascal-capable build.
-  std::string CudaIndexUrl()
-  {
-#if defined(_WIN32)
-    return "https://download.pytorch.org/whl/cu128";
-#else
-    return {};
-#endif
-  }
-
-  // Also kept identical to the nnInteractive install: torch 2.8 has no wheels
-  // for CPython 3.14 or newer, where the oldest usable release is 2.10. See
-  // TorchRequirements() in mitknnInteractiveInstall.cpp for the full rationale.
-  std::vector<std::string> TorchRequirements()
-  {
-    if constexpr (mitk::PythonHelper::VERSION_MINOR >= 14)
-      return { "torch>=2.10.0,<2.11.0", "torchvision>=0.25.0,<1.0.0" };
-    else
-      return { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-  }
 
   // Dumps a { task: { labelId: labelName } } map to <venv>/mitk_totalseg_tasks.json
   // so the tool names its output labels from structured data instead of parsing the
@@ -92,17 +68,7 @@ os.replace(_tmp, _path)
   {
     std::vector<mitk::PipInstallGroup> groups;
 
-    // torchvision must be pinned together with torch (and installed from the same
-    // CUDA index), even though TotalSegmentator does not use it directly: its
-    // transitive dependency timm pulls torchvision, and each torchvision release
-    // hard-pins a matching torch (e.g. torchvision 0.27.1 requires torch 2.12.1).
-    // Without pinning it here, the TotalSegmentator resolve grabs the latest
-    // torchvision and drags torch off the CUDA wheel onto a non-CUDA PyPI build.
-    // The torch upper bound constrains torchvision to its matching pair.
-    mitk::PipInstallGroup torchGroup;
-    torchGroup.requirements = TorchRequirements();
-    torchGroup.indexUrl = CudaIndexUrl();
-    groups.push_back(std::move(torchGroup));
+    groups.push_back(mitk::Torch::BuildInstallGroup());
 
     // TotalSegmentator leaves its own nnunetv2 dependency unbounded
     // ("nnunetv2>=2.3.1") and has never fixed this upstream. New nnunetv2 releases

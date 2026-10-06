@@ -56,16 +56,6 @@ namespace mitk
   class MITKPYTHONSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
-    /** \brief Information about a CUDA-capable GPU device.
-     */
-    struct CUDADeviceInfo
-    {
-      std::string Name;     /**< \brief Device name (e.g., "NVIDIA GeForce RTX 3080"). */
-      int Major;            /**< \brief CUDA compute capability major version. */
-      int Minor;            /**< \brief CUDA compute capability minor version. */
-      int TotalMemoryMB;    /**< \brief Total device memory in megabytes. */
-    };
-
     /** \brief Which interaction types the running session's model checkpoint
      *         supports.
      *
@@ -358,21 +348,6 @@ namespace mitk
      * labels, install mode) are deliberately excluded.
      */
     static const std::vector<std::pair<std::string, std::string>>& GetSessionDefiningPreferences();
-
-    /** \brief Queries CUDA device information via PyTorch.
-     *
-     * Checks for CUDA availability and retrieves device properties from the
-     * GPU device specified in the application preferences.
-     *
-     * \param[out] info The CUDADeviceInfo struct to populate with device
-     *                  information.
-     *
-     * \pre A Python context must have been created via CreatePythonContext().
-     *
-     * \return \c true if a CUDA device was found and info was populated,
-     *         \c false otherwise.
-     */
-    bool GetCUDADeviceInfo(CUDADeviceInfo& info) const;
 
     /** \brief Starts an nnInteractive inference session in the configured mode.
      *

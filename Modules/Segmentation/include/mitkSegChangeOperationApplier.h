@@ -130,8 +130,10 @@ namespace mitk
 
     /** \brief Capture the current (inserted) state as the redo operation and register the undo/redo pair.
       \param description A human-readable description of the operation for the undo stack.
+      \param joinPreviousStep If true, the insert is undone and redone together with the operation
+        registered last, for an action that modifies groups and inserts others.
     */
-    void RegisterUndoRedoOperationEvent(const std::string& description);
+    void RegisterUndoRedoOperationEvent(const std::string& description, bool joinPreviousStep = false);
 
   protected:
     MultiLabelSegmentation::Pointer m_Segmentation;

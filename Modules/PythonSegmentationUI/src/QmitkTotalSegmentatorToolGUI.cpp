@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <QmitkPipInstallDialog.h>
 #include <QmitkIconTheme.h>
+#include <QmitkInfoCard.h>
 #include <QmitkVenvProcess.h>
 
 #include <QApplication>
@@ -32,8 +33,8 @@ found in the LICENSE file.
 #include <QIcon>
 #include <QPointer>
 #include <QProcess>
-#include <QProgressDialog>
 #include <QStringList>
+#include <QTimer>
 
 #include <nlohmann/json.hpp>
 
@@ -204,6 +205,9 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   m_Ui->runButton->setIcon(QmitkIconTheme::GetIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg")));
+
+  // Hidden until the install state below sets the first message.
+  this->SetStatus(QString());
 
   connect(m_Ui->installButton, &QPushButton::clicked, this, &Self::OnInstallButtonClicked);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
@@ -405,15 +409,24 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
   tool->SetExecutablePath(QmitkVenvProcess::ToQString(exe).toStdString());
   tool->SetLabelNameLookup(ReadLabelNames(venvDir, task.toStdString()));
   tool->SetCommandRunner(
-    [this](const std::string& executable, const std::vector<std::string>& args)
-    { return this->RunProcess(executable, args); });
+    [this](const std::string& executable, const std::vector<std::string>& args, const mitk::TotalSegmentatorTool::RunControl& control)
+    { return this->RunProcess(executable, args, control); });
 
   // UpdatePreview() spins a nested event loop (in RunProcess), during which a
   // tool-manager change can delete this GUI. Detect that via a QPointer and bail
   // out before touching any members, rather than crashing on a freed 'this'.
   QPointer<QmitkTotalSegmentatorToolGUI> self(this);
 
-  m_Ui->runButton->setEnabled(false);
+  // The application stays usable during the run, but the task and the settings
+  // must not change while the run uses them.
+  const auto setRunning = [this](bool running)
+  {
+    m_Ui->runButton->setEnabled(!running);
+    m_Ui->taskComboBox->setEnabled(!running);
+    m_Ui->settingsButton->setEnabled(!running);
+  };
+
+  setRunning(true);
   this->SetStatus("Running TotalSegmentator. This can take a while...");
   qApp->processEvents();
   if (self.isNull())
@@ -428,7 +441,7 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
     if (self.isNull())
       return;
     this->SetStatus(QString("Error: %1").arg(e.what()), true);
-    m_Ui->runButton->setEnabled(true);
+    setRunning(false);
     return;
   }
   catch (...)
@@ -436,20 +449,20 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
     if (self.isNull())
       return;
     this->SetStatus("An unknown error occurred while running TotalSegmentator.", true);
-    m_Ui->runButton->setEnabled(true);
+    setRunning(false);
     return;
   }
 
   if (self.isNull())
     return;
 
+  setRunning(false);
+
   // Re-fetch: the connected tool could have changed while the nested event loop
   // inside RunProcess was running.
   tool = this->GetTool();
   if (tool == nullptr)
     return;
-
-  m_Ui->runButton->setEnabled(true);
 
   auto preview = tool->GetPreviewSegmentation();
   if (preview != nullptr && !preview->GetAllLabelValues().empty())
@@ -470,7 +483,8 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
   }
 }
 
-bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, const std::vector<std::string>& args)
+bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, const std::vector<std::string>& args,
+  const mitk::TotalSegmentatorTool::RunControl& control)
 {
   // The executable is UTF-8 (set from ToQString(...).toStdString()) and is decoded
   // below with QString::fromStdString. The arguments include filesystem paths that
@@ -485,17 +499,11 @@ bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, con
   process.setProcessChannelMode(QProcess::MergedChannels); // progress is printed to stderr
 
   // No fixed timeout: a run can legitimately take many minutes (and download
-  // model weights on first use). Cancellation is offered through the dialog.
-  // Parent to the top-level window, not to this tool GUI: a tool change delivered
-  // during the nested event loop below can delete this GUI, and a child dialog on
-  // the stack would then be double-freed by the parent's child cleanup.
-  QProgressDialog dialog("Running TotalSegmentator...", "Cancel", 0, 0, this->window());
-  dialog.setWindowTitle("TotalSegmentator");
-  dialog.setWindowModality(Qt::WindowModal);
-  dialog.setMinimumDuration(0);
-
+  // model weights on first use). Cancellation is offered by the progress
+  // notification of the tool. Nothing below touches this GUI, which a tool
+  // change delivered during the nested event loop can delete.
   QEventLoop loop;
-  bool downloadingSeen = false;
+  bool downloading = false;
 
   QObject::connect(&process, &QProcess::readyRead, &process, [&]()
   {
@@ -503,17 +511,29 @@ bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, con
     MITK_INFO << chunk.toStdString();
 
     // The first weights download for a task can take minutes; say so instead of
-    // leaving the user staring at an unexplained wait.
-    if (!downloadingSeen && chunk.contains("Downloading", Qt::CaseInsensitive))
+    // leaving the user staring at an unexplained wait. A task of several parts
+    // downloads each of them, one after the other.
+    if (!downloading && chunk.contains("Downloading", Qt::CaseInsensitive))
     {
-      downloadingSeen = true;
-      dialog.setLabelText("Downloading model weights (first run for this task)...");
+      downloading = true;
+      control.SetPhase("TotalSegmentator: downloading model weights");
+    }
+    else if (downloading && chunk.contains("Download finished", Qt::CaseInsensitive))
+    {
+      downloading = false;
+      control.SetPhase("TotalSegmentator");
     }
   });
 
   QObject::connect(&process, &QProcess::finished, &loop, &QEventLoop::quit);
   QObject::connect(&process, &QProcess::errorOccurred, &loop, &QEventLoop::quit);
-  QObject::connect(&dialog, &QProgressDialog::canceled, &loop, &QEventLoop::quit);
+
+  QTimer stopPoll;
+  QObject::connect(&stopPoll, &QTimer::timeout, &loop, [&]()
+  {
+    if (control.IsStopRequested())
+      loop.quit();
+  });
 
   process.start(QString::fromStdString(executable), arguments);
 
@@ -524,7 +544,7 @@ bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, con
     return false;
   }
 
-  dialog.show();
+  stopPoll.start(100);
 
   // The process can finish between waitForStarted() and here; only enter the loop
   // while it is still running, otherwise quit() would never arrive.
@@ -533,7 +553,7 @@ bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, con
 
   if (process.state() != QProcess::NotRunning)
   {
-    // Cancelled: stop the still-running process.
+    // Cancelled, or the tool was deactivated: stop the still-running process.
     process.kill();
     process.waitForFinished(2000);
     return false;
@@ -544,8 +564,9 @@ bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, con
 
 void QmitkTotalSegmentatorToolGUI::SetStatus(const QString& message, bool isError)
 {
-  m_Ui->statusLabel->setText(message);
-  m_Ui->statusLabel->setStyleSheet(isError ? "color: red;" : QString());
+  // Errors of TotalSegmentator can contain angle brackets.
+  m_Ui->statusCard->SetMessage(message.toHtmlEscaped(), isError ? QmitkInfoCard::Severity::Error : QmitkInfoCard::Severity::Info);
+  m_Ui->statusCard->setVisible(!message.isEmpty());
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)

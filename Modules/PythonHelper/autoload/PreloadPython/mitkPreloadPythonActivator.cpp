@@ -77,6 +77,15 @@ namespace mitk
       UnsetEnv("PYTHONPATH");
       UnsetEnv("VIRTUAL_ENV");
 
+      // The GPUs that the tools offer are listed by nvidia-smi, which numbers
+      // them in the order of their PCI bus. CUDA numbers them fastest first
+      // unless told otherwise, so with GPUs of different models, the device
+      // picked from a list would not be the one that runs. Set before anything
+      // in the process initializes CUDA, and inherited by the processes that
+      // the tools start.
+      if (!GetEnv("CUDA_DEVICE_ORDER").has_value())
+        SetEnv("CUDA_DEVICE_ORDER", "PCI_BUS_ID");
+
 #if defined(_WIN32)
       AddPathEnv(pythonHome);
       AddPathEnv(pythonHome / "Scripts");

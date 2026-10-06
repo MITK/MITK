@@ -25,6 +25,7 @@ mitk::BinaryThresholdBaseTool::BinaryThresholdBaseTool()
     m_LowerThreshold(1),
     m_UpperThreshold(1)
 {
+  this->RequiresReferenceGeometryOn();
 }
 
 mitk::BinaryThresholdBaseTool::~BinaryThresholdBaseTool()

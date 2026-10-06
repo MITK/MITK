@@ -309,7 +309,7 @@ bool QmitkVoxTellToolGUI::Install()
     }
     catch (const mitk::Exception& e)
     {
-      this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), true);
+      this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), QmitkInfoCard::Severity::Error);
       return false;
     }
 
@@ -338,7 +338,7 @@ bool QmitkVoxTellToolGUI::Install()
   }
   catch (const mitk::Exception& e)
   {
-    this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), true);
+    this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), QmitkInfoCard::Severity::Error);
     return false;
   }
 
@@ -483,7 +483,7 @@ bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
         {
           this->SetStatus(result == QmitkVenvProcess::StepResult::Cancelled
             ? "The download of the text model was cancelled."
-            : "The text model could not be downloaded.", true);
+            : "The text model could not be downloaded.", QmitkInfoCard::Severity::Error);
 
           if (result == QmitkVenvProcess::StepResult::Failed)
             ShowDownloadError(window, output);
@@ -516,7 +516,7 @@ bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
     if (message.contains("out of memory", Qt::CaseInsensitive))
       message += " Try fewer prompts at once, or use the CPU in the VoxTell settings.";
 
-    this->SetStatus(message, true);
+    this->SetStatus(message, QmitkInfoCard::Severity::Error);
     return finish(false);
   }
 
@@ -630,7 +630,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
 
   if (enteredPrompts.empty())
   {
-    this->SetStatus("Enter at least one prompt, one per line.", true);
+    this->SetStatus("Enter at least one prompt, one per line.", QmitkInfoCard::Severity::Error);
     return;
   }
 
@@ -652,7 +652,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
   }
   catch (const mitk::Exception& e)
   {
-    this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), true);
+    this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), QmitkInfoCard::Severity::Error);
     return;
   }
 
@@ -738,7 +738,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     if (self.isNull())
       return;
 
-    this->SetStatus(QString("Error: %1").arg(e.what()), true);
+    this->SetStatus(QString("Error: %1").arg(e.what()), QmitkInfoCard::Severity::Error);
     this->UnloadIfSettingsChanged();
     return;
   }
@@ -784,14 +784,23 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
         return;
     }
 
-    if (!confirmFailed && !promptsWithoutResult.empty())
-      status += QString(" Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult));
+    auto severity = QmitkInfoCard::Severity::Info;
 
-    this->SetStatus(status, confirmFailed);
+    if (confirmFailed)
+    {
+      severity = QmitkInfoCard::Severity::Error;
+    }
+    else if (!promptsWithoutResult.empty())
+    {
+      status += QString(" Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult));
+      severity = QmitkInfoCard::Severity::Warning;
+    }
+
+    this->SetStatus(status, severity);
   }
   else if (!promptsWithoutResult.empty())
   {
-    this->SetStatus(QString("Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult)), true);
+    this->SetStatus(QString("Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult)), QmitkInfoCard::Severity::Error);
   }
   else if (const auto& error = tool->GetLastErrorMessage(); error.empty())
   {
@@ -805,7 +814,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     if (message.contains("out of memory", Qt::CaseInsensitive))
       message += " Try fewer prompts at once, or use the CPU in the VoxTell settings.";
 
-    this->SetStatus(message, true);
+    this->SetStatus(message, QmitkInfoCard::Severity::Error);
   }
 
   if (this->UnloadIfSettingsChanged())
@@ -877,10 +886,10 @@ void QmitkVoxTellToolGUI::UpdateInitializeButtonText()
   m_Ui->initializeButton->setText("Initialize");
 }
 
-void QmitkVoxTellToolGUI::SetStatus(const QString& message, bool isError)
+void QmitkVoxTellToolGUI::SetStatus(const QString& message, QmitkInfoCard::Severity severity)
 {
   // Prompts and errors from Python can contain angle brackets.
-  m_Ui->statusCard->SetMessage(message.toHtmlEscaped(), isError ? QmitkInfoCard::Severity::Error : QmitkInfoCard::Severity::Info);
+  m_Ui->statusCard->SetMessage(message.toHtmlEscaped(), severity);
 }
 
 void QmitkVoxTellToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)

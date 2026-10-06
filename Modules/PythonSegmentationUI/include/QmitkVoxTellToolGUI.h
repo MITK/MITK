@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkVoxTellToolGUI_h
 #define QmitkVoxTellToolGUI_h
 
+#include <QmitkInfoCard.h>
 #include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
 #include <QmitkVenvProcess.h>
 
@@ -132,7 +133,7 @@ private:
   /** \brief Sets the label of the Initialize button to what the next click does. */
   void UpdateInitializeButtonText();
 
-  void SetStatus(const QString& message, bool isError = false);
+  void SetStatus(const QString& message, QmitkInfoCard::Severity severity = QmitkInfoCard::Severity::Info);
 
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event);
 

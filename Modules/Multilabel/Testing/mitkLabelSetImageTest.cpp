@@ -901,18 +901,33 @@ public:
 
   void TestIsEmpty()
   {
-    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    // 128 * 128 * 100 voxels per time step, so that the scan is split into a block of 2^20 voxels and a shorter one.
+    auto referenceImage = mitk::Image::New();
+    unsigned int dimensions[4] = { 128, 128, 100, 2 };
+    referenceImage->Initialize(mitk::MakeScalarPixelType<char>(), 4, dimensions);
+
+    auto segmentation = mitk::MultiLabelSegmentation::New();
+    segmentation->Initialize(referenceImage);
+    segmentation->AddLabel(mitk::Label::New(5, "Target"), 0);
     auto* groupImage = segmentation->GetGroupImage(0);
 
     CPPUNIT_ASSERT_MESSAGE("Label without pixels is not empty", segmentation->IsEmpty(5, 0));
     CPPUNIT_ASSERT_MESSAGE("Label without pixels is not empty at time step 1", segmentation->IsEmpty(5, 1));
 
-    // The last voxel of the time step, so that a scan that stops early misses it.
-    PaintBox(groupImage, 1, { 95, 127, 51 }, { 95, 127, 51 }, 5);
+    // The last voxel of the first block, the first voxel of the second block, and the last voxel of the time step.
+    const std::array<std::array<std::size_t, 3>, 3> voxels = { { { 127, 127, 63 }, { 0, 0, 64 }, { 127, 127, 99 } } };
 
-    CPPUNIT_ASSERT_MESSAGE("Label is not empty at time step 0 although only time step 1 was painted", segmentation->IsEmpty(5, 0));
-    CPPUNIT_ASSERT_MESSAGE("Label with a pixel is empty", !segmentation->IsEmpty(5, 1));
-    CPPUNIT_ASSERT_MESSAGE("Label overload disagrees with the value overload", !segmentation->IsEmpty(segmentation->GetLabel(5), 1));
+    for (const auto& voxel : voxels)
+    {
+      PaintBox(groupImage, 1, voxel, voxel, 5);
+
+      CPPUNIT_ASSERT_MESSAGE("Label is not empty at time step 0 although only time step 1 was painted", segmentation->IsEmpty(5, 0));
+      CPPUNIT_ASSERT_MESSAGE("Label with a pixel is empty", !segmentation->IsEmpty(5, 1));
+      CPPUNIT_ASSERT_MESSAGE("Label overload disagrees with the value overload", !segmentation->IsEmpty(segmentation->GetLabel(5), 1));
+
+      PaintBox(groupImage, 1, voxel, voxel, mitk::MultiLabelSegmentation::UNLABELED_VALUE);
+    }
+
     CPPUNIT_ASSERT_THROW(segmentation->IsEmpty(5, 2), mitk::Exception);
   }
 

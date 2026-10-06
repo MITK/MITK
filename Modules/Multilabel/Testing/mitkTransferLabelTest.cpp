@@ -46,6 +46,7 @@ class mitkTransferLabelTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransfer_multipleLabels_AtTimeStep);
   MITK_TEST(TestTransfer_SubGeometry_Merge);
   MITK_TEST(TestTransfer_SubGeometry_Replace);
+  MITK_TEST(TestTransfer_SubGeometry_EveryVoxel);
   MITK_TEST(TestTransfer_SubGeometry_Replace_LockedBackground);
   MITK_TEST(TestTransfer_SameImage_NoChaining);
   MITK_TEST(TestTransfer_RepeatedMapping);
@@ -584,14 +585,17 @@ public:
         std::fill_n(pixels + (z * sizeY + y) * sizeX + first[0], last[0] - first[0] + 1, value);
   }
 
-  /** A 3D label image of the given size with the default geometry, unlabeled except for the cube from first to last. */
-  static mitk::Image::Pointer CreateLabelImage(unsigned int size, const Index& first, const Index& last, mitk::Label::PixelType value)
+  /** A 3D label image of the given size with the default geometry, unlabeled except for the box from first to last. */
+  static mitk::Image::Pointer CreateLabelImage(const Index& size, const Index& first, const Index& last, mitk::Label::PixelType value)
   {
     auto image = mitk::Image::New();
-    unsigned int dimensions[3] = { size, size, size };
+    unsigned int dimensions[3];
+    for (unsigned int d = 0; d < 3; ++d)
+      dimensions[d] = static_cast<unsigned int>(size[d]);
+
     image->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
 
-    FillBox(image, { 0, 0, 0 }, { size - 1, size - 1, size - 1 }, mitk::MultiLabelSegmentation::UNLABELED_VALUE);
+    FillBox(image, { 0, 0, 0 }, { size[0] - 1, size[1] - 1, size[2] - 1 }, mitk::MultiLabelSegmentation::UNLABELED_VALUE);
     FillBox(image, first, last, value);
 
     return image;
@@ -599,11 +603,13 @@ public:
 
   static constexpr Index SubSourceOffset = { 5, 7, 9 };
 
-  /** A source of 10^3 voxels that lies at SubSourceOffset in the default 40^3 segmentation. Its inner cube from
-   * (2, 2, 2) to (7, 7, 7) is marked with 1. */
+  /** A source of 10x12x14 voxels that lies at SubSourceOffset in the default 40^3 segmentation. The box from
+   * (2, 3, 4) to (6, 9, 11) and the last voxel are marked with 1. Unequal sizes and an off-center box let
+   * mixed-up axes or strides show. */
   static mitk::Image::Pointer CreateSubSource()
   {
-    auto source = CreateLabelImage(10, { 2, 2, 2 }, { 7, 7, 7 }, 1);
+    auto source = CreateLabelImage({ 10, 12, 14 }, { 2, 3, 4 }, { 6, 9, 11 }, 1);
+    FillBox(source, { 9, 11, 13 }, { 9, 11, 13 }, 1);
 
     mitk::Point3D origin;
     for (unsigned int d = 0; d < 3; ++d)
@@ -616,13 +622,14 @@ public:
   /** Destination for the sub source tests: the voxel values at the returned indices probe the transfer rules. */
   struct SubGeometryProbes
   {
-    Index MarkedLocked = { 8, 10, 12 };      // source (3, 3, 3), locked label 1
-    Index MarkedUnlocked = { 9, 10, 12 };    // source (4, 3, 3), unlocked label 2
-    Index MarkedUnlabeled = { 7, 9, 11 };    // source (2, 2, 2), unlabeled
-    Index UnmarkedTarget = { 6, 8, 10 };     // source (1, 1, 1), target label 3
-    Index OutsideTarget = { 30, 30, 30 };    // beyond the source, target label 3
-    Index OutsideOther = { 30, 31, 30 };     // beyond the source, label 2
-    Index LastSourceVoxel = { 14, 16, 18 };  // source (9, 9, 9), unlabeled
+    Index MarkedLocked = { 8, 11, 14 };         // source (3, 4, 5), locked label 1
+    Index MarkedUnlocked = { 9, 11, 14 };       // source (4, 4, 5), unlocked label 2
+    Index MarkedUnlabeled = { 7, 10, 13 };      // source (2, 3, 4), unlabeled
+    Index UnmarkedTarget = { 6, 8, 10 };        // source (1, 1, 1), target label 3
+    Index OutsideTarget = { 30, 30, 30 };       // beyond the source, target label 3
+    Index OutsideOther = { 30, 31, 30 };        // beyond the source, label 2
+    Index LastSourceVoxel = { 14, 18, 22 };     // source (9, 11, 13), unlabeled
+    Index PastLastSourceVoxel = { 15, 18, 22 }; // beyond the source, unlabeled
   };
 
   static mitk::MultiLabelSegmentation::Pointer CreateSubGeometryDestination(const SubGeometryProbes& probes)
@@ -668,8 +675,10 @@ public:
       mitk::Label::PixelType(3), GetPixel(groupImage, 0, probes.OutsideTarget));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Another label beyond the source was changed",
       mitk::Label::PixelType(2), GetPixel(groupImage, 0, probes.OutsideOther));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel under the last source voxel was changed",
-      mitk::Label::PixelType(0), GetPixel(groupImage, 0, probes.LastSourceVoxel));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel under the last source voxel was not assigned",
+      mitk::Label::PixelType(3), GetPixel(groupImage, 0, probes.LastSourceVoxel));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel past the last source voxel was changed",
+      mitk::Label::PixelType(0), GetPixel(groupImage, 0, probes.PastLastSourceVoxel));
   }
 
   void TestTransfer_SubGeometry_Replace()
@@ -692,6 +701,59 @@ public:
       mitk::Label::PixelType(0), GetPixel(groupImage, 0, probes.OutsideTarget));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Another label beyond the source was changed",
       mitk::Label::PixelType(2), GetPixel(groupImage, 0, probes.OutsideOther));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel under the last source voxel was not assigned",
+      mitk::Label::PixelType(3), GetPixel(groupImage, 0, probes.LastSourceVoxel));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel past the last source voxel was changed",
+      mitk::Label::PixelType(0), GetPixel(groupImage, 0, probes.PastLastSourceVoxel));
+  }
+
+  void TestTransfer_SubGeometry_EveryVoxel()
+  {
+    auto segmentation = CreateSurfaceTestSegmentation(1);
+    const auto* groupImage = segmentation->GetGroupImage(0);
+    const auto source = CreateSubSource();
+
+    TransferSubSource(segmentation, mitk::MultiLabelSegmentation::MergeStyle::Merge, false);
+
+    mitk::ImageReadAccessor sourceAccessor(source);
+    mitk::ImageReadAccessor destinationAccessor(groupImage);
+    const auto* sourcePixels = static_cast<const mitk::Label::PixelType*>(sourceAccessor.GetData());
+    const auto* destinationPixels = static_cast<const mitk::Label::PixelType*>(destinationAccessor.GetData());
+
+    const Index sourceSize = { source->GetDimension(0), source->GetDimension(1), source->GetDimension(2) };
+    const Index destinationSize = { groupImage->GetDimension(0), groupImage->GetDimension(1), groupImage->GetDimension(2) };
+
+    for (std::size_t z = 0; z < destinationSize[2]; ++z)
+    {
+      for (std::size_t y = 0; y < destinationSize[1]; ++y)
+      {
+        for (std::size_t x = 0; x < destinationSize[0]; ++x)
+        {
+          const Index index = { x, y, z };
+          bool marked = true;
+          std::size_t sourceLinearIndex = 0;
+
+          for (int d = 2; d >= 0; --d)
+          {
+            if (index[d] < SubSourceOffset[d] || index[d] >= SubSourceOffset[d] + sourceSize[d])
+              marked = false;
+            else
+              sourceLinearIndex = sourceLinearIndex * sourceSize[d] + (index[d] - SubSourceOffset[d]);
+          }
+
+          marked = marked && 1 == sourcePixels[sourceLinearIndex];
+
+          const auto expected = mitk::Label::PixelType(marked ? 3 : 0);
+          const auto actual = destinationPixels[(z * destinationSize[1] + y) * destinationSize[0] + x];
+
+          if (expected != actual)
+          {
+            CPPUNIT_FAIL("Wrong value at (" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) +
+              "): " + std::to_string(actual) + " instead of " + std::to_string(expected));
+          }
+        }
+      }
+    }
   }
 
   void TestTransfer_SubGeometry_Replace_LockedBackground()
@@ -737,7 +799,7 @@ public:
     const auto* groupImage = segmentation->GetGroupImage(0);
     const Index marked = { 20, 20, 20 };
 
-    mitk::TransferLabelContentAtTimeStep(CreateLabelImage(40, marked, marked, 2), segmentation->GetGroupImage(0),
+    mitk::TransferLabelContentAtTimeStep(CreateLabelImage({ 40, 40, 40 }, marked, marked, 2), segmentation->GetGroupImage(0),
       segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(0)), 0,
       mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, { {2, 3}, {2, 3} });
 
@@ -769,7 +831,7 @@ public:
     const auto* groupImage = segmentation->GetGroupImage(0);
     const Index marked = { 20, 20, 20 };
 
-    mitk::TransferLabelContentAtTimeStep(CreateLabelImage(40, marked, marked, 1), segmentation->GetGroupImage(0),
+    mitk::TransferLabelContentAtTimeStep(CreateLabelImage({ 40, 40, 40 }, marked, marked, 1), segmentation->GetGroupImage(0),
       segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(0)), 1,
       mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, { {1, 3} });
 
@@ -784,7 +846,7 @@ public:
     auto segmentation = CreateSurfaceTestSegmentation(1);
     auto* groupImage = segmentation->GetGroupImage(0);
     const auto labels = segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(0));
-    const auto source = CreateLabelImage(40, { 20, 20, 20 }, { 20, 20, 20 }, 1);
+    const auto source = CreateLabelImage({ 40, 40, 40 }, { 20, 20, 20 }, { 20, 20, 20 }, 1);
 
     CPPUNIT_ASSERT_THROW_MESSAGE("A source label mapped to two targets was accepted",
       mitk::TransferLabelContentAtTimeStep(source, groupImage, labels, 0, 0, 0, false, { {1, 2}, {1, 3} }), mitk::Exception);

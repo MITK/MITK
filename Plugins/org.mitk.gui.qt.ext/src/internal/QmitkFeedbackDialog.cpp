@@ -562,7 +562,8 @@ void QmitkFeedbackDialog::OnOpenEmail()
   this->WriteBundleThen([this](const QString& zipPath, const mitk::FeedbackReport& report) {
     const auto fields = mitk::BuildMailFields(report, QFileInfo(zipPath).fileName().toStdString());
 
-    const auto url = QUrl::fromEncoded("mailto:" + EncodeQueryValue(fields.recipient) + "?subject=" +
+    // The address is used as is: mail clients differ in decoding "%40".
+    const auto url = QUrl::fromEncoded("mailto:" + QByteArray::fromStdString(fields.recipient) + "?subject=" +
       EncodeQueryValue(fields.subject) + "&body=" + EncodeQueryValue(fields.body));
 
     if (!QDesktopServices::openUrl(url))

@@ -163,7 +163,8 @@
 	the rest of the window's furniture - as one frame when the pointer approaches an
 	edge, without resizing the render window. It takes the place of the Standard
 	Display's built-in render-window menu: the crosshair and full-screen gestures that
-	menu offered are buttons of this strip.
+	menu offered are buttons of this strip. Its crosshair rotation modes are not offered in
+	the MxN Display.
 
 	The buttons sit together at the leading edge and the sync barcode reads as state at
 	the trailing edge, with only the maximize button beyond it, in the corner where a

@@ -194,9 +194,9 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   }
 
   // Only a change of the preference itself overrides the interaction scheme, so
-  // that the PACS tool or the crosshair rotation mode the user picked survives
-  // unrelated preference edits. A change that the active scheme already agrees
-  // with is no reason to reset it either.
+  // that the PACS tool the user picked survives unrelated preference edits. A
+  // change that the active scheme already agrees with is no reason to reset it
+  // either.
   const bool pacsInteraction = preferences->GetBool("PACS like mouse interaction", false);
   const bool preferenceChanged = m_Impl->m_PACSInteraction != pacsInteraction;
   m_Impl->m_PACSInteraction = pacsInteraction;

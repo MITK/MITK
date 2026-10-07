@@ -1197,8 +1197,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // maximize and layout-document state.
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
-  connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
-  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 
   // The cell's sync barcode toggles the editor-wide layout editor; the view
   // hosting it lives above this module, so the request is only relayed.

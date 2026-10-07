@@ -15,9 +15,11 @@
 #! the generated zip file is appended at the end of the target file. In LINK mode, the
 #! zip file is compiled / linked into the target using platform specific techniques. LINK
 #! mode is necessary if certain tools make additional assumptions about the object layout
-#! of the target file (e.g. codesign on MacOS). LINK mode may result in slower module
-#! initialization and bigger object files. The default mode is LINK mode on MacOS and
-#! APPEND mode on all other platforms.
+#! of the target file (e.g. codesign on MacOS, or strip, which discards everything behind
+#! the ELF structure). The runtime locates the zip archive by scanning the target file
+#! from its end, so both layouts are read by the same code and may be mixed freely within
+#! one process. The default mode is chosen by usFunctionCheckResourceLinking: LINK where
+#! it is available, APPEND on Windows.
 #!
 #! Example usage:
 #! \code{.cmake}
@@ -150,7 +152,7 @@ function(usFunctionEmbedResources)
       add_custom_command(
         OUTPUT ${_source_output}
         COMMAND ${CMAKE_LINKER} -r -b binary -o ${_source_output} ${_zip_archive_name}
-        COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
+        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.rodata,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"

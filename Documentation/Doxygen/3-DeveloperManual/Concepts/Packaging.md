@@ -594,29 +594,19 @@ START file://@EXECUTABLE_DIR/plugins/liborg_mitk_gui_qt_common.so
 
 ## CppMicroServices Resource Embedding {#CppMicroServicesResourcesSection}
 
-CppMicroServices allows modules to embed resources (XML descriptors, icons, etc.) as ZIP archives inside the shared library file itself. This mechanism has a direct impact on packaging because it constrains whether binaries can be stripped.
+CppMicroServices allows modules to embed resources (XML descriptors, icons, etc.) as ZIP archives inside the shared library file itself. Where that archive sits in the file decides whether the binary can be stripped.
 
 ### Two Embedding Modes: APPEND vs LINK
 
-The `usFunctionEmbedResources()` function in `Modules/CppMicroServices/cmake/usFunctionEmbedResources.cmake` supports two modes:
+The `usFunctionEmbedResources()` function in `CMake/usFunctionEmbedResources.cmake` supports two modes:
 
-**APPEND mode** (default on Windows and Linux):
+**APPEND mode** (default on Windows):
 
-The ZIP archive is literally appended as raw bytes **after** the end of the ELF/PE binary structure:
+The ZIP archive is appended as raw bytes **after** the end of the PE or ELF binary structure by `usResourceCompiler --append` in a post-build step of the target.
 
-```cmake
-add_custom_command(
-  TARGET ${US_RESOURCE_TARGET}
-  POST_BUILD
-  COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${_zip_archive}
-  ...)
-```
+**LINK mode** (default on Linux and macOS):
 
-The `usResourceCompiler` opens the shared library in binary append mode and writes the ZIP at the end. At runtime, CppMicroServices uses the miniz library to search for the ZIP central directory signature from the end of the file — standard ZIP behavior that works even when the ZIP is concatenated after other data.
-
-**LINK mode** (default on macOS):
-
-The ZIP archive is compiled into a proper object file section using platform-specific linker techniques:
+The ZIP archive becomes part of a regular section of the binary using platform-specific linker techniques:
 
 | Platform | Technique | Section |
 |---|---|---|
@@ -626,37 +616,32 @@ The ZIP archive is compiled into a proper object file section using platform-spe
 
 The resulting `.o` or `.rc` file is linked into the target as a regular object file, making the ZIP part of the binary's official section table.
 
+At runtime, CppMicroServices does not care which mode produced a module. It opens the module file, scans backwards from the end of the file for the ZIP end-of-central-directory record and derives the archive start from the offsets stored in it. Appended and linked modules therefore mix freely within one process, and modules of external projects built in either mode keep working.
+
 ### Default Mode Selection
 
-`usFunctionCheckResourceLinking.cmake` determines the defaults:
+`usFunctionCheckResourceLinking.cmake` detects on every configure whether linking is available (`ld -r -b binary` plus `objcopy` on Linux, `-sectcreate` on macOS, the resource compiler on Windows) and sets `US_DEFAULT_RESOURCE_MODE`:
 
-- **macOS**: LINK mode (required because `codesign` validates the binary structure and rejects appended data)
-- **Windows**: APPEND mode (even though LINK is available via RC compiler)
-- **Linux**: APPEND mode (even though LINK is available via `ld -r -b binary`)
+- **Linux and macOS**: LINK mode. On macOS `codesign` rejects appended data, on Linux `strip` discards it.
+- **Windows**: APPEND mode. The resource-compiler path exists but has not been verified in MITK yet.
 
-The check sets `US_DEFAULT_RESOURCE_MODE` and `US_RESOURCE_LINKING_AVAILABLE` as cache variables.
+Individual targets can still pass `APPEND` or `LINK` to `usFunctionEmbedResources()`.
+
+The mode and the suffix of the generated resource source (`us_resources.o` in LINK mode, `us_resources.cpp` in APPEND mode) have to agree, which is why both are recomputed together on every configure instead of being read from the cache. Switching only one of them, for example by passing `LINK` to `usFunctionEmbedResources()` while the module still lists the source returned by `usFunctionGetResourceSource()` without a mode, leaves a stale stub in the target: it compiles, the resource object is never linked, and every resource is silently missing.
+
+An existing build tree picks a changed default up on its next configure. The resource-bearing modules relink; with the Makefile generators the ones using a precompiled header also recompile once, because their flags file changes.
 
 ### Why Stripping Breaks APPEND Mode
 
-When `strip` processes an ELF binary, it rewrites the file based on the ELF headers' recorded sections. Everything beyond the official ELF structure — including the appended ZIP archive — is discarded. The stripped binary loads fine, but all CppMicroServices resources are gone, causing runtime failures when modules try to access their embedded resources.
+When `strip` processes an ELF binary, it rewrites the file based on the section and program headers. Everything beyond that structure, including an appended ZIP archive, is discarded. The stripped binary loads fine, but all CppMicroServices resources are gone. Distribution packaging tools such as `dh_strip` and `brp-strip` strip unconditionally, so CPack settings alone cannot prevent this.
 
-LINK mode survives stripping because the ZIP is stored inside a proper ELF section (`.rodata`). The `strip` command preserves allocated sections like `.rodata` since they are needed at runtime.
+LINK mode survives stripping because the archive sits in `.rodata`, an allocated section that `strip` has to keep.
 
-### Current Impact and Future Improvement
+On Linux the linked resource object has no `.note.GNU-stack` section, which older linkers take as a request for an executable stack. `usFunctionEmbedResources()` therefore passes `-z noexecstack` to the consuming target: glibc 2.41 and newer refuse to `dlopen` a shared object that requires an executable stack.
 
-Because MITK uses APPEND mode on Windows and Linux (the default), `CPACK_STRIP_FILES` must be set to `OFF` in `mitkSetupCPack.cmake`. This means **all** binaries in the package are unstripped, resulting in significantly larger packages.
+### Cost of LINK Mode
 
-A future improvement would be to switch CppMicroServices resource embedding to **LINK mode on all platforms**. This would:
-
-1. Allow re-enabling `CPACK_STRIP_FILES ON` to strip debug symbols from all binaries
-2. Eliminate the fragile dependency on file-append ordering
-3. Align all platforms with the same embedding strategy
-
-The trade-off documented in the CppMicroServices source is that LINK mode "may result in slower module initialization and bigger object files." In practice, the initialization overhead is negligible, and the object file size increase is far outweighed by the package size savings from being able to strip debug symbols.
-
-To switch, set `US_DEFAULT_RESOURCE_MODE` to `"LINK"` for all platforms in `usFunctionCheckResourceLinking.cmake`, or pass `LINK` explicitly in each `usFunctionEmbedResources()` call.
-
-However, first tests on Windows and Linux revealed, that the LINK mode seems to be broken on these platforms.
+The archive sits in front of the sections that follow `.rodata` (`.eh_frame`, `.data.rel.ro` and, in unstripped binaries, the symbol tables), so the backward scan reads a few megabytes more per resource-bearing module than in APPEND mode, where the archive is the last thing in the file. Modules without resources have always been scanned completely. Loading the Core module together with its autoload modules takes roughly ten percent longer on Linux with a warm page cache.
 
 ## Changes from Legacy System
 

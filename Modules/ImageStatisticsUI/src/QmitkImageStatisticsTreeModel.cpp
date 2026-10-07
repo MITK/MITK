@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <functional>
 #include <iterator>
 #include <map>
+#include <set>
 #include <variant>
 
 namespace
@@ -140,6 +141,39 @@ namespace
     std::transform(maxAbsValues.cbegin(), maxAbsValues.cend(), std::back_inserter(decimals), GetDecimals);
 
     return decimals;
+  }
+
+  /** Images without scalar pixel values, e.g. RGB images, only get a few statistics. Columns
+  are therefore offered for the statistics that at least one container holds, in the order of
+  mitk::GetAllStatisticNames(). While statistics are still being computed, it is not known yet
+  which ones they will hold, so all statistics are offered then. */
+  std::vector<std::string> GetOfferedStatisticNames(const std::vector<mitk::ImageStatisticsContainer::ConstPointer>& statistics)
+  {
+    auto names = mitk::GetAllStatisticNames(statistics);
+    std::set<std::string> existingNames;
+
+    for (const auto& container : statistics)
+    {
+      if (container->IsWIP())
+        return names;
+
+      for (const auto labelValue : container->GetExistingLabelValues())
+      {
+        for (const auto timeStep : container->GetExistingTimeSteps(labelValue))
+        {
+          const auto keys = container->GetStatistics(labelValue, timeStep).GetExistingStatisticNames();
+          existingNames.insert(keys.cbegin(), keys.cend());
+        }
+      }
+    }
+
+    // Failed computations hold no statistics either.
+    if (existingNames.empty())
+      return names;
+
+    std::erase_if(names, [&existingNames](const std::string& name) { return !existingNames.contains(name); });
+
+    return names;
   }
 
   /** Formats a statistic value for display in the locale of the user. Anything but a number,
@@ -659,7 +693,7 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
     std::lock_guard<std::mutex> locked(m_Mutex);
     m_Statistics = newStatistics;
 
-    m_StatisticNames = mitk::GetAllStatisticNames(m_Statistics);
+    m_StatisticNames = GetOfferedStatisticNames(m_Statistics);
     BuildHierarchicalModel();
     m_BuildTime.Modified();
   }

@@ -29,6 +29,8 @@ found in the LICENSE file.
 #include <QIcon>
 #include <QLocale>
 
+#include <optional>
+
 class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkImageStatisticsTreeModelTestSuite);
@@ -56,6 +58,9 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(Values_AreFormattedForReadingAndAvailableUnformatted);
   MITK_TEST(Values_ShareTheDecimalPlacesOfTheirColumn);
   MITK_TEST(RoundedValue_ToolTipShowsItUnrounded);
+  MITK_TEST(ImageWithFewStatistics_OnlyTheseAreOffered);
+  MITK_TEST(ImagesWithDifferentStatistics_StatisticsOfAllAreOffered);
+  MITK_TEST(StatisticsBeingComputed_AllStatisticsAreOffered);
   CPPUNIT_TEST_SUITE_END();
 
   QLocale m_DefaultLocale;
@@ -142,10 +147,14 @@ public:
     minPosition[1] = 2;
     minPosition[2] = 3;
 
+    // The model only offers columns for statistics that exist, and the header tests need these.
     mitk::ImageStatisticsContainer::ImageStatisticsObject statistics;
     statistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), mean);
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), 0.25);
     statistics.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(),
       static_cast<mitk::ImageStatisticsContainer::VoxelCountType>(999));
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::VOLUME(), 999.0);
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::MPP(), mean);
     statistics.AddStatistic(mitk::ImageStatisticsConstants::MINIMUMPOSITION(), minPosition);
     // Stands for the statistics other modules contribute, which the model knows nothing about.
     statistics.AddStatistic("CustomStat", 0.5);
@@ -170,6 +179,55 @@ public:
     this->AddStatistics(m_Image, mask, mean);
 
     return maskNode;
+  }
+
+  /** Adds a node for a new image, for which statistics without mask can be added. */
+  mitk::DataNode::Pointer AddImageNode(const std::string& name)
+  {
+    auto imageNode = mitk::DataNode::New();
+    imageNode->SetData(CreateTestImage());
+    imageNode->SetName(name);
+    m_DataStorage->Add(imageNode);
+
+    return imageNode;
+  }
+
+  /** Adds statistics without mask for the image of the passed node. Without statistics
+  object, the container is the placeholder of statistics that are still being computed. */
+  void AddUnmaskedStatistics(const mitk::DataNode* imageNode,
+    const std::optional<mitk::ImageStatisticsContainer::ImageStatisticsObject>& statistics)
+  {
+    const auto* image = dynamic_cast<const mitk::Image*>(imageNode->GetData());
+
+    auto container = mitk::ImageStatisticsContainer::New();
+    container->SetTimeGeometry(image->GetTimeGeometry()->Clone());
+    container->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
+    container->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
+
+    if (statistics.has_value())
+    {
+      container->SetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0, *statistics);
+    }
+    else
+    {
+      container->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(),
+        mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
+    }
+
+    mitk::StatisticsToImageRelationRule::New()->Connect(container.GetPointer(), image);
+
+    m_DataStorage->Add(mitk::CreateImageStatisticsNode(container, "statistics"));
+  }
+
+  /** The statistics of an image without scalar pixel values, e.g. an RGB image. */
+  static mitk::ImageStatisticsContainer::ImageStatisticsObject CreateVoxelCountStatistics()
+  {
+    mitk::ImageStatisticsContainer::ImageStatisticsObject statistics;
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(),
+      static_cast<mitk::ImageStatisticsContainer::VoxelCountType>(1000));
+    statistics.AddStatistic(mitk::ImageStatisticsConstants::VOLUME(), 1000.0);
+
+    return statistics;
   }
 
   static mitk::Label::PixelType AddLabel(mitk::MultiLabelSegmentation* mask, const std::string& name, mitk::MultiLabelSegmentation::GroupIndexType groupID)
@@ -800,6 +858,77 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("1234.57"), Text(model, mean));
     CPPUNIT_ASSERT_EQUAL(std::string("1234.56789"),
       model.data(mean, Qt::ToolTipRole).toString().toStdString());
+  }
+
+  void ImageWithFewStatistics_OnlyTheseAreOffered()
+  {
+    auto imageNode = this->AddImageNode("RGB image");
+    this->AddUnmaskedStatistics(imageNode, CreateVoxelCountStatistics());
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ imageNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL(3, model.columnCount());
+    CPPUNIT_ASSERT_EQUAL(1, ColumnOf(model, QStringLiteral("Voxels")));
+    CPPUNIT_ASSERT_EQUAL(2, ColumnOf(model, QStringLiteral("Volume [mm³]")));
+    CPPUNIT_ASSERT_EQUAL(std::string("1000"), Text(model, model.index(0, 1)));
+  }
+
+  void ImagesWithDifferentStatistics_StatisticsOfAllAreOffered()
+  {
+    auto rgbImageNode = this->AddImageNode("RGB image");
+    this->AddUnmaskedStatistics(rgbImageNode, CreateVoxelCountStatistics());
+
+    mitk::ImageStatisticsContainer::ImageStatisticsObject scalarStatistics;
+    scalarStatistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), 2.0);
+    scalarStatistics.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), 3.0);
+
+    auto scalarImageNode = this->AddImageNode("Scalar image");
+    this->AddUnmaskedStatistics(scalarImageNode, scalarStatistics);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ rgbImageNode.GetPointer(), scalarImageNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: unexpected number of image rows.", 2, model.rowCount());
+
+    CPPUNIT_ASSERT_EQUAL(5, model.columnCount());
+    CPPUNIT_ASSERT_EQUAL(1, ColumnOf(model, QStringLiteral("Mean")));
+    CPPUNIT_ASSERT_EQUAL(2, ColumnOf(model, QStringLiteral("Median")));
+    CPPUNIT_ASSERT_EQUAL(3, ColumnOf(model, QStringLiteral("Voxels")));
+    CPPUNIT_ASSERT_EQUAL(4, ColumnOf(model, QStringLiteral("Volume [mm³]")));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A statistic the image does not have must be left empty.",
+      std::string(), Text(model, model.index(0, 1)));
+  }
+
+  void StatisticsBeingComputed_AllStatisticsAreOffered()
+  {
+    const auto allColumns = 1 + static_cast<int>(mitk::ImageStatisticsContainer::ImageStatisticsObject::GetDefaultStatisticNames().size());
+
+    auto rgbImageNode = this->AddImageNode("RGB image");
+    this->AddUnmaskedStatistics(rgbImageNode, std::nullopt);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ rgbImageNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: the placeholder was not picked up.",
+      std::string("..."), Text(model, model.index(0, 1)));
+    CPPUNIT_ASSERT_EQUAL(allColumns, model.columnCount());
+
+    // The statistics of another image must not shrink the columns before all are known.
+    this->AddUnmaskedStatistics(rgbImageNode, CreateVoxelCountStatistics());
+
+    auto scalarImageNode = this->AddImageNode("Scalar image");
+    this->AddUnmaskedStatistics(scalarImageNode, std::nullopt);
+
+    model.SetImageNodes({ rgbImageNode.GetPointer(), scalarImageNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: the result was not picked up.",
+      std::string("1000"), Text(model, model.index(0, ColumnOf(model, QStringLiteral("Voxels")))));
+    CPPUNIT_ASSERT_EQUAL(allColumns, model.columnCount());
   }
 };
 
